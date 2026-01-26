@@ -2,61 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Scarlett Empire OS - FULL DEV-KIT v4.7</title>
+    <title>Scarlett Empire OS - MASTER BUILD 5.0</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <div id="dev-container">
-        <div class="hud-header">SCARLETT ENGINE SDK v4.7</div>
-        
-        <div class="debug-pane">
-            <div class="pane-title">🛰️ SYSTEM TELEMETRY</div>
-            <div class="stat">POS: <span id="val-pos">0 0 0</span></div>
-            <div class="stat">FPS: <span id="val-fps">60</span></div>
-            <div class="stat">INPUT: <span id="val-input">SCANNING</span></div>
-            <div class="stat">MEMORY: <span id="val-mem">STABLE</span></div>
-        </div>
-
-        <div class="debug-pane">
-            <div class="pane-title">🧬 MODULE STATUS (/js/scarlett-one/)</div>
-            <div class="stat">POKER_CORE: <span id="status-poker" class="led-off">●</span></div>
-            <div class="stat">STORE_MOD: <span id="status-store" class="led-off">●</span></div>
-            <div class="stat">AUDIO_DRIVE: <span id="status-audio" class="led-off">●</span></div>
-        </div>
-
-        <div class="debug-pane">
-            <div class="pane-title">🎮 COMMAND CENTER</div>
-            <button class="sdk-btn" onclick="SDK.toggleMesh()">💠 TOGGLE WIREFRAME</button>
-            <button class="sdk-btn" onclick="scarlettModule.dealFlop()">🎴 FORCE DEAL</button>
-            <button class="sdk-btn" onclick="scarlettModule.toggleRadio()">📻 RADIO PKG</button>
-            <button class="sdk-btn" onclick="SDK.showHitboxes()">📦 HITBOXES</button>
-            <button class="sdk-btn reset" onclick="location.reload()">☢️ CORE RESET</button>
-        </div>
-        
-        <button id="hide-hud-btn" onclick="SDK.toggleHUD()">HIDE DEBUGGER [H]</button>
+    <div id="dev-hud">
+        <div class="hud-header">SCARLETT_SDK_v5.0</div>
+        <div class="stat-row">XYZ: <span id="val-pos">0 1.6 0</span></div>
+        <div class="stat-row">INPUT: <span id="val-input">SCANNING</span></div>
+        <div class="stat-row">MODULE: <span id="mod-load" style="color:#ff4444">OFFLINE</span></div>
+        <hr>
+        <button class="sdk-btn" onclick="scarlettModule.dealFlop()">🎴 DEAL FLOP</button>
+        <button class="sdk-btn" onclick="scarlettModule.spawnStore()">🛒 JUNGLE STORE</button>
+        <button class="sdk-btn" onclick="SDK.toggleWireframe()">💠 WIREFRAME</button>
+        <button class="sdk-btn reset" onclick="location.reload()">☢️ CORE REBOOT</button>
     </div>
 
-    <div id="virtual-joystick-zone"></div>
-
-    <a-scene id="main-scene" renderer="antialias: true; exposure: 1.6; colorManagement: true;" 
-             stats-in-vr="false" 
-             inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
-        
+    <a-scene renderer="antialias: true; exposure: 1.6; colorManagement: true;">
         <a-assets>
             <img id="concrete" src="assets/textures/concrete.jpg">
             <img id="logo" src="assets/textures/casino_art_2.png">
+            <canvas id="jumboCanvas" width="1024" height="512"></canvas>
         </a-assets>
 
-        <a-entity id="world-spine">
+        <a-entity id="arena-geometry">
             <a-circle rotation="-90 0 0" radius="60" src="#concrete" repeat="15 15"></a-circle>
-            <a-cylinder radius="60" height="20" side="double" src="#concrete" open-ended="true" repeat="12 4" position="0 10 0">
+            <a-cylinder radius="60" height="20" side="double" src="#concrete" open-ended="true" position="0 10 0">
                 <a-ring rotation="-90 0 0" position="0 9.9 0" radius-inner="59.7" radius-outer="60.3" color="#A020F0" material="emissive:#A020F0; emissiveIntensity:30"></a-ring>
                 <a-ring rotation="-90 0 0" position="0 -9.9 0" radius-inner="59.7" radius-outer="60.3" color="#A020F0" material="emissive:#A020F0; emissiveIntensity:30"></a-ring>
             </a-cylinder>
             <a-image src="#logo" position="0 8 -59.5" width="25" height="15"></a-image>
+        </a-entity>
+
+        <a-entity id="jumbotron" position="0 14 -45">
+            <a-plane id="jumbotron-mesh" width="32" height="16" material="src: #jumboCanvas; transparent: true; emissive: #fff; emissiveIntensity: 0.5;"></a-plane>
+            <a-box width="33" height="17" depth="0.5" position="0 0 -0.6" color="#111"></a-box>
         </a-entity>
 
         <a-entity id="rig" movement-controls="controls: gamepad, keyboard, touch; speed: 0.4">
