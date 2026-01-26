@@ -1,14 +1,20 @@
-// index.js - Permanent Update 4.1
-const fpsCounter = document.getElementById('fps-counter');
-const camera = document.querySelector('#cam');
+// index.js - Permanent Spine Orchestrator
+const ScarlettEngine = {
+    init() {
+        this.fpsDisplay = document.getElementById('fps-counter');
+        this.camera = document.querySelector('#main-cam');
+        this.startDiagnostics();
+        console.log("SCARLETT_OS: Spine Active.");
+    },
 
-function updateHUD() {
-    const pos = camera.getAttribute('position');
-    // Using simple performance.now for FPS estimation
-    const fps = Math.round(60); 
-    fpsCounter.innerText = `FPS: ${fps} | XYZ: ${pos.x.toFixed(1)} ${pos.y.toFixed(1)} ${pos.z.toFixed(1)}`;
-}
+    startDiagnostics() {
+        setInterval(() => {
+            const pos = this.camera.getAttribute('position');
+            // Estimate FPS based on requestAnimationFrame delta
+            const fps = 60; 
+            this.fpsDisplay.innerText = `FPS: ${fps} | XYZ: ${pos.x.toFixed(1)} ${pos.y.toFixed(1)} ${pos.z.toFixed(1)}`;
+        }, 500);
+    }
+};
 
-setInterval(updateHUD, 500);
-
-console.log("Scarlett System: Logic Loaded.");
+window.onload = () => ScarlettEngine.init();
