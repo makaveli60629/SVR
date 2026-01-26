@@ -1,30 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Disable Scarlett Service Worker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disable SW</title>
   <style>
-    body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:20px;line-height:1.5}
-    .box{border:1px solid #0f0;padding:14px;border-radius:12px;background:rgba(0,20,0,0.6)}
-    a{color:#9fe}
+    body { background:#000; color:#0f0; font-family: monospace; padding: 18px; }
+    a { color:#9BFF9B; }
+    .box { border:1px solid #0f0; padding:14px; background: rgba(0,20,0,0.85); border-radius: 12px; }
   </style>
 </head>
 <body>
-  <div class="box" id="out">Disabling service workers…</div>
+  <div class="box" id="msg">Disabling service workers…</div>
+  <p><a href="/SVR/">Return to Scarlett</a></p>
+
   <script>
     (async () => {
-      const out = document.getElementById('out');
-      if (!('serviceWorker' in navigator)) {
-        out.textContent = "No serviceWorker support in this browser.";
-        return;
-      }
+      const msg = document.getElementById('msg');
       try {
-        const regs = await navigator.serviceWorker.getRegistrations();
-        for (const r of regs) await r.unregister();
-        out.innerHTML = "✅ Service workers unregistered. Now go back and reload the main page.<br><br><a href='./index.html'>Return to Scarlett</a>";
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (const r of regs) await r.unregister();
+        }
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          for (const k of keys) await caches.delete(k);
+        }
+        msg.textContent = '✅ Service workers unregistered and caches cleared. Now go back and reload the main page.';
       } catch (e) {
-        out.textContent = "Error: " + (e && e.message ? e.message : e);
+        msg.textContent = '⚠️ Could not fully clear SW/cache: ' + (e?.message || e);
       }
     })();
   </script>
