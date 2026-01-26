@@ -6,7 +6,6 @@ let scene, camera, renderer, clock, playerGroup;
 export function initEngine() {
     scene = new THREE.Scene();
     clock = new THREE.Clock();
-    
     playerGroup = new THREE.Group();
     scene.add(playerGroup);
 
@@ -20,7 +19,6 @@ export function initEngine() {
 
     createWorld(scene, camera, renderer, playerGroup);
 
-    // VR Interaction Trigger
     document.getElementById('entervr').onclick = () => {
         navigator.xr.requestSession('immersive-vr', {
             optionalFeatures: ['hand-tracking', 'local-floor']
@@ -32,8 +30,7 @@ export function initEngine() {
 
 function tick() {
     const delta = clock.getDelta();
-    
-    // Update Diagnostic HUD on screen
+    // Update the on-screen diagnostics from index.html
     document.getElementById('fps-val').innerText = Math.round(1 / delta);
     const p = playerGroup.position;
     document.getElementById('pos-val').innerText = `${p.x.toFixed(1)}, ${p.y.toFixed(1)}, ${p.z.toFixed(1)}`;
