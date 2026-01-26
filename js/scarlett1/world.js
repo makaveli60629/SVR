@@ -1,28 +1,35 @@
 import * as THREE from 'three';
+import { initAssetStore } from './modules/assetStore.js';
+
+let assetStore;
 
 export function createWorld(scene, camera, renderer, playerGroup) {
-    // 1. Casino Ambience Lighting
-    const ambient = new THREE.AmbientLight(0x404040, 2); 
-    scene.add(ambient);
+  // Make it NEVER black
+  scene.background = new THREE.Color(0x020205);
 
-    const neonTableLight = new THREE.PointLight(0x00ff00, 1, 10);
-    neonTableLight.position.set(0, 2.5, -3);
-    scene.add(neonTableLight);
+  const hemi = new THREE.HemisphereLight(0x99ffcc, 0x001010, 0.8);
+  scene.add(hemi);
 
-    // 2. The Poker Table (Geometry Prototype)
-    const tableGeo = new THREE.CylinderGeometry(2, 2, 0.2, 32);
-    const tableMat = new THREE.MeshStandardMaterial({ color: 0x004400, roughness: 0.9 });
-    const table = new THREE.Mesh(tableGeo, tableMat);
-    table.position.set(0, 0.9, -3); // Eye-level height for seated play
-    scene.add(table);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.7);
+  dir.position.set(4, 6, 2);
+  scene.add(dir);
 
-    // 3. Grid Helper (For Android spatial testing)
-    const grid = new THREE.GridHelper(20, 20, 0x00ff00, 0x111111);
-    scene.add(grid);
+  // Poker Table Geometry
+  const tableGeo = new THREE.CylinderGeometry(2, 2, 0.2, 32);
+  const tableMat = new THREE.MeshStandardMaterial({ color: 0x004400 });
+  const table = new THREE.Mesh(tableGeo, tableMat);
+  table.position.set(0, 0.9, -3); 
+  scene.add(table);
 
-    console.log("SCARLETT_ONE_WORLD: ASSETS DEPLOYED");
+  // Floor Grid
+  const grid = new THREE.GridHelper(20, 20, 0x00ff00, 0x111111);
+  scene.add(grid);
+
+  // Asset Store (module) — includes pointer + optional hand-pinch selection
+  assetStore = initAssetStore(scene, camera, renderer);
 }
 
 export function updateWorld(delta, playerGroup) {
-    // Future Event Chips: Card Dealing & Chip Physics
+  const cam = playerGroup.children.find(o => o.isCamera) || null;
+  if (assetStore && cam) assetStore.update(delta, cam);
 }
