@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SVR | PRO COMMAND CENTER</title>
+    <title>SVR | PRO-COMMAND FULL</title>
     <style>
         :root { --neon: #00ff00; --panel: rgba(0, 10, 0, 0.95); --err: #ff0055; --cyan: #00ffff; }
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; color: var(--neon); }
         
-        /* [1] ENGINE DIAGNOSTICS DEPT */
+        /* DIAGNOSTICS DEPT */
         #diag-hud {
             position: absolute; top: 10px; left: 10px; border: 1px solid var(--neon);
             padding: 12px; background: var(--panel); z-index: 1000; width: 260px;
         }
 
-        /* [2] COMMAND BAY (The Buttons) */
+        /* COMMAND BAY (Right Side) */
         #cmd-bar {
             position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 1001;
         }
@@ -25,14 +25,14 @@
         }
         .cmd-btn:active { background: var(--neon); color: #000; }
 
-        /* [3] ANDROID VIRTUAL CONTROLS */
+        /* ANDROID VIRTUAL STICKS */
         #mobile-sticks {
             position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none;
         }
         .base { width: 110px; height: 110px; border: 2px dashed var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.5; pointer-events: auto; }
         .nub { width: 45px; height: 45px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 15px var(--neon); }
 
-        /* [4] MASTER LOG TERMINAL */
+        /* MASTER LOG TERMINAL */
         #term-log {
             position: absolute; bottom: 160px; left: 10px; right: 10px; height: 110px;
             background: rgba(0,0,0,0.85); border-left: 4px solid var(--cyan);
@@ -54,16 +54,15 @@
     </div>
 
     <div id="cmd-bar">
-        <button class="cmd-btn" onclick="sysMsg('CORE_STORE: FETCHING...')">🛒 OPEN STORE</button>
-        <button class="cmd-btn" onclick="sysMsg('WARP_INIT: JUMPING...')">🌀 TELEPORT</button>
+        <button class="cmd-btn" onclick="sysMsg('OPENING_STORE...')">🛒 OPEN STORE</button>
+        <button class="cmd-btn" onclick="sysMsg('INIT_WARP...')">🌀 TELEPORT</button>
         <button class="cmd-btn" onclick="toggleHUD()">🔳 HIDE HUD</button>
         <button class="cmd-btn" onclick="location.reload()" style="color:var(--err); border-color:var(--err);">☢️ RESET</button>
     </div>
 
     <div id="term-log">
-        > INITIALIZING DEV DEPARTMENT...<br>
-        > SETTING PATH_PROTOCOL: RELATIVE...<br>
-        > AWAITING SCARLETT ONE SPINE...
+        > INITIALIZING FULL DEV DEPT...<br>
+        > SETTING PATH: RELATIVE (STRICT LOWERCASE)...
     </div>
 
     <div id="mobile-sticks">
@@ -85,14 +84,14 @@
     </script>
 
     <script type="module">
-        const log = document.getElementById('term-log');
+        const logPanel = document.getElementById('term-log');
         window.sysMsg = (m) => { 
-            log.innerHTML += `<br>> ${m}`;
-            log.scrollTop = log.scrollHeight;
+            logPanel.innerHTML += `<br>> ${m}`;
+            logPanel.scrollTop = logPanel.scrollHeight;
         };
         window.toggleHUD = () => document.getElementById('diag-hud').classList.toggle('hidden');
 
-        // FORCE RELATIVE PATHING
+        // RELATIVE PATHING (Strictly lowercase to match your folders)
         const target = './js/scarlett1/index.js';
         document.getElementById('path-val').innerText = target;
 
@@ -104,7 +103,7 @@
                 sysMsg("SPINE SYNC: SUCCESSFUL.");
             })
             .catch(err => {
-                sysMsg("FATAL: MODULE NOT FOUND. CHECK 'js/scarlett1/' CASING.");
+                sysMsg("FATAL: MODULE NOT FOUND. CHECK FOLDER CASE 'js/scarlett1/'");
                 console.error(err);
             });
     </script>
