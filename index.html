@@ -2,32 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Scarlett Empire OS - Build 4.6</title>
+    <title>Scarlett Empire OS - FULL DEV-KIT v4.7</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <div id="dev-hud">
-        <div class="hud-header">SCARLETT_OS [ROOT]</div>
-        <div id="pos-display">XYZ: 0 0 0</div>
-        <div id="stick-status" style="color: #ff4444;">STICKS: SCANNING...</div>
-        <hr>
-        <div id="module-load-status" style="font-size: 10px; color: #00FFFF;">WATCHING: /js/scarlett-one/</div>
-        <button class="hud-btn" onclick="scarlettModule.dealFlop()">🎴 DEAL POKER</button>
-        <button class="hud-btn" onclick="scarlettModule.spawnStore()">🛒 OPEN STORE</button>
-        <button class="hud-btn" onclick="scarlettModule.toggleRadio()">📻 SPOTIFY RADIO</button>
-        <button class="hud-btn reset" onclick="location.reload()">☢️ HARD REBOOT</button>
+    <div id="dev-container">
+        <div class="hud-header">SCARLETT ENGINE SDK v4.7</div>
+        
+        <div class="debug-pane">
+            <div class="pane-title">🛰️ SYSTEM TELEMETRY</div>
+            <div class="stat">POS: <span id="val-pos">0 0 0</span></div>
+            <div class="stat">FPS: <span id="val-fps">60</span></div>
+            <div class="stat">INPUT: <span id="val-input">SCANNING</span></div>
+            <div class="stat">MEMORY: <span id="val-mem">STABLE</span></div>
+        </div>
+
+        <div class="debug-pane">
+            <div class="pane-title">🧬 MODULE STATUS (/js/scarlett-one/)</div>
+            <div class="stat">POKER_CORE: <span id="status-poker" class="led-off">●</span></div>
+            <div class="stat">STORE_MOD: <span id="status-store" class="led-off">●</span></div>
+            <div class="stat">AUDIO_DRIVE: <span id="status-audio" class="led-off">●</span></div>
+        </div>
+
+        <div class="debug-pane">
+            <div class="pane-title">🎮 COMMAND CENTER</div>
+            <button class="sdk-btn" onclick="SDK.toggleMesh()">💠 TOGGLE WIREFRAME</button>
+            <button class="sdk-btn" onclick="scarlettModule.dealFlop()">🎴 FORCE DEAL</button>
+            <button class="sdk-btn" onclick="scarlettModule.toggleRadio()">📻 RADIO PKG</button>
+            <button class="sdk-btn" onclick="SDK.showHitboxes()">📦 HITBOXES</button>
+            <button class="sdk-btn reset" onclick="location.reload()">☢️ CORE RESET</button>
+        </div>
+        
+        <button id="hide-hud-btn" onclick="SDK.toggleHUD()">HIDE DEBUGGER [H]</button>
     </div>
 
-    <a-scene renderer="antialias: true; exposure: 1.6; colorManagement: true;">
+    <div id="virtual-joystick-zone"></div>
+
+    <a-scene id="main-scene" renderer="antialias: true; exposure: 1.6; colorManagement: true;" 
+             stats-in-vr="false" 
+             inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+        
         <a-assets>
             <img id="concrete" src="assets/textures/concrete.jpg">
             <img id="logo" src="assets/textures/casino_art_2.png">
         </a-assets>
 
-        <a-entity id="main-lobby">
+        <a-entity id="world-spine">
             <a-circle rotation="-90 0 0" radius="60" src="#concrete" repeat="15 15"></a-circle>
             <a-cylinder radius="60" height="20" side="double" src="#concrete" open-ended="true" repeat="12 4" position="0 10 0">
                 <a-ring rotation="-90 0 0" position="0 9.9 0" radius-inner="59.7" radius-outer="60.3" color="#A020F0" material="emissive:#A020F0; emissiveIntensity:30"></a-ring>
@@ -38,12 +61,10 @@
 
         <a-entity id="rig" movement-controls="controls: gamepad, keyboard, touch; speed: 0.4">
             <a-camera id="main-cam" look-controls position="0 1.6 0">
-                <a-cursor color="#00FF00"></a-cursor>
+                <a-cursor color="#00FF00" raycaster="objects: .clickable"></a-cursor>
             </a-camera>
             <a-entity hand-tracking-controls="hand: left;"></a-entity>
             <a-entity hand-tracking-controls="hand: right;"></a-entity>
-            <a-entity oculus-touch-controls="hand: left"></a-entity>
-            <a-entity oculus-touch-controls="hand: right"></a-entity>
         </a-entity>
 
         <a-light type="ambient" intensity="1.5"></a-light>
