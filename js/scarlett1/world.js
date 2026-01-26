@@ -89,8 +89,41 @@ export function createWorld(scene) {
   scene.add(worldGroup);
 
   // Helpers (kept for safety while we build)
-  scene.add(new THREE.GridHelper(80, 80, 0x00ff00, 0x111111));
-  scene.add(new THREE.AxesHelper(3));
+  // === MOVEMENT VISIBILITY (Safe Mode UX) ===
+  // Spawn beacon ring (shows where you start)
+  const beacon = new THREE.Mesh(
+    new THREE.TorusGeometry(0.9, 0.03, 12, 64),
+    new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+  );
+  beacon.rotation.x = Math.PI / 2;
+  beacon.position.set(0, 0.02, 8);
+  scene.add(beacon);
+
+  // Forward arrow (shows facing direction at spawn)
+  const arrow = new THREE.Mesh(
+    new THREE.ConeGeometry(0.18, 0.6, 16),
+    new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+  );
+  arrow.rotation.x = Math.PI / 2;
+  arrow.position.set(0, 0.06, 7.2);
+  scene.add(arrow);
+
+  // Brighter ground grid for depth perception (helps movement)
+  const grid = new THREE.GridHelper(120, 120, 0x00ff00, 0x0a0a0a);
+  grid.position.y = 0.01;
+  scene.add(grid);
+
+  // Horizon posts (simple neon pylons for scale)
+  const postMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  for (let i=0;i<8;i++){
+    const a = (i/8) * Math.PI * 2;
+    const x = Math.cos(a) * 18;
+    const z = Math.sin(a) * 18;
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,3.0,12), postMat);
+    post.position.set(x, 1.5, z);
+    scene.add(post);
+  }
+
 }
 
 export function updateWorld(dt, playerGroup, camera) {

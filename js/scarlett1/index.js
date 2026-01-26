@@ -49,11 +49,12 @@ export function initEngine() {
   window.hideHud = () => {
     const hud = document.getElementById('hud');
     const term = document.getElementById('term');
-    const pads = document.getElementById('pads');
+    const controls = document.getElementById('controls');
     const vis = hud && hud.style.display !== 'none';
     if (hud) hud.style.display = vis ? 'none' : 'block';
     if (term) term.style.display = vis ? 'none' : 'block';
-    if (pads) pads.style.display = vis ? 'none' : 'flex';
+    if (controls) controls.style.display = vis ? 'none' : 'flex';
+    // NOTE: pads stay visible so movement always works on mobile
   };
 
   // Boot modules
