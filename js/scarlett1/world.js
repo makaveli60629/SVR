@@ -1,41 +1,28 @@
-// SVR/js/scarlett1/world.js
-// SCARLETT ONE • SVR — World module entry
-// RULE: Hands-only in VR. Always render something (no black screen).
+import * as THREE from 'three';
 
-import { ModuleHub } from './modules/moduleHub.js';
-import { LobbyEnvironment } from './modules/lobbyEnvironment.js';
-import { LocomotionPads } from './modules/locomotionPads.js';
+export function createWorld(scene, camera, renderer, playerGroup) {
+    // 1. Casino Lighting
+    const ambient = new THREE.AmbientLight(0x404040, 2); 
+    scene.add(ambient);
 
-export function createWorld(ctx) {
-  const { THREE, scene, camera, rig, log } = ctx;
+    const tableLight = new THREE.PointLight(0x00ff00, 1, 10);
+    tableLight.position.set(0, 2.5, -3);
+    scene.add(tableLight);
 
-  // Always lit / always visible (anti-black)
-  scene.background = new THREE.Color(0x05070b);
-  scene.fog = new THREE.Fog(0x05070b, 8, 60);
+    // 2. The First Poker Table (Prototype Geometry)
+    const tableGeo = new THREE.CylinderGeometry(2, 2, 0.2, 32);
+    const tableMat = new THREE.MeshStandardMaterial({ color: 0x004400 });
+    const table = new THREE.Mesh(tableGeo, tableMat);
+    table.position.set(0, 0.9, -3); // Placed directly in front of player
+    scene.add(table);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 1.05));
+    // 3. Grid Floor (Essential for spatial debugging)
+    const grid = new THREE.GridHelper(20, 20, 0x00ff00, 0x111111);
+    scene.add(grid);
 
-  const sun = new THREE.DirectionalLight(0xcffbff, 1.25);
-  sun.position.set(6, 12, 6);
-  sun.castShadow = false;
-  scene.add(sun);
+    console.log("WORLD_LOADED: SCARLETT ONE BOOTED");
+}
 
-  const fill = new THREE.PointLight(0x66ffcc, 0.7, 30, 2);
-  fill.position.set(-4, 3, -4);
-  scene.add(fill);
-
-  // Spawn
-  camera.position.set(0, 1.6, 2);
-  camera.lookAt(0, 1.4, -3);
-
-  log('[world] base scene ready');
-
-  // Register SAFE modules (you can add more later)
-  ModuleHub.register(LobbyEnvironment());
-  ModuleHub.register(LocomotionPads()); // Android touch pads + desktop WASD + VR hand-forward
-
-  // Init all modules (build lobby + controls)
-  ModuleHub.start();
-
-  log('[world] modules started ✅');
+export function updateWorld(delta, playerGroup) {
+    // This function will soon handle chip physics and card dealing
 }
