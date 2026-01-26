@@ -1,20 +1,47 @@
-const SpineEngine = {
+const SDK = {
     init() {
-        this.posHUD = document.getElementById('pos-display');
-        this.stickHUD = document.getElementById('stick-status');
         this.rig = document.querySelector('#rig');
-        
+        this.scene = document.querySelector('a-scene');
+        this.setupDiagnostics();
+        console.log("SCARLETT SDK: INITIALIZED");
+    },
+
+    setupDiagnostics() {
         setInterval(() => {
+            // Update Position
             const p = this.rig.getAttribute('position');
-            this.posHUD.innerText = `XYZ: ${p.x.toFixed(1)} ${p.y.toFixed(1)} ${p.z.toFixed(1)}`;
+            document.getElementById('val-pos').innerText = `${p.x.toFixed(1)} ${p.y.toFixed(1)} ${p.z.toFixed(1)}`;
             
-            const pads = navigator.getGamepads();
-            if(pads[0] || pads[1]) {
-                this.stickHUD.innerText = "STICKS: CONNECTED";
-                this.stickHUD.style.color = "#00FFFF";
+            // Check Module Health
+            if (window.scarlettModule) {
+                document.getElementById('status-poker').style.color = "#00FFFF";
+                document.getElementById('status-store').style.color = "#00FFFF";
+                document.getElementById('status-audio').style.color = "#00FFFF";
             }
+
+            // Stick Detection
+            const pads = navigator.getGamepads();
+            document.getElementById('val-input').innerText = (pads[0] || pads[1]) ? "STICK CONNECTED" : "TOUCH/HANDS";
         }, 100);
-        console.log("SPINE: Online. Controller Active.");
+    },
+
+    toggleHUD() {
+        const hud = document.getElementById('dev-container');
+        hud.style.display = hud.style.display === 'none' ? 'block' : 'none';
+    },
+
+    toggleMesh() {
+        const meshes = document.querySelectorAll('a-entity');
+        meshes.forEach(m => {
+            let obj = m.getObject3D('mesh');
+            if(obj) obj.traverse(node => { if(node.isMesh) node.material.wireframe = !node.material.wireframe; });
+        });
+    },
+
+    showHitboxes() {
+        this.scene.setAttribute('debug', '');
+        console.log("SDK: Hitboxes Visible");
     }
 };
-window.onload = () => SpineEngine.init();
+
+window.onload = () => SDK.init();
