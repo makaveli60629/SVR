@@ -5,9 +5,8 @@ import { createRailing } from './modules/railing.js';
 
 export function createWorld(scene) {
   // Atmosphere
-  scene.fog = new THREE.FogExp2(0x000000, 0.085);
-
-  // === SEALED LOBBY (walls + ceiling) ===
+  scene.fog = new THREE.FogExp2(0x000000, 0.04);
+// === SEALED LOBBY (walls + ceiling) ===
   const room = new THREE.Group();
   room.name = "LOBBY_ROOM";
   scene.add(room);
@@ -15,7 +14,7 @@ export function createWorld(scene) {
   // Big interior box (inward-facing)
   const roomMat = new THREE.MeshStandardMaterial({
     color: 0x050505, roughness: 0.35, metalness: 0.35,
-    emissive: 0x000600, emissiveIntensity: 0.7,
+    emissive: 0x000600, emissiveIntensity: 1.0,
     side: THREE.BackSide
   });
   const roomBox = new THREE.Mesh(new THREE.BoxGeometry(120, 40, 120), roomMat);
@@ -28,7 +27,7 @@ export function createWorld(scene) {
 
   const high = new THREE.Mesh(
     new THREE.RingGeometry(4.5, 34, 96),
-    new THREE.MeshStandardMaterial({ color: 0x060606, roughness: 0.15, metalness: 0.85, emissive: 0x001000, emissiveIntensity: 0.6 })
+    new THREE.MeshStandardMaterial({ color: 0x060606, roughness: 0.15, metalness: 0.85, emissive: 0x001000, emissiveIntensity: 0.9 })
   );
   high.rotation.x = -Math.PI/2;
   high.position.y = 1.6;
@@ -36,7 +35,7 @@ export function createWorld(scene) {
 
   const pit = new THREE.Mesh(
     new THREE.CircleGeometry(4.5, 96),
-    new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.9, emissive: 0x000800, emissiveIntensity: 0.55 })
+    new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.9, emissive: 0x000800, emissiveIntensity: 0.8 })
   );
   pit.rotation.x = -Math.PI/2;
   pit.position.y = 0.0;
@@ -60,7 +59,7 @@ export function createWorld(scene) {
   }
 
   const rimMat = new THREE.MeshStandardMaterial({
-    color: 0x00ff00, emissive: 0x00ff00, emissiveIntensity: 3.5, roughness: 0.2, metalness: 0.3
+    color: 0x00ff00, emissive: 0x00ff00, emissiveIntensity: 5.0, roughness: 0.2, metalness: 0.3
   });
   const rim = new THREE.Mesh(new THREE.TorusGeometry(4.5, 0.05, 18, 180), rimMat);
   rim.rotation.x = Math.PI/2;
@@ -82,7 +81,7 @@ export function createWorld(scene) {
   // Center poker table
   const table = new THREE.Mesh(
     new THREE.CylinderGeometry(2.5, 2.5, 0.32, 48),
-    new THREE.MeshStandardMaterial({ color: 0x004400, roughness: 0.85, emissive: 0x001100, emissiveIntensity: 0.9 })
+    new THREE.MeshStandardMaterial({ color: 0x004400, roughness: 0.6, metalness: 0.05, emissive: 0x002200, emissiveIntensity: 1.2 })
   );
   table.position.set(0, 0.95, 0);
   worldGroup.add(table);
@@ -106,49 +105,50 @@ export function createWorld(scene) {
     strip.position.set(x, 7, z);
     worldGroup.add(strip);
   }
+  // === MASSIVE CASINO LIGHTING RIG ===
+  // Strong ambient so nothing goes dark
+  scene.add(new THREE.AmbientLight(0xffffff, 1.2));
 
-  // === LOTS OF LIGHTS (safe + pretty) ===
-  // Soft ambient base so nothing goes black
-  scene.add(new THREE.AmbientLight(0x203040, 0.8));
-
-  // Big "god ray" spotlight over table
-  const god = new THREE.SpotLight(0x00ff88, 35, 40, Math.PI/5, 0.35, 1.0);
-  god.position.set(0, 18, 0);
-  god.target = table;
-  scene.add(god);
-  scene.add(god.target);
-
-  // Ceiling ring of point lights
-  const lightGroup = new THREE.Group();
-  scene.add(lightGroup);
-  const ringR = 18;
-  for (let i=0;i<16;i++){
-    const a = (i/16)*Math.PI*2;
-    const x = Math.cos(a)*ringR;
-    const z = Math.sin(a)*ringR;
-    const l = new THREE.PointLight(0x00ff66, 2.2, 35, 2.0);
-    l.position.set(x, 14, z);
-    lightGroup.add(l);
-
-    // visible bulbs (emissive)
-    const bulb = new THREE.Mesh(
-      new THREE.SphereGeometry(0.22, 14, 10),
-      new THREE.MeshBasicMaterial({ color: 0x00ff66 })
-    );
-    bulb.position.copy(l.position);
-    lightGroup.add(bulb);
+  // Ceiling point-light grid (even illumination)
+  const ceilingY = 14.5;
+  for (let x = -18; x <= 18; x += 6) {
+    for (let z = -18; z <= 18; z += 6) {
+      const l = new THREE.PointLight(0xffffff, 2.2, 45, 2.0);
+      l.position.set(x, ceilingY, z);
+      scene.add(l);
+      const bulb = new THREE.Mesh(
+        new THREE.SphereGeometry(0.18, 12, 10),
+        new THREE.MeshBasicMaterial({ color: 0xffffff })
+      );
+      bulb.position.copy(l.position);
+      scene.add(bulb);
+    }
   }
 
-  // Wall wash lights (blue/purple for depth)
-  for (let i=0;i<8;i++){
-    const a = (i/8)*Math.PI*2;
-    const x = Math.cos(a)*45;
-    const z = Math.sin(a)*45;
-    const c = (i%2===0) ? 0x2233ff : 0x6622ff;
-    const w = new THREE.PointLight(c, 3.0, 60, 2.0);
-    w.position.set(x, 10, z);
-    scene.add(w);
+  // Wall wash lights (green + blue for depth)
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    const c = (i % 2 === 0) ? 0x00ff88 : 0x2233ff;
+    const wL = new THREE.PointLight(c, 2.6, 70, 2.0);
+    wL.position.set(Math.cos(a) * 48, 10, Math.sin(a) * 48);
+    scene.add(wL);
   }
+
+  // Pit focus + floor bounce (kills under-table black)
+  const pitLight = new THREE.PointLight(0x00ff00, 5.0, 30, 2.0);
+  pitLight.position.set(0, 8, 0);
+  scene.add(pitLight);
+
+  const floorBounce = new THREE.PointLight(0xffffff, 2.0, 22, 2.0);
+  floorBounce.position.set(0, 0.8, 0);
+  scene.add(floorBounce);
+
+  // Table spotlight (casino highlight)
+  const tableSpot = new THREE.SpotLight(0x00ff88, 35, 60, Math.PI/5, 0.35, 1.0);
+  tableSpot.position.set(0, 18, 0);
+  tableSpot.target = table;
+  scene.add(tableSpot);
+  scene.add(tableSpot.target);
 
   // === JUMBOTRONS + LIVE FEED ===
   function createJumbotron(x, z, ry, id, mode='live') {
