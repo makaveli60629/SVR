@@ -3,67 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SVR | DEV COMMAND CENTER</title>
+    <title>SVR | PRO-DEV COMMAND</title>
     <style>
-        :root { --neon: #00ff00; --panel: rgba(0, 15, 0, 0.9); }
+        :root { --neon: #00ff00; --panel: rgba(0, 10, 0, 0.95); --err: #ff0055; }
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; color: var(--neon); }
-
-        /* FULL GUI DIAGNOSTICS */
-        #gui-hud {
+        
+        /* DIAGNOSTICS DEPT */
+        #diag-hud {
             position: absolute; top: 10px; left: 10px; border: 1px solid var(--neon);
-            padding: 12px; background: var(--panel); z-index: 1000; width: 220px;
+            padding: 12px; background: var(--panel); z-index: 1000; width: 240px;
         }
 
-        /* COMMAND BUTTONS (Store, Teleport, etc.) */
+        /* COMMAND DEPT (Right Side) */
         #cmd-bar {
-            position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px;
+            position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 1001;
         }
         .cmd-btn {
             background: #000; border: 1px solid var(--neon); color: var(--neon);
             padding: 10px; cursor: pointer; font-size: 11px; text-transform: uppercase;
-            transition: 0.2s; min-width: 120px;
+            min-width: 130px;
         }
-        .cmd-btn:hover { background: var(--neon); color: #000; box-shadow: 0 0 10px var(--neon); }
+        .cmd-btn:active { background: var(--neon); color: #000; }
 
-        /* ANDROID DEBUG JOYSTICKS */
-        #virtual-controls { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none; }
-        .stick-base { width: 100px; height: 100px; border: 2px dashed var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.4; pointer-events: auto; }
-        .nub { width: 35px; height: 35px; background: var(--neon); border-radius: 50%; }
-
-        /* SYSTEM LOG */
-        #sys-log {
-            position: absolute; bottom: 160px; left: 10px; right: 10px; height: 60px;
-            background: rgba(0,0,0,0.5); font-size: 10px; color: #0f0; overflow-y: hidden;
-            border-left: 3px solid var(--neon); padding: 5px; pointer-events: none;
+        /* ANDROID DEBUG PADS */
+        #mobile-sticks {
+            position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none;
         }
+        .base { width: 100px; height: 100px; border: 2px dashed var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.4; pointer-events: auto; }
+        .nub { width: 35px; height: 35px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon); }
+
+        /* TERMINAL LOG */
+        #term-log {
+            position: absolute; bottom: 150px; left: 10px; right: 10px; height: 80px;
+            background: rgba(0,0,0,0.8); border-left: 3px solid var(--neon);
+            padding: 8px; font-size: 10px; overflow: hidden; color: #8f8;
+        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="gui-hud">
-        [ SVR SYSTEM DIAGNOSTICS ]<br><hr style="border:0; border-top:1px solid #040;">
-        STATUS: <span id="st-val" style="color:red">OFFLINE</span><br>
-        FPS: <span id="fps-val">0</span><br>
-        COORDS: <span id="pos-val">0,0,0</span><br>
-        HANDS: <span id="hand-val">NOT DETECTED</span>
+    <div id="diag-hud">
+        [ SVR SYSTEM DIAGNOSTICS ]<br><hr style="border:0; border-top:1px solid #030;">
+        STATUS: <span id="st-val" style="color:var(--err)">OFFLINE</span><br>
+        FPS: <span id="fps-val">0</span> | MEM: OK<br>
+        POS: <span id="pos-val">0, 0, 0</span><br>
+        PATH: <span id="path-val" style="font-size:8px; color:#666;">DETECTING...</span>
     </div>
 
     <div id="cmd-bar">
-        <button class="cmd-btn" onclick="sysLog('ACCESSING STORE...')">🛒 OPEN STORE</button>
-        <button class="cmd-btn" onclick="sysLog('INITIATING TELEPORT...')">🌀 TELEPORT</button>
-        <button class="cmd-btn" onclick="sysLog('REBOOTING ENGINE...')">🔄 CORE RESET</button>
-        <button class="cmd-btn" id="hide-gui" onclick="toggleGUI()">🔳 HIDE GUI</button>
+        <button class="cmd-btn" onclick="sysMsg('OPENING STORE...')">🛒 STORE</button>
+        <button class="cmd-btn" onclick="sysMsg('JUMPING TO TABLE...')">🌀 TELEPORT</button>
+        <button class="cmd-btn" onclick="toggleHUD()">🔳 HIDE HUD</button>
+        <button class="cmd-btn" onclick="location.reload()" style="color:var(--err); border-color:var(--err);">☢️ RESET</button>
     </div>
 
-    <div id="virtual-controls">
-        <div class="stick-base" id="move-stick"><div class="nub"></div></div>
-        <div class="stick-base" id="look-stick"><div class="nub"></div></div>
-    </div>
+    <div id="term-log">> SVR PRO-DEV BOOT SEQUENCE INITIATED...</div>
 
-    <div id="sys-log">> SYSTEM READY. STANDING BY FOR SCARLETT ONE SPINE...</div>
+    <div id="mobile-sticks">
+        <div class="base"><div class="nub"></div></div>
+        <div class="base"><div class="nub"></div></div>
+    </div>
 
     <div style="position: absolute; bottom: 20px; width: 100%; text-align: center;">
-        <button id="entervr" class="cmd-btn" style="font-size: 1.2rem; padding: 15px 40px;">INITIALIZE VR</button>
+        <button id="entervr" class="cmd-btn" style="font-size: 1.2rem; padding: 15px 40px; background: #010;">INITIALIZE VR</button>
     </div>
 
     <script type="importmap">
@@ -76,29 +79,28 @@
     </script>
 
     <script type="module">
-        import { initEngine } from './js/scarlett1/index.js';
+        // --- SMART-PATH BOOTLOADER ---
+        const log = document.getElementById('term-log');
+        window.sysMsg = (m) => { log.innerHTML = `> ${m}<br>` + log.innerHTML; };
+        window.toggleHUD = () => document.getElementById('diag-hud').classList.toggle('hidden');
 
-        window.sysLog = (msg) => {
-            const log = document.getElementById('sys-log');
-            log.innerHTML = `> ${msg}<br>` + log.innerHTML;
-        };
+        // FORCE CORRECT GITHUB PATHING
+        const repoPath = window.location.pathname.includes('SVR') ? '/SVR' : '';
+        const target = `${repoPath}/js/scarlett1/index.js`.replace('//', '/');
+        
+        document.getElementById('path-val').innerText = target;
 
-        window.toggleGUI = () => {
-            const hud = document.getElementById('gui-hud');
-            hud.style.display = hud.style.display === 'none' ? 'block' : 'none';
-        };
-
-        window.addEventListener('load', () => {
-            try {
-                initEngine();
+        import(target)
+            .then(m => {
+                m.initEngine();
                 document.getElementById('st-val').innerText = 'ACTIVE';
                 document.getElementById('st-val').style.color = '#0f0';
-                sysLog("SCARLETT ONE SPINE CONNECTED SUCCESSFULLY.");
-            } catch (e) {
-                sysLog("CONNECTION ERROR: CHECK FOLDER CASING (js/scarlett1/)");
+                sysMsg("SPINE CONNECTED SUCCESSFULLY.");
+            })
+            .catch(e => {
+                sysMsg("FATAL: FILE NOT FOUND AT " + target);
                 console.error(e);
-            }
-        });
+            });
     </script>
 </body>
 </html>
