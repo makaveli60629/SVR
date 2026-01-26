@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SVR | PRO COMMAND CENTER</title>
+    <title>SVR | PRO MISSION CONTROL</title>
     <style>
         :root { --neon: #00ff00; --panel: rgba(0, 10, 0, 0.95); --err: #ff0055; }
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; color: var(--neon); }
         
-        /* DIAGNOSTICS DEPT */
+        /* DIAGNOSTICS DEPT (Real-time monitoring) */
         #diag-hud {
             position: absolute; top: 10px; left: 10px; border: 1px solid var(--neon);
             padding: 12px; background: var(--panel); z-index: 1000; width: 250px;
         }
 
-        /* COMMAND BAY (Right Side) */
+        /* COMMAND BAY (Right Side Control) */
         #cmd-bar {
             position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 1001;
         }
@@ -25,14 +25,14 @@
         }
         .cmd-btn:active { background: var(--neon); color: #000; }
 
-        /* ANDROID DEBUG PADS (Joysticks) */
+        /* ANDROID DEBUG PADS (On-screen navigation) */
         #mobile-sticks {
             position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none;
         }
         .base { width: 110px; height: 110px; border: 2px dashed var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.5; pointer-events: auto; }
         .nub { width: 40px; height: 40px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon); }
 
-        /* LOGGING DEPARTMENT (The Terminal) */
+        /* LOG TERMINAL (Mobile Debugging) */
         #term-log {
             position: absolute; bottom: 160px; left: 10px; right: 10px; height: 100px;
             background: rgba(0,0,0,0.8); border-left: 3px solid var(--neon);
@@ -88,7 +88,7 @@
         };
         window.toggleHUD = () => document.getElementById('diag-hud').classList.toggle('hidden');
 
-        // Path detection to avoid 404 on GitHub Pages
+        // Automatic repository detection to handle case-sensitive paths on Linux/GitHub
         const repoPath = window.location.pathname.includes('SVR') ? '/SVR' : '';
         const target = `${repoPath}/js/scarlett1/index.js`.replace('//', '/');
         document.getElementById('path-val').innerText = target;
@@ -102,7 +102,7 @@
             })
             .catch(err => {
                 sysMsg("FATAL: FILE NOT FOUND AT " + target);
-                console.error("IMPORT FAILED:", err); //
+                console.error("IMPORT FAILED:", err);
             });
     </script>
 </body>
