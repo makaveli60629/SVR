@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SVR | MISSION CONTROL FULL</title>
+    <title>SVR | PRO COMMAND CENTER</title>
     <style>
         :root { --neon: #00ff00; --panel: rgba(0, 10, 0, 0.95); --err: #ff0055; --cyan: #00ffff; }
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; color: var(--neon); }
@@ -11,10 +11,10 @@
         /* [1] ENGINE DIAGNOSTICS DEPT */
         #diag-hud {
             position: absolute; top: 10px; left: 10px; border: 1px solid var(--neon);
-            padding: 12px; background: var(--panel); z-index: 1000; width: 250px;
+            padding: 12px; background: var(--panel); z-index: 1000; width: 260px;
         }
 
-        /* [2] COMMAND BAY & OPTIONS */
+        /* [2] COMMAND BAY (The Buttons) */
         #cmd-bar {
             position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 1001;
         }
@@ -24,24 +24,20 @@
             min-width: 140px; transition: 0.1s;
         }
         .cmd-btn:active { background: var(--neon); color: #000; }
-        .btn-alert { color: var(--err); border-color: var(--err); }
 
-        /* [3] ANDROID VIRTUAL CONTROLS (Joysticks) */
+        /* [3] ANDROID VIRTUAL CONTROLS */
         #mobile-sticks {
             position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none;
         }
         .base { width: 110px; height: 110px; border: 2px dashed var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.5; pointer-events: auto; }
         .nub { width: 45px; height: 45px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 15px var(--neon); }
 
-        /* [4] THE MASTER LOG TERMINAL */
+        /* [4] MASTER LOG TERMINAL */
         #term-log {
             position: absolute; bottom: 160px; left: 10px; right: 10px; height: 110px;
             background: rgba(0,0,0,0.85); border-left: 4px solid var(--cyan);
             padding: 10px; font-size: 10px; overflow-y: scroll; color: #8f8;
-            scrollbar-width: none;
         }
-        
-        /* UI UTILITIES */
         .hidden { display: none !important; }
         hr { border: 0; border-top: 1px solid #030; margin: 8px 0; }
     </style>
@@ -58,25 +54,25 @@
     </div>
 
     <div id="cmd-bar">
-        <button class="cmd-btn" onclick="sysMsg('CORE_STORE: FETCHING ASSETS...')">🛒 ASSET STORE</button>
-        <button class="cmd-btn" onclick="sysMsg('WARP_INIT: TARGET TABLE_01...')">🌀 TELEPORT</button>
-        <button class="cmd-btn" onclick="toggleHUD()">🔳 HIDE INTERFACE</button>
-        <button class="cmd-btn btn-alert" onclick="location.reload()">☢️ SYSTEM RESET</button>
+        <button class="cmd-btn" onclick="sysMsg('CORE_STORE: FETCHING...')">🛒 OPEN STORE</button>
+        <button class="cmd-btn" onclick="sysMsg('WARP_INIT: JUMPING...')">🌀 TELEPORT</button>
+        <button class="cmd-btn" onclick="toggleHUD()">🔳 HIDE HUD</button>
+        <button class="cmd-btn" onclick="location.reload()" style="color:var(--err); border-color:var(--err);">☢️ RESET</button>
     </div>
 
     <div id="term-log">
         > INITIALIZING DEV DEPARTMENT...<br>
         > SETTING PATH_PROTOCOL: RELATIVE...<br>
-        > AWAITING SCARLETT ONE SPINE CONNECTION...
+        > AWAITING SCARLETT ONE SPINE...
     </div>
 
     <div id="mobile-sticks">
-        <div class="base" id="left-stick"><div class="nub"></div></div>
-        <div class="base" id="right-stick"><div class="nub"></div></div>
+        <div class="base"><div class="nub"></div></div>
+        <div class="base"><div class="nub"></div></div>
     </div>
 
     <div style="position: absolute; bottom: 20px; width: 100%; text-align: center;">
-        <button id="entervr" class="cmd-btn" style="font-size: 1.1rem; padding: 18px 50px; background: #010; border-width: 2px;">INITIALIZE SCARLETT ONE</button>
+        <button id="entervr" class="cmd-btn" style="font-size: 1.1rem; padding: 18px 50px; background: #010;">INITIALIZE VR SESSION</button>
     </div>
 
     <script type="importmap">
@@ -89,7 +85,6 @@
     </script>
 
     <script type="module">
-        // MASTER BOOTLOADER
         const log = document.getElementById('term-log');
         window.sysMsg = (m) => { 
             log.innerHTML += `<br>> ${m}`;
@@ -97,11 +92,11 @@
         };
         window.toggleHUD = () => document.getElementById('diag-hud').classList.toggle('hidden');
 
-        // Professional Standard: Relative Dot-Path
-        const targetFile = './js/scarlett1/index.js';
-        document.getElementById('path-val').innerText = targetFile;
+        // FORCE RELATIVE PATHING
+        const target = './js/scarlett1/index.js';
+        document.getElementById('path-val').innerText = target;
 
-        import(targetFile)
+        import(target)
             .then(engine => {
                 engine.initEngine();
                 document.getElementById('st-val').innerText = 'ACTIVE';
@@ -109,7 +104,7 @@
                 sysMsg("SPINE SYNC: SUCCESSFUL.");
             })
             .catch(err => {
-                sysMsg("FATAL: MODULE NOT FOUND. VERIFY 'js/scarlett1/' CASE.");
+                sysMsg("FATAL: MODULE NOT FOUND. CHECK 'js/scarlett1/' CASING.");
                 console.error(err);
             });
     </script>
