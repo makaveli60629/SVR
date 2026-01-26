@@ -1,89 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Scarlett Empire OS • Grand Lobby</title>
-  <style>
-    :root { --neon:#00ff00; --panel: rgba(0, 10, 0, 0.95); --cyan:#00ffff; --err:#ff0055; }
-    body { margin:0; overflow:hidden; background:#000; font-family:'Courier New', monospace; color:var(--neon); }
-    #hud { position:absolute; top:10px; left:10px; border:1px solid var(--neon); padding:12px; background:var(--panel); z-index:1000; width:420px; }
-    #term { position:absolute; bottom:160px; left:10px; right:10px; height:110px; background:rgba(0,0,0,0.85); border-left:4px solid var(--cyan);
-            padding:10px; font-size:10px; overflow-y:auto; color:#8f8; z-index:1000; }
-    #controls { position:absolute; top:10px; right:10px; z-index:1001; display:flex; flex-direction:column; gap:8px; }
-    .btn { background:#000; border:1px solid var(--neon); color:var(--neon); padding:10px; cursor:pointer; text-transform:uppercase; font-size:10px; width:230px; }
-    .btn.danger { border-color: var(--err); color: var(--err); }
-    #bar { position:absolute; bottom:20px; width:100%; text-align:center; z-index:1001; }
-    #entervr { width:320px; font-size:12px; }
-
-    /* Mobile pads */
-    #pads { position:absolute; left:0; right:0; bottom:0; height:160px; pointer-events:none; z-index:1000; display:flex; justify-content:space-between; padding:16px; }
-    .pad { width:140px; height:140px; border-radius:50%; border:2px dashed rgba(0,255,0,0.35); position:relative; pointer-events:auto; touch-action:none; }
-    .knob { width:54px; height:54px; border-radius:50%; border:2px solid rgba(0,255,0,0.7); position:absolute; left:43px; top:43px; background:rgba(0,255,0,0.08); }
-    .label { position:absolute; bottom:-18px; width:100%; text-align:center; font-size:10px; opacity:0.75; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Scarlett Casino - Update 4.1</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <style>
+        #ui-layer {
+            position: absolute; top: 10px; left: 10px; z-index: 1000;
+            font-family: 'Courier New', monospace; color: #00FF00;
+            background: rgba(0, 20, 0, 0.8); padding: 10px; border: 2px solid #00FF00;
+        }
+        .menu-btn {
+            display: block; width: 100%; background: #004400; color: #00FF00;
+            border: 1px solid #00FF00; margin: 4px 0; padding: 8px; cursor: pointer;
+            text-align: left; font-weight: bold;
+        }
+        .menu-btn:hover { background: #008800; }
+        .reset-btn { color: #FF4444; border-color: #FF4444; }
+    </style>
 </head>
 <body>
-  <div id="hud">
-    <div style="font-weight:bold;color:var(--cyan);">[ SCARLETT • GRAND LOBBY ]</div>
-    STATUS: <span id="st" style="color:var(--err)">BOOTING</span><br>
-    FPS: <span id="fps">--</span> | XYZ: <span id="pos">0.0, 1.6, 0.0</span><br>
-    AVATAR: <span id="av" style="color:var(--cyan)">NONE</span> | JUMBOTRON: <span style="color:var(--cyan)">LIVE</span>
-  </div>
 
-  <button id="menuToggle" class="btn" style="position:absolute; top:10px; right:10px; z-index:1002; width:70px;">MENU</button>
-  <div id="controls">
-    <button class="btn" onclick="window.dealFlop?.()">🃏 DEAL FLOP</button>
-    <button class="btn" onclick="window.spawnChips?.()">🪙 SPAWN CHIPS</button>
-    <button class="btn" onclick="window.openStore?.()">🛒 OPEN STORE</button>
-    <button class="btn" onclick="window.toggleRadio?.()">📻 RADIO TOGGLE</button>
-    <button class="btn" onclick="window.updateJumbotron?.('WALKERS', 'Procedural Patrol')">🚶 WALKERS TOGGLE</button>
-    <button class="btn" onclick="window.updateJumbotron?.('Scarlett Empire', 'Lobby Active')">📺 JUMBOTRON: STATUS</button>
-    <button class="btn" onclick="window.updateJumbotron?.('BOTS', 'Walkers + Players Active')">🤖 BOTS: STATUS</button>
-
-    <button class="btn" onclick="window.spawnAvatar?.('male')">🧍‍♂️ AVATAR: MALE</button>
-    <button class="btn" onclick="window.spawnAvatar?.('female')">🧍‍♀️ AVATAR: FEMALE</button>
-    <button class="btn" onclick="window.spawnAvatar?.('ninja')">🥷 AVATAR: NINJA</button>
-    <button class="btn" onclick="window.spawnAvatar?.('combat')">🛡️ AVATAR: COMBAT</button>
-    <button class="btn" onclick="window.clearAvatar?.()">❌ AVATAR: CLEAR</button>
-
-    <button class="btn" onclick="window.teleportHome?.()">🌀 TELEPORT HOME</button>
-    <button class="btn" onclick="window.hideHud?.()">☑ HIDE HUD</button>
-    <button class="btn danger" onclick="window.resetSpawn?.()">☢ RESET</button>
-  </div>
-
-  <div id="term">> BOOTING…</div>
-
-  <div id="bar">
-    <button id="entervr" class="btn">ENTER VR</button>
-  </div>
-
-  <div id="pads">
-    <div class="pad" id="movePad">
-      <div class="knob" id="moveKnob"></div>
-      <div class="label">MOVE</div>
+    <div id="ui-layer">
+        <div>[ SCARLETT ] STATUS: ACTIVE</div>
+        <div id="fps-display">FPS: -- | XYZ: 0 0 0</div>
+        <hr>
+        <button class="menu-btn" onclick="dealFlop()">🎴 DEAL FLOP</button>
+        <button class="menu-btn" onclick="spawnChips()">🪙 SPAWN CHIPS</button>
+        <button class="menu-btn">🛒 OPEN STORE</button>
+        <button class="menu-btn">📻 RADIO TOGGLE</button>
+        <button class="menu-btn">🚶 WALKERS TOGGLE</button>
+        <button class="menu-btn">🤖 BOTS: ACTIVE</button>
+        <button class="menu-btn" onclick="setAvatar('male')">🧍 AVATAR: MALE</button>
+        <button class="menu-btn" onclick="setAvatar('female')">🧍 AVATAR: FEMALE</button>
+        <button class="menu-btn" onclick="teleportHome()">🌀 TELEPORT HOME</button>
+        <button class="menu-btn reset-btn" onclick="location.reload()">☢️ RESET</button>
     </div>
-    <div class="pad" id="turnPad">
-      <div class="knob" id="turnKnob"></div>
-      <div class="label">TURN</div>
-    </div>
-  </div>
 
-  <script type="importmap">
-    { "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-      }
-    }
-  </script>
+    <a-scene renderer="antialias: true; colorManagement: true;" shadow="type: pcfsoft">
+        
+        <a-assets>
+            <img id="wallTexture" src="assets/textures/brick_wall.jpg">
+            <img id="casinoLogo" src="assets/textures/casino_art_2.png">
+            <img id="cardBack" src="assets/textures/card_back.jpg">
+        </a-assets>
 
-  <script type="module">
-    import { initEngine } from './js/scarlett1/index.js';
-    initEngine();
-    const mt = document.getElementById('menuToggle');
-    mt?.addEventListener('click', () => window.hideHud?.());
-    const st = document.getElementById('st');
-    if (st) { st.textContent = 'ACTIVE'; st.style.color = '#0f0'; }
-  </script>
+        <a-sky color="#87CEEB"></a-sky> <a-light type="directional" position="-1 10 1" intensity="1.5" castShadow="true"></a-light>
+        <a-light type="ambient" intensity="0.7"></a-light>
+
+        <a-entity id="lobby">
+            <a-plane rotation="-90 0 0" width="50" height="50" color="#222" static-body shadow></a-plane>
+            
+            <a-box position="0 5 -25" width="50" height="10" depth="0.5" src="#wallTexture" repeat="4 1">
+                <a-image src="#casinoLogo" position="0 2 0.3" width="5" height="5"></a-image>
+                <a-box position="0 -4.9 0.4" width="50" height="0.2" depth="0.2" color="#A020F0" material="emissive: #A020F0; emissiveIntensity: 2"></a-box>
+                <a-box position="0 4.9 0.4" width="50" height="0.2" depth="0.2" color="#A020F0" material="emissive: #A020F0; emissiveIntensity: 2"></a-box>
+            </a-box>
+
+            <a-cylinder position="-24.5 5 -24.5" radius="0.5" height="10" color="#A020F0" material="emissive: #A020F0; emissiveIntensity: 1.5"></a-cylinder>
+            <a-cylinder position="24.5 5 -24.5" radius="0.5" height="10" color="#A020F0" material="emissive: #A020F0; emissiveIntensity: 1.5"></a-cylinder>
+
+            <a-entity position="0 2.5 -10">
+                <a-text value="TABLE ZONE ROOM" align="center" color="#00FFFF" width="6"></a-text>
+                <a-text value="WALLET: $5,000" position="0 -0.5 0" align="center" color="#00FF00" width="4"></a-text>
+            </a-entity>
+        </a-entity>
+
+        <a-entity id="poker-zone" position="0 0 -15">
+            <a-cylinder radius="3" height="1.1" color="#006400" shadow>
+                <a-text value="HIGH STAKES POKER" position="0 0.6 0" rotation="-90 0 0" align="center" width="8"></a-text>
+            </a-cylinder>
+
+            <a-entity id="community-cards" position="0 1.5 0">
+                <a-box position="-0.6 0 0" width="0.4" height="0.6" depth="0.01" color="white" rotation="0 0 0"></a-box>
+                <a-box position="0 0 0" width="0.4" height="0.6" depth="0.01" color="white" rotation="0 0 0"></a-box>
+                <a-box position="0.6 0 0" width="0.4" height="0.6" depth="0.01" color="white" rotation="0 0 0"></a-box>
+            </a-entity>
+
+            <a-entity id="bot-1" position="4 0 0" rotation="0 -90 0">
+                <a-sphere radius="0.5" position="0 1.5 0" color="#444"></a-sphere> <a-text value="BOT BOB" position="0 2.2 0" align="center" side="double"></a-text>
+                <a-entity position="0 1.2 -1" rotation="45 0 0">
+                    <a-box width="0.3" height="0.4" depth="0.01" color="white"></a-box>
+                </a-entity>
+            </a-entity>
+        </a-entity>
+
+        <a-entity id="rig" movement-controls="fly: false">
+            <a-entity camera position="0 1.6 0" look-controls>
+                <a-cursor color="#00FF00"></a-cursor>
+            </a-entity>
+            <a-entity id="leftHand" hand-tracking-controls="hand: left;"></a-entity>
+            <a-entity id="rightHand" hand-tracking-controls="hand: right;"></a-entity>
+        </a-entity>
+
+    </a-scene>
+
+    <script src="index.js"></script>
+    <script src="world.js"></script>
 </body>
 </html>
