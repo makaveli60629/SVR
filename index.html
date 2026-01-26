@@ -1,111 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SVR | PRO-COMMAND FULL</title>
-    <style>
-        :root { --neon: #00ff00; --panel: rgba(0, 10, 0, 0.95); --err: #ff0055; --cyan: #00ffff; }
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; color: var(--neon); }
-        
-        /* DIAGNOSTICS DEPT */
-        #diag-hud {
-            position: absolute; top: 10px; left: 10px; border: 1px solid var(--neon);
-            padding: 12px; background: var(--panel); z-index: 1000; width: 260px;
-        }
-
-        /* COMMAND BAY (Right Side) */
-        #cmd-bar {
-            position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 1001;
-        }
-        .cmd-btn {
-            background: #000; border: 1px solid var(--neon); color: var(--neon);
-            padding: 12px; cursor: pointer; font-size: 11px; text-transform: uppercase;
-            min-width: 140px; transition: 0.1s;
-        }
-        .cmd-btn:active { background: var(--neon); color: #000; }
-
-        /* ANDROID VIRTUAL STICKS */
-        #mobile-sticks {
-            position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none;
-        }
-        .base { width: 110px; height: 110px; border: 2px dashed var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.5; pointer-events: auto; }
-        .nub { width: 45px; height: 45px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 15px var(--neon); }
-
-        /* MASTER LOG TERMINAL */
-        #term-log {
-            position: absolute; bottom: 160px; left: 10px; right: 10px; height: 110px;
-            background: rgba(0,0,0,0.85); border-left: 4px solid var(--cyan);
-            padding: 10px; font-size: 10px; overflow-y: scroll; color: #8f8;
-        }
-        .hidden { display: none !important; }
-        hr { border: 0; border-top: 1px solid #030; margin: 8px 0; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SVR | MISSION CONTROL</title>
+  <style>
+    :root { --neon:#00ff00; --panel:rgba(0,10,0,0.95); --cyan:#00ffff; --err:#ff0055; }
+    body { margin:0; overflow:hidden; background:#000; font-family:Courier New, monospace; color:var(--neon); }
+    #diag-hud { position:absolute; top:10px; left:10px; border:1px solid var(--neon); padding:12px; background:var(--panel); z-index:1000; width:280px; display:none; }
+    #term-log { position:absolute; bottom:160px; left:10px; right:10px; height:110px; background:rgba(0,0,0,0.85); border-left:4px solid var(--cyan); padding:10px; font-size:10px; overflow-y:auto; color:#8f8; display:none; }
+    .cmd-btn { background:#000; border:1px solid var(--neon); color:var(--neon); padding:12px; cursor:pointer; font-size:11px; text-transform:uppercase; min-width:160px; }
+  </style>
 </head>
 <body>
+  <div id="diag-hud">
+    <div style="font-weight:bold;color:var(--cyan)">[ SVR-CORE MONITOR ]</div>
+    STATUS: <span id="st-val" style="color:var(--err)">OFFLINE</span><br>
+    MODE: <span id="mode-val" style="color:var(--cyan)">PERMANENT</span><br>
+    XYZ: <span id="pos-val">0.0, 1.6, 0.0</span>
+  </div>
+  <div id="term-log">> BOOT...</div>
 
-    <div id="diag-hud">
-        <div style="font-weight: bold; color: var(--cyan);">[ SVR-CORE MONITOR ]</div>
-        <hr>
-        STATUS: <span id="st-val" style="color:var(--err)">OFFLINE</span><br>
-        FPS: <span id="fps-val">--</span> | MEM: <span style="color:var(--cyan)">STABLE</span><br>
-        XYZ: <span id="pos-val">0.0, 1.6, 0.0</span><br>
-        PATH: <span id="path-val" style="font-size:9px; color:#666;">CHECKING...</span>
-    </div>
+  <div style="position:absolute; bottom:20px; width:100%; text-align:center;">
+    <button id="entervr" class="cmd-btn">INITIALIZE VR SESSION</button>
+  </div>
 
-    <div id="cmd-bar">
-        <button class="cmd-btn" onclick="sysMsg('OPENING_STORE...')">🛒 OPEN STORE</button>
-        <button class="cmd-btn" onclick="sysMsg('INIT_WARP...')">🌀 TELEPORT</button>
-        <button class="cmd-btn" onclick="toggleHUD()">🔳 HIDE HUD</button>
-        <button class="cmd-btn" onclick="location.reload()" style="color:var(--err); border-color:var(--err);">☢️ RESET</button>
-    </div>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 
-    <div id="term-log">
-        > INITIALIZING FULL DEV DEPT...<br>
-        > SETTING PATH: RELATIVE (STRICT LOWERCASE)...
-    </div>
+  <script type="module">
+    import { initEngine } from './js/scarlett1/index.js';
 
-    <div id="mobile-sticks">
-        <div class="base"><div class="nub"></div></div>
-        <div class="base"><div class="nub"></div></div>
-    </div>
+    const params = new URLSearchParams(location.search);
+    const dev = params.get('dev') === '1' || params.get('dev') === 'true';
+    document.getElementById('mode-val').innerText = dev ? 'DEV' : 'PERMANENT';
+    document.getElementById('diag-hud').style.display = dev ? 'block' : 'none';
+    document.getElementById('term-log').style.display = dev ? 'block' : 'none';
 
-    <div style="position: absolute; bottom: 20px; width: 100%; text-align: center;">
-        <button id="entervr" class="cmd-btn" style="font-size: 1.1rem; padding: 18px 50px; background: #010;">INITIALIZE VR SESSION</button>
-    </div>
+    function log(msg){
+      const term = document.getElementById('term-log');
+      if(!term || term.style.display === 'none') return;
+      term.innerHTML += `<br>> ${msg}`;
+      term.scrollTop = term.scrollHeight;
+    }
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
+    initEngine();
 
-    <script type="module">
-        const logPanel = document.getElementById('term-log');
-        window.sysMsg = (m) => { 
-            logPanel.innerHTML += `<br>> ${m}`;
-            logPanel.scrollTop = logPanel.scrollHeight;
-        };
-        window.toggleHUD = () => document.getElementById('diag-hud').classList.toggle('hidden');
+    const st = document.getElementById('st-val');
+    st.innerText = 'ACTIVE';
+    st.style.color = '#0f0';
+    log('ENGINE ACTIVE');
 
-        // RELATIVE PATHING (Strictly lowercase to match your folders)
-        const target = './js/scarlett1/index.js';
-        document.getElementById('path-val').innerText = target;
-
-        import(target)
-            .then(engine => {
-                engine.initEngine();
-                document.getElementById('st-val').innerText = 'ACTIVE';
-                document.getElementById('st-val').style.color = '#0f0';
-                sysMsg("SPINE SYNC: SUCCESSFUL.");
-            })
-            .catch(err => {
-                sysMsg("FATAL: MODULE NOT FOUND. CHECK FOLDER CASE 'js/scarlett1/'");
-                console.error(err);
-            });
-    </script>
+    document.getElementById('entervr').addEventListener('click', async () => {
+      // three.js will show its own XR button in some setups; this is a simple "try enter"
+      try {
+        if (!navigator.xr) { log('WebXR not available'); return; }
+        const ok = await navigator.xr.isSessionSupported('immersive-vr');
+        if (!ok) { log('immersive-vr not supported'); return; }
+        log('Use browser XR UI to enter VR (Quest: Oculus Browser)');
+      } catch (e) {
+        log('Enter VR error: ' + (e?.message || e));
+      }
+    });
+  </script>
 </body>
 </html>
