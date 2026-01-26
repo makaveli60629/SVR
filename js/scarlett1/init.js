@@ -1,13 +1,13 @@
-// js/scarlett1/init.js - SCARLETT1 ENTRY (PERMANENT)
-import { ScarlettOS } from './os.js';
-import { world } from './world.js';
-import './guards.js'; // registers guard-bot component
+// js/scarlett1/init.js
+// PERMANENT: Scarlett1 module entrypoint. No Spine edits required.
+// Exposes a single global: window.scarlettModule
 
-// Public API for HUD buttons (kept stable)
-window.Scarlett1 = { world };
+import { createScarlettModule } from './modules/index.js';
 
+// Create module now; lazy-init does scene lookups safely on first init()
+window.scarlettModule = createScarlettModule();
+
+// Auto-init when the page finishes loading (safe no-op if scene not ready yet)
 window.addEventListener('load', () => {
-  ScarlettOS.init();
-  // Ensure cards exist on boot
-  document.addEventListener('DOMContentLoaded', () => world.dealFlop());
+  try { window.scarlettModule.init(); } catch (e) { console.warn('[scarlettModule] init error', e); }
 });
