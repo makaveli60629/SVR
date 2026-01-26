@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SVR | PRO-DEV COMMAND</title>
+    <title>SVR | PRO COMMAND CENTER</title>
     <style>
         :root { --neon: #00ff00; --panel: rgba(0, 10, 0, 0.95); --err: #ff0055; }
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; color: var(--neon); }
@@ -11,32 +11,32 @@
         /* DIAGNOSTICS DEPT */
         #diag-hud {
             position: absolute; top: 10px; left: 10px; border: 1px solid var(--neon);
-            padding: 12px; background: var(--panel); z-index: 1000; width: 240px;
+            padding: 12px; background: var(--panel); z-index: 1000; width: 250px;
         }
 
-        /* COMMAND DEPT (Right Side) */
+        /* COMMAND BAY (Right Side) */
         #cmd-bar {
             position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 1001;
         }
         .cmd-btn {
             background: #000; border: 1px solid var(--neon); color: var(--neon);
-            padding: 10px; cursor: pointer; font-size: 11px; text-transform: uppercase;
-            min-width: 130px;
+            padding: 12px; cursor: pointer; font-size: 11px; text-transform: uppercase;
+            min-width: 140px; transition: 0.2s;
         }
         .cmd-btn:active { background: var(--neon); color: #000; }
 
-        /* ANDROID DEBUG PADS */
+        /* ANDROID DEBUG PADS (Joysticks) */
         #mobile-sticks {
             position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 40px; box-sizing: border-box; pointer-events: none;
         }
-        .base { width: 100px; height: 100px; border: 2px dashed var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.4; pointer-events: auto; }
-        .nub { width: 35px; height: 35px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon); }
+        .base { width: 110px; height: 110px; border: 2px dashed var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.5; pointer-events: auto; }
+        .nub { width: 40px; height: 40px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon); }
 
-        /* TERMINAL LOG */
+        /* LOGGING DEPARTMENT (The Terminal) */
         #term-log {
-            position: absolute; bottom: 150px; left: 10px; right: 10px; height: 80px;
+            position: absolute; bottom: 160px; left: 10px; right: 10px; height: 100px;
             background: rgba(0,0,0,0.8); border-left: 3px solid var(--neon);
-            padding: 8px; font-size: 10px; overflow: hidden; color: #8f8;
+            padding: 10px; font-size: 10px; overflow-y: scroll; color: #8f8;
         }
         .hidden { display: none !important; }
     </style>
@@ -44,21 +44,22 @@
 <body>
 
     <div id="diag-hud">
-        [ SVR SYSTEM DIAGNOSTICS ]<br><hr style="border:0; border-top:1px solid #030;">
+        <div style="font-weight: bold; font-size: 14px;">[SVR ENGINE MONITOR]</div>
+        <hr style="border:0; border-top:1px solid #030; margin: 8px 0;">
         STATUS: <span id="st-val" style="color:var(--err)">OFFLINE</span><br>
-        FPS: <span id="fps-val">0</span> | MEM: OK<br>
-        POS: <span id="pos-val">0, 0, 0</span><br>
-        PATH: <span id="path-val" style="font-size:8px; color:#666;">DETECTING...</span>
+        FPS: <span id="fps-val">--</span> | MEM: OK<br>
+        POS: <span id="pos-val">0.0, 1.6, 0.0</span><br>
+        PATH: <span id="path-val" style="font-size:9px; color:#666;">DETECTING...</span>
     </div>
 
     <div id="cmd-bar">
-        <button class="cmd-btn" onclick="sysMsg('OPENING STORE...')">🛒 STORE</button>
-        <button class="cmd-btn" onclick="sysMsg('JUMPING TO TABLE...')">🌀 TELEPORT</button>
+        <button class="cmd-btn" onclick="sysMsg('OPENING STORE...')">🛒 OPEN STORE</button>
+        <button class="cmd-btn" onclick="sysMsg('INITIATING TELEPORT...')">🌀 TELEPORT</button>
         <button class="cmd-btn" onclick="toggleHUD()">🔳 HIDE HUD</button>
         <button class="cmd-btn" onclick="location.reload()" style="color:var(--err); border-color:var(--err);">☢️ RESET</button>
     </div>
 
-    <div id="term-log">> SVR PRO-DEV BOOT SEQUENCE INITIATED...</div>
+    <div id="term-log">> SVR PRO-DEV BOOT SEQUENCE INITIATED...<br>> WAITING FOR SCARLETT ONE SPINE...</div>
 
     <div id="mobile-sticks">
         <div class="base"><div class="nub"></div></div>
@@ -80,26 +81,28 @@
 
     <script type="module">
         // --- SMART-PATH BOOTLOADER ---
-        const log = document.getElementById('term-log');
-        window.sysMsg = (m) => { log.innerHTML = `> ${m}<br>` + log.innerHTML; };
+        const logPanel = document.getElementById('term-log');
+        window.sysMsg = (msg) => { 
+            logPanel.innerHTML += `<br>> ${msg}`;
+            logPanel.scrollTop = logPanel.scrollHeight;
+        };
         window.toggleHUD = () => document.getElementById('diag-hud').classList.toggle('hidden');
 
-        // FORCE CORRECT GITHUB PATHING
+        // Path detection to avoid 404 on GitHub Pages
         const repoPath = window.location.pathname.includes('SVR') ? '/SVR' : '';
         const target = `${repoPath}/js/scarlett1/index.js`.replace('//', '/');
-        
         document.getElementById('path-val').innerText = target;
 
         import(target)
-            .then(m => {
-                m.initEngine();
+            .then(module => {
+                module.initEngine();
                 document.getElementById('st-val').innerText = 'ACTIVE';
                 document.getElementById('st-val').style.color = '#0f0';
                 sysMsg("SPINE CONNECTED SUCCESSFULLY.");
             })
-            .catch(e => {
+            .catch(err => {
                 sysMsg("FATAL: FILE NOT FOUND AT " + target);
-                console.error(e);
+                console.error("IMPORT FAILED:", err); //
             });
     </script>
 </body>
