@@ -10,7 +10,6 @@ export function initDealer({ scene, Bus }) {
   deck.position.set(0.9, 1.08, 0.5);
   scene.add(deck);
 
-  const cards = [];
   function meta(){
     return { rank: RANKS[(Math.random()*RANKS.length)|0], suit: SUITS[(Math.random()*SUITS.length)|0] };
   }
@@ -24,7 +23,6 @@ export function initDealer({ scene, Bus }) {
     card.position.set(x, 1.11, z);
     card.userData = { ...m, isCard:true };
     scene.add(card);
-    cards.push(card);
     Bus?.log?.(`DEALT: ${m.rank}${m.suit}`);
   }
 

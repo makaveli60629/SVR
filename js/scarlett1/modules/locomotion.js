@@ -1,7 +1,7 @@
 export function initLocomotion({ playerGroup, camera, Bus }) {
   const keys = new Set();
   let yaw = 0;
-  const stick = { mx:0, my:0, tx:0, ty:0 }; // move, turn
+  const stick = { mx:0, my:0, tx:0, ty:0 };
   const pads = {
     move: { pad: document.getElementById('movePad'), knob: document.getElementById('moveKnob'), active:false, id:null, cx:0, cy:0 },
     turn: { pad: document.getElementById('turnPad'), knob: document.getElementById('turnKnob'), active:false, id:null, cx:0, cy:0 },
@@ -45,25 +45,21 @@ export function initLocomotion({ playerGroup, camera, Bus }) {
   bindPad(pads.turn, (x,y)=>{ stick.tx = x; stick.ty = y; });
 
   const speed = 3.2;
-  const turnSpeed = 1.6; // rad/sec approx
+  const turnSpeed = 1.6;
 
   function update(dt){
-    // keyboard move
     let fx = 0, fz = 0;
     if (keys.has('w')) fz -= 1;
     if (keys.has('s')) fz += 1;
     if (keys.has('a')) fx -= 1;
     if (keys.has('d')) fx += 1;
 
-    // add stick
     fx += stick.mx;
     fz += stick.my;
 
-    // turn from stick turn x
     yaw += (-stick.tx) * turnSpeed * dt;
     playerGroup.rotation.y = yaw;
 
-    // move in facing direction
     const sin = Math.sin(yaw), cos = Math.cos(yaw);
     const dx = (fx * cos - fz * sin) * speed * dt;
     const dz = (fx * sin + fz * cos) * speed * dt;
@@ -72,7 +68,6 @@ export function initLocomotion({ playerGroup, camera, Bus }) {
     playerGroup.position.z += dz;
   }
 
-  // expose
   window.__locomotionUpdate = update;
   Bus?.log?.('LOCOMOTION ONLINE');
 }

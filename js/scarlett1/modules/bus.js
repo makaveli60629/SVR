@@ -1,4 +1,5 @@
 export const Bus = {
+  init() {},
   log(msg) {
     const term = document.getElementById('term');
     if (term) {

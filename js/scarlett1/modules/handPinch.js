@@ -1,4 +1,5 @@
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
+
 export function initHands(renderer, scene) {
   try {
     const factory = new XRHandModelFactory();
@@ -7,5 +8,5 @@ export function initHands(renderer, scene) {
       hand.add(factory.createHandModel(hand,'mesh'));
       scene.add(hand);
     }
-  } catch(e){}
+  } catch(e){ /* ignore */ }
 }
