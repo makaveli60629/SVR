@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { initVideoFeed } from './modules/videoFeed.js';
 import { initStoreDisplay } from './modules/storeDisplay.js';
+import { createRailing } from './modules/railing.js';
 
 export function createWorld(scene) {
   // Atmosphere
@@ -65,6 +66,9 @@ export function createWorld(scene) {
   rim.rotation.x = Math.PI/2;
   rim.position.y = 1.62;
   worldGroup.add(rim);
+
+  // Spectator railing at pit lip (Module 23)
+  createRailing(scene, { radius: 4.5, y: 1.25, centerX: 0, centerZ: 0, posts: 12 });
 
   // Steps/ramp into pit (simple wedge)
   const ramp = new THREE.Mesh(

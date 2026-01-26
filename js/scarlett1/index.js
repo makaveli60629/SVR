@@ -12,6 +12,7 @@ import { initDiagnostics } from './modules/diagnostics.js';
 import { Bus } from './modules/bus.js';
 import { initAvatars } from './modules/avatarManager.js';
 import { initRadio } from './modules/radio.js';
+import { initAvatarWalk, updateAvatarWalk } from './modules/avatarWalk.js';
 import { spawnFloatingCard, updateCardHUD } from './modules/cardHUD.js';
 import { initBots, updateBots } from './modules/bots.js';
 
@@ -77,6 +78,8 @@ export function initEngine() {
   Bus.log('SPINE SYNC: SUCCESSFUL.');
   Bus.log('MOVE/ TURN: bottom pads (mobile) or WASD (desktop).');
   Bus.log('AVATARS: use buttons (Male/Female/Ninja/Combat).');
+  Bus.log('WALKING AVATARS: procedural patrol active.');
+  Bus.log('RAILING: spectator railing active.');
   Bus.log('JUMBOTRON: update via button (STATUS).');
 
   renderer.setAnimationLoop(() => {
