@@ -1,3 +1,5 @@
+// Debug locomotion: WASD desktop, drag on mobile.
+// Moves playerGroup on X/Z only.
 export const Locomotion = {
   _keys: new Set(),
   _drag: null,
