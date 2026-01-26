@@ -1,96 +1,187 @@
 import * as THREE from 'three';
 import { initVideoFeed } from './modules/videoFeed.js';
+import { initStoreDisplay } from './modules/storeDisplay.js';
 
 export function createWorld(scene) {
-  // 1) Atmosphere
-  scene.fog = new THREE.FogExp2(0x000000, 0.10);
+  // Atmosphere
+  scene.fog = new THREE.FogExp2(0x000000, 0.085);
 
-  // 2) Lighting rig (safe + cinematic)
-  const spotLight = new THREE.SpotLight(0x00ff00, 15, 20, Math.PI / 4, 0.5);
-  spotLight.position.set(0, 8, 0);
-  scene.add(spotLight);
-  scene.add(new THREE.AmbientLight(0x0a0a20, 0.8));
-  const safetySun = new THREE.DirectionalLight(0xffffff, 1.4);
-  safetySun.position.set(5, 10, 5);
-  scene.add(safetySun);
+  // === SEALED LOBBY (walls + ceiling) ===
+  const room = new THREE.Group();
+  room.name = "LOBBY_ROOM";
+  scene.add(room);
 
+  // Big interior box (inward-facing)
+  const roomMat = new THREE.MeshStandardMaterial({
+    color: 0x050505, roughness: 0.35, metalness: 0.35,
+    emissive: 0x000600, emissiveIntensity: 0.7,
+    side: THREE.BackSide
+  });
+  const roomBox = new THREE.Mesh(new THREE.BoxGeometry(120, 40, 120), roomMat);
+  roomBox.position.set(0, 16, 0);
+  room.add(roomBox);
+
+  // Floor (high ground ring) + pit
   const worldGroup = new THREE.Group();
+  scene.add(worldGroup);
 
-  // 3) Sunken pit + high ground
-  const floor = new THREE.Mesh(
-    new THREE.RingGeometry(4.5, 30, 64),
-    new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.1, metalness: 0.9, emissive: 0x001000, emissiveIntensity: 0.6 })
+  const high = new THREE.Mesh(
+    new THREE.RingGeometry(4.5, 34, 96),
+    new THREE.MeshStandardMaterial({ color: 0x060606, roughness: 0.15, metalness: 0.85, emissive: 0x001000, emissiveIntensity: 0.6 })
   );
-  floor.rotation.x = -Math.PI/2;
-  floor.position.y = 1.6;
-  worldGroup.add(floor);
+  high.rotation.x = -Math.PI/2;
+  high.position.y = 1.6;
+  worldGroup.add(high);
 
-  const pitFloor = new THREE.Mesh(
-    new THREE.CircleGeometry(4.5, 64),
-    new THREE.MeshStandardMaterial({ color: 0x020202, emissive: 0x000600, emissiveIntensity: 0.5, roughness: 1.0 })
+  const pit = new THREE.Mesh(
+    new THREE.CircleGeometry(4.5, 96),
+    new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.9, emissive: 0x000800, emissiveIntensity: 0.55 })
   );
-  pitFloor.rotation.x = -Math.PI/2;
-  pitFloor.position.y = 0.0;
-  worldGroup.add(pitFloor);
+  pit.rotation.x = -Math.PI/2;
+  pit.position.y = 0.0;
+  worldGroup.add(pit);
 
   // Neon rim lip
-  const rim = new THREE.Mesh(
-    new THREE.TorusGeometry(4.5, 0.04, 16, 120),
-    new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-  );
-  rim.rotation.x = Math.PI/2;
-  rim.position.y = 1.61;
-  worldGroup.add(rim);
-
-  // 4) Jumbotrons (2 screens + live canvas feed)
-  function createJumbotron(x, z, ry, id) {
-    const screen = new THREE.Mesh(
-      new THREE.PlaneGeometry(8, 4.5),
-      new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        emissive: 0x00ff00,
-        emissiveIntensity: 0.25,
-        side: THREE.DoubleSide
-      })
-    );
-    screen.position.set(x, 5.5, z);
-    screen.rotation.y = ry;
-    scene.add(screen);
-    initVideoFeed(screen, id);
-    return screen;
+  // === AVATAR PEDESTALS (selection stations) ===
+  const pedMat = new THREE.MeshStandardMaterial({ color: 0x101010, emissive: 0x00ff00, emissiveIntensity: 0.25, roughness: 0.6 });
+  const pedTopMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  for (let i=0;i<6;i++){
+    const a = (i/6) * Math.PI * 2;
+    const px = Math.cos(a) * 7.0;
+    const pz = Math.sin(a) * 7.0;
+    const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.75, 0.25, 28), pedMat);
+    ped.position.set(px, 1.6 + 0.13, pz);
+    scene.add(ped);
+    const top = new THREE.Mesh(new THREE.CircleGeometry(0.62, 24), pedTopMat);
+    top.rotation.x = -Math.PI/2;
+    top.position.set(px, 1.6 + 0.26, pz);
+    scene.add(top);
   }
 
-  const j1 = createJumbotron(0, -12, 0, "main");
-  const j2 = createJumbotron(12, 0, -Math.PI/2, "side");
+  const rimMat = new THREE.MeshStandardMaterial({
+    color: 0x00ff00, emissive: 0x00ff00, emissiveIntensity: 3.5, roughness: 0.2, metalness: 0.3
+  });
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(4.5, 0.05, 18, 180), rimMat);
+  rim.rotation.x = Math.PI/2;
+  rim.position.y = 1.62;
+  worldGroup.add(rim);
 
-  // Global updater updates both screens
-  window.updateJumbotron = (title, status) => {
-    window.__jumbotronUpdate?.("main", title, status);
-    window.__jumbotronUpdate?.("side", title, status);
-  };
-  window.updateJumbotron("Scarlett Empire", "Lobby Active");
+  // Steps/ramp into pit (simple wedge)
+  const ramp = new THREE.Mesh(
+    new THREE.BoxGeometry(2.2, 1.6, 4.5),
+    new THREE.MeshStandardMaterial({ color: 0x040404, emissive: 0x000600, emissiveIntensity: 0.5, roughness: 0.6 })
+  );
+  ramp.position.set(0, 0.8, 4.5);
+  ramp.rotation.y = Math.PI;
+  worldGroup.add(ramp);
 
-  // 5) Center table (pit pedestal)
+  // Center poker table
   const table = new THREE.Mesh(
-    new THREE.CylinderGeometry(2.5, 2.5, 0.3, 40),
-    new THREE.MeshStandardMaterial({ color: 0x004400, roughness: 0.8, emissive: 0x001100, emissiveIntensity: 0.8 })
+    new THREE.CylinderGeometry(2.5, 2.5, 0.32, 48),
+    new THREE.MeshStandardMaterial({ color: 0x004400, roughness: 0.85, emissive: 0x001100, emissiveIntensity: 0.9 })
   );
   table.position.set(0, 0.95, 0);
   worldGroup.add(table);
   scene.userData.table = table;
 
-  // Skybox (inside-visible)
-  const sky = new THREE.Mesh(
-    new THREE.BoxGeometry(160, 160, 160),
-    new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide })
-  );
-  scene.add(sky);
+  // Decorative pillars around the space
+  const pillarMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.25, metalness: 0.6, emissive: 0x000400, emissiveIntensity: 0.5 });
+  for (let i=0;i<12;i++){
+    const a = (i/12)*Math.PI*2;
+    const x = Math.cos(a)*22;
+    const z = Math.sin(a)*22;
+    const p = new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,14,18), pillarMat);
+    p.position.set(x, 7, z);
+    worldGroup.add(p);
 
-  scene.add(worldGroup);
+    // pillar neon strip
+    const strip = new THREE.Mesh(
+      new THREE.BoxGeometry(0.08, 10, 0.08),
+      new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+    );
+    strip.position.set(x, 7, z);
+    worldGroup.add(strip);
+  }
 
-  // Helpers (kept for safety while we build)
-  // === MOVEMENT VISIBILITY (Safe Mode UX) ===
-  // Spawn beacon ring (shows where you start)
+  // === LOTS OF LIGHTS (safe + pretty) ===
+  // Soft ambient base so nothing goes black
+  scene.add(new THREE.AmbientLight(0x203040, 0.8));
+
+  // Big "god ray" spotlight over table
+  const god = new THREE.SpotLight(0x00ff88, 35, 40, Math.PI/5, 0.35, 1.0);
+  god.position.set(0, 18, 0);
+  god.target = table;
+  scene.add(god);
+  scene.add(god.target);
+
+  // Ceiling ring of point lights
+  const lightGroup = new THREE.Group();
+  scene.add(lightGroup);
+  const ringR = 18;
+  for (let i=0;i<16;i++){
+    const a = (i/16)*Math.PI*2;
+    const x = Math.cos(a)*ringR;
+    const z = Math.sin(a)*ringR;
+    const l = new THREE.PointLight(0x00ff66, 2.2, 35, 2.0);
+    l.position.set(x, 14, z);
+    lightGroup.add(l);
+
+    // visible bulbs (emissive)
+    const bulb = new THREE.Mesh(
+      new THREE.SphereGeometry(0.22, 14, 10),
+      new THREE.MeshBasicMaterial({ color: 0x00ff66 })
+    );
+    bulb.position.copy(l.position);
+    lightGroup.add(bulb);
+  }
+
+  // Wall wash lights (blue/purple for depth)
+  for (let i=0;i<8;i++){
+    const a = (i/8)*Math.PI*2;
+    const x = Math.cos(a)*45;
+    const z = Math.sin(a)*45;
+    const c = (i%2===0) ? 0x2233ff : 0x6622ff;
+    const w = new THREE.PointLight(c, 3.0, 60, 2.0);
+    w.position.set(x, 10, z);
+    scene.add(w);
+  }
+
+  // === JUMBOTRONS + LIVE FEED ===
+  function createJumbotron(x, z, ry, id, mode='live') {
+    const frame = new THREE.Mesh(
+      new THREE.BoxGeometry(9.2, 5.2, 0.2),
+      new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.2, metalness: 0.8, emissive: 0x001000, emissiveIntensity: 0.8 })
+    );
+    frame.position.set(x, 6.2, z);
+    frame.rotation.y = ry;
+    scene.add(frame);
+
+    const screen = new THREE.Mesh(
+      new THREE.PlaneGeometry(8, 4.5),
+      new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x00ff00, emissiveIntensity: 0.3, side: THREE.DoubleSide })
+    );
+    screen.position.set(x, 6.2, z + Math.cos(ry)*0.11);
+    screen.rotation.y = ry;
+    scene.add(screen);
+
+    if (mode === 'store') initStoreDisplay(screen);
+    else initVideoFeed(screen, id);
+
+    return screen;
+  }
+
+  createJumbotron(0, -16, 0, "main", "live");
+  createJumbotron(16, 0, -Math.PI/2, "side", "live");
+  createJumbotron(-16, 0,  Math.PI/2, "store", "store");
+
+  window.updateJumbotron = (title, status) => {
+    window.__jumbotronUpdate?.("main", title, status);
+    window.__jumbotronUpdate?.("side", title, status);
+    window.__jumbotronUpdate?.("side2", title, status);
+  };
+  window.updateJumbotron("Scarlett Empire", "Lobby Active");
+
+  // === MOVEMENT VISIBILITY (keep) ===
   const beacon = new THREE.Mesh(
     new THREE.TorusGeometry(0.9, 0.03, 12, 64),
     new THREE.MeshBasicMaterial({ color: 0x00ff00 })
@@ -99,7 +190,6 @@ export function createWorld(scene) {
   beacon.position.set(0, 0.02, 8);
   scene.add(beacon);
 
-  // Forward arrow (shows facing direction at spawn)
   const arrow = new THREE.Mesh(
     new THREE.ConeGeometry(0.18, 0.6, 16),
     new THREE.MeshBasicMaterial({ color: 0x00ff00 })
@@ -108,24 +198,12 @@ export function createWorld(scene) {
   arrow.position.set(0, 0.06, 7.2);
   scene.add(arrow);
 
-  // Brighter ground grid for depth perception (helps movement)
-  const grid = new THREE.GridHelper(120, 120, 0x00ff00, 0x0a0a0a);
+  // Decorative floor grid for depth (lighter)
+  const grid = new THREE.GridHelper(160, 160, 0x00ff00, 0x0a0a0a);
   grid.position.y = 0.01;
   scene.add(grid);
-
-  // Horizon posts (simple neon pylons for scale)
-  const postMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  for (let i=0;i<8;i++){
-    const a = (i/8) * Math.PI * 2;
-    const x = Math.cos(a) * 18;
-    const z = Math.sin(a) * 18;
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,3.0,12), postMat);
-    post.position.set(x, 1.5, z);
-    scene.add(post);
-  }
-
 }
 
 export function updateWorld(dt, playerGroup, camera) {
-  // reserved
+  // reserved for future world animation
 }

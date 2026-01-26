@@ -11,6 +11,9 @@ import { initChips } from './modules/chips.js';
 import { initDiagnostics } from './modules/diagnostics.js';
 import { Bus } from './modules/bus.js';
 import { initAvatars } from './modules/avatarManager.js';
+import { initRadio } from './modules/radio.js';
+import { spawnFloatingCard, updateCardHUD } from './modules/cardHUD.js';
+import { initBots, updateBots } from './modules/bots.js';
 
 let scene, camera, renderer, clock, playerGroup;
 
@@ -64,7 +67,9 @@ export function initEngine() {
   initDealer({ scene, Bus });
   initChips({ scene, Bus });
   initAvatars({ scene, Bus });       // avatar spawn buttons
+  initBots({ scene, Bus });          // NPCs walking + seated players
   initDiagnostics({ Bus });
+  initRadio();
 
   window.addEventListener('resize', onResize);
   onResize();
@@ -77,6 +82,7 @@ export function initEngine() {
   renderer.setAnimationLoop(() => {
     const dt = clock.getDelta();
     window.__locomotionUpdate?.(dt);
+    updateBots(dt);
     updateWorld(dt, playerGroup, camera);
 
     const p = playerGroup.position;
