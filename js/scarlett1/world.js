@@ -1,61 +1,41 @@
-import * as THREE from 'three';
-import { OculusHandModel } from 'three/addons/objects/OculusHandModel.js';
+// SVR/js/scarlett1/world.js
+// SCARLETT ONE • SVR — World module entry
+// RULE: Hands-only in VR. Always render something (no black screen).
 
-let hand1, hand2;
-let turnLock = false;
-const texturePath = 'assets/textures/';
+import { ModuleHub } from './modules/moduleHub.js';
+import { LobbyEnvironment } from './modules/lobbyEnvironment.js';
+import { LocomotionPads } from './modules/locomotionPads.js';
 
-export function createWorld(scene, camera, renderer, playerGroup) {
-    // 1. LIGHTING
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    const spotlight = new THREE.PointLight(0x00ff00, 2);
-    spotlight.position.set(0, 10, 0);
-    scene.add(spotlight);
+export function createWorld(ctx) {
+  const { THREE, scene, camera, rig, log } = ctx;
 
-    // 2. THE GRID (The "Dev Side" Floor)
-    const grid = new THREE.GridHelper(200, 200, 0x00ff00, 0x111111);
-    scene.add(grid);
+  // Always lit / always visible (anti-black)
+  scene.background = new THREE.Color(0x05070b);
+  scene.fog = new THREE.Fog(0x05070b, 8, 60);
 
-    // 3. HAND MODELS (Oculus Hand Tracking)
-    hand1 = renderer.xr.getHand(0);
-    hand1.add(new OculusHandModel(hand1));
-    playerGroup.add(hand1);
+  scene.add(new THREE.AmbientLight(0xffffff, 1.05));
 
-    hand2 = renderer.xr.getHand(1);
-    hand2.add(new OculusHandModel(hand2));
-    playerGroup.add(hand2);
+  const sun = new THREE.DirectionalLight(0xcffbff, 1.25);
+  sun.position.set(6, 12, 6);
+  sun.castShadow = false;
+  scene.add(sun);
 
-    // 4. TEST OBJECTS (So you know the world is alive)
-    const monolithGeo = new THREE.BoxGeometry(2, 20, 2);
-    const monolithMat = new THREE.MeshStandardMaterial({ color: 0x00ff00, wireframe: true });
-    const monolith = new THREE.Mesh(monolithGeo, monolithMat);
-    monolith.position.set(0, 10, -10);
-    scene.add(monolith);
-}
+  const fill = new THREE.PointLight(0x66ffcc, 0.7, 30, 2);
+  fill.position.set(-4, 3, -4);
+  scene.add(fill);
 
-export function updateWorld(delta, playerGroup) {
-    if (!hand1 || !hand1.visible) return;
+  // Spawn
+  camera.position.set(0, 1.6, 2);
+  camera.lookAt(0, 1.4, -3);
 
-    const speed = 5.0;
-    const pos = hand1.position;
+  log('[world] base scene ready');
 
-    // JOYSTICK MOVEMENT (Hand Forward/Back)
-    if (pos.z < -0.2) { 
-        playerGroup.translateZ(-speed * delta); // Move Forward
-    } else if (pos.z > 0.2) { 
-        playerGroup.translateZ(speed * delta); // Move Backward
-    }
+  // Register SAFE modules (you can add more later)
+  ModuleHub.register(LobbyEnvironment());
+  ModuleHub.register(LocomotionPads()); // Android touch pads + desktop WASD + VR hand-forward
 
-    // SNAP TURN (Hand Left/Right)
-    if (!turnLock) {
-        if (pos.x > 0.2) {
-            playerGroup.rotation.y -= Math.PI / 4;
-            turnLock = true;
-            setTimeout(() => turnLock = false, 500);
-        } else if (pos.x < -0.2) {
-            playerGroup.rotation.y += Math.PI / 4;
-            turnLock = true;
-            setTimeout(() => turnLock = false, 500);
-        }
-    }
+  // Init all modules (build lobby + controls)
+  ModuleHub.start();
+
+  log('[world] modules started ✅');
 }
