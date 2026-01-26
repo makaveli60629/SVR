@@ -3,28 +3,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Scarlett Empire OS • Safe Mode Restore</title>
+  <title>Scarlett • Safe Lobby Playable</title>
   <style>
     :root { --neon:#00ff00; --panel: rgba(0, 10, 0, 0.95); --cyan:#00ffff; --err:#ff0055; }
     body { margin:0; overflow:hidden; background:#000; font-family: 'Courier New', monospace; color:var(--neon); }
-    #hud { position:absolute; top:10px; left:10px; border:1px solid var(--neon); padding:12px; background:var(--panel); z-index:1000; width:320px; }
-    #term { position:absolute; bottom:120px; left:10px; right:10px; height:90px; background:rgba(0,0,0,0.85); border-left:4px solid var(--cyan);
+    #hud { position:absolute; top:10px; left:10px; border:1px solid var(--neon); padding:12px; background:var(--panel); z-index:1000; width:360px; }
+    #term { position:absolute; bottom:160px; left:10px; right:10px; height:110px; background:rgba(0,0,0,0.85); border-left:4px solid var(--cyan);
             padding:10px; font-size:10px; overflow-y:auto; color:#8f8; z-index:1000; }
-    .btn { background:#000; border:1px solid var(--neon); color:var(--neon); padding:10px; cursor:pointer; text-transform:uppercase; font-size:11px; min-width:220px; }
+    #controls { position:absolute; top:10px; right:10px; z-index:1001; display:flex; flex-direction:column; gap:8px; }
+    .btn { background:#000; border:1px solid var(--neon); color:var(--neon); padding:10px; cursor:pointer; text-transform:uppercase; font-size:10px; width:200px; }
+    .btn.danger { border-color: var(--err); color: var(--err); }
     #bar { position:absolute; bottom:20px; width:100%; text-align:center; z-index:1001; }
+    #entervr { width:320px; font-size:12px; }
+
+    /* Mobile pads */
+    #pads { position:absolute; left:0; right:0; bottom:0; height:160px; pointer-events:none; z-index:1000; display:flex; justify-content:space-between; padding:16px; }
+    .pad { width:140px; height:140px; border-radius:50%; border:2px dashed rgba(0,255,0,0.35); position:relative; pointer-events:auto; touch-action:none; }
+    .knob { width:54px; height:54px; border-radius:50%; border:2px solid rgba(0,255,0,0.7); position:absolute; left:43px; top:43px; background:rgba(0,255,0,0.08); }
+    .label { position:absolute; bottom:-18px; width:100%; text-align:center; font-size:10px; opacity:0.75; }
   </style>
 </head>
 <body>
   <div id="hud">
-    <div style="font-weight:bold;color:var(--cyan);">[ SCARLETT SAFE MODE ]</div>
+    <div style="font-weight:bold;color:var(--cyan);">[ SCARLETT SAFE LOBBY ]</div>
     STATUS: <span id="st" style="color:var(--err)">BOOTING</span><br>
-    NOTE: ClearColor forced to dark grey for visibility.
+    FPS: <span id="fps">--</span> | XYZ: <span id="pos">0.0, 1.6, 0.0</span><br>
+    NOTE: Touch pads (bottom) move/turn. WASD on desktop.
   </div>
 
-  <div id="term">> SAFE-MODE SPINE: INITIALIZING…</div>
+  <div id="controls">
+    <button class="btn" onclick="window.dealFlop?.()">🃏 DEAL FLOP</button>
+    <button class="btn" onclick="window.spawnChips?.()">🪙 SPAWN CHIPS</button>
+    <button class="btn" onclick="window.teleportHome?.()">🌀 TELEPORT HOME</button>
+    <button class="btn" onclick="window.hideHud?.()">☑ HIDE HUD</button>
+    <button class="btn danger" onclick="window.resetSpawn?.()">☢ RESET</button>
+  </div>
+
+  <div id="term">> BOOTING…</div>
 
   <div id="bar">
     <button id="entervr" class="btn">ENTER VR</button>
+  </div>
+
+  <div id="pads">
+    <div class="pad" id="movePad">
+      <div class="knob" id="moveKnob"></div>
+      <div class="label">MOVE</div>
+    </div>
+    <div class="pad" id="turnPad">
+      <div class="knob" id="turnKnob"></div>
+      <div class="label">TURN</div>
+    </div>
   </div>
 
   <script type="importmap">
@@ -40,8 +69,6 @@
     initEngine();
     const st = document.getElementById('st');
     if (st) { st.textContent = 'ACTIVE'; st.style.color = '#0f0'; }
-    const term = document.getElementById('term');
-    if (term) term.innerHTML += '<br>> SPINE SYNC: SUCCESSFUL.';
   </script>
 </body>
 </html>
