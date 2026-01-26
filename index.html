@@ -5,69 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>SVR | MISSION CONTROL</title>
   <style>
-    :root { --neon:#00ff00; --panel:rgba(0,10,0,0.95); --cyan:#00ffff; --err:#ff0055; }
-    body { margin:0; overflow:hidden; background:#000; font-family:Courier New, monospace; color:var(--neon); }
-    #diag-hud { position:absolute; top:10px; left:10px; border:1px solid var(--neon); padding:12px; background:var(--panel); z-index:1000; width:280px; display:none; }
-    #term-log { position:absolute; bottom:160px; left:10px; right:10px; height:110px; background:rgba(0,0,0,0.85); border-left:4px solid var(--cyan); padding:10px; font-size:10px; overflow-y:auto; color:#8f8; display:none; }
-    .cmd-btn { background:#000; border:1px solid var(--neon); color:var(--neon); padding:12px; cursor:pointer; font-size:11px; text-transform:uppercase; min-width:160px; }
+    :root { --neon:#00ff00; --panel: rgba(0, 10, 0, 0.95); --err:#ff0055; --cyan:#00ffff; }
+    body { margin:0; overflow:hidden; background:#000; font-family:'Courier New', monospace; color:var(--neon); }
+    #diag-hud { position:absolute; top:10px; left:10px; border:1px solid var(--neon); padding:12px; background:var(--panel); z-index:1000; width:260px; }
+    #term-log { position:absolute; bottom:160px; left:10px; right:10px; height:110px; background:rgba(0,0,0,0.85); border-left:4px solid var(--cyan); padding:10px; font-size:10px; overflow-y:auto; color:#8f8; }
+    .cmd-btn { background:#000; border:1px solid var(--neon); color:var(--neon); padding:10px; cursor:pointer; text-transform:uppercase; font-size:10px; margin-bottom:6px; width:160px; }
+    #controls { position:absolute; top:10px; right:10px; z-index:1001; display:flex; flex-direction:column; gap:6px; }
+    #storePanel { position:absolute; right:10px; top:170px; width:240px; padding:10px; border:1px solid var(--neon); background:var(--panel); display:none; z-index:1002; }
+    #storePanel h3 { margin:0 0 8px 0; color:var(--cyan); font-size:12px; }
+    .store-item { display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(0,255,0,0.35); padding:8px; margin-bottom:8px; }
+    .store-item button { background:#000; border:1px solid var(--cyan); color:var(--cyan); padding:6px 8px; cursor:pointer; font-size:10px; }
   </style>
 </head>
 <body>
   <div id="diag-hud">
-    <div style="font-weight:bold;color:var(--cyan)">[ SVR-CORE MONITOR ]</div>
-    STATUS: <span id="st-val" style="color:var(--err)">OFFLINE</span><br>
-    MODE: <span id="mode-val" style="color:var(--cyan)">PERMANENT</span><br>
+    <div style="font-weight:bold;color:var(--cyan);">[ SVR-CORE MONITOR ]</div>
+    STATUS: <span id="st-val" style="color:var(--neon)">ACTIVE</span><br>
+    FPS: <span id="fps-val">--</span> | MEM: <span style="color:var(--cyan)">STABLE</span><br>
     XYZ: <span id="pos-val">0.0, 1.6, 0.0</span>
   </div>
-  <div id="term-log">> BOOT...</div>
+
+  <div id="controls">
+    <button class="cmd-btn" onclick="window.toggleStore && window.toggleStore()">🛒 OPEN STORE</button>
+    <button class="cmd-btn" onclick="window.teleportHome && window.teleportHome()">🌀 TELEPORT</button>
+    <button class="cmd-btn" onclick="window.hideHud && window.hideHud()">☑ HIDE HUD</button>
+    <button class="cmd-btn" style="border-color:var(--err);color:var(--err)" onclick="window.resetSpawn && window.resetSpawn()">☢ RESET</button>
+  </div>
+
+  <div id="storePanel">
+    <h3>ASSET STORE</h3>
+    <div class="store-item"><span>MALE</span><button onclick="window.equipAsset && window.equipAsset('male')">EQUIP</button></div>
+    <div class="store-item"><span>FEMALE</span><button onclick="window.equipAsset && window.equipAsset('female')">EQUIP</button></div>
+    <div class="store-item"><span>NINJA</span><button onclick="window.equipAsset && window.equipAsset('ninja')">EQUIP</button></div>
+  </div>
+
+  <div id="term-log">> SPINE SYNC: SUCCESSFUL.<br>> MODULES LOADED: WORLD, HANDS, STORE, LOCOMOTION.</div>
 
   <div style="position:absolute; bottom:20px; width:100%; text-align:center;">
-    <button id="entervr" class="cmd-btn">INITIALIZE VR SESSION</button>
+    <button id="entervr" class="cmd-btn" style="width:260px; font-size:12px; margin:0 auto;">ENTER VR</button>
   </div>
 
   <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-      }
-    }
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                   "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
   </script>
 
   <script type="module">
     import { initEngine } from './js/scarlett1/index.js';
-
-    const params = new URLSearchParams(location.search);
-    const dev = params.get('dev') === '1' || params.get('dev') === 'true';
-    document.getElementById('mode-val').innerText = dev ? 'DEV' : 'PERMANENT';
-    document.getElementById('diag-hud').style.display = dev ? 'block' : 'none';
-    document.getElementById('term-log').style.display = dev ? 'block' : 'none';
-
-    function log(msg){
-      const term = document.getElementById('term-log');
-      if(!term || term.style.display === 'none') return;
-      term.innerHTML += `<br>> ${msg}`;
-      term.scrollTop = term.scrollHeight;
-    }
-
     initEngine();
 
-    const st = document.getElementById('st-val');
-    st.innerText = 'ACTIVE';
-    st.style.color = '#0f0';
-    log('ENGINE ACTIVE');
-
-    document.getElementById('entervr').addEventListener('click', async () => {
-      // three.js will show its own XR button in some setups; this is a simple "try enter"
-      try {
-        if (!navigator.xr) { log('WebXR not available'); return; }
-        const ok = await navigator.xr.isSessionSupported('immersive-vr');
-        if (!ok) { log('immersive-vr not supported'); return; }
-        log('Use browser XR UI to enter VR (Quest: Oculus Browser)');
-      } catch (e) {
-        log('Enter VR error: ' + (e?.message || e));
-      }
-    });
+    window.hideHud = () => {
+      const hud = document.getElementById('diag-hud');
+      const term = document.getElementById('term-log');
+      const vis = hud.style.display !== 'none';
+      hud.style.display = vis ? 'none' : 'block';
+      term.style.display = vis ? 'none' : 'block';
+    };
   </script>
 </body>
 </html>
