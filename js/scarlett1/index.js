@@ -7,41 +7,41 @@ export function initEngine() {
     scene = new THREE.Scene();
     clock = new THREE.Clock();
     
-    // PLAYER RIG (The Spine)
+    // PLAYER RIG - The physical presence in VR
     playerGroup = new THREE.Group();
     scene.add(playerGroup);
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     playerGroup.add(camera);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.xr.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    // Load World Content
+    // Initialize the logic from world.js
     createWorld(scene, camera, renderer, playerGroup);
 
-    // VR Interaction
-    const vrBtn = document.getElementById('entervr');
-    vrBtn.addEventListener('click', () => {
+    // VR Entry Hook
+    const btn = document.getElementById('entervr');
+    btn.addEventListener('click', () => {
         navigator.xr.requestSession('immersive-vr', {
             optionalFeatures: ['hand-tracking', 'local-floor']
         }).then(session => renderer.xr.setSession(session));
     });
 
-    renderer.setAnimationLoop(tick);
+    renderer.setAnimationLoop(renderLoop);
 }
 
-function tick() {
+function renderLoop() {
     const delta = clock.getDelta();
     
-    // UI Update
-    const fps = Math.round(1 / delta);
-    document.getElementById('fps-val').innerText = fps;
+    // Update Diagnostic UI
+    document.getElementById('fps-val').innerText = Math.round(1 / delta);
     const p = playerGroup.position;
-    document.getElementById('pos-val').innerText = `${p.x.toFixed(1)}, ${p.y.toFixed(1)}, ${p.z.toFixed(1)}`;
+    document.getElementById('pos-val').innerText = `${p.x.toFixed(2)}, ${p.y.toFixed(2)}, ${p.z.toFixed(2)}`;
+    document.getElementById('rot-val').innerText = `${Math.round(playerGroup.rotation.y * (180/Math.PI))}°`;
 
     updateWorld(delta, playerGroup);
     renderer.render(scene, camera);
