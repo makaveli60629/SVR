@@ -1,6 +1,6 @@
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 
-// Hands visual meshes (safe no-op if unsupported)
+// Hands-only visuals (safe no-op if unsupported)
 export function initHands(renderer, scene) {
   try {
     const factory = new XRHandModelFactory();
