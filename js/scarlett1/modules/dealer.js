@@ -1,38 +1,39 @@
 import * as THREE from 'three';
+const SUITS = ['H','D','C','S'];
+const RANKS = [2,3,4,5,6,7,8,9,10,11,12,13,14];
 
-export function initDealer({ Bus, scene }) {
-  const deckGeo = new THREE.BoxGeometry(0.10, 0.05, 0.15);
-  const deckMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-  const deck = new THREE.Mesh(deckGeo, deckMat);
-  deck.position.set(0.5, 0.95, -2.8);
-  deck.name = 'MAIN_DECK';
+export function initDealer({ scene, Bus }) {
+  const deck = new THREE.Mesh(
+    new THREE.BoxGeometry(0.12,0.05,0.18),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x111111, emissiveIntensity: 0.8 })
+  );
+  deck.position.set(0.9, 1.08, 0.5);
   scene.add(deck);
 
   const cards = [];
-  scene.userData._cards = cards;
-
-  function dealCard(x, z) {
-    const cardGeo = new THREE.PlaneGeometry(0.06, 0.09);
-    const cardMat = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide });
-    const card = new THREE.Mesh(cardGeo, cardMat);
-    card.rotation.x = -Math.PI / 2;
-    card.position.set(x, 0.96, z);
-    card.userData.isCard = true;
+  function meta(){
+    return { rank: RANKS[(Math.random()*RANKS.length)|0], suit: SUITS[(Math.random()*SUITS.length)|0] };
+  }
+  function deal(x,z){
+    const m = meta();
+    const card = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.08,0.12),
+      new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x111111, emissiveIntensity: 0.6, side: THREE.DoubleSide })
+    );
+    card.rotation.x = -Math.PI/2;
+    card.position.set(x, 1.11, z);
+    card.userData = { ...m, isCard:true };
     scene.add(card);
     cards.push(card);
-    Bus.emit('cardSpawned', card);
-    window.playSound?.('shuffle');
-    return card;
+    Bus?.log?.(`DEALT: ${m.rank}${m.suit}`);
   }
 
-  // Quick HUD actions
   window.dealFlop = () => {
-    Bus.log('DEAL: FLOP');
-    dealCard(-0.25, -3.05);
-    dealCard( 0.00, -3.05);
-    dealCard( 0.25, -3.05);
+    Bus?.log?.('DEAL: FLOP');
+    deal(-0.25, 0.0);
+    deal(0.00, 0.0);
+    deal(0.25, 0.0);
   };
 
-  scene.userData.dealCard = dealCard;
-  Bus.log('DEALER MODULE ONLINE');
+  Bus?.log?.('DEALER ONLINE');
 }
