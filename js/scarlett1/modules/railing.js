@@ -22,7 +22,7 @@ export function createRailing(scene, {
     metalness: 1.0,
     roughness: 0.12,
     emissive: 0x00ff00,
-    emissiveIntensity: 0.10
+    emissiveIntensity: 0.22
   });
 
   const rail = new THREE.Mesh(railGeo, railMat);
