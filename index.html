@@ -22,11 +22,13 @@
       padding: 10px;
       background: rgba(0, 20, 0, 0.85);
       z-index: 10;
-      max-width: 90vw;
+      max-width: 92vw;
       pointer-events: none;
+      box-sizing: border-box;
     }
 
-    #hud b { color: #7CFFB3; }
+    #hud .title { color: #7CFFB3; font-weight: 700; }
+    #hud .muted { opacity: 0.9; }
 
     #logpanel {
       position: absolute;
@@ -38,10 +40,11 @@
       background: rgba(0, 20, 0, 0.85);
       z-index: 10;
       font-size: 12px;
-      max-height: 200px;
+      max-height: 240px;
       overflow-y: auto;
       white-space: pre-wrap;
       pointer-events: none;
+      box-sizing: border-box;
     }
 
     #ui {
@@ -56,7 +59,7 @@
       padding: 16px 26px;
       font-size: 16px;
       border: 1px solid #fff;
-      background: rgba(255,255,255,0.05);
+      background: rgba(255, 255, 255, 0.05);
       color: #fff;
       border-radius: 10px;
       cursor: pointer;
@@ -68,14 +71,14 @@
       right: 10px;
       z-index: 12;
       font-size: 12px;
-      opacity: 0.85;
+      opacity: 0.9;
+      pointer-events: auto;
     }
 
     #links a {
       color: #9BFF9B;
       text-decoration: underline;
       margin-left: 10px;
-      pointer-events: auto;
     }
   </style>
 </head>
@@ -83,18 +86,18 @@
 <body>
 
   <div id="links">
-    <a href="/SVR/disable-sw.html">disable-sw</a>
-    <a href="/SVR/js/scarlett1/index.js" target="_blank" rel="noopener">engine</a>
-    <a href="/SVR/js/scarlett1/world.js" target="_blank" rel="noopener">world</a>
+    <a href="./disable-sw.html">disable-sw</a>
+    <a href="./js/scarlett1/index.js" target="_blank" rel="noopener">engine</a>
+    <a href="./js/scarlett1/world.js" target="_blank" rel="noopener">world</a>
   </div>
 
   <div id="hud">
-    <b>SCARLETT ONE</b> • SVR<br>
+    <div class="title">SCARLETT ONE • SVR</div>
     STATUS: <span id="status">BOOTING</span><br>
     FPS: <span id="fps-val">0</span><br>
     POS: <span id="pos-val">0.00, 0.00, 0.00</span><br>
-    <span style="opacity:.9">Android debug renders before VR. Press ENTER VR for hands.</span><br>
-    <span style="opacity:.9">Hands-only. Textures: assets/textures/.</span>
+    <span class="muted">Android debug renders before VR. Press ENTER VR for hands.</span><br>
+    <span class="muted">Hands-only. Textures: assets/textures/.</span>
   </div>
 
   <div id="logpanel">booting…</div>
@@ -103,7 +106,7 @@
     <button id="entervr" class="btn">ENTER VR (HANDS ONLY)</button>
   </div>
 
-  <!-- Importmap is safe even if your engine uses CDN imports -->
+  <!-- Importmap is safe even if engine uses CDN imports -->
   <script type="importmap">
   {
     "imports": {
@@ -118,30 +121,34 @@
     const logEl = document.getElementById('logpanel');
 
     function log(line) {
-      logEl.textContent = (logEl.textContent + "\n" + line).split("\n").slice(-200).join("\n");
+      logEl.textContent = (logEl.textContent + "\n" + line).split("\n").slice(-220).join("\n");
       logEl.scrollTop = logEl.scrollHeight;
     }
 
-    // HARD LOCKED PATHS — NO BASE-PATH DETECTION
-    const ENGINE_URL = '/SVR/js/scarlett1/index.js';
+    // ✅ THE FIX: RELATIVE ENGINE IMPORT (kills /VR vs /SVR mismatch forever)
+    const ENGINE_URL = new URL('./js/scarlett1/index.js', window.location.href).href;
 
+    log('[boot] location=' + window.location.href);
     log('[boot] loading engine from ' + ENGINE_URL);
 
     import(ENGINE_URL)
       .then(mod => {
         statusEl.textContent = 'LINKED';
         log('[boot] engine imported ✅');
+
         if (!mod || typeof mod.initEngine !== 'function') {
           statusEl.textContent = 'FATAL ENGINE EXPORT';
           log('[FATAL] initEngine() export missing from engine module');
           return;
         }
+
         mod.initEngine();
+        log('[boot] initEngine() called ✅');
       })
       .catch(err => {
         statusEl.textContent = 'FATAL IMPORT';
-        log('[FATAL] ' + (err?.message || String(err)));
-        log('[HINT] Open ENGINE link top-right. If it does not show code, folder deploy is wrong.');
+        log('[FATAL] import failed: ' + (err?.message || String(err)));
+        log('[HINT] Tap "engine" link top-right. If it 404s, GitHub Pages is not serving /SVR yet.');
         console.error(err);
       });
   </script>
