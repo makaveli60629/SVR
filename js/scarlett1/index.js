@@ -1,23 +1,21 @@
 /**
  * SCARLETTVR POKER — SCARLETT1 (PERMANENT)
- * Single spine module: bright sealed lobby + doors + pads + table + cards + bots + wrist HUD + radio + joystick locomotion.
+ * Permanent Spine: bright circular lobby + doors + interaction pads + poker table + cards + bots + wrist HUD + radio + joystick locomotion.
+ * NEXT PHASE INCLUDED: Poker stages (Hole → Flop → Turn → River) + Jumbotrons + Circular Lobby.
  */
 
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { VRButton } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/VRButton.js';
 
-export const Scarlett1 = {
-  start
-};
+export const Scarlett1 = { start };
 
 function start() {
   const hud = document.getElementById('hud');
-
   const log = (...args) => {
     const t = ((performance.now()/1000).toFixed(3)).padStart(7,' ');
     const line = `[${t}] ${args.join(' ')}`;
     console.log(line);
-    hud.textContent = (hud.textContent + "\n" + line).slice(-1400);
+    hud.textContent = (hud.textContent + "\n" + line).slice(-1800);
   };
 
   // --- renderer / scene / camera ---
@@ -25,6 +23,7 @@ function start() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.xr.enabled = true;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
   document.body.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -56,12 +55,15 @@ function start() {
   dir2.position.set(-6, 10, -6);
   scene.add(dir2);
 
-  // --- sealed lobby room (walls/ceiling/floor) ---
+  // --- circular sealed lobby (floor/ceiling/walls) ---
   const room = new THREE.Group();
   scene.add(room);
 
+  const ROOM_R = 12;
+  const ROOM_H = 6;
+
   const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(24, 24),
+    new THREE.CircleGeometry(ROOM_R, 64),
     new THREE.MeshStandardMaterial({ color: 0x0b1220, roughness: 0.95, metalness: 0.05 })
   );
   floor.rotation.x = -Math.PI/2;
@@ -69,69 +71,95 @@ function start() {
   room.add(floor);
 
   const ceiling = new THREE.Mesh(
-    new THREE.PlaneGeometry(24, 24),
+    new THREE.CircleGeometry(ROOM_R, 64),
     new THREE.MeshStandardMaterial({ color: 0x070a12, roughness: 1, metalness: 0 })
   );
   ceiling.rotation.x = Math.PI/2;
-  ceiling.position.y = 6;
+  ceiling.position.y = ROOM_H;
   room.add(ceiling);
 
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0x0a0f1e, roughness: 0.9, metalness: 0.1 });
-  const mkWall = (w,h, x,y,z, ry=0) => {
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(w,h), wallMat);
-    m.position.set(x,y,z);
-    m.rotation.y = ry;
-    room.add(m);
-    return m;
-  };
-  mkWall(24, 6, 0, 3, -12, 0);
-  mkWall(24, 6, 0, 3,  12, Math.PI);
-  mkWall(24, 6, -12, 3, 0, Math.PI/2);
-  mkWall(24, 6,  12, 3, 0, -Math.PI/2);
+  // Cylindrical wall (sealed)
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x0a0f1e, roughness: 0.9, metalness: 0.12 });
+  const wall = new THREE.Mesh(
+    new THREE.CylinderGeometry(ROOM_R, ROOM_R, ROOM_H, 96, 1, true),
+    wallMat
+  );
+  wall.position.y = ROOM_H/2;
+  room.add(wall);
 
-  const grid = new THREE.GridHelper(24, 24, 0x3355ff, 0x0b1220);
+  // Neon ring accents
+  const ringMat = new THREE.MeshStandardMaterial({
+    color: 0x1730ff, roughness: 0.25, metalness: 0.75,
+    emissive: new THREE.Color(0x2a55ff), emissiveIntensity: 0.9
+  });
+  const ring1 = new THREE.Mesh(new THREE.TorusGeometry(ROOM_R-0.35, 0.06, 16, 128), ringMat);
+  ring1.rotation.x = Math.PI/2;
+  ring1.position.y = 0.08;
+  room.add(ring1);
+
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(ROOM_R-0.35, 0.06, 16, 128), ringMat);
+  ring2.rotation.x = Math.PI/2;
+  ring2.position.y = ROOM_H-0.08;
+  room.add(ring2);
+
+  const grid = new THREE.GridHelper(ROOM_R*2, 32, 0x3355ff, 0x0b1220);
   grid.position.y = 0.01;
   room.add(grid);
 
-  // --- Doors (entrances) ---
+  // --- Doors (3 entrances on the cylinder) ---
   const doors = new THREE.Group();
   room.add(doors);
 
-  const doorMat = new THREE.MeshStandardMaterial({ color: 0x1a2a55, roughness: 0.6, metalness: 0.4, emissive: new THREE.Color(0x0a1435), emissiveIntensity: 0.6 });
-  function makeDoor(x,z, ry, label) {
-    const g = new THREE.Group();
-    const panel = new THREE.Mesh(new THREE.BoxGeometry(2.4, 3.6, 0.15), doorMat);
-    panel.position.set(0, 1.8, 0);
-    panel.userData = { type: 'door', label, open: false };
-    g.add(panel);
+  const doorMat = new THREE.MeshStandardMaterial({
+    color: 0x1a2a55, roughness: 0.6, metalness: 0.4,
+    emissive: new THREE.Color(0x0a1435), emissiveIntensity: 0.8
+  });
 
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(2.6, 3.8, 0.2), new THREE.MeshStandardMaterial({ color: 0x05070f, roughness: 1 }));
-    frame.position.set(0, 1.9, -0.08);
-    g.add(frame);
+  function makeDoorAtAngle(theta, label) {
+    // door panel
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(2.4, 3.6, 0.18), doorMat);
+    panel.userData = { type: 'door', label, open: false, theta, slide: 0 };
 
-    g.position.set(x, 0, z);
-    g.rotation.y = ry;
-    doors.add(g);
+    // place on wall at radius
+    const x = Math.sin(theta) * (ROOM_R - 0.12);
+    const z = Math.cos(theta) * (ROOM_R - 0.12);
+    panel.position.set(x, 1.8, z);
+
+    // face inward
+    panel.lookAt(0, 1.8, 0);
+
+    doors.add(panel);
     return panel;
   }
-  const doorA = makeDoor(0, -11.85, 0, 'Main Entrance');
-  const doorB = makeDoor(-11.85, 0, Math.PI/2, 'Side Entrance');
-  const doorC = makeDoor(11.85, 0, -Math.PI/2, 'VIP Entrance');
 
-  // --- Interaction pads ---
+  const doorA = makeDoorAtAngle(0, 'Main Entrance');                  // north
+  const doorB = makeDoorAtAngle(Math.PI * 2/3, 'Side Entrance');      // 120°
+  const doorC = makeDoorAtAngle(Math.PI * 4/3, 'VIP Entrance');       // 240°
+
+  // --- Interaction pads (arc in front of spawn) ---
   const pads = new THREE.Group();
   room.add(pads);
 
-  const padMat = new THREE.MeshStandardMaterial({ color: 0x1230aa, roughness: 0.4, metalness: 0.6, emissive: new THREE.Color(0x1a3cff), emissiveIntensity: 1.2 });
-  function makePad(x,z, label, onTrigger) {
+  const padMat = new THREE.MeshStandardMaterial({
+    color: 0x1230aa, roughness: 0.4, metalness: 0.6,
+    emissive: new THREE.Color(0x1a3cff), emissiveIntensity: 1.2
+  });
+
+  function makePadPolar(r, theta, label, onTrigger) {
     const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 32), padMat);
+    const x = Math.sin(theta) * r;
+    const z = Math.cos(theta) * r;
     pad.position.set(x, 0.04, z);
     pad.userData = { type: 'pad', label, onTrigger };
     pads.add(pad);
 
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.03, 12, 64), new THREE.MeshStandardMaterial({
-      color: 0x6aa0ff, roughness: 0.2, metalness: 0.8, emissive: new THREE.Color(0x3355ff), emissiveIntensity: 0.7
-    }));
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(0.62, 0.03, 12, 64),
+      new THREE.MeshStandardMaterial({
+        color: 0x6aa0ff, roughness: 0.2, metalness: 0.8,
+        emissive: new THREE.Color(0x3355ff), emissiveIntensity: 0.7
+      })
+    );
     ring.rotation.x = Math.PI/2;
     ring.position.set(x, 0.08, z);
     pads.add(ring);
@@ -139,12 +167,11 @@ function start() {
     return pad;
   }
 
-  // --- Poker table area ---
+  // --- Poker table area (center) ---
   const poker = new THREE.Group();
   poker.position.set(0, 0, 0);
   room.add(poker);
 
-  // Table base
   const table = new THREE.Mesh(
     new THREE.CylinderGeometry(2.2, 2.2, 0.35, 48),
     new THREE.MeshStandardMaterial({ color: 0x131b2f, roughness: 0.8, metalness: 0.15 })
@@ -152,15 +179,16 @@ function start() {
   table.position.set(0, 0.35/2, 0);
   poker.add(table);
 
-  // Felt top
   const felt = new THREE.Mesh(
     new THREE.CylinderGeometry(2.0, 2.0, 0.08, 48),
-    new THREE.MeshStandardMaterial({ color: 0x0a3a2a, roughness: 1.0, metalness: 0.0, emissive: new THREE.Color(0x02140e), emissiveIntensity: 0.2 })
+    new THREE.MeshStandardMaterial({
+      color: 0x0a3a2a, roughness: 1.0, metalness: 0.0,
+      emissive: new THREE.Color(0x02140e), emissiveIntensity: 0.22
+    })
   );
   felt.position.set(0, 0.35 + 0.06, 0);
   poker.add(felt);
 
-  // Rail
   const rail = new THREE.Mesh(
     new THREE.TorusGeometry(2.05, 0.12, 16, 64),
     new THREE.MeshStandardMaterial({ color: 0x141a2f, roughness: 0.7, metalness: 0.2 })
@@ -207,35 +235,119 @@ function start() {
     bots.push(bot);
   }
 
-  // --- Cards (hover + deal animation) ---
+  // --- Cards group + materials ---
   const cardsGroup = new THREE.Group();
   poker.add(cardsGroup);
 
   const cardMat = new THREE.MeshStandardMaterial({
-    color: 0xf2f2f2, roughness: 0.8, metalness: 0.0,
-    emissive: new THREE.Color(0x0a0a0a), emissiveIntensity: 0.15
+    color: 0xf2f2f2,
+    roughness: 0.8,
+    metalness: 0.0,
+    emissive: new THREE.Color(0x0a0a0a),
+    emissiveIntensity: 0.15,
+    side: THREE.DoubleSide, // ✅ always visible
   });
 
+  // Community cards (5)
   const cards = [];
   for (let i=0;i<5;i++){
     const card = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.78), cardMat);
     card.rotation.x = -Math.PI/2;
-    card.position.set((i-2)*0.62, 0.70, 0);
+    card.position.set((i-2)*0.62, 0.72, 0);
     card.userData = { type:'card', idx:i, hoverPhase: Math.random()*Math.PI*2 };
     cardsGroup.add(card);
     cards.push(card);
   }
 
-  // --- Pads actions ---
+  // =============================
+  // NEXT PHASE: Poker Stages System
+  // Hole -> Flop -> Turn -> River
+  // =============================
+  const pokerState = {
+    stage: 0, // 0=idle, 1=hole dealt, 2=flop, 3=turn, 4=river
+    holeCards: [],
+    community: cards,
+  };
+
+  function clearHand() {
+    for (const hc of pokerState.holeCards) cardsGroup.remove(hc.mesh);
+    pokerState.holeCards.length = 0;
+
+    pokerState.community.forEach((c, i) => {
+      c.visible = false;
+      c.position.set((i-2)*0.62, 0.72, 0);
+      c.rotation.set(-Math.PI/2, 0, 0);
+    });
+
+    pokerState.stage = 0;
+    log('[poker] reset');
+  }
+
+  function spawnHoleCards() {
+    const holeMat = cardMat.clone();
+    holeMat.side = THREE.DoubleSide;
+
+    for (let seatIndex = 0; seatIndex < 8; seatIndex++) {
+      const chair = seats[seatIndex];
+      const basePos = new THREE.Vector3().copy(chair.position);
+      const dir = basePos.clone().multiplyScalar(-1).normalize();
+
+      for (let j = 0; j < 2; j++) {
+        const m = new THREE.Mesh(new THREE.PlaneGeometry(0.45, 0.65), holeMat);
+        const p = basePos.clone().add(dir.clone().multiplyScalar(0.9));
+        p.y = 0.72;
+        p.x += (j === 0 ? -0.18 : 0.18);
+
+        m.position.copy(p);
+        m.userData = { type: 'hole', seatIndex, j, hoverPhase: Math.random()*Math.PI*2 };
+        m.visible = false;
+
+        cardsGroup.add(m);
+        pokerState.holeCards.push({ mesh: m, seatIndex });
+      }
+    }
+  }
+
+  function dealHole() {
+    if (pokerState.holeCards.length === 0) spawnHoleCards();
+    for (const hc of pokerState.holeCards) hc.mesh.visible = true;
+    pokerState.stage = 1;
+    log('[poker] hole dealt ✅');
+  }
+
+  function flop() {
+    if (pokerState.stage < 1) dealHole();
+    pokerState.community[0].visible = true;
+    pokerState.community[1].visible = true;
+    pokerState.community[2].visible = true;
+    pokerState.stage = 2;
+    log('[poker] flop ✅');
+  }
+
+  function turn() {
+    if (pokerState.stage < 2) flop();
+    pokerState.community[3].visible = true;
+    pokerState.stage = 3;
+    log('[poker] turn ✅');
+  }
+
+  function river() {
+    if (pokerState.stage < 3) turn();
+    pokerState.community[4].visible = true;
+    pokerState.stage = 4;
+    log('[poker] river ✅');
+  }
+
+  // Deal button = setup hand (hole visible, community hidden until phases)
+  function dealHand() {
+    clearHand();
+    dealHole();
+    log('[cards] full hand ready (Flop / Turn / River)');
+  }
+
+  // --- Pads actions toggles ---
   let padsEnabled = true;
   let botsEnabled = true;
-
-  const padBright = makePad(-4.5, -3.5, "Max Bright", () => setMaxBright(true));
-  const padDeal   = makePad(-3.2, -3.5, "Deal Cards", () => dealCards());
-  const padReset  = makePad(-1.9, -3.5, "Reset Spawn", () => resetSpawn());
-  const padDoor   = makePad( 1.9, -3.5, "Toggle Doors", () => toggleDoors());
-  const padMusic  = makePad( 3.2, -3.5, "Music Toggle", () => toggleMusic());
-  const padBots   = makePad( 4.5, -3.5, "Bots Toggle", () => toggleBots());
 
   // --- Ray interaction (tap/click) ---
   const raycaster = new THREE.Raycaster();
@@ -267,7 +379,7 @@ function start() {
     }
   }
 
-  window.addEventListener('pointerdown', (ev) => { pointerDown = true; });
+  window.addEventListener('pointerdown', () => { pointerDown = true; });
   window.addEventListener('pointerup', (ev) => {
     if (!pointerDown) return;
     pointerDown = false;
@@ -286,13 +398,45 @@ function start() {
 
   btnReset.onclick  = () => resetSpawn();
   btnBright.onclick = () => setMaxBright(true);
-  btnDeal.onclick   = () => dealCards();
-  btnMusic.onclick  = () => toggleMusic();
+  btnDeal.onclick   = () => dealHand();
   btnBots.onclick   = () => toggleBots();
   btnPads.onclick   = () => { padsEnabled = !padsEnabled; btnPads.textContent = `Pads: ${padsEnabled?'ON':'OFF'}`; };
 
+  // Add Phase buttons to wrist (no HTML edits)
+  const wrist = document.getElementById('wrist');
+
+  const phaseRow = document.createElement('div');
+  phaseRow.className = 'row';
+  phaseRow.style.marginTop = '8px';
+
+  const bFlop = document.createElement('button');
+  bFlop.textContent = 'Flop';
+  bFlop.onclick = () => flop();
+
+  const bTurn = document.createElement('button');
+  bTurn.textContent = 'Turn';
+  bTurn.onclick = () => turn();
+
+  phaseRow.appendChild(bFlop);
+  phaseRow.appendChild(bTurn);
+  wrist.appendChild(phaseRow);
+
+  const phaseRow2 = document.createElement('div');
+  phaseRow2.className = 'row';
+
+  const bRiver = document.createElement('button');
+  bRiver.textContent = 'River';
+  bRiver.onclick = () => river();
+
+  const bResetHand = document.createElement('button');
+  bResetHand.textContent = 'Reset Hand';
+  bResetHand.onclick = () => clearHand();
+
+  phaseRow2.appendChild(bRiver);
+  phaseRow2.appendChild(bResetHand);
+  wrist.appendChild(phaseRow2);
+
   // --- Radio system (safe examples + expandable) ---
-  // NOTE: These are examples. You can replace/add your own station URLs anytime.
   const stations = [
     { name: 'OFF', url: '' },
     { name: 'SomaFM — Groove Salad', url: 'https://ice1.somafm.com/groovesalad-128-mp3' },
@@ -300,7 +444,6 @@ function start() {
     { name: 'SomaFM — Drone Zone', url: 'https://ice1.somafm.com/dronezone-128-mp3' },
     { name: 'SomaFM — Secret Agent', url: 'https://ice1.somafm.com/secretagent-128-mp3' },
   ];
-
   for (const s of stations) {
     const opt = document.createElement('option');
     opt.value = s.url;
@@ -340,23 +483,21 @@ function start() {
     if (musicOn) stopMusic();
     else {
       const url = stationSel.value;
-      if (!url) { btnMusic.textContent = 'Music: ON'; musicOn = true; btnMusic.textContent = 'Music: ON'; }
       if (url) playMusic(url);
       else { musicOn = true; btnMusic.textContent = 'Music: ON'; }
     }
   }
+  btnMusic.onclick = () => toggleMusic();
 
   // --- Doors logic ---
   function toggleDoor(doorMesh) {
     doorMesh.userData.open = !doorMesh.userData.open;
-    // slide door sideways when open
     const open = doorMesh.userData.open;
-    doorMesh.position.x = open ? 1.4 : 0;
-    doorMesh.material.emissiveIntensity = open ? 1.8 : 0.6;
+    doorMesh.userData.slide = open ? 1 : 0;
+    doorMesh.material.emissiveIntensity = open ? 2.0 : 0.8;
   }
-  function toggleDoors() {
-    [doorA, doorB, doorC].forEach(toggleDoor);
-  }
+
+  function toggleDoors() { [doorA, doorB, doorC].forEach(toggleDoor); }
 
   // --- Brightness (max) ---
   let maxBright = false;
@@ -378,21 +519,6 @@ function start() {
     log('[spawn] reset');
   }
 
-  // --- Deal animation ---
-  let dealing = false;
-  let dealT = 0;
-
-  function dealCards() {
-    dealing = true;
-    dealT = 0;
-    // start stacked at dealer spot
-    cards.forEach((c, i) => {
-      c.position.set(0, 0.78 + i*0.002, -0.6);
-      c.rotation.z = (Math.random()-0.5)*0.6;
-    });
-    log('[cards] dealing…');
-  }
-
   // --- Bots toggle ---
   function toggleBots() {
     botsEnabled = !botsEnabled;
@@ -400,6 +526,114 @@ function start() {
     btnBots.textContent = `Bots: ${botsEnabled?'ON':'OFF'}`;
     log(`[bots] ${botsEnabled?'ON':'OFF'}`);
   }
+
+  // --- Create pads AFTER functions exist ---
+  // Arrange pads in an arc near the player (south side, facing center)
+  const PAD_R = 6.2;
+  const baseTheta = Math.PI; // south
+  const step = 0.22;
+
+  makePadPolar(PAD_R, baseTheta + step*3, "Max Bright", () => setMaxBright(true));
+  makePadPolar(PAD_R, baseTheta + step*2, "Deal Hand", () => dealHand());
+  makePadPolar(PAD_R, baseTheta + step*1, "Flop", () => flop());
+  makePadPolar(PAD_R, baseTheta + step*0, "Turn", () => turn());
+  makePadPolar(PAD_R, baseTheta - step*1, "River", () => river());
+  makePadPolar(PAD_R, baseTheta - step*2, "Reset Hand", () => clearHand());
+  makePadPolar(PAD_R, baseTheta - step*3, "Toggle Doors", () => toggleDoors());
+
+  // --- JUMBOTRONS (4) ---
+  const jumbos = new THREE.Group();
+  room.add(jumbos);
+
+  function makeCanvasTexture(label) {
+    const c = document.createElement('canvas');
+    c.width = 512; c.height = 256;
+    const ctx = c.getContext('2d');
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+
+    const state = { c, ctx, tex, label, t: 0 };
+
+    function draw() {
+      const { ctx } = state;
+      ctx.clearRect(0,0,c.width,c.height);
+
+      // background
+      ctx.fillStyle = '#060a16';
+      ctx.fillRect(0,0,c.width,c.height);
+
+      // glow frame
+      ctx.strokeStyle = 'rgba(90,140,255,0.85)';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(10,10,c.width-20,c.height-20);
+
+      // title
+      ctx.fillStyle = 'rgba(220,235,255,0.95)';
+      ctx.font = 'bold 34px system-ui, sans-serif';
+      ctx.fillText('SCARLETT JUMBOTRON', 24, 58);
+
+      // label
+      ctx.fillStyle = 'rgba(120,180,255,0.95)';
+      ctx.font = 'bold 28px system-ui, sans-serif';
+      ctx.fillText(label, 24, 100);
+
+      // ticker
+      const now = new Date();
+      const msg = `LIVE • ${now.toLocaleTimeString()} • Poker Night • Radio • VR •`;
+      const x = 24 + ((state.t * 140) % (c.width + 600)) * -1;
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.font = '24px system-ui, sans-serif';
+      ctx.fillText(msg + ' ' + msg, x, 200);
+
+      // simple pulse bar
+      const p = (Math.sin(state.t*2.0)*0.5+0.5);
+      ctx.fillStyle = `rgba(60,120,255,${0.25 + 0.35*p})`;
+      ctx.fillRect(24, 128, (c.width-48)*p, 10);
+
+      state.tex.needsUpdate = true;
+    }
+
+    return { state, draw };
+  }
+
+  const jumboAnim = [];
+
+  function addJumbotron(theta, label) {
+    const { state, draw } = makeCanvasTexture(label);
+    jumboAnim.push({ state, draw });
+
+    const mat = new THREE.MeshStandardMaterial({
+      map: state.tex,
+      emissive: new THREE.Color(0xffffff),
+      emissiveIntensity: 1.2,
+      roughness: 0.4,
+      metalness: 0.1
+    });
+
+    const frame = new THREE.Mesh(
+      new THREE.BoxGeometry(4.4, 2.6, 0.18),
+      new THREE.MeshStandardMaterial({ color: 0x070a14, roughness: 0.8, metalness: 0.2 })
+    );
+
+    const screen = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 2.2), mat);
+    screen.position.z = 0.10;
+
+    const g = new THREE.Group();
+    g.add(frame);
+    g.add(screen);
+
+    const x = Math.sin(theta) * (ROOM_R - 0.55);
+    const z = Math.cos(theta) * (ROOM_R - 0.55);
+    g.position.set(x, 2.9, z);
+    g.lookAt(0, 2.9, 0);
+
+    jumbos.add(g);
+  }
+
+  addJumbotron(0, 'MAIN STAGE');
+  addJumbotron(Math.PI/2, 'TABLE CAM');
+  addJumbotron(Math.PI, 'TOURNAMENT');
+  addJumbotron(Math.PI*1.5, 'VIP LOUNGE');
 
   // --- Android joystick locomotion ---
   const joy = document.getElementById('joystick');
@@ -414,7 +648,6 @@ function start() {
   function setKnob(x, y) {
     knob.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
   }
-
   function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
 
   joy.addEventListener('pointerdown', (e) => {
@@ -451,7 +684,6 @@ function start() {
   // --- VR button ---
   document.body.appendChild(VRButton.createButton(renderer));
   btnEnterVR.onclick = async () => {
-    // VRButton handles session; we just nudge UX
     log('[xr] press the VRButton (browser prompt)');
   };
 
@@ -466,13 +698,17 @@ function start() {
   log(`Android joystick ${isTouch ? 'visible' : 'hidden (desktop)'}`);
   log('World visible');
 
+  // Start clean
+  clearHand();
+
   // --- Main loop ---
   renderer.setAnimationLoop(() => {
     const dt = Math.min(clock.getDelta(), 0.033);
 
     // locomotion vector from joystick or keyboard
-    let moveX = joyVec.x;
-    let moveZ = -joyVec.y;
+    // FIX: Forward/back is correct; strafe was reversed -> keep forward/back, invert ONLY X back to normal
+    let moveX = joyVec.x;     // ✅ left/right fixed
+    let moveZ = joyVec.y;     // ✅ forward/back correct
 
     if (keys.has('w')) moveZ += 1;
     if (keys.has('s')) moveZ -= 1;
@@ -495,51 +731,74 @@ function start() {
       rig.position.addScaledVector(forward, moveZ * speed * dt);
       rig.position.addScaledVector(right,   moveX * speed * dt);
 
-      // keep within room bounds
-      rig.position.x = clamp(rig.position.x, -10.5, 10.5);
-      rig.position.z = clamp(rig.position.z, -10.5, 10.5);
+      // keep within circular room bounds
+      const r = Math.hypot(rig.position.x, rig.position.z);
+      const limit = ROOM_R - 0.9;
+      if (r > limit) {
+        const s = limit / r;
+        rig.position.x *= s;
+        rig.position.z *= s;
+      }
     }
 
-    // bots idle animation (simple breathing + head bob)
+    // doors slide animation (tangent slide)
+    for (const d of [doorA, doorB, doorC]) {
+      const theta = d.userData.theta;
+      const open = d.userData.open;
+      const target = open ? 1.0 : 0.0;
+      d.userData.slide = THREE.MathUtils.lerp(d.userData.slide, target, 0.10);
+
+      // tangent direction around circle
+      const tx = Math.cos(theta);
+      const tz = -Math.sin(theta);
+
+      // base position on wall
+      const baseX = Math.sin(theta) * (ROOM_R - 0.12);
+      const baseZ = Math.cos(theta) * (ROOM_R - 0.12);
+
+      d.position.x = baseX + tx * (1.2 * d.userData.slide);
+      d.position.z = baseZ + tz * (1.2 * d.userData.slide);
+      d.lookAt(0, 1.8, 0);
+    }
+
+    // bots idle animation
     if (botsEnabled) {
       for (const b of bots) {
-        const p = b.userData.idlePhase;
         b.userData.idlePhase += dt * 1.2;
         b.position.y = 0.02 * Math.sin(b.userData.idlePhase * 2.0);
-        b.rotation.y += 0.0015 * Math.sin(b.userData.idlePhase + p);
+        b.rotation.y += 0.0015 * Math.sin(b.userData.idlePhase);
       }
     }
 
-    // card hover + deal animation
-    for (const c of cards) {
+    // Hole card hover + face camera
+    for (const hc of pokerState.holeCards) {
+      const m = hc.mesh;
+      if (!m.visible) continue;
+      m.userData.hoverPhase += dt * 2.0;
+      m.position.y = 0.72 + 0.02 * Math.sin(m.userData.hoverPhase);
+      m.lookAt(camera.position);
+      m.rotateY(Math.PI);
+    }
+
+    // Community cards face camera (if visible) + slight hover
+    for (const c of pokerState.community) {
+      if (!c.visible) continue;
       c.userData.hoverPhase += dt * 2.2;
-      if (!dealing) {
-        c.position.y = 0.70 + 0.03 * Math.sin(c.userData.hoverPhase);
-      }
+      c.position.y = 0.72 + 0.02 * Math.sin(c.userData.hoverPhase);
+      c.lookAt(camera.position);
+      c.rotateY(Math.PI);
     }
 
-    if (dealing) {
-      dealT += dt;
-      const t = Math.min(dealT / 1.2, 1);
-      for (let i=0;i<cards.length;i++){
-        const c = cards[i];
-        const tx = (i-2)*0.62;
-        const ty = 0.70;
-        const tz = 0;
+    // neon pulse
+    const pulse = (Math.sin(performance.now()*0.0012)*0.5+0.5);
+    ringMat.emissiveIntensity = 0.7 + 0.7*pulse;
 
-        // smooth slide
-        c.position.x = THREE.MathUtils.lerp(c.position.x, tx, 0.10 + t*0.25);
-        c.position.y = THREE.MathUtils.lerp(c.position.y, ty, 0.10 + t*0.25);
-        c.position.z = THREE.MathUtils.lerp(c.position.z, tz, 0.10 + t*0.25);
-
-        c.rotation.z = THREE.MathUtils.lerp(c.rotation.z, 0, 0.08);
-      }
-      if (t >= 1) {
-        dealing = false;
-        log('[cards] dealt ✅');
-      }
+    // jumbotron updates
+    for (const j of jumboAnim) {
+      j.state.t += dt;
+      j.draw();
     }
 
     renderer.render(scene, camera);
   });
-                                    }
+}
