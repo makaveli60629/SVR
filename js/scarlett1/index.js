@@ -1,21 +1,23 @@
-// SCARLETT ONE — Permanent Spine Module (SVR/js/scarlett1/index.js)
-// RULES: Hands-only. Do not touch HTML. World building lives in world.js.
+// SCARLETT ONE — Permanent Engine Module
+// Location: SVR/js/scarlett1/index.js
+// RULES: Hands-only. Do NOT touch HTML. World building lives in world.js.
+// NOTE: Uses CDN imports so HTML importmaps are NOT required.
 
-import * as THREE from 'three';
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { createWorld, updateWorld } from './world.js';
 
 let scene, camera, renderer, clock, playerGroup;
 
-function getEl(id) { return document.getElementById(id); }
-function setText(id, txt) { const el = getEl(id); if (el) el.innerText = txt; }
+function el(id) { return document.getElementById(id); }
+function setText(id, txt) { const e = el(id); if (e) e.innerText = txt; }
 
-// Optional on-screen log panel (if your HTML provides it)
+// On-screen log helper (works if your HTML has #log or #logpanel)
 function appendLog(line) {
-  const el = getEl('log');
-  if (!el) return;
-  const next = (el.textContent + "\n" + line).split("\n").slice(-160).join("\n");
-  el.textContent = next;
-  el.scrollTop = el.scrollHeight;
+  const logEl = el('log') || el('logpanel');
+  if (!logEl) return;
+  const lines = (logEl.textContent + "\n" + line).split("\n").slice(-180);
+  logEl.textContent = lines.join("\n");
+  logEl.scrollTop = logEl.scrollHeight;
 }
 
 (function hookConsole() {
@@ -27,20 +29,20 @@ function appendLog(line) {
   console.warn = (...a) => { appendLog("[warn] " + a.map(String).join(" ")); W(...a); };
   console.error = (...a) => { appendLog("[err] " + a.map(String).join(" ")); E(...a); };
 
-  window.addEventListener('error', (ev) => {
+  window.addEventListener("error", (ev) => {
     appendLog("[window.error] " + (ev.message || ev.error || "unknown"));
   });
-  window.addEventListener('unhandledrejection', (ev) => {
+
+  window.addEventListener("unhandledrejection", (ev) => {
     appendLog("[promise] " + (ev.reason?.message || ev.reason || "unhandled"));
   });
 })();
 
 export function initEngine() {
-  // --- Scene ---
   scene = new THREE.Scene();
   clock = new THREE.Clock();
 
-  // --- Player Rig (camera + hands move together) ---
+  // Player rig (camera + hands move together)
   playerGroup = new THREE.Group();
   scene.add(playerGroup);
 
@@ -52,22 +54,20 @@ export function initEngine() {
   );
   playerGroup.add(camera);
 
-  // --- Renderer ---
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-  // IMPORTANT: keep XR disabled until the user presses ENTER VR
-  // (Android/desktop should still render world for debugging)
+  // XR OFF until user presses ENTER VR (keeps Android debug visible)
   renderer.xr.enabled = false;
 
   document.body.appendChild(renderer.domElement);
 
-  // --- World (ALL environment building lives here) ---
+  // World init (all visuals live in world.js)
   createWorld(scene, camera, renderer, playerGroup);
 
-  // --- VR Button (hands-only) ---
-  const btn = getEl('entervr');
+  // ENTER VR (hands-only)
+  const btn = el('entervr');
   if (btn) {
     btn.addEventListener('click', async () => {
       try {
@@ -100,13 +100,9 @@ export function initEngine() {
     });
   }
 
-  // --- Resize ---
   window.addEventListener('resize', onResize);
+  renderer.setAnimationLoop(tick);
 
-  // --- Animate ---
-  renderer.setAnimationLoop(render);
-
-  // HUD status (if present)
   setText('status', 'LINKED');
   console.log("[engine] init complete");
 }
@@ -117,10 +113,10 @@ function onResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function render() {
+function tick() {
   const delta = Math.max(1e-6, clock.getDelta());
 
-  // HUD updates (if present)
+  // HUD updates (if your spine HTML has these IDs)
   const fps = Math.round(1 / delta);
   setText('fps-val', String(fps));
 
