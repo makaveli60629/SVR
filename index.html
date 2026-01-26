@@ -1,93 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<title>SCARLETT ONE v4.0.5 (VR)</title>
-<style>
-  body { margin:0; overflow:hidden; background:#000; font-family:monospace; }
-  #hud {
-    position:absolute; top:10px; left:10px;
-    border:1px solid #0f0; padding:10px;
-    color:#0f0; background:rgba(0,20,0,.85);
-    z-index:10; pointer-events:none;
-  }
-  #ui { position:absolute; bottom:20px; width:100%; text-align:center; z-index:11; }
-  .btn {
-    padding:15px 18px; border:1px solid #fff;
-    background:rgba(255,255,255,.08); color:#fff;
-    cursor:pointer; border-radius:10px;
-  }
-  #log {
-    position:absolute; left:10px; bottom:90px;
-    width:min(520px,calc(100% - 20px));
-    max-height:40vh; overflow:auto;
-    background:rgba(0,0,0,.7);
-    border:1px solid rgba(0,255,0,.35);
-    color:#9f9; padding:8px 10px;
-    border-radius:12px; font-size:12px;
-    white-space:pre-wrap; pointer-events:none;
-  }
-  #tip {
-    position:absolute; top:10px; right:10px;
-    color:#bbb; background: rgba(0,0,0,0.35);
-    border:1px solid rgba(255,255,255,0.15);
-    padding:8px 10px; border-radius:10px;
-    z-index:10; max-width:360px;
-    font-size:12px; line-height:1.4;
-  }
-  a{color:#9fe;}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>SCARLETT ONE v4.0.5</title>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: monospace;
+      color: #0f0;
+    }
+
+    #hud {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      border: 1px solid #0f0;
+      padding: 10px;
+      background: rgba(0, 20, 0, 0.85);
+      z-index: 10;
+    }
+
+    #log {
+      position: absolute;
+      bottom: 90px;
+      left: 10px;
+      right: 10px;
+      border: 1px solid #0f0;
+      padding: 10px;
+      background: rgba(0, 20, 0, 0.85);
+      font-size: 12px;
+      max-height: 160px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    #ui {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+    }
+
+    button {
+      padding: 16px 26px;
+      font-size: 16px;
+      border: 1px solid #fff;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="hud">
-  SCARLETT ONE v4.0.5<br>
-  STATUS: <span id="status">BOOT…</span><br>
-  FPS: <span id="fps-val">0</span><br>
-  POS: <span id="pos-val">0.00, 0.00, 0.00</span>
-</div>
+  <div id="hud">
+    SCARLETT ONE v4.0.5<br>
+    STATUS: <span id="status">BOOTING</span><br>
+    FPS: <span id="fps-val">0</span><br>
+    POS: <span id="pos-val">0.00, 0.00, 0.00</span>
+  </div>
 
-<div id="tip">
-  Android debug renders before VR. Press <b>ENTER VR</b> for hands.<br>
-  Hands-only. Textures: <code>assets/textures/</code>.<br>
-  If you ever get stuck, run <a href="./disable-sw.html">disable-sw</a> once.
-</div>
+  <div id="log">booting…</div>
 
-<div id="log">LOG:
-booting…</div>
+  <div id="ui">
+    <button id="entervr">ENTER VR (HANDS ONLY)</button>
+  </div>
 
-<div id="ui">
-  <button id="entervr" class="btn">ENTER VR (HANDS ONLY)</button>
-</div>
-
-<script type="module">
-  const logEl = document.getElementById('log');
-  const statusEl = document.getElementById('status');
-
-  function log(m){
-    logEl.textContent += "\n" + m;
-    logEl.scrollTop = logEl.scrollHeight;
-    console.log(m);
+  <!-- THREE IMPORT MAP -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
   }
+  </script>
 
-  log("[boot] inline module loaded");
-  statusEl.textContent = "IMPORTING…";
+  <!-- HARD-LOCKED ENGINE LOAD -->
+  <script type="module">
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('status');
 
-  try {
-    const mod = await import('./js/scarlett1/index.js?v=1769389851');
-    log("[boot] engine imported");
-    window.addEventListener('load', () => {
-      statusEl.textContent = "LINKED";
-      log("[boot] initEngine()");
-      mod.initEngine();
-    });
-  } catch (e) {
-    statusEl.textContent = "FATAL IMPORT";
-    log("[FATAL] import failed: " + (e?.message || e));
-    log("[HINT] Open this URL and confirm it shows code:");
-    log(location.origin + location.pathname.replace(/\/index\.html.*/, '') + "/js/scarlett1/index.js");
-  }
-</script>
+    function log(msg) {
+      logEl.textContent += "\n" + msg;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    log("[boot] loading engine from /VR/js/scarlett1/index.js");
+
+    import('/VR/js/scarlett1/index.js')
+      .then(mod => {
+        statusEl.textContent = "LINKED";
+        log("[boot] engine imported");
+        mod.initEngine();
+      })
+      .catch(err => {
+        statusEl.textContent = "FATAL IMPORT";
+        log("[FATAL] " + err.message);
+        console.error(err);
+      });
+  </script>
+
 </body>
 </html>
