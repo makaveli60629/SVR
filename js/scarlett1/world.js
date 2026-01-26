@@ -1,15 +1,17 @@
-// SCARLETT ONE — World Builder (SVR/js/scarlett1/world.js)
-// RULES: Hands-only. No controllers. Safe-load textures from assets/textures/.
+// SCARLETT ONE — Permanent World Module
+// Location: SVR/js/scarlett1/world.js
+// RULES: Hands-only. Safe-load textures from assets/textures/. Never black-screen.
+// NOTE: Uses CDN imports so HTML importmaps are NOT required.
 
-import * as THREE from 'three';
-import { OculusHandModel } from 'three/addons/objects/OculusHandModel.js';
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+import { OculusHandModel } from 'https://unpkg.com/three@0.160.0/examples/jsm/objects/OculusHandModel.js';
 
 let hand1, hand2;
 let canTurn = true;
 
 const textureRoot = 'assets/textures/';
 
-// ---------- SAFE TEXTURE MATERIAL ----------
+// Safe material loader: fallback color if file missing
 function safeMat(fileName, fallbackColor = 0x202020, repeat = 4) {
   const mat = new THREE.MeshStandardMaterial({
     color: fallbackColor,
@@ -35,11 +37,11 @@ function safeMat(fileName, fallbackColor = 0x202020, repeat = 4) {
 }
 
 export function createWorld(scene, camera, renderer, playerGroup) {
-  // Always-visible environment
+  // Always visible
   scene.background = new THREE.Color(0x070a14);
-  scene.fog = new THREE.Fog(0x070a14, 6, 140);
+  scene.fog = new THREE.Fog(0x070a14, 6, 160);
 
-  // --- Lighting (anti-black screen) ---
+  // Lighting (anti-black)
   scene.add(new THREE.AmbientLight(0xffffff, 1.05));
 
   const sun = new THREE.DirectionalLight(0x00ffff, 1.35);
@@ -50,7 +52,7 @@ export function createWorld(scene, camera, renderer, playerGroup) {
   mag.position.set(-4, 3, -4);
   scene.add(mag);
 
-  // --- Floor (textured if exists, otherwise visible fallback) ---
+  // Floor (texture if exists)
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(120, 120),
     safeMat('floor.jpg', 0x151515, 6)
@@ -59,15 +61,15 @@ export function createWorld(scene, camera, renderer, playerGroup) {
   floor.position.y = 0;
   scene.add(floor);
 
-  // --- Grid (debug + depth) ---
+  // Grid overlay (depth + debug)
   const grid = new THREE.GridHelper(120, 120, 0x00ff88, 0x112233);
   grid.position.y = 0.01;
   scene.add(grid);
 
-  // --- “Lobby markers” (visible landmarks) ---
+  // Guaranteed depth objects
   addLandmarks(scene);
 
-  // --- Hands (hands-only, mounted to rig) ---
+  // Hands-only (mounted to rig)
   hand1 = renderer.xr.getHand(0);
   hand1.add(new OculusHandModel(hand1));
   playerGroup.add(hand1);
@@ -76,7 +78,7 @@ export function createWorld(scene, camera, renderer, playerGroup) {
   hand2.add(new OculusHandModel(hand2));
   playerGroup.add(hand2);
 
-  // Camera start
+  // Spawn
   camera.position.set(0, 1.6, 2);
   camera.lookAt(0, 1.4, -3);
 
@@ -84,7 +86,7 @@ export function createWorld(scene, camera, renderer, playerGroup) {
 }
 
 function addLandmarks(scene) {
-  // Rainbow cubes for guaranteed depth
+  // Rainbow cubes
   const cubeGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
   const cubeMat = new THREE.MeshNormalMaterial();
 
@@ -94,7 +96,7 @@ function addLandmarks(scene) {
     scene.add(c);
   }
 
-  // Monolith ring (big shapes so the world feels “real” immediately)
+  // Monolith ring (big landmarks)
   const monoMat = safeMat('wall.jpg', 0x222244, 2);
   for (let i = 0; i < 6; i++) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(2.2, 6.5, 0.6), monoMat);
@@ -107,7 +109,7 @@ function addLandmarks(scene) {
 }
 
 export function updateWorld(delta, playerGroup) {
-  // Locomotion is only active when hand tracking is visible
+  // Locomotion active only when hand tracking is visible
   if (!hand1 || !hand1.visible) return;
 
   const moveSpeed = 3.0;
