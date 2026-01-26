@@ -1,50 +1,32 @@
-/* /css/style.css - HUD + UI Aesthetics (PERMANENT) */
-#dev-hud {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1000;
-  font-family: 'Courier New', monospace;
-  color: #00FF00;
-  background: rgba(0, 20, 0, 0.92);
-  padding: 14px;
-  border: 2px solid #00FF00;
-  width: 265px;
-  pointer-events: auto;
+/* css/style.css - PERMANENT */
+#dev-hud{
+  position:absolute; top:10px; left:10px; z-index:1000;
+  font-family: "Courier New", monospace;
+  color:#00FF00;
+  background:rgba(0, 20, 0, 0.90);
+  padding:15px;
+  border:2px solid #00FF00;
+  width:300px;
+  pointer-events:auto;
+  user-select:none;
 }
-
-.hud-title{
-  font-size: 14px;
-  border-bottom: 1px solid #00FF00;
-  margin-bottom: 6px;
-  padding-bottom: 4px;
+.hud-header{
+  font-weight:bold;
+  border-bottom:1px solid #00FF00;
+  padding-bottom:6px;
+  margin-bottom:8px;
 }
-
-.hud-hr{
-  border: none;
-  border-top: 1px solid #004400;
-  margin: 10px 0;
+.hud-btn{
+  display:block;
+  width:100%;
+  background:#002200;
+  color:#00FF00;
+  border:1px solid #00FF00;
+  margin:6px 0;
+  padding:10px;
+  cursor:pointer;
+  text-transform:uppercase;
+  font-weight:bold;
+  font-size:11px;
 }
-
-.hud-btn {
-  display: block;
-  width: 100%;
-  background: #003300;
-  color: #00FF00;
-  border: 1px solid #00FF00;
-  margin: 6px 0;
-  padding: 10px;
-  cursor: pointer;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 11px;
-}
-
-.hud-btn:hover{
-  filter: brightness(1.15);
-}
-
-.hud-btn-danger{
-  color:#ff4444;
-  border-color:#ff4444;
-}
+.hud-btn:active{ transform: translateY(1px); }
