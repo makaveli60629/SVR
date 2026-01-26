@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Scarlett Casino - Update 4.1</title>
+    <title>Scarlett Casino VR - Update 4.1</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <style>
         #ui-layer {
             position: absolute; top: 10px; left: 10px; z-index: 1000;
             font-family: 'Courier New', monospace; color: #00FF00;
-            background: rgba(0, 20, 0, 0.8); padding: 10px; border: 2px solid #00FF00;
+            background: rgba(0, 20, 0, 0.85); padding: 12px; border: 2px solid #00FF00;
+            pointer-events: auto;
         }
         .menu-btn {
             display: block; width: 100%; background: #004400; color: #00FF00;
-            border: 1px solid #00FF00; margin: 4px 0; padding: 8px; cursor: pointer;
-            text-align: left; font-weight: bold;
+            border: 1px solid #00FF00; margin: 5px 0; padding: 10px; cursor: pointer;
+            font-weight: bold; font-size: 12px;
         }
         .menu-btn:hover { background: #008800; }
         .reset-btn { color: #FF4444; border-color: #FF4444; }
@@ -24,73 +25,72 @@
 <body>
 
     <div id="ui-layer">
-        <div>[ SCARLETT ] STATUS: ACTIVE</div>
-        <div id="fps-display">FPS: -- | XYZ: 0 0 0</div>
+        <div style="font-weight: bold; font-size: 1.2em;">[ SCARLETT ]</div>
+        <div id="fps-counter">FPS: -- | XYZ: 0 0 0</div>
         <hr>
-        <button class="menu-btn" onclick="dealFlop()">🎴 DEAL FLOP</button>
-        <button class="menu-btn" onclick="spawnChips()">🪙 SPAWN CHIPS</button>
+        <button class="menu-btn">🎴 DEAL FLOP</button>
+        <button class="menu-btn">🪙 SPAWN CHIPS</button>
         <button class="menu-btn">🛒 OPEN STORE</button>
-        <button class="menu-btn">📻 RADIO TOGGLE</button>
-        <button class="menu-btn">🚶 WALKERS TOGGLE</button>
-        <button class="menu-btn">🤖 BOTS: ACTIVE</button>
-        <button class="menu-btn" onclick="setAvatar('male')">🧍 AVATAR: MALE</button>
-        <button class="menu-btn" onclick="setAvatar('female')">🧍 AVATAR: FEMALE</button>
-        <button class="menu-btn" onclick="teleportHome()">🌀 TELEPORT HOME</button>
-        <button class="menu-btn reset-btn" onclick="location.reload()">☢️ RESET</button>
+        <button class="menu-btn">🧍 AVATAR: MALE</button>
+        <button class="menu-btn">🧍 AVATAR: FEMALE</button>
+        <button class="menu-btn" onclick="location.reload()" class="reset-btn">☢️ RESET SYSTEM</button>
     </div>
 
-    <a-scene renderer="antialias: true; colorManagement: true;" shadow="type: pcfsoft">
+    <a-scene renderer="antialias: true; colorManagement: true; exposure: 1.5; logarithmicDepthBuffer: true;">
         
         <a-assets>
-            <img id="wallTexture" src="assets/textures/brick_wall.jpg">
-            <img id="casinoLogo" src="assets/textures/casino_art_2.png">
-            <img id="cardBack" src="assets/textures/card_back.jpg">
+            <img id="wallTex" src="assets/textures/brick_wall.jpg">
+            <img id="logoTex" src="assets/textures/casino_art_2.png">
         </a-assets>
 
-        <a-sky color="#87CEEB"></a-sky> <a-light type="directional" position="-1 10 1" intensity="1.5" castShadow="true"></a-light>
-        <a-light type="ambient" intensity="0.7"></a-light>
+        <a-sky color="#B0E2FF"></a-sky> <a-light type="ambient" intensity="1.5"></a-light>
+        <a-light type="directional" position="-2 10 2" intensity="1.2"></a-light>
+        <a-light type="point" position="0 8 -15" intensity="2" distance="50" color="#FFF"></a-light>
 
-        <a-entity id="lobby">
-            <a-plane rotation="-90 0 0" width="50" height="50" color="#222" static-body shadow></a-plane>
-            
-            <a-box position="0 5 -25" width="50" height="10" depth="0.5" src="#wallTexture" repeat="4 1">
-                <a-image src="#casinoLogo" position="0 2 0.3" width="5" height="5"></a-image>
-                <a-box position="0 -4.9 0.4" width="50" height="0.2" depth="0.2" color="#A020F0" material="emissive: #A020F0; emissiveIntensity: 2"></a-box>
-                <a-box position="0 4.9 0.4" width="50" height="0.2" depth="0.2" color="#A020F0" material="emissive: #A020F0; emissiveIntensity: 2"></a-box>
+        <a-entity id="environment">
+            <a-plane rotation="-90 0 0" width="100" height="100" color="#111"></a-plane>
+
+            <a-box position="0 5 -30" width="60" height="12" depth="1" color="#222">
+                <a-image src="#logoTex" position="0 2 0.6" width="10" height="6"></a-image>
+                
+                <a-box position="0 5.8 0.6" width="60" height="0.4" depth="0.2" 
+                       material="color: #A020F0; emissive: #A020F0; emissiveIntensity: 15"></a-box>
+                <a-box position="0 -5.8 0.6" width="60" height="0.4" depth="0.2" 
+                       material="color: #A020F0; emissive: #A020F0; emissiveIntensity: 15"></a-box>
             </a-box>
 
-            <a-cylinder position="-24.5 5 -24.5" radius="0.5" height="10" color="#A020F0" material="emissive: #A020F0; emissiveIntensity: 1.5"></a-cylinder>
-            <a-cylinder position="24.5 5 -24.5" radius="0.5" height="10" color="#A020F0" material="emissive: #A020F0; emissiveIntensity: 1.5"></a-cylinder>
-
-            <a-entity position="0 2.5 -10">
-                <a-text value="TABLE ZONE ROOM" align="center" color="#00FFFF" width="6"></a-text>
-                <a-text value="WALLET: $5,000" position="0 -0.5 0" align="center" color="#00FF00" width="4"></a-text>
-            </a-entity>
+            <a-cylinder position="-29 5 -29" radius="0.8" height="12" material="color: #A020F0; emissive: #A020F0; emissiveIntensity: 10"></a-cylinder>
+            <a-cylinder position="29 5 -29" radius="0.8" height="12" material="color: #A020F0; emissive: #A020F0; emissiveIntensity: 10"></a-cylinder>
         </a-entity>
 
         <a-entity id="poker-zone" position="0 0 -15">
-            <a-cylinder radius="3" height="1.1" color="#006400" shadow>
-                <a-text value="HIGH STAKES POKER" position="0 0.6 0" rotation="-90 0 0" align="center" width="8"></a-text>
-            </a-cylinder>
-
-            <a-entity id="community-cards" position="0 1.5 0">
-                <a-box position="-0.6 0 0" width="0.4" height="0.6" depth="0.01" color="white" rotation="0 0 0"></a-box>
-                <a-box position="0 0 0" width="0.4" height="0.6" depth="0.01" color="white" rotation="0 0 0"></a-box>
-                <a-box position="0.6 0 0" width="0.4" height="0.6" depth="0.01" color="white" rotation="0 0 0"></a-box>
+            <a-entity position="0 3 0">
+                <a-text value="VIP TABLE #1" align="center" color="#A020F0" width="10" material="emissive: #A020F0; emissiveIntensity: 5"></a-text>
             </a-entity>
 
-            <a-entity id="bot-1" position="4 0 0" rotation="0 -90 0">
-                <a-sphere radius="0.5" position="0 1.5 0" color="#444"></a-sphere> <a-text value="BOT BOB" position="0 2.2 0" align="center" side="double"></a-text>
-                <a-entity position="0 1.2 -1" rotation="45 0 0">
-                    <a-box width="0.3" height="0.4" depth="0.01" color="white"></a-box>
+            <a-cylinder radius="4" height="1" color="#004400">
+                <a-box position="0 0.55 0" width="8.2" height="0.1" depth="8.2" color="#A020F0" material="emissive: #A020F0; emissiveIntensity: 2"></a-box>
+            </a-cylinder>
+
+            <a-entity id="community-flop" position="0 1.8 0">
+                <a-box position="-0.8 0 0" width="0.5" height="0.7" depth="0.02" color="white"></a-box>
+                <a-box position="0 0 0" width="0.5" height="0.7" depth="0.02" color="white"></a-box>
+                <a-box position="0.8 0 0" width="0.5" height="0.7" depth="0.02" color="white"></a-box>
+            </a-entity>
+
+            <a-entity id="bot-bob" position="5 0 0" rotation="0 -90 0">
+                <a-sphere radius="0.6" color="#333" position="0 1.6 0"></a-sphere>
+                <a-text value="BOB" position="0 2.5 0" align="center" width="6" color="#00FF00"></a-text>
+                <a-entity position="0 1.3 -0.8" rotation="30 0 0">
+                    <a-box width="0.4" height="0.6" depth="0.01" color="white"></a-box>
                 </a-entity>
             </a-entity>
         </a-entity>
 
-        <a-entity id="rig" movement-controls="fly: false">
-            <a-entity camera position="0 1.6 0" look-controls>
-                <a-cursor color="#00FF00"></a-cursor>
-            </a-entity>
+        <a-entity id="rig" position="0 0 0">
+            <a-camera id="cam" wasd-controls look-controls position="0 1.6 0">
+                <a-cursor color="#00FF00" fuse="false"></a-cursor>
+            </a-camera>
             <a-entity id="leftHand" hand-tracking-controls="hand: left;"></a-entity>
             <a-entity id="rightHand" hand-tracking-controls="hand: right;"></a-entity>
         </a-entity>
