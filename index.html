@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>SCARLETT ONE v4.0.5</title>
+  <title>SCARLETT ONE • SVR</title>
 
   <style>
     body {
       margin: 0;
       overflow: hidden;
       background: #000;
-      font-family: monospace;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       color: #0f0;
     }
 
@@ -22,20 +22,26 @@
       padding: 10px;
       background: rgba(0, 20, 0, 0.85);
       z-index: 10;
+      max-width: 90vw;
+      pointer-events: none;
     }
 
-    #log {
+    #hud b { color: #7CFFB3; }
+
+    #logpanel {
       position: absolute;
-      bottom: 90px;
       left: 10px;
       right: 10px;
+      bottom: 90px;
       border: 1px solid #0f0;
       padding: 10px;
       background: rgba(0, 20, 0, 0.85);
+      z-index: 10;
       font-size: 12px;
-      max-height: 160px;
+      max-height: 200px;
       overflow-y: auto;
       white-space: pre-wrap;
+      pointer-events: none;
     }
 
     #ui {
@@ -43,35 +49,61 @@
       bottom: 20px;
       width: 100%;
       text-align: center;
+      z-index: 11;
     }
 
-    button {
+    .btn {
       padding: 16px 26px;
       font-size: 16px;
       border: 1px solid #fff;
-      background: transparent;
+      background: rgba(255,255,255,0.05);
       color: #fff;
+      border-radius: 10px;
       cursor: pointer;
+    }
+
+    #links {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 12;
+      font-size: 12px;
+      opacity: 0.85;
+    }
+
+    #links a {
+      color: #9BFF9B;
+      text-decoration: underline;
+      margin-left: 10px;
+      pointer-events: auto;
     }
   </style>
 </head>
 
 <body>
 
+  <div id="links">
+    <a href="/SVR/disable-sw.html">disable-sw</a>
+    <a href="/SVR/js/scarlett1/index.js" target="_blank" rel="noopener">engine</a>
+    <a href="/SVR/js/scarlett1/world.js" target="_blank" rel="noopener">world</a>
+  </div>
+
   <div id="hud">
-    SCARLETT ONE v4.0.5<br>
+    <b>SCARLETT ONE</b> • SVR<br>
     STATUS: <span id="status">BOOTING</span><br>
     FPS: <span id="fps-val">0</span><br>
-    POS: <span id="pos-val">0.00, 0.00, 0.00</span>
+    POS: <span id="pos-val">0.00, 0.00, 0.00</span><br>
+    <span style="opacity:.9">Android debug renders before VR. Press ENTER VR for hands.</span><br>
+    <span style="opacity:.9">Hands-only. Textures: assets/textures/.</span>
   </div>
 
-  <div id="log">booting…</div>
+  <div id="logpanel">booting…</div>
 
   <div id="ui">
-    <button id="entervr">ENTER VR (HANDS ONLY)</button>
+    <button id="entervr" class="btn">ENTER VR (HANDS ONLY)</button>
   </div>
 
-  <!-- THREE IMPORT MAP -->
+  <!-- Importmap is safe even if your engine uses CDN imports -->
   <script type="importmap">
   {
     "imports": {
@@ -81,27 +113,35 @@
   }
   </script>
 
-  <!-- HARD-LOCKED ENGINE LOAD -->
   <script type="module">
-    const logEl = document.getElementById('log');
     const statusEl = document.getElementById('status');
+    const logEl = document.getElementById('logpanel');
 
-    function log(msg) {
-      logEl.textContent += "\n" + msg;
+    function log(line) {
+      logEl.textContent = (logEl.textContent + "\n" + line).split("\n").slice(-200).join("\n");
       logEl.scrollTop = logEl.scrollHeight;
     }
 
-    log("[boot] loading engine from /SVR/js/scarlett1/index.js");
+    // HARD LOCKED PATHS — NO BASE-PATH DETECTION
+    const ENGINE_URL = '/SVR/js/scarlett1/index.js';
 
-    import('/VR/js/scarlett1/index.js')
+    log('[boot] loading engine from ' + ENGINE_URL);
+
+    import(ENGINE_URL)
       .then(mod => {
-        statusEl.textContent = "LINKED";
-        log("[boot] engine imported");
+        statusEl.textContent = 'LINKED';
+        log('[boot] engine imported ✅');
+        if (!mod || typeof mod.initEngine !== 'function') {
+          statusEl.textContent = 'FATAL ENGINE EXPORT';
+          log('[FATAL] initEngine() export missing from engine module');
+          return;
+        }
         mod.initEngine();
       })
       .catch(err => {
-        statusEl.textContent = "FATAL IMPORT";
-        log("[FATAL] " + err.message);
+        statusEl.textContent = 'FATAL IMPORT';
+        log('[FATAL] ' + (err?.message || String(err)));
+        log('[HINT] Open ENGINE link top-right. If it does not show code, folder deploy is wrong.');
         console.error(err);
       });
   </script>
