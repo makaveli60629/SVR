@@ -1,157 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>SCARLETT ONE • SVR</title>
-
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: #000;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      color: #0f0;
-    }
-
-    #hud {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      border: 1px solid #0f0;
-      padding: 10px;
-      background: rgba(0, 20, 0, 0.85);
-      z-index: 10;
-      max-width: 92vw;
-      pointer-events: none;
-      box-sizing: border-box;
-    }
-
-    #hud .title { color: #7CFFB3; font-weight: 700; }
-    #hud .muted { opacity: 0.9; }
-
-    #logpanel {
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      bottom: 90px;
-      border: 1px solid #0f0;
-      padding: 10px;
-      background: rgba(0, 20, 0, 0.85);
-      z-index: 10;
-      font-size: 12px;
-      max-height: 240px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      pointer-events: none;
-      box-sizing: border-box;
-    }
-
-    #ui {
-      position: absolute;
-      bottom: 20px;
-      width: 100%;
-      text-align: center;
-      z-index: 11;
-    }
-
-    .btn {
-      padding: 16px 26px;
-      font-size: 16px;
-      border: 1px solid #fff;
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    #links {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 12;
-      font-size: 12px;
-      opacity: 0.9;
-      pointer-events: auto;
-    }
-
-    #links a {
-      color: #9BFF9B;
-      text-decoration: underline;
-      margin-left: 10px;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div id="links">
-    <a href="./disable-sw.html">disable-sw</a>
-    <a href="./js/scarlett1/index.js" target="_blank" rel="noopener">engine</a>
-    <a href="./js/scarlett1/world.js" target="_blank" rel="noopener">world</a>
-  </div>
-
-  <div id="hud">
-    <div class="title">SCARLETT ONE • SVR</div>
-    STATUS: <span id="status">BOOTING</span><br>
-    FPS: <span id="fps-val">0</span><br>
-    POS: <span id="pos-val">0.00, 0.00, 0.00</span><br>
-    <span class="muted">Android debug renders before VR. Press ENTER VR for hands.</span><br>
-    <span class="muted">Hands-only. Textures: assets/textures/.</span>
-  </div>
-
-  <div id="logpanel">booting…</div>
-
-  <div id="ui">
-    <button id="entervr" class="btn">ENTER VR (HANDS ONLY)</button>
-  </div>
-
-  <!-- Importmap is safe even if engine uses CDN imports -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
-
-  <script type="module">
-    const statusEl = document.getElementById('status');
-    const logEl = document.getElementById('logpanel');
-
-    function log(line) {
-      logEl.textContent = (logEl.textContent + "\n" + line).split("\n").slice(-220).join("\n");
-      logEl.scrollTop = logEl.scrollHeight;
-    }
-
-    // ✅ THE FIX: RELATIVE ENGINE IMPORT (kills /VR vs /SVR mismatch forever)
-    const ENGINE_URL = new URL('./js/scarlett1/index.js', window.location.href).href;
-
-    log('[boot] location=' + window.location.href);
-    log('[boot] loading engine from ' + ENGINE_URL);
-
-    import(ENGINE_URL)
-      .then(mod => {
-        statusEl.textContent = 'LINKED';
-        log('[boot] engine imported ✅');
-
-        if (!mod || typeof mod.initEngine !== 'function') {
-          statusEl.textContent = 'FATAL ENGINE EXPORT';
-          log('[FATAL] initEngine() export missing from engine module');
-          return;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SVR | SCARLETT ONE SPINE</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Courier New', monospace; }
+        #hud-monitor {
+            position: absolute; top: 15px; left: 15px; border: 1px solid #00ff00; 
+            padding: 12px; color: #00ff00; background: rgba(0,10,0,0.85); z-index: 100;
+            pointer-events: none; text-shadow: 0 0 5px #00ff00;
         }
+        #launch-pad { position: absolute; bottom: 40px; width: 100%; text-align: center; }
+        .launch-btn { 
+            padding: 18px 36px; font-size: 1rem; letter-spacing: 2px;
+            border: 1px solid #00ff00; background: transparent; color: #00ff00; 
+            cursor: pointer; transition: 0.3s;
+        }
+        .launch-btn:hover { background: #00ff00; color: #000; box-shadow: 0 0 20px #00ff00; }
+    </style>
+</head>
+<body>
+    <div id="hud-monitor">
+        [ NODE: SCARLETT-ONE-SVR ]<br>
+        STATUS: <span id="st-val" style="color: #ff0000;">OFFLINE</span><br>
+        FPS: <span id="fps-val">--</span><br>
+        POS: <span id="pos-val">0, 0, 0</span><br>
+        MEM: <span id="mem-val">STABLE</span>
+    </div>
 
-        mod.initEngine();
-        log('[boot] initEngine() called ✅');
-      })
-      .catch(err => {
-        statusEl.textContent = 'FATAL IMPORT';
-        log('[FATAL] import failed: ' + (err?.message || String(err)));
-        log('[HINT] Tap "engine" link top-right. If it 404s, GitHub Pages is not serving /SVR yet.');
-        console.error(err);
-      });
-  </script>
+    <div id="launch-pad">
+        <button id="entervr" class="launch-btn">INITIALIZE VR SESSION</button>
+    </div>
 
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initEngine } from './js/scarlett1/index.js';
+        
+        window.addEventListener('load', () => {
+            try {
+                initEngine();
+                document.getElementById('st-val').innerText = 'ACTIVE';
+                document.getElementById('st-val').style.color = '#00ff00';
+            } catch (e) {
+                console.error("SPINE BOOT ERROR:", e);
+                document.getElementById('st-val').innerText = 'PATH_FAIL';
+            }
+        });
+    </script>
 </body>
 </html>
