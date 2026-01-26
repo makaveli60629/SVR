@@ -1,10 +1,11 @@
 export const Diagnostics = (() => {
-  const state = { build: 'SCARLETT1_SPINE_RECOVERY', lines: [], startedAt: performance.now(), lastError: null };
+  const state = { build: 'SCARLETT1_SPINE_RECOVERY_V2', lines: [], startedAt: performance.now() };
   let root, pre;
 
-  function now() { return ((performance.now() - state.startedAt) / 1000).toFixed(3); }
-  function log(msg) { state.lines.push(`[${now()}] ${msg}`); render(); }
-  function error(msg) { state.lastError = msg; log('[error] ' + msg); }
+  function log(msg) {
+    state.lines.push(`[${((performance.now()-state.startedAt)/1000).toFixed(3)}] ${msg}`);
+    if (pre) pre.textContent = state.lines.join('\n');
+  }
 
   function mount() {
     if (root) return;
@@ -16,11 +17,5 @@ export const Diagnostics = (() => {
     log('Diagnostics mounted');
   }
 
-  function render() { if (pre) pre.textContent = state.lines.join('\n'); }
-  async function copyReport() {
-    await navigator.clipboard.writeText(state.lines.join('\n'));
-    log('Report copied');
-  }
-
-  return { mount, log, error, copyReport };
+  return { mount, log };
 })();
