@@ -1,66 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>SVR | MISSION CONTROL</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Scarlett Empire OS • Permanent Build</title>
   <style>
     :root { --neon:#00ff00; --panel: rgba(0, 10, 0, 0.95); --err:#ff0055; --cyan:#00ffff; }
-    body { margin:0; overflow:hidden; background:#000; font-family:'Courier New', monospace; color:var(--neon); }
-    #diag-hud { position:absolute; top:10px; left:10px; border:1px solid var(--neon); padding:12px; background:var(--panel); z-index:1000; width:260px; }
-    #term-log { position:absolute; bottom:160px; left:10px; right:10px; height:110px; background:rgba(0,0,0,0.85); border-left:4px solid var(--cyan); padding:10px; font-size:10px; overflow-y:auto; color:#8f8; }
-    .cmd-btn { background:#000; border:1px solid var(--neon); color:var(--neon); padding:10px; cursor:pointer; text-transform:uppercase; font-size:10px; margin-bottom:6px; width:160px; }
-    #controls { position:absolute; top:10px; right:10px; z-index:1001; display:flex; flex-direction:column; gap:6px; }
-    #storePanel { position:absolute; right:10px; top:170px; width:240px; padding:10px; border:1px solid var(--neon); background:var(--panel); display:none; z-index:1002; }
-    #storePanel h3 { margin:0 0 8px 0; color:var(--cyan); font-size:12px; }
-    .store-item { display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(0,255,0,0.35); padding:8px; margin-bottom:8px; }
-    .store-item button { background:#000; border:1px solid var(--cyan); color:var(--cyan); padding:6px 8px; cursor:pointer; font-size:10px; }
+    body { margin:0; overflow:hidden; background:#000; font-family: 'Courier New', monospace; color:var(--neon); }
+    #diag-hud { position:absolute; top:10px; left:10px; border:1px solid var(--neon); padding:12px; background:var(--panel); z-index:1000; width:320px; }
+    #term-log { position:absolute; bottom:160px; left:10px; right:10px; height:110px; background:rgba(0,0,0,0.85);
+                border-left:4px solid var(--cyan); padding:10px; font-size:10px; overflow-y:auto; color:#8f8; z-index:1000; }
+    .cmd-btn { background:#000; border:1px solid var(--neon); color:var(--neon); padding:10px; cursor:pointer; text-transform:uppercase; font-size:10px; width:170px; }
+    #controls { position:absolute; top:10px; right:10px; z-index:1001; display:flex; flex-direction:column; gap:8px; }
+    #storePanel, #settingsPanel {
+      position:absolute; right:10px; top:190px; width:260px; padding:12px; border:1px solid var(--neon);
+      background:var(--panel); display:none; z-index:1002;
+    }
+    #storePanel h3, #settingsPanel h3 { margin:0 0 10px 0; color:var(--cyan); font-size:12px; }
+    .row { display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(0,255,0,0.35); padding:8px; margin-bottom:8px; }
+    .row button { background:#000; border:1px solid var(--cyan); color:var(--cyan); padding:6px 8px; cursor:pointer; font-size:10px; }
+    #bigAction { position:absolute; bottom:18px; width:100%; text-align:center; z-index:1001; }
+    #entervr { width:280px; font-size:12px; }
   </style>
 </head>
 <body>
   <div id="diag-hud">
     <div style="font-weight:bold;color:var(--cyan);">[ SVR-CORE MONITOR ]</div>
-    STATUS: <span id="st-val" style="color:var(--neon)">ACTIVE</span><br>
+    STATUS: <span id="st-val" style="color:var(--neon)">BOOTING</span><br>
     FPS: <span id="fps-val">--</span> | MEM: <span style="color:var(--cyan)">STABLE</span><br>
-    XYZ: <span id="pos-val">0.0, 1.6, 0.0</span>
+    XYZ: <span id="pos-val">0.0, 1.6, 0.0</span><br>
+    BUILD: <span style="color:var(--cyan)">SCARLETT_EMPIRE_OS_FULL</span>
   </div>
 
   <div id="controls">
-    <button class="cmd-btn" onclick="window.toggleStore && window.toggleStore()">🛒 OPEN STORE</button>
-    <button class="cmd-btn" onclick="window.teleportHome && window.teleportHome()">🌀 TELEPORT</button>
-    <button class="cmd-btn" onclick="window.hideHud && window.hideHud()">☑ HIDE HUD</button>
-    <button class="cmd-btn" style="border-color:var(--err);color:var(--err)" onclick="window.resetSpawn && window.resetSpawn()">☢ RESET</button>
+    <button class="cmd-btn" onclick="window.toggleStore?.()">🛒 OPEN STORE</button>
+    <button class="cmd-btn" onclick="window.openSettings?.()">⚙ SETTINGS</button>
+    <button class="cmd-btn" onclick="window.spawnChips?.()">🪙 SPAWN CHIPS</button>
+    <button class="cmd-btn" onclick="window.dealFlop?.()">🃏 DEAL FLOP</button>
+    <button class="cmd-btn" onclick="window.teleportHome?.()">🌀 TELEPORT</button>
+    <button class="cmd-btn" onclick="window.hideHud?.()">☑ HIDE HUD</button>
+    <button class="cmd-btn" style="border-color:var(--err);color:var(--err)" onclick="window.resetSpawn?.()">☢ RESET</button>
   </div>
 
   <div id="storePanel">
     <h3>ASSET STORE</h3>
-    <div class="store-item"><span>MALE</span><button onclick="window.equipAsset && window.equipAsset('male')">EQUIP</button></div>
-    <div class="store-item"><span>FEMALE</span><button onclick="window.equipAsset && window.equipAsset('female')">EQUIP</button></div>
-    <div class="store-item"><span>NINJA</span><button onclick="window.equipAsset && window.equipAsset('ninja')">EQUIP</button></div>
+    <div class="row"><span>MALE</span><button onclick="window.equipAsset?.('male')">EQUIP</button></div>
+    <div class="row"><span>FEMALE</span><button onclick="window.equipAsset?.('female')">EQUIP</button></div>
+    <div class="row"><span>NINJA</span><button onclick="window.equipAsset?.('ninja')">EQUIP</button></div>
   </div>
 
-  <div id="term-log">> SPINE SYNC: SUCCESSFUL.<br>> MODULES LOADED: WORLD, HANDS, STORE, LOCOMOTION.</div>
+  <div id="settingsPanel">
+    <h3>OS SETTINGS</h3>
+    <div class="row"><span>Audio</span><button onclick="window.toggleAudio?.()">TOGGLE</button></div>
+    <div class="row"><span>EV Demo</span><button onclick="window.showEVDemo?.()">RUN</button></div>
+    <div class="row"><span>Legacy Import</span><button onclick="window.legacyPrompt?.()">URL…</button></div>
+  </div>
 
-  <div style="position:absolute; bottom:20px; width:100%; text-align:center;">
-    <button id="entervr" class="cmd-btn" style="width:260px; font-size:12px; margin:0 auto;">ENTER VR</button>
+  <div id="term-log">> INITIALIZING…</div>
+
+  <div id="bigAction">
+    <button id="entervr" class="cmd-btn">ENTER VR</button>
   </div>
 
   <script type="importmap">
-    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                   "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+    { "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
   </script>
 
   <script type="module">
     import { initEngine } from './js/scarlett1/index.js';
     initEngine();
-
-    window.hideHud = () => {
-      const hud = document.getElementById('diag-hud');
-      const term = document.getElementById('term-log');
-      const vis = hud.style.display !== 'none';
-      hud.style.display = vis ? 'none' : 'block';
-      term.style.display = vis ? 'none' : 'block';
-    };
   </script>
 </body>
 </html>
