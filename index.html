@@ -1,42 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Scarlett Empire OS - BUILD 6.0</title>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="theme-color" content="#05060a" />
+  <title>ScarlettVR Poker • Scarlett One</title>
+  <style>
+    html, body { margin:0; padding:0; height:100%; background:#05060a; overflow:hidden; }
+    canvas { display:block; }
+  </style>
 </head>
 <body>
-
-    <div id="dev-hud">
-        <div class="hud-header">SCARLETT_SDK_v6.0</div>
-        <div class="stat-row">POS: <span id="val-pos">0 1.6 0</span></div>
-        <div class="stat-row">MODULE: <span id="mod-load" style="color:#ff4444">OFFLINE</span></div>
-        <hr>
-        <button class="sdk-btn reset clickable" onclick="location.reload()">☢️ HARD REBOOT</button>
-    </div>
-
-    <a-scene renderer="antialias: true; exposure: 1.6;">
-        <a-assets>
-            <a-asset-item id="ninjaModel" src="assets/models/combat_ninja.glb"></a-asset-item>
-            <canvas id="jumboCanvas_NE" width="1024" height="512"></canvas>
-            <canvas id="jumboCanvas_NW" width="1024" height="512"></canvas>
-            <canvas id="jumboCanvas_SE" width="1024" height="512"></canvas>
-            <canvas id="jumboCanvas_SW" width="1024" height="512"></canvas>
-        </a-assets>
-
-        <a-sky color="#000a12"></a-sky>
-        <a-entity id="poker-module"></a-entity>
-
-        <a-entity id="rig" movement-controls="speed: 0.4">
-            <a-camera id="main-cam" look-controls position="0 1.6 0">
-                <a-cursor color="#00FF00" raycaster="objects: .clickable"></a-cursor>
-            </a-camera>
-        </a-entity>
-    </a-scene>
-
-    <script src="js/index.js"></script>
-    <script src="js/scarlett1/logic.js"></script>
+  <script type="module" src="./index.js"></script>
 </body>
 </html>

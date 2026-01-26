@@ -1,2 +1,2 @@
-// index.js (ROOT) - PERMANENT BOOTSTRAP ONLY
-import './js/scarlett1/init.js';
+import { bootScarlettOne } from './js/scarlett1/index.js';
+bootScarlettOne();
