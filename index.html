@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>ScarlettVR Poker - Master Build 4.1.1</title>
+  <title>ScarlettVR Poker • Master Build</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/style.css">
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
@@ -11,11 +11,11 @@
 </head>
 <body>
   <div id="dev-hud">
-    <div class="hud-header">[ SCARLETT_OS v4.1.1 ]</div>
-    <div id="fps-counter">BOOTING...</div>
-    <button class="hud-btn" onclick="world.dealFlop()">🎴 RE-DEAL CARDS</button>
-    <button class="hud-btn" onclick="world.resetPlayer()">🌀 RESET POSITION</button>
-    <button class="hud-btn" style="border-color:#ff4444; color:#ff4444;" onclick="location.reload()">☢️ REBOOT</button>
+    <div class="hud-header">SCARLETT_OS • MASTER</div>
+    <div id="fps-counter">BOOTING…</div>
+    <button class="hud-btn" onclick="Scarlett1.world.dealFlop()">🎴 DEAL FLOP</button>
+    <button class="hud-btn" onclick="Scarlett1.world.resetPlayer()">🌀 RESET SPAWN</button>
+    <button class="hud-btn" style="border-color:#ff4444; color:#ff4444;" onclick="location.reload()">☢️ HARD RELOAD</button>
   </div>
 
   <a-scene renderer="antialias: true; colorManagement: true; exposure: 1.35;">
@@ -26,22 +26,25 @@
       <img id="cardBackTex" src="assets/textures/card_back.jpg">
     </a-assets>
 
-    <a-light type="ambient" intensity="1.7"></a-light>
-    <a-light type="point" position="0 9 -12" intensity="3.2" distance="90"></a-light>
+    <!-- Bright, sealed, visible -->
+    <a-light type="ambient" intensity="1.8"></a-light>
+    <a-light type="point" position="0 10 -12" intensity="3.4" distance="100"></a-light>
 
+    <!-- Environment shell -->
     <a-entity id="environment">
-      <a-plane rotation="-90 0 0" width="100" height="100" src="#floorTex" repeat="10 10"></a-plane>
-      <a-plane rotation="90 0 0" position="0 12 -15" width="100" height="100" color="#0b0b10"></a-plane>
+      <a-plane rotation="-90 0 0" width="110" height="110" src="#floorTex" repeat="11 11"></a-plane>
+      <a-plane rotation="90 0 0" position="0 12 -15" width="110" height="110" color="#0b0b10"></a-plane>
 
-      <a-box id="main-wall" position="0 6 -30" width="60" height="12" depth="1" src="#wallTex" repeat="4 1">
-        <a-image src="#casinoLogo" position="0 1 0.6" width="12" height="7"></a-image>
-        <a-box position="0 5.9 0.6" width="60" height="0.4" depth="0.2"
-               material="color:#A020F0; emissive:#A020F0; emissiveIntensity:20"></a-box>
-        <a-box position="0 -5.9 0.6" width="60" height="0.4" depth="0.2"
-               material="color:#A020F0; emissive:#A020F0; emissiveIntensity:20"></a-box>
+      <a-box id="main-wall" position="0 6 -30" width="70" height="12" depth="1" src="#wallTex" repeat="5 1">
+        <a-image src="#casinoLogo" position="0 1 0.6" width="14" height="7.5"></a-image>
+        <a-box position="0 5.9 0.6" width="70" height="0.4" depth="0.2"
+               material="color:#A020F0; emissive:#A020F0; emissiveIntensity:22"></a-box>
+        <a-box position="0 -5.9 0.6" width="70" height="0.4" depth="0.2"
+               material="color:#A020F0; emissive:#A020F0; emissiveIntensity:22"></a-box>
       </a-box>
     </a-entity>
 
+    <!-- Poker Table -->
     <a-entity id="poker-table" position="0 0 -15">
       <a-text value="VIP HIGH STAKES" position="0 4 0" align="center" width="12" color="#00FF00"></a-text>
       <a-cylinder radius="4" height="1.1" color="#004d00" material="roughness: 0.8">
@@ -51,11 +54,12 @@
       <a-entity id="community-cards" position="0 2 0"></a-entity>
     </a-entity>
 
-    <!-- Guards: now uses the included GLB -->
+    <!-- Guards (use included GLB) -->
     <a-entity position="3 0 -24" guard-bot="model: assets/models/combat_ninja.glb; radius: 3.5;"></a-entity>
     <a-entity position="-3 0 -24" guard-bot="model: assets/models/combat_ninja.glb; radius: 3.5;"></a-entity>
     <a-entity position="0 0 -27"  guard-bot="model: assets/models/combat_ninja.glb; radius: 4.0;"></a-entity>
 
+    <!-- Player Rig -->
     <a-entity id="rig" position="0 0 0" movement-controls="controls: checkpoint, gamepad, keyboard, touch; speed: 0.3">
       <a-camera id="main-cam" look-controls="pointerLockEnabled: true" position="0 1.6 0">
         <a-cursor color="#00FF00"></a-cursor>
@@ -66,7 +70,7 @@
     </a-entity>
   </a-scene>
 
-  <script src="js/index.js"></script>
-  <script src="js/world.js"></script>
+  <!-- Boot only -->
+  <script type="module" src="index.js"></script>
 </body>
 </html>

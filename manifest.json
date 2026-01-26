@@ -1,7 +1,7 @@
 {
   "name": "ScarlettVR Poker",
   "short_name": "ScarlettVR",
-  "description": "The Ultimate Modular VR Poker Experience",
+  "description": "ScarlettVR Poker • Master Build",
   "start_url": "index.html",
   "display": "standalone",
   "orientation": "landscape",
