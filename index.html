@@ -31,6 +31,7 @@
     AVATAR: <span id="av" style="color:var(--cyan)">NONE</span> | JUMBOTRON: <span style="color:var(--cyan)">LIVE</span>
   </div>
 
+  <button id="menuToggle" class="btn" style="position:absolute; top:10px; right:10px; z-index:1002; width:70px;">MENU</button>
   <div id="controls">
     <button class="btn" onclick="window.dealFlop?.()">🃏 DEAL FLOP</button>
     <button class="btn" onclick="window.spawnChips?.()">🪙 SPAWN CHIPS</button>
@@ -75,6 +76,8 @@
   <script type="module">
     import { initEngine } from './js/scarlett1/index.js';
     initEngine();
+    const mt = document.getElementById('menuToggle');
+    mt?.addEventListener('click', () => window.hideHud?.());
     const st = document.getElementById('st');
     if (st) { st.textContent = 'ACTIVE'; st.style.color = '#0f0'; }
   </script>
