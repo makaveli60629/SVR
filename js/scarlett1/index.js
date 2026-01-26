@@ -1,6 +1,9 @@
-// SVR/js/scarlett1/index.js
-// SCARLETT ONE • SVR — Permanent Engine Module (Hands-only VR; Android debug ready)
-// RULE: Do not edit HTML. We attach what we need from here.
+// ============================================================================
+// ✅ SCARLETT ONE • SVR — PERMANENT SPINE MODULE (DO NOT DELETE / DO NOT RENAME)
+// File: SVR/js/scarlett1/index.js
+// Purpose: Engine bootstrap + module hub + Android debug logging
+// Rules: Hands-only VR. Do NOT edit HTML. World building lives in world.js.
+// ============================================================================
 
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { ModuleHub } from './modules/moduleHub.js';
@@ -11,13 +14,19 @@ let scene, camera, renderer, clock, playerRig;
 function el(id) { return document.getElementById(id); }
 function setText(id, txt) { const e = el(id); if (e) e.textContent = txt; }
 
-// On-screen log (uses #log if present, otherwise creates one)
+// ---------- On-screen log panel ----------
+let logEl = null;
+let logVisible = false;
+
 function ensureLogPanel() {
-  let log = el('log');
-  if (!log) {
-    log = document.createElement('div');
-    log.id = 'log';
-    Object.assign(log.style, {
+  if (logEl) return logEl;
+  logEl = el('log');
+
+  // If HTML doesn't have one, create it (but default hidden)
+  if (!logEl) {
+    logEl = document.createElement('div');
+    logEl.id = 'log';
+    Object.assign(logEl.style, {
       position: 'absolute',
       left: '10px',
       right: '10px',
@@ -31,20 +40,29 @@ function ensureLogPanel() {
       background: 'rgba(0,20,0,0.65)',
       zIndex: 10,
       pointerEvents: 'none',
-      fontFamily: 'monospace'
+      fontFamily: 'monospace',
+      display: 'none'
     });
-    document.body.appendChild(log);
+    document.body.appendChild(logEl);
   }
-  return log;
+
+  return logEl;
 }
 
-const logEl = ensureLogPanel();
+function setLogVisible(v) {
+  logVisible = !!v;
+  const p = ensureLogPanel();
+  p.style.display = logVisible ? 'block' : 'none';
+}
+
 function appendLog(line) {
-  const next = (logEl.textContent + "\n" + line).split("\n").slice(-200).join("\n");
-  logEl.textContent = next;
-  logEl.scrollTop = logEl.scrollHeight;
+  const p = ensureLogPanel();
+  const next = (p.textContent + "\n" + line).split("\n").slice(-220).join("\n");
+  p.textContent = next;
+  p.scrollTop = p.scrollHeight;
 }
 
+// Console hook (still captures logs even if panel is hidden)
 (function hookConsole() {
   const L = console.log.bind(console);
   const W = console.warn.bind(console);
@@ -91,21 +109,43 @@ export function initEngine() {
   renderer.xr.enabled = true;
   document.body.appendChild(renderer.domElement);
 
-  // Build world + register modules
+  // Default: log panel hidden so it never blocks UI
+  setLogVisible(false);
+
+  // Toggle log: 3-finger tap (mobile) OR press "L" (desktop)
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'KeyL') setLogVisible(!logVisible);
+  });
+
+  let touchCount = 0;
+  let touchTimer = null;
+  window.addEventListener('touchstart', (e) => {
+    if ((e.touches?.length || 0) >= 3) {
+      touchCount++;
+      clearTimeout(touchTimer);
+      touchTimer = setTimeout(() => { touchCount = 0; }, 600);
+      if (touchCount >= 1) {
+        setLogVisible(!logVisible);
+        touchCount = 0;
+      }
+    }
+  }, { passive: true });
+
   const ctx = {
     THREE, scene, camera, renderer,
     rig: playerRig,
-    setText, log: appendLog
+    setText, log: appendLog,
+    ui: { setLogVisible }
   };
 
   // Initialize Module Hub
   ModuleHub.init(ctx);
 
-  // Create the base world (also registers modules)
+  // Create world + register modules
   createWorld(ctx);
 
-  // Wire ENTER VR if button exists in HTML
-  const btn = el('entervr');
+  // Wire VR button
+  const btn = el('entervr') || el('initializevr');
   if (btn) {
     btn.addEventListener('click', async () => {
       try {
@@ -139,28 +179,23 @@ export function initEngine() {
     const p = playerRig.position;
     setText('pos-val', `${p.x.toFixed(2)}, ${p.y.toFixed(2)}, ${p.z.toFixed(2)}`);
 
-    // Tick all modules
     ModuleHub.update(dt);
-
     renderer.render(scene, camera);
   });
 
-  // Expose internals
   window.__SCARLETT__.scene = scene;
   window.__SCARLETT__.renderer = renderer;
   window.__SCARLETT__.camera = camera;
   window.__SCARLETT__.rig = playerRig;
 
-  setText('status', 'LINKED');
+  setText('status', 'ACTIVE');
   console.log('[boot] engine init complete ✅');
 }
 
-// Auto-start if HTML doesn’t call initEngine()
-// (Safe: if HTML already calls it, nothing breaks)
+// Auto-start safeguard
 if (!window.__SCARLETT_ENGINE_STARTED__) {
   window.__SCARLETT_ENGINE_STARTED__ = true;
-  // slight defer to ensure DOM exists
   window.addEventListener('load', () => {
     try { initEngine(); } catch (e) { console.error('initEngine crash:', e); }
   });
-}
+    }
