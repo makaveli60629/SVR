@@ -200,7 +200,7 @@ function start() {
 
     const pitFloor = new THREE.Mesh(new THREE.CircleGeometry(5.0, 96), pitMat);
     pitFloor.rotation.x = -Math.PI/2;
-    pitFloor.position.y = -1.05;
+    pitFloor.position.y = -1.35; // Update 6: deeper pit floor
     room.add(pitFloor);
 
     // Pit walls (short cylinder)
@@ -208,7 +208,7 @@ function start() {
       new THREE.CylinderGeometry(5.0, 5.0, 2.2, 128, 1, true),
       new THREE.MeshStandardMaterial({ color: 0x0a0f1e, roughness: 0.9, metalness: 0.15 })
     );
-    pitWall.position.y = -0.1;
+    pitWall.position.y = -0.25; // Update 6: align with deeper pit
     room.add(pitWall);
 
     // Stairs/ramp hint (simple wedge)
@@ -216,9 +216,34 @@ function start() {
       new THREE.BoxGeometry(2.4, 1.2, 3.2),
       new THREE.MeshStandardMaterial({ color: 0x0b1220, roughness: 0.95, metalness: 0.05 })
     );
-    ramp.position.set(0, -0.45, 5.2);
+    ramp.position.set(0, -0.65, 5.4); // Update 6: deeper ramp
     ramp.rotation.x = -0.25;
     room.add(ramp);
+
+    // Update 6: Stair ring (simple steps) around the pit for a stronger "dug out" feeling
+    const stairs = new THREE.Group();
+    room.add(stairs);
+    const stepMat = new THREE.MeshStandardMaterial({ color: 0x0b1220, roughness: 0.95, metalness: 0.05 });
+    const stepGeo = new THREE.BoxGeometry(0.9, 0.18, 0.55);
+
+    // 16 steps on the south arc (closest to spawn), tapering down
+    const steps = 16;
+    const arcStart = Math.PI * 0.70;
+    const arcEnd   = Math.PI * 1.30;
+    for (let i=0;i<steps;i++){
+      const t = i/(steps-1);
+      const theta = arcStart + (arcEnd-arcStart)*t;
+      const radius = 5.05 + 0.15*Math.sin(t*Math.PI);
+      const x = Math.sin(theta)*radius;
+      const z = Math.cos(theta)*radius;
+
+      const step = new THREE.Mesh(stepGeo, stepMat);
+      // Height descends into pit
+      step.position.set(x, -0.10 - t*0.95, z);
+      step.lookAt(0, step.position.y, 0);
+      step.rotateY(Math.PI);
+      stairs.add(step);
+    }
 
     // Poker table area centered in pit
     buildPoker(feltTex);
@@ -247,7 +272,7 @@ function start() {
   function buildPoker(feltTex) {
     // Poker group at pit depth
     const poker = new THREE.Group();
-    poker.position.set(0, -1.05, 0);
+    poker.position.set(0, -1.35, 0); // Update 6: deeper pit
     room.add(poker);
 
     // Table pedestal
@@ -615,7 +640,7 @@ function start() {
   let grabbed = null;          // THREE.Object3D
   let grabbedParent = null;    // original parent
   let grabbedOffset = new THREE.Vector3();
-  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -(-1.05 + 0.72)); // y = pit + table height approx
+  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -(-1.35 + 0.72)); // Update 6 // y = pit + table height approx
   const dragPoint = new THREE.Vector3();
   const tmpVec3 = new THREE.Vector3();
 
@@ -665,9 +690,9 @@ function start() {
     if (line.intersectPlane(dragPlane, dragPoint)) {
       tmpVec3.copy(dragPoint).add(grabbedOffset);
       // Keep chips slightly above table
-      if (grabbed.userData.type === 'chips') tmpVec3.y = (-1.05) + 0.55;
+      if (grabbed.userData.type === 'chips') tmpVec3.y = (-1.35) + 0.55; // Update 6
       // Keep cards at table height
-      if (grabbed.userData.type === 'card' || grabbed.userData.type === 'hole') tmpVec3.y = (-1.05) + 0.72;
+      if (grabbed.userData.type === 'card' || grabbed.userData.type === 'hole') tmpVec3.y = (-1.35) + 0.72; // Update 6
       grabbed.position.copy(tmpVec3);
     }
   }
@@ -1007,6 +1032,25 @@ function start() {
   const clock = new THREE.Clock();
   renderer.setAnimationLoop(() => {
     const dt = Math.min(clock.getDelta(), 0.033);
+
+    // Update 6: XR controller look (right stick yaw) when in VR
+    if (renderer.xr.isPresenting) {
+      const session = renderer.xr.getSession();
+      if (session) {
+        for (const src of session.inputSources) {
+          const gp = src.gamepad;
+          if (!gp || !gp.axes || gp.axes.length < 3) continue;
+          // Oculus/Quest typical: right stick X = axes[2]
+          const rx = gp.axes[2] ?? 0;
+          const dead = 0.18;
+          if (Math.abs(rx) > dead) {
+            const yawSpeed = 1.6; // rad/sec at full deflection
+            rig.rotation.y -= (rx * yawSpeed) * dt;
+          }
+        }
+      }
+    }
+
 
     // FINAL correct locomotion mapping
     // joystick up = forward; down = back; left/right correct
