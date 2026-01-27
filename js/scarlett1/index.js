@@ -89,6 +89,43 @@ function start() {
   const room = new THREE.Group();
   scene.add(room);
 
+  // ============================
+  // PHASE 5: SPEAKER ANCHORS (JBL placeholders)
+  // Drop-in ready: replace meshes with your JBL GLB later.
+  // ============================
+  const speakers = new THREE.Group();
+  room.add(speakers);
+
+  const spkMat = new THREE.MeshStandardMaterial({
+    color: 0x0b0f1c, roughness: 0.7, metalness: 0.2,
+    emissive: new THREE.Color(0x0b1230), emissiveIntensity: 0.25
+  });
+
+  function addSpeaker(theta, label) {
+    const g = new THREE.Group();
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.55, 1.1, 0.45), spkMat);
+    box.position.y = 0.55;
+    g.add(box);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.03, 10, 40),
+      new THREE.MeshStandardMaterial({ color: 0x2a55ff, emissive: new THREE.Color(0x2a55ff), emissiveIntensity: 0.9, roughness: 0.3, metalness: 0.2 })
+    );
+    ring.position.set(0, 0.55, 0.24);
+    g.add(ring);
+
+    g.userData = { type: 'speaker', label };
+    const x = Math.sin(theta) * (ROOM_R - 1.25);
+    const z = Math.cos(theta) * (ROOM_R - 1.25);
+    g.position.set(x, 0.0, z);
+    g.lookAt(0, 0.7, 0);
+    speakers.add(g);
+  }
+
+  addSpeaker(0, 'North Speaker');
+  addSpeaker(Math.PI/2, 'East Speaker');
+  addSpeaker(Math.PI, 'South Speaker');
+  addSpeaker(Math.PI*1.5, 'West Speaker');
+
+
   // Neon ring material (pulse)
   const ringMat = new THREE.MeshStandardMaterial({
     color: 0x1730ff, roughness: 0.25, metalness: 0.75,
@@ -333,6 +370,7 @@ function start() {
       c.rotation.x = -Math.PI/2;
       cardsGroup.add(c);
       pokerState.community.push(c);
+      interactables.push(c);
     }
 
     // Hole cards spawn on demand
@@ -355,6 +393,7 @@ function start() {
           m.userData = { type:'hole', seatIndex, j, hoverPhase: Math.random()*Math.PI*2 };
           cardsGroup.add(m);
           pokerState.holeCards.push({ mesh:m, seatIndex });
+          interactables.push(m);
         }
       }
     }
@@ -416,6 +455,7 @@ function start() {
       g.userData = { type:'chips' };
       poker.add(g);
       pokerState.chips.push(g);
+      interactables.push(g);
     }
     // 8 stacks near each seat
     for (let i=0;i<8;i++){
@@ -566,6 +606,80 @@ function start() {
   const pointer = new THREE.Vector2();
   let pointerDown = false;
 
+  // ============================
+  // PHASE 5: GRAB / PICKUP SCAFFOLD (Pointer now, Hands later)
+  // - Tap grabbable (card/chips) to pick up
+  // - Drag to move on a table plane
+  // - Release to drop
+  // ============================
+  let grabbed = null;          // THREE.Object3D
+  let grabbedParent = null;    // original parent
+  let grabbedOffset = new THREE.Vector3();
+  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -(-1.05 + 0.72)); // y = pit + table height approx
+  const dragPoint = new THREE.Vector3();
+  const tmpVec3 = new THREE.Vector3();
+
+  function isGrabbable(obj) {
+    const t = obj?.userData?.type;
+    return (t === 'card' || t === 'hole' || t === 'chips');
+  }
+
+  function tryGrab(ev) {
+    if (!actions.padsEnabled) return false;
+    setPointerFromEvent(ev);
+    raycaster.setFromCamera(pointer, camera);
+
+    // Intersect deeply (groups included)
+    const hits = raycaster.intersectObjects(interactables, true);
+    if (!hits.length) return false;
+
+    // Climb to first grabbable ancestor
+    let o = hits[0].object;
+    while (o && !isGrabbable(o)) o = o.parent;
+    if (!o) return false;
+
+    // Don't grab invisible cards
+    if (o.visible === false) return false;
+
+    grabbed = o;
+    grabbedParent = o.parent;
+
+    // Compute initial offset between hit point projected onto plane and object position
+    const line = raycaster.ray;
+    if (line.intersectPlane(dragPlane, dragPoint)) {
+      grabbedOffset.copy(grabbed.position).sub(dragPoint);
+    } else {
+      grabbedOffset.set(0,0,0);
+    }
+
+    log(`[grab] ${grabbed.userData.type}`);
+    return true;
+  }
+
+  function updateGrab(ev) {
+    if (!grabbed) return;
+    setPointerFromEvent(ev);
+    raycaster.setFromCamera(pointer, camera);
+
+    const line = raycaster.ray;
+    if (line.intersectPlane(dragPlane, dragPoint)) {
+      tmpVec3.copy(dragPoint).add(grabbedOffset);
+      // Keep chips slightly above table
+      if (grabbed.userData.type === 'chips') tmpVec3.y = (-1.05) + 0.55;
+      // Keep cards at table height
+      if (grabbed.userData.type === 'card' || grabbed.userData.type === 'hole') tmpVec3.y = (-1.05) + 0.72;
+      grabbed.position.copy(tmpVec3);
+    }
+  }
+
+  function dropGrab() {
+    if (!grabbed) return;
+    log('[grab] drop');
+    grabbed = null;
+    grabbedParent = null;
+  }
+
+
   function setPointerFromEvent(ev) {
     const x = (ev.clientX / window.innerWidth) * 2 - 1;
     const y = -(ev.clientY / window.innerHeight) * 2 + 1;
@@ -587,10 +701,16 @@ function start() {
     }
   }
 
-  window.addEventListener('pointerdown', () => { pointerDown = true; });
+  window.addEventListener('pointerdown', (ev) => {
+    // first attempt grab
+    if (tryGrab(ev)) { pointerDown = true; return; }
+    pointerDown = true;
+  });
+  window.addEventListener('pointermove', (ev) => { if (grabbed) updateGrab(ev); });
   window.addEventListener('pointerup', (ev) => {
     if (!pointerDown) return;
     pointerDown = false;
+    if (grabbed) { dropGrab(); return; }
     if (!actions.padsEnabled) return;
     doRayInteract(ev);
   });
@@ -624,6 +744,8 @@ function start() {
   const actions = {
     padsEnabled: true,
     botsEnabled: true,
+    seatLock: true,
+
     dealHand: null,
     flop: null,
     turn: null,
@@ -668,6 +790,19 @@ function start() {
     btnPads.textContent = `Pads: ${actions.padsEnabled?'ON':'OFF'}`;
     log(`[pads] ${actions.padsEnabled?'ON':'OFF'}`);
   };
+
+  // Seat lock toggle (when seated, you can lock movement for comfort)
+  const rowSeat = document.createElement('div'); rowSeat.className='row';
+  const btnSeatLock = document.createElement('button');
+  btnSeatLock.textContent = `Seat Lock: ${actions.seatLock?'ON':'OFF'}`;
+  btnSeatLock.onclick = () => {
+    actions.seatLock = !actions.seatLock;
+    btnSeatLock.textContent = `Seat Lock: ${actions.seatLock?'ON':'OFF'}`;
+    log(`[seatLock] ${actions.seatLock?'ON':'OFF'}`);
+  };
+  rowSeat.appendChild(btnSeatLock);
+  wrist.appendChild(rowSeat);
+
 
   // Radio system (safe examples)
   const stations = [
@@ -807,6 +942,12 @@ function start() {
     // joystick up = forward; down = back; left/right correct
     let moveX = -joyVec.x;
     let moveZ = -joyVec.y;
+
+    // If seated and seatLock enabled, require deliberate stick input to move
+    if (pokerState.seated && actions.seatLock) {
+      const mag = Math.hypot(moveX, moveZ);
+      if (mag < 0.35) { moveX = 0; moveZ = 0; }
+    }
 
     if (keys.has('w')) moveZ -= 1;
     if (keys.has('s')) moveZ += 1;
