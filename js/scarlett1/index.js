@@ -424,6 +424,8 @@ function start() {
 
   // Build poker + bots + pads + jumbotrons
   function buildPoker(feltTex) {
+  dt = (typeof window !== 'undefined' && window.__scarlettDT) ? window.__scarlettDT : dt;
+
   const dt = (arguments[0] && arguments[0].dt) || (window.__scarlettDT||0.016);
     // Poker group at pit depth
     const poker = new THREE.Group();
