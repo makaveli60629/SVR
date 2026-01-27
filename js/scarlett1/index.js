@@ -164,6 +164,10 @@ function start() {
   const ROOM_R = 24; // Update 8: lobby radius doubled
   const ROOM_H = 6;
 
+  // Pit vertical offset ("divot" depth). Single source of truth.
+  // Lower = deeper pit (more of bots/chairs visible above the pit floor).
+  const PIT_Y = -1.20;
+
   // Room group
   const room = new THREE.Group();
   scene.add(room);
@@ -374,7 +378,7 @@ function start() {
       new THREE.CylinderGeometry(5.0, 5.0, 2.2, 128, 1, true),
       new THREE.MeshStandardMaterial({ color: 0x0a0f1e, roughness: 0.9, metalness: 0.15 })
     );
-    pitWall.position.y = -0.25; // Update 6: align with deeper pit
+    pitWall.position.y = PIT_Y + 1.10; // Update 13: align to pit depth
     room.add(pitWall);
 
     // Stairs/ramp hint (simple wedge)
@@ -382,7 +386,7 @@ function start() {
       new THREE.BoxGeometry(2.4, 1.2, 3.2),
       new THREE.MeshStandardMaterial({ color: 0x0b1220, roughness: 0.95, metalness: 0.05 })
     );
-    ramp.position.set(0, -0.65, 5.4); // Update 6: deeper ramp
+    ramp.position.set(0, PIT_Y + 0.55, 5.4); // Update 13: deeper ramp anchored to PIT_Y
     ramp.rotation.x = -0.25;
     room.add(ramp);
 
