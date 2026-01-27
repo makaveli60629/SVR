@@ -166,7 +166,8 @@ function start() {
 
   // Pit vertical offset ("divot" depth). Single source of truth.
   // Lower = deeper pit (more of bots/chairs visible above the pit floor).
-  const PIT_Y = -1.20;
+  const PIT_Y = -2.0;
+  const PIT_R = 5.2; // Radius for pit lip/rail sync
 
   // Room group
   const room = new THREE.Group();
@@ -1448,7 +1449,7 @@ function start() {
 
     // Android: screen-left/right should strafe left/right (no inversion)
     // joystick up = forward; down = back
-    let moveX = (-joyVec.x);
+    let moveX = joyVec.x;
     let moveZ = -joyVec.y;
 
     // If seated and seatLock enabled, require deliberate stick input to move
