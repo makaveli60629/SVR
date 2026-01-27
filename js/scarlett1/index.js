@@ -1025,6 +1025,21 @@ function start() {
     log(`[ui] ${on ? 'shown' : 'hidden (controls remain)'}`);
   }
 
+
+  // Update 9.1: boot HUD clear + hard reset
+  const boot = { cleared: false };
+  function clearBootHUD() {
+    const hud = document.getElementById('hud');
+    if (hud) hud.style.display = 'none';
+    boot.cleared = true;
+    log('[boot] hud cleared');
+  }
+  function hardReset() {
+    try { localStorage.clear(); } catch {}
+    try { sessionStorage.clear(); } catch {}
+    location.reload(true);
+  }
+
 // Android joystick locomotion (FINAL mapping)
   const joy = document.getElementById('joystick');
   const knob = document.getElementById('joyKnob');
@@ -1311,6 +1326,8 @@ function start() {
   // Main loop
   const clock = new THREE.Clock();
   renderer.setAnimationLoop(() => {
+    // Update 9.1: clear boot on first frame (prevents endless 'booting...')
+    if (!boot.cleared) clearBootHUD();
     const dt = Math.min(clock.getDelta(), 0.033);
 
     // Update 6: XR controller look (right stick yaw) when in VR
