@@ -366,7 +366,7 @@ function start() {
 
     const pitFloor = new THREE.Mesh(new THREE.CircleGeometry(5.0, 96), pitMat);
     pitFloor.rotation.x = -Math.PI/2;
-    pitFloor.position.y = -1.35; // Update 6: deeper pit floor
+    pitFloor.position.y = PIT_Y; // Update 13: deeper pit floor
     room.add(pitFloor);
 
     // Pit walls (short cylinder)
@@ -441,7 +441,7 @@ function start() {
 
     // Poker group at pit depth
     const poker = new THREE.Group();
-    poker.position.set(0, -1.35, 0); // Update 6: deeper pit
+    poker.position.set(0, PIT_Y, 0); // Update 13: deeper pit (group)
     room.add(poker);
 
     // Table pedestal
@@ -815,7 +815,7 @@ function start() {
   let grabbed = null;          // THREE.Object3D
   let grabbedParent = null;    // original parent
   let grabbedOffset = new THREE.Vector3();
-  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -(-1.35 + 0.72)); // Update 6 // y = pit + table height approx
+  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -(PIT_Y + 0.72)); // Update 6 // y = pit + table height approx
   const dragPoint = new THREE.Vector3();
   const tmpVec3 = new THREE.Vector3();
 
@@ -1444,7 +1444,7 @@ function start() {
 
     // Android: screen-left/right should strafe left/right (no inversion)
     // joystick up = forward; down = back
-    let moveX = joyVec.x;
+    let moveX = (-joyVec.x);
     let moveZ = -joyVec.y;
 
     // If seated and seatLock enabled, require deliberate stick input to move
