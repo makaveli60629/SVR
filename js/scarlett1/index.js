@@ -25,6 +25,19 @@ import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { VRButton } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/VRButton.js';
 import { XRHandModelFactory } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRHandModelFactory.js';
 
+
+// ===== SCARLETT SAFETY GLOBALS (Android/GitHub Pages) =====
+// Prevent "PIT_R/PIT_Y not defined" crashes if constants are referenced across scopes.
+window.__scarlettGlobals = window.__scarlettGlobals || {};
+if (typeof window.__scarlettGlobals.PIT_R !== 'number') window.__scarlettGlobals.PIT_R = 6.2;
+if (typeof window.__scarlettGlobals.PIT_Y !== 'number') window.__scarlettGlobals.PIT_Y = -1.9;
+if (typeof window.__scarlettGlobals.PIT_DEPTH !== 'number') window.__scarlettGlobals.PIT_DEPTH = 2.6;
+// Use var so even early references won't throw (avoids TDZ issues).
+var PIT_R = window.__scarlettGlobals.PIT_R;
+var PIT_Y = window.__scarlettGlobals.PIT_Y;
+var PIT_DEPTH = window.__scarlettGlobals.PIT_DEPTH;
+// =========================================================
+
 export const Scarlett1 = { start };
 
 function start() {
