@@ -98,6 +98,19 @@
   }
   </script>
 
+
+  <!-- Update 9.7: Safe attach helper to prevent amb.append crashes -->
+  <script>
+    window.ScarlettAttach = function(target, ...items){
+      try{
+        if(!target) return;
+        if(typeof target.add === 'function'){ items.forEach(i=>{ if(i) target.add(i); }); return; }
+        if(typeof target.appendChild === 'function'){ items.forEach(i=>{ if(i) target.appendChild(i); }); return; }
+        if(typeof target.append === 'function'){ target.append(...items); return; }
+      }catch(e){ /* swallow */ }
+    };
+  </script>
+
 </head>
 <body>
   <div id="hud">booting…</div>
