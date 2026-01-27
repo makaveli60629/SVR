@@ -132,5 +132,24 @@
   </div>
 
   <script type="module" src="./index.js"></script>
+
+  <div id="diagPanel" style="position:fixed; left:12px; top:12px; z-index:30; max-width:92vw;">
+    <div style="padding:10px 12px; border-radius:14px; background:rgba(10,14,26,0.72); border:1px solid rgba(120,160,255,0.35); color:#eaf2ff; font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;">
+      <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+        <div style="font-weight:700;">SCARLETT DIAG</div>
+        <div id="diagStatus" style="opacity:0.85;">booting…</div>
+        <div style="flex:1"></div>
+        <button id="btnCopyReport" style="padding:6px 8px; border-radius:10px; background:rgba(30,50,110,0.55); border:1px solid rgba(120,160,255,0.45); color:#eaf2ff;">Copy Report</button>
+        <button id="btnToggleDiag" style="padding:6px 8px; border-radius:10px; background:rgba(30,50,110,0.35); border:1px solid rgba(120,160,255,0.35); color:#eaf2ff;">Hide</button>
+      </div>
+      <pre id="diagLog" style="margin:0; white-space:pre-wrap; max-height:34vh; overflow:auto;">(starting…)</pre>
+    </div>
+  </div>
+
+
+  <div id="emergency" style="position:fixed; left:50%; bottom:12px; transform:translateX(-50%); z-index:25;">
+    <button id="btnEmergency" style="padding:10px 14px; border-radius:14px; background:rgba(30,50,110,0.40); border:1px solid rgba(120,160,255,0.45); color:#eaf2ff;">EMERGENCY: RELOAD</button>
+  </div>
+
 </body>
 </html>
