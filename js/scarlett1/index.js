@@ -1,3 +1,4 @@
+// UPDATE_9_14_DT_CALL_BYPASS
 // UPDATE_9_13_GLOBAL_DT_GETTER
 // UPDATE_9_12_DT_SINGLE_SOURCE
 // UPDATE_9_11_CACHE_PURGE
@@ -427,12 +428,9 @@ function start() {
 
   // Build poker + bots + pads + jumbotrons
   function buildPoker(feltTex) {
-  // UPDATE_9_12_DT_SINGLE_SOURCE
-  var _dt = (window.__scarlettDT ? window.__scarlettDT() : ((window.__scarlett&&window.__scarlett.dt)||0.016));
-// Update 9.10: avoid TDZ by using local _dt
-  var _dt = (typeof window !== 'undefined' && window.__scarlettDT()) ? window.__scarlettDT() : 0.016;
+    // DT helper (stable constant; avoids TDZ / globals on mobile browsers)
+    const _dt = 1/60;
 
-  var _dt = (arguments[0] && arguments[0]._dt) || (window.__scarlettDT()||0.016);
     // Poker group at pit depth
     const poker = new THREE.Group();
     poker.position.set(0, -1.35, 0); // Update 6: deeper pit
