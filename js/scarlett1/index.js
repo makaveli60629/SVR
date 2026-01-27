@@ -11,6 +11,7 @@
 
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { VRButton } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/VRButton.js';
+import { XRHandModelFactory } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRHandModelFactory.js';
 
 export const Scarlett1 = { start };
 
@@ -422,6 +423,10 @@ function start() {
         }
       }
     }
+
+    // Update 7: Hand pinch/grab
+    updatePinch(0, dt);
+    updatePinch(1, dt);
 
     function clearHand() {
       for (const hc of pokerState.holeCards) cardsGroup.remove(hc.mesh);
@@ -1014,6 +1019,137 @@ function start() {
 
   // VR button
   document.body.appendChild(VRButton.createButton(renderer));
+
+  // ============================
+  // UPDATE 7: WebXR Hands (Pinch Grab)
+  // - Visual hand models
+  // - Pinch (thumb-tip + index-tip) grabs nearest card/chips
+  // - Works alongside touch grab (Android)
+  // ============================
+  const handModelFactory = new XRHandModelFactory();
+
+  const xrHands = [
+    renderer.xr.getHand(0),
+    renderer.xr.getHand(1),
+  ];
+  xrHands[0].name = 'hand0';
+  xrHands[1].name = 'hand1';
+  scene.add(xrHands[0]);
+  scene.add(xrHands[1]);
+
+  // Add visible models (optional but helpful)
+  xrHands[0].add(handModelFactory.createHandModel(xrHands[0], 'mesh'));
+  xrHands[1].add(handModelFactory.createHandModel(xrHands[1], 'mesh'));
+
+  const handState = [
+    { pinching: false, grabbed: null, grabbedOffset: new THREE.Vector3(), pinchWorld: new THREE.Vector3() },
+    { pinching: false, grabbed: null, grabbedOffset: new THREE.Vector3(), pinchWorld: new THREE.Vector3() },
+  ];
+
+  function getJoint(hand, name) {
+    // three.js WebXR hands populate .joints
+    return hand.joints ? hand.joints[name] : null;
+  }
+
+  function isGrabbableType(t) {
+    return (t === 'card' || t === 'hole' || t === 'chips');
+  }
+
+  function nearestGrabbable(worldPos, maxDist=0.28) {
+    let best = null;
+    let bestD = maxDist;
+    for (const obj of interactables) {
+      // Interactables can be groups; pick ancestor with userData.type
+      let o = obj;
+      if (!o) continue;
+      // walk up to typed node
+      while (o && !isGrabbableType(o.userData?.type) && o.parent) o = o.parent;
+      const t = o?.userData?.type;
+      if (!isGrabbableType(t)) continue;
+      if (o.visible === false) continue;
+
+      const p = new THREE.Vector3();
+      o.getWorldPosition(p);
+      const d = p.distanceTo(worldPos);
+      if (d < bestD) { bestD = d; best = o; }
+    }
+    return best;
+  }
+
+  function beginHandGrab(handIndex, worldPos) {
+    const st = handState[handIndex];
+    if (st.grabbed) return;
+
+    const target = nearestGrabbable(worldPos, 0.28);
+    if (!target) return;
+
+    st.grabbed = target;
+
+    // Compute offset between object and pinch point
+    const objWorld = new THREE.Vector3();
+    target.getWorldPosition(objWorld);
+    st.grabbedOffset.copy(objWorld).sub(worldPos);
+
+    log(`[hand] grab ${target.userData.type} (${handIndex})`);
+  }
+
+  function updateHandGrab(handIndex, worldPos) {
+    const st = handState[handIndex];
+    if (!st.grabbed) return;
+
+    // Desired world position = pinch + offset
+    const desiredWorld = new THREE.Vector3().copy(worldPos).add(st.grabbedOffset);
+
+    // Convert to local coordinates of parent
+    const parent = st.grabbed.parent;
+    if (!parent) return;
+    const local = parent.worldToLocal(desiredWorld.clone());
+
+    // Keep on appropriate plane heights (relative to poker group already)
+    const t = st.grabbed.userData?.type;
+    if (t === 'chips') local.y = 0.55;
+    if (t === 'card' || t === 'hole') local.y = 0.72;
+
+    st.grabbed.position.copy(local);
+  }
+
+  function endHandGrab(handIndex) {
+    const st = handState[handIndex];
+    if (!st.grabbed) return;
+    log(`[hand] drop (${handIndex})`);
+    st.grabbed = null;
+  }
+
+  function updatePinch(handIndex, dt) {
+    const hand = xrHands[handIndex];
+    const thumb = getJoint(hand, 'thumb-tip');
+    const index = getJoint(hand, 'index-finger-tip');
+    if (!thumb || !index) return;
+
+    const tp = new THREE.Vector3(); thumb.getWorldPosition(tp);
+    const ip = new THREE.Vector3(); index.getWorldPosition(ip);
+
+    const dist = tp.distanceTo(ip);
+    const pinchNow = dist < 0.028; // threshold tuned for Quest
+
+    // Midpoint as pinch point
+    const pinch = tp.add(ip).multiplyScalar(0.5);
+    handState[handIndex].pinchWorld.copy(pinch);
+
+    if (pinchNow && !handState[handIndex].pinching) {
+      handState[handIndex].pinching = true;
+      beginHandGrab(handIndex, pinch);
+    } else if (!pinchNow && handState[handIndex].pinching) {
+      handState[handIndex].pinching = false;
+      endHandGrab(handIndex);
+    }
+
+    if (handState[handIndex].pinching) {
+      updateHandGrab(handIndex, pinch);
+    }
+  }
+
+
   btnEnterVR.onclick = async () => log('[xr] press the VRButton (browser prompt)');
 
   // Resize
@@ -1050,6 +1186,10 @@ function start() {
         }
       }
     }
+
+    // Update 7: Hand pinch/grab
+    updatePinch(0, dt);
+    updatePinch(1, dt);
 
 
     // FINAL correct locomotion mapping
@@ -1093,6 +1233,10 @@ function start() {
       }
     }
 
+    // Update 7: Hand pinch/grab
+    updatePinch(0, dt);
+    updatePinch(1, dt);
+
     // Ring pulse
     const pulse = (Math.sin(performance.now()*0.0012)*0.5+0.5);
     ringMat.emissiveIntensity = 0.65 + 0.75*pulse;
@@ -1107,6 +1251,10 @@ function start() {
       }
     }
 
+    // Update 7: Hand pinch/grab
+    updatePinch(0, dt);
+    updatePinch(1, dt);
+
     // Cards face player
     if (pokerState.holeCards.length) {
       for (const hc of pokerState.holeCards) {
@@ -1118,6 +1266,10 @@ function start() {
         m.rotateY(Math.PI);
       }
     }
+
+    // Update 7: Hand pinch/grab
+    updatePinch(0, dt);
+    updatePinch(1, dt);
     if (pokerState.community.length) {
       for (const c of pokerState.community) {
         if (!c.visible) continue;
@@ -1127,6 +1279,10 @@ function start() {
         c.rotateY(Math.PI);
       }
     }
+
+    // Update 7: Hand pinch/grab
+    updatePinch(0, dt);
+    updatePinch(1, dt);
 
     // Jumbotron updates
     for (const j of jumboAnim) {
