@@ -1,3 +1,5 @@
+// UPDATE_9_12_DT_SINGLE_SOURCE
+// UPDATE_9_11_CACHE_PURGE
 /**
  * SCARLETTVR POKER — SCARLETT1 (PHASE 4: PRESENCE + PIT + INTERACTION SCAFFOLD)
  * - Circular sealed lobby (textured hooks)
@@ -424,10 +426,13 @@ function start() {
 
   // Build poker + bots + pads + jumbotrons
   function buildPoker(feltTex) {
-  // Update 9.10: avoid TDZ by using local _dt
-  const _dt = (typeof window !== 'undefined' && window.__scarlettDT) ? window.__scarlettDT : 0.016;
+  // UPDATE_9_12_DT_SINGLE_SOURCE
+  var _dt = __scarlettDT();
 
-  const _dt = (arguments[0] && arguments[0]._dt) || (window.__scarlettDT||0.016);
+  // Update 9.10: avoid TDZ by using local _dt
+  var _dt = (typeof window !== 'undefined' && __scarlettDT()) ? __scarlettDT() : 0.016;
+
+  var _dt = (arguments[0] && arguments[0]._dt) || (__scarlettDT()||0.016);
     // Poker group at pit depth
     const poker = new THREE.Group();
     poker.position.set(0, -1.35, 0); // Update 6: deeper pit
