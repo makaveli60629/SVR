@@ -291,8 +291,8 @@ function start() {
     const loungeMat = new THREE.MeshStandardMaterial({ color: 0x0b1220, roughness: 0.9, metalness: 0.1 });
     const railMat = new THREE.MeshStandardMaterial({ color: 0x101830, roughness: 0.55, metalness: 0.35, emissive: new THREE.Color(0x0b1230), emissiveIntensity: 0.25 });
 
-    // Rail ring around inner walkway
-    const rail = new THREE.Mesh(new THREE.TorusGeometry(ROOM_R-3.8, 0.08, 14, 220), railMat);
+    // Rail ring closer to pit (guards the center table)
+    const rail = new THREE.Mesh(new THREE.TorusGeometry((PIT_R+1.2), 0.08, 14, 220), railMat);
     rail.rotation.x = Math.PI/2;
     rail.position.y = 0.95;
     lounge.add(rail);
