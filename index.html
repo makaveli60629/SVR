@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>SCARLETT_BUILD=UPDATE_9_11_CACHE_PURGE — ScarlettVR Poker • Phase 4</title>
+  <title>SCARLETT_BUILD=UPDATE_9_14_DT_CALL_BYPASS — SCARLETT_BUILD=UPDATE_9_11_CACHE_PURGE — ScarlettVR Poker • Phase 4</title>
   <style>
     html, body { margin:0; padding:0; overflow:hidden; background:#05060a; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
     #hud {
@@ -135,6 +135,32 @@
   };
 </script>
 
+<!-- Update 9.13: global dt getter to avoid scope/name conflicts -->
+<script>
+  (function(){
+    try{
+      window.__scarlett = window.__scarlett || {};
+      if (typeof window.__scarlett.dt !== 'number') window.__scarlett.dt = 0.016;
+      window.__scarlettDT = function(){
+        try{
+          return (window.__scarlett && typeof window.__scarlett.dt === 'number') ? window.__scarlett.dt : 0.016;
+        }catch(e){ return 0.016; }
+      };
+    }catch(e){}
+  })();
+</script>
+
+<!-- UPDATE 9.15: ESM LOCKDOWN importmap for GitHub Pages -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+    "three/examples/jsm/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
 </head>
 <body>
   <div id="hud">booting…</div>
@@ -255,7 +281,7 @@
     setStatus('loading module…');
     const s = document.createElement('script');
     s.type = 'module';
-    s.src = './index.js?v=1769484694';
+    s.src = './index.js?v=915';
     s.onload = () => { write('[bootloader] module loaded'); setStatus('module loaded'); };
     s.onerror = () => { write('[bootloader] module failed to load'); setStatus('MODULE FAIL'); };
     document.body.appendChild(s);
