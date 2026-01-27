@@ -424,9 +424,10 @@ function start() {
 
   // Build poker + bots + pads + jumbotrons
   function buildPoker(feltTex) {
-  dt = (typeof window !== 'undefined' && window.__scarlettDT) ? window.__scarlettDT : dt;
+  // Update 9.10: avoid TDZ by using local _dt
+  const _dt = (typeof window !== 'undefined' && window.__scarlettDT) ? window.__scarlettDT : 0.016;
 
-  const dt = (arguments[0] && arguments[0].dt) || (window.__scarlettDT||0.016);
+  const _dt = (arguments[0] && arguments[0]._dt) || (window.__scarlettDT||0.016);
     // Poker group at pit depth
     const poker = new THREE.Group();
     poker.position.set(0, -1.35, 0); // Update 6: deeper pit
@@ -581,8 +582,8 @@ function start() {
     }
 
     // Update 7: Hand pinch/grab
-    updatePinch(0, dt);
-    updatePinch(1, dt);
+    updatePinch(0, _dt);
+    updatePinch(1, _dt);
 
     function clearHand() {
       for (const hc of pokerState.holeCards) cardsGroup.remove(hc.mesh);
