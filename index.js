@@ -1,3 +1,21 @@
+// UPDATE_9_12_DT_SINGLE_SOURCE: single dt source to avoid TDZ/redeclare issues
+(function(){
+  try{
+    window.__scarlett = window.__scarlett || {};
+    if (typeof window.__scarlett.dt !== 'number') window.__scarlett.dt = 0.016;
+    let last = performance.now();
+    function tick(){
+      const now = performance.now();
+      const d = (now - last) / 1000;
+      last = now;
+      // clamp for stability
+      window.__scarlett.dt = Math.min(0.05, Math.max(0.0, d || 0.016));
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }catch(e){}
+})();
+
 // Update 9.8: global dt fallback for modules that expect dt
 (function(){
   try{
