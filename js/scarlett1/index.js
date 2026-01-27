@@ -330,7 +330,7 @@ function start() {
       g.position.set(Math.sin(a)*r, 0.0, Math.cos(a)*r);
       g.userData = { a, r, dir: (Math.random()<0.5?-1:1), speed: 0.12 + Math.random()*0.12 };
       ambientBots.add(g);
-      amb.append(g);
+      window.ScarlettAttach(amb, g);
     }
 
 
