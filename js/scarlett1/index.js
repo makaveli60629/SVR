@@ -83,7 +83,7 @@ function start() {
   }
 
   // Room constants
-  const ROOM_R = 12;
+  const ROOM_R = 24; // Update 8: lobby radius doubled
   const ROOM_H = 6;
 
   // Room group
@@ -180,6 +180,26 @@ function start() {
     ring2.rotation.x = Math.PI/2;
     ring2.position.y = ROOM_H-0.08;
     room.add(ring2);
+
+    // Update 8: Extra lobby props (columns + ceiling spot rings) for scale
+    const cols = new THREE.Group();
+    room.add(cols);
+    const colMat = new THREE.MeshStandardMaterial({ color: 0x0a0f1e, roughness: 0.85, metalness: 0.12 });
+    const colGeo = new THREE.CylinderGeometry(0.35, 0.35, ROOM_H, 18);
+    for (let i=0;i<16;i++){
+      const a = (i/16)*Math.PI*2;
+      const r = ROOM_R - 1.8;
+      const c = new THREE.Mesh(colGeo, colMat);
+      c.position.set(Math.sin(a)*r, ROOM_H/2, Math.cos(a)*r);
+      cols.add(c);
+
+      const cap = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.05, 12, 48),
+        new THREE.MeshStandardMaterial({ color: 0x2a55ff, emissive: new THREE.Color(0x2a55ff), emissiveIntensity: 0.7, roughness: 0.3, metalness: 0.2 })
+      );
+      cap.rotation.x = Math.PI/2;
+      cap.position.set(c.position.x, ROOM_H-0.20, c.position.z);
+      cols.add(cap);
+    }
 
     // Pit / divot (Phase 4)
     // Outer lip ring
@@ -798,6 +818,8 @@ function start() {
   const btnPads    = document.getElementById('btnPads');
   const btnHide    = document.getElementById('btnHide');
   const btnShow    = document.getElementById('btnShow');
+  const btnShowOverlay = document.getElementById('btnShowOverlay');
+  const showOverlay = document.getElementById('showOverlay');
   const stationSel = document.getElementById('station');
 
   btnReset.onclick  = () => resetSpawn();
@@ -831,6 +853,7 @@ function start() {
 
   if (btnHide) btnHide.onclick = () => setUIVisible(false);
   if (btnShow) btnShow.onclick = () => setUIVisible(true);
+  if (btnShowOverlay) btnShowOverlay.onclick = () => setUIVisible(true);
 
   // Seat lock toggle (when seated, you can lock movement for comfort)
   const rowSeat = document.createElement('div'); rowSeat.className='row';
@@ -918,30 +941,42 @@ function start() {
     visible: true,
     hudEl: document.getElementById('hud'),
     wristEl: document.getElementById('wrist'),
-    joyEl: document.getElementById('joystick'),
+    joyEl: null,
     hintEl: document.getElementById('hint')
   };
   function setUIVisible(on) {
     ui.visible = on;
     if (ui.hudEl) ui.hudEl.style.display = on ? '' : 'none';
     if (ui.wristEl) ui.wristEl.style.display = on ? '' : 'none';
-    if (ui.joyEl) ui.joyEl.style.display = on ? '' : 'none';
     if (ui.hintEl) ui.hintEl.style.display = on ? '' : 'none';
-    log(`[ui] ${on ? 'shown' : 'hidden'}`);
+    // IMPORTANT: joysticks stay visible for control at all times
+    if (showOverlay) showOverlay.style.display = on ? 'none' : '';
+    log(`[ui] ${on ? 'shown' : 'hidden (controls remain)'}`);
   }
 
 // Android joystick locomotion (FINAL mapping)
   const joy = document.getElementById('joystick');
   const knob = document.getElementById('joyKnob');
+  const joyR = document.getElementById('joystickR');
+  const knobR = document.getElementById('joyKnobR');
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-  if (isTouch) joy.style.display = 'block';
+  if (isTouch) { joy.style.display = 'block'; if (joyR) joyR.style.display = 'block'; }
 
   let joyActive = false;
   let joyCenter = { x: 0, y: 0 };
   let joyVec = { x: 0, y: 0 };
 
+  // Right joystick (look)
+  let joyActiveR = false;
+  let joyCenterR = { x: 0, y: 0 };
+  let joyVecR = { x: 0, y: 0 };
+
   function setKnob(x, y) {
     knob.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+  }
+  function setKnobR(x, y) {
+    if (!knobR) return;
+    knobR.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
   }
   function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
 
@@ -972,6 +1007,36 @@ function start() {
   });
 
 
+  if (joyR) {
+    joyR.addEventListener('pointerdown', (e) => {
+      joyActiveR = true;
+      const r = joyR.getBoundingClientRect();
+      joyCenterR.x = r.left + r.width/2;
+      joyCenterR.y = r.top + r.height/2;
+      joyR.setPointerCapture(e.pointerId);
+    });
+
+    joyR.addEventListener('pointermove', (e) => {
+      if (!joyActiveR) return;
+      const dx = e.clientX - joyCenterR.x;
+      const dy = e.clientY - joyCenterR.y;
+      const max = 45;
+      const cx = clamp(dx, -max, max);
+      const cy = clamp(dy, -max, max);
+      setKnobR(cx, cy);
+      joyVecR.x = cx / max;
+      joyVecR.y = cy / max;
+    });
+
+    joyR.addEventListener('pointerup', () => {
+      joyActiveR = false;
+      joyVecR.x = 0; joyVecR.y = 0;
+      setKnobR(0,0);
+    });
+  }
+
+
+
   // ============================
   // Phase 5.2: Finger Look (Yaw)
   // Drag on screen to look left/right.
@@ -983,8 +1048,15 @@ function start() {
   const LOOK_SENS = 0.006; // radians per pixel (tuned for mobile)
 
   function inJoystick(ev) {
-    const r = joy.getBoundingClientRect();
-    return (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom);
+    const rL = joy.getBoundingClientRect();
+    const hitL = (ev.clientX >= rL.left && ev.clientX <= rL.right && ev.clientY >= rL.top && ev.clientY <= rL.bottom);
+    if (hitL) return true;
+    if (joyR) {
+      const rR = joyR.getBoundingClientRect();
+      const hitR = (ev.clientX >= rR.left && ev.clientX <= rR.right && ev.clientY >= rR.top && ev.clientY <= rR.bottom);
+      if (hitR) return true;
+    }
+    return false;
   }
 
   function beginLook(ev) {
@@ -1191,6 +1263,15 @@ function start() {
     updatePinch(0, dt);
     updatePinch(1, dt);
 
+
+    // Update 8: Android right-stick look (yaw)
+    if (!renderer.xr.isPresenting) {
+      const dead = 0.10;
+      if (Math.abs(joyVecR.x) > dead) {
+        const yawSpeed = 1.7; // rad/sec
+        rig.rotation.y -= (joyVecR.x * yawSpeed) * dt;
+      }
+    }
 
     // FINAL correct locomotion mapping
     // joystick up = forward; down = back; left/right correct
