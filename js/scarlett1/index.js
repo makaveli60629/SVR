@@ -1,3 +1,11 @@
+
+// ---- DT GLOBAL SAFETY (GitHub Pages / Mobile) ----
+// Some legacy modules referenced window.__scarlettDT(). Ensure it always exists.
+if (typeof window !== 'undefined') {
+  if (typeof window.__scarlettDT !== 'function') {
+    window.__scarlettDT = () => (1/60);
+  }
+}
 // UPDATE_9_14_DT_CALL_BYPASS
 // UPDATE_9_13_GLOBAL_DT_GETTER
 // UPDATE_9_12_DT_SINGLE_SOURCE
@@ -153,7 +161,9 @@ function start() {
   }
 
   // Room constants
-  const ROOM_R = 24; // Update 8: lobby radius doubled
+  const ROOM_R = 24; const PIT_LIP_R = 5.2;
+const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
+// Update 8: lobby radius doubled
   const ROOM_H = 6;
 
   // Room group
@@ -341,7 +351,7 @@ function start() {
     // Pit / divot (Phase 4)
     // Outer lip ring
     const pitLip = new THREE.Mesh(
-      new THREE.TorusGeometry(5.2, 0.18, 18, 120),
+      new THREE.TorusGeometry(PIT_LIP_R, 0.18, 18, 120),
       new THREE.MeshStandardMaterial({
         color: 0x101830, roughness: 0.7, metalness: 0.25,
         emissive: new THREE.Color(0x0b1230), emissiveIntensity: 0.25
@@ -429,7 +439,7 @@ function start() {
   // Build poker + bots + pads + jumbotrons
   function buildPoker(feltTex) {
     // DT helper (stable constant; avoids TDZ / globals on mobile browsers)
-    const _dt = 1/60;
+    const _dt = (typeof window !== 'undefined' && typeof window.__scarlettDT === 'function') ? window.__scarlettDT() : (1/60);
 
     // Poker group at pit depth
     const poker = new THREE.Group();
