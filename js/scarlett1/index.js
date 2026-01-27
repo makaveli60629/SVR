@@ -16,6 +16,7 @@ import { XRHandModelFactory } from 'https://unpkg.com/three@0.160.0/examples/jsm
 export const Scarlett1 = { start };
 
 function start() {
+  try {
   const hud = document.getElementById('hud');
   const hint = document.getElementById('hint');
 
@@ -25,6 +26,9 @@ function start() {
     console.log(line);
     hud.textContent = (hud.textContent + "\n" + line).slice(-2200);
   };
+
+  // Update 9: immediate boot ping
+  log('[boot] start');
 
   // Renderer
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -200,6 +204,73 @@ function start() {
       cap.position.set(c.position.x, ROOM_H-0.20, c.position.z);
       cols.add(cap);
     }
+
+
+    // Update 9: Outer lounge props + extra ambient bots for density
+    const lounge = new THREE.Group();
+    room.add(lounge);
+
+    const loungeMat = new THREE.MeshStandardMaterial({ color: 0x0b1220, roughness: 0.9, metalness: 0.1 });
+    const railMat = new THREE.MeshStandardMaterial({ color: 0x101830, roughness: 0.55, metalness: 0.35, emissive: new THREE.Color(0x0b1230), emissiveIntensity: 0.25 });
+
+    // Rail ring around inner walkway
+    const rail = new THREE.Mesh(new THREE.TorusGeometry(ROOM_R-3.8, 0.08, 14, 220), railMat);
+    rail.rotation.x = Math.PI/2;
+    rail.position.y = 0.95;
+    lounge.add(rail);
+
+    // Lounge couches (simple capsules) + tables
+    const couchGeo = new THREE.CapsuleGeometry(0.55, 1.2, 6, 12);
+    const tableGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.25, 20);
+    const tableMat = new THREE.MeshStandardMaterial({ color: 0x0e1428, roughness: 0.8, metalness: 0.15 });
+
+    for (let i=0;i<12;i++){
+      const a = (i/12)*Math.PI*2;
+      const r = ROOM_R - 5.6;
+      const x = Math.sin(a)*r;
+      const z = Math.cos(a)*r;
+
+      const couch = new THREE.Mesh(couchGeo, loungeMat);
+      couch.position.set(x, 0.55, z);
+      couch.rotation.y = a + Math.PI/2;
+      lounge.add(couch);
+
+      const t = new THREE.Mesh(tableGeo, tableMat);
+      t.position.set(x + Math.sin(a+Math.PI/2)*1.25, 0.22, z + Math.cos(a+Math.PI/2)*1.25);
+      lounge.add(t);
+
+      // tiny lamp glow
+      const lamp = new THREE.PointLight(0x88aaff, 0.7, 6);
+      lamp.position.set(t.position.x, 1.15, t.position.z);
+      lounge.add(lamp);
+    }
+
+    // Ambient perimeter bots (slow walkers)
+    const ambientBots = new THREE.Group();
+    room.add(ambientBots);
+
+    const ambMatA = new THREE.MeshStandardMaterial({ color: 0x2a68ff, roughness: 0.6, metalness: 0.2, emissive: new THREE.Color(0x0b1a44), emissiveIntensity: 0.55 });
+    const ambMatB = new THREE.MeshStandardMaterial({ color: 0xff2a7a, roughness: 0.6, metalness: 0.2, emissive: new THREE.Color(0x440b22), emissiveIntensity: 0.55 });
+
+    const amb = [];
+    for (let i=0;i<18;i++){
+      const g = new THREE.Group();
+      const mat = (i%2===0)?ambMatA:ambMatB;
+      const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.55, 6, 12), mat);
+      body.position.y = 0.9;
+      g.add(body);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), mat);
+      head.position.y = 1.45;
+      g.add(head);
+
+      const a = Math.random()*Math.PI*2;
+      const r = ROOM_R - 2.4;
+      g.position.set(Math.sin(a)*r, 0.0, Math.cos(a)*r);
+      g.userData = { a, r, dir: (Math.random()<0.5?-1:1), speed: 0.12 + Math.random()*0.12 };
+      ambientBots.add(g);
+      amb.append(g);
+    }
+
 
     // Pit / divot (Phase 4)
     // Outer lip ring
@@ -1234,6 +1305,7 @@ function start() {
   log('Diagnostics mounted');
   log(`Android joystick ${isTouch ? 'visible' : 'hidden (desktop)'}`);
   log('World visible');
+  log('[boot] ready');
   log('Phase 4 loading…');
 
   // Main loop
@@ -1332,6 +1404,19 @@ function start() {
       }
     }
 
+    // Update 9: animate ambient perimeter bots
+    if (typeof amb !== 'undefined') {
+      for (const b of amb) {
+        b.userData.a += dt * b.userData.speed * b.userData.dir;
+        const x = Math.sin(b.userData.a) * b.userData.r;
+        const z = Math.cos(b.userData.a) * b.userData.r;
+        b.position.x = x;
+        b.position.z = z;
+        b.lookAt(0, 1.2, 0);
+      }
+    }
+
+
     // Update 7: Hand pinch/grab
     updatePinch(0, dt);
     updatePinch(1, dt);
@@ -1373,4 +1458,10 @@ function start() {
 
     renderer.render(scene, camera);
   });
+
+  } catch (e) {
+    console.error(e);
+    const hud = document.getElementById('hud');
+    if (hud) hud.textContent = 'BOOT ERROR:\n' + (e?.stack || e?.message || String(e));
+  }
 }
