@@ -161,9 +161,7 @@ function start() {
   }
 
   // Room constants
-  const ROOM_R = 24; const PIT_LIP_R = 5.2;
-const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
-// Update 8: lobby radius doubled
+  const ROOM_R = 24; // Update 8: lobby radius doubled
   const ROOM_H = 6;
 
   // Room group
@@ -290,7 +288,7 @@ const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
     const railMat = new THREE.MeshStandardMaterial({ color: 0x101830, roughness: 0.55, metalness: 0.35, emissive: new THREE.Color(0x0b1230), emissiveIntensity: 0.25 });
 
     // Rail ring around inner walkway
-    const rail = new THREE.Mesh(new THREE.TorusGeometry(RAIL_R, 0.08, 14, 220), railMat);
+    const rail = new THREE.Mesh(new THREE.TorusGeometry(ROOM_R-3.8, 0.08, 14, 220), railMat);
     rail.rotation.x = Math.PI/2;
     rail.position.y = 0.95;
     lounge.add(rail);
@@ -351,7 +349,7 @@ const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
     // Pit / divot (Phase 4)
     // Outer lip ring
     const pitLip = new THREE.Mesh(
-      new THREE.TorusGeometry(PIT_LIP_R, 0.18, 18, 120),
+      new THREE.TorusGeometry(5.2, 0.18, 18, 120),
       new THREE.MeshStandardMaterial({
         color: 0x101830, roughness: 0.7, metalness: 0.25,
         emissive: new THREE.Color(0x0b1230), emissiveIntensity: 0.25
@@ -431,8 +429,6 @@ const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
     stage: 0,
     holeCards: [],
     community: [],
-        deck: null,
-        _deckIndex: 0,
     chips: [],
     seated: false,
     seatedSeatIndex: -1
@@ -499,7 +495,8 @@ const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
 
       // Seat base marker (tap to sit)
       const seat = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.12, 24), chairMat);
-      seat.position.set(x, 0.06, z);
+      // Lift the entire seat stack a bit so bots don't look "half-buried" by the pit floor.
+      seat.position.set(x, 0.26, z);
       seat.userData = { type:'seat', seatIndex:i };
       poker.add(seat);
       seats.push(seat);
@@ -507,7 +504,7 @@ const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
 
       // Backrest
       const back = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.15), chairMat);
-      back.position.set(x, 0.55, z);
+      back.position.set(x, 0.75, z);
       back.rotation.y = a + Math.PI;
       back.translateZ(-0.35);
       poker.add(back);
@@ -539,7 +536,8 @@ const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
       const armR = new THREE.Mesh(armGeo, mat); armR.position.set( 0.35, 1.15, 0.05); armR.rotation.z = -0.15;
       bot.add(armL); bot.add(armR);
 
-      bot.position.set(x, 0, z);
+      // Raise bot root slightly so torso clears the pit floor visually.
+      bot.position.set(x, 0.20, z);
       bot.rotation.y = a + Math.PI;
       bot.userData = { seatIndex:i, idle: Math.random()*Math.PI*2, look: 0 };
       botsGroup.add(bot);
@@ -550,96 +548,18 @@ const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
     const cardsGroup = new THREE.Group();
     poker.add(cardsGroup);
 
-
-    // --- CARD TEXTURES (52-card deck, readable on mobile/Quest) ---
-    const __cardTexCache = new Map();
-    function __makeCardCanvas(label, suit, color, isBack=false){
-      const c = document.createElement('canvas');
-      c.width = 256; c.height = 356;
-      const g = c.getContext('2d');
-      g.fillStyle = isBack ? '#0b1a3a' : '#f7f7fb';
-      g.fillRect(0,0,c.width,c.height);
-      g.lineWidth = 10;
-      g.strokeStyle = isBack ? '#3aa0ff' : '#111827';
-      g.strokeRect(12,12,c.width-24,c.height-24);
-      if (isBack){
-        g.globalAlpha = 0.9;
-        g.strokeStyle = '#93c5fd';
-        g.lineWidth = 6;
-        for (let i=0;i<10;i++){
-          g.beginPath();
-          g.arc(c.width/2, c.height/2, 18 + i*18, 0, Math.PI*2);
-          g.stroke();
-        }
-        g.globalAlpha = 1;
-        g.font = 'bold 44px system-ui, -apple-system, Segoe UI, Roboto';
-        g.fillStyle = '#e6f0ff';
-        g.textAlign = 'center';
-        g.fillText('SCARLETT', c.width/2, c.height/2 + 18);
-        return c;
-      }
-      g.font = 'bold 64px system-ui, -apple-system, Segoe UI, Roboto';
-      g.fillStyle = color;
-      g.textAlign = 'left';
-      g.fillText(label, 28, 80);
-      g.fillText(suit, 30, 150);
-      g.textAlign = 'center';
-      g.font = 'bold 150px system-ui, -apple-system, Segoe UI, Roboto';
-      g.fillText(suit, c.width/2, c.height/2 + 60);
-      g.textAlign = 'right';
-      g.font = 'bold 64px system-ui, -apple-system, Segoe UI, Roboto';
-      g.fillText(label, c.width-28, c.height-70);
-      g.fillText(suit, c.width-30, c.height-10);
-      return c;
-    }
-    function __texFromCanvas(c){
-      const t = new THREE.CanvasTexture(c);
-      t.anisotropy = 4;
-      t.needsUpdate = true;
-      return t;
-    }
-    const __cardBackTex = __texFromCanvas(__makeCardCanvas('', '', '#fff', true));
-    function __cardTex(card){
-      if (__cardTexCache.has(card)) return __cardTexCache.get(card);
-      const rank = card.slice(0, -1);
-      const s = card.slice(-1);
-      const suitMap = { 'S':'♠','H':'♥','D':'♦','C':'♣' };
-      const suit = suitMap[s] || '♠';
-      const red = (s==='H' || s==='D');
-      const canvas = __makeCardCanvas(rank, suit, red ? '#b91c1c' : '#111827', false);
-      const tex = __texFromCanvas(canvas);
-      __cardTexCache.set(card, tex);
-      return tex;
-    }
-    function __setCardBack(mesh){
-      if (!mesh || !mesh.material) return;
-      mesh.material.map = __cardBackTex;
-      mesh.material.needsUpdate = true;
-      mesh.userData.card = null;
-    }
-    function __setCardFace(mesh, card){
-      if (!mesh || !mesh.material) return;
-      mesh.material.map = __cardTex(card);
-      mesh.material.needsUpdate = true;
-      mesh.userData.card = card;
-    }
-    function __freshDeck(){
-      const ranks = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
-      const suits = ['S','H','D','C'];
-      const deck = [];
-      for (const r of ranks) for (const s of suits) deck.push(r+s);
-      for (let i=deck.length-1;i>0;i--){
-        const j = (Math.random()*(i+1))|0;
-        const tmp = deck[i]; deck[i]=deck[j]; deck[j]=tmp;
-      }
-      return deck;
-    }
-    const cardBaseMat = { color: 0xffffff, roughness: 0.45, metalness: 0.05, emissive: new THREE.Color(0x05070f), emissiveIntensity: 0.10 };
-    function __newCardMat(){ return new THREE.MeshStandardMaterial({ ...cardBaseMat, map: __cardBackTex }); }
+    const cardMat = new THREE.MeshStandardMaterial({
+      color: 0xf2f2f2,
+      roughness: 0.8,
+      metalness: 0.0,
+      emissive: new THREE.Color(0x0a0a0a),
+      emissiveIntensity: 0.15,
+      side: THREE.DoubleSide
+    });
 
     pokerState.community = [];
     for (let i=0;i<5;i++){
-      const c = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.78), __newCardMat());
+      const c = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.78), cardMat);
       c.visible = false;
       c.userData = { type:'card', idx:i, hoverPhase: Math.random()*Math.PI*2 };
       c.position.set((i-2)*0.62, 0.72, 0);
@@ -651,7 +571,7 @@ const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
 
     // Hole cards spawn on demand
     function spawnHoleCards() {
-      const holeMat = __newCardMat();
+      const holeMat = cardMat.clone();
       holeMat.side = THREE.DoubleSide;
 
       for (let seatIndex=0; seatIndex<8; seatIndex++){
@@ -679,52 +599,40 @@ const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
     updatePinch(1, _dt);
 
     function clearHand() {
-        poker.hole = []; poker.community = [];
-        poker.deck = __freshDeck();
-        poker._deckIndex = 0;
+      for (const hc of pokerState.holeCards) cardsGroup.remove(hc.mesh);
+      pokerState.holeCards.length = 0;
+      for (const c of pokerState.community) { c.visible=false; }
+      pokerState.stage = 0;
+      log('[poker] reset');
+    }
 
-        for (const m of holeCards) { m.visible = false; __setCardBack(m); }
-        for (const m of commCards) { m.visible = false; __setCardBack(m); }
+    function dealHole() {
+      if (pokerState.holeCards.length===0) spawnHoleCards();
+      for (const hc of pokerState.holeCards) hc.mesh.visible = true;
+      pokerState.stage = 1;
+      log('[poker] hole dealt ✅');
+    }
 
-        diag.log('[poker] reset');
-      }
-
-      function __draw() {
-        if (!poker.deck || poker._deckIndex >= poker.deck.length) {
-          poker.deck = __freshDeck(); poker._deckIndex = 0;
-        }
-        return poker.deck[poker._deckIndex++];
-      }
-
-      function dealHole() {
-        // Deal 2 cards to "player view" (two visible cards)
-        const c1 = __draw();
-        const c2 = __draw();
-        poker.hole = [c1, c2];
-
-        for (let i = 0; i < holeCards.length; i++) {
-          const m = holeCards[i];
-          m.visible = true;
-          __setCardFace(m, i === 0 ? c1 : c2);
-        }
-      }
-
-      function flop() {
-        while (poker.community.length < 3) poker.community.push(__draw());
-        for (let i = 0; i < 3; i++) { commCards[i].visible = true; __setCardFace(commCards[i], poker.community[i]); }
-      }
-
-      function turn() {
-        if (poker.community.length < 4) poker.community.push(__draw());
-        commCards[3].visible = true;
-        __setCardFace(commCards[3], poker.community[3]);
-      }
-
-      function river() {
-        if (poker.community.length < 5) poker.community.push(__draw());
-        commCards[4].visible = true;
-        __setCardFace(commCards[4], poker.community[4]);
-      }
+    function flop() {
+      if (pokerState.stage < 1) dealHole();
+      pokerState.community[0].visible = true;
+      pokerState.community[1].visible = true;
+      pokerState.community[2].visible = true;
+      pokerState.stage = 2;
+      log('[poker] flop ✅');
+    }
+    function turn() {
+      if (pokerState.stage < 2) flop();
+      pokerState.community[3].visible = true;
+      pokerState.stage = 3;
+      log('[poker] turn ✅');
+    }
+    function river() {
+      if (pokerState.stage < 3) turn();
+      pokerState.community[4].visible = true;
+      pokerState.stage = 4;
+      log('[poker] river ✅');
+    }
     function dealHand() {
       clearHand();
       dealHole();
@@ -1534,9 +1442,9 @@ const RAIL_R = PIT_LIP_R + 1.6; // keep rail close to pit
       }
     }
 
-    // FINAL correct locomotion mapping
-    // joystick up = forward; down = back; left/right correct
-    let moveX = -joyVec.x;
+    // Android: screen-left/right should strafe left/right (no inversion)
+    // joystick up = forward; down = back
+    let moveX = joyVec.x;
     let moveZ = -joyVec.y;
 
     // If seated and seatLock enabled, require deliberate stick input to move
