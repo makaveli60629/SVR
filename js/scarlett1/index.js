@@ -25,10 +25,12 @@ function start() {
     const line = `[${t}] ${args.join(' ')}`;
     console.log(line);
     hud.textContent = (hud.textContent + "\n" + line).slice(-2200);
+    diagWrite(line);
   };
 
   // Update 9: immediate boot ping
   log('[boot] start');
+  diagSetStatus('booting');
 
   // Renderer
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -1030,7 +1032,7 @@ function start() {
   const boot = { cleared: false };
   function clearBootHUD() {
     const hud = document.getElementById('hud');
-    if (hud) hud.style.display = 'none';
+    if (hud) hud.style.display = 'none'; // keep diag visible
     boot.cleared = true;
     log('[boot] hud cleared');
   }
@@ -1320,6 +1322,7 @@ function start() {
   log('Diagnostics mounted');
   log(`Android joystick ${isTouch ? 'visible' : 'hidden (desktop)'}`);
   log('World visible');
+  diagSetStatus('world');
   log('[boot] ready');
   log('Phase 4 loading…');
 
