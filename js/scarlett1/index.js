@@ -17,22 +17,82 @@ export const Scarlett1 = { start };
 
 function start() {
   try {
-  const hud = document.getElementById('hud');
-  const hint = document.getElementById('hint');
+    const hud = document.getElementById('hud');
+    const hint = document.getElementById('hint');
 
-  const log = (...args) => {
-    const t = ((performance.now()/1000).toFixed(3)).padStart(7,' ');
-    const line = `[${t}] ${args.join(' ')}`;
-    console.log(line);
-    hud.textContent = (hud.textContent + "\n" + line).slice(-2200);
-    diagWrite(line);
-  };
+    // ===== Update 9.3: Entry Recovery + Diagnostics (no guessing) =====
+    const diag = {
+      statusEl: document.getElementById('diagStatus'),
+      logEl: document.getElementById('diagLog'),
+      btnCopy: document.getElementById('btnCopyReport'),
+      btnToggle: document.getElementById('btnToggleDiag'),
+      lines: [],
+      hidden: false
+    };
 
-  // Update 9: immediate boot ping
-  log('[boot] start');
-  diagSetStatus('booting');
+    function diagSetStatus(s) {
+      if (diag.statusEl) diag.statusEl.textContent = s;
+    }
 
-  // Renderer
+    function diagWrite(line) {
+      try {
+        diag.lines.push(line);
+        if (diag.lines.length > 260) diag.lines.shift();
+        if (diag.logEl) diag.logEl.textContent = diag.lines.join('\n');
+      } catch {}
+    }
+
+    // Wire diag buttons (safe even if clipboard blocked)
+    if (diag.btnToggle) diag.btnToggle.onclick = () => {
+      diag.hidden = !diag.hidden;
+      if (diag.logEl) diag.logEl.style.display = diag.hidden ? 'none' : 'block';
+      diag.btnToggle.textContent = diag.hidden ? 'Show' : 'Hide';
+    };
+    if (diag.btnCopy) diag.btnCopy.onclick = async () => {
+      const report = diag.lines.join('\n');
+      try { await navigator.clipboard.writeText(report); } catch {}
+      diagWrite('[diag] copied report');
+    };
+
+    // Catch uncaught errors early (before anything else)
+    window.addEventListener('error', (ev) => {
+      const msg = ev?.message || 'unknown error';
+      diagWrite('[ERROR] ' + msg);
+      if (ev?.error?.stack) diagWrite(ev.error.stack);
+      diagSetStatus('ERROR');
+      if (hud) hud.textContent = 'BOOT ERROR: ' + msg;
+    });
+    window.addEventListener('unhandledrejection', (ev) => {
+      const msg = ev?.reason?.message || String(ev?.reason);
+      diagWrite('[REJECT] ' + msg);
+      if (ev?.reason?.stack) diagWrite(ev.reason.stack);
+      diagSetStatus('REJECT');
+      if (hud) hud.textContent = 'BOOT REJECT: ' + msg;
+    });
+
+    // Log helper (writes to HUD + DIAG)
+    const log = (...args) => {
+      const t = ((performance.now()/1000).toFixed(3)).padStart(7,' ');
+      const line = `[${t}] ${args.join(' ')}`;
+      console.log(line);
+      if (hud) hud.textContent = (hud.textContent + "\n" + line).slice(-2200);
+      diagWrite(line);
+    };
+
+    // Entry proof
+    if (hud) hud.textContent = 'booting…';
+    diagWrite('(starting…)');
+    log('[boot] entry');
+    diagSetStatus('booting');
+
+    // Deadman timer: if still booting after 4s, show hint
+    setTimeout(() => {
+      if (diag.statusEl && (diag.statusEl.textContent || '').includes('boot')) {
+        diagWrite('[hint] Still booting after 4s. Likely module/import error or path mismatch.');
+      }
+    }, 4000);
+
+// Renderer
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
