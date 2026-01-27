@@ -702,14 +702,20 @@ function start() {
   }
 
   window.addEventListener('pointerdown', (ev) => {
-    // first attempt grab
+    // 1) try grab first
     if (tryGrab(ev)) { pointerDown = true; return; }
+    // 2) otherwise begin look-drag
+    beginLook(ev);
     pointerDown = true;
   });
-  window.addEventListener('pointermove', (ev) => { if (grabbed) updateGrab(ev); });
+  window.addEventListener('pointermove', (ev) => {
+    if (grabbed) updateGrab(ev);
+    else updateLook(ev);
+  });
   window.addEventListener('pointerup', (ev) => {
     if (!pointerDown) return;
     pointerDown = false;
+    endLook();
     if (grabbed) { dropGrab(); return; }
     if (!actions.padsEnabled) return;
     doRayInteract(ev);
@@ -760,6 +766,8 @@ function start() {
   const btnMusic   = document.getElementById('btnMusic');
   const btnBots    = document.getElementById('btnBots');
   const btnPads    = document.getElementById('btnPads');
+  const btnHide    = document.getElementById('btnHide');
+  const btnShow    = document.getElementById('btnShow');
   const stationSel = document.getElementById('station');
 
   btnReset.onclick  = () => resetSpawn();
@@ -790,6 +798,9 @@ function start() {
     btnPads.textContent = `Pads: ${actions.padsEnabled?'ON':'OFF'}`;
     log(`[pads] ${actions.padsEnabled?'ON':'OFF'}`);
   };
+
+  if (btnHide) btnHide.onclick = () => setUIVisible(false);
+  if (btnShow) btnShow.onclick = () => setUIVisible(true);
 
   // Seat lock toggle (when seated, you can lock movement for comfort)
   const rowSeat = document.createElement('div'); rowSeat.className='row';
@@ -871,7 +882,25 @@ function start() {
     log('[spawn] reset');
   }
 
-  // Android joystick locomotion (FINAL mapping)
+  
+  // UI hide/show (Phase 5.2)
+  const ui = {
+    visible: true,
+    hudEl: document.getElementById('hud'),
+    wristEl: document.getElementById('wrist'),
+    joyEl: document.getElementById('joystick'),
+    hintEl: document.getElementById('hint')
+  };
+  function setUIVisible(on) {
+    ui.visible = on;
+    if (ui.hudEl) ui.hudEl.style.display = on ? '' : 'none';
+    if (ui.wristEl) ui.wristEl.style.display = on ? '' : 'none';
+    if (ui.joyEl) ui.joyEl.style.display = on ? '' : 'none';
+    if (ui.hintEl) ui.hintEl.style.display = on ? '' : 'none';
+    log(`[ui] ${on ? 'shown' : 'hidden'}`);
+  }
+
+// Android joystick locomotion (FINAL mapping)
   const joy = document.getElementById('joystick');
   const knob = document.getElementById('joyKnob');
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -912,9 +941,50 @@ function start() {
     setKnob(0,0);
   });
 
+
+  // ============================
+  // Phase 5.2: Finger Look (Yaw)
+  // Drag on screen to look left/right.
+  // - Doesn't interfere with joystick area
+  // - Doesn't interfere with grabs (cards/chips)
+  // ============================
+  let lookActive = false;
+  let lookLastX = 0;
+  const LOOK_SENS = 0.006; // radians per pixel (tuned for mobile)
+
+  function inJoystick(ev) {
+    const r = joy.getBoundingClientRect();
+    return (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom);
+  }
+
+  function beginLook(ev) {
+    // don't begin look if touching joystick or currently grabbing
+    if (grabbed) return false;
+    if (inJoystick(ev)) return false;
+    lookActive = true;
+    lookLastX = ev.clientX;
+    return true;
+  }
+
+  function updateLook(ev) {
+    if (!lookActive) return;
+    const dx = ev.clientX - lookLastX;
+    lookLastX = ev.clientX;
+    rig.rotation.y -= dx * LOOK_SENS;
+  }
+
+  function endLook() {
+    lookActive = false;
+  }
+
+
   // Keyboard fallback
   const keys = new Set();
-  window.addEventListener('keydown', (e)=>keys.add(e.key.toLowerCase()));
+  window.addEventListener('keydown', (e)=>{
+    const key = e.key.toLowerCase();
+    keys.add(key);
+    if (key === 'h') setUIVisible(!ui.visible);
+  });
   window.addEventListener('keyup', (e)=>keys.delete(e.key.toLowerCase()));
 
   // VR button
