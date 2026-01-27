@@ -15,7 +15,7 @@
       white-space: pre-line;
     }
     #wrist {
-      position: fixed; right: 12px; bottom: 12px; z-index: 10;
+      position: fixed; right: 12px; bottom: 175px; z-index: 10;
       width: 235px;
       background: rgba(8,10,18,0.72); border: 1px solid rgba(120,160,255,0.35);
       border-radius: 16px; padding: 10px;
@@ -36,6 +36,30 @@
       outline: none;
     }
     button:active { transform: scale(0.99); }
+    #joystick {
+      position: fixed; left: 16px; bottom: 16px; z-index: 10;
+      width: 140px; height: 140px; border-radius: 999px;
+      background: rgba(30,50,110,0.18);
+      border: 2px solid rgba(120,160,255,0.30);
+      touch-action: none;
+      display:none;
+    }
+    #joystickR {
+      position: fixed; right: 16px; bottom: 16px; z-index: 10;
+      width: 140px; height: 140px; border-radius: 999px;
+      background: rgba(30,50,110,0.18);
+      border: 2px solid rgba(120,160,255,0.30);
+      touch-action: none;
+      display:none;
+    }
+    #joyKnobR {
+      position:absolute; left: 50%; top: 50%;
+      width: 64px; height: 64px; border-radius: 999px;
+      transform: translate(-50%,-50%);
+      background: rgba(90,130,255,0.25);
+      border: 2px solid rgba(140,180,255,0.55);
+    }
+
     #joystick {
       position: fixed; left: 16px; bottom: 16px; z-index: 10;
       width: 140px; height: 140px; border-radius: 999px;
@@ -66,7 +90,12 @@
 </head>
 <body>
   <div id="hud">booting…</div>
-  <div id="hint">Tip: Drag on screen to look left/right. In VR: pinch (thumb+index) to grab cards/chips. Walk to a seat and tap it to snap-sit. Press H (or Hide UI) to toggle HUD.</div>
+
+  <div id="showOverlay" style="position:fixed; right:12px; top:12px; z-index:20; display:none;">
+    <button id="btnShowOverlay" style="padding:10px 12px; border-radius:12px; background:rgba(30,50,110,0.55); border:1px solid rgba(120,160,255,0.45); color:#eaf2ff;">Show UI</button>
+  </div>
+
+  <div id="hint">Tip: Use left stick to move, right stick to look. (Drag also works.) In VR: pinch (thumb+index) to grab cards/chips. Walk to a seat and tap it to snap-sit. Press H (or Hide UI) to toggle HUD.</div>
 
   <div id="wrist">
     <h3>SCARLETT WRIST</h3>
@@ -96,6 +125,10 @@
 
   <div id="joystick">
     <div id="joyKnob"></div>
+  </div>
+
+  <div id="joystickR">
+    <div id="joyKnobR"></div>
   </div>
 
   <script type="module" src="./index.js"></script>
