@@ -3,58 +3,35 @@
 <head>
   <meta charset="utf-8" />
   <title>ScarlettVR Poker</title>
-
-  <!-- Mobile / XR safe -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
 
-  <!-- PWA -->
   <link rel="manifest" href="./manifest.json" />
-
-  <!-- Styles -->
   <link rel="stylesheet" href="./css/style.css" />
 
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #02030a;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+    html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#02030a; }
+    #app { position:fixed; inset:0; }
 
-    #app {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
+    #controls{
+      position:fixed;
+      bottom:14px;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      gap:14px;
+      z-index:9999;
+      pointer-events:auto;
     }
-
-    /* VR / Android control overlay */
-    #controls {
-      position: fixed;
-      bottom: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 14px;
-      z-index: 10;
-    }
-
-    .btn {
-      padding: 10px 14px;
-      border-radius: 14px;
-      background: rgba(20,30,60,0.8);
-      color: #cfe3ff;
-      border: 1px solid rgba(80,120,255,0.4);
-      font-size: 13px;
+    .btn{
+      padding:10px 14px;
+      border-radius:14px;
+      background:rgba(20,30,60,0.8);
+      color:#cfe3ff;
+      border:1px solid rgba(80,120,255,0.4);
+      font-size:13px;
       backdrop-filter: blur(8px);
-    }
-
-    .btn:active {
-      transform: scale(0.96);
     }
   </style>
 </head>
@@ -62,25 +39,17 @@
 <body>
   <div id="app"></div>
 
-  <!-- Controls (kept simple; your JS enhances these) -->
   <div id="controls">
     <button class="btn" id="enterVR">ENTER VR</button>
     <button class="btn" id="reload">EMERGENCY: RELOAD</button>
   </div>
 
-  <!-- FORCE CACHE BUST -->
-  <!-- This is CRITICAL so you actually see world.js changes -->
-  <script type="module" src="./index.js?v=9"></script>
+  <!-- CACHE BUST so you actually see updates -->
+  <script type="module" src="./index.js?v=10"></script>
 
   <script>
-    // Emergency reload button (soft reload, keeps logs)
-    document.getElementById("reload")?.addEventListener("click", () => {
-      location.reload(true);
-    });
-
-    // Let your engine hook this if it wants
+    document.getElementById("reload")?.addEventListener("click", () => location.reload());
     document.getElementById("enterVR")?.addEventListener("click", () => {
-      console.log("[ui] enter VR requested");
       document.dispatchEvent(new Event("scarlett-enter-vr"));
     });
   </script>
