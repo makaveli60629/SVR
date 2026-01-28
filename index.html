@@ -1,1 +1,77 @@
-<!DOCTYPE html><html><head><meta charset='utf-8'><title>ScarlettVR Poker</title><meta name='viewport' content='width=device-width,initial-scale=1'><link rel='manifest' href='./manifest.json'></head><body><div id='app'></div><script type='module' src='./index.js?v=401'></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>ScarlettVR Poker • Boot</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <style>
+    html,body{margin:0;height:100%;background:#02030a;overflow:hidden}
+    #boot{
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+      font:600 16px system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:#d8e6ff; background:linear-gradient(180deg,#02030a,#050a18);
+      z-index:999999;
+    }
+    #bootBox{
+      width:min(720px,calc(100vw - 24px));
+      border:1px solid rgba(120,160,255,.35);
+      border-radius:14px;
+      background:rgba(10,12,18,.9);
+      box-shadow:0 10px 40px rgba(0,0,0,.6);
+      padding:14px;
+    }
+    #bootTitle{font-weight:800; letter-spacing:.2px; margin-bottom:8px}
+    #bootLog{white-space:pre-wrap; font:12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    #bootBtns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+    button{
+      border:1px solid rgba(120,160,255,.35);
+      background:rgba(40,60,120,.25);
+      color:#d8e6ff; padding:10px 12px; border-radius:12px;
+      font:600 14px system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    }
+  </style>
+</head>
+<body>
+  <div id="boot">
+    <div id="bootBox">
+      <div id="bootTitle">SCARLETT BOOT • Always-On Reporter</div>
+      <div id="bootLog">Starting…</div>
+      <div id="bootBtns">
+        <button onclick="location.reload()">Reload</button>
+        <button onclick="location.href=location.href.split('?')[0]+'?v='+Date.now()">Cache Bust</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const logEl = document.getElementById('bootLog');
+    const log = (m)=> logEl.textContent += "\n" + m;
+
+    log("href=" + location.href);
+    log("ua=" + navigator.userAgent);
+
+    window.addEventListener('error', (e)=>{
+      log("[window error] " + (e.message || "unknown"));
+    });
+    window.addEventListener('unhandledrejection', (e)=>{
+      log("[promise rejection] " + (e.reason?.message || e.reason || "unknown"));
+    });
+
+    // IMPORTANT: dynamic import so we can catch failures and print them
+    (async () => {
+      try {
+        log("Importing ./index.js …");
+        await import("./index.js?v=" + Date.now());
+        log("✅ index.js imported");
+        // If your spine mounts, it can hide this overlay later.
+        // For now, we hide only after a short delay so you SEE success.
+        setTimeout(()=>{ document.getElementById('boot').style.display='none'; }, 800);
+      } catch (err) {
+        log("❌ IMPORT FAILED");
+        log(String(err && (err.stack || err.message) || err));
+        // Keep overlay visible forever so you can screenshot the error.
+      }
+    })();
+  </script>
+</body>
+</html>
