@@ -1,1 +1,3 @@
-import { Scarlett1 } from './js/scarlett1/index.js'; Scarlett1.start();
+import { Spine } from "./js/scarlett1/spine.js";
+console.log("🚀 index.js loaded");
+Spine.start();
