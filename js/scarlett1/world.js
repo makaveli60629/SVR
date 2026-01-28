@@ -1,219 +1,125 @@
-// /js/scarlett1/world.js — FULL WORLD (SMALL SINK + PEDESTAL FLOOR + CARPET)
-// Table + chairs sit on pedestal floor (y=0). Pit is shallow so it’s not “downstairs”.
+// /js/scarlett1/world.js
+// Minimal world builder consistent with current conversation:
+// - Shallow pit (not basement)
+// - Carpeted pit floor
+// - Pedestal with table + chairs
+// - Light rail rim line (visual)
 
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
-let WORLD_GROUP;
-
 export function buildWorld(scene) {
-  if (WORLD_GROUP) {
-    scene.add(WORLD_GROUP);
-    return WORLD_GROUP;
-  }
+  const PIT_RADIUS = 10.0;
 
-  WORLD_GROUP = new THREE.Group();
-  WORLD_GROUP.name = "SCARLETT_WORLD";
-
-  // ---------- PIT (SHALLOW SINK) ----------
-  const pitRadius = 10.0;
-
-  // ✅ Small sink depth (NOT a basement)
-  const pitDepth = 3.2;
-
-  const pitWall = new THREE.Mesh(
-    new THREE.CylinderGeometry(pitRadius, pitRadius, pitDepth, 128, 1, true),
-    new THREE.MeshStandardMaterial({ color: 0x151a26, roughness: 0.9 })
+  // Ground void (subtle)
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(120, 24, 18),
+    new THREE.MeshBasicMaterial({ color: 0x050712, side: THREE.BackSide })
   );
-  pitWall.position.y = -pitDepth / 2;
-  WORLD_GROUP.add(pitWall);
+  scene.add(sky);
 
-  const pitBottom = new THREE.Mesh(
-    new THREE.CircleGeometry(pitRadius - 0.7, 128),
-    new THREE.MeshStandardMaterial({ color: 0x04050a, roughness: 1.0 })
+  // Shallow pit floor (carpet)
+  const pitFloor = new THREE.Mesh(
+    new THREE.CircleGeometry(PIT_RADIUS - 0.2, 64),
+    new THREE.MeshStandardMaterial({ color: 0x6b4a7a, roughness: 0.95 })
   );
-  pitBottom.rotation.x = -Math.PI / 2;
-  pitBottom.position.y = -pitDepth + 0.05;
-  WORLD_GROUP.add(pitBottom);
+  pitFloor.rotation.x = -Math.PI / 2;
+  pitFloor.position.y = -0.45; // ✅ shallow
+  scene.add(pitFloor);
 
-  const rimRail = new THREE.Mesh(
-    new THREE.TorusGeometry(pitRadius - 0.12, 0.06, 10, 160),
-    new THREE.MeshStandardMaterial({
-      color: 0x2a7cff,
-      roughness: 0.4,
-      metalness: 0.25,
-      emissive: 0x0b2a66,
-      emissiveIntensity: 1.1,
-    })
+  // Pit wall ring (cylinder)
+  const wall = new THREE.Mesh(
+    new THREE.CylinderGeometry(PIT_RADIUS, PIT_RADIUS, 1.0, 64, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0x101420, roughness: 0.95, side: THREE.DoubleSide })
   );
-  rimRail.rotation.x = Math.PI / 2;
-  rimRail.position.y = 0.03;
-  WORLD_GROUP.add(rimRail);
+  wall.position.y = -0.05;
+  scene.add(wall);
 
-  // ---------- PEDESTAL = FLOOR ----------
-  // Big enough to cover the chair ring so chair legs sit ON it, not “in dirt”.
-  const pedestalRadius = 4.6;
-  const pedestalHeight = 1.1;
+  // Rim floor (walkway ring)
+  const rim = new THREE.Mesh(
+    new THREE.RingGeometry(PIT_RADIUS + 0.6, PIT_RADIUS + 6.8, 96),
+    new THREE.MeshStandardMaterial({ color: 0x0e111a, roughness: 0.95, metalness: 0.0, side: THREE.DoubleSide })
+  );
+  rim.rotation.x = -Math.PI / 2;
+  rim.position.y = 0.0;
+  scene.add(rim);
 
-  // pedestal top surface sits at y=0
+  // Neon rail line at rim edge (visual)
+  const rail = new THREE.Mesh(
+    new THREE.TorusGeometry(PIT_RADIUS + 0.55, 0.045, 10, 200),
+    new THREE.MeshStandardMaterial({ color: 0x2a7cff, emissive: 0x0b2a66, emissiveIntensity: 1.0, roughness: 0.4 })
+  );
+  rail.rotation.x = Math.PI / 2;
+  rail.position.y = 0.10;
+  scene.add(rail);
+
+  // Pedestal (table sits on this)
   const pedestal = new THREE.Mesh(
-    new THREE.CylinderGeometry(pedestalRadius, pedestalRadius, pedestalHeight, 96),
-    new THREE.MeshStandardMaterial({ color: 0x2a2f3a, roughness: 0.8, metalness: 0.1 })
+    new THREE.CylinderGeometry(2.2, 2.5, 0.8, 48),
+    new THREE.MeshStandardMaterial({ color: 0x242a35, roughness: 0.95 })
   );
-  pedestal.position.y = -pedestalHeight / 2;
-  WORLD_GROUP.add(pedestal);
+  pedestal.position.y = -0.10; // slightly sunk
+  scene.add(pedestal);
 
-  // Carpet cap on the top surface
-  const carpet = new THREE.Mesh(
-    new THREE.CircleGeometry(pedestalRadius - 0.05, 128),
-    new THREE.MeshStandardMaterial({
-      map: makeCarpetTexture(),
-      roughness: 1.0,
-      metalness: 0.0,
-      emissive: 0x05020a,
-      emissiveIntensity: 0.25,
-    })
-  );
-  carpet.rotation.x = -Math.PI / 2;
-  carpet.position.y = 0.01;
-  WORLD_GROUP.add(carpet);
-
-  // ---------- TABLE ----------
-  const tableRadius = 1.6;
-
+  // Table
   const tableTop = new THREE.Mesh(
-    new THREE.CylinderGeometry(tableRadius, tableRadius, 0.12, 96),
-    new THREE.MeshStandardMaterial({ color: 0x0f4a2f, roughness: 0.95 })
+    new THREE.CylinderGeometry(2.05, 2.05, 0.12, 48),
+    new THREE.MeshStandardMaterial({ color: 0x3a241f, roughness: 0.85 })
   );
-  tableTop.position.y = 0.92;
-  WORLD_GROUP.add(tableTop);
+  tableTop.position.y = 0.65;
+  scene.add(tableTop);
 
-  const tableEdge = new THREE.Mesh(
-    new THREE.CylinderGeometry(tableRadius + 0.12, tableRadius + 0.12, 0.14, 96),
-    new THREE.MeshStandardMaterial({ color: 0x2b1b10, roughness: 0.75 })
+  const tableStem = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.45, 0.65, 0.70, 32),
+    new THREE.MeshStandardMaterial({ color: 0x2a1c19, roughness: 0.9 })
   );
-  tableEdge.position.y = tableTop.position.y;
-  WORLD_GROUP.add(tableEdge);
+  tableStem.position.y = 0.28;
+  scene.add(tableStem);
 
-  const tableBase = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.42, 0.65, 0.85, 48),
-    new THREE.MeshStandardMaterial({ color: 0x2b1b10, roughness: 0.75 })
-  );
-  tableBase.position.y = 0.45;
-  WORLD_GROUP.add(tableBase);
+  // Chairs (simple)
+  const chairMat = new THREE.MeshStandardMaterial({ color: 0x3b4252, roughness: 0.95 });
+  const seatGeo = new THREE.BoxGeometry(0.55, 0.10, 0.55);
+  const backGeo = new THREE.BoxGeometry(0.55, 0.60, 0.10);
+  const legGeo = new THREE.BoxGeometry(0.08, 0.50, 0.08);
 
-  // ---------- CHAIRS ----------
-  const chairRingRadius = 3.15;
+  const chairRadius = 3.0;
+  const chairs = 8;
+  for (let i = 0; i < chairs; i++) {
+    const a = (i / chairs) * Math.PI * 2;
+    const g = new THREE.Group();
+    g.position.set(Math.cos(a) * chairRadius, 0, Math.sin(a) * chairRadius);
+    g.rotation.y = -a + Math.PI;
 
-  for (let i = 0; i < 8; i++) {
-    const a = (i / 8) * Math.PI * 2;
-    const chair = makeChair();
+    const seat = new THREE.Mesh(seatGeo, chairMat);
+    seat.position.y = 0.35;
+    g.add(seat);
 
-    chair.position.set(
-      Math.cos(a) * chairRingRadius,
-      0.0, // chair legs start at y=0 (pedestal top)
-      Math.sin(a) * chairRingRadius
-    );
-    chair.rotation.y = -a + Math.PI;
-    WORLD_GROUP.add(chair);
-  }
+    const back = new THREE.Mesh(backGeo, chairMat);
+    back.position.y = 0.70;
+    back.position.z = -0.22;
+    g.add(back);
 
-  // ---------- STAIRS ----------
-  const stairsCount = 4;
-  const stairRun = 2.6;
-  const stairSteps = 6;
-  const stairsWidth = 2.4;
-
-  for (let i = 0; i < stairsCount; i++) {
-    const angle = (i / stairsCount) * Math.PI * 2;
-    const stairGroup = new THREE.Group();
-
-    for (let s = 0; s < stairSteps; s++) {
-      const step = new THREE.Mesh(
-        new THREE.BoxGeometry(stairsWidth, 0.20, stairRun / stairSteps),
-        new THREE.MeshStandardMaterial({ color: 0x1c2233, roughness: 0.95 })
-      );
-      step.position.y = s * 0.20 + 0.10;
-      step.position.z = -s * (stairRun / stairSteps) - (stairRun / stairSteps) / 2;
-      stairGroup.add(step);
+    const legs = [
+      [ 0.22, 0.10,  0.22],
+      [-0.22, 0.10,  0.22],
+      [ 0.22, 0.10, -0.22],
+      [-0.22, 0.10, -0.22],
+    ];
+    for (const [x,y,z] of legs) {
+      const leg = new THREE.Mesh(legGeo, chairMat);
+      leg.position.set(x, y, z);
+      g.add(leg);
     }
 
-    const edgeR = pitRadius - 0.35;
-    stairGroup.position.set(Math.cos(angle) * edgeR, 0.02, Math.sin(angle) * edgeR);
-    stairGroup.rotation.y = -angle;
-    WORLD_GROUP.add(stairGroup);
+    // Put chairs on pedestal level
+    g.position.y = -0.10; // align to pedestal top-ish
+    scene.add(g);
   }
 
-  scene.add(WORLD_GROUP);
-  return WORLD_GROUP;
-}
-
-// ---------- helpers ----------
-function makeChair() {
-  const g = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({
-    color: 0x303645,
-    roughness: 0.85,
-    metalness: 0.1,
-  });
-
-  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.10, 0.58), mat);
-  seat.position.y = 0.45;
-  g.add(seat);
-
-  const back = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.55, 0.10), mat);
-  back.position.set(0, 0.76, -0.24);
-  g.add(back);
-
-  const legGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.45, 10);
-  const legs = [
-    [0.24, 0.24],
-    [-0.24, 0.24],
-    [0.24, -0.24],
-    [-0.24, -0.24],
-  ];
-
-  // Bottom touches y=0 exactly
-  for (const [x, z] of legs) {
-    const leg = new THREE.Mesh(legGeo, mat);
-    leg.position.set(x, 0.225, z);
-    g.add(leg);
-  }
-
-  return g;
-}
-
-function makeCarpetTexture() {
-  const size = 512;
-  const c = document.createElement("canvas");
-  c.width = c.height = size;
-  const ctx = c.getContext("2d");
-
-  ctx.fillStyle = "#2a0f22";
-  ctx.fillRect(0, 0, size, size);
-
-  for (let i = 0; i < 28000; i++) {
-    const x = (Math.random() * size) | 0;
-    const y = (Math.random() * size) | 0;
-    const v = 30 + ((Math.random() * 70) | 0);
-    ctx.fillStyle = `rgba(${v},${(v * 0.45) | 0},${(v * 0.75) | 0},0.10)`;
-    ctx.fillRect(x, y, 1, 1);
-  }
-
-  ctx.globalAlpha = 0.18;
-  ctx.strokeStyle = "#3b1a33";
-  ctx.lineWidth = 2;
-  const step = 32;
-
-  for (let x = 0; x <= size; x += step) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, size); ctx.stroke();
-  }
-  for (let y = 0; y <= size; y += step) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(size, y); ctx.stroke();
-  }
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(5, 5);
-  tex.needsUpdate = true;
-  return tex;
+  // Small "sink" center marker (visual)
+  const sink = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.15, 1.15, 0.10, 32),
+    new THREE.MeshStandardMaterial({ color: 0x0c0f18, roughness: 0.9 })
+  );
+  sink.position.y = -0.25;
+  scene.add(sink);
 }

@@ -38,6 +38,7 @@ export const Diagnostics = (() => {
       font:12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       overflow:hidden;
       user-select:text;
+      pointer-events:auto;
     `;
 
     const bar = document.createElement('div');
@@ -59,10 +60,47 @@ export const Diagnostics = (() => {
       border:1px solid rgba(120,160,255,0.35);
       background:rgba(40,60,120,0.25);
       font-size:11px;
+      margin-left:10px;
     `;
 
-    bar.appendChild(title);
-    bar.appendChild(chip);
+    const actions = document.createElement('div');
+    actions.style.cssText = `display:flex; gap:10px; align-items:center;`;
+
+    const btn = (label) => {
+      const b = document.createElement('button');
+      b.textContent = label;
+      b.style.cssText = `
+        padding:8px 12px;
+        border-radius:14px;
+        background:rgba(20,30,60,0.82);
+        color:#cfe3ff;
+        border:1px solid rgba(80,120,255,0.40);
+        font:13px system-ui,-apple-system,sans-serif;
+      `;
+      return b;
+    };
+
+    const copyBtn = btn('Copy Report');
+    copyBtn.onclick = () => copyReport();
+
+    const hideBtn = btn('Hide');
+    hideBtn.onclick = () => {
+      const showing = pre.style.display !== 'none';
+      pre.style.display = showing ? 'none' : 'block';
+      hideBtn.textContent = showing ? 'Show' : 'Hide';
+      log(showing ? '[ui] hidden (controls remain)' : '[ui] shown');
+    };
+
+    actions.appendChild(copyBtn);
+    actions.appendChild(hideBtn);
+
+    const left = document.createElement('div');
+    left.style.cssText = `display:flex; gap:10px; align-items:center;`;
+    left.appendChild(title);
+    left.appendChild(chip);
+
+    bar.appendChild(left);
+    bar.appendChild(actions);
 
     pre = document.createElement('pre');
     pre.style.cssText = `margin:0; padding:10px; max-height:42vh; overflow:auto; white-space:pre-wrap;`;
@@ -71,16 +109,12 @@ export const Diagnostics = (() => {
     root.appendChild(pre);
     document.body.appendChild(root);
 
-    // Global error capture
-    window.addEventListener('error', (e) => {
-      error(e?.message || 'Unknown window error');
-    });
+    window.addEventListener('error', (e) => error(e?.message || 'Unknown window error'));
     window.addEventListener('unhandledrejection', (e) => {
       const msg = (e?.reason && (e.reason.stack || e.reason.message)) || String(e?.reason || 'Unhandled rejection');
       error(msg);
     });
 
-    // Snapshot
     const ua = navigator.userAgent || 'unknown';
     const touch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     log(`=== SCARLETT DIAGNOSTICS ===`);
@@ -95,8 +129,7 @@ export const Diagnostics = (() => {
       './js/scarlett1/index.js',
       './js/scarlett1/spine.js',
       './js/scarlett1/diagnostics.js',
-      './js/scarlett1/devhud.js',
-      './js/scarlett1/androidControls.js',
+      './js/scarlett1/world.js',
     ].forEach(p => log(`[audit] expects ${p}`));
   }
 
