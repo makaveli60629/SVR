@@ -4,13 +4,14 @@
  */
 export const Diagnostics = (() => {
   const state = {
-    build: 'SCARLETT1_WORLD_PHASE1',
+    build: 'SCARLETT1_PERMANENT_RIM_LOBBY',
     lines: [],
     startedAt: performance.now(),
     lastError: null,
+    hidden: false,
   };
 
-  let root, pre;
+  let root, pre, hideBtn;
 
   function now() { return ((performance.now() - state.startedAt) / 1000).toFixed(3); }
   function push(line) {
@@ -22,6 +23,12 @@ export const Diagnostics = (() => {
   function warn(msg) { push(`[${now()}] [warn] ${msg}`); }
   function error(msg) { state.lastError = msg; push(`[${now()}] [error] ${msg}`); }
 
+  function setHidden(v) {
+    state.hidden = !!v;
+    if (!root) return;
+    root.style.display = state.hidden ? "none" : "block";
+  }
+
   function mount() {
     if (root) return;
 
@@ -29,7 +36,7 @@ export const Diagnostics = (() => {
     root.id = 'scarlett-diagnostics';
     root.style.cssText = `
       position:fixed; left:10px; top:10px; z-index:999999;
-      width:min(560px, calc(100vw - 20px));
+      width:min(620px, calc(100vw - 20px));
       background:rgba(10,12,18,0.92);
       border:1px solid rgba(120,160,255,0.35);
       border-radius:12px;
@@ -47,7 +54,11 @@ export const Diagnostics = (() => {
       padding:10px 10px 8px 10px;
       border-bottom:1px solid rgba(120,160,255,0.2);
       background:linear-gradient(180deg, rgba(40,55,90,0.35), rgba(0,0,0,0));
+      gap:10px;
     `;
+
+    const left = document.createElement('div');
+    left.style.cssText = `display:flex; gap:10px; align-items:center; flex-wrap:wrap;`;
 
     const title = document.createElement('div');
     title.textContent = `ScarlettVR Poker • Diagnostics`;
@@ -60,8 +71,10 @@ export const Diagnostics = (() => {
       border:1px solid rgba(120,160,255,0.35);
       background:rgba(40,60,120,0.25);
       font-size:11px;
-      margin-left:10px;
     `;
+
+    left.appendChild(title);
+    left.appendChild(chip);
 
     const actions = document.createElement('div');
     actions.style.cssText = `display:flex; gap:10px; align-items:center;`;
@@ -83,7 +96,7 @@ export const Diagnostics = (() => {
     const copyBtn = btn('Copy Report');
     copyBtn.onclick = () => copyReport();
 
-    const hideBtn = btn('Hide');
+    hideBtn = btn('Hide');
     hideBtn.onclick = () => {
       const showing = pre.style.display !== 'none';
       pre.style.display = showing ? 'none' : 'block';
@@ -93,11 +106,6 @@ export const Diagnostics = (() => {
 
     actions.appendChild(copyBtn);
     actions.appendChild(hideBtn);
-
-    const left = document.createElement('div');
-    left.style.cssText = `display:flex; gap:10px; align-items:center;`;
-    left.appendChild(title);
-    left.appendChild(chip);
 
     bar.appendChild(left);
     bar.appendChild(actions);
@@ -128,9 +136,11 @@ export const Diagnostics = (() => {
     [
       './js/scarlett1/index.js',
       './js/scarlett1/spine.js',
-      './js/scarlett1/diagnostics.js',
       './js/scarlett1/world.js',
+      './js/scarlett1/devhud.js',
     ].forEach(p => log(`[audit] expects ${p}`));
+
+    if (state.hidden) setHidden(true);
   }
 
   async function copyReport() {
@@ -160,5 +170,5 @@ export const Diagnostics = (() => {
     }
   }
 
-  return { mount, log, warn, error, copyReport };
+  return { mount, log, warn, error, copyReport, setHidden };
 })();

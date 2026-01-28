@@ -1,111 +1,101 @@
-/**
- * SCARLETT1 • DEV HUD (PERMANENT)
- * Buttons: Enter VR, Reset Spawn, Hide HUD, Copy Report, Hard Reload, Lights, Music
- */
-import { AndroidControls } from './androidControls.js';
+// /js/scarlett1/devhud.js
+// SCARLETT1 • DEV HUD (PERMANENT)
+// Restores your missing buttons: Hide HUD, Reset Spawn, Hawk View, Toggle NPC/RAIL/STAIRS, Hard Reload.
 
-export const DevHUD = (() => {
-  let hud, minimized = false;
-  let lightsOn = true;
+export function mountDevHUD({ Diagnostics, spine }) {
+  // Floating "Show HUD" when hidden
+  const mini = document.createElement("button");
+  mini.id = "scar-mini";
+  mini.textContent = "Show HUD";
+  mini.style.cssText = `
+    position:fixed; right:12px; top:12px; z-index:1000000;
+    padding:10px 12px; border-radius:14px;
+    background:rgba(20,30,60,0.82); color:#cfe3ff;
+    border:1px solid rgba(80,120,255,0.40);
+    font:13px system-ui,-apple-system,sans-serif;
+    display:none;
+  `;
+  document.body.appendChild(mini);
 
-  function makeBtn(label, onClick) {
-    const b = document.createElement('button');
+  const root = document.createElement("div");
+  root.id = "scar-devhud";
+  root.style.cssText = `
+    position:fixed; right:12px; bottom:14px; z-index:1000000;
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end;
+    pointer-events:auto;
+  `;
+
+  const btn = (label) => {
+    const b = document.createElement("button");
     b.textContent = label;
     b.style.cssText = `
-      padding:10px 12px; border-radius:12px;
-      border:1px solid rgba(120,160,255,0.35);
-      background:rgba(20,25,40,0.9);
-      color:#d8e6ff; font:600 13px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      cursor:pointer;
+      padding:10px 14px; border-radius:14px;
+      background:rgba(20,30,60,0.82); color:#cfe3ff;
+      border:1px solid rgba(80,120,255,0.40);
+      font:13px system-ui,-apple-system,sans-serif;
+      backdrop-filter: blur(8px);
     `;
-    b.addEventListener('click', onClick);
     return b;
-  }
+  };
 
-  function mount(Diagnostics) {
-    if (hud) return;
+  const enterVR = btn("Enter VR");
+  enterVR.onclick = () => document.dispatchEvent(new Event("scarlett-enter-vr"));
 
-    hud = document.createElement('div');
-    hud.id = 'scarlett-devhud';
-    hud.style.cssText = `
-      position:fixed; right:10px; top:10px; z-index:999999;
-      display:flex; flex-direction:column; gap:10px;
-      width:min(270px, calc(100vw - 20px));
-    `;
+  const reset = btn("Reset Spawn");
+  reset.onclick = () => {
+    spine.snapToEagle(true);
+    Diagnostics.log("[cam] reset spawn");
+  };
 
-    const panel = document.createElement('div');
-    panel.style.cssText = `
-      padding:10px; border-radius:16px;
-      background:rgba(10,12,18,0.82);
-      border:1px solid rgba(120,160,255,0.25);
-      box-shadow:0 10px 30px rgba(0,0,0,0.45);
-      display:flex; flex-direction:column; gap:10px;
-    `;
+  const hawk = btn("Hawk View");
+  hawk.onclick = () => {
+    spine.snapToEagle(false);
+    Diagnostics.log("[cam] hawk view snap");
+  };
 
-    const title = document.createElement('div');
-    title.textContent = 'Scarlett One • Dev Controls';
-    title.style.cssText = `color:#d8e6ff; font:700 14px ui-sans-serif, system-ui; letter-spacing:0.2px;`;
+  const hideHud = btn("Hide HUD");
+  hideHud.onclick = () => {
+    // Hide diag + devhud + on-screen sticks, but leave mini button.
+    const v = true;
+    Diagnostics.setHidden(v);
+    root.style.display = "none";
+    const pads = document.querySelectorAll(".scar-pad");
+    pads.forEach(p => p.style.display = "none");
+    mini.style.display = "block";
+    Diagnostics.log("[ui] HUD hidden");
+  };
 
-    const row1 = document.createElement('div');
-    row1.style.cssText = `display:flex; gap:10px; flex-wrap:wrap;`;
+  mini.onclick = () => {
+    Diagnostics.setHidden(false);
+    root.style.display = "flex";
+    const pads = document.querySelectorAll(".scar-pad");
+    pads.forEach(p => p.style.display = "block");
+    mini.style.display = "none";
+    Diagnostics.log("[ui] HUD shown");
+  };
 
-    const enterVR = makeBtn('Enter VR', () => {
-      window.dispatchEvent(new CustomEvent('scarlett:enter-vr'));
-      Diagnostics?.log?.('[ui] Enter VR requested');
-    });
+  const toggleRail = btn("Toggle Rail");
+  toggleRail.onclick = () => spine.toggleRail();
 
-    const reset = makeBtn('Reset Spawn', () => {
-      window.dispatchEvent(new CustomEvent('scarlett:reset-spawn'));
-      Diagnostics?.log?.('[ui] Reset Spawn requested');
-    });
+  const toggleStairs = btn("Toggle Stairs");
+  toggleStairs.onclick = () => spine.toggleStairs();
 
-    const hide = makeBtn('Hide HUD', () => {
-      minimized = !minimized;
-      const diag = document.getElementById('scarlett-diagnostics');
-      const sticks = document.getElementById('scarlett-android-sticks');
-      if (diag) diag.style.display = minimized ? 'none' : 'block';
-      if (sticks) sticks.style.display = minimized ? 'none' : 'block';
-      hide.textContent = minimized ? 'Show HUD' : 'Hide HUD';
-      Diagnostics?.log?.(`[ui] HUD ${minimized ? 'hidden' : 'shown'}`);
-    });
+  const toggleNPC = btn("Toggle NPC");
+  toggleNPC.onclick = () => spine.toggleNPC();
 
-    const copy = makeBtn('Copy Report', async () => {
-      await Diagnostics?.copyReport?.();
-    });
+  const reload = btn("Hard Reload");
+  reload.onclick = () => location.reload();
 
-    const reload = makeBtn('Hard Reload', () => {
-      Diagnostics?.log?.('[ui] Hard Reload requested');
-      location.reload();
-    });
+  root.appendChild(enterVR);
+  root.appendChild(reset);
+  root.appendChild(hawk);
+  root.appendChild(toggleRail);
+  root.appendChild(toggleStairs);
+  root.appendChild(toggleNPC);
+  root.appendChild(hideHud);
+  root.appendChild(reload);
 
-    const lights = makeBtn('Lights: ON', () => {
-      lightsOn = !lightsOn;
-      lights.textContent = `Lights: ${lightsOn ? 'ON' : 'OFF'}`;
-      window.dispatchEvent(new CustomEvent('scarlett:lights', { detail: { on: lightsOn } }));
-      Diagnostics?.log?.(`[ui] Lights ${lightsOn ? 'ON' : 'OFF'}`);
-    });
+  document.body.appendChild(root);
 
-    const music = makeBtn('Music: OFF', () => {
-      window.dispatchEvent(new CustomEvent('scarlett:music-toggle'));
-      Diagnostics?.log?.('[ui] Music toggle requested');
-    });
-
-    row1.appendChild(enterVR);
-    row1.appendChild(reset);
-    row1.appendChild(hide);
-    row1.appendChild(copy);
-    row1.appendChild(reload);
-    row1.appendChild(lights);
-    row1.appendChild(music);
-
-    panel.appendChild(title);
-    panel.appendChild(row1);
-
-    hud.appendChild(panel);
-    document.body.appendChild(hud);
-
-    AndroidControls.mount(Diagnostics);
-  }
-
-  return { mount };
-})();
+  Diagnostics.log("[devhud] buttons mounted ✅");
+}
