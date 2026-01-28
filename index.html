@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>ScarlettVR Poker • Permanent Fix</title>
+  <title>ScarlettVR Poker • Permanent Fix V2</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
   <meta name="theme-color" content="#02030a" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-  <div id="scarlett-app"></div>
   <div id="scarlett-ui"></div>
 
   <div id="boot">
@@ -17,8 +16,8 @@
       <div id="bootTitle">SCARLETT BOOT • Always-On Reporter</div>
       <div id="bootLog">Starting…</div>
       <div id="bootBtns">
-        <button onclick="location.reload()">Reload</button>
-        <button onclick="location.href=location.href.split('?')[0]+'?v='+Date.now()">Cache Bust</button>
+        <button id="bootReload">Reload</button>
+        <button id="bootBust">Cache Bust</button>
       </div>
     </div>
   </div>
@@ -26,20 +25,22 @@
   <script>
     const logEl = document.getElementById('bootLog');
     const log = (m)=> logEl.textContent += "\n" + m;
+
+    document.getElementById('bootReload').onclick = ()=> location.reload();
+    document.getElementById('bootBust').onclick = ()=> location.href = location.href.split('?')[0] + '?v=' + Date.now();
+
     log("href=" + location.href);
     log("ua=" + navigator.userAgent);
+    log("secureContext=" + window.isSecureContext);
 
     window.addEventListener('error', (e)=> log("[window error] " + (e.message || "unknown")));
-    window.addEventListener('unhandledrejection', (e)=> {
-      log("[promise rejection] " + (e.reason?.message || e.reason || "unknown"));
-    });
+    window.addEventListener('unhandledrejection', (e)=> log("[promise rejection] " + (e.reason?.message || e.reason || "unknown")));
 
     (async () => {
       try {
         log("Importing ./index.js …");
         await import("./index.js?v=" + Date.now());
         log("✅ index.js imported");
-        setTimeout(()=>{ document.getElementById('boot').style.display='none'; }, 900);
       } catch (err) {
         log("❌ IMPORT FAILED");
         log(String(err && (err.stack || err.message) || err));
