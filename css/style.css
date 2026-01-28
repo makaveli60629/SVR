@@ -1,16 +1,3 @@
-#dev-hud {
-    position: absolute; top: 10px; left: 10px; z-index: 9999;
-    width: 260px; background: rgba(0, 10, 0, 0.9);
-    border: 2px solid #00FF00; padding: 15px;
-    font-family: 'Courier New', monospace; color: #00FF00;
-}
-.hud-header { font-weight: bold; border-bottom: 2px solid #00FF00; margin-bottom: 10px; padding-bottom: 5px; }
-.stat-row { font-size: 13px; margin: 5px 0; }
-.sdk-btn {
-    display: block; width: 100%; padding: 10px; margin: 5px 0;
-    background: #002200; color: #00FF00; border: 1px solid #00FF00;
-    font-weight: bold; cursor: pointer; text-transform: uppercase;
-}
-.sdk-btn:hover { background: #00FF00; color: #000; }
-.reset { border-color: #ff4444; color: #ff4444; }
-}
+/* Minimal base styles. You can replace anytime. */
+body { background:#02030a; }
+canvas { display:block; }
