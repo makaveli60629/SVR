@@ -1,6 +1,5 @@
 /**
- * SCARLETT1 • SPINE (PERMANENT, NULL-SAFE)
- * Never crashes on missing DOM. Always boots world + HUD.
+ * SCARLETT1 • SPINE (PERMANENT, NULL-PROOF V2)
  */
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 import { VRButton } from "https://unpkg.com/three@0.160.0/examples/jsm/webxr/VRButton.js";
@@ -11,23 +10,32 @@ import { buildWorld } from "./world.js";
 export const Spine = (() => {
   let started = false;
 
-  function ensureRoot(id){
-    let el = document.getElementById(id);
-    if (!el){
-      el = document.createElement("div");
-      el.id = id;
-      document.body.appendChild(el);
-      console.log(`[Spine] created missing #${id}`);
-    }
-    return el;
+  function hideBoot(){
+    const boot = document.getElementById("boot");
+    if (boot) boot.style.display = "none";
+  }
+
+  function mountRendererToBody(renderer){
+    document.querySelectorAll("canvas").forEach(c => { try { c.remove(); } catch {} });
+    const canvas = renderer.domElement;
+    canvas.style.position = "fixed";
+    canvas.style.left = "0";
+    canvas.style.top = "0";
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.zIndex = "0";
+    document.body.appendChild(canvas); // NULL-PROOF
   }
 
   function start(){
     if (started) return;
     started = true;
 
-    const appRoot = ensureRoot("scarlett-app");
-    ensureRoot("scarlett-ui");
+    if (!document.getElementById("scarlett-ui")){
+      const ui = document.createElement("div");
+      ui.id = "scarlett-ui";
+      document.body.appendChild(ui);
+    }
 
     const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
     renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
@@ -36,8 +44,7 @@ export const Spine = (() => {
     renderer.setClearColor(0x02030a, 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    appRoot.innerHTML = "";
-    appRoot.appendChild(renderer.domElement);
+    mountRendererToBody(renderer);
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.05, 500);
@@ -45,7 +52,8 @@ export const Spine = (() => {
     camera.lookAt(0, 1.2, 0);
 
     Diagnostics.mount();
-    Diagnostics.log("[boot] spine start");
+    Diagnostics.log("[boot] spine start (V2)");
+    Diagnostics.log("[boot] renderer mounted to body ✅");
 
     scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1f44, 1.15));
     const key = new THREE.DirectionalLight(0xffffff, 0.9);
@@ -101,12 +109,13 @@ export const Spine = (() => {
       if (keys["a"]) camera.position.addScaledVector(right, speed);
       if (keys["d"]) camera.position.addScaledVector(right, -speed);
 
-      camera.position.y = 1.65; // hawk view level
+      camera.position.y = 1.65; // hawk-view height
 
       renderer.render(scene, camera);
     });
 
     Diagnostics.log("[boot] animation loop ✅");
+    hideBoot();
   }
 
   return { start };

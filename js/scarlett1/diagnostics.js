@@ -1,10 +1,10 @@
 /**
  * SCARLETT1 • DIAGNOSTICS (PERMANENT)
- * Always-on overlay, error capture, copy report, hide/show.
+ * Overlay with: Copy Report + Hide + Show HUD.
  */
 export const Diagnostics = (() => {
   const state = {
-    build: "SCARLETT1_PERMANENT_FIX",
+    build: "SCARLETT1_PERMANENT_FIX_V2",
     lines: [],
     startedAt: performance.now(),
     lastError: null,
@@ -15,7 +15,7 @@ export const Diagnostics = (() => {
   function now(){ return ((performance.now()-state.startedAt)/1000).toFixed(3); }
   function push(line){
     state.lines.push(line);
-    if (state.lines.length > 800) state.lines.shift();
+    if (state.lines.length > 900) state.lines.shift();
     if (pre && !hidden) pre.textContent = state.lines.join("\n");
   }
   function log(msg){ push(`[${now()}] ${msg}`); }

@@ -1,11 +1,8 @@
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
-/**
- * Single-room: Circular Lobby + Shallow Pit Divot (hawk view from lobby).
- */
 export function buildWorld(scene){
   const PIT_RADIUS = 8;
-  const PIT_Y = -0.85; // shallow divot
+  const PIT_Y = -0.85; // shallow divot depth
 
   const sky = new THREE.Mesh(
     new THREE.SphereGeometry(140, 32, 16),
@@ -36,6 +33,7 @@ export function buildWorld(scene){
   wall.position.y = PIT_Y/2;
   scene.add(wall);
 
+  // Rail with an opening
   const rail = new THREE.Mesh(
     new THREE.TorusGeometry(PIT_RADIUS, 0.09, 14, 260, Math.PI*1.6),
     new THREE.MeshStandardMaterial({ color: 0x2a7cff, emissive: 0x0b2a66, emissiveIntensity: 0.8, roughness: 0.3 })
@@ -54,6 +52,7 @@ export function buildWorld(scene){
     scene.add(pillar);
   }
 
+  // 4 Jumbotrons
   for (let i=0;i<4;i++){
     const a = (i/4)*Math.PI*2;
     const j = new THREE.Mesh(
@@ -65,6 +64,7 @@ export function buildWorld(scene){
     scene.add(j);
   }
 
+  // Stairs into pit
   const stairs = new THREE.Group();
   for (let i=0;i<7;i++){
     const step = new THREE.Mesh(
@@ -79,6 +79,7 @@ export function buildWorld(scene){
   stairs.rotation.y = -Math.PI/2;
   scene.add(stairs);
 
+  // Guard placeholder
   const guard = new THREE.Mesh(
     new THREE.CapsuleGeometry(0.28, 1.2, 6, 12),
     new THREE.MeshStandardMaterial({ color: 0x2a2f3a, emissive: 0x0b2a66, emissiveIntensity: 0.18 })
@@ -86,6 +87,7 @@ export function buildWorld(scene){
   guard.position.set(PIT_RADIUS+0.9, 0.65, 0);
   scene.add(guard);
 
+  // Centerpiece (pedestal+table+chair+cards)
   const pedestal = new THREE.Mesh(
     new THREE.CylinderGeometry(0.9, 1.2, 0.9, 18),
     new THREE.MeshStandardMaterial({ color: 0x2a1d18, roughness: 0.85 })

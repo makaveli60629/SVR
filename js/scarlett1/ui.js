@@ -1,6 +1,6 @@
 /**
  * SCARLETT1 • UI (PERMANENT)
- * Bottom buttons that never overlap diagnostics.
+ * Bottom buttons: ENTER VR / RESET / RELOAD
  */
 export function mountUI({ onEnterVR, onReload, onReset }){
   const wrap = document.createElement("div");
