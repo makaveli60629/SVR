@@ -4,7 +4,7 @@
  */
 export const Diagnostics = (() => {
   const state = {
-    build: "SCARLETT1_PERMANENT_FIX_V2",
+    build: "SCARLETT1_PERMANENT_FIX_V3",
     lines: [],
     startedAt: performance.now(),
     lastError: null,

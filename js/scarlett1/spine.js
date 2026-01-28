@@ -1,11 +1,12 @@
 /**
- * SCARLETT1 • SPINE (PERMANENT, NULL-PROOF V2)
+ * SCARLETT1 • SPINE (PERMANENT, ANDROID + LIGHTS V3)
  */
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 import { VRButton } from "https://unpkg.com/three@0.160.0/examples/jsm/webxr/VRButton.js";
 import { Diagnostics } from "./diagnostics.js";
 import { mountUI } from "./ui.js";
 import { buildWorld } from "./world.js";
+import { mountAndroidControls } from "./androidControls.js";
 
 export const Spine = (() => {
   let started = false;
@@ -24,7 +25,7 @@ export const Spine = (() => {
     canvas.style.width = "100%";
     canvas.style.height = "100%";
     canvas.style.zIndex = "0";
-    document.body.appendChild(canvas); // NULL-PROOF
+    document.body.appendChild(canvas);
   }
 
   function start(){
@@ -47,22 +48,33 @@ export const Spine = (() => {
     mountRendererToBody(renderer);
 
     const scene = new THREE.Scene();
+
+    // Put camera on a yaw pivot so right-stick can rotate
     const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.05, 500);
-    camera.position.set(0, 1.65, 14);
-    camera.lookAt(0, 1.2, 0);
+    const yawObj = new THREE.Object3D();
+    yawObj.position.set(0, 1.65, 14);
+    yawObj.add(camera);
+    scene.add(yawObj);
 
     Diagnostics.mount();
-    Diagnostics.log("[boot] spine start (V2)");
+    Diagnostics.log("[boot] spine start (V3)");
     Diagnostics.log("[boot] renderer mounted to body ✅");
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1f44, 1.15));
-    const key = new THREE.DirectionalLight(0xffffff, 0.9);
+    // Bright, consistent lighting
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1f44, 1.25));
+    const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+    scene.add(ambient);
+    const key = new THREE.DirectionalLight(0xffffff, 1.05);
     key.position.set(10, 18, 8);
     scene.add(key);
+    const pitGlow = new THREE.PointLight(0x2a7cff, 1.6, 40);
+    pitGlow.position.set(0, 2.2, 0);
+    scene.add(pitGlow);
 
     buildWorld(scene);
     Diagnostics.log("[boot] world built ✅");
 
+    // VR button (hidden, triggered by our UI)
     let vrBtn = null;
     function ensureVRBtn(){
       if (vrBtn) return vrBtn;
@@ -77,15 +89,24 @@ export const Spine = (() => {
       onEnterVR: () => ensureVRBtn().click(),
       onReload: () => location.reload(),
       onReset: () => {
-        camera.position.set(0, 1.65, 14);
-        camera.lookAt(0, 1.2, 0);
+        yawObj.rotation.y = 0;
+        yawObj.position.set(0, 1.65, 14);
         Diagnostics.log("[reset] camera reset");
       },
     });
 
+    // Inputs: keyboard + android joysticks
     const keys = Object.create(null);
     window.addEventListener("keydown", (e)=> keys[e.key.toLowerCase()] = true);
     window.addEventListener("keyup", (e)=> keys[e.key.toLowerCase()] = false);
+
+    let joyMoveX = 0, joyMoveY = 0;
+    let joyLookX = 0, joyLookY = 0;
+    mountAndroidControls({
+      onMove: (x,y)=>{ joyMoveX = x; joyMoveY = y; },
+      onLook: (x,y)=>{ joyLookX = x; joyLookY = y; },
+      Diagnostics
+    });
 
     function onResize(){
       const w = window.innerWidth, h = window.innerHeight;
@@ -100,16 +121,25 @@ export const Spine = (() => {
     const right = new THREE.Vector3();
 
     renderer.setAnimationLoop(() => {
-      camera.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
+      // Look (right joystick) -> yaw
+      const lookSpeed = 0.045;
+      if (Math.abs(joyLookX) > 0.001) {
+        yawObj.rotation.y += joyLookX * lookSpeed;
+      }
+
+      // Movement: keyboard + left joystick
+      yawObj.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
       right.crossVectors(fwd, up).normalize();
 
-      const speed = 0.12;
-      if (keys["w"]) camera.position.addScaledVector(fwd, speed);
-      if (keys["s"]) camera.position.addScaledVector(fwd, -speed);
-      if (keys["a"]) camera.position.addScaledVector(right, speed);
-      if (keys["d"]) camera.position.addScaledVector(right, -speed);
+      const speed = 0.10;
+      const mx = (keys["d"] ? 1 : 0) - (keys["a"] ? 1 : 0) + joyMoveX;
+      const my = (keys["w"] ? 1 : 0) - (keys["s"] ? 1 : 0) + joyMoveY;
 
-      camera.position.y = 1.65; // hawk-view height
+      if (my) yawObj.position.addScaledVector(fwd, speed * my);
+      if (mx) yawObj.position.addScaledVector(right, -speed * mx);
+
+      // Lock hawk-view height
+      yawObj.position.y = 1.65;
 
       renderer.render(scene, camera);
     });

@@ -2,7 +2,7 @@ import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
 export function buildWorld(scene){
   const PIT_RADIUS = 8;
-  const PIT_Y = -0.85; // shallow divot depth
+  const PIT_Y = -1.35; // deeper divot (still lobby, not basement)
 
   const sky = new THREE.Mesh(
     new THREE.SphereGeometry(140, 32, 16),
@@ -10,6 +10,7 @@ export function buildWorld(scene){
   );
   scene.add(sky);
 
+  // Lobby floor (circular)
   const lobby = new THREE.Mesh(
     new THREE.CircleGeometry(PIT_RADIUS + 14, 96),
     new THREE.MeshStandardMaterial({ color: 0x0c0f18, roughness: 0.98 })
@@ -18,6 +19,7 @@ export function buildWorld(scene){
   lobby.position.y = 0;
   scene.add(lobby);
 
+  // Pit carpet
   const pit = new THREE.Mesh(
     new THREE.CircleGeometry(PIT_RADIUS - 0.2, 64),
     new THREE.MeshStandardMaterial({ color: 0x6b4a7a, roughness: 0.95 })
@@ -26,6 +28,7 @@ export function buildWorld(scene){
   pit.position.y = PIT_Y;
   scene.add(pit);
 
+  // Pit wall
   const wall = new THREE.Mesh(
     new THREE.CylinderGeometry(PIT_RADIUS, PIT_RADIUS, Math.abs(PIT_Y), 64, 1, true),
     new THREE.MeshStandardMaterial({ color: 0x111524, side: THREE.DoubleSide, roughness: 0.9 })
@@ -33,15 +36,16 @@ export function buildWorld(scene){
   wall.position.y = PIT_Y/2;
   scene.add(wall);
 
-  // Rail with an opening
+  // Rail with an opening (arc less than full 2π)
   const rail = new THREE.Mesh(
     new THREE.TorusGeometry(PIT_RADIUS, 0.09, 14, 260, Math.PI*1.6),
-    new THREE.MeshStandardMaterial({ color: 0x2a7cff, emissive: 0x0b2a66, emissiveIntensity: 0.8, roughness: 0.3 })
+    new THREE.MeshStandardMaterial({ color: 0x2a7cff, emissive: 0x0b2a66, emissiveIntensity: 0.9, roughness: 0.25 })
   );
   rail.rotation.x = Math.PI/2;
   rail.position.y = 0.12;
   scene.add(rail);
 
+  // Pillars ring
   for (let i=0;i<12;i++){
     const a = (i/12)*Math.PI*2;
     const pillar = new THREE.Mesh(
@@ -57,21 +61,21 @@ export function buildWorld(scene){
     const a = (i/4)*Math.PI*2;
     const j = new THREE.Mesh(
       new THREE.PlaneGeometry(7, 3.2),
-      new THREE.MeshStandardMaterial({ color: 0x10132a, emissive: 0x1b2cff, emissiveIntensity: 0.35 })
+      new THREE.MeshStandardMaterial({ color: 0x10132a, emissive: 0x1b2cff, emissiveIntensity: 0.45 })
     );
     j.position.set(Math.cos(a)*(PIT_RADIUS+7.2), 3.0, Math.sin(a)*(PIT_RADIUS+7.2));
     j.lookAt(0, 2.2, 0);
     scene.add(j);
   }
 
-  // Stairs into pit
+  // One stairway into pit
   const stairs = new THREE.Group();
-  for (let i=0;i<7;i++){
+  for (let i=0;i<9;i++){
     const step = new THREE.Mesh(
       new THREE.BoxGeometry(2.2, 0.18, 0.62),
       new THREE.MeshStandardMaterial({ color: 0x1c2233, roughness: 0.8 })
     );
-    step.position.y = 0.09 - i*(Math.abs(PIT_Y)/7);
+    step.position.y = 0.09 - i*(Math.abs(PIT_Y)/9);
     step.position.z = -i*0.62;
     stairs.add(step);
   }
@@ -79,15 +83,15 @@ export function buildWorld(scene){
   stairs.rotation.y = -Math.PI/2;
   scene.add(stairs);
 
-  // Guard placeholder
+  // Guard at opening
   const guard = new THREE.Mesh(
     new THREE.CapsuleGeometry(0.28, 1.2, 6, 12),
-    new THREE.MeshStandardMaterial({ color: 0x2a2f3a, emissive: 0x0b2a66, emissiveIntensity: 0.18 })
+    new THREE.MeshStandardMaterial({ color: 0x2a2f3a, emissive: 0x0b2a66, emissiveIntensity: 0.25 })
   );
   guard.position.set(PIT_RADIUS+0.9, 0.65, 0);
   scene.add(guard);
 
-  // Centerpiece (pedestal+table+chair+cards)
+  // Centerpiece: pedestal + table + one chair + cards
   const pedestal = new THREE.Mesh(
     new THREE.CylinderGeometry(0.9, 1.2, 0.9, 18),
     new THREE.MeshStandardMaterial({ color: 0x2a1d18, roughness: 0.85 })
