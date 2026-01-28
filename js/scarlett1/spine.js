@@ -1,12 +1,19 @@
-// /js/scarlett1/spine.js — FULL SPINE (owns renderer, camera, loop)
+// /js/scarlett1/spine.js — FULL SPINE (render + diagnostics + controls + eagle view)
+// Spine owns renderer/camera/loop. Restores your existing diagnostic + control modules safely.
+
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 import { buildWorld } from "./world.js";
+
+// Import entire modules so we don’t depend on exact exported names
+import * as DiagnosticsMod from "./diagnostics.js";
+import * as DevHudMod from "./devhud.js";
+import * as AndroidControlsMod from "./androidControls.js";
 
 export class Spine {
   constructor(opts = {}) {
     this.opts = {
       mountId: opts.mountId || "app",
-      debug: !!opts.debug,
+      debug: opts.debug !== false, // default true
     };
 
     this.scene = new THREE.Scene();
@@ -16,11 +23,13 @@ export class Spine {
       70,
       window.innerWidth / window.innerHeight,
       0.05,
-      200
+      250
     );
-    // Good default spawn: above pedestal looking toward center
-    this.camera.position.set(0, 1.7, 6.5);
-    this.camera.lookAt(0, 1.2, 0);
+
+    // ✅ NATURAL FLOOR / EAGLE VIEW
+    // You start on the rim level, looking slightly down into the center.
+    this.camera.position.set(0, 2.0, 11.5);
+    this.camera.lookAt(0, 0.8, 0);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -29,19 +38,30 @@ export class Spine {
 
     this._diag = null;
     this._worldReady = false;
+
+    // fallback mover
+    this._keys = Object.create(null);
+    this._moveTick = null;
   }
 
   start() {
     this._mountRenderer();
     this._installFailsafeLights();
 
-    // Build your world (pit + pedestal carpet + table + chairs + stairs)
+    // Build world (small sink pit + pedestal floor + table/chairs)
     buildWorld(this.scene);
     this._worldReady = true;
 
-    if (this.opts.debug) this._mountDiag();
+    // ✅ Restore your existing Scarlett diagnostic/dev systems safely
+    this._tryMountDiagnostics();
+    this._tryMountDevHUD();
+    this._tryInitAndroidControls();
 
-    // Main loop
+    // ✅ Guaranteed movement fallback (WASD on desktop, and gives us a safety net)
+    this._enableBasicMovementFallback();
+
+    if (this.opts.debug) this._mountMinimalDiag(); // extra: always visible status
+
     this.renderer.setAnimationLoop(() => {
       this.tick();
       this.renderer.render(this.scene, this.camera);
@@ -52,7 +72,10 @@ export class Spine {
   }
 
   tick() {
-    // future hooks (animations, etc.)
+    // fallback movement
+    this._moveTick?.();
+
+    // if your own modules hook into tick via global/state, they will run independently
   }
 
   onResize() {
@@ -79,19 +102,23 @@ export class Spine {
     }
   }
 
+  // ---------------- internals ----------------
+
   _mountRenderer() {
     const mount = document.getElementById(this.opts.mountId) || document.body;
+
     // Clear mount so old canvases don’t pile up
     while (mount.firstChild) mount.removeChild(mount.firstChild);
+
     mount.appendChild(this.renderer.domElement);
   }
 
   _installFailsafeLights() {
-    // Bright, stable lighting
+    // Stable bright lighting (won’t fight your lighting module, but prevents darkness)
     const hemi = new THREE.HemisphereLight(0xffffff, 0x1b2238, 1.0);
     this.scene.add(hemi);
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.1);
+    const key = new THREE.DirectionalLight(0xffffff, 1.05);
     key.position.set(10, 14, 8);
     this.scene.add(key);
 
@@ -104,9 +131,141 @@ export class Spine {
     this.scene.add(rim);
   }
 
-  _mountDiag() {
+  _tryMountDiagnostics() {
+    // Try common function names without breaking if they don’t exist
+    const candidates = [
+      "mountDiagnostics",
+      "initDiagnostics",
+      "Diagnostics",
+      "startDiagnostics",
+      "bootDiagnostics",
+    ];
+
+    for (const name of candidates) {
+      const fn = DiagnosticsMod?.[name];
+      if (typeof fn === "function") {
+        try {
+          fn({ scene: this.scene, camera: this.camera, renderer: this.renderer });
+          console.log(`[spine] diagnostics mounted via ${name}()`);
+          return;
+        } catch (e) {
+          console.warn(`[spine] diagnostics ${name}() error:`, e);
+        }
+      }
+    }
+
+    // Also support default export as function
+    if (typeof DiagnosticsMod?.default === "function") {
+      try {
+        DiagnosticsMod.default({ scene: this.scene, camera: this.camera, renderer: this.renderer });
+        console.log("[spine] diagnostics mounted via default()");
+        return;
+      } catch (e) {
+        console.warn("[spine] diagnostics default() error:", e);
+      }
+    }
+
+    console.warn("[spine] diagnostics module present but no known mount function found");
+  }
+
+  _tryMountDevHUD() {
+    const candidates = [
+      "mountDevHUD",
+      "initDevHUD",
+      "DevHUD",
+      "startDevHUD",
+      "bootDevHUD",
+    ];
+
+    for (const name of candidates) {
+      const fn = DevHudMod?.[name];
+      if (typeof fn === "function") {
+        try {
+          fn({ scene: this.scene, camera: this.camera, renderer: this.renderer });
+          console.log(`[spine] devhud mounted via ${name}()`);
+          return;
+        } catch (e) {
+          console.warn(`[spine] devhud ${name}() error:`, e);
+        }
+      }
+    }
+
+    if (typeof DevHudMod?.default === "function") {
+      try {
+        DevHudMod.default({ scene: this.scene, camera: this.camera, renderer: this.renderer });
+        console.log("[spine] devhud mounted via default()");
+        return;
+      } catch (e) {
+        console.warn("[spine] devhud default() error:", e);
+      }
+    }
+
+    // Not fatal
+  }
+
+  _tryInitAndroidControls() {
+    const candidates = [
+      "initAndroidControls",
+      "AndroidControls",
+      "startAndroidControls",
+      "mountAndroidControls",
+      "init",
+      "start",
+    ];
+
+    for (const name of candidates) {
+      const fn = AndroidControlsMod?.[name];
+      if (typeof fn === "function") {
+        try {
+          fn({ camera: this.camera, renderer: this.renderer, scene: this.scene });
+          console.log(`[spine] android controls via ${name}()`);
+          return;
+        } catch (e) {
+          console.warn(`[spine] androidControls ${name}() error:`, e);
+        }
+      }
+    }
+
+    if (typeof AndroidControlsMod?.default === "function") {
+      try {
+        AndroidControlsMod.default({ camera: this.camera, renderer: this.renderer, scene: this.scene });
+        console.log("[spine] android controls via default()");
+        return;
+      } catch (e) {
+        console.warn("[spine] androidControls default() error:", e);
+      }
+    }
+
+    console.warn("[spine] android controls not attached (fallback mover still active)");
+  }
+
+  _enableBasicMovementFallback() {
+    // Desktop keys (and a “safety net” if touch module doesn’t attach)
+    window.addEventListener("keydown", (e) => (this._keys[e.key.toLowerCase()] = true));
+    window.addEventListener("keyup", (e) => (this._keys[e.key.toLowerCase()] = false));
+
+    this._moveTick = () => {
+      const speed = 0.06;
+
+      // forward/back relative to camera facing
+      const forward = new THREE.Vector3();
+      this.camera.getWorldDirection(forward);
+      forward.y = 0;
+      forward.normalize();
+
+      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+
+      if (this._keys["w"]) this.camera.position.addScaledVector(forward, speed);
+      if (this._keys["s"]) this.camera.position.addScaledVector(forward, -speed);
+      if (this._keys["a"]) this.camera.position.addScaledVector(right, speed);
+      if (this._keys["d"]) this.camera.position.addScaledVector(right, -speed);
+    };
+  }
+
+  _mountMinimalDiag() {
+    // This does NOT replace your diagnostics — it’s a guaranteed “is it alive” badge.
     const hud = document.createElement("div");
-    hud.id = "scarlett-diag";
+    hud.id = "scarlett-diag-mini";
     hud.style.position = "fixed";
     hud.style.top = "10px";
     hud.style.left = "10px";
@@ -131,8 +290,8 @@ export class Spine {
     const cam = this.camera.position;
     this._diag.innerHTML =
       `SCARLETT DIAG<br>` +
-      `world: ${this._worldReady ? "OK" : "…" }<br>` +
+      `world: ${this._worldReady ? "OK" : "…"}<br>` +
       `objects: ${objCount}<br>` +
       `cam: ${cam.x.toFixed(2)}, ${cam.y.toFixed(2)}, ${cam.z.toFixed(2)}`;
   }
-}
+              }
