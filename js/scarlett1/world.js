@@ -1,6 +1,5 @@
-// /js/scarlett1/world.js
-// SCARLETT ONE — PEDESTAL IS THE FLOOR (CARPETED)
-// Deep pit + huge carpeted pedestal that covers table + ALL chairs.
+// /js/scarlett1/world.js — FULL WORLD
+// Deep pit + big pedestal floor with carpet cap + table + 8 chairs + 4 stairs
 
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
@@ -14,27 +13,6 @@ export function buildWorld(scene) {
 
   WORLD_GROUP = new THREE.Group();
   WORLD_GROUP.name = "SCARLETT_WORLD";
-
-  // ---------- LIGHTS (FAILSAFE) ----------
-  if (!scene.getObjectByName("WORLD_LIGHTS")) {
-    const lights = new THREE.Group();
-    lights.name = "WORLD_LIGHTS";
-    lights.add(new THREE.HemisphereLight(0xffffff, 0x1b2238, 1.0));
-
-    const key = new THREE.DirectionalLight(0xffffff, 1.1);
-    key.position.set(10, 14, 8);
-    lights.add(key);
-
-    const fill = new THREE.DirectionalLight(0xffffff, 0.45);
-    fill.position.set(-10, 8, -8);
-    lights.add(fill);
-
-    const rim = new THREE.PointLight(0x2a7cff, 1.0, 70);
-    rim.position.set(0, 2.5, 0);
-    lights.add(rim);
-
-    scene.add(lights);
-  }
 
   // ---------- PIT ----------
   const pitRadius = 10.0;
@@ -70,22 +48,19 @@ export function buildWorld(scene) {
   WORLD_GROUP.add(rimRail);
 
   // ---------- PEDESTAL = FLOOR ----------
-  // Make it BIG so chairs are on it. Chair ring is ~2.8, chairs have depth,
-  // so pedestal should be ~4.2+ to fully cover.
-  const pedestalRadius = 4.6;     // BIG pedestal so chairs sit on it
+  // Must cover chair ring fully.
+  const pedestalRadius = 4.6;
   const pedestalHeight = 1.8;
 
-  // Pedestal top should be at y = 0 (your “floor line”)
-  // So center is at -height/2.
+  // pedestal top surface sits at y=0
   const pedestal = new THREE.Mesh(
     new THREE.CylinderGeometry(pedestalRadius, pedestalRadius, pedestalHeight, 96),
     new THREE.MeshStandardMaterial({ color: 0x2a2f3a, roughness: 0.8, metalness: 0.1 })
   );
   pedestal.position.y = -pedestalHeight / 2;
-  pedestal.name = "PEDESTAL";
   WORLD_GROUP.add(pedestal);
 
-  // Carpet “cap” sitting exactly on top of pedestal (this is what you wanted)
+  // Carpet cap on top surface
   const carpet = new THREE.Mesh(
     new THREE.CircleGeometry(pedestalRadius - 0.05, 128),
     new THREE.MeshStandardMaterial({
@@ -97,18 +72,17 @@ export function buildWorld(scene) {
     })
   );
   carpet.rotation.x = -Math.PI / 2;
-  carpet.position.y = 0.01; // sits on top surface
-  carpet.name = "PEDESTAL_CARPET";
+  carpet.position.y = 0.01;
   WORLD_GROUP.add(carpet);
 
-  // ---------- TABLE (sits on carpet/pedestal) ----------
+  // ---------- TABLE ----------
   const tableRadius = 1.6;
 
   const tableTop = new THREE.Mesh(
     new THREE.CylinderGeometry(tableRadius, tableRadius, 0.12, 96),
     new THREE.MeshStandardMaterial({ color: 0x0f4a2f, roughness: 0.95 })
   );
-  tableTop.position.y = 0.92; // height above carpet
+  tableTop.position.y = 0.92;
   WORLD_GROUP.add(tableTop);
 
   const tableEdge = new THREE.Mesh(
@@ -125,16 +99,16 @@ export function buildWorld(scene) {
   tableBase.position.y = 0.45;
   WORLD_GROUP.add(tableBase);
 
-  // ---------- CHAIRS (sit ON carpet/pedestal) ----------
-  const chairRingRadius = 3.15; // slightly wider but still on pedestalRadius=4.6
+  // ---------- CHAIRS (legs start at y=0 floor line) ----------
+  const chairRingRadius = 3.15;
 
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2;
-
     const chair = makeChair();
+
     chair.position.set(
       Math.cos(a) * chairRingRadius,
-      0.0, // IMPORTANT: chair base sits on carpet (y=0)
+      0.0,
       Math.sin(a) * chairRingRadius
     );
     chair.rotation.y = -a + Math.PI;
@@ -171,7 +145,7 @@ export function buildWorld(scene) {
   return WORLD_GROUP;
 }
 
-// ---------- chair helper ----------
+// ---------- Helpers ----------
 function makeChair() {
   const g = new THREE.Group();
   const mat = new THREE.MeshStandardMaterial({
@@ -180,7 +154,6 @@ function makeChair() {
     metalness: 0.1,
   });
 
-  // Seat at y=0.45 means legs start at y=0 (chair base)
   const seat = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.10, 0.58), mat);
   seat.position.y = 0.45;
   g.add(seat);
@@ -197,7 +170,7 @@ function makeChair() {
     [-0.24, -0.24],
   ];
 
-  // Legs centered at y=0.225 means bottom touches y=0 exactly
+  // Bottom touches y=0
   for (const [x, z] of legs) {
     const leg = new THREE.Mesh(legGeo, mat);
     leg.position.set(x, 0.225, z);
@@ -207,7 +180,6 @@ function makeChair() {
   return g;
 }
 
-// ---------- procedural carpet texture ----------
 function makeCarpetTexture() {
   const size = 512;
   const c = document.createElement("canvas");
@@ -217,7 +189,6 @@ function makeCarpetTexture() {
   ctx.fillStyle = "#2a0f22";
   ctx.fillRect(0, 0, size, size);
 
-  // speckle noise
   for (let i = 0; i < 28000; i++) {
     const x = (Math.random() * size) | 0;
     const y = (Math.random() * size) | 0;
@@ -226,22 +197,16 @@ function makeCarpetTexture() {
     ctx.fillRect(x, y, 1, 1);
   }
 
-  // weave
   ctx.globalAlpha = 0.18;
   ctx.strokeStyle = "#3b1a33";
   ctx.lineWidth = 2;
   const step = 32;
+
   for (let x = 0; x <= size; x += step) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, size);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, size); ctx.stroke();
   }
   for (let y = 0; y <= size; y += step) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(size, y);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(size, y); ctx.stroke();
   }
 
   const tex = new THREE.CanvasTexture(c);
@@ -249,4 +214,4 @@ function makeCarpetTexture() {
   tex.repeat.set(5, 5);
   tex.needsUpdate = true;
   return tex;
-                     }
+      }
