@@ -29,13 +29,17 @@ import { XRHandModelFactory } from 'https://unpkg.com/three@0.160.0/examples/jsm
 // ===== SCARLETT SAFETY GLOBALS (Android/GitHub Pages) =====
 // Prevent "PIT_R/PIT_Y not defined" crashes if constants are referenced across scopes.
 window.__scarlettGlobals = window.__scarlettGlobals || {};
-if (typeof window.__scarlettGlobals.PIT_R !== 'number') window.__scarlettGlobals.PIT_R = 6.2;
-if (typeof window.__scarlettGlobals.PIT_Y !== 'number') window.__scarlettGlobals.PIT_Y = -1.9;
-if (typeof window.__scarlettGlobals.PIT_DEPTH !== 'number') window.__scarlettGlobals.PIT_DEPTH = 2.6;
+if (typeof window.__scarlettGlobals.PIT_R !== 'number') window.__scarlettGlobals.PIT_R = 6.4;
+if (typeof window.__scarlettGlobals.PIT_Y !== 'number') window.__scarlettGlobals.PIT_Y = -2.1;
+if (typeof window.__scarlettGlobals.PIT_DEPTH !== 'number') window.__scarlettGlobals.PIT_DEPTH = 2.8;
+if (typeof window.__scarlettGlobals.PEDESTAL_H !== 'number') window.__scarlettGlobals.PEDESTAL_H = 1.6;
+if (typeof window.__scarlettGlobals.PEDESTAL_R !== 'number') window.__scarlettGlobals.PEDESTAL_R = 3.2;
 // Use var so even early references won't throw (avoids TDZ issues).
 var PIT_R = window.__scarlettGlobals.PIT_R;
 var PIT_Y = window.__scarlettGlobals.PIT_Y;
 var PIT_DEPTH = window.__scarlettGlobals.PIT_DEPTH;
+var PEDESTAL_H = window.__scarlettGlobals.PEDESTAL_H;
+var PEDESTAL_R = window.__scarlettGlobals.PEDESTAL_R;
 // =========================================================
 
 export const Scarlett1 = { start };
@@ -416,24 +420,23 @@ function start() {
     const stepMat = new THREE.MeshStandardMaterial({ color: 0x0b1220, roughness: 0.95, metalness: 0.05 });
     const stepGeo = new THREE.BoxGeometry(0.9, 0.18, 0.55);
 
-    // 16 steps on the south arc (closest to spawn), tapering down
-    const steps = 16;
-    const arcStart = Math.PI * 0.70;
-    const arcEnd   = Math.PI * 1.30;
-    for (let i=0;i<steps;i++){
-      const t = i/(steps-1);
-      const theta = arcStart + (arcEnd-arcStart)*t;
-      const radius = 5.05 + 0.15*Math.sin(t*Math.PI);
-      const x = Math.sin(theta)*radius;
-      const z = Math.cos(theta)*radius;
-
-      const step = new THREE.Mesh(stepGeo, stepMat);
-      // Height descends into pit
-      step.position.set(x, -0.10 - t*0.95, z);
-      step.lookAt(0, step.position.y, 0);
-      step.rotateY(Math.PI);
-      stairs.add(step);
-    }
+    
+// Steps down from the main floor (y=0) into the pit floor (y=PIT_Y)
+// Straight stair run on the south side (toward spawn)
+const steps = 10;
+const yTop = 0.0;
+const yBottom = PIT_Y + 0.08;
+const stepH = (yTop - yBottom) / steps;
+const stepD = 0.70;
+const startZ = -(PIT_R + 0.70);
+for (let i=0;i<steps;i++){
+  const step = new THREE.Mesh(stepGeo, stepMat);
+  // Each step drops down and moves slightly toward the center
+  const y = yTop - (i+1) * stepH - 0.09; // center of stepGeo (0.18 tall)
+  const z = startZ + i * stepD;
+  step.position.set(0, y, z);
+  stairs.add(step);
+}
 
     // Poker table area centered in pit
     buildPoker(feltTex);
@@ -468,12 +471,26 @@ function start() {
     poker.position.set(0, PIT_Y, 0); // Update 13: deeper pit (group)
     room.add(poker);
 
-    // Table pedestal
+// Table pedestal (center island) — table + bots sit on top of this
+const PEDESTAL_H = (typeof window.__scarlettGlobals?.PEDESTAL_H === 'number') ? window.__scarlettGlobals.PEDESTAL_H : 1.6;
+const PEDESTAL_R = (typeof window.__scarlettGlobals?.PEDESTAL_R === 'number') ? window.__scarlettGlobals.PEDESTAL_R : 3.2;
+
+const pedestal = new THREE.Mesh(
+  new THREE.CylinderGeometry(PEDESTAL_R, PEDESTAL_R, PEDESTAL_H, 64),
+  new THREE.MeshStandardMaterial({ color: 0x0e1322, roughness: 0.95, metalness: 0.05 })
+);
+pedestal.position.set(0, PEDESTAL_H / 2, 0);
+pedestal.castShadow = false;
+pedestal.receiveShadow = true;
+poker.add(pedestal);
+
+// Base Y offset for anything that should rest on the pedestal top
+const baseY = PEDESTAL_H;
     const table = new THREE.Mesh(
       new THREE.CylinderGeometry(2.25, 2.25, 0.38, 64),
       new THREE.MeshStandardMaterial({ color: 0x121a2f, roughness: 0.8, metalness: 0.15 })
     );
-    table.position.set(0, 0.19, 0);
+    table.position.set(0, baseY + 0.19, 0);
     poker.add(table);
 
     // Felt top
