@@ -499,7 +499,7 @@ const baseY = PEDESTAL_H;
       : new THREE.MeshStandardMaterial({ color: 0x0a3a2a, roughness: 1.0, metalness: 0.0, emissive: new THREE.Color(0x02140e), emissiveIntensity: 0.22 });
 
     const felt = new THREE.Mesh(new THREE.CylinderGeometry(2.05, 2.05, 0.09, 64), feltMat);
-    felt.position.set(0, 0.43, 0);
+    felt.position.set(0, baseY + 0.43, 0);
     poker.add(felt);
 
     // Rail (glow)
@@ -508,7 +508,7 @@ const baseY = PEDESTAL_H;
       new THREE.MeshStandardMaterial({ color: 0x121a2f, roughness: 0.7, metalness: 0.25, emissive: new THREE.Color(0x0b1230), emissiveIntensity: 0.18 })
     );
     rail.rotation.x = Math.PI/2;
-    rail.position.set(0, 0.56, 0);
+    rail.position.set(0, baseY + 0.56, 0);
     poker.add(rail);
 
     // Under-rail light ring
@@ -517,7 +517,7 @@ const baseY = PEDESTAL_H;
       new THREE.MeshStandardMaterial({ color: 0x2a55ff, roughness: 0.25, metalness: 0.2, emissive: new THREE.Color(0x2a55ff), emissiveIntensity: 1.0 })
     );
     under.rotation.x = Math.PI/2;
-    under.position.set(0, 0.40, 0);
+    under.position.set(0, baseY + 0.40, 0);
     poker.add(under);
 
     // Seats + bots
@@ -537,7 +537,7 @@ const baseY = PEDESTAL_H;
       // Seat base marker (tap to sit)
       const seat = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.12, 24), chairMat);
       // Lift the entire seat stack a bit so bots don't look "half-buried" by the pit floor.
-      seat.position.set(x, 0.26, z);
+      seat.position.set(x, baseY + 0.26, z);
       seat.userData = { type:'seat', seatIndex:i };
       poker.add(seat);
       seats.push(seat);
@@ -545,7 +545,7 @@ const baseY = PEDESTAL_H;
 
       // Backrest
       const back = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.15), chairMat);
-      back.position.set(x, 0.75, z);
+      back.position.set(x, baseY + 0.75, z);
       back.rotation.y = a + Math.PI;
       back.translateZ(-0.35);
       poker.add(back);
@@ -573,12 +573,12 @@ const baseY = PEDESTAL_H;
 
       // Simple arms (placeholders)
       const armGeo = new THREE.CapsuleGeometry(0.07, 0.35, 5, 10);
-      const armL = new THREE.Mesh(armGeo, mat); armL.position.set(-0.35, 1.15, 0.05); armL.rotation.z = 0.15;
-      const armR = new THREE.Mesh(armGeo, mat); armR.position.set( 0.35, 1.15, 0.05); armR.rotation.z = -0.15;
+      const armL = new THREE.Mesh(armGeo, mat); armL.position.set(-0.35, baseY + 1.15, 0.05); armL.rotation.z = 0.15;
+      const armR = new THREE.Mesh(armGeo, mat); armR.position.set( 0.35, baseY + 1.15, 0.05); armR.rotation.z = -0.15;
       bot.add(armL); bot.add(armR);
 
       // Raise bot root slightly so torso clears the pit floor visually.
-      bot.position.set(x, 0.20, z);
+      bot.position.set(x, baseY + 0.20, z);
       bot.rotation.y = a + Math.PI;
       bot.userData = { seatIndex:i, idle: Math.random()*Math.PI*2, look: 0 };
       botsGroup.add(bot);
@@ -603,7 +603,7 @@ const baseY = PEDESTAL_H;
       const c = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.78), cardMat);
       c.visible = false;
       c.userData = { type:'card', idx:i, hoverPhase: Math.random()*Math.PI*2 };
-      c.position.set((i-2)*0.62, 0.72, 0);
+      c.position.set((i-2)*0.62, baseY + 0.72, 0);
       c.rotation.x = -Math.PI/2;
       cardsGroup.add(c);
       pokerState.community.push(c);
