@@ -1,19 +1,16 @@
-// /js/scarlett1/spine.js — FULL SPINE (render + diagnostics + controls + eagle view)
-// Spine owns renderer/camera/loop. Restores your existing diagnostic + control modules safely.
+// /js/scarlett1/spine.js — FULL (PERMANENT)
+// Restores your Diagnostics overlay + adds guaranteed Android movement joysticks.
+// Eagle-view spawn (not downstairs).
 
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 import { buildWorld } from "./world.js";
-
-// Import entire modules so we don’t depend on exact exported names
-import * as DiagnosticsMod from "./diagnostics.js";
-import * as DevHudMod from "./devhud.js";
-import * as AndroidControlsMod from "./androidControls.js";
+import { Diagnostics } from "./diagnostics.js";
 
 export class Spine {
   constructor(opts = {}) {
     this.opts = {
       mountId: opts.mountId || "app",
-      debug: opts.debug !== false, // default true
+      debug: true,
     };
 
     this.scene = new THREE.Scene();
@@ -26,8 +23,7 @@ export class Spine {
       250
     );
 
-    // ✅ NATURAL FLOOR / EAGLE VIEW
-    // You start on the rim level, looking slightly down into the center.
+    // ✅ Eagle-view spawn: standing near rim looking down
     this.camera.position.set(0, 2.0, 11.5);
     this.camera.lookAt(0, 0.8, 0);
 
@@ -36,46 +32,53 @@ export class Spine {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.xr.enabled = true;
 
-    this._diag = null;
-    this._worldReady = false;
-
-    // fallback mover
+    // movement
     this._keys = Object.create(null);
-    this._moveTick = null;
+    this._stick = {
+      moveX: 0,
+      moveY: 0,
+      turnX: 0,
+    };
+
+    this._ui = {
+      diagVisible: true,
+      diagRoot: null,
+    };
   }
 
   start() {
     this._mountRenderer();
     this._installFailsafeLights();
 
-    // Build world (small sink pit + pedestal floor + table/chairs)
+    // ✅ Bring your real diagnostics back
+    this._mountDiagnostics();
+
+    Diagnostics.log("[boot] entry");
+    Diagnostics.log("[boot] renderer mounted");
+    Diagnostics.log("[boot] building world…");
+
     buildWorld(this.scene);
-    this._worldReady = true;
 
-    // ✅ Restore your existing Scarlett diagnostic/dev systems safely
-    this._tryMountDiagnostics();
-    this._tryMountDevHUD();
-    this._tryInitAndroidControls();
+    Diagnostics.log("[boot] world built ✅");
+    Diagnostics.log("[boot] controls init…");
 
-    // ✅ Guaranteed movement fallback (WASD on desktop, and gives us a safety net)
-    this._enableBasicMovementFallback();
+    // ✅ Guaranteed movement (touch sticks + WASD fallback)
+    this._enableKeyboardFallback();
+    this._enableTouchJoysticks();
 
-    if (this.opts.debug) this._mountMinimalDiag(); // extra: always visible status
+    this._mountDiagButtons();
+
+    Diagnostics.log("[boot] ready");
 
     this.renderer.setAnimationLoop(() => {
       this.tick();
       this.renderer.render(this.scene, this.camera);
-      if (this._diag) this._diagUpdate();
     });
-
-    console.log("[spine] started");
   }
 
   tick() {
-    // fallback movement
-    this._moveTick?.();
-
-    // if your own modules hook into tick via global/state, they will run independently
+    // movement each frame
+    this._applyMovement();
   }
 
   onResize() {
@@ -88,7 +91,7 @@ export class Spine {
 
   async enterVR() {
     if (!navigator.xr) {
-      console.warn("[xr] navigator.xr not available");
+      Diagnostics.warn("[xr] navigator.xr not available");
       return;
     }
     try {
@@ -96,9 +99,9 @@ export class Spine {
         optionalFeatures: ["local-floor", "bounded-floor"],
       });
       await this.renderer.xr.setSession(session);
-      console.log("[xr] session started");
+      Diagnostics.log("[xr] session started ✅");
     } catch (e) {
-      console.warn("[xr] failed:", e);
+      Diagnostics.error(`[xr] failed: ${e?.message || e}`);
     }
   }
 
@@ -106,15 +109,11 @@ export class Spine {
 
   _mountRenderer() {
     const mount = document.getElementById(this.opts.mountId) || document.body;
-
-    // Clear mount so old canvases don’t pile up
     while (mount.firstChild) mount.removeChild(mount.firstChild);
-
     mount.appendChild(this.renderer.domElement);
   }
 
   _installFailsafeLights() {
-    // Stable bright lighting (won’t fight your lighting module, but prevents darkness)
     const hemi = new THREE.HemisphereLight(0xffffff, 0x1b2238, 1.0);
     this.scene.add(hemi);
 
@@ -131,167 +130,209 @@ export class Spine {
     this.scene.add(rim);
   }
 
-  _tryMountDiagnostics() {
-    // Try common function names without breaking if they don’t exist
-    const candidates = [
-      "mountDiagnostics",
-      "initDiagnostics",
-      "Diagnostics",
-      "startDiagnostics",
-      "bootDiagnostics",
-    ];
-
-    for (const name of candidates) {
-      const fn = DiagnosticsMod?.[name];
-      if (typeof fn === "function") {
-        try {
-          fn({ scene: this.scene, camera: this.camera, renderer: this.renderer });
-          console.log(`[spine] diagnostics mounted via ${name}()`);
-          return;
-        } catch (e) {
-          console.warn(`[spine] diagnostics ${name}() error:`, e);
-        }
-      }
+  _mountDiagnostics() {
+    try {
+      Diagnostics.mount();
+      Diagnostics.log("Diagnostics mounted");
+      Diagnostics.log(`Android touch=${("ontouchstart" in window) || (navigator.maxTouchPoints > 0)}`);
+      Diagnostics.log(`XR=${!!navigator.xr}`);
+    } catch (e) {
+      // If diagnostics itself fails, at least console it
+      console.warn("Diagnostics.mount failed", e);
     }
 
-    // Also support default export as function
-    if (typeof DiagnosticsMod?.default === "function") {
-      try {
-        DiagnosticsMod.default({ scene: this.scene, camera: this.camera, renderer: this.renderer });
-        console.log("[spine] diagnostics mounted via default()");
-        return;
-      } catch (e) {
-        console.warn("[spine] diagnostics default() error:", e);
-      }
-    }
-
-    console.warn("[spine] diagnostics module present but no known mount function found");
+    // Pipe global errors into diagnostics
+    window.addEventListener("error", (e) => {
+      Diagnostics.error(e?.message || "Unknown window error");
+    });
+    window.addEventListener("unhandledrejection", (e) => {
+      const msg = (e?.reason && (e.reason.stack || e.reason.message)) || String(e?.reason || "Unhandled rejection");
+      Diagnostics.error(msg);
+    });
   }
 
-  _tryMountDevHUD() {
-    const candidates = [
-      "mountDevHUD",
-      "initDevHUD",
-      "DevHUD",
-      "startDevHUD",
-      "bootDevHUD",
-    ];
+  _mountDiagButtons() {
+    // Small overlay buttons: Copy Report + Hide/Show
+    const wrap = document.createElement("div");
+    wrap.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 999999;
+      display: flex;
+      gap: 10px;
+      pointer-events: auto;
+    `;
 
-    for (const name of candidates) {
-      const fn = DevHudMod?.[name];
-      if (typeof fn === "function") {
-        try {
-          fn({ scene: this.scene, camera: this.camera, renderer: this.renderer });
-          console.log(`[spine] devhud mounted via ${name}()`);
-          return;
-        } catch (e) {
-          console.warn(`[spine] devhud ${name}() error:`, e);
-        }
-      }
-    }
+    const btn = (label) => {
+      const b = document.createElement("button");
+      b.textContent = label;
+      b.style.cssText = `
+        padding: 10px 14px;
+        border-radius: 14px;
+        background: rgba(20,30,60,0.85);
+        color: #cfe3ff;
+        border: 1px solid rgba(80,120,255,0.4);
+        font: 12px system-ui, -apple-system, sans-serif;
+      `;
+      return b;
+    };
 
-    if (typeof DevHudMod?.default === "function") {
-      try {
-        DevHudMod.default({ scene: this.scene, camera: this.camera, renderer: this.renderer });
-        console.log("[spine] devhud mounted via default()");
-        return;
-      } catch (e) {
-        console.warn("[spine] devhud default() error:", e);
-      }
-    }
+    const copy = btn("Copy Report");
+    copy.onclick = async () => {
+      const ok = await Diagnostics.copyReport();
+      if (ok) Diagnostics.log("[copy] report copied ✅");
+      else Diagnostics.warn("[copy] failed ❌");
+    };
 
-    // Not fatal
+    const hide = btn("Hide");
+    hide.onclick = () => {
+      const el = document.getElementById("scarlett-diagnostics");
+      if (!el) return;
+      this._ui.diagVisible = !this._ui.diagVisible;
+      el.style.display = this._ui.diagVisible ? "block" : "none";
+      hide.textContent = this._ui.diagVisible ? "Hide" : "Show";
+    };
+
+    wrap.appendChild(copy);
+    wrap.appendChild(hide);
+    document.body.appendChild(wrap);
   }
 
-  _tryInitAndroidControls() {
-    const candidates = [
-      "initAndroidControls",
-      "AndroidControls",
-      "startAndroidControls",
-      "mountAndroidControls",
-      "init",
-      "start",
-    ];
-
-    for (const name of candidates) {
-      const fn = AndroidControlsMod?.[name];
-      if (typeof fn === "function") {
-        try {
-          fn({ camera: this.camera, renderer: this.renderer, scene: this.scene });
-          console.log(`[spine] android controls via ${name}()`);
-          return;
-        } catch (e) {
-          console.warn(`[spine] androidControls ${name}() error:`, e);
-        }
-      }
-    }
-
-    if (typeof AndroidControlsMod?.default === "function") {
-      try {
-        AndroidControlsMod.default({ camera: this.camera, renderer: this.renderer, scene: this.scene });
-        console.log("[spine] android controls via default()");
-        return;
-      } catch (e) {
-        console.warn("[spine] androidControls default() error:", e);
-      }
-    }
-
-    console.warn("[spine] android controls not attached (fallback mover still active)");
-  }
-
-  _enableBasicMovementFallback() {
-    // Desktop keys (and a “safety net” if touch module doesn’t attach)
+  _enableKeyboardFallback() {
     window.addEventListener("keydown", (e) => (this._keys[e.key.toLowerCase()] = true));
     window.addEventListener("keyup", (e) => (this._keys[e.key.toLowerCase()] = false));
+  }
 
-    this._moveTick = () => {
-      const speed = 0.06;
+  _enableTouchJoysticks() {
+    // Two transparent touch pads (left=move, right=turn) so you can ALWAYS move on Android
+    const makePad = (side) => {
+      const pad = document.createElement("div");
+      pad.style.cssText = `
+        position: fixed;
+        bottom: 90px;
+        ${side}: 18px;
+        width: 150px;
+        height: 150px;
+        border-radius: 999px;
+        border: 2px solid rgba(80,120,255,0.35);
+        background: rgba(10,14,24,0.20);
+        z-index: 999998;
+        touch-action: none;
+        pointer-events: auto;
+      `;
 
-      // forward/back relative to camera facing
-      const forward = new THREE.Vector3();
-      this.camera.getWorldDirection(forward);
-      forward.y = 0;
-      forward.normalize();
+      const knob = document.createElement("div");
+      knob.style.cssText = `
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 70px;
+        height: 70px;
+        transform: translate(-50%, -50%);
+        border-radius: 999px;
+        border: 2px solid rgba(80,120,255,0.45);
+        background: rgba(30,40,70,0.35);
+      `;
+      pad.appendChild(knob);
 
-      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+      let activeId = null;
 
-      if (this._keys["w"]) this.camera.position.addScaledVector(forward, speed);
-      if (this._keys["s"]) this.camera.position.addScaledVector(forward, -speed);
-      if (this._keys["a"]) this.camera.position.addScaledVector(right, speed);
-      if (this._keys["d"]) this.camera.position.addScaledVector(right, -speed);
+      const setKnob = (dx, dy) => {
+        knob.style.transform = `translate(${dx}px, ${dy}px)`;
+      };
+
+      const reset = () => {
+        activeId = null;
+        if (side === "left") {
+          this._stick.moveX = 0;
+          this._stick.moveY = 0;
+        } else {
+          this._stick.turnX = 0;
+        }
+        knob.style.transform = "translate(-50%, -50%)";
+      };
+
+      pad.addEventListener("pointerdown", (e) => {
+        activeId = e.pointerId;
+        pad.setPointerCapture(activeId);
+      });
+
+      pad.addEventListener("pointermove", (e) => {
+        if (e.pointerId !== activeId) return;
+        const r = pad.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+
+        let dx = e.clientX - cx;
+        let dy = e.clientY - cy;
+
+        const max = 50;
+        const len = Math.hypot(dx, dy);
+        if (len > max) {
+          dx = (dx / len) * max;
+          dy = (dy / len) * max;
+        }
+
+        // normalize -1..1
+        const nx = dx / max;
+        const ny = dy / max;
+
+        if (side === "left") {
+          this._stick.moveX = nx;
+          this._stick.moveY = -ny;
+        } else {
+          this._stick.turnX = nx;
+        }
+
+        // knob visual (relative)
+        knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+      });
+
+      pad.addEventListener("pointerup", (e) => {
+        if (e.pointerId !== activeId) return;
+        reset();
+      });
+
+      pad.addEventListener("pointercancel", reset);
+
+      document.body.appendChild(pad);
     };
+
+    // Only show pads on touch devices
+    const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
+    if (!isTouch) return;
+
+    makePad("left");
+    makePad("right");
+
+    Diagnostics.log("[input] touch joysticks visible ✅");
   }
 
-  _mountMinimalDiag() {
-    // This does NOT replace your diagnostics — it’s a guaranteed “is it alive” badge.
-    const hud = document.createElement("div");
-    hud.id = "scarlett-diag-mini";
-    hud.style.position = "fixed";
-    hud.style.top = "10px";
-    hud.style.left = "10px";
-    hud.style.zIndex = "99999";
-    hud.style.background = "rgba(10,14,24,0.72)";
-    hud.style.border = "1px solid rgba(80,120,255,0.35)";
-    hud.style.borderRadius = "12px";
-    hud.style.padding = "10px 12px";
-    hud.style.color = "#cfe3ff";
-    hud.style.fontFamily = "monospace";
-    hud.style.fontSize = "12px";
-    hud.style.maxWidth = "88vw";
-    hud.style.pointerEvents = "none";
-    document.body.appendChild(hud);
+  _applyMovement() {
+    // WASD fallback + touch joystick movement
+    const speed = 0.07;
 
-    this._diag = hud;
-    this._diagUpdate();
-  }
+    const forward = new THREE.Vector3();
+    this.camera.getWorldDirection(forward);
+    forward.y = 0;
+    forward.normalize();
 
-  _diagUpdate() {
-    const objCount = this.scene?.children?.length ?? 0;
-    const cam = this.camera.position;
-    this._diag.innerHTML =
-      `SCARLETT DIAG<br>` +
-      `world: ${this._worldReady ? "OK" : "…"}<br>` +
-      `objects: ${objCount}<br>` +
-      `cam: ${cam.x.toFixed(2)}, ${cam.y.toFixed(2)}, ${cam.z.toFixed(2)}`;
+    const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+
+    // keyboard
+    if (this._keys["w"]) this.camera.position.addScaledVector(forward, speed);
+    if (this._keys["s"]) this.camera.position.addScaledVector(forward, -speed);
+    if (this._keys["a"]) this.camera.position.addScaledVector(right, speed);
+    if (this._keys["d"]) this.camera.position.addScaledVector(right, -speed);
+
+    // touch move
+    if (Math.abs(this._stick.moveY) > 0.02) this.camera.position.addScaledVector(forward, this._stick.moveY * speed);
+    if (Math.abs(this._stick.moveX) > 0.02) this.camera.position.addScaledVector(right, this._stick.moveX * speed);
+
+    // touch turn
+    if (Math.abs(this._stick.turnX) > 0.02) {
+      this.camera.rotation.y -= this._stick.turnX * 0.03;
+    }
   }
-              }
+      }
