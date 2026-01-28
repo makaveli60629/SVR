@@ -1,15 +1,7 @@
-// /index.js — FULL ROOT BOOTLOADER (Spine owns rendering)
-import { Spine } from "./js/scarlett1/spine.js";
+// /index.js — ROOT ENTRY (PERMANENT)
+// Loads Scarlett1 world always.
 
-console.log("[root] boot");
+import { Scarlett1 } from "./js/scarlett1/index.js";
 
-const spine = new Spine({
-  mountId: "app",
-  debug: true,
-});
-
-spine.start();
-
-window.addEventListener("resize", () => spine.onResize());
-
-document.addEventListener("scarlett-enter-vr", () => spine.enterVR());
+console.log("🚀 ROOT index.js loaded");
+Scarlett1.start();
