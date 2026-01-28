@@ -1,26 +1,33 @@
 // /js/scarlett1/spine.js
-// SCARLETT1 • SPINE (PERMANENT)
-// - Owns renderer/camera/loop
-// - Mounts your Diagnostics overlay (Diagnostics.mount())
-// - Adds Copy Report + Hide/Show buttons (top-right)
-// - Adds guaranteed Android touch joysticks (move + turn) so you can ALWAYS move
-// - Eagle-view spawn (rim level looking down into pit)
-// - Hooks Enter VR from index.html via "scarlett-enter-vr" event
-// - Optional full male avatar spawn (if you add modules/maleAvatar.js)
+// SCARLETT1 • SPINE (PERMANENT) — FULL FEATURE PACK
+// + Rim Walk Path Lock
+// + Stairs (visual) animate in/out
+// + Spectator Rail
+// + Auto Eagle-View Snap
+// + NPCs walking the rim
+// + Diagnostics + Android Touch Joysticks + Enter VR hook
 
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 import { buildWorld } from "./world.js";
 import { Diagnostics } from "./diagnostics.js";
 
-// OPTIONAL: if you created /js/scarlett1/modules/maleAvatar.js
-// import { spawnMaleFull } from "./modules/maleAvatar.js";
-
 export class Spine {
   constructor(opts = {}) {
     this.opts = {
       mountId: opts.mountId || "app",
-      debug: opts.debug !== false, // default true
+      debug: opts.debug !== false,
     };
+
+    // --- World scale assumptions (match your world.js defaults) ---
+    this.PIT_RADIUS = 10.0;
+
+    // Rim walk path constraints
+    this.RIM_INNER = this.PIT_RADIUS + 0.9;   // cannot go inside this (prevents falling in)
+    this.RIM_OUTER = this.PIT_RADIUS + 6.5;   // keep player near the pit area
+
+    // Eagle view target (NOT basement)
+    this.EAGLE_POS = new THREE.Vector3(0, 1.65, 8.5);
+    this.EAGLE_LOOK = new THREE.Vector3(0, 0.4, 0);
 
     // Core 3D
     this.scene = new THREE.Scene();
@@ -33,9 +40,9 @@ export class Spine {
       300
     );
 
-    // ✅ Eagle-view spawn: "walkway" level looking down at center
-    this.camera.position.set(0, 2.0, 11.5);
-    this.camera.lookAt(0, 0.8, 0);
+    // ✅ Start at rim floor level, looking slightly down into center
+    this.camera.position.copy(this.EAGLE_POS);
+    this.camera.lookAt(this.EAGLE_LOOK);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     this.renderer.setPixelRatio(window.devicePixelRatio || 1);
@@ -45,19 +52,21 @@ export class Spine {
     // Input state
     this._keys = Object.create(null);
     this._stick = { moveX: 0, moveY: 0, turnX: 0 };
-
-    // UI refs
-    this._ui = {
-      diagVisible: true,
-      buttonsMounted: false,
-      padsMounted: false,
-    };
+    this._lastInputAt = performance.now();
 
     // Movement tuning
-    this._moveSpeed = 0.085;
+    this._moveSpeed = 0.090;
     this._turnSpeed = 0.032;
 
-    // For clean init
+    // World objects we add
+    this._spectatorRail = null;
+    this._stairs = [];
+    this._npcs = [];
+
+    // For smooth snap
+    this._snapBlend = 0; // 0..1
+    this._snapActive = false;
+
     this._started = false;
   }
 
@@ -68,58 +77,72 @@ export class Spine {
     this._mountRenderer();
     this._installFailsafeLights();
 
-    // ✅ Diagnostics
+    // ✅ Diagnostics overlay (your exact export)
     try {
       Diagnostics.mount();
-      Diagnostics.log("Diagnostics mounted");
+      Diagnostics.log("[boot] entry");
+      Diagnostics.log("[boot] Diagnostics mounted");
       Diagnostics.log(`[boot] href=${location.href}`);
+      Diagnostics.log(`[boot] secureContext=${window.isSecureContext}`);
       Diagnostics.log(`[boot] touch=${("ontouchstart" in window) || (navigator.maxTouchPoints > 0)} maxTouchPoints=${navigator.maxTouchPoints || 0}`);
       Diagnostics.log(`[boot] xr=${!!navigator.xr}`);
     } catch (e) {
       console.warn("Diagnostics.mount failed", e);
     }
 
-    // Global error capture -> Diagnostics (you already do this in Diagnostics.mount(),
-    // but we keep it safe if mount is changed later)
-    window.addEventListener("error", (e) => {
-      try { Diagnostics.error(e?.message || "Unknown window error"); } catch {}
-    });
-    window.addEventListener("unhandledrejection", (e) => {
-      const msg = (e?.reason && (e.reason.stack || e.reason.message)) || String(e?.reason || "Unhandled rejection");
-      try { Diagnostics.error(msg); } catch {}
-    });
-
     Diagnostics.log("[boot] building world…");
     buildWorld(this.scene);
     Diagnostics.log("[boot] world built ✅");
 
-    // OPTIONAL: Spawn full male avatar if you installed the module
-    // try {
-    //   spawnMaleFull(this.scene, { position: new THREE.Vector3(2.2, 0.0, 0.2), rotationY: Math.PI, scale: 1.0 });
-    //   Diagnostics.log("[avatar] male full spawned ✅");
-    // } catch (e) {
-    //   Diagnostics.warn("[avatar] male full spawn failed (module missing?)");
-    // }
+    // ✅ Add spectator rail (rim)
+    this._buildSpectatorRail();
+
+    // ✅ Add animated stairs (visual in/out)
+    this._buildAnimatedStairs();
+
+    // ✅ Add NPC passers-by on the rim
+    this._spawnNPCs(3);
 
     // ✅ Controls
     this._enableKeyboardFallback();
-    this._enableTouchJoysticks(); // guaranteed Android movement
-    this._mountTopButtons();      // Copy Report + Hide/Show diagnostics
+    this._enableTouchJoysticks();
 
     // Hook "Enter VR" event from index.html
     document.addEventListener("scarlett-enter-vr", () => this.enterVR());
 
-    Diagnostics.log("[boot] ready");
+    // Optional: hard snap at boot (prevents “basement” first frame)
+    this.snapToEagle(true);
 
     // Main loop
     this.renderer.setAnimationLoop(() => {
       this.tick();
       this.renderer.render(this.scene, this.camera);
     });
+
+    Diagnostics.log("[boot] ready ✅");
   }
 
   tick() {
+    const now = performance.now();
+
+    // movement + constraint
     this._applyMovement();
+
+    // animated stairs
+    this._updateStairs(now);
+
+    // NPCs
+    this._updateNPCs(now);
+
+    // auto eagle snap when idle (no input for 2.0s)
+    const idleMs = now - this._lastInputAt;
+    if (idleMs > 2000) {
+      // gently bias you back to the rim eagle stance if you drifted
+      this._autoEagleBias();
+    }
+
+    // ongoing snap blend (if active)
+    this._updateSnapBlend();
   }
 
   onResize() {
@@ -146,17 +169,294 @@ export class Spine {
     }
   }
 
-  // ---------------- Internals ----------------
+  // =========================
+  // Feature: Eagle View Snap
+  // =========================
+  snapToEagle(immediate = false) {
+    this._snapActive = true;
+    this._snapBlend = immediate ? 1 : 0;
+    if (immediate) {
+      this.camera.position.copy(this.EAGLE_POS);
+      this.camera.lookAt(this.EAGLE_LOOK);
+      // lock height
+      this.camera.position.y = this.EAGLE_POS.y;
+      this._snapActive = false;
+      Diagnostics.log("[cam] snapped to eagle view ✅");
+    } else {
+      Diagnostics.log("[cam] smoothing to eagle view…");
+    }
+  }
 
+  _updateSnapBlend() {
+    if (!this._snapActive) return;
+
+    // blend in ~0.35s
+    this._snapBlend += 0.06;
+    if (this._snapBlend >= 1) {
+      this._snapBlend = 1;
+      this._snapActive = false;
+      Diagnostics.log("[cam] eagle view complete ✅");
+    }
+
+    // Smooth move
+    const t = this._snapBlend;
+    this.camera.position.lerpVectors(this.camera.position, this.EAGLE_POS, t * 0.12);
+
+    // Smooth look (rotate toward target)
+    const currentDir = new THREE.Vector3();
+    this.camera.getWorldDirection(currentDir);
+    const targetDir = new THREE.Vector3().subVectors(this.EAGLE_LOOK, this.camera.position).normalize();
+    currentDir.lerp(targetDir, t * 0.10).normalize();
+    const lookPos = new THREE.Vector3().addVectors(this.camera.position, currentDir);
+    this.camera.lookAt(lookPos);
+
+    // lock height
+    this.camera.position.y = this.EAGLE_POS.y;
+  }
+
+  _autoEagleBias() {
+    // Soft pull toward eagle radius/heading without yanking control.
+    // Only acts if you drift too close to pit edge or too far away.
+    const p = this.camera.position;
+    const r = Math.hypot(p.x, p.z);
+
+    // if too close to pit edge, push outward slightly
+    if (r < this.RIM_INNER + 0.35) {
+      const s = (this.RIM_INNER + 0.35) / Math.max(r, 0.0001);
+      p.x *= s;
+      p.z *= s;
+    }
+
+    // if too far, pull inward slightly
+    if (r > this.RIM_OUTER) {
+      const s = (this.RIM_OUTER) / r;
+      p.x *= s;
+      p.z *= s;
+    }
+
+    // gently bias your Z toward eagle stance (keeps “walk by” viewpoint)
+    p.z = THREE.MathUtils.lerp(p.z, this.EAGLE_POS.z, 0.01);
+    p.x = THREE.MathUtils.lerp(p.x, this.EAGLE_POS.x, 0.01);
+
+    // lock height (prevents “basement” perception)
+    p.y = this.EAGLE_POS.y;
+  }
+
+  // =========================
+  // Feature: Rim Walk Lock
+  // =========================
+  _constrainToRim() {
+    const p = this.camera.position;
+    const r = Math.hypot(p.x, p.z);
+
+    // ✅ lock vertical movement always (prevents “falling into pit” feel)
+    p.y = this.EAGLE_POS.y;
+
+    // clamp radius to rim corridor
+    if (r < this.RIM_INNER) {
+      const s = this.RIM_INNER / Math.max(r, 0.0001);
+      p.x *= s;
+      p.z *= s;
+    } else if (r > this.RIM_OUTER) {
+      const s = this.RIM_OUTER / r;
+      p.x *= s;
+      p.z *= s;
+    }
+  }
+
+  // =========================
+  // Spectator Rail
+  // =========================
+  _buildSpectatorRail() {
+    const railGroup = new THREE.Group();
+    railGroup.name = "SPECTATOR_RAIL";
+
+    const radius = this.PIT_RADIUS - 0.10;
+    const y = 0.05;
+
+    // top glowing ring
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(radius, 0.06, 12, 220),
+      new THREE.MeshStandardMaterial({
+        color: 0x2a7cff,
+        roughness: 0.35,
+        metalness: 0.2,
+        emissive: 0x0b2a66,
+        emissiveIntensity: 1.2,
+      })
+    );
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = y + 1.05;
+    railGroup.add(ring);
+
+    // posts
+    const postMat = new THREE.MeshStandardMaterial({ color: 0x111524, roughness: 0.9 });
+    const postGeo = new THREE.CylinderGeometry(0.04, 0.04, 1.05, 10);
+
+    const posts = 24;
+    for (let i = 0; i < posts; i++) {
+      const a = (i / posts) * Math.PI * 2;
+      const post = new THREE.Mesh(postGeo, postMat);
+      post.position.set(Math.cos(a) * radius, y + 0.52, Math.sin(a) * radius);
+      railGroup.add(post);
+    }
+
+    // mid rail ring
+    const mid = new THREE.Mesh(
+      new THREE.TorusGeometry(radius, 0.03, 10, 180),
+      new THREE.MeshStandardMaterial({ color: 0x1b2238, roughness: 0.8, metalness: 0.1 })
+    );
+    mid.rotation.x = Math.PI / 2;
+    mid.position.y = y + 0.62;
+    railGroup.add(mid);
+
+    this.scene.add(railGroup);
+    this._spectatorRail = railGroup;
+
+    Diagnostics.log("[rail] spectator rail added ✅");
+  }
+
+  // =========================
+  // Animated Stairs (visual)
+  // =========================
+  _buildAnimatedStairs() {
+    const stairsCount = 4;
+    const stairSteps = 7;
+    const stairsWidth = 2.4;
+    const run = 2.8;
+    const stepH = 0.18;
+
+    const edgeR = this.PIT_RADIUS - 0.30;
+
+    for (let i = 0; i < stairsCount; i++) {
+      const angle = (i / stairsCount) * Math.PI * 2;
+
+      const stairGroup = new THREE.Group();
+      stairGroup.name = `STAIRS_${i}`;
+
+      // base position at rim
+      stairGroup.position.set(Math.cos(angle) * edgeR, 0.02, Math.sin(angle) * edgeR);
+      stairGroup.rotation.y = -angle;
+
+      // steps
+      for (let s = 0; s < stairSteps; s++) {
+        const step = new THREE.Mesh(
+          new THREE.BoxGeometry(stairsWidth, 0.20, run / stairSteps),
+          new THREE.MeshStandardMaterial({ color: 0x1c2233, roughness: 0.95 })
+        );
+        step.position.y = s * stepH + 0.10;
+        step.position.z = -s * (run / stairSteps) - (run / stairSteps) / 2;
+        stairGroup.add(step);
+      }
+
+      // store anim data
+      this._stairs.push({
+        group: stairGroup,
+        baseZ: stairGroup.position.z,
+        baseX: stairGroup.position.x,
+        angle,
+        phase: Math.random() * Math.PI * 2,
+        // “in/out” amplitude (how far the stairs slide)
+        slide: 1.0,
+      });
+
+      this.scene.add(stairGroup);
+    }
+
+    Diagnostics.log("[stairs] animated stairs added ✅");
+  }
+
+  _updateStairs(now) {
+    // Visual only: stairs slide in/out slowly (breathing)
+    for (const s of this._stairs) {
+      const t = (now / 1000) + s.phase;
+      const wave = (Math.sin(t * 0.35) * 0.5 + 0.5); // 0..1
+      const slideOut = THREE.MathUtils.lerp(0.2, 1.2, wave); // amount sliding outward
+
+      // slide outward along its local forward axis
+      // since group rotation is set, easiest is radial move
+      const r = (this.PIT_RADIUS - 0.30) + slideOut;
+      s.group.position.x = Math.cos(s.angle) * r;
+      s.group.position.z = Math.sin(s.angle) * r;
+    }
+  }
+
+  // =========================
+  // NPCs walking the rim
+  // =========================
+  _spawnNPCs(count = 3) {
+    const npcRing = this.PIT_RADIUS + 4.6;
+
+    for (let i = 0; i < count; i++) {
+      const npc = this._makeNPC(`NPC_${i}`);
+      npc.userData = {
+        a: (i / count) * Math.PI * 2,
+        speed: 0.18 + Math.random() * 0.08,
+        r: npcRing + (Math.random() * 0.6 - 0.3),
+      };
+      this.scene.add(npc);
+      this._npcs.push(npc);
+    }
+
+    Diagnostics.log(`[npc] spawned ${count} rim walkers ✅`);
+  }
+
+  _makeNPC(name) {
+    const g = new THREE.Group();
+    g.name = name;
+
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2a2f3a, roughness: 0.9 });
+    const skinMat = new THREE.MeshStandardMaterial({ color: 0xd6b08c, roughness: 0.9 });
+
+    // torso
+    const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.45, 8, 14), bodyMat);
+    torso.position.y = 1.05;
+    g.add(torso);
+
+    // head
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 12), skinMat);
+    head.position.y = 1.52;
+    g.add(head);
+
+    // legs
+    const legGeo = new THREE.CylinderGeometry(0.07, 0.07, 0.55, 10);
+    const legL = new THREE.Mesh(legGeo, bodyMat);
+    const legR = new THREE.Mesh(legGeo, bodyMat);
+    legL.position.set(0.08, 0.35, 0);
+    legR.position.set(-0.08, 0.35, 0);
+    g.add(legL, legR);
+
+    return g;
+  }
+
+  _updateNPCs(now) {
+    const t = now / 1000;
+    for (const npc of this._npcs) {
+      npc.userData.a += npc.userData.speed * 0.01;
+      const a = npc.userData.a;
+      const r = npc.userData.r;
+
+      npc.position.set(Math.cos(a) * r, 0.0, Math.sin(a) * r);
+      npc.position.y = 0; // ground
+
+      // face direction of travel
+      npc.rotation.y = -a + Math.PI / 2;
+
+      // subtle bob (life)
+      npc.position.y = 0.02 + Math.sin(t * 3 + a) * 0.01;
+    }
+  }
+
+  // =========================
+  // Controls + Movement
+  // =========================
   _mountRenderer() {
     const mount = document.getElementById(this.opts.mountId) || document.body;
-    // clear mount to avoid stacked canvases
     while (mount.firstChild) mount.removeChild(mount.firstChild);
     mount.appendChild(this.renderer.domElement);
   }
 
   _installFailsafeLights() {
-    // Prevent dark scene even if other lighting modules fail
     const hemi = new THREE.HemisphereLight(0xffffff, 0x1b2238, 1.0);
     this.scene.add(hemi);
 
@@ -173,74 +473,24 @@ export class Spine {
     this.scene.add(rim);
   }
 
-  _mountTopButtons() {
-    if (this._ui.buttonsMounted) return;
-    this._ui.buttonsMounted = true;
-
-    const wrap = document.createElement("div");
-    wrap.style.cssText = `
-      position:fixed;
-      top:10px; right:10px;
-      z-index:999999;
-      display:flex;
-      gap:10px;
-      pointer-events:auto;
-    `;
-
-    const mkBtn = (label) => {
-      const b = document.createElement("button");
-      b.textContent = label;
-      b.style.cssText = `
-        padding:10px 14px;
-        border-radius:14px;
-        background:rgba(20,30,60,0.85);
-        color:#cfe3ff;
-        border:1px solid rgba(80,120,255,0.4);
-        font:12px system-ui,-apple-system,sans-serif;
-      `;
-      return b;
-    };
-
-    const copy = mkBtn("Copy Report");
-    copy.onclick = async () => {
-      try {
-        const ok = await Diagnostics.copyReport();
-        ok ? Diagnostics.log("[copy] report copied ✅") : Diagnostics.warn("[copy] failed ❌");
-      } catch (e) {
-        Diagnostics.warn("[copy] exception");
-      }
-    };
-
-    const toggle = mkBtn("Hide");
-    toggle.onclick = () => {
-      const diag = document.getElementById("scarlett-diagnostics");
-      if (!diag) return;
-      this._ui.diagVisible = !this._ui.diagVisible;
-      diag.style.display = this._ui.diagVisible ? "block" : "none";
-      toggle.textContent = this._ui.diagVisible ? "Hide" : "Show";
-      Diagnostics.log(this._ui.diagVisible ? "[ui] diagnostics shown" : "[ui] diagnostics hidden");
-    };
-
-    wrap.appendChild(copy);
-    wrap.appendChild(toggle);
-    document.body.appendChild(wrap);
-  }
-
   _enableKeyboardFallback() {
-    window.addEventListener("keydown", (e) => (this._keys[e.key.toLowerCase()] = true));
-    window.addEventListener("keyup", (e) => (this._keys[e.key.toLowerCase()] = false));
+    window.addEventListener("keydown", (e) => {
+      this._keys[e.key.toLowerCase()] = true;
+      this._lastInputAt = performance.now();
+    });
+    window.addEventListener("keyup", (e) => {
+      this._keys[e.key.toLowerCase()] = false;
+      this._lastInputAt = performance.now();
+    });
   }
 
   _enableTouchJoysticks() {
-    if (this._ui.padsMounted) return;
-
     const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
     if (!isTouch) return;
 
-    this._ui.padsMounted = true;
-
     const makePad = (side) => {
       const pad = document.createElement("div");
+      pad.classList.add("scar-pad");
       pad.style.cssText = `
         position: fixed;
         bottom: 90px;
@@ -283,10 +533,12 @@ export class Spine {
       pad.addEventListener("pointerdown", (e) => {
         activeId = e.pointerId;
         pad.setPointerCapture(activeId);
+        this._lastInputAt = performance.now();
       });
 
       pad.addEventListener("pointermove", (e) => {
         if (e.pointerId !== activeId) return;
+        this._lastInputAt = performance.now();
 
         const r = pad.getBoundingClientRect();
         const cx = r.left + r.width / 2;
@@ -317,6 +569,7 @@ export class Spine {
 
       pad.addEventListener("pointerup", (e) => {
         if (e.pointerId !== activeId) return;
+        this._lastInputAt = performance.now();
         reset();
       });
       pad.addEventListener("pointercancel", reset);
@@ -327,14 +580,14 @@ export class Spine {
     makePad("left");  // move
     makePad("right"); // turn
 
-    Diagnostics.log("[input] Android touch joysticks visible ✅");
+    Diagnostics.log("[input] Android joysticks visible ✅");
   }
 
   _applyMovement() {
     const speed = this._moveSpeed;
     const turn = this._turnSpeed;
 
-    // Forward/right vectors from camera
+    // forward/right vectors from camera
     const forward = new THREE.Vector3();
     this.camera.getWorldDirection(forward);
     forward.y = 0;
@@ -343,18 +596,20 @@ export class Spine {
     const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0));
     if (right.lengthSq() > 0.0001) right.normalize();
 
-    // Keyboard WASD
-    if (this._keys["w"]) this.camera.position.addScaledVector(forward, speed);
-    if (this._keys["s"]) this.camera.position.addScaledVector(forward, -speed);
-    if (this._keys["a"]) this.camera.position.addScaledVector(right, speed);
-    if (this._keys["d"]) this.camera.position.addScaledVector(right, -speed);
+    // keyboard WASD
+    if (this._keys["w"]) { this.camera.position.addScaledVector(forward, speed); this._lastInputAt = performance.now(); }
+    if (this._keys["s"]) { this.camera.position.addScaledVector(forward, -speed); this._lastInputAt = performance.now(); }
+    if (this._keys["a"]) { this.camera.position.addScaledVector(right, speed); this._lastInputAt = performance.now(); }
+    if (this._keys["d"]) { this.camera.position.addScaledVector(right, -speed); this._lastInputAt = performance.now(); }
 
-    // Touch sticks
+    // touch movement
     if (Math.abs(this._stick.moveY) > 0.02) this.camera.position.addScaledVector(forward, this._stick.moveY * speed);
     if (Math.abs(this._stick.moveX) > 0.02) this.camera.position.addScaledVector(right, this._stick.moveX * speed);
 
-    if (Math.abs(this._stick.turnX) > 0.02) {
-      this.camera.rotation.y -= this._stick.turnX * turn;
-    }
+    // touch turn
+    if (Math.abs(this._stick.turnX) > 0.02) this.camera.rotation.y -= this._stick.turnX * turn;
+
+    // ✅ Lock to rim corridor + lock height
+    this._constrainToRim();
   }
-  }
+      }
