@@ -182,6 +182,12 @@ function start() {
   const PIT_Y = -2.0;
   const PIT_R = 5.2; // Radius for pit lip/rail sync
 
+  // Publish pit constants for any module scope that needs them
+  window.__scarlettGlobals = window.__scarlettGlobals || {};
+  window.__scarlettGlobals.PIT_Y = PIT_Y;
+  window.__scarlettGlobals.PIT_R = PIT_R;
+
+
   // Room group
   const room = new THREE.Group();
   scene.add(room);
@@ -306,7 +312,7 @@ function start() {
     const railMat = new THREE.MeshStandardMaterial({ color: 0x101830, roughness: 0.55, metalness: 0.35, emissive: new THREE.Color(0x0b1230), emissiveIntensity: 0.25 });
 
     // Rail ring closer to pit (guards the center table)
-    const rail = new THREE.Mesh(new THREE.TorusGeometry((PIT_R+1.2), 0.08, 14, 220), railMat);
+    const rail = new THREE.Mesh(new THREE.TorusGeometry(((window.__scarlettGlobals?.PIT_R ?? 5.2)+1.2), 0.08, 14, 220), railMat);
     rail.rotation.x = Math.PI/2;
     rail.position.y = 0.95;
     lounge.add(rail);
