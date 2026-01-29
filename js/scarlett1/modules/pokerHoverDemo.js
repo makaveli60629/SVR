@@ -1,37 +1,37 @@
-/**
- * MODULE: pokerHoverDemo.js
- * Simple hover-cards demo so you see "real cards hover" behavior.
- * (Not full poker yet, but proves the layout & animation.)
- */
-export async function init(ctx){
-  const { THREE, scene, log } = ctx;
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
+export async function init(ctx){
+  const { scene, addLine } = ctx;
   const cards = new THREE.Group();
-  cards.name = "HoverCards";
+  cards.position.set(0, -2.2 + 2.1, 0); // sit above table top if table is at pitY+0.7
   scene.add(cards);
 
-  const mat = new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.6, metalness:0.05 });
-  const geo = new THREE.BoxGeometry(0.75, 0.02, 1.05);
+  const geo = new THREE.PlaneGeometry(0.6, 0.9);
+  const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8, metalness: 0.0 });
+  const meshA = new THREE.Mesh(geo, mat);
+  const meshB = new THREE.Mesh(geo, mat.clone());
+  const meshC = new THREE.Mesh(geo, mat.clone());
+  meshA.position.set(-0.8, 0.05, 0);
+  meshB.position.set(0, 0.05, 0);
+  meshC.position.set(0.8, 0.05, 0);
+  [meshA, meshB, meshC].forEach(m => { m.rotation.x = -Math.PI/2; cards.add(m); });
 
-  const y = -1.65 + 1.95; // above pit floor, near table top
-  const r = 0.9;
+  let t = 0;
+  ctx.__updates = ctx.__updates || [];
+  ctx.__updates.push((dt)=>{
+    t += dt;
+    cards.position.y = (-2.2 + 2.1) + Math.sin(t*2) * 0.05;
+  });
 
-  for (let i=0;i<5;i++){
-    const c = new THREE.Mesh(geo, mat);
-    c.position.set((i-2)*0.85, y, -0.2);
-    c.rotation.x = -Math.PI/2;
-    cards.add(c);
+  // Hook into render loop if bootHud didn't expose update loop: use renderer setAnimationLoop already; we can't inject.
+  // So just use requestAnimationFrame for this module.
+  let last = performance.now();
+  function loop(now){
+    const dt = (now-last)/1000; last = now;
+    if (ctx.__updates) for (const u of ctx.__updates) u(dt);
+    requestAnimationFrame(loop);
   }
+  requestAnimationFrame(loop);
 
-  log('[poker] hover-card demo armed ✅');
-
-  let t=0;
-  return {
-    updates:[(dt)=>{
-      t+=dt;
-      cards.children.forEach((c,i)=>{
-        c.position.y = y + Math.sin(t*1.8 + i*0.6)*0.05;
-      });
-    }]
-  };
+  addLine("[poker] hover-card demo armed ✅");
 }

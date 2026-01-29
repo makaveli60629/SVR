@@ -1,32 +1,13 @@
-/**
- * MODULE: storePad.js
- * Adds a purple Store Pad near the Store Door (tap center-screen to open store UI).
- */
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+
 export async function init(ctx){
-  const { THREE, scene, log } = ctx;
-  const outerR = 70.0;
-  const storeAngle = 0;
-
+  const { scene, addLine } = ctx;
   const pad = new THREE.Mesh(
-    new THREE.CircleGeometry(0.7, 48),
-    new THREE.MeshBasicMaterial({ color:0x8a2be2, transparent:true, opacity:0.55 })
+    new THREE.BoxGeometry(1.2, 0.12, 1.2),
+    new THREE.MeshStandardMaterial({ color: 0x5b2cff, emissive: 0x2a00aa, emissiveIntensity: 1.0 })
   );
-  pad.rotation.x = -Math.PI/2;
-  pad.position.set(Math.cos(storeAngle)*(outerR-2.0), 0.02, Math.sin(storeAngle)*(outerR-2.0));
-  pad.name = "STORE_PAD";
+  pad.position.set(3.5, 0.06, 10.5);
+  pad.name = "storePad";
   scene.add(pad);
-
-  log('[store] pad placed ✅');
-
-  return {
-    interactables:[pad],
-    hooks:{
-      onStorePad: ()=>{
-        const el = document.getElementById('storePanel');
-        if (!el) return;
-        el.style.display = (el.style.display==='none' || !el.style.display) ? 'block' : 'none';
-        log('[store] pad activated ✅');
-      }
-    }
-  };
+  addLine("[store] pad placed ✅");
 }
