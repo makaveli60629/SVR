@@ -28,8 +28,6 @@ export const Spine = (() => {
     xrButtonEl: null,
     worldUpdates: [],
     worldInteractables: [],
-
-    // XR
     controller1: null,
     controller2: null,
     grip1: null,
@@ -71,12 +69,9 @@ export const Spine = (() => {
 
   function animate() {
     const dt = S.clock.getDelta();
-
-    // Run Scarlett1 per-frame updates
     for (let i = 0; i < S.worldUpdates.length; i++) {
       try { S.worldUpdates[i](dt); } catch (e) {}
     }
-
     S.renderer.render(S.scene, S.camera);
   }
 
@@ -84,13 +79,11 @@ export const Spine = (() => {
     const controllerModelFactory = new XRControllerModelFactory();
     const handModelFactory = new XRHandModelFactory();
 
-    // Controllers (target ray space)
     S.controller1 = S.renderer.xr.getController(0);
     S.controller2 = S.renderer.xr.getController(1);
     S.scene.add(S.controller1);
     S.scene.add(S.controller2);
 
-    // Visible ray lines (so you KNOW controllers are working)
     const rayGeo = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0,0,0),
       new THREE.Vector3(0,0,-1),
@@ -105,7 +98,6 @@ export const Spine = (() => {
     ray2.scale.z = 4;
     S.controller2.add(ray2);
 
-    // Controller grips (models)
     S.grip1 = S.renderer.xr.getControllerGrip(0);
     S.grip1.add(controllerModelFactory.createControllerModel(S.grip1));
     S.scene.add(S.grip1);
@@ -114,7 +106,6 @@ export const Spine = (() => {
     S.grip2.add(controllerModelFactory.createControllerModel(S.grip2));
     S.scene.add(S.grip2);
 
-    // Hands (Quest hand tracking)
     S.hand1 = S.renderer.xr.getHand(0);
     S.hand1.add(handModelFactory.createHandModel(S.hand1, 'mesh'));
     S.scene.add(S.hand1);
@@ -135,7 +126,6 @@ export const Spine = (() => {
     S.scene = new THREE.Scene();
     S.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 500);
 
-    // Rig wrapper (future locomotion can move rig instead of camera)
     S.rig = new THREE.Group();
     S.scene.add(S.rig);
     S.rig.add(S.camera);
@@ -151,21 +141,17 @@ export const Spine = (() => {
     S.clock = new THREE.Clock();
     window.addEventListener('resize', resize);
 
-    // ✅ XR Hands + Controllers (does not affect non-XR)
     try { mountXRHandsAndControllers(); }
     catch (e) { S.diag?.warn?.('[xr] mount failed: ' + (e?.message || e)); }
 
-    // ✅ WORLD INIT (your exact contract)
     const log = (m) => S.diag?.log?.(m) || console.log(m);
     const worldResult = await initWorld({ THREE, scene: S.scene, camera: S.camera, log });
 
     S.worldUpdates = Array.isArray(worldResult?.updates) ? worldResult.updates : [];
     S.worldInteractables = Array.isArray(worldResult?.interactables) ? worldResult.interactables : [];
 
-    // ✅ SINGLE LOOP ONLY (prevents blinking)
     S.renderer.setAnimationLoop(animate);
 
-    // XR Button once
     if (!S.xrButtonEl) {
       S.xrButtonEl = XRButton.createButton(S.renderer);
       S.xrButtonEl.style.position = 'absolute';

@@ -1,40 +1,35 @@
 /**
- * diagnostics.js — ROOT (PERMANENT)
- * Zero dependencies. Never throws.
+ * diagnostics.js (ROOT) — PERMANENT
+ * Writes to #diag in index.html.
  */
-export function initDiagnostics(meta = {}) {
-  const el =
-    document.getElementById('diag') ||
-    document.getElementById('log') ||
-    (() => {
-      const p = document.createElement('pre');
-      p.id = 'diag';
-      p.style.position = 'fixed';
-      p.style.left = '12px';
-      p.style.bottom = '12px';
-      p.style.maxHeight = '40vh';
-      p.style.overflow = 'auto';
-      p.style.zIndex = '99';
-      document.body.appendChild(p);
-      return p;
-    })();
+export function initDiagnostics({ build, href, ua } = {}) {
+  const el = document.getElementById('diag');
+  const pad = (n) => String(n).padStart(2,'0');
 
-  function ts() {
+  function ts(){
     const d = new Date();
-    return `[${d.toLocaleTimeString()}]`;
+    return `[${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${String(d.getMilliseconds()).padStart(3,'0')}]`;
   }
 
-  function write(type, msg) {
-    el.textContent += `\n${ts()} ${type} ${msg}`;
+  function write(line){
+    if (!el) return;
+    el.textContent += (el.textContent ? '\n' : '') + line;
   }
 
-  write('===', 'SCARLETT DIAGNOSTICS ===');
-  Object.entries(meta).forEach(([k,v]) => write('', `${k}=${v}`));
-
-  return {
-    log: (m) => write('', m),
-    warn: (m) => write('[warn]', m),
-    error: (m) => write('[error]', m),
-    render: (m) => write('[report]', m)
+  const api = {
+    log: (m)=>write(`${ts()} ${m}`),
+    warn: (m)=>write(`${ts()} [warn] ${m}`),
+    error: (m)=>write(`${ts()} [error] ${m}`),
+    render: (text)=>{ if(el) el.textContent = String(text || ''); },
   };
+
+  api.log('=== SCARLETT DIAGNOSTICS ===');
+  api.log(`build=${build || 'unknown'}`);
+  api.log(`href=${href || location.href}`);
+  api.log(`ua=${ua || navigator.userAgent}`);
+
+  window.addEventListener('error', (e)=> api.error(e?.message || e?.type || 'error'));
+  window.addEventListener('unhandledrejection', (e)=> api.error(String(e?.reason || e)));
+
+  return api;
 }

@@ -19,14 +19,6 @@ export const Boot = (() => {
 
     diag.log('[boot] entry');
 
-    // 🛑 Safety: block accidental double-start
-    if (window.__SCARLETT_BOOT_LOCK__) {
-      diag.warn('[boot] duplicate start blocked');
-      return;
-    }
-    window.__SCARLETT_BOOT_LOCK__ = true;
-
-    // Optional SW registration
     if ('serviceWorker' in navigator) {
       try {
         await navigator.serviceWorker.register('./sw.js', { scope: './' });
@@ -43,7 +35,6 @@ export const Boot = (() => {
       diag.error('[boot] failed: ' + (e?.stack || e?.message || e));
     }
 
-    // Button wiring (matches your root index.html IDs)
     $('btnEnterVR')?.addEventListener('click', () => Spine.enterVR().catch(e => diag.error(String(e))));
     $('btnReset')?.addEventListener('click', () => Spine.resetSpawn());
     $('btnHideHUD')?.addEventListener('click', () => {
