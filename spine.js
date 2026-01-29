@@ -13,6 +13,8 @@
  */
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { XRButton } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRButton.js';
+import { XRControllerModelFactory } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRControllerModelFactory.js';
+import { XRHandModelFactory } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRHandModelFactory.js';
 import { init as initWorld } from './js/scarlett1/world.js';
 
 export const Spine = (() => {
@@ -26,6 +28,14 @@ export const Spine = (() => {
     xrButtonEl: null,
     worldUpdates: [],
     worldInteractables: [],
+
+    // XR
+    controller1: null,
+    controller2: null,
+    grip1: null,
+    grip2: null,
+    hand1: null,
+    hand2: null,
   };
 
   function nowISO(){ return new Date().toISOString(); }
@@ -70,6 +80,52 @@ export const Spine = (() => {
     S.renderer.render(S.scene, S.camera);
   }
 
+  function mountXRHandsAndControllers() {
+    const controllerModelFactory = new XRControllerModelFactory();
+    const handModelFactory = new XRHandModelFactory();
+
+    // Controllers (target ray space)
+    S.controller1 = S.renderer.xr.getController(0);
+    S.controller2 = S.renderer.xr.getController(1);
+    S.scene.add(S.controller1);
+    S.scene.add(S.controller2);
+
+    // Visible ray lines (so you KNOW controllers are working)
+    const rayGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0,0,0),
+      new THREE.Vector3(0,0,-1),
+    ]);
+    const rayMat = new THREE.LineBasicMaterial({ color: 0xffffff });
+
+    const ray1 = new THREE.Line(rayGeo, rayMat);
+    ray1.scale.z = 4;
+    S.controller1.add(ray1);
+
+    const ray2 = new THREE.Line(rayGeo, rayMat);
+    ray2.scale.z = 4;
+    S.controller2.add(ray2);
+
+    // Controller grips (models)
+    S.grip1 = S.renderer.xr.getControllerGrip(0);
+    S.grip1.add(controllerModelFactory.createControllerModel(S.grip1));
+    S.scene.add(S.grip1);
+
+    S.grip2 = S.renderer.xr.getControllerGrip(1);
+    S.grip2.add(controllerModelFactory.createControllerModel(S.grip2));
+    S.scene.add(S.grip2);
+
+    // Hands (Quest hand tracking)
+    S.hand1 = S.renderer.xr.getHand(0);
+    S.hand1.add(handModelFactory.createHandModel(S.hand1, 'mesh'));
+    S.scene.add(S.hand1);
+
+    S.hand2 = S.renderer.xr.getHand(1);
+    S.hand2.add(handModelFactory.createHandModel(S.hand2, 'mesh'));
+    S.scene.add(S.hand2);
+
+    S.diag?.log?.('[xr] controllers + hands mounted ✅');
+  }
+
   async function start({ diag } = {}) {
     S.diag = diag;
 
@@ -94,6 +150,10 @@ export const Spine = (() => {
 
     S.clock = new THREE.Clock();
     window.addEventListener('resize', resize);
+
+    // ✅ XR Hands + Controllers (does not affect non-XR)
+    try { mountXRHandsAndControllers(); }
+    catch (e) { S.diag?.warn?.('[xr] mount failed: ' + (e?.message || e)); }
 
     // ✅ WORLD INIT (your exact contract)
     const log = (m) => S.diag?.log?.(m) || console.log(m);
@@ -142,7 +202,7 @@ export const Spine = (() => {
       'renderer=' + (S.renderer ? 'ready' : 'none'),
       'worldUpdates=' + (S.worldUpdates?.length || 0),
       'worldInteractables=' + (S.worldInteractables?.length || 0),
-    ].join('\\n');
+    ].join('\n');
   }
 
   return { start, enterVR, resetSpawn, getReport };
