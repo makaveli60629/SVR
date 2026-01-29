@@ -2,34 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>ScarlettVR Poker • Safe Modular Spine</title>
-  <link rel="stylesheet" href="./css/style.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>ScarlettVR Poker • Safe Spine</title>
+  <style>
+    html,body { margin:0; padding:0; background:#000; height:100%; overflow:hidden; }
+  </style>
 </head>
 <body>
-  <div id="hud">
-    <div class="hud-title">ScarlettVR Poker • SAFE MODULAR SPINE</div>
-    <div class="hud-row">
-      <button id="btnEnterVR">Enter VR</button>
-      <button id="btnReset">Reset</button>
-      <button id="btnCopy">Copy Report</button>
-      <button id="btnHide">Hide</button>
-    </div>
-    <pre id="log">(starting…)</pre>
-    <div class="hud-row hud-row-bottom">
-      <button id="btnMusicOn">Music On</button>
-      <button id="btnMusicOff">Music Off</button>
-    </div>
-  </div>
-
-  <div id="storePanel" class="panel" style="display:none;">
-    <div class="panel-title">Store</div>
-    <div class="panel-body">
-      <div>• Tap the purple Store Pad near the Store Door.</div>
-      <div>• This build is "safe modular": broken modules won’t black-screen.</div>
-    </div>
-  </div>
-
-  <script type="module" src="./index.js"></script>
+  <!-- IMPORTANT: module entry + cache-bust -->
+  <script type="module" src="./js/scarlett1/index.js?v=SAFEV3"></script>
 </body>
 </html>
