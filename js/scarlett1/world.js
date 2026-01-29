@@ -72,7 +72,7 @@ function addRailWithGap(scene, holeR, { entranceAngle=Math.PI/2, gapAngle=Math.P
   }
   scene.add(postGroup);
 
-  return { rim, rail, postGroup, entranceAngle, gapAngle };
+  return {rim, rail, postGroup, entranceAngle, gapAngle, storePad };
 }
 
 function addStraightStairs(scene, holeR, pitDepthY, { entranceAngle=Math.PI/2 } = {}){
@@ -315,7 +315,38 @@ function addDeckRingLights(scene, outerR){
   return g;
 }
 
-export function buildWorld(scene, opts = {}) {
+export 
+function addStoreDoorPad(scene, outerR, { doorAngle=0 } = {}){
+  const g = new THREE.Group();
+  g.name = "StoreDoorPad";
+
+  // pad base on floor
+  const pad = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.75, 0.9, 0.08, 32),
+    new THREE.MeshStandardMaterial({ color: 0x12121a, roughness: 0.6, metalness: 0.2, emissive: 0x220033, emissiveIntensity: 0.35 })
+  );
+  pad.position.y = 0.04;
+
+  // glowing ring
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.78, 0.06, 12, 120),
+    new THREE.MeshBasicMaterial({ color: 0x8a2be2, transparent:true, opacity:0.55, blending: THREE.AdditiveBlending, depthWrite:false })
+  );
+  ring.rotation.x = Math.PI/2;
+  ring.position.y = 0.09;
+
+  g.add(pad); g.add(ring);
+
+  const r = outerR - 1.4;
+  g.position.set(Math.cos(doorAngle)*r, 0, Math.sin(doorAngle)*r);
+  g.rotation.y = -doorAngle + Math.PI; // face inward
+  g.userData.clickable = true;
+  g.userData.kind = "storePad";
+
+  scene.add(g);
+  return g;
+}
+function buildWorld(scene, opts = {}) {
   const holeR = opts.holeRadius ?? 6;
   const outerR = opts.outerRadius ?? 75;
   const pitDepthY = opts.pitY ?? -2.0;
@@ -370,6 +401,28 @@ export function buildWorld(scene, opts = {}) {
 
   // Keep an update hook for hologram glow/animation
   const updates = [ (dt)=>pod.update(dt) ];
+
+// Mixed seat avatars (8) — you can change order later
+spawnSeatAvatars(scene, {
+  tableY: -1.4,
+  seatRadius: 4.25,
+  seatCount: 8,
+  avatarPaths: [
+    'assets/avatars/male.glb',
+    'assets/avatars/female.glb',
+    'assets/avatars/ninja.glb',
+    'assets/avatars/futuristic_apocalypse_female_cargo_pants.glb',
+    'assets/avatars/male.glb',
+    'assets/avatars/female.glb',
+    'assets/avatars/ninja.glb',
+    'assets/avatars/futuristic_apocalypse_female_cargo_pants.glb',
+  ],
+  scale: 1.0
+});
+
+// Store door pad (opens Store UI when interacted with)
+const storePad = addStoreDoorPad(scene, outerR, { doorAngle: 0 }); // +X door is store
+
 
   // Guard at entrance
   const guard = addGuard(scene, holeR, { entranceAngle });

@@ -53,6 +53,56 @@ scene.add(rig);
 const world = buildWorld(scene, { holeRadius: 6, outerRadius: 60, pitY: -2.0, wallDepth: 14.0 });
 log("[boot] world built ✅");
 
+
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+
+function setStoreVisible(v){
+  const ui = document.getElementById('storeUI');
+  if (!ui) return;
+  ui.style.display = v ? 'block' : 'none';
+}
+document.getElementById('storeClose')?.addEventListener('click', ()=>setStoreVisible(false));
+
+// (For now) Equip just logs selection; wiring player avatar swap is next.
+document.querySelectorAll('.storeBtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const av = btn.getAttribute('data-avatar');
+    log("[store] selected avatar: " + av);
+  });
+});
+
+function tryActivateClickable(){
+  // Ray from camera center
+  ndc.set(0, 0);
+  raycaster.setFromCamera(ndc, camera);
+  const hits = raycaster.intersectObjects(scene.children, true);
+  for (const h of hits){
+    // Walk up parents to find clickable group
+    let o = h.object;
+    for (let k=0;k<6 && o; k++){
+      if (o.userData?.clickable){
+        if (o.userData.kind === "storePad"){
+          setStoreVisible(true);
+          log("[store] opened via door pad");
+          return true;
+        }
+      }
+      o = o.parent;
+    }
+  }
+  return false;
+}
+
+// Tap/click on mobile/desktop
+window.addEventListener('pointerdown', ()=>{ tryActivateClickable(); }, { passive:true });
+
+// XR controller select
+renderer.xr.addEventListener('sessionstart', ()=>{
+  const c0 = renderer.xr.getController(0);
+  c0.addEventListener('select', ()=>{ tryActivateClickable(); });
+});
+
 // Android joysticks move rig
 let moveX=0, moveY=0, turnX=0;
 bindVirtualJoysticks({
