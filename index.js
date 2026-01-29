@@ -1,7 +1,7 @@
 /**
- * SCARLETT • SAFE MODULAR SPINE (ROOT)
- * - Single ESM entry
- * - Loads Scarlett1 orchestrator
+ * ROOT ENTRY — PERMANENT
+ * index.html -> index.js -> boot_spine.js
+ * Only edit /js/scarlett1/* from now on.
  */
-import { boot } from './js/scarlett1/index.js';
-boot();
+import { Boot } from './boot_spine.js';
+Boot.start();
