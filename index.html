@@ -2,107 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>ScarlettVR Poker • BOOT DIAGNOSTICS</title>
-  <style>
-    html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    #boot {
-      position:fixed; inset:12px; z-index:999999;
-      color:#dbe7ff; background:rgba(10,14,24,.88);
-      border:1px solid rgba(120,150,255,.35);
-      border-radius:14px; padding:14px;
-      box-shadow:0 10px 40px rgba(0,0,0,.55);
-      backdrop-filter: blur(8px);
-    }
-    #boot h1{margin:0 0 6px 0;font-size:18px;font-weight:700;letter-spacing:.5px}
-    #boot .row{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
-    #boot button{
-      background:#121a2f;color:#e7f0ff;border:1px solid rgba(120,150,255,.35);
-      border-radius:12px;padding:10px 12px;font-size:14px
-    }
-    #log{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;line-height:1.35}
-  </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="theme-color" content="#111111" />
+  <title>ScarlettVR Poker • Permanent Spine</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-  <div id="boot">
-    <h1>SCARLETT • BOOT DIAGNOSTICS (V1)</h1>
-    <div class="row">
-      <button id="btnReload">Reload</button>
-      <button id="btnNuke">Nuke Cache + SW</button>
-      <button id="btnImport">Import Spine</button>
+  <div id="hud" class="hud">
+    <div class="hud__title">
+      <div class="hud__brand">ScarlettVR Poker • Permanent Spine</div>
+      <div class="hud__sub">Root spine is permanent • Only edit /js/scarlett1/*</div>
     </div>
-    <div id="log">starting…</div>
+
+    <div class="hud__row">
+      <button id="btnEnterVR" class="btn">Enter VR</button>
+      <button id="btnReset" class="btn">Reset Spawn</button>
+      <button id="btnHideHUD" class="btn">Hide HUD</button>
+      <button id="btnCopy" class="btn">Copy Report</button>
+      <button id="btnHardReload" class="btn btn--warn">Hard Reload</button>
+      <a class="btn" href="./boot.html">Boot Tools</a>
+    </div>
+
+    <pre id="diag" class="hud__diag"></pre>
   </div>
 
-  <script type="module">
-    const logEl = document.getElementById('log');
-    const log = (...a)=>{ logEl.textContent += "\n" + a.join(" "); };
-    const hardReload = ()=>location.replace(location.pathname + "?v=" + Date.now());
-
-    window.addEventListener('error', (e)=>log("[window error]", e.message));
-    window.addEventListener('unhandledrejection', (e)=>log("[unhandled]", (e.reason?.message||e.reason||"unknown")));
-
-    document.getElementById('btnReload').onclick = hardReload;
-
-    async function nuke() {
-      log("== NUKE START ==");
-      try {
-        if ('serviceWorker' in navigator) {
-          const regs = await navigator.serviceWorker.getRegistrations();
-          log("SW registrations:", regs.length);
-          for (const r of regs) { await r.unregister(); log("unregistered:", r.scope); }
-        } else log("no serviceWorker support");
-      } catch (e) { log("SW nuke error:", e?.message || e); }
-
-      try {
-        if (window.caches) {
-          const keys = await caches.keys();
-          log("cache storages:", keys.length);
-          for (const k of keys) { await caches.delete(k); log("deleted cache:", k); }
-        } else log("no CacheStorage");
-      } catch (e) { log("cache nuke error:", e?.message || e); }
-
-      log("== NUKE DONE ==");
-      log("Reloading with cache-bust…");
-      setTimeout(hardReload, 300);
-    }
-
-    document.getElementById('btnNuke').onclick = nuke;
-
-    function getBase() {
-      // Works for https://makaveli60629.github.io/SVR/
-      const p = location.pathname;
-      return p.endsWith('/') ? p : p.replace(/\/[^/]*$/, '/');
-    }
-
-    async function importSpine() {
-      const base = getBase();
-      const url = base + "js/scarlett1/index.js?v=" + Date.now();
-      log("base:", base);
-      log("import:", url);
-
-      try {
-        const mod = await import(url);
-        log("IMPORT OK ✅");
-        // If your spine exports start(), call it:
-        if (mod?.start) { log("calling start()"); await mod.start(); log("start() done ✅"); }
-        else log("NOTE: module has no export named start (that’s fine if it auto-runs).");
-        // If the real HUD takes over, you can hide this overlay:
-        // document.getElementById('boot').style.display = 'none';
-      } catch (e) {
-        log("IMPORT FAIL ❌", e?.message || e);
-        log("Most common causes:");
-        log("- 404 path wrong (file not found)");
-        log("- SyntaxError inside js/scarlett1/index.js");
-        log("- GitHub Pages still serving old cached build (hit NUKE)");
-      }
-    }
-
-    document.getElementById('btnImport').onclick = importSpine;
-
-    // Auto-run: nuke once, then import.
-    // Comment out if you don’t want automatic behavior.
-    await nuke();
-  </script>
+  <script type="module" src="./index.js"></script>
 </body>
 </html>
