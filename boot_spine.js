@@ -19,6 +19,13 @@ export const Boot = (() => {
 
     diag.log('[boot] entry');
 
+    // 🛑 Safety: block accidental double-start
+    if (window.__SCARLETT_BOOT_LOCK__) {
+      diag.warn('[boot] duplicate start blocked');
+      return;
+    }
+    window.__SCARLETT_BOOT_LOCK__ = true;
+
     // Optional SW registration
     if ('serviceWorker' in navigator) {
       try {
