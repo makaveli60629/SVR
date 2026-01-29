@@ -159,7 +159,6 @@ export async function init(ctx){
       if(isXRPresenting()) { yawDelta=0; return; }
       if(Math.abs(yawDelta) < 0.00001) return;
 
-      // apply yaw around Y
       camera.rotation.order = "YXZ";
       camera.rotation.y -= yawDelta;
       yawDelta *= 0.35; // decay
@@ -300,7 +299,7 @@ export async function init(ctx){
   const steps = 14;
   const stepH = (0 - pitY)/steps;
   const stepD = 0.28;
-  const w = 1.25;
+  const wStep = 1.25;
   const stepMat = new THREE.MeshStandardMaterial({ color:0x101018, roughness:0.95 });
   const glowMat = new THREE.MeshStandardMaterial({ color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:0.9, roughness:0.45 });
 
@@ -309,7 +308,7 @@ export async function init(ctx){
     const t=i/(steps-1);
     const y = 0 - t*(0-pitY) - stepH*0.5;
     const r = startR - t*1.25;
-    const s = new THREE.Mesh(new THREE.BoxGeometry(w, stepH*0.95, stepD), stepMat);
+    const s = new THREE.Mesh(new THREE.BoxGeometry(wStep, stepH*0.95, stepD), stepMat);
     s.position.set(Math.cos(entranceAngle)*r, y, Math.sin(entranceAngle)*r);
     s.rotation.y = -entranceAngle;
     stairs.add(s);
@@ -342,7 +341,7 @@ export async function init(ctx){
 
   scene.add(balcony);
 
-  // Table + chairs (same as before)
+  // Table + chairs
   const tableGroup = new THREE.Group();
   tableGroup.position.y = pitY + 0.35;
 
@@ -425,4 +424,4 @@ export async function init(ctx){
     ],
     interactables:[]
   };
-                                    }
+}
