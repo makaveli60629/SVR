@@ -26,5 +26,12 @@
   </div>
 
   <script type="module" src="index.js"></script>
+
+  <div id="music-ui" style="position:fixed; right:12px; bottom:12px; z-index:9999; display:flex; gap:8px;">
+    <button id="musicPlay" style="padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(10,10,18,0.55); color:#fff;">Music On</button>
+    <button id="musicStop" style="padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(10,10,18,0.55); color:#fff;">Music Off</button>
+  </div>
+  <audio id="bgMusic" crossorigin="anonymous" preload="none"></audio>
 </body>
+
 </html>
