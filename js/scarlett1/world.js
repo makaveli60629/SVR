@@ -1,14 +1,10 @@
 /**
- * MODULE: world.js
- * Builds: stadium deck hole + pit divot + double walls + rails + stairs + balcony + neon table
- * Adds: Android touch joystick (internal module).
+ * MODULE: world.js (SCARLETT1)
+ * Builds: stadium deck hole + OPEN pit divot (NO center disk) + double walls + rails + stairs + balcony + neon table
+ * Safe: no external imports (prevents GitHub Pages module-load black screen).
  *
- * IMPORTANT:
- * - Pit is OPEN (no center disk). You will see the divot/hole with inner pit walls.
- * - Only edit /js/scarlett1/* from now on (Spine is ROOT permanent).
+ * ONLY EDIT /js/scarlett1/* from now on.
  */
-import { createAndroidJoystick } from './modules/androidJoystick.js';
-
 export async function init(ctx){
   const { THREE, scene, camera, log } = ctx;
 
@@ -22,9 +18,11 @@ export async function init(ctx){
   const dir = new THREE.DirectionalLight(0xffffff, 0.65);
   dir.position.set(8,14,10);
   scene.add(dir);
-  const top = new THREE.PointLight(0xffffff, 1.2, 140);
-  top.position.set(0,10.5,0);
-  scene.add(top);
+
+  const topLight = new THREE.PointLight(0xffffff, 1.2, 140);
+  topLight.position.set(0,10.5,0);
+  scene.add(topLight);
+
   for (let i=0;i<14;i++){
     const a=(i/14)*Math.PI*2;
     const p=new THREE.PointLight(0x8a2be2, 1.1, 70);
@@ -35,7 +33,9 @@ export async function init(ctx){
   // Upper deck ring (hole)
   const deck = new THREE.Mesh(
     new THREE.RingGeometry(holeR, outerR, 180, 1),
-    new THREE.MeshStandardMaterial({ color: 0x0b0b12, roughness:1.0, metalness:0.05, side:THREE.DoubleSide })
+    new THREE.MeshStandardMaterial({
+      color: 0x0b0b12, roughness:1.0, metalness:0.05, side:THREE.DoubleSide
+    })
   );
   deck.rotation.x = -Math.PI/2;
   deck.position.y = 0;
@@ -49,10 +49,11 @@ export async function init(ctx){
   // ==========================
   // PIT / DIVOT (OPEN CENTER)
   // ==========================
-  // No center disk. Inner pit walls show the depth.
+  // No center disk. Inner pit wall cylinder shows depth.
   const pit = new THREE.Group(); pit.name="PitDivot";
 
   const pitDepth = (0 - pitY);
+
   const pitWallMat = new THREE.MeshStandardMaterial({
     color: 0x05050b, roughness: 0.95, metalness: 0.05, side: THREE.DoubleSide
   });
@@ -65,7 +66,7 @@ export async function init(ctx){
   pitWall.position.y = pitY + (pitDepth / 2);
   pit.add(pitWall);
 
-  // Lip neon ring near opening
+  // Lip neon ring near opening (depth cue)
   const pitNeonMat = new THREE.MeshStandardMaterial({
     color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:0.9, roughness:0.4
   });
@@ -77,7 +78,7 @@ export async function init(ctx){
   pitLip.position.y = 0.02;
   pit.add(pitLip);
 
-  // Dark fog cylinder (depth cue)
+  // Dark fog cylinder (visual depth cue)
   const fogMat = new THREE.MeshStandardMaterial({
     color:0x000000, transparent:true, opacity:0.18, roughness:1.0, metalness:0.0, side:THREE.DoubleSide
   });
@@ -92,23 +93,42 @@ export async function init(ctx){
 
   // Double walls + ceiling
   const shell = new THREE.Group(); shell.name="LobbyShell";
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0x05050b, roughness:0.95, side:THREE.DoubleSide });
-  const outerWall = new THREE.Mesh(new THREE.CylinderGeometry(outerR, outerR, 10.5, 200, 1, true), wallMat);
-  outerWall.position.y = 5.25; shell.add(outerWall);
-  const innerWall = new THREE.Mesh(new THREE.CylinderGeometry(outerR-0.7, outerR-0.7, 10.5, 200, 1, true), wallMat);
-  innerWall.position.y = 5.25; shell.add(innerWall);
+  const wallMat = new THREE.MeshStandardMaterial({
+    color: 0x05050b, roughness:0.95, side:THREE.DoubleSide
+  });
+
+  const outerWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(outerR, outerR, 10.5, 200, 1, true),
+    wallMat
+  );
+  outerWall.position.y = 5.25;
+  shell.add(outerWall);
+
+  const innerWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(outerR-0.7, outerR-0.7, 10.5, 200, 1, true),
+    wallMat
+  );
+  innerWall.position.y = 5.25;
+  shell.add(innerWall);
 
   const ceiling = new THREE.Mesh(
     new THREE.RingGeometry(holeR, outerR, 200, 1),
-    new THREE.MeshStandardMaterial({ color: 0x040409, roughness:1.0, side:THREE.DoubleSide })
+    new THREE.MeshStandardMaterial({
+      color: 0x040409, roughness:1.0, side:THREE.DoubleSide
+    })
   );
   ceiling.rotation.x = -Math.PI/2;
   ceiling.position.y = 10.5;
   shell.add(ceiling);
 
-  const neonMat = new THREE.MeshStandardMaterial({ color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:1.25, roughness:0.5 });
+  const neonMat = new THREE.MeshStandardMaterial({
+    color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:1.25, roughness:0.5
+  });
   for (let i=0;i<3;i++){
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(outerR-1.6-i*1.0, 0.07, 12, 240), neonMat);
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(outerR-1.6-i*1.0, 0.07, 12, 240),
+      neonMat
+    );
     ring.rotation.x = Math.PI/2;
     ring.position.y = 9.9 - i*0.7;
     shell.add(ring);
@@ -121,10 +141,21 @@ export async function init(ctx){
   const postMat = new THREE.MeshStandardMaterial({ color:0x12121a, roughness:0.8 });
   const railMat = new THREE.MeshStandardMaterial({ color:0x1a1a26, roughness:0.6, metalness:0.25 });
 
-  const topRing = new THREE.Mesh(new THREE.TorusGeometry(holeR+0.85, 0.04, 10, 220), railMat);
-  topRing.rotation.x = Math.PI/2; topRing.position.y = railY; rail.add(topRing);
-  const midRing = new THREE.Mesh(new THREE.TorusGeometry(holeR+0.85, 0.03, 10, 220), railMat);
-  midRing.rotation.x = Math.PI/2; midRing.position.y = railY-0.35; rail.add(midRing);
+  const topRing = new THREE.Mesh(
+    new THREE.TorusGeometry(holeR+0.85, 0.04, 10, 220),
+    railMat
+  );
+  topRing.rotation.x = Math.PI/2;
+  topRing.position.y = railY;
+  rail.add(topRing);
+
+  const midRing = new THREE.Mesh(
+    new THREE.TorusGeometry(holeR+0.85, 0.03, 10, 220),
+    railMat
+  );
+  midRing.rotation.x = Math.PI/2;
+  midRing.position.y = railY-0.35;
+  rail.add(midRing);
 
   const postGeo = new THREE.CylinderGeometry(0.05,0.05,1.0,12);
   const count = 64;
@@ -146,7 +177,9 @@ export async function init(ctx){
   const stepD = 0.28;
   const w = 1.25;
   const stepMat = new THREE.MeshStandardMaterial({ color:0x101018, roughness:0.95 });
-  const glowMat = new THREE.MeshStandardMaterial({ color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:0.8, roughness:0.5 });
+  const glowMat = new THREE.MeshStandardMaterial({
+    color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:0.8, roughness:0.5
+  });
 
   const startR = holeR+0.75;
   for (let i=0;i<steps;i++){
@@ -158,12 +191,16 @@ export async function init(ctx){
     s.rotation.y = -entranceAngle;
     stairs.add(s);
   }
+
   const railL = new THREE.Mesh(new THREE.BoxGeometry(0.04,(0-pitY)+0.2,0.04), glowMat);
   railL.position.set(Math.cos(entranceAngle)*(startR-0.15), (0+pitY)/2+0.1, Math.sin(entranceAngle)*(startR-0.15));
-  railL.rotation.y = -entranceAngle; stairs.add(railL);
+  railL.rotation.y = -entranceAngle;
+  stairs.add(railL);
+
   const railR = railL.clone();
   railR.position.set(Math.cos(entranceAngle)*(startR+0.15), (0+pitY)/2+0.1, Math.sin(entranceAngle)*(startR+0.15));
   stairs.add(railR);
+
   scene.add(stairs);
 
   // Balcony ring
@@ -174,24 +211,34 @@ export async function init(ctx){
 
   const bDeck = new THREE.Mesh(
     new THREE.RingGeometry(inner, outer, 200, 1),
-    new THREE.MeshStandardMaterial({ color:0x0a0a12, roughness:1.0, metalness:0.05, side:THREE.DoubleSide })
+    new THREE.MeshStandardMaterial({
+      color:0x0a0a12, roughness:1.0, metalness:0.05, side:THREE.DoubleSide
+    })
   );
-  bDeck.rotation.x = -Math.PI/2; bDeck.position.y = by; balcony.add(bDeck);
+  bDeck.rotation.x = -Math.PI/2;
+  bDeck.position.y = by;
+  balcony.add(bDeck);
+
   const bRail = new THREE.Mesh(
     new THREE.TorusGeometry(outer-0.35, 0.05, 10, 240),
     new THREE.MeshStandardMaterial({ color:0x1a1a26, roughness:0.5, metalness:0.3 })
   );
-  bRail.rotation.x = Math.PI/2; bRail.position.y = by+1.0; balcony.add(bRail);
+  bRail.rotation.x = Math.PI/2;
+  bRail.position.y = by+1.0;
+  balcony.add(bRail);
+
   scene.add(balcony);
 
-  // Neon table + chairs (stylized geometry)
+  // Neon table + chairs
   const tableGroup = new THREE.Group(); tableGroup.name="NeonTable";
-  const tableY = pitY + 0.35;
-  tableGroup.position.y = tableY;
+  tableGroup.position.y = pitY + 0.35;
 
   const base = new THREE.Mesh(
     new THREE.CylinderGeometry(2.0, 3.2, 1.3, 48),
-    new THREE.MeshStandardMaterial({ color:0x0b0b10, roughness:0.5, metalness:0.35, emissive:0x8a2be2, emissiveIntensity:0.25 })
+    new THREE.MeshStandardMaterial({
+      color:0x0b0b10, roughness:0.5, metalness:0.35,
+      emissive:0x8a2be2, emissiveIntensity:0.25
+    })
   );
   base.position.y = 0.7;
   tableGroup.add(base);
@@ -213,13 +260,14 @@ export async function init(ctx){
 
   const neon = new THREE.Mesh(
     new THREE.TorusGeometry(5.55, 0.06, 10, 160),
-    new THREE.MeshStandardMaterial({ color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:1.1, roughness:0.4 })
+    new THREE.MeshStandardMaterial({
+      color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:1.1, roughness:0.4
+    })
   );
   neon.rotation.x = Math.PI/2;
   neon.position.y = 1.72;
   tableGroup.add(neon);
 
-  // Chairs
   const chairMat = new THREE.MeshStandardMaterial({ color:0x0b0b10, roughness:0.65, metalness:0.25 });
   const chairGlow = new THREE.MeshStandardMaterial({ color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:0.6, roughness:0.4 });
   const chairDist = 7.15;
@@ -254,27 +302,29 @@ export async function init(ctx){
 
   scene.add(tableGroup);
 
+  // Guard placeholder at entrance
+  const guard = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.26,0.95,6,12),
+    new THREE.MeshStandardMaterial({ color:0x111111, emissive:0x8a2be2, emissiveIntensity:0.25 })
+  );
+  guard.position.set(Math.cos(entranceAngle)*(holeR+0.55), 0.6, Math.sin(entranceAngle)*(holeR+0.55));
+  guard.rotation.y = -entranceAngle + Math.PI;
+  guard.name="GUARD_PLACEHOLDER";
+  scene.add(guard);
+
   // Camera default
   camera.position.set(0, 1.6, 14);
   camera.lookAt(0, 1.4, 0);
 
-  // --- ANDROID JOYSTICK (touch locomotion) ---
-  const joy = createAndroidJoystick({ size: 120 });
+  log('[world] OPEN pit divot (no disk) + stadium built ✅');
 
-  log('[world] stadium + OPEN pit divot + table built ✅');
-
-  // Per-frame updates (joystick + neon pulse)
-  let t=0;
-  const moveUpdate = (dt)=> joy.updateMove(dt, THREE, camera, 2.8);
-
+  // Per-frame updates (subtle neon pulse)
+  let t = 0;
   return {
-    updates:[
-      moveUpdate,
-      (dt)=>{
-        t+=dt;
-        neon.material.emissiveIntensity = 0.95 + Math.sin(t*1.4)*0.15;
-      }
-    ],
+    updates:[(dt)=>{
+      t += dt;
+      neon.material.emissiveIntensity = 0.95 + Math.sin(t*1.4)*0.15;
+    }],
     interactables:[]
   };
 }
