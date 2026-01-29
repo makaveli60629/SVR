@@ -1,44 +1,44 @@
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
-/**
- * XR Controller Locomotion Adapter
- * Permanent Patch – Quest / WebXR
- */
-export function attachXRControllerLocomotion(renderer, player) {
-  let lastSnap = 0;
+export function attachXRControllerLocomotion(renderer, rig, camera, log){
+  const tmp = new THREE.Vector3();
+  const fwd = new THREE.Vector3();
+  const right = new THREE.Vector3();
+  const speed = 2.0;
+  const turnSpeed = 1.6;
 
-  function readGamepad() {
-    const session = renderer.xr.getSession?.();
-    if (!session) return null;
-
-    for (const src of session.inputSources) {
-      if (src.gamepad && src.gamepad.axes) {
-        const a = src.gamepad.axes;
-        return {
-          lx: a[0] ?? 0,
-          ly: a[1] ?? 0,
-          rx: a[2] ?? 0
-        };
-      }
-    }
-    return null;
+  function axesFor(controller){
+    const gp = controller?.gamepad;
+    if(!gp || !gp.axes) return null;
+    return gp.axes;
   }
 
-  return function update(dt) {
-    const gp = readGamepad();
-    if (!gp) return;
+  function update(dt){
+    const s = dt * speed;
+    const t = dt * turnSpeed;
 
-    const dead = 0.15;
+    // Left controller: move
+    const c0 = renderer.xr.getController(0);
+    const c1 = renderer.xr.getController(1);
 
-    // Move
-    if (Math.abs(gp.lx) > dead || Math.abs(gp.ly) > dead) {
-      player.translateX(gp.lx * dt * 2.5);
-      player.translateZ(-gp.ly * dt * 2.5);
-    }
+    const a0 = axesFor(c0);
+    const a1 = axesFor(c1);
 
-    // Snap turn
-    if (Math.abs(gp.rx) > 0.75 && performance.now() - lastSnap > 250) {
-      player.rotation.y += (gp.rx > 0 ? -1 : 1) * Math.PI / 6;
-      lastSnap = performance.now();
-    }
-  };
+    const axMove = a0 ? a0[2] ?? a0[0] : 0;
+    const ayMove = a0 ? a0[3] ?? a0[1] : 0;
+
+    camera.getWorldDirection(fwd);
+    fwd.y = 0; fwd.normalize();
+    right.copy(fwd).cross(camera.up).normalize();
+
+    rig.position.addScaledVector(fwd, -ayMove * s);
+    rig.position.addScaledVector(right, axMove * s);
+
+    // Right controller: turn
+    const axTurn = a1 ? a1[2] ?? a1[0] : 0;
+    rig.rotation.y -= axTurn * t;
+  }
+
+  log?.("[xr] controller locomotion ready");
+  return { update };
 }
