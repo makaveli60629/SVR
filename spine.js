@@ -62,9 +62,9 @@ export const Spine = (() => {
   function animate() {
     const dt = S.clock.getDelta();
 
-    // Run Scarlett1 per-frame updates (neon pulse etc)
+    // Run Scarlett1 per-frame updates
     for (let i = 0; i < S.worldUpdates.length; i++) {
-      try { S.worldUpdates[i](dt); } catch (e) { /* keep loop alive */ }
+      try { S.worldUpdates[i](dt); } catch (e) {}
     }
 
     S.renderer.render(S.scene, S.camera);
@@ -124,7 +124,6 @@ export const Spine = (() => {
   }
 
   function resetSpawn() {
-    // Your world sets camera position in init()
     S.camera.position.set(0, 1.6, 14);
     S.camera.lookAt(0, 1.4, 0);
     S.diag?.log?.('[spine] reset spawn');
