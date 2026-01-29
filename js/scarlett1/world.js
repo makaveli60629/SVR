@@ -340,7 +340,7 @@ export function buildWorld(scene, opts = {}) {
   const stairs = addStraightStairs(scene, holeR, pitDepthY, { entranceAngle });
 
   // Table + 8 chairs in pit
-  const pod = createFuturisticTable(scene, { tableY: -1.6 });
+  const pod = createFuturisticTable(scene, { tableY: -1.6, tableRadius: 2.85, chairRadius: 3.90 });
 
   // Keep an update hook for hologram glow/animation
   const updates = [ (dt)=>pod.update(dt) ];
