@@ -1,20 +1,12 @@
 {
-  "name": "ScarlettVR Poker",
   "short_name": "Scarlett",
-  "start_url": "./",
+  "name": "ScarlettVR Poker",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#050509",
-  "theme_color": "#0b2b6f",
+  "background_color": "#0b0b0f",
+  "theme_color": "#111111",
   "icons": [
-    {
-      "src": "assets/textures/icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/textures/icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "./assets/textures/icon.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "./assets/textures/icon_large.png", "type": "image/png", "sizes": "512x512" }
   ]
 }
