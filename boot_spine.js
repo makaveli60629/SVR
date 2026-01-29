@@ -31,7 +31,7 @@ export const Boot = (() => {
       diag.error('[boot] failed: ' + (e?.stack || e?.message || e));
     }
 
-    // Wire buttons
+    // Wire buttons (matches your index.html IDs)
     $('btnEnterVR')?.addEventListener('click', () => Spine.enterVR().catch(e => diag.error(String(e))));
     $('btnReset')?.addEventListener('click', () => Spine.resetSpawn());
     $('btnHideHUD')?.addEventListener('click', () => {
