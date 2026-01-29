@@ -32,6 +32,21 @@
     <button id="musicStop" style="padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(10,10,18,0.55); color:#fff;">Music Off</button>
   </div>
   <audio id="bgMusic" crossorigin="anonymous" preload="none"></audio>
+
+  <div id="storeUI" style="position:fixed; left:12px; top:88px; z-index:9999; width:min(360px, 92vw); padding:12px; border-radius:16px; background:rgba(10,10,18,0.78); border:1px solid rgba(255,255,255,0.16); color:#fff; display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+      <div style="font-weight:700;">Scarlett Store</div>
+      <button id="storeClose" style="padding:8px 10px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(10,10,18,0.55); color:#fff;">Close</button>
+    </div>
+    <div style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+      <button class="storeBtn" data-avatar="male.glb" style="padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(20,20,34,0.55); color:#fff;">Equip Male</button>
+      <button class="storeBtn" data-avatar="female.glb" style="padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(20,20,34,0.55); color:#fff;">Equip Female</button>
+      <button class="storeBtn" data-avatar="ninja.glb" style="padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(20,20,34,0.55); color:#fff;">Equip Ninja</button>
+      <button class="storeBtn" data-avatar="futuristic_apocalypse_female_cargo_pants.glb" style="padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(20,20,34,0.55); color:#fff;">Equip Apocalypse</button>
+    </div>
+    <div style="margin-top:10px; opacity:0.8; font-size:12px;">Tip: Tap the glowing pad at the Store door to open this.</div>
+  </div>
 </body>
+
 
 </html>

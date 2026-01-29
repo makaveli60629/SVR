@@ -1,0 +1,10 @@
+CENTER TABLE UPDATE (Futuristic Neon Poker Pod)
+
+- Added: js/scarlett1/modules/futuristicTable.js
+- Wired into: js/scarlett1/world.js (replaces old table/chairs/bots with neon pod table + 8 pod chairs + hologram globe)
+- Animation: js/scarlett1/index.js now calls world.updates[] each frame.
+
+Adjust table height:
+- In js/scarlett1/world.js search: createFuturisticTable(scene, { tableY: -1.6 })
+  Raise (less sunken): -1.2
+  Lower (more sunken): -2.0
