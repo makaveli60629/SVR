@@ -1,9 +1,16 @@
 /**
  * spine.js — PERMANENT ROOT SPINE
- * Rule: Root spine is permanent. Only edit /js/scarlett1/* from now on.
- * World contract:
- *   /js/scarlett1/world.js exports async function init(ctx)
- *   returns { updates:[fn(dt)], interactables:[...] }
+ * Spine owns:
+ *  - renderer
+ *  - XR session button
+ *  - single animation loop
+ *
+ * Scarlett1 owns:
+ *  - world geometry + modules
+ *  - exports: async function init(ctx)
+ *  - returns: { updates:[fn(dt)], interactables:[...] }
+ *
+ * ONLY EDIT /js/scarlett1/* from now on.
  */
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { XRButton } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRButton.js';
@@ -21,6 +28,8 @@ export const Spine = (() => {
     worldUpdates: [],
     worldInteractables: [],
   };
+
+  function nowISO(){ return new Date().toISOString(); }
 
   function assertSingleInstance() {
     if (window.__SCARLETT_SPINE_LOCK__) {
@@ -56,7 +65,7 @@ export const Spine = (() => {
 
     // Run Scarlett1 per-frame updates (neon pulse etc)
     for (let i = 0; i < S.worldUpdates.length; i++) {
-      try { S.worldUpdates[i](dt); } catch (e) { /* keep render loop alive */ }
+      try { S.worldUpdates[i](dt); } catch (e) { /* keep loop alive */ }
     }
 
     S.renderer.render(S.scene, S.camera);
@@ -71,9 +80,8 @@ export const Spine = (() => {
     S.scene = new THREE.Scene();
     S.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 500);
 
-    // Camera rig (optional, but nice for future locomotion)
+    // Rig wrapper (future locomotion can move rig instead of camera)
     S.rig = new THREE.Group();
-    S.rig.position.set(0, 0, 0);
     S.scene.add(S.rig);
     S.rig.add(S.camera);
 
@@ -117,8 +125,7 @@ export const Spine = (() => {
   }
 
   function resetSpawn() {
-    // Your world sets camera position inside init(), so reset calls init again would be bad.
-    // Keep reset minimal: just reset camera transform.
+    // Your world sets camera position in init()
     S.camera.position.set(0, 1.6, 14);
     S.camera.lookAt(0, 1.4, 0);
     S.diag?.log?.('[spine] reset spawn');
@@ -128,8 +135,11 @@ export const Spine = (() => {
     return [
       'Scarlett Diagnostics Report',
       'build=SCARLETT_SPINE_PERMANENT_S1_WORLD_INIT',
+      'time=' + nowISO(),
       'href=' + location.href,
       'ua=' + navigator.userAgent,
+      'secureContext=' + (window.isSecureContext ? 'true' : 'false'),
+      'xrSupported=' + ('xr' in navigator ? 'true' : 'false'),
       'spineLock=' + (window.__SCARLETT_SPINE_LOCK__ ? 'true' : 'false'),
       'renderer=' + (S.renderer ? 'ready' : 'none'),
       'worldUpdates=' + (S.worldUpdates?.length || 0),
