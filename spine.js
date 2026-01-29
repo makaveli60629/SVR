@@ -1,11 +1,11 @@
 /**
  * spine.js — PERMANENT ROOT SPINE
- * Spine owns:
+ * Root owns:
  *  - renderer
- *  - XR session button
+ *  - XR button
  *  - single animation loop
  *
- * Scarlett1 world contract:
+ * Scarlett1 contract:
  *   /js/scarlett1/world.js exports async function init(ctx)
  *   returns { updates:[fn(dt)], interactables:[...] }
  *
@@ -13,8 +13,8 @@
  */
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { XRButton } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRButton.js';
-import { XRControllerModelFactory } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRControllerModelFactory.js';
-import { XRHandModelFactory } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRHandModelFactory.js';
+
+// ✅ Root spine lives in /, so this is correct:
 import { init as initWorld } from './js/scarlett1/world.js';
 
 export const Spine = (() => {
@@ -28,12 +28,7 @@ export const Spine = (() => {
     xrButtonEl: null,
     worldUpdates: [],
     worldInteractables: [],
-    controller1: null,
-    controller2: null,
-    grip1: null,
-    grip2: null,
-    hand1: null,
-    hand2: null,
+    handsMounted: false,
   };
 
   function nowISO(){ return new Date().toISOString(); }
@@ -70,51 +65,61 @@ export const Spine = (() => {
   function animate() {
     const dt = S.clock.getDelta();
     for (let i = 0; i < S.worldUpdates.length; i++) {
-      try { S.worldUpdates[i](dt); } catch (e) {}
+      try { S.worldUpdates[i](dt); } catch {}
     }
     S.renderer.render(S.scene, S.camera);
   }
 
-  function mountXRHandsAndControllers() {
-    const controllerModelFactory = new XRControllerModelFactory();
-    const handModelFactory = new XRHandModelFactory();
+  // ✅ Mount XR hands/controllers ONLY after session starts
+  async function mountXRHandsAndControllersOnce() {
+    if (S.handsMounted) return;
+    S.handsMounted = true;
 
-    S.controller1 = S.renderer.xr.getController(0);
-    S.controller2 = S.renderer.xr.getController(1);
-    S.scene.add(S.controller1);
-    S.scene.add(S.controller2);
+    try {
+      const { XRControllerModelFactory } = await import(
+        'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRControllerModelFactory.js'
+      );
+      const { XRHandModelFactory } = await import(
+        'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRHandModelFactory.js'
+      );
 
-    const rayGeo = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0,0,0),
-      new THREE.Vector3(0,0,-1),
-    ]);
-    const rayMat = new THREE.LineBasicMaterial({ color: 0xffffff });
+      const controllerModelFactory = new XRControllerModelFactory();
+      const handModelFactory = new XRHandModelFactory();
 
-    const ray1 = new THREE.Line(rayGeo, rayMat);
-    ray1.scale.z = 4;
-    S.controller1.add(ray1);
+      const c1 = S.renderer.xr.getController(0);
+      const c2 = S.renderer.xr.getController(1);
+      S.scene.add(c1);
+      S.scene.add(c2);
 
-    const ray2 = new THREE.Line(rayGeo, rayMat);
-    ray2.scale.z = 4;
-    S.controller2.add(ray2);
+      const rayGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0,0,0),
+        new THREE.Vector3(0,0,-1),
+      ]);
+      const rayMat = new THREE.LineBasicMaterial({ color: 0xffffff });
 
-    S.grip1 = S.renderer.xr.getControllerGrip(0);
-    S.grip1.add(controllerModelFactory.createControllerModel(S.grip1));
-    S.scene.add(S.grip1);
+      const r1 = new THREE.Line(rayGeo, rayMat); r1.scale.z = 4; c1.add(r1);
+      const r2 = new THREE.Line(rayGeo, rayMat); r2.scale.z = 4; c2.add(r2);
 
-    S.grip2 = S.renderer.xr.getControllerGrip(1);
-    S.grip2.add(controllerModelFactory.createControllerModel(S.grip2));
-    S.scene.add(S.grip2);
+      const g1 = S.renderer.xr.getControllerGrip(0);
+      g1.add(controllerModelFactory.createControllerModel(g1));
+      S.scene.add(g1);
 
-    S.hand1 = S.renderer.xr.getHand(0);
-    S.hand1.add(handModelFactory.createHandModel(S.hand1, 'mesh'));
-    S.scene.add(S.hand1);
+      const g2 = S.renderer.xr.getControllerGrip(1);
+      g2.add(controllerModelFactory.createControllerModel(g2));
+      S.scene.add(g2);
 
-    S.hand2 = S.renderer.xr.getHand(1);
-    S.hand2.add(handModelFactory.createHandModel(S.hand2, 'mesh'));
-    S.scene.add(S.hand2);
+      const h1 = S.renderer.xr.getHand(0);
+      h1.add(handModelFactory.createHandModel(h1, 'mesh'));
+      S.scene.add(h1);
 
-    S.diag?.log?.('[xr] controllers + hands mounted ✅');
+      const h2 = S.renderer.xr.getHand(1);
+      h2.add(handModelFactory.createHandModel(h2, 'mesh'));
+      S.scene.add(h2);
+
+      S.diag?.log?.('[xr] controllers + hands mounted ✅');
+    } catch (e) {
+      S.diag?.warn?.('[xr] mount failed: ' + (e?.message || e));
+    }
   }
 
   async function start({ diag } = {}) {
@@ -141,17 +146,17 @@ export const Spine = (() => {
     S.clock = new THREE.Clock();
     window.addEventListener('resize', resize);
 
-    try { mountXRHandsAndControllers(); }
-    catch (e) { S.diag?.warn?.('[xr] mount failed: ' + (e?.message || e)); }
-
+    // ✅ WORLD INIT FIRST (so you see lobby + joystick on Android immediately)
     const log = (m) => S.diag?.log?.(m) || console.log(m);
     const worldResult = await initWorld({ THREE, scene: S.scene, camera: S.camera, log });
 
     S.worldUpdates = Array.isArray(worldResult?.updates) ? worldResult.updates : [];
     S.worldInteractables = Array.isArray(worldResult?.interactables) ? worldResult.interactables : [];
 
+    // ✅ SINGLE LOOP ONLY
     S.renderer.setAnimationLoop(animate);
 
+    // ✅ XR Button
     if (!S.xrButtonEl) {
       S.xrButtonEl = XRButton.createButton(S.renderer);
       S.xrButtonEl.style.position = 'absolute';
@@ -160,6 +165,12 @@ export const Spine = (() => {
       S.xrButtonEl.style.zIndex = '40';
       document.body.appendChild(S.xrButtonEl);
     }
+
+    // ✅ When XR actually starts, then mount hands/controllers
+    S.renderer.xr.addEventListener('sessionstart', () => {
+      S.diag?.log?.('[xr] sessionstart');
+      mountXRHandsAndControllersOnce();
+    });
 
     S.diag?.log?.('[spine] started ✅');
   }
