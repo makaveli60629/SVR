@@ -88,46 +88,71 @@ function makeGlowRing(radius, tube, colorHex, intensity = 1.0) {
   return g;
 }
 
-function makePodChair({ bodyColor = 0x111118, accent = 0x8a2be2 } = {}) {
+
+function makeLuxuryChair({ bodyColor = 0x14141c, accent = 0x8a2be2 } = {}) {
   const chair = new THREE.Group();
-  chair.name = "PodChair";
+  chair.name = "LuxuryChair";
 
-  const shellGeo = new THREE.SphereGeometry(
-    0.72, 36, 22,
-    0, Math.PI * 2,
-    0, Math.PI * 0.62
-  );
-
-  const shellMat = new THREE.MeshStandardMaterial({
-    color: bodyColor,
-    roughness: 0.32,
-    metalness: 0.28
-  });
-
-  const shell = new THREE.Mesh(shellGeo, shellMat);
-  shell.position.y = 0.75;
-  chair.add(shell);
-
+  // Seat
   const seat = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.46, 0.52, 0.10, 28),
-    new THREE.MeshStandardMaterial({ color: 0x07070b, roughness: 0.6, metalness: 0.05 })
+    new THREE.BoxGeometry(0.72, 0.12, 0.70),
+    new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.55, metalness: 0.12 })
   );
-  seat.position.y = 0.42;
+  seat.position.y = 0.55;
   chair.add(seat);
 
-  const baseRing = makeGlowRing(0.55, 0.035, accent, 1.2);
-  baseRing.position.y = 0.08;
-  chair.add(baseRing);
-
-  const base = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.32, 0.45, 0.28, 20),
-    new THREE.MeshStandardMaterial({ color: 0x0a0a10, roughness: 0.8, metalness: 0.05 })
+  // Back (curved wrap)
+  const back = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.40, 0.46, 0.85, 24, 1, true, Math.PI * 0.55, Math.PI * 0.90),
+    new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.45, metalness: 0.18, side: THREE.DoubleSide })
   );
-  base.position.y = 0.15;
-  chair.add(base);
+  back.rotation.y = Math.PI / 2;
+  back.position.set(0, 0.98, -0.30);
+  chair.add(back);
+
+  // Arm rests
+  const armMat = new THREE.MeshStandardMaterial({ color: 0x0b0b12, roughness: 0.65, metalness: 0.08 });
+  const armGeo = new THREE.BoxGeometry(0.08, 0.10, 0.62);
+  const armL = new THREE.Mesh(armGeo, armMat);
+  const armR = new THREE.Mesh(armGeo, armMat);
+  armL.position.set(-0.40, 0.72, 0.02);
+  armR.position.set( 0.40, 0.72, 0.02);
+  chair.add(armL); chair.add(armR);
+
+  // Stem + base
+  const stem = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.07, 0.10, 0.55, 16),
+    new THREE.MeshStandardMaterial({ color: 0x0a0a12, roughness: 0.55, metalness: 0.35 })
+  );
+  stem.position.y = 0.27;
+  chair.add(stem);
+
+  const foot = new THREE.Mesh(
+    new THREE.TorusGeometry(0.48, 0.03, 10, 120),
+    new THREE.MeshStandardMaterial({ color: 0x111118, roughness: 0.7, metalness: 0.25 })
+  );
+  foot.rotation.x = Math.PI / 2;
+  foot.position.y = 0.01;
+  chair.add(foot);
+
+  // Glow ring
+  const baseRing = new THREE.Mesh(
+    new THREE.TorusGeometry(0.55, 0.04, 12, 140),
+    new THREE.MeshBasicMaterial({
+      color: accent,
+      transparent: true,
+      opacity: 0.55,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+  baseRing.rotation.x = Math.PI / 2;
+  baseRing.position.y = 0.03;
+  chair.add(baseRing);
 
   return chair;
 }
+
 
 export function createFuturisticTable(scene, opts = {}) {
   const {
@@ -200,14 +225,12 @@ export function createFuturisticTable(scene, opts = {}) {
   // chairs
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2;
-    const chair = makePodChair({ accent });
+    const chair = makeLuxuryChair({ accent });
     chair.position.set(Math.cos(a) * chairRadius, 0, Math.sin(a) * chairRadius);
     chair.rotation.y = -a + Math.PI;
     group.add(chair);
   }
 
-  // hologram globe + sparkle cards
-  const holo = new THREE.Mesh(
     new THREE.SphereGeometry(0.58, 28, 20),
     new THREE.MeshBasicMaterial({
       color: 0x7ffcff,
@@ -216,11 +239,7 @@ export function createFuturisticTable(scene, opts = {}) {
       opacity: 0.55
     })
   );
-  holo.name = "HologramGlobe";
-  holo.position.y = 1.25;
-  group.add(holo);
 
-  const holoGlow = new THREE.Mesh(
     new THREE.SphereGeometry(0.66, 22, 16),
     new THREE.MeshBasicMaterial({
       color: 0x7ffcff,
@@ -230,13 +249,10 @@ export function createFuturisticTable(scene, opts = {}) {
       depthWrite: false
     })
   );
-  holoGlow.position.copy(holo.position);
-  group.add(holoGlow);
 
   const cardMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.7 });
   const cardGeo = new THREE.BoxGeometry(0.18, 0.01, 0.26);
   const cards = new THREE.Group();
-  cards.name = "HoloCards";
   for (let i=0;i<5;i++){
     const c = new THREE.Mesh(cardGeo, cardMat);
     c.position.set((i-2)*0.24, 0.35, 0);
@@ -254,14 +270,15 @@ export function createFuturisticTable(scene, opts = {}) {
   purple.position.set(0, 1.2, 0);
   group.add(purple);
 
-  function update(dt){
-    const t = performance.now() * 0.001;
-    holo.rotation.y += dt * 0.7;
-    holo.rotation.x += dt * 0.18;
-    holo.material.opacity = 0.45 + Math.sin(t * 2.0) * 0.08;
-    holoGlow.material.opacity = 0.08 + Math.sin(t * 2.0 + 1.0) * 0.03;
-    cards.rotation.y = Math.sin(t*0.6)*0.15;
-  }
+  
+function update(dt) {
+  // subtle pulse on neon + float cards (if any)
+  const t = performance.now() * 0.001;
+  neon.material.opacity = 0.45 + Math.sin(t * 2.0) * 0.08;
+  // optional: gently bob the whole group
+  // group.position.y = tableY + Math.sin(t * 1.2) * 0.01;
+}
+
 
   scene.add(group);
   return { group, update };
