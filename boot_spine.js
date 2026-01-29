@@ -1,3 +1,8 @@
+/**
+ * boot_spine.js (ROOT) — PERMANENT
+ * Owns: diagnostics + HUD button wiring + calls Spine.start()
+ * Only edit /js/scarlett1/* from now on.
+ */
 import { initDiagnostics } from './diagnostics.js';
 import { Spine } from './spine.js';
 
@@ -31,7 +36,7 @@ export const Boot = (() => {
       diag.error('[boot] failed: ' + (e?.stack || e?.message || e));
     }
 
-    // Wire buttons (matches your index.html IDs)
+    // Button wiring (matches your root index.html IDs)
     $('btnEnterVR')?.addEventListener('click', () => Spine.enterVR().catch(e => diag.error(String(e))));
     $('btnReset')?.addEventListener('click', () => Spine.resetSpawn());
     $('btnHideHUD')?.addEventListener('click', () => {
@@ -44,7 +49,6 @@ export const Boot = (() => {
         await navigator.clipboard.writeText(report);
         diag.log('[hud] report copied');
       } catch {
-        // fallback
         const ta = document.createElement('textarea');
         ta.value = report;
         document.body.appendChild(ta);
