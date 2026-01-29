@@ -1,181 +1,198 @@
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-import { makeLogger } from './modules/diagnosticsMini.js';
-import { bindVirtualJoysticks } from './modules/androidControls.js';
-import { buildWorld } from './world.js';
-import { nukeToDivotOnly } from './modules/divotOnly.js';
-import { attachXRControllerLocomotion } from './xrControllerLocomotion.js';
+import { VRButton } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/VRButton.js';
 
-console.log("✅ SCARLETT1 index.js loaded");
-document.title = "SCARLETT1 ACTIVE";
+/**
+ * SAFE MODULAR SPINE (SCARLETT1)
+ * - Core renderer/camera
+ * - Diagnostics HUD
+ * - Safe module runner: each module can fail without black-screening the whole app
+ */
 
-const logEl = document.getElementById('log');
-const { log, report } = makeLogger(logEl);
+const BUILD = 'SCARLETT1_SAFE_MODULAR_SPINE_V1';
 
-log("=== SCARLETT DIAGNOSTICS ===");
-log("href=" + location.href);
-log("secureContext=" + (window.isSecureContext ? "true":"false"));
-log("ua=" + navigator.userAgent);
-log("touch=" + ('ontouchstart' in window) + " maxTouchPoints=" + (navigator.maxTouchPoints||0));
-log("xr=" + (!!navigator.xr));
+function $(id){ return document.getElementById(id); }
 
-const btnVR = document.getElementById('btnVR');
-const btnReset = document.getElementById('btnReset');
-const btnDivot = document.getElementById('btnDivot');
-const btnCopy = document.getElementById('btnCopy');
-const btnHide = document.getElementById('btnHide');
-const hud = document.getElementById('hud');
-
-btnHide?.addEventListener('click', ()=> hud.style.display = (hud.style.display==='none'?'block':'none'));
-btnCopy?.addEventListener('click', async ()=>{
-  try { await navigator.clipboard.writeText(report()); } catch {}
-  log("[hud] report copied");
-});
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x050509);
-
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.05, 1000);
-camera.position.set(0, 1.6, 10);
-
-const renderer = new THREE.WebGLRenderer({ antialias:true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.xr.enabled = true;
-document.body.appendChild(renderer.domElement);
-
-log("[boot] renderer mounted ✅");
-
-// rig for locomotion
-const rig = new THREE.Group();
-rig.name = "Rig";
-rig.add(camera);
-scene.add(rig);
-
-const world = buildWorld(scene, { holeRadius: 6, outerRadius: 60, pitY: -2.0, wallDepth: 14.0 });
-log("[boot] world built ✅");
-
-
-const raycaster = new THREE.Raycaster();
-const ndc = new THREE.Vector2();
-
-function setStoreVisible(v){
-  const ui = document.getElementById('storeUI');
-  if (!ui) return;
-  ui.style.display = v ? 'block' : 'none';
+function makeLogger(){
+  const logEl = $('log');
+  const lines = [];
+  const t0 = performance.now();
+  const log = (msg)=>{
+    const t = ((performance.now()-t0)/1000).toFixed(3);
+    const line = `[${t}] ${msg}`;
+    lines.push(line);
+    if (lines.length>220) lines.shift();
+    logEl.textContent = lines.join('\n');
+  };
+  const dump = ()=> lines.join('\n');
+  return { log, dump };
 }
-document.getElementById('storeClose')?.addEventListener('click', ()=>setStoreVisible(false));
 
-// (For now) Equip just logs selection; wiring player avatar swap is next.
-document.querySelectorAll('.storeBtn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const av = btn.getAttribute('data-avatar');
-    log("[store] selected avatar: " + av);
-  });
-});
+function attachUI({ renderer, resetFn, logger, audioCtl }){
+  $('btnEnterVR').onclick = ()=>{
+    // Use three's VRButton for broad support
+    const btn = VRButton.createButton(renderer);
+    btn.style.position = 'fixed';
+    btn.style.left = '10px';
+    btn.style.bottom = '10px';
+    btn.style.zIndex = 20;
+    document.body.appendChild(btn);
+    logger.log('[ui] VRButton injected');
+  };
+  $('btnReset').onclick = ()=> resetFn();
+  $('btnCopy').onclick = async ()=>{
+    try{ await navigator.clipboard.writeText(logger.dump()); logger.log('[ui] report copied ✅'); }
+    catch(e){ logger.log('[ui] copy failed: '+(e?.message||e)); }
+  };
+  $('btnHide').onclick = ()=>{
+    const hud = $('hud');
+    hud.style.display = (hud.style.display==='none') ? 'block' : 'none';
+  };
 
-function tryActivateClickable(){
-  // Ray from camera center
-  ndc.set(0, 0);
-  raycaster.setFromCamera(ndc, camera);
-  const hits = raycaster.intersectObjects(scene.children, true);
-  for (const h of hits){
-    // Walk up parents to find clickable group
-    let o = h.object;
-    for (let k=0;k<6 && o; k++){
-      if (o.userData?.clickable){
-        if (o.userData.kind === "storePad"){
-          setStoreVisible(true);
-          log("[store] opened via door pad");
-          return true;
-        }
+  $('btnMusicOn').onclick = ()=> audioCtl.on();
+  $('btnMusicOff').onclick = ()=> audioCtl.off();
+}
+
+function makeAudio(logger){
+  const audio = new Audio();
+  audio.loop = true;
+  audio.volume = 0.65;
+  // Safe default stream (user can swap later)
+  audio.src = 'https://icecast.radiofrance.fr/fip-hifi.aac';
+  const on = async ()=>{
+    try{ await audio.play(); logger.log('[audio] on ✅'); }
+    catch(e){ logger.log('[audio] play blocked (tap screen then try again)'); }
+  };
+  const off = ()=>{ audio.pause(); logger.log('[audio] off'); };
+  return { on, off, audio };
+}
+
+async function safeImport(path, logger){
+  try{
+    const m = await import(path);
+    logger.log(`[mod] loaded: ${path}`);
+    return { ok:true, m };
+  }catch(e){
+    logger.log(`[mod] FAIL: ${path} :: ${(e && e.message) ? e.message : e}`);
+    return { ok:false, err:e };
+  }
+}
+
+async function runModules(ctx, logger){
+  // List modules here (easy to add/remove). Each exports init(ctx)-> {updates?:fn[], interactables?:obj[]}
+  const list = [
+    './world.js',
+    './modules/storePad.js',
+    './modules/musicHint.js',
+    './modules/pokerHoverDemo.js'
+  ];
+
+  const state = { updates:[], interactables:[], hooks:{} };
+
+  for (const p of list){
+    const r = await safeImport(p, logger);
+    if (!r.ok) continue;
+    if (typeof r.m.init === 'function'){
+      try{
+        const out = await r.m.init(ctx);
+        if (out?.updates) state.updates.push(...out.updates);
+        if (out?.interactables) state.interactables.push(...out.interactables);
+        if (out?.hooks) Object.assign(state.hooks, out.hooks);
+        logger.log(`[mod] init ok: ${p}`);
+      }catch(e){
+        logger.log(`[mod] init FAIL: ${p} :: ${(e && e.message) ? e.message : e}`);
       }
-      o = o.parent;
+    }else{
+      logger.log(`[mod] no init(): ${p}`);
     }
   }
-  return false;
+  return state;
 }
 
-// Tap/click on mobile/desktop
-window.addEventListener('pointerdown', ()=>{ tryActivateClickable(); }, { passive:true });
+function makeRayClick({ camera, scene, logger, interactables, hooks }){
+  const ray = new THREE.Raycaster();
+  const pt = new THREE.Vector2(0,0); // center tap
+  const onTap = ()=>{
+    try{
+      ray.setFromCamera(pt, camera);
+      const hits = ray.intersectObjects(interactables, true);
+      if (!hits.length) return;
+      const obj = hits[0].object;
+      const name = obj.name || obj.parent?.name || 'object';
+      logger.log(`[tap] hit: ${name}`);
+      // module hook by name
+      if (name === 'STORE_PAD' && hooks?.onStorePad) hooks.onStorePad();
+    }catch(e){
+      logger.log('[tap] error: '+(e?.message||e));
+    }
+  };
+  window.addEventListener('pointerdown', onTap, { passive:true });
+}
 
-// XR controller select
-renderer.xr.addEventListener('sessionstart', ()=>{
-  const c0 = renderer.xr.getController(0);
-  c0.addEventListener('select', ()=>{ tryActivateClickable(); });
-});
+export async function boot(){
+  const { log } = makeLogger();
+  log('=== SCARLETT SAFE MODULAR SPINE ===');
+  log('build='+BUILD);
+  log('href='+location.href);
+  log('secureContext='+(window.isSecureContext));
+  log('ua='+navigator.userAgent);
 
-// Android joysticks move rig
-let moveX=0, moveY=0, turnX=0;
-bindVirtualJoysticks({
-  onMove:(x,y)=>{ moveX=x; moveY=y; },
-  onTurn:(x,y)=>{ turnX=x; }
-});
-log("[android] joystick visible ✅");
-
-let xrMove = null;
-btnVR?.addEventListener('click', async ()=>{
-  try{
-    await renderer.xr.setSession(await navigator.xr.requestSession('immersive-vr', {
-      optionalFeatures:['local-floor','bounded-floor','hand-tracking','layers']
-    }));
-  }catch(e){
-    log("[vr] failed: " + e.message);
-  }
-});
-
-btnReset?.addEventListener('click', ()=>{
-  rig.position.set(0,0,0);
-  rig.rotation.set(0,0,0);
-  log("[boot] reset");
-});
-
-btnDivot?.addEventListener('click', ()=>{
-  nukeToDivotOnly(scene, { radius: 9.0, depth: 24.0, floorRadius: 60.0 });
-  log("[world] DIVOT ONLY enabled");
-});
-
-renderer.xr.addEventListener('sessionstart', ()=>{
-  xrMove = attachXRControllerLocomotion(renderer, rig, camera, (m)=>log(m));
-  log("[xr] session started ✅");
-});
-
-renderer.xr.addEventListener('sessionend', ()=>{
-  xrMove = null;
-  log("[xr] session ended");
-});
-
-window.addEventListener('resize', ()=>{
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
+  // Renderer
+  const renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio||1));
   renderer.setSize(window.innerWidth, window.innerHeight);
-});
+  renderer.xr.enabled = true;
+  document.body.appendChild(renderer.domElement);
 
-let last = performance.now();
-function animate(now){
-  const dt = Math.min(0.05, (now-last)/1000);
-  last = now;
+  // Scene & camera
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x000006);
+  const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.05, 600);
+  camera.position.set(0, 1.6, 14);
 
-  // Non-VR movement
-  const speed = 2.0;
-  const turnSpeed = 1.6;
+  const audioCtl = makeAudio({ log });
 
-  // forward/back is -moveY
-  const dir = new THREE.Vector3();
-  camera.getWorldDirection(dir);
-  dir.y = 0; dir.normalize();
-  const right = new THREE.Vector3().copy(dir).cross(camera.up).normalize();
+  const resetFn = async ()=>{
+    try{
+      // Clear scene safely (preserve camera)
+      while(scene.children.length) scene.remove(scene.children[0]);
+      log('[reset] scene cleared');
+      // Re-run modules
+      const ctx = { THREE, scene, camera, renderer, log, audioCtl };
+      const state = await runModules(ctx, { log });
+      makeRayClick({ camera, scene, logger:{log}, interactables: state.interactables, hooks: state.hooks });
+      active.updates = state.updates;
+      log('[reset] ready ✅');
+    }catch(e){
+      log('[reset] FAIL: '+(e?.message||e));
+    }
+  };
 
-  rig.position.addScaledVector(dir, -moveY * speed * dt);
-  rig.position.addScaledVector(right, moveX * speed * dt);
-  rig.rotation.y -= turnX * turnSpeed * dt;
+  attachUI({ renderer, resetFn, logger:{log, dump:()=>document.getElementById('log').textContent}, audioCtl });
 
-  // XR controller movement
-  xrMove?.update(dt);
+  // Initial boot
+  const ctx = { THREE, scene, camera, renderer, log, audioCtl };
+  const active = { updates:[] };
+  const state = await runModules(ctx, { log });
+  makeRayClick({ camera, scene, logger:{log}, interactables: state.interactables, hooks: state.hooks });
+  active.updates = state.updates;
 
-  // World animation hooks (table hologram, etc.)
-  if (world?.updates) { for (const fn of world.updates) { try { fn(dt); } catch(e){} } }
+  // Render loop
+  let last = performance.now();
+  renderer.setAnimationLoop(()=>{
+    const now = performance.now();
+    const dt = Math.min(0.05, (now-last)/1000);
+    last = now;
+    for (const u of active.updates) { try{ u(dt); }catch{} }
+    renderer.render(scene, camera);
+  });
 
-  renderer.render(scene, camera);
-  renderer.setAnimationLoop(animate);
+  // Resize
+  window.addEventListener('resize', ()=>{
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  log('[boot] renderer mounted ✅');
+  log('[boot] ready ✅');
 }
-renderer.setAnimationLoop(animate);
-log("[boot] animation loop ✅");
