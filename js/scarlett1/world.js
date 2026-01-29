@@ -1,6 +1,7 @@
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { makeCasinoFloorTexture } from './modules/floorTexture.js';
 import { createFuturisticTable } from './modules/futuristicTable.js';
+import { spawnSeatAvatars, spawnGuard } from './modules/avatarSpawner.js';
 
 function addMegaLights(scene, outerR){
   // Base lights
@@ -40,7 +41,7 @@ function addRailWithGap(scene, holeR, { entranceAngle=Math.PI/2, gapAngle=Math.P
   rim.rotation.x = Math.PI/2;
   // Align gap center to entranceAngle
   rim.rotation.y = entranceAngle - (Math.PI*2 - gapAngle/2);
-  rim.position.y = 0.01;
+  rim.position.y = 0.0;
   scene.add(rim);
 
   // Top rail tube with same gap
@@ -49,7 +50,7 @@ function addRailWithGap(scene, holeR, { entranceAngle=Math.PI/2, gapAngle=Math.P
   rail.name = "PitRailTop";
   rail.rotation.x = Math.PI/2;
   rail.rotation.y = rim.rotation.y;
-  rail.position.y = 1.05;
+  rail.position.y = 1.0;
   scene.add(rail);
 
   // Posts (skip in the gap)
@@ -104,7 +105,7 @@ function addStraightStairs(scene, holeR, pitDepthY, { entranceAngle=Math.PI/2 } 
   }
 
   // Place at rim at entrance angle and face inward
-  const dist = holeR + 0.10; // starts just outside rim then steps go inward
+  const dist = holeR + 0.55; // starts just outside rim then steps go inward
   group.position.set(Math.cos(entranceAngle)*dist, 0, Math.sin(entranceAngle)*dist);
   group.rotation.y = -entranceAngle + Math.PI; // face center
 
@@ -291,9 +292,32 @@ function addGuard(scene, holeR, { entranceAngle=Math.PI/2 } = {}){
   return guard;
 }
 
+
+function addDeckRingLights(scene, outerR){
+  const g = new THREE.Group();
+  g.name = "DeckRingLights";
+
+  // Purple ring lights near the wall
+  const count = 24;
+  for (let i=0;i<count;i++){
+    const a = (i/count)*Math.PI*2;
+    const p = new THREE.PointLight(0x8a2be2, 0.9, 65);
+    p.position.set(Math.cos(a)*(outerR-2.0), 3.4, Math.sin(a)*(outerR-2.0));
+    g.add(p);
+  }
+
+  // Soft ceiling wash
+  const wash = new THREE.PointLight(0xffffff, 1.35, 150);
+  wash.position.set(0, 9.2, 0);
+  g.add(wash);
+
+  scene.add(g);
+  return g;
+}
+
 export function buildWorld(scene, opts = {}) {
   const holeR = opts.holeRadius ?? 6;
-  const outerR = opts.outerRadius ?? 60;
+  const outerR = opts.outerRadius ?? 75;
   const pitDepthY = opts.pitY ?? -2.0;
   const wallDepth = opts.wallDepth ?? 16.0;
 
@@ -302,7 +326,9 @@ export function buildWorld(scene, opts = {}) {
 
   addMegaLights(scene, outerR);
   addLobbyShell(scene, outerR);
-  addPitDownlights(scene, holeR, { count: 12, y: 5.0 });
+  addBalcony(scene, holeR, outerR, { y: 4.8 });
+  addPitDownlights(scene, holeR, { count: 18, y: 5.2 });
+  addDeckRingLights(scene, outerR);
 
   // Upper ring deck (no cap possible)
   const tex = makeCasinoFloorTexture();
@@ -340,18 +366,62 @@ export function buildWorld(scene, opts = {}) {
   const stairs = addStraightStairs(scene, holeR, pitDepthY, { entranceAngle });
 
   // Table + 8 chairs in pit
-  const pod = createFuturisticTable(scene, { tableY: -1.6, tableRadius: 2.85, chairRadius: 3.90 });
+  const pod = createFuturisticTable(scene, { tableY: -1.4, tableRadius: 3.10, chairRadius: 4.25 });
 
   // Keep an update hook for hologram glow/animation
   const updates = [ (dt)=>pod.update(dt) ];
 
   // Guard at entrance
   const guard = addGuard(scene, holeR, { entranceAngle });
+  // Real guard avatar (combat ninja)
+  spawnGuard(scene, {
+    path: 'assets/avatars/combat_ninja_inspired_by_jin_roh_wolf_brigade.glb',
+    position: guard.position.clone(),
+    lookAt: new THREE.Vector3(0, 1.2, 0),
+    scale: 1.0
+  });
 
   // Fog for depth
   scene.fog = new THREE.Fog(0x050509, 3.0, 55.0);
 
   return { holeR, outerR, pitDepthY, wallDepth, entranceAngle, gapAngle, rail, stairs, pod, guard, updates };
+}
+
+
+function addBalcony(scene, holeR, outerR, { y=4.8 } = {}){
+  const g = new THREE.Group();
+  g.name = "UpperBalcony";
+
+  // Walkway ring (overlooking pit)
+  const inner = holeR + 1.2;
+  const outer = outerR - 8.0;
+  const deckGeo = new THREE.RingGeometry(inner, outer, 180, 1);
+  deckGeo.rotateX(-Math.PI/2);
+  const deck = new THREE.Mesh(deckGeo, new THREE.MeshStandardMaterial({
+    color: 0x0a0a12, roughness: 0.95, metalness: 0.05, side: THREE.DoubleSide
+  }));
+  deck.position.y = y;
+  g.add(deck);
+
+  // Inner balcony rail (no gap)
+  const railGeom = new THREE.TorusGeometry(inner + 0.25, 0.05, 10, 180);
+  const rail = new THREE.Mesh(railGeom, new THREE.MeshStandardMaterial({ color: 0x22222a, roughness: 0.7 }));
+  rail.rotation.x = Math.PI/2;
+  rail.position.y = y + 1.0;
+  g.add(rail);
+
+  const posts = 40;
+  const postGeo = new THREE.CylinderGeometry(0.05, 0.05, 1.05, 12);
+  const postMat = new THREE.MeshStandardMaterial({ color: 0x22222a, roughness: 0.7 });
+  for (let i=0;i<posts;i++){
+    const a = (i/posts)*Math.PI*2;
+    const post = new THREE.Mesh(postGeo, postMat);
+    post.position.set(Math.cos(a)*(inner+0.25), y + 0.52, Math.sin(a)*(inner+0.25));
+    g.add(post);
+  }
+
+  scene.add(g);
+  return g;
 }
 
 function addPitDownlights(scene, holeR, { count=10, y=3.5, radiusOffset=0.9 } = {}){
@@ -367,63 +437,71 @@ function addPitDownlights(scene, holeR, { count=10, y=3.5, radiusOffset=0.9 } = 
   return g;
 }
 
+
 function addLobbyShell(scene, outerR){
   const g = new THREE.Group();
   g.name = "LobbyShell";
 
-  // Circular wall
-  const wall = new THREE.Mesh(
-    new THREE.CylinderGeometry(outerR, outerR, 8.0, 160, 1, true),
-    new THREE.MeshStandardMaterial({ color: 0x0a0a12, roughness: 0.95, side: THREE.DoubleSide })
+  // Double circular walls (inner + outer) for thickness
+  const outerWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(outerR, outerR, 10.0, 180, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0x07070c, roughness: 0.95, metalness: 0.05, side: THREE.DoubleSide })
   );
-  wall.position.y = 4.0;
-  g.add(wall);
+  outerWall.position.y = 5.0;
+  g.add(outerWall);
 
-  // Ceiling ring
+  const innerWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(outerR-2.2, outerR-2.2, 10.0, 180, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0x06060b, roughness: 0.98, metalness: 0.03, side: THREE.DoubleSide })
+  );
+  innerWall.position.y = 5.0;
+  g.add(innerWall);
+
+  // Ceiling ring (keep center open)
   const ceiling = new THREE.Mesh(
-    new THREE.RingGeometry(4.0, outerR, 160, 1),
+    new THREE.RingGeometry(4.0, outerR, 180, 1),
     new THREE.MeshStandardMaterial({ color: 0x050509, roughness: 1.0, side: THREE.DoubleSide })
   );
   ceiling.rotation.x = -Math.PI/2;
-  ceiling.position.y = 8.0;
+  ceiling.position.y = 10.0;
   g.add(ceiling);
 
-  // 4 jumbotrons (simple emissive panels)
-  const screenMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.9, roughness: 0.6 });
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x111118, roughness: 0.8 });
-  const screenGeo = new THREE.PlaneGeometry(6.0, 3.2);
-  const frameGeo = new THREE.BoxGeometry(6.3, 3.5, 0.18);
+  // 3 doors + 3 jumbotrons total (1 per door)
+  const screenMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.95, roughness: 0.55 });
+  const frameMat  = new THREE.MeshStandardMaterial({ color: 0x0d0d14, roughness: 0.85, metalness: 0.15 });
+  const screenGeo = new THREE.PlaneGeometry(7.0, 3.8);
+  const frameGeo  = new THREE.BoxGeometry(7.4, 4.2, 0.22);
 
-  const screenR = outerR - 0.6;
-  for (let i=0;i<4;i++){
-    const a = i*(Math.PI/2);
+  const doorMat = new THREE.MeshStandardMaterial({ color: 0x101018, roughness: 0.9 });
+  const doorGeo = new THREE.BoxGeometry(2.8, 3.6, 0.18);
+
+  const screenR = outerR - 1.2;
+  for (let i=0;i<3;i++){
+    const a = i*(Math.PI*2/3);
+
     const frame = new THREE.Mesh(frameGeo, frameMat);
-    frame.position.set(Math.cos(a)*screenR, 4.6, Math.sin(a)*screenR);
-    frame.lookAt(0,4.6,0);
+    frame.position.set(Math.cos(a)*screenR, 6.4, Math.sin(a)*screenR);
+    frame.lookAt(0,6.4,0);
     g.add(frame);
 
     const screen = new THREE.Mesh(screenGeo, screenMat);
-    screen.position.set(Math.cos(a)*(screenR-0.12), 4.6, Math.sin(a)*(screenR-0.12));
-    screen.lookAt(0,4.6,0);
+    screen.position.set(Math.cos(a)*(screenR-0.14), 6.4, Math.sin(a)*(screenR-0.14));
+    screen.lookAt(0,6.4,0);
     g.add(screen);
 
-    // Door under each jumbotron
-    const door = new THREE.Mesh(
-      new THREE.BoxGeometry(2.4, 3.2, 0.15),
-      new THREE.MeshStandardMaterial({ color: 0x111118, roughness: 0.9 })
-    );
-    door.position.set(Math.cos(a)*(screenR-0.15), 1.7, Math.sin(a)*(screenR-0.15));
-    door.lookAt(0,1.7,0);
+    const door = new THREE.Mesh(doorGeo, doorMat);
+    door.position.set(Math.cos(a)*(screenR-0.18), 2.0, Math.sin(a)*(screenR-0.18));
+    door.lookAt(0,2.0,0);
     g.add(door);
   }
 
-  // Neon arch accents
-  const archMat = new THREE.MeshStandardMaterial({ color: 0x0b2b6f, emissive: 0x0b2b6f, emissiveIntensity: 1.6, roughness: 0.5 });
+  // Neon ceiling rings
+  const archMat = new THREE.MeshStandardMaterial({ color: 0x8a2be2, emissive: 0x8a2be2, emissiveIntensity: 1.2, roughness: 0.5 });
   for (let i=0;i<3;i++){
-    const arch = new THREE.Mesh(new THREE.TorusGeometry(outerR-1.2-i*0.9, 0.06, 12, 220, Math.PI*1.15), archMat);
-    arch.rotation.x = Math.PI/2;
-    arch.position.y = 7.2 - i*0.8;
-    g.add(arch);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(outerR-2.2-i*1.2, 0.06, 12, 240), archMat);
+    ring.rotation.x = Math.PI/2;
+    ring.position.y = 9.6 - i*0.8;
+    g.add(ring);
   }
 
   scene.add(g);
