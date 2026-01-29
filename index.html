@@ -1,78 +1,33 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>ScarlettVR FULL RESTORE</title>
-  <style>
-    body { margin:0; overflow:hidden; background:#000; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-    #hud {
-      position:fixed; left:14px; top:14px; z-index:10;
-      background:rgba(10,12,20,0.72); border:1px solid rgba(255,255,255,0.12);
-      color:#e8ecff; padding:14px 14px; border-radius:16px; width:min(560px, calc(100vw - 28px));
-      backdrop-filter: blur(10px);
-    }
-    #row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; align-items:center; }
-    button {
-      padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.18);
-      background:rgba(16,18,28,0.65); color:#fff; font-weight:600;
-    }
-    #diagStatus { opacity:0.9; margin-left:auto; }
-    #diagLog { white-space:pre-wrap; font-size:12px; line-height:1.25; max-height:180px; overflow:auto; opacity:0.92; }
-    #joyWrap{
-      position:fixed; left:0; right:0; bottom:0; height:42vh; z-index:10; pointer-events:none;
-      display:flex; justify-content:space-between; padding:0 18px 18px;
-    }
-    .joy {
-      width:min(44vw, 240px); height:min(44vw, 240px);
-      border-radius:999px; border:2px solid rgba(160,170,255,0.18);
-      background:rgba(90,100,180,0.10);
-      pointer-events:auto;
-    }
-    #music-ui{ position:fixed; right:12px; bottom:12px; z-index:10; display:flex; gap:8px; }
-    #storePanel{
-      position:fixed; right:14px; top:14px; z-index:11; width:310px;
-      background:rgba(10,12,20,0.75); border:1px solid rgba(255,255,255,0.12);
-      color:#e8ecff; padding:14px; border-radius:16px; display:none;
-      backdrop-filter: blur(10px);
-    }
-    #storePanel h3{ margin:0 0 10px 0; font-size:14px; }
-    #storePanel .item{ display:flex; justify-content:space-between; align-items:center; margin:8px 0; }
-  </style>
+  <title>ScarlettVR Poker • Safe Modular Spine</title>
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
   <div id="hud">
-    <div id="row">
-      <div style="font-weight:800;">ScarlettVR Poker • FULL RESTORE</div>
-      <div id="diagStatus">(starting...)</div>
-    </div>
-    <div id="row">
-      <button id="btnVR">Enter VR</button>
+    <div class="hud-title">ScarlettVR Poker • SAFE MODULAR SPINE</div>
+    <div class="hud-row">
+      <button id="btnEnterVR">Enter VR</button>
       <button id="btnReset">Reset</button>
-      <button onclick="navigator.clipboard.writeText(document.getElementById('diagLog').textContent)">Copy Report</button>
+      <button id="btnCopy">Copy Report</button>
+      <button id="btnHide">Hide</button>
     </div>
-    <pre id="diagLog"></pre>
-    <div style="opacity:0.7; font-size:12px;">Tip: Tap the purple Store Pad near the Store Door to open Store UI.</div>
+    <pre id="log">(starting…)</pre>
+    <div class="hud-row hud-row-bottom">
+      <button id="btnMusicOn">Music On</button>
+      <button id="btnMusicOff">Music Off</button>
+    </div>
   </div>
 
-  <div id="storePanel">
-    <h3>Store</h3>
-    <div class="item"><span>Avatar: Male</span><button onclick="console.log('equip male')">Equip</button></div>
-    <div class="item"><span>Avatar: Female</span><button onclick="console.log('equip female')">Equip</button></div>
-    <div class="item"><span>Avatar: Ninja</span><button onclick="console.log('equip ninja')">Equip</button></div>
-    <div class="item"><span>Avatar: Apocalypse</span><button onclick="console.log('equip apocalypse')">Equip</button></div>
-    <div style="margin-top:10px;"><button onclick="document.getElementById('storePanel').style.display='none'">Close</button></div>
-  </div>
-
-  <div id="music-ui">
-    <button id="musicPlay">Music On</button>
-    <button id="musicStop">Music Off</button>
-  </div>
-  <audio id="bgMusic" crossorigin="anonymous" preload="none"></audio>
-
-  <div id="joyWrap">
-    <div id="joyL" class="joy"></div>
-    <div id="joyR" class="joy"></div>
+  <div id="storePanel" class="panel" style="display:none;">
+    <div class="panel-title">Store</div>
+    <div class="panel-body">
+      <div>• Tap the purple Store Pad near the Store Door.</div>
+      <div>• This build is "safe modular": broken modules won’t black-screen.</div>
+    </div>
   </div>
 
   <script type="module" src="./index.js"></script>
