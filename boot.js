@@ -1,92 +1,51 @@
 // boot.js (ROOT) — BOOT TOOLS ONLY (PERMANENT)
-// Purpose: Debug HUD + Reload + Import Spine + NUKE caches/SW
-// IMPORTANT: This file MUST NOT import the app/spine/world.
+// IMPORTANT: MUST NOT import spine/world/app.
 
 const logEl = document.getElementById("log");
-const log = (s) => {
-  if (!logEl) return;
-  logEl.textContent += `\n${s}`;
-};
+const log = (s) => { if (logEl) logEl.textContent += `\n${s}`; };
 
-function cacheBust(url) {
+function cacheBust(url){
   const u = new URL(url, location.href);
   u.searchParams.set("v", String(Date.now()));
   return u.toString();
 }
 
-// Show all uncaught errors on the HUD (super important on Android)
-window.addEventListener("error", (e) => {
-  log(`\n[error] ${e.message || e.type}`);
-});
-
-window.addEventListener("unhandledrejection", (e) => {
-  log(`\n[reject] ${String(e.reason)}`);
-});
+window.addEventListener("error", (e) => log(`\n[error] ${e.message || e.type}`));
+window.addEventListener("unhandledrejection", (e) => log(`\n[reject] ${String(e.reason)}`));
 
 log(`starting…`);
 log(`href=${location.href}`);
 log(`ua=${navigator.userAgent}`);
 
-const btnReload = document.getElementById("btnReload");
-const btnImport = document.getElementById("btnImport");
-const btnNuke = document.getElementById("btnNuke");
+document.getElementById("btnReload")?.addEventListener("click", () => {
+  log(`\n[action] reload`);
+  location.reload();
+});
 
-if (btnReload) {
-  btnReload.onclick = () => {
-    log(`\n[action] reload`);
-    location.reload();
-  };
-}
+document.getElementById("btnImport")?.addEventListener("click", () => {
+  const target = cacheBust("./index.html");
+  log(`\n[action] import spine -> ${target}`);
+  location.href = target;
+});
 
-if (btnImport) {
-  btnImport.onclick = () => {
-    // Navigate to ROOT index.html (Spine entry) with cache-bust
-    const target = cacheBust("./index.html");
-    log(`\n[action] import spine -> ${target}`);
-    location.href = target;
-  };
-}
+document.getElementById("btnNuke")?.addEventListener("click", async () => {
+  log(`\n== NUKE START ==`);
+  try{
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      log(`SW registrations: ${regs.length}`);
+      for (const r of regs) { try { await r.unregister(); } catch {} }
+    } else log(`SW: not supported`);
 
-if (btnNuke) {
-  btnNuke.onclick = async () => {
-    log(`\n== NUKE START ==`);
-    try {
-      // Service Workers
-      if ("serviceWorker" in navigator) {
-        const regs = await navigator.serviceWorker.getRegistrations();
-        log(`SW registrations: ${regs.length}`);
-        for (const r of regs) {
-          try { await r.unregister(); } catch {}
-        }
-      } else {
-        log(`SW: not supported`);
-      }
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      log(`cache storages: ${keys.length}`);
+      for (const k of keys) { try { await caches.delete(k); } catch {} }
+    } else log(`caches: not supported`);
 
-      // Cache Storage
-      if ("caches" in window) {
-        const keys = await caches.keys();
-        log(`cache storages: ${keys.length}`);
-        for (const k of keys) {
-          try { await caches.delete(k); } catch {}
-        }
-      } else {
-        log(`caches: not supported`);
-      }
-
-      // Storage estimate (best effort)
-      if (navigator.storage?.estimate) {
-        try {
-          const est = await navigator.storage.estimate();
-          if (typeof est?.usage === "number") {
-            log(`storage usage: ${(est.usage / 1024 / 1024).toFixed(1)} MB`);
-          }
-        } catch {}
-      }
-
-      log(`== NUKE DONE ==`);
-      log(`(no auto reload — press Reload or Import Spine)`);
-    } catch (err) {
-      log(`\n[NUKE ERROR] ${err?.message || String(err)}`);
-    }
-  };
-}
+    log(`== NUKE DONE ==`);
+    log(`(no auto reload — press Reload or Import Spine)`);
+  } catch(err){
+    log(`\n[NUKE ERROR] ${err?.message || String(err)}`);
+  }
+});
