@@ -29,7 +29,7 @@ log(`ua=${navigator.userAgent}`);
 
 const btnReload = document.getElementById("btnReload");
 const btnImport = document.getElementById("btnImport");
-const btnNuke   = document.getElementById("btnNuke");
+const btnNuke = document.getElementById("btnNuke");
 
 if (btnReload) {
   btnReload.onclick = () => {
@@ -73,11 +73,13 @@ if (btnNuke) {
         log(`caches: not supported`);
       }
 
-      // Best-effort: clear storage (some browsers block this)
+      // Storage estimate (best effort)
       if (navigator.storage?.estimate) {
         try {
           const est = await navigator.storage.estimate();
-          log(`storage estimate: ${(est.usage/1024/1024).toFixed(1)}MB used`);
+          if (typeof est?.usage === "number") {
+            log(`storage usage: ${(est.usage / 1024 / 1024).toFixed(1)} MB`);
+          }
         } catch {}
       }
 
