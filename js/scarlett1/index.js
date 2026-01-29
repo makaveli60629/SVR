@@ -121,6 +121,9 @@ function animate(now){
   // XR controller movement
   xrMove?.update(dt);
 
+  // World animation hooks (table hologram, etc.)
+  if (world?.updates) { for (const fn of world.updates) { try { fn(dt); } catch(e){} } }
+
   renderer.render(scene, camera);
   renderer.setAnimationLoop(animate);
 }

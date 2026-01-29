@@ -1,5 +1,6 @@
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { makeCasinoFloorTexture } from './modules/floorTexture.js';
+import { createFuturisticTable } from './modules/futuristicTable.js';
 
 function addMegaLights(scene, outerR){
   // Base lights
@@ -39,7 +40,7 @@ function addRailWithGap(scene, holeR, { entranceAngle=Math.PI/2, gapAngle=Math.P
   rim.rotation.x = Math.PI/2;
   // Align gap center to entranceAngle
   rim.rotation.y = entranceAngle - (Math.PI*2 - gapAngle/2);
-  rim.position.y = 0.02;
+  rim.position.y = 0.01;
   scene.add(rim);
 
   // Top rail tube with same gap
@@ -48,7 +49,7 @@ function addRailWithGap(scene, holeR, { entranceAngle=Math.PI/2, gapAngle=Math.P
   rail.name = "PitRailTop";
   rail.rotation.x = Math.PI/2;
   rail.rotation.y = rim.rotation.y;
-  rail.position.y = 1.0;
+  rail.position.y = 1.05;
   scene.add(rail);
 
   // Posts (skip in the gap)
@@ -111,57 +112,141 @@ function addStraightStairs(scene, holeR, pitDepthY, { entranceAngle=Math.PI/2 } 
   return group;
 }
 
-function addPokerTable8(scene, pitDepthY){
+
+function addPokerTable8(scene, pitDepthY, { tableDrop=1.6 } = {}){
+  // tableDrop controls how far BELOW the upper deck (y=0) the tabletop sits.
+  // With pitDepthY=-2.0 and tableDrop=1.6 -> tabletop around y=-1.6 (nice "look down" feel).
   const group = new THREE.Group();
   group.name = "PokerTableArea";
-  group.position.y = pitDepthY;
+  group.position.y = 0; // we place absolute Ys below
 
-  // Pedestal
+  const tableTopY = -Math.abs(tableDrop);
+  const baseY = pitDepthY; // pit floor reference
+
+  // Table stand / pedestal (shorter, actually supports table)
+  const pedestalH = 1.2;
   const pedestal = new THREE.Mesh(
-    new THREE.CylinderGeometry(2.4, 2.9, 2.6, 84),
-    new THREE.MeshStandardMaterial({ color: 0x2a2a33, roughness: 0.75, metalness: 0.1 })
+    new THREE.CylinderGeometry(1.4, 1.9, pedestalH, 64),
+    new THREE.MeshStandardMaterial({ color: 0x2a2a33, roughness: 0.7, metalness: 0.08 })
   );
-  pedestal.position.y = 1.3;
+  pedestal.name = "TableStand";
+  pedestal.position.y = tableTopY - (pedestalH/2) - 0.15;
   group.add(pedestal);
 
-  // Table top
+  // Table top (8 seats)
   const table = new THREE.Mesh(
-    new THREE.CylinderGeometry(2.15, 2.15, 0.26, 96),
-    new THREE.MeshStandardMaterial({ color: 0x0a6b33, roughness: 0.95 })
+    new THREE.CylinderGeometry(2.10, 2.10, 0.22, 96),
+    new THREE.MeshStandardMaterial({ color: 0x0a6b33, roughness: 0.92 })
   );
-  table.position.y = 2.65;
+  table.name = "PokerTableTop";
+  table.position.y = tableTopY;
   group.add(table);
 
-  // Rail
+  // Table rail
   const rail = new THREE.Mesh(
-    new THREE.TorusGeometry(2.25, 0.14, 18, 200),
+    new THREE.TorusGeometry(2.22, 0.14, 18, 200),
     new THREE.MeshStandardMaterial({ color: 0x1a0f0a, roughness: 0.85 })
   );
-  rail.position.y = 2.78;
+  rail.name = "TableRail";
+  rail.position.y = tableTopY + 0.10;
   rail.rotation.x = Math.PI/2;
   group.add(rail);
 
-  // 8 divots
+  // Seat divots (8)
   const divotMat = new THREE.MeshStandardMaterial({ color: 0x064a24, roughness: 1.0 });
-  const dR = 1.55;
+  const seatR = 1.55;
   for (let i=0;i<8;i++){
     const a = (i/8)*Math.PI*2;
-    const divot = new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.28,0.03,36), divotMat);
-    divot.position.set(Math.cos(a)*dR, 2.79, Math.sin(a)*dR);
+    const divot = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.03, 36), divotMat);
+    divot.position.set(Math.cos(a)*seatR, tableTopY+0.012, Math.sin(a)*seatR);
     group.add(divot);
-
-    // Simple chair block
-    const chair = new THREE.Mesh(
-      new THREE.BoxGeometry(0.75, 0.85, 0.55),
-      new THREE.MeshStandardMaterial({ color: 0x14141b, roughness: 0.9 })
-    );
-    chair.position.set(Math.cos(a)*3.25, 0.42, Math.sin(a)*3.25);
-    chair.lookAt(0, chair.position.y, 0);
-    group.add(chair);
   }
 
+  // 8 "nice chairs" (procedural geometry)
+  const chairGroup = new THREE.Group();
+  chairGroup.name = "Chairs8";
+  const chairMat = new THREE.MeshStandardMaterial({ color: 0x1b1b22, roughness: 0.85 });
+  const accentMat = new THREE.MeshStandardMaterial({ color: 0x0b2b6f, roughness: 0.6, emissive: 0x0b2b6f, emissiveIntensity: 0.6 });
+
+  function makeChair(){
+    const g = new THREE.Group();
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.10, 0.60), chairMat);
+    seat.position.y = 0.55;
+    g.add(seat);
+
+    const back = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.70, 0.12), chairMat);
+    back.position.set(0, 0.95, -0.24);
+    g.add(back);
+
+    const glow = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.04, 0.64), accentMat);
+    glow.position.y = 0.60;
+    g.add(glow);
+
+    const legGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.55, 12);
+    for (const sx of [-0.26, 0.26]){
+      for (const sz of [-0.26, 0.26]){
+        const leg = new THREE.Mesh(legGeo, chairMat);
+        leg.position.set(sx, 0.275, sz);
+        g.add(leg);
+      }
+    }
+    return g;
+  }
+
+  const chairRing = 2.85;
+  for (let i=0;i<8;i++){
+    const a = (i/8)*Math.PI*2;
+    const chair = makeChair();
+    chair.position.set(Math.cos(a)*chairRing, tableTopY-0.05, Math.sin(a)*chairRing);
+    chair.rotation.y = -a + Math.PI; // face table
+    chairGroup.add(chair);
+  }
+  group.add(chairGroup);
+
+  // Simple bots (placeholder) seated/standing behind chairs
+  const botGroup = new THREE.Group();
+  botGroup.name = "Bots8";
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2b2b36, roughness: 0.7 });
+  const headMat = new THREE.MeshStandardMaterial({ color: 0x3a3a4a, roughness: 0.6 });
+  const bodyGeo = new THREE.CapsuleGeometry(0.16, 0.50, 8, 16);
+  const headGeo = new THREE.SphereGeometry(0.14, 18, 12);
+
+  for (let i=0;i<8;i++){
+    const a = (i/8)*Math.PI*2;
+    const bot = new THREE.Group();
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    body.position.y = 0.70;
+    const head = new THREE.Mesh(headGeo, headMat);
+    head.position.y = 1.10;
+    bot.add(body); bot.add(head);
+
+    bot.position.set(Math.cos(a)*(chairRing+0.35), tableTopY-0.05, Math.sin(a)*(chairRing+0.35));
+    bot.rotation.y = -a + Math.PI;
+    botGroup.add(bot);
+  }
+  group.add(botGroup);
+
+  // Hovering cards demo above table
+  const cardMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85 });
+  const cardGeo = new THREE.BoxGeometry(0.18, 0.01, 0.26);
+  const cards = new THREE.Group();
+  cards.name = "CardsHover";
+  const cardY = tableTopY + 0.20;
+  for (let i=0;i<5;i++){
+    const c = new THREE.Mesh(cardGeo, cardMat);
+    c.position.set((i-2)*0.22, cardY, 0);
+    c.rotation.y = 0.15*(i-2);
+    cards.add(c);
+  }
+  group.add(cards);
+
+  // Local lights for table area (brighter)
+  const tableLight = new THREE.PointLight(0xffffff, 1.1, 12);
+  tableLight.position.set(0, tableTopY + 3.0, 0);
+  group.add(tableLight);
+
   scene.add(group);
-  return group;
+  return { group, tableTopY, baseY };
 }
 
 function addGuard(scene, holeR, { entranceAngle=Math.PI/2 } = {}){
@@ -216,6 +301,8 @@ export function buildWorld(scene, opts = {}) {
   const gapAngle = opts.gapAngle ?? (Math.PI/5); // 36 degrees gap
 
   addMegaLights(scene, outerR);
+  addLobbyShell(scene, outerR);
+  addPitDownlights(scene, holeR, { count: 12, y: 5.0 });
 
   // Upper ring deck (no cap possible)
   const tex = makeCasinoFloorTexture();
@@ -253,7 +340,10 @@ export function buildWorld(scene, opts = {}) {
   const stairs = addStraightStairs(scene, holeR, pitDepthY, { entranceAngle });
 
   // Table + 8 chairs in pit
-  const tableArea = addPokerTable8(scene, pitDepthY);
+  const pod = createFuturisticTable(scene, { tableY: -1.6 });
+
+  // Keep an update hook for hologram glow/animation
+  const updates = [ (dt)=>pod.update(dt) ];
 
   // Guard at entrance
   const guard = addGuard(scene, holeR, { entranceAngle });
@@ -261,5 +351,82 @@ export function buildWorld(scene, opts = {}) {
   // Fog for depth
   scene.fog = new THREE.Fog(0x050509, 3.0, 55.0);
 
-  return { holeR, outerR, pitDepthY, wallDepth, entranceAngle, gapAngle, rail, stairs, tableArea, guard };
+  return { holeR, outerR, pitDepthY, wallDepth, entranceAngle, gapAngle, rail, stairs, pod, guard, updates };
 }
+
+function addPitDownlights(scene, holeR, { count=10, y=3.5, radiusOffset=0.9 } = {}){
+  const g = new THREE.Group();
+  g.name = "PitDownlights";
+  for (let i=0;i<count;i++){
+    const a = (i/count)*Math.PI*2;
+    const p = new THREE.PointLight(0x9fb6ff, 0.9, 40);
+    p.position.set(Math.cos(a)*(holeR+radiusOffset), y, Math.sin(a)*(holeR+radiusOffset));
+    g.add(p);
+  }
+  scene.add(g);
+  return g;
+}
+
+function addLobbyShell(scene, outerR){
+  const g = new THREE.Group();
+  g.name = "LobbyShell";
+
+  // Circular wall
+  const wall = new THREE.Mesh(
+    new THREE.CylinderGeometry(outerR, outerR, 8.0, 160, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0x0a0a12, roughness: 0.95, side: THREE.DoubleSide })
+  );
+  wall.position.y = 4.0;
+  g.add(wall);
+
+  // Ceiling ring
+  const ceiling = new THREE.Mesh(
+    new THREE.RingGeometry(4.0, outerR, 160, 1),
+    new THREE.MeshStandardMaterial({ color: 0x050509, roughness: 1.0, side: THREE.DoubleSide })
+  );
+  ceiling.rotation.x = -Math.PI/2;
+  ceiling.position.y = 8.0;
+  g.add(ceiling);
+
+  // 4 jumbotrons (simple emissive panels)
+  const screenMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.9, roughness: 0.6 });
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x111118, roughness: 0.8 });
+  const screenGeo = new THREE.PlaneGeometry(6.0, 3.2);
+  const frameGeo = new THREE.BoxGeometry(6.3, 3.5, 0.18);
+
+  const screenR = outerR - 0.6;
+  for (let i=0;i<4;i++){
+    const a = i*(Math.PI/2);
+    const frame = new THREE.Mesh(frameGeo, frameMat);
+    frame.position.set(Math.cos(a)*screenR, 4.6, Math.sin(a)*screenR);
+    frame.lookAt(0,4.6,0);
+    g.add(frame);
+
+    const screen = new THREE.Mesh(screenGeo, screenMat);
+    screen.position.set(Math.cos(a)*(screenR-0.12), 4.6, Math.sin(a)*(screenR-0.12));
+    screen.lookAt(0,4.6,0);
+    g.add(screen);
+
+    // Door under each jumbotron
+    const door = new THREE.Mesh(
+      new THREE.BoxGeometry(2.4, 3.2, 0.15),
+      new THREE.MeshStandardMaterial({ color: 0x111118, roughness: 0.9 })
+    );
+    door.position.set(Math.cos(a)*(screenR-0.15), 1.7, Math.sin(a)*(screenR-0.15));
+    door.lookAt(0,1.7,0);
+    g.add(door);
+  }
+
+  // Neon arch accents
+  const archMat = new THREE.MeshStandardMaterial({ color: 0x0b2b6f, emissive: 0x0b2b6f, emissiveIntensity: 1.6, roughness: 0.5 });
+  for (let i=0;i<3;i++){
+    const arch = new THREE.Mesh(new THREE.TorusGeometry(outerR-1.2-i*0.9, 0.06, 12, 220, Math.PI*1.15), archMat);
+    arch.rotation.x = Math.PI/2;
+    arch.position.y = 7.2 - i*0.8;
+    g.add(arch);
+  }
+
+  scene.add(g);
+  return g;
+}
+
