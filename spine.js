@@ -5,10 +5,9 @@
  *  - XR session button
  *  - single animation loop
  *
- * Scarlett1 owns:
- *  - world geometry + modules
- *  - exports: async function init(ctx)
- *  - returns: { updates:[fn(dt)], interactables:[...] }
+ * Scarlett1 world contract:
+ *   /js/scarlett1/world.js exports async function init(ctx)
+ *   returns { updates:[fn(dt)], interactables:[...] }
  *
  * ONLY EDIT /js/scarlett1/* from now on.
  */
