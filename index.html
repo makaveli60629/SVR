@@ -4,11 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>ScarlettVR Poker • Permanent Spine</title>
-  <link rel="stylesheet" href="./css/style.css?v=1" />
+  <link rel="stylesheet" href="./css/style.css?v=2" />
 </head>
 
 <body>
-  <!-- HUD -->
   <div id="hud" class="hud">
     <div class="hud__title">
       <div class="hud__brand">ScarlettVR Poker • Permanent Spine</div>
@@ -22,12 +21,81 @@
       <button id="btnCopy" class="btn">Copy Report</button>
       <button id="btnHard" class="btn btn--warn">Hard Reload</button>
       <button id="btnBoot" class="btn">Boot Tools</button>
+      <button id="btnPurge" class="btn">Purge Cache</button>
     </div>
 
     <pre id="diag" class="hud__diag">(starting...)</pre>
   </div>
 
-  <!-- ROOT ENTRY -->
-  <script type="module" src="./index.js?v=1"></script>
+  <!-- PLAIN JS ALWAYS RUNS (even if module fails) -->
+  <script>
+    (function(){
+      const el = document.getElementById('diag');
+      const write = (t)=>{ if(el) el.textContent = (el.textContent ? el.textContent + "\n" : "") + t; };
+      write("[plain] js running ✅");
+
+      // show uncaught errors in the diag box
+      window.addEventListener('error', (e)=> write("[plain][error] " + (e.message || e.type || e)));
+      window.addEventListener('unhandledrejection', (e)=> write("[plain][rejection] " + String(e.reason || e)));
+
+      // hard reload works even if modules fail
+      const hard = document.getElementById('btnHard');
+      if(hard){
+        hard.addEventListener('click', ()=>{
+          write("[plain] hard reload…");
+          const u = new URL(location.href);
+          u.searchParams.set('v', String(Date.now()));
+          location.replace(u.toString());
+        });
+      }
+
+      // purge cache (service worker + caches)
+      const purge = document.getElementById('btnPurge');
+      if(purge){
+        purge.addEventListener('click', async ()=>{
+          write("[plain] purging SW + caches…");
+          try{
+            if('serviceWorker' in navigator){
+              const regs = await navigator.serviceWorker.getRegistrations();
+              for(const r of regs) await r.unregister();
+              write("[plain] service workers unregistered ✅");
+            }
+          }catch(e){ write("[plain][warn] sw purge failed: " + (e.message||e)); }
+
+          try{
+            if('caches' in window){
+              const keys = await caches.keys();
+              for(const k of keys) await caches.delete(k);
+              write("[plain] caches cleared ✅");
+            }
+          }catch(e){ write("[plain][warn] cache delete failed: " + (e.message||e)); }
+
+          write("[plain] reload now…");
+          const u = new URL(location.href);
+          u.searchParams.set('v', String(Date.now()));
+          location.replace(u.toString());
+        });
+      }
+    })();
+  </script>
+
+  <!-- MODULE LOADER (prints import errors to diag) -->
+  <script type="module">
+    const el = document.getElementById('diag');
+    const write = (t)=>{ if(el) el.textContent = (el.textContent ? el.textContent + "\n" : "") + t; };
+
+    write("[module] loader starting…");
+    const bust = Date.now();
+
+    try{
+      await import(`./index.js?v=${bust}`);
+      write("[module] index.js loaded ✅");
+    }catch(e){
+      write("[module][error] Failed to import ./index.js");
+      write("[module][error] " + (e?.message || String(e)));
+      // Common hint
+      write("[hint] If this says 404 or MIME type, your index.js path is wrong or cached.");
+    }
+  </script>
 </body>
 </html>
