@@ -3,38 +3,43 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <meta name="theme-color" content="#111111" />
+  <meta name="theme-color" content="#070913" />
   <title>ScarlettVR Poker • Permanent Spine</title>
-  <link rel="manifest" href="./manifest.json" />
-  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- HARD CACHE BUST (change v= number anytime) -->
+  <link rel="stylesheet" href="./css/style.css?v=9003">
+
+  <style>
+    /* Fallback so even if CSS fails, buttons aren't ugly */
+    body{background:#070913;color:#eaf0ff;font-family:system-ui;margin:0;overflow:hidden}
+    .hud{position:fixed;left:12px;top:12px;right:12px;max-width:820px;z-index:50;background:rgba(10,14,24,.82);border:1px solid rgba(140,170,255,.2);border-radius:24px;padding:16px}
+    .hud__row{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+    .btn{border:1px solid rgba(255,255,255,.18);background:rgba(8,12,20,.58);color:#eaf0ff;border-radius:18px;padding:12px 16px;font-weight:900;font-size:18px}
+    .hud__diag{margin:0;padding:12px;background:rgba(6,8,14,.55);border:1px solid rgba(140,170,255,.14);border-radius:18px;min-height:56px;max-height:220px;overflow:auto;white-space:pre-wrap;font-family:ui-monospace;font-size:13px}
+  </style>
 </head>
+
 <body>
-
-  <!-- HUD (always above the canvas) -->
-  <div id="hud">
-    <div class="hud-card">
-      <div class="hud-title">ScarlettVR Poker • Permanent Spine</div>
-      <div class="hud-subtitle">Root spine is permanent • Only edit <b>/js/scarlett1/*</b></div>
-
-      <div class="hud-actions">
-        <button id="btnEnterVR" class="hud-btn">Enter VR</button>
-        <button id="btnReset" class="hud-btn">Reset Spawn</button>
-        <button id="btnHideHUD" class="hud-btn">Hide HUD</button>
-        <button id="btnCopy" class="hud-btn">Copy Report</button>
-        <button id="btnHardReload" class="hud-btn hud-btn--gold">Hard Reload</button>
-        <a class="hud-btn hud-btn--wide" href="./boot.html" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
-          Boot Tools
-        </a>
-      </div>
-
-      <div id="diagBox">
-        <pre id="diagPre">(starting…)</pre>
-      </div>
+  <!-- HUD -->
+  <div id="dev-hud" class="hud">
+    <div class="hud__title">
+      <div class="hud__brand">ScarlettVR Poker • Permanent Spine</div>
+      <div class="hud__sub">Root spine is permanent • Only edit <b>/js/scarlett1/*</b></div>
     </div>
+
+    <div class="hud__row">
+      <button id="btn-enter-vr" class="btn">Enter VR</button>
+      <button id="btn-reset" class="btn">Reset Spawn</button>
+      <button id="btn-hide" class="btn">Hide HUD</button>
+      <button id="btn-copy" class="btn">Copy Report</button>
+      <button id="btn-reload" class="btn btn--warn">Hard Reload</button>
+      <button id="btn-tools" class="btn">Boot Tools</button>
+    </div>
+
+    <pre id="diag" class="hud__diag">(starting...)</pre>
   </div>
 
-  <!-- Root entry -->
-  <script type="module" src="./index.js"></script>
-
+  <!-- Touch UI layer is created by world.js -->
+  <script type="module" src="./index.js?v=9003"></script>
 </body>
 </html>
