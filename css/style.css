@@ -1,200 +1,160 @@
-/* /css/style.css — SCARLETT PERMANENT (FULL)
-   - Mobile-first HUD
-   - Keeps Android joystick/LookPad ON TOP
-   - Dark neon theme + readable diagnostics
-*/
+/* =========================================
+   SCARLETT HUD + CANVAS — PERMANENT
+   Fixes:
+   - Canvas always visible full screen
+   - HUD floats above without blacking out scene
+   - Diagnostics readable
+   ========================================= */
 
-/* ---------- Base / Reset ---------- */
 :root{
-  --bg:#070812;
-  --panel: rgba(10,14,22,0.86);
-  --panel2: rgba(8,12,20,0.70);
-  --border: rgba(140,180,255,0.18);
-  --border2: rgba(255,255,255,0.10);
-  --text:#e9eefc;
-  --muted:#b6c2e8;
-  --accent:#8a2be2;
-  --warn:#ffb547;
-  --shadow: 0 18px 60px rgba(0,0,0,0.55);
-
-  /* Leave room so controls don’t collide with phone nav bars */
-  --safeL: env(safe-area-inset-left, 0px);
-  --safeR: env(safe-area-inset-right, 0px);
-  --safeT: env(safe-area-inset-top, 0px);
-  --safeB: env(safe-area-inset-bottom, 0px);
+  --hud-w: min(520px, calc(100vw - 24px));
+  --glass: rgba(10, 12, 20, 0.62);
+  --glass2: rgba(8, 10, 16, 0.72);
+  --stroke: rgba(180, 200, 255, 0.18);
+  --stroke2: rgba(180, 200, 255, 0.28);
+  --text: rgba(240, 245, 255, 0.92);
+  --muted: rgba(240, 245, 255, 0.70);
+  --purple: rgba(138, 43, 226, 0.95);
+  --shadow: 0 20px 60px rgba(0,0,0,0.55);
 }
 
-*{ box-sizing:border-box; }
-html,body{
+html, body{
   margin:0;
+  padding:0;
+  width:100%;
   height:100%;
-  background: radial-gradient(1100px 650px at 50% 0%, rgba(138,43,226,0.15), transparent 55%),
-              radial-gradient(900px 600px at 15% 35%, rgba(60,120,255,0.12), transparent 55%),
-              radial-gradient(900px 600px at 85% 35%, rgba(255,120,60,0.07), transparent 58%),
-              var(--bg);
-  color:var(--text);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   overflow:hidden;
-  touch-action:manipulation;
+  background:#05050b;
+  touch-action:none;
+  -webkit-tap-highlight-color: transparent;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
 }
 
-a{ color:inherit; text-decoration:none; }
-button{ font:inherit; }
-
-/* Make sure the WebGL canvas sits behind UI */
+/* The Three.js canvas MUST be visible and behind HUD */
 canvas{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  display:block !important;
+  z-index:0 !important;
+}
+
+/* A subtle background in case WebGL fails */
+body::before{
+  content:"";
   position:fixed;
   inset:0;
-  width:100% !important;
-  height:100% !important;
-  display:block;
-  z-index:0;
+  z-index:-1;
+  background:
+    radial-gradient(1200px 700px at 50% 60%, rgba(138,43,226,0.20), transparent 55%),
+    radial-gradient(900px 500px at 30% 25%, rgba(0,180,255,0.14), transparent 55%),
+    radial-gradient(900px 600px at 70% 20%, rgba(255,80,160,0.08), transparent 55%),
+    linear-gradient(#05050b, #05050b);
 }
 
-/* ---------- HUD Container ---------- */
-/* IMPORTANT:
-   - HUD below joystick/lookpad (z-index 50)
-   - Joysticks created in world.js use z-index:999999
-*/
-.hud{
+/* HUD container */
+#hud{
   position:fixed;
-  left: calc(12px + var(--safeL));
-  top:  calc(12px + var(--safeT));
-  right:calc(12px + var(--safeR));
-  max-width: 820px;
-  margin:0 auto;
-
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  padding: 14px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
-
-  z-index:50;
+  top:12px;
+  left:12px;
+  width:var(--hud-w);
+  z-index:1000;
   pointer-events:auto;
 }
 
 .hud--hidden{
-  opacity:0;
-  pointer-events:none;
-  transform: translateY(-8px);
-  transition: opacity .18s ease, transform .18s ease;
+  display:none !important;
 }
 
-/* ---------- HUD Header ---------- */
-.hud__title{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  margin-bottom: 10px;
-}
-.hud__brand{
-  font-weight: 900;
-  letter-spacing: .02em;
-  font-size: 18px;
-}
-.hud__sub{
-  font-weight: 650;
-  font-size: 12px;
-  color: rgba(230,236,252,0.78);
+/* HUD panel */
+.hud-card{
+  background: linear-gradient(180deg, rgba(14,16,26,0.76), rgba(10,12,20,0.66));
+  border:1px solid var(--stroke);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding:16px;
+  backdrop-filter: blur(10px);
 }
 
-/* ---------- Button Row ---------- */
-.hud__row{
+/* Title */
+.hud-title{
+  color:var(--text);
+  font-size:28px;
+  font-weight:900;
+  letter-spacing:-0.02em;
+  margin:0 0 2px 0;
+}
+.hud-subtitle{
+  color:var(--muted);
+  margin:0 0 14px 0;
+  font-size:14px;
+  font-weight:600;
+}
+
+/* Buttons */
+.hud-actions{
   display:flex;
   flex-wrap:wrap;
   gap:10px;
-  margin: 10px 0 12px;
+  margin-bottom:12px;
 }
 
-/* ---------- Buttons ---------- */
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-
-  padding: 12px 14px;
-  border-radius: 16px;
-
-  background: rgba(20,30,55,0.75);
-  border: 1px solid rgba(140,180,255,0.22);
-  color: rgba(255,255,255,0.95);
-
+.hud-btn{
+  border:1px solid var(--stroke2);
+  background: rgba(12,14,22,0.55);
+  color: var(--text);
+  border-radius: 18px;
+  padding: 12px 16px;
+  font-size: 18px;
   font-weight: 800;
-  letter-spacing: .01em;
+  letter-spacing: 0.01em;
   cursor:pointer;
-  user-select:none;
-
-  transition: transform .05s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
-}
-.btn:active{ transform: scale(0.99); }
-.btn:hover{ background: rgba(26,38,68,0.82); border-color: rgba(160,205,255,0.30); }
-
-.btn--warn{
-  background: rgba(70,38,10,0.65);
-  border-color: rgba(255,181,71,0.35);
-}
-.btn--warn:hover{
-  background: rgba(88,46,12,0.72);
-  border-color: rgba(255,181,71,0.48);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
 }
 
-/* Make anchor look like button */
-a.btn{ text-decoration:none; }
+.hud-btn:active{
+  transform: translateY(1px);
+}
 
-/* ---------- Diagnostics Box ---------- */
-.hud__diag{
-  margin:0;
-  background: rgba(0,0,0,0.35);
-  border: 1px solid rgba(140,180,255,0.14);
-  border-radius: 16px;
+.hud-btn--gold{
+  border-color: rgba(255,170,70,0.35);
+  background: rgba(70, 42, 10, 0.55);
+}
 
+.hud-btn--wide{
+  width: 220px;
+}
+
+/* Diagnostics area */
+#diagBox{
+  margin-top: 10px;
+  background: linear-gradient(180deg, rgba(6,7,12,0.72), rgba(6,7,12,0.62));
+  border:1px solid rgba(180,200,255,0.14);
+  border-radius: 18px;
   padding: 12px;
-  min-height: 110px;
-  max-height: 46vh;
-  overflow:auto;
+}
 
+#diagPre{
+  margin:0;
+  color: rgba(240,245,255,0.86);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.35;
   white-space: pre-wrap;
   word-break: break-word;
-
-  font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-  font-size: 12.5px;
-  line-height: 1.35;
-  color: rgba(235,240,255,0.93);
+  max-height: 260px;
+  overflow:auto;
 }
 
-/* Scrollbar (where supported) */
-.hud__diag::-webkit-scrollbar{ width:10px; }
-.hud__diag::-webkit-scrollbar-thumb{
-  background: rgba(138,43,226,0.35);
-  border-radius: 999px;
-  border: 2px solid rgba(0,0,0,0.25);
+/* XRButton from Three.js */
+button#VRButton, button#ARButton{
+  z-index:1100 !important;
+  border-radius: 14px !important;
 }
-.hud__diag::-webkit-scrollbar-track{ background: rgba(0,0,0,0.10); }
 
-/* ---------- Mobile tuning ---------- */
+/* Mobile safe */
 @media (max-width: 520px){
-  .hud{ padding: 12px; border-radius: 20px; }
-  .hud__brand{ font-size: 17px; }
-  .btn{ padding: 11px 12px; border-radius: 15px; }
-  .hud__diag{ max-height: 44vh; }
-}
-
-/* ---------- Keep Android controls always clickable ---------- */
-/* If anything overlays them, this ensures our sticks can still receive input. */
-#scarlett-move-stick,
-#scarlett-look-pad{
-  pointer-events:auto !important;
-}
-
-/* Optional: If you ever want HUD not to steal touches except on its own controls,
-   you can enable these two lines. Leave OFF unless you need it.
-.hud{ pointer-events:none; }
-.hud .btn, .hud .hud__diag{ pointer-events:auto; }
-*/
-
-/* ---------- XR Button (Three.js XRButton) ---------- */
-button[style*="START XR"], button[style*="ENTER VR"]{
-  font-weight: 900;
-}
+  #hud{ width: calc(100vw - 24px); }
+  .hud-btn{ font-size: 16px; padding: 11px 14px; }
+   }
