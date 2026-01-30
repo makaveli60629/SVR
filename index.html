@@ -12,48 +12,21 @@
     <h1>ScarlettVR Poker • Permanent Spine</h1>
     <p>Root spine is permanent • Only edit <code>/js/scarlett1/*</code></p>
 
-    <div class="buttons">
-      <button onclick="window.SCARLETT?.enterVR?.()">Enter VR</button>
-      <button onclick="window.SCARLETT?.resetSpawn?.()">Reset Spawn</button>
-      <button onclick="document.getElementById('diag').style.display='none'">Hide HUD</button>
-      <button onclick="navigator.clipboard.writeText(window.SCARLETT?.getReport?.() || 'no report')">Copy Report</button>
-      <button onclick="location.href = location.pathname + '?v=' + Date.now()">Hard Reload</button>
-      <button onclick="window.__PURGE__?.()">Purge Cache</button>
-    </div>
+    <button onclick="window.SCARLETT?.enterVR()">Enter VR</button>
+    <button onclick="window.SCARLETT?.resetSpawn()">Reset Spawn</button>
+    <button onclick="navigator.clipboard.writeText(window.SCARLETT?.getReport?.() || '')">Copy Report</button>
+    <button onclick="location.reload(true)">Hard Reload</button>
 
     <pre id="diag">(starting...)</pre>
   </div>
 
-  <!-- 1) Prove HTML is executing -->
   <script>
-    (function(){
-      const el = document.getElementById('diag');
-      if (el) el.textContent = '[boot] html loaded ✅\n' + el.textContent;
-
-      // Purge SW + Caches (works on Android + Quest)
-      window.__PURGE__ = async function(){
-        try {
-          if ('serviceWorker' in navigator) {
-            const regs = await navigator.serviceWorker.getRegistrations();
-            for (const r of regs) await r.unregister();
-          }
-          if (window.caches) {
-            const keys = await caches.keys();
-            for (const k of keys) await caches.delete(k);
-          }
-          if (el) el.textContent = '[boot] PURGED ✅ — reloading…';
-        } catch (e) {
-          if (el) el.textContent = '[boot] purge failed: ' + (e && e.message ? e.message : e);
-        }
-        location.href = location.pathname + '?v=' + Date.now();
-      };
-    })();
+    document.getElementById('diag').textContent =
+      '[boot] html loaded ✅\n(starting...)';
   </script>
 
-  <!-- 2) Force-cachebust module load -->
-  <script type="module">
-    import './index.js?v=' + Date.now();
-  </script>
+  <!-- ✅ CORRECT MODULE LOAD -->
+  <script type="module" src="./index.js"></script>
 
 </body>
 </html>
