@@ -685,4 +685,4 @@ export async function init(ctx){
     ],
     interactables:[]
   };
-}
+      }
