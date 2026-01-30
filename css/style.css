@@ -1,117 +1,106 @@
-:root{
-  --bg: #05060b;
-  --card: rgba(20,22,30,.65);
-  --stroke: rgba(255,255,255,.12);
-  --txt: rgba(255,255,255,.92);
-  --muted: rgba(255,255,255,.7);
-  --btn: rgba(255,255,255,.08);
-  --btn2: rgba(255,255,255,.12);
-  --shadow: 0 14px 50px rgba(0,0,0,.55);
-  --r: 26px;
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  overflow: hidden;
 }
 
-*{ box-sizing: border-box; }
-html,body{ height:100%; margin:0; background:var(--bg); color:var(--txt); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
-body{ overflow:hidden; }
-
-/* WebGL stage */
-#stage{
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-}
-
-/* Canvas always behind HUD */
-#stage canvas{
+/* THREE CANVAS */
+#stage canvas {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  display:block;
+  z-index: 0;
+  pointer-events: none;
 }
 
-/* HUD overlay */
-.hud{
+/* HUD */
+.hud {
   position: fixed;
   inset: 0;
   z-index: 10;
   display: flex;
-  align-items: flex-start;
   justify-content: center;
-  padding: 22px 14px;
-  pointer-events: none; /* allow world input when HUD hidden */
+  align-items: flex-start;
+  padding: 20px;
+  pointer-events: auto;
 }
 
-.hud .card{
-  pointer-events: auto; /* re-enable clicks inside HUD */
-  width: min(820px, 96vw);
-  border-radius: var(--r);
-  background: radial-gradient(1200px 500px at 50% 0%, rgba(255,255,255,.09), transparent 55%),
-              var(--card);
-  border: 1px solid var(--stroke);
-  box-shadow: var(--shadow);
-  padding: 22px 18px;
-  backdrop-filter: blur(16px);
+.hud > div,
+.hud {
+  max-width: 420px;
+  margin: auto;
+  background: rgba(20,20,30,0.85);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 0 60px rgba(120,80,255,.25);
 }
 
-h1{
-  margin: 0 0 6px 0;
-  font-size: clamp(34px, 7vw, 64px);
-  letter-spacing: .2px;
+h1 {
+  margin-top: 0;
+  font-size: 1.6rem;
 }
 
-.sub{
-  margin: 0 0 16px 0;
-  color: var(--muted);
-  font-size: 16px;
-}
-
-code{
-  background: rgba(255,255,255,.10);
-  border: 1px solid rgba(255,255,255,.14);
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-
-.grid{
+.btns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 14px 0 14px 0;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.btn{
-  appearance:none;
-  border: 1px solid rgba(255,255,255,.14);
-  background: linear-gradient(180deg, var(--btn2), var(--btn));
-  color: var(--txt);
-  padding: 14px 14px;
-  font-size: 18px;
-  border-radius: 18px;
-  box-shadow: 0 10px 26px rgba(0,0,0,.35);
+button {
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-size: 1rem;
 }
 
-.btn:active{ transform: translateY(1px); }
-
-.diag{
-  margin: 12px 0 10px 0;
-  padding: 14px 14px;
-  border-radius: 18px;
-  background: rgba(0,0,0,.38);
-  border: 1px solid rgba(255,255,255,.10);
-  color: rgba(255,255,255,.9);
-  min-height: 72px;
+pre {
+  font-size: 0.85rem;
+  opacity: .9;
   white-space: pre-wrap;
-  word-break: break-word;
 }
 
-.tip{
-  margin: 0;
-  color: rgba(255,255,255,.55);
-  font-size: 14px;
+/* HUD HIDDEN */
+body.hud-hidden .hud {
+  display: none;
 }
 
-/* HUD hide mode */
-body.hud-hidden #hud{
-  display:none;
+body.hud-hidden #stage canvas {
+  pointer-events: auto;
+}
+
+/* ANDROID JOYSTICK */
+#joy {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  width: 160px;
+  height: 160px;
+  z-index: 5;
+}
+
+#joyBase {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.2);
+  position: relative;
+}
+
+#joyKnob {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.18);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
 }
