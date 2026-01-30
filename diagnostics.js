@@ -1,1 +1,1 @@
-export function initDiagnostics(){return{log:console.log,warn:console.warn,error:console.error}}
+api.log('[diag] diagnostics ready ✅');
