@@ -1,37 +1,34 @@
-/**
- * index.js — ROOT ENTRY (PERMANENT)
- * This is the ONLY JS loaded by index.html
- * It boots diagnostics + spine.
- */
-
-import { initDiagnostics } from './diagnostics.js';
 import { Spine } from './spine.js';
 
-// ---- DIAGNOSTICS BOOT ----
-const diag = initDiagnostics({
-  build: 'SCARLETT_SPINE_PERMANENT_S1_WORLD_INIT',
-  href: location.href,
-  ua: navigator.userAgent
+function makeDiag() {
+  const el = document.getElementById('diag');
+  const write = (level, msg) => {
+    const line = `[${level}] ${msg}`;
+    if (el) el.textContent += `\n${line}`;
+    console.log(line);
+  };
+  return {
+    log: (m)=>write('log', m),
+    warn: (m)=>write('warn', m),
+    error: (m)=>write('error', m),
+  };
+}
+
+const diag = makeDiag();
+
+window.addEventListener('error', (e) => {
+  diag.error(e?.message || 'window error');
 });
 
-diag.log('[boot] index.js loaded ✅');
-diag.log('[boot] starting spine…');
+window.addEventListener('unhandledrejection', (e) => {
+  diag.error('unhandledrejection: ' + (e?.reason?.message || e?.reason || 'unknown'));
+});
 
-// ---- START SPINE ----
-(async () => {
-  try {
-    await Spine.start({ diag });
+diag.log('index.js loaded ✅');
+diag.log('starting spine…');
 
-    // expose controls for HUD buttons
-    window.SCARLETT = {
-      enterVR: Spine.enterVR,
-      resetSpawn: Spine.resetSpawn,
-      getReport: Spine.getReport
-    };
+window.SCARLETT = Spine;
 
-    diag.log('[boot] spine ready ✅');
-  } catch (e) {
-    diag.error('[fatal] spine failed: ' + (e?.message || String(e)));
-    console.error(e);
-  }
-})();
+Spine.start({ diag }).catch(err => {
+  diag.error('Spine.start failed: ' + (err?.message || err));
+});
