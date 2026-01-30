@@ -1,171 +1,117 @@
-/* ============================================================
-   ScarlettVR Poker • Permanent Spine — FULL CSS (ROOT)
-   Goals:
-   - Canvas always visible (fullscreen, behind HUD)
-   - HUD readable on mobile/Quest
-   - No body background blocking WebGL
-   ============================================================ */
-
 :root{
-  --bg0: rgba(0,0,0,0.00); /* keep transparent so canvas shows */
-  --cardA: rgba(12, 12, 18, 0.70);
-  --cardB: rgba(12, 12, 18, 0.55);
-  --stroke: rgba(255,255,255,0.12);
-  --stroke2: rgba(255,255,255,0.18);
-  --text: rgba(255,255,255,0.96);
-  --muted: rgba(255,255,255,0.70);
-  --muted2: rgba(255,255,255,0.55);
-  --shadow: rgba(0,0,0,0.45);
+  --bg:#050508;
+  --panel: rgba(10,10,14,.72);
+  --panel2: rgba(18,18,24,.62);
+  --stroke: rgba(255,255,255,.10);
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.70);
+  --shadow: 0 18px 60px rgba(0,0,0,.55);
+  --r: 26px;
 }
 
-*{ box-sizing: border-box; }
-
-html, body{
+*{ box-sizing:border-box; }
+html,body{
   margin:0;
-  padding:0;
-  width:100%;
   height:100%;
-  overflow:hidden;
-  background: var(--bg0) !important; /* CRITICAL: do NOT hide canvas */
+  background: var(--bg);
   color: var(--text);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  overflow:hidden;
 }
 
-/* ============================================================
-   WebGL Canvas (forced by spine.js, but CSS backs it up)
-   ============================================================ */
+/* The WebGL canvas must always be visible behind HUD */
 #scarlett-canvas{
-  position: fixed !important;
-  left: 0 !important;
-  top: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 0 !important;
-  display: block !important;
-  pointer-events: none !important; /* touches go to HUD */
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  z-index:0;
+  display:block;
 }
 
-/* ============================================================
-   HUD Layout
-   ============================================================ */
-.hud{
-  position: fixed;
-  inset: 0;
-  z-index: 10; /* ABOVE CANVAS */
-  display: block;
-  pointer-events: auto;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right)
-           env(safe-area-inset-bottom) env(safe-area-inset-left);
+/* HUD container */
+#hud{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding: 24px 16px;
+  z-index:9999;
+  pointer-events:none; /* allow VR canvas touches unless on HUD elements */
 }
 
-/* center-left-ish for phone, but still looks good on desktop */
-.hud-card{
-  width: min(720px, calc(100vw - 24px));
-  margin: 18px;
-  padding: 22px 22px 18px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, var(--cardA), var(--cardB));
-  border: 1px solid var(--stroke);
-  box-shadow: 0 20px 60px var(--shadow);
+#hud .card{
+  pointer-events:auto;
+  width:min(540px, 92vw);
+  margin-top: 14px;
+  padding: 22px 18px;
+  border-radius: var(--r);
+  background: linear-gradient(180deg, var(--panel), var(--panel2));
+  border:1px solid var(--stroke);
+  box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
-.hud-title{
-  font-size: clamp(36px, 6vw, 56px);
-  font-weight: 900;
-  line-height: 1.02;
+h1{
+  margin:0 0 8px;
+  font-size: 38px;
+  line-height: 1.05;
   letter-spacing: -0.02em;
-  margin: 0 0 10px 0;
 }
 
-.hud-sub{
-  font-size: 16px;
-  line-height: 1.4;
+h1 span{
+  font-weight:800;
+  opacity:.95;
+}
+
+.sub{
+  margin: 0 0 18px;
   color: var(--muted);
-  margin: 0 0 18px 0;
+  font-size: 15px;
 }
 
-.hud-sub code{
-  padding: 2px 8px;
+code{
+  padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.92);
-  font-weight: 700;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.92);
 }
 
-/* Buttons */
-.hud-btnrow{
-  display: flex;
-  flex-wrap: wrap;
+.btnGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin: 10px 0;
+  margin: 14px 0 16px;
 }
 
-.hud-btn{
-  appearance: none;
-  border: 1px solid var(--stroke2);
-  background: rgba(255,255,255,0.10);
-  color: var(--text);
-  padding: 14px 18px;
-  border-radius: 16px;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  transition: transform 0.08s ease, background 0.18s ease, border-color 0.18s ease;
-}
-
-.hud-btn:active{
-  transform: translateY(1px) scale(0.99);
-}
-
-.hud-btn:hover{
-  background: rgba(255,255,255,0.14);
-  border-color: rgba(255,255,255,0.22);
-}
-
-.hud-btn-ghost{
-  background: rgba(255,255,255,0.06);
-}
-
-/* Diagnostics console */
-.hud-diag{
-  margin: 14px 0 10px;
-  padding: 16px 16px;
+.btn{
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.10);
+  color: rgba(255,255,255,.92);
   border-radius: 18px;
-  background: rgba(0,0,0,0.35);
-  border: 1px solid rgba(255,255,255,0.10);
-  color: rgba(240,245,255,0.92);
-  font: 600 14px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  padding: 14px 14px;
+  font-weight: 800;
+  font-size: 16px;
+  box-shadow: 0 10px 22px rgba(0,0,0,.25);
+}
+
+.btn:active{ transform: translateY(1px); }
+
+#diag{
+  margin: 10px 0 0;
+  padding: 14px 14px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.10);
+  color: rgba(240,245,255,.92);
+  font: 600 14px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   white-space: pre-wrap;
-  max-height: min(44vh, 360px);
-  overflow: auto;
 }
 
-.hud-hint{
-  margin-top: 10px;
-  color: var(--muted2);
-  font-size: 14px;
-  line-height: 1.35;
-}
-
-/* Better on narrow phones */
-@media (max-width: 480px){
-  .hud-card{
-    margin: 14px;
-    padding: 18px 18px 14px;
-    border-radius: 20px;
-  }
-  .hud-btn{
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* Prevent selection quirks */
-button, pre{
-  -webkit-tap-highlight-color: transparent;
+.hint{
+  margin: 12px 4px 0;
+  font-size: 13px;
+  color: rgba(255,255,255,.66);
 }
