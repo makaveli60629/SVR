@@ -1,198 +1,198 @@
 /**
- * /spine.js — PERMANENT SPINE (GitHub Pages Safe)
- * ✅ Uses CDN Three.js module import (NO bare specifier)
- * ✅ Loads /js/scarlett1/world.js (your no-import world)
+ * /spine.js — SCARLETT PERMANENT SPINE (VISIBILITY HARDENED)
+ * Fixes:
+ *  - Forces WebGL canvas fullscreen + behind HUD
+ *  - Adds HUD toggle (hide/show)
+ *  - Uses CDN Three + GLTFLoader (so avatars can load)
+ *  - Loads /js/scarlett1/world.js reliably
  */
 
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
 
-export const Spine = {
-  async start({ log = console.log } = {}) {
-    // ------------------------------------------------------------
-    // CORE DOM
-    // ------------------------------------------------------------
-    const wrap = document.getElementById("canvasWrap") || document.body;
+window.THREE = THREE;
+THREE.GLTFLoader = GLTFLoader; // lets world.js detect it safely
 
-    // ------------------------------------------------------------
-    // THREE CORE
-    // ------------------------------------------------------------
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x05050a);
+export async function startSpine(){
+  const diagEl = document.getElementById("diag");
+  const hudEl  = document.getElementById("hud");
 
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.05,
-      2000
-    );
+  const report = {
+    build: "SPINE_VISIBILITY_HARDENED_V1",
+    href: location.href,
+    ua: navigator.userAgent,
+    webgl: null,
+    lastError: "none"
+  };
 
-    // Rig is what we move in XR (camera stays as XR "head")
-    const rig = new THREE.Group();
-    rig.position.set(0, 0, 0);
-    rig.add(camera);
-    scene.add(rig);
+  const log = (s)=>{
+    console.log(s);
+    if(diagEl) diagEl.textContent += `\n${s}`;
+  };
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
-    renderer.xr.enabled = true;
-    wrap.appendChild(renderer.domElement);
+  // --- CANVAS + RENDERER (FORCE FULLSCREEN) ---
+  const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true,              // allow HUD overlay / transparency
+    powerPreference: "high-performance"
+  });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.setSize(window.innerWidth, window.innerHeight, false);
+  renderer.xr.enabled = true;
 
-    log("[spine] renderer created ✅");
+  // Force canvas into view
+  const canvas = renderer.domElement;
+  canvas.id = "scarlett-canvas";
+  canvas.style.position = "fixed";
+  canvas.style.left = "0";
+  canvas.style.top = "0";
+  canvas.style.width = "100vw";
+  canvas.style.height = "100vh";
+  canvas.style.zIndex = "0";
+  canvas.style.pointerEvents = "none"; // HUD gets touches
+  canvas.style.background = "transparent";
 
-    // ------------------------------------------------------------
-    // RESIZE
-    // ------------------------------------------------------------
-    function onResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(canvas);
+
+  // --- SCENE + CAMERA ---
+  const scene = new THREE.Scene();
+  scene.background = null; // keep transparent so CSS doesn't hide it
+
+  const camera = new THREE.PerspectiveCamera(
+    70,
+    window.innerWidth / window.innerHeight,
+    0.05,
+    1500
+  );
+  camera.position.set(0, 1.7, 16);
+
+  // XR rig (optional)
+  const rig = new THREE.Group();
+  rig.add(camera);
+  scene.add(rig);
+
+  // Basic lights (so you ALWAYS see something)
+  scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+  sun.position.set(10, 18, 12);
+  scene.add(sun);
+
+  // Quick "always visible" debug axis in case world fails
+  const axes = new THREE.AxesHelper(3);
+  axes.position.set(0, 0.05, 0);
+  scene.add(axes);
+
+  // --- Resize handling ---
+  const onResize = ()=>{
+    const w = window.innerWidth, h = window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h, false);
+  };
+  window.addEventListener("resize", onResize);
+
+  // --- Spawn controls for HUD buttons ---
+  let spawnPos = new THREE.Vector3(0, 0, 16);
+  let spawnYaw = 0;
+
+  const setXRSpawn = (pos, yaw=0)=>{
+    spawnPos.copy(pos);
+    spawnYaw = yaw;
+  };
+
+  const resetSpawn = ()=>{
+    camera.position.copy(spawnPos).add(new THREE.Vector3(0, 1.7, 0));
+    camera.rotation.set(0, spawnYaw, 0);
+    log("[spine] resetSpawn ✅");
+  };
+
+  const enterVR = async ()=>{
+    try{
+      if(!navigator.xr) return log("[spine] WebXR not available");
+      const session = await navigator.xr.requestSession("immersive-vr", {
+        optionalFeatures: ["local-floor","bounded-floor","hand-tracking","layers"]
+      });
+      await renderer.xr.setSession(session);
+      log("[spine] Enter VR ✅");
+    }catch(e){
+      report.lastError = String(e?.message || e);
+      log(`[spine] Enter VR failed ❌ ${report.lastError}`);
     }
-    window.addEventListener("resize", onResize);
+  };
 
-    // ------------------------------------------------------------
-    // XR SPAWN CONTROL
-    // ------------------------------------------------------------
-    let spawnPos = new THREE.Vector3(0, 0, 16);
-    let spawnYaw = 0;
+  const toggleHUD = (force)=>{
+    if(!hudEl) return;
+    const show = (force === undefined) ? (hudEl.style.display === "none") : force;
+    hudEl.style.display = show ? "block" : "none";
+    log(show ? "[ui] HUD shown ✅" : "[ui] HUD hidden ✅");
+  };
 
-    function setXRSpawn(posVec3, yawRad = 0) {
-      spawnPos.copy(posVec3);
-      spawnYaw = yawRad;
-      // Non-XR fallback: move camera directly
-      if (!renderer.xr.isPresenting) {
-        camera.position.set(spawnPos.x, 1.7, spawnPos.z);
-        camera.rotation.order = "YXZ";
-        camera.rotation.y = spawnYaw;
-      }
-    }
+  const getReport = ()=>{
+    return JSON.stringify(report, null, 2);
+  };
 
-    function resetSpawn() {
-      // XR: move rig; Non-XR: move camera
-      if (renderer.xr.isPresenting) {
-        rig.position.set(spawnPos.x, 0, spawnPos.z);
-        rig.rotation.set(0, spawnYaw, 0);
-      } else {
-        camera.position.set(spawnPos.x, 1.7, spawnPos.z);
-        camera.rotation.set(0, spawnYaw, 0);
-      }
-      log("[spine] spawn reset ✅");
-    }
+  // Expose to your buttons
+  window.SCARLETT = {
+    enterVR,
+    resetSpawn,
+    toggleHUD,
+    getReport
+  };
 
-    // Default spawn now
-    setXRSpawn(new THREE.Vector3(0, 0, 16), 0);
+  // --- WebGL detect ---
+  try{
+    const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
+    report.webgl = gl ? "ok" : "failed";
+  }catch(e){
+    report.webgl = "error";
+  }
 
-    // ------------------------------------------------------------
-    // LOAD WORLD (NO IMPORTS INSIDE WORLD)
-    // ------------------------------------------------------------
-    let worldInit = null;
-    try {
-      const worldModule = await import("./js/scarlett1/world.js");
-      worldInit = worldModule?.init;
-      if (typeof worldInit !== "function") throw new Error("world.js missing export async function init(ctx)");
-      log("[spine] world module loaded ✅ (/js/scarlett1/world.js)");
-    } catch (e) {
-      log("[spine] world import failed ❌ " + (e?.message || e));
-      throw e;
-    }
+  log("[boot] JS LOADED ✅ (module tag ran)");
+  log("[spine] renderer created ✅");
 
-    const ctx = {
-      THREE,
-      scene,
-      camera,
-      rig,
-      renderer,
-      setXRSpawn,
-      log,
-    };
+  // --- Load world module ---
+  let worldMod = null;
+  try{
+    worldMod = await import("./js/scarlett1/world.js");
+    log("[spine] world module loaded ✅ (/js/scarlett1/world.js)");
+  }catch(e){
+    report.lastError = String(e?.message || e);
+    log(`[spine] world import failed ❌ ${report.lastError}`);
+  }
 
-    let updates = [];
-    try {
-      const out = await worldInit(ctx);
-      updates = Array.isArray(out?.updates) ? out.updates : [];
+  // --- Init world ---
+  let updates = [];
+  try{
+    if(worldMod?.init){
+      const world = await worldMod.init({ THREE, scene, camera, rig, renderer, setXRSpawn, log });
+      updates = world?.updates || [];
       log(`[spine] world init ✅ updates=${updates.length}`);
-    } catch (e) {
-      log("[spine] world init failed ❌ " + (e?.message || e));
-      throw e;
+    }else{
+      log("[spine] world.init missing ❌");
+    }
+  }catch(e){
+    report.lastError = String(e?.message || e);
+    log(`[spine] world init failed ❌ ${report.lastError}`);
+  }
+
+  // --- ANIMATION LOOP ---
+  let last = performance.now();
+  renderer.setAnimationLoop(()=>{
+    const now = performance.now();
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+
+    // run world updates
+    for(const fn of updates){
+      try{ fn(dt); }catch(e){}
     }
 
-    // ------------------------------------------------------------
-    // XR ENTER (simple)
-    // ------------------------------------------------------------
-    async function enterVR() {
-      if (!navigator.xr) {
-        log("[xr] navigator.xr not available ❌ (use Oculus Browser / Chrome XR)");
-        return;
-      }
-      try {
-        const session = await navigator.xr.requestSession("immersive-vr", {
-          optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking", "layers"],
-        });
-        renderer.xr.setSession(session);
-        // When session starts, apply spawn to rig
-        session.addEventListener("end", () => {
-          log("[xr] session ended");
-          // restore non-xr spawn
-          setXRSpawn(spawnPos, spawnYaw);
-        });
+    renderer.render(scene, camera);
+  });
 
-        // Move rig at start so you don't spawn inside table
-        rig.position.set(spawnPos.x, 0, spawnPos.z);
-        rig.rotation.set(0, spawnYaw, 0);
+  log("[spine] animation loop ✅");
+  log("[boot] spine started ✅");
 
-        log("[xr] session started ✅");
-      } catch (e) {
-        log("[xr] session failed ❌ " + (e?.message || e));
-      }
-    }
-
-    // ------------------------------------------------------------
-    // REPORT
-    // ------------------------------------------------------------
-    function getReport() {
-      const ua = navigator.userAgent;
-      const href = location.href;
-      const xr = !!navigator.xr;
-      const presenting = !!renderer?.xr?.isPresenting;
-      return [
-        "Scarlett Diagnostics Report",
-        `href=${href}`,
-        `ua=${ua}`,
-        `navigator.xr=${xr}`,
-        `presenting=${presenting}`,
-        `updates=${updates.length}`,
-        `three=unpkg three@0.160.0`,
-      ].join("\n");
-    }
-
-    // Expose API used by HUD buttons
-    window.SCARLETT = {
-      enterVR,
-      resetSpawn,
-      getReport,
-      setXRSpawn,
-    };
-
-    // ------------------------------------------------------------
-    // MAIN LOOP
-    // ------------------------------------------------------------
-    let last = performance.now();
-    renderer.setAnimationLoop(() => {
-      const now = performance.now();
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
-
-      for (const fn of updates) {
-        try { fn(dt); } catch (e) { console.warn("update error", e); }
-      }
-
-      renderer.render(scene, camera);
-    });
-
-    // Ensure something is visible even if world is empty
-    scene.add(new THREE.AmbientLight(0xffffff, 0.25));
-
-    log("[spine] animation loop ✅");
-    return true;
-  },
-};
+  // Ensure spawn once
+  resetSpawn();
+}
