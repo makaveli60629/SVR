@@ -2,45 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>ScarlettVR Poker • Permanent Spine</title>
-  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
-  <!-- WebGL canvas will be injected by spine.js -->
+  <!-- WebGL host -->
+  <canvas id="xr-canvas" aria-label="3D View"></canvas>
 
-  <!-- HUD (must NOT block canvas pointer events except buttons) -->
-  <div id="hud">
-    <div class="panel">
+  <!-- Touch joystick for Android debugging -->
+  <div id="touch-ui" aria-hidden="true">
+    <div id="stick-left" class="stick">
+      <div class="knob"></div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hud">
+    <div class="hud-card">
       <h1>ScarlettVR Poker • Permanent Spine</h1>
-      <div class="sub">Root spine is permanent • Only edit <code>/js/scarlett1/*</code></div>
+      <p class="sub">Root spine is permanent • Only edit <code>/js/scarlett1/*</code></p>
 
-      <div class="btnGrid">
-        <button id="btnEnterVR">Enter VR</button>
-        <button id="btnReset">Reset Spawn</button>
-        <button id="btnCopy">Copy Report</button>
-        <button id="btnReload">Hard Reload</button>
-        <button id="btnHideHud">Hide HUD</button>
-        <button id="btnShowHud">Show HUD</button>
+      <div class="btn-grid">
+        <button id="btn-enter-vr" class="btn">Enter VR</button>
+        <button id="btn-reset" class="btn">Reset Spawn</button>
+        <button id="btn-copy" class="btn">Copy Report</button>
+        <button id="btn-reload" class="btn">Hard Reload</button>
+        <button id="btn-hide" class="btn">Hide HUD</button>
+        <button id="btn-show" class="btn">Show HUD</button>
       </div>
 
-      <pre id="logBox">[boot] html loaded ✅
+      <pre id="log" class="log">[boot] html loaded ✅
 (starting...)</pre>
 
-      <div class="tip">
-        Tip: if you see <b>JS LOADED ✅</b> + <b>world ready ✅</b> but no world, it’s canvas/CSS layering.
-      </div>
+      <p class="tip">Tip: If you see <b>JS LOADED ✅</b> + <b>world ready ✅</b> but no world, it's canvas/CSS/WebGL layering.</p>
     </div>
   </div>
 
-  <!-- Touch Joystick (Android) -->
-  <div id="touch-ui">
-    <div id="joyBase">
-      <div id="joyStick"></div>
-    </div>
-  </div>
-
-  <script type="module" src="./index.js"></script>
+  <script type="module" src="index.js"></script>
 </body>
 </html>
