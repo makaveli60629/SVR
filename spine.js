@@ -1,197 +1,190 @@
-/**
- * spine.js — PERMANENT ROOT SPINE
- * Only edit /js/scarlett1/*
- */
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-import { XRButton } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRButton.js';
-import { XRControllerModelFactory } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRControllerModelFactory.js';
-import { XRHandModelFactory } from 'https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRHandModelFactory.js';
-
-import { init as initWorld } from './js/scarlett1/world.js';
+// /spine.js — PERMANENT ROOT SPINE (LOUD + SAFE)
+// Goal: Always show something + always log why world fails.
 
 export const Spine = (() => {
-  const S = {
-    diag: null,
-    scene: null,
-    camera: null,
-    rig: null,
-    renderer: null,
-    clock: null,
-    xrButtonEl: null,
-    worldUpdates: [],
-    worldInteractables: [],
-    xrSpawn: { pos: new THREE.Vector3(0,0,0), yaw: 0 },
+  let logs = [];
+  let diagEl = null;
+
+  const log = (m) => {
+    logs.push(String(m));
+    if (logs.length > 500) logs.shift();
+    console.log(m);
+    if (diagEl) diagEl.textContent = logs.join('\n');
   };
 
-  function nowISO(){ return new Date().toISOString(); }
-
-  function resize() {
-    if (!S.renderer || !S.camera) return;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    S.camera.aspect = w / h;
-    S.camera.updateProjectionMatrix();
-    S.renderer.setSize(w, h);
+  function getReport() {
+    return logs.join('\n');
   }
 
-  function disposeRendererIfAny() {
-    if (window.__SCARLETT_RENDERER__) {
+  async function loadThree() {
+    // Stable ESM build
+    const THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
+    return THREE;
+  }
+
+  function ensureCanvasLayer(renderer) {
+    renderer.domElement.style.position = 'fixed';
+    renderer.domElement.style.left = '0';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
+    renderer.domElement.style.zIndex = '0';
+    document.body.appendChild(renderer.domElement);
+  }
+
+  function bindPublicAPI({ renderer, rig, camera }) {
+    window.SCARLETT = window.SCARLETT || {};
+    window.SCARLETT.getReport = getReport;
+
+    window.SCARLETT.resetSpawn = () => {
       try {
-        window.__SCARLETT_RENDERER__.setAnimationLoop(null);
-        window.__SCARLETT_RENDERER__.dispose();
-        const oldCanvas = window.__SCARLETT_RENDERER__.domElement;
-        if (oldCanvas?.parentNode) oldCanvas.parentNode.removeChild(oldCanvas);
-      } catch {}
-      window.__SCARLETT_RENDERER__ = null;
+        rig.position.set(0, 0, 0);
+        rig.rotation.set(0, 0, 0);
+        camera.position.set(0, 1.7, 16);
+        camera.lookAt(0, 1.35, 0);
+        log('[api] resetSpawn ✅');
+      } catch (e) {
+        log(`[api] resetSpawn ❌ ${e?.message || e}`);
+      }
+    };
+
+    window.SCARLETT.enterVR = async () => {
+      try {
+        const ok = !!(navigator.xr);
+        log(`[xr] navigator.xr = ${ok ? '✅' : '❌'}`);
+        if (!ok) return;
+        // On mobile/Quest, user gesture is required; this button supplies it.
+        await renderer.xr.setSession(
+          await navigator.xr.requestSession('immersive-vr', {
+            optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking', 'layers'],
+          })
+        );
+        log('[xr] session started ✅');
+      } catch (e) {
+        log(`[xr] enterVR ❌ ${e?.message || e}`);
+      }
+    };
+  }
+
+  async function start({ say } = {}) {
+    diagEl = document.getElementById('diag') || null;
+
+    const sayLog = say || log;
+    sayLog('[spine] start() ✅');
+
+    // Hard guards
+    window.addEventListener('error', (e) => sayLog(`[spine.window.error] ${e.message}`));
+    window.addEventListener('unhandledrejection', (e) => sayLog(`[spine.unhandled] ${String(e.reason || e)}`));
+
+    let THREE;
+    try {
+      sayLog('[spine] loading THREE…');
+      THREE = await loadThree();
+      sayLog('[spine] THREE loaded ✅');
+    } catch (e) {
+      sayLog(`[spine] THREE failed ❌ ${e?.message || e}`);
+      return;
     }
-  }
 
-  function setXRSpawn(posVec3, yawRad = 0){
-    if (posVec3?.isVector3) S.xrSpawn.pos.copy(posVec3);
-    S.xrSpawn.yaw = yawRad || 0;
-    // Apply immediately if already running
-    if (S.rig) {
-      S.rig.position.copy(S.xrSpawn.pos);
-      S.rig.rotation.set(0, S.xrSpawn.yaw, 0);
-    }
-  }
+    // Scene core
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x05050b);
 
-  function animate() {
-    const dt = S.clock.getDelta();
-    for (let i = 0; i < S.worldUpdates.length; i++) {
-      try { S.worldUpdates[i](dt); } catch (e) {}
-    }
-    S.renderer.render(S.scene, S.camera);
-  }
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 800);
+    camera.position.set(0, 1.7, 16);
 
-  function mountXRHandsAndControllers() {
-    const controllerModelFactory = new XRControllerModelFactory();
-    const handModelFactory = new XRHandModelFactory();
+    const rig = new THREE.Group();
+    rig.add(camera);
+    scene.add(rig);
 
-    const controller1 = S.renderer.xr.getController(0);
-    const controller2 = S.renderer.xr.getController(1);
-    S.scene.add(controller1);
-    S.scene.add(controller2);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    renderer.xr.enabled = true;
+    ensureCanvasLayer(renderer);
 
-    const rayGeo = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0,0,0),
-      new THREE.Vector3(0,0,-1),
-    ]);
-    const rayMat = new THREE.LineBasicMaterial({ color: 0xffffff });
+    bindPublicAPI({ renderer, rig, camera });
 
-    const ray1 = new THREE.Line(rayGeo, rayMat); ray1.scale.z = 4; controller1.add(ray1);
-    const ray2 = new THREE.Line(rayGeo, rayMat); ray2.scale.z = 4; controller2.add(ray2);
+    // Always-bright fallback lights (so you NEVER get black screen)
+    scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x202040, 1.0);
+    scene.add(hemi);
+    const dir = new THREE.DirectionalLight(0xffffff, 1.2);
+    dir.position.set(10, 18, 8);
+    scene.add(dir);
 
-    const grip1 = S.renderer.xr.getControllerGrip(0);
-    grip1.add(controllerModelFactory.createControllerModel(grip1));
-    S.scene.add(grip1);
+    // Fallback object so you KNOW rendering works
+    const fallback = new THREE.Mesh(
+      new THREE.BoxGeometry(1.2, 1.2, 1.2),
+      new THREE.MeshStandardMaterial({ color: 0x8a2be2, metalness: 0.2, roughness: 0.4 })
+    );
+    fallback.position.set(0, 1.6, 0);
+    scene.add(fallback);
 
-    const grip2 = S.renderer.xr.getControllerGrip(1);
-    grip2.add(controllerModelFactory.createControllerModel(grip2));
-    S.scene.add(grip2);
-
-    const hand1 = S.renderer.xr.getHand(0);
-    hand1.add(handModelFactory.createHandModel(hand1, 'mesh'));
-    S.scene.add(hand1);
-
-    const hand2 = S.renderer.xr.getHand(1);
-    hand2.add(handModelFactory.createHandModel(hand2, 'mesh'));
-    S.scene.add(hand2);
-
-    S.diag?.log?.('[xr] controllers + hands mounted ✅');
-  }
-
-  async function start({ diag } = {}) {
-    S.diag = diag;
-
-    disposeRendererIfAny();
-
-    S.scene = new THREE.Scene();
-    S.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 500);
-
-    // Rig so XR movement happens by moving rig, not camera
-    S.rig = new THREE.Group();
-    S.scene.add(S.rig);
-    S.rig.add(S.camera);
-
-    // Default spawn (non-XR camera can still be moved by world.js)
-    S.camera.position.set(0, 1.6, 14);
-    S.camera.lookAt(0, 1.4, 0);
-
-    S.renderer = new THREE.WebGLRenderer({ antialias: true });
-    S.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    S.renderer.setSize(window.innerWidth, window.innerHeight);
-    S.renderer.xr.enabled = true;
-
-    document.body.appendChild(S.renderer.domElement);
-    window.__SCARLETT_RENDERER__ = S.renderer;
-
-    S.clock = new THREE.Clock();
-    window.addEventListener('resize', resize);
-
-    // Apply stored XR spawn
-    setXRSpawn(S.xrSpawn.pos, S.xrSpawn.yaw);
-
-    try { mountXRHandsAndControllers(); }
-    catch (e) { S.diag?.warn?.('[xr] mount failed: ' + (e?.message || e)); }
-
-    const log = (m) => (S.diag?.log?.(m) ?? console.log(m));
-
-    log('[spine] init world…');
-
-    const worldResult = await initWorld({
-      THREE,
-      scene: S.scene,
-      camera: S.camera,
-      rig: S.rig,
-      renderer: S.renderer,
-      setXRSpawn,
-      log
+    // Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    S.worldUpdates = Array.isArray(worldResult?.updates) ? worldResult.updates : [];
-    S.worldInteractables = Array.isArray(worldResult?.interactables) ? worldResult.interactables : [];
+    // World load (optional, must not kill rendering)
+    let updates = [];
+    const ctx = {
+      THREE,
+      scene,
+      camera,
+      rig,
+      renderer,
+      log: sayLog,
+      setXRSpawn: (posVec3, yaw = 0) => {
+        try {
+          rig.position.copy(posVec3);
+          rig.rotation.set(0, yaw, 0);
+          sayLog(`[xr] spawn set ✅ (${posVec3.x.toFixed(2)},${posVec3.y.toFixed(2)},${posVec3.z.toFixed(2)})`);
+        } catch (e) {
+          sayLog(`[xr] spawn set ❌ ${e?.message || e}`);
+        }
+      }
+    };
 
-    S.renderer.setAnimationLoop(animate);
+    try {
+      sayLog('[spine] importing world…');
+      const worldMod = await import('./js/scarlett1/world.js');
+      sayLog('[spine] world imported ✅');
 
-    if (!S.xrButtonEl) {
-      S.xrButtonEl = XRButton.createButton(S.renderer);
-      S.xrButtonEl.style.position = 'absolute';
-      S.xrButtonEl.style.left = '12px';
-      S.xrButtonEl.style.bottom = '12px';
-      S.xrButtonEl.style.zIndex = '40';
-      document.body.appendChild(S.xrButtonEl);
+      if (worldMod?.init) {
+        const res = await worldMod.init(ctx);
+        updates = (res && Array.isArray(res.updates)) ? res.updates : [];
+        sayLog(`[spine] world init ✅ updates=${updates.length}`);
+      } else {
+        sayLog('[spine] world has no export init() ❌');
+      }
+    } catch (e) {
+      sayLog(`[spine] world failed ❌ ${e?.message || e}`);
+      sayLog('[spine] continuing with fallback scene ✅');
     }
 
-    log('[spine] started ✅');
+    // Animation
+    let last = performance.now();
+    renderer.setAnimationLoop(() => {
+      const now = performance.now();
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+
+      // animate fallback cube so you KNOW frames are running
+      fallback.rotation.y += dt * 0.7;
+      fallback.rotation.x += dt * 0.35;
+
+      for (const fn of updates) {
+        try { fn(dt); } catch (e) { sayLog(`[update] ❌ ${e?.message || e}`); }
+      }
+
+      renderer.render(scene, camera);
+    });
+
+    sayLog('[spine] render loop running ✅');
   }
 
-  async function enterVR() {
-    if (!S.renderer) throw new Error('Renderer not ready');
-    if (S.xrButtonEl?.tagName === 'BUTTON') S.xrButtonEl.click();
-  }
-
-  function resetSpawn() {
-    // Non-XR spawn
-    S.camera.position.set(0, 1.6, 14);
-    S.camera.lookAt(0, 1.4, 0);
-    S.diag?.log?.('[spine] reset spawn');
-  }
-
-  function getReport() {
-    return [
-      'Scarlett Diagnostics Report',
-      'build=SCARLETT_SPINE_PERMANENT',
-      'time=' + nowISO(),
-      'href=' + location.href,
-      'ua=' + navigator.userAgent,
-      'secureContext=' + (window.isSecureContext ? 'true' : 'false'),
-      'xrSupported=' + ('xr' in navigator ? 'true' : 'false'),
-      'renderer=' + (S.renderer ? 'ready' : 'none'),
-      'worldUpdates=' + (S.worldUpdates?.length || 0),
-      'worldInteractables=' + (S.worldInteractables?.length || 0),
-    ].join('\n');
-  }
-
-  return { start, enterVR, resetSpawn, getReport };
+  return { start, getReport };
 })();
