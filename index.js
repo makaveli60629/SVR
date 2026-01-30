@@ -1,59 +1,52 @@
-import { Spine } from './spine.js';
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
-const diag = document.getElementById('diag');
-const joyBase = document.getElementById('joyBase');
-const joyKnob = document.getElementById('joyKnob');
+export const Spine = {
+  async start({ log, getJoystick }) {
 
-function log(s){
-  diag.textContent += '\n' + s;
-}
+    const stage = document.getElementById('stage');
+    const renderer = new THREE.WebGLRenderer({ antialias:true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.xr.enabled = true;
+    stage.appendChild(renderer.domElement);
 
-log('[boot] JS LOADED ✅');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, .1, 1000);
+    camera.position.set(0,1.6,6);
 
-let joyX = 0, joyY = 0;
-let dragging = false;
-let rect;
+    window.SCARLETT = {
+      enterVR: ()=>renderer.xr.enabled && renderer.xr.setSession,
+      resetSpawn: ()=>camera.position.set(0,1.6,6),
+      hideHUD: ()=>document.body.classList.add('hud-hidden'),
+      showHUD: ()=>document.body.classList.remove('hud-hidden'),
+      copyReport: ()=>navigator.clipboard.writeText(navigator.userAgent)
+    };
 
-function setKnob(x,y){
-  joyKnob.style.transform =
-    `translate(${x*45}px,${y*45}px) translate(-50%,-50%)`;
-}
+    let world;
+    try {
+      world = await import('./js/scarlett1/world.js');
+      await world.init({ THREE, scene, camera, log });
+      log('[world] loaded ✅');
+    } catch(e){
+      log('[world] failed ❌ '+e);
+    }
 
-joyBase.addEventListener('touchstart', e=>{
-  rect = joyBase.getBoundingClientRect();
-  dragging = true;
-});
+    const speed = 2;
+    const dir = new THREE.Vector3();
+    const right = new THREE.Vector3();
+    const up = new THREE.Vector3(0,1,0);
 
-joyBase.addEventListener('touchmove', e=>{
-  if(!dragging) return;
-  const t = e.touches[0];
-  const cx = rect.left + rect.width/2;
-  const cy = rect.top + rect.height/2;
-  let dx = (t.clientX - cx) / 60;
-  let dy = (t.clientY - cy) / 60;
-  dx = Math.max(-1,Math.min(1,dx));
-  dy = Math.max(-1,Math.min(1,dy));
-  joyX = dx;
-  joyY = dy;
-  setKnob(dx,dy);
-  e.preventDefault();
-},{passive:false});
+    renderer.setAnimationLoop(()=>{
+      const j = getJoystick();
+      if(j){
+        camera.getWorldDirection(dir);
+        dir.y = 0; dir.normalize();
+        right.crossVectors(dir,up).normalize();
+        camera.position.addScaledVector(dir,-j.y*speed*.016);
+        camera.position.addScaledVector(right,j.x*speed*.016);
+      }
+      renderer.render(scene,camera);
+    });
 
-joyBase.addEventListener('touchend', ()=>{
-  dragging = false;
-  joyX = joyY = 0;
-  setKnob(0,0);
-});
-
-document.querySelectorAll('[data-action]').forEach(btn=>{
-  btn.onclick = ()=>{
-    const a = btn.dataset.action;
-    if(a==='hardReload') location.reload();
-    else window.SCARLETT?.[a]?.();
-  };
-});
-
-Spine.start({
-  log,
-  getJoystick: ()=>({x:joyX,y:joyY})
-});
+    log('[boot] spine started ✅');
+  }
+};
