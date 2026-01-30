@@ -1,26 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ScarlettVR Poker • Permanent Spine</title>
-<link rel="stylesheet" href="css/style.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>ScarlettVR Poker • Permanent Spine</title>
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
+
 <body>
-<div id="hud">
-<h1>ScarlettVR Poker • Permanent Spine</h1>
-<p>Root spine is permanent • Only edit <code>/js/scarlett1/*</code></p>
-<div class="buttons">
-<button onclick="SCARLETT.enterVR()">Enter VR</button>
-<button onclick="SCARLETT.resetSpawn()">Reset Spawn</button>
-<button onclick="SCARLETT.copyReport()">Copy Report</button>
-<button onclick="location.reload(true)">Hard Reload</button>
-<button onclick="SCARLETT.hideHUD()">Hide HUD</button>
-<button onclick="SCARLETT.showHUD()">Show HUD</button>
-</div>
-<pre id="diag"></pre>
-</div>
-<div id="stage"></div>
-<script type="module" src="index.js"></script>
+  <!-- WebGL canvas will be injected by spine.js -->
+
+  <!-- HUD (must NOT block canvas pointer events except buttons) -->
+  <div id="hud">
+    <div class="panel">
+      <h1>ScarlettVR Poker • Permanent Spine</h1>
+      <div class="sub">Root spine is permanent • Only edit <code>/js/scarlett1/*</code></div>
+
+      <div class="btnGrid">
+        <button id="btnEnterVR">Enter VR</button>
+        <button id="btnReset">Reset Spawn</button>
+        <button id="btnCopy">Copy Report</button>
+        <button id="btnReload">Hard Reload</button>
+        <button id="btnHideHud">Hide HUD</button>
+        <button id="btnShowHud">Show HUD</button>
+      </div>
+
+      <pre id="logBox">[boot] html loaded ✅
+(starting...)</pre>
+
+      <div class="tip">
+        Tip: if you see <b>JS LOADED ✅</b> + <b>world ready ✅</b> but no world, it’s canvas/CSS layering.
+      </div>
+    </div>
+  </div>
+
+  <!-- Touch Joystick (Android) -->
+  <div id="touch-ui">
+    <div id="joyBase">
+      <div id="joyStick"></div>
+    </div>
+  </div>
+
+  <script type="module" src="./index.js"></script>
 </body>
 </html>
