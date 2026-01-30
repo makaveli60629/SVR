@@ -1,32 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>ScarlettVR Poker • Permanent Spine</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="./css/style.css" />
-</head>
-<body>
 
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #05050b;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: #fff;
+    }
+
+    /* Canvas will be injected by spine.js; this keeps it behind HUD */
+    canvas {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      z-index: 0 !important;
+      touch-action: none;
+    }
+
+    #hud {
+      position: fixed;
+      left: 12px;
+      top: 12px;
+      z-index: 999999;
+      width: min(560px, calc(100vw - 24px));
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 14px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+    }
+
+    #hud h1 {
+      margin: 0 0 6px 0;
+      font-size: 22px;
+      letter-spacing: 0.2px;
+    }
+
+    #hud p {
+      margin: 0 0 12px 0;
+      opacity: 0.85;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:active { transform: translateY(1px); }
+
+    #diag {
+      margin: 0;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.10);
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 12px;
+      line-height: 1.35;
+      max-height: 42vh;
+      overflow: auto;
+    }
+
+    #tiny {
+      font-size: 12px;
+      opacity: 0.75;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
   <div id="hud">
     <h1>ScarlettVR Poker • Permanent Spine</h1>
     <p>Root spine is permanent • Only edit <code>/js/scarlett1/*</code></p>
 
-    <button onclick="window.SCARLETT?.enterVR()">Enter VR</button>
-    <button onclick="window.SCARLETT?.resetSpawn()">Reset Spawn</button>
-    <button onclick="navigator.clipboard.writeText(window.SCARLETT?.getReport?.() || '')">Copy Report</button>
-    <button onclick="location.reload(true)">Hard Reload</button>
+    <div class="row">
+      <button id="btnVR">Enter VR</button>
+      <button id="btnSpawn">Reset Spawn</button>
+      <button id="btnCopy">Copy Report</button>
+      <button id="btnReload">Hard Reload</button>
+    </div>
 
-    <pre id="diag">(starting...)</pre>
+    <pre id="diag">[boot] html loaded ✅
+(starting...)</pre>
+
+    <div id="tiny">If you don’t see “JS LOADED ✅” below, the module did not run.</div>
   </div>
 
   <script>
-    document.getElementById('diag').textContent =
-      '[boot] html loaded ✅\n(starting...)';
+    // Visible proof even before modules
+    const diag = document.getElementById('diag');
+    diag.textContent = '[boot] html loaded ✅\n(starting...)';
+
+    // Wire buttons to window.SCARLETT once JS loads
+    document.getElementById('btnVR').onclick = () => window.SCARLETT?.enterVR?.();
+    document.getElementById('btnSpawn').onclick = () => window.SCARLETT?.resetSpawn?.();
+    document.getElementById('btnCopy').onclick = async () => {
+      try {
+        const txt = window.SCARLETT?.getReport?.() || '';
+        await navigator.clipboard.writeText(txt);
+        diag.textContent += '\n[ui] report copied ✅';
+      } catch (e) {
+        diag.textContent += '\n[ui] copy failed ❌ ' + (e?.message || e);
+      }
+    };
+    document.getElementById('btnReload').onclick = () => location.reload();
   </script>
 
-  <!-- ✅ CORRECT MODULE LOAD -->
-  <script type="module" src="./index.js"></script>
-
+  <!-- ONLY ENTRY POINT -->
+  <script type="module">
+    const diag = document.getElementById('diag');
+    diag.textContent += '\n[boot] JS LOADED ✅ (module tag ran)';
+    import('./index.js').catch(err=>{
+      diag.textContent += '\n[boot] index.js import failed ❌ ' + (err?.message || err);
+      console.error(err);
+    });
+  </script>
 </body>
 </html>
