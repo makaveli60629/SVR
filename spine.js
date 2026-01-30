@@ -1,101 +1,115 @@
-// spine.js — ROOT — PERMANENT
-// This file MUST create the renderer + canvas or nothing will ever show
-
+// /spine.js — ROOT — PERMANENT
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
-const log = (m) => {
+function diag(msg){
   const el = document.getElementById("diag");
-  if (el) el.textContent += `\n${m}`;
-  console.log(m);
-};
+  if (el) el.textContent += `\n${msg}`;
+  console.log(msg);
+}
 
-export function startSpine() {
-  log("[spine] starting…");
+export async function startSpine(){
+  diag("[boot] JS LOADED ✅ (module tag ran)");
 
-  // ---------- SCENE ----------
+  // --- Scene ---
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x05050b);
+  scene.background = new THREE.Color(0x050508);
 
-  // ---------- CAMERA ----------
-  const camera = new THREE.PerspectiveCamera(
-    70,
-    window.innerWidth / window.innerHeight,
-    0.01,
-    500
-  );
-  camera.position.set(0, 1.6, 4);
+  // --- Camera ---
+  const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.01, 800);
+  camera.position.set(0, 1.7, 16);
 
-  // ---------- RENDERER ----------
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: false,
-  });
-
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // --- Renderer ---
+  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.xr.enabled = true;
 
-  // 🔥 FORCE CANVAS VISIBILITY
   renderer.domElement.id = "scarlett-canvas";
-  renderer.domElement.style.position = "fixed";
-  renderer.domElement.style.inset = "0";
-  renderer.domElement.style.width = "100vw";
-  renderer.domElement.style.height = "100vh";
-  renderer.domElement.style.zIndex = "0";
-
   document.body.appendChild(renderer.domElement);
-  log("[spine] renderer created ✅");
 
-  // ---------- LIGHT (so you SEE something even if world fails) ----------
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x222233, 2.0);
-  scene.add(hemi);
+  diag("[spine] renderer created ✅");
 
-  const dir = new THREE.DirectionalLight(0xffffff, 1.5);
-  dir.position.set(5, 10, 5);
-  scene.add(dir);
-
-  // ---------- WORLD MODULE ----------
-  import("./js/scarlett1/world.js")
-    .then((mod) => {
-      log("[spine] world module loaded ✅");
-
-      if (mod.initWorld) {
-        mod.initWorld({ THREE, scene, camera, renderer });
-        log("[world] initWorld() called ✅");
-      } else {
-        log("[world][warn] initWorld not found");
-      }
-    })
-    .catch((err) => {
-      log("[world][error] " + err.message);
-      console.error(err);
-    });
-
-  // ---------- RESIZE ----------
-  window.addEventListener("resize", () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
+  // --- Resize ---
+  addEventListener("resize", ()=>{
+    camera.aspect = innerWidth/innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(innerWidth, innerHeight);
   });
 
-  // ---------- LOOP ----------
-  renderer.setAnimationLoop(() => {
+  // --- Public controls ---
+  window.SCARLETT = {
+    enterVR: async ()=>{
+      try{
+        if(!navigator.xr){ diag("[xr] navigator.xr not available"); return; }
+        const ok = await navigator.xr.isSessionSupported("immersive-vr");
+        if(!ok){ diag("[xr] immersive-vr not supported"); return; }
+        const session = await navigator.xr.requestSession("immersive-vr", { optionalFeatures:["local-floor","bounded-floor","hand-tracking"] });
+        renderer.xr.setSession(session);
+        diag("[xr] session started ✅");
+      }catch(e){
+        diag("[xr][error] " + (e?.message||e));
+      }
+    },
+    resetSpawn: ()=>{
+      camera.position.set(0, 1.7, 16);
+      camera.lookAt(0, 1.35, 0);
+      diag("[ui] spawn reset ✅");
+    },
+    hardReload: ()=>{
+      location.reload();
+    },
+    copyReport: async ()=>{
+      try{
+        const txt = document.getElementById("diag")?.textContent || "";
+        await navigator.clipboard.writeText(txt);
+        diag("[ui] report copied ✅");
+      }catch(e){
+        diag("[ui][copy fail] " + (e?.message||e));
+      }
+    },
+    hideHUD: ()=>{
+      const hud = document.getElementById("hud");
+      if(hud) hud.style.display = "none";
+    },
+    showHUD: ()=>{
+      const hud = document.getElementById("hud");
+      if(hud) hud.style.display = "flex";
+    }
+  };
+
+  // --- Load world ---
+  let world = null;
+  try{
+    world = await import("./js/scarlett1/world.js");
+    diag("[spine] world module loaded ✅ (/js/scarlett1/world.js)");
+  }catch(e){
+    diag("[spine][error] world import failed ❌ " + (e?.message||e));
+    throw e;
+  }
+
+  // --- Run init ---
+  let updates = [];
+  try{
+    const ctx = {
+      THREE, scene, camera, renderer,
+      log: diag
+    };
+
+    const res = await (world.init?.(ctx));
+    diag("[spine] world init ✅");
+    updates = (res?.updates || []);
+    diag(`[spine] updates=${updates.length} ✅`);
+  }catch(e){
+    diag("[world][error] init failed ❌ " + (e?.message||e));
+  }
+
+  // --- Loop ---
+  renderer.setAnimationLoop((t)=>{
+    const dt = Math.min(0.05, (renderer.info.render.frame ? 0.016 : 0.016));
+    for(const fn of updates) fn(dt);
     renderer.render(scene, camera);
   });
 
-  log("[spine] animation loop running ✅");
-
-  // ---------- GLOBAL API ----------
-  window.SCARLETT = {
-    enterVR: () => renderer.xr.enabled && navigator.xr && renderer.xr.setSession,
-    resetSpawn: () => camera.position.set(0, 1.6, 4),
-    toggleHUD: (show) => {
-      const hud = document.getElementById("hud");
-      if (hud) hud.style.display = show ? "block" : "none";
-    },
-    getReport: () =>
-      document.getElementById("diag")?.textContent || "",
-  };
-
-  log("[spine] spine started ✅");
+  diag("[spine] animation loop ✅");
+  diag("[boot] spine started ✅");
 }
