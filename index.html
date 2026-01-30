@@ -1,53 +1,43 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <title>ScarlettVR Poker • Permanent Spine</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#05050b" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <link rel="stylesheet" href="./css/style.css" />
 </head>
-
 <body>
-  <!-- HUD (always above canvas) -->
-  <div id="hud" class="hud">
-    <div class="hud-card">
-      <div class="hud-title">ScarlettVR Poker • Permanent Spine</div>
-      <div class="hud-sub">
-        Root spine is permanent • Only edit <code>/js/scarlett1/*</code>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="card">
+      <h1>ScarlettVR Poker<br><span>• Permanent Spine</span></h1>
+      <p class="sub">Root spine is permanent • Only edit <code>/js/scarlett1/*</code></p>
+
+      <div class="btnGrid">
+        <button class="btn" onclick="window.SCARLETT?.enterVR()">Enter VR</button>
+        <button class="btn" onclick="window.SCARLETT?.resetSpawn()">Reset Spawn</button>
+        <button class="btn" onclick="window.SCARLETT?.copyReport()">Copy Report</button>
+        <button class="btn" onclick="window.SCARLETT?.hardReload()">Hard Reload</button>
+        <button class="btn" onclick="window.SCARLETT?.hideHUD()">Hide HUD</button>
+        <button class="btn" onclick="window.SCARLETT?.showHUD()">Show HUD</button>
       </div>
 
-      <div class="hud-btnrow">
-        <button class="hud-btn" onclick="window.SCARLETT?.enterVR()">Enter VR</button>
-        <button class="hud-btn" onclick="window.SCARLETT?.resetSpawn()">Reset Spawn</button>
-      </div>
+      <pre id="diag">(starting...)</pre>
 
-      <div class="hud-btnrow">
-        <button class="hud-btn" onclick="navigator.clipboard.writeText(window.SCARLETT?.getReport?.() || '')">Copy Report</button>
-        <button class="hud-btn" onclick="location.reload()">Hard Reload</button>
-      </div>
-
-      <div class="hud-btnrow">
-        <button class="hud-btn hud-btn-ghost" onclick="window.SCARLETT?.toggleHUD(false)">Hide HUD</button>
-        <button class="hud-btn hud-btn-ghost" onclick="window.SCARLETT?.toggleHUD(true)">Show HUD</button>
-      </div>
-
-      <pre id="diag" class="hud-diag">[boot] html loaded ✅
-(starting...)</pre>
-
-      <div class="hud-hint">
-        Tip: If you see <b>JS LOADED ✅</b> + <b>spine started ✅</b> but no world, it’s canvas/CSS/WebGL layering.
-      </div>
+      <p class="hint">
+        Tip: If you see <b>spine started ✅</b> + <b>world loaded ✅</b> but no world,
+        it’s a canvas/CSS layering issue.
+      </p>
     </div>
   </div>
 
-  <!-- This line proves the HTML loaded even before JS -->
   <script>
-    // keep minimal; spine.js writes the rest
+    const d = document.getElementById("diag");
+    d.textContent = "[boot] html loaded ✅\n(starting...)";
   </script>
 
-  <!-- MAIN ENTRY -->
+  <!-- ENTRY -->
   <script type="module" src="./index.js"></script>
 </body>
 </html>
