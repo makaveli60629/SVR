@@ -1,15 +1,13 @@
 /**
  * /index.js — PERMANENT ROOT BOOT
- * Guarantees HUD buttons work + diagnostics + Spine.start().
+ * Wires HUD + starts Spine.
  */
-
 import { initDiagnostics } from './diagnostics.js';
 import { Spine } from './spine.js';
 
 function $(id){ return document.getElementById(id); }
 
 function hardReload(){
-  // cache-bust EVERYTHING (GitHub pages + Android WebView)
   const url = new URL(location.href);
   url.searchParams.set('v', String(Date.now()));
   location.replace(url.toString());
@@ -20,7 +18,6 @@ async function copyText(text){
     await navigator.clipboard.writeText(text);
     return true;
   }catch{
-    // fallback
     const ta = document.createElement('textarea');
     ta.value = text;
     ta.style.position = 'fixed';
@@ -41,22 +38,20 @@ function setHudHidden(hidden){
 
 async function boot(){
   const diag = initDiagnostics({
-    build: 'SCARLETT_ROOT_BOOT_V1',
+    build: 'SCARLETT_ROOT_BOOT_V2',
     href: location.href,
     ua: navigator.userAgent
   });
 
-  // If JS is running, you will see this instantly:
-  diag.log('[boot] JS running ✅');
+  diag.log('[boot] module JS running ✅');
 
-  // Button wiring
   $('btnEnterVR')?.addEventListener('click', async ()=>{
-    diag.log('[ui] Enter VR pressed');
+    diag.log('[ui] Enter VR');
     try{ await Spine.enterVR(); } catch(e){ diag.error('[EnterVR] ' + (e?.message || e)); }
   });
 
   $('btnReset')?.addEventListener('click', ()=>{
-    diag.log('[ui] Reset spawn pressed');
+    diag.log('[ui] Reset Spawn');
     try{ Spine.resetSpawn(); } catch(e){ diag.error('[Reset] ' + (e?.message || e)); }
   });
 
@@ -67,7 +62,7 @@ async function boot(){
   });
 
   $('btnHard')?.addEventListener('click', ()=>{
-    diag.log('[ui] Hard reload…');
+    diag.log('[ui] Hard Reload');
     hardReload();
   });
 
@@ -77,27 +72,24 @@ async function boot(){
     diag.log('[ui] Report copied ✅');
   });
 
-  // Boot Tools = force-start Spine (if it already started, it’ll log)
   $('btnBoot')?.addEventListener('click', async ()=>{
-    diag.log('[ui] Boot Tools pressed');
+    diag.log('[ui] Boot Tools');
     try{
       await Spine.start({ diag });
       diag.log('[boot] Spine started ✅');
     }catch(e){
       diag.error('[boot] Spine.start failed: ' + (e?.message || e));
-      diag.log('[boot] trying hard reload…');
-      hardReload();
     }
   });
 
-  // Auto-start once at load:
+  // auto start
   try{
-    diag.log('[boot] auto-starting spine…');
+    diag.log('[boot] auto-start spine…');
     await Spine.start({ diag });
     diag.log('[boot] ready ✅');
   }catch(e){
     diag.error('[boot] auto-start failed: ' + (e?.message || e));
-    diag.log('[boot] tap "Boot Tools" or "Hard Reload"');
+    diag.log('[boot] tap Boot Tools');
   }
 }
 
