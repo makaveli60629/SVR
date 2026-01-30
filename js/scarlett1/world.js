@@ -1,24 +1,15 @@
 /**
  * /js/scarlett1/world.js — PERMANENT
- * Fixes:
- *  - Walls pulled in (not too far)
- *  - More light
- *  - Smaller table
- *  - Balcony + store
- *  - Bots demo
- *  - Simple card demo (deal flop/turn/river loop)
- *  - Android joystick + look pad (non-XR)
- *
  * Safe: NO imports.
  */
 
 export async function init(ctx){
-  const { THREE, scene, camera, log } = ctx;
+  const { THREE, scene, camera, renderer, setXRSpawn, log } = ctx;
 
   // ======= SIZES (walls closer now) =======
   const holeR = 6.0;
-  const outerR = 32.0;       // room-length walls (was huge)
-  const wallH  = 10.0;
+  const outerR = 92.0;       // pulled in
+  const wallH  = 12.0;
   const ceilingY = wallH;
 
   const pitY  = -1.85;
@@ -26,16 +17,23 @@ export async function init(ctx){
   // Smaller table
   const TABLE_SCALE = 0.78;
 
-  // ======= helpers =======
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const isXR=()=>!!(renderer && renderer.xr && renderer.xr.isPresenting);
+
+  // XR spawn away from table (only works if spine provides setXRSpawn)
+  setXRSpawn?.(new THREE.Vector3(0, 0, 16), 0);
 
   // ============================================================
-  // ANDROID MOVE + LOOK (NON-XR)
+  // ANDROID MOVE + LOOK (NON-XR ONLY)
   // ============================================================
   function bringToFront(el){
     el.style.zIndex='999999';
     el.style.pointerEvents='auto';
   }
+
+  // remove existing pads if hot-reloaded / reloaded
+  document.getElementById("scarlett-move-stick")?.remove();
+  document.getElementById("scarlett-look-pad")?.remove();
 
   function createMoveStick({ size=124, margin=18, deadzone=0.12 } = {}) {
     const root = document.createElement("div");
@@ -100,6 +98,8 @@ export async function init(ctx){
     root.addEventListener("pointercancel", onUp);
 
     const updateMove=(dt, speed=3.3)=>{
+      if(isXR()) return;
+
       const strafe=x;
       const forward=-y;
       if(Math.abs(strafe)<0.001 && Math.abs(forward)<0.001) return;
@@ -168,6 +168,7 @@ export async function init(ctx){
     pad.addEventListener("pointercancel", end);
 
     const updateLook=()=>{
+      if(isXR()) { yawDelta=0; return; }
       if(Math.abs(yawDelta) < 0.00001) return;
       camera.rotation.order = "YXZ";
       camera.rotation.y -= yawDelta;
@@ -185,19 +186,26 @@ export async function init(ctx){
   dir.position.set(16, 22, 12);
   scene.add(dir);
 
-  const topLight = new THREE.PointLight(0xffffff, 3.0, 120);
+  const topLight = new THREE.PointLight(0xffffff, 3.0, 260);
   topLight.position.set(0, ceilingY - 2.0, 0);
   scene.add(topLight);
 
-  // ======= DECK (HOLE RING) =======
+  for (let i=0;i<22;i++){
+    const a=(i/22)*Math.PI*2;
+    const p=new THREE.PointLight(0x8a2be2, 1.6, 120);
+    p.position.set(Math.cos(a)*(outerR*0.55), 7.6, Math.sin(a)*(outerR*0.55));
+    scene.add(p);
+  }
+
+  // ======= DECK =======
   const deck = new THREE.Mesh(
-    new THREE.RingGeometry(holeR, outerR, 160, 1),
+    new THREE.RingGeometry(holeR, outerR, 220, 1),
     new THREE.MeshStandardMaterial({ color: 0x0b0b12, roughness: 0.95, metalness: 0.06, side:THREE.DoubleSide })
   );
   deck.rotation.x = -Math.PI/2;
   scene.add(deck);
 
-  const grid = new THREE.GridHelper(outerR*2, 60, 0x2a2a44, 0x141422);
+  const grid = new THREE.GridHelper(outerR*2, 110, 0x2a2a44, 0x141422);
   grid.position.y = 0.02;
   scene.add(grid);
 
@@ -206,14 +214,14 @@ export async function init(ctx){
   const pitDepth = (0 - pitY);
 
   const pitWall = new THREE.Mesh(
-    new THREE.CylinderGeometry(holeR, holeR, pitDepth + 0.35, 160, 1, true),
+    new THREE.CylinderGeometry(holeR, holeR, pitDepth + 0.35, 220, 1, true),
     new THREE.MeshStandardMaterial({ color: 0x05050b, roughness: 0.95, metalness: 0.06, side:THREE.DoubleSide })
   );
   pitWall.position.y = pitY + (pitDepth / 2);
   pit.add(pitWall);
 
   const pitLip = new THREE.Mesh(
-    new THREE.TorusGeometry(holeR+0.08, 0.055, 12, 180),
+    new THREE.TorusGeometry(holeR+0.08, 0.055, 12, 240),
     new THREE.MeshStandardMaterial({ color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:1.25, roughness:0.35 })
   );
   pitLip.rotation.x = Math.PI/2;
@@ -226,36 +234,29 @@ export async function init(ctx){
   const shell = new THREE.Group();
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x05050b, roughness:0.95, metalness:0.06, side:THREE.DoubleSide });
 
-  const outerWall = new THREE.Mesh(new THREE.CylinderGeometry(outerR, outerR, wallH, 180, 1, true), wallMat);
+  const outerWall = new THREE.Mesh(new THREE.CylinderGeometry(outerR, outerR, wallH, 240, 1, true), wallMat);
   outerWall.position.y = wallH/2;
   shell.add(outerWall);
 
   const ceiling = new THREE.Mesh(
-    new THREE.RingGeometry(holeR, outerR, 160, 1),
+    new THREE.RingGeometry(holeR, outerR, 220, 1),
     new THREE.MeshStandardMaterial({ color: 0x040409, roughness:1.0, metalness:0.04, side:THREE.DoubleSide })
   );
   ceiling.rotation.x = -Math.PI/2;
   ceiling.position.y = ceilingY;
   shell.add(ceiling);
 
-  const crownMat = new THREE.MeshStandardMaterial({ color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:1.55, roughness:0.45 });
-  for (let i=0;i<2;i++){
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(outerR-1.6-i*1.0, 0.08, 12, 180), crownMat);
-    ring.rotation.x = Math.PI/2;
-    ring.position.y = ceilingY - 1.0 - i*0.8;
-    shell.add(ring);
-  }
   scene.add(shell);
 
   // ======= BALCONY =======
   const balcony = new THREE.Group();
-  const by = 6.8;
+  const by = 7.2;
 
-  const innerB = outerR - 6.5;
-  const outerB = outerR - 3.2;
+  const innerB = outerR - 10.0;
+  const outerB = outerR - 5.0;
 
   const bDeck = new THREE.Mesh(
-    new THREE.RingGeometry(innerB, outerB, 180, 1),
+    new THREE.RingGeometry(innerB, outerB, 240, 1),
     new THREE.MeshStandardMaterial({ color:0x0a0a12, roughness:1.0, metalness:0.05, side:THREE.DoubleSide })
   );
   bDeck.rotation.x = -Math.PI/2;
@@ -264,100 +265,27 @@ export async function init(ctx){
 
   scene.add(balcony);
 
-  // ======= TABLE (SMALLER) + CHAIRS =======
+  // ======= TABLE =======
   const tableGroup = new THREE.Group();
   tableGroup.position.y = pitY + 0.35;
   tableGroup.scale.setScalar(TABLE_SCALE);
 
-  const tableBase = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.9, 3.0, 1.25, 48),
-    new THREE.MeshStandardMaterial({ color:0x0b0b10, roughness:0.55, metalness:0.35, emissive:0x8a2be2, emissiveIntensity:0.25 })
-  );
-  tableBase.position.y = 0.68;
-  tableGroup.add(tableBase);
-
   const tableTop = new THREE.Mesh(
-    new THREE.CylinderGeometry(5.1, 5.1, 0.32, 96),
+    new THREE.CylinderGeometry(5.1, 5.1, 0.32, 120),
     new THREE.MeshStandardMaterial({ color:0x07070c, roughness:0.85, metalness:0.12 })
   );
   tableTop.position.y = 1.48;
   tableGroup.add(tableTop);
 
   const neon = new THREE.Mesh(
-    new THREE.TorusGeometry(5.25, 0.06, 10, 160),
+    new THREE.TorusGeometry(5.25, 0.06, 10, 220),
     new THREE.MeshStandardMaterial({ color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:1.15, roughness:0.4 })
   );
   neon.rotation.x = Math.PI/2;
   neon.position.y = 1.62;
   tableGroup.add(neon);
 
-  const chairMat = new THREE.MeshStandardMaterial({ color:0x0b0b10, roughness:0.65, metalness:0.25 });
-  const chairDist = 6.75;
-  for (let i=0;i<8;i++){
-    const a=(i/8)*Math.PI*2;
-    const chair = new THREE.Group();
-    chair.position.set(Math.cos(a)*chairDist, 0, Math.sin(a)*chairDist);
-    chair.lookAt(0, 0.8, 0);
-
-    const seat = new THREE.Mesh(new THREE.CylinderGeometry(0.82, 0.92, 0.20, 24), chairMat);
-    seat.position.y = 0.80;
-    chair.add(seat);
-
-    tableGroup.add(chair);
-  }
-
   scene.add(tableGroup);
-
-  // ======= STORE (PEDESTALS) =======
-  const store = new THREE.Group();
-  const storeRadius = outerR - 6.5;
-
-  const pedMat = new THREE.MeshStandardMaterial({ color:0x0b0b12, roughness:0.7, metalness:0.2, emissive:0x1b0b2a, emissiveIntensity:0.15 });
-  const pedGlowMat = new THREE.MeshStandardMaterial({ color:0x8a2be2, emissive:0x8a2be2, emissiveIntensity:1.0, roughness:0.4 });
-
-  const storeItems = ["STORE","AVATARS","CARDS","CHIPS","MUSIC","TV","LIGHTS","THEME"];
-
-  function makeLabel(texText){
-    const c=document.createElement('canvas');
-    c.width=512; c.height=256;
-    const g=c.getContext('2d');
-    g.fillStyle='rgba(10,12,18,0.85)'; g.fillRect(0,0,c.width,c.height);
-    g.strokeStyle='rgba(160,205,255,0.35)'; g.lineWidth=10; g.strokeRect(14,14,c.width-28,c.height-28);
-    g.fillStyle='rgba(255,255,255,0.96)'; g.font='900 54px system-ui, Arial';
-    g.textAlign='center'; g.textBaseline='middle';
-    g.fillText(texText, c.width/2, c.height/2 - 6);
-    g.fillStyle='rgba(230,236,252,0.80)'; g.font='700 26px system-ui, Arial';
-    g.fillText('tap / point', c.width/2, c.height/2 + 54);
-    const tex=new THREE.CanvasTexture(c);
-    tex.needsUpdate=true;
-    return tex;
-  }
-
-  for(let i=0;i<8;i++){
-    const a=(i/8)*Math.PI*2;
-    const pedestal=new THREE.Group();
-    pedestal.position.set(Math.cos(a)*storeRadius, 0, Math.sin(a)*storeRadius);
-    pedestal.lookAt(0, 0.8, 0);
-
-    const base=new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.25, 0.65, 24), pedMat);
-    base.position.y=0.33;
-    pedestal.add(base);
-
-    const ring=new THREE.Mesh(new THREE.TorusGeometry(1.10, 0.06, 12, 48), pedGlowMat);
-    ring.rotation.x=Math.PI/2;
-    ring.position.y=0.02;
-    pedestal.add(ring);
-
-    const card=new THREE.Mesh(
-      new THREE.PlaneGeometry(3.1, 1.55),
-      new THREE.MeshStandardMaterial({ map:makeLabel(storeItems[i]), transparent:true, roughness:0.85, metalness:0.05, emissive:0x2a0b44, emissiveIntensity:0.25 })
-    );
-    card.position.set(0, 2.05, 0);
-    pedestal.add(card);
-
-    store.add(pedestal);
-  }
-  scene.add(store);
 
   // ======= BOTS DEMO =======
   const bots = new THREE.Group();
@@ -381,26 +309,13 @@ export async function init(ctx){
   }
   scene.add(bots);
 
-  // ======= CARD GAME DEMO (flop/turn/river loop) =======
+  // ======= CARD DEMO =======
   const cardGroup = new THREE.Group();
   cardGroup.position.y = pitY + 1.72;
   cardGroup.scale.setScalar(TABLE_SCALE);
 
-  const cardMat = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    roughness: 0.85,
-    metalness: 0.05,
-    emissive: 0x101020,
-    emissiveIntensity: 0.08
-  });
-
-  const backMat = new THREE.MeshStandardMaterial({
-    color: 0x8a2be2,
-    roughness: 0.6,
-    metalness: 0.15,
-    emissive: 0x8a2be2,
-    emissiveIntensity: 0.15
-  });
+  const cardMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, metalness: 0.05 });
+  const backMat = new THREE.MeshStandardMaterial({ color: 0x8a2be2, roughness: 0.6, metalness: 0.15 });
 
   function makeCard(){
     const g = new THREE.Group();
@@ -410,7 +325,6 @@ export async function init(ctx){
     g.add(front);
     g.add(back);
     g.rotation.x = -Math.PI/2;
-    g.userData.isFaceUp = false;
     g.userData.front = front;
     return g;
   }
@@ -428,11 +342,8 @@ export async function init(ctx){
   const communityColors = [0xffe066,0x66ffdd,0x66a3ff,0xff66cc,0xa6ff66];
 
   function flipCard(card, faceUp){
-    card.userData.isFaceUp = faceUp;
     if(faceUp){
-      card.userData.front.material.color.setHex(
-        communityColors[Math.floor(Math.random()*communityColors.length)]
-      );
+      card.userData.front.material.color.setHex(communityColors[Math.floor(Math.random()*communityColors.length)]);
       card.rotation.z = 0;
     } else {
       card.rotation.z = Math.PI;
@@ -441,18 +352,14 @@ export async function init(ctx){
 
   for(const c of cards) flipCard(c,false);
 
-  // ======= CAMERA DEFAULT (NON-XR) =======
   camera.position.set(0, 1.7, 16);
   camera.lookAt(0, 1.35, 0);
 
-  // ======= ANDROID CONTROLS =======
   const moveStick = createMoveStick();
   const lookPad   = createLookPad();
 
-  log?.('[world] lobby + balcony + store + bots + cards ✅');
-  log?.('[world] walls pulled in ✅');
+  log?.('[world] loaded ✅');
 
-  // ======= UPDATES =======
   let t = 0;
   let dealTimer = 0;
   let dealStage = 0;
@@ -462,45 +369,29 @@ export async function init(ctx){
     dealStage = 0;
     dealTimer = 0;
   }
+
   resetHand();
 
   return {
     updates:[
       (dt)=> moveStick.updateMove(dt, 3.35),
-      ()=> lookPad.updateLook(),
+      (dt)=> lookPad.updateLook(dt),
       (dt)=>{
         t += dt;
 
-        // neon pulse
         neon.material.emissiveIntensity = 1.02 + Math.sin(t*1.35)*0.22;
         pitLip.material.emissiveIntensity = 1.15 + Math.sin(t*1.05 + 1.0)*0.20;
 
-        // store cards bob + face center
-        for(const ped of store.children){
-          ped.lookAt(0, 0.8, 0);
-          const last = ped.children[ped.children.length-1];
-          if(last) last.position.y = 2.05 + Math.sin(t*1.4 + ped.position.x*0.02)*0.06;
-        }
-
-        // bots walking loop
         for(const b of botData){
           b.phase += dt * b.speed;
           const a = b.phase;
-          b.mesh.position.set(
-            Math.cos(a)*botPathR,
-            botY + Math.sin(t*2.2 + a)*0.03,
-            Math.sin(a)*botPathR
-          );
+          b.mesh.position.set(Math.cos(a)*botPathR, botY, Math.sin(a)*botPathR);
           b.mesh.lookAt(0, botY, 0);
         }
 
-        // card dealing loop
         dealTimer += dt;
-
         if(dealStage === 0 && dealTimer > 2.0){
-          flipCard(cards[0], true);
-          flipCard(cards[1], true);
-          flipCard(cards[2], true);
+          flipCard(cards[0], true); flipCard(cards[1], true); flipCard(cards[2], true);
           dealStage = 1;
         } else if(dealStage === 1 && dealTimer > 4.5){
           flipCard(cards[3], true);
@@ -515,4 +406,4 @@ export async function init(ctx){
     ],
     interactables:[]
   };
-      }
+}
