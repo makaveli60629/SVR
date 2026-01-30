@@ -1,41 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ScarlettVR Poker • Permanent Spine</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="./css/style.css" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ScarlettVR Poker • Permanent Spine</title>
+<link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
-
-  <!-- THREE CANVAS STAGE -->
-  <div id="stage"></div>
-
-  <!-- ANDROID JOYSTICK -->
-  <div id="joy">
-    <div id="joyBase">
-      <div id="joyKnob"></div>
-    </div>
-  </div>
-
-  <!-- HUD -->
-  <div class="hud" id="hud">
-    <h1>ScarlettVR Poker • Permanent Spine</h1>
-    <p>Root spine is permanent • Only edit <code>/js/scarlett1/*</code></p>
-
-    <div class="btns">
-      <button data-action="enterVR">Enter VR</button>
-      <button data-action="resetSpawn">Reset Spawn</button>
-      <button data-action="copyReport">Copy Report</button>
-      <button data-action="hardReload">Hard Reload</button>
-      <button data-action="hideHUD">Hide HUD</button>
-      <button data-action="showHUD">Show HUD</button>
-    </div>
-
-    <pre id="diag">[boot] html loaded ✅
-(starting...)</pre>
-  </div>
-
-  <script type="module" src="./index.js"></script>
+<div id="hud">
+<h1>ScarlettVR Poker • Permanent Spine</h1>
+<p>Root spine is permanent • Only edit <code>/js/scarlett1/*</code></p>
+<div class="buttons">
+<button onclick="SCARLETT.enterVR()">Enter VR</button>
+<button onclick="SCARLETT.resetSpawn()">Reset Spawn</button>
+<button onclick="SCARLETT.copyReport()">Copy Report</button>
+<button onclick="location.reload(true)">Hard Reload</button>
+<button onclick="SCARLETT.hideHUD()">Hide HUD</button>
+<button onclick="SCARLETT.showHUD()">Show HUD</button>
+</div>
+<pre id="diag"></pre>
+</div>
+<div id="stage"></div>
+<script type="module" src="index.js"></script>
 </body>
 </html>
