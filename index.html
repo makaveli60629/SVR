@@ -1,69 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>ScarlettVR Poker • Permanent Spine</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-
-  <!-- Three.js (ESM SAFE CDN) -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
-    }
-  }
-  </script>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <link rel="stylesheet" href="./css/style.css" />
 </head>
-
 <body>
-  <!-- THREE.JS CANVAS LIVES HERE -->
-  <div id="scene-root"></div>
+
+  <!-- WebGL canvas mounts here -->
+  <div id="stage"></div>
 
   <!-- HUD -->
-  <div id="hud">
-    <h1>ScarlettVR Poker • Permanent Spine</h1>
-    <p class="sub">Root spine is permanent • Only edit <code>/js/scarlett1/*</code></p>
+  <div id="hud" class="hud">
+    <div class="card">
+      <h1>ScarlettVR Poker • Permanent Spine</h1>
+      <p class="sub">Root spine is permanent • Only edit <code>/js/scarlett1/*</code></p>
 
-    <div class="buttons">
-      <button id="enterVR">Enter VR</button>
-      <button id="resetSpawn">Reset Spawn</button>
-      <button id="copyReport">Copy Report</button>
-      <button id="hardReload">Hard Reload</button>
-      <button id="hideHUD">Hide HUD</button>
-      <button id="showHUD">Show HUD</button>
-    </div>
+      <div class="grid">
+        <button class="btn" data-action="enterVR">Enter VR</button>
+        <button class="btn" data-action="resetSpawn">Reset Spawn</button>
+        <button class="btn" data-action="copyReport">Copy Report</button>
+        <button class="btn" data-action="hardReload">Hard Reload</button>
+        <button class="btn" data-action="hideHUD">Hide HUD</button>
+        <button class="btn" data-action="showHUD">Show HUD</button>
+      </div>
 
-    <pre id="diag">[boot] html loaded ✅
+      <pre id="diag" class="diag">[boot] html loaded ✅
 (starting...)</pre>
 
-    <p class="tip">
-      Tip: If spine started ✅ + world loaded ✅ but you see nothing,
-      it is ALWAYS canvas/CSS layering.
-    </p>
+      <p class="tip">Tip: If you see <b>JS LOADED ✅</b> but no world, it’s canvas/CSS/WebGL layering.</p>
+    </div>
   </div>
 
-  <!-- SPINE ENTRY -->
-  <script type="module">
-    import { startSpine } from './spine.js';
+  <!-- ✅ module entry -->
+  <script type="module" src="./index.js"></script>
 
-    const diag = document.getElementById('diag');
-    const log = (m) => diag.textContent += `\n${m}`;
-
-    log('[boot] JS LOADED ✅');
-
-    startSpine({
-      mount: document.getElementById('scene-root'),
-      log
-    });
-
-    // UI wiring
-    document.getElementById('hardReload').onclick = () => location.reload(true);
-    document.getElementById('hideHUD').onclick = () =>
-      document.getElementById('hud').classList.add('hidden');
-    document.getElementById('showHUD').onclick = () =>
-      document.getElementById('hud').classList.remove('hidden');
-  </script>
 </body>
 </html>
