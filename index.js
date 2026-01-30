@@ -5,14 +5,13 @@ const diag = initDiagnostics({
   build: 'SCARLETT_SPINE_PERMANENT_S1_WORLD_INIT',
 });
 
-diag.log('[plain] js running ✅');
+diag.log('[plain] module index.js loaded ✅');
 
-// 🔥 THIS WAS MISSING BEFORE
 Spine.start({ diag })
   .then(() => {
     window.SCARLETT = Spine;
     diag.log('[boot] spine started ✅');
   })
   .catch(err => {
-    diag.error('[boot] spine failed: ' + err.message);
+    diag.error('[boot] spine failed: ' + (err?.message || err));
   });
