@@ -1,106 +1,89 @@
-// index.js — PERMANENT ROOT ENTRY (GitHub Pages safe)
-// Loads diagnostics + starts the permanent spine.
-// ONLY EDIT /js/scarlett1/* for world content.
+/**
+ * /index.js — PERMANENT ROOT ENTRY
+ * - Starts diagnostics
+ * - Boots Spine
+ * - Wires HUD buttons
+ *
+ * IMPORTANT: NO "three" bare imports in this file.
+ */
 
 import { initDiagnostics } from './diagnostics.js';
 import { Spine } from './spine.js';
 
-const BUILD = 'SCARLETT_ROOT_ENTRY_V1';
+const diag = initDiagnostics({
+  build: 'SCARLETT_SPINE_PERMANENT_S1_WORLD_INIT',
+  href: location.href,
+  ua: navigator.userAgent,
+});
+
+diag.log('[boot] html loaded ✅');
+diag.log('(starting...)');
 
 function $(id){ return document.getElementById(id); }
 
-function setDiagText(t){
-  const el = $('diag');
-  if (el) el.textContent = String(t || '');
-}
-
-function ensureHudButtons(diag){
-  // Make buttons work even if your HTML uses inline onclicks or not.
-  // We expose a stable API on window.SCARLETT.
-  window.SCARLETT = {
-    enterVR: async () => {
-      try { await Spine.enterVR(); diag.log('[ui] enterVR'); }
-      catch (e) { diag.error('[ui] enterVR failed: ' + (e?.message || e)); }
-    },
-    resetSpawn: () => {
-      try { Spine.resetSpawn(); }
-      catch (e) { diag.error('[ui] resetSpawn failed: ' + (e?.message || e)); }
-    },
-    getReport: () => {
-      try { return Spine.getReport(); }
-      catch (e) { return 'report error: ' + (e?.message || e); }
-    },
-    copyReport: async () => {
-      try {
-        const txt = Spine.getReport();
-        await navigator.clipboard.writeText(txt);
-        diag.log('[ui] report copied ✅');
-      } catch (e) {
-        diag.warn('[ui] copy failed (clipboard blocked): ' + (e?.message || e));
-      }
-    },
-    hardReload: () => {
-      // Most reliable on mobile.
-      location.href = location.pathname + '?v=' + Date.now();
-    },
-    purgeCache: async () => {
-      try {
-        if ('caches' in window) {
-          const keys = await caches.keys();
-          await Promise.all(keys.map(k => caches.delete(k)));
-        }
-        diag.log('[ui] caches purged ✅');
-      } catch (e) {
-        diag.warn('[ui] purgeCache failed: ' + (e?.message || e));
-      }
-    },
-  };
-
-  // Optional: auto-bind if buttons exist without inline onclick
-  const bind = (selector, fn) => {
-    const el = document.querySelector(selector);
-    if (el) el.addEventListener('click', fn);
-  };
-
-  bind('[data-action="enter-vr"]', window.SCARLETT.enterVR);
-  bind('[data-action="reset-spawn"]', window.SCARLETT.resetSpawn);
-  bind('[data-action="copy-report"]', window.SCARLETT.copyReport);
-  bind('[data-action="hard-reload"]', window.SCARLETT.hardReload);
-  bind('[data-action="purge-cache"]', window.SCARLETT.purgeCache);
-}
-
-async function boot(){
-  // show something immediately
-  setDiagText(`[plain] module index.js loaded ✅\n(starting...)`);
-
-  const diag = initDiagnostics({
-    build: BUILD,
-    href: location.href,
-    ua: navigator.userAgent
+function bind(id, fn){
+  const el = $(id);
+  if (!el) { diag.warn(`[hud] missing #${id}`); return; }
+  el.addEventListener('click', async () => {
+    try { await fn(); }
+    catch (e) { diag.error(e?.message || String(e)); }
   });
+}
 
-  diag.log('[diag] diagnostics ready ✅');
+// ---- HUD actions ----
+bind('btnEnterVR', async () => {
+  diag.log('[hud] Enter VR');
+  await Spine.enterVR();
+});
 
-  // Start the spine (this loads /js/scarlett1/world.js)
+bind('btnReset', async () => {
+  Spine.resetSpawn();
+});
+
+bind('btnCopy', async () => {
+  const report = Spine.getReport();
   try {
+    await navigator.clipboard.writeText(report);
+    diag.log('[hud] report copied ✅');
+  } catch {
+    // fallback prompt if clipboard blocked
+    prompt('Copy report:', report);
+    diag.log('[hud] report prompt shown');
+  }
+});
+
+bind('btnReload', async () => {
+  diag.log('[hud] hard reload...');
+  location.reload(true);
+});
+
+// Optional: if you have a purge cache button in HTML, wire it safely
+bind('btnPurge', async () => {
+  diag.log('[hud] purge cache...');
+  if ('caches' in window) {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+  }
+  diag.log('[hud] cache purged ✅');
+  location.reload();
+});
+
+// Hide HUD if button exists
+bind('btnHide', async () => {
+  const hud = $('dev-hud') || $('hud') || document.querySelector('#dev-hud, #hud');
+  if (hud) {
+    hud.style.display = (hud.style.display === 'none') ? '' : 'none';
+    diag.log('[hud] toggled');
+  }
+});
+
+// ---- Boot Spine ----
+(async () => {
+  try {
+    diag.log('[boot] starting spine…');
     await Spine.start({ diag });
     diag.log('[boot] spine started ✅');
   } catch (e) {
-    diag.error('[boot] spine start failed: ' + (e?.message || e));
-    throw e;
+    diag.error('[boot] spine failed: ' + (e?.message || String(e)));
   }
-
-  // Expose button actions
-  ensureHudButtons(diag);
-
-  // Helpful info for debugging
-  diag.log('[env] secureContext=' + (window.isSecureContext ? 'true' : 'false'));
-  diag.log('[env] xrSupported=' + (('xr' in navigator) ? 'true' : 'false'));
-}
-
-boot().catch((e)=>{
-  // Make sure you ALWAYS see something even on mobile.
-  const msg = e?.message || String(e);
-  setDiagText(`[fatal] index.js boot failed:\n${msg}`);
-  console.error(e);
-});
+})();
