@@ -1,6 +1,8 @@
 /**
- * /index.js — PERMANENT ROOT BOOT
- * Wires HUD + starts Spine.
+ * /index.js — PERMANENT ROOT BOOT (FIXED)
+ * IMPORTANT:
+ * - NO "three" package imports here (GitHub Pages can't resolve it)
+ * - Spine already imports Three from CDN.
  */
 import { initDiagnostics } from './diagnostics.js';
 import { Spine } from './spine.js';
@@ -38,12 +40,13 @@ function setHudHidden(hidden){
 
 async function boot(){
   const diag = initDiagnostics({
-    build: 'SCARLETT_ROOT_BOOT_V2',
+    build: 'SCARLETT_ROOT_BOOT_FIXED_NO_THREE',
     href: location.href,
     ua: navigator.userAgent
   });
 
   diag.log('[boot] module JS running ✅');
+  diag.log('[boot] starting spine…');
 
   $('btnEnterVR')?.addEventListener('click', async ()=>{
     diag.log('[ui] Enter VR');
@@ -82,9 +85,8 @@ async function boot(){
     }
   });
 
-  // auto start
+  // auto-start
   try{
-    diag.log('[boot] auto-start spine…');
     await Spine.start({ diag });
     diag.log('[boot] ready ✅');
   }catch(e){
