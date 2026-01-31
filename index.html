@@ -1,61 +1,27 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <meta name="theme-color" content="#0b0b12" />
-  <title>ScarlettVR Poker • Permanent Spine</title>
-
-  <link rel="stylesheet" href="./css/style.css" />
-
-  <!-- IMPORTANT: makes `import "three"` work on GitHub Pages -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Scarlett VR Poker</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+#hud{position:fixed;left:10px;top:10px;color:#9ff;font:12px monospace;
+background:rgba(0,0,0,.55);padding:10px;border-radius:10px;z-index:10}
+#btnEnter{position:fixed;right:12px;top:12px;z-index:11}
+</style>
+<script type="importmap">
+{
+ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+ }
+}
+</script>
 </head>
-
 <body>
-  <div id="hud" class="hud">
-    <div class="hud__title">
-      <div class="hud__brand">ScarlettVR Poker • Permanent Spine</div>
-      <div class="hud__sub">Root spine is permanent • Only edit /js/scarlett1/*</div>
-    </div>
-
-    <div class="hud__row">
-      <button id="btnEnterVR" class="btn">Enter VR</button>
-      <button id="btnResetSpawn" class="btn">Reset Spawn</button>
-      <button id="btnToggleHUD" class="btn">Hide HUD</button>
-      <button id="btnTextPlus" class="btn">Text +</button>
-      <button id="btnTextMinus" class="btn">Text -</button>
-      <button id="btnPurge" class="btn btn--warn">Purge Cache</button>
-      <button id="btnHardReload" class="btn btn--warn">Hard Reload</button>
-    </div>
-
-    <pre id="diag" class="hud__diag">(starting…)</pre>
-  </div>
-
-  <script type="module">
-    const diagEl = document.getElementById('diag');
-    const log = (s)=>{ diagEl.textContent += (diagEl.textContent.endsWith('\n')?'':'\n') + s; };
-
-    diagEl.textContent = '';
-    log('[boot] html loaded ✅');
-    log('[boot] attempting to import ./index.js …');
-
-    window.addEventListener('error', (e)=> log('[window.error] ' + (e.message || e.error || e)));
-    window.addEventListener('unhandledrejection', (e)=> log('[unhandledrejection] ' + (e.reason?.message || e.reason || e)));
-
-    import('./index.js')
-      .then(()=> log('[boot] index.js imported ✅'))
-      .catch((e)=>{
-        log('[boot] index.js import FAILED ❌');
-        log(String(e?.stack || e?.message || e));
-      });
-  </script>
+<div id="hud">Scarlett1 Spine booting…</div>
+<button id="btnEnter">Enter Poker Pit</button>
+<script type="module" src="/js/scarlett1/main.js"></script>
 </body>
 </html>
