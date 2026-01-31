@@ -1,3 +1,4 @@
+import "./modules/safety.js";      // ✅ ADD FIRST (critical)
 import "./modules/locomotion.js";
 import "./modules/portals.js";
 import "./modules/hands.js";
@@ -26,13 +27,15 @@ AFRAME.registerComponent("scarlett-world", {
     hudLog("A-FRAME loaded ✅");
     hudLog("Scarlett1 booting…");
 
+    // ✅ SAFETY GOVERNOR ON SCENE (forces spawn + kills face blockers)
+    this.el.sceneEl.setAttribute("scarlett-safety-governor", "");
+
     // Hands always visible
     this.el.sceneEl.setAttribute("scarlett-hands-always", "");
-
     // Watch teleporter
     this.el.sceneEl.setAttribute("scarlett-watch-teleporter", "");
 
-    // Dest markers
+    // Dest markers (we will keep lobby at 0,0,0 — but safety forces initial spawn away from pit)
     addDest(this.el, "dest_lobby", "0 0 0");
     addDest(this.el, "dest_tables", "0 0 -140");
     addDest(this.el, "dest_store", "-140 0 0");
@@ -56,42 +59,6 @@ AFRAME.registerComponent("scarlett-world", {
     store.setAttribute("position", "-140 0 0");
     store.setAttribute("scarlett-store-room", "");
     this.el.appendChild(store);
-
-    // ✅ FORCE SAFE SPAWN (outside pit, facing center)
-    setTimeout(() => {
-      const rig = document.getElementById("rig");
-      if (rig) {
-        rig.setAttribute("position", "0 1.65 18");   // outside pit
-        rig.setAttribute("rotation", "0 180 0");     // face pit
-      }
-      hudLog("Spawn set ✅ (outside pit)");
-    }, 50);
-
-    // ✅ KILL “THING IN FACE” (remove any UI planes accidentally attached to camera)
-    setTimeout(() => {
-      const cam = document.getElementById("camera");
-      if (!cam) return;
-
-      // remove any accidental children planes/text stuck on camera
-      [...cam.children].forEach(ch => {
-        const tag = (ch.tagName || "").toLowerCase();
-        const isPanel =
-          tag.includes("a-plane") ||
-          tag.includes("a-text") ||
-          (ch.getAttribute && ch.getAttribute("geometry") && ("" + ch.getAttribute("geometry")).includes("plane"));
-
-        const name = (ch.getAttribute && (ch.getAttribute("id") || ch.getAttribute("class") || "")) || "";
-        if (isPanel || /panel|hud|overlay|boot|sign/i.test(name)) {
-          ch.parentNode && ch.parentNode.removeChild(ch);
-        }
-      });
-
-      // also remove a known "boot" screen entity if someone created it
-      const boot = document.getElementById("bootPanel");
-      if (boot && boot.parentNode) boot.parentNode.removeChild(boot);
-
-      hudLog("Face overlay cleanup ✅");
-    }, 300);
 
     hudLog("Rooms created ✅");
   }
