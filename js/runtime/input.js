@@ -1,21 +1,19 @@
 export const Input = {
   ctx:null,
 
-  // movement
   moveSpeed: 2.2,
   snapTurn: true,
-  snapAngle: Math.PI / 6,
+  snapAngle: Math.PI/6,
   snapCooldown: 0.28,
   snapT: 0,
 
-  // trigger behavior
   teleportQueued:false,
   lastSelectTime:0,
   holdingSelect:false,
 
-  // visuals
   rayLine:null,
   reticle:null,
+  feetRing:null,
 
   init(ctx){
     this.ctx = ctx;
@@ -24,11 +22,9 @@ export const Input = {
       this.lastSelectTime = performance.now();
       this.holdingSelect = true;
     };
-
     const onSelectEnd = ()=>{
       const t = performance.now() - this.lastSelectTime;
       this.holdingSelect = false;
-      // Tap => teleport, Hold => was walk
       if (t < 260) this.teleportQueued = true;
     };
 
@@ -37,34 +33,45 @@ export const Input = {
     ctx.controller2?.addEventListener("selectstart", onSelectStart);
     ctx.controller2?.addEventListener("selectend", onSelectEnd);
 
-    this.buildTeleportViz();
-    console.log("✅ Input ready (tap teleport + hold walk forward + reticle)");
+    this.buildViz();
+    console.log("✅ Input ready (feet ring + better aim + hold-walk)");
   },
 
-  buildTeleportViz(){
+  buildViz(){
     const { THREE, scene } = this.ctx;
 
+    // Ray
     const geom = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0,0,0),
-      new THREE.Vector3(0,0,-6),
+      new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,-6)
     ]);
-    const mat = new THREE.LineBasicMaterial({ color: 0x00ffff });
-    this.rayLine = new THREE.Line(geom, mat);
-    this.rayLine.visible = true;
+    this.rayLine = new THREE.Line(
+      geom,
+      new THREE.LineBasicMaterial({ color: 0x00ffff })
+    );
     scene.add(this.rayLine);
 
-    const rGeom = new THREE.RingGeometry(0.12, 0.18, 32);
-    const rMat  = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent:true, opacity:0.95, side: THREE.DoubleSide });
-    this.reticle = new THREE.Mesh(rGeom, rMat);
+    // Teleport reticle
+    this.reticle = new THREE.Mesh(
+      new THREE.RingGeometry(0.12, 0.18, 32),
+      new THREE.MeshBasicMaterial({ color:0x00ffff, transparent:true, opacity:0.95, side:THREE.DoubleSide })
+    );
     this.reticle.rotation.x = -Math.PI/2;
     this.reticle.visible = false;
     scene.add(this.reticle);
+
+    // Feet ring (your “circle on me”)
+    this.feetRing = new THREE.Mesh(
+      new THREE.RingGeometry(0.18, 0.34, 44),
+      new THREE.MeshBasicMaterial({ color:0x00c8ff, transparent:true, opacity:0.75, side:THREE.DoubleSide })
+    );
+    this.feetRing.rotation.x = -Math.PI/2;
+    scene.add(this.feetRing);
   },
 
-  deadzone(v, dz=0.15){
+  deadzone(v, dz=0.18){
     if (Math.abs(v) < dz) return 0;
-    const s = (Math.abs(v) - dz) / (1 - dz);
-    return Math.sign(v) * Math.min(1, s);
+    const s = (Math.abs(v)-dz)/(1-dz);
+    return Math.sign(v)*Math.min(1,s);
   },
 
   getForward(){
@@ -77,8 +84,8 @@ export const Input = {
     return d;
   },
 
-  getGamepad(controller){
-    const gp = controller?.gamepad;
+  getGamepad(c){
+    const gp = c?.gamepad;
     return gp && gp.axes ? gp : null;
   },
 
@@ -92,15 +99,31 @@ export const Input = {
     return { x:p.x, y:-(p.y) };
   },
 
-  rayTeleportFrom(obj){
-    const { THREE, camera, teleportSurfaces } = this.ctx;
+  // Prefer a controller only if it has a real pose; else camera
+  pickAim(){
+    const { THREE, camera, controller1, controller2 } = this.ctx;
+    const tmp = new THREE.Vector3();
+
+    const ok = (c)=>{
+      if (!c) return false;
+      c.getWorldPosition(tmp);
+      // if controller pose is at origin, it’s likely invalid in hands-only mode
+      return (Math.abs(tmp.x)+Math.abs(tmp.y)+Math.abs(tmp.z)) > 0.001;
+    };
+
+    if (ok(controller1)) return controller1;
+    if (ok(controller2)) return controller2;
+    return camera;
+  },
+
+  rayTeleportFrom(fromObj){
+    const { THREE, teleportSurfaces } = this.ctx;
     const ray = new THREE.Raycaster();
     const o = new THREE.Vector3();
     const d = new THREE.Vector3();
 
-    const from = obj || camera;
-    from.getWorldPosition(o);
-    from.getWorldDirection(d);
+    fromObj.getWorldPosition(o);
+    fromObj.getWorldDirection(d);
 
     ray.set(o, d.normalize());
     const hits = ray.intersectObjects(teleportSurfaces, true);
@@ -112,62 +135,56 @@ export const Input = {
     if (!walkSurfaces?.length) return;
 
     const ray = new THREE.Raycaster();
-    ray.set(
-      new THREE.Vector3(rig.position.x, rig.position.y + 1.3, rig.position.z),
-      new THREE.Vector3(0,-1,0)
-    );
+    ray.set(new THREE.Vector3(rig.position.x, rig.position.y + 1.4, rig.position.z), new THREE.Vector3(0,-1,0));
     const hits = ray.intersectObjects(walkSurfaces, true);
     if (!hits?.length) return;
 
     rig.position.y = hits[0].point.y + 1.7;
   },
 
-  updateTeleportViz(hit, fromObj){
-    const { THREE, camera } = this.ctx;
-    if (!this.rayLine || !this.reticle) return;
-
+  updateViz(hit, fromObj){
+    const { THREE } = this.ctx;
     const o = new THREE.Vector3();
     const d = new THREE.Vector3();
-    const src = fromObj || camera;
-    src.getWorldPosition(o);
-    src.getWorldDirection(d);
 
-    if (!hit){
-      this.reticle.visible = false;
-      // still show a short ray forward
-      const end = o.clone().add(d.multiplyScalar(3));
-      const arr = this.rayLine.geometry.attributes.position.array;
-      arr[0]=o.x; arr[1]=o.y; arr[2]=o.z;
-      arr[3]=end.x; arr[4]=end.y; arr[5]=end.z;
-      this.rayLine.geometry.attributes.position.needsUpdate = true;
-      return;
-    }
+    fromObj.getWorldPosition(o);
+    fromObj.getWorldDirection(d);
 
-    this.reticle.visible = true;
-    this.reticle.position.copy(hit.point);
-    this.reticle.position.y += 0.02;
+    const end = hit ? hit.point.clone() : o.clone().add(d.multiplyScalar(3.0));
 
-    const end = hit.point.clone();
     const arr = this.rayLine.geometry.attributes.position.array;
     arr[0]=o.x; arr[1]=o.y; arr[2]=o.z;
     arr[3]=end.x; arr[4]=end.y; arr[5]=end.z;
     this.rayLine.geometry.attributes.position.needsUpdate = true;
+
+    if (hit){
+      this.reticle.visible = true;
+      this.reticle.position.copy(hit.point);
+      this.reticle.position.y += 0.02;
+    } else {
+      this.reticle.visible = false;
+    }
+  },
+
+  updateFeetRing(){
+    const { rig } = this.ctx;
+    // ring sits at your feet
+    this.feetRing.position.set(rig.position.x, rig.position.y - 1.68, rig.position.z);
   },
 
   update(dt){
     const { rig, controller1, controller2 } = this.ctx;
 
-    // Snap turn timer
     this.snapT = Math.max(0, this.snapT - dt);
 
-    // Aim controller
-    const aim = controller1 || controller2;
-
-    // Teleport target (for circle/reticle)
+    const aim = this.pickAim();
     const hit = this.rayTeleportFrom(aim);
-    this.updateTeleportViz(hit, aim);
+    this.updateViz(hit, aim);
 
-    // Teleport on tap
+    // always show feet ring
+    this.updateFeetRing();
+
+    // tap trigger = teleport
     if (this.teleportQueued){
       this.teleportQueued = false;
       if (hit){
@@ -177,7 +194,7 @@ export const Input = {
       return;
     }
 
-    // HOLD trigger = walk forward (universal fallback)
+    // hold trigger = walk forward
     if (this.holdingSelect){
       const f = this.getForward();
       rig.position.x += f.x * 2.0 * dt;
@@ -186,7 +203,7 @@ export const Input = {
       return;
     }
 
-    // Thumbsticks locomotion (best effort)
+    // best-effort sticks (won’t break anything if unmapped)
     const gp = this.getGamepad(controller1) || this.getGamepad(controller2);
     const a0 = this.pickStick(gp, 0);
     const a1 = this.pickStick(gp, 1);
@@ -197,22 +214,19 @@ export const Input = {
     const move = (m0 >= m1) ? a0 : a1;
     const turn = (m0 >= m1) ? a1 : a0;
 
-    const mx = this.deadzone(move.x, 0.15);
-    const my = this.deadzone(move.y, 0.15);
-    const tx = this.deadzone(turn.x, 0.22);
+    const mx = this.deadzone(move.x, 0.18);
+    const my = this.deadzone(move.y, 0.18);
+    const tx = this.deadzone(turn.x, 0.25);
 
     const f = this.getForward();
     const r = new this.ctx.THREE.Vector3(-f.z, 0, f.x);
 
-    const s = this.moveSpeed;
-    rig.position.x += (r.x*mx + f.x*my) * s * dt;
-    rig.position.z += (r.z*mx + f.z*my) * s * dt;
+    rig.position.x += (r.x*mx + f.x*my) * this.moveSpeed * dt;
+    rig.position.z += (r.z*mx + f.z*my) * this.moveSpeed * dt;
 
-    if (this.snapTurn){
-      if (this.snapT <= 0 && Math.abs(tx) > 0.55){
-        rig.rotation.y -= Math.sign(tx) * this.snapAngle;
-        this.snapT = this.snapCooldown;
-      }
+    if (this.snapTurn && this.snapT <= 0 && Math.abs(tx) > 0.55){
+      rig.rotation.y -= Math.sign(tx) * this.snapAngle;
+      this.snapT = this.snapCooldown;
     }
 
     this.snapGround();
