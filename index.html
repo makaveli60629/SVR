@@ -28,6 +28,27 @@
     <pre id="diag" class="hud__diag">(starting…)</pre>
   </div>
 
-  <script type="module" src="./index.js"></script>
+  <!-- BOOTSTRAP: this ALWAYS runs and shows import errors -->
+  <script type="module">
+    const diagEl = document.getElementById('diag');
+    const log = (s)=>{ diagEl.textContent += (diagEl.textContent.endsWith('\n')?'':'\n') + s; };
+    diagEl.textContent = '';
+    log('[boot] html loaded ✅');
+    log('[boot] attempting to import ./index.js …');
+
+    // show any runtime errors too
+    window.addEventListener('error', (e)=> log('[window.error] ' + (e.message || e.error || e)));
+    window.addEventListener('unhandledrejection', (e)=> log('[unhandledrejection] ' + (e.reason?.message || e.reason || e)));
+
+    import('./index.js')
+      .then(()=> log('[boot] index.js imported ✅'))
+      .catch((e)=>{
+        log('[boot] index.js import FAILED ❌');
+        log(String(e?.stack || e?.message || e));
+        // Extra hint for common GitHub Pages path issues:
+        log('Tip: confirm index.js exists at /index.js and loads over HTTPS.');
+      });
+  </script>
+
 </body>
 </html>
