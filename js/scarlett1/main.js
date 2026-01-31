@@ -1,5 +1,6 @@
 // /js/scarlett1/main.js
 import "./modules/lobby.js";
+import "./modules/locomotion.js";
 
 window.hudLog = function hudLog(msg) {
   const el = document.getElementById("hud");
@@ -13,32 +14,33 @@ AFRAME.registerComponent("scarlett-world", {
     hudLog("A-FRAME loaded ✅");
     hudLog("World booting…");
 
-    // Build the lobby as your spawn
+    // Build lobby
     const lobby = document.createElement("a-entity");
     lobby.setAttribute("id", "lobbyRoot");
     lobby.setAttribute("position", "0 0 0");
     lobby.setAttribute("scarlett-lobby", "");
     this.el.appendChild(lobby);
 
-    // Simple “portal click” router
+    // Portal click router
     this.el.addEventListener("click", (e) => {
       const target = e.target;
-      if (!target || !target.classList || !target.classList.contains("portal")) return;
+      if (!target?.classList?.contains("portal")) return;
 
       const dest = target.getAttribute("data-dest");
-      if (!dest) return;
-
       const rig = document.getElementById("rig");
-      if (!rig) return;
+      if (!dest || !rig) return;
 
-      if (dest === "lobby") rig.setAttribute("position", "0 1.6 8");
-      if (dest === "tables") rig.setAttribute("position", "0 1.6 -12");
-      if (dest === "store") rig.setAttribute("position", "12 1.6 0");
+      // These are safe zones (edit later when pit/store/balcony modules exist)
+      if (dest === "lobby")   rig.setAttribute("position", "0 1.6 14");
+      if (dest === "tables")  rig.setAttribute("position", "0 1.6 -12");
+      if (dest === "store")   rig.setAttribute("position", "12 1.6 0");
       if (dest === "balcony") rig.setAttribute("position", "0 4.2 16");
 
       hudLog(`Portal → ${dest.toUpperCase()} ✅`);
     });
 
     hudLog("World ready ✅");
+    hudLog("Movement: Left stick");
+    hudLog("Teleport: Aim right laser at floor → Right Trigger");
   }
 });
