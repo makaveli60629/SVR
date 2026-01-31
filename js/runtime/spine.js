@@ -1,4 +1,5 @@
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+import { XRHandModelFactory } from "https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRHandModelFactory.js";
 import { Input } from "./input.js";
 import { init as initWorld } from "../scarlett1/world.js";
 
@@ -10,8 +11,8 @@ export const Spine = {
     renderer.setSize(innerWidth, innerHeight);
     renderer.xr.enabled = true;
 
-    // Make it BRIGHT and readable
-    renderer.toneMappingExposure = 1.35;
+    // BRIGHTER overall
+    renderer.toneMappingExposure = 1.5;
 
     document.body.appendChild(renderer.domElement);
 
@@ -20,11 +21,11 @@ export const Spine = {
     scene.background = new THREE.Color(0x05060d);
 
     // Camera
-    const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 600);
+    const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 800);
 
-    // Player Rig (move this)
+    // Player rig (move this)
     const rig = new THREE.Group();
-    rig.position.set(0, 1.8, 18);   // safe spawn far from pit lip
+    rig.position.set(0, 1.8, 22); // ✅ moved back (prevents starting in pit)
     rig.add(camera);
     scene.add(rig);
 
@@ -35,10 +36,28 @@ export const Spine = {
       renderer.setSize(innerWidth, innerHeight);
     });
 
+    // XR Controllers + Hands
+    const controller1 = renderer.xr.getController(0);
+    const controller2 = renderer.xr.getController(1);
+    scene.add(controller1, controller2);
+
+    // Hand models (Oculus-style)
+    const handFactory = new XRHandModelFactory();
+    const hand1 = renderer.xr.getHand(0);
+    const hand2 = renderer.xr.getHand(1);
+    hand1.add(handFactory.createHandModel(hand1, "mesh"));
+    hand2.add(handFactory.createHandModel(hand2, "mesh"));
+    scene.add(hand1, hand2);
+
+    // Context for modules
     const ctx = {
       THREE, scene, camera, renderer, rig,
+      controller1, controller2, hand1, hand2,
       log: (...a) => console.log(...a),
-      flags: { noClip: true } // demo: no collision to prevent “stuck”
+      // demo mode: no collision clamp (prevents “stuck”)
+      flags: { noClip: true },
+      // raycast targets for teleport (world fills this)
+      teleportSurfaces: []
     };
 
     // Input
@@ -48,8 +67,7 @@ export const Spine = {
     await initWorld(ctx);
 
     // VR button
-    const btnVR = document.getElementById("btnVR");
-    btnVR?.addEventListener("click", async () => {
+    document.getElementById("btnVR")?.addEventListener("click", async () => {
       try {
         if (!navigator.xr) return;
         const session = await navigator.xr.requestSession("immersive-vr", {
@@ -61,9 +79,9 @@ export const Spine = {
       }
     });
 
-    // Reset spawn button
+    // Reset spawn
     document.getElementById("btnReset")?.addEventListener("click", () => {
-      rig.position.set(0, 1.8, 18);
+      rig.position.set(0, 1.8, 22);
       rig.rotation.set(0, 0, 0);
     });
 
