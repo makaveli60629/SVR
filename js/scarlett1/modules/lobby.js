@@ -2,7 +2,7 @@ AFRAME.registerComponent("scarlett-lobby", {
   init: function () {
     const el = this.el;
 
-    // Neon ring
+    // Neon ring on floor
     const ring = document.createElement("a-torus");
     ring.setAttribute("radius", "1.1");
     ring.setAttribute("radius-tubular", "0.045");
@@ -27,6 +27,43 @@ AFRAME.registerComponent("scarlett-lobby", {
     txt.setAttribute("width", "6");
     el.appendChild(txt);
 
-    hudLog("Lobby built ✅");
+    // Clickable in-world button (NOT on your face)
+    const btn = document.createElement("a-entity");
+    btn.setAttribute("id", "lobbyEnterTablesBtn");
+    btn.setAttribute("position", "0 1.35 -2.05");
+    btn.setAttribute("rotation", "0 0 0");
+    btn.classList.add("clickable"); // your raycaster can target this if you enable it
+
+    const bg = document.createElement("a-plane");
+    bg.setAttribute("width", "1.55");
+    bg.setAttribute("height", "0.32");
+    bg.setAttribute("material", "color:#0b0f14; opacity:0.78; transparent:true");
+    btn.appendChild(bg);
+
+    const label = document.createElement("a-text");
+    label.setAttribute("value", "ENTER POKER TABLES");
+    label.setAttribute("align", "center");
+    label.setAttribute("color", "#9ff");
+    label.setAttribute("width", "3.4");
+    label.setAttribute("position", "0 0 0.01");
+    btn.appendChild(label);
+
+    const outline = document.createElement("a-ring");
+    outline.setAttribute("radius-inner", "0.66");
+    outline.setAttribute("radius-outer", "0.70");
+    outline.setAttribute("position", "0 0 0.012");
+    outline.setAttribute("material", "color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.35; opacity:0.7; transparent:true");
+    btn.appendChild(outline);
+
+    // We can’t rely on click unless cursor exists.
+    // So we also make it triggerable via a helper global hook.
+    btn.addEventListener("click", () => {
+      if (window.enterPokerTables) window.enterPokerTables();
+      if (window.hudLog) hudLog("Lobby button clicked ✅");
+    });
+
+    el.appendChild(btn);
+
+    if (window.hudLog) hudLog("Lobby built ✅ (in-world ENTER button added)");
   }
 });
