@@ -369,6 +369,12 @@ export async function init({ THREE, scene, camera, rig, renderer, setXRSpawn, lo
   }
 
   log('[world] V8 ready ✅ spawn pad + open pit + stairs + store + jumbotrons');
+  // AFTER spawnPad.position is set:
+window.__SCARLETT_SPAWN__ = {
+  pos: new THREE.Vector3(spawnPad.position.x, 0, spawnPad.position.z),
+  yaw: Math.PI
+};
+setXRSpawn?.(window.__SCARLETT_SPAWN__.pos, window.__SCARLETT_SPAWN__.yaw);
 
   // IMPORTANT: Provide teleport surfaces so teleport actually works
   return {
