@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SCARLETT1</title>
 
-  <!-- A-FRAME CDN -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
   <style>
@@ -15,30 +14,37 @@
       color:#9ff; font:14px/1.35 monospace;
       background:rgba(0,0,0,.35); padding:10px 12px; border-radius:10px;
       z-index:9999;
+      pointer-events:none;
     }
+    #enterVRBtn{
+      position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
+      padding:14px 18px; border-radius:14px;
+      background:rgba(10,12,18,.85);
+      border:1px solid rgba(120,240,255,.55);
+      color:#bff; font:700 15px/1.1 system-ui, sans-serif;
+      z-index:10000;
+      display:none;
+    }
+    #enterVRBtn:active{ transform:translateX(-50%) scale(.98); }
   </style>
 </head>
 
 <body>
   <div id="hudWrap"><div id="hud">boot…</div></div>
+  <button id="enterVRBtn">ENTER VR</button>
 
   <a-scene
     renderer="colorManagement:true; physicallyCorrectLights:true; antialias:true"
     vr-mode-ui="enabled:true"
-    embedded
     background="color:#000"
     scarlett-world
   >
-    <!-- RIG -->
     <a-entity id="rig" position="0 1.6 18" rotation="0 0 0">
       <a-entity id="camera" camera look-controls position="0 0 0"></a-entity>
-
-      <!-- Controllers (we keep them, but we hide reticle/laser visuals in code) -->
       <a-entity id="leftHand"  oculus-touch-controls="hand: left"></a-entity>
       <a-entity id="rightHand" oculus-touch-controls="hand: right"></a-entity>
     </a-entity>
 
-    <!-- WORLD ROOT -->
     <a-entity id="worldRoot"></a-entity>
   </a-scene>
 
