@@ -1,4 +1,2 @@
-import { Spine } from "./js/runtime/spine.js";
-
-console.log("🚀 SCARLETT: booting…");
-Spine.start();
+const el = document.getElementById("axisdbg");
+if (el) el.textContent = `axes: ${a.x.toFixed(2)}, ${a.y.toFixed(2)}`;
