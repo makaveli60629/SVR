@@ -2,43 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="theme-color" content="#0b0b12" />
   <title>ScarlettVR Poker • Permanent Spine</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-  <!-- WebGL host -->
-  <canvas id="xr-canvas" aria-label="3D View"></canvas>
 
-  <!-- Touch joystick for Android debugging -->
-  <div id="touch-ui" aria-hidden="true">
-    <div id="stick-left" class="stick">
-      <div class="knob"></div>
-    </div>
-  </div>
-
-  <!-- HUD -->
   <div id="hud" class="hud">
-    <div class="hud-card">
-      <h1>ScarlettVR Poker • Permanent Spine</h1>
-      <p class="sub">Root spine is permanent • Only edit <code>/js/scarlett1/*</code></p>
-
-      <div class="btn-grid">
-        <button id="btn-enter-vr" class="btn">Enter VR</button>
-        <button id="btn-reset" class="btn">Reset Spawn</button>
-        <button id="btn-copy" class="btn">Copy Report</button>
-        <button id="btn-reload" class="btn">Hard Reload</button>
-        <button id="btn-hide" class="btn">Hide HUD</button>
-        <button id="btn-show" class="btn">Show HUD</button>
-      </div>
-
-      <pre id="log" class="log">[boot] html loaded ✅
-(starting...)</pre>
-
-      <p class="tip">Tip: If you see <b>JS LOADED ✅</b> + <b>world ready ✅</b> but no world, it's canvas/CSS/WebGL layering.</p>
+    <div class="hud__title">
+      <div class="hud__brand">ScarlettVR Poker • Permanent Spine</div>
+      <div class="hud__sub">Root spine is permanent • Only edit /js/scarlett1/*</div>
     </div>
+
+    <div class="hud__row">
+      <button id="btnEnterVR" class="btn">Enter VR</button>
+      <button id="btnResetSpawn" class="btn">Reset Spawn</button>
+      <button id="btnToggleHUD" class="btn">Hide HUD</button>
+      <button id="btnTextPlus" class="btn">Text +</button>
+      <button id="btnTextMinus" class="btn">Text -</button>
+      <button id="btnPurge" class="btn btn--warn">Purge Cache</button>
+      <button id="btnHardReload" class="btn btn--warn">Hard Reload</button>
+    </div>
+
+    <pre id="diag" class="hud__diag">(starting…)</pre>
   </div>
 
-  <script type="module" src="index.js"></script>
+  <script type="module" src="./index.js"></script>
 </body>
 </html>
