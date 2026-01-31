@@ -1,410 +1,500 @@
 /**
- * Scarlett1 World — V4 FULL LOBBY (COLOR) + OPEN PIT + STAIRS + RAIL + STORE PAD
- * - Fix VR spawn: create/use a rig and spawn OUTSIDE pit by default
- * - Procedural checker floor texture
- * - Open pit (no cap disk)
- * - Stairs down into pit
- * - Neon rails + accents
- * - Simple store kiosk pad
- * - Bots walking
+ * Scarlett1 World — V5 FULL LOBBY (FAST PACE)
+ * - Open pit (NO CAP DISK)
+ * - Balcony + rails + stairs
+ * - 4 Jumbotrons (animated emissive)
+ * - Store kiosk
+ * - Bots walking ring + pit-side idlers
+ *
+ * Contract:
+ * export async function init({ THREE, scene, camera, renderer, log })
  */
-
-export async function init({ THREE, scene, camera, log, renderer }) {
-  log("[world] init V4 lobby+pit+stairs+store");
+export async function init({ THREE, scene, camera, renderer, log }) {
+  log("[world] init V5 full lobby");
 
   // -----------------
-  // DIMENSIONS
+  // TUNABLES
   // -----------------
-  const roomRadius = 18;
-  const roomHeight = 7;
+  const OUTER_R = 26;
+  const WALL_H = 7.5;
 
-  const pitRadius = 6.0;
-  const pitDepth = 4.0;   // change later when table exists
-  const pitFloorY = -pitDepth;
+  const PIT_R = 7.5;
+  const PIT_DEPTH = 3.4;
 
-  const entranceAngle = Math.PI / 2; // where stairs are
+  const RING_INNER_R = PIT_R + 1.5;
+  const RING_OUTER_R = OUTER_R - 2.0;
+
+  const BALCONY_Y = 3.2;
+  const BALCONY_THICK = 0.35;
+
+  const ENTRY_ANGLE = Math.PI * 0.5; // "door" / stair entry direction
 
   // -----------------
   // SCENE BASICS
   // -----------------
-  scene.background = new THREE.Color(0x04040a);
-  scene.fog = new THREE.Fog(0x04040a, 18, 55);
+  scene.background = new THREE.Color(0x040407);
 
   // -----------------
-  // LIGHTING (BRIGHT + COLOR)
+  // LIGHTING (BRIGHT + EVEN)
   // -----------------
-  scene.add(new THREE.AmbientLight(0xffffff, 0.22));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.35));
 
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x2a2a55, 1.1);
-  hemi.position.set(0, 22, 0);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x222244, 1.15);
+  hemi.position.set(0, 18, 0);
   scene.add(hemi);
 
-  const dir = new THREE.DirectionalLight(0xffffff, 1.35);
-  dir.position.set(8, 12, 7);
+  const dir = new THREE.DirectionalLight(0xffffff, 1.2);
+  dir.position.set(8, 16, 10);
   scene.add(dir);
 
-  // neon-ish fills
-  const magenta = new THREE.PointLight(0xff3cff, 1.0, 60);
-  magenta.position.set(-6, 4, -6);
-  scene.add(magenta);
-
-  const cyan = new THREE.PointLight(0x2bd6ff, 1.0, 60);
-  cyan.position.set(6, 4, 6);
-  scene.add(cyan);
-
-  const pitGlow = new THREE.PointLight(0x7a45ff, 1.2, 45);
-  pitGlow.position.set(0, 1.6, 0);
+  // Neon pit glow
+  const pitGlow = new THREE.PointLight(0x7a45ff, 2.2, 60);
+  pitGlow.position.set(0, 3.5, 0);
   scene.add(pitGlow);
 
   // -----------------
-  // PLAYER RIG (VR SPAWN FIX)
-  // In WebXR, the headset drives camera transforms.
-  // We move a parent "rig" group so VR starts OUTSIDE the pit.
+  // MATERIALS
   // -----------------
-  let rig = camera.parent;
-  if (!rig) {
-    rig = new THREE.Group();
-    rig.name = "playerRig";
-    scene.add(rig);
-    rig.add(camera);
-  }
+  const matFloor = new THREE.MeshStandardMaterial({
+    color: 0x101018,
+    roughness: 0.92,
+    metalness: 0.06,
+  });
 
-  function setSpawn(x, y, z, yaw = 0) {
-    rig.position.set(x, y, z);
-    rig.rotation.set(0, yaw, 0);
-  }
+  const matRing = new THREE.MeshStandardMaterial({
+    color: 0x0d0d14,
+    roughness: 0.88,
+    metalness: 0.10,
+  });
 
-  // Expose so your "Reset Spawn" button (or console) can call it.
-  window.SCARLETT_SPAWN = setSpawn;
-
-  // Default spawn: OUTSIDE pit, looking toward center
-  setSpawn(0, 0, 11.5, Math.PI);
-
-  // -----------------
-  // PROCEDURAL CHECKER TEXTURE (NO ASSET REQUIRED)
-  // -----------------
-  function makeCheckerTexture(size = 512, cells = 16) {
-    const c = document.createElement("canvas");
-    c.width = c.height = size;
-    const ctx = c.getContext("2d");
-
-    const cell = size / cells;
-    for (let y = 0; y < cells; y++) {
-      for (let x = 0; x < cells; x++) {
-        const on = (x + y) % 2 === 0;
-        ctx.fillStyle = on ? "#11111a" : "#0a0a12";
-        ctx.fillRect(x * cell, y * cell, cell, cell);
-      }
-    }
-
-    // subtle diagonal stripes overlay
-    ctx.globalAlpha = 0.12;
-    ctx.strokeStyle = "#7a45ff";
-    ctx.lineWidth = 2;
-    for (let i = -size; i < size * 2; i += 24) {
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i + size, size);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-
-    const tex = new THREE.CanvasTexture(c);
-    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(2.2, 2.2);
-    tex.anisotropy = 4;
-    return tex;
-  }
-
-  const checker = makeCheckerTexture(512, 16);
-
-  // -----------------
-  // FLOOR (RING — HOLE CUT OUT)  ✅ no cap disk
-  // -----------------
-  const ringGeo = new THREE.RingGeometry(pitRadius, roomRadius, 128, 1);
-  const ringMat = new THREE.MeshStandardMaterial({
-    map: checker,
-    color: 0xffffff,
+  const matWall = new THREE.MeshStandardMaterial({
+    color: 0x161623,
     roughness: 0.92,
     metalness: 0.05,
     side: THREE.DoubleSide,
   });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
-  ring.rotation.x = -Math.PI / 2;
-  ring.position.y = 0;
-  scene.add(ring);
 
-  // -----------------
-  // PIT WALL (OPEN CYLINDER, NO CAPS)
-  // -----------------
-  const pitWallGeo = new THREE.CylinderGeometry(pitRadius, pitRadius, pitDepth, 128, 1, true);
-  const pitWallMat = new THREE.MeshStandardMaterial({
-    color: 0x070712,
-    roughness: 0.98,
-    metalness: 0.03,
-    side: THREE.DoubleSide,
-  });
-  const pitWall = new THREE.Mesh(pitWallGeo, pitWallMat);
-  pitWall.position.y = pitFloorY / 2;
-  pitWall.rotation.y = Math.PI;
-  scene.add(pitWall);
-
-  // PIT BOTTOM
-  const pitBottomGeo = new THREE.CircleGeometry(pitRadius - 0.05, 128);
-  const pitBottomMat = new THREE.MeshStandardMaterial({
-    color: 0x05050c,
-    roughness: 0.98,
+  const matPit = new THREE.MeshStandardMaterial({
+    color: 0x08080f,
+    roughness: 0.95,
     metalness: 0.02,
     side: THREE.DoubleSide,
   });
-  const pitBottom = new THREE.Mesh(pitBottomGeo, pitBottomMat);
+
+  const matRail = new THREE.MeshStandardMaterial({
+    color: 0x1a1a28,
+    roughness: 0.45,
+    metalness: 0.85,
+  });
+
+  const matNeon = new THREE.MeshStandardMaterial({
+    color: 0x120818,
+    roughness: 0.35,
+    metalness: 0.25,
+    emissive: 0x7a45ff,
+    emissiveIntensity: 1.0,
+  });
+
+  // -----------------
+  // FLOOR (outer)
+  // -----------------
+  const floor = new THREE.Mesh(
+    new THREE.CircleGeometry(OUTER_R, 96),
+    matFloor
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.y = 0;
+  scene.add(floor);
+
+  // -----------------
+  // PIT (open hole + inner walls + bottom)
+  // -----------------
+  const pitWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(PIT_R, PIT_R, PIT_DEPTH, 96, 1, true),
+    matPit
+  );
+  pitWall.position.y = -PIT_DEPTH / 2;
+  pitWall.rotation.y = Math.PI; // inward faces
+  scene.add(pitWall);
+
+  const pitBottom = new THREE.Mesh(
+    new THREE.CircleGeometry(PIT_R - 0.05, 80),
+    new THREE.MeshStandardMaterial({
+      color: 0x07070c,
+      roughness: 0.98,
+      metalness: 0.02,
+      emissive: 0x160a22,
+      emissiveIntensity: 0.35,
+    })
+  );
   pitBottom.rotation.x = -Math.PI / 2;
-  pitBottom.position.y = pitFloorY;
+  pitBottom.position.y = -PIT_DEPTH;
   scene.add(pitBottom);
 
-  // -----------------
-  // NEON RAILS (pit rim + room rim)
-  // -----------------
-  function neonTorus(radius, y, color, intensity = 1.7, tube = 0.05) {
-    const geo = new THREE.TorusGeometry(radius, tube, 12, 160);
-    const mat = new THREE.MeshStandardMaterial({
-      color,
-      emissive: color,
-      emissiveIntensity: intensity,
-      roughness: 0.45,
-      metalness: 0.35,
-    });
-    const t = new THREE.Mesh(geo, mat);
-    t.rotation.x = Math.PI / 2;
-    t.position.y = y;
-    scene.add(t);
-    return t;
-  }
-
-  const pitRail = neonTorus(pitRadius + 0.12, 0.035, 0x6a3dff, 1.9, 0.055);
-  const roomRail = neonTorus(roomRadius - 0.55, 0.08, 0x2bd6ff, 1.2, 0.04);
+  // make pit bottom teleportable (so you can jump down if you want)
+  pitBottom.userData.teleportable = true;
 
   // -----------------
-  // WALLS (CYLINDER ROOM)
+  // RING WALKWAY AROUND PIT
   // -----------------
-  const wallGeo = new THREE.CylinderGeometry(roomRadius, roomRadius, roomHeight, 128, 1, true);
-  const wallMat = new THREE.MeshStandardMaterial({
-    color: 0x141421,
-    roughness: 0.92,
-    metalness: 0.05,
-    side: THREE.DoubleSide,
-  });
-  const walls = new THREE.Mesh(wallGeo, wallMat);
-  walls.position.y = roomHeight / 2;
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(RING_INNER_R, RING_OUTER_R, 128),
+    matRing
+  );
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = 0.01;
+  scene.add(ring);
+
+  ring.userData.teleportable = true;
+
+  // -----------------
+  // WALLS (cylindrical room)
+  // -----------------
+  const walls = new THREE.Mesh(
+    new THREE.CylinderGeometry(OUTER_R, OUTER_R, WALL_H, 128, 1, true),
+    matWall
+  );
+  walls.position.y = WALL_H / 2;
   walls.rotation.y = Math.PI;
   scene.add(walls);
 
   // -----------------
-  // STAIRS INTO PIT (from rim down to pit floor)
+  // PIT RAIL (top ring)
   // -----------------
-  const stairGroup = new THREE.Group();
-  stairGroup.name = "pitStairs";
-  scene.add(stairGroup);
+  const pitRailR = PIT_R + 0.2;
+  const pitRail = new THREE.Mesh(
+    new THREE.TorusGeometry(pitRailR, 0.08, 14, 128),
+    matRail
+  );
+  pitRail.rotation.x = Math.PI / 2;
+  pitRail.position.y = 0.95;
+  scene.add(pitRail);
 
-  const steps = 14;
-  const stepH = pitDepth / steps;
-  const stepD = 0.55;
-  const stepW = 2.2;
+  // Neon inner rail (glow)
+  const pitNeon = new THREE.Mesh(
+    new THREE.TorusGeometry(PIT_R + 0.55, 0.05, 10, 128),
+    matNeon
+  );
+  pitNeon.rotation.x = Math.PI / 2;
+  pitNeon.position.y = 0.65;
+  scene.add(pitNeon);
 
-  const stepGeo = new THREE.BoxGeometry(stepW, stepH * 0.95, stepD);
-  const stepMat = new THREE.MeshStandardMaterial({
-    color: 0x10101a,
-    roughness: 0.9,
-    metalness: 0.08,
-    emissive: 0x1c0f3a,
-    emissiveIntensity: 0.18,
-  });
+  // -----------------
+  // BALCONY (upper ring) + rails
+  // -----------------
+  const balcony = new THREE.Mesh(
+    new THREE.RingGeometry(RING_INNER_R + 0.8, RING_OUTER_R - 0.8, 128),
+    new THREE.MeshStandardMaterial({
+      color: 0x0d0d13,
+      roughness: 0.92,
+      metalness: 0.08,
+    })
+  );
+  balcony.rotation.x = -Math.PI / 2;
+  balcony.position.y = BALCONY_Y;
+  scene.add(balcony);
 
-  // Place staircase at entranceAngle, starting near rim, descending inward
-  for (let i = 0; i < steps; i++) {
-    const s = new THREE.Mesh(stepGeo, stepMat);
-    const t = i / (steps - 1);
+  // balcony rail (outer)
+  const balconyOuterRail = new THREE.Mesh(
+    new THREE.TorusGeometry(RING_OUTER_R - 0.7, 0.07, 12, 128),
+    matRail
+  );
+  balconyOuterRail.rotation.x = Math.PI / 2;
+  balconyOuterRail.position.y = BALCONY_Y + 1.0;
+  scene.add(balconyOuterRail);
 
-    const y = 0 - (t * pitDepth) + stepH * 0.5;        // down into pit
-    const r = pitRadius - 0.6 - t * 2.0;               // slightly inward as it descends
-    const x = Math.cos(entranceAngle) * r;
-    const z = Math.sin(entranceAngle) * r;
+  // balcony rail (inner)
+  const balconyInnerRail = new THREE.Mesh(
+    new THREE.TorusGeometry(RING_INNER_R + 1.0, 0.07, 12, 128),
+    matRail
+  );
+  balconyInnerRail.rotation.x = Math.PI / 2;
+  balconyInnerRail.position.y = BALCONY_Y + 1.0;
+  scene.add(balconyInnerRail);
 
-    s.position.set(x, y, z);
-    s.rotation.y = -entranceAngle + Math.PI / 2;
-    stairGroup.add(s);
-
-    // tiny neon edge on every 2nd step
-    if (i % 2 === 0) {
-      const edge = new THREE.Mesh(
-        new THREE.BoxGeometry(stepW, 0.02, 0.02),
-        new THREE.MeshStandardMaterial({
-          color: 0x6a3dff,
-          emissive: 0x6a3dff,
-          emissiveIntensity: 2.2,
-          roughness: 0.4,
-          metalness: 0.2,
-        })
-      );
-      edge.position.set(x, y + stepH * 0.48, z - (Math.cos(entranceAngle) * 0.01));
-      edge.rotation.y = -entranceAngle + Math.PI / 2;
-      stairGroup.add(edge);
+  // balcony support posts (simple)
+  {
+    const postGeo = new THREE.CylinderGeometry(0.08, 0.08, BALCONY_Y, 12);
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      const x = Math.cos(a) * (RING_OUTER_R - 1.2);
+      const z = Math.sin(a) * (RING_OUTER_R - 1.2);
+      const post = new THREE.Mesh(postGeo, matRail);
+      post.position.set(x, BALCONY_Y / 2, z);
+      scene.add(post);
     }
   }
 
   // -----------------
-  // CENTER PEDESTAL (table placeholder; you can swap later)
+  // STAIRS (entry gap + steps down into pit)
   // -----------------
-  const pedestalRadius = 2.2;
-  const pedestalHeight = 1.6;
-  const pedestalTopY = pitFloorY + pedestalHeight;
+  // We cut a "visual lane" using fewer rail posts and place steps.
+  // This is not boolean-cut; it’s an open lane by placement.
+  const stair = new THREE.Group();
+  scene.add(stair);
 
-  const pedestalGeo = new THREE.CylinderGeometry(pedestalRadius, pedestalRadius, pedestalHeight, 96);
-  const pedestalMat = new THREE.MeshStandardMaterial({
-    color: 0x14141c,
+  const steps = 14;
+  const stepW = 2.6;
+  const stepH = PIT_DEPTH / steps;
+  const stepD = 0.55;
+
+  const stepMat = new THREE.MeshStandardMaterial({
+    color: 0x12121a,
     roughness: 0.85,
-    metalness: 0.2,
-  });
-  const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
-  pedestal.position.set(0, pitFloorY + pedestalHeight / 2, 0);
-  scene.add(pedestal);
-
-  // table placeholder top
-  const tableGeo = new THREE.CylinderGeometry(2.1, 2.1, 0.18, 96);
-  const tableMat = new THREE.MeshStandardMaterial({
-    color: 0x0c0c12,
-    roughness: 0.65,
-    metalness: 0.15,
-    emissive: 0x120a25,
-    emissiveIntensity: 0.35,
-  });
-  const table = new THREE.Mesh(tableGeo, tableMat);
-  table.position.set(0, pedestalTopY + 0.12, 0);
-  scene.add(table);
-
-  // -----------------
-  // SIMPLE STORE PAD (expand later)
-  // -----------------
-  const store = new THREE.Group();
-  store.name = "storePad";
-  scene.add(store);
-
-  const storeAngle = entranceAngle + Math.PI; // opposite side
-  const storeR = pitRadius + 4.7;
-  const storeX = Math.cos(storeAngle) * storeR;
-  const storeZ = Math.sin(storeAngle) * storeR;
-
-  const padGeo = new THREE.CylinderGeometry(1.4, 1.4, 0.18, 64);
-  const padMat = new THREE.MeshStandardMaterial({
-    color: 0x0e0e18,
-    roughness: 0.6,
-    metalness: 0.25,
-    emissive: 0x2bd6ff,
-    emissiveIntensity: 0.65,
-  });
-  const storePad = new THREE.Mesh(padGeo, padMat);
-  storePad.position.set(storeX, 0.09, storeZ);
-  store.add(storePad);
-
-  // sign
-  const signGeo = new THREE.PlaneGeometry(2.2, 0.9);
-  const signMat = new THREE.MeshStandardMaterial({
-    color: 0x101018,
-    emissive: 0xff3cff,
-    emissiveIntensity: 0.95,
-    roughness: 0.35,
-    metalness: 0.2,
-    side: THREE.DoubleSide,
-  });
-  const sign = new THREE.Mesh(signGeo, signMat);
-  sign.position.set(storeX, 1.6, storeZ);
-  sign.lookAt(0, 1.5, 0);
-  store.add(sign);
-
-  // -----------------
-  // 4 JUMBOTRONS (N/E/S/W)
-  // -----------------
-  const jumboW = 5.2, jumboH = 2.7;
-  const jumboGeo = new THREE.PlaneGeometry(jumboW, jumboH);
-  const baseJumboMat = new THREE.MeshStandardMaterial({
-    color: 0x0f0f18,
-    emissive: 0x3a7bff,
-    emissiveIntensity: 0.85,
-    roughness: 0.3,
-    metalness: 0.2,
-    side: THREE.DoubleSide,
+    metalness: 0.08,
   });
 
-  const jumbotrons = [];
-  const jr = roomRadius - 0.45;
-  const jy = 4.2;
+  for (let i = 0; i < steps; i++) {
+    const t = i / (steps - 1);
+    const y = -t * PIT_DEPTH + stepH * 0.5;
+    const r = PIT_R + 0.6 + t * 2.2;
 
-  function addJumbo(x, z, ry) {
-    const m = new THREE.Mesh(jumboGeo, baseJumboMat.clone());
-    m.position.set(x, jy, z);
-    m.rotation.y = ry;
-    scene.add(m);
-    jumbotrons.push(m);
+    const x = Math.cos(ENTRY_ANGLE) * r;
+    const z = Math.sin(ENTRY_ANGLE) * r;
+
+    const step = new THREE.Mesh(
+      new THREE.BoxGeometry(stepW, stepH, stepD),
+      stepMat
+    );
+    step.position.set(x, y, z);
+    step.lookAt(0, y, 0);
+    stair.add(step);
   }
 
-  addJumbo(0, -jr, 0);
-  addJumbo(0, jr, Math.PI);
-  addJumbo(-jr, 0, Math.PI / 2);
-  addJumbo(jr, 0, -Math.PI / 2);
+  // Side rails for stairs (small)
+  {
+    const railGeo = new THREE.CylinderGeometry(0.04, 0.04, 1.0, 10);
+    for (let i = 0; i < 10; i++) {
+      const t = i / 9;
+      const y = 0.8 - t * (PIT_DEPTH - 0.6);
+      const r = PIT_R + 1.4 + t * 1.8;
+      const x = Math.cos(ENTRY_ANGLE) * r;
+      const z = Math.sin(ENTRY_ANGLE) * r;
+
+      const left = new THREE.Mesh(railGeo, matRail);
+      const right = new THREE.Mesh(railGeo, matRail);
+      left.position.set(x + 0.9 * Math.cos(ENTRY_ANGLE + Math.PI / 2), y, z + 0.9 * Math.sin(ENTRY_ANGLE + Math.PI / 2));
+      right.position.set(x + 0.9 * Math.cos(ENTRY_ANGLE - Math.PI / 2), y, z + 0.9 * Math.sin(ENTRY_ANGLE - Math.PI / 2));
+      scene.add(left, right);
+    }
+  }
 
   // -----------------
-  // BOTS (simple walkers)
+  // JUMBOTRONS (4 corners on the wall)
   // -----------------
-  const bots = [];
-  const botCount = 8;
-  const botGeo = new THREE.CapsuleGeometry(0.18, 0.55, 6, 12);
+  const screens = [];
+  const screenGeo = new THREE.PlaneGeometry(6.2, 3.2);
 
-  for (let i = 0; i < botCount; i++) {
-    const botMat = new THREE.MeshStandardMaterial({
-      color: 0x9a9ad0,
+  function makeScreen(angle, y) {
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0x0b0b12,
+      roughness: 0.55,
+      metalness: 0.10,
+      emissive: 0x2b1bff,
+      emissiveIntensity: 1.4,
+    });
+
+    const m = new THREE.Mesh(screenGeo, mat);
+    const r = OUTER_R - 0.4;
+    m.position.set(Math.cos(angle) * r, y, Math.sin(angle) * r);
+    m.lookAt(0, y, 0);
+    scene.add(m);
+    screens.push(m);
+  }
+
+  makeScreen(Math.PI * 0.25, 4.6);
+  makeScreen(Math.PI * 0.75, 4.6);
+  makeScreen(Math.PI * 1.25, 4.6);
+  makeScreen(Math.PI * 1.75, 4.6);
+
+  // small “door signs” under each screen
+  {
+    const signGeo = new THREE.PlaneGeometry(3.4, 0.7);
+    const signMat = new THREE.MeshStandardMaterial({
+      color: 0x120a1f,
+      emissive: 0x7a45ff,
+      emissiveIntensity: 0.9,
       roughness: 0.7,
       metalness: 0.15,
-      emissive: i % 2 ? 0x2bd6ff : 0xff3cff,
-      emissiveIntensity: 0.18,
+      side: THREE.DoubleSide,
     });
-    const b = new THREE.Mesh(botGeo, botMat);
-    const a = (i / botCount) * Math.PI * 2;
-    b.position.set(Math.cos(a) * (pitRadius + 4.4), 0.9, Math.sin(a) * (pitRadius + 4.4));
-    b.userData = { a, speed: 0.28 + (i % 4) * 0.06 };
+
+    for (let i = 0; i < 4; i++) {
+      const a = Math.PI * (0.25 + i * 0.5);
+      const sign = new THREE.Mesh(signGeo, signMat);
+      const r = OUTER_R - 0.55;
+      sign.position.set(Math.cos(a) * r, 2.2, Math.sin(a) * r);
+      sign.lookAt(0, 2.2, 0);
+      scene.add(sign);
+    }
+  }
+
+  // -----------------
+  // STORE (kiosk + neon)
+  // -----------------
+  const store = new THREE.Group();
+  scene.add(store);
+
+  const storeAngle = ENTRY_ANGLE + Math.PI * 0.5;
+  const storeR = RING_OUTER_R - 3.5;
+  store.position.set(Math.cos(storeAngle) * storeR, 0, Math.sin(storeAngle) * storeR);
+  store.lookAt(0, 0.7, 0);
+
+  const booth = new THREE.Mesh(
+    new THREE.BoxGeometry(2.4, 1.6, 1.4),
+    new THREE.MeshStandardMaterial({
+      color: 0x0e0e16,
+      roughness: 0.7,
+      metalness: 0.2,
+      emissive: 0x090012,
+      emissiveIntensity: 0.25,
+    })
+  );
+  booth.position.y = 0.8;
+  store.add(booth);
+
+  const boothTop = new THREE.Mesh(
+    new THREE.BoxGeometry(2.55, 0.18, 1.55),
+    matNeon
+  );
+  boothTop.position.y = 1.55;
+  store.add(boothTop);
+
+  const storeSign = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.2, 0.55),
+    new THREE.MeshStandardMaterial({
+      color: 0x09090f,
+      emissive: 0x7a45ff,
+      emissiveIntensity: 1.3,
+      roughness: 0.5,
+      metalness: 0.1,
+      side: THREE.DoubleSide,
+    })
+  );
+  storeSign.position.set(0, 2.05, 0.72);
+  store.add(storeSign);
+
+  // -----------------
+  // BOTS (walking around ring)
+  // -----------------
+  const bots = [];
+  const botCount = 10;
+
+  const botBodyMat = new THREE.MeshStandardMaterial({
+    color: 0x111118,
+    roughness: 0.45,
+    metalness: 0.75,
+    emissive: 0x2c1a55,
+    emissiveIntensity: 0.25,
+  });
+
+  const botCoreMat = new THREE.MeshStandardMaterial({
+    color: 0x0b0b12,
+    roughness: 0.25,
+    metalness: 0.15,
+    emissive: 0x7a45ff,
+    emissiveIntensity: 0.9,
+  });
+
+  function makeBot() {
+    const g = new THREE.Group();
+
+    const body = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.28, 0.55, 8, 12),
+      botBodyMat
+    );
+    body.position.y = 0.75;
+    g.add(body);
+
+    const core = new THREE.Mesh(
+      new THREE.SphereGeometry(0.12, 16, 16),
+      botCoreMat
+    );
+    core.position.set(0, 0.95, 0.22);
+    g.add(core);
+
+    return g;
+  }
+
+  for (let i = 0; i < botCount; i++) {
+    const b = makeBot();
+    b.userData.a = (i / botCount) * Math.PI * 2;
+    b.userData.r = (RING_INNER_R + RING_OUTER_R) * 0.5 + (i % 2 ? 0.6 : -0.6);
+    b.userData.speed = 0.35 + (i % 3) * 0.12; // different speeds
     scene.add(b);
     bots.push(b);
   }
 
-  log("[world] ready ✅");
+  // Add a few pit-side idle bots (“playing / watching” vibe)
+  {
+    const idleCount = 4;
+    for (let i = 0; i < idleCount; i++) {
+      const b = makeBot();
+      const a = ENTRY_ANGLE + Math.PI + i * (Math.PI / 8);
+      const r = PIT_R + 2.0;
+      b.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+      b.rotation.y = -a + Math.PI * 0.5;
+      scene.add(b);
+    }
+  }
 
   // -----------------
-  // UPDATE LOOP
+  // SAFE SPAWN (IMPORTANT — OUTSIDE PIT)
   // -----------------
+  function setSpawn(x, y, z, yaw = Math.PI) {
+    camera.position.set(x, 1.6 + y, z);
+    camera.rotation.set(0, yaw, 0);
+    camera.lookAt(0, 1.4, 0);
+  }
+
+  // ALWAYS spawn on ring, not in pit
+  setSpawn(0, 0, 11.5, Math.PI);
+
+  // expose helpers for spine buttons
+  window.SCARLETT_SPAWN = (x, y, z, yaw) => setSpawn(x, y, z, yaw);
+  window.SCARLETT_SPAWN_SAFE = () => setSpawn(0, 0, 11.5, Math.PI);
+  window.SCARLETT_SPAWN_PITRIM = () => setSpawn(0, 0, PIT_R + 2.5, Math.PI);
+  window.SCARLETT_SPAWN_BALCONY = () => setSpawn(0, BALCONY_Y - 0.2, RING_OUTER_R - 4.5, Math.PI);
+
+  // -----------------
+  // UPDATE LOOP (bots + screens + neon pulse)
+  // -----------------
+  let t = 0;
+
   function update(dt) {
-    const t = performance.now() * 0.001;
+    t += dt;
 
-    // bots walk around pit rim
-    for (const b of bots) {
-      const s = b.userData.speed;
-      const a = b.userData.a + t * s;
-      const rr = pitRadius + 4.5;
-      b.position.x = Math.cos(a) * rr;
-      b.position.z = Math.sin(a) * rr;
-      b.position.y = 0.9;
-      b.rotation.y = -a + Math.PI / 2;
+    // screens pulse
+    const pulse = 1.1 + Math.sin(t * 1.6) * 0.35;
+    for (const s of screens) {
+      s.material.emissiveIntensity = pulse;
     }
 
-    // neon pulse
-    pitRail.material.emissiveIntensity = 1.6 + 0.5 * Math.sin(t * 1.4);
-    roomRail.material.emissiveIntensity = 0.9 + 0.25 * Math.sin(t * 1.1);
+    // neon rail pulse
+    pitNeon.material.emissiveIntensity = 0.85 + Math.sin(t * 2.1) * 0.25;
 
-    // jumbotrons pulse
-    const pulse = 0.6 + 0.4 * Math.sin(t * 1.2);
-    for (const j of jumbotrons) j.material.emissiveIntensity = 0.6 + pulse;
+    // bots walk ring
+    for (const b of bots) {
+      b.userData.a += dt * b.userData.speed;
+      const a = b.userData.a;
+      const r = b.userData.r;
+
+      b.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+
+      // face direction of travel
+      const forwardA = a + Math.PI * 0.5;
+      b.rotation.y = -forwardA;
+
+      // slight bob so they feel alive
+      b.position.y = 0.02 + Math.sin(t * 6 + a * 3) * 0.03;
+    }
   }
+
+  log("[world] V5 lobby ready ✅ (pit open, balcony+rails, stairs, jumbotrons, store, bots)");
 
   return {
     updates: [update],
     interactables: [],
+    teleportSurfaces: [ring, pitBottom, balcony], // allow teleport to balcony too
   };
       }
