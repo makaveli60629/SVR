@@ -9,11 +9,10 @@ export const Input = {
   init(ctx){
     this.ctx = ctx;
 
-    // Keyboard fallback
     addEventListener("keydown", e => this.keys[e.code] = true);
     addEventListener("keyup", e => this.keys[e.code] = false);
 
-    // Touch joystick (Android) bottom-left
+    // Touch joystick
     const joyZone = document.getElementById("joyZone");
     if (joyZone) {
       const down = (e) => {
@@ -39,8 +38,6 @@ export const Input = {
 
         this.joy.x = Math.max(-1, Math.min(1, dx / max));
         this.joy.y = Math.max(-1, Math.min(1, dy / max));
-
-        window.__joy = { x:this.joy.x, y:this.joy.y, active:this.joy.active };
         e.preventDefault?.();
       };
 
@@ -48,7 +45,6 @@ export const Input = {
         this.joy.active = false;
         this.joy.id = null;
         this.joy.x = 0; this.joy.y = 0;
-        window.__joy = { x:0, y:0, active:false };
       };
 
       joyZone.addEventListener("touchstart", down, { passive:false });
@@ -61,37 +57,36 @@ export const Input = {
       addEventListener("mouseup", up);
     }
 
-    // Tap teleport (Android) bottom-right
+    // Tap teleport (Android)
     const teleZone = document.getElementById("teleZone");
     if (teleZone) {
       teleZone.addEventListener("click", () => { this.teleportQueued = true; });
       teleZone.addEventListener("touchend", () => { this.teleportQueued = true; }, { passive:true });
     }
 
-    // VR select events (controllers AND hand pinch both emit select)
+    // XR select: controllers AND hand pinch both emit select in most browsers
     const onSelectStart = () => {
       this.lastSelectTime = performance.now();
-      this.moveForwardHeld = true; // hold = move forward
+      this.moveForwardHeld = true;
     };
     const onSelectEnd = () => {
       const t = performance.now() - this.lastSelectTime;
       this.moveForwardHeld = false;
-      // quick tap = teleport
       if (t < 240) this.teleportQueued = true;
     };
 
-    const { controller1, controller2, hand1, hand2 } = ctx;
-    [controller1, controller2, hand1, hand2].forEach(obj => {
+    const { controller1, controller2 } = ctx;
+    [controller1, controller2].forEach(obj => {
       if (!obj) return;
       obj.addEventListener("selectstart", onSelectStart);
       obj.addEventListener("selectend", onSelectEnd);
     });
 
-    console.log("✅ Input: armed (touch + keys + gamepad + XR pinch/trigger)");
+    console.log("✅ Input armed");
   },
 
   getAxes(){
-    // 1) Gamepads (Quest controllers)
+    // Gamepad axes
     const gps = navigator.getGamepads ? navigator.getGamepads() : [];
     for (const gp of gps) {
       if (!gp || !gp.axes) continue;
@@ -100,12 +95,12 @@ export const Input = {
       if (Math.abs(ax) + Math.abs(ay) > 0.01) return { x: ax, y: ay };
     }
 
-    // 2) Touch joystick (Android)
+    // Touch joystick
     if (this.joy.active && (Math.abs(this.joy.x) + Math.abs(this.joy.y) > 0.01)) {
-      return { x: this.joy.x, y: -this.joy.y }; // invert dy so up = forward
+      return { x: this.joy.x, y: -this.joy.y };
     }
 
-    // 3) Keys
+    // Keys
     const k = this.keys;
     return {
       x: (k.KeyD?1:0) - (k.KeyA?1:0),
@@ -141,14 +136,7 @@ export const Input = {
   update(dt){
     const { rig, camera, controller1, controller2 } = this.ctx;
 
-    const a = this.getAxes();
-    const el = document.getElementById("axisdbg");
-    if (el) el.textContent =
-      `axes: ${a.x.toFixed(2)}, ${a.y.toFixed(2)}\n` +
-      `holdMove: ${this.moveForwardHeld ? "YES" : "no"}\n` +
-      `pos: ${rig.position.x.toFixed(2)}, ${rig.position.z.toFixed(2)}`;
-
-    // Teleport: prefer controller rays in VR, else camera
+    // Teleport
     if (this.teleportQueued) {
       this.teleportQueued = false;
       const did =
@@ -156,7 +144,6 @@ export const Input = {
         this.raycastTeleport(controller2) ||
         this.raycastTeleport(null);
 
-      // fallback: small forward hop if nothing hit
       if (!did) {
         const yaw = camera.rotation.y;
         const step = 3.0;
@@ -165,29 +152,27 @@ export const Input = {
       }
     }
 
-    // VR “hold to move forward” (works with pinch)
+    // Hold-to-move (XR select hold)
     if (this.moveForwardHeld) {
       const yaw = camera.rotation.y;
-      const speed = 1.9;
+      const speed = 2.0;
       rig.position.x += Math.sin(yaw) * speed * dt;
       rig.position.z -= Math.cos(yaw) * speed * dt;
       rig.position.y = Math.max(rig.position.y, 1.6);
       return;
     }
 
-    // Normal movement (axes)
+    // Axes move
+    const a = this.getAxes();
     const mag = Math.abs(a.x) + Math.abs(a.y);
     if (mag < 0.001) return;
 
     const yaw = camera.rotation.y;
     const sin = Math.sin(yaw), cos = Math.cos(yaw);
 
-    const forward = a.y;
-    const strafe  = a.x;
-
     const speed = 2.4;
-    const vx = (strafe * cos - forward * sin) * speed * dt;
-    const vz = (strafe * sin + forward * cos) * speed * dt;
+    const vx = (a.x * cos - a.y * sin) * speed * dt;
+    const vz = (a.x * sin + a.y * cos) * speed * dt;
 
     rig.position.x += vx;
     rig.position.z += vz;
