@@ -15,16 +15,16 @@ export const Input = {
   reticle: null,
 
   init(ctx){
-    this.ctx = ctx;
+    Input.ctx = ctx;
 
     const onSelectStart = () => {
-      this.lastSelectTime = performance.now();
-      this.holdingSelect = true;
+      Input.lastSelectTime = performance.now();
+      Input.holdingSelect = true;
     };
     const onSelectEnd = () => {
-      const t = performance.now() - this.lastSelectTime;
-      this.holdingSelect = false;
-      if (t < 260) this.teleportQueued = true;
+      const t = performance.now() - Input.lastSelectTime;
+      Input.holdingSelect = false;
+      if (t < 260) Input.teleportQueued = true;
     };
 
     ctx.controller1?.addEventListener("selectstart", onSelectStart);
@@ -32,16 +32,13 @@ export const Input = {
     ctx.controller2?.addEventListener("selectstart", onSelectStart);
     ctx.controller2?.addEventListener("selectend", onSelectEnd);
 
-    this.buildViz();
-    console.log("✅ Input initialized");
+    Input.buildViz();
+    console.log("✅ Input initialized v2 (this-safe)");
   },
 
-  /* =========================
-     🔧 MISSING FUNCTION (FIX)
-     ========================= */
   getForward(){
-    const { THREE } = this.ctx;
-    const cam = this.getXRCamera();
+    const { THREE } = Input.ctx;
+    const cam = Input.getXRCamera();
     const dir = new THREE.Vector3();
     cam.getWorldDirection(dir);
     dir.y = 0;
@@ -55,7 +52,7 @@ export const Input = {
   },
 
   getXRCamera(){
-    const { renderer, camera } = this.ctx;
+    const { renderer, camera } = Input.ctx;
     try {
       const xrCam = renderer.xr.getCamera(camera);
       return xrCam?.cameras?.[0] || xrCam || camera;
@@ -66,13 +63,13 @@ export const Input = {
 
   poseOk(obj){
     if (!obj) return false;
-    const v = new this.ctx.THREE.Vector3();
+    const v = new Input.ctx.THREE.Vector3();
     obj.getWorldPosition(v);
     return v.lengthSq() > 0.0001;
   },
 
   makeLaser(len=7){
-    const { THREE } = this.ctx;
+    const { THREE } = Input.ctx;
     const g = new THREE.Group();
     const geom = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0,0,0),
@@ -87,9 +84,9 @@ export const Input = {
   },
 
   buildViz(){
-    const { THREE, scene, controller1, controller2 } = this.ctx;
+    const { THREE, scene, controller1, controller2 } = Input.ctx;
 
-    this.feetRing = new THREE.Mesh(
+    Input.feetRing = new THREE.Mesh(
       new THREE.RingGeometry(0.2,0.4,40),
       new THREE.MeshBasicMaterial({
         color:0x00c8ff,
@@ -98,10 +95,10 @@ export const Input = {
         side:THREE.DoubleSide
       })
     );
-    this.feetRing.rotation.x = -Math.PI/2;
-    scene.add(this.feetRing);
+    Input.feetRing.rotation.x = -Math.PI/2;
+    scene.add(Input.feetRing);
 
-    this.reticle = new THREE.Mesh(
+    Input.reticle = new THREE.Mesh(
       new THREE.RingGeometry(0.12,0.18,32),
       new THREE.MeshBasicMaterial({
         color:0x00ffff,
@@ -110,22 +107,22 @@ export const Input = {
         side:THREE.DoubleSide
       })
     );
-    this.reticle.rotation.x = -Math.PI/2;
-    this.reticle.visible = false;
-    scene.add(this.reticle);
+    Input.reticle.rotation.x = -Math.PI/2;
+    Input.reticle.visible = false;
+    scene.add(Input.reticle);
 
-    this.rayCam = this.makeLaser();
-    scene.add(this.rayCam);
+    Input.rayCam = Input.makeLaser();
+    scene.add(Input.rayCam);
 
-    this.rayC1 = this.makeLaser();
-    this.rayC2 = this.makeLaser();
-    if (controller1) controller1.add(this.rayC1);
-    if (controller2) controller2.add(this.rayC2);
+    Input.rayC1 = Input.makeLaser();
+    Input.rayC2 = Input.makeLaser();
+    if (controller1) controller1.add(Input.rayC1);
+    if (controller2) controller2.add(Input.rayC2);
   },
 
   updateFeetRing(){
-    const { rig } = this.ctx;
-    this.feetRing.position.set(
+    const { rig } = Input.ctx;
+    Input.feetRing.position.set(
       rig.position.x,
       rig.position.y - 1.68,
       rig.position.z
@@ -133,14 +130,14 @@ export const Input = {
   },
 
   getAim(){
-    const { controller1, controller2 } = this.ctx;
-    if (this.poseOk(controller1)) return { type:"c1", obj:controller1 };
-    if (this.poseOk(controller2)) return { type:"c2", obj:controller2 };
-    return { type:"cam", obj:this.getXRCamera() };
+    const { controller1, controller2 } = Input.ctx;
+    if (Input.poseOk(controller1)) return { type:"c1", obj:controller1 };
+    if (Input.poseOk(controller2)) return { type:"c2", obj:controller2 };
+    return { type:"cam", obj:Input.getXRCamera() };
   },
 
   raycast(obj){
-    const { THREE, teleportSurfaces } = this.ctx;
+    const { THREE, teleportSurfaces } = Input.ctx;
     const ray = new THREE.Raycaster();
     const o = new THREE.Vector3();
     const d = new THREE.Vector3();
@@ -151,7 +148,7 @@ export const Input = {
   },
 
   snapGround(){
-    const { THREE, rig, walkSurfaces } = this.ctx;
+    const { THREE, rig, walkSurfaces } = Input.ctx;
     if (!walkSurfaces.length) return;
     const ray = new THREE.Raycaster();
     ray.set(
@@ -163,63 +160,63 @@ export const Input = {
   },
 
   update(dt){
-    const { rig } = this.ctx;
+    const { rig } = Input.ctx;
 
-    this.updateFeetRing();
+    Input.updateFeetRing();
 
-    const aim = this.getAim();
+    const aim = Input.getAim();
 
-    this.rayCam.visible = (aim.type==="cam");
-    this.rayC1.visible  = (aim.type==="c1");
-    this.rayC2.visible  = (aim.type==="c2");
+    Input.rayCam.visible = (aim.type==="cam");
+    Input.rayC1.visible  = (aim.type==="c1");
+    Input.rayC2.visible  = (aim.type==="c2");
 
     if (aim.type==="cam"){
-      const p=new this.ctx.THREE.Vector3();
-      const q=new this.ctx.THREE.Quaternion();
+      const p=new Input.ctx.THREE.Vector3();
+      const q=new Input.ctx.THREE.Quaternion();
       aim.obj.getWorldPosition(p);
       aim.obj.getWorldQuaternion(q);
-      this.rayCam.position.copy(p);
-      this.rayCam.quaternion.copy(q);
+      Input.rayCam.position.copy(p);
+      Input.rayCam.quaternion.copy(q);
     }
 
-    const hit = this.raycast(aim.obj);
+    const hit = Input.raycast(aim.obj);
     if (hit){
-      this.reticle.visible=true;
-      this.reticle.position.copy(hit.point);
-      this.reticle.position.y+=0.02;
-    } else this.reticle.visible=false;
+      Input.reticle.visible=true;
+      Input.reticle.position.copy(hit.point);
+      Input.reticle.position.y+=0.02;
+    } else Input.reticle.visible=false;
 
-    if (this.teleportQueued){
-      this.teleportQueued=false;
+    if (Input.teleportQueued){
+      Input.teleportQueued=false;
       if (hit){
         rig.position.set(hit.point.x, hit.point.y+1.7, hit.point.z);
-        this.snapGround();
+        Input.snapGround();
       }
       return;
     }
 
-    if (this.holdingSelect){
-      const f = this.getForward();
+    if (Input.holdingSelect){
+      const f = Input.getForward();
       rig.position.x += f.x * 2.0 * dt;
       rig.position.z += f.z * 2.0 * dt;
-      this.snapGround();
+      Input.snapGround();
       return;
     }
 
     const gp = navigator.getGamepads?.().find(p=>p?.axes?.length>=2);
     if (!gp) return;
 
-    const mx = this.deadzone(gp.axes[0]||0);
-    const my = this.deadzone(-(gp.axes[1]||0));
-    const tx = this.deadzone(gp.axes[2]||0);
+    const mx = Input.deadzone(gp.axes[0]||0);
+    const my = Input.deadzone(-(gp.axes[1]||0));
+    const tx = Input.deadzone(gp.axes[2]||0);
 
-    const f = this.getForward();
-    const r = new this.ctx.THREE.Vector3(-f.z,0,f.x);
+    const f = Input.getForward();
+    const r = new Input.ctx.THREE.Vector3(-f.z,0,f.x);
 
-    rig.position.x += (r.x*mx + f.x*my)*this.moveSpeed*dt;
-    rig.position.z += (r.z*mx + f.z*my)*this.moveSpeed*dt;
-    rig.rotation.y -= tx * this.turnSpeed * dt;
+    rig.position.x += (r.x*mx + f.x*my)*Input.moveSpeed*dt;
+    rig.position.z += (r.z*mx + f.z*my)*Input.moveSpeed*dt;
+    rig.rotation.y -= tx * Input.turnSpeed * dt;
 
-    this.snapGround();
+    Input.snapGround();
   }
 };
