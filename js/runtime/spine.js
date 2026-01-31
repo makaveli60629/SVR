@@ -13,7 +13,6 @@ export const Spine = {
     };
     const setStatus = (t) => (hudStatus.textContent = t);
 
-    // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias:true });
     renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -21,7 +20,6 @@ export const Spine = {
     renderer.xr.setReferenceSpaceType("local-floor");
     document.body.appendChild(renderer.domElement);
 
-    // Scene + rig + camera
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
 
@@ -43,14 +41,11 @@ export const Spine = {
       log,
       spawnPos: new THREE.Vector3(0, 1.75, -42),
       spawnLook: new THREE.Vector3(0, 1.55, 0),
-      spawnYaw: 0, // ✅ forced yaw
     };
 
     const applySpawn = ()=>{
       rig.position.copy(ctx.spawnPos);
-      rig.rotation.set(0, ctx.spawnYaw, 0);
-      // lookAt after yaw so it’s consistent
-      rig.lookAt(ctx.spawnLook);
+      rig.lookAt(ctx.spawnLook); // ✅ no forced yaw
       log("✅ spawn applied");
     };
 
@@ -78,7 +73,7 @@ export const Spine = {
 
         await renderer.xr.setSession(session);
 
-        // ✅ spawn AFTER session starts
+        // ✅ always re-apply after session begins
         applySpawn();
 
         setStatus("VR ✅");
