@@ -7,11 +7,14 @@ export const Spine = {
     const hudLog = document.getElementById("log");
 
     const log = (m) => {
-      hudLog.textContent += String(m) + "\n";
-      hudLog.scrollTop = hudLog.scrollHeight;
+      try{
+        hudLog.textContent += String(m) + "\n";
+        hudLog.scrollTop = hudLog.scrollHeight;
+      }catch(e){}
       console.log(m);
     };
-    const setStatus = (t) => (hudStatus.textContent = t);
+
+    const setStatus = (t) => { try{ hudStatus.textContent = t; }catch(e){} };
 
     const renderer = new THREE.WebGLRenderer({ antialias:true });
     renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
@@ -24,6 +27,7 @@ export const Spine = {
     scene.background = new THREE.Color(0x000000);
 
     const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.05, 900);
+
     const rig = new THREE.Group();
     rig.add(camera);
     scene.add(rig);
@@ -39,14 +43,46 @@ export const Spine = {
       walkSurfaces: [],
       updates: [],
       log,
+
       spawnPos: new THREE.Vector3(0, 1.75, -42),
       spawnLook: new THREE.Vector3(0, 1.55, 0),
     };
 
     const applySpawn = ()=>{
       rig.position.copy(ctx.spawnPos);
-      rig.lookAt(ctx.spawnLook); // ✅ no forced yaw
+      rig.lookAt(ctx.spawnLook);
       log("✅ spawn applied");
+    };
+
+    // Buttons
+    const btnVR    = document.getElementById("btnVR");
+    const btnSpawn = document.getElementById("btnSpawn");
+    const btnReload= document.getElementById("btnReload");
+
+    if (btnReload) btnReload.onclick = ()=> location.reload(true);
+    if (btnSpawn)  btnSpawn.onclick  = ()=> applySpawn();
+
+    if (btnVR) btnVR.onclick = async ()=>{
+      log("▶ Enter VR pressed");
+      try{
+        if (!window.isSecureContext) throw new Error("WebXR requires HTTPS");
+        if (!navigator.xr) throw new Error("navigator.xr missing");
+        const ok = await navigator.xr.isSessionSupported("immersive-vr");
+        if (!ok) throw new Error("immersive-vr not supported");
+
+        const session = await navigator.xr.requestSession("immersive-vr", {
+          optionalFeatures: ["local-floor","bounded-floor","hand-tracking","layers","dom-overlay"],
+          domOverlay: { root: document.body }
+        });
+
+        await renderer.xr.setSession(session);
+        applySpawn();
+        setStatus("VR ✅");
+        log("✅ entered VR");
+      }catch(e){
+        log("❌ Enter VR failed: " + (e?.message || e));
+        setStatus("ready ✅ (VR failed)");
+      }
     };
 
     window.addEventListener("resize", ()=>{
@@ -55,48 +91,22 @@ export const Spine = {
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    document.getElementById("btnReload").onclick = ()=> location.reload(true);
-    document.getElementById("btnSpawn").onclick = ()=> applySpawn();
-
-    document.getElementById("btnVR").onclick = async ()=>{
-      log("▶ Enter VR pressed");
-      try{
-        if (!window.isSecureContext) throw new Error("WebXR requires HTTPS.");
-        if (!navigator.xr) throw new Error("navigator.xr missing.");
-        const ok = await navigator.xr.isSessionSupported("immersive-vr");
-        if (!ok) throw new Error("immersive-vr not supported.");
-
-        const session = await navigator.xr.requestSession("immersive-vr", {
-          optionalFeatures: ["local-floor","bounded-floor","hand-tracking","layers","dom-overlay"],
-          domOverlay: { root: document.body }
-        });
-
-        await renderer.xr.setSession(session);
-
-        // ✅ always re-apply after session begins
-        applySpawn();
-
-        setStatus("VR ✅");
-        log("✅ entered VR");
-      } catch(e){
-        log("❌ Enter VR failed: " + (e?.message || e));
-        setStatus("ready ✅ (VR failed)");
-      }
-    };
-
-    // Input
+    // ✅ Initialize Input
     Input.init(ctx);
-    ctx.updates.push((dt)=> Input.update(dt));
-    log("✅ input loaded");
 
-    // World
+    // ✅ CRITICAL FIX: bind update so `this` is always Input
+    ctx.updates.push((dt)=> Input.update(dt));
+
+    log("✅ input loaded (update bound)");
+
+    // Load world
     setStatus("loading world…");
     log("--- loading scarlett1/world.js ---");
     try{
       const mod = await import("../scarlett1/world.js");
       await mod.init(ctx);
       log("✅ world loaded");
-    } catch(e){
+    }catch(e){
       log("❌ world failed: " + (e?.message || e));
       if (e?.stack) log(e.stack);
     }
@@ -111,7 +121,11 @@ export const Spine = {
       last = now;
 
       for (const fn of ctx.updates){
-        try{ fn(dt); } catch(e){ log("❌ update error: " + (e?.message || e)); }
+        try{
+          fn(dt);
+        }catch(e){
+          log("❌ update error: " + (e?.message || e));
+        }
       }
 
       renderer.render(scene, camera);
