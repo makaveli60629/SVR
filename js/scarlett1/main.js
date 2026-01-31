@@ -26,54 +26,110 @@
     }
   }
 
-  // Simple thumbstick locomotion (XR only)
-  AFRAME.registerComponent("svr-thumbstick-move", {
-    schema: { speed: { default: 1.6 } },
-    init: function () {
-      this.axis = [0, 0];
-      const rig = this.el;
-      const right = document.getElementById("rightHand");
-      if (!right) return;
-
-      right.addEventListener("axismove", (e) => {
-        const a = e.detail.axis || [];
-        // Usually: a[2]=x, a[3]=y on Quest
-        this.axis[0] = a[2] || 0;
-        this.axis[1] = a[3] || 0;
-      });
-
-      hudLog("XR locomotion ready (thumbstick) ✅");
+  // --- XR Thumbstick Move + Turn (Quest-safe) ---
+  // Uses controller axismove events and moves the rig in world-space.
+  AFRAME.registerComponent("svr-xr-locomotion", {
+    schema: {
+      moveSpeed: { default: 2.0 },   // meters/sec
+      turnSpeed: { default: 1.8 },   // radians/sec
+      deadzone:  { default: 0.12 },
+      smoothTurn:{ default: true }   // smooth yaw; set false later for snap
     },
+
+    init: function () {
+      // axis data
+      this.leftAxis  = [0, 0];
+      this.rightAxis = [0, 0];
+
+      this._tmpDir   = new THREE.Vector3();
+      this._tmpRight = new THREE.Vector3();
+      this._up       = new THREE.Vector3(0, 1, 0);
+
+      const left  = document.getElementById("leftHand");
+      const right = document.getElementById("rightHand");
+
+      // On Quest:
+      // - left stick commonly used for move (x,y)
+      // - right stick commonly used for turn (x) (and sometimes move)
+      if (left) {
+        left.addEventListener("axismove", (e) => {
+          const a = e.detail.axis || [];
+          // many controllers: x=a[2], y=a[3]
+          this.leftAxis[0] = a[2] || 0;
+          this.leftAxis[1] = a[3] || 0;
+        });
+      }
+
+      if (right) {
+        right.addEventListener("axismove", (e) => {
+          const a = e.detail.axis || [];
+          this.rightAxis[0] = a[2] || 0;
+          this.rightAxis[1] = a[3] || 0;
+        });
+      }
+
+      hudLog("XR locomotion armed ✅ (left stick move, right stick turn)");
+    },
+
     tick: function (t, dt) {
-      // Only move while in VR
       const scene = this.el.sceneEl;
       if (!scene || !scene.is("vr-mode")) return;
 
       const ms = (dt || 16) / 1000;
-      const x = this.axis[0];
-      const y = this.axis[1];
-      if (Math.abs(x) < 0.08 && Math.abs(y) < 0.08) return;
+
+      // READ AXES
+      let mx = this.leftAxis[0];
+      let my = this.leftAxis[1];
+
+      // If left axis not reporting on a device, fall back to right axis for movement
+      if (Math.abs(mx) < 0.0001 && Math.abs(my) < 0.0001) {
+        mx = this.rightAxis[0];
+        my = this.rightAxis[1];
+      }
+
+      // TURN (right stick X)
+      const tx = this.rightAxis[0];
+
+      // DEADZONE
+      const dz = this.data.deadzone;
+      if (Math.abs(mx) < dz) mx = 0;
+      if (Math.abs(my) < dz) my = 0;
+
+      let turn = tx;
+      if (Math.abs(turn) < dz) turn = 0;
+
+      // --- APPLY TURN ---
+      if (turn !== 0) {
+        const yawDelta = (-turn) * this.data.turnSpeed * ms;
+        this.el.object3D.rotation.y += yawDelta;
+      }
+
+      // --- APPLY MOVE (relative to camera forward) ---
+      if (mx === 0 && my === 0) return;
 
       const cam = document.getElementById("camera");
       if (!cam) return;
 
-      const dir = new THREE.Vector3();
-      cam.object3D.getWorldDirection(dir);
-      dir.y = 0;
-      dir.normalize();
+      // camera forward (world)
+      cam.object3D.getWorldDirection(this._tmpDir);
+      this._tmpDir.y = 0;
+      this._tmpDir.normalize();
 
-      const rightVec = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 1, 0)).normalize();
+      // right vector
+      this._tmpRight.crossVectors(this._tmpDir, this._up).normalize();
 
-      const speed = this.data.speed;
-      const move = new THREE.Vector3();
-      move.addScaledVector(dir, -y * speed * ms);
-      move.addScaledVector(rightVec, x * speed * ms);
+      const speed = this.data.moveSpeed;
 
-      this.el.object3D.position.add(move);
+      // Note: forward is -my (Quest stick up is negative)
+      this.el.object3D.position.addScaledVector(this._tmpDir, (-my) * speed * ms);
+      this.el.object3D.position.addScaledVector(this._tmpRight, (mx) * speed * ms);
     }
   });
 
   function createInWorldButtonAttachToCamera(cameraEl, pit, lobby, btn) {
+    // prevent duplicates
+    if (document.getElementById("vrPitPanel")) return;
+
     const panel = document.createElement("a-entity");
     panel.setAttribute("id", "vrPitPanel");
     panel.setAttribute("position", "0 -0.15 -0.85");
@@ -96,7 +152,7 @@
     panel.addEventListener("click", () => togglePit(pit, lobby, btn, label));
 
     cameraEl.appendChild(panel);
-    hudLog("VR Pit panel attached to camera ✅ (always visible)");
+    hudLog("VR Pit panel ✅");
   }
 
   function boot() {
@@ -114,45 +170,26 @@
 
     hudSetTop("Scarlett1 A-Frame booting…");
     hudLog("A-Frame loaded ✅");
-    hudLog("Quest SAFE XR mode ✅ (no movement-controls on rig)");
+    hudLog("Quest SAFE XR mode ✅");
 
     scene.addEventListener("loaded", () => {
       hudSetTop("Scene loaded ✅");
-      hudLog("Android: top-right button works.");
-      hudLog("Quest: VR panel will appear when VR starts.");
+      hudLog("Android: HTML button works.");
+      hudLog("Quest: VR panel + locomotion activates on enter-vr.");
 
-      // Wire DOM button if present (Android)
-      if (btn) {
-        btn.addEventListener("click", () => togglePit(pit, lobby, btn, null));
-      }
+      if (btn) btn.addEventListener("click", () => togglePit(pit, lobby, btn, null));
 
-      // XR events
       scene.addEventListener("enter-vr", () => {
-        hudLog("enter-vr event ✅");
+        hudLog("enter-vr ✅");
 
-        // Add locomotion only AFTER XR starts (prevents loader hang)
-        rig.setAttribute("svr-thumbstick-move", "speed: 1.7");
+        // Attach locomotion AFTER VR starts (prevents loader hang)
+        rig.setAttribute("svr-xr-locomotion", "moveSpeed:2.1; turnSpeed:1.9; deadzone:0.12");
 
-        // Create VR panel (clickable) attached to camera
+        // VR pit panel always visible
         createInWorldButtonAttachToCamera(cameraEl, pit, lobby, btn);
-      });
 
-      // XR watchdog: if user presses Enter VR and it hangs, we’ll see no enter-vr event.
-      // We log a message so you know it’s XR handshake/caching, not your world.
-      let vrRequested = false;
-      const vrBtn = document.querySelector(".a-enter-vr-button");
-      if (vrBtn) {
-        vrBtn.addEventListener("click", () => {
-          vrRequested = true;
-          hudLog("VR requested… if it hangs, clear Quest cache once.");
-          setTimeout(() => {
-            if (vrRequested && !scene.is("vr-mode")) {
-              hudLog("VR HANG DETECTED: likely Quest cache / XR handshake.");
-              hudLog("Fix: Quest Browser → Clear Cache, then reload.");
-            }
-          }, 2500);
-        });
-      }
+        hudLog("Move: LEFT stick. Turn: RIGHT stick.");
+      });
     });
   }
 
