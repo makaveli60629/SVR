@@ -13,8 +13,7 @@
       position:fixed; left:10px; top:10px; width:360px; max-width:92vw;
       color:#9ff; font:14px/1.35 monospace;
       background:rgba(0,0,0,.35); padding:10px 12px; border-radius:10px;
-      z-index:9999;
-      pointer-events:none;
+      z-index:9999; pointer-events:none;
     }
     #enterVRBtn{
       position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
@@ -22,10 +21,8 @@
       background:rgba(10,12,18,.85);
       border:1px solid rgba(120,240,255,.55);
       color:#bff; font:700 15px/1.1 system-ui, sans-serif;
-      z-index:10000;
-      display:none;
+      z-index:10000; display:none;
     }
-    #enterVRBtn:active{ transform:translateX(-50%) scale(.98); }
   </style>
 </head>
 
@@ -34,9 +31,17 @@
   <button id="enterVRBtn">ENTER VR</button>
 
   <a-scene
-    renderer="colorManagement:true; physicallyCorrectLights:true; antialias:true"
+    renderer="
+      antialias:false;
+      precision:mediump;
+      colorManagement:true;
+      physicallyCorrectLights:false;
+      sortObjects:true;
+      powerPreference:high-performance;
+    "
     vr-mode-ui="enabled:true"
     background="color:#000"
+    device-orientation-permission-ui="enabled: false"
     scarlett-world
   >
     <a-entity id="rig" position="0 1.6 18" rotation="0 0 0">
