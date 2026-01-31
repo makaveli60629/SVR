@@ -1,50 +1,39 @@
-/**
- * SCARLETT1 — LOBBY READY (NO TABLES YET)
- * Features:
- * - Visible carpet ring floor + pit opening
- * - Tech-textured outer wall
- * - 4 Jumbotrons flush aligned
- * - Solid pit rails with an opening + entrance platform connected to stairs
- * - Embedded stairs (walk down and back up)
- * - Ninja guard at entrance + combat ninja patrol (one walking)
- * - Storefront facade + sign + 3 avatar displays left + 3 right
- * - Teleport pads: LOBBY / PIT / STORE
- */
 export async function init(ctx){
   const { THREE, scene, rig, teleportSurfaces, updates, log } = ctx;
 
   // -------------------------
-  // DIMENSIONS
+  // DIMENSIONS (pit raised / shallower)
   // -------------------------
   const lobbyR = 46;
   const wallH  = 11;
   const wallT  = 1.2;
 
   const pitR = 10.5;
-  const pitDepth = 7.6;
+
+  // ✅ Raised pit floor by making pit less deep
+  const pitDepth = 5.2;                 // WAS ~7.6
   const pitFloorY = -pitDepth + 0.05;
 
   const innerFloorR = pitR + 0.30;
 
-  // Stairs/entrance direction: +X (easy to find)
-  const entryAngle = 0; // radians
+  // Stairs entrance direction (toward +X)
+  const entryAngle = 0;
   const entryDir = new THREE.Vector3(Math.cos(entryAngle), 0, Math.sin(entryAngle));
 
-  // Store direction: +Z (front)
+  // Store direction (+Z)
   const storeAngle = Math.PI/2;
 
   // -------------------------
-  // TEXTURES (procedural, stable)
+  // TEXTURES (procedural)
   // -------------------------
   function makeCarpetTex(){
     const c = document.createElement("canvas");
     c.width = 512; c.height = 512;
     const g = c.getContext("2d");
-
     g.fillStyle = "#2a1650";
     g.fillRect(0,0,512,512);
 
-    for (let i=0;i<16000;i++){
+    for (let i=0;i<15000;i++){
       const x = (Math.random()*512)|0;
       const y = (Math.random()*512)|0;
       const v = 18 + (Math.random()*44)|0;
@@ -66,9 +55,9 @@ export async function init(ctx){
     g.globalAlpha = 0.18;
     g.strokeStyle = "#00c8ff";
     g.lineWidth = 2;
-    for (let i=0;i<7;i++){
+    for (let i=0;i<6;i++){
       g.beginPath();
-      g.arc(256,256, 88+i*28, 0, Math.PI*2);
+      g.arc(256,256, 100+i*30, 0, Math.PI*2);
       g.stroke();
     }
     g.globalAlpha = 1;
@@ -84,15 +73,13 @@ export async function init(ctx){
     const c = document.createElement("canvas");
     c.width = 512; c.height = 512;
     const g = c.getContext("2d");
-
     g.fillStyle = "#0b0f1f";
     g.fillRect(0,0,512,512);
 
-    // panels
     for (let y=0;y<512;y+=64){
       for (let x=0;x<512;x+=96){
         const col = 18 + ((Math.random()*12)|0);
-        g.fillStyle = `rgb(${col},${col+2},${col+10})`;
+        g.fillStyle = `rgb(${col},${col+2},${col+12})`;
         g.fillRect(x+4, y+4, 88, 56);
 
         g.strokeStyle = "rgba(0,200,255,0.12)";
@@ -101,11 +88,10 @@ export async function init(ctx){
       }
     }
 
-    // tech traces
     g.globalAlpha = 0.35;
     g.strokeStyle = "#8a2be2";
     g.lineWidth = 2;
-    for (let i=0;i<18;i++){
+    for (let i=0;i<16;i++){
       g.beginPath();
       g.moveTo(0, (Math.random()*512)|0);
       g.lineTo(512, (Math.random()*512)|0);
@@ -124,7 +110,6 @@ export async function init(ctx){
     const c = document.createElement("canvas");
     c.width = 512; c.height = 512;
     const g = c.getContext("2d");
-
     g.fillStyle = "#0a0a12";
     g.fillRect(0,0,512,512);
 
@@ -136,10 +121,6 @@ export async function init(ctx){
         const col = 14 + ((Math.random()*16)|0);
         g.fillStyle = `rgb(${col},${col},${col+10})`;
         g.fillRect(rx, y, bw-6, bh-6);
-
-        g.strokeStyle = "rgba(0,200,255,0.08)";
-        g.lineWidth = 2;
-        g.strokeRect(rx, y, bw-6, bh-6);
       }
     }
 
@@ -173,42 +154,58 @@ export async function init(ctx){
   });
 
   const pitFloorMat = new THREE.MeshStandardMaterial({ color: 0x0b0b12, roughness: 0.98, metalness: 0.02 });
-
-  const metalDark = new THREE.MeshStandardMaterial({ color: 0x101018, roughness: 0.65, metalness: 0.35 });
-  const metalRail = new THREE.MeshStandardMaterial({ color: 0x151526, roughness: 0.55, metalness: 0.55 });
+  const metalDark   = new THREE.MeshStandardMaterial({ color: 0x101018, roughness: 0.65, metalness: 0.35 });
+  const metalRail   = new THREE.MeshStandardMaterial({ color: 0x141426, roughness: 0.55, metalness: 0.60 });
 
   // -------------------------
-  // LIGHTING (more, but stable)
+  // LIGHTING (brighter + ceiling not black)
   // -------------------------
-  scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.70));
 
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x2a2a55, 1.35);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x303070, 1.45);
   hemi.position.set(0, 40, 0);
   scene.add(hemi);
 
-  const dir = new THREE.DirectionalLight(0xffffff, 1.05);
+  const dir = new THREE.DirectionalLight(0xffffff, 1.10);
   dir.position.set(12, 18, 10);
   scene.add(dir);
 
-  const top = new THREE.PointLight(0xffffff, 1.6, 280);
+  const top = new THREE.PointLight(0xffffff, 1.8, 320);
   top.position.set(0, 16.5, 0);
   scene.add(top);
 
-  // Ceiling rings (visual reference)
-  for (let k=0;k<2;k++){
-    const r = lobbyR - 12 - k*8;
-    const y = 10.4;
-    const tor = new THREE.Mesh(
-      new THREE.TorusGeometry(r, 0.09, 10, 120),
-      neonMat(0x00d5ff, 0x00b7ff, 2.1 - k*0.35)
+  // Futuristic ceiling disc + rings (visible, not black)
+  {
+    const ceilY = 12.0;
+    const disc = new THREE.Mesh(
+      new THREE.CircleGeometry(lobbyR - 2.0, 120),
+      new THREE.MeshStandardMaterial({
+        color: 0x0f1230,
+        emissive: 0x121a44,
+        emissiveIntensity: 0.7,
+        roughness: 0.6,
+        metalness: 0.15,
+        side: THREE.DoubleSide
+      })
     );
-    tor.rotation.x = Math.PI/2;
-    tor.position.y = y;
-    scene.add(tor);
+    disc.rotation.x = Math.PI/2;
+    disc.position.y = ceilY;
+    scene.add(disc);
+
+    for (let k=0;k<3;k++){
+      const r = lobbyR - 10 - k*8;
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(r, 0.10, 10, 120),
+        neonMat(0x00d5ff, 0x00b7ff, 2.0 - k*0.35)
+      );
+      ring.rotation.x = Math.PI/2;
+      ring.position.y = ceilY - 0.6;
+      scene.add(ring);
+    }
   }
 
   // -------------------------
-  // FLOOR (visible ring + pit opening)
+  // FLOOR (visible circle ring + teleport plane)
   // -------------------------
   {
     const floor = new THREE.Mesh(
@@ -219,9 +216,8 @@ export async function init(ctx){
     floor.position.y = 0;
     scene.add(floor);
 
-    // Inner trim to seal any tiny gap
     const trim = new THREE.Mesh(
-      new THREE.TorusGeometry(innerFloorR + 0.02, 0.09, 10, 120),
+      new THREE.TorusGeometry(innerFloorR + 0.02, 0.10, 10, 120),
       neonMat(0x8a2be2, 0x6f00ff, 1.85)
     );
     trim.rotation.x = Math.PI/2;
@@ -250,7 +246,6 @@ export async function init(ctx){
     wall.position.y = wallH/2;
     scene.add(wall);
 
-    // Single neon band (NOT a balcony ring)
     const band = new THREE.Mesh(
       new THREE.TorusGeometry(lobbyR-0.35, 0.10, 10, 140),
       neonMat(0x00d5ff, 0x00b7ff, 1.9)
@@ -261,7 +256,7 @@ export async function init(ctx){
   }
 
   // -------------------------
-  // PIT WALL + FLOOR + DEPTH TRIMS
+  // PIT (shallower) + trims
   // -------------------------
   let pitFloor = null;
   {
@@ -280,17 +275,19 @@ export async function init(ctx){
     lip.position.y = 1.05;
     scene.add(lip);
 
-    const midG = new THREE.TorusGeometry(pitR-0.12, 0.06, 10, 120);
-    for (let i=1;i<=2;i++){
-      const mid = new THREE.Mesh(midG, neonMat(0x2222ff, 0x00a6ff, 1.7));
-      mid.rotation.x = Math.PI/2;
-      mid.position.y = pitFloorY + (pitDepth * 0.33 * i);
-      scene.add(mid);
-    }
+    // Mid ring (bluish line)
+    const mid = new THREE.Mesh(
+      new THREE.TorusGeometry(pitR-0.12, 0.07, 10, 120),
+      neonMat(0x2222ff, 0x00a6ff, 1.9)
+    );
+    mid.rotation.x = Math.PI/2;
+    mid.position.y = pitFloorY + pitDepth*0.55;
+    scene.add(mid);
 
+    // Bottom ring now closer because floor is higher
     const bot = new THREE.Mesh(
       new THREE.TorusGeometry(pitR - 0.25, 0.12, 10, 120),
-      neonMat(0xff00aa, 0xff00aa, 2.2)
+      neonMat(0xff00aa, 0xff00aa, 2.0)
     );
     bot.rotation.x = Math.PI/2;
     bot.position.y = pitFloorY + 0.18;
@@ -302,194 +299,195 @@ export async function init(ctx){
     scene.add(pitFloor);
     teleportSurfaces.push(pitFloor);
 
-    // Pit lights so you can read depth
-    const p1 = new THREE.PointLight(0xff00aa, 0.8, 60);
-    p1.position.set(0, pitFloorY + 1.4, 0);
+    // Pit lights
+    const p1 = new THREE.PointLight(0x00c8ff, 0.75, 70);
+    p1.position.set(0, pitFloorY + 1.8, 0);
     scene.add(p1);
 
-    const p2 = new THREE.PointLight(0x00c8ff, 0.6, 60);
-    p2.position.set(3.0, pitFloorY + 2.2, -2.2);
+    const p2 = new THREE.PointLight(0xff00aa, 0.65, 70);
+    p2.position.set(2.8, pitFloorY + 2.2, -2.2);
     scene.add(p2);
   }
 
   // -------------------------
-  // SOLID PIT RAIL with OPENING aligned to stairs
+  // SOLID RAILS (horizontal tubes, aligned)
+  // - ring rail with a clean opening for the stairs entrance
   // -------------------------
-  function addPitRailWithOpening(){
+  function angleDist(a,b){
+    let d = (a-b)%(Math.PI*2);
+    if (d > Math.PI) d -= Math.PI*2;
+    if (d < -Math.PI) d += Math.PI*2;
+    return Math.abs(d);
+  }
+
+  function addRingRailWithOpening(){
     const railR = pitR + 1.55;
     const railY = 1.15;
-
-    const span = Math.PI * 2;
-    const opening = Math.PI / 8;                 // ~22.5 degrees opening
-    const start = entryAngle - opening/2;
-    const end   = entryAngle + opening/2;
-
-    // Solid posts around except opening
+    const opening = Math.PI/8; // ~22.5 degrees
     const postCount = 28;
-    const postG = new THREE.CylinderGeometry(0.08, 0.08, 1.1, 10);
+
+    // posts
+    const postG = new THREE.CylinderGeometry(0.08, 0.08, 1.05, 10);
     for (let i=0;i<postCount;i++){
-      const a = (i/postCount)*span;
-      // skip posts near opening
-      const da = angleDist(a, entryAngle);
-      if (da < opening*0.55) continue;
+      const a = (i/postCount)*Math.PI*2;
+      if (angleDist(a, entryAngle) < opening*0.6) continue;
 
       const x = Math.cos(a)*railR;
       const z = Math.sin(a)*railR;
 
       const post = new THREE.Mesh(postG, metalRail);
-      post.position.set(x, railY-0.45, z);
+      post.position.set(x, railY-0.47, z);
       scene.add(post);
-
-      const cap = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 10), neonMat(0x00ffff, 0x00c8ff, 1.2));
-      cap.position.set(x, railY+0.15, z);
-      scene.add(cap);
     }
 
-    // Top rail segments as two arcs (left + right of opening)
-    const arc1 = makeArcRail(railR, railY+0.05, start+opening/2, Math.PI*2 - opening);
-    scene.add(arc1);
+    // top rail built from short horizontal segments (no “sticks”)
+    const segs = 60;
+    const tubeLen = (Math.PI*2 / segs) * railR;
+    const tubeG = new THREE.CylinderGeometry(0.07, 0.07, tubeLen, 10);
 
-    // Neon guide at opening edges
-    const edge1 = new THREE.PointLight(0x00c8ff, 0.9, 25);
-    edge1.position.set(Math.cos(start)*railR, railY+0.2, Math.sin(start)*railR);
-    scene.add(edge1);
+    for (let i=0;i<segs;i++){
+      const a = (i/segs)*Math.PI*2;
+      if (angleDist(a, entryAngle) < opening*0.55) continue;
 
-    const edge2 = new THREE.PointLight(0x00c8ff, 0.9, 25);
-    edge2.position.set(Math.cos(end)*railR, railY+0.2, Math.sin(end)*railR);
-    scene.add(edge2);
+      const x = Math.cos(a)*railR;
+      const z = Math.sin(a)*railR;
 
-    function makeArcRail(r, y, aStart, aLen){
-      // approximate arc with short cylinders (stable + solid)
-      const group = new THREE.Group();
-      const segs = 36;
-      const tubeLen = (aLen / segs) * r;
-
-      for (let i=0;i<segs;i++){
-        const t = (i+0.5)/segs;
-        const a = aStart + aLen*t;
-        // skip if inside opening
-        const da = angleDist(a, entryAngle);
-        if (da < opening*0.52) continue;
-
-        const x = Math.cos(a)*r;
-        const z = Math.sin(a)*r;
-
-        const cyl = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.07, 0.07, tubeLen, 10),
-          neonMat(0x00d5ff, 0x00b7ff, 1.6)
-        );
-        cyl.position.set(x, y, z);
-        cyl.rotation.z = Math.PI/2;
-        cyl.rotation.y = a;
-        group.add(cyl);
-      }
-      return group;
+      const tube = new THREE.Mesh(tubeG, neonMat(0x00d5ff, 0x00b7ff, 1.55));
+      tube.position.set(x, railY+0.05, z);
+      tube.rotation.z = Math.PI/2; // horizontal
+      tube.rotation.y = a;
+      scene.add(tube);
     }
 
-    function angleDist(a,b){
-      let d = (a-b)%(Math.PI*2);
-      if (d > Math.PI) d -= Math.PI*2;
-      if (d < -Math.PI) d += Math.PI*2;
-      return Math.abs(d);
-    }
+    // opening edge lights
+    const e1 = new THREE.PointLight(0x00c8ff, 0.9, 25);
+    e1.position.set(Math.cos(entryAngle-opening/2)*railR, railY+0.3, Math.sin(entryAngle-opening/2)*railR);
+    scene.add(e1);
+
+    const e2 = new THREE.PointLight(0x00c8ff, 0.9, 25);
+    e2.position.set(Math.cos(entryAngle+opening/2)*railR, railY+0.3, Math.sin(entryAngle+opening/2)*railR);
+    scene.add(e2);
   }
-  addPitRailWithOpening();
+  addRingRailWithOpening();
 
   // -------------------------
-  // EMBEDDED STAIRS (walk down + back up) + entrance platform
+  // CURVED / WALL-SIDE STAIRS (spiral hugging PIT WALL)
+  // - wall (pit wall) on one side
+  // - handrail on the inner side guiding you down
   // -------------------------
-  function addStairsAndEntrance(){
-    // “Quick” stairs: fewer steps, deeper tread
-    const steps = 10;
-    const stepW = 2.8;
-    const stepD = 0.78;
-    const startY = 0.85;
-    const endY = pitFloorY + 1.05;
-    const stepH = (startY - endY) / steps;
+  function addSpiralPitStairs(){
+    // Start at pit lip near opening (top), spiral down to near pit floor.
+    const steps = 18;                 // feels like real stairs, not ladder
+    const stepW = 1.65;
+    const stepD = 0.75;
 
-    // Start just outside opening, push inward
-    const startR = innerFloorR + 0.90;
-    const endR   = pitR - 0.20;
+    const startY = 0.95;
+    const endY   = pitFloorY + 1.10;
+    const stepH  = (startY - endY) / steps;
+
+    // Hug pit wall: radius near pit wall (inside pit)
+    const rWall = pitR - 0.65;
+
+    // Spiral turns: about ~90 degrees
+    const aStart = entryAngle + 0.45;           // offset so you enter naturally through opening
+    const aSpan  = Math.PI * 0.58;              // ~104 degrees
 
     const stepMat = new THREE.MeshStandardMaterial({
       color: 0x111122, roughness: 0.82, metalness: 0.22,
       emissive: 0x12003a, emissiveIntensity: 0.22
     });
 
-    // Entrance platform at top (connected to lobby floor)
+    // Build steps
+    for (let i=0;i<steps;i++){
+      const t = i/(steps-1);
+      const a = aStart + aSpan*t;
+
+      const x = Math.cos(a)*rWall;
+      const z = Math.sin(a)*rWall;
+      const y = startY - (i+1)*stepH;
+
+      const s = new THREE.Mesh(
+        new THREE.BoxGeometry(stepW, Math.max(0.14, stepH*0.92), stepD),
+        stepMat
+      );
+      s.position.set(x, y, z);
+      // face along the tangent direction of the spiral
+      s.rotation.y = a + Math.PI/2;
+      scene.add(s);
+      teleportSurfaces.push(s);
+    }
+
+    // Bottom landing
+    const aEnd = aStart + aSpan;
+    const landX = Math.cos(aEnd)*(rWall - 0.55);
+    const landZ = Math.sin(aEnd)*(rWall - 0.55);
+
+    const landing = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.18, 2.6), stepMat);
+    landing.position.set(landX, endY - 0.15, landZ);
+    landing.rotation.y = aEnd + Math.PI/2;
+    scene.add(landing);
+    teleportSurfaces.push(landing);
+
+    // Inner handrail (solid + horizontal)
+    const railR = rWall - 0.95;       // inner side (toward center)
+    const railY = 1.35;
+
+    const segs = 28;
+    const tubeLen = (aSpan / segs) * railR;
+    const tubeG = new THREE.CylinderGeometry(0.06, 0.06, tubeLen, 10);
+
+    for (let i=0;i<segs;i++){
+      const tt = (i+0.5)/segs;
+      const a = aStart + aSpan*tt;
+
+      const x = Math.cos(a)*railR;
+      const z = Math.sin(a)*railR;
+
+      const tube = new THREE.Mesh(tubeG, neonMat(0x00ffff, 0x00c8ff, 1.2));
+      tube.position.set(x, railY + (startY-endY)*tt*0.65, z);
+      tube.rotation.z = Math.PI/2;        // horizontal
+      tube.rotation.y = a;
+      scene.add(tube);
+
+      // occasional post
+      if (i % 4 === 0){
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05, 0.9, 10), metalRail);
+        post.position.set(x, tube.position.y - 0.45, z);
+        scene.add(post);
+      }
+    }
+
+    // Entrance platform outside pit aligned with opening
     const platR = innerFloorR + 1.25;
     const platX = entryDir.x * platR;
     const platZ = entryDir.z * platR;
 
-    const platform = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.22, 3.2), metalDark);
-    platform.position.set(platX, 0.22/2, platZ);
+    const platform = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.22, 3.3), metalDark);
+    platform.position.set(platX, 0.11, platZ);
     platform.rotation.y = entryAngle;
     scene.add(platform);
     teleportSurfaces.push(platform);
 
-    // Add a small “gate frame” so it reads like an entrance
-    const frameM = neonMat(0x8a2be2, 0x6f00ff, 1.3);
-    const pillarG = new THREE.BoxGeometry(0.22, 2.6, 0.22);
+    // small gate frame
+    const frameM = neonMat(0x8a2be2, 0x6f00ff, 1.1);
+    const pillarG = new THREE.BoxGeometry(0.22, 2.7, 0.22);
+
     const leftP  = new THREE.Mesh(pillarG, frameM);
     const rightP = new THREE.Mesh(pillarG, frameM);
-    leftP.position.set(platX + 1.6, 1.3, platZ);
-    rightP.position.set(platX - 1.6, 1.3, platZ);
+    leftP.position.set(platX + 1.7, 1.35, platZ);
+    rightP.position.set(platX - 1.7, 1.35, platZ);
     scene.add(leftP, rightP);
 
-    const topBar = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.18, 0.22), frameM);
-    topBar.position.set(platX, 2.5, platZ);
+    const topBar = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.18, 0.22), frameM);
+    topBar.position.set(platX, 2.55, platZ);
     scene.add(topBar);
-
-    // Steps
-    for (let i=0;i<steps;i++){
-      const t = (i+0.5)/steps;
-      const r = startR + (endR - startR)*t;
-
-      const x = entryDir.x * r;
-      const z = entryDir.z * r;
-      const y = startY - (i+1)*stepH;
-
-      const s = new THREE.Mesh(
-        new THREE.BoxGeometry(stepW, Math.max(0.12, stepH*0.92), stepD),
-        stepMat
-      );
-      s.position.set(x, y, z);
-      s.rotation.y = entryAngle;
-      scene.add(s);
-      teleportSurfaces.push(s);
-
-      // guide lights (3 only)
-      if (i === 2 || i === 5 || i === 8){
-        const p = new THREE.PointLight(0x00c8ff, 0.35, 22);
-        p.position.set(x + 0.7, y + 0.7, z);
-        scene.add(p);
-      }
-    }
-
-    // Bottom landing
-    const landR = endR - 0.9;
-    const landX = entryDir.x * landR;
-    const landZ = entryDir.z * landR;
-
-    const landing = new THREE.Mesh(new THREE.BoxGeometry(stepW+1.0, 0.18, 2.6), stepMat);
-    landing.position.set(landX, endY - 0.15, landZ);
-    landing.rotation.y = entryAngle;
-    scene.add(landing);
-    teleportSurfaces.push(landing);
-
-    // Small landing rail (solid)
-    const lr = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06, stepW+0.8, 10), neonMat(0x00ffff, 0x00c8ff, 1.3));
-    lr.position.set(landX, endY + 0.9, landZ + 0.95);
-    lr.rotation.z = Math.PI/2;
-    lr.rotation.y = entryAngle;
-    scene.add(lr);
 
     return { platform };
   }
-  const { platform: entryPlatform } = addStairsAndEntrance();
+  const { platform: entryPlatform } = addSpiralPitStairs();
 
   // -------------------------
-  // JUMBOTRONS (4) — flush to wall
+  // JUMBOTRONS (flush aligned)
   // -------------------------
   function placeOnWall(obj, angle, wallRadius, y, depth=0.7, inset=0.05){
     const nx = Math.cos(angle), nz = Math.sin(angle);
@@ -507,7 +505,7 @@ export async function init(ctx){
 
     const screen = new THREE.Mesh(
       new THREE.PlaneGeometry(w*0.88, h*0.82),
-      new THREE.MeshStandardMaterial({ color: 0x111133, emissive: 0x2222ff, emissiveIntensity: 0.9 })
+      new THREE.MeshStandardMaterial({ color: 0x111133, emissive: 0x2222ff, emissiveIntensity: 0.95 })
     );
     screen.position.z = d/2 + 0.001;
     body.add(screen);
@@ -529,24 +527,18 @@ export async function init(ctx){
       const j = makeJumbotron();
       placeOnWall(j, a, lobbyR - (wallT*0.5), 7.3, j.userData.depth, 0.05);
       scene.add(j);
-
-      // Door marker under each jumbotron (still just visual)
-      const door = new THREE.Mesh(
-        new THREE.BoxGeometry(4.4, 6.6, 0.24),
-        new THREE.MeshStandardMaterial({ color: 0x0d0d14, emissive: 0x3a00ff, emissiveIntensity: 0.35 })
-      );
-      placeOnWall(door, a, lobbyR - (wallT*0.5), 3.1, 0.24, 0.03);
-      scene.add(door);
     });
   }
 
   // -------------------------
-  // PILLARS (futuristic) + uplights
+  // PILLARS taller + top caps + lights
   // -------------------------
   {
     const count = 10;
-    const coreG = new THREE.CylinderGeometry(0.55, 0.7, 9.2, 14);
-    const bandG = new THREE.CylinderGeometry(0.68, 0.68, 0.28, 14);
+    const coreG = new THREE.CylinderGeometry(0.55, 0.7, 10.8, 14); // taller
+    const bandG = new THREE.CylinderGeometry(0.68, 0.68, 0.30, 14);
+    const capG  = new THREE.CylinderGeometry(0.9, 0.9, 0.35, 16);
+
     const coreM = new THREE.MeshStandardMaterial({ color: 0x0e0e16, roughness: 0.6, metalness: 0.4 });
 
     for (let i=0;i<count;i++){
@@ -556,34 +548,59 @@ export async function init(ctx){
       const z = Math.sin(a)*r;
 
       const p = new THREE.Mesh(coreG, coreM);
-      p.position.set(x, 4.6, z);
+      p.position.set(x, 5.4, z);
       scene.add(p);
 
       const b1 = new THREE.Mesh(bandG, neonMat(0x8a2be2, 0x6f00ff, 2.0));
-      b1.position.set(x, 2.2, z);
+      b1.position.set(x, 2.4, z);
       scene.add(b1);
 
       const b2 = b1.clone();
-      b2.position.y = 6.9;
+      b2.position.y = 7.8;
       scene.add(b2);
 
-      const upl = new THREE.PointLight(0x6f00ff, 0.35, 30);
+      const cap = new THREE.Mesh(capG, neonMat(0x00d5ff, 0x00b7ff, 1.2));
+      cap.position.set(x, 10.9, z);
+      scene.add(cap);
+
+      const upl = new THREE.PointLight(0x6f00ff, 0.35, 34);
       upl.position.set(x, 1.0, z);
       scene.add(upl);
     }
   }
 
   // -------------------------
-  // STOREFRONT (outside only) at +Z
-  // - looks like a real store front
-  // - 3 avatar displays left + 3 right on the wall
-  // - teleport pad
+  // STORE FRONT + SIGN + display lights + “planters/trees”
   // -------------------------
+  function makeTextSignTexture(text){
+    const c = document.createElement("canvas");
+    c.width = 512; c.height = 256;
+    const g = c.getContext("2d");
+    g.fillStyle = "#061019";
+    g.fillRect(0,0,c.width,c.height);
+
+    g.fillStyle = "rgba(0,255,204,0.15)";
+    g.fillRect(0,0,c.width,c.height);
+
+    g.font = "bold 96px sans-serif";
+    g.fillStyle = "#00ffcc";
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    g.fillText(text, 256, 120);
+
+    g.strokeStyle = "rgba(0,200,255,0.7)";
+    g.lineWidth = 6;
+    g.strokeRect(16, 16, c.width-32, c.height-32);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.anisotropy = 6;
+    return tex;
+  }
+
   function addStorefront(){
     const storeZ = lobbyR - 0.9;
     const storeY = 3.0;
 
-    // facade base
     const facade = new THREE.Group();
 
     const frame = new THREE.Mesh(
@@ -593,9 +610,8 @@ export async function init(ctx){
     frame.position.set(0, storeY, storeZ - 0.20);
     facade.add(frame);
 
-    // window panels
     const glassM = new THREE.MeshStandardMaterial({
-      color: 0x0a1020, roughness: 0.15, metalness: 0.9,
+      color: 0x0a1020, roughness: 0.12, metalness: 0.95,
       emissive: 0x001133, emissiveIntensity: 0.35, transparent:true, opacity:0.75
     });
 
@@ -607,128 +623,170 @@ export async function init(ctx){
     winR.position.x = 5.5;
     facade.add(winR);
 
-    // doorway
     const door = new THREE.Mesh(
       new THREE.BoxGeometry(3.8, 5.6, 0.18),
-      new THREE.MeshStandardMaterial({ color: 0x05050a, emissive: 0x00ffcc, emissiveIntensity: 0.25 })
+      new THREE.MeshStandardMaterial({ color: 0x05050a, emissive: 0x00ffcc, emissiveIntensity: 0.22 })
     );
     door.position.set(0, storeY-0.1, storeZ+0.12);
     facade.add(door);
 
-    // sign
+    // ✅ Real sign (textured)
+    const signTex = makeTextSignTexture("STORE");
     const sign = new THREE.Mesh(
-      new THREE.BoxGeometry(10.5, 1.3, 0.28),
-      neonMat(0x00ffcc, 0x00ffcc, 1.2)
+      new THREE.BoxGeometry(10.8, 1.8, 0.25),
+      new THREE.MeshStandardMaterial({
+        map: signTex,
+        emissive: 0x00ffcc,
+        emissiveIntensity: 0.65,
+        roughness: 0.4,
+        metalness: 0.2
+      })
     );
-    sign.position.set(0, storeY+3.6, storeZ+0.05);
+    sign.position.set(0, storeY+3.7, storeZ+0.05);
     facade.add(sign);
 
-    // teleport pad “STORE”
+    // Teleport pad (outside store)
     const pad = new THREE.Mesh(
       new THREE.CylinderGeometry(2.2, 2.2, 0.22, 40),
-      neonMat(0x00ffcc, 0x00ffcc, 1.3)
+      neonMat(0x00ffcc, 0x00ffcc, 1.2)
     );
     pad.position.set(0, 0.12, lobbyR - 8.8);
     scene.add(pad);
     teleportSurfaces.push(pad);
 
+    // display case lights
+    const dl1 = new THREE.PointLight(0x00ffcc, 0.55, 30);
+    dl1.position.set(-6.0, 6.7, lobbyR - 2.2);
+    scene.add(dl1);
+
+    const dl2 = new THREE.PointLight(0x00ffcc, 0.55, 30);
+    dl2.position.set(6.0, 6.7, lobbyR - 2.2);
+    scene.add(dl2);
+
+    // “Trees/planters”
+    function planter(x,z){
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.9, 0.45, 18), metalDark);
+      base.position.set(x, 0.22, z);
+      scene.add(base);
+
+      const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.10,0.14, 1.3, 12), neonMat(0x00d5ff,0x00b7ff,0.7));
+      stalk.position.set(x, 1.1, z);
+      scene.add(stalk);
+
+      const crown = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), neonMat(0x00ffcc,0x00ffcc,0.6));
+      crown.position.set(x, 1.9, z);
+      scene.add(crown);
+    }
+    planter(-9.0, lobbyR - 7.5);
+    planter( 9.0, lobbyR - 7.5);
+
     scene.add(facade);
+    return pad;
+  }
+  addStorefront();
 
-    // Avatar displays: 3 left + 3 right (placeholder mannequins)
-    function makeMannequin(color){
-      const g = new THREE.Group();
-      const body = new THREE.Mesh(
-        new THREE.CapsuleGeometry(0.28, 0.75, 6, 12),
-        new THREE.MeshStandardMaterial({ color: 0x0b0b12, roughness: 0.6, metalness: 0.3, emissive: color, emissiveIntensity: 0.25 })
-      );
-      body.position.y = 1.0;
-      g.add(body);
+  // -------------------------
+  // AVATAR DISPLAYS: load your real avatars if filenames match
+  // - looks in /assets/avatars/
+  // - if not found, it uses mannequins instead (no crash)
+  // -------------------------
+  async function tryLoadGLB(url){
+    const { GLTFLoader } = await import("https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js");
+    return await new Promise((resolve, reject)=>{
+      const loader = new GLTFLoader();
+      loader.load(url, gltf=>resolve(gltf.scene), undefined, err=>reject(err));
+    });
+  }
 
-      const head = new THREE.Mesh(
-        new THREE.SphereGeometry(0.22, 14, 12),
-        new THREE.MeshStandardMaterial({ color: 0x05050a, emissive: color, emissiveIntensity: 0.35 })
-      );
-      head.position.y = 1.7;
-      g.add(head);
+  function makeMannequin(color){
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.28, 0.75, 6, 12),
+      new THREE.MeshStandardMaterial({ color: 0x0b0b12, roughness: 0.6, metalness: 0.3, emissive: color, emissiveIntensity: 0.25 })
+    );
+    body.position.y = 1.0;
+    g.add(body);
 
-      const base = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.55, 0.55, 0.18, 18),
-        neonMat(0x00d5ff, 0x00b7ff, 1.2)
-      );
-      base.position.y = 0.09;
-      g.add(base);
+    const head = new THREE.Mesh(
+      new THREE.SphereGeometry(0.22, 14, 12),
+      new THREE.MeshStandardMaterial({ color: 0x05050a, emissive: color, emissiveIntensity: 0.35 })
+    );
+    head.position.y = 1.7;
+    g.add(head);
 
-      return g;
+    const base = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.55, 0.55, 0.18, 18),
+      neonMat(0x00d5ff, 0x00b7ff, 1.2)
+    );
+    base.position.y = 0.09;
+    g.add(base);
+
+    return g;
+  }
+
+  // 👇 Put your actual filenames here (in assets/avatars/)
+  // Example: "ninja.glb", "combat_ninja.glb", "female.glb", etc.
+  const avatarFiles = [
+    "avatar1.glb",
+    "avatar2.glb",
+    "avatar3.glb",
+    "avatar4.glb",
+    "avatar5.glb",
+    "avatar6.glb",
+  ];
+
+  async function placeAvatarDisplay(x, z, idx, color){
+    const spot = new THREE.PointLight(color, 0.55, 18);
+    spot.position.set(x, 2.8, z+0.6);
+    scene.add(spot);
+
+    let model = null;
+    const url = `assets/avatars/${avatarFiles[idx]}`;
+    try {
+      model = await tryLoadGLB(url);
+      model.scale.set(1.2, 1.2, 1.2);
+    } catch (e) {
+      model = makeMannequin(color);
     }
 
-    const leftX = -11.5;
-    const rightX = 11.5;
+    model.position.set(x, 0, z);
+    model.rotation.y = Math.PI; // face inward
+    scene.add(model);
 
+    // small “display case” behind
+    const caseMesh = new THREE.Mesh(new THREE.BoxGeometry(2.4, 2.8, 0.22), metalDark);
+    caseMesh.position.set(x, 1.4, z+0.55);
+    scene.add(caseMesh);
+
+    const edge = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.10, 0.06), neonMat(color, color, 1.1));
+    edge.position.set(x, 0.25, z+0.45);
+    scene.add(edge);
+  }
+
+  // 3 left + 3 right near storefront corridor
+  {
+    const leftX  = -11.5;
+    const rightX =  11.5;
     const z1 = lobbyR - 3.0;
     const z2 = lobbyR - 6.2;
     const z3 = lobbyR - 9.4;
 
-    const left = [
-      {x:leftX,z:z1,c:0x8a2be2},
-      {x:leftX,z:z2,c:0x00a6ff},
-      {x:leftX,z:z3,c:0xff00aa}
-    ];
-    const right = [
-      {x:rightX,z:z1,c:0xff00aa},
-      {x:rightX,z:z2,c:0x00a6ff},
-      {x:rightX,z:z3,c:0x8a2be2}
-    ];
+    const colors = [0x8a2be2, 0x00a6ff, 0xff00aa, 0xff00aa, 0x00a6ff, 0x8a2be2];
 
-    [...left, ...right].forEach(d=>{
-      const m = makeMannequin(d.c);
-      m.position.set(d.x, 0, d.z);
-      m.rotation.y = Math.PI; // face inward
-      scene.add(m);
+    await placeAvatarDisplay(leftX,  z1, 0, colors[0]);
+    await placeAvatarDisplay(leftX,  z2, 1, colors[1]);
+    await placeAvatarDisplay(leftX,  z3, 2, colors[2]);
 
-      // small spotlight
-      const spot = new THREE.PointLight(d.c, 0.45, 18);
-      spot.position.set(d.x, 2.6, d.z+0.6);
-      scene.add(spot);
-    });
-
-    // label lights around store area
-    const storeGlow = new THREE.PointLight(0x00ffcc, 0.55, 55);
-    storeGlow.position.set(0, 7.5, lobbyR - 2.0);
-    scene.add(storeGlow);
-
-    return pad;
-  }
-  const storePad = addStorefront();
-
-  // -------------------------
-  // TELEPORT PADS: LOBBY + PIT + STORE
-  // -------------------------
-  function makePad(labelColor, x, z){
-    const pad = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.5, 1.5, 0.20, 36),
-      neonMat(labelColor, labelColor, 1.2)
-    );
-    pad.position.set(x, 0.12, z);
-    scene.add(pad);
-    teleportSurfaces.push(pad);
-
-    const beam = new THREE.PointLight(labelColor, 0.55, 40);
-    beam.position.set(x, 3.0, z);
-    scene.add(beam);
-
-    return pad;
+    await placeAvatarDisplay(rightX, z1, 3, colors[3]);
+    await placeAvatarDisplay(rightX, z2, 4, colors[4]);
+    await placeAvatarDisplay(rightX, z3, 5, colors[5]);
   }
 
-  const lobbyPad = makePad(0x00a6ff,  0, 18);
-  const pitPad   = makePad(0xff00aa,  0, 6);
-
   // -------------------------
-  // NINJA + COMBAT NINJA (one standing guard, one walking)
-  // (Placeholders now; you can swap to your real avatars later.)
+  // NINJA GUARD + COMBAT NINJA PATROL (placeholders until you map your real files)
   // -------------------------
   function makeNinja(color){
     const g = new THREE.Group();
-
     const torso = new THREE.Mesh(
       new THREE.CapsuleGeometry(0.30, 0.80, 6, 12),
       new THREE.MeshStandardMaterial({ color: 0x05050a, roughness: 0.55, metalness: 0.25, emissive: color, emissiveIntensity: 0.18 })
@@ -750,17 +808,16 @@ export async function init(ctx){
     return g;
   }
 
-  // Guard ninja at entrance platform
+  // Guard at entrance platform
   const guard = makeNinja(0x8a2be2);
   guard.position.copy(entryPlatform.position);
   guard.position.y = 0;
-  // offset to the side of entrance
   guard.position.x += 1.25;
   guard.position.z += 0.65;
   guard.rotation.y = entryAngle + Math.PI/2;
   scene.add(guard);
 
-  // Combat ninja patrol (walks around pit rim)
+  // Patrol around pit rim (now has “body”)
   const patrol = makeNinja(0xff00aa);
   patrol.position.set(pitR + 6.2, 0, 0);
   scene.add(patrol);
@@ -776,16 +833,36 @@ export async function init(ctx){
   });
 
   // -------------------------
-  // Simple teleport behavior (pads are surfaces; your Input does raycast)
-  // If you want SNAP teleport to named areas later, we can add it.
+  // TELEPORT PADS (NO PINK PAD IN PIT anymore)
+  // - lobby pad (outside)
+  // - pit pad (outside pit near entrance)
   // -------------------------
+  function makePad(color, x, z){
+    const pad = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.55, 1.55, 0.20, 36),
+      neonMat(color, color, 1.2)
+    );
+    pad.position.set(x, 0.12, z);
+    scene.add(pad);
+    teleportSurfaces.push(pad);
+
+    const beam = new THREE.PointLight(color, 0.5, 40);
+    beam.position.set(x, 3.0, z);
+    scene.add(beam);
+
+    return pad;
+  }
+
+  makePad(0x00a6ff, 0, 18); // lobby
+  // pit pad now near entrance OUTSIDE pit, not inside
+  makePad(0xff00aa, entryDir.x*(innerFloorR+2.2), entryDir.z*(innerFloorR+2.2));
 
   // -------------------------
-  // FINAL: spawn & orientation
+  // SPAWN facing pit
   // -------------------------
   rig.position.set(0, 1.8, 26);
   rig.rotation.set(0,0,0);
   rig.lookAt(0, 1.6, 0);
 
-  log("✅ Lobby ready: stairs+entrance, rails, store, bots, textures, jumbotrons.");
-      }
+  log("✅ Spiral stairs hugging pit wall + fixed rails + raised pit + brighter ceiling + store + avatar displays");
+        }
