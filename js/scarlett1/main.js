@@ -15,15 +15,9 @@ function wireForcedVRButton(scene) {
   if (!btn) return;
 
   const update = () => {
-    // Show button on Quest / XR-capable browsers; also show if A-Frame says VR is possible.
     const xr = !!navigator.xr;
     const likelyQuest = /OculusBrowser|Quest|Meta/i.test(navigator.userAgent);
-    const canVR = (scene && scene.is && scene.is("vr-mode")) || likelyQuest || xr;
-
-    btn.style.display = canVR ? "block" : "none";
-    if (!canVR) {
-      hudLog("No VR runtime detected on this browser (phone is normal).");
-    }
+    btn.style.display = (likelyQuest || xr) ? "block" : "none";
   };
 
   btn.onclick = async () => {
@@ -52,16 +46,12 @@ AFRAME.registerComponent("scarlett-world", {
     hudLog("A-FRAME loaded ✅");
     hudLog("Scarlett1 booting…");
 
-    // Spawn system = single source of truth
-    scene.setAttribute("scarlett-spawn-system", "defaultPad: pad_lobby_safe; lockSeconds: 3.2");
-
-    // Fix right-eye-only artifacts (reticles/panels/laser visuals)
+    // Always-on systems
+    scene.setAttribute("scarlett-spawn-system", "defaultPad: pad_lobby_safe; lockSeconds: 3.0");
     scene.setAttribute("scarlett-vr-eye-fix", "");
-
-    // Teleport (no visible laser/reticle)
     scene.setAttribute("scarlett-teleport", "");
 
-    // Rooms (start with lobby)
+    // FULL LOBBY
     const lobby = document.createElement("a-entity");
     lobby.setAttribute("id", "room_lobby");
     lobby.setAttribute("position", "0 0 0");
@@ -70,7 +60,6 @@ AFRAME.registerComponent("scarlett-world", {
 
     hudLog("Lobby created ✅");
 
-    // Force VR button (works even if A-Frame button disappears)
     wireForcedVRButton(scene);
   }
 });
