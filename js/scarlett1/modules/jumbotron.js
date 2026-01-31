@@ -1,25 +1,22 @@
-export function buildJumbotron(THREE) {
-  const g = new THREE.Group();
+AFRAME.registerComponent("scarlett-jumbotron", {
+  init: function () {
+    const el = this.el;
 
-  const frame = new THREE.Mesh(
-    new THREE.BoxGeometry(6.4, 3.7, 0.25),
-    new THREE.MeshStandardMaterial({ color: 0x0b0f14, roughness: 0.30, metalness: 0.60 })
-  );
-  g.add(frame);
+    const frame = document.createElement("a-box");
+    frame.setAttribute("width", "6.4");
+    frame.setAttribute("height", "3.7");
+    frame.setAttribute("depth", "0.25");
+    frame.setAttribute("material", "color:#0b0f14; metalness:0.6; roughness:0.3");
+    el.appendChild(frame);
 
-  const screen = new THREE.Mesh(
-    new THREE.PlaneGeometry(5.7, 3.1),
-    new THREE.MeshBasicMaterial({ color: 0x12273a })
-  );
-  screen.position.z = 0.13;
-  g.add(screen);
+    const screen = document.createElement("a-plane");
+    screen.setAttribute("width", "5.7");
+    screen.setAttribute("height", "3.1");
+    screen.setAttribute("position", "0 0 0.13");
+    screen.setAttribute("material", "color:#12273a; emissive:#2bd6ff; emissiveIntensity:0.25");
+    el.appendChild(screen);
 
-  const glow = new THREE.Mesh(
-    new THREE.BoxGeometry(6.6, 3.9, 0.10),
-    new THREE.MeshBasicMaterial({ color: 0x2bd6ff, transparent: true, opacity: 0.12 })
-  );
-  glow.position.z = 0.18;
-  g.add(glow);
-
-  return g;
-}
+    // You can swap this later for a <video> texture once you're stable
+    hudLog("Jumbotron built ✅");
+  }
+});
