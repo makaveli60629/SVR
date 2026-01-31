@@ -1,73 +1,38 @@
-export function initLocomotion({ playerGroup, camera, Bus }) {
-  const keys = new Set();
+export function createLocomotion(THREE, renderer, rig, camera) {
+  const keys = { w:false, a:false, s:false, d:false };
   let yaw = 0;
-  const stick = { mx:0, my:0, tx:0, ty:0 };
-  const pads = {
-    move: { pad: document.getElementById('movePad'), knob: document.getElementById('moveKnob'), active:false, id:null, cx:0, cy:0 },
-    turn: { pad: document.getElementById('turnPad'), knob: document.getElementById('turnKnob'), active:false, id:null, cx:0, cy:0 },
+
+  window.addEventListener("keydown", (e) => {
+    const k = e.key.toLowerCase();
+    if (k in keys) keys[k] = true;
+    if (k === "arrowleft") yaw += 0.08;
+    if (k === "arrowright") yaw -= 0.08;
+  });
+  window.addEventListener("keyup", (e) => {
+    const k = e.key.toLowerCase();
+    if (k in keys) keys[k] = false;
+  });
+
+  function moveFlat(dt) {
+    const speed = 1.8; // m/s
+    const forward = (keys.w ? 1 : 0) + (keys.s ? -1 : 0);
+    const strafe  = (keys.d ? 1 : 0) + (keys.a ? -1 : 0);
+
+    rig.rotation.y = yaw;
+
+    if (forward === 0 && strafe === 0) return;
+
+    const dir = new THREE.Vector3(strafe, 0, -forward).normalize();
+    dir.applyAxisAngle(new THREE.Vector3(0,1,0), rig.rotation.y);
+
+    rig.position.addScaledVector(dir, speed * dt);
+  }
+
+  return {
+    update(dt) {
+      // If XR presenting, do nothing here (we’ll add controller locomotion next)
+      if (renderer.xr.isPresenting) return;
+      moveFlat(dt);
+    }
   };
-
-  window.addEventListener('keydown', (e)=>keys.add(e.key.toLowerCase()));
-  window.addEventListener('keyup', (e)=>keys.delete(e.key.toLowerCase()));
-
-  function bindPad(p, setFn){
-    if (!p.pad || !p.knob) return;
-    const radius = 50;
-    p.pad.addEventListener('pointerdown', (e)=>{
-      p.active = true; p.id = e.pointerId;
-      const r = p.pad.getBoundingClientRect();
-      p.cx = r.left + r.width/2; p.cy = r.top + r.height/2;
-      p.pad.setPointerCapture(e.pointerId);
-    });
-    p.pad.addEventListener('pointermove', (e)=>{
-      if (!p.active || e.pointerId !== p.id) return;
-      const dx = e.clientX - p.cx;
-      const dy = e.clientY - p.cy;
-      const len = Math.hypot(dx,dy) || 1;
-      const cl = Math.min(len, radius);
-      const nx = (dx/len) * cl;
-      const ny = (dy/len) * cl;
-      p.knob.style.left = `${43 + nx}px`;
-      p.knob.style.top  = `${43 + ny}px`;
-      setFn(nx/radius, ny/radius);
-    });
-    const end = (e)=>{
-      if (e.pointerId !== p.id) return;
-      p.active = false; p.id = null;
-      p.knob.style.left = '43px'; p.knob.style.top = '43px';
-      setFn(0,0);
-    };
-    p.pad.addEventListener('pointerup', end);
-    p.pad.addEventListener('pointercancel', end);
-  }
-
-  bindPad(pads.move, (x,y)=>{ stick.mx = x; stick.my = y; });
-  bindPad(pads.turn, (x,y)=>{ stick.tx = x; stick.ty = y; });
-
-  const speed = 3.2;
-  const turnSpeed = 1.6;
-
-  function update(dt){
-    let fx = 0, fz = 0;
-    if (keys.has('w')) fz -= 1;
-    if (keys.has('s')) fz += 1;
-    if (keys.has('a')) fx -= 1;
-    if (keys.has('d')) fx += 1;
-
-    fx += stick.mx;
-    fz += stick.my;
-
-    yaw += (-stick.tx) * turnSpeed * dt;
-    playerGroup.rotation.y = yaw;
-
-    const sin = Math.sin(yaw), cos = Math.cos(yaw);
-    const dx = (fx * cos - fz * sin) * speed * dt;
-    const dz = (fx * sin + fz * cos) * speed * dt;
-
-    playerGroup.position.x += dx;
-    playerGroup.position.z += dz;
-  }
-
-  window.__locomotionUpdate = update;
-  Bus?.log?.('LOCOMOTION ONLINE');
 }
