@@ -9,18 +9,22 @@ export const Spine = {
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.setSize(innerWidth, innerHeight);
     renderer.xr.enabled = true;
+
+    // Make it BRIGHT and readable
+    renderer.toneMappingExposure = 1.35;
+
     document.body.appendChild(renderer.domElement);
 
-    // Scene + Camera
+    // Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x04040a);
+    scene.background = new THREE.Color(0x05060d);
 
-    const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 400);
-    camera.position.set(0, 1.7, 10);
+    // Camera
+    const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 600);
 
-    // Player rig (move THIS, not camera directly)
+    // Player Rig (move this)
     const rig = new THREE.Group();
-    rig.position.set(0, 1.7, 12); // ✅ safe spawn
+    rig.position.set(0, 1.8, 18);   // safe spawn far from pit lip
     rig.add(camera);
     scene.add(rig);
 
@@ -31,15 +35,10 @@ export const Spine = {
       renderer.setSize(innerWidth, innerHeight);
     });
 
-    // Context handed to modules
     const ctx = {
-      THREE,
-      scene,
-      camera,
-      renderer,
-      rig,
+      THREE, scene, camera, renderer, rig,
       log: (...a) => console.log(...a),
-      flags: { noClip: false }
+      flags: { noClip: true } // demo: no collision to prevent “stuck”
     };
 
     // Input
@@ -48,14 +47,24 @@ export const Spine = {
     // World
     await initWorld(ctx);
 
-    // XR buttons (basic)
-    document.getElementById("btnVR")?.addEventListener("click", async () => {
-      if (navigator.xr) {
+    // VR button
+    const btnVR = document.getElementById("btnVR");
+    btnVR?.addEventListener("click", async () => {
+      try {
+        if (!navigator.xr) return;
         const session = await navigator.xr.requestSession("immersive-vr", {
           optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"]
         });
         renderer.xr.setSession(session);
+      } catch (e) {
+        console.warn("XR session failed:", e);
       }
+    });
+
+    // Reset spawn button
+    document.getElementById("btnReset")?.addEventListener("click", () => {
+      rig.position.set(0, 1.8, 18);
+      rig.rotation.set(0, 0, 0);
     });
 
     // Render loop
@@ -66,6 +75,6 @@ export const Spine = {
       renderer.render(scene, camera);
     });
 
-    console.log("✅ SCARLETT: ready");
+    console.log("✅ Scarlett Demo: ready");
   }
 };
