@@ -1,9 +1,10 @@
+
 import {createWorld} from "./world.js";
 import {Controls} from "./controls.js";
 import {lobby} from "./lobby.js";
 import {pit} from "./pit.js";
 import {Bots} from "./bots.js";
-import {log,setTop} from "./ui.js";
+import {setTop} from "./ui.js";
 
 const {scene,renderer,playerRoot}=createWorld();
 const c=new Controls(renderer,playerRoot);
@@ -14,7 +15,7 @@ lobby(scene);
 document.getElementById("btnEnter").onclick=async()=>{
  const p=pit(scene);
  bots=new Bots(scene,p.seats);await bots.spawn();
- setTop("Poker Pit Live");
+ setTop("Poker Pit Live + Jumbotron");
 };
 
 renderer.setAnimationLoop(t=>{

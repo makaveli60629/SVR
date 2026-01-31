@@ -1,3 +1,4 @@
+
 import * as THREE from "three";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 export class Bots{
@@ -9,7 +10,8 @@ export class Bots{
    try{o=(await l.loadAsync("/assets/avatars/male.glb")).scene}
    catch{o=new THREE.Mesh(new THREE.CapsuleGeometry(.18,1.1,6,12),
     new THREE.MeshStandardMaterial({color:0x334455}))}
-   o.position.copy(this.seats[i].position);o.rotation.y=this.seats[i].rotation.y;
+   o.position.copy(this.seats[i].position);
+   o.rotation.y=this.seats[i].rotation.y;
    this.scene.add(o);this.bots.push(o);
   }
  }

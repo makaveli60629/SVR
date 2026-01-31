@@ -1,3 +1,4 @@
+
 import * as THREE from "three";
 export class Controls{
  constructor(renderer,player){this.r=renderer;this.p=player;this.v=new THREE.Vector2();this.t=0;}
