@@ -1,6 +1,13 @@
-// /js/scarlett1/main.js
-import "./modules/lobby.js";
 import "./modules/locomotion.js";
+import "./modules/portals.js";
+import "./modules/hands.js";
+import "./modules/watch.js";
+
+import "./modules/cards.js";
+import "./modules/table6.js";
+import "./modules/lobby.js";
+import "./modules/tablesRoom.js";
+import "./modules/storeRoom.js";
 
 window.hudLog = function hudLog(msg) {
   const el = document.getElementById("hud");
@@ -12,35 +19,56 @@ window.hudLog = function hudLog(msg) {
 AFRAME.registerComponent("scarlett-world", {
   init() {
     hudLog("A-FRAME loaded ✅");
-    hudLog("World booting…");
+    hudLog("Scarlett1 booting…");
 
-    // Build lobby
+    // Force hands visible
+    this.el.sceneEl.setAttribute("scarlett-hands-always", "");
+
+    // Watch teleporter (works anywhere)
+    this.el.sceneEl.setAttribute("scarlett-watch-teleporter", "");
+
+    // --- DESTINATION MARKERS (teleport targets) ---
+    // Lobby
+    addDest(this.el, "dest_lobby", "0 0 0");
+
+    // Poker tables room (scorpion room)
+    addDest(this.el, "dest_tables", "0 0 -140");
+
+    // Store room
+    addDest(this.el, "dest_store", "-140 0 0");
+
+    // Balcony view point (inside store, upper level)
+    addDest(this.el, "dest_balcony", "-140 7 0");
+
+    // --- ROOMS ---
     const lobby = document.createElement("a-entity");
-    lobby.setAttribute("id", "lobbyRoot");
+    lobby.setAttribute("id", "room_lobby");
     lobby.setAttribute("position", "0 0 0");
     lobby.setAttribute("scarlett-lobby", "");
     this.el.appendChild(lobby);
 
-    // Portal click router
-    this.el.addEventListener("click", (e) => {
-      const target = e.target;
-      if (!target?.classList?.contains("portal")) return;
+    const tables = document.createElement("a-entity");
+    tables.setAttribute("id", "room_tables");
+    tables.setAttribute("position", "0 0 -140");
+    tables.setAttribute("scarlett-tables-room", "");
+    this.el.appendChild(tables);
 
-      const dest = target.getAttribute("data-dest");
-      const rig = document.getElementById("rig");
-      if (!dest || !rig) return;
+    const store = document.createElement("a-entity");
+    store.setAttribute("id", "room_store");
+    store.setAttribute("position", "-140 0 0");
+    store.setAttribute("scarlett-store-room", "");
+    this.el.appendChild(store);
 
-      // These are safe zones (edit later when pit/store/balcony modules exist)
-      if (dest === "lobby")   rig.setAttribute("position", "0 1.6 14");
-      if (dest === "tables")  rig.setAttribute("position", "0 1.6 -12");
-      if (dest === "store")   rig.setAttribute("position", "12 1.6 0");
-      if (dest === "balcony") rig.setAttribute("position", "0 4.2 16");
-
-      hudLog(`Portal → ${dest.toUpperCase()} ✅`);
-    });
-
-    hudLog("World ready ✅");
-    hudLog("Movement: Left stick");
-    hudLog("Teleport: Aim right laser at floor → Right Trigger");
+    hudLog("Rooms created ✅");
+    hudLog("Teleport ring: aim at floor + Right Trigger");
+    hudLog("Portals/pads: click/trigger on rings/pads");
   }
 });
+
+function addDest(root, id, pos) {
+  if (document.getElementById(id)) return;
+  const d = document.createElement("a-entity");
+  d.setAttribute("id", id);
+  d.setAttribute("position", pos);
+  root.appendChild(d);
+}
