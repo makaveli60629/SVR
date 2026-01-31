@@ -5,10 +5,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <meta name="theme-color" content="#0b0b12" />
   <title>ScarlettVR Poker • Permanent Spine</title>
-  <link rel="stylesheet" href="./css/style.css" />
-</head>
-<body>
 
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- IMPORTANT: makes `import "three"` work on GitHub Pages -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+
+<body>
   <div id="hud" class="hud">
     <div class="hud__title">
       <div class="hud__brand">ScarlettVR Poker • Permanent Spine</div>
@@ -28,15 +39,14 @@
     <pre id="diag" class="hud__diag">(starting…)</pre>
   </div>
 
-  <!-- BOOTSTRAP: this ALWAYS runs and shows import errors -->
   <script type="module">
     const diagEl = document.getElementById('diag');
     const log = (s)=>{ diagEl.textContent += (diagEl.textContent.endsWith('\n')?'':'\n') + s; };
+
     diagEl.textContent = '';
     log('[boot] html loaded ✅');
     log('[boot] attempting to import ./index.js …');
 
-    // show any runtime errors too
     window.addEventListener('error', (e)=> log('[window.error] ' + (e.message || e.error || e)));
     window.addEventListener('unhandledrejection', (e)=> log('[unhandledrejection] ' + (e.reason?.message || e.reason || e)));
 
@@ -45,10 +55,7 @@
       .catch((e)=>{
         log('[boot] index.js import FAILED ❌');
         log(String(e?.stack || e?.message || e));
-        // Extra hint for common GitHub Pages path issues:
-        log('Tip: confirm index.js exists at /index.js and loads over HTTPS.');
       });
   </script>
-
 </body>
 </html>
