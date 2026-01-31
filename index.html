@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>SVR - Scarlett1</title>
+  <title>SCARLETT1 VR</title>
 
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
@@ -31,23 +31,26 @@
     <a-assets timeout="20000"></a-assets>
 
     <!-- PLAYER RIG -->
-    <a-entity id="rig" position="0 1.6 14" rotation="0 0 0" scarlett-locomotion>
+    <a-entity id="rig" position="0 1.6 18" rotation="0 180 0" scarlett-locomotion>
       <a-entity id="cam" camera look-controls="pointerLockEnabled:false"></a-entity>
 
-      <!-- LEFT: movement stick events -->
+      <!-- MUST: hands visible always -->
       <a-entity id="leftHand"
-        oculus-touch-controls="hand:left"
+        oculus-touch-controls="hand:left; model:true"
+        controller-model="hand:left"
+        visible="true"
       ></a-entity>
 
-      <!-- RIGHT: teleport laser + click -->
       <a-entity id="rightHand"
-        oculus-touch-controls="hand:right"
+        oculus-touch-controls="hand:right; model:true"
+        controller-model="hand:right"
         laser-controls="hand:right"
         raycaster="objects:.teleportable,.clickable; far:60; interval:0"
         line="opacity:0.55"
+        visible="true"
       ></a-entity>
 
-      <!-- Desktop/Android click without face reticle -->
+      <!-- Desktop/Android mouse click -->
       <a-entity id="mouseCursor"
         cursor="rayOrigin: mouse; fuse:false"
         raycaster="objects:.clickable; far:60"
@@ -55,7 +58,7 @@
     </a-entity>
 
     <!-- WORLD -->
-    <a-entity id="world" scarlett-world></a-entity>
+    <a-entity id="world" scarlett-world scarlett-portal-router></a-entity>
 
     <script type="module" src="./js/scarlett1/main.js"></script>
   </a-scene>
