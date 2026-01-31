@@ -21,7 +21,10 @@ AFRAME.registerComponent("scarlett-pit", {
     marker.setAttribute("radius-inner", "0.22");
     marker.setAttribute("radius-outer", "0.36");
     marker.setAttribute("rotation", "-90 0 0");
-    marker.setAttribute("material", "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.0; opacity:0.65; transparent:true");
+    marker.setAttribute(
+      "material",
+      "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.0; opacity:0.65; transparent:true"
+    );
     marker.classList.add("seatSpot");
     el.appendChild(marker);
 
@@ -33,6 +36,12 @@ AFRAME.registerComponent("scarlett-pit", {
       marker.setAttribute("position", `${p.x} 0.03 ${p.z}`);
       if (window.hudLog) hudLog("Your seat reserved ✅ (front seat)");
     }, 250);
+
+    // Jumbotron entity (attached here so it definitely exists in pit mode)
+    const jumbo = document.createElement("a-entity");
+    jumbo.setAttribute("id", "scarlettJumboRoot");
+    jumbo.setAttribute("scarlett-jumbotron", "playlist:https://raw.githubusercontent.com/jromero88/iptv/master/channels/us.m3u; preferName:CBS");
+    el.appendChild(jumbo);
 
     // Ninja display pedestals (tries GLBs if present, otherwise shows “statues”)
     const display = document.createElement("a-entity");
@@ -55,7 +64,7 @@ AFRAME.registerComponent("scarlett-pit", {
       "./assets/fighter_ninja.glb"
     ], "Ninja");
 
-    if (window.hudLog) hudLog("Tables built ✅  | Ninja displays ✅");
+    if (window.hudLog) hudLog("Tables built ✅ | Bots seated ✅ | Ninja displays ✅ | Jumbotron attached ✅");
   }
 });
 
@@ -131,23 +140,21 @@ function tryLoadFirstGLB(holder, urls, onFail) {
       if (settled) return;
       settled = true;
 
-      // Auto-scale-ish: make it a good display size
+      // Make it a good display size
       model.setAttribute("scale", "1.2 1.2 1.2");
-      holder.appendChild(model);
-
       if (window.hudLog) hudLog(`Loaded GLB ✅ ${url}`);
     });
 
     model.addEventListener("model-error", () => {
       if (settled) return;
       settled = true;
+      model.remove();
       attempt();
     });
 
-    // Try it
     holder.appendChild(model);
 
-    // Safety timeout (if model never resolves)
+    // Safety timeout
     setTimeout(() => {
       if (settled) return;
       settled = true;
@@ -157,4 +164,4 @@ function tryLoadFirstGLB(holder, urls, onFail) {
   }
 
   attempt();
-                                }
+}
