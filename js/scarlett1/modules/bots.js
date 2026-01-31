@@ -1,36 +1,54 @@
-import { hudLog } from "./diagnostics.js";
+AFRAME.registerComponent("scarlett-bots", {
+  init: function () {
+    const el = this.el;
 
-export function spawnDemoBots(THREE, parent, seatAnchors) {
-  const bots = [];
-  const mat = new THREE.MeshStandardMaterial({ color: 0x0f1116, roughness: 0.6, metalness: 0.2 });
-  const face = new THREE.MeshBasicMaterial({ color: 0x2bd6ff });
+    // Match seat positions around your table
+    const seats = [
+      { x:-1.2, z: 2.4, r: 180 },
+      { x: 0.0, z: 2.4, r: 180 },
+      { x: 1.2, z: 2.4, r: 180 },
+      { x:-1.2, z:-2.4, r:   0 },
+      { x: 0.0, z:-2.4, r:   0 },
+      { x: 1.2, z:-2.4, r:   0 },
+    ];
 
-  seatAnchors.forEach((a, i) => {
-    const bot = new THREE.Group();
-    bot.position.copy(a.position);
-    bot.rotation.y = a.rotation.y;
+    seats.forEach((s,i) => {
+      const bot = document.createElement("a-entity");
+      bot.setAttribute("position", `${s.x} 0 ${s.z}`);
+      bot.setAttribute("rotation", `0 ${s.r} 0`);
+      bot.setAttribute("scarlett-bot", `seed:${Math.random()*10};`);
+      el.appendChild(bot);
+    });
 
-    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.55, 8, 16), mat);
-    body.position.y = 0.95;
-    bot.add(body);
-
-    const visor = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.08, 0.02), face);
-    visor.position.set(0, 1.12, 0.18);
-    bot.add(visor);
-
-    bot.userData = { t: Math.random() * 10, i };
-    parent.add(bot);
-    bots.push(bot);
-  });
-
-  hudLog(`Bots seated: ${bots.length} ✅`);
-  hudLog("Demo: bots bob + idle animation running.");
-  return bots;
-}
-
-export function tickBots(dt, bots) {
-  for (const b of bots) {
-    b.userData.t += dt;
-    b.position.y = 0.02 * Math.sin(b.userData.t * 1.6);
+    hudLog("Bots seated: 6 ✅");
   }
-}
+});
+
+AFRAME.registerComponent("scarlett-bot", {
+  schema: { seed: { type:"number", default: 0 } },
+  init: function () {
+    const el = this.el;
+
+    const body = document.createElement("a-cylinder");
+    body.setAttribute("radius", "0.18");
+    body.setAttribute("height", "1.1");
+    body.setAttribute("position", "0 0.95 0");
+    body.setAttribute("material", "color:#0f1116; metalness:0.2; roughness:0.6");
+    el.appendChild(body);
+
+    const visor = document.createElement("a-plane");
+    visor.setAttribute("width", "0.22");
+    visor.setAttribute("height", "0.08");
+    visor.setAttribute("position", "0 1.12 0.19");
+    visor.setAttribute("material", "color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.2");
+    el.appendChild(visor);
+
+    this.t = this.data.seed;
+  },
+  tick: function (t, dt) {
+    // subtle bob so it looks alive
+    this.t += (dt || 16) / 1000;
+    const y = 0.02 * Math.sin(this.t * 1.6);
+    this.el.object3D.position.y = y;
+  }
+});
