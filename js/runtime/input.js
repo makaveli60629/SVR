@@ -1,181 +1,123 @@
-export const Input = {
-  ctx: null,
-  keys: {},
-  joy: { active:false, id:null, sx:0, sy:0, x:0, y:0 },
-  teleportQueued: false,
-  moveForwardHeld: false,
-  lastSelectTime: 0,
+import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+import { Input } from "./input.js";
+import { init as initWorld } from "../scarlett1/world.js";
 
-  init(ctx){
-    this.ctx = ctx;
+function setStatus(txt){
+  const el = document.getElementById("status");
+  if (el) el.textContent = txt;
+}
+function showErr(err){
+  const box = document.getElementById("err");
+  if (!box) return;
+  box.style.display = "block";
+  box.textContent = String(err?.stack || err?.message || err);
+}
 
-    addEventListener("keydown", e => this.keys[e.code] = true);
-    addEventListener("keyup", e => this.keys[e.code] = false);
+export const Spine = {
+  async start() {
+    // Always show failures instead of black screen
+    window.addEventListener("error", (e) => showErr(e.error || e.message || e));
+    window.addEventListener("unhandledrejection", (e) => showErr(e.reason || e));
 
-    // Touch joystick
-    const joyZone = document.getElementById("joyZone");
-    if (joyZone) {
-      const down = (e) => {
-        const t = e.changedTouches ? e.changedTouches[0] : e;
-        this.joy.active = true;
-        this.joy.id = t.identifier ?? "mouse";
-        this.joy.sx = t.clientX;
-        this.joy.sy = t.clientY;
-        this.joy.x = 0; this.joy.y = 0;
-      };
+    setStatus("init renderer…");
 
-      const move = (e) => {
-        if (!this.joy.active) return;
-        let t = null;
-        if (e.changedTouches) {
-          for (const tt of e.changedTouches) if (tt.identifier === this.joy.id) t = tt;
-        } else t = e;
-        if (!t) return;
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // ✅ reduces Quest jitter
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.xr.enabled = true;
 
-        const dx = t.clientX - this.joy.sx;
-        const dy = t.clientY - this.joy.sy;
-        const max = 70;
+    // Brighter, but stable
+    renderer.toneMappingExposure = 1.45;
 
-        this.joy.x = Math.max(-1, Math.min(1, dx / max));
-        this.joy.y = Math.max(-1, Math.min(1, dy / max));
-        e.preventDefault?.();
-      };
+    // Softer shadows OFF (shadows can cause jitter on Quest if enabled accidentally)
+    renderer.shadowMap.enabled = false;
 
-      const up = () => {
-        this.joy.active = false;
-        this.joy.id = null;
-        this.joy.x = 0; this.joy.y = 0;
-      };
+    document.body.appendChild(renderer.domElement);
 
-      joyZone.addEventListener("touchstart", down, { passive:false });
-      joyZone.addEventListener("touchmove", move, { passive:false });
-      joyZone.addEventListener("touchend", up, { passive:true });
-      joyZone.addEventListener("touchcancel", up, { passive:true });
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x070812);
 
-      joyZone.addEventListener("mousedown", down);
-      addEventListener("mousemove", move);
-      addEventListener("mouseup", up);
-    }
+    // Small fog helps depth and hides far aliasing (also makes it feel “thicker”/more real)
+    scene.fog = new THREE.Fog(0x070812, 35, 130);
 
-    // Tap teleport (Android)
-    const teleZone = document.getElementById("teleZone");
-    if (teleZone) {
-      teleZone.addEventListener("click", () => { this.teleportQueued = true; });
-      teleZone.addEventListener("touchend", () => { this.teleportQueued = true; }, { passive:true });
-    }
+    const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 800);
 
-    // XR select: controllers AND hand pinch both emit select in most browsers
-    const onSelectStart = () => {
-      this.lastSelectTime = performance.now();
-      this.moveForwardHeld = true;
-    };
-    const onSelectEnd = () => {
-      const t = performance.now() - this.lastSelectTime;
-      this.moveForwardHeld = false;
-      if (t < 240) this.teleportQueued = true;
-    };
+    const rig = new THREE.Group();
+    rig.position.set(0, 1.8, 24);
+    rig.add(camera);
+    scene.add(rig);
 
-    const { controller1, controller2 } = ctx;
-    [controller1, controller2].forEach(obj => {
-      if (!obj) return;
-      obj.addEventListener("selectstart", onSelectStart);
-      obj.addEventListener("selectend", onSelectEnd);
+    const controller1 = renderer.xr.getController(0);
+    const controller2 = renderer.xr.getController(1);
+    scene.add(controller1, controller2);
+
+    addEventListener("resize", () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
     });
 
-    console.log("✅ Input armed");
-  },
-
-  getAxes(){
-    // Gamepad axes
-    const gps = navigator.getGamepads ? navigator.getGamepads() : [];
-    for (const gp of gps) {
-      if (!gp || !gp.axes) continue;
-      const ax = gp.axes[2] ?? gp.axes[0] ?? 0;
-      const ay = gp.axes[3] ?? gp.axes[1] ?? 0;
-      if (Math.abs(ax) + Math.abs(ay) > 0.01) return { x: ax, y: ay };
-    }
-
-    // Touch joystick
-    if (this.joy.active && (Math.abs(this.joy.x) + Math.abs(this.joy.y) > 0.01)) {
-      return { x: this.joy.x, y: -this.joy.y };
-    }
-
-    // Keys
-    const k = this.keys;
-    return {
-      x: (k.KeyD?1:0) - (k.KeyA?1:0),
-      y: (k.KeyW?1:0) - (k.KeyS?1:0),
+    const ctx = {
+      THREE, scene, camera, renderer, rig,
+      controller1, controller2,
+      log: (...a) => console.log(...a),
+      flags: { noClip: true },
+      teleportSurfaces: [],
+      // world can register update callbacks here
+      updates: []
     };
-  },
 
-  raycastTeleport(fromObj){
-    const { THREE, camera, rig, teleportSurfaces } = this.ctx;
-    if (!teleportSurfaces || teleportSurfaces.length === 0) return false;
+    setStatus("init input…");
+    Input.init(ctx);
 
-    const raycaster = new THREE.Raycaster();
-    const origin = new THREE.Vector3();
-    const dir = new THREE.Vector3();
+    setStatus("build world…");
+    await initWorld(ctx);
 
-    if (fromObj) {
-      fromObj.getWorldPosition(origin);
-      fromObj.getWorldDirection(dir);
-    } else {
-      camera.getWorldPosition(origin);
-      camera.getWorldDirection(dir);
-    }
+    // UI buttons
+    document.getElementById("btnReset")?.addEventListener("click", () => {
+      rig.position.set(0, 1.8, 24);
+      rig.rotation.set(0, 0, 0);
+    });
 
-    raycaster.set(origin, dir.normalize());
-    const hits = raycaster.intersectObjects(teleportSurfaces, true);
-    if (!hits || hits.length === 0) return false;
+    document.getElementById("btnHard")?.addEventListener("click", () => {
+      const u = new URL(location.href);
+      u.searchParams.set("v", "HARD_" + Date.now());
+      location.href = u.toString();
+    });
 
-    const p = hits[0].point;
-    rig.position.set(p.x, Math.max(1.7, p.y + 1.7), p.z);
-    return true;
-  },
-
-  update(dt){
-    const { rig, camera, controller1, controller2 } = this.ctx;
-
-    // Teleport
-    if (this.teleportQueued) {
-      this.teleportQueued = false;
-      const did =
-        this.raycastTeleport(controller1) ||
-        this.raycastTeleport(controller2) ||
-        this.raycastTeleport(null);
-
-      if (!did) {
-        const yaw = camera.rotation.y;
-        const step = 3.0;
-        rig.position.x += Math.sin(yaw) * step;
-        rig.position.z -= Math.cos(yaw) * step;
+    document.getElementById("btnVR")?.addEventListener("click", async () => {
+      try {
+        if (!navigator.xr) throw new Error("WebXR not available on this browser.");
+        const session = await navigator.xr.requestSession("immersive-vr", {
+          optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"]
+        });
+        renderer.xr.setSession(session);
+      } catch (e) {
+        showErr(e);
       }
-    }
+    });
 
-    // Hold-to-move (XR select hold)
-    if (this.moveForwardHeld) {
-      const yaw = camera.rotation.y;
-      const speed = 2.0;
-      rig.position.x += Math.sin(yaw) * speed * dt;
-      rig.position.z -= Math.cos(yaw) * speed * dt;
-      rig.position.y = Math.max(rig.position.y, 1.6);
-      return;
-    }
+    // ✅ Stable animation step
+    const clock = new THREE.Clock();
+    renderer.setAnimationLoop(() => {
+      const dtRaw = clock.getDelta();
+      // Clamp dt so spikes don’t become big jumps
+      const dt = Math.min(Math.max(dtRaw, 1/120), 1/30);
 
-    // Axes move
-    const a = this.getAxes();
-    const mag = Math.abs(a.x) + Math.abs(a.y);
-    if (mag < 0.001) return;
+      // Input first
+      Input.update(dt);
 
-    const yaw = camera.rotation.y;
-    const sin = Math.sin(yaw), cos = Math.cos(yaw);
+      // World updates (bots etc) — IMPORTANT: no extra rAF loops anywhere
+      for (const fn of ctx.updates) fn(dt);
 
-    const speed = 2.4;
-    const vx = (a.x * cos - a.y * sin) * speed * dt;
-    const vz = (a.x * sin + a.y * cos) * speed * dt;
+      setStatus(
+        `ok • xr=${renderer.xr.isPresenting ? "YES" : "no"}\n` +
+        `pos ${rig.position.x.toFixed(2)}, ${rig.position.y.toFixed(2)}, ${rig.position.z.toFixed(2)}`
+      );
 
-    rig.position.x += vx;
-    rig.position.z += vz;
-    rig.position.y = Math.max(rig.position.y, 1.6);
+      renderer.render(scene, camera);
+    });
+
+    console.log("✅ Scarlett STABLE Demo: ready");
   }
 };
