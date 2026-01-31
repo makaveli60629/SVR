@@ -2,26 +2,28 @@ export const Input = {
   ctx: null,
   keys: {},
   joy: { active:false, id:null, sx:0, sy:0, x:0, y:0 },
+  teleportQueued: false,
 
   init(ctx){
     this.ctx = ctx;
 
-    // ✅ Keys fallback (desktop debugging)
+    // Keyboard fallback
     addEventListener("keydown", e => this.keys[e.code] = true);
     addEventListener("keyup", e => this.keys[e.code] = false);
 
-    // ✅ Touch joystick (Android) — uses #joyZone
-    const zone = document.getElementById("joyZone");
-    if (zone) {
-      const onDown = (e) => {
-        const t = (e.changedTouches ? e.changedTouches[0] : e);
+    // Touch Joystick (bottom-left)
+    const joyZone = document.getElementById("joyZone");
+    if (joyZone) {
+      const down = (e) => {
+        const t = e.changedTouches ? e.changedTouches[0] : e;
         this.joy.active = true;
         this.joy.id = t.identifier ?? "mouse";
         this.joy.sx = t.clientX;
         this.joy.sy = t.clientY;
         this.joy.x = 0; this.joy.y = 0;
       };
-      const onMove = (e) => {
+
+      const move = (e) => {
         if (!this.joy.active) return;
         let t = null;
         if (e.changedTouches) {
@@ -29,36 +31,48 @@ export const Input = {
         } else t = e;
         if (!t) return;
 
-        const dx = (t.clientX - this.joy.sx);
-        const dy = (t.clientY - this.joy.sy);
-        const max = 70; // pixels
-        const nx = Math.max(-1, Math.min(1, dx / max));
-        const ny = Math.max(-1, Math.min(1, dy / max));
-        this.joy.x = nx;
-        this.joy.y = ny;
+        const dx = t.clientX - this.joy.sx;
+        const dy = t.clientY - this.joy.sy;
+
+        const max = 70;
+        this.joy.x = Math.max(-1, Math.min(1, dx / max));
+        this.joy.y = Math.max(-1, Math.min(1, dy / max));
+
+        // global visibility (useful for debugging)
+        window.__joy = { x:this.joy.x, y:this.joy.y, active:this.joy.active };
+
         e.preventDefault?.();
       };
-      const onUp = (e) => {
+
+      const up = () => {
         this.joy.active = false;
         this.joy.id = null;
         this.joy.x = 0; this.joy.y = 0;
+        window.__joy = { x:0, y:0, active:false };
       };
 
-      zone.addEventListener("touchstart", onDown, { passive:false });
-      zone.addEventListener("touchmove", onMove, { passive:false });
-      zone.addEventListener("touchend", onUp, { passive:true });
-      zone.addEventListener("touchcancel", onUp, { passive:true });
+      joyZone.addEventListener("touchstart", down, { passive:false });
+      joyZone.addEventListener("touchmove", move, { passive:false });
+      joyZone.addEventListener("touchend", up, { passive:true });
+      joyZone.addEventListener("touchcancel", up, { passive:true });
 
-      zone.addEventListener("mousedown", onDown);
-      addEventListener("mousemove", onMove);
-      addEventListener("mouseup", onUp);
+      joyZone.addEventListener("mousedown", down);
+      addEventListener("mousemove", move);
+      addEventListener("mouseup", up);
     }
 
-    console.log("✅ Input armed (gamepad + touch + keys)");
+    // Tap-to-teleport (bottom-right): tap = jump forward
+    const teleZone = document.getElementById("teleZone");
+    if (teleZone) {
+      teleZone.addEventListener("click", () => { this.teleportQueued = true; });
+      teleZone.addEventListener("touchend", () => { this.teleportQueued = true; }, { passive:true });
+    }
+
+    console.log("✅ Input: armed (gamepad + touch + keys + tap-teleport)");
   },
 
   getAxes(){
-    // 1) Gamepads (Quest controllers)
+    // 1) Gamepads (Quest / controller)
     const gps = navigator.getGamepads ? navigator.getGamepads() : [];
     for (const gp of gps) {
       if (!gp || !gp.axes) continue;
@@ -68,8 +82,8 @@ export const Input = {
     }
 
     // 2) Touch joystick (Android)
-    if (this.joy.active && (Math.abs(this.joy.x)+Math.abs(this.joy.y) > 0.01)) {
-      return { x: this.joy.x, y: -this.joy.y }; // invert so up = forward
+    if (this.joy.active && (Math.abs(this.joy.x) + Math.abs(this.joy.y) > 0.01)) {
+      return { x: this.joy.x, y: -this.joy.y }; // invert dy so up = forward
     }
 
     // 3) Keys
@@ -84,25 +98,38 @@ export const Input = {
     const { rig, camera } = this.ctx;
     const a = this.getAxes();
 
-    // If no input, skip
-    if (Math.abs(a.x) + Math.abs(a.y) < 0.001) return;
+    // Debug axes on screen
+    const el = document.getElementById("axisdbg");
+    if (el) el.textContent = `axes: ${a.x.toFixed(2)}, ${a.y.toFixed(2)}\nrig: ${rig.position.x.toFixed(2)}, ${rig.position.z.toFixed(2)}`;
 
-    // Move relative to camera yaw
+    // Teleport forward
+    if (this.teleportQueued) {
+      this.teleportQueued = false;
+      const yaw = camera.rotation.y;
+      const step = 3.2;
+      rig.position.x += Math.sin(yaw) * step;
+      rig.position.z -= Math.cos(yaw) * step;
+    }
+
+    // Move rig
+    const mag = Math.abs(a.x) + Math.abs(a.y);
+    if (mag < 0.001) return;
+
+    // Move relative to yaw
     const yaw = camera.rotation.y;
     const sin = Math.sin(yaw), cos = Math.cos(yaw);
 
-    const forward = a.y;     // + forward
-    const strafe  = a.x;     // + right
+    const forward = a.y;
+    const strafe = a.x;
 
-    const speed = 2.1;       // meters/sec
+    const speed = 2.3; // m/s
     const vx = (strafe * cos - forward * sin) * speed * dt;
     const vz = (strafe * sin + forward * cos) * speed * dt;
 
-    // ✅ noClip option if you want to test
     rig.position.x += vx;
     rig.position.z += vz;
 
-    // Keep player above floor baseline
+    // Keep head above floor baseline
     rig.position.y = Math.max(rig.position.y, 1.6);
   }
 };
