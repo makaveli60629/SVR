@@ -1,66 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>SCARLETT1 VR</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>SCARLETT1 — Lobby + Rooms</title>
 
+  <!-- A-Frame CDN (Quest-friendly) -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
   <style>
-    html, body { margin:0; padding:0; width:100%; height:100%; background:#000; overflow:hidden; }
-    #hud {
-      position: fixed; left: 10px; top: 10px; z-index: 99;
-      font: 14px/1.3 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      color: #9ff; background: rgba(0,0,0,.55);
-      padding: 10px 12px; border-radius: 10px; max-width: 92vw;
+    body { margin:0; overflow:hidden; background:#000; }
+    #hudWrap{
+      position:fixed; left:10px; bottom:10px; z-index:9999;
+      width:min(720px, 92vw); max-height:38vh; overflow:auto;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-size:12px; line-height:1.35;
+      background: rgba(0,0,0,0.55); color:#9ff; padding:10px;
+      border:1px solid rgba(0,229,255,0.35); border-radius:10px;
       pointer-events:none;
     }
   </style>
 </head>
 
 <body>
-  <div id="hud">BOOT…</div>
+  <div id="hudWrap"><div id="hud">HUD ready…</div></div>
 
   <a-scene
-    renderer="colorManagement:true; physicallyCorrectLights:true; antialias:true"
-    background="color:#000000"
+    renderer="colorManagement:true; physicallyCorrectLights:true; antialias:true;"
+    background="color:#000"
     vr-mode-ui="enabled:true"
-    loading-screen="enabled:true"
+    device-orientation-permission-ui="enabled:true"
   >
-    <a-assets timeout="20000"></a-assets>
+    <a-assets></a-assets>
 
-    <!-- PLAYER RIG -->
-    <a-entity id="rig" position="0 1.6 18" rotation="0 180 0" scarlett-locomotion>
-      <a-entity id="cam" camera look-controls="pointerLockEnabled:false"></a-entity>
+    <!-- WORLD ROOT -->
+    <a-entity id="world" scarlett-world></a-entity>
 
-      <!-- MUST: hands visible always -->
-      <a-entity id="leftHand"
-        oculus-touch-controls="hand:left; model:true"
-        controller-model="hand:left"
-        visible="true"
-      ></a-entity>
-
-      <a-entity id="rightHand"
-        oculus-touch-controls="hand:right; model:true"
-        controller-model="hand:right"
-        laser-controls="hand:right"
-        raycaster="objects:.teleportable,.clickable; far:60; interval:0"
-        line="opacity:0.55"
-        visible="true"
-      ></a-entity>
-
-      <!-- Desktop/Android mouse click -->
-      <a-entity id="mouseCursor"
-        cursor="rayOrigin: mouse; fuse:false"
-        raycaster="objects:.clickable; far:60"
-      ></a-entity>
+    <!-- Camera rig (your locomotion/teleport modules can override as needed) -->
+    <a-entity id="rig" position="0 1.6 6">
+      <a-camera id="camera" wasd-controls-enabled="false"></a-camera>
     </a-entity>
-
-    <!-- WORLD -->
-    <a-entity id="world" scarlett-world scarlett-portal-router></a-entity>
-
-    <script type="module" src="./js/scarlett1/main.js"></script>
   </a-scene>
+
+  <!-- Your module entry -->
+  <script type="module" src="./js/scarlett1/main.js"></script>
 </body>
 </html>
