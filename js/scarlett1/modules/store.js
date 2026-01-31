@@ -1,92 +1,140 @@
-// js/scarlett1/modules/store.js
-import { getScene, ensureEntity, qs, addClickTarget, setVisible } from './utils.js';
+AFRAME.registerComponent("scarlett-store", {
+  init: function () {
+    const el = this.el;
 
-let _root = null;
-let _visible = false;
+    makeRoom(el, { name:"STORE", center:{x:0,y:0,z:0}, size:{w:22,h:7,d:18}, accent:"#7b61ff" });
 
-function buildStore() {
-  const scene = getScene();
-  if (!scene) return null;
+    for(let i=0;i<5;i++){
+      const shelf = document.createElement("a-box");
+      shelf.setAttribute("width","3.2");
+      shelf.setAttribute("height","0.18");
+      shelf.setAttribute("depth","0.9");
+      shelf.setAttribute("position", `${-6.6 + i*3.3} 1.2 -5.8`);
+      shelf.setAttribute("material","color:#0b0f14; metalness:0.45; roughness:0.5");
+      el.appendChild(shelf);
 
-  _root = ensureEntity('scarlett-store-root','a-entity', scene);
-  _root.setAttribute('position','8 0 -18');
-  _root.setAttribute('rotation','0 -35 0');
+      const glow = document.createElement("a-box");
+      glow.setAttribute("width","3.25");
+      glow.setAttribute("height","0.05");
+      glow.setAttribute("depth","0.95");
+      glow.setAttribute("position", `${-6.6 + i*3.3} 1.32 -5.8`);
+      glow.setAttribute("material","color:#7b61ff; emissive:#7b61ff; emissiveIntensity:0.9; opacity:0.25; transparent:true");
+      el.appendChild(glow);
+    }
 
-  // Base platform
-  const base = document.createElement('a-cylinder');
-  base.setAttribute('radius','3.2');
-  base.setAttribute('height','0.3');
-  base.setAttribute('color','#123018');
-  base.setAttribute('material','roughness: 0.95');
-  _root.appendChild(base);
+    const panel = document.createElement("a-plane");
+    panel.setAttribute("width","3.8");
+    panel.setAttribute("height","2.0");
+    panel.setAttribute("position","0 2.2 6.8");
+    panel.setAttribute("rotation","0 180 0");
+    panel.setAttribute("material","color:#0b0f14; opacity:0.78; transparent:true");
+    el.appendChild(panel);
 
-  // Jungle arches (simple)
-  for (let i=0;i<6;i++){
-    const arch = document.createElement('a-torus');
-    arch.setAttribute('radius','2.6');
-    arch.setAttribute('radius-tubular','0.08');
-    arch.setAttribute('rotation', `90 0 ${i*60}`);
-    arch.setAttribute('position','0 1.5 0');
-    arch.setAttribute('color','#1a6b2a');
-    arch.setAttribute('material','emissive: #0f3; emissiveIntensity: 0.25; roughness:0.9');
-    _root.appendChild(arch);
+    const title = document.createElement("a-text");
+    title.setAttribute("value","WALLET (DEMO)\nCredits: 10,000\nInventory: 0");
+    title.setAttribute("align","center");
+    title.setAttribute("color","#b19cd9");
+    title.setAttribute("width","6");
+    title.setAttribute("position","0 2.2 6.72");
+    title.setAttribute("rotation","0 180 0");
+    el.appendChild(title);
+
+    makeBuy(el, {x:-2.0,y:1.2,z:1.0}, "BUY CHIP STACK\n500", () => chat("STORE","Bought Chip Stack (demo)"));
+    makeBuy(el, {x: 2.0,y:1.2,z:1.0}, "BUY CARD BACK\n250", () => chat("STORE","Bought Card Back (demo)"));
+
+    makePortal(el, {x:0,y:1.4,z:8.2}, "BACK TO LOBBY", ()=> window.gotoLobby && window.gotoLobby());
+
+    if (window.hudLog) hudLog("Store ✅");
   }
+});
 
-  // Items pedestals
-  const labels = [
-    { name:'Avatar Skin', price:'$500', x:-1.6, z:0.9 },
-    { name:'Table Felt', price:'$250', x:0, z:1.8 },
-    { name:'Chip Set', price:'$150', x:1.6, z:0.9 },
-  ];
-  labels.forEach((it, idx) => {
-    const p = document.createElement('a-cylinder');
-    p.setAttribute('radius','0.45');
-    p.setAttribute('height','1.0');
-    p.setAttribute('position', `${it.x} 0.5 ${it.z}`);
-    p.setAttribute('color','#0b0b10');
-    p.setAttribute('material','emissive:#A020F0; emissiveIntensity: 0.7; roughness:0.8');
-    addClickTarget(p);
-    p.addEventListener('click', () => console.log(`[store] selected: ${it.name}`));
-    _root.appendChild(p);
+function chat(u,m){ if(window.addChatMessage) window.addChatMessage(u,m); if(window.hudLog) hudLog("[STORE] "+m); }
 
-    const t = document.createElement('a-text');
-    t.setAttribute('value', `${it.name}\n${it.price}`);
-    t.setAttribute('align','center');
-    t.setAttribute('width','4');
-    t.setAttribute('color','#00FFFF');
-    t.setAttribute('position', `${it.x} 1.35 ${it.z}`);
-    t.setAttribute('rotation','0 0 0');
-    _root.appendChild(t);
-  });
+function makeRoom(root, cfg){
+  const {center,size,accent,name} = cfg;
+  const shell = document.createElement("a-box");
+  shell.setAttribute("width",  size.w);
+  shell.setAttribute("height", size.h);
+  shell.setAttribute("depth",  size.d);
+  shell.setAttribute("position", `${center.x} ${center.y + size.h/2} ${center.z}`);
+  shell.setAttribute("material", "color:#06070b; side:back; roughness:0.95; metalness:0.05");
+  root.appendChild(shell);
 
-  // Sign
-  const sign = document.createElement('a-text');
-  sign.setAttribute('value','JUNGLE STORE');
-  sign.setAttribute('align','center');
-  sign.setAttribute('width','10');
-  sign.setAttribute('color','#00FF00');
-  sign.setAttribute('position','0 3.1 0');
-  _root.appendChild(sign);
+  const glow = document.createElement("a-ring");
+  glow.setAttribute("radius-inner", (Math.min(size.w,size.d)/2)-0.9);
+  glow.setAttribute("radius-outer", (Math.min(size.w,size.d)/2)-0.6);
+  glow.setAttribute("rotation","-90 0 0");
+  glow.setAttribute("position", `${center.x} 0.03 ${center.z}`);
+  glow.setAttribute("material", `color:${accent}; emissive:${accent}; emissiveIntensity:0.9; opacity:0.14; transparent:true`);
+  root.appendChild(glow);
 
-  setVisible(_root, false);
-  return _root;
+  const title = document.createElement("a-text");
+  title.setAttribute("value", name || "ROOM");
+  title.setAttribute("align","center");
+  title.setAttribute("color","#9ff");
+  title.setAttribute("width","12");
+  title.setAttribute("position", `${center.x} ${size.h-0.8} ${center.z - (size.d/2) + 0.35}`);
+  root.appendChild(title);
 }
 
-export const store = {
-  spawn() {
-    if (!_root) buildStore();
-    _visible = true;
-    setVisible(_root, true);
-  },
-  toggle() {
-    if (!_root) buildStore();
-    _visible = !_visible;
-    setVisible(_root, _visible);
-    return _visible;
-  },
-  hide() {
-    if (!_root) return;
-    _visible = false;
-    setVisible(_root, false);
-  }
-};
+function makePortal(root, pos, label, onClick){
+  const g = document.createElement("a-entity");
+  g.setAttribute("position", `${pos.x} ${pos.y} ${pos.z}`);
+  g.classList.add("clickable");
+  root.appendChild(g);
+
+  const bg = document.createElement("a-plane");
+  bg.setAttribute("width","2.4");
+  bg.setAttribute("height","0.6");
+  bg.setAttribute("material","color:#0b0f14; opacity:0.78; transparent:true");
+  bg.classList.add("clickable");
+  g.appendChild(bg);
+
+  const ring = document.createElement("a-ring");
+  ring.setAttribute("radius-inner","0.48");
+  ring.setAttribute("radius-outer","0.54");
+  ring.setAttribute("position","0 0 0.01");
+  ring.setAttribute("material","color:#7b61ff; emissive:#7b61ff; emissiveIntensity:1.4; opacity:0.6; transparent:true");
+  g.appendChild(ring);
+
+  const t = document.createElement("a-text");
+  t.setAttribute("value", label);
+  t.setAttribute("align","center");
+  t.setAttribute("color","#9ff");
+  t.setAttribute("width","7");
+  t.setAttribute("position","0 0 0.02");
+  g.appendChild(t);
+
+  g.addEventListener("click", ()=>{ try{ onClick && onClick(); }catch(e){} });
+}
+
+function makeBuy(root, pos, label, onClick){
+  const g = document.createElement("a-entity");
+  g.setAttribute("position", `${pos.x} ${pos.y} ${pos.z}`);
+  g.classList.add("clickable");
+  root.appendChild(g);
+
+  const bg = document.createElement("a-plane");
+  bg.setAttribute("width","2.2");
+  bg.setAttribute("height","0.9");
+  bg.setAttribute("material","color:#0b0f14; opacity:0.72; transparent:true");
+  bg.classList.add("clickable");
+  g.appendChild(bg);
+
+  const t = document.createElement("a-text");
+  t.setAttribute("value", label);
+  t.setAttribute("align","center");
+  t.setAttribute("color","#b19cd9");
+  t.setAttribute("width","6");
+  t.setAttribute("position","0 0 0.02");
+  g.appendChild(t);
+
+  const glow = document.createElement("a-ring");
+  glow.setAttribute("radius-inner","0.52");
+  glow.setAttribute("radius-outer","0.62");
+  glow.setAttribute("position","0 -0.34 0.01");
+  glow.setAttribute("material","color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.1; opacity:0.25; transparent:true");
+  g.appendChild(glow);
+
+  g.addEventListener("click", ()=>{ try{ onClick && onClick(); }catch(e){} });
+}

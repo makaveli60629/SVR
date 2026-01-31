@@ -1,61 +1,45 @@
-// Spawns 5 bots (leaves 1 seat open for player).
-// Expects seat entities with ids: seat_front, seat_back, seat_left_1, seat_left_2, seat_right_1, seat_right_2
-// (These ids are created by the updated table.js I gave you.)
-
 AFRAME.registerComponent("scarlett-bots", {
   init: function () {
-    const el = this.el;
+    // 5 bots, leave seat_front open for player
+    const seats = ["seat_back","seat_left1","seat_left2","seat_right1","seat_right2"];
+    seats.forEach((seatId, i) => this.spawnBot(seatId, i));
+    if (window.hudLog) hudLog("Bots seated ✅ (5 bots, 1 seat reserved)");
+  },
 
-    // Leave THIS seat for the player:
-    const PLAYER_SEAT_ID = "seat_front";
+  spawnBot: function (seatId, idx) {
+    const seat = document.getElementById(seatId);
+    if (!seat) {
+      setTimeout(() => this.spawnBot(seatId, idx), 120);
+      return;
+    }
 
-    // Candidate seats in priority order
-    const seatIds = [
-      "seat_front",
-      "seat_back",
-      "seat_left_1",
-      "seat_left_2",
-      "seat_right_1",
-      "seat_right_2"
-    ].filter(id => id !== PLAYER_SEAT_ID);
+    const bot = document.createElement("a-entity");
+    bot.setAttribute("id", "bot_" + idx);
+    bot.setAttribute("position", seat.getAttribute("position"));
+    bot.setAttribute("rotation", seat.getAttribute("rotation"));
 
-    // Spawn 5 bots
-    seatIds.slice(0, 5).forEach((seatId, i) => {
-      const seat = document.getElementById(seatId);
-      if (!seat) return;
+    // simple “avatar” placeholder (replace with your GLBs later)
+    const body = document.createElement("a-cylinder");
+    body.setAttribute("radius","0.20");
+    body.setAttribute("height","1.15");
+    body.setAttribute("position","0 0.78 0");
+    body.setAttribute("material","color:#0b0f14; emissive:#2bd6ff; emissiveIntensity:0.12; roughness:0.85");
+    bot.appendChild(body);
 
-      const bot = document.createElement("a-entity");
-      bot.setAttribute("id", `bot_${i+1}`);
-      bot.setAttribute("position", "0 0 0");
-      bot.setAttribute("rotation", "0 0 0");
+    const head = document.createElement("a-sphere");
+    head.setAttribute("radius","0.18");
+    head.setAttribute("position","0 1.45 0");
+    head.setAttribute("material","color:#0b0f14; emissive:#7b61ff; emissiveIntensity:0.10; roughness:0.85");
+    bot.appendChild(head);
 
-      // Simple “avatar placeholder” (you can swap to GLBs later)
-      const body = document.createElement("a-cylinder");
-      body.setAttribute("radius", "0.20");
-      body.setAttribute("height", "0.90");
-      body.setAttribute("position", "0 0.45 0");
-      body.setAttribute("material", "color:#0b0f14; emissive:#2bd6ff; emissiveIntensity:0.18; roughness:0.85");
-      bot.appendChild(body);
+    const name = document.createElement("a-text");
+    name.setAttribute("value", "BOT " + (idx+1));
+    name.setAttribute("align","center");
+    name.setAttribute("color","#9ff");
+    name.setAttribute("width","4");
+    name.setAttribute("position","0 1.75 0");
+    bot.appendChild(name);
 
-      const head = document.createElement("a-sphere");
-      head.setAttribute("radius", "0.16");
-      head.setAttribute("position", "0 1.02 0");
-      head.setAttribute("material", "color:#111; emissive:#7b61ff; emissiveIntensity:0.22; roughness:0.8");
-      bot.appendChild(head);
-
-      // Mount bot to seat (slightly forward so it “sits”)
-      const seatPos = seat.object3D.position;
-      const seatRot = seat.object3D.rotation;
-
-      bot.object3D.position.set(seatPos.x, seatPos.y + 0.10, seatPos.z);
-      bot.object3D.rotation.set(0, seatRot.y, 0);
-
-      // slight forward offset in chair facing direction
-      bot.object3D.translateZ(0.10);
-
-      el.appendChild(bot);
-    });
-
-    if (window.hudLog) hudLog("Bots seated: 5 ✅ (1 seat reserved for you)");
+    this.el.appendChild(bot);
   }
 });
