@@ -1,5 +1,5 @@
 export async function init(ctx){
-  const { THREE, scene, rig, teleportSurfaces, walkSurfaces, updates, log } = ctx;
+  const { THREE, scene, rig, teleportSurfaces, walkSurfaces, log } = ctx;
   const say=(m)=>{ try{log(m);}catch(e){} console.log(m); };
 
   const lobbyR = 70;
@@ -10,12 +10,11 @@ export async function init(ctx){
   const pitFloorY = -pitDepth + 0.06;
 
   const entryAngle = 0;
-  const storeAngle = Math.PI/2;
 
-  // ✅ Spawn: behind pit, facing toward center/store direction
+  // ✅ Face toward center/table: yaw = PI (camera default looks -Z)
   ctx.spawnPos.set(0, 1.75, -42);
   ctx.spawnLook.set(0, 1.55, 0);
-  ctx.spawnYaw = 0;
+  ctx.spawnYaw = Math.PI;
 
   // textures
   function makeCanvasTex(drawFn, rx=1, ry=1){
@@ -99,16 +98,14 @@ export async function init(ctx){
   const hemi = new THREE.HemisphereLight(0xffffff, 0x303070, 1.55);
   hemi.position.set(0, 40, 0);
   scene.add(hemi);
-
   const top = new THREE.PointLight(0xffffff, 2.2, 650);
   top.position.set(0, 22, 0);
   scene.add(top);
 
-  // clear surfaces
   teleportSurfaces.length = 0;
   walkSurfaces.length = 0;
 
-  // floor ring (walk + teleport)
+  // Floor ring
   const innerFloorR = pitR + 0.30;
   const floorRing = new THREE.Mesh(new THREE.RingGeometry(innerFloorR, lobbyR, 220, 1), floorMat);
   floorRing.rotation.x = -Math.PI/2;
@@ -116,32 +113,12 @@ export async function init(ctx){
   teleportSurfaces.push(floorRing);
   walkSurfaces.push(floorRing);
 
-  // walls
+  // Walls
   const wall = new THREE.Mesh(new THREE.CylinderGeometry(lobbyR, lobbyR, wallH, 220, 1, true), wallMat);
   wall.position.y = wallH/2;
   scene.add(wall);
 
-  // spawn pad (walk + teleport)
-  {
-    const pad = new THREE.Mesh(
-      new THREE.CylinderGeometry(2.4, 2.4, 0.22, 40),
-      neonBasic(0x00ffff)
-    );
-    pad.position.set(0, 0.11, -42);
-    scene.add(pad);
-    teleportSurfaces.push(pad);
-    walkSurfaces.push(pad);
-
-    // small base plate under pad for clear “home”
-    const base = new THREE.Mesh(
-      new THREE.CylinderGeometry(2.8, 2.8, 0.08, 40),
-      metalDark
-    );
-    base.position.set(0, 0.04, -42);
-    scene.add(base);
-  }
-
-  // pit wall + floor (walk + teleport)
+  // Pit
   const pitWall = new THREE.Mesh(new THREE.CylinderGeometry(pitR, pitR, pitDepth, 180, 1, true), pitWallMat);
   pitWall.position.y = -pitDepth/2 + 0.08;
   scene.add(pitWall);
@@ -153,43 +130,15 @@ export async function init(ctx){
   teleportSurfaces.push(pitFloor);
   walkSurfaces.push(pitFloor);
 
-  // trim low (border)
+  // Low trim border
   const trim = new THREE.Mesh(new THREE.TorusGeometry(pitR+0.25, 0.11, 10, 200), neonBasic(0xff00aa));
   trim.rotation.x = Math.PI/2;
   trim.position.y = 0.22;
   scene.add(trim);
 
-  // pit rail
-  {
-    const railR = pitR + 1.55;
-    const railY = 1.15;
-    const opening = Math.PI/7;
-
-    const postCount = 44;
-    const postG = new THREE.CylinderGeometry(0.08, 0.08, 1.1, 10);
-
-    for (let i=0;i<postCount;i++){
-      const a = (i/postCount)*Math.PI*2;
-      const dist = Math.abs(((a-entryAngle+Math.PI)%(Math.PI*2))-Math.PI);
-      if (dist < opening*0.62) continue;
-
-      const x = Math.cos(a)*railR;
-      const z = Math.sin(a)*railR;
-      const post = new THREE.Mesh(postG, metalRail);
-      post.position.set(x, railY-0.47, z);
-      scene.add(post);
-    }
-
-    const topRail = new THREE.Mesh(new THREE.TorusGeometry(railR, 0.085, 10, 240), neonBasic(0x00d5ff));
-    topRail.rotation.x = Math.PI/2;
-    topRail.position.y = railY + 0.05;
-    scene.add(topRail);
-  }
-
-  // stairs: add one more + bottom plate flush
+  // Stairs + bottom plate placed under LAST step
   {
     const opening = Math.PI/7;
-
     const platR = (pitR + 0.3) + 0.95;
 
     const topPed = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.22, 4.1), metalDark);
@@ -199,21 +148,12 @@ export async function init(ctx){
     teleportSurfaces.push(topPed);
     walkSurfaces.push(topPed);
 
-    // ✅ bottom plate flush to pit floor and under last step
-    const bottomPlate = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.16, 3.6), metalDark);
-    bottomPlate.position.set(Math.cos(entryAngle)*(pitR-1.25), pitFloorY + 0.08, Math.sin(entryAngle)*(pitR-1.25));
-    bottomPlate.rotation.y = entryAngle;
-    scene.add(bottomPlate);
-    teleportSurfaces.push(bottomPlate);
-    walkSurfaces.push(bottomPlate);
-
-    // ✅ 11 steps now
     const stepCount = 11;
     const stepW = 2.12;
     const stepD = 1.00;
 
     const yTop = 0.86;
-    const yBot = pitFloorY + 0.28; // land nearer the plate
+    const yBot = pitFloorY + 0.28;
     const stepH = (yTop - yBot) / stepCount;
 
     const r = pitR - 0.62;
@@ -225,10 +165,13 @@ export async function init(ctx){
       emissive:0x12003a, emissiveIntensity:0.22
     });
 
-    // ✅ Rail on opposite side now (OUTER side)
-    const railSideR = r + 1.05; // outer side vs inside
+    // ✅ RIGHT side rail = inner side toward pit center
+    const railSideR = r - 1.05;
     const poleG = new THREE.CylinderGeometry(0.06,0.06,0.95,10);
     let prevRailPos = null;
+
+    // We’ll record the last step position
+    let lastStepPos = new THREE.Vector3();
 
     for (let i=0;i<stepCount;i++){
       const t = (i+1)/stepCount;
@@ -244,6 +187,8 @@ export async function init(ctx){
       scene.add(step);
       teleportSurfaces.push(step);
       walkSurfaces.push(step);
+
+      if (i === stepCount - 1) lastStepPos.set(x, y, z);
 
       const rx = Math.cos(a)*railSideR;
       const rz = Math.sin(a)*railSideR;
@@ -264,6 +209,14 @@ export async function init(ctx){
       }
       prevRailPos = railPos;
     }
+
+    // ✅ Bottom plate moved under last step, touching floor
+    const bottomPlate = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.16, 3.6), metalDark);
+    bottomPlate.position.set(lastStepPos.x, pitFloorY + 0.08, lastStepPos.z);
+    bottomPlate.rotation.y = Math.atan2(lastStepPos.x, lastStepPos.z); // stable-ish align
+    scene.add(bottomPlate);
+    teleportSurfaces.push(bottomPlate);
+    walkSurfaces.push(bottomPlate);
   }
 
   // Apply spawn now
@@ -271,5 +224,5 @@ export async function init(ctx){
   rig.rotation.set(0, ctx.spawnYaw, 0);
   rig.lookAt(ctx.spawnLook);
 
-  say("✅ Added spawn pad + fixed locomotion visuals anchoring (via input), added 1 stair + bottom plate flush, and moved stair rail to opposite (outer) side.");
-                                  }
+  say("✅ Fixed: spawn faces table (yaw=PI), laser will follow you (input world->local), bottom plate moved under last step, stair rail moved to right side (inner).");
+                                                     }
