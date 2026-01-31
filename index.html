@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>SCARLETT1</title>
+  <title>SVR</title>
 
   <!-- A-Frame CDN -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
@@ -32,10 +32,8 @@
     embedded
     webxr="optionalFeatures: local-floor, bounded-floor, hand-tracking; referenceSpaceType: local-floor;"
   >
-    <!-- We build everything from JS -->
     <a-entity id="appRoot" scarlett-app></a-entity>
 
-    <!-- Camera rig -->
     <a-entity id="rig" position="0 0 0">
       <a-entity id="camera"
         camera
@@ -43,7 +41,6 @@
         position="0 1.6 0">
       </a-entity>
 
-      <!-- Controllers (when controllers are on) -->
       <a-entity id="leftHand"
         oculus-touch-controls="hand: left"
         raycaster="objects: .teleportable; far: 30; showLine: false">
@@ -54,12 +51,10 @@
         raycaster="objects: .teleportable; far: 30; showLine: false">
       </a-entity>
 
-      <!-- Real hands (when controllers are off) -->
       <a-entity id="leftRealHand" hand-tracking-controls="hand: left"></a-entity>
       <a-entity id="rightRealHand" hand-tracking-controls="hand: right"></a-entity>
     </a-entity>
 
-    <!-- A simple floor hit target (teleportable) -->
     <a-circle class="teleportable" id="globalFloor"
       rotation="-90 0 0"
       radius="60"
@@ -69,6 +64,7 @@
 
   </a-scene>
 
+  <!-- IMPORTANT: path is relative to /SVR/ -->
   <script type="module" src="./js/scarlett1/main.js"></script>
 </body>
 </html>
