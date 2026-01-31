@@ -6,69 +6,72 @@
     }
   }
 
-  function togglePit(pit, lobby, btn, labelEl) {
-    const isPit = pit.getAttribute("visible") === true || pit.getAttribute("visible") === "true";
+  // --------- PIT / LOBBY TOGGLE ----------
+  function setMode(mode, pit, lobby, btn, labelEl) {
+    const isPit = (mode === "pit");
 
-    if (!isPit) {
-      pit.setAttribute("visible", "true");
-      lobby.setAttribute("visible", "false");
-      hudSetTop("Poker Pit ✅");
-      hudLog("Pit ON (table + seats + bots + jumbotron)");
-      if (btn) btn.textContent = "Back To Lobby";
-      if (labelEl) labelEl.setAttribute("value", "BACK TO LOBBY");
-    } else {
-      pit.setAttribute("visible", "false");
-      lobby.setAttribute("visible", "true");
-      hudSetTop("Lobby ✅");
-      hudLog("Lobby ON");
-      if (btn) btn.textContent = "Enter Poker Pit";
-      if (labelEl) labelEl.setAttribute("value", "ENTER POKER PIT");
-    }
+    pit.setAttribute("visible", isPit ? "true" : "false");
+    lobby.setAttribute("visible", isPit ? "false" : "true");
+
+    if (btn) btn.textContent = isPit ? "Back To Lobby" : "Enter Poker Pit";
+    if (labelEl) labelEl.setAttribute("value", isPit ? "BACK TO LOBBY" : "ENTER POKER PIT");
+
+    if (window.hudSetTop) hudSetTop(isPit ? "Poker Pit ✅" : "Lobby ✅");
+    if (window.hudLog) hudLog(isPit ? "Pit ON" : "Lobby ON");
+
+    // Show VR panel only in lobby (so it's not in your face in pit)
+    const panel = document.getElementById("vrPitPanel");
+    if (panel) panel.setAttribute("visible", isPit ? "false" : "true");
+
+    // Show teleport pads only in pit (optional)
+    const pads = document.getElementById("teleportPads");
+    if (pads) pads.setAttribute("visible", isPit ? "true" : "false");
   }
 
-  // --- XR Thumbstick Move + Turn (Quest-safe) ---
-  // Uses controller axismove events and moves the rig in world-space.
+  function toggleMode(pit, lobby, btn, labelEl) {
+    const isPit = pit.getAttribute("visible") === true || pit.getAttribute("visible") === "true";
+    setMode(isPit ? "lobby" : "pit", pit, lobby, btn, labelEl);
+  }
+
+  // --------- XR LOCOMOTION (FIXED INVERSION) ----------
+  // Left stick: move (forward/back + strafe)
+  // Right stick: smooth yaw turn (left/right)
   AFRAME.registerComponent("svr-xr-locomotion", {
     schema: {
-      moveSpeed: { default: 2.0 },   // meters/sec
-      turnSpeed: { default: 1.8 },   // radians/sec
-      deadzone:  { default: 0.12 },
-      smoothTurn:{ default: true }   // smooth yaw; set false later for snap
+      moveSpeed: { default: 2.1 },
+      turnSpeed: { default: 1.9 },
+      deadzone:  { default: 0.12 }
     },
 
     init: function () {
-      // axis data
       this.leftAxis  = [0, 0];
       this.rightAxis = [0, 0];
 
-      this._tmpDir   = new THREE.Vector3();
-      this._tmpRight = new THREE.Vector3();
-      this._up       = new THREE.Vector3(0, 1, 0);
+      this._fwd   = new THREE.Vector3();
+      this._right = new THREE.Vector3();
+      this._up    = new THREE.Vector3(0, 1, 0);
 
       const left  = document.getElementById("leftHand");
       const right = document.getElementById("rightHand");
 
-      // On Quest:
-      // - left stick commonly used for move (x,y)
-      // - right stick commonly used for turn (x) (and sometimes move)
       if (left) {
         left.addEventListener("axismove", (e) => {
           const a = e.detail.axis || [];
-          // many controllers: x=a[2], y=a[3]
-          this.leftAxis[0] = a[2] || 0;
-          this.leftAxis[1] = a[3] || 0;
+          // Quest typical: x=a[2], y=a[3]
+          this.leftAxis[0] = a[2] || 0; // strafe
+          this.leftAxis[1] = a[3] || 0; // forward/back
         });
       }
 
       if (right) {
         right.addEventListener("axismove", (e) => {
           const a = e.detail.axis || [];
-          this.rightAxis[0] = a[2] || 0;
+          this.rightAxis[0] = a[2] || 0; // turn
           this.rightAxis[1] = a[3] || 0;
         });
       }
 
-      hudLog("XR locomotion armed ✅ (left stick move, right stick turn)");
+      hudLog("XR locomotion ✅ (fixed inversion)");
     },
 
     tick: function (t, dt) {
@@ -76,68 +79,107 @@
       if (!scene || !scene.is("vr-mode")) return;
 
       const ms = (dt || 16) / 1000;
+      const dz = this.data.deadzone;
 
-      // READ AXES
+      // Movement (LEFT stick)
       let mx = this.leftAxis[0];
       let my = this.leftAxis[1];
 
-      // If left axis not reporting on a device, fall back to right axis for movement
-      if (Math.abs(mx) < 0.0001 && Math.abs(my) < 0.0001) {
-        mx = this.rightAxis[0];
-        my = this.rightAxis[1];
-      }
-
-      // TURN (right stick X)
-      const tx = this.rightAxis[0];
-
-      // DEADZONE
-      const dz = this.data.deadzone;
       if (Math.abs(mx) < dz) mx = 0;
       if (Math.abs(my) < dz) my = 0;
 
-      let turn = tx;
+      // Turn (RIGHT stick X)
+      let turn = this.rightAxis[0];
       if (Math.abs(turn) < dz) turn = 0;
 
-      // --- APPLY TURN ---
+      // Apply smooth turn
       if (turn !== 0) {
         const yawDelta = (-turn) * this.data.turnSpeed * ms;
         this.el.object3D.rotation.y += yawDelta;
       }
 
-      // --- APPLY MOVE (relative to camera forward) ---
       if (mx === 0 && my === 0) return;
 
+      // Direction based on camera forward
       const cam = document.getElementById("camera");
       if (!cam) return;
 
-      // camera forward (world)
-      cam.object3D.getWorldDirection(this._tmpDir);
-      this._tmpDir.y = 0;
-      this._tmpDir.normalize();
+      cam.object3D.getWorldDirection(this._fwd);
+      this._fwd.y = 0;
+      this._fwd.normalize();
 
-      // right vector
-      this._tmpRight.crossVectors(this._tmpDir, this._up).normalize();
+      this._right.crossVectors(this._fwd, this._up).normalize();
 
+      // ✅ FIXED INVERSION:
+      // - Forward should be forward: use (+my) instead of (-my)
+      // - Left/right should be correct: use (+mx) but invert if needed.
       const speed = this.data.moveSpeed;
 
-      // Note: forward is -my (Quest stick up is negative)
-      this.el.object3D.position.addScaledVector(this._tmpDir, (-my) * speed * ms);
-      this.el.object3D.position.addScaledVector(this._tmpRight, (mx) * speed * ms);
+      this.el.object3D.position.addScaledVector(this._fwd, (my) * speed * ms);
+      this.el.object3D.position.addScaledVector(this._right, (mx) * speed * ms);
     }
   });
 
-  function createInWorldButtonAttachToCamera(cameraEl, pit, lobby, btn) {
-    // prevent duplicates
+  // --------- TELEPORT PADS + TELEPORT CLICK ----------
+  // We make a few pads around pit. Click pad with laser to teleport rig there.
+  AFRAME.registerComponent("svr-teleport-pad", {
+    schema: { x:{default:0}, y:{default:0}, z:{default:0} },
+    init: function () {
+      this.el.classList.add("clickable");
+      this.el.addEventListener("click", () => {
+        const rig = document.getElementById("rig");
+        if (!rig) return;
+        rig.setAttribute("position", `${this.data.x} ${this.data.y} ${this.data.z}`);
+        hudLog(`Teleported to: ${this.data.x.toFixed(1)}, ${this.data.z.toFixed(1)} ✅`);
+      });
+    }
+  });
+
+  function buildTeleportPads(scene) {
+    if (document.getElementById("teleportPads")) return;
+
+    const pads = document.createElement("a-entity");
+    pads.setAttribute("id", "teleportPads");
+    pads.setAttribute("visible", "false"); // only in pit
+
+    // Positions around the table (adjust anytime)
+    const points = [
+      { x: 0,   y: 0, z: 6.0  }, // front
+      { x: 0,   y: 0, z: -6.0 }, // back
+      { x: 6.0, y: 0, z: 0    }, // right
+      { x:-6.0, y: 0, z: 0    }, // left
+      { x: 0,   y: 0, z: 3.8  }, // closer front
+    ];
+
+    points.forEach((p) => {
+      const ring = document.createElement("a-ring");
+      ring.setAttribute("radius-inner", "0.35");
+      ring.setAttribute("radius-outer", "0.55");
+      ring.setAttribute("rotation", "-90 0 0");
+      ring.setAttribute("position", `${p.x} 0.02 ${p.z}`);
+      ring.setAttribute("material", "color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.2; opacity:0.85; transparent:true");
+      ring.setAttribute("svr-teleport-pad", `x:${p.x}; y:${p.y}; z:${p.z}`);
+      pads.appendChild(ring);
+    });
+
+    scene.appendChild(pads);
+    hudLog("Teleport pads ready ✅ (laser-click rings)");
+  }
+
+  // --------- VR PIT PANEL (NOT IN YOUR FACE) ----------
+  function createVrPanel(cameraEl, pit, lobby, btn) {
     if (document.getElementById("vrPitPanel")) return;
 
     const panel = document.createElement("a-entity");
     panel.setAttribute("id", "vrPitPanel");
-    panel.setAttribute("position", "0 -0.15 -0.85");
+    // moved farther + slightly lower so it’s not “in your face”
+    panel.setAttribute("position", "0 -0.35 -1.25");
+    panel.setAttribute("visible", "true");
 
     const bg = document.createElement("a-plane");
     bg.setAttribute("width", "1.05");
     bg.setAttribute("height", "0.25");
-    bg.setAttribute("material", "color:#0b0f14; opacity:0.78; transparent:true");
+    bg.setAttribute("material", "color:#0b0f14; opacity:0.65; transparent:true");
     panel.appendChild(bg);
 
     const label = document.createElement("a-text");
@@ -149,10 +191,10 @@
     panel.appendChild(label);
 
     panel.classList.add("clickable");
-    panel.addEventListener("click", () => togglePit(pit, lobby, btn, label));
+    panel.addEventListener("click", () => toggleMode(pit, lobby, btn, label));
 
     cameraEl.appendChild(panel);
-    hudLog("VR Pit panel ✅");
+    hudLog("VR panel ready ✅ (only shows in lobby)");
   }
 
   function boot() {
@@ -168,27 +210,31 @@
       return;
     }
 
-    hudSetTop("Scarlett1 A-Frame booting…");
+    hudSetTop("Scarlett1 booting…");
     hudLog("A-Frame loaded ✅");
-    hudLog("Quest SAFE XR mode ✅");
 
     scene.addEventListener("loaded", () => {
       hudSetTop("Scene loaded ✅");
-      hudLog("Android: HTML button works.");
-      hudLog("Quest: VR panel + locomotion activates on enter-vr.");
 
-      if (btn) btn.addEventListener("click", () => togglePit(pit, lobby, btn, null));
+      // DOM button (Android)
+      if (btn) btn.addEventListener("click", () => toggleMode(pit, lobby, btn, null));
+
+      // Build teleport pads now (hidden until pit)
+      buildTeleportPads(scene);
+
+      // Start in lobby
+      setMode("lobby", pit, lobby, btn, null);
 
       scene.addEventListener("enter-vr", () => {
         hudLog("enter-vr ✅");
 
-        // Attach locomotion AFTER VR starts (prevents loader hang)
+        // Enable locomotion after XR starts
         rig.setAttribute("svr-xr-locomotion", "moveSpeed:2.1; turnSpeed:1.9; deadzone:0.12");
 
-        // VR pit panel always visible
-        createInWorldButtonAttachToCamera(cameraEl, pit, lobby, btn);
+        // VR panel (only lobby)
+        createVrPanel(cameraEl, pit, lobby, btn);
 
-        hudLog("Move: LEFT stick. Turn: RIGHT stick.");
+        hudLog("Move: LEFT stick. Turn: RIGHT stick. Teleport: click floor rings.");
       });
     });
   }
