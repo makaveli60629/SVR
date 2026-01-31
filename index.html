@@ -2,37 +2,42 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Scarlett VR</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Scarlett VR - Scarlett1</title>
   <style>
-    html,body{margin:0;height:100%;background:#000;color:#9ff;font:12px monospace}
-    #log{white-space:pre-wrap;padding:12px}
+    html,body{margin:0;height:100%;background:#000;overflow:hidden}
+    #log{
+      position:fixed;left:10px;top:10px;z-index:9999;color:#9ff;
+      font:12px ui-monospace,Menlo,Consolas,monospace;
+      background:rgba(0,0,0,.55);padding:10px 12px;border-radius:10px;
+      white-space:pre-wrap;max-width:84vw;pointer-events:none
+    }
+    #btnEnter{
+      position:fixed;right:12px;top:12px;z-index:10000;
+      padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.25);
+      background:rgba(0,0,0,.45);color:#fff;font-weight:800
+    }
   </style>
 </head>
 <body>
   <div id="log">BOOT…</div>
+  <button id="btnEnter">Enter Poker Pit</button>
 
   <script>
     const out = document.getElementById('log');
     const log = (m)=> out.textContent += "\n" + m;
 
-    // Auto-detect base path: "/SVR/" for project pages, "/" for user pages
-    // Example pathnames:
-    //  "/"                -> base "/"
-    //  "/SVR/"            -> base "/SVR/"
-    //  "/SVR/index.html"  -> base "/SVR/"
+    // Auto-detect GitHub Pages base:
+    // "/" (user page) OR "/SVR/" (project page)
     const parts = location.pathname.split('/').filter(Boolean);
     const base = parts.length ? `/${parts[0]}/` : `/`;
-
+    window.__SVR_BASE__ = base;
     log("Base detected: " + base);
 
-    // Catch errors on-screen (Quest-friendly)
     window.addEventListener("error",(e)=>log("ERR: " + e.message));
     window.addEventListener("unhandledrejection",(e)=>log("REJ: " + (e.reason?.message || e.reason)));
 
-    // Helper to build absolute URL under base
-    const u = (p)=> base + p.replace(/^\/+/,''); // strip leading slashes
-
+    const u = (p)=> base + p.replace(/^\/+/,'');
     log("Importing: " + u("js/scarlett1/main.js"));
 
     import(u("js/scarlett1/main.js"))
