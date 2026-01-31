@@ -5,6 +5,9 @@ export const Spine = {
   async start(){
     const hudStatus = document.getElementById("status");
     const hudLog = document.getElementById("log");
+    const btnVR = document.getElementById("btnVR");
+    const btnSpawn = document.getElementById("btnSpawn");
+    const btnReload = document.getElementById("btnReload");
 
     const log = (m) => {
       const line = (typeof m === "string") ? m : JSON.stringify(m, null, 2);
@@ -12,10 +15,9 @@ export const Spine = {
       hudLog.scrollTop = hudLog.scrollHeight;
       console.log(line);
     };
-
     const setStatus = (t) => { hudStatus.textContent = t; };
 
-    // Catch unhandled errors and show them
+    // Show *every* error on the HUD
     window.addEventListener("error", (e)=>{
       setStatus("❌ JS error");
       log("❌ window.error: " + (e?.message || "unknown"));
@@ -39,6 +41,7 @@ export const Spine = {
       renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.xr.enabled = true;
+      renderer.xr.setReferenceSpaceType("local-floor");
       document.body.appendChild(renderer.domElement);
 
       // Scene + Camera + Rig
@@ -55,7 +58,7 @@ export const Spine = {
       const controller2 = renderer.xr.getController(1);
       scene.add(controller1, controller2);
 
-      // Context shared with modules
+      // Shared ctx
       const ctx = {
         THREE, scene, camera, rig, renderer,
         controller1, controller2,
@@ -72,61 +75,78 @@ export const Spine = {
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
 
-      // HARD RELOAD
-      document.getElementById("btnReload").onclick = ()=> location.reload(true);
+      // Buttons
+      btnReload.onclick = ()=> location.reload(true);
 
-      // Reset Spawn
-      document.getElementById("btnSpawn").onclick = ()=>{
+      btnSpawn.onclick = ()=>{
         rig.position.set(0, 1.7, -26);
         rig.lookAt(0, 1.6, 0);
         log("✅ spawn reset");
       };
 
-      // ✅ REAL ENTER VR (no VRButton needed)
-      document.getElementById("btnVR").onclick = async ()=>{
+      // ✅ Detect XR support at boot (so we don’t guess)
+      let xrAvailable = !!navigator.xr;
+      let vrSupported = false;
+      let arSupported = false;
+
+      log("navigator.xr=" + (xrAvailable ? "present ✅" : "missing ❌"));
+
+      if (xrAvailable) {
+        try { vrSupported = await navigator.xr.isSessionSupported("immersive-vr"); }
+        catch(e){ vrSupported = false; }
+        try { arSupported = await navigator.xr.isSessionSupported("immersive-ar"); }
+        catch(e){ arSupported = false; }
+
+        log("immersive-vr supported=" + (vrSupported ? "✅" : "❌"));
+        log("immersive-ar supported=" + (arSupported ? "✅" : "❌"));
+      } else {
+        log("Tip: Quest requires Meta/Oculus Browser. Most phones won’t expose navigator.xr for VR.");
+      }
+
+      // Update the Enter VR button based on support
+      if (!vrSupported) {
+        btnVR.disabled = true;
+        btnVR.style.opacity = "0.5";
+        btnVR.textContent = "VR Unsupported";
+        setStatus("ready ✅ (VR unsupported on this device)");
+      }
+
+      // ✅ REAL Enter VR
+      btnVR.onclick = async ()=>{
+        log("▶ Enter VR pressed");
+        setStatus("requesting VR…");
+
         try {
-          if (!window.isSecureContext) {
-            log("❌ WebXR requires HTTPS / secure context.");
-            return;
-          }
-          if (!navigator.xr) {
-            log("❌ navigator.xr not available on this browser/device.");
-            log("Tip: Quest → Meta/Oculus Browser. Android Chrome often has no immersive-vr.");
-            return;
-          }
+          if (!window.isSecureContext) throw new Error("WebXR requires HTTPS (secure context).");
+          if (!navigator.xr) throw new Error("navigator.xr missing (not WebXR capable browser).");
 
-          // Check support
-          let supported = false;
-          try {
-            supported = await navigator.xr.isSessionSupported("immersive-vr");
-          } catch(e) {
-            // Some browsers throw; treat as unsupported
-            supported = false;
-          }
-          if (!supported) {
-            log("❌ immersive-vr not supported here.");
-            log("Tip: This is expected on most Android phones. Use Quest Browser for VR.");
-            return;
-          }
+          const ok = await navigator.xr.isSessionSupported("immersive-vr");
+          if (!ok) throw new Error("immersive-vr not supported on this device/browser.");
 
-          log("… requesting immersive-vr session");
           const session = await navigator.xr.requestSession("immersive-vr", {
             optionalFeatures: [
               "local-floor",
               "bounded-floor",
               "hand-tracking",
-              "layers"
-            ]
+              "layers",
+              "dom-overlay"
+            ],
+            domOverlay: { root: document.body }
           });
 
-          session.addEventListener("end", ()=> log("ℹ️ XR session ended"));
-          await renderer.xr.setSession(session);
+          session.addEventListener("end", ()=>{
+            log("ℹ️ XR session ended");
+            setStatus("ready ✅");
+          });
 
+          await renderer.xr.setSession(session);
           log("✅ Entered VR session");
+          setStatus("VR ✅");
         } catch (e) {
           log("❌ Enter VR failed:");
           log(e?.message || String(e));
           if (e?.stack) log(e.stack);
+          setStatus("ready ✅ (VR failed)");
         }
       };
 
@@ -141,25 +161,25 @@ export const Spine = {
         if (e?.stack) log(e.stack);
       }
 
-      // Load world (with fallback if it fails)
+      // Load world
       setStatus("loading world…");
       log("--- loading scarlett1/world.js ---");
-
       try {
         const mod = await import("../scarlett1/world.js");
         const worldInit = mod?.init;
-        if (typeof worldInit !== "function") throw new Error("world.js loaded but did not export init(ctx)");
+        if (typeof worldInit !== "function") throw new Error("world.js did not export init(ctx)");
         await worldInit(ctx);
         log("✅ world loaded");
       } catch (e) {
-        log("❌ world failed, using fallback world:");
+        log("❌ world failed:");
         log(e?.message || String(e));
         if (e?.stack) log(e.stack);
-        fallbackWorld(ctx);
       }
 
-      // Start render loop
-      setStatus("ready ✅");
+      // Render loop
+      if (vrSupported) setStatus("ready ✅ (VR available)");
+      else setStatus("ready ✅");
+
       let last = performance.now();
       renderer.setAnimationLoop(()=>{
         const now = performance.now();
@@ -169,7 +189,6 @@ export const Spine = {
         for (const fn of ctx.updates) {
           try { fn(dt); } catch (e) { log("❌ update error: " + (e?.message || e)); }
         }
-
         renderer.render(scene, camera);
       });
 
@@ -178,29 +197,6 @@ export const Spine = {
       hudLog.textContent += "\n❌ BOOT FAILED:\n" + (e?.message || String(e)) + "\n";
       if (e?.stack) hudLog.textContent += e.stack + "\n";
       console.error(e);
-    }
-
-    function fallbackWorld(ctx){
-      const { THREE, scene, rig, teleportSurfaces, walkSurfaces, log } = ctx;
-
-      scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-      const dir = new THREE.DirectionalLight(0xffffff, 1.0);
-      dir.position.set(10,18,12);
-      scene.add(dir);
-
-      const floor = new THREE.Mesh(
-        new THREE.CircleGeometry(30, 64),
-        new THREE.MeshStandardMaterial({ color: 0x222233, roughness: 0.95 })
-      );
-      floor.rotation.x = -Math.PI/2;
-      scene.add(floor);
-      teleportSurfaces.push(floor);
-      walkSurfaces.push(floor);
-
-      rig.position.set(0, 1.7, -12);
-      rig.lookAt(0, 1.6, 0);
-
-      log("✅ FALLBACK world displayed.");
     }
   }
 };
