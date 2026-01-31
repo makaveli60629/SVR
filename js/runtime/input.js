@@ -11,10 +11,11 @@ export const Input = {
   lastSelectTime: 0,
   holdingSelect: false,
 
-  locomotionGroup: null,
-  rayLine: null,
-  reticle: null,
-  feetRing: null,
+  // visuals
+  rayRoot: null,     // a small group we "pose" to the active aim
+  rayLine: null,     // child of rayRoot (LOCAL geometry)
+  reticle: null,     // world-space at hit point
+  feetRing: null,    // world-space at rig feet
 
   init(ctx) {
     this.ctx = ctx;
@@ -26,7 +27,7 @@ export const Input = {
     const onSelectEnd = () => {
       const t = performance.now() - this.lastSelectTime;
       this.holdingSelect = false;
-      if (t < 260) this.teleportQueued = true;
+      if (t < 260) this.teleportQueued = true; // tap = teleport
     };
 
     ctx.controller1?.addEventListener("selectstart", onSelectStart);
@@ -35,9 +36,10 @@ export const Input = {
     ctx.controller2?.addEventListener("selectend", onSelectEnd);
 
     this.buildViz();
-    console.log("✅ Input ready (laser fixed: world->local)");
+    console.log("✅ Input ready (ray posed to active aim)");
   },
 
+  // ---- helpers
   deadzone(v, dz = 0.18) {
     if (Math.abs(v) < dz) return 0;
     const s = (Math.abs(v) - dz) / (1 - dz);
@@ -54,20 +56,19 @@ export const Input = {
     }
   },
 
+  // controller pose is valid if it's not at/near origin
+  controllerOk(c) {
+    if (!c) return false;
+    const p = this._tmpV || (this._tmpV = new this.ctx.THREE.Vector3());
+    c.getWorldPosition(p);
+    return (Math.abs(p.x) + Math.abs(p.y) + Math.abs(p.z)) > 0.001;
+  },
+
   pickAim() {
-    const { THREE, controller1, controller2 } = this.ctx;
-    const cam = this.getXRCamera();
-    const tmp = new THREE.Vector3();
-
-    const ok = (c) => {
-      if (!c) return false;
-      c.getWorldPosition(tmp);
-      return (Math.abs(tmp.x) + Math.abs(tmp.y) + Math.abs(tmp.z)) > 0.001;
-    };
-
-    if (ok(controller1)) return controller1;
-    if (ok(controller2)) return controller2;
-    return cam;
+    const { controller1, controller2 } = this.ctx;
+    if (this.controllerOk(controller1)) return controller1;
+    if (this.controllerOk(controller2)) return controller2;
+    return this.getXRCamera();
   },
 
   getForward() {
@@ -77,8 +78,7 @@ export const Input = {
     cam.getWorldDirection(d);
     d.y = 0;
     const l = Math.hypot(d.x, d.z) || 1;
-    d.x /= l;
-    d.z /= l;
+    d.x /= l; d.z /= l;
     return d;
   },
 
@@ -97,50 +97,91 @@ export const Input = {
     return { x: p.x, y: -(p.y) };
   },
 
+  // ---- build visuals
   buildViz() {
     const { THREE, scene } = this.ctx;
 
-    // Feet ring (world) glued to rig
+    // Feet ring
     this.feetRing = new THREE.Mesh(
       new THREE.RingGeometry(0.20, 0.40, 44),
       new THREE.MeshBasicMaterial({
         color: 0x00c8ff,
         transparent: true,
         opacity: 0.75,
-        side: THREE.DoubleSide,
+        side: THREE.DoubleSide
       })
     );
     this.feetRing.rotation.x = -Math.PI / 2;
     scene.add(this.feetRing);
 
-    // Locomotion group (we position/rotate it to XR camera each frame)
-    this.locomotionGroup = new THREE.Group();
-    scene.add(this.locomotionGroup);
+    // Ray root (we set its world pose to the aim each frame)
+    this.rayRoot = new THREE.Group();
+    scene.add(this.rayRoot);
 
-    // Ray line geometry (LOCAL to locomotionGroup — we write local coords!)
+    // Ray line (LOCAL to rayRoot)
     const geom = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, 0, -3),
+      new THREE.Vector3(0, 0, -6),
     ]);
     this.rayLine = new THREE.Line(
       geom,
       new THREE.LineBasicMaterial({ color: 0x00ffff })
     );
-    this.locomotionGroup.add(this.rayLine);
+    this.rayRoot.add(this.rayLine);
 
-    // Reticle is world-space at hit point
+    // Reticle
     this.reticle = new THREE.Mesh(
       new THREE.RingGeometry(0.12, 0.18, 40),
       new THREE.MeshBasicMaterial({
         color: 0x00ffff,
         transparent: true,
         opacity: 0.95,
-        side: THREE.DoubleSide,
+        side: THREE.DoubleSide
       })
     );
     this.reticle.rotation.x = -Math.PI / 2;
     this.reticle.visible = false;
     scene.add(this.reticle);
+  },
+
+  updateFeetRing() {
+    const { rig } = this.ctx;
+    this.feetRing.position.set(rig.position.x, rig.position.y - 1.68, rig.position.z);
+  },
+
+  // Pose rayRoot to aim (world pose)
+  poseRayToAim(aimObj) {
+    const { THREE } = this.ctx;
+    const p = new THREE.Vector3();
+    const q = new THREE.Quaternion();
+    aimObj.getWorldPosition(p);
+    aimObj.getWorldQuaternion(q);
+    this.rayRoot.position.copy(p);
+    this.rayRoot.quaternion.copy(q);
+  },
+
+  rayTeleportFrom(aimObj) {
+    const { THREE, teleportSurfaces } = this.ctx;
+
+    const ray = new THREE.Raycaster();
+    const o = new THREE.Vector3();
+    const d = new THREE.Vector3();
+    aimObj.getWorldPosition(o);
+    aimObj.getWorldDirection(d);
+    ray.set(o, d.normalize());
+
+    const hits = ray.intersectObjects(teleportSurfaces, true);
+    return hits?.[0] || null;
+  },
+
+  updateReticle(hit) {
+    if (hit) {
+      this.reticle.visible = true;
+      this.reticle.position.copy(hit.point);
+      this.reticle.position.y += 0.02;
+    } else {
+      this.reticle.visible = false;
+    }
   },
 
   snapGround() {
@@ -154,75 +195,24 @@ export const Input = {
     );
     const hits = ray.intersectObjects(walkSurfaces, true);
     if (!hits?.length) return;
-
     rig.position.y = hits[0].point.y + 1.7;
-  },
-
-  rayTeleportFrom(fromObj) {
-    const { THREE, teleportSurfaces } = this.ctx;
-    const ray = new THREE.Raycaster();
-    const o = new THREE.Vector3();
-    const d = new THREE.Vector3();
-
-    fromObj.getWorldPosition(o);
-    fromObj.getWorldDirection(d);
-    ray.set(o, d.normalize());
-
-    const hits = ray.intersectObjects(teleportSurfaces, true);
-    return hits?.[0] || null;
-  },
-
-  updateFeetRing() {
-    const { rig } = this.ctx;
-    this.feetRing.position.set(rig.position.x, rig.position.y - 1.68, rig.position.z);
-  },
-
-  attachLocomotionToXRCamera() {
-    const cam = this.getXRCamera();
-    cam.getWorldPosition(this.locomotionGroup.position);
-    cam.getWorldQuaternion(this.locomotionGroup.quaternion);
-  },
-
-  // ✅ FIX: Write RAY in locomotionGroup LOCAL coordinates
-  updateViz(hit, fromObj) {
-    const { THREE } = this.ctx;
-
-    const oW = new THREE.Vector3();
-    const dW = new THREE.Vector3();
-    fromObj.getWorldPosition(oW);
-    fromObj.getWorldDirection(dW);
-
-    const endW = hit ? hit.point.clone() : oW.clone().add(dW.multiplyScalar(3.0));
-
-    // Convert world points to locomotionGroup local space
-    const oL = this.locomotionGroup.worldToLocal(oW.clone());
-    const eL = this.locomotionGroup.worldToLocal(endW.clone());
-
-    const arr = this.rayLine.geometry.attributes.position.array;
-    arr[0] = oL.x; arr[1] = oL.y; arr[2] = oL.z;
-    arr[3] = eL.x; arr[4] = eL.y; arr[5] = eL.z;
-    this.rayLine.geometry.attributes.position.needsUpdate = true;
-
-    if (hit) {
-      this.reticle.visible = true;
-      this.reticle.position.copy(hit.point);
-      this.reticle.position.y += 0.02;
-    } else {
-      this.reticle.visible = false;
-    }
   },
 
   update(dt) {
     const { rig, controller1, controller2 } = this.ctx;
     this.snapT = Math.max(0, this.snapT - dt);
 
-    this.attachLocomotionToXRCamera();
     this.updateFeetRing();
 
     const aim = this.pickAim();
-    const hit = this.rayTeleportFrom(aim);
-    this.updateViz(hit, aim);
 
+    // ✅ THIS is the laser fix: rayRoot follows aim pose every frame
+    this.poseRayToAim(aim);
+
+    const hit = this.rayTeleportFrom(aim);
+    this.updateReticle(hit);
+
+    // Tap trigger = teleport
     if (this.teleportQueued) {
       this.teleportQueued = false;
       if (hit) {
@@ -232,6 +222,7 @@ export const Input = {
       return;
     }
 
+    // Hold trigger = walk forward
     if (this.holdingSelect) {
       const f = this.getForward();
       rig.position.x += f.x * 2.0 * dt;
@@ -240,6 +231,7 @@ export const Input = {
       return;
     }
 
+    // Thumbsticks (best effort)
     const gp = this.getGamepad(controller1) || this.getGamepad(controller2);
     const a0 = this.pickStick(gp, 0);
     const a1 = this.pickStick(gp, 1);
