@@ -15,37 +15,33 @@ function showErr(err){
 
 export const Spine = {
   async start() {
-    // Always show failures instead of black screen
     window.addEventListener("error", (e) => showErr(e.error || e.message || e));
     window.addEventListener("unhandledrejection", (e) => showErr(e.reason || e));
 
     setStatus("init renderer…");
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // ✅ reduces Quest jitter
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
     renderer.setSize(innerWidth, innerHeight);
     renderer.xr.enabled = true;
-
-    // Brighter, but stable
-    renderer.toneMappingExposure = 1.45;
-
-    // Softer shadows OFF (shadows can cause jitter on Quest if enabled accidentally)
+    renderer.toneMappingExposure = 1.5;
     renderer.shadowMap.enabled = false;
 
     document.body.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x070812);
+    scene.fog = new THREE.Fog(0x070812, 35, 135);
 
-    // Small fog helps depth and hides far aliasing (also makes it feel “thicker”/more real)
-    scene.fog = new THREE.Fog(0x070812, 35, 130);
-
-    const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 800);
+    const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 900);
 
     const rig = new THREE.Group();
-    rig.position.set(0, 1.8, 24);
+    rig.position.set(0, 1.8, 26);          // pushed back so you never spawn in pit
     rig.add(camera);
     scene.add(rig);
+
+    // IMPORTANT: face toward pit center at boot
+    rig.lookAt(0, 1.6, 0);
 
     const controller1 = renderer.xr.getController(0);
     const controller2 = renderer.xr.getController(1);
@@ -63,7 +59,6 @@ export const Spine = {
       log: (...a) => console.log(...a),
       flags: { noClip: true },
       teleportSurfaces: [],
-      // world can register update callbacks here
       updates: []
     };
 
@@ -75,8 +70,9 @@ export const Spine = {
 
     // UI buttons
     document.getElementById("btnReset")?.addEventListener("click", () => {
-      rig.position.set(0, 1.8, 24);
+      rig.position.set(0, 1.8, 26);
       rig.rotation.set(0, 0, 0);
+      rig.lookAt(0, 1.6, 0);
     });
 
     document.getElementById("btnHard")?.addEventListener("click", () => {
@@ -92,22 +88,15 @@ export const Spine = {
           optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"]
         });
         renderer.xr.setSession(session);
-      } catch (e) {
-        showErr(e);
-      }
+      } catch (e) { showErr(e); }
     });
 
-    // ✅ Stable animation step
     const clock = new THREE.Clock();
     renderer.setAnimationLoop(() => {
       const dtRaw = clock.getDelta();
-      // Clamp dt so spikes don’t become big jumps
       const dt = Math.min(Math.max(dtRaw, 1/120), 1/30);
 
-      // Input first
       Input.update(dt);
-
-      // World updates (bots etc) — IMPORTANT: no extra rAF loops anywhere
       for (const fn of ctx.updates) fn(dt);
 
       setStatus(
@@ -118,6 +107,6 @@ export const Spine = {
       renderer.render(scene, camera);
     });
 
-    console.log("✅ Scarlett STABLE Demo: ready");
+    console.log("✅ Scarlett Demo: ready");
   }
 };
