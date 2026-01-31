@@ -1,9 +1,9 @@
 /**
- * spine.js — PERMANENT ROOT SPINE (XR RIG + GAMEPAD MOVE + TELEPORT)
+ * spine.js — PERMANENT ROOT SPINE (SPAWN PAD LOCK + MOVE + TELEPORT)
  * Fixes:
- *  - ALWAYS moves the RIG in XR (spawn/teleport/locomotion)
- *  - Smooth move (left stick) + snap turn (right stick) on Quest controllers
- *  - Teleport (trigger select) with marker
+ *  - Force XR spawn to Spawn Pad (not pit center)
+ *  - Robust Quest gamepad axes (prefer left-hand controller)
+ *  - Teleport marker + trigger teleport
  */
 
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
@@ -25,23 +25,24 @@ export const Spine = (() => {
     worldUpdates: [],
     teleportSurfaces: [],
 
-    controller1: null,
-    controller2: null,
-    grip1: null,
-    grip2: null,
-    hand1: null,
-    hand2: null,
+    controllerL: null,
+    controllerR: null,
+    gripL: null,
+    gripR: null,
+    handL: null,
+    handR: null,
 
     raycaster: null,
     marker: null,
     lastHit: null,
 
+    // spawn
     xrSpawn: { pos: new THREE.Vector3(0, 0, 14), yaw: Math.PI },
-    xrSpawnApplied: false,
+    spawnAppliedOnce: false,
 
-    // locomotion tuning
-    moveSpeed: 2.6,          // meters/sec
-    snapTurnDeg: 30,         // degrees per snap
+    // locomotion
+    moveSpeed: 2.8,
+    snapTurnDeg: 30,
     snapCooldown: 0.22,
     snapT: 0,
   };
@@ -77,7 +78,7 @@ export const Spine = (() => {
     S.raycaster.far = 80;
 
     S.marker = new THREE.Mesh(
-      new THREE.RingGeometry(0.20, 0.30, 40),
+      new THREE.RingGeometry(0.22, 0.34, 44),
       new THREE.MeshBasicMaterial({ color: 0x7a45ff, transparent: true, opacity: 0.95, side: THREE.DoubleSide })
     );
     S.marker.rotation.x = -Math.PI / 2;
@@ -92,10 +93,10 @@ export const Spine = (() => {
   }
 
   function applyXRSpawn() {
-    // IMPORTANT: move RIG, not camera
+    // ALWAYS move RIG, never camera
     S.rig.position.set(S.xrSpawn.pos.x, 0, S.xrSpawn.pos.z);
     S.rig.rotation.set(0, S.xrSpawn.yaw, 0);
-    S.xrSpawnApplied = true;
+    S.spawnAppliedOnce = true;
     S.diag?.log?.('[spawn] applied (rig moved) ✅');
   }
 
@@ -118,9 +119,20 @@ export const Spine = (() => {
     return h;
   }
 
-  function doTeleport() {
+  function doTeleportOrClick() {
     if (!S.lastHit) return;
-    // move rig
+
+    // MENU CLICK PRIORITY (if world provided handler)
+    try {
+      const clicked = window.__SCARLETT_WORLD_CLICK_PANEL__?.(S.lastHit);
+      if (clicked) {
+        S.marker.visible = false;
+        S.lastHit = null;
+        return;
+      }
+    } catch {}
+
+    // TELEPORT
     S.rig.position.x = S.lastHit.point.x;
     S.rig.position.z = S.lastHit.point.z;
     S.rig.position.y = 0;
@@ -136,81 +148,83 @@ export const Spine = (() => {
     const rayGeo = new THREE.BufferGeometry().setFromPoints([ new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,-1) ]);
     const rayMat = new THREE.LineBasicMaterial({ color: 0x2bd6ff });
 
-    S.controller1 = S.renderer.xr.getController(0);
-    S.controller2 = S.renderer.xr.getController(1);
+    // We’ll treat index 0/1 as L/R *after* checking handedness at runtime.
+    const c0 = S.renderer.xr.getController(0);
+    const c1 = S.renderer.xr.getController(1);
 
-    for (const c of [S.controller1, S.controller2]) {
+    for (const c of [c0, c1]) {
       const line = new THREE.Line(rayGeo, rayMat);
       line.scale.z = 40;
       c.add(line);
 
-      // trigger selects -> teleport
       c.addEventListener('selectstart', () => { c.userData.selecting = true; });
-      c.addEventListener('selectend',   () => { c.userData.selecting = false; doTeleport(); });
+      c.addEventListener('selectend',   () => { c.userData.selecting = false; doTeleportOrClick(); });
 
       S.scene.add(c);
     }
 
-    S.grip1 = S.renderer.xr.getControllerGrip(0);
-    S.grip1.add(controllerModelFactory.createControllerModel(S.grip1));
-    S.scene.add(S.grip1);
+    // Controller grips + models
+    const g0 = S.renderer.xr.getControllerGrip(0);
+    g0.add(controllerModelFactory.createControllerModel(g0));
+    S.scene.add(g0);
 
-    S.grip2 = S.renderer.xr.getControllerGrip(1);
-    S.grip2.add(controllerModelFactory.createControllerModel(S.grip2));
-    S.scene.add(S.grip2);
+    const g1 = S.renderer.xr.getControllerGrip(1);
+    g1.add(controllerModelFactory.createControllerModel(g1));
+    S.scene.add(g1);
 
-    // Hands (visual only; pinch events are inconsistent across devices)
-    S.hand1 = S.renderer.xr.getHand(0);
-    S.hand1.add(handModelFactory.createHandModel(S.hand1, 'mesh'));
-    S.scene.add(S.hand1);
+    // Hands
+    const h0 = S.renderer.xr.getHand(0);
+    h0.add(handModelFactory.createHandModel(h0, 'mesh'));
+    S.scene.add(h0);
 
-    S.hand2 = S.renderer.xr.getHand(1);
-    S.hand2.add(handModelFactory.createHandModel(S.hand2, 'mesh'));
-    S.scene.add(S.hand2);
+    const h1 = S.renderer.xr.getHand(1);
+    h1.add(handModelFactory.createHandModel(h1, 'mesh'));
+    S.scene.add(h1);
+
+    // Assign L/R heuristically each frame (some browsers report handedness late)
+    S.controllerL = c0; S.controllerR = c1;
+    S.gripL = g0; S.gripR = g1;
+    S.handL = h0; S.handR = h1;
 
     S.diag?.log?.('[xr] controllers + hands mounted ✅');
   }
 
+  function getGamepad(ctrl) {
+    const src = ctrl?.inputSource;
+    const gp = src?.gamepad;
+    if (!gp || !gp.axes) return null;
+    return gp;
+  }
+
+  function pickMoveGamepad() {
+    // Prefer left-hand controller if we can detect it
+    const gpL = getGamepad(S.controllerL);
+    const gpR = getGamepad(S.controllerR);
+    return gpL || gpR;
+  }
+
   function gamepadLocomotion(dt) {
-    // Read thumbsticks from controller gamepads (Quest)
-    // Typical mapping:
-    //  left: axes[2], axes[3] OR axes[0], axes[1] depending on browser
-    //  right: axes[2], axes[3] etc. We'll try both patterns robustly.
+    const gp = pickMoveGamepad();
+    if (!gp) return;
 
     const dead = 0.16;
 
-    function readPad(ctrl) {
-      const src = ctrl?.inputSource;
-      const gp = src?.gamepad;
-      if (!gp || !gp.axes) return null;
-      return gp;
-    }
-
-    const gp1 = readPad(S.controller1);
-    const gp2 = readPad(S.controller2);
-
-    const gp = gp1 || gp2;
-    if (!gp) return;
-
-    // pick move axes: prefer 0/1 for left stick if present
     const ax0 = gp.axes[0] ?? 0;
     const ax1 = gp.axes[1] ?? 0;
     const ax2 = gp.axes[2] ?? 0;
     const ax3 = gp.axes[3] ?? 0;
 
-    // heuristic: if 0/1 are near 0 but 2/3 are active, use 2/3
-    const use23 = (Math.abs(ax0) + Math.abs(ax1) < 0.08) && (Math.abs(ax2) + Math.abs(ax3) > 0.08);
-
+    // Choose which pair behaves like the move stick
+    const use23 = (Math.abs(ax0)+Math.abs(ax1) < 0.10) && (Math.abs(ax2)+Math.abs(ax3) > 0.10);
     const moveX = use23 ? ax2 : ax0;
     const moveY = use23 ? ax3 : ax1;
 
-    // try to get turn from the "other" pair
+    // Turn from the other X axis
     const turnX = use23 ? ax0 : ax2;
 
     const mx = Math.abs(moveX) > dead ? moveX : 0;
     const my = Math.abs(moveY) > dead ? moveY : 0;
 
-    // Move in the direction the HEADSET faces (camera world direction), but only on XZ
     if (mx || my) {
       const fwd = new THREE.Vector3();
       S.camera.getWorldDirection(fwd);
@@ -229,7 +243,7 @@ export const Spine = (() => {
       }
     }
 
-    // Snap turn (right stick X) — cooldown
+    // Snap turn
     S.snapT -= dt;
     const tx = Math.abs(turnX) > 0.65 ? turnX : 0;
     if (tx && S.snapT <= 0) {
@@ -244,20 +258,16 @@ export const Spine = (() => {
   function animate() {
     const dt = S.clock.getDelta();
 
-    // If XR started and spawn not applied, force it once
-    if (isXR() && !S.xrSpawnApplied) applyXRSpawn();
+    // If XR session is live and spawn hasn’t been forced yet, force it.
+    if (isXR() && !S.spawnAppliedOnce) applyXRSpawn();
 
-    // World updates
     for (let i = 0; i < S.worldUpdates.length; i++) {
       try { S.worldUpdates[i](dt); } catch {}
     }
 
     if (isXR()) {
-      // aiming marker
-      castTeleport(S.controller1);
-      castTeleport(S.controller2);
-
-      // controller locomotion
+      castTeleport(S.controllerL);
+      castTeleport(S.controllerR);
       gamepadLocomotion(dt);
     }
 
@@ -271,9 +281,8 @@ export const Spine = (() => {
     disposeRendererIfAny();
 
     S.scene = new THREE.Scene();
-    S.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 800);
+    S.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 900);
 
-    // player rig (XR locomotion uses this)
     S.rig = new THREE.Group();
     S.rig.name = 'playerRig';
     S.scene.add(S.rig);
@@ -309,29 +318,31 @@ export const Spine = (() => {
 
     S.worldUpdates = Array.isArray(worldResult?.updates) ? worldResult.updates : [];
 
+    // Teleport surfaces are REQUIRED for teleport to work
     if (Array.isArray(worldResult?.teleportSurfaces) && worldResult.teleportSurfaces.length) {
       S.teleportSurfaces = worldResult.teleportSurfaces;
     } else {
       const list = [];
-      S.scene.traverse((o) => { if (o?.userData?.teleportable) list.push(o); });
+      S.scene.traverse((o)=>{ if (o?.userData?.teleportable) list.push(o); });
       S.teleportSurfaces = list;
     }
-
     S.diag?.log?.(`[teleport] surfaces=${S.teleportSurfaces.length}`);
 
-    // XR session hooks
+    // XR session hooks — force spawn to pad every time XR starts
     S.renderer.xr.addEventListener('sessionstart', () => {
-      S.xrSpawnApplied = false; // re-apply once XR begins
+      S.spawnAppliedOnce = false;
       S.diag?.log?.('[xr] sessionstart ✅');
+
+      // Immediately apply spawn, then again after a short delay (Quest sometimes updates origin after first frame)
       applyXRSpawn();
-      // apply again shortly (Quest sometimes updates origin a frame later)
       setTimeout(()=> { if (isXR()) applyXRSpawn(); }, 250);
+      setTimeout(()=> { if (isXR()) applyXRSpawn(); }, 900);
     });
 
     S.renderer.xr.addEventListener('sessionend', () => {
       S.marker.visible = false;
       S.lastHit = null;
-      S.xrSpawnApplied = false;
+      S.spawnAppliedOnce = false;
       S.diag?.log?.('[xr] sessionend ✅');
     });
 
@@ -346,13 +357,13 @@ export const Spine = (() => {
       document.body.appendChild(S.xrButtonEl);
     }
 
-    // debug helpers
+    // quick debug
     window.SCARLETT = {
       enterVR: async ()=> { if (S.xrButtonEl?.tagName === 'BUTTON') S.xrButtonEl.click(); },
       resetSpawn: ()=> applyXRSpawn(),
       getReport: ()=> [
         'Scarlett Diagnostics Report',
-        'build=SCARLETT_SPINE_VR_MOVE_TELEPORT_BRIGHT',
+        'build=SCARLETT_SPAWNPAD_LOCK_V1',
         'time=' + new Date().toISOString(),
         'href=' + location.href,
         'ua=' + navigator.userAgent,
