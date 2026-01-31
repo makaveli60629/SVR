@@ -3,36 +3,57 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>ScarlettVR Poker • Permanent Build</title>
-
+  <title>ScarlettVR Poker • Demo</title>
   <style>
-    html,body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
+    html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
     canvas { display:block; width:100%; height:100%; }
 
-    /* ✅ IMPORTANT: overlays NEVER block touch / joystick */
-    #dev-hud, #hud, #diagnostics, #diag, .hud, .overlay {
-      pointer-events: none !important;
-      user-select: none;
-    }
-    #dev-hud button, #hud button, .overlay button { pointer-events:auto !important; }
+    /* Overlays never block movement input */
+    #hud, #dev-hud, #diag, #diagnostics, .overlay { pointer-events:none !important; user-select:none; }
 
-    /* Simple bottom hint */
-    #hint {
-      position:fixed; left:0; right:0; bottom:10px;
-      text-align:center; font-family:system-ui, sans-serif;
-      font-size:13px; opacity:.85; color:#fff;
-      pointer-events:none;
-      text-shadow:0 2px 10px rgba(0,0,0,.6);
-    }
-
-    /* Minimal VR buttons */
-    #xrbar {
-      position:fixed; right:12px; bottom:12px; display:flex; gap:10px;
+    /* Touch joystick zone: bottom-left area */
+    #joyZone{
+      position:fixed;
+      left:0; bottom:0;
+      width:52vw; height:48vh;
       pointer-events:auto;
+      touch-action:none;
+    }
+
+    /* Tap teleport zone: bottom-right area */
+    #teleZone{
+      position:fixed;
+      right:0; bottom:0;
+      width:48vw; height:48vh;
+      pointer-events:auto;
+      touch-action:manipulation;
+    }
+
+    #axisdbg{
+      position:fixed; left:10px; top:10px;
+      color:#9eff9e; font:12px monospace;
+      background:rgba(0,0,0,.45);
+      padding:6px 8px; border-radius:10px;
+      pointer-events:none;
+      white-space:pre;
+    }
+
+    #hint{
+      position:fixed; left:10px; right:10px; bottom:12px;
+      color:#fff; font:13px system-ui, sans-serif;
+      text-shadow:0 2px 10px rgba(0,0,0,.75);
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    #xrbar{
+      position:fixed; right:12px; top:12px;
+      display:flex; gap:10px;
+      pointer-events:auto;
+      z-index:10;
     }
     .xrbtn{
-      font-family:system-ui, sans-serif;
-      font-weight:700;
+      font:700 13px system-ui, sans-serif;
       padding:10px 14px;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.25);
@@ -40,27 +61,22 @@
       color:#fff;
       backdrop-filter: blur(6px);
     }
-
-    /* Touch joystick zone (left bottom) */
-    #joyZone{
-      position:fixed; left:0; bottom:0; width:50vw; height:45vh;
-      pointer-events:auto;
-      touch-action:none;
-    }
   </style>
 </head>
 <body>
-  <!-- Optional: keep your existing HUD/diagnostics containers if you already have them -->
-  <div id="dev-hud"></div>
+  <div id="xrbar">
+    <button class="xrbtn" id="btnVR">Enter VR</button>
+    <button class="xrbtn" id="btnReset">Reset Spawn</button>
+  </div>
 
-  <div id="hint">Quest: thumbsticks to move • trigger/pinch to teleport • Android: use left touch zone to move</div>
+  <div id="axisdbg">axes: 0.00, 0.00</div>
+
+  <div id="hint">
+    Move: drag bottom-left • Teleport: tap bottom-right • Desktop: WASD • Quest: stick if available
+  </div>
 
   <div id="joyZone" aria-label="joystick-zone"></div>
-
-  <div id="xrbar">
-    <button class="xrbtn" id="btnAR">AR</button>
-    <button class="xrbtn" id="btnVR">VR</button>
-  </div>
+  <div id="teleZone" aria-label="teleport-zone" title="Tap to teleport forward"></div>
 
   <script type="module" src="./index.js"></script>
 </body>
