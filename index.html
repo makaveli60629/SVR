@@ -4,8 +4,40 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Scarlett VR</title>
+  <style>
+    html,body{margin:0;height:100%;background:#000;color:#9ff;font:12px monospace}
+    #log{white-space:pre-wrap;padding:12px}
+  </style>
 </head>
 <body>
-  <script type="module" src="./js/scarlett1/main.js"></script>
+  <div id="log">BOOT…</div>
+
+  <script>
+    const out = document.getElementById('log');
+    const log = (m)=> out.textContent += "\n" + m;
+
+    // Auto-detect base path: "/SVR/" for project pages, "/" for user pages
+    // Example pathnames:
+    //  "/"                -> base "/"
+    //  "/SVR/"            -> base "/SVR/"
+    //  "/SVR/index.html"  -> base "/SVR/"
+    const parts = location.pathname.split('/').filter(Boolean);
+    const base = parts.length ? `/${parts[0]}/` : `/`;
+
+    log("Base detected: " + base);
+
+    // Catch errors on-screen (Quest-friendly)
+    window.addEventListener("error",(e)=>log("ERR: " + e.message));
+    window.addEventListener("unhandledrejection",(e)=>log("REJ: " + (e.reason?.message || e.reason)));
+
+    // Helper to build absolute URL under base
+    const u = (p)=> base + p.replace(/^\/+/,''); // strip leading slashes
+
+    log("Importing: " + u("js/scarlett1/main.js"));
+
+    import(u("js/scarlett1/main.js"))
+      .then(()=>log("main.js loaded ✅"))
+      .catch(e=>log("IMPORT FAIL: " + (e.message || e)));
+  </script>
 </body>
 </html>
