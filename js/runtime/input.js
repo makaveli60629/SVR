@@ -1,19 +1,18 @@
 export const Input = {
   ctx: null,
 
-  // Movement
   moveSpeed: 2.1,
   snapTurn: true,
   snapAngle: Math.PI / 6,
   snapCooldown: 0.28,
   snapT: 0,
 
-  // Trigger behavior
   teleportQueued: false,
   lastSelectTime: 0,
   holdingSelect: false,
 
-  // Visuals
+  // visuals
+  locomotionGroup: null, // ✅ parented to XR camera
   rayLine: null,
   reticle: null,
   feetRing: null,
@@ -28,7 +27,6 @@ export const Input = {
     const onSelectEnd = () => {
       const t = performance.now() - this.lastSelectTime;
       this.holdingSelect = false;
-      // Tap => teleport
       if (t < 260) this.teleportQueued = true;
     };
 
@@ -38,49 +36,7 @@ export const Input = {
     ctx.controller2?.addEventListener("selectend", onSelectEnd);
 
     this.buildViz();
-    console.log("✅ Input ready (XR camera aiming + feet ring glued to rig)");
-  },
-
-  buildViz() {
-    const { THREE, scene } = this.ctx;
-
-    // Ray line in WORLD space (we rewrite its points each frame)
-    const geom = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, 0, -3),
-    ]);
-    this.rayLine = new THREE.Line(
-      geom,
-      new THREE.LineBasicMaterial({ color: 0x00ffff })
-    );
-    scene.add(this.rayLine);
-
-    // Teleport reticle (aim circle)
-    this.reticle = new THREE.Mesh(
-      new THREE.RingGeometry(0.12, 0.18, 40),
-      new THREE.MeshBasicMaterial({
-        color: 0x00ffff,
-        transparent: true,
-        opacity: 0.95,
-        side: THREE.DoubleSide,
-      })
-    );
-    this.reticle.rotation.x = -Math.PI / 2;
-    this.reticle.visible = false;
-    scene.add(this.reticle);
-
-    // Feet ring (ALWAYS on you)
-    this.feetRing = new THREE.Mesh(
-      new THREE.RingGeometry(0.20, 0.40, 44),
-      new THREE.MeshBasicMaterial({
-        color: 0x00c8ff,
-        transparent: true,
-        opacity: 0.75,
-        side: THREE.DoubleSide,
-      })
-    );
-    this.feetRing.rotation.x = -Math.PI / 2;
-    scene.add(this.feetRing);
+    console.log("✅ Input ready (locomotion group attached to XR camera)");
   },
 
   deadzone(v, dz = 0.18) {
@@ -89,15 +45,32 @@ export const Input = {
     return Math.sign(v) * Math.min(1, s);
   },
 
-  // ✅ Always use the XR camera (not the base camera) for direction
   getXRCamera() {
     const { renderer, camera } = this.ctx;
     try {
       const xrCam = renderer.xr.getCamera(camera);
-      return xrCam || camera;
+      // xrCam is a Group-like camera; we want its first camera for direction
+      return xrCam?.cameras?.[0] || xrCam || camera;
     } catch {
       return camera;
     }
+  },
+
+  // Prefer controller if it has real pose; else XR camera
+  pickAim() {
+    const { THREE, controller1, controller2 } = this.ctx;
+    const cam = this.getXRCamera();
+    const tmp = new THREE.Vector3();
+
+    const ok = (c) => {
+      if (!c) return false;
+      c.getWorldPosition(tmp);
+      return (Math.abs(tmp.x) + Math.abs(tmp.y) + Math.abs(tmp.z)) > 0.001;
+    };
+
+    if (ok(controller1)) return controller1;
+    if (ok(controller2)) return controller2;
+    return cam;
   },
 
   getForward() {
@@ -127,21 +100,65 @@ export const Input = {
     return { x: p.x, y: -(p.y) };
   },
 
-  // ✅ If controller pose is invalid, aim from XR camera
-  pickAim() {
-    const { THREE, controller1, controller2 } = this.ctx;
-    const cam = this.getXRCamera();
-    const tmp = new THREE.Vector3();
+  buildViz() {
+    const { THREE, scene } = this.ctx;
 
-    const ok = (c) => {
-      if (!c) return false;
-      c.getWorldPosition(tmp);
-      return (Math.abs(tmp.x) + Math.abs(tmp.y) + Math.abs(tmp.z)) > 0.001;
-    };
+    // Feet ring stays in world (on rig)
+    this.feetRing = new THREE.Mesh(
+      new THREE.RingGeometry(0.20, 0.40, 44),
+      new THREE.MeshBasicMaterial({
+        color: 0x00c8ff,
+        transparent: true,
+        opacity: 0.75,
+        side: THREE.DoubleSide,
+      })
+    );
+    this.feetRing.rotation.x = -Math.PI / 2;
+    scene.add(this.feetRing);
 
-    if (ok(controller1)) return controller1;
-    if (ok(controller2)) return controller2;
-    return cam;
+    // Locomotion visuals will be attached to XR camera each frame in update()
+    this.locomotionGroup = new THREE.Group();
+    scene.add(this.locomotionGroup);
+
+    // Ray line (in WORLD, but stored under locomotionGroup so it can't drift)
+    const geom = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -3),
+    ]);
+    this.rayLine = new THREE.Line(
+      geom,
+      new THREE.LineBasicMaterial({ color: 0x00ffff })
+    );
+    this.locomotionGroup.add(this.rayLine);
+
+    // Reticle (aim circle)
+    this.reticle = new THREE.Mesh(
+      new THREE.RingGeometry(0.12, 0.18, 40),
+      new THREE.MeshBasicMaterial({
+        color: 0x00ffff,
+        transparent: true,
+        opacity: 0.95,
+        side: THREE.DoubleSide,
+      })
+    );
+    this.reticle.rotation.x = -Math.PI / 2;
+    this.reticle.visible = false;
+    scene.add(this.reticle);
+  },
+
+  // ✅ Snap ONLY to walkSurfaces
+  snapGround() {
+    const { THREE, rig, walkSurfaces } = this.ctx;
+    if (!walkSurfaces?.length) return;
+
+    const ray = new THREE.Raycaster();
+    ray.set(
+      new THREE.Vector3(rig.position.x, rig.position.y + 1.6, rig.position.z),
+      new THREE.Vector3(0, -1, 0)
+    );
+    const hits = ray.intersectObjects(walkSurfaces, true);
+    if (!hits?.length) return;
+    rig.position.y = hits[0].point.y + 1.7;
   },
 
   rayTeleportFrom(fromObj) {
@@ -158,32 +175,30 @@ export const Input = {
     return hits?.[0] || null;
   },
 
-  // ✅ Snap ONLY to walkSurfaces (which will no longer include a plane over the pit)
-  snapGround() {
-    const { THREE, rig, walkSurfaces } = this.ctx;
-    if (!walkSurfaces?.length) return;
+  updateFeetRing() {
+    const { rig } = this.ctx;
+    this.feetRing.position.set(rig.position.x, rig.position.y - 1.68, rig.position.z);
+  },
 
-    const ray = new THREE.Raycaster();
-    ray.set(
-      new THREE.Vector3(rig.position.x, rig.position.y + 1.6, rig.position.z),
-      new THREE.Vector3(0, -1, 0)
-    );
-    const hits = ray.intersectObjects(walkSurfaces, true);
-    if (!hits?.length) return;
-
-    rig.position.y = hits[0].point.y + 1.7;
+  // ✅ Attach locomotionGroup to XR camera so it never gets stuck at world origin
+  attachLocomotionToXRCamera() {
+    const cam = this.getXRCamera();
+    // Put the group at the camera position each frame (world space)
+    cam.getWorldPosition(this.locomotionGroup.position);
+    cam.getWorldQuaternion(this.locomotionGroup.quaternion);
   },
 
   updateViz(hit, fromObj) {
     const { THREE } = this.ctx;
+
     const o = new THREE.Vector3();
     const d = new THREE.Vector3();
     fromObj.getWorldPosition(o);
     fromObj.getWorldDirection(d);
 
     const end = hit ? hit.point.clone() : o.clone().add(d.multiplyScalar(3.0));
-    const arr = this.rayLine.geometry.attributes.position.array;
 
+    const arr = this.rayLine.geometry.attributes.position.array;
     arr[0] = o.x; arr[1] = o.y; arr[2] = o.z;
     arr[3] = end.x; arr[4] = end.y; arr[5] = end.z;
     this.rayLine.geometry.attributes.position.needsUpdate = true;
@@ -197,21 +212,16 @@ export const Input = {
     }
   },
 
-  updateFeetRing() {
-    const { rig } = this.ctx;
-    // Feet ring “glued” to your rig, not the world origin
-    this.feetRing.position.set(rig.position.x, rig.position.y - 1.68, rig.position.z);
-  },
-
   update(dt) {
     const { rig, controller1, controller2 } = this.ctx;
     this.snapT = Math.max(0, this.snapT - dt);
 
+    this.attachLocomotionToXRCamera();
+    this.updateFeetRing();
+
     const aim = this.pickAim();
     const hit = this.rayTeleportFrom(aim);
-
     this.updateViz(hit, aim);
-    this.updateFeetRing();
 
     // Tap trigger = teleport
     if (this.teleportQueued) {
@@ -223,7 +233,7 @@ export const Input = {
       return;
     }
 
-    // Hold trigger = walk forward (fallback locomotion always works)
+    // Hold trigger = walk forward
     if (this.holdingSelect) {
       const f = this.getForward();
       rig.position.x += f.x * 2.0 * dt;
