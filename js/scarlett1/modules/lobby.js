@@ -2,7 +2,7 @@ AFRAME.registerComponent("scarlett-lobby", {
   init() {
     const el = this.el;
 
-    // TELEPORTABLE floor (main lobby)
+    // Main teleportable floor
     const floor = document.createElement("a-circle");
     floor.classList.add("teleportable");
     floor.setAttribute("radius", "34");
@@ -10,18 +10,40 @@ AFRAME.registerComponent("scarlett-lobby", {
     floor.setAttribute("material", "color:#070b10; roughness:0.95; metalness:0.05");
     el.appendChild(floor);
 
-    // SKY (no void)
+    // Sky
     const sky = document.createElement("a-sky");
     sky.setAttribute("color", "#03060b");
     el.appendChild(sky);
 
-    // LIGHTING: bright + neon
+    // Lighting (bright)
     addLight(el, "hemisphere", { intensity: 0.95, color: "#d7f3ff", groundColor: "#061018" }, "0 40 0");
     addLight(el, "directional", { intensity: 1.35, color: "#ffffff" }, "18 28 16");
     addLight(el, "point", { intensity: 1.4, distance: 90, decay: 2, color: "#00e5ff" }, "0 12 0");
     addLight(el, "point", { intensity: 1.15, distance: 90, decay: 2, color: "#7b61ff" }, "-18 10 -18");
 
-    // --- CIRCULAR WALLS (twice as high) ---
+    // Pillars (neon)
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2;
+      const x = Math.cos(a) * 18;
+      const z = Math.sin(a) * 18;
+
+      const p = document.createElement("a-cylinder");
+      p.setAttribute("radius", "0.75");
+      p.setAttribute("height", "14");
+      p.setAttribute("position", `${x} 7 ${z}`);
+      p.setAttribute("material", "color:#0b0f14; metalness:0.65; roughness:0.35");
+      el.appendChild(p);
+
+      const band = document.createElement("a-ring");
+      band.setAttribute("radius-inner", "0.72");
+      band.setAttribute("radius-outer", "0.82");
+      band.setAttribute("rotation", "-90 0 0");
+      band.setAttribute("position", `${x} 1.2 ${z}`);
+      band.setAttribute("material", "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.6; opacity:0.55; transparent:true");
+      el.appendChild(band);
+    }
+
+    // Circular walls (double height)
     const wallRadius = 30;
     const wallHeight = 24;
     const wallY = wallHeight / 2;
@@ -49,7 +71,7 @@ AFRAME.registerComponent("scarlett-lobby", {
       el.appendChild(base);
     }
 
-    // --- CENTER PIT / DIVOT ---
+    // Center pit / divot
     const pitEdge = document.createElement("a-ring");
     pitEdge.setAttribute("radius-inner", "7.7");
     pitEdge.setAttribute("radius-outer", "8.3");
@@ -74,19 +96,19 @@ AFRAME.registerComponent("scarlett-lobby", {
     step.setAttribute("material", "color:#0b0f14; metalness:0.6; roughness:0.4; opacity:0.95; transparent:true");
     el.appendChild(step);
 
-    // --- 8-PLAYER ROUND SHOWCASE TABLE in the PIT ---
+    // 8-player round showcase table in pit
     const showcase = document.createElement("a-entity");
     showcase.setAttribute("position", "0 -1.8 0");
     showcase.setAttribute("scarlett-lobby-showcase-table", "");
     el.appendChild(showcase);
 
-    // --- 4 DOORS + 4 JUMBOTRONS ABOVE DOORS ---
+    // Doors + IPTV jumbotrons above (also portals)
     makeDoorWithJumbo(el, { x: 0, z: -28, ry: 0 },  "SCORPION ROOM", "tables");
-    makeDoorWithJumbo(el, { x: 28, z: 0, ry: -90 }, "EVENTS", "tables");     // placeholder route
-    makeDoorWithJumbo(el, { x: 0, z: 28, ry: 180 },  "VIP", "tables");       // placeholder route
+    makeDoorWithJumbo(el, { x: 28, z: 0, ry: -90 }, "EVENTS", "tables");
+    makeDoorWithJumbo(el, { x: 0, z: 28, ry: 180 },  "VIP", "tables");
     makeDoorWithJumbo(el, { x: -28, z: 0, ry: 90 },  "STORE", "store");
 
-    // --- SPAWN PADS near doors ---
+    // Spawn pads near doors
     makeSpawnPad(el, { x: 0, z: -23 }, "tables", "ENTER SCORPION ROOM");
     makeSpawnPad(el, { x: -23, z: 0 }, "store",  "ENTER STORE");
     makeSpawnPad(el, { x: 23, z: 0 },  "tables", "ENTER EVENTS");
@@ -101,9 +123,9 @@ AFRAME.registerComponent("scarlett-lobby", {
     title.setAttribute("position", "0 10 -10");
     el.appendChild(title);
 
-    if (window.hudLog) hudLog("REAL LOBBY built ✅ (circle + pit + 8-seat round + 4 doors + 4 jumbotrons)");
+    if (window.hudLog) hudLog("REAL LOBBY ✅ circle + pit + round 8-seat + IPTV jumbotrons");
 
-    // ---------- helpers ----------
+    // helpers
     function addLight(root, type, cfg, pos) {
       const l = document.createElement("a-entity");
       const kv = Object.entries(cfg).map(([k, v]) => `${k}: ${v}`).join("; ");
@@ -113,7 +135,6 @@ AFRAME.registerComponent("scarlett-lobby", {
     }
 
     function makeDoorWithJumbo(root, pose, label, dest) {
-      // Door frame
       const frame = document.createElement("a-box");
       frame.setAttribute("position", `${pose.x} 4.0 ${pose.z}`);
       frame.setAttribute("rotation", `0 ${pose.ry} 0`);
@@ -123,7 +144,6 @@ AFRAME.registerComponent("scarlett-lobby", {
       frame.setAttribute("material", "color:#0b0f14; metalness:0.7; roughness:0.35");
       root.appendChild(frame);
 
-      // Door opening (visual)
       const door = document.createElement("a-plane");
       door.setAttribute("position", `${pose.x} 3.2 ${pose.z + 0.22}`);
       door.setAttribute("rotation", `0 ${pose.ry} 0`);
@@ -132,22 +152,14 @@ AFRAME.registerComponent("scarlett-lobby", {
       door.setAttribute("material", "color:#03060b; opacity:0.9; transparent:true");
       root.appendChild(door);
 
-      // ✅ REAL video jumbotron above door (also portal)
+      // IPTV jumbotron (also portal)
       const jumbo = document.createElement("a-entity");
-      jumbo.setAttribute("id", `jumbo_${label.toLowerCase().replace(/\s+/g,'_')}`);
+      jumbo.setAttribute("id", `jumbo_${label.toLowerCase().replace(/\s+/g, "_")}`);
       jumbo.classList.add("clickable", "portal");
       jumbo.setAttribute("data-dest", dest);
       jumbo.setAttribute("position", `${pose.x} 8.8 ${pose.z + 0.24}`);
       jumbo.setAttribute("rotation", `0 ${pose.ry} 0`);
-
-      // IMPORTANT: use MP4 for Quest reliability.
-      // Put these files in /assets/ or change to a direct MP4 URL.
-      const demoMP4 =
-        (label === "STORE") ? "./assets/demo_store.mp4" :
-        (label === "SCORPION ROOM") ? "./assets/demo_scissors.mp4" :
-        "./assets/demo_lobby.mp4";
-
-      jumbo.setAttribute("scarlett-jumbotron", `src:${demoMP4}; label:${label}; muted:true; autoplay:true; width:8.5; height:2.2`);
+      jumbo.setAttribute("scarlett-jumbotron-iptv", `m3uUrl:${window.SCARLETT_M3U_URL}; label:${label}; width:8.5; height:2.2`);
       root.appendChild(jumbo);
     }
 
@@ -173,13 +185,11 @@ AFRAME.registerComponent("scarlett-lobby", {
   }
 });
 
-
-// ✅ FULL: 8-player ROUND lobby pit table (8 seats + your seat reserved + optional seated bots)
+// 8-player ROUND lobby pit table (uses scarlett-chair from table6.js)
 AFRAME.registerComponent("scarlett-lobby-showcase-table", {
   init() {
     const el = this.el;
 
-    // --- Pedestal (wide, thin) ---
     const base = document.createElement("a-cylinder");
     base.setAttribute("radius", "6.9");
     base.setAttribute("height", "0.24");
@@ -194,7 +204,6 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
     pillar.setAttribute("material", "color:#0b0f14; metalness:0.70; roughness:0.35");
     el.appendChild(pillar);
 
-    // --- Table top (ROUND) ---
     const top = document.createElement("a-cylinder");
     top.setAttribute("radius", "3.35");
     top.setAttribute("height", "0.22");
@@ -202,7 +211,6 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
     top.setAttribute("material", "color:#101827; roughness:0.65; metalness:0.15");
     el.appendChild(top);
 
-    // --- Leather rim ---
     const leather = document.createElement("a-torus");
     leather.setAttribute("radius", "3.28");
     leather.setAttribute("radius-tubular", "0.10");
@@ -211,7 +219,6 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
     leather.setAttribute("material", "color:#2a1b12; metalness:0.12; roughness:0.92");
     el.appendChild(leather);
 
-    // --- Felt ---
     const felt = document.createElement("a-cylinder");
     felt.setAttribute("radius", "3.00");
     felt.setAttribute("height", "0.05");
@@ -219,7 +226,6 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
     felt.setAttribute("material", "color:#07111a; roughness:0.95; metalness:0.0");
     el.appendChild(felt);
 
-    // --- Neon ring ---
     const neon = document.createElement("a-torus");
     neon.setAttribute("radius", "3.10");
     neon.setAttribute("radius-tubular", "0.028");
@@ -228,7 +234,6 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
     neon.setAttribute("material", "color:#0f1116; emissive:#00e5ff; emissiveIntensity:2.0; opacity:0.85; transparent:true");
     el.appendChild(neon);
 
-    // --- Inner pot zone ---
     const pot = document.createElement("a-cylinder");
     pot.setAttribute("radius", "0.95");
     pot.setAttribute("height", "0.02");
@@ -236,7 +241,6 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
     pot.setAttribute("material", "color:#0b1a25; emissive:#7b61ff; emissiveIntensity:0.25; roughness:0.9; metalness:0.0");
     el.appendChild(pot);
 
-    // --- 8 seats around (seat 0 reserved for you) ---
     const seatRadius = 6.1;
     const seatY = 0.20;
 
@@ -250,11 +254,11 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
       seat.setAttribute("id", `lobby_seat_${i}`);
       seat.setAttribute("position", `${x} ${seatY} ${z}`);
       seat.setAttribute("rotation", `0 ${ry} 0`);
-      seat.setAttribute("scarlett-chair", ""); // chair from table6.js
+      seat.setAttribute("scarlett-chair", "");
       el.appendChild(seat);
     }
 
-    // Seat marker for YOU
+    // Your seat (seat 0)
     const yourSeat = document.getElementById("lobby_seat_0");
     if (yourSeat) {
       const marker = document.createElement("a-ring");
@@ -264,17 +268,9 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
       marker.setAttribute("position", "0 0.03 0");
       marker.setAttribute("material", "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.0; opacity:0.55; transparent:true");
       yourSeat.appendChild(marker);
-
-      const label = document.createElement("a-text");
-      label.setAttribute("value", "YOUR SEAT");
-      label.setAttribute("align", "center");
-      label.setAttribute("color", "#bff");
-      label.setAttribute("width", "6");
-      label.setAttribute("position", "0 1.85 0");
-      yourSeat.appendChild(label);
     }
 
-    // Optional lobby bots seated (7 bots, your seat empty)
+    // Optional lobby seated bots (7 bots, seat 0 empty)
     if (window.SCARLETT_LOBBY_BOTS) {
       const models = [
         "./assets/avatars/male.glb",
@@ -288,7 +284,7 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
 
       let m = 0;
       for (let i = 0; i < 8; i++) {
-        if (i === 0) continue; // reserve your seat
+        if (i === 0) continue;
         const seat = document.getElementById(`lobby_seat_${i}`);
         if (!seat) continue;
 
@@ -303,6 +299,6 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
       }
     }
 
-    if (window.hudLog) hudLog("Lobby pit table ✅ ROUND (8 seats) | seat_0 reserved");
+    if (window.hudLog) hudLog("Lobby table ✅ round 8-seat | seat_0 reserved");
   }
 });
