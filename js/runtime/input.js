@@ -11,8 +11,7 @@ export const Input = {
   lastSelectTime: 0,
   holdingSelect: false,
 
-  // visuals
-  locomotionGroup: null, // ✅ parented to XR camera
+  locomotionGroup: null,
   rayLine: null,
   reticle: null,
   feetRing: null,
@@ -36,7 +35,7 @@ export const Input = {
     ctx.controller2?.addEventListener("selectend", onSelectEnd);
 
     this.buildViz();
-    console.log("✅ Input ready (locomotion group attached to XR camera)");
+    console.log("✅ Input ready (laser fixed: world->local)");
   },
 
   deadzone(v, dz = 0.18) {
@@ -49,14 +48,12 @@ export const Input = {
     const { renderer, camera } = this.ctx;
     try {
       const xrCam = renderer.xr.getCamera(camera);
-      // xrCam is a Group-like camera; we want its first camera for direction
       return xrCam?.cameras?.[0] || xrCam || camera;
     } catch {
       return camera;
     }
   },
 
-  // Prefer controller if it has real pose; else XR camera
   pickAim() {
     const { THREE, controller1, controller2 } = this.ctx;
     const cam = this.getXRCamera();
@@ -103,7 +100,7 @@ export const Input = {
   buildViz() {
     const { THREE, scene } = this.ctx;
 
-    // Feet ring stays in world (on rig)
+    // Feet ring (world) glued to rig
     this.feetRing = new THREE.Mesh(
       new THREE.RingGeometry(0.20, 0.40, 44),
       new THREE.MeshBasicMaterial({
@@ -116,11 +113,11 @@ export const Input = {
     this.feetRing.rotation.x = -Math.PI / 2;
     scene.add(this.feetRing);
 
-    // Locomotion visuals will be attached to XR camera each frame in update()
+    // Locomotion group (we position/rotate it to XR camera each frame)
     this.locomotionGroup = new THREE.Group();
     scene.add(this.locomotionGroup);
 
-    // Ray line (in WORLD, but stored under locomotionGroup so it can't drift)
+    // Ray line geometry (LOCAL to locomotionGroup — we write local coords!)
     const geom = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0, 0, 0),
       new THREE.Vector3(0, 0, -3),
@@ -131,7 +128,7 @@ export const Input = {
     );
     this.locomotionGroup.add(this.rayLine);
 
-    // Reticle (aim circle)
+    // Reticle is world-space at hit point
     this.reticle = new THREE.Mesh(
       new THREE.RingGeometry(0.12, 0.18, 40),
       new THREE.MeshBasicMaterial({
@@ -146,7 +143,6 @@ export const Input = {
     scene.add(this.reticle);
   },
 
-  // ✅ Snap ONLY to walkSurfaces
   snapGround() {
     const { THREE, rig, walkSurfaces } = this.ctx;
     if (!walkSurfaces?.length) return;
@@ -158,6 +154,7 @@ export const Input = {
     );
     const hits = ray.intersectObjects(walkSurfaces, true);
     if (!hits?.length) return;
+
     rig.position.y = hits[0].point.y + 1.7;
   },
 
@@ -180,27 +177,30 @@ export const Input = {
     this.feetRing.position.set(rig.position.x, rig.position.y - 1.68, rig.position.z);
   },
 
-  // ✅ Attach locomotionGroup to XR camera so it never gets stuck at world origin
   attachLocomotionToXRCamera() {
     const cam = this.getXRCamera();
-    // Put the group at the camera position each frame (world space)
     cam.getWorldPosition(this.locomotionGroup.position);
     cam.getWorldQuaternion(this.locomotionGroup.quaternion);
   },
 
+  // ✅ FIX: Write RAY in locomotionGroup LOCAL coordinates
   updateViz(hit, fromObj) {
     const { THREE } = this.ctx;
 
-    const o = new THREE.Vector3();
-    const d = new THREE.Vector3();
-    fromObj.getWorldPosition(o);
-    fromObj.getWorldDirection(d);
+    const oW = new THREE.Vector3();
+    const dW = new THREE.Vector3();
+    fromObj.getWorldPosition(oW);
+    fromObj.getWorldDirection(dW);
 
-    const end = hit ? hit.point.clone() : o.clone().add(d.multiplyScalar(3.0));
+    const endW = hit ? hit.point.clone() : oW.clone().add(dW.multiplyScalar(3.0));
+
+    // Convert world points to locomotionGroup local space
+    const oL = this.locomotionGroup.worldToLocal(oW.clone());
+    const eL = this.locomotionGroup.worldToLocal(endW.clone());
 
     const arr = this.rayLine.geometry.attributes.position.array;
-    arr[0] = o.x; arr[1] = o.y; arr[2] = o.z;
-    arr[3] = end.x; arr[4] = end.y; arr[5] = end.z;
+    arr[0] = oL.x; arr[1] = oL.y; arr[2] = oL.z;
+    arr[3] = eL.x; arr[4] = eL.y; arr[5] = eL.z;
     this.rayLine.geometry.attributes.position.needsUpdate = true;
 
     if (hit) {
@@ -223,7 +223,6 @@ export const Input = {
     const hit = this.rayTeleportFrom(aim);
     this.updateViz(hit, aim);
 
-    // Tap trigger = teleport
     if (this.teleportQueued) {
       this.teleportQueued = false;
       if (hit) {
@@ -233,7 +232,6 @@ export const Input = {
       return;
     }
 
-    // Hold trigger = walk forward
     if (this.holdingSelect) {
       const f = this.getForward();
       rig.position.x += f.x * 2.0 * dt;
@@ -242,7 +240,6 @@ export const Input = {
       return;
     }
 
-    // Thumbstick best effort
     const gp = this.getGamepad(controller1) || this.getGamepad(controller2);
     const a0 = this.pickStick(gp, 0);
     const a1 = this.pickStick(gp, 1);
