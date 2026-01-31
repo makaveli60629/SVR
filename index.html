@@ -1,48 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>SCARLETT1 — Lobby + Rooms</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SCARLETT1</title>
 
-  <!-- A-Frame CDN (Quest-friendly) -->
+  <!-- A-FRAME CDN -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
   <style>
-    body { margin:0; overflow:hidden; background:#000; }
+    body { margin:0; background:#000; overflow:hidden; }
     #hudWrap{
-      position:fixed; left:10px; bottom:10px; z-index:9999;
-      width:min(720px, 92vw); max-height:38vh; overflow:auto;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      font-size:12px; line-height:1.35;
-      background: rgba(0,0,0,0.55); color:#9ff; padding:10px;
-      border:1px solid rgba(0,229,255,0.35); border-radius:10px;
-      pointer-events:none;
+      position:fixed; left:10px; top:10px; width:360px; max-width:92vw;
+      color:#9ff; font:14px/1.35 monospace;
+      background:rgba(0,0,0,.35); padding:10px 12px; border-radius:10px;
+      z-index:9999;
     }
   </style>
 </head>
 
 <body>
-  <div id="hudWrap"><div id="hud">HUD ready…</div></div>
+  <div id="hudWrap"><div id="hud">boot…</div></div>
 
   <a-scene
-    renderer="colorManagement:true; physicallyCorrectLights:true; antialias:true;"
-    background="color:#000"
+    renderer="colorManagement:true; physicallyCorrectLights:true; antialias:true"
     vr-mode-ui="enabled:true"
-    device-orientation-permission-ui="enabled:true"
+    embedded
+    background="color:#000"
+    scarlett-world
   >
-    <a-assets></a-assets>
+    <!-- RIG -->
+    <a-entity id="rig" position="0 1.6 18" rotation="0 0 0">
+      <a-entity id="camera" camera look-controls position="0 0 0"></a-entity>
+
+      <!-- Controllers (we keep them, but we hide reticle/laser visuals in code) -->
+      <a-entity id="leftHand"  oculus-touch-controls="hand: left"></a-entity>
+      <a-entity id="rightHand" oculus-touch-controls="hand: right"></a-entity>
+    </a-entity>
 
     <!-- WORLD ROOT -->
-    <a-entity id="world" scarlett-world></a-entity>
-
-    <!-- Camera rig (your locomotion/teleport modules can override as needed) -->
-    <a-entity id="rig" position="0 1.6 6">
-      <a-camera id="camera" wasd-controls-enabled="false"></a-camera>
-    </a-entity>
+    <a-entity id="worldRoot"></a-entity>
   </a-scene>
 
-  <!-- Your module entry -->
   <script type="module" src="./js/scarlett1/main.js"></script>
 </body>
 </html>
