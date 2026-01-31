@@ -3,6 +3,8 @@ import "./modules/portals.js";
 import "./modules/hands.js";
 import "./modules/watch.js";
 
+import "./modules/jumbotron.js";   // ✅ NEW
+
 import "./modules/cards.js";
 import "./modules/table6.js";
 import "./modules/lobby.js";
@@ -16,6 +18,9 @@ window.hudLog = function hudLog(msg) {
   el.innerHTML = `${el.innerHTML}<br/>[${t}] ${msg}`;
 };
 
+// ✅ Turn ON lobby seated bots (7 bots seated, your seat open)
+window.SCARLETT_LOBBY_BOTS = true;
+
 AFRAME.registerComponent("scarlett-world", {
   init() {
     hudLog("A-FRAME loaded ✅");
@@ -28,16 +33,9 @@ AFRAME.registerComponent("scarlett-world", {
     this.el.sceneEl.setAttribute("scarlett-watch-teleporter", "");
 
     // --- DESTINATION MARKERS (teleport targets) ---
-    // Lobby
     addDest(this.el, "dest_lobby", "0 0 0");
-
-    // Poker tables room (scorpion room)
     addDest(this.el, "dest_tables", "0 0 -140");
-
-    // Store room
     addDest(this.el, "dest_store", "-140 0 0");
-
-    // Balcony view point (inside store, upper level)
     addDest(this.el, "dest_balcony", "-140 7 0");
 
     // --- ROOMS ---
@@ -71,4 +69,4 @@ function addDest(root, id, pos) {
   d.setAttribute("id", id);
   d.setAttribute("position", pos);
   root.appendChild(d);
-}
+  }
