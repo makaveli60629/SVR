@@ -65,25 +65,70 @@ export const Spine = {
         log
       };
 
-      // Buttons
-      document.getElementById("btnReload").onclick = ()=> location.reload(true);
-      document.getElementById("btnSpawn").onclick = ()=>{
-        rig.position.set(0, 1.7, -26);
-        rig.lookAt(0, 1.6, 0);
-        log("✅ spawn reset");
-      };
-      document.getElementById("btnVR").onclick = ()=>{
-        const btn = document.querySelector("button[aria-label='Enter VR']");
-        if (btn) btn.click();
-        else renderer.xr.enabled = true;
-      };
-
       // Resize
       window.addEventListener("resize", ()=>{
         camera.aspect = window.innerWidth/window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
+
+      // HARD RELOAD
+      document.getElementById("btnReload").onclick = ()=> location.reload(true);
+
+      // Reset Spawn
+      document.getElementById("btnSpawn").onclick = ()=>{
+        rig.position.set(0, 1.7, -26);
+        rig.lookAt(0, 1.6, 0);
+        log("✅ spawn reset");
+      };
+
+      // ✅ REAL ENTER VR (no VRButton needed)
+      document.getElementById("btnVR").onclick = async ()=>{
+        try {
+          if (!window.isSecureContext) {
+            log("❌ WebXR requires HTTPS / secure context.");
+            return;
+          }
+          if (!navigator.xr) {
+            log("❌ navigator.xr not available on this browser/device.");
+            log("Tip: Quest → Meta/Oculus Browser. Android Chrome often has no immersive-vr.");
+            return;
+          }
+
+          // Check support
+          let supported = false;
+          try {
+            supported = await navigator.xr.isSessionSupported("immersive-vr");
+          } catch(e) {
+            // Some browsers throw; treat as unsupported
+            supported = false;
+          }
+          if (!supported) {
+            log("❌ immersive-vr not supported here.");
+            log("Tip: This is expected on most Android phones. Use Quest Browser for VR.");
+            return;
+          }
+
+          log("… requesting immersive-vr session");
+          const session = await navigator.xr.requestSession("immersive-vr", {
+            optionalFeatures: [
+              "local-floor",
+              "bounded-floor",
+              "hand-tracking",
+              "layers"
+            ]
+          });
+
+          session.addEventListener("end", ()=> log("ℹ️ XR session ended"));
+          await renderer.xr.setSession(session);
+
+          log("✅ Entered VR session");
+        } catch (e) {
+          log("❌ Enter VR failed:");
+          log(e?.message || String(e));
+          if (e?.stack) log(e.stack);
+        }
+      };
 
       // Input init
       try {
@@ -100,19 +145,16 @@ export const Spine = {
       setStatus("loading world…");
       log("--- loading scarlett1/world.js ---");
 
-      let worldInit = null;
       try {
         const mod = await import("../scarlett1/world.js");
-        worldInit = mod?.init;
+        const worldInit = mod?.init;
         if (typeof worldInit !== "function") throw new Error("world.js loaded but did not export init(ctx)");
         await worldInit(ctx);
         log("✅ world loaded");
       } catch (e) {
-        log("❌ world failed, loading FALLBACK world:");
+        log("❌ world failed, using fallback world:");
         log(e?.message || String(e));
         if (e?.stack) log(e.stack);
-
-        // Fallback minimal world so you NEVER get a black screen
         fallbackWorld(ctx);
       }
 
@@ -132,10 +174,7 @@ export const Spine = {
       });
 
     } catch (e) {
-      // Total boot failure
-      const hudStatus = document.getElementById("status");
-      hudStatus.textContent = "❌ BOOT FAILED";
-      const hudLog = document.getElementById("log");
+      setStatus("❌ BOOT FAILED");
       hudLog.textContent += "\n❌ BOOT FAILED:\n" + (e?.message || String(e)) + "\n";
       if (e?.stack) hudLog.textContent += e.stack + "\n";
       console.error(e);
@@ -158,18 +197,10 @@ export const Spine = {
       teleportSurfaces.push(floor);
       walkSurfaces.push(floor);
 
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(10, 0.12, 10, 80),
-        new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00ffff, emissiveIntensity: 1.2 })
-      );
-      ring.rotation.x = Math.PI/2;
-      ring.position.y = 0.08;
-      scene.add(ring);
-
       rig.position.set(0, 1.7, -12);
       rig.lookAt(0, 1.6, 0);
 
-      log("✅ FALLBACK world displayed (your real world module crashed — error above).");
+      log("✅ FALLBACK world displayed.");
     }
   }
 };
