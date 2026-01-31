@@ -1,3 +1,4 @@
 import { Spine } from "./js/runtime/spine.js";
-console.log("🚀 Scarlett Demo: boot");
+
+console.log("🚀 Scarlett SAFE Demo: boot");
 Spine.start();
