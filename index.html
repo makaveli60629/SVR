@@ -7,8 +7,7 @@
 
   <!-- A-FRAME CDN (Quest friendly) -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
-  <!-- AFRAME-EXTRAS (movement-controls, etc.) -->
+  <!-- AFRAME-EXTRAS (still loaded, but we won't use movement-controls on rig) -->
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
   <style>
@@ -39,37 +38,52 @@
   <script src="./js/scarlett1/modules/bots.js"></script>
   <script src="./js/scarlett1/modules/pit.js"></script>
 
-  <!-- Main bootstrap (contains VR-safe button logic) -->
+  <!-- Main bootstrap -->
   <script src="./js/scarlett1/main.js"></script>
 
-  <!-- A-FRAME SCENE -->
   <a-scene
     renderer="antialias:true; colorManagement:true; physicallyCorrectLights:true"
     background="color:#000"
     vr-mode-ui="enabled:true"
     device-orientation-permission-ui="enabled:true">
 
-    <!-- Player rig: works in flat + Quest -->
-    <a-entity id="rig"
-      position="0 0 3.2"
-      movement-controls="speed:0.12; fly:false"
-      wasd-controls="acceleration:35">
+    <!-- Player rig -->
+    <!-- IMPORTANT: We are NOT using movement-controls here (XR-safe mode). -->
+    <a-entity id="rig" position="0 0 3.2">
 
-      <a-entity id="camera"
-        camera
-        look-controls
-        position="0 1.6 0">
+      <a-entity id="camera" camera look-controls position="0 1.6 0">
+        <!-- Cursor fallback: lets you click VR UI even if controllers fail -->
+        <a-entity cursor="rayOrigin: mouse"
+                  raycaster="objects: .clickable; far: 30"
+                  position="0 0 -0.5"
+                  geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.016"
+                  material="color: #9ff; shader: flat; opacity: 0.9">
+        </a-entity>
       </a-entity>
 
-      <!-- Hands / Lasers (Quest controllers) -->
-      <!-- IMPORTANT: raycaster targets .clickable for VR UI panels -->
-      <a-entity laser-controls="hand: left"  raycaster="objects: .clickable; far: 30"></a-entity>
-      <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 30"></a-entity>
+      <!-- Hands / Lasers -->
+      <a-entity id="leftHand"  laser-controls="hand: left"  raycaster="objects: .clickable; far: 30"></a-entity>
+      <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable; far: 30"></a-entity>
     </a-entity>
 
-    <!-- Lights -->
-    <a-entity light="type:ambient; intensity:0.35; color:#fff"></a-entity>
-    <a-entity light="type:directional; intensity:1.1; color:#fff" position="6 10 4"></a-entity>
+    <!-- MUCH STRONGER LIGHTING -->
+    <a-entity light="type:ambient; intensity:0.90; color:#ffffff"></a-entity>
+
+    <a-entity light="type:directional; intensity:1.40; color:#ffffff"
+              position="6 10 4"></a-entity>
+
+    <!-- Fill lights around the pit -->
+    <a-entity light="type:point; intensity:1.25; distance:25; color:#2bd6ff"
+              position="0 5 6"></a-entity>
+
+    <a-entity light="type:point; intensity:1.10; distance:25; color:#7b61ff"
+              position="0 5 -6"></a-entity>
+
+    <a-entity light="type:point; intensity:1.00; distance:25; color:#ffffff"
+              position="6 4 0"></a-entity>
+
+    <a-entity light="type:point; intensity:1.00; distance:25; color:#ffffff"
+              position="-6 4 0"></a-entity>
 
     <!-- Floor -->
     <a-circle rotation="-90 0 0" radius="40"
@@ -78,7 +92,7 @@
     <!-- Lobby Root -->
     <a-entity id="lobbyRoot" scarlett-lobby></a-entity>
 
-    <!-- Pit Root (hidden until button) -->
+    <!-- Pit Root -->
     <a-entity id="pitRoot" visible="false" scarlett-pit></a-entity>
 
   </a-scene>
