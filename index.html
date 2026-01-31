@@ -3,12 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>Scarlett VR Poker</title>
+  <title>Scarlett VR Poker — Full World</title>
 
-  <!-- A-FRAME CDN -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
-  <!-- HLS for IPTV (Jumbotron) -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
 
   <style>
@@ -19,9 +16,12 @@
       background:rgba(0,0,0,.65);padding:10px 12px;border-radius:10px;
       max-width:88vw;pointer-events:none;white-space:pre-wrap
     }
-    #btnPit{
-      position:fixed;right:12px;top:12px;z-index:10000;
-      padding:10px 14px;border-radius:12px;
+    #menu{
+      position:fixed;right:10px;top:10px;z-index:10000;
+      display:flex;gap:8px;flex-wrap:wrap
+    }
+    .mbtn{
+      padding:10px 12px;border-radius:12px;
       background:rgba(0,0,0,.55);
       border:1px solid rgba(255,255,255,.25);
       color:#fff;font-weight:800
@@ -31,10 +31,14 @@
 
 <body>
   <div id="hud">BOOT…</div>
-  <button id="btnPit">Enter Poker Tables</button>
+  <div id="menu">
+    <button class="mbtn" id="btnLobby">Lobby</button>
+    <button class="mbtn" id="btnPit">Tables</button>
+    <button class="mbtn" id="btnStore">Store</button>
+    <button class="mbtn" id="btnBalcony">Balcony</button>
+  </div>
 
   <script>
-    // ALWAYS show errors (even in Quest)
     (function(){
       const hud = document.getElementById("hud");
       window.hudLog = (m)=>{ hud.textContent += "\n" + m; };
@@ -58,49 +62,60 @@
     vr-mode-ui="enabled:true"
     device-orientation-permission-ui="enabled:true">
 
+    <a-assets></a-assets>
+
     <!-- PLAYER RIG -->
-    <a-entity id="rig" position="0 0 3.2">
+    <a-entity id="rig" position="0 0 4.0">
       <a-entity id="camera" camera look-controls position="0 1.6 0"></a-entity>
 
-      <!-- Controllers (NO CURSOR = no face circle) -->
+      <!-- Controllers (NO cursor/circle in face) -->
       <a-entity id="leftHand"
                 laser-controls="hand: left"
-                raycaster="objects: .clickable, .floor; far: 40">
+                raycaster="objects: .clickable, .floor; far: 50">
       </a-entity>
 
       <a-entity id="rightHand"
                 laser-controls="hand: right"
-                raycaster="objects: .clickable, .floor; far: 40">
+                raycaster="objects: .clickable, .floor; far: 50">
       </a-entity>
     </a-entity>
 
-    <!-- FLOOR must have class floor (teleport + raycast) -->
-    <a-circle class="floor"
-              rotation="-90 0 0"
-              radius="40"
-              material="color:#07090c; roughness:1">
-    </a-circle>
+    <!-- GLOBAL FLOOR for ray hits (invisible) -->
+    <a-plane class="floor"
+             rotation="-90 0 0"
+             width="200" height="200"
+             position="0 0 0"
+             material="color:#000; opacity:0.0; transparent:true">
+    </a-plane>
 
-    <!-- LIGHTING (strong) -->
+    <!-- LIGHTING -->
     <a-entity light="type:ambient; intensity:1.05"></a-entity>
-    <a-entity light="type:directional; intensity:1.6" position="8 12 6"></a-entity>
-    <a-entity light="type:point; intensity:1.3; color:#2bd6ff; distance:30" position="0 6 7"></a-entity>
-    <a-entity light="type:point; intensity:1.2; color:#7b61ff; distance:30" position="0 6 -7"></a-entity>
+    <a-entity light="type:directional; intensity:1.7" position="9 14 7"></a-entity>
+    <a-entity light="type:point; intensity:1.25; color:#2bd6ff; distance:45" position="0 7 9"></a-entity>
+    <a-entity light="type:point; intensity:1.15; color:#7b61ff; distance:45" position="0 7 -9"></a-entity>
 
-    <!-- ROOTS that main.js expects -->
-    <a-entity id="lobbyRoot" scarlett-lobby></a-entity>
-    <a-entity id="pitRoot" visible="false" scarlett-pit></a-entity>
+    <!-- WORLD ROOTS -->
+    <a-entity id="worldRoot" scarlett-world></a-entity>
+
+    <!-- ROOMS -->
+    <a-entity id="lobbyRoot" visible="true"  scarlett-lobby></a-entity>
+    <a-entity id="pitRoot"   visible="false" scarlett-pit></a-entity>
+    <a-entity id="storeRoot" visible="false" scarlett-store></a-entity>
+    <a-entity id="balconyRoot" visible="false" scarlett-balcony></a-entity>
 
   </a-scene>
 
-  <!-- LOAD MODULES FIRST -->
+  <!-- MODULES -->
+  <script src="./js/scarlett1/modules/world.js"></script>
   <script src="./js/scarlett1/modules/lobby.js"></script>
   <script src="./js/scarlett1/modules/table.js"></script>
   <script src="./js/scarlett1/modules/bots.js"></script>
   <script src="./js/scarlett1/modules/jumbotron.js"></script>
   <script src="./js/scarlett1/modules/pit.js"></script>
+  <script src="./js/scarlett1/modules/store.js"></script>
+  <script src="./js/scarlett1/modules/balcony.js"></script>
 
-  <!-- LOAD MAIN LAST -->
+  <!-- MAIN LAST -->
   <script src="./js/scarlett1/main.js"></script>
 
 </body>
