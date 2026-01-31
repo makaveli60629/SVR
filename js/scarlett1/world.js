@@ -11,12 +11,10 @@ export async function init(ctx){
 
   const entryAngle = 0;
 
-  // ✅ Face toward center/table: yaw = PI (camera default looks -Z)
+  // stable spawn (don’t force yaw flips; just look at center)
   ctx.spawnPos.set(0, 1.75, -42);
   ctx.spawnLook.set(0, 1.55, 0);
-  ctx.spawnYaw = Math.PI;
 
-  // textures
   function makeCanvasTex(drawFn, rx=1, ry=1){
     const c=document.createElement("canvas");
     c.width=512; c.height=512;
@@ -37,9 +35,6 @@ export async function init(ctx){
       g.fillStyle=`rgb(${v},${(v*0.45)|0},${(v*1.35)|0})`;
       g.fillRect(x,y,1,1);
     }
-    g.globalAlpha=0.18; g.strokeStyle="#00c8ff"; g.lineWidth=2;
-    for (let i=0;i<7;i++){ g.beginPath(); g.arc(256,256,90+i*28,0,Math.PI*2); g.stroke(); }
-    g.globalAlpha=1;
   }, 9, 9);
 
   const wallTex = makeCanvasTex((g)=>{
@@ -80,9 +75,6 @@ export async function init(ctx){
       g.fillStyle=`rgb(${v},${(v*0.35)|0},${(v*1.25)|0})`;
       g.fillRect(x,y,1,1);
     }
-    g.globalAlpha=0.18; g.strokeStyle="#00c8ff"; g.lineWidth=2;
-    for(let i=0;i<5;i++){ g.beginPath(); g.arc(256,256,80+i*38,0,Math.PI*2); g.stroke(); }
-    g.globalAlpha=1;
   }, 5, 5);
 
   const floorMat = new THREE.MeshStandardMaterial({ map:carpetTex, roughness:0.95, metalness:0.03, side:THREE.DoubleSide });
@@ -94,6 +86,7 @@ export async function init(ctx){
   const metalRail = new THREE.MeshStandardMaterial({ color:0x141426, roughness:0.55, metalness:0.60 });
   const neonBasic = (c)=> new THREE.MeshBasicMaterial({ color:c });
 
+  // lighting
   scene.add(new THREE.AmbientLight(0xffffff, 0.65));
   const hemi = new THREE.HemisphereLight(0xffffff, 0x303070, 1.55);
   hemi.position.set(0, 40, 0);
@@ -102,10 +95,11 @@ export async function init(ctx){
   top.position.set(0, 22, 0);
   scene.add(top);
 
+  // surfaces
   teleportSurfaces.length = 0;
   walkSurfaces.length = 0;
 
-  // Floor ring
+  // floor ring (NO floor over pit)
   const innerFloorR = pitR + 0.30;
   const floorRing = new THREE.Mesh(new THREE.RingGeometry(innerFloorR, lobbyR, 220, 1), floorMat);
   floorRing.rotation.x = -Math.PI/2;
@@ -113,12 +107,12 @@ export async function init(ctx){
   teleportSurfaces.push(floorRing);
   walkSurfaces.push(floorRing);
 
-  // Walls
+  // walls
   const wall = new THREE.Mesh(new THREE.CylinderGeometry(lobbyR, lobbyR, wallH, 220, 1, true), wallMat);
   wall.position.y = wallH/2;
   scene.add(wall);
 
-  // Pit
+  // pit wall + floor
   const pitWall = new THREE.Mesh(new THREE.CylinderGeometry(pitR, pitR, pitDepth, 180, 1, true), pitWallMat);
   pitWall.position.y = -pitDepth/2 + 0.08;
   scene.add(pitWall);
@@ -130,17 +124,17 @@ export async function init(ctx){
   teleportSurfaces.push(pitFloor);
   walkSurfaces.push(pitFloor);
 
-  // Low trim border
+  // trim border
   const trim = new THREE.Mesh(new THREE.TorusGeometry(pitR+0.25, 0.11, 10, 200), neonBasic(0xff00aa));
   trim.rotation.x = Math.PI/2;
   trim.position.y = 0.22;
   scene.add(trim);
 
-  // Stairs + bottom plate placed under LAST step
+  // stairs + smooth curved rail
   {
     const opening = Math.PI/7;
-    const platR = (pitR + 0.3) + 0.95;
 
+    const platR = (pitR + 0.3) + 0.95;
     const topPed = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.22, 4.1), metalDark);
     topPed.position.set(Math.cos(entryAngle)*platR, 0.11, Math.sin(entryAngle)*platR);
     topPed.rotation.y = entryAngle;
@@ -165,13 +159,13 @@ export async function init(ctx){
       emissive:0x12003a, emissiveIntensity:0.22
     });
 
-    // ✅ RIGHT side rail = inner side toward pit center
+    // RIGHT side rail (inner toward pit center)
     const railSideR = r - 1.05;
-    const poleG = new THREE.CylinderGeometry(0.06,0.06,0.95,10);
-    let prevRailPos = null;
 
-    // We’ll record the last step position
+    const poleG = new THREE.CylinderGeometry(0.06,0.06,0.92,10);
+
     let lastStepPos = new THREE.Vector3();
+    const railPoints = [];
 
     for (let i=0;i<stepCount;i++){
       const t = (i+1)/stepCount;
@@ -188,41 +182,41 @@ export async function init(ctx){
       teleportSurfaces.push(step);
       walkSurfaces.push(step);
 
-      if (i === stepCount - 1) lastStepPos.set(x, y, z);
+      if (i === stepCount - 1) lastStepPos.set(x,y,z);
 
+      // poles
       const rx = Math.cos(a)*railSideR;
       const rz = Math.sin(a)*railSideR;
 
       const pole = new THREE.Mesh(poleG, metalRail);
-      pole.position.set(rx, y+0.45, rz);
+      pole.position.set(rx, y+0.46, rz);
       scene.add(pole);
 
-      const railPos = new THREE.Vector3(rx, y+0.92, rz);
-      if (prevRailPos){
-        const mid = prevRailPos.clone().add(railPos).multiplyScalar(0.5);
-        const len = prevRailPos.distanceTo(railPos);
-        const seg = new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,len,10), neonBasic(0x00ffff));
-        seg.position.copy(mid);
-        seg.lookAt(railPos);
-        seg.rotation.x += Math.PI/2;
-        scene.add(seg);
-      }
-      prevRailPos = railPos;
+      // points for smooth handrail
+      railPoints.push(new THREE.Vector3(rx, y+0.92, rz));
     }
 
-    // ✅ Bottom plate moved under last step, touching floor
+    // bottom plate under last step
     const bottomPlate = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.16, 3.6), metalDark);
     bottomPlate.position.set(lastStepPos.x, pitFloorY + 0.08, lastStepPos.z);
-    bottomPlate.rotation.y = Math.atan2(lastStepPos.x, lastStepPos.z); // stable-ish align
     scene.add(bottomPlate);
     teleportSurfaces.push(bottomPlate);
     walkSurfaces.push(bottomPlate);
+
+    // ✅ one continuous smooth curved handrail (tube)
+    if (railPoints.length >= 4){
+      const curve = new THREE.CatmullRomCurve3(railPoints);
+      const tube = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, 120, 0.07, 10, false),
+        neonBasic(0x00ffff)
+      );
+      scene.add(tube);
+    }
   }
 
-  // Apply spawn now
+  // apply spawn
   rig.position.copy(ctx.spawnPos);
-  rig.rotation.set(0, ctx.spawnYaw, 0);
   rig.lookAt(ctx.spawnLook);
 
-  say("✅ Fixed: spawn faces table (yaw=PI), laser will follow you (input world->local), bottom plate moved under last step, stair rail moved to right side (inner).");
-                                                     }
+  say("✅ World: smooth stair handrail tube + tighter stairs.");
+}
