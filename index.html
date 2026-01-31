@@ -3,13 +3,34 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>ScarlettVR Poker • Demo</title>
+  <title>ScarlettVR Poker • SAFE Demo</title>
   <style>
     html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
     canvas { display:block; width:100%; height:100%; }
 
-    /* Never block touch input with overlays */
-    #hud, #dev-hud, #diag, #diagnostics, .overlay { pointer-events:none !important; user-select:none; }
+    #overlay {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: flex-start; justify-content: flex-start;
+      padding: 12px;
+      background: rgba(0,0,0,0.0);
+      color: #fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    #status { background: rgba(0,0,0,0.45); padding: 8px 10px; border-radius: 12px; white-space: pre; }
+    #err {
+      margin-top: 10px;
+      background: rgba(120,0,0,0.55);
+      border: 1px solid rgba(255,120,120,0.6);
+      padding: 10px;
+      border-radius: 14px;
+      max-width: 96vw;
+      white-space: pre-wrap;
+      display: none;
+      pointer-events: auto;
+    }
 
     /* Touch joystick zone (Android) bottom-left */
     #joyZone{
@@ -18,6 +39,7 @@
       width:52vw; height:48vh;
       pointer-events:auto;
       touch-action:none;
+      z-index: 10;
     }
 
     /* Tap teleport zone (Android) bottom-right */
@@ -27,58 +49,43 @@
       width:48vw; height:48vh;
       pointer-events:auto;
       touch-action:manipulation;
-    }
-
-    #axisdbg{
-      position:fixed; left:10px; top:10px;
-      color:#a8ffb0; font:12px ui-monospace, SFMono-Regular, Menlo, monospace;
-      background:rgba(0,0,0,.45);
-      padding:7px 9px; border-radius:12px;
-      pointer-events:none;
-      white-space:pre;
-    }
-
-    #hint{
-      position:fixed; left:10px; right:10px; bottom:12px;
-      color:#fff; font:13px system-ui, sans-serif;
-      text-shadow:0 2px 10px rgba(0,0,0,.75);
-      opacity:.92;
-      pointer-events:none;
+      z-index: 10;
     }
 
     #xrbar{
       position:fixed; right:12px; top:12px;
       display:flex; gap:10px;
       pointer-events:auto;
-      z-index:10;
+      z-index: 10000;
     }
     .xrbtn{
       font:700 13px system-ui, sans-serif;
       padding:10px 14px;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.25);
-      background:rgba(0,0,0,.55);
+      background:rgba(0,0,0,.6);
       color:#fff;
       backdrop-filter: blur(6px);
     }
   </style>
 </head>
 <body>
+
   <div id="xrbar">
     <button class="xrbtn" id="btnVR">Enter VR</button>
     <button class="xrbtn" id="btnReset">Reset Spawn</button>
+    <button class="xrbtn" id="btnHard">Hard Reload</button>
   </div>
 
-  <div id="axisdbg">axes: 0.00, 0.00</div>
-
-  <div id="hint">
-    Android: drag bottom-left to move • tap bottom-right to teleport •
-    Quest: pinch/trigger HOLD = move forward • pinch/trigger TAP = teleport
+  <div id="overlay">
+    <div id="status">boot…</div>
+    <div id="err"></div>
   </div>
 
   <div id="joyZone" aria-label="joystick-zone"></div>
   <div id="teleZone" aria-label="teleport-zone"></div>
 
-  <script type="module" src="./index.js"></script>
+  <!-- Cache-bust version string -->
+  <script type="module" src="./index.js?v=SAFE_20260131_1"></script>
 </body>
 </html>
