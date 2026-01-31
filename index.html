@@ -1,58 +1,57 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SCARLETT1</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>SVR | Scarlett1</title>
 
+  <!-- A-Frame CDN (Quest friendly) -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
   <style>
-    body { margin:0; background:#000; overflow:hidden; }
-    #hudWrap{
-      position:fixed; left:10px; top:10px; width:360px; max-width:92vw;
-      color:#9ff; font:14px/1.35 monospace;
-      background:rgba(0,0,0,.35); padding:10px 12px; border-radius:10px;
-      z-index:9999; pointer-events:none;
-    }
-    #enterVRBtn{
-      position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
-      padding:14px 18px; border-radius:14px;
-      background:rgba(10,12,18,.85);
-      border:1px solid rgba(120,240,255,.55);
-      color:#bff; font:700 15px/1.1 system-ui, sans-serif;
-      z-index:10000; display:none;
+    html, body { margin:0; padding:0; width:100%; height:100%; background:#000; overflow:hidden; }
+    #hud {
+      position: fixed; left: 12px; top: 12px; z-index: 99999;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 14px; line-height: 1.35;
+      color: #8ff; text-shadow: 0 2px 10px rgba(0,0,0,.9);
+      white-space: pre-wrap; pointer-events:none;
+      max-width: 92vw;
     }
   </style>
+
+  <!-- IMPORTANT: load your world -->
+  <script type="module" src="/SVR/js/scarlett1/main.js"></script>
 </head>
 
 <body>
-  <div id="hudWrap"><div id="hud">boot…</div></div>
-  <button id="enterVRBtn">ENTER VR</button>
+  <div id="hud">boot…</div>
 
+  <!-- ✅ MUST HAVE scarlett-world HERE OR NOTHING BUILDS -->
   <a-scene
-    renderer="
-      antialias:false;
-      precision:mediump;
-      colorManagement:true;
-      physicallyCorrectLights:false;
-      sortObjects:true;
-      powerPreference:high-performance;
-    "
-    vr-mode-ui="enabled:true"
-    background="color:#000"
-    device-orientation-permission-ui="enabled: false"
     scarlett-world
+    vr-mode-ui="enabled:true"
+    renderer="antialias:false; precision:mediump; colorManagement:true; physicallyCorrectLights:true;"
+    background="color:#000000"
   >
-    <a-entity id="rig" position="0 1.6 18" rotation="0 0 0">
-      <a-entity id="camera" camera look-controls position="0 0 0"></a-entity>
-      <a-entity id="leftHand"  oculus-touch-controls="hand: left"></a-entity>
-      <a-entity id="rightHand" oculus-touch-controls="hand: right"></a-entity>
+    <!-- Rig -->
+    <a-entity id="rig" position="0 0 18" rotation="0 180 0">
+      <a-entity id="camera" camera look-controls position="0 1.6 0"></a-entity>
+
+      <!-- Quest Controllers + Hands -->
+      <a-entity id="leftHand"
+        oculus-touch-controls="hand:left"
+        hand-controls="hand:left"
+      ></a-entity>
+
+      <a-entity id="rightHand"
+        oculus-touch-controls="hand:right"
+        hand-controls="hand:right"
+      ></a-entity>
     </a-entity>
 
+    <!-- World Root -->
     <a-entity id="worldRoot"></a-entity>
   </a-scene>
-
-  <script type="module" src="./js/scarlett1/main.js"></script>
 </body>
-</html>
+  </html>
