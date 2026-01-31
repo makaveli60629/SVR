@@ -1,47 +1,25 @@
-// js/scarlett1/modules/jumbotron.js
-import { getScene, ensureEntity, setVisible } from './utils.js';
+export function buildJumbotron(THREE) {
+  const g = new THREE.Group();
 
-let _root = null;
-let _visible = true;
+  const frame = new THREE.Mesh(
+    new THREE.BoxGeometry(6.4, 3.7, 0.25),
+    new THREE.MeshStandardMaterial({ color: 0x0b0f14, roughness: 0.30, metalness: 0.60 })
+  );
+  g.add(frame);
 
-export const jumbotron = {
-  spawn() {
-    const scene = getScene();
-    if (!scene) return null;
-    if (_root) return _root;
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(5.7, 3.1),
+    new THREE.MeshBasicMaterial({ color: 0x12273a })
+  );
+  screen.position.z = 0.13;
+  g.add(screen);
 
-    _root = ensureEntity('scarlett-jumbotron','a-entity', scene);
-    _root.setAttribute('position','0 6 -20');
+  const glow = new THREE.Mesh(
+    new THREE.BoxGeometry(6.6, 3.9, 0.10),
+    new THREE.MeshBasicMaterial({ color: 0x2bd6ff, transparent: true, opacity: 0.12 })
+  );
+  glow.position.z = 0.18;
+  g.add(glow);
 
-    const screen = document.createElement('a-plane');
-    screen.setAttribute('width','10');
-    screen.setAttribute('height','5.6');
-    screen.setAttribute('material','color:#111; emissive:#00ffff; emissiveIntensity:0.06; opacity:0.96; transparent:true');
-    _root.appendChild(screen);
-
-    const title = document.createElement('a-text');
-    title.setAttribute('value','JUMBOTRON • VIDEO READY');
-    title.setAttribute('align','center');
-    title.setAttribute('width','12');
-    title.setAttribute('color','#00FF00');
-    title.setAttribute('position','0 2.6 0.02');
-    _root.appendChild(title);
-
-    const hint = document.createElement('a-text');
-    hint.setAttribute('value','(Connect your video later: set material src to a <video> asset)');
-    hint.setAttribute('align','center');
-    hint.setAttribute('width','10');
-    hint.setAttribute('color','#00FFFF');
-    hint.setAttribute('position','0 -2.7 0.02');
-    _root.appendChild(hint);
-
-    setVisible(_root, _visible);
-    return _root;
-  },
-  toggle() {
-    if (!_root) this.spawn();
-    _visible = !_visible;
-    setVisible(_root,_visible);
-    return _visible;
-  }
-};
+  return g;
+}
