@@ -1,11 +1,9 @@
 /**
- * spine.js — PERMANENT ROOT SPINE (XR RIG + TELEPORT)
- * - Creates a player rig (moves in XR)
- * - Teleport works with controllers (select) and hands (pinch)
- * - Calls world init contract and consumes world.teleportSurfaces
- *
- * IMPORTANT:
- *  - In XR: NEVER move camera position to teleport/spawn; move rig instead.
+ * spine.js — PERMANENT ROOT SPINE (XR RIG + GAMEPAD MOVE + TELEPORT)
+ * Fixes:
+ *  - ALWAYS moves the RIG in XR (spawn/teleport/locomotion)
+ *  - Smooth move (left stick) + snap turn (right stick) on Quest controllers
+ *  - Teleport (trigger select) with marker
  */
 
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
@@ -23,39 +21,36 @@ export const Spine = (() => {
     renderer: null,
     clock: null,
     xrButtonEl: null,
+
     worldUpdates: [],
     teleportSurfaces: [],
-    // XR input
+
     controller1: null,
     controller2: null,
     grip1: null,
     grip2: null,
     hand1: null,
     hand2: null,
-    // Teleport
+
     raycaster: null,
     marker: null,
     lastHit: null,
+
     xrSpawn: { pos: new THREE.Vector3(0, 0, 14), yaw: Math.PI },
+    xrSpawnApplied: false,
+
+    // locomotion tuning
+    moveSpeed: 2.6,          // meters/sec
+    snapTurnDeg: 30,         // degrees per snap
+    snapCooldown: 0.22,
+    snapT: 0,
   };
 
-  function nowISO(){ return new Date().toISOString(); }
+  const isXR = () => !!(S.renderer && S.renderer.xr && S.renderer.xr.isPresenting);
 
   function assertSingleInstance() {
-    if (window.__SCARLETT_SPINE_LOCK__) {
-      console.warn('🛑 Duplicate spine init blocked.');
-      throw new Error('Duplicate spine init blocked (blink prevention)');
-    }
+    if (window.__SCARLETT_SPINE_LOCK__) throw new Error('Duplicate spine init blocked (blink prevention)');
     window.__SCARLETT_SPINE_LOCK__ = true;
-  }
-
-  function resize() {
-    if (!S.renderer || !S.camera) return;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    S.camera.aspect = w / h;
-    S.camera.updateProjectionMatrix();
-    S.renderer.setSize(w, h);
   }
 
   function disposeRendererIfAny() {
@@ -70,15 +65,19 @@ export const Spine = (() => {
     }
   }
 
-  const isXR = () => !!(S.renderer && S.renderer.xr && S.renderer.xr.isPresenting);
+  function resize() {
+    if (!S.renderer || !S.camera) return;
+    S.camera.aspect = window.innerWidth / window.innerHeight;
+    S.camera.updateProjectionMatrix();
+    S.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
 
-  // ---------- TELEPORT CORE ----------
   function ensureTeleport() {
     S.raycaster = new THREE.Raycaster();
-    S.raycaster.far = 60;
+    S.raycaster.far = 80;
 
     S.marker = new THREE.Mesh(
-      new THREE.RingGeometry(0.18, 0.26, 32),
+      new THREE.RingGeometry(0.20, 0.30, 40),
       new THREE.MeshBasicMaterial({ color: 0x7a45ff, transparent: true, opacity: 0.95, side: THREE.DoubleSide })
     );
     S.marker.rotation.x = -Math.PI / 2;
@@ -86,38 +85,30 @@ export const Spine = (() => {
     S.scene.add(S.marker);
   }
 
-  function teleportSetSpawn(posVec3, yaw=0) {
+  function setXRSpawn(posVec3, yaw = 0) {
     S.xrSpawn.pos.copy(posVec3);
     S.xrSpawn.yaw = yaw;
-    S.diag?.log?.(`[spawn] setXRSpawn -> (${posVec3.x.toFixed(2)}, ${posVec3.y.toFixed(2)}, ${posVec3.z.toFixed(2)}) yaw=${yaw.toFixed(2)}`);
+    S.diag?.log?.(`[spawn] set -> (${posVec3.x.toFixed(2)},${posVec3.y.toFixed(2)},${posVec3.z.toFixed(2)}) yaw=${yaw.toFixed(2)}`);
   }
 
-  function teleportApplySpawn() {
-    // Move rig to spawn. Keep y = 0 baseline (your world floor is 0)
+  function applyXRSpawn() {
+    // IMPORTANT: move RIG, not camera
     S.rig.position.set(S.xrSpawn.pos.x, 0, S.xrSpawn.pos.z);
     S.rig.rotation.set(0, S.xrSpawn.yaw, 0);
+    S.xrSpawnApplied = true;
     S.diag?.log?.('[spawn] applied (rig moved) ✅');
   }
 
   function castTeleport(fromObj) {
-    if (!fromObj || !S.teleportSurfaces?.length) {
-      S.marker.visible = false;
-      S.lastHit = null;
-      return null;
-    }
+    if (!fromObj || !S.teleportSurfaces?.length) { S.marker.visible = false; S.lastHit = null; return null; }
 
-    const m = new THREE.Matrix4().extractRotation(fromObj.matrixWorld);
+    const rot = new THREE.Matrix4().extractRotation(fromObj.matrixWorld);
     const origin = new THREE.Vector3().setFromMatrixPosition(fromObj.matrixWorld);
-    const dir = new THREE.Vector3(0,0,-1).applyMatrix4(m).normalize();
-
+    const dir = new THREE.Vector3(0, 0, -1).applyMatrix4(rot).normalize();
     S.raycaster.set(origin, dir);
 
     const hits = S.raycaster.intersectObjects(S.teleportSurfaces, true);
-    if (!hits.length) {
-      S.marker.visible = false;
-      S.lastHit = null;
-      return null;
-    }
+    if (!hits.length) { S.marker.visible = false; S.lastHit = null; return null; }
 
     const h = hits[0];
     S.lastHit = h;
@@ -129,19 +120,15 @@ export const Spine = (() => {
 
   function doTeleport() {
     if (!S.lastHit) return;
-
-    // TELEPORT BY MOVING RIG, NOT CAMERA
+    // move rig
     S.rig.position.x = S.lastHit.point.x;
     S.rig.position.z = S.lastHit.point.z;
     S.rig.position.y = 0;
-
     S.marker.visible = false;
     S.lastHit = null;
-
     S.diag?.log?.('[teleport] jump ✅');
   }
 
-  // ---------- XR INPUT ----------
   function mountXRHandsAndControllers() {
     const controllerModelFactory = new XRControllerModelFactory();
     const handModelFactory = new XRHandModelFactory();
@@ -149,17 +136,17 @@ export const Spine = (() => {
     const rayGeo = new THREE.BufferGeometry().setFromPoints([ new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,-1) ]);
     const rayMat = new THREE.LineBasicMaterial({ color: 0x2bd6ff });
 
-    // Controllers
     S.controller1 = S.renderer.xr.getController(0);
     S.controller2 = S.renderer.xr.getController(1);
 
     for (const c of [S.controller1, S.controller2]) {
       const line = new THREE.Line(rayGeo, rayMat);
-      line.scale.z = 30;
+      line.scale.z = 40;
       c.add(line);
 
+      // trigger selects -> teleport
       c.addEventListener('selectstart', () => { c.userData.selecting = true; });
-      c.addEventListener('selectend', () => { c.userData.selecting = false; doTeleport(); });
+      c.addEventListener('selectend',   () => { c.userData.selecting = false; doTeleport(); });
 
       S.scene.add(c);
     }
@@ -172,41 +159,106 @@ export const Spine = (() => {
     S.grip2.add(controllerModelFactory.createControllerModel(S.grip2));
     S.scene.add(S.grip2);
 
-    // Hands
+    // Hands (visual only; pinch events are inconsistent across devices)
     S.hand1 = S.renderer.xr.getHand(0);
     S.hand1.add(handModelFactory.createHandModel(S.hand1, 'mesh'));
-    S.hand1.userData.pinching = false;
-    S.hand1.addEventListener('pinchstart', () => { S.hand1.userData.pinching = true; });
-    S.hand1.addEventListener('pinchend', () => { S.hand1.userData.pinching = false; doTeleport(); });
     S.scene.add(S.hand1);
 
     S.hand2 = S.renderer.xr.getHand(1);
     S.hand2.add(handModelFactory.createHandModel(S.hand2, 'mesh'));
-    S.hand2.userData.pinching = false;
-    S.hand2.addEventListener('pinchstart', () => { S.hand2.userData.pinching = true; });
-    S.hand2.addEventListener('pinchend', () => { S.hand2.userData.pinching = false; doTeleport(); });
     S.scene.add(S.hand2);
 
     S.diag?.log?.('[xr] controllers + hands mounted ✅');
   }
 
+  function gamepadLocomotion(dt) {
+    // Read thumbsticks from controller gamepads (Quest)
+    // Typical mapping:
+    //  left: axes[2], axes[3] OR axes[0], axes[1] depending on browser
+    //  right: axes[2], axes[3] etc. We'll try both patterns robustly.
+
+    const dead = 0.16;
+
+    function readPad(ctrl) {
+      const src = ctrl?.inputSource;
+      const gp = src?.gamepad;
+      if (!gp || !gp.axes) return null;
+      return gp;
+    }
+
+    const gp1 = readPad(S.controller1);
+    const gp2 = readPad(S.controller2);
+
+    const gp = gp1 || gp2;
+    if (!gp) return;
+
+    // pick move axes: prefer 0/1 for left stick if present
+    const ax0 = gp.axes[0] ?? 0;
+    const ax1 = gp.axes[1] ?? 0;
+    const ax2 = gp.axes[2] ?? 0;
+    const ax3 = gp.axes[3] ?? 0;
+
+    // heuristic: if 0/1 are near 0 but 2/3 are active, use 2/3
+    const use23 = (Math.abs(ax0) + Math.abs(ax1) < 0.08) && (Math.abs(ax2) + Math.abs(ax3) > 0.08);
+
+    const moveX = use23 ? ax2 : ax0;
+    const moveY = use23 ? ax3 : ax1;
+
+    // try to get turn from the "other" pair
+    const turnX = use23 ? ax0 : ax2;
+
+    const mx = Math.abs(moveX) > dead ? moveX : 0;
+    const my = Math.abs(moveY) > dead ? moveY : 0;
+
+    // Move in the direction the HEADSET faces (camera world direction), but only on XZ
+    if (mx || my) {
+      const fwd = new THREE.Vector3();
+      S.camera.getWorldDirection(fwd);
+      fwd.y = 0; fwd.normalize();
+
+      const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0,1,0)).normalize();
+
+      const step = new THREE.Vector3()
+        .addScaledVector(right, mx)
+        .addScaledVector(fwd, -my);
+
+      if (step.lengthSq() > 0) {
+        step.normalize().multiplyScalar(S.moveSpeed * dt);
+        S.rig.position.add(step);
+        S.rig.position.y = 0;
+      }
+    }
+
+    // Snap turn (right stick X) — cooldown
+    S.snapT -= dt;
+    const tx = Math.abs(turnX) > 0.65 ? turnX : 0;
+    if (tx && S.snapT <= 0) {
+      const dir = tx > 0 ? -1 : 1;
+      const rad = THREE.MathUtils.degToRad(S.snapTurnDeg) * dir;
+      S.rig.rotation.y += rad;
+      S.snapT = S.snapCooldown;
+      S.diag?.log?.('[move] snap turn');
+    }
+  }
+
   function animate() {
     const dt = S.clock.getDelta();
+
+    // If XR started and spawn not applied, force it once
+    if (isXR() && !S.xrSpawnApplied) applyXRSpawn();
 
     // World updates
     for (let i = 0; i < S.worldUpdates.length; i++) {
       try { S.worldUpdates[i](dt); } catch {}
     }
 
-    // Teleport aiming
     if (isXR()) {
-      // Controller aiming always
+      // aiming marker
       castTeleport(S.controller1);
       castTeleport(S.controller2);
 
-      // Hands aim only while pinching (less noisy)
-      if (S.hand1?.userData?.pinching) castTeleport(S.hand1);
-      if (S.hand2?.userData?.pinching) castTeleport(S.hand2);
+      // controller locomotion
+      gamepadLocomotion(dt);
     }
 
     S.renderer.render(S.scene, S.camera);
@@ -219,9 +271,9 @@ export const Spine = (() => {
     disposeRendererIfAny();
 
     S.scene = new THREE.Scene();
-    S.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 500);
+    S.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 800);
 
-    // Rig wrapper (XR locomotion moves this)
+    // player rig (XR locomotion uses this)
     S.rig = new THREE.Group();
     S.rig.name = 'playerRig';
     S.scene.add(S.rig);
@@ -243,25 +295,20 @@ export const Spine = (() => {
     try { mountXRHandsAndControllers(); }
     catch (e) { S.diag?.warn?.('[xr] mount failed: ' + (e?.message || e)); }
 
-    // Provide world a way to set XR spawn safely
-    const setXRSpawn = (posVec3, yaw=0) => teleportSetSpawn(posVec3, yaw);
-
     const log = (m) => S.diag?.log?.(m) || console.log(m);
 
-    // WORLD INIT (we pass rig/renderer/setXRSpawn so world can cooperate with XR)
     const worldResult = await initWorld({
       THREE,
       scene: S.scene,
       camera: S.camera,
       rig: S.rig,
       renderer: S.renderer,
-      setXRSpawn,
+      setXRSpawn: (pos, yaw=0)=> setXRSpawn(pos, yaw),
       log
     });
 
     S.worldUpdates = Array.isArray(worldResult?.updates) ? worldResult.updates : [];
 
-    // Accept explicit teleportSurfaces OR auto-collect by userData.teleportable
     if (Array.isArray(worldResult?.teleportSurfaces) && worldResult.teleportSurfaces.length) {
       S.teleportSurfaces = worldResult.teleportSurfaces;
     } else {
@@ -272,32 +319,24 @@ export const Spine = (() => {
 
     S.diag?.log?.(`[teleport] surfaces=${S.teleportSurfaces.length}`);
 
-    // XR session events: snap spawn OUTSIDE pit when VR begins
+    // XR session hooks
     S.renderer.xr.addEventListener('sessionstart', () => {
-      const sess = S.renderer.xr.getSession();
-      let hasHands = false, hasControllers = false;
-
-      if (sess?.inputSources) {
-        for (const src of sess.inputSources) {
-          if (src.hand) hasHands = true;
-          if (src.gamepad) hasControllers = true;
-        }
-      }
-      S.diag?.log?.(`[xr] sessionstart ✅ hands=${hasHands} controllers=${hasControllers}`);
-
-      teleportApplySpawn(); // ✅ spawn rig safely
+      S.xrSpawnApplied = false; // re-apply once XR begins
+      S.diag?.log?.('[xr] sessionstart ✅');
+      applyXRSpawn();
+      // apply again shortly (Quest sometimes updates origin a frame later)
+      setTimeout(()=> { if (isXR()) applyXRSpawn(); }, 250);
     });
 
     S.renderer.xr.addEventListener('sessionend', () => {
       S.marker.visible = false;
       S.lastHit = null;
+      S.xrSpawnApplied = false;
       S.diag?.log?.('[xr] sessionend ✅');
     });
 
-    // SINGLE LOOP ONLY
     S.renderer.setAnimationLoop(animate);
 
-    // XR button (once)
     if (!S.xrButtonEl) {
       S.xrButtonEl = XRButton.createButton(S.renderer);
       S.xrButtonEl.style.position = 'absolute';
@@ -307,39 +346,23 @@ export const Spine = (() => {
       document.body.appendChild(S.xrButtonEl);
     }
 
-    // Expose helpers
+    // debug helpers
     window.SCARLETT = {
       enterVR: async ()=> { if (S.xrButtonEl?.tagName === 'BUTTON') S.xrButtonEl.click(); },
-      resetSpawn: ()=> teleportApplySpawn(),
-      setXRSpawn: (x,y,z,yaw=0)=> teleportSetSpawn(new THREE.Vector3(x,y,z), yaw),
-      getReport: ()=> getReport(),
+      resetSpawn: ()=> applyXRSpawn(),
+      getReport: ()=> [
+        'Scarlett Diagnostics Report',
+        'build=SCARLETT_SPINE_VR_MOVE_TELEPORT_BRIGHT',
+        'time=' + new Date().toISOString(),
+        'href=' + location.href,
+        'ua=' + navigator.userAgent,
+        'xr=' + (isXR() ? 'true' : 'false'),
+        'teleportSurfaces=' + (S.teleportSurfaces?.length || 0),
+      ].join('\n')
     };
 
     S.diag?.log?.('[spine] started ✅');
   }
 
-  function resetSpawn() {
-    // Desktop/mobile camera reset only; XR uses rig spawn
-    S.camera.position.set(0, 1.6, 14);
-    S.camera.lookAt(0, 1.4, 0);
-    S.diag?.log?.('[spine] reset spawn');
-  }
-
-  function getReport() {
-    return [
-      'Scarlett Diagnostics Report',
-      'build=SCARLETT_SPINE_XR_RIG_TELEPORT_V3',
-      'time=' + nowISO(),
-      'href=' + location.href,
-      'ua=' + navigator.userAgent,
-      'secureContext=' + (window.isSecureContext ? 'true' : 'false'),
-      'xrSupported=' + ('xr' in navigator ? 'true' : 'false'),
-      'spineLock=' + (window.__SCARLETT_SPINE_LOCK__ ? 'true' : 'false'),
-      'renderer=' + (S.renderer ? 'ready' : 'none'),
-      'worldUpdates=' + (S.worldUpdates?.length || 0),
-      'teleportSurfaces=' + (S.teleportSurfaces?.length || 0),
-    ].join('\n');
-  }
-
-  return { start, resetSpawn, getReport };
+  return { start };
 })();
