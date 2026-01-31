@@ -1,314 +1,283 @@
 /**
- * SCARLETT1 SPINE — XR RIG + LOCOMOTION (PERMANENT)
- * - Player rig you can move in VR
- * - Controllers visible (simple meshes)
- * - Smooth locomotion (thumbstick) + snap turn
- * - Teleport (trigger) using raycast to floor
- * - Safe: no Three.js example imports
+ * SCARLETT1 SPINE — XR EVENTS + TELEPORT (HAND + CONTROLLER) + AXIS MOVE
+ * PERMANENT: edit only /js/scarlett1/*
  */
 
 export async function init(ctx) {
   const { THREE, scene, camera, renderer, log } = ctx;
 
-  log('[spine] init scarlett1 spine');
+  log('[spine] init V3 xr locomotion');
 
   // -------------------------
-  // PLAYER RIG (move this, not the XR camera)
+  // PLAYER RIG (move this)
   // -------------------------
   const playerRig = new THREE.Group();
   playerRig.name = 'playerRig';
   scene.add(playerRig);
-
-  // put camera inside rig
   playerRig.add(camera);
-
-  // default standing height for non-XR (XR overrides pose)
   camera.position.set(0, 1.6, 0);
 
-  // expose for buttons (Reset Spawn, etc)
   window.__SCARLETT_PLAYER__ = playerRig;
 
   // -------------------------
-  // CONTROLLERS (VISIBLE)
+  // CONTROLLERS + EVENTS
   // -------------------------
   const controllers = [];
-  const controllerGrips = []; // optional later
+  const aiming = [false, false];
+  const lastHit = [null, null];
 
-  function makeControllerViz() {
-    const g = new THREE.Group();
-    const mat = new THREE.MeshStandardMaterial({ color: 0x9b7cff, roughness: 0.35, metalness: 0.2 });
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.02, 0.10, 12), mat);
-    body.rotation.x = Math.PI / 2;
-    body.position.z = -0.05;
-    g.add(body);
-
-    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.01, 12, 12), mat);
-    tip.position.z = -0.11;
-    g.add(tip);
-    return g;
-  }
-
-  for (let i = 0; i < 2; i++) {
-    const c = renderer.xr.getController(i);
-    c.add(makeControllerViz());
-    playerRig.add(c);
-    controllers.push(c);
-
-    // Optional: grips later with controller models
-    const grip = renderer.xr.getControllerGrip(i);
-    playerRig.add(grip);
-    controllerGrips.push(grip);
-  }
-
-  // -------------------------
-  // RAY + TELEPORT TARGET
-  // -------------------------
-  const rayMat = new THREE.LineBasicMaterial({ color: 0xffffff });
-  function makeRay() {
-    const geo = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, 0, -1),
-    ]);
-    const line = new THREE.Line(geo, rayMat);
-    line.name = 'teleRay';
-    line.scale.z = 12;
-    line.visible = false;
-    return line;
-  }
-
-  const rays = [makeRay(), makeRay()];
-  controllers[0].add(rays[0]);
-  controllers[1].add(rays[1]);
-
-  const teleportMarker = new THREE.Mesh(
-    new THREE.RingGeometry(0.18, 0.24, 32),
-    new THREE.MeshBasicMaterial({ color: 0x00ffcc, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
-  );
-  teleportMarker.rotation.x = -Math.PI / 2;
-  teleportMarker.visible = false;
-  scene.add(teleportMarker);
-
-  // we will raycast against "floor" meshes tagged with userData.isFloor = true
   const raycaster = new THREE.Raycaster();
   const tmpMat4 = new THREE.Matrix4();
   const tmpDir = new THREE.Vector3();
   const tmpPos = new THREE.Vector3();
 
-  // -------------------------
-  // MOVEMENT SETTINGS
-  // -------------------------
-  const MOVE_SPEED = 2.2;      // meters/sec
-  const TURN_DEG = 30;         // snap turn degrees
-  const TURN_COOLDOWN = 0.25;  // seconds
-  let turnCooldownT = 0;
+  const teleportMarker = new THREE.Mesh(
+    new THREE.RingGeometry(0.18, 0.25, 40),
+    new THREE.MeshBasicMaterial({ color: 0x2bffcc, transparent: true, opacity: 0.9, side: THREE.DoubleSide })
+  );
+  teleportMarker.rotation.x = -Math.PI / 2;
+  teleportMarker.visible = false;
+  scene.add(teleportMarker);
 
-  // Button state
-  const state = {
-    teleportArmed: [false, false],
-    teleportHit: null,
-  };
-
-  function getGamepad(i) {
-    const s = renderer.xr.getSession?.();
-    if (!s) return null;
-    const src = s.inputSources;
-    for (let k = 0; k < src.length; k++) {
-      const gp = src[k]?.gamepad;
-      if (!gp) continue;
-      // map by handedness if possible
-      const handed = src[k].handedness; // 'left'/'right'
-      if (i === 0 && handed === 'left') return gp;
-      if (i === 1 && handed === 'right') return gp;
-    }
-    // fallback: first 2 gamepads
-    const gps = [];
-    for (let k = 0; k < src.length; k++) if (src[k]?.gamepad) gps.push(src[k].gamepad);
-    return gps[i] || null;
+  function makeControllerViz() {
+    const g = new THREE.Group();
+    const mat = new THREE.MeshStandardMaterial({ color: 0x9b7cff, roughness: 0.35, metalness: 0.2 });
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.02, 0.11, 12), mat);
+    body.rotation.x = Math.PI / 2;
+    body.position.z = -0.06;
+    g.add(body);
+    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.012, 12, 12), mat);
+    tip.position.z = -0.125;
+    g.add(tip);
+    return g;
   }
 
-  function yawFromCamera() {
-    // yaw-only direction based on camera forward
-    const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-    fwd.y = 0;
-    fwd.normalize();
-    return fwd;
+  function makeRay() {
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -1),
+    ]);
+    const mat = new THREE.LineBasicMaterial({ color: 0xffffff });
+    const line = new THREE.Line(geo, mat);
+    line.scale.z = 14;
+    line.visible = false;
+    return line;
   }
 
-  function rightFromYaw(fwd) {
-    const r = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0)).normalize();
-    // cross(forward, up) gives left; invert for right
-    r.multiplyScalar(-1);
-    return r;
+  const rays = [makeRay(), makeRay()];
+
+  function getFloors() {
+    const floors = [];
+    scene.traverse(obj => {
+      if (obj?.userData?.isFloor) floors.push(obj);
+    });
+    return floors;
   }
 
-  function tryTeleportFromController(i) {
+  function raycastFloor(i) {
     const c = controllers[i];
-    const ray = rays[i];
+    if (!c) return null;
 
-    // ray origin + direction
     tmpMat4.identity().extractRotation(c.matrixWorld);
     tmpDir.set(0, 0, -1).applyMatrix4(tmpMat4).normalize();
     tmpPos.setFromMatrixPosition(c.matrixWorld);
 
     raycaster.set(tmpPos, tmpDir);
 
-    // find all floor candidates
-    const floors = [];
-    scene.traverse(obj => {
-      if (obj?.userData?.isFloor) floors.push(obj);
-    });
-
-    const hits = raycaster.intersectObjects(floors, true);
-    if (hits && hits.length) {
-      const p = hits[0].point;
-      teleportMarker.position.set(p.x, p.y + 0.01, p.z);
-      teleportMarker.visible = true;
-      state.teleportHit = p.clone();
-      ray.visible = true;
-      return true;
-    }
-
-    teleportMarker.visible = false;
-    state.teleportHit = null;
-    ray.visible = true;
-    return false;
+    const hits = raycaster.intersectObjects(getFloors(), true);
+    if (hits && hits.length) return hits[0].point.clone();
+    return null;
   }
 
-  function commitTeleport() {
-    if (!state.teleportHit) return;
-    // move rig so camera ends up over target. Use camera world position as offset.
-    const camWorld = new THREE.Vector3();
-    camera.getWorldPosition(camWorld);
+  function commitTeleport(i) {
+    const p = lastHit[i];
+    if (!p) return;
 
-    // playerRig world position
-    const rigWorld = new THREE.Vector3();
-    playerRig.getWorldPosition(rigWorld);
-
-    // offset from rig to camera (world)
-    const offset = camWorld.sub(rigWorld);
-
-    // set rig position so camera lands on hit
-    playerRig.position.set(
-      state.teleportHit.x - offset.x,
-      playerRig.position.y, // keep current rig Y (floor is y=0)
-      state.teleportHit.z - offset.z
-    );
+    // Keep current rig Y, move XZ
+    playerRig.position.set(p.x, playerRig.position.y, p.z);
 
     teleportMarker.visible = false;
-    state.teleportHit = null;
+    lastHit[i] = null;
+    aiming[i] = false;
+    rays[i].visible = false;
+
+    log('[spine] teleport ✅');
+  }
+
+  for (let i = 0; i < 2; i++) {
+    const c = renderer.xr.getController(i);
+    c.add(makeControllerViz());
+    c.add(rays[i]);
+    playerRig.add(c);
+    controllers.push(c);
+
+    // Works for controllers AND hand tracking pinch (select events)
+    c.addEventListener('selectstart', () => {
+      aiming[i] = true;
+      rays[i].visible = true;
+      log('[input] selectstart (tele aim)');
+    });
+    c.addEventListener('selectend', () => {
+      // teleport on release
+      commitTeleport(i);
+      log('[input] selectend (tele commit)');
+    });
+
+    // Squeeze can also aim/commit
+    c.addEventListener('squeezestart', () => {
+      aiming[i] = true;
+      rays[i].visible = true;
+      log('[input] squeezestart (tele aim)');
+    });
+    c.addEventListener('squeezeend', () => {
+      commitTeleport(i);
+      log('[input] squeezeend (tele commit)');
+    });
+  }
+
+  // -------------------------
+  // SMOOTH MOVE + SNAP TURN (only if axes exist)
+  // -------------------------
+  const MOVE_SPEED = 2.2;
+  const SNAP_DEG = 30;
+  const dz = 0.15;
+  let turnCooldown = 0;
+
+  function getSession() {
+    return renderer.xr.getSession?.() || null;
+  }
+
+  function getInputGamepads(session) {
+    // returns { left: gp|null, right: gp|null }
+    const out = { left: null, right: null };
+    if (!session) return out;
+    for (const src of session.inputSources) {
+      if (!src?.gamepad) continue;
+      if (src.handedness === 'left') out.left = src.gamepad;
+      if (src.handedness === 'right') out.right = src.gamepad;
+    }
+    // fallback: first two gamepads if handedness missing
+    if (!out.left || !out.right) {
+      const gps = session.inputSources.filter(s => s?.gamepad).map(s => s.gamepad);
+      out.left = out.left || gps[0] || null;
+      out.right = out.right || gps[1] || null;
+    }
+    return out;
+  }
+
+  function pickStickAxes(gp, preferPairIndex = 0) {
+    // Robustly pick a pair: [0,1] or [2,3] depending on which has stronger signal
+    if (!gp?.axes || gp.axes.length < 2) return [0, 0];
+
+    const a0 = gp.axes[0] ?? 0, a1 = gp.axes[1] ?? 0;
+    const a2 = gp.axes[2] ?? 0, a3 = gp.axes[3] ?? 0;
+
+    const mag01 = Math.abs(a0) + Math.abs(a1);
+    const mag23 = Math.abs(a2) + Math.abs(a3);
+
+    // If both exist, pick the pair with greater activity (or preferPairIndex)
+    if (gp.axes.length >= 4) {
+      if (preferPairIndex === 0) return (mag01 >= mag23 ? [a0, a1] : [a2, a3]);
+      return (mag23 >= mag01 ? [a2, a3] : [a0, a1]);
+    }
+
+    return [a0, a1];
+  }
+
+  function yawForward() {
+    const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    fwd.y = 0;
+    fwd.normalize();
+    return fwd;
+  }
+
+  function yawRight(fwd) {
+    const r = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0)).normalize();
+    r.multiplyScalar(-1);
+    return r;
   }
 
   // -------------------------
   // UPDATE LOOP
   // -------------------------
   function update(dt) {
-    // dt in seconds
     if (!dt || !isFinite(dt)) dt = 0.016;
 
-    // snap turn cooldown
-    turnCooldownT = Math.max(0, turnCooldownT - dt);
-
-    const session = renderer.xr.getSession?.();
+    const session = getSession();
     const inXR = !!session;
 
-    // In XR: controller locomotion + teleport
+    // Update teleport aiming marker
     if (inXR) {
-      const fwd = yawFromCamera();
-      const right = rightFromYaw(fwd);
-
-      // Smooth move uses LEFT stick (axes 2/3 commonly, but varies)
-      const gpL = getGamepad(0);
-      const gpR = getGamepad(1);
-
-      // default
-      let axX = 0, axY = 0;
-
-      if (gpL?.axes?.length >= 2) {
-        // pick last two axes (works for many controllers)
-        axX = gpL.axes[2] ?? gpL.axes[0] ?? 0;
-        axY = gpL.axes[3] ?? gpL.axes[1] ?? 0;
-      }
-
-      // deadzone
-      const dz = 0.15;
-      const mx = Math.abs(axX) > dz ? axX : 0;
-      const my = Math.abs(axY) > dz ? axY : 0;
-
-      // move
-      if (mx || my) {
-        const move = new THREE.Vector3();
-        move.addScaledVector(right, mx);
-        move.addScaledVector(fwd, my * -1); // push forward is usually -Y
-        move.normalize().multiplyScalar(MOVE_SPEED * dt);
-        playerRig.position.add(move);
-      }
-
-      // Snap turn uses RIGHT stick X
-      if (gpR?.axes?.length >= 2 && turnCooldownT <= 0) {
-        const rx = gpR.axes[2] ?? gpR.axes[0] ?? 0;
-        if (rx > 0.7) {
-          playerRig.rotation.y -= THREE.MathUtils.degToRad(TURN_DEG);
-          turnCooldownT = TURN_COOLDOWN;
-        } else if (rx < -0.7) {
-          playerRig.rotation.y += THREE.MathUtils.degToRad(TURN_DEG);
-          turnCooldownT = TURN_COOLDOWN;
-        }
-      }
-
-      // Teleport: hold trigger to aim, release to teleport
-      // Many gamepads: buttons[0] trigger, buttons[1] squeeze. We'll check a couple.
       for (let i = 0; i < 2; i++) {
-        const gp = i === 0 ? gpL : gpR;
-        if (!gp?.buttons?.length) continue;
+        if (!aiming[i]) continue;
+        const hit = raycastFloor(i);
+        if (hit) {
+          lastHit[i] = hit;
+          teleportMarker.position.set(hit.x, hit.y + 0.01, hit.z);
+          teleportMarker.visible = true;
+        } else {
+          lastHit[i] = null;
+          teleportMarker.visible = false;
+        }
+      }
+    }
 
-        const trigger = gp.buttons[0]?.value ?? 0;
-        const pressed = trigger > 0.2;
+    // Smooth locomotion only if gamepad axes exist
+    if (inXR) {
+      turnCooldown = Math.max(0, turnCooldown - dt);
 
-        if (pressed) {
-          state.teleportArmed[i] = true;
-          tryTeleportFromController(i);
-        } else if (state.teleportArmed[i]) {
-          // release commits teleport
-          state.teleportArmed[i] = false;
-          // hide rays
-          rays[0].visible = false;
-          rays[1].visible = false;
-          commitTeleport();
+      const { left, right } = getInputGamepads(session);
+      const fwd = yawForward();
+      const rgt = yawRight(fwd);
+
+      // LEFT stick move
+      if (left) {
+        const [sx, sy] = pickStickAxes(left, 0);
+        const mx = Math.abs(sx) > dz ? sx : 0;
+        const my = Math.abs(sy) > dz ? sy : 0;
+
+        if (mx || my) {
+          const move = new THREE.Vector3();
+          move.addScaledVector(rgt, mx);
+          move.addScaledVector(fwd, -my);
+          move.normalize().multiplyScalar(MOVE_SPEED * dt);
+          playerRig.position.add(move);
         }
       }
 
-      // If not aiming, hide rays
-      if (!state.teleportArmed[0] && !state.teleportArmed[1]) {
-        rays[0].visible = false;
-        rays[1].visible = false;
-        teleportMarker.visible = false;
+      // RIGHT stick snap turn
+      if (right && turnCooldown <= 0) {
+        // prefer second pair if exists
+        const [rx] = pickStickAxes(right, 1);
+        if (rx > 0.7) {
+          playerRig.rotation.y -= THREE.MathUtils.degToRad(SNAP_DEG);
+          turnCooldown = 0.25;
+        } else if (rx < -0.7) {
+          playerRig.rotation.y += THREE.MathUtils.degToRad(SNAP_DEG);
+          turnCooldown = 0.25;
+        }
       }
     }
   }
 
   // -------------------------
-  // API FOR ROOT BUTTONS
+  // RESET SPAWN API
   // -------------------------
   function resetSpawn() {
-    // if world defined a spawn pad, use it
     const sp = window.__SCARLETT_SPAWN__;
     if (sp?.position) {
       playerRig.position.set(sp.position.x, 0, sp.position.z);
       playerRig.rotation.set(0, 0, 0);
-      log('[spine] reset spawn -> spawn pad');
+      log('[spine] reset spawn -> spawn pad ✅');
       return;
     }
-    playerRig.position.set(0, 0, 10);
+    playerRig.position.set(0, 0, 12);
     playerRig.rotation.set(0, 0, 0);
     log('[spine] reset spawn -> fallback');
   }
-
   window.__SCARLETT_RESET_SPAWN__ = resetSpawn;
 
-  log('[spine] XR rig ready ✅');
+  log('[spine] ready ✅ (teleport via pinch/trigger/select)');
 
-  return {
-    updates: [update],
-    interactables: [],
-  };
-    }
+  return { updates: [update], interactables: [] };
+  }
