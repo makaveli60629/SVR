@@ -3,16 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>Scarlett VR - Scarlett1</title>
+  <title>Scarlett VR (A-Frame Scarlett1)</title>
+
+  <!-- A-FRAME CDN -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <!-- AFRAME-EXTRAS (movement-controls, etc.) -->
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+
   <style>
     html,body{margin:0;height:100%;background:#000;overflow:hidden}
-    #log{
+    #hud{
       position:fixed;left:10px;top:10px;z-index:9999;color:#9ff;
       font:12px ui-monospace,Menlo,Consolas,monospace;
       background:rgba(0,0,0,.55);padding:10px 12px;border-radius:10px;
       white-space:pre-wrap;max-width:84vw;pointer-events:none
     }
-    #btnEnter{
+    #btnPit{
       position:fixed;right:12px;top:12px;z-index:10000;
       padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.25);
       background:rgba(0,0,0,.45);color:#fff;font-weight:800
@@ -20,29 +26,58 @@
   </style>
 </head>
 <body>
-  <div id="log">BOOT…</div>
-  <button id="btnEnter">Enter Poker Pit</button>
+  <div id="hud">BOOT…</div>
+  <button id="btnPit">Enter Poker Pit</button>
 
-  <script>
-    const out = document.getElementById('log');
-    const log = (m)=> out.textContent += "\n" + m;
+  <!-- Scarlett1 scripts (NO module type; Quest-safe) -->
+  <script src="./js/scarlett1/modules/diagnostics.js"></script>
+  <script src="./js/scarlett1/modules/lobby.js"></script>
+  <script src="./js/scarlett1/modules/table.js"></script>
+  <script src="./js/scarlett1/modules/jumbotron.js"></script>
+  <script src="./js/scarlett1/modules/bots.js"></script>
+  <script src="./js/scarlett1/modules/pit.js"></script>
 
-    // Auto-detect GitHub Pages base:
-    // "/" (user page) OR "/SVR/" (project page)
-    const parts = location.pathname.split('/').filter(Boolean);
-    const base = parts.length ? `/${parts[0]}/` : `/`;
-    window.__SVR_BASE__ = base;
-    log("Base detected: " + base);
+  <!-- Main bootstrap -->
+  <script src="./js/scarlett1/main.js"></script>
 
-    window.addEventListener("error",(e)=>log("ERR: " + e.message));
-    window.addEventListener("unhandledrejection",(e)=>log("REJ: " + (e.reason?.message || e.reason)));
+  <!-- A-FRAME SCENE -->
+  <a-scene
+    renderer="antialias:true; colorManagement:true; physicallyCorrectLights:true"
+    background="color:#000"
+    vr-mode-ui="enabled:true"
+    device-orientation-permission-ui="enabled:true">
 
-    const u = (p)=> base + p.replace(/^\/+/,'');
-    log("Importing: " + u("js/scarlett1/main.js"));
+    <!-- Player rig: works in flat + Quest -->
+    <a-entity id="rig"
+      position="0 0 3.2"
+      movement-controls="speed:0.12; fly:false"
+      wasd-controls="acceleration:35"
+    >
+      <a-entity id="camera"
+        camera
+        look-controls
+        position="0 1.6 0">
+      </a-entity>
 
-    import(u("js/scarlett1/main.js"))
-      .then(()=>log("main.js loaded ✅"))
-      .catch(e=>log("IMPORT FAIL: " + (e.message || e)));
-  </script>
+      <!-- Hands (Quest controllers) -->
+      <a-entity laser-controls="hand: left"></a-entity>
+      <a-entity laser-controls="hand: right"></a-entity>
+    </a-entity>
+
+    <!-- Lights -->
+    <a-entity light="type:ambient; intensity:0.35; color:#fff"></a-entity>
+    <a-entity light="type:directional; intensity:1.1; color:#fff" position="6 10 4"></a-entity>
+
+    <!-- Floor -->
+    <a-circle rotation="-90 0 0" radius="40"
+      material="color:#07090c; roughness:1; metalness:0"></a-circle>
+
+    <!-- Lobby Root -->
+    <a-entity id="lobbyRoot" scarlett-lobby></a-entity>
+
+    <!-- Pit Root (hidden until button) -->
+    <a-entity id="pitRoot" visible="false" scarlett-pit></a-entity>
+
+  </a-scene>
 </body>
 </html>
