@@ -16,7 +16,7 @@ export const Input = {
     addEventListener("keydown", e => this.keys[e.code] = true);
     addEventListener("keyup", e => this.keys[e.code] = false);
 
-    // Touch joystick
+    // Touch joystick (Android)
     const joyZone = document.getElementById("joyZone");
     if (joyZone) {
       const down = (e) => {
@@ -38,7 +38,7 @@ export const Input = {
 
         const dx = t.clientX - this.joy.sx;
         const dy = t.clientY - this.joy.sy;
-        const max = 78; // slightly larger = less twitch
+        const max = 86; // less twitch
 
         this.joy.x = Math.max(-1, Math.min(1, dx / max));
         this.joy.y = Math.max(-1, Math.min(1, dy / max));
@@ -68,7 +68,7 @@ export const Input = {
       teleZone.addEventListener("touchend", () => { this.teleportQueued = true; }, { passive:true });
     }
 
-    // XR select (controller/hand pinch if browser emits it)
+    // XR select hold = move forward, tap = teleport
     const onSelectStart = () => {
       this.lastSelectTime = performance.now();
       this.moveForwardHeld = true;
@@ -86,26 +86,57 @@ export const Input = {
       obj.addEventListener("selectend", onSelectEnd);
     });
 
-    console.log("✅ Input stabilized (deadzone + smoothing)");
+    console.log("✅ Input fixed: world-forward movement + stick detection + smoothing");
   },
 
-  // deadzone to kill micro jitter
   deadzone(v, dz=0.12){
     if (Math.abs(v) < dz) return 0;
-    // re-scale outside deadzone for smooth ramp
     const s = (Math.abs(v) - dz) / (1 - dz);
     return Math.sign(v) * Math.min(1, s);
   },
 
-  getRawAxes(){
-    // 1) Gamepad axes
+  // Gets headset forward (world), flattened to XZ, normalized.
+  getWorldForward(){
+    const { THREE, camera } = this.ctx;
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    dir.y = 0;
+    const len = Math.hypot(dir.x, dir.z);
+    if (len < 1e-6) return new THREE.Vector3(0,0,-1);
+    dir.x /= len; dir.z /= len;
+    return dir;
+  },
+
+  // Read BOTH sticks (Quest mappings vary) and choose the stronger one.
+  getGamepadAxes(){
     const gps = navigator.getGamepads ? navigator.getGamepads() : [];
+    let best = { x:0, y:0, m:0 };
+
     for (const gp of gps) {
       if (!gp || !gp.axes) continue;
-      const ax = gp.axes[2] ?? gp.axes[0] ?? 0;
-      const ay = gp.axes[3] ?? gp.axes[1] ?? 0;
-      if (Math.abs(ax) + Math.abs(ay) > 0.02) return { x: ax, y: ay };
+
+      // candidate pairs
+      const pairs = [
+        { x: gp.axes[0] ?? 0, y: gp.axes[1] ?? 0 }, // common left stick
+        { x: gp.axes[2] ?? 0, y: gp.axes[3] ?? 0 }, // common right stick
+      ];
+
+      for (const p of pairs){
+        const m = Math.abs(p.x) + Math.abs(p.y);
+        if (m > best.m){
+          best = { x: p.x, y: p.y, m };
+        }
+      }
     }
+
+    if (best.m < 0.02) return null;
+    return { x: best.x, y: best.y };
+  },
+
+  getRawAxes(){
+    // 1) Gamepad (Quest sticks)
+    const gp = this.getGamepadAxes();
+    if (gp) return { x: gp.x, y: gp.y };
 
     // 2) Touch joystick
     if (this.joy.active && (Math.abs(this.joy.x) + Math.abs(this.joy.y) > 0.02)) {
@@ -146,7 +177,7 @@ export const Input = {
   },
 
   update(dt){
-    const { rig, camera, controller1, controller2 } = this.ctx;
+    const { rig, controller1, controller2, THREE } = this.ctx;
 
     // Teleport
     if (this.teleportQueued) {
@@ -157,42 +188,42 @@ export const Input = {
         this.raycastTeleport(null);
 
       if (!did) {
-        const yaw = camera.rotation.y;
-        const step = 3.0;
-        rig.position.x += Math.sin(yaw) * step;
-        rig.position.z -= Math.cos(yaw) * step;
+        // fallback hop forward along world-forward
+        const f = this.getWorldForward();
+        rig.position.x += f.x * 3.0;
+        rig.position.z += f.z * 3.0;
       }
     }
 
-    // Hold-to-move in VR
+    // HOLD-to-move forward (trigger/pinch hold)
     if (this.moveForwardHeld) {
-      const yaw = camera.rotation.y;
-      const speed = 2.0;
-      rig.position.x += Math.sin(yaw) * speed * dt;
-      rig.position.z -= Math.cos(yaw) * speed * dt;
+      const f = this.getWorldForward();
+      const speed = 2.15;
+      rig.position.x += f.x * speed * dt;
+      rig.position.z += f.z * speed * dt;
       rig.position.y = Math.max(rig.position.y, 1.6);
       return;
     }
 
-    // Raw axes → deadzone → smoothing
+    // Axes move (stick/keys/touch) with smoothing
     const raw = this.getRawAxes();
     const tx = this.deadzone(raw.x, 0.12);
     const ty = this.deadzone(raw.y, 0.12);
 
-    // Smooth factor (higher = snappier; lower = smoother)
-    const k = 1 - Math.pow(0.001, dt); // time-based smoothing
+    const k = 1 - Math.pow(0.001, dt);
     this.ax += (tx - this.ax) * k;
     this.ay += (ty - this.ay) * k;
 
     const mag = Math.abs(this.ax) + Math.abs(this.ay);
     if (mag < 0.001) return;
 
-    const yaw = camera.rotation.y;
-    const sin = Math.sin(yaw), cos = Math.cos(yaw);
+    // Move relative to world-forward + world-right
+    const f = this.getWorldForward();
+    const r = new THREE.Vector3(-f.z, 0, f.x); // right = rotate forward 90°
 
     const speed = 2.35;
-    const vx = (this.ax * cos - this.ay * sin) * speed * dt;
-    const vz = (this.ax * sin + this.ay * cos) * speed * dt;
+    const vx = (r.x * this.ax + f.x * this.ay) * speed * dt;
+    const vz = (r.z * this.ax + f.z * this.ay) * speed * dt;
 
     rig.position.x += vx;
     rig.position.z += vz;
