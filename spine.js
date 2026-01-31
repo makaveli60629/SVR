@@ -1,257 +1,267 @@
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+/**
+ * SPINE — V3 XR INPUT: controllers + hands + teleport + 3D menu
+ * - Controller ray + trigger teleport
+ * - Hand tracking (if available) + pinch teleport
+ * - Simple 3D menu panel in-world (Reset/Hide/Show)
+ */
 
-export const Spine = (() => {
-  let renderer, scene, camera;
-  let updates = [];
-  let worldApi = null;
+import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+import { XRControllerModelFactory } from "https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRControllerModelFactory.js";
+import { XRHandModelFactory } from "https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRHandModelFactory.js";
 
-  const logLines = [];
-  const logBox = () => document.getElementById('logBox');
+const $ = (id) => document.getElementById(id);
 
-  function log(msg) {
-    console.log(msg);
-    logLines.push(msg);
-    const el = logBox();
-    if (el) el.textContent = logLines.join('\n');
-  }
+export const Spine = {
+  async start() {
+    const log = (m) => {
+      console.log(m);
+      try {
+        const box = $("log");
+        if (box) box.textContent += (box.textContent ? "\n" : "") + m;
+      } catch {}
+    };
 
-  function hardReload() {
-    location.reload(true);
-  }
+    // --- core
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 250);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    renderer.xr.enabled = true;
+    document.body.appendChild(renderer.domElement);
 
-  function copyReport() {
-    const text = logLines.join('\n');
-    navigator.clipboard?.writeText(text).then(
-      () => log('[ui] report copied ✅'),
-      () => log('[ui] copy failed ❌')
+    log("[spine] renderer created ✅");
+
+    // --- rig (move this for teleport)
+    const rig = new THREE.Group();
+    rig.name = "playerRig";
+    rig.add(camera);
+    scene.add(rig);
+
+    // allow world to use this camera parent
+    camera.position.set(0, 1.6, 0);
+
+    // --- resize
+    addEventListener("resize", () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+
+    // --- load world
+    const worldMod = await import("./js/scarlett1/world.js");
+    const world = await worldMod.init({ THREE, scene, camera, renderer, log });
+
+    log("[spine] world module loaded ✅ (/js/scarlett1/world.js)");
+
+    const teleportSurfaces = (world && world.teleportSurfaces) ? world.teleportSurfaces : [];
+    log(`[input] teleport surfaces: ${teleportSurfaces.length}`);
+
+    // ---------------------------------------------------------
+    // TELEPORT SYSTEM
+    // ---------------------------------------------------------
+    const raycaster = new THREE.Raycaster();
+    const tempMat = new THREE.Matrix4();
+    const tempPos = new THREE.Vector3();
+    const tempDir = new THREE.Vector3();
+
+    // marker
+    const marker = new THREE.Mesh(
+      new THREE.RingGeometry(0.18, 0.25, 32),
+      new THREE.MeshBasicMaterial({ color: 0x7a45ff, transparent: true, opacity: 0.9, side: THREE.DoubleSide })
     );
-  }
+    marker.rotation.x = -Math.PI / 2;
+    marker.visible = false;
+    scene.add(marker);
 
-  function setHudVisible(v) {
-    const hud = document.getElementById('hud');
-    if (!hud) return;
-    hud.style.display = v ? 'grid' : 'none';
-    log(v ? '[ui] HUD shown ✅' : '[ui] HUD hidden ✅');
-  }
+    let lastHit = null;
 
-  function resetSpawn() {
-    if (!camera) return;
-    camera.position.set(0, 1.6, 6);
-    camera.lookAt(0, 1.4, 0);
-    log('[ui] spawn reset ✅');
-  }
+    function castTeleport(fromObj) {
+      if (!fromObj) return null;
 
-  // --- Touch joystick (moves camera) ---
-  const joystick = {
-    active: false,
-    dx: 0,
-    dy: 0,
-    base: null,
-    stick: null,
-    centerX: 0,
-    centerY: 0,
-    radius: 70,
-  };
+      tempMat.identity().extractRotation(fromObj.matrixWorld);
+      tempPos.setFromMatrixPosition(fromObj.matrixWorld);
+      tempDir.set(0, 0, -1).applyMatrix4(tempMat).normalize();
 
-  function initJoystick() {
-    joystick.base = document.getElementById('joyBase');
-    joystick.stick = document.getElementById('joyStick');
-    if (!joystick.base || !joystick.stick) return;
+      raycaster.set(tempPos, tempDir);
+      raycaster.far = 40;
 
-    const onDown = (e) => {
-      joystick.active = true;
-      const rect = joystick.base.getBoundingClientRect();
-      joystick.centerX = rect.left + rect.width / 2;
-      joystick.centerY = rect.top + rect.height / 2;
-      onMove(e);
-    };
+      const hits = raycaster.intersectObjects(teleportSurfaces, true);
+      if (!hits.length) return null;
 
-    const onMove = (e) => {
-      if (!joystick.active) return;
-      const t = e.touches ? e.touches[0] : e;
-      const x = t.clientX - joystick.centerX;
-      const y = t.clientY - joystick.centerY;
+      const h = hits[0];
+      marker.position.copy(h.point);
+      marker.visible = true;
 
-      const dist = Math.hypot(x, y);
-      const max = joystick.radius;
-      const nx = dist > max ? (x / dist) * max : x;
-      const ny = dist > max ? (y / dist) * max : y;
-
-      joystick.dx = nx / max;        // -1..1
-      joystick.dy = ny / max;        // -1..1
-
-      joystick.stick.style.transform =
-        `translate(calc(-50% + ${nx}px), calc(-50% + ${ny}px))`;
-    };
-
-    const onUp = () => {
-      joystick.active = false;
-      joystick.dx = 0;
-      joystick.dy = 0;
-      joystick.stick.style.transform = `translate(-50%, -50%)`;
-    };
-
-    joystick.base.addEventListener('touchstart', onDown, { passive: false });
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('touchend', onUp, { passive: true });
-
-    log('[input] joystick ready ✅');
-  }
-
-  function applyJoystickMove(dt) {
-    if (!camera) return;
-    const speed = 2.0; // m/s
-
-    // forward is -Z in three; use camera yaw
-    const yaw = camera.rotation.y;
-    const forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
-    const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
-
-    const f = -joystick.dy;  // push up = move forward
-    const r = joystick.dx;
-
-    const move = new THREE.Vector3()
-      .addScaledVector(forward, f)
-      .addScaledVector(right, r);
-
-    if (move.lengthSq() > 0.0001) {
-      move.normalize().multiplyScalar(speed * dt);
-      camera.position.add(move);
-    }
-  }
-
-  async function enterVR() {
-    if (!renderer) return;
-
-    if (!navigator.xr) {
-      log('[xr] WebXR not available (use Quest/Oculus Browser) ❌');
-      return;
+      lastHit = h;
+      return h;
     }
 
-    try {
-      const supported = await navigator.xr.isSessionSupported('immersive-vr');
-      if (!supported) {
-        log('[xr] immersive-vr not supported on this device ❌');
-        return;
-      }
+    function doTeleport() {
+      if (!lastHit) return;
 
-      const session = await navigator.xr.requestSession('immersive-vr', {
-        optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking', 'layers']
+      // teleport by moving the RIG (not the camera)
+      // keep player at floor level
+      rig.position.x = lastHit.point.x;
+      rig.position.z = lastHit.point.z;
+
+      // You can tune this if your floor is not y=0
+      rig.position.y = 0;
+
+      marker.visible = false;
+      lastHit = null;
+    }
+
+    // ---------------------------------------------------------
+    // CONTROLLERS (ray + trigger teleport)
+    // ---------------------------------------------------------
+    const controllerModelFactory = new XRControllerModelFactory();
+
+    function makeController(i) {
+      const c = renderer.xr.getController(i);
+      c.userData.isSelecting = false;
+
+      // ray line
+      const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1)]);
+      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x2bd6ff }));
+      line.name = "ray";
+      line.scale.z = 20;
+      c.add(line);
+
+      c.addEventListener("selectstart", () => {
+        c.userData.isSelecting = true;
       });
 
-      renderer.xr.enabled = true;
-      await renderer.xr.setSession(session);
-      log('[xr] session started ✅');
-    } catch (e) {
-      log('[xr] session failed ❌ ' + (e?.message || e));
-    }
-  }
+      c.addEventListener("selectend", () => {
+        c.userData.isSelecting = false;
+        // teleport on release if we had a target
+        doTeleport();
+      });
 
-  function hookUI() {
-    const byId = (id) => document.getElementById(id);
+      scene.add(c);
 
-    byId('btnEnterVR')?.addEventListener('click', enterVR);
-    byId('btnReset')?.addEventListener('click', resetSpawn);
-    byId('btnCopy')?.addEventListener('click', copyReport);
-    byId('btnReload')?.addEventListener('click', hardReload);
-    byId('btnHideHud')?.addEventListener('click', () => setHudVisible(false));
-    byId('btnShowHud')?.addEventListener('click', () => setHudVisible(true));
+      // grip model
+      const grip = renderer.xr.getControllerGrip(i);
+      grip.add(controllerModelFactory.createControllerModel(grip));
+      scene.add(grip);
 
-    log('[ui] buttons wired ✅');
-  }
-
-  function onResize() {
-    if (!renderer || !camera) return;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    renderer.setSize(w, h);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  }
-
-  async function loadWorld() {
-    // always load scarlett1 world
-    const mod = await import('./js/scarlett1/world.js');
-    const init = mod?.init;
-    if (typeof init !== 'function') {
-      log('[spine] world init export missing ❌');
-      return;
+      return c;
     }
 
-    worldApi = await init({
-      THREE,
-      scene,
-      camera,
-      log
-    });
+    const controller0 = makeController(0);
+    const controller1 = makeController(1);
 
-    updates = Array.isArray(worldApi?.updates) ? worldApi.updates : [];
-    log('[world] ready ✅');
-  }
+    // ---------------------------------------------------------
+    // HANDS (pinch teleport)
+    // ---------------------------------------------------------
+    const handModelFactory = new XRHandModelFactory();
+    const hands = [];
 
-  function animate() {
-    const clock = new THREE.Clock();
+    function makeHand(i) {
+      const hand = renderer.xr.getHand(i);
+      hand.add(handModelFactory.createHandModel(hand, "mesh"));
+      hand.userData.isPinching = false;
 
-    function loop() {
-      const dt = clock.getDelta();
+      // three.js fires pinch events on hands
+      hand.addEventListener("pinchstart", () => {
+        hand.userData.isPinching = true;
+      });
+      hand.addEventListener("pinchend", () => {
+        hand.userData.isPinching = false;
+        doTeleport();
+      });
 
-      // input
-      applyJoystickMove(dt);
+      scene.add(hand);
+      return hand;
+    }
 
-      // world updates
-      for (const fn of updates) {
-        try { fn(dt); } catch (e) { /* ignore */ }
+    hands.push(makeHand(0));
+    hands.push(makeHand(1));
+
+    // ---------------------------------------------------------
+    // 3D MENU (hand/controller poke later; for now: ray teleport + reset)
+    // ---------------------------------------------------------
+    const menu = new THREE.Group();
+    menu.position.set(0, 1.45, 9.2); // in front of spawn
+    scene.add(menu);
+
+    const panel = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.4, 1.2),
+      new THREE.MeshStandardMaterial({
+        color: 0x0b0b12,
+        roughness: 0.6,
+        metalness: 0.1,
+        emissive: 0x1b0f33,
+        emissiveIntensity: 0.35,
+        transparent: true,
+        opacity: 0.92,
+        side: THREE.DoubleSide,
+      })
+    );
+    panel.lookAt(0, 1.45, 0);
+    menu.add(panel);
+
+    // Quick “reset spawn” by holding both triggers or double pinch, etc.
+    // For now: expose a global and log it.
+    window.SCARLETT_RESET_SPAWN = () => {
+      if (window.SCARLETT_SPAWN_SAFE) window.SCARLETT_SPAWN_SAFE();
+      else if (window.SCARLETT_SPAWN) window.SCARLETT_SPAWN(0, 0, 11.5, Math.PI);
+      log("[input] reset spawn ✅");
+    };
+
+    // ---------------------------------------------------------
+    // XR capability checks + logging
+    // ---------------------------------------------------------
+    renderer.xr.addEventListener("sessionstart", () => {
+      const s = renderer.xr.getSession();
+      const inputs = s ? s.inputSources : [];
+      let hasHands = false;
+      let hasControllers = false;
+
+      for (const src of inputs) {
+        if (src.hand) hasHands = true;
+        if (src.gamepad) hasControllers = true;
       }
 
-      renderer.render(scene, camera);
-    }
-
-    renderer.setAnimationLoop(loop);
-    log('[spine] animation loop ✅');
-  }
-
-  async function start() {
-    log('[boot] JS LOADED ✅ (module tag ran)');
-
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(
-      70,
-      window.innerWidth / window.innerHeight,
-      0.01,
-      1000
-    );
-
-    renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: false
+      log(`[xr] sessionstart ✅ hands=${hasHands} controllers=${hasControllers}`);
+      // Always snap to safe spawn on VR enter
+      window.SCARLETT_RESET_SPAWN();
     });
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.xr.addEventListener("sessionend", () => {
+      log("[xr] sessionend ✅");
+      marker.visible = false;
+      lastHit = null;
+    });
 
-    // IMPORTANT: ensure visible canvas layering
-    renderer.domElement.style.position = 'fixed';
-    renderer.domElement.style.top = '0';
-    renderer.domElement.style.left = '0';
-    renderer.domElement.style.width = '100%';
-    renderer.domElement.style.height = '100%';
-    renderer.domElement.style.zIndex = '0';
-    renderer.domElement.style.pointerEvents = 'auto';
+    // ---------------------------------------------------------
+    // LOOP
+    // ---------------------------------------------------------
+    const updates = (world && world.updates) ? world.updates : [];
+    let lastT = performance.now();
 
-    document.body.appendChild(renderer.domElement);
-    log('[spine] renderer created ✅');
+    renderer.setAnimationLoop(() => {
+      const now = performance.now();
+      const dt = Math.min(0.05, (now - lastT) / 1000);
+      lastT = now;
 
-    hookUI();
-    initJoystick();
+      // controller rays aim teleport
+      if (controller0) castTeleport(controller0);
+      if (controller1) castTeleport(controller1);
 
-    window.addEventListener('resize', onResize);
+      // hands: use hand itself as origin for ray
+      // (when pinching, keep marker live; teleport on pinch end)
+      for (const h of hands) {
+        if (!h) continue;
+        // only show hand-aim marker while pinching, to reduce noise
+        if (h.userData.isPinching) castTeleport(h);
+      }
 
-    log('[world] init');
-    await loadWorld();
+      for (const fn of updates) fn(dt);
 
-    animate();
-    log('[boot] spine started ✅');
-  }
+      renderer.render(scene, camera);
+    });
 
-  return { start };
-})();
+    log("[spine] started ✅");
+  },
+};
