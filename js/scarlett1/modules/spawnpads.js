@@ -1,98 +1,107 @@
-// /js/scarlett1/modules/spawnpads.js
-// Pads control ALL spawns.
+function parseVec3(str) {
+  const [x,y,z] = str.split(" ").map(Number);
+  return {x,y,z};
+}
 
-(function () {
-  const PAD_ATTR = "scarlett-spawnpad";
+window.makeSpawnPad = function(scene, opts) {
+  const pad = document.createElement("a-entity");
+  pad.setAttribute("id", opts.id);
+  pad.setAttribute("position", opts.position || "0 0 0");
+  pad.setAttribute("rotation", opts.rotation || "0 0 0");
+  pad.setAttribute("visible", opts.visible === false ? "false" : "true");
+  scene.appendChild(pad);
 
-  window.makeSpawnPad = function makeSpawnPad(parent, opts) {
-    const {
-      id,
-      position = "0 0 0",
-      rotation = "0 0 0",
-      label = "",
-      visible = false
-    } = opts;
-
-    const pad = document.createElement("a-entity");
-    pad.setAttribute("id", id);
-    pad.setAttribute("position", position);
-    pad.setAttribute("rotation", rotation);
-    pad.setAttribute(PAD_ATTR, "");
-    parent.appendChild(pad);
-
+  // Optional ring (debug)
+  if (opts.visible !== false) {
     const ring = document.createElement("a-ring");
-    ring.classList.add("teleportable");
-    ring.setAttribute("radius-inner", "0.9");
-    ring.setAttribute("radius-outer", "1.25");
+    ring.setAttribute("radius-inner", "0.35");
+    ring.setAttribute("radius-outer", "0.55");
     ring.setAttribute("rotation", "-90 0 0");
-    ring.setAttribute("position", "0 0.03 0");
-    ring.setAttribute("material",
-      "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.4; opacity:0.55; transparent:true"
-    );
-    ring.setAttribute("visible", visible ? "true" : "false");
+    ring.setAttribute("position", "0 0.02 0");
+    ring.setAttribute("material", "color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.2; opacity:0.6; transparent:true");
     pad.appendChild(ring);
+  }
+  return pad;
+};
 
-    if (label) {
-      const t = document.createElement("a-text");
-      t.setAttribute("value", label);
-      t.setAttribute("align", "center");
-      t.setAttribute("color", "#bff");
-      t.setAttribute("width", "8");
-      t.setAttribute("position", "0 1.15 0");
-      t.setAttribute("visible", visible ? "true" : "false");
-      pad.appendChild(t);
-    }
+window.safeSpawnToPad = function(padId) {
+  const rig = document.getElementById("rig");
 
-    return pad;
-  };
+  let tries = 0;
+  const MAX = 40; // ~4 seconds
 
-  window.spawnToPad = function spawnToPad(padId, reason = "") {
-    const rig = document.getElementById("rig");
-    const cam = document.getElementById("camera");
+  const tick = () => {
+    tries++;
     const pad = document.getElementById(padId);
-    if (!rig || !pad) {
-      if (window.hudLog) hudLog(`spawnToPad FAIL ❌ rig=${!!rig} pad=${padId}`);
-      return false;
+
+    // Must exist + have object3D ready
+    if (!rig || !pad || !pad.object3D) {
+      if (tries < MAX) return setTimeout(tick, 100);
+      window.hudLog && hudLog(`Spawn FAIL ❌ rig=${!!rig} pad=${padId}`);
+      return;
     }
 
-    const p = pad.object3D.getWorldPosition(new THREE.Vector3());
-    const r = pad.getAttribute("rotation") || { x: 0, y: 0, z: 0 };
+    const p = pad.object3D.position;
+    const r = pad.getAttribute("rotation") || {x:0,y:0,z:0};
 
-    rig.setAttribute("position", `${p.x} ${p.y + 1.65} ${p.z}`);
-    rig.setAttribute("rotation", `${r.x || 0} ${r.y || 0} ${r.z || 0}`);
-    if (cam) cam.setAttribute("position", "0 0 0");
+    rig.setAttribute("position", `${p.x} ${p.y} ${p.z}`);
+    rig.setAttribute("rotation", `0 ${r.y || 0} 0`);
 
-    if (window.hudLog) hudLog(`Spawned ✅ -> ${padId}${reason ? " (" + reason + ")" : ""}`);
-    return true;
+    window.hudLog && hudLog(`Spawned ✅ -> ${padId}`);
   };
 
-  AFRAME.registerComponent("scarlett-spawn-system", {
-    schema: {
-      defaultPad: { default: "pad_lobby_safe" },
-      lockSeconds: { default: 2.5 }
-    },
-    init() {
-      this.t0 = performance.now();
-      this.did = false;
+  tick();
+};
 
-      this.el.sceneEl.addEventListener("loaded", () => {
-        setTimeout(() => {
-          window.spawnToPad(this.data.defaultPad, "default");
-          this.did = true;
-        }, 150);
-      });
-    },
-    tick() {
-      if (!this.did) return;
-      const elapsed = (performance.now() - this.t0) / 1000;
-      if (elapsed > this.data.lockSeconds) return;
+window.makePortalPad = function(scene, cfg) {
+  const parent = cfg.roomId ? document.getElementById(cfg.roomId) : scene;
+  if (!parent) return;
 
-      // If some module forces you near pit center, pull you back to safe pad.
-      const rig = document.getElementById("rig");
-      if (!rig) return;
-      const pos = rig.getAttribute("position") || { x: 0, y: 0, z: 0 };
-      const nearPit = Math.hypot(pos.x || 0, pos.z || 0) < 7.5;
-      if (nearPit) window.spawnToPad(this.data.defaultPad, "anti-pit-lock");
+  const pad = document.createElement("a-entity");
+  pad.setAttribute("id", cfg.id);
+  pad.setAttribute("position", cfg.position || "0 0 0");
+  parent.appendChild(pad);
+
+  const disc = document.createElement("a-ring");
+  disc.classList.add("teleportable");
+  disc.setAttribute("radius-inner", "0.55");
+  disc.setAttribute("radius-outer", "0.90");
+  disc.setAttribute("rotation", "-90 0 0");
+  disc.setAttribute("position", "0 0.02 0");
+  disc.setAttribute("material", "color:#7b61ff; emissive:#7b61ff; emissiveIntensity:1.4; opacity:0.55; transparent:true");
+  pad.appendChild(disc);
+
+  const t = document.createElement("a-text");
+  t.setAttribute("value", cfg.label || "PORTAL");
+  t.setAttribute("align", "center");
+  t.setAttribute("color", "#9ff");
+  t.setAttribute("width", "6");
+  t.setAttribute("position", "-1.4 1.2 0");
+  pad.appendChild(t);
+
+  // Enter detection (stand in it)
+  const rig = document.getElementById("rig");
+  const R = 0.95;
+
+  const loop = () => {
+    requestAnimationFrame(loop);
+    if (!rig || !pad.object3D || !rig.object3D) return;
+
+    // Only active if parent room visible
+    if (cfg.roomId) {
+      const room = document.getElementById(cfg.roomId);
+      if (!room || room.getAttribute("visible") === false) return;
     }
-  });
-})();
+
+    const rp = rig.object3D.position;
+    const pp = pad.object3D.position;
+    const dx = rp.x - pp.x;
+    const dz = rp.z - pp.z;
+    if ((dx*dx + dz*dz) < (R*R)) {
+      cfg.onEnter && cfg.onEnter();
+    }
+  };
+  loop();
+
+  return pad;
+};
