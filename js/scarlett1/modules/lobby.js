@@ -2,7 +2,12 @@ AFRAME.registerComponent("scarlett-lobby", {
   init() {
     const el = this.el;
 
-    // Main teleportable floor
+    // ---- SKY ----
+    const sky = document.createElement("a-sky");
+    sky.setAttribute("color", "#05080f");
+    el.appendChild(sky);
+
+    // ---- FLOOR ----
     const floor = document.createElement("a-circle");
     floor.classList.add("teleportable");
     floor.setAttribute("radius", "34");
@@ -10,18 +15,61 @@ AFRAME.registerComponent("scarlett-lobby", {
     floor.setAttribute("material", "color:#070b10; roughness:0.95; metalness:0.05");
     el.appendChild(floor);
 
-    // Sky
-    const sky = document.createElement("a-sky");
-    sky.setAttribute("color", "#03060b");
-    el.appendChild(sky);
+    // ---- GLOBAL LIGHTING (BRIGHTER) ----
+    addLight(el, "hemisphere", { intensity: 1.25, color: "#e6fbff", groundColor: "#0b1622" }, "0 40 0");
+    addLight(el, "directional", { intensity: 1.6, color: "#ffffff" }, "18 30 16");
+    addLight(el, "directional", { intensity: 0.9, color: "#b19cd9" }, "-18 22 -14");
 
-    // Lighting (bright)
-    addLight(el, "hemisphere", { intensity: 0.95, color: "#d7f3ff", groundColor: "#061018" }, "0 40 0");
-    addLight(el, "directional", { intensity: 1.35, color: "#ffffff" }, "18 28 16");
-    addLight(el, "point", { intensity: 1.4, distance: 90, decay: 2, color: "#00e5ff" }, "0 12 0");
-    addLight(el, "point", { intensity: 1.15, distance: 90, decay: 2, color: "#7b61ff" }, "-18 10 -18");
+    // big ambient-ish points
+    addLight(el, "point", { intensity: 1.8, distance: 120, decay: 2, color: "#00e5ff" }, "0 14 0");
+    addLight(el, "point", { intensity: 1.4, distance: 120, decay: 2, color: "#7b61ff" }, "-18 10 -18");
+    addLight(el, "point", { intensity: 1.1, distance: 120, decay: 2, color: "#ffffff" }, "18 10 -18");
 
-    // Pillars (neon)
+    // ---- WALLS (DOUBLE HEIGHT) + BRICK TEXTURE ----
+    // If the texture fails to load, it will still show the base color.
+    const assets = document.querySelector("a-assets");
+
+    const brickImg = ensureAssetImage(
+      assets,
+      "brickTex",
+      "https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/brick_diffuse.jpg"
+    );
+
+    const wallRadius = 30;
+    const wallHeight = 24;
+    const wallY = wallHeight / 2;
+
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      const x = Math.cos(a) * wallRadius;
+      const z = Math.sin(a) * wallRadius;
+      const rotY = (-a * 180 / Math.PI) + 90;
+
+      const seg = document.createElement("a-plane");
+      seg.setAttribute("position", `${x} ${wallY} ${z}`);
+      seg.setAttribute("rotation", `0 ${rotY} 0`);
+      seg.setAttribute("width", "12");
+      seg.setAttribute("height", `${wallHeight}`);
+
+      // brick look + neon tint
+      seg.setAttribute(
+        "material",
+        `color:#0a0e14; src:#${brickImg.id}; repeat:6 3; roughness:0.95; metalness:0.05; opacity:0.98; transparent:true`
+      );
+
+      el.appendChild(seg);
+
+      // base neon strip
+      const base = document.createElement("a-plane");
+      base.setAttribute("position", `${x} 0.6 ${z}`);
+      base.setAttribute("rotation", `0 ${rotY} 0`);
+      base.setAttribute("width", "12");
+      base.setAttribute("height", "0.30");
+      base.setAttribute("material", "color:#0b0f14; emissive:#00e5ff; emissiveIntensity:1.2; opacity:0.55; transparent:true");
+      el.appendChild(base);
+    }
+
+    // ---- PILLARS + LIGHT ON EACH ----
     for (let i = 0; i < 10; i++) {
       const a = (i / 10) * Math.PI * 2;
       const x = Math.cos(a) * 18;
@@ -39,45 +87,24 @@ AFRAME.registerComponent("scarlett-lobby", {
       band.setAttribute("radius-outer", "0.82");
       band.setAttribute("rotation", "-90 0 0");
       band.setAttribute("position", `${x} 1.2 ${z}`);
-      band.setAttribute("material", "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.6; opacity:0.55; transparent:true");
+      band.setAttribute("material", "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.8; opacity:0.55; transparent:true");
       el.appendChild(band);
+
+      // ✅ Light attached near top of pillar
+      const lamp = document.createElement("a-entity");
+      lamp.setAttribute("light", "type: point; intensity: 1.35; distance: 22; decay: 2; color: #00e5ff");
+      lamp.setAttribute("position", `${x} 11.5 ${z}`);
+      el.appendChild(lamp);
     }
 
-    // Circular walls (double height)
-    const wallRadius = 30;
-    const wallHeight = 24;
-    const wallY = wallHeight / 2;
-
-    for (let i = 0; i < 16; i++) {
-      const a = (i / 16) * Math.PI * 2;
-      const x = Math.cos(a) * wallRadius;
-      const z = Math.sin(a) * wallRadius;
-      const rotY = (-a * 180 / Math.PI) + 90;
-
-      const seg = document.createElement("a-plane");
-      seg.setAttribute("position", `${x} ${wallY} ${z}`);
-      seg.setAttribute("rotation", `0 ${rotY} 0`);
-      seg.setAttribute("width", "12");
-      seg.setAttribute("height", `${wallHeight}`);
-      seg.setAttribute("material", "color:#05070c; roughness:0.95; metalness:0.05; opacity:0.98; transparent:true");
-      el.appendChild(seg);
-
-      const base = document.createElement("a-plane");
-      base.setAttribute("position", `${x} 0.6 ${z}`);
-      base.setAttribute("rotation", `0 ${rotY} 0`);
-      base.setAttribute("width", "12");
-      base.setAttribute("height", "0.30");
-      base.setAttribute("material", "color:#0b0f14; emissive:#00e5ff; emissiveIntensity:1.0; opacity:0.55; transparent:true");
-      el.appendChild(base);
-    }
-
-    // Center pit / divot
+    // ---- CENTER PIT / DIVOT ----
+    // Make sure there is NO “lid” at player head height
     const pitEdge = document.createElement("a-ring");
     pitEdge.setAttribute("radius-inner", "7.7");
     pitEdge.setAttribute("radius-outer", "8.3");
     pitEdge.setAttribute("rotation", "-90 0 0");
     pitEdge.setAttribute("position", "0 0.07 0");
-    pitEdge.setAttribute("material", "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.6; opacity:0.55; transparent:true");
+    pitEdge.setAttribute("material", "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.8; opacity:0.55; transparent:true");
     el.appendChild(pitEdge);
 
     const pitFloor = document.createElement("a-circle");
@@ -96,15 +123,15 @@ AFRAME.registerComponent("scarlett-lobby", {
     step.setAttribute("material", "color:#0b0f14; metalness:0.6; roughness:0.4; opacity:0.95; transparent:true");
     el.appendChild(step);
 
-    // 8-player round showcase table in pit
+    // ---- 8-SEAT ROUND SHOWCASE TABLE IN PIT ----
     const showcase = document.createElement("a-entity");
     showcase.setAttribute("position", "0 -1.8 0");
     showcase.setAttribute("scarlett-lobby-showcase-table", "");
     el.appendChild(showcase);
 
-    // Doors + IPTV jumbotrons above (also portals)
-    makeDoorWithJumbo(el, { x: 0, z: -28, ry: 0 },  "SCORPION ROOM", "tables");
-    makeDoorWithJumbo(el, { x: 28, z: 0, ry: -90 }, "EVENTS", "tables");
+    // ---- DOORS + JUMBOTRONS (PORTALS) ----
+    makeDoorWithJumbo(el, { x: 0, z: -28, ry: 0 },   "SCORPION ROOM", "tables");
+    makeDoorWithJumbo(el, { x: 28, z: 0, ry: -90 },  "EVENTS", "tables");
     makeDoorWithJumbo(el, { x: 0, z: 28, ry: 180 },  "VIP", "tables");
     makeDoorWithJumbo(el, { x: -28, z: 0, ry: 90 },  "STORE", "store");
 
@@ -114,7 +141,7 @@ AFRAME.registerComponent("scarlett-lobby", {
     makeSpawnPad(el, { x: 23, z: 0 },  "tables", "ENTER EVENTS");
     makeSpawnPad(el, { x: 0, z: 23 },  "tables", "ENTER VIP");
 
-    // Lobby title
+    // Title
     const title = document.createElement("a-text");
     title.setAttribute("value", "SCARLETT LOBBY");
     title.setAttribute("align", "center");
@@ -123,15 +150,26 @@ AFRAME.registerComponent("scarlett-lobby", {
     title.setAttribute("position", "0 10 -10");
     el.appendChild(title);
 
-    if (window.hudLog) hudLog("REAL LOBBY ✅ circle + pit + round 8-seat + IPTV jumbotrons");
+    if (window.hudLog) hudLog("Lobby upgraded ✅ (brick walls + pillar lights + brighter)");
 
-    // helpers
+    // ---- Helpers ----
     function addLight(root, type, cfg, pos) {
       const l = document.createElement("a-entity");
       const kv = Object.entries(cfg).map(([k, v]) => `${k}: ${v}`).join("; ");
       l.setAttribute("light", `type: ${type}; ${kv}`);
       l.setAttribute("position", pos);
       root.appendChild(l);
+    }
+
+    function ensureAssetImage(assets, id, src) {
+      let img = document.getElementById(id);
+      if (img) return img;
+      img = document.createElement("img");
+      img.setAttribute("id", id);
+      img.setAttribute("crossorigin", "anonymous");
+      img.setAttribute("src", src);
+      assets.appendChild(img);
+      return img;
     }
 
     function makeDoorWithJumbo(root, pose, label, dest) {
@@ -152,7 +190,6 @@ AFRAME.registerComponent("scarlett-lobby", {
       door.setAttribute("material", "color:#03060b; opacity:0.9; transparent:true");
       root.appendChild(door);
 
-      // IPTV jumbotron (also portal)
       const jumbo = document.createElement("a-entity");
       jumbo.setAttribute("id", `jumbo_${label.toLowerCase().replace(/\s+/g, "_")}`);
       jumbo.classList.add("clickable", "portal");
@@ -171,7 +208,7 @@ AFRAME.registerComponent("scarlett-lobby", {
       pad.setAttribute("radius-outer", "1.7");
       pad.setAttribute("rotation", "-90 0 0");
       pad.setAttribute("position", `${pos.x} 0.03 ${pos.z}`);
-      pad.setAttribute("material", "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.6; opacity:0.55; transparent:true");
+      pad.setAttribute("material", "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.7; opacity:0.55; transparent:true");
       root.appendChild(pad);
 
       const t = document.createElement("a-text");
@@ -185,11 +222,11 @@ AFRAME.registerComponent("scarlett-lobby", {
   }
 });
 
-// 8-player ROUND lobby pit table (uses scarlett-chair from table6.js)
 AFRAME.registerComponent("scarlett-lobby-showcase-table", {
   init() {
     const el = this.el;
 
+    // platform in pit
     const base = document.createElement("a-cylinder");
     base.setAttribute("radius", "6.9");
     base.setAttribute("height", "0.24");
@@ -211,14 +248,6 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
     top.setAttribute("material", "color:#101827; roughness:0.65; metalness:0.15");
     el.appendChild(top);
 
-    const leather = document.createElement("a-torus");
-    leather.setAttribute("radius", "3.28");
-    leather.setAttribute("radius-tubular", "0.10");
-    leather.setAttribute("rotation", "-90 0 0");
-    leather.setAttribute("position", "0 1.58 0");
-    leather.setAttribute("material", "color:#2a1b12; metalness:0.12; roughness:0.92");
-    el.appendChild(leather);
-
     const felt = document.createElement("a-cylinder");
     felt.setAttribute("radius", "3.00");
     felt.setAttribute("height", "0.05");
@@ -234,15 +263,9 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
     neon.setAttribute("material", "color:#0f1116; emissive:#00e5ff; emissiveIntensity:2.0; opacity:0.85; transparent:true");
     el.appendChild(neon);
 
-    const pot = document.createElement("a-cylinder");
-    pot.setAttribute("radius", "0.95");
-    pot.setAttribute("height", "0.02");
-    pot.setAttribute("position", "0 1.67 0");
-    pot.setAttribute("material", "color:#0b1a25; emissive:#7b61ff; emissiveIntensity:0.25; roughness:0.9; metalness:0.0");
-    el.appendChild(pot);
-
-    const seatRadius = 6.1;
-    const seatY = 0.20;
+    // Seats
+    const seatRadius = 6.2;
+    const seatY = 0.32; // ✅ lifted so bots aren't buried
 
     for (let i = 0; i < 8; i++) {
       const a = (i / 8) * Math.PI * 2;
@@ -258,19 +281,7 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
       el.appendChild(seat);
     }
 
-    // Your seat (seat 0)
-    const yourSeat = document.getElementById("lobby_seat_0");
-    if (yourSeat) {
-      const marker = document.createElement("a-ring");
-      marker.setAttribute("radius-inner", "0.26");
-      marker.setAttribute("radius-outer", "0.40");
-      marker.setAttribute("rotation", "-90 0 0");
-      marker.setAttribute("position", "0 0.03 0");
-      marker.setAttribute("material", "color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.0; opacity:0.55; transparent:true");
-      yourSeat.appendChild(marker);
-    }
-
-    // Optional lobby seated bots (7 bots, seat 0 empty)
+    // Bots (7 seats filled, seat 0 open)
     if (window.SCARLETT_LOBBY_BOTS) {
       const models = [
         "./assets/avatars/male.glb",
@@ -290,7 +301,7 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
 
         const a = document.createElement("a-entity");
         a.setAttribute("gltf-model", models[m % models.length]);
-        a.setAttribute("position", "0 0.06 0.05");
+        a.setAttribute("position", "0 0.15 0.05"); // ✅ lifted more
         a.setAttribute("rotation", "0 180 0");
         a.setAttribute("scale", "1.05 1.05 1.05");
         a.setAttribute("animation-mixer", "clip:*; loop:repeat");
@@ -299,6 +310,6 @@ AFRAME.registerComponent("scarlett-lobby-showcase-table", {
       }
     }
 
-    if (window.hudLog) hudLog("Lobby table ✅ round 8-seat | seat_0 reserved");
+    if (window.hudLog) hudLog("Pit table corrected ✅ (bots lifted, no bury)");
   }
 });
