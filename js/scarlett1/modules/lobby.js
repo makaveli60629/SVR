@@ -1,194 +1,220 @@
-AFRAME.registerComponent("scarlett-lobby", {
-  init: function () {
+// /js/scarlett1/modules/lobby.js
+AFRAME.registerComponent("scarlett-lobby-room", {
+  init() {
     const el = this.el;
 
-    // ----------- LIGHTING (Quest-friendly: few lights + emissive neon) ----------
-    const amb = document.createElement("a-entity");
-    amb.setAttribute("light", "type:ambient; intensity:0.65; color:#bfefff");
-    el.appendChild(amb);
-
-    const hemi = document.createElement("a-entity");
-    hemi.setAttribute("light", "type:hemisphere; intensity:0.55; color:#cfe8ff; groundColor:#05070c");
-    hemi.setAttribute("position", "0 8 0");
-    el.appendChild(hemi);
-
-    // 4 soft point lights around the lobby (not too many)
-    const pts = [
-      {x: 10, y: 6, z: 0},
-      {x:-10, y: 6, z: 0},
-      {x: 0, y: 6, z:10},
-      {x: 0, y: 6, z:-10},
-    ];
-    pts.forEach(p=>{
-      const l = document.createElement("a-entity");
-      l.setAttribute("position", `${p.x} ${p.y} ${p.z}`);
-      l.setAttribute("light", "type:point; intensity:0.75; distance:40; decay:2; color:#8fe9ff");
-      el.appendChild(l);
-    });
-
-    // ----------- FLOOR ----------
+    // === FLOOR ===
     const floor = document.createElement("a-circle");
     floor.classList.add("teleportable");
     floor.setAttribute("radius", "22");
     floor.setAttribute("rotation", "-90 0 0");
     floor.setAttribute("position", "0 0 0");
-    floor.setAttribute("material", "color:#070a10; roughness:1.0; metalness:0.0");
+    floor.setAttribute("material", "color:#05070c; roughness:1; metalness:0");
     el.appendChild(floor);
 
-    // Neon floor ring
-    const ring = document.createElement("a-ring");
-    ring.setAttribute("radius-inner", "20.8");
-    ring.setAttribute("radius-outer", "21.1");
-    ring.setAttribute("rotation", "-90 0 0");
-    ring.setAttribute("position", "0 0.02 0");
-    ring.setAttribute("material", "color:#0f1116; emissive:#2bd6ff; emissiveIntensity:2.0; opacity:0.9; transparent:true");
-    el.appendChild(ring);
-
-    // ----------- WALLS (2x height request) ----------
+    // === WALLS (2x height) ===
     const wall = document.createElement("a-cylinder");
     wall.setAttribute("radius", "22");
-    wall.setAttribute("height", "16"); // 2x taller feel
-    wall.setAttribute("position", "0 8 0");
+    wall.setAttribute("height", "14");
+    wall.setAttribute("position", "0 7 0");
     wall.setAttribute("material", "color:#0b0f14; roughness:0.95; metalness:0.05; side:double");
     el.appendChild(wall);
 
-    // “Brick-ish” ribs so you can see structure (cheap geometry)
-    for (let i=0;i<24;i++){
-      const rib = document.createElement("a-box");
-      const ang = (i/24)*Math.PI*2;
-      const r = 21.8;
-      rib.setAttribute("width","0.25");
-      rib.setAttribute("height","16");
-      rib.setAttribute("depth","0.7");
-      rib.setAttribute("position", `${Math.cos(ang)*r} 8 ${Math.sin(ang)*r}`);
-      rib.setAttribute("rotation", `0 ${-(ang*180/Math.PI)} 0`);
-      rib.setAttribute("material","color:#0a0d13; roughness:1; metalness:0");
-      el.appendChild(rib);
+    // Brick-ish vertical panels (visual texture)
+    for (let i=0; i<16; i++) {
+      const a = (i/16) * Math.PI*2;
+      const x = Math.cos(a) * 21.7;
+      const z = Math.sin(a) * 21.7;
+      const p = document.createElement("a-box");
+      p.setAttribute("width", "2.2");
+      p.setAttribute("height", "10.5");
+      p.setAttribute("depth", "0.3");
+      p.setAttribute("position", `${x} 5.25 ${z}`);
+      p.setAttribute("rotation", `0 ${(-a*180/Math.PI)+90} 0`);
+      p.setAttribute("material", "color:#0f172a; roughness:0.9; metalness:0.05; opacity:0.9; transparent:true");
+      el.appendChild(p);
 
-      // neon strip on each rib
-      const neon = document.createElement("a-box");
-      neon.setAttribute("width","0.05");
-      neon.setAttribute("height","10");
-      neon.setAttribute("depth","0.05");
-      neon.setAttribute("position", `${Math.cos(ang)*21.35} 8 ${Math.sin(ang)*21.35}`);
-      neon.setAttribute("material","color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.4; opacity:0.65; transparent:true");
-      el.appendChild(neon);
+      // neon strip
+      const strip = document.createElement("a-box");
+      strip.setAttribute("width", "0.08");
+      strip.setAttribute("height", "10.2");
+      strip.setAttribute("depth", "0.12");
+      strip.setAttribute("position", `${x} 5.2 ${z}`);
+      strip.setAttribute("rotation", `0 ${(-a*180/Math.PI)+90} 0`);
+      strip.setAttribute("material", `color:${i%2===0?"#2bd6ff":"#7b61ff"}; emissive:${i%2===0?"#2bd6ff":"#7b61ff"}; emissiveIntensity:1.6; opacity:0.85; transparent:true`);
+      el.appendChild(strip);
+
+      // pillar light (extra brightness)
+      const pl = document.createElement("a-light");
+      pl.setAttribute("type", "point");
+      pl.setAttribute("intensity", "0.65");
+      pl.setAttribute("distance", "20");
+      pl.setAttribute("decay", "1.3");
+      pl.setAttribute("color", i%2===0 ? "#2bd6ff" : "#7b61ff");
+      pl.setAttribute("position", `${x} 5.5 ${z}`);
+      el.appendChild(pl);
     }
 
-    // ----------- PILLARS (with neon caps) ----------
-    const pillarPos = [
-      {x: 12, z: 12}, {x:-12, z: 12}, {x:12, z:-12}, {x:-12, z:-12},
-      {x: 16, z: 0},  {x:-16, z: 0},  {x:0, z: 16},  {x:0, z:-16}
-    ];
-    pillarPos.forEach(p=>{
-      const c = document.createElement("a-cylinder");
-      c.setAttribute("radius", "0.55");
-      c.setAttribute("height", "14");
-      c.setAttribute("position", `${p.x} 7 ${p.z}`);
-      c.setAttribute("material", "color:#0b0f14; metalness:0.35; roughness:0.65");
-      el.appendChild(c);
-
-      const cap = document.createElement("a-ring");
-      cap.setAttribute("radius-inner","0.55");
-      cap.setAttribute("radius-outer","0.9");
-      cap.setAttribute("rotation","-90 0 0");
-      cap.setAttribute("position", `${p.x} 13.9 ${p.z}`);
-      cap.setAttribute("material","color:#7b61ff; emissive:#7b61ff; emissiveIntensity:1.5; opacity:0.65; transparent:true");
-      el.appendChild(cap);
-    });
-
-    // ----------- DEEP CENTER PIT (your centerpiece lives inside) ----------
-    const PIT_RADIUS = 8.2;
-    const PIT_DEPTH  = 10.0;
+    // === DEEP PIT (CENTER DIVOT) ===
+    const PIT_RADIUS = 9.0;
+    const PIT_DEPTH  = 9.5;
     const PIT_FLOOR_Y = -PIT_DEPTH;
 
-    const pitLip = document.createElement("a-ring");
-    pitLip.setAttribute("radius-inner", (PIT_RADIUS+0.2).toFixed(2));
-    pitLip.setAttribute("radius-outer", (PIT_RADIUS+0.95).toFixed(2));
-    pitLip.setAttribute("rotation","-90 0 0");
-    pitLip.setAttribute("position","0 0.03 0");
-    pitLip.setAttribute("material","color:#0b0f14; metalness:0.6; roughness:0.4; opacity:0.98; transparent:true");
-    el.appendChild(pitLip);
+    const lip = document.createElement("a-ring");
+    lip.setAttribute("radius-inner", (PIT_RADIUS+0.2).toFixed(2));
+    lip.setAttribute("radius-outer", (PIT_RADIUS+1.0).toFixed(2));
+    lip.setAttribute("rotation", "-90 0 0");
+    lip.setAttribute("position", "0 0.03 0");
+    lip.setAttribute("material", "color:#0b0f14; metalness:0.6; roughness:0.35; opacity:0.98; transparent:true");
+    el.appendChild(lip);
 
     const pitWall = document.createElement("a-cylinder");
     pitWall.setAttribute("radius", PIT_RADIUS.toFixed(2));
     pitWall.setAttribute("height", PIT_DEPTH.toFixed(2));
     pitWall.setAttribute("position", `0 ${(PIT_FLOOR_Y/2).toFixed(2)} 0`);
-    pitWall.setAttribute("material","color:#05070c; roughness:1.0; metalness:0.0; side:double");
+    pitWall.setAttribute("material", "color:#02040a; roughness:1; metalness:0; side:double");
     el.appendChild(pitWall);
 
     const pitFloor = document.createElement("a-circle");
     pitFloor.classList.add("teleportable");
-    pitFloor.setAttribute("radius", (PIT_RADIUS-0.5).toFixed(2));
-    pitFloor.setAttribute("rotation","-90 0 0");
+    pitFloor.setAttribute("radius", (PIT_RADIUS-0.6).toFixed(2));
+    pitFloor.setAttribute("rotation", "-90 0 0");
     pitFloor.setAttribute("position", `0 ${PIT_FLOOR_Y.toFixed(2)} 0`);
-    pitFloor.setAttribute("material","color:#020308; roughness:1.0; metalness:0.0");
+    pitFloor.setAttribute("material", "color:#00040a; roughness:1; metalness:0");
     el.appendChild(pitFloor);
 
-    const depthRing = document.createElement("a-ring");
-    depthRing.setAttribute("radius-inner",(PIT_RADIUS-1.0).toFixed(2));
-    depthRing.setAttribute("radius-outer",(PIT_RADIUS-0.7).toFixed(2));
-    depthRing.setAttribute("rotation","-90 0 0");
-    depthRing.setAttribute("position", `0 ${(PIT_FLOOR_Y+0.10).toFixed(2)} 0`);
-    depthRing.setAttribute("material","color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.8; opacity:0.55; transparent:true");
-    el.appendChild(depthRing);
+    const pitNeon = document.createElement("a-ring");
+    pitNeon.setAttribute("radius-inner", (PIT_RADIUS-1.0).toFixed(2));
+    pitNeon.setAttribute("radius-outer", (PIT_RADIUS-0.7).toFixed(2));
+    pitNeon.setAttribute("rotation", "-90 0 0");
+    pitNeon.setAttribute("position", `0 ${(PIT_FLOOR_Y+0.08).toFixed(2)} 0`);
+    pitNeon.setAttribute("material", "color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.8; opacity:0.6; transparent:true");
+    el.appendChild(pitNeon);
 
-    // Placeholder for your 8-seat centerpiece table entity (keeps your structure)
-    const showcase = document.createElement("a-entity");
-    showcase.setAttribute("id","showcaseTableRoot");
-    showcase.setAttribute("position", `0 ${PIT_FLOOR_Y.toFixed(2)} 0`);
-    // if you already have a component for it, re-enable it here:
-    // showcase.setAttribute("scarlett-lobby-showcase-table", "");
-    el.appendChild(showcase);
+    // === CENTERPIECE TABLE (8 seats, round) inside pit ===
+    const center = document.createElement("a-entity");
+    center.setAttribute("position", `0 ${PIT_FLOOR_Y.toFixed(2)} 0`);
+    center.setAttribute("scarlett-round8-table", "");
+    el.appendChild(center);
 
-    // ----------- “DOORS” + JUMBOTRON FRAMES (4 cardinal points) ----------
-    const doors = [
-      {name:"POKER PIT", x: 0, z:-20.3, r: 0},
-      {name:"STORE",    x: 20.3, z: 0, r: -90},
-      {name:"SCORPION", x:-20.3, z: 0, r: 90},
-      {name:"BALCONY",  x: 0, z: 20.3, r: 180},
+    // === 4 "DOOR" PORTALS + JUMBOTRONS ABOVE ===
+    const portals = [
+      { id:"poker", label:"POKER TABLES", a:0,   room:"room_poker" },
+      { id:"store", label:"STORE",       a:90,  room:"room_store" },
+      { id:"balc",  label:"BALCONY",     a:180, room:"room_balcony" },
+      { id:"scorp", label:"SCORPION",    a:270, room:"room_poker" } // placeholder route
     ];
 
-    doors.forEach(d=>{
-      const frame = document.createElement("a-box");
-      frame.setAttribute("width","6.2");
-      frame.setAttribute("height","4.4");
-      frame.setAttribute("depth","0.25");
-      frame.setAttribute("position", `${d.x} 2.4 ${d.z}`);
-      frame.setAttribute("rotation", `0 ${d.r} 0`);
-      frame.setAttribute("material","color:#0b0f14; metalness:0.35; roughness:0.5");
-      el.appendChild(frame);
+    portals.forEach(p => {
+      const rad = 20.5;
+      const ang = p.a * Math.PI/180;
+      const x = Math.cos(ang) * rad;
+      const z = Math.sin(ang) * rad;
 
-      const screen = document.createElement("a-plane");
-      screen.setAttribute("width","5.6");
-      screen.setAttribute("height","3.4");
-      screen.setAttribute("position", `${d.x} 3.3 ${d.z}`);
-      screen.setAttribute("rotation", `0 ${d.r} 0`);
-      screen.setAttribute("material","color:#060913; emissive:#7b61ff; emissiveIntensity:0.25; opacity:0.95; transparent:true");
-      el.appendChild(screen);
-
-      const label = document.createElement("a-text");
-      label.setAttribute("value", d.name);
-      label.setAttribute("align","center");
-      label.setAttribute("color","#9ff");
-      label.setAttribute("width","10");
-      label.setAttribute("position", `${d.x} 1.0 ${d.z}`);
-      label.setAttribute("rotation", `0 ${d.r} 0`);
-      el.appendChild(label);
-
-      // teleport pad at each door
+      // door pad
       const pad = document.createElement("a-ring");
-      pad.classList.add("teleportable");
-      pad.setAttribute("radius-inner","0.6");
-      pad.setAttribute("radius-outer","0.9");
-      pad.setAttribute("rotation","-90 0 0");
-      pad.setAttribute("position", `${d.x} 0.03 ${d.z}`);
-      pad.setAttribute("material","color:#00e5ff; emissive:#00e5ff; emissiveIntensity:1.2; opacity:0.55; transparent:true");
+      pad.classList.add("clickable","teleportable");
+      pad.setAttribute("id", `portal_${p.id}`);
+      pad.setAttribute("radius-inner", "1.2");
+      pad.setAttribute("radius-outer", "1.7");
+      pad.setAttribute("rotation", "-90 0 0");
+      pad.setAttribute("position", `${x} 0.03 ${z}`);
+      pad.setAttribute("material", "color:#7b61ff; emissive:#7b61ff; emissiveIntensity:1.2; opacity:0.7; transparent:true");
       el.appendChild(pad);
+
+      pad.addEventListener("click", () => {
+        if (window.SCARLETT && window.SCARLETT.setRoom) window.SCARLETT.setRoom(p.room);
+      });
+
+      // label
+      const t = document.createElement("a-text");
+      t.setAttribute("value", p.label);
+      t.setAttribute("align", "center");
+      t.setAttribute("color", "#e8faff");
+      t.setAttribute("width", "8");
+      t.setAttribute("position", `${x} 1.0 ${z}`);
+      t.setAttribute("rotation", `0 ${-p.a+180} 0`);
+      el.appendChild(t);
+
+      // jumbotron above door
+      const j = document.createElement("a-plane");
+      j.setAttribute("width", "6");
+      j.setAttribute("height", "3.4");
+      j.setAttribute("position", `${x} 5.4 ${z}`);
+      j.setAttribute("rotation", `0 ${-p.a+180} 0`);
+      j.setAttribute("material", "color:#000; emissive:#2bd6ff; emissiveIntensity:0.35; opacity:0.95; transparent:true");
+      el.appendChild(j);
+
+      const jt = document.createElement("a-text");
+      jt.setAttribute("value", "JUMBOTRON");
+      jt.setAttribute("align", "center");
+      jt.setAttribute("color", "#9ff");
+      jt.setAttribute("width", "10");
+      jt.setAttribute("position", `${x} 5.4 ${z+0.02*Math.sign(z||1)}`);
+      jt.setAttribute("rotation", `0 ${-p.a+180} 0`);
+      el.appendChild(jt);
     });
 
-    if (window.hudLog) {
-      hudLog("Lobby upgraded ✅ (2x walls + neon ribs + pillars + deep pit + door pads)");
+    if (window.hudLog) hudLog("Lobby created ✅");
+    if (window.hudLog) hudLog("Deep pit created ✅");
+  }
+});
+
+// 8-seat round table (centerpiece demo)
+AFRAME.registerComponent("scarlett-round8-table", {
+  init() {
+    const el = this.el;
+
+    // pedestal
+    const base = document.createElement("a-cylinder");
+    base.setAttribute("radius", "5.0");
+    base.setAttribute("height", "0.20");
+    base.setAttribute("position", "0 0.10 0");
+    base.setAttribute("material", "color:#0b0f14; metalness:0.65; roughness:0.35");
+    el.appendChild(base);
+
+    const pillar = document.createElement("a-cylinder");
+    pillar.setAttribute("radius", "0.9");
+    pillar.setAttribute("height", "1.15");
+    pillar.setAttribute("position", "0 0.78 0");
+    pillar.setAttribute("material", "color:#0b0f14; metalness:0.65; roughness:0.35");
+    el.appendChild(pillar);
+
+    const top = document.createElement("a-cylinder");
+    top.setAttribute("radius", "2.55");
+    top.setAttribute("height", "0.18");
+    top.setAttribute("position", "0 1.45 0");
+    top.setAttribute("material", "color:#101827; metalness:0.2; roughness:0.6");
+    el.appendChild(top);
+
+    const rail = document.createElement("a-torus");
+    rail.setAttribute("radius", "2.55");
+    rail.setAttribute("radius-tubular", "0.045");
+    rail.setAttribute("rotation", "-90 0 0");
+    rail.setAttribute("position", "0 1.54 0");
+    rail.setAttribute("material", "color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:2.0; opacity:0.85; transparent:true");
+    el.appendChild(rail);
+
+    const felt = document.createElement("a-circle");
+    felt.setAttribute("radius", "2.25");
+    felt.setAttribute("rotation", "-90 0 0");
+    felt.setAttribute("position", "0 1.55 0");
+    felt.setAttribute("material", "color:#07111a; roughness:1; metalness:0");
+    el.appendChild(felt);
+
+    // 8 seats
+    const seatY = 0.20;
+    const seatR = 4.6;
+    for (let i=0; i<8; i++) {
+      const a = (i/8) * Math.PI*2;
+      const x = Math.cos(a) * seatR;
+      const z = Math.sin(a) * seatR;
+
+      const chair = document.createElement("a-entity");
+      chair.setAttribute("position", `${x} ${seatY} ${z}`);
+      chair.setAttribute("rotation", `0 ${(-a*180/Math.PI)+90} 0`);
+      chair.setAttribute("scarlett-chair", "");
+      el.appendChild(chair);
     }
   }
 });

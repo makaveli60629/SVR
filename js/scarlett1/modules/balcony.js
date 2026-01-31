@@ -1,88 +1,78 @@
-AFRAME.registerComponent("scarlett-balcony", {
-  init: function () {
+// /js/scarlett1/modules/balcony.js
+AFRAME.registerComponent("scarlett-balcony-room", {
+  init() {
     const el = this.el;
 
-    const platform = document.createElement("a-box");
-    platform.setAttribute("width","18");
-    platform.setAttribute("height","0.4");
-    platform.setAttribute("depth","10");
-    platform.setAttribute("position","0 3.0 0");
-    platform.setAttribute("material","color:#0b0f14; metalness:0.45; roughness:0.6");
+    // Elevated platform
+    const platform = document.createElement("a-cylinder");
+    platform.classList.add("teleportable");
+    platform.setAttribute("radius", "14");
+    platform.setAttribute("height", "0.3");
+    platform.setAttribute("position", "0 6 0");
+    platform.setAttribute("material", "color:#0b0f14; roughness:0.85; metalness:0.15");
     el.appendChild(platform);
 
-    const glow = document.createElement("a-ring");
-    glow.setAttribute("radius-inner","7.2");
-    glow.setAttribute("radius-outer","7.6");
-    glow.setAttribute("rotation","-90 0 0");
-    glow.setAttribute("position","0 3.22 0");
-    glow.setAttribute("material","color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.2; opacity:0.18; transparent:true");
-    el.appendChild(glow);
+    const deck = document.createElement("a-circle");
+    deck.classList.add("teleportable");
+    deck.setAttribute("radius", "13.2");
+    deck.setAttribute("rotation", "-90 0 0");
+    deck.setAttribute("position", "0 6.16 0");
+    deck.setAttribute("material", "color:#070a12; roughness:1; metalness:0");
+    el.appendChild(deck);
 
-    makeRail(el, 0, 3.9,  4.8, 18, 0.22);
-    makeRail(el, 0, 3.9, -4.8, 18, 0.22);
-    makeRailSide(el, -8.8, 3.9, 0, 10, 0.22);
-    makeRailSide(el,  8.8, 3.9, 0, 10, 0.22);
+    // Rail
+    const rail = document.createElement("a-torus");
+    rail.setAttribute("radius", "13.2");
+    rail.setAttribute("radius-tubular", "0.08");
+    rail.setAttribute("rotation", "-90 0 0");
+    rail.setAttribute("position", "0 7.0 0");
+    rail.setAttribute("material", "color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.6; opacity:0.55; transparent:true");
+    el.appendChild(rail);
+
+    // Lights
+    for (let i=0; i<8; i++) {
+      const a = (i/8) * Math.PI*2;
+      const x = Math.cos(a) * 10.5;
+      const z = Math.sin(a) * 10.5;
+
+      const p = document.createElement("a-light");
+      p.setAttribute("type","point");
+      p.setAttribute("intensity","0.95");
+      p.setAttribute("distance","24");
+      p.setAttribute("decay","1.4");
+      p.setAttribute("color", i%2===0 ? "#2bd6ff" : "#7b61ff");
+      p.setAttribute("position", `${x} 7.4 ${z}`);
+      el.appendChild(p);
+    }
+
+    const label = document.createElement("a-text");
+    label.setAttribute("value","BALCONY VIEW");
+    label.setAttribute("align","center");
+    label.setAttribute("color","#9ff");
+    label.setAttribute("width","10");
+    label.setAttribute("position","0 8.4 -6");
+    el.appendChild(label);
+
+    // Back to lobby
+    const back = document.createElement("a-ring");
+    back.classList.add("clickable","teleportable");
+    back.setAttribute("radius-inner","1.1");
+    back.setAttribute("radius-outer","1.55");
+    back.setAttribute("rotation","-90 0 0");
+    back.setAttribute("position","0 6.2 11.5");
+    back.setAttribute("material","color:#7b61ff; emissive:#7b61ff; emissiveIntensity:1.2; opacity:0.7; transparent:true");
+    el.appendChild(back);
 
     const t = document.createElement("a-text");
-    t.setAttribute("value","BALCONY");
+    t.setAttribute("value","BACK TO LOBBY");
     t.setAttribute("align","center");
-    t.setAttribute("color","#9ff");
-    t.setAttribute("width","10");
-    t.setAttribute("position","0 5.3 -4.2");
+    t.setAttribute("color","#e8faff");
+    t.setAttribute("width","8");
+    t.setAttribute("position","0 7.2 11.5");
     el.appendChild(t);
 
-    makePortal(el, {x:0,y:4.2,z:3.8}, "BACK TO LOBBY", ()=> window.gotoLobby && window.gotoLobby());
+    back.addEventListener("click", () => window.SCARLETT && window.SCARLETT.setRoom && window.SCARLETT.setRoom("room_lobby"));
 
-    if (window.hudLog) hudLog("Balcony ✅");
+    if (window.hudLog) hudLog("Balcony room created ✅");
   }
 });
-
-function makeRail(root, x,y,z,w,h){
-  const r = document.createElement("a-box");
-  r.setAttribute("width", w);
-  r.setAttribute("height", h);
-  r.setAttribute("depth", "0.18");
-  r.setAttribute("position", `${x} ${y} ${z}`);
-  r.setAttribute("material","color:#0b0f14; emissive:#7b61ff; emissiveIntensity:0.18; opacity:0.95; transparent:true");
-  root.appendChild(r);
-}
-function makeRailSide(root, x,y,z,d,h){
-  const r = document.createElement("a-box");
-  r.setAttribute("width", "0.18");
-  r.setAttribute("height", h);
-  r.setAttribute("depth", d);
-  r.setAttribute("position", `${x} ${y} ${z}`);
-  r.setAttribute("material","color:#0b0f14; emissive:#7b61ff; emissiveIntensity:0.18; opacity:0.95; transparent:true");
-  root.appendChild(r);
-}
-function makePortal(root, pos, label, onClick){
-  const g = document.createElement("a-entity");
-  g.setAttribute("position", `${pos.x} ${pos.y} ${pos.z}`);
-  g.setAttribute("rotation","0 180 0");
-  g.classList.add("clickable");
-  root.appendChild(g);
-
-  const bg = document.createElement("a-plane");
-  bg.setAttribute("width","2.4");
-  bg.setAttribute("height","0.6");
-  bg.setAttribute("material","color:#0b0f14; opacity:0.78; transparent:true");
-  bg.classList.add("clickable");
-  g.appendChild(bg);
-
-  const ring = document.createElement("a-ring");
-  ring.setAttribute("radius-inner","0.48");
-  ring.setAttribute("radius-outer","0.54");
-  ring.setAttribute("position","0 0 0.01");
-  ring.setAttribute("material","color:#2bd6ff; emissive:#2bd6ff; emissiveIntensity:1.4; opacity:0.6; transparent:true");
-  g.appendChild(ring);
-
-  const t = document.createElement("a-text");
-  t.setAttribute("value", label);
-  t.setAttribute("align","center");
-  t.setAttribute("color","#9ff");
-  t.setAttribute("width","7");
-  t.setAttribute("position","0 0 0.02");
-  g.appendChild(t);
-
-  g.addEventListener("click", ()=>{ try{ onClick && onClick(); }catch(e){} });
-}

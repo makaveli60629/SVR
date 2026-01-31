@@ -1,41 +1,68 @@
+// /js/scarlett1/modules/world.js
 AFRAME.registerComponent("scarlett-world", {
-  init: function () {
-    const el = this.el;
+  init() {
+    const scene = this.el.sceneEl;
 
-    const floor = document.createElement("a-circle");
-    floor.setAttribute("rotation", "-90 0 0");
-    floor.setAttribute("radius", "70");
-    floor.setAttribute("material", "color:#05060a; roughness:1");
-    floor.setAttribute("position", "0 0 0");
-    el.appendChild(floor);
+    // Attach global systems
+    scene.setAttribute("scarlett-lighting", "");
+    this.el.setAttribute("scarlett-room-manager", "");
 
-    const sky = document.createElement("a-sphere");
-    sky.setAttribute("radius", "120");
-    sky.setAttribute("segments-height", "18");
-    sky.setAttribute("segments-width", "28");
-    sky.setAttribute("material", "color:#020205; side:back; opacity:1");
-    el.appendChild(sky);
+    // Rooms root
+    const roomsRoot = document.createElement("a-entity");
+    roomsRoot.setAttribute("id", "roomsRoot");
+    this.el.appendChild(roomsRoot);
 
-    for (let i=0;i<18;i++){
-      const a = (i/18) * Math.PI * 2;
-      const x = Math.cos(a)*28;
-      const z = Math.sin(a)*28;
-      const col = document.createElement("a-cylinder");
-      col.setAttribute("radius", "0.22");
-      col.setAttribute("height", "8");
-      col.setAttribute("position", `${x.toFixed(2)} 4 ${z.toFixed(2)}`);
-      col.setAttribute("material", "color:#0b0f14; emissive:#2bd6ff; emissiveIntensity:0.25; roughness:0.8");
-      el.appendChild(col);
-    }
+    // LOBBY
+    const lobby = document.createElement("a-entity");
+    lobby.setAttribute("id", "room_lobby");
+    lobby.setAttribute("scarlett-lobby-room", "");
+    roomsRoot.appendChild(lobby);
 
-    const ring = document.createElement("a-torus");
-    ring.setAttribute("radius", "6.5");
-    ring.setAttribute("radius-tubular", "0.08");
-    ring.setAttribute("rotation", "-90 0 0");
-    ring.setAttribute("position", "0 0.05 0");
-    ring.setAttribute("material", "color:#0f1116; emissive:#7b61ff; emissiveIntensity:0.9; opacity:0.55; transparent:true");
-    el.appendChild(ring);
+    // POKER TABLE ROOM (6 seats)
+    const poker = document.createElement("a-entity");
+    poker.setAttribute("id", "room_poker");
+    poker.setAttribute("visible", "false");
+    poker.setAttribute("scarlett-poker-room", "");
+    roomsRoot.appendChild(poker);
 
-    if (window.hudLog) hudLog("World built ✅");
+    // STORE
+    const store = document.createElement("a-entity");
+    store.setAttribute("id", "room_store");
+    store.setAttribute("visible", "false");
+    store.setAttribute("scarlett-store-room", "");
+    roomsRoot.appendChild(store);
+
+    // BALCONY
+    const balcony = document.createElement("a-entity");
+    balcony.setAttribute("id", "room_balcony");
+    balcony.setAttribute("visible", "false");
+    balcony.setAttribute("scarlett-balcony-room", "");
+    roomsRoot.appendChild(balcony);
+
+    // Register rooms
+    const rm = this.el.components["scarlett-room-manager"];
+    rm.registerRoom("room_lobby", lobby);
+    rm.registerRoom("room_poker", poker);
+    rm.registerRoom("room_store", store);
+    rm.registerRoom("room_balcony", balcony);
+
+    // Spawn pad (safe)
+    this.spawnToSafePad();
+
+    // signal rooms ready
+    this.el.emit("scarlett-rooms-ready");
+
+    if (window.hudLog) hudLog("Scarlett1 booting…");
+  },
+
+  spawnToSafePad() {
+    const rig = document.getElementById("rig");
+    if (!rig) return;
+
+    // Put rig at a safe position (outside pit)
+    rig.object3D.position.set(0, 0, 14);
+    rig.object3D.rotation.set(0, 0, 0);
+
+    if (window.hudLog) hudLog("Spawned ✅ (lobby safe)");
   }
 });

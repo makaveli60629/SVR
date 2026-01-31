@@ -1,40 +1,20 @@
+// /js/scarlett1/modules/jumbotron.js
+// Placeholder jumbotron system (safe: no external video dependencies).
 AFRAME.registerComponent("scarlett-jumbotron", {
+  schema: { label: { default: "JUMBOTRON" } },
   init() {
-    // HLS test stream (Big Buck Bunny)
-    const src = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+    const p = document.createElement("a-plane");
+    p.setAttribute("width","6");
+    p.setAttribute("height","3.4");
+    p.setAttribute("material","color:#000; emissive:#2bd6ff; emissiveIntensity:0.35; opacity:0.95; transparent:true");
+    this.el.appendChild(p);
 
-    const video = document.createElement("video");
-    video.crossOrigin = "anonymous";
-    video.muted = true;
-    video.playsInline = true;
-    video.autoplay = true;
-    video.loop = true;
-
-    // Many Quest builds can play HLS directly; if not, it will just stay dark.
-    video.src = src;
-
-    const tex = new THREE.VideoTexture(video);
-    tex.minFilter = THREE.LinearFilter;
-    tex.magFilter = THREE.LinearFilter;
-
-    const mesh = this.el.getObject3D("mesh");
-    if (!mesh) {
-      // Wait for plane mesh to exist
-      this.el.addEventListener("object3dset", () => this.apply(tex, video));
-      return;
-    }
-    this.apply(tex, video);
-  },
-
-  apply(tex, video) {
-    const mesh = this.el.getObject3D("mesh");
-    if (!mesh) return;
-
-    mesh.material = new THREE.MeshBasicMaterial({ map: tex });
-    video.play().then(() => {
-      hudLog("Jumbotron video ✅");
-    }).catch(() => {
-      hudLog("Jumbotron play blocked (tap screen once) ⚠️");
-    });
+    const t = document.createElement("a-text");
+    t.setAttribute("value", this.data.label);
+    t.setAttribute("align","center");
+    t.setAttribute("color","#9ff");
+    t.setAttribute("width","10");
+    t.setAttribute("position","0 0 0.02");
+    this.el.appendChild(t);
   }
 });
