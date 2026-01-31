@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
   <title>SVR - Scarlett1</title>
 
-  <!-- A-FRAME CDN -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
   <style>
@@ -29,58 +28,36 @@
     vr-mode-ui="enabled:true"
     loading-screen="enabled:true"
   >
-    <!-- ASSETS (optional; keep empty if you want) -->
     <a-assets timeout="20000"></a-assets>
 
-    <!-- PLAYER RIG (NO FACE-CURSOR / NO RING IN FACE) -->
-    <a-entity id="rig" position="0 1.6 8" rotation="0 180 0">
-      <!-- camera -->
+    <!-- PLAYER RIG -->
+    <a-entity id="rig" position="0 1.6 14" rotation="0 0 0" scarlett-locomotion>
       <a-entity id="cam" camera look-controls="pointerLockEnabled:false"></a-entity>
 
-      <!-- Quest controllers: laser for teleport + UI clicking -->
+      <!-- LEFT: movement stick events -->
       <a-entity id="leftHand"
         oculus-touch-controls="hand:left"
-        laser-controls="hand:left"
-        raycaster="objects:.clickable; far:40"
-        line="opacity:0.55"
       ></a-entity>
 
+      <!-- RIGHT: teleport laser + click -->
       <a-entity id="rightHand"
         oculus-touch-controls="hand:right"
         laser-controls="hand:right"
-        raycaster="objects:.clickable; far:40"
+        raycaster="objects:.teleportable,.clickable; far:60; interval:0"
         line="opacity:0.55"
       ></a-entity>
 
-      <!-- Desktop/Android “click” support without face reticle -->
+      <!-- Desktop/Android click without face reticle -->
       <a-entity id="mouseCursor"
         cursor="rayOrigin: mouse; fuse:false"
         raycaster="objects:.clickable; far:60"
       ></a-entity>
     </a-entity>
 
-    <!-- WORLD ROOT -->
+    <!-- WORLD -->
     <a-entity id="world" scarlett-world></a-entity>
 
     <script type="module" src="./js/scarlett1/main.js"></script>
   </a-scene>
-</body>
-</html>    <a-entity id="balconyRoot" visible="false" scarlett-balcony></a-entity>
-
-  </a-scene>
-
-  <!-- MODULES -->
-  <script src="./js/scarlett1/modules/world.js"></script>
-  <script src="./js/scarlett1/modules/lobby.js"></script>
-  <script src="./js/scarlett1/modules/table.js"></script>
-  <script src="./js/scarlett1/modules/bots.js"></script>
-  <script src="./js/scarlett1/modules/jumbotron.js"></script>
-  <script src="./js/scarlett1/modules/pit.js"></script>
-  <script src="./js/scarlett1/modules/store.js"></script>
-  <script src="./js/scarlett1/modules/balcony.js"></script>
-
-  <!-- MAIN LAST -->
-  <script src="./js/scarlett1/main.js"></script>
-
 </body>
 </html>
