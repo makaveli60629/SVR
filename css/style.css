@@ -1,169 +1,110 @@
-/* ScarlettVR Permanent Spine — UI + Touch Joystick (Mobile First) */
 :root{
-  --bg:#06070c;
-  --panel: rgba(20,22,30,.62);
-  --panel2: rgba(14,16,24,.72);
-  --stroke: rgba(255,255,255,.10);
-  --text: rgba(255,255,255,.92);
-  --muted: rgba(255,255,255,.70);
-  --btn: rgba(255,255,255,.10);
-  --btn2: rgba(255,255,255,.14);
-  --shadow: 0 18px 60px rgba(0,0,0,.55);
-  --r: 22px;
+  --hud-bg: rgba(10,12,18,0.82);
+  --hud-border: rgba(140,180,255,0.22);
+  --btn-bg: rgba(25,34,60,0.92);
+  --btn-border: rgba(140,180,255,0.25);
+  --btn-warn: rgba(130,30,30,0.92);
+
+  /* you can change this live with Text +/- buttons */
+  --diag-font: 16px;
 }
 
-/* Fullscreen canvas behind UI */
 html,body{
-  height:100%;
   margin:0;
-  background: radial-gradient(1200px 900px at 50% 10%, rgba(140,110,255,.18), transparent 60%),
-              radial-gradient(1000px 800px at 20% 90%, rgba(0,255,200,.06), transparent 55%),
-              var(--bg);
-  color:var(--text);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  height:100%;
+  background:#05050a;
+  color:#e9eefc;
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
   overflow:hidden;
 }
 
-#xr-canvas{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
+canvas{
   display:block;
-  z-index:0;
-  background: transparent;
 }
 
-/* HUD overlay */
 .hud{
   position:fixed;
-  inset:0;
+  left:12px; top:12px;
+  right:12px;
+  max-width: 920px;
+
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: 18px;
+  padding: 14px;
+  z-index: 9999;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+}
+
+.hud__title{
   display:flex;
-  align-items:flex-start;
-  justify-content:center;
-  padding: clamp(14px, 3vw, 28px);
-  pointer-events:none; /* allow canvas/joystick unless inside card */
-  z-index:10;
+  flex-direction: column;
+  gap:4px;
+  margin-bottom:10px;
+}
+.hud__brand{
+  font-weight: 900;
+  letter-spacing: .08em;
+  font-size: 18px;
+}
+.hud__sub{
+  opacity: .78;
+  font-size: 13px;
 }
 
-.hud-card{
-  pointer-events:auto;
-  width:min(640px, 92vw);
-  border-radius: clamp(18px, 4vw, 32px);
-  background: linear-gradient(180deg, var(--panel), var(--panel2));
-  border: 1px solid var(--stroke);
-  box-shadow: var(--shadow);
-  padding: clamp(18px, 4vw, 28px);
-  backdrop-filter: blur(16px);
-}
-
-h1{
-  margin:0 0 10px 0;
-  font-size: clamp(34px, 6.4vw, 56px);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-}
-
-.sub{
-  margin: 0 0 16px 0;
-  color: var(--muted);
-  font-size: 16px;
-}
-
-.sub code{
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.10);
-  color: rgba(255,255,255,.88);
-}
-
-.btn-grid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 16px 0 16px 0;
+.hud__row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
 }
 
 .btn{
-  appearance:none;
-  border: 1px solid rgba(255,255,255,.14);
-  background: radial-gradient(180px 80px at 50% 30%, rgba(255,255,255,.16), rgba(255,255,255,.08));
-  color: rgba(255,255,255,.92);
-  border-radius: 18px;
-  padding: 16px 14px;
-  font-weight: 700;
-  font-size: 18px;
-  box-shadow: 0 8px 22px rgba(0,0,0,.35);
+  background: var(--btn-bg);
+  color:#fff;
+  border: 1px solid var(--btn-border);
+  border-radius: 14px;
+  padding: 11px 14px;
+  font-weight: 900;
   cursor:pointer;
-  user-select:none;
-  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.btn:active{ transform: scale(.99); }
+
+.btn--warn{
+  background: var(--btn-warn);
+  border-color: rgba(255,255,255,0.22);
 }
 
-.btn:active{
-  transform: translateY(1px);
-  background: radial-gradient(180px 80px at 50% 30%, rgba(255,255,255,.20), rgba(255,255,255,.10));
-}
+.hud__diag{
+  margin:0;
+  border-radius: 14px;
+  border: 1px solid rgba(140,180,255,0.15);
+  background: rgba(0,0,0,0.35);
 
-.log{
-  margin: 14px 0 10px 0;
-  padding: 14px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.45);
-  color: rgba(255,255,255,.90);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  font-size: 14px;
-  line-height: 1.32;
-  min-height: 120px;
+  /* BIG + readable on Quest */
+  font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size: var(--diag-font);
+  line-height: 1.35;
+
+  padding: 12px;
+  max-height: 46vh;
+  overflow:auto;
   white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.tip{
-  margin: 8px 0 0 0;
-  color: rgba(255,255,255,.66);
-  font-size: 14px;
+/* Hide HUD */
+.hud.hud--hidden{
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* Touch joystick */
-#touch-ui{
-  position:fixed;
-  inset:0;
-  z-index:5;              /* above canvas, below HUD card */
-  pointer-events:none;     /* enable only stick itself */
-}
-
-.stick{
-  pointer-events:auto;
-  position:absolute;
-  left: max(16px, env(safe-area-inset-left));
-  bottom: max(18px, env(safe-area-inset-bottom));
-  width: 140px;
-  height: 140px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.10);
-  box-shadow: 0 10px 30px rgba(0,0,0,.35);
-  backdrop-filter: blur(10px);
-  touch-action:none;
-}
-
-.stick .knob{
-  position:absolute;
-  left: 50%;
-  top: 50%;
-  width: 66px;
-  height: 66px;
-  border-radius: 999px;
-  transform: translate(-50%,-50%);
-  background: rgba(255,255,255,.10);
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow: 0 10px 22px rgba(0,0,0,.35);
-}
-
-/* Smaller screens: keep HUD readable */
-@media (max-width: 360px){
-  .btn{ font-size: 16px; padding: 14px 12px; border-radius: 16px; }
-  .stick{ width: 120px; height: 120px; }
-  .stick .knob{ width: 58px; height: 58px; }
+/* If you want a tiny HUD later, you can switch this class */
+.hud.hud--minimal .hud__sub,
+.hud.hud--minimal .hud__diag{
+  display:none;
 }
