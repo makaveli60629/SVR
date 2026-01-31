@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
   <title>Scarlett VR (A-Frame Scarlett1)</title>
 
-  <!-- A-FRAME CDN -->
+  <!-- A-FRAME CDN (Quest friendly) -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
   <!-- AFRAME-EXTRAS (movement-controls, etc.) -->
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
@@ -25,6 +26,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="hud">BOOT…</div>
   <button id="btnPit">Enter Poker Pit</button>
@@ -37,7 +39,7 @@
   <script src="./js/scarlett1/modules/bots.js"></script>
   <script src="./js/scarlett1/modules/pit.js"></script>
 
-  <!-- Main bootstrap -->
+  <!-- Main bootstrap (contains VR-safe button logic) -->
   <script src="./js/scarlett1/main.js"></script>
 
   <!-- A-FRAME SCENE -->
@@ -51,17 +53,18 @@
     <a-entity id="rig"
       position="0 0 3.2"
       movement-controls="speed:0.12; fly:false"
-      wasd-controls="acceleration:35"
-    >
+      wasd-controls="acceleration:35">
+
       <a-entity id="camera"
         camera
         look-controls
         position="0 1.6 0">
       </a-entity>
 
-      <!-- Hands (Quest controllers) -->
-      <a-entity laser-controls="hand: left"></a-entity>
-      <a-entity laser-controls="hand: right"></a-entity>
+      <!-- Hands / Lasers (Quest controllers) -->
+      <!-- IMPORTANT: raycaster targets .clickable for VR UI panels -->
+      <a-entity laser-controls="hand: left"  raycaster="objects: .clickable; far: 30"></a-entity>
+      <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 30"></a-entity>
     </a-entity>
 
     <!-- Lights -->
