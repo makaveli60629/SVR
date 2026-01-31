@@ -1,33 +1,55 @@
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-import { XRHandModelFactory } from "https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRHandModelFactory.js";
 import { Input } from "./input.js";
 import { init as initWorld } from "../scarlett1/world.js";
 
+function setStatus(txt){
+  const el = document.getElementById("status");
+  if (el) el.textContent = txt;
+}
+function showErr(err){
+  const box = document.getElementById("err");
+  if (!box) return;
+  box.style.display = "block";
+  box.textContent = String(err?.stack || err?.message || err);
+}
+
 export const Spine = {
   async start() {
+    // Global crash visibility (so no more “black screen mystery”)
+    window.addEventListener("error", (e) => {
+      showErr(e.error || e.message || e);
+    });
+    window.addEventListener("unhandledrejection", (e) => {
+      showErr(e.reason || e);
+    });
+
+    setStatus("init renderer…");
+
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.setSize(innerWidth, innerHeight);
     renderer.xr.enabled = true;
-
-    // BRIGHTER overall
-    renderer.toneMappingExposure = 1.5;
-
+    renderer.toneMappingExposure = 1.55;
     document.body.appendChild(renderer.domElement);
 
     // Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x05060d);
+    scene.background = new THREE.Color(0x070812);
 
     // Camera
     const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 800);
 
-    // Player rig (move this)
+    // Player rig
     const rig = new THREE.Group();
-    rig.position.set(0, 1.8, 22); // ✅ moved back (prevents starting in pit)
+    rig.position.set(0, 1.8, 24); // safe spawn far from pit
     rig.add(camera);
     scene.add(rig);
+
+    // Add controllers (no fragile hand model imports)
+    const controller1 = renderer.xr.getController(0);
+    const controller2 = renderer.xr.getController(1);
+    scene.add(controller1, controller2);
 
     // Resize
     addEventListener("resize", () => {
@@ -36,53 +58,44 @@ export const Spine = {
       renderer.setSize(innerWidth, innerHeight);
     });
 
-    // XR Controllers + Hands
-    const controller1 = renderer.xr.getController(0);
-    const controller2 = renderer.xr.getController(1);
-    scene.add(controller1, controller2);
-
-    // Hand models (Oculus-style)
-    const handFactory = new XRHandModelFactory();
-    const hand1 = renderer.xr.getHand(0);
-    const hand2 = renderer.xr.getHand(1);
-    hand1.add(handFactory.createHandModel(hand1, "mesh"));
-    hand2.add(handFactory.createHandModel(hand2, "mesh"));
-    scene.add(hand1, hand2);
-
-    // Context for modules
+    // Context
     const ctx = {
       THREE, scene, camera, renderer, rig,
-      controller1, controller2, hand1, hand2,
+      controller1, controller2,
       log: (...a) => console.log(...a),
-      // demo mode: no collision clamp (prevents “stuck”)
       flags: { noClip: true },
-      // raycast targets for teleport (world fills this)
       teleportSurfaces: []
     };
 
-    // Input
+    setStatus("init input…");
     Input.init(ctx);
 
-    // World
+    setStatus("build world…");
     await initWorld(ctx);
 
-    // VR button
+    // Buttons
+    document.getElementById("btnReset")?.addEventListener("click", () => {
+      rig.position.set(0, 1.8, 24);
+      rig.rotation.set(0, 0, 0);
+    });
+
+    document.getElementById("btnHard")?.addEventListener("click", () => {
+      // bypass caches by forcing reload with a new query param
+      const u = new URL(location.href);
+      u.searchParams.set("v", "HARD_" + Date.now());
+      location.href = u.toString();
+    });
+
     document.getElementById("btnVR")?.addEventListener("click", async () => {
       try {
-        if (!navigator.xr) return;
+        if (!navigator.xr) throw new Error("WebXR not available on this browser.");
         const session = await navigator.xr.requestSession("immersive-vr", {
           optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"]
         });
         renderer.xr.setSession(session);
       } catch (e) {
-        console.warn("XR session failed:", e);
+        showErr(e);
       }
-    });
-
-    // Reset spawn
-    document.getElementById("btnReset")?.addEventListener("click", () => {
-      rig.position.set(0, 1.8, 22);
-      rig.rotation.set(0, 0, 0);
     });
 
     // Render loop
@@ -90,9 +103,15 @@ export const Spine = {
     renderer.setAnimationLoop(() => {
       const dt = Math.min(clock.getDelta(), 0.033);
       Input.update(dt);
+
+      setStatus(
+        `ok • xr=${renderer.xr.isPresenting ? "YES" : "no"}\n` +
+        `pos ${rig.position.x.toFixed(2)}, ${rig.position.y.toFixed(2)}, ${rig.position.z.toFixed(2)}`
+      );
+
       renderer.render(scene, camera);
     });
 
-    console.log("✅ Scarlett Demo: ready");
+    console.log("✅ Scarlett SAFE Demo: ready");
   }
 };
