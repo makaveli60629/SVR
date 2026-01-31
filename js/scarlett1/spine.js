@@ -1,152 +1,314 @@
 /**
- * SCARLETT1 • SPINE (PERMANENT, ANDROID + LIGHTS V3)
+ * SCARLETT1 SPINE — XR RIG + LOCOMOTION (PERMANENT)
+ * - Player rig you can move in VR
+ * - Controllers visible (simple meshes)
+ * - Smooth locomotion (thumbstick) + snap turn
+ * - Teleport (trigger) using raycast to floor
+ * - Safe: no Three.js example imports
  */
-import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-import { VRButton } from "https://unpkg.com/three@0.160.0/examples/jsm/webxr/VRButton.js";
-import { Diagnostics } from "./diagnostics.js";
-import { mountUI } from "./ui.js";
-import { buildWorld } from "./world.js";
-import { mountAndroidControls } from "./androidControls.js";
 
-export const Spine = (() => {
-  let started = false;
+export async function init(ctx) {
+  const { THREE, scene, camera, renderer, log } = ctx;
 
-  function hideBoot(){
-    const boot = document.getElementById("boot");
-    if (boot) boot.style.display = "none";
+  log('[spine] init scarlett1 spine');
+
+  // -------------------------
+  // PLAYER RIG (move this, not the XR camera)
+  // -------------------------
+  const playerRig = new THREE.Group();
+  playerRig.name = 'playerRig';
+  scene.add(playerRig);
+
+  // put camera inside rig
+  playerRig.add(camera);
+
+  // default standing height for non-XR (XR overrides pose)
+  camera.position.set(0, 1.6, 0);
+
+  // expose for buttons (Reset Spawn, etc)
+  window.__SCARLETT_PLAYER__ = playerRig;
+
+  // -------------------------
+  // CONTROLLERS (VISIBLE)
+  // -------------------------
+  const controllers = [];
+  const controllerGrips = []; // optional later
+
+  function makeControllerViz() {
+    const g = new THREE.Group();
+    const mat = new THREE.MeshStandardMaterial({ color: 0x9b7cff, roughness: 0.35, metalness: 0.2 });
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.02, 0.10, 12), mat);
+    body.rotation.x = Math.PI / 2;
+    body.position.z = -0.05;
+    g.add(body);
+
+    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.01, 12, 12), mat);
+    tip.position.z = -0.11;
+    g.add(tip);
+    return g;
   }
 
-  function mountRendererToBody(renderer){
-    document.querySelectorAll("canvas").forEach(c => { try { c.remove(); } catch {} });
-    const canvas = renderer.domElement;
-    canvas.style.position = "fixed";
-    canvas.style.left = "0";
-    canvas.style.top = "0";
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
-    canvas.style.zIndex = "0";
-    document.body.appendChild(canvas);
+  for (let i = 0; i < 2; i++) {
+    const c = renderer.xr.getController(i);
+    c.add(makeControllerViz());
+    playerRig.add(c);
+    controllers.push(c);
+
+    // Optional: grips later with controller models
+    const grip = renderer.xr.getControllerGrip(i);
+    playerRig.add(grip);
+    controllerGrips.push(grip);
   }
 
-  function start(){
-    if (started) return;
-    started = true;
+  // -------------------------
+  // RAY + TELEPORT TARGET
+  // -------------------------
+  const rayMat = new THREE.LineBasicMaterial({ color: 0xffffff });
+  function makeRay() {
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -1),
+    ]);
+    const line = new THREE.Line(geo, rayMat);
+    line.name = 'teleRay';
+    line.scale.z = 12;
+    line.visible = false;
+    return line;
+  }
 
-    if (!document.getElementById("scarlett-ui")){
-      const ui = document.createElement("div");
-      ui.id = "scarlett-ui";
-      document.body.appendChild(ui);
+  const rays = [makeRay(), makeRay()];
+  controllers[0].add(rays[0]);
+  controllers[1].add(rays[1]);
+
+  const teleportMarker = new THREE.Mesh(
+    new THREE.RingGeometry(0.18, 0.24, 32),
+    new THREE.MeshBasicMaterial({ color: 0x00ffcc, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+  );
+  teleportMarker.rotation.x = -Math.PI / 2;
+  teleportMarker.visible = false;
+  scene.add(teleportMarker);
+
+  // we will raycast against "floor" meshes tagged with userData.isFloor = true
+  const raycaster = new THREE.Raycaster();
+  const tmpMat4 = new THREE.Matrix4();
+  const tmpDir = new THREE.Vector3();
+  const tmpPos = new THREE.Vector3();
+
+  // -------------------------
+  // MOVEMENT SETTINGS
+  // -------------------------
+  const MOVE_SPEED = 2.2;      // meters/sec
+  const TURN_DEG = 30;         // snap turn degrees
+  const TURN_COOLDOWN = 0.25;  // seconds
+  let turnCooldownT = 0;
+
+  // Button state
+  const state = {
+    teleportArmed: [false, false],
+    teleportHit: null,
+  };
+
+  function getGamepad(i) {
+    const s = renderer.xr.getSession?.();
+    if (!s) return null;
+    const src = s.inputSources;
+    for (let k = 0; k < src.length; k++) {
+      const gp = src[k]?.gamepad;
+      if (!gp) continue;
+      // map by handedness if possible
+      const handed = src[k].handedness; // 'left'/'right'
+      if (i === 0 && handed === 'left') return gp;
+      if (i === 1 && handed === 'right') return gp;
     }
+    // fallback: first 2 gamepads
+    const gps = [];
+    for (let k = 0; k < src.length; k++) if (src[k]?.gamepad) gps.push(src[k].gamepad);
+    return gps[i] || null;
+  }
 
-    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
-    renderer.setSize(window.innerWidth, window.innerHeight, false);
-    renderer.xr.enabled = true;
-    renderer.setClearColor(0x02030a, 1);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
+  function yawFromCamera() {
+    // yaw-only direction based on camera forward
+    const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    fwd.y = 0;
+    fwd.normalize();
+    return fwd;
+  }
 
-    mountRendererToBody(renderer);
+  function rightFromYaw(fwd) {
+    const r = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0)).normalize();
+    // cross(forward, up) gives left; invert for right
+    r.multiplyScalar(-1);
+    return r;
+  }
 
-    const scene = new THREE.Scene();
+  function tryTeleportFromController(i) {
+    const c = controllers[i];
+    const ray = rays[i];
 
-    // Put camera on a yaw pivot so right-stick can rotate
-    const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.05, 500);
-    const yawObj = new THREE.Object3D();
-    yawObj.position.set(0, 1.65, 14);
-    yawObj.add(camera);
-    scene.add(yawObj);
+    // ray origin + direction
+    tmpMat4.identity().extractRotation(c.matrixWorld);
+    tmpDir.set(0, 0, -1).applyMatrix4(tmpMat4).normalize();
+    tmpPos.setFromMatrixPosition(c.matrixWorld);
 
-    Diagnostics.mount();
-    Diagnostics.log("[boot] spine start (V3)");
-    Diagnostics.log("[boot] renderer mounted to body ✅");
+    raycaster.set(tmpPos, tmpDir);
 
-    // Bright, consistent lighting
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1f44, 1.25));
-    const ambient = new THREE.AmbientLight(0xffffff, 0.65);
-    scene.add(ambient);
-    const key = new THREE.DirectionalLight(0xffffff, 1.05);
-    key.position.set(10, 18, 8);
-    scene.add(key);
-    const pitGlow = new THREE.PointLight(0x2a7cff, 1.6, 40);
-    pitGlow.position.set(0, 2.2, 0);
-    scene.add(pitGlow);
-
-    buildWorld(scene);
-    Diagnostics.log("[boot] world built ✅");
-
-    // VR button (hidden, triggered by our UI)
-    let vrBtn = null;
-    function ensureVRBtn(){
-      if (vrBtn) return vrBtn;
-      vrBtn = VRButton.createButton(renderer);
-      vrBtn.style.position = "fixed";
-      vrBtn.style.left = "-9999px";
-      document.body.appendChild(vrBtn);
-      return vrBtn;
-    }
-
-    mountUI({
-      onEnterVR: () => ensureVRBtn().click(),
-      onReload: () => location.reload(),
-      onReset: () => {
-        yawObj.rotation.y = 0;
-        yawObj.position.set(0, 1.65, 14);
-        Diagnostics.log("[reset] camera reset");
-      },
+    // find all floor candidates
+    const floors = [];
+    scene.traverse(obj => {
+      if (obj?.userData?.isFloor) floors.push(obj);
     });
 
-    // Inputs: keyboard + android joysticks
-    const keys = Object.create(null);
-    window.addEventListener("keydown", (e)=> keys[e.key.toLowerCase()] = true);
-    window.addEventListener("keyup", (e)=> keys[e.key.toLowerCase()] = false);
-
-    let joyMoveX = 0, joyMoveY = 0;
-    let joyLookX = 0, joyLookY = 0;
-    mountAndroidControls({
-      onMove: (x,y)=>{ joyMoveX = x; joyMoveY = y; },
-      onLook: (x,y)=>{ joyLookX = x; joyLookY = y; },
-      Diagnostics
-    });
-
-    function onResize(){
-      const w = window.innerWidth, h = window.innerHeight;
-      camera.aspect = w/h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h, false);
+    const hits = raycaster.intersectObjects(floors, true);
+    if (hits && hits.length) {
+      const p = hits[0].point;
+      teleportMarker.position.set(p.x, p.y + 0.01, p.z);
+      teleportMarker.visible = true;
+      state.teleportHit = p.clone();
+      ray.visible = true;
+      return true;
     }
-    window.addEventListener("resize", onResize, { passive:true });
 
-    const fwd = new THREE.Vector3();
-    const up = new THREE.Vector3(0,1,0);
-    const right = new THREE.Vector3();
+    teleportMarker.visible = false;
+    state.teleportHit = null;
+    ray.visible = true;
+    return false;
+  }
 
-    renderer.setAnimationLoop(() => {
-      // Look (right joystick) -> yaw
-      const lookSpeed = 0.045;
-      if (Math.abs(joyLookX) > 0.001) {
-        yawObj.rotation.y += joyLookX * lookSpeed;
+  function commitTeleport() {
+    if (!state.teleportHit) return;
+    // move rig so camera ends up over target. Use camera world position as offset.
+    const camWorld = new THREE.Vector3();
+    camera.getWorldPosition(camWorld);
+
+    // playerRig world position
+    const rigWorld = new THREE.Vector3();
+    playerRig.getWorldPosition(rigWorld);
+
+    // offset from rig to camera (world)
+    const offset = camWorld.sub(rigWorld);
+
+    // set rig position so camera lands on hit
+    playerRig.position.set(
+      state.teleportHit.x - offset.x,
+      playerRig.position.y, // keep current rig Y (floor is y=0)
+      state.teleportHit.z - offset.z
+    );
+
+    teleportMarker.visible = false;
+    state.teleportHit = null;
+  }
+
+  // -------------------------
+  // UPDATE LOOP
+  // -------------------------
+  function update(dt) {
+    // dt in seconds
+    if (!dt || !isFinite(dt)) dt = 0.016;
+
+    // snap turn cooldown
+    turnCooldownT = Math.max(0, turnCooldownT - dt);
+
+    const session = renderer.xr.getSession?.();
+    const inXR = !!session;
+
+    // In XR: controller locomotion + teleport
+    if (inXR) {
+      const fwd = yawFromCamera();
+      const right = rightFromYaw(fwd);
+
+      // Smooth move uses LEFT stick (axes 2/3 commonly, but varies)
+      const gpL = getGamepad(0);
+      const gpR = getGamepad(1);
+
+      // default
+      let axX = 0, axY = 0;
+
+      if (gpL?.axes?.length >= 2) {
+        // pick last two axes (works for many controllers)
+        axX = gpL.axes[2] ?? gpL.axes[0] ?? 0;
+        axY = gpL.axes[3] ?? gpL.axes[1] ?? 0;
       }
 
-      // Movement: keyboard + left joystick
-      yawObj.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
-      right.crossVectors(fwd, up).normalize();
+      // deadzone
+      const dz = 0.15;
+      const mx = Math.abs(axX) > dz ? axX : 0;
+      const my = Math.abs(axY) > dz ? axY : 0;
 
-      const speed = 0.10;
-      const mx = (keys["d"] ? 1 : 0) - (keys["a"] ? 1 : 0) + joyMoveX;
-      const my = (keys["w"] ? 1 : 0) - (keys["s"] ? 1 : 0) + joyMoveY;
+      // move
+      if (mx || my) {
+        const move = new THREE.Vector3();
+        move.addScaledVector(right, mx);
+        move.addScaledVector(fwd, my * -1); // push forward is usually -Y
+        move.normalize().multiplyScalar(MOVE_SPEED * dt);
+        playerRig.position.add(move);
+      }
 
-      if (my) yawObj.position.addScaledVector(fwd, speed * my);
-      if (mx) yawObj.position.addScaledVector(right, -speed * mx);
+      // Snap turn uses RIGHT stick X
+      if (gpR?.axes?.length >= 2 && turnCooldownT <= 0) {
+        const rx = gpR.axes[2] ?? gpR.axes[0] ?? 0;
+        if (rx > 0.7) {
+          playerRig.rotation.y -= THREE.MathUtils.degToRad(TURN_DEG);
+          turnCooldownT = TURN_COOLDOWN;
+        } else if (rx < -0.7) {
+          playerRig.rotation.y += THREE.MathUtils.degToRad(TURN_DEG);
+          turnCooldownT = TURN_COOLDOWN;
+        }
+      }
 
-      // Lock hawk-view height
-      yawObj.position.y = 1.65;
+      // Teleport: hold trigger to aim, release to teleport
+      // Many gamepads: buttons[0] trigger, buttons[1] squeeze. We'll check a couple.
+      for (let i = 0; i < 2; i++) {
+        const gp = i === 0 ? gpL : gpR;
+        if (!gp?.buttons?.length) continue;
 
-      renderer.render(scene, camera);
-    });
+        const trigger = gp.buttons[0]?.value ?? 0;
+        const pressed = trigger > 0.2;
 
-    Diagnostics.log("[boot] animation loop ✅");
-    hideBoot();
+        if (pressed) {
+          state.teleportArmed[i] = true;
+          tryTeleportFromController(i);
+        } else if (state.teleportArmed[i]) {
+          // release commits teleport
+          state.teleportArmed[i] = false;
+          // hide rays
+          rays[0].visible = false;
+          rays[1].visible = false;
+          commitTeleport();
+        }
+      }
+
+      // If not aiming, hide rays
+      if (!state.teleportArmed[0] && !state.teleportArmed[1]) {
+        rays[0].visible = false;
+        rays[1].visible = false;
+        teleportMarker.visible = false;
+      }
+    }
   }
 
-  return { start };
-})();
+  // -------------------------
+  // API FOR ROOT BUTTONS
+  // -------------------------
+  function resetSpawn() {
+    // if world defined a spawn pad, use it
+    const sp = window.__SCARLETT_SPAWN__;
+    if (sp?.position) {
+      playerRig.position.set(sp.position.x, 0, sp.position.z);
+      playerRig.rotation.set(0, 0, 0);
+      log('[spine] reset spawn -> spawn pad');
+      return;
+    }
+    playerRig.position.set(0, 0, 10);
+    playerRig.rotation.set(0, 0, 0);
+    log('[spine] reset spawn -> fallback');
+  }
+
+  window.__SCARLETT_RESET_SPAWN__ = resetSpawn;
+
+  log('[spine] XR rig ready ✅');
+
+  return {
+    updates: [update],
+    interactables: [],
+  };
+    }
