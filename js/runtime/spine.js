@@ -243,6 +243,7 @@ export const Spine = {
 
       try{
         Input.update(dt);
+        if (ctx.worldUpdate) ctx.worldUpdate(dt);
       }catch(e){
         // Don't hard-crash; just log once per second max
         if (!Spine._lastInputErr || (now-Spine._lastInputErr)>1000){

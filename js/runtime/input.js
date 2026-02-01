@@ -164,18 +164,22 @@ export const Input = {
   },
 
   getBestGamepad() {
-    const { controller1, controller2 } = this.ctx;
+    // Prefer the WebXR controllers' gamepads (Quest reliable inside XR)
+    const c2 = this.ctx?.controller2;
+    const c1 = this.ctx?.controller1;
+    if (c2?.gamepad && c2.gamepad.connected) return c2.gamepad;
+    if (c1?.gamepad && c1.gamepad.connected) return c1.gamepad;
 
-    // Prefer WebXR controller gamepads first.
-    const c2 = controller2?.gamepad;
-    if (c2 && c2.connected && c2.axes && c2.axes.length >= 2) return c2;
-    const c1 = controller1?.gamepad;
-    if (c1 && c1.connected && c1.axes && c1.axes.length >= 2) return c1;
-
-    // Fallback to navigator (non-XR or some browsers).
+    // Fallback to navigator.getGamepads (desktop / non-XR)
     const pads = navigator.getGamepads?.() || [];
-    for (const p of pads) if (p && p.connected && p.axes && p.axes.length >= 4) return p;
-    for (const p of pads) if (p && p.connected && p.axes && p.axes.length >= 2) return p;
+    // Prefer pads that have 4 axes (Quest Touch)
+    for (const p of pads) {
+      if (p && p.connected && p.axes && p.axes.length >= 4) return p;
+    }
+    // fallback any pad with 2 axes
+    for (const p of pads) {
+      if (p && p.connected && p.axes && p.axes.length >= 2) return p;
+    }
     return null;
   },
 
