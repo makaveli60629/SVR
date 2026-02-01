@@ -1,8 +1,8 @@
 export const Input = {
   ctx: null,
 
-  moveSpeed: 2.25,
-  turnSpeed: 2.15,
+  moveSpeed: 2.2,
+  turnSpeed: 2.2,
 
   teleportQueued: false,
   lastSelectTime: 0,
@@ -11,10 +11,11 @@ export const Input = {
   feetRing: null,
   reticle: null,
 
-  rightRay: null,
-  rayLen: 7.0,
+  rayCam: null,
+  rayC1: null,
+  rayC2: null,
 
-  init(ctx){
+  init(ctx) {
     this.ctx = ctx;
 
     const onSelectStart = () => {
@@ -33,32 +34,32 @@ export const Input = {
     ctx.controller2?.addEventListener("selectend", onSelectEnd);
 
     this.buildViz();
-    console.log("✅ Input initialized (right ray attached + XR gamepad)");
+    console.log("✅ Input initialized");
   },
 
-  deadzone(v, dz=0.16){
+  deadzone(v, dz = 0.14) {
     if (Math.abs(v) < dz) return 0;
-    return Math.sign(v) * (Math.abs(v)-dz)/(1-dz);
+    return Math.sign(v) * (Math.abs(v) - dz) / (1 - dz);
   },
 
-  getRightController(){
-    const { controller1, controller2 } = this.ctx;
-    if (controller1?.userData?.handedness === "right") return controller1;
-    if (controller2?.userData?.handedness === "right") return controller2;
-    return controller2 || controller1 || null;
-  },
-
-  getXRCamera(){
+  getXRCamera() {
     const { renderer, camera } = this.ctx;
-    try{
+    try {
       const xrCam = renderer.xr.getCamera(camera);
       return xrCam?.cameras?.[0] || xrCam || camera;
-    }catch{
+    } catch {
       return camera;
     }
   },
 
-  getFlatForward(){
+  poseOk(obj) {
+    if (!obj) return false;
+    const v = new this.ctx.THREE.Vector3();
+    obj.getWorldPosition(v);
+    return v.lengthSq() > 0.000001;
+  },
+
+  getForward() {
     const { THREE } = this.ctx;
     const cam = this.getXRCamera();
     const dir = new THREE.Vector3();
@@ -68,154 +69,142 @@ export const Input = {
     return dir;
   },
 
-  buildViz(){
-    const { THREE, scene } = this.ctx;
+  makeLaser(len = 7) {
+    const { THREE } = this.ctx;
+    const g = new THREE.Group();
+    const geom = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -len),
+    ]);
+    const line = new THREE.Line(
+      geom,
+      new THREE.LineBasicMaterial({ color: 0x00ffff })
+    );
+    g.add(line);
+    return g;
+  },
+
+  buildViz() {
+    const { THREE, scene, controller1, controller2 } = this.ctx;
 
     this.feetRing = new THREE.Mesh(
-      new THREE.RingGeometry(0.20, 0.40, 44),
+      new THREE.RingGeometry(0.22, 0.42, 44),
       new THREE.MeshBasicMaterial({
         color: 0x00c8ff,
         transparent: true,
-        opacity: 0.72,
-        side: THREE.DoubleSide
+        opacity: 0.75,
+        side: THREE.DoubleSide,
       })
     );
-    this.feetRing.rotation.x = -Math.PI/2;
+    this.feetRing.rotation.x = -Math.PI / 2;
     scene.add(this.feetRing);
 
     this.reticle = new THREE.Mesh(
-      new THREE.RingGeometry(0.12, 0.18, 40),
+      new THREE.RingGeometry(0.12, 0.18, 32),
       new THREE.MeshBasicMaterial({
         color: 0x00ffff,
         transparent: true,
         opacity: 0.95,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
       })
     );
-    this.reticle.rotation.x = -Math.PI/2;
+    this.reticle.rotation.x = -Math.PI / 2;
     this.reticle.visible = false;
     scene.add(this.reticle);
 
-    const geom = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0,0,0),
-      new THREE.Vector3(0,0,-this.rayLen)
-    ]);
-    const line = new THREE.Line(geom, new THREE.LineBasicMaterial({ color:0x00ffff }));
-    this.rightRay = new THREE.Group();
-    this.rightRay.add(line);
-    this.rightRay.visible = false;
+    // Lasers:
+    // - controller lasers are parented to controllers (so they move with you)
+    // - camera laser exists for fallback, but we only show it when no controller pose
+    this.rayCam = this.makeLaser();
+    scene.add(this.rayCam);
+
+    this.rayC1 = this.makeLaser();
+    this.rayC2 = this.makeLaser();
+
+    if (controller1) controller1.add(this.rayC1);
+    if (controller2) controller2.add(this.rayC2);
   },
 
-  ensureRayAttached(){
-    if (!this.rightRay) return;
-
-    const right = this.getRightController();
-    if (right && this.rightRay.parent !== right){
-      if (this.rightRay.parent) this.rightRay.parent.remove(this.rightRay);
-      right.add(this.rightRay);
-      this.rightRay.position.set(0,0,0);
-      this.rightRay.rotation.set(0,0,0);
-      this.rightRay.visible = true;
-      return;
-    }
-
-    if (!right){
-      const cam = this.getXRCamera();
-      if (this.rightRay.parent !== cam){
-        if (this.rightRay.parent) this.rightRay.parent.remove(this.rightRay);
-        cam.add(this.rightRay);
-        this.rightRay.position.set(0,0,0);
-        this.rightRay.rotation.set(0,0,0);
-        this.rightRay.visible = true;
-      }
-    }
-  },
-
-  updateFeetRing(){
+  updateFeetRing() {
     const { rig } = this.ctx;
-    this.feetRing.position.set(rig.position.x, rig.position.y - 1.68, rig.position.z);
+    this.feetRing.position.set(rig.position.x, 0.02, rig.position.z);
   },
 
-  raycastFrom(obj){
+  getAim() {
+    // Prefer right controller first (so the laser is "right-hand")
+    const { controller1, controller2 } = this.ctx;
+    if (this.poseOk(controller2)) return { type: "c2", obj: controller2 };
+    if (this.poseOk(controller1)) return { type: "c1", obj: controller1 };
+    return { type: "cam", obj: this.getXRCamera() };
+  },
+
+  raycast(obj) {
     const { THREE, teleportSurfaces } = this.ctx;
+    if (!teleportSurfaces?.length) return null;
+
     const ray = new THREE.Raycaster();
     const o = new THREE.Vector3();
     const d = new THREE.Vector3();
+
     obj.getWorldPosition(o);
     obj.getWorldDirection(d);
+
     ray.set(o, d.normalize());
     return ray.intersectObjects(teleportSurfaces, true)[0] || null;
   },
 
-  snapGround(){
+  snapGround() {
     const { THREE, rig, walkSurfaces } = this.ctx;
-    if (!walkSurfaces.length) return;
+    if (!walkSurfaces?.length) return;
 
     const ray = new THREE.Raycaster();
     ray.set(
-      new THREE.Vector3(rig.position.x, rig.position.y + 1.6, rig.position.z),
-      new THREE.Vector3(0,-1,0)
+      new THREE.Vector3(rig.position.x, 4.0, rig.position.z),
+      new THREE.Vector3(0, -1, 0)
     );
+
     const hit = ray.intersectObjects(walkSurfaces, true)[0];
     if (hit) rig.position.y = hit.point.y + 1.7;
   },
 
-  clampToBounds(){
-    const { rig, bounds } = this.ctx;
-    if (!bounds) return;
-
-    const x = rig.position.x;
-    const z = rig.position.z;
-    const r = Math.hypot(x,z) || 0.00001;
-
-    const inPit = rig.position.y < bounds.pitTopY;
-
-    if (inPit){
-      const maxR = bounds.pitInnerR;
-      if (r > maxR){
-        const s = maxR / r;
-        rig.position.x *= s;
-        rig.position.z *= s;
-      }
-    } else {
-      const minR = bounds.pitOuterR;
-      const maxR = bounds.lobbyR;
-
-      if (r < minR){
-        const s = minR / r;
-        rig.position.x *= s;
-        rig.position.z *= s;
-      }
-      if (r > maxR){
-        const s = maxR / r;
-        rig.position.x *= s;
-        rig.position.z *= s;
-      }
+  // Safer gamepad picker (Quest sometimes reports multiple pads)
+  getBestGamepad() {
+    const pads = navigator.getGamepads?.() || [];
+    // Prefer pads that have 4 axes (Quest Touch)
+    for (const p of pads) {
+      if (p && p.connected && p.axes && p.axes.length >= 4) return p;
     }
-  },
-
-  getRightGamepad(){
-    const right = this.getRightController();
-    const gp = right?.userData?.gamepad;
-    if (gp?.axes?.length >= 2) return gp;
-
-    const all = navigator.getGamepads?.() || [];
-    for (const g of all){
-      if (g?.axes?.length >= 2) return g;
+    // fallback any pad with 2 axes
+    for (const p of pads) {
+      if (p && p.connected && p.axes && p.axes.length >= 2) return p;
     }
     return null;
   },
 
-  update(dt){
+  update(dt) {
     const { rig } = this.ctx;
 
-    this.ensureRayAttached();
     this.updateFeetRing();
 
-    const aimObj = this.getRightController() || this.getXRCamera();
-    const hit = this.raycastFrom(aimObj);
+    const aim = this.getAim();
 
-    if (hit){
+    // visibility
+    this.rayCam.visible = aim.type === "cam";
+    this.rayC1.visible = aim.type === "c1";
+    this.rayC2.visible = aim.type === "c2";
+
+    // if camera aiming, place camera laser at camera pose
+    if (aim.type === "cam") {
+      const p = new this.ctx.THREE.Vector3();
+      const q = new this.ctx.THREE.Quaternion();
+      aim.obj.getWorldPosition(p);
+      aim.obj.getWorldQuaternion(q);
+      this.rayCam.position.copy(p);
+      this.rayCam.quaternion.copy(q);
+    }
+
+    const hit = this.raycast(aim.obj);
+    if (hit) {
       this.reticle.visible = true;
       this.reticle.position.copy(hit.point);
       this.reticle.position.y += 0.02;
@@ -223,40 +212,43 @@ export const Input = {
       this.reticle.visible = false;
     }
 
-    if (this.teleportQueued){
+    // quick tap = teleport
+    if (this.teleportQueued) {
       this.teleportQueued = false;
-      if (hit){
+      if (hit) {
         rig.position.set(hit.point.x, hit.point.y + 1.7, hit.point.z);
         this.snapGround();
-        this.clampToBounds();
       }
       return;
     }
 
-    if (this.holdingSelect){
-      const f = this.getFlatForward();
+    // hold trigger = “walk forward”
+    if (this.holdingSelect) {
+      const f = this.getForward();
       rig.position.x += f.x * 2.0 * dt;
       rig.position.z += f.z * 2.0 * dt;
       this.snapGround();
-      this.clampToBounds();
       return;
     }
 
-    const gp = this.getRightGamepad();
+    // sticks
+    const gp = this.getBestGamepad();
     if (!gp) return;
 
-    const mx = this.deadzone(gp.axes[0] || 0);
-    const my = this.deadzone(-(gp.axes[1] || 0));
-    const tx = this.deadzone(gp.axes[2] || 0);
+    // Common Quest mapping:
+    // axes[0],axes[1] = left stick
+    // axes[2],axes[3] = right stick (turn often on x)
+    const lx = this.deadzone(gp.axes[0] || 0);
+    const ly = this.deadzone(-(gp.axes[1] || 0));
+    const rx = this.deadzone(gp.axes[2] || 0);
 
-    const f = this.getFlatForward();
+    const f = this.getForward();
     const r = new this.ctx.THREE.Vector3(-f.z, 0, f.x);
 
-    rig.position.x += (r.x*mx + f.x*my) * this.moveSpeed * dt;
-    rig.position.z += (r.z*mx + f.z*my) * this.moveSpeed * dt;
-    rig.rotation.y -= tx * this.turnSpeed * dt;
+    rig.position.x += (r.x * lx + f.x * ly) * this.moveSpeed * dt;
+    rig.position.z += (r.z * lx + f.z * ly) * this.moveSpeed * dt;
+    rig.rotation.y -= rx * this.turnSpeed * dt;
 
     this.snapGround();
-    this.clampToBounds();
-  }
+  },
 };
