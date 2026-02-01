@@ -1,16 +1,19 @@
 export const Input = {
   ctx: null,
 
-  moveSpeed: 2.2,
-  turnSpeed: 2.0,
+  moveSpeed: 2.25,
+  turnSpeed: 2.15,
 
   teleportQueued: false,
   lastSelectTime: 0,
   holdingSelect: false,
 
   feetRing: null,
-  rayRight: null,
   reticle: null,
+
+  // the ray is ATTACHED to right controller
+  rightRay: null,
+  rayLen: 7.0,
 
   init(ctx){
     this.ctx = ctx;
@@ -25,19 +28,28 @@ export const Input = {
       if (t < 260) this.teleportQueued = true;
     };
 
-    // works for Touch and for XR input sources
     ctx.controller1?.addEventListener("selectstart", onSelectStart);
     ctx.controller1?.addEventListener("selectend", onSelectEnd);
     ctx.controller2?.addEventListener("selectstart", onSelectStart);
     ctx.controller2?.addEventListener("selectend", onSelectEnd);
 
     this.buildViz();
-    console.log("✅ Input initialized (right-hand laser + bounds)");
+    console.log("✅ Input initialized (right ray attached + XR gamepad)");
   },
 
-  deadzone(v, dz=0.14){
+  deadzone(v, dz=0.16){
     if (Math.abs(v) < dz) return 0;
     return Math.sign(v) * (Math.abs(v)-dz)/(1-dz);
+  },
+
+  // Prefer the controller that reports handedness === right
+  getRightController(){
+    const { controller1, controller2 } = this.ctx;
+    if (controller1?.userData?.handedness === "right") return controller1;
+    if (controller2?.userData?.handedness === "right") return controller2;
+
+    // fallback: often controller2 acts as right
+    return controller2 || controller1 || null;
   },
 
   getXRCamera(){
@@ -50,7 +62,8 @@ export const Input = {
     }
   },
 
-  getForward(){
+  getFlatForward(){
+    // forward based on camera direction but flattened
     const { THREE } = this.ctx;
     const cam = this.getXRCamera();
     const dir = new THREE.Vector3();
@@ -58,36 +71,6 @@ export const Input = {
     dir.y = 0;
     dir.normalize();
     return dir;
-  },
-
-  // choose RIGHT hand controller if available; else fallback to headset
-  getRightAim(){
-    const { controller1, controller2 } = this.ctx;
-
-    const cands = [controller1, controller2].filter(Boolean);
-    const right = cands.find(c => c.userData?.handedness === "right");
-    if (right) return right;
-
-    // sometimes handedness is still unknown for a moment; prefer controller2 as common "right"
-    if (controller2) return controller2;
-    if (controller1) return controller1;
-
-    return this.getXRCamera();
-  },
-
-  makeLaser(len=7){
-    const { THREE } = this.ctx;
-    const g = new THREE.Group();
-    const geom = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0,0,0),
-      new THREE.Vector3(0,0,-len),
-    ]);
-    const line = new THREE.Line(
-      geom,
-      new THREE.LineBasicMaterial({ color: 0x00ffff })
-    );
-    g.add(line);
-    return g;
   },
 
   buildViz(){
@@ -98,7 +81,7 @@ export const Input = {
       new THREE.MeshBasicMaterial({
         color: 0x00c8ff,
         transparent: true,
-        opacity: 0.75,
+        opacity: 0.72,
         side: THREE.DoubleSide
       })
     );
@@ -118,9 +101,47 @@ export const Input = {
     this.reticle.visible = false;
     scene.add(this.reticle);
 
-    // laser is world-attached, but we copy the RIGHT aim pose each frame
-    this.rayRight = this.makeLaser(7.0);
-    scene.add(this.rayRight);
+    // Build ray (line) ONCE
+    const geom = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0,0,0),
+      new THREE.Vector3(0,0,-this.rayLen)
+    ]);
+    const line = new THREE.Line(geom, new THREE.LineBasicMaterial({ color:0x00ffff }));
+    this.rightRay = new THREE.Group();
+    this.rightRay.add(line);
+    this.rightRay.visible = false;
+
+    // Attach later (after controller exists)
+  },
+
+  ensureRayAttached(){
+    const { scene } = this.ctx;
+    if (!this.rightRay) return;
+
+    const right = this.getRightController();
+    if (right && this.rightRay.parent !== right){
+      // remove from old parent
+      if (this.rightRay.parent) this.rightRay.parent.remove(this.rightRay);
+
+      // attach to RIGHT controller
+      right.add(this.rightRay);
+      this.rightRay.position.set(0,0,0);
+      this.rightRay.rotation.set(0,0,0);
+      this.rightRay.visible = true;
+      return;
+    }
+
+    // If no controller at all (rare), attach to camera
+    if (!right){
+      const cam = this.getXRCamera();
+      if (this.rightRay.parent !== cam){
+        if (this.rightRay.parent) this.rightRay.parent.remove(this.rightRay);
+        cam.add(this.rightRay);
+        this.rightRay.position.set(0,0,0);
+        this.rightRay.rotation.set(0,0,0);
+        this.rightRay.visible = true;
+      }
+    }
   },
 
   updateFeetRing(){
@@ -142,29 +163,27 @@ export const Input = {
   snapGround(){
     const { THREE, rig, walkSurfaces } = this.ctx;
     if (!walkSurfaces.length) return;
+
     const ray = new THREE.Raycaster();
     ray.set(
       new THREE.Vector3(rig.position.x, rig.position.y + 1.6, rig.position.z),
-      new THREE.Vector3(0, -1, 0)
+      new THREE.Vector3(0,-1,0)
     );
     const hit = ray.intersectObjects(walkSurfaces, true)[0];
     if (hit) rig.position.y = hit.point.y + 1.7;
   },
 
-  // hard bounds so you cannot walk through pit walls or outside lobby
   clampToBounds(){
     const { rig, bounds } = this.ctx;
     if (!bounds) return;
 
     const x = rig.position.x;
     const z = rig.position.z;
-    const r = Math.hypot(x, z) || 0.00001;
+    const r = Math.hypot(x,z) || 0.00001;
 
-    // decide if we are "in pit" by height
     const inPit = rig.position.y < bounds.pitTopY;
 
     if (inPit){
-      // keep inside pit radius
       const maxR = bounds.pitInnerR;
       if (r > maxR){
         const s = maxR / r;
@@ -172,7 +191,6 @@ export const Input = {
         rig.position.z *= s;
       }
     } else {
-      // keep outside pit hole AND inside lobby
       const minR = bounds.pitOuterR;
       const maxR = bounds.lobbyR;
 
@@ -189,25 +207,28 @@ export const Input = {
     }
   },
 
+  // Prefer XR right-controller gamepad for stick locomotion
+  getRightGamepad(){
+    const right = this.getRightController();
+    const gp = right?.userData?.gamepad;
+    if (gp?.axes?.length >= 2) return gp;
+
+    // fallback: any gamepad with axes
+    const all = navigator.getGamepads?.() || [];
+    for (const g of all){
+      if (g?.axes?.length >= 2) return g;
+    }
+    return null;
+  },
+
   update(dt){
     const { rig } = this.ctx;
 
+    this.ensureRayAttached();
     this.updateFeetRing();
 
-    // RIGHT-hand aim
-    const aim = this.getRightAim();
-
-    // pose laser to aim
-    {
-      const p = new this.ctx.THREE.Vector3();
-      const q = new this.ctx.THREE.Quaternion();
-      aim.getWorldPosition(p);
-      aim.getWorldQuaternion(q);
-      this.rayRight.position.copy(p);
-      this.rayRight.quaternion.copy(q);
-    }
-
-    const hit = this.raycastFrom(aim);
+    const rightCtrl = this.getRightController() || this.getXRCamera();
+    const hit = this.raycastFrom(rightCtrl);
 
     if (hit){
       this.reticle.visible = true;
@@ -230,7 +251,7 @@ export const Input = {
 
     // hold => walk forward (fallback)
     if (this.holdingSelect){
-      const f = this.getForward();
+      const f = this.getFlatForward();
       rig.position.x += f.x * 2.0 * dt;
       rig.position.z += f.z * 2.0 * dt;
       this.snapGround();
@@ -238,19 +259,22 @@ export const Input = {
       return;
     }
 
-    // sticks (best effort)
-    const gp = navigator.getGamepads?.().find(p => p?.axes?.length >= 2);
+    // stick locomotion
+    const gp = this.getRightGamepad();
     if (!gp) return;
 
     const mx = this.deadzone(gp.axes[0] || 0);
     const my = this.deadzone(-(gp.axes[1] || 0));
+
+    // Optional snap-turn: use right stick X if present
     const tx = this.deadzone(gp.axes[2] || 0);
 
-    const f = this.getForward();
+    const f = this.getFlatForward();
     const r = new this.ctx.THREE.Vector3(-f.z, 0, f.x);
 
-    rig.position.x += (r.x * mx + f.x * my) * this.moveSpeed * dt;
-    rig.position.z += (r.z * mx + f.z * my) * this.moveSpeed * dt;
+    rig.position.x += (r.x*mx + f.x*my) * this.moveSpeed * dt;
+    rig.position.z += (r.z*mx + f.z*my) * this.moveSpeed * dt;
+
     rig.rotation.y -= tx * this.turnSpeed * dt;
 
     this.snapGround();
