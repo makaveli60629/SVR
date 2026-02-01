@@ -1,181 +1,259 @@
 // SVR/js/runtime/spine.js
 import * as THREE from 'three';
-import { Input } from './input.js';
+import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { initWorld } from '../scarlett1/world.js';
 
+const $ = (id)=>document.getElementById(id);
+
+function logLine(msg){
+  const el = $('log');
+  if (!el) return;
+  const t = new Date();
+  const pad = (n)=>String(n).padStart(2,'0');
+  const stamp = `${pad(t.getHours())}:${pad(t.getMinutes())}:${pad(t.getSeconds())}`;
+  el.textContent += `[${stamp}] ${msg}\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function setStatus(text, ok=null){
+  const s = $('status');
+  if (!s) return;
+  s.textContent = text;
+  if (ok === true) { s.style.background = 'rgba(0,150,0,.45)'; s.style.borderColor='rgba(0,255,120,.45)'; }
+  if (ok === false){ s.style.background = 'rgba(150,0,0,.55)'; s.style.borderColor='rgba(255,80,80,.45)'; }
+}
+
 export const Spine = {
-  ctx: null,
+  start: async ()=>{
+    setStatus('boot…');
+    logLine('booting…');
 
-  start(){
-    const Bus = this._makeBus();
-    const status = document.getElementById('status');
-    const setStatus = (t)=>{ if(status) status.textContent = t; };
+    // renderer
+    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.xr.enabled = true;
+    document.body.appendChild(renderer.domElement);
 
-    Bus.log("booting…");
-    setStatus("boot…");
-
-    const canvas = document.getElementById('canvas');
-    if (!canvas){
-      Bus.log("❌ canvas missing");
-      setStatus("canvas missing");
-      return;
-    }
-
+    // scene + camera rig (rig moves; camera is headset)
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x05060a);
 
-    const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.05, 300);
-    camera.position.set(0, 1.65, 10);
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.xr.enabled = true;
-
     const rig = new THREE.Group();
-    rig.position.set(0, 1.7, 14.5);
-    rig.rotation.set(0, Math.PI, 0); // face toward center/store direction
-    rig.add(camera);
+    rig.name = 'rig';
     scene.add(rig);
 
+    const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.05, 400);
+    camera.position.set(0, 1.7, 6.5);
+    rig.add(camera);
+
+    // simple sky fog
+    scene.fog = new THREE.Fog(0x05060a, 30, 120);
+
+    // Bus-like logger
+    const Bus = { log: (m)=>logLine(m) };
+
+    // World
+    let worldUpdate = null;
+    let teleportSurfaces = [];
+    try{
+      const res = await initWorld({ THREE, scene, camera, rig, Bus });
+      teleportSurfaces = res?.teleportSurfaces || [];
+      worldUpdate = (dt)=>res?.worldUpdate?.(dt);
+      logLine('world ready ✅');
+      setStatus('world ready ✅ (VR available)', true);
+    }catch(e){
+      logLine('WORLD ERROR: ' + (e?.message || e));
+      setStatus('boot failed ✖', false);
+    }
+
+    // UI buttons
+    $('hardReload')?.addEventListener('click', ()=>location.reload(true));
+    $('resetSpawn')?.addEventListener('click', ()=>{
+      // respawn just outside pit entrance
+      rig.position.set(0, 0, 7.5);
+      rig.rotation.set(0,0,0);
+      logLine('spawn reset');
+    });
+    $('probePaths')?.addEventListener('click', async ()=>{
+      const paths = ['./index.js','./js/runtime/spine.js','./js/scarlett1/world.js'];
+      for (const p of paths){
+        try{
+          const r = await fetch(p, { cache:'no-store' });
+          logLine(`probe ${p} status=${r.status}`);
+        }catch(e){
+          logLine(`probe ${p} FAIL`);
+        }
+      }
+    });
+    $('nukeCache')?.addEventListener('click', async ()=>{
+      // best-effort: clear SW + caches
+      let unreg = 0, del = 0;
+      if ('serviceWorker' in navigator){
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const r of regs){ await r.unregister(); unreg++; }
+      }
+      if (window.caches){
+        const keys = await caches.keys();
+        for (const k of keys){ await caches.delete(k); del++; }
+      }
+      logLine(`serviceWorker: unregistered ${unreg}`);
+      logLine(`caches: deleted ${del}`);
+      logLine('NUKE DONE ✅');
+    });
+
+    // VR button (Quest)
+    $('enterVr')?.addEventListener('click', ()=>{
+      // Use Three's VRButton; click triggers if not already added
+      if (!document.getElementById('VRButton')){
+        document.body.appendChild(VRButton.createButton(renderer));
+      }
+      // Some browsers require user to click the VRButton; we just add it.
+      logLine('Enter VR button added (use browser prompt)');
+    });
+    // add VRButton immediately on XR-capable browsers
+    try{ document.body.appendChild(VRButton.createButton(renderer)); }catch(_){}
+
+    // Controllers + teleport + thumbstick locomotion
     const controller1 = renderer.xr.getController(0);
     const controller2 = renderer.xr.getController(1);
-    scene.add(controller1);
-    scene.add(controller2);
+    rig.add(controller1); rig.add(controller2);
 
-    const ctx = this.ctx = {
-      THREE, scene, camera, renderer, rig,
-      controller1, controller2,
-      Bus,
-      walkSurfaces: [],
-      teleportSurfaces: [],
-      worldUpdate: null
-    };
+    const rayMat = new THREE.LineBasicMaterial({ color: 0x00d6ff });
+    const rayGeo = new THREE.BufferGeometry().setFromPoints([ new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,-1) ]);
+    function makeRay(){
+      const line = new THREE.Line(rayGeo, rayMat);
+      line.name = 'ray';
+      line.scale.z = 12;
+      return line;
+    }
+    controller1.add(makeRay());
+    controller2.add(makeRay());
 
-    this._wireUI(ctx, setStatus);
+    const reticle = new THREE.Mesh(
+      new THREE.RingGeometry(0.16, 0.22, 32),
+      new THREE.MeshBasicMaterial({ color: 0x00d6ff, transparent:true, opacity:0.85, side:THREE.DoubleSide })
+    );
+    reticle.rotation.x = -Math.PI/2;
+    reticle.visible = false;
+    scene.add(reticle);
 
-    // Input viz always loads, so if world fails you'll at least see ring/laser
-    Input.init(ctx);
+    const raycaster = new THREE.Raycaster();
+    const tempMatrix = new THREE.Matrix4();
+    let teleportHit = null;
 
-    (async ()=>{
-      try{
-        Bus.log("world: init…");
-        setStatus("world init…");
-        const res = await initWorld(ctx);
-        if (res?.walkSurfaces) ctx.walkSurfaces = res.walkSurfaces;
-        if (res?.teleportSurfaces) ctx.teleportSurfaces = res.teleportSurfaces;
-        Bus.log("✅ world ready");
-        setStatus("world ready ✅");
-      }catch(e){
-        Bus.log("❌ world init failed: " + (e?.message || e));
-        setStatus("world failed ❌");
+    function updateTeleportFrom(ctrl){
+      tempMatrix.identity().extractRotation(ctrl.matrixWorld);
+      raycaster.ray.origin.setFromMatrixPosition(ctrl.matrixWorld);
+      raycaster.ray.direction.set(0,0,-1).applyMatrix4(tempMatrix);
+      const hits = raycaster.intersectObjects(teleportSurfaces, true);
+      if (hits.length){
+        teleportHit = hits[0];
+        reticle.visible = true;
+        reticle.position.copy(teleportHit.point);
+      }else{
+        teleportHit = null;
+        reticle.visible = false;
       }
-    })();
+    }
 
-    const onResize = ()=>{
-      camera.aspect = window.innerWidth / window.innerHeight;
+    function doTeleport(){
+      if (!teleportHit) return;
+      // keep head height: move rig so camera ends up over target
+      const camWorld = new THREE.Vector3();
+      camera.getWorldPosition(camWorld);
+      const rigWorld = new THREE.Vector3();
+      rig.getWorldPosition(rigWorld);
+      const headOffset = camWorld.sub(rigWorld);
+      rig.position.x = teleportHit.point.x - headOffset.x;
+      rig.position.z = teleportHit.point.z - headOffset.z;
+      // y stays (world uses y=0 floor, pit floor negative)
+      rig.position.y = rig.position.y; 
+    }
+
+    controller1.addEventListener('selectstart', doTeleport);
+    controller2.addEventListener('selectstart', doTeleport);
+
+    // Thumbstick movement (left stick translate; right stick snap turn)
+    let snapCooldown = 0;
+    function applyGamepad(dt){
+      const session = renderer.xr.getSession();
+      if (!session) return;
+      const sources = session.inputSources || [];
+      let moveX=0, moveY=0, turnX=0;
+
+      for (const src of sources){
+        const gp = src.gamepad;
+        if (!gp) continue;
+        const ax = gp.axes || [];
+        const axes2 = { x: ax[0]||0, y: ax[1]||0, rx: ax[2]||0, ry: ax[3]||0 };
+
+        // Heuristic: left-hand = movement (axes0/1), right-hand = turn (axes2 or 0 depending device)
+        if (src.handedness === 'left'){
+          moveX += axes2.x;
+          moveY += axes2.y;
+        }else if (src.handedness === 'right'){
+          turnX += (Math.abs(axes2.rx)>0.05 ? axes2.rx : axes2.x);
+        }else{
+          // unknown: use first pair for move, second for turn if present
+          moveX += axes2.x; moveY += axes2.y;
+          if (ax.length>=4) turnX += axes2.rx;
+        }
+      }
+
+      // deadzone
+      const dz = 0.15;
+      const dead = (v)=> Math.abs(v) < dz ? 0 : v;
+      moveX = dead(moveX); moveY = dead(moveY); turnX = dead(turnX);
+
+      // Move in camera-forward space (ignore pitch)
+      const speed = 2.1; // m/s
+      if (moveX || moveY){
+        const dir = new THREE.Vector3();
+        camera.getWorldDirection(dir);
+        dir.y = 0; dir.normalize();
+        const right = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0,1,0)).normalize();
+        const delta = new THREE.Vector3();
+        delta.addScaledVector(dir, -moveY * speed * dt);
+        delta.addScaledVector(right, moveX * speed * dt);
+        rig.position.add(delta);
+      }
+
+      // snap turn
+      snapCooldown = Math.max(0, snapCooldown - dt);
+      const snap = 0.45;
+      if (snapCooldown === 0 && Math.abs(turnX) > snap){
+        rig.rotation.y -= Math.sign(turnX) * (Math.PI/6); // 30°
+        snapCooldown = 0.25;
+      }
+    }
+
+    // Resize
+    addEventListener('resize', ()=>{
+      camera.aspect = innerWidth/innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-    window.addEventListener('resize', onResize);
+      renderer.setSize(innerWidth, innerHeight);
+    });
 
-    let last = performance.now();
+    // Render loop
+    const clock = new THREE.Clock();
     renderer.setAnimationLoop(()=>{
-      const now = performance.now();
-      const dt = Math.min(0.05, (now-last)/1000);
-      last = now;
-
-      try { Input.update(dt); } catch(e){ Bus.log("Input err: "+(e?.message||e)); }
-      try { ctx.worldUpdate?.(dt); } catch(e){ Bus.log("WorldUpdate err: "+(e?.message||e)); }
-
+      const dt = Math.min(clock.getDelta(), 0.05);
+      // teleport ray from right hand if available
+      updateTeleportFrom(controller1);
+      updateTeleportFrom(controller2);
+      applyGamepad(dt);
+      worldUpdate?.(dt);
       renderer.render(scene, camera);
     });
 
-    Bus.log("boot ok ✅");
-    setStatus("boot ok ✅");
-  },
+    // Avatar buttons call into world module via window
+    $('avMale')?.addEventListener('click', ()=>window.spawnAvatar?.('male'));
+    $('avFemale')?.addEventListener('click', ()=>window.spawnAvatar?.('female'));
+    $('avNinja')?.addEventListener('click', ()=>window.spawnAvatar?.('ninja'));
+    $('avCombat')?.addEventListener('click', ()=>window.spawnAvatar?.('combat'));
+    $('avClear')?.addEventListener('click', ()=>window.clearAvatar?.());
 
-  _makeBus(){
-    const logEl = document.getElementById('log');
-    return {
-      log: (msg)=>{
-        console.log(msg);
-        if (!logEl) return;
-        const t = new Date().toISOString().split('T')[1].replace('Z','');
-        logEl.textContent += `[${t}] ${msg}\n`;
-        logEl.scrollTop = logEl.scrollHeight;
-      }
-    };
-  },
-
-  _wireUI(ctx, setStatus){
-    const $ = (id)=>document.getElementById(id);
-
-    $('enterVr')?.addEventListener('click', async ()=>{
-      try{
-        if (!navigator.xr) throw new Error("navigator.xr not available");
-        const session = await navigator.xr.requestSession('immersive-vr', {
-          optionalFeatures: ['local-floor','bounded-floor','hand-tracking','layers']
-        });
-        await ctx.renderer.xr.setSession(session);
-        ctx.Bus.log("XR session started ✅");
-        setStatus("XR started ✅");
-      }catch(e){
-        ctx.Bus.log("XR start failed: " + (e?.message || e));
-        setStatus("XR failed ❌");
-      }
-    });
-
-    $('resetSpawn')?.addEventListener('click', ()=>{
-      ctx.rig.position.set(0, 1.7, 14.5);
-      ctx.rig.rotation.set(0, Math.PI, 0);
-      ctx.Bus.log("spawn reset ✅");
-      setStatus("spawn reset ✅");
-    });
-
-    $('hardReload')?.addEventListener('click', ()=> location.reload());
-
-    $('nukeCache')?.addEventListener('click', async ()=>{
-      try{
-        if ('serviceWorker' in navigator){
-          const regs = await navigator.serviceWorker.getRegistrations();
-          for (const r of regs) await r.unregister();
-        }
-        if ('caches' in window){
-          const keys = await caches.keys();
-          for (const k of keys) await caches.delete(k);
-        }
-        ctx.Bus.log("cache nuked ✅");
-        setStatus("cache nuked ✅");
-      }catch(e){
-        ctx.Bus.log("nuke failed: " + (e?.message || e));
-        setStatus("nuke failed ❌");
-      }
-    });
-
-    $('probePaths')?.addEventListener('click', async ()=>{
-      const files = [
-        './index.js',
-        './js/runtime/spine.js',
-        './js/runtime/input.js',
-        './js/scarlett1/world.js'
-      ];
-      for (const f of files){
-        try{
-          const r = await fetch(f, { cache: 'no-store' });
-          ctx.Bus.log(`probe ${f} status=${r.status}`);
-        }catch(e){
-          ctx.Bus.log(`probe ${f} FAIL ${(e?.message||e)}`);
-        }
-      }
-    });
-
-    // avatar buttons (world.js defines window.spawnAvatar)
-    const setAv = (name)=>{ const el=$('av'); if(el) el.textContent = `Avatar: ${name||'NONE'}`; };
-    $('avMale')?.addEventListener('click', ()=>{ window.spawnAvatar?.('male'); setAv('MALE'); });
-    $('avFemale')?.addEventListener('click', ()=>{ window.spawnAvatar?.('female'); setAv('FEMALE'); });
-    $('avNinja')?.addEventListener('click', ()=>{ window.spawnAvatar?.('ninja'); setAv('NINJA'); });
-    $('avCombat')?.addEventListener('click', ()=>{ window.spawnAvatar?.('combat'); setAv('COMBAT'); });
-    $('avClear')?.addEventListener('click', ()=>{ window.clearAvatar?.(); setAv(null); });
+    logLine('spine started ✅');
   }
 };
