@@ -2,78 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>ScarlettVR Poker • Permanent Build</title>
-  <style>
-    html,body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
-    canvas { display:block; width:100%; height:100%; }
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b12" />
+  <title>ScarlettVR Poker • SVR</title>
 
-    /* HUD */
-    #hud {
-      position:fixed; top:10px; left:10px; right:10px;
-      z-index:99; pointer-events:auto;
-      color:#e9f3ff;
-      text-shadow:0 1px 2px rgba(0,0,0,0.75);
+  <style>
+    html,body{margin:0;height:100%;background:#05050a;color:#e9e9ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    canvas{display:block;touch-action:none}
+    #hud{
+      position:fixed;left:10px;top:10px;right:10px;max-width:940px;
+      z-index:9999; pointer-events:none;
     }
-    #row {
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    #bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;pointer-events:auto}
+    .btn{
+      padding:10px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.35);color:#fff;font-weight:600
     }
-    .btn {
-      background:rgba(0,0,0,0.55);
-      border:1px solid rgba(255,255,255,0.22);
-      border-radius:18px;
-      padding:10px 14px;
-      color:#fff;
-      font-weight:600;
-      cursor:pointer;
+    .btn:active{transform:scale(.98)}
+    #status{
+      padding:8px 12px;border-radius:14px;background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.10); font-weight:700
     }
-    .btn:active { transform:scale(0.99); }
-    #log {
-      margin-top:10px;
-      max-height:40vh;
-      overflow:auto;
-      background:rgba(0,0,0,0.45);
-      border:1px solid rgba(255,255,255,0.18);
-      border-radius:16px;
-      padding:10px 12px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size:12px;
-      line-height:1.35;
-      white-space:pre-wrap;
+    #panel{
+      margin-top:10px; padding:12px 14px; border-radius:18px;
+      background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.10);
+      max-height:44vh; overflow:auto; pointer-events:auto;
+      white-space:pre-wrap; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:13px; line-height:1.25;
     }
-    #joyZone, #teleZone {
-      position:fixed; bottom:0; width:50%; height:45%;
-      z-index:50;
-    }
-    #joyZone { left:0; }
-    #teleZone { right:0; }
-    .hint {
-      position:fixed; bottom:12px; left:12px; right:12px;
-      z-index:60;
-      font-size:12px;
-      opacity:0.8;
-      color:#d9e7ff;
-      text-shadow:0 1px 2px rgba(0,0,0,0.8);
-      pointer-events:none;
+    #hint{
+      position:fixed;left:10px;right:10px;bottom:10px;
+      z-index:9998; opacity:.75; font-size:13px;
+      text-shadow:0 1px 2px rgba(0,0,0,.8)
     }
   </style>
 </head>
+
 <body>
   <div id="hud">
-    <div id="row">
+    <div id="bar">
       <div id="status">boot…</div>
       <button id="btnVR" class="btn">Enter VR</button>
       <button id="btnSpawn" class="btn">Reset Spawn</button>
       <button id="btnReload" class="btn">Hard Reload</button>
+      <button id="btnNuke" class="btn">NUKE CACHE</button>
     </div>
-    <div id="log"></div>
+    <div id="panel"><div id="log">[hud] mounted\n</div></div>
   </div>
 
-  <!-- Mobile zones -->
-  <div id="joyZone"></div>
-  <div id="teleZone"></div>
-  <div class="hint">Quest: thumbsticks move • trigger teleports • hand tracking: pinch teleports</div>
+  <div id="hint">Quest: thumbsticks move • trigger teleports • hand tracking: pinch teleports</div>
 
-  <script type="module" src="./index.js"></script>
+  <!-- HARD GUARANTEE: load the root index.js -->
+  <script type="module" src="./index.js?v=SVR_BOOT_001"></script>
 </body>
 </html>
