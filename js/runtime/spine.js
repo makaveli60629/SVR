@@ -1,6 +1,7 @@
 // SVR/js/runtime/spine.js
 import * as THREE from 'three';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
+import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 import { initWorld } from '../scarlett1/world.js';
 
 const $ = (id)=>document.getElementById(id);
@@ -130,6 +131,38 @@ export const Spine = {
     controller1.add(makeRay());
     controller2.add(makeRay());
 
+    // WebXR hand tracking (Quest-style mesh hands)
+    const handFactory = new XRHandModelFactory();
+    const hand1 = renderer.xr.getHand(0);
+    const hand2 = renderer.xr.getHand(1);
+    rig.add(hand1); rig.add(hand2);
+
+    const skin = new THREE.Color(0x8d5524);
+    function applySkinTone(root){
+      root.traverse((o)=>{
+        if (!o.isMesh) return;
+        const mats = Array.isArray(o.material) ? o.material : [o.material];
+        for (const m of mats){
+          if (!m) continue;
+          if ('color' in m) m.color.copy(skin);
+          if ('roughness' in m) m.roughness = 0.55;
+          if ('metalness' in m) m.metalness = 0.0;
+          if ('emissive' in m){
+            m.emissive = m.emissive || new THREE.Color(0x000000);
+            m.emissive.multiplyScalar(0.0);
+          }
+          m.needsUpdate = true;
+        }
+      });
+    }
+
+    const handModel1 = handFactory.createHandModel(hand1, 'mesh');
+    const handModel2 = handFactory.createHandModel(hand2, 'mesh');
+    hand1.add(handModel1);
+    hand2.add(handModel2);
+    applySkinTone(handModel1);
+    applySkinTone(handModel2);
+
     const reticle = new THREE.Mesh(
       new THREE.RingGeometry(0.16, 0.22, 32),
       new THREE.MeshBasicMaterial({ color: 0x00d6ff, transparent:true, opacity:0.85, side:THREE.DoubleSide })
@@ -142,19 +175,40 @@ export const Spine = {
     const tempMatrix = new THREE.Matrix4();
     let teleportHit = null;
 
-    function updateTeleportFrom(ctrl){
-      tempMatrix.identity().extractRotation(ctrl.matrixWorld);
-      raycaster.ray.origin.setFromMatrixPosition(ctrl.matrixWorld);
-      raycaster.ray.direction.set(0,0,-1).applyMatrix4(tempMatrix);
+    function updateTeleportFromRay(origin, direction){
+      raycaster.ray.origin.copy(origin);
+      raycaster.ray.direction.copy(direction);
       const hits = raycaster.intersectObjects(teleportSurfaces, true);
-      if (hits.length){
-        teleportHit = hits[0];
-        reticle.visible = true;
-        reticle.position.copy(teleportHit.point);
-      }else{
+      if (!hits.length){
         teleportHit = null;
         reticle.visible = false;
+        return;
       }
+      teleportHit = hits[0];
+      reticle.visible = true;
+      reticle.position.copy(teleportHit.point);
+    }
+
+    function updateTeleportFromController(ctrl){
+      // IMPORTANT: Only sample ONE ray per frame to avoid reticle/teleport jitter
+      tempMatrix.identity().extractRotation(ctrl.matrixWorld);
+      const origin = new THREE.Vector3().setFromMatrixPosition(ctrl.matrixWorld);
+      const dir = new THREE.Vector3(0,0,-1).applyMatrix4(tempMatrix).normalize();
+      updateTeleportFromRay(origin, dir);
+    }
+
+    function updateTeleportFromHand(hand){
+      // Ray: wrist -> index-tip
+      const wrist = hand.joints?.['wrist'];
+      const indexTip = hand.joints?.['index-finger-tip'];
+      if (!wrist || !indexTip) return;
+      const o = new THREE.Vector3();
+      const t = new THREE.Vector3();
+      wrist.getWorldPosition(o);
+      indexTip.getWorldPosition(t);
+      const dir = t.sub(o).normalize();
+      if (dir.lengthSq() < 0.5) return;
+      updateTeleportFromRay(o, dir);
     }
 
     function doTeleport(){
@@ -174,6 +228,19 @@ export const Spine = {
     controller1.addEventListener('selectstart', doTeleport);
     controller2.addEventListener('selectstart', doTeleport);
 
+    // Hand pinch teleport: thumb-tip close to index-tip
+    let pinchWasDown = false;
+    function isPinching(hand){
+      const thumb = hand.joints?.['thumb-tip'];
+      const index = hand.joints?.['index-finger-tip'];
+      if (!thumb || !index) return false;
+      const a = new THREE.Vector3();
+      const b = new THREE.Vector3();
+      thumb.getWorldPosition(a);
+      index.getWorldPosition(b);
+      return a.distanceTo(b) < 0.022;
+    }
+
     // Thumbstick movement (left stick translate; right stick snap turn)
     let snapCooldown = 0;
     function applyGamepad(dt){
@@ -186,18 +253,26 @@ export const Spine = {
         const gp = src.gamepad;
         if (!gp) continue;
         const ax = gp.axes || [];
-        const axes2 = { x: ax[0]||0, y: ax[1]||0, rx: ax[2]||0, ry: ax[3]||0 };
+        const a0 = ax[0]||0, a1 = ax[1]||0, a2 = ax[2]||0, a3 = ax[3]||0;
 
-        // Heuristic: left-hand = movement (axes0/1), right-hand = turn (axes2 or 0 depending device)
+        // Some runtimes put the thumbstick on (0,1), others on (2,3).
+        // Pick the pair with the larger magnitude.
+        const m01 = Math.abs(a0) + Math.abs(a1);
+        const m23 = Math.abs(a2) + Math.abs(a3);
+        const stickX = (m23 > m01) ? a2 : a0;
+        const stickY = (m23 > m01) ? a3 : a1;
+
         if (src.handedness === 'left'){
-          moveX += axes2.x;
-          moveY += axes2.y;
-        }else if (src.handedness === 'right'){
-          turnX += (Math.abs(axes2.rx)>0.05 ? axes2.rx : axes2.x);
-        }else{
-          // unknown: use first pair for move, second for turn if present
-          moveX += axes2.x; moveY += axes2.y;
-          if (ax.length>=4) turnX += axes2.rx;
+          moveX += stickX;
+          moveY += stickY;
+        } else if (src.handedness === 'right'){
+          // Turn uses the X axis of the dominant pair.
+          turnX += stickX;
+        } else {
+          // Unknown handedness: treat as movement, and if 4 axes exist also allow turning.
+          moveX += stickX;
+          moveY += stickY;
+          if (ax.length >= 4) turnX += (m23 > m01 ? a0 : a2); // use the *other* pair if possible
         }
       }
 
@@ -239,9 +314,22 @@ export const Spine = {
     const clock = new THREE.Clock();
     renderer.setAnimationLoop(()=>{
       const dt = Math.min(clock.getDelta(), 0.05);
-      // teleport ray from right hand if available
-      updateTeleportFrom(controller1);
-      updateTeleportFrom(controller2);
+      // Teleport ray: prefer right controller; otherwise use right hand ray.
+      const ctrlRay = (controller2.userData.inputSource && controller2.userData.inputSource.handedness==='right')
+        ? controller2
+        : (controller1.userData.inputSource ? controller1 : null);
+      if (ctrlRay) updateTeleportFromController(ctrlRay);
+      else {
+        // hand ray (works in hand-tracking-only sessions)
+        const handRay = (hand2.joints && Object.keys(hand2.joints).length) ? hand2 : hand1;
+        updateTeleportFromHand(handRay);
+      }
+
+      // Pinch-to-teleport (hands). We only fire on the pinch edge.
+      const pinchNow = isPinching(hand1) || isPinching(hand2);
+      if (pinchNow && !pinchWasDown) doTeleport();
+      pinchWasDown = pinchNow;
+
       applyGamepad(dt);
       worldUpdate?.(dt);
       renderer.render(scene, camera);
