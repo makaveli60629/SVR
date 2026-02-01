@@ -1,110 +1,13 @@
-:root{
-  --hud-bg: rgba(10,12,18,0.82);
-  --hud-border: rgba(140,180,255,0.22);
-  --btn-bg: rgba(25,34,60,0.92);
-  --btn-border: rgba(140,180,255,0.25);
-  --btn-warn: rgba(130,30,30,0.92);
-
-  /* you can change this live with Text +/- buttons */
-  --diag-font: 16px;
-}
-
-html,body{
-  margin:0;
-  height:100%;
-  background:#05050a;
-  color:#e9eefc;
-  font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  overflow:hidden;
-}
-
-canvas{
-  display:block;
-}
-
-.hud{
-  position:fixed;
-  left:12px; top:12px;
-  right:12px;
-  max-width: 920px;
-
-  background: var(--hud-bg);
-  border: 1px solid var(--hud-border);
-  border-radius: 18px;
-  padding: 14px;
-  z-index: 9999;
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  pointer-events: auto;
-}
-
-.hud__title{
-  display:flex;
-  flex-direction: column;
-  gap:4px;
-  margin-bottom:10px;
-}
-.hud__brand{
-  font-weight: 900;
-  letter-spacing: .08em;
-  font-size: 18px;
-}
-.hud__sub{
-  opacity: .78;
-  font-size: 13px;
-}
-
-.hud__row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:10px;
-}
-
-.btn{
-  background: var(--btn-bg);
-  color:#fff;
-  border: 1px solid var(--btn-border);
-  border-radius: 14px;
-  padding: 11px 14px;
-  font-weight: 900;
-  cursor:pointer;
-  touch-action: manipulation;
-}
-.btn:active{ transform: scale(.99); }
-
-.btn--warn{
-  background: var(--btn-warn);
-  border-color: rgba(255,255,255,0.22);
-}
-
-.hud__diag{
-  margin:0;
-  border-radius: 14px;
-  border: 1px solid rgba(140,180,255,0.15);
-  background: rgba(0,0,0,0.35);
-
-  /* BIG + readable on Quest */
-  font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-  font-size: var(--diag-font);
-  line-height: 1.35;
-
-  padding: 12px;
-  max-height: 46vh;
-  overflow:auto;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-/* Hide HUD */
-.hud.hud--hidden{
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* If you want a tiny HUD later, you can switch this class */
-.hud.hud--minimal .hud__sub,
-.hud.hud--minimal .hud__diag{
-  display:none;
-}
+html,body{margin:0;padding:0;overflow:hidden;background:#000;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+#hudWrap{position:fixed;left:12px;top:12px;right:12px;z-index:9999;pointer-events:none}
+#hud{pointer-events:auto;background:rgba(0,0,0,.58);backdrop-filter:blur(6px);color:#eaf7ff;border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;padding:12px 12px 10px 12px;max-width:760px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.btn{pointer-events:auto;cursor:pointer;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);
+  color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;line-height:1}
+.btn:active{transform:scale(.98)}
+.pill{pointer-events:auto;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);
+  color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;line-height:1}
+#log{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.25;
+  max-height:42vh;overflow:auto;border-radius:14px;padding:10px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.10)}
+#tiny{position:fixed;left:14px;bottom:10px;right:14px;z-index:9999;color:rgba(255,255,255,.70);font-size:13px;text-shadow:0 1px 2px rgba(0,0,0,.8)}
