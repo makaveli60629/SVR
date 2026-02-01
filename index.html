@@ -3,56 +3,48 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>ScarlettVR • SVR</title>
+  <title>SVR • ScarlettVR Poker</title>
   <style>
-    html,body{margin:0;padding:0;height:100%;background:#000;overflow:hidden;font-family:system-ui,Segoe UI,Roboto,Arial;}
-    #app{position:fixed;inset:0;}
-    canvas{display:block;touch-action:none;}
-    #hud{position:fixed;left:10px;top:10px;right:10px;z-index:10;pointer-events:none}
-    #hud .row{display:flex;gap:10px;flex-wrap:wrap;pointer-events:auto}
-    .btn{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);color:#fff;
-      padding:10px 14px;border-radius:999px;font-weight:600;letter-spacing:.2px}
+    html,body{margin:0;padding:0;overflow:hidden;background:#000;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    #hudWrap{position:fixed;left:12px;top:12px;right:12px;z-index:9999;pointer-events:none}
+    #hud{pointer-events:auto;background:rgba(0,0,0,.58);backdrop-filter:blur(6px);color:#eaf7ff;border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;padding:12px 12px 10px 12px;max-width:740px}
+    #row1{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+    .btn{pointer-events:auto;cursor:pointer;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);
+      color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;line-height:1}
     .btn:active{transform:scale(.98)}
-    #status{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;
-      background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);color:#fff;font-weight:700}
-    #diag{margin-top:10px;white-space:pre-wrap;line-height:1.25;
-      background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);
-      color:#d7f7ff;border-radius:14px;padding:12px 14px;max-height:52vh;overflow:auto}
-    #hint{position:fixed;left:10px;bottom:10px;right:10px;z-index:10;
-      color:#bfefff;opacity:.75;font-size:12px;text-shadow:0 1px 0 rgba(0,0,0,.35)}
-    #avhud{position:fixed;right:10px;top:10px;z-index:10;background:rgba(0,0,0,.55);
-      border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:14px;padding:10px 12px}
-    #avhud b{display:block;margin-bottom:6px}
-    #avhud .row{display:flex;gap:8px;flex-wrap:wrap}
+    #log{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.25;
+      max-height:42vh;overflow:auto;border-radius:14px;padding:10px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.10)}
+    #tiny{position:fixed;left:14px;bottom:10px;right:14px;z-index:9999;color:rgba(255,255,255,.70);font-size:13px;text-shadow:0 1px 2px rgba(0,0,0,.8)}
   </style>
 </head>
 <body>
-  <div id="app"></div>
+  <div id="hudWrap">
+    <div id="hud">
+      <div id="row1">
+        <div class="btn" id="status">boot…</div>
+        <button class="btn" id="enterVr">Enter VR</button>
+        <button class="btn" id="resetSpawn">Reset Spawn</button>
+        <button class="btn" id="hardReload">Hard Reload</button>
+        <button class="btn" id="nukeCache">NUKE CACHE</button>
+        <button class="btn" id="probePaths">PROBE PATHS</button>
+      </div>
 
-  <div id="hud">
-    <div class="row">
-      <div id="status">boot…</div>
-      <button class="btn" id="enterVr">Enter VR</button>
-      <button class="btn" id="resetSpawn">Reset Spawn</button>
-      <button class="btn" id="hardReload">Hard Reload</button>
-      <button class="btn" id="nukeCache">NUKE CACHE</button>
-      <button class="btn" id="probe">PROBE PATHS</button>
+      <div id="row1">
+        <div class="btn" id="av">Avatar: NONE</div>
+        <button class="btn" id="avMale">Male</button>
+        <button class="btn" id="avFemale">Female</button>
+        <button class="btn" id="avNinja">Ninja</button>
+        <button class="btn" id="avCombat">Combat</button>
+        <button class="btn" id="avClear">Clear</button>
+      </div>
+
+      <div id="log">[hud] mounted
+</div>
     </div>
-    <div id="diag"></div>
   </div>
 
-  <div id="avhud">
-    <b>Avatar: <span id="av">NONE</span></b>
-    <div class="row">
-      <button class="btn" id="avMale">Male</button>
-      <button class="btn" id="avFemale">Female</button>
-      <button class="btn" id="avNinja">Ninja</button>
-      <button class="btn" id="avCombat">Combat</button>
-      <button class="btn" id="avClear">Clear</button>
-    </div>
-  </div>
-
-  <div id="hint">Quest: thumbsticks move • trigger teleports • hand tracking: pinch teleports</div>
+  <div id="tiny">Quest: thumbsticks move • trigger teleports • hand tracking: pinch teleports</div>
 
   <script type="module" src="./index.js"></script>
 </body>
