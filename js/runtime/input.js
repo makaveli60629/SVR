@@ -11,9 +11,10 @@ export const Input = {
   feetRing: null,
   reticle: null,
 
-  rayCam: null,
-  rayC1: null,
-  rayC2: null,
+  // ONE laser only (always attached to "aim parent")
+  laser: null,
+  laserLen: 7.0,
+  laserParent: null,
 
   init(ctx) {
     this.ctx = ctx;
@@ -34,7 +35,7 @@ export const Input = {
     ctx.controller2?.addEventListener("selectend", onSelectEnd);
 
     this.buildViz();
-    console.log("✅ Input initialized");
+    console.log("✅ Input initialized (single laser attached to aim)");
   },
 
   deadzone(v, dz = 0.14) {
@@ -52,11 +53,12 @@ export const Input = {
     }
   },
 
+  // Controller pose is "ok" only if it is non-zero and not NaN
   poseOk(obj) {
     if (!obj) return false;
     const v = new this.ctx.THREE.Vector3();
     obj.getWorldPosition(v);
-    return v.lengthSq() > 0.000001;
+    return Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.z) && v.lengthSq() > 1e-6;
   },
 
   getForward() {
@@ -72,21 +74,26 @@ export const Input = {
   makeLaser(len = 7) {
     const { THREE } = this.ctx;
     const g = new THREE.Group();
+    g.name = "laser";
+
     const geom = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0, 0, 0),
       new THREE.Vector3(0, 0, -len),
     ]);
+
     const line = new THREE.Line(
       geom,
       new THREE.LineBasicMaterial({ color: 0x00ffff })
     );
+
     g.add(line);
     return g;
   },
 
   buildViz() {
-    const { THREE, scene, controller1, controller2 } = this.ctx;
+    const { THREE, scene } = this.ctx;
 
+    // Feet ring
     this.feetRing = new THREE.Mesh(
       new THREE.RingGeometry(0.22, 0.42, 44),
       new THREE.MeshBasicMaterial({
@@ -99,6 +106,7 @@ export const Input = {
     this.feetRing.rotation.x = -Math.PI / 2;
     scene.add(this.feetRing);
 
+    // Reticle
     this.reticle = new THREE.Mesh(
       new THREE.RingGeometry(0.12, 0.18, 32),
       new THREE.MeshBasicMaterial({
@@ -112,33 +120,68 @@ export const Input = {
     this.reticle.visible = false;
     scene.add(this.reticle);
 
-    // Lasers:
-    // - controller lasers are parented to controllers (so they move with you)
-    // - camera laser exists for fallback, but we only show it when no controller pose
-    this.rayCam = this.makeLaser();
-    scene.add(this.rayCam);
+    // Single laser (NOT added to scene forever)
+    this.laser = this.makeLaser(this.laserLen);
+    this.laser.visible = true;
 
-    this.rayC1 = this.makeLaser();
-    this.rayC2 = this.makeLaser();
-
-    if (controller1) controller1.add(this.rayC1);
-    if (controller2) controller2.add(this.rayC2);
+    // We'll attach it during update() to right controller / camera.
+    this.laserParent = null;
   },
 
   updateFeetRing() {
     const { rig } = this.ctx;
+    // keep feet ring on "ground plane" reference
     this.feetRing.position.set(rig.position.x, 0.02, rig.position.z);
   },
 
-  getAim() {
-    // Prefer right controller first (so the laser is "right-hand")
+  // Choose RIGHT controller as priority (Quest often has controller2 as right, but not always)
+  getRightController() {
     const { controller1, controller2 } = this.ctx;
-    if (this.poseOk(controller2)) return { type: "c2", obj: controller2 };
-    if (this.poseOk(controller1)) return { type: "c1", obj: controller1 };
-    return { type: "cam", obj: this.getXRCamera() };
+
+    // If handedness exists, use it
+    const h1 = controller1?.userData?.handedness;
+    const h2 = controller2?.userData?.handedness;
+
+    if (h1 === "right" && this.poseOk(controller1)) return controller1;
+    if (h2 === "right" && this.poseOk(controller2)) return controller2;
+
+    // otherwise prefer controller2, then controller1 (matches your old behavior)
+    if (this.poseOk(controller2)) return controller2;
+    if (this.poseOk(controller1)) return controller1;
+
+    return null;
   },
 
-  raycast(obj) {
+  // Aim object = right controller if available else XR camera
+  getAimObj() {
+    const right = this.getRightController();
+    if (right) return right;
+    return this.getXRCamera();
+  },
+
+  // Attach laser to aim object (so it NEVER stays in world origin)
+  ensureLaserAttached(aimObj) {
+    if (!this.laser) return;
+
+    // If parent already correct, do nothing
+    if (this.laserParent === aimObj) return;
+
+    // Detach from old parent
+    if (this.laserParent && this.laserParent.remove) {
+      this.laserParent.remove(this.laser);
+    }
+
+    // Attach to new parent
+    if (aimObj && aimObj.add) {
+      aimObj.add(this.laser);
+      this.laser.position.set(0, 0, 0);
+      this.laser.rotation.set(0, 0, 0);
+      this.laser.visible = true;
+      this.laserParent = aimObj;
+    }
+  },
+
+  raycast(fromObj) {
     const { THREE, teleportSurfaces } = this.ctx;
     if (!teleportSurfaces?.length) return null;
 
@@ -146,8 +189,10 @@ export const Input = {
     const o = new THREE.Vector3();
     const d = new THREE.Vector3();
 
-    obj.getWorldPosition(o);
-    obj.getWorldDirection(d);
+    fromObj.getWorldPosition(o);
+    fromObj.getWorldDirection(d);
+
+    if (d.lengthSq() < 1e-6) d.set(0, 0, -1);
 
     ray.set(o, d.normalize());
     return ray.intersectObjects(teleportSurfaces, true)[0] || null;
@@ -170,7 +215,8 @@ export const Input = {
   // Safer gamepad picker (Quest sometimes reports multiple pads)
   getBestGamepad() {
     const pads = navigator.getGamepads?.() || [];
-    // Prefer pads that have 4 axes (Quest Touch)
+
+    // Prefer connected pads with 4 axes
     for (const p of pads) {
       if (p && p.connected && p.axes && p.axes.length >= 4) return p;
     }
@@ -186,24 +232,14 @@ export const Input = {
 
     this.updateFeetRing();
 
-    const aim = this.getAim();
+    // 1) Aim
+    const aimObj = this.getAimObj();
 
-    // visibility
-    this.rayCam.visible = aim.type === "cam";
-    this.rayC1.visible = aim.type === "c1";
-    this.rayC2.visible = aim.type === "c2";
+    // 2) Laser always attached to aim object (fixes "stuck in middle")
+    this.ensureLaserAttached(aimObj);
 
-    // if camera aiming, place camera laser at camera pose
-    if (aim.type === "cam") {
-      const p = new this.ctx.THREE.Vector3();
-      const q = new this.ctx.THREE.Quaternion();
-      aim.obj.getWorldPosition(p);
-      aim.obj.getWorldQuaternion(q);
-      this.rayCam.position.copy(p);
-      this.rayCam.quaternion.copy(q);
-    }
-
-    const hit = this.raycast(aim.obj);
+    // 3) Reticle
+    const hit = this.raycast(aimObj);
     if (hit) {
       this.reticle.visible = true;
       this.reticle.position.copy(hit.point);
@@ -212,7 +248,7 @@ export const Input = {
       this.reticle.visible = false;
     }
 
-    // quick tap = teleport
+    // 4) Teleport
     if (this.teleportQueued) {
       this.teleportQueued = false;
       if (hit) {
@@ -222,7 +258,7 @@ export const Input = {
       return;
     }
 
-    // hold trigger = “walk forward”
+    // 5) Hold trigger = walk forward
     if (this.holdingSelect) {
       const f = this.getForward();
       rig.position.x += f.x * 2.0 * dt;
@@ -231,13 +267,12 @@ export const Input = {
       return;
     }
 
-    // sticks
+    // 6) Stick locomotion
     const gp = this.getBestGamepad();
     if (!gp) return;
 
-    // Common Quest mapping:
     // axes[0],axes[1] = left stick
-    // axes[2],axes[3] = right stick (turn often on x)
+    // axes[2]        = right stick X (turn)
     const lx = this.deadzone(gp.axes[0] || 0);
     const ly = this.deadzone(-(gp.axes[1] || 0));
     const rx = this.deadzone(gp.axes[2] || 0);
