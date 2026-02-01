@@ -329,6 +329,12 @@ export async function init(ctx){
   pad('VIP', 19, 7);
   pad('POKER', 13, 7);
 
+  // Avatar display windows inside the Store area (glass showcases)
+  await buildStoreDisplayWindows(ctx, {
+    origin: new ctx.THREE.Vector3(19.6, 0, 12.4),
+    facing: -Math.PI/2,
+  });
+
   // -------------------------------------------------------------------------
   // JUMBOTRONS (4)
   // -------------------------------------------------------------------------
@@ -410,4 +416,199 @@ export async function init(ctx){
   };
 
   Bus?.log?.('WORLD: lobby + pit + stairs + pedestal table loaded');
+}
+
+
+// =============================================================================
+// Helpers: Store avatar showcases (no folder moves; uses CDN GLTFLoader)
+// =============================================================================
+async function buildStoreDisplayWindows(ctx, { origin, facing = 0 } = {}) {
+  const { THREE, scene, Bus } = ctx;
+  try {
+    // GLTFLoader from CDN (works on GitHub Pages; avoids bare specifier 'three')
+    const mod = await import('https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js');
+    const GLTFLoader = mod.GLTFLoader;
+    const loader = new GLTFLoader();
+    loader.setCrossOrigin('anonymous');
+
+    const avatarList = [
+      { key: 'male',   label: 'MALE',   url: './assets/avatars/male.glb' },
+      { key: 'female', label: 'FEMALE', url: './assets/avatars/female.glb' },
+      { key: 'ninja',  label: 'NINJA',  url: './assets/avatars/ninja.glb' },
+      { key: 'combat', label: 'COMBAT', url: './assets/avatars/combat_ninja_inspired_by_jin_roh_wolf_brigade.glb' },
+    ];
+
+    const g = new THREE.Group();
+    g.name = 'StoreShowcases';
+    scene.add(g);
+
+    const base = origin || new THREE.Vector3(19.6, 0, 12.4);
+
+    // wall backer
+    const wall = new THREE.Mesh(
+      new THREE.BoxGeometry(0.35, 4.2, 10.8),
+      new THREE.MeshStandardMaterial({ color: 0x0b0b12, roughness: 0.85, metalness: 0.05 })
+    );
+    wall.position.copy(base).add(new THREE.Vector3(0.0, 2.1, 0.0));
+    wall.rotation.y = facing;
+    g.add(wall);
+
+    const glassMat = new THREE.MeshPhysicalMaterial({
+      color: 0x0b2a44,
+      roughness: 0.05,
+      metalness: 0.0,
+      transmission: 0.85,
+      transparent: true,
+      opacity: 0.35,
+      thickness: 0.15,
+      ior: 1.45,
+      emissive: new THREE.Color(0x001018),
+      emissiveIntensity: 0.6,
+    });
+
+    const frameMat = new THREE.MeshStandardMaterial({ color: 0x11111a, roughness: 0.6, metalness: 0.2 });
+    const pedestalMat = new THREE.MeshStandardMaterial({ color: 0x17171f, roughness: 0.75, metalness: 0.1, emissive: 0x001000, emissiveIntensity: 0.4 });
+
+    const spacing = 2.55;
+    const startZ = +3.8;
+
+    // lighting for the wall
+    const strip = new THREE.RectAreaLight(0x66ccff, 10.0, 1.2, 10.0);
+    strip.position.copy(base).add(new THREE.Vector3(-0.55, 2.7, 0));
+    strip.rotation.y = facing + Math.PI/2;
+    g.add(strip);
+
+    const floorSpot = new THREE.PointLight(0x8a2be2, 1.3, 12);
+    floorSpot.position.copy(base).add(new THREE.Vector3(-1.1, 3.2, 0));
+    g.add(floorSpot);
+
+    // Make a tiny label texture
+    function makeLabel(text) {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 128;
+      const ctx2 = c.getContext('2d');
+      ctx2.clearRect(0,0,c.width,c.height);
+      ctx2.fillStyle = 'rgba(0,0,0,0.0)';
+      ctx2.fillRect(0,0,c.width,c.height);
+      ctx2.font = 'bold 72px Arial';
+      ctx2.textAlign = 'center';
+      ctx2.textBaseline = 'middle';
+      ctx2.fillStyle = '#bff6ff';
+      ctx2.shadowColor = '#00ffff';
+      ctx2.shadowBlur = 18;
+      ctx2.fillText(text, c.width/2, c.height/2);
+      const tex = new THREE.CanvasTexture(c);
+      tex.anisotropy = 2;
+      return tex;
+    }
+
+    // A simple normalizer similar to your avatar manager
+    function normalize(root, targetHeight = 1.75) {
+      const box = new THREE.Box3().setFromObject(root);
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
+      box.getSize(size);
+      box.getCenter(center);
+      root.position.sub(center);
+
+      const h = Math.max(size.y, 0.001);
+      const s = targetHeight / h;
+      root.scale.setScalar(s);
+
+      const box2 = new THREE.Box3().setFromObject(root);
+      root.position.y -= box2.min.y;
+    }
+
+    // Build each window
+    for (let i = 0; i < avatarList.length; i++) {
+      const a = avatarList[i];
+      const zOff = startZ - i * spacing;
+
+      const cell = new THREE.Group();
+      cell.name = `Showcase_${a.key}`;
+      cell.position.copy(base).add(new THREE.Vector3(-0.35, 0, zOff));
+      cell.rotation.y = facing;
+      g.add(cell);
+
+      // frame
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(1.65, 2.65, 0.18), frameMat);
+      frame.position.set(-0.22, 1.55, 0);
+      cell.add(frame);
+
+      // glass in front (slightly offset)
+      const glass = new THREE.Mesh(new THREE.PlaneGeometry(1.48, 2.42), glassMat);
+      glass.position.set(-0.14, 1.55, 0.11);
+      cell.add(glass);
+
+      // pedestal
+      const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.28, 32), pedestalMat);
+      pedestal.position.set(-0.18, 0.16, -0.05);
+      cell.add(pedestal);
+
+      // label
+      const labelTex = makeLabel(a.label);
+      const label = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.2, 0.28),
+        new THREE.MeshBasicMaterial({ map: labelTex, transparent: true })
+      );
+      label.position.set(-0.18, 0.46, 0.10);
+      cell.add(label);
+
+      // local light per window
+      const l = new THREE.PointLight(0x00ffff, 0.85, 6.5);
+      l.position.set(-0.85, 2.35, 0.55);
+      cell.add(l);
+
+      // avatar
+      try {
+        const gltf = await loader.loadAsync(a.url);
+        const root = gltf.scene || gltf.scenes?.[0];
+        if (!root) throw new Error('No scene in GLB');
+
+        root.traverse((o) => {
+          if (!o.isMesh) return;
+          const m = o.material;
+          const apply = (mat) => {
+            if (!mat) return;
+            if ('emissive' in mat) {
+              mat.emissive = mat.emissive || new THREE.Color(0x000000);
+              mat.emissive.add(new THREE.Color(0x001000));
+              mat.emissiveIntensity = Math.max(mat.emissiveIntensity || 0, 0.55);
+            }
+            mat.needsUpdate = true;
+          };
+          if (Array.isArray(m)) m.forEach(apply); else apply(m);
+        });
+
+        normalize(root, 1.7);
+        root.position.set(-0.18, 0.28, -0.05);
+        root.rotation.y = Math.PI; // face outward
+        cell.add(root);
+
+        // slow showroom spin
+        root.userData.__spin = 0.2 + i * 0.06;
+      } catch (e) {
+        Bus?.log?.(`STORE AVATAR FAIL (${a.key}): ${e?.message || e}`);
+        const fallback = new THREE.Mesh(
+          new THREE.CapsuleGeometry(0.22, 0.9, 8, 16),
+          new THREE.MeshStandardMaterial({ color: 0x142235, roughness: 0.7, emissive: 0x001018, emissiveIntensity: 1.0 })
+        );
+        fallback.position.set(-0.18, 0.65, -0.05);
+        cell.add(fallback);
+      }
+    }
+
+    // rotate showroom avatars via Spine render loop
+    const prevUpdate = ctx.worldUpdate;
+    ctx.worldUpdate = (dt) => {
+      if (prevUpdate) prevUpdate(dt);
+      g.traverse((o) => {
+        const s = o.userData?.__spin;
+        if (s) o.rotation.y += s * dt;
+      });
+    };
+    Bus?.log?.('STORE: avatar display windows loaded');
+  } catch (e) {
+    Bus?.log?.(`STORE: display windows unavailable (${e?.message || e})`);
+  }
 }
