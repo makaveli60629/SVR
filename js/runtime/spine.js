@@ -175,6 +175,21 @@ export const Spine = {
     rig.add(controller1);
     rig.add(controller2);
 
+    // Cache WebXR gamepads onto controller objects.
+    // (On Quest/Android inside XR, navigator.getGamepads() can be unreliable.)
+    const bindGamepad = (ctrl) => {
+      ctrl.addEventListener('connected', (e) => {
+        // three.js passes WebXRInputSource data in e.data
+        if (e?.data?.gamepad) ctrl.gamepad = e.data.gamepad;
+        if (e?.data?.handedness) ctrl.userData.handedness = e.data.handedness;
+      });
+      ctrl.addEventListener('disconnected', () => {
+        ctrl.gamepad = null;
+      });
+    };
+    bindGamepad(controller1);
+    bindGamepad(controller2);
+
     // Surfaces used by Input
     const walkSurfaces = [];
     const teleportSurfaces = [];

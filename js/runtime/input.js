@@ -113,8 +113,21 @@ export const Input = {
   },
 
   updateFeetRing() {
-    const { rig } = this.ctx;
-    this.feetRing.position.set(rig.position.x, 0.02, rig.position.z);
+    const { rig, THREE, walkSurfaces } = this.ctx;
+    let y = 0.02;
+
+    // Glue to the ground directly under the rig.
+    if (walkSurfaces?.length) {
+      const ray = new THREE.Raycaster();
+      ray.set(
+        new THREE.Vector3(rig.position.x, rig.position.y + 2.0, rig.position.z),
+        new THREE.Vector3(0, -1, 0)
+      );
+      const hit = ray.intersectObjects(walkSurfaces, true)[0];
+      if (hit) y = hit.point.y + 0.02;
+    }
+
+    this.feetRing.position.set(rig.position.x, y, rig.position.z);
   },
 
   getAim() {
@@ -151,6 +164,15 @@ export const Input = {
   },
 
   getBestGamepad() {
+    const { controller1, controller2 } = this.ctx;
+
+    // Prefer WebXR controller gamepads first.
+    const c2 = controller2?.gamepad;
+    if (c2 && c2.connected && c2.axes && c2.axes.length >= 2) return c2;
+    const c1 = controller1?.gamepad;
+    if (c1 && c1.connected && c1.axes && c1.axes.length >= 2) return c1;
+
+    // Fallback to navigator (non-XR or some browsers).
     const pads = navigator.getGamepads?.() || [];
     for (const p of pads) if (p && p.connected && p.axes && p.axes.length >= 4) return p;
     for (const p of pads) if (p && p.connected && p.axes && p.axes.length >= 2) return p;
@@ -202,12 +224,30 @@ export const Input = {
       return;
     }
 
-    const gp = this.getBestGamepad();
-    if (!gp) return;
+    // Prefer WebXR controller gamepads: left stick moves, right stick turns.
+    const { controller1, controller2 } = this.ctx;
 
-    const lx = this.deadzone(gp.axes[0] || 0);
-    const ly = this.deadzone(-(gp.axes[1] || 0));
-    const rx = this.deadzone(gp.axes[2] || 0);
+    const pickCtrl = (hand) => {
+      const a = controller1;
+      const b = controller2;
+      if (a?.gamepad && a?.userData?.handedness === hand) return a;
+      if (b?.gamepad && b?.userData?.handedness === hand) return b;
+      // Fallback: assume index 0 = left, index 1 = right
+      if (hand === 'left') return a?.gamepad ? a : (b?.gamepad ? b : null);
+      return b?.gamepad ? b : (a?.gamepad ? a : null);
+    };
+
+    const leftCtrl = pickCtrl('left');
+    const rightCtrl = pickCtrl('right');
+    const leftGP = leftCtrl?.gamepad || null;
+    const rightGP = rightCtrl?.gamepad || null;
+
+    // If we can't see XR gamepads, fall back to navigator gamepads
+    const fallback = this.getBestGamepad();
+    const lx = this.deadzone((leftGP?.axes?.[0] ?? fallback?.axes?.[0] ?? 0));
+    const ly = this.deadzone(-(leftGP?.axes?.[1] ?? fallback?.axes?.[1] ?? 0));
+    // Right-stick x is usually axes[0] on the right controller gamepad
+    const rx = this.deadzone((rightGP?.axes?.[0] ?? fallback?.axes?.[2] ?? 0));
 
     const f = this.getForward();
     const r = new this.ctx.THREE.Vector3(-f.z, 0, f.x);
