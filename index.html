@@ -2,136 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <meta name="theme-color" content="#0b0b12"/>
-  <title>ScarlettVR Poker • SVR</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>ScarlettVR • SVR</title>
   <style>
-    html,body{margin:0;height:100%;background:#05050a;color:#e9e9ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    canvas{display:block;touch-action:none}
-    #hud{position:fixed;left:10px;top:10px;right:10px;max-width:940px;z-index:9999}
-    #bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btn{padding:10px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.35);color:#fff;font-weight:700}
-    #status{padding:8px 12px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.10);font-weight:800}
-    #panel{margin-top:10px;padding:12px 14px;border-radius:18px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.10);
-      max-height:44vh;overflow:auto;white-space:pre-wrap;
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
-      font-size:13px;line-height:1.25;}
-    #hint{position:fixed;left:10px;right:10px;bottom:10px;z-index:9998;opacity:.75;font-size:13px;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+    html,body{margin:0;padding:0;height:100%;background:#000;overflow:hidden;font-family:system-ui,Segoe UI,Roboto,Arial;}
+    #app{position:fixed;inset:0;}
+    canvas{display:block;touch-action:none;}
+    #hud{position:fixed;left:10px;top:10px;right:10px;z-index:10;pointer-events:none}
+    #hud .row{display:flex;gap:10px;flex-wrap:wrap;pointer-events:auto}
+    .btn{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);color:#fff;
+      padding:10px 14px;border-radius:999px;font-weight:600;letter-spacing:.2px}
+    .btn:active{transform:scale(.98)}
+    #status{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;
+      background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);color:#fff;font-weight:700}
+    #diag{margin-top:10px;white-space:pre-wrap;line-height:1.25;
+      background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);
+      color:#d7f7ff;border-radius:14px;padding:12px 14px;max-height:52vh;overflow:auto}
+    #hint{position:fixed;left:10px;bottom:10px;right:10px;z-index:10;
+      color:#bfefff;opacity:.75;font-size:12px;text-shadow:0 1px 0 rgba(0,0,0,.35)}
+    #avhud{position:fixed;right:10px;top:10px;z-index:10;background:rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:14px;padding:10px 12px}
+    #avhud b{display:block;margin-bottom:6px}
+    #avhud .row{display:flex;gap:8px;flex-wrap:wrap}
   </style>
 </head>
 <body>
+  <div id="app"></div>
+
   <div id="hud">
-    <div id="bar">
+    <div class="row">
       <div id="status">boot…</div>
-      <button id="btnVR" class="btn">Enter VR</button>
-      <button id="btnSpawn" class="btn">Reset Spawn</button>
-      <button id="btnReload" class="btn">Hard Reload</button>
-      <button id="btnNuke" class="btn">NUKE CACHE</button>
-      <button id="btnProbe" class="btn">PROBE PATHS</button>
+      <button class="btn" id="enterVr">Enter VR</button>
+      <button class="btn" id="resetSpawn">Reset Spawn</button>
+      <button class="btn" id="hardReload">Hard Reload</button>
+      <button class="btn" id="nukeCache">NUKE CACHE</button>
+      <button class="btn" id="probe">PROBE PATHS</button>
     </div>
-    <div id="panel"><div id="log">[hud] mounted\n</div></div>
+    <div id="diag"></div>
+  </div>
+
+  <div id="avhud">
+    <b>Avatar: <span id="av">NONE</span></b>
+    <div class="row">
+      <button class="btn" id="avMale">Male</button>
+      <button class="btn" id="avFemale">Female</button>
+      <button class="btn" id="avNinja">Ninja</button>
+      <button class="btn" id="avCombat">Combat</button>
+      <button class="btn" id="avClear">Clear</button>
+    </div>
   </div>
 
   <div id="hint">Quest: thumbsticks move • trigger teleports • hand tracking: pinch teleports</div>
 
-  <script>
-    // ALWAYS RUNS (even if module loading is broken)
-    const $ = (id)=>document.getElementById(id);
-    const logEl = $("log");
-    const statusEl = $("status");
-
-    function log(msg){
-      try{
-        logEl.textContent += String(msg) + "\n";
-        logEl.parentElement.scrollTop = logEl.parentElement.scrollHeight;
-      }catch(e){}
-      console.log(msg);
-    }
-    function setStatus(t){ statusEl.textContent = t; }
-
-    log("=== SCARLETT DIAGNOSTICS (INLINE BOOT) ===");
-    log("href=" + location.href);
-    log("origin=" + location.origin);
-    log("path=" + location.pathname);
-    log("ua=" + navigator.userAgent);
-    log("secureContext=" + String(window.isSecureContext));
-    log("navigator.xr=" + (!!navigator.xr));
-    setStatus("boot… (inline)");
-
-    window.addEventListener("error", (e)=>{
-      log("❌ window.error: " + (e?.message || e));
-      if (e?.error?.stack) log(e.error.stack);
-      setStatus("error ❌");
-    });
-    window.addEventListener("unhandledrejection", (e)=>{
-      log("❌ unhandledrejection: " + (e?.reason?.message || e?.reason || e));
-      if (e?.reason?.stack) log(e.reason.stack);
-      setStatus("error ❌");
-    });
-
-    $("btnReload").onclick = ()=> location.reload(true);
-
-    $("btnNuke").onclick = async ()=>{
-      log("🧨 NUKE CACHE: starting…");
-      try{
-        if ("serviceWorker" in navigator){
-          const regs = await navigator.serviceWorker.getRegistrations();
-          for (const r of regs) await r.unregister();
-          log("✅ service workers unregistered: " + regs.length);
-        }
-        if ("caches" in window){
-          const keys = await caches.keys();
-          for (const k of keys) await caches.delete(k);
-          log("✅ caches cleared: " + keys.length);
-        }
-      }catch(err){
-        log("⚠️ nuke failed: " + (err?.message || err));
-      }
-      log("🔁 reloading…");
-      location.reload(true);
-    };
-
-    // PROBE PATHS: tells us instantly if your files are actually being served
-    $("btnProbe").onclick = async ()=>{
-      const targets = [
-        "./index.js",
-        "./js/runtime/spine.js",
-        "./js/runtime/input.js",
-        "./scarlett1/world.js"
-      ];
-      log("— PROBE PATHS —");
-      for (const t of targets){
-        try{
-          const r = await fetch(t, { cache:"no-store" });
-          log((r.ok?"✅ ":"❌ ") + t + "  status=" + r.status);
-        }catch(e){
-          log("❌ " + t + "  fetch error");
-        }
-      }
-      log("— END PROBE —");
-    };
-
-    $("btnSpawn").onclick = ()=> { window.__SVR_RESET_SPAWN?.(); log("▶ Reset Spawn pressed"); };
-    $("btnVR").onclick = ()=> { window.__SVR_ENTER_VR?.(); log("▶ Enter VR pressed"); };
-
-    // IMPORTANT: dynamic import from inline script (no silent failure)
-    (async ()=>{
-      try{
-        setStatus("loading…");
-        log("… dynamic importing ./js/runtime/spine.js");
-        const mod = await import("./js/runtime/spine.js?v=" + Date.now());
-        if (!mod?.Spine?.start) throw new Error("Spine.start missing export");
-        log("✅ Spine module loaded");
-
-        await mod.Spine.start();
-        setStatus("ready ✅");
-        log("✅ boot complete");
-      }catch(e){
-        setStatus("boot failed ❌");
-        log("❌ boot failed: " + (e?.message || e));
-        if (e?.stack) log(e.stack);
-      }
-    })();
-  </script>
+  <script type="module" src="./index.js"></script>
 </body>
 </html>
