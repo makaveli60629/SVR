@@ -11,7 +11,6 @@ export const Input = {
   feetRing: null,
   reticle: null,
 
-  // the ray is ATTACHED to right controller
   rightRay: null,
   rayLen: 7.0,
 
@@ -42,13 +41,10 @@ export const Input = {
     return Math.sign(v) * (Math.abs(v)-dz)/(1-dz);
   },
 
-  // Prefer the controller that reports handedness === right
   getRightController(){
     const { controller1, controller2 } = this.ctx;
     if (controller1?.userData?.handedness === "right") return controller1;
     if (controller2?.userData?.handedness === "right") return controller2;
-
-    // fallback: often controller2 acts as right
     return controller2 || controller1 || null;
   },
 
@@ -63,7 +59,6 @@ export const Input = {
   },
 
   getFlatForward(){
-    // forward based on camera direction but flattened
     const { THREE } = this.ctx;
     const cam = this.getXRCamera();
     const dir = new THREE.Vector3();
@@ -101,7 +96,6 @@ export const Input = {
     this.reticle.visible = false;
     scene.add(this.reticle);
 
-    // Build ray (line) ONCE
     const geom = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0,0,0),
       new THREE.Vector3(0,0,-this.rayLen)
@@ -110,20 +104,14 @@ export const Input = {
     this.rightRay = new THREE.Group();
     this.rightRay.add(line);
     this.rightRay.visible = false;
-
-    // Attach later (after controller exists)
   },
 
   ensureRayAttached(){
-    const { scene } = this.ctx;
     if (!this.rightRay) return;
 
     const right = this.getRightController();
     if (right && this.rightRay.parent !== right){
-      // remove from old parent
       if (this.rightRay.parent) this.rightRay.parent.remove(this.rightRay);
-
-      // attach to RIGHT controller
       right.add(this.rightRay);
       this.rightRay.position.set(0,0,0);
       this.rightRay.rotation.set(0,0,0);
@@ -131,7 +119,6 @@ export const Input = {
       return;
     }
 
-    // If no controller at all (rare), attach to camera
     if (!right){
       const cam = this.getXRCamera();
       if (this.rightRay.parent !== cam){
@@ -207,13 +194,11 @@ export const Input = {
     }
   },
 
-  // Prefer XR right-controller gamepad for stick locomotion
   getRightGamepad(){
     const right = this.getRightController();
     const gp = right?.userData?.gamepad;
     if (gp?.axes?.length >= 2) return gp;
 
-    // fallback: any gamepad with axes
     const all = navigator.getGamepads?.() || [];
     for (const g of all){
       if (g?.axes?.length >= 2) return g;
@@ -227,8 +212,8 @@ export const Input = {
     this.ensureRayAttached();
     this.updateFeetRing();
 
-    const rightCtrl = this.getRightController() || this.getXRCamera();
-    const hit = this.raycastFrom(rightCtrl);
+    const aimObj = this.getRightController() || this.getXRCamera();
+    const hit = this.raycastFrom(aimObj);
 
     if (hit){
       this.reticle.visible = true;
@@ -238,7 +223,6 @@ export const Input = {
       this.reticle.visible = false;
     }
 
-    // tap => teleport
     if (this.teleportQueued){
       this.teleportQueued = false;
       if (hit){
@@ -249,7 +233,6 @@ export const Input = {
       return;
     }
 
-    // hold => walk forward (fallback)
     if (this.holdingSelect){
       const f = this.getFlatForward();
       rig.position.x += f.x * 2.0 * dt;
@@ -259,14 +242,11 @@ export const Input = {
       return;
     }
 
-    // stick locomotion
     const gp = this.getRightGamepad();
     if (!gp) return;
 
     const mx = this.deadzone(gp.axes[0] || 0);
     const my = this.deadzone(-(gp.axes[1] || 0));
-
-    // Optional snap-turn: use right stick X if present
     const tx = this.deadzone(gp.axes[2] || 0);
 
     const f = this.getFlatForward();
@@ -274,7 +254,6 @@ export const Input = {
 
     rig.position.x += (r.x*mx + f.x*my) * this.moveSpeed * dt;
     rig.position.z += (r.z*mx + f.z*my) * this.moveSpeed * dt;
-
     rig.rotation.y -= tx * this.turnSpeed * dt;
 
     this.snapGround();
