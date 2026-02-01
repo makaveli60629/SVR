@@ -1,6 +1,4 @@
-// /js/runtime/input.js
-// Movement + teleport + lasers that ALWAYS attach to controllers when available.
-// NOTE: controller2 is treated as RIGHT hand (Quest standard).
+// SVR/js/runtime/input.js
 export const Input = {
   ctx: null,
 
@@ -31,13 +29,13 @@ export const Input = {
       if (t < 260) this.teleportQueued = true;
     };
 
-    ctx.controller1?.addEventListener('selectstart', onSelectStart);
-    ctx.controller1?.addEventListener('selectend', onSelectEnd);
-    ctx.controller2?.addEventListener('selectstart', onSelectStart);
-    ctx.controller2?.addEventListener('selectend', onSelectEnd);
+    ctx.controller1?.addEventListener("selectstart", onSelectStart);
+    ctx.controller1?.addEventListener("selectend", onSelectEnd);
+    ctx.controller2?.addEventListener("selectstart", onSelectStart);
+    ctx.controller2?.addEventListener("selectend", onSelectEnd);
 
     this.buildViz();
-    this.ctx.log?.('✅ Input initialized');
+    console.log("✅ Input initialized");
   },
 
   deadzone(v, dz = 0.14) {
@@ -79,7 +77,10 @@ export const Input = {
       new THREE.Vector3(0, 0, 0),
       new THREE.Vector3(0, 0, -len),
     ]);
-    const line = new THREE.Line(geom, new THREE.LineBasicMaterial({ color: 0x00ffff }));
+    const line = new THREE.Line(
+      geom,
+      new THREE.LineBasicMaterial({ color: 0x00ffff })
+    );
     g.add(line);
     return g;
   },
@@ -89,15 +90,29 @@ export const Input = {
 
     this.feetRing = new THREE.Mesh(
       new THREE.RingGeometry(0.22, 0.42, 44),
-      new THREE.MeshBasicMaterial({ color: 0x00c8ff, transparent: true, opacity: 0.75, side: THREE.DoubleSide })
+      new THREE.MeshBasicMaterial({
+        color: 0x00c8ff,
+        transparent: true,
+        opacity: 0.85,
+        side: THREE.DoubleSide,
+        depthTest: false
+      })
     );
+    this.feetRing.renderOrder = 9999;
     this.feetRing.rotation.x = -Math.PI / 2;
     scene.add(this.feetRing);
 
     this.reticle = new THREE.Mesh(
       new THREE.RingGeometry(0.12, 0.18, 32),
-      new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.95, side: THREE.DoubleSide })
+      new THREE.MeshBasicMaterial({
+        color: 0x00ffff,
+        transparent: true,
+        opacity: 0.95,
+        side: THREE.DoubleSide,
+        depthTest: false
+      })
     );
+    this.reticle.renderOrder = 9999;
     this.reticle.rotation.x = -Math.PI / 2;
     this.reticle.visible = false;
     scene.add(this.reticle);
@@ -113,29 +128,25 @@ export const Input = {
   },
 
   updateFeetRing() {
-    const { rig, THREE, walkSurfaces } = this.ctx;
-    let y = 0.02;
-
-    // Glue to the ground directly under the rig.
-    if (walkSurfaces?.length) {
+    const { THREE, rig, walkSurfaces } = this.ctx;
+    let y = 0.03;
+    if (walkSurfaces?.length){
       const ray = new THREE.Raycaster();
       ray.set(
-        new THREE.Vector3(rig.position.x, rig.position.y + 2.0, rig.position.z),
-        new THREE.Vector3(0, -1, 0)
+        new THREE.Vector3(rig.position.x, rig.position.y + 3.0, rig.position.z),
+        new THREE.Vector3(0,-1,0)
       );
       const hit = ray.intersectObjects(walkSurfaces, true)[0];
-      if (hit) y = hit.point.y + 0.02;
+      if (hit) y = hit.point.y + 0.03;
     }
-
     this.feetRing.position.set(rig.position.x, y, rig.position.z);
   },
 
   getAim() {
     const { controller1, controller2 } = this.ctx;
-    // Prefer RIGHT hand
-    if (this.poseOk(controller2)) return { type: 'c2', obj: controller2 };
-    if (this.poseOk(controller1)) return { type: 'c1', obj: controller1 };
-    return { type: 'cam', obj: this.getXRCamera() };
+    if (this.poseOk(controller2)) return { type: "c2", obj: controller2 };
+    if (this.poseOk(controller1)) return { type: "c1", obj: controller1 };
+    return { type: "cam", obj: this.getXRCamera() };
   },
 
   raycast(obj) {
@@ -158,42 +169,26 @@ export const Input = {
     if (!walkSurfaces?.length) return;
 
     const ray = new THREE.Raycaster();
-    ray.set(new THREE.Vector3(rig.position.x, 4.0, rig.position.z), new THREE.Vector3(0, -1, 0));
+    ray.set(
+      new THREE.Vector3(rig.position.x, rig.position.y + 3.5, rig.position.z),
+      new THREE.Vector3(0, -1, 0)
+    );
     const hit = ray.intersectObjects(walkSurfaces, true)[0];
     if (hit) rig.position.y = hit.point.y + 1.7;
   },
 
-  getBestGamepad() {
-    // Prefer the WebXR controllers' gamepads (Quest reliable inside XR)
-    const c2 = this.ctx?.controller2;
-    const c1 = this.ctx?.controller1;
-    if (c2?.gamepad && c2.gamepad.connected) return c2.gamepad;
-    if (c1?.gamepad && c1.gamepad.connected) return c1.gamepad;
-
-    // Fallback to navigator.getGamepads (desktop / non-XR)
-    const pads = navigator.getGamepads?.() || [];
-    // Prefer pads that have 4 axes (Quest Touch)
-    for (const p of pads) {
-      if (p && p.connected && p.axes && p.axes.length >= 4) return p;
-    }
-    // fallback any pad with 2 axes
-    for (const p of pads) {
-      if (p && p.connected && p.axes && p.axes.length >= 2) return p;
-    }
-    return null;
-  },
-
   update(dt) {
     const { rig } = this.ctx;
+
     this.updateFeetRing();
 
     const aim = this.getAim();
 
-    this.rayCam.visible = aim.type === 'cam';
-    this.rayC1.visible = aim.type === 'c1';
-    this.rayC2.visible = aim.type === 'c2';
+    this.rayCam.visible = aim.type === "cam";
+    this.rayC1.visible  = aim.type === "c1";
+    this.rayC2.visible  = aim.type === "c2";
 
-    if (aim.type === 'cam') {
+    if (aim.type === "cam") {
       const p = new this.ctx.THREE.Vector3();
       const q = new this.ctx.THREE.Quaternion();
       aim.obj.getWorldPosition(p);
@@ -228,30 +223,19 @@ export const Input = {
       return;
     }
 
-    // Prefer WebXR controller gamepads: left stick moves, right stick turns.
-    const { controller1, controller2 } = this.ctx;
+    // --- XR sticks: prefer controller gamepads ---
+    const gp1 = this.ctx.controller1?.gamepad || null;
+    const gp2 = this.ctx.controller2?.gamepad || null;
 
-    const pickCtrl = (hand) => {
-      const a = controller1;
-      const b = controller2;
-      if (a?.gamepad && a?.userData?.handedness === hand) return a;
-      if (b?.gamepad && b?.userData?.handedness === hand) return b;
-      // Fallback: assume index 0 = left, index 1 = right
-      if (hand === 'left') return a?.gamepad ? a : (b?.gamepad ? b : null);
-      return b?.gamepad ? b : (a?.gamepad ? a : null);
-    };
+    // assume gp1=left move, gp2=right turn; fallback if missing
+    const movePad = gp1 || gp2;
+    const turnPad = (gp1 && gp2) ? gp2 : (gp2 || gp1);
 
-    const leftCtrl = pickCtrl('left');
-    const rightCtrl = pickCtrl('right');
-    const leftGP = leftCtrl?.gamepad || null;
-    const rightGP = rightCtrl?.gamepad || null;
+    if (!movePad) return;
 
-    // If we can't see XR gamepads, fall back to navigator gamepads
-    const fallback = this.getBestGamepad();
-    const lx = this.deadzone((leftGP?.axes?.[0] ?? fallback?.axes?.[0] ?? 0));
-    const ly = this.deadzone(-(leftGP?.axes?.[1] ?? fallback?.axes?.[1] ?? 0));
-    // Right-stick x is usually axes[0] on the right controller gamepad
-    const rx = this.deadzone((rightGP?.axes?.[0] ?? fallback?.axes?.[2] ?? 0));
+    const lx = this.deadzone(movePad.axes?.[0] || 0);
+    const ly = this.deadzone(-(movePad.axes?.[1] || 0));
+    const rx = this.deadzone((turnPad?.axes?.[2] ?? turnPad?.axes?.[0] ?? 0) || 0);
 
     const f = this.getForward();
     const r = new this.ctx.THREE.Vector3(-f.z, 0, f.x);
