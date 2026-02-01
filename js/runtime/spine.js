@@ -11,7 +11,7 @@ export const Spine = {
     const log = (m) => {
       try{
         hudLog.textContent += String(m) + "\n";
-        hudLog.scrollTop = hudLog.scrollHeight;
+        hudLog.parentElement.scrollTop = hudLog.parentElement.scrollHeight;
       }catch(e){}
       console.log(m);
     };
@@ -98,15 +98,9 @@ export const Spine = {
       log("✅ spawn applied");
     };
 
-    // Buttons
-    const btnVR     = document.getElementById("btnVR");
-    const btnSpawn  = document.getElementById("btnSpawn");
-    const btnReload = document.getElementById("btnReload");
-
-    if (btnReload) btnReload.onclick = ()=> location.reload(true);
-    if (btnSpawn)  btnSpawn.onclick  = ()=> applySpawn();
-
-    if (btnVR) btnVR.onclick = async ()=>{
+    // expose buttons for index.html handlers
+    window.__SVR_RESET_SPAWN = applySpawn;
+    window.__SVR_ENTER_VR = async ()=>{
       log("▶ Enter VR pressed");
       try{
         if (!window.isSecureContext) throw new Error("WebXR requires HTTPS");
@@ -138,14 +132,15 @@ export const Spine = {
     // Input
     Input.init(ctx);
     ctx.updates.push((dt)=> Input.update(dt));
-
     log("✅ input loaded");
 
-    // World
+    // World (THIS IS THE FIXED PATH)
     setStatus("loading world…");
     log("--- loading scarlett1/world.js ---");
     try{
-      const mod = await import("../scarlett1/world.js");
+      // spine.js is /SVR/js/runtime/spine.js
+      // world.js will be /SVR/scarlett1/world.js
+      const mod = await import("../../scarlett1/world.js?v=" + Date.now());
       await mod.init(ctx);
       log("✅ world loaded");
     }catch(e){
