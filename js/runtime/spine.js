@@ -1,4 +1,6 @@
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+import { XRControllerModelFactory } from "https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRControllerModelFactory.js";
+import { XRHandModelFactory } from "https://unpkg.com/three@0.160.0/examples/jsm/webxr/XRHandModelFactory.js";
 import { Input } from "./input.js";
 
 export const Spine = {
@@ -13,7 +15,6 @@ export const Spine = {
       }catch(e){}
       console.log(m);
     };
-
     const setStatus = (t) => { try{ hudStatus.textContent = t; }catch(e){} };
 
     const renderer = new THREE.WebGLRenderer({ antialias:true });
@@ -24,25 +25,68 @@ export const Spine = {
     document.body.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
+    scene.background = new THREE.Color(0x05020c);
 
     const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.05, 900);
 
+    // Player rig
     const rig = new THREE.Group();
     rig.add(camera);
     scene.add(rig);
 
+    // XR controllers + grips + hands
     const controller1 = renderer.xr.getController(0);
     const controller2 = renderer.xr.getController(1);
     scene.add(controller1, controller2);
 
+    const grip1 = renderer.xr.getControllerGrip(0);
+    const grip2 = renderer.xr.getControllerGrip(1);
+    scene.add(grip1, grip2);
+
+    // Controller models (Touch)
+    const cmf = new XRControllerModelFactory();
+    grip1.add(cmf.createControllerModel(grip1));
+    grip2.add(cmf.createControllerModel(grip2));
+
+    // Hand tracking models
+    const hand1 = renderer.xr.getHand(0);
+    const hand2 = renderer.xr.getHand(1);
+    scene.add(hand1, hand2);
+
+    const hmf = new XRHandModelFactory();
+    hand1.add(hmf.createHandModel(hand1, "mesh"));
+    hand2.add(hmf.createHandModel(hand2, "mesh"));
+
+    function wireXR(ctrl){
+      ctrl.userData.handedness = "unknown";
+      ctrl.userData.gamepad = null;
+
+      ctrl.addEventListener("connected", (e)=>{
+        const src = e?.data; // XRInputSource
+        ctrl.userData.handedness = src?.handedness || "unknown";
+        ctrl.userData.gamepad = src?.gamepad || null;
+        log(`✅ controller connected: ${ctrl.userData.handedness}`);
+      });
+
+      ctrl.addEventListener("disconnected", ()=>{
+        log(`⚠️ controller disconnected: ${ctrl.userData.handedness}`);
+        ctrl.userData.handedness = "unknown";
+        ctrl.userData.gamepad = null;
+      });
+    }
+    wireXR(controller1);
+    wireXR(controller2);
+
     const ctx = {
       THREE, scene, camera, rig, renderer,
-      controller1, controller2,
+      controller1, controller2, grip1, grip2, hand1, hand2,
+
       teleportSurfaces: [],
       walkSurfaces: [],
       updates: [],
       log,
+
+      bounds: null,
 
       spawnPos: new THREE.Vector3(0, 1.75, -42),
       spawnLook: new THREE.Vector3(0, 1.55, 0),
@@ -55,9 +99,9 @@ export const Spine = {
     };
 
     // Buttons
-    const btnVR    = document.getElementById("btnVR");
-    const btnSpawn = document.getElementById("btnSpawn");
-    const btnReload= document.getElementById("btnReload");
+    const btnVR     = document.getElementById("btnVR");
+    const btnSpawn  = document.getElementById("btnSpawn");
+    const btnReload = document.getElementById("btnReload");
 
     if (btnReload) btnReload.onclick = ()=> location.reload(true);
     if (btnSpawn)  btnSpawn.onclick  = ()=> applySpawn();
@@ -91,15 +135,13 @@ export const Spine = {
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // ✅ Initialize Input
+    // Input
     Input.init(ctx);
-
-    // ✅ CRITICAL FIX: bind update so `this` is always Input
     ctx.updates.push((dt)=> Input.update(dt));
 
-    log("✅ input loaded (update bound)");
+    log("✅ input loaded");
 
-    // Load world
+    // World
     setStatus("loading world…");
     log("--- loading scarlett1/world.js ---");
     try{
@@ -121,11 +163,7 @@ export const Spine = {
       last = now;
 
       for (const fn of ctx.updates){
-        try{
-          fn(dt);
-        }catch(e){
-          log("❌ update error: " + (e?.message || e));
-        }
+        try{ fn(dt); }catch(e){ log("❌ update error: " + (e?.message || e)); }
       }
 
       renderer.render(scene, camera);
