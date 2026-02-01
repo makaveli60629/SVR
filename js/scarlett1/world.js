@@ -1,614 +1,647 @@
-/**
- * /js/scarlett1/world.js
- * OPTION A+ WORLD
- *
- * Goals:
- * - Bright circular lobby + pit
- * - Working stairs into pit
- * - Center pedestal + demo table + 8 seats
- * - Balcony ring + rails
- * - Store zone pads + 4 jumbotrons
- * - Simple roaming "bots" + guard placeholder
- *
- * Exposes:
- * - ctx.walkSurfaces[] (ground snap)
- * - ctx.teleportSurfaces[] (teleport reticle)
- */
+// SVR/js/scarlett1/world.js
+// A-RESTORE: full circular lobby + pit divot + aligned stairs + store + balcony + displays + jumbotrons
+// Requires Option A importmap in index.html (so 'three' + addons resolve)
+// No external textures; uses procedural CanvasTexture for carpet/walls.
 
-export async function init(ctx){
-  const { THREE, scene, Bus } = ctx;
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-  // -------------------------------------------------------------------------
-  // TEXTURE HELPERS
-  // -------------------------------------------------------------------------
-  function makeCanvasTexture(draw, size=512){
-    const c = document.createElement('canvas');
-    c.width = c.height = size;
-    const g = c.getContext('2d');
-    draw(g, size);
-    const t = new THREE.CanvasTexture(c);
-    t.colorSpace = THREE.SRGBColorSpace;
-    t.wrapS = t.wrapT = THREE.RepeatWrapping;
-    t.anisotropy = 4;
-    t.needsUpdate = true;
-    return t;
+const AVATARS = {
+  male:   './assets/avatars/male.glb',
+  female: './assets/avatars/female.glb',
+  ninja:  './assets/avatars/ninja.glb',
+  combat: './assets/avatars/combat_ninja_inspired_by_jin_roh_wolf_brigade.glb',
+};
+
+function makeCarpetTexture(){
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 512;
+  const g = c.getContext('2d');
+
+  // base
+  g.fillStyle = '#2a1047';
+  g.fillRect(0,0,c.width,c.height);
+
+  // subtle weave
+  for (let y=0;y<512;y+=8){
+    g.fillStyle = (y%16===0) ? 'rgba(255,255,255,0.035)' : 'rgba(0,0,0,0.035)';
+    g.fillRect(0,y,512,4);
+  }
+  for (let x=0;x<512;x+=10){
+    g.fillStyle = (x%20===0) ? 'rgba(0,255,255,0.025)' : 'rgba(255,0,160,0.02)';
+    g.fillRect(x,0,2,512);
   }
 
-  const carpetTex = makeCanvasTexture((g,s)=>{
-    g.fillStyle = '#1a0f1f';
-    g.fillRect(0,0,s,s);
-    // subtle pattern
-    g.strokeStyle = 'rgba(255,255,255,0.06)';
-    g.lineWidth = 2;
-    for (let i=0;i<24;i++){
-      const y = (i/24)*s;
-      g.beginPath();
-      g.moveTo(0,y);
-      g.lineTo(s,y);
-      g.stroke();
+  // ring accents
+  g.strokeStyle = 'rgba(0,220,255,0.18)';
+  g.lineWidth = 10;
+  g.beginPath(); g.arc(256,256,190,0,Math.PI*2); g.stroke();
+  g.strokeStyle = 'rgba(255,40,140,0.15)';
+  g.lineWidth = 6;
+  g.beginPath(); g.arc(256,256,232,0,Math.PI*2); g.stroke();
+
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(6,6);
+  t.anisotropy = 8;
+  return t;
+}
+
+function makeWallTexture(){
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 512;
+  const g = c.getContext('2d');
+  g.fillStyle = '#07080c';
+  g.fillRect(0,0,512,512);
+
+  // panels
+  for (let y=0;y<512;y+=64){
+    for (let x=0;x<512;x+=64){
+      g.fillStyle = ((x+y)/64)%2===0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,255,255,0.018)';
+      g.fillRect(x+3,y+3,58,58);
+      g.strokeStyle = 'rgba(255,40,140,0.06)';
+      g.strokeRect(x+3,y+3,58,58);
     }
-    // vignette
-    const grd = g.createRadialGradient(s/2,s/2,s*0.1, s/2,s/2,s*0.55);
-    grd.addColorStop(0,'rgba(0,0,0,0)');
-    grd.addColorStop(1,'rgba(0,0,0,0.55)');
-    g.fillStyle = grd;
-    g.fillRect(0,0,s,s);
-  });
-  carpetTex.repeat.set(6,6);
-
-  const tableTex = makeCanvasTexture((g,s)=>{
-    g.fillStyle = '#0f1318';
-    g.fillRect(0,0,s,s);
-
-    // pass line
-    g.strokeStyle = '#ffffff';
-    g.lineWidth = 10;
-    g.beginPath();
-    g.arc(s/2,s/2,s*0.36, 0, Math.PI*2);
-    g.stroke();
-
-    g.strokeStyle = '#00ffff';
-    g.lineWidth = 6;
-    g.beginPath();
-    g.arc(s/2,s/2,s*0.28, 0, Math.PI*2);
-    g.stroke();
-
-    // logo
-    g.fillStyle = 'rgba(255,255,255,0.92)';
-    g.font = 'bold 56px system-ui, Arial';
-    g.textAlign = 'center';
-    g.textBaseline = 'middle';
-    g.fillText('SCARLETT', s/2, s/2 - 18);
-    g.font = 'bold 38px system-ui, Arial';
-    g.fillText('POKER', s/2, s/2 + 34);
-  }, 1024);
-
-  function labelPlane(text, w=1.4, h=0.5){
-    const tex = makeCanvasTexture((g,s)=>{
-      g.fillStyle = 'rgba(0,0,0,0.55)';
-      g.fillRect(0,0,s,s);
-      g.strokeStyle = 'rgba(0,255,255,0.9)';
-      g.lineWidth = 8;
-      g.strokeRect(10,10,s-20,s-20);
-      g.fillStyle = '#ffffff';
-      g.font = 'bold 64px system-ui, Arial';
-      g.textAlign='center';
-      g.textBaseline='middle';
-      g.fillText(text, s/2, s/2);
-    }, 512);
-    const mat = new THREE.MeshStandardMaterial({ map: tex, emissive: new THREE.Color(0x001010), emissiveIntensity: 1.3, roughness: 0.7 });
-    return new THREE.Mesh(new THREE.PlaneGeometry(w,h), mat);
   }
 
-  // -------------------------------------------------------------------------
-  // LIGHTING (bright, readable)
-  // -------------------------------------------------------------------------
-  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(10,3);
+  t.anisotropy = 8;
+  return t;
+}
 
-  const sun = new THREE.DirectionalLight(0xffffff, 0.85);
-  sun.position.set(10,18,6);
-  scene.add(sun);
+function safeDispose(root){
+  root?.traverse?.(o=>{
+    if (o.geometry) o.geometry.dispose?.();
+    if (o.material){
+      if (Array.isArray(o.material)) o.material.forEach(m=>m.dispose?.());
+      else o.material.dispose?.();
+    }
+  });
+}
 
-  const core = new THREE.PointLight(0xffffff, 1.4, 140);
-  core.position.set(0,10,0);
-  scene.add(core);
+function normalizeHuman(root, targetHeight=1.7){
+  const box = new THREE.Box3().setFromObject(root);
+  const size = new THREE.Vector3();
+  const center = new THREE.Vector3();
+  box.getSize(size);
+  box.getCenter(center);
 
-  for (let i=0;i<12;i++){
-    const a = (i/12)*Math.PI*2;
-    const p = new THREE.PointLight(0x8a2be2, 1.15, 60);
-    p.position.set(Math.cos(a)*22, 5.2, Math.sin(a)*22);
+  root.position.sub(center);
+
+  const h = Math.max(size.y, size.x, size.z, 0.001);
+  const s = targetHeight / h;
+  root.scale.setScalar(s);
+
+  const box2 = new THREE.Box3().setFromObject(root);
+  root.position.y -= box2.min.y;
+}
+
+function addSoftEmissive(root){
+  root.traverse(o=>{
+    if (!o.isMesh) return;
+    const apply = (mat)=>{
+      if (!mat) return;
+      if ('emissive' in mat){
+        mat.emissive = mat.emissive || new THREE.Color(0x000000);
+        mat.emissive.add(new THREE.Color(0x001000));
+        mat.emissiveIntensity = Math.max(mat.emissiveIntensity || 0, 0.35);
+      }
+      mat.needsUpdate = true;
+    };
+    if (Array.isArray(o.material)) o.material.forEach(apply);
+    else apply(o.material);
+  });
+}
+
+function makeNeonSign(text='SCARLETT STORE'){
+  const c = document.createElement('canvas');
+  c.width = 1024; c.height = 256;
+  const g = c.getContext('2d');
+
+  g.fillStyle = 'rgba(0,0,0,0)';
+  g.clearRect(0,0,c.width,c.height);
+
+  g.font = 'bold 120px system-ui, Segoe UI, Arial';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+
+  // glow
+  g.shadowColor = 'rgba(255,40,140,0.85)';
+  g.shadowBlur = 28;
+  g.fillStyle = 'rgba(255,90,200,0.95)';
+  g.fillText(text, c.width/2, c.height/2);
+
+  // inner cyan edge
+  g.shadowColor = 'rgba(0,220,255,0.85)';
+  g.shadowBlur = 14;
+  g.fillStyle = 'rgba(220,255,255,0.9)';
+  g.fillText(text, c.width/2, c.height/2);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.anisotropy = 8;
+  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent:true });
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(5.6, 1.4), mat);
+  return mesh;
+}
+
+function makeGlassBox(w,h,d){
+  const g = new THREE.BoxGeometry(w,h,d);
+  const m = new THREE.MeshPhysicalMaterial({
+    color: 0x88ccff,
+    roughness: 0.08,
+    metalness: 0.0,
+    transmission: 0.85,
+    thickness: 0.08,
+    transparent: true,
+    opacity: 0.35,
+  });
+  return new THREE.Mesh(g,m);
+}
+
+async function loadGLB(loader, url){
+  return await loader.loadAsync(url);
+}
+
+export async function initWorld(ctx){
+  const { THREE: T, scene, Bus } = ctx;
+  const walkSurfaces = [];
+  const teleportSurfaces = [];
+  const updaters = [];
+
+  // ---------- lighting (bright, stable) ----------
+  scene.add(new T.AmbientLight(0xffffff, 0.62));
+
+  const key = new T.DirectionalLight(0xffffff, 0.85);
+  key.position.set(10, 16, 10);
+  scene.add(key);
+
+  const rim = new T.DirectionalLight(0x77ccff, 0.55);
+  rim.position.set(-12, 10, -10);
+  scene.add(rim);
+
+  const top = new T.PointLight(0xffffff, 1.15, 140);
+  top.position.set(0, 12.5, 0);
+  scene.add(top);
+
+  // ring lights
+  for (let i=0;i<10;i++){
+    const a = (i/10)*Math.PI*2;
+    const p = new T.PointLight(i%2?0xff2a8a:0x00d6ff, 0.75, 40);
+    p.position.set(Math.cos(a)*10.5, 6.6, Math.sin(a)*10.5);
     scene.add(p);
   }
 
-  // -------------------------------------------------------------------------
-  // GEOMETRY: LOBBY + PIT
-  // -------------------------------------------------------------------------
-  const walkSurfaces = [];
-  const teleportSurfaces = [];
-  ctx.walkSurfaces = walkSurfaces;
-  ctx.teleportSurfaces = teleportSurfaces;
+  // ---------- dimensions ----------
+  const outerR = 22.0;
+  const wallR  = 24.0;
+  const pitR   = 7.2;
+  const pitDepth = 3.4;
 
-  // Lobby floor (carpet)
-  const lobbyR = 28;
-  const floor = new THREE.Mesh(
-    new THREE.CircleGeometry(lobbyR, 96),
-    new THREE.MeshStandardMaterial({ map: carpetTex, roughness: 0.95, metalness: 0.0 })
+  const entranceAngle = Math.PI/2; // +Z side entrance for stairs
+
+  // ---------- materials ----------
+  const carpetTex = makeCarpetTexture();
+  const wallTex = makeWallTexture();
+
+  const matCarpet = new T.MeshStandardMaterial({
+    map: carpetTex,
+    color: 0xffffff,
+    roughness: 0.98,
+    metalness: 0.0
+  });
+
+  const matPitWall = new T.MeshStandardMaterial({
+    map: wallTex,
+    color: 0xffffff,
+    roughness: 0.9,
+    metalness: 0.0,
+    side: T.DoubleSide
+  });
+
+  const matDark = new T.MeshStandardMaterial({ color: 0x0b0c12, roughness: 0.95, metalness: 0.0 });
+  const matRail = new T.MeshStandardMaterial({
+    color: 0x00d6ff,
+    roughness: 0.25,
+    metalness: 0.75,
+    emissive: new T.Color(0x001018),
+    emissiveIntensity: 1.35
+  });
+  const matTrim = new T.MeshStandardMaterial({
+    color: 0xff2a8a,
+    roughness: 0.25,
+    metalness: 0.25,
+    emissive: new T.Color(0x250010),
+    emissiveIntensity: 2.2
+  });
+
+  // ---------- lobby floor (walkable) ----------
+  const floor = new T.Mesh(
+    new T.CylinderGeometry(outerR, outerR, 0.30, 120, 1, false),
+    matCarpet
   );
-  floor.rotation.x = -Math.PI/2;
-  floor.position.y = 0;
+  floor.position.y = 0.0;
   scene.add(floor);
   walkSurfaces.push(floor);
   teleportSurfaces.push(floor);
 
-  // Lobby outer wall
-  const wall = new THREE.Mesh(
-    new THREE.CylinderGeometry(lobbyR, lobbyR, 8.0, 96, 1, true),
-    new THREE.MeshStandardMaterial({ color: 0x05050a, roughness: 0.85, metalness: 0.08, side: THREE.DoubleSide })
+  // ---------- lobby walls (sealed) ----------
+  const walls = new T.Mesh(
+    new T.CylinderGeometry(wallR, wallR, 9.0, 140, 1, true),
+    matPitWall
   );
-  wall.position.y = 4.0;
-  scene.add(wall);
+  walls.position.y = 4.4;
+  scene.add(walls);
 
-  // Neon rail ring
-  const rail = new THREE.Mesh(
-    new THREE.TorusGeometry(lobbyR-1.0, 0.09, 10, 140),
-    new THREE.MeshStandardMaterial({ color: 0x001018, emissive: 0x00ffff, emissiveIntensity: 2.0, roughness: 0.35 })
+  // ---------- ceiling ----------
+  const ceiling = new T.Mesh(
+    new T.CylinderGeometry(wallR, wallR, 0.25, 140),
+    new T.MeshStandardMaterial({ color: 0x06070b, roughness: 0.95 })
   );
-  rail.rotation.x = Math.PI/2;
-  rail.position.y = 1.1;
-  scene.add(rail);
+  ceiling.position.y = 9.0;
+  scene.add(ceiling);
 
-  // Pit cylinder
-  const pitR = 6.3;
-  const pitY = -2.1;
-
-  const pitWall = new THREE.Mesh(
-    new THREE.CylinderGeometry(pitR, pitR, 4.6, 72, 1, true),
-    new THREE.MeshStandardMaterial({ color: 0x090915, roughness: 0.95, metalness: 0.0, side: THREE.DoubleSide })
+  // ---------- pit divot (open, no disk cover) ----------
+  const pitWall = new T.Mesh(
+    new T.CylinderGeometry(pitR, pitR, pitDepth, 120, 1, true),
+    matPitWall
   );
-  pitWall.position.y = pitY - 0.7;
+  pitWall.position.y = -pitDepth/2 - 0.05;
   scene.add(pitWall);
 
-  // Pit floor
-  const pitFloor = new THREE.Mesh(
-    new THREE.CircleGeometry(pitR-0.15, 72),
-    new THREE.MeshStandardMaterial({ color: 0x0a0a12, roughness: 0.95, metalness: 0.0 })
+  const pitBottom = new T.Mesh(
+    new T.CylinderGeometry(pitR-0.35, pitR-0.35, 0.24, 120),
+    new T.MeshStandardMaterial({ color: 0x14121c, roughness: 0.95 })
   );
-  pitFloor.rotation.x = -Math.PI/2;
-  pitFloor.position.y = pitY - 3.0;
-  scene.add(pitFloor);
-  walkSurfaces.push(pitFloor);
-  teleportSurfaces.push(pitFloor);
+  pitBottom.position.y = -pitDepth - 0.17;
+  scene.add(pitBottom);
+  walkSurfaces.push(pitBottom);
+  teleportSurfaces.push(pitBottom);
 
-  // Lip ring (visual)
-  const lip = new THREE.Mesh(
-    new THREE.TorusGeometry(pitR, 0.16, 12, 128),
-    new THREE.MeshStandardMaterial({ color: 0x00c8ff, emissive: 0x0077ff, emissiveIntensity: 1.6, roughness: 0.4 })
+  // ---------- pit trim (does NOT block stairs; arc gap at entrance) ----------
+  // Create a trim arc that leaves a gap centered at entranceAngle
+  const gap = 0.55; // radians gap width
+  const arcLen = Math.PI*2 - gap;
+  const start = entranceAngle + gap/2;
+  const trimArc = new T.Mesh(
+    new T.TorusGeometry(pitR + 0.12, 0.09, 14, 180, arcLen),
+    matTrim
   );
-  lip.rotation.x = Math.PI/2;
-  lip.position.y = 0.04;
-  scene.add(lip);
+  trimArc.rotation.x = Math.PI/2;
+  trimArc.rotation.z = start;
+  trimArc.position.y = 0.08;
+  scene.add(trimArc);
 
-  // -------------------------------------------------------------------------
-  // STAIRS (walkable ramp steps into pit)
-  // -------------------------------------------------------------------------
-  const stairs = new THREE.Group();
-  stairs.name = 'Stairs';
+  // ---------- pit rail (with entrance opening aligned to stairs) ----------
+  const railArc = new T.Mesh(
+    new T.TorusGeometry(pitR + 0.72, 0.10, 10, 220, arcLen),
+    matRail
+  );
+  railArc.rotation.x = Math.PI/2;
+  railArc.rotation.z = start;
+  railArc.position.y = 1.02;
+  scene.add(railArc);
+
+  // posts excluding the entrance range
+  const postCount = 28;
+  for (let i=0;i<postCount;i++){
+    const a = (i/postCount)*Math.PI*2;
+    // skip in entrance wedge
+    const da = Math.atan2(Math.sin(a-entranceAngle), Math.cos(a-entranceAngle));
+    if (Math.abs(da) < gap/2) continue;
+
+    const post = new T.Mesh(
+      new T.CylinderGeometry(0.06,0.06,1.02, 12),
+      matRail
+    );
+    post.position.set(Math.cos(a)*(pitR+0.72), 0.52, Math.sin(a)*(pitR+0.72));
+    scene.add(post);
+  }
+
+  // ---------- stairs down (curved-ish, hugged to wall) ----------
+  // We use a short stepped ramp: 7–9 steps; you asked for ~6 but this fits cleanly.
+  const steps = 8;
+  const stepH = pitDepth / steps;
+  const stepD = 0.62;
+  const stepW = 2.3;
+
+  const stairs = new T.Group();
+  stairs.name = 'stairs';
+  // Place at entranceAngle (+Z); face toward center
+  stairs.position.set(0, 0, pitR + 0.45);
+  stairs.rotation.y = Math.PI; // toward -Z
   scene.add(stairs);
 
-  const steps = 18;
-  const stepW = 2.4;
-  const stepH = 0.16;
-  const stepD = 0.55;
-  const startY = 0.0;
-  const endY = pitFloor.position.y + 0.02;
-  const totalDrop = startY - endY;
-  const dy = totalDrop / steps;
+  const matStair = new T.MeshStandardMaterial({ color: 0x242733, roughness: 0.95 });
 
-  const stepMat = new THREE.MeshStandardMaterial({ color: 0x12121a, roughness: 0.95 });
-  const stairAngle = Math.PI/2; // entrance facing +X
+  // top landing
+  const topLand = new T.Mesh(new T.BoxGeometry(stepW, 0.20, 1.35), matStair);
+  topLand.position.set(0, 0.10, -0.85);
+  stairs.add(topLand);
+  walkSurfaces.push(topLand); teleportSurfaces.push(topLand);
 
+  // steps
   for (let i=0;i<steps;i++){
-    const t = i/(steps-1);
-    const y = startY - dy*i - stepH/2;
-    const r = THREE.MathUtils.lerp(pitR+2.4, pitR-1.0, t);
-
-    const step = new THREE.Mesh(
-      new THREE.BoxGeometry(stepW, stepH, stepD),
-      stepMat
-    );
-
-    step.position.set(
-      Math.cos(stairAngle)*r,
-      y,
-      Math.sin(stairAngle)*r
-    );
-    step.lookAt(0, y, 0);
-    stairs.add(step);
-    walkSurfaces.push(step);
-    teleportSurfaces.push(step);
+    const y = -(i+1)*stepH;
+    const z = -(i*stepD);
+    const s = new T.Mesh(new T.BoxGeometry(stepW, 0.20, stepD), matStair);
+    s.position.set(0, y + 0.10, z);
+    stairs.add(s);
+    walkSurfaces.push(s); teleportSurfaces.push(s);
   }
 
-  // -------------------------------------------------------------------------
-  // CENTER PEDESTAL + DEMO TABLE + 8 SEATS
-  // -------------------------------------------------------------------------
-  const pedestal = new THREE.Mesh(
-    new THREE.CylinderGeometry(3.2, 3.2, 1.25, 64),
-    new THREE.MeshStandardMaterial({ color: 0x101018, roughness: 0.8, metalness: 0.15 })
+  // bottom landing at pit floor
+  const bottomLand = new T.Mesh(new T.BoxGeometry(stepW, 0.20, 1.35), matStair);
+  bottomLand.position.set(0, -pitDepth - 0.10, -((steps-1)*stepD) - 0.85);
+  stairs.add(bottomLand);
+  walkSurfaces.push(bottomLand); teleportSurfaces.push(bottomLand);
+
+  // stairs rail (RIGHT side; clean single curve)
+  const railCurve = new T.CatmullRomCurve3([
+    new T.Vector3(stepW/2 + 0.26, 1.05, -0.95),
+    new T.Vector3(stepW/2 + 0.26, 0.75, -1.75),
+    new T.Vector3(stepW/2 + 0.26, 0.25, -3.00),
+    new T.Vector3(stepW/2 + 0.26, -0.55, -4.45),
+    new T.Vector3(stepW/2 + 0.26, -1.40, -5.75),
+  ]);
+  const stairRail = new T.Mesh(
+    new T.TubeGeometry(railCurve, 120, 0.06, 10, false),
+    matRail
   );
-  pedestal.position.set(0, pitFloor.position.y + 0.62, 0);
+  stairs.add(stairRail);
+
+  // ---------- center table pedestal + table + 8 seats ----------
+  const pedestal = new T.Mesh(
+    new T.CylinderGeometry(1.55, 1.75, 0.85, 64),
+    new T.MeshStandardMaterial({ color: 0x0e1016, roughness: 0.7, metalness: 0.2 })
+  );
+  pedestal.position.set(0, -pitDepth + 0.30, 0);
   scene.add(pedestal);
-  walkSurfaces.push(pedestal);
-  teleportSurfaces.push(pedestal);
 
-  const tableTop = new THREE.Mesh(
-    new THREE.CylinderGeometry(2.1, 2.1, 0.22, 64),
-    new THREE.MeshStandardMaterial({ map: tableTex, roughness: 0.55, metalness: 0.1 })
+  const tableTop = new T.Mesh(
+    new T.CylinderGeometry(2.25, 2.25, 0.14, 96),
+    new T.MeshStandardMaterial({ color: 0x161b25, roughness: 0.35, metalness: 0.65 })
   );
-  tableTop.position.set(0, pedestal.position.y + 0.82, 0);
+  tableTop.position.set(0, -pitDepth + 0.82, 0);
   scene.add(tableTop);
-  walkSurfaces.push(tableTop);
-  teleportSurfaces.push(tableTop);
 
-  // Seats
-  const seatGroup = new THREE.Group();
-  seatGroup.name = 'Seats';
-  scene.add(seatGroup);
+  // pass-line + logo ring (visual)
+  const passLine = new T.Mesh(
+    new T.TorusGeometry(1.55, 0.03, 10, 140),
+    new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35, metalness: 0.2 })
+  );
+  passLine.rotation.x = Math.PI/2;
+  passLine.position.set(0, -pitDepth + 0.90, 0);
+  scene.add(passLine);
 
-  const seatMat = new THREE.MeshStandardMaterial({ color: 0x1b1b24, roughness: 0.75 });
+  const logo = new T.Mesh(
+    new T.CircleGeometry(0.55, 48),
+    new T.MeshStandardMaterial({ color: 0xff2a8a, roughness: 0.3, metalness: 0.25, emissive: new T.Color(0x250010), emissiveIntensity: 2.0 })
+  );
+  logo.rotation.x = -Math.PI/2;
+  logo.position.set(0, -pitDepth + 0.91, 0);
+  scene.add(logo);
+
+  // 8 seats
+  const seatR = 3.0;
   for (let i=0;i<8;i++){
     const a = (i/8)*Math.PI*2;
-    const seat = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.22, 0.7, 8, 16),
-      seatMat
+    const seat = new T.Mesh(
+      new T.BoxGeometry(0.55, 0.75, 0.55),
+      new T.MeshStandardMaterial({ color: 0x2a2f3a, roughness: 0.92 })
     );
-    seat.position.set(Math.cos(a)*3.6, pedestal.position.y + 0.55, Math.sin(a)*3.6);
+    seat.position.set(Math.cos(a)*seatR, -pitDepth + 0.40, Math.sin(a)*seatR);
     seat.lookAt(0, seat.position.y, 0);
-    seatGroup.add(seat);
+    scene.add(seat);
   }
 
-  // -------------------------------------------------------------------------
-  // BALCONY (upper ring) + SIMPLE RAMP UP
-  // -------------------------------------------------------------------------
-  const balconyY = 3.2;
-  const balconyR = 22.0;
+  // ---------- store + balcony (ONLY above store) ----------
+  // Place store at -Z (south)
+  const store = new T.Group();
+  store.name = 'store';
+  store.position.set(0, 0, -18.0);
+  scene.add(store);
 
-  const balcony = new THREE.Mesh(
-    new THREE.RingGeometry(balconyR-2.0, balconyR, 96),
-    new THREE.MeshStandardMaterial({ color: 0x0d0d13, roughness: 0.95, side: THREE.DoubleSide })
+  const storeFrame = new T.Mesh(
+    new T.BoxGeometry(9.0, 3.2, 1.4),
+    new T.MeshStandardMaterial({ color: 0x0d0f15, roughness: 0.9 })
   );
-  balcony.rotation.x = -Math.PI/2;
-  balcony.position.y = balconyY;
-  scene.add(balcony);
-  walkSurfaces.push(balcony);
-  teleportSurfaces.push(balcony);
+  storeFrame.position.set(0, 1.6, 0);
+  store.add(storeFrame);
 
-  const balconyRail = new THREE.Mesh(
-    new THREE.TorusGeometry(balconyR-0.6, 0.08, 10, 140),
-    new THREE.MeshStandardMaterial({ color: 0x001018, emissive: 0x00ffff, emissiveIntensity: 1.8, roughness: 0.35 })
+  // store canopy/hood
+  const hood = new T.Mesh(
+    new T.BoxGeometry(9.4, 0.30, 2.2),
+    new T.MeshStandardMaterial({ color: 0x10131a, roughness: 0.85 })
   );
-  balconyRail.rotation.x = Math.PI/2;
-  balconyRail.position.y = balconyY + 1.05;
-  scene.add(balconyRail);
+  hood.position.set(0, 3.05, 0.45);
+  store.add(hood);
 
-  // Ramp (walkable) from lobby floor to balcony
-  // A wide sloped box. Teleport works regardless, but this makes it feel like "stairs".
-  const ramp = new THREE.Mesh(
-    new THREE.BoxGeometry(3.2, 0.35, 10.5),
-    new THREE.MeshStandardMaterial({ color: 0x13131b, roughness: 0.9 })
-  );
-  ramp.position.set(-10.5, balconyY/2, -10.5);
-  ramp.rotation.x = -Math.atan2(balconyY, 10.5);
-  scene.add(ramp);
-  walkSurfaces.push(ramp);
-  teleportSurfaces.push(ramp);
-
-  // -------------------------------------------------------------------------
-  // STORE ZONE PADS
-  // -------------------------------------------------------------------------
-  const storeZone = new THREE.Group();
-  storeZone.name = 'StoreZone';
-  scene.add(storeZone);
-
-  const padMat = new THREE.MeshStandardMaterial({ color: 0x101018, roughness: 0.7, metalness: 0.2, emissive: 0x001010, emissiveIntensity: 0.8 });
-  const pad = (label, x,z) => {
-    const g = new THREE.Group();
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.75,0.75,0.12,32), padMat);
-    base.position.y = 0.06;
-    g.add(base);
-    const l = labelPlane(label, 1.5, 0.55);
-    l.position.set(0, 0.9, 0);
-    l.rotation.y = Math.PI;
-    g.add(l);
-    g.position.set(x, 0, z);
-    storeZone.add(g);
-    teleportSurfaces.push(base);
-    walkSurfaces.push(base);
-  };
-
-  pad('STORE', 16, 10);
-  pad('VIP', 19, 7);
-  pad('POKER', 13, 7);
-
-  // Avatar display windows inside the Store area (glass showcases)
-  await buildStoreDisplayWindows(ctx, {
-    origin: new ctx.THREE.Vector3(19.6, 0, 12.4),
-    facing: -Math.PI/2,
-  });
-
-  // -------------------------------------------------------------------------
-  // JUMBOTRONS (4)
-  // -------------------------------------------------------------------------
-  const jumboMat = new THREE.MeshStandardMaterial({
-    color: 0x05070c,
-    emissive: 0x2222ff,
-    emissiveIntensity: 1.2,
-    roughness: 0.5,
-    metalness: 0.2
-  });
-
-  const jumbo = (x,z,ry) => {
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(4.4, 2.6, 0.25), new THREE.MeshStandardMaterial({ color: 0x0b0b10, roughness: 0.8 }));
-    frame.position.set(x, 5.2, z);
-    frame.rotation.y = ry;
-
-    const screen = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 2.2), jumboMat);
-    screen.position.set(x, 5.2, z);
-    screen.rotation.y = ry;
-    // offset slightly forward
-    screen.translateZ(0.14);
-
-    scene.add(frame);
-    scene.add(screen);
-  };
-
-  jumbo(0,  (lobbyR-0.6),  Math.PI);
-  jumbo(0, -(lobbyR-0.6),  0);
-  jumbo( (lobbyR-0.6), 0, -Math.PI/2);
-  jumbo(-(lobbyR-0.6), 0,  Math.PI/2);
-
-  // -------------------------------------------------------------------------
-  // SIMPLE ROAMING BOTS (placeholders until GLB bots wired)
-  // -------------------------------------------------------------------------
-  const bots = new THREE.Group();
-  bots.name = 'RoamBots';
-  scene.add(bots);
-
-  const botGeo = new THREE.CapsuleGeometry(0.24, 0.95, 8, 16);
-  const botMat = new THREE.MeshStandardMaterial({ color: 0x1b1b27, roughness: 0.6, emissive: 0x090010, emissiveIntensity: 0.5 });
-  const botCount = 6;
-
-  const botData = [];
-  for (let i=0;i<botCount;i++){
-    const m = new THREE.Mesh(botGeo, botMat);
-    m.position.y = 1.05;
-    bots.add(m);
-    botData.push({
-      a: Math.random()*Math.PI*2,
-      r: 14 + Math.random()*6,
-      s: 0.15 + Math.random()*0.18
-    });
+  // under-hood spotlights
+  for (let i=-3;i<=3;i+=2){
+    const s = new T.SpotLight(0x77ccff, 1.0, 18, Math.PI/6, 0.35, 1.0);
+    s.position.set(i, 3.0, 1.2);
+    s.target.position.set(i, 1.2, 0.5);
+    store.add(s);
+    store.add(s.target);
   }
 
-  // Guard placeholder (swap to combat GLB via avatar button if desired)
-  const guard = new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.28, 1.05, 8, 16),
-    new THREE.MeshStandardMaterial({ color: 0x0b0b12, roughness: 0.7, emissive: 0x001000, emissiveIntensity: 0.9 })
-  );
-  guard.position.set(18.0, 1.15, 12.0);
-  guard.lookAt(16, 1.15, 10);
-  scene.add(guard);
+  // store sign
+  const sign = makeNeonSign('SCARLETT STORE');
+  sign.position.set(0, 2.35, 0.72);
+  store.add(sign);
 
-  // -------------------------------------------------------------------------
-  // ANIMATE HOOK
-  // -------------------------------------------------------------------------
-  ctx.__worldTick = (dt) => {
-    // bots walk in a circle and occasionally wobble
-    for (let i=0;i<botCount;i++){
-      const d = botData[i];
-      d.a += d.s * dt;
-      const x = Math.cos(d.a)*d.r;
-      const z = Math.sin(d.a)*d.r;
-      const m = bots.children[i];
-      m.position.x = x;
-      m.position.z = z;
-      m.lookAt(Math.cos(d.a+0.02)*d.r, 1.05, Math.sin(d.a+0.02)*d.r);
+  // balcony platform above store
+  const balconyPlat = new T.Mesh(
+    new T.BoxGeometry(9.6, 0.22, 4.2),
+    new T.MeshStandardMaterial({ color: 0x0b0c12, roughness: 0.95 })
+  );
+  balconyPlat.position.set(0, 4.1, -0.4);
+  store.add(balconyPlat);
+
+  // balcony rails
+  const railH = 0.95;
+  const railThickness = 0.08;
+  const railMat = matRail;
+
+  const railFront = new T.Mesh(new T.BoxGeometry(9.6, railThickness, railThickness), railMat);
+  railFront.position.set(0, 4.6, 1.55);
+  store.add(railFront);
+
+  const railLeft = new T.Mesh(new T.BoxGeometry(railThickness, railThickness, 4.0), railMat);
+  railLeft.position.set(-4.75, 4.6, -0.35);
+  store.add(railLeft);
+
+  const railRight = new T.Mesh(new T.BoxGeometry(railThickness, railThickness, 4.0), railMat);
+  railRight.position.set(4.75, 4.6, -0.35);
+  store.add(railRight);
+
+  // posts
+  for (let x=-4.6; x<=4.6; x+=1.15){
+    const p = new T.Mesh(new T.CylinderGeometry(0.05,0.05,railH,10), railMat);
+    p.position.set(x, 4.15 + railH/2, 1.55);
+    store.add(p);
+  }
+
+  // ---------- store display windows with avatars ----------
+  const loader = new GLTFLoader();
+  loader.setCrossOrigin('anonymous');
+
+  async function spawnShowcase(key, localX){
+    const booth = new T.Group();
+    booth.position.set(localX, 0, 0.85);
+    store.add(booth);
+
+    // pedestal
+    const ped = new T.Mesh(
+      new T.CylinderGeometry(0.62, 0.72, 0.38, 32),
+      new T.MeshStandardMaterial({ color: 0x10131a, roughness: 0.85 })
+    );
+    ped.position.set(0, 0.19, 0);
+    booth.add(ped);
+
+    // glass
+    const glass = makeGlassBox(1.55, 2.35, 1.25);
+    glass.position.set(0, 1.2, 0);
+    booth.add(glass);
+
+    // light
+    const p = new T.PointLight(0x77ccff, 1.0, 8);
+    p.position.set(0, 2.0, 0.7);
+    booth.add(p);
+
+    // avatar
+    const url = AVATARS[key];
+    if (!url) return;
+
+    try{
+      const gltf = await loadGLB(loader, url);
+      const root = gltf.scene || gltf.scenes?.[0];
+      if (!root) return;
+
+      addSoftEmissive(root);
+      normalizeHuman(root, 1.65);
+      root.position.set(0, 0.0, 0);
+      root.rotation.y = Math.PI;
+      booth.add(root);
+
+      // slow rotate
+      updaters.push((dt)=> { booth.rotation.y += dt * 0.35; });
+
+      Bus?.log?.(`STORE DISPLAY: ${key} ok`);
+    }catch(e){
+      Bus?.log?.(`STORE DISPLAY FAIL: ${key} ${(e?.message||e)}`);
     }
-  };
+  }
 
-  Bus?.log?.('WORLD: lobby + pit + stairs + pedestal table loaded');
-}
+  await spawnShowcase('male',   -3.0);
+  await spawnShowcase('female', -1.0);
+  await spawnShowcase('ninja',   1.0);
+  await spawnShowcase('combat',  3.0);
 
-
-// =============================================================================
-// Helpers: Store avatar showcases (no folder moves; uses CDN GLTFLoader)
-// =============================================================================
-async function buildStoreDisplayWindows(ctx, { origin, facing = 0 } = {}) {
-  const { THREE, scene, Bus } = ctx;
-  try {
-    // GLTFLoader from CDN (works on GitHub Pages; avoids bare specifier 'three')
-    const mod = await import('https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js');
-    const GLTFLoader = mod.GLTFLoader;
-    const loader = new GLTFLoader();
-    loader.setCrossOrigin('anonymous');
-
-    const avatarList = [
-      { key: 'male',   label: 'MALE',   url: './assets/avatars/male.glb' },
-      { key: 'female', label: 'FEMALE', url: './assets/avatars/female.glb' },
-      { key: 'ninja',  label: 'NINJA',  url: './assets/avatars/ninja.glb' },
-      { key: 'combat', label: 'COMBAT', url: './assets/avatars/combat_ninja_inspired_by_jin_roh_wolf_brigade.glb' },
-    ];
-
-    const g = new THREE.Group();
-    g.name = 'StoreShowcases';
+  // ---------- 4 doors + 4 jumbotrons ----------
+  function addDoorAndJumbo(angle, label='ROOM'){
+    const g = new T.Group();
+    const r = wallR - 0.8;
+    const x = Math.cos(angle)*r;
+    const z = Math.sin(angle)*r;
+    g.position.set(x, 0, z);
+    g.rotation.y = -angle + Math.PI/2;
     scene.add(g);
 
-    const base = origin || new THREE.Vector3(19.6, 0, 12.4);
-
-    // wall backer
-    const wall = new THREE.Mesh(
-      new THREE.BoxGeometry(0.35, 4.2, 10.8),
-      new THREE.MeshStandardMaterial({ color: 0x0b0b12, roughness: 0.85, metalness: 0.05 })
+    const door = new T.Mesh(
+      new T.BoxGeometry(3.2, 3.2, 0.28),
+      new T.MeshStandardMaterial({ color: 0x0d0f15, roughness: 0.85 })
     );
-    wall.position.copy(base).add(new THREE.Vector3(0.0, 2.1, 0.0));
-    wall.rotation.y = facing;
-    g.add(wall);
+    door.position.set(0, 1.6, 0);
+    g.add(door);
 
-    const glassMat = new THREE.MeshPhysicalMaterial({
-      color: 0x0b2a44,
-      roughness: 0.05,
-      metalness: 0.0,
-      transmission: 0.85,
-      transparent: true,
-      opacity: 0.35,
-      thickness: 0.15,
-      ior: 1.45,
-      emissive: new THREE.Color(0x001018),
-      emissiveIntensity: 0.6,
-    });
+    const frame = new T.Mesh(
+      new T.BoxGeometry(3.5, 3.5, 0.12),
+      matRail
+    );
+    frame.position.set(0, 1.6, 0.12);
+    g.add(frame);
 
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x11111a, roughness: 0.6, metalness: 0.2 });
-    const pedestalMat = new THREE.MeshStandardMaterial({ color: 0x17171f, roughness: 0.75, metalness: 0.1, emissive: 0x001000, emissiveIntensity: 0.4 });
+    const jumbo = new T.Mesh(
+      new T.PlaneGeometry(5.6, 3.0),
+      new T.MeshStandardMaterial({ color: 0x11131a, roughness: 0.45, metalness: 0.4, emissive: new T.Color(0x001018), emissiveIntensity: 2.0 })
+    );
+    jumbo.position.set(0, 5.8, 0.16);
+    g.add(jumbo);
 
-    const spacing = 2.55;
-    const startZ = +3.8;
-
-    // lighting for the wall
-    const strip = new THREE.RectAreaLight(0x66ccff, 10.0, 1.2, 10.0);
-    strip.position.copy(base).add(new THREE.Vector3(-0.55, 2.7, 0));
-    strip.rotation.y = facing + Math.PI/2;
+    // tiny label strip
+    const strip = new T.Mesh(
+      new T.PlaneGeometry(3.2, 0.5),
+      new T.MeshBasicMaterial({ color: 0xff2a8a })
+    );
+    strip.position.set(0, 4.0, 0.16);
     g.add(strip);
 
-    const floorSpot = new THREE.PointLight(0x8a2be2, 1.3, 12);
-    floorSpot.position.copy(base).add(new THREE.Vector3(-1.1, 3.2, 0));
-    g.add(floorSpot);
-
-    // Make a tiny label texture
-    function makeLabel(text) {
-      const c = document.createElement('canvas');
-      c.width = 512; c.height = 128;
-      const ctx2 = c.getContext('2d');
-      ctx2.clearRect(0,0,c.width,c.height);
-      ctx2.fillStyle = 'rgba(0,0,0,0.0)';
-      ctx2.fillRect(0,0,c.width,c.height);
-      ctx2.font = 'bold 72px Arial';
-      ctx2.textAlign = 'center';
-      ctx2.textBaseline = 'middle';
-      ctx2.fillStyle = '#bff6ff';
-      ctx2.shadowColor = '#00ffff';
-      ctx2.shadowBlur = 18;
-      ctx2.fillText(text, c.width/2, c.height/2);
-      const tex = new THREE.CanvasTexture(c);
-      tex.anisotropy = 2;
-      return tex;
-    }
-
-    // A simple normalizer similar to your avatar manager
-    function normalize(root, targetHeight = 1.75) {
-      const box = new THREE.Box3().setFromObject(root);
-      const size = new THREE.Vector3();
-      const center = new THREE.Vector3();
-      box.getSize(size);
-      box.getCenter(center);
-      root.position.sub(center);
-
-      const h = Math.max(size.y, 0.001);
-      const s = targetHeight / h;
-      root.scale.setScalar(s);
-
-      const box2 = new THREE.Box3().setFromObject(root);
-      root.position.y -= box2.min.y;
-    }
-
-    // Build each window
-    for (let i = 0; i < avatarList.length; i++) {
-      const a = avatarList[i];
-      const zOff = startZ - i * spacing;
-
-      const cell = new THREE.Group();
-      cell.name = `Showcase_${a.key}`;
-      cell.position.copy(base).add(new THREE.Vector3(-0.35, 0, zOff));
-      cell.rotation.y = facing;
-      g.add(cell);
-
-      // frame
-      const frame = new THREE.Mesh(new THREE.BoxGeometry(1.65, 2.65, 0.18), frameMat);
-      frame.position.set(-0.22, 1.55, 0);
-      cell.add(frame);
-
-      // glass in front (slightly offset)
-      const glass = new THREE.Mesh(new THREE.PlaneGeometry(1.48, 2.42), glassMat);
-      glass.position.set(-0.14, 1.55, 0.11);
-      cell.add(glass);
-
-      // pedestal
-      const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.28, 32), pedestalMat);
-      pedestal.position.set(-0.18, 0.16, -0.05);
-      cell.add(pedestal);
-
-      // label
-      const labelTex = makeLabel(a.label);
-      const label = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.2, 0.28),
-        new THREE.MeshBasicMaterial({ map: labelTex, transparent: true })
-      );
-      label.position.set(-0.18, 0.46, 0.10);
-      cell.add(label);
-
-      // local light per window
-      const l = new THREE.PointLight(0x00ffff, 0.85, 6.5);
-      l.position.set(-0.85, 2.35, 0.55);
-      cell.add(l);
-
-      // avatar
-      try {
-        const gltf = await loader.loadAsync(a.url);
-        const root = gltf.scene || gltf.scenes?.[0];
-        if (!root) throw new Error('No scene in GLB');
-
-        root.traverse((o) => {
-          if (!o.isMesh) return;
-          const m = o.material;
-          const apply = (mat) => {
-            if (!mat) return;
-            if ('emissive' in mat) {
-              mat.emissive = mat.emissive || new THREE.Color(0x000000);
-              mat.emissive.add(new THREE.Color(0x001000));
-              mat.emissiveIntensity = Math.max(mat.emissiveIntensity || 0, 0.55);
-            }
-            mat.needsUpdate = true;
-          };
-          if (Array.isArray(m)) m.forEach(apply); else apply(m);
-        });
-
-        normalize(root, 1.7);
-        root.position.set(-0.18, 0.28, -0.05);
-        root.rotation.y = Math.PI; // face outward
-        cell.add(root);
-
-        // slow showroom spin
-        root.userData.__spin = 0.2 + i * 0.06;
-      } catch (e) {
-        Bus?.log?.(`STORE AVATAR FAIL (${a.key}): ${e?.message || e}`);
-        const fallback = new THREE.Mesh(
-          new THREE.CapsuleGeometry(0.22, 0.9, 8, 16),
-          new THREE.MeshStandardMaterial({ color: 0x142235, roughness: 0.7, emissive: 0x001018, emissiveIntensity: 1.0 })
-        );
-        fallback.position.set(-0.18, 0.65, -0.05);
-        cell.add(fallback);
-      }
-    }
-
-    // rotate showroom avatars via Spine render loop
-    const prevUpdate = ctx.worldUpdate;
-    ctx.worldUpdate = (dt) => {
-      if (prevUpdate) prevUpdate(dt);
-      g.traverse((o) => {
-        const s = o.userData?.__spin;
-        if (s) o.rotation.y += s * dt;
-      });
-    };
-    Bus?.log?.('STORE: avatar display windows loaded');
-  } catch (e) {
-    Bus?.log?.(`STORE: display windows unavailable (${e?.message || e})`);
+    return g;
   }
-}
+
+  addDoorAndJumbo(0, 'POKER');
+  addDoorAndJumbo(Math.PI/2, 'VIP');
+  addDoorAndJumbo(Math.PI, 'ARCADE');
+  addDoorAndJumbo(-Math.PI/2, 'LOUNGE');
+
+  // ---------- guard at stair entrance (combat) ----------
+  async function spawnGuard(){
+    const guardGroup = new T.Group();
+    guardGroup.position.set(0, 0, pitR + 2.0);
+    guardGroup.rotation.y = Math.PI;
+    scene.add(guardGroup);
+
+    try{
+      const gltf = await loadGLB(loader, AVATARS.combat);
+      const root = gltf.scene || gltf.scenes?.[0];
+      if (!root) throw new Error('no scene');
+      addSoftEmissive(root);
+      normalizeHuman(root, 1.75);
+      root.position.set(0, 0, 0);
+      guardGroup.add(root);
+      Bus?.log?.('GUARD: combat ok');
+    }catch(e){
+      // fallback capsule
+      const cap = new T.Mesh(
+        new T.CapsuleGeometry(0.28, 1.0, 8, 16),
+        new T.MeshStandardMaterial({ color: 0x13141b, roughness: 0.9 })
+      );
+      cap.position.set(0, 1.0, 0);
+      guardGroup.add(cap);
+      Bus?.log?.('GUARD: fallback');
+    }
+  }
+  await spawnGuard();
+
+  // ---------- roaming bots (lightweight) ----------
+  function spawnWalker(i){
+    const bot = new T.Mesh(
+      new T.CapsuleGeometry(0.22, 0.85, 8, 16),
+      new T.MeshStandardMaterial({ color: i%2?0x222233:0x1a1e28, roughness: 0.85 })
+    );
+    bot.position.set( (Math.random()*2-1)*10, 1.0, (Math.random()*2-1)*10 );
+    scene.add(bot);
+
+    const speed = 0.55 + Math.random()*0.4;
+    const radius = 9.5 + Math.random()*3.0;
+    let t = Math.random()*Math.PI*2;
+
+    updaters.push((dt)=>{
+      t += dt*speed;
+      bot.position.x = Math.cos(t)*radius;
+      bot.position.z = Math.sin(t)*radius;
+      bot.position.y = 1.0;
+      bot.lookAt(0,1.0,0);
+    });
+  }
+  for (let i=0;i<4;i++) spawnWalker(i);
+
+  // ---------- hand off world update to spine ----------
+  ctx.worldUpdate = (dt)=> { for (const fn of updaters) fn(dt); };
+
+  Bus?.log?.('A-RESTORE world loaded ✅ (pit + stairs + store + balcony + table)');
+  return { walkSurfaces, teleportSurfaces };
+    }
