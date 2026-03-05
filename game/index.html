@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+<script src="./systems/hands.js"></script>
+<script src="./systems/teleport.js"></script>
+<script src="./systems/poker.js"></script>
+
+</head>
+
+<body>
+
+<a-scene vr-hands teleport-system poker-table>
+
+<a-sky color="#000"></a-sky>
+
+<a-entity light="type:ambient; intensity:1"></a-entity>
+
+<a-entity id="player"
+          position="0 1.6 3"
+          rotation="0 180 0">
+
+<a-camera></a-camera>
+
+</a-entity>
+
+<a-entity id="table"
+          position="0 0 -3"
+          gltf-model="/assets/table.glb"
+          scale="1 1 1">
+</a-entity>
+
+</a-scene>
+
+</body>
+</html>
