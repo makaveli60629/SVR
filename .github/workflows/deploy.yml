@@ -1,23 +1,49 @@
-name: Deploy GitHub Pages
+name: Auto Deploy
 
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
 
-      - name: Extract update zips
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Prepare site folder
         run: |
-          unzip -o update/site.zip -d .
-          unzip -o update/game.zip -d .
+          mkdir build
+          cp -r site/* build/ || true
+          cp -r game build/game || true
+
+      - name: Apply updater zips
+        run: |
+          if [ -f update/site.zip ]; then
+            echo "Applying site.zip"
+            unzip -o update/site.zip -d build
+          fi
+
+          if [ -f update/game.zip ]; then
+            echo "Applying game.zip"
+            unzip -o update/game.zip -d build
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
+        uses: actions/deploy-pages@v4
