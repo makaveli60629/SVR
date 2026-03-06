@@ -15,70 +15,63 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install unzip
         run: sudo apt-get update && sudo apt-get install -y unzip
 
-      - name: Prepare build folder
+      - name: Prepare build
         run: |
           rm -rf build
-          mkdir -p build
+          mkdir build
 
-          echo "Copying site files..."
+          # copy entire repo except github files
+          rsync -av \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'update' \
+            ./ build/
 
-          if [ -d "site" ]; then
-            cp -r site/* build/
-          fi
-
-          if [ -d "game" ]; then
-            mkdir -p build/game
-            cp -r game/* build/game/
-          fi
-
-      - name: Apply update zips safely
+      - name: Apply update zips
         run: |
 
-          flatten_zip () {
-            ZIPFILE=$1
+          flatten() {
+            ZIP=$1
             TARGET=$2
 
-            mkdir tmpzip
-            unzip -o "$ZIPFILE" -d tmpzip
+            mkdir tmp
+            unzip -o "$ZIP" -d tmp
 
-            # detect nested folder
-            if [ ! -f tmpzip/index.html ]; then
-              INNER=$(find tmpzip -mindepth 1 -maxdepth 1 -type d | head -n1)
+            if [ -f tmp/index.html ]; then
+              cp -r tmp/* "$TARGET"/
+            else
+              INNER=$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1)
               if [ -n "$INNER" ]; then
                 cp -r "$INNER"/* "$TARGET"/
               fi
-            else
-              cp -r tmpzip/* "$TARGET"/
             fi
 
-            rm -rf tmpzip
+            rm -rf tmp
           }
 
           if [ -f update/site.zip ]; then
-            echo "Applying site update..."
-            flatten_zip update/site.zip build
+            echo "Updating site"
+            flatten update/site.zip build
           fi
 
           if [ -f update/game.zip ]; then
-            echo "Applying game update..."
+            echo "Updating game"
             mkdir -p build/game
-            flatten_zip update/game.zip build/game
+            flatten update/game.zip build/game
           fi
 
       - name: Validate build
         run: |
           if [ ! -f build/index.html ]; then
-            echo "❌ ERROR: index.html missing. Deploy cancelled."
+            echo "ERROR: index.html missing"
             exit 1
           fi
-
-          echo "✅ index.html found."
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -88,5 +81,5 @@ jobs:
         with:
           path: build
 
-      - name: Deploy site
+      - name: Deploy
         uses: actions/deploy-pages@v4
