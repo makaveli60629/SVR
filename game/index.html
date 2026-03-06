@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta charset="UTF-8">
 <title>SVR Poker Game</title>
 
@@ -19,90 +18,92 @@ background:black;
 
 <script type="module">
 
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js"
+import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/loaders/GLTFLoader.js"
+import { FBXLoader } from "https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/loaders/FBXLoader.js"
 
-let scene,camera,renderer,table;
+const scene = new THREE.Scene()
 
-init();
-animate();
-
-function init(){
-
-scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
-
-camera = new THREE.PerspectiveCamera(
+const camera = new THREE.PerspectiveCamera(
 70,
 window.innerWidth/window.innerHeight,
 0.1,
-100
-);
+1000
+)
 
-/* Player spawn */
-camera.position.set(0,1.6,3);
-camera.lookAt(0,1,0);
+camera.position.set(0,1.6,4)
 
-/* Renderer */
+const renderer = new THREE.WebGLRenderer({antialias:true})
+renderer.setSize(window.innerWidth,window.innerHeight)
+document.body.appendChild(renderer.domElement)
 
-renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-document.body.appendChild(renderer.domElement);
+const light = new THREE.DirectionalLight(0xffffff,1)
+light.position.set(5,10,5)
+scene.add(light)
 
-/* Lighting */
-
-const ambient = new THREE.AmbientLight(0xffffff,0.4);
-scene.add(ambient);
-
-const light = new THREE.DirectionalLight(0xffffff,1);
-light.position.set(5,10,5);
-scene.add(light);
-
-/* Poker Table Placeholder */
-
-const tableGeometry = new THREE.CylinderGeometry(1.2,1.2,0.12,32);
-const tableMaterial = new THREE.MeshStandardMaterial({
-color:0x003300
-});
-
-table = new THREE.Mesh(tableGeometry,tableMaterial);
-table.position.y = 0.7;
-
-scene.add(table);
-
-/* Floor */
+const ambient = new THREE.AmbientLight(0x888888)
+scene.add(ambient)
 
 const floor = new THREE.Mesh(
-new THREE.PlaneGeometry(20,20),
-new THREE.MeshStandardMaterial({color:0x111111})
-);
+new THREE.PlaneGeometry(50,50),
+new THREE.MeshStandardMaterial({color:0x222222})
+)
 
-floor.rotation.x = -Math.PI/2;
+floor.rotation.x = -Math.PI/2
+scene.add(floor)
 
-scene.add(floor);
+const gltfLoader = new GLTFLoader()
+const fbxLoader = new FBXLoader()
 
-/* Resize Fix */
+/* load poker table */
 
-window.addEventListener("resize",onResize);
-
+gltfLoader.load(
+"assets/models/table.glb",
+(model)=>{
+model.scene.scale.set(1,1,1)
+model.scene.position.set(0,0,0)
+scene.add(model.scene)
 }
+)
+
+/* load player */
+
+gltfLoader.load(
+"assets/models/player.glb",
+(model)=>{
+model.scene.position.set(0,0,-3)
+scene.add(model.scene)
+}
+)
+
+/* load npc */
+
+fbxLoader.load(
+"assets/models/npc_sitting.fbx",
+(model)=>{
+model.scale.set(.01,.01,.01)
+model.position.set(2,0,0)
+scene.add(model)
+}
+)
+
+/* moon */
+
+fbxLoader.load(
+"assets/models/moon.fbx",
+(model)=>{
+model.scale.set(.02,.02,.02)
+model.position.set(0,10,-20)
+scene.add(model)
+}
+)
 
 function animate(){
-
-requestAnimationFrame(animate);
-
-renderer.render(scene,camera);
-
+requestAnimationFrame(animate)
+renderer.render(scene,camera)
 }
 
-function onResize(){
-
-camera.aspect = window.innerWidth/window.innerHeight;
-camera.updateProjectionMatrix();
-
-renderer.setSize(window.innerWidth,window.innerHeight);
-
-}
+animate()
 
 </script>
 
