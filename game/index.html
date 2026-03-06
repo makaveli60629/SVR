@@ -1,42 +1,7 @@
-
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<title>Scarlett VR Poker</title>
-<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-<style>
-body{margin:0;background:black}
-</style>
-</head>
-
-<body>
-
-<a-scene>
-
-<a-assets>
-<a-asset-item id="playerModel" src="assets/models/player.glb"></a-asset-item>
-</a-assets>
-
-<a-entity position="0 1.7 6">
-<a-camera></a-camera>
-</a-entity>
-
-<a-entity gltf-model="#playerModel" position="0 0 -3" rotation="0 180 0"></a-entity>
-
-<a-cylinder radius="2.2" height="0.3" position="0 0 -3" color="#330044"></a-cylinder>
-
-<a-torus radius="2.25" radius-tubular="0.05"
-rotation="90 0 0"
-position="0 0.16 -3"
-material="color:#ff55ff;emissive:#ff55ff"></a-torus>
-
-<a-light type="ambient" intensity="0.8"></a-light>
-<a-light type="point" intensity="2.5" color="#bb55ff" position="0 6 -3"></a-light>
-
-<a-sky color="#000"></a-sky>
-
-</a-scene>
-
+<body style="background:black;color:white;text-align:center;font-family:Arial">
+<h1>SVR Poker Game Engine</h1>
+<p>Game modules load here.</p>
 </body>
 </html>
