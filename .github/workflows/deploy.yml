@@ -1,58 +1,21 @@
-name: Auto Deploy
+- name: Prepare build
+  run: |
+    rm -rf build
+    mkdir -p build
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+    # copy site files directly into root
+    if [ -d "site" ]; then
+      cp -r site/* build/
+    fi
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+    # copy game folder
+    if [ -d "game" ]; then
+      mkdir -p build/game
+      cp -r game/* build/game/
+    fi
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Prepare build folder
-        run: |
-          rm -rf build
-          mkdir -p build
-
-          if [ -d "site" ]; then
-            cp -r site/* build/
-          fi
-
-          if [ -d "game" ]; then
-            mkdir -p build/game
-            cp -r game/* build/game/
-          fi
-
-      - name: Apply update zips
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip
-
-          if [ -f update/site.zip ]; then
-            unzip -o update/site.zip -d build
-          fi
-
-          if [ -f update/game.zip ]; then
-            unzip -o update/game.zip -d build/game
-          fi
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: build
-
-      - name: Deploy
-        uses: actions/deploy-pages@v4
+    # verify root index exists
+    if [ ! -f build/index.html ]; then
+      echo "ERROR: index.html missing in build root"
+      exit 1
+    fi
