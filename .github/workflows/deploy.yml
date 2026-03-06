@@ -16,28 +16,43 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - name: Checkout Repo
+        uses: actions/checkout@v4
 
-      - name: Prepare build
+      - name: Prepare build folder
         run: |
-          mkdir build
-          cp -r site/* build/
-          cp -r game build/game
+          rm -rf build
+          mkdir -p build
 
-      - name: Apply updates
+          if [ -d "site" ]; then
+            cp -r site/* build/
+          fi
+
+          if [ -d "game" ]; then
+            mkdir -p build/game
+            cp -r game/* build/game/
+          fi
+
+      - name: Apply update zips
         run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip
+
           if [ -f update/site.zip ]; then
             unzip -o update/site.zip -d build
           fi
 
           if [ -f update/game.zip ]; then
-            unzip -o update/game.zip -d build
+            unzip -o update/game.zip -d build/game
           fi
 
-      - uses: actions/configure-pages@v5
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: build
 
-      - uses: actions/deploy-pages@v4
+      - name: Deploy
+        uses: actions/deploy-pages@v4
