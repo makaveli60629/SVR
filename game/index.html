@@ -1,21 +1,73 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
+<title>Scarlett VR Poker</title>
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
+
 <body>
 
 <a-scene background="color:black">
 
-<a-entity id="player" position="0 1.6 3">
+<a-assets>
+<img id="tablefelt" src="assets/textures/tablefelt.png">
+</a-assets>
+
+<!-- Player Spawn -->
+<a-entity position="0 1.6 3">
 <a-camera></a-camera>
 </a-entity>
 
-<a-entity position="0 0 -3" gltf-model="assets/models/table.fbx" scale="1 1 1"></a-entity>
+<!-- Poker Table -->
+<a-cylinder
+radius="2"
+height="0.25"
+position="0 0 -3"
+material="src:#tablefelt; roughness:0.8">
+</a-cylinder>
 
-<a-entity position="0 30 -60" scale="15 15 15" gltf-model="assets/models/moon.fbx"></a-entity>
+<!-- Neon Edge -->
+<a-torus
+radius="2.05"
+radius-tubular="0.03"
+rotation="90 0 0"
+position="0 0.15 -3"
+material="color:#aa44ff; emissive:#aa44ff; emissiveIntensity:2">
+</a-torus>
+
+<!-- Seats -->
+<a-ring position="2 0.01 -3" rotation="-90 0 0"
+radius-inner="0.25" radius-outer="0.35"
+color="#aa44ff"></a-ring>
+
+<a-ring position="-2 0.01 -3" rotation="-90 0 0"
+radius-inner="0.25" radius-outer="0.35"
+color="#aa44ff"></a-ring>
+
+<a-ring position="0 0.01 -5" rotation="-90 0 0"
+radius-inner="0.25" radius-outer="0.35"
+color="#aa44ff"></a-ring>
+
+<a-ring position="0 0.01 -1" rotation="-90 0 0"
+radius-inner="0.25" radius-outer="0.35"
+color="#aa44ff"></a-ring>
+
+<!-- Moon -->
+<a-sphere position="0 25 -50"
+radius="8"
+color="#cccccc">
+</a-sphere>
+
+<!-- Lighting -->
+<a-light type="ambient" color="#666"></a-light>
+
+<a-light
+type="point"
+position="0 5 -3"
+intensity="2"
+color="#aa44ff">
+</a-light>
 
 <a-sky color="#000"></a-sky>
 
