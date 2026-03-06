@@ -11,18 +11,18 @@ permissions:
   id-token: write
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
 
       - uses: actions/checkout@v4
 
-      - name: Create build folder
+      - name: Prepare build
         run: |
           mkdir build
-          cp -r site/* build/ || true
-          cp -r game build/game || true
+          cp -r site/* build/
+          cp -r game build/game
 
       - name: Apply updates
         run: |
