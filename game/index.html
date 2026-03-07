@@ -1,3 +1,4 @@
+
 <body style="margin:0;overflow:hidden;background:black;">
 
 <div style="
@@ -7,7 +8,7 @@ left:10px;
 color:white;
 font-family:Arial;
 z-index:10;">
-SVR Poker Multiplayer Client
+SVR Poker Client
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.161/build/three.min.js"></script>
@@ -36,17 +37,21 @@ const light = new THREE.PointLight(0xffffff,2);
 light.position.set(5,10,5);
 scene.add(light);
 
-const tableGeo = new THREE.CylinderGeometry(2,2,0.3,32);
-const tableMat = new THREE.MeshStandardMaterial({color:0x006400});
-const table = new THREE.Mesh(tableGeo,tableMat);
-scene.add(table);
+const floor = new THREE.Mesh(
+new THREE.PlaneGeometry(50,50),
+new THREE.MeshStandardMaterial({color:0x111111})
+);
 
-const floorGeo = new THREE.PlaneGeometry(50,50);
-const floorMat = new THREE.MeshStandardMaterial({color:0x111111});
-const floor = new THREE.Mesh(floorGeo,floorMat);
 floor.rotation.x = -Math.PI/2;
-floor.position.y = -0.2;
 scene.add(floor);
+
+const table = new THREE.Mesh(
+new THREE.CylinderGeometry(2,2,0.3,32),
+new THREE.MeshStandardMaterial({color:0x006400})
+);
+
+table.position.y = 0.15;
+scene.add(table);
 
 function animate(){
 requestAnimationFrame(animate);
