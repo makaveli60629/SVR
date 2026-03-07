@@ -10,6 +10,7 @@ body{
 margin:0;
 overflow:hidden;
 background:black;
+font-family:Arial;
 }
 
 #ui{
@@ -17,7 +18,6 @@ position:absolute;
 top:10px;
 left:10px;
 color:white;
-font-family:Arial;
 z-index:10;
 }
 </style>
@@ -27,7 +27,7 @@ z-index:10;
 <body>
 
 <div id="ui">
-SVR Poker Client
+SVR Poker Multiplayer Client
 </div>
 
 <script type="module">
@@ -47,8 +47,10 @@ const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth,window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-camera.position.set(0,2,4);
+camera.position.set(0,2,5);
 camera.lookAt(0,0,0);
+
+scene.background = new THREE.Color(0x000000);
 
 const light = new THREE.PointLight(0xffffff,2);
 light.position.set(5,10,5);
@@ -57,36 +59,113 @@ scene.add(light);
 const ambient = new THREE.AmbientLight(0xffffff,0.6);
 scene.add(ambient);
 
+//
+// FLOOR
+//
+
 const floor = new THREE.Mesh(
-new THREE.PlaneGeometry(50,50),
+new THREE.PlaneGeometry(80,80),
 new THREE.MeshStandardMaterial({color:0x111111})
 );
 
 floor.rotation.x = -Math.PI/2;
 scene.add(floor);
 
+//
+// POKER TABLE
+//
+
 const table = new THREE.Mesh(
-new THREE.CylinderGeometry(2,2,0.3,32),
-new THREE.MeshStandardMaterial({color:0x006400})
+new THREE.CylinderGeometry(2.2,2.2,0.35,64),
+new THREE.MeshStandardMaterial({color:0x0b5d0b})
 );
 
-table.position.y = 0.15;
+table.position.y = 0.2;
 scene.add(table);
 
-const cube = new THREE.Mesh(
-new THREE.BoxGeometry(0.5,0.5,0.5),
-new THREE.MeshStandardMaterial({color:0xff0000})
+//
+// SEATS
+//
+
+const seatPositions = [
+
+[0,0,3],
+[2.5,0,1.5],
+[2.5,0,-1.5],
+[0,0,-3],
+[-2.5,0,-1.5],
+[-2.5,0,1.5]
+
+];
+
+seatPositions.forEach(pos=>{
+
+const seat = new THREE.Mesh(
+
+new THREE.BoxGeometry(0.6,0.3,0.6),
+new THREE.MeshStandardMaterial({color:0x444444})
+
 );
 
-cube.position.set(0,1,0);
-scene.add(cube);
+seat.position.set(pos[0],0.15,pos[2]);
+
+scene.add(seat);
+
+});
+
+//
+// CHICAGO SKYLINE
+//
+
+for(let i=0;i<50;i++){
+
+const height = Math.random()*8 + 2;
+
+const building = new THREE.Mesh(
+
+new THREE.BoxGeometry(
+Math.random()*2+1,
+height,
+Math.random()*2+1
+),
+
+new THREE.MeshStandardMaterial({color:0x111144})
+
+);
+
+building.position.set(
+
+(Math.random()-0.5)*70,
+height/2,
+(Math.random()-0.5)*70
+
+);
+
+scene.add(building);
+
+}
+
+//
+// MOON
+//
+
+const moon = new THREE.Mesh(
+
+new THREE.SphereGeometry(2,32,32),
+new THREE.MeshBasicMaterial({color:0xffffff})
+
+);
+
+moon.position.set(15,18,-30);
+scene.add(moon);
+
+//
+// ANIMATION
+//
 
 function animate(){
 
 requestAnimationFrame(animate);
-
-cube.rotation.x += 0.01;
-cube.rotation.y += 0.01;
 
 renderer.render(scene,camera);
 
@@ -94,10 +173,15 @@ renderer.render(scene,camera);
 
 animate();
 
+//
+// RESIZE HANDLING
+//
+
 window.addEventListener("resize",()=>{
 
 camera.aspect = window.innerWidth/window.innerHeight;
 camera.updateProjectionMatrix();
+
 renderer.setSize(window.innerWidth,window.innerHeight);
 
 });
