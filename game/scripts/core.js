@@ -1,90 +1,105 @@
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js";
 
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js'
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/loaders/GLTFLoader.js'
+import { createTable } from "./table.js";
+import { initSeats } from "./seat-system.js";
 
-let scene,camera,renderer
+import { initHands } from "../systems/hands.js";
+import { initTeleport } from "../systems/teleport.js";
+import { initPoker } from "../systems/poker.js";
 
-init()
-animate()
+//
+// Scene
+//
 
-function init(){
+const scene = new THREE.Scene();
 
-scene = new THREE.Scene()
+//
+// Camera
+//
 
-camera = new THREE.PerspectiveCamera(
-70,
+const camera = new THREE.PerspectiveCamera(
+75,
 window.innerWidth/window.innerHeight,
 0.1,
 1000
-)
+);
 
-camera.position.set(0,1.6,4)
-camera.lookAt(0,1,0)
+camera.position.set(0,10,16);
 
-renderer = new THREE.WebGLRenderer({antialias:true})
-renderer.setSize(window.innerWidth,window.innerHeight)
+//
+// Renderer
+//
 
-document.body.appendChild(renderer.domElement)
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
 
-const ambient = new THREE.AmbientLight(0xffffff,.6)
-scene.add(ambient)
+document.body.appendChild(renderer.domElement);
 
-const light = new THREE.DirectionalLight(0xffffff,1)
-light.position.set(5,10,5)
-scene.add(light)
+//
+// Lighting
+//
 
-createRooftop()
-loadTable()
-loadMoon()
+const ambient = new THREE.AmbientLight(0xffffff,1);
+scene.add(ambient);
 
-}
+const light = new THREE.PointLight(0xffffff,3);
+light.position.set(10,20,10);
+scene.add(light);
 
-function createRooftop(){
+//
+// Floor
+//
 
 const floor = new THREE.Mesh(
-new THREE.PlaneGeometry(60,60),
+
+new THREE.PlaneGeometry(200,200),
+
 new THREE.MeshStandardMaterial({color:0x111111})
-)
 
-floor.rotation.x = -Math.PI/2
-scene.add(floor)
+);
 
-}
+floor.rotation.x = -Math.PI/2;
 
-function loadTable(){
+scene.add(floor);
 
-const loader = new GLTFLoader()
+//
+// World
+//
 
-loader.load('../assets/models/table.glb',(gltf)=>{
+createTable(scene);
+initSeats(scene);
 
-const table = gltf.scene
-table.position.set(0,0,0)
-scene.add(table)
+//
+// Systems
+//
 
-})
+initHands(scene);
+initTeleport(scene,camera);
+initPoker(scene);
 
-}
-
-function loadMoon(){
-
-const geo = new THREE.SphereGeometry(4,32,32)
-
-const mat = new THREE.MeshBasicMaterial({
-color:0xffffff
-})
-
-const moon = new THREE.Mesh(geo,mat)
-
-moon.position.set(0,30,-80)
-
-scene.add(moon)
-
-}
+//
+// Loop
+//
 
 function animate(){
 
-requestAnimationFrame(animate)
+requestAnimationFrame(animate);
 
-renderer.render(scene,camera)
+renderer.render(scene,camera);
 
 }
+
+animate();
+
+//
+// Resize
+//
+
+window.addEventListener("resize",()=>{
+
+camera.aspect = window.innerWidth/window.innerHeight;
+camera.updateProjectionMatrix();
+
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+});
