@@ -1,10 +1,7 @@
-
 <html>
 
 <head>
-
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
 </head>
 
 <body>
@@ -13,7 +10,7 @@
 
 <a-sky color="#000"></a-sky>
 
-<!-- Player -->
+<!-- PLAYER -->
 
 <a-entity
 camera
@@ -22,7 +19,7 @@ look-controls
 wasd-controls>
 </a-entity>
 
-<!-- Floor -->
+<!-- FLOOR -->
 
 <a-plane
 rotation="-90 0 0"
@@ -31,16 +28,14 @@ height="40"
 color="#111">
 </a-plane>
 
-<!-- Poker Table -->
+<!-- POKER TABLE -->
 
 <a-cylinder
 position="0 1 0"
-radius="1.5"
+radius="1.6"
 height="0.2"
 color="#065f3b">
 </a-cylinder>
-
-<!-- Table Base -->
 
 <a-cylinder
 position="0 0.5 0"
@@ -49,13 +44,38 @@ height="1"
 color="#333">
 </a-cylinder>
 
-<!-- Moon Light -->
+<!-- CHAIRS -->
+
+<a-cylinder position="1.5 0.5 -1" radius="0.4" height="0.6" color="#222"></a-cylinder>
+<a-cylinder position="-1.5 0.5 -1" radius="0.4" height="0.6" color="#222"></a-cylinder>
+<a-cylinder position="1.5 0.5 1" radius="0.4" height="0.6" color="#222"></a-cylinder>
+<a-cylinder position="-1.5 0.5 1" radius="0.4" height="0.6" color="#222"></a-cylinder>
+
+<!-- NPC PLACEHOLDER -->
+
+<a-sphere
+position="1.5 1.3 -1"
+radius="0.3"
+color="#888">
+</a-sphere>
+
+<!-- MOON -->
 
 <a-sphere
 position="0 20 -30"
-radius="5"
-color="#ccc">
+radius="4"
+color="#ddd">
 </a-sphere>
+
+<!-- TELEPORT RING -->
+
+<a-ring
+position="0 0.01 3"
+rotation="-90 0 0"
+radius-inner="0.4"
+radius-outer="0.6"
+color="#9c27ff">
+</a-ring>
 
 </a-scene>
 
