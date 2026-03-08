@@ -1,35 +1,64 @@
-<!DOCTYPE html>
+
 <html>
+
 <head>
-<meta charset="utf-8">
-<title>SVR Poker</title>
 
-<style>
-
-body{
-margin:0;
-overflow:hidden;
-background:black;
-font-family:Arial;
-}
-
-#title{
-position:absolute;
-top:10px;
-left:10px;
-color:white;
-z-index:10;
-}
-
-</style>
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
 </head>
 
 <body>
 
-<div id="title">SVR Poker Multiplayer Client</div>
+<a-scene>
 
-<script type="module" src="./scripts/core.js"></script>
+<a-sky color="#000"></a-sky>
+
+<!-- Player -->
+
+<a-entity
+camera
+position="0 1.6 3"
+look-controls
+wasd-controls>
+</a-entity>
+
+<!-- Floor -->
+
+<a-plane
+rotation="-90 0 0"
+width="40"
+height="40"
+color="#111">
+</a-plane>
+
+<!-- Poker Table -->
+
+<a-cylinder
+position="0 1 0"
+radius="1.5"
+height="0.2"
+color="#065f3b">
+</a-cylinder>
+
+<!-- Table Base -->
+
+<a-cylinder
+position="0 0.5 0"
+radius="0.3"
+height="1"
+color="#333">
+</a-cylinder>
+
+<!-- Moon Light -->
+
+<a-sphere
+position="0 20 -30"
+radius="5"
+color="#ccc">
+</a-sphere>
+
+</a-scene>
 
 </body>
+
 </html>
