@@ -10,7 +10,13 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.get("/api/login",(req,res)=>{
+  res.json({error:"Use POST request"})
+})
 
+app.get("/api/register",(req,res)=>{
+  res.json({error:"Use POST request"})
+})
 // Azure SQL configuration
 const config = {
     user: process.env.DB_USER,
