@@ -19,16 +19,16 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Prepare build folder
+      - name: Prepare build
         run: |
           rm -rf dist
           mkdir dist
 
-      - name: Copy repo files
+      - name: Copy base repo
         run: |
           rsync -av --exclude='.git' --exclude='.github' --exclude='update' ./ dist/
 
-      - name: Apply update packages
+      - name: Apply update zips
         run: |
           if [ -d "update" ]; then
             for z in update/*.zip; do
@@ -42,5 +42,5 @@ jobs:
         with:
           path: dist
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         uses: actions/deploy-pages@v4
