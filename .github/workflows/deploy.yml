@@ -1,8 +1,8 @@
-name: Auto Deploy
+name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -11,75 +11,36 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install unzip
-        run: sudo apt-get update && sudo apt-get install -y unzip
-
-      - name: Prepare build
+      - name: Prepare build folder
         run: |
-          rm -rf build
-          mkdir build
+          rm -rf dist
+          mkdir dist
 
-          # copy entire repo except github files
-          rsync -av \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'update' \
-            ./ build/
-
-      - name: Apply update zips
+      - name: Copy repo files
         run: |
+          rsync -av --exclude='.git' --exclude='.github' --exclude='update' ./ dist/
 
-          flatten() {
-            ZIP=$1
-            TARGET=$2
-
-            mkdir tmp
-            unzip -o "$ZIP" -d tmp
-
-            if [ -f tmp/index.html ]; then
-              cp -r tmp/* "$TARGET"/
-            else
-              INNER=$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1)
-              if [ -n "$INNER" ]; then
-                cp -r "$INNER"/* "$TARGET"/
-              fi
-            fi
-
-            rm -rf tmp
-          }
-
-          if [ -f update/site.zip ]; then
-            echo "Updating site"
-            flatten update/site.zip build
+      - name: Apply update packages
+        run: |
+          if [ -d "update" ]; then
+            for z in update/*.zip; do
+              echo "Applying $z"
+              unzip -o "$z" -d dist
+            done
           fi
 
-          if [ -f update/game.zip ]; then
-            echo "Updating game"
-            mkdir -p build/game
-            flatten update/game.zip build/game
-          fi
-
-      - name: Validate build
-        run: |
-          if [ ! -f build/index.html ]; then
-            echo "ERROR: index.html missing"
-            exit 1
-          fi
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build
+          path: dist
 
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
