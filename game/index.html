@@ -1,26 +1,53 @@
-
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SVR Poker VR Preview</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
-
 <body>
+<a-scene background="color: #020202" renderer="colorManagement: true; physicallyCorrectLights: true">
+  <a-assets>
+    <a-asset-item id="tableModel" src="assets/models/table.glb"></a-asset-item>
+    <img id="skylineImg" src="assets/skyline/chicago_skyline.png" alt="Chicago skyline" />
+    <img id="floorImg" src="assets/texture/casino_floor.png" alt="Casino floor texture" />
+    <img id="watchImg" src="assets/ui/watch_ui.png" alt="Watch UI" />
+  </a-assets>
 
-<a-scene>
+  <a-entity position="0 1.6 3">
+    <a-camera wasd-controls look-controls></a-camera>
+  </a-entity>
 
-<a-sky color="#000"></a-sky>
+  <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly; color: #7f6cff">
+    <a-plane src="#watchImg" position="0.04 0.03 -0.08" rotation="-45 0 0" width="0.10" height="0.10" material="transparent:true"></a-plane>
+  </a-entity>
+  <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly; color: #7f6cff"></a-entity>
 
-<a-sphere position="5 15 -10" radius="3" color="#ffffff"></a-sphere>
+  <a-sky color="#020202"></a-sky>
+  <a-entity light="type: ambient; intensity: 0.85; color: #b8aaff"></a-entity>
+  <a-entity light="type: directional; intensity: 0.7; color: #ffffff" position="3 10 5"></a-entity>
 
-<a-plane position="0 5 -50" width="100" height="20" color="#222"></a-plane>
+  <a-plane src="#floorImg" rotation="-90 0 0" width="60" height="60" repeat="20 20" material="roughness: 1"></a-plane>
 
-<a-cylinder radius="1.5" height="0.3" color="#006400" position="0 0 -3"></a-cylinder>
+  <a-plane src="#skylineImg" position="0 8 -30" width="55" height="16" material="transparent:true; shader: flat"></a-plane>
+  <a-sphere position="8 16 -24" radius="3.2" color="#d7d7d7"></a-sphere>
 
-<a-box position="4 1 -4" color="red"></a-box>
+  <a-entity gltf-model="#tableModel" position="0 0 -3" scale="1 1 1"></a-entity>
 
-<a-entity camera look-controls wasd-controls position="0 1.6 2"></a-entity>
+  <a-cylinder position="1.8 0.45 -3.8" radius="0.33" height="0.7" color="#242424"></a-cylinder>
+  <a-cylinder position="-1.8 0.45 -3.8" radius="0.33" height="0.7" color="#242424"></a-cylinder>
+  <a-cylinder position="1.8 0.45 -2.0" radius="0.33" height="0.7" color="#242424"></a-cylinder>
+  <a-cylinder position="-1.8 0.45 -2.0" radius="0.33" height="0.7" color="#242424"></a-cylinder>
 
+  <a-cylinder position="0 0.02 2.6" rotation="-90 0 0" radius="0.45" height="0.03" color="#8d35ff"></a-cylinder>
+
+  <a-entity position="2.1 0 -3.6">
+    <a-box position="0 1.1 0" width="0.35" height="0.85" depth="0.3" color="#6e6e6e"></a-box>
+    <a-sphere position="0 1.75 0" radius="0.20" color="#9f9f9f"></a-sphere>
+  </a-entity>
+
+  <a-text value="SVR Poker VR Preview\nTable model loaded\nWatch anchored to left hand" color="#ffffff" align="center" position="0 2.7 -2.1" width="5"></a-text>
 </a-scene>
-
 </body>
 </html>
