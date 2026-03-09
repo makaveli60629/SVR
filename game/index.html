@@ -1,106 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<title>SVR Rooftop Casino</title>
-
-<link rel="icon" type="image/png" href="/logo.png">
-
-<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
-<style>
-body{
-margin:0;
-background:black;
-font-family:Arial;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SVR Rooftop Casino</title>
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <style>
+    html,body{margin:0;height:100%;background:#000;font-family:Arial,sans-serif;}
+    #hud{
+      position:fixed;left:14px;top:14px;z-index:10;
+      padding:12px 14px;border:1px solid rgba(180,90,255,.45);
+      border-radius:14px;background:rgba(8,8,18,.72);color:#fff;
+      line-height:1.45;font-size:14px;
+    }
+    #stick{
+      position:fixed;left:18px;bottom:18px;z-index:10;
+      width:92px;height:92px;border-radius:50%;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.25);
+      box-shadow:0 0 20px rgba(160,70,255,.18) inset;
+    }
+    #stickDot{
+      position:absolute;left:50%;top:50%;
+      width:40px;height:40px;border-radius:50%;
+      transform:translate(-50%,-50%);
+      background:#9f54ff;
+      box-shadow:0 0 18px rgba(159,84,255,.9);
+    }
+  </style>
 </head>
-
 <body>
+  <div id="hud">
+    <strong>SVR Rooftop Casino</strong><br>
+    Desktop: WASD + Mouse | T = Teleport<br>
+    Quest Controller: Grip = Teleport<br>
+    Quest Hands: Pinch fallback = Teleport<br>
+    Teleport: <span id="teleportState" style="color:#b66cff">OFF</span>
+  </div>
 
-<a-scene>
+  <div id="stick"><div id="stickDot"></div></div>
 
-<!-- LIGHTING -->
-<a-entity light="type:ambient; intensity:0.7"></a-entity>
-<a-entity light="type:directional; intensity:1" position="2 4 1"></a-entity>
+  <a-scene renderer="colorManagement: true; physicallyCorrectLights: true" background="color: #03030a">
+    <a-assets>
+      <img id="logoImg" src="/logo.png">
+    </a-assets>
 
-<!-- SKY -->
-<a-sky color="#02030a"></a-sky>
+    <a-entity light="type: ambient; intensity: 0.95; color: #b8c7ff"></a-entity>
+    <a-entity light="type: directional; intensity: 1.05; color: #ffffff" position="3 8 2"></a-entity>
+    <a-entity light="type: point; intensity: 1.2; distance: 22; color: #9f54ff" position="0 5 -6"></a-entity>
+    <a-entity light="type: point; intensity: 0.9; distance: 18; color: #38cfff" position="-6 4 -8"></a-entity>
 
-<!-- MOON -->
-<a-sphere position="0 25 -40" radius="4" color="#ccccff" emissive="#8888ff"></a-sphere>
+    <a-sky color="#05060d"></a-sky>
+    <a-sphere position="0 18 -35" radius="3.2" color="#d8dcff" material="emissive: #9ea8ff; emissiveIntensity: 0.8"></a-sphere>
 
-<!-- ROOFTOP FLOOR -->
-<a-plane rotation="-90 0 0"
-width="80"
-height="80"
-color="#101018">
-</a-plane>
+    <a-plane position="0 0 -6" rotation="-90 0 0" width="90" height="90" color="#12131d"></a-plane>
 
-<!-- POKER TABLE -->
-<a-cylinder
-position="0 1 -4"
-radius="1.8"
-height="0.4"
-color="#0a5c2e">
-</a-cylinder>
+    <a-box position="-14 6 -34" width="6" height="12" depth="6" color="#15161e"></a-box>
+    <a-box position="-8 9 -36" width="5" height="18" depth="5" color="#11131a"></a-box>
+    <a-box position="-2 7 -33" width="5" height="14" depth="5" color="#14151d"></a-box>
+    <a-box position="5 10 -38" width="6" height="20" depth="6" color="#101118"></a-box>
+    <a-box position="12 8 -35" width="5" height="16" depth="5" color="#15161e"></a-box>
 
-<!-- COMMUNITY CARDS -->
-<a-plane position="-0.8 1.25 -4" width="0.5" height="0.7" color="#ffffff"></a-plane>
-<a-plane position="-0.4 1.25 -4" width="0.5" height="0.7" color="#ffffff"></a-plane>
-<a-plane position="0 1.25 -4" width="0.5" height="0.7" color="#ffffff"></a-plane>
-<a-plane position="0.4 1.25 -4" width="0.5" height="0.7" color="#ffffff"></a-plane>
-<a-plane position="0.8 1.25 -4" width="0.5" height="0.7" color="#ffffff"></a-plane>
+    <a-box position="0 1.25 -7" width="10" height="0.2" depth="10" color="#1a1d27"></a-box>
 
-<!-- SKYLINE BLOCKS -->
-<a-box position="-10 8 -30" width="6" height="16" depth="6" color="#111"></a-box>
-<a-box position="-4 6 -28" width="5" height="12" depth="5" color="#151515"></a-box>
-<a-box position="4 7 -32" width="6" height="14" depth="6" color="#111"></a-box>
-<a-box position="10 9 -34" width="5" height="18" depth="5" color="#111"></a-box>
+    <a-ring position="0 2.1 -11.8" rotation="0 0 0" radius-inner="0.02" radius-outer="0.03" color="#b76aff"></a-ring>
+    <a-box position="-5 2 -11.8" width="0.08" height="2.2" depth="0.08" color="#7b3cff"></a-box>
+    <a-box position="5 2 -11.8" width="0.08" height="2.2" depth="0.08" color="#7b3cff"></a-box>
+    <a-box position="0 3.05 -11.8" width="10.2" height="0.08" depth="0.08" color="#7b3cff"></a-box>
 
-<!-- PARTICLES -->
-<a-entity id="particles"></a-entity>
+    <a-cylinder position="0 1.1 -5.8" radius="1.85" height="0.25" color="#0d6334"></a-cylinder>
+    <a-cylinder position="0 0.55 -5.8" radius="0.28" height="1" color="#2f3340"></a-cylinder>
 
-<!-- PLAYER -->
-<a-entity id="rig" position="0 1.6 4">
+    <a-plane position="-0.8 1.28 -5.15" rotation="-90 0 0" width="0.42" height="0.62" color="#ffffff"></a-plane>
+    <a-plane position="-0.4 1.28 -5.15" rotation="-90 0 0" width="0.42" height="0.62" color="#ffffff"></a-plane>
+    <a-plane position="0 1.28 -5.15" rotation="-90 0 0" width="0.42" height="0.62" color="#ffffff"></a-plane>
+    <a-plane position="0.4 1.28 -5.15" rotation="-90 0 0" width="0.42" height="0.62" color="#ffffff"></a-plane>
+    <a-plane position="0.8 1.28 -5.15" rotation="-90 0 0" width="0.42" height="0.62" color="#ffffff"></a-plane>
 
-<a-camera wasd-controls look-controls></a-camera>
+    <a-torus position="0 1.26 -5.8" radius="2.02" radius-tubular="0.03" color="#5f2fff"></a-torus>
 
-</a-entity>
+    <a-sphere position="2.2 1.55 -6.2" radius="0.22" color="#8c8c8c"></a-sphere>
 
-</a-scene>
+    <a-entity id="particles"></a-entity>
 
-<script>
+    <a-entity id="rig" position="0 1.6 3.5">
+      <a-camera></a-camera>
 
-const container=document.querySelector("#particles")
+      <a-entity id="leftHand" hand-controls="hand: left">
+        <a-plane position="0 0.04 -0.08" rotation="-45 0 0" width="0.14" height="0.08" color="#0d0f14" material="metalness:0.2; roughness:0.7">
+          <a-plane position="0 0 0.001" width="0.11" height="0.05" color="#111827"></a-plane>
+          <a-plane position="0 0 0.002" width="0.03" height="0.03" material="src:#logoImg; transparent:true"></a-plane>
+        </a-plane>
+      </a-entity>
 
-for(let i=0;i<60;i++){
+      <a-entity id="rightHand" hand-controls="hand: right"></a-entity>
+    </a-entity>
 
-let p=document.createElement("a-sphere")
+    <a-ring id="teleportMarker" position="0 0.02 -1" rotation="-90 0 0" radius-inner="0.22" radius-outer="0.34" color="#9f54ff" visible="false"></a-ring>
+  </a-scene>
 
-p.setAttribute("radius","0.03")
-p.setAttribute("color","#b26cff")
+  <script>
+    const particles = document.getElementById('particles');
+    for (let i = 0; i < 50; i++) {
+      const p = document.createElement('a-sphere');
+      const x = (Math.random() * 10) - 5;
+      const z = -3 - (Math.random() * 8);
+      const y = 0.5 + Math.random() * 2.5;
+      const cyan = Math.random() > 0.5;
+      p.setAttribute('radius', 0.035 + Math.random() * 0.02);
+      p.setAttribute('color', cyan ? '#38cfff' : '#b66cff');
+      p.setAttribute('position', `${x} ${y} ${z}`);
+      p.setAttribute('material', 'emissive:' + (cyan ? '#38cfff' : '#b66cff') + '; emissiveIntensity: 1.2');
+      p.setAttribute('animation', `property: position; to: ${x} ${y + 3.2} ${z}; dir: alternate; dur: ${3500 + Math.floor(Math.random()*1800)}; loop: true`);
+      particles.appendChild(p);
+    }
 
-let x=(Math.random()*8)-4
-let z=(Math.random()*8)-4
-let y=Math.random()*2+1
+    let teleportOn = false;
+    const state = document.getElementById('teleportState');
+    const marker = document.getElementById('teleportMarker');
 
-p.setAttribute("position",`${x} ${y} ${z}`)
+    function setTeleport(v){
+      teleportOn = v;
+      state.textContent = v ? 'ON' : 'OFF';
+      state.style.color = v ? '#38cfff' : '#b66cff';
+      marker.setAttribute('visible', v);
+    }
 
-p.setAttribute("animation",`
-property: position;
-to: ${x} ${y+3} ${z};
-loop: true;
-dur: 4000;
-dir: alternate
-`)
+    window.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 't') setTeleport(!teleportOn);
+    });
 
-container.appendChild(p)
-
-}
-
-</script>
-
+    const scene = document.querySelector('a-scene');
+    scene.addEventListener('click', () => {
+      if (!teleportOn) return;
+      const rig = document.getElementById('rig');
+      rig.setAttribute('position', '0 1.6 1.5');
+    });
+  </script>
 </body>
 </html>
