@@ -1,0 +1,4 @@
+module.exports={
+ MAX_PLAYERS_PER_TABLE:6,
+ STARTING_CHIPS:1000
+}

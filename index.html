@@ -1,238 +1,28 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scarlett VR Poker</title>
-  <meta name="description" content="Scarlett VR Poker - under construction." />
-
-  <!-- Correct tab icon -->
-  <link rel="icon" type="image/png" href="/logo.png" />
-  <link rel="apple-touch-icon" href="/logo.png" />
-
-  <style>
-    :root{
-      --bg:#000000;
-      --text:#ffffff;
-      --muted:rgba(255,255,255,.82);
-      --purple1:#8f38ff;
-      --purple2:#d465ff;
-      --blue1:#1e5b78;
-      --blue2:#2f9fc0;
-    }
-
-    *{
-      box-sizing:border-box;
-    }
-
-    html,body{
-      margin:0;
-      padding:0;
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:var(--bg);
-      color:var(--text);
-      font-family:Arial, Helvetica, sans-serif;
-    }
-
-    #matrix{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100%;
-      z-index:0;
-      display:block;
-      background:#000;
-    }
-
-    .page{
-      position:relative;
-      z-index:2;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      text-align:center;
-    }
-
-    .hero{
-      width:min(760px, 100%);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:14px;
-    }
-
-    .logo{
-      width:min(300px, 68vw);
-      height:auto;
-      display:block;
-      margin:0 auto 4px;
-      filter:drop-shadow(0 0 26px rgba(171,74,255,.85));
-      user-select:none;
-      -webkit-user-drag:none;
-    }
-
-    h1{
-      margin:0;
-      font-size:clamp(40px, 7vw, 72px);
-      line-height:1;
-      font-weight:800;
-      letter-spacing:.4px;
-      text-shadow:0 0 18px rgba(143,56,255,.18);
-    }
-
-    .subtitle{
-      margin:0;
-      font-size:clamp(18px, 2.2vw, 30px);
-      font-weight:700;
-      color:var(--text);
-    }
-
-    .desc{
-      margin:0;
-      max-width:760px;
-      font-size:clamp(15px, 1.6vw, 21px);
-      line-height:1.55;
-      color:var(--muted);
-    }
-
-    .btns{
-      margin-top:8px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:16px;
-      justify-content:center;
-      align-items:center;
-    }
-
-    .btn{
-      min-width:190px;
-      padding:15px 28px;
-      border-radius:12px;
-      color:#fff;
-      text-decoration:none;
-      font-size:17px;
-      font-weight:700;
-      transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
-      box-shadow:0 0 18px rgba(0,0,0,.18);
-    }
-
-    .btn:hover{
-      transform:translateY(-2px);
-      opacity:.98;
-    }
-
-    .btn:active{
-      transform:translateY(0);
-    }
-
-    .btn-site{
-      background:linear-gradient(90deg,var(--purple1),var(--purple2));
-      box-shadow:0 0 22px rgba(143,56,255,.28);
-    }
-
-    .btn-game{
-      background:linear-gradient(90deg,var(--blue1),var(--blue2));
-      box-shadow:0 0 22px rgba(47,159,192,.22);
-    }
-
-    .footer-note{
-      margin-top:6px;
-      font-size:12px;
-      color:rgba(255,255,255,.56);
-    }
-
-    @media (max-width: 640px){
-      .page{
-        padding:18px;
-      }
-
-      .hero{
-        gap:12px;
-      }
-
-      .btn{
-        width:100%;
-        max-width:320px;
-      }
-
-      .btns{
-        width:100%;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<title>SVR Poker</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <canvas id="matrix"></canvas>
 
-  <main class="page">
-    <section class="hero">
-      <img src="/logo.png" class="logo" alt="Scarlett VR Poker logo" />
+<canvas id="matrix"></canvas>
 
-      <h1>SVR Poker</h1>
-      <p class="subtitle">Under Construction</p>
+<div class="center">
+<img src="logo.png" class="logo">
+<h1>SVR Poker</h1>
+<p>Under Construction</p>
 
-      <p class="desc">
-        The public launch page stays here while the real website and VR casino
-        continue behind it for testing and development.
-      </p>
+<a class="enter-btn" href="/game/index.html">
+Enter VR Casino
+</a>
 
-      <div class="btns">
-        <a class="btn btn-site" href="/site/index.html">Preview Site</a>
-        <a class="btn btn-game" href="/game/index.html">Enter VR Casino</a>
-      </div>
+</div>
 
-      <div class="footer-note">
-        Scarlett VR Poker
-      </div>
-    </section>
-  </main>
+<script src="matrix.js"></script>
 
-  <script>
-    const canvas = document.getElementById("matrix");
-    const ctx = canvas.getContext("2d");
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      setupMatrix();
-    }
-
-    const chars = "SVRPOKER0101";
-    const fontSize = 16;
-    let columns = 0;
-    let drops = [];
-
-    function setupMatrix() {
-      columns = Math.floor(canvas.width / fontSize);
-      drops = Array(columns).fill(1);
-    }
-
-    function drawMatrix() {
-      ctx.fillStyle = "rgba(0,0,0,0.08)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "#9f54ff";
-      ctx.font = fontSize + "px monospace";
-
-      for (let i = 0; i < drops.length; i++) {
-        const text = chars[Math.floor(Math.random() * chars.length)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
-    }
-
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-    setInterval(drawMatrix, 36);
-  </script>
 </body>
 </html>

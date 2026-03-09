@@ -1,0 +1,40 @@
+
+Add these socket events to server.js
+
+const round=require("./roundController");
+const bets=require("./betManager");
+
+socket.on("startRound",({tableId})=>{
+
+round.startRound(tableId);
+io.to(tableId).emit("tableUpdate",getTable(tableId));
+
+});
+
+socket.on("nextStage",({tableId})=>{
+
+round.nextStage(tableId);
+io.to(tableId).emit("tableUpdate",getTable(tableId));
+
+});
+
+socket.on("call",({tableId,playerId})=>{
+
+bets.call(tableId,playerId);
+io.to(tableId).emit("tableUpdate",getTable(tableId));
+
+});
+
+socket.on("raise",({tableId,playerId,amount})=>{
+
+bets.raise(tableId,playerId,amount);
+io.to(tableId).emit("tableUpdate",getTable(tableId));
+
+});
+
+socket.on("fold",({tableId,playerId})=>{
+
+bets.fold(tableId,playerId);
+io.to(tableId).emit("tableUpdate",getTable(tableId));
+
+});
