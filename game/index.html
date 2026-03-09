@@ -3,139 +3,369 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SVR Rooftop Casino</title>
+  <title>SVR Poker Rooftop VR</title>
   <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/logo.png" />
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <style>
-    html,body{margin:0;height:100%;background:#000;font-family:Arial,sans-serif;}
+    html,body{margin:0;height:100%;background:#000;font-family:Arial,sans-serif;overflow:hidden}
     #hud{
-      position:fixed;left:14px;top:14px;z-index:10;
+      position:fixed;left:14px;top:14px;z-index:20;
       padding:12px 14px;border:1px solid rgba(180,90,255,.45);
       border-radius:14px;background:rgba(8,8,18,.72);color:#fff;
-      line-height:1.45;font-size:14px;
+      line-height:1.45;font-size:14px;max-width:300px
     }
+    #teleportState{color:#b66cff}
     #stick{
-      position:fixed;left:18px;bottom:18px;z-index:10;
+      position:fixed;left:18px;bottom:18px;z-index:20;
       width:92px;height:92px;border-radius:50%;
       border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.25);
-      box-shadow:0 0 20px rgba(160,70,255,.18) inset;
+      background:rgba(0,0,0,.25);touch-action:none;
+      box-shadow:0 0 20px rgba(160,70,255,.18) inset
     }
     #stickDot{
       position:absolute;left:50%;top:50%;
       width:40px;height:40px;border-radius:50%;
       transform:translate(-50%,-50%);
-      background:#9f54ff;
-      box-shadow:0 0 18px rgba(159,84,255,.9);
+      background:#9f54ff;box-shadow:0 0 18px rgba(159,84,255,.9)
+    }
+    #hint{
+      position:fixed;left:145px;bottom:40px;z-index:20;
+      color:#fff;background:rgba(8,8,18,.7);
+      padding:4px 8px;border-radius:8px;font-size:12px
     }
   </style>
 </head>
 <body>
   <div id="hud">
     <strong>SVR Rooftop Casino</strong><br>
-    Desktop: WASD + Mouse | T = Teleport<br>
-    Quest Controller: Grip = Teleport<br>
-    Quest Hands: Pinch fallback = Teleport<br>
-    Teleport: <span id="teleportState" style="color:#b66cff">OFF</span>
+    Desktop: WASD + Mouse | T = Toggle Teleport<br>
+    Quest Controllers: Grip = Toggle | Trigger = Teleport<br>
+    Quest Hands: Pinch = Toggle / Teleport<br>
+    Left Stick / Touch = Move<br>
+    Teleport: <span id="teleportState">OFF</span>
   </div>
 
   <div id="stick"><div id="stickDot"></div></div>
+  <div id="hint">drag stick to move</div>
 
-  <a-scene renderer="colorManagement: true; physicallyCorrectLights: true" background="color: #03030a">
+  <a-scene id="scene" renderer="colorManagement:true; physicallyCorrectLights:true; antialias:true" background="color:#02030a">
     <a-assets>
-      <img id="logoImg" src="/logo.png">
+      <img id="logoImg" src="/logo.png" crossorigin="anonymous">
     </a-assets>
 
-    <a-entity light="type: ambient; intensity: 0.95; color: #b8c7ff"></a-entity>
-    <a-entity light="type: directional; intensity: 1.05; color: #ffffff" position="3 8 2"></a-entity>
-    <a-entity light="type: point; intensity: 1.2; distance: 22; color: #9f54ff" position="0 5 -6"></a-entity>
-    <a-entity light="type: point; intensity: 0.9; distance: 18; color: #38cfff" position="-6 4 -8"></a-entity>
+    <a-entity light="type: ambient; intensity: 0.95; color: #cfd8ff"></a-entity>
+    <a-entity light="type: directional; intensity: 1.2; color: #ffffff" position="4 8 2"></a-entity>
+    <a-entity light="type: point; intensity: 1.4; distance: 25; color: #9f54ff" position="0 5 -6"></a-entity>
+    <a-entity light="type: point; intensity: 1.0; distance: 20; color: #38cfff" position="-7 4 -8"></a-entity>
 
-    <a-sky color="#05060d"></a-sky>
-    <a-sphere position="0 18 -35" radius="3.2" color="#d8dcff" material="emissive: #9ea8ff; emissiveIntensity: 0.8"></a-sphere>
+    <a-sky color="#04050c"></a-sky>
+    <a-sphere position="0 17 -30" radius="2.5" color="#dbe1ff" material="emissive:#bfc9ff; emissiveIntensity:0.8"></a-sphere>
 
-    <a-plane position="0 0 -6" rotation="-90 0 0" width="90" height="90" color="#12131d"></a-plane>
+    <a-plane id="floor" class="teleportable" position="0 0 -6" rotation="-90 0 0" width="120" height="120" color="#12131d"></a-plane>
 
-    <a-box position="-14 6 -34" width="6" height="12" depth="6" color="#15161e"></a-box>
-    <a-box position="-8 9 -36" width="5" height="18" depth="5" color="#11131a"></a-box>
-    <a-box position="-2 7 -33" width="5" height="14" depth="5" color="#14151d"></a-box>
-    <a-box position="5 10 -38" width="6" height="20" depth="6" color="#101118"></a-box>
-    <a-box position="12 8 -35" width="5" height="16" depth="5" color="#15161e"></a-box>
+    <a-cylinder position="0 1.6 -6" radius="18" height="3.2" open-ended="true" color="#181a26" opacity="0.35" segments-radial="72"></a-cylinder>
+    <a-torus position="0 3.12 -6" rotation="90 0 0" radius="18" radius-tubular="0.03" color="#7a3cff"></a-torus>
 
-    <a-box position="0 1.25 -7" width="10" height="0.2" depth="10" color="#1a1d27"></a-box>
+    <a-cylinder id="tableTop" position="0 1.08 -6" radius="1.85" height="0.23" color="#0d6334"></a-cylinder>
+    <a-cylinder position="0 0.55 -6" radius="0.28" height="1" color="#2f3340"></a-cylinder>
+    <a-torus position="0 1.17 -6" rotation="90 0 0" radius="1.9" radius-tubular="0.05" color="#5f2fff"></a-torus>
 
-    <a-ring position="0 2.1 -11.8" rotation="0 0 0" radius-inner="0.02" radius-outer="0.03" color="#b76aff"></a-ring>
-    <a-box position="-5 2 -11.8" width="0.08" height="2.2" depth="0.08" color="#7b3cff"></a-box>
-    <a-box position="5 2 -11.8" width="0.08" height="2.2" depth="0.08" color="#7b3cff"></a-box>
-    <a-box position="0 3.05 -11.8" width="10.2" height="0.08" depth="0.08" color="#7b3cff"></a-box>
+    <a-plane position="-0.8 1.45 -5.2" rotation="-65 0 0" width="0.52" height="0.74" color="#ffffff"></a-plane>
+    <a-plane position="-0.4 1.45 -5.18" rotation="-65 0 0" width="0.52" height="0.74" color="#ffffff"></a-plane>
+    <a-plane position="0 1.45 -5.16" rotation="-65 0 0" width="0.52" height="0.74" color="#ffffff"></a-plane>
+    <a-plane position="0.4 1.45 -5.18" rotation="-65 0 0" width="0.52" height="0.74" color="#ffffff"></a-plane>
+    <a-plane position="0.8 1.45 -5.2" rotation="-65 0 0" width="0.52" height="0.74" color="#ffffff"></a-plane>
 
-    <a-cylinder position="0 1.1 -5.8" radius="1.85" height="0.25" color="#0d6334"></a-cylinder>
-    <a-cylinder position="0 0.55 -5.8" radius="0.28" height="1" color="#2f3340"></a-cylinder>
+    <a-sphere position="2.25 1.5 -6.2" radius="0.2" color="#8c8c8c"></a-sphere>
 
-    <a-plane position="-0.8 1.28 -5.15" rotation="-90 0 0" width="0.42" height="0.62" color="#ffffff"></a-plane>
-    <a-plane position="-0.4 1.28 -5.15" rotation="-90 0 0" width="0.42" height="0.62" color="#ffffff"></a-plane>
-    <a-plane position="0 1.28 -5.15" rotation="-90 0 0" width="0.42" height="0.62" color="#ffffff"></a-plane>
-    <a-plane position="0.4 1.28 -5.15" rotation="-90 0 0" width="0.42" height="0.62" color="#ffffff"></a-plane>
-    <a-plane position="0.8 1.28 -5.15" rotation="-90 0 0" width="0.42" height="0.62" color="#ffffff"></a-plane>
-
-    <a-torus position="0 1.26 -5.8" radius="2.02" radius-tubular="0.03" color="#5f2fff"></a-torus>
-
-    <a-sphere position="2.2 1.55 -6.2" radius="0.22" color="#8c8c8c"></a-sphere>
-
+    <a-entity id="buildings"></a-entity>
     <a-entity id="particles"></a-entity>
+    <a-entity id="coderain"></a-entity>
 
-    <a-entity id="rig" position="0 1.6 3.5">
-      <a-camera></a-camera>
+    <a-ring id="teleportMarker" position="0 0.02 -1" rotation="-90 0 0" radius-inner="0.22" radius-outer="0.34" color="#9f54ff" visible="false"></a-ring>
+    <a-circle id="teleportLogo" position="0 0.021 -1" rotation="-90 0 0" radius="0.18" color="#111827" visible="false"></a-circle>
 
-      <a-entity id="leftHand" hand-controls="hand: left">
-        <a-plane position="0 0.04 -0.08" rotation="-45 0 0" width="0.14" height="0.08" color="#0d0f14" material="metalness:0.2; roughness:0.7">
-          <a-plane position="0 0 0.001" width="0.11" height="0.05" color="#111827"></a-plane>
-          <a-plane position="0 0 0.002" width="0.03" height="0.03" material="src:#logoImg; transparent:true"></a-plane>
+    <a-entity id="rig" position="0 1.6 6">
+      <a-camera id="cam"></a-camera>
+
+      <a-entity id="leftController"
+        laser-controls="hand: left"
+        raycaster="objects: .teleportable"
+        line="color: #b66cff; opacity:0.9">
+      </a-entity>
+
+      <a-entity id="rightController"
+        laser-controls="hand: right"
+        raycaster="objects: .teleportable"
+        line="color: #38cfff; opacity:0.9">
+      </a-entity>
+
+      <a-entity id="leftHand"
+        hand-tracking-controls="hand: left; modelStyle: mesh; modelColor: #111111">
+      </a-entity>
+
+      <a-entity id="rightHand"
+        hand-tracking-controls="hand: right; modelStyle: mesh; modelColor: #111111">
+      </a-entity>
+
+      <a-entity id="watchLeftCtrl">
+        <a-plane position="0 0.03 -0.09" rotation="-45 0 0" width="0.16" height="0.09" color="#0d0f14">
+          <a-plane position="0 0 0.001" width="0.12" height="0.06" color="#101722"></a-plane>
+          <a-plane position="0 0 0.002" width="0.035" height="0.035" material="src:#logoImg; transparent:true"></a-plane>
         </a-plane>
       </a-entity>
 
-      <a-entity id="rightHand" hand-controls="hand: right"></a-entity>
+      <a-entity id="watchLeftHand">
+        <a-plane position="0 0.04 -0.08" rotation="-45 0 0" width="0.16" height="0.09" color="#0d0f14">
+          <a-plane position="0 0 0.001" width="0.12" height="0.06" color="#101722"></a-plane>
+          <a-plane position="0 0 0.002" width="0.035" height="0.035" material="src:#logoImg; transparent:true"></a-plane>
+        </a-plane>
+      </a-entity>
     </a-entity>
-
-    <a-ring id="teleportMarker" position="0 0.02 -1" rotation="-90 0 0" radius-inner="0.22" radius-outer="0.34" color="#9f54ff" visible="false"></a-ring>
   </a-scene>
 
   <script>
+    const scene = document.getElementById('scene');
+    const rig = document.getElementById('rig');
+    const cam = document.getElementById('cam');
+    const marker = document.getElementById('teleportMarker');
+    const markerLogo = document.getElementById('teleportLogo');
+    const stateEl = document.getElementById('teleportState');
+    const buildings = document.getElementById('buildings');
     const particles = document.getElementById('particles');
-    for (let i = 0; i < 50; i++) {
-      const p = document.createElement('a-sphere');
-      const x = (Math.random() * 10) - 5;
-      const z = -3 - (Math.random() * 8);
-      const y = 0.5 + Math.random() * 2.5;
-      const cyan = Math.random() > 0.5;
-      p.setAttribute('radius', 0.035 + Math.random() * 0.02);
+    const coderain = document.getElementById('coderain');
+    const leftController = document.getElementById('leftController');
+    const rightController = document.getElementById('rightController');
+    const leftHand = document.getElementById('leftHand');
+    const rightHand = document.getElementById('rightHand');
+
+    leftController.appendChild(document.getElementById('watchLeftCtrl'));
+    leftHand.appendChild(document.getElementById('watchLeftHand'));
+
+    function makeFloorTexture() {
+      const c = document.createElement('canvas');
+      c.width = 1024; c.height = 1024;
+      const x = c.getContext('2d');
+      x.fillStyle = '#11131b';
+      x.fillRect(0,0,c.width,c.height);
+      for (let i=0;i<60;i++){
+        x.strokeStyle = i%5===0 ? 'rgba(159,84,255,0.18)' : 'rgba(56,207,255,0.08)';
+        x.lineWidth = i%5===0 ? 3 : 1;
+        const p = i * (c.width/60);
+        x.beginPath(); x.moveTo(p,0); x.lineTo(p,c.height); x.stroke();
+        x.beginPath(); x.moveTo(0,p); x.lineTo(c.width,p); x.stroke();
+      }
+      return c.toDataURL('image/png');
+    }
+
+    function makeFeltTexture() {
+      const c = document.createElement('canvas');
+      c.width = 1024; c.height = 1024;
+      const x = c.getContext('2d');
+      x.fillStyle = '#0a5f34';
+      x.fillRect(0,0,c.width,c.height);
+      for (let i=0;i<5000;i++){
+        x.fillStyle = Math.random()>0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.03)';
+        x.fillRect(Math.random()*c.width, Math.random()*c.height, 2, 2);
+      }
+      return c.toDataURL('image/png');
+    }
+
+    document.getElementById('floor').setAttribute('material', 'src:'+makeFloorTexture()+'; repeat: 16 16');
+    document.getElementById('tableTop').setAttribute('material', 'src:'+makeFeltTexture()+'; repeat: 3 3');
+
+    for (let i=0; i<26; i++) {
+      const ang = (i/26) * Math.PI * 2;
+      const r = 26 + Math.random()*4;
+      const h = 8 + Math.random()*14;
+      const w = 2.5 + Math.random()*3.5;
+      const x = Math.cos(ang)*r;
+      const z = -6 + Math.sin(ang)*r;
+
+      const b = document.createElement('a-box');
+      b.setAttribute('position', `${x} ${h/2} ${z}`);
+      b.setAttribute('width', w);
+      b.setAttribute('height', h);
+      b.setAttribute('depth', w);
+      b.setAttribute('color', '#11131a');
+      buildings.appendChild(b);
+    }
+
+    const tower = document.createElement('a-box');
+    tower.setAttribute('position', '0 12 -32');
+    tower.setAttribute('width', '4.2');
+    tower.setAttribute('height', '24');
+    tower.setAttribute('depth', '4.2');
+    tower.setAttribute('color', '#101118');
+    buildings.appendChild(tower);
+
+    function resetParticle(p){
+      const x = (Math.random()*22)-11;
+      const z = -6 + (Math.random()*22)-11;
+      const y = 0.2 + Math.random()*1.2;
+      const cyan = Math.random() > 0.45;
+      p.setAttribute('radius', 0.025 + Math.random()*0.03);
       p.setAttribute('color', cyan ? '#38cfff' : '#b66cff');
+      p.setAttribute('material', 'emissive:' + (cyan ? '#38cfff' : '#b66cff') + '; emissiveIntensity:1.1; opacity:0.78');
       p.setAttribute('position', `${x} ${y} ${z}`);
-      p.setAttribute('material', 'emissive:' + (cyan ? '#38cfff' : '#b66cff') + '; emissiveIntensity: 1.2');
-      p.setAttribute('animation', `property: position; to: ${x} ${y + 3.2} ${z}; dir: alternate; dur: ${3500 + Math.floor(Math.random()*1800)}; loop: true`);
+      p.dataset.speed = (0.004 + Math.random()*0.01).toString();
+    }
+
+    for (let i = 0; i < 110; i++) {
+      const p = document.createElement('a-sphere');
+      resetParticle(p);
       particles.appendChild(p);
     }
 
+    const chars = ['S','V','R','0','1','K','P','O','E','R'];
+    for (let i=0;i<70;i++){
+      const t = document.createElement('a-entity');
+      const ang = (i/70) * Math.PI * 2;
+      const r = 16.5;
+      const x = Math.cos(ang)*r;
+      const z = -6 + Math.sin(ang)*r;
+      const y = 2 + Math.random()*4;
+      t.setAttribute('position', `${x} ${y} ${z}`);
+      t.setAttribute('rotation', `0 ${(-ang*180/Math.PI)+90} 0`);
+      t.setAttribute('text', `value: ${chars[Math.floor(Math.random()*chars.length)]}; color: #9f54ff; align:center; width:2.6; opacity:0.65`);
+      t.dataset.speed = (0.01 + Math.random()*0.02).toString();
+      coderain.appendChild(t);
+    }
+
     let teleportOn = false;
-    const state = document.getElementById('teleportState');
-    const marker = document.getElementById('teleportMarker');
+    let pendingTeleport = {x:0,y:0.02,z:-1};
 
     function setTeleport(v){
       teleportOn = v;
-      state.textContent = v ? 'ON' : 'OFF';
-      state.style.color = v ? '#38cfff' : '#b66cff';
+      stateEl.textContent = v ? 'ON' : 'OFF';
+      stateEl.style.color = v ? '#38cfff' : '#b66cff';
       marker.setAttribute('visible', v);
+      markerLogo.setAttribute('visible', v);
     }
+
+    function setMarkerFromPoint(pt){
+      pendingTeleport = {x: pt.x, y: 0.02, z: pt.z};
+      marker.setAttribute('position', `${pt.x} 0.02 ${pt.z}`);
+      markerLogo.setAttribute('position', `${pt.x} 0.021 ${pt.z}`);
+    }
+
+    function doTeleport(){
+      if (!teleportOn) return;
+      rig.setAttribute('position', `${pendingTeleport.x} 1.6 ${pendingTeleport.z}`);
+    }
+
+    function rayTeleportHandler(e){
+      const intersections = e.detail && e.detail.intersections;
+      if (intersections && intersections.length){
+        setMarkerFromPoint(intersections[0].point);
+      }
+    }
+
+    leftController.addEventListener('raycaster-intersection', rayTeleportHandler);
+    rightController.addEventListener('raycaster-intersection', rayTeleportHandler);
 
     window.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 't') setTeleport(!teleportOn);
+      if (e.key.toLowerCase() === 'e') doTeleport();
     });
 
-    const scene = document.querySelector('a-scene');
-    scene.addEventListener('click', () => {
-      if (!teleportOn) return;
-      const rig = document.getElementById('rig');
-      rig.setAttribute('position', '0 1.6 1.5');
+    ['gripdown','abuttondown','xbuttondown'].forEach(ev=>{
+      leftController.addEventListener(ev, ()=>setTeleport(!teleportOn));
+      rightController.addEventListener(ev, ()=>setTeleport(!teleportOn));
+    });
+
+    ['triggerdown'].forEach(ev=>{
+      leftController.addEventListener(ev, ()=>doTeleport());
+      rightController.addEventListener(ev, ()=>doTeleport());
+    });
+
+    leftHand.addEventListener('pinchstarted', ()=>setTeleport(!teleportOn));
+    rightHand.addEventListener('pinchstarted', ()=>doTeleport());
+
+    const stick = document.getElementById('stick');
+    const dot = document.getElementById('stickDot');
+    let joy = {x:0,y:0,drag:false};
+    let stickRect = null;
+
+    function updateDot(){
+      dot.style.left = (50 + joy.x*28) + '%';
+      dot.style.top = (50 + joy.y*28) + '%';
+    }
+
+    function startJoy(e){
+      joy.drag = true;
+      stickRect = stick.getBoundingClientRect();
+      moveJoy(e);
+    }
+
+    function moveJoy(e){
+      if(!joy.drag) return;
+      const t = e.touches ? e.touches[0] : e;
+      const cx = stickRect.left + stickRect.width/2;
+      const cy = stickRect.top + stickRect.height/2;
+      let dx = (t.clientX - cx) / (stickRect.width/2);
+      let dy = (t.clientY - cy) / (stickRect.height/2);
+      const len = Math.hypot(dx,dy);
+      if (len > 1){ dx/=len; dy/=len; }
+      joy.x = dx; joy.y = dy;
+      updateDot();
+    }
+
+    function endJoy(){
+      joy.drag = false; joy.x = 0; joy.y = 0; updateDot();
+    }
+
+    stick.addEventListener('pointerdown', startJoy);
+    window.addEventListener('pointermove', moveJoy);
+    window.addEventListener('pointerup', endJoy);
+
+    let controllerMove = {x:0, y:0};
+    leftController.addEventListener('thumbstickmoved', e => {
+      controllerMove.x = e.detail.x;
+      controllerMove.y = e.detail.y;
+    });
+
+    scene.addEventListener('loaded', () => {
+      const rigObj = rig.object3D;
+      scene.renderer.setClearColor('#03040a', 1);
+      scene.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      const tick = () => {
+        particles.childNodes.forEach(p=>{
+          const pos = p.object3D.position;
+          pos.y += parseFloat(p.dataset.speed || '0.006');
+          if (pos.y > 6.5) resetParticle(p);
+        });
+
+        coderain.childNodes.forEach(t=>{
+          const pos = t.object3D.position;
+          pos.y -= parseFloat(t.dataset.speed || '0.015');
+          if (pos.y < 0.6) {
+            pos.y = 3 + Math.random()*4;
+            t.setAttribute('text', 'value: ' + chars[Math.floor(Math.random()*chars.length)] + '; color:#9f54ff; align:center; width:2.6; opacity:0.65');
+          }
+        });
+
+        const moveX = joy.x + controllerMove.x;
+        const moveY = joy.y + controllerMove.y;
+
+        if (Math.abs(moveX) > 0.01 || Math.abs(moveY) > 0.01){
+          const yaw = cam.object3D.rotation.y;
+          const forwardX = -Math.sin(yaw);
+          const forwardZ = -Math.cos(yaw);
+          const rightX = Math.cos(yaw);
+          const rightZ = -Math.sin(yaw);
+          const speed = 0.04;
+
+          rigObj.position.x += (forwardX * (-moveY) + rightX * moveX) * speed;
+          rigObj.position.z += (forwardZ * (-moveY) + rightZ * moveX) * speed;
+        }
+
+        requestAnimationFrame(tick);
+      };
+
+      tick();
     });
   </script>
 </body>
