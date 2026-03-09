@@ -1,21 +1,178 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>SVR Poker</title>
-  <link rel="stylesheet" href="css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Scarlett VR Poker</title>
+
+<!-- FIX TAB ICON -->
+<link rel="icon" type="image/png" href="/logo.png">
+
+<style>
+
+html,body{
+margin:0;
+padding:0;
+background:#000;
+font-family:Arial,Helvetica,sans-serif;
+overflow:hidden;
+color:white;
+}
+
+/* matrix canvas */
+
+#matrix{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:0;
+}
+
+/* center content */
+
+.center{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+text-align:center;
+z-index:2;
+}
+
+/* logo */
+
+.logo{
+width:260px;
+max-width:60vw;
+margin-bottom:25px;
+filter: drop-shadow(0 0 35px rgba(171,74,255,.85));
+}
+
+/* title */
+
+h1{
+font-size:52px;
+margin:10px 0;
+letter-spacing:1px;
+}
+
+/* subtitle */
+
+.sub{
+font-size:18px;
+opacity:.85;
+margin-bottom:35px;
+}
+
+/* buttons */
+
+.btns{
+display:flex;
+gap:18px;
+justify-content:center;
+flex-wrap:wrap;
+}
+
+.btn{
+padding:14px 30px;
+border-radius:10px;
+font-size:16px;
+font-weight:600;
+text-decoration:none;
+transition:.25s;
+}
+
+.btn-site{
+background:linear-gradient(90deg,#9f44ff,#d063ff);
+color:white;
+}
+
+.btn-game{
+background:linear-gradient(90deg,#1c5c7a,#2c9bb8);
+color:white;
+}
+
+.btn:hover{
+transform:translateY(-2px);
+box-shadow:0 0 15px rgba(160,70,255,.8);
+}
+
+</style>
 </head>
+
 <body>
-  <canvas id="matrix"></canvas>
 
-  <div class="center">
-    <img src="img/logo.png" class="logo" />
-    <h1>SVR Poker</h1>
-    <p>Under Construction</p>
-    <a href="pages/dashboard.html" class="enter-btn">Enter Site</a>
-  </div>
+<canvas id="matrix"></canvas>
 
-  <script src="js/matrix.js"></script>
+<div class="center">
+
+<img src="/logo.png" class="logo">
+
+<h1>SVR Poker</h1>
+
+<div class="sub">
+Under Construction<br>
+The real website and VR casino are running behind this page while development continues.
+</div>
+
+<div class="btns">
+<a class="btn btn-site" href="/site/index.html">Preview Site</a>
+<a class="btn btn-game" href="/game/index.html">Enter VR Casino</a>
+</div>
+
+</div>
+
+<script>
+
+/* MATRIX RAIN */
+
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const letters =
+"SVRPOKER01".split("");
+
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+
+const drops = [];
+
+for(let i=0;i<columns;i++)
+drops[i]=1;
+
+function draw(){
+
+ctx.fillStyle="rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="#b26cff";
+ctx.font = fontSize + "px monospace";
+
+for(let i=0;i<drops.length;i++){
+
+const text =
+letters[Math.floor(Math.random()*letters.length)];
+
+ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+
+if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
+drops[i]=0;
+
+drops[i]++;
+
+}
+
+}
+
+setInterval(draw,35);
+
+</script>
+
 </body>
 </html>
