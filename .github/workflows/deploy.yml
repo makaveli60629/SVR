@@ -1,85 +1,14 @@
-name: Auto Deploy
+- name: Prepare build
+  run: |
+    rm -rf build
+    mkdir build
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install unzip
-        run: sudo apt-get update && sudo apt-get install -y unzip
-
-      - name: Prepare build
-        run: |
-          rm -rf build
-          mkdir build
-
-          # copy entire repo except github files
-          rsync -av \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'update' \
-            ./ build/
-
-      - name: Apply update zips
-        run: |
-
-          flatten() {
-            ZIP=$1
-            TARGET=$2
-
-            mkdir tmp
-            unzip -o "$ZIP" -d tmp
-
-            if [ -f tmp/index.html ]; then
-              cp -r tmp/* "$TARGET"/
-            else
-              INNER=$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1)
-              if [ -n "$INNER" ]; then
-                cp -r "$INNER"/* "$TARGET"/
-              fi
-            fi
-
-            rm -rf tmp
-          }
-
-          if [ -f update/site.zip ]; then
-            echo "Updating site"
-            flatten update/site.zip build
-          fi
-
-          if [ -f update/game.zip ]; then
-            echo "Updating game"
-            mkdir -p build/game
-            flatten update/game.zip build/game
-          fi
-
-      - name: Validate build
-        run: |
-          if [ ! -f build/index.html ]; then
-            echo "ERROR: index.html missing"
-            exit 1
-          fi
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: build
-
-      - name: Deploy
-        uses: actions/deploy-pages@v4
+    rsync -av \
+      --exclude '.git' \
+      --exclude '.github' \
+      --exclude 'update' \
+      --exclude 'backend/node_modules' \
+      --exclude 'Library' \
+      --exclude 'Logs' \
+      --exclude 'Temp' \
+      ./ build/ || test $? -eq 24
