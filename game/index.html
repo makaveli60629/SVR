@@ -2,27 +2,35 @@
 <html>
 <head>
 <meta charset="utf-8">
+<title>SVR Poker</title>
 
-<script src="https://unpkg.com/aframe@1.4.2/dist/aframe.min.js"></script>
+<script src="./js/aframe.min.js"></script>
 
 <style>
-body{margin:0;background:black;}
+body{
+margin:0;
+background:black;
+}
 </style>
 
 </head>
 
 <body>
 
-<a-scene>
+<a-scene background="color:black">
+
+<a-entity light="type:ambient; intensity:1"></a-entity>
 
 <a-box position="0 1.5 -4" color="red"></a-box>
 
-<a-plane rotation="-90 0 0"
-width="50"
-height="50"
-color="#111"></a-plane>
+<a-plane
+rotation="-90 0 0"
+width="100"
+height="100"
+color="#111">
+</a-plane>
 
-<a-sky color="black"></a-sky>
+<a-sky color="#000"></a-sky>
 
 </a-scene>
 
