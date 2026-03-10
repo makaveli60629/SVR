@@ -1,44 +1,22 @@
-
-const canvas=document.createElement("canvas")
-document.body.appendChild(canvas)
-
-const ctx=canvas.getContext("2d")
-
-canvas.style.position="fixed"
-canvas.style.top=0
-canvas.style.left=0
-canvas.style.zIndex=-1
-
-canvas.width=window.innerWidth
-canvas.height=window.innerHeight
-
-const letters="SVR"
-const fontSize=16
-const columns=canvas.width/fontSize
-const drops=[]
-
-for(let x=0;x<columns;x++) drops[x]=1
-
-function draw(){
-
-ctx.fillStyle="rgba(0,0,0,0.05)"
-ctx.fillRect(0,0,canvas.width,canvas.height)
-
-ctx.fillStyle="#a020f0"
-ctx.font=fontSize+"px monospace"
-
-for(let i=0;i<drops.length;i++){
-
-const text=letters[Math.floor(Math.random()*letters.length)]
-ctx.fillText(text,i*fontSize,drops[i]*fontSize)
-
-if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
-drops[i]=0
-
-drops[i]++
-
-}
-
-}
-
-setInterval(draw,35)
+﻿(function(){
+  const canvas=document.getElementById("matrix"); if(!canvas) return;
+  const ctx=canvas.getContext("2d");
+  function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+  resize(); addEventListener("resize",resize);
+  const chars="SVRPOKER0123456789#$%&"; const size=16;
+  let cols=Math.floor(innerWidth/size), drops=Array(cols).fill(1);
+  addEventListener("resize",()=>{cols=Math.floor(innerWidth/size);drops=Array(cols).fill(1)});
+  function draw(){
+    ctx.fillStyle="rgba(0,0,0,.12)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.font=size+"px monospace";
+    for(let i=0;i<drops.length;i++){
+      const ch=chars[(Math.random()*chars.length)|0];
+      ctx.fillStyle=Math.random()>.88?"#d6b9ff":"#8a3dff";
+      ctx.fillText(ch,i*size,drops[i]*size);
+      if(drops[i]*size>canvas.height&&Math.random()>.975)drops[i]=0;
+      drops[i]++;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
