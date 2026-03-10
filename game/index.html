@@ -1,251 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SVR Quest Stable</title>
-  <link rel="icon" type="image/png" href="/logo.png" />
-  <link rel="apple-touch-icon" href="/logo.png" />
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <style>
-    html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:Arial,sans-serif}
-    #hud{
-      position:fixed;left:12px;top:12px;z-index:20;
-      padding:10px 12px;max-width:320px;
-      border:1px solid rgba(180,90,255,.45);
-      border-radius:14px;background:rgba(8,8,18,.72);
-      color:#fff;font-size:13px;line-height:1.4
-    }
-    #teleportState{color:#b66cff;font-weight:bold}
-  </style>
+<meta charset="utf-8">
+<title>SVR Poker</title>
+
+<script src="https://unpkg.com/aframe@1.4.2/dist/aframe.min.js"></script>
+
+<style>
+html,body{
+margin:0;
+background:black;
+}
+#loader{
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-family:Arial;
+background:black;
+z-index:9999;
+}
+</style>
+
 </head>
+
 <body>
-<div id="hud">
-  <strong>SVR Quest Stable</strong><br>
-  Desktop: WASD + Mouse | T = Toggle Teleport | E = Teleport<br>
-  Quest Controllers: Grip = Toggle | Trigger = Teleport<br>
-  Quest Hands: Pinch Left = Toggle | Pinch Right = Teleport<br>
-  Teleport: <span id="teleportState">OFF</span>
-</div>
 
-<a-scene id="scene" renderer="antialias:true; colorManagement:true" background="color:#05060d">
-  <a-assets>
-    <img id="logoImg" src="/logo.png" crossorigin="anonymous">
-  </a-assets>
+<div id="loader">Loading SVR Poker…</div>
 
-  <!-- brighter light -->
-  <a-entity light="type:ambient;intensity:1.35;color:#eef2ff"></a-entity>
-  <a-entity light="type:directional;intensity:1.0;color:#ffffff" position="2 6 1"></a-entity>
-  <a-entity light="type:point;intensity:1.2;distance:18;color:#9f54ff" position="0 4 -6"></a-entity>
+<a-scene background="color:black">
 
-  <a-sky color="#060814"></a-sky>
+<a-entity light="type:ambient;intensity:1"></a-entity>
 
-  <!-- moon -->
-  <a-sphere position="0 14 -24" radius="2.2" color="#e6ebff"
-    material="emissive:#c7d2ff; emissiveIntensity:0.65"></a-sphere>
+<a-box position="0 1 -4" color="#8A2BE2"></a-box>
 
-  <!-- floor -->
-  <a-plane id="floor" class="teleportable"
-    position="0 0 -6" rotation="-90 0 0"
-    width="44" height="44" color="#141826"></a-plane>
+<a-plane rotation="-90 0 0"
+width="50"
+height="50"
+color="#111">
+</a-plane>
 
-  <!-- solid walls -->
-  <a-box position="0 2.5 -27" width="44" height="5" depth="0.6" color="#191c2a"></a-box>
-  <a-box position="-22 2.5 -6" width="0.6" height="5" depth="44" color="#191c2a"></a-box>
-  <a-box position="22 2.5 -6" width="0.6" height="5" depth="44" color="#191c2a"></a-box>
-  <a-box position="0 2.5 15" width="44" height="5" depth="0.6" color="#191c2a"></a-box>
+<a-sky color="#000"></a-sky>
 
-  <!-- simple matrix wall glow -->
-  <a-plane position="0 2.5 -26.6" width="40" height="4"
-    color="#2a1240" opacity="0.18"></a-plane>
-
-  <!-- skyline -->
-  <a-entity id="city"></a-entity>
-
-  <!-- logo billboard -->
-  <a-plane position="0 8 -23" width="5" height="5"
-    material="src:#logoImg; transparent:true; opacity:0.95"></a-plane>
-
-  <!-- table -->
-  <a-cylinder position="0 1.02 -6" radius="1.95" height="0.24" color="#0f6d3d"></a-cylinder>
-  <a-cylinder position="0 0.55 -6" radius="0.32" height="0.98" color="#343a4a"></a-cylinder>
-  <a-torus position="0 1.14 -6" rotation="90 0 0" radius="2.02" radius-tubular="0.05" color="#6b38ff"></a-torus>
-
-  <!-- cards -->
-  <a-plane position="-0.95 1.42 -5.12" rotation="-65 0 0" width="0.58" height="0.82" color="#ffffff"></a-plane>
-  <a-plane position="-0.48 1.42 -5.09" rotation="-65 0 0" width="0.58" height="0.82" color="#ffffff"></a-plane>
-  <a-plane position="0 1.42 -5.06" rotation="-65 0 0" width="0.58" height="0.82" color="#ffffff"></a-plane>
-  <a-plane position="0.48 1.42 -5.09" rotation="-65 0 0" width="0.58" height="0.82" color="#ffffff"></a-plane>
-  <a-plane position="0.95 1.42 -5.12" rotation="-65 0 0" width="0.58" height="0.82" color="#ffffff"></a-plane>
-
-  <!-- lighter particle count -->
-  <a-entity id="particles"></a-entity>
-
-  <!-- teleport target -->
-  <a-ring id="teleportMarker" position="0 0.02 -1" rotation="-90 0 0"
-    radius-inner="0.22" radius-outer="0.34" color="#9f54ff" visible="false"></a-ring>
-
-  <a-entity id="rig" position="0 1.6 4">
-    <a-camera id="cam" look-controls wasd-controls></a-camera>
-
-    <a-entity id="leftController"
-      laser-controls="hand: left"
-      raycaster="objects: .teleportable"
-      line="color:#b66cff; opacity:0.95"></a-entity>
-
-    <a-entity id="rightController"
-      laser-controls="hand: right"
-      raycaster="objects: .teleportable"
-      line="color:#38cfff; opacity:0.95"></a-entity>
-
-    <a-entity id="leftHand"
-      hand-tracking-controls="hand: left; modelStyle: dots; modelColor: #b66cff"></a-entity>
-
-    <a-entity id="rightHand"
-      hand-tracking-controls="hand: right; modelStyle: dots; modelColor: #38cfff"></a-entity>
-  </a-entity>
 </a-scene>
 
 <script>
-const scene = document.getElementById('scene');
-const rig = document.getElementById('rig');
-const cam = document.getElementById('cam');
-const marker = document.getElementById('teleportMarker');
-const stateEl = document.getElementById('teleportState');
-const leftController = document.getElementById('leftController');
-const rightController = document.getElementById('rightController');
-const leftHand = document.getElementById('leftHand');
-const rightHand = document.getElementById('rightHand');
-const city = document.getElementById('city');
-const particles = document.getElementById('particles');
-
-let teleportOn = false;
-let pendingTeleport = {x:0,z:-1};
-let watchBuilt = false;
-
-function buildCity(){
-  for(let i=0;i<16;i++){
-    const ang=(i/16)*Math.PI*2;
-    const r=20 + Math.random()*3;
-    const h=8 + Math.random()*12;
-    const w=2.5 + Math.random()*2.5;
-    const x=Math.cos(ang)*r;
-    const z=-6+Math.sin(ang)*r;
-    const b=document.createElement('a-box');
-    b.setAttribute('position', `${x} ${h/2} ${z}`);
-    b.setAttribute('width', w);
-    b.setAttribute('height', h);
-    b.setAttribute('depth', w);
-    b.setAttribute('color', '#11131a');
-    city.appendChild(b);
-  }
-  const tower=document.createElement('a-box');
-  tower.setAttribute('position', '0 13 -24');
-  tower.setAttribute('width','3.6');
-  tower.setAttribute('height','26');
-  tower.setAttribute('depth','3.6');
-  tower.setAttribute('color','#0d0f15');
-  city.appendChild(tower);
-}
-
-function buildParticles(){
-  for(let i=0;i<40;i++){
-    const p=document.createElement('a-sphere');
-    p.object3D.position.set((Math.random()*18)-9, 0.2+Math.random()*0.8, -6+(Math.random()*18)-9);
-    p.dataset.speed=(0.012 + Math.random()*0.018).toString();
-    p.setAttribute('radius', 0.03 + Math.random()*0.025);
-    p.setAttribute('color', Math.random()>0.5 ? '#38cfff' : '#b66cff');
-    p.setAttribute('material', 'emissive:#b66cff; emissiveIntensity:1.0; opacity:0.7; transparent:true');
-    particles.appendChild(p);
-  }
-}
-
-function attachWatch(target){
-  if (!target || watchBuilt) return;
-  const watch = document.createElement('a-plane');
-  watch.setAttribute('position','0 0.04 -0.08');
-  watch.setAttribute('rotation','-45 0 0');
-  watch.setAttribute('width','0.16');
-  watch.setAttribute('height','0.09');
-  watch.setAttribute('color','#0d0f14');
-
-  const screen = document.createElement('a-plane');
-  screen.setAttribute('position','0 0 0.001');
-  screen.setAttribute('width','0.12');
-  screen.setAttribute('height','0.06');
-  screen.setAttribute('color','#101722');
-
-  const logo = document.createElement('a-plane');
-  logo.setAttribute('position','0 0.012 0.002');
-  logo.setAttribute('width','0.034');
-  logo.setAttribute('height','0.034');
-  logo.setAttribute('material','src:#logoImg; transparent:true');
-
-  watch.appendChild(screen);
-  watch.appendChild(logo);
-  target.appendChild(watch);
-  watchBuilt = true;
-}
-
-function setTeleport(v){
-  teleportOn = v;
-  stateEl.textContent = v ? 'ON' : 'OFF';
-  stateEl.style.color = v ? '#38cfff' : '#b66cff';
-  marker.setAttribute('visible', v);
-}
-
-function setMarkerFromPoint(pt){
-  pendingTeleport = {x: pt.x, z: pt.z};
-  marker.setAttribute('position', `${pt.x} 0.02 ${pt.z}`);
-}
-
-function doTeleport(){
-  if(!teleportOn) return;
-  rig.object3D.position.set(pendingTeleport.x, 1.6, pendingTeleport.z);
-}
-
-function rayHandler(e){
-  const isect = e.detail && e.detail.intersections;
-  if(isect && isect.length) setMarkerFromPoint(isect[0].point);
-}
-
-leftController.addEventListener('raycaster-intersection', rayHandler);
-rightController.addEventListener('raycaster-intersection', rayHandler);
-
-window.addEventListener('keydown', e=>{
-  if(e.key.toLowerCase()==='t') setTeleport(!teleportOn);
-  if(e.key.toLowerCase()==='e') doTeleport();
-});
-
-['gripdown','abuttondown','xbuttondown'].forEach(ev=>{
-  leftController.addEventListener(ev, ()=>setTeleport(!teleportOn));
-  rightController.addEventListener(ev, ()=>setTeleport(!teleportOn));
-});
-
-leftController.addEventListener('triggerdown', doTeleport);
-rightController.addEventListener('triggerdown', doTeleport);
-
-leftHand.addEventListener('pinchstarted', ()=>setTeleport(!teleportOn));
-rightHand.addEventListener('pinchstarted', ()=>doTeleport());
-
-leftController.addEventListener('controllerconnected', ()=>attachWatch(leftController));
-leftHand.addEventListener('model-loaded', ()=>attachWatch(leftHand));
-
-buildCity();
-buildParticles();
-
-scene.addEventListener('loaded', ()=>{
-  const rigObj = rig.object3D;
-  function loop(){
-    particles.childNodes.forEach(p=>{
-      const pos = p.object3D.position;
-      pos.y += parseFloat(p.dataset.speed || '0.02');
-      if(pos.y > 7) pos.y = 0.2;
-    });
-    requestAnimationFrame(loop);
-  }
-  loop();
+window.addEventListener("load",()=>{
+document.getElementById("loader").style.display="none";
 });
 </script>
+
 </body>
 </html>
