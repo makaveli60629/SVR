@@ -22,43 +22,47 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y unzip rsync
 
       - name: Prepare build
-        shell: bash
         run: |
-          set -euo pipefail
-
-          rm -rf build
+          set -e
+          rm -rf build tmp
           mkdir -p build
 
-          rsync -av --exclude '.git' --exclude '.github' --exclude 'update' ./ build/
+          rsync -av \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'update' \
+            --exclude 'backend' \
+            --exclude 'docs' \
+            --exclude 'modules' \
+            --exclude 'Library' \
+            --exclude 'Logs' \
+            --exclude 'Temp' \
+            --exclude '*.zip' \
+            --exclude '*.fbx' \
+            ./ build/ || test $? -eq 24
 
       - name: Apply update zips
-        shell: bash
         run: |
-          set -euo pipefail
+          set -e
 
           flatten() {
-            local ZIP="$1"
-            local TARGET="$2"
-            local TMP
-            local SRC
-            local INNER
+            ZIP="$1"
+            TARGET="$2"
 
-            TMP="$(mktemp -d)"
-            mkdir -p "$TARGET"
+            rm -rf tmp
+            mkdir -p tmp
+            unzip -o "$ZIP" -d tmp
 
-            unzip -oq "$ZIP" -d "$TMP"
-
-            SRC="$TMP"
-
-            if [ ! -f "$TMP/index.html" ]; then
-              INNER="$(find "$TMP" -mindepth 1 -maxdepth 1 -type d | head -n 1 || true)"
-              if [ -n "${INNER:-}" ]; then
-                SRC="$INNER"
+            if [ -f tmp/index.html ]; then
+              cp -r tmp/* "$TARGET"/
+            else
+              INNER="$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1)"
+              if [ -n "$INNER" ]; then
+                cp -r "$INNER"/* "$TARGET"/
               fi
             fi
 
-            rsync -av "$SRC"/ "$TARGET"/
-            rm -rf "$TMP"
+            rm -rf tmp
           }
 
           if [ -f update/site.zip ]; then
@@ -68,22 +72,13 @@ jobs:
 
           if [ -f update/game.zip ]; then
             echo "Updating game"
+            mkdir -p build/game
             flatten update/game.zip build/game
           fi
 
       - name: Validate build
-        shell: bash
         run: |
-          set -euo pipefail
-
-          if [ ! -f build/index.html ]; then
-            echo "ERROR: build/index.html missing"
-            exit 1
-          fi
-
-          if [ ! -f build/game/index.html ]; then
-            echo "WARNING: build/game/index.html missing"
-          fi
+          test -f build/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
