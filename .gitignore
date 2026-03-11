@@ -10,9 +10,6 @@ MemoryCaptures/
 .DS_Store
 Thumbs.db
 
-# Ignore zip files by default
 *.zip
-
-# Keep deploy zips only if you really want them
 !update/site.zip
 !update/game.zip
