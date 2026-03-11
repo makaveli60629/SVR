@@ -29,11 +29,7 @@ jobs:
           rm -rf build
           mkdir -p build
 
-          rsync -av \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'update' \
-            ./ build/
+          rsync -av --exclude '.git' --exclude '.github' --exclude 'update' ./ build/
 
       - name: Apply update zips
         shell: bash
