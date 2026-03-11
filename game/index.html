@@ -1,41 +1,58 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SVR Poker Stable Test</title>
+  <title>SVR Poker Engine 3.5.1</title>
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="js/game.js"></script>
   <style>
     html,body{margin:0;height:100%;overflow:hidden;background:#000}
-    #hud{
-      position:fixed;left:16px;bottom:16px;z-index:10;
-      color:#fff;background:rgba(20,10,40,.75);
-      padding:10px 12px;border-radius:12px;
-      border:1px solid rgba(160,90,255,.5);
-      font:14px Arial,sans-serif
-    }
+    #matrix{position:fixed;inset:0;z-index:1;opacity:.16;pointer-events:none}
+    #hud,#status{position:fixed;z-index:10;color:#f3ebff;background:rgba(12,10,22,.74);border:1px solid rgba(145,74,255,.45);border-radius:14px;padding:10px 12px;font:14px Arial,sans-serif}
+    #hud{left:16px;bottom:16px}
+    #status{right:16px;top:16px;font-size:13px}
+    a-scene{z-index:2}
   </style>
 </head>
 <body>
-  <div id="hud">SVR Stable Test • WASD move • Mouse look</div>
+  <canvas id="matrix"></canvas>
+  <div id="hud"><b>SVR Poker Engine 3.5.1</b><br>Cyberpunk skyline â€¢ VR hands â€¢ Sit/Stand</div>
+  <div id="status">VR hands: WebXR only<br>M: watch menu<br>E: sit / stand</div>
 
-  <a-scene background="color:#0a0a12">
-    <a-entity light="type:ambient;intensity:1"></a-entity>
-    <a-entity light="type:directional;intensity:1.2" position="3 6 2"></a-entity>
+  <a-scene background="color:#04040a" fog="type: exponential; color: #090612; density: 0.018">
+    <a-assets timeout="15000">
+      <a-asset-item id="tableModel" src="assets/models/table.glb"></a-asset-item>
+      <img id="tableLogo" src="assets/ui/logo-table.png">
+      <img id="moonTex" src="assets/texture/moon_diffuse.png">
+    </a-assets>
 
-    <a-sky color="#090916"></a-sky>
-    <a-plane rotation="-90 0 0" width="60" height="60" color="#14141c"></a-plane>
+    <a-entity light="type: ambient; intensity: 0.9; color: #cdb8ff"></a-entity>
+    <a-entity light="type: directional; intensity: 1.0; color: #ffffff" position="4 8 3"></a-entity>
+    <a-entity light="type: point; intensity: 1.6; distance: 22; color: #8b42ff" position="0 5 0"></a-entity>
 
-    <!-- table -->
-    <a-cylinder position="0 0.75 0" radius="1.1" height="0.12" color="#0c6b46"></a-cylinder>
-    <a-cylinder position="0 0.35 0" radius="0.14" height="0.8" color="#3a2b1f"></a-cylinder>
+    <a-plane rotation="-90 0 0" width="70" height="70" color="#0f1118"></a-plane>
+    <a-entity id="tableWrapper" gltf-model="#tableModel" position="0 0 0" scale="0.0025 0.0025 0.0025"></a-entity>
+    <a-circle position="0 0.84 0.02" rotation="-90 0 0" radius="0.62" src="#tableLogo" material="transparent:true; alphaTest:0.1"></a-circle>
 
-    <!-- npc marker -->
-    <a-box position="1.8 1 -0.4" width="0.5" height="1.6" depth="0.4" color="#4c3d63"></a-box>
+    <a-entity id="sitTarget" position="0 0 1.45">
+      <a-cylinder position="0 0.44 0" radius="0.31" height="0.09" color="#252936"></a-cylinder>
+      <a-cylinder position="0 0.21 0" radius="0.06" height="0.42" color="#5a6170"></a-cylinder>
+      <a-box position="0 0.78 -0.2" width="0.52" height="0.52" depth="0.08" color="#262b39"></a-box>
+    </a-entity>
 
-    <!-- player -->
-    <a-entity position="0 1.6 5">
-      <a-camera wasd-controls look-controls></a-camera>
+    <a-entity id="npcSeat" position="1.55 0 -0.35" rotation="0 -90 0">
+      <a-entity gltf-model="assets/models/player.glb" position="0 0.02 0" scale="0.0075 0.0075 0.0075"></a-entity>
+    </a-entity>
+
+    <a-entity id="rig" position="0 1.6 3">
+      <a-entity id="camera" camera look-controls wasd-controls="acceleration: 28" position="0 0 0"></a-entity>
+      <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowpoly;" position="-0.3 1.3 -0.4"></a-entity>
+      <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowpoly;" position="0.3 1.3 -0.4"></a-entity>
+      <a-entity id="watchAnchor" position="-0.25 1.25 -0.35">
+        <a-plane id="watchScreen" width="0.12" height="0.07" color="#7f41ff" visible="false"></a-plane>
+        <a-text id="watchText" value="SIT&#10;STAND&#10;CHIPS" align="center" color="#ffffff" width="0.32" position="0 0 0.01" visible="false"></a-text>
+      </a-entity>
     </a-entity>
   </a-scene>
 </body>
