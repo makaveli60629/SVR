@@ -1,10 +1,19 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scarlett VR Poker | Site Preview</title>
-  <meta name="description" content="Scarlett VR Poker website preview." />
+
+  <title>Scarlett VR Poker | Launch Page</title>
+  <meta
+    name="description"
+    content="Scarlett VR Poker public launch page. Preview the site and game. Launching soon."
+  />
+
+  <!-- FIXED PATHS -->
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preload" href="logo.png" as="image" />
+  <link rel="stylesheet" href="style.css" />
 
   <style>
     :root {
@@ -16,6 +25,7 @@
       --accent: #b95aff;
       --accent-2: #7a2cff;
       --glow: rgba(185, 90, 255, 0.35);
+      --danger: #ff9f9f;
     }
 
     * {
@@ -41,16 +51,16 @@
       padding: 24px;
     }
 
-    .wrap {
+    .launch-wrap {
       width: 100%;
-      max-width: 980px;
+      max-width: 960px;
     }
 
-    .card {
+    .launch-card {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 40px 28px;
+      padding: 42px 28px;
       text-align: center;
       box-shadow:
         0 0 0 1px rgba(255,255,255,0.02) inset,
@@ -62,12 +72,13 @@
     .logo-wrap {
       display: flex;
       justify-content: center;
+      align-items: center;
       margin-bottom: 20px;
     }
 
     .logo-wrap img {
-      width: min(300px, 80vw);
-      max-height: 180px;
+      width: min(340px, 82vw);
+      max-height: 190px;
       object-fit: contain;
       display: block;
       filter: drop-shadow(0 0 20px rgba(185, 90, 255, 0.25));
@@ -87,82 +98,93 @@
     }
 
     h1 {
-      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-size: clamp(2.1rem, 4vw, 3.35rem);
       line-height: 1.08;
       margin-bottom: 14px;
       color: #ffffff;
     }
 
     .subtext {
-      max-width: 700px;
-      margin: 0 auto 28px;
+      max-width: 720px;
+      margin: 0 auto 16px;
       color: var(--muted);
       font-size: 1.05rem;
       line-height: 1.65;
     }
 
-    .preview-box {
-      max-width: 760px;
-      margin: 0 auto 28px;
-      padding: 22px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      text-align: left;
+    .status {
+      max-width: 650px;
+      margin: 0 auto 30px;
+      color: #f5dfff;
+      font-size: 1rem;
+      line-height: 1.6;
     }
 
-    .preview-box h2 {
-      font-size: 1.2rem;
-      margin-bottom: 12px;
+    .status strong {
       color: #ffffff;
-    }
-
-    .preview-box p {
-      color: #d7cdee;
-      line-height: 1.7;
-      margin-bottom: 10px;
     }
 
     .button-row {
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
-      gap: 16px;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      width: 100%;
       max-width: 620px;
-      margin: 0 auto;
+      margin: 0 auto 28px;
     }
 
-    .button-row a {
-      flex: 1 1 240px;
-      min-width: 220px;
+    .btn {
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      text-align: center;
-      text-decoration: none;
-      padding: 16px 22px;
+      min-width: 220px;
+      padding: 16px 24px;
       border-radius: 14px;
-      font-weight: 700;
+      text-decoration: none;
       font-size: 1rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
     }
 
     .btn-primary {
+      background: linear-gradient(135deg, #b95aff, #7a2cff);
       color: #ffffff;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
       border: 1px solid rgba(255,255,255,0.08);
       box-shadow: 0 12px 28px rgba(122, 44, 255, 0.35);
     }
 
     .btn-secondary {
-      color: #efe7ff;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(185, 90, 255, 0.3);
+      background: rgba(255,255,255,0.04);
+      color: #f3ecff;
+      border: 1px solid rgba(185, 90, 255, 0.35);
       box-shadow: 0 10px 24px rgba(0,0,0,0.35);
     }
 
-    .button-row a:hover {
-      transform: translateY(-2px);
+    .notice {
+      max-width: 700px;
+      margin: 0 auto 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: #d8caef;
+      line-height: 1.6;
+      font-size: 0.97rem;
+    }
+
+    .disclaimer {
+      margin-top: 18px;
+      font-size: 0.92rem;
+      color: var(--danger);
+      line-height: 1.6;
     }
 
     .footer {
@@ -173,45 +195,58 @@
     }
 
     @media (max-width: 640px) {
-      .card {
+      .launch-card {
         padding: 30px 18px;
+        border-radius: 20px;
       }
 
-      .button-row a {
+      .button-row {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .btn {
         width: 100%;
+        max-width: 320px;
       }
     }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <section class="card">
+  <main class="launch-wrap">
+    <section class="launch-card">
       <div class="logo-wrap">
-        <img src="../logo.png" alt="Scarlett VR Poker Logo" />
+        <img src="logo.png" alt="Scarlett VR Poker Logo" />
       </div>
 
-      <div class="eyebrow">Website Preview</div>
-      <h1>Scarlett VR Poker Site</h1>
+      <div class="eyebrow">Public Launch Page</div>
+
+      <h1>Scarlett VR Poker</h1>
 
       <p class="subtext">
-        This is the website preview area for Scarlett VR Poker. Pages, account tools,
-        payment systems, and member features are being refined for public release.
+        Welcome to the public preview page for Scarlett VR Poker.
+        The full experience is currently being refined and prepared for launch.
       </p>
 
-      <div class="preview-box">
-        <h2>Current Status</h2>
-        <p>Public website framework is under construction.</p>
-        <p>Branding, navigation, storefront, and member systems are being prepared.</p>
-        <p>This preview page confirms the site section is connected and ready for expansion.</p>
-      </div>
+      <p class="status">
+        <strong>Launching Soon.</strong> Preview the website and the current game build below.
+      </p>
 
       <div class="button-row">
-        <a class="btn-primary" href="../index.html">Back to Launch Page</a>
-        <a class="btn-secondary" href="../game/index.html">Go to Game Preview</a>
+        <a class="btn btn-primary" href="./site/index.html">Preview Site</a>
+        <a class="btn btn-secondary" href="./game/index.html">Preview Game</a>
       </div>
 
+      <div class="notice">
+        This is the official public page. Content, visuals, and gameplay features are still under construction and may change during development.
+      </div>
+
+      <p class="disclaimer">
+        18+ Only • This project is intended for adults.
+      </p>
+
       <div class="footer">
-        © 2026 Scarlett VR Poker. Site preview only.
+        © 2026 Scarlett VR Poker. All rights reserved.
       </div>
     </section>
   </main>
