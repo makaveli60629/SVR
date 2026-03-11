@@ -1,22 +1,43 @@
-﻿(function(){
-  const canvas=document.getElementById("matrix"); if(!canvas) return;
-  const ctx=canvas.getContext("2d");
-  function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
-  resize(); addEventListener("resize",resize);
-  const chars="SVRPOKER0123456789#$%&"; const size=16;
-  let cols=Math.floor(innerWidth/size), drops=Array(cols).fill(1);
-  addEventListener("resize",()=>{cols=Math.floor(innerWidth/size);drops=Array(cols).fill(1)});
-  function draw(){
-    ctx.fillStyle="rgba(0,0,0,.12)"; ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.font=size+"px monospace";
-    for(let i=0;i<drops.length;i++){
-      const ch=chars[(Math.random()*chars.length)|0];
-      ctx.fillStyle=Math.random()>.88?"#d6b9ff":"#8a3dff";
-      ctx.fillText(ch,i*size,drops[i]*size);
-      if(drops[i]*size>canvas.height&&Math.random()>.975)drops[i]=0;
+(function () {
+  const canvas = document.createElement("canvas");
+  canvas.className = "matrix-bg";
+  document.body.prepend(canvas);
+
+  const ctx = canvas.getContext("2d", { alpha: true });
+  const glyphs = "SVRPOKER1018+";
+  const fontSize = 18;
+  let drops = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const columns = Math.max(1, Math.floor(canvas.width / fontSize));
+    drops = Array.from({ length: columns }, () => Math.floor(Math.random() * -40));
+  }
+
+  function draw() {
+    ctx.fillStyle = "rgba(5, 5, 7, 0.08)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = glyphs[Math.floor(Math.random() * glyphs.length)];
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
+
+      ctx.fillStyle = i % 3 === 0 ? "#5dd8ff" : "#c86cff";
+      ctx.fillText(text, x, y);
+
+      if (y > canvas.height && Math.random() > 0.975) {
+        drops[i] = Math.floor(Math.random() * -20);
+      }
+
       drops[i]++;
     }
-    requestAnimationFrame(draw);
   }
-  draw();
+
+  resize();
+  window.addEventListener("resize", resize);
+  setInterval(draw, 42);
 })();

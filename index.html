@@ -1,33 +1,46 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SVR Poker</title>
-  <link rel="stylesheet" href="site/css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scarlett VR Poker | Public Launch Page</title>
+  <meta name="description" content="Scarlett VR Poker public launch page. Preview the website and the game before full release.">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="stylesheet" href="/site/css/style.css">
+  <script src="/site/js/matrix.js" defer></script>
 </head>
-<body>
-  <canvas id="matrix"></canvas>
-  <header class="header">
-    <div class="brand">
-      <img src="site/logo-table.png" alt="SVR Poker logo" class="brand-logo" />
-      <div>
-        <div class="logo">SVR Poker</div>
-        <div class="tagline">UNDER CONSTRUCTION â€¢ 18+ â€¢ COMING SOON</div>
-      </div>
-    </div>
-    <nav class="nav"><a href="/game/">Launch Game</a></nav>
-  </header>
-  <main class="hero">
-    <div class="hero-card">
+<body class="launch-page">
+  <main class="page-shell">
+    <section class="hero-card">
+      <div class="eyebrow">Public Launch Page</div>
+
+      <img class="hero-logo" src="/logo.png" alt="Scarlett VR Poker logo">
+
       <h1>Scarlett VR Poker</h1>
-      <p>Cyberpunk rooftop poker prototype for WebXR.</p>
-      <div class="hero-actions">
-        <a class="playButton" href="/game/">Launch VR Poker</a>
+
+      <p class="lead">
+        This is the official public page for Scarlett VR Poker. The full website and the VR poker experience are in active development and launching soon.
+      </p>
+
+      <div class="pill-row">
+        <span class="pill">18+ Only</span>
+        <span class="pill">Public Preview</span>
+        <span class="pill">Launching Soon</span>
       </div>
-    </div>
+
+      <div class="action-row">
+        <a class="btn btn-primary" href="/site/">Preview Site</a>
+        <a class="btn btn-secondary" href="/game/">Preview Game</a>
+      </div>
+
+      <p class="subnote">
+        Preview links open the current public builds. Visuals, features, and gameplay are still being refined before launch.
+      </p>
+    </section>
   </main>
-  <footer class="footer">Scarlett Holding Company</footer>
-  <script src="site/js/matrix.js"></script>
+
+  <footer class="page-footer">
+    Scarlett Holding Company
+  </footer>
 </body>
 </html>
