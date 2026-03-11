@@ -2,1345 +2,253 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#d0bfb7" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>Lisa Pearson Skin Studio | In-Person Skin Care Consultation</title>
-  <meta name="description" content="Professional in-person skin care consultations with Lisa Pearson Skin Studio. Personalized guidance, treatment planning, and a refined booking experience." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Scarlett VR Poker | Launch Page</title>
+  <meta
+    name="description"
+    content="Scarlett VR Poker public launch page. Preview the site and game. Launching soon."
+  />
+
+  <!-- FIXED PATHS -->
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preload" href="logo.png" as="image" />
+  <link rel="stylesheet" href="style.css" />
+
   <style>
     :root {
-      --bg: #ddd0ca;
-      --bg-deep: #d2c1ba;
-      --surface: rgba(255, 250, 247, 0.9);
-      --surface-strong: #fffaf7;
-      --text: #241c19;
-      --muted: #5f5652;
-      --line: #d4c2ba;
-      --blush: #ddb8ae;
-      --rose-gold: #b98468;
-      --rose-gold-dark: #8f5f4b;
-      --sage: #8f9a92;
-      --soft: #ebd9d2;
-      --shadow: 0 18px 46px rgba(79, 56, 47, 0.14);
-      --shadow-soft: 0 10px 24px rgba(79, 56, 47, 0.08);
-      --radius: 26px;
-      --max: 1180px;
+      --bg: #050505;
+      --panel: rgba(14, 14, 18, 0.94);
+      --border: rgba(185, 90, 255, 0.28);
+      --text: #f3ecff;
+      --muted: #b9a9d6;
+      --accent: #b95aff;
+      --accent-2: #7a2cff;
+      --glow: rgba(185, 90, 255, 0.35);
+      --danger: #ff9f9f;
     }
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-family: Inter, Arial, Helvetica, sans-serif;
-      color: var(--text);
-      background: transparent;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-      overflow-x: hidden;
+      padding: 0;
     }
 
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; }
-    button, input, textarea { font: inherit; }
-
-    .ambient-bg {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 14% 16%, rgba(221,184,174,0.34), transparent 24%),
-        radial-gradient(circle at 84% 22%, rgba(185,132,104,0.20), transparent 20%),
-        radial-gradient(circle at 74% 80%, rgba(143,154,146,0.18), transparent 22%),
-        linear-gradient(180deg, rgba(238,228,223,0.92) 0%, rgba(221,208,202,0.96) 100%);
-    }
-
-    .ambient-bg::before {
-      content: "";
-      position: absolute;
-      inset: -10%;
-      background:
-        linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.11) 36%, transparent 55%),
-        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
-      animation: shimmerDrift 22s linear infinite;
-      opacity: 0.9;
-    }
-
-    .ambient-bg::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at center, rgba(255,255,255,0.12), transparent 58%),
-        repeating-linear-gradient(
-          90deg,
-          rgba(255,255,255,0.05) 0,
-          rgba(255,255,255,0.05) 1px,
-          transparent 1px,
-          transparent 140px
-        );
-      opacity: 0.62;
-      mix-blend-mode: soft-light;
-    }
-
-    .ambient-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(12px);
-      opacity: 0.78;
-      will-change: transform, opacity;
-    }
-
-    .ambient-orb.one {
-      width: 460px;
-      height: 460px;
-      top: -80px;
-      left: -60px;
-      background: radial-gradient(circle, rgba(221,184,174,0.56) 0%, rgba(221,184,174,0.26) 42%, transparent 72%);
-      animation: floatOne 18s ease-in-out infinite;
-    }
-
-    .ambient-orb.two {
-      width: 360px;
-      height: 360px;
-      top: 18%;
-      right: -90px;
-      background: radial-gradient(circle, rgba(185,132,104,0.40) 0%, rgba(185,132,104,0.16) 44%, transparent 72%);
-      animation: floatTwo 22s ease-in-out infinite;
-    }
-
-    .ambient-orb.three {
-      width: 400px;
-      height: 400px;
-      bottom: -120px;
-      left: 52%;
-      background: radial-gradient(circle, rgba(143,154,146,0.30) 0%, rgba(143,154,146,0.12) 46%, transparent 72%);
-      animation: floatThree 26s ease-in-out infinite;
-    }
-
-    .ambient-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(185,132,104,0.16);
-      opacity: 0.56;
-      will-change: transform, opacity;
-    }
-
-    .ambient-ring.one {
-      width: 320px;
-      height: 320px;
-      right: 10%;
-      top: 90px;
-      animation: ringPulse 16s ease-in-out infinite;
-    }
-
-    .ambient-ring.two {
-      width: 210px;
-      height: 210px;
-      left: 7%;
-      bottom: 120px;
-      animation: ringPulse 18s ease-in-out infinite reverse;
-    }
-
-    @keyframes floatOne {
-      0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.74; }
-      50% { transform: translate3d(42px, 24px, 0) scale(1.06); opacity: 0.92; }
-    }
-
-    @keyframes floatTwo {
-      0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.7; }
-      50% { transform: translate3d(-34px, 40px, 0) scale(1.08); opacity: 0.9; }
-    }
-
-    @keyframes floatThree {
-      0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.68; }
-      50% { transform: translate3d(-34px, -24px, 0) scale(1.05); opacity: 0.86; }
-    }
-
-    @keyframes ringPulse {
-      0%, 100% { transform: scale(1); opacity: 0.40; }
-      50% { transform: scale(1.08); opacity: 0.14; }
-    }
-
-    @keyframes shimmerDrift {
-      0% { transform: translateX(-6%) translateY(0); }
-      50% { transform: translateX(6%) translateY(1.5%); }
-      100% { transform: translateX(-6%) translateY(0); }
-    }
-
-    .container {
-      width: min(var(--max), calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(248, 241, 237, 0.9);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(212, 194, 186, 0.92);
-    }
-
-    .topbar-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      min-height: 84px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      min-width: 0;
-    }
-
-    .logo-mark {
-      width: 68px;
-      height: 68px;
-      flex: 0 0 68px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.98);
-      border: 1px solid rgba(212, 194, 186, 0.96);
-      box-shadow: 0 18px 36px rgba(79, 56, 47, 0.14);
-      overflow: hidden;
-      padding: 8px;
-      display: grid;
-      place-items: center;
-    }
-
-    .site-logo {
+    html, body {
       width: 100%;
-      height: 100%;
-      object-fit: contain;
-      transform: scale(1.12);
-      filter: contrast(1.08) saturate(1.1) drop-shadow(0 10px 18px rgba(79, 56, 47, 0.12));
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(122, 44, 255, 0.18), transparent 35%),
+        linear-gradient(180deg, #09090b 0%, #030303 100%);
+      color: var(--text);
     }
 
-    .brand-text h1 {
-      margin: 0;
-      font-size: 0.96rem;
-      line-height: 1.1;
-      letter-spacing: 0.18em;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .brand-text p {
-      margin: 4px 0 0;
-      font-size: 0.66rem;
-      letter-spacing: 0.26em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    nav {
+    body {
       display: flex;
-      align-items: center;
-      gap: 22px;
-      font-size: 0.96rem;
-      color: var(--muted);
-    }
-
-    nav a:hover { color: var(--text); }
-
-    .btn {
-      display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 48px;
-      padding: 14px 22px;
-      border-radius: 999px;
-      font-weight: 700;
-      transition: 0.2s ease;
-      border: 1px solid transparent;
-      cursor: pointer;
+      padding: 24px;
+    }
+
+    .launch-wrap {
+      width: 100%;
+      max-width: 960px;
+    }
+
+    .launch-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 42px 28px;
       text-align: center;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.02) inset,
+        0 24px 60px rgba(0,0,0,0.55),
+        0 0 40px var(--glow);
+      backdrop-filter: blur(10px);
     }
 
-    .btn:hover { transform: translateY(-1px); }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--rose-gold), var(--rose-gold-dark));
-      color: #fff;
-      box-shadow: var(--shadow-soft);
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
     }
 
-    .btn-secondary {
-      background: rgba(255,255,255,0.76);
-      border-color: var(--line);
-      color: var(--text);
-    }
-
-    .hero {
-      padding: 56px 0 42px;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-      gap: 32px;
-      align-items: start;
+    .logo-wrap img {
+      width: min(340px, 82vw);
+      max-height: 190px;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 0 20px rgba(185, 90, 255, 0.25));
     }
 
     .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      min-height: 38px;
+      display: inline-block;
+      margin-bottom: 14px;
       padding: 8px 14px;
       border-radius: 999px;
-      background: rgba(255,250,247,0.9);
-      border: 1px solid var(--line);
-      color: var(--rose-gold-dark);
-      font-size: 0.74rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      font-weight: 700;
-    }
-
-    .hero h2,
-    .section-title h3,
-    .feature-title,
-    .about-title,
-    .visual-card h3,
-    .founder-name {
-      font-family: Georgia, 'Times New Roman', serif;
-    }
-
-    .hero-lockup {
-      display: flex;
-      align-items: center;
-      gap: 22px;
-      margin: 18px 0 22px;
-      padding: 18px 20px;
-      max-width: 540px;
-      border-radius: 30px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(235,217,210,0.72));
-      border: 1px solid rgba(212, 194, 186, 0.96);
-      box-shadow: var(--shadow);
-    }
-
-    .hero-lockup .logo-mark {
-      width: 148px;
-      height: 148px;
-      flex: 0 0 148px;
-      padding: 12px;
-      border-radius: 30px;
-    }
-
-    .hero-lockup-copy h3 {
-      margin: 0;
-      font-size: 0.94rem;
-      line-height: 1.1;
-      letter-spacing: 0.16em;
-      font-weight: 800;
-    }
-
-    .hero-lockup-copy p {
-      margin: 7px 0 0;
-      color: var(--muted);
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      font-size: 0.6rem;
-      line-height: 1.5;
-    }
-
-    .brand-detail {
-      margin-top: 10px;
-      color: var(--rose-gold-dark);
-      font-size: 0.69rem;
+      background: rgba(185, 90, 255, 0.12);
+      border: 1px solid rgba(185, 90, 255, 0.25);
+      color: #dec1ff;
+      font-size: 0.85rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      font-weight: 700;
-      line-height: 1.45;
     }
 
-    .hero h2 {
-      margin: 0 0 16px;
-      max-width: 680px;
-      font-size: clamp(2.35rem, 4.4vw, 4rem);
-      line-height: 1.02;
-      letter-spacing: -0.03em;
-      color: #271f1c;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.22);
+    h1 {
+      font-size: clamp(2.1rem, 4vw, 3.35rem);
+      line-height: 1.08;
+      margin-bottom: 14px;
+      color: #ffffff;
     }
 
-    .hero-lead {
-      margin: 0;
-      max-width: 640px;
-      font-size: 1.06rem;
-      line-height: 1.88;
+    .subtext {
+      max-width: 720px;
+      margin: 0 auto 16px;
       color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.65;
     }
 
-    .hero-feature-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    .hero-feature-list span {
-      display: inline-flex;
-      align-items: center;
-      min-height: 42px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.86);
-      border: 1px solid var(--line);
-      color: var(--text);
-      font-size: 0.83rem;
-      font-weight: 700;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 24px;
-    }
-
-    .contact-strip {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    .hero-card,
-    .card {
-      background: var(--surface);
-      border: 1px solid rgba(212, 194, 186, 0.96);
-      border-radius: calc(var(--radius) + 6px);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
-    }
-
-    .hero-card { padding: 22px; }
-
-    .hero-photo {
-      min-height: 540px;
-      background:
-        radial-gradient(circle at top left, rgba(221,184,174,0.56), transparent 38%),
-        radial-gradient(circle at bottom right, rgba(143,154,146,0.22), transparent 34%),
-        linear-gradient(180deg, rgba(255,250,247,0.96), rgba(235,217,210,0.84));
-      border-radius: 30px;
-      padding: 22px;
-      display: flex;
-      align-items: stretch;
-    }
-
-    .hero-photo-inner {
-      width: 100%;
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.74);
-      background: rgba(255,255,255,0.64);
-      overflow: hidden;
-    }
-
-    .studio-visual {
-      position: relative;
-      min-height: 494px;
-      height: 100%;
-      border-radius: 24px;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at top left, rgba(221,184,174,0.96), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(143,154,146,0.34), transparent 30%),
-        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(241,229,223,0.94));
-      padding: 26px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: flex-end;
-    }
-
-    .studio-visual::before {
-      content: "";
-      position: absolute;
-      right: -34px;
-      top: 24px;
-      width: 240px;
-      height: 240px;
-      border: 2px solid rgba(185,132,104,0.34);
-      border-left-color: transparent;
-      border-bottom-color: transparent;
-      border-radius: 50%;
-      transform: rotate(18deg);
-    }
-
-    .studio-visual::after {
-      content: "";
-      position: absolute;
-      left: 36px;
-      top: 70px;
-      width: 176px;
-      height: 250px;
-      border-radius: 110px 110px 38px 38px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.5)),
-        linear-gradient(135deg, rgba(221,184,174,0.72), rgba(255,255,255,0.2));
-      box-shadow: 0 20px 38px rgba(79, 56, 47, 0.12);
-    }
-
-    .studio-badge {
-      position: absolute;
-      top: 18px;
-      left: 18px;
-      z-index: 2;
-      display: inline-flex;
-      align-items: center;
-      min-height: 38px;
-      padding: 9px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.94);
-      border: 1px solid rgba(212, 194, 186, 0.95);
-      color: var(--rose-gold-dark);
-      font-size: 0.74rem;
-      font-weight: 800;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .visual-card {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 370px;
-      padding: 24px;
-      border-radius: 28px;
-      background: rgba(255,255,255,0.93);
-      border: 1px solid rgba(212, 194, 186, 0.96);
-      box-shadow: 0 24px 48px rgba(79, 56, 47, 0.13);
-    }
-
-    .visual-card h3 {
-      margin: 12px 0 10px;
-      font-size: 2rem;
-      line-height: 1.02;
-    }
-
-    .visual-card p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.8;
-      font-size: 0.98rem;
-    }
-
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .stat {
-      padding: 15px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.98);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .stat small {
-      display: block;
-      margin-bottom: 7px;
-      color: var(--muted);
-      font-size: 0.82rem;
-    }
-
-    .stat strong {
+    .status {
+      max-width: 650px;
+      margin: 0 auto 30px;
+      color: #f5dfff;
       font-size: 1rem;
-      color: var(--text);
+      line-height: 1.6;
     }
 
-    .quote-card {
-      margin-top: 16px;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(235,217,210,0.74), rgba(255,255,255,0.95));
-      border: 1px solid var(--line);
-      color: var(--text);
-      line-height: 1.75;
-      font-size: 0.92rem;
+    .status strong {
+      color: #ffffff;
     }
 
-    .quote-card strong {
-      display: inline-block;
-      margin-bottom: 4px;
-      color: var(--rose-gold-dark);
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    section { padding: 34px 0; }
-
-    .section-title {
-      max-width: 760px;
-      margin-bottom: 22px;
-    }
-
-    .section-title h3 {
-      margin: 10px 0 0;
-      font-size: clamp(2rem, 3vw, 3rem);
-      line-height: 1.06;
-    }
-
-    .section-title p {
-      max-width: 640px;
-      margin-top: 10px;
-      line-height: 1.84;
-      color: var(--muted);
-    }
-
-    .grid-3,
-    .brand-grid,
-    .about-grid,
-    .booking-grid {
-      display: grid;
-      gap: 20px;
-    }
-
-    .grid-3 {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .brand-grid,
-    .about-grid,
-    .booking-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .card { padding: 28px; }
-
-    .card h4 {
-      margin: 0 0 10px;
-      font-size: 1.18rem;
-    }
-
-    .card p,
-    .card li {
-      color: var(--muted);
-      line-height: 1.8;
-    }
-
-    .price {
-      margin: 14px 0 10px;
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 2.2rem;
-      color: var(--rose-gold-dark);
-    }
-
-    .mini-logo-row {
+    .button-row {
       display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 16px;
-      margin-top: 18px;
-    }
-
-    .mini-logo-row .logo-mark {
-      width: 90px;
-      height: 90px;
-      flex: 0 0 90px;
-      border-radius: 24px;
-      padding: 10px;
-    }
-
-    .swatch-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .swatch {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px 8px 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.92);
-      border: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 0.86rem;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .swatch-dot {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 1px solid rgba(0,0,0,0.05);
-    }
-
-    .list-clean {
-      margin: 16px 0 0;
-      padding-left: 18px;
-    }
-
-    .founder-card {
-      display: grid;
-      grid-template-columns: 110px 1fr;
       gap: 18px;
-      align-items: start;
-    }
-
-    .founder-portrait {
-      width: 110px;
-      height: 110px;
-      border-radius: 28px;
-      border: 1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.56)),
-        linear-gradient(135deg, rgba(221,184,174,0.76), rgba(143,154,146,0.28));
-      box-shadow: var(--shadow-soft);
-      display: grid;
-      place-items: center;
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 2rem;
-      color: var(--rose-gold-dark);
-    }
-
-    .founder-name {
-      margin: 0 0 6px;
-      font-size: 2rem;
-      line-height: 1.04;
-    }
-
-    .founder-label {
-      display: inline-flex;
-      align-items: center;
-      min-height: 34px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(235,217,210,0.8);
-      color: var(--rose-gold-dark);
-      font-size: 0.74rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      font-weight: 800;
-    }
-
-    .booking-box { padding: 28px; }
-
-    .booking-note {
-      color: var(--muted);
-      line-height: 1.82;
-      margin-top: 14px;
-    }
-
-    .studio-details {
-      margin-top: 22px;
-      display: grid;
-      gap: 12px;
-    }
-
-    .studio-detail {
-      padding: 14px 16px;
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.96);
-    }
-
-    .studio-detail strong {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 0.82rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--rose-gold-dark);
-    }
-
-    form {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 8px;
-    }
-
-    input,
-    textarea {
+      flex-wrap: wrap;
       width: 100%;
-      padding: 15px 16px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.96);
-      color: var(--text);
-      outline: none;
-      min-height: 50px;
+      max-width: 620px;
+      margin: 0 auto 28px;
     }
 
-    textarea {
-      min-height: 140px;
-      resize: vertical;
-      grid-column: 1 / -1;
-    }
-
-    input:focus,
-    textarea:focus {
-      border-color: var(--rose-gold);
-      box-shadow: 0 0 0 4px rgba(185,132,104,0.12);
-    }
-
-    .full { grid-column: 1 / -1; }
-
-    footer {
-      padding: 22px 0 78px;
-      text-align: center;
-      color: var(--muted);
-      border-top: 1px solid rgba(212, 194, 186, 0.92);
-      background: rgba(248, 241, 237, 0.68);
-    }
-
-    .footer-main {
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 220px;
+      padding: 16px 24px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-size: 1rem;
       font-weight: 700;
-      color: var(--text);
-      letter-spacing: 0.03em;
-      font-size: 0.9rem;
+      line-height: 1;
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     }
 
-    .footer-credit {
-      margin-top: 8px;
-      font-size: 0.76rem;
-      color: var(--rose-gold-dark);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+    .btn:hover {
+      transform: translateY(-2px);
     }
 
-    .mobile-bookbar {
-      position: fixed;
-      left: 12px;
-      right: 12px;
-      bottom: 12px;
-      z-index: 120;
-      display: none;
-      gap: 12px;
-      padding: 10px;
-      border-radius: 22px;
-      background: rgba(255, 250, 247, 0.94);
-      border: 1px solid rgba(212, 194, 186, 0.96);
-      box-shadow: 0 20px 42px rgba(79, 56, 47, 0.18);
-      backdrop-filter: blur(12px);
+    .btn-primary {
+      background: linear-gradient(135deg, #b95aff, #7a2cff);
+      color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 12px 28px rgba(122, 44, 255, 0.35);
     }
 
-    .mobile-bookbar .btn {
-      flex: 1 1 auto;
-      min-height: 50px;
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      color: #f3ecff;
+      border: 1px solid rgba(185, 90, 255, 0.35);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.35);
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .ambient-bg::before,
-      .ambient-orb,
-      .ambient-ring {
-        animation: none !important;
-      }
+    .notice {
+      max-width: 700px;
+      margin: 0 auto 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: #d8caef;
+      line-height: 1.6;
+      font-size: 0.97rem;
     }
 
-    @media (max-width: 1080px) {
-      .hero-grid,
-      .brand-grid,
-      .about-grid,
-      .booking-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-photo {
-        min-height: auto;
-      }
-
-      .studio-visual {
-        min-height: 420px;
-      }
+    .disclaimer {
+      margin-top: 18px;
+      font-size: 0.92rem;
+      color: var(--danger);
+      line-height: 1.6;
     }
 
-    @media (max-width: 820px) {
-      .topbar-inner {
-        min-height: 74px;
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: #8e82a8;
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 640px) {
+      .launch-card {
+        padding: 30px 18px;
+        border-radius: 20px;
       }
 
-      nav {
-        display: none;
+      .button-row {
+        flex-direction: column;
+        gap: 12px;
       }
 
-      .hero {
-        padding-top: 28px;
-      }
-
-      .hero h2 {
-        font-size: clamp(2.5rem, 10vw, 4rem);
-      }
-
-      .hero-lockup {
-        max-width: 100%;
-        gap: 16px;
-        padding: 16px;
-      }
-
-      .hero-lockup .logo-mark {
-        width: 118px;
-        height: 118px;
-        flex: 0 0 118px;
-        padding: 10px;
-      }
-
-      .hero-lockup-copy h3 {
-        font-size: 0.82rem;
-      }
-
-      .hero-lockup-copy p {
-        font-size: 0.56rem;
-      }
-
-      .brand-detail {
-        font-size: 0.62rem;
-      }
-
-      .grid-3,
-      form,
-      .founder-card,
-      .stat-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .card,
-      .booking-box {
-        padding: 22px;
-      }
-
-      .mini-logo-row {
-        align-items: flex-start;
-      }
-
-      .mini-logo-row .logo-mark {
-        width: 74px;
-        height: 74px;
-        flex: 0 0 74px;
-      }
-
-      .ambient-orb.one {
-        width: 260px;
-        height: 260px;
-      }
-
-      .ambient-orb.two {
-        width: 190px;
-        height: 190px;
-        right: -60px;
-      }
-
-      .ambient-orb.three {
-        width: 220px;
-        height: 220px;
-        left: 42%;
-      }
-
-      .ambient-ring.one {
-        width: 190px;
-        height: 190px;
-        right: -30px;
-      }
-
-      .ambient-ring.two {
-        width: 140px;
-        height: 140px;
-        left: -12px;
-      }
-
-      .mobile-bookbar {
-        display: flex;
+      .btn {
+        width: 100%;
+        max-width: 320px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="ambient-bg" aria-hidden="true">
-    <span class="ambient-orb one"></span>
-    <span class="ambient-orb two"></span>
-    <span class="ambient-orb three"></span>
-    <span class="ambient-ring one"></span>
-    <span class="ambient-ring two"></span>
-  </div>
-
-  <header class="topbar">
-    <div class="container topbar-inner">
-      <a class="brand" href="#top" aria-label="Lisa Pearson Skin Studio home">
-        <div class="logo-mark"><img class="site-logo" src="logo2.png" alt="Lisa Pearson Skin Studio logo" /></div>
-        <div class="brand-text">
-          <h1>LISA PEARSON</h1>
-          <p>Skin Studio</p>
-        </div>
-      </a>
-      <nav>
-        <a href="#services">Services</a>
-        <a href="#packages">Packages</a>
-        <a href="#about">About</a>
-        <a href="#booking">Book</a>
-        <a class="btn btn-primary" href="#booking">Book Now</a>
-      </nav>
-    </div>
-  </header>
-
-  <main id="top">
-    <section class="hero">
-      <div class="container hero-grid">
-        <div>
-          <span class="eyebrow">In-Person Skin Care Consultation</span>
-
-          <div class="hero-lockup">
-            <div class="logo-mark"><img class="site-logo" src="logo2.png" alt="Lisa Pearson Skin Studio logo" /></div>
-            <div class="hero-lockup-copy">
-              <h3>LISA PEARSON</h3>
-              <p>Skin Studio</p>
-              <div class="brand-detail">Founder-led skin care consultations</div>
-            </div>
-          </div>
-
-          <h2>Healthy skin starts with thoughtful, personalized care.</h2>
-          <p class="hero-lead">
-            A refined booking experience for clients seeking in-person skin care guidance, personalized treatment planning, and a studio presence that feels elevated, calm, and memorable from the first glance.
-          </p>
-
-          <div class="hero-feature-list">
-            <span>Personalized Consultations</span>
-            <span>Luxury Studio Feel</span>
-            <span>Healthy Skin • Confidence • Glow</span>
-          </div>
-
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#booking">Book Appointment</a>
-            <a class="btn btn-secondary" href="#services">Explore Services</a>
-          </div>
-
-          <div class="contact-strip">
-            <span>By appointment only</span>
-            <span>•</span>
-            <span>Professional skin guidance</span>
-            <span>•</span>
-            <span>Luxury client experience</span>
-          </div>
-        </div>
-
-        <div class="hero-card hero-photo">
-          <div class="hero-photo-inner">
-            <div class="studio-visual">
-              <div class="studio-badge">Signature Experience</div>
-              <div class="visual-card">
-                <small class="eyebrow" style="background: var(--soft); border-color: transparent;">Featured Service</small>
-                <h3>Luxury Skin Consultation</h3>
-                <p>
-                  A refined in-studio experience focused on healthy skin, confident care decisions, and a treatment plan tailored to the client.
-                </p>
-                <div class="stat-grid">
-                  <div class="stat">
-                    <small>Session</small>
-                    <strong>45 Minutes</strong>
-                  </div>
-                  <div class="stat">
-                    <small>Setting</small>
-                    <strong>Private Studio</strong>
-                  </div>
-                  <div class="stat">
-                    <small>Approach</small>
-                    <strong>Custom Care</strong>
-                  </div>
-                  <div class="stat">
-                    <small>Result</small>
-                    <strong>Glow + Clarity</strong>
-                  </div>
-                </div>
-                <div class="quote-card">
-                  <strong>Brand feel</strong>
-                  Soft, refined, and memorable — designed to make the studio look elevated before a visitor even books.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+  <main class="launch-wrap">
+    <section class="launch-card">
+      <div class="logo-wrap">
+        <img src="logo.png" alt="Scarlett VR Poker Logo" />
       </div>
-    </section>
 
-    <section id="brand">
-      <div class="container brand-grid">
-        <article class="card">
-          <span class="eyebrow">Brand Direction</span>
-          <div class="section-title" style="margin-bottom: 0;">
-            <h3>Luxury beauty branding with stronger contrast and a polished mobile feel.</h3>
-            <p>
-              The refreshed visual direction uses deeper warm neutrals, cleaner card surfaces, and visible glowing ambient highlights so the site feels more premium on desktop and more appealing on Android screens.
-            </p>
-          </div>
-          <div class="swatch-row">
-            <div class="swatch"><span class="swatch-dot" style="background:#ddb8ae;"></span>Blush</div>
-            <div class="swatch"><span class="swatch-dot" style="background:#b98468;"></span>Rose Gold</div>
-            <div class="swatch"><span class="swatch-dot" style="background:#eee4df;"></span>Warm Nude</div>
-            <div class="swatch"><span class="swatch-dot" style="background:#8f9a92;"></span>Sage</div>
-          </div>
-        </article>
+      <div class="eyebrow">Public Launch Page</div>
 
-        <article class="card">
-          <span class="eyebrow">Signature Identity</span>
-          <div class="mini-logo-row">
-            <div class="logo-mark"><img class="site-logo" src="logo2.png" alt="Lisa Pearson Skin Studio logo" /></div>
-            <div>
-              <h3 class="about-title" style="margin:0; font-size:1.7rem; letter-spacing:0.1em;">Lisa Pearson</h3>
-              <p style="margin:6px 0 0; color:var(--muted); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.22em;">Skin Studio</p>
-            </div>
-          </div>
-          <p style="margin-top:18px;">
-            The hero, cards, buttons, and footer now follow the embedded logo more closely so the full presentation feels cohesive, refined, and client-ready.
-          </p>
-        </article>
+      <h1>Scarlett VR Poker</h1>
+
+      <p class="subtext">
+        Welcome to the public preview page for Scarlett VR Poker.
+        The full experience is currently being refined and prepared for launch.
+      </p>
+
+      <p class="status">
+        <strong>Launching Soon.</strong> Preview the website and the current game build below.
+      </p>
+
+      <div class="button-row">
+        <a class="btn btn-primary" href="./site/index.html">Preview Site</a>
+        <a class="btn btn-secondary" href="./game/index.html">Preview Game</a>
       </div>
-    </section>
 
-    <section id="services">
-      <div class="container">
-        <div class="section-title">
-          <span class="eyebrow">Services</span>
-          <h3>Professional support in a real studio setting.</h3>
-          <p>
-            Present the studio with clarity and confidence so visitors immediately understand the experience, the service focus, and the next step to book.
-          </p>
-        </div>
-        <div class="grid-3">
-          <article class="card">
-            <h4>In-Person Consultation</h4>
-            <p>Face-to-face skin review focused on your concerns, goals, lifestyle, and current routine.</p>
-          </article>
-          <article class="card">
-            <h4>Treatment Planning</h4>
-            <p>Guidance on products, treatment direction, maintenance visits, and realistic next steps.</p>
-          </article>
-          <article class="card">
-            <h4>Ongoing Skin Support</h4>
-            <p>Follow-up care to track progress, refine recommendations, and support healthier skin over time.</p>
-          </article>
-        </div>
+      <div class="notice">
+        This is the official public page. Content, visuals, and gameplay features are still under construction and may change during development.
       </div>
-    </section>
 
-    <section id="packages">
-      <div class="container">
-        <div class="section-title">
-          <span class="eyebrow">Price List</span>
-          <h3>Lisa Pearson Skincare Consulting – Price List</h3>
-          <p>
-            A clear professional service menu for client review, featuring consultation options, personalized planning, and premium skincare guidance.
-          </p>
-        </div>
-        <div class="grid-3">
-          <article class="card">
-            <h4>Initial Skincare Consultation</h4>
-            <div class="price">$120</div>
-            <p>A complete first consultation focused on skin goals, concerns, and a professional care direction.</p>
-            <a class="btn btn-primary" href="#booking">Book This</a>
-          </article>
-          <article class="card">
-            <h4>Personalized Skincare Routine</h4>
-            <div class="price">$180</div>
-            <p>A custom skincare routine built around lifestyle, skin type, product fit, and long-term maintenance.</p>
-            <a class="btn btn-primary" href="#booking">Book This</a>
-          </article>
-          <article class="card">
-            <h4>Acne / Problem Skin Consultation</h4>
-            <div class="price">$220</div>
-            <p>Focused support for acne-prone or problem skin with practical guidance and a structured care approach.</p>
-            <a class="btn btn-primary" href="#booking">Book This</a>
-          </article>
-          <article class="card">
-            <h4>Follow-Up Consultation</h4>
-            <div class="price">$95</div>
-            <p>A follow-up session to review progress, adjust recommendations, and refine the skincare plan.</p>
-            <a class="btn btn-primary" href="#booking">Book This</a>
-          </article>
-          <article class="card">
-            <h4>Premium Skin Transformation Plan</h4>
-            <div class="price">$350</div>
-            <p>A premium consulting package designed for a more complete skin strategy, care roadmap, and elevated guidance.</p>
-            <a class="btn btn-primary" href="#booking">Book This</a>
-          </article>
-          <article class="card">
-            <h4>Quick Skincare Advice (15 mins)</h4>
-            <div class="price">$70</div>
-            <p>A shorter consultation for quick questions, targeted advice, and immediate skincare direction.</p>
-            <a class="btn btn-primary" href="#booking">Book This</a>
-          </article>
-        </div>
-      </div>
-    </section>
+      <p class="disclaimer">
+        18+ Only • This project is intended for adults.
+      </p>
 
-    <section id="about">
-      <div class="container about-grid">
-        <article class="card">
-          <span class="eyebrow">About the Founder</span>
-          <div class="founder-card" style="margin-top:18px;">
-            <div class="founder-portrait">LP</div>
-            <div>
-              <h3 class="founder-name">Lisa Pearson</h3>
-              <div class="founder-label">Founder</div>
-              <p style="margin-top:14px;">
-                Lisa Pearson is the founder of Lisa Pearson Skin Studio, created to offer thoughtful, in-person skin care guidance in a calm and professional environment.
-              </p>
-              <p>
-                This section is ready for the final founder bio and credentials once the client approves the design direction and layout.
-              </p>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <span class="eyebrow">Studio Vision</span>
-          <h3 class="about-title" style="margin:14px 0 10px; font-size:2rem;">Simple, elegant, and client-focused.</h3>
-          <p>
-            Lisa Pearson Skin Studio is designed to feel warm, polished, and personal. The brand voice centers on confidence, healthy skin, trust, and clear professional guidance.
-          </p>
-          <ul class="list-clean">
-            <li>In-person skin care consultations</li>
-            <li>Customized care plans</li>
-            <li>Luxury but approachable presentation</li>
-            <li>Clear next steps for booking and follow-up care</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section id="newsletter">
-      <div class="container booking-grid">
-        <article class="card booking-box">
-          <span class="eyebrow">Newsletter</span>
-          <h3 class="about-title" style="margin:14px 0 10px; font-size:2rem;">Glow with Lisa Pearson ✨</h3>
-          <p class="booking-note">
-            Join the Lisa Pearson Skincare newsletter and stay updated with expert skincare tips, product recommendations, and simple routines to help you achieve healthy, radiant skin.
-          </p>
-          <ul class="list-clean">
-            <li>Exclusive skincare tips</li>
-            <li>Personalized routine advice</li>
-            <li>Early access to skincare consultations</li>
-            <li>Special offers and updates</li>
-          </ul>
-          <p class="booking-note" style="margin-top:16px;">
-            Sign up today and start your journey to glowing, confident skin.
-          </p>
-        </article>
-
-        <article class="card booking-box">
-          <span class="eyebrow">Stay Connected</span>
-          <h3 class="about-title" style="margin:14px 0 10px; font-size:2rem;">Lisa Pearson Skincare Newsletter</h3>
-          <form id="newsletterForm">
-            <input type="text" name="name" placeholder="Full name" required />
-            <input type="email" name="email" placeholder="Email address" required />
-            <input class="full" type="text" name="interest" placeholder="Skincare interests or primary concerns" />
-            <button class="btn btn-primary full" type="submit">Join Newsletter</button>
-          </form>
-        </article>
-      </div>
-    </section>
-
-    <section id="booking">
-      <div class="container booking-grid">
-        <article class="card booking-box">
-          <span class="eyebrow">Book Now</span>
-          <h3 class="about-title" style="margin:14px 0 10px; font-size:2rem;">Request an appointment.</h3>
-          <p class="booking-note">
-            This booking section is intentionally simple for launch. It looks polished for client review now and can be connected to a full booking workflow later.
-          </p>
-          <div class="studio-details">
-            <div class="studio-detail">
-              <strong>Studio Access</strong>
-              Private appointment details can be shared at confirmation.
-            </div>
-            <div class="studio-detail">
-              <strong>Business Contact</strong>
-              Dedicated studio phone line can be added after approval.
-            </div>
-            <div class="studio-detail">
-              <strong>Email</strong>
-              <span id="displayEmail">hello@lisapearsonskin.com</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="card booking-box">
-          <form id="bookingForm">
-            <input type="text" name="name" placeholder="Full name" required />
-            <input type="email" name="email" placeholder="Email address" required />
-            <input type="tel" name="phone" placeholder="Phone number" required />
-            <input type="text" name="date" placeholder="Preferred date" required />
-            <input class="full" type="text" name="concern" placeholder="Primary skin concern" />
-            <textarea name="message" placeholder="Tell us about your goals, skin concerns, or ideal appointment time"></textarea>
-            <button class="btn btn-primary full" type="submit">Send Booking Request</button>
-          </form>
-        </article>
+      <div class="footer">
+        © 2026 Scarlett VR Poker. All rights reserved.
       </div>
     </section>
   </main>
-
-  <footer>
-    <div class="container">
-      <div class="footer-main">© 2026 Lisa Pearson Skin Studio • In-Person Skin Care Consultation</div>
-      <div class="footer-credit">Powered by TeamNova &amp; R.Chadee</div>
-    </div>
-  </footer>
-
-  <div class="mobile-bookbar">
-    <a class="btn btn-secondary" href="#services">Services</a>
-    <a class="btn btn-primary" href="#booking">Book Now</a>
-  </div>
-
-  <script>
-    const bookingEmail = 'hello@lisapearsonskin.com';
-    const displayEmail = document.getElementById('displayEmail');
-    if (displayEmail) displayEmail.textContent = bookingEmail;
-
-    const bookingForm = document.getElementById('bookingForm');
-    if (bookingForm) {
-      bookingForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const data = new FormData(e.target);
-        const subject = encodeURIComponent('New Skin Care Booking Request');
-        const body = encodeURIComponent(
-          'Name: ' + (data.get('name') || '') + '
-' +
-          'Email: ' + (data.get('email') || '') + '
-' +
-          'Phone: ' + (data.get('phone') || '') + '
-' +
-          'Preferred Date: ' + (data.get('date') || '') + '
-' +
-          'Concern: ' + (data.get('concern') || '') + '
-
-' +
-          'Message:
-' + (data.get('message') || '')
-        );
-        window.location.href = 'mailto:' + bookingEmail + '?subject=' + subject + '&body=' + body;
-      });
-    }
-
-    const newsletterForm = document.getElementById('newsletterForm');
-    if (newsletterForm) {
-      newsletterForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const data = new FormData(e.target);
-        const subject = encodeURIComponent('Newsletter Signup');
-        const body = encodeURIComponent(
-          'Name: ' + (data.get('name') || '') + '
-' +
-          'Email: ' + (data.get('email') || '') + '
-' +
-          'Interests: ' + (data.get('interest') || '')
-        );
-        window.location.href = 'mailto:' + bookingEmail + '?subject=' + subject + '&body=' + body;
-      });
-    }
-  </script>
 </body>
 </html>
