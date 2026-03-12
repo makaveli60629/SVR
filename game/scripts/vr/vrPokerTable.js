@@ -1,73 +1,100 @@
+/**
+ * SVR Poker — vrPokerTable.js
+ * A-Frame component that renders the live table state in VR.
+ * Three.js r170 / A-Frame 1.5
+ */
 
-export class VRPokerTable{
+export class VRPokerTable {
+  constructor(scene) {
+    this.scene      = scene;
+    this.tableState = null;
+    this._cards     = new Map();
+    this._seats     = new Map();
+  }
 
-constructor(scene){
-  this.scene = scene;
-  this.tableState = null;
-}
+  /** Update from server tableState */
+  update(table) {
+    this.tableState = table;
+    this._renderCommunity();
+    this._renderPlayers();
+  }
 
-update(table){
+  _renderCommunity() {
+    if (!this.tableState) return;
+    const cards = this.tableState.community || [];
 
-  this.tableState = table;
-  this.renderCommunity();
-  this.renderPlayers();
+    cards.forEach((label, i) => {
+      const id = 'community_' + i;
+      let el   = document.getElementById(id);
+      if (!el) {
+        el = document.createElement('a-plane');
+        el.setAttribute('id', id);
+        el.setAttribute('width',  '0.30');
+        el.setAttribute('height', '0.45');
+        el.setAttribute('color',  '#ffffff');
+        el.setAttribute('position', `${i * 0.38 - 0.76} 1.12 -0.95`);
+        el.setAttribute('rotation', '-90 0 0');
+        this.scene.appendChild(el);
+        this._cards.set(id, el);
+      }
+      el.setAttribute('text', `value: ${label}; align: center; color: black; width: 1`);
+    });
 
-}
-
-renderCommunity(){
-
-  if(!this.tableState) return;
-
-  const cards = this.tableState.community || [];
-
-  cards.forEach((card,i)=>{
-
-    let el = document.getElementById("community"+i);
-
-    if(!el){
-
-      el = document.createElement("a-plane");
-
-      el.setAttribute("id","community"+i);
-      el.setAttribute("width","0.3");
-      el.setAttribute("height","0.45");
-      el.setAttribute("position",`${i*0.4-0.8} 1.1 -1`);
-
-      this.scene.appendChild(el);
+    // Remove stale cards
+    for (const [id, el] of this._cards) {
+      const idx = parseInt(id.replace('community_', ''));
+      if (idx >= cards.length) { el.remove(); this._cards.delete(id); }
     }
+  }
 
-    el.setAttribute("text","value:"+card+";align:center;color:black");
-    el.setAttribute("material","color:white");
+  _renderPlayers() {
+    if (!this.tableState) return;
+    const n = this.tableState.players.length;
 
-  });
+    this.tableState.players.forEach((p, i) => {
+      const angle = (i / n) * Math.PI * 2;
+      const r     = 2.0;
+      const x     = Math.cos(angle) * r;
+      const z     = Math.sin(angle) * r;
 
+      const id = 'seat_' + i;
+      let seat = document.getElementById(id);
+      if (!seat) {
+        seat = document.createElement('a-cylinder');
+        seat.setAttribute('id', id);
+        seat.setAttribute('radius', '0.28');
+        seat.setAttribute('height', '0.08');
+        seat.setAttribute('color',  '#1a004a');
+        seat.setAttribute('position', `${x} 0.82 ${z}`);
+        this.scene.appendChild(seat);
+        this._seats.set(id, seat);
+      }
+
+      // Name label
+      let label = document.getElementById('label_' + i);
+      if (!label) {
+        label = document.createElement('a-text');
+        label.setAttribute('id', 'label_' + i);
+        label.setAttribute('align', 'center');
+        label.setAttribute('color', p.folded ? '#555' : '#b95aff');
+        label.setAttribute('position', `${x} 1.22 ${z}`);
+        label.setAttribute('look-at', '[camera]');
+        this.scene.appendChild(label);
+      }
+      label.setAttribute('value', `${p.name}\n💰${p.chips}${p.folded ? '\n[folded]' : ''}`);
+      label.setAttribute('color', p.folded ? '#555' : '#b95aff');
+    });
+  }
 }
 
-renderPlayers(){
-
-  if(!this.tableState) return;
-
-  this.tableState.players.forEach((p,i)=>{
-
-    let seat = document.getElementById("seat"+i);
-
-    if(!seat){
-
-      seat = document.createElement("a-cylinder");
-
-      seat.setAttribute("id","seat"+i);
-      seat.setAttribute("radius","0.3");
-      seat.setAttribute("height","0.1");
-
-      seat.setAttribute("position",
-      `${Math.cos(i)*2} 0.5 ${Math.sin(i)*2}`);
-
-      this.scene.appendChild(seat);
-
-    }
-
+// Also register as A-Frame component for A-Frame scenes
+if (typeof AFRAME !== 'undefined') {
+  AFRAME.registerComponent('vr-poker-table', {
+    init() {
+      this.vrTable = new VRPokerTable(this.el.sceneEl || this.el);
+    },
+    update(data) {
+      if (data && data.tableState) this.vrTable.update(data.tableState);
+    },
   });
-
-}
-
 }

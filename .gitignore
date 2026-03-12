@@ -13,3 +13,12 @@ Thumbs.db
 *.zip
 !update/site.zip
 !update/game.zip
+
+# Node.js
+node_modules/
+npm-debug.log*
+.env
+
+# Editor
+.vscode/
+.idea/

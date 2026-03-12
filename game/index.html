@@ -1,126 +1,891 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>SVR Poker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SVR Poker</title>
+  <style>
+    /* ── Reset & base ───────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<style>
-body{
-margin:0;
-overflow:hidden;
-background:black;
-}
-</style>
+    :root {
+      --bg:       #070709;
+      --panel:    rgba(10, 10, 18, 0.90);
+      --border:   rgba(185, 90, 255, 0.30);
+      --text:     #f3ecff;
+      --muted:    #b9a9d6;
+      --accent:   #b95aff;
+      --green:    #0a5c2f;
+      --chip:     #ff3c3c;
+      --win:      #ffe94d;
+      --fold:     #ff6b6b;
+      --glow:     rgba(185, 90, 255, 0.40);
+      --card-bg:  #ffffff;
+      --card-red: #cc2222;
+    }
 
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #070709;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+    }
+
+    /* ── Three.js canvas ────────────────────── */
+    #gameCanvas {
+      position: fixed;
+      inset: 0;
+      display: block;
+    }
+
+    /* ── Matrix overlay ─────────────────────── */
+    #matrixCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      z-index: 1;
+    }
+
+    /* ── HUD overlay ────────────────────────── */
+    #hud {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* ── Top bar ────────────────────────────── */
+    #topBar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(7,7,9,0.80) 0%, transparent 100%);
+      pointer-events: auto;
+    }
+    #topBar .logo { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.12em; color: var(--accent); }
+    #topBar .chips { font-size: 1rem; font-weight: 700; color: var(--win); }
+    #topBar .stage-badge {
+      padding: 5px 14px; border-radius: 999px;
+      background: rgba(185,90,255,0.15); border: 1px solid var(--border);
+      font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    /* ── Community cards ────────────────────── */
+    #communityArea {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -60%);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    /* ── Pot display ────────────────────────── */
+    #potDisplay {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -10%);
+      text-align: center;
+      pointer-events: none;
+    }
+    #potDisplay .pot-label { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em; }
+    #potDisplay .pot-amount { font-size: 1.6rem; font-weight: 800; color: var(--win); }
+
+    /* ── Playing card ───────────────────────── */
+    .card {
+      width: 52px; height: 76px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 800;
+      color: #111;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.55);
+      border: 1px solid rgba(0,0,0,0.15);
+      transition: transform 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card.red  { color: var(--card-red); }
+    .card.back {
+      background: linear-gradient(135deg, #4a0096, #1a0040);
+      color: rgba(185,90,255,0.7); font-size: 1.4rem;
+    }
+    .card .rank { font-size: 1.1rem; line-height: 1; }
+    .card .suit { font-size: 1rem;  line-height: 1; }
+    .card-placeholder {
+      width: 52px; height: 76px;
+      border-radius: 8px;
+      border: 2px dashed rgba(185,90,255,0.25);
+      background: rgba(185,90,255,0.04);
+    }
+
+    /* ── Player seats (bottom area) ─────────── */
+    #playerArea {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 0 20px 20px;
+      pointer-events: auto;
+    }
+
+    /* ── My hand ────────────────────────────── */
+    #myHand {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    #myHand .card { width: 64px; height: 92px; font-size: 1.1rem; }
+    #myHand .card .rank { font-size: 1.3rem; }
+    #myHand .card .suit { font-size: 1.15rem; }
+
+    /* ── Action buttons ─────────────────────── */
+    #actionBar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .action-btn {
+      padding: 11px 22px;
+      border-radius: 12px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      letter-spacing: 0.04em;
+    }
+    .action-btn:hover:not(:disabled) { transform: translateY(-2px); }
+    .action-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+
+    .btn-fold  { background: rgba(255,100,100,0.18); color: #ff8888; border: 1px solid rgba(255,100,100,0.35); }
+    .btn-check { background: rgba(255,255,255,0.08); color: #ddd;    border: 1px solid rgba(255,255,255,0.18); }
+    .btn-call  { background: rgba(93,216,255,0.15);  color: #5dd8ff; border: 1px solid rgba(93,216,255,0.35); }
+    .btn-raise { background: rgba(185,90,255,0.20);  color: #d48fff; border: 1px solid var(--border); }
+    .btn-allin { background: linear-gradient(135deg,#ff3c3c,#c00); color: #fff; border: 1px solid rgba(255,60,60,0.5); box-shadow: 0 0 18px rgba(255,60,60,0.3); }
+
+    #raiseInput {
+      width: 80px;
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    /* ── Opponent seats ─────────────────────── */
+    #opponentArea {
+      position: absolute;
+      top: 14%; left: 0; right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      pointer-events: none;
+    }
+
+    .opponent-seat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px 14px;
+      min-width: 120px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+    .opponent-seat .opp-name  { font-size: 0.82rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+    .opponent-seat .opp-chips { font-size: 0.78rem; color: var(--win); margin-bottom: 6px; }
+    .opponent-seat .opp-status{ font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; }
+    .opponent-seat.folded     { opacity: 0.4; }
+    .opponent-seat.active-turn{ border-color: var(--win); box-shadow: 0 0 16px rgba(255,233,77,0.35); }
+    .opp-cards { display: flex; gap: 5px; justify-content: center; }
+    .opp-cards .card { width: 32px; height: 46px; font-size: 0.65rem; }
+    .opp-cards .card .rank { font-size: 0.7rem; }
+    .opp-cards .card .suit  { font-size: 0.65rem; }
+
+    /* ── Turn indicator ─────────────────────── */
+    #turnIndicator {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, 30%);
+      padding: 8px 20px;
+      border-radius: 999px;
+      background: rgba(255,233,77,0.18);
+      border: 1px solid rgba(255,233,77,0.45);
+      color: var(--win);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      pointer-events: none;
+      display: none;
+    }
+
+    /* ── Winner banner ──────────────────────── */
+    #winnerBanner {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 28px 40px;
+      border-radius: 24px;
+      background: rgba(10,10,18,0.97);
+      border: 2px solid rgba(255,233,77,0.65);
+      box-shadow: 0 0 60px rgba(255,233,77,0.25);
+      text-align: center;
+      display: none;
+      z-index: 20;
+      pointer-events: auto;
+      min-width: 320px;
+    }
+    #winnerBanner h2 { font-size: 1.5rem; color: var(--win); margin-bottom: 10px; }
+    #winnerBanner p  { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+
+    /* ── Log panel ──────────────────────────── */
+    #logPanel {
+      position: absolute;
+      bottom: 140px; right: 16px;
+      width: 260px;
+      max-height: 180px;
+      overflow-y: auto;
+      background: rgba(7,7,9,0.82);
+      border: 1px solid rgba(185,90,255,0.18);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    #logPanel .log-entry { margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 3px; }
+
+    /* ── Join overlay ───────────────────────── */
+    #joinOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(7,7,9,0.92);
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .join-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 36px;
+      text-align: center;
+      box-shadow: 0 0 60px var(--glow);
+      width: min(380px, 92vw);
+    }
+    .join-card h1 { font-size: 1.8rem; margin-bottom: 8px; }
+    .join-card p  { color: var(--muted); margin-bottom: 24px; font-size: 0.95rem; }
+    .join-input {
+      width: 100%; padding: 13px 16px;
+      border-radius: 12px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06); color: var(--text);
+      font-size: 1rem; margin-bottom: 12px;
+    }
+    .join-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #b95aff, #7a2cff);
+      color: #fff; border: none; border-radius: 14px;
+      font-size: 1rem; font-weight: 800;
+      cursor: pointer; transition: transform 0.15s ease;
+    }
+    .join-btn:hover { transform: translateY(-2px); }
+    .join-status { margin-top: 12px; font-size: 0.85rem; color: var(--muted); min-height: 20px; }
+
+    /* ── Connection dot ─────────────────────── */
+    #connStatus {
+      position: absolute;
+      top: 16px; right: 20px;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; color: var(--muted);
+      pointer-events: none;
+    }
+    .conn-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #555;
+    }
+    .conn-dot.connected    { background: #44ff88; box-shadow: 0 0 6px #44ff88; }
+    .conn-dot.disconnected { background: #ff4444; }
+
+    /* ── Scrollbar ──────────────────────────── */
+    #logPanel::-webkit-scrollbar { width: 4px; }
+    #logPanel::-webkit-scrollbar-thumb { background: rgba(185,90,255,0.3); border-radius: 2px; }
+  </style>
 </head>
-
 <body>
 
+<!-- ══ Three.js scene canvas ══════════════════════════════════════════════ -->
+<canvas id="gameCanvas"></canvas>
+
+<!-- ══ Matrix rain overlay ════════════════════════════════════════════════ -->
+<canvas id="matrixCanvas"></canvas>
+
+<!-- ══ Main HUD ═══════════════════════════════════════════════════════════ -->
+<div id="hud">
+
+  <!-- Top bar -->
+  <div id="topBar">
+    <span class="logo">SVR POKER</span>
+    <span id="stageDisplay" class="stage-badge">WAITING</span>
+    <span class="chips">💰 <span id="myChips">1000</span></span>
+  </div>
+
+  <!-- Opponents -->
+  <div id="opponentArea"></div>
+
+  <!-- Community cards -->
+  <div id="communityArea"></div>
+
+  <!-- Pot -->
+  <div id="potDisplay">
+    <div class="pot-label">Pot</div>
+    <div class="pot-amount" id="potAmount">0</div>
+  </div>
+
+  <!-- Turn indicator -->
+  <div id="turnIndicator">YOUR TURN</div>
+
+  <!-- Winner banner -->
+  <div id="winnerBanner">
+    <h2 id="winnerTitle">🏆 Winner!</h2>
+    <p id="winnerBody"></p>
+  </div>
+
+  <!-- Bottom player area -->
+  <div id="playerArea">
+    <!-- My hand -->
+    <div id="myHand"></div>
+
+    <!-- Action buttons -->
+    <div id="actionBar">
+      <button class="action-btn btn-fold"  id="btnFold"  onclick="sendAction('fold')">Fold</button>
+      <button class="action-btn btn-check" id="btnCheck" onclick="sendAction('check')">Check</button>
+      <button class="action-btn btn-call"  id="btnCall"  onclick="sendAction('call')">Call</button>
+      <input  type="number" id="raiseInput" min="20" step="10" value="40" />
+      <button class="action-btn btn-raise" id="btnRaise" onclick="sendAction('raise')">Raise</button>
+      <button class="action-btn btn-allin" id="btnAllIn" onclick="sendAction('allin')">All-In</button>
+    </div>
+  </div>
+
+  <!-- Log -->
+  <div id="logPanel"></div>
+
+  <!-- Connection status -->
+  <div id="connStatus">
+    <div class="conn-dot" id="connDot"></div>
+    <span id="connText">Offline</span>
+  </div>
+
+</div>
+
+<!-- ══ Join overlay ════════════════════════════════════════════════════════ -->
+<div id="joinOverlay">
+  <div class="join-card">
+    <h1>SVR Poker</h1>
+    <p>Enter your name to join the table</p>
+    <input class="join-input" type="text" id="nameInput" placeholder="Your name" maxlength="20" />
+    <input class="join-input" type="number" id="chipsInput" placeholder="Starting chips (default 1000)" min="100" max="10000" step="100" />
+    <button class="join-btn" onclick="joinGame()">Join Table</button>
+    <div class="join-status" id="joinStatus">Connecting to server…</div>
+  </div>
+</div>
+
+<!-- ══ Scripts ════════════════════════════════════════════════════════════ -->
+
+<!-- Three.js r170 -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170/examples/jsm/"
+  }
+}
+</script>
+
+<!-- Socket.IO client -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
 <script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js"
-import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/loaders/GLTFLoader.js"
-import { FBXLoader } from "https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/loaders/FBXLoader.js"
+// ─────────────────────────────────────────────────────────────────────────────
+//  THREE.JS SCENE
+// ─────────────────────────────────────────────────────────────────────────────
+const canvas   = document.getElementById('gameCanvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
 
-const scene = new THREE.Scene()
+const scene  = new THREE.Scene();
+scene.background = new THREE.Color(0x070709);
+scene.fog        = new THREE.FogExp2(0x070709, 0.018);
 
-const camera = new THREE.PerspectiveCamera(
-70,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
-)
+const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 500);
+camera.position.set(0, 3.5, 6.5);
+camera.lookAt(0, 0.8, 0);
 
-camera.position.set(0,1.6,4)
+// Orbit controls (desktop)
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0.8, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance   = 3;
+controls.maxDistance   = 14;
+controls.maxPolarAngle = Math.PI / 2.1;
+controls.update();
 
-const renderer = new THREE.WebGLRenderer({antialias:true})
-renderer.setSize(window.innerWidth,window.innerHeight)
-document.body.appendChild(renderer.domElement)
+// ── Lighting ──────────────────────────────────────────────────────────────
+const ambient = new THREE.AmbientLight(0x6644aa, 0.8);
+scene.add(ambient);
 
-const light = new THREE.DirectionalLight(0xffffff,1)
-light.position.set(5,10,5)
-scene.add(light)
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.4);
+keyLight.position.set(5, 10, 6);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+scene.add(keyLight);
 
-const ambient = new THREE.AmbientLight(0x666666)
-scene.add(ambient)
+const fillLight = new THREE.PointLight(0xb95aff, 1.8, 20);
+fillLight.position.set(-4, 3, -2);
+scene.add(fillLight);
 
-/* floor */
+const rimLight = new THREE.PointLight(0x5dd8ff, 1.2, 15);
+rimLight.position.set(4, 2, -4);
+scene.add(rimLight);
 
+// ── Floor ─────────────────────────────────────────────────────────────────
 const floor = new THREE.Mesh(
-new THREE.PlaneGeometry(100,100),
-new THREE.MeshStandardMaterial({color:0x222222})
-)
+  new THREE.PlaneGeometry(80, 80),
+  new THREE.MeshStandardMaterial({ color: 0x0d0d14, roughness: 0.9, metalness: 0.1 })
+);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
 
-floor.rotation.x = -Math.PI/2
-scene.add(floor)
+// ── Poker table ───────────────────────────────────────────────────────────
+const tableFelt = new THREE.TextureLoader().load('assets/texture/tablefelt.png');
+tableFelt.wrapS = tableFelt.wrapT = THREE.RepeatWrapping;
+tableFelt.repeat.set(2, 2);
 
-/* loaders */
+const tableTop = new THREE.Mesh(
+  new THREE.CylinderGeometry(2.6, 2.6, 0.12, 64),
+  new THREE.MeshStandardMaterial({ map: tableFelt, roughness: 0.85, metalness: 0.0 })
+);
+tableTop.position.set(0, 0.76, 0);
+tableTop.receiveShadow = true;
+tableTop.castShadow    = true;
+scene.add(tableTop);
 
-const gltfLoader = new GLTFLoader()
-const fbxLoader = new FBXLoader()
-const texLoader = new THREE.TextureLoader()
+// Table rim
+const tableRim = new THREE.Mesh(
+  new THREE.TorusGeometry(2.6, 0.12, 8, 64),
+  new THREE.MeshStandardMaterial({ color: 0x3b1e00, roughness: 0.5, metalness: 0.3 })
+);
+tableRim.rotation.x = Math.PI / 2;
+tableRim.position.set(0, 0.82, 0);
+tableRim.castShadow = true;
+scene.add(tableRim);
 
-/* table texture */
+// Table leg
+const tableLeg = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.18, 0.28, 0.76, 16),
+  new THREE.MeshStandardMaterial({ color: 0x2a1200, roughness: 0.6, metalness: 0.2 })
+);
+tableLeg.position.set(0, 0.38, 0);
+tableLeg.castShadow = true;
+scene.add(tableLeg);
 
-const felt = texLoader.load("assets/texture/tablefelt.png")
-
-/* TABLE */
-
+// ── Try to load real GLB table if available ───────────────────────────────
+const gltfLoader = new GLTFLoader();
 gltfLoader.load(
-"assets/models/table.glb",
-(gltf)=>{
+  'assets/models/table.glb',
+  (gltf) => {
+    gltf.scene.scale.set(0.01, 0.01, 0.01);
+    gltf.scene.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } });
+    // Only replace if the file is real (>1KB)
+    scene.remove(tableTop); scene.remove(tableRim); scene.remove(tableLeg);
+    scene.add(gltf.scene);
+  },
+  undefined,
+  () => { /* fallback geometry already in scene */ }
+);
 
-gltf.scene.traverse((child)=>{
-if(child.isMesh){
-child.material.map = felt
+// ── City skyline background ────────────────────────────────────────────────
+const skylineTex = new THREE.TextureLoader().load('assets/skyline/chicago_skyline.png');
+const skylineMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(60, 20),
+  new THREE.MeshBasicMaterial({ map: skylineTex, transparent: true, depthWrite: false })
+);
+skylineMesh.position.set(0, 6, -28);
+scene.add(skylineMesh);
+
+// ── Moon ──────────────────────────────────────────────────────────────────
+const moonTex  = new THREE.TextureLoader().load('assets/textures/moon_diffuse.png');
+const moonBump = new THREE.TextureLoader().load('assets/textures/moon_bump.png');
+const moon     = new THREE.Mesh(
+  new THREE.SphereGeometry(3.5, 48, 48),
+  new THREE.MeshStandardMaterial({ map: moonTex, bumpMap: moonBump, bumpScale: 0.3, roughness: 1.0 })
+);
+moon.position.set(12, 18, -40);
+scene.add(moon);
+
+// Moonlight glow
+const moonGlow = new THREE.PointLight(0xfff5cc, 0.7, 80);
+moonGlow.position.copy(moon.position);
+scene.add(moonGlow);
+
+// ── Stars ─────────────────────────────────────────────────────────────────
+const starGeo = new THREE.BufferGeometry();
+const starCount = 1200;
+const starPos = new Float32Array(starCount * 3);
+for (let i = 0; i < starCount * 3; i += 3) {
+  const theta = Math.random() * Math.PI * 2;
+  const phi   = Math.acos(2 * Math.random() - 1);
+  const r     = 180 + Math.random() * 60;
+  starPos[i]   = r * Math.sin(phi) * Math.cos(theta);
+  starPos[i+1] = Math.abs(r * Math.cos(phi)) + 5;
+  starPos[i+2] = r * Math.sin(phi) * Math.sin(theta);
 }
-})
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.35, sizeAttenuation: true }));
+scene.add(stars);
 
-gltf.scene.scale.set(.01,.01,.01)
-scene.add(gltf.scene)
+// ── Neon ring accent under table ──────────────────────────────────────────
+const ringGeo = new THREE.TorusGeometry(2.8, 0.04, 8, 80);
+const ringMat = new THREE.MeshBasicMaterial({ color: 0xb95aff });
+const ring    = new THREE.Mesh(ringGeo, ringMat);
+ring.rotation.x = Math.PI / 2;
+ring.position.set(0, 0.62, 0);
+scene.add(ring);
 
+// ── Resize handler ────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ── Animate ───────────────────────────────────────────────────────────────
+let t = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  t += 0.008;
+  moon.rotation.y += 0.0005;
+  stars.rotation.y += 0.00008;
+  fillLight.intensity = 1.6 + Math.sin(t * 1.3) * 0.3;
+  ringMat.color.setHSL(0.77 + Math.sin(t * 0.5) * 0.05, 1, 0.6);
+  controls.update();
+  renderer.render(scene, camera);
 }
-)
+animate();
 
-/* PLAYER */
+// ── Matrix rain ───────────────────────────────────────────────────────────
+(function initMatrix() {
+  const mc  = document.getElementById('matrixCanvas');
+  const ctx = mc.getContext('2d');
+  const glyphs = 'SVRPOKER0123456789♠♥♦♣';
+  const sz  = 15;
+  let cols, drops;
+  function resize() {
+    mc.width  = window.innerWidth;
+    mc.height = window.innerHeight;
+    cols  = Math.floor(mc.width / sz);
+    drops = Array.from({ length: cols }, () => Math.floor(Math.random() * -30));
+  }
+  function draw() {
+    ctx.fillStyle = 'rgba(7,7,9,0.10)';
+    ctx.fillRect(0, 0, mc.width, mc.height);
+    ctx.font = sz + 'px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const ch = glyphs[(Math.random() * glyphs.length) | 0];
+      ctx.fillStyle = Math.random() > 0.88 ? '#e0b8ff' : '#7a2cff';
+      ctx.fillText(ch, i * sz, drops[i] * sz);
+      if (drops[i] * sz > mc.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  setInterval(draw, 40);
+})();
 
-gltfLoader.load(
-"assets/models/player.glb",
-(gltf)=>{
-gltf.scene.scale.set(.01,.01,.01)
-gltf.scene.position.set(0,0,-3)
-scene.add(gltf.scene)
+// ─────────────────────────────────────────────────────────────────────────────
+//  SOCKET.IO / GAME CLIENT
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Auto-detect server URL: same origin in prod, localhost:8080 in dev
+const SERVER_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? `http://${window.location.hostname}:8080`
+  : window.location.origin;
+
+let socket    = null;
+let myId      = null;
+let myName    = null;
+let gameState = null;
+let isMyTurn  = false;
+const TABLE_ID = 'main';
+
+// Expose to window so onclick handlers work
+window.joinGame      = joinGame;
+window.sendAction    = sendAction;
+
+function generateId() {
+  return 'p_' + Math.random().toString(36).slice(2, 9);
 }
-)
 
-/* NPC */
+function joinGame() {
+  const nameInput  = document.getElementById('nameInput');
+  const chipsInput = document.getElementById('chipsInput');
+  const statusEl   = document.getElementById('joinStatus');
+  const name  = nameInput.value.trim() || 'Player' + Math.floor(Math.random() * 999);
+  const chips = parseInt(chipsInput.value) || 1000;
 
-fbxLoader.load(
-"assets/models/npc_sitting.fbx",
-(fbx)=>{
-fbx.scale.set(.01,.01,.01)
-fbx.position.set(2,0,0)
-scene.add(fbx)
+  myId   = generateId();
+  myName = name;
+  statusEl.textContent = 'Connecting…';
+
+  socket = io(SERVER_URL, { transports: ['websocket', 'polling'] });
+
+  socket.on('connect', () => {
+    setConn(true);
+    statusEl.textContent = 'Connected! Joining table…';
+    socket.emit('registerPlayer', { playerId: myId, name });
+    socket.emit('joinTable', { tableId: TABLE_ID, playerId: myId, chips });
+  });
+
+  socket.on('disconnect', () => setConn(false));
+  socket.on('connect_error', () => {
+    statusEl.textContent = '⚠ Could not reach server. Playing offline.';
+    setConn(false);
+    startOfflineMode(name, chips);
+  });
+
+  socket.on('tableState',  (state) => { gameState = state; render(state); closeJoin(); });
+  socket.on('tableUpdate', (state) => { gameState = state; render(state); });
+  socket.on('roundStarted',(state) => { gameState = state; render(state); addLog('🃏 New round started!'); });
+  socket.on('roundOver',   (data)  => { showWinner(data.winners); });
+  socket.on('stageChanged',(data)  => { addLog(`📋 Stage: ${data.stage} — ${data.community.join(' ')}`); });
+  socket.on('error',       (data)  => { addLog(`⚠ ${data.message}`); });
+  socket.on('actionRequired', (data) => {
+    if (data.playerId === myId) addLog('👉 Your turn!');
+  });
 }
-)
 
-/* MOON */
-
-fbxLoader.load(
-"assets/models/moon.fbx",
-(fbx)=>{
-fbx.scale.set(.02,.02,.02)
-fbx.position.set(0,15,-40)
-scene.add(fbx)
-}
-)
-
-function animate(){
-requestAnimationFrame(animate)
-renderer.render(scene,camera)
+function closeJoin() {
+  document.getElementById('joinOverlay').style.display = 'none';
 }
 
-animate()
+function setConn(on) {
+  document.getElementById('connDot').className  = 'conn-dot ' + (on ? 'connected' : 'disconnected');
+  document.getElementById('connText').textContent = on ? 'Live' : 'Offline';
+}
+
+// ── Render state ─────────────────────────────────────────────────────────
+function render(state) {
+  if (!state) return;
+
+  document.getElementById('stageDisplay').textContent = state.stage.replace('_',' ');
+  document.getElementById('potAmount').textContent    = state.pot;
+
+  isMyTurn = state.currentPlayerId === myId;
+  document.getElementById('turnIndicator').style.display = isMyTurn ? 'block' : 'none';
+
+  // My chips
+  const me = state.players.find(p => p.id === myId);
+  if (me) document.getElementById('myChips').textContent = me.chips;
+
+  // My hand
+  renderMyHand(me, state.stage);
+
+  // Community
+  renderCommunity(state.community);
+
+  // Opponents
+  renderOpponents(state.players, state.currentPlayerId);
+
+  // Buttons
+  updateButtons(state, me);
+}
+
+function renderCard(label, hidden = false) {
+  const el = document.createElement('div');
+  if (hidden || label === '🂠') {
+    el.className = 'card back';
+    el.textContent = '🂠';
+    return el;
+  }
+  // Parse rank and suit
+  const suit  = label.slice(-1);
+  const rank  = label.slice(0, -1);
+  const isRed = suit === '♥' || suit === '♦';
+  el.className = 'card' + (isRed ? ' red' : '');
+  const r = document.createElement('div'); r.className = 'rank'; r.textContent = rank;
+  const s = document.createElement('div'); s.className = 'suit'; s.textContent = suit;
+  el.appendChild(r); el.appendChild(s);
+  return el;
+}
+
+function renderMyHand(me, stage) {
+  const el = document.getElementById('myHand');
+  el.innerHTML = '';
+  if (!me || !me.hand || me.hand.length === 0) {
+    // Placeholders
+    el.appendChild(Object.assign(document.createElement('div'), { className: 'card-placeholder' }));
+    el.appendChild(Object.assign(document.createElement('div'), { className: 'card-placeholder' }));
+    return;
+  }
+  for (const c of me.hand) el.appendChild(renderCard(c));
+}
+
+function renderCommunity(community) {
+  const el = document.getElementById('communityArea');
+  el.innerHTML = '';
+  const total = 5;
+  for (let i = 0; i < total; i++) {
+    if (i < community.length) el.appendChild(renderCard(community[i]));
+    else el.appendChild(Object.assign(document.createElement('div'), { className: 'card-placeholder' }));
+  }
+}
+
+function renderOpponents(players, currentId) {
+  const el = document.getElementById('opponentArea');
+  el.innerHTML = '';
+  const others = players.filter(p => p.id !== myId);
+  for (const p of others) {
+    const seat = document.createElement('div');
+    seat.className = 'opponent-seat' +
+      (p.folded ? ' folded' : '') +
+      (p.id === currentId ? ' active-turn' : '');
+
+    const status = p.folded ? 'Folded' : p.allIn ? '⚡ All-In' : p.id === currentId ? '⏳ Thinking…' : '';
+
+    seat.innerHTML = `
+      <div class="opp-name">${p.name}</div>
+      <div class="opp-chips">💰 ${p.chips}  ${p.bet > 0 ? `(bet: ${p.bet})` : ''}</div>
+      <div class="opp-status">${status}</div>
+      <div class="opp-cards" id="opp_${p.id}"></div>
+    `;
+    el.appendChild(seat);
+
+    // Cards (back face or revealed at showdown)
+    const cardArea = seat.querySelector('.opp-cards');
+    for (const c of (p.hand || [])) {
+      cardArea.appendChild(renderCard(c, c === '🂠'));
+    }
+  }
+}
+
+function updateButtons(state, me) {
+  const active = isMyTurn && me && !me.folded && state.stage !== 'WAITING' && state.stage !== 'SHOWDOWN';
+  ['btnFold','btnCheck','btnCall','btnRaise','btnAllIn','raiseInput'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = !active;
+  });
+}
+
+// ── Actions ──────────────────────────────────────────────────────────────
+function sendAction(type) {
+  if (!isMyTurn) { addLog('⚠ Not your turn'); return; }
+  const amount = parseInt(document.getElementById('raiseInput').value) || 40;
+  if (socket && socket.connected) {
+    socket.emit('action', { tableId: TABLE_ID, playerId: myId, type, amount });
+  } else if (offlineTable) {
+    const result = offlineTable.action(myId, type, amount);
+    if (result && !result.error) render(offlineTable.toPublicState(myId));
+    else if (result && result.error) addLog('⚠ ' + result.error);
+  }
+}
+
+// ── Winner banner ─────────────────────────────────────────────────────────
+function showWinner(winners) {
+  if (!winners || winners.length === 0) return;
+  const banner   = document.getElementById('winnerBanner');
+  const titleEl  = document.getElementById('winnerTitle');
+  const bodyEl   = document.getElementById('winnerBody');
+
+  const lines = winners.map(w =>
+    `${w.name} wins <strong style="color:#ffe94d">${w.won} chips</strong>` +
+    (w.hand ? ` with ${w.hand.join(' ')} (${w.handName || ''})` : '')
+  );
+
+  titleEl.textContent = winners.some(w => w.id === myId) ? '🏆 You Win!' : '🎰 Round Over';
+  bodyEl.innerHTML    = lines.join('<br>');
+  banner.style.display = 'block';
+  setTimeout(() => { banner.style.display = 'none'; }, 4500);
+
+  winners.forEach(w => addLog(`🏆 ${w.name} wins ${w.won} chips`));
+}
+
+// ── Log ───────────────────────────────────────────────────────────────────
+function addLog(msg) {
+  const panel = document.getElementById('logPanel');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.textContent = msg;
+  panel.prepend(entry);
+  while (panel.children.length > 30) panel.removeChild(panel.lastChild);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  OFFLINE MODE (no server)
+// ─────────────────────────────────────────────────────────────────────────────
+let offlineTable = null;
+
+async function startOfflineMode(name, chips) {
+  // Dynamically import the ES module poker engine
+  const { PokerTable } = await import('./scripts/pokerEngine.js');
+  offlineTable = new PokerTable({ tableId: 'offline', smallBlind: 10, bigBlind: 20 });
+  offlineTable.onEvent = (event, data) => {
+    if (event === 'roundOver') showWinner(data.winners);
+    if (event === 'stageChanged') addLog(`📋 Stage: ${data.stage} — ${data.community.join(' ')}`);
+    if (event === 'roundStarted') addLog('🃏 New round started!');
+  };
+
+  offlineTable.addPlayer({ id: myId, name, chips });
+
+  // Add AI bots
+  const bots = ['Bot_Alex', 'Bot_Maya', 'Bot_Ravi'];
+  for (const bn of bots) {
+    offlineTable.addPlayer({ id: 'bot_' + bn, name: bn, chips: 1000 });
+  }
+
+  setConn(false);
+  document.getElementById('connText').textContent = 'Offline';
+  closeJoin();
+  render(offlineTable.toPublicState(myId));
+
+  // Simple bot AI
+  setInterval(doBotTurns, 1200);
+}
+
+function doBotTurns() {
+  if (!offlineTable || offlineTable.stage === 'WAITING' || offlineTable.stage === 'SHOWDOWN') return;
+  const cur = offlineTable._currentPlayer();
+  if (!cur || cur.id === myId) return;
+  const r = Math.random();
+  const type = r < 0.15 ? 'fold' : r < 0.55 ? 'call' : r < 0.75 ? 'check' : 'raise';
+  const amount = offlineTable.currentBet + offlineTable.bigBlind * (1 + Math.floor(Math.random() * 3));
+  offlineTable.action(cur.id, type, amount);
+  render(offlineTable.toPublicState(myId));
+}
 
 </script>
 

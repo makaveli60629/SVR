@@ -1,0 +1,5 @@
+{
+  "version": "2.0.0",
+  "buildDate": "2026-03-12",
+  "notes": "Full poker engine, Socket.IO multiplayer, Three.js r170 scene upgrade"
+}

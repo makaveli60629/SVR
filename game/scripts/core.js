@@ -1,90 +1,64 @@
+/**
+ * SVR Poker — core.js
+ * Initializes the Three.js renderer, scene, camera, and lights
+ * Three.js r170
+ */
 
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js'
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/loaders/GLTFLoader.js'
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.170/examples/jsm/controls/OrbitControls.js';
 
-let scene,camera,renderer
+export function initCore(canvas) {
+  // ── Renderer ──────────────────────────────────────────────────────────
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled      = true;
+  renderer.shadowMap.type         = THREE.PCFSoftShadowMap;
+  renderer.toneMapping            = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure    = 1.1;
 
-init()
-animate()
+  // ── Scene ─────────────────────────────────────────────────────────────
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x070709);
+  scene.fog        = new THREE.FogExp2(0x070709, 0.018);
 
-function init(){
+  // ── Camera ────────────────────────────────────────────────────────────
+  const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 500);
+  camera.position.set(0, 3.5, 6.5);
+  camera.lookAt(0, 0.8, 0);
 
-scene = new THREE.Scene()
+  // ── Controls ──────────────────────────────────────────────────────────
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0.8, 0);
+  controls.enableDamping  = true;
+  controls.dampingFactor  = 0.06;
+  controls.minDistance    = 3;
+  controls.maxDistance    = 14;
+  controls.maxPolarAngle  = Math.PI / 2.1;
 
-camera = new THREE.PerspectiveCamera(
-70,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
-)
+  // ── Lighting ──────────────────────────────────────────────────────────
+  scene.add(new THREE.AmbientLight(0x6644aa, 0.8));
 
-camera.position.set(0,1.6,4)
-camera.lookAt(0,1,0)
+  const keyLight = new THREE.DirectionalLight(0xffffff, 1.4);
+  keyLight.position.set(5, 10, 6);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(2048, 2048);
+  scene.add(keyLight);
 
-renderer = new THREE.WebGLRenderer({antialias:true})
-renderer.setSize(window.innerWidth,window.innerHeight)
+  const fillLight = new THREE.PointLight(0xb95aff, 1.8, 20);
+  fillLight.position.set(-4, 3, -2);
+  scene.add(fillLight);
 
-document.body.appendChild(renderer.domElement)
+  const rimLight = new THREE.PointLight(0x5dd8ff, 1.2, 15);
+  rimLight.position.set(4, 2, -4);
+  scene.add(rimLight);
 
-const ambient = new THREE.AmbientLight(0xffffff,.6)
-scene.add(ambient)
+  // ── Resize handler ────────────────────────────────────────────────────
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
 
-const light = new THREE.DirectionalLight(0xffffff,1)
-light.position.set(5,10,5)
-scene.add(light)
-
-createRooftop()
-loadTable()
-loadMoon()
-
-}
-
-function createRooftop(){
-
-const floor = new THREE.Mesh(
-new THREE.PlaneGeometry(60,60),
-new THREE.MeshStandardMaterial({color:0x111111})
-)
-
-floor.rotation.x = -Math.PI/2
-scene.add(floor)
-
-}
-
-function loadTable(){
-
-const loader = new GLTFLoader()
-
-loader.load('../assets/models/table.glb',(gltf)=>{
-
-const table = gltf.scene
-table.position.set(0,0,0)
-scene.add(table)
-
-})
-
-}
-
-function loadMoon(){
-
-const geo = new THREE.SphereGeometry(4,32,32)
-
-const mat = new THREE.MeshBasicMaterial({
-color:0xffffff
-})
-
-const moon = new THREE.Mesh(geo,mat)
-
-moon.position.set(0,30,-80)
-
-scene.add(moon)
-
-}
-
-function animate(){
-
-requestAnimationFrame(animate)
-
-renderer.render(scene,camera)
-
+  return { renderer, scene, camera, controls, fillLight, rimLight };
 }
