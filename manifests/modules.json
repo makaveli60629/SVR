@@ -1,0 +1,62 @@
+{
+  "version": "2.0.61",
+  "assembledBuild": "game_phase61_modular_recovery.zip",
+  "modules": [
+    {
+      "name": "core-boot",
+      "required": true,
+      "version": "2.0.61",
+      "files": 4,
+      "bytes": 1377039
+    },
+    {
+      "name": "world-room",
+      "required": true,
+      "version": "2.0.61",
+      "files": 10,
+      "bytes": 11264887
+    },
+    {
+      "name": "table-system",
+      "required": true,
+      "version": "2.0.61",
+      "files": 11,
+      "bytes": 11411277
+    },
+    {
+      "name": "avatars-dealer",
+      "required": true,
+      "version": "2.0.61",
+      "files": 8,
+      "bytes": 7482419
+    },
+    {
+      "name": "ui-branding",
+      "required": true,
+      "version": "2.0.61",
+      "files": 1,
+      "bytes": 404414
+    },
+    {
+      "name": "poker-props",
+      "required": true,
+      "version": "2.0.61",
+      "files": 3,
+      "bytes": 2179641
+    },
+    {
+      "name": "radio-config",
+      "required": false,
+      "version": "2.0.61",
+      "files": 1,
+      "bytes": 852
+    },
+    {
+      "name": "diagnostics",
+      "required": false,
+      "version": "2.0.61",
+      "files": 2,
+      "bytes": 1199
+    }
+  ]
+}

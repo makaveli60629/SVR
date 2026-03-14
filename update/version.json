@@ -1,0 +1,4 @@
+{
+  "version": "2.0.61",
+  "notes": "Phase 61 modular recovery architecture: repo-safe updater zip + PowerShell rebuild/verify scripts."
+}
