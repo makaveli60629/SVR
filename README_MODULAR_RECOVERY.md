@@ -10,3 +10,9 @@ This is the small repo-safe bundle.
 ```powershell
 .\tools\Recover-SVRPack.ps1
 ```
+
+
+## Phase 62 note
+- Quest-lite startup disables remote WebXR controller/hand profile fetches to reduce headset boot failures.
+- The marketing HUD cycles through a scripted hand state for promo capture.
+- Use `?lite=1` on desktop/mobile to force the smallest boot path.

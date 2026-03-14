@@ -1,4 +1,4 @@
 {
-  "version": "2.0.61",
-  "notes": "Phase 61 modular recovery architecture: repo-safe updater zip + PowerShell rebuild/verify scripts."
+  "version": "2.0.62",
+  "notes": "Phase 62 quest-lite marketing demo: local-only Quest startup path, richer table props, demo HUD, and lighter sky/sprite counts."
 }
