@@ -1,4 +1,4 @@
 {
-  "version": "2.0.64",
-  "notes": "Phase 64 quest manual-entry fix: disabled auto-enter VR from sessiongranted and kept Quest in manual local-floor startup only."
+  "version": "2.0.65",
+  "notes": "Phase 65 Quest emergency XR shell: local reference space, no optional XR features, and minimal in-session processing on Quest."
 }
