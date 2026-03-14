@@ -16,3 +16,6 @@ This is the small repo-safe bundle.
 - Quest-lite startup disables remote WebXR controller/hand profile fetches to reduce headset boot failures.
 - The marketing HUD cycles through a scripted hand state for promo capture.
 - Use `?lite=1` on desktop/mobile to force the smallest boot path.
+
+
+Phase 63: Quest boot fix patches the bundled VR entry path to request local-floor only on Quest and disables offerSession auto-launch.
