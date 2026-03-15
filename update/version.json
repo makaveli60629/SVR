@@ -1,4 +1,4 @@
 {
-  "version": "2.0.70",
-  "notes": "Phase 70 Quest hands/table pass: tracked hand rendering restored when available, seat facing corrected, seated pinch nudges added, moon/earth moved into Quest view, and the real table OBJ delayed-load path kept."
+  "version": "2.0.71",
+  "notes": "Phase 71 quest tracked glove hands + real table model chain + textured orbiting moon/earth skyline."
 }
