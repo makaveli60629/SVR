@@ -1,4 +1,4 @@
 {
-  "version": "2.0.76",
-  "notes": "Phase 76 lean XR/table repair: Quest overlays hidden, no fake app hands, immediate OBJ table load, rebuilt felt inset, minimal update bundle only."
+  "version": "2.0.77",
+  "notes": "Phase 77 Quest repair: tracked hand meshes on Quest, no Quest fallback Eric pill, hard VR chrome hide, frustum-culling suppression to stop world pop-out, lean minimal update only."
 }
