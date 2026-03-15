@@ -1,4 +1,4 @@
 {
-  "version": "2.0.96",
-  "notes": "Phase 96 exact table: stable Quest baseline plus the exact SVR-main table.glb and tablefelt.png, controllers only, no hands, no Eric, no moon/earth."
+  "version": "2.0.97",
+  "notes": "Phase 97 table align textures: stable Quest baseline plus exact table, sunk floor anchor, leather body texture, custom logo/pass-line felt, lower rig height, controllers only."
 }
