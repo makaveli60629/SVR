@@ -1,4 +1,4 @@
 {
-  "version": "2.0.83",
-  "notes": "Phase 83 lean parity core: Quest overlays removed from the DOM in VR, lightweight dealer parity on Quest, hand-tracking enabled for pinch movement, no fake pill hands."
+  "version": "2.0.84",
+  "notes": "Phase 84 lean parity core: Quest overlays are purged from the DOM in VR, lightweight Eric fallback is restored on Quest, and tracked hand meshes stay visible when hand tracking is available."
 }
