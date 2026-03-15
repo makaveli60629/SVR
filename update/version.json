@@ -1,4 +1,4 @@
 {
-  "version": "2.0.97",
-  "notes": "Phase 97 table align textures: stable Quest baseline plus exact table, sunk floor anchor, leather body texture, custom logo/pass-line felt, lower rig height, controllers only."
+  "version": "2.0.98",
+  "notes": "Phase 98 table refine + camera3: reduced table scale, sank the base seam into the floor, deeper custom logo/pass-line felt inset, lower rig height, stable controller baseline, and a spectator camera 3 anchor for website view."
 }
