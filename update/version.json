@@ -1,4 +1,4 @@
 {
-  "version": "2.0.93",
-  "notes": "Phase 93 table-only baseline: bare Quest boot plus a lightweight table shell, controllers only, no hands, no HUD overlays."
+  "version": "2.0.94",
+  "notes": "Phase 94 OBJ table step: bare Quest baseline plus the best-available OBJ table from archive, still no hands, no Eric, no moon/earth."
 }
