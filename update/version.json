@@ -1,4 +1,4 @@
 {
-  "version": "2.0.77",
-  "notes": "Phase 77 Quest repair: tracked hand meshes on Quest, no Quest fallback Eric pill, hard VR chrome hide, frustum-culling suppression to stop world pop-out, lean minimal update only."
+  "version": "2.0.78",
+  "notes": "Phase 78 Quest core boot/table fix: proven XR boot path, fake Quest props removed, immediate upright OBJ table load, app overlays hidden in VR, frustum culling relaxed for core world/table content."
 }
