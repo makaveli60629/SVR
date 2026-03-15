@@ -1,4 +1,4 @@
 {
-  "version": "2.0.86",
-  "notes": "Phase 86 refine-audit core: Quest HTML overlays are purged earlier, earth and moon tracks are separated, the Quest Eric texture-plane fallback is replaced with a simple 3D stand-in, fake app hands remain off, and the lean upright OBJ table path stays intact."
+  "version": "2.0.87",
+  "notes": "Phase 87 lean repo-mp3 core: keeps the last stable Quest core and adds the repo-hosted Cry For Me mp3 as a local radio source at /game/assets/audio/02. Cry For Me.mp3."
 }
