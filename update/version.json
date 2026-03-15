@@ -1,4 +1,4 @@
 {
-  "version": "2.0.69",
-  "notes": "Phase 69 comfort pass: Quest proxy hands, VR overlay hidden, delayed real table OBJ load, and seated view tuning."
+  "version": "2.0.70",
+  "notes": "Phase 70 Quest hands/table pass: tracked hand rendering restored when available, seat facing corrected, seated pinch nudges added, moon/earth moved into Quest view, and the real table OBJ delayed-load path kept."
 }
