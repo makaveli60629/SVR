@@ -1,4 +1,4 @@
 {
-  "version": "2.0.92",
-  "notes": "Phase 92 bare Quest boot proof: visible Enter VR button restored, controllers only, no hands, no HUD overlays, no moon/earth, no Eric, no heavy table logic."
+  "version": "2.0.93",
+  "notes": "Phase 93 table-only baseline: bare Quest boot plus a lightweight table shell, controllers only, no hands, no HUD overlays."
 }
