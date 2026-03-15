@@ -1,4 +1,4 @@
 {
-  "version": "2.0.78",
-  "notes": "Phase 78 Quest core boot/table fix: proven XR boot path, fake Quest props removed, immediate upright OBJ table load, app overlays hidden in VR, frustum culling relaxed for core world/table content."
+  "version": "2.0.79",
+  "notes": "Phase 79 Quest clean core: hard VR overlay hide, persistent world/table render, upright OBJ table from bottom anchor line, lighter felt inset, minimal assets only."
 }
