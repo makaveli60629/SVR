@@ -1,4 +1,4 @@
 {
-  "version": "2.0.84",
-  "notes": "Phase 84 lean parity core: Quest overlays are purged from the DOM in VR, lightweight Eric fallback is restored on Quest, and tracked hand meshes stay visible when hand tracking is available."
+  "version": "2.0.86",
+  "notes": "Phase 86 refine-audit core: Quest HTML overlays are purged earlier, earth and moon tracks are separated, the Quest Eric texture-plane fallback is replaced with a simple 3D stand-in, fake app hands remain off, and the lean upright OBJ table path stays intact."
 }
