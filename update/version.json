@@ -1,4 +1,4 @@
 {
-  "version": "2.0.82",
-  "notes": "Phase 82 Quest rollback core: reverted to the last known Quest-booting core to clear the black screen, keep overlays hidden in VR, and keep the upright OBJ table path."
+  "version": "2.0.83",
+  "notes": "Phase 83 lean parity core: Quest overlays removed from the DOM in VR, lightweight dealer parity on Quest, hand-tracking enabled for pinch movement, no fake pill hands."
 }
