@@ -1,4 +1,4 @@
 {
-  "version": "2.0.88",
-  "notes": "Phase 88 Quest strip pass: HUD chrome stays hidden, browser hand-tracking path is restored on Quest, and the lean OBJ table core remains intact."
+  "version": "2.0.89",
+  "notes": "Phase 89 Quest boot rollback: restores the last known Quest-booting core, keeps the upright OBJ table path, and hard-hides app overlays in VR."
 }
