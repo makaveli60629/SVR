@@ -1,4 +1,4 @@
 {
-  "version": "2.0.72",
-  "notes": "Phase 72 VR-only hands, corrected felt inset, tighter moon/earth spacing, and Quest-safe table restoration."
+  "version": "2.0.75",
+  "notes": "Phase 75 lean Quest patch: upright OBJ table, no fake app hands, tighter earth/moon spacing, VR overlays hidden, minimal asset set only."
 }
