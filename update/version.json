@@ -1,4 +1,4 @@
 {
-  "version": "2.0.89",
-  "notes": "Phase 89 Quest boot rollback: restores the last known Quest-booting core, keeps the upright OBJ table path, and hard-hides app overlays in VR."
+  "version": "2.0.90",
+  "notes": "Phase 90 Quest clean input rebuild: controllers are primary, browser hand-tracking is secondary when available, VR overlays are stripped from the DOM, and the lean upright OBJ table core stays intact."
 }
