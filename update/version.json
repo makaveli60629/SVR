@@ -1,4 +1,4 @@
 {
-  "version": "2.0.81",
-  "notes": "Phase 81 lean Quest core: forces upright OBJ table only, removes Quest auto-seat so movement stays available, hard-hides VR overlays, keeps world visibility stable, minimal assets only."
+  "version": "2.0.82",
+  "notes": "Phase 82 Quest rollback core: reverted to the last known Quest-booting core to clear the black screen, keep overlays hidden in VR, and keep the upright OBJ table path."
 }
