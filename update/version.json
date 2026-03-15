@@ -1,4 +1,4 @@
 {
-  "version": "2.0.71",
-  "notes": "Phase 71 quest tracked glove hands + real table model chain + textured orbiting moon/earth skyline."
+  "version": "2.0.72",
+  "notes": "Phase 72 VR-only hands, corrected felt inset, tighter moon/earth spacing, and Quest-safe table restoration."
 }
