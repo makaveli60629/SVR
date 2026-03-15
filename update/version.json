@@ -1,4 +1,4 @@
 {
-  "version": "2.0.90",
-  "notes": "Phase 90 Quest clean input rebuild: controllers are primary, browser hand-tracking is secondary when available, VR overlays are stripped from the DOM, and the lean upright OBJ table core stays intact."
+  "version": "2.0.91",
+  "notes": "Phase 91 bare Quest boot proof: controllers only, no hands, no HUD overlays, no moon/earth, no Eric, no heavy table logic."
 }
