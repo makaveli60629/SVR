@@ -1,4 +1,4 @@
 {
-  "version": "2.0.80",
-  "notes": "Phase 80 Quest clean table core: strips Quest overlays, keeps world visible when moving your head, loads the real table module first, closer seated default, minimal assets only."
+  "version": "2.0.81",
+  "notes": "Phase 81 lean Quest core: forces upright OBJ table only, removes Quest auto-seat so movement stays available, hard-hides VR overlays, keeps world visibility stable, minimal assets only."
 }
