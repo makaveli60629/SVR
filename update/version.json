@@ -1,4 +1,4 @@
 {
-  "version": "2.1.16",
-  "notes": "Phase 116 repo-assets-only patch: refined table fit, lower/deeper felt inset, closer seated spawn, lower camera, tighter dealer anchor, textured walls/floor, controller teleport and browser hand-tracking path retained."
+  "version": "2.1.17",
+  "notes": "Phase 117 teleport + seat + felt fix: repo-assets only, deeper table drop, felt above rim surface, left-pinch teleport mode, right-pinch teleport, seat snapping, lower seated camera."
 }
