@@ -1,4 +1,4 @@
 {
-  "version": "2.0.98",
-  "notes": "Phase 98 table refine + camera3: reduced table scale, sank the base seam into the floor, deeper custom logo/pass-line felt inset, lower rig height, stable controller baseline, and a spectator camera 3 anchor for website view."
+  "version": "2.0.99",
+  "notes": "Phase 99 table final polish: real table kept, base seam sunk deeper, larger visible logo/pass-line felt with bump texture, lower player rig, camera3 anchor preserved, stable Quest controller baseline."
 }
