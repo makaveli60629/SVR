@@ -1,4 +1,4 @@
 {
-  "version": "2.1.04",
-  "notes": "Phase 104 table fit patch: bigger real table body, floor anchor corrected, felt enlarged and inset inside rim, closer seated spawn, lower camera, dealer anchor tightened."
+  "version": "2.1.05",
+  "notes": "Phase 105 minimal code-only patch: no duplicate assets added; update relies on existing repo asset folder."
 }
