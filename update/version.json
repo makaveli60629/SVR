@@ -1,4 +1,4 @@
 {
-  "version": "2.1.13",
-  "notes": "Phase 113 tiny table patch: repo-assets-only, bigger table, deeper floor anchor, lower/deeper felt inset, closer seated spawn, lower camera, tighter dealer anchor."
+  "version": "2.1.14",
+  "notes": "Phase 114 input + scene refine: repo-assets table/Eric retained, one compressed wall texture added, controller teleport restored, browser hand-tracking path restored, closer seated spawn and larger table."
 }
