@@ -1,4 +1,4 @@
 {
-  "version": "2.1.17",
-  "notes": "Phase 117 teleport + seat + felt fix: repo-assets only, deeper table drop, felt above rim surface, left-pinch teleport mode, right-pinch teleport, seat snapping, lower seated camera."
+  "version": "2.1.18",
+  "notes": "Phase 118 repo-assets-only fix: component names corrected, felt forced onto the table surface, spawn faces table, hand teleport retained without seat snapping, no duplicate assets added."
 }
