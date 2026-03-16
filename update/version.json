@@ -1,4 +1,4 @@
 {
-  "version": "2.1.10",
-  "notes": "Phase 110 walls + floor check: stable Quest baseline plus slate floor and room wall cues to validate table fit, no duplicate repo assets touched."
+  "version": "2.1.12",
+  "notes": "Phase 112 code-only refine: bigger real table, deeper anchor drop, inset felt inside rim, lower camera, closer seated spawn, and real Eric facing the table at the dealer stop."
 }
