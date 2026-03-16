@@ -1,4 +1,4 @@
 {
-  "version": "2.1.05",
-  "notes": "Phase 105 minimal code-only patch: no duplicate assets added; update relies on existing repo asset folder."
+  "version": "2.1.06",
+  "notes": "Phase 106 repo-assets-only patch: real scene shell, real table, table-top felt, real Eric, controllers primary, browser hand-tracking when available."
 }
