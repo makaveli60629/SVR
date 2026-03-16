@@ -1,4 +1,4 @@
 {
-  "version": "2.1.07",
-  "notes": "Phase 107 repo-assets-only patch: doubles table size, spawns rig 3m from table, disables app-rendered hands; controllers only."
+  "version": "2.1.10",
+  "notes": "Phase 110 walls + floor check: stable Quest baseline plus slate floor and room wall cues to validate table fit, no duplicate repo assets touched."
 }
