@@ -1,4 +1,4 @@
 {
-  "version": "2.1.06",
-  "notes": "Phase 106 repo-assets-only patch: real scene shell, real table, table-top felt, real Eric, controllers primary, browser hand-tracking when available."
+  "version": "2.1.07",
+  "notes": "Phase 107 repo-assets-only patch: doubles table size, spawns rig 3m from table, disables app-rendered hands; controllers only."
 }
