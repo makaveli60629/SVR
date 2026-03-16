@@ -1,4 +1,4 @@
 {
-  "version": "2.1.14",
-  "notes": "Phase 114 input + scene refine: repo-assets table/Eric retained, one compressed wall texture added, controller teleport restored, browser hand-tracking path restored, closer seated spawn and larger table."
+  "version": "2.1.15",
+  "notes": "Phase 115 repo-assets table/Eric retained, optional hand-tracking enabled, teleport target restored, spawn faces table, closer seated fit, walls/floor preserved."
 }
