@@ -1,4 +1,4 @@
 {
-  "version": "2.1.18",
-  "notes": "Phase 118 repo-assets-only fix: component names corrected, felt forced onto the table surface, spawn faces table, hand teleport retained without seat snapping, no duplicate assets added."
+  "version": "2.1.19",
+  "notes": "Phase 119 repo-assets-only patch: spawn faces table, felt aligned to surface, chairs added for seat test, real Eric deals a card, hand/controller teleport refined."
 }
