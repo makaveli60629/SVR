@@ -18,30 +18,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install unzip
-        run: sudo apt-get update && sudo apt-get install -y unzip
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y unzip rsync
 
       - name: Prepare build
         run: |
-          rm -rf build
-          mkdir build
+          set -e
+          rm -rf build tmp
+          mkdir -p build
 
           rsync -av \
             --exclude '.git' \
             --exclude '.github' \
             --exclude 'update' \
-            --exclude 'backend/node_modules' \
+            --exclude 'backend' \
+            --exclude 'docs' \
+            --exclude 'modules' \
             --exclude 'Library' \
             --exclude 'Logs' \
             --exclude 'Temp' \
+            --exclude '*.zip' \
+            --exclude '*.fbx' \
             ./ build/ || test $? -eq 24
 
       - name: Apply update zips
         run: |
+          set -e
 
           flatten() {
-            ZIP=$1
-            TARGET=$2
+            ZIP="$1"
+            TARGET="$2"
 
             rm -rf tmp
             mkdir -p tmp
@@ -50,7 +56,7 @@ jobs:
             if [ -f tmp/index.html ]; then
               cp -r tmp/* "$TARGET"/
             else
-              INNER=$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1)
+              INNER="$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1)"
               if [ -n "$INNER" ]; then
                 cp -r "$INNER"/* "$TARGET"/
               fi
@@ -72,10 +78,7 @@ jobs:
 
       - name: Validate build
         run: |
-          if [ ! -f build/index.html ]; then
-            echo "ERROR: index.html missing"
-            exit 1
-          fi
+          test -f build/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

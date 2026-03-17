@@ -1,5 +1,13 @@
-export function initTeleport(scene,camera){
+AFRAME.registerComponent('teleport-system', {
 
-console.log("Teleport system ready");
+    init: function () {
+        let teleport = false
+        window.addEventListener('keydown', e => {
+            if (e.key === 'f') {
+                teleport = !teleport
+                console.log('Teleport', teleport)
+            }
+        })
+    }
 
-}
+})
