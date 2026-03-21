@@ -1,0 +1,11 @@
+V282 polish pass
+- removed earth
+- moon larger, higher, more detailed
+- mars added with clean orbit
+- planets rotate/spin cleanly away from buildings
+- watch simplified, horizontal/longways, face outward
+- table top rebuilt with stable pill-shaped felt and wood rail
+- reduced star/city counts and disabled shadows for smoother framerate
+- softened floor/wall normal shimmer to reduce blink
+- added simple palm fallback if hand mesh unavailable
+- build label 20260321-v282
