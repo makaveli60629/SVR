@@ -1,0 +1,13 @@
+V292 cleanup pass
+- forced one-lobby desktop/xr flow in main.js
+- removed embed/autocam split
+- removed CDN fallback from asset_base.js
+- reduced fog and scene load for smoother Quest behavior
+- added rising pink/purple lobby sprites
+- moved moon and mars higher, closer, and cleaner orbit/spin
+- removed earth visibility from the scene
+- rebuilt tabletop with stable felt, rail, and pass line overlays
+- lowered deal targets closer to the table
+- set Claudia to a calmer static dealer pose
+- rotated watch into a forearm / predator-style orientation and improved button input
+- build label: 20260321-v292

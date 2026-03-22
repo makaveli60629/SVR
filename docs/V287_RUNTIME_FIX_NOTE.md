@@ -1,0 +1,1 @@
+Fixed runtime error: createTeleportRig now returns getEnabled and toggleEnabled so watch.js can read and toggle teleport state. Build behavior otherwise unchanged.
