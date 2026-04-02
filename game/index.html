@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>SVR Poker Lobby</title>
+<script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+<script src="modules/watch-ui.js"></script>
+<script src="modules/forearm-device.js"></script>
+<script src="modules/meta-hand-materials.js"></script>
+<script src="modules/moon-upgrade.js"></script>
+<script src="modules/lobby-floor.js"></script>
+<script src="modules/lobby-skyline.js"></script>
+<script src="modules/lobby-sprites.js"></script>
+<script src="modules/lobby-signage.js"></script>
+<script src="modules/real-table-stage.js"></script>
+<script src="modules/floating-logo.js"></script>
+<style>
+body{margin:0;background:#000}
+#watchCanvas{position:fixed;left:-99999px;top:-99999px;width:1280px;height:512px;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="watchCanvas" width="1280" height="512"></canvas>
+<a-scene renderer="antialias:true; colorManagement:true" background="color:#020309" fog="type: exponential; color:#050812; density:0.00125">
+  <a-assets>
+    <img id="logoMain" src="assets/textures/logo.png">
+    <img id="logoTable" src="assets/textures/logo-table.png">
+    <img id="moonDiffuse" src="assets/textures/moon_final_diffuse.png">
+    <img id="moonBump" src="assets/textures/moon_final_bump.png">
+    <img id="tableFelt" src="assets/textures/tablefelt.png">
+    <a-asset-item id="tableGLB" src="assets/models/table.glb"></a-asset-item>
+  </a-assets>
+
+  <a-entity id="nightSky" star-dome></a-entity>
+  <a-entity id="lobbyFloor" lobby-floor></a-entity>
+  <a-entity id="skyline" lobby-skyline></a-entity>
+  <a-entity id="sprites" lobby-sprites></a-entity>
+  <a-entity id="signage" lobby-signage></a-entity>
+
+  <a-entity id="rig" position="0 1.62 6.15">
+    <a-camera look-controls wasd-controls="enabled:false"></a-camera>
+    <a-entity id="leftHand" hand-tracking-controls="hand: left; modelStyle: mesh" meta-hand-skin="hand: left" forearm-device="side: left"></a-entity>
+    <a-entity id="rightHand" hand-tracking-controls="hand: right; modelStyle: mesh" meta-hand-skin="hand: right"></a-entity>
+  </a-entity>
+
+  <a-entity id="tableZone" position="0 0 0">
+    <a-entity id="mainTable" gltf-model="#tableGLB" real-table-stage></a-entity>
+  </a-entity>
+
+  <a-plane id="heroLogo" floating-logo position="0 4.45 -4.9" width="6.3" height="2.1" src="#logoMain" material="shader:flat; transparent:true; alphaTest:0.08; side:double; depthWrite:false; depthTest:true"></a-plane>
+
+  <a-sphere id="heroMoon" cinematic-moon radius="1.5" position="-74 214 -610" scale="28 28 28" segments-width="44" segments-height="32"></a-sphere>
+  <a-sphere id="heroMars" cinematic-mars radius="1.1" position="170 228 -670" scale="12.4 12.4 12.4" segments-width="36" segments-height="24"></a-sphere>
+
+  <a-entity light="type:ambient; intensity:0.6; color:#dfe7ff"></a-entity>
+  <a-entity light="type:directional; intensity:0.92; color:#f1f5ff" position="-14 22 10"></a-entity>
+  <a-entity light="type:point; intensity:1.05; distance:36; decay:1.15; color:#8f4eff" position="0 4.6 0"></a-entity>
+  <a-entity light="type:point; intensity:0.9; distance:420; decay:1.0; color:#f7f0e8" position="-68 214 -590"></a-entity>
+  <a-entity light="type:point; intensity:0.68; distance:390; decay:1.0; color:#ffaf72" position="164 228 -650"></a-entity>
+</a-scene>
+</body>
+</html>
