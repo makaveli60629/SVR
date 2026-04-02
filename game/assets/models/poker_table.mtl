@@ -1,6 +1,0 @@
-
-newmtl felt
-map_Kd ../textures/table_felt.jpg
-
-newmtl wood
-map_Kd ../textures/wood.jpg
