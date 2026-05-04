@@ -3,7 +3,6 @@
   const V0 = new THREE.Vector3();
   const V1 = new THREE.Vector3();
   const V2 = new THREE.Vector3();
-  const V3 = new THREE.Vector3();
   const Q0 = new THREE.Quaternion();
   const Q1 = new THREE.Quaternion();
   const M0 = new THREE.Matrix4();
@@ -32,7 +31,8 @@
   }
 
   function getXRFrame(scene) {
-    return (scene && scene.frame) || (scene && scene.renderer && scene.renderer.xr && scene.renderer.xr.getFrame && scene.renderer.xr.getFrame()) || null;
+    return (scene && scene.frame) ||
+      (scene && scene.renderer && scene.renderer.xr && scene.renderer.xr.getFrame && scene.renderer.xr.getFrame()) || null;
   }
 
   function getReferenceSpace(scene, handComp, trackedWebXR) {
@@ -70,29 +70,24 @@
       if (found) return;
       const name = String(obj.name || '').toLowerCase();
       for (let i = 0; i < patterns.length; i++) {
-        if (patterns[i].test(name)) {
-          found = obj;
-          break;
-        }
+        if (patterns[i].test(name)) { found = obj; break; }
       }
     });
     return found;
   }
 
   function getBasisPose(wrist, index, pinky, cameraObj, side) {
+    const V3 = new THREE.Vector3();
     const midpoint = V3.copy(index).add(pinky).multiplyScalar(0.5);
     const forearmDir = wrist.clone().sub(midpoint).normalize();
     let acrossPalm = index.clone().sub(pinky).normalize();
     let faceNormal = new THREE.Vector3().crossVectors(acrossPalm, forearmDir).normalize();
-
     if (cameraObj) {
       cameraObj.getWorldPosition(V0);
       if (faceNormal.dot(V0.sub(wrist)) < 0) faceNormal.multiplyScalar(-1);
     }
-
     acrossPalm = new THREE.Vector3().crossVectors(faceNormal, forearmDir).normalize();
     if (side === 'right') acrossPalm.multiplyScalar(-1);
-
     M0.makeBasis(forearmDir, acrossPalm, faceNormal);
     return {
       position: wrist,
@@ -103,7 +98,7 @@
     };
   }
 
-  function computeWorldPose(el, cache, side) {
+  function computeVRPose(el, cache, side) {
     const cameraObj = el.sceneEl && el.sceneEl.camera && el.sceneEl.camera.el && el.sceneEl.camera.el.object3D;
     const layout = DEVICE_LAYOUT[side] || DEVICE_LAYOUT.left;
 
@@ -133,20 +128,18 @@
         .add(pose.acrossPalm.clone().multiplyScalar(layout.lateralOffset));
       return pose;
     }
-
     return null;
   }
 
+  // ── Build the physical watch device ─────────────────────────────────────
   function makeDeviceEntity(layout) {
     const root = document.createElement('a-entity');
     root.setAttribute('class', 'svr-forearm-device');
-    root.setAttribute('visible', 'false');
 
     const body = document.createElement('a-box');
     body.setAttribute('width', String(layout.length));
     body.setAttribute('height', String(layout.width));
     body.setAttribute('depth', String(layout.depth));
-    body.setAttribute('radius', '0.012');
     body.setAttribute('color', '#08090d');
     body.setAttribute('material', 'metalness:0.9; roughness:0.24');
     root.appendChild(body);
@@ -205,24 +198,292 @@
     return root;
   }
 
+  // ── Desktop/browser floating watch panel ──────────────────────────────────
+  // Always visible in non-VR mode — floats in front of the camera
+  function createDesktopWatch(scene) {
+    const watchEl = document.createElement('a-entity');
+    watchEl.setAttribute('id', 'desktopWatch');
+
+    const panel = document.createElement('a-plane');
+    panel.setAttribute('width', '1.28');
+    panel.setAttribute('height', '0.512');
+    panel.setAttribute('material', 'src:#watchCanvas; shader:flat; transparent:false; side:double');
+    watchEl.appendChild(panel);
+
+    // Frame border
+    const frame = document.createElement('a-box');
+    frame.setAttribute('width', '1.32');
+    frame.setAttribute('height', '0.55');
+    frame.setAttribute('depth', '0.012');
+    frame.setAttribute('position', '0 0 -0.007');
+    frame.setAttribute('color', '#08090d');
+    frame.setAttribute('material', 'metalness:0.9; roughness:0.2');
+    watchEl.appendChild(frame);
+
+    // Purple glow overlay
+    const glow = document.createElement('a-plane');
+    glow.setAttribute('width', '1.32');
+    glow.setAttribute('height', '0.55');
+    glow.setAttribute('position', '0 0 0.002');
+    glow.setAttribute('material', 'color:#7f2aff; shader:flat; opacity:0.07; transparent:true; side:double');
+    watchEl.appendChild(glow);
+
+    // Corner buttons
+    const btns = [
+      { pos: '-0.68 0.29 0.008', color: '#6e42ff', label: '●' },
+      { pos:  '0.68 0.29 0.008', color: '#b02020', label: '●' }
+    ];
+    btns.forEach(b => {
+      const btn = document.createElement('a-sphere');
+      btn.setAttribute('radius', '0.022');
+      btn.setAttribute('position', b.pos);
+      btn.setAttribute('color', b.color);
+      btn.setAttribute('material', 'emissive:' + b.color + '; emissiveIntensity:0.6; metalness:0.8');
+      watchEl.appendChild(btn);
+    });
+
+    // Label
+    const labelEl = document.createElement('a-text');
+    labelEl.setAttribute('value', '[ TELEPORT WATCH ]');
+    labelEl.setAttribute('align', 'center');
+    labelEl.setAttribute('color', '#9b6eff');
+    labelEl.setAttribute('width', '1.2');
+    labelEl.setAttribute('position', '0 -0.31 0.01');
+    labelEl.setAttribute('font', 'monoid');
+    watchEl.appendChild(labelEl);
+
+    watchEl.setAttribute('position', '0 -0.28 -1.2');
+    watchEl.setAttribute('rotation', '-12 0 0');
+    watchEl.setAttribute('visible', 'false');
+
+    // Append to camera rig so it moves with the player
+    const rig = document.getElementById('rig');
+    if (rig) {
+      rig.appendChild(watchEl);
+    } else {
+      scene.appendChild(watchEl);
+    }
+    return watchEl;
+  }
+
+  // ── Teleport destination UI ────────────────────────────────────────────────
+  function makeDestinationTexture(destinations, selected) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+
+    const bg = ctx.createLinearGradient(0, 0, 512, 256);
+    bg.addColorStop(0, '#03040a');
+    bg.addColorStop(1, '#0d1420');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, 512, 256);
+    ctx.strokeStyle = '#9b5bff';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(5, 5, 502, 246);
+
+    ctx.fillStyle = '#f4d5ff';
+    ctx.font = 'bold 28px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('⌚ TELEPORT WATCH', 256, 38);
+
+    destinations.forEach((dest, i) => {
+      const x = 34 + i * 120;
+      const y = 62;
+      const isSelected = i === selected;
+      ctx.fillStyle = isSelected ? '#6e42ff' : 'rgba(110,66,255,0.22)';
+      ctx.beginPath();
+      ctx.roundRect(x, y, 100, 60, 10);
+      ctx.fill();
+      ctx.strokeStyle = isSelected ? '#ffffff' : '#7b52cc';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = isSelected ? 'bold 14px Arial' : '13px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(dest.icon, x + 50, y + 24);
+      ctx.fillText(dest.name, x + 50, y + 50);
+    });
+
+    // Status bar
+    ctx.fillStyle = 'rgba(0,255,160,0.1)';
+    ctx.fillRect(10, 138, 492, 48);
+    ctx.strokeStyle = 'rgba(0,255,160,0.4)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(10, 138, 492, 48);
+    ctx.fillStyle = '#00ffa0';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('▶ SELECT DESTINATION  |  RAISE WRIST TO ACTIVATE', 22, 168);
+
+    // Quick stats
+    ctx.fillStyle = '#8ab4ff';
+    ctx.font = '16px Arial';
+    ctx.fillText('POT: $15,200', 22, 216);
+    ctx.fillStyle = '#00f0a2';
+    ctx.fillText('STACK: $68,500', 180, 216);
+    ctx.fillStyle = '#ffd75a';
+    ctx.fillText('BLINDS: 200/400', 360, 216);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
   AFRAME.registerComponent('forearm-device', {
     schema: { side: { default: 'left' } },
+
     init: function () {
       if (this.data.side !== 'left') return;
+
+      // Draw the watch UI canvas immediately
       if (window.SVRWatchUI && window.SVRWatchUI.draw) window.SVRWatchUI.draw();
+
       const layout = DEVICE_LAYOUT[this.data.side] || DEVICE_LAYOUT.left;
+
+      // ── VR wrist device ──────────────────────────────────────────────────
       this.root = makeDeviceEntity(layout);
+      this.root.setAttribute('visible', 'false');
       this.el.appendChild(this.root);
       this.rootObj = this.root.object3D;
       this.cache = { wristObj: null, indexObj: null, pinkyObj: null };
       this.frames = 0;
+
+      // ── Desktop floating watch panel ─────────────────────────────────────
+      this.desktopWatch = createDesktopWatch(this.el.sceneEl);
+
+      // ── Teleport destinations ────────────────────────────────────────────
+      this.destinations = [
+        { name: 'TABLE',   icon: '🃏', pos: [0, 1.62, 6.15]   },
+        { name: 'LOBBY',   icon: '🏛',  pos: [0, 1.62, 0]      },
+        { name: 'STORE',   icon: '🛒',  pos: [-8, 1.62, -3]    },
+        { name: 'ROOFTOP', icon: '🌙',  pos: [0, 8.0,  -6]     }
+      ];
+      this.selectedDest = 0;
+      this.watchVisible = true;
+
+      // ── Key binding for desktop: T = toggle watch, [/] = cycle destinations ──
+      this._onKey = this._onKey.bind(this);
+      window.addEventListener('keydown', this._onKey);
+
+      // Draw the teleport UI
+      this._refreshDesktopWatch();
+
+      // Show the desktop watch after scene loads
+      const self = this;
+      this.el.sceneEl.addEventListener('loaded', function () {
+        self._updateDesktopVisibility();
+        // Redraw watch after logo loads
+        const logo = document.getElementById('logoMain');
+        if (logo) logo.addEventListener('load', function () {
+          if (window.SVRWatchUI) window.SVRWatchUI.draw();
+        }, { once: true });
+      });
+
+      // VR enter/exit handling
+      this.el.sceneEl.addEventListener('enter-vr', this._updateDesktopVisibility.bind(this));
+      this.el.sceneEl.addEventListener('exit-vr', this._updateDesktopVisibility.bind(this));
     },
+
+    remove: function () {
+      window.removeEventListener('keydown', this._onKey);
+    },
+
+    _onKey: function (e) {
+      const key = e.key.toLowerCase();
+      if (key === 't') {
+        this.watchVisible = !this.watchVisible;
+        this._updateDesktopVisibility();
+      } else if (key === '[' || key === 'arrowleft') {
+        this.selectedDest = (this.selectedDest + this.destinations.length - 1) % this.destinations.length;
+        this._refreshDesktopWatch();
+      } else if (key === ']' || key === 'arrowright') {
+        this.selectedDest = (this.selectedDest + 1) % this.destinations.length;
+        this._refreshDesktopWatch();
+      } else if (key === 'enter' || key === 'f') {
+        this._teleport();
+      }
+    },
+
+    _teleport: function () {
+      const dest = this.destinations[this.selectedDest];
+      const rig = document.getElementById('rig');
+      if (rig && dest) {
+        rig.setAttribute('position', `${dest.pos[0]} ${dest.pos[1]} ${dest.pos[2]}`);
+        // Flash the watch
+        const self = this;
+        if (this.desktopWatch) {
+          const dw = this.desktopWatch;
+          dw.object3D.visible = false;
+          setTimeout(function () {
+            dw.object3D.visible = self.watchVisible && !sceneInVR(self.el.sceneEl);
+          }, 300);
+        }
+      }
+    },
+
+    _refreshDesktopWatch: function () {
+      if (!this.desktopWatch) return;
+      const THREE = AFRAME.THREE;
+      const tex = makeDestinationTexture(this.destinations, this.selectedDest);
+      const panel = this.desktopWatch.querySelector('a-plane');
+      if (panel) {
+        panel.setAttribute('material', 'src:#watchCanvas; shader:flat; transparent:false; side:double');
+      }
+      // Also update the watch canvas with teleport info
+      const canvas = document.getElementById('watchCanvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        // Draw small teleport overlay in corner of watch HUD
+        if (window.SVRWatchUI) window.SVRWatchUI.draw();
+        ctx.save();
+        ctx.fillStyle = 'rgba(110,66,255,0.18)';
+        ctx.beginPath();
+        ctx.roundRect(810, 240, 430, 58, 10);
+        ctx.fill();
+        ctx.strokeStyle = '#9b5bff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = '#c8a8ff';
+        ctx.font = 'bold 18px Arial';
+        ctx.fillText('⌚ WARP: ' + this.destinations[this.selectedDest].icon + ' ' + this.destinations[this.selectedDest].name, 828, 276);
+        ctx.fillStyle = '#7fd2ff';
+        ctx.font = '14px Arial';
+        ctx.fillText('[T] TOGGLE  [←/→] CYCLE  [F/ENTER] JUMP', 828, 296);
+        ctx.restore();
+        // Force texture update
+        const glassEl = document.querySelector('.svr-forearm-device a-plane');
+        if (glassEl && glassEl.components && glassEl.components.material) {
+          const mat = glassEl.components.material.material;
+          if (mat && mat.map) mat.map.needsUpdate = true;
+        }
+      }
+    },
+
+    _updateDesktopVisibility: function () {
+      if (!this.desktopWatch) return;
+      const inVR = sceneInVR(this.el.sceneEl);
+      this.desktopWatch.setAttribute('visible', (!inVR && this.watchVisible) ? 'true' : 'false');
+    },
+
     tick: function () {
       if (!this.rootObj) return;
-      const active = isQuestBrowser() && sceneInVR(this.el.sceneEl);
-      this.rootObj.visible = active;
-      if (!active) return;
+      const inVR = sceneInVR(this.el.sceneEl);
+      const onQuest = isQuestBrowser();
 
+      // Desktop watch: always show unless VR mode
+      if (this.desktopWatch) {
+        const showDesktop = !inVR && this.watchVisible;
+        if (this.desktopWatch.object3D) {
+          this.desktopWatch.object3D.visible = showDesktop;
+        }
+      }
+
+      // VR wrist device: only Quest in VR
+      const vrActive = onQuest && inVR;
+      this.rootObj.visible = vrActive;
+      if (!vrActive) return;
+
+      // Bone tracking
       if ((!this.cache.wristObj || !this.cache.indexObj || !this.cache.pinkyObj) && this.frames % 20 === 0) {
         const rootObj = this.el.object3D;
         this.cache.wristObj = findNamedBone(rootObj, [/^wrist$/, /wrist/, /hand_wrist/, /b_l_wrist/, /leftwrist/]);
@@ -231,17 +492,13 @@
       }
       this.frames += 1;
 
-      const pose = computeWorldPose(this.el, this.cache, this.data.side);
-      if (!pose) {
-        this.rootObj.visible = false;
-        return;
-      }
+      const pose = computeVRPose(this.el, this.cache, this.data.side);
+      if (!pose) { this.rootObj.visible = false; return; }
 
       const parentObj = this.el.object3D;
       const localPos = parentObj.worldToLocal(pose.position.clone());
       parentObj.getWorldQuaternion(Q0);
       Q1.copy(Q0).invert().multiply(pose.quaternion);
-
       this.rootObj.visible = true;
       this.rootObj.position.copy(localPos);
       this.rootObj.quaternion.copy(Q1);
