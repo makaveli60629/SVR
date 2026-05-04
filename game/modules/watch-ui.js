@@ -33,11 +33,9 @@
     ctx.strokeStyle = '#11151d';
     ctx.lineWidth = 3;
     ctx.stroke();
-
     ctx.fillStyle = accent;
     ctx.font = 'bold 34px Arial';
     ctx.fillText(label, x + 12, y + 38);
-
     ctx.globalAlpha = 0.18;
     ctx.fillStyle = accent;
     ctx.font = 'bold 72px Arial';
@@ -159,7 +157,7 @@
   }
 
   window.SVRWatchUI = {
-    setState(next) {
+    setState: function (next) {
       Object.assign(STATE, next || {});
       drawUI();
     },
