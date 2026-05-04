@@ -12,8 +12,22 @@
     options: ['MENU', 'STORE', 'VIEW', 'AUTO']
   };
 
+  // CRITICAL: Cache gradients and computed values
+  const CACHE = {
+    bgGradient: null,
+    accentGradient: null,
+    lastState: JSON.stringify(STATE),
+    isDirty: true
+  };
+
+  // Pre-compute colors to avoid regex tests per frame
+  const CARD_COLORS = {
+    red: '#ff5a5a',
+    black: '#eef2ff'
+  };
+
   function cardColor(card) {
-    return /♥|♦/.test(card) ? '#ff5a5a' : '#eef2ff';
+    return /♥|♦/.test(card) ? CARD_COLORS.red : CARD_COLORS.black;
   }
 
   function roundedRect(ctx, x, y, w, h, r) {
@@ -57,17 +71,29 @@
   function drawUI() {
     const canvas = document.getElementById('watchCanvas');
     if (!canvas) return;
+    
+    // Check if state actually changed
+    const currentStateStr = JSON.stringify(STATE);
+    if (currentStateStr === CACHE.lastState && !CACHE.isDirty) {
+      return;  // Skip redraw if nothing changed
+    }
+    CACHE.lastState = currentStateStr;
+    CACHE.isDirty = false;
+
     const ctx = canvas.getContext('2d');
     const w = canvas.width;
     const h = canvas.height;
 
     ctx.clearRect(0, 0, w, h);
 
-    const bg = ctx.createLinearGradient(0, 0, w, h);
-    bg.addColorStop(0, '#03040a');
-    bg.addColorStop(0.45, '#0a1220');
-    bg.addColorStop(1, '#111a29');
-    ctx.fillStyle = bg;
+    // Cache gradients
+    if (!CACHE.bgGradient) {
+      CACHE.bgGradient = ctx.createLinearGradient(0, 0, w, h);
+      CACHE.bgGradient.addColorStop(0, '#03040a');
+      CACHE.bgGradient.addColorStop(0.45, '#0a1220');
+      CACHE.bgGradient.addColorStop(1, '#111a29');
+    }
+    ctx.fillStyle = CACHE.bgGradient;
     ctx.fillRect(0, 0, w, h);
 
     ctx.strokeStyle = '#9b5bff';
@@ -75,10 +101,12 @@
     roundedRect(ctx, 12, 12, w - 24, h - 24, 28);
     ctx.stroke();
 
-    const accent = ctx.createLinearGradient(0, 0, 0, 120);
-    accent.addColorStop(0, 'rgba(185,122,255,0.22)');
-    accent.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = accent;
+    if (!CACHE.accentGradient) {
+      CACHE.accentGradient = ctx.createLinearGradient(0, 0, 0, 120);
+      CACHE.accentGradient.addColorStop(0, 'rgba(185,122,255,0.22)');
+      CACHE.accentGradient.addColorStop(1, 'rgba(0,0,0,0)');
+    }
+    ctx.fillStyle = CACHE.accentGradient;
     roundedRect(ctx, 18, 18, w - 36, 120, 24);
     ctx.fill();
 
@@ -158,17 +186,31 @@
     });
   }
 
+  // CRITICAL: Use requestAnimationFrame + Dirty flag instead of setInterval
+  let animationFrameId = null;
+  function scheduleRedraw() {
+    if (animationFrameId) return;  // Already scheduled
+    animationFrameId = requestAnimationFrame(function() {
+      drawUI();
+      animationFrameId = null;
+    });
+  }
+
   window.SVRWatchUI = {
     setState(next) {
       Object.assign(STATE, next || {});
-      drawUI();
+      CACHE.isDirty = true;
+      scheduleRedraw();
     },
     draw: drawUI
   };
 
   window.addEventListener('DOMContentLoaded', function () {
     const img = document.getElementById('logoMain');
-    if (img) img.addEventListener('load', drawUI, { once: true });
+    if (img) img.addEventListener('load', function() {
+      CACHE.isDirty = true;
+      drawUI();
+    }, { once: true });
     drawUI();
   });
 })();
