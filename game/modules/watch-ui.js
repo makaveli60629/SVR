@@ -1,3 +1,20 @@
+window.SVRWatchUI = {
+  setData(data){
+    const canvas = document.getElementById('watchCanvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle="#000";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle="#00ffcc";
+    ctx.font="48px monospace";
+
+    ctx.fillText(`Chips: ${data.chips}`,40,100);
+    ctx.fillText(`Pot: ${data.pot}`,40,200);
+    ctx.fillText(`Bet: ${data.bet}`,40,300);
+  }
+};
 (function () {
   const STATE = {
     title: 'SVR POKER',
