@@ -1,3 +1,23 @@
+AFRAME.registerComponent('real-table-stage', {
+  init() {
+    const scene = document.querySelector('a-scene');
+
+    // spawn player cards
+    for (let i=0;i<2;i++){
+      const c = document.createElement('a-box');
+      c.setAttribute('width',0.1);
+      c.setAttribute('height',0.14);
+      c.setAttribute('depth',0.01);
+      c.setAttribute('color','#fff');
+      c.setAttribute('position',`${i*0.12} 1 -0.8`);
+      c.setAttribute('grabbable','');
+      c.setAttribute('card-peek','');
+      scene.appendChild(c);
+    }
+
+    startGameLoop();
+  }
+});
 (function () {
   const THREE = AFRAME.THREE;
   const box = new THREE.Box3();
