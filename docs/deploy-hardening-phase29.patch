@@ -1,0 +1,28 @@
+diff --git a/.github/workflows/deploy.yml b/.github/workflows/deploy.yml
+--- a/.github/workflows/deploy.yml
++++ b/.github/workflows/deploy.yml
+@@ -43,6 +43,7 @@ jobs:
+             rm -rf tmp
+             mkdir -p tmp
+             unzip -o "$ZIP" -d tmp
++            chmod -R u+rwX,go+rX tmp || true
+
+             if [ -f tmp/index.html ]; then
+               cp -r tmp/* "$TARGET"/
+@@ -62,6 +63,14 @@ jobs:
+           if [ -f update/game.zip ]; then
+             echo "Updating game"
+             mkdir -p build/game
++            BYTES=$(wc -c < update/game.zip)
++            LIMIT=26214400
++            if [ "$BYTES" -ge "$LIMIT" ]; then
++              echo "update/game.zip is too large: $BYTES bytes"
++              exit 1
++            fi
+             flatten update/game.zip build/game
+           fi
+
+       - name: Validate build
+         run: |
+           test -f build/index.html
++          test -f build/game/index.html
