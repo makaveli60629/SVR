@@ -1,0 +1,11 @@
+Focused patch:
+- restored flatter origin-style wrist watch
+- removed curved brace/cuff geometry
+- forced outward watch face with wrist anchoring
+- added more detailed chairs
+- hid extra real-table top meshes (circle005, circle02)
+- added custom wood rail + felt over real table base
+- moved moon/earth/mars higher and farther back
+- removed planet emissive/glow so textures carry the look
+- calmed Claudia arm pose and scaled her slightly taller
+- build label updated to 20260318-v240

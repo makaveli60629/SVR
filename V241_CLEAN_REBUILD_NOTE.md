@@ -1,0 +1,1 @@
+Single-source rebuild from saved v241 baseline.\n- removed embed/autocam split\n- removed CDN asset fallback\n- kept local assets only\n- updated build label to 20260320-v241-clean\n
