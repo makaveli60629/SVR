@@ -10,6 +10,10 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -23,7 +27,7 @@ jobs:
 
       - name: Prepare build
         run: |
-          set -e
+          set -euo pipefail
           rm -rf build tmp
           mkdir -p build
 
@@ -43,42 +47,101 @@ jobs:
 
       - name: Apply update zips
         run: |
-          set -e
+          set -euo pipefail
 
-          flatten() {
+          flatten_zip() {
             ZIP="$1"
             TARGET="$2"
+            LABEL="$3"
 
+            if [ ! -f "$ZIP" ]; then
+              echo "No $LABEL zip found at $ZIP"
+              return 0
+            fi
+
+            echo "Applying $LABEL from $ZIP into $TARGET"
             rm -rf tmp
-            mkdir -p tmp
-            unzip -o "$ZIP" -d tmp
+            mkdir -p tmp "$TARGET"
 
+            unzip -o "$ZIP" -d tmp
+            chmod -R u+rwX,go+rX tmp || true
+
+            echo "$LABEL zip top-level contents:"
+            find tmp -maxdepth 2 -mindepth 1 | sort | head -200
+
+            SRC="tmp"
             if [ -f tmp/index.html ]; then
-              cp -r tmp/* "$TARGET"/
+              SRC="tmp"
+            elif [ -f tmp/game/index.html ]; then
+              SRC="tmp/game"
+            elif [ -f tmp/site/index.html ]; then
+              SRC="tmp/site"
             else
-              INNER="$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1)"
-              if [ -n "$INNER" ]; then
-                cp -r "$INNER"/* "$TARGET"/
+              INNER="$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1 || true)"
+              if [ -n "$INNER" ] && [ -f "$INNER/index.html" ]; then
+                SRC="$INNER"
               fi
             fi
+
+            if [ ! -f "$SRC/index.html" ]; then
+              echo "ERROR: $LABEL zip did not contain an index.html at root, /game, /site, or one inner folder."
+              exit 1
+            fi
+
+            # A zip update is authoritative. Remove stale files so old phase labels cannot survive.
+            rm -rf "$TARGET"
+            mkdir -p "$TARGET"
+            cp -a "$SRC"/. "$TARGET"/
+            chmod -R u+rwX,go+rX "$TARGET" || true
 
             rm -rf tmp
           }
 
-          if [ -f update/site.zip ]; then
-            echo "Updating site"
-            flatten update/site.zip build
-          fi
+          flatten_zip update/site.zip build site
+          flatten_zip update/game.zip build/game game
 
-          if [ -f update/game.zip ]; then
-            echo "Updating game"
-            mkdir -p build/game
-            flatten update/game.zip build/game
+      - name: Stamp deploy version
+        run: |
+          set -euo pipefail
+          mkdir -p build/game
+          COMMIT_SHA="${GITHUB_SHA}"
+          DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          cat > build/game/deploy-health.json <<EOF
+          {
+            "status": "ok",
+            "commit": "${COMMIT_SHA}",
+            "deployedAt": "${DEPLOY_TIME}",
+            "workflow": "Auto Deploy",
+            "target": "/game"
+          }
+          EOF
+
+          if [ ! -f build/game/version.json ]; then
+            cat > build/game/version.json <<EOF
+          {
+            "build": "DEPLOY-STAMP-${COMMIT_SHA}",
+            "commit": "${COMMIT_SHA}",
+            "deployedAt": "${DEPLOY_TIME}"
+          }
+          EOF
           fi
 
       - name: Validate build
         run: |
+          set -euo pipefail
           test -f build/index.html
+          test -f build/game/index.html
+          test -f build/game/deploy-health.json
+          test -f build/game/version.json
+
+          echo "Root build files:"
+          find build -maxdepth 2 -type f | sort | head -200
+
+          if grep -R "PHASE-48-POKER-JS-TRUTH-LOCK" build/game 2>/dev/null; then
+            echo "ERROR: stale Phase 48 runtime still exists in build/game after update overlay."
+            exit 1
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
