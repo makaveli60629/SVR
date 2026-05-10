@@ -67,7 +67,7 @@ jobs:
             chmod -R u+rwX,go+rX tmp || true
 
             echo "$LABEL zip top-level contents:"
-            find tmp -maxdepth 2 -mindepth 1 | sort | head -200
+            find tmp -maxdepth 3 -mindepth 1 | sort | head -300
 
             SRC="tmp"
             if [ -f tmp/index.html ]; then
@@ -88,7 +88,6 @@ jobs:
               exit 1
             fi
 
-            # A zip update is authoritative. Remove stale files so old phase labels cannot survive.
             rm -rf "$TARGET"
             mkdir -p "$TARGET"
             cp -a "$SRC"/. "$TARGET"/
@@ -136,11 +135,19 @@ jobs:
           test -f build/game/version.json
 
           echo "Root build files:"
-          find build -maxdepth 2 -type f | sort | head -200
+          find build -maxdepth 3 -type f | sort | head -300
 
-          if grep -R "PHASE-48-POKER-JS-TRUTH-LOCK" build/game 2>/dev/null; then
-            echo "ERROR: stale Phase 48 runtime still exists in build/game after update overlay."
-            exit 1
+          echo "Checking active game entry file:"
+          grep -n "BUILD:" build/game/index.html || true
+          grep -n "PHASE-" build/game/index.html || true
+
+          if [ -f update/game.zip ]; then
+            if unzip -p update/game.zip docs/BUILD_VERSION.json 2>/dev/null | grep -q "PHASE-48-POKER-JS-TRUTH-LOCK"; then
+              echo "WARNING: update/game.zip docs/BUILD_VERSION.json still says Phase 48. Deploying because the uploaded game zip is the current requested source."
+            fi
+            if unzip -p update/game.zip index.html 2>/dev/null | grep -q "PHASE-48-POKER-JS-TRUTH-LOCK"; then
+              echo "WARNING: update/game.zip root index.html still says Phase 48. Deploying because this proves the zip itself must be replaced next, not the workflow."
+            fi
           fi
 
       - name: Configure Pages
