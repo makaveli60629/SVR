@@ -1,4 +1,4 @@
 {
-  "version": "2.1.19",
-  "notes": "Phase 119 repo-assets-only patch: spawn faces table, felt aligned to surface, chairs added for seat test, real Eric deals a card, hand/controller teleport refined."
+  "version": "PHASE-59",
+  "notes": "Updated build to Phase 59; poker logic completed."
 }
