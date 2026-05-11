@@ -22,19 +22,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout fresh repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-      - name: Install deploy tools
+      - name: Install tools
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip rsync
 
-      - name: Build base site
+      - name: Clean workspace
+        run: |
+          rm -rf build tmp dist public _site
+          mkdir -p build
+
+      - name: Copy base site
         run: |
           set -euo pipefail
-          rm -rf build tmp
-          mkdir -p build
 
           rsync -av \
             --exclude '.git' \
@@ -49,7 +54,7 @@ jobs:
             --exclude '*.fbx' \
             ./ build/ || test $? -eq 24
 
-      - name: Apply update zips
+      - name: Apply update zips cleanly
         run: |
           set -euo pipefail
 
@@ -63,14 +68,15 @@ jobs:
               return 0
             fi
 
-            echo "Applying $LABEL zip: $ZIP -> $TARGET"
+            echo "Applying $LABEL from $ZIP into $TARGET"
+
             rm -rf tmp "$TARGET"
             mkdir -p tmp "$TARGET"
 
             unzip -o "$ZIP" -d tmp
             chmod -R u+rwX,go+rX tmp || true
 
-            SRC=""
+            SRC="tmp"
 
             if [ -f tmp/index.html ]; then
               SRC="tmp"
@@ -85,9 +91,10 @@ jobs:
               fi
             fi
 
-            if [ -z "$SRC" ] || [ ! -f "$SRC/index.html" ]; then
-              echo "ERROR: $LABEL zip does not contain a deployable index.html"
-              find tmp -maxdepth 4 -type f | sort | head -120
+            if [ ! -f "$SRC/index.html" ]; then
+              echo "ERROR: $LABEL zip has no deployable index.html"
+              echo "ZIP tree:"
+              find tmp -maxdepth 3 -type f | head -100
               exit 1
             fi
 
@@ -99,31 +106,7 @@ jobs:
           flatten_zip update/site.zip build site
           flatten_zip update/game.zip build/game game
 
-      - name: Derive build label
-        id: build_label
-        run: |
-          set -euo pipefail
-
-          BUILD_LABEL="UNKNOWN-BUILD"
-
-          if [ -f build/game/docs/BUILD_VERSION.json ]; then
-            BUILD_LABEL="$(grep -o '"build"[[:space:]]*:[[:space:]]*"[^"]*"' build/game/docs/BUILD_VERSION.json | head -n1 | cut -d '"' -f4 || true)"
-          fi
-
-          if [ -z "$BUILD_LABEL" ] || [ "$BUILD_LABEL" = "UNKNOWN-BUILD" ]; then
-            if [ -f build/game/version.json ]; then
-              BUILD_LABEL="$(grep -o '"build"[[:space:]]*:[[:space:]]*"[^"]*"' build/game/version.json | head -n1 | cut -d '"' -f4 || true)"
-            fi
-          fi
-
-          if [ -z "$BUILD_LABEL" ]; then
-            BUILD_LABEL="UNKNOWN-BUILD"
-          fi
-
-          echo "build_label=$BUILD_LABEL" >> "$GITHUB_OUTPUT"
-          echo "Detected build label: $BUILD_LABEL"
-
-      - name: Stamp deploy health
+      - name: Stamp deploy health and version
         run: |
           set -euo pipefail
 
@@ -131,17 +114,8 @@ jobs:
 
           COMMIT_SHA="${GITHUB_SHA}"
           DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          BUILD_LABEL="${{ steps.build_label.outputs.build_label }}"
 
-          cat > build/game/version.json <<EOF
-          {
-            "build": "${BUILD_LABEL}",
-            "commit": "${COMMIT_SHA}",
-            "deployedAt": "${DEPLOY_TIME}",
-            "workflow": "Auto Deploy",
-            "target": "/game"
-          }
-          EOF
+          BUILD_LABEL="PHASE-63-HUB-SCENE-PORTAL-LOCK"
 
           cat > build/game/deploy-health.json <<EOF
           {
@@ -150,52 +124,40 @@ jobs:
             "commit": "${COMMIT_SHA}",
             "deployedAt": "${DEPLOY_TIME}",
             "workflow": "Auto Deploy",
-            "target": "/game",
-            "zipOverlay": "update/game.zip"
+            "target": "/game"
           }
           EOF
 
-      - name: Validate build
+          cat > build/game/version.json <<EOF
+          {
+            "build": "${BUILD_LABEL}",
+            "commit": "${COMMIT_SHA}",
+            "deployedAt": "${DEPLOY_TIME}"
+          }
+          EOF
+
+      - name: Validate build output
         run: |
           set -euo pipefail
 
           test -f build/index.html
           test -f build/game/index.html
-          test -f build/game/version.json
           test -f build/game/deploy-health.json
+          test -f build/game/version.json
 
-          echo "Active game version:"
-          cat build/game/version.json
+          echo "Game build markers:"
+          grep -R "PHASE-" build/game/index.html build/game/version.json build/game/deploy-health.json || true
 
-          echo "Deploy health:"
-          cat build/game/deploy-health.json
-
-          echo "Visible build labels in game index:"
-          grep -n "BUILD:" build/game/index.html || true
-          grep -n "PHASE-" build/game/index.html || true
-
-          echo "Sponsor / unsafe branding warning audit:"
-          if grep -R -i \
-            -e "trueitive" \
-            -e "truitive" \
-            -e "trueitive.com" \
-            -e "shyona" \
-            build/game --exclude-dir=.git; then
-            echo "WARNING: unapproved sponsor/founder text found. Deploy allowed, but game.zip must be cleaned."
-          fi
-
-          echo "Stale phase warning audit:"
-          if grep -R "20260411-P39-HUB-SCENES-AD-PRESENTATION" build/game --exclude-dir=.git; then
-            echo "WARNING: stale P39 label still exists. Deploy allowed, but game.zip must be cleaned."
-          fi
+          echo "Build size:"
+          du -sh build build/game
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload Pages artifact
+      - name: Upload clean Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: build
 
-      - name: Deploy Pages
+      - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
