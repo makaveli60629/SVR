@@ -2,7 +2,8 @@ name: Auto Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 env:
@@ -29,93 +30,60 @@ jobs:
 
       - name: Install tools
         run: |
+          set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y unzip rsync
+          sudo apt-get install -y rsync
 
-      - name: Clean workspace
+      - name: Clean build folders
         run: |
+          set -euo pipefail
           rm -rf build tmp dist public _site
           mkdir -p build
 
-      - name: Copy base site
+      - name: Copy site base
         run: |
           set -euo pipefail
-
           rsync -av \
             --exclude '.git' \
             --exclude '.github' \
-            --exclude 'update' \
             --exclude 'backend' \
             --exclude 'docs' \
+            --exclude 'update' \
             --exclude 'Library' \
             --exclude 'Logs' \
             --exclude 'Temp' \
+            --exclude 'node_modules' \
+            --exclude 'backend/node_modules' \
             --exclude '*.zip' \
             --exclude '*.fbx' \
             ./ build/ || test $? -eq 24
 
-      - name: Apply update zips cleanly
+      - name: Copy game folder directly
         run: |
           set -euo pipefail
 
-          flatten_zip() {
-            ZIP="$1"
-            TARGET="$2"
-            LABEL="$3"
+          if [ ! -f game/index.html ]; then
+            echo "ERROR: game/index.html missing in repository."
+            echo "The /game folder must be committed directly."
+            exit 1
+          fi
 
-            if [ ! -f "$ZIP" ]; then
-              echo "No $LABEL zip found at $ZIP"
-              return 0
-            fi
-
-            echo "Applying $LABEL from $ZIP into $TARGET"
-
-            rm -rf tmp "$TARGET"
-            mkdir -p tmp "$TARGET"
-
-            unzip -o "$ZIP" -d tmp
-            chmod -R u+rwX,go+rX tmp || true
-
-            SRC="tmp"
-
-            if [ -f tmp/index.html ]; then
-              SRC="tmp"
-            elif [ -f tmp/game/index.html ]; then
-              SRC="tmp/game"
-            elif [ -f tmp/site/index.html ]; then
-              SRC="tmp/site"
-            else
-              INNER="$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1 || true)"
-              if [ -n "$INNER" ] && [ -f "$INNER/index.html" ]; then
-                SRC="$INNER"
-              fi
-            fi
-
-            if [ ! -f "$SRC/index.html" ]; then
-              echo "ERROR: $LABEL zip has no deployable index.html"
-              echo "ZIP tree:"
-              find tmp -maxdepth 3 -type f | head -100
-              exit 1
-            fi
-
-            cp -a "$SRC"/. "$TARGET"/
-            chmod -R u+rwX,go+rX "$TARGET" || true
-            rm -rf tmp
-          }
-
-          flatten_zip update/site.zip build site
-          flatten_zip update/game.zip build/game game
-
-      - name: Stamp deploy health and version
-        run: |
-          set -euo pipefail
-
+          rm -rf build/game
           mkdir -p build/game
+
+          rsync -av game/ build/game/ || test $? -eq 24
+
+          chmod -R u+rwX,go+rX build || true
+
+      - name: Stamp deploy health
+        run: |
+          set -euo pipefail
 
           COMMIT_SHA="${GITHUB_SHA}"
           DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          BUILD_LABEL="PHASE-65-DIRECT-RUNTIME-FIX-LOCK"
 
-          BUILD_LABEL="PHASE-63-HUB-SCENE-PORTAL-LOCK"
+          mkdir -p build/game
 
           cat > build/game/deploy-health.json <<EOF
           {
@@ -124,7 +92,8 @@ jobs:
             "commit": "${COMMIT_SHA}",
             "deployedAt": "${DEPLOY_TIME}",
             "workflow": "Auto Deploy",
-            "target": "/game"
+            "target": "/game",
+            "source": "direct-game-folder"
           }
           EOF
 
@@ -132,7 +101,8 @@ jobs:
           {
             "build": "${BUILD_LABEL}",
             "commit": "${COMMIT_SHA}",
-            "deployedAt": "${DEPLOY_TIME}"
+            "deployedAt": "${DEPLOY_TIME}",
+            "source": "direct-game-folder"
           }
           EOF
 
@@ -142,10 +112,10 @@ jobs:
 
           test -f build/index.html
           test -f build/game/index.html
-          test -f build/game/deploy-health.json
           test -f build/game/version.json
+          test -f build/game/deploy-health.json
 
-          echo "Game build markers:"
+          echo "Game phase markers:"
           grep -R "PHASE-" build/game/index.html build/game/version.json build/game/deploy-health.json || true
 
           echo "Build size:"
@@ -154,7 +124,7 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload clean Pages artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: build
