@@ -1,261 +1,120 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<title>SVR Poker Lobby</title>
-<script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-<script src="modules/watch-ui.js"></script>
-<script src="modules/forearm-device.js"></script>
-<script src="modules/meta-hand-materials.js"></script>
-<script src="modules/moon-upgrade.js"></script>
-<script src="modules/lobby-floor.js"></script>
-<script src="modules/lobby-skyline.js"></script>
-<script src="modules/lobby-sprites.js"></script>
-<script src="modules/lobby-signage.js"></script>
-<script src="modules/real-table-stage.js"></script>
-<script src="modules/floating-logo.js"></script>
-<style>
-  * { box-sizing: border-box; }
-  body { margin: 0; background: #000; overflow: hidden; }
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>ScarlettVR Poker • Phase 62 Controller Poker Lock</title>
+  <meta name="theme-color" content="#050508"/>
+  <link rel="manifest" href="./manifest.json"/>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
+    #hud {
+      position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10;
+      display: flex; gap: 10px; align-items: center; justify-content: space-between;
+      pointer-events: none;
+    }
+    .pill {
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.35);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #e9e9ff;
+      font-size: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      pointer-events: none;
+    }
+    .btn {
+      pointer-events: auto;
+      border: 1px solid rgba(180,140,255,.45);
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn:hover { background: rgba(60,40,90,.55); }
+    #sceneNav{
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+      pointer-events: auto;
+    }
+    .scene-btn{
+      border: 1px solid rgba(120,255,186,.42);
+      background: rgba(2,10,8,.62);
+      color: #eafff4;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      font-size: 12px;
+    }
+    .scene-btn:hover{ background: rgba(10,48,33,.72); }
+    body.preview-mode #sceneNav { display:none !important; }
+    #log {
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10;
+      max-height: 38vh; overflow: auto; display: none;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.25);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: #d7d7ff;
+      font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+    #err {
+      position: fixed; inset: 0; display: none; z-index: 50;
+      background: rgba(0,0,0,.88);
+      color: #fff;
+      padding: 18px;
+      font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      overflow: auto;
+    }
 
-  /* Hidden canvas used as watch screen texture */
-  #watchCanvas {
-    position: fixed;
-    left: -99999px; top: -99999px;
-    width: 1280px; height: 512px;
-    pointer-events: none;
+    body.preview-mode #hud,
+    body.preview-mode #log,
+    body.preview-mode #err { display: none !important; }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
   }
-
-  /* HUD overlay – only visible in non-VR */
-  #hud {
-    position: fixed;
-    bottom: 18px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; gap: 10px; align-items: center;
-    background: rgba(6,5,18,0.78);
-    border: 1.5px solid #6e3dcc;
-    border-radius: 14px;
-    padding: 8px 18px;
-    font-family: 'Courier New', monospace;
-    color: #c8a8ff;
-    font-size: 13px;
-    pointer-events: none;
-    user-select: none;
-    z-index: 100;
-  }
-  #hud .key {
-    display: inline-block;
-    background: rgba(110,62,204,0.28);
-    border: 1px solid #8f5eff;
-    border-radius: 5px;
-    padding: 2px 7px;
-    color: #e0ccff;
-    font-weight: bold;
-    font-size: 12px;
-  }
-  #hud .sep { color: #4a3870; margin: 0 4px; }
-
-  /* Mini watch preview panel (desktop only) */
-  #watchPreview {
-    position: fixed;
-    top: 14px; right: 16px;
-    width: 320px; height: 128px;
-    border: 2px solid #6e3dcc;
-    border-radius: 10px;
-    background: #040509;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 101;
-  }
-  #watchPreview canvas {
-    width: 100%; height: 100%;
-    display: block;
-    image-rendering: crisp-edges;
-  }
-  #watchBadge {
-    position: fixed;
-    top: 14px; right: 16px;
-    font-family: monospace;
-    color: #9b6eff;
-    font-size: 11px;
-    padding: 3px 8px;
-    background: rgba(6,5,18,0.9);
-    border: 1px solid #5a3299;
-    border-radius: 6px;
-    z-index: 102;
-    pointer-events: none;
-  }
-</style>
+  </script>
 </head>
 <body>
+  <div id="app"></div>
 
-<!-- Off-screen canvas for the watch face texture -->
-<canvas id="watchCanvas" width="1280" height="512"></canvas>
+  <div id="hud">
+    <div class="pill" id="status">Booting…</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
+      <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
+      <span class="pill" id="mode">Hands: …</span>
+      <span class="pill">BUILD: PHASE-62-NEXT-ZIP-CONTROLLER-POKER-LOCK</span>
+    </div>
+  </div>
 
-<!-- Keyboard HUD -->
-<div id="hud">
-  <span class="key">W/S</span> Move
-  <span class="sep">|</span>
-  <span class="key">Mouse</span> Look
-  <span class="sep">|</span>
-  <span class="key">T</span> Toggle Watch
-  <span class="sep">|</span>
-  <span class="key">←/→</span> Dest
-  <span class="sep">|</span>
-  <span class="key">F</span> Teleport
-  <span class="sep">|</span>
-  <span class="key">Enter VR</span> for hand tracking
-</div>
+  <div id="sceneNav">
+    <button class="scene-btn" data-scene="lobby">Lobby</button>
+    <button class="scene-btn" data-scene="seat">Seat</button>
+    <button class="scene-btn" data-scene="reiki">Reiki</button>
+    <button class="scene-btn" data-scene="reikiRoom">Reiki Room</button>
+    <button class="scene-btn" data-scene="pga">PGA</button>
+    <button class="scene-btn" data-scene="legends">Legend</button>
+    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
+    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
+  </div>
 
-<!-- Watch badge -->
-<div id="watchBadge">⌚ TELEPORT WATCH</div>
+  <pre id="log"></pre>
+  <pre id="err"></pre>
 
-<a-scene
-  renderer="antialias:true; colorManagement:true; physicallyCorrectLights:true"
-  background="color:#020309"
-  fog="type: exponential; color:#04060e; density:0.0009"
-  vr-mode-ui="enabled:true">
-
-  <a-assets timeout="8000">
-    <img id="logoMain"     src="assets/textures/logo.png">
-    <img id="logoTable"    src="assets/textures/logo-table.png">
-    <img id="moonDiffuse"  src="assets/textures/moon_final_diffuse.png">
-    <img id="moonBump"     src="assets/textures/moon_final_bump.png">
-    <img id="tableFelt"    src="assets/textures/tablefelt.png">
-    <a-asset-item id="tableGLB" src="assets/models/table.glb"></a-asset-item>
-  </a-assets>
-
-  <!-- ── Environment ────────────────────────────────────────────────────── -->
-  <a-entity id="nightSky"   star-dome></a-entity>
-  <a-entity id="lobbyFloor" lobby-floor></a-entity>
-  <a-entity id="skyline"    lobby-skyline></a-entity>
-  <a-entity id="sprites"    lobby-sprites></a-entity>
-  <a-entity id="signage"    lobby-signage></a-entity>
-
-  <!-- ── Player rig ────────────────────────────────────────────────────── -->
-  <a-entity id="rig" position="0 1.62 5.8">
-    <a-camera
-      look-controls="pointerLockEnabled:true"
-      wasd-controls="fly:false; acceleration:18">
-    </a-camera>
-    <!-- VR hand tracking (Quest) -->
-    <a-entity id="leftHand"
-      hand-tracking-controls="hand: left; modelStyle: mesh"
-      meta-hand-skin="hand: left"
-      forearm-device="side: left">
-    </a-entity>
-    <a-entity id="rightHand"
-      hand-tracking-controls="hand: right; modelStyle: mesh"
-      meta-hand-skin="hand: right">
-    </a-entity>
-  </a-entity>
-
-  <!-- ── Poker table with dealer + NPCs ────────────────────────────────── -->
-  <a-entity id="tableZone" position="0 0 0">
-    <a-entity id="mainTable" gltf-model="#tableGLB" real-table-stage></a-entity>
-  </a-entity>
-
-  <!-- ── Hero logo ─────────────────────────────────────────────────────── -->
-  <a-plane id="heroLogo"
-    floating-logo
-    position="0 4.45 -4.9"
-    width="6.3" height="2.1"
-    src="#logoMain"
-    material="shader:flat; transparent:true; alphaTest:0.08; side:double; depthWrite:false; depthTest:true">
-  </a-plane>
-
-  <!-- ── Moon ──────────────────────────────────────────────────────────── -->
-  <!-- Brought much closer: position ~ (-38, 62, -180), scale 7x7x7        -->
-  <a-sphere id="heroMoon"
-    cinematic-moon
-    radius="1.5"
-    position="-38 62 -180"
-    scale="7 7 7"
-    segments-width="48"
-    segments-height="36">
-  </a-sphere>
-
-  <!-- ── Mars ──────────────────────────────────────────────────────────── -->
-  <!-- Brought much closer: position ~ (52, 74, -200), scale 4.5x           -->
-  <a-sphere id="heroMars"
-    cinematic-mars
-    radius="1.1"
-    position="52 74 -200"
-    scale="4.5 4.5 4.5"
-    segments-width="40"
-    segments-height="28">
-  </a-sphere>
-
-  <!-- ── Lighting ──────────────────────────────────────────────────────── -->
-  <!-- Ambient -->
-  <a-entity light="type:ambient; intensity:0.55; color:#dfe7ff"></a-entity>
-  <!-- Directional sunlight -->
-  <a-entity light="type:directional; intensity:0.85; color:#f1f5ff; castShadow:false" position="-14 22 10"></a-entity>
-  <!-- Casino purple point light -->
-  <a-entity light="type:point; intensity:1.1; distance:40; decay:1.2; color:#8f4eff" position="0 4.6 0"></a-entity>
-  <!-- Moon light (warm white) -->
-  <a-entity light="type:point; intensity:0.7; distance:280; decay:1.0; color:#f7f0e8" position="-38 62 -160"></a-entity>
-  <!-- Mars light (warm orange) -->
-  <a-entity light="type:point; intensity:0.55; distance:250; decay:1.0; color:#ff7040" position="52 74 -180"></a-entity>
-  <!-- Table fill -->
-  <a-entity light="type:point; intensity:0.5; distance:12; decay:2.0; color:#4488ff" position="0 2.8 0"></a-entity>
-
-</a-scene>
-
-<script>
-// ── Refresh watch canvas when logo finishes loading ────────────────────────
-window.addEventListener('DOMContentLoaded', function () {
-  var logo = document.getElementById('logoMain');
-  function redraw() { if (window.SVRWatchUI) window.SVRWatchUI.draw(); }
-  if (logo) { logo.addEventListener('load', redraw, { once: true }); }
-  redraw();
-
-  // Mirror watch canvas to the small preview div
-  var preview = document.getElementById('watchPreview');
-  var src     = document.getElementById('watchCanvas');
-  if (preview && src) {
-    var previewCanvas = document.createElement('canvas');
-    previewCanvas.width  = src.width;
-    previewCanvas.height = src.height;
-    preview.appendChild(previewCanvas);
-    var pCtx = previewCanvas.getContext('2d');
-    function mirrorWatch() {
-      pCtx.drawImage(src, 0, 0, previewCanvas.width, previewCanvas.height);
-      requestAnimationFrame(mirrorWatch);
-    }
-    mirrorWatch();
-  }
-
-  // Patch SVRWatchUI to also redraw the preview
-  var origDraw = window.SVRWatchUI && window.SVRWatchUI.draw;
-  if (origDraw && window.SVRWatchUI) {
-    window.SVRWatchUI.draw = function () {
-      origDraw();
-    };
-  }
-
-  // Hide HUD + preview in VR mode
-  var scene = document.querySelector('a-scene');
-  if (scene) {
-    scene.addEventListener('enter-vr', function () {
-      var hud  = document.getElementById('hud');
-      var wp   = document.getElementById('watchPreview');
-      var wb   = document.getElementById('watchBadge');
-      if (hud) hud.style.display  = 'none';
-      if (wp)  wp.style.display   = 'none';
-      if (wb)  wb.style.display   = 'none';
-    });
-    scene.addEventListener('exit-vr', function () {
-      var hud  = document.getElementById('hud');
-      var wp   = document.getElementById('watchPreview');
-      var wb   = document.getElementById('watchBadge');
-      if (hud) hud.style.display  = '';
-      if (wp)  wp.style.display   = '';
-      if (wb)  wb.style.display   = '';
-    });
-  }
-});
-</script>
-
+  <script type="module" src="./main.js"></script>
 </body>
 </html>

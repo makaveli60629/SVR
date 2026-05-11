@@ -1,0 +1,11 @@
+{
+  "build": "PHASE-62-NEXT-ZIP-CONTROLLER-POKER-LOCK",
+  "phase": 62,
+  "lockedRules": [
+    "game.zip under 25 MB",
+    "playable poker first",
+    "no unapproved unapproved wellness/founder runtime branding",
+    "controller fallback watch enabled",
+    "no Table or old Reiki Room bottom buttons"
+  ]
+}
