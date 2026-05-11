@@ -33,7 +33,6 @@ jobs:
       - name: Build base site
         run: |
           set -euo pipefail
-
           rm -rf build tmp
           mkdir -p build
 
@@ -65,7 +64,6 @@ jobs:
             fi
 
             echo "Applying $LABEL zip: $ZIP -> $TARGET"
-
             rm -rf tmp "$TARGET"
             mkdir -p tmp "$TARGET"
 
@@ -89,14 +87,12 @@ jobs:
 
             if [ -z "$SRC" ] || [ ! -f "$SRC/index.html" ]; then
               echo "ERROR: $LABEL zip does not contain a deployable index.html"
-              echo "ZIP file listing:"
               find tmp -maxdepth 4 -type f | sort | head -120
               exit 1
             fi
 
             cp -a "$SRC"/. "$TARGET"/
             chmod -R u+rwX,go+rX "$TARGET" || true
-
             rm -rf tmp
           }
 
