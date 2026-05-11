@@ -13,3 +13,7 @@ Thumbs.db
 *.zip
 !update/site.zip
 !update/game.zip
+
+backend/node_modules/
+node_modules/
+
