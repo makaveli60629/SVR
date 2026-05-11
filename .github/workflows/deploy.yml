@@ -1,23 +1,206 @@
+name: Auto Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install deploy tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip rsync
+
+      - name: Build base site
+        run: |
+          set -euo pipefail
+
+          rm -rf build tmp
+          mkdir -p build
+
+          rsync -av \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'update' \
+            --exclude 'backend' \
+            --exclude 'docs' \
+            --exclude 'Library' \
+            --exclude 'Logs' \
+            --exclude 'Temp' \
+            --exclude '*.zip' \
+            --exclude '*.fbx' \
+            ./ build/ || test $? -eq 24
+
+      - name: Apply update zips
+        run: |
+          set -euo pipefail
+
+          flatten_zip() {
+            ZIP="$1"
+            TARGET="$2"
+            LABEL="$3"
+
+            if [ ! -f "$ZIP" ]; then
+              echo "No $LABEL zip found at $ZIP"
+              return 0
+            fi
+
+            echo "Applying $LABEL zip: $ZIP -> $TARGET"
+
+            rm -rf tmp "$TARGET"
+            mkdir -p tmp "$TARGET"
+
+            unzip -o "$ZIP" -d tmp
+            chmod -R u+rwX,go+rX tmp || true
+
+            SRC=""
+
+            if [ -f tmp/index.html ]; then
+              SRC="tmp"
+            elif [ -f tmp/game/index.html ]; then
+              SRC="tmp/game"
+            elif [ -f tmp/site/index.html ]; then
+              SRC="tmp/site"
+            else
+              INNER="$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1 || true)"
+              if [ -n "$INNER" ] && [ -f "$INNER/index.html" ]; then
+                SRC="$INNER"
+              fi
+            fi
+
+            if [ -z "$SRC" ] || [ ! -f "$SRC/index.html" ]; then
+              echo "ERROR: $LABEL zip does not contain a deployable index.html"
+              echo "ZIP file listing:"
+              find tmp -maxdepth 4 -type f | sort | head -120
+              exit 1
+            fi
+
+            cp -a "$SRC"/. "$TARGET"/
+            chmod -R u+rwX,go+rX "$TARGET" || true
+
+            rm -rf tmp
+          }
+
+          flatten_zip update/site.zip build site
+          flatten_zip update/game.zip build/game game
+
+      - name: Derive build label
+        id: build_label
+        run: |
+          set -euo pipefail
+
+          BUILD_LABEL="UNKNOWN-BUILD"
+
+          if [ -f build/game/docs/BUILD_VERSION.json ]; then
+            BUILD_LABEL="$(grep -o '"build"[[:space:]]*:[[:space:]]*"[^"]*"' build/game/docs/BUILD_VERSION.json | head -n1 | cut -d '"' -f4 || true)"
+          fi
+
+          if [ -z "$BUILD_LABEL" ] || [ "$BUILD_LABEL" = "UNKNOWN-BUILD" ]; then
+            if [ -f build/game/version.json ]; then
+              BUILD_LABEL="$(grep -o '"build"[[:space:]]*:[[:space:]]*"[^"]*"' build/game/version.json | head -n1 | cut -d '"' -f4 || true)"
+            fi
+          fi
+
+          if [ -z "$BUILD_LABEL" ]; then
+            BUILD_LABEL="UNKNOWN-BUILD"
+          fi
+
+          echo "build_label=$BUILD_LABEL" >> "$GITHUB_OUTPUT"
+          echo "Detected build label: $BUILD_LABEL"
+
+      - name: Stamp deploy health
+        run: |
+          set -euo pipefail
+
+          mkdir -p build/game
+
+          COMMIT_SHA="${GITHUB_SHA}"
+          DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          BUILD_LABEL="${{ steps.build_label.outputs.build_label }}"
+
+          cat > build/game/version.json <<EOF
+          {
+            "build": "${BUILD_LABEL}",
+            "commit": "${COMMIT_SHA}",
+            "deployedAt": "${DEPLOY_TIME}",
+            "workflow": "Auto Deploy",
+            "target": "/game"
+          }
+          EOF
+
+          cat > build/game/deploy-health.json <<EOF
+          {
+            "status": "ok",
+            "build": "${BUILD_LABEL}",
+            "commit": "${COMMIT_SHA}",
+            "deployedAt": "${DEPLOY_TIME}",
+            "workflow": "Auto Deploy",
+            "target": "/game",
+            "zipOverlay": "update/game.zip"
+          }
+          EOF
+
       - name: Validate build
         run: |
           set -euo pipefail
 
           test -f build/index.html
           test -f build/game/index.html
-          test -f build/game/deploy-health.json
           test -f build/game/version.json
+          test -f build/game/deploy-health.json
 
-          echo "Active deployed version:"
+          echo "Active game version:"
           cat build/game/version.json
 
-          echo "Active deploy health:"
+          echo "Deploy health:"
           cat build/game/deploy-health.json
 
-          echo "Index build labels:"
+          echo "Visible build labels in game index:"
           grep -n "BUILD:" build/game/index.html || true
           grep -n "PHASE-" build/game/index.html || true
 
-          echo "Warn if stale Phase 39 label is present:"
-          if grep -R "20260411-P39-HUB-SCENES-AD-PRESENTATION" build/game --exclude-dir=.git; then
-            echo "WARNING: stale Phase 39 label found. Deploy allowed, but game.zip needs cleanup."
+          echo "Sponsor / unsafe branding audit:"
+          if grep -R -i \
+            -e "trueitive" \
+            -e "truitive" \
+            -e "trueitive.com" \
+            -e "shyona" \
+            build/game --exclude-dir=.git; then
+            echo "ERROR: Unapproved sponsor/founder branding found in deployed game."
+            exit 1
           fi
+
+          echo "Stale phase warning audit:"
+          if grep -R "20260411-P39-HUB-SCENES-AD-PRESENTATION" build/game --exclude-dir=.git; then
+            echo "WARNING: stale P39 label still exists. Deploy will continue, but game.zip should be cleaned."
+          fi
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+
+      - name: Deploy Pages
+        uses: actions/deploy-pages@v4
