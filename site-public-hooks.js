@@ -9,7 +9,7 @@
       localStorage.setItem(ADMIN_KEY, override);
       return override;
     }
-    return localStorage.getItem(ADMIN_KEY) || 'offline';
+    return localStorage.getItem(ADMIN_KEY) || 'online';
   }
 
   function paintAdminState() {
@@ -34,7 +34,7 @@
         email: (data.email || '').trim(),
         message: (data.message || '').trim(),
         createdAt: new Date().toISOString(),
-        source: 'svrpoker-public-site-restore'
+        source: 'svrpoker-public-site-phase-2'
       };
       if (!entry.message) {
         if (status) status.textContent = 'Please enter a message before saving.';
@@ -44,7 +44,7 @@
       current.push(entry);
       localStorage.setItem(MESSAGE_KEY, JSON.stringify(current.slice(-100)));
       form.reset();
-      if (status) status.textContent = 'Message saved locally. Backend API/Azure SQL can be wired next.';
+      if (status) status.textContent = 'Message saved locally. Backend API and Azure SQL can be connected when the secure backend is ready.';
     });
   }
 
