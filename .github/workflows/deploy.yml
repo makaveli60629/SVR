@@ -32,12 +32,12 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y rsync
+          sudo apt-get install -y rsync unzip
 
       - name: Clean build folders
         run: |
           set -euo pipefail
-          rm -rf build tmp dist public _site
+          rm -rf build tmp dist public _site tmp_site
           mkdir -p build
 
       - name: Copy site base
@@ -57,6 +57,49 @@ jobs:
             --exclude '*.zip' \
             --exclude '*.fbx' \
             ./ build/ || test $? -eq 24
+
+      - name: Restore public site from root site.zip
+        run: |
+          set -euo pipefail
+
+          if [ ! -f site.zip ]; then
+            echo "No root site.zip found; using committed site base."
+            exit 0
+          fi
+
+          echo "Restoring public website from root site.zip only. Game folder is handled separately."
+          rm -rf tmp_site
+          mkdir -p tmp_site
+
+          unzip -o site.zip -d tmp_site
+          chmod -R u+rwX,go+rX tmp_site || true
+
+          SRC="tmp_site"
+          if [ -f tmp_site/index.html ]; then
+            SRC="tmp_site"
+          elif [ -f tmp_site/site/index.html ]; then
+            SRC="tmp_site/site"
+          else
+            INNER="$(find tmp_site -mindepth 1 -maxdepth 1 -type d | head -n1 || true)"
+            if [ -n "$INNER" ] && [ -f "$INNER/index.html" ]; then
+              SRC="$INNER"
+            fi
+          fi
+
+          if [ ! -f "$SRC/index.html" ]; then
+            echo "ERROR: root site.zip has no deployable index.html"
+            find tmp_site -maxdepth 3 -type f | sort | head -100
+            exit 1
+          fi
+
+          rsync -av \
+            --exclude 'game' \
+            --exclude 'game/**' \
+            --exclude '*.fbx' \
+            "$SRC"/ build/ || test $? -eq 24
+
+          chmod -R u+rwX,go+rX build || true
+          rm -rf tmp_site
 
       - name: Copy game folder directly
         run: |
@@ -114,6 +157,9 @@ jobs:
           test -f build/game/index.html
           test -f build/game/version.json
           test -f build/game/deploy-health.json
+
+          echo "Public site markers:"
+          grep -R "Matrix\|matrix\|Scarlett\|SVR" build/index.html build/*.css build/*.js 2>/dev/null || true
 
           echo "Game phase markers:"
           grep -R "PHASE-" build/game/index.html build/game/version.json build/game/deploy-health.json || true
