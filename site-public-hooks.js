@@ -22,6 +22,21 @@
     });
   }
 
+  function injectSiteDonationButton() {
+    const heroStack = document.querySelector('.hero-brand-stack');
+    if (!heroStack || document.querySelector('.cashapp-dev-donation')) return;
+
+    const link = document.createElement('a');
+    link.className = 'cashapp-dev-donation';
+    link.href = 'https://cash.app/$RonaldChadee7';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.setAttribute('aria-label', 'Donate to support SVR Poker site development and expansion costs through Cash App');
+    link.innerHTML = '<span class="cashapp-dev-label">Support site development</span><strong>$RonaldChadee7</strong><small>Donation for site development and expansion costs only</small>';
+
+    heroStack.prepend(link);
+  }
+
   function wireMessageForm() {
     const form = document.getElementById('visitor-message-form');
     if (!form) return;
@@ -49,5 +64,6 @@
   }
 
   paintAdminState();
+  injectSiteDonationButton();
   wireMessageForm();
 })();
