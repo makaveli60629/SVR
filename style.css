@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap');
 
 :root {
   --bg: #04040a;
@@ -659,3 +659,65 @@ body.launch-body {
 .message-form textarea { resize: vertical; min-height: 130px; }
 .message-card { grid-column: span 2; }
 @media (max-width: 860px) { .message-card { grid-column: span 1; } }
+
+/* PHASE 66 â€” preview panel polish lock */
+.hero-grid {
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+  align-items: center;
+}
+
+.hero-copy {
+  min-width: 0;
+}
+
+.live-preview-panel {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.preview-window-live {
+  width: 100%;
+  max-width: 100%;
+  height: clamp(260px, 32vw, 378px);
+  min-height: 0 !important;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 22px;
+  contain: paint;
+}
+
+.preview-window-live iframe,
+.game-live-preview-frame {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  display: block !important;
+  background: #000 !important;
+}
+
+.preview-live-badge {
+  left: 12px !important;
+  top: 12px !important;
+}
+
+@media (max-width: 1120px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .live-preview-panel {
+    width: 100%;
+  }
+  .preview-window-live {
+    height: clamp(260px, 52vw, 420px);
+  }
+}
+
+@media (max-width: 760px) {
+  .preview-window-live {
+    height: clamp(240px, 68vw, 360px);
+  }
+}
+
