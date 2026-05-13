@@ -1,6 +1,6 @@
 # SVR Site Phase 03 — Azure SQL Next Steps
 
-Build: `SITE-PHASE-03-REFINED-SVRHELP-DIRECT-LOCK`
+Build: `SITE-PHASE-03-ADMIN-MEMBERSHIP-CONTACT-LOCK`
 
 Do not put SQL passwords, Stripe secrets, or API keys in static website files.
 

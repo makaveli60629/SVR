@@ -1,0 +1,1 @@
+SVR site rollback safe restore. Restores the last safe Phase 03 public/site layout, keeps Cash App handle as $SVRhelp, and does not include or touch /game. Apply direct files to repo root and optionally update /update/site.zip.

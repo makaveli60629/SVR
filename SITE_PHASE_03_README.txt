@@ -1,11 +1,11 @@
 SVR Poker Site Phase 03
 
-Build: SITE-PHASE-03-REFINED-SVRHELP-DIRECT-LOCK
+Build: SITE-PHASE-03-ADMIN-MEMBERSHIP-CONTACT-LOCK
 Built: 2026-05-13T01:43:51Z
 
 This is a site-only package. It does not include /game.
 
-Deploy target: direct committed site files. Do not upload only site.zip because the current workflow excludes zip files and the update folder.
+Upload target for current Auto Deploy workflow: update/site.zip
 
 Includes:
 - locked purple binary Matrix public page
