@@ -1,56 +1,44 @@
+
 (function(){
-  const c = document.getElementById('matrixBg') || document.getElementById('matrix');
-  if(!c) return;
-  const ctx = c.getContext('2d', { alpha: true });
-  const PURPLE = '#df6bff';
-  const CYAN = '#6fe0ff';
-
-  let w=0,h=0,cols=0,font=16,drops=[],speed=[];
-  const chars = '01SVRPOKERアイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-  function resize(){
-    const dpr = Math.min(window.devicePixelRatio||1, 2);
-    w = Math.floor(window.innerWidth * dpr);
-    h = Math.floor(window.innerHeight * dpr);
-    c.width = w; c.height = h;
-    c.style.width = window.innerWidth + 'px';
-    c.style.height = window.innerHeight + 'px';
-    font = Math.max(13, Math.floor(15 * dpr));
-    cols = Math.max(1, Math.floor(w / font));
-    drops = new Array(cols).fill(0).map(()=> Math.random() * h / font);
-    speed = new Array(cols).fill(0).map(()=> 0.75 + Math.random()*0.55);
+  const canvas = document.getElementById('matrix');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const secretPhrases = ['I LOVE SHY','I LOVE SCARLETT'];
+  let secretQueue = [];
+  let frame = 0;
+  function size(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+  size(); addEventListener('resize', size);
+  const font = 15;
+  let columns = Math.floor(canvas.width / font);
+  let drops = Array.from({length: columns}, () => Math.floor(Math.random()*canvas.height/font));
+  function refill(){
+    columns = Math.floor(canvas.width / font);
+    drops = Array.from({length: columns}, () => Math.floor(Math.random()*canvas.height/font));
   }
-  window.addEventListener('resize', resize);
-  resize();
-
-  function step(){
-    ctx.fillStyle = 'rgba(2,0,8,0.085)';
-    ctx.fillRect(0,0,w,h);
+  addEventListener('resize', refill);
+  function seedSecret(){
+    const phrase = secretPhrases[Math.floor(Math.random()*secretPhrases.length)];
+    secretQueue = phrase.split('').filter(ch => ch !== ' ');
+  }
+  function draw(){
+    frame++;
+    ctx.fillStyle = 'rgba(2,0,8,0.075)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
     ctx.font = font + 'px monospace';
-
-    for(let i=0;i<cols;i++){
-      const ch = chars[(Math.random()*chars.length)|0];
-      const x = i * font;
-      const y = drops[i] * font;
-      const head = Math.random() > 0.82;
-      const color = head ? CYAN : PURPLE;
-
-      ctx.shadowBlur = head ? 18 : 12;
-      ctx.shadowColor = color;
-      ctx.fillStyle = head ? 'rgba(111,224,255,0.95)' : 'rgba(223,107,255,0.88)';
-      ctx.fillText(ch, x, y);
-
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = head ? 'rgba(111,224,255,0.18)' : 'rgba(223,107,255,0.16)';
-      ctx.fillText(ch, x + 1, y + 1);
-
-      drops[i] += speed[i];
-      if(y > h && Math.random() > 0.965) drops[i] = -Math.random() * 20;
+    if(frame % 260 === 0) seedSecret();
+    for(let i=0;i<drops.length;i++){
+      let text = Math.random() > 0.5 ? '1' : '0';
+      let secret = false;
+      if(secretQueue.length && Math.random() > 0.985){ text = secretQueue.shift(); secret = true; }
+      ctx.fillStyle = secret ? '#fff7ff' : (Math.random() > .965 ? '#55f7ff' : '#b56cff');
+      ctx.shadowBlur = secret ? 18 : 8;
+      ctx.shadowColor = secret ? '#ff4fd8' : '#9d4edd';
+      ctx.fillText(text, i*font, drops[i]*font);
+      if(drops[i]*font > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
     }
-    requestAnimationFrame(step);
+    ctx.shadowBlur = 0;
+    requestAnimationFrame(draw);
   }
-
-  ctx.fillStyle = 'rgba(0,0,0,1)';
-  ctx.fillRect(0,0,w,h);
-  requestAnimationFrame(step);
+  draw();
 })();

@@ -1,0 +1,44 @@
+
+/* Scarlett VR Poker — Site Hotfix (non-invasive)
+   Drop-in CSS to stabilize footer height and prevent layout jumps. */
+
+:root{
+  --footer-h: 40px;
+}
+
+/* lock footer height across banner changes */
+footer, .footer, .site-footer, #footer{
+  min-height: var(--footer-h) !important;
+  height: var(--footer-h) !important;
+  line-height: var(--footer-h) !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+/* prevent slider dots/labels from pushing layout */
+.banner, .banner * , .slider, .slider *{
+  box-sizing: border-box;
+}
+
+/* live status badge */
+.svr-coming-soon{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-left:10px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.2px;
+  border:1px solid rgba(255,80,80,.35);
+  background: rgba(255,0,0,.12);
+  color:#ff5a5a;
+}
+.svr-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:#ff3b3b;
+  box-shadow: 0 0 12px rgba(255,60,60,.65);
+}
+.svr-dot.green{ background:#35ff6a; box-shadow:0 0 12px rgba(53,255,106,.65); }
+.svr-dot.orange{ background:#ffb020; box-shadow:0 0 12px rgba(255,176,32,.65); }

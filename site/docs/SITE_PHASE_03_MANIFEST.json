@@ -1,0 +1,28 @@
+{
+  "build": "SITE-PHASE-03-REFINED-SVRHELP-DIRECT-LOCK",
+  "builtAt": "2026-05-13T02:15:00Z",
+  "type": "site-only-direct-deploy-files",
+  "gameFolderIncluded": false,
+  "publicPage": "Purple binary Matrix launch page preserved",
+  "hiddenPhrases": [
+    "I LOVE SHY",
+    "I LOVE SCARLETT"
+  ],
+  "phaseAdditions": [
+    "admin preview dashboard",
+    "membership preview dashboard",
+    "contact/support form",
+    "sponsorship page",
+    "impact page",
+    "store preview checkout disabled",
+    "live game preview iframe",
+    "Cash App development support button updated to $SVRhelp",
+    "direct deploy package and apply script added"
+  ],
+  "checkoutEnabled": false,
+  "backendMode": "frontend safe local mode unless API_BASE configured",
+  "uploadTarget": "direct committed root/site files",
+  "cashAppHandle": "$SVRhelp",
+  "cashAppUrl": "https://cash.app/$SVRhelp",
+  "deployMethod": "Commit direct files to repo root. Current workflow excludes update/ and *.zip."
+}

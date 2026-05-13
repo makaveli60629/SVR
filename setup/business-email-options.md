@@ -1,8 +1,3 @@
-# Business email options
+# Business Email Options
 
-Use your own domain for branded mailboxes.
-
-Practical starting points:
-- Cloudflare Email Routing for free inbound forwarding
-- Zoho Mail for low-cost or region-dependent free custom domain hosting
-- Microsoft 365 or Google Workspace when you want full hosted mailboxes
+Use a domain mailbox or forwarding service for sponsor/support messages. Keep public forms routed through the Azure API once live.

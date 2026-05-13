@@ -1,46 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SVR Poker | Public Launch Page</title>
-  <meta name="description" content="SVR Poker public launch page." />
-  <link rel="icon" href="./logo.webp" type="image/webp" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./launch.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SVR Poker | Official Launch Page</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="img/logo.png">
+<meta name="build" content="SITE-PHASE-03-REFINED-SVRHELP-DIRECT-LOCK">
 </head>
-<body class="launch-body">
-  <canvas id="binary-rain" aria-hidden="true"></canvas>
-
-  <main class="launch-page">
-    <div class="admin-status offline" id="admin-status" data-state="offline">● Admin Offline</div>
-    <img class="launch-logo" src="./logo.webp" alt="SVR Poker logo" />
-
-    <div class="launch-copy">
-      <div class="eyebrow">Public Launch Page</div>
-      <h1 class="title-lockup brand-inline">
-        <span class="poker-word poker-full">SVR Poker</span>
-      </h1>
-      <p class="launch-note">This is a public page.</p>
-      <p class="launch-note">Site under construction.</p>
-      <p class="launch-note launch-age">18 years and older only for this project.</p>
+<body class="locked-launch">
+<canvas id="matrix"></canvas><div class="scanline"></div>
+<main class="launch-wrap">
+  <section class="launch-card">
+    <a class="dev-support" href="https://cash.app/$SVRhelp" target="_blank" rel="noopener">
+      <strong>Support Site Development</strong><span>Cash App $SVRhelp • donation for site development and expansion costs only</span>
+    </a>
+    <img src="img/logo.png" alt="SVR Poker" class="logo">
+    <div class="kicker">Scarlett VR Poker • Social VR Platform</div>
+    <div class="status">SITE UNDER CONSTRUCTION</div>
+    <div class="age">18+ ONLY • PLAY-MONEY EXPERIENCE • LAUNCHING SOON</div>
+    <div class="admin-pill" data-admin-pill><span class="admin-dot"></span><span data-admin-label>Admin Offline</span></div>
+    <div class="launch-actions">
+      <a class="btn" href="site/">PREVIEW SITE</a>
+      <a class="btn secondary" href="game/">PREVIEW GAME</a>
+      <a class="btn secondary" href="site/contact.html">CONTACT / SPONSOR</a>
     </div>
-
-    <div class="action-row">
-      <a class="btn btn-primary" href="./site/index.html">Preview Site</a>
-      <a class="btn btn-secondary" href="./game/index.html">Preview Game</a>
-      <a class="btn btn-ghost" href="./site/index.html#message">Leave Message</a>
-    </div>
-
-    <footer class="launch-footer">
-      <p>© 2026 SVR Poker. All rights reserved.</p>
-      <p>Scarlett Holding LLC • Team Nova • R.Chadee</p>
-    </footer>
-  </main>
-
-  <script src="./matrix.js"></script>
-  <script src="./site-public-hooks.js"></script>
+    <p class="fineprint">SVR Poker is being structured as a sponsor-supported, play-money, social VR poker and destination-hub experience. No real-money gambling access is provided from this public page.</p>
+  </section>
+</main>
+<footer class="footer launch-footer">© 2026 SVR Poker. All rights reserved. • Scarlett Holding LLC • Team Nova • R.Chadee</footer>
+<script src="js/matrix.js"></script>
+<script src="js/site-public-hooks.js"></script>
 </body>
 </html>
