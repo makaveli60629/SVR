@@ -7,10 +7,11 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { applyPhase71EditUnlock, PHASE71_BUILD, PHASE71_STORE_URL } from "./modules/phase71_edit_unlock.js";
+import { applyPhase71EditUnlock, PHASE71_STORE_URL } from "./modules/phase71_edit_unlock.js";
 import { applyPhase76PrivateSceneLock } from "./modules/phase76_private_scene_lock.js";
-import { PHASE77_BUILD, PHASE77_RANGE_URL, openPhase77Range } from "./modules/phase77_range_route_lock.js";
-import { applyPhase82FullSceneAuditLock, PHASE82_BUILD, PHASE82_STORE_URL } from "./modules/phase83_full_update_audit_lock.js";
+import { PHASE77_RANGE_URL, openPhase77Range } from "./modules/phase77_range_route_lock.js";
+import { applyPhase82FullSceneAuditLock, PHASE82_STORE_URL } from "./modules/phase83_full_update_audit_lock.js";
+import { applyPhase91CelestialPokerLock, PHASE91_BUILD } from "./modules/phase91_celestial_poker_lock.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -19,28 +20,28 @@ const PREVIEW = params.has("preview") || params.has("live") || params.get("cam")
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 
 const SCENE_URL_FALLBACKS = {
-  reikiRoom: "./reiki.html?v=phase83-direct-scene-routes",
-  reikiPrivate: "./reiki.html?v=phase83-direct-scene-routes",
-  reikiEscape: "./reiki.html?v=phase83-direct-scene-routes",
-  pgaDrive: "./pga-drive.html?v=phase83-direct-scene-routes",
-  pgaDriving: "./pga-drive.html?v=phase83-direct-scene-routes",
-  drive: "./pga-drive.html?v=phase83-direct-scene-routes",
-  pgaChipPutt: "./chip-putt.html?v=phase83-direct-scene-routes",
-  chipPutt: "./chip-putt.html?v=phase83-direct-scene-routes",
-  pgaShortGame: "./chip-putt.html?v=phase83-direct-scene-routes",
-  smoker: "./smoker-lounge.html?v=phase83-direct-scene-routes",
-  smokerLounge: "./smoker-lounge.html?v=phase83-direct-scene-routes",
-  lounge: "./smoker-lounge.html?v=phase83-direct-scene-routes",
-  loungeRoom: "./smoker-lounge.html?v=phase83-direct-scene-routes",
-  scorpion: "./scorpion.html?v=phase83-direct-scene-routes",
-  scorpionRoom: "./scorpion.html?v=phase83-direct-scene-routes",
-  scorpionPrivate: "./scorpion.html?v=phase83-direct-scene-routes",
-  scorpionPoker: "./scorpion.html?v=phase83-direct-scene-routes",
-  storeScene: "./store-room.html?v=phase83-direct-scene-routes",
-  storeRoom: "./store-room.html?v=phase83-direct-scene-routes",
-  vrStore: "./store-room.html?v=phase83-direct-scene-routes",
-  storePanel: "./store-room.html?v=phase83-direct-scene-routes",
-  pgaRange: "./pga-drive.html?v=phase83-direct-scene-routes"
+  reikiRoom: "./reiki.html?v=phase91-celestial-poker-lock",
+  reikiPrivate: "./reiki.html?v=phase91-celestial-poker-lock",
+  reikiEscape: "./reiki.html?v=phase91-celestial-poker-lock",
+  pgaDrive: "./pga-drive.html?v=phase91-celestial-poker-lock",
+  pgaDriving: "./pga-drive.html?v=phase91-celestial-poker-lock",
+  drive: "./pga-drive.html?v=phase91-celestial-poker-lock",
+  pgaChipPutt: "./chip-putt.html?v=phase91-celestial-poker-lock",
+  chipPutt: "./chip-putt.html?v=phase91-celestial-poker-lock",
+  pgaShortGame: "./chip-putt.html?v=phase91-celestial-poker-lock",
+  smoker: "./smoker-lounge.html?v=phase91-celestial-poker-lock",
+  smokerLounge: "./smoker-lounge.html?v=phase91-celestial-poker-lock",
+  lounge: "./smoker-lounge.html?v=phase91-celestial-poker-lock",
+  loungeRoom: "./smoker-lounge.html?v=phase91-celestial-poker-lock",
+  scorpion: "./scorpion.html?v=phase91-celestial-poker-lock",
+  scorpionRoom: "./scorpion.html?v=phase91-celestial-poker-lock",
+  scorpionPrivate: "./scorpion.html?v=phase91-celestial-poker-lock",
+  scorpionPoker: "./scorpion.html?v=phase91-celestial-poker-lock",
+  storeScene: "./store-room.html?v=phase91-celestial-poker-lock",
+  storeRoom: "./store-room.html?v=phase91-celestial-poker-lock",
+  vrStore: "./store-room.html?v=phase91-celestial-poker-lock",
+  storePanel: "./store-room.html?v=phase91-celestial-poker-lock",
+  pgaRange: "./pga-drive.html?v=phase91-celestial-poker-lock"
 };
 
 function openSceneFallback(key){
@@ -94,7 +95,6 @@ scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
 
-
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
@@ -111,13 +111,17 @@ const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTarg
 applyPhase71EditUnlock({ scene, sceneTargets, log });
 applyPhase76PrivateSceneLock({ scene, sceneTargets, log });
 applyPhase82FullSceneAuditLock({ scene, sceneTargets, log });
+applyPhase91CelestialPokerLock({ scene, log });
 window.SVR_RANGE_URL = PHASE77_RANGE_URL;
-scene.userData.SVR_BUILD = PHASE77_BUILD;
+scene.userData.SVR_BUILD = PHASE91_BUILD;
+window.SVR_BUILD = PHASE91_BUILD;
 window.SVR_SKY_CONTINUITY_LOCK = true;
 window.SVR_PGA_DRIVE_STANDALONE_SCENE_LOCK = "game/range.html";
 window.SVR_PGA_RANGE_STANCE_MAT_LOCK = true;
 window.SVR_PGA_TARGET_BOUNTY_LOCAL_SCORE_LOCK = true;
 window.SVR_PHASE82_FULL_SCENE_AUDIT_LOCK = true;
+window.SVR_PHASE91_CELESTIAL_ORBIT_LOCK = true;
+window.SVR_POKER_DEAL_DIRECTION = "RIGHT_TO_LEFT";
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -308,7 +312,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : `${PHASE82_BUILD} ready. All scene buttons audited. Moon/Mars forced visible. PGA Drive, Chip/Putt, Store Room, Reiki, Smoker, and Scorpion routes restored.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `${PHASE91_BUILD} ready. Orbiting Moon/Mars active. Scene routes restored. Poker deal direction target: right-to-left.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
