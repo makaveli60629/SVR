@@ -1,37 +1,5 @@
-{
-  "build": "PHASE-83-DIRECT-SCENE-ROUTE-VERIFY-LOCK",
-  "phase": 83,
-  "scope": "game-only direct committed folder route restore and verification lock",
-  "siteTouched": false,
-  "deployRule": "Current workflow deploys committed /game directly; update/game.zip is backup only",
-  "scenes": [
-    "lobby",
-    "table",
-    "seat",
-    "reiki",
-    "reikiRoom",
-    "pga",
-    "pgaDrive",
-    "pgaChipPutt",
-    "smoker",
-    "scorpion",
-    "legends",
-    "sponsor",
-    "store",
-    "storeScene",
-    "webStore"
-  ],
-  "requiredFiles": [
-    "game/index.html",
-    "game/main.js",
-    "game/range.html",
-    "game/pga-drive.html",
-    "game/chip-putt.html",
-    "game/smoker-lounge.html",
-    "game/scorpion.html",
-    "game/store-room.html",
-    "game/reiki.html",
-    "game/modules/range_logic.js",
-    "game/modules/private_scene_common.js"
-  ]
+﻿{
+    "build":  "PHASE-84-GAME-ROUTE-BOOT-LOCK",
+    "siteTouched":  false,
+    "appliedAt":  "2026-05-14T20:22:20.8708519Z"
 }

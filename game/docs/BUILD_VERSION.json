@@ -1,6 +1,6 @@
-﻿{
-    "updatedAt":  "2026-05-14T18:26:14Z",
-    "scope":  "PGA range stability/watch lock",
-    "build":  "PHASE-86-PGA-STABILITY-WATCH-LOCK",
-    "siteTouched":  false
+{
+  "build": "PHASE-84-GAME-ROUTE-BOOT-LOCK",
+  "date": "2026-05-14",
+  "phase": 84,
+  "notes": "Game-side route/boot lock. Site untouched."
 }

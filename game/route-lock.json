@@ -1,0 +1,14 @@
+{
+  "build": "PHASE-84-GAME-ROUTE-BOOT-LOCK",
+  "storePortalUrl": "https://svrpoker.com/site/store.html",
+  "privateScenes": [
+    "reiki.html",
+    "pga-drive.html",
+    "chip-putt.html",
+    "store-room.html",
+    "smoker-lounge.html",
+    "scorpion.html"
+  ],
+  "siteTouched": false,
+  "approvalLock": "No AWAITING APPROVAL/AWAITING APPROVAL/founder names/photos/external Reiki branding in runtime."
+}
