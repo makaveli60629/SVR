@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Membership | SVR Poker</title>
-  <meta name="description" content="Sample SVR membership tiers and pricing preview." />
+  <meta name="description" content="SVR membership sample pricing and access tiers preview." />
   <link rel="icon" href="../logo.webp" type="image/webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,20 +34,20 @@
   </div>
 </nav>
     <main class="site-card">
-      <section class="store-banner" style="margin-top:0;"><span class="store-kicker">Membership Preview</span><h1 class="store-title">Membership + Access Tiers</h1><p class="store-lead">These are sample tiers for layout, pricing, account logic, and future checkout wiring. Nothing is sold yet; use these to review how SVR can present public access, member access, VIP, founders, and sponsor routes.</p><div class="category-strip"><a href="store.html">Store Hub</a><a href="cart.html">Cart</a><a href="stripe-sandbox.html">Stripe Sandbox</a></div></section><section class="store-section"><div class="pricing-grid">
-<article class="pricing-card"><span class="store-pill">Public</span><h3 class="pricing-title">Visitor</h3><p class="price-pill">Free</p><p class="pricing-copy">Public launch page, site preview, game preview links, and general updates.</p><a class="btn btn-secondary" href="contact.html">Join Waitlist</a></article>
-<article class="pricing-card"><span class="store-pill">Member</span><h3 class="pricing-title">SVR Member</h3><p class="price-pill">$9.99/mo</p><p class="pricing-copy">Sample future tier for profile, avatar locker, store wishlist, member updates, and event alerts.</p><a class="btn btn-secondary" href="#" data-add-cart data-name="SVR Member Preview" data-hub="Membership" data-price-cents="999">Add Preview</a></article>
-<article class="pricing-card"><span class="store-pill">VIP</span><h3 class="pricing-title">VIP Table</h3><p class="price-pill">$19.99/mo</p><p class="pricing-copy">Sample future tier for private rooms, table access concepts, premium cosmetics, and tournament invites.</p><a class="btn btn-primary" href="#" data-add-cart data-name="VIP Table Preview" data-hub="Membership" data-price-cents="1999">Add Preview</a></article>
-<article class="pricing-card"><span class="store-pill">Founder</span><h3 class="pricing-title">Founder Pass</h3><p class="price-pill">$49.00</p><p class="pricing-copy">One-time sample founder package with badge, early access identity, and launch recognition concept.</p><a class="btn btn-secondary" href="#" data-add-cart data-name="Founder Pass Preview" data-hub="Membership" data-price-cents="4900">Add Preview</a></article>
-<article class="pricing-card"><span class="store-pill">Sponsor</span><h3 class="pricing-title">Sponsor Intro</h3><p class="price-pill">Custom</p><p class="pricing-copy">For brands, hubs, and partner storefronts. Routes to sponsor inquiry, not checkout.</p><a class="btn btn-ghost" href="sponsorship.html">Sponsor Inquiry</a></article>
-<article class="pricing-card"><span class="store-pill">Locked</span><h3 class="pricing-title">Checkout Status</h3><p class="price-pill">Off</p><p class="pricing-copy">All pricing is sample-only until Stripe sandbox/backend wiring is approved.</p><a class="btn btn-secondary" href="stripe-sandbox.html">View Sandbox</a></article>
-</div></section>
+
+      <section class="store-banner" style="margin-top:0;"><span class="store-kicker">Membership Preview</span><h1 class="store-title">Member Access Tiers</h1><p class="store-lead">Sample pricing and benefits for future SVR accounts. These are placeholders only until backend login, Stripe sandbox, terms, and access rules are approved.</p><div class="category-strip"><a href="store.html">Store</a><a class="active" href="membership.html">Membership</a><a href="cart.html">Cart</a></div></section>
+      <section class="store-section"><div class="pricing-grid">
+        <article class="pricing-card"><span class="store-pill">Free</span><h3 class="pricing-title">Visitor</h3><p class="price-pill">$0</p><p class="pricing-copy">Public pages, news, public game preview, sponsor info, and contact access.</p><a class="btn btn-secondary" href="contact.html">Join Waitlist</a></article>
+        <article class="pricing-card featured"><span class="store-pill">Member</span><h3 class="pricing-title">SVR Member</h3><p class="price-pill">$9.99/mo</p><p class="pricing-copy">Future account dashboard, member profile, store wishlist, event updates, and private-room eligibility.</p><a class="btn btn-primary" href="#cart" data-add-cart data-name="SVR Member Preview" data-hub="Membership" data-price-cents="999">Add Preview</a></article>
+        <article class="pricing-card"><span class="store-pill">VIP</span><h3 class="pricing-title">Founder / VIP</h3><p class="price-pill">$29.99/mo</p><p class="pricing-copy">Future VIP events, special cosmetics, premium table concepts, and early sponsor-room previews.</p><a class="btn btn-secondary" href="#cart" data-add-cart data-name="Founder VIP Preview" data-hub="Membership" data-price-cents="2999">Add Preview</a></article>
+      </div></section>
+      <section class="store-section"><div class="cart-layout"><article class="stripe-panel"><h2 class="section-title">Membership wiring notes</h2><p class="section-copy">Membership checkout should remain disabled until login, subscriptions, cancellations, tax handling, refunds, and access permissions are implemented securely.</p></article><aside class="cart-panel" id="cart"><div class="store-kicker"><span class="store-dot"></span> Sandbox Cart</div><h3 class="hub-title">Cart Preview</h3><div data-cart-list></div><div class="cart-total"><span>Total</span><strong data-cart-total>$0.00</strong></div><div class="checkout-row"><a class="btn btn-primary" href="#" data-sandbox-checkout>Sandbox Checkout</a><a class="btn btn-secondary" href="#" data-clear-cart>Clear</a></div><p class="input-note" data-cart-status>No live sales. Stripe sandbox payload only.</p><div class="approval-note">Checkout is preview-only until backend, Stripe sandbox keys, tax/fulfillment rules, and final approval are wired.</div></aside></div></section>
+
       <footer class="footer"><p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn btn-secondary" href="index.html">Back to Site</a><a class="btn btn-primary" href="../game/index.html">Preview Game</a></div></footer>
     </main>
   </div>
   <script src="../matrix.js"></script>
   <script src="../site-public-hooks.js"></script>
   <script src="store-cart.js"></script>
-  
 </body>
 </html>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cart | SVR Poker</title>
-  <meta name="description" content="SVR sandbox cart for sample store products." />
+  <title>Cart Preview | SVR Poker</title>
+  <meta name="description" content="Sandbox cart preview for SVR Store sample products." />
   <link rel="icon" href="../logo.webp" type="image/webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,13 +34,15 @@
   </div>
 </nav>
     <main class="site-card">
-      <section class="store-banner" style="margin-top:0;"><span class="store-kicker">SVR Cart</span><h1 class="store-title">Sandbox Cart</h1><p class="store-lead">This cart demonstrates the flow before checkout wiring. It saves items in the browser only and creates a local sandbox checkout payload. No money moves here.</p><div class="category-strip"><a href="store.html">Store Hub</a><a href="store-reiki.html">Reiki</a><a href="store-pga.html">PGA</a><a href="stripe-sandbox.html">Stripe Sandbox</a></div></section><section class="store-section"><div class="cart-layout"><div class="stripe-panel"><h2 class="section-title">Checkout Preview</h2><p class="section-copy">Use this page to review the cart and confirm the future backend shape. The real Stripe route will live on the secure backend, not in public JavaScript.</p><pre data-checkout-payload style="white-space:pre-wrap;min-height:180px;border:1px solid rgba(174,118,255,.28);border-radius:18px;padding:14px;background:rgba(0,0,0,.32);color:#e9ddff;overflow:auto;">Click Sandbox Checkout to generate a local preview payload.</pre><div class="sandbox-note">Stripe secret keys, SQL passwords, and checkout session creation must remain server-side. This page is UI and payload preview only.</div></div><aside class="cart-panel" id="cart"><div class="store-kicker"><span class="store-dot"></span> Sandbox Cart</div><h3 class="hub-title">Cart Preview</h3><div data-cart-list></div><div class="cart-total"><span>Total</span><strong data-cart-total>$0.00</strong></div><div class="checkout-row"><a class="btn btn-primary" href="#" data-sandbox-checkout>Sandbox Checkout</a><a class="btn btn-secondary" href="#" data-clear-cart>Clear</a></div><p class="input-note" data-cart-status>No live sales. Stripe sandbox payload only.</p></aside></div></section>
+
+      <section class="store-banner" style="margin-top:0;"><span class="store-kicker">Sandbox Cart</span><h1 class="store-title">Cart Preview</h1><p class="store-lead">Review sample items added from any SVR store category. This cart is local-preview only and does not charge anyone.</p><div class="category-strip"><a href="store.html">All Stores</a><a class="active" href="cart.html">Cart</a><a href="stripe-sandbox.html">Stripe Sandbox</a></div></section>
+      <section class="store-section"><div class="cart-layout"><div class="stripe-panel"><span class="store-kicker">Order Preview</span><h2 class="section-title">Local cart items</h2><div data-cart-list></div><div class="cart-total"><span>Total</span><strong data-cart-total>$0.00</strong></div><div class="checkout-row"><a class="btn btn-primary" href="#" data-sandbox-checkout>Build Sandbox Payload</a><a class="btn btn-secondary" href="#" data-clear-cart>Clear Cart</a></div><p class="input-note" data-cart-status>No live sale. This only saves a preview payload locally.</p></div><aside class="cart-panel"><span class="store-kicker"><span class="store-dot"></span> Next wiring</span><h3 class="hub-title">Backend checkout route</h3><p class="hub-copy">When approved, the site should call a secure backend endpoint that creates Stripe Checkout Sessions. Secret keys must never be placed in public files.</p><p class="input-note"><code>/api/stripe/create-checkout-session</code></p><a class="btn btn-primary" href="stripe-sandbox.html">Open Stripe Sandbox</a></aside></div></section>
+
       <footer class="footer"><p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn btn-secondary" href="index.html">Back to Site</a><a class="btn btn-primary" href="../game/index.html">Preview Game</a></div></footer>
     </main>
   </div>
   <script src="../matrix.js"></script>
   <script src="../site-public-hooks.js"></script>
   <script src="store-cart.js"></script>
-  
 </body>
 </html>

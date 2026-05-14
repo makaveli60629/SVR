@@ -1,13 +1,20 @@
 {
-  "mode": "sandbox_preview_only",
+  "phase": "SITE-PHASE03-STORE-REFINE-ZENDEN-APPROVAL",
   "checkoutEnabled": false,
-  "stripeBackendEndpoint": "/api/stripe/create-checkout-session",
+  "approvalMarkers": {
+    "reiki": "WAITING APPROVAL \u2022 ZEN DEN"
+  },
   "categories": [
-    "SVR",
-    "Reiki",
-    "PGA",
-    "Smoker Lounge",
+    "SVR Game Store",
+    "Reiki Hub Store",
+    "PGA Hub Store",
+    "Smoker Lounge Store",
     "Membership"
   ],
-  "note": "Public catalog sample only. Real products should load from secure backend/SQL."
+  "notes": [
+    "Root public Matrix page is not modified by this patch.",
+    "All products are sample placeholders for sandbox cart logic only.",
+    "Stripe checkout remains disabled until secure backend approval."
+  ],
+  "cashApp": "$SVRhelp"
 }
