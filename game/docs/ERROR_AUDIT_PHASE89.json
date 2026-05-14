@@ -1,0 +1,26 @@
+{
+  "build": "PHASE-90-UNLOCKED-APPLY-BOOT-LOCK",
+  "siteTouched": false,
+  "fixes": [
+    "spawnLogoTex boot path preserved",
+    "main.js safe boot fallback added",
+    "HUD/log/joint controls made null-safe",
+    "private route files verified",
+    "store portal URL preserved"
+  ],
+  "privateRoutes": [
+    "reiki.html",
+    "pga-drive.html",
+    "chip-putt.html",
+    "store-room.html",
+    "smoker-lounge.html",
+    "scorpion.html",
+    "range.html"
+  ],
+  "storePortalUrl": "https://svrpoker.com/site/store.html",
+  "validation": {
+    "jsSyntax": "passed",
+    "relativeImports": "passed",
+    "packageUnder25MB": true
+  }
+}

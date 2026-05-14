@@ -1,5 +1,9 @@
-﻿{
-    "build":  "PHASE-84-GAME-ROUTE-BOOT-LOCK",
-    "siteTouched":  false,
-    "appliedAt":  "2026-05-14T20:22:20.8708519Z"
+{
+  "build": "PHASE-90-UNLOCKED-APPLY-BOOT-LOCK",
+  "date": "2026-05-14",
+  "siteTouched": false,
+  "storePortalUrl": "https://svrpoker.com/site/store.html",
+  "phase": "Phase 90",
+  "fixed": "Removes brittle phase-apply blocker, preserves boot fallback, spawnLogoTex fix, and all private scene routes.",
+  "notes": "Game-side unlocked apply and boot route fix. Site untouched."
 }

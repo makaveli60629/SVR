@@ -1,6 +1,8 @@
 {
-  "build": "PHASE-84-GAME-ROUTE-BOOT-LOCK",
+  "build": "PHASE-90-UNLOCKED-APPLY-BOOT-LOCK",
   "date": "2026-05-14",
-  "phase": 84,
-  "notes": "Game-side route/boot lock. Site untouched."
+  "phase": "Phase 90",
+  "notes": "Game-side unlocked apply and boot route fix. Site untouched.",
+  "fixed": "Removes brittle phase-apply blocker, preserves boot fallback, spawnLogoTex fix, and all private scene routes.",
+  "siteTouched": false
 }

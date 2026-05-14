@@ -1518,7 +1518,7 @@ function addScorpionRoom(scene, R, wallHeight){
   };
 }
 
-function buildOuterCity(scene, R){
+function buildOuterCity(scene, R, spawnLogoTex = null){
   const group = new THREE.Group();
   const glassMats = [
     new THREE.MeshStandardMaterial({ color: 0x9fdfff, roughness: 0.14, metalness: 0.32, emissive: 0x15396a, emissiveIntensity: 1.26 }),
@@ -2079,10 +2079,11 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
 
   const innerPlatform = null;
 
-  const city = buildOuterCity(scene, R);
+  // PHASE-88: load logo texture before skyline/city construction so city billboards never reference an undefined texture.
+  const spawnLogoTex = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
+  const city = buildOuterCity(scene, R, spawnLogoTex);
   const stars = buildStars(scene, R);
   const lobbySprites = buildLobbySprites(scene, R, wallHeight);
-  const spawnLogoTex = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
   const wallPanels = [];
   const wallPanelUpdaters = [];
   [
