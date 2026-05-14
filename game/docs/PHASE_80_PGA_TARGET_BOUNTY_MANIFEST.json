@@ -1,0 +1,30 @@
+{
+  "phase": 80,
+  "build": "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK",
+  "gameOnly": true,
+  "siteTouched": false,
+  "privateScene": "game/range.html",
+  "targets": [
+    {
+      "label": "100 YD",
+      "points": 100
+    },
+    {
+      "label": "200 YD",
+      "points": 200
+    },
+    {
+      "label": "300 YD",
+      "points": 300
+    }
+  ],
+  "walletConnection": "disabled",
+  "storage": "localStorage",
+  "locks": [
+    "original lobby preserved",
+    "PGA range standalone",
+    "gold stance mat",
+    "moon/mars sky continuity",
+    "Reiki approval lock"
+  ]
+}

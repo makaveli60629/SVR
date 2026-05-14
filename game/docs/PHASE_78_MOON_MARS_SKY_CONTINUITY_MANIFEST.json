@@ -1,0 +1,18 @@
+{
+  "build": "PHASE-78-MOON-MARS-SKY-CONTINUITY-LOCK",
+  "phase": 78,
+  "filesChanged": [
+    "game/index.html",
+    "game/range.html",
+    "game/main.js",
+    "game/modules/world_skyline.js",
+    "game/modules/phase76_private_scene_lock.js",
+    "game/modules/range_logic.js",
+    "game/modules/phase77_range_route_lock.js",
+    "game/version.json",
+    "game/docs/BUILD_VERSION.json"
+  ],
+  "siteTouched": false,
+  "approvalLock": "unapproved Reiki sponsor/founder branding remains purged",
+  "privateScenePolicy": "private rooms stay outside the lobby"
+}

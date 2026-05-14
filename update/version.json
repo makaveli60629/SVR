@@ -1,11 +1,37 @@
-﻿{
-  "build": "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK",
-  "phase": 80,
-  "scope": "game-only PGA target bounty local score lock",
+{
+  "build": "PHASE-83-DIRECT-SCENE-ROUTE-VERIFY-LOCK",
+  "phase": 83,
+  "scope": "game-only direct committed folder route restore and verification lock",
   "siteTouched": false,
-  "pgaDriveScene": "game/range.html",
-  "pgaDriveAlias": "game/pga-drive.html",
-  "walletConnected": false,
-  "scoreStorage": "localStorage:svr_pga_range_training_points_v1",
-  "updatedAt": "2026-05-14T02:02:57.9958284-05:00"
+  "deployRule": "Current workflow deploys committed /game directly; update/game.zip is backup only",
+  "scenes": [
+    "lobby",
+    "table",
+    "seat",
+    "reiki",
+    "reikiRoom",
+    "pga",
+    "pgaDrive",
+    "pgaChipPutt",
+    "smoker",
+    "scorpion",
+    "legends",
+    "sponsor",
+    "store",
+    "storeScene",
+    "webStore"
+  ],
+  "requiredFiles": [
+    "game/index.html",
+    "game/main.js",
+    "game/range.html",
+    "game/pga-drive.html",
+    "game/chip-putt.html",
+    "game/smoker-lounge.html",
+    "game/scorpion.html",
+    "game/store-room.html",
+    "game/reiki.html",
+    "game/modules/range_logic.js",
+    "game/modules/private_scene_common.js"
+  ]
 }

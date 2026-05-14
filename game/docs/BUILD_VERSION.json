@@ -1,6 +1,37 @@
 {
-  "build": "PHASE-80-REIKI-APPROVAL-PRIVATE-SCENE-LOCK",
+  "build": "PHASE-83-DIRECT-SCENE-ROUTE-VERIFY-LOCK",
+  "phase": 83,
+  "scope": "game-only direct committed folder route restore and verification lock",
   "siteTouched": false,
-  "target": "update/game.zip",
-  "phase": "Phase 80 \u2014 Reiki Approval Private Scene Lock"
+  "deployRule": "Current workflow deploys committed /game directly; update/game.zip is backup only",
+  "scenes": [
+    "lobby",
+    "table",
+    "seat",
+    "reiki",
+    "reikiRoom",
+    "pga",
+    "pgaDrive",
+    "pgaChipPutt",
+    "smoker",
+    "scorpion",
+    "legends",
+    "sponsor",
+    "store",
+    "storeScene",
+    "webStore"
+  ],
+  "requiredFiles": [
+    "game/index.html",
+    "game/main.js",
+    "game/range.html",
+    "game/pga-drive.html",
+    "game/chip-putt.html",
+    "game/smoker-lounge.html",
+    "game/scorpion.html",
+    "game/store-room.html",
+    "game/reiki.html",
+    "game/modules/range_logic.js",
+    "game/modules/private_scene_common.js"
+  ]
 }

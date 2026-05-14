@@ -12,7 +12,7 @@
 - Hand pinch teleport kept as fallback when controllers are not active.
 - Moon and Mars moved closer, with lower glow and stronger texture contrast.
 - South information boards expanded and enlarged.
-- Existing Reiki Hub storefront preserved and reinforced in the scene build.
+- Existing Reiki Time Hub storefront preserved and reinforced in the scene build.
 
 ## Audit notes
 - Replaced mirrored watch back-plane scaling with normal two-sided readable screen rendering.

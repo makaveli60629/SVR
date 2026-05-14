@@ -1,9 +1,15 @@
 {
-  "name": "SVR Poker Game",
+  "name": "ScarlettVR Poker",
   "short_name": "SVR Poker",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#050508",
   "theme_color": "#050508",
-  "description": "SVR Poker game build PHASE-80-REIKI-APPROVAL-PRIVATE-SCENE-LOCK"
+  "build": "PHASE-75-REIKI-DOMAIN-PURGE-WAITING-APPROVAL",
+  "phase": 75,
+  "label": "PHASE-75-REIKI-DOMAIN-PURGE-WAITING-APPROVAL",
+  "scope": "game-only: remove AWAITING APPROVAL/third-party Reiki domain/branding, show waiting for approval, preserve lobby, store portal, controller/hand teleport routing",
+  "siteTouched": false,
+  "storeUrl": "https://svrpoker.com/site/store.html",
+  "updatedAt": "2026-05-14"
 }

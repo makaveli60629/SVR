@@ -1,0 +1,24 @@
+{
+  "build": "PHASE-77-PGA-STANDALONE-RANGE-TRACER-LOCK",
+  "phase": 77,
+  "scope": "game-only standalone PGA range and ball tracer lock",
+  "siteTouched": false,
+  "lobbyDestroyed": false,
+  "storeUrl": "https://svrpoker.com/site/store.html",
+  "entryPoints": {
+    "lobby": "game/index.html",
+    "pgaRange": "game/range.html"
+  },
+  "newFiles": [
+    "game/range.html",
+    "game/modules/range_logic.js",
+    "game/modules/phase77_range_route_lock.js"
+  ],
+  "privateScenePolicy": {
+    "pgaDrive": "standalone range.html",
+    "pgaChipPutt": "private room route remains outside lobby",
+    "reiki": "approval placeholder, no third-party branding",
+    "smoker": "private social room route",
+    "scorpion": "private poker room route"
+  }
+}

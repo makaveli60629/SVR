@@ -552,7 +552,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   const right = new THREE.Vector3(Math.sin(angle), 0, -Math.cos(angle));
   const center = new THREE.Vector3(Math.cos(angle) * (R - 4.05), 0.01, Math.sin(angle) * (R - 4.05));
   const logoTex = spawnLogoTex || loadUiTexture('./assets/ui/logo.png');
-  const approvalTex = null;
+  const founderTex = null;
 
   const floorPad = new THREE.Mesh(
     new THREE.PlaneGeometry(14.2, 7.0),
@@ -643,11 +643,24 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#dffff7'; x.font = 'bold 84px system-ui, Arial'; x.fillText('SVR REIKI', w/2, 98);
+    x.fillStyle = '#ffbac4'; x.font = 'bold 72px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 98);
   });
   const signB = new THREE.Mesh(new THREE.PlaneGeometry(6.44, 0.70), new THREE.MeshBasicMaterial({ map: signTexB, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   signB.position.copy(signBackB.position).add(new THREE.Vector3(0,0,0.02));
   root.add(signB);
+
+  const hardApprovalTex = canvasTexture(1400, 300, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#3a0208'); g.addColorStop(1, '#080104');
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(255,55,80,0.98)'; x.lineWidth = 12; x.strokeRect(16,16,w-32,h-32);
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#ffffff'; x.font = 'bold 96px system-ui, Arial'; x.fillText('WAITING FOR APPROVAL', w/2, 112);
+    x.fillStyle = '#ffbac4'; x.font = 'bold 40px system-ui, Arial'; x.fillText('No third-party name • no photo • no external website live', w/2, 204);
+  });
+  const hardApproval = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 1.05), new THREE.MeshBasicMaterial({ map: hardApprovalTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+  hardApproval.position.set(0, 3.50, 0.735);
+  root.add(hardApproval);
+
 
   const logoPlate = new THREE.Mesh(new THREE.PlaneGeometry(0.98, 0.62), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   logoPlate.position.set(-4.95, 4.68, 0.73);
@@ -658,39 +671,50 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.82)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#eafff7'; x.font = 'bold 62px system-ui, Arial'; x.fillText('REIKI ROOM', w/2, 86);
-    x.fillStyle = '#9cf0d3'; x.font = 'bold 24px system-ui, Arial'; x.fillText('meditate • restore • breathe', w/2, 138);
+    x.fillStyle = '#eafff7'; x.font = 'bold 62px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 86);
+    x.fillStyle = '#9cf0d3'; x.font = 'bold 24px system-ui, Arial'; x.fillText('SVR placeholder • approval pending', w/2, 138);
   });
   const zenDenPlate = new THREE.Mesh(new THREE.PlaneGeometry(2.34, 0.46), new THREE.MeshBasicMaterial({ map: zenDenTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   zenDenPlate.position.set(4.95, 4.68, 0.73);
   root.add(zenDenPlate);
 
-  const approvalPanelTex = canvasTexture(900, 1200, (x,w,h)=>{
+  const founderPanelTex = canvasTexture(900, 1200, (x,w,h)=>{
     const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#0b1215'); g.addColorStop(1, '#191014');
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(140,255,231,0.90)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
     x.textAlign = 'left';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 62px system-ui, Arial'; x.fillText('Partner Approval', 60, 110);
-    x.fillStyle = '#bcffe9'; x.font = 'bold 46px system-ui, Arial'; x.fillText('AWAITING APPROVAL', 60, 182);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 62px system-ui, Arial'; x.fillText('Reiki Hub', 60, 110);
+    x.fillStyle = '#ff667a'; x.font = 'bold 46px system-ui, Arial'; x.fillText('AWAITING APPROVAL', 60, 182);
     x.fillStyle = '#e5f6f3'; x.font = '34px system-ui, Arial';
     let y = 258;
-    y = fillWrappedText(x, 'Approval pending approval-pending wellness partner hub, leading the Reiki hub with a professional wellness-first approach for virtual and in-person growth.', 60, y, w - 120, 42);
+    y = fillWrappedText(x, 'Reiki sponsor/founder branding is disabled until written approval is received. This hub remains an SVR placeholder with no third-party photo, name, logo, or website active.', 60, y, w - 120, 42);
     y += 78;
-    x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Services', 60, y);
+    x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Placeholder Services', 60, y);
     y += 56;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    ['Reiki placeholder sessions', 'Meditation and reset support', 'Massage / bodywork referrals', 'Holistic wellness guidance'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 46; });
+    ['Reiki meditation placeholder', 'Sponsor approval pending', 'No external brand active', 'SVR logo only for now'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 46; });
     y += 40;
-    x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Book / Explore', 60, y);
+    x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Status', 60, y);
     y += 54;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    fillWrappedText(x, 'svrpoker.com • state search • approval placeholder • Reiki VR entry', 60, y, w - 120, 40);
+    fillWrappedText(x, 'AWAITING APPROVAL • private Reiki room route active • sponsor module locked off', 60, y, w - 120, 40);
   });
-  const approvalPanel = new THREE.Mesh(new THREE.PlaneGeometry(3.28, 4.02), new THREE.MeshBasicMaterial({ map: approvalPanelTex, side: THREE.DoubleSide, transparent: true }));
-  approvalPanel.position.set(-4.10, 2.18, -2.10);
-  root.add(approvalPanel);
+  const founderPanel = new THREE.Mesh(new THREE.PlaneGeometry(3.28, 4.02), new THREE.MeshBasicMaterial({ map: founderPanelTex, side: THREE.DoubleSide, transparent: true }));
+  founderPanel.position.set(-4.10, 2.18, -2.10);
+  root.add(founderPanel);
 
-  const portraitPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 4.02), new THREE.MeshBasicMaterial({ map: approvalTex, side: THREE.DoubleSide }));
+  const portraitTex = canvasTexture(900, 1200, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#2a0208'); g.addColorStop(1, '#060406');
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(255,55,80,0.96)'; x.lineWidth = 14; x.strokeRect(22,22,w-44,h-44);
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#ffffff'; x.font = 'bold 76px system-ui, Arial'; x.fillText('AWAITING', w/2, 350);
+    x.fillText('APPROVAL', w/2, 440);
+    x.fillStyle = '#ffbac4'; x.font = 'bold 48px system-ui, Arial'; x.fillText('No founder photo live', w/2, 560);
+    x.fillStyle = '#f6f6ff'; x.font = 'bold 66px system-ui, Arial'; x.fillText('SVR POKER', w/2, 730);
+    x.fillStyle = '#ffd3da'; x.font = '34px system-ui, Arial'; x.fillText('SVR placeholder • approval pending', w/2, 828);
+  });
+  const portraitPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 4.02), new THREE.MeshBasicMaterial({ map: portraitTex, side: THREE.DoubleSide, transparent: true }));
   portraitPanel.position.set(4.05, 2.18, -2.10);
   root.add(portraitPanel);
 
@@ -698,10 +722,10 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#0b1114'); g.addColorStop(1, '#141016');
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 8; x.strokeRect(16,16,w-32,h-32);
-    x.fillStyle = '#f6ffff'; x.font = 'bold 44px system-ui, Arial'; x.fillText('Professional Highlights', 42, 74);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 44px system-ui, Arial'; x.fillText('Approval Status', 42, 74);
     x.fillStyle = '#bcffe9'; x.font = '32px system-ui, Arial';
     let y = 148;
-    ['Approval pending', 'Reiki and wellness focus', 'Meditation-forward client care', 'Virtual hub ready for growth'].forEach((line)=>{ x.fillText('• ' + line, 46, y); y += 70; });
+    ['Approval pending', 'Reiki placeholder active', 'No founder image/name live', 'Private room route ready'].forEach((line)=>{ x.fillText('• ' + line, 46, y); y += 70; });
   });
   const rightInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 1.64), new THREE.MeshBasicMaterial({ map: rightInfoTex, side: THREE.DoubleSide, transparent: true }));
   rightInfo.position.set(4.05, -0.12, -2.08);
@@ -712,17 +736,17 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 68px system-ui, Arial'; x.fillText('SVR REIKI', w/2, 106);
-    x.fillStyle = '#bcffe9'; x.font = 'bold 34px system-ui, Arial'; x.fillText('Holistic Healing & Wellness', w/2, 166);
-    x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Approval-Pending Services', w/2, 296);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki • meditation • appointments • partner-ready wellness hub', w/2, 366);
+    x.fillStyle = '#ff667a'; x.font = 'bold 68px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 106);
+    x.fillStyle = '#ffbac4'; x.font = 'bold 34px system-ui, Arial'; x.fillText('Sponsor / Founder Module Disabled', w/2, 166);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('SVR Reiki Placeholder', w/2, 296);
+    x.fillStyle = '#ffd4dc'; x.font = '31px system-ui, Arial'; x.fillText('Reiki • meditation • approval pending • no live third-party branding', w/2, 366);
     x.fillStyle = 'rgba(124,255,226,0.16)'; roundRectPath(x, 90, 430, w-180, 138, 28); x.fill();
     x.strokeStyle = 'rgba(124,255,226,0.65)'; x.lineWidth = 6; roundRectPath(x, 90, 430, w-180, 138, 28); x.stroke();
-    x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER THE REIKI HUB', w/2, 510);
-    x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Use the floor portal to enter the guided Reiki space', w/2, 564);
-    x.fillStyle = '#f6ffff'; x.font = 'bold 38px system-ui, Arial'; x.fillText('Professional Highlights', w/2, 716);
-    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('Approval • Wellness • Reiki', w/2, 788);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private sessions • mindful reset • future partner storefront', w/2, 856);
+    x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER WHEN APPROVED', w/2, 510);
+    x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Private route active • sponsor approval pending', w/2, 564);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 38px system-ui, Arial'; x.fillText('Approval Status', w/2, 716);
+    x.fillStyle = '#ffbac4'; x.font = '60px system-ui, Arial'; x.fillText('SVR • Placeholder • Reiki', w/2, 788);
+    x.fillStyle = '#ffd4dc'; x.font = '31px system-ui, Arial'; x.fillText('Private room route active • approval required before sponsor launch', w/2, 856);
   });
   const centerInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.70, 4.02), new THREE.MeshBasicMaterial({ map: centerInfoTex, side: THREE.DoubleSide, transparent: true }));
   centerInfo.position.set(0, 2.18, -2.10);
@@ -733,7 +757,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.strokeStyle = 'rgba(78,255,146,0.90)'; x.lineWidth = 8; roundRectPath(x, 10, 10, w-20, h-20, 24); x.stroke();
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#89ffab'; x.font = 'bold 50px system-ui, Arial'; x.fillText('RESERVED FOR APPROVAL', w/2, 82);
-    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 152);
+    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('No name/photo live', w/2, 152);
   });
   const reservePlaque = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 0.70), new THREE.MeshBasicMaterial({ map: reserveTex, transparent: true, side: THREE.DoubleSide }));
   reservePlaque.position.set(4.05, -1.22, -2.06);
@@ -746,7 +770,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     grad.addColorStop(0.55, 'rgba(58,195,152,0.34)');
     grad.addColorStop(1, 'rgba(10,30,25,0.0)');
     x.fillStyle = grad; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(86,255,176,0.96)'; x.lineWidth = 18; x.beginPath(); x.arc(w/2, h/2, 250, 0, Math.PI*2); x.stroke();
+    x.strokeStyle = 'rgba(255,55,80,0.96)'; x.lineWidth = 18; x.beginPath(); x.arc(w/2, h/2, 250, 0, Math.PI*2); x.stroke();
     x.fillStyle = '#71ffad'; x.textAlign = 'center'; x.font = 'bold 82px system-ui, Arial'; x.fillText('ENTER REIKI', w/2, h/2 + 176);
   });
   const portal = new THREE.Mesh(new THREE.CircleGeometry(1.18, 64), new THREE.MeshBasicMaterial({ map: portalTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
@@ -937,6 +961,28 @@ function createAdBillboardTexture(lines = ["SVRPOKER.COM", "ALL IN"]){
     x.fillText(lines[0], w/2, h/2 - 40);
     x.font = "bold 64px system-ui, Arial";
     x.fillText(lines[1], w/2, h/2 + 38);
+  });
+}
+
+
+function createApprovalBillboardTexture(title = "AWAITING APPROVAL", subtitle = "SVR placeholder active"){
+  return canvasTexture(1024, 1024, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,"#2a0208");
+    g.addColorStop(0.62,"#090507");
+    g.addColorStop(1,"#000000");
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    x.strokeStyle = "rgba(255,55,80,0.96)";
+    x.lineWidth = 18; x.strokeRect(32,32,w-64,h-64);
+    x.textAlign = "center"; x.textBaseline = "middle";
+    x.fillStyle = "#ffffff"; x.font = "bold 82px system-ui, Arial";
+    x.fillText(title, w/2, h/2 - 120);
+    x.fillStyle = "#ff667a"; x.font = "bold 48px system-ui, Arial";
+    x.fillText(subtitle, w/2, h/2 - 28);
+    x.fillStyle = "#f6f6ff"; x.font = "bold 64px system-ui, Arial";
+    x.fillText("SVR POKER", w/2, h/2 + 94);
+    x.fillStyle = "#ffb8c2"; x.font = "34px system-ui, Arial";
+    x.fillText("Sponsor/founder assets disabled until approved", w/2, h/2 + 180);
   });
 }
 
@@ -1401,10 +1447,10 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   group.add(activeBtn);
 
 
-  const adTex = createSponsorPlateTexture('SVR REIKI PLACEHOLDER', 'AWAITING APPROVAL');
+  const adTex = createApprovalBillboardTexture('AWAITING APPROVAL', 'Reiki/store ad disabled');
   const adHeader = new THREE.Mesh(
     new THREE.PlaneGeometry(3.26, 0.56),
-    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('SVR SPOTLIGHT', 'approval placeholder'), transparent: true, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('SVR PLACEHOLDER', 'approval required'), transparent: true, side: THREE.DoubleSide })
   );
   adHeader.position.set(modelX, wallHeight * 0.39, 0.18);
   group.add(adHeader);
@@ -1427,52 +1473,33 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
 }
 
 function addScorpionRoom(scene, R, wallHeight){
-  const angle = Math.PI * 0.24; // southeast wall area
+  const angle = Math.PI * 0.24; // southeast wall access point only
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
-  const center = new THREE.Vector3(Math.cos(angle) * (R - 4.6), 0, Math.sin(angle) * (R - 4.6));
+  const center = new THREE.Vector3(Math.cos(angle) * (R - 1.05), 0, Math.sin(angle) * (R - 1.05));
 
   const root = new THREE.Group();
+  root.name = 'SVR_SCORPION_LOBBY_PORTAL_ONLY_PHASE76';
   root.position.copy(center);
   root.lookAt(root.position.clone().add(inward));
   scene.add(root);
 
-  const floor = new THREE.Mesh(
-    new THREE.BoxGeometry(9.6, 0.12, 6.0),
-    new THREE.MeshStandardMaterial({ color: 0x120812, roughness: 0.88, metalness: 0.04, emissive: 0x2a0b24, emissiveIntensity: 0.18 })
-  );
-  floor.position.set(0, 0.06, 0);
-  root.add(floor);
-
-  const backWall = new THREE.Mesh(
-    new THREE.BoxGeometry(9.8, 5.7, 0.16),
-    new THREE.MeshStandardMaterial({ color: 0x08070d, roughness: 0.74, metalness: 0.10, emissive: 0x1f0a20, emissiveIntensity: 0.18 })
-  );
-  backWall.position.set(0, 2.85, -2.82);
-  root.add(backWall);
-
-  const leftWall = new THREE.Mesh(
-    new THREE.BoxGeometry(0.16, 5.4, 5.9),
-    new THREE.MeshStandardMaterial({ color: 0x0a0810, roughness: 0.72, metalness: 0.08, emissive: 0x18081c, emissiveIntensity: 0.16 })
-  );
-  leftWall.position.set(-4.84, 2.7, 0);
-  root.add(leftWall);
-  const rightWall = leftWall.clone();
-  rightWall.position.x = 4.84;
-  root.add(rightWall);
-
-  const signTex = canvasTexture(1200, 220, (x,w,h)=>{
+  const signTex = canvasTexture(1200, 520, (x,w,h)=>{
     const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, '#120313');
-    g.addColorStop(1, '#290516');
+    g.addColorStop(0, '#130316');
+    g.addColorStop(1, '#07040d');
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(255,111,181,0.92)';
-    x.lineWidth = 10; x.strokeRect(16,16,w-32,h-32);
+    x.lineWidth = 12; x.strokeRect(22,22,w-44,h-44);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#fff2fb'; x.font = 'bold 86px system-ui, Arial'; x.fillText('SCORPION GAME ROOM', w/2, 100);
-    x.fillStyle = '#ffadd7'; x.font = 'bold 30px system-ui, Arial'; x.fillText('REAL PLAY • TABLE FLOW • PRIVATE ACTION', w/2, 170);
+    x.fillStyle = '#fff2fb'; x.font = 'bold 86px system-ui, Arial'; x.fillText('SCORPION PORTAL', w/2, 126);
+    x.fillStyle = '#ffadd7'; x.font = 'bold 42px system-ui, Arial'; x.fillText('PRIVATE ROOM ROUTE', w/2, 210);
+    x.fillStyle = '#f7f2ff'; x.font = '34px system-ui, Arial';
+    x.fillText('The poker room is no longer built inside the lobby.', w/2, 308);
+    x.fillText('Use this portal/watch route to enter the enclosed scene.', w/2, 366);
+    x.fillStyle = 'rgba(255,255,255,0.62)'; x.font = '24px ui-monospace, monospace'; x.fillText('PHASE-76-PRIVATE-SCENE-ROOM-ROUTING-LOCK', w/2, 452);
   });
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 1.10), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
-  sign.position.set(0, 5.14, -2.72);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.25), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
+  sign.position.set(0, 2.25, 0.08);
   root.add(sign);
 
   const portalTex = canvasTexture(1024, 1024, (x,w,h)=>{
@@ -1484,39 +1511,24 @@ function addScorpionRoom(scene, R, wallHeight){
     x.fillStyle = g; x.fillRect(0,0,w,h);
   });
   const portal = new THREE.Mesh(
-    new THREE.RingGeometry(0.72, 1.16, 64),
+    new THREE.RingGeometry(0.78, 1.22, 72),
     new THREE.MeshBasicMaterial({ map: portalTex, color: 0xffffff, transparent: true, side: THREE.DoubleSide, depthWrite: false })
   );
   portal.rotation.x = -Math.PI * 0.5;
-  portal.position.set(0, 0.03, 1.7);
+  portal.position.set(0, 0.035, 1.35);
   root.add(portal);
 
-  const boardTex = canvasTexture(900, 720, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0,'#0b0d17');
-    g.addColorStop(1,'#1c0721');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(214,132,255,0.92)';
-    x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
-    x.fillStyle = '#fdf5ff'; x.font = 'bold 60px system-ui, Arial'; x.fillText('SCORPION ACCESS', 44, 92);
-    x.fillStyle = '#ffc4eb'; x.font = '36px system-ui, Arial'; 
-    let y = 180;
-    ['Fast jump from watch', 'Fist near face toggles teleport', 'Reserved for real play flow', 'Modular room for future game scene'].forEach(line=>{ x.fillText('• ' + line, 54, y); y += 92; });
-  });
-  const board = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.56), new THREE.MeshBasicMaterial({ map: boardTex, transparent: true, side: THREE.DoubleSide }));
-  board.position.set(-2.34, 2.1, -2.68);
-  root.add(board);
-
-  const lightA = new THREE.PointLight(0xff7fd0, 1.4, 18, 2.0);
-  lightA.position.set(0, 3.8, 1.2);
+  const lightA = new THREE.PointLight(0xff7fd0, 1.2, 12, 2.0);
+  lightA.position.set(0, 2.7, 1.0);
   root.add(lightA);
 
   return {
     root,
-    target: center.clone().add(inward.clone().multiplyScalar(2.0)).setY(0),
+    target: center.clone().add(inward.clone().multiplyScalar(2.2)).setY(0),
     look: center.clone().setY(1.6)
   };
 }
+
 
 function buildOuterCity(scene, R){
   const group = new THREE.Group();
@@ -1533,7 +1545,7 @@ function buildOuterCity(scene, R){
   const matrix = createMatrixBillboardTexture();
   const billboardUpdaters = [matrix.update];
   const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
-  const zenTex = createSponsorPlateTexture('REIKI ROOM', 'AWAITING APPROVAL');
+  const zenTex = createApprovalBillboardTexture('AWAITING APPROVAL', 'SVR placeholder only');
 
   const count = 68;
   const adIndices = new Set([4, 11, 20, 28, 36, 44, 52, 60]);
@@ -1611,21 +1623,21 @@ function buildOuterCity(scene, R){
           new THREE.MeshBasicMaterial({
             map: canvasTexture(1500, 260, (ctx,w2,h2)=>{
               const g = ctx.createLinearGradient(0,0,w2,h2);
-              g.addColorStop(0, "rgba(2,28,15,0.92)");
-              g.addColorStop(1, "rgba(3,8,6,0.96)");
+              g.addColorStop(0, "rgba(42,3,8,0.94)");
+              g.addColorStop(1, "rgba(9,2,4,0.98)");
               ctx.fillStyle = g; ctx.fillRect(0,0,w2,h2);
-              ctx.strokeStyle = "rgba(86,255,176,0.96)";
+              ctx.strokeStyle = "rgba(255,55,80,0.96)";
               ctx.lineWidth = 10;
               roundRectPath(ctx, 12, 12, w2 - 24, h2 - 24, 26);
               ctx.stroke();
               ctx.textAlign = "center";
               ctx.textBaseline = "middle";
-              ctx.fillStyle = "#d9ffee";
+              ctx.fillStyle = "#fff4f6";
               ctx.font = "bold 92px system-ui, Arial";
-              ctx.fillText("SVR REIKI", w2 / 2, 94);
-              ctx.fillStyle = "#7bffb7";
+              ctx.fillText("AWAITING APPROVAL", w2 / 2, 94);
+              ctx.fillStyle = "#ffbac4";
               ctx.font = "700 50px system-ui, Arial";
-              ctx.fillText("SVR Reiki • Meditation • Waiting Approval", w2 / 2, 178);
+              ctx.fillText("SVR placeholder • waiting for approval", w2 / 2, 178);
             }),
             transparent: true,
             side: THREE.DoubleSide,
@@ -2088,7 +2100,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   [
     { angle: -Math.PI * 0.5, kind: "main", title: "MAIN SPONSOR SCREEN", subtitle: "SCARLETT VR POKER", size: [9.4, wallHeight - 0.30], logo: [3.2, 3.2], y: wallHeight * 0.5 },
     { angle: Math.PI * 0.5, kind: "reserve", title: "LEAGUE WALL", subtitle: "SOUTH WALL", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
-    { angle: 0, kind: "reiki", title: "REIKI HUB", subtitle: "RED CARPET • PLANTS • ZEN STORE", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
+    { angle: 0, kind: "reiki", title: "REIKI HUB", subtitle: "AWAITING APPROVAL • SVR PLACEHOLDER", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
     { angle: Math.PI, kind: "reserve", title: "LEGENDS", subtitle: "HALL OF FAME", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 }
   ].forEach(({ angle, kind, title, subtitle, size, logo, y })=>{
     const matrix = kind === "main" ? createMatrixBillboardTexture("main") : null;
@@ -2129,7 +2141,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
         const hubPlate = new THREE.Mesh(
           new THREE.PlaneGeometry(2.2, 0.54),
           new THREE.MeshBasicMaterial({
-            map: createPlaqueTexture("reiki time hub", "scarlett vr poker"),
+            map: createPlaqueTexture("awaiting approval", "SVR placeholder"),
             transparent: true,
             side: THREE.DoubleSide,
             depthWrite: false,
@@ -2161,7 +2173,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     wallPanels.push(plate);
   });
 
-  // Legacy simple Reiki wall frame replaced by enhanced Reiki Hub storefront.
+  // Legacy simple Reiki wall frame replaced by enhanced Reiki Time Hub storefront.
 
   const legendHall = buildAlignedLegendHall(scene, R, wallHeight, log);
   await populateLegendPedestals(legendHall, spawnLogoTex, log);
@@ -2215,7 +2227,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(44.0, 44.0, 1);
+  moonHalo.scale.set(52.0, 52.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
@@ -2238,7 +2250,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(28.0, 28.0, 1);
+  marsHalo.scale.set(32.0, 32.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2264,9 +2276,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.75, 560, 1.45);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 3.2, 680, 1.35);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 1.75, 420, 1.55);
+  const marsGlow = new THREE.PointLight(0xff9a72, 2.15, 520, 1.45);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
@@ -2444,16 +2456,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
     moon.position.set(
-      -44 + Math.sin(t * 0.020) * 5.0,
-      wallHeight + 44.0 + Math.sin(t * 0.090) * 1.4,
-      -(R + 128.0) + Math.cos(t * 0.016) * 6.0
+      -66 + Math.sin(t * 0.020) * 4.0,
+      wallHeight + 92.0 + Math.sin(t * 0.060) * 1.1,
+      -(R + 232.0) + Math.cos(t * 0.012) * 4.2
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     mars.position.set(
-      68 + Math.sin(t * 0.016 + 1.4) * 6.5,
-      wallHeight + 52.0 + Math.sin(t * 0.070 + 0.8) * 1.2,
-      -(R + 154.0) + Math.cos(t * 0.012 + 0.4) * 5.0
+      94 + Math.sin(t * 0.014 + 1.4) * 5.0,
+      wallHeight + 104.0 + Math.sin(t * 0.052 + 0.8) * 1.0,
+      -(R + 286.0) + Math.cos(t * 0.010 + 0.4) * 4.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;
