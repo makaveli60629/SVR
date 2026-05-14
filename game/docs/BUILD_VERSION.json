@@ -1,15 +1,10 @@
 {
-  "build": "PHASE-77-PGA-STANDALONE-RANGE-TRACER-LOCK",
-  "phase": 77,
-  "scope": "game-only standalone PGA range tracer lock",
+  "build": "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK",
+  "phase": 80,
+  "scope": "game-only PGA target bounty local score lock",
   "siteTouched": false,
-  "storeUrl": "https://svrpoker.com/site/store.html",
-  "privateScenes": [
-    "reikiRoom",
-    "pgaDrive",
-    "pgaChipPutt",
-    "smoker",
-    "scorpion"
-  ],
-  "updatedAt": "2026-05-14"
+  "pgaDriveScene": "game/range.html",
+  "pgaDriveAlias": "game/pga-drive.html",
+  "walletConnected": false,
+  "scoreStorage": "localStorage:svr_pga_range_training_points_v1"
 }

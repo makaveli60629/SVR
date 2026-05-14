@@ -1,5 +1,5 @@
-const BUILD = "PHASE-77-PGA-STANDALONE-RANGE-TRACER-LOCK";
-const RANGE_URL = "./range.html?v=phase77-pga-range";
+const BUILD = "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK";
+const RANGE_URL = "./range.html?v=phase80-pga-target-bounty";
 const STORE_URL = "https://svrpoker.com/site/store.html";
 
 function openPhase77Range(){
@@ -10,7 +10,7 @@ function openPhase77Range(){
 
 function openPhase77Lobby(){
   if (typeof window === "undefined") return false;
-  window.location.href = "./index.html?v=phase77-return-lobby";
+  window.location.href = "./index.html?v=phase80-return-lobby";
   return true;
 }
 

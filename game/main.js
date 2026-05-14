@@ -79,6 +79,10 @@ applyPhase71EditUnlock({ scene, sceneTargets, log });
 applyPhase76PrivateSceneLock({ scene, sceneTargets, log });
 window.SVR_RANGE_URL = PHASE77_RANGE_URL;
 scene.userData.SVR_BUILD = PHASE77_BUILD;
+window.SVR_SKY_CONTINUITY_LOCK = true;
+window.SVR_PGA_DRIVE_STANDALONE_SCENE_LOCK = "game/range.html";
+window.SVR_PGA_RANGE_STANCE_MAT_LOCK = true;
+window.SVR_PGA_TARGET_BOUNTY_LOCAL_SCORE_LOCK = true;
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -261,7 +265,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : `${PHASE77_BUILD} ready. PGA Range now opens as standalone range.html. Lobby preserved.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `${PHASE77_BUILD} ready. PGA Drive opens standalone range.html. Stand on gold mat, aim at the ball, and earn local training points. Lobby preserved.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -322,6 +326,7 @@ renderer.setAnimationLoop(()=>{
   }
 
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
+  if (scene.userData._phase78PrivateSkyTick) scene.userData._phase78PrivateSkyTick(scene.userData._time || now * 0.001);
 
   hands.update(dt);
   hands.updateDebug();

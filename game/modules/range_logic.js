@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-const BUILD = "PHASE-77-PGA-STANDALONE-RANGE-TRACER-LOCK";
+const BUILD = "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK";
+const SCORE_KEY = "svr_pga_range_training_points_v1";
 const UP = new THREE.Vector3(0,1,0);
 const TMP = new THREE.Vector3();
 const TMP2 = new THREE.Vector3();
@@ -20,6 +21,21 @@ function makeTextTexture(title, subtitle, lines=[], accent='#7dff8a'){
   const tex = new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=8; return tex;
 }
 
+
+function makeGroundTextTexture(title, subtitle='', accent='#f2c14e'){
+  const c = document.createElement('canvas'); c.width=1024; c.height=512;
+  const x = c.getContext('2d');
+  x.clearRect(0,0,c.width,c.height);
+  const g=x.createLinearGradient(0,0,c.width,c.height);
+  g.addColorStop(0,'rgba(255,190,70,.95)'); g.addColorStop(.5,'rgba(255,232,126,.92)'); g.addColorStop(1,'rgba(255,170,42,.95)');
+  x.fillStyle=g; x.fillRect(0,0,c.width,c.height);
+  x.strokeStyle='rgba(255,255,255,.92)'; x.lineWidth=18; x.strokeRect(22,22,c.width-44,c.height-44);
+  x.fillStyle='rgba(0,0,0,.88)'; x.textAlign='center'; x.textBaseline='middle';
+  x.font='900 94px system-ui,Arial'; x.fillText(title,c.width/2,c.height/2-34);
+  x.font='800 42px system-ui,Arial'; x.fillText(subtitle,c.width/2,c.height/2+70);
+  const tex=new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=8; return tex;
+}
+
 function makeGrassTexture(){
   const c=document.createElement('canvas'); c.width=c.height=512; const x=c.getContext('2d');
   x.fillStyle='#0b3b16'; x.fillRect(0,0,512,512);
@@ -35,7 +51,33 @@ function makeDisplacementTexture(){
   const tex=new THREE.CanvasTexture(c); tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(18,42); return tex;
 }
 
-function createTarget(group, z, label, color){
+
+function makePlanetTexture(kind='moon'){
+  const c=document.createElement('canvas'); c.width=c.height=512; const x=c.getContext('2d');
+  const moon = kind === 'moon';
+  const g=x.createRadialGradient(190,170,24,256,256,230);
+  if (moon){ g.addColorStop(0,'#ffffff'); g.addColorStop(.55,'#eaf2ff'); g.addColorStop(1,'#9aa8c0'); }
+  else { g.addColorStop(0,'#ffd0a0'); g.addColorStop(.5,'#ff7a45'); g.addColorStop(1,'#762615'); }
+  x.fillStyle=g; x.beginPath(); x.arc(256,256,210,0,Math.PI*2); x.fill();
+  if (moon){ x.fillStyle='rgba(65,80,105,.24)'; [[185,205,24],[302,154,35],[324,320,24],[145,320,16],[375,250,20]].forEach(([px,py,r])=>{ x.beginPath(); x.arc(px,py,r,0,Math.PI*2); x.fill(); }); }
+  else { x.strokeStyle='rgba(70,20,10,.34)'; x.lineWidth=10; for(let i=0;i<7;i++){ x.beginPath(); x.ellipse(255,175+i*38,150-i*9,10+i%2*5,0.15*i,0,Math.PI*2); x.stroke(); } }
+  const tex=new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; return tex;
+}
+
+function addRangeMoonMarsSky(root){
+  const sky = new THREE.Group(); sky.name = 'SVR_RANGE_MOON_MARS_HIGH_SKY_PHASE78'; root.add(sky);
+  const moon = new THREE.Mesh(new THREE.CircleGeometry(3.2,96), new THREE.MeshBasicMaterial({ map:makePlanetTexture('moon'), transparent:true, side:THREE.DoubleSide, depthWrite:false, toneMapped:false }));
+  moon.position.set(-12,21,-46); sky.add(moon);
+  const mars = new THREE.Mesh(new THREE.CircleGeometry(1.65,96), new THREE.MeshBasicMaterial({ map:makePlanetTexture('mars'), transparent:true, side:THREE.DoubleSide, depthWrite:false, toneMapped:false }));
+  mars.position.set(10,22.4,-52); sky.add(mars);
+  const moonHalo = new THREE.Mesh(new THREE.RingGeometry(3.55,3.72,128), new THREE.MeshBasicMaterial({ color:0xddeaff, transparent:true, opacity:.28, side:THREE.DoubleSide, depthWrite:false })); moonHalo.position.copy(moon.position); sky.add(moonHalo);
+  const marsHalo = new THREE.Mesh(new THREE.RingGeometry(1.88,2.02,128), new THREE.MeshBasicMaterial({ color:0xff8b5a, transparent:true, opacity:.24, side:THREE.DoubleSide, depthWrite:false })); marsHalo.position.copy(mars.position); sky.add(marsHalo);
+  const moonLight = new THREE.PointLight(0xddeaff,2.4,95,1.7); moonLight.position.copy(moon.position); root.add(moonLight);
+  const marsLight = new THREE.PointLight(0xff8b5a,1.1,70,1.9); marsLight.position.copy(mars.position); root.add(marsLight);
+  return (t)=>{ moon.rotation.z = Math.sin(t*.05)*.05; mars.rotation.z += .003; moonHalo.material.opacity=.24+Math.sin(t*.18)*.04; marsHalo.material.opacity=.20+Math.sin(t*.22)*.04; };
+}
+
+function createTarget(group, z, label, color, points=100){
   const base = new THREE.Group(); base.position.set(0,0,z); group.add(base);
   const green = new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,0.05,96), new THREE.MeshStandardMaterial({ color:0x1d8a36, roughness:0.92, metalness:0.02, emissive:color, emissiveIntensity:0.04 }));
   green.position.y=0.035; base.add(green);
@@ -43,9 +85,9 @@ function createTarget(group, z, label, color){
   ring.rotation.x=-Math.PI/2; ring.position.y=.075; base.add(ring);
   const pole = new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,1.8,12), new THREE.MeshBasicMaterial({ color:0xffffff })); pole.position.set(.2,.92,-.1); base.add(pole);
   const flag = new THREE.Mesh(new THREE.PlaneGeometry(.75,.42), new THREE.MeshBasicMaterial({ color, side:THREE.DoubleSide })); flag.position.set(.58,1.45,-.1); flag.rotation.y=.12; base.add(flag);
-  const tex = makeTextTexture(label, 'TARGET GREEN', ['hit = purple burst'], '#'+color.toString(16).padStart(6,'0'));
+  const tex = makeTextTexture(label, 'TARGET GREEN', [`+${points} LOCAL POINTS`, 'hit = purple burst'], '#'+color.toString(16).padStart(6,'0'));
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.7,.85), new THREE.MeshBasicMaterial({ map:tex, side:THREE.DoubleSide, transparent:true })); sign.position.set(-2.9,1.35,0); sign.rotation.y=.28; base.add(sign);
-  return { z, radius:2.25, group:base, hit:false, color };
+  return { z, radius:2.25, group:base, hit:false, color, points, label };
 }
 
 function makeClub(){
@@ -84,11 +126,14 @@ function gripActive(rightHand,rightController){
   return !!controllerGrip || (!!rightHand && isPinching(rightHand));
 }
 
-export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{} }={}){
+export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}, scoreCb=()=>{} }={}){
   scene.background = new THREE.Color(0x020406);
   scene.fog = new THREE.FogExp2(0x03080a,0.014);
   scene.userData.SVR_BUILD = BUILD;
-  const root = new THREE.Group(); root.name='SVR_PGA_STANDALONE_RANGE_ROOT'; scene.add(root);
+  const root = new THREE.Group(); root.name='SVR_PGA_STANDALONE_RANGE_ROOT_PHASE79_STANDALONE_SCENE'; scene.add(root);
+  scene.userData.SVR_PGA_STANDALONE_SCENE = true;
+  scene.userData.SVR_RANGE_STANCE_MAT_LOCK = { playerStart:{x:0,y:0,z:0.42}, ball:{x:0,y:0.19,z:-1.35}, route:'game/range.html' };
+  const tickSky = addRangeMoonMarsSky(root);
 
   const hemi = new THREE.HemisphereLight(0xb2f7ff,0x07120b,1.3); root.add(hemi);
   const moon = new THREE.DirectionalLight(0xd8e9ff,2.0); moon.position.set(-7,14,8); root.add(moon);
@@ -100,21 +145,30 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
   [-3,0,3].forEach(x=>{ const line=new THREE.Mesh(new THREE.PlaneGeometry(.055,70),laneMat); line.rotation.x=-Math.PI/2; line.position.set(x,.035,-31); root.add(line); });
 
   const teeBay = new THREE.Mesh(new THREE.BoxGeometry(4.6,.09,2.4), new THREE.MeshStandardMaterial({ color:0x121420, roughness:.6, metalness:.18, emissive:0x071824, emissiveIntensity:.35 }));
-  teeBay.position.set(0,.045,4.5); root.add(teeBay);
-  const teeGlow = new THREE.Mesh(new THREE.RingGeometry(.55,.75,64), new THREE.MeshBasicMaterial({ color:0x7dff8a, transparent:true, opacity:.8, side:THREE.DoubleSide })); teeGlow.rotation.x=-Math.PI/2; teeGlow.position.set(0,.105,3.55); root.add(teeGlow);
+  teeBay.position.set(0,.045,0.15); root.add(teeBay);
+  const teeGlow = new THREE.Mesh(new THREE.RingGeometry(.55,.75,64), new THREE.MeshBasicMaterial({ color:0x7dff8a, transparent:true, opacity:.8, side:THREE.DoubleSide })); teeGlow.rotation.x=-Math.PI/2; teeGlow.position.set(0,.105,-1.35); root.add(teeGlow);
 
-  const targets=[createTarget(root,-12,'50 YD',0x7dff8a), createTarget(root,-26,'100 YD',0xffdd55), createTarget(root,-42,'150 YD',0xb48cff)];
-  const boardTex = makeTextTexture('SVR PGA RANGE','STANDALONE PRIVATE SCENE',['dynamic turf • target greens','ball tracer • auto-tee','right-hand club grip','Lobby button returns to index.html'],'#7dff8a');
-  const board = new THREE.Mesh(new THREE.PlaneGeometry(7.8,3.9),new THREE.MeshBasicMaterial({ map:boardTex, side:THREE.DoubleSide })); board.position.set(-7,3,-1); board.rotation.y=.45; root.add(board);
+  const stanceMat = new THREE.Mesh(new THREE.PlaneGeometry(2.45,1.35), new THREE.MeshBasicMaterial({ map:makeGroundTextTexture('STAND HERE','AIM AT BALL'), transparent:true, side:THREE.DoubleSide, toneMapped:false }));
+  stanceMat.rotation.x=-Math.PI/2; stanceMat.position.set(0,.118,0.42); root.add(stanceMat);
+  const leftFoot = new THREE.Mesh(new THREE.PlaneGeometry(.28,.68), new THREE.MeshBasicMaterial({ color:0x111111, transparent:true, opacity:.62, side:THREE.DoubleSide })); leftFoot.rotation.x=-Math.PI/2; leftFoot.rotation.z=.08; leftFoot.position.set(-.42,.125,.35); root.add(leftFoot);
+  const rightFoot = leftFoot.clone(); rightFoot.rotation.z=-.08; rightFoot.position.set(.42,.125,.35); root.add(rightFoot);
+  const aimLine = new THREE.Mesh(new THREE.PlaneGeometry(.055,4.15), new THREE.MeshBasicMaterial({ color:0xf2c14e, transparent:true, opacity:.72, side:THREE.DoubleSide, toneMapped:false }));
+  aimLine.rotation.x=-Math.PI/2; aimLine.position.set(0,.132,-1.25); root.add(aimLine);
+  const ballArrow = new THREE.Mesh(new THREE.ConeGeometry(.13,.42,24), new THREE.MeshBasicMaterial({ color:0xf2c14e, transparent:true, opacity:.9, toneMapped:false }));
+  ballArrow.rotation.x=-Math.PI/2; ballArrow.position.set(0,.18,-1.62); root.add(ballArrow);
 
-  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(32,12), new THREE.MeshBasicMaterial({ color:0x050812, transparent:true, opacity:.82, side:THREE.DoubleSide })); backWall.position.set(0,5,-48); root.add(backWall);
+  const targets=[createTarget(root,-18,'100 YD',0x7dff8a,100), createTarget(root,-36,'200 YD',0xffdd55,200), createTarget(root,-56,'300 YD',0xb48cff,300)];
+  const boardTex = makeTextTexture('SVR PGA RANGE','STANDALONE PRIVATE SCENE',['stand on gold mat','ball directly in front','ball tracer • auto-tee','Lobby button returns to index.html'],'#7dff8a');
+  const board = new THREE.Mesh(new THREE.PlaneGeometry(7.8,3.9),new THREE.MeshBasicMaterial({ map:boardTex, side:THREE.DoubleSide })); board.position.set(-7,3,-5.2); board.rotation.y=.45; root.add(board);
+
+  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(32,12), new THREE.MeshBasicMaterial({ color:0x050812, transparent:true, opacity:.82, side:THREE.DoubleSide })); backWall.position.set(0,5,-66); root.add(backWall);
   for(let i=0;i<140;i++){ const star=new THREE.Mesh(new THREE.SphereGeometry(.022+Math.random()*.035,6,6), new THREE.MeshBasicMaterial({ color: Math.random()<.75?0xb48cff:0x7dff8a, transparent:true, opacity:.55+Math.random()*.4 })); star.position.set((Math.random()-.5)*42,2+Math.random()*10,-18-Math.random()*50); root.add(star); }
 
   const ballMat = new THREE.MeshStandardMaterial({ color:0xffffff, roughness:.38, metalness:.04, emissive:0x091a12, emissiveIntensity:.08 });
   const ball = new THREE.Mesh(new THREE.SphereGeometry(.135,32,16), ballMat); root.add(ball);
   const club = makeClub(); root.add(club);
-  const clubRest = new THREE.Vector3(1.35,.92,4.25);
-  const ballStart = new THREE.Vector3(0,.19,3.55);
+  const clubRest = new THREE.Vector3(1.05,.92,-0.45);
+  const ballStart = new THREE.Vector3(0,.19,-1.35);
   const ballVel = new THREE.Vector3();
   const lastHead = new THREE.Vector3(); const headVel = new THREE.Vector3();
   let tracerOn = true, hitLock=.0, autoTeeTimer=0, shots=0, best=0;
@@ -122,7 +176,23 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
   const trailGeom = new THREE.BufferGeometry().setFromPoints(trailPts);
   const trail = new THREE.Line(trailGeom, new THREE.LineBasicMaterial({ color:0xb48cff, transparent:true, opacity:.85 })); root.add(trail);
 
-  function resetBall(){ ball.position.copy(ballStart); ballVel.set(0,0,0); autoTeeTimer=0; targets.forEach(t=>t.hit=false); trailPts.forEach(p=>p.copy(ballStart)); trailGeom.setFromPoints(trailPts); statusCb('Auto-tee: ball ready'); }
+  function readScore(){
+    try { return Math.max(0, parseInt(localStorage.getItem(SCORE_KEY) || '0', 10) || 0); }
+    catch { return 0; }
+  }
+  function writeScore(value){
+    try { localStorage.setItem(SCORE_KEY, String(Math.max(0, Math.floor(value || 0)))); }
+    catch {}
+  }
+  function emitScore(){ scoreCb({ points: readScore(), bestTarget: best, shots, build: BUILD }); }
+  function awardLocalPoints(target){
+    const next = readScore() + target.points;
+    writeScore(next);
+    best = Math.max(best, target.points);
+    emitScore();
+  }
+
+  function resetBall(){ ball.position.copy(ballStart); ballVel.set(0,0,0); autoTeeTimer=0; targets.forEach(t=>t.hit=false); trailPts.forEach(p=>p.copy(ballStart)); trailGeom.setFromPoints(trailPts); statusCb('Auto-tee: ball ready'); emitScore(); }
   resetBall();
 
   function toggleTracer(){ tracerOn=!tracerOn; trail.visible=tracerOn; return tracerOn; }
@@ -152,7 +222,7 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
     // A simple visible desktop club arc. Mouse button controls backswing; fast movement can still hit.
     const t = performance.now()*.001;
     if (!renderer.xr.isPresenting){
-      const p = new THREE.Vector3(.72 + Math.sin(t*1.8)*.18, .75 + Math.abs(Math.sin(t*1.8))*.32, 3.1 + Math.cos(t*1.8)*.28);
+      const p = new THREE.Vector3(.72 + Math.sin(t*1.8)*.18, .82 + Math.abs(Math.sin(t*1.8))*.32, -1.36 + Math.cos(t*1.8)*.28);
       club.position.lerp(p,.06); club.rotation.set(-1.0+Math.sin(t*1.8)*.35,0.06,0.18);
     }
   }
@@ -169,7 +239,7 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
     ballVel.y = THREE.MathUtils.clamp(power*.32 + sweet*1.4, 1.4, 7.2);
     hitLock=.28; autoTeeTimer=0; shots++;
     haptic(info.anchor,.7,55);
-    statusCb(`Shot ${shots}: ${Math.round(power*12)} yd impulse • sweet ${Math.round(sweet*100)}%`);
+    statusCb(`Shot ${shots}: ${Math.round(power*12)} yd impulse • sweet ${Math.round(sweet*100)}% • stance mat locked`);
   }
 
   function updateBall(dt){
@@ -184,10 +254,10 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
         if (Math.abs(ballVel.y)>1.0) ballVel.y *= -.33; else ballVel.y=0;
         ballVel.x*=.72; ballVel.z*=.72;
       }
-      if (ball.position.z < -51 || ball.position.y < -2 || ball.position.length()>92){ autoTeeTimer = Math.max(autoTeeTimer,1.1); }
+      if (ball.position.z < -76 || ball.position.y < -2 || ball.position.length()>110){ autoTeeTimer = Math.max(autoTeeTimer,1.1); }
       for(const target of targets){
         if (!target.hit && Math.abs(ball.position.z-target.z)<2.2 && Math.hypot(ball.position.x, ball.position.z-target.z)<target.radius && ball.position.y<1.1){
-          target.hit=true; addFirework(scene,new THREE.Vector3(target.group.position.x,1.05,target.z),target.color); best=Math.max(best, Math.round(Math.abs(target.z)*3.3)); statusCb(`Target hit: ${Math.round(Math.abs(target.z)*3.3)} yards • purple burst`); haptic({userData:{}},.3,30);
+          target.hit=true; addFirework(scene,new THREE.Vector3(target.group.position.x,1.05,target.z),target.color); awardLocalPoints(target); statusCb(`Target hit: ${target.label} • +${target.points} local training points • no wallet connection`); haptic({userData:{}},.3,30);
         }
       }
       if (tracerOn){ trailPts.shift(); trailPts.push(ball.position.clone()); trailGeom.setFromPoints(trailPts); }
@@ -204,12 +274,15 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
   return {
     resetBall,
     toggleTracer,
+    refreshScore: emitScore,
+    clearLocalScore(){ writeScore(0); best=0; shots=0; emitScore(); statusCb('Local training score cleared'); },
     update(dt,{ rightHand=null,rightController=null }={}){
       desktopSwing(dt);
       const info = updateClub(dt,rightHand,rightController);
       applyHit(info);
       updateBall(dt);
       updateFx(dt);
+      tickSky?.(performance.now()*0.001);
       const cameraTarget = renderer.xr.isPresenting ? renderer.xr.getCamera(camera) : camera;
       scene.userData._camera = cameraTarget;
     }

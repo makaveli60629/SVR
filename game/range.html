@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR PGA Driving Range • Phase 77</title>
+  <title>SVR PGA Driving Range • Phase 80 Target Bounty Local Score Lock</title>
   <meta name="theme-color" content="#050508"/>
   <style>
     :root{color-scheme:dark} html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif} #app{position:fixed;inset:0} canvas{display:block;width:100%;height:100%;outline:none;background:#000}
@@ -16,14 +16,15 @@
   <div id="app"></div>
   <div id="hud">
     <div class="pill" id="status">Loading PGA range…</div>
+    <div class="pill" id="score">Training Points: 0 • Best Target: 0</div>
     <div style="display:flex;gap:8px;align-items:center">
       <button class="btn" id="lobbyBtn">Lobby</button>
       <button class="btn" id="resetBtn">Reset Ball</button>
       <button class="btn" id="tracerBtn">Tracer On</button>
-      <span class="pill">BUILD: PHASE-77-PGA-STANDALONE-RANGE-TRACER-LOCK</span>
+      <span class="pill">BUILD: PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK</span>
     </div>
   </div>
-  <div id="help"><span class="hot">PGA Range:</span> grip right controller / pinch right hand to hold club. Swing through ball. Desktop fallback: hold mouse button, move fast, release near ball. <span class="warn">Lobby is separate.</span></div>
+  <div id="help"><span class="hot">PGA Range:</span> start on the gold STAND HERE mat. Ball is directly in front of you. Hit target greens to earn local training points only. Grip right controller / pinch right hand to hold club, aim at the ball, then swing through it. Desktop fallback: hold mouse button, move fast, release near ball. <span class="warn">Lobby is separate.</span> Moon/Mars sky lock active. PGA Drive is a standalone private scene, not lobby content.</div>
   <script type="module">
     import { createCore } from './modules/core_scene.js';
     import { createDesktopControls } from './modules/desktop_controls.js';
@@ -35,27 +36,32 @@
     const status = document.getElementById('status');
     const { scene, camera, renderer } = createCore({ containerId:'app' });
     scene.userData._camera = camera;
-    camera.position.set(0,1.55,8.2);
-    camera.lookAt(0,1.15,-2.5);
+    camera.position.set(0,1.62,2.25);
+    camera.lookAt(0,0.78,-1.35);
     const desktop = createDesktopControls({ camera, domElement: renderer.domElement });
     const hands = createHands({ scene, renderer, log:(...a)=>console.log(...a) });
-    const range = createRangeExperience({ scene, camera, renderer, statusCb:(txt)=>{ status.textContent = txt; } });
+    const score = document.getElementById('score');
+    const range = createRangeExperience({
+      scene, camera, renderer,
+      statusCb:(txt)=>{ status.textContent = txt; },
+      scoreCb:(state)=>{ score.textContent = `Training Points: ${state.points} • Best Target: ${state.bestTarget} • Shots: ${state.shots}`; }
+    });
     const watch = createWristWatch({
       scene, camera, renderer,
       getState:()=>({ audioEnabled:false, trackTitle:'PGA Range', cash:0, seated:false, inTableZone:false, seatLabel:'Range', teleportEnabled:true }),
       actions:{
-        goLobby:()=>{ location.href='./index.html?v=phase77-return-lobby'; },
+        goLobby:()=>{ location.href='./index.html?v=phase80-return-lobby'; },
         goPgaDrive:()=>range.resetBall(),
         goPgaChipPutt:()=>range.resetBall(),
         toggleTeleport:()=>range.toggleTracer(),
         joinTable:()=>range.resetBall(),
-        leaveTable:()=>{ location.href='./index.html?v=phase77-return-lobby'; }
+        leaveTable:()=>{ location.href='./index.html?v=phase80-return-lobby'; }
       }
     });
-    document.getElementById('lobbyBtn').addEventListener('click',()=>{ location.href='./index.html?v=phase77-return-lobby'; });
+    document.getElementById('lobbyBtn').addEventListener('click',()=>{ location.href='./index.html?v=phase80-return-lobby'; });
     document.getElementById('resetBtn').addEventListener('click',()=>range.resetBall());
     document.getElementById('tracerBtn').addEventListener('click',()=>{ const on=range.toggleTracer(); document.getElementById('tracerBtn').textContent=on?'Tracer On':'Tracer Off'; });
-    window.addEventListener('keydown',(e)=>{ if(e.code==='KeyR') range.resetBall(); if(e.code==='KeyL') location.href='./index.html?v=phase77-return-lobby'; if(e.code==='KeyT') { const on=range.toggleTracer(); document.getElementById('tracerBtn').textContent=on?'Tracer On':'Tracer Off'; }});
+    window.addEventListener('keydown',(e)=>{ if(e.code==='KeyR') range.resetBall(); if(e.code==='KeyL') location.href='./index.html?v=phase80-return-lobby'; if(e.code==='KeyT') { const on=range.toggleTracer(); document.getElementById('tracerBtn').textContent=on?'Tracer On':'Tracer Off'; }});
     renderer.xr.addEventListener('sessionstart',()=>{ document.getElementById('help').style.display='none'; });
     renderer.xr.addEventListener('sessionend',()=>{ document.getElementById('help').style.display='block'; });
     let last = performance.now();
@@ -69,7 +75,8 @@
       watch.update(dt,leftHand||leftController,rightHand||rightController);
       renderer.render(scene,camera);
     });
-    status.textContent = `${PHASE77_BUILD} ready • standalone PGA range`;
+    status.textContent = `${PHASE77_BUILD} ready • standalone PGA range • local target bounty active`;
+    range.refreshScore?.();
   </script>
 </body>
 </html>

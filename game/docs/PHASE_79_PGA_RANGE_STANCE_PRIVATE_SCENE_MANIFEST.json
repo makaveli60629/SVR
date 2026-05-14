@@ -1,0 +1,25 @@
+{
+  "build": "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK",
+  "phase": 79,
+  "filesChanged": [
+    "game/index.html",
+    "game/main.js",
+    "game/range.html",
+    "game/pga-drive.html",
+    "game/modules/range_logic.js",
+    "game/modules/phase77_range_route_lock.js",
+    "game/version.json",
+    "game/docs/BUILD_VERSION.json",
+    "game/docs/PHASE_79_PGA_RANGE_STANCE_PRIVATE_SCENE_LOCK.md"
+  ],
+  "protected": [
+    "site",
+    "root website",
+    "original lobby shell"
+  ],
+  "verification": [
+    "forbidden approval terms purge",
+    "JS syntax",
+    "zip size under 25MB"
+  ]
+}

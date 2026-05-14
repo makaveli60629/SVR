@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const BUILD = "PHASE-76-PRIVATE-SCENE-ROOM-ROUTING-LOCK";
+const BUILD = "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK";
 const STORE_URL = "https://svrpoker.com/site/store.html";
 
 function canvasTexture(w, h, paint){
@@ -104,6 +104,53 @@ function addPrivateRoomLabel(group, text, color = 0x72ffd2){
   const glow = new THREE.PointLight(color, 1.8, 18, 2.2); glow.position.set(0, 3.2, 0); group.add(glow);
 }
 
+function makeMoonTexture(){
+  return canvasTexture(512, 512, (ctx,w,h)=>{
+    const g = ctx.createRadialGradient(w*0.40,h*0.34,20,w/2,h/2,w*0.46);
+    g.addColorStop(0,'#ffffff'); g.addColorStop(0.55,'#eaf2ff'); g.addColorStop(1,'#aebad0');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(w/2,h/2,w*0.42,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(90,105,130,0.22)';
+    [[185,196,22],[298,154,34],[315,310,26],[225,286,16],[377,247,18],[145,319,12]].forEach(([x,y,r])=>{ ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); });
+  });
+}
+
+function makeMarsTexture(){
+  return canvasTexture(512, 512, (ctx,w,h)=>{
+    const g = ctx.createRadialGradient(w*0.36,h*0.34,25,w/2,h/2,w*0.44);
+    g.addColorStop(0,'#ffd0a0'); g.addColorStop(0.48,'#ff7a45'); g.addColorStop(1,'#8d2c19');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(w/2,h/2,w*0.40,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(75,20,12,0.30)'; ctx.lineWidth=9;
+    for(let i=0;i<7;i++){ ctx.beginPath(); ctx.ellipse(250,185+i*35,155-i*12,12+i%2*5,0.12*i,0,Math.PI*2); ctx.stroke(); }
+  });
+}
+
+function addPrivateMoonMarsSky(group, { z=-5.9, y=3.75, width=8.8, height=2.15, accent=0xb48cff } = {}){
+  const skyTex = canvasTexture(1024, 320, (ctx,w,h)=>{
+    const g = ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,'#02040d'); g.addColorStop(0.56,'#08051b'); g.addColorStop(1,'#010204');
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+    for(let i=0;i<180;i++){
+      const a = 0.28 + Math.random()*0.58;
+      ctx.fillStyle = Math.random()<0.72 ? `rgba(220,235,255,${a})` : `rgba(180,140,255,${a})`;
+      ctx.fillRect(Math.random()*w, Math.random()*h, 1+Math.random()*2, 1+Math.random()*2);
+    }
+    ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,0.62)'; ctx.font='bold 28px system-ui,Arial';
+    ctx.fillText('MOON + MARS SKY LOCK', w/2, h-28);
+  });
+  const window = new THREE.Mesh(new THREE.PlaneGeometry(width, height), new THREE.MeshBasicMaterial({ map:skyTex, transparent:true, side:THREE.DoubleSide, depthWrite:false, toneMapped:false }));
+  window.position.set(0, y, z+0.055); group.add(window);
+  const moon = new THREE.Mesh(new THREE.CircleGeometry(0.58, 64), new THREE.MeshBasicMaterial({ map:makeMoonTexture(), transparent:true, side:THREE.DoubleSide, depthWrite:false, toneMapped:false }));
+  moon.position.set(-2.3, y+0.16, z+0.10); group.add(moon);
+  const mars = new THREE.Mesh(new THREE.CircleGeometry(0.34, 64), new THREE.MeshBasicMaterial({ map:makeMarsTexture(), transparent:true, side:THREE.DoubleSide, depthWrite:false, toneMapped:false }));
+  mars.position.set(2.35, y+0.30, z+0.11); group.add(mars);
+  const moonGlow = new THREE.PointLight(0xddeaff, 0.9, 7.0, 2.0); moonGlow.position.set(-2.3, y+0.15, z+0.8); group.add(moonGlow);
+  const marsGlow = new THREE.PointLight(0xff8054, 0.65, 6.0, 2.0); marsGlow.position.set(2.35, y+0.30, z+0.8); group.add(marsGlow);
+  const rim = new THREE.Mesh(new THREE.RingGeometry(0.72,0.75,96), new THREE.MeshBasicMaterial({ color:accent, transparent:true, opacity:0.42, side:THREE.DoubleSide, depthWrite:false }));
+  rim.position.copy(moon.position); group.add(rim);
+  group.userData._privateSkyTick = group.userData._privateSkyTick || [];
+  group.userData._privateSkyTick.push((t)=>{ moon.rotation.z = Math.sin(t*0.10)*0.06; mars.rotation.z += 0.002; window.material.opacity = 0.82 + Math.sin(t*0.22)*0.05; });
+}
+
 function createFreshReikiScene(scene){
   const group = new THREE.Group();
   group.name = 'SVR_PRIVATE_REIKI_FRESH_ROOM_PHASE76';
@@ -111,6 +158,7 @@ function createFreshReikiScene(scene){
   scene.add(group);
   addWalls(group, { w: 14, d: 12, h: 4.2, color: 0x160407, emissive: 0x320408 });
   addPrivateRoomLabel(group, 'REIKI PRIVATE ROOM', 0xff334d);
+  addPrivateMoonMarsSky(group, { z:-5.86, y:3.42, width:8.4, height:1.70, accent:0xff334d });
   const panel = makePanel({ title:'REIKI ROOM', subtitle:'WAITING FOR APPROVAL', accent:'#ff334d', warning:true, lines:['fresh private room outside the lobby', 'no third-party names, photos, logos, or website', 'SVR logo/placeholder only', 'return with Lobby button or watch'] });
   panel.position.set(0, 2.3, -5.88); group.add(panel);
   const meditation = new THREE.Mesh(new THREE.RingGeometry(1.25, 1.95, 128), new THREE.MeshBasicMaterial({ color:0xff334d, transparent:true, opacity:0.72, side:THREE.DoubleSide }));
@@ -127,6 +175,7 @@ function createPgaDriveScene(scene){
   scene.add(group);
   addWalls(group, { w: 18, d: 26, h: 4.4, color: 0x082211, emissive: 0x06220a });
   addPrivateRoomLabel(group, 'PGA DRIVE PRIVATE RANGE', 0x7dff8a);
+  addPrivateMoonMarsSky(group, { z:-12.86, y:3.78, width:10.8, height:1.95, accent:0x7dff8a });
   const panel = makePanel({ title:'PGA DRIVE RANGE', subtitle:'PRIVATE TRAINING SCENE', accent:'#7dff8a', lines:['fresh driving range outside the lobby', 'tee bay, range lane, and target rings', 'future controller club swing physics', 'no golf range object remains in walkway'] });
   panel.position.set(0, 2.55, -12.88); group.add(panel);
   const tee = new THREE.Mesh(new THREE.BoxGeometry(3.2,0.06,1.8), new THREE.MeshStandardMaterial({ color:0x28a044, roughness:0.9 })); tee.position.set(0,0.035,8.4); group.add(tee);
@@ -145,6 +194,7 @@ function createPgaChipPuttScene(scene){
   scene.add(group);
   addWalls(group, { w: 14, d: 14, h: 4.0, color: 0x0c2e15, emissive: 0x061d0c });
   addPrivateRoomLabel(group, 'PGA CHIP + PUTT', 0xa4ff7a);
+  addPrivateMoonMarsSky(group, { z:-6.86, y:3.34, width:8.4, height:1.65, accent:0xa4ff7a });
   const panel = makePanel({ title:'CHIP + PUTT', subtitle:'PRIVATE SHORT-GAME ROOM', accent:'#a4ff7a', lines:['fresh short-game room outside the lobby', 'putting cup and flag scaffold', 'future chip/putt scoring drills', 'separate from drive range'] });
   panel.position.set(0,2.4,-6.88); group.add(panel);
   const green = new THREE.Mesh(new THREE.BoxGeometry(8.5,0.035,5.6), new THREE.MeshStandardMaterial({ color:0x238b38, roughness:0.96 })); green.position.set(0,0.02,-0.5); group.add(green);
@@ -162,6 +212,7 @@ function createSmokerLoungeScene(scene){
   scene.add(group);
   addWalls(group, { w: 16, d: 13, h: 4.2, color: 0x110816, emissive: 0x19081f });
   addPrivateRoomLabel(group, 'SMOKER LOUNGE PRIVATE ROOM', 0xff73d6);
+  addPrivateMoonMarsSky(group, { z:-6.36, y:3.44, width:8.8, height:1.70, accent:0xff73d6 });
   const panel = makePanel({ title:'SMOKER LOUNGE', subtitle:'PRIVATE SOCIAL ROOM', accent:'#ff73d6', lines:['fresh hangout room outside the lobby', 'social replay/jumbotron wall scaffold', 'storefront portal remains in lobby only', 'future moderation and access rules'] });
   panel.position.set(0,2.45,-6.38); group.add(panel);
   const couchMat = new THREE.MeshStandardMaterial({ color:0x2b1538, roughness:0.72, metalness:0.08, emissive:0x1c0a22, emissiveIntensity:0.12 });
@@ -178,6 +229,7 @@ function createScorpionPokerRoom(scene){
   scene.add(group);
   addWalls(group, { w: 15, d: 13, h: 4.2, color: 0x140711, emissive: 0x23061a });
   addPrivateRoomLabel(group, 'SCORPION PRIVATE POKER ROOM', 0xff7fd0);
+  addPrivateMoonMarsSky(group, { z:-6.36, y:3.44, width:8.8, height:1.70, accent:0xff7fd0 });
   const panel = makePanel({ title:'SCORPION ROOM', subtitle:'PRIVATE ENCLOSED POKER ROOM', accent:'#ff7fd0', lines:['fresh private room outside the lobby', 'table, player seat, bots, and card-deal scaffold', 'lobby has portal only', 'future real table matchmaking'] });
   panel.position.set(0,2.45,-6.38); group.add(panel);
   const felt = new THREE.Mesh(new THREE.CylinderGeometry(2.6,2.6,0.18,64), new THREE.MeshStandardMaterial({ color:0x12302a, roughness:0.88, metalness:0.05, emissive:0x051815, emissiveIntensity:0.2 })); felt.scale.z = 0.62; felt.position.set(0,0.55,0); group.add(felt);
@@ -214,6 +266,12 @@ export function applyPhase76PrivateSceneLock({ scene, sceneTargets = {}, log = c
   const chip = createPgaChipPuttScene(scene);
   const smoker = createSmokerLoungeScene(scene);
   const scorpion = createScorpionPokerRoom(scene);
+  const privateSkyGroups = [reiki, drive, chip, smoker, scorpion].map(r => r.group).filter(Boolean);
+  const priorPrivateSkyTick = scene.userData._phase78PrivateSkyTick;
+  scene.userData._phase78PrivateSkyTick = (t)=>{
+    if (priorPrivateSkyTick) priorPrivateSkyTick(t);
+    privateSkyGroups.forEach(g => (g.userData._privateSkyTick || []).forEach(fn => fn(t || 0)));
+  };
 
   // Private destination overrides. Lobby hub keys remain storefronts; room keys jump to isolated private rooms.
   sceneTargets.reikiRoom = { pos: reiki.target.clone(), look: reiki.look.clone() };
