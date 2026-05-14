@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -34,7 +34,7 @@
         <a href="donate.html">Donate</a>
         <a href="faq.html">FAQ</a>
         <a href="#login">Login</a>
-        <a href="#store">Store</a>
+        <a href="store.html">Store</a>
         <a href="#message">Message</a>
         <a href="../index.html">Launch</a>
       </div>
@@ -114,32 +114,56 @@
         </div>
       </section>
 
-
-
       <section class="section" id="store">
-        <h2 class="section-title">Store + Lobby Preview Plan</h2>
-        <p class="section-copy">The site now has a clear place for the item shop and the future live lobby or training-room preview feed. This is the cleanest next layer before full auth and backend wiring.</p>
+        <h2 class="section-title">Official SVR Store Hub</h2>
+        <p class="section-copy">The updated store is now connected from the official site page. Visitors can enter the central SVR Store first, then route into SVR items, Reiki / Zen Den, PGA, Smoker Lounge, memberships, cart preview, and Stripe sandbox review without changing the public Matrix launch page.</p>
         <div class="membership-grid">
           <article class="price-card">
-            <div class="card-tag">Item Shop</div>
-            <h3>Avatar Packs</h3>
-            <p class="price">$9 <small>and up</small></p>
-            <p class="price-note">Character cosmetics, props, accessories, and themed bundles for members.</p>
+            <div class="card-tag">Store Hub</div>
+            <h3>Central SVR Store</h3>
+            <p class="price">Open</p>
+            <p class="price-note">Main store route with sample products, partner category cards, sandbox cart, and checkout-disabled Stripe preview.</p>
+            <div class="inline-actions"><a class="btn btn-primary" href="store.html">Open Store Hub</a></div>
           </article>
           <article class="price-card">
-            <div class="card-tag">Bundles</div>
-            <h3>VIP Packages</h3>
-            <p class="price">$29 <small>starter</small></p>
-            <p class="price-note">Founder packs, chip sets, room access, and premium cosmetic drops.</p>
+            <div class="card-tag" style="border-color:rgba(255,61,119,.55); color:#ff4f7f;">WAITING APPROVAL</div>
+            <h3>Zen Den / Reiki Store</h3>
+            <p class="price">Review</p>
+            <p class="price-note">Sponsor-review page for Reiki / Zen Den sample products, booking concepts, and approval-ready partner layout.</p>
+            <div class="inline-actions"><a class="btn btn-secondary" href="store-reiki.html">Open Zen Den</a></div>
           </article>
           <article class="price-card">
-            <div class="card-tag">Room Feed</div>
-            <h3>Live Preview Panel</h3>
-            <p class="price">Next</p>
-            <p class="price-note">Third-camera lobby preview or live room feed can sit in a dedicated panel once the game camera output is exposed.</p>
+            <div class="card-tag">PGA</div>
+            <h3>PGA Golf Store</h3>
+            <p class="price">Sample</p>
+            <p class="price-note">Golf apparel, range passes, grip skins, training packs, and sponsor placement examples.</p>
+            <div class="inline-actions"><a class="btn btn-secondary" href="store-pga.html">Open PGA Store</a></div>
           </article>
         </div>
-        <div class="setup-note">Recommended next step: reserve a live preview window for a lobby feed or third camera, then wire it through a lightweight backend session layer so visitors can watch activity before entering.</div>
+        <div class="membership-grid">
+          <article class="price-card">
+            <div class="card-tag">SVR</div>
+            <h3>Game Items</h3>
+            <p class="price">Gear</p>
+            <p class="price-note">Watch skins, table themes, chip skins, avatar items, gloves, and future VR portal items.</p>
+            <div class="inline-actions"><a class="btn btn-ghost" href="store-svr.html">Open SVR Items</a></div>
+          </article>
+          <article class="price-card">
+            <div class="card-tag">Lounge</div>
+            <h3>Smoker Lounge Store</h3>
+            <p class="price">Sample</p>
+            <p class="price-note">Compliant lounge apparel, room themes, art displays, and partner shelf examples.</p>
+            <div class="inline-actions"><a class="btn btn-ghost" href="store-smoker.html">Open Lounge Store</a></div>
+          </article>
+          <article class="price-card">
+            <div class="card-tag">Sandbox</div>
+            <h3>Cart + Stripe Preview</h3>
+            <p class="price">No Sales</p>
+            <p class="price-note">Cart is preview-only. Stripe remains sandbox/disabled until backend approval and legal review.</p>
+            <div class="inline-actions"><a class="btn btn-secondary" href="cart.html">View Cart</a><a class="btn btn-primary" href="stripe-sandbox.html">Stripe Sandbox</a></div>
+          </article>
+        </div>
+        <div class="setup-note">Store update connected. Checkout remains disabled: no public SQL credentials, no Stripe secrets, and no live sales in this phase.</div>
       </section>
 
       <section class="section" id="payments">
@@ -256,4 +280,3 @@
   <script src="../site-public-hooks.js"></script>
 </body>
 </html>
-
