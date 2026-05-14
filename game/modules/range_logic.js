@@ -1,13 +1,16 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-const BUILD = "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK";
+const BUILD = "PHASE-92-PGA-TWO-HAND-GRIP-FACE-LOCK";
 const SCORE_KEY = "svr_pga_range_training_points_v1";
 const UP = new THREE.Vector3(0,1,0);
 const TMP = new THREE.Vector3();
 const TMP2 = new THREE.Vector3();
+const TMP3 = new THREE.Vector3();
+const TMP4 = new THREE.Vector3();
 const Q = new THREE.Quaternion();
 const E = new THREE.Euler();
+const CLUB_TARGET = new THREE.Object3D();
 
 function makeTextTexture(title, subtitle, lines=[], accent='#7dff8a'){
   const c = document.createElement('canvas'); c.width=1024; c.height=512;
@@ -20,7 +23,6 @@ function makeTextTexture(title, subtitle, lines=[], accent='#7dff8a'){
   lines.forEach((l,i)=>x.fillText(l,c.width/2,250+i*46));
   const tex = new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=8; return tex;
 }
-
 
 function makeGroundTextTexture(title, subtitle='', accent='#f2c14e'){
   const c = document.createElement('canvas'); c.width=1024; c.height=512;
@@ -50,7 +52,6 @@ function makeDisplacementTexture(){
   for(let i=0;i<1600;i++){ const v=90+Math.random()*120; x.fillStyle=`rgb(${v},${v},${v})`; x.fillRect(Math.random()*256,Math.random()*256,1+Math.random()*3,1+Math.random()*3); }
   const tex=new THREE.CanvasTexture(c); tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(18,42); return tex;
 }
-
 
 function makePlanetTexture(kind='moon'){
   const c=document.createElement('canvas'); c.width=c.height=512; const x=c.getContext('2d');
@@ -120,17 +121,31 @@ function haptic(source, strength=.55, ms=45){
 
 function getJoint(hand, key){ const j=hand?.joints?.[key]; if(!j) return null; j.updateWorldMatrix?.(true,false); return j; }
 function getWorld(obj){ if(!obj) return null; obj.updateWorldMatrix?.(true,false); return obj.getWorldPosition(new THREE.Vector3()); }
+function controllerGripActive(controller){ return ((controller?.userData?.squeeze || 0) > .25) || ((controller?.userData?.trigger || 0) > .35); }
+function handGripActive(hand){ return !!hand && isPinching(hand); }
+function getGripObjectFromHand(hand){ return getJoint(hand,'wrist') || getJoint(hand,'index-finger-metacarpal') || getJoint(hand,'index-finger-tip') || null; }
+function gripPose(hand, controller, label='right'){
+  if (controllerGripActive(controller)){
+    controller.updateWorldMatrix?.(true,false);
+    return { label, type:'controller', source:controller, object:controller, pos:controller.getWorldPosition(new THREE.Vector3()), quat:controller.getWorldQuaternion(new THREE.Quaternion()) };
+  }
+  if (handGripActive(hand)){
+    const obj = getGripObjectFromHand(hand);
+    if (!obj) return null;
+    obj.updateWorldMatrix?.(true,false);
+    return { label, type:'hand', source:hand, object:obj, pos:obj.getWorldPosition(new THREE.Vector3()), quat:obj.getWorldQuaternion(new THREE.Quaternion()) };
+  }
+  return null;
+}
 function gripActive(rightHand,rightController){
-  const handGrip = rightHand && (isPinching(rightHand) || getJoint(rightHand,'middle-finger-tip'));
-  const controllerGrip = (rightController?.userData?.squeeze || 0) > .25 || (rightController?.userData?.trigger || 0) > .35;
-  return !!controllerGrip || (!!rightHand && isPinching(rightHand));
+  return !!gripPose(rightHand, rightController, 'right');
 }
 
 export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}, scoreCb=()=>{} }={}){
   scene.background = new THREE.Color(0x020406);
   scene.fog = new THREE.FogExp2(0x03080a,0.014);
   scene.userData.SVR_BUILD = BUILD;
-  const root = new THREE.Group(); root.name='SVR_PGA_STANDALONE_RANGE_ROOT_PHASE79_STANDALONE_SCENE'; scene.add(root);
+  const root = new THREE.Group(); root.name='SVR_PGA_STANDALONE_RANGE_ROOT_PHASE92_TWO_HAND_GRIP'; scene.add(root);
   scene.userData.SVR_PGA_STANDALONE_SCENE = true;
   scene.userData.SVR_RANGE_STANCE_MAT_LOCK = { playerStart:{x:0,y:0,z:0.42}, ball:{x:0,y:0.19,z:-1.35}, route:'game/range.html' };
   const tickSky = addRangeMoonMarsSky(root);
@@ -158,7 +173,7 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
   ballArrow.rotation.x=-Math.PI/2; ballArrow.position.set(0,.18,-1.62); root.add(ballArrow);
 
   const targets=[createTarget(root,-18,'100 YD',0x7dff8a,100), createTarget(root,-36,'200 YD',0xffdd55,200), createTarget(root,-56,'300 YD',0xb48cff,300)];
-  const boardTex = makeTextTexture('SVR PGA RANGE','STANDALONE PRIVATE SCENE',['stand on gold mat','ball directly in front','ball tracer â€¢ auto-tee','Lobby button returns to index.html'],'#7dff8a');
+  const boardTex = makeTextTexture('SVR PGA RANGE','PHASE 92 TWO-HAND GRIP',['two hands = shaft vector','lead wrist roll opens/closes face','ball tracer + auto-tee','Lobby button returns to index.html'],'#7dff8a');
   const board = new THREE.Mesh(new THREE.PlaneGeometry(7.8,3.9),new THREE.MeshBasicMaterial({ map:boardTex, side:THREE.DoubleSide })); board.position.set(-7,3,-5.2); board.rotation.y=.45; root.add(board);
 
   const backWall = new THREE.Mesh(new THREE.PlaneGeometry(32,12), new THREE.MeshBasicMaterial({ color:0x050812, transparent:true, opacity:.82, side:THREE.DoubleSide })); backWall.position.set(0,5,-66); root.add(backWall);
@@ -173,6 +188,7 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
   const ballVel = new THREE.Vector3();
   const lastHead = new THREE.Vector3(); const headVel = new THREE.Vector3();
   let tracerOn = true, hitLock=.0, autoTeeTimer=0, shots=0, best=0;
+  let dualGripWasActive = false;
   const trailPts = Array.from({length:80},()=>ballStart.clone());
   const trailGeom = new THREE.BufferGeometry().setFromPoints(trailPts);
   const trail = new THREE.Line(trailGeom, new THREE.LineBasicMaterial({ color:0xb48cff, transparent:true, opacity:.85 })); root.add(trail);
@@ -198,29 +214,75 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
 
   function toggleTracer(){ tracerOn=!tracerOn; trail.visible=tracerOn; return tracerOn; }
 
-  function updateClub(dt,rightHand,rightController){
-    let active = gripActive(rightHand,rightController);
+  function applyDualHandGrip(dt, lead, trail){
+    const shaft = TMP.subVectors(trail.pos, lead.pos);
+    const gripDistance = shaft.length();
+    if (gripDistance < .075) return false;
+    const dir = shaft.normalize();
+    const targetPos = TMP2.copy(lead.pos).addScaledVector(dir, -.045);
+
+    const leadUp = TMP3.set(0,1,0).applyQuaternion(lead.quat).normalize();
+    const trailUp = TMP4.set(0,1,0).applyQuaternion(trail.quat).normalize();
+    CLUB_TARGET.up.copy(leadUp.multiplyScalar(.72).add(trailUp.multiplyScalar(.28)).normalize());
+    CLUB_TARGET.position.copy(targetPos);
+    CLUB_TARGET.lookAt(trail.pos);
+    E.setFromQuaternion(lead.quat, 'XYZ');
+    const wristRoll = THREE.MathUtils.clamp(E.z, -.85, .85);
+    CLUB_TARGET.rotateZ(wristRoll * .55);
+
+    const a = 1 - Math.pow(.0008, Math.max(dt, .001));
+    club.position.lerp(targetPos, a);
+    club.quaternion.slerp(CLUB_TARGET.quaternion, a);
+    club.userData.SVR_PHASE92_DUAL_HAND_GRIP = true;
+    club.userData.SVR_PHASE92_GRIP_DISTANCE = gripDistance;
+    club.userData.SVR_PHASE92_WRIST_ROLL = wristRoll;
+    return true;
+  }
+
+  function updateClub(dt,leftHand,rightHand,leftController,rightController){
+    const rightPose = gripPose(rightHand, rightController, 'right');
+    const leftPose = gripPose(leftHand, leftController, 'left');
+    const dual = !!(leftPose && rightPose);
+    let active = dual || !!rightPose || !!leftPose;
     let anchor = null;
-    if (rightController && ((rightController.userData.squeeze||0)>.25 || (rightController.userData.trigger||0)>.35)) anchor=rightController;
-    else if (rightHand && isPinching(rightHand)) anchor=getJoint(rightHand,'wrist') || getJoint(rightHand,'index-finger-tip');
-    if (anchor){
-      anchor.updateWorldMatrix?.(true,false);
-      anchor.getWorldPosition(club.position);
-      anchor.getWorldQuaternion(club.quaternion);
-      club.rotateX(-0.92);
-      club.translateZ(-.12);
+
+    if (dual){
+      // Right-handed golf default: left hand is the top/lead anchor, right hand trails and controls the shaft line.
+      const ok = applyDualHandGrip(dt, leftPose, rightPose);
+      anchor = rightPose.source || leftPose.source;
+      if (ok && !dualGripWasActive){
+        dualGripWasActive = true;
+        haptic(leftPose.source,.20,32);
+        haptic(rightPose.source,.22,36);
+        statusCb('Two-hand grip locked: clubface follows wrist roll');
+      }
+      leftPose.source.userData.isSqueezing = true;
+      rightPose.source.userData.isSqueezing = true;
     } else {
-      club.position.lerp(clubRest,.12);
-      club.rotation.set(-.55,.18,-.18);
+      dualGripWasActive = false;
+      const pose = rightPose || leftPose;
+      if (pose){
+        anchor = pose.source;
+        club.position.copy(pose.pos);
+        club.quaternion.copy(pose.quat);
+        club.rotateX(-0.92);
+        club.translateZ(-.12);
+        club.userData.SVR_PHASE92_DUAL_HAND_GRIP = false;
+        pose.source.userData.isSqueezing = true;
+      } else {
+        club.position.lerp(clubRest,.12);
+        club.rotation.set(-.55,.18,-.18);
+        club.userData.SVR_PHASE92_DUAL_HAND_GRIP = false;
+      }
     }
+
     const headWorld = getWorld(club.userData.head) || club.position.clone();
     headVel.copy(headWorld).sub(lastHead).multiplyScalar(1/Math.max(dt,.001));
     lastHead.copy(headWorld);
-    return { active, anchor, headWorld, speed:headVel.length() };
+    return { active, anchor, headWorld, speed:headVel.length(), dualGrip: dual };
   }
 
   function desktopSwing(dt){
-    // A simple visible desktop club arc. Mouse button controls backswing; fast movement can still hit.
     const t = performance.now()*.001;
     if (!renderer.xr.isPresenting){
       const p = new THREE.Vector3(.72 + Math.sin(t*1.8)*.18, .82 + Math.abs(Math.sin(t*1.8))*.32, -1.36 + Math.cos(t*1.8)*.28);
@@ -235,13 +297,17 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
     const sweet = THREE.MathUtils.clamp(1 - dist/.55, .15, 1.0);
     const forward = new THREE.Vector3(0,0,-1).applyQuaternion(club.quaternion).normalize();
     if (forward.z > -.1) forward.set(0,0,-1);
+    const faceRoll = THREE.MathUtils.clamp(club.userData.SVR_PHASE92_WRIST_ROLL || 0, -.85, .85);
+    const sideShape = info.dualGrip ? faceRoll * 1.15 : 0;
+    forward.x += sideShape;
+    forward.normalize();
     const power = THREE.MathUtils.clamp(info.speed * 0.78 * sweet, 3.5, 17.5);
     ballVel.copy(forward).multiplyScalar(power);
     ballVel.y = THREE.MathUtils.clamp(power*.32 + sweet*1.4, 1.4, 7.2);
     hitLock=.28; autoTeeTimer=0; shots++;
-    scene.userData.SVR_PGA_LAST_IMPACT = { t: performance.now(), speed: info.speed, ball: ball.position.clone(), head: info.headWorld.clone(), build: 'PHASE-85-PGA-UPDATE-LIVING-RANGE-LOCK' };
+    scene.userData.SVR_PGA_LAST_IMPACT = { t: performance.now(), speed: info.speed, ball: ball.position.clone(), head: info.headWorld.clone(), dualGrip: !!info.dualGrip, faceRoll, build: BUILD };
     haptic(info.anchor,.7,55);
-    statusCb(`Shot ${shots}: ${Math.round(power*12)} yd impulse â€¢ sweet ${Math.round(sweet*100)}% â€¢ stance mat locked`);
+    statusCb(`Shot ${shots}: ${Math.round(power*12)} yd impulse - sweet ${Math.round(sweet*100)}% - ${info.dualGrip ? 'two-hand face control' : 'single-hand swing'}`);
   }
 
   function updateBall(dt){
@@ -259,7 +325,7 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
       if (ball.position.z < -76 || ball.position.y < -2 || ball.position.length()>110){ autoTeeTimer = Math.max(autoTeeTimer,1.1); }
       for(const target of targets){
         if (!target.hit && Math.abs(ball.position.z-target.z)<2.2 && Math.hypot(ball.position.x, ball.position.z-target.z)<target.radius && ball.position.y<1.1){
-          target.hit=true; addFirework(scene,new THREE.Vector3(target.group.position.x,1.05,target.z),target.color); awardLocalPoints(target); statusCb(`Target hit: ${target.label} â€¢ +${target.points} local training points â€¢ no wallet connection`); haptic({userData:{}},.3,30);
+          target.hit=true; addFirework(scene,new THREE.Vector3(target.group.position.x,1.05,target.z),target.color); awardLocalPoints(target); statusCb(`Target hit: ${target.label} - +${target.points} local training points - no wallet connection`); haptic({userData:{}},.3,30);
         }
       }
       if (tracerOn){ trailPts.shift(); trailPts.push(ball.position.clone()); trailGeom.setFromPoints(trailPts); }
@@ -278,9 +344,9 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
     toggleTracer,
     refreshScore: emitScore,
     clearLocalScore(){ writeScore(0); best=0; shots=0; emitScore(); statusCb('Local training score cleared'); },
-    update(dt,{ rightHand=null,rightController=null }={}){
+    update(dt,{ leftHand=null,rightHand=null,leftController=null,rightController=null }={}){
       desktopSwing(dt);
-      const info = updateClub(dt,rightHand,rightController);
+      const info = updateClub(dt,leftHand,rightHand,leftController,rightController);
       applyHit(info);
       updateBall(dt);
       updateFx(dt);
@@ -292,4 +358,3 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
 }
 
 export { BUILD as PHASE77_RANGE_BUILD };
-
