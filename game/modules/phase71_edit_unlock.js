@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const BUILD = "PHASE-75-REIKI-DOMAIN-PURGE-WAITING-APPROVAL";
+const BUILD = "PHASE-76-PRIVATE-SCENE-ROOM-ROUTING-LOCK";
 const STORE_URL = "https://svrpoker.com/site/store.html";
 
 function canvasTexture(w, h, paint){
@@ -106,7 +106,7 @@ function addPortalRing(parent, color = 0x72ffd2){
 function createStoreScene(scene){
   const group = new THREE.Group();
   group.name = 'SVR_PRIVATE_STORE_SCENE_PHASE71';
-  group.position.set(31, 0, 10);
+  group.position.set(120, 0, -120);
   scene.add(group);
 
   const floor = new THREE.Mesh(
@@ -198,7 +198,7 @@ function createLobbyStorePortal(scene){
 function createPrivateReikiScene(scene){
   const group = new THREE.Group();
   group.name = 'SVR_PRIVATE_REIKI_APPROVAL_ROOM_PHASE74';
-  group.position.set(39, 0, -12);
+  group.position.set(-120, 0, -120);
   scene.add(group);
   const floor = new THREE.Mesh(new THREE.BoxGeometry(11, 0.08, 8.5), new THREE.MeshStandardMaterial({ color: 0x17070a, roughness: 0.9, metalness: 0.02, emissive: 0x33030a, emissiveIntensity: 0.18 }));
   floor.position.y = -0.04; group.add(floor);
@@ -217,7 +217,7 @@ function createPrivateReikiScene(scene){
 function createPgaDriveScene(scene){
   const group = new THREE.Group();
   group.name = 'SVR_PRIVATE_PGA_DRIVE_RANGE_PHASE74';
-  group.position.set(42,0,6);
+  group.position.set(120,0,120);
   scene.add(group);
   const floor = new THREE.Mesh(new THREE.BoxGeometry(16,0.08,20), new THREE.MeshStandardMaterial({ color:0x12351b, roughness:0.96, metalness:0.0, emissive:0x061207, emissiveIntensity:0.10 }));
   floor.position.y = -0.04; group.add(floor);
@@ -235,7 +235,7 @@ function createPgaDriveScene(scene){
 function createPgaChipPuttScene(scene){
   const group = new THREE.Group();
   group.name = 'SVR_PRIVATE_PGA_CHIP_PUTT_PHASE74';
-  group.position.set(42,0,28);
+  group.position.set(140,0,120);
   scene.add(group);
   const floor = new THREE.Mesh(new THREE.BoxGeometry(12,0.08,10), new THREE.MeshStandardMaterial({ color:0x18572c, roughness:0.96, metalness:0.0, emissive:0x07190c, emissiveIntensity:0.10 })); floor.position.y=-0.04; group.add(floor);
   const sign = makePanel({ title:'CHIP + PUTT', subtitle:'PRIVATE SHORT GAME ROOM', accent:'#a4ff7a', lines:['separate room from main lobby', 'putting green scaffold', 'future ball scoring and drills', 'watch route locked'], width:4.4, height:1.9 });
@@ -287,7 +287,7 @@ export function applyPhase71EditUnlock({ scene, sceneTargets = {}, log = console
     });
   };
 
-  log?.(`[${BUILD}] applied. Store URL: ${STORE_URL}`);
+  log?.(`[${BUILD}] base portal/store layer applied. Store URL: ${STORE_URL}`);
   return { build: BUILD, storeScene, storePortal, storeUrl: STORE_URL };
 }
 

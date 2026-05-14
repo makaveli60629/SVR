@@ -1473,52 +1473,33 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
 }
 
 function addScorpionRoom(scene, R, wallHeight){
-  const angle = Math.PI * 0.24; // southeast wall area
+  const angle = Math.PI * 0.24; // southeast wall access point only
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
-  const center = new THREE.Vector3(Math.cos(angle) * (R - 4.6), 0, Math.sin(angle) * (R - 4.6));
+  const center = new THREE.Vector3(Math.cos(angle) * (R - 1.05), 0, Math.sin(angle) * (R - 1.05));
 
   const root = new THREE.Group();
+  root.name = 'SVR_SCORPION_LOBBY_PORTAL_ONLY_PHASE76';
   root.position.copy(center);
   root.lookAt(root.position.clone().add(inward));
   scene.add(root);
 
-  const floor = new THREE.Mesh(
-    new THREE.BoxGeometry(9.6, 0.12, 6.0),
-    new THREE.MeshStandardMaterial({ color: 0x120812, roughness: 0.88, metalness: 0.04, emissive: 0x2a0b24, emissiveIntensity: 0.18 })
-  );
-  floor.position.set(0, 0.06, 0);
-  root.add(floor);
-
-  const backWall = new THREE.Mesh(
-    new THREE.BoxGeometry(9.8, 5.7, 0.16),
-    new THREE.MeshStandardMaterial({ color: 0x08070d, roughness: 0.74, metalness: 0.10, emissive: 0x1f0a20, emissiveIntensity: 0.18 })
-  );
-  backWall.position.set(0, 2.85, -2.82);
-  root.add(backWall);
-
-  const leftWall = new THREE.Mesh(
-    new THREE.BoxGeometry(0.16, 5.4, 5.9),
-    new THREE.MeshStandardMaterial({ color: 0x0a0810, roughness: 0.72, metalness: 0.08, emissive: 0x18081c, emissiveIntensity: 0.16 })
-  );
-  leftWall.position.set(-4.84, 2.7, 0);
-  root.add(leftWall);
-  const rightWall = leftWall.clone();
-  rightWall.position.x = 4.84;
-  root.add(rightWall);
-
-  const signTex = canvasTexture(1200, 220, (x,w,h)=>{
+  const signTex = canvasTexture(1200, 520, (x,w,h)=>{
     const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, '#120313');
-    g.addColorStop(1, '#290516');
+    g.addColorStop(0, '#130316');
+    g.addColorStop(1, '#07040d');
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(255,111,181,0.92)';
-    x.lineWidth = 10; x.strokeRect(16,16,w-32,h-32);
+    x.lineWidth = 12; x.strokeRect(22,22,w-44,h-44);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#fff2fb'; x.font = 'bold 86px system-ui, Arial'; x.fillText('SCORPION GAME ROOM', w/2, 100);
-    x.fillStyle = '#ffadd7'; x.font = 'bold 30px system-ui, Arial'; x.fillText('REAL PLAY • TABLE FLOW • PRIVATE ACTION', w/2, 170);
+    x.fillStyle = '#fff2fb'; x.font = 'bold 86px system-ui, Arial'; x.fillText('SCORPION PORTAL', w/2, 126);
+    x.fillStyle = '#ffadd7'; x.font = 'bold 42px system-ui, Arial'; x.fillText('PRIVATE ROOM ROUTE', w/2, 210);
+    x.fillStyle = '#f7f2ff'; x.font = '34px system-ui, Arial';
+    x.fillText('The poker room is no longer built inside the lobby.', w/2, 308);
+    x.fillText('Use this portal/watch route to enter the enclosed scene.', w/2, 366);
+    x.fillStyle = 'rgba(255,255,255,0.62)'; x.font = '24px ui-monospace, monospace'; x.fillText('PHASE-76-PRIVATE-SCENE-ROOM-ROUTING-LOCK', w/2, 452);
   });
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 1.10), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
-  sign.position.set(0, 5.14, -2.72);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.25), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
+  sign.position.set(0, 2.25, 0.08);
   root.add(sign);
 
   const portalTex = canvasTexture(1024, 1024, (x,w,h)=>{
@@ -1530,39 +1511,24 @@ function addScorpionRoom(scene, R, wallHeight){
     x.fillStyle = g; x.fillRect(0,0,w,h);
   });
   const portal = new THREE.Mesh(
-    new THREE.RingGeometry(0.72, 1.16, 64),
+    new THREE.RingGeometry(0.78, 1.22, 72),
     new THREE.MeshBasicMaterial({ map: portalTex, color: 0xffffff, transparent: true, side: THREE.DoubleSide, depthWrite: false })
   );
   portal.rotation.x = -Math.PI * 0.5;
-  portal.position.set(0, 0.03, 1.7);
+  portal.position.set(0, 0.035, 1.35);
   root.add(portal);
 
-  const boardTex = canvasTexture(900, 720, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0,'#0b0d17');
-    g.addColorStop(1,'#1c0721');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(214,132,255,0.92)';
-    x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
-    x.fillStyle = '#fdf5ff'; x.font = 'bold 60px system-ui, Arial'; x.fillText('SCORPION ACCESS', 44, 92);
-    x.fillStyle = '#ffc4eb'; x.font = '36px system-ui, Arial'; 
-    let y = 180;
-    ['Fast jump from watch', 'Fist near face toggles teleport', 'Reserved for real play flow', 'Modular room for future game scene'].forEach(line=>{ x.fillText('• ' + line, 54, y); y += 92; });
-  });
-  const board = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.56), new THREE.MeshBasicMaterial({ map: boardTex, transparent: true, side: THREE.DoubleSide }));
-  board.position.set(-2.34, 2.1, -2.68);
-  root.add(board);
-
-  const lightA = new THREE.PointLight(0xff7fd0, 1.4, 18, 2.0);
-  lightA.position.set(0, 3.8, 1.2);
+  const lightA = new THREE.PointLight(0xff7fd0, 1.2, 12, 2.0);
+  lightA.position.set(0, 2.7, 1.0);
   root.add(lightA);
 
   return {
     root,
-    target: center.clone().add(inward.clone().multiplyScalar(2.0)).setY(0),
+    target: center.clone().add(inward.clone().multiplyScalar(2.2)).setY(0),
     look: center.clone().setY(1.6)
   };
 }
+
 
 function buildOuterCity(scene, R){
   const group = new THREE.Group();

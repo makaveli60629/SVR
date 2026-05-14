@@ -8,6 +8,7 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyPhase71EditUnlock, PHASE71_BUILD, PHASE71_STORE_URL } from "./modules/phase71_edit_unlock.js";
+import { applyPhase76PrivateSceneLock, PHASE76_BUILD } from "./modules/phase76_private_scene_lock.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -74,6 +75,7 @@ setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 applyPhase71EditUnlock({ scene, sceneTargets, log });
+applyPhase76PrivateSceneLock({ scene, sceneTargets, log });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -203,6 +205,7 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit7") gotoScene("legends");
   if (e.code === "Digit8") gotoScene("sponsor");
   if (e.code === "Digit9") gotoScene("scorpion");
+  if (e.code === "KeyB") gotoScene("smoker");
   if (e.code === "KeyR") gotoScene("reikiRoom");
   if (e.code === "Digit0") gotoScene("storeScene");
   if (e.code === "KeyO") window.open(PHASE71_STORE_URL, "_blank", "noopener,noreferrer");
@@ -237,6 +240,7 @@ const watch = createWristWatch({
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
+    goSmoker: ()=>gotoScene("smoker"),
     goReikiRoom: ()=>gotoScene("reikiRoom"),
     goStore: ()=>gotoScene("store"),
     goStoreScene: ()=>gotoScene("storeScene"),
@@ -253,7 +257,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : `${PHASE71_BUILD} ready. Reiki domain purge, waiting-approval placeholders, store portal, private scenes, and teleport controls updated.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `${PHASE76_BUILD} ready. Fresh private rooms locked for Reiki, PGA Drive, Chip/Putt, Smoker Lounge, and Scorpion. Lobby preserved.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

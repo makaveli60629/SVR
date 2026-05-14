@@ -1,8 +1,15 @@
 {
-  "build": "PHASE-75-REIKI-DOMAIN-PURGE-WAITING-APPROVAL",
-  "phase": 75,
-  "scope": "game-only: remove AWAITING APPROVAL/third-party Reiki domain/branding, show waiting for approval, preserve lobby, store portal, controller/hand teleport routing",
+  "build": "PHASE-76-PRIVATE-SCENE-ROOM-ROUTING-LOCK",
+  "phase": 76,
+  "scope": "game-only: keep original lobby, move Reiki/PGA/Smoker/Scorpion experiences to fresh private rooms/routes, preserve store portal and teleport controls",
   "siteTouched": false,
   "storeUrl": "https://svrpoker.com/site/store.html",
+  "privateScenes": [
+    "reikiRoom",
+    "pgaDrive",
+    "pgaChipPutt",
+    "smoker",
+    "scorpion"
+  ],
   "updatedAt": "2026-05-14"
 }
