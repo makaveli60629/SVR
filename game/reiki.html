@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>SVR Poker • Reiki Room • Phase 80</title>
+  <meta name="theme-color" content="#050508"/>
+  <style>
+    html,body{height:100%;margin:0;background:#020004;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff}
+    #app{position:fixed;inset:0} canvas{display:block;width:100%;height:100%;outline:none;background:#020004}
+    #hud{position:fixed;left:12px;right:12px;top:12px;z-index:10;display:flex;justify-content:space-between;align-items:center;gap:10px;pointer-events:none}
+    .pill{background:rgba(0,0,0,.62);border:1px solid rgba(180,140,255,.36);backdrop-filter:blur(8px);border-radius:999px;padding:8px 12px;color:#e9e9ff;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+    .btn{pointer-events:auto;border:1px solid rgba(120,255,186,.42);background:rgba(2,10,8,.70);color:#eafff4;border-radius:999px;padding:8px 12px;cursor:pointer;font-size:12px}
+    #bottom{position:fixed;left:12px;right:12px;bottom:12px;z-index:10;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  </style>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="hud"><span class="pill">BUILD: PHASE-80-REIKI-APPROVAL-PRIVATE-SCENE-LOCK</span><span class="pill">Private Reiki Room • SVR placeholder only</span></div>
+  <div id="bottom"><button class="btn" id="backLobby">Return to Lobby</button><button class="btn" id="resetView">Reset View</button></div>
+  <script type="module">
+    import * as THREE from 'three';
+    import { VRButton } from 'three/addons/webxr/VRButton.js';
+    const app=document.getElementById('app');
+    const scene=new THREE.Scene();
+    scene.background=new THREE.Color(0x020004);
+    scene.fog=new THREE.FogExp2(0x05020b,0.025);
+    const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.01,320);
+    camera.position.set(0,1.62,7.2);
+    const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
+    renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.45));
+    renderer.setSize(innerWidth,innerHeight); renderer.xr.enabled=true; app.appendChild(renderer.domElement); document.body.appendChild(VRButton.createButton(renderer));
+    const rig=new THREE.Group(); rig.add(camera); scene.add(rig);
+    const hemi=new THREE.HemisphereLight(0xbffff2,0x180026,1.35); scene.add(hemi);
+    const key=new THREE.DirectionalLight(0xffffff,1.8); key.position.set(-4,8,6); scene.add(key);
+    const fill=new THREE.PointLight(0x70ffd6,2.2,18,2); fill.position.set(0,3.2,0); scene.add(fill);
+    const matGround=new THREE.MeshStandardMaterial({color:0x05090d,roughness:.94,metalness:.04,emissive:0x050b12,emissiveIntensity:.3});
+    const ground=new THREE.Mesh(new THREE.CircleGeometry(24,96),matGround); ground.rotation.x=-Math.PI/2; scene.add(ground);
+    const path=new THREE.Mesh(new THREE.PlaneGeometry(3.4,12),new THREE.MeshStandardMaterial({color:0x8d1024,roughness:.9,emissive:0x380514,emissiveIntensity:.25,side:THREE.DoubleSide})); path.rotation.x=-Math.PI/2; path.position.z=1.8; path.position.y=.004; scene.add(path);
+    const ringMat=new THREE.MeshBasicMaterial({color:0x76ffd8,transparent:true,opacity:.55,side:THREE.DoubleSide});
+    for(let i=0;i<5;i++){const r=new THREE.Mesh(new THREE.RingGeometry(1.35+i*.42,1.39+i*.42,96),ringMat); r.rotation.x=-Math.PI/2; r.position.y=.02+i*.003; scene.add(r);}
+    const orb=new THREE.Mesh(new THREE.SphereGeometry(.72,48,32),new THREE.MeshStandardMaterial({color:0xafffe9,emissive:0x39ffc3,emissiveIntensity:1.6,roughness:.35,transparent:true,opacity:.78})); orb.position.set(0,1.42,0); scene.add(orb);
+    const orbHalo=new THREE.Sprite(new THREE.SpriteMaterial({color:0x58ffd8,map:(()=>{const c=document.createElement('canvas'); c.width=c.height=128; const x=c.getContext('2d'); const g=x.createRadialGradient(64,64,4,64,64,62); g.addColorStop(0,'rgba(255,255,255,.9)'); g.addColorStop(.45,'rgba(92,255,210,.35)'); g.addColorStop(1,'rgba(92,255,210,0)'); x.fillStyle=g; x.fillRect(0,0,128,128); const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;})(),transparent:true,opacity:.75,depthWrite:false,blending:THREE.AdditiveBlending})); orbHalo.scale.set(4.8,4.8,1); orbHalo.position.copy(orb.position); scene.add(orbHalo);
+    function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');draw(x,w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.needsUpdate=true;return t;}
+    function panelTexture(title,sub,lines=[],danger=false){return canvasTex(1200,760,(x,w,h)=>{const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,danger?'#25030a':'#061617');g.addColorStop(1,'#080811');x.fillStyle=g;x.fillRect(0,0,w,h);x.strokeStyle=danger?'rgba(255,70,95,.92)':'rgba(124,255,226,.85)';x.lineWidth=10;x.strokeRect(18,18,w-36,h-36);x.textAlign='center';x.fillStyle='#fff';x.font='bold 72px system-ui,Arial';x.fillText(title,w/2,118);x.fillStyle=danger?'#ff8aa0':'#9cffdc';x.font='bold 38px system-ui,Arial';x.fillText(sub,w/2,184);x.textAlign='left';x.fillStyle='#eafff7';x.font='34px system-ui,Arial';let y=278;for(const l of lines){x.fillText('• '+l,90,y);y+=58;}})}
+    const panels=[[-4.2,2.55,-4.8,panelTexture('REIKI ROOM','PRIVATE MEDITATION SCENE',['Calm reset area','Breathing orb','Moon and Mars visible','Return portal at entry'])],[0,2.55,-5.05,panelTexture('SVR PLACEHOLDER','AWAITING APPROVAL',['No unapproved sponsor names','No outside websites','No founder photo','SVR branding only'],true)],[4.2,2.55,-4.8,panelTexture('APPROVAL LOCK','BRANDING DISABLED',['Reiki partner module removable','Sponsor assets off by default','Private room stays separate','Lobby remains unchanged'],true)]];
+    for(const [x,y,z,tex] of panels){const p=new THREE.Mesh(new THREE.PlaneGeometry(3.6,2.28),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));p.position.set(x,y,z);scene.add(p)}
+    const treeMat=new THREE.MeshStandardMaterial({color:0x09251a,roughness:.96,emissive:0x03110b,emissiveIntensity:.25}); const trunkMat=new THREE.MeshStandardMaterial({color:0x26140d,roughness:.9});
+    for(let i=0;i<34;i++){const a=i/34*Math.PI*2; const r=8+Math.random()*9; const x=Math.cos(a)*r; const z=Math.sin(a)*r-1; const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.09,.15,1.6,8),trunkMat); trunk.position.set(x,.8,z); scene.add(trunk); const crown=new THREE.Mesh(new THREE.ConeGeometry(.8+Math.random()*.35,2.3+Math.random()*.9,10),treeMat); crown.position.set(x,2.2,z); scene.add(crown);}
+    const starTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');const g=x.createRadialGradient(32,32,1,32,32,30);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.45,'rgba(210,230,255,.35)');g.addColorStop(1,'rgba(210,230,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t})();
+    for(let i=0;i<160;i++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:starTex,color:0xffffff,transparent:true,opacity:.35+Math.random()*.45,depthWrite:false})); const a=Math.random()*Math.PI*2; const r=30+Math.random()*90; s.position.set(Math.cos(a)*r,12+Math.random()*52,Math.sin(a)*r); s.scale.setScalar(.14+Math.random()*.28); scene.add(s)}
+    const moon=new THREE.Mesh(new THREE.SphereGeometry(2.3,48,32),new THREE.MeshStandardMaterial({color:0xdfe8ff,emissive:0x33406a,emissiveIntensity:.34,roughness:.85})); moon.position.set(-14,19,-34); scene.add(moon);
+    const mars=new THREE.Mesh(new THREE.SphereGeometry(1.05,36,24),new THREE.MeshStandardMaterial({color:0xff8056,emissive:0x5a1b0c,emissiveIntensity:.45,roughness:.8})); mars.position.set(-9,17,-31); scene.add(mars);
+    const backTex=panelTexture('RETURN TO LOBBY','Portal Route',['Click button below','or use browser back','Reiki private scene remains separate']);
+    const backPanel=new THREE.Mesh(new THREE.PlaneGeometry(3.0,1.9),new THREE.MeshBasicMaterial({map:backTex,side:THREE.DoubleSide})); backPanel.position.set(0,1.9,5.3); backPanel.rotation.y=Math.PI; scene.add(backPanel);
+    function resetView(){rig.position.set(0,0,0);camera.position.set(0,1.62,7.2);camera.lookAt(0,1.2,0)}
+    document.getElementById('backLobby').onclick=()=>{location.href='./index.html?v=phase80-reiki-return'}; document.getElementById('resetView').onclick=resetView;
+    addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+    let t0=performance.now(); renderer.setAnimationLoop(()=>{const t=performance.now()*.001; orb.scale.setScalar(1+Math.sin(t*1.2)*.04); orbHalo.scale.setScalar(4.8+Math.sin(t*1.2)*.18); moon.rotation.y+=.0007; mars.rotation.y+=.0015; renderer.render(scene,camera)});
+  </script>
+</body>
+</html>

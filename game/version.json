@@ -1,7 +1,0 @@
-{
-  "build": "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK",
-  "phase": 80,
-  "siteTouched": false,
-  "range": "game/range.html",
-  "pgaTargetBounty": "local score only"
-}

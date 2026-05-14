@@ -152,19 +152,12 @@ function buildButtons(state){
     { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'reikiRoomScene', label: 'REIKI RM', x: 154, y: 198, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaScene', label: 'PGA', x: 284, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaDriveScene', label: 'RANGE', x: 414, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'legendScene', label: 'LEGEND', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
 
-    { id: 'pgaChipScene', label: 'CHIP', x: 24, y: 250, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'smokerScene', label: 'SMOKER', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'scorpionScene', label: 'SCORPION', x: 284, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'legendScene', label: 'LEGEND', x: 414, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-
-    { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 302, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'storeScene', label: 'STORE', x: 154, y: 302, w: 118, h: 42, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'storeRoomScene', label: 'STORE RM', x: 284, y: 302, w: 118, h: 42, font: 15, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'openStore', label: 'WEB', x: 414, y: 302, w: 118, h: 42, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'reikiRoomScene', label: 'REIKI RM', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
     { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
@@ -235,7 +228,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • PGA Range opens standalone • private rooms preserved', 36, 332);
+    ctx.fillText('Quick scenes • Reiki / Reiki Room / PGA / Sponsor • pinch with other hand • hold aim then release TP', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -278,16 +271,10 @@ let hoveredId = null;
     if (id === 'seatScene') actions.goSeat?.();
     if (id === 'reikiScene') actions.goReiki?.();
     if (id === 'pgaScene') actions.goPga?.();
-    if (id === 'pgaDriveScene') actions.goPgaDrive?.();
-    if (id === 'pgaChipScene') actions.goPgaChipPutt?.();
     if (id === 'legendScene') actions.goLegend?.();
     if (id === 'sponsorScene') actions.goSponsor?.();
-    if (id === 'smokerScene') actions.goSmoker?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
     if (id === 'reikiRoomScene') actions.goReikiRoom?.();
-    if (id === 'storeScene') actions.goStore?.();
-    if (id === 'storeRoomScene') actions.goStoreScene?.();
-    if (id === 'openStore') actions.openStore?.();
   }
 
   function update(dt, leftHand, rightHand){

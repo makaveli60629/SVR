@@ -1,10 +1,6 @@
 {
-  "build": "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK",
-  "phase": 80,
-  "scope": "game-only PGA target bounty local score lock",
+  "build": "PHASE-80-REIKI-APPROVAL-PRIVATE-SCENE-LOCK",
   "siteTouched": false,
-  "pgaDriveScene": "game/range.html",
-  "pgaDriveAlias": "game/pga-drive.html",
-  "walletConnected": false,
-  "scoreStorage": "localStorage:svr_pga_range_training_points_v1"
+  "target": "update/game.zip",
+  "phase": "Phase 80 \u2014 Reiki Approval Private Scene Lock"
 }

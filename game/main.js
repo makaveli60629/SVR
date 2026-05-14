@@ -7,9 +7,6 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { applyPhase71EditUnlock, PHASE71_BUILD, PHASE71_STORE_URL } from "./modules/phase71_edit_unlock.js";
-import { applyPhase76PrivateSceneLock } from "./modules/phase76_private_scene_lock.js";
-import { PHASE77_BUILD, PHASE77_RANGE_URL, openPhase77Range } from "./modules/phase77_range_route_lock.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -75,23 +72,13 @@ const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: ren
 setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
-applyPhase71EditUnlock({ scene, sceneTargets, log });
-applyPhase76PrivateSceneLock({ scene, sceneTargets, log });
-window.SVR_RANGE_URL = PHASE77_RANGE_URL;
-scene.userData.SVR_BUILD = PHASE77_BUILD;
-window.SVR_SKY_CONTINUITY_LOCK = true;
-window.SVR_PGA_DRIVE_STANDALONE_SCENE_LOCK = "game/range.html";
-window.SVR_PGA_RANGE_STANCE_MAT_LOCK = true;
-window.SVR_PGA_TARGET_BOUNTY_LOCAL_SCORE_LOCK = true;
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
 const audio = createAudioPlaylist({
   tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" },
-    { title: "Reiki Time Hub", url: "./assets/audio/reiki_time_hub.mp3" },
-    { title: "SVR After Dark", url: "./assets/audio/svr_after_dark.mp3" }
+    { title: "Lobby 07", url: "./assets/audio/07.mp3" }
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
@@ -180,6 +167,10 @@ function movePlayerToSpot(target, lookTarget = null){
 }
 
 function gotoScene(key){
+  if (key === "reikiRoom"){
+    window.location.href = "./reiki.html?v=phase80-reiki-approval-private-scene-lock";
+    return true;
+  }
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
@@ -189,8 +180,6 @@ function gotoScene(key){
 
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
-    if (btn.dataset.openStore){ window.open(PHASE71_STORE_URL, "_blank", "noopener,noreferrer"); return; }
-    if (btn.dataset.openRange){ openPhase77Range(); return; }
     const key = btn.dataset.scene;
     if (key) gotoScene(key);
   });
@@ -208,15 +197,10 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit3") gotoScene("seat");
   if (e.code === "Digit4") gotoScene("reiki");
   if (e.code === "Digit5") gotoScene("pga");
-  if (e.code === "Digit6") openPhase77Range();
-  if (e.code === "KeyC") gotoScene("pgaChipPutt");
-  if (e.code === "Digit7") gotoScene("legends");
-  if (e.code === "Digit8") gotoScene("sponsor");
-  if (e.code === "Digit9") gotoScene("scorpion");
-  if (e.code === "KeyB") gotoScene("smoker");
-  if (e.code === "KeyR") gotoScene("reikiRoom");
-  if (e.code === "Digit0") gotoScene("storeScene");
-  if (e.code === "KeyO") window.open(PHASE71_STORE_URL, "_blank", "noopener,noreferrer");
+  if (e.code === "Digit6") gotoScene("legends");
+  if (e.code === "Digit7") gotoScene("sponsor");
+  if (e.code === "Digit8") gotoScene("scorpion");
+  if (e.code === "Digit9") gotoScene("reikiRoom");
 });
 
 const watch = createWristWatch({
@@ -243,16 +227,10 @@ const watch = createWristWatch({
     goSeat: ()=>gotoScene("seat"),
     goReiki: ()=>gotoScene("reiki"),
     goPga: ()=>gotoScene("pga"),
-    goPgaDrive: ()=>openPhase77Range(),
-    goPgaChipPutt: ()=>gotoScene("pgaChipPutt"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
-    goSmoker: ()=>gotoScene("smoker"),
-    goReikiRoom: ()=>gotoScene("reikiRoom"),
-    goStore: ()=>gotoScene("store"),
-    goStoreScene: ()=>gotoScene("storeScene"),
-    openStore: ()=>window.open(PHASE71_STORE_URL, "_blank", "noopener,noreferrer")
+    goReikiRoom: ()=>gotoScene("reikiRoom")
   }
 });
 
@@ -265,7 +243,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : `${PHASE77_BUILD} ready. PGA Drive opens standalone range.html. Stand on gold mat, aim at the ball, and earn local training points. Lobby preserved.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion. Reiki Room opens as private scene.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -326,7 +304,6 @@ renderer.setAnimationLoop(()=>{
   }
 
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
-  if (scene.userData._phase78PrivateSkyTick) scene.userData._phase78PrivateSkyTick(scene.userData._time || now * 0.001);
 
   hands.update(dt);
   hands.updateDebug();

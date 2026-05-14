@@ -1,3 +1,7 @@
-# PHASE_91_REIKI_PORTAL_LOCK (Superseded)
+# Phase 91 Reiki portal lock
 
-Superseded by PHASE-75-REIKI-DOMAIN-PURGE-WAITING-APPROVAL. Unapproved Reiki sponsor/founder branding is disabled and replaced by red AWAITING APPROVAL placeholders.
+- Rebuilt the Reiki front with a premium storefront pass inspired by the provided reference image.
+- Added SVR APPROVAL text on the front glass.
+- Added warm interior display lighting.
+- Added a step-to-enter portal pad in front of the Reiki door.
+- Added a dedicated Reiki room destination with a return-to-lobby pad.

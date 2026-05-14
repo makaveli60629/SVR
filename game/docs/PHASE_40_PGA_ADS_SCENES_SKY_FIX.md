@@ -1,3 +1,10 @@
-# PHASE_40_PGA_ADS_SCENES_SKY_FIX (Superseded)
+PHASE 40 PGA / ADS / SCENES / SKY FIX
 
-Superseded by PHASE-75-REIKI-DOMAIN-PURGE-WAITING-APPROVAL. Unapproved Reiki sponsor/founder branding is disabled and replaced by red AWAITING APPROVAL placeholders.
+Changes:
+- Rebuilt PGA storefront layout for better wall alignment, larger text, and no logo overlap on portrait.
+- Added desktop scene buttons for Lobby, Table, Seat, Reiki, Reiki Room, PGA, Legend, Sponsor, and Scorpion.
+- Added SVR approval green-neon ad billboard using uploaded Instagram screenshot.
+- Increased city building scale and billboard coverage to support visible ads around the lobby.
+- Raised Moon and Mars higher and farther behind the skyline.
+- Increased star field depth and density.
+- Preserved lobby music and existing scene/watch quick-jumps.
