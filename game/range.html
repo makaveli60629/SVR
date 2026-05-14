@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR PGA Driving Range • Phase 83 Direct Scene Route Verify Lock</title>
+  <title>SVR PGA Driving Range â€¢ Phase 83 Direct Scene Route Verify Lock</title>
   <meta name="theme-color" content="#050508"/>
   <style>
     :root{color-scheme:dark} html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif} #app{position:fixed;inset:0} canvas{display:block;width:100%;height:100%;outline:none;background:#000}
@@ -15,8 +15,8 @@
 <body>
   <div id="app"></div>
   <div id="hud">
-    <div class="pill" id="status">Loading PGA range…</div>
-    <div class="pill" id="score">Training Points: 0 • Best Target: 0</div>
+    <div class="pill" id="status">Loading PGA rangeâ€¦</div>
+    <div class="pill" id="score">Training Points: 0 â€¢ Best Target: 0</div>
     <div style="display:flex;gap:8px;align-items:center">
       <button class="btn" id="lobbyBtn">Lobby</button>
       <button class="btn" id="resetBtn">Reset Ball</button>
@@ -31,6 +31,7 @@
     import { createHands } from './modules/hands.js';
     import { createWristWatch } from './modules/watch.js';
     import { createRangeExperience } from './modules/range_logic.js';
+    import { createPhase85PgaUpdate, PHASE85_BUILD } from './modules/pga_phase85_update.js';
     import { PHASE77_BUILD } from './modules/phase77_range_route_lock.js';
 
     const status = document.getElementById('status');
@@ -44,7 +45,7 @@
     const range = createRangeExperience({
       scene, camera, renderer,
       statusCb:(txt)=>{ status.textContent = txt; },
-      scoreCb:(state)=>{ score.textContent = `Training Points: ${state.points} • Best Target: ${state.bestTarget} • Shots: ${state.shots}`; }
+      scoreCb:(state)=>{ score.textContent = `Training Points: ${state.points} â€¢ Best Target: ${state.bestTarget} â€¢ Shots: ${state.shots}`; }
     });
     const watch = createWristWatch({
       scene, camera, renderer,
@@ -72,11 +73,13 @@
       const leftHand=hands.getLeftHand(), rightHand=hands.getRightHand();
       const leftController=hands.getLeftController(), rightController=hands.getRightController();
       range.update(dt,{ leftHand,rightHand,leftController,rightController });
+      phase85Pga?.update?.(dt);
       watch.update(dt,leftHand||leftController,rightHand||rightController);
       renderer.render(scene,camera);
     });
-    status.textContent = `${PHASE77_BUILD} ready • standalone PGA range • local target bounty active`;
+    status.textContent = `${PHASE77_BUILD} ready â€¢ standalone PGA range â€¢ local target bounty active`;
     range.refreshScore?.();
   </script>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
 const BUILD = "PHASE-80-PGA-TARGET-BOUNTY-LOCAL-SCORE-LOCK";
@@ -158,15 +158,16 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
   ballArrow.rotation.x=-Math.PI/2; ballArrow.position.set(0,.18,-1.62); root.add(ballArrow);
 
   const targets=[createTarget(root,-18,'100 YD',0x7dff8a,100), createTarget(root,-36,'200 YD',0xffdd55,200), createTarget(root,-56,'300 YD',0xb48cff,300)];
-  const boardTex = makeTextTexture('SVR PGA RANGE','STANDALONE PRIVATE SCENE',['stand on gold mat','ball directly in front','ball tracer • auto-tee','Lobby button returns to index.html'],'#7dff8a');
+  const boardTex = makeTextTexture('SVR PGA RANGE','STANDALONE PRIVATE SCENE',['stand on gold mat','ball directly in front','ball tracer â€¢ auto-tee','Lobby button returns to index.html'],'#7dff8a');
   const board = new THREE.Mesh(new THREE.PlaneGeometry(7.8,3.9),new THREE.MeshBasicMaterial({ map:boardTex, side:THREE.DoubleSide })); board.position.set(-7,3,-5.2); board.rotation.y=.45; root.add(board);
 
   const backWall = new THREE.Mesh(new THREE.PlaneGeometry(32,12), new THREE.MeshBasicMaterial({ color:0x050812, transparent:true, opacity:.82, side:THREE.DoubleSide })); backWall.position.set(0,5,-66); root.add(backWall);
   for(let i=0;i<140;i++){ const star=new THREE.Mesh(new THREE.SphereGeometry(.022+Math.random()*.035,6,6), new THREE.MeshBasicMaterial({ color: Math.random()<.75?0xb48cff:0x7dff8a, transparent:true, opacity:.55+Math.random()*.4 })); star.position.set((Math.random()-.5)*42,2+Math.random()*10,-18-Math.random()*50); root.add(star); }
 
   const ballMat = new THREE.MeshStandardMaterial({ color:0xffffff, roughness:.38, metalness:.04, emissive:0x091a12, emissiveIntensity:.08 });
-  const ball = new THREE.Mesh(new THREE.SphereGeometry(.135,32,16), ballMat); root.add(ball);
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(.135,32,16), ballMat); ball.name = 'svr-pga-ball'; root.add(ball);
   const club = makeClub(); root.add(club);
+  scene.userData.SVR_PGA_RANGE_REFS = { ball, club, root, targets };
   const clubRest = new THREE.Vector3(1.05,.92,-0.45);
   const ballStart = new THREE.Vector3(0,.19,-1.35);
   const ballVel = new THREE.Vector3();
@@ -238,8 +239,9 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
     ballVel.copy(forward).multiplyScalar(power);
     ballVel.y = THREE.MathUtils.clamp(power*.32 + sweet*1.4, 1.4, 7.2);
     hitLock=.28; autoTeeTimer=0; shots++;
+    scene.userData.SVR_PGA_LAST_IMPACT = { t: performance.now(), speed: info.speed, ball: ball.position.clone(), head: info.headWorld.clone(), build: 'PHASE-85-PGA-UPDATE-LIVING-RANGE-LOCK' };
     haptic(info.anchor,.7,55);
-    statusCb(`Shot ${shots}: ${Math.round(power*12)} yd impulse • sweet ${Math.round(sweet*100)}% • stance mat locked`);
+    statusCb(`Shot ${shots}: ${Math.round(power*12)} yd impulse â€¢ sweet ${Math.round(sweet*100)}% â€¢ stance mat locked`);
   }
 
   function updateBall(dt){
@@ -257,7 +259,7 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
       if (ball.position.z < -76 || ball.position.y < -2 || ball.position.length()>110){ autoTeeTimer = Math.max(autoTeeTimer,1.1); }
       for(const target of targets){
         if (!target.hit && Math.abs(ball.position.z-target.z)<2.2 && Math.hypot(ball.position.x, ball.position.z-target.z)<target.radius && ball.position.y<1.1){
-          target.hit=true; addFirework(scene,new THREE.Vector3(target.group.position.x,1.05,target.z),target.color); awardLocalPoints(target); statusCb(`Target hit: ${target.label} • +${target.points} local training points • no wallet connection`); haptic({userData:{}},.3,30);
+          target.hit=true; addFirework(scene,new THREE.Vector3(target.group.position.x,1.05,target.z),target.color); awardLocalPoints(target); statusCb(`Target hit: ${target.label} â€¢ +${target.points} local training points â€¢ no wallet connection`); haptic({userData:{}},.3,30);
         }
       }
       if (tracerOn){ trailPts.shift(); trailPts.push(ball.position.clone()); trailGeom.setFromPoints(trailPts); }
@@ -290,3 +292,4 @@ export function createRangeExperience({ scene, camera, renderer, statusCb=()=>{}
 }
 
 export { BUILD as PHASE77_RANGE_BUILD };
+

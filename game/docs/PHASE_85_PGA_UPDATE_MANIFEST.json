@@ -1,0 +1,17 @@
+{
+  "build": "PHASE-85-PGA-UPDATE-LIVING-RANGE-LOCK",
+  "version": "4.0.85",
+  "scope": "game-side PGA update only",
+  "siteTouched": false,
+  "lobbyReplaced": false,
+  "runtime": "modular Three.js/WebXR; no A-Frame rewrite",
+  "input": "Meta hands first with Quest/Oculus controller fallback preserved",
+  "features": [
+    "Caddie Coach drone",
+    "Manual Day/Night toggle",
+    "Face-to-ball guide",
+    "Slow-grow divots",
+    "Reactive birds",
+    "Precision target ring"
+  ]
+}
