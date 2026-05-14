@@ -1,0 +1,26 @@
+{
+  "package": "SVR_SITE_PHASE03_FINAL_POLISH_LOCK",
+  "created_utc": "2026-05-14T04:59:24.214068+00:00",
+  "scope": [
+    "site/index.html",
+    "site/docs/PHASE_03_FINAL_POLISH_LOCK.md",
+    "site/docs/SITE_QA_CHECKLIST.md",
+    "site/docs/PHASE_03_FINAL_POLISH_MANIFEST.json"
+  ],
+  "protected": [
+    "index.html",
+    "matrix.js",
+    "style.css",
+    "launch.css",
+    "logo files",
+    "game/"
+  ],
+  "changes": [
+    "Add Open Store hero button",
+    "Add compact trust/status strip",
+    "Polish meta description",
+    "Add final lock docs",
+    "Add QA checklist"
+  ],
+  "payment_status": "Stripe sandbox only; live checkout disabled"
+}
