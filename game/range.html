@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR PGA Driving Range - Phase 87 Black Screen Guard</title>
+  <title>SVR PGA Driving Range - Phase 88 Club Bag Alignment Lock</title>
   <meta name="theme-color" content="#050508"/>
   <style>
     :root{color-scheme:dark}
@@ -13,7 +13,7 @@
     #hud{position:fixed;left:12px;right:12px;top:12px;z-index:10;display:flex;gap:10px;align-items:center;justify-content:space-between;pointer-events:none}
     .pill{background:rgba(0,0,0,.58);border:1px solid rgba(125,255,138,.42);backdrop-filter:blur(8px);border-radius:999px;padding:8px 12px;color:#effff1;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);pointer-events:none}
     .btn{pointer-events:auto;border:1px solid rgba(125,255,138,.48);background:rgba(2,20,9,.68);color:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;user-select:none}.btn:hover{background:rgba(16,80,34,.75)}
-    #help{position:fixed;left:12px;bottom:12px;z-index:10;max-width:min(850px,calc(100vw - 24px));background:rgba(0,0,0,.56);border:1px solid rgba(125,255,138,.3);border-radius:16px;color:#dfffe7;padding:10px 12px;font-size:12px;line-height:1.35;pointer-events:none}.hot{color:#c4ff67;font-weight:800}.warn{color:#ff77aa;font-weight:800}
+    #help{position:fixed;left:12px;bottom:12px;z-index:10;max-width:min(900px,calc(100vw - 24px));background:rgba(0,0,0,.56);border:1px solid rgba(125,255,138,.3);border-radius:16px;color:#dfffe7;padding:10px 12px;font-size:12px;line-height:1.35;pointer-events:none}.hot{color:#c4ff67;font-weight:800}.warn{color:#ff77aa;font-weight:800}
     #err{position:fixed;left:12px;right:12px;bottom:92px;display:none;z-index:99;background:rgba(80,0,18,.90);border:1px solid rgba(255,100,130,.75);border-radius:14px;color:#fff;padding:12px;overflow:auto;max-height:35vh;white-space:pre-wrap;font:12px/1.42 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -27,10 +27,10 @@
       <button class="btn" id="lobbyBtn">Lobby</button>
       <button class="btn" id="resetBtn">Reset Ball</button>
       <button class="btn" id="tracerBtn">Tracer On</button>
-      <span class="pill">BUILD: PHASE-87-PGA-BLACK-SCREEN-GUARD</span>
+      <span class="pill">BUILD: PHASE-88-PGA-CLUB-BAG-ALIGNMENT-LOCK</span>
     </div>
   </div>
-  <div id="help"><span class="hot">PGA Range:</span> hard black-screen guard active. Forced light, fallback sky, fallback tee, and safe render loop are active. <span class="hot">Y = Day/Night.</span> <span class="warn">Lobby is separate.</span> Use R reset, T tracer, L lobby.</div>
+  <div id="help"><span class="hot">PGA Range:</span> Club Bag + Tee Alignment lock active. Driver is default. Press <span class="hot">1 Driver</span>, <span class="hot">2 Iron</span>, <span class="hot">3 Putter</span>. <span class="hot">Y = Day/Night.</span> <span class="warn">Lobby is separate.</span> Use R reset, T tracer, L lobby.</div>
   <pre id="err"></pre>
   <script type="module">
     import * as THREE from 'three';
@@ -40,8 +40,9 @@
     import { createWristWatch } from './modules/watch.js';
     import { createRangeExperience } from './modules/range_logic.js';
     import { createPhase85PgaUpdate } from './modules/pga_phase85_update.js';
+    import { applyPhase88PgaClubBagAlignment, PHASE88_BUILD } from './modules/pga_phase88_alignment_club_bag.js';
 
-    const RANGE_BUILD = 'PHASE-87-PGA-BLACK-SCREEN-GUARD';
+    const RANGE_BUILD = 'PHASE-88-PGA-CLUB-BAG-ALIGNMENT-LOCK';
     const status = document.getElementById('status');
     const score = document.getElementById('score');
     const err = document.getElementById('err');
@@ -61,14 +62,13 @@
     scene.fog = new THREE.FogExp2(0x061018, 0.010);
     scene.userData._camera = camera;
     scene.userData.SVR_BUILD = RANGE_BUILD;
-    window.SVR_PHASE87_BUILD = RANGE_BUILD;
+    window.SVR_PHASE88_BUILD = RANGE_BUILD;
 
-    camera.position.set(0,1.62,2.25);
-    camera.lookAt(0,0.78,-1.35);
+    camera.position.set(0,1.62,0.72);
+    camera.lookAt(0,0.78,-1.05);
 
-    // Always-visible guard scene. It prevents a pure black canvas even if a module fails.
     const guard = new THREE.Group();
-    guard.name = 'SVR_PHASE87_ALWAYS_VISIBLE_RANGE_GUARD';
+    guard.name = 'SVR_PHASE88_ALWAYS_VISIBLE_RANGE_GUARD';
     scene.add(guard);
     guard.add(new THREE.HemisphereLight(0xb2f7ff,0x0c1608,1.8));
     const guardSun = new THREE.DirectionalLight(0xffffff,1.1); guardSun.position.set(-4,8,5); guard.add(guardSun);
@@ -77,7 +77,7 @@
     const guardMat = new THREE.Mesh(new THREE.PlaneGeometry(2.5,1.35), new THREE.MeshBasicMaterial({ color:0xf2c14e, side:THREE.DoubleSide }));
     guardMat.rotation.x = -Math.PI/2; guardMat.position.set(0,.015,.42); guard.add(guardMat);
     const guardBall = new THREE.Mesh(new THREE.SphereGeometry(.14,32,16), new THREE.MeshStandardMaterial({ color:0xffffff, roughness:.35 }));
-    guardBall.position.set(0,.16,-1.35); guard.add(guardBall);
+    guardBall.position.set(0,.16,-1.05); guard.add(guardBall);
 
     const desktop = createDesktopControls({ camera, domElement: renderer.domElement });
     const hands = createHands({ scene, renderer, log:(...a)=>console.log(...a) });
@@ -93,7 +93,7 @@
     } catch(e){
       showError('createRangeExperience failed. Fallback tee is visible.', e);
       status.textContent = RANGE_BUILD + ' fallback tee active';
-      range = { update(){}, resetBall(){ guardBall.position.set(0,.16,-1.35); }, toggleTracer(){ return true; }, refreshScore(){} };
+      range = { update(){}, resetBall(){ guardBall.position.set(0,.16,-1.05); }, toggleTracer(){ return true; }, refreshScore(){} };
     }
 
     let phasePga = null;
@@ -104,27 +104,35 @@
       phasePga = { update(){}, toggleEnvironment(){ status.textContent = 'PGA environment toggle unavailable'; } };
     }
 
+    let phase88 = null;
+    try{
+      phase88 = applyPhase88PgaClubBagAlignment({ scene, camera, renderer, range, statusCb:(txt)=>{ status.textContent = txt; } });
+    } catch(e){
+      showError('applyPhase88PgaClubBagAlignment failed. Range remains playable without club bag.', e);
+      phase88 = { update(){}, setClubType(){} };
+    }
+
     const watch = createWristWatch({
       scene, camera, renderer,
-      getState:()=>({ audioEnabled:false, trackTitle:'PGA Range', cash:0, seated:false, inTableZone:false, seatLabel:'Range', teleportEnabled:true }),
+      getState:()=>({ audioEnabled:false, trackTitle:'PGA Range', cash:0, seated:false, inTableZone:false, seatLabel: phase88?.currentClub || 'Range', teleportEnabled:true }),
       actions:{
-        goLobby:()=>{ location.href='./index.html?v=phase87-return-lobby'; },
+        goLobby:()=>{ location.href='./index.html?v=phase88-return-lobby'; },
         goPgaDrive:()=>range.resetBall(),
-        goPgaChipPutt:()=>{ location.href='./chip-putt.html?v=phase87-chip-putt'; },
+        goPgaChipPutt:()=>{ location.href='./chip-putt.html?v=phase88-chip-putt'; },
         toggleTeleport:()=>range.toggleTracer(),
         togglePgaEnvironment:()=>window.SVR_PGA_PHASE85?.toggleEnvironment?.(),
         joinTable:()=>range.resetBall(),
-        leaveTable:()=>{ location.href='./index.html?v=phase87-return-lobby'; }
+        leaveTable:()=>{ location.href='./index.html?v=phase88-return-lobby'; }
       }
     });
 
-    document.getElementById('lobbyBtn').addEventListener('click',()=>{ location.href='./index.html?v=phase87-return-lobby'; });
+    document.getElementById('lobbyBtn').addEventListener('click',()=>{ location.href='./index.html?v=phase88-return-lobby'; });
     document.getElementById('resetBtn').addEventListener('click',()=>range.resetBall());
     document.getElementById('tracerBtn').addEventListener('click',()=>{ const on=range.toggleTracer(); document.getElementById('tracerBtn').textContent=on?'Tracer On':'Tracer Off'; });
     window.addEventListener('keydown',(e)=>{
       if(e.repeat) return;
       if(e.code==='KeyR') range.resetBall();
-      if(e.code==='KeyL') location.href='./index.html?v=phase87-return-lobby';
+      if(e.code==='KeyL') location.href='./index.html?v=phase88-return-lobby';
       if(e.code==='KeyY') window.SVR_PGA_PHASE85?.toggleEnvironment?.();
       if(e.code==='KeyT') { const on=range.toggleTracer(); document.getElementById('tracerBtn').textContent=on?'Tracer On':'Tracer Off'; }
     });
@@ -141,13 +149,14 @@
         const leftController=hands.getLeftController(), rightController=hands.getRightController();
         range.update(dt,{ leftHand,rightHand,leftController,rightController });
         phasePga?.update?.(dt);
+        phase88?.update?.(dt);
         watch.update(dt,leftHand||leftController,rightHand||rightController);
       } catch(e){
         if(!errorShown) showError('PGA render-loop guarded error. Rendering continues.', e);
       }
       renderer.render(scene,camera);
     });
-    status.textContent = `${RANGE_BUILD} ready - safe range guard active`;
+    status.textContent = `${RANGE_BUILD} ready - Driver selected - club bag active`;
     range.refreshScore?.();
   </script>
 </body>
