@@ -1,105 +1,131 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR PGA Driving Range â€¢ Phase 86 PGA Stability Watch Lock</title>
+  <title>SVR PGA Driving Range - Phase 87 Black Screen Guard</title>
   <meta name="theme-color" content="#050508"/>
   <style>
     :root{color-scheme:dark}
     html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    #app{position:fixed;inset:0}
-    canvas{display:block;width:100%;height:100%;outline:none;background:#000}
+    #app{position:fixed;inset:0;background:linear-gradient(#061018,#020403)}
+    canvas{display:block;width:100%;height:100%;outline:none;background:#061018}
     #hud{position:fixed;left:12px;right:12px;top:12px;z-index:10;display:flex;gap:10px;align-items:center;justify-content:space-between;pointer-events:none}
     .pill{background:rgba(0,0,0,.58);border:1px solid rgba(125,255,138,.42);backdrop-filter:blur(8px);border-radius:999px;padding:8px 12px;color:#effff1;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);pointer-events:none}
     .btn{pointer-events:auto;border:1px solid rgba(125,255,138,.48);background:rgba(2,20,9,.68);color:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;user-select:none}.btn:hover{background:rgba(16,80,34,.75)}
-    #help{position:fixed;left:12px;bottom:12px;z-index:10;max-width:min(820px,calc(100vw - 24px));background:rgba(0,0,0,.56);border:1px solid rgba(125,255,138,.3);border-radius:16px;color:#dfffe7;padding:10px 12px;font-size:12px;line-height:1.35;pointer-events:none}.hot{color:#c4ff67;font-weight:800}.warn{color:#ff77aa;font-weight:800}
-    #err{position:fixed;inset:0;display:none;z-index:99;background:rgba(0,0,0,.92);color:#fff;padding:18px;overflow:auto;white-space:pre-wrap;font:13px/1.42 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    #help{position:fixed;left:12px;bottom:12px;z-index:10;max-width:min(850px,calc(100vw - 24px));background:rgba(0,0,0,.56);border:1px solid rgba(125,255,138,.3);border-radius:16px;color:#dfffe7;padding:10px 12px;font-size:12px;line-height:1.35;pointer-events:none}.hot{color:#c4ff67;font-weight:800}.warn{color:#ff77aa;font-weight:800}
+    #err{position:fixed;left:12px;right:12px;bottom:92px;display:none;z-index:99;background:rgba(80,0,18,.90);border:1px solid rgba(255,100,130,.75);border-radius:14px;color:#fff;padding:12px;overflow:auto;max-height:35vh;white-space:pre-wrap;font:12px/1.42 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body>
   <div id="app"></div>
   <div id="hud">
-    <div class="pill" id="status">Loading PGA rangeâ€¦</div>
-    <div class="pill" id="score">Training Points: 0 â€¢ Best Target: 0 â€¢ Shots: 0</div>
+    <div class="pill" id="status">Loading PGA range...</div>
+    <div class="pill" id="score">Training Points: 0 - Best Target: 0 - Shots: 0</div>
     <div style="display:flex;gap:8px;align-items:center">
       <button class="btn" id="lobbyBtn">Lobby</button>
       <button class="btn" id="resetBtn">Reset Ball</button>
       <button class="btn" id="tracerBtn">Tracer On</button>
-      <span class="pill">BUILD: PHASE-86-PGA-STABILITY-WATCH-LOCK</span>
+      <span class="pill">BUILD: PHASE-87-PGA-BLACK-SCREEN-GUARD</span>
     </div>
   </div>
-  <div id="help"><span class="hot">PGA Range:</span> start on the gold STAND HERE mat. Ball is directly in front of you. Hit target greens to earn local training points only. Grip right controller / pinch right hand to hold club, aim at the ball, then swing through it. Desktop fallback: hold mouse button, move fast, release near ball. <span class="hot">Y = Day/Night.</span> <span class="warn">Lobby is separate.</span> Moon/Mars sky lock active. PGA Drive is a standalone private scene, not lobby content.</div>
+  <div id="help"><span class="hot">PGA Range:</span> hard black-screen guard active. Forced light, fallback sky, fallback tee, and safe render loop are active. <span class="hot">Y = Day/Night.</span> <span class="warn">Lobby is separate.</span> Use R reset, T tracer, L lobby.</div>
   <pre id="err"></pre>
   <script type="module">
+    import * as THREE from 'three';
     import { createCore } from './modules/core_scene.js';
     import { createDesktopControls } from './modules/desktop_controls.js';
     import { createHands } from './modules/hands.js';
     import { createWristWatch } from './modules/watch.js';
     import { createRangeExperience } from './modules/range_logic.js';
-    import { createPhase85PgaUpdate, PHASE85_BUILD } from './modules/pga_phase85_update.js';
+    import { createPhase85PgaUpdate } from './modules/pga_phase85_update.js';
 
-    const RANGE_BUILD = 'PHASE-86-PGA-STABILITY-WATCH-LOCK';
+    const RANGE_BUILD = 'PHASE-87-PGA-BLACK-SCREEN-GUARD';
     const status = document.getElementById('status');
+    const score = document.getElementById('score');
     const err = document.getElementById('err');
-    window.addEventListener('error', e=>{ err.style.display='block'; err.textContent = 'PGA RANGE ERROR:\n' + (e?.error?.stack || e?.message || String(e)); });
-    window.addEventListener('unhandledrejection', e=>{ err.style.display='block'; err.textContent = 'PGA RANGE PROMISE ERROR:\n' + (e?.reason?.stack || e?.reason || String(e)); });
+    let errorShown = false;
+    function showError(label, e){
+      errorShown = true;
+      err.style.display = 'block';
+      err.textContent = label + '\n' + (e?.stack || e?.message || String(e));
+      console.error(label, e);
+    }
+    window.addEventListener('error', e=>showError('PGA RANGE ERROR:', e?.error || e?.message || e));
+    window.addEventListener('unhandledrejection', e=>showError('PGA RANGE PROMISE ERROR:', e?.reason || e));
 
     const { scene, camera, renderer } = createCore({ containerId:'app' });
+    renderer.setClearColor(0x061018, 1);
+    scene.background = new THREE.Color(0x061018);
+    scene.fog = new THREE.FogExp2(0x061018, 0.010);
     scene.userData._camera = camera;
     scene.userData.SVR_BUILD = RANGE_BUILD;
-    window.SVR_PHASE86_BUILD = RANGE_BUILD;
+    window.SVR_PHASE87_BUILD = RANGE_BUILD;
+
     camera.position.set(0,1.62,2.25);
     camera.lookAt(0,0.78,-1.35);
 
+    // Always-visible guard scene. It prevents a pure black canvas even if a module fails.
+    const guard = new THREE.Group();
+    guard.name = 'SVR_PHASE87_ALWAYS_VISIBLE_RANGE_GUARD';
+    scene.add(guard);
+    guard.add(new THREE.HemisphereLight(0xb2f7ff,0x0c1608,1.8));
+    const guardSun = new THREE.DirectionalLight(0xffffff,1.1); guardSun.position.set(-4,8,5); guard.add(guardSun);
+    const guardGround = new THREE.Mesh(new THREE.PlaneGeometry(26,70), new THREE.MeshStandardMaterial({ color:0x0f5422, roughness:.9, metalness:0, emissive:0x06220f, emissiveIntensity:.12 }));
+    guardGround.rotation.x = -Math.PI/2; guardGround.position.set(0,-0.012,-29); guard.add(guardGround);
+    const guardMat = new THREE.Mesh(new THREE.PlaneGeometry(2.5,1.35), new THREE.MeshBasicMaterial({ color:0xf2c14e, side:THREE.DoubleSide }));
+    guardMat.rotation.x = -Math.PI/2; guardMat.position.set(0,.015,.42); guard.add(guardMat);
+    const guardBall = new THREE.Mesh(new THREE.SphereGeometry(.14,32,16), new THREE.MeshStandardMaterial({ color:0xffffff, roughness:.35 }));
+    guardBall.position.set(0,.16,-1.35); guard.add(guardBall);
+
     const desktop = createDesktopControls({ camera, domElement: renderer.domElement });
     const hands = createHands({ scene, renderer, log:(...a)=>console.log(...a) });
-    const score = document.getElementById('score');
-    const range = createRangeExperience({
-      scene, camera, renderer,
-      statusCb:(txt)=>{ status.textContent = txt; },
-      scoreCb:(state)=>{ score.textContent = `Training Points: ${state.points} â€¢ Best Target: ${state.bestTarget} â€¢ Shots: ${state.shots}`; }
-    });
 
-    const phase85Pga = createPhase85PgaUpdate({
-      scene,
-      camera,
-      renderer,
-      range,
-      statusCb:(txt)=>{ status.textContent = txt; }
-    });
+    let range = null;
+    try{
+      range = createRangeExperience({
+        scene, camera, renderer,
+        statusCb:(txt)=>{ status.textContent = txt; },
+        scoreCb:(state)=>{ score.textContent = `Training Points: ${state.points} - Best Target: ${state.bestTarget} - Shots: ${state.shots}`; }
+      });
+      guard.visible = false;
+    } catch(e){
+      showError('createRangeExperience failed. Fallback tee is visible.', e);
+      status.textContent = RANGE_BUILD + ' fallback tee active';
+      range = { update(){}, resetBall(){ guardBall.position.set(0,.16,-1.35); }, toggleTracer(){ return true; }, refreshScore(){} };
+    }
+
+    let phasePga = null;
+    try{
+      phasePga = createPhase85PgaUpdate({ scene, camera, renderer, range, statusCb:(txt)=>{ status.textContent = txt; } });
+    } catch(e){
+      showError('createPhase85PgaUpdate failed. Range remains playable without caddie layer.', e);
+      phasePga = { update(){}, toggleEnvironment(){ status.textContent = 'PGA environment toggle unavailable'; } };
+    }
 
     const watch = createWristWatch({
       scene, camera, renderer,
-      getState:()=>({
-        audioEnabled:false,
-        trackTitle:'PGA Range',
-        cash:0,
-        seated:false,
-        inTableZone:false,
-        seatLabel:'Range',
-        teleportEnabled:true,
-        pgaEnv: window.SVR_PGA_PHASE85?.getState?.()?.envMode || window.SVR_PGA_PHASE85?.getState?.()?.mode || 'DAY'
-      }),
+      getState:()=>({ audioEnabled:false, trackTitle:'PGA Range', cash:0, seated:false, inTableZone:false, seatLabel:'Range', teleportEnabled:true }),
       actions:{
-        goLobby:()=>{ location.href='./index.html?v=phase86-return-lobby'; },
+        goLobby:()=>{ location.href='./index.html?v=phase87-return-lobby'; },
         goPgaDrive:()=>range.resetBall(),
-        goPgaChipPutt:()=>{ location.href='./chip-putt.html?v=phase86-chip-putt'; },
+        goPgaChipPutt:()=>{ location.href='./chip-putt.html?v=phase87-chip-putt'; },
         toggleTeleport:()=>range.toggleTracer(),
         togglePgaEnvironment:()=>window.SVR_PGA_PHASE85?.toggleEnvironment?.(),
         joinTable:()=>range.resetBall(),
-        leaveTable:()=>{ location.href='./index.html?v=phase86-return-lobby'; }
+        leaveTable:()=>{ location.href='./index.html?v=phase87-return-lobby'; }
       }
     });
 
-    document.getElementById('lobbyBtn').addEventListener('click',()=>{ location.href='./index.html?v=phase86-return-lobby'; });
+    document.getElementById('lobbyBtn').addEventListener('click',()=>{ location.href='./index.html?v=phase87-return-lobby'; });
     document.getElementById('resetBtn').addEventListener('click',()=>range.resetBall());
     document.getElementById('tracerBtn').addEventListener('click',()=>{ const on=range.toggleTracer(); document.getElementById('tracerBtn').textContent=on?'Tracer On':'Tracer Off'; });
     window.addEventListener('keydown',(e)=>{
       if(e.repeat) return;
       if(e.code==='KeyR') range.resetBall();
-      if(e.code==='KeyL') location.href='./index.html?v=phase86-return-lobby';
+      if(e.code==='KeyL') location.href='./index.html?v=phase87-return-lobby';
+      if(e.code==='KeyY') window.SVR_PGA_PHASE85?.toggleEnvironment?.();
       if(e.code==='KeyT') { const on=range.toggleTracer(); document.getElementById('tracerBtn').textContent=on?'Tracer On':'Tracer Off'; }
     });
     renderer.xr.addEventListener('sessionstart',()=>{ document.getElementById('help').style.display='none'; });
@@ -108,18 +134,21 @@
     let last = performance.now();
     renderer.setAnimationLoop(()=>{
       const now=performance.now(); const dt=Math.min((now-last)/1000,0.033); last=now;
-      if(!renderer.xr.isPresenting){ desktop.update(dt); scene.userData._camera=camera; } else scene.userData._camera=renderer.xr.getCamera(camera);
-      hands.update(dt); hands.updateDebug();
-      const leftHand=hands.getLeftHand(), rightHand=hands.getRightHand();
-      const leftController=hands.getLeftController(), rightController=hands.getRightController();
-      range.update(dt,{ leftHand,rightHand,leftController,rightController });
-      phase85Pga?.update?.(dt);
-      watch.update(dt,leftHand||leftController,rightHand||rightController);
+      try{
+        if(!renderer.xr.isPresenting){ desktop.update(dt); scene.userData._camera=camera; } else scene.userData._camera=renderer.xr.getCamera(camera);
+        hands.update(dt); hands.updateDebug();
+        const leftHand=hands.getLeftHand(), rightHand=hands.getRightHand();
+        const leftController=hands.getLeftController(), rightController=hands.getRightController();
+        range.update(dt,{ leftHand,rightHand,leftController,rightController });
+        phasePga?.update?.(dt);
+        watch.update(dt,leftHand||leftController,rightHand||rightController);
+      } catch(e){
+        if(!errorShown) showError('PGA render-loop guarded error. Rendering continues.', e);
+      }
       renderer.render(scene,camera);
     });
-    status.textContent = `${RANGE_BUILD} ready â€¢ standalone PGA range â€¢ caddie coach active`;
+    status.textContent = `${RANGE_BUILD} ready - safe range guard active`;
     range.refreshScore?.();
   </script>
 </body>
 </html>
-
