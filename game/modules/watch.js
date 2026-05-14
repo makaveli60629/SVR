@@ -154,7 +154,7 @@ function buildButtons(state){
     { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'reikiRoomScene', label: 'REIKI RM', x: 154, y: 198, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'pgaScene', label: 'PGA', x: 284, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaDriveScene', label: 'DRIVE', x: 414, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pgaDriveScene', label: 'RANGE', x: 414, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'pgaChipScene', label: 'CHIP', x: 24, y: 250, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'smokerScene', label: 'SMOKER', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
@@ -235,7 +235,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • private rooms: Reiki / PGA / Smoker / Scorpion / Store', 36, 332);
+    ctx.fillText('Quick scenes • PGA Range opens standalone • private rooms preserved', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();

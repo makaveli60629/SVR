@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>SVR PGA Driving Range • Phase 77</title>
+  <meta name="theme-color" content="#050508"/>
+  <style>
+    :root{color-scheme:dark} html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif} #app{position:fixed;inset:0} canvas{display:block;width:100%;height:100%;outline:none;background:#000}
+    #hud{position:fixed;left:12px;right:12px;top:12px;z-index:10;display:flex;gap:10px;align-items:center;justify-content:space-between;pointer-events:none}.pill{background:rgba(0,0,0,.58);border:1px solid rgba(125,255,138,.42);backdrop-filter:blur(8px);border-radius:999px;padding:8px 12px;color:#effff1;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);pointer-events:none}.btn{pointer-events:auto;border:1px solid rgba(125,255,138,.48);background:rgba(2,20,9,.68);color:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;user-select:none}.btn:hover{background:rgba(16,80,34,.75)}
+    #help{position:fixed;left:12px;bottom:12px;z-index:10;max-width:min(760px,calc(100vw - 24px));background:rgba(0,0,0,.56);border:1px solid rgba(125,255,138,.3);border-radius:16px;color:#dfffe7;padding:10px 12px;font-size:12px;line-height:1.35;pointer-events:none}.hot{color:#c4ff67;font-weight:800}.warn{color:#ff77aa;font-weight:800}
+  </style>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="hud">
+    <div class="pill" id="status">Loading PGA range…</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn" id="lobbyBtn">Lobby</button>
+      <button class="btn" id="resetBtn">Reset Ball</button>
+      <button class="btn" id="tracerBtn">Tracer On</button>
+      <span class="pill">BUILD: PHASE-77-PGA-STANDALONE-RANGE-TRACER-LOCK</span>
+    </div>
+  </div>
+  <div id="help"><span class="hot">PGA Range:</span> grip right controller / pinch right hand to hold club. Swing through ball. Desktop fallback: hold mouse button, move fast, release near ball. <span class="warn">Lobby is separate.</span></div>
+  <script type="module">
+    import { createCore } from './modules/core_scene.js';
+    import { createDesktopControls } from './modules/desktop_controls.js';
+    import { createHands } from './modules/hands.js';
+    import { createWristWatch } from './modules/watch.js';
+    import { createRangeExperience } from './modules/range_logic.js';
+    import { PHASE77_BUILD } from './modules/phase77_range_route_lock.js';
+
+    const status = document.getElementById('status');
+    const { scene, camera, renderer } = createCore({ containerId:'app' });
+    scene.userData._camera = camera;
+    camera.position.set(0,1.55,8.2);
+    camera.lookAt(0,1.15,-2.5);
+    const desktop = createDesktopControls({ camera, domElement: renderer.domElement });
+    const hands = createHands({ scene, renderer, log:(...a)=>console.log(...a) });
+    const range = createRangeExperience({ scene, camera, renderer, statusCb:(txt)=>{ status.textContent = txt; } });
+    const watch = createWristWatch({
+      scene, camera, renderer,
+      getState:()=>({ audioEnabled:false, trackTitle:'PGA Range', cash:0, seated:false, inTableZone:false, seatLabel:'Range', teleportEnabled:true }),
+      actions:{
+        goLobby:()=>{ location.href='./index.html?v=phase77-return-lobby'; },
+        goPgaDrive:()=>range.resetBall(),
+        goPgaChipPutt:()=>range.resetBall(),
+        toggleTeleport:()=>range.toggleTracer(),
+        joinTable:()=>range.resetBall(),
+        leaveTable:()=>{ location.href='./index.html?v=phase77-return-lobby'; }
+      }
+    });
+    document.getElementById('lobbyBtn').addEventListener('click',()=>{ location.href='./index.html?v=phase77-return-lobby'; });
+    document.getElementById('resetBtn').addEventListener('click',()=>range.resetBall());
+    document.getElementById('tracerBtn').addEventListener('click',()=>{ const on=range.toggleTracer(); document.getElementById('tracerBtn').textContent=on?'Tracer On':'Tracer Off'; });
+    window.addEventListener('keydown',(e)=>{ if(e.code==='KeyR') range.resetBall(); if(e.code==='KeyL') location.href='./index.html?v=phase77-return-lobby'; if(e.code==='KeyT') { const on=range.toggleTracer(); document.getElementById('tracerBtn').textContent=on?'Tracer On':'Tracer Off'; }});
+    renderer.xr.addEventListener('sessionstart',()=>{ document.getElementById('help').style.display='none'; });
+    renderer.xr.addEventListener('sessionend',()=>{ document.getElementById('help').style.display='block'; });
+    let last = performance.now();
+    renderer.setAnimationLoop(()=>{
+      const now=performance.now(); const dt=Math.min((now-last)/1000,0.033); last=now;
+      if(!renderer.xr.isPresenting){ desktop.update(dt); scene.userData._camera=camera; } else scene.userData._camera=renderer.xr.getCamera(camera);
+      hands.update(dt); hands.updateDebug();
+      const leftHand=hands.getLeftHand(), rightHand=hands.getRightHand();
+      const leftController=hands.getLeftController(), rightController=hands.getRightController();
+      range.update(dt,{ leftHand,rightHand,leftController,rightController });
+      watch.update(dt,leftHand||leftController,rightHand||rightController);
+      renderer.render(scene,camera);
+    });
+    status.textContent = `${PHASE77_BUILD} ready • standalone PGA range`;
+  </script>
+</body>
+</html>

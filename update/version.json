@@ -1,8 +1,9 @@
 ﻿{
-  "build": "PHASE-76-PRIVATE-SCENE-ROOM-ROUTING-LOCK",
-  "phase": 76,
-  "scope": "game-only private scene room routing lock",
+  "build": "PHASE-77-PGA-STANDALONE-RANGE-TRACER-LOCK",
+  "phase": 77,
+  "scope": "game-only standalone PGA range tracer lock",
   "siteTouched": false,
   "storeUrl": "https://svrpoker.com/site/store.html",
-  "updatedAt": "2026-05-14T01:21:18.5356287-05:00"
+  "pgaRange": "game/range.html",
+  "updatedAt": "2026-05-14T01:28:08.1425147-05:00"
 }

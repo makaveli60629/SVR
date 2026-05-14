@@ -8,7 +8,8 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyPhase71EditUnlock, PHASE71_BUILD, PHASE71_STORE_URL } from "./modules/phase71_edit_unlock.js";
-import { applyPhase76PrivateSceneLock, PHASE76_BUILD } from "./modules/phase76_private_scene_lock.js";
+import { applyPhase76PrivateSceneLock } from "./modules/phase76_private_scene_lock.js";
+import { PHASE77_BUILD, PHASE77_RANGE_URL, openPhase77Range } from "./modules/phase77_range_route_lock.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -76,6 +77,8 @@ const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 applyPhase71EditUnlock({ scene, sceneTargets, log });
 applyPhase76PrivateSceneLock({ scene, sceneTargets, log });
+window.SVR_RANGE_URL = PHASE77_RANGE_URL;
+scene.userData.SVR_BUILD = PHASE77_BUILD;
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -183,6 +186,7 @@ function gotoScene(key){
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
     if (btn.dataset.openStore){ window.open(PHASE71_STORE_URL, "_blank", "noopener,noreferrer"); return; }
+    if (btn.dataset.openRange){ openPhase77Range(); return; }
     const key = btn.dataset.scene;
     if (key) gotoScene(key);
   });
@@ -200,7 +204,7 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit3") gotoScene("seat");
   if (e.code === "Digit4") gotoScene("reiki");
   if (e.code === "Digit5") gotoScene("pga");
-  if (e.code === "Digit6") gotoScene("pgaDrive");
+  if (e.code === "Digit6") openPhase77Range();
   if (e.code === "KeyC") gotoScene("pgaChipPutt");
   if (e.code === "Digit7") gotoScene("legends");
   if (e.code === "Digit8") gotoScene("sponsor");
@@ -235,7 +239,7 @@ const watch = createWristWatch({
     goSeat: ()=>gotoScene("seat"),
     goReiki: ()=>gotoScene("reiki"),
     goPga: ()=>gotoScene("pga"),
-    goPgaDrive: ()=>gotoScene("pgaDrive"),
+    goPgaDrive: ()=>openPhase77Range(),
     goPgaChipPutt: ()=>gotoScene("pgaChipPutt"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
@@ -257,7 +261,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : `${PHASE76_BUILD} ready. Fresh private rooms locked for Reiki, PGA Drive, Chip/Putt, Smoker Lounge, and Scorpion. Lobby preserved.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `${PHASE77_BUILD} ready. PGA Range now opens as standalone range.html. Lobby preserved.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
