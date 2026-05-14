@@ -3,63 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SVR Poker | Contact</title>
-  <meta name="description" content="Contact SVR Poker for sponsorship, support, membership, and business questions." />
+  <title>Contact | SVR Poker</title>
+  <meta name="description" content="SVR Poker contact, support, sponsor inquiry, and message form preview." />
   <link rel="icon" href="../logo.webp" type="image/webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css" />
-  <link rel="stylesheet" href="./site-fixes.css" />
+  
 </head>
 <body>
   <canvas id="binary-rain" aria-hidden="true"></canvas>
-  <div class="site-shell phase67-site-shell">
+  <div class="site-shell">
     <nav class="site-nav">
-  <div class="nav-brand">
-    <img src="../logo.webp" alt="SVR Poker logo" />
-    <div><strong>SVR POKER</strong><span>Official Site</span></div>
-  </div>
-  <div class="nav-links">
-    <span class="admin-status online" id="admin-status" data-state="online">● Admin Online</span>
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="sponsorship.html">Sponsorship</a>
-    <a href="membership.html">Membership</a>
-    <a href="impact.html">Impact</a>
-    <a href="store.html">Store</a>
-    <a href="contact.html">Contact</a>
-    <a href="../index.html">Launch</a>
-  </div>
-</nav>
-    <main class="site-card phase67-site-card">
-      <section class="section page-hero">
-        <div class="card-tag page-kicker">Contact</div>
-        <h1 class="section-title">Contact and Message Intake</h1>
-        <p class="section-copy">Use this page for sponsor requests, support notes, membership questions, and development feedback while the secure backend message system is being wired.</p>
-        <div class="feature-grid">
-          <article class="feature-card">
-      <div class="card-tag">Sponsors</div>
-      <h3>Partnership Requests</h3>
-      <p class="card-copy">Send hub, event, media, or product placement questions.</p>
-    </article>
-<article class="feature-card">
-      <div class="card-tag">Support</div>
-      <h3>Player Help</h3>
-      <p class="card-copy">Use the message box on the main page for support notes during testing.</p>
-    </article>
-<article class="feature-card">
-      <div class="card-tag">Business</div>
-      <h3>Email Setup</h3>
-      <p class="card-copy">Business email routing should separate support, sponsors, admin, and VIP inquiries.</p>
-    </article>
+      <div class="nav-brand">
+        <img src="../logo.webp" alt="SVR Poker logo" />
+        <div>
+          <strong>SVR POKER</strong>
+          <span>All In</span>
         </div>
-        <div class="setup-note">Recommended future emails: hello@svrpoker.com, sponsors@svrpoker.com, support@svrpoker.com, vip@svrpoker.com.</div>
-        <div class="inline-actions">
-          <a class="btn btn-primary" href="index.html">Back to Site</a>
-          <a class="btn btn-secondary" href="../game/index.html?preview=1&cam=director&autocam=1">Game Preview</a>
+      </div>
+      <div class="nav-links">
+        <span class="admin-status online" data-state="online">● Admin Online</span>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="sponsorship.html">Sponsorship</a>
+        <a href="membership.html">Membership</a>
+        <a href="impact.html">Impact</a>
+        <a href="store.html">Store</a>
+        <a href="donate.html">Donate</a>
+        <a href="contact.html">Contact</a>
+        <a href="../index.html">Launch</a>
+      </div>
+    </nav>
+    <main class="site-card">
+      <section class="section" style="margin-top:0;">
+        <div class="card-tag">Contact</div>
+        <h1 class="section-title">Contact SVR</h1>
+        <p class="section-copy">Use this page for sponsor inquiries, support, partner discussions, player questions, and development feedback. The form is safe local-mode until Azure API wiring is active.</p>
+        <div class="utility-grid">
+          <article class="utility-card message-card">
+            <div class="card-tag">Message SVR</div><h3>Leave a Message</h3>
+            <form id="visitor-message-form" class="message-form">
+              <label>Name<input name="name" type="text" placeholder="Your name" autocomplete="name" /></label>
+              <label>Email<input name="email" type="email" placeholder="you@example.com" autocomplete="email" /></label>
+              <label>Message<textarea name="message" rows="5" placeholder="Sponsor inquiry, support note, or site feedback."></textarea></label>
+              <button class="btn btn-primary" type="submit">Save Message</button>
+            </form>
+            <p class="input-note" id="visitor-message-status">Local-safe mode until the secure backend is connected.</p>
+          </article>
+          <article class="utility-card"><div class="card-tag">Email Flow</div><h3>Business Routing</h3><p class="card-copy">Future routing can support hello@svrpoker.com, sponsors@svrpoker.com, vip@svrpoker.com, and admin@svrpoker.com once forwarding is confirmed.</p><a class="btn btn-secondary" href="sponsorship.html">Sponsor Info</a></article>
         </div>
       </section>
+      <footer class="footer">
+        <p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p>
+        <div class="inline-actions">
+          <a class="btn btn-secondary" href="index.html">Back to Site</a>
+          <a class="btn btn-primary" href="../game/index.html">Preview Game</a>
+        </div>
+      </footer>
     </main>
   </div>
   <script src="../matrix.js"></script>

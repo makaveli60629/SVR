@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -20,13 +20,19 @@
         <img src="../logo.webp" alt="SVR Poker logo" />
         <div>
           <strong>SVR POKER</strong>
-          <span>One-page site preview</span>
+          <span>All In</span>
         </div>
       </div>
       <div class="nav-links">
-        <span class="admin-status offline" id="admin-status" data-state="offline">● Admin Offline</span>
+        <span class="admin-status online" id="admin-status" data-state="online">● Admin Online</span>
         <a href="#experience">Experience</a>
         <a href="#live-preview">Live Preview</a>
+        <a href="about.html">About</a>
+        <a href="sponsorship.html">Sponsorship</a>
+        <a href="membership.html">Membership</a>
+        <a href="impact.html">Impact</a>
+        <a href="donate.html">Donate</a>
+        <a href="faq.html">FAQ</a>
         <a href="#login">Login</a>
         <a href="#store">Store</a>
         <a href="#message">Message</a>
@@ -37,30 +43,31 @@
     <main class="site-card">
       <section class="hero-grid" id="experience">
         <div class="hero-copy">
-          <div class="eyebrow">One-Page Public Site</div>
+          <div class="eyebrow">All In</div>
           <h1 class="title-lockup brand-inline brand-inline-left">
             <span class="poker-word poker-full">SVR POKER</span>
           </h1>
-          <p class="hero-sub">Rich neon presentation, simple public flow, and a cleaner one-page structure.</p>
-          <p class="launch-copy">This page is built for show-and-tell: brand forward, lightweight, and ready for your next round of login, SQL, and payment wiring without another redesign.</p>
+          <p class="hero-sub">A social VR poker experience built for play-money competition, sponsor support, and real-world community impact.</p>
+          <p class="launch-copy">SVR Poker brings people together through the love of poker while building a sponsor-supported platform for community fundraising, animal shelters, poverty relief, and future foundation-backed impact.</p>
           <div class="inline-actions">
             <a class="btn btn-primary" href="../game/index.html">Preview Game</a>
             <a class="btn btn-secondary" href="../index.html">Public Launch Page</a>
+            <a class="btn btn-ghost" href="https://cash.app/$SVRhelp" target="_blank" rel="noopener">Support $SVRhelp</a>
           </div>
         </div>
 
         <aside class="hero-panel live-preview-panel" id="live-preview">
           <div class="panel-heading">
             <span class="card-tag">Live Preview</span>
-            <h3>Lobby / Training Room Window</h3>
+            <h3>Live Game Preview</h3>
           </div>
           <div class="preview-window">
-            <iframe src="../game/index.html?embed=1" title="SVR Poker live preview" loading="lazy" allow="fullscreen; xr-spatial-tracking"></iframe>
+            <iframe src="../game/index.html?preview=1&amp;cam=director&amp;autocam=1&amp;v=phase03-site-preview" title="SVR Poker live preview" loading="lazy" allow="fullscreen; xr-spatial-tracking"></iframe>
           </div>
           <div class="metrics metrics-compact">
             <div class="metric">
               <strong>Live View</strong>
-              <span>Embedded room preview</span>
+              <span>Director camera preview</span>
             </div>
             <div class="metric">
               <strong>Login UI</strong>
@@ -71,7 +78,7 @@
               <span>Prepared next step</span>
             </div>
           </div>
-          <div class="setup-note">This panel is reserved for the future lobby feed or a third-camera preview. The current build uses an embedded live room preview so visitors can see the space before entering.</div>
+          <div class="setup-note">This panel is reserved for the future lobby feed or a third-camera preview. The current panel uses the existing director/autocam preview route so visitors can see the space before entering.</div>
         </aside>
       </section>
 
@@ -207,7 +214,7 @@
             <div class="card-tag">Admin Presence</div>
             <h3>Online / Offline Hook</h3>
             <p class="card-copy">The public indicator is now present. It can be wired to your admin login session so visitors see when an admin is available.</p>
-            <div class="admin-status offline admin-status-large" data-state="offline">● Admin Offline</div>
+            <div class="admin-status offline admin-status-large" data-state="online">● Admin Online</div>
           </article>
           <article class="utility-card">
             <div class="card-tag">Backend Next</div>
@@ -249,3 +256,4 @@
   <script src="../site-public-hooks.js"></script>
 </body>
 </html>
+

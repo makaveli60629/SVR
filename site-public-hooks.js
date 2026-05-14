@@ -1,4 +1,4 @@
-﻿(() => {
+(() => {
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages';
 
@@ -9,22 +9,27 @@
       localStorage.setItem(ADMIN_KEY, override);
       return override;
     }
-    return localStorage.getItem(ADMIN_KEY) || 'offline';
+    localStorage.setItem(ADMIN_KEY, 'online');
+    return 'online';
   }
 
   function paintAdminState() {
     const state = getAdminState();
-    document.querySelectorAll('.admin-status').forEach((el) => {
+    const isOnline = state === 'online';
+    document.querySelectorAll('.admin-status,[data-admin-pill]').forEach((el) => {
       el.dataset.state = state;
-      el.classList.toggle('online', state === 'online');
-      el.classList.toggle('offline', state !== 'online');
-      el.textContent = state === 'online' ? 'â— Admin Online' : 'â— Admin Offline';
+      el.classList.toggle('online', isOnline);
+      el.classList.toggle('offline', !isOnline);
+      const label = el.querySelector('[data-admin-label]');
+      if (label) label.textContent = isOnline ? 'Admin Online' : 'Admin Offline';
+      else if (el.classList.contains('admin-status')) el.textContent = isOnline ? '● Admin Online' : '● Admin Offline';
     });
   }
 
   function wireMessageForm() {
     const form = document.getElementById('visitor-message-form');
-    if (!form) return;
+    if (!form || form.dataset.svrWired === '1') return;
+    form.dataset.svrWired = '1';
     const status = document.getElementById('visitor-message-status');
     form.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -34,13 +39,14 @@
         email: (data.email || '').trim(),
         message: (data.message || '').trim(),
         createdAt: new Date().toISOString(),
-        source: 'svrpoker-public-site-restore'
+        source: location.pathname || 'svrpoker-site'
       };
       if (!entry.message) {
         if (status) status.textContent = 'Please enter a message before saving.';
         return;
       }
-      const current = JSON.parse(localStorage.getItem(MESSAGE_KEY) || '[]');
+      let current = [];
+      try { current = JSON.parse(localStorage.getItem(MESSAGE_KEY) || '[]'); } catch (e) { current = []; }
       current.push(entry);
       localStorage.setItem(MESSAGE_KEY, JSON.stringify(current.slice(-100)));
       form.reset();
@@ -48,26 +54,13 @@
     });
   }
 
-  paintAdminState();
-  wireMessageForm();
-})();
-
-/* SVR_ADMIN_FORCE_ONLINE_LOCK
-   Keeps public/admin status green for preview without touching the public page HTML. */
-(function(){
-  try { localStorage.setItem('svr_admin_presence', 'online'); } catch(e) {}
-  function forceOnline(){
-    document.querySelectorAll('.admin-status,[data-admin-pill]').forEach(function(el){
-      el.dataset.state = 'online';
-      el.classList.add('online');
-      el.classList.remove('offline');
-      var label = el.querySelector('[data-admin-label]');
-      if (label) label.textContent = 'Admin Online';
-      else if (el.classList.contains('admin-status')) el.textContent = 'â— Admin Online';
-    });
+  function boot() {
+    paintAdminState();
+    wireMessageForm();
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', forceOnline);
-  else forceOnline();
-  setTimeout(forceOnline, 250);
-  setTimeout(forceOnline, 1000);
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+  setTimeout(paintAdminState, 250);
+  setTimeout(paintAdminState, 1000);
 })();
