@@ -1,4 +1,4 @@
-
+﻿
 (function(){
   const cfg = window.SVR_SITE_CONFIG || {};
   const API_BASE = (cfg.API_BASE || '').replace(/\/$/, '');
@@ -62,4 +62,24 @@
     if(status) status.textContent = 'Preview mode only. Real owner login activates after Azure API/JWT is connected.';
   });
   refreshAdmin(); renderLocalMessages();
+})();
+
+/* SVR_ADMIN_FORCE_ONLINE_LOCK
+   Keeps public/admin status green for preview without touching the public page HTML. */
+(function(){
+  try { localStorage.setItem('svr_admin_presence', 'online'); } catch(e) {}
+  function forceOnline(){
+    document.querySelectorAll('.admin-status,[data-admin-pill]').forEach(function(el){
+      el.dataset.state = 'online';
+      el.classList.add('online');
+      el.classList.remove('offline');
+      var label = el.querySelector('[data-admin-label]');
+      if (label) label.textContent = 'Admin Online';
+      else if (el.classList.contains('admin-status')) el.textContent = 'â— Admin Online';
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', forceOnline);
+  else forceOnline();
+  setTimeout(forceOnline, 250);
+  setTimeout(forceOnline, 1000);
 })();

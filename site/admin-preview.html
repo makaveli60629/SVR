@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SVR Poker | Admin Preview</title>
+  <meta name="description" content="SVR Poker admin dashboard preview for owner/admin tools." />
+  <link rel="icon" href="../logo.webp" type="image/webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="./site-fixes.css" />
+</head>
+<body>
+  <canvas id="binary-rain" aria-hidden="true"></canvas>
+  <div class="site-shell phase67-site-shell">
+    <nav class="site-nav">
+  <div class="nav-brand">
+    <img src="../logo.webp" alt="SVR Poker logo" />
+    <div><strong>SVR POKER</strong><span>Official Site</span></div>
+  </div>
+  <div class="nav-links">
+    <span class="admin-status online" id="admin-status" data-state="online">● Admin Online</span>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="sponsorship.html">Sponsorship</a>
+    <a href="membership.html">Membership</a>
+    <a href="impact.html">Impact</a>
+    <a href="store.html">Store</a>
+    <a href="contact.html">Contact</a>
+    <a href="../index.html">Launch</a>
+  </div>
+</nav>
+    <main class="site-card phase67-site-card">
+      <section class="section page-hero">
+        <div class="card-tag page-kicker">Admin</div>
+        <h1 class="section-title">Owner Dashboard Preview</h1>
+        <p class="section-copy">This page is only a visual preview for owner/admin controls. Live admin login, messages, analytics, and store controls must run through the secure backend.</p>
+        <div class="feature-grid">
+          <article class="feature-card">
+      <div class="card-tag">Owner</div>
+      <h3>God Mode Direction</h3>
+      <p class="card-copy">Full owner controls for users, hubs, events, moderation, economy, analytics, and emergency actions.</p>
+    </article>
+<article class="feature-card">
+      <div class="card-tag">Moderation</div>
+      <h3>Limited Privileges</h3>
+      <p class="card-copy">Moderators should handle reports, mutes, kicks, and escalation without full system authority.</p>
+    </article>
+<article class="feature-card">
+      <div class="card-tag">Analytics</div>
+      <h3>Enterprise Tracking</h3>
+      <p class="card-copy">Future dashboards should track traffic, VR sessions, purchases, room activity, crashes, and sponsor clicks.</p>
+    </article>
+        </div>
+        <div class="setup-note">Do not link live admin controls publicly until auth, roles, and backend protections are active.</div>
+        <div class="inline-actions">
+          <a class="btn btn-primary" href="index.html">Back to Site</a>
+          <a class="btn btn-secondary" href="../game/index.html?preview=1&cam=director&autocam=1">Game Preview</a>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="../matrix.js"></script>
+  <script src="../site-public-hooks.js"></script>
+</body>
+</html>
