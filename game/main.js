@@ -353,7 +353,7 @@ tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Seat/Reiki/PGA/Store/Private scenes.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
-window.dispatchEvent(new CustomEvent("SVR_READY", { detail: { build: window.SVR_BUILD_LABEL || "PHASE-90-UNLOCKED-APPLY-BOOT-LOCK" } }));
+window.dispatchEvent(new CustomEvent("SVR_READY", { detail: { build: window.SVR_BUILD_LABEL || "PHASE-91-PGA-DRIVING-RANGE-RESTORE-LOCK" } }));
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
