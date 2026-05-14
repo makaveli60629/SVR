@@ -1,0 +1,13 @@
+{
+  "mode": "sandbox_preview_only",
+  "checkoutEnabled": false,
+  "stripeBackendEndpoint": "/api/stripe/create-checkout-session",
+  "categories": [
+    "SVR",
+    "Reiki",
+    "PGA",
+    "Smoker Lounge",
+    "Membership"
+  ],
+  "note": "Public catalog sample only. Real products should load from secure backend/SQL."
+}

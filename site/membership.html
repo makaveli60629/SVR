@@ -4,60 +4,50 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Membership | SVR Poker</title>
-  <meta name="description" content="SVR Poker future membership, VIP access, dashboard, and account preview." />
+  <meta name="description" content="Sample SVR membership tiers and pricing preview." />
   <link rel="icon" href="../logo.webp" type="image/webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css" />
-  
+  <link rel="stylesheet" href="store-phase03.css" />
 </head>
 <body>
   <canvas id="binary-rain" aria-hidden="true"></canvas>
   <div class="site-shell">
     <nav class="site-nav">
-      <div class="nav-brand">
-        <img src="../logo.webp" alt="SVR Poker logo" />
-        <div>
-          <strong>SVR POKER</strong>
-          <span>All In</span>
-        </div>
-      </div>
-      <div class="nav-links">
-        <span class="admin-status online" data-state="online">● Admin Online</span>
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="sponsorship.html">Sponsorship</a>
-        <a href="membership.html">Membership</a>
-        <a href="impact.html">Impact</a>
-        <a href="store.html">Store</a>
-        <a href="donate.html">Donate</a>
-        <a href="contact.html">Contact</a>
-        <a href="../index.html">Launch</a>
-      </div>
-    </nav>
+  <div class="nav-brand">
+    <img src="../logo.webp" alt="SVR Poker logo" />
+    <div><strong>SVR POKER</strong><span>All In</span></div>
+  </div>
+  <div class="nav-links">
+    <span class="admin-status online" data-state="online">● Admin Online</span>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="sponsorship.html">Sponsorship</a>
+    <a href="membership.html">Membership</a>
+    <a href="impact.html">Impact</a>
+    <a href="store.html">Store</a>
+    <a href="donate.html">Donate</a>
+    <a href="contact.html">Contact</a>
+    <a href="../index.html">Launch</a>
+  </div>
+</nav>
     <main class="site-card">
-      <section class="section" style="margin-top:0;">
-        <div class="card-tag">Membership Preview</div>
-        <h1 class="section-title">Future member access without exposing private systems.</h1>
-        <p class="section-copy">Membership is preview-only until backend login, Azure SQL, admin roles, and payment review are complete. This page defines the future structure without activating checkout.</p>
-        <div class="membership-grid">
-          <article class="price-card"><div class="card-tag">Public</div><h3>Visitor</h3><p class="price">Free</p><p class="price-note">Public launch page, website preview, game preview, and contact access.</p></article>
-          <article class="price-card"><div class="card-tag">Member</div><h3>SVR Member</h3><p class="price">Coming</p><p class="price-note">Future profile, avatar locker, table access, store wishlist, and event alerts.</p></article>
-          <article class="price-card"><div class="card-tag">VIP</div><h3>Founder / VIP</h3><p class="price">Review</p><p class="price-note">Future private events, sponsor rooms, early previews, and recognition perks.</p></article>
-        </div>
-      </section>
-      <section class="section"><h2 class="section-title">Dashboard direction</h2><p class="section-copy">The future account dashboard can show profile status, inventory, membership tier, store activity, event invites, and support messages after secure backend wiring.</p></section>
-      <footer class="footer">
-        <p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p>
-        <div class="inline-actions">
-          <a class="btn btn-secondary" href="index.html">Back to Site</a>
-          <a class="btn btn-primary" href="../game/index.html">Preview Game</a>
-        </div>
-      </footer>
+      <section class="store-banner" style="margin-top:0;"><span class="store-kicker">Membership Preview</span><h1 class="store-title">Membership + Access Tiers</h1><p class="store-lead">These are sample tiers for layout, pricing, account logic, and future checkout wiring. Nothing is sold yet; use these to review how SVR can present public access, member access, VIP, founders, and sponsor routes.</p><div class="category-strip"><a href="store.html">Store Hub</a><a href="cart.html">Cart</a><a href="stripe-sandbox.html">Stripe Sandbox</a></div></section><section class="store-section"><div class="pricing-grid">
+<article class="pricing-card"><span class="store-pill">Public</span><h3 class="pricing-title">Visitor</h3><p class="price-pill">Free</p><p class="pricing-copy">Public launch page, site preview, game preview links, and general updates.</p><a class="btn btn-secondary" href="contact.html">Join Waitlist</a></article>
+<article class="pricing-card"><span class="store-pill">Member</span><h3 class="pricing-title">SVR Member</h3><p class="price-pill">$9.99/mo</p><p class="pricing-copy">Sample future tier for profile, avatar locker, store wishlist, member updates, and event alerts.</p><a class="btn btn-secondary" href="#" data-add-cart data-name="SVR Member Preview" data-hub="Membership" data-price-cents="999">Add Preview</a></article>
+<article class="pricing-card"><span class="store-pill">VIP</span><h3 class="pricing-title">VIP Table</h3><p class="price-pill">$19.99/mo</p><p class="pricing-copy">Sample future tier for private rooms, table access concepts, premium cosmetics, and tournament invites.</p><a class="btn btn-primary" href="#" data-add-cart data-name="VIP Table Preview" data-hub="Membership" data-price-cents="1999">Add Preview</a></article>
+<article class="pricing-card"><span class="store-pill">Founder</span><h3 class="pricing-title">Founder Pass</h3><p class="price-pill">$49.00</p><p class="pricing-copy">One-time sample founder package with badge, early access identity, and launch recognition concept.</p><a class="btn btn-secondary" href="#" data-add-cart data-name="Founder Pass Preview" data-hub="Membership" data-price-cents="4900">Add Preview</a></article>
+<article class="pricing-card"><span class="store-pill">Sponsor</span><h3 class="pricing-title">Sponsor Intro</h3><p class="price-pill">Custom</p><p class="pricing-copy">For brands, hubs, and partner storefronts. Routes to sponsor inquiry, not checkout.</p><a class="btn btn-ghost" href="sponsorship.html">Sponsor Inquiry</a></article>
+<article class="pricing-card"><span class="store-pill">Locked</span><h3 class="pricing-title">Checkout Status</h3><p class="price-pill">Off</p><p class="pricing-copy">All pricing is sample-only until Stripe sandbox/backend wiring is approved.</p><a class="btn btn-secondary" href="stripe-sandbox.html">View Sandbox</a></article>
+</div></section>
+      <footer class="footer"><p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn btn-secondary" href="index.html">Back to Site</a><a class="btn btn-primary" href="../game/index.html">Preview Game</a></div></footer>
     </main>
   </div>
   <script src="../matrix.js"></script>
   <script src="../site-public-hooks.js"></script>
+  <script src="store-cart.js"></script>
+  
 </body>
 </html>

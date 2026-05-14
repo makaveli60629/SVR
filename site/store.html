@@ -4,64 +4,55 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Store | SVR Poker</title>
-  <meta name="description" content="SVR central store hub for game items, Reiki, PGA, smoker lounge, and future partner shops." />
+  <meta name="description" content="SVR central store hub with sample items, partner routes, sandbox cart, and Stripe preview." />
   <link rel="icon" href="../logo.webp" type="image/webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css" />
-  
+  <link rel="stylesheet" href="store-phase03.css" />
 </head>
 <body>
   <canvas id="binary-rain" aria-hidden="true"></canvas>
   <div class="site-shell">
     <nav class="site-nav">
-      <div class="nav-brand">
-        <img src="../logo.webp" alt="SVR Poker logo" />
-        <div>
-          <strong>SVR POKER</strong>
-          <span>All In</span>
-        </div>
-      </div>
-      <div class="nav-links">
-        <span class="admin-status online" data-state="online">● Admin Online</span>
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="sponsorship.html">Sponsorship</a>
-        <a href="membership.html">Membership</a>
-        <a href="impact.html">Impact</a>
-        <a href="store.html">Store</a>
-        <a href="donate.html">Donate</a>
-        <a href="contact.html">Contact</a>
-        <a href="../index.html">Launch</a>
-      </div>
-    </nav>
+  <div class="nav-brand">
+    <img src="../logo.webp" alt="SVR Poker logo" />
+    <div><strong>SVR POKER</strong><span>All In</span></div>
+  </div>
+  <div class="nav-links">
+    <span class="admin-status online" data-state="online">● Admin Online</span>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="sponsorship.html">Sponsorship</a>
+    <a href="membership.html">Membership</a>
+    <a href="impact.html">Impact</a>
+    <a href="store.html">Store</a>
+    <a href="donate.html">Donate</a>
+    <a href="contact.html">Contact</a>
+    <a href="../index.html">Launch</a>
+  </div>
+</nav>
     <main class="site-card">
-      <section class="section" style="margin-top:0;">
-        <div class="card-tag">SVR Store Hub</div>
-        <h1 class="section-title">One store hub. Multiple partner routes. SVR stays central.</h1>
-        <p class="section-copy">The SVR Store is the central route for game items and future partner stores. Visitors go through SVR first, then choose SVR items, Reiki Hub, PGA Golf, Smoker Lounge, or approved partner categories.</p>
-        <div class="membership-grid">
-          <article class="price-card"><div class="card-tag">SVR</div><h3>Game Items</h3><p class="price-note">Chip packs, watch skins, table themes, avatar items, and future cosmetics.</p><div class="inline-actions"><a class="btn btn-secondary" href="store-svr.html">Open SVR Store</a></div></article>
-          <article class="price-card"><div class="card-tag">Reiki</div><h3>Reiki Hub Store</h3><p class="price-note">Wellness merchandise, booking concepts, digital cards, and approved partner items.</p><div class="inline-actions"><a class="btn btn-primary" href="store-reiki.html">Open Reiki Store</a></div></article>
-          <article class="price-card"><div class="card-tag">PGA</div><h3>PGA Golf Store</h3><p class="price-note">Golf apparel, training content, virtual grip skins, and sponsor products.</p><div class="inline-actions"><a class="btn btn-secondary" href="store-pga.html">Open PGA Store</a></div></article>
-        </div>
-        <div class="membership-grid">
-          <article class="price-card"><div class="card-tag">Lounge</div><h3>Smoker Lounge Store</h3><p class="price-note">Compliant lounge merchandise, apparel, art display slots, and private-room themes.</p><div class="inline-actions"><a class="btn btn-ghost" href="store-smoker.html">Open Lounge Store</a></div></article>
-          <article class="price-card"><div class="card-tag">Payment Lock</div><h3>Checkout Disabled</h3><p class="price-note">No live checkout, no Stripe secrets, and no SQL credentials are stored in public files.</p></article>
-          <article class="price-card"><div class="card-tag">Future</div><h3>VR Portal</h3><p class="price-note">This store structure can later be embedded into the VR game as a controller-friendly portal.</p></article>
-        </div>
-      </section>
-      <footer class="footer">
-        <p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p>
-        <div class="inline-actions">
-          <a class="btn btn-secondary" href="index.html">Back to Site</a>
-          <a class="btn btn-primary" href="../game/index.html">Preview Game</a>
-        </div>
-      </footer>
+      <section class="store-hero-grid" style="margin-top:0;">
+  <div class="store-banner"><span class="store-kicker">SVR Central Store</span><h1 class="store-title">One Store Hub. Every Partner Route.</h1><p class="store-lead">The SVR Store keeps purchasing, memberships, sponsor products, and future VR portal commerce under one controlled structure. Players start here, then move into SVR items, Reiki Hub, PGA Hub, Smoker Lounge, or approved sponsor categories.</p><div class="store-actions"><a class="btn btn-primary" href="#routes">Browse Store Routes</a><a class="btn btn-secondary" href="stripe-sandbox.html">Stripe Sandbox Preview</a><a class="btn btn-ghost" href="cart.html">Open Cart</a></div></div>
+  <div class="stripe-panel"><span class="store-kicker"><span class="store-dot"></span> Checkout Status</span><h3 class="hub-title">Sandbox Only</h3><p class="hub-copy">Live purchases are disabled. The cart saves locally and prepares the shape of a future Stripe Checkout Session without charging anyone.</p><div class="cart-total"><span>Cart Items</span><strong data-cart-count>0</strong></div><div class="cart-total"><span>Total</span><strong data-cart-total>$0.00</strong></div><a class="btn btn-primary" href="cart.html">Review Cart</a><p class="input-note">Future backend route: <code>/api/stripe/create-checkout-session</code></p></div>
+</section><section class="store-section"><h2 class="section-title">Choose a Store Route</h2><p class="section-copy">Every category routes through SVR first. Partner stores remain under the SVR store system, with checkout disabled until backend wiring and approval.</p><div class="hub-grid">
+<a class="hub-card featured" href="store-svr.html"><div class="hub-avatar">♠</div><h3 class="hub-title">SVR Game Store</h3><p class="hub-copy">Chips, watch skins, avatar gear, table themes, and member cosmetics.</p><span class="btn btn-secondary">Open SVR</span></a>
+<a class="hub-card featured" href="store-reiki.html"><div class="hub-avatar">✦</div><h3 class="hub-title">Reiki Hub Store</h3><p class="hub-copy">Wellness apparel, meditation room items, booking samples, and approved partner slots.</p><span class="btn btn-primary">Open Reiki</span></a>
+<a class="hub-card featured" href="store-pga.html"><div class="hub-avatar">⛳</div><h3 class="hub-title">PGA Hub Store</h3><p class="hub-copy">Golf apparel, training packs, virtual grip skins, and sponsor range placements.</p><span class="btn btn-secondary">Open PGA</span></a>
+<a class="hub-card" href="store-smoker.html"><div class="hub-avatar">☁</div><h3 class="hub-title">Smoker Lounge Store</h3><p class="hub-copy">Compliant lounge apparel, art displays, room themes, and partner shelf samples.</p><span class="btn btn-ghost">Open Lounge</span></a>
+<a class="hub-card" href="membership.html"><div class="hub-avatar">★</div><h3 class="hub-title">Membership</h3><p class="hub-copy">Preview tiers, VIP access concepts, event passes, and future member dashboard logic.</p><span class="btn btn-secondary">View Tiers</span></a>
+<a class="hub-card" href="stripe-sandbox.html"><div class="hub-avatar">▣</div><h3 class="hub-title">Stripe Sandbox</h3><p class="hub-copy">Checkout architecture preview with no live sale and no secret keys exposed.</p><span class="btn btn-primary">View Sandbox</span></a>
+</div></section><section class="store-section"><h2 class="section-title">Featured Sample Items</h2><div class="cart-layout"><div class="product-grid">
+
+</div><aside class="cart-panel" id="cart"><div class="store-kicker"><span class="store-dot"></span> Sandbox Cart</div><h3 class="hub-title">Cart Preview</h3><div data-cart-list></div><div class="cart-total"><span>Total</span><strong data-cart-total>$0.00</strong></div><div class="checkout-row"><a class="btn btn-primary" href="#" data-sandbox-checkout>Sandbox Checkout</a><a class="btn btn-secondary" href="#" data-clear-cart>Clear</a></div><p class="input-note" data-cart-status>No live sales. Stripe sandbox payload only.</p></aside></div></section>
+      <footer class="footer"><p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn btn-secondary" href="index.html">Back to Site</a><a class="btn btn-primary" href="../game/index.html">Preview Game</a></div></footer>
     </main>
   </div>
   <script src="../matrix.js"></script>
   <script src="../site-public-hooks.js"></script>
+  <script src="store-cart.js"></script>
+  
 </body>
 </html>

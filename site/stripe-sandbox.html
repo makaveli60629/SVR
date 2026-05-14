@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stripe Sandbox | SVR Poker</title>
+  <meta name="description" content="Stripe sandbox checkout architecture preview for SVR Store." />
+  <link rel="icon" href="../logo.webp" type="image/webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="store-phase03.css" />
+</head>
+<body>
+  <canvas id="binary-rain" aria-hidden="true"></canvas>
+  <div class="site-shell">
+    <nav class="site-nav">
+  <div class="nav-brand">
+    <img src="../logo.webp" alt="SVR Poker logo" />
+    <div><strong>SVR POKER</strong><span>All In</span></div>
+  </div>
+  <div class="nav-links">
+    <span class="admin-status online" data-state="online">● Admin Online</span>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="sponsorship.html">Sponsorship</a>
+    <a href="membership.html">Membership</a>
+    <a href="impact.html">Impact</a>
+    <a href="store.html">Store</a>
+    <a href="donate.html">Donate</a>
+    <a href="contact.html">Contact</a>
+    <a href="../index.html">Launch</a>
+  </div>
+</nav>
+    <main class="site-card">
+      <section class="store-banner" style="margin-top:0;"><span class="store-kicker">Stripe Sandbox</span><h1 class="store-title">Sandbox Mode Only</h1><p class="store-lead">Stripe can be wired safely, but the public website should only call your backend endpoint. The backend creates the checkout session using secret keys stored in Azure App Service settings.</p><div class="category-strip"><a href="store.html">Store Hub</a><a href="cart.html">Cart</a><a class="active" href="stripe-sandbox.html">Stripe Sandbox</a></div></section><section class="store-section stripe-grid"><article class="stripe-panel"><h2 class="section-title">Frontend flow</h2><p class="section-copy">The site sends cart items to a secure route. It never contains Stripe secret keys.</p><ol class="section-copy"><li>Visitor builds cart.</li><li>Visitor clicks sandbox checkout.</li><li>Frontend calls <code>/api/stripe/create-checkout-session</code>.</li><li>Backend creates Stripe Checkout Session in test mode.</li><li>Visitor is redirected to Stripe-hosted checkout.</li></ol></article><article class="stripe-panel"><h2 class="section-title">Settings to wire later</h2><p class="section-copy">These go in Azure App Service settings, not the website files.</p><div class="sandbox-note"><code>STRIPE_SECRET_KEY=sk_test_...</code><br><code>STRIPE_WEBHOOK_SECRET=whsec_...</code><br><code>STORE_CHECKOUT_ENABLED=false</code></div><p class="input-note">Keep checkout disabled until products, taxes, fulfillment, and legal text are approved.</p></article></section><section class="store-section"><div class="cart-layout"><div class="stripe-panel"><h2 class="section-title">Sandbox Payload</h2><pre data-checkout-payload style="white-space:pre-wrap;min-height:160px;border:1px solid rgba(174,118,255,.28);border-radius:18px;padding:14px;background:rgba(0,0,0,.32);color:#e9ddff;overflow:auto;">Open Cart and click Sandbox Checkout to create a local payload.</pre></div><aside class="cart-panel" id="cart"><div class="store-kicker"><span class="store-dot"></span> Sandbox Cart</div><h3 class="hub-title">Cart Preview</h3><div data-cart-list></div><div class="cart-total"><span>Total</span><strong data-cart-total>$0.00</strong></div><div class="checkout-row"><a class="btn btn-primary" href="#" data-sandbox-checkout>Sandbox Checkout</a><a class="btn btn-secondary" href="#" data-clear-cart>Clear</a></div><p class="input-note" data-cart-status>No live sales. Stripe sandbox payload only.</p></aside></div></section>
+      <footer class="footer"><p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn btn-secondary" href="index.html">Back to Site</a><a class="btn btn-primary" href="../game/index.html">Preview Game</a></div></footer>
+    </main>
+  </div>
+  <script src="../matrix.js"></script>
+  <script src="../site-public-hooks.js"></script>
+  <script src="store-cart.js"></script>
+  
+</body>
+</html>
