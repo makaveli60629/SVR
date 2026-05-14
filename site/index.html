@@ -1,3 +1,251 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Website Preview | SVR Poker</title><link rel="stylesheet" href="../css/style.css"><link rel="icon" href="../img/logo.png"><meta name="build" content="SITE-PHASE-03-ADMIN-MEMBERSHIP-CONTACT-LOCK"></head><body class="site-body"><canvas id="matrix"></canvas><div class="scanline"></div><header class="topbar"><a class="brand" href="../"><img src="../img/logo.png" alt="SVR"><span>SVR POKER</span></a><nav class="nav">
-  <a href="index.html" class="active">Home</a><a href="about.html">About</a><a href="sponsorship.html">Sponsorship</a><a href="membership.html">Membership</a><a href="impact.html">Impact</a><a href="store.html">Store</a><a href="contact.html">Contact</a><a href="admin-preview.html">Admin Preview</a><a href="../game/">Game</a>
-</nav></header><section class="page-title"><h1>Website Preview</h1><p>Main website hub with live game preview, business pages, support flow, admin preview, and membership preview.</p><div class="admin-pill" data-admin-pill><span class="admin-dot"></span><span data-admin-label>Admin Offline</span></div></section><section class="hero"><div class="hero-inner"><div class="hero-copy"><img src="../img/logo.png" class="hero-logo" alt="SVR Poker"><span class="tag">Site Phase 03</span><h1 class="hero-title">SVR Poker</h1><p>Official website preview for the SVR Poker ecosystem: play-money poker, sponsor hubs, memberships, impact stories, VR storefronts, admin tools, and future Azure-backed support flow.</p><div class="actions"><a class="btn" href="about.html">Explore About</a><a class="btn secondary" href="sponsorship.html">Sponsor Deck</a><a class="btn green" href="https://cash.app/$SVRhelp" target="_blank" rel="noopener">Support Development</a></div></div><div class="preview-frame"><span class="badge-live">CAM 3 LIVE</span><iframe title="SVR Poker Lobby Preview" src="../game/index.html?preview=1&cam=director&autocam=1" loading="lazy"></iframe></div></div></section><section class="section"><h2>Phase 03 additions</h2><p class="lead">This phase keeps the locked purple Matrix public page and adds review-ready website sections. Admin and membership dashboards are visible for layout review only; access gates stay ready for backend wiring.</p><div class="grid cols-3"><article class="card"><h3>Admin + Support</h3><p>Owner login preview, Admin Online/Offline status, message viewer shell, and safe local message storage until Azure API is live.</p></article><article class="card"><h3>Membership</h3><p>Public membership tiers and dashboard preview for future user profile, access, rewards, and tournament positioning.</p></article><article class="card"><h3>Business Pages</h3><p>About, Sponsorship, Impact, Store, and Contact pages structured for enterprise presentation and sponsor review.</p></article></div></section><section class="section"><h2>Fast portals</h2><div class="portal-panel"><a class="card portal-card" href="about.html"><span class="tag">Mission</span><h3>About SVR</h3><p>Play-money poker, VR lounges, sponsor hubs, and giveback direction.</p></a><a class="card portal-card" href="membership.html"><span class="tag">Preview</span><h3>Membership Dashboard</h3><p>Layout review now; gated access later.</p></a><a class="card portal-card" href="admin-preview.html"><span class="tag">Owner</span><h3>Admin Preview</h3><p>Admin tools shell before authentication lock.</p></a><a class="card portal-card" href="contact.html"><span class="tag">Support</span><h3>Message SVR</h3><p>Public message/drop box in safe local mode.</p></a></div></section><footer class="footer">© 2026 SVR Poker. All rights reserved. • Phase 03 site lock • No game files included.</footer><script src="../js/matrix.js"></script><script src="../js/site-public-hooks.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SVR Poker | One-Page Site</title>
+  <meta name="description" content="Polished one-page site preview for SVR Poker." />
+  <link rel="icon" href="../logo.webp" type="image/webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <canvas id="binary-rain" aria-hidden="true"></canvas>
+
+  <div class="site-shell">
+    <nav class="site-nav">
+      <div class="nav-brand">
+        <img src="../logo.webp" alt="SVR Poker logo" />
+        <div>
+          <strong>SVR POKER</strong>
+          <span>One-page site preview</span>
+        </div>
+      </div>
+      <div class="nav-links">
+        <span class="admin-status offline" id="admin-status" data-state="offline">● Admin Offline</span>
+        <a href="#experience">Experience</a>
+        <a href="#live-preview">Live Preview</a>
+        <a href="#login">Login</a>
+        <a href="#store">Store</a>
+        <a href="#message">Message</a>
+        <a href="../index.html">Launch</a>
+      </div>
+    </nav>
+
+    <main class="site-card">
+      <section class="hero-grid" id="experience">
+        <div class="hero-copy">
+          <div class="eyebrow">One-Page Public Site</div>
+          <h1 class="title-lockup brand-inline brand-inline-left">
+            <span class="poker-word poker-full">SVR POKER</span>
+          </h1>
+          <p class="hero-sub">Rich neon presentation, simple public flow, and a cleaner one-page structure.</p>
+          <p class="launch-copy">This page is built for show-and-tell: brand forward, lightweight, and ready for your next round of login, SQL, and payment wiring without another redesign.</p>
+          <div class="inline-actions">
+            <a class="btn btn-primary" href="../game/index.html">Preview Game</a>
+            <a class="btn btn-secondary" href="../index.html">Public Launch Page</a>
+          </div>
+        </div>
+
+        <aside class="hero-panel live-preview-panel" id="live-preview">
+          <div class="panel-heading">
+            <span class="card-tag">Live Preview</span>
+            <h3>Lobby / Training Room Window</h3>
+          </div>
+          <div class="preview-window">
+            <iframe src="../game/index.html?embed=1" title="SVR Poker live preview" loading="lazy" allow="fullscreen; xr-spatial-tracking"></iframe>
+          </div>
+          <div class="metrics metrics-compact">
+            <div class="metric">
+              <strong>Live View</strong>
+              <span>Embedded room preview</span>
+            </div>
+            <div class="metric">
+              <strong>Login UI</strong>
+              <span>Ready to wire</span>
+            </div>
+            <div class="metric">
+              <strong>Stripe + SQL</strong>
+              <span>Prepared next step</span>
+            </div>
+          </div>
+          <div class="setup-note">This panel is reserved for the future lobby feed or a third-camera preview. The current build uses an embedded live room preview so visitors can see the space before entering.</div>
+        </aside>
+      </section>
+
+      <section class="section" id="login">
+        <h2 class="section-title">Login Access Shell</h2>
+        <p class="section-copy">This section gives you the visual entry point for member login, creator access, and future account flows.</p>
+        <div class="utility-grid">
+          <article class="utility-card">
+            <div class="card-tag">Member Portal</div>
+            <h3>Sign In</h3>
+            <div class="input-grid">
+              <label>Email<input type="email" placeholder="member@svrpoker.com" /></label>
+              <label>Password<input type="password" placeholder="••••••••" /></label>
+            </div>
+            <div class="inline-actions">
+              <a class="btn btn-primary" href="#sql">Wire Login</a>
+              <a class="btn btn-secondary" href="#contact">Request Access</a>
+            </div>
+            <p class="input-note">UI only in this build. Connect to your SQL-backed auth service next.</p>
+          </article>
+          <article class="utility-card">
+            <div class="card-tag">Member Flow</div>
+            <h3>Account Features</h3>
+            <p class="card-copy">Saved profile, membership tier, table access, purchase history, and future event invites can all hang off the same account object once your SQL tables are wired.</p>
+          </article>
+          <article class="utility-card">
+            <div class="card-tag">Email Capture</div>
+            <h3>Waitlist Form</h3>
+            <label>Join updates<input type="email" placeholder="you@example.com" /></label>
+            <div class="inline-actions"><a class="btn btn-ghost" href="#contact">Connect Mail</a></div>
+            <p class="input-note">Use this for launch updates, approvals, founder offers, and table invites.</p>
+          </article>
+        </div>
+      </section>
+
+
+
+      <section class="section" id="store">
+        <h2 class="section-title">Store + Lobby Preview Plan</h2>
+        <p class="section-copy">The site now has a clear place for the item shop and the future live lobby or training-room preview feed. This is the cleanest next layer before full auth and backend wiring.</p>
+        <div class="membership-grid">
+          <article class="price-card">
+            <div class="card-tag">Item Shop</div>
+            <h3>Avatar Packs</h3>
+            <p class="price">$9 <small>and up</small></p>
+            <p class="price-note">Character cosmetics, props, accessories, and themed bundles for members.</p>
+          </article>
+          <article class="price-card">
+            <div class="card-tag">Bundles</div>
+            <h3>VIP Packages</h3>
+            <p class="price">$29 <small>starter</small></p>
+            <p class="price-note">Founder packs, chip sets, room access, and premium cosmetic drops.</p>
+          </article>
+          <article class="price-card">
+            <div class="card-tag">Room Feed</div>
+            <h3>Live Preview Panel</h3>
+            <p class="price">Next</p>
+            <p class="price-note">Third-camera lobby preview or live room feed can sit in a dedicated panel once the game camera output is exposed.</p>
+          </article>
+        </div>
+        <div class="setup-note">Recommended next step: reserve a live preview window for a lobby feed or third camera, then wire it through a lightweight backend session layer so visitors can watch activity before entering.</div>
+      </section>
+
+      <section class="section" id="payments">
+        <h2 class="section-title">Payment Entry</h2>
+        <p class="section-copy">Styled for Stripe Checkout or a hosted payment link. The visuals are here; live keys are not embedded in this public file.</p>
+        <div class="membership-grid">
+          <article class="price-card">
+            <div class="card-tag">Starter</div>
+            <h3>Public Access</h3>
+            <p class="price">Free</p>
+            <p class="price-note">Launch news, public previews, and browser room access.</p>
+            <div class="inline-actions"><a class="btn btn-secondary" href="#contact">Join Waitlist</a></div>
+          </article>
+          <article class="price-card">
+            <div class="card-tag">Core</div>
+            <h3>VIP Table</h3>
+            <p class="price">$19 <small>/ month</small></p>
+            <p class="price-note">Future gated tables, member identity, and premium access.</p>
+            <div class="inline-actions"><a class="btn btn-primary" href="#sql">Connect Stripe</a></div>
+          </article>
+          <article class="price-card">
+            <div class="card-tag">Founders</div>
+            <h3>Creator Tier</h3>
+            <p class="price">$49 <small>/ month</small></p>
+            <p class="price-note">Founders perks, premium event access, and partner positioning.</p>
+            <div class="inline-actions"><a class="btn btn-ghost" href="#contact">Contact Team</a></div>
+          </article>
+        </div>
+        <div class="setup-note">Recommended flow: your front end calls a server endpoint, the server creates a Stripe Checkout Session, and the client redirects there. Keep secret keys on the server only.</div>
+      </section>
+
+      <section class="section" id="sql">
+        <h2 class="section-title">SQL Ready Handoff</h2>
+        <p class="section-copy">The page is now laid out so you can bolt in real data without changing the public design again.</p>
+        <div class="roadmap-grid">
+          <article class="roadmap-item">
+            <h3>Users</h3>
+            <p>Store account email, password hash, membership tier, role, and approval state.</p>
+          </article>
+          <article class="roadmap-item">
+            <h3>Payments</h3>
+            <p>Track Stripe customer ID, subscription ID, status, and renewal dates.</p>
+          </article>
+          <article class="roadmap-item">
+            <h3>Access</h3>
+            <p>Bind gameplay entitlements and room permissions to the logged-in account.</p>
+          </article>
+          <article class="roadmap-item">
+            <h3>Email</h3>
+            <p>Save opt-in state, waitlist status, and campaign list tags for your domain mailboxes.</p>
+          </article>
+        </div>
+      </section>
+
+
+      <section class="section" id="message">
+        <h2 class="section-title">Visitor Message Drop</h2>
+        <p class="section-copy">A simple public message box is restored here so visitors, sponsors, and players can leave questions while the SQL/API layer is being wired.</p>
+        <div class="utility-grid">
+          <article class="utility-card message-card">
+            <div class="card-tag">Public Chat Intake</div>
+            <h3>Leave a Message</h3>
+            <form id="visitor-message-form" class="message-form">
+              <label>Name<input name="name" type="text" placeholder="Your name" autocomplete="name" /></label>
+              <label>Email<input name="email" type="email" placeholder="you@example.com" autocomplete="email" /></label>
+              <label>Message<textarea name="message" rows="5" placeholder="Drop a question, sponsorship request, support note, or site feedback."></textarea></label>
+              <button class="btn btn-primary" type="submit">Save Message</button>
+            </form>
+            <p class="input-note" id="visitor-message-status">Local-safe restore mode: messages are saved in this browser until the Azure SQL/API endpoint is connected.</p>
+          </article>
+          <article class="utility-card">
+            <div class="card-tag">Admin Presence</div>
+            <h3>Online / Offline Hook</h3>
+            <p class="card-copy">The public indicator is now present. It can be wired to your admin login session so visitors see when an admin is available.</p>
+            <div class="admin-status offline admin-status-large" data-state="offline">● Admin Offline</div>
+          </article>
+          <article class="utility-card">
+            <div class="card-tag">Backend Next</div>
+            <h3>Azure SQL Ready</h3>
+            <p class="card-copy">Next connection target: POST visitor messages into an API route, store them in Azure SQL, then show them in the future admin dashboard.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="contact">
+        <h2 class="section-title">Contact + Business Setup</h2>
+        <div class="faq-grid">
+          <article class="faq-item">
+            <h3>Business Email</h3>
+            <p>Use your domain for branded addresses like hello@svrpoker.com and vip@svrpoker.com. The setup notes in this zip point you to simple options for routing or hosted mail.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Next Backend Step</h3>
+            <p>Hand over your SQL schema or connection details and the next pass can wire the login form, waitlist capture, and Stripe endpoints to real data.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Public Posture</h3>
+            <p>This build keeps the launch face clean while leaving clear hooks for accounts, payments, and member-only content.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p>
+        <div class="inline-actions">
+          <a class="btn btn-secondary" href="../index.html">Preview Launch</a>
+          <a class="btn btn-primary" href="../game/index.html">Preview Game</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../matrix.js"></script>
+  <script src="../site-public-hooks.js"></script>
+</body>
+</html>

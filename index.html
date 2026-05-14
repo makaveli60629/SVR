@@ -1,25 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Scarlett VR Poker</title>
-<link rel="stylesheet" href="css/style.css">
-<link rel="icon" href="img/logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SVR Poker | Public Launch Page</title>
+  <meta name="description" content="SVR Poker public launch page." />
+  <link rel="icon" href="./logo.webp" type="image/webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./launch.css" />
 </head>
-<body>
+<body class="launch-body">
+  <canvas id="binary-rain" aria-hidden="true"></canvas>
 
-<canvas id="matrix"></canvas>
+  <main class="launch-page">
+    <div class="admin-status offline" id="admin-status" data-state="offline">● Admin Offline</div>
+    <img class="launch-logo" src="./logo.webp" alt="SVR Poker logo" />
 
-<div class="center">
-<img src="img/logo.png" class="logo">
+    <div class="launch-copy">
+      <div class="eyebrow">Public Launch Page</div>
+      <h1 class="title-lockup brand-inline">
+        <span class="poker-word poker-full">SVR Poker</span>
+      </h1>
+      <p class="launch-note">This is a public page.</p>
+      <p class="launch-note">Site under construction.</p>
+      <p class="launch-note launch-age">18 years and older only for this project.</p>
+    </div>
 
-<div class="status">SITE UNDER CONSTRUCTION</div>
-<div class="age">18+ ONLY • LAUNCHING SOON</div>
+    <div class="action-row">
+      <a class="btn btn-primary" href="./site/index.html">Preview Site</a>
+      <a class="btn btn-secondary" href="./game/index.html">Preview Game</a>
+      <a class="btn btn-ghost" href="./site/index.html#message">Leave Message</a>
+    </div>
 
-<a class="btn" href="game/">ENTER PREVIEW</a>
-</div>
+    <footer class="launch-footer">
+      <p>© 2026 SVR Poker. All rights reserved.</p>
+      <p>Scarlett Holding LLC • Team Nova • R.Chadee</p>
+    </footer>
+  </main>
 
-<script src="js/matrix.js"></script>
-
+  <script src="./matrix.js"></script>
+  <script src="./site-public-hooks.js"></script>
 </body>
 </html>
