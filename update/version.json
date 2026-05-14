@@ -1,4 +1,7 @@
-{
-  "version": "PHASE-59",
-  "notes": "Updated build to Phase 59; poker logic completed."
+﻿{
+  "build": "PHASE-73-DEPLOY-UNSTUCK-DIRECT-GAME",
+  "phase": 73,
+  "scope": "deploy unstuck direct game",
+  "siteTouched": false,
+  "updatedAt": "2026-05-14T00:24:50.3704775-05:00"
 }

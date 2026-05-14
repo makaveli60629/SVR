@@ -40,7 +40,7 @@ function computeForearmPose(hand, camera, renderer, side = 'left'){
   const wrist = getJointWorld(hand, ['wrist']);
   const index = getJointWorld(hand, ['index-finger-metacarpal', 'index-finger-phalanx-proximal', 'index-finger-tip']);
   const pinky = getJointWorld(hand, ['pinky-finger-metacarpal', 'pinky-finger-phalanx-proximal', 'pinky-finger-tip']);
-  if (!wrist || !index || !pinky) return computeControllerForearmPose(hand, side);
+  if (!wrist || !index || !pinky) return null;
 
   const midpoint = V3.copy(index).add(pinky).multiplyScalar(0.5);
   const forearmDir = V0.copy(wrist).sub(midpoint).normalize();
@@ -67,21 +67,6 @@ function computeForearmPose(hand, camera, renderer, side = 'left'){
     .add(faceNormal.clone().multiplyScalar(0.020))
     .add(acrossPalm.clone().multiplyScalar(side === 'left' ? -0.004 : 0.004));
 
-  return { position, quaternion };
-}
-
-
-function computeControllerForearmPose(input, side = 'left'){
-  const controller = input?.userData?.controller || input;
-  if (!controller) return null;
-  controller.updateWorldMatrix?.(true, false);
-  const position = new THREE.Vector3();
-  const quaternion = new THREE.Quaternion();
-  controller.getWorldPosition(position);
-  controller.getWorldQuaternion(quaternion);
-  const outward = new THREE.Vector3(side === 'left' ? -0.075 : 0.075, -0.035, -0.035).applyQuaternion(quaternion);
-  position.add(outward);
-  quaternion.multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.35, side === 'left' ? 0.22 : -0.22, 0.0, 'XYZ')));
   return { position, quaternion };
 }
 
@@ -163,7 +148,8 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 function buildButtons(state){
   const buttons = [
     { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'seatScene', label: 'SEAT', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'tableScene', label: 'TABLE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
@@ -171,7 +157,10 @@ function buildButtons(state){
 
     { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'reikiRoomScene', label: 'REIKI RM', x: 284, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'reikiRoomScene', label: 'REIKI RM', x: 284, y: 250, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'storeScene', label: 'STORE', x: 24, y: 302, w: 118, h: 42, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'storeRoomScene', label: 'STORE RM', x: 154, y: 302, w: 118, h: 42, font: 15, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'openStore', label: 'WEB', x: 284, y: 302, w: 118, h: 42, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
     { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
@@ -242,7 +231,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • Reiki / PGA / Sponsor / Scorpion • pinch with other hand • fist by face toggles TP', 36, 332);
+    ctx.fillText('Quick scenes • Reiki / PGA / Store / Sponsor / Scorpion • original lobby preserved', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -281,6 +270,7 @@ let hoveredId = null;
     if (id === 'leave') actions.leaveTable?.();
     if (id === 'teleport') actions.toggleTeleport?.();
     if (id === 'lobby') actions.goLobby?.();
+    if (id === 'tableScene') actions.goTable?.();
     if (id === 'seatScene') actions.goSeat?.();
     if (id === 'reikiScene') actions.goReiki?.();
     if (id === 'pgaScene') actions.goPga?.();
@@ -288,6 +278,9 @@ let hoveredId = null;
     if (id === 'sponsorScene') actions.goSponsor?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
     if (id === 'reikiRoomScene') actions.goReikiRoom?.();
+    if (id === 'storeScene') actions.goStore?.();
+    if (id === 'storeRoomScene') actions.goStoreScene?.();
+    if (id === 'openStore') actions.openStore?.();
   }
 
   function update(dt, leftHand, rightHand){

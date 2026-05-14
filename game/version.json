@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-62-NEXT-ZIP-CONTROLLER-POKER-LOCK",
-  "phase": 62,
-  "date": "2026-05-11",
-  "notes": "Next ZIP: controller watch fallback, clean bottom routing, neutral Reiki sponsor placeholder, deploy-safe package."
+  "build": "PHASE-73-DEPLOY-UNSTUCK-DIRECT-GAME",
+  "phase": 73,
+  "scope": "deploy unstuck direct game",
+  "siteTouched": false
 }

@@ -1,4 +1,4 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -7,7 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { createGameMatrixSecret } from "./modules/game_matrix_secret.js";
+import { applyPhase71EditUnlock, PHASE71_BUILD, PHASE71_STORE_URL } from "./modules/phase71_edit_unlock.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -55,7 +55,6 @@ $toggleLog.addEventListener("click", ()=>{
 if (AUTOCAM) document.body.classList.add("preview-mode");
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
-const gameMatrixSecret = createGameMatrixSecret({ phrases: ["I LOVE SHY", "I LOVE SCARLETT"], opacity: 0.16, zIndex: 1, fps: 24 });
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
@@ -71,9 +70,10 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading worldâ€¦", { force: true });
+setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
+applyPhase71EditUnlock({ scene, sceneTargets, log });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -180,6 +180,7 @@ function gotoScene(key){
 
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
+    if (btn.dataset.openStore){ window.open(PHASE71_STORE_URL, "_blank", "noopener,noreferrer"); return; }
     const key = btn.dataset.scene;
     if (key) gotoScene(key);
   });
@@ -193,13 +194,16 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
   if (e.code === "Digit1") gotoScene("lobby");
-  if (e.code === "Digit2") gotoScene("seat");
-  if (e.code === "Digit3") gotoScene("reiki");
-  if (e.code === "Digit4") gotoScene("reikiRoom");
+  if (e.code === "Digit2") gotoScene("table");
+  if (e.code === "Digit3") gotoScene("seat");
+  if (e.code === "Digit4") gotoScene("reiki");
   if (e.code === "Digit5") gotoScene("pga");
   if (e.code === "Digit6") gotoScene("legends");
   if (e.code === "Digit7") gotoScene("sponsor");
   if (e.code === "Digit8") gotoScene("scorpion");
+  if (e.code === "Digit9") gotoScene("reikiRoom");
+  if (e.code === "Digit0") gotoScene("storeScene");
+  if (e.code === "KeyO") window.open(PHASE71_STORE_URL, "_blank", "noopener,noreferrer");
 });
 
 const watch = createWristWatch({
@@ -222,13 +226,17 @@ const watch = createWristWatch({
     leaveTable,
     toggleTeleport: ()=>tp.toggleMode(),
     goLobby: ()=>gotoScene("lobby"),
+    goTable: ()=>gotoScene("table"),
     goSeat: ()=>gotoScene("seat"),
     goReiki: ()=>gotoScene("reiki"),
     goPga: ()=>gotoScene("pga"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom")
+    goReikiRoom: ()=>gotoScene("reikiRoom"),
+    goStore: ()=>gotoScene("store"),
+    goStoreScene: ()=>gotoScene("storeScene"),
+    openStore: ()=>window.open(PHASE71_STORE_URL, "_blank", "noopener,noreferrer")
   }
 });
 
@@ -237,12 +245,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logoâ€¦", { force: true });
+setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Controller/hand watch ready. Desktop buttons: Lobby/Seat/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
+setStatus(AUTOCAM ? "Live preview ready" : `${PHASE71_BUILD} ready. Original lobby preserved. Store portal + private store scene added.`, { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -322,7 +330,7 @@ renderer.setAnimationLoop(()=>{
     });
   }
 
-  if (watch) watch.update(dt, leftHand || leftController, rightHand || rightController);
+  if (watch) watch.update(dt, leftHand, rightHand);
 
   renderer.render(scene, camera);
 });
@@ -334,9 +342,7 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloadingâ€¦");
-  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
+  log("[ERR] WebGL context lost. Reloading…");
+  setStatus("WebGL context lost (reloading…)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
-
-
