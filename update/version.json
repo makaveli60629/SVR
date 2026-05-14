@@ -1,7 +1,8 @@
 ﻿{
-  "build": "PHASE-73-DEPLOY-UNSTUCK-DIRECT-GAME",
-  "phase": 73,
-  "scope": "deploy unstuck direct game",
+  "build": "PHASE-75-REIKI-DOMAIN-PURGE-WAITING-APPROVAL",
+  "phase": 75,
+  "scope": "game-only Reiki domain purge, waiting approval placeholder, store portal, teleport controls, private scene routing",
   "siteTouched": false,
-  "updatedAt": "2026-05-14T00:24:50.3704775-05:00"
+  "storeUrl": "https://svrpoker.com/site/store.html",
+  "updatedAt": "2026-05-14T01:07:13.3521853-05:00"
 }

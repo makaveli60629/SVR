@@ -1,0 +1,14 @@
+{
+  "build": "PHASE-75-REIKI-DOMAIN-PURGE-WAITING-APPROVAL",
+  "status": "waiting_for_approval",
+  "liveThirdPartyBranding": false,
+  "forbiddenTerms": [
+    "AWAITING APPROVAL",
+    "AWAITING APPROVAL",
+    "AWAITING APPROVAL",
+    "AWAITING APPROVAL",
+    "AWAITING APPROVAL"
+  ],
+  "placeholder": "WAITING FOR APPROVAL",
+  "siteTouched": false
+}

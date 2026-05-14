@@ -153,6 +153,8 @@ function buildButtons(state){
 
     { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pgaDriveScene', label: 'DRIVE', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pgaChipScene', label: 'CHIP', x: 414, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'legendScene', label: 'LEGEND', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
@@ -231,7 +233,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • Reiki / PGA / Store / Sponsor / Scorpion • original lobby preserved', 36, 332);
+    ctx.fillText('Quick scenes • Reiki / PGA Drive / Chip-Putt / Store • lobby preserved', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -274,6 +276,8 @@ let hoveredId = null;
     if (id === 'seatScene') actions.goSeat?.();
     if (id === 'reikiScene') actions.goReiki?.();
     if (id === 'pgaScene') actions.goPga?.();
+    if (id === 'pgaDriveScene') actions.goPgaDrive?.();
+    if (id === 'pgaChipScene') actions.goPgaChipPutt?.();
     if (id === 'legendScene') actions.goLegend?.();
     if (id === 'sponsorScene') actions.goSponsor?.();
     if (id === 'scorpionScene') actions.goScorpion?.();

@@ -198,10 +198,12 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit3") gotoScene("seat");
   if (e.code === "Digit4") gotoScene("reiki");
   if (e.code === "Digit5") gotoScene("pga");
-  if (e.code === "Digit6") gotoScene("legends");
-  if (e.code === "Digit7") gotoScene("sponsor");
-  if (e.code === "Digit8") gotoScene("scorpion");
-  if (e.code === "Digit9") gotoScene("reikiRoom");
+  if (e.code === "Digit6") gotoScene("pgaDrive");
+  if (e.code === "KeyC") gotoScene("pgaChipPutt");
+  if (e.code === "Digit7") gotoScene("legends");
+  if (e.code === "Digit8") gotoScene("sponsor");
+  if (e.code === "Digit9") gotoScene("scorpion");
+  if (e.code === "KeyR") gotoScene("reikiRoom");
   if (e.code === "Digit0") gotoScene("storeScene");
   if (e.code === "KeyO") window.open(PHASE71_STORE_URL, "_blank", "noopener,noreferrer");
 });
@@ -230,6 +232,8 @@ const watch = createWristWatch({
     goSeat: ()=>gotoScene("seat"),
     goReiki: ()=>gotoScene("reiki"),
     goPga: ()=>gotoScene("pga"),
+    goPgaDrive: ()=>gotoScene("pgaDrive"),
+    goPgaChipPutt: ()=>gotoScene("pgaChipPutt"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
@@ -249,7 +253,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : `${PHASE71_BUILD} ready. Original lobby preserved. Store portal + private store scene added.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `${PHASE71_BUILD} ready. Reiki domain purge, waiting-approval placeholders, store portal, private scenes, and teleport controls updated.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
