@@ -1,0 +1,17 @@
+{
+  "build": "PHASE-86-PGA-STABILITY-WATCH-LOCK",
+  "scope": "game-side PGA range boot/stability lock",
+  "siteTouched": false,
+  "files": [
+    "game/range.html",
+    "game/modules/pga_phase85_update.js",
+    "game/docs/BUILD_VERSION.json",
+    "game/docs/PHASE_86_PGA_STABILITY_WATCH_LOCK.md"
+  ],
+  "fixes": [
+    "defines phase85Pga before render loop",
+    "safe caddie coach module",
+    "manual Day/Night toggle",
+    "range boot safety"
+  ]
+}

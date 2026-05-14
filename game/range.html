@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR PGA Driving Range • Phase 86 PGA Stability Watch Lock</title>
+  <title>SVR PGA Driving Range â€¢ Phase 86 PGA Stability Watch Lock</title>
   <meta name="theme-color" content="#050508"/>
   <style>
     :root{color-scheme:dark}
@@ -21,8 +21,8 @@
 <body>
   <div id="app"></div>
   <div id="hud">
-    <div class="pill" id="status">Loading PGA range…</div>
-    <div class="pill" id="score">Training Points: 0 • Best Target: 0 • Shots: 0</div>
+    <div class="pill" id="status">Loading PGA rangeâ€¦</div>
+    <div class="pill" id="score">Training Points: 0 â€¢ Best Target: 0 â€¢ Shots: 0</div>
     <div style="display:flex;gap:8px;align-items:center">
       <button class="btn" id="lobbyBtn">Lobby</button>
       <button class="btn" id="resetBtn">Reset Ball</button>
@@ -59,7 +59,7 @@
     const range = createRangeExperience({
       scene, camera, renderer,
       statusCb:(txt)=>{ status.textContent = txt; },
-      scoreCb:(state)=>{ score.textContent = `Training Points: ${state.points} • Best Target: ${state.bestTarget} • Shots: ${state.shots}`; }
+      scoreCb:(state)=>{ score.textContent = `Training Points: ${state.points} â€¢ Best Target: ${state.bestTarget} â€¢ Shots: ${state.shots}`; }
     });
 
     const phase85Pga = createPhase85PgaUpdate({
@@ -117,8 +117,9 @@
       watch.update(dt,leftHand||leftController,rightHand||rightController);
       renderer.render(scene,camera);
     });
-    status.textContent = `${RANGE_BUILD} ready • standalone PGA range • caddie coach active`;
+    status.textContent = `${RANGE_BUILD} ready â€¢ standalone PGA range â€¢ caddie coach active`;
     range.refreshScore?.();
   </script>
 </body>
 </html>
+
