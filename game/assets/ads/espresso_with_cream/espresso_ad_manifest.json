@@ -1,0 +1,25 @@
+{
+  "ad_name": "Espresso with Cream",
+  "intended_scene": "SVR Poker main lobby",
+  "placement": "background building above / near Reiki storefront area",
+  "recommended_texture": "espresso_with_cream_building_ad_1024x512.png",
+  "fallback_texture": "espresso_with_cream_building_ad_512x256.png",
+  "scale_notes": {
+    "large_building_plane": {
+      "width": 5.0,
+      "height": 2.5
+    },
+    "small_building_plane": {
+      "width": 3.0,
+      "height": 1.5
+    },
+    "aspect_ratio": "2:1"
+  },
+  "game_rules": [
+    "Use as a modular removable building ad.",
+    "Keep behind/above Reiki storefront without blocking walkway.",
+    "Use unlit/emissive material at low intensity for readability.",
+    "Do not touch website files.",
+    "Keep Android/Quest controller stick movement fallback enabled."
+  ]
+}
