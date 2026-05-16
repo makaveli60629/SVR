@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • PHASE-91-PGA-DRIVING-RANGE-RESTORE-LOCK</title>
+  <title>ScarlettVR Poker • phase 39 hub scenes ad and pga presentation</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -97,42 +97,25 @@
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: …</span>
-      <span class="pill">BUILD: PHASE-91-PGA-DRIVING-RANGE-RESTORE-LOCK</span>
+      <span class="pill">BUILD: PHASE-84-ESPRESSO-BUILDING-AD-CONTROLLER-LOCK</span>
     </div>
   </div>
 
   <div id="sceneNav">
     <button class="scene-btn" data-scene="lobby">Lobby</button>
+    <button class="scene-btn" data-scene="table">Table</button>
     <button class="scene-btn" data-scene="seat">Seat</button>
     <button class="scene-btn" data-scene="reiki">Reiki</button>
-    <button class="scene-btn" data-url="./reiki.html">Reiki Room</button>
+    <button class="scene-btn" data-scene="reikiRoom">Zen Den</button>
     <button class="scene-btn" data-scene="pga">PGA</button>
-    <button class="scene-btn" data-url="./pga-drive.html">Drive</button>
-    <button class="scene-btn" data-url="./chip-putt.html">Chip/Putt</button>
-    <button class="scene-btn" data-url="./store-room.html">Store</button>
-    <button class="scene-btn" data-url="./smoker-lounge.html">Smoker</button>
-    <button class="scene-btn" data-url="./scorpion.html">Scorpion</button>
+    <button class="scene-btn" data-scene="legends">Legend</button>
+    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
+    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
   </div>
 
   <pre id="log"></pre>
   <pre id="err"></pre>
 
   <script type="module" src="./main.js"></script>
-
-  <script>
-    window.SVR_BUILD_LABEL = "PHASE-91-PGA-DRIVING-RANGE-RESTORE-LOCK";
-    (function phase84BootGuard(){
-      const started = Date.now();
-      const failSafe = setTimeout(()=>{
-        const status = document.getElementById('status');
-        const err = document.getElementById('err');
-        if (status && /Booting|Loading/i.test(status.textContent || '')) {
-          status.textContent = 'Preview guard active — lobby fallback ready';
-          if (err) { err.style.display='none'; }
-        }
-      }, 9000);
-      window.addEventListener('SVR_READY', ()=>clearTimeout(failSafe), { once: true });
-    })();
-  </script>
 </body>
 </html>

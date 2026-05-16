@@ -289,7 +289,11 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       snapCooldownUntil = performance.now() + 220;
     }
 
-    const mag = Math.hypot(leftStick.x, leftStick.y);
+    // Phase 84 lock: left stick can still move, but right-stick Y also moves
+    // forward/back so one-controller and Android/controller fallback remain usable.
+    const moveX = Math.abs(leftStick.x) > 0.12 ? leftStick.x : 0;
+    const moveY = Math.abs(leftStick.y) > 0.12 ? leftStick.y : rightStick.y;
+    const mag = Math.hypot(moveX, moveY);
     if (mag < 0.12) return;
 
     const xrCam = renderer.xr.getCamera(camera);
@@ -299,8 +303,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     headDir.normalize();
     const rightDir = new THREE.Vector3(headDir.z, 0, -headDir.x).normalize();
     const speed = 2.8;
-    const stepX = (rightDir.x * leftStick.x + headDir.x * (-leftStick.y)) * speed * dt;
-    const stepZ = (rightDir.z * leftStick.x + headDir.z * (-leftStick.y)) * speed * dt;
+    const stepX = (rightDir.x * moveX + headDir.x * (-moveY)) * speed * dt;
+    const stepZ = (rightDir.z * moveX + headDir.z * (-moveY)) * speed * dt;
     const nextX = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
     const nextZ = THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp);
     setPlayerXZ(nextX, nextZ);
@@ -386,7 +390,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       stableTargetMs = 0;
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
-        ? "Controllers active • left stick move • right stick snap turn • A/X teleport"
+        ? "Controllers active • right stick Y move • right stick X snap turn • A/X teleport"
         : "TELEPORT OFF • press TP or make fist by face";
       statusCb(idleMsg);
       modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist by face toggles TP");
@@ -488,5 +492,5 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     statusCb("HAND TP ON • fist by face toggles • hold pinch then release");
   }
 
-  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
+  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, isEnabled: ()=>mode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
 }

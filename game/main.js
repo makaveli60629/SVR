@@ -43,101 +43,15 @@ function setMode(text){
 
 function log(...args){
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
-  console.log("[SVR]", ...args);
-  if (!$log) return;
   $log.textContent += line + "\n";
   $log.scrollTop = $log.scrollHeight;
 }
 
-$toggleLog?.addEventListener("click", ()=>{
-  if (!$log) return;
+$toggleLog.addEventListener("click", ()=>{
   $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
 });
 
 if (AUTOCAM) document.body.classList.add("preview-mode");
-
-function buildEmergencyLobby(scene, err){
-  const group = new THREE.Group();
-  group.name = "SVR_EMERGENCY_LOBBY_FALLBACK";
-  scene.add(group);
-  scene.background = new THREE.Color(0x010105);
-  scene.add(new THREE.HemisphereLight(0xdde8ff, 0x050507, 0.75));
-  const key = new THREE.DirectionalLight(0xffffff, 1.2);
-  key.position.set(8, 14, 8);
-  scene.add(key);
-
-  const floor = new THREE.Mesh(
-    new THREE.CircleGeometry(24, 96),
-    new THREE.MeshStandardMaterial({ color: 0x171326, roughness: 0.88, metalness: 0.02 })
-  );
-  floor.rotation.x = -Math.PI / 2;
-  group.add(floor);
-
-  const wall = new THREE.Mesh(
-    new THREE.CylinderGeometry(24, 24, 8, 96, 1, true),
-    new THREE.MeshStandardMaterial({ color: 0x080914, side: THREE.BackSide, emissive: 0x140028, emissiveIntensity: 0.28 })
-  );
-  wall.position.y = 4;
-  group.add(wall);
-
-  const table = new THREE.Mesh(
-    new THREE.CylinderGeometry(2.55, 2.55, 0.18, 72),
-    new THREE.MeshStandardMaterial({ color: 0x15391f, roughness: 0.8, metalness: 0.04, emissive: 0x061606, emissiveIntensity: 0.2 })
-  );
-  table.position.y = 0.9;
-  group.add(table);
-
-  const rail = new THREE.Mesh(
-    new THREE.TorusGeometry(2.62, 0.14, 16, 96),
-    new THREE.MeshStandardMaterial({ color: 0x4a2817, roughness: 0.72, metalness: 0.08 })
-  );
-  rail.rotation.x = Math.PI / 2;
-  rail.position.y = 0.99;
-  group.add(rail);
-
-  const msgTex = (()=>{
-    const c=document.createElement('canvas'); c.width=1400; c.height=520;
-    const x=c.getContext('2d');
-    x.fillStyle='rgba(0,0,0,0.86)'; x.fillRect(0,0,c.width,c.height);
-    x.strokeStyle='rgba(180,140,255,0.95)'; x.lineWidth=12; x.strokeRect(18,18,c.width-36,c.height-36);
-    x.fillStyle='#ffffff'; x.font='bold 76px system-ui, Arial'; x.fillText('SVR SAFE BOOT FALLBACK', 70, 115);
-    x.fillStyle='#d7ffee'; x.font='42px system-ui, Arial'; x.fillText('Core lobby failed, but navigation stayed alive.', 70, 195);
-    x.fillStyle='#ffc4c4'; x.font='32px ui-monospace, monospace';
-    const lines = String(err?.message || err || 'Unknown error').slice(0,220).match(/.{1,70}/g) || [];
-    let y=275; for (const line of lines){ x.fillText(line,70,y); y+=44; }
-    const tex=new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; return tex;
-  })();
-  const board = new THREE.Mesh(new THREE.PlaneGeometry(6.4,2.38), new THREE.MeshBasicMaterial({ map: msgTex, side: THREE.DoubleSide }));
-  board.position.set(0,2.45,-5.8);
-  board.lookAt(0,1.7,0);
-  group.add(board);
-
-  const seats = [
-    { x: 0, z: 3.05, label: 'Player Seat' },
-    { x: 2.2, z: 1.55, label: 'Bot 1' },
-    { x: 2.2, z: -1.55, label: 'Bot 2' },
-    { x: 0, z: -3.05, label: 'Dealer Side' },
-    { x: -2.2, z: -1.55, label: 'Bot 3' },
-    { x: -2.2, z: 1.55, label: 'Bot 4' }
-  ];
-  return {
-    roomClamp: 21,
-    seats,
-    tableCenter: new THREE.Vector3(0,0,0),
-    joinRadius: 4.1,
-    previewOrbitRadius: 8.2,
-    sceneTargets: {
-      lobby: { pos: new THREE.Vector3(0,0,4.8), look: new THREE.Vector3(0,1.4,0) },
-      table: { pos: new THREE.Vector3(0,0,3.7), look: new THREE.Vector3(0,1.2,0) },
-      seat: { pos: new THREE.Vector3(0,0,3.05), look: new THREE.Vector3(0,1.2,0) },
-      reiki: { pos: new THREE.Vector3(5.2,0,0), look: new THREE.Vector3(0,1.5,0) },
-      pga: { pos: new THREE.Vector3(-5.2,0,0), look: new THREE.Vector3(0,1.5,0) },
-      legends: { pos: new THREE.Vector3(0,0,-5.2), look: new THREE.Vector3(0,1.5,0) },
-      sponsor: { pos: new THREE.Vector3(0,0,5.2), look: new THREE.Vector3(0,1.5,0) },
-      scorpion: { pos: new THREE.Vector3(-4,0,-4), look: new THREE.Vector3(0,1.4,0) }
-    }
-  };
-}
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData._camera = camera;
@@ -156,18 +70,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
 setStatus("Loading world…", { force: true });
-let world;
-try{
-  world = await buildSkylineRoom(scene, { log, renderer });
-}catch(err){
-  console.error("[SVR] Primary lobby build failed; emergency fallback active", err);
-  if ($err){
-    $err.style.display = AUTOCAM ? "none" : "block";
-    $err.textContent = "PRIMARY LOBBY BUILD FAILED — SAFE FALLBACK ACTIVE\n" + (err?.stack || err?.message || String(err));
-  }
-  setStatus("Safe boot fallback active — private routes still available", { force: true });
-  world = buildEmergencyLobby(scene, err);
-}
+const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
 const hands = createHands({ scene, renderer, log });
@@ -175,7 +78,9 @@ const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
 const audio = createAudioPlaylist({
   tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" }
+    { title: "Lobby 07", url: "./assets/audio/07.mp3" },
+    { title: "Reiki Time Hub", url: "./assets/audio/reiki_time_hub.mp3" },
+    { title: "SVR After Dark", url: "./assets/audio/svr_after_dark.mp3" }
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
@@ -271,18 +176,9 @@ function gotoScene(key){
   return true;
 }
 
-function openPrivateScene(url){
-  if (!url) return false;
-  setStatus(`Opening private scene…`, { force: true });
-  window.location.href = url;
-  return true;
-}
-
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
-    const url = btn.dataset.url;
     const key = btn.dataset.scene;
-    if (url) return openPrivateScene(url);
     if (key) gotoScene(key);
   });
 });
@@ -301,10 +197,8 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit5") gotoScene("pga");
   if (e.code === "Digit6") gotoScene("legends");
   if (e.code === "Digit7") gotoScene("sponsor");
-  if (e.code === "Digit8") openPrivateScene("./scorpion.html");
-  if (e.code === "Digit9") openPrivateScene("./reiki.html");
-  if (e.code === "Digit0") openPrivateScene("./pga-drive.html");
-  if (e.code === "KeyO") openPrivateScene("./store-room.html");
+  if (e.code === "Digit8") gotoScene("scorpion");
+  if (e.code === "Digit9") gotoScene("reikiRoom");
 });
 
 const watch = createWristWatch({
@@ -334,26 +228,21 @@ const watch = createWristWatch({
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>openPrivateScene("./reiki.html"),
-    goPgaDrive: ()=>openPrivateScene("./pga-drive.html"),
-    goChipPutt: ()=>openPrivateScene("./chip-putt.html"),
-    goStore: ()=>openPrivateScene("./store-room.html"),
-    goSmoker: ()=>openPrivateScene("./smoker-lounge.html")
+    goReikiRoom: ()=>gotoScene("reikiRoom")
   }
 });
 
-$toggleJoints?.addEventListener("click", ()=>{
+$toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
-  if ($toggleJoints) $toggleJoints.textContent = on ? "Joints On" : "Joints";
+  $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
 setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Seat/Reiki/PGA/Store/Private scenes.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
-window.dispatchEvent(new CustomEvent("SVR_READY", { detail: { build: window.SVR_BUILD_LABEL || "PHASE-91-PGA-DRIVING-RANGE-RESTORE-LOCK" } }));
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");

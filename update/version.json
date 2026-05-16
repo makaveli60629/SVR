@@ -1,9 +1,5 @@
-{
-  "build": "PHASE-91-PGA-DRIVING-RANGE-RESTORE-LOCK",
-  "date": "2026-05-14",
-  "siteTouched": false,
-  "storePortalUrl": "https://svrpoker.com/site/store.html",
-  "phase": "Phase 91",
-  "fixed": "Restores private PGA Driving Range route with range_logic.js, target greens, stance mat, ball tracer, and auto reset while preserving Phase 90 boot stability.",
-  "notes": "Game-side targeted PGA range restore. Site untouched."
+﻿{
+    "scope":  "game-only",
+    "build":  "PHASE-84-ESPRESSO-BUILDING-AD-CONTROLLER-LOCK",
+    "siteTouched":  false
 }
