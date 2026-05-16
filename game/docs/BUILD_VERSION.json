@@ -1,5 +1,7 @@
 {
-  "build": "PHASE-84-ESPRESSO-BUILDING-AD-CONTROLLER-LOCK",
+  "build": "PHASE-84A-REIKI-BRANDING-ROLLBACK-LOCK",
   "scope": "game-only",
-  "siteTouched": false
+  "siteTouched": false,
+  "phase": "84A",
+  "note": "Unapproved Reiki branding rollback; Espresso ad/controller lock preserved."
 }
