@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">SVR Chip Pack Preview Banner</title>
+  <desc id="desc">SVR Poker chip pack banner with stacked chips, cards, and neon purple background.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#05020e"/><stop offset="0.45" stop-color="#1e0b45"/><stop offset="1" stop-color="#09031c"/></linearGradient>
+    <radialGradient id="cyan" cx="80%" cy="45%" r="55%"><stop offset="0" stop-color="#6fe8ff" stop-opacity="0.72"/><stop offset="1" stop-color="#6fe8ff" stop-opacity="0"/></radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+  <rect width="1200" height="520" rx="42" fill="url(#bg)"/>
+  <rect width="1200" height="520" rx="42" fill="url(#cyan)" opacity="0.45"/>
+  <circle cx="960" cy="260" r="210" fill="#9b5cff" opacity="0.2" filter="url(#soft)"/>
+  <g opacity="0.22" font-family="Orbitron, monospace" font-size="22" fill="#6fe8ff">
+    <text x="60" y="58">0101 1010 0101 1110 0011 1010</text>
+    <text x="60" y="484">1110 0101 0110 1001 0101 0011</text>
+  </g>
+  <g transform="translate(700 80)">
+    <g transform="translate(0 195)">
+      <ellipse cx="110" cy="130" rx="108" ry="36" fill="#2f114f" stroke="#ffd166" stroke-width="9"/>
+      <ellipse cx="110" cy="108" rx="108" ry="36" fill="#583491" stroke="#ffd166" stroke-width="9"/>
+      <ellipse cx="110" cy="84" rx="108" ry="36" fill="#2f114f" stroke="#ffd166" stroke-width="9"/>
+      <ellipse cx="110" cy="60" rx="108" ry="36" fill="#583491" stroke="#ffd166" stroke-width="9"/>
+      <ellipse cx="110" cy="36" rx="108" ry="36" fill="#2f114f" stroke="#ffd166" stroke-width="9"/>
+      <text x="110" y="51" text-anchor="middle" font-family="Arial Black, Orbitron, sans-serif" font-size="36" fill="#fff">$25</text>
+    </g>
+    <g transform="translate(185 148)">
+      <ellipse cx="110" cy="168" rx="108" ry="36" fill="#102f46" stroke="#6fe8ff" stroke-width="9"/>
+      <ellipse cx="110" cy="144" rx="108" ry="36" fill="#1b5a82" stroke="#6fe8ff" stroke-width="9"/>
+      <ellipse cx="110" cy="120" rx="108" ry="36" fill="#102f46" stroke="#6fe8ff" stroke-width="9"/>
+      <ellipse cx="110" cy="96" rx="108" ry="36" fill="#1b5a82" stroke="#6fe8ff" stroke-width="9"/>
+      <ellipse cx="110" cy="72" rx="108" ry="36" fill="#102f46" stroke="#6fe8ff" stroke-width="9"/>
+      <ellipse cx="110" cy="48" rx="108" ry="36" fill="#1b5a82" stroke="#6fe8ff" stroke-width="9"/>
+      <ellipse cx="110" cy="24" rx="108" ry="36" fill="#102f46" stroke="#6fe8ff" stroke-width="9"/>
+      <text x="110" y="41" text-anchor="middle" font-family="Arial Black, Orbitron, sans-serif" font-size="36" fill="#fff">$100</text>
+    </g>
+    <g transform="translate(390 208)">
+      <ellipse cx="95" cy="95" rx="92" ry="31" fill="#4a102e" stroke="#ff4fd8" stroke-width="8"/>
+      <ellipse cx="95" cy="72" rx="92" ry="31" fill="#761e55" stroke="#ff4fd8" stroke-width="8"/>
+      <ellipse cx="95" cy="49" rx="92" ry="31" fill="#4a102e" stroke="#ff4fd8" stroke-width="8"/>
+      <ellipse cx="95" cy="26" rx="92" ry="31" fill="#761e55" stroke="#ff4fd8" stroke-width="8"/>
+      <text x="95" y="41" text-anchor="middle" font-family="Arial Black, Orbitron, sans-serif" font-size="31" fill="#fff">$500</text>
+    </g>
+    <g transform="translate(125 0) rotate(-4)">
+      <rect x="0" y="0" width="150" height="210" rx="18" fill="#f7fbff"/>
+      <text x="26" y="62" font-family="Arial Black, Orbitron" font-size="50" fill="#111">Q</text>
+      <text x="30" y="124" font-family="Arial Black, Orbitron" font-size="58" fill="#111">♣</text>
+    </g>
+    <g transform="translate(265 4) rotate(7)">
+      <rect x="0" y="0" width="150" height="210" rx="18" fill="#fff5fa"/>
+      <text x="26" y="62" font-family="Arial Black, Orbitron" font-size="50" fill="#e3236b">J</text>
+      <text x="30" y="124" font-family="Arial Black, Orbitron" font-size="58" fill="#e3236b">♦</text>
+    </g>
+  </g>
+  <text x="74" y="112" font-family="Orbitron, Arial Black, sans-serif" font-size="34" letter-spacing="8" fill="#6fe8ff">SVR STORE</text>
+  <text x="74" y="198" font-family="Arial Black, Orbitron, sans-serif" font-size="76" fill="#ffffff">CHIP PACK</text>
+  <text x="74" y="274" font-family="Arial Black, Orbitron, sans-serif" font-size="68" fill="#ffd166">PREVIEW</text>
+  <text x="78" y="338" font-family="Rajdhani, Arial, sans-serif" font-size="34" fill="#d8ccff">Play-money cosmetic chip bundles for future member rewards.</text>
+  <rect x="74" y="380" width="340" height="58" rx="29" fill="none" stroke="#ff4fd8" stroke-width="3"/>
+  <text x="244" y="419" text-anchor="middle" font-family="Orbitron, Arial, sans-serif" font-size="22" fill="#ffd8ef">NO LIVE SALES</text>
+</svg>
