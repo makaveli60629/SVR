@@ -2074,7 +2074,7 @@ function sanitizeTableSurface(table, keepMesh = null){
 
 function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
   const group = new THREE.Group();
-  group.name = 'SVR_PHASE84L_AD_DISTRICT_SKYLINE_EXPANSION_LOCK';
+  group.name = 'SVR_PHASE84M_FRONT_ADS_BACK_BUILDINGS_SKY_LOCK';
 
   // Phase 84L rule:
   // - Ads live behind the North / South / East / West walls, not inside the lobby.
@@ -2124,12 +2124,15 @@ function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
   const cyanMat = new THREE.MeshBasicMaterial({ color: 0x66dfff, transparent: true, opacity: 0.80, side: THREE.DoubleSide, depthWrite: false });
   const greenMat = new THREE.MeshBasicMaterial({ color: 0x39ff72, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthWrite: false });
 
-  const mainRadius = R + 28.0;
-  const fillerRadius = R + 38.0;
-  const towerW = 18.2;
-  const towerH = 70.0;
-  const towerD = 3.6;
-  const towerY = wallHeight + towerH * 0.5 + 2.8;
+  // PHASE-84M: ad towers are the front row of the skyline, but still outside/behind the lobby wall.
+  // Filler/normal buildings sit farther back so no banner is blocked from the player viewpoint.
+  const mainRadius = R + 16.5;
+  const fillerRadius = R + 42.0;
+  const farFillerRadius = R + 58.0;
+  const towerW = 22.4;
+  const towerH = 82.0;
+  const towerD = 4.1;
+  const towerY = wallHeight + towerH * 0.5 + 5.5;
 
   function basisFor(angle){
     const outward = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle));
@@ -2206,63 +2209,66 @@ function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
     const { angle, name } = slot;
     const { inward } = basisFor(angle);
 
-    // Premium wide tower centered per wall.
-    addBuilding({ name: `SVR_PHASE84L_${name}_TIER1_WIDE_PREMIUM_AD_TOWER`, angle, radius: mainRadius, width: towerW, height: towerH, depth: towerD, y: towerY, mat: towerMat });
+    // Front row ad tower: closest skyline layer, outside the wall, with no normal buildings in front of it.
+    addBuilding({ name: `SVR_PHASE84M_${name}_FRONT_TIER1_WIDE_PREMIUM_AD_TOWER`, angle, radius: mainRadius, width: towerW, height: towerH, depth: towerD, y: towerY, mat: towerMat });
 
-    // Side/filler buildings make the skyline feel dense, but stay farther back and lower than ad sightline.
-    addBuilding({ name: `SVR_PHASE84L_${name}_LEFT_MEDIUM_FILLER_TOWER`, angle, radius: fillerRadius, width: 7.4, height: 44, depth: 3.0, lateral: -13.0, mat: towerMatDark });
-    addBuilding({ name: `SVR_PHASE84L_${name}_RIGHT_MEDIUM_FILLER_TOWER`, angle, radius: fillerRadius, width: 7.2, height: 47, depth: 3.1, lateral: 13.0, mat: towerMatDark, variant: 'round' });
-    addBuilding({ name: `SVR_PHASE84L_${name}_LOW_WIDE_BANNER_BLOCK_A`, angle, radius: fillerRadius + 3.0, width: 13.5, height: 24, depth: 3.2, lateral: -24.0, mat: towerMatDark });
-    addBuilding({ name: `SVR_PHASE84L_${name}_LOW_WIDE_BANNER_BLOCK_B`, angle, radius: fillerRadius + 3.0, width: 13.5, height: 24, depth: 3.2, lateral: 24.0, mat: towerMatDark });
+    // Normal/filler buildings are deliberately behind the ad row and offset wide, so they add city depth without blocking ads.
+    addBuilding({ name: `SVR_PHASE84M_${name}_BACK_LEFT_MEDIUM_FILLER_TOWER`, angle, radius: fillerRadius, width: 8.2, height: 54, depth: 3.2, lateral: -18.0, mat: towerMatDark });
+    addBuilding({ name: `SVR_PHASE84M_${name}_BACK_RIGHT_MEDIUM_FILLER_TOWER`, angle, radius: fillerRadius, width: 8.0, height: 57, depth: 3.3, lateral: 18.0, mat: towerMatDark, variant: 'round' });
+    addBuilding({ name: `SVR_PHASE84M_${name}_FAR_LEFT_TALL_FILLER`, angle, radius: farFillerRadius, width: 7.0, height: 70, depth: 3.0, lateral: -31.0, mat: towerMatDark });
+    addBuilding({ name: `SVR_PHASE84M_${name}_FAR_RIGHT_TALL_FILLER`, angle, radius: farFillerRadius, width: 7.5, height: 66, depth: 3.0, lateral: 31.0, mat: towerMatDark });
+    addBuilding({ name: `SVR_PHASE84M_${name}_LOW_WIDE_BACK_BANNER_BLOCK_A`, angle, radius: fillerRadius + 5.5, width: 14.5, height: 25, depth: 3.2, lateral: -28.0, mat: towerMatDark });
+    addBuilding({ name: `SVR_PHASE84M_${name}_LOW_WIDE_BACK_BANNER_BLOCK_B`, angle, radius: fillerRadius + 5.5, width: 14.5, height: 25, depth: 3.2, lateral: 28.0, mat: towerMatDark });
 
-    // Tier 1: widest and tallest visible sponsor ad.
+    // Tier 1: widest front-visible premium ad.
     addAdPlane({
-      name: `SVR_TIER1_ESPRESSO_WITH_CREAM_${name}_WIDE_PREMIUM_AD`,
+      name: `SVR_TIER1_ESPRESSO_WITH_CREAM_${name}_FRONT_VISIBLE_PREMIUM_AD`,
       angle,
-      y: wallHeight + 43.5,
-      w: 12.6,
-      h: 31.5,
+      y: wallHeight + 55.5,
+      w: 15.8,
+      h: 37.5,
       tex: espressoTex,
       frameMat: goldMat,
-      order: 92
+      order: 110,
+      radiusOffset: 0.0
     });
 
-    // Tier 2: smaller ALL IN sponsor banner.
+    // Tier 2: ALL IN below the premium ad, still on the same clear front building face.
     addAdPlane({
-      name: `SVR_TIER2_ALL_IN_${name}_MEDIUM_BANNER`,
+      name: `SVR_TIER2_ALL_IN_${name}_FRONT_MEDIUM_BANNER`,
       angle,
-      y: wallHeight + 22.3,
-      w: 10.8,
-      h: 5.1,
+      y: wallHeight + 31.0,
+      w: 14.0,
+      h: 5.9,
       tex: allInTex,
       frameMat: cyanMat,
-      order: 92,
-      radiusOffset: 0.02
+      order: 110,
+      radiusOffset: 0.03
     });
 
-    // Tier 3: green SVR LOGO / WIN CASH promo banner.
+    // Tier 3: green SVR LOGO / WIN CASH promo below tier 2.
     addAdPlane({
-      name: `SVR_TIER3_LOGO_WIN_CASH_${name}_GREEN_PROMO_BANNER`,
+      name: `SVR_TIER3_LOGO_WIN_CASH_${name}_FRONT_GREEN_PROMO_BANNER`,
       angle,
-      y: wallHeight + 15.0,
-      w: 10.8,
-      h: 5.1,
+      y: wallHeight + 22.5,
+      w: 14.0,
+      h: 5.9,
       tex: winCashTex,
       frameMat: greenMat,
-      order: 92,
-      radiusOffset: 0.04
+      order: 110,
+      radiusOffset: 0.06
     });
 
     const glow = new THREE.PointLight(0xffc15a, 0.70, 46, 2.0);
-    glow.name = `SVR_PHASE84L_${name}_AD_DISTRICT_SOFT_GLOW`;
-    glow.position.set(Math.cos(angle) * (mainRadius - 2.0), wallHeight + 43.0, Math.sin(angle) * (mainRadius - 2.0));
+    glow.name = `SVR_PHASE84M_${name}_FRONT_AD_DISTRICT_SOFT_GLOW`;
+    glow.position.set(Math.cos(angle) * (mainRadius - 2.0), wallHeight + 55.0, Math.sin(angle) * (mainRadius - 2.0));
     glow.add(new THREE.Object3D());
     group.add(glow);
 
     // Extra top neon strip for readability from the player POV.
-    const strip = new THREE.Mesh(new THREE.PlaneGeometry(towerW * 0.80, 0.34), goldMat);
-    strip.name = `SVR_PHASE84L_${name}_TOP_PREMIUM_NEON_STRIP`;
-    strip.position.set(Math.cos(angle) * mainRadius, wallHeight + 62.5, Math.sin(angle) * mainRadius);
+    const strip = new THREE.Mesh(new THREE.PlaneGeometry(towerW * 0.86, 0.34), goldMat);
+    strip.name = `SVR_PHASE84M_${name}_TOP_PREMIUM_NEON_STRIP`;
+    strip.position.set(Math.cos(angle) * mainRadius, wallHeight + 78.0, Math.sin(angle) * mainRadius);
     strip.position.add(inward.clone().multiplyScalar(towerD * 0.5 + 0.18));
     faceObject(strip);
     strip.renderOrder = 95;
@@ -2497,11 +2503,11 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-72, wallHeight + 126.0, -(R + 260.0));
+  moon.position.set(-82, wallHeight + 168.0, -(R + 330.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(44.0, 44.0, 1);
+  moonHalo.scale.set(54.0, 54.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
@@ -2518,13 +2524,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  mars.position.set(96, wallHeight + 142.0, -(R + 310.0));
+  mars.position.set(112, wallHeight + 184.0, -(R + 380.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(28.0, 28.0, 1);
+  marsHalo.scale.set(34.0, 34.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2729,29 +2735,29 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       wallHeight + 72.0 + Math.sin(t * 0.018) * 0.22,
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
-    // PHASE-84C: high skyline moon, clear above all banner buildings from player POV.
+    // PHASE-84M: moon remains far above the ad district and never sits at building height.
     moon.position.set(
-      -72 + Math.sin(t * 0.016) * 7.0,
-      wallHeight + 126.0 + Math.sin(t * 0.050) * 2.0,
-      -(R + 260.0) + Math.cos(t * 0.010) * 10.0
+      -82 + Math.sin(t * 0.012) * 8.0,
+      wallHeight + 168.0 + Math.sin(t * 0.040) * 2.5,
+      -(R + 330.0) + Math.cos(t * 0.008) * 12.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
-    // PHASE-84C: Mars stays high and offset from the moon, never at building height.
+    // PHASE-84M: Mars stays high, offset from the moon, and fully above skyline/ad tiers.
     mars.position.set(
-      96 + Math.sin(t * 0.013 + 1.4) * 8.0,
-      wallHeight + 142.0 + Math.sin(t * 0.045 + 0.8) * 1.8,
-      -(R + 310.0) + Math.cos(t * 0.009 + 0.4) * 9.0
+      112 + Math.sin(t * 0.010 + 1.4) * 9.0,
+      wallHeight + 184.0 + Math.sin(t * 0.036 + 0.8) * 2.2,
+      -(R + 380.0) + Math.cos(t * 0.007 + 0.4) * 12.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.045 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.070 + 0.012 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.026 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.050 + 0.012 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{

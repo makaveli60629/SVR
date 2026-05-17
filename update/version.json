@@ -1,7 +1,6 @@
 ﻿{
-  "build": "PHASE-84L-AD-DISTRICT-LOOK-FORWARD-MOVEMENT-LOCK",
-  "phase": "84L",
-  "target": "game",
-  "siteTouched": false,
-  "notes": "Ad district skyline expansion plus look-forward controller movement lock."
+  "build": "PHASE-84M-FRONT-ADS-BACK-BUILDINGS-SKY-LOCK",
+  "phase": "84M",
+  "target": "/game",
+  "notes": "Front ad buildings are first visible tier behind walls; normal buildings are behind ads; Moon and Mars raised high above skyline."
 }

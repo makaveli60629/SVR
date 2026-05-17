@@ -1,7 +1,8 @@
 {
-  "build": "PHASE-84L-AD-DISTRICT-LOOK-FORWARD-MOVEMENT-LOCK",
-  "phase": "84L",
+  "build": "PHASE-84M-FRONT-ADS-BACK-BUILDINGS-SKY-LOCK",
+  "phase": "84M",
   "gameSideOnly": true,
   "siteTouched": false,
-  "trueitiveBlocked": true
+  "trueitiveBlocked": true,
+  "notes": "Front ad buildings are the first visible skyline tier; normal buildings are behind them; Moon and Mars are higher above the sky."
 }
