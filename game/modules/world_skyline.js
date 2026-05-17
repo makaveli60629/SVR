@@ -1526,19 +1526,15 @@ function buildOuterCity(scene, R){
   const count = 68;
   // PHASE-84C: Player-view ad corridor. The sponsor skyline faces the seated/lobby player.
   // Ads are placed on dedicated towers with a clear sight-line instead of being hidden behind random buildings.
-  // PHASE-84X: Clean organized ad district. Keep one premium Espresso banner building
-  // in the front skyline tier and push normal city filler behind it. No stacked/floating duplicate ads.
   const adSlotMap = new Map([
-    [0,  {
-      type: 'premiumVertical',
-      texture: 'espresso',
-      name: 'AD_PREMIUM_ESPRESSO_ORGANIZED_FRONT',
-      angle: -Math.PI * 0.5,
-      rr: R + 30,
-      h: 54,
-      w: 15.0,
-      d: 4.2
-    }]
+    // PHASE-84D: player view looks north through the lobby, so the premium ad must live on the north/center face.
+    [0,  { type: 'premiumVertical', texture: 'espresso', name: 'AD_CENTER_PREMIUM_ESPRESSO_VISIBLE', angle: -Math.PI * 0.5, rr: R + 24, h: 66, w: 11.8, d: 3.6 }],
+    [3,  { type: 'vertical', texture: 'matrix', name: 'AD_RIGHT_TOWER_VISIBLE', angle: -Math.PI * 0.5 + 0.30, rr: R + 36, h: 48, w: 7.2, d: 3.8 }],
+    [65, { type: 'vertical', texture: 'placeholder', name: 'AD_LEFT_TOWER_VISIBLE', angle: -Math.PI * 0.5 - 0.30, rr: R + 36, h: 48, w: 7.2, d: 3.8 }],
+    [7,  { type: 'horizontal', texture: 'svr', name: 'AD_RIGHT_LOWER_BANNER', angle: -Math.PI * 0.5 + 0.54, rr: R + 42, h: 28, w: 11.4, d: 3.6 }],
+    [61, { type: 'horizontal', texture: 'placeholder', name: 'AD_LEFT_LOWER_BANNER', angle: -Math.PI * 0.5 - 0.54, rr: R + 42, h: 28, w: 11.4, d: 3.6 }],
+    [12, { type: 'vertical', texture: 'placeholder', name: 'AD_FAR_RIGHT_SPONSOR_SLOT', angle: -Math.PI * 0.5 + 0.78, rr: R + 50, h: 40, w: 6.4, d: 3.8 }],
+    [56, { type: 'vertical', texture: 'matrix', name: 'AD_FAR_LEFT_SPONSOR_SLOT', angle: -Math.PI * 0.5 - 0.78, rr: R + 50, h: 40, w: 6.4, d: 3.8 }]
   ]);
   const adIndices = new Set(adSlotMap.keys());
   const espressoBuildingIndex = 0;
@@ -1616,8 +1612,8 @@ function buildOuterCity(scene, R){
       const tex = isEspresso ? espressoTex : (slot.texture === 'matrix' ? matrix.texture : (slot.texture === 'placeholder' ? sponsorHoldTex : adTex));
       if (tex) tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
       const isHorizontal = slot.type === 'horizontal';
-      const bw = isEspresso ? Math.max(9.2, Math.min(w * 0.78, 11.6)) : (isHorizontal ? Math.max(7.2, Math.min(w * 0.92, 10.6)) : Math.max(4.6, Math.min(w * 0.80, 6.4)));
-      const bh = isEspresso ? Math.max(21.0, Math.min(h * 0.64, 29.0)) : (isHorizontal ? Math.max(3.0, Math.min(h * 0.22, 5.6)) : Math.max(12.0, Math.min(h * 0.68, 25.0)));
+      const bw = isEspresso ? Math.max(5.4, Math.min(w * 0.86, 7.4)) : (isHorizontal ? Math.max(7.2, Math.min(w * 0.92, 10.6)) : Math.max(4.6, Math.min(w * 0.80, 6.4)));
+      const bh = isEspresso ? Math.max(24.0, Math.min(h * 0.80, 38.0)) : (isHorizontal ? Math.max(3.0, Math.min(h * 0.22, 5.6)) : Math.max(12.0, Math.min(h * 0.68, 25.0)));
       const bill = new THREE.Mesh(
         new THREE.PlaneGeometry(bw, bh),
         new THREE.MeshBasicMaterial({
@@ -1629,7 +1625,7 @@ function buildOuterCity(scene, R){
         })
       );
       bill.name = isEspresso ? "SVR_Espresso_With_Cream_Building_Ad" : `SVR_Building_Billboard_${slot.name || i}`;
-      const yFit = isEspresso ? Math.min(Math.max(h * 0.50, 21.0), h - 5.5) : (isHorizontal ? Math.min(Math.max(h * 0.56, 11.0), h - 2.2) : Math.min(Math.max(h * 0.56, 14.0), h - 2.4));
+      const yFit = isEspresso ? Math.min(Math.max(h * 0.55, 24.0), h - 3.0) : (isHorizontal ? Math.min(Math.max(h * 0.56, 11.0), h - 2.2) : Math.min(Math.max(h * 0.56, 14.0), h - 2.4));
       // Use building depth, not width, so the ad sits directly on the visible front face.
       const faceOffset = d * 0.5 + 0.42;
       bill.position.set(x - outward.x * faceOffset, yFit, z - outward.z * faceOffset);
@@ -1638,7 +1634,7 @@ function buildOuterCity(scene, R){
       group.add(bill);
 
       if (isEspresso){
-        const adGlow = new THREE.PointLight(0xffc15a, 0.72, 32, 2.0);
+        const adGlow = new THREE.PointLight(0xffc15a, 0.95, 26, 2.1);
         adGlow.position.copy(bill.position).add(new THREE.Vector3(0, 0.5, 0));
         group.add(adGlow);
       }
@@ -2205,8 +2201,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const city = buildOuterCity(scene, R);
   const stars = buildStars(scene, R);
   const lobbySprites = buildLobbySprites(scene, R, wallHeight);
-  // Phase 84X: removed the old floating/duplicate always-visible Espresso overlay.
-  const espressoAdGroup = null;
+  const espressoAdGroup = addAlwaysVisibleEspressoAd(scene, R);
   const spawnLogoTex = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
   const wallPanels = [];
   const wallPanelUpdaters = [];
@@ -2324,7 +2319,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(6.2, 56, 56),
+    new THREE.SphereGeometry(5.6, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2336,16 +2331,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-52, wallHeight + 138.0, -(R + 250.0));
+  moon.position.set(-72, wallHeight + 126.0, -(R + 260.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(38.0, 38.0, 1);
+  moonHalo.scale.set(44.0, 44.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(3.8, 44, 44),
+    new THREE.SphereGeometry(3.1, 44, 44),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2357,13 +2352,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  mars.position.set(62, wallHeight + 128.0, -(R + 260.0));
+  mars.position.set(96, wallHeight + 142.0, -(R + 310.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(24.0, 24.0, 1);
+  marsHalo.scale.set(28.0, 28.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);

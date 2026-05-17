@@ -1,6 +1,9 @@
 ﻿{
-  "build": "PHASE-84X-ORGANIZED-ESPRESSO-SKYLINE-LOCK",
-  "siteTouched": false,
-  "gameOnly": true
+    "inputStrategy":  "hand tracking primary with hidden-controller fallback preserved",
+    "build":  "PHASE-84Y-WEBXR-GODMODE-ENFORCER-LOCK",
+    "runtime":  "WebXR / Three.js modular JavaScript",
+    "siteTouched":  false,
+    "gameOnly":  true,
+    "target":  "game-only",
+    "updatedAt":  "2026-05-17T17:42:30Z"
 }
-

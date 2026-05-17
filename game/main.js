@@ -7,11 +7,13 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
+import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
+document.documentElement.dataset.svrBuild = SVR_WEBXR_PHASE;
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 
 const $status = document.getElementById("status");
@@ -53,7 +55,9 @@ $toggleLog.addEventListener("click", ()=>{
 
 if (AUTOCAM) document.body.classList.add("preview-mode");
 
+const enforcerAudit = runWebXREnforcerAudit({ log });
 const { scene, camera, renderer } = createCore({ containerId: "app" });
+scene.userData.SVR_WEBXR_ENFORCER_AUDIT = enforcerAudit;
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);

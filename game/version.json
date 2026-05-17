@@ -1,6 +1,9 @@
 {
-  "build": "PHASE-84X-ORGANIZED-ESPRESSO-SKYLINE-LOCK",
-  "target": "game-only",
+  "build": "PHASE-84Y-WEBXR-GODMODE-ENFORCER-LOCK",
+  "gameOnly": true,
   "siteTouched": false,
+  "target": "game-only",
+  "runtime": "WebXR / Three.js modular JavaScript",
+  "inputStrategy": "hand tracking primary with hidden-controller fallback preserved",
   "reikiBranding": "SVR_AWAITING_APPROVAL_ONLY"
 }
