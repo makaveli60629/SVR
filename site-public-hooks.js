@@ -3,27 +3,51 @@
   const MESSAGE_KEY = 'svr_public_messages';
   const DEFAULT_ADMIN_STATE = 'offline';
 
+  function forceOfflineStyle() {
+    if (document.getElementById('svr-force-admin-offline-style')) return;
+    const style = document.createElement('style');
+    style.id = 'svr-force-admin-offline-style';
+    style.textContent = `
+      .admin-status,
+      .admin-status.online,
+      .admin-status.offline,
+      [data-admin-pill],
+      [data-admin-pill].online,
+      [data-admin-pill].offline {
+        color: #ffb1c7 !important;
+        border-color: rgba(255,106,154,.45) !important;
+        text-shadow: 0 0 14px rgba(255,106,154,.32) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function getAdminState() {
     const qs = new URLSearchParams(window.location.search);
     const override = qs.get('admin');
-    if (override === 'online' || override === 'offline') {
-      localStorage.setItem(ADMIN_KEY, override);
-      return override;
+    if (override === 'online') {
+      localStorage.setItem(ADMIN_KEY, DEFAULT_ADMIN_STATE);
+      return DEFAULT_ADMIN_STATE;
+    }
+    if (override === 'offline') {
+      localStorage.setItem(ADMIN_KEY, DEFAULT_ADMIN_STATE);
+      return DEFAULT_ADMIN_STATE;
     }
     localStorage.setItem(ADMIN_KEY, DEFAULT_ADMIN_STATE);
     return DEFAULT_ADMIN_STATE;
   }
 
   function paintAdminState() {
+    forceOfflineStyle();
     const state = getAdminState();
-    const isOnline = state === 'online';
+    const isOnline = false;
     document.querySelectorAll('.admin-status,[data-admin-pill]').forEach((el) => {
       el.dataset.state = state;
-      el.classList.toggle('online', isOnline);
-      el.classList.toggle('offline', !isOnline);
+      el.classList.remove('online');
+      el.classList.add('offline');
       const label = el.querySelector('[data-admin-label]');
-      if (label) label.textContent = isOnline ? 'Admin Online' : 'Admin Offline';
-      else if (el.classList.contains('admin-status')) el.textContent = isOnline ? '● Admin Online' : '● Admin Offline';
+      if (label) label.textContent = 'Admin Offline';
+      else if (el.classList.contains('admin-status')) el.textContent = '● Admin Offline';
     });
   }
 
@@ -62,6 +86,8 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
+  setTimeout(paintAdminState, 10);
   setTimeout(paintAdminState, 250);
   setTimeout(paintAdminState, 1000);
+  setInterval(paintAdminState, 2500);
 })();
