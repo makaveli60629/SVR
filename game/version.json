@@ -1,5 +1,6 @@
 {
-  "build": "PHASE-84T-WRIST-WATCH-NATIVE-HANDS-LOCK",
-  "phase": "84T",
-  "updated": "2026-05-17"
+  "build": "PHASE-84R-RESTORED-NORMAL-SKYLINE-FOUR-AD-BUILDINGS-LOCK",
+  "phase": "84R",
+  "notes": "Restored calmer normal city skyline, disabled dense billboard skyline overload, kept only four dedicated ad buildings, preserved high Moon/Mars and game-only locks.",
+  "title": "Restored Normal Skyline Four Ad Buildings Lock"
 }

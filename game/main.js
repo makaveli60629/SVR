@@ -178,8 +178,6 @@ function gotoScene(key){
 
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
-    const href = btn.dataset.href;
-    if (href){ location.href = href; return; }
     const key = btn.dataset.scene;
     if (key) gotoScene(key);
   });
@@ -199,11 +197,8 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit5") gotoScene("pga");
   if (e.code === "Digit6") gotoScene("legends");
   if (e.code === "Digit7") gotoScene("sponsor");
-  if (e.code === "Digit8") location.href = "./scorpion.html";
+  if (e.code === "Digit8") gotoScene("scorpion");
   if (e.code === "Digit9") gotoScene("reikiRoom");
-  if (e.code === "Digit0") location.href = "./pga-drive.html";
-  if (e.code === "Minus") location.href = "./chip-putt.html";
-  if (e.code === "Equal") location.href = "./store-room.html";
 });
 
 const watch = createWristWatch({
@@ -214,8 +209,6 @@ const watch = createWristWatch({
     audioEnabled: audio.getState().enabled,
     trackTitle: audio.getState().trackTitle || "Lobby 07",
     cash,
-    username: "King",
-    rank: "Founder / Table Boss",
     seated,
     inTableZone: inTableZone(),
     seatLabel: seatLabel(),
@@ -248,7 +241,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick view locked. Press the white watch button to open/close the menu.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -329,10 +322,7 @@ renderer.setAnimationLoop(()=>{
     });
   }
 
-  // Prefer native Meta hand joints; fall back to hidden-controller hand proxies so controllers never render as controller models.
-  const leftWatchSource = leftHand || leftController;
-  const rightWatchSource = rightHand || rightController;
-  if (watch) watch.update(dt, leftWatchSource, rightWatchSource);
+  if (watch) watch.update(dt, leftHand, rightHand);
 
   renderer.render(scene, camera);
 });

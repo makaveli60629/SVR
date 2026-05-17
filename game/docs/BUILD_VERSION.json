@@ -1,6 +1,9 @@
 {
-  "build": "PHASE-84T-WRIST-WATCH-NATIVE-HANDS-LOCK",
-  "phase": "84T",
-  "scope": "premium wrist watch, white menu button, textured native hands, hidden controller visual fallback",
-  "siteTouched": false
+  "build": "PHASE-84U-RIGID-TEXAS-HOLDEM-ENGINE-LOCK",
+  "phase": "84U",
+  "gameSideOnly": true,
+  "siteTouched": false,
+  "trueitiveBlocked": true,
+  "notes": "Adds a stricter Texas Holdem engine: clockwise button/blinds/deal flow, burn cards, validated fold/check/call/bet/raise/all-in actions, hand evaluation with kickers, side-pot visual separation, 10-second winner reveal, and private card peek support.",
+  "title": "Rigid Texas Holdem Engine Lock"
 }
