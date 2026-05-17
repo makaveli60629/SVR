@@ -1,5 +1,6 @@
-﻿{
-  "build": "PHASE-84F-ESPRESSO-BOOT-FIX-VISIBLE-AD-LOCK",
-  "phase": "84F",
-  "notes": "Fixes espressoTex runtime boot error and keeps Espresso ad front-visible."
+{
+  "build": "PHASE-84I-R-SEAT-RUNTIME-HOTFIX",
+  "target": "game-only",
+  "siteTouched": false,
+  "reikiBranding": "SVR_AWAITING_APPROVAL_ONLY"
 }

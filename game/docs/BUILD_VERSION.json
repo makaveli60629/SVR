@@ -1,5 +1,7 @@
 {
-  "build": "PHASE-84F-ESPRESSO-BOOT-FIX-VISIBLE-AD-LOCK",
+  "build": "PHASE-84I-R-SEAT-RUNTIME-HOTFIX",
   "gameOnly": true,
-  "siteTouched": false
+  "siteTouched": false,
+  "target": "game-only",
+  "reikiBranding": "SVR_AWAITING_APPROVAL_ONLY"
 }

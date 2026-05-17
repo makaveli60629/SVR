@@ -303,78 +303,6 @@ function createStablePokerTable(scene, tableTopY = 0.90, feltTex = null){
   group.add(base);
 
 
-  // PHASE-84D: explicit front-visible Espresso ad tower.
-  // This is a dedicated skyline ad building placed on the north/center sightline, in front of the older rear towers,
-  // so the player sees the ad from the lobby/table viewpoint instead of seeing it hidden behind foreground blocks.
-  {
-    const a = -Math.PI * 0.5;
-    const rr = R + 18;
-    const h = 58;
-    const w = 12.8;
-    const d = 3.4;
-    const x = Math.cos(a) * rr;
-    const z = Math.sin(a) * rr;
-    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
-    const towerMat = new THREE.MeshStandardMaterial({
-      color: 0x07101a,
-      roughness: 0.56,
-      metalness: 0.28,
-      emissive: 0x071a2e,
-      emissiveIntensity: 0.92
-    });
-    const tower = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), towerMat);
-    tower.name = 'SVR_Front_Visible_Espresso_Ad_Tower';
-    tower.position.set(x, h * 0.5, z);
-    tower.rotation.y = -a + Math.PI / 2;
-    tower.castShadow = false;
-    tower.receiveShadow = true;
-    group.add(tower);
-
-    const faceOffset = d * 0.5 + 0.36;
-    const adW = 8.4;
-    const adH = 37.5;
-    const ad = new THREE.Mesh(
-      new THREE.PlaneGeometry(adW, adH),
-      new THREE.MeshBasicMaterial({
-        map: espressoTex,
-        color: 0xffffff,
-        transparent: false,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        depthTest: true
-      })
-    );
-    ad.name = 'SVR_Espresso_With_Cream_FRONT_VISIBLE_BUILDING_AD';
-    ad.position.set(x - outward.x * faceOffset, h * 0.52, z - outward.z * faceOffset);
-    ad.lookAt(ad.position.clone().sub(outward));
-    ad.renderOrder = 90;
-    group.add(ad);
-
-    const frameMat = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
-    const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.42, 0.16), frameMat);
-    frameTop.position.copy(ad.position).add(new THREE.Vector3(0, adH * 0.5 + 0.18, 0));
-    frameTop.lookAt(frameTop.position.clone().sub(outward));
-    frameTop.renderOrder = 91;
-    group.add(frameTop);
-    const frameBottom = frameTop.clone();
-    frameBottom.position.copy(ad.position).add(new THREE.Vector3(0, -adH * 0.5 - 0.18, 0));
-    group.add(frameBottom);
-    const frameSideL = new THREE.Mesh(new THREE.PlaneGeometry(0.16, adH + 0.52), frameMat);
-    const sideAxis = new THREE.Vector3(Math.cos(a + Math.PI * 0.5), 0, Math.sin(a + Math.PI * 0.5));
-    frameSideL.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(-(adW * 0.5 + 0.18)));
-    frameSideL.lookAt(frameSideL.position.clone().sub(outward));
-    frameSideL.renderOrder = 91;
-    group.add(frameSideL);
-    const frameSideR = frameSideL.clone();
-    frameSideR.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(adW * 0.5 + 0.18));
-    group.add(frameSideR);
-
-    const glow = new THREE.PointLight(0xffc15a, 1.45, 42, 1.85);
-    glow.name = 'SVR_Espresso_Ad_Glow';
-    glow.position.copy(ad.position).add(new THREE.Vector3(0, 3.0, 5.0));
-    group.add(glow);
-  }
-
   scene.add(group);
   return { group, topY: tableTopY };
 }
@@ -619,78 +547,6 @@ function buildLobbySprites(scene, R, wallHeight){
   group.userData.snow = snow;
   group.add(tiny);
   group.add(snow);
-
-  // PHASE-84D: explicit front-visible Espresso ad tower.
-  // This is a dedicated skyline ad building placed on the north/center sightline, in front of the older rear towers,
-  // so the player sees the ad from the lobby/table viewpoint instead of seeing it hidden behind foreground blocks.
-  {
-    const a = -Math.PI * 0.5;
-    const rr = R + 18;
-    const h = 58;
-    const w = 12.8;
-    const d = 3.4;
-    const x = Math.cos(a) * rr;
-    const z = Math.sin(a) * rr;
-    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
-    const towerMat = new THREE.MeshStandardMaterial({
-      color: 0x07101a,
-      roughness: 0.56,
-      metalness: 0.28,
-      emissive: 0x071a2e,
-      emissiveIntensity: 0.92
-    });
-    const tower = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), towerMat);
-    tower.name = 'SVR_Front_Visible_Espresso_Ad_Tower';
-    tower.position.set(x, h * 0.5, z);
-    tower.rotation.y = -a + Math.PI / 2;
-    tower.castShadow = false;
-    tower.receiveShadow = true;
-    group.add(tower);
-
-    const faceOffset = d * 0.5 + 0.36;
-    const adW = 8.4;
-    const adH = 37.5;
-    const ad = new THREE.Mesh(
-      new THREE.PlaneGeometry(adW, adH),
-      new THREE.MeshBasicMaterial({
-        map: espressoTex,
-        color: 0xffffff,
-        transparent: false,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        depthTest: true
-      })
-    );
-    ad.name = 'SVR_Espresso_With_Cream_FRONT_VISIBLE_BUILDING_AD';
-    ad.position.set(x - outward.x * faceOffset, h * 0.52, z - outward.z * faceOffset);
-    ad.lookAt(ad.position.clone().sub(outward));
-    ad.renderOrder = 90;
-    group.add(ad);
-
-    const frameMat = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
-    const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.42, 0.16), frameMat);
-    frameTop.position.copy(ad.position).add(new THREE.Vector3(0, adH * 0.5 + 0.18, 0));
-    frameTop.lookAt(frameTop.position.clone().sub(outward));
-    frameTop.renderOrder = 91;
-    group.add(frameTop);
-    const frameBottom = frameTop.clone();
-    frameBottom.position.copy(ad.position).add(new THREE.Vector3(0, -adH * 0.5 - 0.18, 0));
-    group.add(frameBottom);
-    const frameSideL = new THREE.Mesh(new THREE.PlaneGeometry(0.16, adH + 0.52), frameMat);
-    const sideAxis = new THREE.Vector3(Math.cos(a + Math.PI * 0.5), 0, Math.sin(a + Math.PI * 0.5));
-    frameSideL.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(-(adW * 0.5 + 0.18)));
-    frameSideL.lookAt(frameSideL.position.clone().sub(outward));
-    frameSideL.renderOrder = 91;
-    group.add(frameSideL);
-    const frameSideR = frameSideL.clone();
-    frameSideR.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(adW * 0.5 + 0.18));
-    group.add(frameSideR);
-
-    const glow = new THREE.PointLight(0xffc15a, 1.45, 42, 1.85);
-    glow.name = 'SVR_Espresso_Ad_Glow';
-    glow.position.copy(ad.position).add(new THREE.Vector3(0, 3.0, 5.0));
-    group.add(glow);
-  }
 
   scene.add(group);
   return group;
@@ -1221,78 +1077,6 @@ function buildLegendHall(scene, R, wallHeight, log = console.log){
   const center = new THREE.Vector3(-R * 0.46, 0, -R * 0.36);
   group.position.copy(center);
 
-  // PHASE-84D: explicit front-visible Espresso ad tower.
-  // This is a dedicated skyline ad building placed on the north/center sightline, in front of the older rear towers,
-  // so the player sees the ad from the lobby/table viewpoint instead of seeing it hidden behind foreground blocks.
-  {
-    const a = -Math.PI * 0.5;
-    const rr = R + 18;
-    const h = 58;
-    const w = 12.8;
-    const d = 3.4;
-    const x = Math.cos(a) * rr;
-    const z = Math.sin(a) * rr;
-    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
-    const towerMat = new THREE.MeshStandardMaterial({
-      color: 0x07101a,
-      roughness: 0.56,
-      metalness: 0.28,
-      emissive: 0x071a2e,
-      emissiveIntensity: 0.92
-    });
-    const tower = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), towerMat);
-    tower.name = 'SVR_Front_Visible_Espresso_Ad_Tower';
-    tower.position.set(x, h * 0.5, z);
-    tower.rotation.y = -a + Math.PI / 2;
-    tower.castShadow = false;
-    tower.receiveShadow = true;
-    group.add(tower);
-
-    const faceOffset = d * 0.5 + 0.36;
-    const adW = 8.4;
-    const adH = 37.5;
-    const ad = new THREE.Mesh(
-      new THREE.PlaneGeometry(adW, adH),
-      new THREE.MeshBasicMaterial({
-        map: espressoTex,
-        color: 0xffffff,
-        transparent: false,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        depthTest: true
-      })
-    );
-    ad.name = 'SVR_Espresso_With_Cream_FRONT_VISIBLE_BUILDING_AD';
-    ad.position.set(x - outward.x * faceOffset, h * 0.52, z - outward.z * faceOffset);
-    ad.lookAt(ad.position.clone().sub(outward));
-    ad.renderOrder = 90;
-    group.add(ad);
-
-    const frameMat = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
-    const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.42, 0.16), frameMat);
-    frameTop.position.copy(ad.position).add(new THREE.Vector3(0, adH * 0.5 + 0.18, 0));
-    frameTop.lookAt(frameTop.position.clone().sub(outward));
-    frameTop.renderOrder = 91;
-    group.add(frameTop);
-    const frameBottom = frameTop.clone();
-    frameBottom.position.copy(ad.position).add(new THREE.Vector3(0, -adH * 0.5 - 0.18, 0));
-    group.add(frameBottom);
-    const frameSideL = new THREE.Mesh(new THREE.PlaneGeometry(0.16, adH + 0.52), frameMat);
-    const sideAxis = new THREE.Vector3(Math.cos(a + Math.PI * 0.5), 0, Math.sin(a + Math.PI * 0.5));
-    frameSideL.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(-(adW * 0.5 + 0.18)));
-    frameSideL.lookAt(frameSideL.position.clone().sub(outward));
-    frameSideL.renderOrder = 91;
-    group.add(frameSideL);
-    const frameSideR = frameSideL.clone();
-    frameSideR.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(adW * 0.5 + 0.18));
-    group.add(frameSideR);
-
-    const glow = new THREE.PointLight(0xffc15a, 1.45, 42, 1.85);
-    glow.name = 'SVR_Espresso_Ad_Glow';
-    glow.position.copy(ad.position).add(new THREE.Vector3(0, 3.0, 5.0));
-    group.add(glow);
-  }
-
   scene.add(group);
 
   const base = new THREE.Mesh(
@@ -1487,78 +1271,6 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   const center = new THREE.Vector3(Math.cos(angle) * (R - 0.54), wallHeight * 0.5, Math.sin(angle) * (R - 0.54));
   group.position.copy(center);
   group.rotation.y = Math.atan2(inward.x, inward.z);
-
-  // PHASE-84D: explicit front-visible Espresso ad tower.
-  // This is a dedicated skyline ad building placed on the north/center sightline, in front of the older rear towers,
-  // so the player sees the ad from the lobby/table viewpoint instead of seeing it hidden behind foreground blocks.
-  {
-    const a = -Math.PI * 0.5;
-    const rr = R + 18;
-    const h = 58;
-    const w = 12.8;
-    const d = 3.4;
-    const x = Math.cos(a) * rr;
-    const z = Math.sin(a) * rr;
-    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
-    const towerMat = new THREE.MeshStandardMaterial({
-      color: 0x07101a,
-      roughness: 0.56,
-      metalness: 0.28,
-      emissive: 0x071a2e,
-      emissiveIntensity: 0.92
-    });
-    const tower = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), towerMat);
-    tower.name = 'SVR_Front_Visible_Espresso_Ad_Tower';
-    tower.position.set(x, h * 0.5, z);
-    tower.rotation.y = -a + Math.PI / 2;
-    tower.castShadow = false;
-    tower.receiveShadow = true;
-    group.add(tower);
-
-    const faceOffset = d * 0.5 + 0.36;
-    const adW = 8.4;
-    const adH = 37.5;
-    const ad = new THREE.Mesh(
-      new THREE.PlaneGeometry(adW, adH),
-      new THREE.MeshBasicMaterial({
-        map: espressoTex,
-        color: 0xffffff,
-        transparent: false,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        depthTest: true
-      })
-    );
-    ad.name = 'SVR_Espresso_With_Cream_FRONT_VISIBLE_BUILDING_AD';
-    ad.position.set(x - outward.x * faceOffset, h * 0.52, z - outward.z * faceOffset);
-    ad.lookAt(ad.position.clone().sub(outward));
-    ad.renderOrder = 90;
-    group.add(ad);
-
-    const frameMat = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
-    const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.42, 0.16), frameMat);
-    frameTop.position.copy(ad.position).add(new THREE.Vector3(0, adH * 0.5 + 0.18, 0));
-    frameTop.lookAt(frameTop.position.clone().sub(outward));
-    frameTop.renderOrder = 91;
-    group.add(frameTop);
-    const frameBottom = frameTop.clone();
-    frameBottom.position.copy(ad.position).add(new THREE.Vector3(0, -adH * 0.5 - 0.18, 0));
-    group.add(frameBottom);
-    const frameSideL = new THREE.Mesh(new THREE.PlaneGeometry(0.16, adH + 0.52), frameMat);
-    const sideAxis = new THREE.Vector3(Math.cos(a + Math.PI * 0.5), 0, Math.sin(a + Math.PI * 0.5));
-    frameSideL.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(-(adW * 0.5 + 0.18)));
-    frameSideL.lookAt(frameSideL.position.clone().sub(outward));
-    frameSideL.renderOrder = 91;
-    group.add(frameSideL);
-    const frameSideR = frameSideL.clone();
-    frameSideR.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(adW * 0.5 + 0.18));
-    group.add(frameSideR);
-
-    const glow = new THREE.PointLight(0xffc15a, 1.45, 42, 1.85);
-    glow.name = 'SVR_Espresso_Ad_Glow';
-    glow.position.copy(ad.position).add(new THREE.Vector3(0, 3.0, 5.0));
-    group.add(glow);
-  }
 
   scene.add(group);
 
@@ -1962,166 +1674,14 @@ function buildOuterCity(scene, R){
   }
 
 
-  // PHASE-84D: explicit front-visible Espresso ad tower.
-  // This is a dedicated skyline ad building placed on the north/center sightline, in front of the older rear towers,
-  // so the player sees the ad from the lobby/table viewpoint instead of seeing it hidden behind foreground blocks.
-  {
-    const a = -Math.PI * 0.5;
-    const rr = R + 18;
-    const h = 58;
-    const w = 12.8;
-    const d = 3.4;
-    const x = Math.cos(a) * rr;
-    const z = Math.sin(a) * rr;
-    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
-    const towerMat = new THREE.MeshStandardMaterial({
-      color: 0x07101a,
-      roughness: 0.56,
-      metalness: 0.28,
-      emissive: 0x071a2e,
-      emissiveIntensity: 0.92
-    });
-    const tower = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), towerMat);
-    tower.name = 'SVR_Front_Visible_Espresso_Ad_Tower';
-    tower.position.set(x, h * 0.5, z);
-    tower.rotation.y = -a + Math.PI / 2;
-    tower.castShadow = false;
-    tower.receiveShadow = true;
-    group.add(tower);
-
-    const faceOffset = d * 0.5 + 0.36;
-    const adW = 8.4;
-    const adH = 37.5;
-    const ad = new THREE.Mesh(
-      new THREE.PlaneGeometry(adW, adH),
-      new THREE.MeshBasicMaterial({
-        map: espressoTex,
-        color: 0xffffff,
-        transparent: false,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        depthTest: true
-      })
-    );
-    ad.name = 'SVR_Espresso_With_Cream_FRONT_VISIBLE_BUILDING_AD';
-    ad.position.set(x - outward.x * faceOffset, h * 0.52, z - outward.z * faceOffset);
-    ad.lookAt(ad.position.clone().sub(outward));
-    ad.renderOrder = 90;
-    group.add(ad);
-
-    const frameMat = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
-    const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.42, 0.16), frameMat);
-    frameTop.position.copy(ad.position).add(new THREE.Vector3(0, adH * 0.5 + 0.18, 0));
-    frameTop.lookAt(frameTop.position.clone().sub(outward));
-    frameTop.renderOrder = 91;
-    group.add(frameTop);
-    const frameBottom = frameTop.clone();
-    frameBottom.position.copy(ad.position).add(new THREE.Vector3(0, -adH * 0.5 - 0.18, 0));
-    group.add(frameBottom);
-    const frameSideL = new THREE.Mesh(new THREE.PlaneGeometry(0.16, adH + 0.52), frameMat);
-    const sideAxis = new THREE.Vector3(Math.cos(a + Math.PI * 0.5), 0, Math.sin(a + Math.PI * 0.5));
-    frameSideL.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(-(adW * 0.5 + 0.18)));
-    frameSideL.lookAt(frameSideL.position.clone().sub(outward));
-    frameSideL.renderOrder = 91;
-    group.add(frameSideL);
-    const frameSideR = frameSideL.clone();
-    frameSideR.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(adW * 0.5 + 0.18));
-    group.add(frameSideR);
-
-    const glow = new THREE.PointLight(0xffc15a, 1.45, 42, 1.85);
-    glow.name = 'SVR_Espresso_Ad_Glow';
-    glow.position.copy(ad.position).add(new THREE.Vector3(0, 3.0, 5.0));
-    group.add(glow);
-  }
-
-
-  // PHASE-84E: FORCE FRONT-ROW ESPRESSO AD.
-  // The previous ad was technically on a skyline building but still hidden behind player-facing foreground towers.
-  // This creates a deliberate front-row ad building just above the lobby rim, on the player's direct sightline,
-  // with the Espresso plane on the front face and rendered after the skyline so it cannot disappear behind blockers.
-  {
-    const a = -Math.PI * 0.5;
-    const rr = R + 2.8;
-    const h = 44.0;
-    const w = 12.2;
-    const d = 2.2;
-    const x = Math.cos(a) * rr;
-    const z = Math.sin(a) * rr;
-    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
-    const faceOffset = d * 0.5 + 0.30;
-
-    const holder = new THREE.Mesh(
-      new THREE.BoxGeometry(w, h, d),
-      new THREE.MeshStandardMaterial({
-        color: 0x050912,
-        roughness: 0.50,
-        metalness: 0.34,
-        emissive: 0x101a38,
-        emissiveIntensity: 1.35
-      })
-    );
-    holder.name = 'SVR_PHASE84E_FRONT_ROW_ESPRESSO_AD_BUILDING';
-    holder.position.set(x, h * 0.5, z);
-    holder.rotation.y = -a + Math.PI / 2;
-    holder.castShadow = false;
-    holder.receiveShadow = true;
-    holder.renderOrder = 120;
-    group.add(holder);
-
-    const adW = 8.8;
-    const adH = 32.0;
-    const ad = new THREE.Mesh(
-      new THREE.PlaneGeometry(adW, adH),
-      new THREE.MeshBasicMaterial({
-        map: espressoTex,
-        color: 0xffffff,
-        transparent: false,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        depthTest: false
-      })
-    );
-    ad.name = 'SVR_ESPRESSO_WITH_CREAM_ALWAYS_VISIBLE_FRONT_ROW_AD';
-    ad.position.set(x - outward.x * faceOffset, h * 0.55, z - outward.z * faceOffset);
-    ad.lookAt(ad.position.clone().sub(outward));
-    ad.renderOrder = 200;
-    group.add(ad);
-
-    const frameMat = new THREE.MeshBasicMaterial({
-      color: 0xffd06a,
-      transparent: true,
-      opacity: 0.98,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-      depthTest: false
-    });
-    const sideAxis = new THREE.Vector3(Math.cos(a + Math.PI * 0.5), 0, Math.sin(a + Math.PI * 0.5));
-    const frameParts = [
-      { name: 'top',    size: [adW + 0.55, 0.18], pos: new THREE.Vector3(0, adH * 0.5 + 0.18, 0) },
-      { name: 'bottom', size: [adW + 0.55, 0.18], pos: new THREE.Vector3(0, -adH * 0.5 - 0.18, 0) },
-      { name: 'left',   size: [0.18, adH + 0.55], pos: sideAxis.clone().multiplyScalar(-(adW * 0.5 + 0.18)) },
-      { name: 'right',  size: [0.18, adH + 0.55], pos: sideAxis.clone().multiplyScalar(adW * 0.5 + 0.18) }
-    ];
-    frameParts.forEach((part)=>{
-      const f = new THREE.Mesh(new THREE.PlaneGeometry(part.size[0], part.size[1]), frameMat);
-      f.name = 'SVR_ESPRESSO_FRONT_ROW_FRAME_' + part.name.toUpperCase();
-      f.position.copy(ad.position).add(part.pos);
-      f.lookAt(f.position.clone().sub(outward));
-      f.renderOrder = 201;
-      group.add(f);
-    });
-
-    const glow = new THREE.PointLight(0xffc15a, 2.2, 48, 1.7);
-    glow.name = 'SVR_PHASE84E_ESPRESSO_FRONT_ROW_GLOW';
-    glow.position.copy(ad.position).add(new THREE.Vector3(0, 2.4, 1.5));
-    group.add(glow);
-  }
-
   scene.add(group);
   return { group, billboardUpdaters };
 }
 
 function makeSeat(scene, x, z, angle, label, chairMat, metalMat){
+  // Phase 84I hotfix: some prior injected ad/seat code referenced R inside makeSeat.
+  // Keep a local room-radius fallback so the seat path can never black-screen from undefined R.
+  const R = CONFIG?.ROOM_RADIUS || 30;
   const group = new THREE.Group();
   const ring = new THREE.Mesh(
     new THREE.RingGeometry(0.36, 0.54, 48),
@@ -2185,78 +1745,6 @@ function makeSeat(scene, x, z, angle, label, chairMat, metalMat){
   group.position.set(x, 0, z);
   group.rotation.y = angle;
 
-  // PHASE-84D: explicit front-visible Espresso ad tower.
-  // This is a dedicated skyline ad building placed on the north/center sightline, in front of the older rear towers,
-  // so the player sees the ad from the lobby/table viewpoint instead of seeing it hidden behind foreground blocks.
-  {
-    const a = -Math.PI * 0.5;
-    const rr = R + 18;
-    const h = 58;
-    const w = 12.8;
-    const d = 3.4;
-    const x = Math.cos(a) * rr;
-    const z = Math.sin(a) * rr;
-    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
-    const towerMat = new THREE.MeshStandardMaterial({
-      color: 0x07101a,
-      roughness: 0.56,
-      metalness: 0.28,
-      emissive: 0x071a2e,
-      emissiveIntensity: 0.92
-    });
-    const tower = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), towerMat);
-    tower.name = 'SVR_Front_Visible_Espresso_Ad_Tower';
-    tower.position.set(x, h * 0.5, z);
-    tower.rotation.y = -a + Math.PI / 2;
-    tower.castShadow = false;
-    tower.receiveShadow = true;
-    group.add(tower);
-
-    const faceOffset = d * 0.5 + 0.36;
-    const adW = 8.4;
-    const adH = 37.5;
-    const ad = new THREE.Mesh(
-      new THREE.PlaneGeometry(adW, adH),
-      new THREE.MeshBasicMaterial({
-        map: espressoTex,
-        color: 0xffffff,
-        transparent: false,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        depthTest: true
-      })
-    );
-    ad.name = 'SVR_Espresso_With_Cream_FRONT_VISIBLE_BUILDING_AD';
-    ad.position.set(x - outward.x * faceOffset, h * 0.52, z - outward.z * faceOffset);
-    ad.lookAt(ad.position.clone().sub(outward));
-    ad.renderOrder = 90;
-    group.add(ad);
-
-    const frameMat = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
-    const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.42, 0.16), frameMat);
-    frameTop.position.copy(ad.position).add(new THREE.Vector3(0, adH * 0.5 + 0.18, 0));
-    frameTop.lookAt(frameTop.position.clone().sub(outward));
-    frameTop.renderOrder = 91;
-    group.add(frameTop);
-    const frameBottom = frameTop.clone();
-    frameBottom.position.copy(ad.position).add(new THREE.Vector3(0, -adH * 0.5 - 0.18, 0));
-    group.add(frameBottom);
-    const frameSideL = new THREE.Mesh(new THREE.PlaneGeometry(0.16, adH + 0.52), frameMat);
-    const sideAxis = new THREE.Vector3(Math.cos(a + Math.PI * 0.5), 0, Math.sin(a + Math.PI * 0.5));
-    frameSideL.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(-(adW * 0.5 + 0.18)));
-    frameSideL.lookAt(frameSideL.position.clone().sub(outward));
-    frameSideL.renderOrder = 91;
-    group.add(frameSideL);
-    const frameSideR = frameSideL.clone();
-    frameSideR.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(adW * 0.5 + 0.18));
-    group.add(frameSideR);
-
-    const glow = new THREE.PointLight(0xffc15a, 1.45, 42, 1.85);
-    glow.name = 'SVR_Espresso_Ad_Glow';
-    glow.position.copy(ad.position).add(new THREE.Vector3(0, 3.0, 5.0));
-    group.add(glow);
-  }
-
   scene.add(group);
   return { group, ring, x, z, angle, label };
 }
@@ -2271,78 +1759,6 @@ function addChipsAndCards(scene, tableTopY = 0.86){
       chip.position.set(x, tableTopY + 0.010 + i * 0.018, z - 0.19);
       group.add(chip);
     }
-  }
-
-  // PHASE-84D: explicit front-visible Espresso ad tower.
-  // This is a dedicated skyline ad building placed on the north/center sightline, in front of the older rear towers,
-  // so the player sees the ad from the lobby/table viewpoint instead of seeing it hidden behind foreground blocks.
-  {
-    const a = -Math.PI * 0.5;
-    const rr = R + 18;
-    const h = 58;
-    const w = 12.8;
-    const d = 3.4;
-    const x = Math.cos(a) * rr;
-    const z = Math.sin(a) * rr;
-    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
-    const towerMat = new THREE.MeshStandardMaterial({
-      color: 0x07101a,
-      roughness: 0.56,
-      metalness: 0.28,
-      emissive: 0x071a2e,
-      emissiveIntensity: 0.92
-    });
-    const tower = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), towerMat);
-    tower.name = 'SVR_Front_Visible_Espresso_Ad_Tower';
-    tower.position.set(x, h * 0.5, z);
-    tower.rotation.y = -a + Math.PI / 2;
-    tower.castShadow = false;
-    tower.receiveShadow = true;
-    group.add(tower);
-
-    const faceOffset = d * 0.5 + 0.36;
-    const adW = 8.4;
-    const adH = 37.5;
-    const ad = new THREE.Mesh(
-      new THREE.PlaneGeometry(adW, adH),
-      new THREE.MeshBasicMaterial({
-        map: espressoTex,
-        color: 0xffffff,
-        transparent: false,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        depthTest: true
-      })
-    );
-    ad.name = 'SVR_Espresso_With_Cream_FRONT_VISIBLE_BUILDING_AD';
-    ad.position.set(x - outward.x * faceOffset, h * 0.52, z - outward.z * faceOffset);
-    ad.lookAt(ad.position.clone().sub(outward));
-    ad.renderOrder = 90;
-    group.add(ad);
-
-    const frameMat = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
-    const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.42, 0.16), frameMat);
-    frameTop.position.copy(ad.position).add(new THREE.Vector3(0, adH * 0.5 + 0.18, 0));
-    frameTop.lookAt(frameTop.position.clone().sub(outward));
-    frameTop.renderOrder = 91;
-    group.add(frameTop);
-    const frameBottom = frameTop.clone();
-    frameBottom.position.copy(ad.position).add(new THREE.Vector3(0, -adH * 0.5 - 0.18, 0));
-    group.add(frameBottom);
-    const frameSideL = new THREE.Mesh(new THREE.PlaneGeometry(0.16, adH + 0.52), frameMat);
-    const sideAxis = new THREE.Vector3(Math.cos(a + Math.PI * 0.5), 0, Math.sin(a + Math.PI * 0.5));
-    frameSideL.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(-(adW * 0.5 + 0.18)));
-    frameSideL.lookAt(frameSideL.position.clone().sub(outward));
-    frameSideL.renderOrder = 91;
-    group.add(frameSideL);
-    const frameSideR = frameSideL.clone();
-    frameSideR.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(adW * 0.5 + 0.18));
-    group.add(frameSideR);
-
-    const glow = new THREE.PointLight(0xffc15a, 1.45, 42, 1.85);
-    glow.name = 'SVR_Espresso_Ad_Glow';
-    glow.position.copy(ad.position).add(new THREE.Vector3(0, 3.0, 5.0));
-    group.add(glow);
   }
 
   scene.add(group);
@@ -2431,78 +1847,6 @@ function addDealingDemo(scene, seats, tableTopY = 0.86, getDealerPos = null){
   winningHalo.position.y = tableTopY + 0.02;
   group.add(winningHalo);
 
-
-  // PHASE-84D: explicit front-visible Espresso ad tower.
-  // This is a dedicated skyline ad building placed on the north/center sightline, in front of the older rear towers,
-  // so the player sees the ad from the lobby/table viewpoint instead of seeing it hidden behind foreground blocks.
-  {
-    const a = -Math.PI * 0.5;
-    const rr = R + 18;
-    const h = 58;
-    const w = 12.8;
-    const d = 3.4;
-    const x = Math.cos(a) * rr;
-    const z = Math.sin(a) * rr;
-    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
-    const towerMat = new THREE.MeshStandardMaterial({
-      color: 0x07101a,
-      roughness: 0.56,
-      metalness: 0.28,
-      emissive: 0x071a2e,
-      emissiveIntensity: 0.92
-    });
-    const tower = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), towerMat);
-    tower.name = 'SVR_Front_Visible_Espresso_Ad_Tower';
-    tower.position.set(x, h * 0.5, z);
-    tower.rotation.y = -a + Math.PI / 2;
-    tower.castShadow = false;
-    tower.receiveShadow = true;
-    group.add(tower);
-
-    const faceOffset = d * 0.5 + 0.36;
-    const adW = 8.4;
-    const adH = 37.5;
-    const ad = new THREE.Mesh(
-      new THREE.PlaneGeometry(adW, adH),
-      new THREE.MeshBasicMaterial({
-        map: espressoTex,
-        color: 0xffffff,
-        transparent: false,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        depthTest: true
-      })
-    );
-    ad.name = 'SVR_Espresso_With_Cream_FRONT_VISIBLE_BUILDING_AD';
-    ad.position.set(x - outward.x * faceOffset, h * 0.52, z - outward.z * faceOffset);
-    ad.lookAt(ad.position.clone().sub(outward));
-    ad.renderOrder = 90;
-    group.add(ad);
-
-    const frameMat = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
-    const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.42, 0.16), frameMat);
-    frameTop.position.copy(ad.position).add(new THREE.Vector3(0, adH * 0.5 + 0.18, 0));
-    frameTop.lookAt(frameTop.position.clone().sub(outward));
-    frameTop.renderOrder = 91;
-    group.add(frameTop);
-    const frameBottom = frameTop.clone();
-    frameBottom.position.copy(ad.position).add(new THREE.Vector3(0, -adH * 0.5 - 0.18, 0));
-    group.add(frameBottom);
-    const frameSideL = new THREE.Mesh(new THREE.PlaneGeometry(0.16, adH + 0.52), frameMat);
-    const sideAxis = new THREE.Vector3(Math.cos(a + Math.PI * 0.5), 0, Math.sin(a + Math.PI * 0.5));
-    frameSideL.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(-(adW * 0.5 + 0.18)));
-    frameSideL.lookAt(frameSideL.position.clone().sub(outward));
-    frameSideL.renderOrder = 91;
-    group.add(frameSideL);
-    const frameSideR = frameSideL.clone();
-    frameSideR.position.copy(ad.position).add(sideAxis.clone().multiplyScalar(adW * 0.5 + 0.18));
-    group.add(frameSideR);
-
-    const glow = new THREE.PointLight(0xffc15a, 1.45, 42, 1.85);
-    glow.name = 'SVR_Espresso_Ad_Glow';
-    glow.position.copy(ad.position).add(new THREE.Vector3(0, 3.0, 5.0));
-    group.add(glow);
-  }
 
   scene.add(group);
 
@@ -2685,6 +2029,87 @@ function sanitizeTableSurface(table, keepMesh = null){
     if (isThinCap || isKnownBlink) child.visible = false;
   });
 }
+
+function addAlwaysVisibleEspressoAd(scene, R){
+  const group = new THREE.Group();
+  group.name = 'SVR_PHASE84G_ALWAYS_VISIBLE_ESPRESSO_BUILDING_AD_GROUP';
+
+  // Player-facing front-center tower. It sits just inside the skyline rim so foreground skyline blocks cannot hide it.
+  const z = -(R - 2.8);
+  const x = -1.0;
+  const h = 34.0;
+  const w = 10.8;
+  const d = 1.65;
+
+  const tower = new THREE.Mesh(
+    new THREE.BoxGeometry(w, h, d),
+    new THREE.MeshStandardMaterial({
+      color: 0x050914,
+      roughness: 0.50,
+      metalness: 0.32,
+      emissive: 0x111a38,
+      emissiveIntensity: 1.15
+    })
+  );
+  tower.name = 'SVR_PHASE84G_FRONT_CENTER_ESPRESSO_AD_BUILDING';
+  tower.position.set(x, h * 0.5, z);
+  tower.castShadow = false;
+  tower.receiveShadow = false;
+  tower.renderOrder = 130;
+  group.add(tower);
+
+  const adW = 8.4;
+  const adH = 26.0;
+  const adZ = z + d * 0.5 + 0.055;
+  const adY = h * 0.55;
+  const ad = new THREE.Mesh(
+    new THREE.PlaneGeometry(adW, adH),
+    new THREE.MeshBasicMaterial({
+      map: espressoTex,
+      color: 0xffffff,
+      transparent: false,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      depthTest: false
+    })
+  );
+  ad.name = 'SVR_ESPRESSO_WITH_CREAM_ALWAYS_VISIBLE_PLAYER_POV_AD';
+  ad.position.set(x, adY, adZ);
+  ad.renderOrder = 250;
+  group.add(ad);
+
+  const frameMat = new THREE.MeshBasicMaterial({
+    color: 0xffcf6a,
+    transparent: true,
+    opacity: 0.96,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    depthTest: false
+  });
+  const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.55, 0.18), frameMat);
+  frameTop.position.set(x, adY + adH * 0.5 + 0.22, adZ + 0.01);
+  frameTop.renderOrder = 251;
+  group.add(frameTop);
+  const frameBottom = frameTop.clone();
+  frameBottom.position.y = adY - adH * 0.5 - 0.22;
+  group.add(frameBottom);
+  const frameLeft = new THREE.Mesh(new THREE.PlaneGeometry(0.18, adH + 0.62), frameMat);
+  frameLeft.position.set(x - adW * 0.5 - 0.22, adY, adZ + 0.01);
+  frameLeft.renderOrder = 251;
+  group.add(frameLeft);
+  const frameRight = frameLeft.clone();
+  frameRight.position.x = x + adW * 0.5 + 0.22;
+  group.add(frameRight);
+
+  const glow = new THREE.PointLight(0xffc15a, 1.85, 54, 1.75);
+  glow.name = 'SVR_PHASE84G_ESPRESSO_AD_GLOW';
+  glow.position.set(x, adY + 1.0, adZ + 2.4);
+  group.add(glow);
+
+  scene.add(group);
+  return group;
+}
+
 export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const R = CONFIG.ROOM_RADIUS;
   const H = CONFIG.WALL_HEIGHT;
@@ -2779,6 +2204,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const city = buildOuterCity(scene, R);
   const stars = buildStars(scene, R);
   const lobbySprites = buildLobbySprites(scene, R, wallHeight);
+  const espressoAdGroup = addAlwaysVisibleEspressoAd(scene, R);
   const spawnLogoTex = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
   const wallPanels = [];
   const wallPanelUpdaters = [];
