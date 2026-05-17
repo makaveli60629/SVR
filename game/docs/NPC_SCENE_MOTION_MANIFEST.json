@@ -1,0 +1,49 @@
+{
+  "phase": "PHASE-85-NPC-SCENE-MOTION-LOCK",
+  "siteTouched": false,
+  "gameSideOnly": true,
+  "dependsOn": "Phase 84 avatar rig intake assets are included in this patch for safe dependency coverage.",
+  "avatars": [
+    "eric",
+    "carla",
+    "mei"
+  ],
+  "sceneRoles": {
+    "lobby": [
+      "Eric walking patrol",
+      "Carla host patrol",
+      "two seated poker placeholders"
+    ],
+    "reiki": [
+      "Mei guide placeholder"
+    ],
+    "pga-drive": [
+      "Eric range coach placeholder"
+    ],
+    "chip-putt": [
+      "Carla short-game coach placeholder"
+    ],
+    "smoker-lounge": [
+      "Carla social host placeholder"
+    ],
+    "scorpion": [
+      "Eric Scorpion host placeholder"
+    ],
+    "store-room": [
+      "Mei avatar display placeholder"
+    ]
+  },
+  "blocked": [
+    "raw sci-fi city OBJ autoload",
+    "site edits",
+    "dealer body restoration",
+    "unapproved Reiki branding"
+  ],
+  "files": [
+    "game/modules/avatar_asset_registry.js",
+    "game/modules/npc_avatar_system.js",
+    "game/modules/npc_motion_controller.js",
+    "game/modules/npc_scene_attach.js",
+    "game/docs/PHASE_85_NPC_SCENE_MOTION_LOCK.md"
+  ]
+}

@@ -1,7 +1,6 @@
 ﻿{
-    "phase":  "84Z",
-    "label":  "Audit Scene Enable Skyline Lock",
-    "build":  "PHASE-84Z-AUDIT-SCENE-ENABLE-SKYLINE-LOCK",
     "siteTouched":  false,
-    "appliedAt":  "2026-05-17T18:06:07Z"
+    "build":  "PHASE-85-NPC-SCENE-MOTION-LOCK",
+    "type":  "game-module-patch",
+    "createdAt":  "2026-05-17T19:06:19Z"
 }

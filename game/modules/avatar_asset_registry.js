@@ -1,7 +1,7 @@
-// SVR Phase 84 — Avatar NPC Rig Intake Registry
+// SVR Phase 85 — NPC Scene Motion Registry
 // Game-side only. Site-side files must not import this module.
 
-export const SVR_AVATAR_NPC_PHASE = "PHASE-84-AVATAR-NPC-RIG-INTAKE-LOCK";
+export const SVR_AVATAR_NPC_PHASE = "PHASE-85-NPC-SCENE-MOTION-LOCK";
 
 export const NPC_AVATAR_REGISTRY = Object.freeze({
   eric: {
@@ -42,9 +42,12 @@ export const NPC_AVATAR_REGISTRY = Object.freeze({
   }
 });
 
+// Scene keys are intentionally generic so the same avatar module can be used in
+// index.html, reiki.html, pga-drive.html/range.html, chip-putt.html,
+// smoker-lounge.html, scorpion.html, and future private rooms.
 export const NPC_SCENE_SPAWNS = Object.freeze([
   {
-    id: "lobby-eric-walker",
+    id: "lobby-eric-patrol",
     avatar: "eric",
     scene: "lobby",
     mode: "walk_loop",
@@ -59,7 +62,7 @@ export const NPC_SCENE_SPAWNS = Object.freeze([
     scaleBoost: 1.0
   },
   {
-    id: "lobby-carla-host",
+    id: "lobby-carla-host-patrol",
     avatar: "carla",
     scene: "lobby",
     mode: "walk_loop",
@@ -74,20 +77,113 @@ export const NPC_SCENE_SPAWNS = Object.freeze([
     scaleBoost: 1.0
   },
   {
-    id: "reiki-mei-static",
+    id: "poker-eric-seat-1",
+    avatar: "eric",
+    scene: "lobby",
+    mode: "seated_poker",
+    label: "Eric Bot",
+    seatSlot: 1,
+    scaleBoost: 0.94,
+    idleStyle: "chip_reach"
+  },
+  {
+    id: "poker-carla-seat-3",
+    avatar: "carla",
+    scene: "lobby",
+    mode: "seated_poker",
+    label: "Carla Bot",
+    seatSlot: 3,
+    scaleBoost: 0.92,
+    idleStyle: "card_peek"
+  },
+  {
+    id: "reiki-mei-guide",
     avatar: "mei",
     scene: "reiki",
     mode: "static_idle",
-    label: "Mei Placeholder",
+    label: "Mei Guide",
     position: { x: 0.0, y: 0, z: -5.8 },
     lookAt: { x: 0, y: 1.4, z: 0 },
-    scaleBoost: 0.98
+    scaleBoost: 0.98,
+    idleStyle: "calm_breath"
+  },
+  {
+    id: "range-eric-coach",
+    avatar: "eric",
+    scene: "pga-drive",
+    mode: "static_idle",
+    label: "Range Coach",
+    position: { x: -2.4, y: 0, z: -1.2 },
+    lookAt: { x: 0, y: 1.2, z: -6.0 },
+    scaleBoost: 0.96,
+    idleStyle: "coach_point"
+  },
+  {
+    id: "chipputt-carla-coach",
+    avatar: "carla",
+    scene: "chip-putt",
+    mode: "static_idle",
+    label: "Short Game Coach",
+    position: { x: 2.2, y: 0, z: -1.0 },
+    lookAt: { x: 0, y: 1.2, z: -4.0 },
+    scaleBoost: 0.94,
+    idleStyle: "coach_point"
+  },
+  {
+    id: "lounge-carla-social",
+    avatar: "carla",
+    scene: "smoker-lounge",
+    mode: "walk_loop",
+    label: "Lounge Host",
+    path: [
+      { x: -2.8, y: 0, z: 1.8 },
+      { x: -1.2, y: 0, z: -0.8 },
+      { x: 1.6, y: 0, z: -0.6 },
+      { x: 2.8, y: 0, z: 1.4 }
+    ],
+    speed: 0.28,
+    scaleBoost: 0.94
+  },
+  {
+    id: "scorpion-eric-security",
+    avatar: "eric",
+    scene: "scorpion",
+    mode: "static_idle",
+    label: "Scorpion Host",
+    position: { x: -3.0, y: 0, z: 0.8 },
+    lookAt: { x: 0, y: 1.3, z: 0 },
+    scaleBoost: 0.96,
+    idleStyle: "card_peek"
+  },
+  {
+    id: "store-mei-display",
+    avatar: "mei",
+    scene: "store-room",
+    mode: "static_idle",
+    label: "Avatar Display",
+    position: { x: 1.8, y: 0, z: -2.2 },
+    lookAt: { x: 0, y: 1.3, z: 0 },
+    scaleBoost: 0.95,
+    idleStyle: "calm_breath"
   }
 ]);
+
+export const NPC_SCENE_ALIASES = Object.freeze({
+  "index": "lobby",
+  "game": "lobby",
+  "reiki": "reiki",
+  "range": "pga-drive",
+  "pga-drive": "pga-drive",
+  "chip-putt": "chip-putt",
+  "store-room": "store-room",
+  "smoker-lounge": "smoker-lounge",
+  "scorpion": "scorpion"
+});
 
 export const SCIFI_DOWNTOWN_RUNTIME_NOTE = Object.freeze({
   sourceZip: "whsjqj04ge-ScifiDowntowncity.zip",
   runtimeStatus: "source_only_not_loaded_by_default",
-  reason: "The full OBJ is a private-scene background candidate and should be optimized before shipping live.",
-  intendedScenes: ["scorpion_city_overlook", "future_sci_fi_private_scene"]
+  reason: "The full OBJ is a private-scene background candidate and must be optimized before live loading.",
+  intendedScenes: ["scorpion_city_overlook", "future_sci_fi_private_scene"],
+  phase85Lock: "Do not load the raw OBJ in lobby runtime. Use only preview cards or optimized future GLB."
 });

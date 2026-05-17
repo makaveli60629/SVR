@@ -1,8 +1,6 @@
 import * as THREE from "three";
 import { NPC_AVATAR_REGISTRY, NPC_SCENE_SPAWNS, SVR_AVATAR_NPC_PHASE } from "./avatar_asset_registry.js";
-
-const tmpV = new THREE.Vector3();
-const tmpLook = new THREE.Vector3();
+import { detectNpcSceneKey, shouldSpawnInScene, placeActorRoot, updateActorMotion } from "./npc_motion_controller.js";
 
 function makeLabel(text){
   const canvas = document.createElement("canvas");
@@ -95,13 +93,13 @@ async function loadFbxAvatar(def, labelText, log){
   try {
     ({ FBXLoader } = await import("three/addons/loaders/FBXLoader.js"));
   } catch (err){
-    log?.("[Phase84] FBXLoader unavailable; using procedural NPC fallback", err?.message || err);
+    log?.("[Phase85] FBXLoader unavailable; using procedural NPC fallback", err?.message || err);
     return makeFallbackAvatar(def, labelText);
   }
 
   const loader = new FBXLoader();
   const group = await loader.loadAsync(def.fbx).catch((err)=>{
-    log?.(`[Phase84] Failed to load ${def.fbx}; fallback created`, err?.message || err);
+    log?.(`[Phase85] Failed to load ${def.fbx}; fallback created`, err?.message || err);
     return null;
   });
   if (!group) return makeFallbackAvatar(def, labelText);
@@ -117,7 +115,6 @@ async function loadFbxAvatar(def, labelText, log){
     }
   });
 
-  // Light texture override. If the FBX material paths resolve naturally, this is harmless.
   try {
     const tex = await loadRuntimeTexture(def.diffuse, def.normal);
     group.traverse((obj)=>{
@@ -137,42 +134,39 @@ async function loadFbxAvatar(def, labelText, log){
   return group;
 }
 
-function placeRoot(root, spawn){
-  const p = spawn.position || spawn.path?.[0] || { x: 0, y: 0, z: 0 };
-  root.position.set(p.x || 0, p.y || 0, p.z || 0);
-  if (spawn.lookAt){
-    tmpLook.set(spawn.lookAt.x || 0, spawn.lookAt.y || 1.4, spawn.lookAt.z || 0);
-    root.lookAt(tmpLook);
-  }
-}
-
-export function createNpcAvatarSystem({ scene, log } = {}){
+export function createNpcAvatarSystem({ scene, seats = [], tableCenter = { x: 0, y: 0, z: 0 }, currentScene = null, maxActors = 6, log } = {}){
+  if (!scene) throw new Error("createNpcAvatarSystem requires a THREE.Scene");
+  const sceneKey = detectNpcSceneKey(currentScene);
   const root = new THREE.Group();
-  root.name = `SVR_NPC_AVATAR_SYSTEM_${SVR_AVATAR_NPC_PHASE}`;
+  root.name = `SVR_NPC_AVATAR_SYSTEM_${SVR_AVATAR_NPC_PHASE}_${sceneKey}`;
   scene.add(root);
 
+  const spawns = NPC_SCENE_SPAWNS.filter(spawn => shouldSpawnInScene(spawn, sceneKey)).slice(0, maxActors);
   const actors = [];
   const state = {
     phase: SVR_AVATAR_NPC_PHASE,
     ready: false,
     actors,
+    sceneKey,
     enabled: true,
-    source: "assets.zip optimized runtime intake"
+    source: "Phase84 assets + Phase85 scene motion lock",
+    spawnCount: spawns.length
   };
 
   async function boot(){
-    for (const spawn of NPC_SCENE_SPAWNS){
+    for (const spawn of spawns){
       const def = NPC_AVATAR_REGISTRY[spawn.avatar];
       if (!def) continue;
       const actorRoot = new THREE.Group();
       actorRoot.name = `SVR_NPC_SLOT_${spawn.id}`;
-      placeRoot(actorRoot, spawn);
+      placeActorRoot(actorRoot, spawn, seats, tableCenter);
+      if (spawn.scaleBoost) actorRoot.scale.setScalar(spawn.scaleBoost);
       root.add(actorRoot);
 
       const fallback = makeFallbackAvatar(def, spawn.label);
       actorRoot.add(fallback);
 
-      actors.push({
+      const actor = {
         spawn,
         def,
         root: actorRoot,
@@ -180,19 +174,20 @@ export function createNpcAvatarSystem({ scene, log } = {}){
         pathIndex: 1,
         phaseOffset: Math.random() * 10,
         loaded: false
-      });
+      };
+      actors.push(actor);
 
       loadFbxAvatar(def, spawn.label, log).then((loaded)=>{
         if (!loaded) return;
         actorRoot.remove(fallback);
         actorRoot.add(loaded);
-        const actor = actors.find(a => a.root === actorRoot);
-        if (actor){ actor.model = loaded; actor.loaded = !loaded.name.includes("FALLBACK"); }
+        actor.model = loaded;
+        actor.loaded = !loaded.name.includes("FALLBACK");
       });
     }
     state.ready = true;
     window.SVR_NPC_AVATAR_SYSTEM = state;
-    log?.(`[Phase84] NPC avatar system booted: ${actors.length} avatar slots`);
+    log?.(`[Phase85] NPC scene motion system booted: ${actors.length} avatar slots for ${sceneKey}`);
   }
 
   boot();
@@ -200,35 +195,7 @@ export function createNpcAvatarSystem({ scene, log } = {}){
   function update(dt){
     if (!state.enabled) return;
     const now = performance.now() * 0.001;
-    for (const actor of actors){
-      const { spawn, root: actorRoot, model } = actor;
-      if (spawn.mode === "walk_loop" && spawn.path?.length > 1){
-        const target = spawn.path[actor.pathIndex % spawn.path.length];
-        tmpV.set(target.x || 0, target.y || 0, target.z || 0);
-        const pos = actorRoot.position;
-        const dist = pos.distanceTo(tmpV);
-        if (dist < 0.08){
-          actor.pathIndex = (actor.pathIndex + 1) % spawn.path.length;
-        } else {
-          const step = Math.min(dist, (spawn.speed || 0.35) * dt);
-          pos.lerp(tmpV, step / Math.max(dist, 0.0001));
-          const look = tmpV.clone();
-          look.y = pos.y;
-          actorRoot.lookAt(look);
-        }
-      }
-      const bob = Math.sin(now * 3.0 + actor.phaseOffset) * 0.012;
-      if (model) model.position.y = bob;
-      const parts = model?.userData?._proceduralParts;
-      if (parts){
-        const s = Math.sin(now * 4.0 + actor.phaseOffset);
-        parts.armL.rotation.x = s * 0.22;
-        parts.armR.rotation.x = -s * 0.22;
-        parts.legL.rotation.x = -s * 0.18;
-        parts.legR.rotation.x = s * 0.18;
-        parts.head.rotation.y = Math.sin(now * 1.2 + actor.phaseOffset) * 0.1;
-      }
-    }
+    for (const actor of actors) updateActorMotion(actor, dt, now);
   }
 
   function setEnabled(on){ state.enabled = !!on; root.visible = state.enabled; }

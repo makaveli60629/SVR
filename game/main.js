@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -7,6 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
+import { createNpcAvatarSystem } from "./modules/npc_avatar_system.js";
 import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
 
 const params = new URLSearchParams(location.search);
@@ -73,12 +74,14 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading world…", { force: true });
+setStatus("Loading worldâ€¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
+const npcAvatarSystem = createNpcAvatarSystem({ scene, seats, tableCenter, sceneTargets, currentScene: "lobby", log });
+window.SVR_NPC_AVATAR_SYSTEM = npcAvatarSystem?.state || null;
 
 const audio = createAudioPlaylist({
   tracks: [
@@ -249,12 +252,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logo…", { force: true });
+setStatus("Loading logoâ€¦", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -314,6 +317,7 @@ renderer.setAnimationLoop(()=>{
   }
 
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
+  if (npcAvatarSystem?.update) npcAvatarSystem.update(dt);
 
   hands.update(dt);
   hands.updateDebug();
@@ -346,7 +350,8 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading…");
-  setStatus("WebGL context lost (reloading…)", { force: true });
+  log("[ERR] WebGL context lost. Reloadingâ€¦");
+  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
