@@ -1,6 +1,6 @@
 ﻿{
-  "build": "PHASE-84O-HIGH-PLANETS-FILLED-SKYLINE-LOCK",
-  "phase": "84O",
-  "target": "/game",
-  "notes": "Moon and Mars are larger and higher; extra varied buildings fill gaps behind and between ad districts while ads remain front-visible."
+    "phase":  "84P",
+    "title":  "Cyber Skyline Moon Mars Manifest Lock",
+    "build":  "PHASE-84P-CYBER-SKYLINE-MOON-MARS-MANIFEST-LOCK",
+    "updatedAt":  "2026-05-17T04:19:41Z"
 }

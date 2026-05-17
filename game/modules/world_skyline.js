@@ -2388,6 +2388,163 @@ function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
   return group;
 }
 
+
+function createWindowGridTexture(primary = '#9fdfff', secondary = '#b993ff'){
+  return canvasTexture(1024, 1024, (ctx,w,h)=>{
+    const bg = ctx.createLinearGradient(0,0,w,h);
+    bg.addColorStop(0,'#050914');
+    bg.addColorStop(1,'#111827');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = 'rgba(255,255,255,0.035)';
+    for (let y=18; y<h; y+=42){
+      for (let x=18; x<w; x+=52){
+        const on = ((x*13+y*7) % 5) !== 0;
+        ctx.fillStyle = on ? primary : 'rgba(18,26,44,0.7)';
+        ctx.globalAlpha = on ? 0.38 + (((x+y)%97)/260) : 0.18;
+        ctx.fillRect(x, y, 24, 18);
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = secondary;
+    ctx.lineWidth = 3;
+    for (let x=0; x<w; x+=128){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+    for (let y=0; y<h; y+=128){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+  });
+}
+
+function addPhase84PMasterCyberSkyline(scene, R, wallHeight = 8){
+  const group = new THREE.Group();
+  group.name = 'SVR_PHASE84P_MASTER_CYBER_SKYLINE_LOOP_DEPTH_LOGIC';
+
+  const purpleWindows = createWindowGridTexture('#b993ff', '#51e6ff');
+  const cyanWindows = createWindowGridTexture('#7ee7ff', '#b993ff');
+  const roughMetal = canvasTexture(512,512,(ctx,w,h)=>{
+    ctx.fillStyle = '#07101a'; ctx.fillRect(0,0,w,h);
+    for(let i=0;i<700;i++){
+      const v = 18 + Math.random()*42;
+      ctx.fillStyle = `rgba(${v|0},${(v+8)|0},${(v+22)|0},${0.06+Math.random()*0.12})`;
+      ctx.fillRect(Math.random()*w, Math.random()*h, 1+Math.random()*5, 1+Math.random()*5);
+    }
+  });
+  [purpleWindows, cyanWindows, roughMetal].forEach((tex)=>{ tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.anisotropy=8; });
+
+  const metalMat = new THREE.MeshStandardMaterial({ map: roughMetal, color: 0x0b101a, roughness: 0.60, metalness: 0.72, emissive: 0x07112a, emissiveIntensity: 0.28 });
+  const darkMat = new THREE.MeshStandardMaterial({ color: 0x050912, roughness: 0.66, metalness: 0.58, emissive: 0x08051c, emissiveIntensity: 0.20 });
+  const pillarMat = new THREE.MeshStandardMaterial({ color: 0x03060d, roughness: 0.62, metalness: 0.70, emissive: 0x08051b, emissiveIntensity: 0.36 });
+  const purpleTrim = new THREE.MeshBasicMaterial({ color: 0xb45cff, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthWrite: false });
+  const cyanTrim = new THREE.MeshBasicMaterial({ color: 0x4fe8ff, transparent: true, opacity: 0.82, side: THREE.DoubleSide, depthWrite: false });
+  const greenTrim = new THREE.MeshBasicMaterial({ color: 0x39ff72, transparent: true, opacity: 0.90, side: THREE.DoubleSide, depthWrite: false });
+  const goldTrim = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.95, side: THREE.DoubleSide, depthWrite: false });
+
+  const allInTex = createAllInTierTexture();
+  const winCashTex = createWinCashTierTexture();
+  [espressoTex, allInTex, winCashTex].forEach((tex)=>{ if(tex){ tex.wrapS=tex.wrapT=THREE.ClampToEdgeWrapping; tex.anisotropy=8; tex.needsUpdate=true; } });
+
+  function basis(angle){
+    const outward = new THREE.Vector3(Math.cos(angle),0,Math.sin(angle));
+    const inward = outward.clone().multiplyScalar(-1);
+    const across = new THREE.Vector3(-Math.sin(angle),0,Math.cos(angle));
+    return { outward, inward, across };
+  }
+  function face(obj){ obj.lookAt(new THREE.Vector3(0, obj.position.y, 0)); }
+  function pos(angle, radius, lateral=0){
+    const { across } = basis(angle);
+    return new THREE.Vector3(Math.cos(angle)*radius, 0, Math.sin(angle)*radius).add(across.multiplyScalar(lateral));
+  }
+  function addTrim(center, angle, w, h, mat, order=150){
+    const { across } = basis(angle);
+    const parts = [
+      [w+0.8,0.28,0,h*0.5+0.32], [w+0.8,0.28,0,-h*0.5-0.32],
+      [0.28,h+0.8,-w*0.5-0.34,0], [0.28,h+0.8,w*0.5+0.34,0]
+    ];
+    for(const [pw,ph,lx,ly] of parts){
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(pw,ph), mat);
+      m.position.copy(center).add(across.clone().multiplyScalar(lx)).add(new THREE.Vector3(0,ly,0));
+      face(m); m.renderOrder=order; m.frustumCulled=true; group.add(m);
+    }
+  }
+  function addBox(name, angle, radius, lateral, width, height, depth, baseY, mat, {round=false, windows=true, trim=true}={}){
+    const c = pos(angle,radius,lateral);
+    const geo = round ? new THREE.CylinderGeometry(width*0.46,width*0.58,height,14) : new THREE.BoxGeometry(width,height,depth);
+    const m = new THREE.Mesh(geo, mat);
+    m.name=name; m.position.set(c.x, baseY+height*0.5, c.z); face(m); m.frustumCulled=true; group.add(m);
+    const { inward, across } = basis(angle);
+    if(windows && !round){
+      const f = new THREE.Mesh(new THREE.PlaneGeometry(width*0.88,height*0.82), new THREE.MeshBasicMaterial({map: (width+height)%2>1 ? purpleWindows : cyanWindows, side: THREE.DoubleSide, transparent:true, opacity:0.72, depthWrite:false}));
+      f.position.copy(m.position).add(inward.clone().multiplyScalar(depth*0.5+0.035)); face(f); f.renderOrder=80; f.frustumCulled=true; group.add(f);
+    }
+    // corner pillars for flat boxes
+    if(!round){
+      [-1,1].forEach((side)=>{
+        const p = new THREE.Mesh(new THREE.BoxGeometry(0.46,height+0.7,0.54), pillarMat);
+        p.position.copy(m.position).add(across.clone().multiplyScalar(side*(width*0.5+0.14))).add(inward.clone().multiplyScalar(depth*0.5+0.18));
+        face(p); p.frustumCulled=true; group.add(p);
+      });
+    }
+    if(trim){
+      const trimYTop = baseY + height + 0.22;
+      const trimYBase = baseY + 0.22;
+      [trimYTop, trimYBase].forEach((yy,idx)=>{
+        const t = new THREE.Mesh(new THREE.PlaneGeometry(width+0.9,0.22), idx?purpleTrim:cyanTrim);
+        t.position.copy(pos(angle,radius,lateral)).setY(yy).add(inward.clone().multiplyScalar(depth*0.5+0.24));
+        face(t); t.renderOrder=120; t.frustumCulled=true; group.add(t);
+      });
+    }
+    return m;
+  }
+  function addAd(name, angle, radius, lateral, y, w, h, tex, frameMat, order=180, forward=0.5){
+    const { inward } = basis(angle);
+    const p = pos(angle,radius,lateral).setY(y).add(inward.multiplyScalar(forward));
+    const ad = new THREE.Mesh(new THREE.PlaneGeometry(w,h), new THREE.MeshBasicMaterial({ map: tex, color: 0xffffff, side: THREE.DoubleSide, transparent:false, depthWrite:false, depthTest:true }));
+    ad.name=name; ad.position.copy(p); face(ad); ad.renderOrder=order; ad.frustumCulled=true; group.add(ad); addTrim(p,angle,w,h,frameMat,order+1); return ad;
+  }
+
+  const wallSlots = [
+    {name:'NORTH', angle:-Math.PI*0.5}, {name:'SOUTH', angle:Math.PI*0.5}, {name:'EAST', angle:0}, {name:'WEST', angle:Math.PI}
+  ];
+  const cornerSlots = [
+    {name:'NORTHEAST', angle:-Math.PI*0.25}, {name:'SOUTHEAST', angle:Math.PI*0.25}, {name:'SOUTHWEST', angle:Math.PI*0.75}, {name:'NORTHWEST', angle:-Math.PI*0.75}
+  ];
+
+  // Cardinal ad districts: Tier 1 and Tier 2 are larger and deliberately separated.
+  wallSlots.forEach(({name,angle})=>{
+    const frontR = R + 30;
+    const midR = R + 37;
+    const backR = R + 68;
+    addBox(`SVR_84P_${name}_T1_BASE_SETBACK`, angle, frontR, 0, 42, 30, 8, wallHeight+4, metalMat);
+    addBox(`SVR_84P_${name}_T1_UPPER_MEGATRON_TOWER`, angle, frontR, 0, 25, 74, 6, wallHeight+34, darkMat);
+    addAd(`SVR_84P_${name}_TIER1_ESPRESSO_MEGATRON`, angle, frontR, 0, wallHeight+82, 22, 40, espressoTex, goldTrim, 190, 4.0);
+    addAd(`SVR_84P_${name}_TIER2_ALL_IN_LEFT_LANDSCAPE`, angle, midR, -30, wallHeight+43, 23, 11.5, allInTex, cyanTrim, 185, 3.6);
+    addAd(`SVR_84P_${name}_TIER2_ALL_IN_RIGHT_LANDSCAPE`, angle, midR, 30, wallHeight+43, 23, 11.5, allInTex, cyanTrim, 185, 3.6);
+    addBox(`SVR_84P_${name}_T2_LEFT_BUILDING`, angle, midR, -30, 25, 55, 6, wallHeight+7, metalMat);
+    addBox(`SVR_84P_${name}_T2_RIGHT_BUILDING`, angle, midR, 30, 25, 55, 6, wallHeight+7, metalMat);
+    [
+      [-55,8,72,3.6,false],[-42,13,46,5.0,false],[-15,7,86,3.2,true],[15,11,58,4.2,false],[43,7,78,3.2,true],[58,16,40,5.2,false]
+    ].forEach(([lat,w,h,d,round],i)=> addBox(`SVR_84P_${name}_BACKFILL_${i}`, angle, backR + (i%2)*12, lat, w, h, d, wallHeight+3, i%2?darkMat:metalMat, {round, windows:true, trim:true}));
+  });
+
+  // Intercardinal buildings fill the spaces between the four main districts and carry Tier 3 green banners.
+  cornerSlots.forEach(({name,angle})=>{
+    addBox(`SVR_84P_${name}_INTERCARDINAL_T3_BASE`, angle, R+34, 0, 28, 44, 6, wallHeight+5, metalMat);
+    addAd(`SVR_84P_${name}_TIER3_SVR_LOGO_WIN_CASH_RIBBON`, angle, R+34, 0, wallHeight+34, 23, 5.2, winCashTex, greenTrim, 182, 3.2);
+    [-28,28].forEach((lat,i)=> addBox(`SVR_84P_${name}_INTERCARDINAL_SIDE_${i}`, angle, R+64, lat, 10+i*2, 52+i*12, 3.5, wallHeight+3, i?darkMat:metalMat, {round:!!i, windows:true, trim:true}));
+    [-48,-14,14,48].forEach((lat,i)=> addBox(`SVR_84P_${name}_DEEP_GAP_FILL_${i}`, angle, R+86+(i%2)*10, lat, 6+(i%3)*3, 36+(i*11)%48, 3.1, wallHeight+2, darkMat, {round:i%2===0, windows:true, trim:true}));
+  });
+
+  // South skyline anchor from the technical manifest: heavy horizon anchor with separated Tier 1/2 displays.
+  const south = Math.PI * 0.5;
+  addBox('SVR_84P_SOUTH_MANIFEST_BASE_HORIZON_ANCHOR', south, R+46, 0, 40, 30, 22, wallHeight+4, metalMat);
+  addBox('SVR_84P_SOUTH_MANIFEST_UPPER_TOWER', south, R+46, 0, 24, 70, 18, wallHeight+36, darkMat);
+  addAd('SVR_84P_SOUTH_MANIFEST_TIER1_ESPRESSO_VERTICAL_5DEG', south, R+46, 0, wallHeight+78, 16, 30, espressoTex, goldTrim, 196, 10.0).rotation.x = THREE.MathUtils.degToRad(-5);
+  addAd('SVR_84P_SOUTH_MANIFEST_TIER2_WIN_CASH_LANDSCAPE', south, R+46, 0, wallHeight+50, 18, 10, winCashTex, greenTrim, 194, 10.2);
+
+  const ambient = new THREE.PointLight(0x754dff, 1.1, 220, 2.1);
+  ambient.name='SVR_84P_LOW_COST_SKYLINE_AMBIENT_GLOW'; ambient.position.set(0, wallHeight+42, -(R+20)); group.add(ambient);
+  scene.add(group);
+  return group;
+}
+
 export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const R = CONFIG.ROOM_RADIUS;
   const H = CONFIG.WALL_HEIGHT;
@@ -2483,6 +2640,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const stars = buildStars(scene, R);
   const lobbySprites = buildLobbySprites(scene, R, wallHeight);
   const espressoAdGroup = addAlwaysVisibleEspressoAd(scene, R, wallHeight);
+  const phase84PMasterSkyline = addPhase84PMasterCyberSkyline(scene, R, wallHeight);
   const spawnLogoTex = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
   const wallPanels = [];
   const wallPanelUpdaters = [];
@@ -2600,46 +2758,46 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(9.4, 64, 64),
+    new THREE.SphereGeometry(18.0, 64, 64),
     new THREE.MeshStandardMaterial({
-      color: 0xe9ebef,
-      roughness: 0.99,
+      color: 0xe6ccff,
+      roughness: 0.88,
       metalness: 0.0,
       map: moonTex || null,
       bumpMap: moonBump || null,
-      bumpScale: moonBump ? 0.94 : 0,
-      emissive: 0x111820,
-      emissiveIntensity: 0.0
+      bumpScale: moonBump ? 0.72 : 0,
+      emissive: 0x44305f,
+      emissiveIntensity: 0.48
     })
   );
-  moon.position.set(-72, wallHeight + 226.0, -(R + 300.0));
+  moon.position.set(75, wallHeight + 118.0, -(R + 120.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(96.0, 96.0, 1);
+  moonHalo.scale.set(132.0, 132.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(5.4, 56, 56),
+    new THREE.SphereGeometry(12.0, 56, 56),
     new THREE.MeshStandardMaterial({
-      color: 0xc56b45,
+      color: 0xff9999,
       roughness: 0.82,
       metalness: 0.0,
       map: marsTex || null,
       bumpMap: marsBump || null,
-      bumpScale: marsBump ? 0.42 : 0,
-      emissive: 0x1c0904,
-      emissiveIntensity: 0.0
+      bumpScale: marsBump ? 0.38 : 0,
+      emissive: 0x401108,
+      emissiveIntensity: 0.42
     })
   );
-  mars.position.set(104, wallHeight + 244.0, -(R + 340.0));
+  mars.position.set(-85, wallHeight + 101.0, -(R + 100.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(58.0, 58.0, 1);
+  marsHalo.scale.set(92.0, 92.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2844,29 +3002,30 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       wallHeight + 72.0 + Math.sin(t * 0.018) * 0.22,
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
-    // PHASE-84O: moon is larger and locked high above every ad/building tier.
+    // PHASE-84P: cyber moon and Mars are big, high, and isolated behind the ad skyline loop.
     moon.position.set(
-      -72 + Math.sin(t * 0.010) * 9.0,
-      wallHeight + 226.0 + Math.sin(t * 0.032) * 3.0,
-      -(R + 300.0) + Math.cos(t * 0.007) * 14.0
+      75 + Math.sin(t * 0.006) * 7.0,
+      wallHeight + 118.0 + Math.sin(t * 0.018) * 2.5,
+      -(R + 120.0) + Math.cos(t * 0.005) * 8.0
     );
-    moon.rotation.y += dt * 0.08;
+    // 4-minute clockwise axial rotation target.
+    moon.rotation.y += dt * ((Math.PI * 2) / 240.0);
     moon.rotation.z = 0.03;
-    // PHASE-84O: Mars is larger, higher, and offset from the Moon above the skyline.
     mars.position.set(
-      104 + Math.sin(t * 0.009 + 1.4) * 10.0,
-      wallHeight + 244.0 + Math.sin(t * 0.030 + 0.8) * 2.7,
-      -(R + 340.0) + Math.cos(t * 0.006 + 0.4) * 14.0
+      -85 + Math.sin(t * 0.007 + 1.4) * 6.5,
+      wallHeight + 101.0 + Math.sin(t * 0.020 + 0.8) * 2.2,
+      -(R + 100.0) + Math.cos(t * 0.006 + 0.4) * 7.0
     );
     mars.visible = true;
-    mars.rotation.y += dt * 0.06;
+    // 3-minute counter-clockwise axial rotation target.
+    mars.rotation.y -= dt * ((Math.PI * 2) / 180.0);
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.090 + 0.016 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.13 + 0.024 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.070 + 0.014 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.10 + 0.020 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{
