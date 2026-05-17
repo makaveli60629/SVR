@@ -1,5 +1,7 @@
 {
-  "build": "PHASE-84K-THREE-TIER-CARDINAL-BANNER-ADS-LOCK",
-  "phase": "84J",
-  "scope": "Move Espresso/banner ad towers behind the four perimeter walls, raised above the wall sightline, without blocking storefronts."
+  "build": "PHASE-84L-AD-DISTRICT-LOOK-FORWARD-MOVEMENT-LOCK",
+  "phase": "84L",
+  "gameSideOnly": true,
+  "siteTouched": false,
+  "trueitiveBlocked": true
 }

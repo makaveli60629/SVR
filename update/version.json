@@ -1,6 +1,7 @@
 ﻿{
-  "build": "PHASE-84K-THREE-TIER-CARDINAL-BANNER-ADS-LOCK",
-  "phase": "84K",
-  "scope": "game-only",
-  "notes": "Three-tier cardinal building ad grid: Tier 1 Espresso, Tier 2 ALL IN, Tier 3 SVR LOGO / WIN CASH green. Website untouched."
+  "build": "PHASE-84L-AD-DISTRICT-LOOK-FORWARD-MOVEMENT-LOCK",
+  "phase": "84L",
+  "target": "game",
+  "siteTouched": false,
+  "notes": "Ad district skyline expansion plus look-forward controller movement lock."
 }
