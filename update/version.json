@@ -1,5 +1,6 @@
 ﻿{
-    "phase":  "84A",
-    "build":  "PHASE-84A-REIKI-BRANDING-ROLLBACK-LOCK",
-    "note":  "Unapproved Reiki branding rollback; Espresso building ad and controller lock preserved."
+  "build": "PHASE-84D-FRONT-VISIBLE-ESPRESSO-AD-LOCK",
+  "siteTouched": false,
+  "gameOnly": true,
+  "notes": "Moves Espresso With Cream ad onto a front-visible center skyline building."
 }

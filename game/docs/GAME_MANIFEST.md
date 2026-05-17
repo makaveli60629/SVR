@@ -112,7 +112,7 @@ Source package used for this phase:
 
 
 ## Phase 35 audit / restore
-- Restored the SVR Reiki Placeholder founder image and logo assets into the Reiki hub.
+- Restored the AWAITING APPROVAL founder image and logo assets into the Reiki hub.
 - Rewrote the Reiki three-column storefront copy to read more professional and founder-led.
 - Moved the PGA hub to the south-west wall.
 - Raised Moon and Mars higher behind the city skyline and increased their glow.
@@ -131,4 +131,4 @@ Source package used for this phase:
 - donor modular split preserved
 
 ## Phase 42 modular overlay
-- SVR Reiki Placeholder building ad refreshed to `AWAITING APPROVAL / L.A.` in neon green presentation styling.
+- AWAITING APPROVAL building ad refreshed to `AWAITING APPROVAL / L.A.` in neon green presentation styling.
