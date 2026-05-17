@@ -1,6 +1,6 @@
 ﻿{
-    "build":  "PHASE-84J-BEHIND-WALL-CARDINAL-AD-SKYLINE-LOCK",
-    "phase":  "84J",
-    "updatedAt":  "2026-05-17T02:37:19Z",
-    "scope":  "Behind-wall cardinal ad skyline lock; four ad towers behind North/South/East/West walls; storefronts untouched."
+  "build": "PHASE-84K-THREE-TIER-CARDINAL-BANNER-ADS-LOCK",
+  "phase": "84K",
+  "scope": "game-only",
+  "notes": "Three-tier cardinal building ad grid: Tier 1 Espresso, Tier 2 ALL IN, Tier 3 SVR LOGO / WIN CASH green. Website untouched."
 }
