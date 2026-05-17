@@ -1,26 +1,19 @@
-// PHASE-84W-REFINED-ESPRESSO-SKYLINE-MOON-MARS-LOCK
-// Runtime ad skyline lives in world_skyline.js addAlwaysVisibleEspressoAd().
-// Strategic ad design: a few dedicated, front-facing Times Square/Shibuya/HK-inspired ad buildings.
+// PHASE-84D-FRONT-VISIBLE-ESPRESSO-AD-LOCK
+// Runtime player-POV ad grid lock lives in world_skyline.js buildOuterCity().
+// This registry documents modular building ad slots for future swaps.
 export const BUILDING_AD_GRID_LOCK = {
-  build: "PHASE-84W-REFINED-ESPRESSO-SKYLINE-MOON-MARS-LOCK",
+  build: "PHASE-84D-FRONT-VISIBLE-ESPRESSO-AD-LOCK",
   siteTouched: false,
-  approvalLock: "No unapproved Reiki sponsor/founder branding. Reiki remains SVR / AWAITING APPROVAL only.",
-  strategy: "Refined Espresso-only skyline: two larger Espresso banners on dedicated front ad buildings, normal city silhouettes pushed behind the ad tier, Moon and Mars raised and centered higher in the sky.",
+  approvalLock: "No UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED content until explicit approval.",
   slots: [
-    "NE_STORE_SPONSOR_TIER1_ESPRESSO",
-    "NE_STORE_SPONSOR_TIER2_SPONSOR",
-    "NORTH_TIER2_ALL_IN",
-    "EAST_TIER2_WIN_CASH",
-    "SOUTH_SVR_PROMO",
-    "WEST_PROMO",
-    "TIER3_SMALL_RIBBON_GAP_BUILDINGS"
-  ],
-  privateScenes: [
-    "game/pga-drive.html",
-    "game/chip-putt.html",
-    "game/reiki.html",
-    "game/store-room.html",
-    "game/smoker-lounge.html",
-    "game/scorpion.html"
+    "AD_CENTER_PREMIUM_ESPRESSO_FRONT_VISIBLE",
+    "AD_LEFT_TOWER_VISIBLE",
+    "AD_RIGHT_TOWER_VISIBLE",
+    "AD_FAR_LEFT_SPONSOR_SLOT",
+    "AD_FAR_RIGHT_SPONSOR_SLOT",
+    "AD_LOWER_BANNER_01",
+    "AD_LOWER_BANNER_02",
+    "AD_LOWER_BANNER_03",
+    "AD_LOWER_BANNER_04"
   ]
 };

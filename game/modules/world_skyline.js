@@ -926,48 +926,6 @@ function createAdBillboardTexture(lines = ["SVRPOKER.COM", "ALL IN"]){
   });
 }
 
-
-function createAllInTierTexture(){
-  return canvasTexture(1024, 384, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, '#050b1d');
-    g.addColorStop(1, '#1b0530');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(130,220,255,0.98)';
-    x.lineWidth = 12; x.strokeRect(18,18,w-36,h-36);
-    x.strokeStyle = 'rgba(180,110,255,0.75)';
-    x.lineWidth = 5; x.strokeRect(42,42,w-84,h-84);
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#ffffff';
-    x.font = '900 118px system-ui, Arial';
-    x.fillText('ALL IN', w/2, h/2 - 10);
-    x.fillStyle = 'rgba(130,220,255,0.96)';
-    x.font = 'bold 34px system-ui, Arial';
-    x.fillText('SVR POKER', w/2, h - 70);
-  });
-}
-
-function createWinCashTierTexture(){
-  return canvasTexture(1024, 384, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, '#020b08');
-    g.addColorStop(1, '#061c12');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(65,255,125,0.98)';
-    x.lineWidth = 12; x.strokeRect(18,18,w-36,h-36);
-    x.fillStyle = 'rgba(255,255,255,0.95)';
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.font = '900 54px system-ui, Arial';
-    x.fillText('SVR LOGO', w/2, 82);
-    x.fillStyle = '#45ff76';
-    x.font = '900 104px system-ui, Arial';
-    x.fillText('WIN CASH', w/2, h/2 + 30);
-    x.fillStyle = 'rgba(185,255,204,0.90)';
-    x.font = 'bold 30px system-ui, Arial';
-    x.fillText('SPONSOR PROMO SLOT', w/2, h - 58);
-  });
-}
-
 function createStoreDisplayTexture(){
   return canvasTexture(1024, 1024, (x,w,h)=>{
     const g = x.createLinearGradient(0,0,w,h);
@@ -1568,18 +1526,22 @@ function buildOuterCity(scene, R){
   const count = 68;
   // PHASE-84C: Player-view ad corridor. The sponsor skyline faces the seated/lobby player.
   // Ads are placed on dedicated towers with a clear sight-line instead of being hidden behind random buildings.
+  // PHASE-84X: Clean organized ad district. Keep one premium Espresso banner building
+  // in the front skyline tier and push normal city filler behind it. No stacked/floating duplicate ads.
   const adSlotMap = new Map([
-    // PHASE-84D: player view looks north through the lobby, so the premium ad must live on the north/center face.
-    [0,  { type: 'premiumVertical', texture: 'placeholder', name: 'AD_CENTER_PREMIUM_PLACEHOLDER_BEHIND_WALL_ONLY', angle: -Math.PI * 0.5, rr: R + 24, h: 66, w: 11.8, d: 3.6 }],
-    [3,  { type: 'vertical', texture: 'matrix', name: 'AD_RIGHT_TOWER_VISIBLE', angle: -Math.PI * 0.5 + 0.30, rr: R + 36, h: 48, w: 7.2, d: 3.8 }],
-    [65, { type: 'vertical', texture: 'placeholder', name: 'AD_LEFT_TOWER_VISIBLE', angle: -Math.PI * 0.5 - 0.30, rr: R + 36, h: 48, w: 7.2, d: 3.8 }],
-    [7,  { type: 'horizontal', texture: 'svr', name: 'AD_RIGHT_LOWER_BANNER', angle: -Math.PI * 0.5 + 0.54, rr: R + 42, h: 28, w: 11.4, d: 3.6 }],
-    [61, { type: 'horizontal', texture: 'placeholder', name: 'AD_LEFT_LOWER_BANNER', angle: -Math.PI * 0.5 - 0.54, rr: R + 42, h: 28, w: 11.4, d: 3.6 }],
-    [12, { type: 'vertical', texture: 'placeholder', name: 'AD_FAR_RIGHT_SPONSOR_SLOT', angle: -Math.PI * 0.5 + 0.78, rr: R + 50, h: 40, w: 6.4, d: 3.8 }],
-    [56, { type: 'vertical', texture: 'matrix', name: 'AD_FAR_LEFT_SPONSOR_SLOT', angle: -Math.PI * 0.5 - 0.78, rr: R + 50, h: 40, w: 6.4, d: 3.8 }]
+    [0,  {
+      type: 'premiumVertical',
+      texture: 'espresso',
+      name: 'AD_PREMIUM_ESPRESSO_ORGANIZED_FRONT',
+      angle: -Math.PI * 0.5,
+      rr: R + 30,
+      h: 54,
+      w: 15.0,
+      d: 4.2
+    }]
   ]);
   const adIndices = new Set(adSlotMap.keys());
-  const espressoBuildingIndex = -1; // Phase 84K: espresso only appears in behind-wall tiered ad grid
+  const espressoBuildingIndex = 0;
   const normalizeAngle = (ang)=> Math.atan2(Math.sin(ang), Math.cos(ang));
   for (let i = 0; i < count; i++){
     const slot = adSlotMap.get(i);
@@ -1654,8 +1616,8 @@ function buildOuterCity(scene, R){
       const tex = isEspresso ? espressoTex : (slot.texture === 'matrix' ? matrix.texture : (slot.texture === 'placeholder' ? sponsorHoldTex : adTex));
       if (tex) tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
       const isHorizontal = slot.type === 'horizontal';
-      const bw = isEspresso ? Math.max(5.4, Math.min(w * 0.86, 7.4)) : (isHorizontal ? Math.max(7.2, Math.min(w * 0.92, 10.6)) : Math.max(4.6, Math.min(w * 0.80, 6.4)));
-      const bh = isEspresso ? Math.max(24.0, Math.min(h * 0.80, 38.0)) : (isHorizontal ? Math.max(3.0, Math.min(h * 0.22, 5.6)) : Math.max(12.0, Math.min(h * 0.68, 25.0)));
+      const bw = isEspresso ? Math.max(9.2, Math.min(w * 0.78, 11.6)) : (isHorizontal ? Math.max(7.2, Math.min(w * 0.92, 10.6)) : Math.max(4.6, Math.min(w * 0.80, 6.4)));
+      const bh = isEspresso ? Math.max(21.0, Math.min(h * 0.64, 29.0)) : (isHorizontal ? Math.max(3.0, Math.min(h * 0.22, 5.6)) : Math.max(12.0, Math.min(h * 0.68, 25.0)));
       const bill = new THREE.Mesh(
         new THREE.PlaneGeometry(bw, bh),
         new THREE.MeshBasicMaterial({
@@ -1667,7 +1629,7 @@ function buildOuterCity(scene, R){
         })
       );
       bill.name = isEspresso ? "SVR_Espresso_With_Cream_Building_Ad" : `SVR_Building_Billboard_${slot.name || i}`;
-      const yFit = isEspresso ? Math.min(Math.max(h * 0.55, 24.0), h - 3.0) : (isHorizontal ? Math.min(Math.max(h * 0.56, 11.0), h - 2.2) : Math.min(Math.max(h * 0.56, 14.0), h - 2.4));
+      const yFit = isEspresso ? Math.min(Math.max(h * 0.50, 21.0), h - 5.5) : (isHorizontal ? Math.min(Math.max(h * 0.56, 11.0), h - 2.2) : Math.min(Math.max(h * 0.56, 14.0), h - 2.4));
       // Use building depth, not width, so the ad sits directly on the visible front face.
       const faceOffset = d * 0.5 + 0.42;
       bill.position.set(x - outward.x * faceOffset, yFit, z - outward.z * faceOffset);
@@ -1676,7 +1638,7 @@ function buildOuterCity(scene, R){
       group.add(bill);
 
       if (isEspresso){
-        const adGlow = new THREE.PointLight(0xffc15a, 0.95, 26, 2.1);
+        const adGlow = new THREE.PointLight(0xffc15a, 0.72, 32, 2.0);
         adGlow.position.copy(bill.position).add(new THREE.Vector3(0, 0.5, 0));
         group.add(adGlow);
       }
@@ -1721,9 +1683,6 @@ function buildOuterCity(scene, R){
 }
 
 function makeSeat(scene, x, z, angle, label, chairMat, metalMat){
-  // Phase 84I hotfix: some prior injected ad/seat code referenced R inside makeSeat.
-  // Keep a local room-radius fallback so the seat path can never black-screen from undefined R.
-  const R = CONFIG?.ROOM_RADIUS || 30;
   const group = new THREE.Group();
   const ring = new THREE.Mesh(
     new THREE.RingGeometry(0.36, 0.54, 48),
@@ -2072,436 +2031,82 @@ function sanitizeTableSurface(table, keepMesh = null){
   });
 }
 
-function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
+function addAlwaysVisibleEspressoAd(scene, R){
   const group = new THREE.Group();
-  group.name = 'SVR_PHASE84W_REFINED_SKYLINE_ESPRESSO_VISIBLE_LOCK';
+  group.name = 'SVR_PHASE84G_ALWAYS_VISIBLE_ESPRESSO_BUILDING_AD_GROUP';
 
-  // Phase 84W: refined city skyline, Espresso-only ad strategy.
-  // Goal: make the ad readable from player POV, keep all ad structures behind the wall,
-  // reduce billboard clutter, and push normal city buildings behind the ad tier.
-  if (espressoTex){
-    espressoTex.wrapS = espressoTex.wrapT = THREE.ClampToEdgeWrapping;
-    espressoTex.anisotropy = 8;
-    espressoTex.needsUpdate = true;
-  }
+  // Player-facing front-center tower. It sits just inside the skyline rim so foreground skyline blocks cannot hide it.
+  const z = -(R - 2.8);
+  const x = -1.0;
+  const h = 34.0;
+  const w = 10.8;
+  const d = 1.65;
 
-  const facadeBlue = createParallaxWindowTexture('#55b9ff', '#143b72', 0.62);
-  const facadePurple = createParallaxWindowTexture('#9b6bff', '#1c0d38', 0.52);
-  const facadeCyan = createParallaxWindowTexture('#8ff5ff', '#082d46', 0.44);
+  const tower = new THREE.Mesh(
+    new THREE.BoxGeometry(w, h, d),
+    new THREE.MeshStandardMaterial({
+      color: 0x050914,
+      roughness: 0.50,
+      metalness: 0.32,
+      emissive: 0x111a38,
+      emissiveIntensity: 1.15
+    })
+  );
+  tower.name = 'SVR_PHASE84G_FRONT_CENTER_ESPRESSO_AD_BUILDING';
+  tower.position.set(x, h * 0.5, z);
+  tower.castShadow = false;
+  tower.receiveShadow = false;
+  tower.renderOrder = 130;
+  group.add(tower);
 
-  const premiumGlass = new THREE.MeshStandardMaterial({
-    map: facadeBlue, color: 0xe5f3ff, roughness: 0.20, metalness: 0.66,
-    emissive: 0x051326, emissiveIntensity: 0.20
-  });
-  const premiumGlassB = new THREE.MeshStandardMaterial({
-    map: facadePurple, color: 0xf0e8ff, roughness: 0.24, metalness: 0.58,
-    emissive: 0x170a2c, emissiveIntensity: 0.18
-  });
-  const cityGlass = new THREE.MeshStandardMaterial({
-    map: facadeCyan, color: 0xdcefff, roughness: 0.34, metalness: 0.42,
-    emissive: 0x03101a, emissiveIntensity: 0.10
-  });
-  const darkCity = new THREE.MeshStandardMaterial({
-    color: 0x020710, roughness: 0.55, metalness: 0.24,
-    emissive: 0x030711, emissiveIntensity: 0.10
-  });
-  const podiumMat = new THREE.MeshStandardMaterial({
-    color: 0x06101c, roughness: 0.56, metalness: 0.34,
-    emissive: 0x06182c, emissiveIntensity: 0.16
-  });
-  const goldTrim = new THREE.MeshBasicMaterial({ color: 0xffc76d, transparent:true, opacity:0.92, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending });
-  const cyanTrim = new THREE.MeshBasicMaterial({ color: 0x64e6ff, transparent:true, opacity:0.64, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending });
-  const purpleTrim = new THREE.MeshBasicMaterial({ color: 0xad7dff, transparent:true, opacity:0.58, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending });
-
-  function basis(angle){
-    const outward = new THREE.Vector3(Math.cos(angle),0,Math.sin(angle));
-    const inward = outward.clone().multiplyScalar(-1);
-    const across = new THREE.Vector3(-Math.sin(angle),0,Math.cos(angle));
-    return { outward, inward, across };
-  }
-  function pos(angle, radius, lateral=0){
-    const { across } = basis(angle);
-    return new THREE.Vector3(Math.cos(angle)*radius, 0, Math.sin(angle)*radius).add(across.multiplyScalar(lateral));
-  }
-  function faceCenter(obj){ obj.lookAt(new THREE.Vector3(0, obj.position.y, 0)); }
-
-  function addBuilding({ name, angle, radius, lateral=0, width=8, height=26, depth=4, baseY=wallHeight+1.4, mat=cityGlass, trim=true, podium=false }){
-    const root = new THREE.Group();
-    root.name = name;
-    const p = pos(angle, radius, lateral);
-    root.position.set(p.x, baseY, p.z);
-    root.lookAt(new THREE.Vector3(0, baseY, 0));
-
-    const body = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), mat);
-    body.position.y = height * 0.5;
-    body.castShadow = false;
-    body.receiveShadow = false;
-    body.frustumCulled = true;
-    root.add(body);
-
-    if (podium){
-      const ph = Math.max(4.5, height * 0.20);
-      const pod = new THREE.Mesh(new THREE.BoxGeometry(width * 1.25, ph, depth * 1.30), podiumMat);
-      pod.position.y = ph * 0.5;
-      pod.frustumCulled = true;
-      root.add(pod);
-    }
-
-    const cap = new THREE.Mesh(new THREE.BoxGeometry(width * 1.05, 0.28, depth * 1.06), mat === premiumGlass ? premiumGlassB : premiumGlass);
-    cap.position.y = height + 0.15;
-    cap.frustumCulled = true;
-    root.add(cap);
-
-    if (trim){
-      const z = -depth * 0.528;
-      [height * 0.34, height + 0.38].forEach((yy, idx)=>{
-        const t = new THREE.Mesh(new THREE.PlaneGeometry(width * 1.06, 0.12), idx ? cyanTrim : purpleTrim);
-        t.position.set(0, yy, z - 0.025);
-        t.renderOrder = 60;
-        root.add(t);
-      });
-    }
-    group.add(root);
-    return root;
-  }
-
-  function addEspressoBillboard({ name, angle, radius, lateral=0, y=30, w=13, h=22, depthOffset=3.15, order=190 }){
-    const { inward, across } = basis(angle);
-    const p = pos(angle, radius, lateral).setY(y).add(inward.clone().multiplyScalar(depthOffset));
-
-    const backGlow = new THREE.Mesh(new THREE.PlaneGeometry(w * 1.26, h * 1.22), new THREE.MeshBasicMaterial({
-      color: 0xffc15f, transparent:true, opacity:0.18, side:THREE.DoubleSide, depthWrite:false,
-      blending:THREE.AdditiveBlending
-    }));
-    backGlow.position.copy(p).add(inward.clone().multiplyScalar(0.035));
-    faceCenter(backGlow);
-    backGlow.renderOrder = order - 2;
-    backGlow.frustumCulled = false;
-    group.add(backGlow);
-
-    const ad = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({
-      map: espressoTex || null,
+  const adW = 8.4;
+  const adH = 26.0;
+  const adZ = z + d * 0.5 + 0.055;
+  const adY = h * 0.55;
+  const ad = new THREE.Mesh(
+    new THREE.PlaneGeometry(adW, adH),
+    new THREE.MeshBasicMaterial({
+      map: espressoTex,
       color: 0xffffff,
+      transparent: false,
       side: THREE.DoubleSide,
-      depthWrite:false,
-      depthTest:true,
-      transparent: true
-    }));
-    ad.name = name;
-    ad.position.copy(p).add(inward.clone().multiplyScalar(0.12));
-    faceCenter(ad);
-    ad.renderOrder = order;
-    ad.frustumCulled = false;
-    group.add(ad);
+      depthWrite: false,
+      depthTest: false
+    })
+  );
+  ad.name = 'SVR_ESPRESSO_WITH_CREAM_ALWAYS_VISIBLE_PLAYER_POV_AD';
+  ad.position.set(x, adY, adZ);
+  ad.renderOrder = 250;
+  group.add(ad);
 
-    const frameParts = [
-      [w+0.52,0.18,0,h*0.5+0.26], [w+0.52,0.18,0,-h*0.5-0.26],
-      [0.18,h+0.52,-w*0.5-0.26,0], [0.18,h+0.52,w*0.5+0.26,0]
-    ];
-    for (const [fw,fh,lx,ly] of frameParts){
-      const part = new THREE.Mesh(new THREE.PlaneGeometry(fw,fh), goldTrim);
-      part.position.copy(p).add(across.clone().multiplyScalar(lx)).add(new THREE.Vector3(0,ly,0)).add(inward.clone().multiplyScalar(0.16));
-      faceCenter(part);
-      part.renderOrder = order + 1;
-      part.frustumCulled = false;
-      group.add(part);
-    }
-
-    const tagTex = createSmallTextTexture('ESPRESSO WITH CREAM', '#0a0500', '#ffd783');
-    const tag = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.86, 0.82), new THREE.MeshBasicMaterial({ map: tagTex, transparent:true, side:THREE.DoubleSide, depthWrite:false }));
-    tag.position.copy(p).add(new THREE.Vector3(0, -h*0.5 - 0.78, 0)).add(inward.clone().multiplyScalar(0.18));
-    faceCenter(tag);
-    tag.renderOrder = order + 2;
-    tag.frustumCulled = false;
-    group.add(tag);
-    return ad;
-  }
-
-  // Store/sponsor-side premium espresso billboard: closer, wider, and above the wall.
-  const storeAngle = -Math.PI * 0.34;
-  const adR = R + 15.5;
-  addBuilding({ name:'SVR_84W_FRONT_ESPRESSO_PREMIUM_BUILDING', angle:storeAngle, radius:adR, lateral:-2.0, width:16.8, height:54, depth:5.4, baseY:wallHeight+1.2, mat:premiumGlass, podium:true, trim:true });
-  addEspressoBillboard({ name:'SVR_84W_VISIBLE_ESPRESSO_WITH_CREAM_MAIN_BANNER', angle:storeAngle, radius:adR, lateral:-2.0, y:wallHeight+37.0, w:14.6, h:22.6, order:210 });
-
-  // A smaller same-brand side face on the same ad district, still Espresso-only.
-  const sideAngle = -Math.PI * 0.50;
-  addBuilding({ name:'SVR_84W_FRONT_ESPRESSO_SIDE_BUILDING', angle:sideAngle, radius:R+17.0, lateral:9.5, width:12.0, height:42, depth:4.8, baseY:wallHeight+1.2, mat:premiumGlassB, podium:true, trim:true });
-  addEspressoBillboard({ name:'SVR_84W_VISIBLE_ESPRESSO_WITH_CREAM_SIDE_BANNER', angle:sideAngle, radius:R+17.0, lateral:9.5, y:wallHeight+30.5, w:10.5, h:16.5, order:205 });
-
-  // Refined normal skyline: varied silhouettes behind ads, never in front of the Espresso buildings.
-  const skylineAngles = [];
-  for (let i=0; i<34; i++) skylineAngles.push(-Math.PI + (i/34)*Math.PI*2);
-  skylineAngles.forEach((angle, i)=>{
-    const skipAdLane = Math.abs(THREE.MathUtils.euclideanModulo(angle - storeAngle + Math.PI, Math.PI*2) - Math.PI) < 0.20;
-    const baseR = R + (skipAdLane ? 54 : 44) + (i % 5) * 5.5;
-    const lateral = ((i % 7) - 3) * 4.8;
-    const height = 16 + ((i * 13) % 34);
-    const width = 4.5 + ((i * 7) % 10);
-    const depth = 3.2 + ((i * 5) % 4);
-    const mat = i % 4 === 0 ? premiumGlassB : (i % 3 === 0 ? cityGlass : darkCity);
-    addBuilding({ name:`SVR_84W_REFINED_BACKGROUND_SKYLINE_${i}`, angle, radius:baseR, lateral, width, height, depth, baseY:wallHeight+1.1, mat, podium:false, trim:i%3===0 });
+  const frameMat = new THREE.MeshBasicMaterial({
+    color: 0xffcf6a,
+    transparent: true,
+    opacity: 0.96,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    depthTest: false
   });
+  const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.55, 0.18), frameMat);
+  frameTop.position.set(x, adY + adH * 0.5 + 0.22, adZ + 0.01);
+  frameTop.renderOrder = 251;
+  group.add(frameTop);
+  const frameBottom = frameTop.clone();
+  frameBottom.position.y = adY - adH * 0.5 - 0.22;
+  group.add(frameBottom);
+  const frameLeft = new THREE.Mesh(new THREE.PlaneGeometry(0.18, adH + 0.62), frameMat);
+  frameLeft.position.set(x - adW * 0.5 - 0.22, adY, adZ + 0.01);
+  frameLeft.renderOrder = 251;
+  group.add(frameLeft);
+  const frameRight = frameLeft.clone();
+  frameRight.position.x = x + adW * 0.5 + 0.22;
+  group.add(frameRight);
 
-  // Low smog strips create depth without hiding banners.
-  for (let i=0; i<14; i++){
-    const angle = -Math.PI + (i/14) * Math.PI * 2;
-    const { inward } = basis(angle);
-    const haze = new THREE.Mesh(new THREE.PlaneGeometry(24 + (i%4)*3, 4.2), new THREE.MeshBasicMaterial({
-      color: i%2 ? 0x64dcff : 0x9b6cff,
-      transparent:true, opacity:0.035, side:THREE.DoubleSide, depthWrite:false,
-      blending:THREE.AdditiveBlending
-    }));
-    haze.position.copy(pos(angle, R+40+(i%3)*10, ((i%5)-2)*7)).setY(wallHeight+3.0).add(inward.multiplyScalar(0.45));
-    faceCenter(haze);
-    haze.renderOrder = 10;
-    group.add(haze);
-  }
+  const glow = new THREE.PointLight(0xffc15a, 1.85, 54, 1.75);
+  glow.name = 'SVR_PHASE84G_ESPRESSO_AD_GLOW';
+  glow.position.set(x, adY + 1.0, adZ + 2.4);
+  group.add(glow);
 
-  addPremiumStarfield(scene, R, group);
-
-  const skylineGlow = new THREE.PointLight(0x416dff, 0.72, 180, 2.0);
-  skylineGlow.name = 'SVR_84W_REFINED_SKYLINE_GLOW';
-  skylineGlow.position.set(0, wallHeight + 35, -(R + 62));
-  group.add(skylineGlow);
-
-  scene.add(group);
-  scene.userData._svrAdSkyline84W = { group, espressoBanners: 2, normalBuildings: skylineAngles.length };
-  return group;
-}
-
-function createSponsorAdTexture(){
-  return canvasTexture(1024,512,(ctx,w,h)=>{
-    const g = ctx.createLinearGradient(0,0,w,h); g.addColorStop(0,'#06111f'); g.addColorStop(1,'#1d0d2e');
-    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle='rgba(126,231,255,0.85)'; ctx.lineWidth=12; ctx.strokeRect(18,18,w-36,h-36);
-    ctx.fillStyle='#e8f7ff'; ctx.textAlign='center'; ctx.font='bold 88px system-ui, Arial'; ctx.fillText('SPONSOR', w/2, 205);
-    ctx.fillStyle='#87e9ff'; ctx.font='bold 44px system-ui, Arial'; ctx.fillText('FEATURE WALL', w/2, 282);
-    ctx.fillStyle='rgba(255,255,255,0.88)'; ctx.font='28px system-ui, Arial'; ctx.fillText('Reserved premium lobby placement', w/2, 354);
-  });
-}
-function createSvrLogoAdTexture(){
-  return canvasTexture(1024,512,(ctx,w,h)=>{
-    const g = ctx.createLinearGradient(0,0,w,h); g.addColorStop(0,'#050914'); g.addColorStop(1,'#112519');
-    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    ctx.textAlign='center';
-    ctx.fillStyle='#ffffff'; ctx.font='bold 92px system-ui, Arial'; ctx.fillText('SVR', w/2, 170);
-    ctx.fillStyle='#42ff84'; ctx.font='bold 76px system-ui, Arial'; ctx.fillText('WIN CASH', w/2, 275);
-    ctx.fillStyle='#c7ffe0'; ctx.font='30px system-ui, Arial'; ctx.fillText('Sponsor-funded promos • legal review required', w/2, 346);
-    ctx.strokeStyle='rgba(66,255,132,0.78)'; ctx.lineWidth=10; ctx.strokeRect(18,18,w-36,h-36);
-  });
-}
-function createSmallTextTexture(text, bg='#06111c', fg='#ffffff'){
-  return canvasTexture(512,128,(ctx,w,h)=>{
-    ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle='rgba(130,220,255,0.65)'; ctx.lineWidth=5; ctx.strokeRect(8,8,w-16,h-16);
-    ctx.fillStyle=fg; ctx.textAlign='center'; ctx.font='bold 36px system-ui, Arial'; ctx.fillText(text, w/2, 78);
-  });
-}
-function createParallaxWindowTexture(primary='#8adfff', secondary='#b58cff', lit=0.6){
-  return canvasTexture(1024,1024,(ctx,w,h)=>{
-    ctx.fillStyle='#040812'; ctx.fillRect(0,0,w,h);
-    for(let y=16;y<h;y+=44){
-      for(let x=14;x<w;x+=46){
-        const active = ((x*31+y*17)%100)/100 < lit;
-        const depth = ((x+y)%5);
-        ctx.fillStyle = active ? (depth%2 ? primary : secondary) : '#111827';
-        ctx.globalAlpha = active ? 0.34 + depth*0.07 : 0.35;
-        ctx.fillRect(x+depth*1.8,y+depth*1.3,22,28);
-        if(active){
-          ctx.globalAlpha = 0.18;
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(x+6+depth*1.8,y+5+depth*1.3,4,14);
-        }
-      }
-    }
-    ctx.globalAlpha=1;
-    ctx.strokeStyle='rgba(160,190,255,0.16)'; ctx.lineWidth=2;
-    for(let x=0;x<w;x+=92){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
-    for(let y=0;y<h;y+=88){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
-  });
-}
-function addPremiumStarfield(scene, R, parent){
-  const count = 1400;
-  const pos = new Float32Array(count*3);
-  const col = new Float32Array(count*3);
-  for(let i=0;i<count;i++){
-    const theta = Math.random()*Math.PI*2;
-    const phi = Math.random()*Math.PI*0.36 + 0.02;
-    const rr = R + 260 + Math.random()*620;
-    pos[i*3] = Math.cos(theta)*Math.sin(phi)*rr;
-    pos[i*3+1] = Math.cos(phi)*rr*0.82 + 120;
-    pos[i*3+2] = Math.sin(theta)*Math.sin(phi)*rr;
-    const b = 0.78 + Math.random()*0.22;
-    col[i*3] = b; col[i*3+1] = Math.min(1,b+0.05); col[i*3+2] = 1;
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-  geo.setAttribute('color', new THREE.BufferAttribute(col,3));
-  const pts = new THREE.Points(geo, new THREE.PointsMaterial({
-    size:0.22, sizeAttenuation:true, transparent:true, opacity:0.72,
-    map:makeSpriteTexture(), vertexColors:true, depthWrite:false,
-    blending:THREE.AdditiveBlending
-  }));
-  pts.name='SVR_84S_HIGH_DENSITY_DEEP_SPACE_STARFIELD';
-  pts.frustumCulled=false;
-  scene.add(pts);
-  parent.userData.deepStars = pts;
-  return pts;
-}
-
-
-function createWindowGridTexture(primary = '#9fdfff', secondary = '#b993ff'){
-  return canvasTexture(1024, 1024, (ctx,w,h)=>{
-    const bg = ctx.createLinearGradient(0,0,w,h);
-    bg.addColorStop(0,'#050914');
-    bg.addColorStop(1,'#111827');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0,0,w,h);
-    ctx.fillStyle = 'rgba(255,255,255,0.035)';
-    for (let y=18; y<h; y+=42){
-      for (let x=18; x<w; x+=52){
-        const on = ((x*13+y*7) % 5) !== 0;
-        ctx.fillStyle = on ? primary : 'rgba(18,26,44,0.7)';
-        ctx.globalAlpha = on ? 0.38 + (((x+y)%97)/260) : 0.18;
-        ctx.fillRect(x, y, 24, 18);
-      }
-    }
-    ctx.globalAlpha = 1;
-    ctx.strokeStyle = secondary;
-    ctx.lineWidth = 3;
-    for (let x=0; x<w; x+=128){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
-    for (let y=0; y<h; y+=128){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
-  });
-}
-
-function addPhase84PMasterCyberSkyline(scene, R, wallHeight = 8){
-  const group = new THREE.Group();
-  group.name = 'SVR_PHASE84P_MASTER_CYBER_SKYLINE_LOOP_DEPTH_LOGIC';
-
-  const purpleWindows = createWindowGridTexture('#b993ff', '#51e6ff');
-  const cyanWindows = createWindowGridTexture('#7ee7ff', '#b993ff');
-  const roughMetal = canvasTexture(512,512,(ctx,w,h)=>{
-    ctx.fillStyle = '#07101a'; ctx.fillRect(0,0,w,h);
-    for(let i=0;i<700;i++){
-      const v = 18 + Math.random()*42;
-      ctx.fillStyle = `rgba(${v|0},${(v+8)|0},${(v+22)|0},${0.06+Math.random()*0.12})`;
-      ctx.fillRect(Math.random()*w, Math.random()*h, 1+Math.random()*5, 1+Math.random()*5);
-    }
-  });
-  [purpleWindows, cyanWindows, roughMetal].forEach((tex)=>{ tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.anisotropy=8; });
-
-  const metalMat = new THREE.MeshStandardMaterial({ map: roughMetal, color: 0x0b101a, roughness: 0.60, metalness: 0.72, emissive: 0x07112a, emissiveIntensity: 0.28 });
-  const darkMat = new THREE.MeshStandardMaterial({ color: 0x050912, roughness: 0.66, metalness: 0.58, emissive: 0x08051c, emissiveIntensity: 0.20 });
-  const pillarMat = new THREE.MeshStandardMaterial({ color: 0x03060d, roughness: 0.62, metalness: 0.70, emissive: 0x08051b, emissiveIntensity: 0.36 });
-  const purpleTrim = new THREE.MeshBasicMaterial({ color: 0xb45cff, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthWrite: false });
-  const cyanTrim = new THREE.MeshBasicMaterial({ color: 0x4fe8ff, transparent: true, opacity: 0.82, side: THREE.DoubleSide, depthWrite: false });
-  const greenTrim = new THREE.MeshBasicMaterial({ color: 0x39ff72, transparent: true, opacity: 0.90, side: THREE.DoubleSide, depthWrite: false });
-  const goldTrim = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.95, side: THREE.DoubleSide, depthWrite: false });
-
-  const allInTex = createAllInTierTexture();
-  const winCashTex = createWinCashTierTexture();
-  [espressoTex, allInTex, winCashTex].forEach((tex)=>{ if(tex){ tex.wrapS=tex.wrapT=THREE.ClampToEdgeWrapping; tex.anisotropy=8; tex.needsUpdate=true; } });
-
-  function basis(angle){
-    const outward = new THREE.Vector3(Math.cos(angle),0,Math.sin(angle));
-    const inward = outward.clone().multiplyScalar(-1);
-    const across = new THREE.Vector3(-Math.sin(angle),0,Math.cos(angle));
-    return { outward, inward, across };
-  }
-  function face(obj){ obj.lookAt(new THREE.Vector3(0, obj.position.y, 0)); }
-  function pos(angle, radius, lateral=0){
-    const { across } = basis(angle);
-    return new THREE.Vector3(Math.cos(angle)*radius, 0, Math.sin(angle)*radius).add(across.multiplyScalar(lateral));
-  }
-  function addTrim(center, angle, w, h, mat, order=150){
-    const { across } = basis(angle);
-    const parts = [
-      [w+0.8,0.28,0,h*0.5+0.32], [w+0.8,0.28,0,-h*0.5-0.32],
-      [0.28,h+0.8,-w*0.5-0.34,0], [0.28,h+0.8,w*0.5+0.34,0]
-    ];
-    for(const [pw,ph,lx,ly] of parts){
-      const m = new THREE.Mesh(new THREE.PlaneGeometry(pw,ph), mat);
-      m.position.copy(center).add(across.clone().multiplyScalar(lx)).add(new THREE.Vector3(0,ly,0));
-      face(m); m.renderOrder=order; m.frustumCulled=true; group.add(m);
-    }
-  }
-  function addBox(name, angle, radius, lateral, width, height, depth, baseY, mat, {round=false, windows=true, trim=true}={}){
-    const c = pos(angle,radius,lateral);
-    const geo = round ? new THREE.CylinderGeometry(width*0.46,width*0.58,height,14) : new THREE.BoxGeometry(width,height,depth);
-    const m = new THREE.Mesh(geo, mat);
-    m.name=name; m.position.set(c.x, baseY+height*0.5, c.z); face(m); m.frustumCulled=true; group.add(m);
-    const { inward, across } = basis(angle);
-    if(windows && !round){
-      const f = new THREE.Mesh(new THREE.PlaneGeometry(width*0.88,height*0.82), new THREE.MeshBasicMaterial({map: (width+height)%2>1 ? purpleWindows : cyanWindows, side: THREE.DoubleSide, transparent:true, opacity:0.72, depthWrite:false}));
-      f.position.copy(m.position).add(inward.clone().multiplyScalar(depth*0.5+0.035)); face(f); f.renderOrder=80; f.frustumCulled=true; group.add(f);
-    }
-    // corner pillars for flat boxes
-    if(!round){
-      [-1,1].forEach((side)=>{
-        const p = new THREE.Mesh(new THREE.BoxGeometry(0.46,height+0.7,0.54), pillarMat);
-        p.position.copy(m.position).add(across.clone().multiplyScalar(side*(width*0.5+0.14))).add(inward.clone().multiplyScalar(depth*0.5+0.18));
-        face(p); p.frustumCulled=true; group.add(p);
-      });
-    }
-    if(trim){
-      const trimYTop = baseY + height + 0.22;
-      const trimYBase = baseY + 0.22;
-      [trimYTop, trimYBase].forEach((yy,idx)=>{
-        const t = new THREE.Mesh(new THREE.PlaneGeometry(width+0.9,0.22), idx?purpleTrim:cyanTrim);
-        t.position.copy(pos(angle,radius,lateral)).setY(yy).add(inward.clone().multiplyScalar(depth*0.5+0.24));
-        face(t); t.renderOrder=120; t.frustumCulled=true; group.add(t);
-      });
-    }
-    return m;
-  }
-  function addAd(name, angle, radius, lateral, y, w, h, tex, frameMat, order=180, forward=0.5){
-    const { inward } = basis(angle);
-    const p = pos(angle,radius,lateral).setY(y).add(inward.multiplyScalar(forward));
-    const ad = new THREE.Mesh(new THREE.PlaneGeometry(w,h), new THREE.MeshBasicMaterial({ map: tex, color: 0xffffff, side: THREE.DoubleSide, transparent:false, depthWrite:false, depthTest:true }));
-    ad.name=name; ad.position.copy(p); face(ad); ad.renderOrder=order; ad.frustumCulled=true; group.add(ad); addTrim(p,angle,w,h,frameMat,order+1); return ad;
-  }
-
-  const wallSlots = [
-    {name:'NORTH', angle:-Math.PI*0.5}, {name:'SOUTH', angle:Math.PI*0.5}, {name:'EAST', angle:0}, {name:'WEST', angle:Math.PI}
-  ];
-  const cornerSlots = [
-    {name:'NORTHEAST', angle:-Math.PI*0.25}, {name:'SOUTHEAST', angle:Math.PI*0.25}, {name:'SOUTHWEST', angle:Math.PI*0.75}, {name:'NORTHWEST', angle:-Math.PI*0.75}
-  ];
-
-  // Cardinal ad districts: Tier 1 and Tier 2 are larger and deliberately separated.
-  wallSlots.forEach(({name,angle})=>{
-    const frontR = R + 30;
-    const midR = R + 37;
-    const backR = R + 68;
-    addBox(`SVR_84P_${name}_T1_BASE_SETBACK`, angle, frontR, 0, 42, 30, 8, wallHeight+4, metalMat);
-    addBox(`SVR_84P_${name}_T1_UPPER_MEGATRON_TOWER`, angle, frontR, 0, 25, 74, 6, wallHeight+34, darkMat);
-    addAd(`SVR_84P_${name}_TIER1_ESPRESSO_MEGATRON`, angle, frontR, 0, wallHeight+82, 22, 40, espressoTex, goldTrim, 190, 4.0);
-    addAd(`SVR_84P_${name}_TIER2_ALL_IN_LEFT_LANDSCAPE`, angle, midR, -30, wallHeight+43, 23, 11.5, allInTex, cyanTrim, 185, 3.6);
-    addAd(`SVR_84P_${name}_TIER2_ALL_IN_RIGHT_LANDSCAPE`, angle, midR, 30, wallHeight+43, 23, 11.5, allInTex, cyanTrim, 185, 3.6);
-    addBox(`SVR_84P_${name}_T2_LEFT_BUILDING`, angle, midR, -30, 25, 55, 6, wallHeight+7, metalMat);
-    addBox(`SVR_84P_${name}_T2_RIGHT_BUILDING`, angle, midR, 30, 25, 55, 6, wallHeight+7, metalMat);
-    [
-      [-55,8,72,3.6,false],[-42,13,46,5.0,false],[-15,7,86,3.2,true],[15,11,58,4.2,false],[43,7,78,3.2,true],[58,16,40,5.2,false]
-    ].forEach(([lat,w,h,d,round],i)=> addBox(`SVR_84P_${name}_BACKFILL_${i}`, angle, backR + (i%2)*12, lat, w, h, d, wallHeight+3, i%2?darkMat:metalMat, {round, windows:true, trim:true}));
-  });
-
-  // Intercardinal buildings fill the spaces between the four main districts and carry Tier 3 green banners.
-  cornerSlots.forEach(({name,angle})=>{
-    addBox(`SVR_84P_${name}_INTERCARDINAL_T3_BASE`, angle, R+34, 0, 28, 44, 6, wallHeight+5, metalMat);
-    addAd(`SVR_84P_${name}_TIER3_SVR_LOGO_WIN_CASH_RIBBON`, angle, R+34, 0, wallHeight+34, 23, 5.2, winCashTex, greenTrim, 182, 3.2);
-    [-28,28].forEach((lat,i)=> addBox(`SVR_84P_${name}_INTERCARDINAL_SIDE_${i}`, angle, R+64, lat, 10+i*2, 52+i*12, 3.5, wallHeight+3, i?darkMat:metalMat, {round:!!i, windows:true, trim:true}));
-    [-48,-14,14,48].forEach((lat,i)=> addBox(`SVR_84P_${name}_DEEP_GAP_FILL_${i}`, angle, R+86+(i%2)*10, lat, 6+(i%3)*3, 36+(i*11)%48, 3.1, wallHeight+2, darkMat, {round:i%2===0, windows:true, trim:true}));
-  });
-
-  // South skyline anchor from the technical manifest: heavy horizon anchor with separated Tier 1/2 displays.
-  const south = Math.PI * 0.5;
-  addBox('SVR_84P_SOUTH_MANIFEST_BASE_HORIZON_ANCHOR', south, R+46, 0, 40, 30, 22, wallHeight+4, metalMat);
-  addBox('SVR_84P_SOUTH_MANIFEST_UPPER_TOWER', south, R+46, 0, 24, 70, 18, wallHeight+36, darkMat);
-  addAd('SVR_84P_SOUTH_MANIFEST_TIER1_ESPRESSO_VERTICAL_5DEG', south, R+46, 0, wallHeight+78, 16, 30, espressoTex, goldTrim, 196, 10.0).rotation.x = THREE.MathUtils.degToRad(-5);
-  addAd('SVR_84P_SOUTH_MANIFEST_TIER2_WIN_CASH_LANDSCAPE', south, R+46, 0, wallHeight+50, 18, 10, winCashTex, greenTrim, 194, 10.2);
-
-  const ambient = new THREE.PointLight(0x754dff, 1.1, 220, 2.1);
-  ambient.name='SVR_84P_LOW_COST_SKYLINE_AMBIENT_GLOW'; ambient.position.set(0, wallHeight+42, -(R+20)); group.add(ambient);
   scene.add(group);
   return group;
 }
@@ -2600,8 +2205,8 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const city = buildOuterCity(scene, R);
   const stars = buildStars(scene, R);
   const lobbySprites = buildLobbySprites(scene, R, wallHeight);
-  const espressoAdGroup = addAlwaysVisibleEspressoAd(scene, R, wallHeight);
-  const phase84PMasterSkyline = null; // Phase 84R: dense cyber ad skyline disabled; restored calmer city background with four ad buildings only.
+  // Phase 84X: removed the old floating/duplicate always-visible Espresso overlay.
+  const espressoAdGroup = null;
   const spawnLogoTex = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
   const wallPanels = [];
   const wallPanelUpdaters = [];
@@ -2719,46 +2324,46 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(24.0, 64, 64),
+    new THREE.SphereGeometry(6.2, 56, 56),
     new THREE.MeshStandardMaterial({
-      color: 0xe6ccff,
-      roughness: 0.88,
+      color: 0xe9ebef,
+      roughness: 0.99,
       metalness: 0.0,
       map: moonTex || null,
       bumpMap: moonBump || null,
-      bumpScale: moonBump ? 0.72 : 0,
-      emissive: 0x44305f,
-      emissiveIntensity: 0.48
+      bumpScale: moonBump ? 0.94 : 0,
+      emissive: 0x111820,
+      emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-34, wallHeight + 154.0, -(R + 92.0));
+  moon.position.set(-52, wallHeight + 138.0, -(R + 250.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(168.0, 168.0, 1);
+  moonHalo.scale.set(38.0, 38.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(15.0, 56, 56),
+    new THREE.SphereGeometry(3.8, 44, 44),
     new THREE.MeshStandardMaterial({
-      color: 0xff9999,
+      color: 0xc56b45,
       roughness: 0.82,
       metalness: 0.0,
       map: marsTex || null,
       bumpMap: marsBump || null,
-      bumpScale: marsBump ? 0.38 : 0,
-      emissive: 0x401108,
-      emissiveIntensity: 0.42
+      bumpScale: marsBump ? 0.42 : 0,
+      emissive: 0x1c0904,
+      emissiveIntensity: 0.0
     })
   );
-  mars.position.set(38, wallHeight + 136.0, -(R + 82.0));
+  mars.position.set(62, wallHeight + 128.0, -(R + 260.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(118.0, 118.0, 1);
+  marsHalo.scale.set(24.0, 24.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2784,9 +2389,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 3.35, 680, 1.45);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.75, 560, 1.45);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 2.25, 520, 1.55);
+  const marsGlow = new THREE.PointLight(0xff9a72, 1.75, 420, 1.55);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
@@ -2963,34 +2568,29 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       wallHeight + 72.0 + Math.sin(t * 0.018) * 0.22,
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
-    // PHASE-84P: cyber moon and Mars are big, high, and isolated behind the ad skyline loop.
+    // PHASE-84C: high skyline moon, clear above all banner buildings from player POV.
     moon.position.set(
-      -34 + Math.sin(t * 0.0045) * 5.0,
-      wallHeight + 154.0 + Math.sin(t * 0.014) * 2.2,
-      -(R + 92.0) + Math.cos(t * 0.004) * 5.5
+      -72 + Math.sin(t * 0.016) * 7.0,
+      wallHeight + 126.0 + Math.sin(t * 0.050) * 2.0,
+      -(R + 260.0) + Math.cos(t * 0.010) * 10.0
     );
-    // 4-minute clockwise axial rotation target.
-    moon.rotation.y += dt * ((Math.PI * 2) / 240.0);
+    moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
+    // PHASE-84C: Mars stays high and offset from the moon, never at building height.
     mars.position.set(
-      38 + Math.sin(t * 0.0055 + 1.4) * 4.5,
-      wallHeight + 136.0 + Math.sin(t * 0.016 + 0.8) * 1.8,
-      -(R + 82.0) + Math.cos(t * 0.005 + 0.4) * 4.5
+      96 + Math.sin(t * 0.013 + 1.4) * 8.0,
+      wallHeight + 142.0 + Math.sin(t * 0.045 + 0.8) * 1.8,
+      -(R + 310.0) + Math.cos(t * 0.009 + 0.4) * 9.0
     );
     mars.visible = true;
-    // 3-minute counter-clockwise axial rotation target.
-    mars.rotation.y -= dt * ((Math.PI * 2) / 180.0);
+    mars.rotation.y += dt * 0.06;
     mars.rotation.z = 0.04;
-    moon.visible = true;
-    moonGlow.visible = true;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.13 + 0.024 * (0.5 + 0.5 * Math.sin(t * 0.24));
-    mars.visible = true;
-    marsGlow.visible = true;
+    moonHalo.material.opacity = 0.045 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.10 + 0.020 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.026 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{
@@ -3042,18 +2642,6 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     seats.forEach((seat)=>{ seat.ring.material.opacity = 0.60; });
     stars.spriteGroup.rotation.y += dt * 0.00018;
     stars.pts.material.opacity = 0.82;
-    if (espressoAdGroup?.userData?.deepStars) {
-      espressoAdGroup.userData.deepStars.rotation.y += dt * 0.00008;
-    }
-    if (espressoAdGroup?.userData?.reflectionStreaks?.length){
-      espressoAdGroup.userData.reflectionStreaks.forEach((streak, i)=>{
-        const moonPulse = 0.5 + 0.5 * Math.sin(t * 0.42 + i * 0.8 + moon.position.x * 0.012);
-        const marsPulse = 0.5 + 0.5 * Math.sin(t * 0.36 + i * 0.65 + mars.position.x * 0.014);
-        streak.material.opacity = 0.035 + moonPulse * 0.115 + marsPulse * 0.045;
-        streak.position.y = (streak.userData.baseY || streak.position.y) + Math.sin(t * 0.48 + streak.userData.phase) * 0.55;
-        streak.scale.x = 0.84 + moonPulse * 0.34;
-      });
-    }
     if (lobbyInfoBoards?.length) lobbyInfoBoards.forEach((rec, idx)=>{ const bob = Math.sin(t * 1.2 + rec.phase) * 0.04; rec.board.position.y = 1.72 + bob; rec.glow.position.y = rec.board.position.y; rec.glow.material.opacity = 0.10 + 0.06 * (0.5 + 0.5 * Math.sin(t * 1.4 + idx)); });
     city.billboardUpdaters.forEach(fn=>fn(t));
     tickPgaHub(scene, t);
