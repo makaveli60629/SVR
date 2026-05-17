@@ -1,5 +1,6 @@
 ﻿{
-  "build": "PHASE-84S-STRATEGIC-AD-SKYLINE-SCENE-ROUTING-LOCK",
-  "siteTouched": false,
-  "gameOnly": true
+    "phase":  "84T",
+    "scope":  "premium wrist watch white button native hands textured hidden controller fallback",
+    "build":  "PHASE-84T-WRIST-WATCH-NATIVE-HANDS-LOCK",
+    "updated":  "2026-05-17"
 }

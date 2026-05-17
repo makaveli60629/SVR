@@ -214,6 +214,8 @@ const watch = createWristWatch({
     audioEnabled: audio.getState().enabled,
     trackTitle: audio.getState().trackTitle || "Lobby 07",
     cash,
+    username: "King",
+    rank: "Founder / Table Boss",
     seated,
     inTableZone: inTableZone(),
     seatLabel: seatLabel(),
@@ -246,7 +248,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick view locked. Press the white watch button to open/close the menu.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -327,7 +329,10 @@ renderer.setAnimationLoop(()=>{
     });
   }
 
-  if (watch) watch.update(dt, leftHand, rightHand);
+  // Prefer native Meta hand joints; fall back to hidden-controller hand proxies so controllers never render as controller models.
+  const leftWatchSource = leftHand || leftController;
+  const rightWatchSource = rightHand || rightController;
+  if (watch) watch.update(dt, leftWatchSource, rightWatchSource);
 
   renderer.render(scene, camera);
 });
