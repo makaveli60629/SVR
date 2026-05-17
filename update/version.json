@@ -1,6 +1,6 @@
 ﻿{
-  "build": "PHASE-84N-SEPARATED-TIERS-INTERCARDINAL-AD-SKYLINE-LOCK",
-  "phase": "84N",
+  "build": "PHASE-84O-HIGH-PLANETS-FILLED-SKYLINE-LOCK",
+  "phase": "84O",
   "target": "/game",
-  "notes": "Tier 1 and Tier 2 ads are bigger and separated; Tier 3 green banners sit on buildings between the four wall ad districts; normal buildings remain behind ads."
+  "notes": "Moon and Mars are larger and higher; extra varied buildings fill gaps behind and between ad districts while ads remain front-visible."
 }

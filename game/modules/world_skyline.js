@@ -2074,14 +2074,15 @@ function sanitizeTableSurface(table, keepMesh = null){
 
 function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
   const group = new THREE.Group();
-  group.name = 'SVR_PHASE84N_SEPARATED_TIERS_INTERCARDINAL_AD_SKYLINE_LOCK';
+  group.name = 'SVR_PHASE84O_HIGH_PLANETS_FILLED_SKYLINE_LOCK';
 
-  // Phase 84N rule:
+  // Phase 84O rule:
   // - Four cardinal wall ad districts remain behind the walls and do not touch storefronts.
   // - Tier 1 and Tier 2 are larger, physically separated billboard rows.
   // - Tier 3 green WIN CASH / SVR LOGO banners move onto buildings between the four main walls.
   // - Normal filler buildings sit behind all ad buildings, never in front of them.
-  // - Moon and Mars stay high above the full skyline.
+  // - Moon and Mars are larger and much higher above the full skyline.
+  // - Extra varied normal buildings fill the gaps between the ad districts, behind the ad row.
   const wallSlots = [
     { name: 'NORTH', angle: -Math.PI * 0.5 },
     { name: 'SOUTH', angle:  Math.PI * 0.5 },
@@ -2238,7 +2239,7 @@ function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
 
     // Tier 1: separated premium tower. Wider and taller than prior phase.
     addBuilding({
-      name: `SVR_PHASE84N_${name}_TIER1_SEPARATE_WIDE_PREMIUM_ESPRESSO_TOWER`,
+      name: `SVR_PHASE84O_${name}_TIER1_SEPARATE_WIDE_PREMIUM_ESPRESSO_TOWER`,
       angle,
       radius: premiumRadius,
       width: 30.0,
@@ -2264,7 +2265,7 @@ function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
     [-1, 1].forEach((side)=>{
       const sideName = side < 0 ? 'LEFT' : 'RIGHT';
       addBuilding({
-        name: `SVR_PHASE84N_${name}_TIER2_${sideName}_SEPARATE_ALL_IN_BUILDING`,
+        name: `SVR_PHASE84O_${name}_TIER2_${sideName}_SEPARATE_ALL_IN_BUILDING`,
         angle,
         radius: tier2Radius,
         lateral: side * 25.5,
@@ -2290,18 +2291,40 @@ function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
     });
 
     // Normal buildings stay behind the ad row and never block the Tier 1/2 views.
-    addBuilding({ name: `SVR_PHASE84N_${name}_BACK_LEFT_NORMAL_TOWER`, angle, radius: fillerRadius, width: 9.5, height: 58, depth: 3.4, lateral: -15.0, mat: fillerMat });
-    addBuilding({ name: `SVR_PHASE84N_${name}_BACK_RIGHT_NORMAL_TOWER`, angle, radius: fillerRadius, width: 10.0, height: 62, depth: 3.5, lateral: 15.0, mat: fillerMat, variant: 'round' });
-    addBuilding({ name: `SVR_PHASE84N_${name}_FAR_LEFT_NORMAL_TOWER`, angle, radius: farFillerRadius, width: 8.0, height: 75, depth: 3.2, lateral: -37.0, mat: fillerMat });
-    addBuilding({ name: `SVR_PHASE84N_${name}_FAR_RIGHT_NORMAL_TOWER`, angle, radius: farFillerRadius, width: 8.5, height: 70, depth: 3.2, lateral: 37.0, mat: fillerMat });
+    addBuilding({ name: `SVR_PHASE84O_${name}_BACK_LEFT_NORMAL_TOWER`, angle, radius: fillerRadius, width: 9.5, height: 58, depth: 3.4, lateral: -15.0, mat: fillerMat });
+    addBuilding({ name: `SVR_PHASE84O_${name}_BACK_RIGHT_NORMAL_TOWER`, angle, radius: fillerRadius, width: 10.0, height: 62, depth: 3.5, lateral: 15.0, mat: fillerMat, variant: 'round' });
+    addBuilding({ name: `SVR_PHASE84O_${name}_FAR_LEFT_NORMAL_TOWER`, angle, radius: farFillerRadius, width: 8.0, height: 75, depth: 3.2, lateral: -37.0, mat: fillerMat });
+    addBuilding({ name: `SVR_PHASE84O_${name}_FAR_RIGHT_NORMAL_TOWER`, angle, radius: farFillerRadius, width: 8.5, height: 70, depth: 3.2, lateral: 37.0, mat: fillerMat });
+
+    // Phase 84O: extra varied normal skyline filler behind the ad district.
+    [
+      { label: 'FILLER_LOW_WIDE_CENTER', radius: fillerRadius + 10.0, lateral: 0.0, width: 18.0, height: 38, depth: 4.8, variant: 'box' },
+      { label: 'FILLER_SLIM_LEFT_MID', radius: farFillerRadius + 14.0, lateral: -56.0, width: 6.2, height: 86, depth: 3.0, variant: 'box' },
+      { label: 'FILLER_SLIM_RIGHT_MID', radius: farFillerRadius + 14.0, lateral: 56.0, width: 6.8, height: 82, depth: 3.0, variant: 'round' },
+      { label: 'FILLER_STEPPED_LEFT_GAP', radius: farFillerRadius + 24.0, lateral: -25.5, width: 12.0, height: 48, depth: 3.6, variant: 'box' },
+      { label: 'FILLER_STEPPED_RIGHT_GAP', radius: farFillerRadius + 24.0, lateral: 25.5, width: 13.5, height: 54, depth: 3.6, variant: 'box' }
+    ].forEach((b)=>{
+      addBuilding({
+        name: `SVR_PHASE84O_${name}_${b.label}`,
+        angle,
+        radius: b.radius,
+        width: b.width,
+        height: b.height,
+        depth: b.depth,
+        lateral: b.lateral,
+        mat: fillerMat,
+        variant: b.variant,
+        face: true
+      });
+    });
 
     const glow = new THREE.PointLight(0xffc15a, 0.65, 48, 2.0);
-    glow.name = `SVR_PHASE84N_${name}_SEPARATED_TIER_SOFT_GLOW`;
+    glow.name = `SVR_PHASE84O_${name}_SEPARATED_TIER_SOFT_GLOW`;
     glow.position.set(Math.cos(angle) * (premiumRadius - 2.0), wallHeight + 66.0, Math.sin(angle) * (premiumRadius - 2.0));
     group.add(glow);
 
     const strip = new THREE.Mesh(new THREE.PlaneGeometry(25.5, 0.36), goldMat);
-    strip.name = `SVR_PHASE84N_${name}_TIER1_TOP_NEON_STRIP`;
+    strip.name = `SVR_PHASE84O_${name}_TIER1_TOP_NEON_STRIP`;
     strip.position.set(Math.cos(angle) * premiumRadius, wallHeight + 88.0, Math.sin(angle) * premiumRadius);
     strip.position.add(inward.clone().multiplyScalar(4.4 * 0.5 + 0.18));
     faceObject(strip);
@@ -2313,7 +2336,7 @@ function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
   cornerSlots.forEach((slot)=>{
     const { angle, name } = slot;
     addBuilding({
-      name: `SVR_PHASE84N_${name}_BETWEEN_WALLS_TIER3_GREEN_PROMO_BUILDING`,
+      name: `SVR_PHASE84O_${name}_BETWEEN_WALLS_TIER3_GREEN_PROMO_BUILDING`,
       angle,
       radius: tier3Radius,
       width: 18.0,
@@ -2337,8 +2360,28 @@ function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
     });
 
     // Smaller background towers between the corners so the skyline looks filled, but behind the green promo.
-    addBuilding({ name: `SVR_PHASE84N_${name}_FAR_BACKGROUND_NORMAL_A`, angle, radius: farFillerRadius + 8.0, width: 7.5, height: 62, depth: 3.0, lateral: -15.0, mat: fillerMat });
-    addBuilding({ name: `SVR_PHASE84N_${name}_FAR_BACKGROUND_NORMAL_B`, angle, radius: farFillerRadius + 8.0, width: 7.8, height: 68, depth: 3.0, lateral: 15.0, mat: fillerMat, variant: 'round' });
+    addBuilding({ name: `SVR_PHASE84O_${name}_FAR_BACKGROUND_NORMAL_A`, angle, radius: farFillerRadius + 8.0, width: 7.5, height: 62, depth: 3.0, lateral: -15.0, mat: fillerMat });
+    addBuilding({ name: `SVR_PHASE84O_${name}_FAR_BACKGROUND_NORMAL_B`, angle, radius: farFillerRadius + 8.0, width: 7.8, height: 68, depth: 3.0, lateral: 15.0, mat: fillerMat, variant: 'round' });
+    [
+      { label: 'BETWEEN_GAP_LOW_BLOCK', lateral: 0, width: 16.0, height: 34, radiusAdd: 18, depth: 4.2, variant: 'box' },
+      { label: 'BETWEEN_GAP_TALL_LEFT', lateral: -32, width: 7.0, height: 76, radiusAdd: 26, depth: 3.1, variant: 'round' },
+      { label: 'BETWEEN_GAP_TALL_RIGHT', lateral: 32, width: 7.4, height: 72, radiusAdd: 26, depth: 3.1, variant: 'box' },
+      { label: 'BETWEEN_GAP_SHORT_STACK', lateral: 46, width: 10.4, height: 44, radiusAdd: 38, depth: 3.5, variant: 'box' },
+      { label: 'BETWEEN_GAP_SHORT_STACK_OPP', lateral: -46, width: 9.4, height: 42, radiusAdd: 38, depth: 3.5, variant: 'box' }
+    ].forEach((b)=>{
+      addBuilding({
+        name: `SVR_PHASE84O_${name}_${b.label}`,
+        angle,
+        radius: farFillerRadius + b.radiusAdd,
+        width: b.width,
+        height: b.height,
+        depth: b.depth,
+        lateral: b.lateral,
+        mat: fillerMat,
+        variant: b.variant,
+        face: true
+      });
+    });
   });
 
   scene.add(group);
@@ -2557,7 +2600,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(5.6, 56, 56),
+    new THREE.SphereGeometry(9.4, 64, 64),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2569,16 +2612,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-82, wallHeight + 168.0, -(R + 330.0));
+  moon.position.set(-72, wallHeight + 226.0, -(R + 300.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(54.0, 54.0, 1);
+  moonHalo.scale.set(96.0, 96.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(3.1, 44, 44),
+    new THREE.SphereGeometry(5.4, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2590,13 +2633,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  mars.position.set(112, wallHeight + 184.0, -(R + 380.0));
+  mars.position.set(104, wallHeight + 244.0, -(R + 340.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(34.0, 34.0, 1);
+  marsHalo.scale.set(58.0, 58.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2622,9 +2665,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.75, 560, 1.45);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 3.35, 680, 1.45);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 1.75, 420, 1.55);
+  const marsGlow = new THREE.PointLight(0xff9a72, 2.25, 520, 1.55);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
@@ -2801,29 +2844,29 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       wallHeight + 72.0 + Math.sin(t * 0.018) * 0.22,
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
-    // PHASE-84N: moon remains high above the separated ad tiers and normal skyline.
+    // PHASE-84O: moon is larger and locked high above every ad/building tier.
     moon.position.set(
-      -82 + Math.sin(t * 0.012) * 8.0,
-      wallHeight + 168.0 + Math.sin(t * 0.040) * 2.5,
-      -(R + 330.0) + Math.cos(t * 0.008) * 12.0
+      -72 + Math.sin(t * 0.010) * 9.0,
+      wallHeight + 226.0 + Math.sin(t * 0.032) * 3.0,
+      -(R + 300.0) + Math.cos(t * 0.007) * 14.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
-    // PHASE-84N: Mars stays high, offset from the moon, and fully above skyline/ad tiers.
+    // PHASE-84O: Mars is larger, higher, and offset from the Moon above the skyline.
     mars.position.set(
-      112 + Math.sin(t * 0.010 + 1.4) * 9.0,
-      wallHeight + 184.0 + Math.sin(t * 0.036 + 0.8) * 2.2,
-      -(R + 380.0) + Math.cos(t * 0.007 + 0.4) * 12.0
+      104 + Math.sin(t * 0.009 + 1.4) * 10.0,
+      wallHeight + 244.0 + Math.sin(t * 0.030 + 0.8) * 2.7,
+      -(R + 340.0) + Math.cos(t * 0.006 + 0.4) * 14.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.070 + 0.012 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.090 + 0.016 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.050 + 0.012 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.070 + 0.014 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{
