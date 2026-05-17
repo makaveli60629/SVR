@@ -1,8 +1,5 @@
 {
-  "build": "PHASE-84B-BUILDING-BANNER-AD-GRID-LOCK",
-  "scope": "game-only",
-  "siteTouched": false,
-  "phase": "84B",
-  "name": "Building Banner Ad Grid Lock",
-  "unapprovedSponsorBlocked": true
+  "build": "PHASE-84E-ALWAYS-VISIBLE-ESPRESSO-AD-LOCK",
+  "gameOnly": true,
+  "siteTouched": false
 }

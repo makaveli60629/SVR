@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-84D-FRONT-VISIBLE-ESPRESSO-AD-LOCK",
+  "build": "PHASE-84E-ALWAYS-VISIBLE-ESPRESSO-AD-LOCK",
+  "target": "game-only",
   "siteTouched": false,
-  "gameOnly": true,
-  "notes": "Moves Espresso With Cream ad to a dedicated front-visible center skyline building."
+  "reikiBranding": "SVR_AWAITING_APPROVAL_ONLY"
 }

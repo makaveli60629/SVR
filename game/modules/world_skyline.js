@@ -2029,6 +2029,89 @@ function buildOuterCity(scene, R){
     group.add(glow);
   }
 
+
+  // PHASE-84E: FORCE FRONT-ROW ESPRESSO AD.
+  // The previous ad was technically on a skyline building but still hidden behind player-facing foreground towers.
+  // This creates a deliberate front-row ad building just above the lobby rim, on the player's direct sightline,
+  // with the Espresso plane on the front face and rendered after the skyline so it cannot disappear behind blockers.
+  {
+    const a = -Math.PI * 0.5;
+    const rr = R + 2.8;
+    const h = 44.0;
+    const w = 12.2;
+    const d = 2.2;
+    const x = Math.cos(a) * rr;
+    const z = Math.sin(a) * rr;
+    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
+    const faceOffset = d * 0.5 + 0.30;
+
+    const holder = new THREE.Mesh(
+      new THREE.BoxGeometry(w, h, d),
+      new THREE.MeshStandardMaterial({
+        color: 0x050912,
+        roughness: 0.50,
+        metalness: 0.34,
+        emissive: 0x101a38,
+        emissiveIntensity: 1.35
+      })
+    );
+    holder.name = 'SVR_PHASE84E_FRONT_ROW_ESPRESSO_AD_BUILDING';
+    holder.position.set(x, h * 0.5, z);
+    holder.rotation.y = -a + Math.PI / 2;
+    holder.castShadow = false;
+    holder.receiveShadow = true;
+    holder.renderOrder = 120;
+    group.add(holder);
+
+    const adW = 8.8;
+    const adH = 32.0;
+    const ad = new THREE.Mesh(
+      new THREE.PlaneGeometry(adW, adH),
+      new THREE.MeshBasicMaterial({
+        map: espressoTex,
+        color: 0xffffff,
+        transparent: false,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        depthTest: false
+      })
+    );
+    ad.name = 'SVR_ESPRESSO_WITH_CREAM_ALWAYS_VISIBLE_FRONT_ROW_AD';
+    ad.position.set(x - outward.x * faceOffset, h * 0.55, z - outward.z * faceOffset);
+    ad.lookAt(ad.position.clone().sub(outward));
+    ad.renderOrder = 200;
+    group.add(ad);
+
+    const frameMat = new THREE.MeshBasicMaterial({
+      color: 0xffd06a,
+      transparent: true,
+      opacity: 0.98,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      depthTest: false
+    });
+    const sideAxis = new THREE.Vector3(Math.cos(a + Math.PI * 0.5), 0, Math.sin(a + Math.PI * 0.5));
+    const frameParts = [
+      { name: 'top',    size: [adW + 0.55, 0.18], pos: new THREE.Vector3(0, adH * 0.5 + 0.18, 0) },
+      { name: 'bottom', size: [adW + 0.55, 0.18], pos: new THREE.Vector3(0, -adH * 0.5 - 0.18, 0) },
+      { name: 'left',   size: [0.18, adH + 0.55], pos: sideAxis.clone().multiplyScalar(-(adW * 0.5 + 0.18)) },
+      { name: 'right',  size: [0.18, adH + 0.55], pos: sideAxis.clone().multiplyScalar(adW * 0.5 + 0.18) }
+    ];
+    frameParts.forEach((part)=>{
+      const f = new THREE.Mesh(new THREE.PlaneGeometry(part.size[0], part.size[1]), frameMat);
+      f.name = 'SVR_ESPRESSO_FRONT_ROW_FRAME_' + part.name.toUpperCase();
+      f.position.copy(ad.position).add(part.pos);
+      f.lookAt(f.position.clone().sub(outward));
+      f.renderOrder = 201;
+      group.add(f);
+    });
+
+    const glow = new THREE.PointLight(0xffc15a, 2.2, 48, 1.7);
+    glow.name = 'SVR_PHASE84E_ESPRESSO_FRONT_ROW_GLOW';
+    glow.position.copy(ad.position).add(new THREE.Vector3(0, 2.4, 1.5));
+    group.add(glow);
+  }
+
   scene.add(group);
   return { group, billboardUpdaters };
 }

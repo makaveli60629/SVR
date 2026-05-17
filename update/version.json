@@ -1,6 +1,6 @@
 ﻿{
-  "build": "PHASE-84D-FRONT-VISIBLE-ESPRESSO-AD-LOCK",
+  "build": "PHASE-84E-ALWAYS-VISIBLE-ESPRESSO-AD-LOCK",
+  "target": "game",
   "siteTouched": false,
-  "gameOnly": true,
-  "notes": "Moves Espresso With Cream ad onto a front-visible center skyline building."
+  "notes": "Front-row Espresso ad building; ad forced visible from player POV."
 }
