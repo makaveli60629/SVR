@@ -1,6 +1,6 @@
 ﻿{
-  "build": "PHASE-84M-FRONT-ADS-BACK-BUILDINGS-SKY-LOCK",
-  "phase": "84M",
+  "build": "PHASE-84N-SEPARATED-TIERS-INTERCARDINAL-AD-SKYLINE-LOCK",
+  "phase": "84N",
   "target": "/game",
-  "notes": "Front ad buildings are first visible tier behind walls; normal buildings are behind ads; Moon and Mars raised high above skyline."
+  "notes": "Tier 1 and Tier 2 ads are bigger and separated; Tier 3 green banners sit on buildings between the four wall ad districts; normal buildings remain behind ads."
 }

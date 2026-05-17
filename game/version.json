@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-84M-FRONT-ADS-BACK-BUILDINGS-SKY-LOCK",
-  "phase": "84M",
-  "notes": "Front ad buildings are the first visible skyline tier; normal buildings are behind them; Moon and Mars are higher above the sky."
+  "build": "PHASE-84N-SEPARATED-TIERS-INTERCARDINAL-AD-SKYLINE-LOCK",
+  "phase": "84N",
+  "notes": "Separated Tier 1/Tier 2 billboard buildings, Tier 3 green banners between the four walls, normal buildings behind ads, Moon and Mars high in sky."
 }
