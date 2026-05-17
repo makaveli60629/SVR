@@ -58,32 +58,32 @@ function buildProfileTexture(){
     roundRect(ctx, 60, 60, w - 120, 132, 28);
     ctx.fill();
     ctx.fillStyle = "#ff7784";
-    ctx.font = "700 42px Arial";
+    ctx.font = "700 34px Arial";
     ctx.fillText("SOUTH-WEST WALL • PGA HUB", 92, 126);
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "700 92px Arial";
-    ctx.fillText("JUAN E. ESPEJO", 92, 254);
+    ctx.font = "700 72px Arial";
+    ctx.fillText("JUAN E. ESPEJO", 82, 248);
     ctx.fillStyle = "#ffc2c9";
-    ctx.font = "600 40px Arial";
+    ctx.font = "600 32px Arial";
     ctx.fillText("PGA Pro • Maryville Golf Academy Founder", 92, 324);
 
     ctx.fillStyle = "#ff7784";
-    ctx.font = "700 48px Arial";
+    ctx.font = "700 38px Arial";
     ctx.fillText("ABOUT", 92, 420);
     ctx.fillStyle = "#f7f0f2";
-    ctx.font = "500 38px Arial";
+    ctx.font = "500 31px Arial";
     let y = drawWrappedText(ctx,
       "Dedicated VR golf storefront reserved for training, lessons, academy promotion, and future branded PGA media. Built as a professional modular client hub so it can be refined without disturbing the main lobby baseline.",
-      92, 474, w - 184, 46);
+      82, 456, w - 164, 38);
 
     y += 76;
     ctx.fillStyle = "#ff7784";
-    ctx.font = "700 42px Arial";
+    ctx.font = "700 34px Arial";
     ctx.fillText("FOCUS", 92, y);
     y += 54;
     ctx.fillStyle = "#f7f0f2";
-    ctx.font = "500 36px Arial";
+    ctx.font = "500 30px Arial";
     [
       "• Private instruction",
       "• Group lessons",
@@ -103,7 +103,7 @@ function buildProfileTexture(){
     ctx.font = "700 34px Arial";
     ctx.fillText("RESERVED SPOTLIGHT", 108, h - 172);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "700 42px Arial";
+    ctx.font = "700 34px Arial";
     ctx.fillText("VR GOLF / PGA HUB", 108, h - 118);
   }, 1100, 1500);
 }
@@ -257,31 +257,31 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     group.add(logoPanel);
 
     const infoPanel = new THREE.Mesh(
-      new THREE.PlaneGeometry(7.5, 5.2),
+      new THREE.PlaneGeometry(6.35, 5.05),
       new THREE.MeshBasicMaterial({ map: buildProfileTexture(), side: THREE.DoubleSide, transparent: true })
     );
-    infoPanel.position.set(-1.70, 3.10, 0.18);
+    infoPanel.position.set(-2.28, 3.12, 0.24);
     group.add(infoPanel);
 
     const portraitBack = new THREE.Mesh(
       new THREE.PlaneGeometry(2.26, 3.06),
       new THREE.MeshBasicMaterial({ color: 0x0f0709, side: THREE.DoubleSide })
     );
-    portraitBack.position.set(3.92, 3.04, 0.16);
+    portraitBack.position.set(4.16, 3.12, 0.26);
     group.add(portraitBack);
 
     const portrait = new THREE.Mesh(
       new THREE.PlaneGeometry(2.04, 2.84),
       new THREE.MeshBasicMaterial({ map: buildPortraitTexture(), transparent: true, side: THREE.DoubleSide })
     );
-    portrait.position.set(3.92, 3.04, 0.19);
+    portrait.position.set(4.16, 3.12, 0.31);
     group.add(portrait);
 
     const badge = new THREE.Mesh(
       new THREE.CircleGeometry(0.62, 64),
       new THREE.MeshBasicMaterial({ map: buildBadgeTexture(), transparent: true, side: THREE.DoubleSide })
     );
-    badge.position.set(4.98, 5.04, 0.20);
+    badge.position.set(5.02, 5.14, 0.33);
     group.add(badge);
 
     const badgeFrame = new THREE.Mesh(
@@ -292,10 +292,10 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     group.add(badgeFrame);
 
     const reservePlaque = new THREE.Mesh(
-      new THREE.PlaneGeometry(4.16, 0.88),
+      new THREE.PlaneGeometry(3.55, 0.78),
       new THREE.MeshBasicMaterial({ map: buildReserveTexture(), side: THREE.DoubleSide, transparent: true })
     );
-    reservePlaque.position.set(4.08, 1.10, 0.20);
+    reservePlaque.position.set(4.18, 1.22, 0.34);
     group.add(reservePlaque);
 
     const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.82), softGlass);
@@ -309,10 +309,10 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     fillA.position.set(-0.4, 4.8, 1.34);
     group.add(fillA);
     const fillB = new THREE.PointLight(0xffb0ba, 2.7, 13, 2.0);
-    fillB.position.set(4.1, 5.1, 1.20);
+    fillB.position.set(4.6, 5.2, 1.28);
     group.add(fillB);
     const fillC = new THREE.PointLight(0x73ff97, 1.0, 8, 2.0);
-    fillC.position.set(1.0, 0.54, 1.06);
+    fillC.position.set(0.8, 0.58, 1.18);
     group.add(fillC);
 
     const railMat = new THREE.MeshStandardMaterial({ color: 0xefe7de, roughness: 0.30, metalness: 0.68, emissive: 0x24191a, emissiveIntensity: 0.08 });
