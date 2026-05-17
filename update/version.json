@@ -1,8 +1,5 @@
-﻿{
-    "gameSideOnly":  true,
-    "build":  "PHASE-84U-RIGID-TEXAS-HOLDEM-ENGINE-LOCK",
-    "siteTouched":  false,
-    "deployedBy":  "APPLY-PHASE84U-RIGID-TEXAS-HOLDEM-ENGINE-LOCK.ps1",
-    "phase":  "84U",
-    "notes":  "Rigid Texas Holdem poker engine with clockwise dealer, blinds, burn cards, validated actions, side pots, winner reveal, and peek support."
+{
+  "build": "PHASE-84V-ESPRESSO-AD-BANNER-ONLY-LOCK",
+  "scope": "game-only",
+  "siteTouched": false
 }

@@ -283,35 +283,28 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const leftStick = getStick(moveSource, "left");
     const rightStick = getStick(turnSource, "right");
 
-    // Phase 84L comfort lock:
-    // - Right stick Y moves in the direction the headset/camera is looking.
-    // - Right stick X still snap-turns, but snap turn is ignored while the user is
-    //   pushing forward/back. This prevents accidental turn+move nausea.
-    // - Slightly faster walk speed for a less sluggish lobby feel.
-    const rightYActive = Math.abs(rightStick.y) > 0.18;
-    const leftYActive = Math.abs(leftStick.y) > 0.18;
-    const userIsMovingForwardBack = rightYActive || leftYActive;
-    if (!userIsMovingForwardBack && Math.abs(rightStick.x) > 0.72 && performance.now() > snapCooldownUntil){
+    if (Math.abs(rightStick.x) > 0.72 && performance.now() > snapCooldownUntil){
       playerYaw += Math.sign(rightStick.x) * (Math.PI / 4);
       applyReferenceSpace();
-      snapCooldownUntil = performance.now() + 260;
+      snapCooldownUntil = performance.now() + 220;
     }
 
-    const moveX = Math.abs(leftStick.x) > 0.14 ? leftStick.x : 0;
-    const moveY = leftYActive ? leftStick.y : (rightYActive ? rightStick.y : 0);
+    // Phase 84 lock: left stick can still move, but right-stick Y also moves
+    // forward/back so one-controller and Android/controller fallback remain usable.
+    const moveX = Math.abs(leftStick.x) > 0.12 ? leftStick.x : 0;
+    const moveY = Math.abs(leftStick.y) > 0.12 ? leftStick.y : rightStick.y;
     const mag = Math.hypot(moveX, moveY);
-    if (mag < 0.14) return;
+    if (mag < 0.12) return;
 
     const xrCam = renderer.xr.getCamera(camera);
     xrCam.getWorldDirection(headDir);
     headDir.y = 0;
     if (headDir.lengthSq() < 1e-5) headDir.set(0, 0, -1);
     headDir.normalize();
-    const rightDir = new THREE.Vector3().crossVectors(headDir, new THREE.Vector3(0,1,0)).normalize();
-    const speed = 3.65;
-    const forwardAmount = -moveY; // WebXR gamepads usually report stick-up as negative Y.
-    const stepX = (rightDir.x * moveX + headDir.x * forwardAmount) * speed * dt;
-    const stepZ = (rightDir.z * moveX + headDir.z * forwardAmount) * speed * dt;
+    const rightDir = new THREE.Vector3(headDir.z, 0, -headDir.x).normalize();
+    const speed = 2.8;
+    const stepX = (rightDir.x * moveX + headDir.x * (-moveY)) * speed * dt;
+    const stepZ = (rightDir.z * moveX + headDir.z * (-moveY)) * speed * dt;
     const nextX = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
     const nextZ = THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp);
     setPlayerXZ(nextX, nextZ);
@@ -397,7 +390,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       stableTargetMs = 0;
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
-        ? "Controllers active • look-forward right stick move • faster walk • A/X teleport"
+        ? "Controllers active • right stick Y move • right stick X snap turn • A/X teleport"
         : "TELEPORT OFF • press TP or make fist by face";
       statusCb(idleMsg);
       modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist by face toggles TP");

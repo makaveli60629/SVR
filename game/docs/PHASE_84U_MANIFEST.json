@@ -1,9 +1,0 @@
-{
-  "phase": "84U",
-  "build": "PHASE-84U-RIGID-TEXAS-HOLDEM-ENGINE-LOCK",
-  "scope": "game-side poker engine",
-  "siteTouched": false,
-  "under25MBTarget": true,
-  "controls": ["F fold", "C check/call", "R raise", "A all-in", "P peek", "H next hand"],
-  "locked": ["clockwise dealer", "left-of-button deal start", "burn cards", "side pots", "10-second winner reveal", "hand evaluator with kickers"]
-}

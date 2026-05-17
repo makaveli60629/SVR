@@ -1,6 +1,5 @@
 {
-  "build": "PHASE-84R-RESTORED-NORMAL-SKYLINE-FOUR-AD-BUILDINGS-LOCK",
-  "phase": "84R",
-  "notes": "Restored calmer normal city skyline, disabled dense billboard skyline overload, kept only four dedicated ad buildings, preserved high Moon/Mars and game-only locks.",
-  "title": "Restored Normal Skyline Four Ad Buildings Lock"
+  "build": "PHASE-84V-ESPRESSO-AD-BANNER-ONLY-LOCK",
+  "scope": "game-only",
+  "siteTouched": false
 }
