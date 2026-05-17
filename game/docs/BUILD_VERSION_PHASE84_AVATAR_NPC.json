@@ -1,0 +1,7 @@
+{
+  "build": "PHASE-84-AVATAR-NPC-RIG-INTAKE-LOCK",
+  "type": "game-module-patch",
+  "description": "Adds modular avatar NPC registry, FBX runtime candidates, and moving NPC slots without touching the site.",
+  "siteTouched": false,
+  "createdAt": "2026-05-17"
+}

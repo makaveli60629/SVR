@@ -1,0 +1,41 @@
+{
+  "phase": "PHASE-84-AVATAR-NPC-RIG-INTAKE-LOCK",
+  "scope": "game-side-only",
+  "siteTouched": false,
+  "assets": {
+    "eric": {
+      "fbx": "game/assets/avatars/eric/eric.fbx",
+      "runtimeRole": "male moving NPC / poker player candidate",
+      "rigged": true
+    },
+    "carla": {
+      "fbx": "game/assets/avatars/carla/carla.fbx",
+      "runtimeRole": "female moving NPC / host candidate",
+      "rigged": true
+    },
+    "mei": {
+      "fbx": "game/assets/avatars/mei/mei.fbx",
+      "runtimeRole": "static host placeholder until re-rigged/retargeted",
+      "rigged": false
+    },
+    "scifiDowntown": {
+      "sourceZip": "whsjqj04ge-ScifiDowntowncity.zip",
+      "runtimeRole": "source-only private scene / Scorpion overlook candidate",
+      "autoLoad": false
+    }
+  },
+  "modules": [
+    "game/modules/avatar_asset_registry.js",
+    "game/modules/npc_avatar_system.js"
+  ],
+  "integration": {
+    "mainJsImport": "import { createNpcAvatarSystem } from './modules/npc_avatar_system.js';",
+    "mainJsInit": "const npcAvatarSystem = createNpcAvatarSystem({ scene, seats, tableCenter, sceneTargets, log });",
+    "mainJsTick": "if (npcAvatarSystem?.update) npcAvatarSystem.update(dt);"
+  },
+  "locks": {
+    "gameZipUnder25MB": "preserve; patch package is separate and small",
+    "dealerBody": "do not re-enable without approval",
+    "website": "do not touch"
+  }
+}
