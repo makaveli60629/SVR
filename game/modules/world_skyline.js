@@ -1528,7 +1528,7 @@ function buildOuterCity(scene, R){
   // Ads are placed on dedicated towers with a clear sight-line instead of being hidden behind random buildings.
   const adSlotMap = new Map([
     // PHASE-84D: player view looks north through the lobby, so the premium ad must live on the north/center face.
-    [0,  { type: 'premiumVertical', texture: 'espresso', name: 'AD_CENTER_PREMIUM_ESPRESSO_VISIBLE', angle: -Math.PI * 0.5, rr: R + 24, h: 66, w: 11.8, d: 3.6 }],
+    [0,  { type: 'premiumVertical', texture: 'placeholder', name: 'AD_CENTER_PREMIUM_PLACEHOLDER_BEHIND_WALL_ONLY', angle: -Math.PI * 0.5, rr: R + 24, h: 66, w: 11.8, d: 3.6 }],
     [3,  { type: 'vertical', texture: 'matrix', name: 'AD_RIGHT_TOWER_VISIBLE', angle: -Math.PI * 0.5 + 0.30, rr: R + 36, h: 48, w: 7.2, d: 3.8 }],
     [65, { type: 'vertical', texture: 'placeholder', name: 'AD_LEFT_TOWER_VISIBLE', angle: -Math.PI * 0.5 - 0.30, rr: R + 36, h: 48, w: 7.2, d: 3.8 }],
     [7,  { type: 'horizontal', texture: 'svr', name: 'AD_RIGHT_LOWER_BANNER', angle: -Math.PI * 0.5 + 0.54, rr: R + 42, h: 28, w: 11.4, d: 3.6 }],
@@ -2030,81 +2030,112 @@ function sanitizeTableSurface(table, keepMesh = null){
   });
 }
 
-function addAlwaysVisibleEspressoAd(scene, R){
+function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
   const group = new THREE.Group();
-  group.name = 'SVR_PHASE84G_ALWAYS_VISIBLE_ESPRESSO_BUILDING_AD_GROUP';
+  group.name = 'SVR_PHASE84J_CARDINAL_BEHIND_WALL_ESPRESSO_ADS';
 
-  // Player-facing front-center tower. It sits just inside the skyline rim so foreground skyline blocks cannot hide it.
-  const z = -(R - 2.8);
-  const x = -1.0;
-  const h = 34.0;
-  const w = 10.8;
-  const d = 1.65;
+  // Phase 84J rule: all sponsor/ad towers sit BEHIND the perimeter wall,
+  // raised above the wall line so storefronts and player pathways stay clear.
+  // Four cardinal placements keep the banner visible from North/South/East/West views.
+  const slots = [
+    { name: 'NORTH', angle: -Math.PI * 0.5 },
+    { name: 'SOUTH', angle:  Math.PI * 0.5 },
+    { name: 'EAST',  angle:  0 },
+    { name: 'WEST',  angle:  Math.PI }
+  ];
 
-  const tower = new THREE.Mesh(
-    new THREE.BoxGeometry(w, h, d),
-    new THREE.MeshStandardMaterial({
-      color: 0x050914,
-      roughness: 0.50,
-      metalness: 0.32,
-      emissive: 0x111a38,
-      emissiveIntensity: 1.15
-    })
-  );
-  tower.name = 'SVR_PHASE84G_FRONT_CENTER_ESPRESSO_AD_BUILDING';
-  tower.position.set(x, h * 0.5, z);
-  tower.castShadow = false;
-  tower.receiveShadow = false;
-  tower.renderOrder = 130;
-  group.add(tower);
-
-  const adW = 8.4;
-  const adH = 26.0;
-  const adZ = z + d * 0.5 + 0.055;
-  const adY = h * 0.55;
-  const ad = new THREE.Mesh(
-    new THREE.PlaneGeometry(adW, adH),
-    new THREE.MeshBasicMaterial({
-      map: espressoTex,
-      color: 0xffffff,
-      transparent: false,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-      depthTest: false
-    })
-  );
-  ad.name = 'SVR_ESPRESSO_WITH_CREAM_ALWAYS_VISIBLE_PLAYER_POV_AD';
-  ad.position.set(x, adY, adZ);
-  ad.renderOrder = 250;
-  group.add(ad);
-
-  const frameMat = new THREE.MeshBasicMaterial({
+  const towerMat = new THREE.MeshStandardMaterial({
+    color: 0x061124,
+    roughness: 0.54,
+    metalness: 0.34,
+    emissive: 0x10245a,
+    emissiveIntensity: 0.86
+  });
+  const sideMat = new THREE.MeshStandardMaterial({
+    color: 0x102f6c,
+    roughness: 0.45,
+    metalness: 0.24,
+    emissive: 0x0d55a4,
+    emissiveIntensity: 0.72
+  });
+  const goldMat = new THREE.MeshBasicMaterial({
     color: 0xffcf6a,
     transparent: true,
     opacity: 0.96,
     side: THREE.DoubleSide,
-    depthWrite: false,
-    depthTest: false
+    depthWrite: false
   });
-  const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.55, 0.18), frameMat);
-  frameTop.position.set(x, adY + adH * 0.5 + 0.22, adZ + 0.01);
-  frameTop.renderOrder = 251;
-  group.add(frameTop);
-  const frameBottom = frameTop.clone();
-  frameBottom.position.y = adY - adH * 0.5 - 0.22;
-  group.add(frameBottom);
-  const frameLeft = new THREE.Mesh(new THREE.PlaneGeometry(0.18, adH + 0.62), frameMat);
-  frameLeft.position.set(x - adW * 0.5 - 0.22, adY, adZ + 0.01);
-  frameLeft.renderOrder = 251;
-  group.add(frameLeft);
-  const frameRight = frameLeft.clone();
-  frameRight.position.x = x + adW * 0.5 + 0.22;
-  group.add(frameRight);
 
-  const glow = new THREE.PointLight(0xffc15a, 1.85, 54, 1.75);
-  glow.name = 'SVR_PHASE84G_ESPRESSO_AD_GLOW';
-  glow.position.set(x, adY + 1.0, adZ + 2.4);
-  group.add(glow);
+  const radius = R + 14.5;           // behind the wall, never inside the lobby/storefront area
+  const towerW = 9.2;
+  const towerH = 52.0;
+  const towerD = 3.2;
+  const towerY = wallHeight + towerH * 0.5 + 1.2;
+  const adW = 7.0;
+  const adH = 27.0;
+  const adY = wallHeight + 27.5;     // moved higher above wall/rim sightline
+
+  slots.forEach((slot)=>{
+    const outward = new THREE.Vector3(Math.cos(slot.angle), 0, Math.sin(slot.angle));
+    const inward = outward.clone().multiplyScalar(-1);
+    const x = outward.x * radius;
+    const z = outward.z * radius;
+
+    const tower = new THREE.Mesh(new THREE.BoxGeometry(towerW, towerH, towerD), towerMat);
+    tower.name = `SVR_PHASE84J_${slot.name}_BEHIND_WALL_AD_BUILDING`;
+    tower.position.set(x, towerY, z);
+    tower.lookAt(new THREE.Vector3(0, towerY, 0));
+    tower.castShadow = false;
+    tower.receiveShadow = false;
+    tower.renderOrder = 32;
+    group.add(tower);
+
+    const accent = new THREE.Mesh(new THREE.PlaneGeometry(towerW * 0.86, towerH * 0.92), sideMat);
+    accent.name = `SVR_PHASE84J_${slot.name}_AD_BUILDING_FACE`;
+    accent.position.copy(tower.position).add(inward.clone().multiplyScalar(towerD * 0.5 + 0.025));
+    accent.lookAt(new THREE.Vector3(0, accent.position.y, 0));
+    accent.renderOrder = 33;
+    group.add(accent);
+
+    const ad = new THREE.Mesh(
+      new THREE.PlaneGeometry(adW, adH),
+      new THREE.MeshBasicMaterial({
+        map: espressoTex,
+        color: 0xffffff,
+        transparent: false,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        depthTest: true
+      })
+    );
+    ad.name = `SVR_ESPRESSO_WITH_CREAM_${slot.name}_BEHIND_WALL_AD`;
+    ad.position.set(x, adY, z).add(inward.clone().multiplyScalar(towerD * 0.5 + 0.09));
+    ad.lookAt(new THREE.Vector3(0, adY, 0));
+    ad.renderOrder = 90;
+    group.add(ad);
+
+    const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.55, 0.16), goldMat);
+    frameTop.position.copy(ad.position).add(new THREE.Vector3(0, adH * 0.5 + 0.25, 0));
+    frameTop.lookAt(new THREE.Vector3(0, frameTop.position.y, 0));
+    frameTop.renderOrder = 91;
+    group.add(frameTop);
+    const frameBottom = frameTop.clone();
+    frameBottom.position.copy(ad.position).add(new THREE.Vector3(0, -adH * 0.5 - 0.25, 0));
+    group.add(frameBottom);
+    const frameLeft = new THREE.Mesh(new THREE.PlaneGeometry(0.16, adH + 0.66), goldMat);
+    frameLeft.position.copy(ad.position).add(new THREE.Vector3(-adW * 0.5 - 0.25, 0, 0));
+    frameLeft.lookAt(new THREE.Vector3(0, frameLeft.position.y, 0));
+    frameLeft.renderOrder = 91;
+    group.add(frameLeft);
+    const frameRight = frameLeft.clone();
+    frameRight.position.copy(ad.position).add(new THREE.Vector3(adW * 0.5 + 0.25, 0, 0));
+    group.add(frameRight);
+
+    const glow = new THREE.PointLight(0xffc15a, 0.9, 42, 2.0);
+    glow.name = `SVR_PHASE84J_${slot.name}_ESPRESSO_AD_GLOW`;
+    glow.position.copy(ad.position).add(inward.clone().multiplyScalar(1.4)).add(new THREE.Vector3(0, 1.4, 0));
+    group.add(glow);
+  });
 
   scene.add(group);
   return group;
@@ -2204,7 +2235,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const city = buildOuterCity(scene, R);
   const stars = buildStars(scene, R);
   const lobbySprites = buildLobbySprites(scene, R, wallHeight);
-  const espressoAdGroup = addAlwaysVisibleEspressoAd(scene, R);
+  const espressoAdGroup = addAlwaysVisibleEspressoAd(scene, R, wallHeight);
   const spawnLogoTex = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
   const wallPanels = [];
   const wallPanelUpdaters = [];
