@@ -143,6 +143,11 @@ function loadUiTexture(url){
   tex.anisotropy = 8;
   return tex;
 }
+
+// Phase 84F boot fix: shared espresso texture for all skyline/ad helper functions.
+const SVR_ESPRESSO_AD_TEXTURE_PATH = './assets/ads/espresso_with_cream/espresso_with_cream_vertical_building_ad_512x1024.png';
+const espressoTex = loadUiTexture(SVR_ESPRESSO_AD_TEXTURE_PATH);
+
 function fillWrappedText(ctx, text, x, y, maxWidth, lineHeight){
   const words = String(text || '').split(/\s+/);
   let line = '';
@@ -1804,7 +1809,7 @@ function buildOuterCity(scene, R){
   const billboardUpdaters = [matrix.update];
   const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
   const sponsorHoldTex = createAdBillboardTexture(['SPONSOR SLOT', 'AVAILABLE']);
-  const espressoTex = loadUiTexture('./assets/ads/espresso_with_cream/espresso_with_cream_vertical_building_ad_512x1024.png');
+  // Phase 84F: espressoTex is preloaded/shared above to avoid boot ReferenceError.
 
   const count = 68;
   // PHASE-84C: Player-view ad corridor. The sponsor skyline faces the seated/lobby player.

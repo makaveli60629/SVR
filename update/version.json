@@ -1,6 +1,5 @@
 ﻿{
-  "build": "PHASE-84E-ALWAYS-VISIBLE-ESPRESSO-AD-LOCK",
-  "target": "game",
-  "siteTouched": false,
-  "notes": "Front-row Espresso ad building; ad forced visible from player POV."
+  "build": "PHASE-84F-ESPRESSO-BOOT-FIX-VISIBLE-AD-LOCK",
+  "phase": "84F",
+  "notes": "Fixes espressoTex runtime boot error and keeps Espresso ad front-visible."
 }
