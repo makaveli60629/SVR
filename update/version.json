@@ -1,9 +1,7 @@
 ﻿{
-    "inputStrategy":  "hand tracking primary with hidden-controller fallback preserved",
-    "build":  "PHASE-84Y-WEBXR-GODMODE-ENFORCER-LOCK",
-    "runtime":  "WebXR / Three.js modular JavaScript",
+    "phase":  "84Z",
+    "label":  "Audit Scene Enable Skyline Lock",
+    "build":  "PHASE-84Z-AUDIT-SCENE-ENABLE-SKYLINE-LOCK",
     "siteTouched":  false,
-    "gameOnly":  true,
-    "target":  "game-only",
-    "updatedAt":  "2026-05-17T17:42:30Z"
+    "appliedAt":  "2026-05-17T18:06:07Z"
 }

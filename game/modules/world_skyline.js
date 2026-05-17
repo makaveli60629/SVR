@@ -2029,36 +2029,45 @@ function sanitizeTableSurface(table, keepMesh = null){
 
 function addAlwaysVisibleEspressoAd(scene, R){
   const group = new THREE.Group();
-  group.name = 'SVR_PHASE84G_ALWAYS_VISIBLE_ESPRESSO_BUILDING_AD_GROUP';
+  group.name = 'SVR_PHASE84Z_ORGANIZED_ESPRESSO_AD_BUILDING_GROUP';
 
-  // Player-facing front-center tower. It sits just inside the skyline rim so foreground skyline blocks cannot hide it.
-  const z = -(R - 2.8);
-  const x = -1.0;
-  const h = 34.0;
-  const w = 10.8;
-  const d = 1.65;
+  // Organized premium ad tower: behind the wall, attached to the building face,
+  // player-readable without floating over the sky or blocking storefront portals.
+  const z = -(R + 8.4);
+  const x = -6.8;
+  const h = 31.0;
+  const w = 7.2;
+  const d = 2.4;
 
-  const tower = new THREE.Mesh(
-    new THREE.BoxGeometry(w, h, d),
-    new THREE.MeshStandardMaterial({
-      color: 0x050914,
-      roughness: 0.50,
-      metalness: 0.32,
-      emissive: 0x111a38,
-      emissiveIntensity: 1.15
-    })
-  );
-  tower.name = 'SVR_PHASE84G_FRONT_CENTER_ESPRESSO_AD_BUILDING';
+  const towerMat = new THREE.MeshStandardMaterial({
+    color: 0x061026,
+    roughness: 0.58,
+    metalness: 0.30,
+    emissive: 0x0d1632,
+    emissiveIntensity: 0.58
+  });
+  const tower = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), towerMat);
+  tower.name = 'SVR_PHASE84Z_ORGANIZED_ESPRESSO_AD_BUILDING';
   tower.position.set(x, h * 0.5, z);
   tower.castShadow = false;
   tower.receiveShadow = false;
-  tower.renderOrder = 130;
+  tower.renderOrder = 38;
   group.add(tower);
 
-  const adW = 8.4;
-  const adH = 26.0;
-  const adZ = z + d * 0.5 + 0.055;
-  const adY = h * 0.55;
+  // Window strips so the tower reads as a real building rather than a flat sign post.
+  const windowMat = new THREE.MeshBasicMaterial({ color: 0x78d8ff, transparent: true, opacity: 0.52, side: THREE.DoubleSide });
+  for (let i = 0; i < 9; i++){
+    const strip = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.74, 0.16), windowMat);
+    strip.position.set(x, 3.2 + i * 2.25, z + d * 0.5 + 0.026);
+    strip.rotation.y = 0;
+    strip.renderOrder = 39;
+    group.add(strip);
+  }
+
+  const adW = 5.75;
+  const adH = 18.8;
+  const adZ = z + d * 0.5 + 0.072;
+  const adY = 18.2;
   const ad = new THREE.Mesh(
     new THREE.PlaneGeometry(adW, adH),
     new THREE.MeshBasicMaterial({
@@ -2066,45 +2075,93 @@ function addAlwaysVisibleEspressoAd(scene, R){
       color: 0xffffff,
       transparent: false,
       side: THREE.DoubleSide,
-      depthWrite: false,
-      depthTest: false
+      depthWrite: true,
+      depthTest: true
     })
   );
-  ad.name = 'SVR_ESPRESSO_WITH_CREAM_ALWAYS_VISIBLE_PLAYER_POV_AD';
+  ad.name = 'SVR_ESPRESSO_WITH_CREAM_ORGANIZED_BUILDING_FACE_AD';
   ad.position.set(x, adY, adZ);
-  ad.renderOrder = 250;
+  ad.renderOrder = 52;
   group.add(ad);
 
-  const frameMat = new THREE.MeshBasicMaterial({
-    color: 0xffcf6a,
-    transparent: true,
-    opacity: 0.96,
-    side: THREE.DoubleSide,
-    depthWrite: false,
-    depthTest: false
-  });
-  const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.55, 0.18), frameMat);
-  frameTop.position.set(x, adY + adH * 0.5 + 0.22, adZ + 0.01);
-  frameTop.renderOrder = 251;
+  const frameMat = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.94, side: THREE.DoubleSide, depthWrite: false, depthTest: true });
+  const frameTop = new THREE.Mesh(new THREE.PlaneGeometry(adW + 0.42, 0.12), frameMat);
+  frameTop.position.set(x, adY + adH * 0.5 + 0.15, adZ + 0.015);
+  frameTop.renderOrder = 53;
   group.add(frameTop);
   const frameBottom = frameTop.clone();
-  frameBottom.position.y = adY - adH * 0.5 - 0.22;
+  frameBottom.position.y = adY - adH * 0.5 - 0.15;
   group.add(frameBottom);
-  const frameLeft = new THREE.Mesh(new THREE.PlaneGeometry(0.18, adH + 0.62), frameMat);
-  frameLeft.position.set(x - adW * 0.5 - 0.22, adY, adZ + 0.01);
-  frameLeft.renderOrder = 251;
+  const frameLeft = new THREE.Mesh(new THREE.PlaneGeometry(0.12, adH + 0.42), frameMat);
+  frameLeft.position.set(x - adW * 0.5 - 0.15, adY, adZ + 0.015);
+  frameLeft.renderOrder = 53;
   group.add(frameLeft);
   const frameRight = frameLeft.clone();
-  frameRight.position.x = x + adW * 0.5 + 0.22;
+  frameRight.position.x = x + adW * 0.5 + 0.15;
   group.add(frameRight);
 
-  const glow = new THREE.PointLight(0xffc15a, 1.85, 54, 1.75);
-  glow.name = 'SVR_PHASE84G_ESPRESSO_AD_GLOW';
-  glow.position.set(x, adY + 1.0, adZ + 2.4);
+  const glow = new THREE.PointLight(0xffc15a, 0.72, 30, 2.0);
+  glow.name = 'SVR_PHASE84Z_ESPRESSO_AD_CONTROLLED_GLOW';
+  glow.position.set(x, adY + 1.0, adZ + 2.0);
   group.add(glow);
 
   scene.add(group);
   return group;
+}
+
+function addEnabledPrivateSceneRoutes(scene){
+  const routeGroup = new THREE.Group();
+  routeGroup.name = 'SVR_PHASE84Z_ENABLED_PRIVATE_SCENE_ROUTE_MARKERS';
+  scene.add(routeGroup);
+
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x05070d, roughness: 0.78, metalness: 0.08, emissive: 0x071229, emissiveIntensity: 0.24 });
+  const borderMat = new THREE.MeshBasicMaterial({ color: 0x66ffe0, transparent: true, opacity: 0.86, side: THREE.DoubleSide });
+  const panelMat = (title, subtitle)=> new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture(title, subtitle), transparent: true, side: THREE.DoubleSide, depthWrite: false });
+
+  function makeRoom(key, title, subtitle, x, z, accent = 0x66ffe0){
+    const g = new THREE.Group();
+    g.name = `SVR_ENABLED_SCENE_${key}`;
+    g.position.set(x, 0, z);
+    routeGroup.add(g);
+
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(14, 0.08, 10), floorMat.clone());
+    floor.position.set(0, 0.04, 0);
+    g.add(floor);
+
+    const ring = new THREE.Mesh(new THREE.RingGeometry(4.6, 4.9, 80), borderMat.clone());
+    ring.material.color.setHex(accent);
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.105;
+    g.add(ring);
+
+    const back = new THREE.Mesh(new THREE.BoxGeometry(12, 5.4, 0.18), new THREE.MeshStandardMaterial({ color: 0x060814, roughness: 0.62, metalness: 0.16, emissive: accent, emissiveIntensity: 0.10 }));
+    back.position.set(0, 2.72, -4.8);
+    g.add(back);
+
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 1.95), panelMat(title, subtitle));
+    sign.position.set(0, 3.1, -4.69);
+    sign.renderOrder = 60;
+    g.add(sign);
+
+    const portal = new THREE.Mesh(new THREE.TorusGeometry(1.15, 0.045, 10, 64), new THREE.MeshBasicMaterial({ color: accent, transparent: true, opacity: 0.88 }));
+    portal.position.set(0, 1.24, -3.76);
+    portal.rotation.x = Math.PI / 2;
+    g.add(portal);
+
+    return {
+      group: g,
+      pos: new THREE.Vector3(x, 0, z + 3.0),
+      look: new THREE.Vector3(x, 1.55, z - 3.9)
+    };
+  }
+
+  return {
+    pgaDrive: makeRoom('PGA_DRIVE', 'PGA DRIVE RANGE', 'PRIVATE TRAINING ROOM', 64, -86, 0x72ff9d),
+    chipPutt: makeRoom('CHIP_PUTT', 'CHIP + PUTT', 'SHORT GAME PRIVATE ROOM', -64, -86, 0x72ff9d),
+    storeRoom: makeRoom('VR_STORE', 'SVR VR STORE', 'PRIVATE STORE PORTAL ROOM', 72, 62, 0xd7a1ff),
+    smokerLounge: makeRoom('SMOKER_LOUNGE', 'SMOKER LOUNGE', 'PRIVATE SOCIAL ROOM', -72, 62, 0xff9a72),
+    scorpionVip: makeRoom('SCORPION_VIP', 'SCORPION PIT VIP', 'PRIVATE POKER ROOM', 0, -118, 0xff4545)
+  };
 }
 
 export async function buildSkylineRoom(scene, { log = console.log } = {}){
@@ -2290,6 +2347,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const reikiHub = await addRikiArea(scene, R, wallHeight, spawnLogoTex, log);
   const scorpionRoom = addScorpionRoom(scene, R, wallHeight);
   const lobbyInfoBoards = addLobbyInfoBoards(scene, R, wallHeight);
+  const privateRoutes = addEnabledPrivateSceneRoutes(scene);
 
   const moonTex = await loadFirstTexture(assetUrls("texture/moon_diffuse.png"), { colorSpace: THREE.SRGBColorSpace });
   const moonBump = await loadFirstTexture(assetUrls("texture/moon_bump.png"));
@@ -2725,7 +2783,12 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       pos: new THREE.Vector3(storeWall.group.position.x * 0.86, 0, storeWall.group.position.z * 0.86),
       look: storeWall.group.position.clone().setY(1.6)
     },
-    scorpion: scorpionRoom ? { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() } : null
+    scorpion: scorpionRoom ? { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() } : null,
+    pgaDrive: privateRoutes.pgaDrive ? { pos: privateRoutes.pgaDrive.pos.clone(), look: privateRoutes.pgaDrive.look.clone() } : null,
+    chipPutt: privateRoutes.chipPutt ? { pos: privateRoutes.chipPutt.pos.clone(), look: privateRoutes.chipPutt.look.clone() } : null,
+    storeRoom: privateRoutes.storeRoom ? { pos: privateRoutes.storeRoom.pos.clone(), look: privateRoutes.storeRoom.look.clone() } : null,
+    smokerLounge: privateRoutes.smokerLounge ? { pos: privateRoutes.smokerLounge.pos.clone(), look: privateRoutes.smokerLounge.look.clone() } : null,
+    scorpionVip: privateRoutes.scorpionVip ? { pos: privateRoutes.scorpionVip.pos.clone(), look: privateRoutes.scorpionVip.look.clone() } : null
   };
 
   return {

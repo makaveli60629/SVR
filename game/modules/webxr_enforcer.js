@@ -1,10 +1,10 @@
-// PHASE-84Y-WEBXR-GODMODE-ENFORCER-LOCK
+// PHASE-84Z-AUDIT-SCENE-ENABLE-SKYLINE-LOCK
 // Runtime-safe guardrails for SVR Poker WebXR builds.
 // This module does not rewrite the scene. It records the architecture contract
 // and runs a lightweight audit so future updates do not accidentally flatten
 // the lobby, remove the moon/sky locks, or break scene routing.
 
-export const SVR_WEBXR_PHASE = "PHASE-84Y-WEBXR-GODMODE-ENFORCER-LOCK";
+export const SVR_WEBXR_PHASE = "PHASE-84Z-AUDIT-SCENE-ENABLE-SKYLINE-LOCK";
 
 export const SVR_WEBXR_CONTRACT = Object.freeze({
   project: "SVR Poker / ScarlettVR Poker",
@@ -33,6 +33,12 @@ export const SVR_WEBXR_CONTRACT = Object.freeze({
     "Legend",
     "Sponsor",
     "Scorpion"
+  ]),
+  enabledOptionalScenes: Object.freeze([
+    "pgaDrive",
+    "chipPutt",
+    "storeRoom",
+    "smokerLounge"
   ]),
   protectedSceneItems: Object.freeze([
     "permanent moon / mars sky presence",

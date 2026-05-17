@@ -203,6 +203,10 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit7") gotoScene("sponsor");
   if (e.code === "Digit8") gotoScene("scorpion");
   if (e.code === "Digit9") gotoScene("reikiRoom");
+  if (e.code === "Digit0") gotoScene("pgaDrive");
+  if (e.code === "KeyK") gotoScene("chipPutt");
+  if (e.code === "KeyO") gotoScene("storeRoom");
+  if (e.code === "KeyB") gotoScene("smokerLounge");
 });
 
 const watch = createWristWatch({
@@ -232,7 +236,11 @@ const watch = createWristWatch({
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom")
+    goReikiRoom: ()=>gotoScene("reikiRoom"),
+    goPgaDrive: ()=>gotoScene("pgaDrive"),
+    goChipPutt: ()=>gotoScene("chipPutt"),
+    goStoreRoom: ()=>gotoScene("storeRoom"),
+    goSmokerLounge: ()=>gotoScene("smokerLounge")
   }
 });
 
