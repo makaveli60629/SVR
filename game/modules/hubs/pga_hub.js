@@ -159,11 +159,11 @@ function buildReserveTexture(){
     ctx.stroke();
     ctx.fillStyle = "#ff7784";
     ctx.textAlign = "center";
-    ctx.font = "700 64px Arial";
-    ctx.fillText("RESERVED FOR", w / 2, 96);
+    ctx.font = "700 46px Arial";
+    ctx.fillText("RESERVED", w / 2, 82);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "700 74px Arial";
-    ctx.fillText("JUAN ESPEJO", w / 2, 184);
+    ctx.font = "700 52px Arial";
+    ctx.fillText("JUAN ESPEJO", w / 2, 158);
   }, 900, 240);
 }
 
@@ -260,7 +260,7 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
       new THREE.PlaneGeometry(6.35, 5.05),
       new THREE.MeshBasicMaterial({ map: buildProfileTexture(), side: THREE.DoubleSide, transparent: true })
     );
-    infoPanel.position.set(-2.28, 3.12, 0.24);
+    infoPanel.position.set(-2.05, 3.12, 0.26);
     group.add(infoPanel);
 
     const portraitBack = new THREE.Mesh(
@@ -281,7 +281,7 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
       new THREE.CircleGeometry(0.62, 64),
       new THREE.MeshBasicMaterial({ map: buildBadgeTexture(), transparent: true, side: THREE.DoubleSide })
     );
-    badge.position.set(5.02, 5.14, 0.33);
+    badge.position.set(5.05, 4.55, 0.36);
     group.add(badge);
 
     const badgeFrame = new THREE.Mesh(
@@ -292,10 +292,10 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     group.add(badgeFrame);
 
     const reservePlaque = new THREE.Mesh(
-      new THREE.PlaneGeometry(3.55, 0.78),
+      new THREE.PlaneGeometry(4.25, 0.82),
       new THREE.MeshBasicMaterial({ map: buildReserveTexture(), side: THREE.DoubleSide, transparent: true })
     );
-    reservePlaque.position.set(4.18, 1.22, 0.34);
+    reservePlaque.position.set(4.12, 1.18, 0.38);
     group.add(reservePlaque);
 
     const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.82), softGlass);
