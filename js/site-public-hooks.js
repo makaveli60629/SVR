@@ -1,6 +1,7 @@
 (() => {
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages';
+  const DEFAULT_ADMIN_STATE = 'offline';
 
   function getAdminState() {
     const qs = new URLSearchParams(window.location.search);
@@ -9,8 +10,8 @@
       localStorage.setItem(ADMIN_KEY, override);
       return override;
     }
-    localStorage.setItem(ADMIN_KEY, 'online');
-    return 'online';
+    localStorage.setItem(ADMIN_KEY, DEFAULT_ADMIN_STATE);
+    return DEFAULT_ADMIN_STATE;
   }
 
   function paintAdminState() {
