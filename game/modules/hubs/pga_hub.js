@@ -257,24 +257,24 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     group.add(logoPanel);
 
     const infoPanel = new THREE.Mesh(
-      new THREE.PlaneGeometry(6.35, 5.05),
+      new THREE.PlaneGeometry(6.75, 5.15),
       new THREE.MeshBasicMaterial({ map: buildProfileTexture(), side: THREE.DoubleSide, transparent: true })
     );
-    infoPanel.position.set(-2.05, 3.12, 0.26);
+    infoPanel.position.set(-2.00, 3.15, 0.34);
     group.add(infoPanel);
 
     const portraitBack = new THREE.Mesh(
       new THREE.PlaneGeometry(2.26, 3.06),
       new THREE.MeshBasicMaterial({ color: 0x0f0709, side: THREE.DoubleSide })
     );
-    portraitBack.position.set(4.16, 3.12, 0.26);
+    portraitBack.position.set(4.08, 3.18, 0.38);
     group.add(portraitBack);
 
     const portrait = new THREE.Mesh(
       new THREE.PlaneGeometry(2.04, 2.84),
       new THREE.MeshBasicMaterial({ map: buildPortraitTexture(), transparent: true, side: THREE.DoubleSide })
     );
-    portrait.position.set(4.16, 3.12, 0.31);
+    portrait.position.set(4.08, 3.18, 0.44);
     group.add(portrait);
 
     const badge = new THREE.Mesh(
@@ -298,7 +298,7 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     reservePlaque.position.set(4.12, 1.18, 0.38);
     group.add(reservePlaque);
 
-    const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.82), softGlass);
+    const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(2.65, 3.15), softGlass);
     frontGlassL.position.set(-2.62, 3.18, 1.14);
     group.add(frontGlassL);
     const frontGlassR = frontGlassL.clone();
