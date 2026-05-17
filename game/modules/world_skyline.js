@@ -2545,6 +2545,205 @@ function addPhase84PMasterCyberSkyline(scene, R, wallHeight = 8){
   return group;
 }
 
+
+function addPhase84QRealCitySkyline(scene, R, wallHeight = 8){
+  const group = new THREE.Group();
+  group.name = 'SVR_PHASE84Q_REAL_CITY_SKYLINE_SILHOUETTE_LOCK';
+
+  const winPurple = createWindowGridTexture('#b986ff', '#49eaff');
+  const winCyan = createWindowGridTexture('#74eaff', '#b986ff');
+  [winPurple, winCyan].forEach((tex)=>{ tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(1, 2); tex.anisotropy = 8; });
+
+  const mats = {
+    bodyA: new THREE.MeshStandardMaterial({ color: 0x050812, roughness: 0.70, metalness: 0.48, emissive: 0x070d22, emissiveIntensity: 0.20 }),
+    bodyB: new THREE.MeshStandardMaterial({ color: 0x080b15, roughness: 0.68, metalness: 0.52, emissive: 0x100820, emissiveIntensity: 0.22 }),
+    bodyC: new THREE.MeshStandardMaterial({ color: 0x0a101a, roughness: 0.64, metalness: 0.46, emissive: 0x05151f, emissiveIntensity: 0.18 }),
+    pillar: new THREE.MeshStandardMaterial({ color: 0x02040a, roughness: 0.56, metalness: 0.70, emissive: 0x060313, emissiveIntensity: 0.34 }),
+    purple: new THREE.MeshBasicMaterial({ color: 0xb15cff, transparent: true, opacity: 0.88, depthWrite: false, side: THREE.DoubleSide }),
+    cyan: new THREE.MeshBasicMaterial({ color: 0x48eaff, transparent: true, opacity: 0.86, depthWrite: false, side: THREE.DoubleSide }),
+    roof: new THREE.MeshBasicMaterial({ color: 0x25114c, transparent: true, opacity: 0.80, depthWrite: false, side: THREE.DoubleSide })
+  };
+
+  function basis(angle){
+    const outward = new THREE.Vector3(Math.cos(angle),0,Math.sin(angle));
+    const inward = outward.clone().multiplyScalar(-1);
+    const across = new THREE.Vector3(-Math.sin(angle),0,Math.cos(angle));
+    return { outward, inward, across };
+  }
+  function pos(angle, radius, lateral = 0){
+    const { across } = basis(angle);
+    return new THREE.Vector3(Math.cos(angle)*radius, 0, Math.sin(angle)*radius).add(across.multiplyScalar(lateral));
+  }
+  function face(obj){ obj.lookAt(new THREE.Vector3(0, obj.position.y, 0)); }
+  function addFacePlane(parent, angle, center, width, height, depth, tex, opacity = 0.66){
+    const { inward } = basis(angle);
+    const plane = new THREE.Mesh(
+      new THREE.PlaneGeometry(width, height),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false })
+    );
+    plane.position.copy(center).add(inward.clone().multiplyScalar(depth * 0.5 + 0.055));
+    face(plane);
+    plane.renderOrder = 58;
+    plane.frustumCulled = true;
+    parent.add(plane);
+    return plane;
+  }
+  function addRoofTrim(parent, angle, center, width, height, depth, mat){
+    const { inward } = basis(angle);
+    const yTop = center.y + height * 0.5 + 0.16;
+    const yBase = center.y - height * 0.5 + 0.20;
+    [yTop, yBase].forEach((yy, idx)=>{
+      const t = new THREE.Mesh(new THREE.PlaneGeometry(width + 0.7, idx ? 0.18 : 0.24), idx ? mats.purple : mat);
+      t.position.copy(center).setY(yy).add(inward.clone().multiplyScalar(depth * 0.5 + 0.10));
+      face(t);
+      t.renderOrder = 72;
+      t.frustumCulled = true;
+      parent.add(t);
+    });
+  }
+  function addTower({ name, angle, radius, lateral, width, baseH, upperH, depth, mat, windowTex, spire = false, setback = 0.72 }){
+    const root = new THREE.Group();
+    root.name = name;
+    const baseCenter = pos(angle, radius, lateral).setY(wallHeight + 2.0 + baseH * 0.5);
+    const base = new THREE.Mesh(new THREE.BoxGeometry(width, baseH, depth), mat);
+    base.name = `${name}_PODIUM_BASE`;
+    base.position.copy(baseCenter);
+    face(base);
+    base.frustumCulled = true;
+    root.add(base);
+    addFacePlane(root, angle, baseCenter, width * 0.88, baseH * 0.78, depth, windowTex, 0.54);
+    addRoofTrim(root, angle, baseCenter, width, baseH, depth, mats.cyan);
+
+    const upperW = Math.max(3.6, width * setback);
+    const upperD = Math.max(2.6, depth * 0.80);
+    const upperCenter = pos(angle, radius + 0.8, lateral).setY(wallHeight + 2.0 + baseH + upperH * 0.5);
+    const upper = new THREE.Mesh(new THREE.BoxGeometry(upperW, upperH, upperD), mat);
+    upper.name = `${name}_SETBACK_UPPER_TOWER`;
+    upper.position.copy(upperCenter);
+    face(upper);
+    upper.frustumCulled = true;
+    root.add(upper);
+    addFacePlane(root, angle, upperCenter, upperW * 0.86, upperH * 0.86, upperD, windowTex, 0.64);
+    addRoofTrim(root, angle, upperCenter, upperW, upperH, upperD, mats.purple);
+
+    const { across, inward } = basis(angle);
+    [-1, 1].forEach((side)=>{
+      const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.38, upperH + baseH * 0.35, 0.42), mats.pillar);
+      pillar.name = `${name}_FRONT_CORNER_PILLAR_${side < 0 ? 'L' : 'R'}`;
+      pillar.position.copy(upperCenter).add(across.clone().multiplyScalar(side * (upperW * 0.5 + 0.10))).add(inward.clone().multiplyScalar(upperD * 0.5 + 0.12));
+      face(pillar);
+      pillar.frustumCulled = true;
+      root.add(pillar);
+    });
+
+    if (spire){
+      const antenna = new THREE.Mesh(new THREE.BoxGeometry(0.22, 9.0, 0.22), mats.cyan);
+      antenna.name = `${name}_ROOFTOP_SPIRE`;
+      antenna.position.copy(upperCenter).setY(upperCenter.y + upperH * 0.5 + 4.6);
+      face(antenna);
+      antenna.renderOrder = 75;
+      root.add(antenna);
+    }
+    group.add(root);
+    return root;
+  }
+
+  const sideAngles = [
+    { name:'NORTH', angle:-Math.PI*0.5 },
+    { name:'EAST', angle:0 },
+    { name:'SOUTH', angle:Math.PI*0.5 },
+    { name:'WEST', angle:Math.PI }
+  ];
+  const frontPattern = [
+    [-70, 9, 22, 42, 4.2, 0.70], [-58, 13, 18, 28, 5.0, 0.78], [-42, 10, 26, 56, 4.0, 0.66],
+    [-28, 16, 20, 36, 5.2, 0.72], [-9, 12, 24, 66, 4.1, 0.64], [8, 18, 19, 32, 5.4, 0.75],
+    [29, 11, 28, 60, 4.1, 0.68], [45, 15, 20, 38, 5.0, 0.70], [63, 9, 24, 50, 3.8, 0.64], [75, 12, 18, 30, 4.8, 0.76]
+  ];
+  const rearPattern = [
+    [-76, 7, 32, 78, 3.1, 0.62], [-63, 8, 28, 60, 3.4, 0.72], [-50, 6, 36, 92, 2.9, 0.60],
+    [-36, 9, 28, 74, 3.5, 0.70], [-20, 7, 42, 98, 3.0, 0.58], [0, 10, 30, 68, 3.8, 0.66],
+    [20, 7, 40, 96, 3.0, 0.58], [36, 9, 30, 78, 3.6, 0.70], [51, 6, 34, 90, 2.9, 0.60], [65, 8, 26, 58, 3.3, 0.72], [78, 7, 30, 76, 3.0, 0.62]
+  ];
+
+  sideAngles.forEach(({name, angle}, sideIndex)=>{
+    frontPattern.forEach(([lat,w,bh,uh,d,setback],i)=>{
+      addTower({
+        name:`SVR_84Q_${name}_CONTINUOUS_FRONT_SKYLINE_${String(i).padStart(2,'0')}`,
+        angle,
+        radius:R + 54 + (i % 2) * 3,
+        lateral:lat,
+        width:w,
+        baseH:bh,
+        upperH:uh,
+        depth:d,
+        mat:[mats.bodyA,mats.bodyB,mats.bodyC][(i+sideIndex)%3],
+        windowTex:(i+sideIndex)%2 ? winPurple : winCyan,
+        spire:i % 4 === 0,
+        setback
+      });
+    });
+    rearPattern.forEach(([lat,w,bh,uh,d,setback],i)=>{
+      addTower({
+        name:`SVR_84Q_${name}_DEEP_TALL_SKYLINE_${String(i).padStart(2,'0')}`,
+        angle,
+        radius:R + 92 + (i % 3) * 7,
+        lateral:lat,
+        width:w,
+        baseH:bh,
+        upperH:uh,
+        depth:d,
+        mat:[mats.bodyB,mats.bodyC,mats.bodyA][(i+sideIndex)%3],
+        windowTex:(i+sideIndex)%2 ? winCyan : winPurple,
+        spire:i % 3 === 0,
+        setback
+      });
+    });
+
+    // continuous lower skyline belt so the city reads as one skyline instead of isolated towers
+    const belt = new THREE.Mesh(
+      new THREE.BoxGeometry(168, 8.0, 3.2),
+      new THREE.MeshStandardMaterial({ color: 0x050713, roughness: 0.72, metalness: 0.42, emissive: 0x08051c, emissiveIntensity: 0.24 })
+    );
+    belt.name = `SVR_84Q_${name}_CONTINUOUS_LOW_CITY_BELT`;
+    belt.position.copy(pos(angle, R + 50, 0)).setY(wallHeight + 6.0);
+    face(belt);
+    belt.frustumCulled = true;
+    group.add(belt);
+    addFacePlane(group, angle, belt.position, 154, 5.4, 3.2, sideIndex%2 ? winPurple : winCyan, 0.42);
+    addRoofTrim(group, angle, belt.position, 168, 8.0, 3.2, mats.cyan);
+  });
+
+  const cornerAngles = [
+    { name:'NE', angle:-Math.PI*0.25 }, { name:'SE', angle:Math.PI*0.25 },
+    { name:'SW', angle:Math.PI*0.75 }, { name:'NW', angle:-Math.PI*0.75 }
+  ];
+  cornerAngles.forEach(({name, angle}, cidx)=>{
+    [-44,-24,-8,10,28,46].forEach((lat,i)=>{
+      addTower({
+        name:`SVR_84Q_${name}_CORNER_SKYLINE_BRIDGE_${i}`,
+        angle,
+        radius:R + 72 + (i%2)*12,
+        lateral:lat,
+        width:8 + (i%3)*3,
+        baseH:18 + (i%2)*8,
+        upperH:42 + ((i*13)%45),
+        depth:3.4 + (i%2)*0.8,
+        mat:[mats.bodyA,mats.bodyB,mats.bodyC][(i+cidx)%3],
+        windowTex:(i+cidx)%2 ? winPurple : winCyan,
+        spire:i===1 || i===4,
+        setback:0.64 + (i%3)*0.05
+      });
+    });
+  });
+
+  const lowSkyGlow = new THREE.PointLight(0x5540ff, 0.75, 260, 2.4);
+  lowSkyGlow.name = 'SVR_84Q_REAL_SKYLINE_LOW_PURPLE_REFLECTION_GLOW';
+  lowSkyGlow.position.set(0, wallHeight + 34, -(R + 58));
+  group.add(lowSkyGlow);
+  scene.add(group);
+  return group;
+}
+
 export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const R = CONFIG.ROOM_RADIUS;
   const H = CONFIG.WALL_HEIGHT;
@@ -2641,6 +2840,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const lobbySprites = buildLobbySprites(scene, R, wallHeight);
   const espressoAdGroup = addAlwaysVisibleEspressoAd(scene, R, wallHeight);
   const phase84PMasterSkyline = addPhase84PMasterCyberSkyline(scene, R, wallHeight);
+  const phase84QRealCitySkyline = addPhase84QRealCitySkyline(scene, R, wallHeight);
   const spawnLogoTex = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
   const wallPanels = [];
   const wallPanelUpdaters = [];

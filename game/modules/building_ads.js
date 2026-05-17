@@ -1,8 +1,8 @@
-// PHASE-84P-CYBER-SKYLINE-MOON-MARS-MANIFEST-LOCK
+// PHASE-84Q-REAL-CITY-SKYLINE-SILHOUETTE-LOCK
 // Runtime player-POV ad grid lock lives in world_skyline.js buildOuterCity().
 // This registry documents modular building ad slots for future swaps.
 export const BUILDING_AD_GRID_LOCK = {
-  build: "PHASE-84P-CYBER-SKYLINE-MOON-MARS-MANIFEST-LOCK",
+  build: "PHASE-84Q-REAL-CITY-SKYLINE-SILHOUETTE-LOCK",
   siteTouched: false,
   approvalLock: "No UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED content until explicit approval.",
   slots: [
