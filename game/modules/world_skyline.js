@@ -2074,28 +2074,13 @@ function sanitizeTableSurface(table, keepMesh = null){
 
 function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
   const group = new THREE.Group();
-  group.name = 'SVR_PHASE84O_HIGH_PLANETS_FILLED_SKYLINE_LOCK';
+  group.name = 'SVR_PHASE84R_NORMAL_SKYLINE_FOUR_AD_BUILDINGS_LOCK';
 
-  // Phase 84O rule:
-  // - Four cardinal wall ad districts remain behind the walls and do not touch storefronts.
-  // - Tier 1 and Tier 2 are larger, physically separated billboard rows.
-  // - Tier 3 green WIN CASH / SVR LOGO banners move onto buildings between the four main walls.
-  // - Normal filler buildings sit behind all ad buildings, never in front of them.
-  // - Moon and Mars are larger and much higher above the full skyline.
-  // - Extra varied normal buildings fill the gaps between the ad districts, behind the ad row.
-  const wallSlots = [
-    { name: 'NORTH', angle: -Math.PI * 0.5 },
-    { name: 'SOUTH', angle:  Math.PI * 0.5 },
-    { name: 'EAST',  angle:  0 },
-    { name: 'WEST',  angle:  Math.PI }
-  ];
-  const cornerSlots = [
-    { name: 'NORTHEAST', angle: -Math.PI * 0.25 },
-    { name: 'SOUTHEAST', angle:  Math.PI * 0.25 },
-    { name: 'SOUTHWEST', angle:  Math.PI * 0.75 },
-    { name: 'NORTHWEST', angle: -Math.PI * 0.75 }
-  ];
-
+  // Phase 84R rule: restore a believable, calmer city background.
+  // - No ad-wall overload.
+  // - Only four dedicated ad buildings, one per cardinal side.
+  // - Normal buildings sit farther back and lower, reading as a skyline silhouette.
+  // - Storefronts, walkways, and lobby view remain unobstructed.
   const allInTex = createAllInTierTexture();
   const winCashTex = createWinCashTierTexture();
   [espressoTex, allInTex, winCashTex].forEach((tex)=>{
@@ -2105,284 +2090,137 @@ function addAlwaysVisibleEspressoAd(scene, R, wallHeight = 8){
     tex.needsUpdate = true;
   });
 
-  const premiumTowerMat = new THREE.MeshStandardMaterial({
-    color: 0x06142c,
-    roughness: 0.45,
-    metalness: 0.38,
-    emissive: 0x10346f,
-    emissiveIntensity: 0.76
-  });
-  const tier2TowerMat = new THREE.MeshStandardMaterial({
-    color: 0x07192f,
-    roughness: 0.48,
-    metalness: 0.32,
-    emissive: 0x0b3d70,
-    emissiveIntensity: 0.66
-  });
-  const tier3TowerMat = new THREE.MeshStandardMaterial({
-    color: 0x04150c,
-    roughness: 0.52,
-    metalness: 0.26,
-    emissive: 0x0c5c22,
-    emissiveIntensity: 0.52
-  });
-  const fillerMat = new THREE.MeshStandardMaterial({
-    color: 0x040914,
-    roughness: 0.66,
+  const adTowerMat = new THREE.MeshStandardMaterial({
+    color: 0x071325,
+    roughness: 0.62,
     metalness: 0.22,
-    emissive: 0x061124,
-    emissiveIntensity: 0.38
+    emissive: 0x071c36,
+    emissiveIntensity: 0.32
   });
-  const faceMat = new THREE.MeshStandardMaterial({
-    color: 0x0a2a64,
-    roughness: 0.38,
-    metalness: 0.25,
-    emissive: 0x0d5cab,
-    emissiveIntensity: 0.48
+  const cityMatA = new THREE.MeshStandardMaterial({
+    color: 0x03070f,
+    roughness: 0.74,
+    metalness: 0.12,
+    emissive: 0x030b17,
+    emissiveIntensity: 0.18
   });
-  const greenFaceMat = new THREE.MeshStandardMaterial({
-    color: 0x083116,
-    roughness: 0.42,
-    metalness: 0.20,
-    emissive: 0x0b5d26,
-    emissiveIntensity: 0.45
+  const cityMatB = new THREE.MeshStandardMaterial({
+    color: 0x050b16,
+    roughness: 0.70,
+    metalness: 0.16,
+    emissive: 0x06101f,
+    emissiveIntensity: 0.20
   });
-  const goldMat = new THREE.MeshBasicMaterial({ color: 0xffcf6a, transparent: true, opacity: 0.98, side: THREE.DoubleSide, depthWrite: false });
-  const cyanMat = new THREE.MeshBasicMaterial({ color: 0x66dfff, transparent: true, opacity: 0.86, side: THREE.DoubleSide, depthWrite: false });
-  const greenMat = new THREE.MeshBasicMaterial({ color: 0x39ff72, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
+  const windowMat = new THREE.MeshBasicMaterial({ color: 0x4da9ff, transparent: true, opacity: 0.26, side: THREE.DoubleSide, depthWrite: false });
+  const trimGold = new THREE.MeshBasicMaterial({ color: 0xffcc6a, transparent: true, opacity: 0.82, side: THREE.DoubleSide, depthWrite: false });
+  const trimCyan = new THREE.MeshBasicMaterial({ color: 0x66dfff, transparent: true, opacity: 0.68, side: THREE.DoubleSide, depthWrite: false });
+  const trimGreen = new THREE.MeshBasicMaterial({ color: 0x3cff77, transparent: true, opacity: 0.72, side: THREE.DoubleSide, depthWrite: false });
 
-  const premiumRadius = R + 18.5;
-  const tier2Radius = R + 22.0;
-  const tier3Radius = R + 24.5;
-  const fillerRadius = R + 54.0;
-  const farFillerRadius = R + 74.0;
-
-  function basisFor(angle){
-    const outward = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle));
+  function basis(angle){
+    const outward = new THREE.Vector3(Math.cos(angle),0,Math.sin(angle));
     const inward = outward.clone().multiplyScalar(-1);
-    const across = new THREE.Vector3(-Math.sin(angle), 0, Math.cos(angle));
+    const across = new THREE.Vector3(-Math.sin(angle),0,Math.cos(angle));
     return { outward, inward, across };
   }
-
-  function faceObject(obj, centerY = null){
-    obj.lookAt(new THREE.Vector3(0, centerY ?? obj.position.y, 0));
+  function face(obj){ obj.lookAt(new THREE.Vector3(0, obj.position.y, 0)); }
+  function pos(angle, radius, lateral=0){
+    const { across } = basis(angle);
+    return new THREE.Vector3(Math.cos(angle)*radius, 0, Math.sin(angle)*radius).add(across.multiplyScalar(lateral));
   }
-
-  function worldPos(angle, radius, lateral = 0){
-    const { across } = basisFor(angle);
-    return new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius)
-      .add(across.clone().multiplyScalar(lateral));
-  }
-
-  function addFrame(parent, center, angle, w, h, mat, order){
-    const { across } = basisFor(angle);
-    const up = new THREE.Vector3(0, 1, 0);
-    const pieces = [
-      { geo: new THREE.PlaneGeometry(w + 0.95, 0.24), pos: up.clone().multiplyScalar(h * 0.5 + 0.32) },
-      { geo: new THREE.PlaneGeometry(w + 0.95, 0.24), pos: up.clone().multiplyScalar(-h * 0.5 - 0.32) },
-      { geo: new THREE.PlaneGeometry(0.24, h + 0.86), pos: across.clone().multiplyScalar(-w * 0.5 - 0.36) },
-      { geo: new THREE.PlaneGeometry(0.24, h + 0.86), pos: across.clone().multiplyScalar(w * 0.5 + 0.36) }
+  function addFrame(center, angle, w, h, mat, order=120){
+    const { across } = basis(angle);
+    const parts = [
+      [w+0.50,0.18,0,h*0.5+0.22], [w+0.50,0.18,0,-h*0.5-0.22],
+      [0.18,h+0.50,-w*0.5-0.22,0], [0.18,h+0.50,w*0.5+0.22,0]
     ];
-    pieces.forEach(({geo, pos})=>{
-      const m = new THREE.Mesh(geo, mat);
-      m.position.copy(center).add(pos);
-      faceObject(m);
-      m.renderOrder = order;
-      parent.add(m);
-    });
+    for(const [pw,ph,lx,ly] of parts){
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(pw,ph), mat);
+      m.position.copy(center).add(across.clone().multiplyScalar(lx)).add(new THREE.Vector3(0,ly,0));
+      face(m); m.renderOrder=order; m.frustumCulled=true; group.add(m);
+    }
   }
-
-  function addAdPlane({ name, angle, radius, lateral = 0, y, w, h, tex, frameMat, order, depth = 4.2, liftForward = 0.20 }){
-    const { inward } = basisFor(angle);
-    const base = worldPos(angle, radius, lateral).add(inward.clone().multiplyScalar(depth * 0.5 + liftForward));
-    const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(w, h),
-      new THREE.MeshBasicMaterial({ map: tex, color: 0xffffff, transparent: false, side: THREE.DoubleSide, depthWrite: false, depthTest: true })
-    );
-    plane.name = name;
-    plane.position.copy(base).setY(y);
-    faceObject(plane);
-    plane.renderOrder = order;
-    group.add(plane);
-    addFrame(group, plane.position, angle, w, h, frameMat, order + 1);
-    return plane;
-  }
-
-  function addBuilding({ name, angle, radius, width, height, depth, y, mat = premiumTowerMat, face = true, lateral = 0, variant = 'box', faceMaterial = faceMat }){
-    const { inward } = basisFor(angle);
-    const center = worldPos(angle, radius, lateral);
-    const geo = variant === 'round'
-      ? new THREE.CylinderGeometry(width * 0.45, width * 0.56, height, 14)
-      : new THREE.BoxGeometry(width, height, depth);
+  function addBuilding(name, angle, radius, lateral, width, height, depth, baseY, mat, { windows=true, trim=false, round=false }={}){
+    const c = pos(angle, radius, lateral);
+    const geo = round ? new THREE.CylinderGeometry(width*0.45,width*0.55,height,12) : new THREE.BoxGeometry(width,height,depth);
     const b = new THREE.Mesh(geo, mat);
     b.name = name;
-    b.position.set(center.x, y ?? (wallHeight + height * 0.5 + 2.0), center.z);
-    faceObject(b);
+    b.position.set(c.x, baseY + height*0.5, c.z);
+    face(b);
     b.castShadow = false;
     b.receiveShadow = false;
-    b.renderOrder = 20;
+    b.frustumCulled = true;
     group.add(b);
-    if (face){
-      const f = new THREE.Mesh(new THREE.PlaneGeometry(width * 0.88, height * 0.88), faceMaterial);
-      f.name = `${name}_VISIBLE_FACE`;
-      f.position.copy(b.position).add(inward.clone().multiplyScalar(depth * 0.5 + 0.04));
-      faceObject(f);
-      f.renderOrder = 21;
-      group.add(f);
+    const { inward } = basis(angle);
+    if (windows && !round){
+      const rows = Math.max(3, Math.floor(height / 8));
+      for (let i=0; i<rows; i++){
+        const pane = new THREE.Mesh(new THREE.PlaneGeometry(width*0.72, 0.22), windowMat);
+        pane.position.copy(b.position)
+          .add(inward.clone().multiplyScalar(depth*0.5+0.035))
+          .setY(baseY + 4 + i*(height-7)/Math.max(1, rows-1));
+        face(pane); pane.renderOrder=25; pane.frustumCulled=true; group.add(pane);
+      }
+    }
+    if (trim){
+      [baseY + 0.25, baseY + height + 0.18].forEach((y, idx)=>{
+        const t = new THREE.Mesh(new THREE.PlaneGeometry(width + 0.7, 0.16), idx ? trimCyan : trimGold);
+        t.position.copy(pos(angle,radius,lateral)).setY(y).add(inward.clone().multiplyScalar(depth*0.5+0.06));
+        face(t); t.renderOrder=85; t.frustumCulled=true; group.add(t);
+      });
     }
     return b;
   }
+  function addAd(name, angle, radius, lateral, y, w, h, tex, frameMat, order=140){
+    const { inward } = basis(angle);
+    const p = pos(angle, radius, lateral).setY(y).add(inward.clone().multiplyScalar(2.65));
+    const ad = new THREE.Mesh(new THREE.PlaneGeometry(w,h), new THREE.MeshBasicMaterial({ map: tex, color: 0xffffff, side: THREE.DoubleSide, depthWrite:false, depthTest:true }));
+    ad.name = name;
+    ad.position.copy(p);
+    face(ad);
+    ad.renderOrder = order;
+    ad.frustumCulled = true;
+    group.add(ad);
+    addFrame(p, angle, w, h, frameMat, order+1);
+    return ad;
+  }
 
-  wallSlots.forEach((slot)=>{
-    const { angle, name } = slot;
-    const { inward } = basisFor(angle);
+  const adSlots = [
+    { name:'NORTH', angle:-Math.PI*0.5, tex:espressoTex, label:'ESPRESSO', w:14.5, h:25.5, y:wallHeight+38, frame:trimGold },
+    { name:'SOUTH', angle: Math.PI*0.5, tex:allInTex, label:'ALL_IN', w:18.0, h:8.6, y:wallHeight+29, frame:trimCyan },
+    { name:'EAST', angle:0, tex:winCashTex, label:'WIN_CASH', w:17.0, h:7.2, y:wallHeight+26, frame:trimGreen },
+    { name:'WEST', angle:Math.PI, tex:winCashTex, label:'SVR_WIN_CASH', w:17.0, h:7.2, y:wallHeight+26, frame:trimGreen }
+  ];
 
-    // Tier 1: separated premium tower. Wider and taller than prior phase.
-    addBuilding({
-      name: `SVR_PHASE84O_${name}_TIER1_SEPARATE_WIDE_PREMIUM_ESPRESSO_TOWER`,
-      angle,
-      radius: premiumRadius,
-      width: 30.0,
-      height: 94.0,
-      depth: 4.4,
-      y: wallHeight + 94.0 * 0.5 + 8.0,
-      mat: premiumTowerMat
-    });
-    addAdPlane({
-      name: `SVR_TIER1_ESPRESSO_WITH_CREAM_${name}_SEPARATE_WIDE_PREMIUM_AD`,
-      angle,
-      radius: premiumRadius,
-      y: wallHeight + 67.0,
-      w: 21.0,
-      h: 42.0,
-      tex: espressoTex,
-      frameMat: goldMat,
-      order: 130,
-      depth: 4.4
-    });
-
-    // Tier 2: ALL IN banners are now physically separated from Tier 1 on two side buildings.
-    [-1, 1].forEach((side)=>{
-      const sideName = side < 0 ? 'LEFT' : 'RIGHT';
-      addBuilding({
-        name: `SVR_PHASE84O_${name}_TIER2_${sideName}_SEPARATE_ALL_IN_BUILDING`,
-        angle,
-        radius: tier2Radius,
-        lateral: side * 25.5,
-        width: 19.5,
-        height: 53.0,
-        depth: 4.0,
-        y: wallHeight + 53.0 * 0.5 + 7.0,
-        mat: tier2TowerMat
-      });
-      addAdPlane({
-        name: `SVR_TIER2_ALL_IN_${name}_${sideName}_SEPARATE_LARGE_BANNER`,
-        angle,
-        radius: tier2Radius,
-        lateral: side * 25.5,
-        y: wallHeight + 40.5,
-        w: 18.0,
-        h: 8.4,
-        tex: allInTex,
-        frameMat: cyanMat,
-        order: 128,
-        depth: 4.0
-      });
-    });
-
-    // Normal buildings stay behind the ad row and never block the Tier 1/2 views.
-    addBuilding({ name: `SVR_PHASE84O_${name}_BACK_LEFT_NORMAL_TOWER`, angle, radius: fillerRadius, width: 9.5, height: 58, depth: 3.4, lateral: -15.0, mat: fillerMat });
-    addBuilding({ name: `SVR_PHASE84O_${name}_BACK_RIGHT_NORMAL_TOWER`, angle, radius: fillerRadius, width: 10.0, height: 62, depth: 3.5, lateral: 15.0, mat: fillerMat, variant: 'round' });
-    addBuilding({ name: `SVR_PHASE84O_${name}_FAR_LEFT_NORMAL_TOWER`, angle, radius: farFillerRadius, width: 8.0, height: 75, depth: 3.2, lateral: -37.0, mat: fillerMat });
-    addBuilding({ name: `SVR_PHASE84O_${name}_FAR_RIGHT_NORMAL_TOWER`, angle, radius: farFillerRadius, width: 8.5, height: 70, depth: 3.2, lateral: 37.0, mat: fillerMat });
-
-    // Phase 84O: extra varied normal skyline filler behind the ad district.
-    [
-      { label: 'FILLER_LOW_WIDE_CENTER', radius: fillerRadius + 10.0, lateral: 0.0, width: 18.0, height: 38, depth: 4.8, variant: 'box' },
-      { label: 'FILLER_SLIM_LEFT_MID', radius: farFillerRadius + 14.0, lateral: -56.0, width: 6.2, height: 86, depth: 3.0, variant: 'box' },
-      { label: 'FILLER_SLIM_RIGHT_MID', radius: farFillerRadius + 14.0, lateral: 56.0, width: 6.8, height: 82, depth: 3.0, variant: 'round' },
-      { label: 'FILLER_STEPPED_LEFT_GAP', radius: farFillerRadius + 24.0, lateral: -25.5, width: 12.0, height: 48, depth: 3.6, variant: 'box' },
-      { label: 'FILLER_STEPPED_RIGHT_GAP', radius: farFillerRadius + 24.0, lateral: 25.5, width: 13.5, height: 54, depth: 3.6, variant: 'box' }
-    ].forEach((b)=>{
-      addBuilding({
-        name: `SVR_PHASE84O_${name}_${b.label}`,
-        angle,
-        radius: b.radius,
-        width: b.width,
-        height: b.height,
-        depth: b.depth,
-        lateral: b.lateral,
-        mat: fillerMat,
-        variant: b.variant,
-        face: true
-      });
-    });
-
-    const glow = new THREE.PointLight(0xffc15a, 0.65, 48, 2.0);
-    glow.name = `SVR_PHASE84O_${name}_SEPARATED_TIER_SOFT_GLOW`;
-    glow.position.set(Math.cos(angle) * (premiumRadius - 2.0), wallHeight + 66.0, Math.sin(angle) * (premiumRadius - 2.0));
-    group.add(glow);
-
-    const strip = new THREE.Mesh(new THREE.PlaneGeometry(25.5, 0.36), goldMat);
-    strip.name = `SVR_PHASE84O_${name}_TIER1_TOP_NEON_STRIP`;
-    strip.position.set(Math.cos(angle) * premiumRadius, wallHeight + 88.0, Math.sin(angle) * premiumRadius);
-    strip.position.add(inward.clone().multiplyScalar(4.4 * 0.5 + 0.18));
-    faceObject(strip);
-    strip.renderOrder = 122;
-    group.add(strip);
+  // Four ad buildings only: premium but restrained, set behind the wall and apart from the storefronts.
+  adSlots.forEach((slot, idx)=>{
+    const towerH = idx === 0 ? 54 : 38;
+    const towerW = idx === 0 ? 17 : 22;
+    const towerR = R + 32;
+    addBuilding(`SVR_84R_${slot.name}_DEDICATED_AD_BUILDING`, slot.angle, towerR, 0, towerW, towerH, 5.5, wallHeight+3, adTowerMat, { windows:true, trim:true });
+    addAd(`SVR_84R_${slot.name}_${slot.label}_BANNER_ONLY`, slot.angle, towerR, 0, slot.y, slot.w, slot.h, slot.tex, slot.frame, 150);
   });
 
-  // Tier 3: buildings BETWEEN the four wall districts. These carry the green SVR LOGO / WIN CASH banner.
-  cornerSlots.forEach((slot)=>{
-    const { angle, name } = slot;
-    addBuilding({
-      name: `SVR_PHASE84O_${name}_BETWEEN_WALLS_TIER3_GREEN_PROMO_BUILDING`,
-      angle,
-      radius: tier3Radius,
-      width: 18.0,
-      height: 42.0,
-      depth: 4.0,
-      y: wallHeight + 42.0 * 0.5 + 6.2,
-      mat: tier3TowerMat,
-      faceMaterial: greenFaceMat
-    });
-    addAdPlane({
-      name: `SVR_TIER3_LOGO_WIN_CASH_${name}_BETWEEN_WALLS_GREEN_BANNER`,
-      angle,
-      radius: tier3Radius,
-      y: wallHeight + 31.5,
-      w: 16.4,
-      h: 7.4,
-      tex: winCashTex,
-      frameMat: greenMat,
-      order: 126,
-      depth: 4.0
-    });
-
-    // Smaller background towers between the corners so the skyline looks filled, but behind the green promo.
-    addBuilding({ name: `SVR_PHASE84O_${name}_FAR_BACKGROUND_NORMAL_A`, angle, radius: farFillerRadius + 8.0, width: 7.5, height: 62, depth: 3.0, lateral: -15.0, mat: fillerMat });
-    addBuilding({ name: `SVR_PHASE84O_${name}_FAR_BACKGROUND_NORMAL_B`, angle, radius: farFillerRadius + 8.0, width: 7.8, height: 68, depth: 3.0, lateral: 15.0, mat: fillerMat, variant: 'round' });
-    [
-      { label: 'BETWEEN_GAP_LOW_BLOCK', lateral: 0, width: 16.0, height: 34, radiusAdd: 18, depth: 4.2, variant: 'box' },
-      { label: 'BETWEEN_GAP_TALL_LEFT', lateral: -32, width: 7.0, height: 76, radiusAdd: 26, depth: 3.1, variant: 'round' },
-      { label: 'BETWEEN_GAP_TALL_RIGHT', lateral: 32, width: 7.4, height: 72, radiusAdd: 26, depth: 3.1, variant: 'box' },
-      { label: 'BETWEEN_GAP_SHORT_STACK', lateral: 46, width: 10.4, height: 44, radiusAdd: 38, depth: 3.5, variant: 'box' },
-      { label: 'BETWEEN_GAP_SHORT_STACK_OPP', lateral: -46, width: 9.4, height: 42, radiusAdd: 38, depth: 3.5, variant: 'box' }
-    ].forEach((b)=>{
-      addBuilding({
-        name: `SVR_PHASE84O_${name}_${b.label}`,
-        angle,
-        radius: farFillerRadius + b.radiusAdd,
-        width: b.width,
-        height: b.height,
-        depth: b.depth,
-        lateral: b.lateral,
-        mat: fillerMat,
-        variant: b.variant,
-        face: true
-      });
+  // Calm background skyline: varied silhouettes, farther back, no ad clutter.
+  const dirs = [ -Math.PI*0.5, -Math.PI*0.25, 0, Math.PI*0.25, Math.PI*0.5, Math.PI*0.75, Math.PI, -Math.PI*0.75 ];
+  dirs.forEach((angle, sector)=>{
+    const specs = [
+      [-46, 8, 34 + (sector%3)*8, 3.2, false],
+      [-29, 12, 24 + (sector%4)*5, 4.2, false],
+      [-12, 6, 48 + (sector%2)*16, 2.8, true],
+      [  8, 14, 28 + (sector%5)*4, 4.6, false],
+      [ 27, 7, 54 + (sector%3)*9, 2.9, false],
+      [ 45, 10, 32 + (sector%4)*7, 3.7, false]
+    ];
+    specs.forEach(([lat,w,h,d,round], i)=>{
+      const r = R + 62 + ((i+sector)%3)*12;
+      addBuilding(`SVR_84R_BACKGROUND_SKYLINE_${sector}_${i}`, angle, r, lat, w, h, d, wallHeight+2, (i+sector)%2 ? cityMatA : cityMatB, { windows:true, trim:false, round:!!round });
     });
   });
+
+  const softGlow = new THREE.PointLight(0x274b9b, 0.65, 190, 2.0);
+  softGlow.name = 'SVR_84R_SUBTLE_CITY_SKYLINE_GLOW';
+  softGlow.position.set(0, wallHeight + 26, -(R + 60));
+  group.add(softGlow);
 
   scene.add(group);
   return group;
@@ -2545,205 +2383,6 @@ function addPhase84PMasterCyberSkyline(scene, R, wallHeight = 8){
   return group;
 }
 
-
-function addPhase84QRealCitySkyline(scene, R, wallHeight = 8){
-  const group = new THREE.Group();
-  group.name = 'SVR_PHASE84Q_REAL_CITY_SKYLINE_SILHOUETTE_LOCK';
-
-  const winPurple = createWindowGridTexture('#b986ff', '#49eaff');
-  const winCyan = createWindowGridTexture('#74eaff', '#b986ff');
-  [winPurple, winCyan].forEach((tex)=>{ tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(1, 2); tex.anisotropy = 8; });
-
-  const mats = {
-    bodyA: new THREE.MeshStandardMaterial({ color: 0x050812, roughness: 0.70, metalness: 0.48, emissive: 0x070d22, emissiveIntensity: 0.20 }),
-    bodyB: new THREE.MeshStandardMaterial({ color: 0x080b15, roughness: 0.68, metalness: 0.52, emissive: 0x100820, emissiveIntensity: 0.22 }),
-    bodyC: new THREE.MeshStandardMaterial({ color: 0x0a101a, roughness: 0.64, metalness: 0.46, emissive: 0x05151f, emissiveIntensity: 0.18 }),
-    pillar: new THREE.MeshStandardMaterial({ color: 0x02040a, roughness: 0.56, metalness: 0.70, emissive: 0x060313, emissiveIntensity: 0.34 }),
-    purple: new THREE.MeshBasicMaterial({ color: 0xb15cff, transparent: true, opacity: 0.88, depthWrite: false, side: THREE.DoubleSide }),
-    cyan: new THREE.MeshBasicMaterial({ color: 0x48eaff, transparent: true, opacity: 0.86, depthWrite: false, side: THREE.DoubleSide }),
-    roof: new THREE.MeshBasicMaterial({ color: 0x25114c, transparent: true, opacity: 0.80, depthWrite: false, side: THREE.DoubleSide })
-  };
-
-  function basis(angle){
-    const outward = new THREE.Vector3(Math.cos(angle),0,Math.sin(angle));
-    const inward = outward.clone().multiplyScalar(-1);
-    const across = new THREE.Vector3(-Math.sin(angle),0,Math.cos(angle));
-    return { outward, inward, across };
-  }
-  function pos(angle, radius, lateral = 0){
-    const { across } = basis(angle);
-    return new THREE.Vector3(Math.cos(angle)*radius, 0, Math.sin(angle)*radius).add(across.multiplyScalar(lateral));
-  }
-  function face(obj){ obj.lookAt(new THREE.Vector3(0, obj.position.y, 0)); }
-  function addFacePlane(parent, angle, center, width, height, depth, tex, opacity = 0.66){
-    const { inward } = basis(angle);
-    const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(width, height),
-      new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false })
-    );
-    plane.position.copy(center).add(inward.clone().multiplyScalar(depth * 0.5 + 0.055));
-    face(plane);
-    plane.renderOrder = 58;
-    plane.frustumCulled = true;
-    parent.add(plane);
-    return plane;
-  }
-  function addRoofTrim(parent, angle, center, width, height, depth, mat){
-    const { inward } = basis(angle);
-    const yTop = center.y + height * 0.5 + 0.16;
-    const yBase = center.y - height * 0.5 + 0.20;
-    [yTop, yBase].forEach((yy, idx)=>{
-      const t = new THREE.Mesh(new THREE.PlaneGeometry(width + 0.7, idx ? 0.18 : 0.24), idx ? mats.purple : mat);
-      t.position.copy(center).setY(yy).add(inward.clone().multiplyScalar(depth * 0.5 + 0.10));
-      face(t);
-      t.renderOrder = 72;
-      t.frustumCulled = true;
-      parent.add(t);
-    });
-  }
-  function addTower({ name, angle, radius, lateral, width, baseH, upperH, depth, mat, windowTex, spire = false, setback = 0.72 }){
-    const root = new THREE.Group();
-    root.name = name;
-    const baseCenter = pos(angle, radius, lateral).setY(wallHeight + 2.0 + baseH * 0.5);
-    const base = new THREE.Mesh(new THREE.BoxGeometry(width, baseH, depth), mat);
-    base.name = `${name}_PODIUM_BASE`;
-    base.position.copy(baseCenter);
-    face(base);
-    base.frustumCulled = true;
-    root.add(base);
-    addFacePlane(root, angle, baseCenter, width * 0.88, baseH * 0.78, depth, windowTex, 0.54);
-    addRoofTrim(root, angle, baseCenter, width, baseH, depth, mats.cyan);
-
-    const upperW = Math.max(3.6, width * setback);
-    const upperD = Math.max(2.6, depth * 0.80);
-    const upperCenter = pos(angle, radius + 0.8, lateral).setY(wallHeight + 2.0 + baseH + upperH * 0.5);
-    const upper = new THREE.Mesh(new THREE.BoxGeometry(upperW, upperH, upperD), mat);
-    upper.name = `${name}_SETBACK_UPPER_TOWER`;
-    upper.position.copy(upperCenter);
-    face(upper);
-    upper.frustumCulled = true;
-    root.add(upper);
-    addFacePlane(root, angle, upperCenter, upperW * 0.86, upperH * 0.86, upperD, windowTex, 0.64);
-    addRoofTrim(root, angle, upperCenter, upperW, upperH, upperD, mats.purple);
-
-    const { across, inward } = basis(angle);
-    [-1, 1].forEach((side)=>{
-      const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.38, upperH + baseH * 0.35, 0.42), mats.pillar);
-      pillar.name = `${name}_FRONT_CORNER_PILLAR_${side < 0 ? 'L' : 'R'}`;
-      pillar.position.copy(upperCenter).add(across.clone().multiplyScalar(side * (upperW * 0.5 + 0.10))).add(inward.clone().multiplyScalar(upperD * 0.5 + 0.12));
-      face(pillar);
-      pillar.frustumCulled = true;
-      root.add(pillar);
-    });
-
-    if (spire){
-      const antenna = new THREE.Mesh(new THREE.BoxGeometry(0.22, 9.0, 0.22), mats.cyan);
-      antenna.name = `${name}_ROOFTOP_SPIRE`;
-      antenna.position.copy(upperCenter).setY(upperCenter.y + upperH * 0.5 + 4.6);
-      face(antenna);
-      antenna.renderOrder = 75;
-      root.add(antenna);
-    }
-    group.add(root);
-    return root;
-  }
-
-  const sideAngles = [
-    { name:'NORTH', angle:-Math.PI*0.5 },
-    { name:'EAST', angle:0 },
-    { name:'SOUTH', angle:Math.PI*0.5 },
-    { name:'WEST', angle:Math.PI }
-  ];
-  const frontPattern = [
-    [-70, 9, 22, 42, 4.2, 0.70], [-58, 13, 18, 28, 5.0, 0.78], [-42, 10, 26, 56, 4.0, 0.66],
-    [-28, 16, 20, 36, 5.2, 0.72], [-9, 12, 24, 66, 4.1, 0.64], [8, 18, 19, 32, 5.4, 0.75],
-    [29, 11, 28, 60, 4.1, 0.68], [45, 15, 20, 38, 5.0, 0.70], [63, 9, 24, 50, 3.8, 0.64], [75, 12, 18, 30, 4.8, 0.76]
-  ];
-  const rearPattern = [
-    [-76, 7, 32, 78, 3.1, 0.62], [-63, 8, 28, 60, 3.4, 0.72], [-50, 6, 36, 92, 2.9, 0.60],
-    [-36, 9, 28, 74, 3.5, 0.70], [-20, 7, 42, 98, 3.0, 0.58], [0, 10, 30, 68, 3.8, 0.66],
-    [20, 7, 40, 96, 3.0, 0.58], [36, 9, 30, 78, 3.6, 0.70], [51, 6, 34, 90, 2.9, 0.60], [65, 8, 26, 58, 3.3, 0.72], [78, 7, 30, 76, 3.0, 0.62]
-  ];
-
-  sideAngles.forEach(({name, angle}, sideIndex)=>{
-    frontPattern.forEach(([lat,w,bh,uh,d,setback],i)=>{
-      addTower({
-        name:`SVR_84Q_${name}_CONTINUOUS_FRONT_SKYLINE_${String(i).padStart(2,'0')}`,
-        angle,
-        radius:R + 54 + (i % 2) * 3,
-        lateral:lat,
-        width:w,
-        baseH:bh,
-        upperH:uh,
-        depth:d,
-        mat:[mats.bodyA,mats.bodyB,mats.bodyC][(i+sideIndex)%3],
-        windowTex:(i+sideIndex)%2 ? winPurple : winCyan,
-        spire:i % 4 === 0,
-        setback
-      });
-    });
-    rearPattern.forEach(([lat,w,bh,uh,d,setback],i)=>{
-      addTower({
-        name:`SVR_84Q_${name}_DEEP_TALL_SKYLINE_${String(i).padStart(2,'0')}`,
-        angle,
-        radius:R + 92 + (i % 3) * 7,
-        lateral:lat,
-        width:w,
-        baseH:bh,
-        upperH:uh,
-        depth:d,
-        mat:[mats.bodyB,mats.bodyC,mats.bodyA][(i+sideIndex)%3],
-        windowTex:(i+sideIndex)%2 ? winCyan : winPurple,
-        spire:i % 3 === 0,
-        setback
-      });
-    });
-
-    // continuous lower skyline belt so the city reads as one skyline instead of isolated towers
-    const belt = new THREE.Mesh(
-      new THREE.BoxGeometry(168, 8.0, 3.2),
-      new THREE.MeshStandardMaterial({ color: 0x050713, roughness: 0.72, metalness: 0.42, emissive: 0x08051c, emissiveIntensity: 0.24 })
-    );
-    belt.name = `SVR_84Q_${name}_CONTINUOUS_LOW_CITY_BELT`;
-    belt.position.copy(pos(angle, R + 50, 0)).setY(wallHeight + 6.0);
-    face(belt);
-    belt.frustumCulled = true;
-    group.add(belt);
-    addFacePlane(group, angle, belt.position, 154, 5.4, 3.2, sideIndex%2 ? winPurple : winCyan, 0.42);
-    addRoofTrim(group, angle, belt.position, 168, 8.0, 3.2, mats.cyan);
-  });
-
-  const cornerAngles = [
-    { name:'NE', angle:-Math.PI*0.25 }, { name:'SE', angle:Math.PI*0.25 },
-    { name:'SW', angle:Math.PI*0.75 }, { name:'NW', angle:-Math.PI*0.75 }
-  ];
-  cornerAngles.forEach(({name, angle}, cidx)=>{
-    [-44,-24,-8,10,28,46].forEach((lat,i)=>{
-      addTower({
-        name:`SVR_84Q_${name}_CORNER_SKYLINE_BRIDGE_${i}`,
-        angle,
-        radius:R + 72 + (i%2)*12,
-        lateral:lat,
-        width:8 + (i%3)*3,
-        baseH:18 + (i%2)*8,
-        upperH:42 + ((i*13)%45),
-        depth:3.4 + (i%2)*0.8,
-        mat:[mats.bodyA,mats.bodyB,mats.bodyC][(i+cidx)%3],
-        windowTex:(i+cidx)%2 ? winPurple : winCyan,
-        spire:i===1 || i===4,
-        setback:0.64 + (i%3)*0.05
-      });
-    });
-  });
-
-  const lowSkyGlow = new THREE.PointLight(0x5540ff, 0.75, 260, 2.4);
-  lowSkyGlow.name = 'SVR_84Q_REAL_SKYLINE_LOW_PURPLE_REFLECTION_GLOW';
-  lowSkyGlow.position.set(0, wallHeight + 34, -(R + 58));
-  group.add(lowSkyGlow);
-  scene.add(group);
-  return group;
-}
-
 export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const R = CONFIG.ROOM_RADIUS;
   const H = CONFIG.WALL_HEIGHT;
@@ -2839,8 +2478,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const stars = buildStars(scene, R);
   const lobbySprites = buildLobbySprites(scene, R, wallHeight);
   const espressoAdGroup = addAlwaysVisibleEspressoAd(scene, R, wallHeight);
-  const phase84PMasterSkyline = addPhase84PMasterCyberSkyline(scene, R, wallHeight);
-  const phase84QRealCitySkyline = addPhase84QRealCitySkyline(scene, R, wallHeight);
+  const phase84PMasterSkyline = null; // Phase 84R: dense cyber ad skyline disabled; restored calmer city background with four ad buildings only.
   const spawnLogoTex = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
   const wallPanels = [];
   const wallPanelUpdaters = [];

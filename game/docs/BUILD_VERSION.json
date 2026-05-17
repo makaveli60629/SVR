@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-84Q-REAL-CITY-SKYLINE-SILHOUETTE-LOCK",
-  "phase": "84Q",
+  "build": "PHASE-84R-RESTORED-NORMAL-SKYLINE-FOUR-AD-BUILDINGS-LOCK",
+  "phase": "84R",
   "gameSideOnly": true,
   "siteTouched": false,
   "trueitiveBlocked": true,
-  "notes": "Refined the city skyline into a continuous real skyline silhouette with dense front and deep background tower rows, varied widths/heights, podium bases, setback upper towers, window-grid facades, corner pillars, and neon roofline trims while preserving ad visibility and high Moon/Mars sky lock.",
-  "title": "Real City Skyline Silhouette Lock"
+  "notes": "Restored calmer normal city skyline, disabled dense billboard skyline overload, kept only four dedicated ad buildings, preserved high Moon/Mars and game-only locks.",
+  "title": "Restored Normal Skyline Four Ad Buildings Lock"
 }

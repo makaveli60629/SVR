@@ -1,19 +1,15 @@
-// PHASE-84Q-REAL-CITY-SKYLINE-SILHOUETTE-LOCK
-// Runtime player-POV ad grid lock lives in world_skyline.js buildOuterCity().
-// This registry documents modular building ad slots for future swaps.
+// PHASE-84R-RESTORED-NORMAL-SKYLINE-FOUR-AD-BUILDINGS-LOCK
+// Runtime ad skyline now lives in world_skyline.js addAlwaysVisibleEspressoAd().
+// Phase 84R intentionally reduces ad clutter: four premium ad buildings only.
 export const BUILDING_AD_GRID_LOCK = {
-  build: "PHASE-84Q-REAL-CITY-SKYLINE-SILHOUETTE-LOCK",
+  build: "PHASE-84R-RESTORED-NORMAL-SKYLINE-FOUR-AD-BUILDINGS-LOCK",
   siteTouched: false,
-  approvalLock: "No UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED/UNAPPROVED_SPONSOR_BLOCKED content until explicit approval.",
+  approvalLock: "No unapproved Reiki sponsor/founder branding. Reiki remains SVR / AWAITING APPROVAL only.",
+  strategy: "Restored normal skyline silhouette with only four dedicated ad buildings; dense cyber billboard wall disabled.",
   slots: [
-    "AD_CENTER_PREMIUM_ESPRESSO_FRONT_VISIBLE",
-    "AD_LEFT_TOWER_VISIBLE",
-    "AD_RIGHT_TOWER_VISIBLE",
-    "AD_FILLED_SKYLINE_GAP_LEFT",
-    "AD_FILLED_SKYLINE_GAP_RIGHT",
-    "AD_LOWER_BANNER_01",
-    "AD_LOWER_BANNER_02",
-    "AD_LOWER_BANNER_03",
-    "AD_INTERCARDINAL_TIER3_WIN_CASH"
+    "NORTH_ESPRESSO_WITH_CREAM_AD_BUILDING",
+    "SOUTH_ALL_IN_AD_BUILDING",
+    "EAST_WIN_CASH_AD_BUILDING",
+    "WEST_SVR_WIN_CASH_AD_BUILDING"
   ]
 };
