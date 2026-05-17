@@ -1,9 +1,6 @@
 {
-  "build": "PHASE-84R-RESTORED-NORMAL-SKYLINE-FOUR-AD-BUILDINGS-LOCK",
-  "phase": "84R",
-  "gameSideOnly": true,
+  "build": "PHASE-84S-STRATEGIC-AD-SKYLINE-SCENE-ROUTING-LOCK",
+  "date": "2026-05-17",
   "siteTouched": false,
-  "trueitiveBlocked": true,
-  "notes": "Restored calmer normal city skyline, disabled dense billboard skyline overload, kept only four dedicated ad buildings, preserved high Moon/Mars and game-only locks.",
-  "title": "Restored Normal Skyline Four Ad Buildings Lock"
+  "summary": "Strategic front-facing ad skyline with Espresso beside store/sponsor wall, cleaner NYC/HK/Tokyo-style ad placement, orbiting Moon/Mars, enhanced stars, and restored private scene entry pages."
 }

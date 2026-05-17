@@ -178,6 +178,8 @@ function gotoScene(key){
 
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
+    const href = btn.dataset.href;
+    if (href){ location.href = href; return; }
     const key = btn.dataset.scene;
     if (key) gotoScene(key);
   });
@@ -197,8 +199,11 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit5") gotoScene("pga");
   if (e.code === "Digit6") gotoScene("legends");
   if (e.code === "Digit7") gotoScene("sponsor");
-  if (e.code === "Digit8") gotoScene("scorpion");
+  if (e.code === "Digit8") location.href = "./scorpion.html";
   if (e.code === "Digit9") gotoScene("reikiRoom");
+  if (e.code === "Digit0") location.href = "./pga-drive.html";
+  if (e.code === "Minus") location.href = "./chip-putt.html";
+  if (e.code === "Equal") location.href = "./store-room.html";
 });
 
 const watch = createWristWatch({

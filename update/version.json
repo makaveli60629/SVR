@@ -1,6 +1,5 @@
 ﻿{
-    "phase":  "84R",
-    "title":  "Restored Normal Skyline Four Ad Buildings Lock",
-    "build":  "PHASE-84R-RESTORED-NORMAL-SKYLINE-FOUR-AD-BUILDINGS-LOCK",
-    "updatedAt":  "2026-05-17T15:20:02Z"
+  "build": "PHASE-84S-STRATEGIC-AD-SKYLINE-SCENE-ROUTING-LOCK",
+  "siteTouched": false,
+  "gameOnly": true
 }
