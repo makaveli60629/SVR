@@ -1,0 +1,18 @@
+{
+  "phase": "PHASE-86-BUILDING-AD-FUNDRAISER-LOCK",
+  "game_side_only": true,
+  "site_touched": false,
+  "added_assets": [
+    "game/assets/ui/all-in-win-cash-fundraiser-ad.png"
+  ],
+  "patched_files_expected": [
+    "game/modules/world_skyline.js"
+  ],
+  "requested_copy": [
+    "ALL IN",
+    "WIN CA$H",
+    "SPONSORSHIP GAMES",
+    "FUNDRAISER"
+  ],
+  "note": "Replaces old/espresso-style building ad with neon green fundraiser/sponsorship sign."
+}

@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
@@ -666,7 +666,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.strokeStyle = 'rgba(255,85,98,0.82)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#fff5f5'; x.font = 'bold 58px system-ui, Arial'; x.fillText('PRIVATE REIKI ROOM', w/2, 76);
-    x.fillStyle = '#ffb6bd'; x.font = 'bold 24px system-ui, Arial'; x.fillText('meditate • restore • breathe', w/2, 132);
+    x.fillStyle = '#ffb6bd'; x.font = 'bold 24px system-ui, Arial'; x.fillText('meditate â€¢ restore â€¢ breathe', w/2, 132);
   });
   const zenDenPlate = new THREE.Mesh(new THREE.PlaneGeometry(2.84, 0.52), new THREE.MeshBasicMaterial({ map: zenDenTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   zenDenPlate.position.set(4.95, 4.68, 0.73);
@@ -686,7 +686,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#ffb6bd'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Live Policy', 60, y);
     y += 62;
     x.fillStyle = '#fff8f8'; x.font = '34px system-ui, Arial';
-    ['No unapproved branding', 'No founder photos', 'No outside websites', 'SVR placeholder only'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 58; });
+    ['No unapproved branding', 'No founder photos', 'No outside websites', 'SVR placeholder only'].forEach((line)=>{ x.fillText('â€¢ ' + line, 72, y); y += 58; });
   });
   const leftInfo = new THREE.Mesh(new THREE.PlaneGeometry(3.28, 4.02), new THREE.MeshBasicMaterial({ map: leftInfoTex, side: THREE.DoubleSide, transparent: true }));
   leftInfo.position.set(-4.10, 2.18, -2.10);
@@ -700,7 +700,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#fff7f7'; x.font = 'bold 70px system-ui, Arial'; x.fillText('SVR REIKI HUB', w/2, 104);
     x.fillStyle = '#ffb6bd'; x.font = 'bold 42px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 172);
     x.fillStyle = '#fff5f5'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Private Meditation Route', w/2, 306);
-    x.fillStyle = '#ffd6da'; x.font = '31px system-ui, Arial'; x.fillText('Relaxation • wellness placeholder • future partner module', w/2, 372);
+    x.fillStyle = '#ffd6da'; x.font = '31px system-ui, Arial'; x.fillText('Relaxation â€¢ wellness placeholder â€¢ future partner module', w/2, 372);
     x.fillStyle = 'rgba(255,82,95,0.16)'; roundRectPath(x, 90, 430, w-180, 138, 28); x.fill();
     x.strokeStyle = 'rgba(255,85,98,0.65)'; x.lineWidth = 6; roundRectPath(x, 90, 430, w-180, 138, 28); x.stroke();
     x.fillStyle = '#ffebee'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER PRIVATE REIKI', w/2, 510);
@@ -1456,7 +1456,7 @@ function addScorpionRoom(scene, R, wallHeight){
     x.lineWidth = 10; x.strokeRect(16,16,w-32,h-32);
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#fff2fb'; x.font = 'bold 86px system-ui, Arial'; x.fillText('SCORPION GAME ROOM', w/2, 100);
-    x.fillStyle = '#ffadd7'; x.font = 'bold 30px system-ui, Arial'; x.fillText('REAL PLAY • TABLE FLOW • PRIVATE ACTION', w/2, 170);
+    x.fillStyle = '#ffadd7'; x.font = 'bold 30px system-ui, Arial'; x.fillText('REAL PLAY â€¢ TABLE FLOW â€¢ PRIVATE ACTION', w/2, 170);
   });
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 1.10), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
   sign.position.set(0, 5.14, -2.72);
@@ -1488,7 +1488,7 @@ function addScorpionRoom(scene, R, wallHeight){
     x.fillStyle = '#fdf5ff'; x.font = 'bold 60px system-ui, Arial'; x.fillText('SCORPION ACCESS', 44, 92);
     x.fillStyle = '#ffc4eb'; x.font = '36px system-ui, Arial'; 
     let y = 180;
-    ['Fast jump from watch', 'Fist near face toggles teleport', 'Reserved for real play flow', 'Modular room for future game scene'].forEach(line=>{ x.fillText('• ' + line, 54, y); y += 92; });
+    ['Fast jump from watch', 'Fist near face toggles teleport', 'Reserved for real play flow', 'Modular room for future game scene'].forEach(line=>{ x.fillText('â€¢ ' + line, 54, y); y += 92; });
   });
   const board = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.56), new THREE.MeshBasicMaterial({ map: boardTex, transparent: true, side: THREE.DoubleSide }));
   board.position.set(-2.34, 2.1, -2.68);
@@ -1519,7 +1519,7 @@ function buildOuterCity(scene, R){
   ];
   const matrix = createMatrixBillboardTexture();
   const billboardUpdaters = [matrix.update];
-  const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
+  const adTex = loadUiTexture('./assets/ui/all-in-win-cash-fundraiser-ad.png');
   const sponsorHoldTex = createAdBillboardTexture(['SPONSOR SLOT', 'AVAILABLE']);
   // Phase 84F: espressoTex is preloaded/shared above to avoid boot ReferenceError.
 
@@ -2265,7 +2265,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   [
     { angle: -Math.PI * 0.5, kind: "main", title: "MAIN SPONSOR SCREEN", subtitle: "SCARLETT VR POKER", size: [9.4, wallHeight - 0.30], logo: [3.2, 3.2], y: wallHeight * 0.5 },
     { angle: Math.PI * 0.5, kind: "reserve", title: "LEAGUE WALL", subtitle: "SOUTH WALL", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
-    { angle: 0, kind: "reiki", title: "REIKI TIME HUB", subtitle: "RED CARPET • PLANTS • ZEN STORE", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
+    { angle: 0, kind: "reiki", title: "REIKI TIME HUB", subtitle: "RED CARPET â€¢ PLANTS â€¢ ZEN STORE", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
     { angle: Math.PI, kind: "reserve", title: "LEGENDS", subtitle: "HALL OF FAME", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 }
   ].forEach(({ angle, kind, title, subtitle, size, logo, y })=>{
     const matrix = kind === "main" ? createMatrixBillboardTexture("main") : null;
@@ -2800,3 +2800,4 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+

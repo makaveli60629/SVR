@@ -1,6 +1,5 @@
-﻿{
-    "siteTouched":  false,
-    "build":  "PHASE-85-NPC-SCENE-MOTION-LOCK",
-    "type":  "game-module-patch",
-    "createdAt":  "2026-05-17T19:06:19Z"
+{
+  "build": "PHASE-86-BUILDING-AD-FUNDRAISER-LOCK",
+  "phase": 86,
+  "scope": "game-side building ad fundraiser sign"
 }
