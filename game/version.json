@@ -1,5 +1,6 @@
 {
-  "build": "PHASE-84V-ESPRESSO-AD-BANNER-ONLY-LOCK",
-  "scope": "game-only",
-  "siteTouched": false
+  "build": "PHASE-84W-REFINED-ESPRESSO-SKYLINE-MOON-MARS-LOCK",
+  "siteTouched": false,
+  "gameOnly": true,
+  "notes": "Refines building skyline, makes Espresso banners larger/visible, raises Moon and Mars."
 }
