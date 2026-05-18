@@ -1,6 +1,7 @@
 {
-  "build": "PHASE-85-BOOT-STABLE-PLAYABLE-POKER-LOCK",
+  "build": "PHASE-86-WATCH-POKER-CONTROL-LOCK",
   "scope": "game-only",
-  "fix": "boot stability, scene route fallbacks, playable poker engine, bot turns, hand evaluation, chip pot accounting",
-  "siteTouched": false
+  "fix": "VR wrist watch poker buttons, route buttons, readable poker state on watch",
+  "siteTouched": false,
+  "previousStableBuild": "PHASE-85-BOOT-STABLE-PLAYABLE-POKER-LOCK"
 }
