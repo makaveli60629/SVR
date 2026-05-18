@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-93-RUNTIME-AUDIT-GUARD-LOCK",
+  "build": "PHASE-94-RUNTIME-AUDIT-GUARD-HOTFIX-LOCK",
   "scope": "game-only",
-  "fix": "runtime audit guard, phase label sync, missing module detection, route button checks, approval-term scan",
+  "fix": "runtime audit guard typo fix, safer health reporting, phase label sync, missing module and route checks",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-92-NPC-BOT-ANIMATION-POLISH-LOCK"
+  "previousStableBuild": "PHASE-93-RUNTIME-AUDIT-GUARD-LOCK"
 }
