@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-96-RUNTIME-AUDIT-EXPANSION-LOCK",
+  "build": "PHASE-97-RUNTIME-HEALTH-PANEL-LOCK",
   "scope": "game-only",
-  "fix": "expanded runtime audit, Phase 95 feedback FX detection, stale phase label detection, safer public health report",
+  "fix": "in-game runtime health panel, audit status button, module route and approval checks without console",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-95-POKER-FEEDBACK-FX-LOCK"
+  "previousStableBuild": "PHASE-96-RUNTIME-AUDIT-EXPANSION-LOCK"
 }
