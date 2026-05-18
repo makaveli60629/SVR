@@ -1,6 +1,6 @@
-﻿{
-  "build": "PHASE-84-SKYLINE-CLONE-HOTFIX",
+{
+  "build": "PHASE-85-BOOT-STABLE-PLAYABLE-POKER-LOCK",
   "scope": "game-only",
-  "fix": "world_skyline sceneTargets safe clone guard",
+  "fix": "boot stability, scene route fallbacks, playable poker engine, bot turns, hand evaluation, chip pot accounting",
   "siteTouched": false
 }
