@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-92-NPC-BOT-ANIMATION-POLISH-LOCK",
+  "build": "PHASE-93-RUNTIME-AUDIT-GUARD-LOCK",
   "scope": "game-only",
-  "fix": "NPC bot idle breathing, action bubbles, card peek, chip reach, fold and winner reactions",
+  "fix": "runtime audit guard, phase label sync, missing module detection, route button checks, approval-term scan",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-91-QUEST-PERFORMANCE-PASS-LOCK"
+  "previousStableBuild": "PHASE-92-NPC-BOT-ANIMATION-POLISH-LOCK"
 }
