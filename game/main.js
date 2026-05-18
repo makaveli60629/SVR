@@ -1,4 +1,4 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -8,13 +8,15 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createNpcAvatarSystem } from "./modules/npc_avatar_system.js";
+import { createPlayablePoker } from "./modules/playable_poker.js";
 import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
 
+const PHASE_85_BUILD = "PHASE-85-BOOT-STABLE-PLAYABLE-POKER-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
-document.documentElement.dataset.svrBuild = SVR_WEBXR_PHASE;
+document.documentElement.dataset.svrBuild = PHASE_85_BUILD;
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 
 const $status = document.getElementById("status");
@@ -59,10 +61,10 @@ if (AUTOCAM) document.body.classList.add("preview-mode");
 const enforcerAudit = runWebXREnforcerAudit({ log });
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData.SVR_WEBXR_ENFORCER_AUDIT = enforcerAudit;
+scene.userData.SVR_PHASE_85_BUILD = PHASE_85_BUILD;
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
-
 
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
@@ -74,9 +76,16 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading worldâ€¦", { force: true });
+setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
+
+if (!sceneTargets.pgaDrive) sceneTargets.pgaDrive = sceneTargets.pgaWall || sceneTargets.pga || sceneTargets.lobby;
+if (!sceneTargets.chipPutt) sceneTargets.chipPutt = sceneTargets.pgaWall || sceneTargets.pga || sceneTargets.lobby;
+if (!sceneTargets.storeRoom) sceneTargets.storeRoom = sceneTargets.sponsor || sceneTargets.lobby;
+if (!sceneTargets.smokerLounge) sceneTargets.smokerLounge = sceneTargets.sponsor || sceneTargets.lobby;
+if (!sceneTargets.reikiRoom) sceneTargets.reikiRoom = sceneTargets.reiki || sceneTargets.lobby;
+window.SVR_SCENE_TARGETS = sceneTargets;
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -106,6 +115,20 @@ const audio = createAudioPlaylist({
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
+
+const poker = createPlayablePoker({
+  scene,
+  tableCenter,
+  seats,
+  log,
+  onState: (state)=>{
+    cash = state?.playerStack ?? cash;
+    if (state?.awaitingPlayer && !$status?.textContent?.includes("YOUR POKER TURN")){
+      setStatus(`YOUR POKER TURN: ${state.toCall > 0 ? `Call $${state.toCall}` : "Check"} / Raise / Fold`, { force: true, minGap: 0 });
+    }
+  }
+});
+window.SVR_PLAYABLE_POKER = poker;
 
 function currentHeadXZ(){
   if (renderer.xr.isPresenting){
@@ -150,6 +173,7 @@ function joinTable(){
     moveDesktopToSeat(seat);
   }
   setMode(`Seat: ${seat.label}`);
+  setStatus("Poker controls: F Fold • C Check/Call • R Raise • A All-In • H Next Hand", { force: true });
   return true;
 }
 
@@ -177,7 +201,10 @@ function movePlayerToSpot(target, lookTarget = null){
 
 function gotoScene(key){
   const rec = sceneTargets?.[key];
-  if (!rec?.pos) return false;
+  if (!rec?.pos){
+    setStatus(`Route unavailable: ${key}`, { force: true });
+    return false;
+  }
   movePlayerToSpot(rec.pos, rec.look || null);
   setStatus(`Quick jump: ${key}`, { force: true });
   return true;
@@ -192,6 +219,11 @@ $sceneButtons.forEach((btn)=>{
 
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
+  if (e.code === "KeyF") poker.fold();
+  if (e.code === "KeyC") poker.checkCall();
+  if (e.code === "KeyR") poker.raise();
+  if (e.code === "KeyA") poker.allIn();
+  if (e.code === "KeyH") poker.nextHand();
   if (e.code === "KeyM") await audio.toggle();
   if (e.code === "KeyN") await audio.next();
   if (e.code === "KeyJ") joinTable();
@@ -219,11 +251,12 @@ const watch = createWristWatch({
   getState: ()=>({
     audioEnabled: audio.getState().enabled,
     trackTitle: audio.getState().trackTitle || "Lobby 07",
-    cash,
+    cash: poker.getState().playerStack ?? cash,
     seated,
     inTableZone: inTableZone(),
     seatLabel: seatLabel(),
-    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
+    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true,
+    poker: poker.getState()
   }),
   actions: {
     toggleAudio: ()=>audio.toggle(),
@@ -231,6 +264,11 @@ const watch = createWristWatch({
     joinTable,
     leaveTable,
     toggleTeleport: ()=>tp.toggleMode(),
+    pokerFold: ()=>poker.fold(),
+    pokerCall: ()=>poker.checkCall(),
+    pokerRaise: ()=>poker.raise(),
+    pokerAllIn: ()=>poker.allIn(),
+    pokerNext: ()=>poker.nextHand(),
     goLobby: ()=>gotoScene("lobby"),
     goTable: ()=>gotoScene("table"),
     goSeat: ()=>gotoScene("seat"),
@@ -252,12 +290,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logoâ€¦", { force: true });
+setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Poker is playable: F/C/R/A/H. Wrist quick-jump and poker buttons enabled.", { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -318,6 +356,7 @@ renderer.setAnimationLoop(()=>{
 
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
   if (npcAvatarSystem?.update) npcAvatarSystem.update(dt);
+  if (poker?.update) poker.update(dt);
 
   hands.update(dt);
   hands.updateDebug();
@@ -350,8 +389,7 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloadingâ€¦");
-  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
+  log("[ERR] WebGL context lost. Reloading…");
+  setStatus("WebGL context lost (reloading…)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
-
