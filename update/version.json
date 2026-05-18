@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-90-ACTIVE-SEAT-CHIP-FX-LOCK",
+  "build": "PHASE-91-QUEST-PERFORMANCE-PASS-LOCK",
   "scope": "game-only",
-  "fix": "active seat glow, pot chip stack visuals, winner banner, poker table FX module",
+  "fix": "throttled poker HUD updates, adaptive table FX, low-performance fallback, reduced canvas texture redraws",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-89-POKER-SIDEPOT-BETTING-POLISH-LOCK"
+  "previousStableBuild": "PHASE-90-ACTIVE-SEAT-CHIP-FX-LOCK"
 }
