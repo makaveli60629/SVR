@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-108-WATCH-POKER-DISABLED-STATE-LOCK",
+  "build": "PHASE-109-PRIVATE-SCENE-STARTER-BUILDS-LOCK",
   "scope": "game-only",
-  "fix": "VR wrist watch poker disabled states, locked-action feedback, legal poker button state polish while preserving watch baseline",
+  "fix": "private scene starter pages for Reiki, PGA Drive, Chip Putt, VR Store, Smoker Lounge, and Scorpion Room with shared lightweight starter module",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-107-RAISE-SIZING-HUD-LOCK"
+  "previousStableBuild": "PHASE-108-WATCH-POKER-DISABLED-STATE-LOCK"
 }
