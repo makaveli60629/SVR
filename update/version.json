@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-94-RUNTIME-AUDIT-GUARD-HOTFIX-LOCK",
+  "build": "PHASE-95-POKER-FEEDBACK-FX-LOCK",
   "scope": "game-only",
-  "fix": "runtime audit guard typo fix, safer health reporting, phase label sync, missing module and route checks",
+  "fix": "poker turn toast, action toast, winner toast, lightweight WebAudio cues after user interaction",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-93-RUNTIME-AUDIT-GUARD-LOCK"
+  "previousStableBuild": "PHASE-94-RUNTIME-AUDIT-GUARD-HOTFIX-LOCK"
 }
