@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-86-WATCH-POKER-CONTROL-LOCK",
+  "build": "PHASE-87-DESKTOP-ANDROID-POKER-HUD-LOCK",
   "scope": "game-only",
-  "fix": "VR wrist watch poker buttons, route buttons, readable poker state on watch",
+  "fix": "desktop and Android poker action HUD, touch-friendly poker buttons, XR auto-hide HUD",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-85-BOOT-STABLE-PLAYABLE-POKER-LOCK"
+  "previousStableBuild": "PHASE-86-WATCH-POKER-CONTROL-LOCK"
 }
