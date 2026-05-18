@@ -2760,35 +2760,65 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       }
     }
   };
+  // PHASE-84-SKYLINE-CLONE-HOTFIX
+  // Fixes boot crash: TypeError: Cannot read properties of undefined (reading 'clone').
+  // Cause: optional hub/private-scene target data can be missing during partial deploys.
+  // Rule: clone only real THREE.Vector3 values; otherwise use safe fallback vectors.
+  const safeCloneVec = (value, fallback = new THREE.Vector3()) => {
+    if (value && typeof value.clone === "function") return value.clone();
+    return fallback.clone();
+  };
+  const safeY = (value, fallback, y = 1.6) => safeCloneVec(value, fallback).setY(y);
+  const safeSceneTarget = (pos, look) => {
+    if (!pos || !look) return null;
+    return { pos, look };
+  };
+
+  const pgaHubRuntime = scene?.userData?._pgaHub || null;
+  const pgaHubPos = pgaHubRuntime?.group?.position || null;
+  const pgaHubInward = pgaHubRuntime?.inward || null;
+  const makePgaTarget = (distance, sideOffset = 0) => {
+    if (!pgaHubPos || !pgaHubInward || typeof pgaHubPos.clone !== "function" || typeof pgaHubInward.clone !== "function") return null;
+    const pos = pgaHubPos.clone()
+      .add(pgaHubInward.clone().multiplyScalar(distance))
+      .add(new THREE.Vector3(0, 0, sideOffset))
+      .setY(0);
+    const look = pgaHubPos.clone().setY(1.8);
+    return { pos, look };
+  };
+
+  const reikiFallbackCenter = safeCloneVec(reikiHub?.center, new THREE.Vector3(-10, 0, -6));
+  const scorpionFallbackCenter = safeCloneVec(scorpionRoom?.target, new THREE.Vector3(8, 0, -6));
 
   const sceneTargets = {
     lobby: { pos: new THREE.Vector3(0, 0, 4.8), look: new THREE.Vector3(0, 1.15, 0) },
     table: { pos: new THREE.Vector3(0, 0, 3.2), look: new THREE.Vector3(0, 1.05, 0) },
-    seat: seats[3] ? { pos: new THREE.Vector3(seats[3].x, 0, seats[3].z), look: new THREE.Vector3(0, 1.0, 0) } : null,
-    reiki: reikiHub ? { pos: reikiHub.target.clone(), look: reikiHub.look.clone() } : null,
-    reikiRoom: reikiHub ? { pos: reikiHub.roomTarget.clone(), look: reikiHub.center.clone() } : null,
-    pga: scene.userData._pgaHub ? {
-      pos: scene.userData._pgaHub.group.position.clone().add(scene.userData._pgaHub.inward.clone().multiplyScalar(3.2)).setY(0),
-      look: scene.userData._pgaHub.group.position.clone().setY(1.8)
+    seat: seats?.[3] ? { pos: new THREE.Vector3(seats[3].x, 0, seats[3].z), look: new THREE.Vector3(0, 1.0, 0) } : null,
+
+    reiki: reikiHub ? {
+      pos: safeCloneVec(reikiHub.target, reikiFallbackCenter.clone().setY(0)),
+      look: safeCloneVec(reikiHub.look, reikiFallbackCenter.clone().setY(1.6))
     } : null,
-    pgaWall: scene.userData._pgaHub ? {
-      pos: scene.userData._pgaHub.group.position.clone().add(scene.userData._pgaHub.inward.clone().multiplyScalar(2.2)).add(new THREE.Vector3(0,0,0.5)).setY(0),
-      look: scene.userData._pgaHub.group.position.clone().setY(1.8)
+    reikiRoom: reikiHub ? {
+      pos: safeCloneVec(reikiHub.roomTarget, reikiFallbackCenter.clone().setY(0)),
+      look: safeCloneVec(reikiHub.center, reikiFallbackCenter.clone().setY(1.6))
     } : null,
-    legends: {
+
+    pga: makePgaTarget(3.2),
+    pgaWall: makePgaTarget(2.2, 0.5),
+
+    legends: legendHall?.group?.position ? {
       pos: new THREE.Vector3(legendHall.group.position.x * 0.82, 0, legendHall.group.position.z * 0.82),
-      look: legendHall.group.position.clone().setY(1.8)
-    },
-    sponsor: {
+      look: safeY(legendHall.group.position, new THREE.Vector3(0, 0, -8), 1.8)
+    } : null,
+    sponsor: storeWall?.group?.position ? {
       pos: new THREE.Vector3(storeWall.group.position.x * 0.86, 0, storeWall.group.position.z * 0.86),
-      look: storeWall.group.position.clone().setY(1.6)
-    },
-    scorpion: scorpionRoom ? { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() } : null,
-    pgaDrive: privateRoutes.pgaDrive ? { pos: privateRoutes.pgaDrive.pos.clone(), look: privateRoutes.pgaDrive.look.clone() } : null,
-    chipPutt: privateRoutes.chipPutt ? { pos: privateRoutes.chipPutt.pos.clone(), look: privateRoutes.chipPutt.look.clone() } : null,
-    storeRoom: privateRoutes.storeRoom ? { pos: privateRoutes.storeRoom.pos.clone(), look: privateRoutes.storeRoom.look.clone() } : null,
-    smokerLounge: privateRoutes.smokerLounge ? { pos: privateRoutes.smokerLounge.pos.clone(), look: privateRoutes.smokerLounge.look.clone() } : null,
-    scorpionVip: privateRoutes.scorpionVip ? { pos: privateRoutes.scorpionVip.pos.clone(), look: privateRoutes.scorpionVip.look.clone() } : null
+      look: safeY(storeWall.group.position, new THREE.Vector3(0, 0, 8), 1.6)
+    } : null,
+    scorpion: scorpionRoom ? {
+      pos: safeCloneVec(scorpionRoom.target, scorpionFallbackCenter.clone().setY(0)),
+      look: safeCloneVec(scorpionRoom.look, scorpionFallbackCenter.clone().setY(1.6))
+    } : null
   };
 
   return {
@@ -2800,4 +2830,5 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+
 

@@ -1,5 +1,6 @@
-{
-  "build": "PHASE-86-BUILDING-AD-FUNDRAISER-LOCK",
-  "phase": 86,
-  "scope": "game-side building ad fundraiser sign"
+﻿{
+  "build": "PHASE-84-SKYLINE-CLONE-HOTFIX",
+  "scope": "game-only",
+  "fix": "world_skyline sceneTargets safe clone guard",
+  "siteTouched": false
 }
