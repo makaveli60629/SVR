@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-101-VISUAL-CARD-MESH-SYNC-LOCK",
+  "build": "PHASE-102-CHIP-THROW-SWEEP-ANIMATION-LOCK",
   "scope": "game-only",
-  "fix": "visible board and player card meshes synced from playable poker state with deck visuals and card state label",
+  "fix": "chip throw animation on call raise blinds, pot pulse, chip sweep animation to winner after showdown",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-100-RUNTIME-SMOKE-TEST-DEPLOY-PACK-LOCK"
+  "previousStableBuild": "PHASE-101-VISUAL-CARD-MESH-SYNC-LOCK"
 }
