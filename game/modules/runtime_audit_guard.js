@@ -1,9 +1,8 @@
-// PHASE-93-RUNTIME-AUDIT-GUARD-LOCK
-// Game-side only. Runtime audit/phase sync guard for the SVR Poker game track.
-// This module does not modify the website or /site. It only validates and records
-// game runtime health after boot so stale phase labels and missing modules are easier to catch.
+// PHASE-94-RUNTIME-AUDIT-GUARD-HOTFIX-LOCK
+// Game-side only. Fixes the Phase 93 runtime audit typo and strengthens
+// health checks without touching the website or /site.
 
-const PHASE = "PHASE-93-RUNTIME-AUDIT-GUARD-LOCK";
+const PHASE = "PHASE-94-RUNTIME-AUDIT-GUARD-HOTFIX-LOCK";
 const REQUIRED_GLOBALS = [
   ["SVR_PLAYABLE_POKER", "playable poker engine"],
   ["SVR_POKER_ACTION_HUD", "desktop/android poker HUD"],
@@ -17,15 +16,12 @@ function textIncludesAny(text, terms){
   const body = String(text || "").toLowerCase();
   return terms.filter(term => body.includes(term.toLowerCase()));
 }
-
 function getMissingButtons(){
   return REQUIRED_SCENE_BUTTONS.filter(key => !document.querySelector(`#sceneNav [data-scene="${key}"]`));
 }
-
 function getMissingGlobals(){
   return REQUIRED_GLOBALS.filter(([key]) => !window[key]).map(([key, label]) => ({ key, label }));
 }
-
 function getModuleStates(){
   const poker = window.SVR_PLAYABLE_POKER;
   const pokerState = poker?.getState?.();
@@ -41,43 +37,42 @@ function getModuleStates(){
     lowPerf: document.body.classList.contains("svr-low-perf")
   };
 }
-
 function setBuildLabel(){
   document.documentElement.dataset.svrBuild = PHASE;
   window.SVR_CURRENT_GAME_PHASE = PHASE;
   window.SVR_GAME_TRACK = "game-side-only";
   window.SVR_SITE_TOUCHED_BY_GAME_TRACK = false;
 }
-
 function updateVisualLabel(){
   const pills = Array.from(document.querySelectorAll(".pill"));
   const buildPill = pills.find(pill => String(pill.textContent || "").includes("BUILD:"));
   if (buildPill) buildPill.textContent = `BUILD: ${PHASE}`;
-  if (!String(document.title || "").includes("Phase 93")) document.title = "ScarlettVR Poker • Phase 93 runtime audit guard";
+  if (!String(document.title || "").includes("Phase 94")) document.title = "ScarlettVR Poker • Phase 94 runtime audit hotfix";
 }
-
 function runAudit(){
   setBuildLabel();
   updateVisualLabel();
   const htmlText = document.documentElement?.innerText || document.body?.innerText || "";
-  const blockedTermsPresent = textIncludesAny(htmlText, APPROVAL_BLOCKED_TERMS);
+  const blockedApprovalTermsPresent = textIncludesAny(htmlText, APPROVAL_BLOCKED_TERMS);
+  const missingGlobals = getMissingGlobals();
+  const missingSceneButtons = getMissingButtons();
   const audit = {
     phase: PHASE,
     timestamp: new Date().toISOString(),
     siteTouched: false,
     gameTrackOnly: true,
-    missingGlobals: getMissingGlobals(),
-    missingSceneButtons: getMissingButtons(),
+    missingGlobals,
+    missingSceneButtons,
     blockedApprovalTermsPresent,
     modules: getModuleStates(),
     ok: false
   };
-  audit.ok = audit.missingSceneButtons.length === 0 && audit.blockedApprovalTermsPresent.length === 0;
+  audit.ok = missingGlobals.length === 0 && missingSceneButtons.length === 0 && blockedApprovalTermsPresent.length === 0;
+  window.SVR_PHASE94_RUNTIME_AUDIT = audit;
   window.SVR_PHASE93_RUNTIME_AUDIT = audit;
   window.dispatchEvent(new CustomEvent("svr-runtime-audit", { detail: audit }));
   return audit;
 }
-
 function boot(){
   setBuildLabel();
   updateVisualLabel();
@@ -85,16 +80,22 @@ function boot(){
   let runs = 0;
   const loop = () => {
     runs += 1;
-    const audit = runAudit();
-    const sig = JSON.stringify({ missing: audit.missingGlobals, buttons: audit.missingSceneButtons, blocked: audit.blockedApprovalTermsPresent, modules: audit.modules });
+    let audit;
+    try {
+      audit = runAudit();
+    } catch (err){
+      audit = { phase: PHASE, ok: false, error: err?.message || String(err), timestamp: new Date().toISOString() };
+      window.SVR_PHASE94_RUNTIME_AUDIT = audit;
+      window.SVR_PHASE93_RUNTIME_AUDIT = audit;
+    }
+    const sig = JSON.stringify({ missing: audit.missingGlobals, buttons: audit.missingSceneButtons, blocked: audit.blockedApprovalTermsPresent, modules: audit.modules, error: audit.error });
     if (sig !== lastSig){
       lastSig = sig;
-      try { console.info("[SVR Phase 93 Runtime Audit]", audit); } catch {}
+      try { console.info("[SVR Phase 94 Runtime Audit]", audit); } catch {}
     }
-    if (runs < 36) setTimeout(loop, 1000);
+    if (runs < 45) setTimeout(loop, 1000);
   };
   setTimeout(loop, 600);
 }
-
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
 else boot();
