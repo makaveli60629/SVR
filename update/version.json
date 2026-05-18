@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-95-POKER-FEEDBACK-FX-LOCK",
+  "build": "PHASE-96-RUNTIME-AUDIT-EXPANSION-LOCK",
   "scope": "game-only",
-  "fix": "poker turn toast, action toast, winner toast, lightweight WebAudio cues after user interaction",
+  "fix": "expanded runtime audit, Phase 95 feedback FX detection, stale phase label detection, safer public health report",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-94-RUNTIME-AUDIT-GUARD-HOTFIX-LOCK"
+  "previousStableBuild": "PHASE-95-POKER-FEEDBACK-FX-LOCK"
 }
