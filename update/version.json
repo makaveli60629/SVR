@@ -1,7 +1,8 @@
 {
-  "build": "PHASE-98-RUNTIME-PHASE-SYNC-LOCK",
-  "scope": "game-only",
-  "fix": "sync runtime audit and health panel to latest modular stack, include health panel detection, update phase compatibility globals",
+  "build": "PHASE-100-RUNTIME-SMOKE-TEST-DEPLOY-PACK-LOCK",
+  "scope": "game-docs-deploy-validation-only",
+  "fix": "runtime smoke-test checklist, deploy validation pack, health panel expected output, poker watch HUD FX route tests",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-97-RUNTIME-HEALTH-PANEL-LOCK"
+  "runtimePreserved": "PHASE-98-RUNTIME-PHASE-SYNC-LOCK",
+  "previousStableBuild": "PHASE-99-CURRENT-GAME-MANIFEST-SYNC-LOCK"
 }
