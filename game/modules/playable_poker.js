@@ -1,10 +1,13 @@
 import * as THREE from "three";
 
-const PHASE = "PHASE-85-BOOT-STABLE-PLAYABLE-POKER-LOCK";
+const PHASE = "PHASE-89-POKER-SIDEPOT-BETTING-POLISH-LOCK";
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"];
 const RANK_VALUE = Object.fromEntries(RANKS.map((rank, i) => [rank, i + 2]));
 const PLAYER_SEAT_INDEX = 3;
+const STARTING_STACK = 1000;
+const SMALL_BLIND = 10;
+const BIG_BLIND = 20;
 
 function createDeck(){
   const deck = [];
@@ -13,7 +16,6 @@ function createDeck(){
   }
   return deck;
 }
-
 function shuffle(deck){
   for (let i = deck.length - 1; i > 0; i--){
     const j = Math.floor(Math.random() * (i + 1));
@@ -21,7 +23,6 @@ function shuffle(deck){
   }
   return deck;
 }
-
 function cardText(card){ return card ? card.id : "--"; }
 function cardsText(cards, hidden = false){
   if (!cards?.length) return "--";
@@ -32,9 +33,7 @@ function comboScore(category, values){
   const padded = values.concat([0,0,0,0,0]).slice(0, 5);
   return category * 1e10 + padded[0] * 1e8 + padded[1] * 1e6 + padded[2] * 1e4 + padded[3] * 1e2 + padded[4];
 }
-function topValues(values, count, exclude = []){
-  return values.filter(v => !exclude.includes(v)).slice(0, count);
-}
+function topValues(values, count, exclude = []){ return values.filter(v => !exclude.includes(v)).slice(0, count); }
 function findStraight(values){
   const unique = Array.from(new Set(values)).sort((a,b)=>b-a);
   if (unique.includes(14)) unique.push(1);
@@ -59,9 +58,7 @@ function evaluateFive(cards){
   }
   const trips = grouped.filter(g => g[1] === 3).map(g => g[0]);
   const pairs = grouped.filter(g => g[1] === 2).map(g => g[0]);
-  if (trips.length && pairs.length){
-    return { category: 6, values: [trips[0], pairs[0]], score: comboScore(6, [trips[0], pairs[0]]), label: "Full House" };
-  }
+  if (trips.length && pairs.length) return { category: 6, values: [trips[0], pairs[0]], score: comboScore(6, [trips[0], pairs[0]]), label: "Full House" };
   if (flush) return { category: 5, values, score: comboScore(5, values), label: "Flush" };
   if (straightHigh) return { category: 4, values: [straightHigh], score: comboScore(4, [straightHigh]), label: "Straight" };
   if (trips.length){
@@ -135,6 +132,7 @@ function drawRoundRect(ctx, x, y, w, h, r){
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
 }
+function clampNumber(value, min, max){ return Math.max(min, Math.min(max, Number.isFinite(value) ? Math.floor(value) : min)); }
 
 export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), seats = [], log = ()=>{}, onState = ()=>{} } = {}){
   const panel = makeCanvasPanel();
@@ -143,7 +141,7 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
     seat: i,
     name: i === PLAYER_SEAT_INDEX ? "YOU" : ["NOVA", "CARLA", "MILO", "ACE", "RIVER", "ONYX"][i] || `BOT ${i + 1}`,
     isUser: i === PLAYER_SEAT_INDEX,
-    stack: 1000,
+    stack: STARTING_STACK,
     bet: 0,
     totalBet: 0,
     folded: false,
@@ -155,24 +153,27 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
   let deck = [];
   let board = [];
   let pot = 0;
+  let sidePots = [];
   let dealerButton = 0;
   let activeIndex = 0;
   let currentBet = 0;
-  let minRaise = 20;
+  let minRaise = BIG_BLIND;
   let phase = "idle";
   let awaitingPlayer = false;
   let botTimer = 0;
   let handNumber = 0;
   let winnerText = "";
+  let winnerDetails = "";
   let lastAction = "Ready — press H for next hand";
   let dirty = true;
 
   function orderedFrom(start){ return Array.from({ length: players.length }, (_, n) => (start + n) % players.length); }
+  function liveBettingPlayers(){ return players.filter(p => !p.folded && !p.allIn && p.stack > 0 && p.cards.length); }
   function nextLiveIndex(from){
     for (let step = 1; step <= players.length; step++){
       const idx = (from + step) % players.length;
       const p = players[idx];
-      if (!p.folded && !p.allIn && p.stack > 0) return idx;
+      if (!p.folded && !p.allIn && p.stack > 0 && p.cards.length) return idx;
     }
     return -1;
   }
@@ -181,7 +182,7 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
   function resetRoundBets(){
     for (const p of players){ p.bet = 0; p.acted = p.folded || p.allIn; }
     currentBet = 0;
-    minRaise = 20;
+    minRaise = BIG_BLIND;
   }
   function collect(player, amount){
     const pay = Math.min(Math.max(0, Math.floor(amount)), player.stack);
@@ -207,20 +208,22 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
     deck = shuffle(createDeck());
     board = [];
     pot = 0;
+    sidePots = [];
     currentBet = 0;
-    minRaise = 20;
+    minRaise = BIG_BLIND;
     winnerText = "";
+    winnerDetails = "";
     phase = "preflop";
     dealerButton = (dealerButton + 1) % players.length;
     for (const p of players){
-      if (p.stack <= 0) p.stack = 1000;
+      if (p.stack <= 0) p.stack = STARTING_STACK;
       p.bet = 0; p.totalBet = 0; p.folded = false; p.allIn = false; p.cards = []; p.acted = false; p.lastAction = "";
     }
     dealHoleCards();
     const sb = (dealerButton + 1) % players.length;
     const bb = (dealerButton + 2) % players.length;
-    postBlind(sb, 10, "SB");
-    postBlind(bb, 20, "BB");
+    postBlind(sb, SMALL_BLIND, "SB");
+    postBlind(bb, BIG_BLIND, "BB");
     activeIndex = (bb + 1) % players.length;
     for (const p of players) p.acted = false;
     players[sb].acted = true;
@@ -232,25 +235,49 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
   }
   function remainingUnfolded(){ return players.filter(p => !p.folded && p.cards.length); }
   function onlyOneLeft(){ return remainingUnfolded().length === 1; }
+  function buildSidePots(){
+    const levels = Array.from(new Set(players.map(p => p.totalBet).filter(v => v > 0))).sort((a,b)=>a-b);
+    const pots = [];
+    let prev = 0;
+    for (const level of levels){
+      const contributors = players.filter(p => p.totalBet >= level);
+      const eligible = contributors.filter(p => !p.folded && p.cards.length);
+      const amount = (level - prev) * contributors.length;
+      if (amount > 0 && eligible.length) pots.push({ amount, eligible });
+      prev = level;
+    }
+    return pots;
+  }
+  function addPayout(winners, amount){
+    if (!winners.length || amount <= 0) return;
+    const share = Math.floor(amount / winners.length);
+    let remainder = amount - share * winners.length;
+    for (const w of winners){
+      w.stack += share + (remainder > 0 ? 1 : 0);
+      if (remainder > 0) remainder -= 1;
+    }
+  }
   function payoutSingle(reason = "wins"){
     const winner = remainingUnfolded()[0];
     if (!winner) return;
     winner.stack += pot;
-    winnerText = `${winner.name} ${reason} ${pot}`;
+    winnerText = `${winner.name} ${reason} $${pot}`;
+    winnerDetails = "All opponents folded";
     lastAction = winnerText;
     pot = 0;
+    sidePots = [];
     phase = "showdown";
     awaitingPlayer = false;
     markDirty();
   }
   function roundComplete(){
-    const active = players.filter(p => !p.folded && !p.allIn && p.cards.length);
+    const active = liveBettingPlayers();
     if (active.length === 0) return true;
     return active.every(p => p.acted && p.bet === currentBet);
   }
   function firstPostflopActor(){
     const order = orderedFrom((dealerButton + 1) % players.length);
-    return order.find(idx => !players[idx].folded && !players[idx].allIn && players[idx].cards.length) ?? -1;
+    return order.find(idx => !players[idx].folded && !players[idx].allIn && players[idx].stack > 0 && players[idx].cards.length) ?? -1;
   }
   function advanceStreet(){
     if (onlyOneLeft()) return payoutSingle("takes the pot");
@@ -266,50 +293,97 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
     } else if (phase === "river") return showdown();
     resetRoundBets();
     activeIndex = firstPostflopActor();
-    awaitingPlayer = activeIndex >= 0 && players[activeIndex].isUser;
+    if (activeIndex < 0) return showdown();
+    awaitingPlayer = players[activeIndex]?.isUser;
     botTimer = 0.55;
     lastAction = `${phase.toUpperCase()} dealt`;
     markDirty();
   }
   function showdown(){
-    const ranked = contenders().map(p => ({ player: p, hand: evaluateBest([...p.cards, ...board]) })).sort((a,b)=>b.hand.score-a.hand.score);
-    const winner = ranked[0]?.player;
-    if (!winner){ phase = "showdown"; return; }
-    const hand = ranked[0].hand;
-    winner.stack += pot;
-    winnerText = `${winner.name} wins ${pot} — ${hand.label}`;
+    const ranked = contenders().map(p => ({ player: p, hand: evaluateBest([...p.cards, ...board]) }));
+    if (!ranked.length){ phase = "showdown"; markDirty(); return; }
+    const byPlayer = new Map(ranked.map(r => [r.player, r.hand]));
+    const pots = buildSidePots();
+    const payouts = [];
+    for (const sidePot of pots){
+      let bestScore = -Infinity;
+      for (const p of sidePot.eligible) bestScore = Math.max(bestScore, byPlayer.get(p)?.score ?? -Infinity);
+      const winners = sidePot.eligible.filter(p => (byPlayer.get(p)?.score ?? -Infinity) === bestScore);
+      addPayout(winners, sidePot.amount);
+      const label = byPlayer.get(winners[0])?.label || "Hand";
+      payouts.push(`${winners.map(w => w.name).join("/")} $${sidePot.amount} (${label})`);
+    }
+    const top = ranked.sort((a,b)=>b.hand.score-a.hand.score)[0];
+    sidePots = pots.map(p => ({ amount: p.amount, eligible: p.eligible.map(e => e.name) }));
+    winnerText = payouts[0] || `${top.player.name} wins — ${top.hand.label}`;
+    winnerDetails = payouts.join(" • ") || `${top.player.name}: ${top.hand.label}`;
     lastAction = winnerText;
     pot = 0;
     phase = "showdown";
     awaitingPlayer = false;
     markDirty();
   }
-  function actionFor(player, type){
+  function getLegalState(player = players[PLAYER_SEAT_INDEX]){
+    const inHand = !!player?.cards?.length && !player.folded && !player.allIn && phase !== "idle" && phase !== "showdown";
+    const toCall = inHand ? Math.max(0, currentBet - player.bet) : 0;
+    const canCheck = inHand && toCall === 0;
+    const canCall = inHand && toCall > 0 && player.stack > 0;
+    const minRaiseTo = Math.max(currentBet + minRaise, BIG_BLIND * 2);
+    const maxRaiseTo = player ? player.bet + player.stack : 0;
+    const canRaise = inHand && maxRaiseTo > Math.max(currentBet, minRaiseTo - 1) && player.stack > toCall;
+    return { inHand, toCall, canFold: inHand, canCheck, canCall, canRaise, canAllIn: inHand && player.stack > 0, minRaiseTo, maxRaiseTo };
+  }
+  function setIllegal(player, label){
+    if (player){ player.lastAction = `Blocked: ${label}`; }
+    lastAction = `${player?.name || "Player"}: illegal action blocked (${label})`;
+    markDirty();
+    return false;
+  }
+  function actionFor(player, type, raiseMode = "min"){
     if (!player || phase === "showdown" || phase === "idle") return false;
-    const toCall = Math.max(0, currentBet - player.bet);
+    const legal = getLegalState(player);
+    if (!legal.inHand) return setIllegal(player, "not active in hand");
+    const toCall = legal.toCall;
     player.acted = true;
     if (type === "fold"){
+      if (!legal.canFold) return setIllegal(player, "cannot fold");
       player.folded = true;
       player.lastAction = "Fold";
       lastAction = `${player.name}: fold`;
       if (onlyOneLeft()) payoutSingle("wins by fold");
     } else if (type === "allin"){
-      const before = player.bet;
+      if (!legal.canAllIn) return setIllegal(player, "cannot all-in");
+      const beforeBet = player.bet;
       const paid = collect(player, player.stack);
-      if (player.bet > currentBet){ currentBet = player.bet; for (const p of players) if (p !== player && !p.folded && !p.allIn) p.acted = false; }
-      player.lastAction = `All-In ${paid}`;
-      lastAction = `${player.name}: all-in`;
-      if (player.bet === before) player.allIn = true;
-    } else if (type === "raise"){
-      const raiseTo = Math.min(player.stack + player.bet, Math.max(currentBet + minRaise, 40));
-      const paid = collect(player, raiseTo - player.bet);
       if (player.bet > currentBet){
+        const actualRaise = player.bet - currentBet;
         currentBet = player.bet;
+        if (actualRaise >= minRaise) minRaise = actualRaise;
         for (const p of players) if (p !== player && !p.folded && !p.allIn) p.acted = false;
       }
-      player.lastAction = `Raise ${paid}`;
-      lastAction = `${player.name}: raise`;
+      player.lastAction = `All-In ${paid}`;
+      lastAction = `${player.name}: all-in`;
+      if (player.bet === beforeBet) player.allIn = true;
+    } else if (type === "raise"){
+      if (!legal.canRaise) return setIllegal(player, "cannot raise");
+      let target = legal.minRaiseTo;
+      if (raiseMode === "halfpot") target = Math.max(legal.minRaiseTo, currentBet + Math.ceil((pot + toCall) / 2));
+      if (raiseMode === "pot") target = Math.max(legal.minRaiseTo, currentBet + pot + toCall);
+      target = clampNumber(target, legal.minRaiseTo, legal.maxRaiseTo);
+      const beforeBet = player.bet;
+      const paid = collect(player, target - player.bet);
+      if (player.bet > currentBet){
+        const actualRaise = player.bet - currentBet;
+        currentBet = player.bet;
+        if (actualRaise >= minRaise) minRaise = actualRaise;
+        for (const p of players) if (p !== player && !p.folded && !p.allIn) p.acted = false;
+      }
+      player.lastAction = player.allIn ? `Raise All-In ${paid}` : `Raise ${paid}`;
+      lastAction = `${player.name}: raise to $${player.bet}`;
+      if (player.bet === beforeBet) return setIllegal(player, "raise too small");
     } else {
+      if (toCall > 0 && !legal.canCall) return setIllegal(player, "cannot call");
+      if (toCall === 0 && !legal.canCheck) return setIllegal(player, "cannot check");
       const paid = collect(player, toCall);
       player.lastAction = toCall > 0 ? `Call ${paid}` : "Check";
       lastAction = `${player.name}: ${toCall > 0 ? "call" : "check"}`;
@@ -325,28 +399,36 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
     markDirty();
     return true;
   }
-  function userAction(type){ if (!awaitingPlayer) return false; return actionFor(players[PLAYER_SEAT_INDEX], type); }
+  function userAction(type, raiseMode = "min"){
+    if (!awaitingPlayer) return setIllegal(players[PLAYER_SEAT_INDEX], "not your turn");
+    return actionFor(players[PLAYER_SEAT_INDEX], type, raiseMode);
+  }
   function botAction(){
     const p = players[activeIndex];
     if (!p || p.isUser || p.folded || p.allIn) return;
-    const toCall = Math.max(0, currentBet - p.bet);
+    const legal = getLegalState(p);
+    if (!legal.inHand) return;
     let strength = phase === "preflop" ? preflopStrength(p.cards) : (evaluateBest([...p.cards, ...board]).category / 8);
     strength += Math.random() * 0.16 - 0.08;
-    if (toCall > 0 && strength < 0.34 && toCall > p.stack * 0.12) return actionFor(p, "fold");
-    if (strength > 0.72 && p.stack > toCall + minRaise && Math.random() > 0.42) return actionFor(p, "raise");
+    if (legal.toCall > 0 && strength < 0.30 && legal.toCall > p.stack * 0.10) return actionFor(p, "fold");
+    if (legal.canRaise && strength > 0.76 && Math.random() > 0.44) return actionFor(p, "raise", strength > 0.88 ? "halfpot" : "min");
+    if (legal.canAllIn && strength > 0.93 && p.stack < pot * 0.45 && Math.random() > 0.55) return actionFor(p, "allin");
     return actionFor(p, "call");
   }
   function getState(){
     const user = players[PLAYER_SEAT_INDEX];
-    const toCall = Math.max(0, currentBet - user.bet);
+    const legal = getLegalState(user);
     const current = players[activeIndex];
     return {
       phase: PHASE,
       handNumber,
       street: phase,
       pot,
+      sidePots,
       currentBet,
-      toCall,
+      minRaise,
+      toCall: legal.toCall,
+      legal,
       awaitingPlayer,
       activeName: current?.name || "--",
       playerStack: user.stack,
@@ -354,6 +436,7 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
       playerCards: user.cards.map(cardText),
       board: board.map(cardText),
       winnerText,
+      winnerDetails,
       lastAction,
       controls: "F Fold • C Check/Call • R Raise • A All-In • H Next"
     };
@@ -368,39 +451,45 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
     ctx.fillStyle = bg;
     drawRoundRect(ctx, 18, 18, 988, 476, 34);
     ctx.fill();
-    ctx.strokeStyle = "rgba(178,132,255,0.78)";
+    ctx.strokeStyle = state.awaitingPlayer ? "rgba(246,226,127,0.86)" : "rgba(178,132,255,0.78)";
     ctx.lineWidth = 6;
     drawRoundRect(ctx, 18, 18, 988, 476, 34);
     ctx.stroke();
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 46px system-ui, Arial";
-    ctx.fillText("SVR PLAYABLE POKER", 44, 72);
+    ctx.font = "bold 43px system-ui, Arial";
+    ctx.fillText("SVR PLAYABLE POKER", 44, 70);
     ctx.fillStyle = "#7ff5c7";
-    ctx.font = "bold 34px system-ui, Arial";
-    ctx.fillText(`Pot $${state.pot}  •  ${state.street.toUpperCase()}  •  Active: ${state.activeName}`, 44, 124);
+    ctx.font = "bold 30px system-ui, Arial";
+    ctx.fillText(`Pot $${state.pot}  •  ${state.street.toUpperCase()}  •  Active: ${state.activeName}`, 44, 118);
     ctx.fillStyle = "#e9e9ff";
-    ctx.font = "bold 40px system-ui, Arial";
-    ctx.fillText(`Board: ${cardsText(board)}`, 44, 188);
-    ctx.fillText(`Your hand: ${cardsText(players[PLAYER_SEAT_INDEX].cards)}`, 44, 246);
+    ctx.font = "bold 37px system-ui, Arial";
+    ctx.fillText(`Board: ${cardsText(board)}`, 44, 178);
+    ctx.fillText(`Your hand: ${cardsText(userCards())}`, 44, 232);
     ctx.fillStyle = state.awaitingPlayer ? "#f6e27f" : "#cfcfff";
-    ctx.font = "bold 32px system-ui, Arial";
-    ctx.fillText(state.awaitingPlayer ? `YOUR TURN — ${state.toCall > 0 ? `CALL $${state.toCall}` : "CHECK"}` : state.lastAction, 44, 308);
+    ctx.font = "bold 30px system-ui, Arial";
+    ctx.fillText(state.awaitingPlayer ? `YOUR TURN — ${state.toCall > 0 ? `CALL $${state.toCall}` : "CHECK"}` : state.lastAction, 44, 292);
     ctx.fillStyle = "rgba(255,255,255,0.82)";
-    ctx.font = "26px system-ui, Arial";
-    ctx.fillText(`Stack: $${state.playerStack}  •  Bet: $${state.playerBet}  •  ${state.controls}`, 44, 360);
+    ctx.font = "24px system-ui, Arial";
+    ctx.fillText(`Stack: $${state.playerStack} • Bet: $${state.playerBet} • Min Raise: $${state.legal.minRaiseTo}`, 44, 340);
+    if (state.sidePots.length){
+      ctx.fillStyle = "rgba(246,226,127,0.88)";
+      ctx.font = "20px system-ui, Arial";
+      ctx.fillText(`Side pots: ${state.sidePots.map(p => `$${p.amount}`).join(" / ")}`, 44, 372);
+    }
     const rows = players.map(p => `${p.name}${p.seat === dealerButton ? " D" : ""}: $${p.stack} ${p.folded ? "FOLD" : p.lastAction || ""}`);
     ctx.fillStyle = "rgba(218,218,255,0.78)";
-    ctx.font = "22px system-ui, Arial";
-    rows.slice(0,3).forEach((row, i)=>ctx.fillText(row, 48, 410 + i * 28));
-    rows.slice(3).forEach((row, i)=>ctx.fillText(row, 536, 410 + i * 28));
+    ctx.font = "21px system-ui, Arial";
+    rows.slice(0,3).forEach((row, i)=>ctx.fillText(row, 48, 410 + i * 26));
+    rows.slice(3).forEach((row, i)=>ctx.fillText(row, 536, 410 + i * 26));
     if (winnerText){
       ctx.fillStyle = "#7ff5c7";
-      ctx.font = "bold 30px system-ui, Arial";
-      ctx.fillText(winnerText, 44, 466);
+      ctx.font = "bold 25px system-ui, Arial";
+      ctx.fillText(winnerText.slice(0, 58), 44, 486);
     }
     texture.needsUpdate = true;
     dirty = false;
   }
+  function userCards(){ return players[PLAYER_SEAT_INDEX].cards; }
   function update(dt){
     panel.mesh.position.x = tableCenter.x || 0;
     if (phase !== "idle" && phase !== "showdown" && !awaitingPlayer){
@@ -413,7 +502,7 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
 
   beginHand();
   drawPanel();
-  log(`[${PHASE}] Playable poker module loaded`);
+  log(`[${PHASE}] Side-pot and betting polish poker module loaded`);
   return {
     update,
     getState,
@@ -421,7 +510,9 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
     nextHand,
     fold: () => userAction("fold"),
     checkCall: () => userAction("call"),
-    raise: () => userAction("raise"),
+    raise: () => userAction("raise", "min"),
+    raiseHalfPot: () => userAction("raise", "halfpot"),
+    raisePot: () => userAction("raise", "pot"),
     allIn: () => userAction("allin"),
     object: panel.mesh
   };
