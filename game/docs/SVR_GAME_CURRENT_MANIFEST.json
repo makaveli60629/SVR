@@ -1,6 +1,6 @@
 {
-  "manifestPhase": "PHASE-99-CURRENT-GAME-MANIFEST-SYNC-LOCK",
-  "currentRuntimeBuild": "PHASE-98-RUNTIME-PHASE-SYNC-LOCK",
+  "manifestPhase": "PHASE-106-CURRENT-GAME-MANIFEST-2026-SYNC-LOCK",
+  "currentRuntimeBuild": "PHASE-105-RUNTIME-AUDIT-LATEST-MODULE-SYNC-LOCK",
   "scope": "game-documentation-manifest-sync-only",
   "siteTouched": false,
   "repoTrack": "game-side-only",
@@ -18,7 +18,8 @@
     "Preserve one open south/front player seat and five bot seats.",
     "Preserve invisible dealer/card logic; dealer body remains disabled.",
     "Preserve runtime health/audit panel visibility for testing.",
-    "Keep modular add-on files removable without breaking the lobby boot path."
+    "Keep modular add-on files removable without breaking the lobby boot path.",
+    "Preserve Phase 101 visible card sync, Phase 102 chip motion, Phase 103 controller input, Phase 104 private route guard, and Phase 105 audit sync."
   ],
   "runtimeHistory": {
     "phase85": {"name": "Playable Poker Lock", "features": ["deck creation and shuffle", "hole cards", "community board", "street flow", "bot actions", "hand evaluation", "pot movement", "stack accounting", "table status panel", "keyboard controls"]},
@@ -35,14 +36,22 @@
     "phase96": {"name": "Runtime Audit Expansion Lock", "features": ["feedback FX detection", "stale label detection", "audio unlock status", "expanded health object"]},
     "phase97": {"name": "Runtime Health Panel Lock", "features": ["in-game HEALTH button", "module status panel", "route status panel", "approval-term status panel"]},
     "phase98": {"name": "Runtime Phase Sync Lock", "features": ["sync audit to latest stack", "health panel detection", "Phase 98 compatibility globals", "visible build label sync"]},
-    "phase99": {"name": "Current Game Manifest Sync Lock", "features": ["updated current manifest", "post-98 phase history", "next-phase roadmap", "deployment checklist"]}
+    "phase99": {"name": "Current Game Manifest Sync Lock", "features": ["updated current manifest", "post-98 phase history", "next-phase roadmap", "deployment checklist"]},
+    "phase100": {"name": "Runtime Smoke-Test Deploy Pack Lock", "features": ["deploy checklist", "first-load smoke test", "HEALTH panel expected output", "poker/watch/HUD/FX/NPC/private-route tests"]},
+    "phase101": {"name": "Visual Card Mesh Sync Lock", "features": ["visible board cards", "visible player hand cards", "deck placeholder", "muck placeholder", "winner and your-turn card highlight"]},
+    "phase102": {"name": "Chip Throw Sweep Animation Lock", "features": ["chip throw on call/raise/blinds/all-in", "pot pulse", "chip sweep to winner", "low-performance protection"]},
+    "phase103": {"name": "Quest Controller Input Polish Lock", "features": ["right-stick forward/back movement", "45-degree snap turn", "hold A/grip/trigger aim teleport", "release teleport", "controller debug state"]},
+    "phase104": {"name": "Private Scene Route Hardening Lock", "features": ["private route registry", "route availability checks", "missing-route reporting", "Shift/Alt private scene open", "route guard panel"]},
+    "phase105": {"name": "Runtime Audit Latest Module Sync Lock", "features": ["audit detects cards/chips/controller/routes", "HEALTH panel reports latest module status", "Phase 105 compatibility globals", "latest visible build label sync"]},
+    "phase106": {"name": "Current Game Manifest 2026 Sync Lock", "features": ["manifest synced through Phase 105", "updated locked files", "updated runtime globals", "updated next roadmap", "site untouched documentation"]}
   },
   "lockedFiles": {
     "runtimeEntry": ["game/index.html", "game/main.js"],
     "poker": ["game/modules/playable_poker.js", "game/modules/watch.js", "game/modules/poker_action_hud.js"],
-    "fxAndFeedback": ["game/modules/poker_table_fx.js", "game/modules/npc_bot_animation_fx.js", "game/modules/poker_feedback_fx.js"],
-    "auditAndHealth": ["game/modules/runtime_audit_guard.js", "game/modules/runtime_health_panel.js"],
+    "fxAndFeedback": ["game/modules/poker_table_fx.js", "game/modules/npc_bot_animation_fx.js", "game/modules/poker_feedback_fx.js", "game/modules/poker_card_mesh_sync.js", "game/modules/poker_chip_motion_fx.js"],
+    "auditHealthRoutes": ["game/modules/runtime_audit_guard.js", "game/modules/runtime_health_panel.js", "game/modules/private_scene_route_guard.js"],
     "sceneAndVR": ["game/modules/world_skyline.js", "game/modules/teleport.js", "game/modules/hands.js", "game/modules/npc_avatar_system.js", "game/modules/webxr_enforcer.js"],
+    "docs": ["game/docs/SVR_GAME_CURRENT_MANIFEST.json", "game/docs/PHASE_100_RUNTIME_SMOKE_TEST_DEPLOY_PACK.md", "game/docs/PHASE_106_CURRENT_GAME_MANIFEST_2026_SYNC_LOCK.md"],
     "version": ["update/version.json"]
   },
   "runtimeGlobals": [
@@ -51,8 +60,12 @@
     "window.SVR_PHASE91_TABLE_FX",
     "window.SVR_PHASE92_NPC_BOT_ANIMATION_FX",
     "window.SVR_PHASE95_POKER_FEEDBACK_FX",
-    "window.SVR_PHASE98_RUNTIME_AUDIT",
-    "window.SVR_PHASE98_RUNTIME_HEALTH_PANEL"
+    "window.SVR_PHASE101_VISUAL_CARD_MESH_SYNC",
+    "window.SVR_PHASE102_CHIP_MOTION_FX",
+    "window.SVR_PHASE103_CONTROLLER_INPUT",
+    "window.SVR_PHASE104_PRIVATE_ROUTE_GUARD",
+    "window.SVR_PHASE105_RUNTIME_AUDIT",
+    "window.SVR_PHASE105_RUNTIME_HEALTH_PANEL"
   ],
   "lobbyRule": {
     "allowed": ["main poker table", "Reiki storefront/portal", "PGA storefront/portal", "Smoker Lounge portal", "Scorpion Room portal", "VR Store portal", "sponsor placeholders", "Moon and Mars in sky"],
@@ -61,12 +74,12 @@
   "privateSceneRoutes": ["game/reiki.html", "game/range.html", "game/pga-drive.html", "game/chip-putt.html", "game/store-room.html", "game/smoker-lounge.html", "game/scorpion.html"],
   "controlsLock": {
     "handTracking": ["pinch/fist hold aims teleport", "release teleports", "wrist watch controls available", "no instant accidental teleport"],
-    "questControllerFallback": ["right stick up/down forward/back", "right stick left/right 45 degree snap turn", "A/grip/trigger hold aims teleport", "release teleports", "controller meshes hidden or natural hands"],
+    "questControllerFallback": ["right stick up/down forward/back", "right stick left/right 45 degree snap turn", "A/grip/trigger hold aims teleport", "release teleports", "controller meshes hidden or natural hands", "window.SVR_PHASE103_CONTROLLER_INPUT reports state"],
     "desktopAndroid": ["keyboard poker controls", "touch-friendly poker HUD", "scene nav outside preview mode", "HUD hidden during XR sessions", "health panel available outside preview mode"]
   },
   "pokerLock": {
-    "preserve": ["left-to-right dealing from dealer button", "one open player seat", "five bot seats", "fold/check/call/raise/all-in/next hand", "street progression", "hand evaluation", "side-pot payout", "player and bot stack updates", "visible poker status panel", "watch poker controls", "desktop/mobile poker HUD", "feedback toasts"],
-    "nextImprovements": ["visual card meshes synchronized with logic", "chip throw/sweep animation tied to actual actions", "stronger raise sizing UI", "disabled button states when illegal", "persistent table/session state when backend is ready"]
+    "preserve": ["left-to-right dealing from dealer button", "one open player seat", "five bot seats", "fold/check/call/raise/all-in/next hand", "street progression", "hand evaluation", "side-pot payout", "player and bot stack updates", "visible poker status panel", "watch poker controls", "desktop/mobile poker HUD", "feedback toasts", "visible card sync", "chip motion FX"],
+    "nextImprovements": ["stronger raise sizing UI", "disabled button states when illegal", "cleaner player betting controls on HUD/watch", "actual private scene page builds", "persistent table/session state when backend is ready"]
   },
   "approvalSafetyLock": {
     "blockedUntilApproval": ["Trueitive", "Truitive", "trueitive.com", "truitive.com", "Shyona", "Royston", "founder photos", "outside Reiki websites", "unapproved Reiki logos"],
@@ -74,20 +87,23 @@
   },
   "siteProtectionLock": ["root index.html", "/site", "site.zip", "website style.css/matrix.js files", "website admin/contact/store pages"],
   "nextRecommendedPhases": [
-    {"phase": "Phase 100", "name": "Runtime Smoke-Test Checklist + Deploy Pack"},
-    {"phase": "Phase 101", "name": "Visual Card Mesh Sync"},
-    {"phase": "Phase 102", "name": "Chip Throw/Sweep Animation"},
-    {"phase": "Phase 103", "name": "Quest Controller Input Final Polish"},
-    {"phase": "Phase 104", "name": "Private Scene Route Hardening"}
+    {"phase": "Phase 107", "name": "Raise Sizing UI + Illegal Button Disabled States"},
+    {"phase": "Phase 108", "name": "Watch Poker Button Disabled-State Polish"},
+    {"phase": "Phase 109", "name": "Private Scene Page Starter Builds"},
+    {"phase": "Phase 110", "name": "Quest Performance Regression Pass"},
+    {"phase": "Phase 111", "name": "Gameplay Demo Polish Lock"}
   ],
   "deploymentChecklist": [
     "Confirm /site and root public website are untouched.",
     "Run GitHub Actions Auto Deploy on main.",
-    "Open /game/?v=phase99-manifest-sync or later cache-busting URL.",
+    "Open /game/?v=phase106-manifest-sync or later cache-busting URL.",
     "Press Ctrl+F5.",
     "Confirm HEALTH panel status is OK or inspect listed issues.",
     "Confirm poker HUD works on desktop/mobile.",
     "Confirm watch/VR route buttons are still available in XR.",
+    "Confirm visible cards and chip motion still render.",
+    "Confirm Quest controller input state updates when tested on headset.",
+    "Confirm private route guard reports routes clearly.",
     "Confirm no blocked Reiki approval terms appear in runtime audit.",
     "Confirm no stale visible phase labels remain after audit sync."
   ]
