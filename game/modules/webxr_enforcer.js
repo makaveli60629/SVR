@@ -1,10 +1,10 @@
-// PHASE-84Z-AUDIT-SCENE-ENABLE-SKYLINE-LOCK
+// PHASE-85-BOOT-STABLE-PLAYABLE-POKER-LOCK
 // Runtime-safe guardrails for SVR Poker WebXR builds.
 // This module does not rewrite the scene. It records the architecture contract
 // and runs a lightweight audit so future updates do not accidentally flatten
 // the lobby, remove the moon/sky locks, or break scene routing.
 
-export const SVR_WEBXR_PHASE = "PHASE-84Z-AUDIT-SCENE-ENABLE-SKYLINE-LOCK";
+export const SVR_WEBXR_PHASE = "PHASE-85-BOOT-STABLE-PLAYABLE-POKER-LOCK";
 
 export const SVR_WEBXR_CONTRACT = Object.freeze({
   project: "SVR Poker / ScarlettVR Poker",
@@ -14,10 +14,8 @@ export const SVR_WEBXR_CONTRACT = Object.freeze({
   zipLimitMB: 25,
   requiredZones: Object.freeze([
     "lobby",
-    "table",
     "seat",
     "reiki",
-    "reikiRoom",
     "pga",
     "legends",
     "sponsor",
@@ -25,10 +23,8 @@ export const SVR_WEBXR_CONTRACT = Object.freeze({
   ]),
   requiredZoneLabels: Object.freeze([
     "Lobby",
-    "Table",
     "Seat",
     "Reiki",
-    "Zen Den",
     "PGA",
     "Legend",
     "Sponsor",
@@ -38,15 +34,16 @@ export const SVR_WEBXR_CONTRACT = Object.freeze({
     "pgaDrive",
     "chipPutt",
     "storeRoom",
-    "smokerLounge"
+    "smokerLounge",
+    "reikiRoom"
   ]),
   protectedSceneItems: Object.freeze([
     "permanent moon / mars sky presence",
     "neon purple/cyan accent trims",
     "store portal / store mirror surface",
-    "10-second silent winning hand banner",
     "wrist watch quick navigation",
     "private scene routing",
+    "playable poker table action loop",
     "Espresso With Cream building ad slot"
   ]),
   inputStrategy: Object.freeze({
@@ -56,6 +53,13 @@ export const SVR_WEBXR_CONTRACT = Object.freeze({
     snapTurn: "Right-stick left/right = 45-degree snap turn",
     move: "Right-stick up/down = look-forward movement",
     teleport: "Hold A / grip / trigger / hand pinch-fist to aim; release to teleport"
+  }),
+  pokerLock: Object.freeze({
+    playerActions: "Fold / Check / Call / Raise / All-In / Next Hand",
+    botTurns: "Simple bot decisions with fold/call/raise",
+    handFlow: "Preflop / Flop / Turn / River / Showdown",
+    payout: "Pot moves to winner stack",
+    dealer: "Dealer body remains invisible; logic is runtime-only"
   }),
   reikiApprovalLock: Object.freeze({
     allowed: "SVR branding and AWAITING APPROVAL placeholders only",
@@ -95,6 +99,7 @@ export function runWebXREnforcerAudit({ log = console.log } = {}){
     missingZones,
     requiredZones: [...SVR_WEBXR_CONTRACT.requiredZones],
     inputStrategy: SVR_WEBXR_CONTRACT.inputStrategy,
+    pokerLock: SVR_WEBXR_CONTRACT.pokerLock,
     protectedSceneItems: [...SVR_WEBXR_CONTRACT.protectedSceneItems]
   };
   window.SVR_WEBXR_ENFORCER = SVR_WEBXR_CONTRACT;
