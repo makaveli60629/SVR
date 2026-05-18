@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • Phase 87 desktop Android poker HUD lock</title>
+  <title>ScarlettVR Poker • Phase 89 side-pot betting polish</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -11,97 +11,34 @@
     html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
     #app { position: fixed; inset: 0; }
     canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
-    #hud {
-      position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10;
-      display: flex; gap: 10px; align-items: center; justify-content: space-between;
-      pointer-events: none;
-    }
-    .pill {
-      background: rgba(0,0,0,.55);
-      border: 1px solid rgba(180,140,255,.35);
-      backdrop-filter: blur(8px);
-      border-radius: 999px;
-      padding: 8px 12px;
-      color: #e9e9ff;
-      font-size: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.5);
-      pointer-events: none;
-    }
-    .btn {
-      pointer-events: auto;
-      border: 1px solid rgba(180,140,255,.45);
-      background: rgba(0,0,0,.55);
-      color: #fff;
-      border-radius: 999px;
-      padding: 8px 12px;
-      cursor: pointer;
-      user-select: none;
-    }
+    #hud { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10; display: flex; gap: 10px; align-items: center; justify-content: space-between; pointer-events: none; }
+    .pill { background: rgba(0,0,0,.55); border: 1px solid rgba(180,140,255,.35); backdrop-filter: blur(8px); border-radius: 999px; padding: 8px 12px; color: #e9e9ff; font-size: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.5); pointer-events: none; }
+    .btn { pointer-events: auto; border: 1px solid rgba(180,140,255,.45); background: rgba(0,0,0,.55); color: #fff; border-radius: 999px; padding: 8px 12px; cursor: pointer; user-select: none; }
     .btn:hover { background: rgba(60,40,90,.55); }
-    #sceneNav{
-      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12;
-      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
-      pointer-events: auto;
-    }
-    .scene-btn{
-      border: 1px solid rgba(120,255,186,.42);
-      background: rgba(2,10,8,.62);
-      color: #eafff4;
-      border-radius: 999px;
-      padding: 8px 12px;
-      cursor: pointer;
-      box-shadow: 0 10px 28px rgba(0,0,0,.35);
-      font-size: 12px;
-    }
+    #sceneNav{ position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; pointer-events: auto; }
+    .scene-btn{ border: 1px solid rgba(120,255,186,.42); background: rgba(2,10,8,.62); color: #eafff4; border-radius: 999px; padding: 8px 12px; cursor: pointer; box-shadow: 0 10px 28px rgba(0,0,0,.35); font-size: 12px; }
     .scene-btn:hover{ background: rgba(10,48,33,.72); }
     body.preview-mode #sceneNav { display:none !important; }
-    #log {
-      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10;
-      max-height: 38vh; overflow: auto; display: none;
-      background: rgba(0,0,0,.55);
-      border: 1px solid rgba(180,140,255,.25);
-      border-radius: 14px;
-      padding: 10px 12px;
-      color: #d7d7ff;
-      font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      white-space: pre-wrap;
-    }
-    #err {
-      position: fixed; inset: 0; display: none; z-index: 50;
-      background: rgba(0,0,0,.88);
-      color: #fff;
-      padding: 18px;
-      font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      overflow: auto;
-    }
-
-    body.preview-mode #hud,
-    body.preview-mode #log,
-    body.preview-mode #err { display: none !important; }
+    #log { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10; max-height: 38vh; overflow: auto; display: none; background: rgba(0,0,0,.55); border: 1px solid rgba(180,140,255,.25); border-radius: 14px; padding: 10px 12px; color: #d7d7ff; font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; white-space: pre-wrap; }
+    #err { position: fixed; inset: 0; display: none; z-index: 50; background: rgba(0,0,0,.88); color: #fff; padding: 18px; font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; overflow: auto; }
+    body.preview-mode #hud, body.preview-mode #log, body.preview-mode #err { display: none !important; }
   </style>
   <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-    }
-  }
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
   </script>
 </head>
 <body>
-  <!-- BUILD: PHASE-87-DESKTOP-ANDROID-POKER-HUD-LOCK -->
+  <!-- BUILD: PHASE-89-POKER-SIDEPOT-BETTING-POLISH-LOCK -->
   <div id="app"></div>
-
   <div id="hud">
     <div class="pill" id="status">Booting…</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: …</span>
-      <span class="pill">BUILD: PHASE-87-DESKTOP-ANDROID-POKER-HUD-LOCK</span>
+      <span class="pill">BUILD: PHASE-89-POKER-SIDEPOT-BETTING-POLISH-LOCK</span>
     </div>
   </div>
-
   <div id="sceneNav">
     <button class="scene-btn" data-scene="lobby">Lobby</button>
     <button class="scene-btn" data-scene="seat">Seat</button>
@@ -115,10 +52,8 @@
     <button class="scene-btn" data-scene="storeRoom">Store</button>
     <button class="scene-btn" data-scene="smokerLounge">Lounge</button>
   </div>
-
   <pre id="log"></pre>
   <pre id="err"></pre>
-
   <script type="module" src="./main.js"></script>
 </body>
 </html>
