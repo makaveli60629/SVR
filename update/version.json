@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-102-CHIP-THROW-SWEEP-ANIMATION-LOCK",
+  "build": "PHASE-103-QUEST-CONTROLLER-INPUT-POLISH-LOCK",
   "scope": "game-only",
-  "fix": "chip throw animation on call raise blinds, pot pulse, chip sweep animation to winner after showdown",
+  "fix": "Quest controller movement and teleport input polish, hold A/grip/trigger to aim and release to teleport, right-stick movement and snap-turn refinement",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-101-VISUAL-CARD-MESH-SYNC-LOCK"
+  "previousStableBuild": "PHASE-102-CHIP-THROW-SWEEP-ANIMATION-LOCK"
 }
