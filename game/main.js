@@ -9,9 +9,10 @@ import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createNpcAvatarSystem } from "./modules/npc_avatar_system.js";
 import { createPlayablePoker } from "./modules/playable_poker.js";
+import "./modules/poker_action_hud.js";
 import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
 
-const PHASE_85_BUILD = "PHASE-85-BOOT-STABLE-PLAYABLE-POKER-LOCK";
+const PHASE_85_BUILD = "PHASE-87-DESKTOP-ANDROID-POKER-HUD-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -310,6 +311,7 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
+  document.getElementById("svrPokerHud")?.classList.add("svr-hidden");
   await audio.prime();
   await audio.start();
   await tp.onSessionStart();
@@ -318,6 +320,7 @@ renderer.xr.addEventListener("sessionend", ()=>{
   setHudVisible(true);
   const nav = document.getElementById("sceneNav");
   if (nav && !AUTOCAM) nav.style.display = "flex";
+  document.getElementById("svrPokerHud")?.classList.remove("svr-hidden");
 });
 
 let tPrev = performance.now();
