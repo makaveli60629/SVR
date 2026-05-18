@@ -1,19 +1,23 @@
-// PHASE-98-RUNTIME-PHASE-SYNC-LOCK
-// Game-side only. Syncs the live runtime audit with the latest modular game stack
-// and includes the in-game health panel in the health report. No website or /site edits.
+// PHASE-105-RUNTIME-AUDIT-LATEST-MODULE-SYNC-LOCK
+// Game-side only. Syncs the runtime audit with the Phase 101-104 add-on modules
+// plus the latest health panel compatibility globals. No website or /site edits.
 
-const PHASE = "PHASE-98-RUNTIME-PHASE-SYNC-LOCK";
+const PHASE = "PHASE-105-RUNTIME-AUDIT-LATEST-MODULE-SYNC-LOCK";
 const REQUIRED_GLOBALS = [
   ["SVR_PLAYABLE_POKER", "playable poker engine"],
   ["SVR_POKER_ACTION_HUD", "desktop/android poker HUD"],
   ["SVR_PHASE91_TABLE_FX", "performance table FX"],
   ["SVR_PHASE92_NPC_BOT_ANIMATION_FX", "NPC bot animation FX"],
   ["SVR_PHASE95_POKER_FEEDBACK_FX", "poker feedback FX"],
-  ["SVR_PHASE97_RUNTIME_HEALTH_PANEL", "runtime health panel"]
+  ["SVR_PHASE101_VISUAL_CARD_MESH_SYNC", "visual card mesh sync"],
+  ["SVR_PHASE102_CHIP_MOTION_FX", "chip motion FX"],
+  ["SVR_PHASE103_CONTROLLER_INPUT", "Quest controller input state"],
+  ["SVR_PHASE104_PRIVATE_ROUTE_GUARD", "private scene route guard"],
+  ["SVR_PHASE105_RUNTIME_HEALTH_PANEL", "runtime health panel"]
 ];
 const REQUIRED_SCENE_BUTTONS = ["lobby", "seat", "reiki", "pga", "legends", "sponsor", "scorpion", "pgaDrive", "chipPutt", "storeRoom", "smokerLounge"];
 const APPROVAL_BLOCKED_TERMS = ["Trueitive", "Truitive", "trueitive.com", "truitive.com", "Shyona", "Royston"];
-const KNOWN_STALE_PHASES = ["PHASE-85", "PHASE-86", "PHASE-87", "PHASE-88", "PHASE-89", "PHASE-90", "PHASE-91", "PHASE-92", "PHASE-93", "PHASE-94", "PHASE-95", "PHASE-96", "PHASE-97"];
+const KNOWN_STALE_PHASES = ["PHASE-85", "PHASE-86", "PHASE-87", "PHASE-88", "PHASE-89", "PHASE-90", "PHASE-91", "PHASE-92", "PHASE-93", "PHASE-94", "PHASE-95", "PHASE-96", "PHASE-97", "PHASE-98", "PHASE-99", "PHASE-100", "PHASE-101", "PHASE-102", "PHASE-103", "PHASE-104"];
 
 function textIncludesAny(text, terms){
   const body = String(text || "").toLowerCase();
@@ -38,6 +42,7 @@ function getModuleStates(){
   const poker = window.SVR_PLAYABLE_POKER;
   const pokerState = poker?.getState?.();
   const feedback = window.SVR_PHASE95_POKER_FEEDBACK_FX;
+  const privateRoutes = window.SVR_PHASE104_PRIVATE_ROUTE_GUARD?.audit || null;
   return {
     poker: !!poker,
     pokerPhase: pokerState?.phase || null,
@@ -49,7 +54,14 @@ function getModuleStates(){
     npcFx: !!window.SVR_PHASE92_NPC_BOT_ANIMATION_FX,
     feedbackFx: !!feedback,
     feedbackAudioUnlocked: typeof feedback?.audioUnlocked === "function" ? !!feedback.audioUnlocked() : false,
-    healthPanel: !!window.SVR_PHASE97_RUNTIME_HEALTH_PANEL,
+    cardMeshSync: !!window.SVR_PHASE101_VISUAL_CARD_MESH_SYNC,
+    chipMotionFx: !!window.SVR_PHASE102_CHIP_MOTION_FX,
+    controllerInput: !!window.SVR_PHASE103_CONTROLLER_INPUT,
+    controllerInputState: window.SVR_PHASE103_CONTROLLER_INPUT?.input || null,
+    privateRouteGuard: !!window.SVR_PHASE104_PRIVATE_ROUTE_GUARD,
+    privateRoutesOk: privateRoutes ? !!privateRoutes.ok : null,
+    privateMissingRoutes: privateRoutes?.missingRoutes || [],
+    healthPanel: !!window.SVR_PHASE105_RUNTIME_HEALTH_PANEL || !!window.SVR_PHASE98_RUNTIME_HEALTH_PANEL,
     npcSystem: !!window.SVR_NPC_AVATAR_SYSTEM,
     lowPerf: document.body.classList.contains("svr-low-perf")
   };
@@ -64,7 +76,7 @@ function updateVisualLabel(){
   const pills = Array.from(document.querySelectorAll(".pill"));
   const buildPill = pills.find(pill => String(pill.textContent || "").includes("BUILD:"));
   if (buildPill) buildPill.textContent = `BUILD: ${PHASE}`;
-  if (!String(document.title || "").includes("Phase 98")) document.title = "ScarlettVR Poker • Phase 98 runtime phase sync";
+  if (!String(document.title || "").includes("Phase 105")) document.title = "ScarlettVR Poker • Phase 105 runtime audit latest module sync";
 }
 function runAudit(){
   setBuildLabel();
@@ -89,6 +101,7 @@ function runAudit(){
     ok: false
   };
   audit.ok = missingGlobals.length === 0 && missingSceneButtons.length === 0 && blockedApprovalTermsPresent.length === 0 && stalePhaseLabels.length === 0;
+  window.SVR_PHASE105_RUNTIME_AUDIT = audit;
   window.SVR_PHASE98_RUNTIME_AUDIT = audit;
   window.SVR_PHASE96_RUNTIME_AUDIT = audit;
   window.SVR_PHASE94_RUNTIME_AUDIT = audit;
@@ -108,6 +121,7 @@ function boot(){
       audit = runAudit();
     } catch (err){
       audit = { phase: PHASE, ok: false, error: err?.message || String(err), timestamp: new Date().toISOString() };
+      window.SVR_PHASE105_RUNTIME_AUDIT = audit;
       window.SVR_PHASE98_RUNTIME_AUDIT = audit;
       window.SVR_PHASE96_RUNTIME_AUDIT = audit;
       window.SVR_PHASE94_RUNTIME_AUDIT = audit;
@@ -116,9 +130,9 @@ function boot(){
     const sig = JSON.stringify({ missing: audit.missingGlobals, buttons: audit.missingSceneButtons, blocked: audit.blockedApprovalTermsPresent, stale: audit.stalePhaseLabels, modules: audit.modules, error: audit.error });
     if (sig !== lastSig){
       lastSig = sig;
-      try { console.info("[SVR Phase 98 Runtime Audit]", audit); } catch {}
+      try { console.info("[SVR Phase 105 Runtime Audit]", audit); } catch {}
     }
-    if (runs < 75) setTimeout(loop, 1000);
+    if (runs < 90) setTimeout(loop, 1000);
   };
   setTimeout(loop, 600);
 }
