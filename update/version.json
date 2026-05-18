@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-87-DESKTOP-ANDROID-POKER-HUD-LOCK",
+  "build": "PHASE-89-POKER-SIDEPOT-BETTING-POLISH-LOCK",
   "scope": "game-only",
-  "fix": "desktop and Android poker action HUD, touch-friendly poker buttons, XR auto-hide HUD",
+  "fix": "side-pot payout support, legal-action guards, betting polish, clearer showdown details",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-86-WATCH-POKER-CONTROL-LOCK"
+  "previousStableBuild": "PHASE-87-DESKTOP-ANDROID-POKER-HUD-LOCK"
 }
