@@ -1,0 +1,119 @@
+{
+  "manifestPhase": "PHASE-88-UPDATED-GAME-MANIFEST-LOCK",
+  "currentRuntimeBuild": "PHASE-87-DESKTOP-ANDROID-POKER-HUD-LOCK",
+  "scope": "game-documentation-manifest-only",
+  "siteTouched": false,
+  "repoTrack": "game-side-only",
+  "hardLocks": [
+    "Do not touch public website or /site work in this game track.",
+    "Preserve current game lobby baseline.",
+    "Do not replace the lobby with a different shell.",
+    "Keep lobby as a portal/storefront hub only.",
+    "Keep private experiences separate from the lobby.",
+    "Keep sponsor and founder branding approval-safe.",
+    "Keep game package targets under 25 MB when ZIP packaging is used.",
+    "Preserve Quest/Oculus controller fallback and hand tracking support.",
+    "Preserve hidden controller meshes or natural hand proxies.",
+    "Preserve left-to-right dealing from dealer button perspective.",
+    "Preserve one open south/front player seat and five bot seats.",
+    "Preserve invisible dealer/card logic; dealer body remains disabled."
+  ],
+  "runtimeHistory": {
+    "phase85": {
+      "name": "Playable Poker Lock",
+      "features": [
+        "deck creation and shuffle",
+        "two-card hole cards",
+        "community board cards",
+        "preflop/flop/turn/river/showdown flow",
+        "bot actions",
+        "hand evaluation",
+        "pot movement",
+        "stack accounting",
+        "table status panel",
+        "desktop keyboard controls"
+      ]
+    },
+    "phase86": {
+      "name": "Watch Poker Control Lock",
+      "features": [
+        "wrist watch poker buttons",
+        "live pot display",
+        "active player display",
+        "board/player card display",
+        "current street display",
+        "scene route buttons",
+        "teleport toggle"
+      ]
+    },
+    "phase87": {
+      "name": "Desktop Android Poker HUD Lock",
+      "features": [
+        "touch-friendly non-VR poker buttons",
+        "desktop and Android browser support",
+        "visible hand/board/pot state",
+        "HUD auto-hides in VR/XR",
+        "watch remains VR control layer"
+      ]
+    }
+  },
+  "lockedFiles": {
+    "runtimeEntry": ["game/index.html", "game/main.js"],
+    "poker": ["game/modules/playable_poker.js", "game/modules/watch.js", "game/modules/poker_action_hud.js"],
+    "sceneAndVR": ["game/modules/world_skyline.js", "game/modules/teleport.js", "game/modules/hands.js", "game/modules/npc_avatar_system.js", "game/modules/webxr_enforcer.js"],
+    "version": ["update/version.json"]
+  },
+  "lobbyRule": {
+    "allowed": ["main poker table", "Reiki storefront/portal", "PGA storefront/portal", "Smoker Lounge portal", "Scorpion Room portal", "VR Store portal", "sponsor placeholders", "Moon and Mars in sky"],
+    "notAllowed": ["full Reiki meditation room", "full PGA driving range", "full PGA chip/putt area", "full Smoker Lounge room", "full Scorpion room", "full store showroom"]
+  },
+  "privateSceneRoutes": [
+    "game/reiki.html",
+    "game/range.html",
+    "game/pga-drive.html",
+    "game/chip-putt.html",
+    "game/store-room.html",
+    "game/smoker-lounge.html",
+    "game/scorpion.html"
+  ],
+  "controlsLock": {
+    "handTracking": ["pinch/fist hold aims teleport", "release teleports", "wrist watch controls available", "no instant accidental teleport"],
+    "questControllerFallback": ["right stick up/down forward/back", "right stick left/right 45 degree snap turn", "A/grip/trigger hold aims teleport", "release teleports", "controller meshes hidden or natural hands"],
+    "desktopAndroid": ["keyboard poker controls", "touch-friendly poker HUD", "scene nav outside preview mode", "HUD hidden during XR sessions"]
+  },
+  "pokerLock": {
+    "preserve": [
+      "left-to-right dealing from dealer button",
+      "one open player seat",
+      "five bot seats",
+      "fold/check/call/raise/all-in/next hand",
+      "street progression",
+      "hand evaluation",
+      "pot payout",
+      "player and bot stack updates",
+      "visible poker status panel",
+      "watch poker controls",
+      "desktop/mobile poker HUD"
+    ],
+    "nextImprovements": [
+      "side-pot handling for all-in multiway hands",
+      "better raise amount controls",
+      "stronger bot decision tiers",
+      "visual cards/chips animation synchronized with logic",
+      "turn glow around active seat",
+      "winner banner and winning hand reveal",
+      "persistent table/session state when backend is ready"
+    ]
+  },
+  "approvalSafetyLock": {
+    "blockedUntilApproval": ["Trueitive", "Truitive", "trueitive.com", "truitive.com", "Shyona", "Royston", "founder photos", "outside Reiki websites", "unapproved Reiki logos"],
+    "allowed": ["SVR branding", "AWAITING APPROVAL placeholders", "WAITING FOR APPROVAL placeholders"]
+  },
+  "siteProtectionLock": ["root index.html", "/site", "site.zip", "website style.css/matrix.js files", "website admin/contact/store pages"],
+  "nextRecommendedPhases": [
+    {"phase": "Phase 89", "name": "Poker Side-Pot + Betting Polish"},
+    {"phase": "Phase 90", "name": "Active Seat / Chip Animation Lock"},
+    {"phase": "Phase 91", "name": "Quest Performance Pass"},
+    {"phase": "Phase 92", "name": "NPC Bot Animation Polish"}
+  ]
+}
