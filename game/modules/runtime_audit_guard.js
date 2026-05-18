@@ -1,18 +1,19 @@
-// PHASE-96-RUNTIME-AUDIT-EXPANSION-LOCK
-// Game-side only. Expands runtime health reporting to include Phase 95 feedback FX,
-// stale phase-label detection, and safer public audit data. No website or /site edits.
+// PHASE-98-RUNTIME-PHASE-SYNC-LOCK
+// Game-side only. Syncs the live runtime audit with the latest modular game stack
+// and includes the in-game health panel in the health report. No website or /site edits.
 
-const PHASE = "PHASE-96-RUNTIME-AUDIT-EXPANSION-LOCK";
+const PHASE = "PHASE-98-RUNTIME-PHASE-SYNC-LOCK";
 const REQUIRED_GLOBALS = [
   ["SVR_PLAYABLE_POKER", "playable poker engine"],
   ["SVR_POKER_ACTION_HUD", "desktop/android poker HUD"],
   ["SVR_PHASE91_TABLE_FX", "performance table FX"],
   ["SVR_PHASE92_NPC_BOT_ANIMATION_FX", "NPC bot animation FX"],
-  ["SVR_PHASE95_POKER_FEEDBACK_FX", "poker feedback FX"]
+  ["SVR_PHASE95_POKER_FEEDBACK_FX", "poker feedback FX"],
+  ["SVR_PHASE97_RUNTIME_HEALTH_PANEL", "runtime health panel"]
 ];
 const REQUIRED_SCENE_BUTTONS = ["lobby", "seat", "reiki", "pga", "legends", "sponsor", "scorpion", "pgaDrive", "chipPutt", "storeRoom", "smokerLounge"];
 const APPROVAL_BLOCKED_TERMS = ["Trueitive", "Truitive", "trueitive.com", "truitive.com", "Shyona", "Royston"];
-const KNOWN_STALE_PHASES = ["PHASE-85", "PHASE-86", "PHASE-87", "PHASE-88", "PHASE-89", "PHASE-90", "PHASE-91", "PHASE-92", "PHASE-93", "PHASE-94", "PHASE-95"];
+const KNOWN_STALE_PHASES = ["PHASE-85", "PHASE-86", "PHASE-87", "PHASE-88", "PHASE-89", "PHASE-90", "PHASE-91", "PHASE-92", "PHASE-93", "PHASE-94", "PHASE-95", "PHASE-96", "PHASE-97"];
 
 function textIncludesAny(text, terms){
   const body = String(text || "").toLowerCase();
@@ -48,6 +49,7 @@ function getModuleStates(){
     npcFx: !!window.SVR_PHASE92_NPC_BOT_ANIMATION_FX,
     feedbackFx: !!feedback,
     feedbackAudioUnlocked: typeof feedback?.audioUnlocked === "function" ? !!feedback.audioUnlocked() : false,
+    healthPanel: !!window.SVR_PHASE97_RUNTIME_HEALTH_PANEL,
     npcSystem: !!window.SVR_NPC_AVATAR_SYSTEM,
     lowPerf: document.body.classList.contains("svr-low-perf")
   };
@@ -62,7 +64,7 @@ function updateVisualLabel(){
   const pills = Array.from(document.querySelectorAll(".pill"));
   const buildPill = pills.find(pill => String(pill.textContent || "").includes("BUILD:"));
   if (buildPill) buildPill.textContent = `BUILD: ${PHASE}`;
-  if (!String(document.title || "").includes("Phase 96")) document.title = "ScarlettVR Poker • Phase 96 runtime audit expansion";
+  if (!String(document.title || "").includes("Phase 98")) document.title = "ScarlettVR Poker • Phase 98 runtime phase sync";
 }
 function runAudit(){
   setBuildLabel();
@@ -87,6 +89,7 @@ function runAudit(){
     ok: false
   };
   audit.ok = missingGlobals.length === 0 && missingSceneButtons.length === 0 && blockedApprovalTermsPresent.length === 0 && stalePhaseLabels.length === 0;
+  window.SVR_PHASE98_RUNTIME_AUDIT = audit;
   window.SVR_PHASE96_RUNTIME_AUDIT = audit;
   window.SVR_PHASE94_RUNTIME_AUDIT = audit;
   window.SVR_PHASE93_RUNTIME_AUDIT = audit;
@@ -105,6 +108,7 @@ function boot(){
       audit = runAudit();
     } catch (err){
       audit = { phase: PHASE, ok: false, error: err?.message || String(err), timestamp: new Date().toISOString() };
+      window.SVR_PHASE98_RUNTIME_AUDIT = audit;
       window.SVR_PHASE96_RUNTIME_AUDIT = audit;
       window.SVR_PHASE94_RUNTIME_AUDIT = audit;
       window.SVR_PHASE93_RUNTIME_AUDIT = audit;
@@ -112,9 +116,9 @@ function boot(){
     const sig = JSON.stringify({ missing: audit.missingGlobals, buttons: audit.missingSceneButtons, blocked: audit.blockedApprovalTermsPresent, stale: audit.stalePhaseLabels, modules: audit.modules, error: audit.error });
     if (sig !== lastSig){
       lastSig = sig;
-      try { console.info("[SVR Phase 96 Runtime Audit]", audit); } catch {}
+      try { console.info("[SVR Phase 98 Runtime Audit]", audit); } catch {}
     }
-    if (runs < 60) setTimeout(loop, 1000);
+    if (runs < 75) setTimeout(loop, 1000);
   };
   setTimeout(loop, 600);
 }
