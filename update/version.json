@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-97-RUNTIME-HEALTH-PANEL-LOCK",
+  "build": "PHASE-98-RUNTIME-PHASE-SYNC-LOCK",
   "scope": "game-only",
-  "fix": "in-game runtime health panel, audit status button, module route and approval checks without console",
+  "fix": "sync runtime audit and health panel to latest modular stack, include health panel detection, update phase compatibility globals",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-96-RUNTIME-AUDIT-EXPANSION-LOCK"
+  "previousStableBuild": "PHASE-97-RUNTIME-HEALTH-PANEL-LOCK"
 }
