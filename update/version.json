@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-91-QUEST-PERFORMANCE-PASS-LOCK",
+  "build": "PHASE-92-NPC-BOT-ANIMATION-POLISH-LOCK",
   "scope": "game-only",
-  "fix": "throttled poker HUD updates, adaptive table FX, low-performance fallback, reduced canvas texture redraws",
+  "fix": "NPC bot idle breathing, action bubbles, card peek, chip reach, fold and winner reactions",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-90-ACTIVE-SEAT-CHIP-FX-LOCK"
+  "previousStableBuild": "PHASE-91-QUEST-PERFORMANCE-PASS-LOCK"
 }
