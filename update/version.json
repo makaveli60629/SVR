@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-89-POKER-SIDEPOT-BETTING-POLISH-LOCK",
+  "build": "PHASE-90-ACTIVE-SEAT-CHIP-FX-LOCK",
   "scope": "game-only",
-  "fix": "side-pot payout support, legal-action guards, betting polish, clearer showdown details",
+  "fix": "active seat glow, pot chip stack visuals, winner banner, poker table FX module",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-87-DESKTOP-ANDROID-POKER-HUD-LOCK"
+  "previousStableBuild": "PHASE-89-POKER-SIDEPOT-BETTING-POLISH-LOCK"
 }
