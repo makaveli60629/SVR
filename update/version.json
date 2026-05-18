@@ -1,8 +1,7 @@
 {
-  "build": "PHASE-100-RUNTIME-SMOKE-TEST-DEPLOY-PACK-LOCK",
-  "scope": "game-docs-deploy-validation-only",
-  "fix": "runtime smoke-test checklist, deploy validation pack, health panel expected output, poker watch HUD FX route tests",
+  "build": "PHASE-101-VISUAL-CARD-MESH-SYNC-LOCK",
+  "scope": "game-only",
+  "fix": "visible board and player card meshes synced from playable poker state with deck visuals and card state label",
   "siteTouched": false,
-  "runtimePreserved": "PHASE-98-RUNTIME-PHASE-SYNC-LOCK",
-  "previousStableBuild": "PHASE-99-CURRENT-GAME-MANIFEST-SYNC-LOCK"
+  "previousStableBuild": "PHASE-100-RUNTIME-SMOKE-TEST-DEPLOY-PACK-LOCK"
 }
