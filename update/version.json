@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-105-RUNTIME-AUDIT-LATEST-MODULE-SYNC-LOCK",
+  "build": "PHASE-107-RAISE-SIZING-HUD-LOCK",
   "scope": "game-only",
-  "fix": "runtime audit and health panel synced to Phase 101-104 modules including cards, chips, controller input, and private route guard",
+  "fix": "desktop Android poker HUD raise sizing, min half-pot pot raise buttons, legal-action disabled button states",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-104-PRIVATE-SCENE-ROUTE-HARDENING-LOCK"
+  "previousStableBuild": "PHASE-106-CURRENT-GAME-MANIFEST-2026-SYNC-LOCK"
 }
