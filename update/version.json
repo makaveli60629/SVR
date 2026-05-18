@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-107-RAISE-SIZING-HUD-LOCK",
+  "build": "PHASE-108-WATCH-POKER-DISABLED-STATE-LOCK",
   "scope": "game-only",
-  "fix": "desktop Android poker HUD raise sizing, min half-pot pot raise buttons, legal-action disabled button states",
+  "fix": "VR wrist watch poker disabled states, locked-action feedback, legal poker button state polish while preserving watch baseline",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-106-CURRENT-GAME-MANIFEST-2026-SYNC-LOCK"
+  "previousStableBuild": "PHASE-107-RAISE-SIZING-HUD-LOCK"
 }
