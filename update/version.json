@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-119-QUEST-REGRESSION-BUNDLE-ADMIN-ONLINE-LOCK",
+  "build": "PHASE-120-DEMO-CANDIDATE-LOCK",
   "scope": "game-only",
-  "fix": "Quest regression bundle audit plus visible admin online runtime flag for game testing only",
+  "fix": "demo candidate gate panel tying together audit, performance, bundle, admin online, poker, custom raise, routes, cards, chips, and watch locks",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-118-SCORPION-PRIVATE-POKER-TABLE-PASS-LOCK"
+  "previousStableBuild": "PHASE-119-QUEST-REGRESSION-BUNDLE-ADMIN-ONLINE-LOCK"
 }
