@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const PHASE = "PHASE-89-POKER-SIDEPOT-BETTING-POLISH-LOCK";
+const PHASE = "PHASE-116-CUSTOM-RAISE-INPUT-LOCK";
 const SUITS = ["♠", "♥", "♦", "♣"];
 const RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"];
 const RANK_VALUE = Object.fromEntries(RANKS.map((rank, i) => [rank, i + 2]));
@@ -339,6 +339,14 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
     markDirty();
     return false;
   }
+  function normalizeCustomRaiseTo(legal, raw){
+    const value = Number(raw);
+    if (!Number.isFinite(value)) return { ok: false, label: "invalid raise amount" };
+    const target = Math.floor(value);
+    if (target < legal.minRaiseTo) return { ok: false, label: `raise below minimum $${legal.minRaiseTo}` };
+    if (target > legal.maxRaiseTo) return { ok: false, label: `raise above stack $${legal.maxRaiseTo}` };
+    return { ok: true, target };
+  }
   function actionFor(player, type, raiseMode = "min"){
     if (!player || phase === "showdown" || phase === "idle") return false;
     const legal = getLegalState(player);
@@ -367,9 +375,15 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
     } else if (type === "raise"){
       if (!legal.canRaise) return setIllegal(player, "cannot raise");
       let target = legal.minRaiseTo;
-      if (raiseMode === "halfpot") target = Math.max(legal.minRaiseTo, currentBet + Math.ceil((pot + toCall) / 2));
-      if (raiseMode === "pot") target = Math.max(legal.minRaiseTo, currentBet + pot + toCall);
-      target = clampNumber(target, legal.minRaiseTo, legal.maxRaiseTo);
+      if (typeof raiseMode === "object" && raiseMode?.customTo !== undefined){
+        const custom = normalizeCustomRaiseTo(legal, raiseMode.customTo);
+        if (!custom.ok) return setIllegal(player, custom.label);
+        target = custom.target;
+      } else {
+        if (raiseMode === "halfpot") target = Math.max(legal.minRaiseTo, currentBet + Math.ceil((pot + toCall) / 2));
+        if (raiseMode === "pot") target = Math.max(legal.minRaiseTo, currentBet + pot + toCall);
+        target = clampNumber(target, legal.minRaiseTo, legal.maxRaiseTo);
+      }
       const beforeBet = player.bet;
       const paid = collect(player, target - player.bet);
       if (player.bet > currentBet){
@@ -402,6 +416,10 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
   function userAction(type, raiseMode = "min"){
     if (!awaitingPlayer) return setIllegal(players[PLAYER_SEAT_INDEX], "not your turn");
     return actionFor(players[PLAYER_SEAT_INDEX], type, raiseMode);
+  }
+  function userRaiseTo(target){
+    if (!awaitingPlayer) return setIllegal(players[PLAYER_SEAT_INDEX], "not your turn");
+    return actionFor(players[PLAYER_SEAT_INDEX], "raise", { customTo: target });
   }
   function botAction(){
     const p = players[activeIndex];
@@ -502,7 +520,7 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
 
   beginHand();
   drawPanel();
-  log(`[${PHASE}] Side-pot and betting polish poker module loaded`);
+  log(`[${PHASE}] Custom raise input poker module loaded`);
   return {
     update,
     getState,
@@ -513,6 +531,8 @@ export function createPlayablePoker({ scene, tableCenter = new THREE.Vector3(), 
     raise: () => userAction("raise", "min"),
     raiseHalfPot: () => userAction("raise", "halfpot"),
     raisePot: () => userAction("raise", "pot"),
+    raiseTo: (amount) => userRaiseTo(amount),
+    raiseCustom: (amount) => userRaiseTo(amount),
     allIn: () => userAction("allin"),
     object: panel.mesh
   };
