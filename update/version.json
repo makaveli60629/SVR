@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-120-DEMO-CANDIDATE-LOCK",
+  "build": "PHASE-121-DEMO-STATUS-PATCH-LOCK",
   "scope": "game-only",
-  "fix": "demo candidate gate panel tying together audit, performance, bundle, admin online, poker, custom raise, routes, cards, chips, and watch locks",
+  "fix": "lightweight demo status patch keeps visible game build marker current after Phase 120 without replacing core audit module",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-119-QUEST-REGRESSION-BUNDLE-ADMIN-ONLINE-LOCK"
+  "previousStableBuild": "PHASE-120-DEMO-CANDIDATE-LOCK"
 }
