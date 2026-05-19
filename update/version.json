@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-111-GAMEPLAY-DEMO-POLISH-LOCK",
+  "build": "PHASE-112-RUNTIME-AUDIT-DEMO-SYNC-LOCK",
   "scope": "game-only",
-  "fix": "gameplay demo readiness panel, quick health and performance checks, demo status button, non-invasive presentation polish",
+  "fix": "runtime audit synced with gameplay demo polish, visible build label no longer downgrades to older audit phase, demo polish detection added",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-110-QUEST-PERFORMANCE-REGRESSION-PASS-LOCK"
+  "previousStableBuild": "PHASE-111-GAMEPLAY-DEMO-POLISH-LOCK"
 }
