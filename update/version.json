@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-112-RUNTIME-AUDIT-DEMO-SYNC-LOCK",
+  "build": "PHASE-113-HEALTH-PERF-DEMO-SYNC-PATCH-LOCK",
   "scope": "game-only",
-  "fix": "runtime audit synced with gameplay demo polish, visible build label no longer downgrades to older audit phase, demo polish detection added",
+  "fix": "small health panel sync patch linking HEALTH, PERF, and DEMO readiness state without replacing runtime modules",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-111-GAMEPLAY-DEMO-POLISH-LOCK"
+  "previousStableBuild": "PHASE-112-RUNTIME-AUDIT-DEMO-SYNC-LOCK"
 }
