@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-110-QUEST-PERFORMANCE-REGRESSION-PASS-LOCK",
+  "build": "PHASE-111-GAMEPLAY-DEMO-POLISH-LOCK",
   "scope": "game-only",
-  "fix": "Quest performance monitor, FPS and frame-time panel, adaptive low-performance mode reporting, runtime audit performance sync",
+  "fix": "gameplay demo readiness panel, quick health and performance checks, demo status button, non-invasive presentation polish",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-109-PRIVATE-SCENE-STARTER-BUILDS-LOCK"
+  "previousStableBuild": "PHASE-110-QUEST-PERFORMANCE-REGRESSION-PASS-LOCK"
 }
