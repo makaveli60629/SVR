@@ -1,53 +1,29 @@
 (() => {
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages';
-  const DEFAULT_ADMIN_STATE = 'offline';
-
-  function forceOfflineStyle() {
-    if (document.getElementById('svr-force-admin-offline-style')) return;
-    const style = document.createElement('style');
-    style.id = 'svr-force-admin-offline-style';
-    style.textContent = `
-      .admin-status,
-      .admin-status.online,
-      .admin-status.offline,
-      [data-admin-pill],
-      [data-admin-pill].online,
-      [data-admin-pill].offline {
-        color: #ffb1c7 !important;
-        border-color: rgba(255,106,154,.45) !important;
-        text-shadow: 0 0 14px rgba(255,106,154,.32) !important;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+  const DEFAULT_ADMIN_STATE = 'online';
 
   function getAdminState() {
     const qs = new URLSearchParams(window.location.search);
     const override = qs.get('admin');
-    if (override === 'online') {
-      localStorage.setItem(ADMIN_KEY, DEFAULT_ADMIN_STATE);
-      return DEFAULT_ADMIN_STATE;
-    }
     if (override === 'offline') {
-      localStorage.setItem(ADMIN_KEY, DEFAULT_ADMIN_STATE);
-      return DEFAULT_ADMIN_STATE;
+      localStorage.setItem(ADMIN_KEY, 'offline');
+      return 'offline';
     }
     localStorage.setItem(ADMIN_KEY, DEFAULT_ADMIN_STATE);
     return DEFAULT_ADMIN_STATE;
   }
 
   function paintAdminState() {
-    forceOfflineStyle();
     const state = getAdminState();
-    const isOnline = false;
+    const isOnline = state === 'online';
     document.querySelectorAll('.admin-status,[data-admin-pill]').forEach((el) => {
       el.dataset.state = state;
-      el.classList.remove('online');
-      el.classList.add('offline');
+      el.classList.toggle('online', isOnline);
+      el.classList.toggle('offline', !isOnline);
       const label = el.querySelector('[data-admin-label]');
-      if (label) label.textContent = 'Admin Offline';
-      else if (el.classList.contains('admin-status')) el.textContent = '● Admin Offline';
+      if (label) label.textContent = isOnline ? 'Admin Online' : 'Admin Offline';
+      else if (el.classList.contains('admin-status')) el.textContent = isOnline ? '● Admin Online' : '● Admin Offline';
     });
   }
 
