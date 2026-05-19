@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-117-PRIVATE-SCENE-3D-ENVIRONMENT-PASS-LOCK",
+  "build": "PHASE-118-SCORPION-PRIVATE-POKER-TABLE-PASS-LOCK",
   "scope": "game-only",
-  "fix": "upgraded private scene starter routes into richer lightweight 3D-feeling environment shells while keeping routes separate from lobby",
+  "fix": "dedicated Scorpion private poker room shell with table, player seat, bot seats, cards, chips, and demo dealing controls",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-116-CUSTOM-RAISE-INPUT-LOCK"
+  "previousStableBuild": "PHASE-117-PRIVATE-SCENE-3D-ENVIRONMENT-PASS-LOCK"
 }
