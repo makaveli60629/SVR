@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-122-FULL-GAME-AUDIT-RUNTIME-SYNC-LOCK",
+  "build": "PHASE-123-WATCH-RAISE-CONTROLS-UPGRADE-LOCK",
   "scope": "game-only",
-  "fix": "full game audit runtime sync after Phase 121, checking poker, custom raise, admin online, bundle, performance, routes, cards, chips, and demo candidate status",
+  "fix": "VR wrist watch raise controls upgraded with Min, Half Pot, Pot, and All-In buttons while preserving forearm watch baseline",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-121-DEMO-STATUS-PATCH-LOCK"
+  "previousStableBuild": "PHASE-122-FULL-GAME-AUDIT-RUNTIME-SYNC-LOCK"
 }
