@@ -12,7 +12,7 @@ import { createPlayablePoker } from "./modules/playable_poker.js";
 import "./modules/poker_action_hud.js";
 import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
 
-const PHASE_85_BUILD = "PHASE-87-DESKTOP-ANDROID-POKER-HUD-LOCK";
+const PHASE_85_BUILD = "PHASE-123-WATCH-RAISE-CONTROLS-UPGRADE-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -268,6 +268,8 @@ const watch = createWristWatch({
     pokerFold: ()=>poker.fold(),
     pokerCall: ()=>poker.checkCall(),
     pokerRaise: ()=>poker.raise(),
+    pokerRaiseHalfPot: ()=>poker.raiseHalfPot?.() || poker.raise?.(),
+    pokerRaisePot: ()=>poker.raisePot?.() || poker.raise?.(),
     pokerAllIn: ()=>poker.allIn(),
     pokerNext: ()=>poker.nextHand(),
     goLobby: ()=>gotoScene("lobby"),
