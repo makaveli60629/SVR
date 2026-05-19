@@ -1,7 +1,7 @@
-// SVR Phase 85 — NPC Scene Motion Registry
+// SVR Phase 126 — NPC Avatar Professional Polish Registry
 // Game-side only. Site-side files must not import this module.
 
-export const SVR_AVATAR_NPC_PHASE = "PHASE-85-NPC-SCENE-MOTION-LOCK";
+export const SVR_AVATAR_NPC_PHASE = "PHASE-126-NPC-AVATAR-PROFESSIONAL-POLISH-LOCK";
 
 export const NPC_AVATAR_REGISTRY = Object.freeze({
   eric: {
