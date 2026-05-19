@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-116-CUSTOM-RAISE-INPUT-LOCK",
+  "build": "PHASE-117-PRIVATE-SCENE-3D-ENVIRONMENT-PASS-LOCK",
   "scope": "game-only",
-  "fix": "custom raise engine support and compact desktop Android custom raise input with legal min max validation",
+  "fix": "upgraded private scene starter routes into richer lightweight 3D-feeling environment shells while keeping routes separate from lobby",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-115-CURRENT-GAME-MANIFEST-114-SYNC-LOCK"
+  "previousStableBuild": "PHASE-116-CUSTOM-RAISE-INPUT-LOCK"
 }
