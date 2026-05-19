@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-121-DEMO-STATUS-PATCH-LOCK",
+  "build": "PHASE-122-FULL-GAME-AUDIT-RUNTIME-SYNC-LOCK",
   "scope": "game-only",
-  "fix": "lightweight demo status patch keeps visible game build marker current after Phase 120 without replacing core audit module",
+  "fix": "full game audit runtime sync after Phase 121, checking poker, custom raise, admin online, bundle, performance, routes, cards, chips, and demo candidate status",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-120-DEMO-CANDIDATE-LOCK"
+  "previousStableBuild": "PHASE-121-DEMO-STATUS-PATCH-LOCK"
 }
