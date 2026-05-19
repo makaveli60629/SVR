@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-123-WATCH-RAISE-CONTROLS-UPGRADE-LOCK",
+  "build": "PHASE-124-SCORPION-GAMEPLAY-WIRING-LOCK",
   "scope": "game-only",
-  "fix": "VR wrist watch raise controls upgraded with Min, Half Pot, Pot, and All-In buttons while preserving forearm watch baseline",
+  "fix": "Scorpion private room upgraded from demo shell to local play-money poker gameplay with player actions, bot actions, pot/chips, board cards, and next-hand loop",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-122-FULL-GAME-AUDIT-RUNTIME-SYNC-LOCK"
+  "previousStableBuild": "PHASE-123-WATCH-RAISE-CONTROLS-UPGRADE-LOCK"
 }
