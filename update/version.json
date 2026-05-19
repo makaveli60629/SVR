@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-114-RUNTIME-AUDIT-HEALTH-SYNC-LOCK",
+  "build": "PHASE-116-CUSTOM-RAISE-INPUT-LOCK",
   "scope": "game-only",
-  "fix": "runtime audit synced with Phase 113 health perf demo sync patch, latest visible build label and audit globals updated",
+  "fix": "custom raise engine support and compact desktop Android custom raise input with legal min max validation",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-113-HEALTH-PERF-DEMO-SYNC-PATCH-LOCK"
+  "previousStableBuild": "PHASE-115-CURRENT-GAME-MANIFEST-114-SYNC-LOCK"
 }
