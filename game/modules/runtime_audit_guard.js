@@ -1,8 +1,8 @@
-// PHASE-112-RUNTIME-AUDIT-DEMO-SYNC-LOCK
-// Game-side only. Syncs the audit label after the Phase 111 demo polish module
-// so the runtime no longer downgrades the visible build label to an older phase.
+// PHASE-114-RUNTIME-AUDIT-HEALTH-SYNC-LOCK
+// Game-side only. Syncs the runtime audit with the Phase 113 HEALTH/PERF/DEMO
+// sync patch so the visible build label and audit report stay current.
 
-const PHASE = "PHASE-112-RUNTIME-AUDIT-DEMO-SYNC-LOCK";
+const PHASE = "PHASE-114-RUNTIME-AUDIT-HEALTH-SYNC-LOCK";
 const REQUIRED_GLOBALS = [
   ["SVR_PLAYABLE_POKER", "playable poker engine"],
   ["SVR_POKER_ACTION_HUD", "desktop/android poker HUD"],
@@ -17,17 +17,18 @@ const REQUIRED_GLOBALS = [
   ["SVR_PHASE107_RAISE_SIZING_HUD", "raise sizing HUD"],
   ["SVR_PHASE108_WATCH_POKER_DISABLED_STATES", "watch poker disabled states"],
   ["SVR_PHASE110_QUEST_PERFORMANCE_MONITOR", "Quest performance monitor"],
-  ["SVR_PHASE111_GAMEPLAY_DEMO_POLISH", "gameplay demo polish panel"]
+  ["SVR_PHASE111_GAMEPLAY_DEMO_POLISH", "gameplay demo polish panel"],
+  ["SVR_PHASE113_RUNTIME_HEALTH_SYNC", "health perf demo sync patch"]
 ];
 const REQUIRED_SCENE_BUTTONS = ["lobby", "seat", "reiki", "pga", "legends", "sponsor", "scorpion", "pgaDrive", "chipPutt", "storeRoom", "smokerLounge"];
 const APPROVAL_BLOCKED_TERMS = ["Trueitive", "Truitive", "trueitive.com", "truitive.com", "Shyona", "Royston"];
-const KNOWN_STALE_PHASES = ["PHASE-85", "PHASE-86", "PHASE-87", "PHASE-88", "PHASE-89", "PHASE-90", "PHASE-91", "PHASE-92", "PHASE-93", "PHASE-94", "PHASE-95", "PHASE-96", "PHASE-97", "PHASE-98", "PHASE-99", "PHASE-100", "PHASE-101", "PHASE-102", "PHASE-103", "PHASE-104", "PHASE-105", "PHASE-106", "PHASE-107", "PHASE-108", "PHASE-109", "PHASE-110", "PHASE-111"];
+const KNOWN_STALE_PHASES = ["PHASE-85", "PHASE-86", "PHASE-87", "PHASE-88", "PHASE-89", "PHASE-90", "PHASE-91", "PHASE-92", "PHASE-93", "PHASE-94", "PHASE-95", "PHASE-96", "PHASE-97", "PHASE-98", "PHASE-99", "PHASE-100", "PHASE-101", "PHASE-102", "PHASE-103", "PHASE-104", "PHASE-105", "PHASE-106", "PHASE-107", "PHASE-108", "PHASE-109", "PHASE-110", "PHASE-111", "PHASE-112", "PHASE-113"];
 
 function textIncludesAny(text, terms){ const body = String(text || "").toLowerCase(); return terms.filter(term => body.includes(term.toLowerCase())); }
 function getMissingButtons(){ return REQUIRED_SCENE_BUTTONS.filter(key => !document.querySelector(`#sceneNav [data-scene="${key}"]`)); }
 function getMissingGlobals(){ return REQUIRED_GLOBALS.filter(([key]) => !window[key]).map(([key, label]) => ({ key, label })); }
 function getVisibleBuildText(){ const pills = Array.from(document.querySelectorAll(".pill")); const buildPill = pills.find(pill => String(pill.textContent || "").includes("BUILD:")); return String(buildPill?.textContent || ""); }
-function findStaleLabels(){ const visible = `${document.title || ""}\n${getVisibleBuildText()}\n${document.documentElement.dataset.svrBuild || ""}`; return KNOWN_STALE_PHASES.filter(label => visible.includes(label) && !PHASE.includes(label)); }
+function findStaleLabels(){ const visible = `${document.title || ""}\n${getVisibleBuildText()}\n${document.documentElement.dataset.svrBuild || ""}\n${document.documentElement.dataset.svrPhase113Sync || ""}`; return KNOWN_STALE_PHASES.filter(label => visible.includes(label) && !PHASE.includes(label)); }
 function getModuleStates(){
   const poker = window.SVR_PLAYABLE_POKER;
   const pokerState = poker?.getState?.();
@@ -35,6 +36,7 @@ function getModuleStates(){
   const privateRoutes = window.SVR_PHASE104_PRIVATE_ROUTE_GUARD?.audit || null;
   const perf = window.SVR_PHASE110_QUEST_PERFORMANCE_MONITOR?.metrics?.() || null;
   const demo = window.SVR_PHASE111_GAMEPLAY_DEMO_POLISH?.report?.() || null;
+  const sync = window.SVR_PHASE113_RUNTIME_HEALTH_SYNC?.status?.() || null;
   return {
     poker: !!poker,
     pokerPhase: pokerState?.phase || null,
@@ -59,13 +61,15 @@ function getModuleStates(){
     questPerformance: perf,
     gameplayDemoPolish: !!window.SVR_PHASE111_GAMEPLAY_DEMO_POLISH,
     gameplayDemoOk: demo ? !!demo.ok : null,
+    healthPerfDemoSync: !!window.SVR_PHASE113_RUNTIME_HEALTH_SYNC,
+    healthPerfDemoStatus: sync,
     healthPanel: !!window.SVR_PHASE105_RUNTIME_HEALTH_PANEL || !!window.SVR_PHASE98_RUNTIME_HEALTH_PANEL,
     npcSystem: !!window.SVR_NPC_AVATAR_SYSTEM,
     lowPerf: document.body.classList.contains("svr-low-perf")
   };
 }
 function setBuildLabel(){ document.documentElement.dataset.svrBuild = PHASE; window.SVR_CURRENT_GAME_PHASE = PHASE; window.SVR_GAME_TRACK = "game-side-only"; window.SVR_SITE_TOUCHED_BY_GAME_TRACK = false; }
-function updateVisualLabel(){ const pills = Array.from(document.querySelectorAll(".pill")); const buildPill = pills.find(pill => String(pill.textContent || "").includes("BUILD:")); if (buildPill) buildPill.textContent = `BUILD: ${PHASE}`; if (!String(document.title || "").includes("Phase 112")) document.title = "ScarlettVR Poker • Phase 112 runtime audit demo sync"; }
+function updateVisualLabel(){ const pills = Array.from(document.querySelectorAll(".pill")); const buildPill = pills.find(pill => String(pill.textContent || "").includes("BUILD:")); if (buildPill) buildPill.textContent = `BUILD: ${PHASE}`; if (!String(document.title || "").includes("Phase 114")) document.title = "ScarlettVR Poker • Phase 114 runtime audit health sync"; }
 function runAudit(){
   setBuildLabel(); updateVisualLabel();
   const htmlText = document.documentElement?.innerText || document.body?.innerText || "";
@@ -76,6 +80,7 @@ function runAudit(){
   const modules = getModuleStates();
   const audit = { phase: PHASE, timestamp: new Date().toISOString(), siteTouched: false, gameTrackOnly: true, missingGlobals, missingSceneButtons, blockedApprovalTermsPresent, stalePhaseLabels, modules, expectedSceneButtons: [...REQUIRED_SCENE_BUTTONS], ok: false };
   audit.ok = missingGlobals.length === 0 && missingSceneButtons.length === 0 && blockedApprovalTermsPresent.length === 0 && stalePhaseLabels.length === 0;
+  window.SVR_PHASE114_RUNTIME_AUDIT = audit;
   window.SVR_PHASE112_RUNTIME_AUDIT = audit;
   window.SVR_PHASE110_RUNTIME_AUDIT = audit;
   window.SVR_PHASE105_RUNTIME_AUDIT = audit;
@@ -93,10 +98,10 @@ function boot(){
     runs += 1;
     let audit;
     try { audit = runAudit(); }
-    catch (err){ audit = { phase: PHASE, ok: false, error: err?.message || String(err), timestamp: new Date().toISOString() }; window.SVR_PHASE112_RUNTIME_AUDIT = audit; window.SVR_PHASE110_RUNTIME_AUDIT = audit; window.SVR_PHASE105_RUNTIME_AUDIT = audit; window.SVR_PHASE98_RUNTIME_AUDIT = audit; }
+    catch (err){ audit = { phase: PHASE, ok: false, error: err?.message || String(err), timestamp: new Date().toISOString() }; window.SVR_PHASE114_RUNTIME_AUDIT = audit; window.SVR_PHASE112_RUNTIME_AUDIT = audit; window.SVR_PHASE110_RUNTIME_AUDIT = audit; window.SVR_PHASE105_RUNTIME_AUDIT = audit; window.SVR_PHASE98_RUNTIME_AUDIT = audit; }
     const sig = JSON.stringify({ missing: audit.missingGlobals, buttons: audit.missingSceneButtons, blocked: audit.blockedApprovalTermsPresent, stale: audit.stalePhaseLabels, modules: audit.modules, error: audit.error });
-    if (sig !== lastSig){ lastSig = sig; try { console.info("[SVR Phase 112 Runtime Audit]", audit); } catch {} }
-    if (runs < 150) setTimeout(loop, 1000);
+    if (sig !== lastSig){ lastSig = sig; try { console.info("[SVR Phase 114 Runtime Audit]", audit); } catch {} }
+    if (runs < 180) setTimeout(loop, 1000);
   };
   setTimeout(loop, 600);
 }
