@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-109-PRIVATE-SCENE-STARTER-BUILDS-LOCK",
+  "build": "PHASE-110-QUEST-PERFORMANCE-REGRESSION-PASS-LOCK",
   "scope": "game-only",
-  "fix": "private scene starter pages for Reiki, PGA Drive, Chip Putt, VR Store, Smoker Lounge, and Scorpion Room with shared lightweight starter module",
+  "fix": "Quest performance monitor, FPS and frame-time panel, adaptive low-performance mode reporting, runtime audit performance sync",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-108-WATCH-POKER-DISABLED-STATE-LOCK"
+  "previousStableBuild": "PHASE-109-PRIVATE-SCENE-STARTER-BUILDS-LOCK"
 }
