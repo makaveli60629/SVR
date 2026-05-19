@@ -1,11 +1,11 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-// PHASE-108-WATCH-POKER-DISABLED-STATE-LOCK
-// Game-side only. Preserves the locked forearm watch baseline while adding
-// poker legal-action disabled states and clearer watch feedback.
+// PHASE-123-WATCH-RAISE-CONTROLS-UPGRADE-LOCK
+// Game-side only. Preserves the locked forearm watch baseline while upgrading
+// VR watch poker raise controls with Min / Half Pot / Pot / All-In actions.
 
-const PHASE = "PHASE-108-WATCH-POKER-DISABLED-STATE-LOCK";
+const PHASE = "PHASE-123-WATCH-RAISE-CONTROLS-UPGRADE-LOCK";
 
 function rr(c, x, y, w, h, r){
   c.beginPath();
@@ -88,13 +88,14 @@ function pokerLegal(poker, key){
   if (!turn) return false;
   if (key === 'fold') return !!legal.canFold;
   if (key === 'call') return !!(legal.canCheck || legal.canCall);
-  if (key === 'raise') return !!legal.canRaise;
+  if (key === 'raise' || key === 'halfpot' || key === 'pot') return !!legal.canRaise;
   if (key === 'allin') return !!legal.canAllIn;
   return true;
 }
 function disabledReason(poker, key){
   if (key === 'next' && !pokerEnded(poker)) return 'Finish hand first';
   if (!poker?.awaitingPlayer) return 'Not your turn';
+  if (key === 'halfpot' || key === 'pot' || key === 'raise') return 'Raise locked';
   return 'Illegal now';
 }
 
@@ -181,10 +182,12 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   function buildButtons(state){
     const poker = state.poker || {};
     const callLabel = poker.toCall > 0 ? `CALL ${poker.toCall}` : 'CHECK';
-    const raiseLabel = poker?.legal?.minRaiseTo ? `RAISE ${poker.legal.minRaiseTo}` : 'RAISE';
+    const minLabel = poker?.legal?.minRaiseTo ? `MIN ${poker.legal.minRaiseTo}` : 'MIN';
     const foldDisabled = !pokerLegal(poker, 'fold');
     const callDisabled = !pokerLegal(poker, 'call');
     const raiseDisabled = !pokerLegal(poker, 'raise');
+    const halfPotDisabled = !pokerLegal(poker, 'halfpot');
+    const potDisabled = !pokerLegal(poker, 'pot');
     const allInDisabled = !pokerLegal(poker, 'allin');
     const nextDisabled = !pokerLegal(poker, 'next');
     const buttons = [
@@ -200,16 +203,18 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
       button('storeRoomScene', 'STORE', 24, 276, 110, 38, 18),
       button('smokerLoungeScene', 'LOUNGE', 144, 276, 110, 38, 17),
       button('teleport', state.teleportEnabled ? 'TP ON' : 'TP OFF', 264, 276, 110, 38, 18),
-      button('pokerFold', 'FOLD', 424, 184, 166, 54, 24, 0.15, foldDisabled, disabledReason(poker, 'fold')),
-      button('pokerCall', callLabel, 604, 184, 178, 54, poker.toCall > 999 ? 18 : 24, 0.15, callDisabled, disabledReason(poker, 'call')),
-      button('pokerRaise', raiseLabel, 796, 184, 166, 54, poker?.legal?.minRaiseTo > 999 ? 17 : 22, 0.15, raiseDisabled, disabledReason(poker, 'raise')),
-      button('pokerAllIn', 'ALL-IN', 424, 252, 166, 54, 23, 0.18, allInDisabled, disabledReason(poker, 'allin')),
-      button('pokerNext', 'NEXT HAND', 604, 252, 178, 54, 22, 0.18, nextDisabled, disabledReason(poker, 'next')),
-      button('audio', state.audioEnabled ? 'MUSIC' : 'MUTE', 796, 252, 166, 54, 23, 0.18),
-      button('next', 'TRACK', 424, 394, 166, 46, 20, 0.20)
+      button('pokerFold', 'FOLD', 424, 184, 120, 48, 21, 0.15, foldDisabled, disabledReason(poker, 'fold')),
+      button('pokerCall', callLabel, 554, 184, 134, 48, poker.toCall > 999 ? 16 : 21, 0.15, callDisabled, disabledReason(poker, 'call')),
+      button('pokerRaise', minLabel, 698, 184, 124, 48, poker?.legal?.minRaiseTo > 999 ? 15 : 20, 0.15, raiseDisabled, disabledReason(poker, 'raise')),
+      button('pokerRaiseHalfPot', 'HALF POT', 832, 184, 130, 48, 16, 0.15, halfPotDisabled, disabledReason(poker, 'halfpot')),
+      button('pokerRaisePot', 'POT', 424, 244, 166, 48, 21, 0.15, potDisabled, disabledReason(poker, 'pot')),
+      button('pokerAllIn', 'ALL-IN', 604, 244, 178, 48, 22, 0.18, allInDisabled, disabledReason(poker, 'allin')),
+      button('pokerNext', 'NEXT HAND', 796, 244, 166, 48, 20, 0.18, nextDisabled, disabledReason(poker, 'next')),
+      button('audio', state.audioEnabled ? 'MUSIC' : 'MUTE', 424, 394, 166, 46, 20, 0.18),
+      button('next', 'TRACK', 604, 394, 178, 46, 20, 0.20)
     ];
-    if (state.seated) buttons.push(button('leave', 'LEAVE TABLE', 604, 394, 178, 46, 20, 0.18));
-    else if (state.inTableZone) buttons.push(button('join', 'QUICK SIT', 604, 394, 178, 46, 20, 0.18));
+    if (state.seated) buttons.push(button('leave', 'LEAVE TABLE', 796, 394, 166, 46, 18, 0.18));
+    else if (state.inTableZone) buttons.push(button('join', 'QUICK SIT', 796, 394, 166, 46, 19, 0.18));
     return buttons;
   }
 
@@ -284,7 +289,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ctx.fillText(`Board: ${(poker.board || []).join(' ') || '--'}   Hand: ${(poker.playerCards || []).join(' ') || '--'}`, 424, 138);
     const noticeLive = performance.now() < watchNoticeUntil;
     ctx.fillStyle = noticeLive ? '#f6e27f' : 'rgba(233,233,255,0.78)';
-    ctx.fillText(noticeLive ? watchNotice : poker.awaitingPlayer ? 'YOUR TURN: watch buttons unlocked' : (poker.lastAction || 'Bots acting...'), 424, 166);
+    ctx.fillText(noticeLive ? watchNotice : poker.awaitingPlayer ? 'YOUR TURN: Min / Half Pot / Pot / All-In ready' : (poker.lastAction || 'Bots acting...'), 424, 166);
 
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 20px system-ui, Arial';
@@ -294,7 +299,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ctx.fillStyle = 'rgba(233,233,255,0.72)';
     ctx.font = '20px system-ui, Arial';
     ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'} • Zone: ${state.inTableZone ? 'Ready' : 'Walk closer'}`, 34, 342);
-    ctx.fillText('Watch locks illegal poker actions automatically', 34, 372);
+    ctx.fillText('Watch locks illegal poker actions and raise sizes', 34, 372);
     ctx.fillText(`Track: ${state.audioEnabled ? state.trackTitle : 'Paused'}`, 34, 430);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
@@ -344,6 +349,8 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     if (id === 'pokerFold') actions.pokerFold?.();
     if (id === 'pokerCall') actions.pokerCall?.();
     if (id === 'pokerRaise') actions.pokerRaise?.();
+    if (id === 'pokerRaiseHalfPot') actions.pokerRaiseHalfPot?.() || window.SVR_PLAYABLE_POKER?.raiseHalfPot?.();
+    if (id === 'pokerRaisePot') actions.pokerRaisePot?.() || window.SVR_PLAYABLE_POKER?.raisePot?.();
     if (id === 'pokerAllIn') actions.pokerAllIn?.();
     if (id === 'pokerNext') actions.pokerNext?.();
     if (id === 'lobby') actions.goLobby?.();
@@ -436,6 +443,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   }
 
   draw(true);
-  window.SVR_PHASE108_WATCH_POKER_DISABLED_STATES = { phase: PHASE };
+  window.SVR_PHASE123_WATCH_RAISE_CONTROLS = { phase: PHASE };
+  window.SVR_PHASE108_WATCH_POKER_DISABLED_STATES = window.SVR_PHASE123_WATCH_RAISE_CONTROLS;
   return { update, object: group };
 }
