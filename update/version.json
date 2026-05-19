@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-118-SCORPION-PRIVATE-POKER-TABLE-PASS-LOCK",
+  "build": "PHASE-119-QUEST-REGRESSION-BUNDLE-ADMIN-ONLINE-LOCK",
   "scope": "game-only",
-  "fix": "dedicated Scorpion private poker room shell with table, player seat, bot seats, cards, chips, and demo dealing controls",
+  "fix": "Quest regression bundle audit plus visible admin online runtime flag for game testing only",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-117-PRIVATE-SCENE-3D-ENVIRONMENT-PASS-LOCK"
+  "previousStableBuild": "PHASE-118-SCORPION-PRIVATE-POKER-TABLE-PASS-LOCK"
 }
