@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-113-HEALTH-PERF-DEMO-SYNC-PATCH-LOCK",
+  "build": "PHASE-114-RUNTIME-AUDIT-HEALTH-SYNC-LOCK",
   "scope": "game-only",
-  "fix": "small health panel sync patch linking HEALTH, PERF, and DEMO readiness state without replacing runtime modules",
+  "fix": "runtime audit synced with Phase 113 health perf demo sync patch, latest visible build label and audit globals updated",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-112-RUNTIME-AUDIT-DEMO-SYNC-LOCK"
+  "previousStableBuild": "PHASE-113-HEALTH-PERF-DEMO-SYNC-PATCH-LOCK"
 }
