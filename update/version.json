@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-124-SCORPION-GAMEPLAY-WIRING-LOCK",
+  "build": "PHASE-125-PRIVATE-SCENE-INTERACTION-POLISH-LOCK",
   "scope": "game-only",
-  "fix": "Scorpion private room upgraded from demo shell to local play-money poker gameplay with player actions, bot actions, pot/chips, board cards, and next-hand loop",
+  "fix": "private scene interaction polish for Reiki, PGA Drive, Chip Putt, Store, Lounge, and route checks while keeping experiences separate from lobby",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-123-WATCH-RAISE-CONTROLS-UPGRADE-LOCK"
+  "previousStableBuild": "PHASE-124-SCORPION-GAMEPLAY-WIRING-LOCK"
 }
