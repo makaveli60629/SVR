@@ -1,10 +1,50 @@
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/addons/webxr/XRHandModelFactory.js";
 
+const PHASE = "PHASE-168-HANDS-MATERIAL-POLISH";
+
 function makeProxyJoint(name){
   const obj = new THREE.Object3D();
   obj.name = name;
   return obj;
+}
+
+function createHandMaterial(handed = "right"){
+  return new THREE.MeshStandardMaterial({
+    color: handed === "left" ? 0x7ff5c7 : 0xb48cff,
+    roughness: 0.34,
+    metalness: 0.16,
+    transparent: true,
+    opacity: 0.92,
+    emissive: handed === "left" ? 0x07251c : 0x150728,
+    emissiveIntensity: 0.16
+  });
+}
+
+function createProxyMaterial(handed = "right"){
+  return new THREE.MeshStandardMaterial({
+    color: handed === "left" ? 0x58e7c1 : 0xb48cff,
+    roughness: 0.28,
+    metalness: 0.24,
+    transparent: true,
+    opacity: 0.78,
+    emissive: handed === "left" ? 0x06372a : 0x241044,
+    emissiveIntensity: 0.34
+  });
+}
+
+function applyMaterialToHandModel(model, material){
+  if (!model || !material || model.userData._svrMaterialApplied) return false;
+  let applied = false;
+  model.traverse?.((obj)=>{
+    if (!obj?.isMesh) return;
+    obj.material = material;
+    obj.castShadow = false;
+    obj.receiveShadow = false;
+    applied = true;
+  });
+  if (applied) model.userData._svrMaterialApplied = true;
+  return applied;
 }
 
 function makeControllerProxy(controller, handed = "right"){
@@ -21,6 +61,14 @@ function makeControllerProxy(controller, handed = "right"){
     "pinky-finger-tip": makeProxyJoint("pinky-finger-tip")
   };
   Object.values(proxy.joints).forEach(j=>proxy.add(j));
+
+  const palmMat = createProxyMaterial(handed);
+  const palm = new THREE.Mesh(new THREE.SphereGeometry(0.028, 14, 14), palmMat);
+  palm.name = `svr-${handed}-controller-hand-palm`;
+  palm.visible = false;
+  proxy.userData.visualPalm = palm;
+  proxy.userData.visualMaterial = palmMat;
+  proxy.add(palm);
   return proxy;
 }
 
@@ -42,6 +90,16 @@ function updateControllerProxy(proxy){
   proxy.userData.trigger = trigger;
   proxy.userData.squeeze = squeeze;
   proxy.joints.wrist.position.set(0, 0, 0);
+
+  if (proxy.userData.visualPalm){
+    proxy.userData.visualPalm.visible = false;
+    proxy.userData.visualPalm.position.set(0, 0, 0.018);
+    const mat = proxy.userData.visualMaterial;
+    if (mat){
+      mat.emissiveIntensity = fist ? 0.58 : trigger > 0.18 ? 0.46 : 0.26;
+      mat.opacity = fist ? 0.88 : 0.74;
+    }
+  }
 
   if (fist){
     proxy.joints["thumb-tip"].position.set(0.016 * side, -0.005, 0.012);
@@ -71,11 +129,24 @@ export function createHands({ scene, renderer, log = console.log }){
   const handDebugGroups = [];
   const controllers = [];
   const controllerProxies = [];
+  const materials = { left: createHandMaterial("left"), right: createHandMaterial("right"), unknown: createHandMaterial("right") };
   let leftHand = null;
   let rightHand = null;
   let leftControllerProxy = null;
   let rightControllerProxy = null;
   let debugOn = false;
+  let materialApplyCount = 0;
+
+  window.SVR_HAND_MATERIAL_STATE = {
+    phase: PHASE,
+    active: true,
+    appliedModels: 0,
+    controllerProxyVisuals: false,
+    leftHandTracked: false,
+    rightHandTracked: false,
+    controllerFallback: true,
+    note: "Lightweight mesh material polish applied without replacing hand/controller fallback runtime."
+  };
 
   function makeDebugGroup(parent){
     const group = new THREE.Group();
@@ -100,6 +171,7 @@ export function createHands({ scene, renderer, log = console.log }){
     rawHands.push(hand);
     const model = handFactory.createHandModel(hand, "mesh");
     model.visible = true;
+    model.userData._svrHandIndex = i;
     hand.add(model);
     handModels.push(model);
     handDebugGroups.push(makeDebugGroup(hand));
@@ -109,12 +181,19 @@ export function createHands({ scene, renderer, log = console.log }){
       hand.userData.handedness = handed;
       if (handed === "left") leftHand = hand;
       if (handed === "right") rightHand = hand;
-      log("Hand connected", i, handed);
+      const applied = applyMaterialToHandModel(model, materials[handed] || materials.unknown);
+      if (applied) materialApplyCount++;
+      window.SVR_HAND_MATERIAL_STATE.appliedModels = materialApplyCount;
+      window.SVR_HAND_MATERIAL_STATE.leftHandTracked = !!leftHand;
+      window.SVR_HAND_MATERIAL_STATE.rightHandTracked = !!rightHand;
+      log("Hand connected", i, handed, applied ? "material-polished" : "material-pending");
     });
 
     hand.addEventListener("disconnected", ()=>{
       if (leftHand === hand) leftHand = null;
       if (rightHand === hand) rightHand = null;
+      window.SVR_HAND_MATERIAL_STATE.leftHandTracked = !!leftHand;
+      window.SVR_HAND_MATERIAL_STATE.rightHandTracked = !!rightHand;
     });
 
     const controller = renderer.xr.getController(i);
@@ -132,7 +211,8 @@ export function createHands({ scene, renderer, log = console.log }){
       controllerProxies.push({ controller, proxy, debug });
       if (handed === "left") leftControllerProxy = proxy;
       if (handed === "right") rightControllerProxy = proxy;
-      log("Controller connected", i, handed);
+      window.SVR_HAND_MATERIAL_STATE.controllerProxyVisuals = true;
+      log("Controller connected", i, handed, "proxy-hand-material-ready");
     });
 
     controller.addEventListener("disconnected", ()=>{
@@ -144,16 +224,24 @@ export function createHands({ scene, renderer, log = console.log }){
         rec.proxy.parent?.remove(rec.proxy);
         controllerProxies.splice(idx, 1);
       }
+      window.SVR_HAND_MATERIAL_STATE.controllerProxyVisuals = controllerProxies.length > 0;
     });
   }
 
   function update(dt = 0.016){
     controllers.forEach(c=>{ if (c) c.visible = false; });
-    rawHands.forEach((h, idx)=>{
-      if (h) h.visible = true;
+    rawHands.forEach((h)=>{ if (h) h.visible = true; });
+    handModels.forEach((m, idx)=>{
+      if (!m) return;
+      m.visible = true;
+      const handed = rawHands[idx]?.userData?.handedness || "unknown";
+      if (applyMaterialToHandModel(m, materials[handed] || materials.unknown)) materialApplyCount++;
     });
-    handModels.forEach(m=>{ if (m) m.visible = true; });
     controllerProxies.forEach(({ proxy })=> updateControllerProxy(proxy, dt));
+    window.SVR_HAND_MATERIAL_STATE.appliedModels = materialApplyCount;
+    window.SVR_HAND_MATERIAL_STATE.leftHandTracked = !!leftHand;
+    window.SVR_HAND_MATERIAL_STATE.rightHandTracked = !!rightHand;
+    window.SVR_HAND_MATERIAL_STATE.controllerProxyVisuals = controllerProxies.length > 0;
   }
 
   function updateDebug(){
