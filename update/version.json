@@ -1,7 +1,7 @@
 ﻿{
-    "phase":  101,
-    "scope":  "Scorpion chip flow and winner moment polish",
-    "build":  "PHASE-101-SCORPION-CHIP-FLOW-WINNER-MOMENT-LOCK",
-    "updatedAt":  "2026-05-20T03:48:48Z",
-    "track":  "game-next/scorpion-polish"
+    "phase":  102,
+    "notes":  "Scorpion turn UX and player decision polish. Website and SQL untouched.",
+    "build":  "PHASE-102-SCORPION-TURN-UX-PLAYER-DECISION-LOCK",
+    "updatedAt":  "2026-05-20T03:53:16.0968255Z",
+    "track":  "game"
 }
