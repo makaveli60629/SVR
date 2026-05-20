@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/addons/webxr/XRHandModelFactory.js";
 
-const PHASE = "PHASE-172-ACTIVE-TELEPORT-PURPLE-HAND-GLOW";
+const PHASE = "PHASE-174-HAND-TEXT-TEXTURE-WATCH-POLISH";
 const BASE_LEFT = new THREE.Color(0x7ff5c7);
 const BASE_RIGHT = new THREE.Color(0xb48cff);
 const PURPLE_GLOW = new THREE.Color(0xb648ff);
@@ -11,6 +11,58 @@ function makeProxyJoint(name){
   const obj = new THREE.Object3D();
   obj.name = name;
   return obj;
+}
+
+function makeTextCanvasTexture(label = "SVR", sub = "READY"){
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d");
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+
+  function draw(nextLabel = label, nextSub = sub, active = false){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    grad.addColorStop(0, active ? "rgba(68,12,105,0.96)" : "rgba(8,12,24,0.86)");
+    grad.addColorStop(1, active ? "rgba(180,72,255,0.82)" : "rgba(22,10,42,0.84)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect?.(8, 8, 240, 112, 22);
+    if (!ctx.roundRect){
+      ctx.rect(8, 8, 240, 112);
+    }
+    ctx.fill();
+    ctx.strokeStyle = active ? "rgba(255,255,255,0.92)" : "rgba(180,140,255,0.72)";
+    ctx.lineWidth = active ? 7 : 4;
+    ctx.stroke();
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "bold 50px system-ui, Arial";
+    ctx.fillText(nextLabel, 128, 50);
+    ctx.fillStyle = active ? "#f6e27f" : "#7ff5c7";
+    ctx.font = "bold 26px system-ui, Arial";
+    ctx.fillText(nextSub, 128, 91);
+    tex.needsUpdate = true;
+  }
+
+  draw(label, sub, false);
+  return { texture: tex, draw };
+}
+
+function createHandTextPlane(handed = "right"){
+  const layer = makeTextCanvasTexture("SVR", "READY");
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.086, 0.043),
+    new THREE.MeshBasicMaterial({ map: layer.texture, transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
+  );
+  mesh.name = `svr-${handed}-hand-text-texture`;
+  mesh.visible = false;
+  mesh.renderOrder = 84;
+  mesh.userData.textLayer = layer;
+  return mesh;
 }
 
 function createHandMaterial(handed = "right"){
@@ -42,8 +94,8 @@ function setMaterialGlow(material, handed, active){
   if (active){
     material.color.copy(PURPLE_GLOW);
     material.emissive.copy(PURPLE_EMISSIVE);
-    material.emissiveIntensity = 1.15;
-    material.opacity = 0.98;
+    material.emissiveIntensity = 1.85;
+    material.opacity = 1.0;
   } else {
     material.color.copy(handed === "left" ? BASE_LEFT : BASE_RIGHT);
     material.emissive.setHex(handed === "left" ? 0x07251c : 0x150728);
@@ -59,13 +111,24 @@ function setProxyGlow(proxy, active){
   if (active){
     mat.color.copy(PURPLE_GLOW);
     mat.emissive.copy(PURPLE_EMISSIVE);
-    mat.emissiveIntensity = 1.35;
-    mat.opacity = 0.96;
+    mat.emissiveIntensity = 2.0;
+    mat.opacity = 1.0;
   } else {
     mat.color.setHex(handed === "left" ? 0x58e7c1 : 0xb48cff);
     mat.emissive.setHex(handed === "left" ? 0x06372a : 0x241044);
     mat.emissiveIntensity = 0.30;
     mat.opacity = 0.76;
+  }
+}
+
+function updateTextPlane(mesh, active, label = "SVR", sub = "READY"){
+  if (!mesh) return;
+  mesh.visible = !!active;
+  if (mesh.userData._lastLabel !== label || mesh.userData._lastSub !== sub || mesh.userData._lastActive !== active){
+    mesh.userData.textLayer?.draw?.(label, sub, active);
+    mesh.userData._lastLabel = label;
+    mesh.userData._lastSub = sub;
+    mesh.userData._lastActive = active;
   }
 }
 
@@ -105,6 +168,12 @@ function makeControllerProxy(controller, handed = "right"){
   proxy.userData.visualPalm = palm;
   proxy.userData.visualMaterial = palmMat;
   proxy.add(palm);
+
+  const textPlane = createHandTextPlane(handed);
+  textPlane.position.set(0, 0.034, 0.065);
+  textPlane.rotation.x = -0.45;
+  proxy.userData.textPlane = textPlane;
+  proxy.add(textPlane);
   return proxy;
 }
 
@@ -141,6 +210,7 @@ function updateControllerProxy(proxy){
       mat.opacity = fist ? 0.88 : 0.74;
     }
   }
+  updateTextPlane(proxy.userData.textPlane, activeProxy, "TP ON", "SVR");
 
   if (fist){
     proxy.joints["thumb-tip"].position.set(0.016 * side, -0.005, 0.012);
@@ -170,6 +240,7 @@ export function createHands({ scene, renderer, log = console.log }){
   const handDebugGroups = [];
   const controllers = [];
   const controllerProxies = [];
+  const handTextPlanes = { left: null, right: null };
   const materials = { left: createHandMaterial("left"), right: createHandMaterial("right"), unknown: createHandMaterial("right") };
   let leftHand = null;
   let rightHand = null;
@@ -188,7 +259,8 @@ export function createHands({ scene, renderer, log = console.log }){
     controllerFallback: true,
     teleportGlowActive: "none",
     teleportGlowColor: "off",
-    note: "Purple glow follows window.SVR_ACTIVE_TELEPORT_HAND when fist/controller teleport is armed."
+    handTextTexture: true,
+    note: "Purple glow and TP ON hand text follow window.SVR_ACTIVE_TELEPORT_HAND."
   };
 
   function makeDebugGroup(parent){
@@ -216,17 +288,24 @@ export function createHands({ scene, renderer, log = console.log }){
     handModels.push(model);
     handDebugGroups.push(makeDebugGroup(hand));
 
+    const guessedHanded = i === 0 ? "left" : "right";
+    const textPlane = createHandTextPlane(guessedHanded);
+    textPlane.position.set(guessedHanded === "left" ? -0.028 : 0.028, 0.015, 0.055);
+    textPlane.rotation.set(-0.95, 0, guessedHanded === "left" ? 0.18 : -0.18);
+    hand.add(textPlane);
+    hand.userData.textPlane = textPlane;
+
     hand.addEventListener("connected", (evt)=>{
       const handed = evt?.data?.handedness || "unknown";
       hand.userData.handedness = handed;
-      if (handed === "left") leftHand = hand;
-      if (handed === "right") rightHand = hand;
+      if (handed === "left") { leftHand = hand; handTextPlanes.left = textPlane; }
+      if (handed === "right") { rightHand = hand; handTextPlanes.right = textPlane; }
       const applied = applyMaterialToHandModel(model, materials[handed] || materials.unknown);
       if (applied) materialApplyCount++;
       window.SVR_HAND_MATERIAL_STATE.appliedModels = materialApplyCount;
       window.SVR_HAND_MATERIAL_STATE.leftHandTracked = !!leftHand;
       window.SVR_HAND_MATERIAL_STATE.rightHandTracked = !!rightHand;
-      log("Hand connected", i, handed, applied ? "material-polished" : "material-pending");
+      log("Hand connected", i, handed, applied ? "material-polished-textured" : "material-pending");
     });
 
     hand.addEventListener("disconnected", ()=>{
@@ -252,7 +331,7 @@ export function createHands({ scene, renderer, log = console.log }){
       if (handed === "left") leftControllerProxy = proxy;
       if (handed === "right") rightControllerProxy = proxy;
       window.SVR_HAND_MATERIAL_STATE.controllerProxyVisuals = true;
-      log("Controller connected", i, handed, "proxy-hand-material-ready");
+      log("Controller connected", i, handed, "proxy-hand-material-texture-ready");
     });
 
     controller.addEventListener("disconnected", ()=>{
@@ -274,6 +353,8 @@ export function createHands({ scene, renderer, log = console.log }){
     setMaterialGlow(materials.left, "left", active === "left");
     setMaterialGlow(materials.right, "right", active === "right");
     setMaterialGlow(materials.unknown, "right", active === "right" || active === "left");
+    updateTextPlane(handTextPlanes.left, active === "left", "TP ON", "SVR");
+    updateTextPlane(handTextPlanes.right, active === "right", "TP ON", "SVR");
     window.SVR_HAND_MATERIAL_STATE.teleportGlowActive = active || "none";
     window.SVR_HAND_MATERIAL_STATE.teleportGlowColor = active === "none" ? "off" : "purple";
   }
