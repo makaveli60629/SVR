@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-const PHASE = "PHASE-165-WATCH-HOLOGRAM-BUTTON";
+const PHASE = "PHASE-174-WATCH-TEXTURE-POLISH";
 const V0 = new THREE.Vector3();
 const V1 = new THREE.Vector3();
 const V2 = new THREE.Vector3();
@@ -110,15 +110,13 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
   const frame = new THREE.Mesh(
     new THREE.BoxGeometry(plateW * 0.98, plateH * 0.98, 0.003),
-    new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.36, metalness: 0.20, emissive: 0x090b12, emissiveIntensity: 0.02, transparent: true, opacity: 0.84 })
+    new THREE.MeshStandardMaterial({ color: 0x0c1020, roughness: 0.30, metalness: 0.32, emissive: 0x12001f, emissiveIntensity: 0.08, transparent: true, opacity: 0.92 })
   );
   frame.position.z = -0.014;
   group.add(frame);
 
-  const strapL = new THREE.Mesh(
-    new THREE.BoxGeometry(plateW * 0.16, plateH * 0.34, 0.002),
-    new THREE.MeshStandardMaterial({ color: 0x181d2a, roughness: 0.62, metalness: 0.08, emissive: 0x06080c, emissiveIntensity: 0.02 })
-  );
+  const strapMat = new THREE.MeshStandardMaterial({ color: 0x151827, roughness: 0.58, metalness: 0.10, emissive: 0x05060a, emissiveIntensity: 0.03 });
+  const strapL = new THREE.Mesh(new THREE.BoxGeometry(plateW * 0.16, plateH * 0.34, 0.002), strapMat);
   strapL.position.set(-plateW * 0.43, 0, -0.018);
   group.add(strapL);
   const strapR = strapL.clone();
@@ -171,15 +169,36 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ];
   }
 
+  function drawGrid(){
+    ctx.save();
+    ctx.strokeStyle = "rgba(180,140,255,0.08)";
+    ctx.lineWidth = 1;
+    for (let x = 32; x < 1000; x += 32){
+      ctx.beginPath(); ctx.moveTo(x, 28); ctx.lineTo(x, 484); ctx.stroke();
+    }
+    for (let y = 32; y < 488; y += 32){
+      ctx.beginPath(); ctx.moveTo(24, y); ctx.lineTo(1000, y); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   function drawButton(btn, hovered){
     ctx.save();
     const disabled = !!btn.disabled;
-    ctx.fillStyle = disabled ? "rgba(255,255,255,0.035)" : hovered ? "rgba(180,140,255,0.36)" : "rgba(255,255,255,0.08)";
-    ctx.strokeStyle = disabled ? "rgba(255,255,255,0.18)" : hovered ? "rgba(246,226,127,0.98)" : "rgba(180,140,255,0.42)";
+    const fill = disabled ? "rgba(255,255,255,0.035)" : hovered ? "rgba(180,72,255,0.42)" : "rgba(255,255,255,0.075)";
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = disabled ? "rgba(255,255,255,0.16)" : hovered ? "rgba(246,226,127,0.98)" : "rgba(180,140,255,0.50)";
     ctx.lineWidth = hovered && !disabled ? 5 : 3;
     rr(ctx, btn.x, btn.y, btn.w, btn.h, 15);
     ctx.fill();
     ctx.stroke();
+    if (hovered && !disabled){
+      ctx.shadowColor = "rgba(180,72,255,0.8)";
+      ctx.shadowBlur = 18;
+      ctx.strokeStyle = "rgba(180,72,255,0.7)";
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
     ctx.fillStyle = disabled ? "rgba(255,255,255,0.42)" : hovered ? "#ffffff" : "#e8e8ff";
     ctx.font = `bold ${btn.font || 20}px system-ui, Arial`;
     ctx.textAlign = "center";
@@ -191,19 +210,22 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   function draw(force = false){
     const state = getState();
     const poker = state.poker || {};
-    const sig = JSON.stringify({ h: hoveredId, notice: watchNotice, noticeLive: performance.now() < watchNoticeUntil, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, pot: poker.pot, street: poker.street, active: poker.activeName, turn: poker.awaitingPlayer, legal: poker.legal, holo: state.hologramVisible, sec: new Date().getSeconds() });
+    const activeTp = window.SVR_ACTIVE_TELEPORT_HAND || {};
+    const sig = JSON.stringify({ h: hoveredId, notice: watchNotice, noticeLive: performance.now() < watchNoticeUntil, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, pot: poker.pot, street: poker.street, active: poker.activeName, turn: poker.awaitingPlayer, legal: poker.legal, holo: state.hologramVisible, tp: activeTp.state, tpHand: activeTp.active, sec: new Date().getSeconds() });
     if (!force && sig === lastSig) return;
     lastSig = sig;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    grad.addColorStop(0, "rgba(5,8,16,0.92)");
-    grad.addColorStop(1, "rgba(18,10,32,0.96)");
+    grad.addColorStop(0, "rgba(5,8,16,0.96)");
+    grad.addColorStop(0.46, "rgba(25,9,48,0.96)");
+    grad.addColorStop(1, "rgba(8,12,26,0.98)");
     ctx.fillStyle = grad;
     rr(ctx, 12, 12, 1000, 488, 34);
     ctx.fill();
-    ctx.strokeStyle = poker.awaitingPlayer ? "rgba(246,226,127,0.88)" : "rgba(180,140,255,0.64)";
-    ctx.lineWidth = 6;
+    drawGrid();
+    ctx.strokeStyle = activeTp.glow === "purple" ? "rgba(180,72,255,0.96)" : poker.awaitingPlayer ? "rgba(246,226,127,0.88)" : "rgba(180,140,255,0.70)";
+    ctx.lineWidth = activeTp.glow === "purple" ? 8 : 6;
     rr(ctx, 12, 12, 1000, 488, 34);
     ctx.stroke();
 
@@ -216,9 +238,10 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ctx.fillStyle = "rgba(233,233,255,0.95)";
     ctx.font = "bold 27px system-ui, Arial";
     ctx.fillText("SVR WRIST CONSOLE", 34, 104);
-    ctx.fillStyle = state.hologramVisible ? "#f6e27f" : "rgba(233,233,255,0.72)";
+    ctx.fillStyle = activeTp.glow === "purple" ? "#f6e27f" : state.hologramVisible ? "#f6e27f" : "rgba(233,233,255,0.72)";
     ctx.font = "18px system-ui, Arial";
-    ctx.fillText(state.hologramVisible ? "Hologram menu open" : "Tap HOLO for large menu", 208, 104);
+    const tpText = activeTp.glow === "purple" ? `TP ACTIVE: ${String(activeTp.active || "hand").toUpperCase()}` : state.hologramVisible ? "Hologram menu open" : "Tap HOLO for large menu";
+    ctx.fillText(tpText, 208, 104);
 
     ctx.textAlign = "right";
     ctx.fillStyle = "#7ff5c7";
@@ -233,8 +256,8 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ctx.font = "21px system-ui, Arial";
     ctx.fillText(`Board: ${(poker.board || []).join(" ") || "--"}   Hand: ${(poker.playerCards || []).join(" ") || "--"}`, 424, 138);
     const noticeLive = performance.now() < watchNoticeUntil;
-    ctx.fillStyle = noticeLive ? "#f6e27f" : "rgba(233,233,255,0.78)";
-    ctx.fillText(noticeLive ? watchNotice : poker.awaitingPlayer ? "YOUR TURN: watch or HOLO menu ready" : (poker.lastAction || "Bots acting..."), 424, 166);
+    ctx.fillStyle = noticeLive ? "#f6e27f" : activeTp.glow === "purple" ? "#b648ff" : "rgba(233,233,255,0.78)";
+    ctx.fillText(noticeLive ? watchNotice : activeTp.glow === "purple" ? "Teleport armed — purple hand active" : poker.awaitingPlayer ? "YOUR TURN: watch or HOLO menu ready" : (poker.lastAction || "Bots acting..."), 424, 166);
 
     ctx.fillStyle = "rgba(180,140,255,0.92)";
     ctx.font = "bold 19px system-ui, Arial";
@@ -310,21 +333,10 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
   function update(dt, leftHand, rightHand){
     const anchor = leftHand?.joints?.wrist ? leftHand : rightHand?.joints?.wrist ? rightHand : null;
-    if (!anchor?.joints?.wrist){
-      group.visible = false;
-      hoveredId = null;
-      draw(true);
-      return;
-    }
-
+    if (!anchor?.joints?.wrist){ group.visible = false; hoveredId = null; draw(true); return; }
     const watchOnLeft = anchor === leftHand;
     const pose = computeForearmPose(anchor, camera, renderer, watchOnLeft ? "left" : "right");
-    if (!pose){
-      group.visible = false;
-      hoveredId = null;
-      draw(true);
-      return;
-    }
+    if (!pose){ group.visible = false; hoveredId = null; draw(true); return; }
 
     group.visible = true;
     group.position.copy(pose.position);
@@ -355,12 +367,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     if (pinching && hoveredId && !pressLockId) pressLockId = hoveredId;
     if (pinching && pressLockId) hoveredId = pressLockId;
     if (!pinching) pressLockId = null;
-    if (hoveredId !== lastHovered){
-      lastHovered = hoveredId;
-      pinchTime = 0;
-      if (!pinching) pressed = false;
-      if (!hoveredId) pressLockId = null;
-    }
+    if (hoveredId !== lastHovered){ lastHovered = hoveredId; pinchTime = 0; if (!pinching) pressed = false; if (!hoveredId) pressLockId = null; }
 
     const buttons = buildButtons(getState());
     const activeBtn = buttons.find(btn => btn.id === hoveredId) || null;
@@ -368,19 +375,16 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     else if (!pinching) pinchTime = 0;
 
     const directHold = activeBtn?.hold ?? 0.11;
-    if (hoveredId && !pressed && pinching && pinchTime > directHold){
-      pressed = true;
-      activate(hoveredId);
-      pinchTime = 0;
-    }
+    if (hoveredId && !pressed && pinching && pinchTime > directHold){ pressed = true; activate(hoveredId); pinchTime = 0; }
     if (!pinching) pressed = false;
 
     draw();
   }
 
   draw(true);
-  window.SVR_PHASE165_WATCH_HOLOGRAM_BUTTON = { phase: PHASE };
-  window.SVR_PHASE123_WATCH_RAISE_CONTROLS = window.SVR_PHASE165_WATCH_HOLOGRAM_BUTTON;
-  window.SVR_PHASE108_WATCH_POKER_DISABLED_STATES = window.SVR_PHASE165_WATCH_HOLOGRAM_BUTTON;
+  window.SVR_PHASE174_WATCH_TEXTURE = { phase: PHASE, texture: "procedural-grid-bezel", holo: true };
+  window.SVR_PHASE165_WATCH_HOLOGRAM_BUTTON = window.SVR_PHASE174_WATCH_TEXTURE;
+  window.SVR_PHASE123_WATCH_RAISE_CONTROLS = window.SVR_PHASE174_WATCH_TEXTURE;
+  window.SVR_PHASE108_WATCH_POKER_DISABLED_STATES = window.SVR_PHASE174_WATCH_TEXTURE;
   return { update, object: group };
 }
