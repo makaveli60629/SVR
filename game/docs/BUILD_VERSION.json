@@ -1,7 +1,7 @@
 ﻿{
-    "updatedAt":  "2026-05-20T01:07:34Z",
-    "websiteTouched":  false,
-    "scope":  "game-side-only",
-    "build":  "PHASE-88-SCORPION-INTEGRATION-QUEST-VALIDATION-LOCK",
-    "sqlTouched":  false
+    "phase":  101,
+    "scope":  "Scorpion chip flow and winner moment polish",
+    "build":  "PHASE-101-SCORPION-CHIP-FLOW-WINNER-MOMENT-LOCK",
+    "updatedAt":  "2026-05-20T03:48:48Z",
+    "track":  "game-next/scorpion-polish"
 }
