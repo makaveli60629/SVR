@@ -1,12 +1,12 @@
 import * as THREE from "three";
 
-// PHASE-101-VISUAL-CARD-MESH-SYNC-LOCK
-// Game-side only. Adds lightweight visible card meshes synchronized from the
-// playable poker state. Logic source of truth remains playable_poker.js.
+// PHASE-118-CARD-READABILITY-TABLE-TAG-HEIGHT-LOCK
+// Game-side only. Enlarges card rank/suit readability from seated VR view.
+// Logic source of truth remains playable_poker.js.
 
-const PHASE = "PHASE-101-VISUAL-CARD-MESH-SYNC-LOCK";
-const CARD_W = 0.245;
-const CARD_H = 0.345;
+const PHASE = "PHASE-118-CARD-READABILITY-TABLE-TAG-HEIGHT-LOCK";
+const CARD_W = 0.265;
+const CARD_H = 0.372;
 const UPDATE_MS = 140;
 
 function makeCardTexture(label = "--", opts = {}){
@@ -39,7 +39,7 @@ function makeCardTexture(label = "--", opts = {}){
         }
       }
       ctx.fillStyle = "#7ff5c7";
-      ctx.font = "bold 42px system-ui, Arial";
+      ctx.font = "bold 46px system-ui, Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("SVR", 128, 192);
@@ -47,32 +47,32 @@ function makeCardTexture(label = "--", opts = {}){
       const rank = text.slice(0, -1) || text;
       const suit = text.slice(-1);
       ctx.fillStyle = red ? "#b01832" : "#111827";
-      ctx.font = "bold 58px system-ui, Arial";
+      ctx.font = "900 72px system-ui, Arial";
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
-      ctx.fillText(rank, 26, 24);
-      ctx.font = "bold 54px system-ui, Arial";
-      ctx.fillText(suit, 28, 82);
+      ctx.fillText(rank, 22, 18);
+      ctx.font = "900 68px system-ui, Arial";
+      ctx.fillText(suit, 24, 92);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = "bold 108px system-ui, Arial";
-      ctx.fillText(suit, 128, 210);
+      ctx.font = "900 134px system-ui, Arial";
+      ctx.fillText(suit, 128, 224);
       ctx.save();
-      ctx.translate(230, 360);
+      ctx.translate(232, 362);
       ctx.rotate(Math.PI);
-      ctx.font = "bold 44px system-ui, Arial";
+      ctx.font = "900 56px system-ui, Arial";
       ctx.textAlign = "left";
       ctx.fillText(rank, 0, 0);
       ctx.restore();
     }
     ctx.fillStyle = opts.tag ? "rgba(5,8,16,0.82)" : "transparent";
     if (opts.tag){
-      ctx.fillRect(0, 336, 256, 42);
+      ctx.fillRect(0, 332, 256, 46);
       ctx.fillStyle = "#7ff5c7";
-      ctx.font = "bold 20px system-ui, Arial";
+      ctx.font = "bold 23px system-ui, Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(opts.tag, 128, 358);
+      ctx.fillText(opts.tag, 128, 356);
     }
     texture.needsUpdate = true;
   };
@@ -115,12 +115,12 @@ function updateCard(mesh, label, selected = false){
 
 function createCardSync(scene){
   const root = new THREE.Group();
-  root.name = "SVR_Phase101_VisualCardMeshSync";
+  root.name = "SVR_Phase118_VisualCardMeshSync";
   scene.add(root);
 
   const boardCards = Array.from({ length: 5 }, (_, i) => {
     const mesh = makeCardMesh("--", i === 0 ? "BOARD" : "");
-    mesh.position.set((i - 2) * (CARD_W + 0.035), 0.875, -0.20);
+    mesh.position.set((i - 2) * (CARD_W + 0.04), 0.88, -0.20);
     mesh.rotation.z = (i - 2) * 0.015;
     root.add(mesh);
     return mesh;
@@ -128,7 +128,7 @@ function createCardSync(scene){
 
   const playerCards = Array.from({ length: 2 }, (_, i) => {
     const mesh = makeCardMesh("--", i === 0 ? "YOUR HAND" : "");
-    mesh.position.set((i - 0.5) * (CARD_W + 0.045), 0.885, 0.83);
+    mesh.position.set((i - 0.5) * (CARD_W + 0.052), 0.895, 0.83);
     mesh.rotation.z = (i === 0 ? -0.08 : 0.08);
     root.add(mesh);
     return mesh;
@@ -155,30 +155,30 @@ function createCardSync(scene){
   const labelTexture = new THREE.CanvasTexture(labelCanvas);
   labelTexture.colorSpace = THREE.SRGBColorSpace;
   const labelMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.96, 0.36),
+    new THREE.PlaneGeometry(2.24, 0.42),
     new THREE.MeshBasicMaterial({ map: labelTexture, transparent: true, toneMapped: false, side: THREE.DoubleSide, depthWrite: false })
   );
-  labelMesh.name = "SVR_Phase101_CardStateLabel";
-  labelMesh.position.set(0, 1.08, 0.38);
-  labelMesh.rotation.x = -0.34;
-  labelMesh.renderOrder = 54;
+  labelMesh.name = "SVR_Phase118_CardStateLabel_High";
+  labelMesh.position.set(0, 1.34, 0.42);
+  labelMesh.rotation.x = -0.20;
+  labelMesh.renderOrder = 64;
   root.add(labelMesh);
 
   function drawLabel(state){
     const text = state?.winnerText || (state?.awaitingPlayer ? "YOUR TURN — cards synced" : `Cards synced • ${String(state?.street || "ready").toUpperCase()} • Pot $${state?.pot || 0}`);
     labelCtx.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
-    labelCtx.fillStyle = "rgba(4,7,16,0.82)";
-    roundRect(labelCtx, 18, 30, 988, 116, 32);
+    labelCtx.fillStyle = "rgba(4,7,16,0.84)";
+    roundRect(labelCtx, 18, 24, 988, 126, 34);
     labelCtx.fill();
     labelCtx.strokeStyle = state?.winnerText ? "rgba(127,245,199,0.90)" : state?.awaitingPlayer ? "rgba(246,226,127,0.86)" : "rgba(180,140,255,0.65)";
-    labelCtx.lineWidth = 6;
-    roundRect(labelCtx, 18, 30, 988, 116, 32);
+    labelCtx.lineWidth = 7;
+    roundRect(labelCtx, 18, 24, 988, 126, 34);
     labelCtx.stroke();
     labelCtx.fillStyle = state?.awaitingPlayer ? "#f6e27f" : "#ffffff";
-    labelCtx.font = "bold 42px system-ui, Arial";
+    labelCtx.font = "900 48px system-ui, Arial";
     labelCtx.textAlign = "center";
     labelCtx.textBaseline = "middle";
-    labelCtx.fillText(String(text).slice(0, 62), 512, 88);
+    labelCtx.fillText(String(text).slice(0, 58), 512, 88);
     labelTexture.needsUpdate = true;
   }
 
@@ -215,7 +215,7 @@ function boot(){
     sync.drawLabel(state);
   };
   requestAnimationFrame(loop);
-  window.SVR_PHASE101_VISUAL_CARD_MESH_SYNC = { phase: PHASE };
+  window.SVR_PHASE118_VISUAL_CARD_MESH_SYNC = { phase: PHASE, cardW: CARD_W, cardH: CARD_H, tagY: 1.34 };
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
