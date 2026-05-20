@@ -8,12 +8,13 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
+import { applyWatchHardfix } from "./modules/watch_hardfix.js";
 import { createNpcAvatarSystem } from "./modules/npc_avatar_system.js";
 import { createPlayablePoker } from "./modules/playable_poker.js";
 import "./modules/poker_action_hud.js";
 import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
 
-const PHASE_85_BUILD = "PHASE-123-WATCH-RAISE-CONTROLS-UPGRADE-LOCK";
+const PHASE_85_BUILD = "PHASE-117-WATCH-HARDFIX-WIRING-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -78,7 +79,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading worldâ€¦", { force: true });
+setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -175,7 +176,7 @@ function joinTable(){
     moveDesktopToSeat(seat);
   }
   setMode(`Seat: ${seat.label}`);
-  setStatus("Poker controls: F Fold â€¢ C Check/Call â€¢ R Raise â€¢ A All-In â€¢ H Next Hand", { force: true });
+  setStatus("Poker controls: F Fold • C Check/Call • R Raise • A All-In • H Next Hand", { force: true });
   return true;
 }
 
@@ -294,12 +295,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logoâ€¦", { force: true });
+setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Poker is playable: F/C/R/A/H. Wrist quick-jump and poker buttons enabled.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -383,7 +384,10 @@ renderer.setAnimationLoop(()=>{
     });
   }
 
-  if (watch) watch.update(dt, leftHand, rightHand);
+  if (watch) {
+    watch.update(dt, leftHand, rightHand);
+    applyWatchHardfix(watch.object, camera, renderer);
+  }
 
   renderer.render(scene, camera);
 });
@@ -395,8 +399,7 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloadingâ€¦");
-  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
+  log("[ERR] WebGL context lost. Reloading…");
+  setStatus("WebGL context lost (reloading…)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
-
