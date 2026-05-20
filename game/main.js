@@ -8,6 +8,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
+import { createHologramMenu } from "./modules/hologram_menu.js";
 import { applyWatchHardfix } from "./modules/watch_hardfix.js";
 import { createNpcAvatarSystem } from "./modules/npc_avatar_system.js";
 import { createPlayablePoker } from "./modules/playable_poker.js";
@@ -15,7 +16,7 @@ import "./modules/poker_action_hud.js";
 import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
 import { buildTeleportRouteRegistry } from "./modules/teleport-router.js";
 
-const PHASE_85_BUILD = "PHASE-156-TELEPORT-ROUTER-REGISTRY";
+const PHASE_85_BUILD = "PHASE-165-HOLOGRAM-MENU-CODE-PATCH";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -107,14 +108,8 @@ const audio = createAudioPlaylist({
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
-    if (state.error){
-      setStatus(`Audio: ${state.error}`);
-      return;
-    }
-    if (state.enabled){
-      setStatus(`Now Playing: ${state.trackTitle}`);
-      return;
-    }
+    if (state.error){ setStatus(`Audio: ${state.error}`); return; }
+    if (state.enabled){ setStatus(`Now Playing: ${state.trackTitle}`); return; }
     setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
   }
 });
@@ -122,6 +117,7 @@ const audio = createAudioPlaylist({
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
+let hologram = null;
 
 const poker = createPlayablePoker({
   scene,
@@ -152,14 +148,8 @@ function inTableZone(){
   return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7);
 }
 
-function seatLabel(){
-  return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing";
-}
-
-function moveDesktopToSeat(seat){
-  camera.position.set(seat.x, 1.12, seat.z);
-  camera.lookAt(0, 1.0, 0);
-}
+function seatLabel(){ return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing"; }
+function moveDesktopToSeat(seat){ camera.position.set(seat.x, 1.12, seat.z); camera.lookAt(0, 1.0, 0); }
 
 function joinTable(){
   if (!inTableZone()) return false;
@@ -174,11 +164,8 @@ function joinTable(){
   seatIndex = best;
   seated = true;
   const seat = seats[best];
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(seat.x, -0.42, seat.z);
-  } else {
-    moveDesktopToSeat(seat);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(seat.x, -0.42, seat.z);
+  else moveDesktopToSeat(seat);
   setMode(`Seat: ${seat.label}`);
   setStatus("Poker controls: F Fold • C Check/Call • R Raise • A All-In • H Next Hand", { force: true });
   return true;
@@ -187,44 +174,71 @@ function joinTable(){
 function leaveTable(){
   seated = false;
   seatIndex = -1;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(0, 0, 4.8);
-  } else {
-    camera.position.set(0, 1.6, 4.8);
-    camera.lookAt(0, 1.15, 0);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(0, 0, 4.8);
+  else { camera.position.set(0, 1.6, 4.8); camera.lookAt(0, 1.15, 0); }
   return true;
 }
 
 function movePlayerToSpot(target, lookTarget = null){
   if (!target) return;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(target.x, 0, target.z);
-  } else {
-    camera.position.set(target.x, 1.6, target.z);
-    if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(target.x, 0, target.z);
+  else { camera.position.set(target.x, 1.6, target.z); if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z); }
 }
 
 function gotoScene(key){
   const routeKey = teleportRouter.normalizeRouteKey(key);
   const rec = teleportRouter.getRoute(routeKey) || sceneTargets?.[key];
-  if (!rec?.pos){
-    setStatus(`Route unavailable: ${key}`, { force: true });
-    return false;
-  }
+  if (!rec?.pos){ setStatus(`Route unavailable: ${key}`, { force: true }); return false; }
   movePlayerToSpot(rec.pos, rec.look || null);
   setStatus(`Quick jump: ${rec.label || routeKey}`, { force: true });
   window.SVR_LAST_ROUTE = { requested: key, routeKey, label: rec.label || routeKey, type: rec.type || "legacy", privateScene: !!rec.privateScene };
   return true;
 }
 
-$sceneButtons.forEach((btn)=>{
-  btn.addEventListener("click", ()=>{
-    const key = btn.dataset.scene;
-    if (key) gotoScene(key);
-  });
-});
+$sceneButtons.forEach((btn)=>{ btn.addEventListener("click", ()=>{ const key = btn.dataset.scene; if (key) gotoScene(key); }); });
+
+function getGameState(){
+  return {
+    audioEnabled: audio.getState().enabled,
+    trackTitle: audio.getState().trackTitle || "Lobby 07",
+    cash: poker.getState().playerStack ?? cash,
+    seated,
+    inTableZone: inTableZone(),
+    seatLabel: seatLabel(),
+    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true,
+    hologramVisible: !!hologram?.getState?.().visible,
+    poker: poker.getState()
+  };
+}
+
+const watchActions = {
+  toggleAudio: ()=>audio.toggle(),
+  nextTrack: ()=>audio.next(),
+  joinTable,
+  leaveTable,
+  toggleTeleport: ()=>tp.toggleMode(),
+  toggleHologram: ()=>hologram?.toggle("watch-holo-button"),
+  pokerFold: ()=>poker.fold(),
+  pokerCall: ()=>poker.checkCall(),
+  pokerRaise: ()=>poker.raise(),
+  pokerRaiseHalfPot: ()=>poker.raiseHalfPot?.() || poker.raise?.(),
+  pokerRaisePot: ()=>poker.raisePot?.() || poker.raise?.(),
+  pokerAllIn: ()=>poker.allIn(),
+  pokerNext: ()=>poker.nextHand(),
+  goLobby: ()=>gotoScene("lobby"),
+  goTable: ()=>gotoScene("main_poker_pit"),
+  goSeat: ()=>gotoScene("seat_south_player"),
+  goReiki: ()=>gotoScene("reiki_hub"),
+  goPga: ()=>gotoScene("pga_hub"),
+  goLegend: ()=>gotoScene("sponsor_wall"),
+  goSponsor: ()=>gotoScene("sponsor_wall"),
+  goScorpion: ()=>gotoScene("scorpion_room"),
+  goReikiRoom: ()=>gotoScene("reiki_room"),
+  goPgaDrive: ()=>gotoScene("pga_drive"),
+  goChipPutt: ()=>gotoScene("pga_chip_putt"),
+  goStoreRoom: ()=>gotoScene("vr_store"),
+  goSmokerLounge: ()=>gotoScene("smoker_lounge")
+};
 
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
@@ -238,6 +252,7 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
+  if (e.code === "KeyG") hologram?.toggle("desktop-key-g");
   if (e.code === "Digit1") gotoScene("lobby");
   if (e.code === "Digit2") gotoScene("table");
   if (e.code === "Digit3") gotoScene("seat");
@@ -253,48 +268,9 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "KeyB") gotoScene("smokerLounge");
 });
 
-const watch = createWristWatch({
-  scene,
-  camera,
-  renderer,
-  getState: ()=>({
-    audioEnabled: audio.getState().enabled,
-    trackTitle: audio.getState().trackTitle || "Lobby 07",
-    cash: poker.getState().playerStack ?? cash,
-    seated,
-    inTableZone: inTableZone(),
-    seatLabel: seatLabel(),
-    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true,
-    poker: poker.getState()
-  }),
-  actions: {
-    toggleAudio: ()=>audio.toggle(),
-    nextTrack: ()=>audio.next(),
-    joinTable,
-    leaveTable,
-    toggleTeleport: ()=>tp.toggleMode(),
-    pokerFold: ()=>poker.fold(),
-    pokerCall: ()=>poker.checkCall(),
-    pokerRaise: ()=>poker.raise(),
-    pokerRaiseHalfPot: ()=>poker.raiseHalfPot?.() || poker.raise?.(),
-    pokerRaisePot: ()=>poker.raisePot?.() || poker.raise?.(),
-    pokerAllIn: ()=>poker.allIn(),
-    pokerNext: ()=>poker.nextHand(),
-    goLobby: ()=>gotoScene("lobby"),
-    goTable: ()=>gotoScene("main_poker_pit"),
-    goSeat: ()=>gotoScene("seat_south_player"),
-    goReiki: ()=>gotoScene("reiki_hub"),
-    goPga: ()=>gotoScene("pga_hub"),
-    goLegend: ()=>gotoScene("sponsor_wall"),
-    goSponsor: ()=>gotoScene("sponsor_wall"),
-    goScorpion: ()=>gotoScene("scorpion_room"),
-    goReikiRoom: ()=>gotoScene("reiki_room"),
-    goPgaDrive: ()=>gotoScene("pga_drive"),
-    goChipPutt: ()=>gotoScene("pga_chip_putt"),
-    goStoreRoom: ()=>gotoScene("vr_store"),
-    goSmokerLounge: ()=>gotoScene("smoker_lounge")
-  }
-});
+const watch = createWristWatch({ scene, camera, renderer, getState: getGameState, actions: watchActions });
+hologram = createHologramMenu({ scene, camera, renderer, getState: getGameState, actions: watchActions });
+window.SVR_HOLOGRAM_MENU = hologram;
 
 $toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
@@ -305,7 +281,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Poker is playable: F/C/R/A/H. Wrist quick-jump and poker buttons enabled.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Poker is playable. Wrist console + hologram menu enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -379,21 +355,14 @@ renderer.setAnimationLoop(()=>{
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
   if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({
-      dt,
-      leftHand,
-      rightHand,
-      leftController,
-      rightController,
-      statusCb: (text)=>{ setStatus(text); },
-      modeCb: (text)=>{ setMode(text); }
-    });
+    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } });
   }
 
   if (watch) {
     watch.update(dt, leftHand, rightHand);
     applyWatchHardfix(watch.object, camera, renderer);
   }
+  if (hologram) hologram.update(dt, leftHand, rightHand);
 
   renderer.render(scene, camera);
 });
