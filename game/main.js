@@ -1,4 +1,4 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import "./modules/scorpion_integration_guard.js";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
@@ -13,8 +13,9 @@ import { createNpcAvatarSystem } from "./modules/npc_avatar_system.js";
 import { createPlayablePoker } from "./modules/playable_poker.js";
 import "./modules/poker_action_hud.js";
 import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
+import { buildTeleportRouteRegistry } from "./modules/teleport-router.js";
 
-const PHASE_85_BUILD = "PHASE-117-WATCH-HARDFIX-WIRING-LOCK";
+const PHASE_85_BUILD = "PHASE-156-TELEPORT-ROUTER-REGISTRY";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -88,6 +89,9 @@ if (!sceneTargets.chipPutt) sceneTargets.chipPutt = sceneTargets.pgaWall || scen
 if (!sceneTargets.storeRoom) sceneTargets.storeRoom = sceneTargets.sponsor || sceneTargets.lobby;
 if (!sceneTargets.smokerLounge) sceneTargets.smokerLounge = sceneTargets.sponsor || sceneTargets.lobby;
 if (!sceneTargets.reikiRoom) sceneTargets.reikiRoom = sceneTargets.reiki || sceneTargets.lobby;
+const teleportRouter = buildTeleportRouteRegistry(sceneTargets, seats, tableCenter);
+Object.assign(sceneTargets, teleportRouter.legacySceneTargets);
+window.SVR_TELEPORT_ROUTER = teleportRouter;
 window.SVR_SCENE_TARGETS = sceneTargets;
 
 const hands = createHands({ scene, renderer, log });
@@ -203,13 +207,15 @@ function movePlayerToSpot(target, lookTarget = null){
 }
 
 function gotoScene(key){
-  const rec = sceneTargets?.[key];
+  const routeKey = teleportRouter.normalizeRouteKey(key);
+  const rec = teleportRouter.getRoute(routeKey) || sceneTargets?.[key];
   if (!rec?.pos){
     setStatus(`Route unavailable: ${key}`, { force: true });
     return false;
   }
   movePlayerToSpot(rec.pos, rec.look || null);
-  setStatus(`Quick jump: ${key}`, { force: true });
+  setStatus(`Quick jump: ${rec.label || routeKey}`, { force: true });
+  window.SVR_LAST_ROUTE = { requested: key, routeKey, label: rec.label || routeKey, type: rec.type || "legacy", privateScene: !!rec.privateScene };
   return true;
 }
 
@@ -275,18 +281,18 @@ const watch = createWristWatch({
     pokerAllIn: ()=>poker.allIn(),
     pokerNext: ()=>poker.nextHand(),
     goLobby: ()=>gotoScene("lobby"),
-    goTable: ()=>gotoScene("table"),
-    goSeat: ()=>gotoScene("seat"),
-    goReiki: ()=>gotoScene("reiki"),
-    goPga: ()=>gotoScene("pga"),
-    goLegend: ()=>gotoScene("legends"),
-    goSponsor: ()=>gotoScene("sponsor"),
-    goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom"),
-    goPgaDrive: ()=>gotoScene("pgaDrive"),
-    goChipPutt: ()=>gotoScene("chipPutt"),
-    goStoreRoom: ()=>gotoScene("storeRoom"),
-    goSmokerLounge: ()=>gotoScene("smokerLounge")
+    goTable: ()=>gotoScene("main_poker_pit"),
+    goSeat: ()=>gotoScene("seat_south_player"),
+    goReiki: ()=>gotoScene("reiki_hub"),
+    goPga: ()=>gotoScene("pga_hub"),
+    goLegend: ()=>gotoScene("sponsor_wall"),
+    goSponsor: ()=>gotoScene("sponsor_wall"),
+    goScorpion: ()=>gotoScene("scorpion_room"),
+    goReikiRoom: ()=>gotoScene("reiki_room"),
+    goPgaDrive: ()=>gotoScene("pga_drive"),
+    goChipPutt: ()=>gotoScene("pga_chip_putt"),
+    goStoreRoom: ()=>gotoScene("vr_store"),
+    goSmokerLounge: ()=>gotoScene("smoker_lounge")
   }
 });
 
