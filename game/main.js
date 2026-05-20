@@ -1,4 +1,5 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
+import "./modules/scorpion_integration_guard.js";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -77,7 +78,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading world…", { force: true });
+setStatus("Loading worldâ€¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -174,7 +175,7 @@ function joinTable(){
     moveDesktopToSeat(seat);
   }
   setMode(`Seat: ${seat.label}`);
-  setStatus("Poker controls: F Fold • C Check/Call • R Raise • A All-In • H Next Hand", { force: true });
+  setStatus("Poker controls: F Fold â€¢ C Check/Call â€¢ R Raise â€¢ A All-In â€¢ H Next Hand", { force: true });
   return true;
 }
 
@@ -293,12 +294,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logo…", { force: true });
+setStatus("Loading logoâ€¦", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Poker is playable: F/C/R/A/H. Wrist quick-jump and poker buttons enabled.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -394,7 +395,8 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading…");
-  setStatus("WebGL context lost (reloading…)", { force: true });
+  log("[ERR] WebGL context lost. Reloadingâ€¦");
+  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+

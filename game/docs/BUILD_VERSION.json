@@ -1,6 +1,7 @@
 ﻿{
-    "updatedAt":  "2026-05-20T00:52:49Z",
+    "updatedAt":  "2026-05-20T01:07:34Z",
     "websiteTouched":  false,
     "scope":  "game-side-only",
-    "build":  "PHASE-87-SCORPION-TABLE-RULES-ENGINE-LOCK"
+    "build":  "PHASE-88-SCORPION-INTEGRATION-QUEST-VALIDATION-LOCK",
+    "sqlTouched":  false
 }
