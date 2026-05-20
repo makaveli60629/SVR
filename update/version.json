@@ -1,7 +1,9 @@
-{
-  "build": "PHASE-125-PRIVATE-SCENE-INTERACTION-POLISH-LOCK",
-  "scope": "game-only",
-  "fix": "private scene interaction polish for Reiki, PGA Drive, Chip Putt, Store, Lounge, and route checks while keeping experiences separate from lobby",
-  "siteTouched": false,
-  "previousStableBuild": "PHASE-124-SCORPION-GAMEPLAY-WIRING-LOCK"
+﻿{
+    "build":  "PHASE-86-GLB-AVATAR-MOTION-LOCK",
+    "updatedAt":  "2026-05-20T00:50:20Z",
+    "scope":  "game-side-only",
+    "protected":  [
+                      "site",
+                      "sql-backend"
+                  ]
 }

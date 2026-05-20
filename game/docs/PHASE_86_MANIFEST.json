@@ -1,0 +1,29 @@
+{
+  "phase": "PHASE-86-GLB-AVATAR-MOTION-LOCK",
+  "scope": "game-side-only",
+  "protected": [
+    "site",
+    "root website",
+    "sql/backend"
+  ],
+  "adds": [
+    "game/modules/avatar_seated_controller.js",
+    "game/docs/PHASE_86_GLB_AVATAR_MOTION_LOCK.md",
+    "game/docs/PHASE_86_MANIFEST.json"
+  ],
+  "locks": [
+    "optimized GLB/VRM seated avatars preferred",
+    "procedural fallback if GLB fails",
+    "no T-pose fallback visible",
+    "five bots plus one open south/front seat",
+    "dealer body remains invisible/removed",
+    "left-to-right dealing preserved",
+    "package under 25MB"
+  ],
+  "events": [
+    "svr:poker:turn",
+    "svr:poker:action",
+    "svr:poker:showdown",
+    "svr:poker:winner"
+  ]
+}
