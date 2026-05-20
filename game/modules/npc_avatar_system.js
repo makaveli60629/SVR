@@ -2,19 +2,21 @@ import * as THREE from "three";
 import { NPC_AVATAR_REGISTRY, NPC_SCENE_SPAWNS, SVR_AVATAR_NPC_PHASE } from "./avatar_asset_registry.js";
 import { detectNpcSceneKey, shouldSpawnInScene, placeActorRoot, updateActorMotion } from "./npc_motion_controller.js";
 
+const PHASE_118_TAG_HEIGHT = 2.55;
+
 function makeLabel(text){
   const canvas = document.createElement("canvas");
   canvas.width = 512;
   canvas.height = 128;
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "rgba(0,0,0,0.58)";
-  ctx.strokeStyle = "rgba(150,255,214,0.7)";
-  ctx.lineWidth = 4;
+  ctx.fillStyle = "rgba(0,0,0,0.64)";
+  ctx.strokeStyle = "rgba(150,255,214,0.82)";
+  ctx.lineWidth = 5;
   roundRect(ctx, 14, 18, 484, 88, 24);
   ctx.fill();
   ctx.stroke();
-  ctx.font = "bold 42px system-ui, Segoe UI, Arial";
+  ctx.font = "900 46px system-ui, Segoe UI, Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#f3fff8";
@@ -23,8 +25,11 @@ function makeLabel(text){
   tex.colorSpace = THREE.SRGBColorSpace;
   const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false });
   const spr = new THREE.Sprite(mat);
-  spr.scale.set(1.1, 0.28, 1);
-  spr.position.y = 2.05;
+  spr.name = "SVR_Phase118_Raised_Table_Tag";
+  spr.scale.set(1.28, 0.34, 1);
+  spr.position.y = PHASE_118_TAG_HEIGHT;
+  spr.renderOrder = 68;
+  spr.userData.svrPhase118RaisedTag = true;
   return spr;
 }
 
@@ -145,11 +150,13 @@ export function createNpcAvatarSystem({ scene, seats = [], tableCenter = { x: 0,
   const actors = [];
   const state = {
     phase: SVR_AVATAR_NPC_PHASE,
+    phase118RaisedTags: true,
+    tagHeight: PHASE_118_TAG_HEIGHT,
     ready: false,
     actors,
     sceneKey,
     enabled: true,
-    source: "Phase84 assets + Phase85 scene motion lock",
+    source: "Phase84 assets + Phase85 scene motion lock + Phase118 raised tags",
     spawnCount: spawns.length
   };
 
@@ -187,7 +194,7 @@ export function createNpcAvatarSystem({ scene, seats = [], tableCenter = { x: 0,
     }
     state.ready = true;
     window.SVR_NPC_AVATAR_SYSTEM = state;
-    log?.(`[Phase85] NPC scene motion system booted: ${actors.length} avatar slots for ${sceneKey}`);
+    log?.(`[Phase118] NPC table tags raised: ${actors.length} avatar slots for ${sceneKey}`);
   }
 
   boot();
