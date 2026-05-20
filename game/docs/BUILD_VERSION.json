@@ -1,7 +1,6 @@
-{
-  "build": "PHASE-84Z-AUDIT-SCENE-ENABLE-SKYLINE-LOCK",
-  "phase": "84Z",
-  "label": "Audit Scene Enable Skyline Lock",
-  "createdAt": "2026-05-17T00:00:00Z",
-  "siteTouched": false
+﻿{
+    "updatedAt":  "2026-05-20T00:52:49Z",
+    "websiteTouched":  false,
+    "scope":  "game-side-only",
+    "build":  "PHASE-87-SCORPION-TABLE-RULES-ENGINE-LOCK"
 }

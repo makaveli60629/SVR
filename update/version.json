@@ -1,9 +1,5 @@
 ﻿{
-    "build":  "PHASE-86-GLB-AVATAR-MOTION-LOCK",
-    "updatedAt":  "2026-05-20T00:50:20Z",
-    "scope":  "game-side-only",
-    "protected":  [
-                      "site",
-                      "sql-backend"
-                  ]
+    "updatedAt":  "2026-05-20T00:52:49Z",
+    "source":  "Phase 87 patch",
+    "game":  "PHASE-87-SCORPION-TABLE-RULES-ENGINE-LOCK"
 }
