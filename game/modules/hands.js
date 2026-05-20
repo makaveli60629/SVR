@@ -1,7 +1,11 @@
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/addons/webxr/XRHandModelFactory.js";
 
-const PHASE = "PHASE-168-HANDS-MATERIAL-POLISH";
+const PHASE = "PHASE-172-ACTIVE-TELEPORT-PURPLE-HAND-GLOW";
+const BASE_LEFT = new THREE.Color(0x7ff5c7);
+const BASE_RIGHT = new THREE.Color(0xb48cff);
+const PURPLE_GLOW = new THREE.Color(0xb648ff);
+const PURPLE_EMISSIVE = new THREE.Color(0x7a22ff);
 
 function makeProxyJoint(name){
   const obj = new THREE.Object3D();
@@ -11,26 +15,58 @@ function makeProxyJoint(name){
 
 function createHandMaterial(handed = "right"){
   return new THREE.MeshStandardMaterial({
-    color: handed === "left" ? 0x7ff5c7 : 0xb48cff,
-    roughness: 0.34,
-    metalness: 0.16,
+    color: handed === "left" ? BASE_LEFT.clone() : BASE_RIGHT.clone(),
+    roughness: 0.32,
+    metalness: 0.18,
     transparent: true,
     opacity: 0.92,
-    emissive: handed === "left" ? 0x07251c : 0x150728,
+    emissive: handed === "left" ? new THREE.Color(0x07251c) : new THREE.Color(0x150728),
     emissiveIntensity: 0.16
   });
 }
 
 function createProxyMaterial(handed = "right"){
   return new THREE.MeshStandardMaterial({
-    color: handed === "left" ? 0x58e7c1 : 0xb48cff,
+    color: handed === "left" ? new THREE.Color(0x58e7c1) : BASE_RIGHT.clone(),
     roughness: 0.28,
     metalness: 0.24,
     transparent: true,
     opacity: 0.78,
-    emissive: handed === "left" ? 0x06372a : 0x241044,
+    emissive: handed === "left" ? new THREE.Color(0x06372a) : new THREE.Color(0x241044),
     emissiveIntensity: 0.34
   });
+}
+
+function setMaterialGlow(material, handed, active){
+  if (!material) return;
+  if (active){
+    material.color.copy(PURPLE_GLOW);
+    material.emissive.copy(PURPLE_EMISSIVE);
+    material.emissiveIntensity = 1.15;
+    material.opacity = 0.98;
+  } else {
+    material.color.copy(handed === "left" ? BASE_LEFT : BASE_RIGHT);
+    material.emissive.setHex(handed === "left" ? 0x07251c : 0x150728);
+    material.emissiveIntensity = 0.16;
+    material.opacity = 0.92;
+  }
+}
+
+function setProxyGlow(proxy, active){
+  const handed = proxy?.userData?.handedness || "right";
+  const mat = proxy?.userData?.visualMaterial;
+  if (!mat) return;
+  if (active){
+    mat.color.copy(PURPLE_GLOW);
+    mat.emissive.copy(PURPLE_EMISSIVE);
+    mat.emissiveIntensity = 1.35;
+    mat.opacity = 0.96;
+  } else {
+    mat.color.setHex(handed === "left" ? 0x58e7c1 : 0xb48cff);
+    mat.emissive.setHex(handed === "left" ? 0x06372a : 0x241044);
+    mat.emissiveIntensity = 0.30;
+    mat.opacity = 0.76;
+  }
 }
 
 function applyMaterialToHandModel(model, material){
@@ -79,11 +115,15 @@ function updateControllerProxy(proxy){
   controller.getWorldPosition(proxy.position);
   controller.getWorldQuaternion(proxy.quaternion);
 
+  const activeState = window.SVR_ACTIVE_TELEPORT_HAND || {};
+  const handed = proxy.userData.handedness || "right";
+  const activeProxy = activeState.glow === "purple" && (activeState.active === `${handed}-controller` || activeState.active === handed);
+
   const gp = proxy?.userData?.inputSource?.gamepad || controller.inputSource?.gamepad || null;
   proxy.userData.gamepad = gp || null;
   const trigger = gp?.buttons?.[0]?.value || 0;
   const squeeze = gp?.buttons?.[1]?.value || 0;
-  const side = proxy.userData.handedness === "left" ? -1 : 1;
+  const side = handed === "left" ? -1 : 1;
   const curl = THREE.MathUtils.lerp(0, 1, Math.max(trigger, squeeze));
   const fist = squeeze > 0.35;
 
@@ -94,8 +134,9 @@ function updateControllerProxy(proxy){
   if (proxy.userData.visualPalm){
     proxy.userData.visualPalm.visible = false;
     proxy.userData.visualPalm.position.set(0, 0, 0.018);
+    setProxyGlow(proxy, activeProxy);
     const mat = proxy.userData.visualMaterial;
-    if (mat){
+    if (mat && !activeProxy){
       mat.emissiveIntensity = fist ? 0.58 : trigger > 0.18 ? 0.46 : 0.26;
       mat.opacity = fist ? 0.88 : 0.74;
     }
@@ -145,7 +186,9 @@ export function createHands({ scene, renderer, log = console.log }){
     leftHandTracked: false,
     rightHandTracked: false,
     controllerFallback: true,
-    note: "Lightweight mesh material polish applied without replacing hand/controller fallback runtime."
+    teleportGlowActive: "none",
+    teleportGlowColor: "off",
+    note: "Purple glow follows window.SVR_ACTIVE_TELEPORT_HAND when fist/controller teleport is armed."
   };
 
   function makeDebugGroup(parent){
@@ -153,10 +196,7 @@ export function createHands({ scene, renderer, log = console.log }){
     group.visible = false;
     const keys = ["wrist", "thumb-tip", "index-finger-tip", "middle-finger-tip", "ring-finger-tip", "pinky-finger-tip"];
     for (const key of keys){
-      const mesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.009, 10, 10),
-        new THREE.MeshBasicMaterial({ color: 0xb48cff })
-      );
+      const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.009, 10, 10), new THREE.MeshBasicMaterial({ color: 0xb48cff }));
       mesh.userData.jointKey = key;
       group.add(mesh);
     }
@@ -228,7 +268,18 @@ export function createHands({ scene, renderer, log = console.log }){
     });
   }
 
+  function updateHandGlow(){
+    const activeState = window.SVR_ACTIVE_TELEPORT_HAND || {};
+    const active = activeState.glow === "purple" ? activeState.active : "none";
+    setMaterialGlow(materials.left, "left", active === "left");
+    setMaterialGlow(materials.right, "right", active === "right");
+    setMaterialGlow(materials.unknown, "right", active === "right" || active === "left");
+    window.SVR_HAND_MATERIAL_STATE.teleportGlowActive = active || "none";
+    window.SVR_HAND_MATERIAL_STATE.teleportGlowColor = active === "none" ? "off" : "purple";
+  }
+
   function update(dt = 0.016){
+    updateHandGlow();
     controllers.forEach(c=>{ if (c) c.visible = false; });
     rawHands.forEach((h)=>{ if (h) h.visible = true; });
     handModels.forEach((m, idx)=>{
