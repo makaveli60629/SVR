@@ -1,40 +1,53 @@
 /*
- * SVR Poker — Phase 105 Teleport Hotfix Guard
- * Goal: normalize fist/clench, grip, A-button, trigger/select into one hold-to-aim/release-to-teleport state.
- * Safe, additive module. It does not remove existing locomotion; it wraps/bridges inputs and dispatches SVR teleport events.
+ * SVR Poker — Phase 116 Emergency Teleport Freeze Hardfix
+ * Game-side only. Stops fist/clench teleport freeze by using edge-only input,
+ * throttled polling, single marker reuse, short cooldowns, and safe cancel paths.
  */
 (function () {
   'use strict';
 
-  const BUILD = 'PHASE-105-TELEPORT-HOTFIX-ZIP-DEPLOY-LOCK';
-  const COOLDOWN_MS = 280;
-  const MAX_AIM_MS = 15000;
+  const BUILD = 'PHASE-116-EMERGENCY-TELEPORT-WATCH-HARDFIX-LOCK';
+  const COOLDOWN_MS = 450;
+  const DEBOUNCE_MS = 180;
+  const MAX_AIM_MS = 8000;
+  const POLL_MS = 125;
 
   const state = {
     build: BUILD,
-    phase: 105,
+    phase: 116,
     status: 'idle',
     active: false,
     source: null,
     startedAt: 0,
     lastReleaseAt: 0,
+    lastEdgeAt: 0,
     lastTarget: null,
     lastError: null,
     markerVisible: false,
-    events: [],
-    ready: false
+    ready: false,
+    events: []
   };
 
   window.SVR_TELEPORT_HOTFIX = state;
   window.SVR_TELEPORT_STATE = state;
+  window.SVR_PHASE116_TELEPORT_FREEZE_HARDFIX = state;
+
+  const SOURCE_MAP = {
+    gripdown: 'grip', gripstart: 'grip', gripup: 'grip', gripend: 'grip',
+    triggerdown: 'trigger', triggerup: 'trigger', selectstart: 'trigger', selectend: 'trigger',
+    abuttondown: 'a-button', abuttonup: 'a-button',
+    pinchstarted: 'pinch', pinchstart: 'pinch', pinchended: 'pinch', pinchend: 'pinch',
+    fiststart: 'fist', fistend: 'fist', clenchstart: 'fist', clenchdown: 'fist', clenchend: 'fist', clenchup: 'fist'
+  };
+
+  const START_EVENTS = ['gripdown','gripstart','triggerdown','selectstart','abuttondown','pinchstarted','pinchstart','fiststart','clenchstart','clenchdown'];
+  const END_EVENTS = ['gripup','gripend','triggerup','selectend','abuttonup','pinchended','pinchend','fistend','clenchend','clenchup'];
 
   function log(type, detail) {
     const entry = { type, detail: detail || {}, t: Date.now() };
     state.events.push(entry);
-    if (state.events.length > 80) state.events.shift();
-    try {
-      window.dispatchEvent(new CustomEvent('svr:teleport:hotfix-log', { detail: entry }));
-    } catch (_) {}
+    if (state.events.length > 60) state.events.shift();
+    try { window.dispatchEvent(new CustomEvent('svr:teleport:phase116-log', { detail: entry })); } catch (_) {}
   }
 
   function rootScene() {
@@ -47,9 +60,7 @@
         detail: { build: BUILD, status: state.status, active: state.active, source: state.source, label }
       }));
     } catch (_) {}
-
-    const watchLabels = document.querySelectorAll('[data-svr-teleport-status], .svr-teleport-status, #svr-teleport-status');
-    watchLabels.forEach((el) => {
+    document.querySelectorAll('[data-svr-teleport-status], .svr-teleport-status, #svr-teleport-status').forEach((el) => {
       try { el.textContent = label; } catch (_) {}
     });
   }
@@ -57,25 +68,14 @@
   function ensureMarker() {
     let marker = document.getElementById('svr-teleport-hotfix-marker');
     if (marker) return marker;
-
     marker = document.createElement('div');
     marker.id = 'svr-teleport-hotfix-marker';
     marker.setAttribute('aria-hidden', 'true');
     marker.style.cssText = [
-      'position:fixed',
-      'left:50%',
-      'bottom:92px',
-      'transform:translateX(-50%)',
-      'z-index:999999',
-      'pointer-events:none',
-      'display:none',
-      'padding:10px 16px',
-      'border-radius:999px',
-      'font:700 13px system-ui,Segoe UI,Arial,sans-serif',
-      'letter-spacing:.08em',
-      'color:#f0dcff',
-      'background:rgba(88,20,148,.72)',
-      'border:1px solid rgba(220,160,255,.82)',
+      'position:fixed','left:50%','bottom:92px','transform:translateX(-50%)','z-index:999999',
+      'pointer-events:none','display:none','padding:10px 16px','border-radius:999px',
+      'font:700 13px system-ui,Segoe UI,Arial,sans-serif','letter-spacing:.08em','color:#f0dcff',
+      'background:rgba(88,20,148,.72)','border:1px solid rgba(220,160,255,.82)',
       'box-shadow:0 0 22px rgba(184,78,255,.85), inset 0 0 14px rgba(255,255,255,.12)',
       'text-shadow:0 0 8px rgba(255,255,255,.6)'
     ].join(';');
@@ -88,8 +88,6 @@
     state.markerVisible = !!show;
     const marker = ensureMarker();
     marker.style.display = show ? 'block' : 'none';
-
-    // Also emit for real in-world arc/marker systems that already exist.
     try {
       window.dispatchEvent(new CustomEvent(show ? 'svr:teleport:show-marker' : 'svr:teleport:hide-marker', {
         detail: { build: BUILD, source: state.source, active: state.active }
@@ -97,56 +95,58 @@
     } catch (_) {}
   }
 
-  function callExistingTeleport(action, detail) {
-    const payload = Object.assign({ build: BUILD, source: state.source }, detail || {});
-
-    // Event bridge for existing router modules.
+  function dispatchTeleport(action, detail) {
+    const payload = Object.assign({ build: BUILD, phase: 116, source: state.source }, detail || {});
     const names = action === 'start'
-      ? ['svr:teleport:start-aim', 'svr:teleport:arm', 'svr:teleport-aim-start']
+      ? ['svr:teleport:start-aim', 'svr:teleport:arm']
       : action === 'release'
-        ? ['svr:teleport:release', 'svr:teleport:commit', 'svr:teleport-aim-release']
-        : ['svr:teleport:cancel', 'svr:teleport-aim-cancel'];
+        ? ['svr:teleport:release', 'svr:teleport:commit']
+        : ['svr:teleport:cancel'];
 
     names.forEach((name) => {
       try { window.dispatchEvent(new CustomEvent(name, { detail: payload })); } catch (_) {}
-      try { rootScene().dispatchEvent(new CustomEvent(name, { detail: payload })); } catch (_) {}
     });
 
-    // Optional direct API bridges without requiring any one implementation.
-    const candidates = [
-      window.SVRTeleport,
-      window.SVR_TELEPORT,
-      window.SVR && window.SVR.teleport,
-      window.SVR && window.SVR.teleportRouter,
-      window.teleportRouter
-    ].filter(Boolean);
+    const scene = rootScene();
+    names.forEach((name) => {
+      try { scene.dispatchEvent(new CustomEvent(name, { detail: payload })); } catch (_) {}
+    });
 
-    candidates.forEach((api) => {
+    const candidates = [window.SVRTeleport, window.SVR_TELEPORT, window.SVR && window.SVR.teleport, window.SVR && window.SVR.teleportRouter, window.teleportRouter].filter(Boolean);
+    for (const api of candidates) {
       try {
         if (action === 'start') {
-          if (typeof api.startAim === 'function') api.startAim(payload);
-          else if (typeof api.arm === 'function') api.arm(payload);
-          else if (typeof api.setArmed === 'function') api.setArmed(true, payload);
+          if (typeof api.startAim === 'function') { api.startAim(payload); break; }
+          if (typeof api.arm === 'function') { api.arm(payload); break; }
+          if (typeof api.setArmed === 'function') { api.setArmed(true, payload); break; }
         } else if (action === 'release') {
-          if (typeof api.release === 'function') api.release(payload);
-          else if (typeof api.commit === 'function') api.commit(payload);
-          else if (typeof api.teleport === 'function') api.teleport(payload);
-          else if (typeof api.setArmed === 'function') api.setArmed(false, payload);
-        } else if (action === 'cancel') {
-          if (typeof api.cancel === 'function') api.cancel(payload);
-          else if (typeof api.setArmed === 'function') api.setArmed(false, payload);
+          if (typeof api.release === 'function') { api.release(payload); break; }
+          if (typeof api.commit === 'function') { api.commit(payload); break; }
+          if (typeof api.teleport === 'function') { api.teleport(payload); break; }
+          if (typeof api.setArmed === 'function') { api.setArmed(false, payload); break; }
+        } else {
+          if (typeof api.cancel === 'function') { api.cancel(payload); break; }
+          if (typeof api.setArmed === 'function') { api.setArmed(false, payload); break; }
         }
       } catch (err) {
         state.lastError = String(err && err.message || err);
         log('api-error', { action, error: state.lastError });
       }
-    });
+    }
+  }
+
+  function canEdge() {
+    const now = Date.now();
+    if (now - state.lastEdgeAt < DEBOUNCE_MS) return false;
+    state.lastEdgeAt = now;
+    return true;
   }
 
   function beginAim(source, detail) {
     const now = Date.now();
     if (state.status === 'cooldown' && now - state.lastReleaseAt < COOLDOWN_MS) return;
-    if (state.active && state.source === source) return;
+    if (state.active) return;
+    if (!canEdge()) return;
 
     state.status = 'aiming';
     state.active = true;
@@ -157,32 +157,29 @@
     document.documentElement.dataset.svrTeleport = 'aiming';
     showMarker(true);
     setWatchStatus('TP AIM — RELEASE');
-    callExistingTeleport('start', detail);
+    dispatchTeleport('start', detail);
     log('begin', { source: state.source });
   }
 
-  function endAim(source, detail) {
+  function releaseAim(source, detail) {
     if (!state.active) return;
-    if (source && state.source && source !== state.source) {
-      // Prevent one input from releasing a different active input unless it is a generic safety release.
-      if (source !== 'lost-tracking' && source !== 'visibility' && source !== 'keyboard') return;
-    }
+    const activeSource = state.source;
+    if (source && activeSource && source !== activeSource && source !== 'safety' && source !== 'lost-tracking' && source !== 'visibility') return;
+    if (!canEdge()) return;
 
     state.status = 'released';
     state.active = false;
     state.lastReleaseAt = Date.now();
-
     showMarker(false);
     setWatchStatus('TP READY');
-    callExistingTeleport('release', detail);
-    log('release', { source: source || state.source });
+    dispatchTeleport('release', detail);
+    log('release', { source: source || activeSource });
 
     window.setTimeout(() => {
       if (!state.active) {
         state.status = 'idle';
         state.source = null;
         document.documentElement.dataset.svrTeleport = 'idle';
-        setWatchStatus('TP READY');
       }
     }, COOLDOWN_MS);
   }
@@ -192,9 +189,10 @@
     const oldSource = state.source;
     state.status = 'cancelled';
     state.active = false;
+    state.lastReleaseAt = Date.now();
     showMarker(false);
     setWatchStatus('TP READY');
-    callExistingTeleport('cancel', { reason });
+    dispatchTeleport('cancel', { reason });
     log('cancel', { source: oldSource, reason });
 
     window.setTimeout(() => {
@@ -206,94 +204,59 @@
     }, COOLDOWN_MS);
   }
 
-  function isPressedValue(v) {
-    return v === true || v === 1 || v === '1' || v === 'pressed' || v === 'down';
+  function bindTarget(target) {
+    if (!target || target.__svrPhase116TeleportBound) return;
+    target.__svrPhase116TeleportBound = true;
+    START_EVENTS.forEach((name) => {
+      target.addEventListener(name, (event) => beginAim(SOURCE_MAP[name] || name, { originalEvent: name, detail: event.detail || {} }), { passive: true });
+    });
+    END_EVENTS.forEach((name) => {
+      target.addEventListener(name, (event) => releaseAim(SOURCE_MAP[name] || name, { originalEvent: name, detail: event.detail || {} }), { passive: true });
+    });
   }
 
-  function bindControllerEvents(target) {
-    if (!target || target.__svrTeleportHotfixBound) return;
-    target.__svrTeleportHotfixBound = true;
-
-    const starts = [
-      'gripdown', 'gripstart',
-      'abuttondown', 'buttondown',
-      'triggerdown', 'selectstart',
-      'pinchstarted', 'pinchstart',
-      'fiststart', 'clenchstart', 'clenchdown'
-    ];
-    const ends = [
-      'gripup', 'gripend',
-      'abuttonup', 'buttonup',
-      'triggerup', 'selectend',
-      'pinchended', 'pinchend',
-      'fistend', 'clenchend', 'clenchup'
-    ];
-
-    starts.forEach((name) => {
-      target.addEventListener(name, (event) => beginAim(name, { originalEvent: name, detail: event.detail || {} }), { passive: true });
-    });
-    ends.forEach((name) => {
-      target.addEventListener(name, (event) => endAim(name.replace(/(up|end|ended)$/,'down'), { originalEvent: name, detail: event.detail || {} }), { passive: true });
-    });
-
-    target.addEventListener('axismove', (event) => {
-      // Do not interfere with stick locomotion. This listener exists only to keep binding alive on controllers.
-      state.lastAxisEvent = Date.now();
-    }, { passive: true });
-  }
-
-  function bindExistingHandsAndControllers() {
+  function bindControllers() {
+    bindTarget(window);
+    bindTarget(document);
+    bindTarget(rootScene());
     const selectors = [
-      '[hand-tracking-controls]',
-      '[oculus-touch-controls]',
-      '[meta-touch-controls]',
-      '[laser-controls]',
-      '[tracked-controls]',
-      '#leftHand', '#rightHand', '#left-hand', '#right-hand',
-      '.hand', '.controller', '.xr-controller'
+      '[hand-tracking-controls]','[oculus-touch-controls]','[meta-touch-controls]','[laser-controls]','[tracked-controls]',
+      '#leftHand','#rightHand','#left-hand','#right-hand','.hand','.controller','.xr-controller'
     ];
-    selectors.forEach((sel) => document.querySelectorAll(sel).forEach(bindControllerEvents));
-    bindControllerEvents(document);
-    bindControllerEvents(window);
-    bindControllerEvents(rootScene());
+    selectors.forEach((sel) => document.querySelectorAll(sel).forEach(bindTarget));
   }
 
-  function readGamepadButtons() {
-    const pads = (navigator.getGamepads && Array.from(navigator.getGamepads()).filter(Boolean)) || [];
-    let shouldAim = false;
-    let source = null;
-
-    pads.forEach((pad, padIndex) => {
-      if (!pad || !pad.buttons) return;
-      const pressed = pad.buttons.map((b) => !!(b && b.pressed));
-      // Common XR mappings: trigger 0, grip 1, A/B 4/5 depending hand/profile.
-      const hit = pressed[0] || pressed[1] || pressed[4] || pressed[5];
-      if (hit) {
-        shouldAim = true;
-        source = `gamepad-${padIndex}`;
+  let lastGamepadPressed = false;
+  function readGamepadsEdge() {
+    let pressed = false;
+    try {
+      const pads = navigator.getGamepads ? Array.from(navigator.getGamepads()).filter(Boolean) : [];
+      for (const pad of pads) {
+        const b = pad && pad.buttons ? pad.buttons : [];
+        if (!!(b[0]?.pressed || b[1]?.pressed || b[4]?.pressed || b[5]?.pressed)) { pressed = true; break; }
       }
-    });
-
-    if (shouldAim && !state.active) beginAim(source || 'gamepad', { gamepad: true });
-    if (!shouldAim && state.active && state.source && String(state.source).startsWith('gamepad')) endAim(state.source, { gamepad: true });
+    } catch (_) {}
+    if (pressed && !lastGamepadPressed) beginAim('gamepad', { gamepad: true });
+    if (!pressed && lastGamepadPressed && state.active && state.source === 'gamepad') releaseAim('gamepad', { gamepad: true });
+    lastGamepadPressed = pressed;
   }
 
-  let lastFistState = false;
-  function readHandPoseSignals() {
-    // Optional global bridges from existing hand modules. This avoids requiring one specific hand library.
+  let lastFist = false;
+  function readFistEdge() {
     const handState = window.SVR_HAND_STATE || window.SVRHands || (window.SVR && window.SVR.hands) || null;
     if (!handState) return;
-
     const left = handState.left || handState.Left || handState.leftHand || {};
     const right = handState.right || handState.Right || handState.rightHand || {};
-    const fist = !!(
-      left.fist || left.clench || left.clenched || left.isFist || left.grip ||
-      right.fist || right.clench || right.clenched || right.isFist || right.grip
-    );
+    const fist = !!(left.fist || left.clench || left.clenched || left.isFist || right.fist || right.clench || right.clenched || right.isFist);
+    if (fist && !lastFist) beginAim('fist', { handState: true });
+    if (!fist && lastFist && state.active && state.source === 'fist') releaseAim('fist', { handState: true });
+    lastFist = fist;
+  }
 
-    if (fist && !lastFistState) beginAim('fist', { handState: true });
-    if (!fist && lastFistState && state.active && state.source === 'fist') endAim('fist', { handState: true });
-    lastFistState = fist;
+  function pollSafety() {
+    readGamepadsEdge();
+    readFistEdge();
+    if (state.active && Date.now() - state.startedAt > MAX_AIM_MS) cancelAim('max-aim-timeout');
   }
 
   function bindKeyboardFallback() {
@@ -302,46 +265,27 @@
       if (event.code === 'KeyT') beginAim('keyboard', { key: 'T' });
     });
     window.addEventListener('keyup', (event) => {
-      if (event.code === 'KeyT') endAim('keyboard', { key: 'T' });
+      if (event.code === 'KeyT') releaseAim('keyboard', { key: 'T' });
     });
-  }
-
-  function safetyTick() {
-    readGamepadButtons();
-    readHandPoseSignals();
-
-    if (state.active && Date.now() - state.startedAt > MAX_AIM_MS) {
-      cancelAim('max-aim-timeout');
-    }
-
-    window.requestAnimationFrame(safetyTick);
   }
 
   function init() {
     ensureMarker();
-    bindExistingHandsAndControllers();
+    bindControllers();
     bindKeyboardFallback();
-
-    // Re-bind if A-Frame/controller entities load later.
-    const observer = new MutationObserver(() => bindExistingHandsAndControllers());
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+    window.setInterval(bindControllers, 1200);
+    window.setInterval(pollSafety, POLL_MS);
 
     window.addEventListener('blur', () => cancelAim('window-blur'));
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) cancelAim('visibility-hidden');
-    });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAim('visibility-hidden'); });
     window.addEventListener('beforeunload', () => cancelAim('unload'));
 
     state.ready = true;
     document.documentElement.dataset.svrTeleportHotfix = BUILD;
     setWatchStatus('TP READY');
     log('ready', { build: BUILD });
-    window.requestAnimationFrame(safetyTick);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+  else init();
 })();
