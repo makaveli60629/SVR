@@ -1,7 +1,9 @@
-// PHASE-121-DEMO-STATUS-PATCH-LOCK
-// Game-side only. Keeps the visible game build label current and reports a compact demo status.
+// PHASE-180-PASSIVE-PHASE121-STATUS-PATCH
+// Game-side only. Replaces the old Phase 121 status loop with a passive one-shot status snapshot.
+// It no longer rewrites the visible build label/title every second.
 
-const PHASE = 'PHASE-121-DEMO-STATUS-PATCH-LOCK';
+const PHASE = 'PHASE-180-PASSIVE-PHASE121-STATUS-PATCH';
+const LEGACY_PHASE = 'PHASE-121-DEMO-STATUS-PATCH-LOCK';
 
 function state(){
   const perf = window.SVR_PHASE110_QUEST_PERFORMANCE_MONITOR?.metrics?.() || null;
@@ -14,6 +16,8 @@ function state(){
   ].forEach(k => { if (!window[k]) missing.push(k); });
   return {
     phase: PHASE,
+    legacyPhase: LEGACY_PHASE,
+    passive: true,
     ok: missing.length === 0 && (!perf || perf.status !== 'LOW-PERF'),
     siteTouched: false,
     missing,
@@ -25,22 +29,13 @@ function state(){
   };
 }
 
-function syncLabel(){
-  document.documentElement.dataset.svrBuild = PHASE;
-  window.SVR_CURRENT_GAME_PHASE = PHASE;
-  window.SVR_GAME_TRACK = 'game-side-only';
-  window.SVR_SITE_TOUCHED_BY_GAME_TRACK = false;
-  const build = Array.from(document.querySelectorAll('.pill')).find(p => String(p.textContent || '').includes('BUILD:'));
-  if (build) build.textContent = 'BUILD: ' + PHASE;
-  if (!String(document.title || '').includes('Phase 121')) document.title = 'ScarlettVR Poker • Phase 121 demo status patch';
-}
-
-function tick(){
-  syncLabel();
+function boot(){
   const s = state();
-  window.SVR_PHASE121_DEMO_STATUS_PATCH = { phase: PHASE, state, syncLabel, last: s };
+  window.SVR_PHASE121_DEMO_STATUS_PATCH = { phase: PHASE, legacyPhase: LEGACY_PHASE, state, last: s, passive: true };
   window.SVR_PHASE121_RUNTIME_AUDIT = s;
-  setTimeout(tick, 1000);
+  window.SVR_PHASE180_BOOT_LOOP_FIX = window.SVR_PHASE180_BOOT_LOOP_FIX || { phase: 'PHASE-180-BOOT-LOOP-FIX', passiveAudits: [] };
+  window.SVR_PHASE180_BOOT_LOOP_FIX.passiveAudits.push('phase121_demo_status_patch.js');
+  try { console.info('[SVR Passive Phase 121 Status]', s); } catch {}
 }
 
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tick, { once:true }); else tick();
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once:true }); else boot();
