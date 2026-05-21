@@ -1,9 +1,9 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker â€¢ Phase 122 full game audit runtime sync</title>
+  <title>ScarlettVR Poker • Phase 180 boot loop stabilized</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -29,15 +29,15 @@
   </script>
 </head>
 <body>
-  <!-- BUILD: PHASE-105-TELEPORT-HOTFIX-ZIP-DEPLOY-LOCK -->
+  <!-- BUILD: PHASE-180-BOOT-LOOP-STABILIZED -->
   <div id="app"></div>
   <div id="hud">
-    <div class="pill" id="status">Bootingâ€¦</div>
+    <div class="pill" id="status">Booting…</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
-      <span class="pill" id="mode">Hands: â€¦</span>
-      <span class="pill">BUILD: PHASE-105-TELEPORT-HOTFIX-ZIP-DEPLOY-LOCK</span>
+      <span class="pill" id="mode">Hands: …</span>
+      <span class="pill">BUILD: PHASE-180-BOOT-LOOP-STABILIZED</span>
     </div>
   </div>
   <div id="sceneNav">
@@ -73,13 +73,8 @@
   <script type="module" src="./modules/demo_candidate_lock.js"></script>
   <script type="module" src="./modules/phase121_demo_status_patch.js"></script>
   <script type="module" src="./modules/phase122_full_game_audit.js"></script>
-
-<script src="modules/scorpion_chip_flow_polish.js?v=phase101"></script>
+  <script src="modules/scorpion_chip_flow_polish.js?v=phase101"></script>
   <script src="modules/scorpion_turn_ux_polish.js"></script>
   <script src="modules/teleport_hotfix_guard.js"></script>
 </body>
 </html>
-
-
-
-
