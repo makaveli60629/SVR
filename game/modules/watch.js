@@ -80,6 +80,70 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
 
+  // Phase 101: real Three.js wrist hologram panel. Do not use the old A-Frame replacement.
+  const holoCanvas = document.createElement('canvas');
+  holoCanvas.width = 1024;
+  holoCanvas.height = 512;
+  const holoCtx = holoCanvas.getContext('2d');
+  const holoTex = new THREE.CanvasTexture(holoCanvas);
+  holoTex.colorSpace = THREE.SRGBColorSpace;
+  holoTex.anisotropy = 8;
+
+  function redrawHoloPanel(state = {}){
+    holoCtx.clearRect(0, 0, holoCanvas.width, holoCanvas.height);
+    const g = holoCtx.createLinearGradient(0, 0, holoCanvas.width, holoCanvas.height);
+    g.addColorStop(0, 'rgba(8, 10, 24, 0.76)');
+    g.addColorStop(0.55, 'rgba(38, 12, 64, 0.70)');
+    g.addColorStop(1, 'rgba(0, 30, 38, 0.62)');
+    holoCtx.fillStyle = g;
+    rr(holoCtx, 24, 24, 976, 464, 42);
+    holoCtx.fill();
+    holoCtx.strokeStyle = 'rgba(124,255,226,0.95)';
+    holoCtx.lineWidth = 8;
+    rr(holoCtx, 24, 24, 976, 464, 42);
+    holoCtx.stroke();
+    holoCtx.textAlign = 'center';
+    holoCtx.textBaseline = 'middle';
+    holoCtx.fillStyle = '#ffffff';
+    holoCtx.font = '900 64px system-ui, Arial';
+    holoCtx.fillText('SVR HOLO MENU', 512, 94);
+    holoCtx.fillStyle = '#7ff5c7';
+    holoCtx.font = '800 34px system-ui, Arial';
+    holoCtx.fillText('WATCH ROUTING • STORE • PROFILE • PRIVATE ROOMS', 512, 154);
+    const items = [
+      ['SCORPION', 'private poker gameplay'],
+      ['REIKI', 'approval placeholder room'],
+      ['PGA', 'private range training'],
+      ['STORE', 'VR store portal'],
+      ['LOUNGE', 'social private room'],
+      ['SPACE', 'Moon / Mars deck']
+    ];
+    holoCtx.font = '800 30px system-ui, Arial';
+    items.forEach((item, idx)=>{
+      const col = idx % 2;
+      const row = Math.floor(idx / 2);
+      const x = col ? 728 : 296;
+      const y = 232 + row * 72;
+      holoCtx.fillStyle = 'rgba(180,140,255,0.18)';
+      rr(holoCtx, x - 180, y - 27, 360, 52, 18);
+      holoCtx.fill();
+      holoCtx.strokeStyle = 'rgba(180,140,255,0.44)';
+      holoCtx.lineWidth = 3;
+      rr(holoCtx, x - 180, y - 27, 360, 52, 18);
+      holoCtx.stroke();
+      holoCtx.fillStyle = '#ffffff';
+      holoCtx.fillText(item[0], x, y - 7);
+      holoCtx.fillStyle = 'rgba(233,255,246,0.78)';
+      holoCtx.font = '600 20px system-ui, Arial';
+      holoCtx.fillText(item[1], x, y + 18);
+      holoCtx.font = '800 30px system-ui, Arial';
+    });
+    holoCtx.fillStyle = '#ffd86b';
+    holoCtx.font = '800 24px system-ui, Arial';
+    holoCtx.fillText(state.teleportEnabled ? 'TP ARMED: aim + release' : 'TP OFF: use watch TP / fist chinch', 512, 462);
+    holoTex.needsUpdate = true;
+  }
+
   const group = new THREE.Group();
   group.visible = false;
   scene.add(group);
@@ -119,6 +183,26 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   screenFront.position.z = 0.012;
   screenFront.rotation.z = 0;
   group.add(screenFront);
+
+  const holoPanel = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.275, 0.138),
+    new THREE.MeshBasicMaterial({ map: holoTex, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
+  );
+  holoPanel.name = 'PHASE_101_WRIST_HOLOGRAM_PANEL';
+  holoPanel.position.set(0, 0.150, 0.052);
+  holoPanel.rotation.x = -0.18;
+  holoPanel.renderOrder = 70;
+  group.add(holoPanel);
+
+  const holoBeam = new THREE.Mesh(
+    new THREE.ConeGeometry(0.070, 0.145, 32, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0x7ff5c7, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false })
+  );
+  holoBeam.name = 'PHASE_101_WRIST_HOLOGRAM_BEAM';
+  holoBeam.position.set(0, 0.074, 0.028);
+  holoBeam.rotation.x = Math.PI;
+  holoBeam.renderOrder = 69;
+  group.add(holoBeam);
 
   const screenBack = new THREE.Mesh(
     new THREE.PlaneGeometry(plateW * 0.965, plateH * 0.965),
@@ -183,9 +267,13 @@ let hoveredId = null;
 
   function draw(force = false){
     const state = getState();
-    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, sec: new Date().getSeconds() });
+    const holoVisible = state.holoMenuVisible !== false;
+    if (holoPanel) holoPanel.visible = holoVisible;
+    if (holoBeam) holoBeam.visible = holoVisible;
+    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, holo: state.holoMenuVisible, tp: state.teleportEnabled, sec: new Date().getSeconds() });
     if (!force && sig === lastSig) return;
     lastSig = sig;
+    redrawHoloPanel(state);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
@@ -219,7 +307,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(233,233,255,0.95)';
     ctx.font = 'bold 30px system-ui, Arial';
-    ctx.fillText('SVR VR SCENE CONSOLE', 34, 112);
+    ctx.fillText('SVR WATCH HOLO CONSOLE', 34, 112);
     ctx.fillStyle = 'rgba(233,233,255,0.78)';
     ctx.font = '25px system-ui, Arial';
     ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 430, 152);

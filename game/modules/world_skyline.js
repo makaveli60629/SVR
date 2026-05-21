@@ -745,7 +745,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = 'rgba(124,255,226,0.16)'; roundRectPath(x, 90, 430, w-180, 138, 28); x.fill();
     x.strokeStyle = 'rgba(124,255,226,0.65)'; x.lineWidth = 6; roundRectPath(x, 90, 430, w-180, 138, 28); x.stroke();
     x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER THE REIKI HUB', w/2, 510);
-    x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Use the floor portal to enter the guided Reiki space', w/2, 564);
+    x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Use the single storefront portal to enter Reiki', w/2, 564);
     x.fillStyle = '#f6ffff'; x.font = 'bold 38px system-ui, Arial'; x.fillText('Professional Highlights', w/2, 716);
     x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('Wellness • Reiki • Placeholder', w/2, 788);
     x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private room • mindful reset • future approved partner storefront', w/2, 856);
@@ -779,10 +779,14 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   portal.rotation.x = -Math.PI * 0.5;
   portal.position.set(0, 0.03, 0.98);
   root.add(portal);
+  portal.visible = false;
+  portal.userData.phase101HiddenDuplicatePortal = true;
   const portalLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.18, 0.54), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
   portalLogo.rotation.x = -Math.PI * 0.5;
   portalLogo.position.set(0, 0.035, 0.98);
   root.add(portalLogo);
+  portalLogo.visible = false;
+  portalLogo.userData.phase101HiddenDuplicatePortal = true;
 
   const postMat = new THREE.MeshStandardMaterial({ color: 0xd9d1dc, roughness: 0.26, metalness: 0.76, emissive: 0x28333a, emissiveIntensity: 0.12 });
   const ropeMat = new THREE.MeshStandardMaterial({ color: 0xbf0c28, roughness: 0.78, metalness: 0.08, emissive: 0x520b16, emissiveIntensity: 0.22 });
@@ -1053,13 +1057,13 @@ function createEspressoCreamAdTexture(){
 
 function addReikiBackBuildingEspressoAd(scene, { center, inward, wallHeight }){
   const outward = inward.clone().multiplyScalar(-1);
-  const base = center.clone().addScaledVector(outward, 7.2).add(new THREE.Vector3(0,0,-3.2));
+  const base = center.clone().addScaledVector(outward, 8.2);
   const buildingMat = new THREE.MeshStandardMaterial({ color: 0x07121a, roughness: 0.68, metalness: 0.18, emissive: 0x07142a, emissiveIntensity: 0.26 });
   const tower = new THREE.Mesh(new THREE.BoxGeometry(4.8, wallHeight + 13.5, 1.05), buildingMat);
   tower.position.copy(base).setY((wallHeight + 13.5) * 0.5);
   scene.add(tower);
-  const ad = new THREE.Mesh(new THREE.PlaneGeometry(3.65, 5.65), new THREE.MeshBasicMaterial({ map: createEspressoCreamAdTexture(), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  ad.position.copy(base).addScaledVector(inward, 0.56).setY(wallHeight + 4.0);
+  const ad = new THREE.Mesh(new THREE.PlaneGeometry(4.25, 6.65), new THREE.MeshBasicMaterial({ map: createEspressoCreamAdTexture(), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+  ad.position.copy(base).addScaledVector(inward, 0.62).setY(wallHeight + 4.6);
   ad.lookAt(center.clone().setY(ad.position.y));
   ad.renderOrder = 45;
   scene.add(ad);
@@ -1747,6 +1751,8 @@ function addScorpionRoom(scene, R, wallHeight){
   portal.rotation.x = -Math.PI * 0.5;
   portal.position.set(0, 0.03, 1.7);
   root.add(portal);
+  portal.visible = false;
+  portal.userData.phase101HiddenDuplicatePortal = true;
 
   const boardTex = canvasTexture(900, 720, (x,w,h)=>{
     const g = x.createLinearGradient(0,0,w,h);
@@ -1891,7 +1897,7 @@ function addPhase97PrivateRouteMarkers(scene, { R, wallHeight, reikiHub, scorpio
   // Space room/deck target for Moon + Mars checking without touching the website.
   const spacePos = new THREE.Vector3(0, 0, -(R - 5.6));
   targets.spaceRoom = { pos: spacePos.clone(), look: new THREE.Vector3(0, wallHeight + 12.0, -(R + 92.0)) };
-  addLock(addPhase97PortalMarker(scene, { position: new THREE.Vector3(-2.1, 0, -(R - 7.6)), look: targets.spaceRoom.look.clone(), label: 'SPACE ROOM', subtitle: 'Moon / Mars deck', destination: 'spaceRoom', hue: '#b48cff', radius: 1.04 }));
+  // Phase 101: no extra Space floor portal in the lobby; Space remains accessible from watch/Holo menu only.
 
   return { portalLocks, targets };
 }
@@ -2713,7 +2719,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(7.2, 56, 56),
+    new THREE.SphereGeometry(8.8, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2725,16 +2731,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-30, wallHeight + 32.0, -(R + 58.0));
+  moon.position.set(-23, wallHeight + 25.0, -(R + 43.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(58.0, 58.0, 1);
+  moonHalo.scale.set(68.0, 68.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(4.2, 44, 44),
+    new THREE.SphereGeometry(5.6, 44, 44),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2746,13 +2752,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  mars.position.set(38, wallHeight + 38.0, -(R + 72.0));
+  mars.position.set(29, wallHeight + 28.0, -(R + 51.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(38.0, 38.0, 1);
+  marsHalo.scale.set(48.0, 48.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2958,16 +2964,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
     moon.position.set(
-      -30 + Math.sin(t * 0.020) * 3.0,
-      wallHeight + 32.0 + Math.sin(t * 0.090) * 1.0,
-      -(R + 58.0) + Math.cos(t * 0.016) * 3.0
+      -23 + Math.sin(t * 0.020) * 2.6,
+      wallHeight + 25.0 + Math.sin(t * 0.090) * 0.8,
+      -(R + 43.0) + Math.cos(t * 0.016) * 2.4
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     mars.position.set(
-      38 + Math.sin(t * 0.016 + 1.4) * 3.5,
-      wallHeight + 38.0 + Math.sin(t * 0.070 + 0.8) * 0.9,
-      -(R + 72.0) + Math.cos(t * 0.012 + 0.4) * 3.0
+      29 + Math.sin(t * 0.016 + 1.4) * 3.0,
+      wallHeight + 28.0 + Math.sin(t * 0.070 + 0.8) * 0.7,
+      -(R + 51.0) + Math.cos(t * 0.012 + 0.4) * 2.5
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;

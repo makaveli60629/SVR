@@ -275,22 +275,45 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     pointer.material.needsUpdate = true;
   }
 
+  function bestStick(...sticks){
+    let best = { x: 0, y: 0 };
+    let bestMag = 0;
+    for (const stick of sticks){
+      const mag = Math.hypot(stick?.x || 0, stick?.y || 0);
+      if (mag > bestMag){
+        best = stick;
+        bestMag = mag;
+      }
+    }
+    return { ...best, mag: bestMag };
+  }
+
   function movePlayerFromControllers(dt){
     const leftGp = controllerGamepad(leftControllerRef);
     const rightGp = controllerGamepad(rightControllerRef);
-    const moveSource = leftGp || rightGp;
-    const turnSource = rightGp || leftGp;
-    const leftStick = getStick(moveSource, "left");
-    const rightStick = getStick(turnSource, "right");
 
-    if (Math.abs(rightStick.x) > 0.72 && performance.now() > snapCooldownUntil){
-      playerYaw += Math.sign(rightStick.x) * (Math.PI / 4);
+    // Phase 101: accept either controller and either common WebXR axis layout.
+    // This prevents Quest/browser variations from killing forward/back movement.
+    const moveStick = bestStick(
+      getStick(leftGp, "left"),
+      getStick(leftGp, "right"),
+      getStick(rightGp, "left"),
+      getStick(rightGp, "right")
+    );
+    const turnStick = bestStick(
+      getStick(rightGp, "right"),
+      getStick(rightGp, "left"),
+      getStick(leftGp, "right"),
+      getStick(leftGp, "left")
+    );
+
+    if (Math.abs(turnStick.x) > 0.72 && performance.now() > snapCooldownUntil){
+      playerYaw += Math.sign(turnStick.x) * (Math.PI / 4);
       applyReferenceSpace();
       snapCooldownUntil = performance.now() + 220;
     }
 
-    const mag = Math.hypot(leftStick.x, leftStick.y);
-    if (mag < 0.12) return;
+    if (moveStick.mag < 0.12) return;
 
     const xrCam = renderer.xr.getCamera(camera);
     xrCam.getWorldDirection(headDir);
@@ -299,8 +322,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     headDir.normalize();
     const rightDir = new THREE.Vector3(headDir.z, 0, -headDir.x).normalize();
     const speed = 2.8;
-    const stepX = (rightDir.x * leftStick.x + headDir.x * (-leftStick.y)) * speed * dt;
-    const stepZ = (rightDir.z * leftStick.x + headDir.z * (-leftStick.y)) * speed * dt;
+    const stepX = (rightDir.x * moveStick.x + headDir.x * (-moveStick.y)) * speed * dt;
+    const stepZ = (rightDir.z * moveStick.x + headDir.z * (-moveStick.y)) * speed * dt;
     const nextX = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
     const nextZ = THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp);
     setPlayerXZ(nextX, nextZ);
@@ -384,9 +407,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
         ? "Controllers active • left stick move • right stick snap turn • A/X teleport"
-        : "TELEPORT OFF • press TP or fist/chinch by face";
+        : "TELEPORT OFF • press TP or make fist/chinch near face";
       statusCb(idleMsg);
-      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist/chinch by face toggles TP");
+      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist/chinch near face toggles TP");
       return;
     }
 
@@ -482,7 +505,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (!pinch) pinchHoldStart = 0;
     active.userData._wasPinching = pinch;
     modeCb("Hands: TELEPORT ON");
-    statusCb("HAND TP ON • fist/chinch by face toggles • hold pinch then release");
+    statusCb("HAND TP ON • fist/chinch toggles • pinch-hold/release teleports");
   }
 
   return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };

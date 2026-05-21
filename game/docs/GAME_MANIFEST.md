@@ -189,3 +189,17 @@ Implementation:
 - Added Reiki-aligned Espresso wall ad building.
 - Repaired hand fist/chinch teleport activation.
 - Added watch HOLO button and DOM holo menu toggle.
+
+
+## Phase 101 — VR Runtime Correction Lock
+
+- Build label: `PHASE-101-VR-RUNTIME-CORRECTION-LOCK`
+- Corrected the pasted handoff errors by keeping the active Three.js/WebXR runtime instead of replacing it with an A-Frame scaffold.
+- Added native Three.js wrist hologram panel tied to the watch Holo state.
+- Reduced portal clutter by hiding duplicate Reiki/Scorpion internal rings and removing the visible Space floor portal from the lobby.
+- Preserved one storefront portal per hub and kept private scenes outside the lobby.
+- Improved controller locomotion axis recovery for Quest/WebXR variations.
+- Relaxed hand pinch/fist thresholds to restore fist/chinch teleport reliability.
+- Repositioned Moon/Mars for stronger lobby visibility.
+- Enlarged/aligned Espresso with Cream ad behind the Reiki hub area.
+- Site untouched.

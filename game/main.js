@@ -7,7 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { PHASE_100_BUILD, routeLabel, PHASE_100_LOBBY_PORTAL_CLEANUP_LOCK } from "./modules/private_room_registry.js";
+import { PHASE_101_BUILD, routeLabel, PHASE_101_VR_RUNTIME_CORRECTION_LOCK } from "./modules/private_room_registry.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -183,7 +183,7 @@ function gotoScene(key){
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
-  setStatus(`Phase 100 VR route: ${routeLabel(key)}`, { force: true });
+  setStatus(`Phase 101 VR route: ${routeLabel(key)}`, { force: true });
   return true;
 }
 
@@ -284,7 +284,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_100_BUILD}: single storefront portals active, Moon/Mars fail-safe visible, watch holo/TP repaired.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_101_BUILD}: corrected runtime active, watch holo display repaired, one portal per storefront.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
