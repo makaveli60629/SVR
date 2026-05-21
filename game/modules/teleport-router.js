@@ -12,6 +12,7 @@ export const SVR_ROUTE_KEYS = Object.freeze({
   REIKI_ROOM: "reiki_room",
   SMOKER_LOUNGE: "smoker_lounge",
   VR_STORE: "vr_store",
+  SPACE_STATION: "space_station",
   SPONSOR_WALL: "sponsor_wall"
 });
 
@@ -42,6 +43,9 @@ export const SVR_ROUTE_ALIASES = Object.freeze({
   storeRoom: SVR_ROUTE_KEYS.VR_STORE,
   store: SVR_ROUTE_KEYS.VR_STORE,
   vrStore: SVR_ROUTE_KEYS.VR_STORE,
+  space: SVR_ROUTE_KEYS.SPACE_STATION,
+  spaceStation: SVR_ROUTE_KEYS.SPACE_STATION,
+  station: SVR_ROUTE_KEYS.SPACE_STATION,
   sponsor: SVR_ROUTE_KEYS.SPONSOR_WALL,
   sponsorWall: SVR_ROUTE_KEYS.SPONSOR_WALL,
   legends: SVR_ROUTE_KEYS.SPONSOR_WALL,
@@ -106,6 +110,7 @@ export function buildTeleportRouteRegistry(sceneTargets = {}, seats = [], tableC
     [SVR_ROUTE_KEYS.REIKI_ROOM]: makeRecord(SVR_ROUTE_KEYS.REIKI_ROOM, "Reiki Room", "private_scene", src.reiki_room || src.reikiRoom, src.reiki_hub || src.reiki || fallbackLobby, { scenePath: "game/reiki.html", privateScene: true }),
     [SVR_ROUTE_KEYS.SMOKER_LOUNGE]: makeRecord(SVR_ROUTE_KEYS.SMOKER_LOUNGE, "Smoker Lounge", "private_scene", src.smoker_lounge || src.smokerLounge, src.sponsor || fallbackLobby, { scenePath: "game/smoker-lounge.html", privateScene: true }),
     [SVR_ROUTE_KEYS.VR_STORE]: makeRecord(SVR_ROUTE_KEYS.VR_STORE, "VR Store", "private_scene", src.vr_store || src.storeRoom, src.sponsor || fallbackLobby, { scenePath: "game/store-room.html", privateScene: true }),
+    [SVR_ROUTE_KEYS.SPACE_STATION]: makeRecord(SVR_ROUTE_KEYS.SPACE_STATION, "Space Station", "private_scene", src.space_station || src.spaceStation || src.space, src.sponsor || fallbackLobby, { scenePath: "game/space-station.html", privateScene: true, spawnNote: "Lightweight private space-station route. Uploaded FBX/Blend reserved for optimized GLB conversion." }),
     [SVR_ROUTE_KEYS.SCORPION_ROOM]: makeRecord(SVR_ROUTE_KEYS.SCORPION_ROOM, "Scorpion Room", "private_scene", src.scorpion_room || src.scorpion, src.sponsor || fallbackLobby, { scenePath: "game/scorpion.html", privateScene: true })
   };
 
@@ -115,11 +120,11 @@ export function buildTeleportRouteRegistry(sceneTargets = {}, seats = [], tableC
   }
 
   const state = {
-    phase: "PHASE-156-TELEPORT-ROUTER-REGISTRY",
+    phase: "PHASE-84-SPACE-STATION-PRIVATE-ROUTE-LOCK",
     keys: Object.keys(registry),
     aliases: { ...SVR_ROUTE_ALIASES },
     privateRoutes: Object.values(registry).filter(r => r.privateScene).map(r => r.key),
-    rule: "Routes use player pose/XR reference-space systems. Do not move WebXR camera directly."
+    rule: "Routes use player pose/XR reference-space systems. Do not move WebXR camera directly. Space Station is private route only, not lobby geometry."
   };
   window.SVR_TELEPORT_ROUTE_REGISTRY = state;
 
