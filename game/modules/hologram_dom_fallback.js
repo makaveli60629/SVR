@@ -2,7 +2,7 @@
 // Game-side only. This is a guaranteed visible fallback for the watch HOLO button.
 // It does not alter lobby geometry. It only creates a lightweight overlay UI.
 
-const PHASE = "PHASE-84-HOLOGRAM-DOM-FALLBACK";
+const PHASE = "PHASE-84-HOLOGRAM-DOM-FALLBACK-RECURSION-FIX";
 
 function css(){
   if (document.getElementById("svr-holo-fallback-style")) return;
@@ -58,15 +58,19 @@ export function createHologramDomFallback({ getState = ()=>({}), actions = {} } 
   document.body.appendChild(root);
 
   const status = root.querySelector("#svrHoloFallbackStatus");
-  const state = { phase: PHASE, visible: false, lastAction: "none", guaranteedVisible: true };
+  const state = { phase: PHASE, visible: false, lastAction: "none", guaranteedVisible: true, recursionFixed: true };
   window.SVR_PHASE84_HOLOGRAM_DOM_FALLBACK = state;
+
+  function publish(){
+    window.SVR_PHASE84_HOLOGRAM_DOM_FALLBACK = { ...state };
+  }
 
   function setVisible(next, reason = "manual"){
     state.visible = !!next;
     state.reason = reason;
     root.classList.toggle("svr-open", state.visible);
     root.setAttribute("aria-hidden", state.visible ? "false" : "true");
-    window.SVR_PHASE84_HOLOGRAM_DOM_FALLBACK = state;
+    publish();
     return state.visible;
   }
   function toggle(reason = "toggle"){
@@ -81,6 +85,7 @@ export function createHologramDomFallback({ getState = ()=>({}), actions = {} } 
     if (!btn) return;
     const action = btn.dataset.action;
     state.lastAction = action;
+    publish();
     if (action === "close"){
       setVisible(false, "close-button");
       return;
@@ -99,5 +104,9 @@ export function createHologramDomFallback({ getState = ()=>({}), actions = {} } 
     if (e.code === "Escape" && state.visible) setVisible(false, "escape-key");
   });
 
-  return { setVisible, toggle, getState:()=>({ ...state, game:getState?.() || {} }) };
+  return {
+    setVisible,
+    toggle,
+    getState:()=>({ ...state })
+  };
 }
