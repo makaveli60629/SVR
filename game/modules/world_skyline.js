@@ -1055,43 +1055,68 @@ function createEspressoCreamAdTexture(){
   });
 }
 
+function createEspressoCreamAdMaterial(){
+  const fallbackTex = createEspressoCreamAdTexture();
+  const mat = new THREE.MeshBasicMaterial({
+    map: fallbackTex,
+    transparent: true,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    depthTest: false,
+    toneMapped: false
+  });
+  try {
+    const url = assetUrls('ui/espresso-with-cream-real.png')[0];
+    new THREE.TextureLoader().load(url, (tex)=>{
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 8;
+      mat.map = tex;
+      mat.needsUpdate = true;
+    });
+  } catch (err) {
+    // Keep the procedural fallback if the restored real ad texture cannot load.
+  }
+  return mat;
+}
+
 function addReikiBackBuildingEspressoAd(scene, { center, inward, wallHeight }){
-  // Phase 107: Espresso ad wall holder is a clean front-facing billboard tower.
-  // The ad face is rotated to look back toward the Reiki storefront/lobby view.
+  // Phase 111: dedicated Reiki-aligned espresso tower.
+  // The wall holder and ad face now point toward the center/lobby sightline, not sideways.
   const outward = inward.clone().multiplyScalar(-1);
-  const base = center.clone().addScaledVector(outward, 8.2);
+  const base = center.clone().addScaledVector(outward, 10.4);
   const buildingMat = new THREE.MeshStandardMaterial({ color: 0x07121a, roughness: 0.66, metalness: 0.20, emissive: 0x081c31, emissiveIntensity: 0.42 });
-  const tower = new THREE.Mesh(new THREE.BoxGeometry(7.2, wallHeight + 22.0, 1.24), buildingMat);
-  tower.position.copy(base).setY((wallHeight + 22.0) * 0.5);
-  tower.name = 'PHASE_107_REIKI_ALIGNED_ESPRESSO_BUILDING_FACING_LOBBY';
-  scene.add(tower);
+  const tower = new THREE.Mesh(new THREE.BoxGeometry(8.5, wallHeight + 29.0, 1.42), buildingMat);
+  tower.position.copy(base).setY((wallHeight + 29.0) * 0.5);
+  tower.name = 'PHASE_111_REIKI_ALIGNED_ESPRESSO_BUILDING_FACE_CENTER';
 
   const ad = new THREE.Mesh(
-    new THREE.PlaneGeometry(6.25, 9.30),
-    new THREE.MeshBasicMaterial({ map: createEspressoCreamAdTexture(), transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
+    new THREE.PlaneGeometry(7.35, 10.85),
+    createEspressoCreamAdMaterial()
   );
-  ad.position.copy(base).addScaledVector(inward, 0.74).setY(wallHeight + 8.0);
-  ad.lookAt(center.clone().addScaledVector(inward, 2.0).setY(ad.position.y));
-  ad.rotateY(Math.PI); // Phase 107: flip the wall holder so the art faces the Reiki/lobby sightline.
-  ad.name = 'PHASE_107_ESPRESSO_AD_FACE_REIKI_LOBBY';
-  ad.renderOrder = 180;
+  ad.position.copy(base).addScaledVector(inward, 0.84).setY(wallHeight + 12.0);
+  ad.lookAt(center.clone().addScaledVector(inward, 3.8).setY(ad.position.y));
+  ad.rotateY(Math.PI); // front texture faces the center/lobby sightline.
+  ad.name = 'PHASE_111_ESPRESSO_REAL_AD_FACE_CENTER';
+  ad.renderOrder = 190;
+  tower.quaternion.copy(ad.quaternion);
+  scene.add(tower);
   scene.add(ad);
 
   const trimMat = new THREE.MeshBasicMaterial({ color: 0xffc56a, transparent: true, opacity: 0.96, depthTest: false });
-  const top = new THREE.Mesh(new THREE.BoxGeometry(6.58, 0.10, 0.055), trimMat);
+  const top = new THREE.Mesh(new THREE.BoxGeometry(7.74, 0.11, 0.055), trimMat);
   const bot = top.clone();
-  const left = new THREE.Mesh(new THREE.BoxGeometry(0.10, 9.62, 0.055), trimMat);
+  const left = new THREE.Mesh(new THREE.BoxGeometry(0.11, 11.22, 0.055), trimMat);
   const right = left.clone();
   [top, bot, left, right].forEach((piece)=>{ piece.position.copy(ad.position); piece.quaternion.copy(ad.quaternion); piece.renderOrder = 181; scene.add(piece); });
-  top.translateY(4.78); bot.translateY(-4.78); left.translateX(-3.24); right.translateX(3.24);
+  top.translateY(5.58); bot.translateY(-5.58); left.translateX(-3.82); right.translateX(3.82);
 
   const wallHolder = new THREE.Mesh(
-    new THREE.BoxGeometry(6.75, 9.75, 0.10),
+    new THREE.BoxGeometry(7.95, 11.38, 0.12),
     new THREE.MeshStandardMaterial({ color: 0x110707, roughness: 0.54, metalness: 0.20, emissive: 0x24120a, emissiveIntensity: 0.30 })
   );
   wallHolder.position.copy(ad.position).addScaledVector(inward, -0.05);
   wallHolder.quaternion.copy(ad.quaternion);
-  wallHolder.name = 'PHASE_107_ESPRESSO_WALL_HOLDER_FLIPPED';
+  wallHolder.name = 'PHASE_111_ESPRESSO_WALL_HOLDER_FACE_CENTER';
   wallHolder.renderOrder = 170;
   scene.add(wallHolder);
 
@@ -2785,7 +2810,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(10.8, 64, 64),
+    new THREE.SphereGeometry(16.2, 64, 64),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2797,19 +2822,19 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.22
     })
   );
-  moon.position.set(-18, wallHeight + 52.0, -(R + 64.0));
+  moon.position.set(-26, wallHeight + 86.0, -(R + 118.0));
   moon.material.depthTest = false;
   moon.material.depthWrite = false;
-  moon.renderOrder = 120;
+  moon.renderOrder = 220;
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(112.0, 112.0, 1);
+  moonHalo.scale.set(168.0, 168.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(7.4, 56, 56),
+    new THREE.SphereGeometry(10.8, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2821,16 +2846,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.18
     })
   );
-  mars.position.set(24, wallHeight + 55.0, -(R + 72.0));
+  mars.position.set(30, wallHeight + 90.0, -(R + 128.0));
   mars.visible = true;
   mars.material.depthTest = false;
   mars.material.depthWrite = false;
-  mars.renderOrder = 121;
+  mars.renderOrder = 221;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(82.0, 82.0, 1);
+  marsHalo.scale.set(126.0, 126.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2856,9 +2881,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 5.2, 720, 1.25);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 7.4, 900, 1.18);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 3.6, 580, 1.35);
+  const marsGlow = new THREE.PointLight(0xff9a72, 5.2, 760, 1.25);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
@@ -3036,16 +3061,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
     moon.position.set(
-      -18 + Math.sin(t * 0.020) * 2.6,
-      wallHeight + 52.0 + Math.sin(t * 0.090) * 0.9,
-      -(R + 64.0) + Math.cos(t * 0.016) * 2.4
+      -26 + Math.sin(t * 0.020) * 2.6,
+      wallHeight + 86.0 + Math.sin(t * 0.090) * 0.75,
+      -(R + 118.0) + Math.cos(t * 0.016) * 2.4
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     mars.position.set(
-      24 + Math.sin(t * 0.016 + 1.4) * 3.0,
-      wallHeight + 55.0 + Math.sin(t * 0.070 + 0.8) * 0.8,
-      -(R + 72.0) + Math.cos(t * 0.012 + 0.4) * 2.5
+      30 + Math.sin(t * 0.016 + 1.4) * 3.0,
+      wallHeight + 90.0 + Math.sin(t * 0.070 + 0.8) * 0.70,
+      -(R + 128.0) + Math.cos(t * 0.012 + 0.4) * 2.5
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;

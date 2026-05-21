@@ -288,3 +288,12 @@ Implementation:
 - Watch hologram remains OFF by default.
 - HOLO / TP / MOVE controls remain separate for usability and Quest safety.
 - No site-side changes.
+
+
+## Phase 111 — Sky + Espresso Face Center Lock
+
+- Build label: `PHASE-111-SKY-ESPRESSO-FACE-CENTER-LOCK`.
+- Raised and enlarged Moon/Mars for Quest visibility above skyline/buildings.
+- Rebuilt Espresso wall holder to face center/Reiki/lobby view.
+- Added restored real Espresso ad texture at `assets/ui/espresso-with-cream-real.png` with procedural fallback preserved.
+- Site untouched.

@@ -1,4 +1,5 @@
-export const PHASE_110_BUILD = "PHASE-110-BOOT-VERIFIED-WATCH-STABILITY-LOCK";
+export const PHASE_111_BUILD = "PHASE-111-SKY-ESPRESSO-FACE-CENTER-LOCK";
+export const PHASE_110_BUILD = PHASE_111_BUILD;
 export const PHASE_109_BUILD = PHASE_110_BUILD;
 export const PHASE_108_BUILD = PHASE_110_BUILD;
 export const PHASE_107_BUILD = PHASE_110_BUILD;
@@ -13,7 +14,7 @@ export const PHASE_100_BUILD = PHASE_110_BUILD;
 // Compatibility named exports for older mixed-phase runtimes.
 // These prevent boot failure when a cached or stale module imports a phase-specific object name.
 export const PHASE_101_VR_RUNTIME_CORRECTION_LOCK = Object.freeze({
-  phase: PHASE_110_BUILD,
+  phase: PHASE_111_BUILD,
   lock: "Three.js/WebXR runtime; A-Frame snippets are quarantined and not loaded",
   controls: "Meta hand tracking plus hidden Quest/Oculus controller fallback",
   safety: "watch hologram defaults off; teleport, fist glow, and locomotion have explicit controls",
@@ -28,6 +29,7 @@ export const PHASE_107_VISUAL_TABLE_FLOW_LOCK = PHASE_101_VR_RUNTIME_CORRECTION_
 export const PHASE_108_WATCH_TELEPORT_LOCOMOTION_LOCK = PHASE_101_VR_RUNTIME_CORRECTION_LOCK;
 export const PHASE_109_REGISTRY_EXPORT_BOOT_LOCK = PHASE_101_VR_RUNTIME_CORRECTION_LOCK;
 export const PHASE_110_BOOT_VERIFIED_WATCH_STABILITY_LOCK = PHASE_101_VR_RUNTIME_CORRECTION_LOCK;
+export const PHASE_111_SKY_ESPRESSO_FACE_CENTER_LOCK = PHASE_101_VR_RUNTIME_CORRECTION_LOCK;
 
 export const PRIVATE_ROOM_REGISTRY = Object.freeze([
   { key: "scorpion", label: "Scorpion Poker VR", type: "private-vr-room", status: "active", entry: "Scorpion storefront", exit: "Back to Lobby portal", branding: "SVR / modular sponsor-ready", vrReady: true, safeBounds: true },
