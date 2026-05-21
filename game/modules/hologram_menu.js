@@ -1,19 +1,7 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-const PHASE = "PHASE-178-RELIABLE-HOLOGRAM-CARD-SELECTION";
-
-function getActiveCamera(camera, renderer){
-  if (renderer?.xr?.isPresenting) return renderer.xr.getCamera(camera);
-  return camera || null;
-}
-
-function getJointWorld(hand, name){
-  const joint = hand?.joints?.[name];
-  if (!joint) return null;
-  joint.updateWorldMatrix?.(true, false);
-  return joint.getWorldPosition(new THREE.Vector3());
-}
+const PHASE = "PHASE-179-VISIBLE-HOLOGRAM-POPUP-PANEL";
 
 function rr(c, x, y, w, h, r){
   c.beginPath();
@@ -25,46 +13,16 @@ function rr(c, x, y, w, h, r){
   c.closePath();
 }
 
-function makeCardTexture(card, opts = {}){
-  const canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 256;
-  const ctx = canvas.getContext("2d");
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 6;
+function getActiveCamera(camera, renderer){
+  if (renderer?.xr?.isPresenting) return renderer.xr.getCamera(camera);
+  return camera || null;
+}
 
-  function draw({ hovered = false, disabled = false, state = {} } = {}){
-    const activeTp = window.SVR_ACTIVE_TELEPORT_HAND || {};
-    const label = typeof card.label === "function" ? card.label(state, activeTp) : card.label;
-    const sub = typeof card.sub === "function" ? card.sub(state, activeTp) : card.sub;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    grad.addColorStop(0, disabled ? "rgba(28,28,34,0.92)" : hovered ? "rgba(92,20,155,0.98)" : "rgba(18,12,45,0.95)");
-    grad.addColorStop(1, disabled ? "rgba(42,42,48,0.88)" : hovered ? "rgba(208,92,255,0.92)" : "rgba(55,20,96,0.90)");
-    ctx.fillStyle = grad;
-    rr(ctx, 14, 14, 484, 228, 32);
-    ctx.fill();
-    ctx.strokeStyle = disabled ? "rgba(255,255,255,0.20)" : hovered ? "rgba(246,226,127,0.98)" : "rgba(180,140,255,0.72)";
-    ctx.lineWidth = hovered && !disabled ? 10 : 6;
-    rr(ctx, 14, 14, 484, 228, 32);
-    ctx.stroke();
-    ctx.fillStyle = disabled ? "rgba(255,255,255,0.42)" : "#ffffff";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.font = `bold ${label?.length > 10 ? 40 : 50}px system-ui, Arial`;
-    ctx.fillText(label || card.id, 256, 90);
-    ctx.fillStyle = disabled ? "rgba(255,255,255,0.32)" : hovered ? "#f6e27f" : "#7ff5c7";
-    ctx.font = "bold 26px system-ui, Arial";
-    ctx.fillText(sub || card.section || "SVR", 256, 148);
-    ctx.fillStyle = "rgba(255,255,255,0.62)";
-    ctx.font = "19px system-ui, Arial";
-    ctx.fillText(disabled ? (card.reason || "Locked") : "touch + pinch", 256, 198);
-    tex.needsUpdate = true;
-  }
-
-  draw(opts);
-  return { canvas, texture: tex, draw };
+function getJointWorld(hand, name){
+  const joint = hand?.joints?.[name];
+  if (!joint) return null;
+  joint.updateWorldMatrix?.(true, false);
+  return joint.getWorldPosition(new THREE.Vector3());
 }
 
 function pokerEnded(poker){ return poker?.street === "showdown" || !!poker?.winnerText || poker?.street === "idle"; }
@@ -85,101 +43,166 @@ function disabledReason(poker, key){
   if (key === "raise") return "Raise locked";
   return "Illegal now";
 }
-
-function buildCards(state = {}){
+function zone(id, label, x, y, w, h, action, section = "", disabled = false, reason = ""){
+  return { id, label, x, y, w, h, action, section, disabled, reason, margin: 22, hold: 0.075 };
+}
+function buildZones(state = {}){
   const poker = state.poker || {};
   const callLabel = poker.toCall > 0 ? `CALL ${poker.toCall}` : "CHECK";
+  const tp = window.SVR_ACTIVE_TELEPORT_HAND || {};
   return [
-    { id:"close", section:"System", label:"CLOSE", sub:"Return", x:0, y:1.02, action:"close" },
-    { id:"lobby", section:"Nav", label:"LOBBY", sub:"Main room", x:-1.1, y:0.38, action:"goLobby" },
-    { id:"seat", section:"Nav", label:"SEAT", sub:"Player spot", x:0, y:0.38, action:"goSeat" },
-    { id:"scorpion", section:"Private", label:"SCORPION", sub:"Poker room", x:1.1, y:0.38, action:"goScorpion" },
-    { id:"reiki", section:"Private", label:"REIKI", sub:"Meditation", x:-1.1, y:-0.28, action:"goReiki" },
-    { id:"pga", section:"Private", label:"PGA", sub:"Golf hub", x:0, y:-0.28, action:"goPga" },
-    { id:"drive", section:"Private", label:"DRIVE", sub:"Range", x:1.1, y:-0.28, action:"goPgaDrive" },
-    { id:"chip", section:"Private", label:"CHIP", sub:"Putt area", x:-1.1, y:-0.94, action:"goChipPutt" },
-    { id:"store", section:"Private", label:"STORE", sub:"SVR portal", x:0, y:-0.94, action:"goStoreRoom" },
-    { id:"lounge", section:"Private", label:"LOUNGE", sub:"Social", x:1.1, y:-0.94, action:"goSmokerLounge" },
-    { id:"teleport", section:"Teleport", label:(s,tp)=> tp?.glow === "purple" ? "TP ON" : "TP OFF", sub:"Fist toggle", x:-1.1, y:-1.60, action:"toggleTeleport" },
-    { id:"audio", section:"Audio", label:"AUDIO", sub:state.audioEnabled ? "Playing" : "Paused", x:0, y:-1.60, action:"toggleAudio" },
-    { id:"next", section:"Audio", label:"NEXT", sub:"Track", x:1.1, y:-1.60, action:"nextTrack" },
-    { id:"fold", section:"Poker", label:"FOLD", sub:"Hand action", x:-1.1, y:-2.26, action:"pokerFold", disabled:!pokerLegal(poker,"fold"), reason:disabledReason(poker,"fold") },
-    { id:"call", section:"Poker", label:callLabel, sub:"Hand action", x:0, y:-2.26, action:"pokerCall", disabled:!pokerLegal(poker,"call"), reason:disabledReason(poker,"call") },
-    { id:"raise", section:"Poker", label:"RAISE", sub:"Increase", x:1.1, y:-2.26, action:"pokerRaise", disabled:!pokerLegal(poker,"raise"), reason:disabledReason(poker,"raise") },
-    { id:"allin", section:"Poker", label:"ALL-IN", sub:"Max bet", x:-0.55, y:-2.92, action:"pokerAllIn", disabled:!pokerLegal(poker,"allin"), reason:disabledReason(poker,"allin") },
-    { id:"nextHand", section:"Poker", label:"NEXT HAND", sub:"New deal", x:0.55, y:-2.92, action:"pokerNext", disabled:!pokerLegal(poker,"nextHand"), reason:disabledReason(poker,"nextHand") }
+    zone("close", "CLOSE", 44, 76, 188, 76, "close", "System"),
+    zone("lobby", "LOBBY", 260, 76, 188, 76, "goLobby", "Nav"),
+    zone("seat", "SEAT", 476, 76, 188, 76, "goSeat", "Nav"),
+    zone("scorpion", "SCORPION", 692, 76, 252, 76, "goScorpion", "Private"),
+    zone("reiki", "REIKI", 44, 184, 188, 78, "goReiki", "Private"),
+    zone("pga", "PGA", 260, 184, 188, 78, "goPga", "Private"),
+    zone("drive", "DRIVE", 476, 184, 188, 78, "goPgaDrive", "Private"),
+    zone("chip", "CHIP", 692, 184, 252, 78, "goChipPutt", "Private"),
+    zone("store", "STORE", 44, 292, 188, 78, "goStoreRoom", "Private"),
+    zone("lounge", "LOUNGE", 260, 292, 188, 78, "goSmokerLounge", "Private"),
+    zone("teleport", tp.glow === "purple" ? "TP ON" : "TP OFF", 476, 292, 188, 78, "toggleTeleport", "Teleport"),
+    zone("audio", state.audioEnabled ? "MUSIC" : "MUTE", 692, 292, 252, 78, "toggleAudio", "Audio"),
+    zone("fold", "FOLD", 44, 432, 188, 88, "pokerFold", "Poker", !pokerLegal(poker,"fold"), disabledReason(poker,"fold")),
+    zone("call", callLabel, 260, 432, 188, 88, "pokerCall", "Poker", !pokerLegal(poker,"call"), disabledReason(poker,"call")),
+    zone("raise", "RAISE", 476, 432, 188, 88, "pokerRaise", "Poker", !pokerLegal(poker,"raise"), disabledReason(poker,"raise")),
+    zone("allin", "ALL-IN", 692, 432, 252, 88, "pokerAllIn", "Poker", !pokerLegal(poker,"allin"), disabledReason(poker,"allin")),
+    zone("next", "NEXT TRACK", 44, 564, 260, 84, "nextTrack", "Audio"),
+    zone("nextHand", "NEXT HAND", 334, 564, 280, 84, "pokerNext", "Poker", !pokerLegal(poker,"nextHand"), disabledReason(poker,"nextHand")),
+    zone("help", "HELP", 644, 564, 300, 84, "help", "Controls")
   ];
 }
 
 export function createHologramMenu({ scene, camera = null, renderer = null, getState = ()=>({}), actions = {} }){
+  const canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 704;
+  const ctx = canvas.getContext("2d");
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+
   const group = new THREE.Group();
   group.visible = false;
   scene.add(group);
 
-  const cardW = 0.62;
-  const cardH = 0.32;
-  const hitW = cardW * 1.24;
-  const hitH = cardH * 1.42;
-  const cardMeshes = [];
+  const panelW = 1.38;
+  const panelH = 0.95;
 
-  const header = makeCardTexture({ id:"header", label:"SVR HOLOGRAM", sub:"Touch card + pinch", section:"Header" });
-  const headerMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.04, 0.30),
-    new THREE.MeshBasicMaterial({ map: header.texture, transparent:true, side:THREE.DoubleSide, depthWrite:false, depthTest:false, toneMapped:false })
+  const back = new THREE.Mesh(
+    new THREE.PlaneGeometry(panelW * 1.05, panelH * 1.05),
+    new THREE.MeshBasicMaterial({ color: 0x120020, transparent: true, opacity: 0.58, side: THREE.DoubleSide, depthWrite: false, depthTest: false })
   );
-  headerMesh.position.set(0, 0.73, 0.02);
-  headerMesh.renderOrder = 86;
-  group.add(headerMesh);
+  back.position.z = -0.018;
+  back.renderOrder = 90;
+  group.add(back);
 
-  for (const card of buildCards({})){
-    const textureLayer = makeCardTexture(card);
-    const mesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(cardW, cardH),
-      new THREE.MeshBasicMaterial({ map:textureLayer.texture, transparent:true, side:THREE.DoubleSide, depthWrite:false, depthTest:false, toneMapped:false })
-    );
-    mesh.position.set(card.x * 0.66, card.y * 0.29, 0);
-    mesh.userData.card = card;
-    mesh.userData.textureLayer = textureLayer;
-    mesh.renderOrder = 88;
-    group.add(mesh);
-    cardMeshes.push(mesh);
-  }
+  const panel = new THREE.Mesh(
+    new THREE.PlaneGeometry(panelW, panelH),
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
+  );
+  panel.renderOrder = 92;
+  group.add(panel);
 
-  const glow = new THREE.PointLight(0xd05cff, 1.6, 3.5, 2.0);
-  glow.position.set(0, -0.15, 0.35);
+  const glow = new THREE.PointLight(0xd05cff, 2.0, 4.0, 2.0);
+  glow.position.set(0, 0, 0.32);
   group.add(glow);
 
-  const state = { phase: PHASE, visible:false, reason:"init", hoveredButton:null, lastAction:"none", moduleMode:"reliable-3d-panel-cards", pinchReleaseState:"PINCH_RELEASED" };
+  const state = { phase: PHASE, visible: false, reason: "init", hoveredButton: null, lastAction: "none", moduleMode: "visible-popup-panel", pinchReleaseState: "PINCH_RELEASED" };
   window.SVR_HOLOGRAM_MENU_STATE = state;
 
-  let hoveredMesh = null;
+  let hoveredId = null;
   let pressed = false;
   let pinchTime = 0;
   let pressLockId = null;
-  let lastDrawSig = "";
+  let lastHovered = null;
+  let lastSig = "";
+
+  function drawButton(z, hovered){
+    const disabled = !!z.disabled;
+    ctx.save();
+    const grad = ctx.createLinearGradient(z.x, z.y, z.x + z.w, z.y + z.h);
+    grad.addColorStop(0, disabled ? "rgba(50,50,56,0.78)" : hovered ? "rgba(208,92,255,0.96)" : "rgba(42,18,88,0.86)");
+    grad.addColorStop(1, disabled ? "rgba(30,30,36,0.78)" : hovered ? "rgba(246,226,127,0.70)" : "rgba(92,32,152,0.76)");
+    ctx.fillStyle = grad;
+    ctx.strokeStyle = disabled ? "rgba(255,255,255,0.18)" : hovered ? "rgba(255,255,255,0.98)" : "rgba(180,140,255,0.74)";
+    ctx.lineWidth = hovered && !disabled ? 8 : 4;
+    ctx.shadowColor = hovered ? "rgba(208,92,255,0.9)" : "transparent";
+    ctx.shadowBlur = hovered ? 18 : 0;
+    rr(ctx, z.x, z.y, z.w, z.h, 18);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = disabled ? "rgba(255,255,255,0.42)" : "#ffffff";
+    ctx.font = `bold ${z.label.length > 9 ? 25 : 32}px system-ui, Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(z.label, z.x + z.w / 2, z.y + z.h / 2 - 7);
+    ctx.fillStyle = disabled ? "rgba(255,255,255,0.32)" : hovered ? "#f6e27f" : "#7ff5c7";
+    ctx.font = "bold 15px system-ui, Arial";
+    ctx.fillText(disabled ? (z.reason || "LOCKED") : z.section, z.x + z.w / 2, z.y + z.h - 17);
+    ctx.restore();
+  }
+
+  function draw(force = false){
+    const s = getState() || {};
+    const poker = s.poker || {};
+    const tp = window.SVR_ACTIVE_TELEPORT_HAND || {};
+    const sig = JSON.stringify({ visible: state.visible, h: hoveredId, cash: s.cash, seated: s.seated, tp: tp.state, tpa: tp.active, pot: poker.pot, turn: poker.awaitingPlayer, legal: poker.legal, last: state.lastAction, sec: Math.floor(performance.now() / 500) });
+    if (!force && sig === lastSig) return;
+    lastSig = sig;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    bg.addColorStop(0, "rgba(5,8,16,0.96)");
+    bg.addColorStop(0.52, "rgba(38,11,68,0.95)");
+    bg.addColorStop(1, "rgba(5,8,16,0.96)");
+    ctx.fillStyle = bg;
+    rr(ctx, 12, 12, 1000, 680, 34);
+    ctx.fill();
+    ctx.strokeStyle = tp.glow === "purple" ? "rgba(208,92,255,0.98)" : "rgba(180,140,255,0.86)";
+    ctx.lineWidth = 7;
+    rr(ctx, 12, 12, 1000, 680, 34);
+    ctx.stroke();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 42px system-ui, Arial";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText("SVR HOLOGRAM", 44, 38);
+    ctx.fillStyle = "rgba(233,233,255,0.78)";
+    ctx.font = "22px system-ui, Arial";
+    ctx.fillText("Touch a large card, then pinch. Close returns hand teleport.", 370, 38);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#7ff5c7";
+    ctx.font = "bold 30px system-ui, Arial";
+    ctx.fillText(`$${Number(s.cash || 0).toLocaleString()}`, 968, 38);
+    for (const z of buildZones(s)) drawButton(z, hoveredId === z.id);
+    tex.needsUpdate = true;
+  }
 
   function show(reason = "manual"){
     state.visible = true;
     state.reason = reason;
     group.visible = true;
-    hoveredMesh = null;
+    hoveredId = null;
     pressed = false;
     pinchTime = 0;
     pressLockId = null;
     placeInFront(true);
-    redrawCards(true);
+    draw(true);
+    window.SVR_HOLOGRAM_MENU_STATE = state;
   }
 
   function hide(reason = "closed"){
     state.visible = false;
     state.reason = reason;
     state.hoveredButton = null;
-    hoveredMesh = null;
+    hoveredId = null;
     group.visible = false;
     pressed = false;
     pinchTime = 0;
     pressLockId = null;
-    redrawCards(true);
+    draw(true);
+    window.SVR_HOLOGRAM_MENU_STATE = state;
   }
 
   function toggle(reason = "toggle"){
@@ -196,71 +219,40 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
     const camDir = new THREE.Vector3();
     activeCamera.getWorldPosition(camPos);
     activeCamera.getWorldDirection(camDir);
-    const targetPos = camPos.clone().add(camDir.multiplyScalar(1.18));
-    targetPos.y = THREE.MathUtils.clamp(camPos.y + 0.02, 1.16, 1.78);
-    group.position.lerp(targetPos, force ? 1 : 0.18);
+    const targetPos = camPos.clone().add(camDir.multiplyScalar(1.05));
+    targetPos.y = THREE.MathUtils.clamp(camPos.y + 0.03, 1.08, 1.78);
+    group.position.copy(targetPos);
     group.lookAt(camPos);
   }
 
-  function redrawCards(force = false){
-    const s = getState() || {};
-    const poker = s.poker || {};
-    const tp = window.SVR_ACTIVE_TELEPORT_HAND || {};
-    const sig = JSON.stringify({ h: state.hoveredButton, cash:s.cash, seated:s.seated, tp:tp.state, tpa:tp.active, pot:poker.pot, turn:poker.awaitingPlayer, legal:poker.legal, action:state.lastAction, sec:Math.floor(performance.now()/700) });
-    if (!force && sig === lastDrawSig) return;
-    lastDrawSig = sig;
-    const updated = buildCards(s);
-    for (const mesh of cardMeshes){
-      const next = updated.find(c=>c.id === mesh.userData.card.id) || mesh.userData.card;
-      mesh.userData.card = next;
-      const hovered = state.hoveredButton === next.id;
-      mesh.userData.textureLayer?.draw?.({ hovered, disabled:!!next.disabled, state:s });
-      mesh.scale.setScalar(hovered && !next.disabled ? 1.10 : 1);
-      mesh.position.z = hovered ? 0.04 : 0;
-    }
-  }
-
-  function activateCard(card){
-    if (!card) return;
-    if (card.disabled){
-      state.lastAction = card.reason || "locked";
-      redrawCards(true);
-      return;
-    }
-    state.lastAction = card.id;
-    if (card.action === "close") { hide("close-card"); return; }
-    actions[card.action]?.();
-    redrawCards(true);
-  }
-
-  function directHitFromHand(hand){
-    const tipPos = getJointWorld(hand, "index-finger-tip");
-    if (!tipPos) return null;
-    const local = group.worldToLocal(tipPos.clone());
-    if (local.z < -0.16 || local.z > 0.18) return null;
+  function localHit(local){
+    const x = ((local.x / panelW) + 0.5) * canvas.width;
+    const y = ((-local.y / panelH) + 0.5) * canvas.height;
     let best = null;
     let bestScore = Infinity;
-    for (const mesh of cardMeshes){
-      const mx = mesh.position.x;
-      const my = mesh.position.y;
-      const dx = Math.abs(local.x - mx);
-      const dy = Math.abs(local.y - my);
-      if (dx > hitW * 0.5 || dy > hitH * 0.5) continue;
-      const score = (dx / hitW) * (dx / hitW) + (dy / hitH) * (dy / hitH) + Math.abs(local.z) * 0.12;
-      if (score < bestScore){
-        bestScore = score;
-        best = mesh;
-      }
+    for (const z of buildZones(getState() || {})){
+      const m = z.margin || 20;
+      if (x < z.x - m || x > z.x + z.w + m || y < z.y - m || y > z.y + z.h + m) continue;
+      const cx = z.x + z.w / 2;
+      const cy = z.y + z.h / 2;
+      const score = Math.pow((x - cx) / z.w, 2) + Math.pow((y - cy) / z.h, 2);
+      if (score < bestScore){ best = z; bestScore = score; }
     }
     return best;
   }
 
-  function getHover(leftHand, rightHand){
-    const right = directHitFromHand(rightHand);
-    if (right) return { mesh:right, input:rightHand };
-    const left = directHitFromHand(leftHand);
-    if (left) return { mesh:left, input:leftHand };
-    return { mesh:null, input:null };
+  function activate(z){
+    if (!z) return;
+    if (z.disabled){
+      state.lastAction = z.reason || "locked";
+      draw(true);
+      return;
+    }
+    state.lastAction = z.id;
+    if (z.action === "close") { hide("close-card"); return; }
+    if (z.action === "help") { state.lastAction = "Look at fist + clench toggles TP. Controller: hold trigger/grip/A, release to teleport."; draw(true); return; }
+    actions[z.action]?.();
+    draw(true);
   }
 
   function update(dt, leftHand, rightHand){
@@ -269,31 +261,46 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
       return;
     }
     placeInFront();
-    const hover = getHover(leftHand, rightHand);
-    hoveredMesh = hover.mesh;
-    const card = hoveredMesh?.userData?.card || null;
-    state.hoveredButton = card?.id || null;
-
-    const pinching = !!hover.input && isPinching(hover.input);
+    let nextHover = null;
+    let activeInput = null;
+    let bestDepth = Infinity;
+    for (const candidate of [rightHand, leftHand]){
+      const tipPos = getJointWorld(candidate, "index-finger-tip");
+      if (!tipPos) continue;
+      const local = group.worldToLocal(tipPos.clone());
+      if (local.z < -0.18 || local.z > 0.22 || Math.abs(local.x) > panelW * 0.66 || Math.abs(local.y) > panelH * 0.66) continue;
+      const hit = localHit(local);
+      if (!hit) continue;
+      const depth = Math.abs(local.z);
+      if (depth < bestDepth){
+        bestDepth = depth;
+        nextHover = hit;
+        activeInput = candidate;
+      }
+    }
+    hoveredId = nextHover?.id || null;
+    state.hoveredButton = hoveredId;
+    const pinching = !!activeInput && isPinching(activeInput);
     state.pinchReleaseState = pinching ? "PINCH_WAIT_RELEASE" : "PINCH_RELEASED";
-    if (pinching && card?.id && !pressLockId) pressLockId = card.id;
+    if (pinching && hoveredId && !pressLockId) pressLockId = hoveredId;
+    if (pinching && pressLockId && nextHover?.id !== pressLockId) nextHover = buildZones(getState() || {}).find(z=>z.id === pressLockId) || nextHover;
     if (!pinching) pressLockId = null;
-    if (pinching && card) pinchTime += dt;
+    if (nextHover && pinching) pinchTime += dt;
     else if (!pinching) pinchTime = 0;
-
-    if (card && pinching && !pressed && pinchTime > 0.085){
+    if (nextHover && pinching && !pressed && pinchTime > (nextHover.hold || 0.08)){
       pressed = true;
-      activateCard(card);
+      activate(nextHover);
       pinchTime = 0;
     }
     if (!pinching) pressed = false;
-
-    redrawCards();
+    if (hoveredId !== lastHovered){ lastHovered = hoveredId; draw(true); }
+    else draw();
     window.SVR_HOLOGRAM_MENU_STATE = state;
   }
 
-  redrawCards(true);
+  draw(true);
+  window.SVR_PHASE179_HOLOGRAM_VISIBLE_PANEL = state;
   window.SVR_PHASE178_HOLOGRAM_RELIABLE_MENU = state;
   window.SVR_PHASE177_HOLOGRAM_3D_MENU = state;
-  return { object:group, show, hide, toggle, update, getState:()=>state };
+  return { object: group, show, hide, toggle, update, getState: ()=>state };
 }
