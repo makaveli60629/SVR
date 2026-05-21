@@ -21,7 +21,7 @@ function showBootError(err){
   }
 }
 
-window.__SVR_BOOT_WRAPPER = "PHASE-106-HOLOCTX-BOOT-FIX-LOCK";
+window.__SVR_BOOT_WRAPPER = "PHASE-107-VISUAL-TABLE-FLOW-LOCK";
 setBootStatus("Loading Phase 105 boot-safe runtime…");
 
 const bootTimer = setTimeout(()=>{

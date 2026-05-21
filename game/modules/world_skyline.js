@@ -601,13 +601,13 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   root.lookAt(root.position.clone().add(inward));
   scene.add(root);
 
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x11161a, roughness: 0.28, metalness: 0.30, emissive: 0x14323a, emissiveIntensity: 0.22 });
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x11161a, roughness: 0.28, metalness: 0.30, emissive: 0x14323a, emissiveIntensity: 0.46 });
   const trimMat = new THREE.MeshStandardMaterial({ color: 0x85fff0, roughness: 0.18, metalness: 0.56, emissive: 0x1ba98f, emissiveIntensity: 0.85 });
   const glassMat = new THREE.MeshStandardMaterial({ color: 0x97fff2, transparent: true, opacity: 0.10, roughness: 0.04, metalness: 0.22, emissive: 0x1a7066, emissiveIntensity: 0.30, side: THREE.DoubleSide });
 
   const rearWall = new THREE.Mesh(
     new THREE.BoxGeometry(13.2, 6.05, 0.18),
-    new THREE.MeshStandardMaterial({ color: 0x090f12, roughness: 0.72, metalness: 0.16, emissive: 0x07161b, emissiveIntensity: 0.18 })
+    new THREE.MeshStandardMaterial({ color: 0x090f12, roughness: 0.72, metalness: 0.16, emissive: 0x07161b, emissiveIntensity: 0.42 })
   );
   rearWall.position.set(0, 2.98, -2.24);
   root.add(rearWall);
@@ -1056,38 +1056,49 @@ function createEspressoCreamAdTexture(){
 }
 
 function addReikiBackBuildingEspressoAd(scene, { center, inward, wallHeight }){
-  // Phase 102: premium Espresso wall ad is locked directly behind the Reiki hub.
-  // It is bigger, higher, and front-facing so it reads from the lobby instead of hiding behind skyline geometry.
+  // Phase 107: Espresso ad wall holder is a clean front-facing billboard tower.
+  // The ad face is rotated to look back toward the Reiki storefront/lobby view.
   const outward = inward.clone().multiplyScalar(-1);
-  const base = center.clone().addScaledVector(outward, 6.4);
-  const buildingMat = new THREE.MeshStandardMaterial({ color: 0x07121a, roughness: 0.66, metalness: 0.20, emissive: 0x07142a, emissiveIntensity: 0.34 });
-  const tower = new THREE.Mesh(new THREE.BoxGeometry(6.4, wallHeight + 18.0, 1.16), buildingMat);
-  tower.position.copy(base).setY((wallHeight + 18.0) * 0.5);
-  tower.name = 'PHASE_102_REIKI_ALIGNED_ESPRESSO_BUILDING';
+  const base = center.clone().addScaledVector(outward, 8.2);
+  const buildingMat = new THREE.MeshStandardMaterial({ color: 0x07121a, roughness: 0.66, metalness: 0.20, emissive: 0x081c31, emissiveIntensity: 0.42 });
+  const tower = new THREE.Mesh(new THREE.BoxGeometry(7.2, wallHeight + 22.0, 1.24), buildingMat);
+  tower.position.copy(base).setY((wallHeight + 22.0) * 0.5);
+  tower.name = 'PHASE_107_REIKI_ALIGNED_ESPRESSO_BUILDING_FACING_LOBBY';
   scene.add(tower);
 
   const ad = new THREE.Mesh(
-    new THREE.PlaneGeometry(5.55, 8.25),
+    new THREE.PlaneGeometry(6.25, 9.30),
     new THREE.MeshBasicMaterial({ map: createEspressoCreamAdTexture(), transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
   );
-  ad.position.copy(base).addScaledVector(inward, 0.68).setY(wallHeight + 6.5);
+  ad.position.copy(base).addScaledVector(inward, 0.74).setY(wallHeight + 8.0);
   ad.lookAt(center.clone().addScaledVector(inward, 2.0).setY(ad.position.y));
-  ad.name = 'PHASE_102_REIKI_ALIGNED_ESPRESSO_AD';
-  ad.renderOrder = 150;
+  ad.rotateY(Math.PI); // Phase 107: flip the wall holder so the art faces the Reiki/lobby sightline.
+  ad.name = 'PHASE_107_ESPRESSO_AD_FACE_REIKI_LOBBY';
+  ad.renderOrder = 180;
   scene.add(ad);
 
-  const trimMat = new THREE.MeshBasicMaterial({ color: 0xffc56a, transparent: true, opacity: 0.90, depthTest: false });
-  const top = new THREE.Mesh(new THREE.BoxGeometry(5.9, 0.08, 0.05), trimMat);
+  const trimMat = new THREE.MeshBasicMaterial({ color: 0xffc56a, transparent: true, opacity: 0.96, depthTest: false });
+  const top = new THREE.Mesh(new THREE.BoxGeometry(6.58, 0.10, 0.055), trimMat);
   const bot = top.clone();
-  const left = new THREE.Mesh(new THREE.BoxGeometry(0.08, 8.5, 0.05), trimMat);
+  const left = new THREE.Mesh(new THREE.BoxGeometry(0.10, 9.62, 0.055), trimMat);
   const right = left.clone();
-  [top, bot, left, right].forEach((piece)=>{ piece.position.copy(ad.position); piece.quaternion.copy(ad.quaternion); piece.renderOrder = 151; scene.add(piece); });
-  top.translateY(4.24); bot.translateY(-4.24); left.translateX(-2.91); right.translateX(2.91);
+  [top, bot, left, right].forEach((piece)=>{ piece.position.copy(ad.position); piece.quaternion.copy(ad.quaternion); piece.renderOrder = 181; scene.add(piece); });
+  top.translateY(4.78); bot.translateY(-4.78); left.translateX(-3.24); right.translateX(3.24);
 
-  const glow = new THREE.PointLight(0xffc56a, 2.6, 22, 2.1);
-  glow.position.copy(ad.position).addScaledVector(inward, 1.6);
+  const wallHolder = new THREE.Mesh(
+    new THREE.BoxGeometry(6.75, 9.75, 0.10),
+    new THREE.MeshStandardMaterial({ color: 0x110707, roughness: 0.54, metalness: 0.20, emissive: 0x24120a, emissiveIntensity: 0.30 })
+  );
+  wallHolder.position.copy(ad.position).addScaledVector(inward, -0.05);
+  wallHolder.quaternion.copy(ad.quaternion);
+  wallHolder.name = 'PHASE_107_ESPRESSO_WALL_HOLDER_FLIPPED';
+  wallHolder.renderOrder = 170;
+  scene.add(wallHolder);
+
+  const glow = new THREE.PointLight(0xffc56a, 4.0, 30, 1.8);
+  glow.position.copy(ad.position).addScaledVector(inward, 1.9);
   scene.add(glow);
-  return { tower, ad };
+  return { tower, ad, wallHolder };
 }
 
 
@@ -1511,33 +1522,67 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
 
 
 function makeScorpionTableFeltTexture(){
-  return canvasTexture(1024, 512, (x,w,h)=>{
+  // Phase 107: clean casino felt layout.
+  // One central logo, one pass/bet line, and two readable command zones inside the line:
+  // left = player chip count / stack area, right = call/raise/fold hand-command area.
+  return canvasTexture(1400, 760, (x,w,h)=>{
     const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, '#120615');
-    g.addColorStop(0.52, '#050509');
-    g.addColorStop(1, '#1c0717');
+    g.addColorStop(0, '#140314');
+    g.addColorStop(0.48, '#050509');
+    g.addColorStop(1, '#1c0616');
     x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(255,92,190,0.86)';
-    x.lineWidth = 16;
-    roundRectPath(x, 40, 40, w - 80, h - 80, 90);
+
+    x.strokeStyle = 'rgba(255,92,190,0.92)';
+    x.lineWidth = 18;
+    roundRectPath(x, 44, 44, w - 88, h - 88, 108);
     x.stroke();
-    x.strokeStyle = 'rgba(130,235,255,0.66)';
-    x.lineWidth = 5;
-    roundRectPath(x, 78, 78, w - 156, h - 156, 70);
+
+    x.strokeStyle = 'rgba(160,255,240,0.80)';
+    x.lineWidth = 8;
+    roundRectPath(x, 108, 114, w - 216, h - 228, 82);
     x.stroke();
+    x.fillStyle = 'rgba(160,255,240,0.16)';
+    roundRectPath(x, 120, h - 178, w - 240, 18, 9);
+    x.fill();
+    x.fillStyle = '#9fffee';
+    x.font = '900 32px system-ui, Arial';
     x.textAlign = 'center';
     x.textBaseline = 'middle';
+    x.fillText('PASS / BET LINE', w / 2, h - 206);
+
+    // Single main center logo only.
+    x.save();
+    x.translate(w/2, h/2 - 42);
+    const logoGrad = x.createRadialGradient(0,0,10,0,0,150);
+    logoGrad.addColorStop(0, 'rgba(255,255,255,0.96)');
+    logoGrad.addColorStop(0.36, 'rgba(255,108,210,0.82)');
+    logoGrad.addColorStop(1, 'rgba(82,15,96,0.12)');
+    x.fillStyle = logoGrad;
+    x.beginPath(); x.arc(0,0,150,0,Math.PI*2); x.fill();
+    x.strokeStyle = 'rgba(255,255,255,0.58)'; x.lineWidth = 8; x.beginPath(); x.arc(0,0,118,0,Math.PI*2); x.stroke();
     x.fillStyle = '#fff2fb';
-    x.font = '900 78px system-ui, Arial';
-    x.fillText('SVR', w / 2, h / 2 - 26);
+    x.font = '900 108px system-ui, Arial';
+    x.fillText('SVR', 0, -18);
     x.fillStyle = '#ff9bd8';
-    x.font = '800 38px system-ui, Arial';
-    x.fillText('SCORPION FRONT TABLE', w / 2, h / 2 + 52);
-    x.fillStyle = 'rgba(255,255,255,0.22)';
-    x.fillRect(122, h - 110, w - 244, 8);
-    x.fillStyle = '#9feeff';
-    x.font = '700 24px system-ui, Arial';
-    x.fillText('PASS / BET LINE', w / 2, h - 84);
+    x.font = '900 42px system-ui, Arial';
+    x.fillText('SCORPION', 0, 72);
+    x.restore();
+
+    function zone(x0, y0, ww, hh, title, sub, color){
+      x.fillStyle = 'rgba(5,8,14,0.62)';
+      roundRectPath(x, x0, y0, ww, hh, 30); x.fill();
+      x.strokeStyle = color; x.lineWidth = 6;
+      roundRectPath(x, x0, y0, ww, hh, 30); x.stroke();
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillStyle = '#ffffff'; x.font = '900 34px system-ui, Arial'; x.fillText(title, x0 + ww/2, y0 + 46);
+      x.fillStyle = color; x.font = '800 25px system-ui, Arial'; x.fillText(sub, x0 + ww/2, y0 + 88);
+    }
+    zone(138, 438, 430, 130, 'PLAYER STACK', 'chip count / bankroll', 'rgba(128,255,226,0.88)');
+    zone(w - 568, 438, 430, 130, 'ACTION ZONE', 'call • raise • fold gestures', 'rgba(255,120,210,0.92)');
+
+    x.fillStyle = 'rgba(255,255,255,0.70)';
+    x.font = '800 24px system-ui, Arial';
+    x.fillText('Cards and pot stay inside the pass line', w/2, 622);
   });
 }
 
@@ -1789,12 +1834,16 @@ function addScorpionRoom(scene, R, wallHeight){
 
   const scorpionFrontTable = addScorpionRoomFrontTable(root, console.log);
 
-  const guardRailMat = new THREE.MeshStandardMaterial({ color: 0x2d0f28, roughness: 0.48, metalness: 0.22, emissive: 0x4a0b3a, emissiveIntensity: 0.42 });
-  [[-4.1, 0.62, 1.84, 0.08, 1.0], [4.1, 0.62, 1.84, 0.08, 1.0], [0, 0.62, 2.54, 7.6, 0.08]].forEach(([x,y,z,w,d])=>{
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(w, 0.16, d), guardRailMat);
-    rail.position.set(x, y, z);
-    root.add(rail);
-  });
+  // Phase 107: removed the front/side guard rails. The Scorpion room is now walk-in open
+  // so users can physically approach and inspect the new display table before routing to gameplay.
+  const entryGlow = new THREE.Mesh(
+    new THREE.PlaneGeometry(7.2, 0.12),
+    new THREE.MeshBasicMaterial({ color: 0xff5dc8, transparent: true, opacity: 0.42, depthWrite: false, side: THREE.DoubleSide })
+  );
+  entryGlow.rotation.x = -Math.PI * 0.5;
+  entryGlow.position.set(0, 0.072, 2.46);
+  entryGlow.name = 'PHASE_107_SCORPION_OPEN_WALK_IN_ENTRY_LINE';
+  root.add(entryGlow);
 
   const lightA = new THREE.PointLight(0xff7fd0, 1.4, 18, 2.0);
   lightA.position.set(0, 3.8, 1.2);
@@ -2736,7 +2785,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(8.4, 56, 56),
+    new THREE.SphereGeometry(10.8, 64, 64),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2748,19 +2797,19 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.22
     })
   );
-  moon.position.set(-14, wallHeight + 33.0, -(R + 30.0));
+  moon.position.set(-18, wallHeight + 52.0, -(R + 64.0));
   moon.material.depthTest = false;
   moon.material.depthWrite = false;
   moon.renderOrder = 120;
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(78.0, 78.0, 1);
+  moonHalo.scale.set(112.0, 112.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(5.2, 44, 44),
+    new THREE.SphereGeometry(7.4, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2772,7 +2821,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.18
     })
   );
-  mars.position.set(18, wallHeight + 35.0, -(R + 35.0));
+  mars.position.set(24, wallHeight + 55.0, -(R + 72.0));
   mars.visible = true;
   mars.material.depthTest = false;
   mars.material.depthWrite = false;
@@ -2781,7 +2830,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(54.0, 54.0, 1);
+  marsHalo.scale.set(82.0, 82.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2807,9 +2856,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.75, 560, 1.45);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 5.2, 720, 1.25);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 1.75, 420, 1.55);
+  const marsGlow = new THREE.PointLight(0xff9a72, 3.6, 580, 1.35);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
@@ -2987,26 +3036,26 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
     moon.position.set(
-      -23 + Math.sin(t * 0.020) * 2.6,
-      wallHeight + 25.0 + Math.sin(t * 0.090) * 0.8,
-      -(R + 43.0) + Math.cos(t * 0.016) * 2.4
+      -18 + Math.sin(t * 0.020) * 2.6,
+      wallHeight + 52.0 + Math.sin(t * 0.090) * 0.9,
+      -(R + 64.0) + Math.cos(t * 0.016) * 2.4
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     mars.position.set(
-      29 + Math.sin(t * 0.016 + 1.4) * 3.0,
-      wallHeight + 28.0 + Math.sin(t * 0.070 + 0.8) * 0.7,
-      -(R + 51.0) + Math.cos(t * 0.012 + 0.4) * 2.5
+      24 + Math.sin(t * 0.016 + 1.4) * 3.0,
+      wallHeight + 55.0 + Math.sin(t * 0.070 + 0.8) * 0.8,
+      -(R + 72.0) + Math.cos(t * 0.012 + 0.4) * 2.5
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.045 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.16 + 0.035 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.026 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.12 + 0.030 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{

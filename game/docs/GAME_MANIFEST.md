@@ -251,3 +251,13 @@ Implementation:
 - Watch hologram now uses unique scoped Phase 106 canvas/context names.
 - Keep Scorpion/PGA/Reiki/private scene work from prior phases.
 - Site untouched.
+
+
+## Phase 107 — Visual Table Flow Lock
+- Build label: `PHASE-107-VISUAL-TABLE-FLOW-LOCK`.
+- Raised Moon and Mars higher in the skyline and increased halo/glow opacity for Quest visibility.
+- Rebuilt the Espresso with Cream wall holder behind the Reiki hub so the ad face points back toward the Reiki/lobby sightline.
+- Removed the visual guard rail in front of the Scorpion game room so users can walk in and inspect the display table.
+- Rebuilt Scorpion table felt with one centered SVR/Scorpion logo, one pass/bet line, a Player Stack zone, and an Action Zone for call/raise/fold gestures.
+- Preserved the current Three.js/WebXR runtime; no A-Frame replacement.
+- Website/site untouched.
