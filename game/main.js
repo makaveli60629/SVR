@@ -17,14 +17,14 @@ import "./modules/poker_action_hud.js";
 import { runWebXREnforcerAudit } from "./modules/webxr_enforcer.js";
 import { buildTeleportRouteRegistry } from "./modules/teleport-router.js";
 
-const PHASE_92_BUILD = "PHASE-92-LAZY-SCORPION-PROXY-AFTER-BOOT";
+const PHASE_93_BUILD = "PHASE-93-LAZY-GEOMETRIC-TEXTURE-TABLE";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
-document.documentElement.dataset.svrBuild = PHASE_92_BUILD;
+document.documentElement.dataset.svrBuild = PHASE_93_BUILD;
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-const SCORPION_PROXY_DISABLED = params.has("noScorpionProxy") || params.get("scorpionProxy") === "0";
+const GEO_TABLE_DISABLED = params.has("noGeoTable") || params.get("geoTable") === "0";
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -34,13 +34,14 @@ const $toggleLog = document.getElementById("toggleLog");
 const $toggleJoints = document.getElementById("toggleJoints");
 const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
 
-window.SVR_PHASE92_BOOT_STATE = {
-  phase: PHASE_92_BUILD,
+window.SVR_PHASE93_BOOT_STATE = {
+  phase: PHASE_93_BUILD,
   appElementExists: !!document.getElementById("app"),
-  scorpionProxyLoadedAtBoot: false,
-  lazyScorpionProxy: true,
-  disabledByQuery: SCORPION_PROXY_DISABLED,
-  note: "Scorpion storefront proxy loads only after lobby boot/render. Use ?noScorpionProxy=1 as emergency kill switch."
+  geometricTableLoadedAtBoot: false,
+  lazyGeometricTextureTable: true,
+  disabledByQuery: GEO_TABLE_DISABLED,
+  notScorpion: true,
+  note: "Standalone geometric texture table loads after lobby boot/render. Use ?noGeoTable=1 as emergency kill switch."
 };
 
 let lastStatusText = "";
@@ -79,7 +80,7 @@ if (AUTOCAM) document.body.classList.add("preview-mode");
 const enforcerAudit = runWebXREnforcerAudit({ log });
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData.SVR_WEBXR_ENFORCER_AUDIT = enforcerAudit;
-scene.userData.SVR_PHASE_92_BUILD = PHASE_92_BUILD;
+scene.userData.SVR_PHASE_93_BUILD = PHASE_93_BUILD;
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
@@ -109,50 +110,52 @@ Object.assign(sceneTargets, teleportRouter.legacySceneTargets);
 window.SVR_TELEPORT_ROUTER = teleportRouter;
 window.SVR_SCENE_TARGETS = sceneTargets;
 
-let scorpionProxyLoadStarted = false;
-let scorpionProxyInstalled = false;
-async function loadScorpionProxySafely(reason = "manual"){
-  if (SCORPION_PROXY_DISABLED){
-    window.SVR_PHASE92_SCORPION_PROXY = { phase: PHASE_92_BUILD, skipped: true, reason: "disabled-by-query" };
+let geoTableLoadStarted = false;
+let geoTableInstalled = false;
+async function loadGeometricTableSafely(reason = "manual"){
+  if (GEO_TABLE_DISABLED){
+    window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE_LOADER = { phase: PHASE_93_BUILD, skipped: true, reason: "disabled-by-query" };
     return null;
   }
-  if (scorpionProxyInstalled || scorpionProxyLoadStarted) return window.SVR_PHASE92_SCORPION_PROXY || null;
-  scorpionProxyLoadStarted = true;
-  window.SVR_PHASE92_SCORPION_PROXY = { phase: PHASE_92_BUILD, loading: true, reason, bootSafe: true };
+  if (geoTableInstalled || geoTableLoadStarted) return window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE_LOADER || null;
+  geoTableLoadStarted = true;
+  window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE_LOADER = { phase: PHASE_93_BUILD, loading: true, reason, bootSafe: true, notScorpion: true };
   try {
-    const mod = await import(`./modules/scorpion_storefront_proxy.js?v=phase92-lazy-${Date.now()}`);
-    if (typeof mod.installScorpionStorefrontProxy !== "function") throw new Error("installScorpionStorefrontProxy export missing");
-    const object = mod.installScorpionStorefrontProxy({ scene, sceneTargets, log });
-    scorpionProxyInstalled = !!object;
-    window.SVR_PHASE92_SCORPION_PROXY = {
-      phase: PHASE_92_BUILD,
+    const mod = await import(`./modules/geometric_texture_table.js?v=phase93-lazy-${Date.now()}`);
+    if (typeof mod.installGeometricTextureTable !== "function") throw new Error("installGeometricTextureTable export missing");
+    const object = await mod.installGeometricTextureTable({ scene, sceneTargets, tableCenter, log });
+    geoTableInstalled = !!object;
+    window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE_LOADER = {
+      phase: PHASE_93_BUILD,
       loading: false,
-      installed: scorpionProxyInstalled,
+      installed: geoTableInstalled,
       reason,
       objectName: object?.name || null,
       recovered: true,
-      note: "Lazy-loaded after lobby boot. If it fails, the game stays alive."
+      notScorpion: true,
+      note: "Standalone geometric texture table lazy-loaded after lobby boot. If it fails, the game stays alive."
     };
-    if (scorpionProxyInstalled) setStatus("Scorpion storefront proxy loaded safely", { force: true });
+    if (geoTableInstalled) setStatus("Geometric texture table loaded safely", { force: true });
     return object;
   } catch (err){
-    window.SVR_PHASE92_SCORPION_PROXY = {
-      phase: PHASE_92_BUILD,
+    window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE_LOADER = {
+      phase: PHASE_93_BUILD,
       loading: false,
       installed: false,
       failed: true,
       reason,
       message: err?.message || String(err),
       stack: err?.stack || null,
-      recovered: true
+      recovered: true,
+      notScorpion: true
     };
-    console.warn("[SVR] Lazy Scorpion proxy failed safely", err);
-    setStatus("Scorpion proxy skipped safely", { force: true });
+    console.warn("[SVR] Geometric texture table failed safely", err);
+    setStatus("Geometric table skipped safely", { force: true });
     return null;
   }
 }
-window.SVR_LOAD_SCORPION_PROXY = loadScorpionProxySafely;
-window.SVR_DISABLE_SCORPION_PROXY_NOTE = "Reload with ?noScorpionProxy=1 to skip the lazy storefront proxy.";
+window.SVR_LOAD_GEOMETRIC_TABLE = loadGeometricTableSafely;
+window.SVR_DISABLE_GEOMETRIC_TABLE_NOTE = "Reload with ?noGeoTable=1 to skip the lazy geometric texture table.";
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -254,7 +257,7 @@ function gotoScene(key){
     const path = rec.scenePath.replace(/^game\//, "./");
     window.SVR_LAST_ROUTE = { requested: key, routeKey, label: rec.label || routeKey, type: rec.type || "private_scene", privateScene: true, scenePath: rec.scenePath };
     setStatus(`Opening private scene: ${rec.label || routeKey}`, { force: true });
-    setTimeout(()=>{ window.location.href = `${path}?v=phase92-private-route`; }, 80);
+    setTimeout(()=>{ window.location.href = `${path}?v=phase93-private-route`; }, 80);
     return true;
   }
 
@@ -332,7 +335,7 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
   if (e.code === "KeyG") watchActions.toggleHologram();
-  if (e.code === "KeyP") loadScorpionProxySafely("keyboard-p");
+  if (e.code === "KeyP") loadGeometricTableSafely("keyboard-p");
   if (e.code === "Digit1") gotoScene("lobby");
   if (e.code === "Digit2") gotoScene("table");
   if (e.code === "Digit3") gotoScene("seat");
@@ -356,7 +359,7 @@ window.SVR_HOLOGRAM_MENU = hologram;
 window.SVR_HOLOGRAM_DOM_FALLBACK = holoFallback;
 window.SVR_OPEN_HOLOGRAM = ()=>holoFallback?.setVisible(true, "manual-global-open");
 window.SVR_CLOSE_HOLOGRAM = ()=>holoFallback?.setVisible(false, "manual-global-close");
-window.SVR_PHASE92_HOLOGRAM_HOTFIX = { phase: PHASE_92_BUILD, forcedDomFallback: true, xrUses3d: true };
+window.SVR_PHASE93_HOLOGRAM_HOTFIX = { phase: PHASE_93_BUILD, forcedDomFallback: true, xrUses3d: true };
 
 $toggleJoints?.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
@@ -367,7 +370,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 92 lazy Scorpion proxy loaded after boot.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 93 geometric table lazy-loader armed.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -455,9 +458,9 @@ renderer.setAnimationLoop(()=>{
 
   if (!firstRenderedFrame){
     firstRenderedFrame = true;
-    window.SVR_PHASE92_BOOT_STATE.firstRenderedFrame = true;
-    if (!AUTOCAM && !SCORPION_PROXY_DISABLED){
-      setTimeout(()=>loadScorpionProxySafely("post-first-render-delay"), 3200);
+    window.SVR_PHASE93_BOOT_STATE.firstRenderedFrame = true;
+    if (!AUTOCAM && !GEO_TABLE_DISABLED){
+      setTimeout(()=>loadGeometricTableSafely("post-first-render-delay"), 3200);
     }
   }
 });
