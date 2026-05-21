@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import "./modules/scorpion_integration_guard.js";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -8,23 +7,13 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { createHologramMenu } from "./modules/hologram_menu.js";
-import { createHologramDomFallback } from "./modules/hologram_dom_fallback.js";
-import { applyWatchHardfix } from "./modules/watch_hardfix.js";
-import { createNpcAvatarSystem } from "./modules/npc_avatar_system.js";
-import { createPlayablePoker } from "./modules/playable_poker.js";
-import "./modules/poker_action_hud.js";
-import { runWebXREnforcerAudit } from "./modules/webxr_enforcer.js";
-import { buildTeleportRouteRegistry } from "./modules/teleport-router.js";
+import { PHASE_99_BUILD, routeLabel, PHASE_99_SCENE_ADD_LOCK } from "./modules/private_room_registry.js";
 
-const PHASE_95_BUILD = "PHASE-95-VISIBLE-GEOMETRIC-TABLE-WRAPPER";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
-document.documentElement.dataset.svrBuild = PHASE_95_BUILD;
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-const GEO_TABLE_DISABLED = params.has("noGeoTable") || params.get("geoTable") === "0";
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -33,17 +22,6 @@ const $err = document.getElementById("err");
 const $toggleLog = document.getElementById("toggleLog");
 const $toggleJoints = document.getElementById("toggleJoints");
 const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
-
-window.SVR_PHASE95_BOOT_STATE = {
-  phase: PHASE_95_BUILD,
-  appElementExists: !!document.getElementById("app"),
-  geometricTableLoadedAtBoot: false,
-  lazyGeometricTextureTable: true,
-  visibleWrapper: true,
-  disabledByQuery: GEO_TABLE_DISABLED,
-  notScorpion: true,
-  note: "Visible wrapper loads after lobby render. Use ?noGeoTable=1 as emergency kill switch."
-};
 
 let lastStatusText = "";
 let lastStatusAt = 0;
@@ -65,26 +43,22 @@ function setMode(text){
 }
 
 function log(...args){
-  if (!$log) return;
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
   $log.textContent += line + "\n";
   $log.scrollTop = $log.scrollHeight;
 }
 
-$toggleLog?.addEventListener("click", ()=>{
-  if (!$log) return;
+$toggleLog.addEventListener("click", ()=>{
   $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
 });
 
 if (AUTOCAM) document.body.classList.add("preview-mode");
 
-const enforcerAudit = runWebXREnforcerAudit({ log });
 const { scene, camera, renderer } = createCore({ containerId: "app" });
-scene.userData.SVR_WEBXR_ENFORCER_AUDIT = enforcerAudit;
-scene.userData.SVR_PHASE_95_BUILD = PHASE_95_BUILD;
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
+
 
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
@@ -95,75 +69,15 @@ window.addEventListener("unhandledrejection", (e)=>{
   if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e));
 });
 
-const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
+let world = null;
+let desktop = null;
 setStatus("Loading world…", { force: true });
-const world = await buildSkylineRoom(scene, { log, renderer });
-const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
-
-if (!sceneTargets.pgaDrive) sceneTargets.pgaDrive = sceneTargets.pgaWall || sceneTargets.pga || sceneTargets.lobby;
-if (!sceneTargets.chipPutt) sceneTargets.chipPutt = sceneTargets.pgaWall || sceneTargets.pga || sceneTargets.lobby;
-if (!sceneTargets.storeRoom) sceneTargets.storeRoom = sceneTargets.sponsor || sceneTargets.lobby;
-if (!sceneTargets.smokerLounge) sceneTargets.smokerLounge = sceneTargets.sponsor || sceneTargets.lobby;
-if (!sceneTargets.reikiRoom) sceneTargets.reikiRoom = sceneTargets.reiki || sceneTargets.lobby;
-if (!sceneTargets.spaceStation) sceneTargets.spaceStation = sceneTargets.sponsor || sceneTargets.lobby;
-const teleportRouter = buildTeleportRouteRegistry(sceneTargets, seats, tableCenter);
-Object.assign(sceneTargets, teleportRouter.legacySceneTargets);
-window.SVR_TELEPORT_ROUTER = teleportRouter;
-window.SVR_SCENE_TARGETS = sceneTargets;
-
-let geoTableLoadStarted = false;
-let geoTableInstalled = false;
-async function loadGeometricTableSafely(reason = "manual"){
-  if (GEO_TABLE_DISABLED){
-    window.SVR_PHASE95_GEOMETRIC_TEXTURE_TABLE_LOADER = { phase: PHASE_95_BUILD, skipped: true, reason: "disabled-by-query" };
-    return null;
-  }
-  if (geoTableInstalled || geoTableLoadStarted) return window.SVR_PHASE95_GEOMETRIC_TEXTURE_TABLE_LOADER || null;
-  geoTableLoadStarted = true;
-  window.SVR_PHASE95_GEOMETRIC_TEXTURE_TABLE_LOADER = { phase: PHASE_95_BUILD, loading: true, reason, bootSafe: true, notScorpion: true, visibleWrapper: true };
-  try {
-    const mod = await import(`./modules/geometric_texture_table_visible.js?v=phase95-visible-${Date.now()}`);
-    if (typeof mod.installGeometricTextureTable !== "function") throw new Error("installGeometricTextureTable export missing");
-    const object = await mod.installGeometricTextureTable({ scene, sceneTargets, tableCenter, log });
-    geoTableInstalled = !!object;
-    window.SVR_PHASE95_GEOMETRIC_TEXTURE_TABLE_LOADER = {
-      phase: PHASE_95_BUILD,
-      loading: false,
-      installed: geoTableInstalled,
-      reason,
-      objectName: object?.name || null,
-      recovered: true,
-      notScorpion: true,
-      visibleWrapper: true,
-      note: "Visible geometric table wrapper lazy-loaded after lobby boot. If it fails, the game stays alive."
-    };
-    if (geoTableInstalled) setStatus("Visible geometric table loaded", { force: true });
-    return object;
-  } catch (err){
-    window.SVR_PHASE95_GEOMETRIC_TEXTURE_TABLE_LOADER = {
-      phase: PHASE_95_BUILD,
-      loading: false,
-      installed: false,
-      failed: true,
-      reason,
-      message: err?.message || String(err),
-      stack: err?.stack || null,
-      recovered: true,
-      notScorpion: true,
-      visibleWrapper: true
-    };
-    console.warn("[SVR] Visible geometric texture table failed safely", err);
-    setStatus("Geometric table skipped safely", { force: true });
-    return null;
-  }
-}
-window.SVR_LOAD_GEOMETRIC_TABLE = loadGeometricTableSafely;
-window.SVR_DISABLE_GEOMETRIC_TABLE_NOTE = "Reload with ?noGeoTable=1 to skip the lazy visible geometric texture table.";
+world = await buildSkylineRoom(scene, { log, renderer });
+const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {}, portalLocks = [] } = world;
+desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement, roomClamp });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
-const npcAvatarSystem = createNpcAvatarSystem({ scene, seats, tableCenter, sceneTargets, currentScene: "lobby", log });
-window.SVR_NPC_AVATAR_SYSTEM = npcAvatarSystem?.state || null;
 
 const audio = createAudioPlaylist({
   tracks: [
@@ -173,8 +87,14 @@ const audio = createAudioPlaylist({
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
-    if (state.error){ setStatus(`Audio: ${state.error}`); return; }
-    if (state.enabled){ setStatus(`Now Playing: ${state.trackTitle}`); return; }
+    if (state.error){
+      setStatus(`Audio: ${state.error}`);
+      return;
+    }
+    if (state.enabled){
+      setStatus(`Now Playing: ${state.trackTitle}`);
+      return;
+    }
     setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
   }
 });
@@ -182,22 +102,6 @@ const audio = createAudioPlaylist({
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
-let hologram = null;
-let holoFallback = null;
-
-const poker = createPlayablePoker({
-  scene,
-  tableCenter,
-  seats,
-  log,
-  onState: (state)=>{
-    cash = state?.playerStack ?? cash;
-    if (state?.awaitingPlayer && !$status?.textContent?.includes("YOUR POKER TURN")){
-      setStatus(`YOUR POKER TURN: ${state.toCall > 0 ? `Call $${state.toCall}` : "Check"} / Raise / Fold`, { force: true, minGap: 0 });
-    }
-  }
-});
-window.SVR_PLAYABLE_POKER = poker;
 
 function currentHeadXZ(){
   if (renderer.xr.isPresenting){
@@ -214,8 +118,14 @@ function inTableZone(){
   return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7);
 }
 
-function seatLabel(){ return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing"; }
-function moveDesktopToSeat(seat){ camera.position.set(seat.x, 1.12, seat.z); camera.lookAt(0, 1.0, 0); }
+function seatLabel(){
+  return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing";
+}
+
+function moveDesktopToSeat(seat){
+  camera.position.set(seat.x, 1.12, seat.z);
+  camera.lookAt(0, 1.0, 0);
+}
 
 function joinTable(){
   if (!inTableZone()) return false;
@@ -230,115 +140,80 @@ function joinTable(){
   seatIndex = best;
   seated = true;
   const seat = seats[best];
-  if (renderer.xr.isPresenting) tp.setPlayerPose(seat.x, -0.42, seat.z);
-  else moveDesktopToSeat(seat);
+  if (renderer.xr.isPresenting){
+    tp.setPlayerPose(seat.x, -0.42, seat.z);
+  } else {
+    moveDesktopToSeat(seat);
+  }
   setMode(`Seat: ${seat.label}`);
-  setStatus("Poker controls: F Fold • C Check/Call • R Raise • A All-In • H Next Hand", { force: true });
   return true;
 }
 
 function leaveTable(){
   seated = false;
   seatIndex = -1;
-  if (renderer.xr.isPresenting) tp.setPlayerPose(0, 0, 4.8);
-  else { camera.position.set(0, 1.6, 4.8); camera.lookAt(0, 1.15, 0); }
+  if (renderer.xr.isPresenting){
+    tp.setPlayerPose(0, 0, 4.8);
+  } else {
+    camera.position.set(0, 1.6, 4.8);
+    camera.lookAt(0, 1.15, 0);
+  }
   return true;
 }
 
 function movePlayerToSpot(target, lookTarget = null){
   if (!target) return;
-  if (renderer.xr.isPresenting) tp.setPlayerPose(target.x, 0, target.z);
-  else { camera.position.set(target.x, 1.6, target.z); if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z); }
+  if (renderer.xr.isPresenting){
+    tp.setPlayerPose(target.x, 0, target.z);
+  } else {
+    camera.position.set(target.x, 1.6, target.z);
+    if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z);
+  }
 }
 
 function gotoScene(key){
-  const routeKey = teleportRouter.normalizeRouteKey(key);
-  const rec = teleportRouter.getRoute(routeKey) || sceneTargets?.[key];
-  if (!rec?.pos){ setStatus(`Route unavailable: ${key}`, { force: true }); return false; }
-
-  if (rec.scenePath && rec.privateScene){
-    const path = rec.scenePath.replace(/^game\//, "./");
-    window.SVR_LAST_ROUTE = { requested: key, routeKey, label: rec.label || routeKey, type: rec.type || "private_scene", privateScene: true, scenePath: rec.scenePath };
-    setStatus(`Opening private scene: ${rec.label || routeKey}`, { force: true });
-    setTimeout(()=>{ window.location.href = `${path}?v=phase95-private-route`; }, 80);
-    return true;
-  }
-
+  const rec = sceneTargets?.[key];
+  if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
-  setStatus(`Quick jump: ${rec.label || routeKey}`, { force: true });
-  window.SVR_LAST_ROUTE = { requested: key, routeKey, label: rec.label || routeKey, type: rec.type || "legacy", privateScene: !!rec.privateScene };
+  setStatus(`Phase 99 VR route: ${routeLabel(key)}`, { force: true });
   return true;
 }
 
-$sceneButtons.forEach((btn)=>{ btn.addEventListener("click", ()=>{ const key = btn.dataset.scene; if (key) gotoScene(key); }); });
-
-function getGameState(){
-  return {
-    audioEnabled: audio.getState().enabled,
-    trackTitle: audio.getState().trackTitle || "Lobby 07",
-    cash: poker.getState().playerStack ?? cash,
-    seated,
-    inTableZone: inTableZone(),
-    seatLabel: seatLabel(),
-    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true,
-    hologramVisible: !!hologram?.getState?.().visible || !!holoFallback?.getState?.().visible,
-    poker: poker.getState()
-  };
+let portalCooldownUntil = 0;
+function checkPortalLocks(){
+  if (AUTOCAM || !portalLocks?.length) return;
+  const now = performance.now();
+  if (now < portalCooldownUntil) return;
+  const p = currentHeadXZ();
+  for (const lock of portalLocks){
+    if (!lock?.position || !lock?.destination) continue;
+    const dx = p.x - lock.position.x;
+    const dz = p.z - lock.position.z;
+    const radius = lock.radius || 1.05;
+    if ((dx * dx + dz * dz) <= radius * radius){
+      if (gotoScene(lock.destination)){
+        portalCooldownUntil = now + (lock.cooldownMs || 3200);
+        setStatus(`VR portal locked: ${lock.label || lock.key} → ${routeLabel(lock.destination)}`, { force: true });
+      }
+      break;
+    }
+  }
 }
 
-const watchActions = {
-  toggleAudio: ()=>audio.toggle(),
-  nextTrack: ()=>audio.next(),
-  joinTable,
-  leaveTable,
-  toggleTeleport: ()=>tp.toggleMode(),
-  toggleHologram: ()=>{
-    if (renderer.xr.isPresenting){
-      const opened3d = hologram?.toggle("watch-holo-button-xr");
-      setStatus(opened3d ? "3D hologram opened" : "3D hologram closed", { force: true });
-      return opened3d;
-    }
-    const opened = holoFallback?.toggle("watch-holo-fallback-forced");
-    setStatus(opened ? "HOLOGRAM FALLBACK OPEN" : "HOLOGRAM FALLBACK CLOSED", { force: true });
-    return opened;
-  },
-  pokerFold: ()=>poker.fold(),
-  pokerCall: ()=>poker.checkCall(),
-  pokerRaise: ()=>poker.raise(),
-  pokerRaiseHalfPot: ()=>poker.raiseHalfPot?.() || poker.raise?.(),
-  pokerRaisePot: ()=>poker.raisePot?.() || poker.raise?.(),
-  pokerAllIn: ()=>poker.allIn(),
-  pokerNext: ()=>poker.nextHand(),
-  goLobby: ()=>gotoScene("lobby"),
-  goTable: ()=>gotoScene("main_poker_pit"),
-  goSeat: ()=>gotoScene("seat_south_player"),
-  goReiki: ()=>gotoScene("reiki_hub"),
-  goPga: ()=>gotoScene("pga_hub"),
-  goLegend: ()=>gotoScene("sponsor_wall"),
-  goSponsor: ()=>gotoScene("sponsor_wall"),
-  goScorpion: ()=>gotoScene("scorpion_room"),
-  goReikiRoom: ()=>gotoScene("reiki_room"),
-  goPgaDrive: ()=>gotoScene("pga_drive"),
-  goChipPutt: ()=>gotoScene("pga_chip_putt"),
-  goStoreRoom: ()=>gotoScene("vr_store"),
-  goSmokerLounge: ()=>gotoScene("smoker_lounge"),
-  goSpaceStation: ()=>gotoScene("space_station")
-};
+$sceneButtons.forEach((btn)=>{
+  btn.addEventListener("click", ()=>{
+    const key = btn.dataset.scene;
+    if (key) gotoScene(key);
+  });
+});
 
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
-  if (e.code === "KeyF") poker.fold();
-  if (e.code === "KeyC") poker.checkCall();
-  if (e.code === "KeyR") poker.raise();
-  if (e.code === "KeyA") poker.allIn();
-  if (e.code === "KeyH") poker.nextHand();
   if (e.code === "KeyM") await audio.toggle();
   if (e.code === "KeyN") await audio.next();
   if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
-  if (e.code === "KeyG") watchActions.toggleHologram();
-  if (e.code === "KeyP") loadGeometricTableSafely("keyboard-p");
   if (e.code === "Digit1") gotoScene("lobby");
   if (e.code === "Digit2") gotoScene("table");
   if (e.code === "Digit3") gotoScene("seat");
@@ -348,23 +223,49 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit7") gotoScene("sponsor");
   if (e.code === "Digit8") gotoScene("scorpion");
   if (e.code === "Digit9") gotoScene("reikiRoom");
-  if (e.code === "Digit0") gotoScene("pgaDrive");
-  if (e.code === "KeyK") gotoScene("chipPutt");
-  if (e.code === "KeyO") gotoScene("storeRoom");
-  if (e.code === "KeyB") gotoScene("smokerLounge");
-  if (e.code === "KeyS") gotoScene("spaceStation");
+  if (e.code === "Digit0") gotoScene("scorpion");
+  if (e.code === "KeyV") gotoScene("vrStore");
+  if (e.code === "KeyO") gotoScene("smokerLounge");
+  if (e.code === "KeyX") gotoScene("spaceRoom");
+  if (e.code === "KeyR") gotoScene("pgaRange");
 });
 
-const watch = createWristWatch({ scene, camera, renderer, getState: getGameState, actions: watchActions });
-hologram = createHologramMenu({ scene, camera, renderer, getState: getGameState, actions: watchActions });
-holoFallback = createHologramDomFallback({ getState: getGameState, actions: watchActions });
-window.SVR_HOLOGRAM_MENU = hologram;
-window.SVR_HOLOGRAM_DOM_FALLBACK = holoFallback;
-window.SVR_OPEN_HOLOGRAM = ()=>holoFallback?.setVisible(true, "manual-global-open");
-window.SVR_CLOSE_HOLOGRAM = ()=>holoFallback?.setVisible(false, "manual-global-close");
-window.SVR_PHASE95_HOLOGRAM_HOTFIX = { phase: PHASE_95_BUILD, forcedDomFallback: true, xrUses3d: true };
+const watch = createWristWatch({
+  scene,
+  camera,
+  renderer,
+  getState: ()=>({
+    audioEnabled: audio.getState().enabled,
+    trackTitle: audio.getState().trackTitle || "Lobby 07",
+    cash,
+    seated,
+    inTableZone: inTableZone(),
+    seatLabel: seatLabel(),
+    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
+  }),
+  actions: {
+    toggleAudio: ()=>audio.toggle(),
+    nextTrack: ()=>audio.next(),
+    joinTable,
+    leaveTable,
+    toggleTeleport: ()=>tp.toggleMode(),
+    goLobby: ()=>gotoScene("lobby"),
+    goTable: ()=>gotoScene("table"),
+    goSeat: ()=>gotoScene("seat"),
+    goReiki: ()=>gotoScene("reiki"),
+    goPga: ()=>gotoScene("pga"),
+    goLegend: ()=>gotoScene("legends"),
+    goSponsor: ()=>gotoScene("sponsor"),
+    goScorpion: ()=>gotoScene("scorpion"),
+    goReikiRoom: ()=>gotoScene("reikiRoom"),
+    goPgaRange: ()=>gotoScene("pgaRange"),
+    goVrStore: ()=>gotoScene("vrStore"),
+    goSmokerLounge: ()=>gotoScene("smokerLounge"),
+    goSpaceRoom: ()=>gotoScene("spaceRoom")
+  }
+});
 
-$toggleJoints?.addEventListener("click", ()=>{
+$toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
@@ -373,7 +274,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 95 visible geometric table armed.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_99_BUILD}: full VR scene routes active, safe spawn mats locked, private rooms added.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -389,7 +290,6 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
-  document.getElementById("svrPokerHud")?.classList.add("svr-hidden");
   await audio.prime();
   await audio.start();
   await tp.onSessionStart();
@@ -398,11 +298,9 @@ renderer.xr.addEventListener("sessionend", ()=>{
   setHudVisible(true);
   const nav = document.getElementById("sceneNav");
   if (nav && !AUTOCAM) nav.style.display = "flex";
-  document.getElementById("svrPokerHud")?.classList.remove("svr-hidden");
 });
 
 let tPrev = performance.now();
-let firstRenderedFrame = false;
 const previewTarget = new THREE.Vector3(0, 1.25, 0);
 const previewPos = new THREE.Vector3();
 const previewShots = [
@@ -417,7 +315,7 @@ renderer.setAnimationLoop(()=>{
   tPrev = now;
 
   if (!renderer.xr.isPresenting){
-    if (!AUTOCAM) desktop.update(dt);
+    if (!AUTOCAM && desktop) desktop.update(dt);
     else {
       const shotIndex = Math.floor(now / 9000) % previewShots.length;
       const shot = previewShots[shotIndex];
@@ -437,8 +335,6 @@ renderer.setAnimationLoop(()=>{
   }
 
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
-  if (npcAvatarSystem?.update) npcAvatarSystem.update(dt);
-  if (poker?.update) poker.update(dt);
 
   hands.update(dt);
   hands.updateDebug();
@@ -448,24 +344,22 @@ renderer.setAnimationLoop(()=>{
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
   if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } });
+    tp.update({
+      dt,
+      leftHand,
+      rightHand,
+      leftController,
+      rightController,
+      statusCb: (text)=>{ setStatus(text); },
+      modeCb: (text)=>{ setMode(text); }
+    });
   }
 
-  if (watch) {
-    watch.update(dt, leftHand, rightHand);
-    applyWatchHardfix(watch.object, camera, renderer);
-  }
-  if (hologram) hologram.update(dt, leftHand, rightHand);
+  checkPortalLocks();
+
+  if (watch) watch.update(dt, leftHand, rightHand);
 
   renderer.render(scene, camera);
-
-  if (!firstRenderedFrame){
-    firstRenderedFrame = true;
-    window.SVR_PHASE95_BOOT_STATE.firstRenderedFrame = true;
-    if (!AUTOCAM && !GEO_TABLE_DISABLED){
-      setTimeout(()=>loadGeometricTableSafely("post-first-render-delay"), 3200);
-    }
-  }
 });
 
 const canvasEl = renderer.domElement;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • Phase 97 Desktop Overlay Hide</title>
+  <title>ScarlettVR Poker • Phase 99 Full VR Scene Add Lock</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -11,125 +11,112 @@
     html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
     #app { position: fixed; inset: 0; }
     canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
-    #hud { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10; display: flex; gap: 10px; align-items: center; justify-content: space-between; pointer-events: none; }
-    .pill { background: rgba(0,0,0,.55); border: 1px solid rgba(180,140,255,.35); backdrop-filter: blur(8px); border-radius: 999px; padding: 8px 12px; color: #e9e9ff; font-size: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.5); pointer-events: none; }
-    .btn { pointer-events: auto; border: 1px solid rgba(180,140,255,.45); background: rgba(0,0,0,.55); color: #fff; border-radius: 999px; padding: 8px 12px; cursor: pointer; user-select: none; }
+    #hud {
+      position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10;
+      display: flex; gap: 10px; align-items: center; justify-content: space-between;
+      pointer-events: none;
+    }
+    .pill {
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.35);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #e9e9ff;
+      font-size: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      pointer-events: none;
+    }
+    .btn {
+      pointer-events: auto;
+      border: 1px solid rgba(180,140,255,.45);
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
     .btn:hover { background: rgba(60,40,90,.55); }
-    #sceneNav{ position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; pointer-events: auto; }
-    .scene-btn{ border: 1px solid rgba(120,255,186,.42); background: rgba(2,10,8,.62); color: #eafff4; border-radius: 999px; padding: 8px 12px; cursor: pointer; box-shadow: 0 10px 28px rgba(0,0,0,.35); font-size: 12px; }
+    #sceneNav{
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+      pointer-events: auto;
+    }
+    .scene-btn{
+      border: 1px solid rgba(120,255,186,.42);
+      background: rgba(2,10,8,.62);
+      color: #eafff4;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      font-size: 12px;
+    }
     .scene-btn:hover{ background: rgba(10,48,33,.72); }
     body.preview-mode #sceneNav { display:none !important; }
-    body.svr-low-perf .pill, body.svr-low-perf .btn, body.svr-low-perf .scene-btn { box-shadow: none; backdrop-filter: none; }
-    #log { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10; max-height: 38vh; overflow: auto; display: none; background: rgba(0,0,0,.55); border: 1px solid rgba(180,140,255,.25); border-radius: 14px; padding: 10px 12px; color: #d7d7ff; font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; white-space: pre-wrap; }
-    #err { position: fixed; inset: 0; display: none; z-index: 50; background: rgba(0,0,0,.88); color: #fff; padding: 18px; font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; overflow: auto; }
-    body.preview-mode #hud, body.preview-mode #log, body.preview-mode #err { display: none !important; }
-    #hardHoloButton{position:fixed;right:14px;top:62px;z-index:2147483000;border:1px solid rgba(246,226,127,.95);background:linear-gradient(135deg,rgba(88,24,150,.96),rgba(208,92,255,.96));color:#fff;border-radius:999px;padding:13px 18px;font-weight:1000;letter-spacing:.04em;box-shadow:0 0 34px rgba(208,92,255,.55);cursor:pointer;pointer-events:auto}
-    #hardHoloOverlay{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 34%,rgba(208,92,255,.22),rgba(0,0,0,.58) 62%,rgba(0,0,0,.82));color:#fff;pointer-events:auto}
-    #hardHoloOverlay.open{display:flex}.hard-holo-panel{width:min(980px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;border:1px solid rgba(246,226,127,.72);border-radius:30px;background:linear-gradient(135deg,rgba(4,7,18,.97),rgba(43,9,82,.97));box-shadow:0 0 90px rgba(208,92,255,.36);padding:22px}.hard-holo-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.hard-holo-title{font-size:clamp(30px,5vw,58px);font-weight:1000;line-height:1}.hard-holo-sub{color:#7ff5c7;font-weight:900;letter-spacing:.12em;font-size:12px;margin-bottom:6px}.hard-holo-close{border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:12px 16px;font-weight:1000;cursor:pointer}.hard-holo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.hard-holo-card{min-height:96px;border:1px solid rgba(180,140,255,.55);background:linear-gradient(135deg,rgba(127,245,199,.10),rgba(208,92,255,.18));color:#fff;border-radius:18px;padding:14px;text-align:left;cursor:pointer}.hard-holo-card:hover{outline:2px solid #f6e27f;background:linear-gradient(135deg,rgba(208,92,255,.38),rgba(127,245,199,.14))}.hard-holo-card b{display:block;font-size:22px}.hard-holo-card span{display:block;margin-top:7px;font-size:12px;color:#7ff5c7;font-weight:900;text-transform:uppercase}.hard-holo-status{margin-top:14px;color:#f6e27f;font-weight:1000}@media(max-width:740px){.hard-holo-grid{grid-template-columns:1fr 1fr}.hard-holo-panel{padding:16px}}@media(max-width:460px){.hard-holo-grid{grid-template-columns:1fr}}
+    #log {
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10;
+      max-height: 38vh; overflow: auto; display: none;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.25);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: #d7d7ff;
+      font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+    #err {
+      position: fixed; inset: 0; display: none; z-index: 50;
+      background: rgba(0,0,0,.88);
+      color: #fff;
+      padding: 18px;
+      font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      overflow: auto;
+    }
+
+    body.preview-mode #hud,
+    body.preview-mode #log,
+    body.preview-mode #err { display: none !important; }
   </style>
   <script type="importmap">
-  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
   </script>
 </head>
 <body>
-  <!-- BUILD: PHASE-97-DESKTOP-OVERLAY-HIDE-GUARD -->
   <div id="app"></div>
-  <button id="hardHoloButton" type="button">HOLO MENU</button>
-  <div id="hardHoloOverlay" aria-hidden="true">
-    <section class="hard-holo-panel" role="dialog" aria-label="SVR hard hologram menu">
-      <div class="hard-holo-top"><div><div class="hard-holo-sub">PHASE 97 DESKTOP FALLBACK</div><div class="hard-holo-title">SVR HOLOGRAM</div><div style="color:rgba(255,255,255,.72);margin-top:8px">Desktop overlay hide guard active. Use HIDE UI / SHOW UI or press U.</div></div><button class="hard-holo-close" data-hard-close>CLOSE</button></div>
-      <div class="hard-holo-grid">
-        <button class="hard-holo-card" data-hard-route="./index.html?v=phase97-lobby"><b>Lobby</b><span>Main game</span></button>
-        <button class="hard-holo-card" data-hard-action="seat"><b>Seat</b><span>Use in-game seat</span></button>
-        <button class="hard-holo-card" data-hard-route="./scorpion.html?v=phase97"><b>Scorpion</b><span>Private poker</span></button>
-        <button class="hard-holo-card" data-hard-route="./reiki.html?v=phase97"><b>Reiki Room</b><span>Private scene</span></button>
-        <button class="hard-holo-card" data-hard-route="./pga-drive.html?v=phase97"><b>PGA Drive</b><span>Range</span></button>
-        <button class="hard-holo-card" data-hard-route="./chip-putt.html?v=phase97"><b>Chip / Putt</b><span>Short game</span></button>
-        <button class="hard-holo-card" data-hard-route="./store-room.html?v=phase97"><b>Store</b><span>VR store</span></button>
-        <button class="hard-holo-card" data-hard-route="./smoker-lounge.html?v=phase97"><b>Lounge</b><span>Private social</span></button>
-        <button class="hard-holo-card" data-hard-route="./space-station.html?v=phase97"><b>Space Station</b><span>Private space</span></button>
-        <button class="hard-holo-card" data-hard-action="teleport"><b>Teleport</b><span>Use fist/controller</span></button>
-        <button class="hard-holo-card" data-hard-action="call"><b>Check / Call</b><span>Poker action</span></button>
-        <button class="hard-holo-card" data-hard-action="fold"><b>Fold</b><span>Poker action</span></button>
-      </div>
-      <div id="hardHoloStatus" class="hard-holo-status">Ready. Desktop: press G or tap HOLO MENU. Press U to hide/show desktop UI.</div>
-    </section>
-  </div>
+
   <div id="hud">
     <div class="pill" id="status">Booting…</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: …</span>
-      <span class="pill">BUILD: PHASE-97-OVERLAY-HIDE</span>
+      <span class="pill">BUILD: PHASE-99-SCORPION-ROOM-TABLE-LOCK</span>
     </div>
   </div>
+
   <div id="sceneNav">
-    <button class="scene-btn" data-scene="lobby">Lobby</button>
+    <button class="scene-btn" data-scene="lobby">VR Lobby</button>
+    <button class="scene-btn" data-scene="table">Main Table</button>
     <button class="scene-btn" data-scene="seat">Seat</button>
-    <button class="scene-btn" data-scene="reiki">Reiki</button>
-    <button class="scene-btn" data-scene="pga">PGA</button>
-    <button class="scene-btn" data-scene="legends">Legend</button>
-    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
-    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
-    <button class="scene-btn" data-scene="pgaDrive">Drive</button>
-    <button class="scene-btn" data-scene="chipPutt">Chip/Putt</button>
-    <button class="scene-btn" data-scene="storeRoom">Store</button>
-    <button class="scene-btn" data-scene="smokerLounge">Lounge</button>
-    <button class="scene-btn" data-scene="spaceStation">Space</button>
+    <button class="scene-btn" data-scene="scorpion">Scorpion VR</button>
+    <button class="scene-btn" data-scene="reikiRoom">Reiki VR</button>
+    <button class="scene-btn" data-scene="pgaRange">PGA VR</button>
+    <button class="scene-btn" data-scene="vrStore">VR Store</button>
+    <button class="scene-btn" data-scene="smokerLounge">Lounge VR</button>
+    <button class="scene-btn" data-scene="spaceRoom">Space VR</button>
+    <button class="scene-btn" data-scene="sponsor">Sponsor Wall</button>
   </div>
+
   <pre id="log"></pre>
   <pre id="err"></pre>
-  <script>
-    (function(){
-      const overlay = document.getElementById('hardHoloOverlay');
-      const btn = document.getElementById('hardHoloButton');
-      const status = document.getElementById('hardHoloStatus');
-      function setOpen(open){ overlay.classList.toggle('open', !!open); overlay.setAttribute('aria-hidden', open ? 'false' : 'true'); window.SVR_HARD_HOLO_OPEN = !!open; }
-      function toggle(){ setOpen(!overlay.classList.contains('open')); }
-      window.SVR_HARD_OPEN_HOLOGRAM = () => setOpen(true);
-      window.SVR_HARD_CLOSE_HOLOGRAM = () => setOpen(false);
-      window.SVR_HARD_TOGGLE_HOLOGRAM = toggle;
-      btn.addEventListener('click', toggle);
-      overlay.addEventListener('click', (e)=>{
-        if (e.target === overlay || e.target.closest('[data-hard-close]')) { setOpen(false); return; }
-        const route = e.target.closest('[data-hard-route]');
-        if (route){ window.location.href = route.dataset.hardRoute; return; }
-        const act = e.target.closest('[data-hard-action]');
-        if (act){
-          const a = act.dataset.hardAction;
-          if (a === 'seat') { window.dispatchEvent(new KeyboardEvent('keydown', { code:'KeyJ' })); status.textContent = 'Seat command sent.'; }
-          else if (a === 'call') { window.dispatchEvent(new KeyboardEvent('keydown', { code:'KeyC' })); status.textContent = 'Check/Call command sent.'; }
-          else if (a === 'fold') { window.dispatchEvent(new KeyboardEvent('keydown', { code:'KeyF' })); status.textContent = 'Fold command sent.'; }
-          else if (a === 'teleport') { window.dispatchEvent(new KeyboardEvent('keydown', { code:'KeyT' })); status.textContent = 'Teleport toggle command sent.'; }
-        }
-      });
-      window.addEventListener('keydown', (e)=>{ if (e.code === 'KeyG' && !e.repeat) toggle(); if (e.code === 'Escape') setOpen(false); }, true);
-      window.SVR_PHASE97_GAME_ENTRY = { phase:'PHASE-97-DESKTOP-OVERLAY-HIDE-GUARD', ready:true, appElementExists: !!document.getElementById('app') };
-    })();
-  </script>
-  <script type="module" src="./main.js?v=phase97-desktop-overlay-hide"></script>
-  <script type="module" src="./modules/poker_table_fx.js?v=phase97"></script>
-  <script type="module" src="./modules/npc_bot_animation_fx.js?v=phase97"></script>
-  <script type="module" src="./modules/runtime_audit_guard.js?v=phase97"></script>
-  <script type="module" src="./modules/poker_feedback_fx.js?v=phase97"></script>
-  <script type="module" src="./modules/runtime_health_panel.js?v=phase97"></script>
-  <script type="module" src="./modules/poker_card_mesh_sync.js?v=phase97"></script>
-  <script type="module" src="./modules/poker_chip_motion_fx.js?v=phase97"></script>
-  <script type="module" src="./modules/private_scene_route_guard.js?v=phase97"></script>
-  <script type="module" src="./modules/quest_performance_monitor.js?v=phase97"></script>
-  <script type="module" src="./modules/gameplay_demo_polish.js?v=phase97"></script>
-  <script type="module" src="./modules/runtime_health_sync_patch.js?v=phase97"></script>
-  <script type="module" src="./modules/poker_custom_raise_ui.js?v=phase97"></script>
-  <script type="module" src="./modules/hud_conflict_guard.js?v=phase97"></script>
-  <script type="module" src="./modules/desktop_overlay_hide_guard.js?v=phase97"></script>
-  <script type="module" src="./modules/admin_online.js?v=phase97"></script>
-  <script type="module" src="./modules/quest_regression_bundle_audit.js?v=phase97"></script>
-  <script type="module" src="./modules/demo_candidate_lock.js?v=phase97"></script>
-  <script type="module" src="./modules/phase121_demo_status_patch.js?v=phase97"></script>
-  <script type="module" src="./modules/phase122_full_game_audit.js?v=phase97"></script>
-  <script src="modules/scorpion_chip_flow_polish.js?v=phase97"></script>
-  <script src="modules/scorpion_turn_ux_polish.js?v=phase97"></script>
-  <script src="modules/teleport_hotfix_guard.js?v=phase97"></script>
+
+  <script type="module" src="./main.js"></script>
 </body>
 </html>

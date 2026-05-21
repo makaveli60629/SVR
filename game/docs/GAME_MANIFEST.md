@@ -7,6 +7,15 @@ This folder exists to preserve working state, priorities, and handoff notes so p
 Source package used for this phase:
 - `game_next_phase_store_preview_watch.zip`
 
+
+## Phase 96 — Scorpion Table Front Lock
+- Current active build label: `PHASE-96-SCORPION-TABLE-FRONT-LOCK`.
+- Moved the visible table asset from the store-front prop path into the Scorpion game room/front-table area.
+- Store front now stays as a clean kiosk/portal preview instead of showing the table model.
+- Scorpion room now owns a dedicated front table mount with real table asset loading and procedural fallback.
+- Runtime unapproved Reiki sponsor/founder branding remains disabled and replaced with `AWAITING APPROVAL` placeholders.
+- Website/site side was not touched.
+
 ## Locked baselines
 - Official forearm watch baseline is the reference watch.
 - Watch screen should face upward.
@@ -112,7 +121,7 @@ Source package used for this phase:
 
 
 ## Phase 35 audit / restore
-- Restored the AWAITING APPROVAL founder image and logo assets into the Reiki hub.
+- Restored the UNAPPROVED_REIKI_BRANDING_REMOVED founder image and logo assets into the Reiki hub.
 - Rewrote the Reiki three-column storefront copy to read more professional and founder-led.
 - Moved the PGA hub to the south-west wall.
 - Raised Moon and Mars higher behind the city skyline and increased their glow.
@@ -131,4 +140,29 @@ Source package used for this phase:
 - donor modular split preserved
 
 ## Phase 42 modular overlay
-- AWAITING APPROVAL building ad refreshed to `AWAITING APPROVAL / L.A.` in neon green presentation styling.
+- UNAPPROVED_REIKI_BRANDING_REMOVED building ad refreshed to `UNAPPROVED_REIKI_BRANDING_REMOVED.COM / L.A.` in neon green presentation styling.
+
+
+## Phase 99 — Private Room Portal Hardening + Module Registry
+
+- Build label: `PHASE-99-SCORPION-ROOM-TABLE-LOCK`
+- Website/site side untouched.
+- Preserved Phase 96 Scorpion table front lock.
+- Added private room registry module.
+- Added route-safe portal markers and proximity portal handling.
+- Added backup back-to-lobby portal markers for Scorpion, Reiki Room, PGA Range, VR Store, Smoker Lounge, and Space Room.
+- Locked desktop movement clamp to prevent walking beyond safe lobby bounds.
+- Maintained unapproved Reiki sponsor/founder branding as SVR `AWAITING APPROVAL` placeholders.
+
+
+## Phase 99 full VR scene add lock
+- Every private room/storefront route now has a visible VR scene pod.
+- Scene pods include safe spawn mats, guard rings, sponsor/ad banner surfaces, and back-to-lobby route compatibility.
+- Website/site side was not touched.
+
+## Phase 99 — Scorpion Room Table Lock
+- Build label: `PHASE-99-SCORPION-ROOM-TABLE-LOCK`
+- Locked the new Scorpion table into the Scorpion Game Room/private room.
+- Storefront remains a portal/kiosk preview only.
+- Procedural fallback table remains visible if the GLB table asset is missing or dark.
+- Site untouched.

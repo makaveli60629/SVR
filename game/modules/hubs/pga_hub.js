@@ -1,135 +1,364 @@
 import * as THREE from "three";
 
-const PGA_HUB_BUILD = "PGA-WIDE-READABLE-2026-05-17";
-
-function canvasTexture(draw, w = 1800, h = 1000){
-  const c = document.createElement("canvas");
-  c.width = w; c.height = h;
-  const ctx = c.getContext("2d");
-  draw(ctx, w, h);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 8;
-  return t;
+function makeCanvasTexture(painter, width = 1024, height = 1024){
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  painter(ctx, width, height);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
 }
 
-function rr(ctx, x, y, w, h, r){
+function roundRect(ctx, x, y, w, h, r){
+  const rr = Math.min(r, w * 0.5, h * 0.5);
   ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
+  ctx.moveTo(x + rr, y);
+  ctx.arcTo(x + w, y, x + w, y + h, rr);
+  ctx.arcTo(x + w, y + h, x, y + h, rr);
+  ctx.arcTo(x, y + h, x, y, rr);
+  ctx.arcTo(x, y, x + w, y, rr);
   ctx.closePath();
 }
 
-function wrap(ctx, text, x, y, max, lh){
-  const words = String(text).split(/\s+/);
+function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = String(text || "").split(/\s+/);
   let line = "";
   let yy = y;
   for (const word of words){
-    const test = line ? line + " " + word : word;
-    if (ctx.measureText(test).width > max && line){ ctx.fillText(line, x, yy); line = word; yy += lh; }
-    else line = test;
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && line){
+      ctx.fillText(line, x, yy);
+      line = word;
+      yy += lineHeight;
+    } else {
+      line = test;
+    }
   }
   if (line) ctx.fillText(line, x, yy);
+  return yy;
 }
 
-function profileTexture(){
-  return canvasTexture((ctx, w, h)=>{
-    const g = ctx.createLinearGradient(0,0,w,h);
-    g.addColorStop(0,"#120609"); g.addColorStop(.58,"#230910"); g.addColorStop(1,"#050507");
-    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle = "#ff4054"; ctx.lineWidth = 18; rr(ctx,28,28,w-56,h-56,40); ctx.stroke();
+function buildProfileTexture(){
+  return makeCanvasTexture((ctx, w, h)=>{
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, "#0d0608");
+    grad.addColorStop(0.6, "#1a090d");
+    grad.addColorStop(1, "#050507");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "#ff3f52";
+    ctx.lineWidth = 16;
+    roundRect(ctx, 28, 28, w - 56, h - 56, 44);
+    ctx.stroke();
 
-    ctx.fillStyle = "rgba(255,64,84,.20)"; rr(ctx,62,56,w-124,116,26); ctx.fill();
-    ctx.fillStyle = "#ff8b96"; ctx.font = "900 46px Arial"; ctx.fillText("PGA GOLF HUB • LESSONS • TRAINING", 96, 130);
+    ctx.fillStyle = "rgba(255, 63, 82, 0.16)";
+    roundRect(ctx, 60, 60, w - 120, 132, 28);
+    ctx.fill();
+    ctx.fillStyle = "#ff7784";
+    ctx.font = "700 42px Arial";
+    ctx.fillText("SOUTH-WEST WALL • PGA HUB", 92, 126);
 
-    ctx.fillStyle = "#fff"; ctx.font = "900 92px Arial"; ctx.fillText("JUAN E. ESPEJO", 96, 270);
-    ctx.fillStyle = "#ffd1d7"; ctx.font = "800 44px Arial"; ctx.fillText("PGA Pro • Maryville Golf Academy Founder", 96, 342);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "700 92px Arial";
+    ctx.fillText("JUAN E. ESPEJO", 92, 254);
+    ctx.fillStyle = "#ffc2c9";
+    ctx.font = "600 40px Arial";
+    ctx.fillText("PGA Pro • Maryville Golf Academy Founder", 92, 324);
 
-    ctx.fillStyle = "rgba(255,255,255,.085)"; rr(ctx,76,405,w-152,230,28); ctx.fill();
-    ctx.strokeStyle = "rgba(255,128,144,.52)"; ctx.lineWidth = 5; rr(ctx,76,405,w-152,230,28); ctx.stroke();
-    ctx.fillStyle = "#ff8b96"; ctx.font = "900 42px Arial"; ctx.fillText("ABOUT", 112, 475);
-    ctx.fillStyle = "#fff"; ctx.font = "700 36px Arial";
-    wrap(ctx,"Professional golf training storefront for lessons, academy promotion, sponsor media, and private PGA range access.",112,535,w-224,48);
+    ctx.fillStyle = "#ff7784";
+    ctx.font = "700 48px Arial";
+    ctx.fillText("ABOUT", 92, 420);
+    ctx.fillStyle = "#f7f0f2";
+    ctx.font = "500 38px Arial";
+    let y = drawWrappedText(ctx,
+      "Dedicated VR golf storefront reserved for training, lessons, academy promotion, and future branded PGA media. Built as a professional modular client hub so it can be refined without disturbing the main lobby baseline.",
+      92, 474, w - 184, 46);
 
-    ctx.fillStyle = "rgba(255,255,255,.085)"; rr(ctx,76,685,w-152,230,28); ctx.fill();
-    ctx.strokeStyle = "rgba(255,128,144,.52)"; ctx.lineWidth = 5; rr(ctx,76,685,w-152,230,28); ctx.stroke();
-    ctx.fillStyle = "#ff8b96"; ctx.font = "900 42px Arial"; ctx.fillText("TRAINING FOCUS", 112, 755);
-    ctx.fillStyle = "#fff"; ctx.font = "800 36px Arial";
-    ["Private instruction","Group lessons","Beginner fundamentals","Player development"].forEach((v,i)=>ctx.fillText("• " + v,126,820+i*48));
-  }, 1800, 1000);
+    y += 76;
+    ctx.fillStyle = "#ff7784";
+    ctx.font = "700 42px Arial";
+    ctx.fillText("FOCUS", 92, y);
+    y += 54;
+    ctx.fillStyle = "#f7f0f2";
+    ctx.font = "500 36px Arial";
+    [
+      "• Private instruction",
+      "• Group lessons",
+      "• Beginner fundamentals",
+      "• Player development",
+      "• Sponsor-ready showcase"
+    ].forEach((line)=>{ ctx.fillText(line, 98, y); y += 50; });
+
+    ctx.fillStyle = "rgba(255,255,255,0.08)";
+    roundRect(ctx, 74, h - 232, w - 148, 142, 26);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 128, 144, 0.52)";
+    ctx.lineWidth = 4;
+    roundRect(ctx, 74, h - 232, w - 148, 142, 26);
+    ctx.stroke();
+    ctx.fillStyle = "#ff7784";
+    ctx.font = "700 34px Arial";
+    ctx.fillText("RESERVED SPOTLIGHT", 108, h - 172);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "700 42px Arial";
+    ctx.fillText("VR GOLF / PGA HUB", 108, h - 118);
+  }, 1100, 1500);
 }
 
-function headerTexture(){
-  return canvasTexture((ctx,w,h)=>{
-    ctx.fillStyle = "#100609"; ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle = "rgba(255,208,214,.9)"; ctx.lineWidth = 10; rr(ctx,18,18,w-36,h-36,24); ctx.stroke();
-    ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillStyle = "#fff"; ctx.font = "900 96px Arial"; ctx.fillText("JUAN ESPEJO PGA HUB",w/2,92);
-    ctx.fillStyle = "#ffb0ba"; ctx.font = "800 36px Arial"; ctx.fillText("GOLF LESSONS • TRAINING • ACADEMY • SPONSOR SHOWCASE",w/2,178);
-  }, 1900, 230);
-}
+function buildBadgeTexture(){
+  return makeCanvasTexture((ctx, w, h)=>{
+    const cx = w / 2;
+    const cy = h / 2;
+    const outer = Math.min(w, h) * 0.46;
+    const glow = ctx.createRadialGradient(cx, cy, outer * 0.14, cx, cy, outer * 1.15);
+    glow.addColorStop(0, "rgba(255, 90, 110, 0.42)");
+    glow.addColorStop(1, "rgba(255, 90, 110, 0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, w, h);
 
-function reserveTexture(){
-  return canvasTexture((ctx,w,h)=>{
-    ctx.fillStyle = "#240307"; rr(ctx,0,0,w,h,26); ctx.fill();
-    ctx.strokeStyle = "#ff4a59"; ctx.lineWidth = 10; rr(ctx,10,10,w-20,h-20,24); ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, outer, 0, Math.PI * 2);
+    ctx.fillStyle = "#7a0915";
+    ctx.fill();
+    ctx.lineWidth = 28;
+    ctx.strokeStyle = "#ff4456";
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, outer * 0.78, 0, Math.PI * 2);
+    ctx.fillStyle = "#250306";
+    ctx.fill();
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = "rgba(255, 206, 212, 0.9)";
+    ctx.stroke();
+
+    ctx.fillStyle = "#ffe9ec";
     ctx.textAlign = "center";
-    ctx.fillStyle = "#ff8b96"; ctx.font = "900 44px Arial"; ctx.fillText("RESERVED",w/2,82);
-    ctx.fillStyle = "#fff"; ctx.font = "900 58px Arial"; ctx.fillText("JUAN ESPEJO",w/2,160);
-  }, 1100, 240);
+    ctx.font = "700 54px Arial";
+    ctx.fillText("FEATURE", cx, cy - 146);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "700 210px Arial";
+    ctx.fillText("PGA", cx, cy + 54);
+    ctx.fillStyle = "#ffccd2";
+    ctx.font = "700 44px Arial";
+    ctx.fillText("SPOTLIGHT", cx, cy + 162);
+  }, 900, 900);
 }
 
-function portraitTexture(){
-  const tex = new THREE.TextureLoader().load("./assets/ui/juan-espejo.jpg");
-  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; return tex;
+function buildReserveTexture(){
+  return makeCanvasTexture((ctx, w, h)=>{
+    ctx.fillStyle = "#240307";
+    roundRect(ctx, 0, 0, w, h, 26);
+    ctx.fill();
+    ctx.strokeStyle = "#ff4a59";
+    ctx.lineWidth = 10;
+    roundRect(ctx, 10, 10, w - 20, h - 20, 24);
+    ctx.stroke();
+    ctx.fillStyle = "#ff7784";
+    ctx.textAlign = "center";
+    ctx.font = "700 64px Arial";
+    ctx.fillText("RESERVED FOR", w / 2, 96);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "700 74px Arial";
+    ctx.fillText("JUAN ESPEJO", w / 2, 184);
+  }, 900, 240);
 }
 
-export function addPgaHub(scene, { radius = 26, log = console.log } = {}){
+function buildPortraitTexture(){
+  const loader = new THREE.TextureLoader();
+  const tex = loader.load('./assets/ui/juan-espejo.jpg');
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+
+export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.log } = {}){
   try {
-    const angle = Math.PI * .75;
-    const inward = new THREE.Vector3(-Math.cos(angle),0,-Math.sin(angle));
-    const tangent = new THREE.Vector3(-Math.sin(angle),0,Math.cos(angle));
+    const anchorAngle = Math.PI * 0.75; // south-west wall
+    const inward = new THREE.Vector3(-Math.cos(anchorAngle), 0, -Math.sin(anchorAngle));
+    const tangent = new THREE.Vector3(-Math.sin(anchorAngle), 0, Math.cos(anchorAngle));
+    const wallInset = radius - 0.08;
+
     const group = new THREE.Group();
-    group.name = PGA_HUB_BUILD;
-    group.position.set(Math.cos(angle)*(radius-.08),0,Math.sin(angle)*(radius-.08));
-    group.position.addScaledVector(tangent,-.06);
+    group.position.set(Math.cos(anchorAngle) * wallInset, 0, Math.sin(anchorAngle) * wallInset);
+    group.position.addScaledVector(tangent, -0.06);
     group.lookAt(group.position.clone().add(inward));
 
-    const accent = new THREE.MeshStandardMaterial({color:0xff4456,roughness:.18,metalness:.38,emissive:0x6b0c15,emissiveIntensity:.96});
-    const wallMat = new THREE.MeshStandardMaterial({color:0x070508,roughness:.66,metalness:.08,emissive:0x14060a,emissiveIntensity:.22,side:THREE.DoubleSide});
+    const frameMat = new THREE.MeshStandardMaterial({ color: 0x12090c, roughness: 0.34, metalness: 0.22, emissive: 0x371017, emissiveIntensity: 0.24 });
+    const accentMat = new THREE.MeshStandardMaterial({ color: 0xff4456, roughness: 0.18, metalness: 0.38, emissive: 0x6b0c15, emissiveIntensity: 0.96 });
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x070508, roughness: 0.66, metalness: 0.08, emissive: 0x14060a, emissiveIntensity: 0.22, side: THREE.DoubleSide });
+    const softGlass = new THREE.MeshStandardMaterial({ color: 0xffd8df, transparent: true, opacity: 0.05, roughness: 0.08, metalness: 0.18, emissive: 0x2a0b12, emissiveIntensity: 0.18, side: THREE.DoubleSide });
 
-    const wall = new THREE.Mesh(new THREE.BoxGeometry(16.2,7.0,.12),wallMat); wall.position.set(0,3.28,-.12); group.add(wall);
-    const floor = new THREE.Mesh(new THREE.BoxGeometry(14.8,.08,2.45),new THREE.MeshStandardMaterial({color:0x16090d,roughness:.82,metalness:.06,emissive:0x260b10,emissiveIntensity:.14})); floor.position.set(0,.04,.92); group.add(floor);
-    const turf = new THREE.Mesh(new THREE.BoxGeometry(9.5,.04,1.65),new THREE.MeshStandardMaterial({color:0x15572c,roughness:.97})); turf.position.set(.08,.085,.92); group.add(turf);
+    const backWall = new THREE.Mesh(new THREE.BoxGeometry(12.8, 6.7, 0.12), wallMat);
+    backWall.position.set(0, 3.22, -0.10);
+    group.add(backWall);
 
-    const left = new THREE.Mesh(new THREE.BoxGeometry(.18,6.9,.18),accent); left.position.set(-7.8,3.34,1.22); group.add(left);
-    const right = left.clone(); right.position.x = 7.8; group.add(right);
-    const top = new THREE.Mesh(new THREE.BoxGeometry(15.6,.18,.18),accent); top.position.set(0,6.72,1.22); group.add(top);
+    const floorDeck = new THREE.Mesh(
+      new THREE.BoxGeometry(12.2, 0.08, 2.32),
+      new THREE.MeshStandardMaterial({ color: 0x16090d, roughness: 0.82, metalness: 0.06, emissive: 0x260b10, emissiveIntensity: 0.14 })
+    );
+    floorDeck.position.set(0, 0.04, 0.88);
+    group.add(floorDeck);
 
-    const header = new THREE.Mesh(new THREE.PlaneGeometry(12.2,1.22),new THREE.MeshBasicMaterial({map:headerTexture(),transparent:true,side:THREE.DoubleSide,depthWrite:false})); header.position.set(0,5.94,1.34); group.add(header);
-    const info = new THREE.Mesh(new THREE.PlaneGeometry(9.7,5.25),new THREE.MeshBasicMaterial({map:profileTexture(),transparent:true,side:THREE.DoubleSide,depthWrite:false})); info.position.set(-2.35,3.22,.80); group.add(info);
+    const turf = new THREE.Mesh(
+      new THREE.BoxGeometry(8.0, 0.04, 1.62),
+      new THREE.MeshStandardMaterial({ color: 0x15572c, roughness: 0.97, metalness: 0.0, emissive: 0x0a2212, emissiveIntensity: 0.14 })
+    );
+    turf.position.set(0.14, 0.085, 0.86);
+    group.add(turf);
 
-    const pBack = new THREE.Mesh(new THREE.PlaneGeometry(3.2,3.9),new THREE.MeshBasicMaterial({color:0x0f0709,side:THREE.DoubleSide})); pBack.position.set(5.72,3.26,.88); group.add(pBack);
-    const portrait = new THREE.Mesh(new THREE.PlaneGeometry(2.9,3.58),new THREE.MeshBasicMaterial({map:portraitTexture(),transparent:true,side:THREE.DoubleSide,depthWrite:false})); portrait.position.set(5.72,3.26,.97); group.add(portrait);
-    const plaque = new THREE.Mesh(new THREE.PlaneGeometry(5.6,.94),new THREE.MeshBasicMaterial({map:reserveTexture(),transparent:true,side:THREE.DoubleSide,depthWrite:false})); plaque.position.set(5.72,1.12,.98); group.add(plaque);
+    const lane = new THREE.Mesh(
+      new THREE.BoxGeometry(5.6, 0.024, 0.52),
+      new THREE.MeshStandardMaterial({ color: 0x2d9446, roughness: 0.92, metalness: 0.0 })
+    );
+    lane.position.set(0.18, 0.102, 0.86);
+    group.add(lane);
 
-    const ball = new THREE.Mesh(new THREE.SphereGeometry(.09,24,24),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.72})); ball.position.set(-1.8,.17,1.28); group.add(ball);
-    const fillA = new THREE.PointLight(0xff4456,5.0,18,2); fillA.position.set(-1,5,1.8); group.add(fillA);
-    const fillB = new THREE.PointLight(0xffb0ba,3.6,14,2); fillB.position.set(5.8,5.15,1.95); group.add(fillB);
+    const cup = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.08, 0.08, 0.05, 24),
+      new THREE.MeshStandardMaterial({ color: 0xf0f0f0, roughness: 0.42, metalness: 0.16 })
+    );
+    cup.position.set(2.56, 0.10, 0.86);
+    group.add(cup);
+
+    const leftFrontColumn = new THREE.Mesh(new THREE.BoxGeometry(0.18, 6.65, 0.18), accentMat);
+    leftFrontColumn.position.set(-6.20, 3.24, 1.18);
+    group.add(leftFrontColumn);
+    const rightFrontColumn = leftFrontColumn.clone();
+    rightFrontColumn.position.x = 6.20;
+    group.add(rightFrontColumn);
+    const frontHeader = new THREE.Mesh(new THREE.BoxGeometry(12.58, 0.18, 0.18), accentMat);
+    frontHeader.position.set(0, 6.58, 1.18);
+    group.add(frontHeader);
+
+    const logoPanel = new THREE.Mesh(
+      new THREE.PlaneGeometry(8.8, 1.10),
+      new THREE.MeshBasicMaterial({
+        map: makeCanvasTexture((ctx, w, h)=>{
+          const g = ctx.createLinearGradient(0,0,w,h);
+          g.addColorStop(0, '#090506');
+          g.addColorStop(1, '#300910');
+          ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+          ctx.strokeStyle = 'rgba(255,208,214,0.86)'; ctx.lineWidth = 10; roundRect(ctx, 18, 18, w-36, h-36, 24); ctx.stroke();
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#fff7f8'; ctx.font = '700 88px Arial'; ctx.fillText('JUAN ESPEJO PGA HUB', w/2, 98);
+          ctx.fillStyle = 'rgba(255,176,186,0.98)'; ctx.font = '700 34px Arial'; ctx.fillText('GOLF LESSONS • TRAINING • ACADEMY • SPONSOR SHOWCASE', w/2, 184);
+        }, 1700, 240),
+        transparent: true,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      })
+    );
+    logoPanel.position.set(0, 5.78, 1.22);
+    group.add(logoPanel);
+
+    const infoPanel = new THREE.Mesh(
+      new THREE.PlaneGeometry(7.5, 5.2),
+      new THREE.MeshBasicMaterial({ map: buildProfileTexture(), side: THREE.DoubleSide, transparent: true })
+    );
+    infoPanel.position.set(-1.70, 3.10, 0.18);
+    group.add(infoPanel);
+
+    const portraitBack = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.26, 3.06),
+      new THREE.MeshBasicMaterial({ color: 0x0f0709, side: THREE.DoubleSide })
+    );
+    portraitBack.position.set(3.92, 3.04, 0.16);
+    group.add(portraitBack);
+
+    const portrait = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.04, 2.84),
+      new THREE.MeshBasicMaterial({ map: buildPortraitTexture(), transparent: true, side: THREE.DoubleSide })
+    );
+    portrait.position.set(3.92, 3.04, 0.19);
+    group.add(portrait);
+
+    const badge = new THREE.Mesh(
+      new THREE.CircleGeometry(0.62, 64),
+      new THREE.MeshBasicMaterial({ map: buildBadgeTexture(), transparent: true, side: THREE.DoubleSide })
+    );
+    badge.position.set(4.98, 5.04, 0.20);
+    group.add(badge);
+
+    const badgeFrame = new THREE.Mesh(
+      new THREE.RingGeometry(0.66, 0.80, 64),
+      new THREE.MeshStandardMaterial({ color: 0xff4456, roughness: 0.18, metalness: 0.42, emissive: 0x5b0911, emissiveIntensity: 1.02, side: THREE.DoubleSide })
+    );
+    badgeFrame.position.copy(badge.position);
+    group.add(badgeFrame);
+
+    const reservePlaque = new THREE.Mesh(
+      new THREE.PlaneGeometry(4.16, 0.88),
+      new THREE.MeshBasicMaterial({ map: buildReserveTexture(), side: THREE.DoubleSide, transparent: true })
+    );
+    reservePlaque.position.set(4.08, 1.10, 0.20);
+    group.add(reservePlaque);
+
+    const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.82), softGlass);
+    frontGlassL.position.set(-2.62, 3.18, 1.14);
+    group.add(frontGlassL);
+    const frontGlassR = frontGlassL.clone();
+    frontGlassR.position.x = 2.62;
+    group.add(frontGlassR);
+
+    const fillA = new THREE.PointLight(0xff4456, 4.2, 16, 2.0);
+    fillA.position.set(-0.4, 4.8, 1.34);
+    group.add(fillA);
+    const fillB = new THREE.PointLight(0xffb0ba, 2.7, 13, 2.0);
+    fillB.position.set(4.1, 5.1, 1.20);
+    group.add(fillB);
+    const fillC = new THREE.PointLight(0x73ff97, 1.0, 8, 2.0);
+    fillC.position.set(1.0, 0.54, 1.06);
+    group.add(fillC);
+
+    const railMat = new THREE.MeshStandardMaterial({ color: 0xefe7de, roughness: 0.30, metalness: 0.68, emissive: 0x24191a, emissiveIntensity: 0.08 });
+    const ropeMat = new THREE.MeshStandardMaterial({ color: 0x90232d, roughness: 0.84, metalness: 0.06, emissive: 0x4d1116, emissiveIntensity: 0.18 });
+    const railXs = [-2.8, 2.8];
+    const railZs = [1.92, 0.14];
+    railXs.forEach((x)=>{ railZs.forEach((z)=>{ const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.78, 12), railMat); post.position.set(x, 0.39, z); group.add(post); const cap = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), railMat); cap.position.set(x, 0.80, z); group.add(cap); }); });
+    railXs.forEach((x)=>{ const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.78, 10), ropeMat); rope.rotation.x = Math.PI * 0.5; rope.position.set(x, 0.74, 1.03); group.add(rope); });
+    [[-2.8,2.8,1.92],[-2.8,2.8,0.14]].forEach(([x1,x2,z])=>{ const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, Math.abs(x2-x1), 10), ropeMat); rope.rotation.z = Math.PI * 0.5; rope.position.set((x1+x2)*0.5, 0.74, z); group.add(rope); });
+
+    const clubStem = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.018, 0.018, 1.54, 12),
+      new THREE.MeshStandardMaterial({ color: 0xcfd5df, roughness: 0.32, metalness: 0.62 })
+    );
+    clubStem.rotation.z = -0.42;
+    clubStem.position.set(-3.7, 1.15, 0.92);
+    group.add(clubStem);
+    const clubHead = new THREE.Mesh(
+      new THREE.BoxGeometry(0.18, 0.08, 0.36),
+      new THREE.MeshStandardMaterial({ color: 0x15171a, roughness: 0.42, metalness: 0.28 })
+    );
+    clubHead.rotation.z = -0.42;
+    clubHead.position.set(-4.52, 0.20, 1.12);
+    group.add(clubHead);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.09, 24, 24), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.72, metalness: 0.0 }));
+    ball.position.set(-1.54, 0.17, 1.26);
+    group.add(ball);
 
     scene.add(group);
-    const box = new THREE.Box3().setFromObject(group); group.position.y -= box.min.y;
-    scene.userData._pgaHub = { group, fillA, fillB, build:PGA_HUB_BUILD };
+
+    const box = new THREE.Box3().setFromObject(group);
+    group.position.y -= box.min.y;
+
+    scene.userData._pgaHub = { group, badgeFrame, logoPanel, fillA, fillB, fillC, inward, anchorAngle };
     return scene.userData._pgaHub;
-  } catch (err){ log("[pga_hub] failed", err?.message || err); return null; }
+  } catch (err) {
+    log('[pga_hub] failed to build', err?.message || err);
+    return null;
+  }
 }
 
 export function tickPgaHub(scene, t = 0){
   const hub = scene?.userData?._pgaHub;
   if (!hub) return;
-  if (hub.fillA) hub.fillA.intensity = 4.9 + Math.sin(t*1.2)*.22;
-  if (hub.fillB) hub.fillB.intensity = 3.5 + Math.sin(t+0.6)*.18;
+  if (hub.badgeFrame?.material) hub.badgeFrame.material.emissiveIntensity = 0.88 + Math.sin(t * 1.6) * 0.16;
+  if (hub.fillA) hub.fillA.intensity = 4.2 + Math.sin(t * 1.2) * 0.24;
+  if (hub.fillB) hub.fillB.intensity = 2.6 + Math.sin(t * 1.0 + 0.6) * 0.14;
+  if (hub.fillC) hub.fillC.intensity = 1.0 + Math.sin(t * 1.3 + 1.1) * 0.10;
 }

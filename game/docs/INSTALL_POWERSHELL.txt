@@ -1,10 +1,18 @@
-C:\Users\ronal\SVR
+# Phase 96 apply commands
+# This is game-side only. It does not touch /site.
 
-Copy-Item .\update\game.zip .\update\game_before_phase94_relock.zip -Force
-Copy-Item "$HOME\Downloads\game.zip" .\update\game.zip -Force
-if (Test-Path .\game) { Remove-Item .\game -Recurse -Force }
-Expand-Archive -Path .\update\game.zip -DestinationPath . -Force
-git add .\update\game.zip .\game
-git commit -m "Lock Phase 94 audit relock"
+cd C:\Users\ronal\SVR
+
 git pull --rebase origin main
+
+# Copy the downloaded Phase 96 package into update/game.zip if your repo still uses update zip overlay:
+Copy-Item "$env:USERPROFILE\Downloads\game.zip" "update\game.zip" -Force
+
+# Also keep a backup copy with the unique phase name:
+Copy-Item "$env:USERPROFILE\Downloads\game-phase96-scorpion-table-front-lock.zip" "update\game-phase96-scorpion-table-front-lock.zip" -Force
+
+git add update/game.zip update/game-phase96-scorpion-table-front-lock.zip
+
+git commit -m "Phase 96 Scorpion table front lock"
+
 git push origin main

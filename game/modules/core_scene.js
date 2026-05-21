@@ -20,6 +20,7 @@ export function createCore({ containerId = "app" } = {}){
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 0.9));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
+  renderer.xr.setReferenceSpaceType?.("local-floor");
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -29,7 +30,7 @@ export function createCore({ containerId = "app" } = {}){
   document.getElementById(containerId).appendChild(renderer.domElement);
   const vrButton = VRButton.createButton(renderer, {
     requiredFeatures: ["local-floor"],
-    optionalFeatures: ["bounded-floor", "hand-tracking"]
+    optionalFeatures: ["bounded-floor", "hand-tracking", "layers"]
   });
   vrButton.classList.add("svr-vr-button");
   document.body.appendChild(vrButton);

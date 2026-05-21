@@ -1,112 +1,10 @@
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/addons/webxr/XRHandModelFactory.js";
 
-const PHASE = "PHASE-179-VISIBLE-PURPLE-TELEPORT-HAND-BEACON";
-const BASE_LEFT = new THREE.Color(0x7ff5c7);
-const BASE_RIGHT = new THREE.Color(0xb48cff);
-const PURPLE_GLOW = new THREE.Color(0xd05cff);
-const PURPLE_EMISSIVE = new THREE.Color(0xa020ff);
-
 function makeProxyJoint(name){
   const obj = new THREE.Object3D();
   obj.name = name;
   return obj;
-}
-
-function createHandMaterial(handed = "right"){
-  return new THREE.MeshStandardMaterial({
-    color: handed === "left" ? BASE_LEFT.clone() : BASE_RIGHT.clone(),
-    roughness: 0.28,
-    metalness: 0.20,
-    transparent: true,
-    opacity: 0.92,
-    emissive: handed === "left" ? new THREE.Color(0x07251c) : new THREE.Color(0x150728),
-    emissiveIntensity: 0.16
-  });
-}
-
-function createProxyMaterial(handed = "right"){
-  return new THREE.MeshStandardMaterial({
-    color: handed === "left" ? new THREE.Color(0x58e7c1) : BASE_RIGHT.clone(),
-    roughness: 0.24,
-    metalness: 0.26,
-    transparent: true,
-    opacity: 0.82,
-    emissive: handed === "left" ? new THREE.Color(0x06372a) : new THREE.Color(0x241044),
-    emissiveIntensity: 0.34
-  });
-}
-
-function createBeacon(name){
-  const group = new THREE.Group();
-  group.name = name;
-  group.visible = false;
-  const orb = new THREE.Mesh(
-    new THREE.SphereGeometry(0.046, 24, 24),
-    new THREE.MeshBasicMaterial({ color: 0xd05cff, transparent: true, opacity: 0.88, depthWrite: false, depthTest: false, toneMapped: false })
-  );
-  orb.renderOrder = 120;
-  group.add(orb);
-  const ring = new THREE.Mesh(
-    new THREE.RingGeometry(0.064, 0.086, 40),
-    new THREE.MeshBasicMaterial({ color: 0xf6e27f, transparent: true, opacity: 0.82, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
-  );
-  ring.renderOrder = 121;
-  ring.rotation.x = Math.PI / 2;
-  group.add(ring);
-  const light = new THREE.PointLight(0xd05cff, 1.8, 1.25, 2.0);
-  light.position.set(0, 0.03, 0.02);
-  group.add(light);
-  group.userData.orb = orb;
-  group.userData.ring = ring;
-  group.userData.light = light;
-  return group;
-}
-
-function setMaterialGlow(material, handed, active){
-  if (!material) return;
-  if (active){
-    material.color.copy(PURPLE_GLOW);
-    material.emissive.copy(PURPLE_EMISSIVE);
-    material.emissiveIntensity = 3.0;
-    material.opacity = 1.0;
-  } else {
-    material.color.copy(handed === "left" ? BASE_LEFT : BASE_RIGHT);
-    material.emissive.setHex(handed === "left" ? 0x07251c : 0x150728);
-    material.emissiveIntensity = 0.16;
-    material.opacity = 0.92;
-  }
-}
-
-function setProxyGlow(proxy, active){
-  const handed = proxy?.userData?.handedness || "right";
-  const mat = proxy?.userData?.visualMaterial;
-  if (!mat) return;
-  if (active){
-    mat.color.copy(PURPLE_GLOW);
-    mat.emissive.copy(PURPLE_EMISSIVE);
-    mat.emissiveIntensity = 3.0;
-    mat.opacity = 1.0;
-  } else {
-    mat.color.setHex(handed === "left" ? 0x58e7c1 : 0xb48cff);
-    mat.emissive.setHex(handed === "left" ? 0x06372a : 0x241044);
-    mat.emissiveIntensity = 0.30;
-    mat.opacity = 0.78;
-  }
-}
-
-function applyMaterialToHandModel(model, material){
-  if (!model || !material || model.userData._svrMaterialApplied) return false;
-  let applied = false;
-  model.traverse?.((obj)=>{
-    if (!obj?.isMesh) return;
-    obj.material = material;
-    obj.castShadow = false;
-    obj.receiveShadow = false;
-    applied = true;
-  });
-  if (applied) model.userData._svrMaterialApplied = true;
-  return applied;
 }
 
 function makeControllerProxy(controller, handed = "right"){
@@ -123,17 +21,6 @@ function makeControllerProxy(controller, handed = "right"){
     "pinky-finger-tip": makeProxyJoint("pinky-finger-tip")
   };
   Object.values(proxy.joints).forEach(j=>proxy.add(j));
-  const palmMat = createProxyMaterial(handed);
-  const palm = new THREE.Mesh(new THREE.SphereGeometry(0.036, 18, 18), palmMat);
-  palm.name = `svr-${handed}-controller-hand-palm`;
-  palm.visible = false;
-  proxy.userData.visualPalm = palm;
-  proxy.userData.visualMaterial = palmMat;
-  proxy.add(palm);
-  const beacon = createBeacon(`svr-${handed}-controller-teleport-beacon`);
-  beacon.position.set(0, 0.035, 0.055);
-  proxy.userData.beacon = beacon;
-  proxy.add(beacon);
   return proxy;
 }
 
@@ -144,33 +31,17 @@ function updateControllerProxy(proxy){
   controller.getWorldPosition(proxy.position);
   controller.getWorldQuaternion(proxy.quaternion);
 
-  const activeState = window.SVR_ACTIVE_TELEPORT_HAND || {};
-  const handed = proxy.userData.handedness || "right";
-  const activeProxy = activeState.glow === "purple" && (activeState.active === `${handed}-controller` || activeState.active === handed);
-
   const gp = proxy?.userData?.inputSource?.gamepad || controller.inputSource?.gamepad || null;
   proxy.userData.gamepad = gp || null;
   const trigger = gp?.buttons?.[0]?.value || 0;
   const squeeze = gp?.buttons?.[1]?.value || 0;
-  const side = handed === "left" ? -1 : 1;
-  const curl = Math.max(trigger, squeeze);
+  const side = proxy.userData.handedness === "left" ? -1 : 1;
+  const curl = THREE.MathUtils.lerp(0, 1, Math.max(trigger, squeeze));
   const fist = squeeze > 0.35;
 
   proxy.userData.trigger = trigger;
   proxy.userData.squeeze = squeeze;
-  proxy.visible = true;
   proxy.joints.wrist.position.set(0, 0, 0);
-
-  if (proxy.userData.visualPalm){
-    proxy.userData.visualPalm.visible = activeProxy;
-    proxy.userData.visualPalm.position.set(0, 0, 0.018);
-    setProxyGlow(proxy, activeProxy);
-  }
-  if (proxy.userData.beacon){
-    proxy.userData.beacon.visible = activeProxy;
-    proxy.userData.beacon.rotation.y += 0.075;
-    proxy.userData.beacon.rotation.z -= 0.045;
-  }
 
   if (fist){
     proxy.joints["thumb-tip"].position.set(0.016 * side, -0.005, 0.012);
@@ -185,6 +56,7 @@ function updateControllerProxy(proxy){
     proxy.joints["ring-finger-tip"].position.set(-0.008 * side, 0.0, 0.076 - curl * 0.024);
     proxy.joints["pinky-finger-tip"].position.set(-0.018 * side, -0.002, 0.068 - curl * 0.02);
   }
+
   if (trigger > 0.18){
     const pinchZ = 0.038 - trigger * 0.01;
     proxy.joints["thumb-tip"].position.set(0.015 * side, -0.006, pinchZ);
@@ -199,36 +71,21 @@ export function createHands({ scene, renderer, log = console.log }){
   const handDebugGroups = [];
   const controllers = [];
   const controllerProxies = [];
-  const beacons = { left: null, right: null };
-  const materials = { left: createHandMaterial("left"), right: createHandMaterial("right"), unknown: createHandMaterial("right") };
   let leftHand = null;
   let rightHand = null;
   let leftControllerProxy = null;
   let rightControllerProxy = null;
   let debugOn = false;
-  let materialApplyCount = 0;
-
-  window.SVR_HAND_MATERIAL_STATE = {
-    phase: PHASE,
-    active: true,
-    handTextTexture: false,
-    visibleBeacon: true,
-    appliedModels: 0,
-    controllerProxyVisuals: true,
-    leftHandTracked: false,
-    rightHandTracked: false,
-    controllerFallback: true,
-    teleportGlowActive: "none",
-    teleportGlowColor: "off",
-    note: "Visible purple beacon is attached to active hand/controller so teleport glow is obvious on Quest."
-  };
 
   function makeDebugGroup(parent){
     const group = new THREE.Group();
     group.visible = false;
     const keys = ["wrist", "thumb-tip", "index-finger-tip", "middle-finger-tip", "ring-finger-tip", "pinky-finger-tip"];
     for (const key of keys){
-      const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.009, 10, 10), new THREE.MeshBasicMaterial({ color: 0xb48cff }));
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.009, 10, 10),
+        new THREE.MeshBasicMaterial({ color: 0xb48cff })
+      );
       mesh.userData.jointKey = key;
       group.add(mesh);
     }
@@ -243,35 +100,21 @@ export function createHands({ scene, renderer, log = console.log }){
     rawHands.push(hand);
     const model = handFactory.createHandModel(hand, "mesh");
     model.visible = true;
-    model.userData._svrHandIndex = i;
     hand.add(model);
     handModels.push(model);
     handDebugGroups.push(makeDebugGroup(hand));
-    const guessed = i === 0 ? "left" : "right";
-    const beacon = createBeacon(`svr-${guessed}-teleport-beacon`);
-    beacon.position.set(guessed === "left" ? -0.028 : 0.028, 0.018, 0.055);
-    hand.add(beacon);
-    hand.userData.beacon = beacon;
 
     hand.addEventListener("connected", (evt)=>{
-      const handed = evt?.data?.handedness || guessed;
+      const handed = evt?.data?.handedness || "unknown";
       hand.userData.handedness = handed;
-      if (handed === "left") { leftHand = hand; beacons.left = beacon; }
-      if (handed === "right") { rightHand = hand; beacons.right = beacon; }
-      const applied = applyMaterialToHandModel(model, materials[handed] || materials.unknown);
-      if (applied) materialApplyCount++;
-      window.SVR_HAND_MATERIAL_STATE.appliedModels = materialApplyCount;
-      window.SVR_HAND_MATERIAL_STATE.leftHandTracked = !!leftHand;
-      window.SVR_HAND_MATERIAL_STATE.rightHandTracked = !!rightHand;
-      log("Hand connected", i, handed, applied ? "bright-beacon-material-ready" : "material-pending");
+      if (handed === "left") leftHand = hand;
+      if (handed === "right") rightHand = hand;
+      log("Hand connected", i, handed);
     });
 
     hand.addEventListener("disconnected", ()=>{
       if (leftHand === hand) leftHand = null;
       if (rightHand === hand) rightHand = null;
-      if (hand.userData.beacon) hand.userData.beacon.visible = false;
-      window.SVR_HAND_MATERIAL_STATE.leftHandTracked = !!leftHand;
-      window.SVR_HAND_MATERIAL_STATE.rightHandTracked = !!rightHand;
     });
 
     const controller = renderer.xr.getController(i);
@@ -280,7 +123,7 @@ export function createHands({ scene, renderer, log = console.log }){
     controllers.push(controller);
 
     controller.addEventListener("connected", (evt)=>{
-      const handed = evt?.data?.handedness || evt?.data?.gamepad?.hand || guessed;
+      const handed = evt?.data?.handedness || evt?.data?.gamepad?.hand || (i === 0 ? "left" : "right");
       controller.inputSource = evt?.data || controller.inputSource || null;
       const proxy = makeControllerProxy(controller, handed);
       proxy.userData.inputSource = evt?.data || null;
@@ -289,8 +132,7 @@ export function createHands({ scene, renderer, log = console.log }){
       controllerProxies.push({ controller, proxy, debug });
       if (handed === "left") leftControllerProxy = proxy;
       if (handed === "right") rightControllerProxy = proxy;
-      window.SVR_HAND_MATERIAL_STATE.controllerProxyVisuals = true;
-      log("Controller connected", i, handed, "visible-purple-beacon-ready");
+      log("Controller connected", i, handed);
     });
 
     controller.addEventListener("disconnected", ()=>{
@@ -302,43 +144,16 @@ export function createHands({ scene, renderer, log = console.log }){
         rec.proxy.parent?.remove(rec.proxy);
         controllerProxies.splice(idx, 1);
       }
-      window.SVR_HAND_MATERIAL_STATE.controllerProxyVisuals = controllerProxies.length > 0;
     });
-  }
-
-  function updateHandGlow(){
-    const activeState = window.SVR_ACTIVE_TELEPORT_HAND || {};
-    const active = activeState.glow === "purple" ? activeState.active : "none";
-    setMaterialGlow(materials.left, "left", active === "left");
-    setMaterialGlow(materials.right, "right", active === "right");
-    setMaterialGlow(materials.unknown, "right", active === "right" || active === "left");
-    if (beacons.left){
-      beacons.left.visible = active === "left";
-      if (beacons.left.visible){ beacons.left.rotation.y += 0.075; beacons.left.rotation.z -= 0.045; }
-    }
-    if (beacons.right){
-      beacons.right.visible = active === "right";
-      if (beacons.right.visible){ beacons.right.rotation.y += 0.075; beacons.right.rotation.z -= 0.045; }
-    }
-    window.SVR_HAND_MATERIAL_STATE.teleportGlowActive = active || "none";
-    window.SVR_HAND_MATERIAL_STATE.teleportGlowColor = active === "none" ? "off" : "purple";
   }
 
   function update(dt = 0.016){
-    updateHandGlow();
     controllers.forEach(c=>{ if (c) c.visible = false; });
-    rawHands.forEach(h=>{ if (h) h.visible = true; });
-    handModels.forEach((m, idx)=>{
-      if (!m) return;
-      m.visible = true;
-      const handed = rawHands[idx]?.userData?.handedness || (idx === 0 ? "left" : "right");
-      if (applyMaterialToHandModel(m, materials[handed] || materials.unknown)) materialApplyCount++;
+    rawHands.forEach((h, idx)=>{
+      if (h) h.visible = true;
     });
+    handModels.forEach(m=>{ if (m) m.visible = true; });
     controllerProxies.forEach(({ proxy })=> updateControllerProxy(proxy, dt));
-    window.SVR_HAND_MATERIAL_STATE.appliedModels = materialApplyCount;
-    window.SVR_HAND_MATERIAL_STATE.leftHandTracked = !!leftHand;
-    window.SVR_HAND_MATERIAL_STATE.rightHandTracked = !!rightHand;
-    window.SVR_HAND_MATERIAL_STATE.controllerProxyVisuals = controllerProxies.length > 0;
   }
 
   function updateDebug(){
