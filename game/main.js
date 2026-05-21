@@ -9,6 +9,7 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createHologramMenu } from "./modules/hologram_menu.js";
+import { createHologramDomFallback } from "./modules/hologram_dom_fallback.js";
 import { applyWatchHardfix } from "./modules/watch_hardfix.js";
 import { createNpcAvatarSystem } from "./modules/npc_avatar_system.js";
 import { createPlayablePoker } from "./modules/playable_poker.js";
@@ -16,7 +17,7 @@ import "./modules/poker_action_hud.js";
 import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
 import { buildTeleportRouteRegistry } from "./modules/teleport-router.js";
 
-const PHASE_85_BUILD = "PHASE-165-HOLOGRAM-MENU-CODE-PATCH";
+const PHASE_85_BUILD = "PHASE-84-HOLOGRAM-SPACE-ROUTING-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -90,6 +91,7 @@ if (!sceneTargets.chipPutt) sceneTargets.chipPutt = sceneTargets.pgaWall || scen
 if (!sceneTargets.storeRoom) sceneTargets.storeRoom = sceneTargets.sponsor || sceneTargets.lobby;
 if (!sceneTargets.smokerLounge) sceneTargets.smokerLounge = sceneTargets.sponsor || sceneTargets.lobby;
 if (!sceneTargets.reikiRoom) sceneTargets.reikiRoom = sceneTargets.reiki || sceneTargets.lobby;
+if (!sceneTargets.spaceStation) sceneTargets.spaceStation = sceneTargets.sponsor || sceneTargets.lobby;
 const teleportRouter = buildTeleportRouteRegistry(sceneTargets, seats, tableCenter);
 Object.assign(sceneTargets, teleportRouter.legacySceneTargets);
 window.SVR_TELEPORT_ROUTER = teleportRouter;
@@ -118,6 +120,7 @@ let seated = false;
 let seatIndex = -1;
 let cash = 50000;
 let hologram = null;
+let holoFallback = null;
 
 const poker = createPlayablePoker({
   scene,
@@ -189,6 +192,15 @@ function gotoScene(key){
   const routeKey = teleportRouter.normalizeRouteKey(key);
   const rec = teleportRouter.getRoute(routeKey) || sceneTargets?.[key];
   if (!rec?.pos){ setStatus(`Route unavailable: ${key}`, { force: true }); return false; }
+
+  if (rec.scenePath && rec.privateScene){
+    const path = rec.scenePath.replace(/^game\//, "./");
+    window.SVR_LAST_ROUTE = { requested: key, routeKey, label: rec.label || routeKey, type: rec.type || "private_scene", privateScene: true, scenePath: rec.scenePath };
+    setStatus(`Opening private scene: ${rec.label || routeKey}`, { force: true });
+    setTimeout(()=>{ window.location.href = `${path}?v=phase84-private-route`; }, 80);
+    return true;
+  }
+
   movePlayerToSpot(rec.pos, rec.look || null);
   setStatus(`Quick jump: ${rec.label || routeKey}`, { force: true });
   window.SVR_LAST_ROUTE = { requested: key, routeKey, label: rec.label || routeKey, type: rec.type || "legacy", privateScene: !!rec.privateScene };
@@ -206,7 +218,7 @@ function getGameState(){
     inTableZone: inTableZone(),
     seatLabel: seatLabel(),
     teleportEnabled: tp.isEnabled ? tp.isEnabled() : true,
-    hologramVisible: !!hologram?.getState?.().visible,
+    hologramVisible: !!hologram?.getState?.().visible || !!holoFallback?.getState?.().visible,
     poker: poker.getState()
   };
 }
@@ -217,7 +229,12 @@ const watchActions = {
   joinTable,
   leaveTable,
   toggleTeleport: ()=>tp.toggleMode(),
-  toggleHologram: ()=>hologram?.toggle("watch-holo-button"),
+  toggleHologram: ()=>{
+    const opened = hologram?.toggle("watch-holo-button");
+    const visible3d = !!hologram?.getState?.().visible;
+    if (!visible3d || !opened) return holoFallback?.toggle("watch-holo-fallback");
+    return opened;
+  },
   pokerFold: ()=>poker.fold(),
   pokerCall: ()=>poker.checkCall(),
   pokerRaise: ()=>poker.raise(),
@@ -237,7 +254,8 @@ const watchActions = {
   goPgaDrive: ()=>gotoScene("pga_drive"),
   goChipPutt: ()=>gotoScene("pga_chip_putt"),
   goStoreRoom: ()=>gotoScene("vr_store"),
-  goSmokerLounge: ()=>gotoScene("smoker_lounge")
+  goSmokerLounge: ()=>gotoScene("smoker_lounge"),
+  goSpaceStation: ()=>gotoScene("space_station")
 };
 
 window.addEventListener("keydown", async (e)=>{
@@ -252,7 +270,7 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
-  if (e.code === "KeyG") hologram?.toggle("desktop-key-g");
+  if (e.code === "KeyG") watchActions.toggleHologram();
   if (e.code === "Digit1") gotoScene("lobby");
   if (e.code === "Digit2") gotoScene("table");
   if (e.code === "Digit3") gotoScene("seat");
@@ -266,11 +284,14 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "KeyK") gotoScene("chipPutt");
   if (e.code === "KeyO") gotoScene("storeRoom");
   if (e.code === "KeyB") gotoScene("smokerLounge");
+  if (e.code === "KeyS") gotoScene("spaceStation");
 });
 
 const watch = createWristWatch({ scene, camera, renderer, getState: getGameState, actions: watchActions });
 hologram = createHologramMenu({ scene, camera, renderer, getState: getGameState, actions: watchActions });
+holoFallback = createHologramDomFallback({ getState: getGameState, actions: watchActions });
 window.SVR_HOLOGRAM_MENU = hologram;
+window.SVR_HOLOGRAM_DOM_FALLBACK = holoFallback;
 
 $toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
