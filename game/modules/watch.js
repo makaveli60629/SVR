@@ -184,6 +184,74 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   screenFront.rotation.z = 0;
   group.add(screenFront);
 
+  // Phase 102: visible physical HOLO button on the watch body.
+  // Pinch the HOLO area on the watch screen; this raised button makes the target obvious in VR.
+  const holoButtonMat = new THREE.MeshStandardMaterial({
+    color: 0xbb47ff,
+    roughness: 0.18,
+    metalness: 0.28,
+    emissive: 0x7a18d8,
+    emissiveIntensity: 1.45,
+    transparent: true,
+    opacity: 0.94
+  });
+  const holoButtonCap = new THREE.Mesh(new THREE.BoxGeometry(0.044, 0.018, 0.009), holoButtonMat);
+  holoButtonCap.name = 'PHASE_102_PHYSICAL_HOLO_BUTTON';
+  holoButtonCap.position.set(plateW * 0.31, plateH * 0.32, 0.019);
+  group.add(holoButtonCap);
+
+  const holoTexCanvas = document.createElement('canvas');
+  holoTexCanvas.width = 900;
+  holoTexCanvas.height = 620;
+  const holoCtx = holoTexCanvas.getContext('2d');
+  const holoTex = new THREE.CanvasTexture(holoTexCanvas);
+  holoTex.colorSpace = THREE.SRGBColorSpace;
+  holoTex.anisotropy = 8;
+  const holoPanel = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.30, 0.205),
+    new THREE.MeshBasicMaterial({ map: holoTex, transparent: true, opacity: 0.94, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
+  );
+  holoPanel.name = 'PHASE_102_WATCH_HOLOGRAM_PANEL';
+  holoPanel.position.set(0, plateH * 1.25, 0.045);
+  holoPanel.renderOrder = 72;
+  group.add(holoPanel);
+
+  function drawHoloPanel(state){
+    holoCtx.clearRect(0, 0, holoTexCanvas.width, holoTexCanvas.height);
+    const w = holoTexCanvas.width;
+    const h = holoTexCanvas.height;
+    const grad = holoCtx.createLinearGradient(0,0,w,h);
+    grad.addColorStop(0, 'rgba(8, 12, 28, 0.92)');
+    grad.addColorStop(1, 'rgba(46, 10, 78, 0.88)');
+    holoCtx.fillStyle = grad;
+    rr(holoCtx, 20, 20, w - 40, h - 40, 42);
+    holoCtx.fill();
+    holoCtx.strokeStyle = 'rgba(155, 255, 232, 0.92)';
+    holoCtx.lineWidth = 10;
+    rr(holoCtx, 20, 20, w - 40, h - 40, 42);
+    holoCtx.stroke();
+    holoCtx.textAlign = 'center';
+    holoCtx.textBaseline = 'middle';
+    holoCtx.fillStyle = '#ffffff';
+    holoCtx.font = '900 58px system-ui, Arial';
+    holoCtx.fillText('SVR HOLO ROUTER', w/2, 82);
+    holoCtx.fillStyle = '#8fffe6';
+    holoCtx.font = '800 32px system-ui, Arial';
+    holoCtx.fillText('Pinch HOLO button to close/open', w/2, 136);
+    const lines = [
+      'Lobby • Scorpion • Reiki • PGA',
+      'Store • Lounge • Space Room',
+      state.teleportEnabled ? 'Teleport armed from watch / fist' : 'Teleport off — tap TP ON',
+      'Close fist: glow / aim • release to jump'
+    ];
+    holoCtx.font = '700 34px system-ui, Arial';
+    lines.forEach((line, i)=>{
+      holoCtx.fillStyle = i === 2 ? '#ffe986' : '#e7e2ff';
+      holoCtx.fillText(line, w/2, 222 + i * 70);
+    });
+    holoTex.needsUpdate = true;
+  }
+
   const holoPanel = new THREE.Mesh(
     new THREE.PlaneGeometry(0.275, 0.138),
     new THREE.MeshBasicMaterial({ map: holoTex, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
@@ -249,7 +317,7 @@ function buildButtons(state){
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
     { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'holo', label: state.holoMenuVisible === false ? 'HOLO OFF' : 'HOLO ON', x: 380, y: 120, w: 172, h: 48, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'holo', label: state.holoMenuVisible === false ? 'PRESS HOLO' : 'HOLO OPEN', x: 380, y: 120, w: 172, h: 48, font: 20, pinchOnly: true, hold: 0.16, margin: 8 },
     { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
   ];
   if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
@@ -321,11 +389,17 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Watch lock • HOLO button • fist/pinch teleport • single storefront portal routing', 36, 332);
+    ctx.fillText('Press HOLO button • close fist glows TP • release to jump • storefront routing', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
     tex.needsUpdate = true;
+
+    const holoOpen = state.holoMenuVisible !== false;
+    holoButtonCap.material.emissiveIntensity = holoOpen ? 2.2 : 0.62;
+    holoButtonCap.material.color.setHex(holoOpen ? 0x00ffd8 : 0xbb47ff);
+    holoPanel.visible = holoOpen;
+    if (holoOpen) drawHoloPanel(state);
   }
 
   function localHit(local){

@@ -203,3 +203,15 @@ Implementation:
 - Repositioned Moon/Mars for stronger lobby visibility.
 - Enlarged/aligned Espresso with Cream ad behind the Reiki hub area.
 - Site untouched.
+
+
+## Phase 102 — VR Visual Alignment Lock
+
+- Build label: `PHASE-102-VR-VISUAL-ALIGNMENT-LOCK`
+- Fixed Quest-visible Moon and Mars by moving them higher/closer and disabling depth-test on the planet meshes.
+- Rebuilt Espresso with Cream as a larger building-wall ad directly behind the Reiki hub area.
+- Fixed Scorpion room table overlap so only one display table is visible when the real asset loads.
+- Re-aligned the Juan Espejo PGA Hub display so the info panel and portrait remain fully visible.
+- Added a raised watch HOLO button and visible wrist hologram panel.
+- Restored close-fist teleport glow and release-to-teleport behavior.
+- Website/site side untouched.

@@ -1,5 +1,6 @@
-export const PHASE_101_BUILD = "PHASE-101-VR-RUNTIME-CORRECTION-LOCK";
-export const PHASE_100_BUILD = PHASE_101_BUILD; // compatibility alias
+export const PHASE_102_BUILD = "PHASE-102-VR-VISUAL-ALIGNMENT-LOCK";
+export const PHASE_101_BUILD = PHASE_102_BUILD; // compatibility alias
+export const PHASE_100_BUILD = PHASE_102_BUILD; // compatibility alias
 
 export const PRIVATE_ROOM_REGISTRY = Object.freeze([
   { key: "scorpion", label: "Scorpion Poker VR", type: "private-vr-room", status: "active", entry: "Scorpion storefront", exit: "Back to Lobby portal", branding: "SVR / modular sponsor-ready", vrReady: true, safeBounds: true },

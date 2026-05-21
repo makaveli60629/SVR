@@ -1056,19 +1056,36 @@ function createEspressoCreamAdTexture(){
 }
 
 function addReikiBackBuildingEspressoAd(scene, { center, inward, wallHeight }){
+  // Phase 102: premium Espresso wall ad is locked directly behind the Reiki hub.
+  // It is bigger, higher, and front-facing so it reads from the lobby instead of hiding behind skyline geometry.
   const outward = inward.clone().multiplyScalar(-1);
-  const base = center.clone().addScaledVector(outward, 8.2);
-  const buildingMat = new THREE.MeshStandardMaterial({ color: 0x07121a, roughness: 0.68, metalness: 0.18, emissive: 0x07142a, emissiveIntensity: 0.26 });
-  const tower = new THREE.Mesh(new THREE.BoxGeometry(4.8, wallHeight + 13.5, 1.05), buildingMat);
-  tower.position.copy(base).setY((wallHeight + 13.5) * 0.5);
+  const base = center.clone().addScaledVector(outward, 6.4);
+  const buildingMat = new THREE.MeshStandardMaterial({ color: 0x07121a, roughness: 0.66, metalness: 0.20, emissive: 0x07142a, emissiveIntensity: 0.34 });
+  const tower = new THREE.Mesh(new THREE.BoxGeometry(6.4, wallHeight + 18.0, 1.16), buildingMat);
+  tower.position.copy(base).setY((wallHeight + 18.0) * 0.5);
+  tower.name = 'PHASE_102_REIKI_ALIGNED_ESPRESSO_BUILDING';
   scene.add(tower);
-  const ad = new THREE.Mesh(new THREE.PlaneGeometry(4.25, 6.65), new THREE.MeshBasicMaterial({ map: createEspressoCreamAdTexture(), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  ad.position.copy(base).addScaledVector(inward, 0.62).setY(wallHeight + 4.6);
-  ad.lookAt(center.clone().setY(ad.position.y));
-  ad.renderOrder = 45;
+
+  const ad = new THREE.Mesh(
+    new THREE.PlaneGeometry(5.55, 8.25),
+    new THREE.MeshBasicMaterial({ map: createEspressoCreamAdTexture(), transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
+  );
+  ad.position.copy(base).addScaledVector(inward, 0.68).setY(wallHeight + 6.5);
+  ad.lookAt(center.clone().addScaledVector(inward, 2.0).setY(ad.position.y));
+  ad.name = 'PHASE_102_REIKI_ALIGNED_ESPRESSO_AD';
+  ad.renderOrder = 150;
   scene.add(ad);
-  const glow = new THREE.PointLight(0xffc56a, 1.7, 16, 2.2);
-  glow.position.copy(ad.position).addScaledVector(inward, 1.2);
+
+  const trimMat = new THREE.MeshBasicMaterial({ color: 0xffc56a, transparent: true, opacity: 0.90, depthTest: false });
+  const top = new THREE.Mesh(new THREE.BoxGeometry(5.9, 0.08, 0.05), trimMat);
+  const bot = top.clone();
+  const left = new THREE.Mesh(new THREE.BoxGeometry(0.08, 8.5, 0.05), trimMat);
+  const right = left.clone();
+  [top, bot, left, right].forEach((piece)=>{ piece.position.copy(ad.position); piece.quaternion.copy(ad.quaternion); piece.renderOrder = 151; scene.add(piece); });
+  top.translateY(4.24); bot.translateY(-4.24); left.translateX(-2.91); right.translateX(2.91);
+
+  const glow = new THREE.PointLight(0xffc56a, 2.6, 22, 2.1);
+  glow.position.copy(ad.position).addScaledVector(inward, 1.6);
   scene.add(glow);
   return { tower, ad };
 }
@@ -1589,14 +1606,14 @@ function addScorpionTableAccessories(mount, tableTopY = 0.86){
 function addScorpionRoomFrontTable(root, log = console.log){
   const tableTopY = 0.86;
   const mount = new THREE.Group();
-  mount.name = 'PHASE_99_SCORPION_ROOM_TABLE_MOUNT';
-  mount.position.set(0, 0.10, 0.02);
-  mount.scale.setScalar(1.18);
+  mount.name = 'PHASE_102_SCORPION_ROOM_SINGLE_DISPLAY_TABLE_MOUNT';
+  mount.position.set(0, 0.10, 0.16);
+  mount.scale.setScalar(1.02);
   mount.rotation.y = 0;
   root.add(mount);
 
   const fallback = makeScorpionFallbackTable(tableTopY);
-  fallback.name = 'PHASE_99_SCORPION_ROOM_TABLE_FALLBACK';
+  fallback.name = 'PHASE_102_SCORPION_ROOM_SINGLE_DISPLAY_TABLE_FALLBACK';
   mount.add(fallback);
   addScorpionTableAccessories(mount, tableTopY);
 
@@ -1609,7 +1626,7 @@ function addScorpionRoomFrontTable(root, log = console.log){
     x.lineWidth = 10; roundRectPath(x, 14, 14, w-28, h-28, 32); x.stroke();
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#ffffff'; x.font = '900 70px system-ui, Arial'; x.fillText('SCORPION TABLE', w/2, 104);
-    x.fillStyle = '#9feeff'; x.font = '700 32px system-ui, Arial'; x.fillText('PRIVATE ROOM TABLE • NEW TABLE LOCKED HERE', w/2, 174);
+    x.fillStyle = '#9feeff'; x.font = '700 32px system-ui, Arial'; x.fillText('ONE DISPLAY TABLE • PORTAL TO PRIVATE GAMEPLAY', w/2, 174);
   });
   const label = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 0.82), new THREE.MeshBasicMaterial({ map: labelTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   label.position.set(0, tableTopY + 0.80, -1.55);
@@ -1632,18 +1649,18 @@ function addScorpionRoomFrontTable(root, log = console.log){
         child.material.emissiveIntensity = Math.max(child.material.emissiveIntensity || 0, 0.035);
       }
     });
-    fitDiameter(realTable, 4.34);
+    fitDiameter(realTable, 3.86);
     realTable.updateMatrixWorld(true);
     const bb = boxSize(realTable).box;
     realTable.position.set(-((bb.min.x + bb.max.x) * 0.5), tableTopY - bb.max.y, -((bb.min.z + bb.max.z) * 0.5));
-    realTable.name = 'PHASE_99_SCORPION_ROOM_TABLE_ASSET';
+    realTable.name = 'PHASE_102_SCORPION_ROOM_SINGLE_DISPLAY_TABLE_ASSET';
     mount.add(realTable);
-    fallback.visible = true;
-    fallback.userData.phase99AlwaysVisibleBase = true;
+    fallback.visible = false;
+    fallback.userData.phase102HiddenWhenAssetLoads = true;
     mount.userData.tableAssetMounted = true;
-    mount.userData.phase99RoomTableLocked = true;
-    log('Phase 99: Scorpion private room table mounted from table/store asset backup; fallback base remains visible.');
-  })().catch((err)=> log('Phase 99: Scorpion private room table fallback active', err?.message || err));
+    mount.userData.phase102SingleDisplayTableLocked = true;
+    log('Phase 102: Scorpion room single display table mounted; duplicate fallback hidden.');
+  })().catch((err)=> log('Phase 102: Scorpion room single display table fallback active', err?.message || err));
 
   return mount;
 }
@@ -2719,7 +2736,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(8.8, 56, 56),
+    new THREE.SphereGeometry(8.4, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2727,20 +2744,23 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       map: moonTex || null,
       bumpMap: moonBump || null,
       bumpScale: moonBump ? 0.94 : 0,
-      emissive: 0x111820,
-      emissiveIntensity: 0.0
+      emissive: 0x38414f,
+      emissiveIntensity: 0.22
     })
   );
-  moon.position.set(-23, wallHeight + 25.0, -(R + 43.0));
+  moon.position.set(-14, wallHeight + 33.0, -(R + 30.0));
+  moon.material.depthTest = false;
+  moon.material.depthWrite = false;
+  moon.renderOrder = 120;
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(68.0, 68.0, 1);
+  moonHalo.scale.set(78.0, 78.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(5.6, 44, 44),
+    new THREE.SphereGeometry(5.2, 44, 44),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2748,17 +2768,20 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       map: marsTex || null,
       bumpMap: marsBump || null,
       bumpScale: marsBump ? 0.42 : 0,
-      emissive: 0x1c0904,
-      emissiveIntensity: 0.0
+      emissive: 0x3c140a,
+      emissiveIntensity: 0.18
     })
   );
-  mars.position.set(29, wallHeight + 28.0, -(R + 51.0));
+  mars.position.set(18, wallHeight + 35.0, -(R + 35.0));
   mars.visible = true;
+  mars.material.depthTest = false;
+  mars.material.depthWrite = false;
+  mars.renderOrder = 121;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(48.0, 48.0, 1);
+  marsHalo.scale.set(54.0, 54.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);

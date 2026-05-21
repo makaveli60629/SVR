@@ -59,23 +59,23 @@ function buildProfileTexture(){
     ctx.fill();
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 42px Arial";
-    ctx.fillText("SOUTH-WEST WALL • PGA HUB", 92, 126);
+    ctx.fillText("WEST WALL • PGA HUB", 92, 126);
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "700 92px Arial";
-    ctx.fillText("JUAN E. ESPEJO", 92, 254);
+    ctx.font = "700 74px Arial";
+    ctx.fillText("JUAN E. ESPEJO", 92, 248);
     ctx.fillStyle = "#ffc2c9";
-    ctx.font = "600 40px Arial";
-    ctx.fillText("PGA Pro • Maryville Golf Academy Founder", 92, 324);
+    ctx.font = "600 34px Arial";
+    ctx.fillText("PGA Pro • Maryville Golf Academy Founder", 92, 316);
 
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 48px Arial";
     ctx.fillText("ABOUT", 92, 420);
     ctx.fillStyle = "#f7f0f2";
-    ctx.font = "500 38px Arial";
+    ctx.font = "500 34px Arial";
     let y = drawWrappedText(ctx,
       "Dedicated VR golf storefront reserved for training, lessons, academy promotion, and future branded PGA media. Built as a professional modular client hub so it can be refined without disturbing the main lobby baseline.",
-      92, 474, w - 184, 46);
+      92, 464, w - 184, 42);
 
     y += 76;
     ctx.fillStyle = "#ff7784";
@@ -257,31 +257,36 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     group.add(logoPanel);
 
     const infoPanel = new THREE.Mesh(
-      new THREE.PlaneGeometry(7.5, 5.2),
-      new THREE.MeshBasicMaterial({ map: buildProfileTexture(), side: THREE.DoubleSide, transparent: true })
+      new THREE.PlaneGeometry(6.25, 4.75),
+      new THREE.MeshBasicMaterial({ map: buildProfileTexture(), side: THREE.DoubleSide, transparent: true, depthWrite: false })
     );
-    infoPanel.position.set(-1.70, 3.10, 0.18);
+    infoPanel.name = "PHASE_102_PGA_INFO_PANEL_FULLY_ALIGNED";
+    infoPanel.position.set(-2.15, 3.18, 0.34);
     group.add(infoPanel);
 
     const portraitBack = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.26, 3.06),
+      new THREE.PlaneGeometry(1.92, 2.70),
       new THREE.MeshBasicMaterial({ color: 0x0f0709, side: THREE.DoubleSide })
     );
-    portraitBack.position.set(3.92, 3.04, 0.16);
+    portraitBack.name = "PHASE_102_PGA_PORTRAIT_BACK_FULLY_VISIBLE";
+    portraitBack.position.set(3.58, 3.16, 0.36);
     group.add(portraitBack);
 
     const portrait = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.04, 2.84),
+      new THREE.PlaneGeometry(1.72, 2.46),
       new THREE.MeshBasicMaterial({ map: buildPortraitTexture(), transparent: true, side: THREE.DoubleSide })
     );
-    portrait.position.set(3.92, 3.04, 0.19);
+    portrait.name = "PHASE_102_PGA_JUAN_FACE_FULLY_VISIBLE";
+    portrait.position.set(3.58, 3.16, 0.40);
+    portrait.renderOrder = 65;
     group.add(portrait);
 
     const badge = new THREE.Mesh(
       new THREE.CircleGeometry(0.62, 64),
       new THREE.MeshBasicMaterial({ map: buildBadgeTexture(), transparent: true, side: THREE.DoubleSide })
     );
-    badge.position.set(4.98, 5.04, 0.20);
+    badge.position.set(4.82, 5.02, 0.44);
+    badge.renderOrder = 66;
     group.add(badge);
 
     const badgeFrame = new THREE.Mesh(
@@ -295,8 +300,18 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
       new THREE.PlaneGeometry(4.16, 0.88),
       new THREE.MeshBasicMaterial({ map: buildReserveTexture(), side: THREE.DoubleSide, transparent: true })
     );
-    reservePlaque.position.set(4.08, 1.10, 0.20);
+    reservePlaque.name = "PHASE_102_PGA_RESERVED_PLAQUE_ALIGNED";
+    reservePlaque.position.set(3.58, 1.14, 0.42);
+    reservePlaque.scale.setScalar(0.88);
     group.add(reservePlaque);
+
+    const phase102AlignFrame = new THREE.Mesh(
+      new THREE.PlaneGeometry(11.25, 5.85),
+      new THREE.MeshBasicMaterial({ color: 0xff4456, transparent: true, opacity: 0.10, side: THREE.DoubleSide, depthWrite: false })
+    );
+    phase102AlignFrame.name = "PHASE_102_PGA_FULL_ALIGNMENT_BACKPLATE";
+    phase102AlignFrame.position.set(0, 3.22, 0.10);
+    group.add(phase102AlignFrame);
 
     const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.82), softGlass);
     frontGlassL.position.set(-2.62, 3.18, 1.14);

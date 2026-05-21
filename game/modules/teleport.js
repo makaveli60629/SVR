@@ -102,6 +102,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let lastTP = 0;
   let pinchHoldStart = 0;
   let triggerHoldStart = 0;
+  let fistHoldStart = 0;
   let leftHandRef = null;
   let rightHandRef = null;
   let leftControllerRef = null;
@@ -236,6 +237,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       activeMode = "hand";
       pinchHoldStart = 0;
       triggerHoldStart = 0;
+      fistHoldStart = 0;
       return mode;
     }
     const preferredController = preferred === "left" ? leftControllerRef : rightControllerRef;
@@ -366,6 +368,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       cooldownUntil = now + 260;
       pinchHoldStart = 0;
       triggerHoldStart = 0;
+      fistHoldStart = now;
+      if (leftHandRef) leftHandRef.userData._wasFist = true;
     }
     if (rightFist && !lastRightFistToggle && now > cooldownUntil){
       mode = !(mode && active === rightHandRef);
@@ -374,6 +378,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       cooldownUntil = now + 260;
       pinchHoldStart = 0;
       triggerHoldStart = 0;
+      fistHoldStart = now;
+      if (rightHandRef) rightHandRef.userData._wasFist = true;
     }
     lastLeftFistToggle = leftFist;
     lastRightFistToggle = rightFist;
@@ -407,9 +413,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
         ? "Controllers active • left stick move • right stick snap turn • A/X teleport"
-        : "TELEPORT OFF • press TP or make fist/chinch near face";
+        : "TELEPORT OFF • close fist by face to arm; release fist to jump";
       statusCb(idleMsg);
-      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist/chinch near face toggles TP");
+      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • close fist by face arms TP");
       return;
     }
 
@@ -422,7 +428,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       markerGlow.intensity = 0;
       stableTargetMs = 0;
       lastAimValid = false;
-      statusCb(activeMode === "controller" ? "CONTROLLER TP ON • hold trigger then release" : "HAND TP ON • hold pinch then release");
+      statusCb(activeMode === "controller" ? "CONTROLLER TP ON • hold trigger then release" : "HAND TP ON • close fist glows / release fist to teleport");
       modeCb(activeMode === "controller" ? "Controllers: TELEPORT ON" : `Hands: TELEPORT ON`);
       return;
     }
@@ -477,7 +483,52 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       return;
     }
 
+    // Phase 102: closed-fist teleport now works as hold-to-aim / release-to-jump.
+    // Close fist near the face once to arm TP, keep fist closed to keep the target glowing, release fist to teleport.
+    const fist = isFist(active);
+    if (active.userData._wasFist === undefined) active.userData._wasFist = false;
+    if (fist && !active.userData._wasFist) fistHoldStart = now;
+    const fistHeld = fistHoldStart ? (now - fistHoldStart) : 0;
+    if (fist){
+      ringMat.color.setHex(0x00ffd8);
+      ringMat.emissive.setHex(0x00ffd8);
+      markerGlow.color.setHex(0x00ffd8);
+      markerGlow.intensity = 3.1;
+      statusCb("FIST TP GLOW • keep fist closed to aim • release fist to teleport");
+      modeCb("Hands: FIST TELEPORT GLOW");
+    }
+    if (active.userData._wasFist && !fist && fistHeld > 260 && stableTargetMs > 90 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
+      const ok = teleportByDelta(smoothedTarget);
+      if (ok){
+        lastTP = now + 220;
+        cooldownUntil = now + 260;
+        mode = false;
+        active = null;
+        fistHoldStart = 0;
+        pinchHoldStart = 0;
+        stableTargetMs = 0;
+        lastAimValid = false;
+        pointer.visible = false;
+        ring.visible = false;
+        hideArc();
+        setGlow(false);
+        statusCb("FIST TELEPORT RELEASED");
+      } else {
+        cooldownUntil = now + 180;
+        fistHoldStart = 0;
+        stableTargetMs = 0;
+        statusCb("FIST TELEPORT RESET • aim again");
+      }
+    }
+    if (!fist && !active.userData._wasFist) fistHoldStart = 0;
+    active.userData._wasFist = fist;
+
     const pinch = isPinching(active);
+    if (!fist){
+      ringMat.color.setHex(0xb48cff);
+      ringMat.emissive.setHex(0x2a0d3a);
+      markerGlow.color.setHex(0xb48cff);
+    }
     if (active.userData._wasPinching === undefined) active.userData._wasPinching = false;
     if (pinch && !active.userData._wasPinching) pinchHoldStart = now;
     const held = pinchHoldStart ? (now - pinchHoldStart) : 0;
