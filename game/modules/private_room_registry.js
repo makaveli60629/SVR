@@ -1,6 +1,9 @@
-export const PHASE_102_BUILD = "PHASE-102-VR-VISUAL-ALIGNMENT-LOCK";
-export const PHASE_101_BUILD = PHASE_102_BUILD; // compatibility alias
-export const PHASE_100_BUILD = PHASE_102_BUILD; // compatibility alias
+export const PHASE_105_BUILD = "PHASE-105-BOOT-SAFE-RUNTIME-LOCK";
+export const PHASE_104_BUILD = PHASE_105_BUILD;
+export const PHASE_103_BUILD = PHASE_105_BUILD; // compatibility alias
+export const PHASE_102_BUILD = PHASE_105_BUILD; // compatibility alias
+export const PHASE_101_BUILD = PHASE_105_BUILD; // compatibility alias
+export const PHASE_100_BUILD = PHASE_105_BUILD; // compatibility alias
 
 export const PRIVATE_ROOM_REGISTRY = Object.freeze([
   { key: "scorpion", label: "Scorpion Poker VR", type: "private-vr-room", status: "active", entry: "Scorpion storefront", exit: "Back to Lobby portal", branding: "SVR / modular sponsor-ready", vrReady: true, safeBounds: true },
@@ -17,7 +20,7 @@ export function routeLabel(key){
 
 
 export const PHASE_101_VR_RUNTIME_CORRECTION_LOCK = Object.freeze({
-  lock: "corrected Three.js/WebXR runtime; one storefront portal per hub; no A-Frame replacement",
+  lock: "corrected Three.js/WebXR runtime; one storefront portal per hub; A-Frame snippets are quarantined and not loaded",
   controls: "Meta hand tracking plus hidden Quest/Oculus controller fallback",
   safety: "watch hologram display repaired; private routes remain isolated from lobby",
   siteTouched: false

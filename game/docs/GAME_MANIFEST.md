@@ -215,3 +215,31 @@ Implementation:
 - Added a raised watch HOLO button and visible wrist hologram panel.
 - Restored close-fist teleport glow and release-to-teleport behavior.
 - Website/site side untouched.
+
+
+## Phase 103 — Boot Rescue Lock
+
+- Fixed Booting freeze caused by duplicate watch hologram declarations.
+- Kept current Three.js/WebXR runtime; do not replace with A-Frame index.
+- Preserved Phase 102 visual targets: Moon/Mars visibility, Espresso sign, Scorpion table, PGA alignment, watch HOLO button, fist teleport target glow.
+- Site untouched.
+
+
+## Phase 104 — Boot Constant + A-Frame Guard Lock
+- Fixed the phase build constant mismatch that could stop boot.
+- Active build label: `PHASE-104-BOOT-CONSTANT-AFRAME-GUARD`.
+- Pasted A-Frame watch-ui code is not loaded into the active Three.js/WebXR runtime.
+- Future watch changes must edit `game/modules/watch.js` only.
+- Site untouched.
+
+
+## Phase 105 — Boot Safe Runtime Lock
+
+- Build label: `PHASE-105-BOOT-SAFE-RUNTIME-LOCK`.
+- Added a non-blocking boot wrapper in `game/main.js`.
+- Moved the real Three.js/WebXR runtime to `game/main-runtime.js`.
+- Added an emergency rendered loading panel so the canvas never stays black while assets load.
+- Added timeout-protected world loading with a minimal fallback world if the full skyline build fails.
+- Kept A-Frame snippets quarantined; the live game remains Three.js/WebXR.
+- Preserved Phase 102/103 visual/watch/fist teleport fixes where present.
+- Site untouched.

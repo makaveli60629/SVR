@@ -1,18 +1,6 @@
-# Phase 96 apply commands
-# This is game-side only. It does not touch /site.
+Run from PowerShell:
 
-cd C:\Users\ronal\SVR
-
-git pull --rebase origin main
-
-# Copy the downloaded Phase 96 package into update/game.zip if your repo still uses update zip overlay:
-Copy-Item "$env:USERPROFILE\Downloads\game.zip" "update\game.zip" -Force
-
-# Also keep a backup copy with the unique phase name:
-Copy-Item "$env:USERPROFILE\Downloads\game-phase96-scorpion-table-front-lock.zip" "update\game-phase96-scorpion-table-front-lock.zip" -Force
-
-git add update/game.zip update/game-phase96-scorpion-table-front-lock.zip
-
-git commit -m "Phase 96 Scorpion table front lock"
-
-git push origin main
+cd "$env:USERPROFILE\Downloads"
+Unblock-File ".\APPLY-PHASE105-BOOT-SAFE-RUNTIME-LOCK.ps1"
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+& ".\APPLY-PHASE105-BOOT-SAFE-RUNTIME-LOCK.ps1"
