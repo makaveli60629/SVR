@@ -17,12 +17,12 @@ import "./modules/poker_action_hud.js";
 import { runWebXREnforcerAudit } from "./modules/webxr_enforcer.js";
 import { buildTeleportRouteRegistry } from "./modules/teleport-router.js";
 
-const PHASE_93_BUILD = "PHASE-93-LAZY-GEOMETRIC-TEXTURE-TABLE";
+const PHASE_95_BUILD = "PHASE-95-VISIBLE-GEOMETRIC-TABLE-WRAPPER";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
-document.documentElement.dataset.svrBuild = PHASE_93_BUILD;
+document.documentElement.dataset.svrBuild = PHASE_95_BUILD;
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 const GEO_TABLE_DISABLED = params.has("noGeoTable") || params.get("geoTable") === "0";
 
@@ -34,14 +34,15 @@ const $toggleLog = document.getElementById("toggleLog");
 const $toggleJoints = document.getElementById("toggleJoints");
 const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
 
-window.SVR_PHASE93_BOOT_STATE = {
-  phase: PHASE_93_BUILD,
+window.SVR_PHASE95_BOOT_STATE = {
+  phase: PHASE_95_BUILD,
   appElementExists: !!document.getElementById("app"),
   geometricTableLoadedAtBoot: false,
   lazyGeometricTextureTable: true,
+  visibleWrapper: true,
   disabledByQuery: GEO_TABLE_DISABLED,
   notScorpion: true,
-  note: "Standalone geometric texture table loads after lobby boot/render. Use ?noGeoTable=1 as emergency kill switch."
+  note: "Visible wrapper loads after lobby render. Use ?noGeoTable=1 as emergency kill switch."
 };
 
 let lastStatusText = "";
@@ -80,7 +81,7 @@ if (AUTOCAM) document.body.classList.add("preview-mode");
 const enforcerAudit = runWebXREnforcerAudit({ log });
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData.SVR_WEBXR_ENFORCER_AUDIT = enforcerAudit;
-scene.userData.SVR_PHASE_93_BUILD = PHASE_93_BUILD;
+scene.userData.SVR_PHASE_95_BUILD = PHASE_95_BUILD;
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
@@ -114,32 +115,33 @@ let geoTableLoadStarted = false;
 let geoTableInstalled = false;
 async function loadGeometricTableSafely(reason = "manual"){
   if (GEO_TABLE_DISABLED){
-    window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE_LOADER = { phase: PHASE_93_BUILD, skipped: true, reason: "disabled-by-query" };
+    window.SVR_PHASE95_GEOMETRIC_TEXTURE_TABLE_LOADER = { phase: PHASE_95_BUILD, skipped: true, reason: "disabled-by-query" };
     return null;
   }
-  if (geoTableInstalled || geoTableLoadStarted) return window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE_LOADER || null;
+  if (geoTableInstalled || geoTableLoadStarted) return window.SVR_PHASE95_GEOMETRIC_TEXTURE_TABLE_LOADER || null;
   geoTableLoadStarted = true;
-  window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE_LOADER = { phase: PHASE_93_BUILD, loading: true, reason, bootSafe: true, notScorpion: true };
+  window.SVR_PHASE95_GEOMETRIC_TEXTURE_TABLE_LOADER = { phase: PHASE_95_BUILD, loading: true, reason, bootSafe: true, notScorpion: true, visibleWrapper: true };
   try {
-    const mod = await import(`./modules/geometric_texture_table.js?v=phase93-lazy-${Date.now()}`);
+    const mod = await import(`./modules/geometric_texture_table_visible.js?v=phase95-visible-${Date.now()}`);
     if (typeof mod.installGeometricTextureTable !== "function") throw new Error("installGeometricTextureTable export missing");
     const object = await mod.installGeometricTextureTable({ scene, sceneTargets, tableCenter, log });
     geoTableInstalled = !!object;
-    window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE_LOADER = {
-      phase: PHASE_93_BUILD,
+    window.SVR_PHASE95_GEOMETRIC_TEXTURE_TABLE_LOADER = {
+      phase: PHASE_95_BUILD,
       loading: false,
       installed: geoTableInstalled,
       reason,
       objectName: object?.name || null,
       recovered: true,
       notScorpion: true,
-      note: "Standalone geometric texture table lazy-loaded after lobby boot. If it fails, the game stays alive."
+      visibleWrapper: true,
+      note: "Visible geometric table wrapper lazy-loaded after lobby boot. If it fails, the game stays alive."
     };
-    if (geoTableInstalled) setStatus("Geometric texture table loaded safely", { force: true });
+    if (geoTableInstalled) setStatus("Visible geometric table loaded", { force: true });
     return object;
   } catch (err){
-    window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE_LOADER = {
-      phase: PHASE_93_BUILD,
+    window.SVR_PHASE95_GEOMETRIC_TEXTURE_TABLE_LOADER = {
+      phase: PHASE_95_BUILD,
       loading: false,
       installed: false,
       failed: true,
@@ -147,15 +149,16 @@ async function loadGeometricTableSafely(reason = "manual"){
       message: err?.message || String(err),
       stack: err?.stack || null,
       recovered: true,
-      notScorpion: true
+      notScorpion: true,
+      visibleWrapper: true
     };
-    console.warn("[SVR] Geometric texture table failed safely", err);
+    console.warn("[SVR] Visible geometric texture table failed safely", err);
     setStatus("Geometric table skipped safely", { force: true });
     return null;
   }
 }
 window.SVR_LOAD_GEOMETRIC_TABLE = loadGeometricTableSafely;
-window.SVR_DISABLE_GEOMETRIC_TABLE_NOTE = "Reload with ?noGeoTable=1 to skip the lazy geometric texture table.";
+window.SVR_DISABLE_GEOMETRIC_TABLE_NOTE = "Reload with ?noGeoTable=1 to skip the lazy visible geometric texture table.";
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -257,7 +260,7 @@ function gotoScene(key){
     const path = rec.scenePath.replace(/^game\//, "./");
     window.SVR_LAST_ROUTE = { requested: key, routeKey, label: rec.label || routeKey, type: rec.type || "private_scene", privateScene: true, scenePath: rec.scenePath };
     setStatus(`Opening private scene: ${rec.label || routeKey}`, { force: true });
-    setTimeout(()=>{ window.location.href = `${path}?v=phase93-private-route`; }, 80);
+    setTimeout(()=>{ window.location.href = `${path}?v=phase95-private-route`; }, 80);
     return true;
   }
 
@@ -359,7 +362,7 @@ window.SVR_HOLOGRAM_MENU = hologram;
 window.SVR_HOLOGRAM_DOM_FALLBACK = holoFallback;
 window.SVR_OPEN_HOLOGRAM = ()=>holoFallback?.setVisible(true, "manual-global-open");
 window.SVR_CLOSE_HOLOGRAM = ()=>holoFallback?.setVisible(false, "manual-global-close");
-window.SVR_PHASE93_HOLOGRAM_HOTFIX = { phase: PHASE_93_BUILD, forcedDomFallback: true, xrUses3d: true };
+window.SVR_PHASE95_HOLOGRAM_HOTFIX = { phase: PHASE_95_BUILD, forcedDomFallback: true, xrUses3d: true };
 
 $toggleJoints?.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
@@ -370,7 +373,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 93 geometric table lazy-loader armed.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 95 visible geometric table armed.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -458,7 +461,7 @@ renderer.setAnimationLoop(()=>{
 
   if (!firstRenderedFrame){
     firstRenderedFrame = true;
-    window.SVR_PHASE93_BOOT_STATE.firstRenderedFrame = true;
+    window.SVR_PHASE95_BOOT_STATE.firstRenderedFrame = true;
     if (!AUTOCAM && !GEO_TABLE_DISABLED){
       setTimeout(()=>loadGeometricTableSafely("post-first-render-delay"), 3200);
     }
