@@ -1,9 +1,9 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker â€¢ Phase 88 VR hologram</title>
+  <title>ScarlettVR Poker • Phase 91 Boot Rescue</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -32,21 +32,22 @@
   </script>
 </head>
 <body>
-  <!-- BUILD: PHASE-89-SCORPION-PROXY<div id="app"></div>
+  <!-- BUILD: PHASE-91-BLACK-SCREEN-BOOT-RESCUE -->
+  <div id="app"></div>
   <button id="hardHoloButton" type="button">HOLO MENU</button>
   <div id="hardHoloOverlay" aria-hidden="true">
     <section class="hard-holo-panel" role="dialog" aria-label="SVR hard hologram menu">
-      <div class="hard-holo-top"><div><div class="hard-holo-sub">PHASE 88 DESKTOP FALLBACK</div><div class="hard-holo-title">SVR HOLOGRAM</div><div style="color:rgba(255,255,255,.72);margin-top:8px">Desktop fallback stays here. VR uses the world-space headset-follow hologram panel.</div></div><button class="hard-holo-close" data-hard-close>CLOSE</button></div>
+      <div class="hard-holo-top"><div><div class="hard-holo-sub">PHASE 91 DESKTOP FALLBACK</div><div class="hard-holo-title">SVR HOLOGRAM</div><div style="color:rgba(255,255,255,.72);margin-top:8px">Boot rescue active. Scorpion proxy is disabled until the lobby renders safely.</div></div><button class="hard-holo-close" data-hard-close>CLOSE</button></div>
       <div class="hard-holo-grid">
-        <button class="hard-holo-card" data-hard-route="./index.html?v=phase88-lobby"><b>Lobby</b><span>Main game</span></button>
+        <button class="hard-holo-card" data-hard-route="./index.html?v=phase91-lobby"><b>Lobby</b><span>Main game</span></button>
         <button class="hard-holo-card" data-hard-action="seat"><b>Seat</b><span>Use in-game seat</span></button>
-        <button class="hard-holo-card" data-hard-route="./scorpion.html?v=phase88"><b>Scorpion</b><span>Private poker</span></button>
-        <button class="hard-holo-card" data-hard-route="./reiki.html?v=phase88"><b>Reiki Room</b><span>Private scene</span></button>
-        <button class="hard-holo-card" data-hard-route="./pga-drive.html?v=phase88"><b>PGA Drive</b><span>Range</span></button>
-        <button class="hard-holo-card" data-hard-route="./chip-putt.html?v=phase88"><b>Chip / Putt</b><span>Short game</span></button>
-        <button class="hard-holo-card" data-hard-route="./store-room.html?v=phase88"><b>Store</b><span>VR store</span></button>
-        <button class="hard-holo-card" data-hard-route="./smoker-lounge.html?v=phase88"><b>Lounge</b><span>Private social</span></button>
-        <button class="hard-holo-card" data-hard-route="./space-station.html?v=phase88"><b>Space Station</b><span>Private space</span></button>
+        <button class="hard-holo-card" data-hard-route="./scorpion.html?v=phase91"><b>Scorpion</b><span>Private poker</span></button>
+        <button class="hard-holo-card" data-hard-route="./reiki.html?v=phase91"><b>Reiki Room</b><span>Private scene</span></button>
+        <button class="hard-holo-card" data-hard-route="./pga-drive.html?v=phase91"><b>PGA Drive</b><span>Range</span></button>
+        <button class="hard-holo-card" data-hard-route="./chip-putt.html?v=phase91"><b>Chip / Putt</b><span>Short game</span></button>
+        <button class="hard-holo-card" data-hard-route="./store-room.html?v=phase91"><b>Store</b><span>VR store</span></button>
+        <button class="hard-holo-card" data-hard-route="./smoker-lounge.html?v=phase91"><b>Lounge</b><span>Private social</span></button>
+        <button class="hard-holo-card" data-hard-route="./space-station.html?v=phase91"><b>Space Station</b><span>Private space</span></button>
         <button class="hard-holo-card" data-hard-action="teleport"><b>Teleport</b><span>Use fist/controller</span></button>
         <button class="hard-holo-card" data-hard-action="call"><b>Check / Call</b><span>Poker action</span></button>
         <button class="hard-holo-card" data-hard-action="fold"><b>Fold</b><span>Poker action</span></button>
@@ -55,12 +56,12 @@
     </section>
   </div>
   <div id="hud">
-    <div class="pill" id="status">Bootingâ€¦</div>
+    <div class="pill" id="status">Booting…</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
-      <span class="pill" id="mode">Hands: â€¦</span>
-      <span class="pill">BUILD: PHASE-89-SCORPION-PROXY</span>
+      <span class="pill" id="mode">Hands: …</span>
+      <span class="pill">BUILD: PHASE-91-BOOT-RESCUE</span>
     </div>
   </div>
   <div id="sceneNav">
@@ -104,29 +105,29 @@
         }
       });
       window.addEventListener('keydown', (e)=>{ if (e.code === 'KeyG' && !e.repeat) toggle(); if (e.code === 'Escape') setOpen(false); }, true);
-      window.SVR_PHASE88_GAME_ENTRY = { phase:'PHASE-88-VR-WORLDSPACE-HEADSET-FOLLOW-HOLOGRAM', ready:true };
+      window.SVR_PHASE91_GAME_ENTRY = { phase:'PHASE-91-BLACK-SCREEN-BOOT-RESCUE', ready:true, appElementExists: !!document.getElementById('app') };
     })();
   </script>
-  <script type="module" src="./main.js?v=phase88-vr-worldspace-holo"></script>
-  <script type="module" src="./modules/poker_table_fx.js?v=phase88"></script>
-  <script type="module" src="./modules/npc_bot_animation_fx.js?v=phase88"></script>
-  <script type="module" src="./modules/runtime_audit_guard.js?v=phase88"></script>
-  <script type="module" src="./modules/poker_feedback_fx.js?v=phase88"></script>
-  <script type="module" src="./modules/runtime_health_panel.js?v=phase88"></script>
-  <script type="module" src="./modules/poker_card_mesh_sync.js?v=phase88"></script>
-  <script type="module" src="./modules/poker_chip_motion_fx.js?v=phase88"></script>
-  <script type="module" src="./modules/private_scene_route_guard.js?v=phase88"></script>
-  <script type="module" src="./modules/quest_performance_monitor.js?v=phase88"></script>
-  <script type="module" src="./modules/gameplay_demo_polish.js?v=phase88"></script>
-  <script type="module" src="./modules/runtime_health_sync_patch.js?v=phase88"></script>
-  <script type="module" src="./modules/poker_custom_raise_ui.js?v=phase88"></script>
-  <script type="module" src="./modules/admin_online.js?v=phase88"></script>
-  <script type="module" src="./modules/quest_regression_bundle_audit.js?v=phase88"></script>
-  <script type="module" src="./modules/demo_candidate_lock.js?v=phase88"></script>
-  <script type="module" src="./modules/phase121_demo_status_patch.js?v=phase88"></script>
-  <script type="module" src="./modules/phase122_full_game_audit.js?v=phase88"></script>
-  <script src="modules/scorpion_chip_flow_polish.js?v=phase88"></script>
-  <script src="modules/scorpion_turn_ux_polish.js?v=phase88"></script>
-  <script src="modules/teleport_hotfix_guard.js?v=phase88"></script>
+  <script type="module" src="./main.js?v=phase91-black-screen-boot-rescue"></script>
+  <script type="module" src="./modules/poker_table_fx.js?v=phase91"></script>
+  <script type="module" src="./modules/npc_bot_animation_fx.js?v=phase91"></script>
+  <script type="module" src="./modules/runtime_audit_guard.js?v=phase91"></script>
+  <script type="module" src="./modules/poker_feedback_fx.js?v=phase91"></script>
+  <script type="module" src="./modules/runtime_health_panel.js?v=phase91"></script>
+  <script type="module" src="./modules/poker_card_mesh_sync.js?v=phase91"></script>
+  <script type="module" src="./modules/poker_chip_motion_fx.js?v=phase91"></script>
+  <script type="module" src="./modules/private_scene_route_guard.js?v=phase91"></script>
+  <script type="module" src="./modules/quest_performance_monitor.js?v=phase91"></script>
+  <script type="module" src="./modules/gameplay_demo_polish.js?v=phase91"></script>
+  <script type="module" src="./modules/runtime_health_sync_patch.js?v=phase91"></script>
+  <script type="module" src="./modules/poker_custom_raise_ui.js?v=phase91"></script>
+  <script type="module" src="./modules/admin_online.js?v=phase91"></script>
+  <script type="module" src="./modules/quest_regression_bundle_audit.js?v=phase91"></script>
+  <script type="module" src="./modules/demo_candidate_lock.js?v=phase91"></script>
+  <script type="module" src="./modules/phase121_demo_status_patch.js?v=phase91"></script>
+  <script type="module" src="./modules/phase122_full_game_audit.js?v=phase91"></script>
+  <script src="modules/scorpion_chip_flow_polish.js?v=phase91"></script>
+  <script src="modules/scorpion_turn_ux_polish.js?v=phase91"></script>
+  <script src="modules/teleport_hotfix_guard.js?v=phase91"></script>
 </body>
 </html>
