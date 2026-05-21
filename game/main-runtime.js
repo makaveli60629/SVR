@@ -7,8 +7,9 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { PHASE_109_BUILD, routeLabel, PHASE_101_VR_RUNTIME_CORRECTION_LOCK, PHASE_106_HOLOCTX_BOOT_FIX_LOCK } from "./modules/private_room_registry.js";
+import { PHASE_110_BUILD, routeLabel, PHASE_101_VR_RUNTIME_CORRECTION_LOCK, PHASE_106_HOLOCTX_BOOT_FIX_LOCK, PHASE_110_BOOT_VERIFIED_WATCH_STABILITY_LOCK } from "./modules/private_room_registry.js";
 
+window.__SVR_PHASE110_RUNTIME_LOCK = PHASE_110_BOOT_VERIFIED_WATCH_STABILITY_LOCK;
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -409,7 +410,7 @@ const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"),
 tp.setLogoTexture(logoTexture);
 
 window.__SVR_RUNTIME_READY = true;
-setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_109_BUILD}: watch holo starts off, hand teleport glow/release locked, locomotion toggle active.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_110_BUILD}: boot verified, watch holo off by default, TP/MOVE toggles stable.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
