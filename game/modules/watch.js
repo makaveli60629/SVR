@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-const PHASE = "PHASE-174-WATCH-TEXTURE-POLISH";
+const PHASE = "PHASE-177-WATCH-HOLOGRAM-LAUNCHER";
 const V0 = new THREE.Vector3();
 const V1 = new THREE.Vector3();
 const V2 = new THREE.Vector3();
@@ -68,27 +68,8 @@ function computeForearmPose(hand, camera, renderer, side = "left"){
   return { position, quaternion };
 }
 
-function button(id, label, x, y, w, h, font = 18, hold = 0.11, disabled = false, reason = ""){
-  return { id, label, x, y, w, h, font, hold, margin: 12, disabled, reason };
-}
-
-function pokerEnded(poker){ return poker?.street === "showdown" || !!poker?.winnerText || poker?.street === "idle"; }
-function pokerLegal(poker, key){
-  const legal = poker?.legal || {};
-  const turn = !!poker?.awaitingPlayer;
-  if (key === "next") return pokerEnded(poker);
-  if (!turn) return false;
-  if (key === "fold") return !!legal.canFold;
-  if (key === "call") return !!(legal.canCheck || legal.canCall);
-  if (key === "raise" || key === "halfpot" || key === "pot") return !!legal.canRaise;
-  if (key === "allin") return !!legal.canAllIn;
-  return true;
-}
-function disabledReason(poker, key){
-  if (key === "next" && !pokerEnded(poker)) return "Finish hand first";
-  if (!poker?.awaitingPlayer) return "Not your turn";
-  if (key === "halfpot" || key === "pot" || key === "raise") return "Raise locked";
-  return "Illegal now";
+function holoButton(){
+  return { id: "holo", label: "OPEN HOLOGRAM", x: 72, y: 156, w: 880, h: 208, font: 64, hold: 0.075, margin: 34 };
 }
 
 export function createWristWatch({ scene, camera = null, renderer = null, getState = ()=>({}), actions = {} }){
@@ -105,12 +86,12 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   group.visible = false;
   scene.add(group);
 
-  const plateW = 0.224;
-  const plateH = 0.116;
+  const plateW = 0.232;
+  const plateH = 0.124;
 
   const frame = new THREE.Mesh(
-    new THREE.BoxGeometry(plateW * 0.98, plateH * 0.98, 0.003),
-    new THREE.MeshStandardMaterial({ color: 0x0c1020, roughness: 0.30, metalness: 0.32, emissive: 0x12001f, emissiveIntensity: 0.08, transparent: true, opacity: 0.92 })
+    new THREE.BoxGeometry(plateW, plateH, 0.004),
+    new THREE.MeshStandardMaterial({ color: 0x0c1020, roughness: 0.28, metalness: 0.36, emissive: 0x18002a, emissiveIntensity: 0.14, transparent: true, opacity: 0.95 })
   );
   frame.position.z = -0.014;
   group.add(frame);
@@ -127,216 +108,129 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     new THREE.PlaneGeometry(plateW * 0.965, plateH * 0.965),
     new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.FrontSide, depthWrite: false, depthTest: false, toneMapped: false })
   );
-  screenFront.renderOrder = 40;
+  screenFront.renderOrder = 44;
   screenFront.position.z = 0.012;
   group.add(screenFront);
 
   let hoveredId = null;
   let pressed = false;
   let pinchTime = 0;
-  let pressLockId = null;
-  let lastHovered = null;
   let lastSig = "";
-  let watchNotice = "";
-  let watchNoticeUntil = 0;
-
-  function buildButtons(state){
-    const poker = state.poker || {};
-    const callLabel = poker.toCall > 0 ? `CALL ${poker.toCall}` : "CHECK";
-    const minLabel = poker?.legal?.minRaiseTo ? `MIN ${poker.legal.minRaiseTo}` : "MIN";
-    return [
-      button("holo", "HOLO", 24, 132, 110, 40, 20, 0.10),
-      button("lobby", "LOBBY", 144, 132, 110, 40, 18),
-      button("seatScene", "SEAT", 264, 132, 110, 40, 18),
-      button("reikiScene", "REIKI", 24, 180, 110, 40, 18),
-      button("pgaScene", "PGA", 144, 180, 110, 40, 18),
-      button("scorpionScene", "SCORP", 264, 180, 110, 40, 16),
-      button("pgaDriveScene", "DRIVE", 24, 228, 110, 40, 18),
-      button("chipPuttScene", "CHIP", 144, 228, 110, 40, 18),
-      button("storeRoomScene", "STORE", 264, 228, 110, 40, 18),
-      button("smokerLoungeScene", "LOUNGE", 24, 276, 110, 40, 16),
-      button("teleport", state.teleportEnabled ? "TP ON" : "TP OFF", 144, 276, 110, 40, 17),
-      button("audio", state.audioEnabled ? "MUSIC" : "MUTE", 264, 276, 110, 40, 17),
-      button("pokerFold", "FOLD", 424, 184, 120, 48, 21, 0.12, !pokerLegal(poker, "fold"), disabledReason(poker, "fold")),
-      button("pokerCall", callLabel, 554, 184, 134, 48, poker.toCall > 999 ? 16 : 21, 0.12, !pokerLegal(poker, "call"), disabledReason(poker, "call")),
-      button("pokerRaise", minLabel, 698, 184, 124, 48, poker?.legal?.minRaiseTo > 999 ? 15 : 20, 0.12, !pokerLegal(poker, "raise"), disabledReason(poker, "raise")),
-      button("pokerRaiseHalfPot", "HALF POT", 832, 184, 130, 48, 16, 0.12, !pokerLegal(poker, "halfpot"), disabledReason(poker, "halfpot")),
-      button("pokerRaisePot", "POT", 424, 244, 166, 48, 21, 0.12, !pokerLegal(poker, "pot"), disabledReason(poker, "pot")),
-      button("pokerAllIn", "ALL-IN", 604, 244, 178, 48, 22, 0.14, !pokerLegal(poker, "allin"), disabledReason(poker, "allin")),
-      button("pokerNext", "NEXT HAND", 796, 244, 166, 48, 20, 0.14, !pokerLegal(poker, "next"), disabledReason(poker, "next")),
-      button("next", "TRACK", 604, 394, 178, 46, 20, 0.16),
-      state.seated ? button("leave", "LEAVE TABLE", 796, 394, 166, 46, 18, 0.14) : button("join", state.inTableZone ? "QUICK SIT" : "WALK CLOSER", 796, 394, 166, 46, 17, 0.14, !state.inTableZone, "Walk closer")
-    ];
-  }
-
-  function drawGrid(){
-    ctx.save();
-    ctx.strokeStyle = "rgba(180,140,255,0.08)";
-    ctx.lineWidth = 1;
-    for (let x = 32; x < 1000; x += 32){
-      ctx.beginPath(); ctx.moveTo(x, 28); ctx.lineTo(x, 484); ctx.stroke();
-    }
-    for (let y = 32; y < 488; y += 32){
-      ctx.beginPath(); ctx.moveTo(24, y); ctx.lineTo(1000, y); ctx.stroke();
-    }
-    ctx.restore();
-  }
+  let notice = "";
+  let noticeUntil = 0;
 
   function drawButton(btn, hovered){
     ctx.save();
-    const disabled = !!btn.disabled;
-    const fill = disabled ? "rgba(255,255,255,0.035)" : hovered ? "rgba(180,72,255,0.42)" : "rgba(255,255,255,0.075)";
-    ctx.fillStyle = fill;
-    ctx.strokeStyle = disabled ? "rgba(255,255,255,0.16)" : hovered ? "rgba(246,226,127,0.98)" : "rgba(180,140,255,0.50)";
-    ctx.lineWidth = hovered && !disabled ? 5 : 3;
-    rr(ctx, btn.x, btn.y, btn.w, btn.h, 15);
+    const grd = ctx.createLinearGradient(btn.x, btn.y, btn.x + btn.w, btn.y + btn.h);
+    grd.addColorStop(0, hovered ? "rgba(208,92,255,0.95)" : "rgba(122,34,255,0.70)");
+    grd.addColorStop(1, hovered ? "rgba(246,226,127,0.80)" : "rgba(180,72,255,0.70)");
+    ctx.fillStyle = grd;
+    ctx.strokeStyle = hovered ? "#ffffff" : "rgba(246,226,127,0.86)";
+    ctx.lineWidth = hovered ? 10 : 6;
+    ctx.shadowColor = hovered ? "rgba(208,92,255,0.95)" : "rgba(180,72,255,0.55)";
+    ctx.shadowBlur = hovered ? 28 : 16;
+    rr(ctx, btn.x, btn.y, btn.w, btn.h, 34);
     ctx.fill();
     ctx.stroke();
-    if (hovered && !disabled){
-      ctx.shadowColor = "rgba(180,72,255,0.8)";
-      ctx.shadowBlur = 18;
-      ctx.strokeStyle = "rgba(180,72,255,0.7)";
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-    }
-    ctx.fillStyle = disabled ? "rgba(255,255,255,0.42)" : hovered ? "#ffffff" : "#e8e8ff";
-    ctx.font = `bold ${btn.font || 20}px system-ui, Arial`;
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `bold ${btn.font}px system-ui, Arial`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(btn.label, btn.x + btn.w / 2, btn.y + btn.h / 2 + 1);
+    ctx.fillText(btn.label, btn.x + btn.w / 2, btn.y + btn.h / 2 - 18);
+    ctx.fillStyle = "rgba(255,255,255,0.88)";
+    ctx.font = "bold 30px system-ui, Arial";
+    ctx.fillText("BIG 3D MENU", btn.x + btn.w / 2, btn.y + btn.h / 2 + 52);
     ctx.restore();
   }
 
   function draw(force = false){
-    const state = getState();
+    const state = getState() || {};
     const poker = state.poker || {};
-    const activeTp = window.SVR_ACTIVE_TELEPORT_HAND || {};
-    const sig = JSON.stringify({ h: hoveredId, notice: watchNotice, noticeLive: performance.now() < watchNoticeUntil, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, pot: poker.pot, street: poker.street, active: poker.activeName, turn: poker.awaitingPlayer, legal: poker.legal, holo: state.hologramVisible, tp: activeTp.state, tpHand: activeTp.active, sec: new Date().getSeconds() });
+    const tp = window.SVR_ACTIVE_TELEPORT_HAND || {};
+    const liveNotice = performance.now() < noticeUntil;
+    const sig = JSON.stringify({ h: hoveredId, cash: state.cash, seat: state.seatLabel, seated: state.seated, holo: state.hologramVisible, tp: tp.state, tpHand: tp.active, pot: poker.pot, turn: poker.awaitingPlayer, liveNotice, sec: Math.floor(performance.now() / 500) });
     if (!force && sig === lastSig) return;
     lastSig = sig;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    grad.addColorStop(0, "rgba(5,8,16,0.96)");
-    grad.addColorStop(0.46, "rgba(25,9,48,0.96)");
-    grad.addColorStop(1, "rgba(8,12,26,0.98)");
-    ctx.fillStyle = grad;
-    rr(ctx, 12, 12, 1000, 488, 34);
+    const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    bg.addColorStop(0, "rgba(5,8,16,0.98)");
+    bg.addColorStop(0.52, "rgba(34,10,60,0.98)");
+    bg.addColorStop(1, "rgba(5,8,16,0.98)");
+    ctx.fillStyle = bg;
+    rr(ctx, 12, 12, 1000, 488, 36);
     ctx.fill();
-    drawGrid();
-    ctx.strokeStyle = activeTp.glow === "purple" ? "rgba(180,72,255,0.96)" : poker.awaitingPlayer ? "rgba(246,226,127,0.88)" : "rgba(180,140,255,0.70)";
-    ctx.lineWidth = activeTp.glow === "purple" ? 8 : 6;
-    rr(ctx, 12, 12, 1000, 488, 34);
+
+    ctx.strokeStyle = tp.glow === "purple" ? "rgba(208,92,255,0.98)" : "rgba(180,140,255,0.72)";
+    ctx.lineWidth = 7;
+    rr(ctx, 12, 12, 1000, 488, 36);
     ctx.stroke();
 
-    const now = new Date();
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 48px system-ui, Arial";
+    ctx.font = "bold 42px system-ui, Arial";
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
-    ctx.fillText(now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), 34, 58);
-    ctx.fillStyle = "rgba(233,233,255,0.95)";
-    ctx.font = "bold 27px system-ui, Arial";
-    ctx.fillText("SVR WRIST CONSOLE", 34, 104);
-    ctx.fillStyle = activeTp.glow === "purple" ? "#f6e27f" : state.hologramVisible ? "#f6e27f" : "rgba(233,233,255,0.72)";
-    ctx.font = "18px system-ui, Arial";
-    const tpText = activeTp.glow === "purple" ? `TP ACTIVE: ${String(activeTp.active || "hand").toUpperCase()}` : state.hologramVisible ? "Hologram menu open" : "Tap HOLO for large menu";
-    ctx.fillText(tpText, 208, 104);
+    ctx.fillText("SVR WATCH", 44, 58);
+
+    ctx.fillStyle = "rgba(233,233,255,0.84)";
+    ctx.font = "22px system-ui, Arial";
+    ctx.fillText(`Seat: ${state.seated ? state.seatLabel : "Standing"} • Pot $${poker.pot || 0}`, 44, 104);
 
     ctx.textAlign = "right";
     ctx.fillStyle = "#7ff5c7";
     ctx.font = "bold 34px system-ui, Arial";
-    ctx.fillText(`$${Number(state.cash || 0).toLocaleString()}`, 972, 58);
+    ctx.fillText(`$${Number(state.cash || 0).toLocaleString()}`, 976, 58);
 
     ctx.textAlign = "left";
-    ctx.fillStyle = poker.awaitingPlayer ? "#f6e27f" : "rgba(233,233,255,0.82)";
+    ctx.fillStyle = tp.glow === "purple" ? "#f6e27f" : "rgba(233,233,255,0.82)";
     ctx.font = "bold 24px system-ui, Arial";
-    ctx.fillText(`Poker: ${String(poker.street || "ready").toUpperCase()} • Pot $${poker.pot || 0} • Active: ${poker.activeName || "--"}`, 424, 104);
-    ctx.fillStyle = "rgba(233,233,255,0.78)";
-    ctx.font = "21px system-ui, Arial";
-    ctx.fillText(`Board: ${(poker.board || []).join(" ") || "--"}   Hand: ${(poker.playerCards || []).join(" ") || "--"}`, 424, 138);
-    const noticeLive = performance.now() < watchNoticeUntil;
-    ctx.fillStyle = noticeLive ? "#f6e27f" : activeTp.glow === "purple" ? "#b648ff" : "rgba(233,233,255,0.78)";
-    ctx.fillText(noticeLive ? watchNotice : activeTp.glow === "purple" ? "Teleport armed — purple hand active" : poker.awaitingPlayer ? "YOUR TURN: watch or HOLO menu ready" : (poker.lastAction || "Bots acting..."), 424, 166);
+    const tpLine = tp.glow === "purple" ? `Teleport ON: ${String(tp.active || "hand").toUpperCase()}` : "Teleport OFF • look at fist + clench";
+    ctx.fillText(tpLine, 44, 410);
 
-    ctx.fillStyle = "rgba(180,140,255,0.92)";
-    ctx.font = "bold 19px system-ui, Arial";
-    ctx.fillText("Scenes + HOLO", 34, 122);
-    ctx.fillText("Poker Actions", 424, 122);
+    ctx.fillStyle = liveNotice ? "#f6e27f" : poker.awaitingPlayer ? "#f6e27f" : "rgba(233,233,255,0.76)";
+    ctx.font = "22px system-ui, Arial";
+    ctx.fillText(liveNotice ? notice : poker.awaitingPlayer ? "YOUR TURN — open hologram for poker controls" : "Open hologram for scenes, poker, audio, help", 44, 450);
 
-    ctx.fillStyle = "rgba(233,233,255,0.72)";
-    ctx.font = "19px system-ui, Arial";
-    ctx.fillText(`Seat: ${state.seated ? state.seatLabel : "Standing"} • Zone: ${state.inTableZone ? "Ready" : "Walk closer"}`, 34, 342);
-    ctx.fillText("HOLO opens the large floating menu", 34, 372);
-    ctx.fillText(`Track: ${state.audioEnabled ? state.trackTitle : "Paused"}`, 34, 430);
-
-    for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
+    drawButton(holoButton(), hoveredId === "holo");
     tex.needsUpdate = true;
   }
 
   function localHit(local){
-    const state = getState();
+    const btn = holoButton();
     const x = ((local.x / plateW) + 0.5) * canvas.width;
     const y = ((-local.y / plateH) + 0.5) * canvas.height;
-    let best = null;
-    let bestScore = Infinity;
-    for (const btn of buildButtons(state)){
-      const margin = btn.margin ?? 12;
-      if (x < btn.x - margin || x > btn.x + btn.w + margin || y < btn.y - margin || y > btn.y + btn.h + margin) continue;
-      const cx = btn.x + btn.w / 2;
-      const cy = btn.y + btn.h / 2;
-      const nx = (x - cx) / Math.max(btn.w / 2, 1);
-      const ny = (y - cy) / Math.max(btn.h / 2, 1);
-      const score = nx * nx + ny * ny;
-      if (score < bestScore){ best = btn.id; bestScore = score; }
-    }
-    return best;
-  }
-
-  function showDisabled(btn){
-    watchNotice = btn?.reason || "Action locked";
-    watchNoticeUntil = performance.now() + 1600;
-    try { window.SVR_PHASE95_POKER_FEEDBACK_FX?.showToast?.({ title: "Watch Action Locked", body: watchNotice, sub: "SVR wrist console", kind: "warn", ms: 1600 }); } catch {}
-    draw(true);
+    const margin = btn.margin ?? 24;
+    if (x < btn.x - margin || x > btn.x + btn.w + margin || y < btn.y - margin || y > btn.y + btn.h + margin) return null;
+    return btn.id;
   }
 
   function activate(id){
-    if (!id) return;
-    const btn = buildButtons(getState()).find(b => b.id === id);
-    if (btn?.disabled){ showDisabled(btn); return; }
-    if (id === "holo") actions.toggleHologram?.();
-    if (id === "audio") actions.toggleAudio?.();
-    if (id === "next") actions.nextTrack?.();
-    if (id === "join") actions.joinTable?.();
-    if (id === "leave") actions.leaveTable?.();
-    if (id === "teleport") actions.toggleTeleport?.();
-    if (id === "pokerFold") actions.pokerFold?.();
-    if (id === "pokerCall") actions.pokerCall?.();
-    if (id === "pokerRaise") actions.pokerRaise?.();
-    if (id === "pokerRaiseHalfPot") actions.pokerRaiseHalfPot?.() || window.SVR_PLAYABLE_POKER?.raiseHalfPot?.();
-    if (id === "pokerRaisePot") actions.pokerRaisePot?.() || window.SVR_PLAYABLE_POKER?.raisePot?.();
-    if (id === "pokerAllIn") actions.pokerAllIn?.();
-    if (id === "pokerNext") actions.pokerNext?.();
-    if (id === "lobby") actions.goLobby?.();
-    if (id === "seatScene") actions.goSeat?.();
-    if (id === "reikiScene") actions.goReiki?.();
-    if (id === "pgaScene") actions.goPga?.();
-    if (id === "legendScene") actions.goLegend?.();
-    if (id === "sponsorScene") actions.goSponsor?.();
-    if (id === "scorpionScene") actions.goScorpion?.();
-    if (id === "pgaDriveScene") actions.goPgaDrive?.();
-    if (id === "chipPuttScene") actions.goChipPutt?.();
-    if (id === "storeRoomScene") actions.goStoreRoom?.();
-    if (id === "smokerLoungeScene") actions.goSmokerLounge?.();
+    if (id !== "holo") return;
+    actions.toggleHologram?.();
+    notice = "Hologram opened";
+    noticeUntil = performance.now() + 1600;
     draw(true);
   }
 
   function update(dt, leftHand, rightHand){
     const anchor = leftHand?.joints?.wrist ? leftHand : rightHand?.joints?.wrist ? rightHand : null;
-    if (!anchor?.joints?.wrist){ group.visible = false; hoveredId = null; draw(true); return; }
+    if (!anchor?.joints?.wrist){
+      group.visible = false;
+      hoveredId = null;
+      draw(true);
+      return;
+    }
+
     const watchOnLeft = anchor === leftHand;
     const pose = computeForearmPose(anchor, camera, renderer, watchOnLeft ? "left" : "right");
-    if (!pose){ group.visible = false; hoveredId = null; draw(true); return; }
+    if (!pose){
+      group.visible = false;
+      hoveredId = null;
+      draw(true);
+      return;
+    }
 
     group.visible = true;
     group.position.copy(pose.position);
@@ -353,38 +247,36 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
       const tipPos = new THREE.Vector3();
       tip.getWorldPosition(tipPos);
       const local = group.worldToLocal(tipPos.clone());
-      if (local.z > -0.020 && local.z < 0.090 && Math.abs(local.x) < plateW * 0.78 && Math.abs(local.y) < plateH * 0.78){
+      if (local.z > -0.026 && local.z < 0.115 && Math.abs(local.x) < plateW * 0.92 && Math.abs(local.y) < plateH * 0.92){
         const hit = localHit(local);
         if (hit){
           const depth = Math.abs(local.z);
-          if (depth < bestDepth){ bestDepth = depth; nextHovered = hit; activeInput = candidate; }
+          if (depth < bestDepth){
+            bestDepth = depth;
+            nextHovered = hit;
+            activeInput = candidate;
+          }
         }
       }
     }
+
     hoveredId = nextHovered;
-
     const pinching = !!activeInput && isPinching(activeInput);
-    if (pinching && hoveredId && !pressLockId) pressLockId = hoveredId;
-    if (pinching && pressLockId) hoveredId = pressLockId;
-    if (!pinching) pressLockId = null;
-    if (hoveredId !== lastHovered){ lastHovered = hoveredId; pinchTime = 0; if (!pinching) pressed = false; if (!hoveredId) pressLockId = null; }
-
-    const buttons = buildButtons(getState());
-    const activeBtn = buttons.find(btn => btn.id === hoveredId) || null;
     if (hoveredId && pinching) pinchTime += dt;
     else if (!pinching) pinchTime = 0;
 
-    const directHold = activeBtn?.hold ?? 0.11;
-    if (hoveredId && !pressed && pinching && pinchTime > directHold){ pressed = true; activate(hoveredId); pinchTime = 0; }
+    if (hoveredId && pinching && !pressed && pinchTime > holoButton().hold){
+      pressed = true;
+      activate(hoveredId);
+      pinchTime = 0;
+    }
     if (!pinching) pressed = false;
-
     draw();
   }
 
   draw(true);
-  window.SVR_PHASE174_WATCH_TEXTURE = { phase: PHASE, texture: "procedural-grid-bezel", holo: true };
-  window.SVR_PHASE165_WATCH_HOLOGRAM_BUTTON = window.SVR_PHASE174_WATCH_TEXTURE;
-  window.SVR_PHASE123_WATCH_RAISE_CONTROLS = window.SVR_PHASE174_WATCH_TEXTURE;
-  window.SVR_PHASE108_WATCH_POKER_DISABLED_STATES = window.SVR_PHASE174_WATCH_TEXTURE;
+  window.SVR_PHASE177_WATCH_LAUNCHER = { phase: PHASE, mode: "large-hologram-launcher", smallButtonsRemoved: true };
+  window.SVR_PHASE174_WATCH_TEXTURE = window.SVR_PHASE177_WATCH_LAUNCHER;
+  window.SVR_PHASE165_WATCH_HOLOGRAM_BUTTON = window.SVR_PHASE177_WATCH_LAUNCHER;
   return { update, object: group };
 }
