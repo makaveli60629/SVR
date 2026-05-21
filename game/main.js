@@ -7,7 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { PHASE_99_BUILD, routeLabel, PHASE_99_SCENE_ADD_LOCK } from "./modules/private_room_registry.js";
+import { PHASE_100_BUILD, routeLabel, PHASE_100_LOBBY_PORTAL_CLEANUP_LOCK } from "./modules/private_room_registry.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -102,6 +102,14 @@ const audio = createAudioPlaylist({
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
+let holoMenuVisible = true;
+function toggleHoloMenu(){
+  holoMenuVisible = !holoMenuVisible;
+  const nav = document.getElementById("sceneNav");
+  if (nav && !AUTOCAM && !renderer.xr.isPresenting) nav.style.display = holoMenuVisible ? "flex" : "none";
+  setStatus(holoMenuVisible ? "HOLO MENU ON" : "HOLO MENU OFF", { force: true });
+  return holoMenuVisible;
+}
 
 function currentHeadXZ(){
   if (renderer.xr.isPresenting){
@@ -175,7 +183,7 @@ function gotoScene(key){
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
-  setStatus(`Phase 99 VR route: ${routeLabel(key)}`, { force: true });
+  setStatus(`Phase 100 VR route: ${routeLabel(key)}`, { force: true });
   return true;
 }
 
@@ -241,7 +249,8 @@ const watch = createWristWatch({
     seated,
     inTableZone: inTableZone(),
     seatLabel: seatLabel(),
-    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
+    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true,
+    holoMenuVisible
   }),
   actions: {
     toggleAudio: ()=>audio.toggle(),
@@ -249,6 +258,7 @@ const watch = createWristWatch({
     joinTable,
     leaveTable,
     toggleTeleport: ()=>tp.toggleMode(),
+    toggleHoloMenu,
     goLobby: ()=>gotoScene("lobby"),
     goTable: ()=>gotoScene("table"),
     goSeat: ()=>gotoScene("seat"),
@@ -274,7 +284,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_99_BUILD}: full VR scene routes active, safe spawn mats locked, private rooms added.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_100_BUILD}: single storefront portals active, Moon/Mars fail-safe visible, watch holo/TP repaired.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

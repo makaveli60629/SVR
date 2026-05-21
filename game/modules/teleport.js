@@ -204,7 +204,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const dist = wristPos.distanceTo(headPos);
     const relativeY = wristPos.y - headPos.y;
     const relativeZ = wristPos.z - headPos.z;
-    return dist < 0.34 && relativeY > -0.28 && relativeY < 0.22 && Math.abs(relativeZ) < 0.28;
+    return dist < 0.48 && relativeY > -0.34 && relativeY < 0.28 && Math.abs(relativeZ) < 0.42;
   }
 
   function controllerTriggerValue(proxy){
@@ -332,31 +332,28 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     lastLeftToggle = leftToggle;
     lastRightToggle = rightToggle;
 
-    if (!leftControllerRef?.joints && !rightControllerRef?.joints){
-      const leftFist = !!leftHandRef?.joints && handNearFace(leftHandRef) && isFist(leftHandRef);
-      const rightFist = !!rightHandRef?.joints && handNearFace(rightHandRef) && isFist(rightHandRef);
-      if (leftFist && !lastLeftFistToggle && now > cooldownUntil){
-        mode = !(mode && active === leftHandRef);
-        active = mode ? leftHandRef : null;
-        activeMode = 'hand';
-        cooldownUntil = now + 320;
-        pinchHoldStart = 0;
-        triggerHoldStart = 0;
-      }
-      if (rightFist && !lastRightFistToggle && now > cooldownUntil){
-        mode = !(mode && active === rightHandRef);
-        active = mode ? rightHandRef : null;
-        activeMode = 'hand';
-        cooldownUntil = now + 320;
-        pinchHoldStart = 0;
-        triggerHoldStart = 0;
-      }
-      lastLeftFistToggle = leftFist;
-      lastRightFistToggle = rightFist;
-    } else {
-      lastLeftFistToggle = false;
-      lastRightFistToggle = false;
+    // Phase 100: preserve hand fist/pinch teleport even when Quest controllers are present as fallback.
+    // Earlier builds disabled fist activation whenever controller proxies existed, which broke hand-tracking teleport.
+    const leftFist = !!leftHandRef?.joints && handNearFace(leftHandRef) && isFist(leftHandRef);
+    const rightFist = !!rightHandRef?.joints && handNearFace(rightHandRef) && isFist(rightHandRef);
+    if (leftFist && !lastLeftFistToggle && now > cooldownUntil){
+      mode = !(mode && active === leftHandRef);
+      active = mode ? leftHandRef : null;
+      activeMode = 'hand';
+      cooldownUntil = now + 260;
+      pinchHoldStart = 0;
+      triggerHoldStart = 0;
     }
+    if (rightFist && !lastRightFistToggle && now > cooldownUntil){
+      mode = !(mode && active === rightHandRef);
+      active = mode ? rightHandRef : null;
+      activeMode = 'hand';
+      cooldownUntil = now + 260;
+      pinchHoldStart = 0;
+      triggerHoldStart = 0;
+    }
+    lastLeftFistToggle = leftFist;
+    lastRightFistToggle = rightFist;
 
     if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){
       pointer.visible = false;
@@ -387,9 +384,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
         ? "Controllers active • left stick move • right stick snap turn • A/X teleport"
-        : "TELEPORT OFF • press TP or make fist by face";
+        : "TELEPORT OFF • press TP or fist/chinch by face";
       statusCb(idleMsg);
-      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist by face toggles TP");
+      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist/chinch by face toggles TP");
       return;
     }
 
@@ -485,7 +482,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (!pinch) pinchHoldStart = 0;
     active.userData._wasPinching = pinch;
     modeCb("Hands: TELEPORT ON");
-    statusCb("HAND TP ON • fist by face toggles • hold pinch then release");
+    statusCb("HAND TP ON • fist/chinch by face toggles • hold pinch then release");
   }
 
   return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };

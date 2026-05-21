@@ -848,6 +848,9 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   reikiFillB.position.copy(center).add(new THREE.Vector3(2.6, 2.8, 0.8));
   scene.add(reikiFillB);
 
+  // Phase 100: Espresso with Cream wall ad sits on a tall building directly behind the Reiki storefront.
+  addReikiBackBuildingEspressoAd(scene, { center, inward, wallHeight });
+
   const hubTarget = center.clone().addScaledVector(inward, 3.2);
   const roomTarget = center.clone().addScaledVector(inward, 1.3).addScaledVector(right, 0.0);
   return {
@@ -1021,6 +1024,51 @@ function createPlaqueTexture(title = "legend", subtitle = "hall of fame"){
     x.fillText(String(subtitle || "").toUpperCase(), w/2, 170);
   });
 }
+
+function createEspressoCreamAdTexture(){
+  return canvasTexture(900, 1400, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h);
+    g.addColorStop(0, '#11070a');
+    g.addColorStop(0.55, '#2b1410');
+    g.addColorStop(1, '#070407');
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(255,218,128,0.92)'; x.lineWidth = 18; x.strokeRect(28,28,w-56,h-56);
+    x.fillStyle = 'rgba(255,255,255,0.05)'; x.fillRect(82,90,w-164,h-180);
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    const cupX = w/2, cupY = 350;
+    const rg = x.createRadialGradient(cupX-30,cupY-60,18,cupX,cupY,180);
+    rg.addColorStop(0,'#fff2d0'); rg.addColorStop(0.36,'#c76b2a'); rg.addColorStop(0.72,'#5a2411'); rg.addColorStop(1,'#2b1108');
+    x.fillStyle = rg; x.beginPath(); x.arc(cupX,cupY,168,0,Math.PI*2); x.fill();
+    x.strokeStyle = '#fff0c8'; x.lineWidth = 18; x.beginPath(); x.arc(cupX,cupY,180,0,Math.PI*2); x.stroke();
+    x.strokeStyle = 'rgba(255,244,210,0.92)'; x.lineWidth = 16; x.beginPath(); x.arc(cupX,cupY,70,0.2,Math.PI*1.7); x.stroke();
+    x.fillStyle = '#fff6dd'; x.font = '900 86px system-ui, Arial'; x.fillText('ESPRESSO', w/2, 720);
+    x.fillStyle = '#ffd782'; x.font = '900 72px system-ui, Arial'; x.fillText('WITH CREAM', w/2, 815);
+    x.fillStyle = '#ffffff'; x.font = '800 34px system-ui, Arial'; x.fillText('SVR LOBBY WALL AD', w/2, 930);
+    x.fillStyle = 'rgba(255,215,130,0.20)'; roundRectPath(x, 120, 1005, w-240, 142, 32); x.fill();
+    x.strokeStyle = 'rgba(255,215,130,0.72)'; x.lineWidth = 7; roundRectPath(x, 120, 1005, w-240, 142, 32); x.stroke();
+    x.fillStyle = '#fff7e7'; x.font = '800 38px system-ui, Arial'; x.fillText('Premium sponsor slot', w/2, 1078);
+    x.fillStyle = '#ffcc73'; x.font = '700 29px system-ui, Arial'; x.fillText('aligned behind Reiki Hub', w/2, 1210);
+  });
+}
+
+function addReikiBackBuildingEspressoAd(scene, { center, inward, wallHeight }){
+  const outward = inward.clone().multiplyScalar(-1);
+  const base = center.clone().addScaledVector(outward, 7.2).add(new THREE.Vector3(0,0,-3.2));
+  const buildingMat = new THREE.MeshStandardMaterial({ color: 0x07121a, roughness: 0.68, metalness: 0.18, emissive: 0x07142a, emissiveIntensity: 0.26 });
+  const tower = new THREE.Mesh(new THREE.BoxGeometry(4.8, wallHeight + 13.5, 1.05), buildingMat);
+  tower.position.copy(base).setY((wallHeight + 13.5) * 0.5);
+  scene.add(tower);
+  const ad = new THREE.Mesh(new THREE.PlaneGeometry(3.65, 5.65), new THREE.MeshBasicMaterial({ map: createEspressoCreamAdTexture(), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+  ad.position.copy(base).addScaledVector(inward, 0.56).setY(wallHeight + 4.0);
+  ad.lookAt(center.clone().setY(ad.position.y));
+  ad.renderOrder = 45;
+  scene.add(ad);
+  const glow = new THREE.PointLight(0xffc56a, 1.7, 16, 2.2);
+  glow.position.copy(ad.position).addScaledVector(inward, 1.2);
+  scene.add(glow);
+  return { tower, ad };
+}
+
 
 function createInfoBoardTexture(title = "leaderboard", lines = []){
   return canvasTexture(1024, 1024, (x,w,h)=>{
@@ -1596,6 +1644,45 @@ function addScorpionRoomFrontTable(root, log = console.log){
   return mount;
 }
 
+
+function addScorpionPrivateGameplayRoom(scene, R, wallHeight){
+  const center = new THREE.Vector3(0, 0, -(R + 48));
+  const root = new THREE.Group();
+  root.name = 'PHASE_100_SCORPION_PRIVATE_GAMEPLAY_ROOM';
+  root.position.copy(center);
+  scene.add(root);
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(12.8, 0.12, 9.2), new THREE.MeshStandardMaterial({ color: 0x0b0710, roughness: 0.88, metalness: 0.08, emissive: 0x18051a, emissiveIntensity: 0.22 }));
+  floor.position.set(0, 0.06, 0); root.add(floor);
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x050409, roughness: 0.74, metalness: 0.12, emissive: 0x13051a, emissiveIntensity: 0.30 });
+  const back = new THREE.Mesh(new THREE.BoxGeometry(12.8, 6.2, 0.18), wallMat); back.position.set(0,3.1,-4.6); root.add(back);
+  const left = new THREE.Mesh(new THREE.BoxGeometry(0.18,6.0,9.2), wallMat); left.position.set(-6.4,3.0,0); root.add(left);
+  const right = left.clone(); right.position.x = 6.4; root.add(right);
+  const frontRail = new THREE.Mesh(new THREE.BoxGeometry(12.8, 1.2, 0.16), wallMat); frontRail.position.set(0,0.66,4.6); root.add(frontRail);
+  const signTex = canvasTexture(1400, 300, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0,'#170317'); g.addColorStop(1,'#06050b');
+    x.fillStyle = g; x.fillRect(0,0,w,h); x.strokeStyle = 'rgba(255,93,202,0.95)'; x.lineWidth = 12; x.strokeRect(18,18,w-36,h-36);
+    x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#fff4fb'; x.font = '900 84px system-ui, Arial'; x.fillText('SCORPION PRIVATE GAMEPLAY', w/2, 120);
+    x.fillStyle = '#8fffe6'; x.font = '800 34px system-ui, Arial'; x.fillText('REAL TABLE FLOW • ONE GAMEPLAY TABLE • WATCH RETURN TO LOBBY', w/2, 210);
+  });
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 1.54), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
+  sign.position.set(0, 4.95, -4.48); root.add(sign);
+  const table = makeScorpionFallbackTable(0.86);
+  table.name = 'PHASE_100_SCORPION_PRIVATE_GAMEPLAY_TABLE_ONE_ONLY';
+  table.position.set(0, 0, -0.15); table.scale.setScalar(1.22); root.add(table);
+  addScorpionTableAccessories(table, 0.86);
+  const guideTex = canvasTexture(1000, 360, (x,w,h)=>{
+    x.fillStyle = 'rgba(5,8,16,0.96)'; x.fillRect(0,0,w,h); x.strokeStyle = 'rgba(143,255,230,0.86)'; x.lineWidth = 10; x.strokeRect(16,16,w-32,h-32);
+    x.textAlign='center'; x.textBaseline='middle'; x.fillStyle='#fff'; x.font='900 54px system-ui, Arial'; x.fillText('GAMEPLAY ROOM', w/2, 92);
+    x.fillStyle='#8fffe6'; x.font='800 31px system-ui, Arial'; x.fillText('Use watch: Lobby / Scorpion / TP / Holo', w/2, 176);
+    x.fillStyle='rgba(255,255,255,0.72)'; x.font='700 25px system-ui, Arial'; x.fillText('Lobby stays clean: storefront portals only', w/2, 250);
+  });
+  const guide = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 1.58), new THREE.MeshBasicMaterial({ map: guideTex, transparent:true, side: THREE.DoubleSide }));
+  guide.position.set(0, 1.75, 4.45); guide.lookAt(0, 1.75, 0); root.add(guide);
+  const light = new THREE.PointLight(0xff5dc8, 2.8, 18, 2.0); light.position.set(0, 3.8, 0.8); root.add(light);
+  const cyan = new THREE.PointLight(0x70ffe4, 1.5, 16, 2.0); cyan.position.set(2.8, 2.6, -1.2); root.add(cyan);
+  return { root, target: center.clone().add(new THREE.Vector3(0, 0, 3.05)), look: center.clone().add(new THREE.Vector3(0, 1.45, -0.1)) };
+}
+
 function addScorpionRoom(scene, R, wallHeight){
   const angle = Math.PI * 0.24; // southeast wall area
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
@@ -1762,28 +1849,25 @@ function addPhase97PortalMarker(scene, { position, look = null, label = 'PORTAL'
   return { key: group.name, label, destination, position: group.position.clone(), radius, cooldownMs: 3200 };
 }
 
-function addPhase97PrivateRouteMarkers(scene, { R, wallHeight, reikiHub, scorpionRoom, storeWall, pgaHub }){
+function addPhase97PrivateRouteMarkers(scene, { R, wallHeight, reikiHub, scorpionRoom, scorpionPrivate, storeWall, pgaHub }){
   const portalLocks = [];
   const targets = {};
   const lobbyTarget = new THREE.Vector3(0, 0, 4.8);
   const lobbyLook = new THREE.Vector3(0, 1.2, 0);
   const addLock = (rec)=>{ if (rec) portalLocks.push(rec); };
 
-  // Scorpion private room: floor entry marker + explicit back-to-lobby backup portal.
+  // Phase 100: Lobby has ONE Scorpion storefront portal. It routes to the private gameplay room.
+  // The visible Scorpion showroom/table remains display-only and does not host the real gameplay loop.
   if (scorpionRoom?.target){
-    targets.scorpion = { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() };
-    addLock(addPhase97PortalMarker(scene, { position: scorpionRoom.target.clone().add(new THREE.Vector3(0,0,0.82)), look: scorpionRoom.look.clone(), label: 'SCORPION', subtitle: 'enter poker room', destination: 'scorpion', hue: '#ff8ed8', radius: 1.10 }));
-    if (scorpionRoom.root){
-      const back = scorpionRoom.root.localToWorld(new THREE.Vector3(0, 0, 2.64));
-      addLock(addPhase97PortalMarker(scene, { position: back, look: lobbyLook, label: 'BACK TO LOBBY', subtitle: 'Scorpion exit route', destination: 'lobby', hue: '#8fffe6', radius: 0.96 }));
-    }
+    targets.scorpionShowroom = { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() };
+    targets.scorpion = scorpionPrivate?.target ? { pos: scorpionPrivate.target.clone(), look: scorpionPrivate.look.clone() } : { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() };
+    addLock(addPhase97PortalMarker(scene, { position: scorpionRoom.target.clone().add(new THREE.Vector3(0,0,0.82)), look: scorpionRoom.look.clone(), label: 'SCORPION', subtitle: 'private gameplay', destination: 'scorpion', hue: '#ff8ed8', radius: 1.10 }));
   }
 
   // Reiki private room route: storefront portal sends player into the private meditation room.
   if (reikiHub?.roomTarget){
     targets.reikiRoom = { pos: reikiHub.roomTarget.clone(), look: reikiHub.center.clone().setY(1.5) };
     addLock(addPhase97PortalMarker(scene, { position: reikiHub.target.clone(), look: reikiHub.center.clone().setY(1.5), label: 'REIKI ROOM', subtitle: 'private meditation', destination: 'reikiRoom', hue: '#80ffd8', radius: 1.06 }));
-    addLock(addPhase97PortalMarker(scene, { position: reikiHub.roomTarget.clone().add(new THREE.Vector3(-2.15,0,1.35)), look: lobbyLook, label: 'BACK TO LOBBY', subtitle: 'Reiki exit route', destination: 'lobby', hue: '#8fffe6', radius: 0.94 }));
   }
 
   // PGA private training route scaffold.
@@ -1792,7 +1876,6 @@ function addPhase97PrivateRouteMarkers(scene, { R, wallHeight, reikiHub, scorpio
     const pgaRange = pgaHub.group.position.clone().add(pgaHub.inward.clone().multiplyScalar(6.60)).setY(0);
     targets.pgaRange = { pos: pgaRange.clone(), look: pgaHub.group.position.clone().setY(1.8) };
     addLock(addPhase97PortalMarker(scene, { position: pgaEntry, look: pgaHub.group.position.clone().setY(1.8), label: 'PGA RANGE', subtitle: 'private training', destination: 'pgaRange', hue: '#9cff82', radius: 1.05 }));
-    addLock(addPhase97PortalMarker(scene, { position: pgaRange.clone().add(new THREE.Vector3(1.72,0,0.94)), look: lobbyLook, label: 'BACK TO LOBBY', subtitle: 'PGA exit route', destination: 'lobby', hue: '#8fffe6', radius: 0.94 }));
   }
 
   // VR Store and Smoker Lounge storefronts remain separate private modules/routes.
@@ -1802,16 +1885,13 @@ function addPhase97PrivateRouteMarkers(scene, { R, wallHeight, reikiHub, scorpio
     targets.vrStore = { pos: storeBase.clone().add(new THREE.Vector3(-0.85, 0, 0.65)), look: storeLook };
     targets.smokerLounge = { pos: storeBase.clone().add(new THREE.Vector3(2.35, 0, -0.85)), look: storeLook };
     addLock(addPhase97PortalMarker(scene, { position: storeBase.clone().add(new THREE.Vector3(-1.15,0,1.48)), look: storeLook, label: 'VR STORE', subtitle: 'private storefront', destination: 'vrStore', hue: '#9fdcff', radius: 1.02 }));
-    addLock(addPhase97PortalMarker(scene, { position: targets.vrStore.pos.clone().add(new THREE.Vector3(-1.05,0,0.82)), look: lobbyLook, label: 'BACK TO LOBBY', subtitle: 'Store exit route', destination: 'lobby', hue: '#8fffe6', radius: 0.90 }));
     addLock(addPhase97PortalMarker(scene, { position: storeBase.clone().add(new THREE.Vector3(2.35,0,1.52)), look: storeLook, label: 'SMOKER LOUNGE', subtitle: 'private social route', destination: 'smokerLounge', hue: '#d6a1ff', radius: 1.02 }));
-    addLock(addPhase97PortalMarker(scene, { position: targets.smokerLounge.pos.clone().add(new THREE.Vector3(1.12,0,0.82)), look: lobbyLook, label: 'BACK TO LOBBY', subtitle: 'Lounge exit route', destination: 'lobby', hue: '#8fffe6', radius: 0.90 }));
   }
 
   // Space room/deck target for Moon + Mars checking without touching the website.
   const spacePos = new THREE.Vector3(0, 0, -(R - 5.6));
   targets.spaceRoom = { pos: spacePos.clone(), look: new THREE.Vector3(0, wallHeight + 12.0, -(R + 92.0)) };
   addLock(addPhase97PortalMarker(scene, { position: new THREE.Vector3(-2.1, 0, -(R - 7.6)), look: targets.spaceRoom.look.clone(), label: 'SPACE ROOM', subtitle: 'Moon / Mars deck', destination: 'spaceRoom', hue: '#b48cff', radius: 1.04 }));
-  addLock(addPhase97PortalMarker(scene, { position: spacePos.clone().add(new THREE.Vector3(1.6,0,1.18)), look: lobbyLook, label: 'BACK TO LOBBY', subtitle: 'Space exit route', destination: 'lobby', hue: '#8fffe6', radius: 0.92 }));
 
   return { portalLocks, targets };
 }
@@ -1941,18 +2021,12 @@ function addPhase98VrScenePod(scene, { key, label, subtitle, pos, look, hue = '#
 }
 
 function addPhase98FullVrScenes(scene, { phase97Routes }){
-  const targets = phase97Routes?.targets || {};
-  const scenes = [];
-  const add = (rec)=>{ const made = addPhase98VrScenePod(scene, rec); if (made) scenes.push(made); };
-  add({ key:'scorpion', label:'SCORPION VR', subtitle:'private poker room scene', pos:targets.scorpion?.pos, look:targets.scorpion?.look, hue:'#ff8ed8', radius:3.15, style:'scorpion' });
-  add({ key:'reikiRoom', label:'REIKI VR', subtitle:'private meditation scene', pos:targets.reikiRoom?.pos, look:targets.reikiRoom?.look, hue:'#80ffd8', radius:3.05, style:'reiki' });
-  add({ key:'pgaRange', label:'PGA VR', subtitle:'private golf training scene', pos:targets.pgaRange?.pos, look:targets.pgaRange?.look, hue:'#9cff82', radius:3.05, style:'pga' });
-  add({ key:'vrStore', label:'VR STORE', subtitle:'private store scene', pos:targets.vrStore?.pos, look:targets.vrStore?.look, hue:'#9fdcff', radius:2.75, style:'store' });
-  add({ key:'smokerLounge', label:'LOUNGE VR', subtitle:'private social lounge scene', pos:targets.smokerLounge?.pos, look:targets.smokerLounge?.look, hue:'#d6a1ff', radius:2.75, style:'lounge' });
-  add({ key:'spaceRoom', label:'SPACE VR', subtitle:'Moon / Mars observation scene', pos:targets.spaceRoom?.pos, look:targets.spaceRoom?.look, hue:'#b48cff', radius:3.00, style:'space' });
-  scene.userData.phase98VrScenes = scenes;
-  return scenes;
+  // Phase 100 cleanup: do not draw extra floor pods/portal pads in the lobby.
+  // Storefronts are the only visible lobby portals; private-room targets remain in sceneTargets.
+  scene.userData.phase98VrScenes = [];
+  return [];
 }
+
 
 
 function buildOuterCity(scene, R){
@@ -2606,7 +2680,8 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   addPgaHub(scene, { radius: R, wallHeight, log });
   const reikiHub = await addRikiArea(scene, R, wallHeight, spawnLogoTex, log);
   const scorpionRoom = addScorpionRoom(scene, R, wallHeight);
-  const phase97Routes = addPhase97PrivateRouteMarkers(scene, { R, wallHeight, reikiHub, scorpionRoom, storeWall, pgaHub: scene.userData._pgaHub });
+  const scorpionPrivate = addScorpionPrivateGameplayRoom(scene, R, wallHeight);
+  const phase97Routes = addPhase97PrivateRouteMarkers(scene, { R, wallHeight, reikiHub, scorpionRoom, scorpionPrivate, storeWall, pgaHub: scene.userData._pgaHub });
   const phase98VrScenes = addPhase98FullVrScenes(scene, { phase97Routes });
   const lobbyInfoBoards = addLobbyInfoBoards(scene, R, wallHeight);
 
@@ -2638,7 +2713,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(5.6, 56, 56),
+    new THREE.SphereGeometry(7.2, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2650,16 +2725,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-164, wallHeight + 178.0, -(R + 548.0));
+  moon.position.set(-30, wallHeight + 32.0, -(R + 58.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(44.0, 44.0, 1);
+  moonHalo.scale.set(58.0, 58.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(3.1, 44, 44),
+    new THREE.SphereGeometry(4.2, 44, 44),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2671,13 +2746,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  mars.position.set(232, wallHeight + 196.0, -(R + 678.0));
+  mars.position.set(38, wallHeight + 38.0, -(R + 72.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(28.0, 28.0, 1);
+  marsHalo.scale.set(38.0, 38.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2883,16 +2958,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
     moon.position.set(
-      -44 + Math.sin(t * 0.020) * 5.0,
-      wallHeight + 44.0 + Math.sin(t * 0.090) * 1.4,
-      -(R + 128.0) + Math.cos(t * 0.016) * 6.0
+      -30 + Math.sin(t * 0.020) * 3.0,
+      wallHeight + 32.0 + Math.sin(t * 0.090) * 1.0,
+      -(R + 58.0) + Math.cos(t * 0.016) * 3.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     mars.position.set(
-      68 + Math.sin(t * 0.016 + 1.4) * 6.5,
-      wallHeight + 52.0 + Math.sin(t * 0.070 + 0.8) * 1.2,
-      -(R + 154.0) + Math.cos(t * 0.012 + 0.4) * 5.0
+      38 + Math.sin(t * 0.016 + 1.4) * 3.5,
+      wallHeight + 38.0 + Math.sin(t * 0.070 + 0.8) * 0.9,
+      -(R + 72.0) + Math.cos(t * 0.012 + 0.4) * 3.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;
@@ -3046,7 +3121,8 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       pos: new THREE.Vector3(storeWall.group.position.x * 0.86, 0, storeWall.group.position.z * 0.86),
       look: storeWall.group.position.clone().setY(1.6)
     },
-    scorpion: scorpionRoom ? { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() } : null
+    scorpion: phase97Routes.targets.scorpion || (scorpionPrivate ? { pos: scorpionPrivate.target.clone(), look: scorpionPrivate.look.clone() } : null),
+    scorpionShowroom: phase97Routes.targets.scorpionShowroom || (scorpionRoom ? { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() } : null)
   };
 
   return {

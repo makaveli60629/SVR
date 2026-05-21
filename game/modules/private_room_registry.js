@@ -1,4 +1,4 @@
-export const PHASE_99_BUILD = "PHASE-99-SCORPION-ROOM-TABLE-LOCK";
+export const PHASE_100_BUILD = "PHASE-100-LOBBY-PORTAL-CLEANUP-LOCK";
 
 export const PRIVATE_ROOM_REGISTRY = Object.freeze([
   { key: "scorpion", label: "Scorpion Poker VR", type: "private-vr-room", status: "active", entry: "Scorpion storefront", exit: "Back to Lobby portal", branding: "SVR / modular sponsor-ready", vrReady: true, safeBounds: true },
@@ -14,9 +14,9 @@ export function routeLabel(key){
 }
 
 
-export const PHASE_99_SCENE_ADD_LOCK = Object.freeze({
-  lock: "all private rooms are VR-routable scenes",
+export const PHASE_100_LOBBY_PORTAL_CLEANUP_LOCK = Object.freeze({
+  lock: "single portal per storefront; private gameplay scenes remain outside lobby",
   controls: "Meta hand tracking plus hidden Quest/Oculus controller fallback",
-  safety: "each scene has safe spawn mat, guard ring, and back-to-lobby route",
+  safety: "lobby shows storefront portal only; watch handles lobby return",
   siteTouched: false
 });

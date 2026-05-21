@@ -1,9 +1,9 @@
 {
-  "name": "ScarlettVR Poker \u2014 Phase 97",
-  "short_name": "SVR Phase 97",
+  "name": "ScarlettVR Poker — Phase 100",
+  "short_name": "SVR Phase 100",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050508",
   "theme_color": "#050508",
-  "description": "Phase 97 private room portal hardening and module registry lock."
+  "description": "Phase 100 lobby portal cleanup, Moon/Mars visibility, Espresso ad alignment, watch HOLO, and fist/chinch teleport repair."
 }

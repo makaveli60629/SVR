@@ -166,3 +166,26 @@ Source package used for this phase:
 - Storefront remains a portal/kiosk preview only.
 - Procedural fallback table remains visible if the GLB table asset is missing or dark.
 - Site untouched.
+
+---
+
+# Phase 100 — Lobby Portal Cleanup Lock
+
+Recorded locked user feedback:
+- Too many portal pads were visible after Phase 99.
+- Lobby must have one portal per storefront only.
+- Private scenes should not appear as clutter inside the main lobby.
+- Moon and Mars must remain visible in the lobby.
+- Scorpion front table is display-only; real Scorpion gameplay routes to private gameplay room.
+- Espresso with Cream ad belongs on a tall building wall aligned behind the Reiki hub.
+- Watch must include a working HOLO button.
+- Fist/chinch teleport must work again with hand tracking, even if controller fallback exists.
+
+Implementation:
+- Build label: PHASE-100-LOBBY-PORTAL-CLEANUP-LOCK
+- Added `PHASE_100_LOBBY_PORTAL_CLEANUP_LOCK` registry constants.
+- Cleaned portal routing to storefront-only portal markers.
+- Added Scorpion private gameplay room target.
+- Added Reiki-aligned Espresso wall ad building.
+- Repaired hand fist/chinch teleport activation.
+- Added watch HOLO button and DOM holo menu toggle.

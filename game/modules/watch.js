@@ -165,6 +165,7 @@ function buildButtons(state){
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
     { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
+    { id: 'holo', label: state.holoMenuVisible === false ? 'HOLO OFF' : 'HOLO ON', x: 380, y: 120, w: 172, h: 48, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
   ];
   if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
@@ -232,7 +233,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('VR scenes • Scorpion / Reiki / PGA / Store / Lounge / Space • pinch button • TP has backup portals', 36, 332);
+    ctx.fillText('Watch lock • HOLO button • fist/pinch teleport • single storefront portal routing', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -270,6 +271,7 @@ let hoveredId = null;
     if (id === 'join') actions.joinTable?.();
     if (id === 'leave') actions.leaveTable?.();
     if (id === 'teleport') actions.toggleTeleport?.();
+    if (id === 'holo') actions.toggleHoloMenu?.();
     if (id === 'lobby') actions.goLobby?.();
     if (id === 'tableScene') actions.goTable?.();
     if (id === 'seatScene') actions.goSeat?.();
