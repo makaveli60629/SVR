@@ -1,0 +1,30 @@
+{
+  "phase": "PHASE-89-SCORPION-STOREFRONT-MATERIAL-PROXY-LOCK",
+  "track": "game-only",
+  "siteTouched": false,
+  "lobbyReplaced": false,
+  "mainPokerTableReplaced": false,
+  "privateScenesMergedIntoLobby": false,
+  "rawMaxRuntimeLoaded": false,
+  "rawFbxRuntimeAdded": false,
+  "module": "game/modules/scorpion_storefront_proxy.js",
+  "textures": [
+    "game/assets/textures/scorpion/scorpion_bare_metal_512.jpg",
+    "game/assets/textures/scorpion/scorpion_concrete_512.jpg",
+    "game/assets/textures/scorpion/scorpion_bronze_tile_512.jpg",
+    "game/assets/textures/scorpion/scorpion_raw_wood_512.jpg",
+    "game/assets/textures/scorpion/scorpion_ochre_fabric_512.jpg",
+    "game/assets/textures/scorpion/scorpion_black_fabric_512.jpg",
+    "game/assets/textures/scorpion/scorpion_pattern_carpet_512.jpg",
+    "game/assets/textures/scorpion/scorpion_vip_carpet_512.jpg",
+    "game/assets/textures/scorpion/scorpion_light_wood_512.jpg"
+  ],
+  "rules": [
+    "Do not touch website/site in this game track.",
+    "Do not replace the current lobby.",
+    "Do not replace the main poker table.",
+    "Keep Scorpion full poker room as a private scene.",
+    "Use uploaded maps as lightweight proxies first.",
+    "Convert table 2.max to optimized GLB before live runtime use."
+  ]
+}

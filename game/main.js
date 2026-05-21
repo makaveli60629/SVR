@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import "./modules/scorpion_integration_guard.js";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
@@ -16,6 +16,7 @@ import { createPlayablePoker } from "./modules/playable_poker.js";
 import "./modules/poker_action_hud.js";
 import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
 import { buildTeleportRouteRegistry } from "./modules/teleport-router.js";
+import { installScorpionStorefrontProxy } from "./modules/scorpion_storefront_proxy.js";
 
 const PHASE_85_BUILD = "PHASE-85-FORCE-VISIBLE-HOLOGRAM-FALLBACK";
 const params = new URLSearchParams(location.search);
@@ -82,7 +83,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading world…", { force: true });
+setStatus("Loading worldâ€¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -96,6 +97,7 @@ const teleportRouter = buildTeleportRouteRegistry(sceneTargets, seats, tableCent
 Object.assign(sceneTargets, teleportRouter.legacySceneTargets);
 window.SVR_TELEPORT_ROUTER = teleportRouter;
 window.SVR_SCENE_TARGETS = sceneTargets;
+installScorpionStorefrontProxy({ scene, sceneTargets, log });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -170,7 +172,7 @@ function joinTable(){
   if (renderer.xr.isPresenting) tp.setPlayerPose(seat.x, -0.42, seat.z);
   else moveDesktopToSeat(seat);
   setMode(`Seat: ${seat.label}`);
-  setStatus("Poker controls: F Fold • C Check/Call • R Raise • A All-In • H Next Hand", { force: true });
+  setStatus("Poker controls: F Fold â€¢ C Check/Call â€¢ R Raise â€¢ A All-In â€¢ H Next Hand", { force: true });
   return true;
 }
 
@@ -305,12 +307,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logo…", { force: true });
+setStatus("Loading logoâ€¦", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 85 hologram fallback hotfix loaded.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -402,7 +404,8 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading…");
-  setStatus("WebGL context lost (reloading…)", { force: true });
+  log("[ERR] WebGL context lost. Reloadingâ€¦");
+  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
