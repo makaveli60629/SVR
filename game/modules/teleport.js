@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { CONFIG } from "./config.js";
 import { isFist, isTwoFingerPoint, isThreeFingerPinch, twoFingerAimPoint } from "./gestures.js";
 
-const PHASE = "PHASE-175-LOOK-AT-FIST-TOGGLE-BRIGHT-GLOW";
+const PHASE = "PHASE-176-TELEPORT-QA-FLOOR-TABLE-BOUNDARY";
 const RIGHT_STICK_DEADZONE = 0.20;
 const HAND_PINCH_MIN_HOLD_MS = 120;
 const HAND_TARGET_STABLE_MS = 65;
@@ -10,6 +10,12 @@ const COMMIT_GUARD_MS = 330;
 const FIST_TOGGLE_COOLDOWN_MS = 520;
 const FAST_AIM_LERP_STABLE = 0.82;
 const FAST_AIM_LERP_MOVING = 0.58;
+const SAFE_FLOOR_MIN_Y = -0.55;
+const SAFE_FLOOR_MAX_Y = 0.05;
+const MAIN_TABLE_CENTER_X = 0;
+const MAIN_TABLE_CENTER_Z = 0;
+const MAIN_TABLE_BLOCK_RADIUS = 1.48;
+const MAIN_TABLE_ESCAPE_RADIUS = 1.74;
 
 export function createTeleportRig({ scene, renderer, camera, roomClamp, log = console.log }){
   let baseRefSpace = null;
@@ -59,10 +65,25 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     activeTeleportHand: "none",
     glow: "off",
     lastTeleportResult: "none",
-    note: "Look at fist + clench toggles teleport ON/OFF. Bright purple glow is active indicator. No sticky hand text overlay."
+    note: "Phase 175 fist toggle preserved. Phase 176 adds floor/Y clamp and table-safe teleport targets."
+  };
+
+  const boundaryState = {
+    phase: PHASE,
+    floorClampActive: true,
+    tableBlockActive: true,
+    lastClampReason: "init",
+    lastSafeTarget: null,
+    lastRawTarget: null,
+    tableCenter: { x: MAIN_TABLE_CENTER_X, z: MAIN_TABLE_CENTER_Z },
+    tableBlockRadius: MAIN_TABLE_BLOCK_RADIUS,
+    tableEscapeRadius: MAIN_TABLE_ESCAPE_RADIUS,
+    floorYRange: { min: SAFE_FLOOR_MIN_Y, max: SAFE_FLOOR_MAX_Y },
+    note: "Prevents aim/controller movement from landing inside the main poker table while preserving seating via direct setPlayerPose."
   };
 
   window.SVR_TELEPORT_CALIBRATION = calibration;
+  window.SVR_MOVEMENT_BOUNDARY_STATE = boundaryState;
   window.SVR_ACTIVE_TELEPORT_HAND = {
     phase: PHASE,
     active: "none",
@@ -112,7 +133,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
 
   const debug = document.createElement("div");
   debug.id = "svr-teleport-calibration-debug";
-  debug.style.cssText = "position:fixed;right:10px;bottom:10px;z-index:99999;max-width:340px;padding:8px 10px;border:1px solid rgba(208,92,255,.85);border-radius:10px;background:rgba(5,6,14,.72);color:#f4dcff;font:11px/1.35 monospace;pointer-events:none;display:none;white-space:pre-wrap";
+  debug.style.cssText = "position:fixed;right:10px;bottom:10px;z-index:99999;max-width:360px;padding:8px 10px;border:1px solid rgba(208,92,255,.85);border-radius:10px;background:rgba(5,6,14,.72);color:#f4dcff;font:11px/1.35 monospace;pointer-events:none;display:none;white-space:pre-wrap";
   document.body?.appendChild(debug);
 
   function handLabel(obj){
@@ -145,11 +166,56 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     window.SVR_TELEPORT_CALIBRATION = calibration;
   }
 
+  function updateBoundary(reason, rawTarget, safeTarget){
+    boundaryState.lastClampReason = reason;
+    boundaryState.lastRawTarget = rawTarget ? { x: rawTarget.x, y: rawTarget.y || 0, z: rawTarget.z } : null;
+    boundaryState.lastSafeTarget = safeTarget ? { x: safeTarget.x, y: safeTarget.y || 0, z: safeTarget.z } : null;
+    window.SVR_MOVEMENT_BOUNDARY_STATE = boundaryState;
+  }
+
+  function isInsideMainTableXZ(x, z){
+    const dx = x - MAIN_TABLE_CENTER_X;
+    const dz = z - MAIN_TABLE_CENTER_Z;
+    return Math.hypot(dx, dz) < MAIN_TABLE_BLOCK_RADIUS;
+  }
+
+  function pushOutsideMainTable(target, reason = "table-boundary"){
+    const raw = target.clone ? target.clone() : new THREE.Vector3(target.x, target.y || 0, target.z);
+    let x = THREE.MathUtils.clamp(raw.x, -roomClamp, roomClamp);
+    let z = THREE.MathUtils.clamp(raw.z, -roomClamp, roomClamp);
+    const dx = x - MAIN_TABLE_CENTER_X;
+    const dz = z - MAIN_TABLE_CENTER_Z;
+    const dist = Math.hypot(dx, dz);
+    let safe = false;
+
+    if (dist < MAIN_TABLE_BLOCK_RADIUS){
+      const dirX = dist > 0.001 ? dx / dist : 0;
+      const dirZ = dist > 0.001 ? dz / dist : 1;
+      x = THREE.MathUtils.clamp(MAIN_TABLE_CENTER_X + dirX * MAIN_TABLE_ESCAPE_RADIUS, -roomClamp, roomClamp);
+      z = THREE.MathUtils.clamp(MAIN_TABLE_CENTER_Z + dirZ * MAIN_TABLE_ESCAPE_RADIUS, -roomClamp, roomClamp);
+      safe = true;
+    }
+
+    const out = new THREE.Vector3(x, 0, z);
+    updateBoundary(safe ? reason : "clear", raw, out);
+    return out;
+  }
+
+  function clampFloorY(y){
+    const nextY = THREE.MathUtils.clamp(Number.isFinite(y) ? y : 0, SAFE_FLOOR_MIN_Y, SAFE_FLOOR_MAX_Y);
+    if (nextY !== y){
+      boundaryState.lastClampReason = "floor-y-clamp";
+      window.SVR_MOVEMENT_BOUNDARY_STATE = boundaryState;
+    }
+    return nextY;
+  }
+
   function menusOpen(){ return !!window.SVR_HOLOGRAM_MENU_STATE?.visible; }
 
   function applyReferenceSpace(){
     if (!baseRefSpace || !renderer?.xr?.isPresenting) return false;
     try{
+      playerY = clampFloorY(playerY);
       const halfYaw = -playerYaw * 0.5;
       const xform = new XRRigidTransform(
         { x: -playerX, y: -playerY, z: -playerZ },
@@ -164,8 +230,21 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     }
   }
 
-  function setPlayerPose(x, y, z){ playerX = x; playerY = y; playerZ = z; return applyReferenceSpace(); }
-  function setPlayerXZ(x, z){ playerX = x; playerZ = z; return applyReferenceSpace(); }
+  function setPlayerPose(x, y, z){
+    playerX = THREE.MathUtils.clamp(x, -roomClamp, roomClamp);
+    playerY = clampFloorY(y);
+    playerZ = THREE.MathUtils.clamp(z, -roomClamp, roomClamp);
+    updateBoundary("direct-pose-preserved", new THREE.Vector3(x, y || 0, z), new THREE.Vector3(playerX, playerY, playerZ));
+    return applyReferenceSpace();
+  }
+
+  function setPlayerXZ(x, z){
+    const safe = pushOutsideMainTable(new THREE.Vector3(x, 0, z), "right-stick-table-boundary");
+    playerX = safe.x;
+    playerZ = safe.z;
+    return applyReferenceSpace();
+  }
+
   function getPlayerPose(){ return { x: playerX, y: playerY, z: playerZ, yaw: playerYaw }; }
   function setPlayerYaw(nextYaw){ playerYaw = nextYaw; return applyReferenceSpace(); }
 
@@ -207,11 +286,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   }
 
   function clampTarget(p){
-    return new THREE.Vector3(
-      THREE.MathUtils.clamp(p.x, -roomClamp, roomClamp),
-      0,
-      THREE.MathUtils.clamp(p.z, -roomClamp, roomClamp)
-    );
+    return pushOutsideMainTable(p, "teleport-target-table-boundary");
   }
 
   function updateDebug(){
@@ -225,6 +300,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       `src=${calibration.source} valid=${calibration.valid}`,
       `stick x=${calibration.rightStick.x.toFixed(2)} y=${calibration.rightStick.y.toFixed(2)}`,
       `target ${calibration.target ? `${calibration.target.x.toFixed(2)},${calibration.target.z.toFixed(2)}` : "none"}`,
+      `boundary=${boundaryState.lastClampReason}`,
       `last=${calibration.lastTeleportResult}`
     ].join("\n");
   }
@@ -233,21 +309,26 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (!renderer?.xr?.isPresenting || !baseRefSpace) return false;
     if (!target || !Number.isFinite(target.x) || !Number.isFinite(target.z)) return false;
     try{
+      const safeTarget = pushOutsideMainTable(target, "teleport-commit-table-boundary");
       const xrCam = renderer.xr.getCamera(camera);
       if (!xrCam) return false;
       xrCam.getWorldPosition(head);
-      const dx = target.x - head.x;
-      const dz = target.z - head.z;
+      const dx = safeTarget.x - head.x;
+      const dz = safeTarget.z - head.z;
       const prev = { x: playerX, y: playerY, z: playerZ, yaw: playerYaw };
       playerX += dx;
       playerZ += dz;
+      playerY = clampFloorY(playerY);
+      const postSafe = pushOutsideMainTable(new THREE.Vector3(playerX, 0, playerZ), "teleport-post-table-boundary");
+      playerX = postSafe.x;
+      playerZ = postSafe.z;
       if (!applyReferenceSpace()){
         playerX = prev.x; playerY = prev.y; playerZ = prev.z; playerYaw = prev.yaw;
         applyReferenceSpace();
         calibration.lastTeleportResult = "rollback";
         return false;
       }
-      calibration.lastTeleportResult = "teleported";
+      calibration.lastTeleportResult = isInsideMainTableXZ(target.x, target.z) ? "teleported-boundary-adjusted" : "teleported";
       return true;
     }catch(err){
       log("[teleport] jump failed", err?.message || err);
@@ -331,11 +412,12 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     calibration.rayDirection = { x: controllerDir.x, y: controllerDir.y, z: controllerDir.z };
     const t = controllerOrigin.y / (-controllerDir.y);
     if (!isFinite(t) || t < 0.12){ calibration.valid = false; calibration.target = null; return null; }
-    const target = new THREE.Vector3(
+    const rawTarget = new THREE.Vector3(
       controllerOrigin.x + controllerDir.x * Math.min(t, 160),
       0,
       controllerOrigin.z + controllerDir.z * Math.min(t, 160)
     );
+    const target = clampTarget(rawTarget);
     calibration.valid = true;
     calibration.target = { x: target.x, y: 0, z: target.z };
     return target;
@@ -394,10 +476,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const speed = 2.65;
     const stepX = headDir.x * (-moveY) * speed * dt;
     const stepZ = headDir.z * (-moveY) * speed * dt;
-    setPlayerXZ(
-      THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp),
-      THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp)
-    );
+    setPlayerXZ(playerX + stepX, playerZ + stepZ);
     lastInputSummary = `right stick ${moveY < 0 ? "forward" : "back"}`;
   }
 
@@ -410,10 +489,12 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       pose: getPlayerPose(),
       input: lastInputSummary,
       calibration,
+      movementBoundary: boundaryState,
       ...extra
     };
     window.SVR_PHASE103_CONTROLLER_INPUT = window.SVR_PHASE142_CONTROLLER_INPUT;
     window.SVR_TELEPORT_CALIBRATION = calibration;
+    window.SVR_MOVEMENT_BOUNDARY_STATE = boundaryState;
     updateDebug();
   }
 
@@ -427,7 +508,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       lastTP = now;
       lastInputSummary = commitReason;
       calibration.lastTeleportResult = commitReason;
-      const commitLabel = commitReason;
+      const commitLabel = calibration.lastTeleportResult || commitReason;
       fullOff(commitReason);
       window.SVR_ACTIVE_TELEPORT_HAND.lastCommit = commitLabel;
       setActiveTeleportState("OFF", "none", "none", "off", commitLabel);
@@ -619,6 +700,6 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     setPlayerYaw,
     toggleMode,
     isEnabled: ()=>mode,
-    getState: ()=>({ mode, activeHand: handLabel(active), activeMode, phase: PHASE, input: lastInputSummary, calibration })
+    getState: ()=>({ mode, activeHand: handLabel(active), activeMode, phase: PHASE, input: lastInputSummary, calibration, movementBoundary: boundaryState })
   };
 }
