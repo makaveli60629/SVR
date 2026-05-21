@@ -1,11 +1,11 @@
-// PHASE-93-STANDALONE-GEOMETRIC-TEXTURE-TABLE
+// PHASE-94-GEOMETRIC-TEXTURE-TABLE-POLISH
 // Game-side only. This is NOT the Scorpion storefront proxy.
-// It creates a separate geometric display table using uploaded texture maps when available.
-// It is safe to lazy-load after the lobby renders.
+// Standalone geometric display table using uploaded texture maps when available.
+// Lazy-load safe after the lobby renders. Missing maps fall back safely.
 
 import * as THREE from "three";
 
-const PHASE = "PHASE-93-STANDALONE-GEOMETRIC-TEXTURE-TABLE";
+const PHASE = "PHASE-94-GEOMETRIC-TEXTURE-TABLE-POLISH";
 const TEXTURE_BASE = "./assets/textures/scorpion/";
 const MAPS = {
   bareMetal: "scorpion_bare_metal_512.jpg",
@@ -20,7 +20,14 @@ const MAPS = {
 };
 
 function safeLog(log, ...args){ try { (log || console.log)(...args); } catch {} }
-function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+function qnum(name, fallback, min = -50, max = 50){
+  try {
+    const params = new URLSearchParams(location.search);
+    if (!params.has(name)) return fallback;
+    const n = Number(params.get(name));
+    return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
+  } catch { return fallback; }
+}
 
 function fallbackMaterial(color, opts = {}){
   return new THREE.MeshStandardMaterial({
@@ -35,7 +42,7 @@ function fallbackMaterial(color, opts = {}){
   });
 }
 
-function makeCanvasLabel(title, subtitle){
+function makeCanvasLabel(title, subtitle, footer = "GEOMETRIC TEXTURE TABLE • MAP PROXY"){
   const canvas = document.createElement("canvas");
   canvas.width = 1024;
   canvas.height = 512;
@@ -61,7 +68,28 @@ function makeCanvasLabel(title, subtitle){
   ctx.fillText(subtitle, 512, 292);
   ctx.fillStyle = "#f6e27f";
   ctx.font = "900 23px system-ui, Arial";
-  ctx.fillText("GEOMETRIC TEXTURE TABLE • MAP PROXY", 512, 366);
+  ctx.fillText(footer, 512, 366);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+function makeSmallLabel(text){
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 160;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgba(4,7,18,0.96)";
+  ctx.fillRect(0, 0, 512, 160);
+  ctx.strokeStyle = "rgba(127,245,199,.82)";
+  ctx.lineWidth = 8;
+  ctx.strokeRect(12, 12, 488, 136);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "900 42px system-ui, Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 256, 81);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 4;
@@ -127,18 +155,33 @@ function addPlane(parent, name, mat, width, depth, pos){
   return mesh;
 }
 
+function addLabel(parent, name, text, pos, scale = new THREE.Vector3(0.44, 0.14, 0.018)){
+  const mat = new THREE.MeshBasicMaterial({ map: makeSmallLabel(text), transparent: true, side: THREE.DoubleSide, depthWrite: false });
+  const label = addBox(parent, name, mat, scale, pos, { x: -0.08 });
+  label.renderOrder = 25;
+  return label;
+}
+
 function resolvePlacement(sceneTargets = {}, tableCenter = null){
-  // Not Scorpion. Put it as a neutral material-demo table near a side/vendor area.
+  const overrideX = qnum("geoX", null);
+  const overrideZ = qnum("geoZ", null);
+  const overrideYaw = qnum("geoYaw", null, -360, 360);
   const src = sceneTargets.sponsor_wall || sceneTargets.sponsor || sceneTargets.pga_hub || sceneTargets.pga || sceneTargets.lobby;
   const base = src?.pos?.isVector3 ? src.pos.clone() : new THREE.Vector3(4.35, 0, -1.85);
   const look = tableCenter?.isVector3 ? tableCenter.clone() : (src?.look?.isVector3 ? src.look.clone() : new THREE.Vector3(0, 1.2, 0));
   base.x += base.x >= 0 ? -1.25 : 1.25;
   base.z += 0.72;
   base.y = 0;
-  return { pos: base, look };
+  if (overrideX !== null) base.x = overrideX;
+  if (overrideZ !== null) base.z = overrideZ;
+  return { pos: base, look, yawOverride: overrideYaw };
 }
 
-function faceToward(group, target){
+function faceToward(group, target, yawOverride = null){
+  if (Number.isFinite(yawOverride)) {
+    group.rotation.set(0, THREE.MathUtils.degToRad(yawOverride), 0);
+    return;
+  }
   const flat = target?.clone ? target.clone() : new THREE.Vector3(0,0,0);
   flat.y = group.position.y;
   group.lookAt(flat);
@@ -147,6 +190,7 @@ function faceToward(group, target){
 export async function installGeometricTextureTable({ scene, sceneTargets = {}, tableCenter = null, log = console.log } = {}){
   try {
     if (!scene) return null;
+    if (scene.getObjectByName("SVR_Phase94_Geometric_Texture_Table")) return scene.getObjectByName("SVR_Phase94_Geometric_Texture_Table");
     if (scene.getObjectByName("SVR_Phase93_Geometric_Texture_Table")) return scene.getObjectByName("SVR_Phase93_Geometric_Texture_Table");
 
     const loader = new THREE.TextureLoader();
@@ -163,31 +207,30 @@ export async function installGeometricTextureTable({ scene, sceneTargets = {}, t
       concrete: materialFromTexture(loaded.concrete, 0x56585c, { repeatX: 1.4, repeatY: 1.2, roughness: 0.94 }),
       accentFabric: materialFromTexture(loaded.ochreFabric, 0xb39654, { repeatX: 1.3, repeatY: 1.0, roughness: 0.96 }),
       glow: new THREE.MeshBasicMaterial({ color: 0x7ff5c7, transparent: true, opacity: 0.86, depthWrite: false }),
-      sign: new THREE.MeshStandardMaterial({ map: makeCanvasLabel("GEOMETRIC TABLE", "map-textured prototype"), roughness: 0.68, emissive: 0x061a14, emissiveIntensity: 0.12 })
+      sign: new THREE.MeshStandardMaterial({ map: makeCanvasLabel("GEOMETRIC TABLE", "map-textured prototype", "PHASE 94 • STANDALONE • NOT SCORPION"), roughness: 0.68, emissive: 0x061a14, emissiveIntensity: 0.12 })
     };
 
-    const { pos, look } = resolvePlacement(sceneTargets, tableCenter);
+    const { pos, look, yawOverride } = resolvePlacement(sceneTargets, tableCenter);
     const group = new THREE.Group();
-    group.name = "SVR_Phase93_Geometric_Texture_Table";
+    group.name = "SVR_Phase94_Geometric_Texture_Table";
     group.position.copy(pos);
-    faceToward(group, look);
+    faceToward(group, look, yawOverride);
 
-    addPlane(group, "GeoTable_MapCarpet_Base", mats.floor, 3.9, 2.4, new THREE.Vector3(0, 0.018, 0));
-    addBox(group, "GeoTable_Concrete_BackPlinth", mats.concrete, new THREE.Vector3(2.9, 0.44, 0.16), new THREE.Vector3(0, 0.24, -0.86));
+    addPlane(group, "GeoTable_MapCarpet_Base", mats.floor, 4.15, 2.55, new THREE.Vector3(0, 0.018, 0));
+    addBox(group, "GeoTable_Concrete_BackPlinth", mats.concrete, new THREE.Vector3(3.05, 0.48, 0.17), new THREE.Vector3(0, 0.25, -0.88));
+    addBox(group, "GeoTable_Wood_LowerBody", mats.body, new THREE.Vector3(1.04, 0.32, 0.76), new THREE.Vector3(0, 0.44, 0));
     addBox(group, "GeoTable_Metal_CenterPedestal", mats.metal, new THREE.Vector3(0.72, 0.58, 0.50), new THREE.Vector3(0, 0.36, 0));
-    addCylinder(group, "GeoTable_Octagon_WoodTop", mats.top, 1.08, 1.02, 0.14, 8, new THREE.Vector3(0, 0.76, 0), { y: Math.PI / 8 });
+    addCylinder(group, "GeoTable_Octagon_WoodTop", mats.top, 1.10, 1.03, 0.14, 8, new THREE.Vector3(0, 0.76, 0), { y: Math.PI / 8 });
     addCylinder(group, "GeoTable_Octagon_BlackFabricInset", mats.felt, 0.82, 0.80, 0.026, 8, new THREE.Vector3(0, 0.845, 0), { y: Math.PI / 8 });
-    addCylinder(group, "GeoTable_BronzeRail", mats.rail, 1.15, 1.09, 0.07, 8, new THREE.Vector3(0, 0.91, 0), { y: Math.PI / 8 });
+    addCylinder(group, "GeoTable_BronzeRail", mats.rail, 1.16, 1.10, 0.07, 8, new THREE.Vector3(0, 0.91, 0), { y: Math.PI / 8 });
 
-    const legPositions = [
-      [-0.82, -0.47], [0.82, -0.47], [-0.82, 0.47], [0.82, 0.47]
-    ];
+    const legPositions = [[-0.82, -0.47], [0.82, -0.47], [-0.82, 0.47], [0.82, 0.47]];
     for (const [x,z] of legPositions){
       addCylinder(group, "GeoTable_BareMetal_AngledLeg", mats.metal, 0.055, 0.075, 0.72, 8, new THREE.Vector3(x, 0.39, z), { z: x > 0 ? -0.18 : 0.18 });
     }
 
     addBox(group, "GeoTable_OchreFabric_FrontPanel", mats.accentFabric, new THREE.Vector3(1.55, 0.38, 0.045), new THREE.Vector3(0, 0.48, 0.70));
-    addBox(group, "GeoTable_MapSign", mats.sign, new THREE.Vector3(2.55, 0.70, 0.045), new THREE.Vector3(0, 1.64, -0.92), { x: -0.10 });
+    addBox(group, "GeoTable_MapSign", mats.sign, new THREE.Vector3(2.66, 0.72, 0.045), new THREE.Vector3(0, 1.66, -0.94), { x: -0.10 });
 
     const trimRing = new THREE.Mesh(new THREE.TorusGeometry(1.18, 0.012, 8, 64), mats.glow);
     trimRing.name = "GeoTable_NeonTrim_Ring";
@@ -197,12 +240,13 @@ export async function installGeometricTextureTable({ scene, sceneTargets = {}, t
     group.add(trimRing);
 
     const mapNames = [
-      ["BareMetal", mats.metal], ["Concrete", mats.concrete], ["Bronze", mats.rail],
-      ["Wood", mats.body], ["Ochre", mats.accentFabric], ["BlackFabric", mats.felt]
+      ["METAL", mats.metal], ["CONCRETE", mats.concrete], ["BRONZE", mats.rail],
+      ["WOOD", mats.body], ["OCHRE", mats.accentFabric], ["FELT", mats.felt]
     ];
     mapNames.forEach(([name, material], i)=>{
       const x = -1.28 + i * 0.51;
       addBox(group, `GeoTable_MapProxy_${name}`, material, new THREE.Vector3(0.38, 0.28, 0.035), new THREE.Vector3(x, 1.14, -0.77), { x: -0.08 });
+      addLabel(group, `GeoTable_Label_${name}`, name, new THREE.Vector3(x, 0.88, -0.79), new THREE.Vector3(0.36, 0.10, 0.014));
     });
 
     scene.add(group);
@@ -214,17 +258,20 @@ export async function installGeometricTextureTable({ scene, sceneTargets = {}, t
       notScorpion: true,
       mainPokerTableReplaced: false,
       lobbyReplaced: false,
+      placement: { x: Number(group.position.x.toFixed(3)), y: Number(group.position.y.toFixed(3)), z: Number(group.position.z.toFixed(3)), yaw: Number(THREE.MathUtils.radToDeg(group.rotation.y).toFixed(2)) },
+      placementControls: "Use ?geoX=number&geoZ=number&geoYaw=degrees to tune placement. Use ?noGeoTable=1 to disable.",
       mapTexturesAttempted: Object.keys(MAPS),
       mapTexturesLoaded: Object.entries(loaded).filter(([,tex])=>!!tex).map(([key])=>key),
       mapTexturesMissing: Object.entries(loaded).filter(([,tex])=>!tex).map(([key])=>key),
       objectName: group.name,
-      note: "Standalone geometric texture table. It is not placed by Scorpion and does not replace the main poker table."
+      note: "Standalone geometric texture table with material labels. It is not placed by Scorpion and does not replace the main poker table."
     };
+    window.SVR_PHASE94_GEOMETRIC_TEXTURE_TABLE = state;
     window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE = state;
     safeLog(log, "[SVR]", PHASE, "installed", state);
     return group;
   } catch (err){
-    window.SVR_PHASE93_GEOMETRIC_TEXTURE_TABLE = {
+    window.SVR_PHASE94_GEOMETRIC_TEXTURE_TABLE = {
       phase: PHASE,
       installed: false,
       failed: true,
