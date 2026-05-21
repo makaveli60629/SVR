@@ -1,4 +1,4 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import "./modules/scorpion_integration_guard.js";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
@@ -14,16 +14,15 @@ import { applyWatchHardfix } from "./modules/watch_hardfix.js";
 import { createNpcAvatarSystem } from "./modules/npc_avatar_system.js";
 import { createPlayablePoker } from "./modules/playable_poker.js";
 import "./modules/poker_action_hud.js";
-import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
+import { runWebXREnforcerAudit } from "./modules/webxr_enforcer.js";
 import { buildTeleportRouteRegistry } from "./modules/teleport-router.js";
-import { installScorpionStorefrontProxy } from "./modules/scorpion_storefront_proxy.js";
 
-const PHASE_85_BUILD = "PHASE-85-FORCE-VISIBLE-HOLOGRAM-FALLBACK";
+const PHASE_91_BUILD = "PHASE-91-BLACK-SCREEN-BOOT-RESCUE";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
-document.documentElement.dataset.svrBuild = PHASE_85_BUILD;
+document.documentElement.dataset.svrBuild = PHASE_91_BUILD;
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 
 const $status = document.getElementById("status");
@@ -33,6 +32,13 @@ const $err = document.getElementById("err");
 const $toggleLog = document.getElementById("toggleLog");
 const $toggleJoints = document.getElementById("toggleJoints");
 const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
+
+window.SVR_PHASE91_BOOT_RESCUE = {
+  phase: PHASE_91_BUILD,
+  appElementExists: !!document.getElementById("app"),
+  scorpionProxyLoadedAtBoot: false,
+  note: "Scorpion storefront proxy is intentionally disabled during boot rescue."
+};
 
 let lastStatusText = "";
 let lastStatusAt = 0;
@@ -54,12 +60,14 @@ function setMode(text){
 }
 
 function log(...args){
+  if (!$log) return;
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
   $log.textContent += line + "\n";
   $log.scrollTop = $log.scrollHeight;
 }
 
-$toggleLog.addEventListener("click", ()=>{
+$toggleLog?.addEventListener("click", ()=>{
+  if (!$log) return;
   $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
 });
 
@@ -68,7 +76,7 @@ if (AUTOCAM) document.body.classList.add("preview-mode");
 const enforcerAudit = runWebXREnforcerAudit({ log });
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData.SVR_WEBXR_ENFORCER_AUDIT = enforcerAudit;
-scene.userData.SVR_PHASE_85_BUILD = PHASE_85_BUILD;
+scene.userData.SVR_PHASE_91_BUILD = PHASE_91_BUILD;
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
@@ -83,7 +91,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading worldâ€¦", { force: true });
+setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -97,7 +105,6 @@ const teleportRouter = buildTeleportRouteRegistry(sceneTargets, seats, tableCent
 Object.assign(sceneTargets, teleportRouter.legacySceneTargets);
 window.SVR_TELEPORT_ROUTER = teleportRouter;
 window.SVR_SCENE_TARGETS = sceneTargets;
-installScorpionStorefrontProxy({ scene, sceneTargets, log });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -172,7 +179,7 @@ function joinTable(){
   if (renderer.xr.isPresenting) tp.setPlayerPose(seat.x, -0.42, seat.z);
   else moveDesktopToSeat(seat);
   setMode(`Seat: ${seat.label}`);
-  setStatus("Poker controls: F Fold â€¢ C Check/Call â€¢ R Raise â€¢ A All-In â€¢ H Next Hand", { force: true });
+  setStatus("Poker controls: F Fold • C Check/Call • R Raise • A All-In • H Next Hand", { force: true });
   return true;
 }
 
@@ -199,7 +206,7 @@ function gotoScene(key){
     const path = rec.scenePath.replace(/^game\//, "./");
     window.SVR_LAST_ROUTE = { requested: key, routeKey, label: rec.label || routeKey, type: rec.type || "private_scene", privateScene: true, scenePath: rec.scenePath };
     setStatus(`Opening private scene: ${rec.label || routeKey}`, { force: true });
-    setTimeout(()=>{ window.location.href = `${path}?v=phase85-private-route`; }, 80);
+    setTimeout(()=>{ window.location.href = `${path}?v=phase91-private-route`; }, 80);
     return true;
   }
 
@@ -300,19 +307,19 @@ window.SVR_HOLOGRAM_MENU = hologram;
 window.SVR_HOLOGRAM_DOM_FALLBACK = holoFallback;
 window.SVR_OPEN_HOLOGRAM = ()=>holoFallback?.setVisible(true, "manual-global-open");
 window.SVR_CLOSE_HOLOGRAM = ()=>holoFallback?.setVisible(false, "manual-global-close");
-window.SVR_PHASE85_HOLOGRAM_HOTFIX = { phase: PHASE_85_BUILD, forcedDomFallback: true, xrUses3d: true };
+window.SVR_PHASE91_HOLOGRAM_HOTFIX = { phase: PHASE_91_BUILD, forcedDomFallback: true, xrUses3d: true };
 
-$toggleJoints.addEventListener("click", ()=>{
+$toggleJoints?.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logoâ€¦", { force: true });
+setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 85 hologram fallback hotfix loaded.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 91 boot rescue loaded.", { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -404,8 +411,7 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloadingâ€¦");
-  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
+  log("[ERR] WebGL context lost. Reloading…");
+  setStatus("WebGL context lost (reloading…)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
-
