@@ -17,7 +17,7 @@ import "./modules/poker_action_hud.js";
 import { runWebXREnforcerAudit, SVR_WEBXR_PHASE } from "./modules/webxr_enforcer.js";
 import { buildTeleportRouteRegistry } from "./modules/teleport-router.js";
 
-const PHASE_85_BUILD = "PHASE-84-HOLOGRAM-SPACE-ROUTING-LOCK";
+const PHASE_85_BUILD = "PHASE-85-FORCE-VISIBLE-HOLOGRAM-FALLBACK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -197,7 +197,7 @@ function gotoScene(key){
     const path = rec.scenePath.replace(/^game\//, "./");
     window.SVR_LAST_ROUTE = { requested: key, routeKey, label: rec.label || routeKey, type: rec.type || "private_scene", privateScene: true, scenePath: rec.scenePath };
     setStatus(`Opening private scene: ${rec.label || routeKey}`, { force: true });
-    setTimeout(()=>{ window.location.href = `${path}?v=phase84-private-route`; }, 80);
+    setTimeout(()=>{ window.location.href = `${path}?v=phase85-private-route`; }, 80);
     return true;
   }
 
@@ -230,9 +230,13 @@ const watchActions = {
   leaveTable,
   toggleTeleport: ()=>tp.toggleMode(),
   toggleHologram: ()=>{
-    const opened = hologram?.toggle("watch-holo-button");
-    const visible3d = !!hologram?.getState?.().visible;
-    if (!visible3d || !opened) return holoFallback?.toggle("watch-holo-fallback");
+    if (renderer.xr.isPresenting){
+      const opened3d = hologram?.toggle("watch-holo-button-xr");
+      setStatus(opened3d ? "3D hologram opened" : "3D hologram closed", { force: true });
+      return opened3d;
+    }
+    const opened = holoFallback?.toggle("watch-holo-fallback-forced");
+    setStatus(opened ? "HOLOGRAM FALLBACK OPEN" : "HOLOGRAM FALLBACK CLOSED", { force: true });
     return opened;
   },
   pokerFold: ()=>poker.fold(),
@@ -292,6 +296,9 @@ hologram = createHologramMenu({ scene, camera, renderer, getState: getGameState,
 holoFallback = createHologramDomFallback({ getState: getGameState, actions: watchActions });
 window.SVR_HOLOGRAM_MENU = hologram;
 window.SVR_HOLOGRAM_DOM_FALLBACK = holoFallback;
+window.SVR_OPEN_HOLOGRAM = ()=>holoFallback?.setVisible(true, "manual-global-open");
+window.SVR_CLOSE_HOLOGRAM = ()=>holoFallback?.setVisible(false, "manual-global-close");
+window.SVR_PHASE85_HOLOGRAM_HOTFIX = { phase: PHASE_85_BUILD, forcedDomFallback: true, xrUses3d: true };
 
 $toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
@@ -302,7 +309,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Poker is playable. Wrist console + hologram menu enabled.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 85 hologram fallback hotfix loaded.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
