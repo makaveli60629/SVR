@@ -80,7 +80,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
 
-  // Phase 103: single Three.js watch hologram path. Removed duplicate Phase 101/102 canvas declarations that blocked boot.
+  // Phase 106: single Three.js watch hologram path with unique scoped canvas identifiers to stop holoCtx redeclare boot errors.
 
   const group = new THREE.Group();
   group.visible = false;
@@ -134,60 +134,62 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     opacity: 0.94
   });
   const holoButtonCap = new THREE.Mesh(new THREE.BoxGeometry(0.044, 0.018, 0.009), holoButtonMat);
-  holoButtonCap.name = 'PHASE_103_PHYSICAL_HOLO_BUTTON';
+  holoButtonCap.name = 'PHASE_106_PHYSICAL_HOLO_BUTTON';
   holoButtonCap.position.set(plateW * 0.31, plateH * 0.32, 0.019);
   group.add(holoButtonCap);
 
-  const holoTexCanvas = document.createElement('canvas');
-  holoTexCanvas.width = 900;
-  holoTexCanvas.height = 620;
-  const holoCtx = holoTexCanvas.getContext('2d');
-  const holoTex = new THREE.CanvasTexture(holoTexCanvas);
-  holoTex.colorSpace = THREE.SRGBColorSpace;
-  holoTex.anisotropy = 8;
-  const holoPanel = new THREE.Mesh(
+  // Phase 106: renamed the hologram canvas/context/texture identifiers so stale or duplicated
+  // prior watch snippets cannot crash boot with "Identifier 'holoCtx' has already been declared".
+  const svrHoloCanvas106 = document.createElement('canvas');
+  svrHoloCanvas106.width = 900;
+  svrHoloCanvas106.height = 620;
+  const svrHoloCtx106 = svrHoloCanvas106.getContext('2d');
+  const svrHoloTexture106 = new THREE.CanvasTexture(svrHoloCanvas106);
+  svrHoloTexture106.colorSpace = THREE.SRGBColorSpace;
+  svrHoloTexture106.anisotropy = 8;
+  const svrHoloPanel106 = new THREE.Mesh(
     new THREE.PlaneGeometry(0.30, 0.205),
-    new THREE.MeshBasicMaterial({ map: holoTex, transparent: true, opacity: 0.94, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
+    new THREE.MeshBasicMaterial({ map: svrHoloTexture106, transparent: true, opacity: 0.94, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
   );
-  holoPanel.name = 'PHASE_103_WATCH_HOLOGRAM_PANEL';
-  holoPanel.position.set(0, plateH * 1.25, 0.045);
-  holoPanel.renderOrder = 72;
-  group.add(holoPanel);
+  svrHoloPanel106.name = 'PHASE_106_WATCH_HOLOGRAM_PANEL';
+  svrHoloPanel106.position.set(0, plateH * 1.25, 0.045);
+  svrHoloPanel106.renderOrder = 72;
+  group.add(svrHoloPanel106);
 
   function drawHoloPanel(state){
-    holoCtx.clearRect(0, 0, holoTexCanvas.width, holoTexCanvas.height);
-    const w = holoTexCanvas.width;
-    const h = holoTexCanvas.height;
-    const grad = holoCtx.createLinearGradient(0,0,w,h);
+    svrHoloCtx106.clearRect(0, 0, svrHoloCanvas106.width, svrHoloCanvas106.height);
+    const w = svrHoloCanvas106.width;
+    const h = svrHoloCanvas106.height;
+    const grad = svrHoloCtx106.createLinearGradient(0,0,w,h);
     grad.addColorStop(0, 'rgba(8, 12, 28, 0.92)');
     grad.addColorStop(1, 'rgba(46, 10, 78, 0.88)');
-    holoCtx.fillStyle = grad;
-    rr(holoCtx, 20, 20, w - 40, h - 40, 42);
-    holoCtx.fill();
-    holoCtx.strokeStyle = 'rgba(155, 255, 232, 0.92)';
-    holoCtx.lineWidth = 10;
-    rr(holoCtx, 20, 20, w - 40, h - 40, 42);
-    holoCtx.stroke();
-    holoCtx.textAlign = 'center';
-    holoCtx.textBaseline = 'middle';
-    holoCtx.fillStyle = '#ffffff';
-    holoCtx.font = '900 58px system-ui, Arial';
-    holoCtx.fillText('SVR HOLO ROUTER', w/2, 82);
-    holoCtx.fillStyle = '#8fffe6';
-    holoCtx.font = '800 32px system-ui, Arial';
-    holoCtx.fillText('Pinch HOLO button to close/open', w/2, 136);
+    svrHoloCtx106.fillStyle = grad;
+    rr(svrHoloCtx106, 20, 20, w - 40, h - 40, 42);
+    svrHoloCtx106.fill();
+    svrHoloCtx106.strokeStyle = 'rgba(155, 255, 232, 0.92)';
+    svrHoloCtx106.lineWidth = 10;
+    rr(svrHoloCtx106, 20, 20, w - 40, h - 40, 42);
+    svrHoloCtx106.stroke();
+    svrHoloCtx106.textAlign = 'center';
+    svrHoloCtx106.textBaseline = 'middle';
+    svrHoloCtx106.fillStyle = '#ffffff';
+    svrHoloCtx106.font = '900 58px system-ui, Arial';
+    svrHoloCtx106.fillText('SVR HOLO ROUTER', w/2, 82);
+    svrHoloCtx106.fillStyle = '#8fffe6';
+    svrHoloCtx106.font = '800 32px system-ui, Arial';
+    svrHoloCtx106.fillText('Pinch HOLO button to close/open', w/2, 136);
     const lines = [
       'Lobby • Scorpion • Reiki • PGA',
       'Store • Lounge • Space Room',
       state.teleportEnabled ? 'Teleport armed from watch / fist' : 'Teleport off — tap TP ON',
       'Close fist: glow / aim • release to jump'
     ];
-    holoCtx.font = '700 34px system-ui, Arial';
+    svrHoloCtx106.font = '700 34px system-ui, Arial';
     lines.forEach((line, i)=>{
-      holoCtx.fillStyle = i === 2 ? '#ffe986' : '#e7e2ff';
-      holoCtx.fillText(line, w/2, 222 + i * 70);
+      svrHoloCtx106.fillStyle = i === 2 ? '#ffe986' : '#e7e2ff';
+      svrHoloCtx106.fillText(line, w/2, 222 + i * 70);
     });
-    holoTex.needsUpdate = true;
+    svrHoloTexture106.needsUpdate = true;
   }
 
   // Phase 103: removed duplicate PHASE_101_WRIST_HOLOGRAM_PANEL. The Phase 102 physical holo panel above is the single source of truth.
@@ -267,7 +269,7 @@ let hoveredId = null;
   function draw(force = false){
     const state = getState();
     const holoVisible = state.holoMenuVisible !== false;
-    if (holoPanel) holoPanel.visible = holoVisible;
+    if (svrHoloPanel106) svrHoloPanel106.visible = holoVisible;
     if (holoBeam) holoBeam.visible = holoVisible;
     const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, holo: state.holoMenuVisible, tp: state.teleportEnabled, sec: new Date().getSeconds() });
     if (!force && sig === lastSig) return;
@@ -327,7 +329,7 @@ let hoveredId = null;
     const holoOpen = state.holoMenuVisible !== false;
     holoButtonCap.material.emissiveIntensity = holoOpen ? 2.2 : 0.62;
     holoButtonCap.material.color.setHex(holoOpen ? 0x00ffd8 : 0xbb47ff);
-    holoPanel.visible = holoOpen;
+    svrHoloPanel106.visible = holoOpen;
     if (holoOpen) drawHoloPanel(state);
   }
 

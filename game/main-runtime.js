@@ -7,7 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { PHASE_105_BUILD, routeLabel, PHASE_101_VR_RUNTIME_CORRECTION_LOCK } from "./modules/private_room_registry.js";
+import { PHASE_106_BUILD, routeLabel, PHASE_101_VR_RUNTIME_CORRECTION_LOCK } from "./modules/private_room_registry.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -405,7 +405,7 @@ const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"),
 tp.setLogoTexture(logoTexture);
 
 window.__SVR_RUNTIME_READY = true;
-setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_105_BUILD}: boot safe runtime active, never-stuck fallback armed, A-Frame snippets quarantined.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_106_BUILD}: boot safe runtime active, never-stuck fallback armed, A-Frame snippets quarantined.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

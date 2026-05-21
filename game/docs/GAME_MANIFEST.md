@@ -243,3 +243,11 @@ Implementation:
 - Kept A-Frame snippets quarantined; the live game remains Three.js/WebXR.
 - Preserved Phase 102/103 visual/watch/fist teleport fixes where present.
 - Site untouched.
+
+
+## Phase 106 — HoloCtx Boot Fix Lock
+- Corrected boot rescue error: `Identifier 'holoCtx' has already been declared`.
+- Locked current Three.js/WebXR runtime; do not replace with A-Frame snippets.
+- Watch hologram now uses unique scoped Phase 106 canvas/context names.
+- Keep Scorpion/PGA/Reiki/private scene work from prior phases.
+- Site untouched.

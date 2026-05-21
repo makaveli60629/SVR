@@ -1,4 +1,5 @@
-export const PHASE_105_BUILD = "PHASE-105-BOOT-SAFE-RUNTIME-LOCK";
+export const PHASE_106_BUILD = "PHASE-106-HOLOCTX-BOOT-FIX-LOCK";
+export const PHASE_105_BUILD = PHASE_106_BUILD;
 export const PHASE_104_BUILD = PHASE_105_BUILD;
 export const PHASE_103_BUILD = PHASE_105_BUILD; // compatibility alias
 export const PHASE_102_BUILD = PHASE_105_BUILD; // compatibility alias
