@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-const PHASE = "PHASE-179-VISIBLE-HOLOGRAM-POPUP-PANEL";
+const PHASE = "PHASE-87-XR-HEADSET-HOLOGRAM-HUD";
 
 function rr(c, x, y, w, h, r){
   c.beginPath();
@@ -44,7 +44,7 @@ function disabledReason(poker, key){
   return "Illegal now";
 }
 function zone(id, label, x, y, w, h, action, section = "", disabled = false, reason = ""){
-  return { id, label, x, y, w, h, action, section, disabled, reason, margin: 22, hold: 0.075 };
+  return { id, label, x, y, w, h, action, section, disabled, reason, margin: 26, hold: 0.075 };
 }
 function buildZones(state = {}){
   const poker = state.poker || {};
@@ -86,29 +86,31 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
   group.visible = false;
   scene.add(group);
 
-  const panelW = 1.38;
-  const panelH = 0.95;
+  const panelW = 1.65;
+  const panelH = 1.14;
 
   const back = new THREE.Mesh(
-    new THREE.PlaneGeometry(panelW * 1.05, panelH * 1.05),
-    new THREE.MeshBasicMaterial({ color: 0x120020, transparent: true, opacity: 0.58, side: THREE.DoubleSide, depthWrite: false, depthTest: false })
+    new THREE.PlaneGeometry(panelW * 1.08, panelH * 1.08),
+    new THREE.MeshBasicMaterial({ color: 0x120020, transparent: true, opacity: 0.72, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
   );
   back.position.z = -0.018;
-  back.renderOrder = 90;
+  back.renderOrder = 9000;
+  back.frustumCulled = false;
   group.add(back);
 
   const panel = new THREE.Mesh(
     new THREE.PlaneGeometry(panelW, panelH),
     new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
   );
-  panel.renderOrder = 92;
+  panel.renderOrder = 9001;
+  panel.frustumCulled = false;
   group.add(panel);
 
-  const glow = new THREE.PointLight(0xd05cff, 2.0, 4.0, 2.0);
+  const glow = new THREE.PointLight(0xd05cff, 2.4, 4.0, 2.0);
   glow.position.set(0, 0, 0.32);
   group.add(glow);
 
-  const state = { phase: PHASE, visible: false, reason: "init", hoveredButton: null, lastAction: "none", moduleMode: "visible-popup-panel", pinchReleaseState: "PINCH_RELEASED" };
+  const state = { phase: PHASE, visible: false, reason: "init", hoveredButton: null, lastAction: "none", moduleMode: "xr-headset-hud", pinchReleaseState: "PINCH_RELEASED", attachedToCamera: false };
   window.SVR_HOLOGRAM_MENU_STATE = state;
 
   let hoveredId = null;
@@ -117,6 +119,7 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
   let pressLockId = null;
   let lastHovered = null;
   let lastSig = "";
+  let lastParent = null;
 
   function drawButton(z, hovered){
     const disabled = !!z.disabled;
@@ -148,35 +151,72 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
     const s = getState() || {};
     const poker = s.poker || {};
     const tp = window.SVR_ACTIVE_TELEPORT_HAND || {};
-    const sig = JSON.stringify({ visible: state.visible, h: hoveredId, cash: s.cash, seated: s.seated, tp: tp.state, tpa: tp.active, pot: poker.pot, turn: poker.awaitingPlayer, legal: poker.legal, last: state.lastAction, sec: Math.floor(performance.now() / 500) });
+    const sig = JSON.stringify({ visible: state.visible, h: hoveredId, cash: s.cash, seated: s.seated, tp: tp.state, tpa: tp.active, pot: poker.pot, turn: poker.awaitingPlayer, legal: poker.legal, last: state.lastAction, xr: renderer?.xr?.isPresenting, sec: Math.floor(performance.now() / 500) });
     if (!force && sig === lastSig) return;
     lastSig = sig;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    bg.addColorStop(0, "rgba(5,8,16,0.96)");
-    bg.addColorStop(0.52, "rgba(38,11,68,0.95)");
-    bg.addColorStop(1, "rgba(5,8,16,0.96)");
+    bg.addColorStop(0, "rgba(5,8,16,0.98)");
+    bg.addColorStop(0.52, "rgba(38,11,68,0.98)");
+    bg.addColorStop(1, "rgba(5,8,16,0.98)");
     ctx.fillStyle = bg;
     rr(ctx, 12, 12, 1000, 680, 34);
     ctx.fill();
     ctx.strokeStyle = tp.glow === "purple" ? "rgba(208,92,255,0.98)" : "rgba(180,140,255,0.86)";
-    ctx.lineWidth = 7;
+    ctx.lineWidth = 8;
     rr(ctx, 12, 12, 1000, 680, 34);
     ctx.stroke();
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 42px system-ui, Arial";
+    ctx.font = "bold 44px system-ui, Arial";
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
-    ctx.fillText("SVR HOLOGRAM", 44, 38);
+    ctx.fillText("SVR VR HOLOGRAM", 44, 38);
     ctx.fillStyle = "rgba(233,233,255,0.78)";
     ctx.font = "22px system-ui, Arial";
-    ctx.fillText("Touch a large card, then pinch. Close returns hand teleport.", 370, 38);
+    ctx.fillText("Headset HUD panel • touch card + pinch • close returns teleport", 430, 38);
     ctx.textAlign = "right";
     ctx.fillStyle = "#7ff5c7";
     ctx.font = "bold 30px system-ui, Arial";
     ctx.fillText(`$${Number(s.cash || 0).toLocaleString()}`, 968, 38);
     for (const z of buildZones(s)) drawButton(z, hoveredId === z.id);
     tex.needsUpdate = true;
+  }
+
+  function attachForVR(){
+    if (!renderer?.xr?.isPresenting) return false;
+    const activeCamera = getActiveCamera(camera, renderer);
+    if (!activeCamera) return false;
+    if (group.parent !== activeCamera){
+      group.parent?.remove(group);
+      activeCamera.add(group);
+      lastParent = activeCamera;
+    }
+    group.position.set(0, -0.035, -1.18);
+    group.rotation.set(0, 0, 0);
+    group.scale.setScalar(1.0);
+    state.attachedToCamera = true;
+    return true;
+  }
+
+  function placeInFront(force = false){
+    if (!state.visible && !force) return;
+    if (attachForVR()) return;
+    if (group.parent !== scene){
+      group.parent?.remove(group);
+      scene.add(group);
+      lastParent = scene;
+    }
+    state.attachedToCamera = false;
+    const activeCamera = getActiveCamera(camera, renderer);
+    if (!activeCamera) return;
+    const camPos = new THREE.Vector3();
+    const camDir = new THREE.Vector3();
+    activeCamera.getWorldPosition(camPos);
+    activeCamera.getWorldDirection(camDir);
+    const targetPos = camPos.clone().add(camDir.multiplyScalar(1.05));
+    targetPos.y = THREE.MathUtils.clamp(camPos.y + 0.03, 1.08, 1.78);
+    group.position.copy(targetPos);
+    group.lookAt(camPos);
   }
 
   function show(reason = "manual"){
@@ -209,20 +249,6 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
     if (state.visible) hide(reason);
     else show(reason);
     return state.visible;
-  }
-
-  function placeInFront(force = false){
-    if (!state.visible && !force) return;
-    const activeCamera = getActiveCamera(camera, renderer);
-    if (!activeCamera) return;
-    const camPos = new THREE.Vector3();
-    const camDir = new THREE.Vector3();
-    activeCamera.getWorldPosition(camPos);
-    activeCamera.getWorldDirection(camDir);
-    const targetPos = camPos.clone().add(camDir.multiplyScalar(1.05));
-    targetPos.y = THREE.MathUtils.clamp(camPos.y + 0.03, 1.08, 1.78);
-    group.position.copy(targetPos);
-    group.lookAt(camPos);
   }
 
   function localHit(local){
@@ -268,15 +294,11 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
       const tipPos = getJointWorld(candidate, "index-finger-tip");
       if (!tipPos) continue;
       const local = group.worldToLocal(tipPos.clone());
-      if (local.z < -0.18 || local.z > 0.22 || Math.abs(local.x) > panelW * 0.66 || Math.abs(local.y) > panelH * 0.66) continue;
+      if (local.z < -0.30 || local.z > 0.38 || Math.abs(local.x) > panelW * 0.70 || Math.abs(local.y) > panelH * 0.72) continue;
       const hit = localHit(local);
       if (!hit) continue;
       const depth = Math.abs(local.z);
-      if (depth < bestDepth){
-        bestDepth = depth;
-        nextHover = hit;
-        activeInput = candidate;
-      }
+      if (depth < bestDepth){ bestDepth = depth; nextHover = hit; activeInput = candidate; }
     }
     hoveredId = nextHover?.id || null;
     state.hoveredButton = hoveredId;
@@ -299,8 +321,8 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
   }
 
   draw(true);
+  window.SVR_PHASE87_XR_HEADSET_HOLOGRAM_HUD = state;
   window.SVR_PHASE179_HOLOGRAM_VISIBLE_PANEL = state;
-  window.SVR_PHASE178_HOLOGRAM_RELIABLE_MENU = state;
   window.SVR_PHASE177_HOLOGRAM_3D_MENU = state;
   return { object: group, show, hide, toggle, update, getState: ()=>state };
 }
