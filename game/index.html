@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • Phase 96 HUD Guard</title>
+  <title>ScarlettVR Poker • Phase 97 Desktop Overlay Hide</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -32,27 +32,27 @@
   </script>
 </head>
 <body>
-  <!-- BUILD: PHASE-96-HUD-CONFLICT-GUARD -->
+  <!-- BUILD: PHASE-97-DESKTOP-OVERLAY-HIDE-GUARD -->
   <div id="app"></div>
   <button id="hardHoloButton" type="button">HOLO MENU</button>
   <div id="hardHoloOverlay" aria-hidden="true">
     <section class="hard-holo-panel" role="dialog" aria-label="SVR hard hologram menu">
-      <div class="hard-holo-top"><div><div class="hard-holo-sub">PHASE 96 DESKTOP FALLBACK</div><div class="hard-holo-title">SVR HOLOGRAM</div><div style="color:rgba(255,255,255,.72);margin-top:8px">HUD conflict guard active. Custom raise and poker controls no longer fight for input.</div></div><button class="hard-holo-close" data-hard-close>CLOSE</button></div>
+      <div class="hard-holo-top"><div><div class="hard-holo-sub">PHASE 97 DESKTOP FALLBACK</div><div class="hard-holo-title">SVR HOLOGRAM</div><div style="color:rgba(255,255,255,.72);margin-top:8px">Desktop overlay hide guard active. Use HIDE UI / SHOW UI or press U.</div></div><button class="hard-holo-close" data-hard-close>CLOSE</button></div>
       <div class="hard-holo-grid">
-        <button class="hard-holo-card" data-hard-route="./index.html?v=phase96-lobby"><b>Lobby</b><span>Main game</span></button>
+        <button class="hard-holo-card" data-hard-route="./index.html?v=phase97-lobby"><b>Lobby</b><span>Main game</span></button>
         <button class="hard-holo-card" data-hard-action="seat"><b>Seat</b><span>Use in-game seat</span></button>
-        <button class="hard-holo-card" data-hard-route="./scorpion.html?v=phase96"><b>Scorpion</b><span>Private poker</span></button>
-        <button class="hard-holo-card" data-hard-route="./reiki.html?v=phase96"><b>Reiki Room</b><span>Private scene</span></button>
-        <button class="hard-holo-card" data-hard-route="./pga-drive.html?v=phase96"><b>PGA Drive</b><span>Range</span></button>
-        <button class="hard-holo-card" data-hard-route="./chip-putt.html?v=phase96"><b>Chip / Putt</b><span>Short game</span></button>
-        <button class="hard-holo-card" data-hard-route="./store-room.html?v=phase96"><b>Store</b><span>VR store</span></button>
-        <button class="hard-holo-card" data-hard-route="./smoker-lounge.html?v=phase96"><b>Lounge</b><span>Private social</span></button>
-        <button class="hard-holo-card" data-hard-route="./space-station.html?v=phase96"><b>Space Station</b><span>Private space</span></button>
+        <button class="hard-holo-card" data-hard-route="./scorpion.html?v=phase97"><b>Scorpion</b><span>Private poker</span></button>
+        <button class="hard-holo-card" data-hard-route="./reiki.html?v=phase97"><b>Reiki Room</b><span>Private scene</span></button>
+        <button class="hard-holo-card" data-hard-route="./pga-drive.html?v=phase97"><b>PGA Drive</b><span>Range</span></button>
+        <button class="hard-holo-card" data-hard-route="./chip-putt.html?v=phase97"><b>Chip / Putt</b><span>Short game</span></button>
+        <button class="hard-holo-card" data-hard-route="./store-room.html?v=phase97"><b>Store</b><span>VR store</span></button>
+        <button class="hard-holo-card" data-hard-route="./smoker-lounge.html?v=phase97"><b>Lounge</b><span>Private social</span></button>
+        <button class="hard-holo-card" data-hard-route="./space-station.html?v=phase97"><b>Space Station</b><span>Private space</span></button>
         <button class="hard-holo-card" data-hard-action="teleport"><b>Teleport</b><span>Use fist/controller</span></button>
         <button class="hard-holo-card" data-hard-action="call"><b>Check / Call</b><span>Poker action</span></button>
         <button class="hard-holo-card" data-hard-action="fold"><b>Fold</b><span>Poker action</span></button>
       </div>
-      <div id="hardHoloStatus" class="hard-holo-status">Ready. Desktop: press G or tap HOLO MENU. VR: use watch HOLO.</div>
+      <div id="hardHoloStatus" class="hard-holo-status">Ready. Desktop: press G or tap HOLO MENU. Press U to hide/show desktop UI.</div>
     </section>
   </div>
   <div id="hud">
@@ -61,7 +61,7 @@
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: …</span>
-      <span class="pill">BUILD: PHASE-96-HUD-GUARD</span>
+      <span class="pill">BUILD: PHASE-97-OVERLAY-HIDE</span>
     </div>
   </div>
   <div id="sceneNav">
@@ -105,30 +105,31 @@
         }
       });
       window.addEventListener('keydown', (e)=>{ if (e.code === 'KeyG' && !e.repeat) toggle(); if (e.code === 'Escape') setOpen(false); }, true);
-      window.SVR_PHASE96_GAME_ENTRY = { phase:'PHASE-96-HUD-CONFLICT-GUARD', ready:true, appElementExists: !!document.getElementById('app') };
+      window.SVR_PHASE97_GAME_ENTRY = { phase:'PHASE-97-DESKTOP-OVERLAY-HIDE-GUARD', ready:true, appElementExists: !!document.getElementById('app') };
     })();
   </script>
-  <script type="module" src="./main.js?v=phase96-hud-conflict-guard"></script>
-  <script type="module" src="./modules/poker_table_fx.js?v=phase96"></script>
-  <script type="module" src="./modules/npc_bot_animation_fx.js?v=phase96"></script>
-  <script type="module" src="./modules/runtime_audit_guard.js?v=phase96"></script>
-  <script type="module" src="./modules/poker_feedback_fx.js?v=phase96"></script>
-  <script type="module" src="./modules/runtime_health_panel.js?v=phase96"></script>
-  <script type="module" src="./modules/poker_card_mesh_sync.js?v=phase96"></script>
-  <script type="module" src="./modules/poker_chip_motion_fx.js?v=phase96"></script>
-  <script type="module" src="./modules/private_scene_route_guard.js?v=phase96"></script>
-  <script type="module" src="./modules/quest_performance_monitor.js?v=phase96"></script>
-  <script type="module" src="./modules/gameplay_demo_polish.js?v=phase96"></script>
-  <script type="module" src="./modules/runtime_health_sync_patch.js?v=phase96"></script>
-  <script type="module" src="./modules/poker_custom_raise_ui.js?v=phase96"></script>
-  <script type="module" src="./modules/hud_conflict_guard.js?v=phase96"></script>
-  <script type="module" src="./modules/admin_online.js?v=phase96"></script>
-  <script type="module" src="./modules/quest_regression_bundle_audit.js?v=phase96"></script>
-  <script type="module" src="./modules/demo_candidate_lock.js?v=phase96"></script>
-  <script type="module" src="./modules/phase121_demo_status_patch.js?v=phase96"></script>
-  <script type="module" src="./modules/phase122_full_game_audit.js?v=phase96"></script>
-  <script src="modules/scorpion_chip_flow_polish.js?v=phase96"></script>
-  <script src="modules/scorpion_turn_ux_polish.js?v=phase96"></script>
-  <script src="modules/teleport_hotfix_guard.js?v=phase96"></script>
+  <script type="module" src="./main.js?v=phase97-desktop-overlay-hide"></script>
+  <script type="module" src="./modules/poker_table_fx.js?v=phase97"></script>
+  <script type="module" src="./modules/npc_bot_animation_fx.js?v=phase97"></script>
+  <script type="module" src="./modules/runtime_audit_guard.js?v=phase97"></script>
+  <script type="module" src="./modules/poker_feedback_fx.js?v=phase97"></script>
+  <script type="module" src="./modules/runtime_health_panel.js?v=phase97"></script>
+  <script type="module" src="./modules/poker_card_mesh_sync.js?v=phase97"></script>
+  <script type="module" src="./modules/poker_chip_motion_fx.js?v=phase97"></script>
+  <script type="module" src="./modules/private_scene_route_guard.js?v=phase97"></script>
+  <script type="module" src="./modules/quest_performance_monitor.js?v=phase97"></script>
+  <script type="module" src="./modules/gameplay_demo_polish.js?v=phase97"></script>
+  <script type="module" src="./modules/runtime_health_sync_patch.js?v=phase97"></script>
+  <script type="module" src="./modules/poker_custom_raise_ui.js?v=phase97"></script>
+  <script type="module" src="./modules/hud_conflict_guard.js?v=phase97"></script>
+  <script type="module" src="./modules/desktop_overlay_hide_guard.js?v=phase97"></script>
+  <script type="module" src="./modules/admin_online.js?v=phase97"></script>
+  <script type="module" src="./modules/quest_regression_bundle_audit.js?v=phase97"></script>
+  <script type="module" src="./modules/demo_candidate_lock.js?v=phase97"></script>
+  <script type="module" src="./modules/phase121_demo_status_patch.js?v=phase97"></script>
+  <script type="module" src="./modules/phase122_full_game_audit.js?v=phase97"></script>
+  <script src="modules/scorpion_chip_flow_polish.js?v=phase97"></script>
+  <script src="modules/scorpion_turn_ux_polish.js?v=phase97"></script>
+  <script src="modules/teleport_hotfix_guard.js?v=phase97"></script>
 </body>
 </html>
