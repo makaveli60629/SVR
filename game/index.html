@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • Phase 84 hologram space routing</title>
+  <title>ScarlettVR Poker • Phase 85 hologram hotfix</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -29,7 +29,7 @@
   </script>
 </head>
 <body>
-  <!-- BUILD: PHASE-84-HOLOGRAM-SPACE-ROUTING-LOCK -->
+  <!-- BUILD: PHASE-85-FORCE-VISIBLE-HOLOGRAM-FALLBACK -->
   <div id="app"></div>
   <div id="hud">
     <div class="pill" id="status">Booting…</div>
@@ -37,7 +37,7 @@
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: …</span>
-      <span class="pill">BUILD: PHASE-84-HOLOGRAM-SPACE-ROUTING-LOCK</span>
+      <span class="pill">BUILD: PHASE-85-HOLO-FALLBACK</span>
     </div>
   </div>
   <div id="sceneNav">
@@ -56,7 +56,7 @@
   </div>
   <pre id="log"></pre>
   <pre id="err"></pre>
-  <script type="module" src="./main.js"></script>
+  <script type="module" src="./main.js?v=phase85-holo-fallback-force"></script>
   <script type="module" src="./modules/poker_table_fx.js"></script>
   <script type="module" src="./modules/npc_bot_animation_fx.js"></script>
   <script type="module" src="./modules/runtime_audit_guard.js"></script>
