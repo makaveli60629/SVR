@@ -1,5 +1,7 @@
-export const PHASE_107_BUILD = "PHASE-107-VISUAL-TABLE-FLOW-LOCK";
-export const PHASE_105_BUILD = PHASE_107_BUILD;
+export const PHASE_108_BUILD = "PHASE-108-WATCH-TELEPORT-LOCOMOTION-LOCK";
+export const PHASE_107_BUILD = PHASE_108_BUILD;
+export const PHASE_106_BUILD = PHASE_108_BUILD;
+export const PHASE_105_BUILD = PHASE_108_BUILD;
 export const PHASE_104_BUILD = PHASE_105_BUILD;
 export const PHASE_103_BUILD = PHASE_105_BUILD; // compatibility alias
 export const PHASE_102_BUILD = PHASE_105_BUILD; // compatibility alias
@@ -23,6 +25,6 @@ export function routeLabel(key){
 export const PHASE_101_VR_RUNTIME_CORRECTION_LOCK = Object.freeze({
   lock: "corrected Three.js/WebXR runtime; one storefront portal per hub; A-Frame snippets are quarantined and not loaded",
   controls: "Meta hand tracking plus hidden Quest/Oculus controller fallback",
-  safety: "watch hologram display repaired; private routes remain isolated from lobby",
+  safety: "watch hologram defaults off, physical HOLO button toggles it, teleport and locomotion each have explicit on/off controls",
   siteTouched: false
 });

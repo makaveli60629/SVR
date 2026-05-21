@@ -7,7 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { PHASE_106_BUILD, routeLabel, PHASE_101_VR_RUNTIME_CORRECTION_LOCK } from "./modules/private_room_registry.js";
+import { PHASE_108_BUILD, routeLabel, PHASE_101_VR_RUNTIME_CORRECTION_LOCK } from "./modules/private_room_registry.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -222,12 +222,14 @@ const audio = createAudioPlaylist({
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
-let holoMenuVisible = true;
+let holoMenuVisible = false;
+// Phase 108: holo starts OFF; user turns it on from the physical watch HOLO button.
+
 function toggleHoloMenu(){
   holoMenuVisible = !holoMenuVisible;
   const nav = document.getElementById("sceneNav");
-  if (nav && !AUTOCAM && !renderer.xr.isPresenting) nav.style.display = holoMenuVisible ? "flex" : "none";
-  setStatus(holoMenuVisible ? "HOLO MENU ON" : "HOLO MENU OFF", { force: true });
+  if (nav && !AUTOCAM && !renderer.xr.isPresenting) nav.style.display = "flex";
+  setStatus(holoMenuVisible ? "WATCH HOLO ON" : "WATCH HOLO OFF", { force: true });
   return holoMenuVisible;
 }
 
@@ -303,7 +305,7 @@ function gotoScene(key){
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
-  setStatus(`Phase 105 VR route: ${routeLabel(key)}`, { force: true });
+  setStatus(`Phase 108 VR route: ${routeLabel(key)}`, { force: true });
   return true;
 }
 
@@ -370,6 +372,7 @@ const watch = createWristWatch({
     inTableZone: inTableZone(),
     seatLabel: seatLabel(),
     teleportEnabled: tp.isEnabled ? tp.isEnabled() : true,
+    locomotionEnabled: tp.isLocomotionEnabled ? tp.isLocomotionEnabled() : true,
     holoMenuVisible
   }),
   actions: {
@@ -378,6 +381,7 @@ const watch = createWristWatch({
     joinTable,
     leaveTable,
     toggleTeleport: ()=>tp.toggleMode(),
+    toggleLocomotion: ()=>tp.toggleLocomotion?.(),
     toggleHoloMenu,
     goLobby: ()=>gotoScene("lobby"),
     goTable: ()=>gotoScene("table"),
@@ -405,7 +409,7 @@ const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"),
 tp.setLogoTexture(logoTexture);
 
 window.__SVR_RUNTIME_READY = true;
-setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_106_BUILD}: boot safe runtime active, never-stuck fallback armed, A-Frame snippets quarantined.`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${PHASE_108_BUILD}: watch holo starts off, hand teleport glow/release locked, locomotion toggle active.`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

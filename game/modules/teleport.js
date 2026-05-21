@@ -88,7 +88,51 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   markerGlow.position.y = 0.4;
   scene.add(markerGlow);
 
-  function hideArc(){}
+  // Phase 108: realer teleport arc + hand glow feedback.
+  const arcMaterial = new THREE.LineBasicMaterial({ color: 0x00ffd8, transparent: true, opacity: 0.88, depthWrite: false, depthTest: false });
+  const arcGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+  const arcLine = new THREE.Line(arcGeometry, arcMaterial);
+  arcLine.visible = false;
+  arcLine.renderOrder = 80;
+  scene.add(arcLine);
+
+  const leftHandGlow = new THREE.PointLight(0x00ffd8, 0, 0.75, 2.0);
+  const rightHandGlow = new THREE.PointLight(0x00ffd8, 0, 0.75, 2.0);
+  scene.add(leftHandGlow, rightHandGlow);
+  const arcOrigin = new THREE.Vector3();
+  const tmpWrist = new THREE.Vector3();
+
+  function hideArc(){ arcLine.visible = false; }
+
+  function setHandGlow(hand, on, color = 0x00ffd8){
+    const glow = hand === leftHandRef ? leftHandGlow : hand === rightHandRef ? rightHandGlow : null;
+    if (!glow) return;
+    glow.color.setHex(color);
+    glow.intensity = on ? 2.4 : 0;
+    if (on && hand?.joints?.wrist){
+      hand.joints.wrist.getWorldPosition(tmpWrist);
+      glow.position.copy(tmpWrist);
+    }
+  }
+
+  function clearHandGlows(){
+    leftHandGlow.intensity = 0;
+    rightHandGlow.intensity = 0;
+  }
+
+  function showArc(from, to, color = 0x00ffd8){
+    if (!from || !to) return hideArc();
+    const points = [];
+    for (let i = 0; i <= 18; i++){
+      const t = i / 18;
+      const p = new THREE.Vector3().lerpVectors(from, to, t);
+      p.y += Math.sin(t * Math.PI) * 0.72;
+      points.push(p);
+    }
+    arcMaterial.color.setHex(color);
+    arcGeometry.setFromPoints(points);
+    arcLine.visible = true;
+  }
 
   function setGlow(on){
     ringMat.emissiveIntensity = on ? 1.3 : 0.0;
@@ -96,6 +140,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   }
 
   let mode = false;
+  let locomotionEnabled = true;
   let active = null;
   let activeMode = "hand";
   let cooldownUntil = 0;
@@ -230,6 +275,15 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     );
   }
 
+  function toggleLocomotion(){
+    locomotionEnabled = !locomotionEnabled;
+    return locomotionEnabled;
+  }
+
+  function isLocomotionEnabled(){ return locomotionEnabled; }
+
+  function isEnabled(){ return mode; }
+
   function toggleMode(preferred = "right"){
     mode = !mode;
     if (!mode){
@@ -291,6 +345,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   }
 
   function movePlayerFromControllers(dt){
+    if (!locomotionEnabled) return;
     const leftGp = controllerGamepad(leftControllerRef);
     const rightGp = controllerGamepad(rightControllerRef);
 
@@ -389,6 +444,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       ring.visible = false;
       hideArc();
       setGlow(false);
+      clearHandGlows();
       stableTargetMs = 0;
       lastAimValid = false;
       statusCb("Waiting for hands or controllers…");
@@ -409,13 +465,14 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       ring.visible = false;
       hideArc();
       setGlow(false);
+      clearHandGlows();
       stableTargetMs = 0;
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
-        ? "Controllers active • left stick move • right stick snap turn • A/X teleport"
-        : "TELEPORT OFF • close fist by face to arm; release fist to jump";
+        ? (locomotionEnabled ? "Controllers ready • MOVE ON • right stick snap turn • watch TP button" : "Controllers ready • MOVE OFF • teleport only")
+        : "TELEPORT OFF • use watch TP ON, then close fist near face and release to jump";
       statusCb(idleMsg);
-      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • close fist by face arms TP");
+      modeCb((leftControllerRef || rightControllerRef) ? (locomotionEnabled ? "Controllers ready • MOVE ON" : "Controllers ready • MOVE OFF") : "Hands ready • watch TP ON first");
       return;
     }
 
@@ -451,6 +508,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     markerGlow.position.copy(smoothedTarget).setY(0.34);
 
     if (activeMode === "controller"){
+      arcOrigin.copy(controllerOrigin);
+      showArc(arcOrigin, smoothedTarget, 0xb48cff);
       const trigger = controllerTriggerValue(active);
       if (trigger > 0.22 && !active.userData._wasTrigger) triggerHoldStart = now;
       const held = triggerHoldStart ? (now - triggerHoldStart) : 0;
@@ -469,6 +528,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
           ring.visible = false;
           hideArc();
           setGlow(false);
+          clearHandGlows();
         }else{
           cooldownUntil = now + 180;
           triggerHoldStart = 0;
@@ -483,6 +543,11 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       return;
     }
 
+    if (active?.joints?.wrist){
+      active.joints.wrist.getWorldPosition(arcOrigin);
+      showArc(arcOrigin, smoothedTarget, 0x00ffd8);
+    }
+
     // Phase 102: closed-fist teleport now works as hold-to-aim / release-to-jump.
     // Close fist near the face once to arm TP, keep fist closed to keep the target glowing, release fist to teleport.
     const fist = isFist(active);
@@ -494,6 +559,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       ringMat.emissive.setHex(0x00ffd8);
       markerGlow.color.setHex(0x00ffd8);
       markerGlow.intensity = 3.1;
+      setHandGlow(active, true, 0x00ffd8);
       statusCb("FIST TP GLOW • keep fist closed to aim • release fist to teleport");
       modeCb("Hands: FIST TELEPORT GLOW");
     }
@@ -512,6 +578,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
         ring.visible = false;
         hideArc();
         setGlow(false);
+        clearHandGlows();
         statusCb("FIST TELEPORT RELEASED");
       } else {
         cooldownUntil = now + 180;
@@ -520,6 +587,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
         statusCb("FIST TELEPORT RESET • aim again");
       }
     }
+    if (!fist){ setHandGlow(active, mode && activeMode === "hand", 0xb48cff); }
     if (!fist && !active.userData._wasFist) fistHoldStart = 0;
     active.userData._wasFist = fist;
 
@@ -546,6 +614,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
         ring.visible = false;
         hideArc();
         setGlow(false);
+        clearHandGlows();
       } else {
         cooldownUntil = now + 180;
         pinchHoldStart = 0;
@@ -559,5 +628,5 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     statusCb("HAND TP ON • fist/chinch toggles • pinch-hold/release teleports");
   }
 
-  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
+  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, isEnabled, toggleLocomotion, isLocomotionEnabled, getState: ()=>({ mode, locomotionEnabled, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
 }

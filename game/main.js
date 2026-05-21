@@ -21,8 +21,8 @@ function showBootError(err){
   }
 }
 
-window.__SVR_BOOT_WRAPPER = "PHASE-107-VISUAL-TABLE-FLOW-LOCK";
-setBootStatus("Loading Phase 105 boot-safe runtime…");
+window.__SVR_BOOT_WRAPPER = "PHASE-108-WATCH-TELEPORT-LOCOMOTION-LOCK";
+setBootStatus("Loading Phase 108 watch/teleport runtime…");
 
 const bootTimer = setTimeout(()=>{
   if (!window.__SVR_RUNTIME_READY){
@@ -30,7 +30,7 @@ const bootTimer = setTimeout(()=>{
   }
 }, 6500);
 
-import(`./main-runtime.js?v=phase105-${Date.now()}`)
+import(`./main-runtime.js?v=phase108-${Date.now()}`)
   .then(()=>clearTimeout(bootTimer))
   .catch((err)=>{
     clearTimeout(bootTimer);

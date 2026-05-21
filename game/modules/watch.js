@@ -86,8 +86,9 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   group.visible = false;
   scene.add(group);
 
-  const plateW = 0.224;
-  const plateH = 0.116;
+  // Phase 108: compact watch body. The large hologram now starts OFF and only opens from the HOLO button.
+  const plateW = 0.192;
+  const plateH = 0.096;
 
   const frame = new THREE.Mesh(
     new THREE.BoxGeometry(plateW * 0.98, plateH * 0.98, 0.003),
@@ -133,9 +134,9 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     transparent: true,
     opacity: 0.94
   });
-  const holoButtonCap = new THREE.Mesh(new THREE.BoxGeometry(0.044, 0.018, 0.009), holoButtonMat);
-  holoButtonCap.name = 'PHASE_106_PHYSICAL_HOLO_BUTTON';
-  holoButtonCap.position.set(plateW * 0.31, plateH * 0.32, 0.019);
+  const holoButtonCap = new THREE.Mesh(new THREE.BoxGeometry(0.038, 0.016, 0.008), holoButtonMat);
+  holoButtonCap.name = 'PHASE_108_PHYSICAL_HOLO_BUTTON';
+  holoButtonCap.position.set(plateW * 0.32, plateH * 0.31, 0.018);
   group.add(holoButtonCap);
 
   // Phase 106: renamed the hologram canvas/context/texture identifiers so stale or duplicated
@@ -148,11 +149,11 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   svrHoloTexture106.colorSpace = THREE.SRGBColorSpace;
   svrHoloTexture106.anisotropy = 8;
   const svrHoloPanel106 = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.30, 0.205),
-    new THREE.MeshBasicMaterial({ map: svrHoloTexture106, transparent: true, opacity: 0.94, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
+    new THREE.PlaneGeometry(0.215, 0.132),
+    new THREE.MeshBasicMaterial({ map: svrHoloTexture106, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
   );
-  svrHoloPanel106.name = 'PHASE_106_WATCH_HOLOGRAM_PANEL';
-  svrHoloPanel106.position.set(0, plateH * 1.25, 0.045);
+  svrHoloPanel106.name = 'PHASE_108_WATCH_HOLOGRAM_PANEL_COMPACT';
+  svrHoloPanel106.position.set(0, plateH * 0.98, 0.040);
   svrHoloPanel106.renderOrder = 72;
   group.add(svrHoloPanel106);
 
@@ -177,12 +178,13 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     svrHoloCtx106.fillText('SVR HOLO ROUTER', w/2, 82);
     svrHoloCtx106.fillStyle = '#8fffe6';
     svrHoloCtx106.font = '800 32px system-ui, Arial';
-    svrHoloCtx106.fillText('Pinch HOLO button to close/open', w/2, 136);
+    svrHoloCtx106.fillText('Pinch HOLO: open / close panel', w/2, 136);
     const lines = [
       'Lobby • Scorpion • Reiki • PGA',
       'Store • Lounge • Space Room',
-      state.teleportEnabled ? 'Teleport armed from watch / fist' : 'Teleport off — tap TP ON',
-      'Close fist: glow / aim • release to jump'
+      state.teleportEnabled ? 'TP ON: close fist glows / release jumps' : 'TP OFF: tap TP ON before hand teleport',
+      state.locomotionEnabled === false ? 'MOVE OFF: teleport only' : 'MOVE ON: stick locomotion active'
+      
     ];
     svrHoloCtx106.font = '700 34px system-ui, Arial';
     lines.forEach((line, i)=>{
@@ -196,11 +198,11 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
 
   const holoBeam = new THREE.Mesh(
-    new THREE.ConeGeometry(0.070, 0.145, 32, 1, true),
+    new THREE.ConeGeometry(0.046, 0.082, 28, 1, true),
     new THREE.MeshBasicMaterial({ color: 0x7ff5c7, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false })
   );
-  holoBeam.name = 'PHASE_101_WRIST_HOLOGRAM_BEAM';
-  holoBeam.position.set(0, 0.074, 0.028);
+  holoBeam.name = 'PHASE_108_WRIST_HOLOGRAM_BEAM_COMPACT';
+  holoBeam.position.set(0, 0.050, 0.025);
   holoBeam.rotation.x = Math.PI;
   holoBeam.renderOrder = 69;
   group.add(holoBeam);
@@ -250,8 +252,10 @@ function buildButtons(state){
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
     { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'holo', label: state.holoMenuVisible === false ? 'PRESS HOLO' : 'HOLO OPEN', x: 380, y: 120, w: 172, h: 48, font: 20, pinchOnly: true, hold: 0.16, margin: 8 },
-    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
+    { id: 'holo', label: state.holoMenuVisible === false ? 'HOLO ON' : 'HOLO OFF', x: 410, y: 116, w: 184, h: 50, font: 21, pinchOnly: true, hold: 0.14, margin: 8 },
+    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 258, h: 116, font: 46, pinchOnly: true, hold: 0.16, margin: 8 },
+    { id: 'locomotion', label: state.locomotionEnabled === false ? 'MOVE OFF' : 'MOVE ON', x: 718, y: 178, w: 258, h: 116, font: 40, pinchOnly: true, hold: 0.16, margin: 8 },
+    { id: 'fistHelp', label: 'FIST: HOLD / GLOW / RELEASE', x: 428, y: 314, w: 548, h: 104, font: 26, pinchOnly: true, hold: 0.20, margin: 8 },
   ];
   if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
   else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 428, y: 120, w: 548, h: 48, font: 28, pinchOnly: true, hold: 0.18, margin: 8 });
@@ -271,7 +275,7 @@ let hoveredId = null;
     const holoVisible = state.holoMenuVisible !== false;
     if (svrHoloPanel106) svrHoloPanel106.visible = holoVisible;
     if (holoBeam) holoBeam.visible = holoVisible;
-    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, holo: state.holoMenuVisible, tp: state.teleportEnabled, sec: new Date().getSeconds() });
+    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, holo: state.holoMenuVisible, tp: state.teleportEnabled, loc: state.locomotionEnabled, sec: new Date().getSeconds() });
     if (!force && sig === lastSig) return;
     lastSig = sig;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -320,7 +324,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Press HOLO button • close fist glows TP • release to jump • storefront routing', 36, 332);
+    ctx.fillText('HOLO button opens panel • TP toggles fist teleport • MOVE toggles stick locomotion', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -365,6 +369,7 @@ let hoveredId = null;
     if (id === 'leave') actions.leaveTable?.();
     if (id === 'teleport') actions.toggleTeleport?.();
     if (id === 'holo') actions.toggleHoloMenu?.();
+    if (id === 'locomotion') actions.toggleLocomotion?.();
     if (id === 'lobby') actions.goLobby?.();
     if (id === 'tableScene') actions.goTable?.();
     if (id === 'seatScene') actions.goSeat?.();
@@ -378,6 +383,7 @@ let hoveredId = null;
     if (id === 'sponsorScene') actions.goSponsor?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
     if (id === 'reikiRoomScene') actions.goReikiRoom?.();
+    if (id === 'fistHelp') actions.toggleTeleport?.();
   }
 
   function update(dt, leftHand, rightHand){

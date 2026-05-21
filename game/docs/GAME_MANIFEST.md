@@ -261,3 +261,13 @@ Implementation:
 - Rebuilt Scorpion table felt with one centered SVR/Scorpion logo, one pass/bet line, a Player Stack zone, and an Action Zone for call/raise/fold gestures.
 - Preserved the current Three.js/WebXR runtime; no A-Frame replacement.
 - Website/site untouched.
+
+## Phase 108 — Watch Teleport Locomotion Lock
+
+- Watch hologram starts OFF by default.
+- Physical HOLO button toggles compact hologram ON/OFF.
+- TP ON/OFF and MOVE ON/OFF are separate watch controls.
+- MOVE OFF disables stick locomotion without disabling teleport.
+- Fist teleport now provides cyan hand glow, teleport arc, target glow, and release-to-jump behavior.
+- Current Three.js/WebXR runtime preserved; no A-Frame replacement.
+- Site untouched.
