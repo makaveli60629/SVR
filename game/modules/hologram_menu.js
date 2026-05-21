@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-const PHASE = "PHASE-177-3D-MODULAR-HOLOGRAM-CARDS";
+const PHASE = "PHASE-178-RELIABLE-HOLOGRAM-CARD-SELECTION";
 
 function getActiveCamera(camera, renderer){
   if (renderer?.xr?.isPresenting) return renderer.xr.getCamera(camera);
@@ -49,18 +49,17 @@ function makeCardTexture(card, opts = {}){
     ctx.lineWidth = hovered && !disabled ? 10 : 6;
     rr(ctx, 14, 14, 484, 228, 32);
     ctx.stroke();
-
     ctx.fillStyle = disabled ? "rgba(255,255,255,0.42)" : "#ffffff";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = `bold ${label?.length > 10 ? 44 : 54}px system-ui, Arial`;
-    ctx.fillText(label || card.id, 256, 92);
+    ctx.font = `bold ${label?.length > 10 ? 40 : 50}px system-ui, Arial`;
+    ctx.fillText(label || card.id, 256, 90);
     ctx.fillStyle = disabled ? "rgba(255,255,255,0.32)" : hovered ? "#f6e27f" : "#7ff5c7";
-    ctx.font = "bold 28px system-ui, Arial";
-    ctx.fillText(sub || card.section || "SVR", 256, 150);
+    ctx.font = "bold 26px system-ui, Arial";
+    ctx.fillText(sub || card.section || "SVR", 256, 148);
     ctx.fillStyle = "rgba(255,255,255,0.62)";
-    ctx.font = "20px system-ui, Arial";
-    ctx.fillText(disabled ? (card.reason || "Locked") : "pinch / controller select", 256, 198);
+    ctx.font = "19px system-ui, Arial";
+    ctx.fillText(disabled ? (card.reason || "Locked") : "touch + pinch", 256, 198);
     tex.needsUpdate = true;
   }
 
@@ -91,24 +90,24 @@ function buildCards(state = {}){
   const poker = state.poker || {};
   const callLabel = poker.toCall > 0 ? `CALL ${poker.toCall}` : "CHECK";
   return [
-    { id:"close", section:"System", label:"CLOSE", sub:"Return to game", x:0, y:1, action:"close" },
-    { id:"lobby", section:"Navigation", label:"LOBBY", sub:"Main room", x:-1.1, y:0.35, action:"goLobby" },
-    { id:"seat", section:"Navigation", label:"SEAT", sub:"Player spot", x:0, y:0.35, action:"goSeat" },
-    { id:"scorpion", section:"Private", label:"SCORPION", sub:"Poker room", x:1.1, y:0.35, action:"goScorpion" },
-    { id:"reiki", section:"Private", label:"REIKI", sub:"Meditation", x:-1.1, y:-0.32, action:"goReiki" },
-    { id:"pga", section:"Private", label:"PGA", sub:"Golf hub", x:0, y:-0.32, action:"goPga" },
-    { id:"drive", section:"Private", label:"DRIVE", sub:"Range", x:1.1, y:-0.32, action:"goPgaDrive" },
-    { id:"chip", section:"Private", label:"CHIP", sub:"Putt area", x:-1.1, y:-0.99, action:"goChipPutt" },
-    { id:"store", section:"Private", label:"STORE", sub:"SVR portal", x:0, y:-0.99, action:"goStoreRoom" },
-    { id:"lounge", section:"Private", label:"LOUNGE", sub:"Social", x:1.1, y:-0.99, action:"goSmokerLounge" },
-    { id:"teleport", section:"Teleport", label:(s,tp)=> tp?.glow === "purple" ? "TP ON" : "TP OFF", sub:"Fist toggle", x:-1.1, y:-1.66, action:"toggleTeleport" },
-    { id:"audio", section:"Audio", label:"AUDIO", sub:state.audioEnabled ? "Playing" : "Paused", x:0, y:-1.66, action:"toggleAudio" },
-    { id:"next", section:"Audio", label:"NEXT", sub:"Track", x:1.1, y:-1.66, action:"nextTrack" },
-    { id:"fold", section:"Poker", label:"FOLD", sub:"Hand action", x:-1.1, y:-2.33, action:"pokerFold", disabled:!pokerLegal(poker,"fold"), reason:disabledReason(poker,"fold") },
-    { id:"call", section:"Poker", label:callLabel, sub:"Hand action", x:0, y:-2.33, action:"pokerCall", disabled:!pokerLegal(poker,"call"), reason:disabledReason(poker,"call") },
-    { id:"raise", section:"Poker", label:"RAISE", sub:"Increase bet", x:1.1, y:-2.33, action:"pokerRaise", disabled:!pokerLegal(poker,"raise"), reason:disabledReason(poker,"raise") },
-    { id:"allin", section:"Poker", label:"ALL-IN", sub:"Max bet", x:-0.55, y:-3.0, action:"pokerAllIn", disabled:!pokerLegal(poker,"allin"), reason:disabledReason(poker,"allin") },
-    { id:"nextHand", section:"Poker", label:"NEXT HAND", sub:"New deal", x:0.55, y:-3.0, action:"pokerNext", disabled:!pokerLegal(poker,"nextHand"), reason:disabledReason(poker,"nextHand") }
+    { id:"close", section:"System", label:"CLOSE", sub:"Return", x:0, y:1.02, action:"close" },
+    { id:"lobby", section:"Nav", label:"LOBBY", sub:"Main room", x:-1.1, y:0.38, action:"goLobby" },
+    { id:"seat", section:"Nav", label:"SEAT", sub:"Player spot", x:0, y:0.38, action:"goSeat" },
+    { id:"scorpion", section:"Private", label:"SCORPION", sub:"Poker room", x:1.1, y:0.38, action:"goScorpion" },
+    { id:"reiki", section:"Private", label:"REIKI", sub:"Meditation", x:-1.1, y:-0.28, action:"goReiki" },
+    { id:"pga", section:"Private", label:"PGA", sub:"Golf hub", x:0, y:-0.28, action:"goPga" },
+    { id:"drive", section:"Private", label:"DRIVE", sub:"Range", x:1.1, y:-0.28, action:"goPgaDrive" },
+    { id:"chip", section:"Private", label:"CHIP", sub:"Putt area", x:-1.1, y:-0.94, action:"goChipPutt" },
+    { id:"store", section:"Private", label:"STORE", sub:"SVR portal", x:0, y:-0.94, action:"goStoreRoom" },
+    { id:"lounge", section:"Private", label:"LOUNGE", sub:"Social", x:1.1, y:-0.94, action:"goSmokerLounge" },
+    { id:"teleport", section:"Teleport", label:(s,tp)=> tp?.glow === "purple" ? "TP ON" : "TP OFF", sub:"Fist toggle", x:-1.1, y:-1.60, action:"toggleTeleport" },
+    { id:"audio", section:"Audio", label:"AUDIO", sub:state.audioEnabled ? "Playing" : "Paused", x:0, y:-1.60, action:"toggleAudio" },
+    { id:"next", section:"Audio", label:"NEXT", sub:"Track", x:1.1, y:-1.60, action:"nextTrack" },
+    { id:"fold", section:"Poker", label:"FOLD", sub:"Hand action", x:-1.1, y:-2.26, action:"pokerFold", disabled:!pokerLegal(poker,"fold"), reason:disabledReason(poker,"fold") },
+    { id:"call", section:"Poker", label:callLabel, sub:"Hand action", x:0, y:-2.26, action:"pokerCall", disabled:!pokerLegal(poker,"call"), reason:disabledReason(poker,"call") },
+    { id:"raise", section:"Poker", label:"RAISE", sub:"Increase", x:1.1, y:-2.26, action:"pokerRaise", disabled:!pokerLegal(poker,"raise"), reason:disabledReason(poker,"raise") },
+    { id:"allin", section:"Poker", label:"ALL-IN", sub:"Max bet", x:-0.55, y:-2.92, action:"pokerAllIn", disabled:!pokerLegal(poker,"allin"), reason:disabledReason(poker,"allin") },
+    { id:"nextHand", section:"Poker", label:"NEXT HAND", sub:"New deal", x:0.55, y:-2.92, action:"pokerNext", disabled:!pokerLegal(poker,"nextHand"), reason:disabledReason(poker,"nextHand") }
   ];
 }
 
@@ -117,27 +116,28 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
   group.visible = false;
   scene.add(group);
 
-  const cardW = 0.58;
-  const cardH = 0.30;
+  const cardW = 0.62;
+  const cardH = 0.32;
+  const hitW = cardW * 1.24;
+  const hitH = cardH * 1.42;
   const cardMeshes = [];
 
-  const header = makeCardTexture({ id:"header", label:"SVR HOLOGRAM", sub:"Large 3D modular menu", section:"Header" });
+  const header = makeCardTexture({ id:"header", label:"SVR HOLOGRAM", sub:"Touch card + pinch", section:"Header" });
   const headerMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.95, 0.30),
+    new THREE.PlaneGeometry(2.04, 0.30),
     new THREE.MeshBasicMaterial({ map: header.texture, transparent:true, side:THREE.DoubleSide, depthWrite:false, depthTest:false, toneMapped:false })
   );
-  headerMesh.position.set(0, 1.46, 0.02);
+  headerMesh.position.set(0, 0.73, 0.02);
   headerMesh.renderOrder = 86;
   group.add(headerMesh);
 
-  const cardDefinitions = buildCards({});
-  for (const card of cardDefinitions){
+  for (const card of buildCards({})){
     const textureLayer = makeCardTexture(card);
     const mesh = new THREE.Mesh(
       new THREE.PlaneGeometry(cardW, cardH),
       new THREE.MeshBasicMaterial({ map:textureLayer.texture, transparent:true, side:THREE.DoubleSide, depthWrite:false, depthTest:false, toneMapped:false })
     );
-    mesh.position.set(card.x * 0.64, card.y * 0.38, 0);
+    mesh.position.set(card.x * 0.66, card.y * 0.29, 0);
     mesh.userData.card = card;
     mesh.userData.textureLayer = textureLayer;
     mesh.renderOrder = 88;
@@ -146,15 +146,12 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
   }
 
   const glow = new THREE.PointLight(0xd05cff, 1.6, 3.5, 2.0);
-  glow.position.set(0, -0.30, 0.35);
+  glow.position.set(0, -0.15, 0.35);
   group.add(glow);
 
-  const state = { phase: PHASE, visible:false, reason:"init", hoveredButton:null, lastAction:"none", moduleMode:"3d-cards", pinchReleaseState:"PINCH_RELEASED" };
+  const state = { phase: PHASE, visible:false, reason:"init", hoveredButton:null, lastAction:"none", moduleMode:"reliable-3d-panel-cards", pinchReleaseState:"PINCH_RELEASED" };
   window.SVR_HOLOGRAM_MENU_STATE = state;
 
-  const raycaster = new THREE.Raycaster();
-  const tmpRayOrigin = new THREE.Vector3();
-  const tmpRayDir = new THREE.Vector3();
   let hoveredMesh = null;
   let pressed = false;
   let pinchTime = 0;
@@ -199,9 +196,9 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
     const camDir = new THREE.Vector3();
     activeCamera.getWorldPosition(camPos);
     activeCamera.getWorldDirection(camDir);
-    const targetPos = camPos.clone().add(camDir.multiplyScalar(1.28));
-    targetPos.y = THREE.MathUtils.clamp(camPos.y + 0.10, 1.15, 1.92);
-    group.position.lerp(targetPos, force ? 1 : 0.14);
+    const targetPos = camPos.clone().add(camDir.multiplyScalar(1.18));
+    targetPos.y = THREE.MathUtils.clamp(camPos.y + 0.02, 1.16, 1.78);
+    group.position.lerp(targetPos, force ? 1 : 0.18);
     group.lookAt(camPos);
   }
 
@@ -218,8 +215,8 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
       mesh.userData.card = next;
       const hovered = state.hoveredButton === next.id;
       mesh.userData.textureLayer?.draw?.({ hovered, disabled:!!next.disabled, state:s });
-      mesh.scale.setScalar(hovered && !next.disabled ? 1.085 : 1);
-      mesh.position.z = hovered ? 0.035 : 0;
+      mesh.scale.setScalar(hovered && !next.disabled ? 1.10 : 1);
+      mesh.position.z = hovered ? 0.04 : 0;
     }
   }
 
@@ -236,19 +233,33 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
     redrawCards(true);
   }
 
-  function getPointHover(leftHand, rightHand){
-    const candidates = [rightHand, leftHand];
-    for (const candidate of candidates){
-      const tipPos = getJointWorld(candidate, "index-finger-tip");
-      if (!tipPos) continue;
-      tmpRayOrigin.copy(tipPos);
-      tmpRayDir.copy(group.position).sub(tipPos).normalize();
-      raycaster.set(tmpRayOrigin, tmpRayDir);
-      raycaster.near = 0.02;
-      raycaster.far = 1.8;
-      const hits = raycaster.intersectObjects(cardMeshes, false);
-      if (hits.length) return { mesh:hits[0].object, input:candidate };
+  function directHitFromHand(hand){
+    const tipPos = getJointWorld(hand, "index-finger-tip");
+    if (!tipPos) return null;
+    const local = group.worldToLocal(tipPos.clone());
+    if (local.z < -0.16 || local.z > 0.18) return null;
+    let best = null;
+    let bestScore = Infinity;
+    for (const mesh of cardMeshes){
+      const mx = mesh.position.x;
+      const my = mesh.position.y;
+      const dx = Math.abs(local.x - mx);
+      const dy = Math.abs(local.y - my);
+      if (dx > hitW * 0.5 || dy > hitH * 0.5) continue;
+      const score = (dx / hitW) * (dx / hitW) + (dy / hitH) * (dy / hitH) + Math.abs(local.z) * 0.12;
+      if (score < bestScore){
+        bestScore = score;
+        best = mesh;
+      }
     }
+    return best;
+  }
+
+  function getHover(leftHand, rightHand){
+    const right = directHitFromHand(rightHand);
+    if (right) return { mesh:right, input:rightHand };
+    const left = directHitFromHand(leftHand);
+    if (left) return { mesh:left, input:leftHand };
     return { mesh:null, input:null };
   }
 
@@ -258,21 +269,19 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
       return;
     }
     placeInFront();
-    const hover = getPointHover(leftHand, rightHand);
+    const hover = getHover(leftHand, rightHand);
     hoveredMesh = hover.mesh;
     const card = hoveredMesh?.userData?.card || null;
     state.hoveredButton = card?.id || null;
 
     const pinching = !!hover.input && isPinching(hover.input);
     state.pinchReleaseState = pinching ? "PINCH_WAIT_RELEASE" : "PINCH_RELEASED";
-
     if (pinching && card?.id && !pressLockId) pressLockId = card.id;
     if (!pinching) pressLockId = null;
-
     if (pinching && card) pinchTime += dt;
     else if (!pinching) pinchTime = 0;
 
-    if (card && pinching && !pressed && pinchTime > 0.11){
+    if (card && pinching && !pressed && pinchTime > 0.085){
       pressed = true;
       activateCard(card);
       pinchTime = 0;
@@ -284,6 +293,7 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
   }
 
   redrawCards(true);
+  window.SVR_PHASE178_HOLOGRAM_RELIABLE_MENU = state;
   window.SVR_PHASE177_HOLOGRAM_3D_MENU = state;
   return { object:group, show, hide, toggle, update, getState:()=>state };
 }
