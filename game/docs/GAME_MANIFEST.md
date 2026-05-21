@@ -271,3 +271,10 @@ Implementation:
 - Fist teleport now provides cyan hand glow, teleport arc, target glow, and release-to-jump behavior.
 - Current Three.js/WebXR runtime preserved; no A-Frame replacement.
 - Site untouched.
+
+
+## Phase 109 — Registry Export Boot Lock
+- Fixed private room registry missing export boot error.
+- Added backward-compatible phase exports so mixed cached modules do not crash the runtime.
+- Build label: `PHASE-109-REGISTRY-EXPORT-BOOT-LOCK`.
+- Site untouched.
