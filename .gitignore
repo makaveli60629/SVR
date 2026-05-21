@@ -17,3 +17,9 @@ Thumbs.db
 backend/node_modules/
 node_modules/
 
+# SVR API secrets
+api/.env
+api/.env.local
+api/node_modules/
+.env
+.env.local
