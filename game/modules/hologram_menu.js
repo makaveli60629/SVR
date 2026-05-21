@@ -1,7 +1,10 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-const PHASE = "PHASE-87-XR-HEADSET-HOLOGRAM-HUD";
+const PHASE = "PHASE-88-VR-WORLDSPACE-HEADSET-FOLLOW-HOLOGRAM";
+const V_HEAD = new THREE.Vector3();
+const V_DIR = new THREE.Vector3();
+const V_TARGET = new THREE.Vector3();
 
 function rr(c, x, y, w, h, r){
   c.beginPath();
@@ -44,7 +47,7 @@ function disabledReason(poker, key){
   return "Illegal now";
 }
 function zone(id, label, x, y, w, h, action, section = "", disabled = false, reason = ""){
-  return { id, label, x, y, w, h, action, section, disabled, reason, margin: 26, hold: 0.075 };
+  return { id, label, x, y, w, h, action, section, disabled, reason, margin: 32, hold: 0.07 };
 }
 function buildZones(state = {}){
   const poker = state.poker || {};
@@ -84,17 +87,18 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
 
   const group = new THREE.Group();
   group.visible = false;
+  group.frustumCulled = false;
   scene.add(group);
 
-  const panelW = 1.65;
-  const panelH = 1.14;
+  const panelW = 1.82;
+  const panelH = 1.26;
 
   const back = new THREE.Mesh(
-    new THREE.PlaneGeometry(panelW * 1.08, panelH * 1.08),
-    new THREE.MeshBasicMaterial({ color: 0x120020, transparent: true, opacity: 0.72, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
+    new THREE.PlaneGeometry(panelW * 1.10, panelH * 1.10),
+    new THREE.MeshBasicMaterial({ color: 0x120020, transparent: true, opacity: 0.82, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
   );
-  back.position.z = -0.018;
-  back.renderOrder = 9000;
+  back.position.z = -0.026;
+  back.renderOrder = 9990;
   back.frustumCulled = false;
   group.add(back);
 
@@ -102,15 +106,15 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
     new THREE.PlaneGeometry(panelW, panelH),
     new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
   );
-  panel.renderOrder = 9001;
+  panel.renderOrder = 9991;
   panel.frustumCulled = false;
   group.add(panel);
 
-  const glow = new THREE.PointLight(0xd05cff, 2.4, 4.0, 2.0);
-  glow.position.set(0, 0, 0.32);
+  const glow = new THREE.PointLight(0xd05cff, 3.2, 5.0, 2.0);
+  glow.position.set(0, 0, 0.45);
   group.add(glow);
 
-  const state = { phase: PHASE, visible: false, reason: "init", hoveredButton: null, lastAction: "none", moduleMode: "xr-headset-hud", pinchReleaseState: "PINCH_RELEASED", attachedToCamera: false };
+  const state = { phase: PHASE, visible: false, reason: "init", hoveredButton: null, lastAction: "none", moduleMode: "world-space-headset-follow", pinchReleaseState: "PINCH_RELEASED", attachedToCamera: false, worldSpaceFollow: true };
   window.SVR_HOLOGRAM_MENU_STATE = state;
 
   let hoveredId = null;
@@ -119,7 +123,6 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
   let pressLockId = null;
   let lastHovered = null;
   let lastSig = "";
-  let lastParent = null;
 
   function drawButton(z, hovered){
     const disabled = !!z.disabled;
@@ -173,7 +176,7 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
     ctx.fillText("SVR VR HOLOGRAM", 44, 38);
     ctx.fillStyle = "rgba(233,233,255,0.78)";
     ctx.font = "22px system-ui, Arial";
-    ctx.fillText("Headset HUD panel • touch card + pinch • close returns teleport", 430, 38);
+    ctx.fillText("World-space headset-follow panel • touch card + pinch", 430, 38);
     ctx.textAlign = "right";
     ctx.fillStyle = "#7ff5c7";
     ctx.font = "bold 30px system-ui, Arial";
@@ -182,41 +185,26 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
     tex.needsUpdate = true;
   }
 
-  function attachForVR(){
-    if (!renderer?.xr?.isPresenting) return false;
-    const activeCamera = getActiveCamera(camera, renderer);
-    if (!activeCamera) return false;
-    if (group.parent !== activeCamera){
-      group.parent?.remove(group);
-      activeCamera.add(group);
-      lastParent = activeCamera;
-    }
-    group.position.set(0, -0.035, -1.18);
-    group.rotation.set(0, 0, 0);
-    group.scale.setScalar(1.0);
-    state.attachedToCamera = true;
-    return true;
-  }
-
   function placeInFront(force = false){
     if (!state.visible && !force) return;
-    if (attachForVR()) return;
     if (group.parent !== scene){
       group.parent?.remove(group);
       scene.add(group);
-      lastParent = scene;
     }
     state.attachedToCamera = false;
     const activeCamera = getActiveCamera(camera, renderer);
     if (!activeCamera) return;
-    const camPos = new THREE.Vector3();
-    const camDir = new THREE.Vector3();
-    activeCamera.getWorldPosition(camPos);
-    activeCamera.getWorldDirection(camDir);
-    const targetPos = camPos.clone().add(camDir.multiplyScalar(1.05));
-    targetPos.y = THREE.MathUtils.clamp(camPos.y + 0.03, 1.08, 1.78);
-    group.position.copy(targetPos);
-    group.lookAt(camPos);
+    activeCamera.updateWorldMatrix?.(true, false);
+    activeCamera.getWorldPosition(V_HEAD);
+    activeCamera.getWorldDirection(V_DIR);
+    if (!Number.isFinite(V_DIR.x) || V_DIR.lengthSq() < 0.0001) V_DIR.set(0, 0, -1);
+    V_DIR.normalize();
+    V_TARGET.copy(V_HEAD).addScaledVector(V_DIR, renderer?.xr?.isPresenting ? 0.96 : 1.06);
+    V_TARGET.y = renderer?.xr?.isPresenting ? V_HEAD.y - 0.04 : THREE.MathUtils.clamp(V_HEAD.y + 0.03, 1.08, 1.78);
+    group.position.copy(V_TARGET);
+    group.lookAt(V_HEAD);
+    group.visible = true;
+    group.scale.setScalar(renderer?.xr?.isPresenting ? 1.06 : 1.0);
   }
 
   function show(reason = "manual"){
@@ -294,7 +282,7 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
       const tipPos = getJointWorld(candidate, "index-finger-tip");
       if (!tipPos) continue;
       const local = group.worldToLocal(tipPos.clone());
-      if (local.z < -0.30 || local.z > 0.38 || Math.abs(local.x) > panelW * 0.70 || Math.abs(local.y) > panelH * 0.72) continue;
+      if (local.z < -0.38 || local.z > 0.46 || Math.abs(local.x) > panelW * 0.76 || Math.abs(local.y) > panelH * 0.78) continue;
       const hit = localHit(local);
       if (!hit) continue;
       const depth = Math.abs(local.z);
@@ -321,8 +309,8 @@ export function createHologramMenu({ scene, camera = null, renderer = null, getS
   }
 
   draw(true);
+  window.SVR_PHASE88_VR_WORLDSPACE_HEADSET_HOLOGRAM = state;
   window.SVR_PHASE87_XR_HEADSET_HOLOGRAM_HUD = state;
   window.SVR_PHASE179_HOLOGRAM_VISIBLE_PANEL = state;
-  window.SVR_PHASE177_HOLOGRAM_3D_MENU = state;
   return { object: group, show, hide, toggle, update, getState: ()=>state };
 }
