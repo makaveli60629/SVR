@@ -15,10 +15,12 @@
   <canvas id="binary-rain" aria-hidden="true"></canvas>
 
   <main class="launch-page">
-    <div class="status-stack" aria-label="SVR system status">
-      <div class="admin-status online" id="admin-status" data-state="online">ADMIN ONLINE</div>
-      <div class="game-status online" id="game-status" data-state="online">GAME ONLINE</div>
-      <div class="database-status online" id="database-status" data-state="online">DATABASE SERVER ONLINE</div>
+    <div class="system-status-badge" aria-label="SVR system status">
+      <span class="status-item admin-status online" id="admin-status" data-state="online"><span data-admin-label>ADMIN ONLINE</span></span>
+      <span class="status-divider" aria-hidden="true">|</span>
+      <span class="status-item server-status online" id="server-status" data-state="online">SERVER ONLINE</span>
+      <span class="status-divider" aria-hidden="true">|</span>
+      <span class="status-item database-status online" id="database-status" data-state="online">DATABASE ONLINE</span>
     </div>
     <img class="launch-logo" src="./logo.webp" alt="SVR Poker logo" />
 
