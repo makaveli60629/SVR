@@ -1,26 +1,62 @@
-(() => {
+﻿(() => {
   const API_BASE = window.SVR_API_BASE || 'https://api.svrpoker.com';
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages_backup';
+  const SESSION_KEY = 'svr_site_session_id';
   const STATUS_REFRESH_MS = 30000;
 
   let lastAdminState = 'offline';
+
+  function sessionId() {
+    try {
+      let id = localStorage.getItem(SESSION_KEY);
+      if (!id) {
+        id = `svr-site-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+        localStorage.setItem(SESSION_KEY, id);
+      }
+      return id;
+    } catch (e) {
+      return `svr-site-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    }
+  }
+
+  function track(eventType, metadata = {}) {
+    const body = JSON.stringify({
+      eventType,
+      pagePath: location.pathname || '/',
+      pageTitle: document.title || 'SVR Poker',
+      referrer: document.referrer || '',
+      sessionId: sessionId(),
+      source: 'site',
+      metadata: { href: location.href, ...metadata }
+    });
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: 'application/json' });
+        if (navigator.sendBeacon(`${API_BASE}/api/analytics/event`, blob)) return;
+      }
+    } catch (e) {}
+    fetch(`${API_BASE}/api/analytics/event`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body,
+      keepalive: body.length < 60000
+    }).catch(() => {});
+  }
 
   function setAdminVisualState(isOnline, sourceText) {
     const state = isOnline ? 'online' : 'offline';
     lastAdminState = state;
     try { localStorage.setItem(ADMIN_KEY, state); } catch (e) {}
-
     document.querySelectorAll('.admin-status,[data-admin-pill]').forEach((el) => {
       el.dataset.state = state;
       el.dataset.source = sourceText || 'aws-api';
       el.classList.toggle('online', isOnline);
       el.classList.toggle('offline', !isOnline);
-
       const label = el.querySelector('[data-admin-label]');
       const text = isOnline ? 'Admin Online' : 'Admin Offline';
       if (label) label.textContent = text;
-      else if (el.classList.contains('admin-status')) el.textContent = isOnline ? '● Admin Online' : '● Admin Offline';
+      else if (el.classList.contains('admin-status')) el.textContent = isOnline ? 'â— Admin Online' : 'â— Admin Offline';
     });
   }
 
@@ -29,18 +65,13 @@
       if (!el.textContent || el.textContent.includes('Offline') || el.textContent.includes('Online')) {
         const label = el.querySelector('[data-admin-label]');
         if (label) label.textContent = 'Checking Admin Status';
-        else if (el.classList.contains('admin-status')) el.textContent = '● Checking Admin Status';
+        else if (el.classList.contains('admin-status')) el.textContent = 'â— Checking Admin Status';
       }
     });
   }
 
   async function fetchAdminStatus() {
-    const response = await fetch(`${API_BASE}/api/admin/status`, {
-      method: 'GET',
-      cache: 'no-store',
-      headers: { 'Accept': 'application/json' }
-    });
-
+    const response = await fetch(`${API_BASE}/api/admin/status`, { method: 'GET', cache: 'no-store', headers: { 'Accept': 'application/json' } });
     if (!response.ok) throw new Error(`Admin status request failed: ${response.status}`);
     return response.json();
   }
@@ -51,10 +82,7 @@
       if (!data || data.ok === false) throw new Error(data && data.error ? data.error : 'Invalid admin status payload');
       setAdminVisualState(Boolean(data.isOnline), 'aws-api');
     } catch (error) {
-      console.warn('SVR admin status API unavailable:', error.message);
-      const fallback = (() => {
-        try { return localStorage.getItem(ADMIN_KEY); } catch (e) { return null; }
-      })();
+      const fallback = (() => { try { return localStorage.getItem(ADMIN_KEY); } catch (e) { return null; } })();
       setAdminVisualState(fallback === 'online' && lastAdminState === 'online', 'fallback');
     }
   }
@@ -62,17 +90,11 @@
   async function postPublicMessage(entry) {
     const response = await fetch(`${API_BASE}/api/messages`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(entry)
     });
-
     const data = await response.json().catch(() => ({}));
-    if (!response.ok || data.ok === false) {
-      throw new Error(data.error || `Message request failed: ${response.status}`);
-    }
+    if (!response.ok || data.ok === false) throw new Error(data.error || `Message request failed: ${response.status}`);
     return data;
   }
 
@@ -86,10 +108,8 @@
   function wireMessageForm() {
     const form = document.getElementById('visitor-message-form');
     if (!form || form.dataset.svrWired === '1') return;
-
     form.dataset.svrWired = '1';
     const status = document.getElementById('visitor-message-status');
-
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
@@ -100,31 +120,42 @@
         message: (data.message || '').trim(),
         source: location.pathname || 'svrpoker-site'
       };
-
-      if (!entry.message) {
-        if (status) status.textContent = 'Please enter a message before sending.';
-        return;
-      }
-
+      if (!entry.message) { if (status) status.textContent = 'Please enter a message before sending.'; return; }
       if (status) status.textContent = 'Sending message to SVR...';
-
+      track('message_submit_attempt', { source: entry.source });
       try {
         await postPublicMessage(entry);
         saveLocalMessageBackup({ ...entry, createdAt: new Date().toISOString(), sent: true });
         form.reset();
         if (status) status.textContent = 'Message sent to SVR. Thank you.';
+        track('message_submit_success', { source: entry.source });
       } catch (error) {
-        console.warn('SVR message API unavailable:', error.message);
         saveLocalMessageBackup({ ...entry, createdAt: new Date().toISOString(), sent: false, error: error.message });
         if (status) status.textContent = 'Message saved locally. Live API could not be reached yet.';
+        track('message_submit_fallback', { source: entry.source });
       }
     });
+  }
+
+  function wireClicks() {
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest && event.target.closest('a,button');
+      if (!link) return;
+      const label = (link.textContent || link.getAttribute('aria-label') || link.href || 'click').trim().slice(0, 120);
+      const href = link.href || '';
+      if (/store/i.test(label) || /store/i.test(href)) track('store_click', { label, href });
+      else if (/sponsor|partner/i.test(label + ' ' + href)) track('sponsor_interest_click', { label, href });
+      else if (/donate|cash|support/i.test(label + ' ' + href)) track('support_click', { label, href });
+      else if (/game|preview|play/i.test(label + ' ' + href)) track('game_interest_click', { label, href });
+    }, { passive: true });
   }
 
   function boot() {
     setAdminLoadingState();
     paintAdminState();
     wireMessageForm();
+    wireClicks();
+    track('page_view');
     setTimeout(paintAdminState, 1500);
     setInterval(paintAdminState, STATUS_REFRESH_MS);
   }

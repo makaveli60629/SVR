@@ -1,4 +1,4 @@
-require("dotenv").config();
+﻿require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
@@ -185,6 +185,27 @@ async function ensureGameEventsTable() {
   `);
 }
 
+async function ensureSiteAnalyticsTable() {
+  await ensurePgCrypto();
+  await dbQuery(`
+    CREATE TABLE IF NOT EXISTS site_analytics_events (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      event_type TEXT NOT NULL DEFAULT 'page_view',
+      page_path TEXT,
+      page_title TEXT,
+      referrer TEXT,
+      session_id TEXT,
+      source TEXT NOT NULL DEFAULT 'site',
+      user_agent TEXT,
+      metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_site_analytics_created_at ON site_analytics_events (created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_site_analytics_event_type ON site_analytics_events (event_type);
+    CREATE INDEX IF NOT EXISTS idx_site_analytics_page_path ON site_analytics_events (page_path);
+    CREATE INDEX IF NOT EXISTS idx_site_analytics_session_id ON site_analytics_events (session_id);
+  `);
+}
 async function writeAdminLog(email, action, details) {
   try {
     await ensureAdminLogsTable();
@@ -499,6 +520,114 @@ app.post("/api/game/events", async (req, res) => {
   }
 });
 
+app.post("/api/analytics/event", async (req, res) => {
+  const eventType = cleanText(req.body?.eventType || req.body?.type || "page_view", 100);
+  const pagePath = cleanText(req.body?.pagePath || req.body?.path || "/", 500);
+  const pageTitle = cleanText(req.body?.pageTitle || req.body?.title || "", 240);
+  const referrer = cleanText(req.body?.referrer || "", 700);
+  const sessionId = cleanText(req.body?.sessionId || "anonymous", 180);
+  const source = cleanText(req.body?.source || "site", 80);
+  const userAgent = cleanText(req.headers["user-agent"] || req.body?.userAgent || "", 500);
+  const metadata = req.body?.metadata && typeof req.body.metadata === "object" ? req.body.metadata : {};
+  try {
+    await ensureSiteAnalyticsTable();
+    const result = await dbQuery(`
+      INSERT INTO site_analytics_events (event_type, page_path, page_title, referrer, session_id, source, user_agent, metadata)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
+      RETURNING id, created_at
+    `, [eventType, pagePath, pageTitle || null, referrer || null, sessionId || null, source, userAgent || null, JSON.stringify(metadata)]);
+    return res.status(201).json({ ok: true, event: result.rows[0] });
+  } catch (error) {
+    return res.status(500).json({ ok: false, error: "Analytics write failed.", detail: error.message });
+  }
+});
+
+app.get("/api/admin/analytics/summary", requireAdmin, async (req, res) => {
+  try {
+    await ensureSiteAnalyticsTable();
+    await ensureSiteMessagesTable();
+    await ensureMarketingTables();
+    await ensureGameEventsTable();
+    await ensureStoreItemsTable();
+
+    const totals = await dbQuery(`
+      SELECT
+        COUNT(*)::int AS all_events,
+        COUNT(*) FILTER (WHERE event_type = 'page_view')::int AS all_page_views,
+        COUNT(DISTINCT session_id)::int AS all_sessions,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '24 hours')::int AS events_24h,
+        COUNT(*) FILTER (WHERE event_type = 'page_view' AND created_at >= NOW() - INTERVAL '24 hours')::int AS page_views_24h,
+        COUNT(DISTINCT session_id) FILTER (WHERE created_at >= NOW() - INTERVAL '24 hours')::int AS sessions_24h,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days')::int AS events_7d,
+        COUNT(*) FILTER (WHERE event_type = 'page_view' AND created_at >= NOW() - INTERVAL '7 days')::int AS page_views_7d,
+        COUNT(DISTINCT session_id) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days')::int AS sessions_7d,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days')::int AS events_30d,
+        COUNT(*) FILTER (WHERE event_type = 'page_view' AND created_at >= NOW() - INTERVAL '30 days')::int AS page_views_30d,
+        COUNT(DISTINCT session_id) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days')::int AS sessions_30d
+      FROM site_analytics_events
+    `);
+    const business = await dbQuery(`
+      SELECT
+        (SELECT COUNT(*)::int FROM site_messages WHERE created_at >= NOW() - INTERVAL '30 days') AS messages_30d,
+        (SELECT COUNT(*)::int FROM marketing_leads WHERE created_at >= NOW() - INTERVAL '30 days') AS leads_30d,
+        (SELECT COUNT(*)::int FROM game_events WHERE created_at >= NOW() - INTERVAL '30 days') AS game_events_30d,
+        (SELECT COUNT(*)::int FROM store_items WHERE is_active = TRUE) AS active_store_items
+    `);
+    const topPages = await dbQuery(`
+      SELECT COALESCE(page_path, '/') AS page_path, COUNT(*)::int AS views, COUNT(DISTINCT session_id)::int AS sessions
+      FROM site_analytics_events
+      WHERE event_type = 'page_view' AND created_at >= NOW() - INTERVAL '30 days'
+      GROUP BY page_path
+      ORDER BY views DESC
+      LIMIT 12
+    `);
+    const referrers = await dbQuery(`
+      SELECT COALESCE(NULLIF(referrer, ''), 'direct') AS referrer, COUNT(*)::int AS visits
+      FROM site_analytics_events
+      WHERE event_type = 'page_view' AND created_at >= NOW() - INTERVAL '30 days'
+      GROUP BY COALESCE(NULLIF(referrer, ''), 'direct')
+      ORDER BY visits DESC
+      LIMIT 10
+    `);
+    const eventCounts = await dbQuery(`
+      SELECT event_type, COUNT(*)::int AS count
+      FROM site_analytics_events
+      WHERE created_at >= NOW() - INTERVAL '30 days'
+      GROUP BY event_type
+      ORDER BY count DESC
+      LIMIT 20
+    `);
+    const daily = await dbQuery(`
+      SELECT TO_CHAR(day, 'YYYY-MM-DD') AS day, COALESCE(events,0)::int AS events, COALESCE(page_views,0)::int AS page_views, COALESCE(sessions,0)::int AS sessions
+      FROM generate_series(CURRENT_DATE - INTERVAL '13 days', CURRENT_DATE, INTERVAL '1 day') AS day
+      LEFT JOIN (
+        SELECT DATE_TRUNC('day', created_at)::date AS d, COUNT(*) AS events, COUNT(*) FILTER (WHERE event_type = 'page_view') AS page_views, COUNT(DISTINCT session_id) AS sessions
+        FROM site_analytics_events
+        WHERE created_at >= CURRENT_DATE - INTERVAL '13 days'
+        GROUP BY d
+      ) stats ON stats.d = day::date
+      ORDER BY day
+    `);
+    return res.json({ ok: true, totals: totals.rows[0] || {}, business: business.rows[0] || {}, topPages: topPages.rows, referrers: referrers.rows, eventCounts: eventCounts.rows, daily: daily.rows });
+  } catch (error) {
+    return res.status(500).json({ ok: false, error: "Analytics summary failed.", detail: error.message });
+  }
+});
+
+app.get("/api/admin/analytics/events", requireAdmin, async (req, res) => {
+  try {
+    await ensureSiteAnalyticsTable();
+    const result = await dbQuery(`
+      SELECT id, event_type, page_path, page_title, referrer, session_id, source, created_at
+      FROM site_analytics_events
+      ORDER BY created_at DESC
+      LIMIT 200
+    `);
+    return res.json({ ok: true, events: result.rows });
+  } catch (error) {
+    return res.status(500).json({ ok: false, error: "Analytics events failed.", detail: error.message });
+  }
+});
 app.get("/api/admin/leads", requireAdmin, async (req, res) => {
   const includeArchived = String(req.query?.includeArchived || "") === "1";
   try {
@@ -649,3 +778,4 @@ app.get("/api/admin/logs", requireAdmin, async (req, res) => {
 app.use("/api", (req, res) => res.status(404).json({ ok: false, error: "API route not found." }));
 
 app.listen(PORT, () => console.log(`SVR AWS PostgreSQL API listening on port ${PORT}`));
+
