@@ -742,6 +742,75 @@ function createAdBillboardTexture(lines = ["SVRPOKER.COM", "ALL IN"]){
   });
 }
 
+
+
+function createEspressoBannerTexture(){
+  return canvasTexture(1024, 512, (x,w,h)=>{
+    const bg = x.createLinearGradient(0,0,w,h);
+    bg.addColorStop(0, '#120905');
+    bg.addColorStop(0.46, '#3a1d0c');
+    bg.addColorStop(1, '#090504');
+    x.fillStyle = bg;
+    x.fillRect(0,0,w,h);
+
+    // warm cream center glow
+    const glow = x.createRadialGradient(w*0.50,h*0.44,30,w*0.50,h*0.44,w*0.62);
+    glow.addColorStop(0, 'rgba(255,226,181,0.34)');
+    glow.addColorStop(0.42, 'rgba(197,96,32,0.18)');
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = glow;
+    x.fillRect(0,0,w,h);
+
+    // frame
+    x.strokeStyle = 'rgba(255,205,139,0.96)';
+    x.lineWidth = 12;
+    roundRectPath(x, 18, 18, w-36, h-36, 34);
+    x.stroke();
+    x.strokeStyle = 'rgba(132,64,26,0.92)';
+    x.lineWidth = 5;
+    roundRectPath(x, 42, 42, w-84, h-84, 26);
+    x.stroke();
+
+    // simple cup mark
+    x.save();
+    x.translate(w*0.20, h*0.50);
+    x.fillStyle = 'rgba(255,236,201,0.98)';
+    roundRectPath(x, -64, -28, 128, 82, 18);
+    x.fill();
+    x.strokeStyle = 'rgba(255,236,201,0.92)';
+    x.lineWidth = 12;
+    x.beginPath();
+    x.arc(70, 14, 32, -Math.PI*0.55, Math.PI*0.55);
+    x.stroke();
+    x.fillStyle = 'rgba(52,22,8,0.92)';
+    x.fillRect(-50, -12, 100, 24);
+    x.strokeStyle = 'rgba(255,205,139,0.74)';
+    x.lineWidth = 7;
+    for (let i=0;i<3;i++){
+      x.beginPath();
+      x.moveTo(-36 + i*36, -52);
+      x.bezierCurveTo(-58 + i*36, -84, -10 + i*36, -96, -30 + i*36, -128);
+      x.stroke();
+    }
+    x.restore();
+
+    x.textAlign = 'center';
+    x.textBaseline = 'middle';
+    x.fillStyle = '#fff2dc';
+    x.font = '900 82px system-ui, Arial';
+    x.fillText('ESPRESSO', w*0.60, 160);
+    x.fillStyle = '#ffd29b';
+    x.font = '900 64px system-ui, Arial';
+    x.fillText('WITH CREAM', w*0.60, 240);
+    x.fillStyle = 'rgba(255,241,217,0.94)';
+    x.font = '700 31px system-ui, Arial';
+    x.fillText('SVR LOUNGE PARTNER • AD SLOT RESTORED', w*0.60, 318);
+    x.fillStyle = 'rgba(255,211,150,0.86)';
+    x.font = '700 26px system-ui, Arial';
+    x.fillText('coffee • social lounge • premium city banner', w*0.60, 370);
+  });
+}
+
 function createStoreDisplayTexture(){
   return canvasTexture(1024, 1024, (x,w,h)=>{
     const g = x.createLinearGradient(0,0,w,h);
@@ -1203,10 +1272,10 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   group.add(activeBtn);
 
 
-  const adTex = createAdBillboardTexture(['SVR SPONSOR SLOT', 'AWAITING APPROVAL']);
+  const adTex = createEspressoBannerTexture();
   const adHeader = new THREE.Mesh(
     new THREE.PlaneGeometry(3.26, 0.56),
-    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('SVR SPONSOR SLOT', 'awaiting approval'), transparent: true, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('ESPRESSO WITH CREAM', 'city ad banner restored'), transparent: true, side: THREE.DoubleSide })
   );
   adHeader.position.set(modelX, wallHeight * 0.39, 0.18);
   group.add(adHeader);
@@ -1336,6 +1405,7 @@ function buildOuterCity(scene, R){
   const billboardUpdaters = [matrix.update];
   const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
   const zenTex = createAdBillboardTexture(['AWAITING APPROVAL', 'SVR SPONSOR SLOT']);
+  const espressoTex = createEspressoBannerTexture();
 
   const count = 68;
   const adIndices = new Set([4, 11, 20, 28, 36, 44, 52, 60]);
@@ -1395,7 +1465,7 @@ function buildOuterCity(scene, R){
     }
 
     if (adIndices.has(i)){
-      const tex = (i === 20 || i === 52) ? zenTex : (i % 2 ? matrix.texture : adTex);
+      const tex = (i === 11 || i === 44) ? espressoTex : ((i === 20 || i === 52) ? zenTex : (i % 2 ? matrix.texture : adTex));
       if (tex) tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
       const bw = Math.max(4.4, w * 0.92);
       const bh = Math.max(9.6, h * 0.56);

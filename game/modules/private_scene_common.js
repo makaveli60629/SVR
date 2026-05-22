@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-export const PHASE_LABEL = 'PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK';
+export const PHASE_LABEL = 'PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK';
 
 export function bootPrivateScene({ title = 'SVR Private Scene', subtitle = 'Private module', accent = 0x9b6dff } = {}){
   const app = document.getElementById('app') || document.body.appendChild(document.createElement('div'));

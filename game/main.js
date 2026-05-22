@@ -84,7 +84,7 @@ const dbClient = createDatabaseClient({
 });
 dbClient.health().then((dbState)=>{
   log('[SVR DB]', dbState);
-  dbClient.postGameEvent('game_boot', { build: 'PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK', preview: PREVIEW, embed: EMBED });
+  dbClient.postGameEvent('game_boot', { build: 'PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK', preview: PREVIEW, embed: EMBED });
 }).catch((error)=> log('[SVR DB] init failed', error?.message || error));
 
 
@@ -262,7 +262,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK. DB API safe-mode enabled. Lobby routes are modular.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK. DB API safe-mode enabled. Lobby routes are modular.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

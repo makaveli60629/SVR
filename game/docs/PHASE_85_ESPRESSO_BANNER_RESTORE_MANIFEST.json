@@ -1,0 +1,32 @@
+{
+  "phase": "PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK",
+  "date": "2026-05-21",
+  "siteTouched": false,
+  "gameOnly": true,
+  "summary": [
+    "restored Espresso with Cream banner as procedural skyline ad texture",
+    "added Espresso ad back into outer city billboard rotation",
+    "added Espresso ad panel near active VR Store/sponsor display zone",
+    "preserved Phase 84 database/API structure",
+    "preserved private scene routing and lobby baseline"
+  ],
+  "databaseMode": "secure-api-only-no-direct-sql-in-game",
+  "protectedRules": [
+    "site untouched",
+    "under 25 MB",
+    "no frontend secrets",
+    "Reiki approval lock preserved",
+    "private rooms stay separate from lobby"
+  ],
+  "modifiedFiles": [
+    "game/index.html",
+    "game/main.js",
+    "game/modules/world_skyline.js",
+    "game/modules/database_client.js",
+    "game/modules/private_scene_common.js",
+    "game/docs/BUILD_VERSION.json",
+    "game/docs/PHASE_85_ESPRESSO_BANNER_RESTORE_LOCK.md",
+    "game/docs/PHASE_85_ESPRESSO_BANNER_RESTORE_MANIFEST.json",
+    "update/version.json"
+  ]
+}

@@ -1,4 +1,4 @@
-// PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK
+// PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK
 // Browser-side API client for SVR Poker.
 // IMPORTANT: this module never stores SQL passwords, Stripe secrets, or admin secrets.
 // It only calls a secure backend API such as Azure App Service, Azure Functions, or AWS API.
@@ -40,7 +40,7 @@ function queueOfflineEvent(event){
 export function createDatabaseClient({ log = console.log, statusCb = () => {} } = {}){
   let apiBase = getConfiguredBaseUrl();
   const state = {
-    phase: 'PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK',
+    phase: 'PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK',
     configured: Boolean(apiBase),
     apiBasePublic: apiBase ? apiBase.replace(/^https?:\/\//, '') : '',
     status: apiBase ? 'checking' : 'safe-local-mode',
@@ -88,7 +88,7 @@ export function createDatabaseClient({ log = console.log, statusCb = () => {} } 
     const event = {
       type,
       payload,
-      phase: 'PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK',
+      phase: 'PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK',
       at: new Date().toISOString(),
       path: location.pathname,
       ua: navigator.userAgent,

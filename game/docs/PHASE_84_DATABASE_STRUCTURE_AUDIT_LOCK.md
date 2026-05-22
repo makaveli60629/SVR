@@ -1,4 +1,4 @@
-# PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK — Full Audit + Database Structure Lock
+# PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK — Full Audit + Database Structure Lock
 
 ## Scope
 Game-side repair only. The website/site side is not modified.
@@ -18,7 +18,7 @@ Game-side repair only. The website/site side is not modified.
 - Removed unapproved sponsor UI media from the package.
 - Replaced Reiki runtime content with red `AWAITING APPROVAL` placeholder panels.
 - Replaced unapproved building ad runtime labels with `SVR SPONSOR SLOT / AWAITING APPROVAL`.
-- Updated `game/index.html` to `PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK`.
+- Updated `game/index.html` to `PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK`.
 
 ## Database rule
 The game must never connect directly to SQL. The game only calls a secure backend API:
@@ -79,7 +79,7 @@ game/
 ```
 
 ## Testing checklist
-- Lobby loads and top-right build label shows `PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK`.
+- Lobby loads and top-right build label shows `PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK`.
 - Console has no import errors for `database_client.js`.
 - If API is not configured, database state shows safe-local-mode and game still boots.
 - If API is configured, `/api/health` should show online/connected.

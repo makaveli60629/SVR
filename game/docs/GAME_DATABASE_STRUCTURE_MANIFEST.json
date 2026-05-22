@@ -1,5 +1,5 @@
 {
-  "phase": "PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK",
+  "phase": "PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK",
   "auditFindings": [
     "game/index.html carried stale Phase 39 title/build label",
     "unapproved sponsor/founder runtime assets and text were present",
@@ -41,5 +41,9 @@
       "admin password",
       "JWT secret"
     ]
-  }
+  },
+  "phase85Additions": [
+    "Espresso with Cream skyline banner restored",
+    "database structure lock preserved"
+  ]
 }

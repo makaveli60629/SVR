@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK",
+  "build": "PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK",
   "date": "2026-05-21",
   "siteTouched": false,
   "databaseMode": "secure-api-only-no-direct-sql-in-game",
@@ -9,5 +9,6 @@
     "no secrets in frontend",
     "under 25 MB",
     "sponsor branding disabled until approval"
-  ]
+  ],
+  "espressoBanner": "restored-city-building-ad-and-store-zone-panel"
 }
