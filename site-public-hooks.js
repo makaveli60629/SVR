@@ -1,11 +1,11 @@
-﻿(() => {
+(() => {
   const API_BASE = window.SVR_API_BASE || 'https://api.svrpoker.com';
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages_backup';
   const SESSION_KEY = 'svr_site_session_id';
   const STATUS_REFRESH_MS = 30000;
 
-  let lastAdminState = 'offline';
+  let lastAdminState = 'online';
 
   function sessionId() {
     try {
@@ -50,23 +50,21 @@
     try { localStorage.setItem(ADMIN_KEY, state); } catch (e) {}
     document.querySelectorAll('.admin-status,[data-admin-pill]').forEach((el) => {
       el.dataset.state = state;
-      el.dataset.source = sourceText || 'aws-api';
+      el.dataset.source = sourceText || 'api';
       el.classList.toggle('online', isOnline);
       el.classList.toggle('offline', !isOnline);
+      const text = isOnline ? 'ADMIN ONLINE' : 'ADMIN OFFLINE';
       const label = el.querySelector('[data-admin-label]');
-      const text = isOnline ? 'Admin Online' : 'Admin Offline';
       if (label) label.textContent = text;
-      else if (el.classList.contains('admin-status')) el.textContent = isOnline ? 'â— Admin Online' : 'â— Admin Offline';
+      else el.textContent = text;
     });
   }
 
   function setAdminLoadingState() {
     document.querySelectorAll('.admin-status,[data-admin-pill]').forEach((el) => {
-      if (!el.textContent || el.textContent.includes('Offline') || el.textContent.includes('Online')) {
-        const label = el.querySelector('[data-admin-label]');
-        if (label) label.textContent = 'Checking Admin Status';
-        else if (el.classList.contains('admin-status')) el.textContent = 'â— Checking Admin Status';
-      }
+      const label = el.querySelector('[data-admin-label]');
+      if (label) label.textContent = 'CHECKING ADMIN STATUS';
+      else el.textContent = 'CHECKING ADMIN STATUS';
     });
   }
 
@@ -80,10 +78,10 @@
     try {
       const data = await fetchAdminStatus();
       if (!data || data.ok === false) throw new Error(data && data.error ? data.error : 'Invalid admin status payload');
-      setAdminVisualState(Boolean(data.isOnline), 'aws-api');
+      setAdminVisualState(Boolean(data.isOnline), 'api');
     } catch (error) {
       const fallback = (() => { try { return localStorage.getItem(ADMIN_KEY); } catch (e) { return null; } })();
-      setAdminVisualState(fallback === 'online' && lastAdminState === 'online', 'fallback');
+      setAdminVisualState(fallback !== 'offline', 'fallback');
     }
   }
 
