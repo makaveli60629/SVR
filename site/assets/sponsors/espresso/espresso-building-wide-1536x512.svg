@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="512" viewBox="0 0 1536 512" role="img" aria-label="SVR espresso sponsor wide building billboard">
+<defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ffe090"/><stop offset=".5" stop-color="#d99b38"/><stop offset="1" stop-color="#fff0b0"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect width="1536" height="512" fill="#080006"/>
+<rect x="24" y="24" width="1488" height="464" rx="40" fill="#16080a" stroke="url(#g)" stroke-width="12"/>
+<image href="/site/assets/sponsors/espresso/espresso-sponsor-photo.svg" x="54" y="54" width="540" height="404" preserveAspectRatio="xMidYMid slice"/>
+<rect x="54" y="54" width="540" height="404" rx="24" fill="none" stroke="url(#g)" stroke-width="7"/>
+<text x="660" y="150" font-family="Arial Black,Arial" font-size="76" fill="#fff7e8" filter="url(#glow)">ESPRESSO WITH CREAM</text>
+<text x="660" y="226" font-family="Arial Black,Arial" font-size="38" fill="#ffd879">FIRST SPONSOR EVENT TEMPLATE</text>
+<text x="660" y="286" font-family="Arial" font-size="31" fill="#f2e9dc">Community cause slot: Animal Shelter Partner Pending</text>
+<text x="660" y="336" font-family="Arial" font-size="28" fill="#e8e8e8">Sponsor-funded prize/event concept • Draft approval only</text>
+<rect x="660" y="376" width="690" height="58" rx="29" fill="#3a1f10" stroke="url(#g)" stroke-width="4"/>
+<text x="1005" y="416" text-anchor="middle" font-family="Arial Black,Arial" font-size="34" fill="#fff8eb">SVR LOBBY WALL AD • MEGA TIER</text>
+</svg>
