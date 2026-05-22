@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-label="SVR member population database visual">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#13001f"/><stop offset=".55" stop-color="#030011"/><stop offset="1" stop-color="#1c0030"/></linearGradient>
+    <linearGradient id="neon" x1="0" x2="1"><stop offset="0" stop-color="#80f8ff"/><stop offset="1" stop-color="#ff55df"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1200" height="760" rx="46" fill="url(#bg)"/>
+  <rect x="42" y="42" width="1116" height="676" rx="36" fill="none" stroke="url(#neon)" stroke-width="4" filter="url(#glow)" opacity=".9"/>
+  <text x="86" y="122" fill="#fff5ff" font-family="Arial Black,Arial" font-size="52">MEMBER POPULATION</text>
+  <text x="90" y="164" fill="#c8b6d8" font-family="Arial" font-size="24">Database intake for players, testers, sponsors, and community supporters</text>
+  <g transform="translate(92 220)">
+    <rect width="314" height="340" rx="24" fill="rgba(0,0,0,.34)" stroke="#80f8ff" stroke-width="2"/>
+    <circle cx="88" cy="92" r="42" fill="none" stroke="#80f8ff" stroke-width="8"/>
+    <path d="M35 210c18-58 88-76 125-18 18 28 20 58 18 98H36c-5-34-7-55-1-80z" fill="none" stroke="#ff55df" stroke-width="8"/>
+    <text x="36" y="302" fill="#fff" font-family="Arial Black,Arial" font-size="29">PLAYERS</text>
+  </g>
+  <g transform="translate(443 220)">
+    <rect width="314" height="340" rx="24" fill="rgba(0,0,0,.34)" stroke="#ff55df" stroke-width="2"/>
+    <rect x="58" y="60" width="188" height="92" rx="18" fill="none" stroke="#ffd879" stroke-width="7"/>
+    <path d="M94 190h124M94 232h96" stroke="#80f8ff" stroke-width="9" stroke-linecap="round"/>
+    <text x="36" y="302" fill="#fff" font-family="Arial Black,Arial" font-size="29">TESTERS</text>
+  </g>
+  <g transform="translate(794 220)">
+    <rect width="314" height="340" rx="24" fill="rgba(0,0,0,.34)" stroke="#ffd879" stroke-width="2"/>
+    <path d="M157 54l32 65 72 10-52 50 13 71-65-34-64 34 12-71-52-50 72-10z" fill="none" stroke="#ffd879" stroke-width="8" stroke-linejoin="round"/>
+    <text x="36" y="302" fill="#fff" font-family="Arial Black,Arial" font-size="29">SUPPORTERS</text>
+  </g>
+  <g transform="translate(96 620)">
+    <rect width="1008" height="54" rx="27" fill="rgba(128,248,255,.08)" stroke="rgba(128,248,255,.45)"/>
+    <text x="34" y="37" fill="#80f8ff" font-family="Arial Black,Arial" font-size="24">PRIVATE ADMIN COUNTER • MEMBER WAITLIST • LEADS • GAME EVENTS • STORE GROWTH</text>
+  </g>
+</svg>
