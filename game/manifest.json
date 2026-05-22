@@ -1,9 +1,8 @@
 {
-  "name": "ScarlettVR Poker — Phase 102",
-  "short_name": "SVR Phase 102",
+  "name": "ScarlettVR Poker",
+  "short_name": "SVR Poker",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050508",
-  "theme_color": "#050508",
-  "description": "Phase 102 VR visual alignment: Quest-visible Moon and Mars, Reiki Espresso wall ad, Scorpion single table, PGA full alignment, watch HOLO button, and fist release teleport."
+  "theme_color": "#050508"
 }

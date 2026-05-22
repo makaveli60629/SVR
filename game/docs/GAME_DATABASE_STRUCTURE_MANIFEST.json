@@ -1,0 +1,45 @@
+{
+  "phase": "PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK",
+  "auditFindings": [
+    "game/index.html carried stale Phase 39 title/build label",
+    "unapproved sponsor/founder runtime assets and text were present",
+    "database wiring was absent from the game runtime",
+    "scene routing was mixed between lobby jump targets and private-scene intent",
+    "package contained no BUILD_VERSION.json or update/version.json sync marker"
+  ],
+  "fixes": [
+    "added database_client.js safe API client with health check and offline event queue",
+    "added private_scene_common.js and standalone private scene shells",
+    "added Phase 84 build/version docs",
+    "removed unapproved sponsor media assets from package",
+    "neutralized Reiki storefront runtime text to AWAITING APPROVAL placeholders",
+    "added clean route buttons for private scenes without touching the site"
+  ],
+  "newStructure": {
+    "game/index.html": "main lobby shell",
+    "game/main.js": "runtime boot, controls, watch, API client boot",
+    "game/modules/database_client.js": "safe backend API client only",
+    "game/modules/private_scene_common.js": "shared private scene renderer",
+    "game/modules/private-scenes/": "private scene boot modules",
+    "game/docs/": "audit, version, manifest docs",
+    "update/version.json": "repo-side version file written by apply script"
+  },
+  "backendContract": {
+    "required": [
+      "GET /api/health"
+    ],
+    "recommended": [
+      "POST /api/game/events",
+      "GET /api/admin/status",
+      "GET /api/store/products",
+      "POST /api/poker/sessions",
+      "POST /api/poker/hands"
+    ],
+    "neverExpose": [
+      "SQL connection string",
+      "Stripe secret key",
+      "admin password",
+      "JWT secret"
+    ]
+  }
+}

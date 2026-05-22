@@ -1,6 +1,0 @@
-Run from PowerShell:
-
-cd "$env:USERPROFILE\Downloads"
-Unblock-File ".\APPLY-PHASE105-BOOT-SAFE-RUNTIME-LOCK.ps1"
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-& ".\APPLY-PHASE105-BOOT-SAFE-RUNTIME-LOCK.ps1"

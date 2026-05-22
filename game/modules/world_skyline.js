@@ -547,323 +547,92 @@ function buildLobbySprites(scene, R, wallHeight){
 
 
 
-function createApprovalPlaceholderTexture(title = 'AWAITING APPROVAL', subtitle = 'SVR placeholder only'){
-  return canvasTexture(1024, 1024, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, '#21060a');
-    g.addColorStop(0.55, '#09070c');
-    g.addColorStop(1, '#260511');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(255,52,72,0.96)';
-    x.lineWidth = 24;
-    roundRectPath(x, 38, 38, w - 76, h - 76, 52);
-    x.stroke();
-    x.textAlign = 'center';
-    x.textBaseline = 'middle';
-    x.fillStyle = '#ffffff';
-    x.font = '900 92px system-ui, Arial';
-    x.fillText(title, w / 2, h * 0.42);
-    x.fillStyle = '#ff9aa7';
-    x.font = '700 42px system-ui, Arial';
-    x.fillText(subtitle, w / 2, h * 0.55);
-    x.fillStyle = 'rgba(255,255,255,0.70)';
-    x.font = '700 30px system-ui, Arial';
-    x.fillText('Branding disabled until written approval', w / 2, h * 0.66);
-  });
-}
-
 async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log){
+  // Phase 84 neutral Reiki approval storefront.
+  // No unapproved sponsor/founder/external branding may appear in runtime.
   const angle = 0;
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
-  const right = new THREE.Vector3(Math.sin(angle), 0, -Math.cos(angle));
   const center = new THREE.Vector3(Math.cos(angle) * (R - 4.05), 0.01, Math.sin(angle) * (R - 4.05));
-  const logoTex = spawnLogoTex || createApprovalPlaceholderTexture('SVR', 'Reiki placeholder');
-  const founderTex = createApprovalPlaceholderTexture('AWAITING APPROVAL', 'Reiki sponsor/founder placeholder');
 
   const floorPad = new THREE.Mesh(
-    new THREE.PlaneGeometry(14.2, 7.0),
-    new THREE.MeshStandardMaterial({ color: 0x0a0f12, roughness: 0.95, metalness: 0.04, emissive: 0x12242b, emissiveIntensity: 0.10, side: THREE.DoubleSide })
+    new THREE.PlaneGeometry(12.8, 6.4),
+    new THREE.MeshStandardMaterial({ color: 0x0a0f12, roughness: 0.95, metalness: 0.04, emissive: 0x22040a, emissiveIntensity: 0.18, side: THREE.DoubleSide })
   );
   floorPad.rotation.x = -Math.PI * 0.5;
-  floorPad.position.copy(center).add(new THREE.Vector3(0, 0.002, 0));
+  floorPad.position.copy(center).add(new THREE.Vector3(0, 0.003, 0));
   scene.add(floorPad);
-
-  const carpet = new THREE.Mesh(
-    new THREE.PlaneGeometry(7.2, 5.4),
-    new THREE.MeshStandardMaterial({ color: 0x8d1024, roughness: 0.96, metalness: 0.02, emissive: 0x35050d, emissiveIntensity: 0.24, side: THREE.DoubleSide })
-  );
-  carpet.rotation.x = -Math.PI * 0.5;
-  carpet.position.copy(center).addScaledVector(inward, -0.22).add(new THREE.Vector3(0, 0.004, 0));
-  scene.add(carpet);
 
   const root = new THREE.Group();
   root.position.copy(center);
   root.lookAt(root.position.clone().add(inward));
   scene.add(root);
 
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x11161a, roughness: 0.28, metalness: 0.30, emissive: 0x14323a, emissiveIntensity: 0.46 });
-  const trimMat = new THREE.MeshStandardMaterial({ color: 0x85fff0, roughness: 0.18, metalness: 0.56, emissive: 0x1ba98f, emissiveIntensity: 0.85 });
-  const glassMat = new THREE.MeshStandardMaterial({ color: 0x97fff2, transparent: true, opacity: 0.10, roughness: 0.04, metalness: 0.22, emissive: 0x1a7066, emissiveIntensity: 0.30, side: THREE.DoubleSide });
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x11161a, roughness: 0.30, metalness: 0.26, emissive: 0x281020, emissiveIntensity: 0.22 });
+  const trimMat = new THREE.MeshStandardMaterial({ color: 0xff304d, roughness: 0.22, metalness: 0.42, emissive: 0x8d0618, emissiveIntensity: 0.92 });
+  const glassMat = new THREE.MeshStandardMaterial({ color: 0xff7b90, transparent: true, opacity: 0.10, roughness: 0.06, metalness: 0.16, emissive: 0x49101a, emissiveIntensity: 0.28, side: THREE.DoubleSide });
 
-  const rearWall = new THREE.Mesh(
-    new THREE.BoxGeometry(13.2, 6.05, 0.18),
-    new THREE.MeshStandardMaterial({ color: 0x090f12, roughness: 0.72, metalness: 0.16, emissive: 0x07161b, emissiveIntensity: 0.42 })
-  );
-  rearWall.position.set(0, 2.98, -2.24);
+  const rearWall = new THREE.Mesh(new THREE.BoxGeometry(12.2, 5.6, 0.18), frameMat);
+  rearWall.position.set(0, 2.8, -2.15);
   root.add(rearWall);
-
-  const leftColumn = new THREE.Mesh(new THREE.BoxGeometry(0.16, 5.8, 0.22), trimMat);
-  leftColumn.position.set(-6.52, 2.9, 0.74);
-  root.add(leftColumn);
-  const rightColumn = leftColumn.clone();
-  rightColumn.position.x = 6.52;
-  root.add(rightColumn);
-  const frontHeader = new THREE.Mesh(new THREE.BoxGeometry(13.2, 0.16, 0.22), trimMat);
-  frontHeader.position.set(0, 5.76, 0.74);
-  root.add(frontHeader);
-  const roof = new THREE.Mesh(new THREE.BoxGeometry(13.0, 0.12, 4.8), frameMat);
-  roof.position.set(0, 5.92, -0.42);
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(12.4, 0.15, 4.5), frameMat);
+  roof.position.set(0, 5.58, -0.35);
   root.add(roof);
-
-  const sideFrameL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 4.9, 4.5), frameMat);
-  sideFrameL.position.set(-6.48, 2.38, -0.48);
-  root.add(sideFrameL);
-  const sideFrameR = sideFrameL.clone();
-  sideFrameR.position.x = 6.48;
-  root.add(sideFrameR);
-
-  const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.95), glassMat);
-  frontGlassL.position.set(-4.82, 2.26, 0.66);
-  root.add(frontGlassL);
-  const frontGlassR = frontGlassL.clone();
-  frontGlassR.position.x = 4.82;
-  root.add(frontGlassR);
-  const sideGlassL = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 4.05), glassMat);
-  sideGlassL.position.set(-6.40, 2.25, -0.48);
-  sideGlassL.rotation.y = Math.PI * 0.5;
-  root.add(sideGlassL);
-  const sideGlassR = sideGlassL.clone();
-  sideGlassR.position.x = 6.40;
-  sideGlassR.rotation.y = -Math.PI * 0.5;
-  root.add(sideGlassR);
-
-  const signBackA = new THREE.Mesh(new THREE.PlaneGeometry(7.8, 0.96), new THREE.MeshBasicMaterial({ color: 0x05090c, side: THREE.DoubleSide }));
-  signBackA.position.set(0, 5.12, 0.68);
-  root.add(signBackA);
-  const signTexA = canvasTexture(1400, 220, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#08191b'); g.addColorStop(1, '#0d0e11');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(166,255,238,0.95)'; x.lineWidth = 10; x.strokeRect(12,12,w-24,h-24);
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 90px system-ui, Arial'; x.fillText('REIKI HUB', w/2, 110);
+  [-6.1, 6.1].forEach((x)=>{
+    const col = new THREE.Mesh(new THREE.BoxGeometry(0.18, 5.4, 0.22), trimMat);
+    col.position.set(x, 2.7, 0.68); root.add(col);
+    const side = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 3.8), glassMat);
+    side.position.set(x * 0.995, 2.35, -0.50); side.rotation.y = x < 0 ? Math.PI * .5 : -Math.PI * .5; root.add(side);
   });
-  const signA = new THREE.Mesh(new THREE.PlaneGeometry(7.62, 0.88), new THREE.MeshBasicMaterial({ map: signTexA, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  signA.position.copy(signBackA.position).add(new THREE.Vector3(0,0,0.02));
-  root.add(signA);
+  const header = new THREE.Mesh(new THREE.BoxGeometry(12.2, 0.18, 0.20), trimMat);
+  header.position.set(0, 5.38, 0.68); root.add(header);
 
-  const signBackB = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 0.76), new THREE.MeshBasicMaterial({ color: 0x05090c, side: THREE.DoubleSide }));
-  signBackB.position.set(0, 4.28, 0.69);
-  root.add(signBackB);
-  const signTexB = canvasTexture(1200, 200, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#0b0d10'); g.addColorStop(1, '#0b1d19');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#dffff7'; x.font = 'bold 84px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 98);
-  });
-  const signB = new THREE.Mesh(new THREE.PlaneGeometry(6.44, 0.70), new THREE.MeshBasicMaterial({ map: signTexB, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  signB.position.copy(signBackB.position).add(new THREE.Vector3(0,0,0.02));
-  root.add(signB);
-
-  const logoPlate = new THREE.Mesh(new THREE.PlaneGeometry(0.98, 0.62), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  logoPlate.position.set(-4.95, 4.68, 0.73);
-  root.add(logoPlate);
-
-  const zenDenTex = canvasTexture(900, 180, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#071313'); g.addColorStop(1, '#0f2220');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(124,255,226,0.82)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#eafff7'; x.font = 'bold 62px system-ui, Arial'; x.fillText('THE ZEN DEN', w/2, 86);
-    x.fillStyle = '#9cf0d3'; x.font = 'bold 24px system-ui, Arial'; x.fillText('meditate • restore • breathe', w/2, 138);
-  });
-  const zenDenPlate = new THREE.Mesh(new THREE.PlaneGeometry(2.34, 0.46), new THREE.MeshBasicMaterial({ map: zenDenTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  zenDenPlate.position.set(4.95, 4.68, 0.73);
-  root.add(zenDenPlate);
-
-  const founderPanelTex = canvasTexture(900, 1200, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#0b1215'); g.addColorStop(1, '#191014');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(140,255,231,0.90)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
-    x.textAlign = 'left';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 62px system-ui, Arial'; x.fillText('Meet the Founder', 60, 110);
-    x.fillStyle = '#bcffe9'; x.font = 'bold 46px system-ui, Arial'; x.fillText('SVR Placeholder', 60, 182);
-    x.fillStyle = '#e5f6f3'; x.font = '34px system-ui, Arial';
-    let y = 258;
-    y = fillWrappedText(x, 'Reiki sponsor/founder branding is disabled until written approval. This panel is reserved for approved partner copy, approved photos, and approved contact information.', 60, y, w - 120, 42);
-    y += 78;
-    x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Services', 60, y);
-    y += 56;
-    x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    ['Approval-pending Reiki sessions', 'Meditation and reset support', 'Wellness partner listing pending', 'Holistic wellness guidance'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 46; });
-    y += 40;
-    x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Book / Explore', 60, y);
-    y += 54;
-    x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    fillWrappedText(x, 'SVR placeholder • approval pending • Reiki VR entry', 60, y, w - 120, 40);
-  });
-  const founderPanel = new THREE.Mesh(new THREE.PlaneGeometry(3.28, 4.02), new THREE.MeshBasicMaterial({ map: founderPanelTex, side: THREE.DoubleSide, transparent: true }));
-  founderPanel.position.set(-4.10, 2.18, -2.10);
-  root.add(founderPanel);
-
-  const portraitPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 4.02), new THREE.MeshBasicMaterial({ map: founderTex, side: THREE.DoubleSide }));
-  portraitPanel.position.set(4.05, 2.18, -2.10);
-  root.add(portraitPanel);
-
-  const rightInfoTex = canvasTexture(900, 520, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#0b1114'); g.addColorStop(1, '#141016');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 8; x.strokeRect(16,16,w-32,h-32);
-    x.fillStyle = '#f6ffff'; x.font = 'bold 44px system-ui, Arial'; x.fillText('Professional Highlights', 42, 74);
-    x.fillStyle = '#bcffe9'; x.font = '32px system-ui, Arial';
-    let y = 148;
-    ['Approval pending', 'Reiki and wellness focus', 'Meditation-forward client care', 'Virtual hub ready for growth'].forEach((line)=>{ x.fillText('• ' + line, 46, y); y += 70; });
-  });
-  const rightInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 1.64), new THREE.MeshBasicMaterial({ map: rightInfoTex, side: THREE.DoubleSide, transparent: true }));
-  rightInfo.position.set(4.05, -0.12, -2.08);
-  root.add(rightInfo);
-
-  const centerInfoTex = canvasTexture(900, 1200, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#07161a'); g.addColorStop(1, '#121118');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 68px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 106);
-    x.fillStyle = '#bcffe9'; x.font = 'bold 34px system-ui, Arial'; x.fillText('Holistic Healing & Wellness', w/2, 166);
-    x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Founder-Led Services', w/2, 296);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki • meditation • appointments • partner-ready wellness hub', w/2, 366);
-    x.fillStyle = 'rgba(124,255,226,0.16)'; roundRectPath(x, 90, 430, w-180, 138, 28); x.fill();
-    x.strokeStyle = 'rgba(124,255,226,0.65)'; x.lineWidth = 6; roundRectPath(x, 90, 430, w-180, 138, 28); x.stroke();
-    x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER THE REIKI HUB', w/2, 510);
-    x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Use the single storefront portal to enter Reiki', w/2, 564);
-    x.fillStyle = '#f6ffff'; x.font = 'bold 38px system-ui, Arial'; x.fillText('Professional Highlights', w/2, 716);
-    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('Wellness • Reiki • Placeholder', w/2, 788);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private room • mindful reset • future approved partner storefront', w/2, 856);
-  });
-  const centerInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.70, 4.02), new THREE.MeshBasicMaterial({ map: centerInfoTex, side: THREE.DoubleSide, transparent: true }));
-  centerInfo.position.set(0, 2.18, -2.10);
-  root.add(centerInfo);
-
-  const reserveTex = canvasTexture(960, 220, (x,w,h)=>{
-    x.fillStyle = '#0d1714'; roundRectPath(x, 0, 0, w, h, 28); x.fill();
-    x.strokeStyle = 'rgba(78,255,146,0.90)'; x.lineWidth = 8; roundRectPath(x, 10, 10, w-20, h-20, 24); x.stroke();
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#89ffab'; x.font = 'bold 50px system-ui, Arial'; x.fillText('RESERVED FOR APPROVAL', w/2, 82);
-    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('SVR Placeholder', w/2, 152);
-  });
-  const reservePlaque = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 0.70), new THREE.MeshBasicMaterial({ map: reserveTex, transparent: true, side: THREE.DoubleSide }));
-  reservePlaque.position.set(4.05, -1.22, -2.06);
-  root.add(reservePlaque);
-
-  const portalTex = canvasTexture(1024, 1024, (x,w,h)=>{
-    x.clearRect(0,0,w,h);
-    const grad = x.createRadialGradient(w/2, h/2, 80, w/2, h/2, 400);
-    grad.addColorStop(0, 'rgba(88,255,180,0.88)');
-    grad.addColorStop(0.55, 'rgba(58,195,152,0.34)');
-    grad.addColorStop(1, 'rgba(10,30,25,0.0)');
-    x.fillStyle = grad; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(86,255,176,0.96)'; x.lineWidth = 18; x.beginPath(); x.arc(w/2, h/2, 250, 0, Math.PI*2); x.stroke();
-    x.fillStyle = '#71ffad'; x.textAlign = 'center'; x.font = 'bold 82px system-ui, Arial'; x.fillText('ENTER REIKI', w/2, h/2 + 176);
-  });
-  const portal = new THREE.Mesh(new THREE.CircleGeometry(1.18, 64), new THREE.MeshBasicMaterial({ map: portalTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
-  portal.rotation.x = -Math.PI * 0.5;
-  portal.position.set(0, 0.03, 0.98);
-  root.add(portal);
-  portal.visible = false;
-  portal.userData.phase101HiddenDuplicatePortal = true;
-  const portalLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.18, 0.54), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
-  portalLogo.rotation.x = -Math.PI * 0.5;
-  portalLogo.position.set(0, 0.035, 0.98);
-  root.add(portalLogo);
-  portalLogo.visible = false;
-  portalLogo.userData.phase101HiddenDuplicatePortal = true;
-
-  const postMat = new THREE.MeshStandardMaterial({ color: 0xd9d1dc, roughness: 0.26, metalness: 0.76, emissive: 0x28333a, emissiveIntensity: 0.12 });
-  const ropeMat = new THREE.MeshStandardMaterial({ color: 0xbf0c28, roughness: 0.78, metalness: 0.08, emissive: 0x520b16, emissiveIntensity: 0.22 });
-  const rails = [
-    { x: -2.84, zA: 1.58, zB: -1.26 },
-    { x:  2.84, zA: 1.58, zB: -1.26 }
-  ];
-  rails.forEach(({x, zA, zB})=>{
-    [zA, zB].forEach((z)=>{
-      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.05,0.95,14), postMat);
-      post.position.set(x, 0.48, z);
-      root.add(post);
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 12), postMat);
-      head.position.copy(post.position).add(new THREE.Vector3(0,0.49,0));
-      root.add(head);
-    });
-    const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.024,0.024,Math.abs(zA-zB),12), ropeMat);
-    rope.rotation.x = Math.PI * 0.5;
-    rope.position.set(x, 0.86, (zA+zB)*0.5);
-    root.add(rope);
-  });
-
-  const plantRoot = await tryLoadOBJ(assetUrls('models/riki/plant/indoor_plant.obj'), log, 12000);
-  const plantCol = await loadFirstTexture(assetUrls('models/riki/plant/plant_col.jpg'), { colorSpace: THREE.SRGBColorSpace });
-  if (plantRoot){
-    plantRoot.traverse((child)=>{
-      if (!child.isMesh) return;
-      child.castShadow = false;
-      child.receiveShadow = false;
-      child.frustumCulled = false;
-      const nm = String(child.material?.name || child.name || '').toLowerCase();
-      if (nm.includes('pot')) child.material = new THREE.MeshStandardMaterial({ color: 0x25393b, roughness: 0.88, metalness: 0.10, emissive: 0x0d1618, emissiveIntensity: 0.08 });
-      else child.material = new THREE.MeshStandardMaterial({ map: plantCol || null, color: 0xffffff, roughness: 0.96, metalness: 0.0, side: THREE.DoubleSide });
-    });
-    const placements = [[-5.0,1.8],[-5.0,0.1],[-4.2,-1.45],[-3.2,-2.05],[-2.0,1.55],[2.0,1.55],[3.2,-2.05],[4.2,-1.45],[5.0,0.1],[5.0,1.8]];
-    placements.forEach(([ox,oz], idx)=>{
-      const plant = plantRoot.clone(true);
-      scaleToHeight(plant, 1.20 + (idx % 3) * 0.14);
-      dropToGround(plant);
-      plant.position.copy(center).addScaledVector(right, ox).addScaledVector(inward, oz);
-      plant.rotation.y = angle + Math.PI + (idx % 2 ? 0.14 : -0.10);
-      scene.add(plant);
-    });
-
-    const lobbyPlacements = [
-      [-10.5, 6.0], [-12.2, -4.0], [10.6, 5.8], [12.2, -4.4],
-      [-6.8, 12.4], [6.8, 12.4], [-15.0, 0.0], [15.0, 0.0]
-    ];
-    lobbyPlacements.forEach(([xw,zw], idx)=>{
-      const plant = plantRoot.clone(true);
-      scaleToHeight(plant, 1.45 + (idx % 2) * 0.18);
-      dropToGround(plant);
-      plant.position.set(xw, 0.0, zw);
-      plant.rotation.y = Math.PI * (0.15 + idx * 0.11);
-      scene.add(plant);
+  function panelTexture(title, lines, opts = {}){
+    return canvasTexture(opts.w || 1200, opts.h || 800, (ctx,w,h)=>{
+      const g = ctx.createLinearGradient(0,0,w,h); g.addColorStop(0, '#14050b'); g.addColorStop(1, '#05060a');
+      ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+      ctx.strokeStyle = opts.stroke || 'rgba(255,65,94,.92)'; ctx.lineWidth = 10; ctx.strokeRect(18,18,w-36,h-36);
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#fff7fb'; ctx.font = opts.titleFont || 'bold 78px system-ui, Arial'; ctx.fillText(title, w/2, opts.titleY || 112);
+      ctx.fillStyle = '#ffd5dc'; ctx.font = opts.font || 'bold 40px system-ui, Arial';
+      let y = opts.startY || 242;
+      for (const line of lines){ ctx.fillText(line, w/2, y); y += opts.gap || 70; }
     });
   }
 
-  const reikiFillA = new THREE.PointLight(0x6effd2, 2.6, 18, 2.0);
-  reikiFillA.position.copy(center).add(new THREE.Vector3(-2.6, 2.8, 0.8));
-  scene.add(reikiFillA);
-  const reikiFillB = new THREE.PointLight(0x89ffb1, 2.2, 18, 2.0);
-  reikiFillB.position.copy(center).add(new THREE.Vector3(2.6, 2.8, 0.8));
-  scene.add(reikiFillB);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(7.8, 0.95), new THREE.MeshBasicMaterial({ map: panelTexture('REIKI HUB', ['SVR WELLNESS PLACEHOLDER'], { w: 1400, h: 260, titleY: 92, startY: 182, gap: 48 }), transparent: true, side: THREE.DoubleSide }));
+  sign.position.set(0, 5.08, 0.72); root.add(sign);
 
-  // Phase 100: Espresso with Cream wall ad sits on a tall building directly behind the Reiki storefront.
-  addReikiBackBuildingEspressoAd(scene, { center, inward, wallHeight });
+  const approval = new THREE.Mesh(new THREE.PlaneGeometry(7.1, 1.0), new THREE.MeshBasicMaterial({ map: panelTexture('AWAITING APPROVAL', ['Sponsor content disabled', 'SVR placeholder only'], { w: 1400, h: 320, stroke: 'rgba(255,48,77,.95)', titleY: 100, startY: 195, gap: 58 }), transparent: true, side: THREE.DoubleSide }));
+  approval.position.set(0, 4.05, 0.73); root.add(approval);
 
-  const hubTarget = center.clone().addScaledVector(inward, 3.2);
-  const roomTarget = center.clone().addScaledVector(inward, 1.3).addScaledVector(right, 0.0);
-  return {
-    center: center.clone(),
-    target: hubTarget,
-    roomTarget,
-    look: center.clone().addScaledVector(inward, -2.0)
-  };
+  const left = new THREE.Mesh(new THREE.PlaneGeometry(3.35, 3.8), new THREE.MeshBasicMaterial({ map: panelTexture('PENDING', ['Founder photo removed', 'No external websites', 'Legal approval required', 'Modular sponsor slot'], { titleFont: 'bold 62px system-ui, Arial', font: '34px system-ui, Arial' }), transparent: true, side: THREE.DoubleSide }));
+  left.position.set(-3.95, 2.15, -2.05); root.add(left);
+  const centerInfo = new THREE.Mesh(new THREE.PlaneGeometry(3.35, 3.8), new THREE.MeshBasicMaterial({ map: panelTexture('SVR REIKI', ['Meditation room route', 'Calm reset area', 'Sponsor-ready module', 'Safe placeholder mode'], { titleFont: 'bold 62px system-ui, Arial', font: '34px system-ui, Arial' }), transparent: true, side: THREE.DoubleSide }));
+  centerInfo.position.set(0, 2.15, -2.05); root.add(centerInfo);
+  const right = new THREE.Mesh(new THREE.PlaneGeometry(3.35, 3.8), new THREE.MeshBasicMaterial({ map: panelTexture('APPROVAL LOCK', ['No sponsor text', 'No founder names', 'No photos/logos', 'No outside links'], { titleFont: 'bold 56px system-ui, Arial', font: '34px system-ui, Arial' }), transparent: true, side: THREE.DoubleSide }));
+  right.position.set(3.95, 2.15, -2.05); root.add(right);
+
+  const portalTex = canvasTexture(1024, 1024, (ctx,w,h)=>{
+    ctx.clearRect(0,0,w,h);
+    const grad = ctx.createRadialGradient(w/2,h/2,80,w/2,h/2,410);
+    grad.addColorStop(0, 'rgba(255,58,96,.86)'); grad.addColorStop(.6, 'rgba(80,10,25,.38)'); grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle = 'rgba(255,65,94,.96)'; ctx.lineWidth = 18; ctx.beginPath(); ctx.arc(w/2,h/2,250,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle = '#fff0f4'; ctx.textAlign = 'center'; ctx.font = 'bold 76px system-ui, Arial'; ctx.fillText('REIKI ROOM', w/2, h/2 + 172);
+  });
+  const portal = new THREE.Mesh(new THREE.CircleGeometry(1.18, 64), new THREE.MeshBasicMaterial({ map: portalTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+  portal.rotation.x = -Math.PI * .5;
+  portal.position.set(0, .035, 1.02);
+  root.add(portal);
+  if (spawnLogoTex){
+    const portalLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.18, .54), new THREE.MeshBasicMaterial({ map: spawnLogoTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+    portalLogo.rotation.x = -Math.PI * .5; portalLogo.position.set(0, .04, 1.02); root.add(portalLogo);
+  }
+
+  const roomTarget = center.clone().add(inward.clone().multiplyScalar(1.20)).setY(0);
+  return { root, target: center.clone().add(inward.clone().multiplyScalar(2.40)).setY(0), roomTarget, look: center.clone().setY(1.7), center: center.clone().setY(1.4) };
 }
+
 
 function createOrbHaloSprite(color = 0xffffff, opacity = 0.5){
   return new THREE.Sprite(new THREE.SpriteMaterial({
@@ -1028,104 +797,6 @@ function createPlaqueTexture(title = "legend", subtitle = "hall of fame"){
     x.fillText(String(subtitle || "").toUpperCase(), w/2, 170);
   });
 }
-
-function createEspressoCreamAdTexture(){
-  return canvasTexture(900, 1400, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, '#11070a');
-    g.addColorStop(0.55, '#2b1410');
-    g.addColorStop(1, '#070407');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(255,218,128,0.92)'; x.lineWidth = 18; x.strokeRect(28,28,w-56,h-56);
-    x.fillStyle = 'rgba(255,255,255,0.05)'; x.fillRect(82,90,w-164,h-180);
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    const cupX = w/2, cupY = 350;
-    const rg = x.createRadialGradient(cupX-30,cupY-60,18,cupX,cupY,180);
-    rg.addColorStop(0,'#fff2d0'); rg.addColorStop(0.36,'#c76b2a'); rg.addColorStop(0.72,'#5a2411'); rg.addColorStop(1,'#2b1108');
-    x.fillStyle = rg; x.beginPath(); x.arc(cupX,cupY,168,0,Math.PI*2); x.fill();
-    x.strokeStyle = '#fff0c8'; x.lineWidth = 18; x.beginPath(); x.arc(cupX,cupY,180,0,Math.PI*2); x.stroke();
-    x.strokeStyle = 'rgba(255,244,210,0.92)'; x.lineWidth = 16; x.beginPath(); x.arc(cupX,cupY,70,0.2,Math.PI*1.7); x.stroke();
-    x.fillStyle = '#fff6dd'; x.font = '900 86px system-ui, Arial'; x.fillText('ESPRESSO', w/2, 720);
-    x.fillStyle = '#ffd782'; x.font = '900 72px system-ui, Arial'; x.fillText('WITH CREAM', w/2, 815);
-    x.fillStyle = '#ffffff'; x.font = '800 34px system-ui, Arial'; x.fillText('SVR LOBBY WALL AD', w/2, 930);
-    x.fillStyle = 'rgba(255,215,130,0.20)'; roundRectPath(x, 120, 1005, w-240, 142, 32); x.fill();
-    x.strokeStyle = 'rgba(255,215,130,0.72)'; x.lineWidth = 7; roundRectPath(x, 120, 1005, w-240, 142, 32); x.stroke();
-    x.fillStyle = '#fff7e7'; x.font = '800 38px system-ui, Arial'; x.fillText('Premium sponsor slot', w/2, 1078);
-    x.fillStyle = '#ffcc73'; x.font = '700 29px system-ui, Arial'; x.fillText('aligned behind Reiki Hub', w/2, 1210);
-  });
-}
-
-function createEspressoCreamAdMaterial(){
-  const fallbackTex = createEspressoCreamAdTexture();
-  const mat = new THREE.MeshBasicMaterial({
-    map: fallbackTex,
-    transparent: true,
-    side: THREE.DoubleSide,
-    depthWrite: false,
-    depthTest: false,
-    toneMapped: false
-  });
-  try {
-    const url = assetUrls('ui/espresso-with-cream-real.png')[0];
-    new THREE.TextureLoader().load(url, (tex)=>{
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.anisotropy = 8;
-      mat.map = tex;
-      mat.needsUpdate = true;
-    });
-  } catch (err) {
-    // Keep the procedural fallback if the restored real ad texture cannot load.
-  }
-  return mat;
-}
-
-function addReikiBackBuildingEspressoAd(scene, { center, inward, wallHeight }){
-  // Phase 111: dedicated Reiki-aligned espresso tower.
-  // The wall holder and ad face now point toward the center/lobby sightline, not sideways.
-  const outward = inward.clone().multiplyScalar(-1);
-  const base = center.clone().addScaledVector(outward, 10.4);
-  const buildingMat = new THREE.MeshStandardMaterial({ color: 0x07121a, roughness: 0.66, metalness: 0.20, emissive: 0x081c31, emissiveIntensity: 0.42 });
-  const tower = new THREE.Mesh(new THREE.BoxGeometry(8.5, wallHeight + 29.0, 1.42), buildingMat);
-  tower.position.copy(base).setY((wallHeight + 29.0) * 0.5);
-  tower.name = 'PHASE_111_REIKI_ALIGNED_ESPRESSO_BUILDING_FACE_CENTER';
-
-  const ad = new THREE.Mesh(
-    new THREE.PlaneGeometry(7.35, 10.85),
-    createEspressoCreamAdMaterial()
-  );
-  ad.position.copy(base).addScaledVector(inward, 0.84).setY(wallHeight + 12.0);
-  ad.lookAt(center.clone().addScaledVector(inward, 3.8).setY(ad.position.y));
-  ad.rotateY(Math.PI); // front texture faces the center/lobby sightline.
-  ad.name = 'PHASE_111_ESPRESSO_REAL_AD_FACE_CENTER';
-  ad.renderOrder = 190;
-  tower.quaternion.copy(ad.quaternion);
-  scene.add(tower);
-  scene.add(ad);
-
-  const trimMat = new THREE.MeshBasicMaterial({ color: 0xffc56a, transparent: true, opacity: 0.96, depthTest: false });
-  const top = new THREE.Mesh(new THREE.BoxGeometry(7.74, 0.11, 0.055), trimMat);
-  const bot = top.clone();
-  const left = new THREE.Mesh(new THREE.BoxGeometry(0.11, 11.22, 0.055), trimMat);
-  const right = left.clone();
-  [top, bot, left, right].forEach((piece)=>{ piece.position.copy(ad.position); piece.quaternion.copy(ad.quaternion); piece.renderOrder = 181; scene.add(piece); });
-  top.translateY(5.58); bot.translateY(-5.58); left.translateX(-3.82); right.translateX(3.82);
-
-  const wallHolder = new THREE.Mesh(
-    new THREE.BoxGeometry(7.95, 11.38, 0.12),
-    new THREE.MeshStandardMaterial({ color: 0x110707, roughness: 0.54, metalness: 0.20, emissive: 0x24120a, emissiveIntensity: 0.30 })
-  );
-  wallHolder.position.copy(ad.position).addScaledVector(inward, -0.05);
-  wallHolder.quaternion.copy(ad.quaternion);
-  wallHolder.name = 'PHASE_111_ESPRESSO_WALL_HOLDER_FACE_CENTER';
-  wallHolder.renderOrder = 170;
-  scene.add(wallHolder);
-
-  const glow = new THREE.PointLight(0xffc56a, 4.0, 30, 1.8);
-  glow.position.copy(ad.position).addScaledVector(inward, 1.9);
-  scene.add(glow);
-  return { tower, ad, wallHolder };
-}
-
 
 function createInfoBoardTexture(title = "leaderboard", lines = []){
   return canvasTexture(1024, 1024, (x,w,h)=>{
@@ -1506,11 +1177,23 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   kioskShell.add(kioskTrim);
   modelMount.add(kioskShell);
 
-  // PHASE-96-SCORPION-TABLE-FRONT-LOCK:
-  // The 3D table asset must not be displayed as the store-front prop.
-  // Keep the store as a clean kiosk/portal preview; the table model is mounted in the Scorpion room.
-  kioskShell.visible = true;
-  modelMount.userData.phase96StoreTableRemoved = true;
+  (async ()=>{
+    let storeModel = await tryLoadGLTF(assetUrls("models/store.glb", "store.glb"), ()=>{}, 9000);
+    if (!storeModel) storeModel = await tryLoadFBX(assetUrls("models/store.fbx", "store.fbx"), ()=>{}, 10000);
+    if (!storeModel) return;
+    touchModelShadows(storeModel);
+    orientCharacterUpright(storeModel);
+    scaleToHeight(storeModel, 2.70);
+    fitDiameter(storeModel, 2.10);
+    storeModel.rotation.set(0, 0, 0);
+    let info = boxSize(storeModel);
+    storeModel.position.set(-info.center.x, -info.box.min.y, -info.center.z + 0.10);
+    info = boxSize(storeModel);
+    storeModel.position.x -= info.center.x * 0.02;
+    storeModel.traverse((child)=>{ if (child.isMesh && child.material){ child.material.emissive = new THREE.Color(0x101828); child.material.emissiveIntensity = 0.06; } });
+    kioskShell.visible = false;
+    modelMount.add(storeModel);
+  })().catch(()=>{});
 
   const activeBtn = new THREE.Mesh(
     new THREE.BoxGeometry(0.9, 0.22, 0.08),
@@ -1520,10 +1203,10 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   group.add(activeBtn);
 
 
-  const adTex = createApprovalPlaceholderTexture('AWAITING APPROVAL', 'Store sponsor placeholder');
+  const adTex = createAdBillboardTexture(['SVR SPONSOR SLOT', 'AWAITING APPROVAL']);
   const adHeader = new THREE.Mesh(
     new THREE.PlaneGeometry(3.26, 0.56),
-    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('SPONSOR SPOTLIGHT', 'approval placeholder'), transparent: true, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('SVR SPONSOR SLOT', 'awaiting approval'), transparent: true, side: THREE.DoubleSide })
   );
   adHeader.position.set(modelX, wallHeight * 0.39, 0.18);
   group.add(adHeader);
@@ -1543,235 +1226,6 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   group.add(activePlaque);
 
   return { group };
-}
-
-
-function makeScorpionTableFeltTexture(){
-  // Phase 107: clean casino felt layout.
-  // One central logo, one pass/bet line, and two readable command zones inside the line:
-  // left = player chip count / stack area, right = call/raise/fold hand-command area.
-  return canvasTexture(1400, 760, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, '#140314');
-    g.addColorStop(0.48, '#050509');
-    g.addColorStop(1, '#1c0616');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-
-    x.strokeStyle = 'rgba(255,92,190,0.92)';
-    x.lineWidth = 18;
-    roundRectPath(x, 44, 44, w - 88, h - 88, 108);
-    x.stroke();
-
-    x.strokeStyle = 'rgba(160,255,240,0.80)';
-    x.lineWidth = 8;
-    roundRectPath(x, 108, 114, w - 216, h - 228, 82);
-    x.stroke();
-    x.fillStyle = 'rgba(160,255,240,0.16)';
-    roundRectPath(x, 120, h - 178, w - 240, 18, 9);
-    x.fill();
-    x.fillStyle = '#9fffee';
-    x.font = '900 32px system-ui, Arial';
-    x.textAlign = 'center';
-    x.textBaseline = 'middle';
-    x.fillText('PASS / BET LINE', w / 2, h - 206);
-
-    // Single main center logo only.
-    x.save();
-    x.translate(w/2, h/2 - 42);
-    const logoGrad = x.createRadialGradient(0,0,10,0,0,150);
-    logoGrad.addColorStop(0, 'rgba(255,255,255,0.96)');
-    logoGrad.addColorStop(0.36, 'rgba(255,108,210,0.82)');
-    logoGrad.addColorStop(1, 'rgba(82,15,96,0.12)');
-    x.fillStyle = logoGrad;
-    x.beginPath(); x.arc(0,0,150,0,Math.PI*2); x.fill();
-    x.strokeStyle = 'rgba(255,255,255,0.58)'; x.lineWidth = 8; x.beginPath(); x.arc(0,0,118,0,Math.PI*2); x.stroke();
-    x.fillStyle = '#fff2fb';
-    x.font = '900 108px system-ui, Arial';
-    x.fillText('SVR', 0, -18);
-    x.fillStyle = '#ff9bd8';
-    x.font = '900 42px system-ui, Arial';
-    x.fillText('SCORPION', 0, 72);
-    x.restore();
-
-    function zone(x0, y0, ww, hh, title, sub, color){
-      x.fillStyle = 'rgba(5,8,14,0.62)';
-      roundRectPath(x, x0, y0, ww, hh, 30); x.fill();
-      x.strokeStyle = color; x.lineWidth = 6;
-      roundRectPath(x, x0, y0, ww, hh, 30); x.stroke();
-      x.textAlign = 'center'; x.textBaseline = 'middle';
-      x.fillStyle = '#ffffff'; x.font = '900 34px system-ui, Arial'; x.fillText(title, x0 + ww/2, y0 + 46);
-      x.fillStyle = color; x.font = '800 25px system-ui, Arial'; x.fillText(sub, x0 + ww/2, y0 + 88);
-    }
-    zone(138, 438, 430, 130, 'PLAYER STACK', 'chip count / bankroll', 'rgba(128,255,226,0.88)');
-    zone(w - 568, 438, 430, 130, 'ACTION ZONE', 'call • raise • fold gestures', 'rgba(255,120,210,0.92)');
-
-    x.fillStyle = 'rgba(255,255,255,0.70)';
-    x.font = '800 24px system-ui, Arial';
-    x.fillText('Cards and pot stay inside the pass line', w/2, 622);
-  });
-}
-
-function makeScorpionFallbackTable(tableTopY = 0.86){
-  const group = new THREE.Group();
-  const feltTex = makeScorpionTableFeltTexture();
-  const topShape = makePillShape(3.46, 2.20, 0.72);
-  const railShape = makePillShape(3.86, 2.56, 0.84);
-  const hole = makePillShape(3.34, 2.06, 0.66);
-  railShape.holes.push(hole);
-
-  const railGeo = new THREE.ExtrudeGeometry(railShape, { depth: 0.15, bevelEnabled: false, curveSegments: 28 });
-  railGeo.rotateX(-Math.PI * 0.5);
-  railGeo.translate(0, tableTopY - 0.075, 0);
-  const rail = new THREE.Mesh(railGeo, new THREE.MeshStandardMaterial({ color: 0x201019, roughness: 0.72, metalness: 0.10, emissive: 0x160617, emissiveIntensity: 0.20 }));
-  group.add(rail);
-
-  const feltGeo = new THREE.ShapeGeometry(topShape, 48);
-  feltGeo.rotateX(-Math.PI * 0.5);
-  feltGeo.translate(0, tableTopY + 0.002, 0);
-  const felt = new THREE.Mesh(feltGeo, new THREE.MeshStandardMaterial({ map: feltTex, color: 0xffffff, roughness: 0.96, metalness: 0.0, emissive: 0x080208, emissiveIntensity: 0.07, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
-  felt.renderOrder = 34;
-  group.add(felt);
-
-  const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.40, 0.58, tableTopY - 0.08, 28), new THREE.MeshStandardMaterial({ color: 0x120d17, roughness: 0.82, metalness: 0.08, emissive: 0x08040c, emissiveIntensity: 0.08 }));
-  pedestal.position.y = (tableTopY - 0.08) * 0.5;
-  group.add(pedestal);
-
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.90, 0.10, 36), new THREE.MeshStandardMaterial({ color: 0x0d0a12, roughness: 0.88, metalness: 0.10 }));
-  base.position.y = 0.05;
-  group.add(base);
-  return group;
-}
-
-function addScorpionTableAccessories(mount, tableTopY = 0.86){
-  const chipMats = [
-    new THREE.MeshStandardMaterial({ color: 0xff4ebb, roughness: 0.36, metalness: 0.24, emissive: 0x4c082f, emissiveIntensity: 0.42 }),
-    new THREE.MeshStandardMaterial({ color: 0x7feaff, roughness: 0.38, metalness: 0.20, emissive: 0x063c46, emissiveIntensity: 0.32 }),
-    new THREE.MeshStandardMaterial({ color: 0xf6d36b, roughness: 0.42, metalness: 0.16, emissive: 0x3a2605, emissiveIntensity: 0.24 })
-  ];
-  const cardMat = new THREE.MeshStandardMaterial({ color: 0xfffbf2, roughness: 0.86, metalness: 0.0, emissive: 0x111014, emissiveIntensity: 0.025 });
-  const redMat = new THREE.MeshStandardMaterial({ color: 0xe94060, roughness: 0.52, metalness: 0.04, emissive: 0x3f0612, emissiveIntensity: 0.10 });
-  const blackMat = new THREE.MeshStandardMaterial({ color: 0x101116, roughness: 0.54, metalness: 0.04, emissive: 0x050509, emissiveIntensity: 0.08 });
-
-  [[-0.96,0.46,0],[0.96,0.42,1],[-0.58,-0.38,2],[0.54,-0.42,0],[0.0,0.66,1]].forEach(([x,z,mi], idx)=>{
-    for (let i=0;i<7;i++){
-      const chip = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.014, 22), chipMats[mi]);
-      chip.rotation.x = Math.PI * 0.5;
-      chip.position.set(x + (i % 2) * 0.012, tableTopY + 0.020 + i * 0.015, z + Math.sin(i + idx) * 0.012);
-      mount.add(chip);
-    }
-  });
-
-  for (let i=0;i<5;i++){
-    const card = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.006, 0.31), cardMat);
-    card.position.set(-0.42 + i * 0.21, tableTopY + 0.036 + i * 0.001, -0.05);
-    card.rotation.y = 0.025 * (i - 2);
-    mount.add(card);
-    const pip = new THREE.Mesh(new THREE.BoxGeometry(0.050, 0.008, 0.050), i % 2 ? redMat : blackMat);
-    pip.position.set(card.position.x, tableTopY + 0.042 + i * 0.001, card.position.z - 0.03);
-    pip.rotation.copy(card.rotation);
-    mount.add(pip);
-  }
-}
-
-function addScorpionRoomFrontTable(root, log = console.log){
-  const tableTopY = 0.86;
-  const mount = new THREE.Group();
-  mount.name = 'PHASE_102_SCORPION_ROOM_SINGLE_DISPLAY_TABLE_MOUNT';
-  mount.position.set(0, 0.10, 0.16);
-  mount.scale.setScalar(1.02);
-  mount.rotation.y = 0;
-  root.add(mount);
-
-  const fallback = makeScorpionFallbackTable(tableTopY);
-  fallback.name = 'PHASE_102_SCORPION_ROOM_SINGLE_DISPLAY_TABLE_FALLBACK';
-  mount.add(fallback);
-  addScorpionTableAccessories(mount, tableTopY);
-
-  const labelTex = canvasTexture(1200, 260, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0,'rgba(22,3,24,0.94)');
-    g.addColorStop(1,'rgba(4,8,14,0.96)');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(255,99,205,0.94)';
-    x.lineWidth = 10; roundRectPath(x, 14, 14, w-28, h-28, 32); x.stroke();
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#ffffff'; x.font = '900 70px system-ui, Arial'; x.fillText('SCORPION TABLE', w/2, 104);
-    x.fillStyle = '#9feeff'; x.font = '700 32px system-ui, Arial'; x.fillText('ONE DISPLAY TABLE • PORTAL TO PRIVATE GAMEPLAY', w/2, 174);
-  });
-  const label = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 0.82), new THREE.MeshBasicMaterial({ map: labelTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  label.position.set(0, tableTopY + 0.80, -1.55);
-  label.lookAt(0, tableTopY + 0.80, 0.2);
-  mount.add(label);
-
-  (async ()=>{
-    const realTable = await tryLoadGLTF(assetUrls('models/table.glb', 'models/store.glb'), log, 9000)
-      || await tryLoadFBX(assetUrls('models/table.fbx', 'models/store.fbx'), log, 9000);
-    if (!realTable) return;
-    touchModelShadows(realTable);
-    realTable.traverse((child)=>{
-      if (!child.isMesh) return;
-      child.castShadow = false;
-      child.receiveShadow = true;
-      child.frustumCulled = false;
-      if (child.material){
-        child.material = child.material.clone();
-        child.material.emissive = new THREE.Color(0x130515);
-        child.material.emissiveIntensity = Math.max(child.material.emissiveIntensity || 0, 0.035);
-      }
-    });
-    fitDiameter(realTable, 3.86);
-    realTable.updateMatrixWorld(true);
-    const bb = boxSize(realTable).box;
-    realTable.position.set(-((bb.min.x + bb.max.x) * 0.5), tableTopY - bb.max.y, -((bb.min.z + bb.max.z) * 0.5));
-    realTable.name = 'PHASE_102_SCORPION_ROOM_SINGLE_DISPLAY_TABLE_ASSET';
-    mount.add(realTable);
-    fallback.visible = false;
-    fallback.userData.phase102HiddenWhenAssetLoads = true;
-    mount.userData.tableAssetMounted = true;
-    mount.userData.phase102SingleDisplayTableLocked = true;
-    log('Phase 102: Scorpion room single display table mounted; duplicate fallback hidden.');
-  })().catch((err)=> log('Phase 102: Scorpion room single display table fallback active', err?.message || err));
-
-  return mount;
-}
-
-
-function addScorpionPrivateGameplayRoom(scene, R, wallHeight){
-  const center = new THREE.Vector3(0, 0, -(R + 48));
-  const root = new THREE.Group();
-  root.name = 'PHASE_100_SCORPION_PRIVATE_GAMEPLAY_ROOM';
-  root.position.copy(center);
-  scene.add(root);
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(12.8, 0.12, 9.2), new THREE.MeshStandardMaterial({ color: 0x0b0710, roughness: 0.88, metalness: 0.08, emissive: 0x18051a, emissiveIntensity: 0.22 }));
-  floor.position.set(0, 0.06, 0); root.add(floor);
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0x050409, roughness: 0.74, metalness: 0.12, emissive: 0x13051a, emissiveIntensity: 0.30 });
-  const back = new THREE.Mesh(new THREE.BoxGeometry(12.8, 6.2, 0.18), wallMat); back.position.set(0,3.1,-4.6); root.add(back);
-  const left = new THREE.Mesh(new THREE.BoxGeometry(0.18,6.0,9.2), wallMat); left.position.set(-6.4,3.0,0); root.add(left);
-  const right = left.clone(); right.position.x = 6.4; root.add(right);
-  const frontRail = new THREE.Mesh(new THREE.BoxGeometry(12.8, 1.2, 0.16), wallMat); frontRail.position.set(0,0.66,4.6); root.add(frontRail);
-  const signTex = canvasTexture(1400, 300, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0,'#170317'); g.addColorStop(1,'#06050b');
-    x.fillStyle = g; x.fillRect(0,0,w,h); x.strokeStyle = 'rgba(255,93,202,0.95)'; x.lineWidth = 12; x.strokeRect(18,18,w-36,h-36);
-    x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#fff4fb'; x.font = '900 84px system-ui, Arial'; x.fillText('SCORPION PRIVATE GAMEPLAY', w/2, 120);
-    x.fillStyle = '#8fffe6'; x.font = '800 34px system-ui, Arial'; x.fillText('REAL TABLE FLOW • ONE GAMEPLAY TABLE • WATCH RETURN TO LOBBY', w/2, 210);
-  });
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 1.54), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
-  sign.position.set(0, 4.95, -4.48); root.add(sign);
-  const table = makeScorpionFallbackTable(0.86);
-  table.name = 'PHASE_100_SCORPION_PRIVATE_GAMEPLAY_TABLE_ONE_ONLY';
-  table.position.set(0, 0, -0.15); table.scale.setScalar(1.22); root.add(table);
-  addScorpionTableAccessories(table, 0.86);
-  const guideTex = canvasTexture(1000, 360, (x,w,h)=>{
-    x.fillStyle = 'rgba(5,8,16,0.96)'; x.fillRect(0,0,w,h); x.strokeStyle = 'rgba(143,255,230,0.86)'; x.lineWidth = 10; x.strokeRect(16,16,w-32,h-32);
-    x.textAlign='center'; x.textBaseline='middle'; x.fillStyle='#fff'; x.font='900 54px system-ui, Arial'; x.fillText('GAMEPLAY ROOM', w/2, 92);
-    x.fillStyle='#8fffe6'; x.font='800 31px system-ui, Arial'; x.fillText('Use watch: Lobby / Scorpion / TP / Holo', w/2, 176);
-    x.fillStyle='rgba(255,255,255,0.72)'; x.font='700 25px system-ui, Arial'; x.fillText('Lobby stays clean: storefront portals only', w/2, 250);
-  });
-  const guide = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 1.58), new THREE.MeshBasicMaterial({ map: guideTex, transparent:true, side: THREE.DoubleSide }));
-  guide.position.set(0, 1.75, 4.45); guide.lookAt(0, 1.75, 0); root.add(guide);
-  const light = new THREE.PointLight(0xff5dc8, 2.8, 18, 2.0); light.position.set(0, 3.8, 0.8); root.add(light);
-  const cyan = new THREE.PointLight(0x70ffe4, 1.5, 16, 2.0); cyan.position.set(2.8, 2.6, -1.2); root.add(cyan);
-  return { root, target: center.clone().add(new THREE.Vector3(0, 0, 3.05)), look: center.clone().add(new THREE.Vector3(0, 1.45, -0.1)) };
 }
 
 function addScorpionRoom(scene, R, wallHeight){
@@ -1838,8 +1292,6 @@ function addScorpionRoom(scene, R, wallHeight){
   portal.rotation.x = -Math.PI * 0.5;
   portal.position.set(0, 0.03, 1.7);
   root.add(portal);
-  portal.visible = false;
-  portal.userData.phase101HiddenDuplicatePortal = true;
 
   const boardTex = canvasTexture(900, 720, (x,w,h)=>{
     const g = x.createLinearGradient(0,0,w,h);
@@ -1857,274 +1309,16 @@ function addScorpionRoom(scene, R, wallHeight){
   board.position.set(-2.34, 2.1, -2.68);
   root.add(board);
 
-  const scorpionFrontTable = addScorpionRoomFrontTable(root, console.log);
-
-  // Phase 107: removed the front/side guard rails. The Scorpion room is now walk-in open
-  // so users can physically approach and inspect the new display table before routing to gameplay.
-  const entryGlow = new THREE.Mesh(
-    new THREE.PlaneGeometry(7.2, 0.12),
-    new THREE.MeshBasicMaterial({ color: 0xff5dc8, transparent: true, opacity: 0.42, depthWrite: false, side: THREE.DoubleSide })
-  );
-  entryGlow.rotation.x = -Math.PI * 0.5;
-  entryGlow.position.set(0, 0.072, 2.46);
-  entryGlow.name = 'PHASE_107_SCORPION_OPEN_WALK_IN_ENTRY_LINE';
-  root.add(entryGlow);
-
   const lightA = new THREE.PointLight(0xff7fd0, 1.4, 18, 2.0);
   lightA.position.set(0, 3.8, 1.2);
   root.add(lightA);
 
   return {
     root,
-    frontTable: scorpionFrontTable,
     target: center.clone().add(inward.clone().multiplyScalar(2.0)).setY(0),
     look: center.clone().setY(1.6)
   };
 }
-
-
-function makePhase97PortalTexture(title = 'PORTAL', subtitle = 'private room route', hue = '#8fffe6'){
-  return canvasTexture(1024, 1024, (x,w,h)=>{
-    x.clearRect(0,0,w,h);
-    const g = x.createRadialGradient(w/2, h/2, 42, w/2, h/2, 488);
-    g.addColorStop(0, 'rgba(255,255,255,0.96)');
-    g.addColorStop(0.20, 'rgba(160,255,235,0.72)');
-    g.addColorStop(0.56, 'rgba(110,70,255,0.28)');
-    g.addColorStop(1, 'rgba(0,0,0,0.0)');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = hue;
-    x.lineWidth = 22;
-    x.beginPath(); x.arc(w/2, h/2, 308, 0, Math.PI * 2); x.stroke();
-    x.lineWidth = 8;
-    x.beginPath(); x.arc(w/2, h/2, 232, 0, Math.PI * 2); x.stroke();
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#ffffff'; x.font = '900 72px system-ui, Arial'; x.fillText(title, w/2, h/2 + 154);
-    x.fillStyle = hue; x.font = '800 34px system-ui, Arial'; x.fillText(subtitle, w/2, h/2 + 214);
-  });
-}
-
-function addPhase97PortalMarker(scene, { position, look = null, label = 'PORTAL', subtitle = 'private room route', destination = 'lobby', hue = '#8fffe6', radius = 1.05 }){
-  if (!position) return null;
-  const group = new THREE.Group();
-  group.name = `PHASE_97_PORTAL_${destination}_${label.replace(/\W+/g,'_').toUpperCase()}`;
-  group.position.copy(position).setY(0);
-  scene.add(group);
-
-  const portalTex = makePhase97PortalTexture(label, subtitle, hue);
-  const disc = new THREE.Mesh(
-    new THREE.CircleGeometry(0.98, 72),
-    new THREE.MeshBasicMaterial({ map: portalTex, transparent: true, side: THREE.DoubleSide, depthWrite: false, toneMapped: false })
-  );
-  disc.rotation.x = -Math.PI * 0.5;
-  disc.position.y = 0.035;
-  group.add(disc);
-
-  const ring = new THREE.Mesh(
-    new THREE.RingGeometry(0.98, 1.08, 72),
-    new THREE.MeshStandardMaterial({ color: 0x85ffe9, roughness: 0.20, metalness: 0.48, emissive: 0x2affd1, emissiveIntensity: 0.76, side: THREE.DoubleSide, transparent: true, opacity: 0.78 })
-  );
-  ring.rotation.x = -Math.PI * 0.5;
-  ring.position.y = 0.05;
-  group.add(ring);
-
-  const labelTex = canvasTexture(1024, 260, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, 'rgba(6,10,18,0.96)');
-    g.addColorStop(1, 'rgba(12,3,20,0.96)');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = hue; x.lineWidth = 9; roundRectPath(x, 16, 16, w-32, h-32, 34); x.stroke();
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#ffffff'; x.font = '900 58px system-ui, Arial'; x.fillText(label, w/2, 94);
-    x.fillStyle = hue; x.font = '800 31px system-ui, Arial'; x.fillText(subtitle, w/2, 166);
-  });
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.45, 0.62), new THREE.MeshBasicMaterial({ map: labelTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  sign.position.set(0, 1.24, 0);
-  if (look) sign.lookAt(look.clone().setY(1.24));
-  else sign.lookAt(new THREE.Vector3(0, 1.24, 0));
-  group.add(sign);
-
-  return { key: group.name, label, destination, position: group.position.clone(), radius, cooldownMs: 3200 };
-}
-
-function addPhase97PrivateRouteMarkers(scene, { R, wallHeight, reikiHub, scorpionRoom, scorpionPrivate, storeWall, pgaHub }){
-  const portalLocks = [];
-  const targets = {};
-  const lobbyTarget = new THREE.Vector3(0, 0, 4.8);
-  const lobbyLook = new THREE.Vector3(0, 1.2, 0);
-  const addLock = (rec)=>{ if (rec) portalLocks.push(rec); };
-
-  // Phase 100: Lobby has ONE Scorpion storefront portal. It routes to the private gameplay room.
-  // The visible Scorpion showroom/table remains display-only and does not host the real gameplay loop.
-  if (scorpionRoom?.target){
-    targets.scorpionShowroom = { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() };
-    targets.scorpion = scorpionPrivate?.target ? { pos: scorpionPrivate.target.clone(), look: scorpionPrivate.look.clone() } : { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() };
-    addLock(addPhase97PortalMarker(scene, { position: scorpionRoom.target.clone().add(new THREE.Vector3(0,0,0.82)), look: scorpionRoom.look.clone(), label: 'SCORPION', subtitle: 'private gameplay', destination: 'scorpion', hue: '#ff8ed8', radius: 1.10 }));
-  }
-
-  // Reiki private room route: storefront portal sends player into the private meditation room.
-  if (reikiHub?.roomTarget){
-    targets.reikiRoom = { pos: reikiHub.roomTarget.clone(), look: reikiHub.center.clone().setY(1.5) };
-    addLock(addPhase97PortalMarker(scene, { position: reikiHub.target.clone(), look: reikiHub.center.clone().setY(1.5), label: 'REIKI ROOM', subtitle: 'private meditation', destination: 'reikiRoom', hue: '#80ffd8', radius: 1.06 }));
-  }
-
-  // PGA private training route scaffold.
-  if (pgaHub?.group && pgaHub?.inward){
-    const pgaEntry = pgaHub.group.position.clone().add(pgaHub.inward.clone().multiplyScalar(2.80)).setY(0);
-    const pgaRange = pgaHub.group.position.clone().add(pgaHub.inward.clone().multiplyScalar(6.60)).setY(0);
-    targets.pgaRange = { pos: pgaRange.clone(), look: pgaHub.group.position.clone().setY(1.8) };
-    addLock(addPhase97PortalMarker(scene, { position: pgaEntry, look: pgaHub.group.position.clone().setY(1.8), label: 'PGA RANGE', subtitle: 'private training', destination: 'pgaRange', hue: '#9cff82', radius: 1.05 }));
-  }
-
-  // VR Store and Smoker Lounge storefronts remain separate private modules/routes.
-  if (storeWall?.group){
-    const storeBase = storeWall.group.position.clone().multiplyScalar(0.80).setY(0);
-    const storeLook = storeWall.group.position.clone().setY(1.6);
-    targets.vrStore = { pos: storeBase.clone().add(new THREE.Vector3(-0.85, 0, 0.65)), look: storeLook };
-    targets.smokerLounge = { pos: storeBase.clone().add(new THREE.Vector3(2.35, 0, -0.85)), look: storeLook };
-    addLock(addPhase97PortalMarker(scene, { position: storeBase.clone().add(new THREE.Vector3(-1.15,0,1.48)), look: storeLook, label: 'VR STORE', subtitle: 'private storefront', destination: 'vrStore', hue: '#9fdcff', radius: 1.02 }));
-    addLock(addPhase97PortalMarker(scene, { position: storeBase.clone().add(new THREE.Vector3(2.35,0,1.52)), look: storeLook, label: 'SMOKER LOUNGE', subtitle: 'private social route', destination: 'smokerLounge', hue: '#d6a1ff', radius: 1.02 }));
-  }
-
-  // Space room/deck target for Moon + Mars checking without touching the website.
-  const spacePos = new THREE.Vector3(0, 0, -(R - 5.6));
-  targets.spaceRoom = { pos: spacePos.clone(), look: new THREE.Vector3(0, wallHeight + 12.0, -(R + 92.0)) };
-  // Phase 101: no extra Space floor portal in the lobby; Space remains accessible from watch/Holo menu only.
-
-  return { portalLocks, targets };
-}
-
-
-function makePhase98SceneSignTexture(title, subtitle, hue = '#8fffe6'){
-  return canvasTexture(1200, 620, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0,'rgba(5,8,18,0.97)');
-    g.addColorStop(0.55,'rgba(12,6,22,0.97)');
-    g.addColorStop(1,'rgba(2,14,18,0.96)');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = hue; x.lineWidth = 13; roundRectPath(x, 24, 24, w-48, h-48, 44); x.stroke();
-    x.strokeStyle = 'rgba(255,255,255,0.16)'; x.lineWidth = 4; roundRectPath(x, 58, 58, w-116, h-116, 36); x.stroke();
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#ffffff'; x.font = '900 86px system-ui, Arial'; x.fillText(title, w/2, 152);
-    x.fillStyle = hue; x.font = '800 42px system-ui, Arial'; x.fillText(subtitle, w/2, 240);
-    x.fillStyle = 'rgba(235,245,255,0.90)'; x.font = '700 30px system-ui, Arial';
-    x.fillText('VR READY • SAFE SPAWN • BACK PORTAL LOCKED', w/2, 348);
-    x.fillStyle = 'rgba(255,255,255,0.72)'; x.font = '600 25px system-ui, Arial';
-    x.fillText('hand tracking + hidden controller fallback preserved', w/2, 420);
-    x.fillText('marketing banner surfaces are modular / removable', w/2, 468);
-  });
-}
-
-function addPhase98GuardRing(group, radius, hueColor = 0x8fffe6){
-  const mat = new THREE.MeshStandardMaterial({ color: hueColor, roughness: 0.32, metalness: 0.34, emissive: hueColor, emissiveIntensity: 0.30, transparent: true, opacity: 0.78 });
-  const ring = new THREE.Mesh(new THREE.RingGeometry(radius - 0.08, radius, 96), mat);
-  ring.rotation.x = -Math.PI * 0.5;
-  ring.position.y = 0.055;
-  group.add(ring);
-  for (let i=0;i<10;i++){
-    const a = i * Math.PI * 2 / 10;
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.72, 12), mat);
-    post.position.set(Math.cos(a) * radius, 0.39, Math.sin(a) * radius);
-    group.add(post);
-  }
-}
-
-function addPhase98VrScenePod(scene, { key, label, subtitle, pos, look, hue = '#8fffe6', radius = 3.0, style = 'generic' }){
-  if (!pos) return null;
-  const hueColor = new THREE.Color(hue).getHex();
-  const group = new THREE.Group();
-  group.name = `PHASE_98_VR_SCENE_${key.toUpperCase()}`;
-  group.position.copy(pos).setY(0.02);
-  scene.add(group);
-
-  const floorTex = canvasTexture(1024, 1024, (x,w,h)=>{
-    x.clearRect(0,0,w,h);
-    const g = x.createRadialGradient(w/2,h/2,30,w/2,h/2,510);
-    g.addColorStop(0,'rgba(255,255,255,0.20)');
-    g.addColorStop(0.34, `${hue}66`);
-    g.addColorStop(0.74, 'rgba(10,12,18,0.78)');
-    g.addColorStop(1, 'rgba(0,0,0,0.94)');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = hue; x.lineWidth = 22; x.beginPath(); x.arc(w/2,h/2,408,0,Math.PI*2); x.stroke();
-    x.strokeStyle = 'rgba(255,255,255,0.18)'; x.lineWidth = 5;
-    for (let r of [135,245,345]){ x.beginPath(); x.arc(w/2,h/2,r,0,Math.PI*2); x.stroke(); }
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#fff'; x.font = '900 58px system-ui, Arial'; x.fillText('STAND HERE', w/2, h/2 - 16);
-    x.fillStyle = hue; x.font = '800 32px system-ui, Arial'; x.fillText('VR SAFE SPAWN', w/2, h/2 + 54);
-  });
-  const floor = new THREE.Mesh(new THREE.CircleGeometry(radius, 96), new THREE.MeshBasicMaterial({ map: floorTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  floor.rotation.x = -Math.PI * 0.5;
-  floor.position.y = 0.032;
-  group.add(floor);
-  addPhase98GuardRing(group, radius + 0.16, hueColor);
-
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 2.34), new THREE.MeshBasicMaterial({ map: makePhase98SceneSignTexture(label, subtitle, hue), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  sign.position.set(0, 2.36, -radius + 0.36);
-  if (look) sign.lookAt(look.clone().setY(2.36));
-  group.add(sign);
-
-  const bannerTex = createApprovalPlaceholderTexture('SPONSOR / AD SLOT', `${label} module surface`);
-  const banner = new THREE.Mesh(new THREE.PlaneGeometry(2.75, 1.15), new THREE.MeshBasicMaterial({ map: bannerTex, transparent: true, side: THREE.DoubleSide }));
-  banner.position.set(radius - 0.62, 1.58, -radius + 0.78);
-  if (look) banner.lookAt(look.clone().setY(1.58));
-  group.add(banner);
-
-  const mat = new THREE.MeshStandardMaterial({ color: hueColor, roughness: 0.42, metalness: 0.22, emissive: hueColor, emissiveIntensity: 0.16 });
-  if (style === 'scorpion'){
-    const scorpionTable = makeScorpionFallbackTable(0.74);
-    scorpionTable.name = 'PHASE_99_SCORPION_VR_POD_TABLE';
-    scorpionTable.scale.setScalar(0.92);
-    scorpionTable.position.set(0, 0.00, 0.54);
-    group.add(scorpionTable);
-    addScorpionTableAccessories(scorpionTable, 0.74);
-    const playerMat = new THREE.MeshStandardMaterial({ color: 0x2b0d25, roughness: 0.65, metalness: 0.08, emissive: 0x22051d, emissiveIntensity: 0.18 });
-    for (let i=0;i<6;i++){
-      const a = i * Math.PI * 2 / 6 + Math.PI / 6;
-      const chair = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.42, 0.42), playerMat);
-      chair.position.set(Math.cos(a) * 1.90, 0.34, 0.54 + Math.sin(a) * 1.30);
-      chair.lookAt(0, 0.34, 0.54);
-      group.add(chair);
-    }
-    const lockPlaque = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.80, 0.48),
-      new THREE.MeshBasicMaterial({ map: createPlaqueTexture('TABLE INSIDE THIS ROOM', 'Phase 99 lock'), transparent: true, side: THREE.DoubleSide })
-    );
-    lockPlaque.position.set(0, 1.54, 2.08);
-    if (look) lockPlaque.lookAt(look.clone().setY(1.54));
-    group.add(lockPlaque);
-  } else if (style === 'pga'){
-    const turf = new THREE.Mesh(new THREE.BoxGeometry(4.9, 0.035, 1.20), new THREE.MeshStandardMaterial({ color: 0x0d5a28, roughness: 0.85, metalness: 0.02, emissive: 0x063814, emissiveIntensity: 0.18 }));
-    turf.position.set(0, 0.08, 0.28); group.add(turf);
-    for (let i=0;i<5;i++){ const ball = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 10), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.65 })); ball.position.set(-1.4+i*0.32, 0.17, 0.12+Math.sin(i)*0.08); group.add(ball); }
-    const flag = new THREE.Mesh(new THREE.BoxGeometry(0.055, 1.25, 0.055), mat); flag.position.set(1.7,0.72,0.2); group.add(flag);
-    const cloth = new THREE.Mesh(new THREE.PlaneGeometry(0.62,0.36), new THREE.MeshBasicMaterial({ color: hueColor, side: THREE.DoubleSide })); cloth.position.set(2.02,1.18,0.2); cloth.rotation.y = Math.PI*0.5; group.add(cloth);
-  } else if (style === 'reiki'){
-    const cushionMat = new THREE.MeshStandardMaterial({ color: 0x7d1225, roughness: 0.78, metalness: 0.02, emissive: 0x25070d, emissiveIntensity: 0.16 });
-    for (let i=0;i<6;i++){ const a=i*Math.PI*2/6; const c=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.34,0.10,28), cushionMat); c.position.set(Math.cos(a)*1.15,0.13,Math.sin(a)*1.15); group.add(c); }
-    for (let i=0;i<5;i++){ const a=i*Math.PI*2/5+0.3; const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.07,0.7,10), new THREE.MeshStandardMaterial({ color:0x3a2013 })); trunk.position.set(Math.cos(a)*2.25,0.42,Math.sin(a)*2.25); group.add(trunk); const leaf=new THREE.Mesh(new THREE.ConeGeometry(0.42,0.9,18), new THREE.MeshStandardMaterial({ color:0x0d6a3d, roughness:0.8, emissive:0x06351d, emissiveIntensity:0.16 })); leaf.position.set(trunk.position.x,1.14,trunk.position.z); group.add(leaf); }
-  } else if (style === 'store'){
-    for (let i=0;i<4;i++){ const rack=new THREE.Mesh(new THREE.BoxGeometry(0.74,1.05,0.12), mat); rack.position.set(-1.35+i*0.9,0.64,0.18); group.add(rack); const shelf=new THREE.Mesh(new THREE.BoxGeometry(0.82,0.055,0.48), mat); shelf.position.set(rack.position.x,0.28,0.42); group.add(shelf); }
-  } else if (style === 'lounge'){
-    const couchMat = new THREE.MeshStandardMaterial({ color: 0x271432, roughness: 0.64, metalness: 0.08, emissive: 0x16091d, emissiveIntensity: 0.22 });
-    [[-1.1,0.42,0.32],[1.1,0.42,0.32],[0,0.42,1.2]].forEach(([x,y,z],i)=>{ const couch=new THREE.Mesh(new THREE.BoxGeometry(1.2,0.42,0.58), couchMat); couch.position.set(x,y,z); couch.rotation.y = i===2?0:0; group.add(couch); });
-    const table=new THREE.Mesh(new THREE.CylinderGeometry(0.62,0.62,0.10,36), mat); table.position.set(0,0.20,0.58); group.add(table);
-  } else if (style === 'space'){
-    const dome=new THREE.Mesh(new THREE.SphereGeometry(2.45,48,18,0,Math.PI*2,0,Math.PI*0.46), new THREE.MeshBasicMaterial({ color: hueColor, transparent:true, opacity:0.10, side:THREE.DoubleSide, depthWrite:false })); dome.position.y=0.12; group.add(dome);
-    for (let i=0;i<36;i++){ const star=new THREE.Mesh(new THREE.SphereGeometry(0.018+Math.random()*0.018,8,6), new THREE.MeshBasicMaterial({ color:0xffffff })); star.position.set((Math.random()*2-1)*2.2,0.8+Math.random()*1.8,(Math.random()*2-1)*2.2); group.add(star); }
-  } else {
-    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(1.0,1.08,0.18,48), mat); plinth.position.y=0.16; group.add(plinth);
-  }
-
-  return { key, group, pos: group.position.clone(), look };
-}
-
-function addPhase98FullVrScenes(scene, { phase97Routes }){
-  // Phase 100 cleanup: do not draw extra floor pods/portal pads in the lobby.
-  // Storefronts are the only visible lobby portals; private-room targets remain in sceneTargets.
-  scene.userData.phase98VrScenes = [];
-  return [];
-}
-
-
 
 function buildOuterCity(scene, R){
   const group = new THREE.Group();
@@ -2141,7 +1335,7 @@ function buildOuterCity(scene, R){
   const matrix = createMatrixBillboardTexture();
   const billboardUpdaters = [matrix.update];
   const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
-  const zenTex = createApprovalPlaceholderTexture('AWAITING APPROVAL', 'Reiki billboard placeholder');
+  const zenTex = createAdBillboardTexture(['AWAITING APPROVAL', 'SVR SPONSOR SLOT']);
 
   const count = 68;
   const adIndices = new Set([4, 11, 20, 28, 36, 44, 52, 60]);
@@ -2233,7 +1427,7 @@ function buildOuterCity(scene, R){
               ctx.fillText("AWAITING APPROVAL", w2 / 2, 94);
               ctx.fillStyle = "#7bffb7";
               ctx.font = "700 50px system-ui, Arial";
-              ctx.fillText("SVR Reiki • Approval Pending", w2 / 2, 178);
+              ctx.fillText("SVR sponsor placeholder • approval required", w2 / 2, 178);
             }),
             transparent: true,
             side: THREE.DoubleSide,
@@ -2777,9 +1971,6 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   addPgaHub(scene, { radius: R, wallHeight, log });
   const reikiHub = await addRikiArea(scene, R, wallHeight, spawnLogoTex, log);
   const scorpionRoom = addScorpionRoom(scene, R, wallHeight);
-  const scorpionPrivate = addScorpionPrivateGameplayRoom(scene, R, wallHeight);
-  const phase97Routes = addPhase97PrivateRouteMarkers(scene, { R, wallHeight, reikiHub, scorpionRoom, scorpionPrivate, storeWall, pgaHub: scene.userData._pgaHub });
-  const phase98VrScenes = addPhase98FullVrScenes(scene, { phase97Routes });
   const lobbyInfoBoards = addLobbyInfoBoards(scene, R, wallHeight);
 
   const moonTex = await loadFirstTexture(assetUrls("texture/moon_diffuse.png"), { colorSpace: THREE.SRGBColorSpace });
@@ -2810,7 +2001,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(16.2, 64, 64),
+    new THREE.SphereGeometry(5.6, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2818,23 +2009,20 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       map: moonTex || null,
       bumpMap: moonBump || null,
       bumpScale: moonBump ? 0.94 : 0,
-      emissive: 0x38414f,
-      emissiveIntensity: 0.22
+      emissive: 0x111820,
+      emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-26, wallHeight + 86.0, -(R + 118.0));
-  moon.material.depthTest = false;
-  moon.material.depthWrite = false;
-  moon.renderOrder = 220;
+  moon.position.set(-164, wallHeight + 178.0, -(R + 548.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(168.0, 168.0, 1);
+  moonHalo.scale.set(44.0, 44.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(10.8, 56, 56),
+    new THREE.SphereGeometry(3.1, 44, 44),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2842,20 +2030,17 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       map: marsTex || null,
       bumpMap: marsBump || null,
       bumpScale: marsBump ? 0.42 : 0,
-      emissive: 0x3c140a,
-      emissiveIntensity: 0.18
+      emissive: 0x1c0904,
+      emissiveIntensity: 0.0
     })
   );
-  mars.position.set(30, wallHeight + 90.0, -(R + 128.0));
+  mars.position.set(232, wallHeight + 196.0, -(R + 678.0));
   mars.visible = true;
-  mars.material.depthTest = false;
-  mars.material.depthWrite = false;
-  mars.renderOrder = 221;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(126.0, 126.0, 1);
+  marsHalo.scale.set(28.0, 28.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2881,9 +2066,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 7.4, 900, 1.18);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.75, 560, 1.45);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 5.2, 760, 1.25);
+  const marsGlow = new THREE.PointLight(0xff9a72, 1.75, 420, 1.55);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
@@ -3061,26 +2246,26 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
     moon.position.set(
-      -26 + Math.sin(t * 0.020) * 2.6,
-      wallHeight + 86.0 + Math.sin(t * 0.090) * 0.75,
-      -(R + 118.0) + Math.cos(t * 0.016) * 2.4
+      -44 + Math.sin(t * 0.020) * 5.0,
+      wallHeight + 44.0 + Math.sin(t * 0.090) * 1.4,
+      -(R + 128.0) + Math.cos(t * 0.016) * 6.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     mars.position.set(
-      30 + Math.sin(t * 0.016 + 1.4) * 3.0,
-      wallHeight + 90.0 + Math.sin(t * 0.070 + 0.8) * 0.70,
-      -(R + 128.0) + Math.cos(t * 0.012 + 0.4) * 2.5
+      68 + Math.sin(t * 0.016 + 1.4) * 6.5,
+      wallHeight + 52.0 + Math.sin(t * 0.070 + 0.8) * 1.2,
+      -(R + 154.0) + Math.cos(t * 0.012 + 0.4) * 5.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.16 + 0.035 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.045 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.12 + 0.030 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.026 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{
@@ -3212,10 +2397,6 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       pos: scene.userData._pgaHub.group.position.clone().add(scene.userData._pgaHub.inward.clone().multiplyScalar(2.2)).add(new THREE.Vector3(0,0,0.5)).setY(0),
       look: scene.userData._pgaHub.group.position.clone().setY(1.8)
     } : null,
-    pgaRange: phase97Routes.targets.pgaRange || null,
-    vrStore: phase97Routes.targets.vrStore || null,
-    smokerLounge: phase97Routes.targets.smokerLounge || null,
-    spaceRoom: phase97Routes.targets.spaceRoom || null,
     legends: {
       pos: new THREE.Vector3(legendHall.group.position.x * 0.82, 0, legendHall.group.position.z * 0.82),
       look: legendHall.group.position.clone().setY(1.8)
@@ -3224,8 +2405,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       pos: new THREE.Vector3(storeWall.group.position.x * 0.86, 0, storeWall.group.position.z * 0.86),
       look: storeWall.group.position.clone().setY(1.6)
     },
-    scorpion: phase97Routes.targets.scorpion || (scorpionPrivate ? { pos: scorpionPrivate.target.clone(), look: scorpionPrivate.look.clone() } : null),
-    scorpionShowroom: phase97Routes.targets.scorpionShowroom || (scorpionRoom ? { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() } : null)
+    scorpion: scorpionRoom ? { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() } : null
   };
 
   return {
@@ -3234,8 +2414,6 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     seats,
     joinRadius: 6.3,
     previewOrbitRadius: 12.8,
-    sceneTargets,
-    portalLocks: phase97Routes.portalLocks || [],
-    vrScenes: phase98VrScenes || []
+    sceneTargets
   };
 }

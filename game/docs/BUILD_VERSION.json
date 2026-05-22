@@ -1,0 +1,13 @@
+{
+  "build": "PHASE-84-DATABASE-STRUCTURE-AUDIT-LOCK",
+  "date": "2026-05-21",
+  "siteTouched": false,
+  "databaseMode": "secure-api-only-no-direct-sql-in-game",
+  "apiBaseConfig": "window.SVR_API_BASE_URL, ?api=, or localStorage SVR_API_BASE_URL",
+  "protectedRules": [
+    "game side only",
+    "no secrets in frontend",
+    "under 25 MB",
+    "sponsor branding disabled until approval"
+  ]
+}

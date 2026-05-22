@@ -80,15 +80,12 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
 
-  // Phase 106: single Three.js watch hologram path with unique scoped canvas identifiers to stop holoCtx redeclare boot errors.
-
   const group = new THREE.Group();
   group.visible = false;
   scene.add(group);
 
-  // Phase 108: compact watch body. The large hologram now starts OFF and only opens from the HOLO button.
-  const plateW = 0.192;
-  const plateH = 0.096;
+  const plateW = 0.224;
+  const plateH = 0.116;
 
   const frame = new THREE.Mesh(
     new THREE.BoxGeometry(plateW * 0.98, plateH * 0.98, 0.003),
@@ -123,90 +120,6 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   screenFront.rotation.z = 0;
   group.add(screenFront);
 
-  // Phase 102: visible physical HOLO button on the watch body.
-  // Pinch the HOLO area on the watch screen; this raised button makes the target obvious in VR.
-  const holoButtonMat = new THREE.MeshStandardMaterial({
-    color: 0xbb47ff,
-    roughness: 0.18,
-    metalness: 0.28,
-    emissive: 0x7a18d8,
-    emissiveIntensity: 1.45,
-    transparent: true,
-    opacity: 0.94
-  });
-  const holoButtonCap = new THREE.Mesh(new THREE.BoxGeometry(0.038, 0.016, 0.008), holoButtonMat);
-  holoButtonCap.name = 'PHASE_108_PHYSICAL_HOLO_BUTTON';
-  holoButtonCap.position.set(plateW * 0.32, plateH * 0.31, 0.018);
-  group.add(holoButtonCap);
-
-  // Phase 106: renamed the hologram canvas/context/texture identifiers so stale or duplicated
-  // prior watch snippets cannot crash boot with "Identifier 'holoCtx' has already been declared".
-  const svrHoloCanvas106 = document.createElement('canvas');
-  svrHoloCanvas106.width = 900;
-  svrHoloCanvas106.height = 620;
-  const svrHoloCtx106 = svrHoloCanvas106.getContext('2d');
-  const svrHoloTexture106 = new THREE.CanvasTexture(svrHoloCanvas106);
-  svrHoloTexture106.colorSpace = THREE.SRGBColorSpace;
-  svrHoloTexture106.anisotropy = 8;
-  const svrHoloPanel106 = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.215, 0.132),
-    new THREE.MeshBasicMaterial({ map: svrHoloTexture106, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
-  );
-  svrHoloPanel106.name = 'PHASE_108_WATCH_HOLOGRAM_PANEL_COMPACT';
-  svrHoloPanel106.position.set(0, plateH * 0.98, 0.040);
-  svrHoloPanel106.renderOrder = 72;
-  group.add(svrHoloPanel106);
-
-  function drawHoloPanel(state){
-    svrHoloCtx106.clearRect(0, 0, svrHoloCanvas106.width, svrHoloCanvas106.height);
-    const w = svrHoloCanvas106.width;
-    const h = svrHoloCanvas106.height;
-    const grad = svrHoloCtx106.createLinearGradient(0,0,w,h);
-    grad.addColorStop(0, 'rgba(8, 12, 28, 0.92)');
-    grad.addColorStop(1, 'rgba(46, 10, 78, 0.88)');
-    svrHoloCtx106.fillStyle = grad;
-    rr(svrHoloCtx106, 20, 20, w - 40, h - 40, 42);
-    svrHoloCtx106.fill();
-    svrHoloCtx106.strokeStyle = 'rgba(155, 255, 232, 0.92)';
-    svrHoloCtx106.lineWidth = 10;
-    rr(svrHoloCtx106, 20, 20, w - 40, h - 40, 42);
-    svrHoloCtx106.stroke();
-    svrHoloCtx106.textAlign = 'center';
-    svrHoloCtx106.textBaseline = 'middle';
-    svrHoloCtx106.fillStyle = '#ffffff';
-    svrHoloCtx106.font = '900 58px system-ui, Arial';
-    svrHoloCtx106.fillText('SVR HOLO ROUTER', w/2, 82);
-    svrHoloCtx106.fillStyle = '#8fffe6';
-    svrHoloCtx106.font = '800 32px system-ui, Arial';
-    svrHoloCtx106.fillText('Pinch HOLO: open / close panel', w/2, 136);
-    const lines = [
-      'Lobby • Scorpion • Reiki • PGA',
-      'Store • Lounge • Space Room',
-      state.teleportEnabled ? 'TP ON: close fist glows / release jumps' : 'TP OFF: tap TP ON before hand teleport',
-      state.locomotionEnabled === false ? 'MOVE OFF: teleport only' : 'MOVE ON: stick locomotion active'
-      
-    ];
-    svrHoloCtx106.font = '700 34px system-ui, Arial';
-    lines.forEach((line, i)=>{
-      svrHoloCtx106.fillStyle = i === 2 ? '#ffe986' : '#e7e2ff';
-      svrHoloCtx106.fillText(line, w/2, 222 + i * 70);
-    });
-    svrHoloTexture106.needsUpdate = true;
-  }
-
-  // Phase 103: removed duplicate PHASE_101_WRIST_HOLOGRAM_PANEL. The Phase 102 physical holo panel above is the single source of truth.
-
-
-  const holoBeam = new THREE.Mesh(
-    new THREE.ConeGeometry(0.046, 0.082, 28, 1, true),
-    new THREE.MeshBasicMaterial({ color: 0x7ff5c7, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false })
-  );
-  holoBeam.name = 'PHASE_108_WRIST_HOLOGRAM_BEAM_COMPACT';
-  holoBeam.position.set(0, 0.050, 0.025);
-  holoBeam.rotation.x = Math.PI;
-  holoBeam.renderOrder = 69;
-  group.add(holoBeam);
-
   const screenBack = new THREE.Mesh(
     new THREE.PlaneGeometry(plateW * 0.965, plateH * 0.965),
     new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.BackSide, depthWrite: false, depthTest: false, opacity: 0.0, toneMapped: false })
@@ -240,22 +153,15 @@ function buildButtons(state){
 
     { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaRangeScene', label: 'RANGE', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'legendScene', label: 'LEGEND', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
 
-    { id: 'scorpionScene', label: 'SCORPION', x: 24, y: 250, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'reikiRoomScene', label: 'REIKI RM', x: 154, y: 250, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'storeScene', label: 'STORE', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-
-    { id: 'loungeScene', label: 'LOUNGE', x: 24, y: 302, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'spaceScene', label: 'SPACE', x: 154, y: 302, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'sponsorScene', label: 'SPONSOR', x: 284, y: 302, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'reikiRoomScene', label: 'ZEN DEN', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
     { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'holo', label: state.holoMenuVisible === false ? 'HOLO ON' : 'HOLO OFF', x: 410, y: 116, w: 184, h: 50, font: 21, pinchOnly: true, hold: 0.14, margin: 8 },
-    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 258, h: 116, font: 46, pinchOnly: true, hold: 0.16, margin: 8 },
-    { id: 'locomotion', label: state.locomotionEnabled === false ? 'MOVE OFF' : 'MOVE ON', x: 718, y: 178, w: 258, h: 116, font: 40, pinchOnly: true, hold: 0.16, margin: 8 },
-    { id: 'fistHelp', label: 'FIST: HOLD / GLOW / RELEASE', x: 428, y: 314, w: 548, h: 104, font: 26, pinchOnly: true, hold: 0.20, margin: 8 },
+    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
   ];
   if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
   else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 428, y: 120, w: 548, h: 48, font: 28, pinchOnly: true, hold: 0.18, margin: 8 });
@@ -272,12 +178,10 @@ let hoveredId = null;
 
   function draw(force = false){
     const state = getState();
-    const holoVisible = state.holoMenuVisible !== false;
-    if (svrHoloPanel106) svrHoloPanel106.visible = holoVisible;
-    if (holoBeam) holoBeam.visible = holoVisible;
-    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, holo: state.holoMenuVisible, tp: state.teleportEnabled, loc: state.locomotionEnabled, sec: new Date().getSeconds() });
+    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, sec: new Date().getSeconds() });
     if (!force && sig === lastSig) return;
     lastSig = sig;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     if (DISPLAY_MIRRORED){
@@ -310,7 +214,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(233,233,255,0.95)';
     ctx.font = 'bold 30px system-ui, Arial';
-    ctx.fillText('SVR WATCH HOLO CONSOLE', 34, 112);
+    ctx.fillText('SVR WRIST CONSOLE', 34, 112);
     ctx.fillStyle = 'rgba(233,233,255,0.78)';
     ctx.font = '25px system-ui, Arial';
     ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 430, 152);
@@ -324,17 +228,11 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('HOLO button opens panel • TP toggles fist teleport • MOVE toggles stick locomotion', 36, 332);
+    ctx.fillText('Quick scenes • Reiki / PGA / Sponsor / Scorpion • pinch with other hand • fist by face toggles TP', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
     tex.needsUpdate = true;
-
-    const holoOpen = state.holoMenuVisible !== false;
-    holoButtonCap.material.emissiveIntensity = holoOpen ? 2.2 : 0.62;
-    holoButtonCap.material.color.setHex(holoOpen ? 0x00ffd8 : 0xbb47ff);
-    svrHoloPanel106.visible = holoOpen;
-    if (holoOpen) drawHoloPanel(state);
   }
 
   function localHit(local){
@@ -368,22 +266,15 @@ let hoveredId = null;
     if (id === 'join') actions.joinTable?.();
     if (id === 'leave') actions.leaveTable?.();
     if (id === 'teleport') actions.toggleTeleport?.();
-    if (id === 'holo') actions.toggleHoloMenu?.();
-    if (id === 'locomotion') actions.toggleLocomotion?.();
     if (id === 'lobby') actions.goLobby?.();
     if (id === 'tableScene') actions.goTable?.();
     if (id === 'seatScene') actions.goSeat?.();
     if (id === 'reikiScene') actions.goReiki?.();
     if (id === 'pgaScene') actions.goPga?.();
-    if (id === 'pgaRangeScene') actions.goPgaRange?.();
     if (id === 'legendScene') actions.goLegend?.();
-    if (id === 'storeScene') actions.goVrStore?.();
-    if (id === 'loungeScene') actions.goSmokerLounge?.();
-    if (id === 'spaceScene') actions.goSpaceRoom?.();
     if (id === 'sponsorScene') actions.goSponsor?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
     if (id === 'reikiRoomScene') actions.goReikiRoom?.();
-    if (id === 'fistHelp') actions.toggleTeleport?.();
   }
 
   function update(dt, leftHand, rightHand){

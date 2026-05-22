@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { CONFIG } from "./config.js";
 
-export function createDesktopControls({ camera, domElement, roomClamp = 25 }){
+export function createDesktopControls({ camera, domElement }){
   const state = { yaw: 0, pitch: 0, keys: new Set(), locked: false };
 
   domElement.addEventListener("click", ()=>{
@@ -51,10 +51,6 @@ export function createDesktopControls({ camera, domElement, roomClamp = 25 }){
     camera.position.addScaledVector(fwd, mf * speed * dt);
     camera.position.addScaledVector(right, mr * speed * dt);
     camera.position.y = Math.max(0.2, camera.position.y + mu * speed * dt);
-    if (Number.isFinite(roomClamp) && roomClamp > 0){
-      camera.position.x = THREE.MathUtils.clamp(camera.position.x, -roomClamp, roomClamp);
-      camera.position.z = THREE.MathUtils.clamp(camera.position.z, -roomClamp, roomClamp);
-    }
   }
 
   return { update };
