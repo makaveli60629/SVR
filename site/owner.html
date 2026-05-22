@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>SVR Owner Admin Panel</title>
+  <style>
+    :root{--bg:#07000d;--panel:rgba(24,5,40,.9);--line:#8b49b9;--cyan:#80f8ff;--pink:#ff55df;--green:#58ff96;--red:#ff5f7e;--text:#f8edff;--muted:#c8b6d8}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 10%,rgba(128,248,255,.16),transparent 34%),radial-gradient(circle at 80% 20%,rgba(255,85,223,.18),transparent 34%),linear-gradient(135deg,#020006,#07000d 45%,#160024);color:var(--text);font-family:Arial,Helvetica,sans-serif}main{max-width:1100px;margin:auto;padding:24px}.card{border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:18px;margin:14px 0;box-shadow:0 0 24px rgba(161,70,255,.18)}h1{margin:0 0 8px;font-size:clamp(1.6rem,4vw,2.5rem)}h2{margin:0 0 12px;color:var(--cyan)}.grid{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:14px}.row{display:flex;gap:10px;flex-wrap:wrap}input{width:100%;background:#090012;color:white;border:1px solid rgba(128,248,255,.55);border-radius:12px;padding:12px;margin:6px 0}button,a.btn{background:#3b1459;color:white;border:1px solid #a867ff;border-radius:12px;padding:11px 14px;cursor:pointer;text-decoration:none;font-weight:700}button:hover,a.btn:hover{border-color:var(--cyan)}button.good{background:rgba(88,255,150,.16)}button.bad{background:rgba(255,95,126,.16)}.good{color:var(--green)}.bad{color:var(--red)}.muted{color:var(--muted)}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:7px 11px;margin-top:8px;color:var(--muted)}.msg{border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px;margin:10px 0;background:rgba(0,0,0,.24);white-space:pre-wrap}code{color:var(--cyan)}@media(max-width:800px){main{padding:14px}.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <div class="card"><h1>SVR Owner Admin</h1><div class="muted">Live AWS panel for owner login, Admin Online/Offline, and public messages.</div><div id="status" class="pill">Checking AWS status...</div></div>
+  <section class="grid">
+    <div class="card"><h2>Owner Login</h2><label class="muted">Owner email</label><input id="email" type="email" value="owner@svrpoker.local" autocomplete="username"><label class="muted">Owner password</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter private owner password"><div class="row"><button id="loginBtn">Log In</button><button id="logoutBtn" class="bad">Log Out</button></div><p id="loginNote" class="muted"></p></div>
+    <div class="card"><h2>Live Controls</h2><div class="row"><button id="onlineBtn" class="good">Set Admin Online</button><button id="offlineBtn" class="bad">Set Admin Offline</button><button id="refreshBtn">Refresh Messages</button><a class="btn" href="/" target="_blank" rel="noopener">Public Site</a><a class="btn" href="https://api.svrpoker.com/api/health" target="_blank" rel="noopener">API Health</a></div><p id="controlNote" class="muted"></p></div>
+  </section>
+  <div class="card"><h2>Public Messages</h2><div id="messages" class="muted">Log in, then refresh messages.</div></div>
+</main>
+<script>
+(function(){
+  const API='https://api.svrpoker.com';let token='';
+  const $=(id)=>document.getElementById(id);
+  const safe=(s)=>String(s||'').replace(/[&<>"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  async function api(path,opts={}){const headers=Object.assign({'Accept':'application/json'},opts.headers||{});if(opts.body)headers['Content-Type']='application/json';if(token)headers.Authorization='Bearer '+token;const res=await fetch(API+path,Object.assign({cache:'no-store'},opts,{headers}));const data=await res.json().catch(()=>({}));if(!res.ok||data.ok===false)throw new Error(data.error||data.detail||('Request failed '+res.status));return data;}
+  async function status(){try{const d=await api('/api/admin/status');$('status').innerHTML=d.isOnline?'<span class="good">● Admin Online</span>':'<span class="bad">● Admin Offline</span>';}catch(e){$('status').innerHTML='<span class="bad">API status error</span>';}}
+  async function login(){$('loginNote').textContent='Logging in...';const d=await api('/api/admin/login',{method:'POST',body:JSON.stringify({email:$('email').value.trim(),password:$('password').value})});token=d.token;$('password').value='';$('loginNote').textContent='Owner login successful.';await status();await messages();}
+  async function setOnline(value){$('controlNote').textContent='Updating...';await api('/api/admin/online',{method:'POST',body:JSON.stringify({isOnline:value})});$('controlNote').textContent=value?'Admin Online set.':'Admin Offline set.';await status();}
+  async function messages(){$('messages').textContent='Loading messages...';const d=await api('/api/messages/admin');const list=d.messages||[];if(!list.length){$('messages').textContent='No public messages yet.';return;}$('messages').innerHTML=list.map(m=>'<div class="msg"><b>'+safe(m.subject||'Message')+'</b><br><span class="muted">From: '+safe(m.name||'Anonymous')+' '+safe(m.email||'')+'<br>'+safe(m.created_at||'')+' · '+safe(m.source||'site')+'</span><br><br>'+safe(m.message)+'</div>').join('');}
+  $('loginBtn').onclick=()=>login().catch(e=>$('loginNote').textContent=e.message);
+  $('logoutBtn').onclick=()=>{token='';$('loginNote').textContent='Logged out in this browser.';$('messages').textContent='Log in, then refresh messages.';};
+  $('onlineBtn').onclick=()=>setOnline(true).catch(e=>$('controlNote').textContent=e.message);
+  $('offlineBtn').onclick=()=>setOnline(false).catch(e=>$('controlNote').textContent=e.message);
+  $('refreshBtn').onclick=()=>messages().catch(e=>$('controlNote').textContent=e.message);
+  status();
+})();
+</script>
+</body>
+</html>
