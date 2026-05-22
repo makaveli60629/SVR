@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "version": "site-game-1.1-sponsor-event-template",
+  "activeCampaign": {
+    "id": "espresso-with-cream-template-001",
+    "status": "draft_placeholder",
+    "isLiveSponsor": false,
+    "requiresApproval": true,
+    "sponsorName": "Espresso with Cream",
+    "campaignTitle": "First Sponsor Event Template",
+    "campaignType": "sample_sponsor_event",
+    "disclosureText": "Sponsor event template. Draft approval only.",
+    "causeCategory": "animal_shelter_support",
+    "causePartnerName": "Animal Shelter Partner Pending",
+    "causeDisclosure": "Shelter name, nonprofit status, payout process, and campaign terms must be approved before public fundraising claims are activated.",
+    "eventPrizeMode": "sponsor_funded_concept",
+    "eventPrizeDisclosure": "No live real-cash promotion is active. Use no-purchase-required official rules before publishing any prize event.",
+    "placements": [
+      {
+        "key": "game_lobby_wall_mega",
+        "tier": "mega",
+        "asset": "/site/assets/sponsors/espresso/espresso-building-wide-1536x512.svg",
+        "label": "Lobby Wall Mega"
+      },
+      {
+        "key": "game_building_premium",
+        "tier": "premium",
+        "asset": "/site/assets/sponsors/espresso/espresso-building-standard-1024x512.svg",
+        "label": "Building Premium"
+      },
+      {
+        "key": "site_event_card",
+        "tier": "site",
+        "asset": "/site/assets/sponsors/espresso/espresso-sponsor-event-card.svg",
+        "label": "Site Event Card"
+      }
+    ],
+    "workflow": [
+      "Sponsor submits request",
+      "Owner reviews in admin panel",
+      "Artwork and disclosure checked",
+      "Cause partner approved",
+      "Official rules approved if prize is used",
+      "Banner activated for monthly campaign",
+      "Traffic and impressions reviewed in owner dashboard"
+    ]
+  }
+}

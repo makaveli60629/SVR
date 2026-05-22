@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SVR Poker | Sponsor Event Template</title>
+  <meta name="description" content="SVR Poker first sponsor event template with billboard ad placements, animal shelter cause slot, and admin-controlled monthly campaign workflow." />
+  <link rel="icon" href="../logo.webp" type="image/webp" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .event-hero{display:grid;grid-template-columns:.9fr 1.1fr;gap:22px;align-items:center}.event-hero img,.ad-grid img{width:100%;border-radius:24px;border:1px solid rgba(255,216,121,.42);box-shadow:0 0 30px rgba(255,216,121,.16)}.event-card{border:1px solid rgba(128,248,255,.25);border-radius:22px;background:rgba(5,0,16,.72);padding:20px}.ad-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.workflow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.workflow article{border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(0,0,0,.28);padding:14px}.disclaimer{border:1px solid rgba(255,216,121,.4);border-radius:16px;padding:14px;background:rgba(255,216,121,.08);color:#ffe7aa}@media(max-width:900px){.event-hero,.ad-grid,.workflow{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <canvas id="binary-rain" aria-hidden="true"></canvas>
+  <div class="site-shell">
+    <nav class="site-nav">
+      <div class="nav-brand"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Sponsor Event</span></div></div>
+      <div class="nav-links"><a href="index.html">Site Home</a><a href="billboards.html">Billboards</a><a href="sponsorship.html">Sponsors</a><a href="register.html">Register</a><a href="store.html">Store</a><a href="../index.html">Launch</a></div>
+    </nav>
+    <main class="site-card">
+      <section class="section event-hero">
+        <img src="assets/sponsors/espresso/espresso-sponsor-event-card.svg" alt="Espresso with Cream sponsor event ad template">
+        <div>
+          <div class="card-tag">Site/Game 1.1 Sponsor Template</div>
+          <h1 class="section-title">Espresso with Cream Sponsor Event</h1>
+          <p class="section-copy">This is the first polished sponsor-event template for SVR. It demonstrates how a sponsor ad, in-game billboard, monthly campaign, and animal shelter cause slot can connect through the site, owner panel, database, and game billboard system.</p>
+          <div class="inline-actions"><a class="btn btn-primary" href="billboards.html">Request Billboard Review</a><a class="btn btn-secondary" href="register.html">Join Event Updates</a><a class="btn btn-ghost" href="data/sponsor-event-current.json">View Event Data</a></div>
+          <p class="disclaimer">Draft placeholder only. The animal shelter partner, sponsor terms, prize rules, and real-cash promotion language must be approved before public activation.</p>
+        </div>
+      </section>
+      <section class="section event-card">
+        <h2 class="section-title">Building Ad Tier Assets</h2>
+        <p class="section-copy">These assets define the reusable building ad tier sizes for future sponsors. Replace the artwork and data file each month without changing the whole site or game.</p>
+        <div class="ad-grid">
+          <article><h3>Mega Tier — 1536 × 512</h3><img src="assets/sponsors/espresso/espresso-building-wide-1536x512.svg" alt="Mega tier espresso sponsor banner"></article>
+          <article><h3>Premium Tier — 1024 × 512</h3><img src="assets/sponsors/espresso/espresso-building-standard-1024x512.svg" alt="Premium tier espresso sponsor banner"></article>
+        </div>
+      </section>
+      <section class="section event-card">
+        <h2 class="section-title">Sponsor Event Workflow</h2>
+        <div class="workflow">
+          <article><div class="card-tag">1</div><h3>Intake</h3><p>Sponsor or cause partner submits request from the billboard page.</p></article>
+          <article><div class="card-tag">2</div><h3>Owner Review</h3><p>Admin checks artwork, sponsor details, disclosure, and cause partner information.</p></article>
+          <article><div class="card-tag">3</div><h3>Approval</h3><p>Approved campaign becomes the active monthly sponsor event data record.</p></article>
+          <article><div class="card-tag">4</div><h3>Site Display</h3><p>The site reads the current sponsor event data and displays active assets.</p></article>
+          <article><div class="card-tag">5</div><h3>Game Display</h3><p>The game billboard bridge can load the active banner into lobby/building placements.</p></article>
+          <article><div class="card-tag">6</div><h3>Impact Report</h3><p>Traffic, impressions, clicks, leads, and sponsor interest feed the owner dashboard.</p></article>
+        </div>
+      </section>
+      <section class="section event-card">
+        <h2 class="section-title">Animal Shelter Cause Slot</h2>
+        <p class="section-copy">This template reserves a cause area for an animal shelter campaign. The live shelter name should stay as <strong>Animal Shelter Partner Pending</strong> until the partner gives approval, the fundraising method is documented, and the owner approves the exact public language.</p>
+        <p class="disclaimer">Real-cash prize events should not be published as poker gambling. Use sponsor-funded/no-purchase-required rules and legal review before promoting cash prizes.</p>
+      </section>
+    </main>
+  </div>
+  <script src="../matrix.js"></script>
+  <script src="../site-public-hooks.js"></script>
+</body>
+</html>
