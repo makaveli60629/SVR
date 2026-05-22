@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SVR Poker | One-Page Site</title>
-  <meta name="description" content="SVR Poker official site preview: social VR poker, sponsor-supported community impact, store sandbox, member access shell, and live game preview." />
+  <meta name="description" content="SVR Poker official site preview: social VR poker, sponsor-supported community impact, member registration, store sandbox, and live game preview." />
   <link rel="icon" href="../logo.webp" type="image/webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,15 +26,14 @@
       <div class="nav-links">
         <span class="admin-status online" id="admin-status" data-state="online">&#9679; Admin Online</span>
         <a href="#experience">Experience</a>
-        <a href="#live-preview">Live Preview</a>
+        <a href="#live-preview">Preview</a>
         <a href="about.html">About</a>
-        <a href="sponsorship.html">Sponsorship</a>
-        <a href="membership.html">Membership</a>
+        <a href="sponsorship.html">Sponsors</a>
         <a href="impact.html">Impact</a>
-        <a href="donate.html">Donate</a>
-        <a href="faq.html">FAQ</a>
         <a href="#login">Login</a>
+        <a href="register.html">Register</a>
         <a href="store.html">Store</a>
+        <a href="billboards.html">Billboards</a>
         <a href="#message">Message</a>
         <a href="../index.html">Launch</a>
       </div>
@@ -53,6 +52,7 @@
           <p class="launch-copy">SVR Poker brings people together through the love of poker while building a sponsor-supported platform for community fundraising, animal shelters, poverty relief, and future foundation-backed impact.</p>
           <div class="inline-actions">
             <a class="btn btn-primary" href="../game/index.html">Preview Game</a>
+            <a class="btn btn-secondary" href="register.html">Register</a>
             <a class="btn btn-secondary" href="../index.html">Public Launch Page</a>
             <a class="btn btn-ghost" href="https://cash.app/$SVRhelp" target="_blank" rel="noopener">Support $SVRhelp</a>
             <a class="btn btn-primary" href="store.html">Open Store</a>
@@ -73,46 +73,48 @@
               <span>Director camera preview</span>
             </div>
             <div class="metric">
-              <strong>Login UI</strong>
-              <span>Ready to wire</span>
+              <strong>Register</strong>
+              <span>AWS member intake</span>
             </div>
             <div class="metric">
-              <strong>Stripe + SQL</strong>
-              <span>Prepared next step</span>
+              <strong>Store + SQL</strong>
+              <span>Database connected</span>
             </div>
           </div>
-          <div class="setup-note">This panel is reserved for the future lobby feed or a third-camera preview. The current panel uses the existing director/autocam preview route so visitors can see the space before entering.</div>
+          <div class="setup-note">This panel uses the existing director/autocam preview route so visitors can see the game space before entering. Registration and intake now route through the live AWS API.</div>
         </aside>
       </section>
 
       <section class="section" id="login">
-        <h2 class="section-title">Login Access Shell</h2>
-        <p class="section-copy">This section gives you the visual entry point for member login, creator access, and future account flows.</p>
+        <h2 class="section-title">Login + Registration Access</h2>
+        <p class="section-copy">Visitors can register for the member population list now. The sign-in shell stays ready for full account authentication once profile passwords, roles, member tiers, and game entitlements are activated.</p>
         <div class="utility-grid">
           <article class="utility-card">
             <div class="card-tag">Member Portal</div>
-            <h3>Sign In</h3>
+            <h3>Sign In / Register</h3>
             <div class="input-grid">
               <label>Email<input type="email" placeholder="member@svrpoker.com" /></label>
               <label>Password<input type="password" placeholder="••••••••" /></label>
             </div>
             <div class="inline-actions">
-              <a class="btn btn-primary" href="#sql">Wire Login</a>
-              <a class="btn btn-secondary" href="#contact">Request Access</a>
+              <a class="btn btn-primary" href="register.html">Register Member</a>
+              <a class="btn btn-secondary" href="#sql">Login Wiring</a>
+              <a class="btn btn-ghost" href="#message">Request Help</a>
             </div>
-            <p class="input-note">UI only in this build. Connect to your SQL-backed auth service next.</p>
+            <p class="input-note">Registration is live member-intake through the AWS API. Password login remains a protected UI shell until the full account-auth table is activated.</p>
           </article>
           <article class="utility-card">
             <div class="card-tag">Member Flow</div>
             <h3>Account Features</h3>
-            <p class="card-copy">Saved profile, membership tier, table access, purchase history, and future event invites can all hang off the same account object once your SQL tables are wired.</p>
+            <p class="card-copy">The registration page starts the member population database. Future login logic can load profile, tier, role, owned store items, table access, billboard interests, and game permissions from the same account flow.</p>
+            <div class="inline-actions"><a class="btn btn-secondary" href="register.html">Join Member List</a></div>
           </article>
           <article class="utility-card">
             <div class="card-tag">Email Capture</div>
-            <h3>Waitlist Form</h3>
+            <h3>Waitlist + Updates</h3>
             <label>Join updates<input type="email" placeholder="you@example.com" /></label>
-            <div class="inline-actions"><a class="btn btn-ghost" href="#contact">Connect Mail</a></div>
-            <p class="input-note">Use this for launch updates, approvals, founder offers, and table invites.</p>
+            <div class="inline-actions"><a class="btn btn-ghost" href="register.html">Register for Updates</a></div>
+            <p class="input-note">Use registration for launch updates, member access, tester invites, sponsor events, store drops, and community cause campaigns.</p>
           </article>
         </div>
       </section>
@@ -178,45 +180,45 @@
             <h3>Public Access</h3>
             <p class="price">Free</p>
             <p class="price-note">Launch news, public previews, and browser room access.</p>
-            <div class="inline-actions"><a class="btn btn-secondary" href="#contact">Join Waitlist</a></div>
+            <div class="inline-actions"><a class="btn btn-secondary" href="register.html">Register Free</a></div>
           </article>
           <article class="price-card">
             <div class="card-tag">Core</div>
             <h3>VIP Table</h3>
-            <p class="price">$19 <small>/ month</small></p>
-            <p class="price-note">Future gated tables, member identity, and premium access.</p>
-            <div class="inline-actions"><a class="btn btn-primary" href="#sql">Connect Stripe</a></div>
+            <p class="price">Preview</p>
+            <p class="price-note">Future gated tables, member identity, and premium access after account/payment review.</p>
+            <div class="inline-actions"><a class="btn btn-primary" href="#sql">Connect Auth Later</a></div>
           </article>
           <article class="price-card">
             <div class="card-tag">Founders</div>
             <h3>Creator Tier</h3>
-            <p class="price">$49 <small>/ month</small></p>
-            <p class="price-note">Founders perks, premium event access, and partner positioning.</p>
-            <div class="inline-actions"><a class="btn btn-ghost" href="#contact">Contact Team</a></div>
+            <p class="price">Review</p>
+            <p class="price-note">Founders perks, premium event access, and partner positioning after approval.</p>
+            <div class="inline-actions"><a class="btn btn-ghost" href="register.html">Register Interest</a></div>
           </article>
         </div>
-        <div class="setup-note">Recommended flow: your front end calls a server endpoint, the server creates a Stripe Checkout Session, and the client redirects there. Keep secret keys on the server only.</div>
+        <div class="setup-note">Recommended flow: public registration creates a member lead; full login later verifies account credentials, role, membership tier, and entitlements through the API. Keep payment keys on the server only.</div>
       </section>
 
       <section class="section" id="sql">
-        <h2 class="section-title">SQL Ready Handoff</h2>
-        <p class="section-copy">The page is now laid out so you can bolt in real data without changing the public design again.</p>
+        <h2 class="section-title">Database Ready Handoff</h2>
+        <p class="section-copy">The site now has a real registration route and clean data flow into the AWS API while full member authentication remains protected for the next backend phase.</p>
         <div class="roadmap-grid">
           <article class="roadmap-item">
-            <h3>Users</h3>
-            <p>Store account email, password hash, membership tier, role, and approval state.</p>
+            <h3>Registration</h3>
+            <p>Member, tester, sponsor-event, store-update, and community-cause interests are saved through the registration page.</p>
           </article>
           <article class="roadmap-item">
-            <h3>Payments</h3>
-            <p>Track Stripe customer ID, subscription ID, status, and renewal dates.</p>
+            <h3>Users</h3>
+            <p>Next backend step: create secure account records with password hash, role, membership tier, and approval state.</p>
           </article>
           <article class="roadmap-item">
             <h3>Access</h3>
-            <p>Bind gameplay entitlements and room permissions to the logged-in account.</p>
+            <p>Bind gameplay entitlements, room permissions, store inventory, and billboard interests to approved accounts.</p>
           </article>
           <article class="roadmap-item">
-            <h3>Email</h3>
-            <p>Save opt-in state, waitlist status, and campaign list tags for your domain mailboxes.</p>
+            <h3>Admin Review</h3>
+            <p>Owner panel displays member population, billboard requests, public messages, traffic, store items, and game events.</p>
           </article>
         </div>
       </section>
@@ -224,7 +226,7 @@
 
       <section class="section" id="message">
         <h2 class="section-title">Visitor Message Drop</h2>
-        <p class="section-copy">A simple public message box is restored here so visitors, sponsors, and players can leave questions while the SQL/API layer is being wired.</p>
+        <p class="section-copy">Visitors, sponsors, and players can leave questions while registrations and member intake flow through the live API.</p>
         <div class="utility-grid">
           <article class="utility-card message-card">
             <div class="card-tag">Public Chat Intake</div>
@@ -235,18 +237,18 @@
               <label>Message<textarea name="message" rows="5" placeholder="Drop a question, sponsorship request, support note, or site feedback."></textarea></label>
               <button class="btn btn-primary" type="submit">Save Message</button>
             </form>
-            <p class="input-note" id="visitor-message-status">Local-safe restore mode: messages are saved in this browser until the Azure SQL/API endpoint is connected.</p>
+            <p class="input-note" id="visitor-message-status">Messages are submitted through the live API when available, with safe fallback handling in the site hook.</p>
           </article>
           <article class="utility-card">
             <div class="card-tag">Admin Presence</div>
             <h3>Online / Offline Hook</h3>
-            <p class="card-copy">The public indicator is now present. It can be wired to your admin login session so visitors see when an admin is available.</p>
+            <p class="card-copy">The public indicator is present and the owner panel can update admin online/offline status through the AWS API.</p>
             <div class="admin-status offline admin-status-large" data-state="online">● Admin Online</div>
           </article>
           <article class="utility-card">
             <div class="card-tag">Backend Next</div>
-            <h3>Azure SQL Ready</h3>
-            <p class="card-copy">Next connection target: POST visitor messages into an API route, store them in Azure SQL, then show them in the future admin dashboard.</p>
+            <h3>Member Auth</h3>
+            <p class="card-copy">Next target: move from intake-only registration to secure member login with approved roles, inventory, game access, and event permissions.</p>
           </article>
         </div>
       </section>
@@ -256,24 +258,25 @@
         <div class="faq-grid">
           <article class="faq-item">
             <h3>Business Email</h3>
-            <p>Use your domain for branded addresses like hello@svrpoker.com and vip@svrpoker.com. The setup notes in this zip point you to simple options for routing or hosted mail.</p>
+            <p>Use your domain for branded addresses like hello@svrpoker.com and vip@svrpoker.com. Registration data stays separated from public display and is reviewed privately in the owner panel.</p>
           </article>
           <article class="faq-item">
-            <h3>Next Backend Step</h3>
-            <p>Hand over your SQL schema or connection details and the next pass can wire the login form, waitlist capture, and Stripe endpoints to real data.</p>
+            <h3>Member Population</h3>
+            <p>Use the registration page to grow the player and tester list before enabling full account login.</p>
           </article>
           <article class="faq-item">
             <h3>Public Posture</h3>
-            <p>This build keeps the launch face clean while leaving clear hooks for accounts, payments, and member-only content.</p>
+            <p>This build keeps the launch face clean while adding real hooks for accounts, store modules, sponsor billboards, and community campaigns.</p>
           </article>
         </div>
       </section>
 
       <footer class="footer">
-        <p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p>
+        <p class="footer-note">© SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p>
         <div class="inline-actions">
           <a class="btn btn-secondary" href="../index.html">Preview Launch</a>
           <a class="btn btn-primary" href="../game/index.html">Preview Game</a>
+          <a class="btn btn-secondary" href="register.html">Register</a>
         </div>
       </footer>
     </main>
