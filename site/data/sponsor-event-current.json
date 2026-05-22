@@ -1,48 +1,85 @@
 {
-  "ok": true,
-  "version": "site-game-1.1-sponsor-event-template",
-  "activeCampaign": {
-    "id": "espresso-with-cream-template-001",
-    "status": "draft_placeholder",
-    "isLiveSponsor": false,
-    "requiresApproval": true,
-    "sponsorName": "Espresso with Cream",
-    "campaignTitle": "First Sponsor Event Template",
-    "campaignType": "sample_sponsor_event",
-    "disclosureText": "Sponsor event template. Draft approval only.",
-    "causeCategory": "animal_shelter_support",
-    "causePartnerName": "Animal Shelter Partner Pending",
-    "causeDisclosure": "Shelter name, nonprofit status, payout process, and campaign terms must be approved before public fundraising claims are activated.",
-    "eventPrizeMode": "sponsor_funded_concept",
-    "eventPrizeDisclosure": "No live real-cash promotion is active. Use no-purchase-required official rules before publishing any prize event.",
-    "placements": [
-      {
-        "key": "game_lobby_wall_mega",
-        "tier": "mega",
-        "asset": "/site/assets/sponsors/espresso/espresso-building-wide-1536x512.svg",
-        "label": "Lobby Wall Mega"
-      },
-      {
-        "key": "game_building_premium",
-        "tier": "premium",
-        "asset": "/site/assets/sponsors/espresso/espresso-building-standard-1024x512.svg",
-        "label": "Building Premium"
-      },
-      {
-        "key": "site_event_card",
-        "tier": "site",
-        "asset": "/site/assets/sponsors/espresso/espresso-sponsor-event-card.svg",
-        "label": "Site Event Card"
-      }
-    ],
-    "workflow": [
-      "Sponsor submits request",
-      "Owner reviews in admin panel",
-      "Artwork and disclosure checked",
-      "Cause partner approved",
-      "Official rules approved if prize is used",
-      "Banner activated for monthly campaign",
-      "Traffic and impressions reviewed in owner dashboard"
-    ]
-  }
+  "schemaVersion": "1.1",
+  "module": "svr-sponsor-event-template",
+  "status": "sample_draft_only",
+  "active": true,
+  "sponsor": {
+    "name": "Espresso with Cream Caf\u00e9",
+    "displayName": "Espresso with Cream",
+    "type": "sample sponsor placeholder",
+    "disclosure": "Sample sponsor placement. Not a live paid advertisement until approved."
+  },
+  "event": {
+    "title": "Paws & Pour Community Cup",
+    "subtitle": "First Sponsor Event Template",
+    "summary": "A polished example sponsor module showing how SVR can rotate a monthly sponsor, display in-game billboard art, collect sponsor leads, and support a community cause concept.",
+    "entryMode": "preview_only",
+    "prizeMode": "sponsor_funded_concept_pending_rules",
+    "publicPrizeText": "Prize/Event details pending official rules and sponsor approval.",
+    "liveCashPrizeActive": false,
+    "requiresOfficialRules": true
+  },
+  "cause": {
+    "category": "animal_shelter",
+    "partnerName": "Paws & Hope Animal Shelter",
+    "partnerStatus": "sample_placeholder_pending_written_approval",
+    "publicText": "Animal Shelter Partner Pending",
+    "fundingHandling": "No public fundraising claim is active until shelter approval, accounting workflow, and legal review are complete."
+  },
+  "art": {
+    "poster": "/site/assets/sponsors/espresso/espresso-sponsor-event-card-900x1400.png",
+    "photo": "/site/assets/sponsors/espresso/espresso-sponsor-photo-1024x768.png",
+    "wide": "/site/assets/sponsors/espresso/espresso-building-wide-1536x512.png",
+    "standard": "/site/assets/sponsors/espresso/espresso-building-standard-1024x512.png",
+    "tower": "/site/assets/sponsors/espresso/espresso-tower-vertical-720x1280.png",
+    "square": "/site/assets/sponsors/espresso/espresso-square-social-1024x1024.png",
+    "causeCard": "/site/assets/sponsors/espresso/paws-hope-animal-shelter-sample-card.png",
+    "workflow": "/site/assets/sponsors/espresso/sponsor-event-workflow-map.png"
+  },
+  "placements": [
+    {
+      "key": "game_lobby_wall_mega",
+      "tier": "mega",
+      "size": "1536x512",
+      "image": "/site/assets/sponsors/espresso/espresso-building-wide-1536x512.png",
+      "enabled": true
+    },
+    {
+      "key": "game_building_premium",
+      "tier": "premium",
+      "size": "1024x512",
+      "image": "/site/assets/sponsors/espresso/espresso-building-standard-1024x512.png",
+      "enabled": true
+    },
+    {
+      "key": "site_event_card",
+      "tier": "site",
+      "size": "900x1400",
+      "image": "/site/assets/sponsors/espresso/espresso-sponsor-event-card-900x1400.png",
+      "enabled": true
+    },
+    {
+      "key": "tower_vertical",
+      "tier": "vertical",
+      "size": "720x1280",
+      "image": "/site/assets/sponsors/espresso/espresso-tower-vertical-720x1280.png",
+      "enabled": true
+    }
+  ],
+  "analyticsEvents": [
+    "sponsor_event_view",
+    "sponsor_cta_click",
+    "sponsor_billboard_impression",
+    "cause_interest_click"
+  ],
+  "adminWorkflow": [
+    "draft",
+    "art_review",
+    "sponsor_review",
+    "cause_partner_review",
+    "official_rules_review",
+    "ready_to_publish",
+    "active",
+    "archived"
+  ]
 }
