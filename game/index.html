@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • Phase 97 Camera Forward Controller Fix</title>
+  <title>ScarlettVR Poker • Phase 98 Stable Performance Boot</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -24,7 +24,8 @@
     body.preview-mode #hud, body.preview-mode #log, body.preview-mode #err { display: none !important; }
   </style>
   <script>
-    window.SVR_BUILD_PHASE = 'PHASE-97-CAMERA-FORWARD-CONTROLLER-LOCK';
+    window.SVR_BUILD_PHASE = 'PHASE-98-STABLE-PERFORMANCE-BOOT';
+    window.SVR_PERFORMANCE_MODE = true;
     window.SVR_API_BASE = window.SVR_API_BASE || 'https://api.svrpoker.com';
   </script>
   <script type="importmap">
@@ -33,13 +34,11 @@
 </head>
 <body>
   <div id="app"></div>
-  <div id="hud"><div class="pill" id="status">Booting…</div><div style="display:flex;gap:8px;align-items:center;"><button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button><button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button><span class="pill" id="mode">Hands: …</span><span class="pill">BUILD: PHASE-97-CAMERA-FORWARD-CONTROLLER-LOCK</span></div></div>
+  <div id="hud"><div class="pill" id="status">Booting…</div><div style="display:flex;gap:8px;align-items:center;"><button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button><button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button><span class="pill" id="mode">Hands: …</span><span class="pill">BUILD: PHASE-98-STABLE-PERFORMANCE-BOOT</span></div></div>
   <div id="sceneNav"><button class="scene-btn" data-scene="lobby">Lobby</button><button class="scene-btn" data-scene="seat">Seat</button><button class="scene-btn" data-scene="reiki">Reiki Hub</button><button class="scene-btn" data-route="./reiki.html">Reiki Room</button><button class="scene-btn" data-scene="pga">PGA Hub</button><button class="scene-btn" data-route="./pga-drive.html">PGA Drive</button><button class="scene-btn" data-route="./chip-putt.html">Chip/Putt</button><button class="scene-btn" data-route="./store-room.html">VR Store</button><button class="scene-btn" data-route="./smoker-lounge.html">Smoker Lounge</button><button class="scene-btn" data-route="./scorpion.html">Scorpion</button></div>
   <pre id="log"></pre><pre id="err"></pre>
-  <script type="module" src="./modules/phase89_game_polish_lock.js?v=phase97-camera-forward"></script>
-  <script type="module" src="./modules/phase94_ad_face_center_lock.js?v=phase97-camera-forward"></script>
-  <script type="module" src="./modules/espresso_real_ad_patch.js?v=phase97-camera-forward"></script>
-  <script type="module" src="./main.js?v=phase97-camera-forward"></script>
-  <script type="module" src="./modules/sponsor_billboard_bridge.js?v=phase97-camera-forward"></script>
+  <script type="module" src="./modules/espresso_real_ad_patch.js?v=phase98-stable-performance"></script>
+  <script type="module" src="./main.js?v=phase98-stable-performance"></script>
+  <script type="module" src="./modules/sponsor_billboard_bridge.js?v=phase98-stable-performance"></script>
 </body>
 </html>
