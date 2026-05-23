@@ -6,7 +6,29 @@
 **Current active baseline:** `PHASE-131-GAME-CLEAN-BOOT-AUDIT-REPAIR-LOCK`  
 **Track:** Game-side only unless the user explicitly opens a site/public-page track.  
 **Primary target:** WebXR / Meta Quest Browser, with desktop/browser preview support.  
-**Hosting/deploy:** GitHub repository `makaveli60629/SVR`; deployment path may be GitHub Pages/Netlify depending current external configuration, so repo code must remain static-host safe.
+**Hosting/deploy:** Netlify is the current locked hosting target for fast asset delivery, connected to GitHub repository `makaveli60629/SVR`.
+
+## Hosting and domain lock
+
+- Active Netlify deploy instance: `curious-kelpie-b6bb99.netlify.app`
+- Production domain: `svrpoker.com`
+- WWW domain: `www.svrpoker.com`
+- Domain/SSL may be in DNS propagation at times; keep a direct Netlify access path available.
+- Public launch page must include a high-visibility `NewServer` button linking to the Netlify game deployment:
+
+```text
+https://curious-kelpie-b6bb99.netlify.app/game/index.html
+```
+
+## Public page UI lock
+
+The public root `index.html` must keep a bottom/control-dock-style action area:
+
+- Container id: `control-dock-container`
+- Main game button label: `Launch VR Room`
+- Secondary button label: `NewServer`
+- `NewServer` color target: neon teal `#00f5d4`
+- `NewServer` purpose: direct Netlify fallback during custom-domain propagation or SSL/network transition.
 
 ## Non-regression rules
 
