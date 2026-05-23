@@ -1,6 +1,13 @@
 import * as THREE from "three";
 
-export const LOCOMOTION_PHASE = "PHASE-99-LOCOMOTION-MODULE-LOCK";
+export const LOCOMOTION_PHASE = "PHASE-137-MOVEMENT-LOCOMOTION-TELEPORT-MODULE-LOCK";
+
+const ZERO_STICK = { x: 0, y: 0 };
+const MOVE_STICK = { x: 0, y: 0 };
+const TURN_STICK = { x: 0, y: 0 };
+const FORWARD = new THREE.Vector3(0, 0, -1);
+const RIGHT = new THREE.Vector3(1, 0, 0);
+const NEXT_POS = { x: 0, z: 0, moved: false };
 
 export function controllerGamepad(proxy){
   return proxy?.userData?.gamepad || proxy?.userData?.inputSource?.gamepad || proxy?.userData?.controller?.inputSource?.gamepad || null;
@@ -14,13 +21,19 @@ export function deadZone(v, zone = 0.16){
   return Math.abs(v || 0) < zone ? 0 : (v || 0);
 }
 
-export function stickPair(gp, pair = "left"){
-  if (!gp?.axes?.length) return { x: 0, y: 0 };
+export function stickPair(gp, pair = "left", out = MOVE_STICK){
+  out.x = 0;
+  out.y = 0;
+  if (!gp?.axes?.length) return out;
   const axes = gp.axes;
-  const raw = pair === "right" && axes.length >= 4
-    ? { x: axes[2] || 0, y: axes[3] || 0 }
-    : { x: axes[0] || 0, y: axes[1] || 0 };
-  return { x: deadZone(raw.x), y: deadZone(raw.y) };
+  if (pair === "right" && axes.length >= 4){
+    out.x = deadZone(axes[2] || 0);
+    out.y = deadZone(axes[3] || 0);
+  } else {
+    out.x = deadZone(axes[0] || 0);
+    out.y = deadZone(axes[1] || 0);
+  }
+  return out;
 }
 
 export function triggerValue(proxy){
@@ -31,46 +44,53 @@ export function triggerValue(proxy){
 
 export function movementStick(leftControllerRef, rightControllerRef){
   const leftGp = controllerGamepad(leftControllerRef);
+  stickPair(leftGp, "left", MOVE_STICK);
+  if (Math.hypot(MOVE_STICK.x, MOVE_STICK.y) > 0.12) return MOVE_STICK;
   const rightGp = controllerGamepad(rightControllerRef);
-  const leftMove = stickPair(leftGp, "left");
-  if (Math.hypot(leftMove.x, leftMove.y) > 0.12) return leftMove;
-  const rightMoveFallback = stickPair(rightGp, "left");
-  if (Math.hypot(rightMoveFallback.x, rightMoveFallback.y) > 0.12) return rightMoveFallback;
-  return { x: 0, y: 0 };
+  stickPair(rightGp, "left", MOVE_STICK);
+  if (Math.hypot(MOVE_STICK.x, MOVE_STICK.y) > 0.12) return MOVE_STICK;
+  return ZERO_STICK;
 }
 
 export function snapTurnStick(leftControllerRef, rightControllerRef){
   const rightGp = controllerGamepad(rightControllerRef);
-  const rightTurn = stickPair(rightGp, "right");
-  if (Math.abs(rightTurn.x) > 0.15) return rightTurn;
+  stickPair(rightGp, "right", TURN_STICK);
+  if (Math.abs(TURN_STICK.x) > 0.15) return TURN_STICK;
   const leftGp = controllerGamepad(leftControllerRef);
-  return stickPair(leftGp, "right");
+  stickPair(leftGp, "right", TURN_STICK);
+  return TURN_STICK;
 }
 
 export function cameraForwardVectors(renderer, camera){
   const xrCam = renderer?.xr?.getCamera?.(camera) || camera;
-  const forward = new THREE.Vector3(0, 0, -1);
-  if (xrCam?.getWorldDirection) xrCam.getWorldDirection(forward);
-  forward.y = 0;
-  if (forward.lengthSq() < 1e-5) forward.set(0, 0, -1);
-  forward.normalize();
-  const right = new THREE.Vector3(forward.z, 0, -forward.x).normalize();
-  return { forward, right };
+  FORWARD.set(0, 0, -1);
+  if (xrCam?.getWorldDirection) xrCam.getWorldDirection(FORWARD);
+  FORWARD.y = 0;
+  if (FORWARD.lengthSq() < 1e-5) FORWARD.set(0, 0, -1);
+  FORWARD.normalize();
+  RIGHT.set(FORWARD.z, 0, -FORWARD.x).normalize();
+  return { forward: FORWARD, right: RIGHT };
 }
 
 export function nextCameraForwardPosition({ renderer, camera, leftControllerRef, rightControllerRef, playerX, playerZ, roomClamp, dt, speed = 2.2 }){
   const move = movementStick(leftControllerRef, rightControllerRef);
-  if (Math.hypot(move.x, move.y) < 0.12) return { x: playerX, z: playerZ, moved: false };
-  const { forward, right } = cameraForwardVectors(renderer, camera);
+  if (Math.hypot(move.x, move.y) < 0.12){
+    NEXT_POS.x = playerX;
+    NEXT_POS.z = playerZ;
+    NEXT_POS.moved = false;
+    return NEXT_POS;
+  }
+  const vectors = cameraForwardVectors(renderer, camera);
+  const forward = vectors.forward;
+  const right = vectors.right;
   const forwardAmount = -move.y;
   const strafeAmount = move.x * 0.65;
   const stepX = (forward.x * forwardAmount + right.x * strafeAmount) * speed * dt;
   const stepZ = (forward.z * forwardAmount + right.z * strafeAmount) * speed * dt;
-  return {
-    x: THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp),
-    z: THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp),
-    moved: true
-  };
+  NEXT_POS.x = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
+  NEXT_POS.z = THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp);
+  NEXT_POS.moved = true;
+  return NEXT_POS;
 }
 
 export function shouldSnapTurn(leftControllerRef, rightControllerRef, cooldownReady){
@@ -81,8 +101,9 @@ export function shouldSnapTurn(leftControllerRef, rightControllerRef, cooldownRe
 
 window.SVR_LOCOMOTION_LOCK = {
   phase: LOCOMOTION_PHASE,
-  movement: "left stick camera-forward",
+  movement: "left stick camera-forward with right-controller fallback",
   snapTurn: "right stick 45 degrees",
   fallback: "right controller left-stick pair if needed",
-  teleport: "hold aim and release commit"
+  teleport: "hold trigger/A/grip or hand fist/pinch and release commit",
+  allocationPolicy: "reused vectors/objects in hot path"
 };
