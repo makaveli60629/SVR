@@ -8,12 +8,21 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createDatabaseClient } from "./modules/database_client.js";
+import { CONFIG } from "./modules/config.js";
+import { createViewPerformanceManager } from "./modules/view_performance_manager.js";
+import { installHighSkyNorthEast } from "./modules/high_sky_north_east.js";
 
+const PHASE_BUILD = "PHASE-129-VIEW-PERFORMANCE-SPAWN-TELEPORT-MODULE-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
+
+window.SVR_BUILD_PHASE = PHASE_BUILD;
+window.SVR_CURRENT_GAME_PHASE = PHASE_BUILD;
+window.SVR_SITE_TOUCHED_BY_GAME_TRACK = false;
+document.documentElement.dataset.svrBuild = PHASE_BUILD;
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -44,11 +53,13 @@ function setMode(text){
 
 function log(...args){
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
-  $log.textContent += line + "\n";
-  $log.scrollTop = $log.scrollHeight;
+  if ($log){
+    $log.textContent += line + "\n";
+    $log.scrollTop = $log.scrollHeight;
+  }
 }
 
-$toggleLog.addEventListener("click", ()=>{
+$toggleLog?.addEventListener("click", ()=>{
   $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
 });
 
@@ -56,9 +67,18 @@ if (AUTOCAM) document.body.classList.add("preview-mode");
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData._camera = camera;
-camera.position.set(0, 1.6, 4.8);
-camera.lookAt(0, 1.15, 0);
+const worldRoot = new THREE.Group();
+worldRoot.name = "SVR_WORLD_ROOT_PHASE129";
+scene.add(worldRoot);
+window.SVR_WORLD_ROOT = worldRoot;
 
+function forceSafeDesktopSpawn(){
+  if (renderer?.xr?.isPresenting) return;
+  camera.position.set(CONFIG.SPAWN_X, 1.6, CONFIG.SPAWN_Z);
+  camera.lookAt(0, 1.32, -8);
+  camera.updateProjectionMatrix?.();
+}
+forceSafeDesktopSpawn();
 
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
@@ -70,12 +90,23 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
+const perf = createViewPerformanceManager({ renderer, scene, camera, worldRoot, statusCb: (text)=>setStatus(text, { force:true }) });
+const highSky = installHighSkyNorthEast({ scene, worldRoot });
+
 setStatus("Loading world…", { force: true });
-const world = await buildSkylineRoom(scene, { log, renderer });
+const world = await buildSkylineRoom(worldRoot, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
+forceSafeDesktopSpawn();
+
+if (!sceneTargets.pgaDrive) sceneTargets.pgaDrive = sceneTargets.pgaWall || sceneTargets.pga || sceneTargets.lobby;
+if (!sceneTargets.chipPutt) sceneTargets.chipPutt = sceneTargets.pgaWall || sceneTargets.pga || sceneTargets.lobby;
+if (!sceneTargets.storeRoom) sceneTargets.storeRoom = sceneTargets.sponsor || sceneTargets.lobby;
+if (!sceneTargets.smokerLounge) sceneTargets.smokerLounge = sceneTargets.sponsor || sceneTargets.lobby;
+if (!sceneTargets.reikiRoom) sceneTargets.reikiRoom = sceneTargets.reiki || sceneTargets.lobby;
+window.SVR_SCENE_TARGETS = sceneTargets;
 
 const hands = createHands({ scene, renderer, log });
-const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
+const tp = createTeleportRig({ scene, renderer, camera, roomClamp, worldRoot, log });
 const dbClient = createDatabaseClient({
   log,
   statusCb: (dbState)=>{
@@ -84,9 +115,8 @@ const dbClient = createDatabaseClient({
 });
 dbClient.health().then((dbState)=>{
   log('[SVR DB]', dbState);
-  dbClient.postGameEvent('game_boot', { build: 'PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK', preview: PREVIEW, embed: EMBED });
+  dbClient.postGameEvent('game_boot', { build: PHASE_BUILD, preview: PREVIEW, embed: EMBED });
 }).catch((error)=> log('[SVR DB] init failed', error?.message || error));
-
 
 const audio = createAudioPlaylist({
   tracks: [
@@ -96,14 +126,8 @@ const audio = createAudioPlaylist({
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
-    if (state.error){
-      setStatus(`Audio: ${state.error}`);
-      return;
-    }
-    if (state.enabled){
-      setStatus(`Now Playing: ${state.trackTitle}`);
-      return;
-    }
+    if (state.error){ setStatus(`Audio: ${state.error}`); return; }
+    if (state.enabled){ setStatus(`Now Playing: ${state.trackTitle}`); return; }
     setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
   }
 });
@@ -113,29 +137,15 @@ let seatIndex = -1;
 let cash = 50000;
 
 function currentHeadXZ(){
-  if (renderer.xr.isPresenting){
-    const xrCam = renderer.xr.getCamera(camera);
-    const p = new THREE.Vector3();
-    xrCam.getWorldPosition(p);
-    return p;
-  }
+  if (renderer.xr.isPresenting) return new THREE.Vector3(tp.getPlayerPose().x, 0, tp.getPlayerPose().z);
   return camera.position.clone();
 }
-
 function inTableZone(){
   const p = currentHeadXZ();
   return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7);
 }
-
-function seatLabel(){
-  return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing";
-}
-
-function moveDesktopToSeat(seat){
-  camera.position.set(seat.x, 1.12, seat.z);
-  camera.lookAt(0, 1.0, 0);
-}
-
+function seatLabel(){ return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing"; }
+function moveDesktopToSeat(seat){ camera.position.set(seat.x, 1.12, seat.z); camera.lookAt(0, 1.0, 0); }
 function joinTable(){
   if (!inTableZone()) return false;
   const p = currentHeadXZ();
@@ -149,37 +159,26 @@ function joinTable(){
   seatIndex = best;
   seated = true;
   const seat = seats[best];
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(seat.x, -0.42, seat.z);
-  } else {
-    moveDesktopToSeat(seat);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(seat.x, -0.42, seat.z);
+  else moveDesktopToSeat(seat);
   setMode(`Seat: ${seat.label}`);
   return true;
 }
-
 function leaveTable(){
   seated = false;
   seatIndex = -1;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(0, 0, 4.8);
-  } else {
-    camera.position.set(0, 1.6, 4.8);
-    camera.lookAt(0, 1.15, 0);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
+  else forceSafeDesktopSpawn();
   return true;
 }
-
 function movePlayerToSpot(target, lookTarget = null){
   if (!target) return;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(target.x, 0, target.z);
-  } else {
+  if (renderer.xr.isPresenting) tp.setPlayerPose(target.x, 0, target.z);
+  else {
     camera.position.set(target.x, 1.6, target.z);
     if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z);
   }
 }
-
 function gotoScene(key){
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
@@ -191,16 +190,9 @@ function gotoScene(key){
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
     const route = btn.dataset.route;
-    if (route){
-      dbClient?.postGameEvent?.('scene_route', { route });
-      location.href = route;
-      return;
-    }
+    if (route){ dbClient?.postGameEvent?.('scene_route', { route }); location.href = route; return; }
     const key = btn.dataset.scene;
-    if (key){
-      dbClient?.postGameEvent?.('scene_jump', { key });
-      gotoScene(key);
-    }
+    if (key){ dbClient?.postGameEvent?.('scene_jump', { key }); gotoScene(key); }
   });
 });
 
@@ -220,6 +212,10 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit7") gotoScene("sponsor");
   if (e.code === "Digit8") gotoScene("scorpion");
   if (e.code === "Digit9") gotoScene("reikiRoom");
+  if (e.code === "Digit0") gotoScene("pgaDrive");
+  if (e.code === "KeyK") gotoScene("chipPutt");
+  if (e.code === "KeyO") gotoScene("storeRoom");
+  if (e.code === "KeyB") gotoScene("smokerLounge");
 });
 
 const watch = createWristWatch({
@@ -249,11 +245,15 @@ const watch = createWristWatch({
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom")
+    goReikiRoom: ()=>gotoScene("reikiRoom"),
+    goPgaDrive: ()=>gotoScene("pgaDrive"),
+    goChipPutt: ()=>gotoScene("chipPutt"),
+    goStoreRoom: ()=>gotoScene("storeRoom"),
+    goSmokerLounge: ()=>gotoScene("smokerLounge")
   }
 });
 
-$toggleJoints.addEventListener("click", ()=>{
+$toggleJoints?.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
@@ -262,7 +262,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. PHASE-85-ESPRESSO-BANNER-RESTORE-LOCK. DB API safe-mode enabled. Lobby routes are modular.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 129 safe spawn, world-root teleport, high sky, and performance module active.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -271,7 +271,6 @@ function setHudVisible(visible){
   if ($log) $log.style.display = "none";
   if ($err) $err.style.display = "none";
 }
-
 if (AUTOCAM) setHudVisible(false);
 if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display","none");
 
@@ -283,9 +282,11 @@ renderer.xr.addEventListener("sessionstart", async ()=>{
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
+  tp.onSessionEnd?.();
   setHudVisible(true);
   const nav = document.getElementById("sceneNav");
   if (nav && !AUTOCAM) nav.style.display = "flex";
+  forceSafeDesktopSpawn();
 });
 
 let tPrev = performance.now();
@@ -301,6 +302,8 @@ renderer.setAnimationLoop(()=>{
   const now = performance.now();
   const dt = Math.min((now - tPrev) / 1000, 0.033);
   tPrev = now;
+  perf.update(dt);
+  highSky?.update?.(dt);
 
   if (!renderer.xr.isPresenting){
     if (!AUTOCAM) desktop.update(dt);
@@ -322,6 +325,7 @@ renderer.setAnimationLoop(()=>{
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
 
+  if (worldRoot.userData._tickWorld) worldRoot.userData._tickWorld(dt);
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
 
   hands.update(dt);
@@ -332,15 +336,7 @@ renderer.setAnimationLoop(()=>{
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
   if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({
-      dt,
-      leftHand,
-      rightHand,
-      leftController,
-      rightController,
-      statusCb: (text)=>{ setStatus(text); },
-      modeCb: (text)=>{ setMode(text); }
-    });
+    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>setStatus(text), modeCb: (text)=>setMode(text) });
   }
 
   if (watch) watch.update(dt, leftHand, rightHand);
