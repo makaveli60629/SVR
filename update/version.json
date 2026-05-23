@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-129-VIEW-PERFORMANCE-SPAWN-TELEPORT-MODULE-LOCK",
+  "build": "PHASE-130-ORBIT-SKY-PERFORMANCE-STABILITY-LOCK",
   "scope": "game-only",
-  "fix": "full game entry rewired to safe spawn outside the table, world-root XR locomotion/teleport without reference-space mutation, visible high sky Moon north and Mars east module, and modular view/performance manager for black-edge/performance control",
+  "fix": "Moon and Mars enlarged, raised high above the lobby, and set to slow orbit; Quest view/performance manager tightened with lower framebuffer scale, high foveation, reduced fog/lights, shadow disable, and black-edge projection mitigation",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-128-SPAWN-TELEPORT-SKY-NORTH-LOCK"
+  "previousStableBuild": "PHASE-129-VIEW-PERFORMANCE-SPAWN-TELEPORT-MODULE-LOCK"
 }
