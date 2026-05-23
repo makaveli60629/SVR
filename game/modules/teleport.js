@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { CONFIG } from "./config.js";
 import { isPinching, isFist, aimPoint } from "./gestures.js";
 
-const PHASE = "PHASE-96-TELEPORT-RELEASE-HAND-FIRE-LOCK";
+const PHASE = "PHASE-97-CAMERA-FORWARD-CONTROLLER-LOCK";
 
 export function createTeleportRig({ scene, renderer, camera, roomClamp, log = console.log }){
   let baseRefSpace = null;
@@ -177,55 +177,64 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   function controllerGamepad(proxy){ return proxy?.userData?.gamepad || proxy?.userData?.inputSource?.gamepad || proxy?.userData?.controller?.inputSource?.gamepad || null; }
   function getButtonValue(gp, idx){ return gp?.buttons?.[idx]?.value || 0; }
   function controllerTriggerValue(proxy){ const gp = controllerGamepad(proxy); return gp ? Math.max(getButtonValue(gp,0), getButtonValue(gp,1), getButtonValue(gp,4), getButtonValue(gp,5)) : 0; }
-  function dead(v, zone=.14){ return Math.abs(v || 0) < zone ? 0 : (v || 0); }
-
-  function getStick(gp, pair="left"){
+  function dead(v, zone=.16){ return Math.abs(v || 0) < zone ? 0 : (v || 0); }
+  function stickPair(gp, pair="left"){
     if (!gp?.axes?.length) return { x:0, y:0 };
     const axes = gp.axes;
     const a = pair === "right" && axes.length >= 4 ? { x:axes[2]||0, y:axes[3]||0 } : { x:axes[0]||0, y:axes[1]||0 };
     return { x:dead(a.x), y:dead(a.y) };
   }
 
-  function bestMoveStick(){
-    const gps = [controllerGamepad(leftControllerRef), controllerGamepad(rightControllerRef)].filter(Boolean);
-    let best = { x:0, y:0 };
-    for (const gp of gps){
-      for (const pair of ["left", "right"]){
-        const s = getStick(gp, pair);
-        if (Math.hypot(s.x, s.y) > Math.hypot(best.x, best.y)) best = s;
-      }
-    }
-    return best;
+  function movementStick(){
+    // PHASE 97 LOCK: movement only comes from the left/movement stick pair.
+    // The right stick is reserved for snap turn so it cannot accidentally strafe/spin the user and cause dizziness.
+    const leftGp = controllerGamepad(leftControllerRef);
+    const rightGp = controllerGamepad(rightControllerRef);
+    const leftMove = stickPair(leftGp, "left");
+    if (Math.hypot(leftMove.x, leftMove.y) > .12) return leftMove;
+    const rightMoveFallback = stickPair(rightGp, "left");
+    if (Math.hypot(rightMoveFallback.x, rightMoveFallback.y) > .12) return rightMoveFallback;
+    return { x:0, y:0 };
   }
 
-  function bestTurnStick(){
-    const right = controllerGamepad(rightControllerRef);
-    const left = controllerGamepad(leftControllerRef);
-    const r = right ? getStick(right, "right") : { x:0, y:0 };
-    if (Math.abs(r.x) > .15) return r;
-    return left ? getStick(left, "right") : r;
+  function turnStick(){
+    // PHASE 97 LOCK: snap turn prefers the right stick x axis only.
+    const rightGp = controllerGamepad(rightControllerRef);
+    const rightTurn = stickPair(rightGp, "right");
+    if (Math.abs(rightTurn.x) > .15) return rightTurn;
+    const leftGp = controllerGamepad(leftControllerRef);
+    return stickPair(leftGp, "right");
   }
 
   function movePlayerFromControllers(dt){
     if (!renderer?.xr?.isPresenting) return;
-    const moveStick = bestMoveStick();
-    const turnStick = bestTurnStick();
-    if (Math.abs(turnStick.x) > .72 && performance.now() > snapCooldownUntil){
-      playerYaw += Math.sign(turnStick.x) * (Math.PI / 4);
+    const move = movementStick();
+    const turn = turnStick();
+
+    if (Math.abs(turn.x) > .72 && performance.now() > snapCooldownUntil){
+      playerYaw += Math.sign(turn.x) * (Math.PI / 4);
       applyReferenceSpace();
-      snapCooldownUntil = performance.now() + 220;
+      snapCooldownUntil = performance.now() + 260;
     }
-    if (Math.hypot(moveStick.x, moveStick.y) < .12) return;
+
+    if (Math.hypot(move.x, move.y) < .12) return;
+
     const xrCam = renderer.xr.getCamera(camera);
+    if (!xrCam) return;
     xrCam.getWorldDirection(headDir);
     headDir.y = 0;
     if (headDir.lengthSq() < 1e-5) headDir.set(0, 0, -1);
     headDir.normalize();
     rightDir.set(headDir.z, 0, -headDir.x).normalize();
-    const speed = 3.05;
-    const stepX = (rightDir.x * moveStick.x + headDir.x * (-moveStick.y)) * speed * dt;
-    const stepZ = (rightDir.z * moveStick.x + headDir.z * (-moveStick.y)) * speed * dt;
+
+    // Forward/back is exactly where the headset/camera is looking. X only strafes relative to that same view.
+    const speed = 2.45;
+    const forward = -move.y;
+    const strafe = move.x * 0.70;
+    const stepX = (headDir.x * forward + rightDir.x * strafe) * speed * dt;
+    const stepZ = (headDir.z * forward + rightDir.z * strafe) * speed * dt;
     setPlayerXZ(THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp), THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp));
+    window.SVR_CAMERA_FORWARD_MOVEMENT = { phase: PHASE, forward:"headset-camera-yaw", movementStick:"left-stick-only", snapTurn:"right-stick-only" };
   }
 
   function controllerAimPoint(proxy){
@@ -313,8 +322,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
 
     if (!mode || !active){
       resetTeleportVisuals();
-      statusCb((leftControllerRef || rightControllerRef) ? "Controllers active • stick move • right stick snap • hold trigger/A then release TP" : "TELEPORT OFF • make fist to turn on purple hand fire");
-      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist toggles TP");
+      statusCb((leftControllerRef || rightControllerRef) ? "Left stick moves where camera looks • right stick snap turns • trigger/A teleports" : "TELEPORT OFF • make fist to turn on purple hand fire");
+      modeCb((leftControllerRef || rightControllerRef) ? "Camera-forward locomotion locked" : "Hands ready • fist toggles TP");
       return;
     }
 
