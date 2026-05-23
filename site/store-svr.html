@@ -1,111 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SVR Game Store | SVR Poker</title>
-  <meta name="description" content="SVR core game item store with sample products and sandbox cart." />
-  <link rel="icon" href="../logo.webp" type="image/webp" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../style.css" />
-  <link rel="stylesheet" href="store-phase03.css" />
-  <link rel="stylesheet" href="store-card-fix.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SVR Poker | SVR Game Items</title>
+<meta name="description" content="SVR Poker professional marketing page."/>
+<link rel="icon" href="../logo.webp" type="image/webp"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site-market.css"/>
 </head>
-<body>
-  <canvas id="binary-rain" aria-hidden="true"></canvas>
-  <div class="site-shell">
-    <nav class="site-nav">
-  <div class="nav-brand">
-    <img src="../logo.webp" alt="SVR Poker logo" />
-    <div><strong>SVR POKER</strong><span>All In</span></div>
-  </div>
-  <div class="nav-links">
-    <span class="admin-status online" data-state="online">● Admin Online</span>
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="sponsorship.html">Sponsorship</a>
-    <a href="membership.html">Membership</a>
-    <a href="impact.html">Impact</a>
-    <a href="store.html">Store</a>
-    <a href="donate.html">Donate</a>
-    <a href="contact.html">Contact</a>
-    <a href="../index.html">Launch</a>
-  </div>
+<body class="svr-market">
+<canvas id="binary-rain" aria-hidden="true"></canvas>
+<div class="market-page">
+<nav class="market-nav">
+<a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Premium Social VR</span></div></a>
+<div class="market-links"><span class="status-pill">ADMIN ONLINE</span><a href="index.html">Home</a><a href="about.html">About</a><a href="sponsorship.html">Sponsors</a><a href="advertising.html">Advertising</a><a href="billboards.html">Billboards</a><a href="store.html">Store</a><a href="membership.html">Membership</a><a href="impact.html">Impact</a><a href="contact.html">Contact</a></div>
 </nav>
-    <main class="site-card">
+<main class="market-shell">
+<section class="hero"><div><span class="kicker">Store</span><h1>SVR Store</h1><p class="lead">A polished storefront for digital items, apparel concepts, sponsor products, collectibles, and VR-friendly shopping.</p><p class="copy">The store gives visitors a clear idea of what SVR can sell and promote: avatar clothing, table themes, chip styles, partner products, event drops, and premium memberships.</p></div><aside class="hero-card"><img src="assets/marketing/store-feature.svg" alt="SVR Store banner"></aside></section>
+<section class="section"><div class="grid3"><article class="card"><h3>Game Items</h3><p>Watch skins, table themes, card backs, chip designs, avatar gear, and room cosmetics.</p></article><article class="card"><h3>Partner Products</h3><p>Approved sponsor goods, lifestyle products, services, and storefront features.</p></article><article class="card"><h3>Event Drops</h3><p>Limited themed items connected to sponsor nights, community events, and tournaments.</p></article></div></section>
 
-      <section class="store-banner svr-hero" style="margin-top:0;">
-        <span class="store-kicker">SVR Core Items</span>
-        <h1 class="store-title">SVR Game Store</h1>
-        <p class="store-lead">Core SVR items for future avatar cosmetics, table visuals, watch skins, event access, and controlled sponsor placements.</p>
-        <div class="category-strip"><a href="store.html">All Stores</a><a class="active" href="store-svr.html">SVR Game Store</a><a href="cart.html">Cart</a><a href="stripe-sandbox.html">Stripe Sandbox</a></div>
-      </section>
-      <section class="store-section"><div class="cart-layout"><div><h2 class="section-title">Sample Products</h2><p class="section-copy">SVR-owned products stay central and can later sync to the VR store portal and player inventory.</p><div class="product-grid aligned-products">
-<article class="product-card">
-      <div class="product-media item-banner watch-banner"><span class="item-banner-svr">SVR</span><span class="product-icon">⌚</span><span class="item-banner-label">WATCH SKIN</span></div>
-      <span class="store-pill">SVR Game Store</span>
-      <h3 class="product-title">Neon Watch Skin Pack</h3>
-      <p class="product-copy">Sample watch interface cosmetic themes.</p>
-      <div class="product-meta"><a class="btn btn-secondary price-button" href="#cart" data-add-cart data-name="Neon Watch Skin Pack" data-hub="SVR Game Store" data-price-cents="999">Add $9.99</a></div>
-    </article>
-<article class="product-card">
-      <div class="product-media item-banner glove-banner"><span class="item-banner-svr">SVR</span><span class="product-icon">🧤</span><span class="item-banner-label">GLOVE COLOR</span></div>
-      <span class="store-pill">SVR Game Store</span>
-      <h3 class="product-title">VR Glove Color Pack</h3>
-      <p class="product-copy">Sample glove cosmetic set for future avatar gear.</p>
-      <div class="product-meta"><a class="btn btn-secondary price-button" href="#cart" data-add-cart data-name="VR Glove Color Pack" data-hub="SVR Game Store" data-price-cents="1299">Add $12.99</a></div>
-    </article>
-<article class="product-card">
-      <div class="product-media item-banner chips-banner"><span class="item-banner-svr">SVR</span><span class="product-icon">♣</span><span class="item-banner-label">CHIP SKINS</span></div>
-      <span class="store-pill">SVR Game Store</span>
-      <h3 class="product-title">Tournament Chip Skin Set</h3>
-      <p class="product-copy">Sample chip skin pack for visual table customization.</p>
-      <div class="product-meta"><a class="btn btn-secondary price-button" href="#cart" data-add-cart data-name="Tournament Chip Skin Set" data-hub="SVR Game Store" data-price-cents="799">Add $7.99</a></div>
-    </article>
-<article class="product-card">
-      <div class="product-media item-banner cards-banner"><span class="item-banner-svr">SVR</span><span class="product-icon">🃏</span><span class="item-banner-label">CARD BACKS</span></div>
-      <span class="store-pill">SVR Game Store</span>
-      <h3 class="product-title">Premium Card Back Pack</h3>
-      <p class="product-copy">Sample card-back cosmetics for private tables.</p>
-      <div class="product-meta"><a class="btn btn-secondary price-button" href="#cart" data-add-cart data-name="Premium Card Back Pack" data-hub="SVR Game Store" data-price-cents="899">Add $8.99</a></div>
-    </article>
-<article class="product-card">
-      <div class="product-media item-banner felt-banner"><span class="item-banner-svr">SVR</span><span class="product-icon">🎲</span><span class="item-banner-label">TABLE FELT</span></div>
-      <span class="store-pill">SVR Game Store</span>
-      <h3 class="product-title">Table Felt Theme</h3>
-      <p class="product-copy">Sample felt and rail theme pack.</p>
-      <div class="product-meta"><a class="btn btn-secondary price-button" href="#cart" data-add-cart data-name="Table Felt Theme" data-hub="SVR Game Store" data-price-cents="1499">Add $14.99</a></div>
-    </article>
-<article class="product-card">
-      <div class="product-media item-banner city-banner"><span class="item-banner-svr">SVR</span><span class="product-icon">🌃</span><span class="item-banner-label">LOBBY SLOT</span></div>
-      <span class="store-pill">SVR Game Store</span>
-      <h3 class="product-title">City Lobby Poster Slot</h3>
-      <p class="product-copy">Sample poster/sponsor slot for controlled lobby visuals.</p>
-      <div class="product-meta"><a class="btn btn-secondary price-button" href="#cart" data-add-cart data-name="City Lobby Poster Slot" data-hub="SVR Game Store" data-price-cents="2499">Add $24.99</a></div>
-    </article>
-<article class="product-card">
-      <div class="product-media item-banner tee-banner"><span class="item-banner-svr">SVR</span><span class="product-icon">👕</span><span class="item-banner-label">ALL IN TEE</span></div>
-      <span class="store-pill">SVR Game Store</span>
-      <h3 class="product-title">All In Tee</h3>
-      <p class="product-copy">SVR apparel sample for launch merchandise.</p>
-      <div class="product-meta"><a class="btn btn-secondary price-button" href="#cart" data-add-cart data-name="All In Tee" data-hub="SVR Game Store" data-price-cents="2499">Add $24.99</a></div>
-    </article>
-<article class="product-card">
-      <div class="product-media item-banner event-banner"><span class="item-banner-svr">SVR</span><span class="product-icon">🎟</span><span class="item-banner-label">EVENT PASS</span></div>
-      <span class="store-pill">SVR Game Store</span>
-      <h3 class="product-title">Event Entry Preview</h3>
-      <p class="product-copy">Future event access placeholder. No live ticketing enabled.</p>
-      <div class="product-meta"><a class="btn btn-secondary price-button" href="#cart" data-add-cart data-name="Event Entry Preview" data-hub="SVR Game Store" data-price-cents="1999">Add $19.99</a></div>
-    </article>
-        </div></div><aside class="cart-panel" id="cart"><div class="store-kicker"><span class="store-dot"></span> Sandbox Cart</div><h3 class="hub-title">Cart Preview</h3><div data-cart-list></div><div class="cart-total"><span>Total</span><strong data-cart-total>$0.00</strong></div><div class="checkout-row"><a class="btn btn-primary" href="#" data-sandbox-checkout>Sandbox Checkout</a><a class="btn btn-secondary" href="#" data-clear-cart>Clear</a></div><p class="input-note" data-cart-status>No live sales. Stripe sandbox payload only.</p><div class="approval-note">Checkout is preview-only until backend, Stripe sandbox keys, tax/fulfillment rules, and final approval are wired.</div></aside></div></section>
-
-      <footer class="footer"><p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn btn-secondary" href="index.html">Back to Site</a><a class="btn btn-primary" href="../game/index.html">Preview Game</a></div></footer>
-    </main>
-  </div>
-  <script src="../matrix.js"></script>
-  <script src="../site-public-hooks.js"></script>
-  <script src="store-cart.js"></script>
-</body>
-</html>
+<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="../index.html">Public Launch</a><a class="btn primary" href="../game/index.html">Preview Game</a><a class="btn secondary" href="contact.html">Contact</a></div></footer>
+</main></div>
+<script src="../matrix.js"></script><script src="../site-public-hooks.js"></script><script src="js/market-ads.js"></script>
+</body></html>

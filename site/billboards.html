@@ -1,64 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SVR Poker | In-Game Billboard Program</title>
-  <meta name="description" content="Request future SVR in-game billboard, lobby banner, sponsor wall, and community campaign placement previews." />
-  <link rel="icon" href="../logo.webp" type="image/webp" />
-  <link rel="stylesheet" href="../style.css" />
-  <style>
-    .billboard-hero{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:center}.billboard-hero img{width:100%;border-radius:24px;border:1px solid rgba(255,216,121,.32);box-shadow:0 0 32px rgba(255,216,121,.16)}.placement-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.placement-grid article,.form-card{border:1px solid rgba(128,248,255,.24);border-radius:20px;background:rgba(5,0,16,.72);padding:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}select,textarea{width:100%;background:rgba(4,0,14,.9);color:#fff;border:1px solid rgba(128,248,255,.45);border-radius:14px;padding:12px}textarea{min-height:130px}.status-box{margin-top:12px;color:#80f8ff}@media(max-width:850px){.billboard-hero,.placement-grid,.form-grid{grid-template-columns:1fr}}
-  </style>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SVR Poker | Billboards</title>
+<meta name="description" content="SVR Poker professional marketing page."/>
+<link rel="icon" href="../logo.webp" type="image/webp"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site-market.css"/>
 </head>
-<body>
-  <canvas id="binary-rain" aria-hidden="true"></canvas>
-  <div class="site-shell">
-    <nav class="site-nav">
-      <div class="nav-brand"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>In-Game Billboard</span></div></div>
-      <div class="nav-links"><a href="index.html">Site Home</a><a href="register.html">Register</a><a href="sponsorship.html">Sponsorship</a><a href="store.html">Store</a><a href="../index.html">Launch</a></div>
-    </nav>
-    <main class="site-card">
-      <section class="section billboard-hero">
-        <div>
-          <div class="card-tag">Sponsor Module</div>
-          <h1 class="section-title">In-Game Billboard Program</h1>
-          <p class="section-copy">SVR billboard pages are for future approved sponsor banners, community awareness campaigns, event announcements, and in-game lobby placements. This is a request/intake page only — no public paid placement is activated from this page.</p>
-          <p class="setup-note">Approved placements can later be routed to lobby walls, game storefronts, Scorpion room displays, sponsor walls, private scenes, and monthly event boards.</p>
-        </div>
-        <img src="assets/images/billboard-program-update.svg" alt="SVR in-game billboard placement visual">
-      </section>
-      <section class="section">
-        <h2 class="section-title">Placement types</h2>
-        <div class="placement-grid">
-          <article><div class="card-tag">Lobby</div><h3>Wall Banner</h3><p>Brand-safe lobby banner or public awareness placement.</p></article>
-          <article><div class="card-tag">Private Scenes</div><h3>Room Banner</h3><p>Scene-specific panels for Scorpion, PGA, Store, Lounge, or Reiki placeholder routes.</p></article>
-          <article><div class="card-tag">Monthly</div><h3>Event Campaign</h3><p>Future sponsor-funded community campaign or prize-event announcement pending official rules.</p></article>
-        </div>
-      </section>
-      <section class="section form-card">
-        <h2 class="section-title">Request a billboard review</h2>
-        <form id="billboard-form">
-          <div class="form-grid">
-            <label>Name<input name="name" type="text" placeholder="Contact name" required></label>
-            <label>Email<input name="email" type="email" placeholder="you@example.com" required></label>
-            <label>Organization<input name="organization" type="text" placeholder="Company, cause, or community group"></label>
-            <label>Placement<select name="placement"><option value="lobby_wall">Lobby wall banner</option><option value="game_storefront">Game storefront</option><option value="scorpion_room">Scorpion room screen</option><option value="pga_range">PGA range board</option><option value="site_sponsor_page">Website sponsor page</option><option value="monthly_event">Monthly sponsor event</option></select></label>
-          </div>
-          <label>Campaign notes<textarea name="message" placeholder="Describe the ad, sponsor, cause, event, image needs, month requested, and whether this is a placeholder or approval-ready placement."></textarea></label>
-          <label class="section-copy"><input name="consent" type="checkbox" style="width:auto;margin-right:8px" required> I understand this is a review request. Sponsor placements require approval, disclosure, and legal/compliance review before going live.</label>
-          <button class="btn btn-primary" type="submit">Submit Billboard Request</button>
-          <p id="billboard-status" class="status-box">Ready.</p>
-        </form>
-      </section>
-    </main>
-  </div>
-  <script src="../matrix.js"></script>
-  <script>
-    const API='https://api.svrpoker.com';
-    const form=document.getElementById('billboard-form');
-    const status=document.getElementById('billboard-status');
-    form.addEventListener('submit',async(e)=>{e.preventDefault();status.textContent='Saving billboard request...';const fd=new FormData(form);const placement=fd.get('placement')||'lobby_wall';const body={leadType:'billboard_'+placement,name:fd.get('name'),email:fd.get('email'),organization:fd.get('organization'),message:fd.get('message')||('Billboard placement request: '+placement),source:'site/billboards.html',consent:fd.get('consent')==='on'};try{const res=await fetch(API+'/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await res.json();if(!res.ok||data.ok===false)throw new Error(data.error||'Request failed');status.textContent='Saved. Your billboard request is now visible in the owner admin panel.';form.reset();}catch(err){status.textContent='Could not reach live API. Please try again or use the contact page. '+err.message;}});
-  </script>
-</body>
-</html>
+<body class="svr-market">
+<canvas id="binary-rain" aria-hidden="true"></canvas>
+<div class="market-page">
+<nav class="market-nav">
+<a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Premium Social VR</span></div></a>
+<div class="market-links"><span class="status-pill">ADMIN ONLINE</span><a href="index.html">Home</a><a href="about.html">About</a><a href="sponsorship.html">Sponsors</a><a href="advertising.html">Advertising</a><a href="billboards.html">Billboards</a><a href="store.html">Store</a><a href="membership.html">Membership</a><a href="impact.html">Impact</a><a href="contact.html">Contact</a></div>
+</nav>
+<main class="market-shell">
+<section class="hero"><div><span class="kicker">Billboards</span><h1>VR Surfaces</h1><p class="lead">Billboards are the bridge between the website and the VR world.</p><p class="copy">The same banner used on the site can be placed on a building, storefront wall, room panel, or event board inside the game experience.</p></div><aside class="hero-card"><img src="assets/marketing/billboard-wall.svg" alt="VR billboard banner"></aside></section>
+<section class="section"><div class="banner-grid"><article class="banner-card"><img src="assets/marketing/espresso-ad.svg" alt="Espresso ad"><h3>Building Wall Example</h3><p>Espresso-style ad placement for a city building or sponsor wall.</p></article><article class="banner-card"><img src="assets/marketing/billboard-wall.svg" alt="Billboard"><h3>Lobby Billboard Example</h3><p>Clean visual format for lobby and private room signage.</p></article></div></section>
+
+<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="../index.html">Public Launch</a><a class="btn primary" href="../game/index.html">Preview Game</a><a class="btn secondary" href="contact.html">Contact</a></div></footer>
+</main></div>
+<script src="../matrix.js"></script><script src="../site-public-hooks.js"></script><script src="js/market-ads.js"></script>
+</body></html>

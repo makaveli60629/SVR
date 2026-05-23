@@ -1,0 +1,16 @@
+{
+  "phase": "SVR_SITE_PHASE05_MARKET_READY_POLISH",
+  "scope": "site-only",
+  "protected": [
+    "root index.html",
+    "launch.css",
+    "matrix.js",
+    "/game"
+  ],
+  "public_positioning": "premium marketing site with banners, sponsor pages, advertising features, store, membership, events, and impact",
+  "removed_from_public_copy": [
+    "SQL-focused language",
+    "unfinished-site wording",
+    "under construction messaging"
+  ]
+}
