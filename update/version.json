@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-142-TELEPORT-CRITICAL-QUEST-CONTROLLER-WATCH-MOON-MARS-LOCK",
-  "scope": "game-teleport-critical-quest-controller-watch-moon-mars-lock",
-  "fix": "made teleport a critical Quest-safe module with deferred teleport commit, no forced matrix update on teleport commit, simplified pointer/ring visuals, lightweight purple fire, preserved controller fallback, restored static Moon/Mars without sky/orbit, added watch orientation patch, added hand texture patch, and kept FPS emergency guard active",
+  "build": "PHASE-143-QUEST-CONTROLLER-AXIS-A-BUTTON-FREEZE-FIX-LOCK",
+  "scope": "game-controller-axis-and-teleport-freeze-fix",
+  "fix": "right controller movement now checks both Quest axis pairs for forward/back and left/right, 45-degree snap turn remains on horizontal stick movement, A/B buttons are disabled as teleport triggers because pressing A caused freezing, teleport uses trigger/grip only, and teleport target visuals are high-contrast green/yellow/cyan for visibility",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-141-QUEST-FPS-EMERGENCY-STABILITY-LOCK",
-  "nextBuild": "PHASE-143-BARE-TELEPORT-ONLY-DIAGNOSTIC-LOCK-IF-FREEZE-CONTINUES"
+  "previousStableBuild": "PHASE-142-TELEPORT-CRITICAL-QUEST-CONTROLLER-WATCH-MOON-MARS-LOCK",
+  "nextBuild": "PHASE-144-BARE-TELEPORT-ONLY-DIAGNOSTIC-LOCK-IF-FREEZE-CONTINUES"
 }
