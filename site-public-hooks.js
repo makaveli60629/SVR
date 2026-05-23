@@ -4,9 +4,9 @@
   const MESSAGE_KEY = 'svr_public_messages_backup';
   const SESSION_KEY = 'svr_site_session_id';
   const STATUS_REFRESH_MS = 30000;
-  const FORCE_ADMIN_ONLINE = true;
+  const FORCE_ADMIN_ONLINE = false;
 
-  let lastAdminState = 'online';
+  let lastAdminState = 'unknown';
 
   function sessionId() {
     try {
@@ -45,32 +45,37 @@
     }).catch(() => {});
   }
 
-  function setAdminVisualState(isOnline, sourceText) {
-    const forcedOnline = FORCE_ADMIN_ONLINE ? true : isOnline;
-    const state = forcedOnline ? 'online' : 'offline';
-    lastAdminState = state;
-    try { localStorage.setItem(ADMIN_KEY, state); } catch (e) {}
-    document.querySelectorAll('.admin-status,[data-admin-pill]').forEach((el) => {
-      el.dataset.state = state;
-      el.dataset.source = sourceText || 'site-lock';
-      el.classList.toggle('online', forcedOnline);
-      el.classList.toggle('offline', !forcedOnline);
-      const text = forcedOnline ? 'ADMIN ONLINE' : 'ADMIN OFFLINE';
-      const label = el.querySelector('[data-admin-label]');
-      if (label) label.textContent = text;
-      else el.textContent = text;
+  function getAdminBadgeElements() {
+    const all = Array.from(document.querySelectorAll('.admin-status,[data-admin-pill],.status-pill'));
+    return all.filter((el) => {
+      const text = (el.textContent || '').trim().toUpperCase();
+      return el.matches('.admin-status,[data-admin-pill]') || text.includes('ADMIN ONLINE') || text.includes('ADMIN OFFLINE') || text.includes('ADMIN STATUS');
     });
   }
 
-  function setAdminLoadingState() {
-    document.querySelectorAll('.admin-status,[data-admin-pill]').forEach((el) => {
+  function setAdminVisualState(isOnline, sourceText) {
+    const state = isOnline ? 'online' : 'offline';
+    lastAdminState = state;
+    try { localStorage.setItem(ADMIN_KEY, state); } catch (e) {}
+    getAdminBadgeElements().forEach((el) => {
+      el.dataset.state = state;
+      el.dataset.source = sourceText || 'api-or-fallback';
+      el.classList.toggle('online', isOnline);
+      el.classList.toggle('offline', !isOnline);
+      const text = isOnline ? 'ADMIN ONLINE' : 'ADMIN OFFLINE';
       const label = el.querySelector('[data-admin-label]');
-      if (label) label.textContent = 'ADMIN ONLINE';
-      else el.textContent = 'ADMIN ONLINE';
-      el.classList.add('online');
-      el.classList.remove('offline');
-      el.dataset.state = 'online';
+      if (label) label.textContent = text;
+      else el.textContent = text;
+      el.setAttribute('aria-label', text);
+      el.title = text;
     });
+    window.SVR_ADMIN_PRESENCE = { state, isOnline, source: sourceText || 'api-or-fallback', updatedAt: new Date().toISOString() };
+  }
+
+  function setAdminLoadingState() {
+    const fallback = (() => { try { return localStorage.getItem(ADMIN_KEY); } catch (e) { return null; } })();
+    if (fallback === 'offline') setAdminVisualState(false, 'local-loading');
+    else setAdminVisualState(true, 'loading');
   }
 
   async function fetchAdminStatus() {
@@ -80,14 +85,11 @@
   }
 
   async function paintAdminState() {
-    if (FORCE_ADMIN_ONLINE) {
-      setAdminVisualState(true, 'site-lock');
-      return;
-    }
     try {
       const data = await fetchAdminStatus();
       if (!data || data.ok === false) throw new Error(data && data.error ? data.error : 'Invalid admin status payload');
-      setAdminVisualState(Boolean(data.isOnline), 'api');
+      const online = Boolean(data.isOnline ?? data.online ?? data.adminOnline ?? data.status === 'online');
+      setAdminVisualState(online, 'api');
     } catch (error) {
       const fallback = (() => { try { return localStorage.getItem(ADMIN_KEY); } catch (e) { return null; } })();
       setAdminVisualState(fallback !== 'offline', 'fallback');
