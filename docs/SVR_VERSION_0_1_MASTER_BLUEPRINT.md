@@ -4,6 +4,12 @@
 
 SVR returns to GitHub + PowerShell + GitHub Actions workflow as the official deploy workflow. Remove the temporary NewServer rule from the public launch page and manifests. The project must be modular, performance-first, VR-ready, account-ready, AWS-database-ready, sponsor-ready, charity/impact-ready, and marketable as a professional interactive WebXR poker/social hub.
 
+## Current phase lock
+
+- Active program phase: `PHASE-135-MASTER-MANIFEST-DEPLOY-WORKFLOW-LOCK`
+- Current emergency playable baseline: `PHASE-133-STABLE-LOBBY-REFINE-REBASE-LOCK` with Phase 134 audit/performance correction.
+- Next build phase: `PHASE-136-STABLE-LOBBY-FULL-DEMO-REBUILD-LOCK`.
+
 ## Hosting and deploy workflow
 
 - Source of truth: GitHub repository `makaveli60629/SVR`.
@@ -11,6 +17,7 @@ SVR returns to GitHub + PowerShell + GitHub Actions workflow as the official dep
 - Operator workflow: PowerShell commands from a local repo checkout.
 - Temporary NewServer button/rule: removed.
 - Public site and game must align through stable routes, shared status metadata, and secure backend APIs.
+- Do not re-add external fallback server buttons unless explicitly requested.
 
 ## Database rule
 
@@ -44,6 +51,7 @@ Current active game structure:
 - `game/modules/` — isolated modules
 - `game/assets/` — runtime assets only
 - `docs/` — manifests and phase records
+- `scripts/` — PowerShell operator workflows
 - `update/version.json` — active build marker
 
 Do not rebuild into an obsolete root `index.js/world.js` structure unless explicitly requested. Preserve the `/game` modular architecture.
@@ -110,7 +118,7 @@ Rebuild a full lobby demo using the prior stable baseline and the master manifes
 - Winning hand display.
 - Pot/winner banner.
 - Winning station/avatar highlight.
-- Dealer should not rely on spoken win announcement.
+- Dealer should not rely on spoken/audio win announcement.
 - Hand history strip.
 
 ## Multiplayer/account readiness
@@ -160,8 +168,8 @@ Primary VR poker/social casino competitors include Vegas Infinite/PokerStars VR-
 
 ## Phase ladder
 
-- Phase 135: Master manifest cleanup and deploy workflow lock.
-- Phase 136: Stable lobby rebuild module pass.
+- Phase 135: Master manifest cleanup and deploy workflow lock. **DONE.**
+- Phase 136: Stable lobby rebuild module pass. **NEXT.**
 - Phase 137: Movement/locomotion/teleport module lock.
 - Phase 138: Watch UI and input bridge lock.
 - Phase 139: Poker gameplay table/state lock.
@@ -171,6 +179,15 @@ Primary VR poker/social casino competitors include Vegas Infinite/PokerStars VR-
 - Phase 143: Sponsorship/charity/marketing integration manifest.
 - Phase 144: Multiplayer readiness manifest.
 - Phase 145: Quest performance certification checklist.
+
+## Phase 135 files
+
+- `docs/PHASE-135-MASTER-MANIFEST-DEPLOY-WORKFLOW-LOCK.md`
+- `scripts/SVR-Phase135-Deploy-And-Audit.ps1`
+- `docs/SVR_VERSION_0_1_MASTER_BLUEPRINT.md`
+- `update/version.json`
+- `index.html`
+- `launch.css`
 
 ## Master rule
 
