@@ -1,0 +1,21 @@
+{
+  "phase": "SVR_SITE_PHASE09_FULL_INTERACTIVE_SITE_GAME_AI",
+  "scope": "site-only",
+  "protected": [
+    "root index.html",
+    "launch.css",
+    "matrix.js",
+    "/game"
+  ],
+  "features": [
+    "connected admin/server/database badge display",
+    "AI chat room shell",
+    "site-game bridge",
+    "login/profile pages",
+    "VR UI page",
+    "admin preview",
+    "populated player/room/ad tables",
+    "Espresso ad module",
+    "correct logo asset"
+  ]
+}
