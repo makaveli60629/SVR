@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-126-NPC-AVATAR-PROFESSIONAL-POLISH-LOCK",
+  "build": "PHASE-127-STALE-PHASE-104-UNLOCK-LOCK",
   "scope": "game-only",
-  "fix": "NPC avatar professional polish pass with improved procedural fallback bodies, eyes, hands, card and chip props, smoother idle motions, coach pointing, card peek, chip reach, and calm breathing",
+  "fix": "game entry page unlocked from stale Phase 104 label and rewired with latest module stack cache busters",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-125-PRIVATE-SCENE-INTERACTION-POLISH-LOCK"
+  "previousStableBuild": "PHASE-126-NPC-AVATAR-PROFESSIONAL-POLISH-LOCK"
 }
