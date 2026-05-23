@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-135-MASTER-MANIFEST-DEPLOY-WORKFLOW-LOCK",
-  "scope": "project-workflow-lock",
-  "fix": "removed temporary NewServer public rule, restored GitHub PowerShell Auto Workflow as the official deploy path, added SVR-Version 0.1 master blueprint status, added Phase 135 manifest, and added PowerShell deploy/audit workflow",
-  "siteTouched": true,
-  "gameTouched": false,
-  "previousStableBuild": "PHASE-133-STABLE-LOBBY-REFINE-REBASE-LOCK",
-  "nextBuild": "PHASE-136-STABLE-LOBBY-FULL-DEMO-REBUILD-LOCK"
+  "build": "PHASE-136-STABLE-LOBBY-FULL-DEMO-REBUILD-LOCK",
+  "scope": "game-lobby-floor-texture-demo-rebuild",
+  "fix": "added a stronger textured SVR-Version 0.1 lobby floor, safe spawn pad, north arrow, improved portal/wall presentation, visible hub portal layout, and high orbit Moon/Mars through the stable lobby module while preserving Quest performance rules",
+  "siteTouched": false,
+  "gameTouched": true,
+  "previousStableBuild": "PHASE-135-MASTER-MANIFEST-DEPLOY-WORKFLOW-LOCK",
+  "nextBuild": "PHASE-137-MOVEMENT-LOCOMOTION-TELEPORT-MODULE-LOCK"
 }
