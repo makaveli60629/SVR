@@ -19,6 +19,7 @@ const M0 = new THREE.Matrix4();
 const FLIP_Q = new THREE.Quaternion();
 const SCREEN_TILT_Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.34);
 const DISPLAY_MIRRORED = false;
+const DISPLAY_ROTATE_180 = true;
 
 function getJointWorld(hand, names){
   if (!hand?.joints) return null;
@@ -120,19 +121,12 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   screenFront.rotation.z = 0;
   group.add(screenFront);
 
-  const screenBack = new THREE.Mesh(
-    new THREE.PlaneGeometry(plateW * 0.965, plateH * 0.965),
-    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.BackSide, depthWrite: false, depthTest: false, opacity: 0.0, toneMapped: false })
-  );
-  screenBack.visible = false;
-
-
   function drawButton(btn, hovered){
     ctx.save();
-    ctx.fillStyle = hovered ? 'rgba(180,140,255,0.28)' : 'rgba(255,255,255,0.08)';
-    ctx.strokeStyle = hovered ? 'rgba(180,140,255,0.95)' : 'rgba(180,140,255,0.35)';
-    ctx.lineWidth = hovered ? 5 : 3;
-    rr(ctx, btn.x, btn.y, btn.w, btn.h, 18);
+    ctx.fillStyle = hovered ? 'rgba(105,232,255,0.26)' : 'rgba(255,255,255,0.08)';
+    ctx.strokeStyle = hovered ? 'rgba(105,232,255,0.95)' : 'rgba(180,140,255,0.38)';
+    ctx.lineWidth = hovered ? 6 : 3;
+    rr(ctx, btn.x, btn.y, btn.w, btn.h, 24);
     ctx.fill();
     ctx.stroke();
     ctx.fillStyle = hovered ? '#ffffff' : '#e8e8ff';
@@ -143,32 +137,19 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ctx.restore();
   }
 
+  function buildButtons(state){
+    const buttons = [
+      { id: 'siteHub', label: 'SITE HUB', x: 30, y: 128, w: 310, h: 116, font: 42, hold: 0.16, margin: 8 },
+      { id: 'rooms', label: 'ROOMS', x: 358, y: 128, w: 300, h: 116, font: 42, hold: 0.16, margin: 8 },
+      { id: 'teleport', label: state.teleportEnabled ? 'TELEPORT ON' : 'TELEPORT', x: 676, y: 128, w: 318, h: 116, font: 38, hold: 0.16, margin: 8 },
+      { id: 'join', label: state.seated ? 'LEAVE TABLE' : 'JOIN TABLE', x: 30, y: 270, w: 310, h: 92, font: 32, hold: 0.16, margin: 8 },
+      { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC', x: 358, y: 270, w: 300, h: 92, font: 32, hold: 0.18, margin: 8 },
+      { id: 'next', label: 'NEXT', x: 676, y: 270, w: 318, h: 92, font: 32, hold: 0.18, margin: 8 },
+    ];
+    return buttons;
+  }
 
-
-function buildButtons(state){
-  const buttons = [
-    { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'tableScene', label: 'TABLE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-
-    { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'legendScene', label: 'LEGEND', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
-
-    { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'reikiRoomScene', label: 'ZEN DEN', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-
-    { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
-  ];
-  if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
-  else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 428, y: 120, w: 548, h: 48, font: 28, pinchOnly: true, hold: 0.18, margin: 8 });
-  return buttons;
-}
-
-let hoveredId = null;
+  let hoveredId = null;
   let pressed = false;
   let hoverTime = 0;
   let pinchTime = 0;
@@ -178,59 +159,54 @@ let hoveredId = null;
 
   function draw(force = false){
     const state = getState();
-    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, sec: new Date().getSeconds() });
+    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, tp: state.teleportEnabled, sec: new Date().getSeconds() });
     if (!force && sig === lastSig) return;
     lastSig = sig;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
+    if (DISPLAY_ROTATE_180){
+      ctx.translate(canvas.width, canvas.height);
+      ctx.rotate(Math.PI);
+    }
     if (DISPLAY_MIRRORED){
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
     }
     const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    grad.addColorStop(0, 'rgba(5,8,16,0.90)');
-    grad.addColorStop(1, 'rgba(18,10,32,0.94)');
+    grad.addColorStop(0, 'rgba(5,8,16,0.94)');
+    grad.addColorStop(1, 'rgba(18,10,32,0.97)');
     ctx.fillStyle = grad;
     rr(ctx, 12, 12, 1000, 488, 34);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(180,140,255,0.6)';
+    ctx.strokeStyle = 'rgba(105,232,255,0.62)';
     ctx.lineWidth = 6;
     rr(ctx, 12, 12, 1000, 488, 34);
     ctx.stroke();
 
     const now = new Date();
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 58px system-ui, Arial';
+    ctx.font = 'bold 52px system-ui, Arial';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 42, 66);
+    ctx.fillText('SVR WATCH', 34, 58);
 
     ctx.textAlign = 'right';
     ctx.fillStyle = '#7ff5c7';
-    ctx.font = 'bold 40px system-ui, Arial';
-    ctx.fillText(`$${Number(state.cash || 0).toLocaleString()}`, 972, 66);
+    ctx.font = 'bold 36px system-ui, Arial';
+    ctx.fillText(`$${Number(state.cash || 0).toLocaleString()}`, 972, 58);
 
     ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(233,233,255,0.95)';
-    ctx.font = 'bold 30px system-ui, Arial';
-    ctx.fillText('SVR WRIST CONSOLE', 34, 112);
-    ctx.fillStyle = 'rgba(233,233,255,0.78)';
-    ctx.font = '25px system-ui, Arial';
-    ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 430, 152);
-    ctx.fillText(`Track: ${state.audioEnabled ? state.trackTitle : 'Paused'}`, 430, 190);
-    ctx.fillText(`Zone: ${state.inTableZone ? 'Ready' : 'Walk closer'}`, 430, 228);
-    ctx.textAlign = 'right';
-    ctx.fillStyle = state.seated ? '#7ff5c7' : state.inTableZone ? '#f6e27f' : 'rgba(233,233,255,0.72)';
-    ctx.font = 'bold 28px system-ui, Arial';
-    ctx.fillText(state.seated ? 'AT TABLE' : (state.inTableZone ? 'JOIN READY' : 'LOBBY'), 970, 148);
-
-    ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(180,140,255,0.92)';
-    ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • Reiki / PGA / Sponsor / Scorpion • pinch with other hand • fist by face toggles TP', 36, 332);
+    ctx.fillStyle = 'rgba(233,233,255,0.86)';
+    ctx.font = '26px system-ui, Arial';
+    ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}   •   ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`, 38, 96);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(180,220,255,0.82)';
+    ctx.font = 'bold 24px system-ui, Arial';
+    ctx.fillText('Pinch to press • fist by face aims teleport • controller trigger/A releases teleport', 512, 430);
     ctx.restore();
     tex.needsUpdate = true;
   }
@@ -238,12 +214,16 @@ let hoveredId = null;
   function localHit(local){
     const state = getState();
     let x = ((local.x / plateW) + 0.5) * canvas.width;
-    const y = ((-local.y / plateH) + 0.5) * canvas.height;
+    let y = ((-local.y / plateH) + 0.5) * canvas.height;
+    if (DISPLAY_ROTATE_180){
+      x = canvas.width - x;
+      y = canvas.height - y;
+    }
     if (DISPLAY_MIRRORED) x = canvas.width - x;
     let best = null;
     let bestScore = Infinity;
     for (const btn of buildButtons(state)){
-      const margin = btn.margin ?? (btn.id === 'teleport' ? 14 : 10);
+      const margin = btn.margin ?? 10;
       const inside = x >= btn.x - margin && x <= btn.x + btn.w + margin && y >= btn.y - margin && y <= btn.y + btn.h + margin;
       if (!inside) continue;
       const cx = btn.x + btn.w / 2;
@@ -251,10 +231,7 @@ let hoveredId = null;
       const nx = (x - cx) / Math.max(btn.w / 2, 1);
       const ny = (y - cy) / Math.max(btn.h / 2, 1);
       const score = nx * nx + ny * ny;
-      if (score < bestScore){
-        best = btn.id;
-        bestScore = score;
-      }
+      if (score < bestScore){ best = btn.id; bestScore = score; }
     }
     return best;
   }
@@ -263,18 +240,10 @@ let hoveredId = null;
     if (!id) return;
     if (id === 'audio') actions.toggleAudio?.();
     if (id === 'next') actions.nextTrack?.();
-    if (id === 'join') actions.joinTable?.();
-    if (id === 'leave') actions.leaveTable?.();
+    if (id === 'join') getState().seated ? actions.leaveTable?.() : actions.joinTable?.();
     if (id === 'teleport') actions.toggleTeleport?.();
-    if (id === 'lobby') actions.goLobby?.();
-    if (id === 'tableScene') actions.goTable?.();
-    if (id === 'seatScene') actions.goSeat?.();
-    if (id === 'reikiScene') actions.goReiki?.();
-    if (id === 'pgaScene') actions.goPga?.();
-    if (id === 'legendScene') actions.goLegend?.();
-    if (id === 'sponsorScene') actions.goSponsor?.();
-    if (id === 'scorpionScene') actions.goScorpion?.();
-    if (id === 'reikiRoomScene') actions.goReikiRoom?.();
+    if (id === 'siteHub') actions.goSiteHub?.();
+    if (id === 'rooms') actions.goRooms?.();
   }
 
   function update(dt, leftHand, rightHand){
@@ -287,7 +256,6 @@ let hoveredId = null;
     }
 
     const watchOnLeft = anchor === leftHand;
-    const inputHand = watchOnLeft ? rightHand : leftHand;
     const pose = computeForearmPose(anchor, camera, renderer, watchOnLeft ? 'left' : 'right');
     if (!pose){
       group.visible = false;
@@ -315,11 +283,7 @@ let hoveredId = null;
         const hit = localHit(local);
         if (hit){
           const depth = Math.abs(local.z);
-          if (depth < bestDepth){
-            bestDepth = depth;
-            nextHovered = hit;
-            activeInput = candidate;
-          }
+          if (depth < bestDepth){ bestDepth = depth; nextHovered = hit; activeInput = candidate; }
         }
       }
     }
@@ -330,31 +294,20 @@ let hoveredId = null;
     if (pinching && pressLockId) hoveredId = pressLockId;
     if (!pinching) pressLockId = null;
     if (hoveredId === lastHovered && hoveredId) hoverTime += dt;
-    else {
-      lastHovered = hoveredId;
-      hoverTime = hoveredId ? 0 : 0;
-      pinchTime = 0;
-      if (pressed) pressed = false;
-      if (!hoveredId) pressLockId = null;
-    }
+    else { lastHovered = hoveredId; hoverTime = hoveredId ? 0 : 0; pinchTime = 0; if (pressed) pressed = false; if (!hoveredId) pressLockId = null; }
 
     const buttons = buildButtons(getState());
     const activeBtn = buttons.find(btn => btn.id === hoveredId) || null;
-
     if (hoveredId && pinching) pinchTime += dt;
     else if (!pinching) pinchTime = 0;
-
-    const directHold = activeBtn?.hold ?? (activeBtn?.pinchOnly ? 0.12 : 0.10);
-    const directPressReady = !!activeBtn && pinching && pinchTime > directHold;
-
-    if (hoveredId && !pressed && directPressReady){
+    const directHold = activeBtn?.hold ?? 0.12;
+    if (hoveredId && !pressed && pinching && pinchTime > directHold){
       pressed = true;
       activate(hoveredId);
       hoverTime = 0;
       pinchTime = 0;
     }
     if (!pinching) pressed = false;
-
     draw();
   }
 
