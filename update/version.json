@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-130-ORBIT-SKY-PERFORMANCE-STABILITY-LOCK",
+  "build": "PHASE-131-GAME-CLEAN-BOOT-AUDIT-REPAIR-LOCK",
   "scope": "game-only",
-  "fix": "Moon and Mars enlarged, raised high above the lobby, and set to slow orbit; Quest view/performance manager tightened with lower framebuffer scale, high foveation, reduced fog/lights, shadow disable, and black-edge projection mitigation",
+  "fix": "cleaned game boot entry by removing duplicate standalone module scripts, added runtime clean boot audit guard, preserved Phase 130 floor recovery, orbit sky, and performance modules through main.js",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-129-VIEW-PERFORMANCE-SPAWN-TELEPORT-MODULE-LOCK"
+  "previousStableBuild": "PHASE-130-ORBIT-SKY-PERFORMANCE-STABILITY-LOCK"
 }
