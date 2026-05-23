@@ -1,0 +1,28 @@
+/* SVR banner/portal design tokens */
+:root {
+  --svr-bg: #05020c;
+  --svr-panel: rgba(8, 5, 22, .86);
+  --svr-cyan: #69e8ff;
+  --svr-pink: #ff5be9;
+  --svr-purple: #8a46ff;
+  --svr-green: #a7ff80;
+  --svr-gold: #ffd36b;
+  --svr-text: #fbf8ff;
+  --svr-muted: #d9cdec;
+}
+.svr-banner {
+  border-radius: 28px;
+  border: 1px solid rgba(105,232,255,.24);
+  background: radial-gradient(circle at 20% 15%, rgba(105,232,255,.22), transparent 34%),
+              linear-gradient(180deg, #05020c, #18062b);
+  box-shadow: 0 24px 70px rgba(0,0,0,.35);
+}
+.svr-status-stack {
+  display: grid;
+  gap: 4px;
+  color: var(--svr-green);
+  font-family: Orbitron, Arial, sans-serif;
+  font-size: .62rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}

@@ -1,0 +1,44 @@
+{
+  "package": "SVR Full Design Banner + Slide Package",
+  "purpose": "Website, game portal, sponsor ad, and VR UI asset kit",
+  "recommended_repo_paths": {
+    "web_banners": "site/assets/banners/",
+    "web_slides": "site/assets/slides/",
+    "game_portals": "game/assets/ui/portals/",
+    "game_wall_ads": "game/assets/ads/",
+    "game_ui": "game/assets/ui/"
+  },
+  "locked_rules": [
+    "Use corrected SVR logo source.",
+    "Keep Reiki as AWAITING APPROVAL unless explicit approval is given.",
+    "Lobby uses storefront portal surfaces; private experiences stay separate.",
+    "Assets are safe PNG files and contain no API keys or secrets."
+  ],
+  "files": [
+    "ads/sponsor_placeholders/espresso_lobby_wall_ad_1080x1600.png",
+    "ads/sponsor_placeholders/sponsor_placeholder_wall_ad_1080x1600.png",
+    "docs/svr_design_tokens.css",
+    "game/portal_panels/portal_pga_drive_1024.png",
+    "game/portal_panels/portal_reiki_approval_1024.png",
+    "game/portal_panels/portal_scorpion_room_1024.png",
+    "game/portal_panels/portal_smoker_lounge_1024.png",
+    "game/portal_panels/portal_vr_store_1024.png",
+    "game/ui/admin_server_database_stacked_badge.png",
+    "game/ui/vr_portal_button_panel.png",
+    "game/wall_ads/community_impact_square_1024.png",
+    "game/wall_ads/svr_billboard_square_1024.png",
+    "source/espresso-with-cream-real.png",
+    "source/logo-table.png",
+    "source/logo.png",
+    "web/banners/community_impact_1920x720.png",
+    "web/banners/hero_svr_poker_1920x720.png",
+    "web/banners/sponsor_network_1920x720.png",
+    "web/banners/store_portal_1920x720.png",
+    "web/slides/slide_01_svr_poker_platform.png",
+    "web/slides/slide_02_sponsor_ad_system.png",
+    "web/slides/slide_03_store_membership.png",
+    "web/slides/slide_04_game_private_scenes.png",
+    "web/slides/slide_05_ai_chat_admin_panel.png",
+    "web/slides/slide_06_launch_visual_checklist.png"
+  ]
+}
