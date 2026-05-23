@@ -3,7 +3,7 @@ import { CONFIG } from "./config.js";
 import { isPinching, isFist, aimPoint } from "./gestures.js";
 import { triggerValue, nextCameraForwardPosition, shouldSnapTurn } from "./locomotion_lock.js";
 
-const PHASE = "PHASE-142-TELEPORT-CRITICAL-QUEST-CONTROLLER-WATCH-MOON-MARS-LOCK";
+const PHASE = "PHASE-143-QUEST-CONTROLLER-AXIS-A-BUTTON-FREEZE-FIX-LOCK";
 
 export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoot = null, log = console.log }){
   let playerX = CONFIG.SPAWN_X;
@@ -43,58 +43,62 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
       worldRoot.rotation.set(0,0,0);
     }
   }
-  function writePose(){
-    window.SVR_TELEPORT_POSE = { phase: PHASE, x: playerX, y: playerY, z: playerZ, yaw: playerYaw };
-  }
+  function writePose(){ window.SVR_TELEPORT_POSE = { phase: PHASE, x: playerX, y: playerY, z: playerZ, yaw: playerYaw }; }
   function setPlayerPose(x, y, z){
     playerX = THREE.MathUtils.clamp(x, -roomClamp * 1.05, roomClamp * 1.05);
     playerY = y;
     playerZ = THREE.MathUtils.clamp(z, -roomClamp * 1.05, roomClamp * 1.05);
-    if (renderer?.xr?.isPresenting) syncWorldRoot();
-    else camera.position.set(playerX, 1.6 + playerY, playerZ);
-    writePose();
-    return true;
+    if (renderer?.xr?.isPresenting) syncWorldRoot(); else camera.position.set(playerX, 1.6 + playerY, playerZ);
+    writePose(); return true;
   }
   function setPlayerXZ(x, z){
     playerX = THREE.MathUtils.clamp(x, -roomClamp * 1.05, roomClamp * 1.05);
     playerZ = THREE.MathUtils.clamp(z, -roomClamp * 1.05, roomClamp * 1.05);
-    if (renderer?.xr?.isPresenting) syncWorldRoot();
-    else { camera.position.x = playerX; camera.position.z = playerZ; }
-    writePose();
-    return true;
+    if (renderer?.xr?.isPresenting) syncWorldRoot(); else { camera.position.x = playerX; camera.position.z = playerZ; }
+    writePose(); return true;
   }
   function setPlayerYaw(nextYaw){ playerYaw = nextYaw; syncWorldRoot(); writePose(); return true; }
   function getPlayerPose(){ return { x: playerX, y: playerY, z: playerZ, yaw: playerYaw }; }
   function isEnabled(){ return mode; }
 
   const pointer = new THREE.Mesh(
-    new THREE.CircleGeometry(Math.max(CONFIG.POINTER_SIZE || .34, .32), 32),
-    new THREE.MeshBasicMaterial({ color:0x7ff5c7, transparent:true, opacity:.72, depthWrite:false, depthTest:true, side:THREE.DoubleSide, toneMapped:false })
+    new THREE.CircleGeometry(0.62, 48),
+    new THREE.MeshBasicMaterial({ color:0x00ff66, transparent:true, opacity:.92, depthWrite:false, depthTest:false, side:THREE.DoubleSide, toneMapped:false })
   );
-  pointer.name = "SVR_PHASE142_TELEPORT_POINTER";
+  pointer.name = "SVR_PHASE143_HIGH_CONTRAST_TELEPORT_POINTER";
   pointer.rotation.x = -Math.PI / 2;
-  pointer.position.y = .034;
+  pointer.position.y = .052;
   pointer.visible = false;
-  pointer.renderOrder = 92;
+  pointer.renderOrder = 900;
   pointer.userData.svrNoWorldShift = true;
   scene.add(pointer);
 
   const ring = new THREE.Mesh(
-    new THREE.RingGeometry(CONFIG.RING_INNER || .34, CONFIG.RING_OUTER || .54, 48),
-    new THREE.MeshBasicMaterial({ color:0xb48cff, side:THREE.DoubleSide, transparent:true, opacity:.82, depthWrite:false, depthTest:true, toneMapped:false })
+    new THREE.RingGeometry(0.72, 1.03, 64),
+    new THREE.MeshBasicMaterial({ color:0xffff00, side:THREE.DoubleSide, transparent:true, opacity:.96, depthWrite:false, depthTest:false, toneMapped:false })
   );
-  ring.name = "SVR_PHASE142_TELEPORT_RING";
+  ring.name = "SVR_PHASE143_HIGH_CONTRAST_TELEPORT_RING";
   ring.rotation.x = -Math.PI / 2;
-  ring.position.y = .03;
+  ring.position.y = .058;
   ring.visible = false;
-  ring.renderOrder = 91;
+  ring.renderOrder = 901;
   ring.userData.svrNoWorldShift = true;
   scene.add(ring);
 
-  const leftFire = new THREE.Mesh(new THREE.SphereGeometry(.035, 8, 6), new THREE.MeshBasicMaterial({ color:0x9b4dff, transparent:true, opacity:.78, toneMapped:false }));
+  const line = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,-1)]),
+    new THREE.LineBasicMaterial({ color:0x00ffff, transparent:true, opacity:.88, depthTest:false, depthWrite:false, toneMapped:false })
+  );
+  line.name = "SVR_PHASE143_TELEPORT_AIM_LINE";
+  line.visible = false;
+  line.renderOrder = 902;
+  line.userData.svrNoWorldShift = true;
+  scene.add(line);
+
+  const leftFire = new THREE.Mesh(new THREE.SphereGeometry(.052, 10, 8), new THREE.MeshBasicMaterial({ color:0xff00ff, transparent:true, opacity:.95, depthTest:false, depthWrite:false, toneMapped:false }));
   const rightFire = leftFire.clone();
-  leftFire.name = "SVR_PHASE142_LEFT_PURPLE_FIRE_SAFE";
-  rightFire.name = "SVR_PHASE142_RIGHT_PURPLE_FIRE_SAFE";
+  leftFire.name = "SVR_PHASE143_LEFT_PURPLE_FIRE_HIGH_CONTRAST";
+  rightFire.name = "SVR_PHASE143_RIGHT_PURPLE_FIRE_HIGH_CONTRAST";
   leftFire.visible = false; rightFire.visible = false;
   leftFire.userData.svrNoWorldShift = true; rightFire.userData.svrNoWorldShift = true;
   scene.add(leftFire, rightFire);
@@ -114,47 +118,37 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
     return clampedTarget;
   }
   function resetTeleportVisuals(){
-    pointer.visible = false;
-    ring.visible = false;
-    leftFire.visible = false;
-    rightFire.visible = false;
-    setTeleportVisual(false);
-    lastAimValid = false;
-    pinchHoldStart = 0;
-    triggerHoldStart = 0;
-    pendingCommit = false;
+    pointer.visible = false; ring.visible = false; line.visible = false; leftFire.visible = false; rightFire.visible = false;
+    setTeleportVisual(false); lastAimValid = false; pinchHoldStart = 0; triggerHoldStart = 0; pendingCommit = false;
   }
 
   function safeReleaseTeleport(target){
     const now = performance.now();
-    if (!target || now - lastTP < 520 || pendingCommit) return false;
+    if (!target || now - lastTP < 650 || pendingCommit) return false;
     lastTP = now;
-    cooldownUntil = now + 520;
+    cooldownUntil = now + 650;
     pendingCommit = true;
     commitTarget.copy(target);
     mode = false;
     active = null;
     resetTeleportVisuals();
-    requestAnimationFrame(()=>{
+    setTimeout(()=>{
       setPlayerXZ(commitTarget.x, commitTarget.z);
       pendingCommit = false;
       window.SVR_TELEPORT_COMMIT = {
-        phase: PHASE,
-        ok: true,
-        moved: true,
-        method: renderer?.xr?.isPresenting ? "xr-world-root-position-shift-deferred-no-forced-matrix" : "desktop-camera-jump",
-        target: { x: commitTarget.x, z: commitTarget.z },
-        at: new Date().toISOString()
+        phase: PHASE, ok: true, moved: true,
+        method: renderer?.xr?.isPresenting ? "deferred-timeout-world-root-shift-no-A-button" : "desktop-camera-jump",
+        target: { x: commitTarget.x, z: commitTarget.z }, at: new Date().toISOString()
       };
-    });
+    }, 34);
     return true;
   }
 
   function movePlayerFromControllers(dt){
     if (!renderer?.xr?.isPresenting || mode || pendingCommit) return;
     const snap = shouldSnapTurn(leftControllerRef, rightControllerRef, performance.now() > snapCooldownUntil);
-    if (snap){ setPlayerYaw(playerYaw + snap); snapCooldownUntil = performance.now() + 420; }
-    const next = nextCameraForwardPosition({ renderer, camera, leftControllerRef, rightControllerRef, playerX, playerZ, roomClamp, dt, speed:1.10 });
+    if (snap){ setPlayerYaw(playerYaw + snap); snapCooldownUntil = performance.now() + 460; }
+    const next = nextCameraForwardPosition({ renderer, camera, leftControllerRef, rightControllerRef, playerX, playerZ, roomClamp, dt, speed:1.35 });
     if (next.moved) setPlayerXZ(next.x, next.z);
   }
 
@@ -175,9 +169,18 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
     return controllerOrigin;
   }
 
+  function updateAimLine(target, source){
+    if (!target || !source){ line.visible = false; return; }
+    const pos = line.geometry.attributes.position;
+    pos.setXYZ(0, source.x, source.y, source.z);
+    pos.setXYZ(1, target.x, .08, target.z);
+    pos.needsUpdate = true;
+    line.visible = true;
+  }
+
   function chooseController(){ return rightControllerRef?.joints ? rightControllerRef : leftControllerRef?.joints ? leftControllerRef : null; }
   function chooseHand(){ return rightHandRef?.joints ? rightHandRef : leftHandRef?.joints ? leftHandRef : null; }
-  function turnOnTeleport(nextActive, nextMode){ mode = true; active = nextActive; activeMode = nextMode; cooldownUntil = performance.now() + 160; pinchHoldStart = 0; triggerHoldStart = 0; }
+  function turnOnTeleport(nextActive, nextMode){ mode = true; active = nextActive; activeMode = nextMode; cooldownUntil = performance.now() + 180; pinchHoldStart = 0; triggerHoldStart = 0; }
   function toggleMode(preferred="right"){
     if (mode){ mode = false; active = null; resetTeleportVisuals(); return false; }
     const ctrl = preferred === "left" ? (leftControllerRef?.joints ? leftControllerRef : chooseController()) : (rightControllerRef?.joints ? rightControllerRef : chooseController());
@@ -186,18 +189,12 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
     return mode;
   }
   async function onSessionStart(){
-    playerYaw = 0;
-    playerX = CONFIG.SPAWN_X;
-    playerY = 0;
-    playerZ = CONFIG.SPAWN_Z;
-    mode = false;
-    active = null;
-    resetTeleportVisuals();
-    syncWorldRoot();
-    window.SVR_TELEPORT_COMMIT = { phase:PHASE, method:"xr-world-root-position-shift-deferred-no-forced-matrix", session:"started", safeSpawn:{x:playerX,z:playerZ} };
+    playerYaw = 0; playerX = CONFIG.SPAWN_X; playerY = 0; playerZ = CONFIG.SPAWN_Z;
+    mode = false; active = null; resetTeleportVisuals(); syncWorldRoot();
+    window.SVR_TELEPORT_COMMIT = { phase:PHASE, method:"no-A-button-critical-teleport", session:"started", safeSpawn:{x:playerX,z:playerZ} };
   }
   function onSessionEnd(){ resetTeleportVisuals(); resetWorldRoot(); }
-  function setLogoTexture(tex){ /* Phase 142 disables logo pointer texture for Quest performance. */ }
+  function setLogoTexture(tex){ /* Disabled for Quest freeze isolation. */ }
 
   function update({ dt=.016, leftHand, rightHand, leftController, rightController, statusCb=()=>{}, modeCb=()=>{} }){
     const now = performance.now();
@@ -221,16 +218,17 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
     updateFire(leftFire, leftHandRef, mode && activeMode === "hand" && active === leftHandRef);
     updateFire(rightFire, rightHandRef, mode && activeMode === "hand" && active === rightHandRef);
     if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){ resetTeleportVisuals(); statusCb("Waiting for hands/controllers…"); modeCb("Input not tracked"); return; }
-    if (!mode || !active){ resetTeleportVisuals(); statusCb((leftControllerRef || rightControllerRef) ? "Quest controller movement active • hold trigger/A/grip for teleport" : "Fist toggles teleport"); modeCb("Teleport critical module ready"); return; }
+    if (!mode || !active){ resetTeleportVisuals(); statusCb((leftControllerRef || rightControllerRef) ? "Right controller stick: move/turn • trigger/grip only for teleport" : "Fist toggles teleport"); modeCb("A button disabled"); return; }
     setTeleportVisual(true);
     const aim = activeMode === "controller" ? controllerAimPoint(active) : aimPoint(active);
-    if (!aim){ pointer.visible=false; ring.visible=false; statusCb(activeMode === "controller" ? "Aim down, release to cancel" : "Purple fire on • aim down"); modeCb("Teleport armed"); return; }
+    if (!aim){ pointer.visible=false; ring.visible=false; line.visible=false; statusCb(activeMode === "controller" ? "Aim down with controller" : "Purple fire on • aim down"); modeCb("Teleport armed"); return; }
     const target = clampTarget(aim);
-    if (!lastAimValid) smoothedTarget.copy(target); else smoothedTarget.lerp(target, .12);
+    if (!lastAimValid) smoothedTarget.copy(target); else smoothedTarget.lerp(target, .18);
     lastAimValid = true;
     pointer.visible = true; ring.visible = true;
-    pointer.position.x = smoothedTarget.x; pointer.position.y = .034; pointer.position.z = smoothedTarget.z;
-    ring.position.x = smoothedTarget.x; ring.position.y = .03; ring.position.z = smoothedTarget.z;
+    pointer.position.set(smoothedTarget.x, .052, smoothedTarget.z);
+    ring.position.set(smoothedTarget.x, .058, smoothedTarget.z);
+    updateAimLine(smoothedTarget, activeMode === "controller" ? controllerOrigin : (active?.joints?.wrist?.position || null));
     if (activeMode === "controller"){
       const trigger = triggerValue(active), was = !!active.userData._wasTrigger;
       if (trigger > .26 && !was) triggerHoldStart = now;
@@ -238,7 +236,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
       if (was && trigger <= .18 && held > 130) safeReleaseTeleport(smoothedTarget);
       if (trigger <= .18) triggerHoldStart = 0;
       active.userData._wasTrigger = trigger > .26;
-      statusCb("Release trigger/A/grip to teleport"); modeCb("Controller teleport armed"); return;
+      statusCb("Release trigger/grip to teleport • A disabled"); modeCb("High contrast target"); return;
     }
     const pinch = isPinching(active), wasPinching = !!active.userData._wasPinching;
     if (pinch && !wasPinching) pinchHoldStart = now;
@@ -249,8 +247,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
     statusCb("Release pinch to teleport"); modeCb("Hand teleport armed");
   }
 
-  window.SVR_PHASE142_TELEPORT_CRITICAL_LOCK = { phase: PHASE, method:"deferred-world-root-position-shift-no-forced-matrix", safeSpawnZ:CONFIG.SPAWN_Z, handFist:true, watchToggle:true, triggerRelease:true, controllerFallback:true };
-  window.SVR_PHASE137_TELEPORT_LOCK = window.SVR_PHASE142_TELEPORT_CRITICAL_LOCK;
-  window.SVR_PHASE129_TELEPORT_FIX = window.SVR_PHASE142_TELEPORT_CRITICAL_LOCK;
+  window.SVR_PHASE143_TELEPORT_LOCK = { phase: PHASE, aButtonDisabled:true, highContrast:true, method:"timeout-deferred-world-root-shift", controllerFallback:true };
+  window.SVR_PHASE142_TELEPORT_CRITICAL_LOCK = window.SVR_PHASE143_TELEPORT_LOCK;
+  window.SVR_PHASE137_TELEPORT_LOCK = window.SVR_PHASE143_TELEPORT_LOCK;
+  window.SVR_PHASE129_TELEPORT_FIX = window.SVR_PHASE143_TELEPORT_LOCK;
   return { onSessionStart,onSessionEnd,setLogoTexture,update,setPlayerPose,setPlayerXZ,getPlayerPose,setPlayerYaw,toggleMode,isEnabled,getState:()=>({ mode, activeHand:active===rightHandRef || active===rightControllerRef ? "right" : active===leftHandRef || active===leftControllerRef ? "left" : "none", activeMode }) };
 }
