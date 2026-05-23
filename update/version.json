@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-139-TELEPORT-SAFE-LOBBY-NO-SKY-LOCK",
-  "scope": "game-teleport-safe-lobby-no-sky-lock",
-  "fix": "removed the active sky/Moon/Mars orbit layer from the lobby module because it may be freezing Quest teleport; replaced it with a lightweight static ceiling cap while preserving textured floor, walls, portals, table, spawn pad, watch, movement, and teleport systems",
+  "build": "PHASE-140-TEXTURE-FLOOR-RESTORE-NO-SKY-LOCK",
+  "scope": "game-texture-floor-restore-no-sky-lock",
+  "fix": "restored a visible textured lobby floor as a separate removable overlay module while preserving the Phase 139 no-sky teleport stability rule, table safe ring, watch, portals, movement, and teleport systems",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-138-WATCH-UI-INPUT-BRIDGE-LOCK",
-  "nextBuild": "PHASE-140-POKER-GAMEPLAY-TABLE-STATE-LOCK"
+  "previousStableBuild": "PHASE-139-TELEPORT-SAFE-LOBBY-NO-SKY-LOCK",
+  "nextBuild": "PHASE-141-POKER-GAMEPLAY-TABLE-STATE-LOCK"
 }
