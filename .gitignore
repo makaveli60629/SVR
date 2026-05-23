@@ -14,6 +14,15 @@ Thumbs.db
 !update/site.zip
 !update/game.zip
 
+# Local backup / cleanup artifacts
+_local_untracked_archive/
+*.bak
+*.bak-*
+*.backup
+*.tmp
+*~
+tatus
+
 backend/node_modules/
 node_modules/
 
