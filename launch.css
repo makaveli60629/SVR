@@ -160,20 +160,6 @@ body {
   box-shadow: 0 0 20px rgba(172, 83, 255, 0.2);
 }
 .btn-secondary { background: rgba(9, 9, 16, 0.82); }
-.btn-newserver {
-  border-color: rgba(0,245,212,.86);
-  background: linear-gradient(135deg, rgba(0,245,212,.92), rgba(14,120,255,.58));
-  color: #001311;
-  font-family: Orbitron, Rajdhani, Arial, sans-serif;
-  font-weight: 900;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  box-shadow: 0 0 18px rgba(0,245,212,.34), inset 0 0 18px rgba(255,255,255,.13);
-}
-.btn-newserver:hover {
-  border-color: rgba(0,245,212,1);
-  box-shadow: 0 0 28px rgba(0,245,212,.52), inset 0 0 20px rgba(255,255,255,.18);
-}
 .launch-footer {
   margin-top: 2px;
   display: grid;
