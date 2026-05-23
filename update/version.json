@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-131-GAME-CLEAN-BOOT-AUDIT-REPAIR-LOCK",
+  "build": "PHASE-132-FLOOR-PERFORMANCE-RUNTIME-REPAIR-LOCK",
   "scope": "game-only",
-  "fix": "cleaned game boot entry by removing duplicate standalone module scripts, added runtime clean boot audit guard, preserved Phase 130 floor recovery, orbit sky, and performance modules through main.js",
+  "fix": "hard lobby floor repair, reduced renderer load, disabled antialiasing, lowered Quest framebuffer/pixel ratio, reduced atmosphere/lights/sprites, hid duplicate low planets, and wired runtime repair module through clean boot main.js",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-130-ORBIT-SKY-PERFORMANCE-STABILITY-LOCK"
+  "previousStableBuild": "PHASE-131-GAME-CLEAN-BOOT-AUDIT-REPAIR-LOCK"
 }
