@@ -12,8 +12,9 @@ import { CONFIG } from "./modules/config.js";
 import { createViewPerformanceManager } from "./modules/view_performance_manager.js";
 import { installHighSkyNorthEast } from "./modules/high_sky_north_east.js";
 import { installLobbyFloorRecovery } from "./modules/lobby_floor_recovery.js";
+import { installLobbyRuntimeRepair } from "./modules/lobby_runtime_repair.js";
 
-const PHASE_BUILD = "PHASE-130-ORBIT-SKY-PERFORMANCE-STABILITY-LOCK";
+const PHASE_BUILD = "PHASE-132-FLOOR-PERFORMANCE-RUNTIME-REPAIR-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -69,7 +70,7 @@ if (AUTOCAM) document.body.classList.add("preview-mode");
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData._camera = camera;
 const worldRoot = new THREE.Group();
-worldRoot.name = "SVR_WORLD_ROOT_PHASE130";
+worldRoot.name = "SVR_WORLD_ROOT_PHASE132";
 scene.add(worldRoot);
 window.SVR_WORLD_ROOT = worldRoot;
 
@@ -94,12 +95,15 @@ const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: ren
 const perf = createViewPerformanceManager({ renderer, scene, camera, worldRoot, statusCb: (text)=>setStatus(text, { force:true }) });
 const highSky = installHighSkyNorthEast({ scene, worldRoot });
 const floorRecovery = installLobbyFloorRecovery({ worldRoot, scene, radius: CONFIG.ROOM_RADIUS || 24 });
+let runtimeRepair = null;
 
 setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(worldRoot, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 forceSafeDesktopSpawn();
 floorRecovery?.update?.();
+runtimeRepair = installLobbyRuntimeRepair({ scene, worldRoot, radius: CONFIG.ROOM_RADIUS || 24, camera, renderer });
+runtimeRepair?.apply?.();
 
 if (!sceneTargets.pgaDrive) sceneTargets.pgaDrive = sceneTargets.pgaWall || sceneTargets.pga || sceneTargets.lobby;
 if (!sceneTargets.chipPutt) sceneTargets.chipPutt = sceneTargets.pgaWall || sceneTargets.pga || sceneTargets.lobby;
@@ -265,7 +269,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 130 floor restored, orbit sky active, performance module tightened.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 132 hard floor and runtime performance repair active.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -280,6 +284,7 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
+  runtimeRepair?.apply?.();
   await audio.prime();
   await audio.start();
   await tp.onSessionStart();
@@ -290,6 +295,7 @@ renderer.xr.addEventListener("sessionend", ()=>{
   const nav = document.getElementById("sceneNav");
   if (nav && !AUTOCAM) nav.style.display = "flex";
   forceSafeDesktopSpawn();
+  runtimeRepair?.apply?.();
 });
 
 let tPrev = performance.now();
@@ -308,6 +314,7 @@ renderer.setAnimationLoop(()=>{
   perf.update(dt);
   highSky?.update?.(dt);
   floorRecovery?.update?.();
+  runtimeRepair?.update?.();
 
   if (!renderer.xr.isPresenting){
     if (!AUTOCAM) desktop.update(dt);
