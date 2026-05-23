@@ -1,7 +1,9 @@
 {
-  "build": "PHASE-133-STABLE-LOBBY-REFINE-REBASE-LOCK",
-  "scope": "game-only",
-  "fix": "rebased game lobby runtime to a stable lightweight refined lobby module, bypassing heavy skyline/runtime repair stacks, restoring correct visible floor, simple walls, table showpiece, portal landmarks, high orbit Moon/Mars, safe spawn, watch, controller/hand locomotion, and lower runtime overhead",
-  "siteTouched": false,
-  "previousStableBuild": "PHASE-132-FLOOR-PERFORMANCE-RUNTIME-REPAIR-LOCK"
+  "build": "PHASE-135-MASTER-MANIFEST-DEPLOY-WORKFLOW-LOCK",
+  "scope": "project-workflow-lock",
+  "fix": "removed temporary NewServer public rule, restored GitHub PowerShell Auto Workflow as the official deploy path, added SVR-Version 0.1 master blueprint status, added Phase 135 manifest, and added PowerShell deploy/audit workflow",
+  "siteTouched": true,
+  "gameTouched": false,
+  "previousStableBuild": "PHASE-133-STABLE-LOBBY-REFINE-REBASE-LOCK",
+  "nextBuild": "PHASE-136-STABLE-LOBBY-FULL-DEMO-REBUILD-LOCK"
 }
