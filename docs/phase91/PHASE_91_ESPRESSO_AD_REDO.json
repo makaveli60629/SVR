@@ -1,0 +1,17 @@
+{
+  "phase": "PHASE-91-ESPRESSO-AD-REDO",
+  "source": "uploaded espresso image",
+  "assets": [
+    "game/assets/ads/espresso_lobby_wall_ad_1080x1600.png",
+    "game/assets/ads/espresso_game_banner_2048x1024.png",
+    "game/assets/ads/espresso_square_billboard_1024.png",
+    "site/assets/ads/espresso_lobby_wall_ad_1080x1600.png",
+    "site/assets/ads/espresso_game_banner_2048x1024.png",
+    "site/assets/ads/espresso_square_billboard_1024.png"
+  ],
+  "notes": [
+    "Vertical texture replaces building wall ad.",
+    "Landscape banner is for wide game billboard/banner placements.",
+    "Square texture is for compact billboard slots."
+  ]
+}
