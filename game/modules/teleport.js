@@ -3,7 +3,7 @@ import { CONFIG } from "./config.js";
 import { isPinching, isFist, aimPoint } from "./gestures.js";
 import { triggerValue, nextCameraForwardPosition, shouldSnapTurn } from "./locomotion_lock.js";
 
-const PHASE = "PHASE-129-VIEW-PERFORMANCE-SPAWN-TELEPORT-MODULE-LOCK";
+const PHASE = "PHASE-137-MOVEMENT-LOCOMOTION-TELEPORT-MODULE-LOCK";
 
 export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoot = null, log = console.log }){
   let playerX = CONFIG.SPAWN_X;
@@ -24,6 +24,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
   const controllerOrigin = new THREE.Vector3();
   const controllerDir = new THREE.Vector3();
   const smoothedTarget = new THREE.Vector3(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
+  const clampedTarget = new THREE.Vector3(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
   let lastAimValid = false;
 
   function syncWorldRoot(){
@@ -109,7 +110,10 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
   }
 
   function setTeleportVisual(on){ markerGlow.intensity = on ? 1.05 : 0; window.SVR_TELEPORT_FIRE_STATE = { phase: PHASE, teleportOn:Boolean(on), activeMode }; }
-  function clampTarget(p){ return new THREE.Vector3(THREE.MathUtils.clamp(p.x, -roomClamp, roomClamp), 0, THREE.MathUtils.clamp(p.z, -roomClamp, roomClamp)); }
+  function clampTarget(p){
+    clampedTarget.set(THREE.MathUtils.clamp(p.x, -roomClamp, roomClamp), 0, THREE.MathUtils.clamp(p.z, -roomClamp, roomClamp));
+    return clampedTarget;
+  }
   function resetTeleportVisuals(){ pointer.visible = false; ring.visible = false; setTeleportVisual(false); lastAimValid = false; pinchHoldStart = 0; triggerHoldStart = 0; }
 
   function safeReleaseTeleport(target){
@@ -129,7 +133,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
     if (!renderer?.xr?.isPresenting || mode) return;
     const snap = shouldSnapTurn(leftControllerRef, rightControllerRef, performance.now() > snapCooldownUntil);
     if (snap){ playerYaw += snap; snapCooldownUntil = performance.now() + 360; }
-    const next = nextCameraForwardPosition({ renderer, camera, leftControllerRef, rightControllerRef, playerX, playerZ, roomClamp, dt, speed:1.35 });
+    const next = nextCameraForwardPosition({ renderer, camera, leftControllerRef, rightControllerRef, playerX, playerZ, roomClamp, dt, speed:1.45 });
     if (next.moved) setPlayerXZ(next.x, next.z);
   }
 
@@ -143,7 +147,10 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
     controllerDir.normalize();
     const t = controllerOrigin.y / (-controllerDir.y);
     if (!isFinite(t) || t < .12) return null;
-    return new THREE.Vector3(controllerOrigin.x + controllerDir.x * Math.min(t, 24), 0, controllerOrigin.z + controllerDir.z * Math.min(t, 24));
+    controllerOrigin.x += controllerDir.x * Math.min(t, 24);
+    controllerOrigin.y = 0;
+    controllerOrigin.z += controllerDir.z * Math.min(t, 24);
+    return controllerOrigin;
   }
   function chooseController(){ return rightControllerRef?.joints ? rightControllerRef : leftControllerRef?.joints ? leftControllerRef : null; }
   function chooseHand(){ return rightHandRef?.joints ? rightHandRef : leftHandRef?.joints ? leftHandRef : null; }
@@ -178,7 +185,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
     updateFireGroup(leftFire, leftHandRef, mode && activeMode === "hand" && active === leftHandRef, t);
     updateFireGroup(rightFire, rightHandRef, mode && activeMode === "hand" && active === rightHandRef, t);
     if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){ resetTeleportVisuals(); statusCb("Waiting for hands or controllers…"); modeCb("Input not tracked"); return; }
-    if (!mode || !active){ resetTeleportVisuals(); statusCb((leftControllerRef || rightControllerRef) ? "Stick movement active • hold trigger to teleport" : "Teleport off • fist turns purple fire on"); modeCb("World-root teleport ready"); return; }
+    if (!mode || !active){ resetTeleportVisuals(); statusCb((leftControllerRef || rightControllerRef) ? "Stick movement active • hold trigger/A/grip to teleport" : "Teleport off • fist turns purple fire on"); modeCb("World-root teleport ready"); return; }
     setTeleportVisual(true);
     const aim = activeMode === "controller" ? controllerAimPoint(active) : aimPoint(active);
     if (!aim){ pointer.visible=false; ring.visible=false; statusCb(activeMode === "controller" ? "Aim down, release to cancel" : "Purple fire on • aim down, release pinch"); modeCb("Teleport armed"); return; }
@@ -196,7 +203,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
       if (was && trigger <= .18 && held > 120) safeReleaseTeleport(smoothedTarget);
       if (trigger <= .18) triggerHoldStart = 0;
       active.userData._wasTrigger = trigger > .22;
-      statusCb("Release trigger/A to teleport"); modeCb("Controller teleport armed"); return;
+      statusCb("Release trigger/A/grip to teleport"); modeCb("Controller teleport armed"); return;
     }
     const pinch = isPinching(active), wasPinching = !!active.userData._wasPinching;
     if (pinch && !wasPinching) pinchHoldStart = now;
@@ -206,6 +213,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, worldRoo
     active.userData._wasPinching = pinch;
     statusCb("Purple fire on • release pinch to teleport"); modeCb("Hand teleport armed");
   }
-  window.SVR_PHASE129_TELEPORT_FIX = { phase: PHASE, method:"xr-world-root-shift-no-reference-space", safeSpawnZ:CONFIG.SPAWN_Z };
+  window.SVR_PHASE137_TELEPORT_LOCK = { phase: PHASE, method:"xr-world-root-shift-no-reference-space", safeSpawnZ:CONFIG.SPAWN_Z, handFist:true, watchToggle:true, triggerRelease:true };
+  window.SVR_PHASE129_TELEPORT_FIX = window.SVR_PHASE137_TELEPORT_LOCK;
   return { onSessionStart,onSessionEnd,setLogoTexture,update,setPlayerPose,setPlayerXZ,getPlayerPose,setPlayerYaw,toggleMode,isEnabled,getState:()=>({ mode, activeHand:active===rightHandRef || active===rightControllerRef ? "right" : active===leftHandRef || active===leftControllerRef ? "left" : "none", activeMode }) };
 }
