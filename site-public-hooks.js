@@ -4,6 +4,7 @@
   const MESSAGE_KEY = 'svr_public_messages_backup';
   const SESSION_KEY = 'svr_site_session_id';
   const STATUS_REFRESH_MS = 30000;
+  const FORCE_ADMIN_ONLINE = true;
 
   let lastAdminState = 'online';
 
@@ -45,15 +46,16 @@
   }
 
   function setAdminVisualState(isOnline, sourceText) {
-    const state = isOnline ? 'online' : 'offline';
+    const forcedOnline = FORCE_ADMIN_ONLINE ? true : isOnline;
+    const state = forcedOnline ? 'online' : 'offline';
     lastAdminState = state;
     try { localStorage.setItem(ADMIN_KEY, state); } catch (e) {}
     document.querySelectorAll('.admin-status,[data-admin-pill]').forEach((el) => {
       el.dataset.state = state;
-      el.dataset.source = sourceText || 'api';
-      el.classList.toggle('online', isOnline);
-      el.classList.toggle('offline', !isOnline);
-      const text = isOnline ? 'ADMIN ONLINE' : 'ADMIN OFFLINE';
+      el.dataset.source = sourceText || 'site-lock';
+      el.classList.toggle('online', forcedOnline);
+      el.classList.toggle('offline', !forcedOnline);
+      const text = forcedOnline ? 'ADMIN ONLINE' : 'ADMIN OFFLINE';
       const label = el.querySelector('[data-admin-label]');
       if (label) label.textContent = text;
       else el.textContent = text;
@@ -63,8 +65,11 @@
   function setAdminLoadingState() {
     document.querySelectorAll('.admin-status,[data-admin-pill]').forEach((el) => {
       const label = el.querySelector('[data-admin-label]');
-      if (label) label.textContent = 'CHECKING ADMIN STATUS';
-      else el.textContent = 'CHECKING ADMIN STATUS';
+      if (label) label.textContent = 'ADMIN ONLINE';
+      else el.textContent = 'ADMIN ONLINE';
+      el.classList.add('online');
+      el.classList.remove('offline');
+      el.dataset.state = 'online';
     });
   }
 
@@ -75,6 +80,10 @@
   }
 
   async function paintAdminState() {
+    if (FORCE_ADMIN_ONLINE) {
+      setAdminVisualState(true, 'site-lock');
+      return;
+    }
     try {
       const data = await fetchAdminStatus();
       if (!data || data.ok === false) throw new Error(data && data.error ? data.error : 'Invalid admin status payload');
