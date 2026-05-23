@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-132-FLOOR-PERFORMANCE-RUNTIME-REPAIR-LOCK",
+  "build": "PHASE-133-STABLE-LOBBY-REFINE-REBASE-LOCK",
   "scope": "game-only",
-  "fix": "hard lobby floor repair, reduced renderer load, disabled antialiasing, lowered Quest framebuffer/pixel ratio, reduced atmosphere/lights/sprites, hid duplicate low planets, and wired runtime repair module through clean boot main.js",
+  "fix": "rebased game lobby runtime to a stable lightweight refined lobby module, bypassing heavy skyline/runtime repair stacks, restoring correct visible floor, simple walls, table showpiece, portal landmarks, high orbit Moon/Mars, safe spawn, watch, controller/hand locomotion, and lower runtime overhead",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-131-GAME-CLEAN-BOOT-AUDIT-REPAIR-LOCK"
+  "previousStableBuild": "PHASE-132-FLOOR-PERFORMANCE-RUNTIME-REPAIR-LOCK"
 }
