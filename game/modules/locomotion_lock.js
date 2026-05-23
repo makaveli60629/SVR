@@ -1,9 +1,10 @@
 import * as THREE from "three";
 
-export const LOCOMOTION_PHASE = "PHASE-137-MOVEMENT-LOCOMOTION-TELEPORT-MODULE-LOCK";
+export const LOCOMOTION_PHASE = "PHASE-143-QUEST-CONTROLLER-AXIS-A-BUTTON-FREEZE-FIX-LOCK";
 
 const ZERO_STICK = { x: 0, y: 0 };
 const MOVE_STICK = { x: 0, y: 0 };
+const MOVE_CANDIDATE = { x: 0, y: 0 };
 const TURN_STICK = { x: 0, y: 0 };
 const FORWARD = new THREE.Vector3(0, 0, -1);
 const RIGHT = new THREE.Vector3(1, 0, 0);
@@ -17,7 +18,7 @@ export function buttonValue(gp, idx){
   return gp?.buttons?.[idx]?.value || 0;
 }
 
-export function deadZone(v, zone = 0.16){
+export function deadZone(v, zone = 0.14){
   return Math.abs(v || 0) < zone ? 0 : (v || 0);
 }
 
@@ -36,19 +37,39 @@ export function stickPair(gp, pair = "left", out = MOVE_STICK){
   return out;
 }
 
+function copyBestStick(gp){
+  MOVE_STICK.x = 0;
+  MOVE_STICK.y = 0;
+  if (!gp?.axes?.length) return ZERO_STICK;
+  stickPair(gp, "left", MOVE_STICK);
+  let bestLen = Math.hypot(MOVE_STICK.x, MOVE_STICK.y);
+  if (gp.axes.length >= 4){
+    stickPair(gp, "right", MOVE_CANDIDATE);
+    const len = Math.hypot(MOVE_CANDIDATE.x, MOVE_CANDIDATE.y);
+    if (len > bestLen){
+      MOVE_STICK.x = MOVE_CANDIDATE.x;
+      MOVE_STICK.y = MOVE_CANDIDATE.y;
+      bestLen = len;
+    }
+  }
+  return bestLen > 0.12 ? MOVE_STICK : ZERO_STICK;
+}
+
 export function triggerValue(proxy){
   const gp = controllerGamepad(proxy);
   if (!gp) return 0;
-  return Math.max(buttonValue(gp, 0), buttonValue(gp, 1), buttonValue(gp, 4), buttonValue(gp, 5));
+  // Phase 143: A/B buttons are intentionally NOT teleport triggers.
+  // Quest A caused teleport freeze reports; only trigger + grip/squeeze can arm teleport.
+  return Math.max(buttonValue(gp, 0), buttonValue(gp, 1));
 }
 
 export function movementStick(leftControllerRef, rightControllerRef){
-  const leftGp = controllerGamepad(leftControllerRef);
-  stickPair(leftGp, "left", MOVE_STICK);
-  if (Math.hypot(MOVE_STICK.x, MOVE_STICK.y) > 0.12) return MOVE_STICK;
   const rightGp = controllerGamepad(rightControllerRef);
-  stickPair(rightGp, "left", MOVE_STICK);
-  if (Math.hypot(MOVE_STICK.x, MOVE_STICK.y) > 0.12) return MOVE_STICK;
+  const rightMove = copyBestStick(rightGp);
+  if (Math.hypot(rightMove.x, rightMove.y) > 0.12) return rightMove;
+  const leftGp = controllerGamepad(leftControllerRef);
+  const leftMove = copyBestStick(leftGp);
+  if (Math.hypot(leftMove.x, leftMove.y) > 0.12) return leftMove;
   return ZERO_STICK;
 }
 
@@ -56,6 +77,8 @@ export function snapTurnStick(leftControllerRef, rightControllerRef){
   const rightGp = controllerGamepad(rightControllerRef);
   stickPair(rightGp, "right", TURN_STICK);
   if (Math.abs(TURN_STICK.x) > 0.15) return TURN_STICK;
+  stickPair(rightGp, "left", TURN_STICK);
+  if (Math.abs(TURN_STICK.x) > 0.15 && Math.abs(TURN_STICK.y) < 0.35) return TURN_STICK;
   const leftGp = controllerGamepad(leftControllerRef);
   stickPair(leftGp, "right", TURN_STICK);
   return TURN_STICK;
@@ -84,12 +107,12 @@ export function nextCameraForwardPosition({ renderer, camera, leftControllerRef,
   const forward = vectors.forward;
   const right = vectors.right;
   const forwardAmount = -move.y;
-  const strafeAmount = move.x * 0.65;
+  const strafeAmount = move.x * 0.72;
   const stepX = (forward.x * forwardAmount + right.x * strafeAmount) * speed * dt;
   const stepZ = (forward.z * forwardAmount + right.z * strafeAmount) * speed * dt;
   NEXT_POS.x = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
   NEXT_POS.z = THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp);
-  NEXT_POS.moved = true;
+  NEXT_POS.moved = Math.abs(stepX) + Math.abs(stepZ) > 0.0001;
   return NEXT_POS;
 }
 
@@ -101,9 +124,9 @@ export function shouldSnapTurn(leftControllerRef, rightControllerRef, cooldownRe
 
 window.SVR_LOCOMOTION_LOCK = {
   phase: LOCOMOTION_PHASE,
-  movement: "left stick camera-forward with right-controller fallback",
-  snapTurn: "right stick 45 degrees",
-  fallback: "right controller left-stick pair if needed",
-  teleport: "hold trigger/A/grip or hand fist/pinch and release commit",
+  movement: "right controller stick now supports forward/back and strafe by testing both Quest axis pairs",
+  snapTurn: "right stick 45 degrees when horizontal axis is used",
+  teleport: "A/B disabled; trigger or grip only",
+  freezeFix: "A button removed from teleport arming path",
   allocationPolicy: "reused vectors/objects in hot path"
 };
