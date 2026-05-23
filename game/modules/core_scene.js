@@ -5,7 +5,7 @@ export function createCore({ containerId = "app" } = {}){
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x050508);
 
-  const camera = new THREE.PerspectiveCamera(68, window.innerWidth / window.innerHeight, 0.09, 1700);
+  const camera = new THREE.PerspectiveCamera(66, window.innerWidth / window.innerHeight, 0.08, 180);
 
   const renderer = new THREE.WebGLRenderer({
     antialias: false,
@@ -16,15 +16,19 @@ export function createCore({ containerId = "app" } = {}){
     preserveDrawingBuffer: false
   });
 
+  const ua = navigator.userAgent || "";
+  const quest = /Quest|OculusBrowser|Meta Quest|VR/i.test(ua);
+  const startScale = quest ? 0.38 : 0.46;
+
   renderer.setClearColor(0x050508, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 0.50));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, startScale));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
-  if (renderer.xr.setFramebufferScaleFactor) renderer.xr.setFramebufferScaleFactor(0.50);
+  if (renderer.xr.setFramebufferScaleFactor) renderer.xr.setFramebufferScaleFactor(startScale);
   try { renderer.xr.setFoveation?.(1.0); } catch {}
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.78;
+  renderer.toneMappingExposure = 0.74;
   renderer.shadowMap.enabled = false;
   renderer.sortObjects = false;
 
@@ -43,15 +47,16 @@ export function createCore({ containerId = "app" } = {}){
   });
 
   window.SVR_XR_RENDERER_LOCK = {
-    phase: "PHASE-132-FLOOR-PERFORMANCE-RUNTIME-REPAIR-LOCK",
-    nearPlane: 0.09,
-    farPlane: 1700,
-    pixelRatioMax: 0.50,
-    framebufferScale: 0.50,
+    phase: "PHASE-141-QUEST-FPS-EMERGENCY-STABILITY-LOCK",
+    nearPlane: 0.08,
+    farPlane: 180,
+    pixelRatioMax: startScale,
+    framebufferScale: startScale,
     foveation: 1.0,
     antialias: false,
     shadows: false,
-    sortObjects: false
+    sortObjects: false,
+    questDetected: quest
   };
   window.SVR_CORE_SCENE = scene;
   window.SVR_CORE_CAMERA = camera;
