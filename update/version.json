@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-144-RIGHT-CONTROLLER-ONLY-TELEPORT-FREEZE-ISOLATION-LOCK",
-  "scope": "game-right-controller-only-teleport-freeze-isolation",
-  "fix": "disabled hand-tracking output because hands freeze, ignored left controller for this test, forced right Quest controller only, kept trigger/grip as the only teleport inputs, added generated high-contrast SVR TELEPORT logo target, delayed teleport commit by 80ms plus animation frame, and preserved right-controller movement/snap-turn for freeze isolation",
+  "build": "PHASE-145-GRAPHICS-CONTRAST-NO-MUSIC-TELEPORT-ALIGNMENT-LOCK",
+  "scope": "game-graphics-contrast-no-music-teleport-alignment",
+  "fix": "removed music completely, improved Quest graphics clarity by raising renderer scale and reducing foveation, sharpened the lobby floor texture, increased UI contrast, fixed right-controller teleport alignment so the target does not appear behind the player, made grip preview-only because grip release froze, and kept trigger release as the only teleport commit path",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-143-QUEST-CONTROLLER-AXIS-A-BUTTON-FREEZE-FIX-LOCK",
-  "nextBuild": "PHASE-145-BARE-TELEPORT-ONLY-DIAGNOSTIC-LOCK-IF-FREEZE-CONTINUES"
+  "previousStableBuild": "PHASE-144-RIGHT-CONTROLLER-ONLY-TELEPORT-FREEZE-ISOLATION-LOCK",
+  "nextBuild": "PHASE-146-BARE-RIGHT-CONTROLLER-TRIGGER-ONLY-TELEPORT-DIAGNOSTIC-LOCK-IF-FREEZE-CONTINUES"
 }
