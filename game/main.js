@@ -3,21 +3,16 @@ import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
-import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { createDatabaseClient } from "./modules/database_client.js";
 import { CONFIG } from "./modules/config.js";
 import { createViewPerformanceManager } from "./modules/view_performance_manager.js";
-import { installHighSkyNorthEast } from "./modules/high_sky_north_east.js";
-import { installLobbyFloorRecovery } from "./modules/lobby_floor_recovery.js";
-import { installLobbyRuntimeRepair } from "./modules/lobby_runtime_repair.js";
+import { buildStableLobby } from "./modules/lobby_stable_refine.js";
 
-const PHASE_BUILD = "PHASE-132-FLOOR-PERFORMANCE-RUNTIME-REPAIR-LOCK";
+const PHASE_BUILD = "PHASE-133-STABLE-LOBBY-REFINE-REBASE-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
-const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 
@@ -45,32 +40,20 @@ function setStatus(text, { force = false, minGap = 180 } = {}){
   lastStatusAt = now;
   $status.textContent = text;
 }
-
 let lastModeText = "";
-function setMode(text){
-  if (!$mode || text === lastModeText) return;
-  lastModeText = text;
-  $mode.textContent = text;
-}
-
+function setMode(text){ if (!$mode || text === lastModeText) return; lastModeText = text; $mode.textContent = text; }
 function log(...args){
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
-  if ($log){
-    $log.textContent += line + "\n";
-    $log.scrollTop = $log.scrollHeight;
-  }
+  if ($log){ $log.textContent += line + "\n"; $log.scrollTop = $log.scrollHeight; }
 }
 
-$toggleLog?.addEventListener("click", ()=>{
-  $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
-});
-
+$toggleLog?.addEventListener("click", ()=>{ $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none"; });
 if (AUTOCAM) document.body.classList.add("preview-mode");
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData._camera = camera;
 const worldRoot = new THREE.Group();
-worldRoot.name = "SVR_WORLD_ROOT_PHASE132";
+worldRoot.name = "SVR_WORLD_ROOT_PHASE133_STABLE";
 scene.add(worldRoot);
 window.SVR_WORLD_ROOT = worldRoot;
 
@@ -82,49 +65,19 @@ function forceSafeDesktopSpawn(){
 }
 forceSafeDesktopSpawn();
 
-window.addEventListener("error", (e)=>{
-  if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
-  if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
-});
-window.addEventListener("unhandledrejection", (e)=>{
-  if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
-  if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e));
-});
+window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e)); });
+window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
 const perf = createViewPerformanceManager({ renderer, scene, camera, worldRoot, statusCb: (text)=>setStatus(text, { force:true }) });
-const highSky = installHighSkyNorthEast({ scene, worldRoot });
-const floorRecovery = installLobbyFloorRecovery({ worldRoot, scene, radius: CONFIG.ROOM_RADIUS || 24 });
-let runtimeRepair = null;
-
-setStatus("Loading world…", { force: true });
-const world = await buildSkylineRoom(worldRoot, { log, renderer });
+setStatus("Loading stable lobby…", { force: true });
+const world = buildStableLobby(worldRoot, { renderer, log });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 forceSafeDesktopSpawn();
-floorRecovery?.update?.();
-runtimeRepair = installLobbyRuntimeRepair({ scene, worldRoot, radius: CONFIG.ROOM_RADIUS || 24, camera, renderer });
-runtimeRepair?.apply?.();
-
-if (!sceneTargets.pgaDrive) sceneTargets.pgaDrive = sceneTargets.pgaWall || sceneTargets.pga || sceneTargets.lobby;
-if (!sceneTargets.chipPutt) sceneTargets.chipPutt = sceneTargets.pgaWall || sceneTargets.pga || sceneTargets.lobby;
-if (!sceneTargets.storeRoom) sceneTargets.storeRoom = sceneTargets.sponsor || sceneTargets.lobby;
-if (!sceneTargets.smokerLounge) sceneTargets.smokerLounge = sceneTargets.sponsor || sceneTargets.lobby;
-if (!sceneTargets.reikiRoom) sceneTargets.reikiRoom = sceneTargets.reiki || sceneTargets.lobby;
 window.SVR_SCENE_TARGETS = sceneTargets;
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, worldRoot, log });
-const dbClient = createDatabaseClient({
-  log,
-  statusCb: (dbState)=>{
-    if (!renderer?.xr?.isPresenting && dbState.status === 'online') setStatus(`DB API: ${dbState.database || 'online'}`);
-  }
-});
-dbClient.health().then((dbState)=>{
-  log('[SVR DB]', dbState);
-  dbClient.postGameEvent('game_boot', { build: PHASE_BUILD, preview: PREVIEW, embed: EMBED });
-}).catch((error)=> log('[SVR DB] init failed', error?.message || error));
-
 const audio = createAudioPlaylist({
   tracks: [
     { title: "Lobby 07", url: "./assets/audio/07.mp3" },
@@ -143,20 +96,14 @@ let seated = false;
 let seatIndex = -1;
 let cash = 50000;
 
-function currentHeadXZ(){
-  if (renderer.xr.isPresenting) return new THREE.Vector3(tp.getPlayerPose().x, 0, tp.getPlayerPose().z);
-  return camera.position.clone();
-}
-function inTableZone(){
-  const p = currentHeadXZ();
-  return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7);
-}
+function currentHeadXZ(){ return renderer.xr.isPresenting ? new THREE.Vector3(tp.getPlayerPose().x, 0, tp.getPlayerPose().z) : camera.position.clone(); }
+function inTableZone(){ const p = currentHeadXZ(); return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7); }
 function seatLabel(){ return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing"; }
 function moveDesktopToSeat(seat){ camera.position.set(seat.x, 1.12, seat.z); camera.lookAt(0, 1.0, 0); }
 function joinTable(){
   if (!inTableZone()) return false;
   const p = currentHeadXZ();
-  let best = 0;
+  let best = 3;
   let bestDist = Infinity;
   seats.forEach((seat, idx)=>{
     if (seat.label === "Dealer Side") return;
@@ -181,28 +128,17 @@ function leaveTable(){
 function movePlayerToSpot(target, lookTarget = null){
   if (!target) return;
   if (renderer.xr.isPresenting) tp.setPlayerPose(target.x, 0, target.z);
-  else {
-    camera.position.set(target.x, 1.6, target.z);
-    if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z);
-  }
+  else { camera.position.set(target.x, 1.6, target.z); if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z); }
 }
 function gotoScene(key){
   const rec = sceneTargets?.[key];
-  if (!rec?.pos) return false;
+  if (!rec?.pos){ setStatus(`Route unavailable: ${key}`, { force:true }); return false; }
   movePlayerToSpot(rec.pos, rec.look || null);
   setStatus(`Quick jump: ${key}`, { force: true });
   return true;
 }
 
-$sceneButtons.forEach((btn)=>{
-  btn.addEventListener("click", ()=>{
-    const route = btn.dataset.route;
-    if (route){ dbClient?.postGameEvent?.('scene_route', { route }); location.href = route; return; }
-    const key = btn.dataset.scene;
-    if (key){ dbClient?.postGameEvent?.('scene_jump', { key }); gotoScene(key); }
-  });
-});
-
+$sceneButtons.forEach((btn)=>btn.addEventListener("click", ()=>{ const key = btn.dataset.scene; if (key) gotoScene(key); }));
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
   if (e.code === "KeyM") await audio.toggle();
@@ -226,51 +162,16 @@ window.addEventListener("keydown", async (e)=>{
 });
 
 const watch = createWristWatch({
-  scene,
-  camera,
-  renderer,
-  getState: ()=>({
-    audioEnabled: audio.getState().enabled,
-    trackTitle: audio.getState().trackTitle || "Lobby 07",
-    cash,
-    seated,
-    inTableZone: inTableZone(),
-    seatLabel: seatLabel(),
-    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
-  }),
-  actions: {
-    toggleAudio: ()=>audio.toggle(),
-    nextTrack: ()=>audio.next(),
-    joinTable,
-    leaveTable,
-    toggleTeleport: ()=>tp.toggleMode(),
-    goLobby: ()=>gotoScene("lobby"),
-    goTable: ()=>gotoScene("table"),
-    goSeat: ()=>gotoScene("seat"),
-    goReiki: ()=>gotoScene("reiki"),
-    goPga: ()=>gotoScene("pga"),
-    goLegend: ()=>gotoScene("legends"),
-    goSponsor: ()=>gotoScene("sponsor"),
-    goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom"),
-    goPgaDrive: ()=>gotoScene("pgaDrive"),
-    goChipPutt: ()=>gotoScene("chipPutt"),
-    goStoreRoom: ()=>gotoScene("storeRoom"),
-    goSmokerLounge: ()=>gotoScene("smokerLounge")
-  }
+  scene, camera, renderer,
+  getState: ()=>({ audioEnabled: audio.getState().enabled, trackTitle: audio.getState().trackTitle || "Lobby 07", cash, seated, inTableZone: inTableZone(), seatLabel: seatLabel(), teleportEnabled: tp.isEnabled ? tp.isEnabled() : true }),
+  actions: { toggleAudio: ()=>audio.toggle(), nextTrack: ()=>audio.next(), joinTable, leaveTable, toggleTeleport: ()=>tp.toggleMode(), goLobby: ()=>gotoScene("lobby"), goTable: ()=>gotoScene("table"), goSeat: ()=>gotoScene("seat"), goReiki: ()=>gotoScene("reiki"), goPga: ()=>gotoScene("pga"), goLegend: ()=>gotoScene("legends"), goSponsor: ()=>gotoScene("sponsor"), goScorpion: ()=>gotoScene("scorpion"), goReikiRoom: ()=>gotoScene("reikiRoom"), goPgaDrive: ()=>gotoScene("pgaDrive"), goChipPutt: ()=>gotoScene("chipPutt"), goStoreRoom: ()=>gotoScene("storeRoom"), goSmokerLounge: ()=>gotoScene("smokerLounge") }
 });
 
-$toggleJoints?.addEventListener("click", ()=>{
-  const on = hands.toggleDebug();
-  $toggleJoints.textContent = on ? "Joints On" : "Joints";
-});
-
-setStatus("Loading logo…", { force: true });
+$toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $toggleJoints.textContent = on ? "Joints On" : "Joints"; });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 132 hard floor and runtime performance repair active.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 133 stable refined lobby active.", { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : "Hands/controllers ready");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -280,89 +181,39 @@ function setHudVisible(visible){
 }
 if (AUTOCAM) setHudVisible(false);
 if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display","none");
-
-renderer.xr.addEventListener("sessionstart", async ()=>{
-  setHudVisible(false);
-  document.getElementById("sceneNav")?.style.setProperty("display","none");
-  runtimeRepair?.apply?.();
-  await audio.prime();
-  await audio.start();
-  await tp.onSessionStart();
-});
-renderer.xr.addEventListener("sessionend", ()=>{
-  tp.onSessionEnd?.();
-  setHudVisible(true);
-  const nav = document.getElementById("sceneNav");
-  if (nav && !AUTOCAM) nav.style.display = "flex";
-  forceSafeDesktopSpawn();
-  runtimeRepair?.apply?.();
-});
+renderer.xr.addEventListener("sessionstart", async ()=>{ setHudVisible(false); document.getElementById("sceneNav")?.style.setProperty("display","none"); await audio.prime(); await audio.start(); await tp.onSessionStart(); });
+renderer.xr.addEventListener("sessionend", ()=>{ tp.onSessionEnd?.(); setHudVisible(true); const nav = document.getElementById("sceneNav"); if (nav && !AUTOCAM) nav.style.display = "flex"; forceSafeDesktopSpawn(); });
 
 let tPrev = performance.now();
 const previewTarget = new THREE.Vector3(0, 1.25, 0);
 const previewPos = new THREE.Vector3();
-const previewShots = [
-  { y: 1.62, r: previewOrbitRadius - 3.5, speed: 0.030, sway: 0.015, lookY: 1.02, targetX: 0.0, targetZ: 0.0, leadX: 0.14, leadZ: 0.08 },
-  { y: 1.68, r: previewOrbitRadius - 3.0, speed: -0.024, sway: 0.018, lookY: 1.04, targetX: 0.1, targetZ: -0.1, leadX: -0.10, leadZ: 0.12 },
-  { y: 1.64, r: previewOrbitRadius - 2.6, speed: 0.022, sway: 0.018, lookY: 1.03, targetX: -0.12, targetZ: 0.04, leadX: 0.10, leadZ: -0.08 }
-];
-
 renderer.setAnimationLoop(()=>{
   const now = performance.now();
   const dt = Math.min((now - tPrev) / 1000, 0.033);
   tPrev = now;
   perf.update(dt);
-  highSky?.update?.(dt);
-  floorRecovery?.update?.();
-  runtimeRepair?.update?.();
-
+  world.update?.(dt);
   if (!renderer.xr.isPresenting){
     if (!AUTOCAM) desktop.update(dt);
     else {
-      const shotIndex = Math.floor(now / 9000) % previewShots.length;
-      const shot = previewShots[shotIndex];
-      const orbitT = now * 0.001 * shot.speed;
-      previewPos.set(
-        Math.cos(orbitT) * shot.r + shot.leadX * Math.sin(now * 0.00047),
-        shot.y + Math.sin(now * 0.0014 + shotIndex) * shot.sway,
-        Math.sin(orbitT) * shot.r + shot.leadZ * Math.cos(now * 0.00053)
-      );
-      previewTarget.set(shot.targetX, shot.lookY, shot.targetZ);
-      camera.position.lerp(previewPos, 0.06);
+      const orbitT = now * 0.000035;
+      previewPos.set(Math.cos(orbitT)*18, 1.72, Math.sin(orbitT)*18);
+      previewTarget.set(0,1.16,0);
+      camera.position.lerp(previewPos, 0.055);
       camera.lookAt(previewTarget);
     }
     scene.userData._camera = camera;
-  } else {
-    scene.userData._camera = renderer.xr.getCamera(camera);
-  }
-
-  if (worldRoot.userData._tickWorld) worldRoot.userData._tickWorld(dt);
-  if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
-
+  } else scene.userData._camera = renderer.xr.getCamera(camera);
   hands.update(dt);
   hands.updateDebug();
-
   const leftHand = hands.getLeftHand();
   const rightHand = hands.getRightHand();
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
-  if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>setStatus(text), modeCb: (text)=>setMode(text) });
-  }
-
+  if (!AUTOCAM || renderer.xr.isPresenting) tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>setStatus(text), modeCb: (text)=>setMode(text) });
   if (watch) watch.update(dt, leftHand, rightHand);
-
   renderer.render(scene, camera);
 });
 
-const canvasEl = renderer.domElement;
-canvasEl.addEventListener("pointerdown", async ()=>{
-  const st = audio.getState();
-  if (!st.enabled) await audio.start();
-}, { passive: true });
-canvasEl.addEventListener("webglcontextlost", (e)=>{
-  e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading…");
-  setStatus("WebGL context lost (reloading…)", { force: true });
-  setTimeout(()=>location.reload(), 500);
-}, false);
+renderer.domElement.addEventListener("pointerdown", async ()=>{ const st = audio.getState(); if (!st.enabled) await audio.start(); }, { passive: true });
+renderer.domElement.addEventListener("webglcontextlost", (e)=>{ e.preventDefault(); log("[ERR] WebGL context lost. Reloading…"); setStatus("WebGL context lost (reloading…)", { force: true }); setTimeout(()=>location.reload(), 500); }, false);
