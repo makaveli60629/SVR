@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-136-STABLE-LOBBY-FULL-DEMO-REBUILD-LOCK",
-  "scope": "game-lobby-floor-texture-demo-rebuild",
-  "fix": "added a stronger textured SVR-Version 0.1 lobby floor, safe spawn pad, north arrow, improved portal/wall presentation, visible hub portal layout, and high orbit Moon/Mars through the stable lobby module while preserving Quest performance rules",
+  "build": "PHASE-137-MOVEMENT-LOCOMOTION-TELEPORT-MODULE-LOCK",
+  "scope": "game-movement-locomotion-teleport-lock",
+  "fix": "locked Quest/WebXR locomotion and teleport modules with zero-allocation movement hot path, trigger/A/grip hold-to-aim release-to-teleport behavior, hand fist teleport mode, pinch-release teleport commit, watch teleport toggle compatibility, and world-root shift teleport without XR reference-space mutation",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-135-MASTER-MANIFEST-DEPLOY-WORKFLOW-LOCK",
-  "nextBuild": "PHASE-137-MOVEMENT-LOCOMOTION-TELEPORT-MODULE-LOCK"
+  "previousStableBuild": "PHASE-136-STABLE-LOBBY-FULL-DEMO-REBUILD-LOCK",
+  "nextBuild": "PHASE-138-WATCH-UI-INPUT-BRIDGE-LOCK"
 }
