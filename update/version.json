@@ -1,7 +1,7 @@
 {
-  "build": "PHASE-127-STALE-PHASE-104-UNLOCK-LOCK",
+  "build": "PHASE-128-SPAWN-TELEPORT-SKY-NORTH-LOCK",
   "scope": "game-only",
-  "fix": "game entry page unlocked from stale Phase 104 label and rewired with latest module stack cache busters",
+  "fix": "safe spawn moved out of table, desktop spawn faces north, teleport switched to XR offset reference space to reduce freezing, high sky Moon placed north, Mars placed east, and Phase 128 labels wired",
   "siteTouched": false,
-  "previousStableBuild": "PHASE-126-NPC-AVATAR-PROFESSIONAL-POLISH-LOCK"
+  "previousStableBuild": "PHASE-127-STALE-PHASE-104-UNLOCK-LOCK"
 }
