@@ -5,9 +5,7 @@ export function createCore({ containerId = "app" } = {}){
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x050508);
 
-  // Phase 104: lower near plane for Quest/WebXR so close watch, hand-fire, and teleport markers
-  // do not clip differently between eyes.
-  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 1600);
+  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 2200);
 
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -45,12 +43,16 @@ export function createCore({ containerId = "app" } = {}){
   });
 
   window.SVR_XR_RENDERER_LOCK = {
-    phase: "PHASE-104-XR-EYE-STABILITY-LOCK",
+    phase: "PHASE-128-SPAWN-TELEPORT-SKY-NORTH-LOCK",
     nearPlane: 0.05,
+    farPlane: 2200,
     pixelRatioMax: 0.82,
     framebufferScale: 0.82,
     shadows: false
   };
+  window.SVR_CORE_SCENE = scene;
+  window.SVR_CORE_CAMERA = camera;
+  window.SVR_CORE_RENDERER = renderer;
 
   return { scene, camera, renderer };
 }
