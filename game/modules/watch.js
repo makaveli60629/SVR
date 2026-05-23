@@ -17,9 +17,9 @@ const V2 = new THREE.Vector3();
 const V3 = new THREE.Vector3();
 const M0 = new THREE.Matrix4();
 const FLIP_Q = new THREE.Quaternion();
-const SCREEN_TILT_Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.34);
+const SCREEN_TILT_Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.22);
 const DISPLAY_MIRRORED = false;
-const DISPLAY_ROTATE_180 = true;
+const DISPLAY_ROTATE_180 = false;
 
 function getJointWorld(hand, names){
   if (!hand?.joints) return null;
@@ -64,8 +64,8 @@ function computeForearmPose(hand, camera, renderer, side = 'left'){
   quaternion.multiply(SCREEN_TILT_Q);
 
   const position = wrist.clone()
-    .add(forearmDir.clone().multiplyScalar(0.092))
-    .add(faceNormal.clone().multiplyScalar(0.020))
+    .add(forearmDir.clone().multiplyScalar(0.088))
+    .add(faceNormal.clone().multiplyScalar(0.024))
     .add(acrossPalm.clone().multiplyScalar(side === 'left' ? -0.004 : 0.004));
 
   return { position, quaternion };
@@ -79,7 +79,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 8;
+  tex.anisotropy = 4;
 
   const group = new THREE.Group();
   group.visible = false;
@@ -88,37 +88,20 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   const plateW = 0.224;
   const plateH = 0.116;
 
-  const frame = new THREE.Mesh(
-    new THREE.BoxGeometry(plateW * 0.98, plateH * 0.98, 0.003),
-    new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.36, metalness: 0.20, emissive: 0x090b12, emissiveIntensity: 0.02, transparent: true, opacity: 0.84 })
-  );
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(plateW * 0.98, plateH * 0.98, 0.003), new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.42, metalness: 0.14, emissive: 0x090b12, emissiveIntensity: 0.02, transparent: true, opacity: 0.84 }));
   frame.position.z = -0.014;
   group.add(frame);
 
-  const strapL = new THREE.Mesh(
-    new THREE.BoxGeometry(plateW * 0.16, plateH * 0.34, 0.002),
-    new THREE.MeshStandardMaterial({ color: 0x181d2a, roughness: 0.62, metalness: 0.08, emissive: 0x06080c, emissiveIntensity: 0.02 })
-  );
+  const strapL = new THREE.Mesh(new THREE.BoxGeometry(plateW * 0.16, plateH * 0.34, 0.002), new THREE.MeshStandardMaterial({ color: 0x181d2a, roughness: 0.68, metalness: 0.05, emissive: 0x06080c, emissiveIntensity: 0.02 }));
   strapL.position.set(-plateW * 0.43, 0, -0.018);
   group.add(strapL);
   const strapR = strapL.clone();
   strapR.position.x = plateW * 0.43;
   group.add(strapR);
 
-  const bezel = new THREE.Mesh(
-    new THREE.PlaneGeometry(plateW * 1.00, plateH * 1.00),
-    new THREE.MeshBasicMaterial({ color: 0x243048, transparent: true, opacity: 0.12, side: THREE.DoubleSide, depthWrite: false, depthTest: false })
-  );
-  bezel.position.z = -0.006;
-  group.add(bezel);
-
-  const screenFront = new THREE.Mesh(
-    new THREE.PlaneGeometry(plateW * 0.965, plateH * 0.965),
-    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.FrontSide, depthWrite: false, depthTest: false, toneMapped: false })
-  );
+  const screenFront = new THREE.Mesh(new THREE.PlaneGeometry(plateW * 0.965, plateH * 0.965), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.FrontSide, depthWrite: false, depthTest: false, toneMapped: false }));
   screenFront.renderOrder = 40;
   screenFront.position.z = 0.012;
-  screenFront.rotation.z = 0;
   group.add(screenFront);
 
   function drawButton(btn, hovered){
@@ -138,15 +121,14 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   }
 
   function buildButtons(state){
-    const buttons = [
+    return [
       { id: 'siteHub', label: 'SITE HUB', x: 30, y: 128, w: 310, h: 116, font: 42, hold: 0.16, margin: 8 },
       { id: 'rooms', label: 'ROOMS', x: 358, y: 128, w: 300, h: 116, font: 42, hold: 0.16, margin: 8 },
       { id: 'teleport', label: state.teleportEnabled ? 'TELEPORT ON' : 'TELEPORT', x: 676, y: 128, w: 318, h: 116, font: 38, hold: 0.16, margin: 8 },
       { id: 'join', label: state.seated ? 'LEAVE TABLE' : 'JOIN TABLE', x: 30, y: 270, w: 310, h: 92, font: 32, hold: 0.16, margin: 8 },
       { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC', x: 358, y: 270, w: 300, h: 92, font: 32, hold: 0.18, margin: 8 },
-      { id: 'next', label: 'NEXT', x: 676, y: 270, w: 318, h: 92, font: 32, hold: 0.18, margin: 8 },
+      { id: 'next', label: 'NEXT', x: 676, y: 270, w: 318, h: 92, font: 32, hold: 0.18, margin: 8 }
     ];
-    return buttons;
   }
 
   let hoveredId = null;
@@ -159,54 +141,24 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
   function draw(force = false){
     const state = getState();
-    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, tp: state.teleportEnabled, sec: new Date().getSeconds() });
+    const sig = JSON.stringify({ h: hoveredId, ae: state.audioEnabled, c: state.cash, s: state.seated, seat: state.seatLabel, tp: state.teleportEnabled, phase:'99' });
     if (!force && sig === lastSig) return;
     lastSig = sig;
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    if (DISPLAY_ROTATE_180){
-      ctx.translate(canvas.width, canvas.height);
-      ctx.rotate(Math.PI);
-    }
-    if (DISPLAY_MIRRORED){
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-    }
+    if (DISPLAY_ROTATE_180){ ctx.translate(canvas.width, canvas.height); ctx.rotate(Math.PI); }
+    if (DISPLAY_MIRRORED){ ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
     const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
     grad.addColorStop(0, 'rgba(5,8,16,0.94)');
     grad.addColorStop(1, 'rgba(18,10,32,0.97)');
     ctx.fillStyle = grad;
-    rr(ctx, 12, 12, 1000, 488, 34);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(105,232,255,0.62)';
-    ctx.lineWidth = 6;
-    rr(ctx, 12, 12, 1000, 488, 34);
-    ctx.stroke();
-
-    const now = new Date();
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 52px system-ui, Arial';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('SVR WATCH', 34, 58);
-
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#7ff5c7';
-    ctx.font = 'bold 36px system-ui, Arial';
-    ctx.fillText(`$${Number(state.cash || 0).toLocaleString()}`, 972, 58);
-
-    ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(233,233,255,0.86)';
-    ctx.font = '26px system-ui, Arial';
-    ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}   •   ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`, 38, 96);
-
+    rr(ctx, 12, 12, 1000, 488, 34); ctx.fill();
+    ctx.strokeStyle = 'rgba(105,232,255,0.62)'; ctx.lineWidth = 6; rr(ctx, 12, 12, 1000, 488, 34); ctx.stroke();
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 52px system-ui, Arial'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText('SVR WATCH', 34, 58);
+    ctx.textAlign = 'right'; ctx.fillStyle = '#7ff5c7'; ctx.font = 'bold 36px system-ui, Arial'; ctx.fillText(`$${Number(state.cash || 0).toLocaleString()}`, 972, 58);
+    ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(233,233,255,0.86)'; ctx.font = '26px system-ui, Arial'; ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 38, 96);
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
-
-    ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(180,220,255,0.82)';
-    ctx.font = 'bold 24px system-ui, Arial';
-    ctx.fillText('Pinch to press • fist by face aims teleport • controller trigger/A releases teleport', 512, 430);
+    ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(180,220,255,0.82)'; ctx.font = 'bold 24px system-ui, Arial'; ctx.fillText('Pinch to press • fist toggles teleport • release commits movement', 512, 430);
     ctx.restore();
     tex.needsUpdate = true;
   }
@@ -215,21 +167,14 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     const state = getState();
     let x = ((local.x / plateW) + 0.5) * canvas.width;
     let y = ((-local.y / plateH) + 0.5) * canvas.height;
-    if (DISPLAY_ROTATE_180){
-      x = canvas.width - x;
-      y = canvas.height - y;
-    }
+    if (DISPLAY_ROTATE_180){ x = canvas.width - x; y = canvas.height - y; }
     if (DISPLAY_MIRRORED) x = canvas.width - x;
-    let best = null;
-    let bestScore = Infinity;
+    let best = null, bestScore = Infinity;
     for (const btn of buildButtons(state)){
       const margin = btn.margin ?? 10;
-      const inside = x >= btn.x - margin && x <= btn.x + btn.w + margin && y >= btn.y - margin && y <= btn.y + btn.h + margin;
-      if (!inside) continue;
-      const cx = btn.x + btn.w / 2;
-      const cy = btn.y + btn.h / 2;
-      const nx = (x - cx) / Math.max(btn.w / 2, 1);
-      const ny = (y - cy) / Math.max(btn.h / 2, 1);
+      if (x < btn.x - margin || x > btn.x + btn.w + margin || y < btn.y - margin || y > btn.y + btn.h + margin) continue;
+      const nx = (x - (btn.x + btn.w / 2)) / Math.max(btn.w / 2, 1);
+      const ny = (y - (btn.y + btn.h / 2)) / Math.max(btn.h / 2, 1);
       const score = nx * nx + ny * ny;
       if (score < bestScore){ best = btn.id; bestScore = score; }
     }
@@ -248,69 +193,44 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
   function update(dt, leftHand, rightHand){
     const anchor = leftHand?.joints?.wrist ? leftHand : rightHand?.joints?.wrist ? rightHand : null;
-    if (!anchor?.joints?.wrist){
-      group.visible = false;
-      hoveredId = null;
-      draw(true);
-      return;
-    }
-
+    if (!anchor?.joints?.wrist){ group.visible = false; hoveredId = null; draw(true); return; }
     const watchOnLeft = anchor === leftHand;
     const pose = computeForearmPose(anchor, camera, renderer, watchOnLeft ? 'left' : 'right');
-    if (!pose){
-      group.visible = false;
-      hoveredId = null;
-      draw(true);
-      return;
-    }
-
+    if (!pose){ group.visible = false; hoveredId = null; draw(true); return; }
     group.visible = true;
     group.position.copy(pose.position);
     group.quaternion.copy(pose.quaternion);
     group.updateMatrixWorld(true);
 
-    let nextHovered = null;
-    let activeInput = null;
-    let bestDepth = Infinity;
+    let nextHovered = null, activeInput = null, bestDepth = Infinity;
     const candidates = watchOnLeft ? [rightHand, leftHand] : [leftHand, rightHand];
     for (const candidate of candidates){
       const tip = candidate?.joints?.['index-finger-tip'];
       if (!tip) continue;
-      const tipPos = new THREE.Vector3();
-      tip.getWorldPosition(tipPos);
+      const tipPos = new THREE.Vector3(); tip.getWorldPosition(tipPos);
       const local = group.worldToLocal(tipPos.clone());
       if (local.z > -0.018 && local.z < 0.085 && Math.abs(local.x) < plateW * 0.74 && Math.abs(local.y) < plateH * 0.74){
         const hit = localHit(local);
-        if (hit){
-          const depth = Math.abs(local.z);
-          if (depth < bestDepth){ bestDepth = depth; nextHovered = hit; activeInput = candidate; }
-        }
+        if (hit){ const depth = Math.abs(local.z); if (depth < bestDepth){ bestDepth = depth; nextHovered = hit; activeInput = candidate; } }
       }
     }
     hoveredId = nextHovered;
-
     const pinching = !!activeInput && isPinching(activeInput);
     if (pinching && hoveredId && !pressLockId) pressLockId = hoveredId;
     if (pinching && pressLockId) hoveredId = pressLockId;
     if (!pinching) pressLockId = null;
     if (hoveredId === lastHovered && hoveredId) hoverTime += dt;
     else { lastHovered = hoveredId; hoverTime = hoveredId ? 0 : 0; pinchTime = 0; if (pressed) pressed = false; if (!hoveredId) pressLockId = null; }
-
-    const buttons = buildButtons(getState());
-    const activeBtn = buttons.find(btn => btn.id === hoveredId) || null;
-    if (hoveredId && pinching) pinchTime += dt;
-    else if (!pinching) pinchTime = 0;
-    const directHold = activeBtn?.hold ?? 0.12;
-    if (hoveredId && !pressed && pinching && pinchTime > directHold){
-      pressed = true;
-      activate(hoveredId);
-      hoverTime = 0;
-      pinchTime = 0;
+    const activeBtn = buildButtons(getState()).find(btn => btn.id === hoveredId) || null;
+    if (hoveredId && pinching) pinchTime += dt; else if (!pinching) pinchTime = 0;
+    if (hoveredId && !pressed && pinching && pinchTime > (activeBtn?.hold ?? .12)){
+      pressed = true; activate(hoveredId); hoverTime = 0; pinchTime = 0;
     }
     if (!pinching) pressed = false;
     draw();
   }
 
   draw(true);
+  window.SVR_WATCH_ALIGNMENT_LOCK = { phase:'PHASE-99-WATCH-ALIGNMENT-LOCK', rotate180:false, mirrored:false, screenTilt:0.22 };
   return { update, object: group };
 }
