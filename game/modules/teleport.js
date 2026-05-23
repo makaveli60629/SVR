@@ -158,29 +158,44 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     return proxy?.userData?.gamepad || proxy?.userData?.inputSource?.gamepad || proxy?.userData?.controller?.inputSource?.gamepad || null;
   }
 
+  function dead(v, zone = 0.14){
+    return Math.abs(v || 0) < zone ? 0 : (v || 0);
+  }
+
   function getStick(gp, side = "left") {
     if (!gp?.axes?.length) return { x: 0, y: 0 };
     const axes = gp.axes;
-    let x = 0, y = 0;
-    if (axes.length >= 4) {
-      if (side === "right") {
-        x = axes[2] || 0;
-        y = axes[3] || 0;
-        if (Math.abs(x) < 0.001 && Math.abs(y) < 0.001) {
-          x = axes[0] || 0;
-          y = axes[1] || 0;
-        }
-      } else {
-        x = axes[0] || 0;
-        y = axes[1] || 0;
-      }
-    } else {
-      x = axes[0] || 0;
-      y = axes[1] || 0;
+    const pairs = [];
+    if (axes.length >= 2) pairs.push({ x: axes[0] || 0, y: axes[1] || 0, idx: 0 });
+    if (axes.length >= 4) pairs.push({ x: axes[2] || 0, y: axes[3] || 0, idx: 2 });
+    if (!pairs.length) return { x: 0, y: 0 };
+
+    let chosen;
+    if (side === "right") chosen = pairs.find(p=>p.idx === 2 && (Math.abs(p.x) > 0.001 || Math.abs(p.y) > 0.001)) || pairs[0];
+    else chosen = pairs.find(p=>p.idx === 0 && (Math.abs(p.x) > 0.001 || Math.abs(p.y) > 0.001)) || pairs[pairs.length - 1];
+
+    return { x: dead(chosen.x), y: dead(chosen.y) };
+  }
+
+  function bestMoveStick(){
+    const leftGp = controllerGamepad(leftControllerRef);
+    const rightGp = controllerGamepad(rightControllerRef);
+    const candidates = [];
+    if (leftGp) candidates.push(getStick(leftGp, "left"), getStick(leftGp, "right"));
+    if (rightGp) candidates.push(getStick(rightGp, "left"), getStick(rightGp, "right"));
+    let best = { x: 0, y: 0 };
+    for (const s of candidates){
+      if (Math.hypot(s.x, s.y) > Math.hypot(best.x, best.y)) best = s;
     }
-    if (Math.abs(x) < 0.14) x = 0;
-    if (Math.abs(y) < 0.14) y = 0;
-    return { x, y };
+    return best;
+  }
+
+  function bestTurnStick(){
+    const rightGp = controllerGamepad(rightControllerRef);
+    const leftGp = controllerGamepad(leftControllerRef);
+    const preferred = rightGp ? getStick(rightGp, "right") : { x: 0, y: 0 };
+    if (Math.abs(preferred.x) > 0.15) return preferred;
+    return leftGp ? getStick(leftGp, "right") : preferred;
   }
 
   function getButtonValue(gp, idx){
@@ -204,12 +219,13 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const dist = wristPos.distanceTo(headPos);
     const relativeY = wristPos.y - headPos.y;
     const relativeZ = wristPos.z - headPos.z;
-    return dist < 0.34 && relativeY > -0.28 && relativeY < 0.22 && Math.abs(relativeZ) < 0.28;
+    return dist < 0.38 && relativeY > -0.30 && relativeY < 0.24 && Math.abs(relativeZ) < 0.34;
   }
 
   function controllerTriggerValue(proxy){
     const gp = controllerGamepad(proxy);
-    return getButtonValue(gp, 0);
+    if (!gp) return 0;
+    return Math.max(getButtonValue(gp, 0), getButtonValue(gp, 1), getButtonValue(gp, 4), getButtonValue(gp, 5));
   }
 
   function controllerAimPoint(proxy){
@@ -278,18 +294,18 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   function movePlayerFromControllers(dt){
     const leftGp = controllerGamepad(leftControllerRef);
     const rightGp = controllerGamepad(rightControllerRef);
-    const moveSource = leftGp || rightGp;
-    const turnSource = rightGp || leftGp;
-    const leftStick = getStick(moveSource, "left");
-    const rightStick = getStick(turnSource, "right");
+    if (!leftGp && !rightGp) return;
 
-    if (Math.abs(rightStick.x) > 0.72 && performance.now() > snapCooldownUntil){
-      playerYaw += Math.sign(rightStick.x) * (Math.PI / 4);
+    const moveStick = bestMoveStick();
+    const turnStick = bestTurnStick();
+
+    if (Math.abs(turnStick.x) > 0.72 && performance.now() > snapCooldownUntil){
+      playerYaw += Math.sign(turnStick.x) * (Math.PI / 4);
       applyReferenceSpace();
       snapCooldownUntil = performance.now() + 220;
     }
 
-    const mag = Math.hypot(leftStick.x, leftStick.y);
+    const mag = Math.hypot(moveStick.x, moveStick.y);
     if (mag < 0.12) return;
 
     const xrCam = renderer.xr.getCamera(camera);
@@ -298,9 +314,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (headDir.lengthSq() < 1e-5) headDir.set(0, 0, -1);
     headDir.normalize();
     const rightDir = new THREE.Vector3(headDir.z, 0, -headDir.x).normalize();
-    const speed = 2.8;
-    const stepX = (rightDir.x * leftStick.x + headDir.x * (-leftStick.y)) * speed * dt;
-    const stepZ = (rightDir.z * leftStick.x + headDir.z * (-leftStick.y)) * speed * dt;
+    const speed = 3.05;
+    const stepX = (rightDir.x * moveStick.x + headDir.x * (-moveStick.y)) * speed * dt;
+    const stepZ = (rightDir.z * moveStick.x + headDir.z * (-moveStick.y)) * speed * dt;
     const nextX = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
     const nextZ = THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp);
     setPlayerXZ(nextX, nextZ);
@@ -314,6 +330,24 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     rightControllerRef = rightController;
 
     if (renderer?.xr?.isPresenting && (leftControllerRef || rightControllerRef)) movePlayerFromControllers(dt);
+
+    const leftTrigger = controllerTriggerValue(leftControllerRef);
+    const rightTrigger = controllerTriggerValue(rightControllerRef);
+    if (!mode && now > cooldownUntil){
+      if (rightTrigger > 0.35 && rightControllerRef?.joints){
+        mode = true;
+        active = rightControllerRef;
+        activeMode = "controller";
+        triggerHoldStart = now;
+        cooldownUntil = now + 90;
+      } else if (leftTrigger > 0.35 && leftControllerRef?.joints){
+        mode = true;
+        active = leftControllerRef;
+        activeMode = "controller";
+        triggerHoldStart = now;
+        cooldownUntil = now + 90;
+      }
+    }
 
     const leftToggle = controllerTogglePressed(leftControllerRef);
     const rightToggle = controllerTogglePressed(rightControllerRef);
@@ -332,31 +366,26 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     lastLeftToggle = leftToggle;
     lastRightToggle = rightToggle;
 
-    if (!leftControllerRef?.joints && !rightControllerRef?.joints){
-      const leftFist = !!leftHandRef?.joints && handNearFace(leftHandRef) && isFist(leftHandRef);
-      const rightFist = !!rightHandRef?.joints && handNearFace(rightHandRef) && isFist(rightHandRef);
-      if (leftFist && !lastLeftFistToggle && now > cooldownUntil){
-        mode = !(mode && active === leftHandRef);
-        active = mode ? leftHandRef : null;
-        activeMode = 'hand';
-        cooldownUntil = now + 320;
-        pinchHoldStart = 0;
-        triggerHoldStart = 0;
-      }
-      if (rightFist && !lastRightFistToggle && now > cooldownUntil){
-        mode = !(mode && active === rightHandRef);
-        active = mode ? rightHandRef : null;
-        activeMode = 'hand';
-        cooldownUntil = now + 320;
-        pinchHoldStart = 0;
-        triggerHoldStart = 0;
-      }
-      lastLeftFistToggle = leftFist;
-      lastRightFistToggle = rightFist;
-    } else {
-      lastLeftFistToggle = false;
-      lastRightFistToggle = false;
+    const leftFist = !!leftHandRef?.joints && handNearFace(leftHandRef) && isFist(leftHandRef);
+    const rightFist = !!rightHandRef?.joints && handNearFace(rightHandRef) && isFist(rightHandRef);
+    if (leftFist && !lastLeftFistToggle && now > cooldownUntil){
+      mode = !(mode && active === leftHandRef);
+      active = mode ? leftHandRef : null;
+      activeMode = 'hand';
+      cooldownUntil = now + 320;
+      pinchHoldStart = 0;
+      triggerHoldStart = 0;
     }
+    if (rightFist && !lastRightFistToggle && now > cooldownUntil){
+      mode = !(mode && active === rightHandRef);
+      active = mode ? rightHandRef : null;
+      activeMode = 'hand';
+      cooldownUntil = now + 320;
+      pinchHoldStart = 0;
+      triggerHoldStart = 0;
+    }
+    lastLeftFistToggle = leftFist;
+    lastRightFistToggle = rightFist;
 
     if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){
       pointer.visible = false;
@@ -371,10 +400,10 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     }
 
     if (mode && activeMode === "controller" && !(active?.joints)){
-      active = leftControllerRef?.joints ? leftControllerRef : rightControllerRef?.joints ? rightControllerRef : leftHandRef?.joints ? leftHandRef : rightHandRef?.joints ? rightHandRef : null;
+      active = rightControllerRef?.joints ? rightControllerRef : leftControllerRef?.joints ? leftControllerRef : rightHandRef?.joints ? rightHandRef : leftHandRef?.joints ? leftHandRef : null;
       activeMode = active === leftControllerRef || active === rightControllerRef ? "controller" : "hand";
     } else if (mode && activeMode === "hand" && !(active?.joints)){
-      active = leftHandRef?.joints ? leftHandRef : rightHandRef?.joints ? rightHandRef : leftControllerRef?.joints ? leftControllerRef : rightControllerRef?.joints ? rightControllerRef : null;
+      active = rightHandRef?.joints ? rightHandRef : leftHandRef?.joints ? leftHandRef : rightControllerRef?.joints ? rightControllerRef : leftControllerRef?.joints ? leftControllerRef : null;
       activeMode = active === leftControllerRef || active === rightControllerRef ? "controller" : "hand";
     }
 
@@ -386,8 +415,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       stableTargetMs = 0;
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
-        ? "Controllers active • left stick move • right stick snap turn • A/X teleport"
-        : "TELEPORT OFF • press TP or make fist by face";
+        ? "Controllers active • stick move • right stick snap • hold trigger/A then release TP"
+        : "TELEPORT OFF • make fist by face";
       statusCb(idleMsg);
       modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist by face toggles TP");
       return;
@@ -402,7 +431,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       markerGlow.intensity = 0;
       stableTargetMs = 0;
       lastAimValid = false;
-      statusCb(activeMode === "controller" ? "CONTROLLER TP ON • hold trigger then release" : "HAND TP ON • hold pinch then release");
+      statusCb(activeMode === "controller" ? "CONTROLLER TP ON • hold trigger/A then release" : "HAND TP ON • hold pinch then release");
       modeCb(activeMode === "controller" ? "Controllers: TELEPORT ON" : `Hands: TELEPORT ON`);
       return;
     }
@@ -428,7 +457,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       const trigger = controllerTriggerValue(active);
       if (trigger > 0.22 && !active.userData._wasTrigger) triggerHoldStart = now;
       const held = triggerHoldStart ? (now - triggerHoldStart) : 0;
-      if (active.userData._wasTrigger && trigger <= 0.12 && held > 140 && stableTargetMs > 120 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
+      if (active.userData._wasTrigger && trigger <= 0.12 && held > 120 && stableTargetMs > 80 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
         const ok = teleportByDelta(smoothedTarget);
         if (ok){
           lastTP = now + 220;
@@ -453,7 +482,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       if (trigger <= 0.12) triggerHoldStart = 0;
       active.userData._wasTrigger = trigger > 0.22;
       modeCb("Controllers: TELEPORT ON");
-      statusCb("CONTROLLER TP ON • hold trigger then release");
+      statusCb("CONTROLLER TP ON • hold trigger/A then release");
       return;
     }
 
@@ -461,7 +490,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (active.userData._wasPinching === undefined) active.userData._wasPinching = false;
     if (pinch && !active.userData._wasPinching) pinchHoldStart = now;
     const held = pinchHoldStart ? (now - pinchHoldStart) : 0;
-    if (active.userData._wasPinching && !pinch && held > 240 && stableTargetMs > 140 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
+    if (active.userData._wasPinching && !pinch && held > 200 && stableTargetMs > 100 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
       const ok = teleportByDelta(smoothedTarget);
       if (ok){
         lastTP = now + 220;
