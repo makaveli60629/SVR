@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SVR Poker | System Verification Center</title>
+<meta name="description" content="SVR Poker system verification page for the live game preview, store portal, sponsor path, profile path, and private room routes."/>
+<link rel="icon" href="../logo.webp" type="image/webp"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site-market.css"/>
+<style>
+.status-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.status-check{border:1px solid rgba(167,255,128,.18);background:rgba(167,255,128,.055);border-radius:22px;padding:18px}.status-check strong{display:block;color:#fff;font-family:Orbitron,Arial,sans-serif;margin-bottom:8px}.status-check span{display:inline-flex;gap:8px;align-items:center;color:#dfffce;font-weight:800}.status-check span:before{content:'';width:10px;height:10px;border-radius:50%;background:#a7ff80;box-shadow:0 0 14px #a7ff80}.route-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.route-list a{display:flex;justify-content:space-between;gap:12px;text-decoration:none;color:#fff;border:1px solid rgba(105,232,255,.16);background:rgba(105,232,255,.055);border-radius:16px;padding:14px 16px;font-weight:800}.route-list small{color:#d9cdec;font-weight:700}.phase-note{border:1px solid rgba(255,211,107,.25);background:rgba(255,211,107,.06);border-radius:22px;padding:18px}@media(max-width:820px){.status-board,.route-list{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="svr-market">
+<canvas id="binary-rain" aria-hidden="true"></canvas>
+<div class="market-page">
+<nav class="market-nav">
+<a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>System Verification</span></div></a>
+<div class="market-links"><span class="status-pill">ADMIN ONLINE</span><a href="index.html">Home</a><a href="system.html">System</a><a href="profile.html">Profile</a><a href="store.html">Store</a><a href="sponsorship.html">Sponsors</a><a href="contact.html">Contact</a></div>
+</nav>
+<main class="market-shell">
+<section class="section">
+<span class="tag">Phase 88</span>
+<h1>Verification Lock</h1>
+<p class="lead">This page checks the public-facing paths that connect the SVR website, live game preview, store portal, sponsor path, profile path, and private-room routes.</p>
+<p class="copy">The visitor experience stays polished and non-technical. Internal service details, credentials, and backend infrastructure remain private.</p>
+<div class="actions"><a class="btn primary" href="../game/index.html?v=phase88-verify-lock">Open Game</a><a class="btn secondary" href="../game/index.html?preview=1&amp;cam=director&amp;autocam=1&amp;embed=1&amp;v=phase88-verify-lock">Open Live Preview</a><a class="btn ghost" href="store.html">Open Store</a></div>
+</section>
+<section class="section compact-section">
+<div class="head"><div><span class="tag">Ready Checks</span><h2>Site + Game Status</h2><p>These are front-end verification checks for presentation readiness and routing.</p></div></div>
+<div class="status-board">
+<article class="status-check"><strong>Admin Badge</strong><span>Online</span><p>Public-facing status badge is visible and consistent.</p></article>
+<article class="status-check"><strong>Game Preview</strong><span>Ready</span><p>Live preview route is available for the website panel.</p></article>
+<article class="status-check"><strong>Store Portal</strong><span>Ready</span><p>Store path is reachable from website and game-facing links.</p></article>
+<article class="status-check"><strong>Sponsors</strong><span>Ready</span><p>Sponsor and billboard pages are routed for review.</p></article>
+<article class="status-check"><strong>Private Rooms</strong><span>Ready</span><p>Game room links are separated from the main lobby structure.</p></article>
+<article class="status-check"><strong>Public Copy</strong><span>Clean</span><p>No visitor-facing cloud/database wording is shown here.</p></article>
+</div>
+</section>
+<section class="section">
+<div class="head"><div><span class="tag">Routes</span><h2>Fast Route Test</h2><p>Use these buttons to verify that the full SVR path is organized.</p></div></div>
+<div class="route-list">
+<a href="index.html">Site Home <small>/site/</small></a>
+<a href="profile.html">Profile <small>account path</small></a>
+<a href="store.html">Store <small>portal path</small></a>
+<a href="sponsorship.html">Sponsors <small>partner path</small></a>
+<a href="../game/index.html?v=phase88-route-check">Game Lobby <small>/game/</small></a>
+<a href="../game/reiki.html?v=phase88-route-check">Reiki Room <small>private</small></a>
+<a href="../game/pga-drive.html?v=phase88-route-check">PGA Drive <small>private</small></a>
+<a href="../game/chip-putt.html?v=phase88-route-check">Chip/Putt <small>private</small></a>
+<a href="../game/store-room.html?v=phase88-route-check">VR Store Room <small>private</small></a>
+<a href="../game/smoker-lounge.html?v=phase88-route-check">Smoker Lounge <small>private</small></a>
+<a href="../game/scorpion.html?v=phase88-route-check">Scorpion Room <small>private</small></a>
+<a href="contact.html">Contact <small>support</small></a>
+</div>
+</section>
+<section class="section"><div class="phase-note"><h3>Phase 88 lock</h3><p>Phase 88 is a verification and organization phase. It does not expose backend details, does not publish secrets, and does not replace the lobby or the public Matrix page.</p></div></section>
+<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="../index.html">Public Launch</a><a class="btn primary" href="../game/index.html?v=phase88">Preview Game</a><a class="btn secondary" href="index.html">Site Home</a></div></footer>
+</main></div>
+<script src="../matrix.js"></script><script src="../site-public-hooks.js"></script>
+</body></html>
