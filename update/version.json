@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-137-MOVEMENT-LOCOMOTION-TELEPORT-MODULE-LOCK",
-  "scope": "game-movement-locomotion-teleport-lock",
-  "fix": "locked Quest/WebXR locomotion and teleport modules with zero-allocation movement hot path, trigger/A/grip hold-to-aim release-to-teleport behavior, hand fist teleport mode, pinch-release teleport commit, watch teleport toggle compatibility, and world-root shift teleport without XR reference-space mutation",
+  "build": "PHASE-138-WATCH-UI-INPUT-BRIDGE-LOCK",
+  "scope": "game-watch-ui-input-bridge-lock",
+  "fix": "upgraded the forearm watch into the SVR-Version 0.1 input bridge with teleport, lobby, Scorpion, Reiki, PGA Drive, Store, Lounge, Sponsor, music, next track, chip/putt, and sit/leave controls while preserving watch placement and improving watch hot-path allocations",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-136-STABLE-LOBBY-FULL-DEMO-REBUILD-LOCK",
-  "nextBuild": "PHASE-138-WATCH-UI-INPUT-BRIDGE-LOCK"
+  "previousStableBuild": "PHASE-137-MOVEMENT-LOCOMOTION-TELEPORT-MODULE-LOCK",
+  "nextBuild": "PHASE-139-POKER-GAMEPLAY-TABLE-STATE-LOCK"
 }
