@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-138-WATCH-UI-INPUT-BRIDGE-LOCK",
-  "scope": "game-watch-ui-input-bridge-lock",
-  "fix": "upgraded the forearm watch into the SVR-Version 0.1 input bridge with teleport, lobby, Scorpion, Reiki, PGA Drive, Store, Lounge, Sponsor, music, next track, chip/putt, and sit/leave controls while preserving watch placement and improving watch hot-path allocations",
+  "build": "PHASE-139-TELEPORT-SAFE-LOBBY-NO-SKY-LOCK",
+  "scope": "game-teleport-safe-lobby-no-sky-lock",
+  "fix": "removed the active sky/Moon/Mars orbit layer from the lobby module because it may be freezing Quest teleport; replaced it with a lightweight static ceiling cap while preserving textured floor, walls, portals, table, spawn pad, watch, movement, and teleport systems",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-137-MOVEMENT-LOCOMOTION-TELEPORT-MODULE-LOCK",
-  "nextBuild": "PHASE-139-POKER-GAMEPLAY-TABLE-STATE-LOCK"
+  "previousStableBuild": "PHASE-138-WATCH-UI-INPUT-BRIDGE-LOCK",
+  "nextBuild": "PHASE-140-POKER-GAMEPLAY-TABLE-STATE-LOCK"
 }
