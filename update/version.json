@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-140-TEXTURE-FLOOR-RESTORE-NO-SKY-LOCK",
-  "scope": "game-texture-floor-restore-no-sky-lock",
-  "fix": "restored a visible textured lobby floor as a separate removable overlay module while preserving the Phase 139 no-sky teleport stability rule, table safe ring, watch, portals, movement, and teleport systems",
+  "build": "PHASE-142-TELEPORT-CRITICAL-QUEST-CONTROLLER-WATCH-MOON-MARS-LOCK",
+  "scope": "game-teleport-critical-quest-controller-watch-moon-mars-lock",
+  "fix": "made teleport a critical Quest-safe module with deferred teleport commit, no forced matrix update on teleport commit, simplified pointer/ring visuals, lightweight purple fire, preserved controller fallback, restored static Moon/Mars without sky/orbit, added watch orientation patch, added hand texture patch, and kept FPS emergency guard active",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-139-TELEPORT-SAFE-LOBBY-NO-SKY-LOCK",
-  "nextBuild": "PHASE-141-POKER-GAMEPLAY-TABLE-STATE-LOCK"
+  "previousStableBuild": "PHASE-141-QUEST-FPS-EMERGENCY-STABILITY-LOCK",
+  "nextBuild": "PHASE-143-BARE-TELEPORT-ONLY-DIAGNOSTIC-LOCK-IF-FREEZE-CONTINUES"
 }
