@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • Phase 140 texture floor no-sky lock</title>
+  <title>ScarlettVR Poker • Phase 141 Quest FPS emergency lock</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -25,7 +25,7 @@
     body.preview-mode #hud, body.preview-mode #log, body.preview-mode #err { display: none !important; }
   </style>
   <script>
-    window.SVR_BUILD_PHASE = 'PHASE-140-TEXTURE-FLOOR-RESTORE-NO-SKY-LOCK';
+    window.SVR_BUILD_PHASE = 'PHASE-141-QUEST-FPS-EMERGENCY-STABILITY-LOCK';
     window.SVR_SITE_TOUCHED_BY_GAME_TRACK = false;
   </script>
   <script type="importmap">
@@ -33,7 +33,7 @@
   </script>
 </head>
 <body>
-  <!-- BUILD: PHASE-140-TEXTURE-FLOOR-RESTORE-NO-SKY-LOCK -->
+  <!-- BUILD: PHASE-141-QUEST-FPS-EMERGENCY-STABILITY-LOCK -->
   <div id="app"></div>
   <div id="hud">
     <div class="pill" id="status">Booting…</div>
@@ -41,7 +41,7 @@
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: …</span>
-      <span class="pill">BUILD: PHASE-140-TEXTURE-FLOOR-RESTORE-NO-SKY-LOCK</span>
+      <span class="pill">BUILD: PHASE-141-QUEST-FPS-EMERGENCY-STABILITY-LOCK</span>
     </div>
   </div>
   <div id="sceneNav">
@@ -59,8 +59,8 @@
   </div>
   <pre id="log"></pre>
   <pre id="err"></pre>
-  <script type="module" src="./main.js?v=phase140-texture-floor"></script>
-  <script type="module" src="./modules/floor_texture_overlay.js?v=phase140-texture-floor"></script>
-  <script type="module" src="./modules/phase131_clean_boot_audit.js?v=phase140-texture-floor"></script>
+  <script type="module" src="./main.js?v=phase141-quest-fps"></script>
+  <script type="module" src="./modules/floor_texture_overlay.js?v=phase141-quest-fps"></script>
+  <script type="module" src="./modules/quest_fps_guard.js?v=phase141-quest-fps"></script>
 </body>
 </html>
