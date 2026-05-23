@@ -7,6 +7,7 @@
   --pink: #ff5ae8;
   --purple: #9c53ff;
   --cyan: #66ddff;
+  --teal: #00f5d4;
   --line: rgba(178, 102, 255, 0.24);
 }
 
@@ -78,11 +79,7 @@ body {
   flex-wrap: nowrap;
   width: min(860px, 100%);
 }
-.poker-full {
-  display: inline-block;
-  padding-left: 0.12em;
-  text-align: center;
-}
+.poker-full { display: inline-block; padding-left: 0.12em; text-align: center; }
 .s-word {
   display: inline-block;
   font-family: 'Orbitron', Arial, sans-serif;
@@ -121,13 +118,23 @@ body {
   line-height: 1.16;
 }
 .launch-age { color: #f0dfff; }
-.action-row {
+.action-row,
+#control-dock-container {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
   margin-top: 8px;
+}
+#control-dock-container {
+  position: relative;
+  z-index: 5;
+  padding: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,245,212,.12);
+  background: rgba(0,0,0,.18);
+  box-shadow: 0 0 22px rgba(0,245,212,.05);
 }
 .btn {
   min-width: min(40vw, 220px);
@@ -141,7 +148,7 @@ body {
   font-size: clamp(0.94rem, 1.4vw, 1.06rem);
   text-decoration: none;
   color: #fff;
-  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
   background: rgba(10, 10, 18, 0.74);
 }
 .btn:hover {
@@ -152,8 +159,20 @@ body {
   background: linear-gradient(135deg, rgba(250, 82, 231, 0.94), rgba(100, 62, 255, 0.92));
   box-shadow: 0 0 20px rgba(172, 83, 255, 0.2);
 }
-.btn-secondary {
-  background: rgba(9, 9, 16, 0.82);
+.btn-secondary { background: rgba(9, 9, 16, 0.82); }
+.btn-newserver {
+  border-color: rgba(0,245,212,.86);
+  background: linear-gradient(135deg, rgba(0,245,212,.92), rgba(14,120,255,.58));
+  color: #001311;
+  font-family: Orbitron, Rajdhani, Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  box-shadow: 0 0 18px rgba(0,245,212,.34), inset 0 0 18px rgba(255,255,255,.13);
+}
+.btn-newserver:hover {
+  border-color: rgba(0,245,212,1);
+  box-shadow: 0 0 28px rgba(0,245,212,.52), inset 0 0 20px rgba(255,255,255,.18);
 }
 .launch-footer {
   margin-top: 2px;
@@ -169,39 +188,17 @@ body {
 }
 
 @media (max-width: 900px) {
-  .launch-logo {
-    width: min(40vh, 84vw);
-    max-height: 34vh;
-  }
+  .launch-logo { width: min(40vh, 84vw); max-height: 34vh; }
 }
 
 @media (max-width: 720px) {
-  .launch-page {
-    gap: 8px;
-    padding: 14px 14px 14px;
-  }
-  .launch-logo {
-    width: min(36vh, 76vw);
-    max-height: 31vh;
-  }
-  .title-lockup.brand-inline {
-    gap: 0;
-  }
-  .s-word {
-    font-size: clamp(1.2rem, 5vw, 1.7rem);
-  }
-  .poker-word {
-    font-size: clamp(1.2rem, 6.6vw, 1.98rem);
-    letter-spacing: 0.072em;
-  }
-  .action-row {
-    width: 100%;
-    gap: 10px;
-  }
-  .btn {
-    min-width: min(78vw, 310px);
-    width: min(78vw, 310px);
-  }
+  .launch-page { gap: 8px; padding: 14px 14px 14px; }
+  .launch-logo { width: min(36vh, 76vw); max-height: 31vh; }
+  .title-lockup.brand-inline { gap: 0; }
+  .s-word { font-size: clamp(1.2rem, 5vw, 1.7rem); }
+  .poker-word { font-size: clamp(1.2rem, 6.6vw, 1.98rem); letter-spacing: 0.072em; }
+  .action-row, #control-dock-container { width: 100%; gap: 10px; border-radius: 24px; }
+  .btn { min-width: min(78vw, 310px); width: min(78vw, 310px); }
 }
 
 /* SVR tiny single system status badge */
@@ -241,23 +238,11 @@ body {
   background: currentColor;
   box-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
 }
-.status-divider {
-  color: rgba(186,255,114,.34);
-  font-weight: 500;
-  margin: 0;
-}
-.admin-status.offline {
-  color: #ff668f;
-  text-shadow: 0 0 4px rgba(255,102,143,.38), 0 0 8px rgba(255,102,143,.12);
-}
+.status-divider { color: rgba(186,255,114,.34); font-weight: 500; margin: 0; }
+.admin-status.offline { color: #ff668f; text-shadow: 0 0 4px rgba(255,102,143,.38), 0 0 8px rgba(255,102,143,.12); }
 .server-status,
 .server-status.online,
 .database-status,
-.database-status.online {
-  color: #baff72;
-}
+.database-status.online { color: #baff72; }
 .admin-status-large { margin-top: 16px; width: fit-content; }
 .message-form { display: grid; gap: 14px; margin-top: 14px; }
-.message-form textarea { resize: vertical; min-height: 130px; }
-.message-card { grid-column: span 2; }
-@media (max-width: 860px) { .message-card { grid-column: span 1; } }
