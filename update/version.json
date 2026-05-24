@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-146-BARE-RIGHT-CONTROLLER-TRIGGER-TELEPORT-LOCK",
-  "scope": "game-bare-right-controller-trigger-teleport-diagnostic",
-  "fix": "switched game entry to a bare diagnostic runtime that does not load main.js, watch, hand tracking, music, portals, Moon/Mars, or heavy lobby modules; tests only right Quest controller movement, grip preview, trigger-release teleport, final-destination rig movement, and original-style texture paths from the uploaded game asset structure",
+  "build": "PHASE-147-WEBXR-DOLLY-RIG-TELEPORT-LOCK",
+  "scope": "game-webxr-dolly-rig-teleport-lock",
+  "fix": "clarified the runtime as WebXR, switched the game entry to a strict WebXR dolly-rig teleport diagnostic, disabled main.js/watch/hands/music/old teleport/world shifting, kept right WebXR controller only, uses selectstart/selectend plus trigger polling fallback, grip is preview-only, and teleport moves only the player dolly so the HMD lands on the final target",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-145-GRAPHICS-CONTRAST-NO-MUSIC-TELEPORT-ALIGNMENT-LOCK",
-  "nextBuild": "PHASE-147-REBUILD-LOBBY-ONLY-AFTER-TELEPORT-PASSES"
+  "previousStableBuild": "PHASE-146-BARE-RIGHT-CONTROLLER-TRIGGER-TELEPORT-LOCK",
+  "nextBuild": "PHASE-148-WEBXR-CONTROLLER-TELEMETRY-IF-TELEPORT-FAILS"
 }
