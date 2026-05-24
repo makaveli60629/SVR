@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-154-WEBXR-NO-SAFE-LOCK-ALIGNED-HANDS-LOCK",
-  "scope": "game-webxr-no-safe-lock-aligned-hands-lock",
-  "fix": "removed table/center safe-lock targeting entirely, removed target hiding and safe-ring magnet behavior, aligned fist aiming to a wrist-oriented floor ray, preserved official root logo.png for wall and teleport halo, kept Moon/Mars/sky, and retained the working WebXR dolly movement with snap-turn and no music/watch",
+  "build": "PHASE-155-WEBXR-PORTALS-ON-OFFICIAL-HANDS-BASE-LOCK",
+  "scope": "game-webxr-portals-on-official-hands-base-lock",
+  "fix": "added visual/select-ready Reiki, PGA, Scorpion, Store, Lounge, and Seat portal pads on the stable Phase 154 base, preserved official root logo.png branding, aligned hand/fist aim, no safe lock, Moon/Mars/sky, 45-degree snap-turn, forward/back dolly movement, no music, no watch, and no XR reference-space mutation; private scene routing is intentionally reserved for Phase 156",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-153-WEBXR-OFFICIAL-LOGO-HANDS-HALO-SKY-LOCK",
-  "nextBuild": "PHASE-155-PORTALS-ON-NO-SAFE-LOCK-HANDS-BASE"
+  "previousStableBuild": "PHASE-154-WEBXR-NO-SAFE-LOCK-ALIGNED-HANDS-LOCK",
+  "nextBuild": "PHASE-156-PRIVATE-SCENE-ROUTES-PORTAL-LINKS"
 }
