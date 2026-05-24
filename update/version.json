@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-152-WEBXR-HANDS-PURPLE-FIRE-SKY-BRAND-LOCK",
-  "scope": "game-webxr-hands-purple-fire-sky-brand-lock",
-  "fix": "added low-cost visible hand proxy spheres, fist detection, purple fire, fist-release teleport using the proven WebXR dolly method, procedural purple SVR brand logo, purple teleport logo, purple star sky, textured Moon and textured Mars while preserving Phase 151 heading movement, no-center-lock, snap-turn, no music, no watch, and no XR reference-space mutation",
+  "build": "PHASE-153-WEBXR-OFFICIAL-LOGO-HANDS-HALO-SKY-LOCK",
+  "scope": "game-webxr-official-logo-hands-halo-sky-lock",
+  "fix": "uses the official root logo.png for wall brand and teleport halo, improves glove-style hand proxy texture, makes purple fire smaller so the halo remains visible while fist aiming, keeps fist-release teleport on the proven WebXR dolly method, enlarges and raises textured Moon and Mars, and preserves Phase 151 movement/no-center-lock/no-music/no-watch stability",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-151-WEBXR-HEADING-FIX-NO-CENTER-LOCK",
-  "nextBuild": "PHASE-153-RESTORE-LOBBY-PORTALS-ON-WORKING-HANDS-BASE"
+  "previousStableBuild": "PHASE-152-WEBXR-HANDS-PURPLE-FIRE-SKY-BRAND-LOCK",
+  "nextBuild": "PHASE-154-PORTALS-ON-OFFICIAL-LOGO-HANDS-BASE"
 }
