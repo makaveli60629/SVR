@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
@@ -804,10 +804,10 @@ function createEspressoBannerTexture(){
     x.fillText('WITH CREAM', w*0.60, 240);
     x.fillStyle = 'rgba(255,241,217,0.94)';
     x.font = '700 31px system-ui, Arial';
-    x.fillText('SVR LOUNGE PARTNER • AD SLOT RESTORED', w*0.60, 318);
+    x.fillText('SVR LOUNGE PARTNER â€¢ AD SLOT RESTORED', w*0.60, 318);
     x.fillStyle = 'rgba(255,211,150,0.86)';
     x.font = '700 26px system-ui, Arial';
-    x.fillText('coffee • social lounge • premium city banner', w*0.60, 370);
+    x.fillText('coffee â€¢ social lounge â€¢ premium city banner', w*0.60, 370);
   });
 }
 
@@ -1340,7 +1340,7 @@ function addScorpionRoom(scene, R, wallHeight){
     x.lineWidth = 10; x.strokeRect(16,16,w-32,h-32);
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#fff2fb'; x.font = 'bold 86px system-ui, Arial'; x.fillText('SCORPION GAME ROOM', w/2, 100);
-    x.fillStyle = '#ffadd7'; x.font = 'bold 30px system-ui, Arial'; x.fillText('REAL PLAY • TABLE FLOW • PRIVATE ACTION', w/2, 170);
+    x.fillStyle = '#ffadd7'; x.font = 'bold 30px system-ui, Arial'; x.fillText('REAL PLAY â€¢ TABLE FLOW â€¢ PRIVATE ACTION', w/2, 170);
   });
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 1.10), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
   sign.position.set(0, 5.14, -2.72);
@@ -1372,7 +1372,7 @@ function addScorpionRoom(scene, R, wallHeight){
     x.fillStyle = '#fdf5ff'; x.font = 'bold 60px system-ui, Arial'; x.fillText('SCORPION ACCESS', 44, 92);
     x.fillStyle = '#ffc4eb'; x.font = '36px system-ui, Arial'; 
     let y = 180;
-    ['Fast jump from watch', 'Fist near face toggles teleport', 'Reserved for real play flow', 'Modular room for future game scene'].forEach(line=>{ x.fillText('• ' + line, 54, y); y += 92; });
+    ['Fast jump from watch', 'Fist near face toggles teleport', 'Reserved for real play flow', 'Modular room for future game scene'].forEach(line=>{ x.fillText('â€¢ ' + line, 54, y); y += 92; });
   });
   const board = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.56), new THREE.MeshBasicMaterial({ map: boardTex, transparent: true, side: THREE.DoubleSide }));
   board.position.set(-2.34, 2.1, -2.68);
@@ -1497,7 +1497,7 @@ function buildOuterCity(scene, R){
               ctx.fillText("AWAITING APPROVAL", w2 / 2, 94);
               ctx.fillStyle = "#7bffb7";
               ctx.font = "700 50px system-ui, Arial";
-              ctx.fillText("SVR sponsor placeholder • approval required", w2 / 2, 178);
+              ctx.fillText("SVR sponsor placeholder â€¢ approval required", w2 / 2, 178);
             }),
             transparent: true,
             side: THREE.DoubleSide,
@@ -1960,7 +1960,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   [
     { angle: -Math.PI * 0.5, kind: "main", title: "MAIN SPONSOR SCREEN", subtitle: "SCARLETT VR POKER", size: [9.4, wallHeight - 0.30], logo: [3.2, 3.2], y: wallHeight * 0.5 },
     { angle: Math.PI * 0.5, kind: "reserve", title: "LEAGUE WALL", subtitle: "SOUTH WALL", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
-    { angle: 0, kind: "reiki", title: "REIKI TIME HUB", subtitle: "RED CARPET • PLANTS • ZEN STORE", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
+    { angle: 0, kind: "reiki", title: "REIKI TIME HUB", subtitle: "RED CARPET â€¢ PLANTS â€¢ ZEN STORE", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
     { angle: Math.PI, kind: "reserve", title: "LEGENDS", subtitle: "HALL OF FAME", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 }
   ].forEach(({ angle, kind, title, subtitle, size, logo, y })=>{
     const matrix = kind === "main" ? createMatrixBillboardTexture("main") : null;
@@ -2452,30 +2452,65 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       }
     }
   };
+  // PHASE-84-SKYLINE-CLONE-HOTFIX
+  // Fixes boot crash: TypeError: Cannot read properties of undefined (reading 'clone').
+  // Cause: optional hub/private-scene target data can be missing during partial deploys.
+  // Rule: clone only real THREE.Vector3 values; otherwise use safe fallback vectors.
+  const safeCloneVec = (value, fallback = new THREE.Vector3()) => {
+    if (value && typeof value.clone === "function") return value.clone();
+    return fallback.clone();
+  };
+  const safeY = (value, fallback, y = 1.6) => safeCloneVec(value, fallback).setY(y);
+  const safeSceneTarget = (pos, look) => {
+    if (!pos || !look) return null;
+    return { pos, look };
+  };
+
+  const pgaHubRuntime = scene?.userData?._pgaHub || null;
+  const pgaHubPos = pgaHubRuntime?.group?.position || null;
+  const pgaHubInward = pgaHubRuntime?.inward || null;
+  const makePgaTarget = (distance, sideOffset = 0) => {
+    if (!pgaHubPos || !pgaHubInward || typeof pgaHubPos.clone !== "function" || typeof pgaHubInward.clone !== "function") return null;
+    const pos = pgaHubPos.clone()
+      .add(pgaHubInward.clone().multiplyScalar(distance))
+      .add(new THREE.Vector3(0, 0, sideOffset))
+      .setY(0);
+    const look = pgaHubPos.clone().setY(1.8);
+    return { pos, look };
+  };
+
+  const reikiFallbackCenter = safeCloneVec(reikiHub?.center, new THREE.Vector3(-10, 0, -6));
+  const scorpionFallbackCenter = safeCloneVec(scorpionRoom?.target, new THREE.Vector3(8, 0, -6));
 
   const sceneTargets = {
     lobby: { pos: new THREE.Vector3(0, 0, 4.8), look: new THREE.Vector3(0, 1.15, 0) },
     table: { pos: new THREE.Vector3(0, 0, 3.2), look: new THREE.Vector3(0, 1.05, 0) },
-    seat: seats[3] ? { pos: new THREE.Vector3(seats[3].x, 0, seats[3].z), look: new THREE.Vector3(0, 1.0, 0) } : null,
-    reiki: reikiHub ? { pos: reikiHub.target.clone(), look: reikiHub.look.clone() } : null,
-    reikiRoom: reikiHub ? { pos: reikiHub.roomTarget.clone(), look: reikiHub.center.clone() } : null,
-    pga: scene.userData._pgaHub ? {
-      pos: scene.userData._pgaHub.group.position.clone().add(scene.userData._pgaHub.inward.clone().multiplyScalar(3.2)).setY(0),
-      look: scene.userData._pgaHub.group.position.clone().setY(1.8)
+    seat: seats?.[3] ? { pos: new THREE.Vector3(seats[3].x, 0, seats[3].z), look: new THREE.Vector3(0, 1.0, 0) } : null,
+
+    reiki: reikiHub ? {
+      pos: safeCloneVec(reikiHub.target, reikiFallbackCenter.clone().setY(0)),
+      look: safeCloneVec(reikiHub.look, reikiFallbackCenter.clone().setY(1.6))
     } : null,
-    pgaWall: scene.userData._pgaHub ? {
-      pos: scene.userData._pgaHub.group.position.clone().add(scene.userData._pgaHub.inward.clone().multiplyScalar(2.2)).add(new THREE.Vector3(0,0,0.5)).setY(0),
-      look: scene.userData._pgaHub.group.position.clone().setY(1.8)
+    reikiRoom: reikiHub ? {
+      pos: safeCloneVec(reikiHub.roomTarget, reikiFallbackCenter.clone().setY(0)),
+      look: safeCloneVec(reikiHub.center, reikiFallbackCenter.clone().setY(1.6))
     } : null,
-    legends: {
+
+    pga: makePgaTarget(3.2),
+    pgaWall: makePgaTarget(2.2, 0.5),
+
+    legends: legendHall?.group?.position ? {
       pos: new THREE.Vector3(legendHall.group.position.x * 0.82, 0, legendHall.group.position.z * 0.82),
-      look: legendHall.group.position.clone().setY(1.8)
-    },
-    sponsor: {
+      look: safeY(legendHall.group.position, new THREE.Vector3(0, 0, -8), 1.8)
+    } : null,
+    sponsor: storeWall?.group?.position ? {
       pos: new THREE.Vector3(storeWall.group.position.x * 0.86, 0, storeWall.group.position.z * 0.86),
-      look: storeWall.group.position.clone().setY(1.6)
-    },
-    scorpion: scorpionRoom ? { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() } : null
+      look: safeY(storeWall.group.position, new THREE.Vector3(0, 0, 8), 1.6)
+    } : null,
+    scorpion: scorpionRoom ? {
+      pos: safeCloneVec(scorpionRoom.target, scorpionFallbackCenter.clone().setY(0)),
+      look: safeCloneVec(scorpionRoom.look, scorpionFallbackCenter.clone().setY(1.6))
+    } : null
   };
 
   return {
@@ -2487,3 +2522,4 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+

@@ -1,9 +1,6 @@
-{
-  "build": "PHASE-165-SCORPION-3D-POT-VACUUM-WINNING-HAND-DISPLAY-LOCK",
-  "scope": "game-scorpion-3d-pot-vacuum-winning-hand-display-lock",
-  "fix": "added Scorpion winner banner layer, winning-hand display strip, 3D-style animated chip/pot vacuum lane, winner-directed pot destination, visual state panel, and SVR_PHASE165_LAST_POT_VACUUM audit record while preserving Phase 164 hand history, Phase 163 watch action mirror, Phase 162 turn indicators, Phase 161 table/action layer, official logo branding, no music, no teleport changes, no movement changes, no hand tracking changes, and no XR reference-space mutation",
-  "siteTouched": false,
-  "gameTouched": true,
-  "previousStableBuild": "PHASE-164-SCORPION-ACTION-STATE-HAND-HISTORY-STRIP-LOCK",
-  "nextBuild": "PHASE-166-SCORPION-BET-LINE-CHIP-STACKS-REALISM"
+﻿{
+  "build": "PHASE-84-SKYLINE-CLONE-HOTFIX",
+  "scope": "game-only",
+  "fix": "world_skyline sceneTargets safe clone guard",
+  "siteTouched": false
 }
