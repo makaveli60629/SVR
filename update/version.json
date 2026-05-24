@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-150-WEBXR-HEADING-MOVE-SMALL-SAFE-RING-LOCK",
-  "scope": "game-webxr-heading-movement-small-safe-ring-lock",
-  "fix": "fixed forward/back movement after 45-degree snap-turn by using one best WebXR gamepad axis pair at a time and moving forward by current headset heading, kept right-stick left/right 45-degree snap-turn, reduced table safe ring strength, and prepared the next removable visual-hands phase",
+  "build": "PHASE-151-WEBXR-HEADING-FIX-NO-CENTER-LOCK",
+  "scope": "game-webxr-heading-fix-no-center-lock",
+  "fix": "fixed sideways forward movement after 45-degree snap turn by using dolly yaw heading for forward/back movement, changed table center behavior from magnet lock to blocked target hide, retained right-controller WebXR dolly teleport, snap-turn, grip preview, and trigger release teleport",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-149-WEBXR-SNAPTURN-TABLE-SAFE-POINTER-LOCK",
-  "nextBuild": "PHASE-151-HANDS-FIST-PURPLE-FIRE-ON-WORKING-DOLLY-BASE"
+  "previousStableBuild": "PHASE-150-WEBXR-HEADING-MOVE-SMALL-SAFE-RING-LOCK",
+  "nextBuild": "PHASE-152-HANDS-FIST-PURPLE-FIRE-ON-WORKING-DOLLY-BASE"
 }
