@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-147-WEBXR-DOLLY-RIG-TELEPORT-LOCK",
-  "scope": "game-webxr-dolly-rig-teleport-lock",
-  "fix": "clarified the runtime as WebXR, switched the game entry to a strict WebXR dolly-rig teleport diagnostic, disabled main.js/watch/hands/music/old teleport/world shifting, kept right WebXR controller only, uses selectstart/selectend plus trigger polling fallback, grip is preview-only, and teleport moves only the player dolly so the HMD lands on the final target",
+  "build": "PHASE-148-WEBXR-POINTER-ALIGNMENT-LOCK",
+  "scope": "game-webxr-pointer-alignment-lock",
+  "fix": "kept the working WebXR dolly-rig teleport from Phase 147 and refined right-controller pointer alignment using raw WebXR target ray first, inverted ray only when it gives the better floor hit, front-clamped fallback, no hands, no watch, no music, grip preview only, and trigger/select release teleport commit",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-146-BARE-RIGHT-CONTROLLER-TRIGGER-TELEPORT-LOCK",
-  "nextBuild": "PHASE-148-WEBXR-CONTROLLER-TELEMETRY-IF-TELEPORT-FAILS"
+  "previousStableBuild": "PHASE-147-WEBXR-DOLLY-RIG-TELEPORT-LOCK",
+  "nextBuild": "PHASE-149-WEBXR-POINTER-CALIBRATION-OR-LOBBY-REBUILD"
 }
