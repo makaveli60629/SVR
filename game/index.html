@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • Phase 146 bare teleport diagnostic</title>
+  <title>ScarlettVR Poker • Phase 147 WebXR dolly teleport</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -12,11 +12,11 @@
     #app { position: fixed; inset: 0; }
     canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
     #hud { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10; display: flex; gap: 10px; align-items: center; justify-content: space-between; pointer-events: none; }
-    .pill { background: rgba(0,0,0,.78); border: 1px solid rgba(246,226,127,.85); border-radius: 999px; padding: 8px 12px; color: #fff7be; font-size: 12px; font-weight:900; box-shadow: 0 10px 30px rgba(0,0,0,.5); pointer-events: none; }
+    .pill { background: rgba(0,0,0,.82); border: 1px solid rgba(127,245,199,.90); border-radius: 999px; padding: 8px 12px; color: #dfffee; font-size: 12px; font-weight:900; box-shadow: 0 10px 30px rgba(0,0,0,.5); pointer-events: none; }
     #sceneNav, .btn, #log, #err { display:none !important; }
   </style>
   <script>
-    window.SVR_BUILD_PHASE = 'PHASE-146-BARE-RIGHT-CONTROLLER-TRIGGER-TELEPORT-LOCK';
+    window.SVR_BUILD_PHASE = 'PHASE-147-WEBXR-DOLLY-RIG-TELEPORT-LOCK';
     window.SVR_SITE_TOUCHED_BY_GAME_TRACK = false;
   </script>
   <script type="importmap">
@@ -24,15 +24,15 @@
   </script>
 </head>
 <body>
-  <!-- BUILD: PHASE-146-BARE-RIGHT-CONTROLLER-TRIGGER-TELEPORT-LOCK -->
+  <!-- BUILD: PHASE-147-WEBXR-DOLLY-RIG-TELEPORT-LOCK -->
   <div id="app"></div>
   <div id="hud">
-    <div class="pill" id="status">Booting Phase 146…</div>
+    <div class="pill" id="status">Booting Phase 147…</div>
     <div style="display:flex;gap:8px;align-items:center;">
-      <span class="pill" id="mode">Right controller only</span>
-      <span class="pill">BUILD: PHASE-146</span>
+      <span class="pill" id="mode">WebXR dolly rig</span>
+      <span class="pill">BUILD: PHASE-147</span>
     </div>
   </div>
-  <script type="module" src="./modules/phase146_bare_right_teleport.js?v=phase146-bare-right-trigger-teleport"></script>
+  <script type="module" src="./modules/phase147_webxr_dolly_teleport.js?v=phase147-webxr-dolly-teleport"></script>
 </body>
 </html>
