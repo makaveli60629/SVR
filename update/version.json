@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-155-WEBXR-PORTALS-ON-OFFICIAL-HANDS-BASE-LOCK",
-  "scope": "game-webxr-portals-on-official-hands-base-lock",
-  "fix": "added visual/select-ready Reiki, PGA, Scorpion, Store, Lounge, and Seat portal pads on the stable Phase 154 base, preserved official root logo.png branding, aligned hand/fist aim, no safe lock, Moon/Mars/sky, 45-degree snap-turn, forward/back dolly movement, no music, no watch, and no XR reference-space mutation; private scene routing is intentionally reserved for Phase 156",
+  "build": "PHASE-156-WEBXR-LOBBY-SHELL-MODULES-REBUILD-LOCK",
+  "scope": "game-webxr-lobby-shell-modules-rebuild-lock",
+  "fix": "added perimeter walls, neon corner pillars, wall trims, official logo wall, center table, module facades, and portal pads for Reiki, PGA, Scorpion, Store, Lounge, and Seat on the stable WebXR base",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-154-WEBXR-NO-SAFE-LOCK-ALIGNED-HANDS-LOCK",
-  "nextBuild": "PHASE-156-PRIVATE-SCENE-ROUTES-PORTAL-LINKS"
+  "previousStableBuild": "PHASE-155-WEBXR-PORTALS-ON-OFFICIAL-HANDS-BASE-LOCK",
+  "nextBuild": "PHASE-157-PRIVATE-SCENE-ROUTES-AND-LOBBY-POLISH"
 }
