@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-156-WEBXR-LOBBY-SHELL-MODULES-REBUILD-LOCK",
-  "scope": "game-webxr-lobby-shell-modules-rebuild-lock",
-  "fix": "added perimeter walls, neon corner pillars, wall trims, official logo wall, center table, module facades, and portal pads for Reiki, PGA, Scorpion, Store, Lounge, and Seat on the stable WebXR base",
+  "build": "PHASE-157-WEBXR-PRIVATE-SCENE-ROUTES-LOBBY-POLISH-LOCK",
+  "scope": "game-webxr-private-scene-routes-lobby-polish-lock",
+  "fix": "wired portal pads into lightweight private-scene routes while preserving Phase 156 lobby shell, official logo branding, WebXR dolly movement, 45-degree snap-turn, hands/fist purple fire, no safe lock, Moon/Mars/sky, no music, no watch, and no XR reference-space mutation",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-155-WEBXR-PORTALS-ON-OFFICIAL-HANDS-BASE-LOCK",
-  "nextBuild": "PHASE-157-PRIVATE-SCENE-ROUTES-AND-LOBBY-POLISH"
+  "previousStableBuild": "PHASE-156-WEBXR-LOBBY-SHELL-MODULES-REBUILD-LOCK",
+  "nextBuild": "PHASE-158-PRIVATE-SCENE-ROOMS-ONE-BY-ONE"
 }
