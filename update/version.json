@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-159-SCORPION-ROOM-GAMEPLAY-FIRST-LOCK",
-  "scope": "game-scorpion-room-gameplay-first-lock",
-  "fix": "added first Scorpion private room gameplay pass with readable cards, 20 second action timer, left to right deal rule, street flow, pot and stack display, and winner state recording while preserving private rooms, official logo, no music, no watch, and modular room architecture",
+  "build": "PHASE-160-SCORPION-CARD-FLOW-WINNER-BANNER-LOCK",
+  "scope": "game-scorpion-card-flow-winner-banner-lock",
+  "fix": "upgraded Scorpion private room gameplay with large readable card flow, board display, winner banner, pot progress, chip vacuum visual, stack display, 20 second timer, street progression, and preserved private rooms, official logo, no music, no watch, and modular architecture",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-158-WEBXR-PRIVATE-SCENE-ROOMS-ONE-BY-ONE-LOCK",
-  "nextBuild": "PHASE-160-SCORPION-REAL-CARD-FLOW-AND-WINNER-BANNER"
+  "previousStableBuild": "PHASE-159-SCORPION-ROOM-GAMEPLAY-FIRST-LOCK",
+  "nextBuild": "PHASE-161-SCORPION-TABLE-CARD-MESHES-ACTION-BUTTONS"
 }
