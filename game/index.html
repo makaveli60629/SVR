@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • Phase 145 graphics contrast no music</title>
+  <title>ScarlettVR Poker • Phase 146 bare teleport diagnostic</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -12,19 +12,11 @@
     #app { position: fixed; inset: 0; }
     canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
     #hud { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10; display: flex; gap: 10px; align-items: center; justify-content: space-between; pointer-events: none; }
-    .pill { background: rgba(0,0,0,.68); border: 1px solid rgba(246,226,127,.65); backdrop-filter: blur(5px); border-radius: 999px; padding: 8px 12px; color: #fff7be; font-size: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.5); pointer-events: none; }
-    .btn { pointer-events: auto; border: 1px solid rgba(246,226,127,.70); background: rgba(0,0,0,.66); color: #fff; border-radius: 999px; padding: 8px 12px; cursor: pointer; user-select: none; }
-    .btn:hover { background: rgba(90,68,20,.66); }
-    #sceneNav{ position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; pointer-events: auto; }
-    .scene-btn{ border: 1px solid rgba(246,226,127,.70); background: rgba(3,9,20,.72); color: #fff7be; border-radius: 999px; padding: 8px 12px; cursor: pointer; box-shadow: 0 10px 28px rgba(0,0,0,.35); font-size: 12px; font-weight:800; }
-    .scene-btn:hover{ background: rgba(60,48,18,.72); }
-    body.preview-mode #sceneNav { display:none !important; }
-    #log { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10; max-height: 38vh; overflow: auto; display: none; background: rgba(0,0,0,.55); border: 1px solid rgba(246,226,127,.55); border-radius: 14px; padding: 10px 12px; color: #fff7be; font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; white-space: pre-wrap; }
-    #err { position: fixed; inset: 0; display: none; z-index: 50; background: rgba(0,0,0,.88); color: #fff; padding: 18px; font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; overflow: auto; }
-    body.preview-mode #hud, body.preview-mode #log, body.preview-mode #err { display: none !important; }
+    .pill { background: rgba(0,0,0,.78); border: 1px solid rgba(246,226,127,.85); border-radius: 999px; padding: 8px 12px; color: #fff7be; font-size: 12px; font-weight:900; box-shadow: 0 10px 30px rgba(0,0,0,.5); pointer-events: none; }
+    #sceneNav, .btn, #log, #err { display:none !important; }
   </style>
   <script>
-    window.SVR_BUILD_PHASE = 'PHASE-145-GRAPHICS-CONTRAST-NO-MUSIC-TELEPORT-ALIGNMENT-LOCK';
+    window.SVR_BUILD_PHASE = 'PHASE-146-BARE-RIGHT-CONTROLLER-TRIGGER-TELEPORT-LOCK';
     window.SVR_SITE_TOUCHED_BY_GAME_TRACK = false;
   </script>
   <script type="importmap">
@@ -32,36 +24,15 @@
   </script>
 </head>
 <body>
-  <!-- BUILD: PHASE-145-GRAPHICS-CONTRAST-NO-MUSIC-TELEPORT-ALIGNMENT-LOCK -->
+  <!-- BUILD: PHASE-146-BARE-RIGHT-CONTROLLER-TRIGGER-TELEPORT-LOCK -->
   <div id="app"></div>
   <div id="hud">
-    <div class="pill" id="status">Booting…</div>
+    <div class="pill" id="status">Booting Phase 146…</div>
     <div style="display:flex;gap:8px;align-items:center;">
-      <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
-      <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
-      <span class="pill" id="mode">Right controller…</span>
-      <span class="pill">BUILD: PHASE-145</span>
+      <span class="pill" id="mode">Right controller only</span>
+      <span class="pill">BUILD: PHASE-146</span>
     </div>
   </div>
-  <div id="sceneNav">
-    <button class="scene-btn" data-scene="lobby">Lobby</button>
-    <button class="scene-btn" data-scene="seat">Seat</button>
-    <button class="scene-btn" data-scene="reiki">Reiki</button>
-    <button class="scene-btn" data-scene="pga">PGA</button>
-    <button class="scene-btn" data-scene="legends">Legend</button>
-    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
-    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
-    <button class="scene-btn" data-scene="pgaDrive">Drive</button>
-    <button class="scene-btn" data-scene="chipPutt">Chip/Putt</button>
-    <button class="scene-btn" data-scene="storeRoom">Store</button>
-    <button class="scene-btn" data-scene="smokerLounge">Lounge</button>
-  </div>
-  <pre id="log"></pre>
-  <pre id="err"></pre>
-  <script type="module" src="./main.js?v=phase145-graphics-no-music-align"></script>
-  <script type="module" src="./modules/floor_texture_overlay.js?v=phase145-graphics-no-music-align"></script>
-  <script type="module" src="./modules/static_moon_mars.js?v=phase145-graphics-no-music-align"></script>
-  <script type="module" src="./modules/quest_fps_guard.js?v=phase145-graphics-no-music-align"></script>
-  <script type="module" src="./modules/watch_orientation_patch.js?v=phase145-graphics-no-music-align"></script>
+  <script type="module" src="./modules/phase146_bare_right_teleport.js?v=phase146-bare-right-trigger-teleport"></script>
 </body>
 </html>
