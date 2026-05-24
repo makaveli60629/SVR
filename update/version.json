@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-153-WEBXR-OFFICIAL-LOGO-HANDS-HALO-SKY-LOCK",
-  "scope": "game-webxr-official-logo-hands-halo-sky-lock",
-  "fix": "uses the official root logo.png for wall brand and teleport halo, improves glove-style hand proxy texture, makes purple fire smaller so the halo remains visible while fist aiming, keeps fist-release teleport on the proven WebXR dolly method, enlarges and raises textured Moon and Mars, and preserves Phase 151 movement/no-center-lock/no-music/no-watch stability",
+  "build": "PHASE-154-WEBXR-NO-SAFE-LOCK-ALIGNED-HANDS-LOCK",
+  "scope": "game-webxr-no-safe-lock-aligned-hands-lock",
+  "fix": "removed table/center safe-lock targeting entirely, removed target hiding and safe-ring magnet behavior, aligned fist aiming to a wrist-oriented floor ray, preserved official root logo.png for wall and teleport halo, kept Moon/Mars/sky, and retained the working WebXR dolly movement with snap-turn and no music/watch",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-152-WEBXR-HANDS-PURPLE-FIRE-SKY-BRAND-LOCK",
-  "nextBuild": "PHASE-154-PORTALS-ON-OFFICIAL-LOGO-HANDS-BASE"
+  "previousStableBuild": "PHASE-153-WEBXR-OFFICIAL-LOGO-HANDS-HALO-SKY-LOCK",
+  "nextBuild": "PHASE-155-PORTALS-ON-NO-SAFE-LOCK-HANDS-BASE"
 }
