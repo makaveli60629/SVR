@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-151-WEBXR-HEADING-FIX-NO-CENTER-LOCK",
-  "scope": "game-webxr-heading-fix-no-center-lock",
-  "fix": "fixed sideways forward movement after 45-degree snap turn by using dolly yaw heading for forward/back movement, changed table center behavior from magnet lock to blocked target hide, retained right-controller WebXR dolly teleport, snap-turn, grip preview, and trigger release teleport",
+  "build": "PHASE-152-WEBXR-HANDS-PURPLE-FIRE-SKY-BRAND-LOCK",
+  "scope": "game-webxr-hands-purple-fire-sky-brand-lock",
+  "fix": "added low-cost visible hand proxy spheres, fist detection, purple fire, fist-release teleport using the proven WebXR dolly method, procedural purple SVR brand logo, purple teleport logo, purple star sky, textured Moon and textured Mars while preserving Phase 151 heading movement, no-center-lock, snap-turn, no music, no watch, and no XR reference-space mutation",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-150-WEBXR-HEADING-MOVE-SMALL-SAFE-RING-LOCK",
-  "nextBuild": "PHASE-152-HANDS-FIST-PURPLE-FIRE-ON-WORKING-DOLLY-BASE"
+  "previousStableBuild": "PHASE-151-WEBXR-HEADING-FIX-NO-CENTER-LOCK",
+  "nextBuild": "PHASE-153-RESTORE-LOBBY-PORTALS-ON-WORKING-HANDS-BASE"
 }
