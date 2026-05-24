@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-161-SCORPION-TABLE-CARD-MESHES-ACTION-BUTTONS-LOCK",
-  "scope": "game-scorpion-table-card-meshes-action-buttons-lock",
-  "fix": "added Scorpion table-level card visual layer with hero, board, and bot card lanes, SVR card backs, dealer left-to-right marker, pot marker, action buttons for check/call/raise/fold, 20 second timer, and preserved official logo branding, no music, no watch, and modular private room architecture",
+  "build": "PHASE-162-SCORPION-SEAT-TURN-INDICATORS-WATCH-REINTRO-LOCK",
+  "scope": "game-scorpion-seat-turn-indicators-watch-reintro-lock",
+  "fix": "added Scorpion player/bot/dealer seat indicators, top turn banner, and display-only SVR watch HUD mirroring street, timer, pot, and turn while preserving Phase 161 table card/action layer, official logo branding, no music, no locomotion changes, no teleport changes, and no XR reference-space mutation",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-160-SCORPION-CARD-FLOW-WINNER-BANNER-LOCK",
-  "nextBuild": "PHASE-162-SCORPION-SEAT-TURN-INDICATORS-WATCH-REINTRO"
+  "previousStableBuild": "PHASE-161-SCORPION-TABLE-CARD-MESHES-ACTION-BUTTONS-LOCK",
+  "nextBuild": "PHASE-163-SCORPION-WATCH-VR-ATTACH-AND-ACTION-MIRROR"
 }
