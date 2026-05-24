@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-163-SCORPION-WATCH-VR-ATTACH-ACTION-MIRROR-LOCK",
-  "scope": "game-scorpion-watch-vr-attach-action-mirror-lock",
-  "fix": "added safe floating VR-style SVR watch proxy and watch action mirror buttons for check, call, raise, and fold while preserving Phase 162 turn indicators, Phase 161 table/action layer, official logo branding, no music, no locomotion changes, no teleport changes, no hand tracking changes, and no XR reference-space mutation",
+  "build": "PHASE-164-SCORPION-ACTION-STATE-HAND-HISTORY-STRIP-LOCK",
+  "scope": "game-scorpion-action-state-hand-history-strip-lock",
+  "fix": "added Scorpion hand history strip, action-state panel, compact history pills, and audit records for Phase 161 table state, Phase 160 winner state, and Phase 163 watch actions while preserving watch mirror, turn indicators, table/action layer, official logo branding, no music, no teleport changes, no movement changes, no hand tracking changes, and no XR reference-space mutation",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-162-SCORPION-SEAT-TURN-INDICATORS-WATCH-REINTRO-LOCK",
-  "nextBuild": "PHASE-164-SCORPION-ACTION-STATE-AND-HAND-HISTORY-STRIP"
+  "previousStableBuild": "PHASE-163-SCORPION-WATCH-VR-ATTACH-ACTION-MIRROR-LOCK",
+  "nextBuild": "PHASE-165-SCORPION-3D-POT-VACUUM-AND-WINNING-HAND-DISPLAY"
 }
