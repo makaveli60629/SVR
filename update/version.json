@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-148-WEBXR-POINTER-ALIGNMENT-LOCK",
-  "scope": "game-webxr-pointer-alignment-lock",
-  "fix": "kept the working WebXR dolly-rig teleport from Phase 147 and refined right-controller pointer alignment using raw WebXR target ray first, inverted ray only when it gives the better floor hit, front-clamped fallback, no hands, no watch, no music, grip preview only, and trigger/select release teleport commit",
+  "build": "PHASE-149-WEBXR-SNAPTURN-TABLE-SAFE-POINTER-LOCK",
+  "scope": "game-webxr-snapturn-table-safe-pointer-lock",
+  "fix": "kept the working WebXR dolly teleport base, restored right-stick left/right 45-degree snap-turn, kept right-stick up/down forward/back movement, added a table-safe radius so the teleport halo cannot lock at the table center, pushed table-center targets to a safe ring, kept grip preview-only, kept trigger/select release teleport, no hands/watch/music yet",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-147-WEBXR-DOLLY-RIG-TELEPORT-LOCK",
-  "nextBuild": "PHASE-149-WEBXR-POINTER-CALIBRATION-OR-LOBBY-REBUILD"
+  "previousStableBuild": "PHASE-148-WEBXR-POINTER-ALIGNMENT-LOCK",
+  "nextBuild": "PHASE-150-HANDS-FIST-PURPLE-FIRE-ON-WORKING-DOLLY-BASE"
 }
