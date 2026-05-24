@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-149-WEBXR-SNAPTURN-TABLE-SAFE-POINTER-LOCK",
-  "scope": "game-webxr-snapturn-table-safe-pointer-lock",
-  "fix": "kept the working WebXR dolly teleport base, restored right-stick left/right 45-degree snap-turn, kept right-stick up/down forward/back movement, added a table-safe radius so the teleport halo cannot lock at the table center, pushed table-center targets to a safe ring, kept grip preview-only, kept trigger/select release teleport, no hands/watch/music yet",
+  "build": "PHASE-150-WEBXR-HEADING-MOVE-SMALL-SAFE-RING-LOCK",
+  "scope": "game-webxr-heading-movement-small-safe-ring-lock",
+  "fix": "fixed forward/back movement after 45-degree snap-turn by using one best WebXR gamepad axis pair at a time and moving forward by current headset heading, kept right-stick left/right 45-degree snap-turn, reduced table safe ring strength, and prepared the next removable visual-hands phase",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-148-WEBXR-POINTER-ALIGNMENT-LOCK",
-  "nextBuild": "PHASE-150-HANDS-FIST-PURPLE-FIRE-ON-WORKING-DOLLY-BASE"
+  "previousStableBuild": "PHASE-149-WEBXR-SNAPTURN-TABLE-SAFE-POINTER-LOCK",
+  "nextBuild": "PHASE-151-HANDS-FIST-PURPLE-FIRE-ON-WORKING-DOLLY-BASE"
 }
