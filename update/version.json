@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-157-WEBXR-PRIVATE-SCENE-ROUTES-LOBBY-POLISH-LOCK",
-  "scope": "game-webxr-private-scene-routes-lobby-polish-lock",
-  "fix": "wired portal pads into lightweight private-scene routes while preserving Phase 156 lobby shell, official logo branding, WebXR dolly movement, 45-degree snap-turn, hands/fist purple fire, no safe lock, Moon/Mars/sky, no music, no watch, and no XR reference-space mutation",
+  "build": "PHASE-158-WEBXR-PRIVATE-SCENE-ROOMS-ONE-BY-ONE-LOCK",
+  "scope": "game-webxr-private-scene-rooms-one-by-one-lock",
+  "fix": "replaced the private-scene placeholder with lightweight WebXR private rooms for Reiki, PGA, Scorpion, and Lounge, added a Phase 158 route bridge from the Phase 156 lobby shell, preserved official root logo.png branding, Store route, no music, no watch, modular private scenes, and prepared Scorpion gameplay polish for Phase 159",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-156-WEBXR-LOBBY-SHELL-MODULES-REBUILD-LOCK",
-  "nextBuild": "PHASE-158-PRIVATE-SCENE-ROOMS-ONE-BY-ONE"
+  "previousStableBuild": "PHASE-157-WEBXR-PRIVATE-SCENE-ROUTES-LOBBY-POLISH-LOCK",
+  "nextBuild": "PHASE-159-SCORPION-ROOM-GAMEPLAY-FIRST"
 }
