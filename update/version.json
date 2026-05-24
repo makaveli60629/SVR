@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-145-GRAPHICS-CONTRAST-NO-MUSIC-TELEPORT-ALIGNMENT-LOCK",
-  "scope": "game-graphics-contrast-no-music-teleport-alignment",
-  "fix": "removed music completely, improved Quest graphics clarity by raising renderer scale and reducing foveation, sharpened the lobby floor texture, increased UI contrast, fixed right-controller teleport alignment so the target does not appear behind the player, made grip preview-only because grip release froze, and kept trigger release as the only teleport commit path",
+  "build": "PHASE-146-BARE-RIGHT-CONTROLLER-TRIGGER-TELEPORT-LOCK",
+  "scope": "game-bare-right-controller-trigger-teleport-diagnostic",
+  "fix": "switched game entry to a bare diagnostic runtime that does not load main.js, watch, hand tracking, music, portals, Moon/Mars, or heavy lobby modules; tests only right Quest controller movement, grip preview, trigger-release teleport, final-destination rig movement, and original-style texture paths from the uploaded game asset structure",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-144-RIGHT-CONTROLLER-ONLY-TELEPORT-FREEZE-ISOLATION-LOCK",
-  "nextBuild": "PHASE-146-BARE-RIGHT-CONTROLLER-TRIGGER-ONLY-TELEPORT-DIAGNOSTIC-LOCK-IF-FREEZE-CONTINUES"
+  "previousStableBuild": "PHASE-145-GRAPHICS-CONTRAST-NO-MUSIC-TELEPORT-ALIGNMENT-LOCK",
+  "nextBuild": "PHASE-147-REBUILD-LOBBY-ONLY-AFTER-TELEPORT-PASSES"
 }
