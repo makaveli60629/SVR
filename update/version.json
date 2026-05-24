@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-160-SCORPION-CARD-FLOW-WINNER-BANNER-LOCK",
-  "scope": "game-scorpion-card-flow-winner-banner-lock",
-  "fix": "upgraded Scorpion private room gameplay with large readable card flow, board display, winner banner, pot progress, chip vacuum visual, stack display, 20 second timer, street progression, and preserved private rooms, official logo, no music, no watch, and modular architecture",
+  "build": "PHASE-161-SCORPION-TABLE-CARD-MESHES-ACTION-BUTTONS-LOCK",
+  "scope": "game-scorpion-table-card-meshes-action-buttons-lock",
+  "fix": "added Scorpion table-level card visual layer with hero, board, and bot card lanes, SVR card backs, dealer left-to-right marker, pot marker, action buttons for check/call/raise/fold, 20 second timer, and preserved official logo branding, no music, no watch, and modular private room architecture",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-159-SCORPION-ROOM-GAMEPLAY-FIRST-LOCK",
-  "nextBuild": "PHASE-161-SCORPION-TABLE-CARD-MESHES-ACTION-BUTTONS"
+  "previousStableBuild": "PHASE-160-SCORPION-CARD-FLOW-WINNER-BANNER-LOCK",
+  "nextBuild": "PHASE-162-SCORPION-SEAT-TURN-INDICATORS-WATCH-REINTRO"
 }
