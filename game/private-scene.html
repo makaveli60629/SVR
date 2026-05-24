@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>SVR Private Scene</title>
+  <style>
+    html,body{height:100%;margin:0;background:#04020a;color:#fff;font-family:system-ui,Arial,sans-serif;overflow:hidden}
+    .wrap{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,rgba(124,44,255,.28),transparent 36%),linear-gradient(#020010,#07020d)}
+    .card{width:min(760px,calc(100vw - 28px));border:1px solid rgba(180,140,255,.9);border-radius:24px;background:rgba(0,0,0,.68);box-shadow:0 20px 60px rgba(0,0,0,.65);padding:28px;text-align:center}
+    img{width:150px;max-width:42vw;margin-bottom:18px}.phase{color:#b48cff;font-weight:900;letter-spacing:.08em}.title{font-size:clamp(32px,8vw,74px);font-weight:1000;margin:10px 0}.sub{font-size:18px;color:#e6d7ff;margin-bottom:24px}.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}a{display:inline-block;border-radius:999px;border:1px solid #f6e27f;color:#f6e27f;text-decoration:none;padding:12px 18px;font-weight:900;background:rgba(0,0,0,.45)}
+  </style>
+</head>
+<body>
+  <main class="wrap"><section class="card"><img src="../logo.png" alt="SVR"/><div class="phase">PHASE 157 PRIVATE SCENE</div><div class="title" id="title">SVR</div><div class="sub" id="sub">Private scene route placeholder is online. Full room modules wire in next polish phases.</div><div class="btns"><a href="./?v=phase157-private-routes">Return to Lobby</a><a href="../site/store.html">Open Store</a></div></section></main>
+  <script>
+    const p=new URLSearchParams(location.search);const s=(p.get('scene')||'private').toUpperCase();
+    const labels={REIKI:'Reiki Meditation Room',PGA:'PGA Driving Range',SCORPION:'Scorpion Poker Room',LOUNGE:'Smoker Lounge'};
+    document.getElementById('title').textContent=labels[s]||s;
+    document.getElementById('sub').textContent='Route confirmed for '+(labels[s]||s)+'. This placeholder keeps routing modular while the private scene gets rebuilt.';
+  </script>
+</body>
+</html>
