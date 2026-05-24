@@ -3,21 +3,16 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR Private Scene</title>
+  <title>SVR Phase 158 Private Scene</title>
+  <meta name="theme-color" content="#050508"/>
   <style>
-    html,body{height:100%;margin:0;background:#04020a;color:#fff;font-family:system-ui,Arial,sans-serif;overflow:hidden}
-    .wrap{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,rgba(124,44,255,.28),transparent 36%),linear-gradient(#020010,#07020d)}
-    .card{width:min(760px,calc(100vw - 28px));border:1px solid rgba(180,140,255,.9);border-radius:24px;background:rgba(0,0,0,.68);box-shadow:0 20px 60px rgba(0,0,0,.65);padding:28px;text-align:center}
-    img{width:150px;max-width:42vw;margin-bottom:18px}.phase{color:#b48cff;font-weight:900;letter-spacing:.08em}.title{font-size:clamp(32px,8vw,74px);font-weight:1000;margin:10px 0}.sub{font-size:18px;color:#e6d7ff;margin-bottom:24px}.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}a{display:inline-block;border-radius:999px;border:1px solid #f6e27f;color:#f6e27f;text-decoration:none;padding:12px 18px;font-weight:900;background:rgba(0,0,0,.45)}
+    html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:system-ui,Arial,sans-serif}#app{position:fixed;inset:0}canvas{display:block;width:100%;height:100%;background:#000;outline:none}#hud{position:fixed;left:12px;right:12px;top:12px;z-index:10;display:flex;gap:10px;align-items:center;justify-content:space-between;pointer-events:none}.pill{background:rgba(0,0,0,.84);border:1px solid rgba(180,140,255,.92);border-radius:999px;padding:8px 12px;color:#e6d7ff;font-size:12px;font-weight:900;box-shadow:0 10px 30px rgba(0,0,0,.5);pointer-events:none}
   </style>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body>
-  <main class="wrap"><section class="card"><img src="../logo.png" alt="SVR"/><div class="phase">PHASE 157 PRIVATE SCENE</div><div class="title" id="title">SVR</div><div class="sub" id="sub">Private scene route placeholder is online. Full room modules wire in next polish phases.</div><div class="btns"><a href="./?v=phase157-private-routes">Return to Lobby</a><a href="../site/store.html">Open Store</a></div></section></main>
-  <script>
-    const p=new URLSearchParams(location.search);const s=(p.get('scene')||'private').toUpperCase();
-    const labels={REIKI:'Reiki Meditation Room',PGA:'PGA Driving Range',SCORPION:'Scorpion Poker Room',LOUNGE:'Smoker Lounge'};
-    document.getElementById('title').textContent=labels[s]||s;
-    document.getElementById('sub').textContent='Route confirmed for '+(labels[s]||s)+'. This placeholder keeps routing modular while the private scene gets rebuilt.';
-  </script>
+  <div id="app"></div>
+  <div id="hud"><div class="pill" id="status">Booting Phase 158...</div><div style="display:flex;gap:8px;align-items:center;"><span class="pill" id="mode">Private room</span><span class="pill" id="title">PHASE-158</span></div></div>
+  <script type="module" src="./modules/private_scene_runtime_phase158.js?v=phase158-private-rooms"></script>
 </body>
 </html>
