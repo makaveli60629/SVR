@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-170-POKERJS-LOCK-AND-LOBBY-QA",
-  "scope": "game-pokerjs-lock-and-lobby-qa",
-  "fix": "added modular game/poker/poker.js engine with deck, shuffle, five-card and seven-card evaluation, full hand flow, fold/check/call/raise/all-in/next-hand actions, bot actions, 20 second timer, auto-check/free, auto-fold/facing bet, pot accounting, winner evaluation, and Scorpion private-room runtime wiring while preserving Phase 169 lobby lock, official logo branding, no music, no site changes, no teleport changes, no movement changes, and no XR reference-space mutation",
+  "build": "PHASE-172-POKER-WATCH-ACTION-BINDINGS-AND-SEAT-QA",
+  "scope": "game-scorpion-poker-watch-actions-seat-qa",
+  "fix": "added Scorpion private-room watch-style Fold/Check/Call/Raise/All-In/Next Hand action bindings, keyboard action shortcuts, 20-second timer display, player-turn display, legal action display, and stronger six-seat/five-bot/south-player-seat QA while preserving Phase 171 table bindings, Phase 170 poker.js engine, left-to-right dealing, invisible dealer, official logo branding, no music, no site changes, no movement changes, no teleport changes, and no XR reference-space mutation",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-169-LOBBY-ORIGINAL-ASSET-PASS-CORRECT-FLOOR-LOCK",
-  "nextBuild": "PHASE-171-POKER-3D-TABLE-BINDINGS-AND-QA"
+  "previousStableBuild": "PHASE-171-POKER-3D-TABLE-BINDINGS-AND-QA-LOCK",
+  "nextBuild": "PHASE-173-POKER-SEAT-HEIGHT-AND-ACTION-TIMER-POLISH"
 }
