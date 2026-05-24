@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-162-SCORPION-SEAT-TURN-INDICATORS-WATCH-REINTRO-LOCK",
-  "scope": "game-scorpion-seat-turn-indicators-watch-reintro-lock",
-  "fix": "added Scorpion player/bot/dealer seat indicators, top turn banner, and display-only SVR watch HUD mirroring street, timer, pot, and turn while preserving Phase 161 table card/action layer, official logo branding, no music, no locomotion changes, no teleport changes, and no XR reference-space mutation",
+  "build": "PHASE-163-SCORPION-WATCH-VR-ATTACH-ACTION-MIRROR-LOCK",
+  "scope": "game-scorpion-watch-vr-attach-action-mirror-lock",
+  "fix": "added safe floating VR-style SVR watch proxy and watch action mirror buttons for check, call, raise, and fold while preserving Phase 162 turn indicators, Phase 161 table/action layer, official logo branding, no music, no locomotion changes, no teleport changes, no hand tracking changes, and no XR reference-space mutation",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-161-SCORPION-TABLE-CARD-MESHES-ACTION-BUTTONS-LOCK",
-  "nextBuild": "PHASE-163-SCORPION-WATCH-VR-ATTACH-AND-ACTION-MIRROR"
+  "previousStableBuild": "PHASE-162-SCORPION-SEAT-TURN-INDICATORS-WATCH-REINTRO-LOCK",
+  "nextBuild": "PHASE-164-SCORPION-ACTION-STATE-AND-HAND-HISTORY-STRIP"
 }
