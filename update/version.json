@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-158-WEBXR-PRIVATE-SCENE-ROOMS-ONE-BY-ONE-LOCK",
-  "scope": "game-webxr-private-scene-rooms-one-by-one-lock",
-  "fix": "replaced the private-scene placeholder with lightweight WebXR private rooms for Reiki, PGA, Scorpion, and Lounge, added a Phase 158 route bridge from the Phase 156 lobby shell, preserved official root logo.png branding, Store route, no music, no watch, modular private scenes, and prepared Scorpion gameplay polish for Phase 159",
+  "build": "PHASE-159-SCORPION-ROOM-GAMEPLAY-FIRST-LOCK",
+  "scope": "game-scorpion-room-gameplay-first-lock",
+  "fix": "added first Scorpion private room gameplay pass with readable cards, 20 second action timer, left to right deal rule, street flow, pot and stack display, and winner state recording while preserving private rooms, official logo, no music, no watch, and modular room architecture",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-157-WEBXR-PRIVATE-SCENE-ROUTES-LOBBY-POLISH-LOCK",
-  "nextBuild": "PHASE-159-SCORPION-ROOM-GAMEPLAY-FIRST"
+  "previousStableBuild": "PHASE-158-WEBXR-PRIVATE-SCENE-ROOMS-ONE-BY-ONE-LOCK",
+  "nextBuild": "PHASE-160-SCORPION-REAL-CARD-FLOW-AND-WINNER-BANNER"
 }
