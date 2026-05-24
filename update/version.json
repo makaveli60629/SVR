@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-166-SCORPION-BET-LINE-CHIP-STACKS-REALISM-LOCK",
-  "scope": "game-scorpion-bet-line-chip-stacks-realism-lock",
-  "fix": "added Scorpion pass/bet line, player and bot stack zones, flat multi-color chip stack visuals, pot/stack state panel, and SVR_PHASE166_LAST_CHIP_STATE audit record while preserving Phase 165 pot vacuum, Phase 164 hand history, Phase 163 watch mirror, Phase 162 turn indicators, Phase 161 table/action layer, official logo branding, no music, no teleport changes, no movement changes, no hand tracking changes, and no XR reference-space mutation",
+  "build": "PHASE-169-LOBBY-ORIGINAL-ASSET-PASS-CORRECT-FLOOR-LOCK",
+  "scope": "game-lobby-original-asset-pass-correct-floor-lock",
+  "fix": "switched game index to Phase 169, preserved Phase 168 fast original lobby restore, added Phase 169 audit overlay and runtime records, locked correct floor/walls/logo/portals/high Moon and Mars/no music/official logo only/private scene routes/right-controller movement/45 degree snap turn/trigger-release teleport/grip preview, and kept the site untouched",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-165-SCORPION-3D-POT-VACUUM-WINNING-HAND-DISPLAY-LOCK",
-  "nextBuild": "PHASE-167-SCORPION-PLAYER-ACTION-PROMPTS-BUTTON-POLISH"
+  "previousStableBuild": "PHASE-168-ORIGINAL-LOBBY-FAST-RESTORE-LOCK",
+  "nextBuild": "PHASE-170-POKERJS-LOCK-AND-LOBBY-QA"
 }
