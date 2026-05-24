@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-169-LOBBY-ORIGINAL-ASSET-PASS-CORRECT-FLOOR-LOCK",
-  "scope": "game-lobby-original-asset-pass-correct-floor-lock",
-  "fix": "switched game index to Phase 169, preserved Phase 168 fast original lobby restore, added Phase 169 audit overlay and runtime records, locked correct floor/walls/logo/portals/high Moon and Mars/no music/official logo only/private scene routes/right-controller movement/45 degree snap turn/trigger-release teleport/grip preview, and kept the site untouched",
+  "build": "PHASE-170-POKERJS-LOCK-AND-LOBBY-QA",
+  "scope": "game-pokerjs-lock-and-lobby-qa",
+  "fix": "added modular game/poker/poker.js engine with deck, shuffle, five-card and seven-card evaluation, full hand flow, fold/check/call/raise/all-in/next-hand actions, bot actions, 20 second timer, auto-check/free, auto-fold/facing bet, pot accounting, winner evaluation, and Scorpion private-room runtime wiring while preserving Phase 169 lobby lock, official logo branding, no music, no site changes, no teleport changes, no movement changes, and no XR reference-space mutation",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-168-ORIGINAL-LOBBY-FAST-RESTORE-LOCK",
-  "nextBuild": "PHASE-170-POKERJS-LOCK-AND-LOBBY-QA"
+  "previousStableBuild": "PHASE-169-LOBBY-ORIGINAL-ASSET-PASS-CORRECT-FLOOR-LOCK",
+  "nextBuild": "PHASE-171-POKER-3D-TABLE-BINDINGS-AND-QA"
 }
