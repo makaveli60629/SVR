@@ -1,4 +1,4 @@
-# PHASE-178-ACTION-LOG-BOT-DECISION-LOCK
+# PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK
 
 Adds optional backend persistence for poker action logs.
 

@@ -1,6 +1,6 @@
 ﻿{
     "phase":  "PHASE-85-AMBIENTCG-SOURCE-LOCK",
-    "updatedUtc":  "2026-05-25T17:06:47Z",
+    "updatedUtc":  "2026-05-25T17:07:39Z",
     "rules":  [
                   "Do not bulk import the entire AmbientCG library into SVR.",
                   "Use AmbientCG as an approved CC0 asset source.",
