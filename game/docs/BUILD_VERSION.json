@@ -1,6 +1,8 @@
 {
-  "build": "PHASE-209-SAFE-EVENT-BUS-LOCK",
-  "phase": 209,
+  "build": "PHASE-210-BOOT-CACHE-MARKER-ALIGNMENT-LOCK",
+  "phase": 210,
+  "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
-  "public_page_touched": false
+  "public_page_touched": false,
+  "featureLock": "boot cache marker alignment, phase import cache bust, stuck boot verification"
 }
