@@ -1,6 +1,6 @@
 # Phase 199 — Runtime QA Snapshot Lock
 
-Build: `PHASE-225-PILOT-HANDOFF-CARD-LOCK`
+Build: `PHASE-226-PILOT-READY-SUMMARY-LOCK`
 
 ## Scope
 - Adds `game/modules/runtime_qa.js`.

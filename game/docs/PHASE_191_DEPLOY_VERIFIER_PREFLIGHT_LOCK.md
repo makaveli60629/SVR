@@ -1,6 +1,6 @@
 # Phase 199 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-225-PILOT-HANDOFF-CARD-LOCK`
+Build: `PHASE-226-PILOT-READY-SUMMARY-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

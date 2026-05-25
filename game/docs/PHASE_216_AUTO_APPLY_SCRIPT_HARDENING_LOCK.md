@@ -1,6 +1,6 @@
-# PHASE-225-PILOT-HANDOFF-CARD-LOCK
+# PHASE-226-PILOT-READY-SUMMARY-LOCK
 
-Phase 225 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 226 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

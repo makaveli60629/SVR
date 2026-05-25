@@ -1,6 +1,6 @@
 # Phase 199 — Smoke Test Automation Lock
 
-Build: `PHASE-225-PILOT-HANDOFF-CARD-LOCK`
+Build: `PHASE-226-PILOT-READY-SUMMARY-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

@@ -7,4 +7,4 @@
 5. Press **X** and confirm session export downloads.
 6. Confirm no public Matrix launch page files changed.
 
-Build: `PHASE-225-PILOT-HANDOFF-CARD-LOCK`
+Build: `PHASE-226-PILOT-READY-SUMMARY-LOCK`

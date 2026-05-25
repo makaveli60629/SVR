@@ -1,9 +1,9 @@
-# PHASE-225-PILOT-HANDOFF-CARD-LOCK
+# PHASE-226-PILOT-READY-SUMMARY-LOCK
 
-Phase 225 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
+Phase 226 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
 
 ## Test
-Open `/game/?v=phase225-autoapplystatus` and press `I`.
+Open `/game/?v=phase226-autoapplystatus` and press `I`.
 
 ## Locked
 - Public Matrix launch page untouched.

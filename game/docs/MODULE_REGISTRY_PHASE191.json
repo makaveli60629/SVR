@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
+  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
   "modules_added": [
     "modules/deploy_verify.js"
   ],

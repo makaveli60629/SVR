@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-225-PILOT-HANDOFF-CARD-LOCK`
+Build: `PHASE-226-PILOT-READY-SUMMARY-LOCK`
 
 ## Added
 - In-game bug report capture panel.

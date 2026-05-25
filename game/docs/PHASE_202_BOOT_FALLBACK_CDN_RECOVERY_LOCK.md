@@ -1,4 +1,4 @@
-# PHASE-225-PILOT-HANDOFF-CARD-LOCK
+# PHASE-226-PILOT-READY-SUMMARY-LOCK
 
 ## Purpose
 Fix the remaining stuck-on-Booting risk by adding a no-Three.js recovery shell. If CDN/import/runtime loading fails, the game no longer remains frozen on Booting.

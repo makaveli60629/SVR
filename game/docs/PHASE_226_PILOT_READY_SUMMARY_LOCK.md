@@ -1,7 +1,7 @@
 # PHASE-226-PILOT-READY-SUMMARY-LOCK
 
 ## Purpose
-Phase 226 adds a pilot handoff card so non-technical testers can open one concise panel with the test link, what to verify, what to report, and the support shortcuts.
+Phase 226 adds a Pilot Ready Summary panel that gives one consolidated go/no-go view for the test build.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 226 adds a pilot handoff card so non-technical testers can open one concis
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase226-handoff` and press `H`.
+Open `/game/?v=phase226-pilotready` and press `Y`.

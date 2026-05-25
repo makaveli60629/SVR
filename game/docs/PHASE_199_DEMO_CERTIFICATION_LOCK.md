@@ -1,4 +1,4 @@
-# PHASE-225-PILOT-HANDOFF-CARD-LOCK
+# PHASE-226-PILOT-READY-SUMMARY-LOCK
 
 ## Summary
 Adds the Demo Certification module and go/no-go readiness gate for demo/playtest preparation.

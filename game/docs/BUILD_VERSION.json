@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
-  "phase": 225,
+  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
+  "phase": 226,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "pilot handoff card, test instructions, readiness summary"
+  "featureLock": "pilot ready summary, tester evidence, final go/no-go handoff"
 }

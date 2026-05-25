@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
+  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
   "modules": [
     "boot_route_health.js",
     "boot_route_recovery.js",

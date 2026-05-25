@@ -1,4 +1,4 @@
-# PHASE-225-PILOT-HANDOFF-CARD-LOCK
+# PHASE-226-PILOT-READY-SUMMARY-LOCK
 
 ## Scope
 - Keeps playable poker priority moving forward.

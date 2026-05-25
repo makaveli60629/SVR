@@ -1,4 +1,4 @@
-# PHASE-225-PILOT-HANDOFF-CARD-LOCK
+# PHASE-226-PILOT-READY-SUMMARY-LOCK
 
 Phase 213 aligns every visible and machine-readable game marker after the boot-cache work.
 
@@ -15,8 +15,8 @@ Phase 213 aligns every visible and machine-readable game marker after the boot-c
 - Title/HUD/version/deploy-health/boot-query marker checks
 
 ## Test
-Open `/game/?v=phase225-markerhealth`, then verify:
+Open `/game/?v=phase226-markerhealth`, then verify:
 - the title says Phase 213
-- the HUD says `PHASE-225-PILOT-HANDOFF-CARD-LOCK`
+- the HUD says `PHASE-226-PILOT-READY-SUMMARY-LOCK`
 - `version.json` reports phase 211
 - the game does not return to a stuck Booting screen

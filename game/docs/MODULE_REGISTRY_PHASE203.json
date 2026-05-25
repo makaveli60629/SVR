@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
+  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
   "phase": 203,
   "modules": [
     "boot.js",

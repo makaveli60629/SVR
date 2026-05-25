@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-225-PILOT-HANDOFF-CARD-LOCK
+ * Build: PHASE-226-PILOT-READY-SUMMARY-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-225-PILOT-HANDOFF-CARD-LOCK';
+const BUILD = 'PHASE-226-PILOT-READY-SUMMARY-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

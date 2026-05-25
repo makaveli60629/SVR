@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
+  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase225.js"
+    "game/modules/enterprise_bridge_phase226.js"
   ],
   "protected": {
     "publicPageTouched": false,

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-225-PILOT-HANDOFF-CARD-LOCK
+ * Build: PHASE-226-PILOT-READY-SUMMARY-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-225-PILOT-HANDOFF-CARD-LOCK';
+const BUILD = 'PHASE-226-PILOT-READY-SUMMARY-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }

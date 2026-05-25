@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-225-PILOT-HANDOFF-CARD-LOCK`
+Build: `PHASE-226-PILOT-READY-SUMMARY-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

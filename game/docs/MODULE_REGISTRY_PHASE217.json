@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
-  "phase": 225,
+  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
+  "phase": 226,
   "modules": [
     "game/modules/auto_apply_git_wrapper_fix.js",
-    "game/modules/enterprise_bridge_phase225.js"
+    "game/modules/enterprise_bridge_phase226.js"
   ],
   "public_page_touched": false
 }

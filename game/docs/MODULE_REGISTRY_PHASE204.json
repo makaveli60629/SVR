@@ -1,6 +1,6 @@
 {
   "phase": 204,
-  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
+  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
   "modules_added": [
     "modules/event_firewall.js"
   ],

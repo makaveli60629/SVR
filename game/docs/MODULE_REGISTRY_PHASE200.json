@@ -1,6 +1,6 @@
 {
   "phase": 200,
-  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
+  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
   "modules": [
     "enterprise_bridge",
     "runtime_qa",
