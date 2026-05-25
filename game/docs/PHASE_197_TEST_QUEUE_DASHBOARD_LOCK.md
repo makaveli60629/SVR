@@ -1,4 +1,4 @@
-# PHASE-211-FULL-MARKER-HEALTH-LOCK
+# PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
 
 ## Scope
 Adds a local tester queue dashboard that turns tester feedback, bug reports, release-candidate checks, smoke tests, and runtime errors into a compact ranked queue.

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Report Bundle
- * Build: PHASE-211-FULL-MARKER-HEALTH-LOCK
+ * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
  * Purpose: combine QA snapshots, bug reports, tester feedback, test queue, smoke/RC/preflight/session exports into one playtest report bundle.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
+const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
 const EXPECTED_PHASE = 198;
 const STORE_KEY = 'svr_test_report_bundles_phase198';
 

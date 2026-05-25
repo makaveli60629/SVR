@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-211-FULL-MARKER-HEALTH-LOCK",
+  "build": "PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK",
   "phase": 203,
   "modules": [
     "boot.js",

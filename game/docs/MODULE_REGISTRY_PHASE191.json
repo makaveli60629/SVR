@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-211-FULL-MARKER-HEALTH-LOCK",
+  "build": "PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK",
   "modules_added": [
     "modules/deploy_verify.js"
   ],

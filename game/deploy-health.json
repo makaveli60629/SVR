@@ -1,7 +1,7 @@
 {
   "status": "ok",
-  "build": "PHASE-211-FULL-MARKER-HEALTH-LOCK",
-  "phase": 211,
-  "source": "phase211-package",
+  "build": "PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK",
+  "phase": 212,
+  "source": "package-predeploy",
   "public_page_touched": false
 }

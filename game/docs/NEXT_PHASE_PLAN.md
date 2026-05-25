@@ -1,10 +1,1 @@
-# Next Phase Plan after PHASE-211-FULL-MARKER-HEALTH-LOCK
-
-## Phase 199 recommendation
-Focus on final tester handoff:
-- one-page tester instructions
-- Quest/browser checklist
-- bug report intake
-- session export review flow
-- no lobby redesign
-- no public page edits
+Next: Phase 213 should use boot diagnostic evidence from Phase 212 to remove any remaining stale import or runtime blockers before adding new visible features.

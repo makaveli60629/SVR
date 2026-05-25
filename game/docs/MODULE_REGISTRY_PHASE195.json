@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-211-FULL-MARKER-HEALTH-LOCK",
+  "build": "PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK",
   "phase": 199,
   "modules": {
     "bug_reporter": "game/modules/bug_reporter.js",

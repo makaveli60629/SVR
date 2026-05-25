@@ -1,4 +1,4 @@
-# PHASE-211-FULL-MARKER-HEALTH-LOCK
+# PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

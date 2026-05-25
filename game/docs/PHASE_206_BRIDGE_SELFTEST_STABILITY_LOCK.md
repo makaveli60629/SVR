@@ -1,4 +1,4 @@
-# PHASE-211-FULL-MARKER-HEALTH-LOCK
+# PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
 
 ## Purpose
 Phase 206 adds a bridge self-test/autorepair layer after the Phase 205 recorder cache-bust fix.

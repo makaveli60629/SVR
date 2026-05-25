@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Queue Dashboard
- * Build: PHASE-211-FULL-MARKER-HEALTH-LOCK
+ * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
  * Purpose: convert tester feedback, bug reports, release candidate checks, and smoke tests into a compact triage queue.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
+const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
 const EXPECTED_PHASE = 197;
 const STORE_KEY = 'svr_test_queue_phase197';
 

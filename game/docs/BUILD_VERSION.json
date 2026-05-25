@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-211-FULL-MARKER-HEALTH-LOCK",
-  "phase": 211,
+  "build": "PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK",
+  "phase": 212,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "full marker health, boot title/version/deploy alignment, cache-bust verification"
+  "featureLock": "boot diagnostic snapshot, CDN/import/deploy marker evidence capture, recovery report export"
 }

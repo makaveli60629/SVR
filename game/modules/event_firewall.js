@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-211-FULL-MARKER-HEALTH-LOCK
+ * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
+const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

@@ -1,4 +1,4 @@
-# PHASE-211-FULL-MARKER-HEALTH-LOCK
+# PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
 
 ## Purpose
 Fix game stuck on `Booting…` by moving game startup behind a guarded loader.

@@ -1,9 +1,9 @@
 /*
- * SVR Poker Phase 211 - Boot Cache Marker Alignment Lock
- * Purpose: align boot cache markers so stale phase imports cannot keep the player stuck on Booting.
+ * SVR Poker Phase 212 - Boot Diagnostic Snapshot Lock
+ * Purpose: capture boot/import/cache evidence and avoid permanent Booting stalls.
  */
 (function(){
-  var BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
+  var BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
   var startedAt = new Date().toISOString();
   var statusEl = document.getElementById('status');
   var errEl = document.getElementById('err');
@@ -23,7 +23,7 @@
     if (ready || fallbackStarted) return;
     fallbackStarted = true;
     setStatus('Boot fallback: loading recovery shell…');
-    import('./modules/boot_fallback.js?v=phase211').then(function(){
+    import('./modules/boot_fallback.js?v=phase212').then(function(){
       if (window.SVR_BOOT_FALLBACK && !ready) window.SVR_BOOT_FALLBACK.show(reason, detail);
     }).catch(function(error){
       showRecovery('Fallback shell failed. Manual reload required.', error, false);
@@ -51,7 +51,7 @@
     var target = event.target && event.target.closest && event.target.closest('[data-svr-boot]'); if (!target) return;
     var action = target.getAttribute('data-svr-boot');
     if (action === 'reload') location.reload();
-    if (action === 'cache') location.href = './index.html?v=phase211-' + Date.now();
+    if (action === 'cache') location.href = './index.html?v=phase212-' + Date.now();
     if (action === 'fallback') startFallback('Manual recovery shell requested.', '');
   });
   window.addEventListener('svr_game_ready', function(event){ hideRecovery(); setStatus((event.detail && event.detail.preview) ? 'Live preview ready' : 'Ready. Enter VR.'); });
@@ -60,5 +60,5 @@
   setStatus('Boot guard: loading game module…');
   setTimeout(function(){ if (!ready) { showRecovery('Game is taking longer than expected. Recovery shell is available.', '', true); } }, 6000);
   mainTimer = setTimeout(function(){ if (!ready) { showRecovery('Game did not send ready signal. Opening recovery shell so Booting cannot freeze.', '', false); startFallback('Main runtime timeout before ready signal.', 'Likely CDN/import/cache/runtime module issue.'); } }, 15000);
-  import('./main.js?v=phase211').then(function(){ imported = true; setStatus('Game module loaded. Building scene…'); }).catch(function(error){ imported = false; showRecovery('Failed to import main game module. Booting screen stopped by recovery guard.', error, false); startFallback('Failed to import main game module.', error); });
+  import('./main.js?v=phase212').then(function(){ imported = true; setStatus('Game module loaded. Building scene…'); }).catch(function(error){ imported = false; showRecovery('Failed to import main game module. Booting screen stopped by recovery guard.', error, false); startFallback('Failed to import main game module.', error); });
 })();

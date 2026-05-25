@@ -1,6 +1,6 @@
 {
   "phase": 204,
-  "build": "PHASE-211-FULL-MARKER-HEALTH-LOCK",
+  "build": "PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK",
   "modules_added": [
     "modules/event_firewall.js"
   ],

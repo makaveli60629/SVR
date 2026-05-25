@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-211-FULL-MARKER-HEALTH-LOCK`
+Build: `PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

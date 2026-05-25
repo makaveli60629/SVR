@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Safe Event Bus
- * Build: PHASE-211-FULL-MARKER-HEALTH-LOCK
+ * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
  * Purpose: sandbox SVR custom-event listeners so a missing recorder/listener cannot freeze gameplay.
  */
-const BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
+const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
 const ORIGINAL_ADD = EventTarget.prototype.addEventListener;
 const ORIGINAL_REMOVE = EventTarget.prototype.removeEventListener;
 const ORIGINAL_DISPATCH = EventTarget.prototype.dispatchEvent;

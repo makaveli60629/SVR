@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-211-FULL-MARKER-HEALTH-LOCK`
+Build: `PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK`
 
 ## Added
 - In-game bug report capture panel.

@@ -1,11 +1,11 @@
 /**
  * SVR Poker — Bridge Proxy Runtime Guard
- * Build: PHASE-211-FULL-MARKER-HEALTH-LOCK
+ * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
  * Purpose: install a no-crash proxy before poker/runtime modules dispatch telemetry.
  * The proxy returns safe functions for any record* method so missing recorder aliases
  * cannot freeze the render loop.
  */
-const BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
+const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
 const STORE_KEY = '__svrBridgeProxyQueue';
 
 function safePayload(value){

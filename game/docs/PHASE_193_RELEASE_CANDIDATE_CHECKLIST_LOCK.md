@@ -1,6 +1,6 @@
 # Phase 199 — Release Candidate Checklist Lock
 
-Build: `PHASE-211-FULL-MARKER-HEALTH-LOCK`
+Build: `PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK`
 
 ## Purpose
 Adds a final in-game release candidate checklist that combines deploy verifier, smoke test, QA snapshot, session export, private route presence, and watch/HUD readiness into one gate.

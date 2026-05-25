@@ -2,7 +2,7 @@
 
 - Open `/game/?v=phase192`.
 - Press `V` and confirm SVR DEPLOY PREFLIGHT panel appears.
-- Confirm build displays `PHASE-211-FULL-MARKER-HEALTH-LOCK`.
+- Confirm build displays `PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK`.
 - Press `Q` and confirm QA overlay still works.
 - Press `X` and confirm session JSON download works.
 - Press `Y` and confirm copy export path does not break runtime.

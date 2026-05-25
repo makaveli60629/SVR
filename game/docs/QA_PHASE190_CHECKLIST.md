@@ -1,7 +1,7 @@
 # QA Checklist — Phase 199
 
 - Open `/game/?v=phase190`.
-- Confirm build marker reads `PHASE-211-FULL-MARKER-HEALTH-LOCK`.
+- Confirm build marker reads `PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK`.
 - Press `Q` and verify QA overlay still toggles.
 - Press `X` and confirm a JSON session export downloads.
 - Press `Y` and confirm clipboard copy succeeds where browser permissions allow.

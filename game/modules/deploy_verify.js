@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Deploy Verifier / Preflight QA Module
- * Build: PHASE-211-FULL-MARKER-HEALTH-LOCK
+ * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
  * Purpose: catch stale deploys, mismatched game/version/deploy-health data, and runtime drift before testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
+const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
 const EXPECTED_PHASE = 194;
 
 async function fetchJsonSafe(url) {

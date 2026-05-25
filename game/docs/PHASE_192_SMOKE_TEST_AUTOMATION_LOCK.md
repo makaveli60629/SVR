@@ -1,6 +1,6 @@
 # Phase 199 — Smoke Test Automation Lock
 
-Build: `PHASE-211-FULL-MARKER-HEALTH-LOCK`
+Build: `PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

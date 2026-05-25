@@ -1,6 +1,6 @@
 # Phase 200 — Pilot Testing Ready Lock
 
-Build: `PHASE-211-FULL-MARKER-HEALTH-LOCK`
+Build: `PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK`
 
 ## Protected rules
 

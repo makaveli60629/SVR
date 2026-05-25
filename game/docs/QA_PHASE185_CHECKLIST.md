@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Load `/game/?v=phase185` without black screen.
-- [ ] Confirm title/version shows `PHASE-211-FULL-MARKER-HEALTH-LOCK`.
+- [ ] Confirm title/version shows `PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK`.
 - [ ] Confirm YOUR TURN countdown updates once per second.
 - [ ] Confirm hand-history panel shows TURN line.
 - [ ] Confirm action log still records player and bot actions.
