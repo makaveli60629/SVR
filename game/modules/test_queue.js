@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Queue Dashboard
- * Build: PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
+ * Build: PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
  * Purpose: convert tester feedback, bug reports, release candidate checks, and smoke tests into a compact triage queue.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK';
+const BUILD = 'PHASE-208-RUNTIME-CRASH-SHIELD-LOCK';
 const EXPECTED_PHASE = 197;
 const STORE_KEY = 'svr_test_queue_phase197';
 

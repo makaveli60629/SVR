@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
+ * Build: PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK';
+const BUILD = 'PHASE-208-RUNTIME-CRASH-SHIELD-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

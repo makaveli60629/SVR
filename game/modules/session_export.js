@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
+ * Build: PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK';
+const BUILD = 'PHASE-208-RUNTIME-CRASH-SHIELD-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

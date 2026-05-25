@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
+ * Build: PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK';
+const BUILD = 'PHASE-208-RUNTIME-CRASH-SHIELD-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

@@ -1,10 +1,10 @@
 /**
  * SVR Poker - Demo Certification Lock
- * Build: PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
+ * Build: PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
  * Shortcut: Z
  * Purpose: combine QA, smoke, RC, feedback, bug reports, and report bundle into one demo-ready gate.
  */
-const BUILD = 'PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK';
+const BUILD = 'PHASE-208-RUNTIME-CRASH-SHIELD-LOCK';
 const STORE_KEY = 'svr_demo_certifications';
 
 function safeRead(name, fallback = null) {

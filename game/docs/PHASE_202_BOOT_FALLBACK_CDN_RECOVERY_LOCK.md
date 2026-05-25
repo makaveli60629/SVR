@@ -1,4 +1,4 @@
-# PHASE-202-BOOT-FALLBACK-CDN-RECOVERY-LOCK
+# PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
 
 ## Purpose
 Fix the remaining stuck-on-Booting risk by adding a no-Three.js recovery shell. If CDN/import/runtime loading fails, the game no longer remains frozen on Booting.

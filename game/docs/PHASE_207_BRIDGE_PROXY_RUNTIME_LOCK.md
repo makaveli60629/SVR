@@ -1,4 +1,4 @@
-# PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
+# PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
 
 ## Purpose
 Install a first-run bridge proxy before event/firewall/poker modules so missing `record*` methods cannot crash the runtime.

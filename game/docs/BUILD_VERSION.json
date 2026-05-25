@@ -1,9 +1,6 @@
 {
-  "build": "PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK",
-  "phase": 207,
+  "build": "PHASE-208-RUNTIME-CRASH-SHIELD-LOCK",
+  "phase": 208,
   "public_page_touched": false,
-  "game_package_under_25mb_target": true,
-  "featureLock": "bridge proxy runtime guard, universal recorder fallback, event crash prevention",
-  "source": "direct-game-folder",
-  "generatedAt": "2026-05-25T00:00:00Z"
+  "lock": "runtime crash shield"
 }

@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Load `/game/?v=phase185` without black screen.
-- [ ] Confirm title/version shows `PHASE-199-DEMO-CERTIFICATION-LOCK`.
+- [ ] Confirm title/version shows `PHASE-208-RUNTIME-CRASH-SHIELD-LOCK`.
 - [ ] Confirm YOUR TURN countdown updates once per second.
 - [ ] Confirm hand-history panel shows TURN line.
 - [ ] Confirm action log still records player and bot actions.

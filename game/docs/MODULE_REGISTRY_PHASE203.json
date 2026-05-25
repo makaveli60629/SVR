@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK",
+  "build": "PHASE-208-RUNTIME-CRASH-SHIELD-LOCK",
   "phase": 203,
   "modules": [
     "boot.js",

@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-199-DEMO-CERTIFICATION-LOCK",
+  "build": "PHASE-208-RUNTIME-CRASH-SHIELD-LOCK",
   "modules": [
     "game/main.js",
     "game/modules/watch.js",
