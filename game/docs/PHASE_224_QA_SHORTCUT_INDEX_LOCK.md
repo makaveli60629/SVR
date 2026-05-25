@@ -1,7 +1,7 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Purpose
-Phase 234 adds a master QA shortcut index so testers do not need to remember every panel key.
+Phase 235 adds a master QA shortcut index so testers do not need to remember every panel key.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 234 adds a master QA shortcut index so testers do not need to remember eve
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase234-shortcuts` and press `?` or `/`.
+Open `/game/?v=phase235-shortcuts` and press `?` or `/`.

@@ -1,6 +1,6 @@
 # Phase 199 QA Checklist
 
-- [ ] /game/version.json shows PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+- [ ] /game/version.json shows PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 - [ ] During player turn, the hand-history panel shows an AID line.
 - [ ] Free check shows FREE CHECK / 0% call cost.
 - [ ] Calling a bet shows pot-odds percentage.

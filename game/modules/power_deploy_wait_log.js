@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK";
+  const BUILD = "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK";
   const state = {
     build: BUILD,
     phase: 230,
@@ -14,7 +14,7 @@
   }
 
   async function probe(url){
-    const full = url + (url.includes("?") ? "&" : "?") + "v=phase234-" + Date.now();
+    const full = url + (url.includes("?") ? "&" : "?") + "v=phase235-" + Date.now();
     try {
       const r = await fetch(full, { cache: "no-store" });
       const text = await r.text();

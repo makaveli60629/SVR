@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+ * Build: PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK';
+const BUILD = 'PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

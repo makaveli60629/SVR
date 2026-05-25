@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
+  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase234.js"
+    "game/modules/enterprise_bridge_phase235.js"
   ],
   "protected": {
     "publicPageTouched": false,

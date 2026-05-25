@@ -1,6 +1,6 @@
 # Phase 200 — Pilot Testing Ready Lock
 
-Build: `PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK`
+Build: `PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK`
 
 ## Protected rules
 

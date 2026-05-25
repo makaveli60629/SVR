@@ -1,8 +1,8 @@
-// PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+// PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
+    build: "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

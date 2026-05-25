@@ -1,4 +1,4 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Scope
 Adds a local tester queue dashboard that turns tester feedback, bug reports, release-candidate checks, smoke tests, and runtime errors into a compact ranked queue.

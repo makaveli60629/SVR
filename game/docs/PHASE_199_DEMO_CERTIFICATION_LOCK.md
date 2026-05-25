@@ -1,4 +1,4 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Summary
 Adds the Demo Certification module and go/no-go readiness gate for demo/playtest preparation.

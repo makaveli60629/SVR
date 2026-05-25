@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Open /game/?v=phase188.
-- [ ] Confirm build marker shows PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+- [ ] Confirm build marker shows PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 - [ ] Enter or preview game without black screen.
 - [ ] During player turn, watch shows actor YOU and countdown.
 - [ ] When no call is facing player, watch button reads CHECK.

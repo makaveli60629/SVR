@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
+  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
   "phase": 199,
   "modules": {
     "poker_demo.js": [

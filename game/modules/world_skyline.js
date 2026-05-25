@@ -2299,6 +2299,19 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     makeSeat(scene, 2.28, 1.02, faceCenter(2.28, 1.02), "Right Back", chairMat, metalMat)
   ];
 
+  const spawnFrontSeat = seats.find((seat)=> seat.label === "South Edge");
+  if (spawnFrontSeat?.group){
+    spawnFrontSeat.group.userData.svrSpawnClearNoChair = true;
+    spawnFrontSeat.group.children.forEach((child)=>{
+      if (child !== spawnFrontSeat.ring) child.visible = false;
+    });
+    if (spawnFrontSeat.ring?.material){
+      spawnFrontSeat.ring.material.opacity = 0.26;
+      spawnFrontSeat.ring.material.color.set(0x7fffe0);
+    }
+    spawnFrontSeat.ring?.scale?.setScalar?.(0.82);
+  }
+
   const feltTex = await loadFirstTexture(assetUrls("texture/tablefelt.png"), { colorSpace: THREE.SRGBColorSpace });
   let tableTopY = 0.905;
   await createPreferredTable(scene, tableTopY, feltTex, log);

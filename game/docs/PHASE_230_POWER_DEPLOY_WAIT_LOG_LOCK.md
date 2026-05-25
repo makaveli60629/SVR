@@ -1,7 +1,7 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Purpose
-Phase 234 adds a Power Deploy Wait Log panel and a stronger PowerShell deploy script that can trigger GitHub Actions, wait for the newest run, and show the final run list.
+Phase 235 adds a Power Deploy Wait Log panel and a stronger PowerShell deploy script that can trigger GitHub Actions, wait for the newest run, and show the final run list.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 234 adds a Power Deploy Wait Log panel and a stronger PowerShell deploy sc
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase234-powerwait` and press `F7`.
+Open `/game/?v=phase235-powerwait` and press `F7`.

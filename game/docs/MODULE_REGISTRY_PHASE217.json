@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
-  "phase": 234,
+  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+  "phase": 235,
   "modules": [
     "game/modules/auto_apply_git_wrapper_fix.js",
-    "game/modules/enterprise_bridge_phase234.js"
+    "game/modules/enterprise_bridge_phase235.js"
   ],
   "public_page_touched": false
 }

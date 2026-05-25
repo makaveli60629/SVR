@@ -1,4 +1,4 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

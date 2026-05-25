@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
+  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
   "public_page_touched": false,
   "modules_added": [
     "game/modules/playtest_wizard.js"

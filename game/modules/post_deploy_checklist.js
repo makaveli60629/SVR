@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK";
+  const BUILD = "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK";
   const state = {
     build: BUILD,
     phase: 222,
@@ -10,7 +10,7 @@
       { label: "Git push completed", done: false },
       { label: "GitHub Actions Auto Deploy ran", done: false },
       { label: "Cache-bust URL loaded", done: false },
-      { label: "version.json shows Phase 234", done: false },
+      { label: "version.json shows Phase 235", done: false },
       { label: "deploy-health.json available", done: false },
       { label: "Tester shortcut panels available", done: false }
     ],
@@ -22,7 +22,7 @@
   }
 
   async function get(url){
-    const full = url + (url.includes("?") ? "&" : "?") + "v=phase234-" + Date.now();
+    const full = url + (url.includes("?") ? "&" : "?") + "v=phase235-" + Date.now();
     try {
       const r = await fetch(full, { cache: "no-store" });
       const text = await r.text();
@@ -40,7 +40,7 @@
     checks.push(await get("./deploy-health.json"));
     checks.push(await get("../deploy-health.json"));
     const combined = JSON.stringify(checks);
-    const phaseVisible = combined.includes("PHASE-222") || combined.includes('"phase":222') || combined.includes('"phase": 234');
+    const phaseVisible = combined.includes("PHASE-222") || combined.includes('"phase":222') || combined.includes('"phase": 235');
     const deployHealth = checks.some(c => c.url.includes("deploy-health") && c.ok);
     state.checks = checks;
     state.checkedAt = new Date().toISOString();
@@ -48,7 +48,7 @@
     state.checklist = state.checklist.map(item => {
       if(item.label.includes("version.json")) return {...item, done: phaseVisible};
       if(item.label.includes("deploy-health")) return {...item, done: deployHealth};
-      if(item.label.includes("Cache-bust")) return {...item, done: location.search.includes("phase234")};
+      if(item.label.includes("Cache-bust")) return {...item, done: location.search.includes("phase235")};
       if(item.label.includes("Tester shortcut")) return {...item, done: !!(window.SVR_ONE_COMMAND_RUNBOOK || window.SVR_ONE_COMMAND_DEPLOY_HEALTH || window.SVR_AUTO_APPLY_STATUS)};
       return item;
     });

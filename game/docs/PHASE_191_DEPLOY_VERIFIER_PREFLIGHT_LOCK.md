@@ -1,6 +1,6 @@
 # Phase 199 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK`
+Build: `PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

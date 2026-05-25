@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
-  "phase": 234,
+  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+  "phase": 235,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "PowerShell deploy smoke probe, live URL checks, boot fallback verification"
+  "featureLock": "right-stick forward movement, fist teleport restore, spawn chair cleared"
 }

@@ -1,7 +1,7 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Purpose
-Phase 234 adds a Power Deploy Watcher panel for the new PowerShell-only workflow.
+Phase 235 adds a Power Deploy Watcher panel for the new PowerShell-only workflow.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 234 adds a Power Deploy Watcher panel for the new PowerShell-only workflow
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase234-powerdeploy` and press `F6`.
+Open `/game/?v=phase235-powerdeploy` and press `F6`.

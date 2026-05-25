@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+ * Build: PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK';
+const BUILD = 'PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

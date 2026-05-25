@@ -1,5 +1,5 @@
 
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Purpose
 Fixes the PowerShell updater failure where the apply script wrapper passed git arguments incorrectly and Git opened help instead of running the intended subcommand.

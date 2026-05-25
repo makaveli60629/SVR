@@ -134,17 +134,17 @@ Source package used for this phase:
 - SVR Wellness building ad refreshed to `SVR WELLNESS / L.A.` in neon green presentation styling.
 
 
-## PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+## PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 - Added exact best-five winning cards to showdown, history, and telemetry.
 
 
-## PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+## PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 - Adds side-pot eligibility and payout resolution.
 - Emits `svr_poker_side_pot_resolution`.
 - Keeps public Matrix page untouched.
 
 
-## PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+## PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 - Added folded/mucked player eligibility state.
 - Folded players are excluded from side-pot winner eligibility.
@@ -154,8 +154,8 @@ Source package used for this phase:
 
 
 ## Phase 199
-- PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK: dealer/blind state + safe rebuy continuity. Public page untouched.
+- PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK: dealer/blind state + safe rebuy continuity. Public page untouched.
 
 
 ## Phase 199
-- PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK: player decision aid, pot-odds pressure hints, and backend telemetry hook. Public page untouched.
+- PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK: player decision aid, pot-odds pressure hints, and backend telemetry hook. Public page untouched.

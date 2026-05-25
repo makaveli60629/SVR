@@ -1,4 +1,4 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

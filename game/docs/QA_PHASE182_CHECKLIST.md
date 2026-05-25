@@ -1,6 +1,6 @@
 # QA Phase 199
 
-- [ ] Confirm build marker says `PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK`.
+- [ ] Confirm build marker says `PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK`.
 - [ ] Start a hand and verify contribution line appears.
 - [ ] Trigger all-in action and verify ALL-IN player list appears.
 - [ ] At showdown, verify side-pot summary appears in the hand-history panel.

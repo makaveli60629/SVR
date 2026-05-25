@@ -1,4 +1,4 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

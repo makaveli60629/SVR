@@ -1,11 +1,11 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase234.js`
+- `game/modules/enterprise_bridge_phase235.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

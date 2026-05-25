@@ -1,4 +1,4 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Purpose
 Install a first-run bridge proxy before event/firewall/poker modules so missing `record*` methods cannot crash the runtime.
@@ -12,5 +12,5 @@ Install a first-run bridge proxy before event/firewall/poker modules so missing 
 
 ## Added files
 - `game/modules/bridge_proxy.js`
-- `game/modules/enterprise_bridge_phase234.js`
+- `game/modules/enterprise_bridge_phase235.js`
 - `game/docs/MODULE_REGISTRY_PHASE207.json`

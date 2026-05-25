@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Tester Feedback Triage
- * Build: PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+ * Build: PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
  * Purpose: collect playtest verdicts and triage summaries after QA/smoke/bug-report passes.
  * Public Matrix page is not touched.
  */
-const BUILD = 'PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK';
+const BUILD = 'PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK';
 const EXPECTED_PHASE = 196;
 const STORE_KEY = 'svr_tester_feedback_phase197';
 

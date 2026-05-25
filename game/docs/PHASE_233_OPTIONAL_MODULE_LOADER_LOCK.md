@@ -1,7 +1,7 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Purpose
-Phase 234 hardens boot by removing optional QA/telemetry panel modules from the static `main.js` import chain.
+Phase 235 hardens boot by removing optional QA/telemetry panel modules from the static `main.js` import chain.
 
 ## Direct fix
 - Adds `game/modules/optional_module_loader.js`
@@ -15,4 +15,4 @@ Phase 234 hardens boot by removing optional QA/telemetry panel modules from the 
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase234-optionalloader` and press `F10`.
+Open `/game/?v=phase235-optionalloader` and press `F10`.

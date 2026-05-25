@@ -1,4 +1,4 @@
-# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
+# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
 
 ## Purpose
 Adds a boot diagnostic snapshot layer so testing can capture exact evidence for boot/import/CDN/cache/deploy mismatches instead of relying on screenshots alone.

@@ -1,6 +1,6 @@
 {
   "phase": 200,
-  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
+  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
   "modules": [
     "enterprise_bridge",
     "runtime_qa",

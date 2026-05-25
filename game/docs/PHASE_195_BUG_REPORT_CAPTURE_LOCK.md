@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK`
+Build: `PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK`
 
 ## Added
 - In-game bug report capture panel.
