@@ -1,5 +1,5 @@
 
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
 Fixes the PowerShell updater failure where the apply script wrapper passed git arguments incorrectly and Git opened help instead of running the intended subcommand.

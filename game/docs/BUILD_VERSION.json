@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
-  "phase": 242,
+  "build": "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
+  "phase": 244,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "watch teleport conflict guard, double-sided watch screen, black-square texture heartbeat"
+  "featureLock": "main.js runtime catch fix, Quest-safe animation error guard, deploy sync retained"
 }

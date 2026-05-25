@@ -1,7 +1,7 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 strengthens the Phase 235/236 input fix for Meta Quest / WebXR controller axis differences.
+Phase 244 strengthens the Phase 235/236 input fix for Meta Quest / WebXR controller axis differences.
 
 ## Direct fixes
 - Right-stick forward/back movement now auto-calibrates between axis pairs `[2,3]` and `[0,1]`.
@@ -19,4 +19,4 @@ Phase 242 strengthens the Phase 235/236 input fix for Meta Quest / WebXR control
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase242-questinput` and press `F11`.
+Open `/game/?v=phase244-questinput` and press `F11`.

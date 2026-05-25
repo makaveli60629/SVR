@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+ * Build: PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK';
+const BUILD = 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

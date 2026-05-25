@@ -1,6 +1,6 @@
 # Phase 199 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK`
+Build: `PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

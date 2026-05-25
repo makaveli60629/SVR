@@ -1,9 +1,9 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
-Phase 242 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
+Phase 244 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
 
 ## Test
-Open `/game/?v=phase242-autoapplystatus` and press `I`.
+Open `/game/?v=phase244-autoapplystatus` and press `I`.
 
 ## Locked
 - Public Matrix launch page untouched.

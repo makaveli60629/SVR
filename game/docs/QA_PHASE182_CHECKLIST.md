@@ -1,6 +1,6 @@
 # QA Phase 199
 
-- [ ] Confirm build marker says `PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK`.
+- [ ] Confirm build marker says `PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK`.
 - [ ] Start a hand and verify contribution line appears.
 - [ ] Trigger all-in action and verify ALL-IN player list appears.
 - [ ] At showdown, verify side-pot summary appears in the hand-history panel.

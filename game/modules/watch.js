@@ -206,14 +206,14 @@ let hoveredId = null;
   let pressLockId = null;
   let lastHovered = null;
   let lastSig = '';
-  let lastWatchUprightState = { build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK', phase: 241, uprightRolled: false, uprightDot: 1, side: 'none', visible: false };
+  let lastWatchUprightState = { build: 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK', phase: 241, uprightRolled: false, uprightDot: 1, side: 'none', visible: false };
 
 
   function publishWatchInteraction(extra = {}){
     const now = performance.now();
     const interacting = !!(extra.visible && (extra.hoveredId || extra.pinching || extra.nearScreen));
     lastWatchInteractionState = {
-      build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK',
+      build: 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK',
       phase: 242,
       visible: !!extra.visible,
       hoveredId: extra.hoveredId || null,
@@ -385,7 +385,7 @@ let hoveredId = null;
     group.position.copy(pose.position);
     group.quaternion.copy(pose.quaternion);
     lastWatchUprightState = {
-      build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK',
+      build: 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK',
       phase: 241,
       uprightRolled: !!pose.uprightRolled,
       uprightDot: Number((pose.uprightDot ?? 1).toFixed(3)),

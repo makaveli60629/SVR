@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Bridge Self-Test & Auto-Heal Module
- * Build: PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+ * Build: PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
  * Purpose: verify bridge recorder methods at runtime, patch missing aliases, and emit a clear health report without stopping the game loop.
  */
-const BUILD = 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK';
+const BUILD = 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK';
 const REQUIRED_RECORDERS = [
   'recordHandResult','recordPlayerAction','recordActionLog','recordLegalActions','recordShowdown','recordSidePot',
   'recordTurnIndicator','recordWatchTurnIndicator','recordDealerButton','recordRebuy','recordDecisionAid','recordTelemetry',

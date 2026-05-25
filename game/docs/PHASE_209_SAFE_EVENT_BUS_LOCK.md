@@ -1,11 +1,11 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase242.js`
+- `game/modules/enterprise_bridge_phase244.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

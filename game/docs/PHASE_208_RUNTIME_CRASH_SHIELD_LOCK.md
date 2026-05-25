@@ -1,4 +1,4 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

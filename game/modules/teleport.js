@@ -114,7 +114,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let lastLeftFistToggle = false;
   let lastRightFistToggle = false;
   const inputState = {
-    build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+    build: "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
     phase: 239,
     rightStickMove: true,
     rightStickTurn: true,
@@ -128,7 +128,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   };
 
   const handTeleportState = {
-    build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+    build: "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
     phase: 239,
     mode: "face-toggle-point-pinch",
     active: false,

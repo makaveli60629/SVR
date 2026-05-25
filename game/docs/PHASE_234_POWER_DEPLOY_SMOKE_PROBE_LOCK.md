@@ -1,7 +1,7 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 adds a deploy smoke probe in both PowerShell and the game UI.
+Phase 244 adds a deploy smoke probe in both PowerShell and the game UI.
 
 ## Direct fix
 - Adds `game/modules/power_deploy_smoke_probe.js`
@@ -17,4 +17,4 @@ Phase 242 adds a deploy smoke probe in both PowerShell and the game UI.
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase242-smokeprobe` and press `F12`.
+Open `/game/?v=phase244-smokeprobe` and press `F12`.

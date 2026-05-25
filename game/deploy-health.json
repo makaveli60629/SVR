@@ -1,6 +1,7 @@
 {
-  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
-  "phase": 242,
+  "status": "ok",
+  "build": "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
+  "phase": 244,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false

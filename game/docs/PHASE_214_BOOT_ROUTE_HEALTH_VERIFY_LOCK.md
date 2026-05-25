@@ -1,4 +1,4 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 Phase 214 adds a boot route health verifier to confirm the lobby and private scene recovery links resolve after deployment.
 

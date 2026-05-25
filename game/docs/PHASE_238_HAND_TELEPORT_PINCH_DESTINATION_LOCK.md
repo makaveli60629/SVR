@@ -1,7 +1,7 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 changes hand teleport behavior to the user-requested interaction model.
+Phase 244 changes hand teleport behavior to the user-requested interaction model.
 
 ## Direct fixes
 - Teleport ON/OFF only toggles when the hand is near the face/chin and the user pinches or makes a fist.
@@ -19,4 +19,4 @@ Phase 242 changes hand teleport behavior to the user-requested interaction model
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase242-handtp` and press `F1`.
+Open `/game/?v=phase244-handtp` and press `F1`.

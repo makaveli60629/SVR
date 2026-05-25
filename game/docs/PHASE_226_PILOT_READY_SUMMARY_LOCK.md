@@ -1,7 +1,7 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 adds a Pilot Ready Summary panel that gives one consolidated go/no-go view for the test build.
+Phase 244 adds a Pilot Ready Summary panel that gives one consolidated go/no-go view for the test build.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 242 adds a Pilot Ready Summary panel that gives one consolidated go/no-go 
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase242-pilotready` and press `Y`.
+Open `/game/?v=phase244-pilotready` and press `Y`.

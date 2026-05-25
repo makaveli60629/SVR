@@ -1,7 +1,7 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 fixes the reported upside-down wrist watch.
+Phase 244 fixes the reported upside-down wrist watch.
 
 ## Direct fix
 - `modules/watch.js`
@@ -23,4 +23,4 @@ Phase 242 fixes the reported upside-down wrist watch.
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase242-watchupright` and press `F6`.
+Open `/game/?v=phase244-watchupright` and press `F6`.

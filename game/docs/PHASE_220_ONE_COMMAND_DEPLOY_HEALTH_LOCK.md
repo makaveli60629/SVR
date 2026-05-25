@@ -1,7 +1,7 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 adds a simple one-command deploy health surface so the project can confirm whether the latest package is actually visible after GitHub Pages deploy.
+Phase 244 adds a simple one-command deploy health surface so the project can confirm whether the latest package is actually visible after GitHub Pages deploy.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 242 adds a simple one-command deploy health surface so the project can con
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase242-deployhealth` and press `M`.
+Open `/game/?v=phase244-deployhealth` and press `M`.

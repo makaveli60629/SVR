@@ -1,11 +1,11 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 fixes the boot fallback shown when `main.js` failed to dynamically import because the cache-busted enterprise bridge module for the current phase was missing.
+Phase 244 fixes the boot fallback shown when `main.js` failed to dynamically import because the cache-busted enterprise bridge module for the current phase was missing.
 
 ## Direct fix
-- Adds `game/modules/enterprise_bridge_phase242.js`
-- Updates `main.js` to import `enterprise_bridge_phase242.js`
+- Adds `game/modules/enterprise_bridge_phase244.js`
+- Updates `main.js` to import `enterprise_bridge_phase244.js`
 - Adds `game/modules/main_import_recovery.js`
 - Adds F8 import check panel
 
@@ -15,4 +15,4 @@ Phase 242 fixes the boot fallback shown when `main.js` failed to dynamically imp
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase242-importfix` and press `F8`.
+Open `/game/?v=phase244-importfix` and press `F8`.

@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+  "build": "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",
-    "game/modules/enterprise_bridge_phase242.js",
+    "game/modules/enterprise_bridge_phase244.js",
     "game/modules/bridge_selftest.js",
     "game/modules/event_firewall.js"
   ],

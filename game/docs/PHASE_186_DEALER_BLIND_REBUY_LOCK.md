@@ -1,4 +1,4 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Scope
 - Added dealer button / blind-state telemetry for every hand.

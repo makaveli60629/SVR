@@ -1,8 +1,8 @@
-// PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+// PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+    build: "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

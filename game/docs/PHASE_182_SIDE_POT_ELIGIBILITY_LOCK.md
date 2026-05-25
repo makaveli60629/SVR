@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK`
+Build: `PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

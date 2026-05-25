@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+  "build": "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
   "phase": 199,
   "modules_added": [
     "game/modules/smoke_test.js"

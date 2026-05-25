@@ -1,13 +1,13 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 fixes the live Phase 230 boot fallback by adding bridge alias files for stale and current main.js imports.
+Phase 244 fixes the live Phase 230 boot fallback by adding bridge alias files for stale and current main.js imports.
 
 ## Direct fix
 - Adds `game/modules/enterprise_bridge_phase229.js`
 - Adds `game/modules/enterprise_bridge_phase230.js`
-- Adds `game/modules/enterprise_bridge_phase242.js`
-- Adds `game/modules/enterprise_bridge_phase242.js`
+- Adds `game/modules/enterprise_bridge_phase244.js`
+- Adds `game/modules/enterprise_bridge_phase244.js`
 - Updates `main.js` to import the stable bridge directly.
 - Adds `game/modules/bridge_alias_recovery.js`
 - Adds F9 alias check panel.
@@ -21,4 +21,4 @@ The live boot report shows `main.js?v=phase230` failed to dynamically import. Th
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase242-bridgealias` and press `F9`.
+Open `/game/?v=phase244-bridgealias` and press `F9`.

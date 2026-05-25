@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Bug Report Capture
- * Build: PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+ * Build: PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
  * Purpose: capture tester issue reports from inside the game without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK';
+const BUILD = 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK';
 const EXPECTED_PHASE = 195;
 const STORE_KEY = 'svr_bug_reports_phase197';
 

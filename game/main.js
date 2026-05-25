@@ -7,7 +7,11 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import "./modules/optional_module_loader.js?v=phase242";
+import "./modules/optional_module_loader.js?v=phase244";
+
+const BUILD_LABEL = "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK";
+const BUILD_PHASE = 244;
+window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -44,11 +48,14 @@ function setMode(text){
 
 function log(...args){
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
+  console.log("[SVR]", line);
+  if (!$log) return;
   $log.textContent += line + "\n";
   $log.scrollTop = $log.scrollHeight;
 }
 
-$toggleLog.addEventListener("click", ()=>{
+$toggleLog?.addEventListener("click", ()=>{
+  if (!$log) return;
   $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
 });
 
@@ -100,7 +107,7 @@ let seatIndex = -1;
 let cash = 50000;
 
 const pokerHudState = {
-  build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+  build: BUILD_LABEL,
   actor: "TABLE",
   stage: "waiting",
   action: "waiting",
@@ -303,17 +310,17 @@ const watch = createWristWatch({
   }
 });
 
-$toggleJoints.addEventListener("click", ()=>{
+$toggleJoints?.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
-  $toggleJoints.textContent = on ? "Joints On" : "Joints";
+  if ($toggleJoints) $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
 setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK" } }));
-window.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK", preview: AUTOCAM, at: new Date().toISOString() } }));
+window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: BUILD_LABEL } }));
+window.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: BUILD_LABEL, preview: AUTOCAM, at: new Date().toISOString() } }));
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold grip/A/trigger to aim teleport, release to teleport. Poker keys: F/C/R/A/H. QA keys: Q/V/T/U/W/G/X/Y. Private scene buttons enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
@@ -356,7 +363,7 @@ renderer.setAnimationLoop(()=>{
   tPrev = now;
 
   if (!renderer.xr.isPresenting){
-    if (!AUTOCAM) desktop.update(dt);
+    if (!AUTOCAM && desktop) desktop.update(dt);
     else {
       const shotIndex = Math.floor(now / 9000) % previewShots.length;
       const shot = previewShots[shotIndex];
@@ -400,8 +407,28 @@ renderer.setAnimationLoop(()=>{
 
   renderer.render(scene, camera);
   } catch (error) {
-    if (window.SVR_RUNTIME_CRASH_SHIELD?.handleAnimationError?.(error, { phase: PHASE.build })) return;
-    throw error;
+    const message = error?.stack || error?.message || String(error);
+    window.SVR_MAIN_RUNTIME_STATE.animationErrors += 1;
+    window.SVR_MAIN_RUNTIME_STATE.lastAnimationError = {
+      at: new Date().toISOString(),
+      message,
+      count: window.SVR_MAIN_RUNTIME_STATE.animationErrors
+    };
+    console.error("[SVR main animation error]", error);
+    window.dispatchEvent(new CustomEvent("svr_main_runtime_error", {
+      detail: { build: BUILD_LABEL, phase: BUILD_PHASE, message, count: window.SVR_MAIN_RUNTIME_STATE.animationErrors }
+    }));
+
+    const shield = window.SVR_RUNTIME_CRASH_SHIELD;
+    if (shield?.handleAnimationError?.(error, { phase: BUILD_PHASE, build: BUILD_LABEL, module: "main.animationLoop" })) return;
+
+    setStatus("Runtime recovered • check Logs", { force: true, minGap: 0 });
+    if (!renderer.xr.isPresenting && $err) {
+      $err.style.display = "block";
+      $err.textContent = "RUNTIME ERROR RECOVERED:\n" + message;
+    }
+    // Quest-safe: do not throw from the animation loop, because a secondary throw can freeze WebXR.
+    return;
   }
 });
 

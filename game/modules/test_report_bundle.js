@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Report Bundle
- * Build: PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+ * Build: PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
  * Purpose: combine QA snapshots, bug reports, tester feedback, test queue, smoke/RC/preflight/session exports into one playtest report bundle.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK';
+const BUILD = 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK';
 const EXPECTED_PHASE = 198;
 const STORE_KEY = 'svr_test_report_bundles_phase198';
 

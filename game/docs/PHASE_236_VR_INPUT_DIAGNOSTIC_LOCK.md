@@ -1,14 +1,14 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 carries Phase 242's right-stick movement / fist teleport / spawn-chair fix forward and adds a tester diagnostic surface.
+Phase 244 carries Phase 244's right-stick movement / fist teleport / spawn-chair fix forward and adds a tester diagnostic surface.
 
 ## Adds
 - `game/modules/vr_input_diagnostic.js`
 - `window.SVR_VR_INPUT_DIAGNOSTIC`
 - F5 panel for controller axes, movement test steps, fist teleport test, and spawn path confirmation.
 
-## Preserved from Phase 242
+## Preserved from Phase 244
 - Right stick Y: forward/back movement.
 - Right stick X: 45-degree snap turn.
 - Hand fist teleport: hold fist/pinch to aim, release to teleport.
@@ -20,4 +20,4 @@ Phase 242 carries Phase 242's right-stick movement / fist teleport / spawn-chair
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase242-inputdiag` and press `F5`.
+Open `/game/?v=phase244-inputdiag` and press `F5`.

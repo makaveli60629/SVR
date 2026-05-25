@@ -1,4 +1,4 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

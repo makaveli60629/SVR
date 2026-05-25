@@ -319,7 +319,7 @@ export function createHands({ scene, renderer, log = console.log }){
     handGlowEffects.forEach(effect => updateFireLightningHandGlow(effect, t));
     controllerProxies.forEach(({ glow })=> updateFireLightningHandGlow(glow, t));
     window.SVR_FIRE_LIGHTNING_HANDS = {
-      build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+      build: "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
       rawGlowCount: handGlowEffects.length,
       controllerGlowCount: controllerProxies.filter(x=>x.glow).length,
       theme: "fire-orange + electric-cyan + SVR-violet"

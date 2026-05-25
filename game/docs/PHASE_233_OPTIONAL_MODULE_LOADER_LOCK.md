@@ -1,7 +1,7 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 hardens boot by removing optional QA/telemetry panel modules from the static `main.js` import chain.
+Phase 244 hardens boot by removing optional QA/telemetry panel modules from the static `main.js` import chain.
 
 ## Direct fix
 - Adds `game/modules/optional_module_loader.js`
@@ -15,4 +15,4 @@ Phase 242 hardens boot by removing optional QA/telemetry panel modules from the 
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase242-optionalloader` and press `F10`.
+Open `/game/?v=phase244-optionalloader` and press `F10`.

@@ -2139,7 +2139,7 @@ function buildFireLightningArch(scene){
     }
   };
   window.SVR_FIRE_LIGHTNING_ARCH = {
-    build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+    build: "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
     position: { x: group.position.x, y: group.position.y, z: group.position.z },
     theme: "SVR fire orange, electric cyan, violet logo glow"
   };

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Tester Feedback Triage
- * Build: PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+ * Build: PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
  * Purpose: collect playtest verdicts and triage summaries after QA/smoke/bug-report passes.
  * Public Matrix page is not touched.
  */
-const BUILD = 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK';
+const BUILD = 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK';
 const EXPECTED_PHASE = 196;
 const STORE_KEY = 'svr_tester_feedback_phase197';
 

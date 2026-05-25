@@ -1,7 +1,7 @@
-# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
+# PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK
 
 ## Purpose
-Phase 242 adds a master QA shortcut index so testers do not need to remember every panel key.
+Phase 244 adds a master QA shortcut index so testers do not need to remember every panel key.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 242 adds a master QA shortcut index so testers do not need to remember eve
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase242-shortcuts` and press `?` or `/`.
+Open `/game/?v=phase244-shortcuts` and press `?` or `/`.
