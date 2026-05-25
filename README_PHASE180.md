@@ -1,4 +1,4 @@
-# PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK
+# PHASE-187-DECISION-AID-POT-ODDS-LOCK
 
 Adds optional backend persistence for showdown reveal results.
 

@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-186-DEALER-BLIND-REBUY-LOCK",
+  "build": "PHASE-187-DECISION-AID-POT-ODDS-LOCK",
   "phase": 184,
   "modules": [
     "poker_demo",

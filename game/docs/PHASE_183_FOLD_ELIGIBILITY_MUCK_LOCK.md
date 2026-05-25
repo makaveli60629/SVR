@@ -1,6 +1,6 @@
 # Phase 185 — Fold Eligibility + Muck Lock
 
-Build: `PHASE-186-DEALER-BLIND-REBUY-LOCK`
+Build: `PHASE-187-DECISION-AID-POT-ODDS-LOCK`
 
 ## Added
 

@@ -1,6 +1,6 @@
 # SVR Phase 183 Backend Starter
 
-Build: `PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK`
+Build: `PHASE-187-DECISION-AID-POT-ODDS-LOCK`
 
 Adds optional persistence for side-pot resolution payloads.
 

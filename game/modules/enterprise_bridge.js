@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-186-DEALER-BLIND-REBUY-LOCK
+ * Build: PHASE-187-DECISION-AID-POT-ODDS-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK',
+  build: 'PHASE-187-DECISION-AID-POT-ODDS-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,
@@ -21,6 +21,7 @@ const SVREnterpriseBridge = {
     window.addEventListener('svr_watch_turn_indicator_update', (event) => this.recordWatchTurnIndicator(event.detail || {}));
     window.addEventListener('svr_poker_dealer_button_update', (event) => this.recordDealerButton(event.detail || {}));
     window.addEventListener('svr_poker_rebuy_update', (event) => this.recordRebuy(event.detail || {}));
+    window.addEventListener('svr_poker_decision_aid_update', (event) => this.recordDecisionAid(event.detail || {}));
     window.addEventListener('svr_runtime_telemetry', (event) => this.recordTelemetry(event.detail || {}));
     this.healthCheck();
     setInterval(() => this.flush(), 15000);

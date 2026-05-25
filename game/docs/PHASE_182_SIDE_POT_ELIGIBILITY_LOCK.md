@@ -1,6 +1,6 @@
 # Phase 185 — Side Pot Eligibility Lock
 
-Build: `PHASE-186-DEALER-BLIND-REBUY-LOCK`
+Build: `PHASE-187-DECISION-AID-POT-ODDS-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 181 contribution ledger.

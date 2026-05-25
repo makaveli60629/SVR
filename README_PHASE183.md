@@ -1,6 +1,6 @@
 # Phase 183 Backend Starter — Fold Eligibility + Muck Lock
 
-Build: `PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK`
+Build: `PHASE-187-DECISION-AID-POT-ODDS-LOCK`
 
 Adds Azure SQL starter storage for folded/mucked player eligibility events.
 

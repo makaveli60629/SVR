@@ -1,4 +1,4 @@
-# PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK Backend Starter
+# PHASE-187-DECISION-AID-POT-ODDS-LOCK Backend Starter
 
 Adds `/api/game/telemetry` for queued browser-side gameplay telemetry and updates `/api/health` to report the Phase 177 build label.
 

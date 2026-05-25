@@ -20,7 +20,7 @@ function auth(req,res,next){
 }
 
 app.get('/api/health', async (_req,res)=>{
-  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK' }); }
+  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-187-DECISION-AID-POT-ODDS-LOCK' }); }
   catch(err){ res.status(500).json({ status:'error', database:'failed', message:err.message }); }
 });
 
@@ -269,6 +269,41 @@ app.get('/api/game/turn-indicators', async (req, res) => {
     res.json({ ok:true, turnIndicators: result.recordset.map(row => ({ id: row.Id, handNumber: row.HandNumber, seatIndex: row.SeatIndex, actor: row.ActorName, stage: row.Stage, action: row.ActionName, remaining: row.RemainingSeconds, pot: row.PotAmount, createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
   } catch (err) {
     res.status(500).json({ ok:false, error:err.message });
+  }
+});
+
+
+
+app.post('/api/game/decision-aid', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const aid = body.decisionAid || body;
+    const pool = await getPool();
+    await pool.request()
+      .input('HandNumber', sql.Int, Number(body.handNumber || body.hand || 0))
+      .input('Stage', sql.NVarChar(80), aid.stage || body.stage || null)
+      .input('CallAmount', sql.Int, Number(aid.callAmount || 0))
+      .input('PotAmount', sql.Int, Number(aid.pot || body.pot || 0))
+      .input('PotOddsPct', sql.Int, Number(aid.potOddsPct || 0))
+      .input('PressureLabel', sql.NVarChar(80), aid.pressure || null)
+      .input('HintText', sql.NVarChar(255), aid.hint || null)
+      .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(body))
+      .query('INSERT INTO GameDecisionAid(HandNumber, Stage, CallAmount, PotAmount, PotOddsPct, PressureLabel, HintText, PayloadJson) VALUES(@HandNumber, @Stage, @CallAmount, @PotAmount, @PotOddsPct, @PressureLabel, @HintText, @PayloadJson)');
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.get('/api/game/decision-aid', async (req, res) => {
+  try {
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit || 30)));
+    const pool = await getPool();
+    const result = await pool.request().input('Limit', sql.Int, limit)
+      .query('SELECT TOP (@Limit) Id, HandNumber, Stage, CallAmount, PotAmount, PotOddsPct, PressureLabel, HintText, PayloadJson, CreatedAt FROM GameDecisionAid ORDER BY Id DESC');
+    res.json({ ok: true, rows: result.recordset });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
   }
 });
 

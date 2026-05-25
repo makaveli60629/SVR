@@ -1,7 +1,7 @@
 # Phase 185 QA Checklist
 
 1. Open `/game/?v=phase183`.
-2. Confirm build label shows `PHASE-186-DEALER-BLIND-REBUY-LOCK`.
+2. Confirm build label shows `PHASE-187-DECISION-AID-POT-ODDS-LOCK`.
 3. Play/watch through showdown.
 4. Confirm status panel shows `Winning 5`.
 5. Confirm hand history line includes `WIN` cards.

@@ -1,6 +1,6 @@
 # SVR Phase 186 Backend Starter
 
-Build: `PHASE-186-DEALER-BLIND-REBUY-LOCK`
+Build: `PHASE-187-DECISION-AID-POT-ODDS-LOCK`
 
 Adds optional storage for dealer button / blind-state snapshots and rebuy continuity events.
 

@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-186-DEALER-BLIND-REBUY-LOCK",
-  "phase": 186,
+  "build": "PHASE-187-DECISION-AID-POT-ODDS-LOCK",
+  "phase": 187,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "dealer button, blinds, rebuy continuity, telemetry"
+  "featureLock": "player decision aid, pot odds, pressure hint telemetry"
 }

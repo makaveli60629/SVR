@@ -1,13 +1,12 @@
 {
-  "phase": 186,
+  "phase": 187,
   "build": "PHASE-187-DECISION-AID-POT-ODDS-LOCK",
   "modules": [
     "game/modules/poker_demo.js",
     "game/modules/enterprise_bridge.js"
   ],
   "events": [
-    "svr_poker_dealer_button_update",
-    "svr_poker_rebuy_update"
+    "svr_poker_decision_aid_update"
   ],
   "publicPageTouched": false
 }

@@ -1,4 +1,4 @@
-# PHASE-186-DEALER-BLIND-REBUY-LOCK
+# PHASE-187-DECISION-AID-POT-ODDS-LOCK
 
 ## Scope
 - Added dealer button / blind-state telemetry for every hand.
