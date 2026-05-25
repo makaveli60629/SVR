@@ -1,6 +1,6 @@
 {
   "status": "ok",
-  "build": "PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK",
+  "build": "PHASE-181-ALLIN-CONTRIBUTION-LOCK",
   "source": "direct-game-folder",
   "target": "/game",
   "phase": 180,

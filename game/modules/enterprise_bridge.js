@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK
+ * Build: PHASE-181-ALLIN-CONTRIBUTION-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK',
+  build: 'PHASE-181-ALLIN-CONTRIBUTION-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,

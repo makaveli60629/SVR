@@ -1,9 +1,10 @@
-# Next Phase Plan after PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK
+# Next Phase Plan
 
-Next recommended phase: PHASE-181-WATCH-SHOWDOWN-SYNC-LOCK
+## Phase 182 target
+Build full side-pot split resolution from the Phase 181 contribution ledger.
 
-Focus:
-- Mirror winning hand and legal action state to the wrist watch.
-- Add clearer active-turn indicator near the open player seat.
-- Keep package under 25 MB.
-- Keep public page untouched.
+Priority:
+1. Create main pot and side-pot slices from contributions.
+2. Determine eligible winners per pot.
+3. Pay each pot to correct winner/tied winners.
+4. Show side-pot display on table and hand history.

@@ -1,4 +1,4 @@
-# PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK
+# PHASE-181-ALLIN-CONTRIBUTION-LOCK
 
 ## Scope
 - Keeps playable poker priority moving forward.

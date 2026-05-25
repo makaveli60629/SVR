@@ -81,6 +81,36 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   const PLAYER_INDEX = 3;
   const actionLog = [];
   const legalState = { stage: 'idle', callAmount: 0, minRaise: 100, options: ['nextHand'], expiresAt: 0 };
+
+  function getContributionsLine() {
+    if (!current?.contributions) return 'Contributions loading';
+    return players.map((p, i) => `${p.anchor.name}: $${current.contributions[i] || 0}`).join('  •  ');
+  }
+
+  function getAllInNames() {
+    if (!current?.allInPlayers) return [];
+    return [...current.allInPlayers].map((i) => players[i]?.anchor?.name).filter(Boolean);
+  }
+
+  function contributeToPot(index, requestedAmount = 0, stage = '', action = 'bet') {
+    if (!Number.isFinite(index) || !players[index]) return 0;
+    const request = Math.max(0, Math.round(Number(requestedAmount || 0)));
+    const available = Math.max(0, Math.round(playerStacks[index] || 0));
+    const paid = Math.min(request, available);
+    if (paid <= 0) return 0;
+    applyStackDelta(index, -paid);
+    if (!current.contributions) current.contributions = players.map(() => 0);
+    current.contributions[index] = Math.round((current.contributions[index] || 0) + paid);
+    current.pot = Math.round((current.pot || 0) + paid);
+    if (!current.allInPlayers) current.allInPlayers = new Set();
+    if ((playerStacks[index] || 0) <= 0 || paid < request) {
+      current.allInPlayers.add(index);
+      try { window.dispatchEvent(new CustomEvent('svr_poker_allin_update', { detail: { build: 'PHASE-181-ALLIN-CONTRIBUTION-LOCK', handNumber, player: players[index].anchor.name, seatIndex: index, paid, requested: request, stage: stage || current.stage, pot: current.pot, stacks: playerStacks.slice(), contributions: current.contributions.slice(), allInPlayers: getAllInNames() } })); } catch (_) {}
+    }
+    refreshPotStack();
+    return paid;
+  }
+
   buildSeatChips();
   paintHistory();
 
@@ -138,16 +168,22 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     ctx.fillStyle = "rgba(236,232,255,0.94)";
     ctx.font = "31px system-ui";
     const stackLine = players.map((p, i) => `${p.anchor.name}: $${playerStacks[i]}`).join("  •  ");
-    ctx.fillText(stackLine, 54, 120);
+    ctx.fillText(stackLine, 54, 112);
+    ctx.fillStyle = "rgba(140,229,255,0.84)";
+    ctx.font = "24px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+    ctx.fillText(getContributionsLine(), 54, 148);
+    const allInLine = getAllInNames().length ? `ALL-IN: ${getAllInNames().join(', ')}` : 'ALL-IN: none';
+    ctx.fillStyle = getAllInNames().length ? "#ffb95f" : "rgba(236,232,255,0.52)";
+    ctx.fillText(allInLine, 54, 176);
     ctx.font = "30px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
     if (handHistory.length === 0) {
       ctx.fillStyle = "rgba(236,232,255,0.72)";
-      ctx.fillText("No completed hands yet. Results will lock here after showdown.", 54, 194);
+      ctx.fillText("No completed hands yet. Results will lock here after showdown.", 54, 222);
     } else {
       handHistory.slice(0, 3).forEach((h, i) => {
         ctx.fillStyle = i === 0 ? "#ffffff" : "rgba(236,232,255,0.82)";
         const cardsText = h.winningCards ? ` • WIN ${h.winningCards}` : '';
-        ctx.fillText(`#${h.hand} ${h.winner} won $${h.pot} • ${h.handName}${cardsText}`, 54, 184 + i * 38);
+        ctx.fillText(`#${h.hand} ${h.winner} won $${h.pot} • ${h.handName}${cardsText}`, 54, 214 + i * 38);
       });
     }
     ctx.fillStyle = "#8ce5ff";
@@ -178,14 +214,14 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     actionLog.unshift(clean);
     if (actionLog.length > 12) actionLog.length = 12;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_action_log_update', { detail: { build: 'PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK', latest: clean, actions: actionLog.slice(0, 12), stacks: playerStacks.slice(), pot: current?.pot || 0 } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_action_log_update', { detail: { build: 'PHASE-181-ALLIN-CONTRIBUTION-LOCK', latest: clean, actions: actionLog.slice(0, 12), stacks: playerStacks.slice(), pot: current?.pot || 0 } })); } catch (_) {}
   }
 
   function recordHistory(entry) {
     handHistory.unshift(entry);
     if (handHistory.length > 8) handHistory.length = 8;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_history_update', { detail: { build: 'PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK', latest: entry, history: handHistory.slice(0, 8), stacks: playerStacks.slice() } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_history_update', { detail: { build: 'PHASE-181-ALLIN-CONTRIBUTION-LOCK', latest: entry, history: handHistory.slice(0, 8), stacks: playerStacks.slice() } })); } catch (_) {}
   }
 
   function applyStackDelta(index, amount) {
@@ -460,7 +496,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
 
   function emitPokerEvent(name, payload = {}) {
-    try { window.dispatchEvent(new CustomEvent(name, { detail: { build: 'PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK', handNumber, ...payload } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent(name, { detail: { build: 'PHASE-181-ALLIN-CONTRIBUTION-LOCK', handNumber, ...payload } })); } catch (_) {}
   }
 
   function shiftFutureQueue(delay) {
@@ -478,12 +514,13 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
   function updateLegalState(stage, callAmount = 0, expiresAt = 0) {
     legalState.stage = String(stage || current?.stage || 'table');
-    legalState.callAmount = Math.max(0, Math.round(Number(callAmount || 0)));
-    legalState.minRaise = 100;
+    const available = playerStacks[PLAYER_INDEX] || 0;
+    legalState.callAmount = Math.min(available, Math.max(0, Math.round(Number(callAmount || 0))));
+    legalState.minRaise = Math.min(Math.max(0, available - legalState.callAmount), 100);
     legalState.options = computeLegalActions(legalState.callAmount);
     legalState.expiresAt = expiresAt || 0;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_legal_actions_update', { detail: { build: 'PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK', handNumber, legal: { ...legalState }, pot: current?.pot || 0, stacks: playerStacks.slice() } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_legal_actions_update', { detail: { build: 'PHASE-181-ALLIN-CONTRIBUTION-LOCK', handNumber, legal: { ...legalState }, pot: current?.pot || 0, stacks: playerStacks.slice() } })); } catch (_) {}
     return legalState;
   }
 
@@ -536,8 +573,8 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     else if (action === 'call' || action === 'check') added = callAmount;
     else if (action === 'raise') added = callAmount + legalState.minRaise;
     else if (action === 'allIn') added = Math.max(500, callAmount + 500);
-    if (added) applyStackDelta(PLAYER_INDEX, -added);
-    current.pot += added;
+    if (action === 'allIn') added = playerStacks[PLAYER_INDEX] || 0;
+    added = contributeToPot(PLAYER_INDEX, added, stage, action);
     refreshPotStack();
     applyActionHighlight(PLAYER_INDEX);
     if (action === 'check' && callAmount === 0) label = 'CHECK';
@@ -588,16 +625,16 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     const flopAggressor = runnerUp.player.anchor.index;
     const turnAggressor = winner.player.anchor.index;
     const riverAggressor = winner.player.anchor.index;
-    current = { handPlayers, board, winner, results, handNumber, dealerIndex, sbIndex, bbIndex, actorIndex: null, pot: 0, stage: "shuffle" };
+    current = { handPlayers, board, winner, results, handNumber, dealerIndex, sbIndex, bbIndex, actorIndex: null, pot: 0, stage: "shuffle", contributions: players.map(() => 0), allInPlayers: new Set() };
     refreshPotStack();
     queue = [];
     let t = nowS + 0.85;
 
     schedule(t, () => {
       current.stage = "blinds";
-      current.pot = 30;
-      applyStackDelta(sbIndex, -10);
-      applyStackDelta(bbIndex, -20);
+      current.pot = 0;
+      contributeToPot(sbIndex, 10, "blinds", "small blind");
+      contributeToPot(bbIndex, 20, "blinds", "big blind");
       refreshPotStack();
       paintStatus(`Hand ${handNumber} • dealer ${BOT_NAMES[dealerIndex]}`, `SB ${BOT_NAMES[sbIndex]} • BB ${BOT_NAMES[bbIndex]} • pot $${current.pot}`);
       statusCb(`HAND ${handNumber} • blinds live • pot $${current.pot}`);
@@ -626,10 +663,10 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const actor = preflopAggressor;
       const result = current.results.find((r) => r.player.anchor.index === actor)?.result || winner.result;
       const amount = handStrengthToBet(result, "preflop");
-      current.actorIndex = actor; current.stage = "preflop"; applyStackDelta(actor, -amount); current.pot += amount; refreshPotStack(); applyActionHighlight(actor);
+      current.actorIndex = actor; current.stage = "preflop"; const paid = contributeToPot(actor, amount, "preflop", actionName); refreshPotStack(); applyActionHighlight(actor);
       const actionName = result.score[0] >= 2 ? 'raise' : 'call';
       paintStatus(`${BOT_NAMES[actor]} ${actionName === 'raise' ? "raises" : "calls"}`, `Preflop • pot $${current.pot}`);
-      recordAction(BOT_NAMES[actor], actionName, amount, 'preflop');
+      recordAction(BOT_NAMES[actor], actionName, paid, 'preflop');
     });
 
     t += 0.52;
@@ -649,9 +686,9 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const result = current.results.find((r) => r.player.anchor.index === actor)?.result || runnerUp.result;
       const amount = handStrengthToBet(result, "flop");
       const isBet = result.score[0] >= 1;
-      current.actorIndex = actor; current.stage = "flop-action"; if (isBet) applyStackDelta(actor, -amount); current.pot += isBet ? amount : 0; refreshPotStack(); applyActionHighlight(actor);
+      current.actorIndex = actor; current.stage = "flop-action"; const paid = isBet ? contributeToPot(actor, amount, "flop", isBet ? "bet" : "check") : 0; refreshPotStack(); applyActionHighlight(actor);
       paintStatus(`${BOT_NAMES[actor]} ${isBet ? "bets" : "checks"}`, `Flop • pot $${current.pot}`);
-      recordAction(BOT_NAMES[actor], isBet ? 'bet' : 'check', isBet ? amount : 0, 'flop');
+      recordAction(BOT_NAMES[actor], isBet ? 'bet' : 'check', paid, 'flop');
     });
     t += 0.58;
     schedule(t, () => { startPlayerTurn('flop', 0); });
@@ -670,9 +707,9 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const result = current.results.find((r) => r.player.anchor.index === actor)?.result || winner.result;
       const amount = handStrengthToBet(result, "turn");
       const isBet = result.score[0] >= 2;
-      current.actorIndex = actor; current.stage = "turn-action"; if (isBet) applyStackDelta(actor, -amount); current.pot += isBet ? amount : 0; refreshPotStack(); applyActionHighlight(actor);
+      current.actorIndex = actor; current.stage = "turn-action"; const paid = isBet ? contributeToPot(actor, amount, "turn", isBet ? "bet" : "check") : 0; refreshPotStack(); applyActionHighlight(actor);
       paintStatus(`${BOT_NAMES[actor]} ${isBet ? "bets" : "checks"}`, `Turn • pot $${current.pot}`);
-      recordAction(BOT_NAMES[actor], isBet ? 'bet' : 'check', isBet ? amount : 0, 'turn');
+      recordAction(BOT_NAMES[actor], isBet ? 'bet' : 'check', paid, 'turn');
     });
     t += 0.58;
     schedule(t, () => { startPlayerTurn('turn', 0); });
@@ -691,7 +728,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const result = current.results.find((r) => r.player.anchor.index === actor)?.result || winner.result;
       const amount = handStrengthToBet(result, "river");
       const isBet = result.score[0] >= 2;
-      current.actorIndex = actor; current.stage = "river-action"; if (isBet) applyStackDelta(actor, -amount); current.pot += isBet ? amount : 0; refreshPotStack(); applyActionHighlight(actor);
+      current.actorIndex = actor; current.stage = "river-action"; const paid = isBet ? contributeToPot(actor, amount, "river", isBet ? "bet" : "check") : 0; refreshPotStack(); applyActionHighlight(actor);
       paintStatus(`${BOT_NAMES[actor]} ${isBet ? "shoves" : "checks"}`, `River • pot $${current.pot}`);
       recordAction(BOT_NAMES[actor], isBet ? 'shove' : 'check', isBet ? amount : 0, 'river');
     });
@@ -718,7 +755,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const payout = current.pot;
       applyStackDelta(winner.player.anchor.index, payout);
       lastWinnerSweep = { startedAt: nowS, winnerIndex: winner.player.anchor.index, amount: payout };
-      const handPayload = { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: winner.player.anchor.name, handName: winner.result.name, board: boardText, pot: payout, winnerHoleCards: winnerCards, winningCards, ranking, stacks: playerStacks.slice() };
+      const handPayload = { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: winner.player.anchor.name, handName: winner.result.name, board: boardText, pot: payout, winnerHoleCards: winnerCards, winningCards, ranking, contributions: current.contributions ? current.contributions.slice() : [], allInPlayers: getAllInNames(), stacks: playerStacks.slice() };
       recordAction(winner.player.anchor.name, 'wins', payout, 'showdown');
       recordHistory(handPayload);
       emitPokerEvent('svr_poker_hand_result', handPayload);
@@ -807,8 +844,8 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     if (normalized === 'raise') freeAdded = 100;
     if (normalized === 'call') freeAdded = 50;
     if (normalized === 'allIn') freeAdded = 500;
-    if (freeAdded) applyStackDelta(PLAYER_INDEX, -freeAdded);
-    current.pot += freeAdded;
+    if (normalized === 'allIn') freeAdded = playerStacks[PLAYER_INDEX] || freeAdded;
+    freeAdded = contributeToPot(PLAYER_INDEX, freeAdded, current.stage, normalized);
     refreshPotStack();
     const title = normalized === 'allIn' ? 'YOU ALL-IN' : `YOU ${label || 'ACT'}`;
     paintStatus(title, `Player action registered • pot $${current.pot}`, normalized === 'fold' ? 'rgba(255,125,160,0.96)' : 'rgba(126,240,208,0.95)');
