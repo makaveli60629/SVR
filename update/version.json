@@ -1,7 +1,12 @@
-﻿{
-    "phase":  175,
-    "appliedAt":  "2026-05-25T04:53:08Z",
-    "build":  "PHASE-175-MASTER-MANIFEST-MODULE-COMPLETE-LOCK",
-    "siteTouched":  false,
-    "track":  "game-only"
+{
+  "phase": 174,
+  "appliedAt": "2026-05-25T05:10:00Z",
+  "build": "PHASE-174-RECOVERY-BOOT-PRIVATE-SCENE-HOTFIX-LOCK",
+  "scope": "game-recovery-boot-private-scene-hotfix-lock",
+  "fix": "hotfixed lobby boot by routing game/index.html away from broken world_skyline.js createMatrixBillboardTexture path, restored missing game/private-scene.html route to stop 404, added boot-safe recovery lobby runtime with floor/walls/logo/high Moon and Mars/portals/right-controller movement/snap turn/teleport, and kept public page and site untouched",
+  "siteTouched": false,
+  "gameTouched": true,
+  "track": "game-only",
+  "previousStableBuild": "PHASE-173-MILESTONE-5-PRIVACY-PRESENTATION-MODULE-CHECKLIST-LOCK",
+  "nextBuild": "PHASE-175-RECOVERY-QA-AND-SKYLINE-FUNCTION-REPAIR"
 }
