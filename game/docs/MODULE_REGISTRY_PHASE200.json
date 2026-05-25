@@ -1,0 +1,21 @@
+{
+  "phase": 200,
+  "build": "PHASE-200-PILOT-TESTING-READY-LOCK",
+  "modules": [
+    "enterprise_bridge",
+    "runtime_qa",
+    "session_export",
+    "deploy_verify",
+    "smoke_test",
+    "release_candidate",
+    "playtest_wizard",
+    "bug_reporter",
+    "tester_feedback",
+    "test_queue",
+    "test_report_bundle",
+    "demo_certification",
+    "pilot_testing_ready"
+  ],
+  "public_page_touched": false,
+  "shortcut": "P"
+}

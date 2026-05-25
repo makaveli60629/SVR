@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-199-DEMO-CERTIFICATION-LOCK",
-  "phase": 199,
+  "build": "PHASE-200-PILOT-TESTING-READY-LOCK",
+  "phase": 200,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "demo certification, go/no-go readiness gate, testing shortcut map"
+  "featureLock": "pilot testing ready gate, tester checklist, launch-safe handoff bundle"
 }
