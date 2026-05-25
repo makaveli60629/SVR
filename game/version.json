@@ -1,8 +1,8 @@
 ﻿{
     "public_page_touched":  false,
-    "build":  "PHASE-248-VISIBLE-RECOVERY-SCENE-GUARD-LOCK",
-    "source":  "visible-recovery-scene-guard-hotfix",
-    "featureLock":  "visible recovery scene guard, recovery grid/ring/sign, no pure black screen after runtime shield",
-    "generatedAt":  "2026-05-25T23:18:36.1229037Z",
-    "phase":  248
+    "build":  "PHASE-249-OPTIONAL-LOADER-SYNTAX-FIX-LOCK",
+    "source":  "optional-loader-syntax-fix-hotfix",
+    "featureLock":  "optional_module_loader syntax fix, clean module array, phase cache bust",
+    "generatedAt":  "2026-05-25T23:22:11.5588936Z",
+    "phase":  249
 }

@@ -1,61 +1,64 @@
 ﻿(function(){
-  const BUILD = "PHASE-248-VISIBLE-RECOVERY-SCENE-GUARD-LOCK";
+  const BUILD = "PHASE-249-OPTIONAL-LOADER-SYNTAX-FIX-LOCK";
   const modules = [
-  "./runtime_crash_shield.js",
-  "./safe_event_bus.js",
-  "./boot_cache_watchdog.js",
-  "./marker_health.js",
-  "./boot_diagnostic_snapshot.js",
-  "./boot_route_recovery.js",
-  "./boot_route_health.js",
-  "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase248",
-  "./auto_apply_verify.js?v=phase248",
-  "./one_command_deploy_health.js?v=phase248",
-  "./one_command_runbook.js?v=phase248",
-  "./post_deploy_checklist.js?v=phase248",
-  "./tester_launch_card.js?v=phase248",
-  "./qa_shortcut_index.js?v=phase248",
-  "./pilot_handoff_card.js?v=phase248",
-  "./pilot_ready_summary.js?v=phase248",
-  "./pilot_issue_template.js?v=phase248",
-  "./pilot_feedback_export.js?v=phase248",
-  "./power_deploy_watcher.js?v=phase248",
-  "./power_deploy_wait_log.js?v=phase248",
-  "./power_deploy_smoke_probe.js?v=phase248",
-  "./vr_input_spawn_clear_recovery.js?v=phase248",
-  "./vr_input_diagnostic.js?v=phase248",
-  "./quest_input_autocalibration.js?v=phase248",
-  "./hand_teleport_pinch_destination.js?v=phase248",
-  "./hand_teleport_aim_confirm.js?v=phase248",
-  "./fire_lightning_theme_panel.js?v=phase248",
-  "./watch_upright_orientation_panel.js?v=phase248",
-  "./watch_teleport_conflict_guard.js?v=phase248",
-  "./deploy_sync_force.js?v=phase248",
-  "./main_runtime_catch_fix.js?v=phase248",
-  "./main_import_recovery.js?v=phase248",
-  "./bridge_alias_recovery.js?v=phase248",
-  "./bridge_proxy.js",
-  "./event_firewall.js",
-  "./enterprise_bridge.js",
-  "./bridge_selftest.js",
-  "./runtime_qa.js",
-  "./session_export.js",
-  "./deploy_verify.js",
-  "./smoke_test.js",
-  "./release_candidate.js",
-  "./playtest_wizard.js",
-  "./bug_reporter.js",
-  "./tester_feedback.js",
-  "./test_queue.js",
-  "./test_report_bundle.js",
-  "./demo_certification.js",
-  "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase248"
-  "./black_screen_render_loop_guard.js?v=phase248"`r`n  "./visible_recovery_scene_guard.js?v=phase248"`r`n];
+    "./runtime_crash_shield.js",
+    "./safe_event_bus.js",
+    "./boot_cache_watchdog.js",
+    "./marker_health.js",
+    "./boot_diagnostic_snapshot.js",
+    "./boot_route_recovery.js",
+    "./boot_route_health.js",
+    "./auto_apply_helper.js",
+    "./auto_apply_status.js?v=phase249",
+    "./auto_apply_verify.js?v=phase249",
+    "./one_command_deploy_health.js?v=phase249",
+    "./one_command_runbook.js?v=phase249",
+    "./post_deploy_checklist.js?v=phase249",
+    "./tester_launch_card.js?v=phase249",
+    "./qa_shortcut_index.js?v=phase249",
+    "./pilot_handoff_card.js?v=phase249",
+    "./pilot_ready_summary.js?v=phase249",
+    "./pilot_issue_template.js?v=phase249",
+    "./pilot_feedback_export.js?v=phase249",
+    "./power_deploy_watcher.js?v=phase249",
+    "./power_deploy_wait_log.js?v=phase249",
+    "./power_deploy_smoke_probe.js?v=phase249",
+    "./vr_input_spawn_clear_recovery.js?v=phase249",
+    "./vr_input_diagnostic.js?v=phase249",
+    "./quest_input_autocalibration.js?v=phase249",
+    "./hand_teleport_pinch_destination.js?v=phase249",
+    "./hand_teleport_aim_confirm.js?v=phase249",
+    "./fire_lightning_theme_panel.js?v=phase249",
+    "./watch_upright_orientation_panel.js?v=phase249",
+    "./watch_teleport_conflict_guard.js?v=phase249",
+    "./deploy_sync_force.js?v=phase249",
+    "./main_runtime_catch_fix.js?v=phase249",
+    "./black_screen_render_loop_guard.js?v=phase249",
+    "./visible_recovery_scene_guard.js?v=phase249",
+    "./main_import_recovery.js?v=phase249",
+    "./bridge_alias_recovery.js?v=phase249",
+    "./bridge_proxy.js",
+    "./event_firewall.js",
+    "./enterprise_bridge.js",
+    "./bridge_selftest.js",
+    "./runtime_qa.js",
+    "./session_export.js",
+    "./deploy_verify.js",
+    "./smoke_test.js",
+    "./release_candidate.js",
+    "./playtest_wizard.js",
+    "./bug_reporter.js",
+    "./tester_feedback.js",
+    "./test_queue.js",
+    "./test_report_bundle.js",
+    "./demo_certification.js",
+    "./pilot_testing_ready.js",
+    "./auto_apply_git_wrapper_fix.js?v=phase249"
+  ];
+
   const state = {
     build: BUILD,
-    phase: 244,
+    phase: 249,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -96,7 +99,7 @@
 
   function panel(){
     let p = document.getElementById("svr-optional-module-loader-panel");
-    if(p) return p;
+    if (p) return p;
     p = document.createElement("div");
     p.id = "svr-optional-module-loader-panel";
     p.style.cssText = [
@@ -112,14 +115,14 @@
   }
 
   function esc(v){
-    return String(v == null ? "" : v).replace(/[<>&]/g, s => ({"<":"&lt;",">":"&gt;","&":"&amp;"}[s]));
+    return String(v == null ? "" : v).replace(/[<>&]/g, s => ({ "<":"&lt;", ">":"&gt;", "&":"&amp;" }[s]));
   }
 
   function render(show=true){
     const p = panel();
-    if(show) p.style.display = "block";
-    const failed = state.failed.map(x => `<li>âš ï¸ <b>${esc(x.path)}</b><br><small>${esc(x.error)}</small></li>`).join("");
-    const loaded = state.loaded.slice(-30).map(x => `<li>âœ… ${esc(x)}</li>`).join("");
+    if (show) p.style.display = "block";
+    const failed = state.failed.map(x => `<li>WARN <b>${esc(x.path)}</b><br><small>${esc(x.error)}</small></li>`).join("");
+    const loaded = state.loaded.slice(-30).map(x => `<li>OK ${esc(x)}</li>`).join("");
     p.innerHTML = `
       <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
         <b>SVR Optional Module Loader</b>
@@ -130,7 +133,7 @@
       <div><b>Status:</b> ${esc(state.status)}</div>
       <div><b>Loaded:</b> ${state.loaded.length} / ${modules.length}</div>
       <div><b>Failed optional:</b> ${state.failed.length}</div>
-      <div><b>Fix:</b> optional QA/telemetry imports no longer block main game boot.</div>
+      <div><b>Fix:</b> optional module array syntax is locked clean.</div>
       <div><b>Public Matrix page:</b> locked / untouched</div>
       <h4>Failed optional modules</h4>
       <ul>${failed || "<li>None</li>"}</ul>
@@ -151,15 +154,14 @@
     close: () => { panel().style.display = "none"; },
     toggle: () => {
       const p = panel();
-      const show = p.style.display === "none";
-      render(show);
+      render(p.style.display === "none");
     },
     snapshot: () => JSON.parse(JSON.stringify(state))
   };
 
   window.SVR_OPTIONAL_MODULE_LOADER = api;
   window.addEventListener("keydown", ev => {
-    if(ev.key === "F10" && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+    if (ev.key === "F10" && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
       ev.preventDefault();
       api.toggle();
     }
@@ -168,5 +170,3 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
-
-
