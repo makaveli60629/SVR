@@ -1,0 +1,8 @@
+﻿{
+    "build":  "PHASE-250-BOOTJS-SYNTAX-HARDRESET-LOCK",
+    "public_page_touched":  false,
+    "fix":  "hard reset boot.js and optional_module_loader.js with parser-safe code",
+    "reason":  "fix SyntaxError Unexpected identifier r in boot.js phase249",
+    "phase":  250,
+    "generatedAt":  "2026-05-25T23:26:55.0527238Z"
+}

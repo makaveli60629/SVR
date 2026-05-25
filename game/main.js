@@ -7,10 +7,10 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import "./modules/optional_module_loader.js?v=phase249";
+import "./modules/optional_module_loader.js?v=phase250";
 
-const BUILD_LABEL = "PHASE-249-OPTIONAL-LOADER-SYNTAX-FIX-LOCK";
-const BUILD_PHASE = 249;
+const BUILD_LABEL = "PHASE-250-BOOTJS-SYNTAX-HARDRESET-LOCK";
+const BUILD_PHASE = 250;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, subsystemErrors: {}, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
@@ -619,6 +619,7 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
 
 
 
