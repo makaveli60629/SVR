@@ -817,6 +817,99 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   return { group, holoGroups: [], center: center.clone(), target, roomTarget, look };
 }
 
+// Phase 173.4 boot hotfix: local Legend Hall builder.
+// Some restored skyline branches call buildLegendHall() but did not carry the helper.
+// Keep this lightweight and procedural so the world can boot even if optional Legend GLBs fail.
+function buildLegendHall(scene, R, wallHeight, log = console.log){
+  const group = new THREE.Group();
+  group.name = "SVR_Legend_Hall";
+  const holoGroups = [];
+  const displayRoots = [];
+  const displayUpdaters = [];
+
+  const baseMat = new THREE.MeshStandardMaterial({ color: 0x090814, roughness: 0.74, metalness: 0.18, emissive: 0x12051f, emissiveIntensity: 0.22 });
+  const trimMat = new THREE.MeshBasicMaterial({ color: 0xb95aff, transparent: true, opacity: 0.82 });
+  const glassMat = new THREE.MeshBasicMaterial({ color: 0x8fdcff, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false });
+
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(8.4, 0.08, 4.4), baseMat);
+  floor.position.set(0, 0.04, 0);
+  group.add(floor);
+
+  const back = new THREE.Mesh(new THREE.BoxGeometry(8.4, 3.8, 0.12), baseMat.clone());
+  back.position.set(0, 1.94, -2.14);
+  group.add(back);
+
+  const signTex = createPlaqueTexture("LEGEND HALL", "SVR FEATURE SHOWCASE");
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(5.9, 1.12), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+  sign.position.set(0, 3.58, -2.215);
+  group.add(sign);
+
+  const infoTex = createAdBillboardTexture(["SVR LEGENDS", "PLAYER HISTORY", "REPLAYS", "COMING SOON"]);
+  const info = new THREE.Mesh(new THREE.PlaneGeometry(4.9, 2.18), new THREE.MeshBasicMaterial({ map: infoTex, side: THREE.DoubleSide, transparent: true, depthWrite: false }));
+  info.position.set(0, 1.82, -2.225);
+  group.add(info);
+
+  for (let i = -1; i <= 1; i++){
+    const x = i * 2.55;
+    const podium = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.68, 0.32, 28), new THREE.MeshStandardMaterial({ color: 0x181021, roughness: 0.66, metalness: 0.18, emissive: 0x1b0730, emissiveIntensity: 0.20 }));
+    podium.position.set(x, 0.20, 0.42);
+    group.add(podium);
+
+    const holo = new THREE.Group();
+    holo.position.set(x, 1.20, 0.42);
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.34, 1), new THREE.MeshBasicMaterial({ color: i === 0 ? 0xffffff : 0xdcb7ff, transparent: true, opacity: 0.72, wireframe: true }));
+    core.userData.phase = i;
+    holo.userData.core = core;
+    holo.add(core);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.012, 8, 60), trimMat.clone());
+    ring.rotation.x = Math.PI * 0.5;
+    holo.add(ring);
+    group.add(holo);
+    holoGroups.push(holo);
+  }
+
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(8.0, 0.035, 0.035), trimMat.clone());
+  rail.position.set(0, 0.84, 1.96);
+  group.add(rail);
+
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(8.0, 2.7), glassMat);
+  glass.position.set(0, 1.72, 2.01);
+  group.add(glass);
+
+  const glow = new THREE.PointLight(0xb95aff, 3.6, 16, 2.0);
+  glow.position.set(0, 2.4, 0.8);
+  group.add(glow);
+
+  scene.add(group);
+  return { group, holoGroups, displayRoots, displayUpdaters };
+}
+
+// Phase 173.4 boot hotfix: lobby info board builder used by the skyline return path.
+function addLobbyInfoBoards(scene, R, wallHeight){
+  const boards = [];
+  const items = [
+    { angle: -Math.PI * 0.12, title: "PLAYABLE POKER", sub: "Fold • Check • Call • Raise • All-In" },
+    { angle: Math.PI * 0.12, title: "HAND HISTORY", sub: "Winner proof and recent results" },
+    { angle: 0, title: "SVR MISSION", sub: "Play-money social VR with sponsor-ready impact" }
+  ];
+  items.forEach((item, idx)=>{
+    const tex = createPlaqueTexture(item.title, item.sub);
+    const board = new THREE.Mesh(new THREE.PlaneGeometry(3.7, 1.42), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+    const radius = R - 2.7;
+    board.position.set(Math.cos(item.angle) * radius, 1.72, Math.sin(item.angle) * radius);
+    board.lookAt(0, 1.55, 0);
+    board.renderOrder = 42;
+    scene.add(board);
+
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: makeSpriteTexture(), color: 0xb95aff, transparent: true, opacity: 0.10, depthWrite: false, blending: THREE.AdditiveBlending }));
+    glow.scale.set(5.4, 2.2, 1);
+    glow.position.copy(board.position).add(new THREE.Vector3(0, 0, 0.04));
+    scene.add(glow);
+    boards.push({ board, glow, phase: idx * 0.9 });
+  });
+  return boards;
+}
+
 function buildAlignedLegendHall(scene, R, wallHeight, log = console.log){
   const hall = buildLegendHall(scene, R, wallHeight, log);
   const angle = -Math.PI * 0.75;
