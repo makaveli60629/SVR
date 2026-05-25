@@ -1,0 +1,10 @@
+IF OBJECT_ID('dbo.GameTelemetry', 'U') IS NULL
+BEGIN
+  CREATE TABLE dbo.GameTelemetry (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    EventType NVARCHAR(80) NOT NULL,
+    PayloadJson NVARCHAR(MAX) NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+  );
+END;
+GO

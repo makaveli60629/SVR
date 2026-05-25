@@ -1,0 +1,15 @@
+{
+  "phase": "PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK",
+  "modules": {
+    "poker_demo.js": "Showdown winning five cards, ranking payload, player/legal-action flow preserved",
+    "enterprise_bridge.js": "Telemetry bridge for hand results/action logs/legal actions/showdown reveal",
+    "watch.js": "Watch action buttons preserved",
+    "world_skyline.js": "Lobby scene preserved; dealer body disabled"
+  },
+  "protected": [
+    "root public Matrix page",
+    "site redesign",
+    "unapproved Reiki branding",
+    "visible dealer rig"
+  ]
+}

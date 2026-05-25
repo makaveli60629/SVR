@@ -132,3 +132,7 @@ Source package used for this phase:
 
 ## Phase 42 modular overlay
 - SVR Wellness building ad refreshed to `SVR WELLNESS / L.A.` in neon green presentation styling.
+
+
+## PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK
+- Added exact best-five winning cards to showdown, history, and telemetry.

@@ -1,9 +1,9 @@
-# Next Phase Plan after PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK
+# Next Phase Plan after PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK
 
-Next recommended phase: PHASE-180-WATCH-LEGAL-ACTION-SYNC-LOCK
+Next recommended phase: PHASE-181-WATCH-SHOWDOWN-SYNC-LOCK
 
 Focus:
-- Show legal action/call amount on the wrist watch.
-- Disable or dim unavailable action buttons during player turn.
-- Keep game package under 25 MB.
+- Mirror winning hand and legal action state to the wrist watch.
+- Add clearer active-turn indicator near the open player seat.
+- Keep package under 25 MB.
 - Keep public page untouched.

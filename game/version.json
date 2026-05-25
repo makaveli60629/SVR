@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK",
-  "phase": 179,
+  "build": "PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK",
+  "phase": 180,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z"
 }

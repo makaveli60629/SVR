@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK
+ * Build: PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK',
+  build: 'PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,
@@ -64,3 +64,7 @@ const SVREnterpriseBridge = {
 };
 
 SVREnterpriseBridge.init();
+
+  window.addEventListener('svr_poker_showdown_reveal', (event) => {
+    postJson('/api/game/showdown', event.detail || {});
+  });
