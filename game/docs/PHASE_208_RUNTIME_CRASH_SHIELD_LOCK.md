@@ -1,4 +1,4 @@
-# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
+# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

@@ -1,11 +1,11 @@
 /**
  * SVR Poker — Bridge Proxy Runtime Guard
- * Build: PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
+ * Build: PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
  * Purpose: install a no-crash proxy before poker/runtime modules dispatch telemetry.
  * The proxy returns safe functions for any record* method so missing recorder aliases
  * cannot freeze the render loop.
  */
-const BUILD = 'PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK';
+const BUILD = 'PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK';
 const STORE_KEY = '__svrBridgeProxyQueue';
 
 function safePayload(value){

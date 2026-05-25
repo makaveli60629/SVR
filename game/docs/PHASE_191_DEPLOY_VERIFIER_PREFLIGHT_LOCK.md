@@ -1,6 +1,6 @@
 # Phase 199 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK`
+Build: `PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

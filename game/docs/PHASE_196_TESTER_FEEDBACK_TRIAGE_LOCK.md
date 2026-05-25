@@ -1,4 +1,4 @@
-# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
+# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

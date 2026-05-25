@@ -1,11 +1,11 @@
-# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
+# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase227.js`
+- `game/modules/enterprise_bridge_phase228.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

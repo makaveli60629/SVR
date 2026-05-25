@@ -1,5 +1,5 @@
 
-# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
+# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
 
 ## Purpose
 Fixes the PowerShell updater failure where the apply script wrapper passed git arguments incorrectly and Git opened help instead of running the intended subcommand.

@@ -1,4 +1,4 @@
-# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
+# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

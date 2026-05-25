@@ -1,7 +1,7 @@
 # QA Phase 199 Checklist
 
 - [ ] Open `/game/?v=phase197`.
-- [ ] Confirm version/deploy overlay shows `PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK`.
+- [ ] Confirm version/deploy overlay shows `PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK`.
 - [ ] Press `G` and confirm bug report panel opens.
 - [ ] Enter area/severity/device/notes and save a report.
 - [ ] Confirm report count increments.

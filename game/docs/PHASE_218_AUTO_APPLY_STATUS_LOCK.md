@@ -1,9 +1,9 @@
-# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
+# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
 
-Phase 227 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
+Phase 228 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
 
 ## Test
-Open `/game/?v=phase227-autoapplystatus` and press `I`.
+Open `/game/?v=phase228-autoapplystatus` and press `I`.
 
 ## Locked
 - Public Matrix launch page untouched.

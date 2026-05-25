@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK";
+  const BUILD = "PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK";
   const shortcuts = [
     ["?", "Open QA shortcut index"],
     ["/", "Open QA shortcut index"],
@@ -65,7 +65,7 @@
       <hr style="border:0;border-top:1px solid rgba(150,190,255,.3)">
       <div><b>Build:</b> ${esc(BUILD)}</div>
       <div><b>Public page:</b> locked / untouched</div>
-      <div><b>Test URL:</b> /game/?v=phase227-shortcuts</div>
+      <div><b>Test URL:</b> /game/?v=phase228-shortcuts</div>
       <h4>Panels / test keys</h4>
       <table>${rows}</table>
       <h4>One-command update</h4>

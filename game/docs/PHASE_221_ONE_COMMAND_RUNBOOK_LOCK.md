@@ -1,7 +1,7 @@
-# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
+# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
 
 ## Purpose
-Phase 227 adds an in-game runbook for the simplified one-command PowerShell update flow.
+Phase 228 adds an in-game runbook for the simplified one-command PowerShell update flow.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 227 adds an in-game runbook for the simplified one-command PowerShell upda
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase227-runbook` and press `N`.
+Open `/game/?v=phase228-runbook` and press `N`.

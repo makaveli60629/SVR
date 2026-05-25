@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Release Candidate Checklist Module
- * Build: PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
+ * Build: PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
  * Purpose: combine deploy, smoke, QA, export, and runtime module checks into one tester-ready release gate.
  * Public Matrix page is untouched. No secrets. No SQL strings.
  */
-const BUILD = 'PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK';
+const BUILD = 'PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeText(value, max = 260) { return String(value ?? '').slice(0, max); }

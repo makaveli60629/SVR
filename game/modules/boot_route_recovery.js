@@ -2,19 +2,19 @@
  * No Three.js dependency. Gives testers a route recovery panel even when main runtime is unstable.
  */
 (function(){
-  const BUILD = 'PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK';
+  const BUILD = 'PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK';
   const state = { build: BUILD, opened: false, reports: [], startedAt: new Date().toISOString() };
   const esc = (v)=>String(v == null ? '' : v).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   const routeList = [
-    ['Lobby hard refresh','./index.html?v=phase227-route-'+Date.now()],
+    ['Lobby hard refresh','./index.html?v=phase228-route-'+Date.now()],
     ['Lobby no cache','./index.html?nocache='+Date.now()],
-    ['Scorpion Poker','./scorpion.html?v=phase227'],
-    ['PGA Drive','./pga-drive.html?v=phase227'],
-    ['Chip / Putt','./chip-putt.html?v=phase227'],
-    ['Reiki Room','./reiki.html?v=phase227'],
-    ['VR Store','./store-room.html?v=phase227'],
-    ['Smoker Lounge','./smoker-lounge.html?v=phase227'],
-    ['Cam 3 Preview','./cam3.html?v=phase227']
+    ['Scorpion Poker','./scorpion.html?v=phase228'],
+    ['PGA Drive','./pga-drive.html?v=phase228'],
+    ['Chip / Putt','./chip-putt.html?v=phase228'],
+    ['Reiki Room','./reiki.html?v=phase228'],
+    ['VR Store','./store-room.html?v=phase228'],
+    ['Smoker Lounge','./smoker-lounge.html?v=phase228'],
+    ['Cam 3 Preview','./cam3.html?v=phase228']
   ];
   function collect(reason='manual'){
     const report = {
@@ -61,7 +61,7 @@
   function show(reason='manual'){ render(collect(reason)); }
   function close(){ const el=document.getElementById('svrBootRouteRecovery'); if(el) el.remove(); state.opened=false; }
   async function copy(){ const r=state.reports[state.reports.length-1] || collect('copy'); try { await navigator.clipboard.writeText(JSON.stringify(r,null,2)); } catch(_) { download(); } }
-  function download(){ const r=state.reports[state.reports.length-1] || collect('download'); const blob=new Blob([JSON.stringify(r,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='svr-boot-route-recovery-phase227.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+  function download(){ const r=state.reports[state.reports.length-1] || collect('download'); const blob=new Blob([JSON.stringify(r,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='svr-boot-route-recovery-phase228.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
   document.addEventListener('keydown', e=>{ if((e.key||'').toLowerCase()==='r' && !e.repeat) state.opened ? close() : show('keyboard-r'); });
   document.addEventListener('click', e=>{ const t=e.target && e.target.closest && e.target.closest('[data-svr-route-recovery]'); if(!t) return; const a=t.getAttribute('data-svr-route-recovery'); if(a==='close') close(); if(a==='copy') copy(); if(a==='download') download(); if(a==='refresh') show('refresh'); });
   window.SVR_BOOT_ROUTE_RECOVERY = { build: BUILD, state, routeList, collect, show, close, copy, download };

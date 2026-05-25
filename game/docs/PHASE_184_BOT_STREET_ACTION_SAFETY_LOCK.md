@@ -1,7 +1,7 @@
 # Phase 199 — Bot Street Action Safety Lock
 
 ## Build
-`PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK`
+`PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK`
 
 ## Purpose
 This phase locks the poker runtime against scheduled bot-action errors and hardens street betting events before the next polish pass.

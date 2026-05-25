@@ -1,4 +1,4 @@
-# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
+# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
 
 ## Scope
 Adds a local tester queue dashboard that turns tester feedback, bug reports, release-candidate checks, smoke tests, and runtime errors into a compact ranked queue.
