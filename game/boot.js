@@ -3,7 +3,7 @@
  * Purpose: recover from malformed boot.js / optional loader syntax and stop permanent Booting stalls.
  */
 (function(){
-  var BUILD = "PHASE-250-BOOTJS-SYNTAX-HARDRESET-LOCK";
+  var BUILD = "PHASE-251-MAINJS-LITERAL-RN-SYNTAX-FIX-LOCK";
   var PHASE = 250;
   var startedAt = new Date().toISOString();
   var statusEl = document.getElementById("status");
@@ -84,7 +84,7 @@
     if (ready || fallbackStarted) return;
     fallbackStarted = true;
     setStatus("Boot fallback: loading recovery shell...");
-    import("./modules/boot_fallback.js?v=phase250").then(function(){
+    import("./modules/boot_fallback.js?v=phase245").then(function(){
       if (window.SVR_BOOT_FALLBACK && !ready) {
         window.SVR_BOOT_FALLBACK.show(reason, detail);
       }
@@ -103,10 +103,10 @@
     startFallback: startFallback
   };
 
-  import("./modules/boot_route_recovery.js?v=phase250").catch(function(error){
+  import("./modules/boot_route_recovery.js?v=phase245").catch(function(error){
     softReport("Boot route recovery module failed.", error);
   });
-  import("./modules/boot_route_health.js?v=phase250").catch(function(error){
+  import("./modules/boot_route_health.js?v=phase245").catch(function(error){
     softReport("Boot route health module failed.", error);
   });
 
@@ -157,7 +157,7 @@
     }
   }, 15000);
 
-  import("./main.js?v=phase250").then(function(){
+  import("./main.js?v=phase245").then(function(){
     imported = true;
     setStatus("Game module loaded. Building scene...");
   }).catch(function(error){
@@ -166,3 +166,5 @@
     startFallback("Failed to import main game module.", error);
   });
 })();
+
+

@@ -7,10 +7,10 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import "./modules/optional_module_loader.js?v=phase250";
+import "./modules/optional_module_loader.js?v=phase245";
 
-const BUILD_LABEL = "PHASE-250-BOOTJS-SYNTAX-HARDRESET-LOCK";
-const BUILD_PHASE = 250;
+const BUILD_LABEL = "PHASE-245-FIXED-GIT-RUNGIT-HOTFIX-LOCK";
+const BUILD_PHASE = 245;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, subsystemErrors: {}, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
@@ -511,15 +511,16 @@ function safeLoopStep(source, fn){
 
 function emergencyRenderFrame(){
   try {
-    safeLoopStep("visible_recovery_tick", ()=>visibleRecovery?.tick?.(dt));
-  safeLoopStep("renderer_render", ()=>renderer.render(scene, camera));
+    if (typeof visibleRecovery !== "undefined") {
+      visibleRecovery?.tick?.(0.016);
+    }
+    renderer.render(scene, camera);
     return true;
   } catch(error) {
     recordLoopError("emergency_renderer_render", error);
     return false;
   }
 }
-
 let tPrev = performance.now();
 const previewTarget = new THREE.Vector3(0, 1.25, 0);
 const previewPos = new THREE.Vector3();
@@ -555,7 +556,7 @@ renderer.setAnimationLoop(()=>{
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
 
-  safeLoopStep("world_tick", ()=>{ safeLoopStep("world_tick", ()=>{ if (scene.userData._tickWorld) scene.userData._tickWorld(dt); }); });
+  safeLoopStep("world_tick", ()=>{ if (scene.userData._tickWorld) scene.userData._tickWorld(dt); });
 
   safeLoopStep("hands_update", ()=>hands.update(dt));
   safeLoopStep("hands_debug", ()=>hands.updateDebug());
@@ -576,7 +577,7 @@ renderer.setAnimationLoop(()=>{
     }));
   }
 
-  safeLoopStep("watch_update", ()=>{ safeLoopStep("watch_update", ()=>{ if (watch) watch.update(dt, leftHand, rightHand); }); });
+  safeLoopStep("watch_update", ()=>{ if (watch) watch.update(dt, leftHand, rightHand); });
 
   safeLoopStep("visible_recovery_tick", ()=>visibleRecovery?.tick?.(dt));
   safeLoopStep("renderer_render", ()=>renderer.render(scene, camera));
@@ -604,7 +605,8 @@ renderer.setAnimationLoop(()=>{
       $err.style.display = "block";
       $err.textContent = "RUNTIME ERROR RECOVERED:\n" + message;
     }
-    emergencyRenderFrame();`r`n    return;
+    emergencyRenderFrame();
+    return;
   }
 });
 
@@ -619,6 +621,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 
