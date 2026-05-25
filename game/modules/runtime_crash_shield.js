@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Crash Shield
- * Build: PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+ * Build: PHASE-223-TESTER-LAUNCH-CARD-LOCK
  * Purpose: keep render/game loop alive, capture runtime errors, and prevent bridge/listener crashes from freezing the game.
  */
-const BUILD = 'PHASE-222-POST-DEPLOY-CHECKLIST-LOCK';
+const BUILD = 'PHASE-223-TESTER-LAUNCH-CARD-LOCK';
 const KNOWN_RECOVERABLE = [
   /record[A-Za-z0-9_]+ is not a function/i,
   /SVR_ENTERPRISE_BRIDGE/i,

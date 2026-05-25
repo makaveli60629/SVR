@@ -1,11 +1,11 @@
-# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+# PHASE-223-TESTER-LAUNCH-CARD-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase222.js`
+- `game/modules/enterprise_bridge_phase223.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

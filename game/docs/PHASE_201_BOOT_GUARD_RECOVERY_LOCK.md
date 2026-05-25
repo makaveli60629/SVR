@@ -1,4 +1,4 @@
-# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+# PHASE-223-TESTER-LAUNCH-CARD-LOCK
 
 ## Purpose
 Fix game stuck on `Booting…` by moving game startup behind a guarded loader.

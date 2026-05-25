@@ -1,6 +1,6 @@
 # Phase 199 — Smoke Test Automation Lock
 
-Build: `PHASE-222-POST-DEPLOY-CHECKLIST-LOCK`
+Build: `PHASE-223-TESTER-LAUNCH-CARD-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

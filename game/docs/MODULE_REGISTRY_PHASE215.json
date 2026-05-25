@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
+  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
   "modules_added": [
     "modules/auto_apply_helper.js",
-    "modules/enterprise_bridge_phase222.js"
+    "modules/enterprise_bridge_phase223.js"
   ],
   "public_page_touched": false,
   "deployment": "direct game folder plus update/game.zip backup"

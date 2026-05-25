@@ -1,6 +1,6 @@
-# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+# PHASE-223-TESTER-LAUNCH-CARD-LOCK
 
-Phase 222 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 223 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

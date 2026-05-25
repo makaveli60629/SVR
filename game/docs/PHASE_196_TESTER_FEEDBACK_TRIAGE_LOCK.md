@@ -1,4 +1,4 @@
-# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+# PHASE-223-TESTER-LAUNCH-CARD-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
+  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase222.js"
+    "game/modules/enterprise_bridge_phase223.js"
   ],
   "protected": {
     "publicPageTouched": false,

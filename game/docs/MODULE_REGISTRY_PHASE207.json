@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
+  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",
-    "game/modules/enterprise_bridge_phase222.js",
+    "game/modules/enterprise_bridge_phase223.js",
     "game/modules/bridge_selftest.js",
     "game/modules/event_firewall.js"
   ],

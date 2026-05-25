@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = 'PHASE-222-POST-DEPLOY-CHECKLIST-LOCK';
+  const BUILD = 'PHASE-223-TESTER-LAUNCH-CARD-LOCK';
   const state = { build: BUILD, status: 'ready', fixed: ['PowerShell Invoke-Git argument binding', 'highest-phase packet detection', 'direct packet apply'] };
   window.SVR_AUTO_APPLY_GIT_FIX = {
     state,

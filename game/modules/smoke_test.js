@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+ * Build: PHASE-223-TESTER-LAUNCH-CARD-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-222-POST-DEPLOY-CHECKLIST-LOCK';
+const BUILD = 'PHASE-223-TESTER-LAUNCH-CARD-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }

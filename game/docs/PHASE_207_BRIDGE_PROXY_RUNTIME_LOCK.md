@@ -1,4 +1,4 @@
-# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+# PHASE-223-TESTER-LAUNCH-CARD-LOCK
 
 ## Purpose
 Install a first-run bridge proxy before event/firewall/poker modules so missing `record*` methods cannot crash the runtime.
@@ -12,5 +12,5 @@ Install a first-run bridge proxy before event/firewall/poker modules so missing 
 
 ## Added files
 - `game/modules/bridge_proxy.js`
-- `game/modules/enterprise_bridge_phase222.js`
+- `game/modules/enterprise_bridge_phase223.js`
 - `game/docs/MODULE_REGISTRY_PHASE207.json`

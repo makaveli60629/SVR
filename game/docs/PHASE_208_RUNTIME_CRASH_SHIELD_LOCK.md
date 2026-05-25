@@ -1,4 +1,4 @@
-# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+# PHASE-223-TESTER-LAUNCH-CARD-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

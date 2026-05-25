@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
+  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
   "modulesAdded": [
     "game/modules/demo_certification.js"
   ],

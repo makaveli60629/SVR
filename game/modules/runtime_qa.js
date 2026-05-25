@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+ * Build: PHASE-223-TESTER-LAUNCH-CARD-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-222-POST-DEPLOY-CHECKLIST-LOCK';
+const BUILD = 'PHASE-223-TESTER-LAUNCH-CARD-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

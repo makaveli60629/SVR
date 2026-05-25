@@ -7,4 +7,4 @@
 5. Press **X** and confirm session export downloads.
 6. Confirm no public Matrix launch page files changed.
 
-Build: `PHASE-222-POST-DEPLOY-CHECKLIST-LOCK`
+Build: `PHASE-223-TESTER-LAUNCH-CARD-LOCK`

@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
-  "phase": 222,
+  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
+  "phase": 223,
   "modules": [
     "game/modules/auto_apply_git_wrapper_fix.js",
-    "game/modules/enterprise_bridge_phase222.js"
+    "game/modules/enterprise_bridge_phase223.js"
   ],
   "public_page_touched": false
 }

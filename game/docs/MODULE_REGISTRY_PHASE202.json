@@ -1,6 +1,6 @@
 {
   "phase": 202,
-  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
+  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
   "modules": [
     "boot.js",
     "modules/boot_fallback.js",

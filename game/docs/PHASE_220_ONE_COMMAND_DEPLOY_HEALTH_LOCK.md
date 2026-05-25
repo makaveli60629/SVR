@@ -1,7 +1,7 @@
-# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+# PHASE-223-TESTER-LAUNCH-CARD-LOCK
 
 ## Purpose
-Phase 222 adds a simple one-command deploy health surface so the project can confirm whether the latest package is actually visible after GitHub Pages deploy.
+Phase 223 adds a simple one-command deploy health surface so the project can confirm whether the latest package is actually visible after GitHub Pages deploy.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 222 adds a simple one-command deploy health surface so the project can con
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase222-deployhealth` and press `M`.
+Open `/game/?v=phase223-deployhealth` and press `M`.

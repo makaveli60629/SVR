@@ -1,6 +1,6 @@
 {
   "phase": 200,
-  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
+  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
   "modules": [
     "enterprise_bridge",
     "runtime_qa",

@@ -1,9 +1,9 @@
-# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
+# PHASE-223-TESTER-LAUNCH-CARD-LOCK
 
-Phase 222 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
+Phase 223 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
 
 ## Test
-Open `/game/?v=phase222-autoapplystatus` and press `I`.
+Open `/game/?v=phase223-autoapplystatus` and press `I`.
 
 ## Locked
 - Public Matrix launch page untouched.

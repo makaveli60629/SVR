@@ -3,7 +3,7 @@
  * Runs without Three.js. Purpose: never leave the player stuck on Booting.
  */
 (function(){
-  const BUILD = 'PHASE-222-POST-DEPLOY-CHECKLIST-LOCK';
+  const BUILD = 'PHASE-223-TESTER-LAUNCH-CARD-LOCK';
   let active = false;
   let reports = [];
   const esc = (v)=>String(v == null ? '' : v).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -44,14 +44,14 @@
   }
   function privateLinks(){
     return [
-      ['Lobby retry','./index.html?v=phase222-retry-'+Date.now()],
+      ['Lobby retry','./index.html?v=phase223-retry-'+Date.now()],
       ['No-cache reload','./index.html?nocache='+Date.now()],
-      ['Scorpion','./scorpion.html?v=phase222'],
-      ['PGA Drive','./pga-drive.html?v=phase222'],
-      ['Chip/Putt','./chip-putt.html?v=phase222'],
-      ['Reiki Room','./reiki.html?v=phase222'],
-      ['VR Store','./store-room.html?v=phase222'],
-      ['Smoker Lounge','./smoker-lounge.html?v=phase222']
+      ['Scorpion','./scorpion.html?v=phase223'],
+      ['PGA Drive','./pga-drive.html?v=phase223'],
+      ['Chip/Putt','./chip-putt.html?v=phase223'],
+      ['Reiki Room','./reiki.html?v=phase223'],
+      ['VR Store','./store-room.html?v=phase223'],
+      ['Smoker Lounge','./smoker-lounge.html?v=phase223']
     ];
   }
   function show(reason, detail){
