@@ -1,6 +1,6 @@
-# QA Phase 196 Checklist
+# QA Phase 197 Checklist
 
-- Open `/game/?v=phase196`.
+- Open `/game/?v=phase197`.
 - Press `J` and confirm tester feedback panel opens.
 - Save one feedback entry.
 - Press `G` and confirm bug reporter still opens.

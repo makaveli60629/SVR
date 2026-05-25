@@ -1,12 +1,12 @@
 /**
  * SVR Poker — Bug Report Capture
- * Build: PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK
+ * Build: PHASE-197-TEST-QUEUE-DASHBOARD-LOCK
  * Purpose: capture tester issue reports from inside the game without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK';
+const BUILD = 'PHASE-197-TEST-QUEUE-DASHBOARD-LOCK';
 const EXPECTED_PHASE = 195;
-const STORE_KEY = 'svr_bug_reports_phase196';
+const STORE_KEY = 'svr_bug_reports_phase197';
 
 function sanitize(value, max = 1600) {
   return String(value ?? '').replace(/[<>]/g, '').slice(0, max);
@@ -184,7 +184,7 @@ const SVRBugReporter = {
     const blob = new Blob([shortJson(payload, 120000)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `svr-bug-reports-phase196-${Date.now()}.json`;
+    a.download = `svr-bug-reports-phase197-${Date.now()}.json`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   },

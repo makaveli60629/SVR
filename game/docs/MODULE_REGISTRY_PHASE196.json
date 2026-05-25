@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK",
+  "build": "PHASE-197-TEST-QUEUE-DASHBOARD-LOCK",
   "phase": 196,
   "modules": {
     "tester_feedback": "game/modules/tester_feedback.js",

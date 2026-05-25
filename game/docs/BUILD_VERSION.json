@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK",
-  "phase": 196,
+  "build": "PHASE-197-TEST-QUEUE-DASHBOARD-LOCK",
+  "phase": 197,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "tester feedback triage, test verdict capture, bug/QA summary queue"
+  "featureLock": "tester feedback queue, blocker triage dashboard, playtest certification summary"
 }

@@ -1,7 +1,7 @@
-# QA Phase 196 Checklist
+# QA Phase 197 Checklist
 
-- [ ] Open `/game/?v=phase196`.
-- [ ] Confirm version/deploy overlay shows `PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK`.
+- [ ] Open `/game/?v=phase197`.
+- [ ] Confirm version/deploy overlay shows `PHASE-197-TEST-QUEUE-DASHBOARD-LOCK`.
 - [ ] Press `G` and confirm bug report panel opens.
 - [ ] Enter area/severity/device/notes and save a report.
 - [ ] Confirm report count increments.
