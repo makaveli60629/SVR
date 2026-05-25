@@ -1,0 +1,79 @@
+{
+  "phase": "PHASE-84-OS3A-ASSET-INTAKE-LOCK",
+  "status": "planning_lock",
+  "date": "2026-05-25",
+  "source": {
+    "gallery": "https://www.opensource3dassets.com/en/gallery",
+    "reviewed_repository": "https://github.com/makaveli60629/os3a-gallery",
+    "upstream_data_repository": "https://github.com/ToxSam/open-source-3D-assets"
+  },
+  "approved_for": [
+    "Reiki private scene environmental props",
+    "PGA private range environmental/range props",
+    "Scorpion private room decorative props",
+    "VR Store private showroom display props",
+    "light lobby storefront decoration"
+  ],
+  "blocked_for": [
+    "bulk importing entire collections",
+    "unapproved sponsor branding",
+    "protected IP/trademarked assets",
+    "large unoptimized FBX payloads",
+    "site/public Matrix page changes"
+  ],
+  "asset_rules": {
+    "preferred_format": "glb",
+    "license_required_per_asset": true,
+    "target_total_pilot_payload_mb": 3,
+    "game_zip_max_mb": 25,
+    "manifest_required": true,
+    "optimization_required": true
+  },
+  "runtime_paths": {
+    "root": "game/assets/os3a/",
+    "manifest": "game/assets/os3a/manifest.json",
+    "reiki": "game/assets/os3a/reiki/",
+    "pga": "game/assets/os3a/pga/",
+    "scorpion": "game/assets/os3a/scorpion/",
+    "store": "game/assets/os3a/store/",
+    "lobby": "game/assets/os3a/lobby/"
+  },
+  "pilot_import_slots": [
+    {
+      "slot": "reiki_plant_01",
+      "target_module": "game/reiki.html",
+      "status": "pending_selection",
+      "max_optimized_mb": 0.5
+    },
+    {
+      "slot": "reiki_rock_01",
+      "target_module": "game/reiki.html",
+      "status": "pending_selection",
+      "max_optimized_mb": 0.5
+    },
+    {
+      "slot": "pga_range_marker_01",
+      "target_module": "game/range.html",
+      "status": "pending_selection",
+      "max_optimized_mb": 0.5
+    },
+    {
+      "slot": "pga_flag_or_sign_01",
+      "target_module": "game/pga-drive.html",
+      "status": "pending_selection",
+      "max_optimized_mb": 0.5
+    },
+    {
+      "slot": "scorpion_vip_prop_01",
+      "target_module": "game/scorpion.html",
+      "status": "pending_selection",
+      "max_optimized_mb": 0.5
+    },
+    {
+      "slot": "store_display_prop_01",
+      "target_module": "game/store-room.html",
+      "status": "pending_selection",
+      "max_optimized_mb": 0.5
+    }
+  ]
+}

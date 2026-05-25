@@ -1,0 +1,21 @@
+{
+  "schema": "svr-os3a-asset-manifest-v1",
+  "phase": "PHASE-84-OS3A-ASSET-INTAKE-LOCK",
+  "assets": [],
+  "required_fields_for_each_asset": [
+    "id",
+    "displayName",
+    "sourceUrl",
+    "sourceRepository",
+    "license",
+    "licenseVerified",
+    "creator",
+    "targetModule",
+    "localPath",
+    "originalSizeBytes",
+    "optimizedSizeBytes",
+    "optimizationNotes",
+    "approvalStatus"
+  ],
+  "notes": "Do not add assets here until each asset license and target module are verified."
+}
