@@ -1,8 +1,8 @@
 ﻿{
     "public_page_touched":  false,
-    "build":  "PHASE-247-BLACK-SCREEN-RENDER-LOOP-GUARD-LOCK",
-    "source":  "black-screen-render-loop-guard-hotfix",
-    "featureLock":  "black screen render loop guard, subsystem isolation, emergency render after runtime shield",
-    "generatedAt":  "2026-05-25T23:14:59.6468118Z",
-    "phase":  247
+    "build":  "PHASE-248-VISIBLE-RECOVERY-SCENE-GUARD-LOCK",
+    "source":  "visible-recovery-scene-guard-hotfix",
+    "featureLock":  "visible recovery scene guard, recovery grid/ring/sign, no pure black screen after runtime shield",
+    "generatedAt":  "2026-05-25T23:18:36.1229037Z",
+    "phase":  248
 }

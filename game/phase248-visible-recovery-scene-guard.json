@@ -1,0 +1,8 @@
+﻿{
+    "build":  "PHASE-248-VISIBLE-RECOVERY-SCENE-GUARD-LOCK",
+    "public_page_touched":  false,
+    "fix":  "add always-visible recovery grid/ring/sign and tick before renderer render",
+    "reason":  "runtime shield and loop guards worked but user still saw a pure black scene",
+    "phase":  248,
+    "generatedAt":  "2026-05-25T23:18:36.1615396Z"
+}

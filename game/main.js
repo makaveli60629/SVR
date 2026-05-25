@@ -7,10 +7,10 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import "./modules/optional_module_loader.js?v=phase247";
+import "./modules/optional_module_loader.js?v=phase248";
 
-const BUILD_LABEL = "PHASE-247-BLACK-SCREEN-RENDER-LOOP-GUARD-LOCK";
-const BUILD_PHASE = 247;
+const BUILD_LABEL = "PHASE-248-VISIBLE-RECOVERY-SCENE-GUARD-LOCK";
+const BUILD_PHASE = 248;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, subsystemErrors: {}, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
@@ -65,6 +65,112 @@ const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
+
+scene.background = new THREE.Color(0x02050b);
+
+function createVisibleRecoveryScene(){
+  const root = new THREE.Group();
+  root.name = "SVR_VISIBLE_RECOVERY_SCENE_GUARD";
+  root.visible = true;
+
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(15, 15),
+    new THREE.MeshBasicMaterial({ color: 0x06140f, transparent: true, opacity: 0.34, side: THREE.DoubleSide, depthWrite: false })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.set(0, 0.018, 0);
+  root.add(floor);
+
+  const grid = new THREE.GridHelper(15, 30, 0x00ffd5, 0x6d39ff);
+  grid.name = "SVR_RECOVERY_NEON_GRID";
+  grid.position.y = 0.028;
+  grid.material.transparent = true;
+  grid.material.opacity = 0.48;
+  grid.renderOrder = -5;
+  root.add(grid);
+
+  const beacon = new THREE.Mesh(
+    new THREE.TorusGeometry(1.08, 0.026, 10, 96),
+    new THREE.MeshBasicMaterial({ color: 0x35f7ff, transparent: true, opacity: 0.86, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  beacon.name = "SVR_RECOVERY_CENTER_RING";
+  beacon.position.set(0, 1.22, 1.35);
+  beacon.rotation.x = Math.PI * 0.5;
+  root.add(beacon);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgba(0,0,0,0.45)";
+  ctx.fillRect(0,0,1024,256);
+  ctx.font = "bold 76px Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = "#35f7ff";
+  ctx.shadowBlur = 28;
+  ctx.fillStyle = "#eaffff";
+  ctx.fillText("SVR RECOVERY VIEW", 512, 92);
+  ctx.font = "bold 34px Arial, sans-serif";
+  ctx.shadowColor = "#ff7a2f";
+  ctx.shadowBlur = 18;
+  ctx.fillStyle = "#ffd8a8";
+  ctx.fillText("rendering protected â€¢ world can continue loading", 512, 162);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const sign = new THREE.Mesh(
+    new THREE.PlaneGeometry(3.75, 0.94),
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })
+  );
+  sign.name = "SVR_RECOVERY_SIGN";
+  sign.position.set(0, 2.22, 1.34);
+  root.add(sign);
+
+  const lightA = new THREE.PointLight(0x35f7ff, 1.8, 10, 1.6);
+  lightA.position.set(0, 2.4, 2.0);
+  root.add(lightA);
+  const lightB = new THREE.PointLight(0xff7a2f, 1.0, 7, 1.8);
+  lightB.position.set(-2.2, 1.2, 1.2);
+  root.add(lightB);
+
+  scene.add(root);
+
+  window.SVR_VISIBLE_RECOVERY_SCENE_GUARD = {
+    build: BUILD_LABEL,
+    phase: BUILD_PHASE,
+    active: true,
+    reason: "startup visibility guard",
+    frames: 0,
+    lastTick: null
+  };
+
+  return {
+    root,
+    beacon,
+    sign,
+    grid,
+    tick(dt){
+      const runtime = window.SVR_MAIN_RUNTIME_STATE || {};
+      const hasErrors = !!(runtime.animationErrors || runtime.lastAnimationError);
+      root.visible = true;
+      const t = performance.now() * 0.001;
+      beacon.rotation.z += (0.4 + (hasErrors ? 1.1 : 0.25)) * dt;
+      beacon.material.opacity = hasErrors ? 0.94 : 0.42 + Math.sin(t * 2.2) * 0.08;
+      sign.visible = hasErrors || performance.now() < 9500;
+      grid.material.opacity = hasErrors ? 0.64 : 0.34;
+      window.SVR_VISIBLE_RECOVERY_SCENE_GUARD = {
+        build: BUILD_LABEL,
+        phase: BUILD_PHASE,
+        active: root.visible,
+        errorMode: hasErrors,
+        reason: hasErrors ? "runtime error visibility fallback" : "startup visibility guard",
+        frames: (window.SVR_VISIBLE_RECOVERY_SCENE_GUARD?.frames || 0) + 1,
+        lastTick: new Date().toISOString()
+      };
+    }
+  };
+}
+const visibleRecovery = createVisibleRecoveryScene();
 
 
 window.addEventListener("error", (e)=>{
@@ -405,7 +511,8 @@ function safeLoopStep(source, fn){
 
 function emergencyRenderFrame(){
   try {
-    safeLoopStep("renderer_render", ()=>renderer.render(scene, camera));
+    safeLoopStep("visible_recovery_tick", ()=>visibleRecovery?.tick?.(dt));
+  safeLoopStep("renderer_render", ()=>renderer.render(scene, camera));
     return true;
   } catch(error) {
     recordLoopError("emergency_renderer_render", error);
@@ -448,7 +555,7 @@ renderer.setAnimationLoop(()=>{
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
 
-  safeLoopStep("world_tick", ()=>{ if (scene.userData._tickWorld) scene.userData._tickWorld(dt); });
+  safeLoopStep("world_tick", ()=>{ safeLoopStep("world_tick", ()=>{ if (scene.userData._tickWorld) scene.userData._tickWorld(dt); }); });
 
   safeLoopStep("hands_update", ()=>hands.update(dt));
   safeLoopStep("hands_debug", ()=>hands.updateDebug());
@@ -469,8 +576,9 @@ renderer.setAnimationLoop(()=>{
     }));
   }
 
-  safeLoopStep("watch_update", ()=>{ if (watch) watch.update(dt, leftHand, rightHand); });
+  safeLoopStep("watch_update", ()=>{ safeLoopStep("watch_update", ()=>{ if (watch) watch.update(dt, leftHand, rightHand); }); });
 
+  safeLoopStep("visible_recovery_tick", ()=>visibleRecovery?.tick?.(dt));
   safeLoopStep("renderer_render", ()=>renderer.render(scene, camera));
   } catch (error) {
     const message = error?.stack || error?.message || String(error);
@@ -496,8 +604,7 @@ renderer.setAnimationLoop(()=>{
       $err.style.display = "block";
       $err.textContent = "RUNTIME ERROR RECOVERED:\n" + message;
     }
-    // Quest-safe: do not throw from the animation loop, because a secondary throw can freeze WebXR.
-    return;
+    emergencyRenderFrame();`r`n    return;
   }
 });
 
@@ -512,5 +619,6 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
 
 
