@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
+  "build": "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase226.js"
+    "game/modules/enterprise_bridge_phase227.js"
   ],
   "protected": {
     "publicPageTouched": false,

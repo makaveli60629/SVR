@@ -1,4 +1,4 @@
-# PHASE-226-PILOT-READY-SUMMARY-LOCK
+# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
 
 ## Fix
 - Fixes runtime error: `this.recordDealerButton is not a function`.

@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-226-PILOT-READY-SUMMARY-LOCK";
+  const BUILD = "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK";
   const state = {
     build: BUILD,
     phase: 219,
@@ -10,7 +10,7 @@
 
   async function checkJson(url){
     try {
-      const r = await fetch(url + (url.includes("?") ? "&" : "?") + "v=phase226-" + Date.now(), { cache: "no-store" });
+      const r = await fetch(url + (url.includes("?") ? "&" : "?") + "v=phase227-" + Date.now(), { cache: "no-store" });
       const text = await r.text();
       let json = null;
       try { json = JSON.parse(text); } catch(_e) {}

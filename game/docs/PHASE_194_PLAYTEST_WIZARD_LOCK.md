@@ -1,6 +1,6 @@
 # Phase 199 — Playtest Wizard Lock
 
-Build: `PHASE-226-PILOT-READY-SUMMARY-LOCK`
+Build: `PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK`
 
 ## Scope
 - Adds guided playtest wizard overlay.

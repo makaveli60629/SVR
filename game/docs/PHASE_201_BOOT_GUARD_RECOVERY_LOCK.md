@@ -1,4 +1,4 @@
-# PHASE-226-PILOT-READY-SUMMARY-LOCK
+# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
 
 ## Purpose
 Fix game stuck on `Booting…` by moving game startup behind a guarded loader.

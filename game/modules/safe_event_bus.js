@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Safe Event Bus
- * Build: PHASE-226-PILOT-READY-SUMMARY-LOCK
+ * Build: PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
  * Purpose: sandbox SVR custom-event listeners so a missing recorder/listener cannot freeze gameplay.
  */
-const BUILD = 'PHASE-226-PILOT-READY-SUMMARY-LOCK';
+const BUILD = 'PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK';
 const ORIGINAL_ADD = EventTarget.prototype.addEventListener;
 const ORIGINAL_REMOVE = EventTarget.prototype.removeEventListener;
 const ORIGINAL_DISPATCH = EventTarget.prototype.dispatchEvent;

@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
+  "build": "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK",
   "phase": 208,
   "modules": [
     "runtime_crash_shield.js",
     "bridge_proxy.js",
-    "enterprise_bridge_phase226.js",
+    "enterprise_bridge_phase227.js",
     "event_firewall.js"
   ],
   "public_page_touched": false

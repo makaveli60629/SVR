@@ -1,4 +1,4 @@
-# PHASE-226-PILOT-READY-SUMMARY-LOCK
+# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

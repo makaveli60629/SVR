@@ -1,4 +1,4 @@
-# PHASE-226-PILOT-READY-SUMMARY-LOCK
+# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

@@ -1,6 +1,6 @@
 # Phase 200 — Pilot Testing Ready Lock
 
-Build: `PHASE-226-PILOT-READY-SUMMARY-LOCK`
+Build: `PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK`
 
 ## Protected rules
 

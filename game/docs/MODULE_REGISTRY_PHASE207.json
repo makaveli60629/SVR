@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
+  "build": "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",
-    "game/modules/enterprise_bridge_phase226.js",
+    "game/modules/enterprise_bridge_phase227.js",
     "game/modules/bridge_selftest.js",
     "game/modules/event_firewall.js"
   ],

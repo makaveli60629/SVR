@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
+  "build": "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK",
   "modules_added": [
     "modules/auto_apply_helper.js",
-    "modules/enterprise_bridge_phase226.js"
+    "modules/enterprise_bridge_phase227.js"
   ],
   "public_page_touched": false,
   "deployment": "direct game folder plus update/game.zip backup"

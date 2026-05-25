@@ -1,6 +1,6 @@
-# PHASE-226-PILOT-READY-SUMMARY-LOCK
+# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
 
-Phase 226 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 227 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

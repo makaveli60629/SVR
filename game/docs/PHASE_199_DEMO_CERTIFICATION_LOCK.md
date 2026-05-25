@@ -1,4 +1,4 @@
-# PHASE-226-PILOT-READY-SUMMARY-LOCK
+# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
 
 ## Summary
 Adds the Demo Certification module and go/no-go readiness gate for demo/playtest preparation.

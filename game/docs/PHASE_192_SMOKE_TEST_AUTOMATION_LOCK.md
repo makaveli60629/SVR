@@ -1,6 +1,6 @@
 # Phase 199 — Smoke Test Automation Lock
 
-Build: `PHASE-226-PILOT-READY-SUMMARY-LOCK`
+Build: `PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

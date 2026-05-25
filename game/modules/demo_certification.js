@@ -1,10 +1,10 @@
 /**
  * SVR Poker - Demo Certification Lock
- * Build: PHASE-226-PILOT-READY-SUMMARY-LOCK
+ * Build: PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
  * Shortcut: Z
  * Purpose: combine QA, smoke, RC, feedback, bug reports, and report bundle into one demo-ready gate.
  */
-const BUILD = 'PHASE-226-PILOT-READY-SUMMARY-LOCK';
+const BUILD = 'PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK';
 const STORE_KEY = 'svr_demo_certifications';
 
 function safeRead(name, fallback = null) {

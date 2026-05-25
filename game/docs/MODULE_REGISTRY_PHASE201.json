@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
+  "build": "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK",
   "phase": 201,
   "modulesAdded": [
     "boot.js"

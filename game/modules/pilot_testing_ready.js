@@ -1,7 +1,7 @@
 // SVR Poker Phase 200 - Pilot Testing Ready Gate
 // Public Matrix page is not touched by this module.
 (function(){
-  const BUILD = 'PHASE-226-PILOT-READY-SUMMARY-LOCK';
+  const BUILD = 'PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK';
   const storageKey = 'svr_pilot_testing_ready_reports';
   const requiredModules = [
     ['SVR_DEPLOY_VERIFIER','Deploy verifier'],

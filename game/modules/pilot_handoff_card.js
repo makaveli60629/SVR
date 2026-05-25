@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-226-PILOT-READY-SUMMARY-LOCK";
+  const BUILD = "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK";
   const state = {
     build: BUILD,
     phase: 225,
@@ -11,7 +11,7 @@
       "Poker table and controls are visible",
       "Watch/HUD panels are visible",
       "Private scene links open",
-      "Version marker matches Phase 226"
+      "Version marker matches Phase 227"
     ],
     reportItems: [
       "Device/browser used",
@@ -55,7 +55,7 @@
       </div>
       <hr style="border:0;border-top:1px solid rgba(130,255,230,.3)">
       <div><b>Build:</b> ${esc(BUILD)}</div>
-      <div><b>Tester URL:</b> /game/?v=phase226-handoff</div>
+      <div><b>Tester URL:</b> /game/?v=phase227-handoff</div>
       <div><b>Public Matrix page:</b> locked / untouched</div>
       <h4>Must-pass checks</h4>
       <ol>${mustPass}</ol>

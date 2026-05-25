@@ -1,7 +1,7 @@
-# PHASE-226-PILOT-READY-SUMMARY-LOCK
+# PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
 
 ## Purpose
-Phase 226 adds a tester launch card so testers have one small panel with the URL, shortcut keys, checklist, and expected pass/fail notes.
+Phase 227 adds a tester launch card so testers have one small panel with the URL, shortcut keys, checklist, and expected pass/fail notes.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 226 adds a tester launch card so testers have one small panel with the URL
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase226-testercard` and press `C`.
+Open `/game/?v=phase227-testercard` and press `C`.

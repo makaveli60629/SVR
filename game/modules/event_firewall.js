@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-226-PILOT-READY-SUMMARY-LOCK
+ * Build: PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-226-PILOT-READY-SUMMARY-LOCK';
+const BUILD = 'PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

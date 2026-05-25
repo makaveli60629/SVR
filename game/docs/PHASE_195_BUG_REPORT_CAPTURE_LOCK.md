@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-226-PILOT-READY-SUMMARY-LOCK`
+Build: `PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK`
 
 ## Added
 - In-game bug report capture panel.

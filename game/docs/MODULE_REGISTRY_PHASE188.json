@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
+  "build": "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK",
   "modules": [
     "game/main.js",
     "game/modules/watch.js",

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-226-PILOT-READY-SUMMARY-LOCK
+ * Build: PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-226-PILOT-READY-SUMMARY-LOCK';
+const BUILD = 'PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }

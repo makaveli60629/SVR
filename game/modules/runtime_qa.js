@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-226-PILOT-READY-SUMMARY-LOCK
+ * Build: PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-226-PILOT-READY-SUMMARY-LOCK';
+const BUILD = 'PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

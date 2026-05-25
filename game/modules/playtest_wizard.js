@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Guided Playtest Wizard
- * Build: PHASE-226-PILOT-READY-SUMMARY-LOCK
+ * Build: PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
  * Purpose: give testers one clear checklist after deploy without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-226-PILOT-READY-SUMMARY-LOCK';
+const BUILD = 'PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeValue(value, max = 260) {

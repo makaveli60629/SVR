@@ -2,7 +2,7 @@
 
 - Open `/game/?v=phase192`.
 - Press `V` and confirm SVR DEPLOY PREFLIGHT panel appears.
-- Confirm build displays `PHASE-226-PILOT-READY-SUMMARY-LOCK`.
+- Confirm build displays `PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK`.
 - Press `Q` and confirm QA overlay still works.
 - Press `X` and confirm session JSON download works.
 - Press `Y` and confirm copy export path does not break runtime.

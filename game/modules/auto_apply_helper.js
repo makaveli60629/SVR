@@ -1,8 +1,8 @@
-// PHASE-226-PILOT-READY-SUMMARY-LOCK
+// PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-226-PILOT-READY-SUMMARY-LOCK",
+    build: "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

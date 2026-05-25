@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-226-PILOT-READY-SUMMARY-LOCK",
-  "phase": 226,
+  "build": "PHASE-227-PILOT-ISSUE-TEMPLATE-LOCK",
+  "phase": 227,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "pilot ready summary, tester evidence, final go/no-go handoff"
+  "featureLock": "pilot issue template, bug evidence capture, tester report format"
 }
