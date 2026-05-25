@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-194-PLAYTEST-WIZARD-LOCK",
-  "phase": 194,
-  "source": "direct-game-folder",
-  "generatedAt": "2026-05-25T00:00:00Z",
+  "build": "PHASE-195-BUG-REPORT-CAPTURE-LOCK",
+  "phase": 195,
   "public_page_touched": false,
-  "featureLock": "guided playtest wizard, keyboard shortcut map, release candidate test flow"
+  "site_track": "site internal only",
+  "game_package_under_25mb_target": true,
+  "featureLock": "bug report capture, tester notes, session issue export"
 }

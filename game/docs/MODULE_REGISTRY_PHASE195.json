@@ -1,0 +1,25 @@
+{
+  "build": "PHASE-195-BUG-REPORT-CAPTURE-LOCK",
+  "phase": 195,
+  "modules": {
+    "bug_reporter": "game/modules/bug_reporter.js",
+    "playtest_wizard": "game/modules/playtest_wizard.js",
+    "release_candidate": "game/modules/release_candidate.js",
+    "smoke_test": "game/modules/smoke_test.js",
+    "deploy_verify": "game/modules/deploy_verify.js",
+    "runtime_qa": "game/modules/runtime_qa.js",
+    "session_export": "game/modules/session_export.js",
+    "enterprise_bridge": "game/modules/enterprise_bridge.js"
+  },
+  "shortcuts": {
+    "G": "Bug report panel",
+    "W": "Playtest wizard",
+    "U": "Release candidate",
+    "T": "Smoke test",
+    "V": "Deploy verifier",
+    "Q": "Runtime QA",
+    "X": "Download session export",
+    "Y": "Copy session export"
+  },
+  "publicPageTouched": false
+}
