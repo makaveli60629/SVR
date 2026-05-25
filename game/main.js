@@ -7,10 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { initEnterpriseBridge } from "./modules/enterprise_bridge.js";
 
-const BUILD_LABEL = "PHASE-174-ENTERPRISE-AUTO-FINISH-LOCK";
-window.SVR_BUILD_LABEL = BUILD_LABEL;
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -24,15 +21,6 @@ const $err = document.getElementById("err");
 const $toggleLog = document.getElementById("toggleLog");
 const $toggleJoints = document.getElementById("toggleJoints");
 const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
-const $pokerActions = Array.from(document.querySelectorAll("#pokerActions [data-poker-action]"));
-const PRIVATE_SCENE_ROUTES = {
-  reikiRoom: "./reiki.html",
-  pgaDrive: "./pga-drive.html",
-  chipPutt: "./chip-putt.html",
-  storeRoom: "./store-room.html",
-  loungeRoom: "./smoker-lounge.html",
-  scorpionRoom: "./scorpion.html"
-};
 
 let lastStatusText = "";
 let lastStatusAt = 0;
@@ -84,16 +72,13 @@ const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: ren
 setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
-initEnterpriseBridge({ scene, sceneTargets, log });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
 const audio = createAudioPlaylist({
   tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" },
-    { title: "Reiki Time Hub", url: "./assets/audio/reiki_time_hub.mp3" },
-    { title: "SVR After Dark", url: "./assets/audio/svr_after_dark.mp3" }
+    { title: "Lobby 07", url: "./assets/audio/07.mp3" }
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
@@ -182,7 +167,6 @@ function movePlayerToSpot(target, lookTarget = null){
 }
 
 function gotoScene(key){
-  if (PRIVATE_SCENE_ROUTES[key]){ window.location.href = PRIVATE_SCENE_ROUTES[key]; return true; }
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
@@ -190,17 +174,30 @@ function gotoScene(key){
   return true;
 }
 
+function openPrivatePage(url){
+  if (!url) return false;
+  window.location.href = url;
+  return true;
+}
+
+function pokerAction(name){
+  const actions = scene.userData?._pokerActions;
+  const fn = actions?.[name];
+  if (typeof fn === 'function') {
+    fn();
+    setStatus(`Poker: ${name}`, { force: true });
+    return true;
+  }
+  setStatus('Poker controls loading…', { force: true });
+  return false;
+}
+
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
+    const url = btn.dataset.url;
     const key = btn.dataset.scene;
-    if (key) gotoScene(key);
-  });
-});
-
-$pokerActions.forEach((btn)=>{
-  btn.addEventListener("click", ()=>{
-    const action = btn.dataset.pokerAction;
-    if (action) window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action } }));
+    if (url) openPrivatePage(url);
+    else if (key) gotoScene(key);
   });
 });
 
@@ -211,27 +208,20 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
+  if (e.code === "KeyF") pokerAction("fold");
+  if (e.code === "KeyC") pokerAction("call");
+  if (e.code === "KeyR") pokerAction("raise");
+  if (e.code === "KeyA") pokerAction("allIn");
+  if (e.code === "KeyH") pokerAction("nextHand");
   if (e.code === "Digit1") gotoScene("lobby");
-  if (e.code === "Digit2") gotoScene("table");
-  if (e.code === "Digit3") gotoScene("seat");
-  if (e.code === "Digit4") gotoScene("reiki");
+  if (e.code === "Digit2") gotoScene("seat");
+  if (e.code === "Digit3") gotoScene("reiki");
+  if (e.code === "Digit4") openPrivatePage("./reiki.html");
   if (e.code === "Digit5") gotoScene("pga");
-  if (e.code === "Digit6") gotoScene("legends");
-  if (e.code === "Digit7") gotoScene("sponsor");
-  if (e.code === "Digit8") gotoScene("scorpion");
-  if (e.code === "Digit9") gotoScene("reikiRoom");
-  if (e.code === "Digit0") gotoScene("pgaDrive");
-  if (e.code === "KeyF") window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "fold" } }));
-  if (e.code === "KeyC") window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "call" } }));
-  if (e.code === "KeyR") window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "raise" } }));
-  if (e.code === "KeyA") window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "allin" } }));
-  if (e.code === "KeyH") window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "next" } }));
-  if (e.code === "Digit0") gotoScene("pgaDrive");
-  if (e.code === "KeyF") window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "fold" } }));
-  if (e.code === "KeyC") window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "call" } }));
-  if (e.code === "KeyR") window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "raise" } }));
-  if (e.code === "KeyA") window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "allin" } }));
-  if (e.code === "KeyH") window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "next" } }));
+  if (e.code === "Digit6") openPrivatePage("./pga-drive.html");
+  if (e.code === "Digit7") openPrivatePage("./chip-putt.html");
+  if (e.code === "Digit8") openPrivatePage("./store-room.html");
+  if (e.code === "Digit9") openPrivatePage("./scorpion.html");
 });
 
 const watch = createWristWatch({
@@ -261,15 +251,17 @@ const watch = createWristWatch({
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom"),
-    pokerFold: ()=>window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "fold" } })),
-    pokerCall: ()=>window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "call" } })),
-    pokerRaise: ()=>window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "raise" } })),
-    pokerAllIn: ()=>window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "allin" } })),
-    pokerFold: ()=>window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "fold" } })),
-    pokerCall: ()=>window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "call" } })),
-    pokerRaise: ()=>window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "raise" } })),
-    pokerAllIn: ()=>window.dispatchEvent(new CustomEvent("svr_poker_action", { detail: { action: "allin" } }))
+    goReikiRoom: ()=>openPrivatePage("./reiki.html"),
+    goPgaDrive: ()=>openPrivatePage("./pga-drive.html"),
+    goPgaShort: ()=>openPrivatePage("./chip-putt.html"),
+    goStoreRoom: ()=>openPrivatePage("./store-room.html"),
+    goSmoker: ()=>openPrivatePage("./smoker-lounge.html"),
+    goScorpion: ()=>openPrivatePage("./scorpion.html"),
+    pokerFold: ()=>pokerAction("fold"),
+    pokerCall: ()=>pokerAction("call"),
+    pokerRaise: ()=>pokerAction("raise"),
+    pokerAllIn: ()=>pokerAction("allIn"),
+    pokerNextHand: ()=>pokerAction("nextHand")
   }
 });
 
@@ -282,7 +274,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Ready. Poker controls: Fold/Check/Call/Raise/All-In. Private scenes route from storefront buttons. Public page untouched.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold grip/A/trigger to aim teleport, release to teleport. Poker keys: F/C/R/A/H. Private scene buttons enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

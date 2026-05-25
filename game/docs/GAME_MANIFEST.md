@@ -112,8 +112,8 @@ Source package used for this phase:
 
 
 ## Phase 35 audit / restore
-- Restored the SVR Wellness founder image and logo assets into the Reiki hub.
-- Rewrote the Reiki three-column storefront copy to read more professional and founder-led.
+- Restored the SVR Wellness partner image and logo assets into the Reiki hub.
+- Rewrote the Reiki three-column storefront copy to read more professional and partner-led.
 - Moved the PGA hub to the south-west wall.
 - Raised Moon and Mars higher behind the city skyline and increased their glow.
 - Added 07.mp3 as the first lobby music track.
@@ -131,4 +131,4 @@ Source package used for this phase:
 - donor modular split preserved
 
 ## Phase 42 modular overlay
-- SVR Wellness building ad refreshed to `SVR WELLNESS.COM / L.A.` in neon green presentation styling.
+- SVR Wellness building ad refreshed to `SVR WELLNESS / L.A.` in neon green presentation styling.

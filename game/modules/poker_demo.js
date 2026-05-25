@@ -6,7 +6,6 @@ const SUIT_SYMBOL = { S: "♠", H: "♥", D: "♦", C: "♣" };
 const SUIT_COLOR = { S: "#101218", C: "#101218", H: "#c71f44", D: "#c71f44" };
 const RANK_LABEL = { 14: "A", 13: "K", 12: "Q", 11: "J", 10: "10", 9: "9", 8: "8", 7: "7", 6: "6", 5: "5", 4: "4", 3: "3", 2: "2" };
 const BOT_NAMES = ["BOT NOVA", "BOT VEGA", "BOT ORBIT", "YOU", "BOT ACE", "BOT LUX"];
-const USER_INDEX = 3;
 const CHIP_PALETTES = [
   [0x7d4dff,0x2bd4ff,0xf2d269],
   [0xff6fb1,0x2bd4ff,0xf2d269],
@@ -73,54 +72,6 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   let queue = [];
   let stepIndex = 0;
   let current = null;
-  let waitingForUser = null;
-
-  function setGlobalPokerState(extra = {}){
-    window.SVR_POKER_STATE = Object.assign({
-      build: "PHASE-174-POKER-ACTION-LOCK",
-      waiting: !!waitingForUser,
-      handNumber,
-      stage: current?.stage || "boot",
-      pot: current?.pot || 0,
-      userFolded: !!current?.userFolded
-    }, extra);
-  }
-
-  function waitForUserAction(stage, callAmount = 0){
-    if (current?.userFolded) return;
-    current.stage = stage;
-    current.actorIndex = USER_INDEX;
-    waitingForUser = { stage, callAmount };
-    applyActionHighlight(USER_INDEX);
-    const label = callAmount > 0 ? `Call $${callAmount}, raise, all-in, or fold` : "Check, bet/raise, all-in, or fold";
-    paintStatus(`YOUR TURN • ${stage.toUpperCase()}`, `${label} • pot $${current.pot}`, "rgba(126,240,208,0.98)");
-    statusCb(`YOUR TURN • ${stage} • F fold • C call/check • R raise • A all-in`);
-    setGlobalPokerState({ userDecision: label });
-  }
-
-  function resolveUserAction(action){
-    if (action === "next") { waitingForUser = null; planHand(); return; }
-    if (!waitingForUser || !current) return;
-    const act = String(action || "").toLowerCase();
-    let amount = 0;
-    let label = "checks";
-    if (act === "fold") { current.userFolded = true; label = "folds"; }
-    else if (act === "raise") { amount = Math.max(80, waitingForUser.callAmount + 80); label = `raises $${amount}`; }
-    else if (act === "allin" || act === "all-in") { amount = 500; label = `goes all-in $${amount}`; }
-    else if (act === "call") { amount = waitingForUser.callAmount; label = amount > 0 ? `calls $${amount}` : "checks"; }
-    else if (act === "check") { amount = 0; label = waitingForUser.callAmount > 0 ? "calls" : "checks"; if (waitingForUser.callAmount > 0) amount = waitingForUser.callAmount; }
-    current.pot += amount;
-    current.userContribution = (current.userContribution || 0) + amount;
-    refreshPotStack();
-    paintStatus(`YOU ${label}`, `${waitingForUser.stage} • pot $${current.pot}`, act === "fold" ? "rgba(255,120,120,0.98)" : "rgba(244,210,105,0.98)");
-    statusCb(`YOU ${label} • pot $${current.pot}`);
-    log("Player action", { hand: handNumber, action: act, amount, stage: waitingForUser.stage, pot: current.pot });
-    waitingForUser = null;
-    setGlobalPokerState({ lastUserAction: act });
-  }
-
-  window.addEventListener("svr_poker_action", (event)=> resolveUserAction(event.detail?.action));
-  window.SVR_POKER_ACTION = resolveUserAction;
 
   function makeDynamicPanel(width, height, worldW, worldH) {
     const { canvas, ctx, texture } = makeCanvasLabel({
@@ -443,7 +394,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     const flopAggressor = runnerUp.player.anchor.index;
     const turnAggressor = winner.player.anchor.index;
     const riverAggressor = winner.player.anchor.index;
-    current = { handPlayers, board, winner, results, handNumber, dealerIndex, sbIndex, bbIndex, actorIndex: null, pot: 0, stage: "shuffle", userFolded: false, userContribution: 0 };
+    current = { handPlayers, board, winner, results, handNumber, dealerIndex, sbIndex, bbIndex, actorIndex: null, pot: 0, stage: "shuffle" };
     refreshPotStack();
     queue = [];
     let t = nowS + 0.85;
@@ -472,9 +423,6 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       }
     }
 
-    t += 0.70;
-    schedule(t, () => waitForUserAction("preflop", 20));
-
     t += 0.95;
     schedule(t, () => {
       const actor = preflopAggressor;
@@ -493,8 +441,6 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       current.pot += 90; refreshPotStack(); applyActionHighlight(flopAggressor);
       paintStatus(`Flop • ${formatCards(board.slice(0, 3))}`, `pot $${current.pot}`);
     });
-    t += 0.55;
-    schedule(t, () => waitForUserAction("flop", 0));
     t += 1.2;
     schedule(t, () => {
       const actor = flopAggressor;
@@ -513,8 +459,6 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       current.pot += 60; refreshPotStack(); applyActionHighlight(turnAggressor);
       paintStatus(`Turn • ${formatCards(board.slice(0, 4))}`, `pot $${current.pot}`);
     });
-    t += 0.55;
-    schedule(t, () => waitForUserAction("turn", 0));
     t += 1.2;
     schedule(t, () => {
       const actor = turnAggressor;
@@ -533,8 +477,6 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       current.pot += 60; refreshPotStack(); applyActionHighlight(riverAggressor);
       paintStatus(`River • ${formatCards(board)}`, `pot $${current.pot}`);
     });
-    t += 0.55;
-    schedule(t, () => waitForUserAction("river", 0));
     t += 1.2;
     schedule(t, () => {
       const actor = riverAggressor;
@@ -547,16 +489,14 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     t += 1.55;
     schedule(t, () => {
       current.stage = "showdown";
-      const finalWinner = current.userFolded ? (current.results.find((r)=>r.player.anchor.index !== USER_INDEX) || winner) : winner;
-      current.actorIndex = finalWinner.player.anchor.index;
-      applyWinnerHighlight(finalWinner.player.anchor.index);
+      current.actorIndex = winner.player.anchor.index;
+      applyWinnerHighlight(winner.player.anchor.index);
       refreshPotStack();
-      const winnerCards = formatCards(finalWinner.player.cards);
+      const winnerCards = formatCards(winner.player.cards);
       const boardText = formatCards(board);
-      paintStatus(`${finalWinner.player.anchor.name} wins • ${finalWinner.result.name}`, `Pot $${current.pot} • Hole ${winnerCards} • Board ${boardText}`, "rgba(244,210,105,0.98)");
-      statusCb(`HAND ${handNumber} • ${finalWinner.player.anchor.name} wins • ${finalWinner.result.name} • pot $${current.pot}`);
-      window.dispatchEvent(new CustomEvent("svr_hand_complete", { detail: { hand: handNumber, winner: finalWinner.player.anchor.name, handName: finalWinner.result.name, board: boardText, pot: current.pot } }));
-      log("Poker showdown", { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: finalWinner.player.anchor.name, handName: finalWinner.result.name, board: boardText, pot: current.pot });
+      paintStatus(`${winner.player.anchor.name} wins • ${winner.result.name}`, `Pot $${current.pot} • Hole ${winnerCards} • Board ${boardText}`, "rgba(244,210,105,0.98)");
+      statusCb(`HAND ${handNumber} • ${winner.player.anchor.name} wins • ${winner.result.name} • pot $${current.pot}`);
+      log("Poker showdown", { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: winner.player.anchor.name, handName: winner.result.name, board: boardText, pot: current.pot });
     });
     t += 4.3;
     schedule(t, () => { planHand(); });
@@ -611,10 +551,27 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     statusPanel.mesh.rotation.set(0, ry, 0);
   }
 
+  function playerAction(action) {
+    const label = String(action || '').replace(/([A-Z])/g, ' $1').trim().toUpperCase();
+    if (action === 'nextHand') { planHand(); return true; }
+    if (!current) planHand();
+    const youIndex = 3;
+    current.actorIndex = youIndex;
+    current.stage = 'player-action';
+    applyActionHighlight(youIndex);
+    if (action === 'raise') current.pot += 100;
+    if (action === 'call') current.pot += 50;
+    if (action === 'allIn') current.pot += 500;
+    refreshPotStack();
+    const title = action === 'allIn' ? 'YOU ALL-IN' : `YOU ${label || 'ACT'}`;
+    paintStatus(title, `Player action registered • pot $${current.pot}`, action === 'fold' ? 'rgba(255,125,160,0.96)' : 'rgba(126,240,208,0.95)');
+    statusCb(`PLAYER ${label || 'ACTION'} • pot $${current.pot}`);
+    return true;
+  }
+
   function update(now) {
     nowS = now;
     if (!current) planHand();
-    if (waitingForUser) { setGlobalPokerState(); updateAnimations(); updateCardsHover(); updatePotStack(); updateSeatChips(); updateStatusFacing(); return; }
     while (queue[stepIndex] && nowS >= queue[stepIndex].at) {
       const ref = queue;
       queue[stepIndex].fn();
@@ -628,5 +585,5 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     updateStatusFacing();
   }
 
-  return { update, forceNextHand(){ planHand(); } };
+  return { update, forceNextHand(){ planHand(); }, playerAction, fold(){ return playerAction('fold'); }, call(){ return playerAction('call'); }, raise(){ return playerAction('raise'); }, allIn(){ return playerAction('allIn'); } };
 }

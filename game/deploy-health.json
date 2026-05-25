@@ -1,4 +1,5 @@
 {
+  "status": "ok",
   "build": "PHASE-175-CLEAN-RUNTIME-POKER-DB-LOCK",
   "date": "2026-05-25",
   "scope": "game runtime cleanup, playable poker controls, private scene routing, internal site/backend wiring only",
