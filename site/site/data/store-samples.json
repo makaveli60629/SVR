@@ -1,0 +1,20 @@
+{
+  "checkout_enabled": false,
+  "products": [
+    {
+      "sku": "svr-watch-skin-alpha",
+      "title": "SVR Watch Skin Alpha",
+      "status": "preview"
+    },
+    {
+      "sku": "svr-glove-neon",
+      "title": "SVR Neon Glove Preview",
+      "status": "preview"
+    },
+    {
+      "sku": "sponsor-billboard-test",
+      "title": "Sponsor Billboard Preview",
+      "status": "approval_required"
+    }
+  ]
+}

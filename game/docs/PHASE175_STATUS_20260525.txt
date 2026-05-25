@@ -1,3 +1,0 @@
-PHASE-175-MASTER-MANIFEST-MODULE-COMPLETE-LOCK
-Status note: 2026-05-25T00:08:00-05:00
-Gameplay package remains locked for Phase 175.

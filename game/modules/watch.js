@@ -148,8 +148,8 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 function buildButtons(state){
   const buttons = [
     { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'seatScene', label: 'SEAT', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'checkAction', label: 'CHECK', x: 284, y: 146, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'tableScene', label: 'TABLE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
@@ -157,11 +157,15 @@ function buildButtons(state){
 
     { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'callAction', label: 'CALL', x: 284, y: 250, w: 118, h: 42, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'reikiRoomScene', label: 'ZEN DEN', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
 
-    { id: 'foldAction', label: 'FOLD', x: 24, y: 360, w: 108, h: 58, font: 23, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'raiseAction', label: 'RAISE', x: 144, y: 360, w: 108, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'allinAction', label: 'ALL-IN', x: 264, y: 360, w: 108, h: 58, font: 21, pinchOnly: true, hold: 0.20, margin: 6 },
+    { id: 'pokerFold', label: 'FOLD', x: 24, y: 306, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pokerCall', label: 'CALL', x: 154, y: 306, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pokerRaise', label: 'RAISE', x: 284, y: 306, w: 118, h: 42, font: 21, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pokerAllIn', label: 'ALL-IN', x: 428, y: 120, w: 548, h: 48, font: 30, pinchOnly: true, hold: 0.18, margin: 8 },
+
+    { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
+    { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
     { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
   ];
   if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
@@ -179,8 +183,7 @@ let hoveredId = null;
 
   function draw(force = false){
     const state = getState();
-    const poker = state.poker || {};
-    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, ps: poker.stage, pw: poker.waitingForPlayer, pp: poker.pot, cb: poker.currentBet, ca: poker.callAmount, pa: (poker.legalActions || []).join(','), la: poker.actionLog?.slice?.(-1)?.[0] || '', wp: poker.winnerProof?.winner || '', wh: poker.winnerProof?.handName || '', sec: new Date().getSeconds() });
+    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, sec: new Date().getSeconds() });
     if (!force && sig === lastSig) return;
     lastSig = sig;
 
@@ -220,9 +223,8 @@ let hoveredId = null;
     ctx.fillStyle = 'rgba(233,233,255,0.78)';
     ctx.font = '25px system-ui, Arial';
     ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 430, 152);
-    const pokerLine = poker.waitingForPlayer ? `YOUR TURN • call $${poker.callAmount || 0} • pot $${poker.pot || 0}` : `Poker: ${poker.stage || 'loading'} • pot $${poker.pot || 0}`;
-    ctx.fillText(pokerLine, 430, 190);
-    ctx.fillText(`Stack: $${Number(poker.playerStack || state.cash || 0).toLocaleString()} • Target $${poker.currentBet || 0} • ${state.inTableZone ? 'Ready' : 'Walk closer'}`, 430, 228);
+    ctx.fillText(`Track: ${state.audioEnabled ? state.trackTitle : 'Paused'}`, 430, 190);
+    ctx.fillText(`Zone: ${state.inTableZone ? 'Ready' : 'Walk closer'}`, 430, 228);
     ctx.textAlign = 'right';
     ctx.fillStyle = state.seated ? '#7ff5c7' : state.inTableZone ? '#f6e27f' : 'rgba(233,233,255,0.72)';
     ctx.font = 'bold 28px system-ui, Arial';
@@ -231,14 +233,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    const lastAction = poker.actionLog?.length ? poker.actionLog[poker.actionLog.length - 1] : '';
-    const proof = poker.winnerProof;
-    const legalLine = poker.waitingForPlayer
-      ? `LEGAL: ${(poker.legalActions || []).join(' / ').toUpperCase()}`
-      : proof
-        ? `WINNER: ${proof.winner} • ${proof.handName} • Best ${proof.bestFive}`
-        : (lastAction ? `Last action: ${lastAction}` : 'Poker waits for your turn • TP hold/aim/release');
-    ctx.fillText(legalLine, 36, 332);
+    ctx.fillText('Poker: Fold / Call / Raise / All-In • Quick scenes • pinch with other hand', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -281,15 +276,14 @@ let hoveredId = null;
     if (id === 'seatScene') actions.goSeat?.();
     if (id === 'reikiScene') actions.goReiki?.();
     if (id === 'pgaScene') actions.goPga?.();
-    if (id === 'foldAction') actions.pokerFold?.();
-    if (id === 'checkAction') actions.pokerCheck?.();
-    if (id === 'callAction') actions.pokerCall?.();
-    if (id === 'raiseAction') actions.pokerRaise?.();
-    if (id === 'allinAction') actions.pokerAllIn?.();
     if (id === 'legendScene') actions.goLegend?.();
     if (id === 'sponsorScene') actions.goSponsor?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
     if (id === 'reikiRoomScene') actions.goReikiRoom?.();
+    if (id === 'pokerFold') actions.pokerFold?.();
+    if (id === 'pokerCall') actions.pokerCall?.();
+    if (id === 'pokerRaise') actions.pokerRaise?.();
+    if (id === 'pokerAllIn') actions.pokerAllIn?.();
   }
 
   function update(dt, leftHand, rightHand){

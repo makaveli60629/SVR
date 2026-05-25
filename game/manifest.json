@@ -1,8 +1,10 @@
 {
-  "name": "ScarlettVR Poker",
+  "name": "SVR Poker",
   "short_name": "SVR Poker",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050508",
-  "theme_color": "#050508"
+  "theme_color": "#050508",
+  "description": "SVR Poker WebXR enterprise modular build",
+  "version": "PHASE-174-ENTERPRISE-AUTO-FINISH-LOCK"
 }

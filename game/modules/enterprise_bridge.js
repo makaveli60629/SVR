@@ -1,68 +1,64 @@
-// SVR Poker Enterprise Manifest Bridge
-// Version: PHASE-175-MASTER-MANIFEST-MODULE-COMPLETE-LOCK
-// Purpose: expose the uploaded master manifest architecture without forcing backend calls at boot.
+import * as THREE from "three";
 
-const PHASE_175_MODULES = [
-  'mod_charity',
-  'mod_private',
-  'mod_sponsor',
-  'mod_commerce',
-  'mod_stream',
-  'mod_audio',
-  'mod_watch',
-  'mod_router',
-  'mod_scorpion_fx',
-  'mod_sportsbook',
-  'mod_avatar',
-  'mod_profile_sync',
-  'mod_network'
-];
+const DEFAULT_API = localStorage.getItem("SVR_API_BASE") || "";
 
-function ensureSvrRoot(){
-  const root = window.SVR || {};
-  root.version = 'PHASE-175-MASTER-MANIFEST-MODULE-COMPLETE-LOCK';
-  root.modules = root.modules || {};
-  root.manifest = root.manifest || {};
-  root.config = root.config || {};
-  root.config.backendEnabled = Boolean(root.config.backendEnabled);
-  root.config.multiplayerEnabled = Boolean(root.config.multiplayerEnabled);
-  root.config.sponsorInjectionEnabled = Boolean(root.config.sponsorInjectionEnabled);
-  root.manifest.scarlett1Modules = PHASE_175_MODULES.slice();
-  root.manifest.tableSeatsMax = 6;
-  root.manifest.postHandShowcaseMs = 10000;
-  root.manifest.controllerFallbackPreserved = true;
-  root.manifest.websiteTrackLocked = true;
-  window.SVR = root;
-  return root;
-}
-
-function installEventAuditBridge(){
-  const audit = [];
-  const remember = (type, detail = {}) => {
-    audit.push({ type, detail, at: new Date().toISOString() });
-    while (audit.length > 50) audit.shift();
+export function initEnterpriseBridge({ scene, sceneTargets = {}, log = console.log } = {}){
+  const state = {
+    apiBase: DEFAULT_API,
+    online: false,
+    modules: ["charity", "private", "sponsor", "commerce", "analytics", "avatar", "table-router", "store-portal"],
+    build: window.SVR_BUILD_LABEL || "PHASE-174-ENTERPRISE-AUTO-FINISH-LOCK"
   };
-  window.SVR.getEnterpriseAudit = () => audit.slice();
-  window.addEventListener('svr_show_banner', e => remember('svr_show_banner', e.detail));
-  window.addEventListener('svr_request_seat', e => remember('svr_request_seat', e.detail));
-  window.addEventListener('svr_inject_sponsor_materials', e => remember('svr_inject_sponsor_materials', { keys: Object.keys(e.detail?.textures || {}) }));
-  window.addEventListener('svr_network_player_update', e => remember('svr_network_player_update', { userId: e.detail?.userId }));
+  window.SVR_ENTERPRISE = state;
+
+  async function api(path, options = {}){
+    if (!state.apiBase) return null;
+    try{
+      const res = await fetch(`${state.apiBase}${path}`, { credentials: "omit", ...options });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      return await res.json();
+    }catch(err){
+      log("Enterprise API offline/fallback", path, err.message || err);
+      return null;
+    }
+  }
+
+  async function refreshStatus(){
+    const health = await api("/api/health");
+    state.online = !!health && health.status === "ok";
+    window.dispatchEvent(new CustomEvent("svr_backend_status", { detail: { online: state.online, health } }));
+  }
+
+  function createStorePortal(){
+    if (!scene || scene.getObjectByName("SVR_STORE_WEB_PORTAL")) return;
+    const c = document.createElement("canvas"); c.width = 1024; c.height = 512;
+    const x = c.getContext("2d");
+    const g = x.createLinearGradient(0,0,c.width,c.height); g.addColorStop(0,"#090913"); g.addColorStop(1,"#25104a");
+    x.fillStyle = g; x.fillRect(0,0,c.width,c.height);
+    x.strokeStyle = "rgba(180,140,255,.95)"; x.lineWidth = 16; x.strokeRect(28,28,c.width-56,c.height-56);
+    x.textAlign = "center"; x.textBaseline = "middle";
+    x.fillStyle = "#fff"; x.font = "bold 82px system-ui, Arial"; x.fillText("SVR STORE PORTAL", c.width/2, 150);
+    x.fillStyle = "#c7fff1"; x.font = "bold 38px system-ui, Arial"; x.fillText("svrpoker.com/site/store.html", c.width/2, 245);
+    x.fillStyle = "#ffd77a"; x.font = "30px system-ui, Arial"; x.fillText("Use desktop/mobile fallback for live checkout until API lock is approved", c.width/2, 328);
+    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+    const portal = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 2.4), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide }));
+    portal.name = "SVR_STORE_WEB_PORTAL";
+    portal.position.set(4.8, 2.2, -4.2);
+    portal.rotation.y = -0.52;
+    portal.userData.url = "https://svrpoker.com/site/store.html";
+    scene.add(portal);
+  }
+
+  window.addEventListener("svr_inject_sponsor_materials", (event)=>{
+    state.lastSponsorTexturePacket = event.detail || {};
+  });
+  window.addEventListener("svr_hand_complete", (event)=>{
+    api("/api/game/hand-results", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(event.detail) });
+  });
+  window.addEventListener("svr_store_portal_open", ()=>{ window.open("https://svrpoker.com/site/store.html", "_blank", "noopener"); });
+
+  createStorePortal();
+  refreshStatus();
+  setInterval(refreshStatus, 60000);
+  return state;
 }
-
-function announceReady(){
-  const detail = {
-    phase: 'PHASE-175-MASTER-MANIFEST-MODULE-COMPLETE-LOCK',
-    modules: PHASE_175_MODULES,
-    safeMode: true,
-    backendEnabled: Boolean(window.SVR?.config?.backendEnabled),
-    multiplayerEnabled: Boolean(window.SVR?.config?.multiplayerEnabled)
-  };
-  window.dispatchEvent(new CustomEvent('svr_enterprise_manifest_ready', { detail }));
-  console.info('[SVR] Enterprise manifest bridge ready', detail);
-}
-
-ensureSvrRoot();
-installEventAuditBridge();
-announceReady();
-
-export { PHASE_175_MODULES };

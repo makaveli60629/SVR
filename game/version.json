@@ -1,9 +1,8 @@
 {
-  "build": "PHASE-175-MASTER-MANIFEST-MODULE-COMPLETE-LOCK",
-  "phase": 175,
-  "updatedAt": "2026-05-24T00:00:00-05:00",
-  "track": "game-only",
-  "siteTouched": false,
-  "deployMode": "direct-game-folder-plus-update-game-zip-archive",
-  "notes": "Master manifest module catalog completed in safe dormant mode."
+  "build": "PHASE-174-ENTERPRISE-AUTO-FINISH-LOCK",
+  "phase": 174,
+  "date": "2026-05-25",
+  "public_page_touched": false,
+  "site_track": "site internal only",
+  "game_package_under_25mb_target": true
 }

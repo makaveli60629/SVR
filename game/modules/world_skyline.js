@@ -8,7 +8,6 @@ import { assetUrls, loadFirstTexture } from "./asset_base.js";
 import { createPokerDemo } from "./poker_demo.js";
 import { addPgaHub, tickPgaHub } from "./hubs/pga_hub.js";
 
-// PHASE-173.2 DIRECT BOOT FIX: createMatrixBillboardTexture is local and hoisted before skyline build.
 function delay(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
 async function withTimeout(promise, ms){
   return await Promise.race([
@@ -161,185 +160,6 @@ function fillWrappedText(ctx, text, x, y, maxWidth, lineHeight){
   if (line) ctx.fillText(line, x, yy);
   return yy;
 }
-
-
-// Phase 173.1 boot hotfix helpers: these texture/sprite builders are intentionally
-// local to world_skyline.js so the skyline can boot without relying on optional globals.
-function createPlaqueTexture(title = "SVR", subtitle = ""){
-  return canvasTexture(1024, 512, (ctx,w,h)=>{
-    const g = ctx.createLinearGradient(0,0,w,h);
-    g.addColorStop(0,"#080612");
-    g.addColorStop(0.58,"#17091f");
-    g.addColorStop(1,"#05070e");
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle = "rgba(210,125,255,0.92)";
-    ctx.lineWidth = 18;
-    ctx.strokeRect(28,28,w-56,h-56);
-    ctx.strokeStyle = "rgba(120,220,255,0.28)";
-    ctx.lineWidth = 6;
-    ctx.strokeRect(54,54,w-108,h-108);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#fff7ff";
-    ctx.font = "800 72px Arial, Helvetica, sans-serif";
-    ctx.fillText(String(title || "SVR").toUpperCase(), w/2, h*0.43);
-    ctx.fillStyle = "#dcb7ff";
-    ctx.font = "700 38px Arial, Helvetica, sans-serif";
-    ctx.fillText(String(subtitle || "").toUpperCase(), w/2, h*0.62);
-  });
-}
-
-function createSponsorPlateTexture(title = "SPONSOR SLOT", subtitle = "AWAITING APPROVAL"){
-  return canvasTexture(1024, 512, (ctx,w,h)=>{
-    ctx.fillStyle = "#07070d";
-    ctx.fillRect(0,0,w,h);
-    const g = ctx.createRadialGradient(w/2,h/2,40,w/2,h/2,w*0.62);
-    g.addColorStop(0,"rgba(255,255,255,0.18)");
-    g.addColorStop(0.45,"rgba(185,90,255,0.20)");
-    g.addColorStop(1,"rgba(0,0,0,0)");
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle = "rgba(255,60,60,0.95)";
-    ctx.lineWidth = 20;
-    ctx.strokeRect(32,32,w-64,h-64);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "900 70px Arial, Helvetica, sans-serif";
-    ctx.fillText(String(title || "SPONSOR SLOT").toUpperCase(), w/2, h*0.43);
-    ctx.fillStyle = "#ffb4b4";
-    ctx.font = "800 42px Arial, Helvetica, sans-serif";
-    ctx.fillText(String(subtitle || "AWAITING APPROVAL").toUpperCase(), w/2, h*0.62);
-  });
-}
-
-function createStoreDisplayTexture(){
-  return canvasTexture(1400, 900, (ctx,w,h)=>{
-    const g = ctx.createLinearGradient(0,0,w,h);
-    g.addColorStop(0,"#05070d");
-    g.addColorStop(0.48,"#13061f");
-    g.addColorStop(1,"#05070d");
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle = "rgba(185,90,255,0.96)";
-    ctx.lineWidth = 24;
-    ctx.strokeRect(36,36,w-72,h-72);
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "900 94px Arial, Helvetica, sans-serif";
-    ctx.fillText("SVR STORE", w/2, 190);
-    ctx.fillStyle = "#dcb7ff";
-    ctx.font = "700 46px Arial, Helvetica, sans-serif";
-    ctx.fillText("VR-FRIENDLY WEB PORTAL", w/2, 280);
-    ctx.fillStyle = "#9fe8ff";
-    ctx.font = "700 40px Arial, Helvetica, sans-serif";
-    ["Watches", "Gloves", "Avatar Gear", "Sponsor Items"].forEach((line,i)=>{
-      ctx.fillText(line, w/2, 420 + i*82);
-    });
-    ctx.fillStyle = "#fff2ff";
-    ctx.font = "800 34px Arial, Helvetica, sans-serif";
-    ctx.fillText("svrpoker.com/site/store.html", w/2, h-110);
-  });
-}
-
-function createAdBillboardTexture(lines = ["SVRPOKER.COM", "ALL IN"]){
-  const safeLines = Array.isArray(lines) && lines.length ? lines : [String(lines || "SVRPOKER.COM")];
-  return canvasTexture(1400, 620, (ctx,w,h)=>{
-    ctx.fillStyle = "#06070c";
-    ctx.fillRect(0,0,w,h);
-    const g = ctx.createLinearGradient(0,0,w,0);
-    g.addColorStop(0,"rgba(185,90,255,0.18)");
-    g.addColorStop(0.5,"rgba(120,220,255,0.24)");
-    g.addColorStop(1,"rgba(185,90,255,0.18)");
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle = "rgba(255,255,255,0.80)";
-    ctx.lineWidth = 14;
-    ctx.strokeRect(28,28,w-56,h-56);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    safeLines.slice(0,4).forEach((line,i)=>{
-      ctx.fillStyle = i === 0 ? "#ffffff" : "#dcb7ff";
-      ctx.font = i === 0 ? "900 86px Arial, Helvetica, sans-serif" : "800 58px Arial, Helvetica, sans-serif";
-      ctx.fillText(String(line).toUpperCase(), w/2, 190 + i*96);
-    });
-  });
-}
-
-function createMatrixBillboardTexture(kind = "outer"){
-  const width = 1024;
-  const height = kind === "main" ? 1024 : 512;
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d");
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.anisotropy = 8;
-  let frame = 0;
-  const columns = 46;
-  const drops = Array.from({ length: columns }, (_,i)=> (i * 17) % height);
-  function paint(){
-    frame++;
-    ctx.fillStyle = "rgba(2,3,8,0.98)";
-    ctx.fillRect(0,0,width,height);
-    ctx.fillStyle = "rgba(185,90,255,0.22)";
-    ctx.fillRect(0,0,width,height);
-    ctx.font = "700 24px monospace";
-    ctx.textAlign = "center";
-    for (let i=0;i<columns;i++){
-      const x = (i + 0.5) * (width / columns);
-      for (let j=0;j<12;j++){
-        const y = (drops[i] + j*34) % height;
-        const alpha = Math.max(0.08, 0.88 - j*0.07);
-        ctx.fillStyle = `rgba(218,180,255,${alpha})`;
-        ctx.fillText(Math.random() > 0.5 ? "1" : "0", x, y);
-      }
-      drops[i] = (drops[i] + 4 + (i % 3)) % height;
-    }
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "rgba(255,255,255,0.96)";
-    ctx.font = kind === "main" ? "900 92px Arial, Helvetica, sans-serif" : "900 60px Arial, Helvetica, sans-serif";
-    ctx.fillText(kind === "main" ? "SVR POKER" : "SVR", width/2, height*0.42);
-    ctx.fillStyle = "rgba(230,194,255,0.92)";
-    ctx.font = kind === "main" ? "800 42px Arial, Helvetica, sans-serif" : "800 34px Arial, Helvetica, sans-serif";
-    ctx.fillText(kind === "main" ? "PLAY MONEY • SOCIAL VR • COMMUNITY" : "ALL IN", width/2, height*0.56);
-    texture.needsUpdate = true;
-  }
-  paint();
-  return {
-    texture,
-    update(){
-      if (frame % 2 === 0) paint();
-      else frame++;
-    }
-  };
-}
-
-function createOrbHaloSprite(color = 0xffffff, extraOpacity = 0){
-  const tex = canvasTexture(256, 256, (ctx,w,h)=>{
-    const g = ctx.createRadialGradient(w/2,h/2,4,w/2,h/2,w/2);
-    g.addColorStop(0,"rgba(255,255,255,0.88)");
-    g.addColorStop(0.22,"rgba(255,255,255,0.32)");
-    g.addColorStop(1,"rgba(255,255,255,0)");
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,w,h);
-  });
-  const mat = new THREE.SpriteMaterial({
-    map: tex,
-    color,
-    transparent: true,
-    opacity: Math.min(0.85, 0.36 + Math.max(0, extraOpacity || 0)),
-    depthWrite: false,
-    depthTest: true,
-    blending: THREE.AdditiveBlending
-  });
-  return new THREE.Sprite(mat);
-}
-
 function makeSpriteTexture(){
   return canvasTexture(128, 128, (x,w,h)=>{
     const g = x.createRadialGradient(w/2,h/2,3,w/2,h/2,58);
@@ -726,188 +546,664 @@ function buildLobbySprites(scene, R, wallHeight){
 }
 
 
-async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log){
+async function addReikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log){
   const angle = 0;
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
   const right = new THREE.Vector3(Math.sin(angle), 0, -Math.cos(angle));
   const center = new THREE.Vector3(Math.cos(angle) * (R - 4.05), 0.01, Math.sin(angle) * (R - 4.05));
+  const logoTex = loadUiTexture('./assets/ui/logo.png');
+  const founderTex = loadUiTexture('./assets/ui/logo.png');
 
-  const group = new THREE.Group();
-  group.position.copy(center);
-  group.lookAt(group.position.clone().add(inward));
-  scene.add(group);
+  const floorPad = new THREE.Mesh(
+    new THREE.PlaneGeometry(14.2, 7.0),
+    new THREE.MeshStandardMaterial({ color: 0x0a0f12, roughness: 0.95, metalness: 0.04, emissive: 0x12242b, emissiveIntensity: 0.10, side: THREE.DoubleSide })
+  );
+  floorPad.rotation.x = -Math.PI * 0.5;
+  floorPad.position.copy(center).add(new THREE.Vector3(0, 0.002, 0));
+  scene.add(floorPad);
 
-  const floorMat = new THREE.MeshStandardMaterial({ color: 0x101018, roughness: 0.92, metalness: 0.04, emissive: 0x1e0a14, emissiveIntensity: 0.18, side: THREE.DoubleSide });
-  const glassMat = new THREE.MeshStandardMaterial({ color: 0x97fff2, transparent: true, opacity: 0.10, roughness: 0.05, metalness: 0.18, emissive: 0x1a7066, emissiveIntensity: 0.24, side: THREE.DoubleSide });
-  const trimMat = new THREE.MeshStandardMaterial({ color: 0xff3b54, roughness: 0.24, metalness: 0.44, emissive: 0x9b0b20, emissiveIntensity: 0.75 });
-  const darkMat = new THREE.MeshStandardMaterial({ color: 0x080a0f, roughness: 0.78, metalness: 0.12, emissive: 0x090612, emissiveIntensity: 0.18 });
+  const carpet = new THREE.Mesh(
+    new THREE.PlaneGeometry(7.2, 5.4),
+    new THREE.MeshStandardMaterial({ color: 0x8d1024, roughness: 0.96, metalness: 0.02, emissive: 0x35050d, emissiveIntensity: 0.24, side: THREE.DoubleSide })
+  );
+  carpet.rotation.x = -Math.PI * 0.5;
+  carpet.position.copy(center).addScaledVector(inward, -0.22).add(new THREE.Vector3(0, 0.004, 0));
+  scene.add(carpet);
 
-  const pad = new THREE.Mesh(new THREE.PlaneGeometry(13.2, 6.6), floorMat);
-  pad.rotation.x = -Math.PI * 0.5;
-  pad.position.set(0, 0.005, -0.38);
-  group.add(pad);
+  const root = new THREE.Group();
+  root.position.copy(center);
+  root.lookAt(root.position.clone().add(inward));
+  scene.add(root);
 
-  const rearWall = new THREE.Mesh(new THREE.BoxGeometry(12.6, 5.8, 0.18), darkMat);
-  rearWall.position.set(0, 2.9, -2.18);
-  group.add(rearWall);
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x11161a, roughness: 0.28, metalness: 0.30, emissive: 0x14323a, emissiveIntensity: 0.22 });
+  const trimMat = new THREE.MeshStandardMaterial({ color: 0x85fff0, roughness: 0.18, metalness: 0.56, emissive: 0x1ba98f, emissiveIntensity: 0.85 });
+  const glassMat = new THREE.MeshStandardMaterial({ color: 0x97fff2, transparent: true, opacity: 0.10, roughness: 0.04, metalness: 0.22, emissive: 0x1a7066, emissiveIntensity: 0.30, side: THREE.DoubleSide });
 
-  const header = new THREE.Mesh(new THREE.BoxGeometry(12.8, 0.20, 0.24), trimMat);
-  header.position.set(0, 5.42, 0.58);
-  group.add(header);
-  const leftPost = new THREE.Mesh(new THREE.BoxGeometry(0.18, 5.1, 0.24), trimMat);
-  leftPost.position.set(-6.34, 2.55, 0.58);
-  group.add(leftPost);
-  const rightPost = leftPost.clone();
-  rightPost.position.x = 6.34;
-  group.add(rightPost);
+  const rearWall = new THREE.Mesh(
+    new THREE.BoxGeometry(13.2, 6.05, 0.18),
+    new THREE.MeshStandardMaterial({ color: 0x090f12, roughness: 0.72, metalness: 0.16, emissive: 0x07161b, emissiveIntensity: 0.18 })
+  );
+  rearWall.position.set(0, 2.98, -2.24);
+  root.add(rearWall);
 
-  const glassL = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 3.72), glassMat);
-  glassL.position.set(-4.12, 2.38, 0.64);
-  group.add(glassL);
-  const glassR = glassL.clone();
-  glassR.position.x = 4.12;
-  group.add(glassR);
+  const leftColumn = new THREE.Mesh(new THREE.BoxGeometry(0.16, 5.8, 0.22), trimMat);
+  leftColumn.position.set(-6.52, 2.9, 0.74);
+  root.add(leftColumn);
+  const rightColumn = leftColumn.clone();
+  rightColumn.position.x = 6.52;
+  root.add(rightColumn);
+  const frontHeader = new THREE.Mesh(new THREE.BoxGeometry(13.2, 0.16, 0.22), trimMat);
+  frontHeader.position.set(0, 5.76, 0.74);
+  root.add(frontHeader);
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(13.0, 0.12, 4.8), frameMat);
+  roof.position.set(0, 5.92, -0.42);
+  root.add(roof);
 
-  const signTex = canvasTexture(1400, 300, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#11040a'); g.addColorStop(1, '#0b1018');
+  const sideFrameL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 4.9, 4.5), frameMat);
+  sideFrameL.position.set(-6.48, 2.38, -0.48);
+  root.add(sideFrameL);
+  const sideFrameR = sideFrameL.clone();
+  sideFrameR.position.x = 6.48;
+  root.add(sideFrameR);
+
+  const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.95), glassMat);
+  frontGlassL.position.set(-4.82, 2.26, 0.66);
+  root.add(frontGlassL);
+  const frontGlassR = frontGlassL.clone();
+  frontGlassR.position.x = 4.82;
+  root.add(frontGlassR);
+  const sideGlassL = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 4.05), glassMat);
+  sideGlassL.position.set(-6.40, 2.25, -0.48);
+  sideGlassL.rotation.y = Math.PI * 0.5;
+  root.add(sideGlassL);
+  const sideGlassR = sideGlassL.clone();
+  sideGlassR.position.x = 6.40;
+  sideGlassR.rotation.y = -Math.PI * 0.5;
+  root.add(sideGlassR);
+
+  const signBackA = new THREE.Mesh(new THREE.PlaneGeometry(7.8, 0.96), new THREE.MeshBasicMaterial({ color: 0x05090c, side: THREE.DoubleSide }));
+  signBackA.position.set(0, 5.12, 0.68);
+  root.add(signBackA);
+  const signTexA = canvasTexture(1400, 220, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#08191b'); g.addColorStop(1, '#0d0e11');
     x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(255,70,92,0.95)'; x.lineWidth = 12; x.strokeRect(18,18,w-36,h-36);
+    x.strokeStyle = 'rgba(166,255,238,0.95)'; x.lineWidth = 10; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#ffffff'; x.font = 'bold 94px system-ui, Arial'; x.fillText('REIKI HUB', w/2, 106);
-    x.fillStyle = '#ffb7c3'; x.font = 'bold 42px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 206);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 90px system-ui, Arial'; x.fillText('REIKI HUB', w/2, 110);
   });
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(7.4, 1.15), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  sign.position.set(0, 4.72, 0.70);
-  group.add(sign);
+  const signA = new THREE.Mesh(new THREE.PlaneGeometry(7.62, 0.88), new THREE.MeshBasicMaterial({ map: signTexA, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+  signA.position.copy(signBackA.position).add(new THREE.Vector3(0,0,0.02));
+  root.add(signA);
 
-  const infoTex = canvasTexture(1100, 950, (x,w,h)=>{
-    x.fillStyle = '#080a10'; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(255,70,92,0.95)'; x.lineWidth = 12; x.strokeRect(22,22,w-44,h-44);
-    x.textAlign = 'center';
-    x.fillStyle = '#ffffff'; x.font = 'bold 58px system-ui, Arial'; x.fillText('SVR WELLNESS PORTAL', w/2, 112);
-    x.fillStyle = '#ffb7c3'; x.font = 'bold 42px system-ui, Arial'; x.fillText('SPONSOR DETAILS PENDING', w/2, 192);
-    x.fillStyle = '#f0efff'; x.font = '34px system-ui, Arial';
-    const lines = ['No external Reiki branding is active.', 'No founder photos or outside websites are shown.', 'This storefront remains modular and approval-safe.', 'Use this portal for the future private meditation scene.'];
-    let y = 306;
-    lines.forEach(line => { x.fillText(line, w/2, y); y += 74; });
-    x.fillStyle = '#ff4d68'; x.font = 'bold 52px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 780);
+  const signBackB = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 0.76), new THREE.MeshBasicMaterial({ color: 0x05090c, side: THREE.DoubleSide }));
+  signBackB.position.set(0, 4.28, 0.69);
+  root.add(signBackB);
+  const signTexB = canvasTexture(1200, 200, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#0b0d10'); g.addColorStop(1, '#0b1d19');
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#dffff7'; x.font = 'bold 84px system-ui, Arial'; x.fillText('SVR WELLNESS.COM', w/2, 98);
   });
-  const info = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 3.8), new THREE.MeshBasicMaterial({ map: infoTex, transparent: true, side: THREE.DoubleSide }));
-  info.position.set(0, 2.35, -2.05);
-  group.add(info);
+  const signB = new THREE.Mesh(new THREE.PlaneGeometry(6.44, 0.70), new THREE.MeshBasicMaterial({ map: signTexB, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+  signB.position.copy(signBackB.position).add(new THREE.Vector3(0,0,0.02));
+  root.add(signB);
 
-  if (spawnLogoTex){
-    const logo = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 1.15), new THREE.MeshBasicMaterial({ map: spawnLogoTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-    logo.position.set(0, 3.55, 0.74);
-    group.add(logo);
-  }
+  const logoPlate = new THREE.Mesh(new THREE.PlaneGeometry(0.98, 0.62), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+  logoPlate.position.set(-4.95, 4.68, 0.73);
+  root.add(logoPlate);
 
-  const portalRing = new THREE.Mesh(new THREE.TorusGeometry(1.05, 0.035, 10, 80), new THREE.MeshBasicMaterial({ color: 0xff4d68, transparent: true, opacity: 0.82 }));
-  portalRing.rotation.x = Math.PI * 0.5;
-  portalRing.position.set(0, 0.055, 1.35);
-  group.add(portalRing);
+  const zenDenTex = canvasTexture(900, 180, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#071313'); g.addColorStop(1, '#0f2220');
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(124,255,226,0.82)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#eafff7'; x.font = 'bold 62px system-ui, Arial'; x.fillText('THE ZEN DEN', w/2, 86);
+    x.fillStyle = '#9cf0d3'; x.font = 'bold 24px system-ui, Arial'; x.fillText('meditate • restore • breathe', w/2, 138);
+  });
+  const zenDenPlate = new THREE.Mesh(new THREE.PlaneGeometry(2.34, 0.46), new THREE.MeshBasicMaterial({ map: zenDenTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+  zenDenPlate.position.set(4.95, 4.68, 0.73);
+  root.add(zenDenPlate);
 
-  const glow = new THREE.PointLight(0xff4d68, 4.8, 18, 2.0);
-  glow.position.set(0, 2.6, 0.1);
-  group.add(glow);
+  const founderPanelTex = canvasTexture(900, 1200, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#0b1215'); g.addColorStop(1, '#191014');
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(140,255,231,0.90)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
+    x.textAlign = 'left';
+    x.fillStyle = '#f6ffff'; x.font = 'bold 62px system-ui, Arial'; x.fillText('Meet the Founder', 60, 110);
+    x.fillStyle = '#bcffe9'; x.font = 'bold 46px system-ui, Arial'; x.fillText('AWAITING APPROVAL', 60, 182);
+    x.fillStyle = '#e5f6f3'; x.font = '34px system-ui, Arial';
+    let y = 258;
+    y = fillWrappedText(x, 'SVR approval placeholder Placeholder, leading the Reiki hub with a professional wellness-first approach for virtual and in-person growth.', 60, y, w - 120, 42);
+    y += 78;
+    x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Services', 60, y);
+    y += 56;
+    x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
+    ['Founder-led Reiki sessions', 'Meditation and reset support', 'Massage / bodywork referrals', 'Holistic wellness guidance'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 46; });
+    y += 40;
+    x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Book / Explore', 60, y);
+    y += 54;
+    x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
+    fillWrappedText(x, 'svr-wellness.com • state search • founder spotlight • Reiki VR entry', 60, y, w - 120, 40);
+  });
+  const founderPanel = new THREE.Mesh(new THREE.PlaneGeometry(3.28, 4.02), new THREE.MeshBasicMaterial({ map: founderPanelTex, side: THREE.DoubleSide, transparent: true }));
+  founderPanel.position.set(-4.10, 2.18, -2.10);
+  root.add(founderPanel);
 
-  const target = center.clone().addScaledVector(inward, 3.35).setY(0);
-  const roomTarget = center.clone().addScaledVector(inward, 5.6).setY(0);
-  const look = center.clone().setY(1.65);
-  return { group, holoGroups: [], center: center.clone(), target, roomTarget, look };
-}
+  const portraitPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 4.02), new THREE.MeshBasicMaterial({ map: founderTex, side: THREE.DoubleSide }));
+  portraitPanel.position.set(4.05, 2.18, -2.10);
+  root.add(portraitPanel);
 
-// Phase 173.4 boot hotfix: local Legend Hall builder.
-// Some restored skyline branches call buildLegendHall() but did not carry the helper.
-// Keep this lightweight and procedural so the world can boot even if optional Legend GLBs fail.
-function buildLegendHall(scene, R, wallHeight, log = console.log){
-  const group = new THREE.Group();
-  group.name = "SVR_Legend_Hall";
-  const holoGroups = [];
-  const displayRoots = [];
-  const displayUpdaters = [];
+  const rightInfoTex = canvasTexture(900, 520, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#0b1114'); g.addColorStop(1, '#141016');
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 8; x.strokeRect(16,16,w-32,h-32);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 44px system-ui, Arial'; x.fillText('Professional Highlights', 42, 74);
+    x.fillStyle = '#bcffe9'; x.font = '32px system-ui, Arial';
+    let y = 148;
+    ['SVR approval placeholder', 'Reiki and wellness focus', 'Meditation-forward client care', 'Virtual hub ready for growth'].forEach((line)=>{ x.fillText('• ' + line, 46, y); y += 70; });
+  });
+  const rightInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 1.64), new THREE.MeshBasicMaterial({ map: rightInfoTex, side: THREE.DoubleSide, transparent: true }));
+  rightInfo.position.set(4.05, -0.12, -2.08);
+  root.add(rightInfo);
 
-  const baseMat = new THREE.MeshStandardMaterial({ color: 0x090814, roughness: 0.74, metalness: 0.18, emissive: 0x12051f, emissiveIntensity: 0.22 });
-  const trimMat = new THREE.MeshBasicMaterial({ color: 0xb95aff, transparent: true, opacity: 0.82 });
-  const glassMat = new THREE.MeshBasicMaterial({ color: 0x8fdcff, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false });
+  const centerInfoTex = canvasTexture(900, 1200, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#07161a'); g.addColorStop(1, '#121118');
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#f6ffff'; x.font = 'bold 68px system-ui, Arial'; x.fillText('SVR WELLNESS.COM', w/2, 106);
+    x.fillStyle = '#bcffe9'; x.font = 'bold 34px system-ui, Arial'; x.fillText('Holistic Healing & Wellness', w/2, 166);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Founder-Led Services', w/2, 296);
+    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki • meditation • appointments • partner-ready wellness hub', w/2, 366);
+    x.fillStyle = 'rgba(124,255,226,0.16)'; roundRectPath(x, 90, 430, w-180, 138, 28); x.fill();
+    x.strokeStyle = 'rgba(124,255,226,0.65)'; x.lineWidth = 6; roundRectPath(x, 90, 430, w-180, 138, 28); x.stroke();
+    x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER THE REIKI HUB', w/2, 510);
+    x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Use the floor portal to enter the guided Reiki space', w/2, 564);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 38px system-ui, Arial'; x.fillText('Professional Highlights', w/2, 716);
+    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('Founder • Wellness • Reiki', w/2, 788);
+    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private sessions • mindful reset • future partner storefront', w/2, 856);
+  });
+  const centerInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.70, 4.02), new THREE.MeshBasicMaterial({ map: centerInfoTex, side: THREE.DoubleSide, transparent: true }));
+  centerInfo.position.set(0, 2.18, -2.10);
+  root.add(centerInfo);
 
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(8.4, 0.08, 4.4), baseMat);
-  floor.position.set(0, 0.04, 0);
-  group.add(floor);
+  const reserveTex = canvasTexture(960, 220, (x,w,h)=>{
+    x.fillStyle = '#0d1714'; roundRectPath(x, 0, 0, w, h, 28); x.fill();
+    x.strokeStyle = 'rgba(78,255,146,0.90)'; x.lineWidth = 8; roundRectPath(x, 10, 10, w-20, h-20, 24); x.stroke();
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#89ffab'; x.font = 'bold 50px system-ui, Arial'; x.fillText('RESERVED FOR APPROVAL', w/2, 82);
+    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 152);
+  });
+  const reservePlaque = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 0.70), new THREE.MeshBasicMaterial({ map: reserveTex, transparent: true, side: THREE.DoubleSide }));
+  reservePlaque.position.set(4.05, -1.22, -2.06);
+  root.add(reservePlaque);
 
-  const back = new THREE.Mesh(new THREE.BoxGeometry(8.4, 3.8, 0.12), baseMat.clone());
-  back.position.set(0, 1.94, -2.14);
-  group.add(back);
+  const portalTex = canvasTexture(1024, 1024, (x,w,h)=>{
+    x.clearRect(0,0,w,h);
+    const grad = x.createRadialGradient(w/2, h/2, 80, w/2, h/2, 400);
+    grad.addColorStop(0, 'rgba(88,255,180,0.88)');
+    grad.addColorStop(0.55, 'rgba(58,195,152,0.34)');
+    grad.addColorStop(1, 'rgba(10,30,25,0.0)');
+    x.fillStyle = grad; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(86,255,176,0.96)'; x.lineWidth = 18; x.beginPath(); x.arc(w/2, h/2, 250, 0, Math.PI*2); x.stroke();
+    x.fillStyle = '#71ffad'; x.textAlign = 'center'; x.font = 'bold 82px system-ui, Arial'; x.fillText('ENTER REIKI', w/2, h/2 + 176);
+  });
+  const portal = new THREE.Mesh(new THREE.CircleGeometry(1.18, 64), new THREE.MeshBasicMaterial({ map: portalTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+  portal.rotation.x = -Math.PI * 0.5;
+  portal.position.set(0, 0.03, 0.98);
+  root.add(portal);
+  const portalLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.18, 0.54), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+  portalLogo.rotation.x = -Math.PI * 0.5;
+  portalLogo.position.set(0, 0.035, 0.98);
+  root.add(portalLogo);
 
-  const signTex = createPlaqueTexture("LEGEND HALL", "SVR FEATURE SHOWCASE");
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(5.9, 1.12), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-  sign.position.set(0, 3.58, -2.215);
-  group.add(sign);
-
-  const infoTex = createAdBillboardTexture(["SVR LEGENDS", "PLAYER HISTORY", "REPLAYS", "COMING SOON"]);
-  const info = new THREE.Mesh(new THREE.PlaneGeometry(4.9, 2.18), new THREE.MeshBasicMaterial({ map: infoTex, side: THREE.DoubleSide, transparent: true, depthWrite: false }));
-  info.position.set(0, 1.82, -2.225);
-  group.add(info);
-
-  for (let i = -1; i <= 1; i++){
-    const x = i * 2.55;
-    const podium = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.68, 0.32, 28), new THREE.MeshStandardMaterial({ color: 0x181021, roughness: 0.66, metalness: 0.18, emissive: 0x1b0730, emissiveIntensity: 0.20 }));
-    podium.position.set(x, 0.20, 0.42);
-    group.add(podium);
-
-    const holo = new THREE.Group();
-    holo.position.set(x, 1.20, 0.42);
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.34, 1), new THREE.MeshBasicMaterial({ color: i === 0 ? 0xffffff : 0xdcb7ff, transparent: true, opacity: 0.72, wireframe: true }));
-    core.userData.phase = i;
-    holo.userData.core = core;
-    holo.add(core);
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.012, 8, 60), trimMat.clone());
-    ring.rotation.x = Math.PI * 0.5;
-    holo.add(ring);
-    group.add(holo);
-    holoGroups.push(holo);
-  }
-
-  const rail = new THREE.Mesh(new THREE.BoxGeometry(8.0, 0.035, 0.035), trimMat.clone());
-  rail.position.set(0, 0.84, 1.96);
-  group.add(rail);
-
-  const glass = new THREE.Mesh(new THREE.PlaneGeometry(8.0, 2.7), glassMat);
-  glass.position.set(0, 1.72, 2.01);
-  group.add(glass);
-
-  const glow = new THREE.PointLight(0xb95aff, 3.6, 16, 2.0);
-  glow.position.set(0, 2.4, 0.8);
-  group.add(glow);
-
-  scene.add(group);
-  return { group, holoGroups, displayRoots, displayUpdaters };
-}
-
-// Phase 173.4 boot hotfix: lobby info board builder used by the skyline return path.
-function addLobbyInfoBoards(scene, R, wallHeight){
-  const boards = [];
-  const items = [
-    { angle: -Math.PI * 0.12, title: "PLAYABLE POKER", sub: "Fold • Check • Call • Raise • All-In" },
-    { angle: Math.PI * 0.12, title: "HAND HISTORY", sub: "Winner proof and recent results" },
-    { angle: 0, title: "SVR MISSION", sub: "Play-money social VR with sponsor-ready impact" }
+  const postMat = new THREE.MeshStandardMaterial({ color: 0xd9d1dc, roughness: 0.26, metalness: 0.76, emissive: 0x28333a, emissiveIntensity: 0.12 });
+  const ropeMat = new THREE.MeshStandardMaterial({ color: 0xbf0c28, roughness: 0.78, metalness: 0.08, emissive: 0x520b16, emissiveIntensity: 0.22 });
+  const rails = [
+    { x: -2.84, zA: 1.58, zB: -1.26 },
+    { x:  2.84, zA: 1.58, zB: -1.26 }
   ];
-  items.forEach((item, idx)=>{
-    const tex = createPlaqueTexture(item.title, item.sub);
-    const board = new THREE.Mesh(new THREE.PlaneGeometry(3.7, 1.42), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
-    const radius = R - 2.7;
-    board.position.set(Math.cos(item.angle) * radius, 1.72, Math.sin(item.angle) * radius);
-    board.lookAt(0, 1.55, 0);
-    board.renderOrder = 42;
-    scene.add(board);
+  rails.forEach(({x, zA, zB})=>{
+    [zA, zB].forEach((z)=>{
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.05,0.95,14), postMat);
+      post.position.set(x, 0.48, z);
+      root.add(post);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 12), postMat);
+      head.position.copy(post.position).add(new THREE.Vector3(0,0.49,0));
+      root.add(head);
+    });
+    const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.024,0.024,Math.abs(zA-zB),12), ropeMat);
+    rope.rotation.x = Math.PI * 0.5;
+    rope.position.set(x, 0.86, (zA+zB)*0.5);
+    root.add(rope);
+  });
 
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: makeSpriteTexture(), color: 0xb95aff, transparent: true, opacity: 0.10, depthWrite: false, blending: THREE.AdditiveBlending }));
-    glow.scale.set(5.4, 2.2, 1);
-    glow.position.copy(board.position).add(new THREE.Vector3(0, 0, 0.04));
+  const plantRoot = await tryLoadOBJ(assetUrls('models/reiki/plant/indoor_plant.obj'), log, 12000);
+  const plantCol = await loadFirstTexture(assetUrls('models/reiki/plant/plant_col.jpg'), { colorSpace: THREE.SRGBColorSpace });
+  if (plantRoot){
+    plantRoot.traverse((child)=>{
+      if (!child.isMesh) return;
+      child.castShadow = false;
+      child.receiveShadow = false;
+      child.frustumCulled = false;
+      const nm = String(child.material?.name || child.name || '').toLowerCase();
+      if (nm.includes('pot')) child.material = new THREE.MeshStandardMaterial({ color: 0x25393b, roughness: 0.88, metalness: 0.10, emissive: 0x0d1618, emissiveIntensity: 0.08 });
+      else child.material = new THREE.MeshStandardMaterial({ map: plantCol || null, color: 0xffffff, roughness: 0.96, metalness: 0.0, side: THREE.DoubleSide });
+    });
+    const placements = [[-5.0,1.8],[-5.0,0.1],[-4.2,-1.45],[-3.2,-2.05],[-2.0,1.55],[2.0,1.55],[3.2,-2.05],[4.2,-1.45],[5.0,0.1],[5.0,1.8]];
+    placements.forEach(([ox,oz], idx)=>{
+      const plant = plantRoot.clone(true);
+      scaleToHeight(plant, 1.20 + (idx % 3) * 0.14);
+      dropToGround(plant);
+      plant.position.copy(center).addScaledVector(right, ox).addScaledVector(inward, oz);
+      plant.rotation.y = angle + Math.PI + (idx % 2 ? 0.14 : -0.10);
+      scene.add(plant);
+    });
+
+    const lobbyPlacements = [
+      [-10.5, 6.0], [-12.2, -4.0], [10.6, 5.8], [12.2, -4.4],
+      [-6.8, 12.4], [6.8, 12.4], [-15.0, 0.0], [15.0, 0.0]
+    ];
+    lobbyPlacements.forEach(([xw,zw], idx)=>{
+      const plant = plantRoot.clone(true);
+      scaleToHeight(plant, 1.45 + (idx % 2) * 0.18);
+      dropToGround(plant);
+      plant.position.set(xw, 0.0, zw);
+      plant.rotation.y = Math.PI * (0.15 + idx * 0.11);
+      scene.add(plant);
+    });
+  }
+
+  const reikiFillA = new THREE.PointLight(0x6effd2, 2.6, 18, 2.0);
+  reikiFillA.position.copy(center).add(new THREE.Vector3(-2.6, 2.8, 0.8));
+  scene.add(reikiFillA);
+  const reikiFillB = new THREE.PointLight(0x89ffb1, 2.2, 18, 2.0);
+  reikiFillB.position.copy(center).add(new THREE.Vector3(2.6, 2.8, 0.8));
+  scene.add(reikiFillB);
+
+  const hubTarget = center.clone().addScaledVector(inward, 3.2);
+  const roomTarget = center.clone().addScaledVector(inward, 1.3).addScaledVector(right, 0.0);
+  return {
+    center: center.clone(),
+    target: hubTarget,
+    roomTarget,
+    look: center.clone().addScaledVector(inward, -2.0)
+  };
+}
+
+function createOrbHaloSprite(color = 0xffffff, opacity = 0.5){
+  return new THREE.Sprite(new THREE.SpriteMaterial({
+    map: makeSpriteTexture(),
+    color,
+    transparent: true,
+    opacity,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  }));
+}
+function createMatrixBillboardTexture(variant = "main"){
+  const canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 1536;
+  const ctx = canvas.getContext("2d");
+  const glyphs = "0101SVRPOKERALLIN0101011010010110";
+  const phrases = variant === "main"
+    ? ["SCARLETT VR POKER", "ALL IN", "SPONSOR READY", "DONOR NATION", "WIN MONEY"]
+    : ["JOIN THE LEAGUE", "RESERVED FOR S.R.", "SCARLETT VR POKER"];
+  const cols = Array.from({ length: 60 }, (_, i)=>({ x: 12 + i * 17, y: Math.random() * canvas.height, speed: 9 + (i % 7) }));
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  let lastT = -999;
+  function redraw(t = 0){
+    if (t - lastT < 0.08) return;
+    lastT = t;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const bg = ctx.createLinearGradient(0,0,0,canvas.height);
+    bg.addColorStop(0, "rgba(5,0,12,0.98)");
+    bg.addColorStop(1, "rgba(1,2,8,1.0)");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.font = "bold 22px monospace";
+    cols.forEach((c, i)=>{
+      const phase = Math.floor(t * 22 + i * 5);
+      for (let j = 0; j < 96; j++){
+        const yy = (c.y + j * 18) % (canvas.height + 160) - 80;
+        const char = glyphs[(phase + j + i * 3) % glyphs.length];
+        const hot = j < 4;
+        ctx.fillStyle = hot ? "rgba(255,245,255,0.98)" : (i % 2 ? "rgba(238,114,255,0.80)" : "rgba(118,204,255,0.82)");
+        ctx.fillText(char, c.x, yy);
+      }
+      c.y += c.speed;
+      if (c.y > canvas.height + 40) c.y = -Math.random() * 180;
+    });
+
+    const panelTop = variant === "main" ? 200 : 320;
+    const panelH = variant === "main" ? 1080 : 860;
+    ctx.fillStyle = variant === "main" ? "rgba(7,10,18,0.40)" : "rgba(0,0,0,0.92)";
+    ctx.fillRect(70, panelTop, canvas.width - 140, panelH);
+    ctx.strokeStyle = "rgba(148,226,255,0.40)";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(70, panelTop, canvas.width - 140, panelH);
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    phrases.forEach((line, idx)=>{
+      ctx.fillStyle = idx % 2 ? "rgba(202,144,255,0.98)" : "rgba(230,245,255,0.98)";
+      ctx.font = idx === 0 ? "bold 62px system-ui, Arial" : "bold 42px system-ui, Arial";
+      ctx.fillText(line, canvas.width / 2, panelTop + 130 + idx * 96);
+    });
+    tex.needsUpdate = true;
+  }
+  redraw(0);
+  return { texture: tex, update: redraw };
+}
+
+function createSponsorPlateTexture(title = "MAIN SPONSOR SCREEN", subtitle = "SCARLETT VR POKER"){
+  return canvasTexture(1024, 256, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h);
+    g.addColorStop(0, "rgba(5,16,30,0.94)");
+    g.addColorStop(1, "rgba(25,4,34,0.94)");
+    x.fillStyle = g;
+    x.fillRect(0,0,w,h);
+    x.strokeStyle = "rgba(130,210,255,0.95)";
+    x.lineWidth = 8;
+    x.strokeRect(10,10,w-20,h-20);
+    x.textAlign = "center";
+    x.textBaseline = "middle";
+    x.fillStyle = "#f2f7ff";
+    x.font = "bold 56px system-ui, Arial";
+    x.fillText(title, w/2, 92);
+    x.fillStyle = "rgba(198,136,255,0.96)";
+    x.font = "bold 34px system-ui, Arial";
+    x.fillText(subtitle, w/2, 172);
+  });
+}
+function createAdBillboardTexture(lines = ["SVRPOKER.COM", "ALL IN"]){
+  return canvasTexture(512, 512, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,"#04122c");
+    g.addColorStop(1,"#25092a");
+    x.fillStyle = g;
+    x.fillRect(0,0,w,h);
+    x.strokeStyle = "rgba(127,212,255,0.92)";
+    x.lineWidth = 8;
+    x.strokeRect(18,18,w-36,h-36);
+    x.fillStyle = "#f6fbff";
+    x.textAlign = "center";
+    x.textBaseline = "middle";
+    x.font = "bold 52px system-ui, Arial";
+    x.fillText(lines[0], w/2, h/2 - 40);
+    x.font = "bold 64px system-ui, Arial";
+    x.fillText(lines[1], w/2, h/2 + 38);
+  });
+}
+
+function createStoreDisplayTexture(){
+  return canvasTexture(1024, 1024, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h);
+    g.addColorStop(0, "#081221");
+    g.addColorStop(1, "#18081e");
+    x.fillStyle = g;
+    x.fillRect(0,0,w,h);
+    x.strokeStyle = "rgba(140,220,255,0.88)";
+    x.lineWidth = 10;
+    x.strokeRect(18,18,w-36,h-36);
+    x.fillStyle = "rgba(20,28,40,0.72)";
+    x.fillRect(74,94,w-148,h-188);
+    x.strokeStyle = "rgba(190,120,255,0.72)";
+    x.lineWidth = 5;
+    x.strokeRect(74,94,w-148,h-188);
+    x.textAlign = "center";
+    x.textBaseline = "middle";
+    x.fillStyle = "#f3f8ff";
+    x.font = "bold 78px system-ui, Arial";
+    x.fillText("SVR STORE", w/2, 170);
+    x.fillStyle = "rgba(188,214,255,0.98)";
+    x.font = "bold 42px system-ui, Arial";
+    x.fillText("north east wall", w/2, 236);
+    const items = ["chips", "cards", "sponsor merch", "hall of fame soon"];
+    items.forEach((item, i)=>{
+      const yy = 420 + i*110;
+      x.fillStyle = i % 2 ? "rgba(194,145,255,0.95)" : "rgba(127,214,255,0.95)";
+      x.fillRect(190, yy-34, w-380, 68);
+      x.fillStyle = "#08101a";
+      x.font = "bold 34px system-ui, Arial";
+      x.fillText(item.toUpperCase(), w/2, yy);
+    });
+  });
+}
+
+function createPlaqueTexture(title = "legend", subtitle = "hall of fame"){
+  return canvasTexture(512, 256, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h);
+    g.addColorStop(0, "rgba(8,14,24,0.98)");
+    g.addColorStop(1, "rgba(34,10,44,0.98)");
+    x.fillStyle = g;
+    x.fillRect(0,0,w,h);
+    x.strokeStyle = "rgba(136,220,255,0.85)";
+    x.lineWidth = 6;
+    x.strokeRect(12,12,w-24,h-24);
+    x.textAlign = "center";
+    x.textBaseline = "middle";
+    x.fillStyle = "#f6fbff";
+    x.font = "bold 40px system-ui, Arial";
+    x.fillText(String(title || "").toUpperCase(), w/2, 92);
+    x.fillStyle = "rgba(198,136,255,0.96)";
+    x.font = "bold 26px system-ui, Arial";
+    x.fillText(String(subtitle || "").toUpperCase(), w/2, 170);
+  });
+}
+
+function createInfoBoardTexture(title = "leaderboard", lines = []){
+  return canvasTexture(1024, 1024, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h);
+    g.addColorStop(0, "#07111d");
+    g.addColorStop(1, "#240d29");
+    x.fillStyle = g;
+    x.fillRect(0,0,w,h);
+    x.strokeStyle = "rgba(143,224,255,0.92)";
+    x.lineWidth = 10;
+    x.strokeRect(22,22,w-44,h-44);
+    x.fillStyle = "rgba(255,255,255,0.06)";
+    x.fillRect(64,96,w-128,120);
+    x.textAlign = "center";
+    x.textBaseline = "middle";
+    x.fillStyle = "#f6fbff";
+    x.font = "bold 72px system-ui, Arial";
+    x.fillText(String(title || "").toUpperCase(), w/2, 156);
+    x.strokeStyle = "rgba(194,145,255,0.56)";
+    x.lineWidth = 4;
+    x.beginPath();
+    x.moveTo(84, 246);
+    x.lineTo(w - 84, 246);
+    x.stroke();
+    const visibleLines = lines.slice(0,7);
+    const rowH = visibleLines.length > 6 ? 86 : (visibleLines.length > 5 ? 98 : 118);
+    visibleLines.forEach((line, idx)=>{
+      const yy = 330 + idx * rowH;
+      x.fillStyle = idx % 2 ? "rgba(194,145,255,0.95)" : "rgba(127,214,255,0.95)";
+      x.fillRect(96, yy - 36, w - 192, 72);
+      x.fillStyle = "#08101a";
+      x.font = `bold ${visibleLines.length > 6 ? 22 : (visibleLines.length > 5 ? 25 : 31)}px system-ui, Arial`;
+      x.fillText(String(line || "").toUpperCase(), w/2, yy);
+    });
+  });
+}
+
+function addLobbyInfoBoards(scene, R, wallHeight){
+  const baseAngle = Math.PI * 0.5;
+  const inward = new THREE.Vector3(-Math.cos(baseAngle), 0, -Math.sin(baseAngle));
+  const tangent = new THREE.Vector3(-inward.z, 0, inward.x);
+  const baseCenter = new THREE.Vector3(Math.cos(baseAngle) * (R - 2.3), 1.72, Math.sin(baseAngle) * (R - 2.3));
+  const defs = [
+    { title: "leaderboard", lines: ["top cash tables", "player stacks and stats", "sponsor bonus wins", "community giveback", "animal shelter aid", "feedback and rankings"], offset: -2.65 },
+    { title: "tourney", lines: ["daily sit n go", "weekend finals", "sponsor hosted events", "WIN CASH MONEY", "league points and prizes", "PGA hub coming soon"], offset: 0.0 },
+    { title: "about", lines: ["poker that gives back", "homeless outreach", "animal shelters", "wellness and reiki hub", "sponsors raise funds", "ads support the mission"], offset: 2.65 }
+  ];
+  const boards = [];
+  defs.forEach((def, idx)=>{
+    const board = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.92, 1.92),
+      new THREE.MeshBasicMaterial({ map: createInfoBoardTexture(def.title, def.lines), side: THREE.DoubleSide })
+    );
+    board.position.copy(baseCenter).addScaledVector(tangent, def.offset).addScaledVector(inward, 0.08).add(new THREE.Vector3(0, Math.sin(idx) * 0.03, 0));
+    board.lookAt(0, board.position.y, 0);
+    board.renderOrder = 32;
+    scene.add(board);
+    const glow = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.18, 2.18),
+      new THREE.MeshBasicMaterial({ color: idx % 2 ? 0xc18dff : 0x8fdfff, transparent: true, opacity: 0.12, side: THREE.DoubleSide, depthWrite: false })
+    );
+    glow.position.copy(board.position).addScaledVector(inward, 0.02);
+    glow.lookAt(0, glow.position.y, 0);
+    glow.renderOrder = 31;
     scene.add(glow);
-    boards.push({ board, glow, phase: idx * 0.9 });
+    boards.push({ board, glow, phase: idx * 0.8 });
   });
   return boards;
+}
+function createHologramSilhouette(kind = "legend"){
+  const group = new THREE.Group();
+  const mat = new THREE.MeshBasicMaterial({ color: 0x9fe1ff, transparent: true, opacity: 0.24, wireframe: true });
+  let mesh;
+  if (kind === "free ghost"){
+    mesh = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.55, 10, 1, true), mat);
+    mesh.position.y = 0.78;
+  } else if (kind === "mutant2"){
+    mesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.82, 1), mat);
+    mesh.position.y = 0.92;
+  } else {
+    mesh = new THREE.Mesh(new THREE.TorusKnotGeometry(0.42, 0.14, 84, 10), mat);
+    mesh.position.y = 0.9;
+  }
+  group.add(mesh);
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: makeSpriteTexture(), color: 0xb48cff, transparent: true, opacity: 0.42, depthWrite: false, blending: THREE.AdditiveBlending }));
+  halo.scale.set(2.2, 2.2, 1);
+  halo.position.y = 0.92;
+  group.add(halo);
+  group.userData.core = mesh;
+  return group;
+}
+function buildLegendHall(scene, R, wallHeight, log = console.log){
+  const group = new THREE.Group();
+  const center = new THREE.Vector3(-R * 0.46, 0, -R * 0.36);
+  group.position.copy(center);
+  scene.add(group);
+
+  const base = new THREE.Mesh(
+    new THREE.BoxGeometry(11.0, 0.18, 6.4),
+    new THREE.MeshStandardMaterial({ color: 0x10141d, roughness: 0.78, metalness: 0.12, emissive: 0x0a0f1a, emissiveIntensity: 0.12 })
+  );
+  base.position.y = 0.09;
+  group.add(base);
+
+  const trim = new THREE.Mesh(
+    new THREE.BoxGeometry(11.2, 0.08, 6.6),
+    new THREE.MeshStandardMaterial({ color: 0x7b57ff, roughness: 0.22, metalness: 0.34, emissive: 0x5521ff, emissiveIntensity: 0.95 })
+  );
+  trim.position.y = 0.22;
+  group.add(trim);
+
+  const backWall = new THREE.Mesh(
+    new THREE.PlaneGeometry(10.2, 5.8),
+    new THREE.MeshStandardMaterial({ color: 0x0b1018, roughness: 0.82, metalness: 0.08, emissive: 0x091120, emissiveIntensity: 0.12, side: THREE.DoubleSide })
+  );
+  backWall.position.set(0, 3.05, -3.16);
+  group.add(backWall);
+
+  const titleTex = createPlaqueTexture("game legends", "hall of fame top 10");
+  const title = new THREE.Mesh(
+    new THREE.PlaneGeometry(5.8, 1.46),
+    new THREE.MeshBasicMaterial({ map: titleTex, transparent: true, side: THREE.DoubleSide })
+  );
+  title.position.set(0, 5.00, -3.05);
+  group.add(title);
+
+  const pedX = [-2.9, 0, 2.9];
+  const labels = ["character model", "scarlett vr", "animated model"];
+  const holoGroups = [];
+  pedX.forEach((xPos, idx)=>{
+    const pedestal = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.86, 0.98, 1.08, 24),
+      new THREE.MeshStandardMaterial({ color: 0x171b22, roughness: 0.65, metalness: 0.24, emissive: 0x0c1018, emissiveIntensity: 0.16 })
+    );
+    pedestal.position.set(xPos, 0.62, -0.3);
+    group.add(pedestal);
+
+    const cap = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.94, 0.94, 0.06, 28),
+      new THREE.MeshStandardMaterial({ color: 0x8bcfff, roughness: 0.18, metalness: 0.42, emissive: 0x4da9ff, emissiveIntensity: 0.65 })
+    );
+    cap.position.set(xPos, 1.18, -0.3);
+    group.add(cap);
+
+    const plaqueTex = createPlaqueTexture(labels[idx], "reserved display");
+    const plaque = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.2, 0.62),
+      new THREE.MeshBasicMaterial({ map: plaqueTex, transparent: true, side: THREE.DoubleSide })
+    );
+    plaque.position.set(xPos, 0.72, 0.82);
+    plaque.rotation.x = -0.42;
+    group.add(plaque);
+
+    const holo = createHologramSilhouette(labels[idx]);
+    holo.position.set(xPos, 1.2, -0.3);
+    group.add(holo);
+    holoGroups.push(holo);
+
+    const spot = new THREE.SpotLight(0xe7f1ff, 13.5, 18, Math.PI * 0.16, 0.26, 1.4);
+    spot.position.set(xPos, 6.2, 1.2);
+    spot.target.position.set(xPos, 1.2, -0.3);
+    spot.castShadow = false;
+    group.add(spot);
+    group.add(spot.target);
+  });
+
+  const postMat = new THREE.MeshStandardMaterial({ color: 0xaab5c8, roughness: 0.32, metalness: 0.55, emissive: 0x1b2432, emissiveIntensity: 0.22 });
+  const ropeMat = new THREE.MeshStandardMaterial({ color: 0x6e4dff, roughness: 0.34, metalness: 0.14, emissive: 0x4522d0, emissiveIntensity: 0.88 });
+  const railPts = [
+    new THREE.Vector3(-4.75, 0, 1.7),
+    new THREE.Vector3( 4.75, 0, 1.7),
+    new THREE.Vector3( 5.2, 0, -2.15),
+    new THREE.Vector3(-5.2, 0, -2.15)
+  ];
+  railPts.forEach((p)=>{
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.09, 1.08, 16), postMat);
+    post.position.copy(p).add(new THREE.Vector3(0, 0.54, 0));
+    group.add(post);
+  });
+  function addRope(a,b,y){
+    const dir = new THREE.Vector3().subVectors(b,a);
+    const len = dir.length();
+    const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, len, 12), ropeMat);
+    rope.position.copy(a).lerp(b, 0.5).add(new THREE.Vector3(0, y, 0));
+    rope.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.clone().normalize());
+    group.add(rope);
+  }
+  for (let i = 0; i < railPts.length; i++){
+    const a = railPts[i];
+    const b = railPts[(i + 1) % railPts.length];
+    addRope(a,b,0.78);
+    addRope(a,b,0.54);
+  }
+
+  const blocker = new THREE.Mesh(
+    new THREE.BoxGeometry(10.8, 0.18, 0.52),
+    new THREE.MeshStandardMaterial({ color: 0x111722, roughness: 0.76, metalness: 0.08, emissive: 0x0d1220, emissiveIntensity: 0.10 })
+  );
+  blocker.position.set(0, 0.09, 1.96);
+  group.add(blocker);
+
+  const fillA = new THREE.PointLight(0x9a7cff, 5.4, 30, 2.0);
+  fillA.position.set(-2.8, 3.8, -1.0);
+  group.add(fillA);
+  const fillB = new THREE.PointLight(0x89d8ff, 5.0, 30, 2.0);
+  fillB.position.set(2.8, 3.8, -1.0);
+  group.add(fillB);
+
+  return { group, holoGroups };
 }
 
 function buildAlignedLegendHall(scene, R, wallHeight, log = console.log){
@@ -1105,10 +1401,10 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   group.add(activeBtn);
 
 
-  const adTex = createPlaqueTexture('AWAITING APPROVAL', 'future sponsor ad');
+  const adTex = createAdBillboardTexture(['SVR WELLNESS', 'AWAITING APPROVAL']);
   const adHeader = new THREE.Mesh(
     new THREE.PlaneGeometry(3.26, 0.56),
-    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('SPONSOR SLOT', 'awaiting approval'), transparent: true, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('SVR WELLNESS SPOTLIGHT', 'founder wellness ad'), transparent: true, side: THREE.DoubleSide })
   );
   adHeader.position.set(modelX, wallHeight * 0.39, 0.18);
   group.add(adHeader);
@@ -1237,7 +1533,7 @@ function buildOuterCity(scene, R){
   const matrix = createMatrixBillboardTexture();
   const billboardUpdaters = [matrix.update];
   const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
-  const zenTex = createPlaqueTexture('AWAITING APPROVAL', 'future wellness module');
+  const zenTex = createAdBillboardTexture(['REIKI', 'AWAITING APPROVAL']);
 
   const count = 68;
   const adIndices = new Set([4, 11, 20, 28, 36, 44, 52, 60]);
@@ -1326,7 +1622,7 @@ function buildOuterCity(scene, R){
               ctx.textBaseline = "middle";
               ctx.fillStyle = "#d9ffee";
               ctx.font = "bold 92px system-ui, Arial";
-              ctx.fillText("AWAITING APPROVAL.COM", w2 / 2, 94);
+              ctx.fillText("SVR WELLNESS.COM", w2 / 2, 94);
               ctx.fillStyle = "#7bffb7";
               ctx.font = "700 50px system-ui, Arial";
               ctx.fillText("Founder-led Reiki • Meditation • Wellness", w2 / 2, 178);
@@ -1833,7 +2129,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
         const hubPlate = new THREE.Mesh(
           new THREE.PlaneGeometry(2.2, 0.54),
           new THREE.MeshBasicMaterial({
-            map: createPlaqueTexture("reiki time hub", "scarlett vr poker"),
+            map: createPlaqueTexture("Reiki approval hub", "scarlett vr poker"),
             transparent: true,
             side: THREE.DoubleSide,
             depthWrite: false,
@@ -1871,7 +2167,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   await populateLegendPedestals(legendHall, spawnLogoTex, log);
   const storeWall = buildStoreWall(scene, R, wallHeight, spawnLogoTex);
   addPgaHub(scene, { radius: R, wallHeight, log });
-  const reikiHub = await addRikiArea(scene, R, wallHeight, spawnLogoTex, log);
+  const reikiHub = await addReikiArea(scene, R, wallHeight, spawnLogoTex, log);
   const scorpionRoom = addScorpionRoom(scene, R, wallHeight);
   const lobbyInfoBoards = addLobbyInfoBoards(scene, R, wallHeight);
 
@@ -2055,8 +2351,8 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   let dealerPose = null;
   const ericTex = await loadFirstTexture(assetUrls("models/eric/rp_eric_rigged_001_dif.jpg"), { colorSpace: THREE.SRGBColorSpace });
   const ericNorm = await loadFirstTexture(assetUrls("models/eric/rp_eric_rigged_001_norm.jpg"));
-  const dealerBase = null; // Phase 170: visible dealer body disabled; invisible card logic remains.
-  const dealerIdle = null;
+  const dealerBase = await tryLoadFBX(assetUrls("models/eric/eric.fbx"), log, 14000);
+  const dealerIdle = await tryLoadFBX(assetUrls("models/anims/eric_idle.fbx"), log, 14000);
   if (dealerBase){
     dealerActor = dealerBase;
     applyEricMaterial(dealerActor, ericTex, ericNorm);
@@ -2316,7 +2612,6 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     seats,
     joinRadius: 6.3,
     previewOrbitRadius: 12.8,
-    sceneTargets,
-    pokerDemo
+    sceneTargets
   };
 }
