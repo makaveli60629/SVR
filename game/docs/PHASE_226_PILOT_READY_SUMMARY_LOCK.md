@@ -1,7 +1,7 @@
-# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
 
 ## Purpose
-Phase 231 adds a Pilot Ready Summary panel that gives one consolidated go/no-go view for the test build.
+Phase 232 adds a Pilot Ready Summary panel that gives one consolidated go/no-go view for the test build.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 231 adds a Pilot Ready Summary panel that gives one consolidated go/no-go 
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase231-pilotready` and press `Y`.
+Open `/game/?v=phase232-pilotready` and press `Y`.

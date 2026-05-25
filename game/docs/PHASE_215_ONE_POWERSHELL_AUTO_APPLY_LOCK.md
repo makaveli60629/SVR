@@ -1,4 +1,4 @@
-# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

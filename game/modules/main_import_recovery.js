@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK";
+  const BUILD = "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK";
   const state = {
     build: BUILD,
     phase: 231,
@@ -10,11 +10,11 @@
   };
 
   const dependencies = [
-    "./main.js?v=phase231",
-    "./modules/enterprise_bridge_phase231.js",
-    "./modules/power_deploy_wait_log.js?v=phase231",
-    "./modules/power_deploy_watcher.js?v=phase231",
-    "./modules/pilot_feedback_export.js?v=phase231"
+    "./main.js?v=phase232",
+    "./modules/enterprise_bridge_phase232.js",
+    "./modules/power_deploy_wait_log.js?v=phase232",
+    "./modules/power_deploy_watcher.js?v=phase232",
+    "./modules/pilot_feedback_export.js?v=phase232"
   ];
 
   function esc(v) {
@@ -72,7 +72,7 @@
       <hr style="border:0;border-top:1px solid rgba(210,150,255,.32)">
       <div><b>Build:</b> ${esc(BUILD)}</div>
       <div><b>Status:</b> ${esc(state.status)}</div>
-      <div><b>Fix:</b> cache-busted enterprise bridge file restored for Phase 231.</div>
+      <div><b>Fix:</b> cache-busted enterprise bridge file restored for Phase 232.</div>
       <div><b>Public Matrix page:</b> locked / untouched</div>
       <button id="svrMainImportRun" style="border:1px solid #caf;background:#16061d;color:#f4eeff;border-radius:999px;padding:7px 12px;cursor:pointer;margin-top:10px">Run Import Check</button>
       <ul>${checks}</ul>

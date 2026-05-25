@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-231-MAIN-IMPORT-RECOVERY-LOCK`
+Build: `PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

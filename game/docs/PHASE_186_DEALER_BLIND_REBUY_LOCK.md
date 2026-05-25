@@ -1,4 +1,4 @@
-# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
 
 ## Scope
 - Added dealer button / blind-state telemetry for every hand.

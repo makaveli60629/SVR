@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge Phase 208
- * Build: PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+ * Build: PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
  * Purpose: cache-busted bridge with proxy-compatible safe recorder aliases so poker events cannot crash the render loop.
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
-const BUILD = 'PHASE-231-MAIN-IMPORT-RECOVERY-LOCK';
+const BUILD = 'PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK';
 
 const EVENT_TO_RECORDER = [
   ['svr_poker_hand_result', 'recordHandResult', 'hand_result'],

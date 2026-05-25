@@ -1,6 +1,6 @@
-# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
 
-Phase 231 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 232 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

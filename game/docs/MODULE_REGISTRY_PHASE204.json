@@ -1,6 +1,6 @@
 {
   "phase": 204,
-  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
+  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
   "modules_added": [
     "modules/event_firewall.js"
   ],

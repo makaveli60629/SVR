@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
+  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase231.js"
+    "game/modules/enterprise_bridge_phase232.js"
   ],
   "protected": {
     "publicPageTouched": false,

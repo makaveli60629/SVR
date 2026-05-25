@@ -1,11 +1,11 @@
-# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
 
 ## Purpose
-Phase 231 fixes the boot fallback shown when `main.js` failed to dynamically import because the cache-busted enterprise bridge module for the current phase was missing.
+Phase 232 fixes the boot fallback shown when `main.js` failed to dynamically import because the cache-busted enterprise bridge module for the current phase was missing.
 
 ## Direct fix
-- Adds `game/modules/enterprise_bridge_phase231.js`
-- Updates `main.js` to import `enterprise_bridge_phase231.js`
+- Adds `game/modules/enterprise_bridge_phase232.js`
+- Updates `main.js` to import `enterprise_bridge_phase232.js`
 - Adds `game/modules/main_import_recovery.js`
 - Adds F8 import check panel
 
@@ -15,4 +15,4 @@ Phase 231 fixes the boot fallback shown when `main.js` failed to dynamically imp
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase231-importfix` and press `F8`.
+Open `/game/?v=phase232-importfix` and press `F8`.

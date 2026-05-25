@@ -1,6 +1,6 @@
 # Phase 199 — Playtest Wizard Lock
 
-Build: `PHASE-231-MAIN-IMPORT-RECOVERY-LOCK`
+Build: `PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK`
 
 ## Scope
 - Adds guided playtest wizard overlay.

@@ -1,6 +1,6 @@
 {
   "phase": 202,
-  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
+  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
   "modules": [
     "boot.js",
     "modules/boot_fallback.js",

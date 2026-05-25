@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Bug Report Capture
- * Build: PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+ * Build: PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
  * Purpose: capture tester issue reports from inside the game without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-231-MAIN-IMPORT-RECOVERY-LOCK';
+const BUILD = 'PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK';
 const EXPECTED_PHASE = 195;
 const STORE_KEY = 'svr_bug_reports_phase197';
 

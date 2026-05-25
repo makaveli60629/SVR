@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
+  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
   "modules": [
     "game/main.js",
     "game/modules/watch.js",

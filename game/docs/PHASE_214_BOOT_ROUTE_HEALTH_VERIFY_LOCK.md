@@ -1,4 +1,4 @@
-# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
 
 Phase 214 adds a boot route health verifier to confirm the lobby and private scene recovery links resolve after deployment.
 

@@ -1,4 +1,4 @@
-# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
 
 ## Purpose
 Prevent boot-route confusion after cache/import failures by adding a dependency-free route recovery module and correcting fallback private-scene links.

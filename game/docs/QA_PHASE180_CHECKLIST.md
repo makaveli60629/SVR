@@ -1,7 +1,7 @@
 # Phase 199 QA Checklist
 
 1. Open `/game/?v=phase183`.
-2. Confirm build label shows `PHASE-231-MAIN-IMPORT-RECOVERY-LOCK`.
+2. Confirm build label shows `PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK`.
 3. Play/watch through showdown.
 4. Confirm status panel shows `Winning 5`.
 5. Confirm hand history line includes `WIN` cards.

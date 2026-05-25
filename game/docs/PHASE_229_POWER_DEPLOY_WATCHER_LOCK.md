@@ -1,7 +1,7 @@
-# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
 
 ## Purpose
-Phase 231 adds a Power Deploy Watcher panel for the new PowerShell-only workflow.
+Phase 232 adds a Power Deploy Watcher panel for the new PowerShell-only workflow.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 231 adds a Power Deploy Watcher panel for the new PowerShell-only workflow
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase231-powerdeploy` and press `F6`.
+Open `/game/?v=phase232-powerdeploy` and press `F6`.

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Release Candidate Checklist Module
- * Build: PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+ * Build: PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
  * Purpose: combine deploy, smoke, QA, export, and runtime module checks into one tester-ready release gate.
  * Public Matrix page is untouched. No secrets. No SQL strings.
  */
-const BUILD = 'PHASE-231-MAIN-IMPORT-RECOVERY-LOCK';
+const BUILD = 'PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeText(value, max = 260) { return String(value ?? '').slice(0, max); }

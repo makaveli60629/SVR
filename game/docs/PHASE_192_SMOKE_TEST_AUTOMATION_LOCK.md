@@ -1,6 +1,6 @@
 # Phase 199 — Smoke Test Automation Lock
 
-Build: `PHASE-231-MAIN-IMPORT-RECOVERY-LOCK`
+Build: `PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

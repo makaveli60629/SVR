@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Queue Dashboard
- * Build: PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
+ * Build: PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
  * Purpose: convert tester feedback, bug reports, release candidate checks, and smoke tests into a compact triage queue.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-231-MAIN-IMPORT-RECOVERY-LOCK';
+const BUILD = 'PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK';
 const EXPECTED_PHASE = 197;
 const STORE_KEY = 'svr_test_queue_phase197';
 

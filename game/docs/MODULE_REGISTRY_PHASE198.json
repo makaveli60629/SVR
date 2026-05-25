@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
+  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
   "public_page_touched": false,
   "module": "game/modules/test_report_bundle.js",
   "shortcut": "B",

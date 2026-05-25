@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
-  "phase": 231,
+  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
+  "phase": 232,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "main import recovery, cache-busted bridge file, no-stuck boot module repair"
+  "featureLock": "bridge alias recovery, stale main import repair, phase230 compatibility bridge"
 }

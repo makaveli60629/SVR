@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
+  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
   "modules": [
     "boot_route_health.js",
     "boot_route_recovery.js",
