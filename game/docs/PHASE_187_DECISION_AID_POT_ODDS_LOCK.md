@@ -1,4 +1,4 @@
-# PHASE-223-TESTER-LAUNCH-CARD-LOCK
+# PHASE-224-QA-SHORTCUT-INDEX-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

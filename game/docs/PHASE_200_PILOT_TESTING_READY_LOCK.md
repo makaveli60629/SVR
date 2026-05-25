@@ -1,6 +1,6 @@
 # Phase 200 — Pilot Testing Ready Lock
 
-Build: `PHASE-223-TESTER-LAUNCH-CARD-LOCK`
+Build: `PHASE-224-QA-SHORTCUT-INDEX-LOCK`
 
 ## Protected rules
 

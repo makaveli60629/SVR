@@ -1,7 +1,7 @@
-# PHASE-223-TESTER-LAUNCH-CARD-LOCK
+# PHASE-224-QA-SHORTCUT-INDEX-LOCK
 
 ## Purpose
-Phase 223 adds a post-deploy checklist panel so the workflow can verify deployment, cache busting, and tester handoff after Auto Deploy.
+Phase 224 adds a post-deploy checklist panel so the workflow can verify deployment, cache busting, and tester handoff after Auto Deploy.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 223 adds a post-deploy checklist panel so the workflow can verify deployme
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase223-postdeploy` and press `E`.
+Open `/game/?v=phase224-postdeploy` and press `E`.

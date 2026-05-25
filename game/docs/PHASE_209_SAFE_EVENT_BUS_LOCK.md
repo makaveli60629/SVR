@@ -1,11 +1,11 @@
-# PHASE-223-TESTER-LAUNCH-CARD-LOCK
+# PHASE-224-QA-SHORTCUT-INDEX-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase223.js`
+- `game/modules/enterprise_bridge_phase224.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

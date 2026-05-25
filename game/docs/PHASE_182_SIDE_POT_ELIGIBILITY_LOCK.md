@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-223-TESTER-LAUNCH-CARD-LOCK`
+Build: `PHASE-224-QA-SHORTCUT-INDEX-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

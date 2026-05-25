@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
+  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"

@@ -1,4 +1,4 @@
-# PHASE-223-TESTER-LAUNCH-CARD-LOCK
+# PHASE-224-QA-SHORTCUT-INDEX-LOCK
 
 ## Purpose
 Fix the remaining stuck-on-Booting risk by adding a no-Three.js recovery shell. If CDN/import/runtime loading fails, the game no longer remains frozen on Booting.

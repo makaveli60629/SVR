@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Safe Event Bus
- * Build: PHASE-223-TESTER-LAUNCH-CARD-LOCK
+ * Build: PHASE-224-QA-SHORTCUT-INDEX-LOCK
  * Purpose: sandbox SVR custom-event listeners so a missing recorder/listener cannot freeze gameplay.
  */
-const BUILD = 'PHASE-223-TESTER-LAUNCH-CARD-LOCK';
+const BUILD = 'PHASE-224-QA-SHORTCUT-INDEX-LOCK';
 const ORIGINAL_ADD = EventTarget.prototype.addEventListener;
 const ORIGINAL_REMOVE = EventTarget.prototype.removeEventListener;
 const ORIGINAL_DISPATCH = EventTarget.prototype.dispatchEvent;

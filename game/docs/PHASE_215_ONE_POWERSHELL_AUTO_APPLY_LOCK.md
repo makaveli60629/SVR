@@ -1,4 +1,4 @@
-# PHASE-223-TESTER-LAUNCH-CARD-LOCK
+# PHASE-224-QA-SHORTCUT-INDEX-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

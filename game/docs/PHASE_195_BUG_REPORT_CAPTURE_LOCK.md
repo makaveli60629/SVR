@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-223-TESTER-LAUNCH-CARD-LOCK`
+Build: `PHASE-224-QA-SHORTCUT-INDEX-LOCK`
 
 ## Added
 - In-game bug report capture panel.

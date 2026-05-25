@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-223-TESTER-LAUNCH-CARD-LOCK";
+  const BUILD = "PHASE-224-QA-SHORTCUT-INDEX-LOCK";
   const state = {
     build: BUILD,
     phase: 223,
@@ -56,7 +56,7 @@
       </div>
       <hr style="border:0;border-top:1px solid rgba(120,150,255,.28)">
       <div><b>Build:</b> ${esc(BUILD)}</div>
-      <div><b>Test URL:</b> /game/?v=phase223-testercard</div>
+      <div><b>Test URL:</b> /game/?v=phase224-testercard</div>
       <div><b>Public page:</b> locked / untouched</div>
       <h4>Quick checks</h4>
       <ol>${checks}</ol>

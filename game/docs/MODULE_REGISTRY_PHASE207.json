@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
+  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",
-    "game/modules/enterprise_bridge_phase223.js",
+    "game/modules/enterprise_bridge_phase224.js",
     "game/modules/bridge_selftest.js",
     "game/modules/event_firewall.js"
   ],

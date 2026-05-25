@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
+  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
   "phase": 206,
   "modules_added": [
     "game/modules/bridge_selftest.js",
-    "game/modules/enterprise_bridge_phase223.js"
+    "game/modules/enterprise_bridge_phase224.js"
   ],
   "events": [
     "svr_bridge_selftest_update"

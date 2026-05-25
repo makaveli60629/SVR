@@ -1,6 +1,6 @@
 {
   "phase": 204,
-  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
+  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
   "modules_added": [
     "modules/event_firewall.js"
   ],

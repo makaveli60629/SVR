@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
+  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
   "public_page_touched": false,
   "modules_added": [
     "game/modules/playtest_wizard.js"

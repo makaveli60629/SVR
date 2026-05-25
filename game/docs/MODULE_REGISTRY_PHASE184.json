@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
+  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
   "phase": 199,
   "modules": [
     "poker_demo",

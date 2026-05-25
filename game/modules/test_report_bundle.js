@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Report Bundle
- * Build: PHASE-223-TESTER-LAUNCH-CARD-LOCK
+ * Build: PHASE-224-QA-SHORTCUT-INDEX-LOCK
  * Purpose: combine QA snapshots, bug reports, tester feedback, test queue, smoke/RC/preflight/session exports into one playtest report bundle.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-223-TESTER-LAUNCH-CARD-LOCK';
+const BUILD = 'PHASE-224-QA-SHORTCUT-INDEX-LOCK';
 const EXPECTED_PHASE = 198;
 const STORE_KEY = 'svr_test_report_bundles_phase198';
 

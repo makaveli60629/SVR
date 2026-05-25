@@ -1,4 +1,4 @@
-# PHASE-223-TESTER-LAUNCH-CARD-LOCK
+# PHASE-224-QA-SHORTCUT-INDEX-LOCK
 
 Phase 213 aligns every visible and machine-readable game marker after the boot-cache work.
 
@@ -15,8 +15,8 @@ Phase 213 aligns every visible and machine-readable game marker after the boot-c
 - Title/HUD/version/deploy-health/boot-query marker checks
 
 ## Test
-Open `/game/?v=phase223-markerhealth`, then verify:
+Open `/game/?v=phase224-markerhealth`, then verify:
 - the title says Phase 213
-- the HUD says `PHASE-223-TESTER-LAUNCH-CARD-LOCK`
+- the HUD says `PHASE-224-QA-SHORTCUT-INDEX-LOCK`
 - `version.json` reports phase 211
 - the game does not return to a stuck Booting screen

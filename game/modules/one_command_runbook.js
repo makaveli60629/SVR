@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-223-TESTER-LAUNCH-CARD-LOCK";
+  const BUILD = "PHASE-224-QA-SHORTCUT-INDEX-LOCK";
   const state = {
     build: BUILD,
     phase: 221,
@@ -52,7 +52,7 @@
       <pre style="white-space:pre-wrap;background:rgba(255,255,255,.06);border-radius:10px;padding:10px">cd C:\\Users\\ronal\\SVR
 powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT-FIXED.ps1"</pre>
       <div><b>Deploy:</b> GitHub → Actions → Auto Deploy → Run workflow → main</div>
-      <div><b>Test:</b> /game/?v=phase223-runbook</div>
+      <div><b>Test:</b> /game/?v=phase224-runbook</div>
       <p style="color:#dec8ff;margin-bottom:0">Press N to toggle this runbook.</p>
     `;
     p.querySelector("#svrRunbookClose").onclick = () => p.style.display = "none";

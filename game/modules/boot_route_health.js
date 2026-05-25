@@ -3,16 +3,16 @@
  * Verifies the direct route links used by boot fallback/recovery so testers can see if a private scene route is missing, stale, or blocked by cache/CDN.
  */
 (function(){
-  const BUILD = 'PHASE-223-TESTER-LAUNCH-CARD-LOCK';
+  const BUILD = 'PHASE-224-QA-SHORTCUT-INDEX-LOCK';
   const ROUTES = [
-    { key:'lobby', label:'Lobby', url:'./index.html?v=phase223-routecheck' },
-    { key:'scorpion', label:'Scorpion', url:'./scorpion.html?v=phase223-routecheck' },
-    { key:'pgaDrive', label:'PGA Drive', url:'./pga-drive.html?v=phase223-routecheck' },
-    { key:'chipPutt', label:'Chip/Putt', url:'./chip-putt.html?v=phase223-routecheck' },
-    { key:'reiki', label:'Reiki Room', url:'./reiki.html?v=phase223-routecheck' },
-    { key:'store', label:'VR Store', url:'./store-room.html?v=phase223-routecheck' },
-    { key:'smoker', label:'Smoker Lounge', url:'./smoker-lounge.html?v=phase223-routecheck' },
-    { key:'cam3', label:'Cam 3 Preview', url:'./cam3.html?v=phase223-routecheck' }
+    { key:'lobby', label:'Lobby', url:'./index.html?v=phase224-routecheck' },
+    { key:'scorpion', label:'Scorpion', url:'./scorpion.html?v=phase224-routecheck' },
+    { key:'pgaDrive', label:'PGA Drive', url:'./pga-drive.html?v=phase224-routecheck' },
+    { key:'chipPutt', label:'Chip/Putt', url:'./chip-putt.html?v=phase224-routecheck' },
+    { key:'reiki', label:'Reiki Room', url:'./reiki.html?v=phase224-routecheck' },
+    { key:'store', label:'VR Store', url:'./store-room.html?v=phase224-routecheck' },
+    { key:'smoker', label:'Smoker Lounge', url:'./smoker-lounge.html?v=phase224-routecheck' },
+    { key:'cam3', label:'Cam 3 Preview', url:'./cam3.html?v=phase224-routecheck' }
   ];
   let lastResult = null;
   let overlay = null;
@@ -59,7 +59,7 @@
   }
   function toggle(){ const el=ensureOverlay(); if(el.style.display==='none' || !el.style.display) render(lastResult, true); else el.style.display='none'; }
   async function copy(){ if (!lastResult) await run('copy'); const txt=JSON.stringify(lastResult,null,2); try{ await navigator.clipboard.writeText(txt); }catch(_){ console.log(txt); } }
-  function download(){ const data=JSON.stringify(lastResult || {build:BUILD, at:now(), results:[]}, null, 2); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download='svr-route-health-phase223.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000); }
+  function download(){ const data=JSON.stringify(lastResult || {build:BUILD, at:now(), results:[]}, null, 2); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download='svr-route-health-phase224.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000); }
   document.addEventListener('click', ev=>{ const btn=ev.target && ev.target.closest && ev.target.closest('[data-svr-route-health]'); if(!btn) return; const act=btn.getAttribute('data-svr-route-health'); if(act==='run') run('button'); if(act==='copy') copy(); if(act==='download') download(); if(act==='hide') ensureOverlay().style.display='none'; });
   window.addEventListener('keydown', ev=>{ if(ev.key && ev.key.toLowerCase()==='l' && !ev.ctrlKey && !ev.altKey && !ev.metaKey){ toggle(); if(!lastResult) run('keyboard'); }});
   window.SVR_BOOT_ROUTE_HEALTH = { build:BUILD, routes:ROUTES.slice(), run, render, toggle, latest:()=>lastResult };

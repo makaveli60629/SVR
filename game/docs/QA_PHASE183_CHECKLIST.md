@@ -1,6 +1,6 @@
 # QA Phase 199
 
-- [ ] Confirm build marker says `PHASE-223-TESTER-LAUNCH-CARD-LOCK`.
+- [ ] Confirm build marker says `PHASE-224-QA-SHORTCUT-INDEX-LOCK`.
 - [ ] Press `F` during a player turn and confirm YOU appears under MUCKED/FOLDED.
 - [ ] Let showdown complete and confirm folded players are excluded from side-pot winners.
 - [ ] Confirm hand history still records winner, pot, winning five cards, side pots, contributions, and stacks.

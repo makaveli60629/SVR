@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
+  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
   "phase": 216,
   "modules": [
     "modules/auto_apply_helper.js",
-    "modules/enterprise_bridge_phase223.js"
+    "modules/enterprise_bridge_phase224.js"
   ],
   "public_page_touched": false,
   "notes": "Hardened single-script updater workflow. Chooses highest SVR_PHASE*_NEXT_PACKET.zip by phase number and applies safely."

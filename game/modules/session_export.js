@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-223-TESTER-LAUNCH-CARD-LOCK
+ * Build: PHASE-224-QA-SHORTCUT-INDEX-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-223-TESTER-LAUNCH-CARD-LOCK';
+const BUILD = 'PHASE-224-QA-SHORTCUT-INDEX-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

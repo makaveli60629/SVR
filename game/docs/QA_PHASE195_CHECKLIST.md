@@ -1,7 +1,7 @@
 # QA Phase 199 Checklist
 
 - [ ] Open `/game/?v=phase197`.
-- [ ] Confirm version/deploy overlay shows `PHASE-223-TESTER-LAUNCH-CARD-LOCK`.
+- [ ] Confirm version/deploy overlay shows `PHASE-224-QA-SHORTCUT-INDEX-LOCK`.
 - [ ] Press `G` and confirm bug report panel opens.
 - [ ] Enter area/severity/device/notes and save a report.
 - [ ] Confirm report count increments.

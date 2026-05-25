@@ -1,6 +1,6 @@
-# PHASE-223-TESTER-LAUNCH-CARD-LOCK
+# PHASE-224-QA-SHORTCUT-INDEX-LOCK
 
-Phase 223 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 224 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

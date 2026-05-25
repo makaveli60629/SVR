@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-223-TESTER-LAUNCH-CARD-LOCK",
+  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase223.js"
+    "game/modules/enterprise_bridge_phase224.js"
   ],
   "protected": {
     "publicPageTouched": false,
