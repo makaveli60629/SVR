@@ -1,4 +1,4 @@
-# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
+# PHASE-218-AUTO-APPLY-STATUS-LOCK
 
 ## Purpose
 Fix the remaining stuck-on-Booting risk by adding a no-Three.js recovery shell. If CDN/import/runtime loading fails, the game no longer remains frozen on Booting.

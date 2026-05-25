@@ -1,6 +1,6 @@
 # Phase 199 — Fold Eligibility + Muck Lock
 
-Build: `PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK`
+Build: `PHASE-218-AUTO-APPLY-STATUS-LOCK`
 
 ## Added
 

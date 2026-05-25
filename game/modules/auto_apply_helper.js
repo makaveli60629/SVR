@@ -1,8 +1,8 @@
-// PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
+// PHASE-218-AUTO-APPLY-STATUS-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
+    build: "PHASE-218-AUTO-APPLY-STATUS-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

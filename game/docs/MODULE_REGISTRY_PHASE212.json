@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
+  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"

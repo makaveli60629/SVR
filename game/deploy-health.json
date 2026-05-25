@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
-  "phase": 217,
+  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
+  "phase": 218,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false

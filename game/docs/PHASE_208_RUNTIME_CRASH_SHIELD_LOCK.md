@@ -1,4 +1,4 @@
-# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
+# PHASE-218-AUTO-APPLY-STATUS-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

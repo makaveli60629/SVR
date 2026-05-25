@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
+  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
   "phase": 216,
   "modules": [
     "modules/auto_apply_helper.js",
-    "modules/enterprise_bridge_phase217.js"
+    "modules/enterprise_bridge_phase218.js"
   ],
   "public_page_touched": false,
   "notes": "Hardened single-script updater workflow. Chooses highest SVR_PHASE*_NEXT_PACKET.zip by phase number and applies safely."

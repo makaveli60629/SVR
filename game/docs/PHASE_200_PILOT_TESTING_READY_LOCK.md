@@ -1,6 +1,6 @@
 # Phase 200 — Pilot Testing Ready Lock
 
-Build: `PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK`
+Build: `PHASE-218-AUTO-APPLY-STATUS-LOCK`
 
 ## Protected rules
 

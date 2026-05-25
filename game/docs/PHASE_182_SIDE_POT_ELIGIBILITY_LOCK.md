@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK`
+Build: `PHASE-218-AUTO-APPLY-STATUS-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

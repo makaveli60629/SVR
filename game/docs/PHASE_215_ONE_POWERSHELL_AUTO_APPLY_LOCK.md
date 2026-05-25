@@ -1,4 +1,4 @@
-# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
+# PHASE-218-AUTO-APPLY-STATUS-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

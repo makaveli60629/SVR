@@ -1,6 +1,6 @@
 # Phase 199 — Runtime QA Snapshot Lock
 
-Build: `PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK`
+Build: `PHASE-218-AUTO-APPLY-STATUS-LOCK`
 
 ## Scope
 - Adds `game/modules/runtime_qa.js`.

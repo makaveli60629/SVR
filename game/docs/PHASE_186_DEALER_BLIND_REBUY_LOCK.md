@@ -1,4 +1,4 @@
-# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
+# PHASE-218-AUTO-APPLY-STATUS-LOCK
 
 ## Scope
 - Added dealer button / blind-state telemetry for every hand.

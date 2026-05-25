@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Guided Playtest Wizard
- * Build: PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
+ * Build: PHASE-218-AUTO-APPLY-STATUS-LOCK
  * Purpose: give testers one clear checklist after deploy without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK';
+const BUILD = 'PHASE-218-AUTO-APPLY-STATUS-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeValue(value, max = 260) {

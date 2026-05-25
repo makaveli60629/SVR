@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
+  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
   "phase": 208,
   "modules": [
     "runtime_crash_shield.js",
     "bridge_proxy.js",
-    "enterprise_bridge_phase217.js",
+    "enterprise_bridge_phase218.js",
     "event_firewall.js"
   ],
   "public_page_touched": false

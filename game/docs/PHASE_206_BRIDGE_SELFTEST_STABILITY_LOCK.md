@@ -1,11 +1,11 @@
-# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
+# PHASE-218-AUTO-APPLY-STATUS-LOCK
 
 ## Purpose
 Phase 206 adds a bridge self-test/autorepair layer after the Phase 205 recorder cache-bust fix.
 
 ## Locked fixes
 - Adds `game/modules/bridge_selftest.js`.
-- Imports the bridge self-test after `enterprise_bridge_phase217.js`.
+- Imports the bridge self-test after `enterprise_bridge_phase218.js`.
 - Verifies every required bridge recorder alias at startup, game-ready, and key poker telemetry events.
 - Patches missing aliases in memory instead of allowing a TypeError to crash the render loop.
 - Emits `svr_bridge_selftest_update` for QA/admin telemetry.

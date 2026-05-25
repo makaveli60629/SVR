@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
+ * Build: PHASE-218-AUTO-APPLY-STATUS-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK';
+const BUILD = 'PHASE-218-AUTO-APPLY-STATUS-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

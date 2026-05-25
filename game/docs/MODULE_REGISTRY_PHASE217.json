@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
-  "phase": 217,
+  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
+  "phase": 218,
   "modules": [
     "game/modules/auto_apply_git_wrapper_fix.js",
-    "game/modules/enterprise_bridge_phase217.js"
+    "game/modules/enterprise_bridge_phase218.js"
   ],
   "public_page_touched": false
 }

@@ -1,4 +1,4 @@
-# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
+# PHASE-218-AUTO-APPLY-STATUS-LOCK
 
 ## Purpose
 Install a first-run bridge proxy before event/firewall/poker modules so missing `record*` methods cannot crash the runtime.
@@ -12,5 +12,5 @@ Install a first-run bridge proxy before event/firewall/poker modules so missing 
 
 ## Added files
 - `game/modules/bridge_proxy.js`
-- `game/modules/enterprise_bridge_phase217.js`
+- `game/modules/enterprise_bridge_phase218.js`
 - `game/docs/MODULE_REGISTRY_PHASE207.json`

@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
+  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
   "phase": 201,
   "modulesAdded": [
     "boot.js"

@@ -1,6 +1,6 @@
-# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
+# PHASE-218-AUTO-APPLY-STATUS-LOCK
 
-Phase 217 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 218 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

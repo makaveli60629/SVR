@@ -1,6 +1,6 @@
 {
   "phase": 200,
-  "build": "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
+  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
   "modules": [
     "enterprise_bridge",
     "runtime_qa",

@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
+  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
   "modules": [
     "game/modules/poker_demo.js",
     "game/modules/enterprise_bridge.js"

@@ -1,6 +1,6 @@
 # Phase 199 — Playtest Wizard Lock
 
-Build: `PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK`
+Build: `PHASE-218-AUTO-APPLY-STATUS-LOCK`
 
 ## Scope
 - Adds guided playtest wizard overlay.
