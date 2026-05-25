@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-224-QA-SHORTCUT-INDEX-LOCK
+ * Build: PHASE-225-PILOT-HANDOFF-CARD-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-224-QA-SHORTCUT-INDEX-LOCK';
+const BUILD = 'PHASE-225-PILOT-HANDOFF-CARD-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

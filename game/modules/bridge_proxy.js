@@ -1,11 +1,11 @@
 /**
  * SVR Poker — Bridge Proxy Runtime Guard
- * Build: PHASE-224-QA-SHORTCUT-INDEX-LOCK
+ * Build: PHASE-225-PILOT-HANDOFF-CARD-LOCK
  * Purpose: install a no-crash proxy before poker/runtime modules dispatch telemetry.
  * The proxy returns safe functions for any record* method so missing recorder aliases
  * cannot freeze the render loop.
  */
-const BUILD = 'PHASE-224-QA-SHORTCUT-INDEX-LOCK';
+const BUILD = 'PHASE-225-PILOT-HANDOFF-CARD-LOCK';
 const STORE_KEY = '__svrBridgeProxyQueue';
 
 function safePayload(value){

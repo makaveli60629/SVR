@@ -1,4 +1,4 @@
-# PHASE-224-QA-SHORTCUT-INDEX-LOCK
+# PHASE-225-PILOT-HANDOFF-CARD-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

@@ -1,4 +1,4 @@
-# PHASE-224-QA-SHORTCUT-INDEX-LOCK
+# PHASE-225-PILOT-HANDOFF-CARD-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

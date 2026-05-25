@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Deploy Verifier / Preflight QA Module
- * Build: PHASE-224-QA-SHORTCUT-INDEX-LOCK
+ * Build: PHASE-225-PILOT-HANDOFF-CARD-LOCK
  * Purpose: catch stale deploys, mismatched game/version/deploy-health data, and runtime drift before testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-224-QA-SHORTCUT-INDEX-LOCK';
+const BUILD = 'PHASE-225-PILOT-HANDOFF-CARD-LOCK';
 const EXPECTED_PHASE = 194;
 
 async function fetchJsonSafe(url) {

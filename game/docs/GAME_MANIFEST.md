@@ -134,17 +134,17 @@ Source package used for this phase:
 - SVR Wellness building ad refreshed to `SVR WELLNESS / L.A.` in neon green presentation styling.
 
 
-## PHASE-224-QA-SHORTCUT-INDEX-LOCK
+## PHASE-225-PILOT-HANDOFF-CARD-LOCK
 - Added exact best-five winning cards to showdown, history, and telemetry.
 
 
-## PHASE-224-QA-SHORTCUT-INDEX-LOCK
+## PHASE-225-PILOT-HANDOFF-CARD-LOCK
 - Adds side-pot eligibility and payout resolution.
 - Emits `svr_poker_side_pot_resolution`.
 - Keeps public Matrix page untouched.
 
 
-## PHASE-224-QA-SHORTCUT-INDEX-LOCK
+## PHASE-225-PILOT-HANDOFF-CARD-LOCK
 
 - Added folded/mucked player eligibility state.
 - Folded players are excluded from side-pot winner eligibility.
@@ -154,8 +154,8 @@ Source package used for this phase:
 
 
 ## Phase 199
-- PHASE-224-QA-SHORTCUT-INDEX-LOCK: dealer/blind state + safe rebuy continuity. Public page untouched.
+- PHASE-225-PILOT-HANDOFF-CARD-LOCK: dealer/blind state + safe rebuy continuity. Public page untouched.
 
 
 ## Phase 199
-- PHASE-224-QA-SHORTCUT-INDEX-LOCK: player decision aid, pot-odds pressure hints, and backend telemetry hook. Public page untouched.
+- PHASE-225-PILOT-HANDOFF-CARD-LOCK: player decision aid, pot-odds pressure hints, and backend telemetry hook. Public page untouched.

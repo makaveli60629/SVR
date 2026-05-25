@@ -1,4 +1,4 @@
-# PHASE-224-QA-SHORTCUT-INDEX-LOCK
+# PHASE-225-PILOT-HANDOFF-CARD-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Release Candidate Checklist Module
- * Build: PHASE-224-QA-SHORTCUT-INDEX-LOCK
+ * Build: PHASE-225-PILOT-HANDOFF-CARD-LOCK
  * Purpose: combine deploy, smoke, QA, export, and runtime module checks into one tester-ready release gate.
  * Public Matrix page is untouched. No secrets. No SQL strings.
  */
-const BUILD = 'PHASE-224-QA-SHORTCUT-INDEX-LOCK';
+const BUILD = 'PHASE-225-PILOT-HANDOFF-CARD-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeText(value, max = 260) { return String(value ?? '').slice(0, max); }

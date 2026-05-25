@@ -1,5 +1,5 @@
 {
-  "phase": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
+  "phase": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
   "modules": {
     "poker_demo.js": "Showdown winning five cards, ranking payload, player/legal-action flow preserved",
     "enterprise_bridge.js": "Telemetry bridge for hand results/action logs/legal actions/showdown reveal",

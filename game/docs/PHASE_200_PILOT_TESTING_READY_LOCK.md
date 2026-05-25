@@ -1,6 +1,6 @@
 # Phase 200 — Pilot Testing Ready Lock
 
-Build: `PHASE-224-QA-SHORTCUT-INDEX-LOCK`
+Build: `PHASE-225-PILOT-HANDOFF-CARD-LOCK`
 
 ## Protected rules
 

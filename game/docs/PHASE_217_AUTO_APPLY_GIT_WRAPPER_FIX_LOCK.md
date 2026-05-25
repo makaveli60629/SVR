@@ -1,5 +1,5 @@
 
-# PHASE-224-QA-SHORTCUT-INDEX-LOCK
+# PHASE-225-PILOT-HANDOFF-CARD-LOCK
 
 ## Purpose
 Fixes the PowerShell updater failure where the apply script wrapper passed git arguments incorrectly and Git opened help instead of running the intended subcommand.

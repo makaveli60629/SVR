@@ -1,9 +1,9 @@
-# PHASE-224-QA-SHORTCUT-INDEX-LOCK
+# PHASE-225-PILOT-HANDOFF-CARD-LOCK
 
-Phase 224 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
+Phase 225 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
 
 ## Test
-Open `/game/?v=phase224-autoapplystatus` and press `I`.
+Open `/game/?v=phase225-autoapplystatus` and press `I`.
 
 ## Locked
 - Public Matrix launch page untouched.

@@ -1,6 +1,6 @@
 # Phase 199 — Fold Eligibility + Muck Lock
 
-Build: `PHASE-224-QA-SHORTCUT-INDEX-LOCK`
+Build: `PHASE-225-PILOT-HANDOFF-CARD-LOCK`
 
 ## Added
 

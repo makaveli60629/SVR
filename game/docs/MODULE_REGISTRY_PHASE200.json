@@ -1,6 +1,6 @@
 {
   "phase": 200,
-  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
+  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
   "modules": [
     "enterprise_bridge",
     "runtime_qa",

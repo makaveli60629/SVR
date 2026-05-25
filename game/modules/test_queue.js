@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Queue Dashboard
- * Build: PHASE-224-QA-SHORTCUT-INDEX-LOCK
+ * Build: PHASE-225-PILOT-HANDOFF-CARD-LOCK
  * Purpose: convert tester feedback, bug reports, release candidate checks, and smoke tests into a compact triage queue.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-224-QA-SHORTCUT-INDEX-LOCK';
+const BUILD = 'PHASE-225-PILOT-HANDOFF-CARD-LOCK';
 const EXPECTED_PHASE = 197;
 const STORE_KEY = 'svr_test_queue_phase197';
 

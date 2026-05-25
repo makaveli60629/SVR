@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
+  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase224.js"
+    "game/modules/enterprise_bridge_phase225.js"
   ],
   "protected": {
     "publicPageTouched": false,

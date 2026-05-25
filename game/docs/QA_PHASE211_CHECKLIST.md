@@ -1,8 +1,8 @@
 # Phase 213 QA Checklist
 
-- [ ] Open `/game/?v=phase224-markerhealth`.
+- [ ] Open `/game/?v=phase225-markerhealth`.
 - [ ] Confirm the page title shows Phase 213.
-- [ ] Confirm HUD/build marker shows PHASE-224-QA-SHORTCUT-INDEX-LOCK.
+- [ ] Confirm HUD/build marker shows PHASE-225-PILOT-HANDOFF-CARD-LOCK.
 - [ ] Confirm console has no red runtime crash during first 20 seconds.
 - [ ] Confirm `window.SVR_MARKER_HEALTH.run()` returns all required marker checks.
 - [ ] Confirm Booting does not stay permanent.

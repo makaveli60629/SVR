@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
+  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",
-    "game/modules/enterprise_bridge_phase224.js",
+    "game/modules/enterprise_bridge_phase225.js",
     "game/modules/bridge_selftest.js",
     "game/modules/event_firewall.js"
   ],

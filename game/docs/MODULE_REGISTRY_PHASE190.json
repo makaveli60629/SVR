@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
+  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
   "modules": [
     {
       "path": "game/modules/session_export.js",

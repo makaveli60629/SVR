@@ -1,8 +1,8 @@
-// PHASE-224-QA-SHORTCUT-INDEX-LOCK
+// PHASE-225-PILOT-HANDOFF-CARD-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
+    build: "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

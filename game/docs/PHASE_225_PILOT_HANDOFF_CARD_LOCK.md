@@ -1,7 +1,7 @@
 # PHASE-225-PILOT-HANDOFF-CARD-LOCK
 
 ## Purpose
-Phase 225 adds a post-deploy checklist panel so the workflow can verify deployment, cache busting, and tester handoff after Auto Deploy.
+Phase 225 adds a pilot handoff card so non-technical testers can open one concise panel with the test link, what to verify, what to report, and the support shortcuts.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 225 adds a post-deploy checklist panel so the workflow can verify deployme
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase225-postdeploy` and press `E`.
+Open `/game/?v=phase225-handoff` and press `H`.

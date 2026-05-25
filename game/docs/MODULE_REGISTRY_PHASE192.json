@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
+  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
   "phase": 199,
   "modules_added": [
     "game/modules/smoke_test.js"

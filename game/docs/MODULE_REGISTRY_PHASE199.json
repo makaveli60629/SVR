@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
+  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
   "modulesAdded": [
     "game/modules/demo_certification.js"
   ],

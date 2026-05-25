@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Open /game/?v=phase188.
-- [ ] Confirm build marker shows PHASE-224-QA-SHORTCUT-INDEX-LOCK
+- [ ] Confirm build marker shows PHASE-225-PILOT-HANDOFF-CARD-LOCK
 - [ ] Enter or preview game without black screen.
 - [ ] During player turn, watch shows actor YOU and countdown.
 - [ ] When no call is facing player, watch button reads CHECK.

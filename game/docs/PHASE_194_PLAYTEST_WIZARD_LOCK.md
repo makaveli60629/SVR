@@ -1,6 +1,6 @@
 # Phase 199 — Playtest Wizard Lock
 
-Build: `PHASE-224-QA-SHORTCUT-INDEX-LOCK`
+Build: `PHASE-225-PILOT-HANDOFF-CARD-LOCK`
 
 ## Scope
 - Adds guided playtest wizard overlay.

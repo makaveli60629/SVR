@@ -1,6 +1,6 @@
-# PHASE-224-QA-SHORTCUT-INDEX-LOCK
+# PHASE-225-PILOT-HANDOFF-CARD-LOCK
 
-Phase 224 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 225 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
-  "phase": 224,
+  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
+  "phase": 225,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "QA shortcut index, tester control map, launch-panel navigation"
+  "featureLock": "pilot handoff card, test instructions, readiness summary"
 }

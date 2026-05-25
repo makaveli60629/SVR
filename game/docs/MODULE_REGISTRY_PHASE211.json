@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-224-QA-SHORTCUT-INDEX-LOCK",
+  "build": "PHASE-225-PILOT-HANDOFF-CARD-LOCK",
   "public_page_touched": false,
   "modules": [
     "modules/runtime_crash_shield.js",
@@ -9,7 +9,7 @@
     "modules/marker_health.js",
     "modules/bridge_proxy.js",
     "modules/event_firewall.js",
-    "modules/enterprise_bridge_phase224.js",
+    "modules/enterprise_bridge_phase225.js",
     "modules/bridge_selftest.js"
   ]
 }

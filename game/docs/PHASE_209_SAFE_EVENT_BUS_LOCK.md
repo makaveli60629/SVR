@@ -1,11 +1,11 @@
-# PHASE-224-QA-SHORTCUT-INDEX-LOCK
+# PHASE-225-PILOT-HANDOFF-CARD-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase224.js`
+- `game/modules/enterprise_bridge_phase225.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections
