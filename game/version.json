@@ -1,8 +1,8 @@
 ﻿{
     "public_page_touched":  false,
-    "build":  "PHASE-245-FIXED-GIT-RUNGIT-HOTFIX-LOCK",
-    "source":  "direct-mainjs-hotfix",
-    "featureLock":  "fixed RunGit PowerShell wrapper, main.js runtime catch locked, phase cache bust",
-    "generatedAt":  "2026-05-25T23:53:55.7353033Z",
-    "phase":  245
+    "build":  "PHASE-247-BLACK-SCREEN-RENDER-LOOP-GUARD-LOCK",
+    "source":  "black-screen-render-loop-guard-hotfix",
+    "featureLock":  "black screen render loop guard, subsystem isolation, emergency render after runtime shield",
+    "generatedAt":  "2026-05-25T23:55:02.9571505Z",
+    "phase":  247
 }

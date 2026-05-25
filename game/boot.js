@@ -84,7 +84,7 @@
     if (ready || fallbackStarted) return;
     fallbackStarted = true;
     setStatus("Boot fallback: loading recovery shell...");
-    import("./modules/boot_fallback.js?v=phase245").then(function(){
+    import("./modules/boot_fallback.js?v=phase247").then(function(){
       if (window.SVR_BOOT_FALLBACK && !ready) {
         window.SVR_BOOT_FALLBACK.show(reason, detail);
       }
@@ -103,10 +103,10 @@
     startFallback: startFallback
   };
 
-  import("./modules/boot_route_recovery.js?v=phase245").catch(function(error){
+  import("./modules/boot_route_recovery.js?v=phase247").catch(function(error){
     softReport("Boot route recovery module failed.", error);
   });
-  import("./modules/boot_route_health.js?v=phase245").catch(function(error){
+  import("./modules/boot_route_health.js?v=phase247").catch(function(error){
     softReport("Boot route health module failed.", error);
   });
 
@@ -157,7 +157,7 @@
     }
   }, 15000);
 
-  import("./main.js?v=phase245").then(function(){
+  import("./main.js?v=phase247").then(function(){
     imported = true;
     setStatus("Game module loaded. Building scene...");
   }).catch(function(error){
@@ -166,5 +166,7 @@
     startFallback("Failed to import main game module.", error);
   });
 })();
+
+
 
 
