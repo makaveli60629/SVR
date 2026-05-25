@@ -134,5 +134,11 @@ Source package used for this phase:
 - SVR Wellness building ad refreshed to `SVR WELLNESS / L.A.` in neon green presentation styling.
 
 
-## PHASE-181-ALLIN-CONTRIBUTION-LOCK
+## PHASE-182-SIDE-POT-ELIGIBILITY-LOCK
 - Added exact best-five winning cards to showdown, history, and telemetry.
+
+
+## PHASE-182-SIDE-POT-ELIGIBILITY-LOCK
+- Adds side-pot eligibility and payout resolution.
+- Emits `svr_poker_side_pot_resolution`.
+- Keeps public Matrix page untouched.

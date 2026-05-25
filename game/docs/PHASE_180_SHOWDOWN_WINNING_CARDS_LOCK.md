@@ -1,4 +1,4 @@
-# PHASE-181-ALLIN-CONTRIBUTION-LOCK
+# PHASE-182-SIDE-POT-ELIGIBILITY-LOCK
 
 ## Scope
 - Keeps playable poker priority moving forward.

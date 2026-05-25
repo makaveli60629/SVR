@@ -20,7 +20,7 @@ function auth(req,res,next){
 }
 
 app.get('/api/health', async (_req,res)=>{
-  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK' }); }
+  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-182-SIDE-POT-ELIGIBILITY-LOCK' }); }
   catch(err){ res.status(500).json({ status:'error', database:'failed', message:err.message }); }
 });
 
@@ -170,4 +170,52 @@ app.get('/api/game/legal-actions', async (req,res)=>{
   }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
 });
 
+
+app.post('/api/game/showdown', async (req,res)=>{
+  try{
+    const body = req.body || {};
+    const pool = await getPool();
+    await pool.request()
+      .input('HandNumber', sql.Int, body.hand || body.handNumber || null)
+      .input('Winner', sql.NVarChar(120), body.winner || null)
+      .input('HandName', sql.NVarChar(120), body.handName || null)
+      .input('WinningCards', sql.NVarChar(80), body.winningCards || null)
+      .input('Board', sql.NVarChar(80), body.board || null)
+      .input('Pot', sql.Int, Number(body.pot || 0))
+      .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(body))
+      .query('INSERT INTO GameShowdowns(HandNumber, Winner, HandName, WinningCards, Board, Pot, PayloadJson) VALUES(@HandNumber, @Winner, @HandName, @WinningCards, @Board, @Pot, @PayloadJson)');
+    res.json({ ok:true });
+  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
+});
+
+app.get('/api/game/showdowns', async (req,res)=>{
+  try{
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit || 30)));
+    const pool = await getPool();
+    const result = await pool.request()
+      .input('Limit', sql.Int, limit)
+      .query('SELECT TOP (@Limit) Id, HandNumber, Winner, HandName, WinningCards, Board, Pot, PayloadJson, CreatedAt FROM GameShowdowns ORDER BY CreatedAt DESC');
+    res.json({ ok:true, showdowns: result.recordset.map(row => ({ id: row.Id, handNumber: row.HandNumber, winner: row.Winner, handName: row.HandName, winningCards: row.WinningCards, board: row.Board, pot: row.Pot, createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
+  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
+});
+
 app.listen(port, () => console.log(`SVR Enterprise API running on port ${port}`));
+
+
+app.post('/api/game/side-pots', async (req,res)=>{
+  const payload = req.body || {};
+  const pool = await getPool();
+  await pool.request()
+    .input('HandNumber', sql.Int, Number(payload.handNumber || payload.hand || 0))
+    .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(payload))
+    .query('INSERT INTO GameSidePotResolutions(HandNumber, PayloadJson) VALUES(@HandNumber, @PayloadJson)');
+  res.json({ ok:true });
+});
+
+app.get('/api/game/side-pots', async (req,res)=>{
+  const limit = Math.min(100, Math.max(1, Number(req.query.limit || 30)));
+  const pool = await getPool();
+  const result = await pool.request().input('Limit', sql.Int, limit)
+    .query('SELECT TOP (@Limit) Id, HandNumber, PayloadJson, CreatedAt FROM GameSidePotResolutions ORDER BY Id DESC');
+  res.json({ ok:true, rows: result.recordset });
+});

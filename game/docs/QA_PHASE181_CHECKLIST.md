@@ -1,7 +1,7 @@
-# QA Phase 181
+# QA Phase 182
 
-- [ ] Open `/game/?v=phase181`.
-- [ ] Confirm build says PHASE-181-ALLIN-CONTRIBUTION-LOCK.
+- [ ] Open `/game/?v=phase182`.
+- [ ] Confirm build says PHASE-182-SIDE-POT-ELIGIBILITY-LOCK.
 - [ ] Start hand and verify history panel shows contribution line.
 - [ ] Press A or ALL-IN and verify stack does not go negative.
 - [ ] Verify all-in name appears in panel.

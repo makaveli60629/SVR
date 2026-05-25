@@ -1,8 +1,7 @@
 {
   "status": "ok",
-  "build": "PHASE-181-ALLIN-CONTRIBUTION-LOCK",
+  "build": "PHASE-182-SIDE-POT-ELIGIBILITY-LOCK",
+  "phase": 182,
   "source": "direct-game-folder",
-  "target": "/game",
-  "phase": 180,
   "generatedAt": "2026-05-25T00:00:00Z"
 }

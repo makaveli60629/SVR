@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-181-ALLIN-CONTRIBUTION-LOCK
+ * Build: PHASE-182-SIDE-POT-ELIGIBILITY-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-181-ALLIN-CONTRIBUTION-LOCK',
+  build: 'PHASE-182-SIDE-POT-ELIGIBILITY-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,
@@ -68,3 +68,5 @@ SVREnterpriseBridge.init();
   window.addEventListener('svr_poker_showdown_reveal', (event) => {
     postJson('/api/game/showdown', event.detail || {});
   });
+
+try { window.addEventListener('svr_poker_side_pot_resolution', (event) => { SVREnterpriseBridge?.queueTelemetry?.('side_pot_resolution', event.detail || {}); }); } catch (_) {}
