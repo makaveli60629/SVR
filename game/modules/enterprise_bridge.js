@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-194-PLAYTEST-WIZARD-LOCK
+ * Build: PHASE-199-DEMO-CERTIFICATION-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-194-PLAYTEST-WIZARD-LOCK',
+  build: 'PHASE-199-DEMO-CERTIFICATION-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,

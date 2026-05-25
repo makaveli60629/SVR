@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Bug Report Capture
- * Build: PHASE-198-TEST-REPORT-BUNDLE-LOCK
+ * Build: PHASE-199-DEMO-CERTIFICATION-LOCK
  * Purpose: capture tester issue reports from inside the game without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-198-TEST-REPORT-BUNDLE-LOCK';
+const BUILD = 'PHASE-199-DEMO-CERTIFICATION-LOCK';
 const EXPECTED_PHASE = 195;
 const STORE_KEY = 'svr_bug_reports_phase197';
 

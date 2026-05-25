@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-194-PLAYTEST-WIZARD-LOCK
+ * Build: PHASE-199-DEMO-CERTIFICATION-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-194-PLAYTEST-WIZARD-LOCK';
+const BUILD = 'PHASE-199-DEMO-CERTIFICATION-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }

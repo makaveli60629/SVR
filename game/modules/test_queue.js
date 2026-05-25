@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Queue Dashboard
- * Build: PHASE-198-TEST-REPORT-BUNDLE-LOCK
+ * Build: PHASE-199-DEMO-CERTIFICATION-LOCK
  * Purpose: convert tester feedback, bug reports, release candidate checks, and smoke tests into a compact triage queue.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-198-TEST-REPORT-BUNDLE-LOCK';
+const BUILD = 'PHASE-199-DEMO-CERTIFICATION-LOCK';
 const EXPECTED_PHASE = 197;
 const STORE_KEY = 'svr_test_queue_phase197';
 

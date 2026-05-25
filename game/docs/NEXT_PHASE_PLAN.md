@@ -1,6 +1,6 @@
-# Next Phase Plan after PHASE-194-PLAYTEST-WIZARD-LOCK
+# Next Phase Plan after PHASE-199-DEMO-CERTIFICATION-LOCK
 
-## Phase 198 recommendation
+## Phase 199 recommendation
 Focus on final tester handoff:
 - one-page tester instructions
 - Quest/browser checklist

@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-198-TEST-REPORT-BUNDLE-LOCK",
-  "phase": 198,
+  "build": "PHASE-199-DEMO-CERTIFICATION-LOCK",
+  "phase": 199,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "test report bundle, QA/bug/tester/test-queue session packaging"
+  "featureLock": "demo certification, go/no-go readiness gate, testing shortcut map"
 }

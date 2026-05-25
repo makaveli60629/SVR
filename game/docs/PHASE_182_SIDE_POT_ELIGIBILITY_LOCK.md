@@ -1,9 +1,9 @@
-# Phase 185 — Side Pot Eligibility Lock
+# Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-194-PLAYTEST-WIZARD-LOCK`
+Build: `PHASE-199-DEMO-CERTIFICATION-LOCK`
 
 ## Locked additions
-- Side-pot resolution from the Phase 181 contribution ledger.
+- Side-pot resolution from the Phase 199 contribution ledger.
 - Per-seat payout array at showdown.
 - Winning side-pot summary displayed in the table hand-history panel.
 - New browser event: `svr_poker_side_pot_resolution`.

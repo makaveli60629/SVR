@@ -1,4 +1,4 @@
-# PHASE-194-PLAYTEST-WIZARD-LOCK
+# PHASE-199-DEMO-CERTIFICATION-LOCK
 
 ## Scope
 - Added dealer button / blind-state telemetry for every hand.

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Guided Playtest Wizard
- * Build: PHASE-194-PLAYTEST-WIZARD-LOCK
+ * Build: PHASE-199-DEMO-CERTIFICATION-LOCK
  * Purpose: give testers one clear checklist after deploy without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-194-PLAYTEST-WIZARD-LOCK';
+const BUILD = 'PHASE-199-DEMO-CERTIFICATION-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeValue(value, max = 260) {
@@ -92,7 +92,7 @@ const SVRPlaytestWizard = {
     const checks = [];
     const add = (name, pass, detail = '') => checks.push({ name, pass: !!pass, detail: safeValue(detail, 240) });
 
-    add('Build label present', document.documentElement.innerHTML.includes(BUILD) || document.title.includes('Phase 194'), BUILD);
+    add('Build label present', document.documentElement.innerHTML.includes(BUILD) || document.title.includes('Phase 199'), BUILD);
     add('Runtime QA module', has('SVR_RUNTIME_QA'), 'Q overlay');
     add('Session export module', has('SVR_SESSION_EXPORT'), 'X download / Y copy');
     add('Deploy verifier module', has('SVR_DEPLOY_VERIFIER'), 'V overlay');

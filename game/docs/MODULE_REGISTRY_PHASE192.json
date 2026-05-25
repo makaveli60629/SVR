@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-194-PLAYTEST-WIZARD-LOCK",
-  "phase": 194,
+  "build": "PHASE-199-DEMO-CERTIFICATION-LOCK",
+  "phase": 199,
   "modules_added": [
     "game/modules/smoke_test.js"
   ],

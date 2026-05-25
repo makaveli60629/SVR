@@ -69,7 +69,7 @@ Source package used for this phase:
 - skyline should leave enough room to see the sky and moon
 
 
-## Phase 78 lock additions
+## Phase 199 lock additions
 - Watch text flipped upright again as the permanent baseline.
 - Added leaderboard, tourney, and about boards as persistent lobby signage.
 - Added brighter stars, more lobby sprites, and rising snow-flake style particles.
@@ -78,14 +78,14 @@ Source package used for this phase:
 - Moon and Mars are now both visible and brighter for the skyline pass.
 
 
-## Phase 94 audit relock
+## Phase 199 audit relock
 - Current lock was rebuilt from the later phase package, not the old helper zip.
 - The accidental helper-only `game.zip` was removed from the deployment path for this package.
 - This relock keeps the later lobby/runtime/modules/assets together in one repo-ready `game/` folder.
-- Historical Phase 76 notes remain in `docs/` only as lineage records; they are not the active build target.
+- Historical Phase 199 notes remain in `docs/` only as lineage records; they are not the active build target.
 
 
-## Phase 33 donor rebase module lock (2026-04-11)
+## Phase 199 donor rebase module lock (2026-04-11)
 - donor baseline: uploaded `game.zip` from user on 2026-04-11
 - control lock:
   - Meta hands only
@@ -105,13 +105,13 @@ Source package used for this phase:
   - docs
 
 
-## Phase 34 modular overlay
+## Phase 199 modular overlay
 - Floor donor restored from earlier tile/slate lobby pass
 - Reiki storefront donor restored from earlier donor pass
 - PGA storefront donor restored from elegance donor pass
 
 
-## Phase 35 audit / restore
+## Phase 199 audit / restore
 - Restored the SVR Wellness partner image and logo assets into the Reiki hub.
 - Rewrote the Reiki three-column storefront copy to read more professional and partner-led.
 - Moved the PGA hub to the south-west wall.
@@ -124,27 +124,27 @@ Source package used for this phase:
 - Moon and Mars raised, brightened, and pushed behind skyline
 
 
-## Phase 38 lock
+## Phase 199 lock
 - PGA hub wall/floor alignment corrected on the south-west wall
 - wrist watch quick scene teleports restored
 - scene quick-jumps enabled for lobby, table, seat, Reiki, PGA, legend, sponsor
 - donor modular split preserved
 
-## Phase 42 modular overlay
+## Phase 199 modular overlay
 - SVR Wellness building ad refreshed to `SVR WELLNESS / L.A.` in neon green presentation styling.
 
 
-## PHASE-194-PLAYTEST-WIZARD-LOCK
+## PHASE-199-DEMO-CERTIFICATION-LOCK
 - Added exact best-five winning cards to showdown, history, and telemetry.
 
 
-## PHASE-194-PLAYTEST-WIZARD-LOCK
+## PHASE-199-DEMO-CERTIFICATION-LOCK
 - Adds side-pot eligibility and payout resolution.
 - Emits `svr_poker_side_pot_resolution`.
 - Keeps public Matrix page untouched.
 
 
-## PHASE-194-PLAYTEST-WIZARD-LOCK
+## PHASE-199-DEMO-CERTIFICATION-LOCK
 
 - Added folded/mucked player eligibility state.
 - Folded players are excluded from side-pot winner eligibility.
@@ -153,9 +153,9 @@ Source package used for this phase:
 - Public Matrix page untouched.
 
 
-## Phase 186
-- PHASE-194-PLAYTEST-WIZARD-LOCK: dealer/blind state + safe rebuy continuity. Public page untouched.
+## Phase 199
+- PHASE-199-DEMO-CERTIFICATION-LOCK: dealer/blind state + safe rebuy continuity. Public page untouched.
 
 
-## Phase 187
-- PHASE-194-PLAYTEST-WIZARD-LOCK: player decision aid, pot-odds pressure hints, and backend telemetry hook. Public page untouched.
+## Phase 199
+- PHASE-199-DEMO-CERTIFICATION-LOCK: player decision aid, pot-odds pressure hints, and backend telemetry hook. Public page untouched.

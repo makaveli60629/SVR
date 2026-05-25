@@ -1,7 +1,7 @@
-# Phase 185 — Bot Street Action Safety Lock
+# Phase 199 — Bot Street Action Safety Lock
 
 ## Build
-`PHASE-194-PLAYTEST-WIZARD-LOCK`
+`PHASE-199-DEMO-CERTIFICATION-LOCK`
 
 ## Purpose
 This phase locks the poker runtime against scheduled bot-action errors and hardens street betting events before the next polish pass.

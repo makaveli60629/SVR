@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Tester Feedback Triage
- * Build: PHASE-198-TEST-REPORT-BUNDLE-LOCK
+ * Build: PHASE-199-DEMO-CERTIFICATION-LOCK
  * Purpose: collect playtest verdicts and triage summaries after QA/smoke/bug-report passes.
  * Public Matrix page is not touched.
  */
-const BUILD = 'PHASE-198-TEST-REPORT-BUNDLE-LOCK';
+const BUILD = 'PHASE-199-DEMO-CERTIFICATION-LOCK';
 const EXPECTED_PHASE = 196;
 const STORE_KEY = 'svr_tester_feedback_phase197';
 

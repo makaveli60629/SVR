@@ -1,7 +1,7 @@
-# QA Phase 185
+# QA Phase 199
 
 - [ ] Open `/game/?v=phase183`.
-- [ ] Confirm build says PHASE-194-PLAYTEST-WIZARD-LOCK
+- [ ] Confirm build says PHASE-199-DEMO-CERTIFICATION-LOCK
 - [ ] Start hand and verify history panel shows contribution line.
 - [ ] Press A or ALL-IN and verify stack does not go negative.
 - [ ] Verify all-in name appears in panel.

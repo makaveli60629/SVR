@@ -1,6 +1,6 @@
-# Phase 194 — Deploy Verifier Preflight Lock
+# Phase 199 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-194-PLAYTEST-WIZARD-LOCK`
+Build: `PHASE-199-DEMO-CERTIFICATION-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.
