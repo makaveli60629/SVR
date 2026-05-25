@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-172-POKER-WATCH-ACTION-BINDINGS-AND-SEAT-QA",
-  "scope": "game-scorpion-poker-watch-actions-seat-qa",
-  "fix": "added Scorpion private-room watch-style Fold/Check/Call/Raise/All-In/Next Hand action bindings, keyboard action shortcuts, 20-second timer display, player-turn display, legal action display, and stronger six-seat/five-bot/south-player-seat QA while preserving Phase 171 table bindings, Phase 170 poker.js engine, left-to-right dealing, invisible dealer, official logo branding, no music, no site changes, no movement changes, no teleport changes, and no XR reference-space mutation",
+  "build": "PHASE-173-MILESTONE-5-PRIVACY-PRESENTATION-MODULE-CHECKLIST-LOCK",
+  "scope": "game-phase173-privacy-presentation-module-checklist-lock",
+  "fix": "added Phase 173 Milestone 5 manifest checklist, recorded optional privacy, presentation, hand physics, seat helper, daily pick, ticker, and philanthropy modules, preserved Phase 169 lobby restore and Phase 170-172 Scorpion poker locks, kept public page and site untouched, and locked no music, no movement changes, no teleport changes, no XR reference-space mutation, official logo only, and modular phase checklist flow",
   "siteTouched": false,
   "gameTouched": true,
-  "previousStableBuild": "PHASE-171-POKER-3D-TABLE-BINDINGS-AND-QA-LOCK",
-  "nextBuild": "PHASE-173-POKER-SEAT-HEIGHT-AND-ACTION-TIMER-POLISH"
+  "previousStableBuild": "PHASE-172-POKER-WATCH-ACTION-BINDINGS-AND-SEAT-QA",
+  "nextBuild": "PHASE-174-MODULE-REGISTRY-COMPLETION-EVENT-BRIDGE"
 }
