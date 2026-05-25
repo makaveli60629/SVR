@@ -1,4 +1,4 @@
--- SVR Phase 182 side pot resolution storage
+-- SVR Phase 183 side pot resolution storage
 IF OBJECT_ID('dbo.GameSidePotResolutions', 'U') IS NULL
 BEGIN
   CREATE TABLE dbo.GameSidePotResolutions (

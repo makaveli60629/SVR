@@ -1,4 +1,4 @@
-# PHASE-182-SIDE-POT-ELIGIBILITY-LOCK
+# PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK
 
 ## Scope
 - Keeps playable poker priority moving forward.

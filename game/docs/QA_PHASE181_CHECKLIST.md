@@ -1,7 +1,7 @@
-# QA Phase 182
+# QA Phase 183
 
-- [ ] Open `/game/?v=phase182`.
-- [ ] Confirm build says PHASE-182-SIDE-POT-ELIGIBILITY-LOCK.
+- [ ] Open `/game/?v=phase183`.
+- [ ] Confirm build says PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK.
 - [ ] Start hand and verify history panel shows contribution line.
 - [ ] Press A or ALL-IN and verify stack does not go negative.
 - [ ] Verify all-in name appears in panel.

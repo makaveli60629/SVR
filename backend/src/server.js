@@ -20,7 +20,7 @@ function auth(req,res,next){
 }
 
 app.get('/api/health', async (_req,res)=>{
-  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-182-SIDE-POT-ELIGIBILITY-LOCK' }); }
+  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK' }); }
   catch(err){ res.status(500).json({ status:'error', database:'failed', message:err.message }); }
 });
 
@@ -217,5 +217,26 @@ app.get('/api/game/side-pots', async (req,res)=>{
   const pool = await getPool();
   const result = await pool.request().input('Limit', sql.Int, limit)
     .query('SELECT TOP (@Limit) Id, HandNumber, PayloadJson, CreatedAt FROM GameSidePotResolutions ORDER BY Id DESC');
+  res.json({ ok:true, rows: result.recordset });
+});
+
+
+app.post('/api/game/fold-eligibility', async (req,res)=>{
+  const payload = req.body || {};
+  const folded = payload.foldedPlayers || payload.folded || [];
+  const pool = await getPool();
+  await pool.request()
+    .input('HandNumber', sql.Int, Number(payload.handNumber || payload.hand || 0))
+    .input('FoldedPlayersJson', sql.NVarChar(sql.MAX), JSON.stringify(folded))
+    .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(payload))
+    .query('INSERT INTO GameFoldEligibility(HandNumber, FoldedPlayersJson, PayloadJson) VALUES(@HandNumber, @FoldedPlayersJson, @PayloadJson)');
+  res.json({ ok:true });
+});
+
+app.get('/api/game/fold-eligibility', async (req,res)=>{
+  const limit = Math.min(100, Math.max(1, Number(req.query.limit || 30)));
+  const pool = await getPool();
+  const result = await pool.request().input('Limit', sql.Int, limit)
+    .query('SELECT TOP (@Limit) Id, HandNumber, FoldedPlayersJson, PayloadJson, CreatedAt FROM GameFoldEligibility ORDER BY Id DESC');
   res.json({ ok:true, rows: result.recordset });
 });

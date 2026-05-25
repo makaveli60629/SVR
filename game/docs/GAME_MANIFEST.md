@@ -134,11 +134,20 @@ Source package used for this phase:
 - SVR Wellness building ad refreshed to `SVR WELLNESS / L.A.` in neon green presentation styling.
 
 
-## PHASE-182-SIDE-POT-ELIGIBILITY-LOCK
+## PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK
 - Added exact best-five winning cards to showdown, history, and telemetry.
 
 
-## PHASE-182-SIDE-POT-ELIGIBILITY-LOCK
+## PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK
 - Adds side-pot eligibility and payout resolution.
 - Emits `svr_poker_side_pot_resolution`.
 - Keeps public Matrix page untouched.
+
+
+## PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK
+
+- Added folded/mucked player eligibility state.
+- Folded players are excluded from side-pot winner eligibility.
+- Added mucked/folded line to table hand-history panel.
+- Added `svr_poker_fold_eligibility_update` event.
+- Public Matrix page untouched.

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-182-SIDE-POT-ELIGIBILITY-LOCK
+ * Build: PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-182-SIDE-POT-ELIGIBILITY-LOCK',
+  build: 'PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,

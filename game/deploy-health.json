@@ -1,7 +1,6 @@
 {
   "status": "ok",
-  "build": "PHASE-182-SIDE-POT-ELIGIBILITY-LOCK",
-  "phase": 182,
-  "source": "direct-game-folder",
-  "generatedAt": "2026-05-25T00:00:00Z"
+  "build": "PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK",
+  "target": "/game",
+  "source": "direct-game-folder"
 }

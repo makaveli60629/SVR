@@ -1,6 +1,6 @@
-# Phase 182 — Side Pot Eligibility Lock
+# Phase 183 — Side Pot Eligibility Lock
 
-Build: `PHASE-182-SIDE-POT-ELIGIBILITY-LOCK`
+Build: `PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 181 contribution ledger.

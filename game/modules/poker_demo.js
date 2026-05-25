@@ -92,6 +92,15 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     return [...current.allInPlayers].map((i) => players[i]?.anchor?.name).filter(Boolean);
   }
 
+  function getFoldedNames() {
+    if (!current?.foldedPlayers) return [];
+    return [...current.foldedPlayers].map((i) => players[i]?.anchor?.name).filter(Boolean);
+  }
+
+  function isFolded(index) {
+    return !!current?.foldedPlayers?.has(index);
+  }
+
 
   function summarizeSidePots(sidePots = []) {
     if (!sidePots.length) return 'SIDE POTS: none';
@@ -100,15 +109,18 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
   function resolveSidePots(results = [], contributions = [], totalPot = 0) {
     const normalized = players.map((_, i) => Math.max(0, Math.round(Number(contributions[i] || 0))));
-    const ranking = new Map(results.map((r) => [r.player.anchor.index, r]));
+    const folded = current?.foldedPlayers || new Set();
+    const eligibleResults = results.filter((r) => !folded.has(r.player.anchor.index));
+    const ranking = new Map((eligibleResults.length ? eligibleResults : results).map((r) => [r.player.anchor.index, r]));
     const levels = [...new Set(normalized.filter((v) => v > 0))].sort((a, b) => a - b);
     const sidePots = [];
     const payouts = players.map(() => 0);
     let previous = 0;
 
     for (const level of levels) {
-      const eligible = normalized.map((v, i) => v >= level ? i : -1).filter((i) => i >= 0);
-      const amount = (level - previous) * eligible.length;
+      const contributors = normalized.map((v, i) => v >= level ? i : -1).filter((i) => i >= 0);
+      const eligible = contributors.filter((i) => !folded.has(i));
+      const amount = (level - previous) * contributors.length;
       previous = level;
       if (amount <= 0 || eligible.length === 0) continue;
 
@@ -130,6 +142,8 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
         level,
         amount,
         eligible,
+        contributors,
+        foldedExcluded: [...folded],
         winners: winners.map((entry) => entry.player.anchor.name),
         winningHand: top.result.name,
         winningCards: formatCards(top.result.cards || [])
@@ -176,7 +190,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     if (!current.allInPlayers) current.allInPlayers = new Set();
     if ((playerStacks[index] || 0) <= 0 || paid < request) {
       current.allInPlayers.add(index);
-      try { window.dispatchEvent(new CustomEvent('svr_poker_allin_update', { detail: { build: 'PHASE-182-SIDE-POT-ELIGIBILITY-LOCK', handNumber, player: players[index].anchor.name, seatIndex: index, paid, requested: request, stage: stage || current.stage, pot: current.pot, stacks: playerStacks.slice(), contributions: current.contributions.slice(), allInPlayers: getAllInNames() } })); } catch (_) {}
+      try { window.dispatchEvent(new CustomEvent('svr_poker_allin_update', { detail: { build: 'PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK', handNumber, player: players[index].anchor.name, seatIndex: index, paid, requested: request, stage: stage || current.stage, pot: current.pot, stacks: playerStacks.slice(), contributions: current.contributions.slice(), allInPlayers: getAllInNames() } })); } catch (_) {}
     }
     refreshPotStack();
     return paid;
@@ -246,9 +260,12 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     const allInLine = getAllInNames().length ? `ALL-IN: ${getAllInNames().join(', ')}` : 'ALL-IN: none';
     ctx.fillStyle = getAllInNames().length ? "#ffb95f" : "rgba(236,232,255,0.52)";
     ctx.fillText(allInLine, 54, 176);
+    const foldedLine = getFoldedNames().length ? `MUCKED/FOLDED: ${getFoldedNames().join(', ')}` : 'MUCKED/FOLDED: none';
+    ctx.fillStyle = getFoldedNames().length ? "#ff7da0" : "rgba(236,232,255,0.52)";
+    ctx.fillText(foldedLine, 54, 204);
     ctx.fillStyle = current?.sidePots?.length ? "#8ce5ff" : "rgba(236,232,255,0.52)";
     ctx.font = "23px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
-    ctx.fillText(current?.sidePots?.length ? summarizeSidePots(current.sidePots).slice(0, 116) : 'SIDE POTS: waiting for showdown', 54, 204);
+    ctx.fillText(current?.sidePots?.length ? summarizeSidePots(current.sidePots).slice(0, 116) : 'SIDE POTS: waiting for showdown', 54, 232);
     ctx.font = "30px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
     if (handHistory.length === 0) {
       ctx.fillStyle = "rgba(236,232,255,0.72)";
@@ -288,14 +305,14 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     actionLog.unshift(clean);
     if (actionLog.length > 12) actionLog.length = 12;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_action_log_update', { detail: { build: 'PHASE-182-SIDE-POT-ELIGIBILITY-LOCK', latest: clean, actions: actionLog.slice(0, 12), stacks: playerStacks.slice(), pot: current?.pot || 0 } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_action_log_update', { detail: { build: 'PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK', latest: clean, actions: actionLog.slice(0, 12), stacks: playerStacks.slice(), pot: current?.pot || 0 } })); } catch (_) {}
   }
 
   function recordHistory(entry) {
     handHistory.unshift(entry);
     if (handHistory.length > 8) handHistory.length = 8;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_history_update', { detail: { build: 'PHASE-182-SIDE-POT-ELIGIBILITY-LOCK', latest: entry, history: handHistory.slice(0, 8), stacks: playerStacks.slice() } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_history_update', { detail: { build: 'PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK', latest: entry, history: handHistory.slice(0, 8), stacks: playerStacks.slice() } })); } catch (_) {}
   }
 
   function applyStackDelta(index, amount) {
@@ -570,7 +587,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
 
   function emitPokerEvent(name, payload = {}) {
-    try { window.dispatchEvent(new CustomEvent(name, { detail: { build: 'PHASE-182-SIDE-POT-ELIGIBILITY-LOCK', handNumber, ...payload } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent(name, { detail: { build: 'PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK', handNumber, ...payload } })); } catch (_) {}
   }
 
   function shiftFutureQueue(delay) {
@@ -594,7 +611,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     legalState.options = computeLegalActions(legalState.callAmount);
     legalState.expiresAt = expiresAt || 0;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_legal_actions_update', { detail: { build: 'PHASE-182-SIDE-POT-ELIGIBILITY-LOCK', handNumber, legal: { ...legalState }, pot: current?.pot || 0, stacks: playerStacks.slice() } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_legal_actions_update', { detail: { build: 'PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK', handNumber, legal: { ...legalState }, pot: current?.pot || 0, stacks: playerStacks.slice() } })); } catch (_) {}
     return legalState;
   }
 
@@ -643,7 +660,12 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     updateLegalState(stage, callAmount, 0);
     let added = 0;
     let label = String(action || 'check').toUpperCase();
-    if (action === 'fold') added = 0;
+    if (action === 'fold') {
+      if (!current.foldedPlayers) current.foldedPlayers = new Set();
+      current.foldedPlayers.add(PLAYER_INDEX);
+      added = 0;
+      try { window.dispatchEvent(new CustomEvent('svr_poker_fold_eligibility_update', { detail: { build: 'PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK', handNumber, foldedPlayers: getFoldedNames(), seatIndex: PLAYER_INDEX, stage } })); } catch (_) {}
+    }
     else if (action === 'call' || action === 'check') added = callAmount;
     else if (action === 'raise') added = callAmount + legalState.minRaise;
     else if (action === 'allIn') added = Math.max(500, callAmount + 500);
@@ -699,7 +721,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     const flopAggressor = runnerUp.player.anchor.index;
     const turnAggressor = winner.player.anchor.index;
     const riverAggressor = winner.player.anchor.index;
-    current = { handPlayers, board, winner, results, handNumber, dealerIndex, sbIndex, bbIndex, actorIndex: null, pot: 0, stage: "shuffle", contributions: players.map(() => 0), allInPlayers: new Set(), sidePots: [] };
+    current = { handPlayers, board, winner, results, handNumber, dealerIndex, sbIndex, bbIndex, actorIndex: null, pot: 0, stage: "shuffle", contributions: players.map(() => 0), allInPlayers: new Set(), foldedPlayers: new Set(), sidePots: [] };
     refreshPotStack();
     queue = [];
     let t = nowS + 0.85;
@@ -835,12 +857,13 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const sidePotText = summarizeSidePots(current.sidePots);
       paintStatus(`${primaryWinner} paid • ${winner.result.name}`, `Paid $${potResolution.totalPaid} • ${sidePotText}`.slice(0, 110), "rgba(244,210,105,0.98)");
       statusCb(`HAND ${handNumber} • ${primaryWinner} paid • side pots ${current.sidePots.length} • total paid $${potResolution.totalPaid}`);
-      const handPayload = { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: primaryWinner, handName: winner.result.name, board: boardText, pot: potResolution.totalPaid, winnerHoleCards: winnerCards, winningCards, ranking, contributions: current.contributions ? current.contributions.slice() : [], allInPlayers: getAllInNames(), sidePots: current.sidePots, payouts: potResolution.payouts, stacks: playerStacks.slice() };
+      const handPayload = { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: primaryWinner, handName: winner.result.name, board: boardText, pot: potResolution.totalPaid, winnerHoleCards: winnerCards, winningCards, ranking, contributions: current.contributions ? current.contributions.slice() : [], allInPlayers: getAllInNames(), foldedPlayers: getFoldedNames(), sidePots: current.sidePots, payouts: potResolution.payouts, stacks: playerStacks.slice() };
       potResolution.payouts.forEach((amount, seatIndex) => { if (amount > 0) recordAction(players[seatIndex].anchor.name, 'side pot paid', amount, 'showdown'); });
       recordHistory(handPayload);
       emitPokerEvent('svr_poker_hand_result', handPayload);
       emitPokerEvent('svr_poker_showdown_reveal', handPayload);
-      emitPokerEvent('svr_poker_side_pot_resolution', { sidePots: current.sidePots, payouts: potResolution.payouts, totalPaid: potResolution.totalPaid, contributions: current.contributions ? current.contributions.slice() : [] });
+      emitPokerEvent('svr_poker_side_pot_resolution', { sidePots: current.sidePots, payouts: potResolution.payouts, totalPaid: potResolution.totalPaid, contributions: current.contributions ? current.contributions.slice() : [], foldedPlayers: getFoldedNames() });
+      emitPokerEvent('svr_poker_fold_eligibility_update', { foldedPlayers: getFoldedNames(), sidePots: current.sidePots, payouts: potResolution.payouts });
       log("Poker showdown", handPayload);
     });
     t += 4.3;
@@ -922,6 +945,11 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     current.stage = 'player-free-action';
     applyActionHighlight(PLAYER_INDEX);
     let freeAdded = 0;
+    if (normalized === 'fold') {
+      if (!current.foldedPlayers) current.foldedPlayers = new Set();
+      current.foldedPlayers.add(PLAYER_INDEX);
+      try { window.dispatchEvent(new CustomEvent('svr_poker_fold_eligibility_update', { detail: { build: 'PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK', handNumber, foldedPlayers: getFoldedNames(), seatIndex: PLAYER_INDEX, stage: current.stage } })); } catch (_) {}
+    }
     if (normalized === 'raise') freeAdded = 100;
     if (normalized === 'call') freeAdded = 50;
     if (normalized === 'allIn') freeAdded = 500;
