@@ -1,6 +1,6 @@
 # Phase 199 — Smoke Test Automation Lock
 
-Build: `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`
+Build: `PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

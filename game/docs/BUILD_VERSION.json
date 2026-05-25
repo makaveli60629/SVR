@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
-  "phase": 238,
+  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+  "phase": 242,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "hand teleport face-toggle, point-and-pinch destination, no release shutoff"
+  "featureLock": "watch teleport conflict guard, double-sided watch screen, black-square texture heartbeat"
 }

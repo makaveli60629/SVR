@@ -1,6 +1,6 @@
 # Phase 199 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`
+Build: `PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK";
+  const BUILD = "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK";
   const state = {
     build: BUILD,
     phase: 228,
@@ -65,7 +65,7 @@
     const blob = new Blob([text], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "svr-pilot-feedback-phase238.json";
+    a.download = "svr-pilot-feedback-phase242.json";
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);

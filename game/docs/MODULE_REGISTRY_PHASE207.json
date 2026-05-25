@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
+  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",
-    "game/modules/enterprise_bridge_phase238.js",
+    "game/modules/enterprise_bridge_phase242.js",
     "game/modules/bridge_selftest.js",
     "game/modules/event_firewall.js"
   ],

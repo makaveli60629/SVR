@@ -1,11 +1,11 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase238.js`
+- `game/modules/enterprise_bridge_phase242.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

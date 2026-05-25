@@ -1,4 +1,4 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
 Prevent boot-route confusion after cache/import failures by adding a dependency-free route recovery module and correcting fallback private-scene links.

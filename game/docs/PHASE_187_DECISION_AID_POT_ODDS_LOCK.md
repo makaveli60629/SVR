@@ -1,4 +1,4 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

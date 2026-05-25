@@ -1,4 +1,4 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

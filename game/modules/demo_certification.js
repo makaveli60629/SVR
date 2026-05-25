@@ -1,10 +1,10 @@
 /**
  * SVR Poker - Demo Certification Lock
- * Build: PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+ * Build: PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
  * Shortcut: Z
  * Purpose: combine QA, smoke, RC, feedback, bug reports, and report bundle into one demo-ready gate.
  */
-const BUILD = 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK';
+const BUILD = 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK';
 const STORE_KEY = 'svr_demo_certifications';
 
 function safeRead(name, fallback = null) {

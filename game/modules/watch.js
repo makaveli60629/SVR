@@ -18,6 +18,8 @@ const V3 = new THREE.Vector3();
 const M0 = new THREE.Matrix4();
 const FLIP_Q = new THREE.Quaternion();
 const SCREEN_TILT_Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.34);
+const WATCH_UPRIGHT_ROLL_Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI);
+const WATCH_LOCAL_UP = new THREE.Vector3(0, 1, 0);
 const DISPLAY_MIRRORED = false;
 
 function getJointWorld(hand, names){
@@ -34,6 +36,20 @@ function getJointWorld(hand, names){
 function getActiveCamera(camera, renderer){
   if (renderer?.xr?.isPresenting) return renderer.xr.getCamera(camera);
   return camera || null;
+}
+
+
+function applyCameraUprightRoll(quaternion, camera, renderer){
+  const activeCamera = getActiveCamera(camera, renderer);
+  if (!activeCamera) return { quaternion, rolled: false, dot: 1 };
+  const watchUp = WATCH_LOCAL_UP.clone().applyQuaternion(quaternion).normalize();
+  const camUp = WATCH_LOCAL_UP.clone().applyQuaternion(activeCamera.quaternion).normalize();
+  const dot = watchUp.dot(camUp);
+  if (dot < 0){
+    quaternion.multiply(WATCH_UPRIGHT_ROLL_Q);
+    return { quaternion, rolled: true, dot };
+  }
+  return { quaternion, rolled: false, dot };
 }
 
 function computeForearmPose(hand, camera, renderer, side = 'left'){
@@ -61,13 +77,14 @@ function computeForearmPose(hand, camera, renderer, side = 'left'){
   const quaternion = new THREE.Quaternion().setFromRotationMatrix(M0);
   quaternion.multiply(FLIP_Q);
   quaternion.multiply(SCREEN_TILT_Q);
+  const upright = applyCameraUprightRoll(quaternion, camera, renderer);
 
   const position = wrist.clone()
     .add(forearmDir.clone().multiplyScalar(0.092))
     .add(faceNormal.clone().multiplyScalar(0.020))
     .add(acrossPalm.clone().multiplyScalar(side === 'left' ? -0.004 : 0.004));
 
-  return { position, quaternion };
+  return { position, quaternion, uprightRolled: upright.rolled, uprightDot: upright.dot };
 }
 
 export function createWristWatch({ scene, camera = null, renderer = null, getState = ()=>({}), actions = {} }){
@@ -79,6 +96,8 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
+  tex.generateMipmaps = false;
+  tex.needsUpdate = true;
 
   const group = new THREE.Group();
   group.visible = false;
@@ -113,7 +132,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
   const screenFront = new THREE.Mesh(
     new THREE.PlaneGeometry(plateW * 0.965, plateH * 0.965),
-    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.FrontSide, depthWrite: false, depthTest: false, toneMapped: false })
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
   );
   screenFront.renderOrder = 40;
   screenFront.position.z = 0.012;
@@ -187,6 +206,37 @@ let hoveredId = null;
   let pressLockId = null;
   let lastHovered = null;
   let lastSig = '';
+  let lastWatchUprightState = { build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK', phase: 241, uprightRolled: false, uprightDot: 1, side: 'none', visible: false };
+
+
+  function publishWatchInteraction(extra = {}){
+    const now = performance.now();
+    const interacting = !!(extra.visible && (extra.hoveredId || extra.pinching || extra.nearScreen));
+    lastWatchInteractionState = {
+      build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK',
+      phase: 242,
+      visible: !!extra.visible,
+      hoveredId: extra.hoveredId || null,
+      pinching: !!extra.pinching,
+      nearScreen: !!extra.nearScreen,
+      interacting,
+      lockUntil: interacting ? now + 320 : Math.max(0, lastWatchInteractionState.lockUntil || 0),
+      side: extra.side || lastWatchInteractionState.side || 'none',
+      updatedAt: now
+    };
+    window.SVR_WATCH_INTERACTION_STATE = lastWatchInteractionState;
+    window.dispatchEvent(new CustomEvent('svr_watch_interaction_update', { detail: lastWatchInteractionState }));
+    return lastWatchInteractionState;
+  }
+
+  function watchTextureHeartbeat(){
+    const now = performance.now();
+    if (now - lastTextureHeartbeat > 550){
+      lastTextureHeartbeat = now;
+      tex.needsUpdate = true;
+      if (screenFront?.material) screenFront.material.needsUpdate = true;
+    }
+  }
 
   function draw(force = false){
     const state = getState();
@@ -311,6 +361,9 @@ let hoveredId = null;
     if (!anchor?.joints?.wrist){
       group.visible = false;
       hoveredId = null;
+      lastWatchUprightState = { ...lastWatchUprightState, visible: false };
+      window.SVR_WATCH_UPRIGHT_STATE = lastWatchUprightState;
+      publishWatchInteraction({ visible: false });
       draw(true);
       return;
     }
@@ -321,6 +374,9 @@ let hoveredId = null;
     if (!pose){
       group.visible = false;
       hoveredId = null;
+      lastWatchUprightState = { ...lastWatchUprightState, visible: false };
+      window.SVR_WATCH_UPRIGHT_STATE = lastWatchUprightState;
+      publishWatchInteraction({ visible: false });
       draw(true);
       return;
     }
@@ -328,11 +384,23 @@ let hoveredId = null;
     group.visible = true;
     group.position.copy(pose.position);
     group.quaternion.copy(pose.quaternion);
+    lastWatchUprightState = {
+      build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK',
+      phase: 241,
+      uprightRolled: !!pose.uprightRolled,
+      uprightDot: Number((pose.uprightDot ?? 1).toFixed(3)),
+      side: watchOnLeft ? 'left' : 'right',
+      visible: true,
+      screenFacing: 'camera-readable'
+    };
+    window.SVR_WATCH_UPRIGHT_STATE = lastWatchUprightState;
+    window.dispatchEvent(new CustomEvent('svr_watch_upright_update', { detail: lastWatchUprightState }));
     group.updateMatrixWorld(true);
 
     let nextHovered = null;
     let activeInput = null;
     let bestDepth = Infinity;
+    let nearScreen = false;
     const candidates = watchOnLeft ? [rightHand, leftHand] : [leftHand, rightHand];
     for (const candidate of candidates){
       const tip = candidate?.joints?.['index-finger-tip'];
@@ -340,6 +408,9 @@ let hoveredId = null;
       const tipPos = new THREE.Vector3();
       tip.getWorldPosition(tipPos);
       const local = group.worldToLocal(tipPos.clone());
+      if (local.z > -0.032 && local.z < 0.115 && Math.abs(local.x) < plateW * 0.88 && Math.abs(local.y) < plateH * 0.88){
+        nearScreen = true;
+      }
       if (local.z > -0.018 && local.z < 0.085 && Math.abs(local.x) < plateW * 0.74 && Math.abs(local.y) < plateH * 0.74){
         const hit = localHit(local);
         if (hit){
@@ -355,6 +426,8 @@ let hoveredId = null;
     hoveredId = nextHovered;
 
     const pinching = !!activeInput && isPinching(activeInput);
+    publishWatchInteraction({ visible: true, hoveredId, pinching, nearScreen, side: watchOnLeft ? 'left' : 'right' });
+    watchTextureHeartbeat();
     if (pinching && hoveredId && !pressLockId) pressLockId = hoveredId;
     if (pinching && pressLockId) hoveredId = pressLockId;
     if (!pinching) pressLockId = null;
@@ -384,9 +457,12 @@ let hoveredId = null;
     }
     if (!pinching) pressed = false;
 
+    if (window.SVR_TELEPORT_INPUT_STATE?.lastUpdatedAt || window.SVR_HAND_TELEPORT_STATE?.lastUpdatedAt){
+      watchTextureHeartbeat();
+    }
     draw();
   }
 
   draw(true);
-  return { update, object: group };
+  return { update, object: group, getUprightState: ()=>({ ...lastWatchUprightState }) };
 }

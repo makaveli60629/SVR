@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Crash Shield
- * Build: PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+ * Build: PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
  * Purpose: keep render/game loop alive, capture runtime errors, and prevent bridge/listener crashes from freezing the game.
  */
-const BUILD = 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK';
+const BUILD = 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK';
 const KNOWN_RECOVERABLE = [
   /record[A-Za-z0-9_]+ is not a function/i,
   /SVR_ENTERPRISE_BRIDGE/i,

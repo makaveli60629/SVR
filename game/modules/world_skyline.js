@@ -1996,6 +1996,157 @@ function sanitizeTableSurface(table, keepMesh = null){
     if (isThinCap || isKnownBlink) child.visible = false;
   });
 }
+
+function buildFireLightningArch(scene){
+  const group = new THREE.Group();
+  group.name = "SVR_FIRE_LIGHTNING_ARCH";
+  group.position.set(0, 0, 6.85);
+
+  const fireMat = new THREE.MeshStandardMaterial({
+    color: 0xff6a00,
+    emissive: 0xff3000,
+    emissiveIntensity: 1.25,
+    roughness: 0.22,
+    metalness: 0.28
+  });
+  const electricMat = new THREE.MeshBasicMaterial({
+    color: 0x32e8ff,
+    transparent: true,
+    opacity: 0.75,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  const violetMat = new THREE.MeshStandardMaterial({
+    color: 0xb48cff,
+    emissive: 0x6b28ff,
+    emissiveIntensity: 0.95,
+    roughness: 0.18,
+    metalness: 0.35
+  });
+
+  const pillarGeo = new THREE.CylinderGeometry(0.13, 0.20, 2.05, 18);
+  const leftPillar = new THREE.Mesh(pillarGeo, fireMat);
+  const rightPillar = new THREE.Mesh(pillarGeo, fireMat.clone());
+  leftPillar.position.set(-2.35, 1.03, 0);
+  rightPillar.position.set(2.35, 1.03, 0);
+  group.add(leftPillar, rightPillar);
+
+  const innerLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.072, 0.095, 2.15, 16), violetMat);
+  const innerRight = innerLeft.clone();
+  innerLeft.position.set(-2.12, 1.08, 0.035);
+  innerRight.position.set(2.12, 1.08, 0.035);
+  group.add(innerLeft, innerRight);
+
+  const pts = [];
+  for (let i = 0; i <= 72; i++){
+    const a = Math.PI - (i / 72) * Math.PI;
+    pts.push(new THREE.Vector3(Math.cos(a) * 2.35, 1.82 + Math.sin(a) * 1.42, 0));
+  }
+  const curve = new THREE.CatmullRomCurve3(pts);
+  const archTube = new THREE.Mesh(new THREE.TubeGeometry(curve, 96, 0.13, 18, false), fireMat.clone());
+  const archGlow = new THREE.Mesh(new THREE.TubeGeometry(curve, 96, 0.055, 12, false), electricMat.clone());
+  archGlow.position.z = 0.018;
+  group.add(archTube, archGlow);
+
+  const baseGeo = new THREE.BoxGeometry(0.72, 0.12, 0.52);
+  const baseL = new THREE.Mesh(baseGeo, violetMat.clone());
+  const baseR = baseL.clone();
+  baseL.position.set(-2.35, 0.06, 0);
+  baseR.position.set(2.35, 0.06, 0);
+  group.add(baseL, baseR);
+
+  const signCanvas = document.createElement("canvas");
+  signCanvas.width = 1024;
+  signCanvas.height = 256;
+  const ctx = signCanvas.getContext("2d");
+  const grd = ctx.createLinearGradient(0,0,1024,0);
+  grd.addColorStop(0, "#ff4b00");
+  grd.addColorStop(0.44, "#ffd36a");
+  grd.addColorStop(0.60, "#38f2ff");
+  grd.addColorStop(1, "#b48cff");
+  ctx.fillStyle = "rgba(0,0,0,0.22)";
+  ctx.fillRect(0,0,1024,256);
+  ctx.font = "bold 76px Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = "#32e8ff";
+  ctx.shadowBlur = 22;
+  ctx.fillStyle = grd;
+  ctx.fillText("SVR FIRE LIGHTNING", 512, 106);
+  ctx.font = "bold 34px Arial, sans-serif";
+  ctx.shadowColor = "#ff6a00";
+  ctx.fillStyle = "#fff6d8";
+  ctx.fillText("ELECTRIC HANDS • PORTAL ARCH", 512, 170);
+  const signTex = new THREE.CanvasTexture(signCanvas);
+  signTex.colorSpace = THREE.SRGBColorSpace;
+  const sign = new THREE.Mesh(
+    new THREE.PlaneGeometry(3.65, 0.92),
+    new THREE.MeshBasicMaterial({ map: signTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  sign.position.set(0, 2.68, 0.03);
+  group.add(sign);
+
+  const lightningGeom = new THREE.BufferGeometry();
+  const count = 36;
+  const arr = new Float32Array(count * 2 * 3);
+  lightningGeom.setAttribute("position", new THREE.BufferAttribute(arr, 3));
+  const lightning = new THREE.LineSegments(lightningGeom, new THREE.LineBasicMaterial({
+    color: 0x33e8ff,
+    transparent: true,
+    opacity: 0.68,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  }));
+  lightning.renderOrder = 31;
+  group.add(lightning);
+
+  const fireLight = new THREE.PointLight(0xff6a00, 2.4, 9.5, 1.8);
+  fireLight.position.set(0, 2.1, 0.42);
+  const electricLight = new THREE.PointLight(0x33e8ff, 2.1, 10.5, 1.8);
+  electricLight.position.set(0, 2.75, -0.35);
+  group.add(fireLight, electricLight);
+
+  scene.add(group);
+  scene.userData._fireLightningArch = {
+    group,
+    lightning,
+    fireLight,
+    electricLight,
+    tick(t){
+      group.visible = true;
+      archGlow.material.opacity = 0.58 + Math.sin(t * 4.8) * 0.16;
+      sign.material.opacity = 0.86 + Math.sin(t * 2.4) * 0.10;
+      fireLight.intensity = 2.0 + Math.sin(t * 3.9) * 0.55;
+      electricLight.intensity = 1.85 + Math.sin(t * 5.1 + 1.4) * 0.55;
+      const pos = lightning.geometry.attributes.position;
+      const data = pos.array;
+      for (let i = 0; i < count; i++){
+        const f = i / count;
+        const a = Math.PI - f * Math.PI;
+        const r = 2.38 + Math.sin(t * 5.0 + i) * 0.05;
+        const x1 = Math.cos(a) * r;
+        const y1 = 1.82 + Math.sin(a) * 1.42;
+        const z1 = 0.035 + Math.sin(t * 3.7 + i) * 0.045;
+        const x2 = x1 + Math.sin(t * 11.0 + i * 1.7) * 0.20;
+        const y2 = y1 + Math.cos(t * 9.0 + i) * 0.18;
+        const z2 = z1 + Math.cos(t * 6.0 + i) * 0.10;
+        const o = i * 6;
+        data[o] = x1; data[o+1] = y1; data[o+2] = z1;
+        data[o+3] = x2; data[o+4] = y2; data[o+5] = z2;
+      }
+      pos.needsUpdate = true;
+      lightning.material.opacity = 0.52 + Math.sin(t * 8.0) * 0.22;
+    }
+  };
+  window.SVR_FIRE_LIGHTNING_ARCH = {
+    build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+    position: { x: group.position.x, y: group.position.y, z: group.position.z },
+    theme: "SVR fire orange, electric cyan, violet logo glow"
+  };
+  return group;
+}
+
+
 export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const R = CONFIG.ROOM_RADIUS;
   const H = CONFIG.WALL_HEIGHT;
@@ -2084,6 +2235,8 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   rim.rotation.x = Math.PI / 2;
   rim.position.set(0, wallHeight - 0.18, 0);
   scene.add(rim);
+
+  buildFireLightningArch(scene);
 
   const innerPlatform = null;
 
@@ -2462,6 +2615,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.userData._tickWorld = (dt)=>{
     scene.userData._time = (scene.userData._time || 0) + dt;
     const t = scene.userData._time;
+    scene.userData._fireLightningArch?.tick?.(t, dt);
     pokerDemo.update(t, dt);
     earth.visible = false;
     earth.rotation.y += dt * 0.05;

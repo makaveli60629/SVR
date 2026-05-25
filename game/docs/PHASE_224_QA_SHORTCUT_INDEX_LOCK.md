@@ -1,7 +1,7 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
-Phase 238 adds a master QA shortcut index so testers do not need to remember every panel key.
+Phase 242 adds a master QA shortcut index so testers do not need to remember every panel key.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 238 adds a master QA shortcut index so testers do not need to remember eve
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase238-shortcuts` and press `?` or `/`.
+Open `/game/?v=phase242-shortcuts` and press `?` or `/`.

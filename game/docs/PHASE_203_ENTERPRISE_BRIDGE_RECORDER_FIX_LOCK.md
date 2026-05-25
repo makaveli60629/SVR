@@ -1,4 +1,4 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Fix
 - Fixes runtime error: `this.recordDealerButton is not a function`.

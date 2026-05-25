@@ -1,7 +1,7 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
-Phase 238 changes hand teleport behavior to the user-requested interaction model.
+Phase 242 changes hand teleport behavior to the user-requested interaction model.
 
 ## Direct fixes
 - Teleport ON/OFF only toggles when the hand is near the face/chin and the user pinches or makes a fist.
@@ -19,4 +19,4 @@ Phase 238 changes hand teleport behavior to the user-requested interaction model
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase238-handtp` and press `F1`.
+Open `/game/?v=phase242-handtp` and press `F1`.

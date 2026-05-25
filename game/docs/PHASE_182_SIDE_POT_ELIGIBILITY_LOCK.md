@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`
+Build: `PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK';
+  const BUILD = 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK';
   const state = { build: BUILD, status: 'ready', fixed: ['PowerShell Invoke-Git argument binding', 'highest-phase packet detection', 'direct packet apply'] };
   window.SVR_AUTO_APPLY_GIT_FIX = {
     state,

@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
+  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
   "public_page_touched": false,
   "modules_added": [
     "game/modules/playtest_wizard.js"

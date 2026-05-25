@@ -1,7 +1,7 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
-Phase 238 adds a tester launch card so testers have one small panel with the URL, shortcut keys, checklist, and expected pass/fail notes.
+Phase 242 adds a tester launch card so testers have one small panel with the URL, shortcut keys, checklist, and expected pass/fail notes.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 238 adds a tester launch card so testers have one small panel with the URL
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase238-testercard` and press `C`.
+Open `/game/?v=phase242-testercard` and press `C`.

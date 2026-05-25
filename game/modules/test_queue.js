@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Queue Dashboard
- * Build: PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+ * Build: PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
  * Purpose: convert tester feedback, bug reports, release candidate checks, and smoke tests into a compact triage queue.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK';
+const BUILD = 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK';
 const EXPECTED_PHASE = 197;
 const STORE_KEY = 'svr_test_queue_phase197';
 

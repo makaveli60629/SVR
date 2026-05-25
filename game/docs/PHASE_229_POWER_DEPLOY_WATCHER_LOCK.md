@@ -1,7 +1,7 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
-Phase 238 adds a Power Deploy Watcher panel for the new PowerShell-only workflow.
+Phase 242 adds a Power Deploy Watcher panel for the new PowerShell-only workflow.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 238 adds a Power Deploy Watcher panel for the new PowerShell-only workflow
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase238-powerdeploy` and press `F6`.
+Open `/game/?v=phase242-powerdeploy` and press `F6`.

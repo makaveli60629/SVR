@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
+  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
   "phase": 199,
   "modules": {
     "bug_reporter": "game/modules/bug_reporter.js",

@@ -1,8 +1,8 @@
-// PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+// PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
+    build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

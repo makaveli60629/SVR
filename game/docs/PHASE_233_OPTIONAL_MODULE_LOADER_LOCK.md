@@ -1,7 +1,7 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
-Phase 238 hardens boot by removing optional QA/telemetry panel modules from the static `main.js` import chain.
+Phase 242 hardens boot by removing optional QA/telemetry panel modules from the static `main.js` import chain.
 
 ## Direct fix
 - Adds `game/modules/optional_module_loader.js`
@@ -15,4 +15,4 @@ Phase 238 hardens boot by removing optional QA/telemetry panel modules from the 
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase238-optionalloader` and press `F10`.
+Open `/game/?v=phase242-optionalloader` and press `F10`.

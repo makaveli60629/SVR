@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
+  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"

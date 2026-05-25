@@ -127,7 +127,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   function publishDealerButtonState(stage = '') {
     if (!current) return;
     const payload = {
-      build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK',
+      build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK',
       handNumber,
       stage: stage || current.stage || 'table',
       dealerIndex: current.dealerIndex,
@@ -145,7 +145,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   function publishRebuyLedger(latest = [], reason = '') {
     if (!latest.length) return;
     const payload = {
-      build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK',
+      build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK',
       handNumber,
       reason: reason || 'table-continuity',
       latest,
@@ -273,7 +273,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     if (!current.allInPlayers) current.allInPlayers = new Set();
     if ((playerStacks[index] || 0) <= 0 || paid < request) {
       current.allInPlayers.add(index);
-      try { window.dispatchEvent(new CustomEvent('svr_poker_allin_update', { detail: { build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK', handNumber, player: players[index].anchor.name, seatIndex: index, paid, requested: request, stage: stage || current.stage, pot: current.pot, stacks: playerStacks.slice(), contributions: current.contributions.slice(), allInPlayers: getAllInNames() } })); } catch (_) {}
+      try { window.dispatchEvent(new CustomEvent('svr_poker_allin_update', { detail: { build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK', handNumber, player: players[index].anchor.name, seatIndex: index, paid, requested: request, stage: stage || current.stage, pot: current.pot, stacks: playerStacks.slice(), contributions: current.contributions.slice(), allInPlayers: getAllInNames() } })); } catch (_) {}
     }
     refreshPotStack();
     return paid;
@@ -417,14 +417,14 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     actionLog.unshift(clean);
     if (actionLog.length > 12) actionLog.length = 12;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_action_log_update', { detail: { build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK', latest: clean, actions: actionLog.slice(0, 12), stacks: playerStacks.slice(), pot: current?.pot || 0 } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_action_log_update', { detail: { build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK', latest: clean, actions: actionLog.slice(0, 12), stacks: playerStacks.slice(), pot: current?.pot || 0 } })); } catch (_) {}
   }
 
   function recordHistory(entry) {
     handHistory.unshift(entry);
     if (handHistory.length > 8) handHistory.length = 8;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_history_update', { detail: { build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK', latest: entry, history: handHistory.slice(0, 8), stacks: playerStacks.slice() } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_history_update', { detail: { build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK', latest: entry, history: handHistory.slice(0, 8), stacks: playerStacks.slice() } })); } catch (_) {}
   }
 
   function applyStackDelta(index, amount) {
@@ -700,7 +700,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
   function publishTurnIndicator(extra = {}) {
     const payload = {
-      build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK',
+      build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK',
       handNumber,
       seatIndex: turnIndicator.seatIndex,
       actor: turnIndicator.actor,
@@ -744,7 +744,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
 
   function emitPokerEvent(name, payload = {}) {
-    try { window.dispatchEvent(new CustomEvent(name, { detail: { build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK', handNumber, ...payload } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent(name, { detail: { build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK', handNumber, ...payload } })); } catch (_) {}
   }
 
   function shiftFutureQueue(delay) {
@@ -769,7 +769,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     legalState.expiresAt = expiresAt || 0;
     computeDecisionAid(stage, legalState.callAmount);
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_legal_actions_update', { detail: { build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK', handNumber, legal: { ...legalState }, decisionAid: { ...decisionAid }, pot: current?.pot || 0, stacks: playerStacks.slice() } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_legal_actions_update', { detail: { build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK', handNumber, legal: { ...legalState }, decisionAid: { ...decisionAid }, pot: current?.pot || 0, stacks: playerStacks.slice() } })); } catch (_) {}
     publishDecisionAid();
     return legalState;
   }
@@ -800,7 +800,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   function publishDecisionAid() {
     try {
       window.dispatchEvent(new CustomEvent('svr_poker_decision_aid_update', {
-        detail: { build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK', handNumber, decisionAid: { ...decisionAid }, legal: { ...legalState }, stacks: playerStacks.slice(), pot: current?.pot || 0 }
+        detail: { build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK', handNumber, decisionAid: { ...decisionAid }, legal: { ...legalState }, stacks: playerStacks.slice(), pot: current?.pot || 0 }
       }));
     } catch (_) {}
   }
@@ -862,7 +862,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       if (!current.foldedPlayers) current.foldedPlayers = new Set();
       current.foldedPlayers.add(PLAYER_INDEX);
       added = 0;
-      try { window.dispatchEvent(new CustomEvent('svr_poker_fold_eligibility_update', { detail: { build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK', handNumber, foldedPlayers: getFoldedNames(), seatIndex: PLAYER_INDEX, stage } })); } catch (_) {}
+      try { window.dispatchEvent(new CustomEvent('svr_poker_fold_eligibility_update', { detail: { build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK', handNumber, foldedPlayers: getFoldedNames(), seatIndex: PLAYER_INDEX, stage } })); } catch (_) {}
     }
     else if (action === 'call' || action === 'check') added = callAmount;
     else if (action === 'raise') added = callAmount + legalState.minRaise;
@@ -1161,7 +1161,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     if (normalized === 'fold') {
       if (!current.foldedPlayers) current.foldedPlayers = new Set();
       current.foldedPlayers.add(PLAYER_INDEX);
-      try { window.dispatchEvent(new CustomEvent('svr_poker_fold_eligibility_update', { detail: { build: 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK', handNumber, foldedPlayers: getFoldedNames(), seatIndex: PLAYER_INDEX, stage: current.stage } })); } catch (_) {}
+      try { window.dispatchEvent(new CustomEvent('svr_poker_fold_eligibility_update', { detail: { build: 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK', handNumber, foldedPlayers: getFoldedNames(), seatIndex: PLAYER_INDEX, stage: current.stage } })); } catch (_) {}
     }
     if (normalized === 'raise') freeAdded = 100;
     if (normalized === 'call') freeAdded = 50;

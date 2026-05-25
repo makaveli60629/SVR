@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
+  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase238.js"
+    "game/modules/enterprise_bridge_phase242.js"
   ],
   "protected": {
     "publicPageTouched": false,

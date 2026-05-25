@@ -1,4 +1,4 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

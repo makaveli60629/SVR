@@ -1,6 +1,6 @@
 {
   "phase": 202,
-  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
+  "build": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
   "modules": [
     "boot.js",
     "modules/boot_fallback.js",

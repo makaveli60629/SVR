@@ -1,7 +1,7 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
-Phase 238 adds a post-deploy checklist panel so the workflow can verify deployment, cache busting, and tester handoff after Auto Deploy.
+Phase 242 adds a post-deploy checklist panel so the workflow can verify deployment, cache busting, and tester handoff after Auto Deploy.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 238 adds a post-deploy checklist panel so the workflow can verify deployme
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase238-postdeploy` and press `E`.
+Open `/game/?v=phase242-postdeploy` and press `E`.

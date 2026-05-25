@@ -1,6 +1,6 @@
 # Phase 199 — Playtest Wizard Lock
 
-Build: `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`
+Build: `PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK`
 
 ## Scope
 - Adds guided playtest wizard overlay.

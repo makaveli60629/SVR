@@ -114,8 +114,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let lastLeftFistToggle = false;
   let lastRightFistToggle = false;
   const inputState = {
-    build: "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
-    phase: 238,
+    build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+    phase: 239,
     rightStickMove: true,
     rightStickTurn: true,
     fistTeleport: true,
@@ -124,6 +124,19 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     leftStick: { x: 0, y: 0, pair: [0, 1], source: "left" },
     rightStick: { x: 0, y: 0, pair: [2, 3], source: "right" },
     move: { x: 0, y: 0, source: "idle" },
+    lastUpdatedAt: 0
+  };
+
+  const handTeleportState = {
+    build: "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
+    phase: 239,
+    mode: "face-toggle-point-pinch",
+    active: false,
+    nearFace: false,
+    aimValid: false,
+    stableTargetMs: 0,
+    target: null,
+    lastAction: "ready",
     lastUpdatedAt: 0
   };
 
@@ -244,6 +257,19 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   }
 
 
+  function publishHandTeleportState(extra = {}){
+    const target = lastAimValid ? smoothedTarget : null;
+    handTeleportState.active = !!(mode && activeMode === "hand");
+    handTeleportState.aimValid = !!lastAimValid;
+    handTeleportState.stableTargetMs = stableTargetMs;
+    handTeleportState.target = target ? { x: Number(target.x.toFixed(3)), y: 0, z: Number(target.z.toFixed(3)) } : null;
+    handTeleportState.lastUpdatedAt = performance.now();
+    Object.assign(handTeleportState, extra);
+    window.SVR_HAND_TELEPORT_STATE = { ...handTeleportState };
+    window.dispatchEvent(new CustomEvent("svr_hand_teleport_state_update", { detail: window.SVR_HAND_TELEPORT_STATE }));
+    return window.SVR_HAND_TELEPORT_STATE;
+  }
+
   function resetTeleportVisuals(){
     pinchHoldStart = 0;
     triggerHoldStart = 0;
@@ -260,6 +286,29 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     active = null;
     activeMode = "hand";
     resetTeleportVisuals();
+    publishHandTeleportState({ active: false, nearFace: false, aimValid: false, target: null, lastAction: "off" });
+  }
+
+
+  function watchInteractionActive(now = performance.now()){
+    const st = window.SVR_WATCH_INTERACTION_STATE;
+    if (!st || !st.visible) return false;
+    if (st.interacting || st.pinching || st.hoveredId || st.nearScreen) return true;
+    return Number(st.lockUntil || 0) > now;
+  }
+
+  function suspendTeleportForWatch(statusCb = ()=>{}, modeCb = ()=>{}){
+    pointer.visible = false;
+    ring.visible = false;
+    hideArc();
+    setGlow(false);
+    stableTargetMs = 0;
+    lastAimValid = false;
+    pinchHoldStart = 0;
+    triggerHoldStart = 0;
+    publishHandTeleportState?.({ lastAction: "watch-paused", aimValid: false, target: null });
+    statusCb("WATCH ACTIVE • teleport paused");
+    modeCb("Watch interaction guard");
   }
 
   function toggleMode(preferred = "right"){
@@ -381,11 +430,14 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     lastLeftToggle = leftToggle;
     lastRightToggle = rightToggle;
 
+    const watchGuardActive = watchInteractionActive(now);
+
     // Hand teleport toggle lock:
     // - ON/OFF only happens when the hand is near the face/chin.
     // - Pointing away from the face will never toggle off; it is reserved for destination selection.
-    const leftFace = !!leftHandRef?.joints && handNearFace(leftHandRef);
-    const rightFace = !!rightHandRef?.joints && handNearFace(rightHandRef);
+    // - Watch interaction pauses teleport so the watch never freezes into a black square.
+    const leftFace = !watchGuardActive && !!leftHandRef?.joints && handNearFace(leftHandRef);
+    const rightFace = !watchGuardActive && !!rightHandRef?.joints && handNearFace(rightHandRef);
     const leftToggleGesture = leftFace && (isPinching(leftHandRef) || isFist(leftHandRef));
     const rightToggleGesture = rightFace && (isPinching(rightHandRef) || isFist(rightHandRef));
 
@@ -446,6 +498,11 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
         : "TELEPORT OFF • face pinch/fist toggles ON";
       statusCb(idleMsg);
       modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready • right stick moves" : "Hands ready • face pinch/fist toggles TP");
+      return;
+    }
+
+    if (activeMode === "hand" && watchGuardActive){
+      suspendTeleportForWatch(statusCb, modeCb);
       return;
     }
 
@@ -516,8 +573,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const pinch = isPinching(active);
     const fistHeld = isFist(active);
     const nearFace = handNearFace(active);
-    const destinationPinch = pinch && !nearFace;
-    const destinationFist = fistHeld && !nearFace;
+    const destinationPinch = pinch && !nearFace && !watchGuardActive;
+    const destinationFist = fistHeld && !nearFace && !watchGuardActive;
 
     if (active.userData._wasDestinationPinch === undefined) active.userData._wasDestinationPinch = false;
     if (destinationPinch && !active.userData._wasDestinationPinch) pinchHoldStart = now;
@@ -533,7 +590,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
         lastTP = now + 220;
         cooldownUntil = now + 300;
         clearTeleportMode();
-        statusCb("TELEPORTED • point + pinch destination accepted");
+        publishHandTeleportState({ lastAction: "teleported", active: false });
+        statusCb("TELEPORTED • destination accepted");
       } else {
         cooldownUntil = now + 180;
         pinchHoldStart = 0;
@@ -546,8 +604,14 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     active.userData._wasDestinationPinch = destinationPinch;
     active.userData._wasPinching = pinch;
     active.userData._wasHandTeleportAction = destinationPinch || destinationFist;
+    publishHandTeleportState({
+      nearFace,
+      destinationPinch,
+      destinationFist,
+      lastAction: nearFace ? "face-toggle-zone" : (lastAimValid ? "aiming-destination" : "aiming-no-target")
+    });
     modeCb("Hands: TELEPORT ON");
-    statusCb(nearFace ? "HAND TP ON • face pinch/fist toggles OFF" : "HAND TP ON • point and pinch destination");
+    statusCb(nearFace ? "HAND TP ON • face pinch/fist toggles OFF" : (lastAimValid ? "DESTINATION LOCKED • pinch to teleport" : "HAND TP ON • point at floor then pinch"));
   }
 
   return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode, inputState: { ...inputState } }) };

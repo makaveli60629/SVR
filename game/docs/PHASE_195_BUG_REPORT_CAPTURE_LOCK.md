@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`
+Build: `PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK`
 
 ## Added
 - In-game bug report capture panel.

@@ -1,5 +1,5 @@
 {
-  "phase": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
+  "phase": "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK",
   "modules": {
     "poker_demo.js": "Showdown winning five cards, ranking payload, player/legal-action flow preserved",
     "enterprise_bridge.js": "Telemetry bridge for hand results/action logs/legal actions/showdown reveal",

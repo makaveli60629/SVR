@@ -1,7 +1,7 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
-Phase 238 adds a pilot handoff card so non-technical testers can open one concise panel with the test link, what to verify, what to report, and the support shortcuts.
+Phase 242 adds a pilot handoff card so non-technical testers can open one concise panel with the test link, what to verify, what to report, and the support shortcuts.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 238 adds a pilot handoff card so non-technical testers can open one concis
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase238-handoff` and press `H`.
+Open `/game/?v=phase242-handoff` and press `H`.

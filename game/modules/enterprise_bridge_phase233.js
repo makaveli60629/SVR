@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge Phase 205
- * Build: PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+ * Build: PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
  * Purpose: cache-busted bridge with safe recorder aliases so poker events cannot crash the render loop.
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
-const BUILD = 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK';
+const BUILD = 'PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK';
 
 const EVENT_TO_RECORDER = [
   ['svr_poker_hand_result', 'recordHandResult', 'hand_result'],
@@ -157,4 +157,4 @@ Object.entries(METHOD_TO_TYPE).forEach(([method, type]) => {
 SVREnterpriseBridge.init();
 export default SVREnterpriseBridge;
 
-// Phase 238 compatibility alias enterprise_bridge_phase233.js
+// Phase 242 compatibility alias enterprise_bridge_phase233.js

@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK";
+  const BUILD = "PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK";
   const state = {
     build: BUILD,
     phase: 226,
@@ -14,7 +14,7 @@
   }
 
   async function probe(url){
-    const full = url + (url.includes("?") ? "&" : "?") + "v=phase238-" + Date.now();
+    const full = url + (url.includes("?") ? "&" : "?") + "v=phase242-" + Date.now();
     try {
       const r = await fetch(full, { cache: "no-store" });
       const text = await r.text();
@@ -32,7 +32,7 @@
     evidence.push(await probe("./deploy-health.json"));
     evidence.push(await probe("../deploy-health.json"));
     const combined = JSON.stringify(evidence);
-    const phaseOk = combined.includes("PHASE-226") || combined.includes('"phase":226') || combined.includes('"phase": 238');
+    const phaseOk = combined.includes("PHASE-226") || combined.includes('"phase":226') || combined.includes('"phase": 242');
     const hasPanels = !!(window.SVR_PILOT_HANDOFF_CARD || window.SVR_QA_SHORTCUT_INDEX || window.SVR_POST_DEPLOY_CHECKLIST);
     const noBootError = !document.body.innerText.includes("SVR Boot Fallback") && !document.body.innerText.includes("Boot Guard recovery");
     state.evidence = evidence;
@@ -82,7 +82,7 @@
       <ol>
         <li>Game loads past Booting.</li>
         <li>No red runtime recovery panel is visible.</li>
-        <li>Phase 238 appears in version/deploy markers.</li>
+        <li>Phase 242 appears in version/deploy markers.</li>
         <li>Tester panels are available: H, ?, E, M.</li>
         <li>Public Matrix launch page remains untouched.</li>
       </ol>

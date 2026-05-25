@@ -1,4 +1,4 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Scope
 Adds a local tester queue dashboard that turns tester feedback, bug reports, release-candidate checks, smoke tests, and runtime errors into a compact ranked queue.

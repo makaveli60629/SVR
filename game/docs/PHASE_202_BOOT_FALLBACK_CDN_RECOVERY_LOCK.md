@@ -1,4 +1,4 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
 Fix the remaining stuck-on-Booting risk by adding a no-Three.js recovery shell. If CDN/import/runtime loading fails, the game no longer remains frozen on Booting.

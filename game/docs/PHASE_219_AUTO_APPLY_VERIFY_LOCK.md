@@ -1,7 +1,7 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
-Phase 238 adds a verification surface for the simplified one-command PowerShell updater.
+Phase 242 adds a verification surface for the simplified one-command PowerShell updater.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 238 adds a verification surface for the simplified one-command PowerShell 
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase238-autoverify` and press `O`.
+Open `/game/?v=phase242-autoverify` and press `O`.

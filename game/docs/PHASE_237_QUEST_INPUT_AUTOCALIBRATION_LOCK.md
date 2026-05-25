@@ -1,7 +1,7 @@
-# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
+# PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK
 
 ## Purpose
-Phase 238 strengthens the Phase 235/236 input fix for Meta Quest / WebXR controller axis differences.
+Phase 242 strengthens the Phase 235/236 input fix for Meta Quest / WebXR controller axis differences.
 
 ## Direct fixes
 - Right-stick forward/back movement now auto-calibrates between axis pairs `[2,3]` and `[0,1]`.
@@ -19,4 +19,4 @@ Phase 238 strengthens the Phase 235/236 input fix for Meta Quest / WebXR control
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase238-questinput` and press `F11`.
+Open `/game/?v=phase242-questinput` and press `F11`.

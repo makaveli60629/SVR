@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Load `/game/?v=phase185` without black screen.
-- [ ] Confirm title/version shows `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`.
+- [ ] Confirm title/version shows `PHASE-242-WATCH-TELEPORT-CONFLICT-GUARD-LOCK`.
 - [ ] Confirm YOUR TURN countdown updates once per second.
 - [ ] Confirm hand-history panel shows TURN line.
 - [ ] Confirm action log still records player and bot actions.
