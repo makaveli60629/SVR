@@ -1,4 +1,4 @@
-# PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK
+# PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK
 
 ## Fix
 - Fixes runtime error: `this.recordDealerButton is not a function`.
@@ -7,6 +7,6 @@
 - Public Matrix launch page untouched.
 
 ## Test
-1. Open `/game/?v=phase205-recordfix`.
+1. Open `/game/?v=phase206-recordfix`.
 2. Confirm the scene does not freeze after dealer button/blind telemetry publishes.
 3. Press `V`, `T`, `U`, `W`, `G`, `J`, `K`, `B`, `Z`, `P` to verify diagnostic overlays still load.

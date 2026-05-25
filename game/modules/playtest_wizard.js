@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Guided Playtest Wizard
- * Build: PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK
+ * Build: PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK
  * Purpose: give testers one clear checklist after deploy without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK';
+const BUILD = 'PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeValue(value, max = 260) {

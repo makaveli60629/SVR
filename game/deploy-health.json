@@ -1,6 +1,7 @@
 {
   "status": "ok",
-  "build": "PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK",
+  "build": "PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK",
+  "phase": 206,
   "source": "direct-game-folder",
-  "public_page_touched": false
+  "generatedAt": "2026-05-25T00:00:00Z"
 }

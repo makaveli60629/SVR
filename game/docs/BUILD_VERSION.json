@@ -1,6 +1,7 @@
 {
-  "build": "PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK",
-  "phase": 205,
-  "source": "direct-game-folder",
-  "public_page_touched": false
+  "build": "PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK",
+  "phase": 206,
+  "public_page_touched": false,
+  "game_package_under_25mb_target": true,
+  "featureLock": "bridge recorder self-test, runtime alias auto-heal, missing-recorder crash prevention"
 }

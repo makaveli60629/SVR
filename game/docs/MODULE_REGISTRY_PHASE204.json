@@ -1,6 +1,6 @@
 {
   "phase": 204,
-  "build": "PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK",
+  "build": "PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK",
   "modules_added": [
     "modules/event_firewall.js"
   ],

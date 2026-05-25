@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK
+ * Build: PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK';
+const BUILD = 'PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }

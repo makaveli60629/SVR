@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK",
-  "phase": 205,
+  "build": "PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK",
+  "phase": 206,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "enterprise bridge cache-busted recorder aliases, decision aid runtime crash fix"
+  "featureLock": "bridge recorder self-test, runtime alias auto-heal, missing-recorder crash prevention"
 }

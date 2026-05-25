@@ -1,10 +1,10 @@
 /**
  * SVR Poker - Demo Certification Lock
- * Build: PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK
+ * Build: PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK
  * Shortcut: Z
  * Purpose: combine QA, smoke, RC, feedback, bug reports, and report bundle into one demo-ready gate.
  */
-const BUILD = 'PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK';
+const BUILD = 'PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK';
 const STORE_KEY = 'svr_demo_certifications';
 
 function safeRead(name, fallback = null) {
