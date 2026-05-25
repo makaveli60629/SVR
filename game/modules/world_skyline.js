@@ -2369,7 +2369,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const ericNorm = null;
   const dealerBase = null;
   const dealerIdle = null;
-  log('Visible dealer rig disabled for Phase 178; invisible card source preserved.');
+  log('Visible dealer rig disabled for Phase 179; invisible card source preserved.');
   if (dealerBase){
     dealerActor = dealerBase;
     applyEricMaterial(dealerActor, ericTex, ericNorm);

@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-178-ACTION-LOG-BOT-DECISION-LOCK",
-  "phase": 178,
+  "build": "PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK",
+  "phase": 179,
   "lockedPublicPage": "untouched",
   "focus": "hand history, stack accounting, winner sweep, poker telemetry",
   "source": "direct-game-folder",

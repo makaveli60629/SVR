@@ -1,8 +1,8 @@
 {
   "status": "ok",
-  "build": "PHASE-178-ACTION-LOG-BOT-DECISION-LOCK",
+  "build": "PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK",
   "source": "direct-game-folder",
   "target": "/game",
-  "phase": 178,
+  "phase": 179,
   "generatedAt": "2026-05-25T00:00:00Z"
 }

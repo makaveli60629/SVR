@@ -1,10 +1,9 @@
-# Next Phase Plan after PHASE-178-ACTION-LOG-BOT-DECISION-LOCK
+# Next Phase Plan after PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK
 
-Next recommended phase: PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK
+Next recommended phase: PHASE-180-WATCH-LEGAL-ACTION-SYNC-LOCK
 
 Focus:
-- Round-by-round table action consistency.
-- Track current bet and legal action options per street.
-- Display call amount on watch and table.
-- Keep package under 25 MB.
+- Show legal action/call amount on the wrist watch.
+- Disable or dim unavailable action buttons during player turn.
+- Keep game package under 25 MB.
 - Keep public page untouched.

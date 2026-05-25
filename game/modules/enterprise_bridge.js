@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-178-ACTION-LOG-BOT-DECISION-LOCK
+ * Build: PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-178-ACTION-LOG-BOT-DECISION-LOCK',
+  build: 'PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,
@@ -14,6 +14,7 @@ const SVREnterpriseBridge = {
     window.addEventListener('svr_poker_hand_result', (event) => this.recordHandResult(event.detail || {}));
     window.addEventListener('svr_poker_player_action', (event) => this.recordPlayerAction(event.detail || {}));
     window.addEventListener('svr_poker_action_log_update', (event) => this.recordActionLog(event.detail || {}));
+    window.addEventListener('svr_poker_legal_actions_update', (event) => this.recordLegalActions(event.detail || {}));
     window.addEventListener('svr_runtime_telemetry', (event) => this.recordTelemetry(event.detail || {}));
     this.healthCheck();
     setInterval(() => this.flush(), 15000);
@@ -42,6 +43,7 @@ const SVREnterpriseBridge = {
   recordHandResult(payload) { this.enqueue('hand_result', payload); },
   recordPlayerAction(payload) { this.enqueue('player_action', payload); },
   recordActionLog(payload) { this.enqueue('action_log', payload); },
+  recordLegalActions(payload) { this.enqueue('legal_actions', payload); },
   recordTelemetry(payload) { this.enqueue('runtime_telemetry', payload); },
 
   async flush() {

@@ -20,7 +20,7 @@ function auth(req,res,next){
 }
 
 app.get('/api/health', async (_req,res)=>{
-  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-178-ACTION-LOG-BOT-DECISION-LOCK' }); }
+  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK' }); }
   catch(err){ res.status(500).json({ status:'error', database:'failed', message:err.message }); }
 });
 
@@ -139,6 +139,34 @@ app.get('/api/game/action-log', async (req,res)=>{
       .input('Limit', sql.Int, limit)
       .query('SELECT TOP (@Limit) Id, PayloadJson, CreatedAt FROM GameActionLog ORDER BY CreatedAt DESC');
     res.json({ ok:true, actions: result.recordset.map(row => ({ id: row.Id, createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
+  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
+});
+
+
+app.post('/api/game/legal-actions', async (req,res)=>{
+  try{
+    const body = req.body || {};
+    const legal = body.legal || body;
+    const pool = await getPool();
+    await pool.request()
+      .input('HandNumber', sql.Int, body.handNumber || null)
+      .input('Stage', sql.NVarChar(80), legal.stage || body.stage || null)
+      .input('CallAmount', sql.Int, Number(legal.callAmount || body.callAmount || 0))
+      .input('OptionsJson', sql.NVarChar(sql.MAX), JSON.stringify(legal.options || []))
+      .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(body))
+      .query('INSERT INTO GameLegalActions(HandNumber, Stage, CallAmount, OptionsJson, PayloadJson) VALUES(@HandNumber, @Stage, @CallAmount, @OptionsJson, @PayloadJson)');
+    res.json({ ok:true });
+  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
+});
+
+app.get('/api/game/legal-actions', async (req,res)=>{
+  try{
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit || 30)));
+    const pool = await getPool();
+    const result = await pool.request()
+      .input('Limit', sql.Int, limit)
+      .query('SELECT TOP (@Limit) Id, HandNumber, Stage, CallAmount, OptionsJson, PayloadJson, CreatedAt FROM GameLegalActions ORDER BY CreatedAt DESC');
+    res.json({ ok:true, legalActions: result.recordset.map(row => ({ id: row.Id, handNumber: row.HandNumber, stage: row.Stage, callAmount: row.CallAmount, options: JSON.parse(row.OptionsJson || '[]'), createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
   }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
 });
 

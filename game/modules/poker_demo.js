@@ -62,7 +62,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   statusPanel.mesh.position.set(0, tableTopY + 1.22, -0.06);
   group.add(statusPanel.mesh);
 
-  const historyPanel = makeDynamicPanel(1300, 460, 2.9, 0.98);
+  const historyPanel = makeDynamicPanel(1300, 500, 2.9, 1.06);
   historyPanel.mesh.position.set(0, tableTopY + 0.86, 1.08);
   group.add(historyPanel.mesh);
 
@@ -80,6 +80,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   let playerTurn = { active: false, expiresAt: 0, callAmount: 0, stage: '', pauseStartedAt: 0, lastSecond: -1 };
   const PLAYER_INDEX = 3;
   const actionLog = [];
+  const legalState = { stage: 'idle', callAmount: 0, minRaise: 100, options: ['nextHand'], expiresAt: 0 };
   buildSeatChips();
   paintHistory();
 
@@ -161,6 +162,13 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
         ctx.fillText(`${a.actor}: ${a.action}${a.amount ? ' $' + a.amount : ''} • ${a.stage}`, 54, 360 + i * 34);
       });
     }
+    ctx.fillStyle = "#f2d269";
+    ctx.font = "bold 28px system-ui";
+    ctx.fillText("LEGAL ACTIONS", 54, 468);
+    ctx.font = "25px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+    ctx.fillStyle = "rgba(236,232,255,0.86)";
+    const legalLine = `${legalState.stage.toUpperCase()} • ${legalState.callAmount > 0 ? 'CALL $' + legalState.callAmount : 'CHECK FREE'} • MIN RAISE $${legalState.minRaise} • ${legalState.options.join('/')}`;
+    ctx.fillText(legalLine, 54, 496);
     texture.needsUpdate = true;
   }
 
@@ -169,14 +177,14 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     actionLog.unshift(clean);
     if (actionLog.length > 12) actionLog.length = 12;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_action_log_update', { detail: { build: 'PHASE-178-ACTION-LOG-BOT-DECISION-LOCK', latest: clean, actions: actionLog.slice(0, 12), stacks: playerStacks.slice(), pot: current?.pot || 0 } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_action_log_update', { detail: { build: 'PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK', latest: clean, actions: actionLog.slice(0, 12), stacks: playerStacks.slice(), pot: current?.pot || 0 } })); } catch (_) {}
   }
 
   function recordHistory(entry) {
     handHistory.unshift(entry);
     if (handHistory.length > 8) handHistory.length = 8;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_history_update', { detail: { build: 'PHASE-178-ACTION-LOG-BOT-DECISION-LOCK', latest: entry, history: handHistory.slice(0, 8), stacks: playerStacks.slice() } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_history_update', { detail: { build: 'PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK', latest: entry, history: handHistory.slice(0, 8), stacks: playerStacks.slice() } })); } catch (_) {}
   }
 
   function applyStackDelta(index, amount) {
@@ -450,7 +458,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
 
   function emitPokerEvent(name, payload = {}) {
-    try { window.dispatchEvent(new CustomEvent(name, { detail: { build: 'PHASE-178-ACTION-LOG-BOT-DECISION-LOCK', handNumber, ...payload } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent(name, { detail: { build: 'PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK', handNumber, ...payload } })); } catch (_) {}
   }
 
   function shiftFutureQueue(delay) {
@@ -458,14 +466,52 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     for (let i = stepIndex; i < queue.length; i += 1) queue[i].at += delay;
   }
 
+  function computeLegalActions(callAmount = 0) {
+    const options = ['fold'];
+    if (callAmount > 0) options.push('call');
+    else options.push('check');
+    options.push('raise', 'allIn');
+    return options;
+  }
+
+  function updateLegalState(stage, callAmount = 0, expiresAt = 0) {
+    legalState.stage = String(stage || current?.stage || 'table');
+    legalState.callAmount = Math.max(0, Math.round(Number(callAmount || 0)));
+    legalState.minRaise = 100;
+    legalState.options = computeLegalActions(legalState.callAmount);
+    legalState.expiresAt = expiresAt || 0;
+    paintHistory();
+    try { window.dispatchEvent(new CustomEvent('svr_poker_legal_actions_update', { detail: { build: 'PHASE-179-BETTING-ROUND-CONSISTENCY-LOCK', handNumber, legal: { ...legalState }, pot: current?.pot || 0, stacks: playerStacks.slice() } })); } catch (_) {}
+    return legalState;
+  }
+
+  function formatLegalLine() {
+    if (!legalState) return 'Legal actions loading';
+    const primary = legalState.callAmount > 0 ? `Call $${legalState.callAmount} or fold` : 'Check free or raise';
+    return `${primary} • Legal ${legalState.options.join('/')} • pot $${current?.pot || 0}`;
+  }
+
+  function normalizeLegalAction(action, callAmount = 0) {
+    let normalized = String(action || '').trim();
+    if (!normalized) normalized = callAmount > 0 ? 'call' : 'check';
+    if (normalized === 'check' && callAmount > 0) normalized = 'call';
+    if (normalized === 'call' && callAmount === 0) normalized = 'check';
+    const legal = computeLegalActions(callAmount);
+    if (!legal.includes(normalized)) {
+      normalized = callAmount > 0 ? 'fold' : 'check';
+    }
+    return normalized;
+  }
+
   function startPlayerTurn(stage, callAmount = 0) {
-    playerTurn = { active: true, expiresAt: nowS + 20, callAmount, stage, pauseStartedAt: nowS, lastSecond: -1 };
+    playerTurn = { active: true, expiresAt: nowS + 20, callAmount: Math.max(0, Math.round(callAmount || 0)), stage, pauseStartedAt: nowS, lastSecond: -1 };
     current.actorIndex = PLAYER_INDEX;
     current.stage = `player-${stage}`;
     applyActionHighlight(PLAYER_INDEX);
-    recordAction('YOU', 'turn start', callAmount, stage);
-    emitPokerEvent('svr_poker_player_action', { action: 'turn_start', stage, callAmount, expiresIn: 20 });
-    paintStatus('YOUR TURN • 20 SEC', `${callAmount > 0 ? 'Call $' + callAmount + ' or fold' : 'Check free or raise'} • F/C/R/A • pot $${current.pot}`, 'rgba(126,240,208,0.98)');
+    updateLegalState(stage, playerTurn.callAmount, playerTurn.expiresAt);
+    recordAction('YOU', 'turn start', playerTurn.callAmount, stage);
+    emitPokerEvent('svr_poker_player_action', { action: 'turn_start', stage, callAmount: playerTurn.callAmount, legal: { ...legalState }, expiresIn: 20 });
+    paintStatus('YOUR TURN • 20 SEC', formatLegalLine(), 'rgba(126,240,208,0.98)');
   }
 
   function resolvePlayerTurn(action, automatic = false) {
@@ -480,11 +526,13 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     playerTurn.active = false;
     current.actorIndex = PLAYER_INDEX;
     current.stage = automatic ? 'player-auto-action' : 'player-action';
+    action = normalizeLegalAction(action, callAmount);
+    updateLegalState(stage, callAmount, 0);
     let added = 0;
     let label = String(action || 'check').toUpperCase();
     if (action === 'fold') added = 0;
     else if (action === 'call' || action === 'check') added = callAmount;
-    else if (action === 'raise') added = callAmount + 100;
+    else if (action === 'raise') added = callAmount + legalState.minRaise;
     else if (action === 'allIn') added = Math.max(500, callAmount + 500);
     if (added) applyStackDelta(PLAYER_INDEX, -added);
     current.pot += added;
@@ -497,7 +545,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     paintStatus(`${prefix}${label}`, `${stage} • ${added ? '+$' + added + ' • ' : ''}pot $${current.pot}`, accent);
     statusCb(`${prefix}${label} • pot $${current.pot}`);
     recordAction('YOU', label, added, stage, automatic);
-    emitPokerEvent('svr_poker_player_action', { action, automatic, stage, callAmount, added, pot: current.pot });
+    emitPokerEvent('svr_poker_player_action', { action, automatic, stage, callAmount, added, pot: current.pot, legal: { ...legalState } });
     return true;
   }
 
@@ -506,7 +554,8 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     const remaining = Math.max(0, Math.ceil(playerTurn.expiresAt - nowS));
     if (remaining !== playerTurn.lastSecond) {
       playerTurn.lastSecond = remaining;
-      paintStatus(`YOUR TURN • ${remaining}s`, `${playerTurn.callAmount > 0 ? 'Call $' + playerTurn.callAmount + ' or fold' : 'Free check available'} • F/C/R/A • pot $${current?.pot || 0}`, remaining <= 5 ? 'rgba(255,185,95,0.98)' : 'rgba(126,240,208,0.98)');
+      updateLegalState(playerTurn.stage, playerTurn.callAmount, playerTurn.expiresAt);
+      paintStatus(`YOUR TURN • ${remaining}s`, formatLegalLine(), remaining <= 5 ? 'rgba(255,185,95,0.98)' : 'rgba(126,240,208,0.98)');
     }
     if (remaining <= 0) {
       resolvePlayerTurn(playerTurn.callAmount > 0 ? 'fold' : 'check', true);
@@ -736,7 +785,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     if (normalized === 'nextHand') { playerTurn.active = false; planHand(); return true; }
     if (!current) planHand();
     if (playerTurn.active) {
-      const actual = normalized === 'call' && playerTurn.callAmount === 0 ? 'check' : normalized;
+      const actual = normalizeLegalAction(normalized, playerTurn.callAmount || 0);
       return resolvePlayerTurn(actual || 'check', false);
     }
     const label = normalized.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
