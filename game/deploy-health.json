@@ -1,6 +1,7 @@
 {
   "status": "ok",
-  "build": "PHASE-202-BOOT-FALLBACK-CDN-RECOVERY-LOCK",
+  "build": "PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK",
+  "phase": 203,
   "source": "direct-game-folder",
-  "phase": 202
+  "public_page_touched": false
 }

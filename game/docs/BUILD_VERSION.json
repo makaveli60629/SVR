@@ -1,8 +1,7 @@
 {
-  "build": "PHASE-202-BOOT-FALLBACK-CDN-RECOVERY-LOCK",
-  "phase": 202,
-  "source": "direct-game-folder",
-  "generatedAt": "2026-05-25T00:00:00Z",
+  "build": "PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK",
+  "phase": 203,
   "public_page_touched": false,
-  "featureLock": "boot fallback recovery shell, CDN/import timeout report, no-stuck boot hardening"
+  "site_track": "internal only",
+  "game_package_under_25mb_target": true
 }
