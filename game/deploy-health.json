@@ -1,7 +1,7 @@
 {
   "status": "ok",
-  "build": "PHASE-192-SMOKE-TEST-AUTOMATION-LOCK",
-  "target": "/game",
-  "source": "direct-game-folder",
-  "phase": 192
+  "build": "PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK",
+  "phase": 193,
+  "source": "packaged-game-zip",
+  "generatedAt": "2026-05-25T00:00:00Z"
 }

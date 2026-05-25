@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-192-SMOKE-TEST-AUTOMATION-LOCK
+ * Build: PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-192-SMOKE-TEST-AUTOMATION-LOCK';
+const BUILD = 'PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

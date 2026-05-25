@@ -1,11 +1,11 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-192-SMOKE-TEST-AUTOMATION-LOCK
+ * Build: PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-192-SMOKE-TEST-AUTOMATION-LOCK';
-const EXPECTED_PHASE = 192;
+const BUILD = 'PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK';
+const EXPECTED_PHASE = 193;
 
 function bool(value) { return !!value; }
 function text(value, max = 220) { return String(value ?? '').slice(0, max); }
@@ -65,7 +65,7 @@ const SVRSmokeTest = {
     const checks = [];
     const versionBuild = text(version?.json?.build);
     const versionPhase = Number(version?.json?.phase || 0);
-    checks.push({ name: 'version_file_phase_192', pass: versionBuild === BUILD && versionPhase === EXPECTED_PHASE, value: versionBuild || 'missing' });
+    checks.push({ name: 'version_file_phase_193', pass: versionBuild === BUILD && versionPhase === EXPECTED_PHASE, value: versionBuild || 'missing' });
     checks.push({ name: 'deploy_verifier_module', pass: bool(window.SVR_DEPLOY_VERIFIER), value: bool(window.SVR_DEPLOY_VERIFIER) });
     checks.push({ name: 'runtime_qa_module', pass: bool(window.SVR_RUNTIME_QA), value: bool(window.SVR_RUNTIME_QA) });
     checks.push({ name: 'session_export_module', pass: bool(window.SVR_SESSION_EXPORT), value: bool(window.SVR_SESSION_EXPORT) });

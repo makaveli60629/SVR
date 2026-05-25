@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-192-SMOKE-TEST-AUTOMATION-LOCK",
-  "phase": 192,
+  "build": "PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK",
+  "phase": 193,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "smoke test automation, runtime readiness checklist, QA/download/deploy verifier integration"
+  "featureLock": "release candidate checklist, final preflight gate, module readiness pass"
 }

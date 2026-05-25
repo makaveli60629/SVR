@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-192-SMOKE-TEST-AUTOMATION-LOCK",
-  "phase": 192,
+  "build": "PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK",
+  "phase": 193,
   "modules_added": [
     "game/modules/smoke_test.js"
   ],

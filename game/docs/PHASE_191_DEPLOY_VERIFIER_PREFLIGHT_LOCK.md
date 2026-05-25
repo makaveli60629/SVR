@@ -1,6 +1,6 @@
-# Phase 192 — Deploy Verifier Preflight Lock
+# Phase 193 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-192-SMOKE-TEST-AUTOMATION-LOCK`
+Build: `PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

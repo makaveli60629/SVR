@@ -1,6 +1,6 @@
 {
-  "phase": 191,
-  "build": "PHASE-192-SMOKE-TEST-AUTOMATION-LOCK",
+  "phase": 193,
+  "build": "PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK",
   "modules_added": [
     "modules/deploy_verify.js"
   ],

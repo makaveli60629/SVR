@@ -1,6 +1,6 @@
-# Phase 192 — Smoke Test Automation Lock
+# Phase 193 — Smoke Test Automation Lock
 
-Build: `PHASE-192-SMOKE-TEST-AUTOMATION-LOCK`
+Build: `PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

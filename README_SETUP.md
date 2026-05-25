@@ -1,5 +1,1 @@
-# SVR Phase 192 Backend Starter
-
-Build: `PHASE-192-SMOKE-TEST-AUTOMATION-LOCK`
-
-Adds smoke-test telemetry endpoints. No secrets included.
+SVR Phase 193 backend starter. Public page untouched. Build PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK.
