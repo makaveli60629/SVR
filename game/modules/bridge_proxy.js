@@ -1,11 +1,11 @@
 /**
  * SVR Poker — Bridge Proxy Runtime Guard
- * Build: PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+ * Build: PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
  * Purpose: install a no-crash proxy before poker/runtime modules dispatch telemetry.
  * The proxy returns safe functions for any record* method so missing recorder aliases
  * cannot freeze the render loop.
  */
-const BUILD = 'PHASE-229-POWER-DEPLOY-WATCHER-LOCK';
+const BUILD = 'PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK';
 const STORE_KEY = '__svrBridgeProxyQueue';
 
 function safePayload(value){

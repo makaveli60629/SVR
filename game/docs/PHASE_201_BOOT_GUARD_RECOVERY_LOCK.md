@@ -1,4 +1,4 @@
-# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
 
 ## Purpose
 Fix game stuck on `Booting…` by moving game startup behind a guarded loader.

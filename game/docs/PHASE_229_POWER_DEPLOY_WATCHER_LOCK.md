@@ -1,7 +1,7 @@
-# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
 
 ## Purpose
-Phase 229 adds a Power Deploy Watcher panel for the new PowerShell-only workflow.
+Phase 230 adds a Power Deploy Watcher panel for the new PowerShell-only workflow.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 229 adds a Power Deploy Watcher panel for the new PowerShell-only workflow
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase229-powerdeploy` and press `F6`.
+Open `/game/?v=phase230-powerdeploy` and press `F6`.

@@ -1,11 +1,11 @@
-# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase229.js`
+- `game/modules/enterprise_bridge_phase230.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

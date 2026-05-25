@@ -1,4 +1,4 @@
-# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
 
 ## Purpose
 Install a first-run bridge proxy before event/firewall/poker modules so missing `record*` methods cannot crash the runtime.
@@ -12,5 +12,5 @@ Install a first-run bridge proxy before event/firewall/poker modules so missing 
 
 ## Added files
 - `game/modules/bridge_proxy.js`
-- `game/modules/enterprise_bridge_phase229.js`
+- `game/modules/enterprise_bridge_phase230.js`
 - `game/docs/MODULE_REGISTRY_PHASE207.json`

@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
+  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
   "modules": [
     "modules/test_queue.js",
     "modules/tester_feedback.js",

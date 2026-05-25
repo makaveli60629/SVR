@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Bridge Self-Test & Auto-Heal Module
- * Build: PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+ * Build: PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
  * Purpose: verify bridge recorder methods at runtime, patch missing aliases, and emit a clear health report without stopping the game loop.
  */
-const BUILD = 'PHASE-229-POWER-DEPLOY-WATCHER-LOCK';
+const BUILD = 'PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK';
 const REQUIRED_RECORDERS = [
   'recordHandResult','recordPlayerAction','recordActionLog','recordLegalActions','recordShowdown','recordSidePot',
   'recordTurnIndicator','recordWatchTurnIndicator','recordDealerButton','recordRebuy','recordDecisionAid','recordTelemetry',

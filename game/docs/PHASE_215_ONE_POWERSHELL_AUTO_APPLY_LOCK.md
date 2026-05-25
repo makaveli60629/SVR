@@ -1,4 +1,4 @@
-# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

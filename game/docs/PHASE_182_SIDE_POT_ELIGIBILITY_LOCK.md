@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-229-POWER-DEPLOY-WATCHER-LOCK`
+Build: `PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

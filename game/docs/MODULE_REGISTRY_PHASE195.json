@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
+  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
   "phase": 199,
   "modules": {
     "bug_reporter": "game/modules/bug_reporter.js",

@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
+  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
   "modules": [
     "boot_route_health.js",
     "boot_route_recovery.js",

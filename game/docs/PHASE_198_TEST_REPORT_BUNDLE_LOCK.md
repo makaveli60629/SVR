@@ -1,4 +1,4 @@
-# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
 
 Adds the in-game Test Report Bundle module. Press **B** inside the game to package bug reports, tester feedback, test queue, runtime QA, session exports, smoke tests, deploy verifier, and release-candidate state into one JSON playtest report.
 

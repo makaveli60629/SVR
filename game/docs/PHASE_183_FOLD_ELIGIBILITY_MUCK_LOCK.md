@@ -1,6 +1,6 @@
 # Phase 199 — Fold Eligibility + Muck Lock
 
-Build: `PHASE-229-POWER-DEPLOY-WATCHER-LOCK`
+Build: `PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK`
 
 ## Added
 

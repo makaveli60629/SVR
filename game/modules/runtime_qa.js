@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+ * Build: PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-229-POWER-DEPLOY-WATCHER-LOCK';
+const BUILD = 'PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

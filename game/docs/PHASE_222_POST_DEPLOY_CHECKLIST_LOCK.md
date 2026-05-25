@@ -1,7 +1,7 @@
-# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
 
 ## Purpose
-Phase 229 adds a post-deploy checklist panel so the workflow can verify deployment, cache busting, and tester handoff after Auto Deploy.
+Phase 230 adds a post-deploy checklist panel so the workflow can verify deployment, cache busting, and tester handoff after Auto Deploy.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 229 adds a post-deploy checklist panel so the workflow can verify deployme
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase229-postdeploy` and press `E`.
+Open `/game/?v=phase230-postdeploy` and press `E`.

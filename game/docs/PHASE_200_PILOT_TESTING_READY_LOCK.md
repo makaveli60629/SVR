@@ -1,6 +1,6 @@
 # Phase 200 — Pilot Testing Ready Lock
 
-Build: `PHASE-229-POWER-DEPLOY-WATCHER-LOCK`
+Build: `PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK`
 
 ## Protected rules
 

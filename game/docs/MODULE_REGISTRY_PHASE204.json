@@ -1,6 +1,6 @@
 {
   "phase": 204,
-  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
+  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
   "modules_added": [
     "modules/event_firewall.js"
   ],

@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-229-POWER-DEPLOY-WATCHER-LOCK";
+  const BUILD = "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK";
   const state = {
     build: BUILD,
     phase: 219,
@@ -10,7 +10,7 @@
 
   async function checkJson(url){
     try {
-      const r = await fetch(url + (url.includes("?") ? "&" : "?") + "v=phase229-" + Date.now(), { cache: "no-store" });
+      const r = await fetch(url + (url.includes("?") ? "&" : "?") + "v=phase230-" + Date.now(), { cache: "no-store" });
       const text = await r.text();
       let json = null;
       try { json = JSON.parse(text); } catch(_e) {}

@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
-  "phase": 229,
+  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+  "phase": 230,
   "modules": [
     "game/modules/auto_apply_git_wrapper_fix.js",
-    "game/modules/enterprise_bridge_phase229.js"
+    "game/modules/enterprise_bridge_phase230.js"
   ],
   "public_page_touched": false
 }

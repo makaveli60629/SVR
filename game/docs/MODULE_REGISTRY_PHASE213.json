@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
+  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase229.js"
+    "game/modules/enterprise_bridge_phase230.js"
   ],
   "protected": {
     "publicPageTouched": false,

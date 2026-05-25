@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
+  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",
-    "game/modules/enterprise_bridge_phase229.js",
+    "game/modules/enterprise_bridge_phase230.js",
     "game/modules/bridge_selftest.js",
     "game/modules/event_firewall.js"
   ],

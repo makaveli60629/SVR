@@ -1,6 +1,6 @@
 {
   "phase": 200,
-  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
+  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
   "modules": [
     "enterprise_bridge",
     "runtime_qa",

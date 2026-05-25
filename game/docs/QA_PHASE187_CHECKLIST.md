@@ -1,6 +1,6 @@
 # Phase 199 QA Checklist
 
-- [ ] /game/version.json shows PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+- [ ] /game/version.json shows PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
 - [ ] During player turn, the hand-history panel shows an AID line.
 - [ ] Free check shows FREE CHECK / 0% call cost.
 - [ ] Calling a bet shows pot-odds percentage.

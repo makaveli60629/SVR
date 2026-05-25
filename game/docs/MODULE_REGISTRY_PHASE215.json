@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
+  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
   "modules_added": [
     "modules/auto_apply_helper.js",
-    "modules/enterprise_bridge_phase229.js"
+    "modules/enterprise_bridge_phase230.js"
   ],
   "public_page_touched": false,
   "deployment": "direct game folder plus update/game.zip backup"

@@ -1,8 +1,8 @@
-// PHASE-229-POWER-DEPLOY-WATCHER-LOCK
+// PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
+    build: "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

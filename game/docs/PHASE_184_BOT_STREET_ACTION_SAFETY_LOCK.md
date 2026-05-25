@@ -1,7 +1,7 @@
 # Phase 199 — Bot Street Action Safety Lock
 
 ## Build
-`PHASE-229-POWER-DEPLOY-WATCHER-LOCK`
+`PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK`
 
 ## Purpose
 This phase locks the poker runtime against scheduled bot-action errors and hardens street betting events before the next polish pass.
