@@ -1,14 +1,6 @@
 {
-  "build": "PHASE-170-PLAYABLE-POKER-TEST-LOCK",
-  "phase": 170,
-  "date": "2026-05-24",
-  "siteTouched": false,
-  "focus": "Playable poker test controls, approval cleanup, phase label lock",
-  "packageRule": "under 25 MB",
-  "next": [
-    "turn-gated betting",
-    "bot action cadence",
-    "watch action state feedback",
-    "Quest seat/play distance validation"
-  ]
+  "build": "PHASE-173-WINNER-PROOF-HAND-HISTORY-LOCK",
+  "phase": 173,
+  "scope": "game",
+  "notes": "Winner proof and hand history lock with exact winning-card highlight, showdown explanation, and replay-ready hand log. Site untouched."
 }

@@ -179,7 +179,8 @@ let hoveredId = null;
 
   function draw(force = false){
     const state = getState();
-    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, sec: new Date().getSeconds() });
+    const poker = state.poker || {};
+    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, ps: poker.stage, pw: poker.waitingForPlayer, pp: poker.pot, cb: poker.currentBet, ca: poker.callAmount, pa: (poker.legalActions || []).join(','), la: poker.actionLog?.slice?.(-1)?.[0] || '', wp: poker.winnerProof?.winner || '', wh: poker.winnerProof?.handName || '', sec: new Date().getSeconds() });
     if (!force && sig === lastSig) return;
     lastSig = sig;
 
@@ -219,8 +220,9 @@ let hoveredId = null;
     ctx.fillStyle = 'rgba(233,233,255,0.78)';
     ctx.font = '25px system-ui, Arial';
     ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 430, 152);
-    ctx.fillText(`Track: ${state.audioEnabled ? state.trackTitle : 'Paused'}`, 430, 190);
-    ctx.fillText(`Zone: ${state.inTableZone ? 'Ready' : 'Walk closer'}`, 430, 228);
+    const pokerLine = poker.waitingForPlayer ? `YOUR TURN • call $${poker.callAmount || 0} • pot $${poker.pot || 0}` : `Poker: ${poker.stage || 'loading'} • pot $${poker.pot || 0}`;
+    ctx.fillText(pokerLine, 430, 190);
+    ctx.fillText(`Stack: $${Number(poker.playerStack || state.cash || 0).toLocaleString()} • Target $${poker.currentBet || 0} • ${state.inTableZone ? 'Ready' : 'Walk closer'}`, 430, 228);
     ctx.textAlign = 'right';
     ctx.fillStyle = state.seated ? '#7ff5c7' : state.inTableZone ? '#f6e27f' : 'rgba(233,233,255,0.72)';
     ctx.font = 'bold 28px system-ui, Arial';
@@ -229,7 +231,14 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • Reiki / PGA / Sponsor / Scorpion • pinch with other hand • fist by face toggles TP', 36, 332);
+    const lastAction = poker.actionLog?.length ? poker.actionLog[poker.actionLog.length - 1] : '';
+    const proof = poker.winnerProof;
+    const legalLine = poker.waitingForPlayer
+      ? `LEGAL: ${(poker.legalActions || []).join(' / ').toUpperCase()}`
+      : proof
+        ? `WINNER: ${proof.winner} • ${proof.handName} • Best ${proof.bestFive}`
+        : (lastAction ? `Last action: ${lastAction}` : 'Poker waits for your turn • TP hold/aim/release');
+    ctx.fillText(legalLine, 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();

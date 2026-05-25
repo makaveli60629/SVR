@@ -1,14 +1,15 @@
 {
-  "build": "PHASE-170-PLAYABLE-POKER-TEST-LOCK",
-  "phase": 170,
-  "date": "2026-05-24",
-  "siteTouched": false,
-  "focus": "Playable poker test controls, approval cleanup, phase label lock",
-  "packageRule": "under 25 MB",
-  "next": [
-    "turn-gated betting",
-    "bot action cadence",
-    "watch action state feedback",
-    "Quest seat/play distance validation"
+  "build": "PHASE-173-WINNER-PROOF-HAND-HISTORY-LOCK",
+  "phase": 173,
+  "scope": "game",
+  "locked": [
+    "site untouched",
+    "true lobby preserved",
+    "dealer body disabled",
+    "left-to-right dealing preserved",
+    "turn-gated player poker actions",
+    "bot AI betting rounds",
+    "winner proof panel",
+    "hand history strip"
   ]
 }

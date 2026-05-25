@@ -1,16 +1,18 @@
 {
-  "build": "PHASE-170-PLAYABLE-POKER-TEST-LOCK",
-  "lockedRules": [
-    "site untouched",
-    "game under 25 MB",
-    "unapproved Reiki branding disabled",
+  "build": "PHASE-173-WINNER-PROOF-HAND-HISTORY-LOCK",
+  "phase": 173,
+  "scope": "game",
+  "siteTouched": false,
+  "lockedBaseline": [
+    "true lobby preserved",
     "dealer body disabled",
-    "invisible dealing logic preserved",
-    "5 bots plus 1 open south/front player seat",
-    "left-to-right dealing preserved"
-  ],
-  "readiness": {
-    "testingReadyPercent": 72,
-    "polishedLaunchReadyPercent": 45
-  }
+    "invisible dealing/card logic preserved",
+    "5 bots + 1 south/front player seat",
+    "left-to-right card dealing",
+    "turn-gated poker actions",
+    "betting round and bot AI lock",
+    "winner proof and hand history lock",
+    "Reiki approval placeholders only",
+    "under 25 MB package rule"
+  ]
 }

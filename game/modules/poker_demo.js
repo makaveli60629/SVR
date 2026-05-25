@@ -6,6 +6,8 @@ const SUIT_SYMBOL = { S: "♠", H: "♥", D: "♦", C: "♣" };
 const SUIT_COLOR = { S: "#101218", C: "#101218", H: "#c71f44", D: "#c71f44" };
 const RANK_LABEL = { 14: "A", 13: "K", 12: "Q", 11: "J", 10: "10", 9: "9", 8: "8", 7: "7", 6: "6", 5: "5", 4: "4", 3: "3", 2: "2" };
 const BOT_NAMES = ["BOT NOVA", "BOT VEGA", "BOT ORBIT", "YOU", "BOT ACE", "BOT LUX"];
+const PLAYER_INDEX = 3;
+const TURN_SECONDS = 20;
 const CHIP_PALETTES = [
   [0x7d4dff,0x2bd4ff,0xf2d269],
   [0xff6fb1,0x2bd4ff,0xf2d269],
@@ -62,16 +64,29 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   statusPanel.mesh.position.set(0, tableTopY + 1.22, -0.06);
   group.add(statusPanel.mesh);
 
+  const proofPanel = makeDynamicPanel(1400, 310, 3.0, 0.66);
+  proofPanel.mesh.position.set(0, tableTopY + 1.02, 0.64);
+  group.add(proofPanel.mesh);
+
+  const historyPanel = makeDynamicPanel(1400, 230, 2.95, 0.48);
+  historyPanel.mesh.position.set(0, tableTopY + 0.84, 0.96);
+  group.add(historyPanel.mesh);
+
   const potStack = new THREE.Group();
   group.add(potStack);
 
   buildSeatChips();
+  paintProofPanel(null);
+  paintHistoryPanel();
 
   let handNumber = 0;
   let nowS = 0;
   let queue = [];
   let stepIndex = 0;
   let current = null;
+  let playerStacks = players.map(() => 1000);
+  const handHistory = [];
+  const MAX_HISTORY = 6;
 
   function makeDynamicPanel(width, height, worldW, worldH) {
     const { canvas, ctx, texture } = makeCanvasLabel({
@@ -106,6 +121,66 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     ctx.fillStyle = "rgba(236,232,255,0.92)";
     ctx.font = "42px system-ui";
     ctx.fillText(subtitle, canvas.width / 2, 176);
+    texture.needsUpdate = true;
+  }
+
+
+  function paintProofPanel(proof = null) {
+    const { ctx, canvas, texture } = proofPanel;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(7,5,14,0.58)";
+    roundRect(ctx, 18, 18, canvas.width - 36, canvas.height - 36, 36);
+    ctx.fill();
+    ctx.strokeStyle = proof ? "rgba(244,210,105,0.90)" : "rgba(126,240,208,0.28)";
+    ctx.lineWidth = 6;
+    roundRect(ctx, 18, 18, canvas.width - 36, canvas.height - 36, 36);
+    ctx.stroke();
+    ctx.fillStyle = proof ? "#f2d269" : "rgba(236,232,255,0.75)";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.font = "bold 48px system-ui";
+    ctx.fillText(proof ? "WINNER PROOF" : "SHOWDOWN PROOF READY", 56, 48);
+    ctx.fillStyle = "rgba(245,240,255,0.95)";
+    ctx.font = "36px system-ui";
+    const lines = proof ? [
+      `${proof.winner} wins $${proof.payout} with ${proof.handName}`,
+      `Best five: ${proof.bestFive}`,
+      `Why: ${proof.reason}`,
+      `Board: ${proof.board}`
+    ] : [
+      "Showdown will highlight the exact winning cards.",
+      "Hand history will record winner, hand type, payout, and board.",
+      "Use H / Next Hand to advance after review."
+    ];
+    lines.forEach((line, i) => ctx.fillText(line, 56, 116 + i * 45));
+    texture.needsUpdate = true;
+  }
+
+  function paintHistoryPanel() {
+    const { ctx, canvas, texture } = historyPanel;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(0,0,0,0.46)";
+    roundRect(ctx, 18, 18, canvas.width - 36, canvas.height - 36, 32);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(185,90,255,0.58)";
+    ctx.lineWidth = 5;
+    roundRect(ctx, 18, 18, canvas.width - 36, canvas.height - 36, 32);
+    ctx.stroke();
+    ctx.fillStyle = "#f5f0ff";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.font = "bold 36px system-ui";
+    ctx.fillText("HAND HISTORY", 54, 38);
+    ctx.font = "29px system-ui";
+    ctx.fillStyle = "rgba(236,232,255,0.92)";
+    const rows = handHistory.slice(-4).reverse();
+    if (!rows.length) {
+      ctx.fillText("No completed hands yet.", 54, 92);
+    } else {
+      rows.forEach((row, i) => {
+        ctx.fillText(`#${row.hand} ${row.winner} • ${row.handName} • +$${row.payout}`, 54, 86 + i * 33);
+      });
+    }
     texture.needsUpdate = true;
   }
 
@@ -200,6 +275,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   }
 
   function clearCards() {
+    clearWinningHighlights();
     while (cardObjects.length) {
       const mesh = cardObjects.pop();
       mesh.parent?.remove(mesh);
@@ -301,8 +377,11 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
         for (let c = b + 1; c < cards.length - 2; c += 1) {
           for (let d = c + 1; d < cards.length - 1; d += 1) {
             for (let e = d + 1; e < cards.length; e += 1) {
-              const result = evaluate5([cards[a], cards[b], cards[c], cards[d], cards[e]]);
-              if (!best || compareArrays(result.score, best.score) > 0) best = result;
+              const bestCards = [cards[a], cards[b], cards[c], cards[d], cards[e]];
+              const result = evaluate5(bestCards);
+              if (!best || compareArrays(result.score, best.score) > 0) {
+                best = { ...result, cards: bestCards.slice() };
+              }
             }
           }
         }
@@ -313,12 +392,308 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   function formatCards(cards) {
     return cards.map((card) => `${RANK_LABEL[card.rank]}${SUIT_SYMBOL[card.suit]}`).join(" ");
   }
-  function handStrengthToBet(result, street = "preflop") {
-    const level = result.score[0];
-    if (street === "preflop") return level >= 2 ? 80 : level >= 1 ? 50 : 35;
-    if (street === "flop") return level >= 3 ? 120 : level >= 1 ? 60 : 40;
-    if (street === "turn") return level >= 4 ? 160 : level >= 2 ? 80 : 45;
-    return level >= 5 ? 220 : level >= 2 ? 90 : 55;
+  function cardKey(card) {
+    return card ? `${card.rank}${card.suit}` : "";
+  }
+  function describeScore(result) {
+    const score = result?.score || [];
+    const name = result?.name || "High Card";
+    const primary = RANK_LABEL[score[1]] || score[1] || "";
+    const secondary = RANK_LABEL[score[2]] || score[2] || "";
+    if (name === "Pair") return `Pair of ${primary}s with kickers`;
+    if (name === "Two Pair") return `Two pair, ${primary}s and ${secondary}s`;
+    if (name === "Three of a Kind") return `Trips ${primary}s`;
+    if (name === "Straight") return `${primary}-high straight`;
+    if (name === "Flush") return `${primary}-high flush`;
+    if (name === "Full House") return `${primary}s full of ${secondary}s`;
+    if (name === "Four of a Kind") return `Quad ${primary}s`;
+    if (name === "Straight Flush") return `${primary}-high straight flush`;
+    if (name === "Royal Flush") return "Ace-high royal flush";
+    return `${primary || "high"} high`;
+  }
+  function clearWinningHighlights() {
+    cardObjects.forEach((mesh) => {
+      mesh.scale.set(1, 1, 1);
+      if (mesh.material) {
+        mesh.material.emissive?.set?.(0x130814);
+        mesh.material.emissiveIntensity = 0.06;
+      }
+      mesh.userData.winningCard = false;
+    });
+  }
+  function highlightWinningCards(cards) {
+    const keys = new Set((cards || []).map(cardKey));
+    cardObjects.forEach((mesh) => {
+      const isWinner = keys.has(cardKey(mesh.userData.card));
+      if (!isWinner) return;
+      mesh.scale.set(1.18, 1.18, 1.18);
+      mesh.userData.winningCard = true;
+      if (mesh.material) {
+        mesh.material.emissive?.set?.(0xf2d269);
+        mesh.material.emissiveIntensity = 0.34;
+      }
+    });
+  }
+  function handStrengthToBet(result, street = "preflop", pot = 0) {
+    const level = result?.score?.[0] || 0;
+    const potBased = Math.max(35, Math.round((pot || 80) * 0.42));
+    if (street === "preflop") return level >= 2 ? 100 : level >= 1 ? 70 : 40;
+    if (street === "flop") return level >= 3 ? Math.max(130, potBased) : level >= 1 ? Math.max(75, Math.round(potBased * 0.85)) : 45;
+    if (street === "turn") return level >= 4 ? Math.max(170, potBased) : level >= 2 ? Math.max(95, Math.round(potBased * 0.90)) : 55;
+    return level >= 5 ? Math.max(230, potBased) : level >= 2 ? Math.max(115, Math.round(potBased * 0.95)) : 65;
+  }
+
+  function resetStacksIfNeeded() {
+    if (!playerStacks.length || playerStacks.some((stack) => stack <= 0)) playerStacks = players.map(() => 1000);
+  }
+
+  function resetStreetBets(street) {
+    if (!current) return;
+    current.street = street;
+    current.stage = `${street}-betting`;
+    current.streetBets = players.map(() => 0);
+    current.currentBet = 0;
+    current.lastRaiseBy = null;
+    current.lastBotBet = 0;
+    current.callAmount = 0;
+    current.legalActions = [];
+  }
+
+  function activeCount() {
+    if (!current) return 0;
+    return players.filter((_, i) => !current.folded?.[i] && (playerStacks[i] || 0) >= 0).length;
+  }
+
+  function pushActionLog(text) {
+    if (!current) return;
+    current.actionLog = current.actionLog || [];
+    current.actionLog.push(text);
+    if (current.actionLog.length > 8) current.actionLog.shift();
+  }
+
+  function commitBet(index, requestedAmount) {
+    if (!current) return 0;
+    const safeIndex = Math.max(0, Math.min(playerStacks.length - 1, index));
+    const amount = Math.max(0, Math.floor(Number(requestedAmount) || 0));
+    const paid = Math.min(amount, Math.max(0, playerStacks[safeIndex] || 0));
+    playerStacks[safeIndex] = Math.max(0, (playerStacks[safeIndex] || 0) - paid);
+    current.pot += paid;
+    current.streetBets[safeIndex] = (current.streetBets[safeIndex] || 0) + paid;
+    if ((playerStacks[safeIndex] || 0) <= 0) current.allIn[safeIndex] = true;
+    return paid;
+  }
+
+  function awardPot(index) {
+    if (!current) return 0;
+    const paid = Math.max(0, current.pot || 0);
+    playerStacks[index] = (playerStacks[index] || 0) + paid;
+    current.lastPayout = paid;
+    current.pot = 0;
+    return paid;
+  }
+
+  function legalActionsFor(callAmount) {
+    return callAmount > 0 ? ["fold", "call", "raise", "allin"] : ["fold", "check", "raise", "allin"];
+  }
+
+  function playerActionLabel(action, callAmount, paid = 0) {
+    if (action === "check") return "checks";
+    if (action === "call") return `calls $${Math.max(0, callAmount || paid)}`;
+    if (action === "raise") return `raises to $${current?.streetBets?.[PLAYER_INDEX] || paid}`;
+    if (action === "allin") return "moves all-in";
+    return "folds";
+  }
+
+  function tableOrderFrom(startIndex) {
+    return Array.from({ length: players.length }, (_, offset) => (startIndex + offset) % players.length);
+  }
+
+  function cardsVisibleForStreet(street) {
+    if (street === "preflop") return [];
+    if (street === "flop") return current.board.slice(0, 3);
+    if (street === "turn") return current.board.slice(0, 4);
+    return current.board.slice(0, 5);
+  }
+
+  function getPlayerResultAtStreet(index, street) {
+    const hp = current.handPlayers[index];
+    const visible = cardsVisibleForStreet(street);
+    if (!hp) return { score: [0], name: "Unknown" };
+    if (visible.length >= 3) return evaluate7([...hp.cards, ...visible]);
+    return null;
+  }
+
+  function estimatePreflopStrength(cards) {
+    if (!cards || cards.length < 2) return 0.20;
+    const [a, b] = cards;
+    const high = Math.max(a.rank, b.rank);
+    const low = Math.min(a.rank, b.rank);
+    const pair = a.rank === b.rank;
+    const suited = a.suit === b.suit;
+    const connected = Math.abs(a.rank - b.rank) <= 1;
+    let strength = (high - 2) / 18 + (low - 2) / 30;
+    if (pair) strength += 0.38 + (high >= 10 ? 0.12 : 0.0);
+    if (suited) strength += 0.08;
+    if (connected) strength += 0.06;
+    if (high === 14) strength += 0.08;
+    return THREE.MathUtils.clamp(strength, 0.05, 0.96);
+  }
+
+  function estimateStreetStrength(index, street) {
+    const hp = current.handPlayers[index];
+    if (!hp) return 0.25;
+    if (street === "preflop") return estimatePreflopStrength(hp.cards);
+    const result = getPlayerResultAtStreet(index, street);
+    const level = result?.score?.[0] || 0;
+    const kicker = (result?.score?.[1] || 0) / 14;
+    const visible = cardsVisibleForStreet(street);
+    const suitedCount = Math.max(...SUITS.map((s) => [...hp.cards, ...visible].filter((c) => c.suit === s).length));
+    const drawBonus = suitedCount === 4 ? 0.10 : 0;
+    return THREE.MathUtils.clamp((level / 8) + 0.18 + kicker * 0.18 + drawBonus, 0.05, 0.98);
+  }
+
+  function decideBotAction(index, street, closing = false) {
+    const callAmount = Math.max(0, (current.currentBet || 0) - (current.streetBets[index] || 0));
+    const stack = playerStacks[index] || 0;
+    const strength = estimateStreetStrength(index, street);
+    const pressure = stack > 0 ? callAmount / Math.max(stack, 1) : 1;
+    const result = getPlayerResultAtStreet(index, street) || current.results.find((r) => r.player.anchor.index === index)?.result;
+    const canRaise = !closing && stack > callAmount + 50 && activeCount() > 1;
+    const bluff = Math.random() < (street === "preflop" ? 0.08 : 0.06);
+
+    if (callAmount > 0) {
+      if (strength < 0.30 && pressure > 0.09 && !bluff) return { action: "fold", amount: 0, strength, result };
+      if (canRaise && (strength > 0.76 || bluff) && Math.random() < (strength > 0.80 ? 0.55 : 0.24)) {
+        const raiseSize = handStrengthToBet(result || { score: [0] }, street, current.pot);
+        return { action: "raise", amount: callAmount + raiseSize, strength, result };
+      }
+      return { action: "call", amount: callAmount, strength, result };
+    }
+
+    if (canRaise && (strength > 0.63 || bluff) && Math.random() < (strength > 0.74 ? 0.58 : 0.30)) {
+      const betSize = handStrengthToBet(result || { score: [0] }, street, current.pot);
+      return { action: "bet", amount: betSize, strength, result };
+    }
+    return { action: "check", amount: 0, strength, result };
+  }
+
+  function executeBotDecision(index, street, closing = false) {
+    if (!current || current.folded[index] || current.allIn[index]) return;
+    const decision = decideBotAction(index, street, closing);
+    const name = BOT_NAMES[index] || `P${index + 1}`;
+    let paid = 0;
+    let label = "checks";
+
+    if (decision.action === "fold") {
+      current.folded[index] = true;
+      label = "folds";
+    } else if (decision.action === "call") {
+      paid = commitBet(index, decision.amount);
+      label = `calls $${paid}`;
+    } else if (decision.action === "bet") {
+      paid = commitBet(index, decision.amount);
+      current.currentBet = Math.max(current.currentBet || 0, current.streetBets[index] || 0);
+      current.lastRaiseBy = index;
+      current.lastBotBet = paid;
+      label = `bets $${paid}`;
+    } else if (decision.action === "raise") {
+      paid = commitBet(index, decision.amount);
+      current.currentBet = Math.max(current.currentBet || 0, current.streetBets[index] || 0);
+      current.lastRaiseBy = index;
+      current.lastBotBet = paid;
+      label = `raises to $${current.streetBets[index]}`;
+    }
+
+    current.actorIndex = index;
+    current.stage = `${street}-${decision.action}`;
+    current.lastBotAction = { index, name, action: decision.action, paid, strength: decision.strength, street };
+    refreshPotStack();
+    applyActionHighlight(index);
+    const handName = decision.result?.name || (street === "preflop" ? "preflop read" : "table read");
+    pushActionLog(`${name} ${label}`);
+    paintStatus(`${name} ${label}`, `${capitalize(street)} • ${handName} • pot $${current.pot} • target $${current.currentBet || 0}`);
+    statusCb(`${capitalize(street)} • ${name} ${label} • pot $${current.pot}`);
+  }
+
+  function capitalize(text) { return String(text || '').slice(0, 1).toUpperCase() + String(text || '').slice(1); }
+
+  function paintPlayerPrompt(force = false) {
+    if (!current?.waitingForPlayer) return;
+    const elapsed = Math.max(0, nowS - (current.turnStartedAt || nowS));
+    const remaining = Math.max(0, Math.ceil(TURN_SECONDS - elapsed));
+    if (!force && current.lastPromptSecond === remaining) return;
+    current.lastPromptSecond = remaining;
+    const callAmount = current.callAmount || 0;
+    const stack = playerStacks[PLAYER_INDEX] || 0;
+    const legal = current.legalActions || legalActionsFor(callAmount);
+    const actionText = callAmount > 0 ? `Fold / Call $${callAmount} / Raise / All-In` : "Fold / Check / Raise / All-In";
+    const actionTail = current.actionLog?.length ? ` • Last: ${current.actionLog[current.actionLog.length - 1]}` : "";
+    paintStatus(`YOUR TURN • ${remaining}s`, `${current.turnStreet || "Action"} • ${actionText} • pot $${current.pot} • stack $${stack}${actionTail}`, "rgba(140,229,255,0.98)");
+    statusCb(`YOUR TURN • ${remaining}s • legal: ${legal.join("/")} • call $${callAmount} • pot $${current.pot} • stack $${stack}`);
+  }
+
+  function promptPlayerDecision(street, callAmount = null) {
+    if (!current || current.folded[PLAYER_INDEX] || current.allIn[PLAYER_INDEX]) return;
+    const required = callAmount === null ? Math.max(0, (current.currentBet || 0) - (current.streetBets[PLAYER_INDEX] || 0)) : callAmount;
+    current.waitingForPlayer = true;
+    current.turnStreet = street;
+    current.callAmount = Math.max(0, required);
+    current.legalActions = legalActionsFor(current.callAmount);
+    current.turnStartedAt = nowS;
+    current.lastPromptSecond = null;
+    current.actorIndex = PLAYER_INDEX;
+    current.stage = `${String(street).toLowerCase().replace(/[^a-z0-9]+/g, "-")}-player-turn`;
+    applyActionHighlight(PLAYER_INDEX);
+    paintPlayerPrompt(true);
+  }
+
+  function resumeAfterPlayerAction() {
+    if (!current) return;
+    current.waitingForPlayer = false;
+    current.lastPromptSecond = null;
+    const next = queue[stepIndex];
+    if (next) {
+      const shift = (nowS + 0.72) - next.at;
+      for (let i = stepIndex; i < queue.length; i += 1) queue[i].at += shift;
+    }
+  }
+
+  function closeBettingRound(street) {
+    if (!current) return;
+    current.stage = `${street}-closing`;
+    const unmatchedBots = tableOrderFrom((current.dealerIndex + 1) % players.length)
+      .filter((idx) => idx !== PLAYER_INDEX && !current.folded[idx] && !current.allIn[idx] && (current.streetBets[idx] || 0) < (current.currentBet || 0));
+    unmatchedBots.forEach((idx) => executeBotDecision(idx, street, true));
+    const playerNeedsResponse = !current.folded[PLAYER_INDEX] && !current.allIn[PLAYER_INDEX] && ((current.streetBets[PLAYER_INDEX] || 0) < (current.currentBet || 0));
+    if (playerNeedsResponse) {
+      promptPlayerDecision(`${capitalize(street)} Response`, Math.max(0, (current.currentBet || 0) - (current.streetBets[PLAYER_INDEX] || 0)));
+      return;
+    }
+    resetRingHighlights();
+    paintStatus(`${capitalize(street)} betting closed`, `Pot $${current.pot} • target $${current.currentBet || 0}`);
+    statusCb(`${capitalize(street)} betting closed • pot $${current.pot}`);
+  }
+
+  function scheduleBettingRound(startAt, street, firstIndex) {
+    let t = startAt;
+    resetStreetBets(street);
+    const order = tableOrderFrom(firstIndex);
+    schedule(t, () => {
+      resetStreetBets(street);
+      paintStatus(`${capitalize(street)} betting round`, `Action starts with ${BOT_NAMES[firstIndex]} • pot $${current.pot}`);
+      statusCb(`${capitalize(street)} betting round starts`);
+    });
+    for (const idx of order) {
+      t += 0.78;
+      schedule(t, () => {
+        if (!current || current.folded[idx] || current.allIn[idx] || activeCount() <= 1) return;
+        if (idx === PLAYER_INDEX) promptPlayerDecision(capitalize(street), null);
+        else executeBotDecision(idx, street, false);
+      });
+    }
+    t += 0.90;
+    schedule(t, () => closeBettingRound(street));
+    return t;
   }
 
   function clearPotStack() { while (potStack.children.length) potStack.remove(potStack.children[0]); }
@@ -379,6 +754,9 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     clearCards();
     clearPotStack();
     resetRingHighlights();
+    paintProofPanel(null);
+    paintHistoryPanel();
+    resetStacksIfNeeded();
 
     const dealerIndex = (handNumber - 1) % players.length;
     const sbIndex = (dealerIndex + 1) % players.length;
@@ -388,120 +766,144 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     const board = [deck.shift(), deck.shift(), deck.shift(), deck.shift(), deck.shift()];
     const results = handPlayers.map((player) => ({ player, result: evaluate7([...player.cards, ...board]) }));
     results.sort((a, b) => compareArrays(b.result.score, a.result.score));
-    const winner = results[0];
-    const runnerUp = results[1];
-    const preflopAggressor = winner.player.anchor.index;
-    const flopAggressor = runnerUp.player.anchor.index;
-    const turnAggressor = winner.player.anchor.index;
-    const riverAggressor = winner.player.anchor.index;
-    current = { handPlayers, board, winner, results, handNumber, dealerIndex, sbIndex, bbIndex, actorIndex: null, pot: 0, stage: "shuffle" };
+    current = {
+      handPlayers,
+      board,
+      results,
+      handNumber,
+      dealerIndex,
+      sbIndex,
+      bbIndex,
+      actorIndex: null,
+      pot: 0,
+      stage: "shuffle",
+      street: "preflop",
+      waitingForPlayer: false,
+      userFolded: false,
+      folded: players.map(() => false),
+      allIn: players.map(() => false),
+      streetBets: players.map(() => 0),
+      currentBet: 0,
+      legalActions: [],
+      callAmount: 0,
+      lastPayout: 0,
+      lastBotBet: 0,
+      actionLog: []
+    };
     refreshPotStack();
     queue = [];
     let t = nowS + 0.85;
 
     schedule(t, () => {
+      resetStreetBets("preflop");
       current.stage = "blinds";
-      current.pot = 30;
+      const sbPaid = commitBet(sbIndex, 10);
+      const bbPaid = commitBet(bbIndex, 20);
+      current.currentBet = Math.max(current.streetBets[sbIndex], current.streetBets[bbIndex]);
+      current.lastRaiseBy = bbIndex;
+      pushActionLog(`${BOT_NAMES[sbIndex]} posts SB $${sbPaid}`);
+      pushActionLog(`${BOT_NAMES[bbIndex]} posts BB $${bbPaid}`);
       refreshPotStack();
-      paintStatus(`Hand ${handNumber} • dealer ${BOT_NAMES[dealerIndex]}`, `SB ${BOT_NAMES[sbIndex]} • BB ${BOT_NAMES[bbIndex]} • pot $${current.pot}`);
+      paintStatus(`Hand ${handNumber} • dealer ${BOT_NAMES[dealerIndex]}`, `SB ${BOT_NAMES[sbIndex]} $${sbPaid} • BB ${BOT_NAMES[bbIndex]} $${bbPaid} • pot $${current.pot}`);
       statusCb(`HAND ${handNumber} • blinds live • pot $${current.pot}`);
       applyActionHighlight(bbIndex);
     });
 
+    const dealOrder = tableOrderFrom((dealerIndex + 1) % players.length);
     for (let round = 0; round < 2; round += 1) {
-      for (let i = 0; i < handPlayers.length; i += 1) {
+      for (const idx of dealOrder) {
         t += 0.42;
         schedule(t, () => {
-          const player = handPlayers[i];
+          const player = handPlayers[idx];
           const card = player.cards[round];
           addCard(card, player.anchor.cards[round], 0.46, 1.0);
           current.stage = "deal";
           current.actorIndex = player.anchor.index;
           applyActionHighlight(player.anchor.index);
-          paintStatus(`Dealing ${player.anchor.name}`, `${formatCards(player.cards.slice(0, round + 1))} • pot $${current.pot}`);
+          paintStatus(`Dealing ${player.anchor.name}`, `Left-to-right from dealer button • card ${round + 1} • pot $${current.pot}`);
         });
       }
     }
 
-    t += 0.95;
-    schedule(t, () => {
-      const actor = preflopAggressor;
-      const result = current.results.find((r) => r.player.anchor.index === actor)?.result || winner.result;
-      const amount = handStrengthToBet(result, "preflop");
-      current.actorIndex = actor; current.stage = "preflop"; current.pot += amount; refreshPotStack(); applyActionHighlight(actor);
-      paintStatus(`${BOT_NAMES[actor]} ${result.score[0] >= 2 ? "raises" : "calls"}`, `Preflop • pot $${current.pot}`);
-    });
+    t += 0.80;
+    t = scheduleBettingRound(t, "preflop", (bbIndex + 1) % players.length);
 
-    t += 0.52;
+    t += 0.78;
     schedule(t, () => { addBurnCard(0, 0.34); paintStatus("Burn", `Before flop • pot $${current.pot}`); });
     t += 0.53;
     schedule(t, () => {
       current.stage = "flop";
       for (let i = 0; i < 3; i += 1) addCard(board[i], boardAnchors[i], 0.52, 1.18);
-      current.pot += 90; refreshPotStack(); applyActionHighlight(flopAggressor);
+      refreshPotStack();
       paintStatus(`Flop • ${formatCards(board.slice(0, 3))}`, `pot $${current.pot}`);
     });
-    t += 1.2;
-    schedule(t, () => {
-      const actor = flopAggressor;
-      const result = current.results.find((r) => r.player.anchor.index === actor)?.result || runnerUp.result;
-      const amount = handStrengthToBet(result, "flop");
-      const isBet = result.score[0] >= 1;
-      current.actorIndex = actor; current.stage = "flop-action"; current.pot += isBet ? amount : 0; refreshPotStack(); applyActionHighlight(actor);
-      paintStatus(`${BOT_NAMES[actor]} ${isBet ? "bets" : "checks"}`, `Flop • pot $${current.pot}`);
-    });
-    t += 0.58;
+    t += 0.92;
+    t = scheduleBettingRound(t, "flop", (dealerIndex + 1) % players.length);
+
+    t += 0.78;
     schedule(t, () => { addBurnCard(1, 0.34); paintStatus("Burn", `Before turn • pot $${current.pot}`); });
     t += 0.67;
     schedule(t, () => {
       current.stage = "turn";
       addCard(board[3], boardAnchors[3], 0.52, 1.18);
-      current.pot += 60; refreshPotStack(); applyActionHighlight(turnAggressor);
+      refreshPotStack();
       paintStatus(`Turn • ${formatCards(board.slice(0, 4))}`, `pot $${current.pot}`);
     });
-    t += 1.2;
-    schedule(t, () => {
-      const actor = turnAggressor;
-      const result = current.results.find((r) => r.player.anchor.index === actor)?.result || winner.result;
-      const amount = handStrengthToBet(result, "turn");
-      const isBet = result.score[0] >= 2;
-      current.actorIndex = actor; current.stage = "turn-action"; current.pot += isBet ? amount : 0; refreshPotStack(); applyActionHighlight(actor);
-      paintStatus(`${BOT_NAMES[actor]} ${isBet ? "bets" : "checks"}`, `Turn • pot $${current.pot}`);
-    });
-    t += 0.58;
+    t += 0.92;
+    t = scheduleBettingRound(t, "turn", (dealerIndex + 1) % players.length);
+
+    t += 0.78;
     schedule(t, () => { addBurnCard(2, 0.34); paintStatus("Burn", `Before river • pot $${current.pot}`); });
     t += 0.67;
     schedule(t, () => {
       current.stage = "river";
       addCard(board[4], boardAnchors[4], 0.52, 1.18);
-      current.pot += 60; refreshPotStack(); applyActionHighlight(riverAggressor);
+      refreshPotStack();
       paintStatus(`River • ${formatCards(board)}`, `pot $${current.pot}`);
     });
-    t += 1.2;
-    schedule(t, () => {
-      const actor = riverAggressor;
-      const result = current.results.find((r) => r.player.anchor.index === actor)?.result || winner.result;
-      const amount = handStrengthToBet(result, "river");
-      const isBet = result.score[0] >= 2;
-      current.actorIndex = actor; current.stage = "river-action"; current.pot += isBet ? amount : 0; refreshPotStack(); applyActionHighlight(actor);
-      paintStatus(`${BOT_NAMES[actor]} ${isBet ? "shoves" : "checks"}`, `River • pot $${current.pot}`);
-    });
-    t += 1.55;
+    t += 0.92;
+    t = scheduleBettingRound(t, "river", (dealerIndex + 1) % players.length);
+
+    t += 1.30;
     schedule(t, () => {
       current.stage = "showdown";
-      current.actorIndex = winner.player.anchor.index;
-      applyWinnerHighlight(winner.player.anchor.index);
+      const liveResults = current.results.filter((r) => !current.folded[r.player.anchor.index]);
+      const liveWinner = liveResults[0] || current.results.find((r) => r.player.anchor.index !== PLAYER_INDEX) || current.results[0];
+      current.winner = liveWinner;
+      current.actorIndex = liveWinner.player.anchor.index;
+      current.userFolded = !!current.folded[PLAYER_INDEX];
+      applyWinnerHighlight(liveWinner.player.anchor.index);
+      clearWinningHighlights();
+      highlightWinningCards(liveWinner.result.cards || []);
+      const payout = awardPot(liveWinner.player.anchor.index);
       refreshPotStack();
-      const winnerCards = formatCards(winner.player.cards);
+      const winnerCards = formatCards(liveWinner.player.cards);
       const boardText = formatCards(board);
-      paintStatus(`${winner.player.anchor.name} wins • ${winner.result.name}`, `Pot $${current.pot} • Hole ${winnerCards} • Board ${boardText}`, "rgba(244,210,105,0.98)");
-      statusCb(`HAND ${handNumber} • ${winner.player.anchor.name} wins • ${winner.result.name} • pot $${current.pot}`);
-      log("Poker showdown", { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: winner.player.anchor.name, handName: winner.result.name, board: boardText, pot: current.pot });
+      const bestFive = formatCards(liveWinner.result.cards || []);
+      const proof = {
+        hand: handNumber,
+        winner: liveWinner.player.anchor.name,
+        handName: liveWinner.result.name,
+        payout,
+        bestFive,
+        holeCards: winnerCards,
+        board: boardText,
+        reason: describeScore(liveWinner.result),
+        actions: current.actionLog?.slice() || []
+      };
+      current.winnerProof = proof;
+      handHistory.push(proof);
+      while (handHistory.length > MAX_HISTORY) handHistory.shift();
+      paintProofPanel(proof);
+      paintHistoryPanel();
+      paintStatus(`${liveWinner.player.anchor.name} wins • ${liveWinner.result.name}`, `Payout $${payout} • Best five ${bestFive} • Board ${boardText}`, "rgba(244,210,105,0.98)");
+      statusCb(`HAND ${handNumber} • ${liveWinner.player.anchor.name} wins • ${liveWinner.result.name} • best ${bestFive} • payout $${payout}`);
+      log("Poker showdown proof", { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: liveWinner.player.anchor.name, handName: liveWinner.result.name, bestFive, board: boardText, payout, stacks: playerStacks.slice(), actions: current.actionLog?.slice() });
     });
     t += 4.3;
     schedule(t, () => { planHand(); });
     stepIndex = 0;
-    paintStatus(`Shuffling live deck`, `Hand ${handNumber} • real 52-card flow`);
+    paintStatus(`Shuffling live deck`, `Hand ${handNumber} • bot AI betting rounds enabled`);
   }
 
   function orientCardToCamera(mesh) {
@@ -527,7 +929,8 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     cardObjects.forEach((mesh, i) => {
       if (animations.find((anim) => anim.mesh === mesh)) return;
       if (mesh.userData.baseY === undefined) mesh.userData.baseY = mesh.position.y;
-      mesh.position.y = mesh.userData.baseY + Math.sin(nowS * 2.1 + i * 0.4) * 0.018;
+      const lift = mesh.userData.winningCard ? 0.055 : 0;
+      mesh.position.y = mesh.userData.baseY + lift + Math.sin(nowS * 2.1 + i * 0.4) * 0.018;
       orientCardToCamera(mesh);
     });
   }
@@ -547,18 +950,29 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   function updateStatusFacing() {
     const cam = scene.userData?._camera;
     if (!cam) return;
-    const ry = Math.atan2(cam.position.x - statusPanel.mesh.position.x, cam.position.z - statusPanel.mesh.position.z);
-    statusPanel.mesh.rotation.set(0, ry, 0);
+    [statusPanel.mesh, proofPanel.mesh, historyPanel.mesh].forEach((mesh) => {
+      const ry = Math.atan2(cam.position.x - mesh.position.x, cam.position.z - mesh.position.z);
+      mesh.rotation.set(0, ry, 0);
+    });
   }
 
   function update(now) {
     nowS = now;
     if (!current) planHand();
-    while (queue[stepIndex] && nowS >= queue[stepIndex].at) {
+    while (!current?.waitingForPlayer && queue[stepIndex] && nowS >= queue[stepIndex].at) {
       const ref = queue;
       queue[stepIndex].fn();
       if (queue !== ref) break;
       stepIndex += 1;
+      if (current?.waitingForPlayer) break;
+    }
+    if (current?.waitingForPlayer) {
+      paintPlayerPrompt(false);
+      const elapsed = Math.max(0, nowS - (current.turnStartedAt || nowS));
+      if (elapsed >= TURN_SECONDS) {
+        const autoAction = current.legalActions?.includes("check") ? "check" : "fold";
+        playerAction(autoAction, true);
+      }
     }
     updateAnimations();
     updateCardsHover();
@@ -567,10 +981,11 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     updateStatusFacing();
   }
 
-  function playerAction(action) {
+  function playerAction(action, auto = false) {
     if (!current) planHand();
     const normalized = String(action || '').toLowerCase();
-    const playerIndex = 3;
+    if (normalized === 'next') { planHand(); return true; }
+
     const labels = {
       fold: 'folds',
       check: 'checks',
@@ -579,16 +994,47 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       allin: 'moves all-in'
     };
     if (!labels[normalized]) return false;
-    const potDelta = normalized === 'call' ? 50 : normalized === 'raise' ? 150 : normalized === 'allin' ? 500 : 0;
-    current.actorIndex = playerIndex;
+
+    if (!current.waitingForPlayer) {
+      paintStatus('WAIT FOR YOUR TURN', `Current stage: ${current.stage || 'dealing'} • pot $${current.pot}`, 'rgba(255,210,105,0.92)');
+      statusCb(`WAIT FOR YOUR TURN • ${normalized.toUpperCase()} ignored • stage ${current.stage}`);
+      return false;
+    }
+
+    const legal = current.legalActions || [];
+    if (!legal.includes(normalized)) {
+      paintStatus('ACTION NOT LEGAL', `Legal now: ${legal.join(' / ').toUpperCase()} • pot $${current.pot}`, 'rgba(255,160,160,0.94)');
+      statusCb(`ACTION NOT LEGAL • choose ${legal.join('/')}`);
+      return false;
+    }
+
+    const callAmount = current.callAmount || 0;
+    let paid = 0;
+    if (normalized === 'call') paid = commitBet(PLAYER_INDEX, callAmount);
+    if (normalized === 'raise') paid = commitBet(PLAYER_INDEX, Math.max(150, callAmount + 100));
+    if (normalized === 'allin') paid = commitBet(PLAYER_INDEX, playerStacks[PLAYER_INDEX] || 0);
+    if (normalized === 'fold') {
+      current.userFolded = true;
+      current.folded[PLAYER_INDEX] = true;
+    }
+    if ((normalized === 'raise' || normalized === 'allin') && (current.streetBets[PLAYER_INDEX] || 0) > (current.currentBet || 0)) {
+      current.currentBet = current.streetBets[PLAYER_INDEX];
+      current.lastRaiseBy = PLAYER_INDEX;
+    }
+
+    current.actorIndex = PLAYER_INDEX;
     current.stage = `player-${normalized}`;
-    current.pot += potDelta;
+    current.lastPlayerAction = { action: normalized, paid, auto: !!auto, at: nowS, street: current.street, target: current.currentBet };
     refreshPotStack();
-    applyActionHighlight(playerIndex);
-    const potText = potDelta ? `+$${potDelta} • pot $${current.pot}` : `pot $${current.pot}`;
-    paintStatus(`YOU ${labels[normalized]}`, `Manual test action • ${potText}`, normalized === 'fold' ? 'rgba(255,160,160,0.94)' : 'rgba(140,229,255,0.96)');
-    statusCb(`PLAYER ACTION • YOU ${labels[normalized]} • ${potText}`);
-    log('Player action', { action: normalized, pot: current.pot, hand: handNumber });
+    applyActionHighlight(PLAYER_INDEX);
+    const actionPhrase = playerActionLabel(normalized, callAmount, paid);
+    const prefix = auto ? 'AUTO ' : '';
+    const paidText = paid ? `+$${paid} • ` : '';
+    pushActionLog(`YOU ${actionPhrase}`);
+    paintStatus(`${prefix}YOU ${actionPhrase}`, `${paidText}pot $${current.pot} • target $${current.currentBet || 0} • stack $${playerStacks[PLAYER_INDEX] || 0}`, normalized === 'fold' ? 'rgba(255,160,160,0.94)' : 'rgba(140,229,255,0.96)');
+    statusCb(`${prefix}PLAYER ACTION • YOU ${actionPhrase} • ${paidText}pot $${current.pot}`);
+    log('Player turn action', { action: normalized, paid, auto: !!auto, pot: current.pot, stack: playerStacks[PLAYER_INDEX], hand: handNumber, stage: current.stage, target: current.currentBet });
+    resumeAfterPlayerAction();
     return true;
   }
 
@@ -598,8 +1044,23 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       stage: current.stage,
       pot: current.pot,
       actorIndex: current.actorIndex,
+      waitingForPlayer: !!current.waitingForPlayer,
+      legalActions: current.legalActions || [],
+      callAmount: current.callAmount || 0,
+      currentBet: current.currentBet || 0,
+      playerStreetBet: current.streetBets?.[PLAYER_INDEX] || 0,
+      playerStack: playerStacks[PLAYER_INDEX] || 0,
+      stacks: playerStacks.slice(),
+      activePlayers: activeCount(),
+      userFolded: !!current.userFolded,
+      lastBotAction: current.lastBotAction || null,
+      lastPlayerAction: current.lastPlayerAction || null,
+      actionLog: current.actionLog?.slice() || [],
       winner: current.winner?.player?.anchor?.name || null,
-      winnerHand: current.winner?.result?.name || null
+      winnerHand: current.winner?.result?.name || null,
+      winnerProof: current.winnerProof || null,
+      handHistory: handHistory.slice(),
+      lastPayout: current.lastPayout || 0
     } : null;
   }
 
