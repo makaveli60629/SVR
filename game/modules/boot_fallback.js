@@ -3,7 +3,7 @@
  * Runs without Three.js. Purpose: never leave the player stuck on Booting.
  */
 (function(){
-  const BUILD = 'PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK';
+  const BUILD = 'PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK';
   let active = false;
   let reports = [];
   const esc = (v)=>String(v == null ? '' : v).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));

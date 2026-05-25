@@ -1,4 +1,4 @@
-# PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK
+# PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
 
 ## Purpose
 Phase 206 adds a bridge self-test/autorepair layer after the Phase 205 recorder cache-bust fix.

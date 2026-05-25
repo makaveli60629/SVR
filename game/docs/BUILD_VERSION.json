@@ -1,7 +1,9 @@
 {
-  "build": "PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK",
-  "phase": 206,
+  "build": "PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK",
+  "phase": 207,
   "public_page_touched": false,
   "game_package_under_25mb_target": true,
-  "featureLock": "bridge recorder self-test, runtime alias auto-heal, missing-recorder crash prevention"
+  "featureLock": "bridge proxy runtime guard, universal recorder fallback, event crash prevention",
+  "source": "direct-game-folder",
+  "generatedAt": "2026-05-25T00:00:00Z"
 }

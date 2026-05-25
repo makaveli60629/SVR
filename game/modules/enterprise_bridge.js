@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge Phase 205
- * Build: PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK
+ * Build: PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
  * Purpose: cache-busted bridge with safe recorder aliases so poker events cannot crash the render loop.
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
-const BUILD = 'PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK';
+const BUILD = 'PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK';
 
 const EVENT_TO_RECORDER = [
   ['svr_poker_hand_result', 'recordHandResult', 'hand_result'],

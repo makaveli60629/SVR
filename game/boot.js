@@ -3,7 +3,7 @@
  * Purpose: never leave the player stuck on Booting; provide CDN/import fallback report.
  */
 (function(){
-  var BUILD = 'PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK';
+  var BUILD = 'PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK';
   var startedAt = new Date().toISOString();
   var statusEl = document.getElementById('status');
   var errEl = document.getElementById('err');

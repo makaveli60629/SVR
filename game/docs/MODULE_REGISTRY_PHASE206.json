@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK",
+  "build": "PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK",
   "phase": 206,
   "modules_added": [
     "game/modules/bridge_selftest.js",

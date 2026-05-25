@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Bridge Self-Test & Auto-Heal Module
- * Build: PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK
+ * Build: PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
  * Purpose: verify bridge recorder methods at runtime, patch missing aliases, and emit a clear health report without stopping the game loop.
  */
-const BUILD = 'PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK';
+const BUILD = 'PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK';
 const REQUIRED_RECORDERS = [
   'recordHandResult','recordPlayerAction','recordActionLog','recordLegalActions','recordShowdown','recordSidePot',
   'recordTurnIndicator','recordWatchTurnIndicator','recordDealerButton','recordRebuy','recordDecisionAid','recordTelemetry',

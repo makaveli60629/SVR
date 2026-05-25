@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK",
+  "build": "PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK",
   "phase": 203,
   "modules": [
     "boot.js",

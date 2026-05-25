@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Deploy Verifier / Preflight QA Module
- * Build: PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK
+ * Build: PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
  * Purpose: catch stale deploys, mismatched game/version/deploy-health data, and runtime drift before testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK';
+const BUILD = 'PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK';
 const EXPECTED_PHASE = 194;
 
 async function fetchJsonSafe(url) {

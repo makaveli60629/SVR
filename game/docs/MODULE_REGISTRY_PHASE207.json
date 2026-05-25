@@ -1,0 +1,12 @@
+{
+  "build": "PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK",
+  "phase": 207,
+  "modules": [
+    "game/modules/bridge_proxy.js",
+    "game/modules/enterprise_bridge_phase207.js",
+    "game/modules/bridge_selftest.js",
+    "game/modules/event_firewall.js"
+  ],
+  "lock": "Bridge proxy installs before event firewall and poker telemetry so any record* method resolves safely.",
+  "public_page_touched": false
+}

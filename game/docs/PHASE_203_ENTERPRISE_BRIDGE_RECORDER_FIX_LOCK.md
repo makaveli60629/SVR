@@ -1,4 +1,4 @@
-# PHASE-206-BRIDGE-SELFTEST-STABILITY-LOCK
+# PHASE-207-BRIDGE-PROXY-RUNTIME-LOCK
 
 ## Fix
 - Fixes runtime error: `this.recordDealerButton is not a function`.
