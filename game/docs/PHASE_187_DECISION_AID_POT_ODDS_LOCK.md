@@ -1,4 +1,4 @@
-# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

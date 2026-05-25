@@ -1,4 +1,4 @@
-# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
 
 ## Purpose
 Adds a boot diagnostic snapshot layer so testing can capture exact evidence for boot/import/CDN/cache/deploy mismatches instead of relying on screenshots alone.

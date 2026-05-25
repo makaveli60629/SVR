@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK";
+  const BUILD = "PHASE-229-POWER-DEPLOY-WATCHER-LOCK";
   const state = {
     build: BUILD,
     phase: 223,
@@ -56,7 +56,7 @@
       </div>
       <hr style="border:0;border-top:1px solid rgba(120,150,255,.28)">
       <div><b>Build:</b> ${esc(BUILD)}</div>
-      <div><b>Test URL:</b> /game/?v=phase228-testercard</div>
+      <div><b>Test URL:</b> /game/?v=phase229-testercard</div>
       <div><b>Public page:</b> locked / untouched</div>
       <h4>Quick checks</h4>
       <ol>${checks}</ol>

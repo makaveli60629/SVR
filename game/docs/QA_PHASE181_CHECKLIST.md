@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Open `/game/?v=phase183`.
-- [ ] Confirm build says PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+- [ ] Confirm build says PHASE-229-POWER-DEPLOY-WATCHER-LOCK
 - [ ] Start hand and verify history panel shows contribution line.
 - [ ] Press A or ALL-IN and verify stack does not go negative.
 - [ ] Verify all-in name appears in panel.

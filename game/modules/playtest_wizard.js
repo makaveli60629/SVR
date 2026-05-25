@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Guided Playtest Wizard
- * Build: PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+ * Build: PHASE-229-POWER-DEPLOY-WATCHER-LOCK
  * Purpose: give testers one clear checklist after deploy without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK';
+const BUILD = 'PHASE-229-POWER-DEPLOY-WATCHER-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeValue(value, max = 260) {

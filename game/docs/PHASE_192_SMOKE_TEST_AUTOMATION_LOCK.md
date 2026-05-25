@@ -1,6 +1,6 @@
 # Phase 199 — Smoke Test Automation Lock
 
-Build: `PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK`
+Build: `PHASE-229-POWER-DEPLOY-WATCHER-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

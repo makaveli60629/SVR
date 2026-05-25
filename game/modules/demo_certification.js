@@ -1,10 +1,10 @@
 /**
  * SVR Poker - Demo Certification Lock
- * Build: PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+ * Build: PHASE-229-POWER-DEPLOY-WATCHER-LOCK
  * Shortcut: Z
  * Purpose: combine QA, smoke, RC, feedback, bug reports, and report bundle into one demo-ready gate.
  */
-const BUILD = 'PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK';
+const BUILD = 'PHASE-229-POWER-DEPLOY-WATCHER-LOCK';
 const STORE_KEY = 'svr_demo_certifications';
 
 function safeRead(name, fallback = null) {

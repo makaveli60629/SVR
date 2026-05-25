@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = 'PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK';
+  const BUILD = 'PHASE-229-POWER-DEPLOY-WATCHER-LOCK';
   const state = { build: BUILD, status: 'ready', fixed: ['PowerShell Invoke-Git argument binding', 'highest-phase packet detection', 'direct packet apply'] };
   window.SVR_AUTO_APPLY_GIT_FIX = {
     state,

@@ -1,4 +1,4 @@
-# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
 
 ## Purpose
 Prevent boot-route confusion after cache/import failures by adding a dependency-free route recovery module and correcting fallback private-scene links.

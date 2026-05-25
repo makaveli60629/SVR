@@ -1,11 +1,11 @@
-# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
 
 ## Purpose
 Phase 206 adds a bridge self-test/autorepair layer after the Phase 205 recorder cache-bust fix.
 
 ## Locked fixes
 - Adds `game/modules/bridge_selftest.js`.
-- Imports the bridge self-test after `enterprise_bridge_phase228.js`.
+- Imports the bridge self-test after `enterprise_bridge_phase229.js`.
 - Verifies every required bridge recorder alias at startup, game-ready, and key poker telemetry events.
 - Patches missing aliases in memory instead of allowing a TypeError to crash the render loop.
 - Emits `svr_bridge_selftest_update` for QA/admin telemetry.

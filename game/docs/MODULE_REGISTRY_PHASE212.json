@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK",
+  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"

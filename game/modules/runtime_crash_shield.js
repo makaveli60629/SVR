@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Crash Shield
- * Build: PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+ * Build: PHASE-229-POWER-DEPLOY-WATCHER-LOCK
  * Purpose: keep render/game loop alive, capture runtime errors, and prevent bridge/listener crashes from freezing the game.
  */
-const BUILD = 'PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK';
+const BUILD = 'PHASE-229-POWER-DEPLOY-WATCHER-LOCK';
 const KNOWN_RECOVERABLE = [
   /record[A-Za-z0-9_]+ is not a function/i,
   /SVR_ENTERPRISE_BRIDGE/i,

@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK",
+  "build": "PHASE-229-POWER-DEPLOY-WATCHER-LOCK",
   "phase": 206,
   "modules_added": [
     "game/modules/bridge_selftest.js",
-    "game/modules/enterprise_bridge_phase228.js"
+    "game/modules/enterprise_bridge_phase229.js"
   ],
   "events": [
     "svr_bridge_selftest_update"

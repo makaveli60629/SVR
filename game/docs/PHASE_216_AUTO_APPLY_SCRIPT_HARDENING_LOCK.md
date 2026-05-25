@@ -1,6 +1,6 @@
-# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
 
-Phase 228 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 229 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

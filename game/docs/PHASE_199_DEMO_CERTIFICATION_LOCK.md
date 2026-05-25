@@ -1,4 +1,4 @@
-# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
 
 ## Summary
 Adds the Demo Certification module and go/no-go readiness gate for demo/playtest preparation.

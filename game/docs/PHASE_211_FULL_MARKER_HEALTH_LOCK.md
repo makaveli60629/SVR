@@ -1,4 +1,4 @@
-# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
 
 Phase 213 aligns every visible and machine-readable game marker after the boot-cache work.
 
@@ -15,8 +15,8 @@ Phase 213 aligns every visible and machine-readable game marker after the boot-c
 - Title/HUD/version/deploy-health/boot-query marker checks
 
 ## Test
-Open `/game/?v=phase228-markerhealth`, then verify:
+Open `/game/?v=phase229-markerhealth`, then verify:
 - the title says Phase 213
-- the HUD says `PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK`
+- the HUD says `PHASE-229-POWER-DEPLOY-WATCHER-LOCK`
 - `version.json` reports phase 211
 - the game does not return to a stuck Booting screen

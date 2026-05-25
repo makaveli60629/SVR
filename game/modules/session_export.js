@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+ * Build: PHASE-229-POWER-DEPLOY-WATCHER-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK';
+const BUILD = 'PHASE-229-POWER-DEPLOY-WATCHER-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

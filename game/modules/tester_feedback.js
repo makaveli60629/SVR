@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Tester Feedback Triage
- * Build: PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+ * Build: PHASE-229-POWER-DEPLOY-WATCHER-LOCK
  * Purpose: collect playtest verdicts and triage summaries after QA/smoke/bug-report passes.
  * Public Matrix page is not touched.
  */
-const BUILD = 'PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK';
+const BUILD = 'PHASE-229-POWER-DEPLOY-WATCHER-LOCK';
 const EXPECTED_PHASE = 196;
 const STORE_KEY = 'svr_tester_feedback_phase197';
 

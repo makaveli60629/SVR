@@ -1,4 +1,4 @@
-# PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+# PHASE-229-POWER-DEPLOY-WATCHER-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

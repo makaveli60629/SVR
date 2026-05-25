@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Bug Report Capture
- * Build: PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK
+ * Build: PHASE-229-POWER-DEPLOY-WATCHER-LOCK
  * Purpose: capture tester issue reports from inside the game without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-228-PILOT-FEEDBACK-EXPORT-LOCK';
+const BUILD = 'PHASE-229-POWER-DEPLOY-WATCHER-LOCK';
 const EXPECTED_PHASE = 195;
 const STORE_KEY = 'svr_bug_reports_phase197';
 
