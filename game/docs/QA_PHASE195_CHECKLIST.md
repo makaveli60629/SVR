@@ -1,7 +1,7 @@
-# QA Phase 195 Checklist
+# QA Phase 196 Checklist
 
-- [ ] Open `/game/?v=phase195`.
-- [ ] Confirm version/deploy overlay shows `PHASE-195-BUG-REPORT-CAPTURE-LOCK`.
+- [ ] Open `/game/?v=phase196`.
+- [ ] Confirm version/deploy overlay shows `PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK`.
 - [ ] Press `G` and confirm bug report panel opens.
 - [ ] Enter area/severity/device/notes and save a report.
 - [ ] Confirm report count increments.

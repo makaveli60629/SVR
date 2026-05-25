@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-195-BUG-REPORT-CAPTURE-LOCK",
+  "build": "PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK",
   "phase": 195,
   "modules": {
     "bug_reporter": "game/modules/bug_reporter.js",

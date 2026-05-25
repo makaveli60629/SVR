@@ -1,6 +1,6 @@
 # Next Phase Plan after PHASE-194-PLAYTEST-WIZARD-LOCK
 
-## Phase 195 recommendation
+## Phase 196 recommendation
 Focus on final tester handoff:
 - one-page tester instructions
 - Quest/browser checklist

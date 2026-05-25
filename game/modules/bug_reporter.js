@@ -1,12 +1,12 @@
 /**
  * SVR Poker — Bug Report Capture
- * Build: PHASE-195-BUG-REPORT-CAPTURE-LOCK
+ * Build: PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK
  * Purpose: capture tester issue reports from inside the game without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-195-BUG-REPORT-CAPTURE-LOCK';
+const BUILD = 'PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK';
 const EXPECTED_PHASE = 195;
-const STORE_KEY = 'svr_bug_reports_phase195';
+const STORE_KEY = 'svr_bug_reports_phase196';
 
 function sanitize(value, max = 1600) {
   return String(value ?? '').replace(/[<>]/g, '').slice(0, max);
@@ -122,7 +122,7 @@ const SVRBugReporter = {
     ].join(';');
     panel.innerHTML = `
       <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px">
-        <strong>SVR BUG REPORT — PHASE 195</strong>
+        <strong>SVR BUG REPORT — PHASE 196</strong>
         <button data-close style="border:1px solid #8950b8;background:#160b24;color:#fff;border-radius:8px;padding:4px 8px">Close</button>
       </div>
       <label>Area</label>
@@ -184,7 +184,7 @@ const SVRBugReporter = {
     const blob = new Blob([shortJson(payload, 120000)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `svr-bug-reports-phase195-${Date.now()}.json`;
+    a.download = `svr-bug-reports-phase196-${Date.now()}.json`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   },

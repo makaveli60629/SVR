@@ -1,0 +1,9 @@
+IF OBJECT_ID('dbo.GameTesterFeedback','U') IS NULL
+BEGIN
+  CREATE TABLE dbo.GameTesterFeedback (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    PayloadJson NVARCHAR(MAX) NOT NULL
+  );
+END;
+GO

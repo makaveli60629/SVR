@@ -1,7 +1,7 @@
 {
   "status": "ok",
-  "build": "PHASE-195-BUG-REPORT-CAPTURE-LOCK",
-  "phase": 195,
-  "source": "direct-game-folder",
+  "build": "PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK",
+  "phase": 196,
+  "source": "phase-package",
   "public_page_touched": false
 }

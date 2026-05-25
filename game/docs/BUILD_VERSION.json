@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-195-BUG-REPORT-CAPTURE-LOCK",
-  "phase": 195,
+  "build": "PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK",
+  "phase": 196,
+  "source": "direct-game-folder",
+  "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "site_track": "site internal only",
-  "game_package_under_25mb_target": true,
-  "featureLock": "bug report capture, tester notes, session issue export"
+  "featureLock": "tester feedback triage, test verdict capture, bug/QA summary queue"
 }

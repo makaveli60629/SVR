@@ -1,6 +1,6 @@
-# Phase 195 — Bug Report Capture Lock
+# Phase 196 — Bug Report Capture Lock
 
-Build: `PHASE-195-BUG-REPORT-CAPTURE-LOCK`
+Build: `PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK`
 
 ## Added
 - In-game bug report capture panel.

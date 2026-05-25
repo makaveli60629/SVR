@@ -15,6 +15,7 @@ import "./modules/smoke_test.js";
 import "./modules/release_candidate.js";
 import "./modules/playtest_wizard.js";
 import "./modules/bug_reporter.js";
+import "./modules/tester_feedback.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -107,7 +108,7 @@ let seatIndex = -1;
 let cash = 50000;
 
 const pokerHudState = {
-  build: "PHASE-195-BUG-REPORT-CAPTURE-LOCK",
+  build: "PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK",
   actor: "TABLE",
   stage: "waiting",
   action: "waiting",
@@ -319,7 +320,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: "PHASE-195-BUG-REPORT-CAPTURE-LOCK" } }));
+window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: "PHASE-196-TESTER-FEEDBACK-TRIAGE-LOCK" } }));
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold grip/A/trigger to aim teleport, release to teleport. Poker keys: F/C/R/A/H. QA keys: Q/V/T/U/W/G/X/Y. Private scene buttons enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
