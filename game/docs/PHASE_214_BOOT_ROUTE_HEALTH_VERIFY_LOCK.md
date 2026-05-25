@@ -1,4 +1,4 @@
-# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
+# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
 
 Phase 214 adds a boot route health verifier to confirm the lobby and private scene recovery links resolve after deployment.
 

@@ -1,4 +1,4 @@
-# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
+# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
 
 ## Scope
 - Keeps playable poker priority moving forward.

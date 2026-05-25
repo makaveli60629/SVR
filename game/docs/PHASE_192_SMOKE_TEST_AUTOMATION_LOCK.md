@@ -1,6 +1,6 @@
 # Phase 199 — Smoke Test Automation Lock
 
-Build: `PHASE-233-OPTIONAL-MODULE-LOADER-LOCK`
+Build: `PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

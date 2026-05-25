@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Bug Report Capture
- * Build: PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
+ * Build: PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
  * Purpose: capture tester issue reports from inside the game without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-233-OPTIONAL-MODULE-LOADER-LOCK';
+const BUILD = 'PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK';
 const EXPECTED_PHASE = 195;
 const STORE_KEY = 'svr_bug_reports_phase197';
 

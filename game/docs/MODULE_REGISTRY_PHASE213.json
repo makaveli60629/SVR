@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
+  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase233.js"
+    "game/modules/enterprise_bridge_phase234.js"
   ],
   "protected": {
     "publicPageTouched": false,

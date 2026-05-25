@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
-  "phase": 233,
+  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
+  "phase": 234,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false

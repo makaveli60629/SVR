@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
+  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
   "public_page_touched": false,
   "modules": [
     "modules/runtime_crash_shield.js",
@@ -9,7 +9,7 @@
     "modules/marker_health.js",
     "modules/bridge_proxy.js",
     "modules/event_firewall.js",
-    "modules/enterprise_bridge_phase233.js",
+    "modules/enterprise_bridge_phase234.js",
     "modules/bridge_selftest.js"
   ]
 }

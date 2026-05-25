@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
-  "phase": 233,
+  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
+  "phase": 234,
   "modules": [
     "game/modules/auto_apply_git_wrapper_fix.js",
-    "game/modules/enterprise_bridge_phase233.js"
+    "game/modules/enterprise_bridge_phase234.js"
   ],
   "public_page_touched": false
 }

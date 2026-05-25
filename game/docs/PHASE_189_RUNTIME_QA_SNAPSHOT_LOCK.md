@@ -1,6 +1,6 @@
 # Phase 199 — Runtime QA Snapshot Lock
 
-Build: `PHASE-233-OPTIONAL-MODULE-LOADER-LOCK`
+Build: `PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK`
 
 ## Scope
 - Adds `game/modules/runtime_qa.js`.

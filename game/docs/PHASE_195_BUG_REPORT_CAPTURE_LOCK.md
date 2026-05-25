@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-233-OPTIONAL-MODULE-LOADER-LOCK`
+Build: `PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK`
 
 ## Added
 - In-game bug report capture panel.

@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK";
+  const BUILD = "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK";
   const state = {
     build: BUILD,
     phase: 220,
@@ -10,7 +10,7 @@
   };
 
   async function fetchText(url){
-    const full = url + (url.includes("?") ? "&" : "?") + "v=phase233-" + Date.now();
+    const full = url + (url.includes("?") ? "&" : "?") + "v=phase234-" + Date.now();
     try {
       const r = await fetch(full, { cache: "no-store" });
       const text = await r.text();

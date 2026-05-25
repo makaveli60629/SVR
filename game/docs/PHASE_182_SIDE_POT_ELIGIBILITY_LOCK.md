@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-233-OPTIONAL-MODULE-LOADER-LOCK`
+Build: `PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

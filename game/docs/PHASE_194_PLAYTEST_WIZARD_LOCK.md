@@ -1,6 +1,6 @@
 # Phase 199 — Playtest Wizard Lock
 
-Build: `PHASE-233-OPTIONAL-MODULE-LOADER-LOCK`
+Build: `PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK`
 
 ## Scope
 - Adds guided playtest wizard overlay.

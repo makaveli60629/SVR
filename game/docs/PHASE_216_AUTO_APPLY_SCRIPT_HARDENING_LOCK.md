@@ -1,6 +1,6 @@
-# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
+# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
 
-Phase 233 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 234 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

@@ -1,7 +1,7 @@
-# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
+# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
 
 ## Purpose
-Phase 233 adds a master QA shortcut index so testers do not need to remember every panel key.
+Phase 234 adds a master QA shortcut index so testers do not need to remember every panel key.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 233 adds a master QA shortcut index so testers do not need to remember eve
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase233-shortcuts` and press `?` or `/`.
+Open `/game/?v=phase234-shortcuts` and press `?` or `/`.

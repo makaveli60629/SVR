@@ -1,7 +1,7 @@
-# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
+# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
 
 ## Purpose
-Phase 233 adds a simple one-command deploy health surface so the project can confirm whether the latest package is actually visible after GitHub Pages deploy.
+Phase 234 adds a simple one-command deploy health surface so the project can confirm whether the latest package is actually visible after GitHub Pages deploy.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 233 adds a simple one-command deploy health surface so the project can con
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase233-deployhealth` and press `M`.
+Open `/game/?v=phase234-deployhealth` and press `M`.

@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK";
+  const BUILD = "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK";
   const state = {
     build: BUILD,
     phase: 227,
@@ -48,7 +48,7 @@
     const blob = new Blob([template()], { type: "text/plain" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "svr-pilot-issue-template-phase233.txt";
+    a.download = "svr-pilot-issue-template-phase234.txt";
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);

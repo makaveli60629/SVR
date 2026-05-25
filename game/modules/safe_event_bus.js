@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Safe Event Bus
- * Build: PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
+ * Build: PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
  * Purpose: sandbox SVR custom-event listeners so a missing recorder/listener cannot freeze gameplay.
  */
-const BUILD = 'PHASE-233-OPTIONAL-MODULE-LOADER-LOCK';
+const BUILD = 'PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK';
 const ORIGINAL_ADD = EventTarget.prototype.addEventListener;
 const ORIGINAL_REMOVE = EventTarget.prototype.removeEventListener;
 const ORIGINAL_DISPATCH = EventTarget.prototype.dispatchEvent;

@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
+  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"

@@ -1,8 +1,8 @@
-// PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
+// PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
+    build: "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

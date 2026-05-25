@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
+  "build": "PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK",
   "modulesAdded": [
     "game/modules/demo_certification.js"
   ],

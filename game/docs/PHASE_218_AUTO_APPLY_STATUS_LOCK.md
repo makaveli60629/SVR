@@ -1,9 +1,9 @@
-# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
+# PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
 
-Phase 233 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
+Phase 234 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
 
 ## Test
-Open `/game/?v=phase233-autoapplystatus` and press `I`.
+Open `/game/?v=phase234-autoapplystatus` and press `I`.
 
 ## Locked
 - Public Matrix launch page untouched.

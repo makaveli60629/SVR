@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
+ * Build: PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-233-OPTIONAL-MODULE-LOADER-LOCK';
+const BUILD = 'PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }
