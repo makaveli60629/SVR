@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
+ * Build: PHASE-209-SAFE-EVENT-BUS-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-208-RUNTIME-CRASH-SHIELD-LOCK';
+const BUILD = 'PHASE-209-SAFE-EVENT-BUS-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

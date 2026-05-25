@@ -1,10 +1,10 @@
 /**
  * SVR Poker - Demo Certification Lock
- * Build: PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
+ * Build: PHASE-209-SAFE-EVENT-BUS-LOCK
  * Shortcut: Z
  * Purpose: combine QA, smoke, RC, feedback, bug reports, and report bundle into one demo-ready gate.
  */
-const BUILD = 'PHASE-208-RUNTIME-CRASH-SHIELD-LOCK';
+const BUILD = 'PHASE-209-SAFE-EVENT-BUS-LOCK';
 const STORE_KEY = 'svr_demo_certifications';
 
 function safeRead(name, fallback = null) {

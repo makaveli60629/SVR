@@ -1,7 +1,6 @@
 {
   "status": "ok",
-  "build": "PHASE-208-RUNTIME-CRASH-SHIELD-LOCK",
-  "phase": 208,
-  "source": "phase208-package",
+  "build": "PHASE-209-SAFE-EVENT-BUS-LOCK",
+  "source": "direct-game-folder",
   "public_page_touched": false
 }

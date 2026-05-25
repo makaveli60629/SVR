@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Report Bundle
- * Build: PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
+ * Build: PHASE-209-SAFE-EVENT-BUS-LOCK
  * Purpose: combine QA snapshots, bug reports, tester feedback, test queue, smoke/RC/preflight/session exports into one playtest report bundle.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-208-RUNTIME-CRASH-SHIELD-LOCK';
+const BUILD = 'PHASE-209-SAFE-EVENT-BUS-LOCK';
 const EXPECTED_PHASE = 198;
 const STORE_KEY = 'svr_test_report_bundles_phase198';
 

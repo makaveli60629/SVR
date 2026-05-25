@@ -1,6 +1,6 @@
 {
   "phase": 202,
-  "build": "PHASE-208-RUNTIME-CRASH-SHIELD-LOCK",
+  "build": "PHASE-209-SAFE-EVENT-BUS-LOCK",
   "modules": [
     "boot.js",
     "modules/boot_fallback.js",

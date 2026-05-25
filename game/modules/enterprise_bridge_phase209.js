@@ -1,7 +1,7 @@
 /**
- * SVR Poker — Enterprise Bridge Phase 205
+ * SVR Poker — Enterprise Bridge Phase 208
  * Build: PHASE-209-SAFE-EVENT-BUS-LOCK
- * Purpose: cache-busted bridge with safe recorder aliases so poker events cannot crash the render loop.
+ * Purpose: cache-busted bridge with proxy-compatible safe recorder aliases so poker events cannot crash the render loop.
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const BUILD = 'PHASE-209-SAFE-EVENT-BUS-LOCK';
@@ -51,6 +51,10 @@ const SVREnterpriseBridge = {
   listenerErrors: [],
 
   init() {
+    const prior = window.SVR_ENTERPRISE_BRIDGE || window.SVREnterpriseBridge || null;
+    if (prior && Array.isArray(prior.pending) && prior.pending.length) {
+      this.pending.push(...prior.pending.splice(0));
+    }
     window.SVREnterpriseBridge = this;
     window.SVR_ENTERPRISE_BRIDGE = this;
     this.ensureRecorderSurface();
@@ -156,3 +160,13 @@ Object.entries(METHOD_TO_TYPE).forEach(([method, type]) => {
 
 SVREnterpriseBridge.init();
 export default SVREnterpriseBridge;
+
+
+// Phase 209 safety patch: ensure common recorder aliases exist even on stale bridge states.
+(function(){
+  const bridge = window.SVR_ENTERPRISE_BRIDGE || window.SVRBridge || {};
+  const names = ['recordDealerButton','recordRebuy','recordDecisionAid','recordAllIn','recordFoldEligibility','recordDeployPreflight','recordSmokeTest','recordReleaseCandidate','recordRuntimeQA','recordSessionExport','recordBugReport','recordTesterFeedback','recordTestQueue','recordTestReportBundle','recordDemoCertification','recordPilotReady','recordSafeEventBus'];
+  bridge.queue = bridge.queue || function(type, payload){ try { (window.__SVR_BRIDGE_QUEUE__ = window.__SVR_BRIDGE_QUEUE__ || []).push({ type, payload, at:new Date().toISOString(), build:'PHASE-209-SAFE-EVENT-BUS-LOCK' }); } catch(_){} };
+  for (const n of names) if (typeof bridge[n] !== 'function') bridge[n] = function(payload){ return bridge.queue(n.replace(/^record/, '').replace(/[A-Z]/g, m => '_' + m.toLowerCase()).replace(/^_/, ''), payload); };
+  window.SVR_ENTERPRISE_BRIDGE = bridge;
+})();

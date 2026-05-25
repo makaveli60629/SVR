@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Deploy Verifier / Preflight QA Module
- * Build: PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
+ * Build: PHASE-209-SAFE-EVENT-BUS-LOCK
  * Purpose: catch stale deploys, mismatched game/version/deploy-health data, and runtime drift before testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-208-RUNTIME-CRASH-SHIELD-LOCK';
+const BUILD = 'PHASE-209-SAFE-EVENT-BUS-LOCK';
 const EXPECTED_PHASE = 194;
 
 async function fetchJsonSafe(url) {

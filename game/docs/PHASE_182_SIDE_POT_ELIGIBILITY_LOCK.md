@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-208-RUNTIME-CRASH-SHIELD-LOCK`
+Build: `PHASE-209-SAFE-EVENT-BUS-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

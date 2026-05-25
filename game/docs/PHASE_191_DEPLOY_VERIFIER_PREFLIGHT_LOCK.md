@@ -1,6 +1,6 @@
 # Phase 199 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-208-RUNTIME-CRASH-SHIELD-LOCK`
+Build: `PHASE-209-SAFE-EVENT-BUS-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

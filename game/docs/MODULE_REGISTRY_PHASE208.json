@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-208-RUNTIME-CRASH-SHIELD-LOCK",
+  "build": "PHASE-209-SAFE-EVENT-BUS-LOCK",
   "phase": 208,
   "modules": [
     "runtime_crash_shield.js",
     "bridge_proxy.js",
-    "enterprise_bridge_phase208.js",
+    "enterprise_bridge_phase209.js",
     "event_firewall.js"
   ],
   "public_page_touched": false

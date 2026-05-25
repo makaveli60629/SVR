@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
+ * Build: PHASE-209-SAFE-EVENT-BUS-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-208-RUNTIME-CRASH-SHIELD-LOCK';
+const BUILD = 'PHASE-209-SAFE-EVENT-BUS-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

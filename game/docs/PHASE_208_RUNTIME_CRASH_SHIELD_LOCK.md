@@ -1,4 +1,4 @@
-# PHASE-208-RUNTIME-CRASH-SHIELD-LOCK
+# PHASE-209-SAFE-EVENT-BUS-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.
