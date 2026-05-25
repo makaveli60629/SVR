@@ -567,5 +567,41 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     updateStatusFacing();
   }
 
-  return { update, forceNextHand(){ planHand(); } };
+  function playerAction(action) {
+    if (!current) planHand();
+    const normalized = String(action || '').toLowerCase();
+    const playerIndex = 3;
+    const labels = {
+      fold: 'folds',
+      check: 'checks',
+      call: 'calls',
+      raise: 'raises',
+      allin: 'moves all-in'
+    };
+    if (!labels[normalized]) return false;
+    const potDelta = normalized === 'call' ? 50 : normalized === 'raise' ? 150 : normalized === 'allin' ? 500 : 0;
+    current.actorIndex = playerIndex;
+    current.stage = `player-${normalized}`;
+    current.pot += potDelta;
+    refreshPotStack();
+    applyActionHighlight(playerIndex);
+    const potText = potDelta ? `+$${potDelta} • pot $${current.pot}` : `pot $${current.pot}`;
+    paintStatus(`YOU ${labels[normalized]}`, `Manual test action • ${potText}`, normalized === 'fold' ? 'rgba(255,160,160,0.94)' : 'rgba(140,229,255,0.96)');
+    statusCb(`PLAYER ACTION • YOU ${labels[normalized]} • ${potText}`);
+    log('Player action', { action: normalized, pot: current.pot, hand: handNumber });
+    return true;
+  }
+
+  function getState() {
+    return current ? {
+      handNumber: current.handNumber,
+      stage: current.stage,
+      pot: current.pot,
+      actorIndex: current.actorIndex,
+      winner: current.winner?.player?.anchor?.name || null,
+      winnerHand: current.winner?.result?.name || null
+    } : null;
+  }
+
+  return { update, forceNextHand(){ planHand(); }, playerAction, getState };
 }

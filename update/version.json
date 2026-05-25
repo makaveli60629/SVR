@@ -1,9 +1,14 @@
 {
-  "build": "PHASE-173-MILESTONE-5-PRIVACY-PRESENTATION-MODULE-CHECKLIST-LOCK",
-  "scope": "game-phase173-privacy-presentation-module-checklist-lock",
-  "fix": "added Phase 173 Milestone 5 manifest checklist, recorded optional privacy, presentation, hand physics, seat helper, daily pick, ticker, and philanthropy modules, preserved Phase 169 lobby restore and Phase 170-172 Scorpion poker locks, kept public page and site untouched, and locked no music, no movement changes, no teleport changes, no XR reference-space mutation, official logo only, and modular phase checklist flow",
+  "build": "PHASE-170-PLAYABLE-POKER-TEST-LOCK",
+  "phase": 170,
+  "date": "2026-05-24",
   "siteTouched": false,
-  "gameTouched": true,
-  "previousStableBuild": "PHASE-172-POKER-WATCH-ACTION-BINDINGS-AND-SEAT-QA",
-  "nextBuild": "PHASE-174-MODULE-REGISTRY-COMPLETION-EVENT-BRIDGE"
+  "focus": "Playable poker test controls, approval cleanup, phase label lock",
+  "packageRule": "under 25 MB",
+  "next": [
+    "turn-gated betting",
+    "bot action cadence",
+    "watch action state feedback",
+    "Quest seat/play distance validation"
+  ]
 }

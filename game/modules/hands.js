@@ -1,13 +1,14 @@
 import * as THREE from "three";
+import { XRHandModelFactory } from "three/addons/webxr/XRHandModelFactory.js";
 
-const PHASE = "PHASE-144-RIGHT-CONTROLLER-ONLY-TELEPORT-FREEZE-ISOLATION-LOCK";
-const RIGHT_ONLY = true;
+function makeProxyJoint(name){
+  const obj = new THREE.Object3D();
+  obj.name = name;
+  return obj;
+}
 
-function tagDynamic(obj){ if(obj) obj.userData.svrNoWorldShift = true; return obj; }
-function makeProxyJoint(name){ const obj = new THREE.Object3D(); obj.name = name; obj.userData.svrNoWorldShift = true; return obj; }
 function makeControllerProxy(controller, handed = "right"){
-  const proxy = tagDynamic(new THREE.Group());
-  proxy.name = `SVR_PHASE144_${String(handed).toUpperCase()}_CONTROLLER_PROXY`;
+  const proxy = new THREE.Group();
   proxy.userData.controller = controller;
   proxy.userData.handedness = handed;
   proxy.visible = false;
@@ -22,13 +23,14 @@ function makeControllerProxy(controller, handed = "right"){
   Object.values(proxy.joints).forEach(j=>proxy.add(j));
   return proxy;
 }
+
 function updateControllerProxy(proxy){
   const controller = proxy?.userData?.controller;
   if (!controller) return;
-  controller.visible = false;
   controller.updateWorldMatrix(true, false);
   controller.getWorldPosition(proxy.position);
   controller.getWorldQuaternion(proxy.quaternion);
+
   const gp = proxy?.userData?.inputSource?.gamepad || controller.inputSource?.gamepad || null;
   proxy.userData.gamepad = gp || null;
   const trigger = gp?.buttons?.[0]?.value || 0;
@@ -36,9 +38,11 @@ function updateControllerProxy(proxy){
   const side = proxy.userData.handedness === "left" ? -1 : 1;
   const curl = THREE.MathUtils.lerp(0, 1, Math.max(trigger, squeeze));
   const fist = squeeze > 0.35;
+
   proxy.userData.trigger = trigger;
   proxy.userData.squeeze = squeeze;
   proxy.joints.wrist.position.set(0, 0, 0);
+
   if (fist){
     proxy.joints["thumb-tip"].position.set(0.016 * side, -0.005, 0.012);
     proxy.joints["index-finger-tip"].position.set(0.011 * side, -0.001, 0.018);
@@ -52,6 +56,7 @@ function updateControllerProxy(proxy){
     proxy.joints["ring-finger-tip"].position.set(-0.008 * side, 0.0, 0.076 - curl * 0.024);
     proxy.joints["pinky-finger-tip"].position.set(-0.018 * side, -0.002, 0.068 - curl * 0.02);
   }
+
   if (trigger > 0.18){
     const pinchZ = 0.038 - trigger * 0.01;
     proxy.joints["thumb-tip"].position.set(0.015 * side, -0.006, pinchZ);
@@ -60,22 +65,28 @@ function updateControllerProxy(proxy){
 }
 
 export function createHands({ scene, renderer, log = console.log }){
+  const handFactory = new XRHandModelFactory();
   const rawHands = [];
+  const handModels = [];
   const handDebugGroups = [];
   const controllers = [];
   const controllerProxies = [];
+  let leftHand = null;
+  let rightHand = null;
   let leftControllerProxy = null;
   let rightControllerProxy = null;
   let debugOn = false;
 
   function makeDebugGroup(parent){
-    const group = tagDynamic(new THREE.Group());
+    const group = new THREE.Group();
     group.visible = false;
     const keys = ["wrist", "thumb-tip", "index-finger-tip", "middle-finger-tip", "ring-finger-tip", "pinky-finger-tip"];
     for (const key of keys){
-      const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.009, 8, 8), new THREE.MeshBasicMaterial({ color: 0x00ffff, depthTest:false, depthWrite:false }));
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.009, 10, 10),
+        new THREE.MeshBasicMaterial({ color: 0xb48cff })
+      );
       mesh.userData.jointKey = key;
-      mesh.userData.svrNoWorldShift = true;
       group.add(mesh);
     }
     parent.add(group);
@@ -83,28 +94,37 @@ export function createHands({ scene, renderer, log = console.log }){
   }
 
   for (let i = 0; i < 2; i++){
-    const hand = tagDynamic(renderer.xr.getHand(i));
-    hand.visible = false;
+    const hand = renderer.xr.getHand(i);
+    hand.visible = true;
     scene.add(hand);
     rawHands.push(hand);
-    hand.addEventListener("connected", (evt)=>{
-      hand.visible = false;
-      log("Hand tracking disabled for Phase 144 controller-only freeze isolation", i, evt?.data?.handedness || "unknown");
-    });
-    hand.addEventListener("disconnected", ()=>{});
+    const model = handFactory.createHandModel(hand, "mesh");
+    model.visible = true;
+    hand.add(model);
+    handModels.push(model);
+    handDebugGroups.push(makeDebugGroup(hand));
 
-    const controller = tagDynamic(renderer.xr.getController(i));
+    hand.addEventListener("connected", (evt)=>{
+      const handed = evt?.data?.handedness || "unknown";
+      hand.userData.handedness = handed;
+      if (handed === "left") leftHand = hand;
+      if (handed === "right") rightHand = hand;
+      log("Hand connected", i, handed);
+    });
+
+    hand.addEventListener("disconnected", ()=>{
+      if (leftHand === hand) leftHand = null;
+      if (rightHand === hand) rightHand = null;
+    });
+
+    const controller = renderer.xr.getController(i);
     controller.visible = false;
     scene.add(controller);
     controllers.push(controller);
+
     controller.addEventListener("connected", (evt)=>{
       const handed = evt?.data?.handedness || evt?.data?.gamepad?.hand || (i === 0 ? "left" : "right");
       controller.inputSource = evt?.data || controller.inputSource || null;
-      controller.visible = false;
-      if (RIGHT_ONLY && handed !== "right"){
-        log("Left controller ignored for Phase 144", i, handed);
-        return;
-      }
       const proxy = makeControllerProxy(controller, handed);
       proxy.userData.inputSource = evt?.data || null;
       scene.add(proxy);
@@ -112,8 +132,9 @@ export function createHands({ scene, renderer, log = console.log }){
       controllerProxies.push({ controller, proxy, debug });
       if (handed === "left") leftControllerProxy = proxy;
       if (handed === "right") rightControllerProxy = proxy;
-      log("Right controller proxy connected for Phase 144", i, handed);
+      log("Controller connected", i, handed);
     });
+
     controller.addEventListener("disconnected", ()=>{
       const idx = controllerProxies.findIndex(x=>x.controller === controller);
       if (idx >= 0){
@@ -128,12 +149,16 @@ export function createHands({ scene, renderer, log = console.log }){
 
   function update(dt = 0.016){
     controllers.forEach(c=>{ if (c) c.visible = false; });
-    rawHands.forEach(h=>{ if (h) h.visible = false; });
+    rawHands.forEach((h, idx)=>{
+      if (h) h.visible = true;
+    });
+    handModels.forEach(m=>{ if (m) m.visible = true; });
     controllerProxies.forEach(({ proxy })=> updateControllerProxy(proxy, dt));
   }
+
   function updateDebug(){
-    const sources = controllerProxies.map(x=>x.proxy);
-    const groups = controllerProxies.map(x=>x.debug);
+    const sources = [...rawHands, ...controllerProxies.map(x=>x.proxy)];
+    const groups = [...handDebugGroups, ...controllerProxies.map(x=>x.debug)];
     for (let i = 0; i < sources.length; i++){
       const hand = sources[i];
       const group = groups[i];
@@ -147,18 +172,19 @@ export function createHands({ scene, renderer, log = console.log }){
       }
     }
   }
+
   function toggleDebug(){
     debugOn = !debugOn;
     [...handDebugGroups, ...controllerProxies.map(x=>x.debug)].forEach(group=>{ if (group) group.visible = debugOn; });
     return debugOn;
   }
-  window.SVR_XR_DYNAMIC_TAG_LOCK = { phase:PHASE, controllerOnly:true, rightControllerOnly:RIGHT_ONLY, handTrackingDisabled:true, reason:"hand freezes reported" };
+
   return {
-    getLeft: ()=> null,
-    getRight: ()=> rightControllerProxy || null,
-    getLeftHand: ()=> null,
-    getRightHand: ()=> null,
-    getLeftController: ()=> null,
+    getLeft: ()=> leftHand?.joints ? leftHand : (leftControllerProxy || rawHands[0] || null),
+    getRight: ()=> rightHand?.joints ? rightHand : (rightControllerProxy || rawHands[1] || rawHands[0] || null),
+    getLeftHand: ()=> leftHand?.joints ? leftHand : null,
+    getRightHand: ()=> rightHand?.joints ? rightHand : null,
+    getLeftController: ()=> leftControllerProxy || null,
     getRightController: ()=> rightControllerProxy || null,
     toggleDebug,
     updateDebug,

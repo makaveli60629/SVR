@@ -1,0 +1,16 @@
+{
+  "build": "PHASE-170-PLAYABLE-POKER-TEST-LOCK",
+  "lockedRules": [
+    "site untouched",
+    "game under 25 MB",
+    "unapproved Reiki branding disabled",
+    "dealer body disabled",
+    "invisible dealing logic preserved",
+    "5 bots plus 1 open south/front player seat",
+    "left-to-right dealing preserved"
+  ],
+  "readiness": {
+    "testingReadyPercent": 72,
+    "polishedLaunchReadyPercent": 45
+  }
+}
