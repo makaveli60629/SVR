@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -7,10 +7,10 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import "./modules/optional_module_loader.js?v=phase244";
+import "./modules/optional_module_loader.js?v=phase245";
 
-const BUILD_LABEL = "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK";
-const BUILD_PHASE = 244;
+const BUILD_LABEL = "PHASE-245-FIXED-GIT-RUNGIT-HOTFIX-LOCK";
+const BUILD_PHASE = 245;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
@@ -77,7 +77,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading world…", { force: true });
+setStatus("Loading worldâ€¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -223,7 +223,7 @@ function pokerAction(name){
     setStatus(`Poker: ${name}`, { force: true });
     return true;
   }
-  setStatus('Poker controls loading…', { force: true });
+  setStatus('Poker controls loadingâ€¦', { force: true });
   return false;
 }
 
@@ -315,14 +315,14 @@ $toggleJoints?.addEventListener("click", ()=>{
   if ($toggleJoints) $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logo…", { force: true });
+setStatus("Loading logoâ€¦", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
 window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: BUILD_LABEL } }));
 window.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: BUILD_LABEL, preview: AUTOCAM, at: new Date().toISOString() } }));
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold grip/A/trigger to aim teleport, release to teleport. Poker keys: F/C/R/A/H. QA keys: Q/V/T/U/W/G/X/Y. Private scene buttons enabled.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -408,6 +408,9 @@ renderer.setAnimationLoop(()=>{
   renderer.render(scene, camera);
   } catch (error) {
     const message = error?.stack || error?.message || String(error);
+    if (!window.SVR_MAIN_RUNTIME_STATE) {
+      window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
+    }
     window.SVR_MAIN_RUNTIME_STATE.animationErrors += 1;
     window.SVR_MAIN_RUNTIME_STATE.lastAnimationError = {
       at: new Date().toISOString(),
@@ -422,7 +425,7 @@ renderer.setAnimationLoop(()=>{
     const shield = window.SVR_RUNTIME_CRASH_SHIELD;
     if (shield?.handleAnimationError?.(error, { phase: BUILD_PHASE, build: BUILD_LABEL, module: "main.animationLoop" })) return;
 
-    setStatus("Runtime recovered • check Logs", { force: true, minGap: 0 });
+    setStatus("Runtime recovered â€¢ check Logs", { force: true, minGap: 0 });
     if (!renderer.xr.isPresenting && $err) {
       $err.style.display = "block";
       $err.textContent = "RUNTIME ERROR RECOVERED:\n" + message;
@@ -439,7 +442,8 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading…");
-  setStatus("WebGL context lost (reloading…)", { force: true });
+  log("[ERR] WebGL context lost. Reloadingâ€¦");
+  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+

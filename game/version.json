@@ -1,8 +1,8 @@
-{
-  "build": "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
-  "phase": 244,
-  "source": "direct-game-folder",
-  "generatedAt": "2026-05-25T00:00:00Z",
-  "public_page_touched": false,
-  "featureLock": "main.js runtime catch fix, Quest-safe animation error guard, deploy sync retained"
+﻿{
+    "public_page_touched":  false,
+    "build":  "PHASE-245-FIXED-GIT-RUNGIT-HOTFIX-LOCK",
+    "source":  "direct-mainjs-hotfix",
+    "featureLock":  "fixed RunGit PowerShell wrapper, main.js runtime catch locked, phase cache bust",
+    "generatedAt":  "2026-05-25T23:05:05.7065319Z",
+    "phase":  245
 }
