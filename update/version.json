@@ -1,11 +1,7 @@
-{
-  "build": "PHASE-173-4-LEGEND-HALL-BOOT-FIX",
-  "phase": "173.4",
-  "label": "PHASE-173-4-LEGEND-HALL-BOOT-FIX",
-  "cacheBust": "phase173-4-legend-hall-boot-fix",
-  "fix": "Direct cache-busted world_skyline.js import plus local createMatrixBillboardTexture helper.",
+﻿{
+  "build": "PHASE-173-5-POKER-HISTORY-INIT-BOOT-FIX",
+  "cacheBust": "phase173-5-poker-history-init-boot-fix",
+  "scope": "game-only",
   "siteTouched": false,
-  "gameOnly": true,
-  "updated": "2026-05-25",
-  "notes": "Legend Hall and lobby info board skyline boot hotfix; preserves Phase 173 poker proof layer."
+  "updatedAt": "2026-05-24T23:20:48"
 }

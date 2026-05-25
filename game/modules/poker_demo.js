@@ -75,10 +75,10 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   const potStack = new THREE.Group();
   group.add(potStack);
 
-  buildSeatChips();
-  paintProofPanel(null);
-  paintHistoryPanel();
-
+  // Phase 173.5 boot hotfix:
+  // These state variables must exist before the first panel paint.
+  // paintHistoryPanel() reads handHistory during createPokerDemo(), so declaring
+  // handHistory after that first call triggers a TDZ boot crash in modern browsers.
   let handNumber = 0;
   let nowS = 0;
   let queue = [];
@@ -87,6 +87,10 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   let playerStacks = players.map(() => 1000);
   const handHistory = [];
   const MAX_HISTORY = 6;
+
+  buildSeatChips();
+  paintProofPanel(null);
+  paintHistoryPanel();
 
   function makeDynamicPanel(width, height, worldW, worldH) {
     const { canvas, ctx, texture } = makeCanvasLabel({
