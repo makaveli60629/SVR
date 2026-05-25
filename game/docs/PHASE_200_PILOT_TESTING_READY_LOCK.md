@@ -1,6 +1,6 @@
 # Phase 200 — Pilot Testing Ready Lock
 
-Build: `PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK`
+Build: `PHASE-231-MAIN-IMPORT-RECOVERY-LOCK`
 
 ## Protected rules
 

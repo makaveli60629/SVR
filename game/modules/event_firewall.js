@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+ * Build: PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK';
+const BUILD = 'PHASE-231-MAIN-IMPORT-RECOVERY-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

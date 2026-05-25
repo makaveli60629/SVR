@@ -1,6 +1,6 @@
 {
   "phase": 200,
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
   "modules": [
     "enterprise_bridge",
     "runtime_qa",

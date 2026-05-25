@@ -1,7 +1,7 @@
-# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
 
 ## Purpose
-Phase 230 adds a tester launch card so testers have one small panel with the URL, shortcut keys, checklist, and expected pass/fail notes.
+Phase 231 adds a tester launch card so testers have one small panel with the URL, shortcut keys, checklist, and expected pass/fail notes.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 230 adds a tester launch card so testers have one small panel with the URL
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase230-testercard` and press `C`.
+Open `/game/?v=phase231-testercard` and press `C`.

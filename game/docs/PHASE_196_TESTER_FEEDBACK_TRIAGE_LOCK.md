@@ -1,4 +1,4 @@
-# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

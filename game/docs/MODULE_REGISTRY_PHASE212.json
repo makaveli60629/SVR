@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"

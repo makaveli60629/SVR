@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
   "modules": [
     "game/modules/poker_demo.js",
     "game/modules/enterprise_bridge.js",

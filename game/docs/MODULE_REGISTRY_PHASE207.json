@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",
-    "game/modules/enterprise_bridge_phase230.js",
+    "game/modules/enterprise_bridge_phase231.js",
     "game/modules/bridge_selftest.js",
     "game/modules/event_firewall.js"
   ],

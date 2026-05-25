@@ -1,9 +1,9 @@
-# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
 
-Phase 230 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
+Phase 231 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
 
 ## Test
-Open `/game/?v=phase230-autoapplystatus` and press `I`.
+Open `/game/?v=phase231-autoapplystatus` and press `I`.
 
 ## Locked
 - Public Matrix launch page untouched.

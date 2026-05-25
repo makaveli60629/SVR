@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Deploy Verifier / Preflight QA Module
- * Build: PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+ * Build: PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
  * Purpose: catch stale deploys, mismatched game/version/deploy-health data, and runtime drift before testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK';
+const BUILD = 'PHASE-231-MAIN-IMPORT-RECOVERY-LOCK';
 const EXPECTED_PHASE = 194;
 
 async function fetchJsonSafe(url) {

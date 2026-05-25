@@ -1,4 +1,4 @@
-# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
 
 ## Scope
 - Added dealer button / blind-state telemetry for every hand.

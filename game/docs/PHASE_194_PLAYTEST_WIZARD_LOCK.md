@@ -1,6 +1,6 @@
 # Phase 199 — Playtest Wizard Lock
 
-Build: `PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK`
+Build: `PHASE-231-MAIN-IMPORT-RECOVERY-LOCK`
 
 ## Scope
 - Adds guided playtest wizard overlay.

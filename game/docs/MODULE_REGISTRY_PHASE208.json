@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
   "phase": 208,
   "modules": [
     "runtime_crash_shield.js",
     "bridge_proxy.js",
-    "enterprise_bridge_phase230.js",
+    "enterprise_bridge_phase231.js",
     "event_firewall.js"
   ],
   "public_page_touched": false

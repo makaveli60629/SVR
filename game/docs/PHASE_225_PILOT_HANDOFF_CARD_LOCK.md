@@ -1,7 +1,7 @@
-# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
 
 ## Purpose
-Phase 230 adds a pilot handoff card so non-technical testers can open one concise panel with the test link, what to verify, what to report, and the support shortcuts.
+Phase 231 adds a pilot handoff card so non-technical testers can open one concise panel with the test link, what to verify, what to report, and the support shortcuts.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 230 adds a pilot handoff card so non-technical testers can open one concis
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase230-handoff` and press `H`.
+Open `/game/?v=phase231-handoff` and press `H`.

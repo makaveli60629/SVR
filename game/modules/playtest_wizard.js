@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Guided Playtest Wizard
- * Build: PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+ * Build: PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
  * Purpose: give testers one clear checklist after deploy without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK';
+const BUILD = 'PHASE-231-MAIN-IMPORT-RECOVERY-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeValue(value, max = 260) {

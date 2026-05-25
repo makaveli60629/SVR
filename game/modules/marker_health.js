@@ -3,7 +3,7 @@
  * It does not block gameplay and never throws into the main runtime.
  */
 (function(){
-  const BUILD = 'PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK';
+  const BUILD = 'PHASE-231-MAIN-IMPORT-RECOVERY-LOCK';
   const KEY = '__SVR_MARKER_HEALTH__';
   const state = { build: BUILD, checks: [], ok: false, lastRunAt: null };
   function safeDispatch(name, detail){ try { window.dispatchEvent(new CustomEvent(name, { detail })); } catch(_){} }
@@ -22,10 +22,10 @@
       const scripts = Array.from(document.scripts || []).map(s => s.src || '').join('\n');
       add('title-marker', title.includes('Phase 213') || title.includes(BUILD), title);
       add('hud-build-marker', hudText.includes(BUILD), 'HUD/body contains current build marker');
-      add('boot-script-cache', scripts.includes('boot.js?v=phase230'), scripts || 'no scripts found');
-      const version = await fetchJson('./version.json?v=phase230-' + Date.now());
+      add('boot-script-cache', scripts.includes('boot.js?v=phase231'), scripts || 'no scripts found');
+      const version = await fetchJson('./version.json?v=phase231-' + Date.now());
       add('version-json-marker', version && version.build === BUILD && Number(version.phase) === 211, JSON.stringify(version));
-      const gameHealth = await fetchJson('./deploy-health.json?v=phase230-' + Date.now());
+      const gameHealth = await fetchJson('./deploy-health.json?v=phase231-' + Date.now());
       add('game-deploy-health', !gameHealth.error && (!gameHealth.build || String(gameHealth.build).includes('PHASE-')), JSON.stringify(gameHealth));
       state.ok = state.checks.every(c => c.ok);
       try { localStorage.setItem(KEY, JSON.stringify({ build: BUILD, ok: state.ok, checks: state.checks, at: state.lastRunAt })); } catch(_){}

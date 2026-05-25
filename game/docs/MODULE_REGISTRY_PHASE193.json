@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
   "modules_added": [
     "modules/release_candidate.js"
   ],

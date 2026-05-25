@@ -1,4 +1,4 @@
-# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

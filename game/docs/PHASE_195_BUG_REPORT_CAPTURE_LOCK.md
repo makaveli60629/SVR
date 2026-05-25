@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK`
+Build: `PHASE-231-MAIN-IMPORT-RECOVERY-LOCK`
 
 ## Added
 - In-game bug report capture panel.

@@ -1,11 +1,11 @@
-# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase230.js`
+- `game/modules/enterprise_bridge_phase231.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

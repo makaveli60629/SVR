@@ -1,8 +1,8 @@
-// PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+// PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+    build: "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

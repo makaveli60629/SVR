@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
-  "phase": 230,
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
+  "phase": 231,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false

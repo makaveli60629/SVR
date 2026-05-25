@@ -1,4 +1,4 @@
-# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
 
 ## Scope
 - Keeps playable poker priority moving forward.

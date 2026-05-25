@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
   "public_page_touched": false,
   "modules": [
     "modules/runtime_crash_shield.js",
@@ -9,7 +9,7 @@
     "modules/marker_health.js",
     "modules/bridge_proxy.js",
     "modules/event_firewall.js",
-    "modules/enterprise_bridge_phase230.js",
+    "modules/enterprise_bridge_phase231.js",
     "modules/bridge_selftest.js"
   ]
 }

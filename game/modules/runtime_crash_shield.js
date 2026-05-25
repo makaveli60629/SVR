@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Crash Shield
- * Build: PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+ * Build: PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
  * Purpose: keep render/game loop alive, capture runtime errors, and prevent bridge/listener crashes from freezing the game.
  */
-const BUILD = 'PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK';
+const BUILD = 'PHASE-231-MAIN-IMPORT-RECOVERY-LOCK';
 const KNOWN_RECOVERABLE = [
   /record[A-Za-z0-9_]+ is not a function/i,
   /SVR_ENTERPRISE_BRIDGE/i,

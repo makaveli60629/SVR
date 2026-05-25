@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
-  "phase": 230,
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
+  "phase": 231,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "PowerShell deploy wait log, workflow completion monitor, deploy status evidence"
+  "featureLock": "main import recovery, cache-busted bridge file, no-stuck boot module repair"
 }

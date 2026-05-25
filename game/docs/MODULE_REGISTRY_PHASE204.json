@@ -1,6 +1,6 @@
 {
   "phase": 204,
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
   "modules_added": [
     "modules/event_firewall.js"
   ],

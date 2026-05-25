@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Report Bundle
- * Build: PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+ * Build: PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
  * Purpose: combine QA snapshots, bug reports, tester feedback, test queue, smoke/RC/preflight/session exports into one playtest report bundle.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK';
+const BUILD = 'PHASE-231-MAIN-IMPORT-RECOVERY-LOCK';
 const EXPECTED_PHASE = 198;
 const STORE_KEY = 'svr_test_report_bundles_phase198';
 

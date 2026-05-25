@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK",
+  "build": "PHASE-231-MAIN-IMPORT-RECOVERY-LOCK",
   "phase": 216,
   "modules": [
     "modules/auto_apply_helper.js",
-    "modules/enterprise_bridge_phase230.js"
+    "modules/enterprise_bridge_phase231.js"
   ],
   "public_page_touched": false,
   "notes": "Hardened single-script updater workflow. Chooses highest SVR_PHASE*_NEXT_PACKET.zip by phase number and applies safely."

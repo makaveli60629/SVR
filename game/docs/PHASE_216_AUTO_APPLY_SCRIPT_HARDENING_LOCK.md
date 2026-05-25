@@ -1,6 +1,6 @@
-# PHASE-230-POWER-DEPLOY-WAIT-LOG-LOCK
+# PHASE-231-MAIN-IMPORT-RECOVERY-LOCK
 
-Phase 230 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 231 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.
