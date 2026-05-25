@@ -1,7 +1,10 @@
-﻿{
-  "build": "PHASE-173-5-POKER-HISTORY-INIT-BOOT-FIX",
-  "cacheBust": "phase173-5-poker-history-init-boot-fix",
-  "scope": "game-only",
+{
+  "build": "PHASE-174-MASTER-AUDIT-ROOM-WALKAROUND-LOCK",
+  "phase": "174",
+  "label": "PHASE-174-MASTER-AUDIT-ROOM-WALKAROUND-LOCK",
+  "cacheBust": "phase174-master-audit-room-walkaround-lock",
   "siteTouched": false,
-  "updatedAt": "2026-05-24T23:20:48"
+  "gameOnly": true,
+  "updated": "2026-05-25",
+  "notes": "Full game-side audit lock: direct /game deploy alignment, private room walkaround pages, master checklist, and VR-ready lightweight scene routes."
 }

@@ -3,7 +3,7 @@ import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
-import { buildSkylineRoom } from "./modules/world_skyline.js?v=phase173-5-poker-history-init-boot-fix";
+import { buildSkylineRoom } from "./modules/world_skyline.js?v=phase174-master-audit-room-walkaround-lock";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
@@ -21,6 +21,7 @@ const $err = document.getElementById("err");
 const $toggleLog = document.getElementById("toggleLog");
 const $toggleJoints = document.getElementById("toggleJoints");
 const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
+const $roomLinks = Array.from(document.querySelectorAll("#sceneNav .room-link"));
 const $pokerActionButtons = Array.from(document.querySelectorAll("#pokerActions .poker-action"));
 
 let lastStatusText = "";
@@ -182,6 +183,13 @@ $sceneButtons.forEach((btn)=>{
   });
 });
 
+$roomLinks.forEach((btn)=>{
+  btn.addEventListener("click", ()=>{
+    const href = btn.dataset.href;
+    if (href) window.location.href = href;
+  });
+});
+
 function runPokerAction(action){
   if (action === 'next') {
     world.pokerDemo?.forceNextHand?.();
@@ -271,7 +279,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready • PHASE-173-5-POKER-HISTORY-INIT-BOOT-FIX. Winner proof active. Matrix billboard, Legend Hall, and poker history init boot hotfixes applied. Keys: F fold, X check, C call, R raise, A all-in, H next hand.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready • PHASE-174-MASTER-AUDIT-ROOM-WALKAROUND-LOCK. Winner proof active. Matrix billboard, Legend Hall, and poker history init boot hotfixes applied. Keys: F fold, X check, C call, R raise, A all-in, H next hand.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

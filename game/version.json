@@ -1,11 +1,10 @@
 {
-  "build": "PHASE-173-5-POKER-HISTORY-INIT-BOOT-FIX",
-  "phase": "173.4",
-  "label": "PHASE-173-5-POKER-HISTORY-INIT-BOOT-FIX",
-  "cacheBust": "phase173-5-poker-history-init-boot-fix",
-  "fix": "Direct cache-busted world_skyline.js import plus local createMatrixBillboardTexture helper.",
+  "build": "PHASE-174-MASTER-AUDIT-ROOM-WALKAROUND-LOCK",
+  "phase": "174",
+  "label": "PHASE-174-MASTER-AUDIT-ROOM-WALKAROUND-LOCK",
+  "cacheBust": "phase174-master-audit-room-walkaround-lock",
   "siteTouched": false,
   "gameOnly": true,
   "updated": "2026-05-25",
-  "notes": "Legend Hall and lobby info board skyline boot hotfix; preserves Phase 173 poker proof layer."
+  "notes": "Full game-side audit lock: direct /game deploy alignment, private room walkaround pages, master checklist, and VR-ready lightweight scene routes."
 }
