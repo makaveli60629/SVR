@@ -1,6 +1,6 @@
-# Phase 197 — Bug Report Capture Lock
+# Phase 198 — Bug Report Capture Lock
 
-Build: `PHASE-197-TEST-QUEUE-DASHBOARD-LOCK`
+Build: `PHASE-198-TEST-REPORT-BUNDLE-LOCK`
 
 ## Added
 - In-game bug report capture panel.

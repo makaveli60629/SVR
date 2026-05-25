@@ -1,4 +1,4 @@
-# PHASE-197-TEST-QUEUE-DASHBOARD-LOCK
+# PHASE-198-TEST-REPORT-BUNDLE-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

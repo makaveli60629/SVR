@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-197-TEST-QUEUE-DASHBOARD-LOCK",
+  "build": "PHASE-198-TEST-REPORT-BUNDLE-LOCK",
   "phase": 195,
   "modules": {
     "bug_reporter": "game/modules/bug_reporter.js",

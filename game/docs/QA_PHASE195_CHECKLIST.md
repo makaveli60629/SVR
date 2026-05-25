@@ -1,7 +1,7 @@
-# QA Phase 197 Checklist
+# QA Phase 198 Checklist
 
 - [ ] Open `/game/?v=phase197`.
-- [ ] Confirm version/deploy overlay shows `PHASE-197-TEST-QUEUE-DASHBOARD-LOCK`.
+- [ ] Confirm version/deploy overlay shows `PHASE-198-TEST-REPORT-BUNDLE-LOCK`.
 - [ ] Press `G` and confirm bug report panel opens.
 - [ ] Enter area/severity/device/notes and save a report.
 - [ ] Confirm report count increments.

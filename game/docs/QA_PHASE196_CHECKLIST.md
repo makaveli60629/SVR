@@ -1,4 +1,4 @@
-# QA Phase 197 Checklist
+# QA Phase 198 Checklist
 
 - Open `/game/?v=phase197`.
 - Press `J` and confirm tester feedback panel opens.
