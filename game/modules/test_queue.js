@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Queue Dashboard
- * Build: PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK
+ * Build: PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK
  * Purpose: convert tester feedback, bug reports, release candidate checks, and smoke tests into a compact triage queue.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK';
+const BUILD = 'PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK';
 const EXPECTED_PHASE = 197;
 const STORE_KEY = 'svr_test_queue_phase197';
 

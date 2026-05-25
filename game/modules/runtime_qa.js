@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK
+ * Build: PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK';
+const BUILD = 'PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

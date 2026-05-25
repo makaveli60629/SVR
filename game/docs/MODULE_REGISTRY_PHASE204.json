@@ -1,6 +1,6 @@
 {
   "phase": 204,
-  "build": "PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK",
+  "build": "PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK",
   "modules_added": [
     "modules/event_firewall.js"
   ],

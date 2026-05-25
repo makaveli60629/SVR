@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK
+ * Build: PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK';
+const BUILD = 'PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK",
-  "phase": 204,
+  "build": "PHASE-205-ENTERPRISE-BRIDGE-CACHEBUST-FIX-LOCK",
+  "phase": 205,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "runtime event firewall, bridge safe listeners, recorder error capture"
+  "featureLock": "enterprise bridge cache-busted recorder aliases, decision aid runtime crash fix"
 }

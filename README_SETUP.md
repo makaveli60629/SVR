@@ -1,16 +1,5 @@
-# SVR Phase 195 Backend / Database Starter
+# SVR Phase 205 Backend Starter
 
-Build: `PHASE-195-BUG-REPORT-CAPTURE-LOCK`
+Adds SQL table for bridge recorder/cache-bust runtime errors.
 
-## New endpoint
-- `POST /api/game/bug-report`
-- `GET /api/game/bug-report?limit=30`
-
-## SQL
-Run:
-
-```sql
-sql/022_phase195_bug_reports.sql
-```
-
-No secrets are included. Keep `AZURE_SQL_CONNECTION_STRING` only in Azure App Service settings or local `.env`.
+No SQL secrets, Stripe secrets, API secrets, or passwords are included.
