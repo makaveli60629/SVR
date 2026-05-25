@@ -1,4 +1,4 @@
-# PHASE-209-SAFE-EVENT-BUS-LOCK
+# PHASE-211-FULL-MARKER-HEALTH-LOCK
 
 ## Summary
 Adds the Demo Certification module and go/no-go readiness gate for demo/playtest preparation.

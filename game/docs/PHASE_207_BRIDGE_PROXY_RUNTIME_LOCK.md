@@ -1,4 +1,4 @@
-# PHASE-209-SAFE-EVENT-BUS-LOCK
+# PHASE-211-FULL-MARKER-HEALTH-LOCK
 
 ## Purpose
 Install a first-run bridge proxy before event/firewall/poker modules so missing `record*` methods cannot crash the runtime.

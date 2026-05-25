@@ -1,8 +1,12 @@
+require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const app = express();
-app.use(express.json({limit:'1mb'}));
-const rows=[];
-app.get('/api/health',(req,res)=>res.json({status:'ok', build:'PHASE-210-BOOT-CACHE-MARKER-ALIGNMENT-LOCK'}));
-app.post('/api/game/boot-cache-health',(req,res)=>{rows.push({...req.body, at:new Date().toISOString()}); res.json({ok:true,count:rows.length});});
-app.get('/api/game/boot-cache-health',(req,res)=>res.json(rows.slice(-30).reverse()));
-app.listen(process.env.PORT||8080,()=>console.log('SVR Phase 210 backend starter running'));
+app.use(cors());
+app.use(express.json({ limit: '1mb' }));
+const memory = [];
+app.get('/api/health', (req,res)=>res.json({status:'ok', phase:211, module:'marker-health'}));
+app.post('/api/game/marker-health', (req,res)=>{ memory.unshift({ at:new Date().toISOString(), body:req.body }); res.json({ok:true, stored:true}); });
+app.get('/api/game/marker-health', (req,res)=>res.json(memory.slice(0, Number(req.query.limit||30))));
+const port = process.env.PORT || 8080;
+app.listen(port, ()=>console.log(`SVR marker health API running on ${port}`));

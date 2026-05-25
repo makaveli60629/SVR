@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-209-SAFE-EVENT-BUS-LOCK",
+  "build": "PHASE-211-FULL-MARKER-HEALTH-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",

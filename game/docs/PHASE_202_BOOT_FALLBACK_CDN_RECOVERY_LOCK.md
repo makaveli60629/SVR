@@ -1,4 +1,4 @@
-# PHASE-209-SAFE-EVENT-BUS-LOCK
+# PHASE-211-FULL-MARKER-HEALTH-LOCK
 
 ## Purpose
 Fix the remaining stuck-on-Booting risk by adding a no-Three.js recovery shell. If CDN/import/runtime loading fails, the game no longer remains frozen on Booting.

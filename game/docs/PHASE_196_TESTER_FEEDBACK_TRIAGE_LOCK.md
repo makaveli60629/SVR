@@ -1,4 +1,4 @@
-# PHASE-209-SAFE-EVENT-BUS-LOCK
+# PHASE-211-FULL-MARKER-HEALTH-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

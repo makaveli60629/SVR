@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-209-SAFE-EVENT-BUS-LOCK
+ * Build: PHASE-211-FULL-MARKER-HEALTH-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-209-SAFE-EVENT-BUS-LOCK';
+const BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }

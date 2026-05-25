@@ -1,0 +1,15 @@
+{
+  "phase": 211,
+  "build": "PHASE-211-FULL-MARKER-HEALTH-LOCK",
+  "public_page_touched": false,
+  "modules": [
+    "modules/runtime_crash_shield.js",
+    "modules/safe_event_bus.js",
+    "modules/boot_cache_watchdog.js",
+    "modules/marker_health.js",
+    "modules/bridge_proxy.js",
+    "modules/event_firewall.js",
+    "modules/enterprise_bridge_phase211.js",
+    "modules/bridge_selftest.js"
+  ]
+}

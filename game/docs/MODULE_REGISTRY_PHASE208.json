@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-209-SAFE-EVENT-BUS-LOCK",
+  "build": "PHASE-211-FULL-MARKER-HEALTH-LOCK",
   "phase": 208,
   "modules": [
     "runtime_crash_shield.js",
     "bridge_proxy.js",
-    "enterprise_bridge_phase209.js",
+    "enterprise_bridge_phase211.js",
     "event_firewall.js"
   ],
   "public_page_touched": false

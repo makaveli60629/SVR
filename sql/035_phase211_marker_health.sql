@@ -1,0 +1,8 @@
+CREATE TABLE SvrMarkerHealth (
+  Id INT IDENTITY(1,1) PRIMARY KEY,
+  BuildLabel NVARCHAR(120) NULL,
+  IsOk BIT NULL,
+  Payload NVARCHAR(MAX) NULL,
+  CreatedAtUtc DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+);
+CREATE INDEX IX_SvrMarkerHealth_CreatedAtUtc ON SvrMarkerHealth(CreatedAtUtc DESC);

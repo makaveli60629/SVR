@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Open /game/?v=phase188.
-- [ ] Confirm build marker shows PHASE-209-SAFE-EVENT-BUS-LOCK
+- [ ] Confirm build marker shows PHASE-211-FULL-MARKER-HEALTH-LOCK
 - [ ] Enter or preview game without black screen.
 - [ ] During player turn, watch shows actor YOU and countdown.
 - [ ] When no call is facing player, watch button reads CHECK.

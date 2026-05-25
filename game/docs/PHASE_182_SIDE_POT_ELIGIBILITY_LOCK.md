@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-209-SAFE-EVENT-BUS-LOCK`
+Build: `PHASE-211-FULL-MARKER-HEALTH-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

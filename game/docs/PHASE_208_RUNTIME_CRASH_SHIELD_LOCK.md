@@ -1,4 +1,4 @@
-# PHASE-209-SAFE-EVENT-BUS-LOCK
+# PHASE-211-FULL-MARKER-HEALTH-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

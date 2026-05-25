@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-209-SAFE-EVENT-BUS-LOCK
+ * Build: PHASE-211-FULL-MARKER-HEALTH-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-209-SAFE-EVENT-BUS-LOCK';
+const BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

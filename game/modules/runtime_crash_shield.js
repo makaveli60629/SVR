@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Crash Shield
- * Build: PHASE-209-SAFE-EVENT-BUS-LOCK
+ * Build: PHASE-211-FULL-MARKER-HEALTH-LOCK
  * Purpose: keep render/game loop alive, capture runtime errors, and prevent bridge/listener crashes from freezing the game.
  */
-const BUILD = 'PHASE-209-SAFE-EVENT-BUS-LOCK';
+const BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
 const KNOWN_RECOVERABLE = [
   /record[A-Za-z0-9_]+ is not a function/i,
   /SVR_ENTERPRISE_BRIDGE/i,

@@ -1,11 +1,11 @@
-/* SVR Phase 210 cache-busted enterprise bridge import. Carries Phase 209 safe event bus bridge and recorder guards. */
+/* SVR Phase 211 cache-busted enterprise bridge import. Carries Phase 209 safe event bus bridge and recorder guards. */
 /**
  * SVR Poker — Enterprise Bridge Phase 208
- * Build: PHASE-210-BOOT-CACHE-MARKER-ALIGNMENT-LOCK
+ * Build: PHASE-211-FULL-MARKER-HEALTH-LOCK
  * Purpose: cache-busted bridge with proxy-compatible safe recorder aliases so poker events cannot crash the render loop.
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
-const BUILD = 'PHASE-210-BOOT-CACHE-MARKER-ALIGNMENT-LOCK';
+const BUILD = 'PHASE-211-FULL-MARKER-HEALTH-LOCK';
 
 const EVENT_TO_RECORDER = [
   ['svr_poker_hand_result', 'recordHandResult', 'hand_result'],
@@ -167,7 +167,7 @@ export default SVREnterpriseBridge;
 (function(){
   const bridge = window.SVR_ENTERPRISE_BRIDGE || window.SVRBridge || {};
   const names = ['recordDealerButton','recordRebuy','recordDecisionAid','recordAllIn','recordFoldEligibility','recordDeployPreflight','recordSmokeTest','recordReleaseCandidate','recordRuntimeQA','recordSessionExport','recordBugReport','recordTesterFeedback','recordTestQueue','recordTestReportBundle','recordDemoCertification','recordPilotReady','recordSafeEventBus'];
-  bridge.queue = bridge.queue || function(type, payload){ try { (window.__SVR_BRIDGE_QUEUE__ = window.__SVR_BRIDGE_QUEUE__ || []).push({ type, payload, at:new Date().toISOString(), build:'PHASE-210-BOOT-CACHE-MARKER-ALIGNMENT-LOCK' }); } catch(_){} };
+  bridge.queue = bridge.queue || function(type, payload){ try { (window.__SVR_BRIDGE_QUEUE__ = window.__SVR_BRIDGE_QUEUE__ || []).push({ type, payload, at:new Date().toISOString(), build:'PHASE-211-FULL-MARKER-HEALTH-LOCK' }); } catch(_){} };
   for (const n of names) if (typeof bridge[n] !== 'function') bridge[n] = function(payload){ return bridge.queue(n.replace(/^record/, '').replace(/[A-Z]/g, m => '_' + m.toLowerCase()).replace(/^_/, ''), payload); };
   window.SVR_ENTERPRISE_BRIDGE = bridge;
 })();
