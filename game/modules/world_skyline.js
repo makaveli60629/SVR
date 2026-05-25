@@ -160,6 +160,185 @@ function fillWrappedText(ctx, text, x, y, maxWidth, lineHeight){
   if (line) ctx.fillText(line, x, yy);
   return yy;
 }
+
+
+// Phase 173.1 boot hotfix helpers: these texture/sprite builders are intentionally
+// local to world_skyline.js so the skyline can boot without relying on optional globals.
+function createPlaqueTexture(title = "SVR", subtitle = ""){
+  return canvasTexture(1024, 512, (ctx,w,h)=>{
+    const g = ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,"#080612");
+    g.addColorStop(0.58,"#17091f");
+    g.addColorStop(1,"#05070e");
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle = "rgba(210,125,255,0.92)";
+    ctx.lineWidth = 18;
+    ctx.strokeRect(28,28,w-56,h-56);
+    ctx.strokeStyle = "rgba(120,220,255,0.28)";
+    ctx.lineWidth = 6;
+    ctx.strokeRect(54,54,w-108,h-108);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#fff7ff";
+    ctx.font = "800 72px Arial, Helvetica, sans-serif";
+    ctx.fillText(String(title || "SVR").toUpperCase(), w/2, h*0.43);
+    ctx.fillStyle = "#dcb7ff";
+    ctx.font = "700 38px Arial, Helvetica, sans-serif";
+    ctx.fillText(String(subtitle || "").toUpperCase(), w/2, h*0.62);
+  });
+}
+
+function createSponsorPlateTexture(title = "SPONSOR SLOT", subtitle = "AWAITING APPROVAL"){
+  return canvasTexture(1024, 512, (ctx,w,h)=>{
+    ctx.fillStyle = "#07070d";
+    ctx.fillRect(0,0,w,h);
+    const g = ctx.createRadialGradient(w/2,h/2,40,w/2,h/2,w*0.62);
+    g.addColorStop(0,"rgba(255,255,255,0.18)");
+    g.addColorStop(0.45,"rgba(185,90,255,0.20)");
+    g.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle = "rgba(255,60,60,0.95)";
+    ctx.lineWidth = 20;
+    ctx.strokeRect(32,32,w-64,h-64);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 70px Arial, Helvetica, sans-serif";
+    ctx.fillText(String(title || "SPONSOR SLOT").toUpperCase(), w/2, h*0.43);
+    ctx.fillStyle = "#ffb4b4";
+    ctx.font = "800 42px Arial, Helvetica, sans-serif";
+    ctx.fillText(String(subtitle || "AWAITING APPROVAL").toUpperCase(), w/2, h*0.62);
+  });
+}
+
+function createStoreDisplayTexture(){
+  return canvasTexture(1400, 900, (ctx,w,h)=>{
+    const g = ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,"#05070d");
+    g.addColorStop(0.48,"#13061f");
+    g.addColorStop(1,"#05070d");
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle = "rgba(185,90,255,0.96)";
+    ctx.lineWidth = 24;
+    ctx.strokeRect(36,36,w-72,h-72);
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 94px Arial, Helvetica, sans-serif";
+    ctx.fillText("SVR STORE", w/2, 190);
+    ctx.fillStyle = "#dcb7ff";
+    ctx.font = "700 46px Arial, Helvetica, sans-serif";
+    ctx.fillText("VR-FRIENDLY WEB PORTAL", w/2, 280);
+    ctx.fillStyle = "#9fe8ff";
+    ctx.font = "700 40px Arial, Helvetica, sans-serif";
+    ["Watches", "Gloves", "Avatar Gear", "Sponsor Items"].forEach((line,i)=>{
+      ctx.fillText(line, w/2, 420 + i*82);
+    });
+    ctx.fillStyle = "#fff2ff";
+    ctx.font = "800 34px Arial, Helvetica, sans-serif";
+    ctx.fillText("svrpoker.com/site/store.html", w/2, h-110);
+  });
+}
+
+function createAdBillboardTexture(lines = ["SVRPOKER.COM", "ALL IN"]){
+  const safeLines = Array.isArray(lines) && lines.length ? lines : [String(lines || "SVRPOKER.COM")];
+  return canvasTexture(1400, 620, (ctx,w,h)=>{
+    ctx.fillStyle = "#06070c";
+    ctx.fillRect(0,0,w,h);
+    const g = ctx.createLinearGradient(0,0,w,0);
+    g.addColorStop(0,"rgba(185,90,255,0.18)");
+    g.addColorStop(0.5,"rgba(120,220,255,0.24)");
+    g.addColorStop(1,"rgba(185,90,255,0.18)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle = "rgba(255,255,255,0.80)";
+    ctx.lineWidth = 14;
+    ctx.strokeRect(28,28,w-56,h-56);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    safeLines.slice(0,4).forEach((line,i)=>{
+      ctx.fillStyle = i === 0 ? "#ffffff" : "#dcb7ff";
+      ctx.font = i === 0 ? "900 86px Arial, Helvetica, sans-serif" : "800 58px Arial, Helvetica, sans-serif";
+      ctx.fillText(String(line).toUpperCase(), w/2, 190 + i*96);
+    });
+  });
+}
+
+function createMatrixBillboardTexture(kind = "outer"){
+  const width = 1024;
+  const height = kind === "main" ? 1024 : 512;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.anisotropy = 8;
+  let frame = 0;
+  const columns = 46;
+  const drops = Array.from({ length: columns }, (_,i)=> (i * 17) % height);
+  function paint(){
+    frame++;
+    ctx.fillStyle = "rgba(2,3,8,0.98)";
+    ctx.fillRect(0,0,width,height);
+    ctx.fillStyle = "rgba(185,90,255,0.22)";
+    ctx.fillRect(0,0,width,height);
+    ctx.font = "700 24px monospace";
+    ctx.textAlign = "center";
+    for (let i=0;i<columns;i++){
+      const x = (i + 0.5) * (width / columns);
+      for (let j=0;j<12;j++){
+        const y = (drops[i] + j*34) % height;
+        const alpha = Math.max(0.08, 0.88 - j*0.07);
+        ctx.fillStyle = `rgba(218,180,255,${alpha})`;
+        ctx.fillText(Math.random() > 0.5 ? "1" : "0", x, y);
+      }
+      drops[i] = (drops[i] + 4 + (i % 3)) % height;
+    }
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "rgba(255,255,255,0.96)";
+    ctx.font = kind === "main" ? "900 92px Arial, Helvetica, sans-serif" : "900 60px Arial, Helvetica, sans-serif";
+    ctx.fillText(kind === "main" ? "SVR POKER" : "SVR", width/2, height*0.42);
+    ctx.fillStyle = "rgba(230,194,255,0.92)";
+    ctx.font = kind === "main" ? "800 42px Arial, Helvetica, sans-serif" : "800 34px Arial, Helvetica, sans-serif";
+    ctx.fillText(kind === "main" ? "PLAY MONEY • SOCIAL VR • COMMUNITY" : "ALL IN", width/2, height*0.56);
+    texture.needsUpdate = true;
+  }
+  paint();
+  return {
+    texture,
+    update(){
+      if (frame % 2 === 0) paint();
+      else frame++;
+    }
+  };
+}
+
+function createOrbHaloSprite(color = 0xffffff, extraOpacity = 0){
+  const tex = canvasTexture(256, 256, (ctx,w,h)=>{
+    const g = ctx.createRadialGradient(w/2,h/2,4,w/2,h/2,w/2);
+    g.addColorStop(0,"rgba(255,255,255,0.88)");
+    g.addColorStop(0.22,"rgba(255,255,255,0.32)");
+    g.addColorStop(1,"rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+  });
+  const mat = new THREE.SpriteMaterial({
+    map: tex,
+    color,
+    transparent: true,
+    opacity: Math.min(0.85, 0.36 + Math.max(0, extraOpacity || 0)),
+    depthWrite: false,
+    depthTest: true,
+    blending: THREE.AdditiveBlending
+  });
+  return new THREE.Sprite(mat);
+}
+
 function makeSpriteTexture(){
   return canvasTexture(128, 128, (x,w,h)=>{
     const g = x.createRadialGradient(w/2,h/2,3,w/2,h/2,58);

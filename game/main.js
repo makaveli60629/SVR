@@ -271,7 +271,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready • PHASE-173-WINNER-PROOF-HAND-HISTORY-LOCK. Winner proof and hand history enabled. Keys: F fold, X check, C call, R raise, A all-in, H next hand.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready • PHASE-173-1-MATRIX-BILLBOARD-BOOT-HOTFIX. Winner proof active. Matrix billboard boot hotfix applied. Keys: F fold, X check, C call, R raise, A all-in, H next hand.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
