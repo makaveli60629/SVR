@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK
+ * Build: PHASE-192-SMOKE-TEST-AUTOMATION-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK';
+const BUILD = 'PHASE-192-SMOKE-TEST-AUTOMATION-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

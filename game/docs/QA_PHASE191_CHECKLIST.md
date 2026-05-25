@@ -1,8 +1,8 @@
-# Phase 191 QA Checklist
+# Phase 192 QA Checklist
 
-- Open `/game/?v=phase191`.
+- Open `/game/?v=phase192`.
 - Press `V` and confirm SVR DEPLOY PREFLIGHT panel appears.
-- Confirm build displays `PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK`.
+- Confirm build displays `PHASE-192-SMOKE-TEST-AUTOMATION-LOCK`.
 - Press `Q` and confirm QA overlay still works.
 - Press `X` and confirm session JSON download works.
 - Press `Y` and confirm copy export path does not break runtime.

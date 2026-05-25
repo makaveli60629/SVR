@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK
+ * Build: PHASE-192-SMOKE-TEST-AUTOMATION-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK';
+const BUILD = 'PHASE-192-SMOKE-TEST-AUTOMATION-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

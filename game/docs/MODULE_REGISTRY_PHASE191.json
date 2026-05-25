@@ -1,6 +1,6 @@
 {
   "phase": 191,
-  "build": "PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK",
+  "build": "PHASE-192-SMOKE-TEST-AUTOMATION-LOCK",
   "modules_added": [
     "modules/deploy_verify.js"
   ],

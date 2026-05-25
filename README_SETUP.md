@@ -1,5 +1,5 @@
-# SVR Phase 191 Backend Starter
+# SVR Phase 192 Backend Starter
 
-Build: `PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK`
+Build: `PHASE-192-SMOKE-TEST-AUTOMATION-LOCK`
 
-Adds deploy preflight telemetry endpoints. No secrets included.
+Adds smoke-test telemetry endpoints. No secrets included.

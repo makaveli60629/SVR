@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK",
-  "phase": 191,
+  "build": "PHASE-192-SMOKE-TEST-AUTOMATION-LOCK",
+  "phase": 192,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "deploy verifier, preflight QA, live build mismatch detection"
+  "featureLock": "smoke test automation, runtime readiness checklist, QA/download/deploy verifier integration"
 }
