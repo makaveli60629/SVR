@@ -1,4 +1,4 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

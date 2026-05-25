@@ -1,7 +1,7 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
-Phase 236 hardens boot by removing optional QA/telemetry panel modules from the static `main.js` import chain.
+Phase 238 hardens boot by removing optional QA/telemetry panel modules from the static `main.js` import chain.
 
 ## Direct fix
 - Adds `game/modules/optional_module_loader.js`
@@ -15,4 +15,4 @@ Phase 236 hardens boot by removing optional QA/telemetry panel modules from the 
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase236-optionalloader` and press `F10`.
+Open `/game/?v=phase238-optionalloader` and press `F10`.

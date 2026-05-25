@@ -1,6 +1,6 @@
 {
   "phase": 202,
-  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
+  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
   "modules": [
     "boot.js",
     "modules/boot_fallback.js",

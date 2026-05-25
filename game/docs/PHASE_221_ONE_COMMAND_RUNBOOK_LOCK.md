@@ -1,7 +1,7 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
-Phase 236 adds an in-game runbook for the simplified one-command PowerShell update flow.
+Phase 238 adds an in-game runbook for the simplified one-command PowerShell update flow.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 236 adds an in-game runbook for the simplified one-command PowerShell upda
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase236-runbook` and press `N`.
+Open `/game/?v=phase238-runbook` and press `N`.

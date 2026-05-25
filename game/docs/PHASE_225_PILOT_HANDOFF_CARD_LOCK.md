@@ -1,7 +1,7 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
-Phase 236 adds a pilot handoff card so non-technical testers can open one concise panel with the test link, what to verify, what to report, and the support shortcuts.
+Phase 238 adds a pilot handoff card so non-technical testers can open one concise panel with the test link, what to verify, what to report, and the support shortcuts.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 236 adds a pilot handoff card so non-technical testers can open one concis
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase236-handoff` and press `H`.
+Open `/game/?v=phase238-handoff` and press `H`.

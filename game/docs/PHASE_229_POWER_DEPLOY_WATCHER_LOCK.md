@@ -1,7 +1,7 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
-Phase 236 adds a Power Deploy Watcher panel for the new PowerShell-only workflow.
+Phase 238 adds a Power Deploy Watcher panel for the new PowerShell-only workflow.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 236 adds a Power Deploy Watcher panel for the new PowerShell-only workflow
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase236-powerdeploy` and press `F6`.
+Open `/game/?v=phase238-powerdeploy` and press `F6`.

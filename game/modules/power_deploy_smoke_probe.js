@@ -1,16 +1,16 @@
 (function(){
-  const BUILD = "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK";
+  const BUILD = "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK";
   const routes = [
     ["Game index", "./index.html"],
-    ["Main module", "./main.js?v=phase236"],
+    ["Main module", "./main.js?v=phase238"],
     ["Version", "./version.json"],
     ["Game deploy health", "./deploy-health.json"],
     ["Root deploy health", "../deploy-health.json"],
-    ["Optional loader", "./modules/optional_module_loader.js?v=phase236"],
+    ["Optional loader", "./modules/optional_module_loader.js?v=phase238"],
     ["Stable bridge", "./modules/enterprise_bridge.js"],
     ["Phase 230 bridge alias", "./modules/enterprise_bridge_phase230.js"],
-    ["Phase 236 bridge alias", "./modules/enterprise_bridge_phase236.js"],
-    ["Boot fallback", "./modules/boot_fallback.js?v=phase236"]
+    ["Phase 238 bridge alias", "./modules/enterprise_bridge_phase238.js"],
+    ["Boot fallback", "./modules/boot_fallback.js?v=phase238"]
   ];
 
   const state = {
@@ -27,7 +27,7 @@
   }
 
   async function probe(label, url){
-    const full = url + (url.includes("?") ? "&" : "?") + "probe=phase236-" + Date.now();
+    const full = url + (url.includes("?") ? "&" : "?") + "probe=phase238-" + Date.now();
     const started = performance.now();
     try {
       const r = await fetch(full, { cache: "no-store" });
@@ -35,7 +35,7 @@
       const ms = Math.round(performance.now() - started);
       let json = null;
       try { json = JSON.parse(text); } catch(_e) {}
-      const hasPhase = text.includes("PHASE-234") || text.includes("phase236") || text.includes('"phase":234') || text.includes('"phase": 236');
+      const hasPhase = text.includes("PHASE-234") || text.includes("phase238") || text.includes('"phase":234') || text.includes('"phase": 238');
       return { label, url, ok: r.ok, status: r.status, ms, bytes: text.length, hasPhase, json, sample: text.slice(0, 180) };
     } catch(err) {
       return { label, url, ok: false, error: String(err && err.message || err) };
@@ -47,7 +47,7 @@
     for(const [label, url] of routes) checks.push(await probe(label, url));
     state.checks = checks;
     state.checkedAt = new Date().toISOString();
-    const requiredOk = checks.filter(x => ["Main module","Version","Optional loader","Stable bridge","Phase 236 bridge alias"].includes(x.label)).every(x => x.ok);
+    const requiredOk = checks.filter(x => ["Main module","Version","Optional loader","Stable bridge","Phase 238 bridge alias"].includes(x.label)).every(x => x.ok);
     const phaseVisible = checks.some(x => x.hasPhase);
     state.status = requiredOk && phaseVisible ? "SMOKE_PROBE_OK" : "NEEDS_REVIEW";
     window.dispatchEvent(new CustomEvent("svr_power_deploy_smoke_probe_update", { detail: { ...state } }));
@@ -76,7 +76,7 @@
     const p = panel();
     if(show) p.style.display = "block";
     const rows = (state.checks || []).map(c => {
-      const marker = c.hasPhase ? " · phase236" : "";
+      const marker = c.hasPhase ? " · phase238" : "";
       const detail = c.error || ((c.status || "") + " · " + (c.ms || "?") + "ms · " + (c.bytes || 0) + " bytes" + marker);
       return `<tr><td>${c.ok ? "✅" : "⚠️"}</td><td><b>${esc(c.label)}</b></td><td>${esc(c.url)}</td><td>${esc(detail)}</td></tr>`;
     }).join("");

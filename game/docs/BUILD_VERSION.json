@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
-  "phase": 236,
+  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
+  "phase": 238,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "VR input diagnostic, right-stick axis evidence, fist teleport tester proof"
+  "featureLock": "hand teleport face-toggle, point-and-pinch destination, no release shutoff"
 }

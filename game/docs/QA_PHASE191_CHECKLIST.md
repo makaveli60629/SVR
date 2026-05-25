@@ -2,7 +2,7 @@
 
 - Open `/game/?v=phase192`.
 - Press `V` and confirm SVR DEPLOY PREFLIGHT panel appears.
-- Confirm build displays `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`.
+- Confirm build displays `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`.
 - Press `Q` and confirm QA overlay still works.
 - Press `X` and confirm session JSON download works.
 - Press `Y` and confirm copy export path does not break runtime.

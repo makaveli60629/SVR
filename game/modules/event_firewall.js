@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+ * Build: PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK';
+const BUILD = 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

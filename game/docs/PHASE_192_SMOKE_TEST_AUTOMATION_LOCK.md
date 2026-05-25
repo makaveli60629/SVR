@@ -1,6 +1,6 @@
 # Phase 199 — Smoke Test Automation Lock
 
-Build: `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`
+Build: `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

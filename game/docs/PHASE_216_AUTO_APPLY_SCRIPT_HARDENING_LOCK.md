@@ -1,6 +1,6 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
-Phase 236 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 238 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

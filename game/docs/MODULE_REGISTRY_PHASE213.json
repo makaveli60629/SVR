@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
+  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase236.js"
+    "game/modules/enterprise_bridge_phase238.js"
   ],
   "protected": {
     "publicPageTouched": false,

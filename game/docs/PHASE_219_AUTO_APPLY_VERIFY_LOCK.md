@@ -1,7 +1,7 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
-Phase 236 adds a verification surface for the simplified one-command PowerShell updater.
+Phase 238 adds a verification surface for the simplified one-command PowerShell updater.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 236 adds a verification surface for the simplified one-command PowerShell 
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase236-autoverify` and press `O`.
+Open `/game/?v=phase238-autoverify` and press `O`.

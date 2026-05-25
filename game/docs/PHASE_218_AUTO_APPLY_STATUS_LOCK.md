@@ -1,9 +1,9 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
-Phase 236 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
+Phase 238 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
 
 ## Test
-Open `/game/?v=phase236-autoapplystatus` and press `I`.
+Open `/game/?v=phase238-autoapplystatus` and press `I`.
 
 ## Locked
 - Public Matrix launch page untouched.

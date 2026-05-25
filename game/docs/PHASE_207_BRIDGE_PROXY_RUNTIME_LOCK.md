@@ -1,4 +1,4 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
 Install a first-run bridge proxy before event/firewall/poker modules so missing `record*` methods cannot crash the runtime.
@@ -12,5 +12,5 @@ Install a first-run bridge proxy before event/firewall/poker modules so missing 
 
 ## Added files
 - `game/modules/bridge_proxy.js`
-- `game/modules/enterprise_bridge_phase236.js`
+- `game/modules/enterprise_bridge_phase238.js`
 - `game/docs/MODULE_REGISTRY_PHASE207.json`

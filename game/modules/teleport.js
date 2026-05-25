@@ -113,6 +113,19 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let lastRightToggle = false;
   let lastLeftFistToggle = false;
   let lastRightFistToggle = false;
+  const inputState = {
+    build: "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
+    phase: 238,
+    rightStickMove: true,
+    rightStickTurn: true,
+    fistTeleport: true,
+    leftAxes: [],
+    rightAxes: [],
+    leftStick: { x: 0, y: 0, pair: [0, 1], source: "left" },
+    rightStick: { x: 0, y: 0, pair: [2, 3], source: "right" },
+    move: { x: 0, y: 0, source: "idle" },
+    lastUpdatedAt: 0
+  };
 
   const head = new THREE.Vector3();
   const headDir = new THREE.Vector3();
@@ -158,29 +171,30 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     return proxy?.userData?.gamepad || proxy?.userData?.inputSource?.gamepad || proxy?.userData?.controller?.inputSource?.gamepad || null;
   }
 
+  function deadzone(v, min = 0.14){
+    return Math.abs(v || 0) < min ? 0 : (v || 0);
+  }
+
+  function axisPair(gp, pair, source = "unknown"){
+    const axes = gp?.axes || [];
+    const x = deadzone(axes[pair[0]] || 0);
+    const y = deadzone(axes[pair[1]] || 0);
+    return { x, y, pair, source, mag: Math.hypot(x, y) };
+  }
+
+  function bestStick(gp, side = "left"){
+    if (!gp?.axes?.length) return { x: 0, y: 0, pair: [0, 1], source: side, mag: 0 };
+    const pairs = gp.axes.length >= 4
+      ? (side === "right" ? [[2,3], [0,1]] : [[0,1], [2,3]])
+      : [[0,1]];
+    const sticks = pairs.map(pair => axisPair(gp, pair, side));
+    sticks.sort((a,b)=> b.mag - a.mag);
+    const chosen = sticks[0] || { x: 0, y: 0, pair: [0,1], source: side, mag: 0 };
+    return { x: chosen.x, y: chosen.y, pair: chosen.pair, source: side, mag: chosen.mag };
+  }
+
   function getStick(gp, side = "left") {
-    if (!gp?.axes?.length) return { x: 0, y: 0 };
-    const axes = gp.axes;
-    let x = 0, y = 0;
-    if (axes.length >= 4) {
-      if (side === "right") {
-        x = axes[2] || 0;
-        y = axes[3] || 0;
-        if (Math.abs(x) < 0.001 && Math.abs(y) < 0.001) {
-          x = axes[0] || 0;
-          y = axes[1] || 0;
-        }
-      } else {
-        x = axes[0] || 0;
-        y = axes[1] || 0;
-      }
-    } else {
-      x = axes[0] || 0;
-      y = axes[1] || 0;
-    }
-    if (Math.abs(x) < 0.14) x = 0;
-    if (Math.abs(y) < 0.14) y = 0;
-    return { x, y };
+    return bestStick(gp, side);
   }
 
   function getButtonValue(gp, idx){
@@ -229,13 +243,29 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     );
   }
 
+
+  function resetTeleportVisuals(){
+    pinchHoldStart = 0;
+    triggerHoldStart = 0;
+    stableTargetMs = 0;
+    lastAimValid = false;
+    pointer.visible = false;
+    ring.visible = false;
+    hideArc();
+    setGlow(false);
+  }
+
+  function clearTeleportMode(){
+    mode = false;
+    active = null;
+    activeMode = "hand";
+    resetTeleportVisuals();
+  }
+
   function toggleMode(preferred = "right"){
     mode = !mode;
     if (!mode){
-      active = null;
-      activeMode = "hand";
-      pinchHoldStart = 0;
-      triggerHoldStart = 0;
+      clearTeleportMode();
       return mode;
     }
     const preferredController = preferred === "left" ? leftControllerRef : rightControllerRef;
@@ -281,17 +311,33 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
 
     const leftStick = getStick(leftGp, "left");
     const rightStick = getStick(rightGp || leftGp, "right");
+    const rightFallback = getStick(rightGp, "left");
+
+    // Quest lock: prefer the physical right controller vertical axis for forward/back.
+    // Some browsers expose the right thumbstick on axes [2,3], others on [0,1].
+    const calibratedRightY = Math.abs(rightStick.y) >= Math.abs(rightFallback.y) ? rightStick.y : rightFallback.y;
+    const calibratedRightX = Math.abs(rightStick.x) >= Math.abs(rightFallback.x) ? rightStick.x : rightFallback.x;
+
+    inputState.leftAxes = Array.from(leftGp?.axes || []);
+    inputState.rightAxes = Array.from(rightGp?.axes || []);
+    inputState.leftStick = leftStick;
+    inputState.rightStick = { ...rightStick, fallbackPair: rightFallback.pair, calibratedX: calibratedRightX, calibratedY: calibratedRightY };
+    inputState.lastUpdatedAt = performance.now();
+    window.SVR_TELEPORT_INPUT_STATE = inputState;
 
     // Right stick X remains 45-degree snap turn.
-    if (Math.abs(rightStick.x) > 0.72 && performance.now() > snapCooldownUntil){
-      playerYaw += Math.sign(rightStick.x) * (Math.PI / 4);
+    if (Math.abs(calibratedRightX) > 0.72 && performance.now() > snapCooldownUntil){
+      playerYaw += Math.sign(calibratedRightX) * (Math.PI / 4);
       applyReferenceSpace();
       snapCooldownUntil = performance.now() + 220;
     }
 
-    // Movement lock: left stick still works, and right-stick Y now also moves forward/back.
-    const moveX = leftStick.x;
-    const moveY = Math.abs(leftStick.y) > 0.12 ? leftStick.y : rightStick.y;
+    // Movement lock: left stick works, and right-stick Y always moves forward/back when used.
+    const moveX = Math.abs(leftStick.x) > 0.12 ? leftStick.x : 0;
+    const moveY = Math.abs(calibratedRightY) > 0.12 ? calibratedRightY : leftStick.y;
+    const moveSource = Math.abs(calibratedRightY) > 0.12 ? "right-stick-y" : (Math.abs(leftStick.y) > 0.12 || Math.abs(leftStick.x) > 0.12 ? "left-stick" : "idle");
+    inputState.move = { x: moveX, y: moveY, source: moveSource };
+
     const mag = Math.hypot(moveX, moveY);
     if (mag < 0.12) return;
 
@@ -301,7 +347,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (headDir.lengthSq() < 1e-5) headDir.set(0, 0, -1);
     headDir.normalize();
     const rightDir = new THREE.Vector3(headDir.z, 0, -headDir.x).normalize();
-    const speed = 2.95;
+    const speed = 3.05;
     const stepX = (rightDir.x * moveX + headDir.x * (-moveY)) * speed * dt;
     const stepZ = (rightDir.z * moveX + headDir.z * (-moveY)) * speed * dt;
     const nextX = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
@@ -335,28 +381,38 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     lastLeftToggle = leftToggle;
     lastRightToggle = rightToggle;
 
-    // Fist teleport lock: hand fist works even when controller fallback is available.
-    // First fist press opens hand teleport mode. Release after aiming teleports.
-    const leftFist = !!leftHandRef?.joints && isFist(leftHandRef);
-    const rightFist = !!rightHandRef?.joints && isFist(rightHandRef);
-    if (leftFist && !lastLeftFistToggle && now > cooldownUntil){
-      mode = !(mode && active === leftHandRef && activeMode === "hand");
-      active = mode ? leftHandRef : null;
-      activeMode = "hand";
-      cooldownUntil = now + 260;
-      pinchHoldStart = 0;
-      triggerHoldStart = 0;
+    // Hand teleport toggle lock:
+    // - ON/OFF only happens when the hand is near the face/chin.
+    // - Pointing away from the face will never toggle off; it is reserved for destination selection.
+    const leftFace = !!leftHandRef?.joints && handNearFace(leftHandRef);
+    const rightFace = !!rightHandRef?.joints && handNearFace(rightHandRef);
+    const leftToggleGesture = leftFace && (isPinching(leftHandRef) || isFist(leftHandRef));
+    const rightToggleGesture = rightFace && (isPinching(rightHandRef) || isFist(rightHandRef));
+
+    if (leftToggleGesture && !lastLeftFistToggle && now > cooldownUntil){
+      if (mode && activeMode === "hand" && active === leftHandRef){
+        clearTeleportMode();
+      } else {
+        mode = true;
+        active = leftHandRef;
+        activeMode = "hand";
+        resetTeleportVisuals();
+      }
+      cooldownUntil = now + 360;
     }
-    if (rightFist && !lastRightFistToggle && now > cooldownUntil){
-      mode = !(mode && active === rightHandRef && activeMode === "hand");
-      active = mode ? rightHandRef : null;
-      activeMode = "hand";
-      cooldownUntil = now + 260;
-      pinchHoldStart = 0;
-      triggerHoldStart = 0;
+    if (rightToggleGesture && !lastRightFistToggle && now > cooldownUntil){
+      if (mode && activeMode === "hand" && active === rightHandRef){
+        clearTeleportMode();
+      } else {
+        mode = true;
+        active = rightHandRef;
+        activeMode = "hand";
+        resetTeleportVisuals();
+      }
+      cooldownUntil = now + 360;
     }
-    lastLeftFistToggle = leftFist;
-    lastRightFistToggle = rightFist;
+    lastLeftFistToggle = leftToggleGesture;
+    lastRightFistToggle = rightToggleGesture;
 
     if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){
       pointer.visible = false;
@@ -387,9 +443,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
         ? "Controllers active • right stick forward/back • right stick snap turn • fist TP"
-        : "TELEPORT OFF • make fist to aim • release fist to teleport";
+        : "TELEPORT OFF • face pinch/fist toggles ON";
       statusCb(idleMsg);
-      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready • right stick moves" : "Hands ready • fist teleports");
+      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready • right stick moves" : "Hands ready • face pinch/fist toggles TP");
       return;
     }
 
@@ -459,37 +515,40 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
 
     const pinch = isPinching(active);
     const fistHeld = isFist(active);
-    const handAction = pinch || fistHeld;
-    if (active.userData._wasHandTeleportAction === undefined) active.userData._wasHandTeleportAction = false;
-    if (handAction && !active.userData._wasHandTeleportAction) pinchHoldStart = now;
+    const nearFace = handNearFace(active);
+    const destinationPinch = pinch && !nearFace;
+    const destinationFist = fistHeld && !nearFace;
+
+    if (active.userData._wasDestinationPinch === undefined) active.userData._wasDestinationPinch = false;
+    if (destinationPinch && !active.userData._wasDestinationPinch) pinchHoldStart = now;
     const held = pinchHoldStart ? (now - pinchHoldStart) : 0;
-    if (active.userData._wasHandTeleportAction && !handAction && held > 220 && stableTargetMs > 120 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
+
+    // Point-and-pinch lock:
+    // A face/chin pinch toggles teleport ON/OFF.
+    // A pointed pinch away from face selects the destination and teleports.
+    // Release alone no longer turns teleport off.
+    if (destinationPinch && held > 90 && stableTargetMs > 100 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
       const ok = teleportByDelta(smoothedTarget);
       if (ok){
         lastTP = now + 220;
-        cooldownUntil = now + 260;
-        mode = false;
-        active = null;
-        pinchHoldStart = 0;
-        stableTargetMs = 0;
-        lastAimValid = false;
-        pointer.visible = false;
-        ring.visible = false;
-        hideArc();
-        setGlow(false);
+        cooldownUntil = now + 300;
+        clearTeleportMode();
+        statusCb("TELEPORTED • point + pinch destination accepted");
       } else {
         cooldownUntil = now + 180;
         pinchHoldStart = 0;
         stableTargetMs = 0;
-        statusCb("TELEPORT RESET • aim again");
+        statusCb("TELEPORT RESET • point again");
       }
     }
-    if (!handAction) pinchHoldStart = 0;
-    active.userData._wasHandTeleportAction = handAction;
+
+    if (!destinationPinch) pinchHoldStart = 0;
+    active.userData._wasDestinationPinch = destinationPinch;
     active.userData._wasPinching = pinch;
+    active.userData._wasHandTeleportAction = destinationPinch || destinationFist;
     modeCb("Hands: TELEPORT ON");
-    statusCb("HAND TP ON • hold fist or pinch • release to teleport");
+    statusCb(nearFace ? "HAND TP ON • face pinch/fist toggles OFF" : "HAND TP ON • point and pinch destination");
   }
 
-  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
+  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode, inputState: { ...inputState } }) };
 }

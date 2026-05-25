@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Bridge Self-Test & Auto-Heal Module
- * Build: PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+ * Build: PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
  * Purpose: verify bridge recorder methods at runtime, patch missing aliases, and emit a clear health report without stopping the game loop.
  */
-const BUILD = 'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK';
+const BUILD = 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK';
 const REQUIRED_RECORDERS = [
   'recordHandResult','recordPlayerAction','recordActionLog','recordLegalActions','recordShowdown','recordSidePot',
   'recordTurnIndicator','recordWatchTurnIndicator','recordDealerButton','recordRebuy','recordDecisionAid','recordTelemetry',

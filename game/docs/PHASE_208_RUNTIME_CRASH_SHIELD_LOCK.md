@@ -1,4 +1,4 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

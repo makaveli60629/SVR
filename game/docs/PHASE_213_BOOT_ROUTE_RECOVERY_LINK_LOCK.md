@@ -1,4 +1,4 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
 Prevent boot-route confusion after cache/import failures by adding a dependency-free route recovery module and correcting fallback private-scene links.

@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`
+Build: `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

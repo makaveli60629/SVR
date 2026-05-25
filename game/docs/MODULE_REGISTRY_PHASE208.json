@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
+  "build": "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
   "phase": 208,
   "modules": [
     "runtime_crash_shield.js",
     "bridge_proxy.js",
-    "enterprise_bridge_phase236.js",
+    "enterprise_bridge_phase238.js",
     "event_firewall.js"
   ],
   "public_page_touched": false

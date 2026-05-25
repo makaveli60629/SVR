@@ -1,7 +1,7 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
-Phase 236 fixes the VR input complaints and spawn obstruction reported by the user.
+Phase 238 fixes the VR input complaints and spawn obstruction reported by the user.
 
 ## Direct fixes
 - Right controller stick Y now moves forward/backward.
@@ -18,4 +18,4 @@ Phase 236 fixes the VR input complaints and spawn obstruction reported by the us
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase236-inputspawn` and press `F3`.
+Open `/game/?v=phase238-inputspawn` and press `F3`.

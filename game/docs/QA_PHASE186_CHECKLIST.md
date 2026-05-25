@@ -1,6 +1,6 @@
 # Phase 199 QA Checklist
 
-- [ ] /game/version.json shows PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+- [ ] /game/version.json shows PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 - [ ] Hand-history panel shows BUTTON / SB / BB line.
 - [ ] If a stack reaches zero, next hand displays a rebuy ledger entry.
 - [ ] No public Matrix launch page files are modified.

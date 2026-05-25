@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Deploy Verifier / Preflight QA Module
- * Build: PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+ * Build: PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
  * Purpose: catch stale deploys, mismatched game/version/deploy-health data, and runtime drift before testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK';
+const BUILD = 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK';
 const EXPECTED_PHASE = 194;
 
 async function fetchJsonSafe(url) {

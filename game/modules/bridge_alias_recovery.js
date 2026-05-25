@@ -1,11 +1,11 @@
 (function(){
-  const BUILD = "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK";
+  const BUILD = "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK";
   const aliases = [
     "./modules/enterprise_bridge.js",
     "./modules/enterprise_bridge_phase229.js",
     "./modules/enterprise_bridge_phase230.js",
-    "./modules/enterprise_bridge_phase236.js",
-    "./modules/enterprise_bridge_phase236.js"
+    "./modules/enterprise_bridge_phase238.js",
+    "./modules/enterprise_bridge_phase238.js"
   ];
   const state = {
     build: BUILD,
@@ -22,7 +22,7 @@
   }
 
   async function probe(url){
-    const full = url + (url.includes("?") ? "&" : "?") + "v=phase236-" + Date.now();
+    const full = url + (url.includes("?") ? "&" : "?") + "v=phase238-" + Date.now();
     try {
       const r = await fetch(full, { cache: "no-store" });
       const text = await r.text();
@@ -35,7 +35,7 @@
   async function run(){
     const checks = [];
     for(const alias of aliases) checks.push(await probe(alias));
-    checks.push(await probe("./main.js?v=phase236"));
+    checks.push(await probe("./main.js?v=phase238"));
     state.checks = checks;
     state.checkedAt = new Date().toISOString();
     state.status = checks.every(c => c.ok) ? "BRIDGE_ALIASES_OK" : "MISSING_ALIAS";

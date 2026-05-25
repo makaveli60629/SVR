@@ -1,11 +1,11 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase236.js`
+- `game/modules/enterprise_bridge_phase238.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

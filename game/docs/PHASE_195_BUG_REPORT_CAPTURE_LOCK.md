@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`
+Build: `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`
 
 ## Added
 - In-game bug report capture panel.

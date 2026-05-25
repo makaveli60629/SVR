@@ -1,13 +1,13 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
-Phase 236 fixes the live Phase 230 boot fallback by adding bridge alias files for stale and current main.js imports.
+Phase 238 fixes the live Phase 230 boot fallback by adding bridge alias files for stale and current main.js imports.
 
 ## Direct fix
 - Adds `game/modules/enterprise_bridge_phase229.js`
 - Adds `game/modules/enterprise_bridge_phase230.js`
-- Adds `game/modules/enterprise_bridge_phase236.js`
-- Adds `game/modules/enterprise_bridge_phase236.js`
+- Adds `game/modules/enterprise_bridge_phase238.js`
+- Adds `game/modules/enterprise_bridge_phase238.js`
 - Updates `main.js` to import the stable bridge directly.
 - Adds `game/modules/bridge_alias_recovery.js`
 - Adds F9 alias check panel.
@@ -21,4 +21,4 @@ The live boot report shows `main.js?v=phase230` failed to dynamically import. Th
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase236-bridgealias` and press `F9`.
+Open `/game/?v=phase238-bridgealias` and press `F9`.

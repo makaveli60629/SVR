@@ -1,8 +1,8 @@
-// PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+// PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
+    build: "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

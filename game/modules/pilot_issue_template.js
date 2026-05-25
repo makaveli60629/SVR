@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK";
+  const BUILD = "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK";
   const state = {
     build: BUILD,
     phase: 227,
@@ -48,7 +48,7 @@
     const blob = new Blob([template()], { type: "text/plain" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "svr-pilot-issue-template-phase236.txt";
+    a.download = "svr-pilot-issue-template-phase238.txt";
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);

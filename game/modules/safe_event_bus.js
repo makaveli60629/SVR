@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Safe Event Bus
- * Build: PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+ * Build: PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
  * Purpose: sandbox SVR custom-event listeners so a missing recorder/listener cannot freeze gameplay.
  */
-const BUILD = 'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK';
+const BUILD = 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK';
 const ORIGINAL_ADD = EventTarget.prototype.addEventListener;
 const ORIGINAL_REMOVE = EventTarget.prototype.removeEventListener;
 const ORIGINAL_DISPATCH = EventTarget.prototype.dispatchEvent;

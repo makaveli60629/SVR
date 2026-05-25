@@ -1,6 +1,6 @@
 # Phase 200 — Pilot Testing Ready Lock
 
-Build: `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`
+Build: `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`
 
 ## Protected rules
 

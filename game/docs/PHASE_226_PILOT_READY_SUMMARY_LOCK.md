@@ -1,7 +1,7 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
-Phase 236 adds a Pilot Ready Summary panel that gives one consolidated go/no-go view for the test build.
+Phase 238 adds a Pilot Ready Summary panel that gives one consolidated go/no-go view for the test build.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 236 adds a Pilot Ready Summary panel that gives one consolidated go/no-go 
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase236-pilotready` and press `Y`.
+Open `/game/?v=phase238-pilotready` and press `Y`.

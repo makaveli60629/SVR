@@ -1,6 +1,6 @@
 # QA Phase 199
 
-- [ ] Confirm build marker says `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`.
+- [ ] Confirm build marker says `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`.
 - [ ] Start a hand and verify contribution line appears.
 - [ ] Trigger all-in action and verify ALL-IN player list appears.
 - [ ] At showdown, verify side-pot summary appears in the hand-history panel.

@@ -1,6 +1,6 @@
 # Phase 199 — Runtime QA Snapshot Lock
 
-Build: `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`
+Build: `PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK`
 
 ## Scope
 - Adds `game/modules/runtime_qa.js`.

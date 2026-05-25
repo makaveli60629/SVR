@@ -1,11 +1,11 @@
 /* SVR Phase 213 cache-busted enterprise bridge import. Carries Phase 209 safe event bus bridge and recorder guards. */
 /**
  * SVR Poker — Enterprise Bridge Phase 208
- * Build: PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+ * Build: PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
  * Purpose: cache-busted bridge with proxy-compatible safe recorder aliases so poker events cannot crash the render loop.
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
-const BUILD = 'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK';
+const BUILD = 'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK';
 
 const EVENT_TO_RECORDER = [
   ['svr_poker_hand_result', 'recordHandResult', 'hand_result'],
@@ -167,7 +167,7 @@ export default SVREnterpriseBridge;
 (function(){
   const bridge = window.SVR_ENTERPRISE_BRIDGE || window.SVRBridge || {};
   const names = ['recordDealerButton','recordRebuy','recordDecisionAid','recordAllIn','recordFoldEligibility','recordDeployPreflight','recordSmokeTest','recordReleaseCandidate','recordRuntimeQA','recordSessionExport','recordBugReport','recordTesterFeedback','recordTestQueue','recordTestReportBundle','recordDemoCertification','recordPilotReady','recordSafeEventBus'];
-  bridge.queue = bridge.queue || function(type, payload){ try { (window.__SVR_BRIDGE_QUEUE__ = window.__SVR_BRIDGE_QUEUE__ || []).push({ type, payload, at:new Date().toISOString(), build:'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK' }); } catch(_){} };
+  bridge.queue = bridge.queue || function(type, payload){ try { (window.__SVR_BRIDGE_QUEUE__ = window.__SVR_BRIDGE_QUEUE__ || []).push({ type, payload, at:new Date().toISOString(), build:'PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK' }); } catch(_){} };
   for (const n of names) if (typeof bridge[n] !== 'function') bridge[n] = function(payload){ return bridge.queue(n.replace(/^record/, '').replace(/[A-Z]/g, m => '_' + m.toLowerCase()).replace(/^_/, ''), payload); };
   window.SVR_ENTERPRISE_BRIDGE = bridge;
 })();

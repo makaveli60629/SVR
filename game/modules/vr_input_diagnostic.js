@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK";
+  const BUILD = "PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK";
   const state = {
     build: BUILD,
     phase: 236,

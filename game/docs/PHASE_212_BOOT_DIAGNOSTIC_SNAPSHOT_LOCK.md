@@ -1,4 +1,4 @@
-# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
+# PHASE-238-HAND-TELEPORT-PINCH-DESTINATION-LOCK
 
 ## Purpose
 Adds a boot diagnostic snapshot layer so testing can capture exact evidence for boot/import/CDN/cache/deploy mismatches instead of relying on screenshots alone.
