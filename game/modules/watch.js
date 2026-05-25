@@ -157,15 +157,15 @@ function buildButtons(state){
 
     { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'reikiRoomScene', label: 'ZEN DEN', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-
-    { id: 'pokerFold', label: 'FOLD', x: 24, y: 306, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pokerCall', label: 'CALL', x: 154, y: 306, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pokerRaise', label: 'RAISE', x: 284, y: 306, w: 118, h: 42, font: 21, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pokerAllIn', label: 'ALL-IN', x: 428, y: 120, w: 548, h: 48, font: 30, pinchOnly: true, hold: 0.18, margin: 8 },
+    { id: 'reikiRoomScene', label: 'REIKI RM', x: 284, y: 250, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
     { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
+
+    { id: 'pokerFold', label: 'FOLD', x: 24, y: 306, w: 92, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pokerCall', label: 'CALL', x: 124, y: 306, w: 92, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pokerRaise', label: 'RAISE', x: 224, y: 306, w: 92, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pokerAllIn', label: 'ALL-IN', x: 324, y: 306, w: 92, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
   ];
   if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
@@ -233,7 +233,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Poker: Fold / Call / Raise / All-In • Quick scenes • pinch with other hand', 36, 332);
+    ctx.fillText('Poker: Fold / Call / Raise / All-In • private scenes stay outside lobby • hold TP to aim', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();

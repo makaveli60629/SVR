@@ -1,0 +1,39 @@
+﻿{
+    "phase":  "PHASE-85-AMBIENTCG-SOURCE-LOCK",
+    "updatedUtc":  "2026-05-25T17:06:47Z",
+    "rules":  [
+                  "Do not bulk import the entire AmbientCG library into SVR.",
+                  "Use AmbientCG as an approved CC0 asset source.",
+                  "Prefer 1K or 2K textures for Quest/browser runtime.",
+                  "Only optimized final runtime files may enter game/assets/open/ambientcg/runtime.",
+                  "Keep game.zip under 25 MB.",
+                  "Do not touch website/site files in this game-side asset phase."
+              ],
+    "sources":  [
+                    {
+                        "id":  "ambientcg",
+                        "name":  "ambientCG",
+                        "website":  "https://ambientcg.com",
+                        "apiDocs":  "https://docs.ambientcg.com/api/",
+                        "apiV3Assets":  "https://ambientcg.com/api/v3/assets",
+                        "license":  "CC0",
+                        "allowedUse":  "Textures, HDRIs, materials, selected models after optimization",
+                        "runtimeUse":  "Local optimized copies only; no bulk library import",
+                        "svrpokerStatus":  "approved-source-not-bulk-imported"
+                    },
+                    {
+                        "id":  "polyhaven",
+                        "name":  "Poly Haven",
+                        "website":  "https://polyhaven.com",
+                        "note":  "Use as offline import source; do not call live API from game runtime.",
+                        "svrpokerStatus":  "approved-source"
+                    },
+                    {
+                        "id":  "os3a",
+                        "name":  "OpenSource3DAssets / OS3A",
+                        "website":  "https://www.opensource3dassets.com",
+                        "note":  "Use selected GLB assets only after license and size check.",
+                        "svrpokerStatus":  "approved-source"
+                    }
+                ]
+}

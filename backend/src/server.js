@@ -20,7 +20,7 @@ function auth(req,res,next){
 }
 
 app.get('/api/health', async (_req,res)=>{
-  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK' }); }
+  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK' }); }
   catch(err){ res.status(500).json({ status:'error', database:'failed', message:err.message }); }
 });
 
@@ -197,6 +197,79 @@ app.get('/api/game/showdowns', async (req,res)=>{
       .query('SELECT TOP (@Limit) Id, HandNumber, Winner, HandName, WinningCards, Board, Pot, PayloadJson, CreatedAt FROM GameShowdowns ORDER BY CreatedAt DESC');
     res.json({ ok:true, showdowns: result.recordset.map(row => ({ id: row.Id, handNumber: row.HandNumber, winner: row.Winner, handName: row.HandName, winningCards: row.WinningCards, board: row.Board, pot: row.Pot, createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
   }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
+});
+
+
+
+app.post('/api/game/bot-action-safety', async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const pool = await getPool();
+    await pool.request()
+      .input('HandNumber', sql.Int, payload.handNumber || null)
+      .input('Stage', sql.NVarChar(80), payload.stage || null)
+      .input('SeatIndex', sql.Int, payload.seatIndex ?? null)
+      .input('ActorName', sql.NVarChar(120), payload.actor || null)
+      .input('ActionName', sql.NVarChar(80), payload.action || null)
+      .input('RequestedAmount', sql.Int, payload.requested ?? null)
+      .input('PaidAmount', sql.Int, payload.paid ?? null)
+      .input('PotAmount', sql.Int, payload.pot ?? null)
+      .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(payload))
+      .query(`INSERT INTO GameBotActionSafety (HandNumber, Stage, SeatIndex, ActorName, ActionName, RequestedAmount, PaidAmount, PotAmount, PayloadJson)
+              VALUES (@HandNumber, @Stage, @SeatIndex, @ActorName, @ActionName, @RequestedAmount, @PaidAmount, @PotAmount, @PayloadJson)`);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message || 'bot_action_safety_failed' });
+  }
+});
+
+app.post('/api/game/runtime-recovery', async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const pool = await getPool();
+    await pool.request()
+      .input('HandNumber', sql.Int, payload.handNumber || null)
+      .input('Stage', sql.NVarChar(80), payload.stage || null)
+      .input('Message', sql.NVarChar(400), String(payload.message || '').slice(0, 400))
+      .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(payload))
+      .query('INSERT INTO GameRuntimeRecovery (HandNumber, Stage, Message, PayloadJson) VALUES (@HandNumber, @Stage, @Message, @PayloadJson)');
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message || 'runtime_recovery_failed' });
+  }
+});
+
+app.post('/api/game/turn-indicator', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const pool = await getPool();
+    await pool.request()
+      .input('HandNumber', sql.Int, body.handNumber || null)
+      .input('SeatIndex', sql.Int, body.seatIndex ?? null)
+      .input('ActorName', sql.NVarChar(120), body.actor || null)
+      .input('Stage', sql.NVarChar(80), body.stage || null)
+      .input('ActionName', sql.NVarChar(80), body.action || null)
+      .input('RemainingSeconds', sql.Int, body.remaining ?? null)
+      .input('PotAmount', sql.Int, body.pot ?? null)
+      .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(body))
+      .query('INSERT INTO GameTurnIndicators (HandNumber, SeatIndex, ActorName, Stage, ActionName, RemainingSeconds, PotAmount, PayloadJson) VALUES (@HandNumber, @SeatIndex, @ActorName, @Stage, @ActionName, @RemainingSeconds, @PotAmount, @PayloadJson)');
+    res.json({ ok:true });
+  } catch (err) {
+    res.status(500).json({ ok:false, error:err.message });
+  }
+});
+
+app.get('/api/game/turn-indicators', async (req, res) => {
+  try {
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit || 30)));
+    const pool = await getPool();
+    const result = await pool.request()
+      .input('Limit', sql.Int, limit)
+      .query('SELECT TOP (@Limit) Id, HandNumber, SeatIndex, ActorName, Stage, ActionName, RemainingSeconds, PotAmount, PayloadJson, CreatedAt FROM GameTurnIndicators ORDER BY CreatedAt DESC');
+    res.json({ ok:true, turnIndicators: result.recordset.map(row => ({ id: row.Id, handNumber: row.HandNumber, seatIndex: row.SeatIndex, actor: row.ActorName, stage: row.Stage, action: row.ActionName, remaining: row.RemainingSeconds, pot: row.PotAmount, createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
+  } catch (err) {
+    res.status(500).json({ ok:false, error:err.message });
+  }
 });
 
 app.listen(port, () => console.log(`SVR Enterprise API running on port ${port}`));

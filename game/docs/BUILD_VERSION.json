@@ -1,6 +1,6 @@
 {
   "build": "PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK",
   "phase": 185,
-  "source": "direct-game-folder",
-  "generatedAt": "2026-05-25T00:00:00Z"
+  "generatedAt": "2026-05-25T00:00:00Z",
+  "public_page_touched": false
 }

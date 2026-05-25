@@ -112,8 +112,8 @@ Source package used for this phase:
 
 
 ## Phase 35 audit / restore
-- Restored the SVR Wellness founder image and logo assets into the Reiki hub.
-- Rewrote the Reiki three-column storefront copy to read more professional and founder-led.
+- Restored the SVR Wellness partner image and logo assets into the Reiki hub.
+- Rewrote the Reiki three-column storefront copy to read more professional and partner-led.
 - Moved the PGA hub to the south-west wall.
 - Raised Moon and Mars higher behind the city skyline and increased their glow.
 - Added 07.mp3 as the first lobby music track.
@@ -131,4 +131,23 @@ Source package used for this phase:
 - donor modular split preserved
 
 ## Phase 42 modular overlay
-- SVR Wellness building ad refreshed to `SVR WELLNESS.COM / L.A.` in neon green presentation styling.
+- SVR Wellness building ad refreshed to `SVR WELLNESS / L.A.` in neon green presentation styling.
+
+
+## PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK
+- Added exact best-five winning cards to showdown, history, and telemetry.
+
+
+## PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK
+- Adds side-pot eligibility and payout resolution.
+- Emits `svr_poker_side_pot_resolution`.
+- Keeps public Matrix page untouched.
+
+
+## PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK
+
+- Added folded/mucked player eligibility state.
+- Folded players are excluded from side-pot winner eligibility.
+- Added mucked/folded line to table hand-history panel.
+- Added `svr_poker_fold_eligibility_update` event.
+- Public Matrix page untouched.
