@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-176-TURN-TIMER-TELEMETRY-LOCK
+ * Build: PHASE-177-HAND-HISTORY-STACK-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-176-TURN-TIMER-TELEMETRY-LOCK',
+  build: 'PHASE-177-HAND-HISTORY-STACK-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,

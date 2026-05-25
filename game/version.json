@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-176-TURN-TIMER-TELEMETRY-LOCK",
+  "build": "PHASE-177-HAND-HISTORY-STACK-LOCK",
   "phase": 176,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z"

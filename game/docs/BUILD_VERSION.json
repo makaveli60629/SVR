@@ -1,7 +1,6 @@
 {
-  "build": "PHASE-176-TURN-TIMER-TELEMETRY-LOCK",
-  "phase": 176,
+  "build": "PHASE-177-HAND-HISTORY-STACK-LOCK",
+  "phase": 177,
   "lockedPublicPage": "untouched",
-  "deployMode": "direct-game-folder + update/game.zip compatibility",
-  "generatedAt": "2026-05-25T00:00:00Z"
+  "focus": "hand history, stack accounting, winner sweep, poker telemetry"
 }

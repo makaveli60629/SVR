@@ -1,0 +1,16 @@
+{
+  "phase": "PHASE-177-HAND-HISTORY-STACK-LOCK",
+  "modules": {
+    "poker": "hand history, stacks, timer, telemetry",
+    "enterprise_bridge": "safe queue to backend, no secrets",
+    "private_scenes": [
+      "reiki",
+      "pga-drive",
+      "chip-putt",
+      "store-room",
+      "smoker-lounge",
+      "scorpion"
+    ]
+  },
+  "publicPageTouched": false
+}

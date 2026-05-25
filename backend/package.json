@@ -1,13 +1,20 @@
-
 {
-"name": "svr-backend",
-"version": "1.0.0",
-"main": "server.js",
-"scripts": {
-"start": "node server.js"
-},
-"dependencies": {
-"express": "^4.18.2",
-"socket.io": "^4.7.2"
-}
+  "name": "svr-enterprise-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "@azure/identity": "latest",
+    "bcryptjs": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "jsonwebtoken": "latest",
+    "mssql": "latest",
+    "stripe": "latest"
+  }
 }
