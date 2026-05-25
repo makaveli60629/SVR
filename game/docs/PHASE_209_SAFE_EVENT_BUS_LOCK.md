@@ -1,11 +1,11 @@
-# PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase221.js`
+- `game/modules/enterprise_bridge_phase222.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

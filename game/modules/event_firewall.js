@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+ * Build: PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-221-ONE-COMMAND-RUNBOOK-LOCK';
+const BUILD = 'PHASE-222-POST-DEPLOY-CHECKLIST-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

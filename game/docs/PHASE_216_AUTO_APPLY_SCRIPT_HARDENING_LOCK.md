@@ -1,6 +1,6 @@
-# PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
 
-Phase 221 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 222 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

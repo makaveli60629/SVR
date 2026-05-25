@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-221-ONE-COMMAND-RUNBOOK-LOCK",
+  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"

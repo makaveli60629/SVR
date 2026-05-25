@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Queue Dashboard
- * Build: PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+ * Build: PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
  * Purpose: convert tester feedback, bug reports, release candidate checks, and smoke tests into a compact triage queue.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-221-ONE-COMMAND-RUNBOOK-LOCK';
+const BUILD = 'PHASE-222-POST-DEPLOY-CHECKLIST-LOCK';
 const EXPECTED_PHASE = 197;
 const STORE_KEY = 'svr_test_queue_phase197';
 

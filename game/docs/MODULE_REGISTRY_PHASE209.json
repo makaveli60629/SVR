@@ -1,12 +1,12 @@
 {
-  "build": "PHASE-221-ONE-COMMAND-RUNBOOK-LOCK",
+  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
   "phase": 209,
   "modules": [
     "runtime_crash_shield.js",
     "safe_event_bus.js",
     "bridge_proxy.js",
     "event_firewall.js",
-    "enterprise_bridge_phase221.js",
+    "enterprise_bridge_phase222.js",
     "bridge_selftest.js"
   ],
   "public_page_touched": false,

@@ -1,6 +1,6 @@
 # QA Phase 199
 
-- [ ] Confirm build marker shows PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+- [ ] Confirm build marker shows PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
 - [ ] Press `Q` on desktop and confirm QA overlay opens/closes.
 - [ ] Start a hand and confirm legal/action/turn events update the QA overlay.
 - [ ] Confirm watch decision sync still changes CALL/CHECK labels.

@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-221-ONE-COMMAND-RUNBOOK-LOCK",
-  "phase": 221,
+  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
+  "phase": 222,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "one-command runbook, updater checklist, deploy/test command guide"
+  "featureLock": "post-deploy checklist, cache-bust verification, tester handoff steps"
 }

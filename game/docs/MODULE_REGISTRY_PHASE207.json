@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-221-ONE-COMMAND-RUNBOOK-LOCK",
+  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",
-    "game/modules/enterprise_bridge_phase221.js",
+    "game/modules/enterprise_bridge_phase222.js",
     "game/modules/bridge_selftest.js",
     "game/modules/event_firewall.js"
   ],

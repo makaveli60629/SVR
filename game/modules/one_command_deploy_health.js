@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-221-ONE-COMMAND-RUNBOOK-LOCK";
+  const BUILD = "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK";
   const state = {
     build: BUILD,
     phase: 220,
@@ -10,7 +10,7 @@
   };
 
   async function fetchText(url){
-    const full = url + (url.includes("?") ? "&" : "?") + "v=phase221-" + Date.now();
+    const full = url + (url.includes("?") ? "&" : "?") + "v=phase222-" + Date.now();
     try {
       const r = await fetch(full, { cache: "no-store" });
       const text = await r.text();

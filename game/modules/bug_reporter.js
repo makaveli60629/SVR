@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Bug Report Capture
- * Build: PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+ * Build: PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
  * Purpose: capture tester issue reports from inside the game without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-221-ONE-COMMAND-RUNBOOK-LOCK';
+const BUILD = 'PHASE-222-POST-DEPLOY-CHECKLIST-LOCK';
 const EXPECTED_PHASE = 195;
 const STORE_KEY = 'svr_bug_reports_phase197';
 

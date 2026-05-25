@@ -1,6 +1,6 @@
 # Phase 199 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-221-ONE-COMMAND-RUNBOOK-LOCK`
+Build: `PHASE-222-POST-DEPLOY-CHECKLIST-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

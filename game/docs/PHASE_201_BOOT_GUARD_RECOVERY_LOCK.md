@@ -1,4 +1,4 @@
-# PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
 
 ## Purpose
 Fix game stuck on `Booting…` by moving game startup behind a guarded loader.

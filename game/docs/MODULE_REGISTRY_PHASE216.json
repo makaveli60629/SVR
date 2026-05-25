@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-221-ONE-COMMAND-RUNBOOK-LOCK",
+  "build": "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK",
   "phase": 216,
   "modules": [
     "modules/auto_apply_helper.js",
-    "modules/enterprise_bridge_phase221.js"
+    "modules/enterprise_bridge_phase222.js"
   ],
   "public_page_touched": false,
   "notes": "Hardened single-script updater workflow. Chooses highest SVR_PHASE*_NEXT_PACKET.zip by phase number and applies safely."

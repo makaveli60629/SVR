@@ -1,4 +1,4 @@
-# PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
 
 ## Scope
 - Added dealer button / blind-state telemetry for every hand.

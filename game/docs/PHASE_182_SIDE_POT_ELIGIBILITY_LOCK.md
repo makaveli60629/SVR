@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-221-ONE-COMMAND-RUNBOOK-LOCK`
+Build: `PHASE-222-POST-DEPLOY-CHECKLIST-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

@@ -1,4 +1,4 @@
-# PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+# PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

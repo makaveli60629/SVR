@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Bridge Self-Test & Auto-Heal Module
- * Build: PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+ * Build: PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
  * Purpose: verify bridge recorder methods at runtime, patch missing aliases, and emit a clear health report without stopping the game loop.
  */
-const BUILD = 'PHASE-221-ONE-COMMAND-RUNBOOK-LOCK';
+const BUILD = 'PHASE-222-POST-DEPLOY-CHECKLIST-LOCK';
 const REQUIRED_RECORDERS = [
   'recordHandResult','recordPlayerAction','recordActionLog','recordLegalActions','recordShowdown','recordSidePot',
   'recordTurnIndicator','recordWatchTurnIndicator','recordDealerButton','recordRebuy','recordDecisionAid','recordTelemetry',

@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-221-ONE-COMMAND-RUNBOOK-LOCK";
+  const BUILD = "PHASE-222-POST-DEPLOY-CHECKLIST-LOCK";
   const state = {
     build: BUILD,
     phase: 219,
@@ -10,7 +10,7 @@
 
   async function checkJson(url){
     try {
-      const r = await fetch(url + (url.includes("?") ? "&" : "?") + "v=phase221-" + Date.now(), { cache: "no-store" });
+      const r = await fetch(url + (url.includes("?") ? "&" : "?") + "v=phase222-" + Date.now(), { cache: "no-store" });
       const text = await r.text();
       let json = null;
       try { json = JSON.parse(text); } catch(_e) {}

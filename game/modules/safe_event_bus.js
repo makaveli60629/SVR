@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Safe Event Bus
- * Build: PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
+ * Build: PHASE-222-POST-DEPLOY-CHECKLIST-LOCK
  * Purpose: sandbox SVR custom-event listeners so a missing recorder/listener cannot freeze gameplay.
  */
-const BUILD = 'PHASE-221-ONE-COMMAND-RUNBOOK-LOCK';
+const BUILD = 'PHASE-222-POST-DEPLOY-CHECKLIST-LOCK';
 const ORIGINAL_ADD = EventTarget.prototype.addEventListener;
 const ORIGINAL_REMOVE = EventTarget.prototype.removeEventListener;
 const ORIGINAL_DISPATCH = EventTarget.prototype.dispatchEvent;
