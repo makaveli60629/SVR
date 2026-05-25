@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK",
-  "phase": 193,
+  "build": "PHASE-194-PLAYTEST-WIZARD-LOCK",
+  "phase": 194,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "release candidate checklist, final preflight gate, module readiness pass"
+  "featureLock": "guided playtest wizard, keyboard shortcut map, release candidate test flow"
 }

@@ -1,5 +1,5 @@
 {
-  "phase": "PHASE-187-DECISION-AID-POT-ODDS-LOCK",
+  "phase": "PHASE-194-PLAYTEST-WIZARD-LOCK",
   "modules": {
     "poker_demo.js": "Showdown winning five cards, ranking payload, player/legal-action flow preserved",
     "enterprise_bridge.js": "Telemetry bridge for hand results/action logs/legal actions/showdown reveal",

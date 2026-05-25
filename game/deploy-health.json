@@ -1,7 +1,7 @@
 {
   "status": "ok",
-  "build": "PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK",
-  "phase": 193,
+  "build": "PHASE-194-PLAYTEST-WIZARD-LOCK",
+  "phase": 194,
   "source": "packaged-game-zip",
   "generatedAt": "2026-05-25T00:00:00Z"
 }

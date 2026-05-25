@@ -1,0 +1,28 @@
+{
+  "build": "PHASE-194-PLAYTEST-WIZARD-LOCK",
+  "phase": 194,
+  "shortcuts": [
+    "W",
+    "V",
+    "T",
+    "U",
+    "Q",
+    "X",
+    "Y",
+    "F",
+    "C",
+    "R",
+    "A",
+    "H"
+  ],
+  "public_page_touched": false,
+  "steps": [
+    "Open /game/?v=phase194",
+    "Press V for deploy preflight",
+    "Press T for smoke test",
+    "Press U for release candidate checklist",
+    "Press W for guided playtest wizard",
+    "Play one hand with F/C/R/A/H",
+    "Press X or Y for export"
+  ]
+}

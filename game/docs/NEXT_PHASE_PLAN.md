@@ -1,5 +1,10 @@
-# Next Phase Plan after PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK
+# Next Phase Plan after PHASE-194-PLAYTEST-WIZARD-LOCK
 
-1. Use Phase 193 verifier before every Quest test.
-2. If verifier reports stale deploy, re-run Auto Deploy and hard refresh with `?v=phase192`.
-3. Continue playable poker refinement only after verifier and session export pass.
+## Phase 195 recommendation
+Focus on final tester handoff:
+- one-page tester instructions
+- Quest/browser checklist
+- bug report intake
+- session export review flow
+- no lobby redesign
+- no public page edits

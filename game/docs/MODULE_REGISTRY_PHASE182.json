@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-187-DECISION-AID-POT-ODDS-LOCK",
-  "phase": 182,
+  "build": "PHASE-194-PLAYTEST-WIZARD-LOCK",
+  "phase": 194,
   "modules": {
     "poker_demo.js": [
       "side pot eligibility",

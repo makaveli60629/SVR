@@ -1,7 +1,7 @@
 # QA Phase 188
 
 - [ ] Open /game/?v=phase188.
-- [ ] Confirm build marker shows PHASE-190-SESSION-EXPORT-LOCK.
+- [ ] Confirm build marker shows PHASE-194-PLAYTEST-WIZARD-LOCK
 - [ ] Enter or preview game without black screen.
 - [ ] During player turn, watch shows actor YOU and countdown.
 - [ ] When no call is facing player, watch button reads CHECK.

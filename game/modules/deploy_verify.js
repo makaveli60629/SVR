@@ -1,11 +1,11 @@
 /**
  * SVR Poker — Deploy Verifier / Preflight QA Module
- * Build: PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK
+ * Build: PHASE-194-PLAYTEST-WIZARD-LOCK
  * Purpose: catch stale deploys, mismatched game/version/deploy-health data, and runtime drift before testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK';
-const EXPECTED_PHASE = 193;
+const BUILD = 'PHASE-194-PLAYTEST-WIZARD-LOCK';
+const EXPECTED_PHASE = 194;
 
 async function fetchJsonSafe(url) {
   try {

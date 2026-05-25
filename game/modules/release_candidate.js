@@ -1,11 +1,11 @@
 /**
  * SVR Poker — Release Candidate Checklist Module
- * Build: PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK
+ * Build: PHASE-194-PLAYTEST-WIZARD-LOCK
  * Purpose: combine deploy, smoke, QA, export, and runtime module checks into one tester-ready release gate.
  * Public Matrix page is untouched. No secrets. No SQL strings.
  */
-const BUILD = 'PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK';
-const EXPECTED_PHASE = 193;
+const BUILD = 'PHASE-194-PLAYTEST-WIZARD-LOCK';
+const EXPECTED_PHASE = 194;
 
 function safeText(value, max = 260) { return String(value ?? '').slice(0, max); }
 function yes(value) { return !!value; }
@@ -81,13 +81,14 @@ const SVRReleaseCandidate = {
     const checks = [];
     const versionBuild = safeText(version?.json?.build);
     const versionPhase = Number(version?.json?.phase || 0);
-    checks.push({ name:'version_build_phase_193', pass: versionBuild === BUILD && versionPhase === EXPECTED_PHASE, value: versionBuild || 'missing' });
+    checks.push({ name:'version_build_phase_194', pass: versionBuild === BUILD && versionPhase === EXPECTED_PHASE, value: versionBuild || 'missing' });
     checks.push({ name:'game_deploy_health', pass: !gameHealth.ok || safeText(gameHealth?.json?.build) === BUILD, value: gameHealth.ok ? safeText(gameHealth.json?.build) : (gameHealth.status || gameHealth.error || 'pending') });
     checks.push({ name:'root_deploy_health_seen', pass: rootHealth.ok || rootHealth.status === 404 || rootHealth.error, value: rootHealth.ok ? safeText(rootHealth.json?.build) : (rootHealth.status || rootHealth.error || 'pending') });
     checks.push({ name:'deploy_verifier', pass: yes(window.SVR_DEPLOY_VERIFIER), value: yes(window.SVR_DEPLOY_VERIFIER) });
     checks.push({ name:'smoke_test', pass: yes(window.SVR_SMOKE_TEST), value: yes(window.SVR_SMOKE_TEST) });
     checks.push({ name:'runtime_qa', pass: yes(window.SVR_RUNTIME_QA), value: yes(window.SVR_RUNTIME_QA) });
     checks.push({ name:'session_export', pass: yes(window.SVR_SESSION_EXPORT), value: yes(window.SVR_SESSION_EXPORT) });
+    checks.push({ name:'playtest_wizard', pass: yes(window.SVR_PLAYTEST_WIZARD), value: yes(window.SVR_PLAYTEST_WIZARD) });
     checks.push({ name:'enterprise_bridge', pass: yes(window.SVR_ENTERPRISE_BRIDGE), value: yes(window.SVR_ENTERPRISE_BRIDGE) });
     checks.push({ name:'watch_module_state', pass: yes(window.SVR_WATCH_STATE) || yes(document.getElementById('hud')), value: yes(window.SVR_WATCH_STATE) ? 'watch-state' : 'hud-fallback' });
     checks.push({ name:'private_scene_routes', pass: document.querySelectorAll('#sceneNav .scene-btn[data-url]').length >= 5, value: document.querySelectorAll('#sceneNav .scene-btn[data-url]').length });
@@ -136,8 +137,7 @@ const SVRReleaseCandidate = {
       ...s.checks.map(c => `${c.pass ? '✓' : '⚠'} ${c.name}: ${c.value}`),
       '',
       'Keys: U release checklist • T smoke • V verifier • Q QA • X export • Y copy'
-    ].join('
-');
+    ].join('\n');
   },
 
   publish(reason) {

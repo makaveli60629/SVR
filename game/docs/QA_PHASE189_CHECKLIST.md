@@ -1,6 +1,6 @@
 # QA Phase 189
 
-- [ ] Confirm build marker shows PHASE-190-SESSION-EXPORT-LOCK.
+- [ ] Confirm build marker shows PHASE-194-PLAYTEST-WIZARD-LOCK
 - [ ] Press `Q` on desktop and confirm QA overlay opens/closes.
 - [ ] Start a hand and confirm legal/action/turn events update the QA overlay.
 - [ ] Confirm watch decision sync still changes CALL/CHECK labels.

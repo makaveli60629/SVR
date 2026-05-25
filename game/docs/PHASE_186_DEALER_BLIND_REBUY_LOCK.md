@@ -1,4 +1,4 @@
-# PHASE-187-DECISION-AID-POT-ODDS-LOCK
+# PHASE-194-PLAYTEST-WIZARD-LOCK
 
 ## Scope
 - Added dealer button / blind-state telemetry for every hand.

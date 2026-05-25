@@ -1,6 +1,6 @@
 # Phase 185 — Fold Eligibility + Muck Lock
 
-Build: `PHASE-187-DECISION-AID-POT-ODDS-LOCK`
+Build: `PHASE-194-PLAYTEST-WIZARD-LOCK`
 
 ## Added
 

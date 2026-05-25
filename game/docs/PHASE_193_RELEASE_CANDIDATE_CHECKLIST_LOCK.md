@@ -1,6 +1,6 @@
-# Phase 193 — Release Candidate Checklist Lock
+# Phase 194 — Release Candidate Checklist Lock
 
-Build: `PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK`
+Build: `PHASE-194-PLAYTEST-WIZARD-LOCK`
 
 ## Purpose
 Adds a final in-game release candidate checklist that combines deploy verifier, smoke test, QA snapshot, session export, private route presence, and watch/HUD readiness into one gate.
@@ -17,4 +17,4 @@ Adds a final in-game release candidate checklist that combines deploy verifier, 
 - Public Matrix launch page untouched
 - Dealer body disabled; invisible deal/card logic preserved
 - Game package remains under 25 MB
-- Unapproved Reiki/Trueitive/founder branding remains removed
+- Unapproved Reiki/AWAITING APPROVAL/founder branding remains removed

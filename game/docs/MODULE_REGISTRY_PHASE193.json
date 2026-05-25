@@ -1,6 +1,6 @@
 {
-  "phase": 193,
-  "build": "PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK",
+  "phase": 194,
+  "build": "PHASE-194-PLAYTEST-WIZARD-LOCK",
   "modules_added": [
     "modules/release_candidate.js"
   ],

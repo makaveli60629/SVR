@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-190-SESSION-EXPORT-LOCK
+ * Build: PHASE-194-PLAYTEST-WIZARD-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-190-SESSION-EXPORT-LOCK',
+  build: 'PHASE-194-PLAYTEST-WIZARD-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,
@@ -23,6 +23,7 @@ const SVREnterpriseBridge = {
     window.addEventListener('svr_poker_rebuy_update', (event) => this.recordRebuy(event.detail || {}));
     window.addEventListener('svr_poker_decision_aid_update', (event) => this.recordDecisionAid(event.detail || {}));
     window.addEventListener('svr_runtime_telemetry', (event) => this.recordTelemetry(event.detail || {}));
+    window.addEventListener('svr_playtest_wizard_update', (event) => this.recordGeneric('/api/game/playtest-wizard', event.detail || {}));
     this.healthCheck();
     setInterval(() => this.flush(), 15000);
   },
@@ -45,6 +46,11 @@ const SVREnterpriseBridge = {
     this.pending.push(safePayload);
     if (this.pending.length > 75) this.pending.shift();
     this.flush();
+  },
+
+
+  recordGeneric(endpoint, payload) {
+    this.queue(endpoint, payload || {});
   },
 
   recordHandResult(payload) { this.enqueue('hand_result', payload); },

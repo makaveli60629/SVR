@@ -1,6 +1,6 @@
 # QA Phase 185
 
-- [ ] Confirm build marker says `PHASE-187-DECISION-AID-POT-ODDS-LOCK`.
+- [ ] Confirm build marker says `PHASE-194-PLAYTEST-WIZARD-LOCK`.
 - [ ] Start a hand and verify contribution line appears.
 - [ ] Trigger all-in action and verify ALL-IN player list appears.
 - [ ] At showdown, verify side-pot summary appears in the hand-history panel.

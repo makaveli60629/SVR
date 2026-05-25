@@ -1,6 +1,6 @@
 {
-  "phase": 181,
-  "build": "PHASE-187-DECISION-AID-POT-ODDS-LOCK",
+  "phase": 194,
+  "build": "PHASE-194-PLAYTEST-WIZARD-LOCK",
   "modules": [
     "poker_demo.js",
     "enterprise_bridge.js",

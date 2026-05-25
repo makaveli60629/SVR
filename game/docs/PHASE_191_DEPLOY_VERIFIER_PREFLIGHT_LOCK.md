@@ -1,6 +1,6 @@
-# Phase 193 — Deploy Verifier Preflight Lock
+# Phase 194 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK`
+Build: `PHASE-194-PLAYTEST-WIZARD-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

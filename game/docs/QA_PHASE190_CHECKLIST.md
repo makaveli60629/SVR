@@ -1,7 +1,7 @@
 # QA Checklist — Phase 190
 
 - Open `/game/?v=phase190`.
-- Confirm build marker reads `PHASE-190-SESSION-EXPORT-LOCK`.
+- Confirm build marker reads `PHASE-194-PLAYTEST-WIZARD-LOCK`.
 - Press `Q` and verify QA overlay still toggles.
 - Press `X` and confirm a JSON session export downloads.
 - Press `Y` and confirm clipboard copy succeeds where browser permissions allow.

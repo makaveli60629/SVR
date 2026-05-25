@@ -1,7 +1,7 @@
 # QA Phase 185
 
 - [ ] Open `/game/?v=phase183`.
-- [ ] Confirm build says PHASE-187-DECISION-AID-POT-ODDS-LOCK.
+- [ ] Confirm build says PHASE-194-PLAYTEST-WIZARD-LOCK
 - [ ] Start hand and verify history panel shows contribution line.
 - [ ] Press A or ALL-IN and verify stack does not go negative.
 - [ ] Verify all-in name appears in panel.

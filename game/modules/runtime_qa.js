@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK
+ * Build: PHASE-194-PLAYTEST-WIZARD-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-193-RELEASE-CANDIDATE-CHECKLIST-LOCK';
+const BUILD = 'PHASE-194-PLAYTEST-WIZARD-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),
