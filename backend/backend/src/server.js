@@ -20,7 +20,7 @@ function auth(req,res,next){
 }
 
 app.get('/api/health', async (_req,res)=>{
-  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-180-SHOWDOWN-WINNING-CARDS-LOCK' }); }
+  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-174-ENTERPRISE-AUTO-FINISH-LOCK' }); }
   catch(err){ res.status(500).json({ status:'error', database:'failed', message:err.message }); }
 });
 
@@ -90,112 +90,6 @@ app.post('/api/game/hand-results', async (req,res)=>{
       .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(req.body || {}))
       .query('INSERT INTO GameHandResults(PayloadJson) VALUES(@PayloadJson)');
     res.json({ ok:true });
-  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
-});
-
-
-app.post('/api/game/telemetry', async (req,res)=>{
-  try{
-    const events = Array.isArray(req.body?.events) ? req.body.events : [];
-    if (events.length === 0) return res.json({ ok:true, inserted:0 });
-    const pool = await getPool();
-    for (const event of events.slice(0, 50)) {
-      await pool.request()
-        .input('EventType', sql.NVarChar(80), event.type || 'unknown')
-        .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(event))
-        .query('INSERT INTO GameTelemetry(EventType, PayloadJson) VALUES(@EventType, @PayloadJson)');
-    }
-    res.json({ ok:true, inserted: Math.min(events.length, 50) });
-  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
-});
-
-app.get('/api/game/hand-history', async (req,res)=>{
-  try{
-    const limit = Math.max(1, Math.min(100, Number(req.query.limit || 20)));
-    const pool = await getPool();
-    const result = await pool.request()
-      .input('Limit', sql.Int, limit)
-      .query('SELECT TOP (@Limit) Id, PayloadJson, CreatedAt FROM GameHandResults ORDER BY CreatedAt DESC');
-    res.json({ ok:true, hands: result.recordset.map(row => ({ id: row.Id, createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
-  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
-});
-
-
-app.post('/api/game/action-log', async (req,res)=>{
-  try{
-    const pool = await getPool();
-    await pool.request()
-      .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(req.body || {}))
-      .query('INSERT INTO GameActionLog(PayloadJson) VALUES(@PayloadJson)');
-    res.json({ ok:true });
-  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
-});
-
-app.get('/api/game/action-log', async (req,res)=>{
-  try{
-    const limit = Math.max(1, Math.min(100, Number(req.query.limit || 30)));
-    const pool = await getPool();
-    const result = await pool.request()
-      .input('Limit', sql.Int, limit)
-      .query('SELECT TOP (@Limit) Id, PayloadJson, CreatedAt FROM GameActionLog ORDER BY CreatedAt DESC');
-    res.json({ ok:true, actions: result.recordset.map(row => ({ id: row.Id, createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
-  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
-});
-
-
-app.post('/api/game/legal-actions', async (req,res)=>{
-  try{
-    const body = req.body || {};
-    const legal = body.legal || body;
-    const pool = await getPool();
-    await pool.request()
-      .input('HandNumber', sql.Int, body.handNumber || null)
-      .input('Stage', sql.NVarChar(80), legal.stage || body.stage || null)
-      .input('CallAmount', sql.Int, Number(legal.callAmount || body.callAmount || 0))
-      .input('OptionsJson', sql.NVarChar(sql.MAX), JSON.stringify(legal.options || []))
-      .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(body))
-      .query('INSERT INTO GameLegalActions(HandNumber, Stage, CallAmount, OptionsJson, PayloadJson) VALUES(@HandNumber, @Stage, @CallAmount, @OptionsJson, @PayloadJson)');
-    res.json({ ok:true });
-  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
-});
-
-app.get('/api/game/legal-actions', async (req,res)=>{
-  try{
-    const limit = Math.max(1, Math.min(100, Number(req.query.limit || 30)));
-    const pool = await getPool();
-    const result = await pool.request()
-      .input('Limit', sql.Int, limit)
-      .query('SELECT TOP (@Limit) Id, HandNumber, Stage, CallAmount, OptionsJson, PayloadJson, CreatedAt FROM GameLegalActions ORDER BY CreatedAt DESC');
-    res.json({ ok:true, legalActions: result.recordset.map(row => ({ id: row.Id, handNumber: row.HandNumber, stage: row.Stage, callAmount: row.CallAmount, options: JSON.parse(row.OptionsJson || '[]'), createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
-  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
-});
-
-
-app.post('/api/game/showdown', async (req,res)=>{
-  try{
-    const body = req.body || {};
-    const pool = await getPool();
-    await pool.request()
-      .input('HandNumber', sql.Int, body.hand || body.handNumber || null)
-      .input('Winner', sql.NVarChar(120), body.winner || null)
-      .input('HandName', sql.NVarChar(120), body.handName || null)
-      .input('WinningCards', sql.NVarChar(80), body.winningCards || null)
-      .input('Board', sql.NVarChar(80), body.board || null)
-      .input('Pot', sql.Int, Number(body.pot || 0))
-      .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(body))
-      .query('INSERT INTO GameShowdowns(HandNumber, Winner, HandName, WinningCards, Board, Pot, PayloadJson) VALUES(@HandNumber, @Winner, @HandName, @WinningCards, @Board, @Pot, @PayloadJson)');
-    res.json({ ok:true });
-  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
-});
-
-app.get('/api/game/showdowns', async (req,res)=>{
-  try{
-    const limit = Math.max(1, Math.min(100, Number(req.query.limit || 30)));
-    const pool = await getPool();
-    const result = await pool.request()
-      .input('Limit', sql.Int, limit)
-      .query('SELECT TOP (@Limit) Id, HandNumber, Winner, HandName, WinningCards, Board, Pot, PayloadJson, CreatedAt FROM GameShowdowns ORDER BY CreatedAt DESC');
-    res.json({ ok:true, showdowns: result.recordset.map(row => ({ id: row.Id, handNumber: row.HandNumber, winner: row.Winner, handName: row.HandName, winningCards: row.WinningCards, board: row.Board, pot: row.Pot, createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
   }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
 });
 

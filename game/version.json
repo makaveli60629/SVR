@@ -1,6 +1,8 @@
 {
-  "build": "PHASE-183-FOLD-ELIGIBILITY-MUCK-LOCK",
-  "phase": 183,
-  "source": "direct-game-folder",
-  "generatedAt": "2026-05-25T00:00:00Z"
+  "build": "PHASE-174-ENTERPRISE-AUTO-FINISH-LOCK",
+  "phase": 174,
+  "date": "2026-05-25",
+  "public_page_touched": false,
+  "site_track": "site internal only",
+  "game_package_under_25mb_target": true
 }
