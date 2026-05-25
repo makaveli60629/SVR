@@ -1,8 +1,9 @@
 {
-  "build": "PHASE-200-PILOT-TESTING-READY-LOCK",
-  "phase": 200,
+  "build": "PHASE-201-BOOT-GUARD-RECOVERY-LOCK",
+  "phase": 201,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "pilot testing ready gate, tester checklist, launch-safe handoff bundle"
+  "bootGuard": true,
+  "recoveryOverlay": true
 }

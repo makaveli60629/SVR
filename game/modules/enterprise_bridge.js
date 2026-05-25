@@ -1,16 +1,17 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-199-DEMO-CERTIFICATION-LOCK
+ * Build: PHASE-201-BOOT-GUARD-RECOVERY-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-199-DEMO-CERTIFICATION-LOCK',
+  build: 'PHASE-201-BOOT-GUARD-RECOVERY-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,
 
   init() {
     window.SVREnterpriseBridge = this;
+    window.SVR_ENTERPRISE_BRIDGE = this;
     window.addEventListener('svr_poker_hand_result', (event) => this.recordHandResult(event.detail || {}));
     window.addEventListener('svr_poker_player_action', (event) => this.recordPlayerAction(event.detail || {}));
     window.addEventListener('svr_poker_action_log_update', (event) => this.recordActionLog(event.detail || {}));
@@ -50,8 +51,11 @@ const SVREnterpriseBridge = {
 
 
   recordGeneric(endpoint, payload) {
-    this.queue(endpoint, payload || {});
+    this.enqueue(endpoint || 'generic', payload || {});
   },
+
+  queue(type, payload) { this.enqueue(type || 'generic', payload || {}); },
+  postTelemetry(type, payload) { this.enqueue(type || 'telemetry', payload || {}); },
 
   recordHandResult(payload) { this.enqueue('hand_result', payload); },
   recordPlayerAction(payload) { this.enqueue('player_action', payload); },
