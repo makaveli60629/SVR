@@ -1,15 +1,9 @@
 {
-  "build": "PHASE-173-1-MATRIX-BILLBOARD-BOOT-HOTFIX",
-  "phase": 173,
-  "scope": "game",
-  "locked": [
-    "site untouched",
-    "true lobby preserved",
-    "dealer body disabled",
-    "left-to-right dealing preserved",
-    "turn-gated player poker actions",
-    "bot AI betting rounds",
-    "winner proof panel",
-    "hand history strip"
-  ]
+  "build": "PHASE-173-3-WORLD-SKYLINE-CACHE-BUST-BOOT-FIX",
+  "phase": "173.3",
+  "label": "PHASE-173-3-WORLD-SKYLINE-CACHE-BUST-BOOT-FIX",
+  "cacheBust": "phase173-3-skyline-cache-bust",
+  "fix": "Direct cache-busted world_skyline.js import plus local createMatrixBillboardTexture helper.",
+  "siteTouched": false,
+  "gameOnly": true
 }

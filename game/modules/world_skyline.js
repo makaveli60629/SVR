@@ -8,6 +8,7 @@ import { assetUrls, loadFirstTexture } from "./asset_base.js";
 import { createPokerDemo } from "./poker_demo.js";
 import { addPgaHub, tickPgaHub } from "./hubs/pga_hub.js";
 
+// PHASE-173.2 DIRECT BOOT FIX: createMatrixBillboardTexture is local and hoisted before skyline build.
 function delay(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
 async function withTimeout(promise, ms){
   return await Promise.race([

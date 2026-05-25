@@ -1,6 +1,9 @@
-﻿{
-    "phase":  173,
-    "scope":  "game",
-    "build":  "PHASE-173-WINNER-PROOF-HAND-HISTORY-LOCK",
-    "updatedAt":  "2026-05-25T03:49:56Z"
+{
+  "build": "PHASE-173-3-WORLD-SKYLINE-CACHE-BUST-BOOT-FIX",
+  "phase": "173.3",
+  "label": "PHASE-173-3-WORLD-SKYLINE-CACHE-BUST-BOOT-FIX",
+  "cacheBust": "phase173-3-skyline-cache-bust",
+  "fix": "Direct cache-busted world_skyline.js import plus local createMatrixBillboardTexture helper.",
+  "siteTouched": false,
+  "gameOnly": true
 }

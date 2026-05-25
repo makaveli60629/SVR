@@ -1,6 +1,9 @@
 {
-  "build": "PHASE-173-1-MATRIX-BILLBOARD-BOOT-HOTFIX",
-  "phase": 173,
-  "scope": "game",
-  "notes": "Winner proof and hand history lock with exact winning-card highlight, showdown explanation, and replay-ready hand log. Site untouched."
+  "build": "PHASE-173-3-WORLD-SKYLINE-CACHE-BUST-BOOT-FIX",
+  "phase": "173.3",
+  "label": "PHASE-173-3-WORLD-SKYLINE-CACHE-BUST-BOOT-FIX",
+  "cacheBust": "phase173-3-skyline-cache-bust",
+  "fix": "Direct cache-busted world_skyline.js import plus local createMatrixBillboardTexture helper.",
+  "siteTouched": false,
+  "gameOnly": true
 }

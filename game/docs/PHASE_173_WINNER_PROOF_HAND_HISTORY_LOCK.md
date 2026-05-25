@@ -1,4 +1,4 @@
-# PHASE-173-WINNER-PROOF-HAND-HISTORY-LOCK
+# PHASE-173-3-WORLD-SKYLINE-CACHE-BUST-BOOT-FIX
 
 ## Scope
 Game-side only. Website/site files remain untouched.
@@ -26,7 +26,7 @@ Convert the Phase 172 betting flow into a clearer tester-facing poker proof loop
 
 ## Test checklist
 1. Load `/game/?v=phase173-winner-proof-hand-history-lock`.
-2. Confirm visible build label is `PHASE-173-WINNER-PROOF-HAND-HISTORY-LOCK`.
+2. Confirm visible build label is `PHASE-173-3-WORLD-SKYLINE-CACHE-BUST-BOOT-FIX`.
 3. Play or wait through one full hand.
 4. Confirm showdown shows winner, payout, hand type, best-five cards, board, and reason.
 5. Confirm winning cards glow/lift.

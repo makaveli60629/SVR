@@ -3,7 +3,7 @@ import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
-import { buildSkylineRoom } from "./modules/world_skyline.js";
+import { buildSkylineRoom } from "./modules/world_skyline.js?v=phase173-3-skyline-cache-bust";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
@@ -271,7 +271,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready • PHASE-173-1-MATRIX-BILLBOARD-BOOT-HOTFIX. Winner proof active. Matrix billboard boot hotfix applied. Keys: F fold, X check, C call, R raise, A all-in, H next hand.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready • PHASE-173-3-WORLD-SKYLINE-CACHE-BUST-BOOT-FIX. Winner proof active. Matrix billboard boot hotfix applied. Keys: F fold, X check, C call, R raise, A all-in, H next hand.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
