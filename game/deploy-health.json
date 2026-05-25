@@ -1,9 +1,6 @@
 {
   "status": "ok",
-  "build": "PHASE-175-CLEAN-RUNTIME-POKER-DB-LOCK",
-  "date": "2026-05-25",
-  "scope": "game runtime cleanup, playable poker controls, private scene routing, internal site/backend wiring only",
-  "public_page_touched": false,
-  "brand_lock": "No unapproved Reiki sponsor/runtime references. Reiki uses SVR AWAITING APPROVAL placeholders.",
-  "package_rule": "game.zip must remain under 25 MB"
+  "build": "PHASE-176-TURN-TIMER-TELEMETRY-LOCK",
+  "source": "phase176-package",
+  "target": "/game"
 }

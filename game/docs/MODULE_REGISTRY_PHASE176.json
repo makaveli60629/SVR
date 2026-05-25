@@ -1,0 +1,16 @@
+{
+  "phase": "PHASE-176-TURN-TIMER-TELEMETRY-LOCK",
+  "modules": {
+    "poker_demo.js": "Turn timer, player action events, hand-result telemetry",
+    "enterprise_bridge.js": "Safe browser-side API/telemetry bridge",
+    "watch.js": "Wrist action buttons preserved",
+    "teleport.js": "Hold-to-aim, release-to-teleport preserved",
+    "world_skyline.js": "Lobby and private-scene portal targets preserved"
+  },
+  "protected": [
+    "root public page",
+    "matrix.js",
+    "public launch assets",
+    "unapproved Reiki sponsor/founder branding"
+  ]
+}

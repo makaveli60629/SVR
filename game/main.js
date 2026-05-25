@@ -7,6 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
+import "./modules/enterprise_bridge.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -256,7 +257,7 @@ const watch = createWristWatch({
     goPgaShort: ()=>openPrivatePage("./chip-putt.html"),
     goStoreRoom: ()=>openPrivatePage("./store-room.html"),
     goSmoker: ()=>openPrivatePage("./smoker-lounge.html"),
-    goScorpion: ()=>openPrivatePage("./scorpion.html"),
+    goScorpionRoom: ()=>openPrivatePage("./scorpion.html"),
     pokerFold: ()=>pokerAction("fold"),
     pokerCall: ()=>pokerAction("call"),
     pokerRaise: ()=>pokerAction("raise"),
@@ -274,6 +275,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
+window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: "PHASE-176-TURN-TIMER-TELEMETRY-LOCK" } }));
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold grip/A/trigger to aim teleport, release to teleport. Poker keys: F/C/R/A/H. Private scene buttons enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
