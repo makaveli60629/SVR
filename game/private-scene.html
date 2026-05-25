@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>SVR Phase 174 Private Scene Recovery</title>
+  <meta name="theme-color" content="#050508"/>
+  <style>
+    html,body{height:100%;margin:0;background:#050508;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif}
+    #scene{position:fixed;inset:0;background:radial-gradient(circle at 50% 30%,#201037,#050508 58%,#000 100%)}
+    #hud{position:fixed;left:12px;right:12px;top:12px;z-index:10;display:flex;justify-content:space-between;gap:10px;pointer-events:none}.pill{background:rgba(0,0,0,.84);border:1px solid rgba(246,226,127,.88);border-radius:999px;padding:8px 12px;color:#fff7cc;font-size:12px;font-weight:900}.panel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(820px,calc(100vw - 24px));min-height:520px;border:2px solid rgba(180,140,255,.9);border-radius:28px;background:rgba(0,0,0,.72);box-shadow:0 24px 90px rgba(0,0,0,.72),inset 0 0 42px rgba(180,140,255,.18);padding:18px}.logo{width:116px;height:116px;margin:0 auto 10px;background:url('../logo.png') center/contain no-repeat;filter:drop-shadow(0 0 16px #b48cff)}.title{text-align:center;font-size:28px;font-weight:1000;color:#fff}.sub{text-align:center;color:#e6d7ff;font-weight:900;margin-bottom:12px}.table{position:relative;margin:10px auto;width:min(680px,90vw);height:275px;border:2px solid #f6e27f;border-radius:50%/36%;background:radial-gradient(circle,#0f4737,#061b14 62%,#020403);box-shadow:0 18px 62px rgba(0,0,0,.6),inset 0 0 32px rgba(246,226,127,.16)}.tableLogo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:90px;height:90px;background:url('../logo.png') center/contain no-repeat;opacity:.66}.pot{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);border:1px solid #f6e27f;border-radius:999px;padding:8px 16px;background:rgba(0,0,0,.82);color:#f6e27f;font-weight:1000}.cards{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:8px}.board{top:70px}.hero{bottom:22px}.card{width:48px;height:68px;border-radius:9px;background:#fff;color:#111;display:grid;place-items:center;font-size:23px;font-weight:1000;border:2px solid #f6e27f;box-shadow:0 8px 22px rgba(0,0,0,.6)}.red{color:#c80030}.seat{position:absolute;width:94px;height:56px;border:1px solid #b48cff;border-radius:14px;background:rgba(0,0,0,.72);display:grid;place-items:center;text-align:center;font-size:11px;font-weight:1000;color:#e6d7ff}.active{border-color:#f6e27f;color:#f6e27f;box-shadow:0 0 18px #f6e27f}.s0{left:50%;bottom:88px;transform:translateX(-50%)}.s1{left:11%;bottom:92px}.s2{left:7%;top:88px}.s3{left:50%;top:24px;transform:translateX(-50%)}.s4{right:7%;top:88px}.s5{right:11%;bottom:92px}.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}.btn{border:1px solid rgba(246,226,127,.88);border-radius:999px;background:rgba(0,0,0,.85);color:#f6e27f;font-weight:1000;padding:11px 16px;cursor:pointer}.btn:hover{background:rgba(180,140,255,.26);color:#fff}.footer{position:fixed;left:12px;right:12px;bottom:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.nav{border:1px solid #7ff5c7;border-radius:999px;background:rgba(0,0,0,.82);color:#eafff7;padding:8px 12px;font-weight:900;text-decoration:none}.state{position:fixed;right:12px;top:58px;width:min(320px,calc(100vw - 24px));border:1px solid #7ff5c7;border-radius:16px;background:rgba(0,0,0,.78);padding:10px;color:#eafff7;font-size:12px;font-weight:900;white-space:pre-wrap}.warn{color:#ffb6c5}.ok{color:#7ff5c7}
+  </style>
+</head>
+<body>
+<div id="scene"></div>
+<div id="hud"><span class="pill" id="status">PHASE 174 PRIVATE SCENE RECOVERED</span><span class="pill" id="mode">BUILD: PHASE-174</span></div>
+<div class="panel">
+  <div class="logo"></div>
+  <div class="title" id="roomTitle">SCORPION ROOM</div>
+  <div class="sub" id="roomSub">Recovered private route • file restored • no 404</div>
+  <div class="table" id="table">
+    <div class="tableLogo"></div><div class="pot" id="pot">POT 30</div>
+    <div class="cards board" id="board"></div><div class="cards hero" id="hero"></div>
+    <div class="seat s0 active">PLAYER<br/>OPEN SOUTH</div><div class="seat s1">BOT 1</div><div class="seat s2">BOT 2</div><div class="seat s3">BOT 3</div><div class="seat s4">BOT 4</div><div class="seat s5">BOT 5</div>
+  </div>
+  <div class="actions"><button class="btn" data-a="fold">Fold</button><button class="btn" data-a="check">Check</button><button class="btn" data-a="call">Call</button><button class="btn" data-a="raise">Raise +25</button><button class="btn" data-a="allin">All-In</button><button class="btn" data-a="next">Next Hand</button></div>
+</div>
+<pre class="state" id="state"></pre>
+<div class="footer"><a class="nav" href="./index.html?v=phase174">Lobby</a><a class="nav" href="./private-scene.html?scene=scorpion&v=phase174">Scorpion</a><a class="nav" href="./private-scene.html?scene=reiki&v=phase174">Reiki</a><a class="nav" href="./private-scene.html?scene=pga&v=phase174">PGA</a><a class="nav" href="./private-scene.html?scene=lounge&v=phase174">Lounge</a></div>
+<script>
+const PHASE='PHASE-174-RECOVERY-BOOT-PRIVATE-SCENE-HOTFIX-LOCK';
+const params=new URLSearchParams(location.search); const scene=(params.get('scene')||'scorpion').toLowerCase();
+window.SVR_BUILD_PHASE=PHASE; window.SVR_SITE_TOUCHED_BY_GAME_TRACK=false; window.SVR_PHASE174_PRIVATE_SCENE={phase:PHASE,scene,siteTouched:false,gameTouched:true,fileRestored:true,no404:true};
+const title=document.getElementById('roomTitle'), sub=document.getElementById('roomSub'), board=document.getElementById('board'), hero=document.getElementById('hero'), potEl=document.getElementById('pot'), state=document.getElementById('state');
+title.textContent=scene.toUpperCase()+' ROOM';
+sub.textContent=scene==='scorpion'?'Recovered poker room • left-to-right deal • one open south seat':'Recovered private route • modular placeholder active';
+let hand=0,pot=30,street='PREFLOP',timer=20,history=[];
+const deck=['AS','KH','QD','JC','10S','9H','8D','7C','6S','5H','4D','3C','2S','AH','KD','QC','JS','10H']; let di=0; const draw=()=>deck[(di++)%deck.length];
+function red(c){return /H|D/.test(c)} function card(c){return '<span class="card '+(red(c)?'red':'')+'">'+c+'</span>'}
+let h=[],b=[]; function next(){hand++;di=hand%deck.length;pot=30;street='PREFLOP';timer=20;h=[draw(),draw()];b=[];history.unshift('Hand '+hand+' dealt left-to-right');render();}
+function advance(){timer=20;if(street==='PREFLOP'){street='FLOP';b=[draw(),draw(),draw()];pot+=20}else if(street==='FLOP'){street='TURN';b.push(draw());pot+=15}else if(street==='TURN'){street='RIVER';b.push(draw());pot+=15}else{history.unshift('Winner: PLAYER • pot '+pot);street='SHOWDOWN'}render();}
+function action(a){if(a==='next')return next(); if(a==='fold'){history.unshift('Player fold • bots win');street='SHOWDOWN'} else if(a==='raise'){pot+=50;history.unshift('Raise +25 • bot call')} else if(a==='call'){pot+=10;history.unshift('Call auto-staged')} else history.unshift(a.toUpperCase()); if(street!=='SHOWDOWN'&&a!=='fold')advance(); else render();}
+function render(){hero.innerHTML=h.map(card).join('')||card('--')+card('--');board.innerHTML=b.length?b.map(card).join(''):card('--')+card('--')+card('--');potEl.textContent='POT '+pot;state.textContent=PHASE+'\nScene: '+scene+'\nStreet: '+street+'\nTimer: '+timer+'s\nPot: '+pot+'\nPublic page touched: false\nPrivate scene: recovered\n\nHistory:\n'+history.slice(0,7).join('\n'); window.SVR_PHASE174_LAST_PRIVATE_STATE={phase:PHASE,scene,hand,street,pot,hero:h,board:b,history:[...history],at:new Date().toISOString()};}
+document.querySelectorAll('[data-a]').forEach(btn=>btn.onclick=()=>action(btn.dataset.a));next();setInterval(()=>{if(scene==='scorpion'&&street!=='SHOWDOWN'){timer--; if(timer<=0){history.unshift('Timer auto-check');advance();} render();}},1000);
+</script>
+</body>
+</html>
