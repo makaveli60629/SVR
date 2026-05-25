@@ -1,6 +1,6 @@
-# PHASE-218-AUTO-APPLY-STATUS-LOCK
+# PHASE-219-AUTO-APPLY-VERIFY-LOCK
 
-Phase 218 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 219 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

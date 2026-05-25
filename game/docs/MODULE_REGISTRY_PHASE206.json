@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
+  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
   "phase": 206,
   "modules_added": [
     "game/modules/bridge_selftest.js",
-    "game/modules/enterprise_bridge_phase218.js"
+    "game/modules/enterprise_bridge_phase219.js"
   ],
   "events": [
     "svr_bridge_selftest_update"

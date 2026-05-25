@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Load `/game/?v=phase185` without black screen.
-- [ ] Confirm title/version shows `PHASE-218-AUTO-APPLY-STATUS-LOCK`.
+- [ ] Confirm title/version shows `PHASE-219-AUTO-APPLY-VERIFY-LOCK`.
 - [ ] Confirm YOUR TURN countdown updates once per second.
 - [ ] Confirm hand-history panel shows TURN line.
 - [ ] Confirm action log still records player and bot actions.

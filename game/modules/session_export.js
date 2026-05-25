@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-218-AUTO-APPLY-STATUS-LOCK
+ * Build: PHASE-219-AUTO-APPLY-VERIFY-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-218-AUTO-APPLY-STATUS-LOCK';
+const BUILD = 'PHASE-219-AUTO-APPLY-VERIFY-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

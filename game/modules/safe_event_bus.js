@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Safe Event Bus
- * Build: PHASE-218-AUTO-APPLY-STATUS-LOCK
+ * Build: PHASE-219-AUTO-APPLY-VERIFY-LOCK
  * Purpose: sandbox SVR custom-event listeners so a missing recorder/listener cannot freeze gameplay.
  */
-const BUILD = 'PHASE-218-AUTO-APPLY-STATUS-LOCK';
+const BUILD = 'PHASE-219-AUTO-APPLY-VERIFY-LOCK';
 const ORIGINAL_ADD = EventTarget.prototype.addEventListener;
 const ORIGINAL_REMOVE = EventTarget.prototype.removeEventListener;
 const ORIGINAL_DISPATCH = EventTarget.prototype.dispatchEvent;

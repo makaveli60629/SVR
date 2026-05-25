@@ -1,6 +1,6 @@
 # Phase 200 — Pilot Testing Ready Lock
 
-Build: `PHASE-218-AUTO-APPLY-STATUS-LOCK`
+Build: `PHASE-219-AUTO-APPLY-VERIFY-LOCK`
 
 ## Protected rules
 

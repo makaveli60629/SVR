@@ -1,5 +1,5 @@
 
-# PHASE-218-AUTO-APPLY-STATUS-LOCK
+# PHASE-219-AUTO-APPLY-VERIFY-LOCK
 
 ## Purpose
 Fixes the PowerShell updater failure where the apply script wrapper passed git arguments incorrectly and Git opened help instead of running the intended subcommand.

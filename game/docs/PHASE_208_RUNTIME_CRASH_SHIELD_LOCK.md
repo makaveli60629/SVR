@@ -1,4 +1,4 @@
-# PHASE-218-AUTO-APPLY-STATUS-LOCK
+# PHASE-219-AUTO-APPLY-VERIFY-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

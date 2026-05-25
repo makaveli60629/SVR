@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
+  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"

@@ -1,4 +1,4 @@
-# PHASE-218-AUTO-APPLY-STATUS-LOCK
+# PHASE-219-AUTO-APPLY-VERIFY-LOCK
 
 ## Purpose
 Prevent boot-route confusion after cache/import failures by adding a dependency-free route recovery module and correcting fallback private-scene links.

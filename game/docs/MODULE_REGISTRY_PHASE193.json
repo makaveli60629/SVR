@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-218-AUTO-APPLY-STATUS-LOCK",
+  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
   "modules_added": [
     "modules/release_candidate.js"
   ],

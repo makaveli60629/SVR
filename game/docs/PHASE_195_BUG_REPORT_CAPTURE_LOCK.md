@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-218-AUTO-APPLY-STATUS-LOCK`
+Build: `PHASE-219-AUTO-APPLY-VERIFY-LOCK`
 
 ## Added
 - In-game bug report capture panel.

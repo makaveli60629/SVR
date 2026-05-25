@@ -1,6 +1,6 @@
 # Phase 199 — Release Candidate Checklist Lock
 
-Build: `PHASE-218-AUTO-APPLY-STATUS-LOCK`
+Build: `PHASE-219-AUTO-APPLY-VERIFY-LOCK`
 
 ## Purpose
 Adds a final in-game release candidate checklist that combines deploy verifier, smoke test, QA snapshot, session export, private route presence, and watch/HUD readiness into one gate.

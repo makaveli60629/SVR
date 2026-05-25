@@ -7,4 +7,4 @@
 5. Press **X** and confirm session export downloads.
 6. Confirm no public Matrix launch page files changed.
 
-Build: `PHASE-218-AUTO-APPLY-STATUS-LOCK`
+Build: `PHASE-219-AUTO-APPLY-VERIFY-LOCK`
