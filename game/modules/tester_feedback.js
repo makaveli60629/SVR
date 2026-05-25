@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Tester Feedback Triage
- * Build: PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
+ * Build: PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
  * Purpose: collect playtest verdicts and triage summaries after QA/smoke/bug-report passes.
  * Public Matrix page is not touched.
  */
-const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
+const BUILD = 'PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK';
 const EXPECTED_PHASE = 196;
 const STORE_KEY = 'svr_tester_feedback_phase197';
 

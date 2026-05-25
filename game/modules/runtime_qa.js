@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
+ * Build: PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
+const BUILD = 'PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

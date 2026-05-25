@@ -1,4 +1,4 @@
-# PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
+# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
 
 ## Purpose
 Fix game stuck on `Booting…` by moving game startup behind a guarded loader.

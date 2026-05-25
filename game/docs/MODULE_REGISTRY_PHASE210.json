@@ -1,10 +1,10 @@
 {
-  "phase": 210,
-  "build": "PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK",
+  "phase": 215,
+  "build": "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
   "modules": [
     "boot.js",
     "modules/boot_cache_watchdog.js",
-    "modules/enterprise_bridge_phase213.js",
+    "modules/enterprise_bridge_phase217.js",
     "modules/safe_event_bus.js",
     "modules/runtime_crash_shield.js"
   ],

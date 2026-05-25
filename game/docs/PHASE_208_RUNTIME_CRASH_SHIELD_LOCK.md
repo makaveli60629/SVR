@@ -1,4 +1,4 @@
-# PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
+# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

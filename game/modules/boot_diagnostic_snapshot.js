@@ -1,7 +1,7 @@
 
 /* SVR Phase 213 - Boot Diagnostic Snapshot Lock */
 (function(){
-  const BUILD = "PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK";
+  const BUILD = "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK";
   const MAX_ERRORS = 40;
   const state = {
     build: BUILD,
@@ -109,7 +109,7 @@
   function escapeHtml(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
   function toggle(){ state.visible = !state.visible; if (state.visible) snapshot('panel-open'); else render(); }
   async function copy(){ const snap = state.snapshots[state.snapshots.length-1] || await snapshot('copy'); await navigator.clipboard?.writeText?.(JSON.stringify(snap,null,2)); }
-  async function download(){ const snap = state.snapshots[state.snapshots.length-1] || await snapshot('download'); const blob = new Blob([JSON.stringify(snap,null,2)], {type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='svr-boot-diagnostic-phase213.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+  async function download(){ const snap = state.snapshots[state.snapshots.length-1] || await snapshot('download'); const blob = new Blob([JSON.stringify(snap,null,2)], {type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='svr-boot-diagnostic-phase217.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
   window.addEventListener('error', e => { state.errors.push({type:'error', at:new Date().toISOString(), message:e.message, source:e.filename, line:e.lineno, col:e.colno}); if(state.errors.length>MAX_ERRORS) state.errors.shift(); });
   window.addEventListener('unhandledrejection', e => { state.errors.push({type:'unhandledrejection', at:new Date().toISOString(), reason:clean(e.reason)}); if(state.errors.length>MAX_ERRORS) state.errors.shift(); });
   document.addEventListener('keydown', e => { if ((e.key||'').toLowerCase()==='d' && !e.repeat) toggle(); });

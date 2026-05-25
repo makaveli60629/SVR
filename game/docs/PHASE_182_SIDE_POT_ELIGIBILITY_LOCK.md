@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK`
+Build: `PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

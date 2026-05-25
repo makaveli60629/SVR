@@ -1,4 +1,4 @@
-# PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
+# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
+ * Build: PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
+const BUILD = 'PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

@@ -1,4 +1,4 @@
-# PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
+# PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
 
 ## Scope
 - Added dealer button / blind-state telemetry for every hand.

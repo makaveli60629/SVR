@@ -1,7 +1,7 @@
 # QA Checklist — Phase 199
 
 - Open `/game/?v=phase190`.
-- Confirm build marker reads `PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK`.
+- Confirm build marker reads `PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK`.
 - Press `Q` and verify QA overlay still toggles.
 - Press `X` and confirm a JSON session export downloads.
 - Press `Y` and confirm clipboard copy succeeds where browser permissions allow.

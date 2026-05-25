@@ -1,7 +1,7 @@
 # Phase 199 — Bot Street Action Safety Lock
 
 ## Build
-`PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK`
+`PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK`
 
 ## Purpose
 This phase locks the poker runtime against scheduled bot-action errors and hardens street betting events before the next polish pass.

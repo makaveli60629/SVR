@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK",
+  "build": "PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK",
   "phase": 206,
   "modules_added": [
     "game/modules/bridge_selftest.js",
-    "game/modules/enterprise_bridge_phase206.js"
+    "game/modules/enterprise_bridge_phase217.js"
   ],
   "events": [
     "svr_bridge_selftest_update"

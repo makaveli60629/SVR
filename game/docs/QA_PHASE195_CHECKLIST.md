@@ -1,7 +1,7 @@
 # QA Phase 199 Checklist
 
 - [ ] Open `/game/?v=phase197`.
-- [ ] Confirm version/deploy overlay shows `PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK`.
+- [ ] Confirm version/deploy overlay shows `PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK`.
 - [ ] Press `G` and confirm bug report panel opens.
 - [ ] Enter area/severity/device/notes and save a report.
 - [ ] Confirm report count increments.

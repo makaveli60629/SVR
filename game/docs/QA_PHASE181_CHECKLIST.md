@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Open `/game/?v=phase183`.
-- [ ] Confirm build says PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
+- [ ] Confirm build says PHASE-217-AUTO-APPLY-GIT-WRAPPER-FIX-LOCK
 - [ ] Start hand and verify history panel shows contribution line.
 - [ ] Press A or ALL-IN and verify stack does not go negative.
 - [ ] Verify all-in name appears in panel.
