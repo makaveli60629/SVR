@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-201-BOOT-GUARD-RECOVERY-LOCK",
-  "phase": 201,
+  "build": "PHASE-202-BOOT-FALLBACK-CDN-RECOVERY-LOCK",
+  "phase": 202,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "boot guard, stuck boot recovery, dynamic module loader, ready signal watchdog"
+  "featureLock": "boot fallback recovery shell, CDN/import timeout report, no-stuck boot hardening"
 }
