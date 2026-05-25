@@ -1,4 +1,4 @@
-# PHASE-219-AUTO-APPLY-VERIFY-LOCK
+# PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
 
 ## Purpose
 Fix game stuck on `Booting…` by moving game startup behind a guarded loader.

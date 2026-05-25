@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
+  "build": "PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK",
   "phase": 199,
   "modules": {
     "tester_feedback": "game/modules/tester_feedback.js",

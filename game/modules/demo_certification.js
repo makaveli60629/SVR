@@ -1,10 +1,10 @@
 /**
  * SVR Poker - Demo Certification Lock
- * Build: PHASE-219-AUTO-APPLY-VERIFY-LOCK
+ * Build: PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
  * Shortcut: Z
  * Purpose: combine QA, smoke, RC, feedback, bug reports, and report bundle into one demo-ready gate.
  */
-const BUILD = 'PHASE-219-AUTO-APPLY-VERIFY-LOCK';
+const BUILD = 'PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK';
 const STORE_KEY = 'svr_demo_certifications';
 
 function safeRead(name, fallback = null) {

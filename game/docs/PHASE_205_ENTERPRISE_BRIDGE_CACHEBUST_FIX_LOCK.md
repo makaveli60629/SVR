@@ -8,7 +8,7 @@ TypeError: this.recordDecisionAid is not a function
 ```
 
 ## Fix
-- Creates `game/modules/enterprise_bridge_phase219.js`.
+- Creates `game/modules/enterprise_bridge_phase220.js`.
 - Changes `main.js` to import the cache-busted bridge file instead of the previously cached bridge path.
 - Installs recorder aliases before event listeners.
 - Wraps event listeners so missing/future aliases queue safely instead of crashing the render loop.

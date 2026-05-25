@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
+  "build": "PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"

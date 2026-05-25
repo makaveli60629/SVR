@@ -1,4 +1,4 @@
-# PHASE-219-AUTO-APPLY-VERIFY-LOCK
+# PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
 
 ## Fix
 - Fixes runtime error: `this.recordDealerButton is not a function`.

@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-219-AUTO-APPLY-VERIFY-LOCK
+ * Build: PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-219-AUTO-APPLY-VERIFY-LOCK';
+const BUILD = 'PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

@@ -1,4 +1,4 @@
-# PHASE-219-AUTO-APPLY-VERIFY-LOCK
+# PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

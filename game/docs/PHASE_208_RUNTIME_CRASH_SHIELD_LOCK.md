@@ -1,4 +1,4 @@
-# PHASE-219-AUTO-APPLY-VERIFY-LOCK
+# PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

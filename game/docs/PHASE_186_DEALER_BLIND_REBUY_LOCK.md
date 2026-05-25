@@ -1,4 +1,4 @@
-# PHASE-219-AUTO-APPLY-VERIFY-LOCK
+# PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
 
 ## Scope
 - Added dealer button / blind-state telemetry for every hand.

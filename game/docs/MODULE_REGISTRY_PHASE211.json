@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
+  "build": "PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK",
   "public_page_touched": false,
   "modules": [
     "modules/runtime_crash_shield.js",
@@ -9,7 +9,7 @@
     "modules/marker_health.js",
     "modules/bridge_proxy.js",
     "modules/event_firewall.js",
-    "modules/enterprise_bridge_phase219.js",
+    "modules/enterprise_bridge_phase220.js",
     "modules/bridge_selftest.js"
   ]
 }

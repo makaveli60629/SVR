@@ -1,6 +1,6 @@
 # Phase 199 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-219-AUTO-APPLY-VERIFY-LOCK`
+Build: `PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

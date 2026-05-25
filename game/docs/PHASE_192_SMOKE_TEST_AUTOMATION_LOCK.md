@@ -1,6 +1,6 @@
 # Phase 199 — Smoke Test Automation Lock
 
-Build: `PHASE-219-AUTO-APPLY-VERIFY-LOCK`
+Build: `PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK`
 
 ## Added
 - `game/modules/smoke_test.js`

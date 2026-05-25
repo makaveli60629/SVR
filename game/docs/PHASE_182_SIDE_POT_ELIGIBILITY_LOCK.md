@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-219-AUTO-APPLY-VERIFY-LOCK`
+Build: `PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

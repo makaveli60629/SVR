@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Bug Report Capture
- * Build: PHASE-219-AUTO-APPLY-VERIFY-LOCK
+ * Build: PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
  * Purpose: capture tester issue reports from inside the game without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-219-AUTO-APPLY-VERIFY-LOCK';
+const BUILD = 'PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK';
 const EXPECTED_PHASE = 195;
 const STORE_KEY = 'svr_bug_reports_phase197';
 

@@ -1,8 +1,8 @@
-// PHASE-219-AUTO-APPLY-VERIFY-LOCK
+// PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
+    build: "PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

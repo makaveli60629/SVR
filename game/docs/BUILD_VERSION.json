@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
-  "phase": 219,
+  "build": "PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK",
+  "phase": 220,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "auto-apply verify overlay, deploy confirmation, one-command updater evidence"
+  "featureLock": "one-command deploy health, status verification, live marker confirmation"
 }

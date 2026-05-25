@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
+  "build": "PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK",
   "phase": 206,
   "modules_added": [
     "game/modules/bridge_selftest.js",
-    "game/modules/enterprise_bridge_phase219.js"
+    "game/modules/enterprise_bridge_phase220.js"
   ],
   "events": [
     "svr_bridge_selftest_update"

@@ -1,7 +1,7 @@
 # PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
 
 ## Purpose
-Phase 220 adds a verification surface for the simplified one-command PowerShell updater.
+Phase 220 adds a simple one-command deploy health surface so the project can confirm whether the latest package is actually visible after GitHub Pages deploy.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 220 adds a verification surface for the simplified one-command PowerShell 
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase220-autoverify` and press `O`.
+Open `/game/?v=phase220-deployhealth` and press `M`.

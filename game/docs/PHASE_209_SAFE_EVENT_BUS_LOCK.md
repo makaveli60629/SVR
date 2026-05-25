@@ -1,11 +1,11 @@
-# PHASE-219-AUTO-APPLY-VERIFY-LOCK
+# PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase219.js`
+- `game/modules/enterprise_bridge_phase220.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

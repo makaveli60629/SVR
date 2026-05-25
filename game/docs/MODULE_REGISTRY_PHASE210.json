@@ -1,10 +1,10 @@
 {
   "phase": 215,
-  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
+  "build": "PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK",
   "modules": [
     "boot.js",
     "modules/boot_cache_watchdog.js",
-    "modules/enterprise_bridge_phase219.js",
+    "modules/enterprise_bridge_phase220.js",
     "modules/safe_event_bus.js",
     "modules/runtime_crash_shield.js"
   ],

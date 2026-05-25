@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-219-AUTO-APPLY-VERIFY-LOCK
+ * Build: PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-219-AUTO-APPLY-VERIFY-LOCK';
+const BUILD = 'PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

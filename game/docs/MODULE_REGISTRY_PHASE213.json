@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
+  "build": "PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase219.js"
+    "game/modules/enterprise_bridge_phase220.js"
   ],
   "protected": {
     "publicPageTouched": false,

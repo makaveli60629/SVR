@@ -1,4 +1,4 @@
-# PHASE-219-AUTO-APPLY-VERIFY-LOCK
+# PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
 
 Phase 214 adds a boot route health verifier to confirm the lobby and private scene recovery links resolve after deployment.
 

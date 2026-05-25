@@ -1,4 +1,4 @@
-# PHASE-219-AUTO-APPLY-VERIFY-LOCK
+# PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
 
 ## Purpose
 Install a first-run bridge proxy before event/firewall/poker modules so missing `record*` methods cannot crash the runtime.
@@ -12,5 +12,5 @@ Install a first-run bridge proxy before event/firewall/poker modules so missing 
 
 ## Added files
 - `game/modules/bridge_proxy.js`
-- `game/modules/enterprise_bridge_phase219.js`
+- `game/modules/enterprise_bridge_phase220.js`
 - `game/docs/MODULE_REGISTRY_PHASE207.json`

@@ -1,12 +1,12 @@
 {
-  "build": "PHASE-219-AUTO-APPLY-VERIFY-LOCK",
+  "build": "PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK",
   "phase": 209,
   "modules": [
     "runtime_crash_shield.js",
     "safe_event_bus.js",
     "bridge_proxy.js",
     "event_firewall.js",
-    "enterprise_bridge_phase219.js",
+    "enterprise_bridge_phase220.js",
     "bridge_selftest.js"
   ],
   "public_page_touched": false,
