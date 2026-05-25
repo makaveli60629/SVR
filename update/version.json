@@ -1,10 +1,7 @@
-{
-  "build": "PHASE-174-MASTER-AUDIT-ROOM-WALKAROUND-LOCK",
-  "phase": "174",
-  "label": "PHASE-174-MASTER-AUDIT-ROOM-WALKAROUND-LOCK",
-  "cacheBust": "phase174-master-audit-room-walkaround-lock",
-  "siteTouched": false,
-  "gameOnly": true,
-  "updated": "2026-05-25",
-  "notes": "Full game-side audit lock: direct /game deploy alignment, private room walkaround pages, master checklist, and VR-ready lightweight scene routes."
+﻿{
+    "phase":  175,
+    "appliedAt":  "2026-05-25T04:53:08Z",
+    "build":  "PHASE-175-MASTER-MANIFEST-MODULE-COMPLETE-LOCK",
+    "siteTouched":  false,
+    "track":  "game-only"
 }

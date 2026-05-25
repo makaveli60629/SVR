@@ -3,10 +3,11 @@ import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
-import { buildSkylineRoom } from "./modules/world_skyline.js?v=phase174-master-audit-room-walkaround-lock";
+import { buildSkylineRoom } from "./modules/world_skyline.js?v=phase175-master-manifest-module-complete-lock";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
+import "./modules/enterprise_bridge.js?v=phase175-master-manifest-module-complete-lock";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -279,7 +280,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready • PHASE-174-MASTER-AUDIT-ROOM-WALKAROUND-LOCK. Winner proof active. Matrix billboard, Legend Hall, and poker history init boot hotfixes applied. Keys: F fold, X check, C call, R raise, A all-in, H next hand.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready • PHASE-175-MASTER-MANIFEST-MODULE-COMPLETE-LOCK. Winner proof active. Matrix billboard, Legend Hall, and poker history init boot hotfixes applied. Keys: F fold, X check, C call, R raise, A all-in, H next hand.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
