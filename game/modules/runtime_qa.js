@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-190-SESSION-EXPORT-LOCK
+ * Build: PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-190-SESSION-EXPORT-LOCK';
+const BUILD = 'PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

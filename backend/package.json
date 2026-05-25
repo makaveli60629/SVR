@@ -1,20 +1,12 @@
 {
-  "name": "svr-enterprise-api",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "@azure/identity": "latest",
-    "bcryptjs": "latest",
     "cors": "latest",
     "dotenv": "latest",
     "express": "latest",
-    "jsonwebtoken": "latest",
-    "mssql": "latest",
-    "stripe": "latest"
-  }
+    "mssql": "latest"
+  },
+  "type": "module"
 }

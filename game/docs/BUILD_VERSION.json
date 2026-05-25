@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-190-SESSION-EXPORT-LOCK",
-  "phase": 190,
-  "public_page_touched": false,
-  "game_package_under_25mb_target": true,
+  "build": "PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK",
+  "phase": 191,
   "source": "direct-game-folder",
-  "featureLock": "session export QA transcript"
+  "generatedAt": "2026-05-25T00:00:00Z",
+  "public_page_touched": false,
+  "featureLock": "deploy verifier, preflight QA, live build mismatch detection"
 }

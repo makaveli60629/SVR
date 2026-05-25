@@ -10,6 +10,7 @@ import { createWristWatch } from "./modules/watch.js";
 import "./modules/enterprise_bridge.js";
 import "./modules/runtime_qa.js";
 import "./modules/session_export.js";
+import "./modules/deploy_verify.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -102,7 +103,7 @@ let seatIndex = -1;
 let cash = 50000;
 
 const pokerHudState = {
-  build: "PHASE-190-SESSION-EXPORT-LOCK",
+  build: "PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK",
   actor: "TABLE",
   stage: "waiting",
   action: "waiting",
@@ -314,7 +315,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: "PHASE-190-SESSION-EXPORT-LOCK" } }));
+window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: "PHASE-191-DEPLOY-VERIFIER-PREFLIGHT-LOCK" } }));
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold grip/A/trigger to aim teleport, release to teleport. Poker keys: F/C/R/A/H. Private scene buttons enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
