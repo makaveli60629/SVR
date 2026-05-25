@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
+ * Build: PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK';
+const BUILD = 'PHASE-221-ONE-COMMAND-RUNBOOK-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }

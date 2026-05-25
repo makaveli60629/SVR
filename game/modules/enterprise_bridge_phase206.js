@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge Phase 206
- * Build: PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
+ * Build: PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
  * Purpose: cache-busted bridge with safe recorder aliases so poker events cannot crash the render loop.
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
-const BUILD = 'PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK';
+const BUILD = 'PHASE-221-ONE-COMMAND-RUNBOOK-LOCK';
 
 const EVENT_TO_RECORDER = [
   ['svr_poker_hand_result', 'recordHandResult', 'hand_result'],

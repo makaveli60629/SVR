@@ -1,7 +1,7 @@
 # PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
 
 ## Purpose
-Phase 221 adds a simple one-command deploy health surface so the project can confirm whether the latest package is actually visible after GitHub Pages deploy.
+Phase 221 adds an in-game runbook for the simplified one-command PowerShell update flow.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 221 adds a simple one-command deploy health surface so the project can con
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase221-deployhealth` and press `M`.
+Open `/game/?v=phase221-runbook` and press `N`.

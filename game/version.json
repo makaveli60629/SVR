@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK",
-  "phase": 220,
+  "build": "PHASE-221-ONE-COMMAND-RUNBOOK-LOCK",
+  "phase": 221,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "one-command deploy health, status verification, live marker confirmation"
+  "featureLock": "one-command runbook, updater checklist, deploy/test command guide"
 }

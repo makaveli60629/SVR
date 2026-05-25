@@ -1,7 +1,7 @@
-# PHASE-220-ONE-COMMAND-DEPLOY-HEALTH-LOCK
+# PHASE-221-ONE-COMMAND-RUNBOOK-LOCK
 
 ## Purpose
-Phase 220 adds a verification surface for the simplified one-command PowerShell updater.
+Phase 221 adds a verification surface for the simplified one-command PowerShell updater.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 220 adds a verification surface for the simplified one-command PowerShell 
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase220-autoverify` and press `O`.
+Open `/game/?v=phase221-autoverify` and press `O`.
