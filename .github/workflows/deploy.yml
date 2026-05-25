@@ -76,7 +76,13 @@ jobs:
 
           COMMIT_SHA="${GITHUB_SHA}"
           DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          BUILD_LABEL="SITE-DIRECT-FILES-LOCK-20260512"
+          BUILD_LABEL="$(grep -oE 'PHASE-[A-Za-z0-9._-]+' build/game/index.html | head -n 1 || true)"
+          if [ -z "${BUILD_LABEL}" ] && [ -f build/game/docs/BUILD_VERSION.json ]; then
+            BUILD_LABEL="$(grep -oE 'PHASE-[A-Za-z0-9._-]+' build/game/docs/BUILD_VERSION.json | head -n 1 || true)"
+          fi
+          if [ -z "${BUILD_LABEL}" ]; then
+            BUILD_LABEL="SVR-DIRECT-FILES-LOCK"
+          fi
 
           mkdir -p build/game build/site
 
