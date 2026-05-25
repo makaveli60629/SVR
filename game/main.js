@@ -7,11 +7,11 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import "./modules/optional_module_loader.js?v=phase245";
+import "./modules/optional_module_loader.js?v=phase247";
 
-const BUILD_LABEL = "PHASE-245-FIXED-GIT-RUNGIT-HOTFIX-LOCK";
-const BUILD_PHASE = 245;
-window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
+const BUILD_LABEL = "PHASE-247-BLACK-SCREEN-RENDER-LOOP-GUARD-LOCK";
+const BUILD_PHASE = 247;
+window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, subsystemErrors: {}, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -347,6 +347,72 @@ renderer.xr.addEventListener("sessionend", ()=>{
   if (nav && !AUTOCAM) nav.style.display = "flex";
 });
 
+
+function ensureMainRuntimeState(){
+  if (!window.SVR_MAIN_RUNTIME_STATE) {
+    window.SVR_MAIN_RUNTIME_STATE = {
+      build: BUILD_LABEL,
+      phase: BUILD_PHASE,
+      startedAt: new Date().toISOString(),
+      animationErrors: 0,
+      subsystemErrors: {},
+      lastAnimationError: null
+    };
+  }
+  if (!window.SVR_MAIN_RUNTIME_STATE.subsystemErrors) window.SVR_MAIN_RUNTIME_STATE.subsystemErrors = {};
+  return window.SVR_MAIN_RUNTIME_STATE;
+}
+
+function recordLoopError(source, error){
+  const message = error?.stack || error?.message || String(error);
+  const state = ensureMainRuntimeState();
+  state.animationErrors += 1;
+  const prev = state.subsystemErrors[source] || { count: 0 };
+  state.subsystemErrors[source] = {
+    count: (prev.count || 0) + 1,
+    at: new Date().toISOString(),
+    message
+  };
+  state.lastAnimationError = {
+    source,
+    at: new Date().toISOString(),
+    message,
+    count: state.animationErrors
+  };
+  console.error(`[SVR ${source} runtime error]`, error);
+  try {
+    window.dispatchEvent(new CustomEvent("svr_main_runtime_error", {
+      detail: { build: BUILD_LABEL, phase: BUILD_PHASE, source, message, count: state.animationErrors }
+    }));
+  } catch(_e) {}
+  try {
+    window.SVR_RUNTIME_CRASH_SHIELD?.record?.("main_loop_" + source, error, { build: BUILD_LABEL, phase: BUILD_PHASE, source });
+  } catch(_e) {}
+  try {
+    setStatus(`Runtime shield isolated ${source} error`, { force: true, minGap: 0 });
+  } catch(_e) {}
+  return false;
+}
+
+function safeLoopStep(source, fn){
+  try {
+    return fn();
+  } catch(error) {
+    recordLoopError(source, error);
+    return null;
+  }
+}
+
+function emergencyRenderFrame(){
+  try {
+    safeLoopStep("renderer_render", ()=>renderer.render(scene, camera));
+    return true;
+  } catch(error) {
+    recordLoopError("emergency_renderer_render", error);
+    return false;
+  }
+}
+
 let tPrev = performance.now();
 const previewTarget = new THREE.Vector3(0, 1.25, 0);
 const previewPos = new THREE.Vector3();
@@ -382,17 +448,17 @@ renderer.setAnimationLoop(()=>{
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
 
-  if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
+  safeLoopStep("world_tick", ()=>{ if (scene.userData._tickWorld) scene.userData._tickWorld(dt); });
 
-  hands.update(dt);
-  hands.updateDebug();
+  safeLoopStep("hands_update", ()=>hands.update(dt));
+  safeLoopStep("hands_debug", ()=>hands.updateDebug());
 
   const leftHand = hands.getLeftHand();
   const rightHand = hands.getRightHand();
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
   if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({
+    safeLoopStep("teleport_update", ()=>tp.update({
       dt,
       leftHand,
       rightHand,
@@ -400,19 +466,19 @@ renderer.setAnimationLoop(()=>{
       rightController,
       statusCb: (text)=>{ setStatus(text); },
       modeCb: (text)=>{ setMode(text); }
-    });
+    }));
   }
 
-  if (watch) watch.update(dt, leftHand, rightHand);
+  safeLoopStep("watch_update", ()=>{ if (watch) watch.update(dt, leftHand, rightHand); });
 
-  renderer.render(scene, camera);
+  safeLoopStep("renderer_render", ()=>renderer.render(scene, camera));
   } catch (error) {
     const message = error?.stack || error?.message || String(error);
     if (!window.SVR_MAIN_RUNTIME_STATE) {
-      window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
+      window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, subsystemErrors: {}, lastAnimationError: null };
     }
-    window.SVR_MAIN_RUNTIME_STATE.animationErrors += 1;
-    window.SVR_MAIN_RUNTIME_STATE.lastAnimationError = {
+    ensureMainRuntimeState().animationErrors += 1;
+    ensureMainRuntimeState().lastAnimationError = {
       at: new Date().toISOString(),
       message,
       count: window.SVR_MAIN_RUNTIME_STATE.animationErrors
@@ -423,7 +489,7 @@ renderer.setAnimationLoop(()=>{
     }));
 
     const shield = window.SVR_RUNTIME_CRASH_SHIELD;
-    if (shield?.handleAnimationError?.(error, { phase: BUILD_PHASE, build: BUILD_LABEL, module: "main.animationLoop" })) return;
+    if (shield?.handleAnimationError?.(error, { phase: BUILD_PHASE, build: BUILD_LABEL, module: "main.animationLoop" })) { emergencyRenderFrame(); return; }
 
     setStatus("Runtime recovered â€¢ check Logs", { force: true, minGap: 0 });
     if (!renderer.xr.isPresenting && $err) {
@@ -446,4 +512,5 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
 

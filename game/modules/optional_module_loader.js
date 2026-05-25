@@ -1,5 +1,5 @@
-(function(){
-  const BUILD = "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK";
+﻿(function(){
+  const BUILD = "PHASE-247-BLACK-SCREEN-RENDER-LOOP-GUARD-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,32 +9,32 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase244",
-  "./auto_apply_verify.js?v=phase244",
-  "./one_command_deploy_health.js?v=phase244",
-  "./one_command_runbook.js?v=phase244",
-  "./post_deploy_checklist.js?v=phase244",
-  "./tester_launch_card.js?v=phase244",
-  "./qa_shortcut_index.js?v=phase244",
-  "./pilot_handoff_card.js?v=phase244",
-  "./pilot_ready_summary.js?v=phase244",
-  "./pilot_issue_template.js?v=phase244",
-  "./pilot_feedback_export.js?v=phase244",
-  "./power_deploy_watcher.js?v=phase244",
-  "./power_deploy_wait_log.js?v=phase244",
-  "./power_deploy_smoke_probe.js?v=phase244",
-  "./vr_input_spawn_clear_recovery.js?v=phase244",
-  "./vr_input_diagnostic.js?v=phase244",
-  "./quest_input_autocalibration.js?v=phase244",
-  "./hand_teleport_pinch_destination.js?v=phase244",
-  "./hand_teleport_aim_confirm.js?v=phase244",
-  "./fire_lightning_theme_panel.js?v=phase244",
-  "./watch_upright_orientation_panel.js?v=phase244",
-  "./watch_teleport_conflict_guard.js?v=phase244",
-  "./deploy_sync_force.js?v=phase244",
-  "./main_runtime_catch_fix.js?v=phase244",
-  "./main_import_recovery.js?v=phase244",
-  "./bridge_alias_recovery.js?v=phase244",
+  "./auto_apply_status.js?v=phase247",
+  "./auto_apply_verify.js?v=phase247",
+  "./one_command_deploy_health.js?v=phase247",
+  "./one_command_runbook.js?v=phase247",
+  "./post_deploy_checklist.js?v=phase247",
+  "./tester_launch_card.js?v=phase247",
+  "./qa_shortcut_index.js?v=phase247",
+  "./pilot_handoff_card.js?v=phase247",
+  "./pilot_ready_summary.js?v=phase247",
+  "./pilot_issue_template.js?v=phase247",
+  "./pilot_feedback_export.js?v=phase247",
+  "./power_deploy_watcher.js?v=phase247",
+  "./power_deploy_wait_log.js?v=phase247",
+  "./power_deploy_smoke_probe.js?v=phase247",
+  "./vr_input_spawn_clear_recovery.js?v=phase247",
+  "./vr_input_diagnostic.js?v=phase247",
+  "./quest_input_autocalibration.js?v=phase247",
+  "./hand_teleport_pinch_destination.js?v=phase247",
+  "./hand_teleport_aim_confirm.js?v=phase247",
+  "./fire_lightning_theme_panel.js?v=phase247",
+  "./watch_upright_orientation_panel.js?v=phase247",
+  "./watch_teleport_conflict_guard.js?v=phase247",
+  "./deploy_sync_force.js?v=phase247",
+  "./main_runtime_catch_fix.js?v=phase247",
+  "./main_import_recovery.js?v=phase247",
+  "./bridge_alias_recovery.js?v=phase247",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -51,8 +51,8 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase244"
-];
+  "./auto_apply_git_wrapper_fix.js?v=phase247"
+  "./black_screen_render_loop_guard.js?v=phase247"`r`n];
   const state = {
     build: BUILD,
     phase: 244,
@@ -118,8 +118,8 @@
   function render(show=true){
     const p = panel();
     if(show) p.style.display = "block";
-    const failed = state.failed.map(x => `<li>⚠️ <b>${esc(x.path)}</b><br><small>${esc(x.error)}</small></li>`).join("");
-    const loaded = state.loaded.slice(-30).map(x => `<li>✅ ${esc(x)}</li>`).join("");
+    const failed = state.failed.map(x => `<li>âš ï¸ <b>${esc(x.path)}</b><br><small>${esc(x.error)}</small></li>`).join("");
+    const loaded = state.loaded.slice(-30).map(x => `<li>âœ… ${esc(x)}</li>`).join("");
     p.innerHTML = `
       <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
         <b>SVR Optional Module Loader</b>
@@ -168,3 +168,4 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
