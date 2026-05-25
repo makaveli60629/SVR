@@ -1,6 +1,8 @@
 {
   "status": "ok",
-  "build": "PHASE-177-HAND-HISTORY-STACK-LOCK",
-  "source": "phase176-package",
-  "target": "/game"
+  "build": "PHASE-178-ACTION-LOG-BOT-DECISION-LOCK",
+  "source": "direct-game-folder",
+  "target": "/game",
+  "phase": 178,
+  "generatedAt": "2026-05-25T00:00:00Z"
 }

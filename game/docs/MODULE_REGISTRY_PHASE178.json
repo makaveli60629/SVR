@@ -1,0 +1,15 @@
+{
+  "phase": "PHASE-178-ACTION-LOG-BOT-DECISION-LOCK",
+  "modules": {
+    "poker_demo.js": "Poker state, action log, stack panel, timer, hand history",
+    "enterprise_bridge.js": "Browser-safe telemetry bridge for action log / player actions / hand results",
+    "watch.js": "Watch action buttons preserved",
+    "world_skyline.js": "Lobby scene preserved; dealer body disabled"
+  },
+  "protected": [
+    "root public Matrix page",
+    "site redesign",
+    "unapproved Reiki branding",
+    "visible dealer rig"
+  ]
+}

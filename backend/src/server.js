@@ -20,7 +20,7 @@ function auth(req,res,next){
 }
 
 app.get('/api/health', async (_req,res)=>{
-  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-177-HAND-HISTORY-STACK-LOCK' }); }
+  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-178-ACTION-LOG-BOT-DECISION-LOCK' }); }
   catch(err){ res.status(500).json({ status:'error', database:'failed', message:err.message }); }
 });
 
@@ -117,6 +117,28 @@ app.get('/api/game/hand-history', async (req,res)=>{
       .input('Limit', sql.Int, limit)
       .query('SELECT TOP (@Limit) Id, PayloadJson, CreatedAt FROM GameHandResults ORDER BY CreatedAt DESC');
     res.json({ ok:true, hands: result.recordset.map(row => ({ id: row.Id, createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
+  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
+});
+
+
+app.post('/api/game/action-log', async (req,res)=>{
+  try{
+    const pool = await getPool();
+    await pool.request()
+      .input('PayloadJson', sql.NVarChar(sql.MAX), JSON.stringify(req.body || {}))
+      .query('INSERT INTO GameActionLog(PayloadJson) VALUES(@PayloadJson)');
+    res.json({ ok:true });
+  }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
+});
+
+app.get('/api/game/action-log', async (req,res)=>{
+  try{
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit || 30)));
+    const pool = await getPool();
+    const result = await pool.request()
+      .input('Limit', sql.Int, limit)
+      .query('SELECT TOP (@Limit) Id, PayloadJson, CreatedAt FROM GameActionLog ORDER BY CreatedAt DESC');
+    res.json({ ok:true, actions: result.recordset.map(row => ({ id: row.Id, createdAt: row.CreatedAt, payload: JSON.parse(row.PayloadJson || '{}') })) });
   }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
 });
 
