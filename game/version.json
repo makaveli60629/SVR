@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK",
-  "phase": 203,
+  "build": "PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK",
+  "phase": 204,
   "source": "direct-game-folder",
   "generatedAt": "2026-05-25T00:00:00Z",
   "public_page_touched": false,
-  "featureLock": "enterprise bridge recorder methods, dealer button telemetry crash fix, boot-safe telemetry"
+  "featureLock": "runtime event firewall, bridge safe listeners, recorder error capture"
 }

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Release Candidate Checklist Module
- * Build: PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK
+ * Build: PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK
  * Purpose: combine deploy, smoke, QA, export, and runtime module checks into one tester-ready release gate.
  * Public Matrix page is untouched. No secrets. No SQL strings.
  */
-const BUILD = 'PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK';
+const BUILD = 'PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeText(value, max = 260) { return String(value ?? '').slice(0, max); }

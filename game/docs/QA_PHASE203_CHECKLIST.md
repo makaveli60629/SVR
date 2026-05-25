@@ -1,6 +1,6 @@
-# QA Phase 203 — Enterprise Bridge Recorder Fix
+# QA Phase 204 — Enterprise Bridge Recorder Fix
 
-- [ ] Open `/game/?v=phase203-recordfix`.
+- [ ] Open `/game/?v=phase204-recordfix`.
 - [ ] Confirm it does not freeze after `publishDealerButtonState` runs.
 - [ ] Confirm no runtime error says `this.recordDealerButton is not a function`.
 - [ ] Confirm dealer button / blind telemetry appears or queues safely.

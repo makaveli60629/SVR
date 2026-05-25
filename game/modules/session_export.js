@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK
+ * Build: PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK';
+const BUILD = 'PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

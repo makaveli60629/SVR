@@ -1,0 +1,13 @@
+{
+  "phase": 204,
+  "build": "PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK",
+  "modules_added": [
+    "modules/event_firewall.js"
+  ],
+  "modules_hardened": [
+    "modules/enterprise_bridge.js",
+    "boot.js",
+    "main.js"
+  ],
+  "public_page_touched": false
+}

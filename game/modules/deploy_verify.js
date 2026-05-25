@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Deploy Verifier / Preflight QA Module
- * Build: PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK
+ * Build: PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK
  * Purpose: catch stale deploys, mismatched game/version/deploy-health data, and runtime drift before testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK';
+const BUILD = 'PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK';
 const EXPECTED_PHASE = 194;
 
 async function fetchJsonSafe(url) {

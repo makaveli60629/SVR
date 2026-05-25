@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK
+ * Build: PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK';
+const BUILD = 'PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }

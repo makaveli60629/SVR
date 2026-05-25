@@ -1,7 +1,7 @@
 {
   "status": "ok",
-  "build": "PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK",
-  "phase": 203,
+  "build": "PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK",
+  "phase": 204,
   "source": "direct-game-folder",
-  "public_page_touched": false
+  "generatedAt": "2026-05-25T00:00:00Z"
 }

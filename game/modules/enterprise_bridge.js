@@ -1,46 +1,75 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK
+ * Build: PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK',
+  build: 'PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,
+  installedListeners: [],
 
   init() {
     window.SVREnterpriseBridge = this;
     window.SVR_ENTERPRISE_BRIDGE = this;
-    window.addEventListener('svr_poker_hand_result', (event) => this.recordHandResult(event.detail || {}));
-    window.addEventListener('svr_poker_player_action', (event) => this.recordPlayerAction(event.detail || {}));
-    window.addEventListener('svr_poker_action_log_update', (event) => this.recordActionLog(event.detail || {}));
-    window.addEventListener('svr_poker_legal_actions_update', (event) => this.recordLegalActions(event.detail || {}));
-    window.addEventListener('svr_poker_showdown_reveal', (event) => this.recordShowdown(event.detail || {}));
-    window.addEventListener('svr_poker_side_pot_resolution', (event) => this.recordSidePot(event.detail || {}));
-    window.addEventListener('svr_poker_turn_indicator_update', (event) => this.recordTurnIndicator(event.detail || {}));
-    window.addEventListener('svr_watch_turn_indicator_update', (event) => this.recordWatchTurnIndicator(event.detail || {}));
-    window.addEventListener('svr_poker_dealer_button_update', (event) => this.recordDealerButton(event.detail || {}));
-    window.addEventListener('svr_poker_rebuy_update', (event) => this.recordRebuy(event.detail || {}));
-    window.addEventListener('svr_poker_decision_aid_update', (event) => this.recordDecisionAid(event.detail || {}));
-    window.addEventListener('svr_runtime_telemetry', (event) => this.recordTelemetry(event.detail || {}));
-    window.addEventListener('svr_poker_allin_update', (event) => this.recordAllIn(event.detail || {}));
-    window.addEventListener('svr_poker_fold_eligibility_update', (event) => this.recordFoldEligibility(event.detail || {}));
-    window.addEventListener('svr_deploy_preflight_update', (event) => this.recordDeployPreflight(event.detail || {}));
-    window.addEventListener('svr_smoke_test_result', (event) => this.recordSmokeTest(event.detail || {}));
-    window.addEventListener('svr_release_candidate_update', (event) => this.recordReleaseCandidate(event.detail || {}));
-    window.addEventListener('svr_runtime_qa_snapshot', (event) => this.recordRuntimeQA(event.detail || {}));
-    window.addEventListener('svr_session_export_update', (event) => this.recordSessionExport(event.detail || {}));
-    window.addEventListener('svr_bug_report_update', (event) => this.recordBugReport(event.detail || {}));
-    window.addEventListener('svr_tester_feedback_update', (event) => this.recordTesterFeedback(event.detail || {}));
-    window.addEventListener('svr_test_queue_update', (event) => this.recordTestQueue(event.detail || {}));
-    window.addEventListener('svr_test_report_bundle_update', (event) => this.recordTestReportBundle(event.detail || {}));
-    window.addEventListener('svr_demo_certification_update', (event) => this.recordDemoCertification(event.detail || {}));
-    window.addEventListener('svr_pilot_testing_ready_update', (event) => this.recordPilotReady(event.detail || {}));
-    window.addEventListener('svr_playtest_wizard_update', (event) => this.recordGeneric('/api/game/playtest-wizard', event.detail || {}));
     this.ensureRecorderSurface();
+    this.installListeners();
     this.healthCheck();
     setInterval(() => this.flush(), 15000);
+  },
+
+  installListeners(){
+    const listeners = [
+      ['svr_poker_hand_result', 'recordHandResult'],
+      ['svr_poker_player_action', 'recordPlayerAction'],
+      ['svr_poker_action_log_update', 'recordActionLog'],
+      ['svr_poker_legal_actions_update', 'recordLegalActions'],
+      ['svr_poker_showdown_reveal', 'recordShowdown'],
+      ['svr_poker_side_pot_resolution', 'recordSidePot'],
+      ['svr_poker_turn_indicator_update', 'recordTurnIndicator'],
+      ['svr_watch_turn_indicator_update', 'recordWatchTurnIndicator'],
+      ['svr_poker_dealer_button_update', 'recordDealerButton'],
+      ['svr_poker_rebuy_update', 'recordRebuy'],
+      ['svr_poker_decision_aid_update', 'recordDecisionAid'],
+      ['svr_runtime_telemetry', 'recordTelemetry'],
+      ['svr_poker_allin_update', 'recordAllIn'],
+      ['svr_poker_fold_eligibility_update', 'recordFoldEligibility'],
+      ['svr_deploy_preflight_update', 'recordDeployPreflight'],
+      ['svr_smoke_test_result', 'recordSmokeTest'],
+      ['svr_release_candidate_update', 'recordReleaseCandidate'],
+      ['svr_runtime_qa_snapshot', 'recordRuntimeQA'],
+      ['svr_session_export_update', 'recordSessionExport'],
+      ['svr_bug_report_update', 'recordBugReport'],
+      ['svr_tester_feedback_update', 'recordTesterFeedback'],
+      ['svr_test_queue_update', 'recordTestQueue'],
+      ['svr_test_report_bundle_update', 'recordTestReportBundle'],
+      ['svr_demo_certification_update', 'recordDemoCertification'],
+      ['svr_pilot_testing_ready_update', 'recordPilotReady'],
+      ['svr_event_firewall_update', 'recordEventFirewall'],
+      ['svr_event_firewall_error', 'recordEventFirewallError'],
+      ['svr_playtest_wizard_update', 'recordPlaytestWizard']
+    ];
+    listeners.forEach(([eventName, methodName]) => this.safeListen(eventName, methodName));
+  },
+
+  safeListen(eventName, methodName){
+    const handler = (event) => {
+      try {
+        if (typeof this[methodName] !== 'function') {
+          this.ensureRecorderSurface();
+        }
+        if (typeof this[methodName] === 'function') {
+          this[methodName](event?.detail || {});
+        } else {
+          this.enqueue(`missing_recorder:${methodName}`, event?.detail || {});
+        }
+      } catch (error) {
+        this.recordBridgeError({ eventName, methodName, message: error?.message || String(error), stack: error?.stack || null });
+      }
+    };
+    window.addEventListener(eventName, handler);
+    this.installedListeners.push({ eventName, methodName });
   },
 
   ensureRecorderSurface() {
@@ -60,7 +89,10 @@ const SVREnterpriseBridge = {
       recordTestQueue: 'test_queue',
       recordTestReportBundle: 'test_report_bundle',
       recordDemoCertification: 'demo_certification',
-      recordPilotReady: 'pilot_ready'
+      recordPilotReady: 'pilot_ready',
+      recordEventFirewall: 'event_firewall',
+      recordEventFirewallError: 'event_firewall_error',
+      recordPlaytestWizard: 'playtest_wizard'
     };
     Object.entries(recorderMap).forEach(([method, type]) => {
       if (typeof this[method] !== 'function') {
@@ -82,20 +114,27 @@ const SVREnterpriseBridge = {
     }
   },
 
+  safePayload(payload){
+    try { return JSON.parse(JSON.stringify(payload ?? {})); }
+    catch (_) { return { unserializable: true, summary: String(payload) }; }
+  },
+
   enqueue(type, payload) {
-    const safePayload = { type, build: this.build, at: new Date().toISOString(), payload };
+    const safePayload = { type, build: this.build, at: new Date().toISOString(), payload: this.safePayload(payload) };
     this.pending.push(safePayload);
     if (this.pending.length > 75) this.pending.shift();
     this.flush();
   },
 
-
-  recordGeneric(endpoint, payload) {
-    this.enqueue(endpoint || 'generic', payload || {});
-  },
-
+  recordGeneric(endpoint, payload) { this.enqueue(endpoint || 'generic', payload || {}); },
   queue(type, payload) { this.enqueue(type || 'generic', payload || {}); },
   postTelemetry(type, payload) { this.enqueue(type || 'telemetry', payload || {}); },
+
+  recordBridgeError(payload) {
+    this.pending.push({ type: 'bridge_error', build: this.build, at: new Date().toISOString(), payload: this.safePayload(payload) });
+    if (this.pending.length > 75) this.pending.shift();
+    try { window.SVR_EVENT_FIREWALL?.recordError?.('enterprise_bridge_error', payload?.message || 'bridge error', payload); } catch (_) {}
+  },
 
   recordHandResult(payload) { this.enqueue('hand_result', payload); },
   recordPlayerAction(payload) { this.enqueue('player_action', payload); },
@@ -122,6 +161,9 @@ const SVREnterpriseBridge = {
   recordDemoCertification(payload) { this.enqueue('demo_certification', payload); },
   recordPilotReady(payload) { this.enqueue('pilot_ready', payload); },
   recordTelemetry(payload) { this.enqueue('runtime_telemetry', payload); },
+  recordEventFirewall(payload) { this.enqueue('event_firewall', payload); },
+  recordEventFirewallError(payload) { this.enqueue('event_firewall_error', payload); },
+  recordPlaytestWizard(payload) { this.enqueue('playtest_wizard', payload); },
 
   async flush() {
     if (!this.apiBase || this.pending.length === 0) return;
@@ -141,3 +183,4 @@ const SVREnterpriseBridge = {
 };
 
 SVREnterpriseBridge.init();
+export default SVREnterpriseBridge;

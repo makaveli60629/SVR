@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Report Bundle
- * Build: PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK
+ * Build: PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK
  * Purpose: combine QA snapshots, bug reports, tester feedback, test queue, smoke/RC/preflight/session exports into one playtest report bundle.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK';
+const BUILD = 'PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK';
 const EXPECTED_PHASE = 198;
 const STORE_KEY = 'svr_test_report_bundles_phase198';
 

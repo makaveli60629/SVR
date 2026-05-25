@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-203-ENTERPRISE-BRIDGE-RECORDER-FIX-LOCK",
+  "build": "PHASE-204-EVENT-FIREWALL-BRIDGE-HARDENING-LOCK",
   "phase": 203,
   "modules": [
     "boot.js",
