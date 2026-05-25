@@ -1,4 +1,4 @@
-# PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+# PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Crash Shield
- * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+ * Build: PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
  * Purpose: keep render/game loop alive, capture runtime errors, and prevent bridge/listener crashes from freezing the game.
  */
-const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
+const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
 const KNOWN_RECOVERABLE = [
   /record[A-Za-z0-9_]+ is not a function/i,
   /SVR_ENTERPRISE_BRIDGE/i,

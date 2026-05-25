@@ -1,7 +1,7 @@
 {
   "status": "ok",
-  "build": "PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK",
-  "phase": 212,
-  "source": "package-predeploy",
-  "public_page_touched": false
+  "build": "PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK",
+  "phase": 213,
+  "source": "direct-game-folder",
+  "generatedAt": "2026-05-25T00:00:00Z"
 }

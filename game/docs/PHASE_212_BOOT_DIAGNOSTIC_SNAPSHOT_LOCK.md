@@ -1,4 +1,4 @@
-# PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+# PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
 
 ## Purpose
 Adds a boot diagnostic snapshot layer so testing can capture exact evidence for boot/import/CDN/cache/deploy mismatches instead of relying on screenshots alone.

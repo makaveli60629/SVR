@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+ * Build: PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
+const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }

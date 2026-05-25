@@ -134,17 +134,17 @@ Source package used for this phase:
 - SVR Wellness building ad refreshed to `SVR WELLNESS / L.A.` in neon green presentation styling.
 
 
-## PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+## PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
 - Added exact best-five winning cards to showdown, history, and telemetry.
 
 
-## PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+## PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
 - Adds side-pot eligibility and payout resolution.
 - Emits `svr_poker_side_pot_resolution`.
 - Keeps public Matrix page untouched.
 
 
-## PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+## PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
 
 - Added folded/mucked player eligibility state.
 - Folded players are excluded from side-pot winner eligibility.
@@ -154,8 +154,8 @@ Source package used for this phase:
 
 
 ## Phase 199
-- PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK: dealer/blind state + safe rebuy continuity. Public page untouched.
+- PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK: dealer/blind state + safe rebuy continuity. Public page untouched.
 
 
 ## Phase 199
-- PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK: player decision aid, pot-odds pressure hints, and backend telemetry hook. Public page untouched.
+- PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK: player decision aid, pot-odds pressure hints, and backend telemetry hook. Public page untouched.

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Release Candidate Checklist Module
- * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+ * Build: PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
  * Purpose: combine deploy, smoke, QA, export, and runtime module checks into one tester-ready release gate.
  * Public Matrix page is untouched. No secrets. No SQL strings.
  */
-const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
+const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeText(value, max = 260) { return String(value ?? '').slice(0, max); }

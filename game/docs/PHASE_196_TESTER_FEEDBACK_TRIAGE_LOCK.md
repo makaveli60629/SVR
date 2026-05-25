@@ -1,4 +1,4 @@
-# PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+# PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

@@ -1,9 +1,9 @@
 /*
- * SVR Poker Phase 212 - Boot Diagnostic Snapshot Lock
+ * SVR Poker Phase 213 - Boot Diagnostic Snapshot Lock
  * Purpose: capture boot/import/cache evidence and avoid permanent Booting stalls.
  */
 (function(){
-  var BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
+  var BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
   var startedAt = new Date().toISOString();
   var statusEl = document.getElementById('status');
   var errEl = document.getElementById('err');
@@ -23,7 +23,7 @@
     if (ready || fallbackStarted) return;
     fallbackStarted = true;
     setStatus('Boot fallback: loading recovery shell…');
-    import('./modules/boot_fallback.js?v=phase212').then(function(){
+    import('./modules/boot_fallback.js?v=phase213').then(function(){
       if (window.SVR_BOOT_FALLBACK && !ready) window.SVR_BOOT_FALLBACK.show(reason, detail);
     }).catch(function(error){
       showRecovery('Fallback shell failed. Manual reload required.', error, false);
@@ -47,18 +47,20 @@
     var fb = document.getElementById('svrBootFallback'); if (fb) fb.style.display = 'none';
   }
   window.SVR_BOOT_GUARD = { build: BUILD, startedAt: startedAt, ready: function(){return ready;}, imported: function(){return imported;}, recoveryShown: function(){return recoveryShown;}, startFallback: startFallback };
+  import('./modules/boot_route_recovery.js?v=phase213').catch(function(error){ softReport('Boot route recovery module failed.', error); });
+
   document.addEventListener('click', function(event){
     var target = event.target && event.target.closest && event.target.closest('[data-svr-boot]'); if (!target) return;
     var action = target.getAttribute('data-svr-boot');
     if (action === 'reload') location.reload();
-    if (action === 'cache') location.href = './index.html?v=phase212-' + Date.now();
+    if (action === 'cache') location.href = './index.html?v=phase213-' + Date.now();
     if (action === 'fallback') startFallback('Manual recovery shell requested.', '');
   });
   window.addEventListener('svr_game_ready', function(event){ hideRecovery(); setStatus((event.detail && event.detail.preview) ? 'Live preview ready' : 'Ready. Enter VR.'); });
   window.addEventListener('error', function(event){ if (!ready) { softReport('Runtime error before ready signal.', event.error || event.message || event); showRecovery('Runtime error before ready signal.', event.error || event.message || event, false); startFallback('Runtime error before ready signal.', event.error || event.message || event); } });
   window.addEventListener('unhandledrejection', function(event){ if (!ready) { softReport('Promise rejection before ready signal.', event.reason || event); showRecovery('Promise rejection before ready signal.', event.reason || event, false); startFallback('Promise rejection before ready signal.', event.reason || event); } });
   setStatus('Boot guard: loading game module…');
-  setTimeout(function(){ if (!ready) { showRecovery('Game is taking longer than expected. Recovery shell is available.', '', true); } }, 6000);
+  setTimeout(function(){ if (!ready) { showRecovery('Game is taking longer than expected. Recovery shell and route recovery are available.', '', true); if (window.SVR_BOOT_ROUTE_RECOVERY) window.SVR_BOOT_ROUTE_RECOVERY.collect('slow-boot'); } }, 6000);
   mainTimer = setTimeout(function(){ if (!ready) { showRecovery('Game did not send ready signal. Opening recovery shell so Booting cannot freeze.', '', false); startFallback('Main runtime timeout before ready signal.', 'Likely CDN/import/cache/runtime module issue.'); } }, 15000);
-  import('./main.js?v=phase212').then(function(){ imported = true; setStatus('Game module loaded. Building scene…'); }).catch(function(error){ imported = false; showRecovery('Failed to import main game module. Booting screen stopped by recovery guard.', error, false); startFallback('Failed to import main game module.', error); });
+  import('./main.js?v=phase213').then(function(){ imported = true; setStatus('Game module loaded. Building scene…'); }).catch(function(error){ imported = false; showRecovery('Failed to import main game module. Booting screen stopped by recovery guard.', error, false); startFallback('Failed to import main game module.', error); });
 })();

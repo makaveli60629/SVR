@@ -1,4 +1,4 @@
-# PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+# PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
 
 ## Summary
 Adds the Demo Certification module and go/no-go readiness gate for demo/playtest preparation.

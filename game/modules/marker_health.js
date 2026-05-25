@@ -1,9 +1,9 @@
-/* SVR Poker Phase 212 - Full Marker Health Lock
+/* SVR Poker Phase 213 - Full Marker Health Lock
  * Passive marker verifier: confirms visible title, HUD, version.json, deploy-health, and boot query all agree.
  * It does not block gameplay and never throws into the main runtime.
  */
 (function(){
-  const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
+  const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
   const KEY = '__SVR_MARKER_HEALTH__';
   const state = { build: BUILD, checks: [], ok: false, lastRunAt: null };
   function safeDispatch(name, detail){ try { window.dispatchEvent(new CustomEvent(name, { detail })); } catch(_){} }
@@ -20,12 +20,12 @@
       const title = document.title || '';
       const hudText = document.body ? document.body.innerText || '' : '';
       const scripts = Array.from(document.scripts || []).map(s => s.src || '').join('\n');
-      add('title-marker', title.includes('Phase 212') || title.includes(BUILD), title);
+      add('title-marker', title.includes('Phase 213') || title.includes(BUILD), title);
       add('hud-build-marker', hudText.includes(BUILD), 'HUD/body contains current build marker');
-      add('boot-script-cache', scripts.includes('boot.js?v=phase212'), scripts || 'no scripts found');
-      const version = await fetchJson('./version.json?v=phase212-' + Date.now());
+      add('boot-script-cache', scripts.includes('boot.js?v=phase213'), scripts || 'no scripts found');
+      const version = await fetchJson('./version.json?v=phase213-' + Date.now());
       add('version-json-marker', version && version.build === BUILD && Number(version.phase) === 211, JSON.stringify(version));
-      const gameHealth = await fetchJson('./deploy-health.json?v=phase212-' + Date.now());
+      const gameHealth = await fetchJson('./deploy-health.json?v=phase213-' + Date.now());
       add('game-deploy-health', !gameHealth.error && (!gameHealth.build || String(gameHealth.build).includes('PHASE-')), JSON.stringify(gameHealth));
       state.ok = state.checks.every(c => c.ok);
       try { localStorage.setItem(KEY, JSON.stringify({ build: BUILD, ok: state.ok, checks: state.checks, at: state.lastRunAt })); } catch(_){}

@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+ * Build: PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
+const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

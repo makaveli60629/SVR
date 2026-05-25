@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Bridge Self-Test & Auto-Heal Module
- * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+ * Build: PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
  * Purpose: verify bridge recorder methods at runtime, patch missing aliases, and emit a clear health report without stopping the game loop.
  */
-const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
+const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
 const REQUIRED_RECORDERS = [
   'recordHandResult','recordPlayerAction','recordActionLog','recordLegalActions','recordShowdown','recordSidePot',
   'recordTurnIndicator','recordWatchTurnIndicator','recordDealerButton','recordRebuy','recordDecisionAid','recordTelemetry',

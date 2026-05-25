@@ -1,6 +1,6 @@
 # Phase 199 — Deploy Verifier Preflight Lock
 
-Build: `PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK`
+Build: `PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK`
 
 ## Purpose
 Adds an in-game deploy verifier so stale GitHub Pages deploys and build/version drift can be detected before long Quest tests.

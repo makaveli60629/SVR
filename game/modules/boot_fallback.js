@@ -1,9 +1,9 @@
 /*
- * SVR Poker Phase 202 - Boot Fallback CDN Recovery Lock
+ * SVR Poker Phase 213 - Boot Route Recovery Link Lock
  * Runs without Three.js. Purpose: never leave the player stuck on Booting.
  */
 (function(){
-  const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
+  const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
   let active = false;
   let reports = [];
   const esc = (v)=>String(v == null ? '' : v).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -44,14 +44,14 @@
   }
   function privateLinks(){
     return [
-      ['Lobby retry','./index.html?v=phase206-retry-'+Date.now()],
+      ['Lobby retry','./index.html?v=phase213-retry-'+Date.now()],
       ['No-cache reload','./index.html?nocache='+Date.now()],
-      ['Scorpion','./scorpion.html?v=phase206'],
-      ['PGA Drive','./pga-drive.html?v=phase206'],
-      ['Chip/Putt','./chip-putt.html?v=phase206'],
-      ['Reiki Room','./reiki.html?v=phase206'],
-      ['VR Store','./store-room.html?v=phase206'],
-      ['Smoker Lounge','./smoker-lounge.html?v=phase206']
+      ['Scorpion','./scorpion.html?v=phase213'],
+      ['PGA Drive','./pga-drive.html?v=phase213'],
+      ['Chip/Putt','./chip-putt.html?v=phase213'],
+      ['Reiki Room','./reiki.html?v=phase213'],
+      ['VR Store','./store-room.html?v=phase213'],
+      ['Smoker Lounge','./smoker-lounge.html?v=phase213']
     ];
   }
   function show(reason, detail){

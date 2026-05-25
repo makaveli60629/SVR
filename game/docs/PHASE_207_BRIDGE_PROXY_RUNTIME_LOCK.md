@@ -1,4 +1,4 @@
-# PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+# PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
 
 ## Purpose
 Install a first-run bridge proxy before event/firewall/poker modules so missing `record*` methods cannot crash the runtime.

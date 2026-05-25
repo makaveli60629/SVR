@@ -7,4 +7,4 @@
 5. Press **X** and confirm session export downloads.
 6. Confirm no public Matrix launch page files changed.
 
-Build: `PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK`
+Build: `PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK`

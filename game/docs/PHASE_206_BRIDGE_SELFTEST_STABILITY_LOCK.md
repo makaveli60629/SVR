@@ -1,4 +1,4 @@
-# PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+# PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
 
 ## Purpose
 Phase 206 adds a bridge self-test/autorepair layer after the Phase 205 recorder cache-bust fix.

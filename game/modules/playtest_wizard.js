@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Guided Playtest Wizard
- * Build: PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK
+ * Build: PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK
  * Purpose: give testers one clear checklist after deploy without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK';
+const BUILD = 'PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK';
 const EXPECTED_PHASE = 194;
 
 function safeValue(value, max = 260) {

@@ -1,6 +1,6 @@
 {
   "phase": 212,
-  "build": "PHASE-212-BOOT-DIAGNOSTIC-SNAPSHOT-LOCK",
+  "build": "PHASE-213-BOOT-ROUTE-RECOVERY-LINK-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"
