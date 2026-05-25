@@ -1,6 +1,6 @@
 {
   "phase": 200,
-  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
+  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
   "modules": [
     "enterprise_bridge",
     "runtime_qa",

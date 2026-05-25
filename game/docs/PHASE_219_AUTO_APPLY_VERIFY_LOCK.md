@@ -1,7 +1,7 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Purpose
-Phase 232 adds a verification surface for the simplified one-command PowerShell updater.
+Phase 233 adds a verification surface for the simplified one-command PowerShell updater.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 232 adds a verification surface for the simplified one-command PowerShell 
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase232-autoverify` and press `O`.
+Open `/game/?v=phase233-autoverify` and press `O`.

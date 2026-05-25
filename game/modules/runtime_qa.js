@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime QA Snapshot Module
- * Build: PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+ * Build: PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
  * Purpose: give tester/admin a fast, non-secret runtime snapshot without touching the public page.
  */
-const BUILD = 'PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK';
+const BUILD = 'PHASE-233-OPTIONAL-MODULE-LOADER-LOCK';
 const SVRRuntimeQA = {
   build: BUILD,
   startedAt: new Date().toISOString(),

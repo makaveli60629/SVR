@@ -1,5 +1,5 @@
 
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Purpose
 Fixes the PowerShell updater failure where the apply script wrapper passed git arguments incorrectly and Git opened help instead of running the intended subcommand.

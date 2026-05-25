@@ -1,9 +1,9 @@
 /**
  * SVR Poker — Runtime Event Firewall
- * Build: PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+ * Build: PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
  * Captures high-risk runtime events and errors without touching the public page.
  */
-const BUILD = 'PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK';
+const BUILD = 'PHASE-233-OPTIONAL-MODULE-LOADER-LOCK';
 const MAX_ITEMS = 120;
 
 function safeDetail(value){

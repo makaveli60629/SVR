@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+ * Build: PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK';
+const BUILD = 'PHASE-233-OPTIONAL-MODULE-LOADER-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

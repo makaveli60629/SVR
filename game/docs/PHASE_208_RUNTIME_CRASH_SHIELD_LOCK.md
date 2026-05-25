@@ -1,4 +1,4 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Purpose
 Prevent runtime/event bridge failures from freezing the game loop.

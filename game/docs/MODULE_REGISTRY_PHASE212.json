@@ -1,6 +1,6 @@
 {
   "phase": 215,
-  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
+  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
   "module": "boot_diagnostic_snapshot",
   "files": [
     "game/modules/boot_diagnostic_snapshot.js"

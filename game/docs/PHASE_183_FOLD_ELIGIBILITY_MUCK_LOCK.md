@@ -1,6 +1,6 @@
 # Phase 199 — Fold Eligibility + Muck Lock
 
-Build: `PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK`
+Build: `PHASE-233-OPTIONAL-MODULE-LOADER-LOCK`
 
 ## Added
 

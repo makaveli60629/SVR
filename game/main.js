@@ -7,46 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import "./modules/runtime_crash_shield.js";
-import "./modules/safe_event_bus.js";
-import "./modules/boot_cache_watchdog.js";
-import "./modules/marker_health.js";
-import "./modules/boot_diagnostic_snapshot.js";
-import "./modules/boot_route_recovery.js";
-import "./modules/boot_route_health.js";
-import "./modules/auto_apply_helper.js";
-import "./modules/auto_apply_status.js?v=phase232";
-import "./modules/auto_apply_verify.js?v=phase232";
-import "./modules/one_command_deploy_health.js?v=phase232";
-import "./modules/one_command_runbook.js?v=phase232";
-import "./modules/post_deploy_checklist.js?v=phase232";
-import "./modules/tester_launch_card.js?v=phase232";
-import "./modules/qa_shortcut_index.js?v=phase232";
-import "./modules/pilot_handoff_card.js?v=phase232";
-import "./modules/pilot_ready_summary.js?v=phase232";
-import "./modules/pilot_issue_template.js?v=phase232";
-import "./modules/pilot_feedback_export.js?v=phase232";
-import "./modules/power_deploy_watcher.js?v=phase232";
-import "./modules/power_deploy_wait_log.js?v=phase232";
-import "./modules/main_import_recovery.js?v=phase232";
-import "./modules/bridge_alias_recovery.js?v=phase232";
-import "./modules/bridge_proxy.js";
-import "./modules/event_firewall.js";
-import "./modules/enterprise_bridge.js";
-import "./modules/bridge_selftest.js";
-import "./modules/runtime_qa.js";
-import "./modules/session_export.js";
-import "./modules/deploy_verify.js";
-import "./modules/smoke_test.js";
-import "./modules/release_candidate.js";
-import "./modules/playtest_wizard.js";
-import "./modules/bug_reporter.js";
-import "./modules/tester_feedback.js";
-import "./modules/test_queue.js";
-import "./modules/test_report_bundle.js";
-import "./modules/demo_certification.js";
-import "./modules/pilot_testing_ready.js";
-import "./modules/auto_apply_git_wrapper_fix.js?v=phase232";
+import "./modules/optional_module_loader.js?v=phase233";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -139,7 +100,7 @@ let seatIndex = -1;
 let cash = 50000;
 
 const pokerHudState = {
-  build: "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
+  build: "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
   actor: "TABLE",
   stage: "waiting",
   action: "waiting",
@@ -351,8 +312,8 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK" } }));
-window.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK", preview: AUTOCAM, at: new Date().toISOString() } }));
+window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK" } }));
+window.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK", preview: AUTOCAM, at: new Date().toISOString() } }));
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold grip/A/trigger to aim teleport, release to teleport. Poker keys: F/C/R/A/H. QA keys: Q/V/T/U/W/G/X/Y. Private scene buttons enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 

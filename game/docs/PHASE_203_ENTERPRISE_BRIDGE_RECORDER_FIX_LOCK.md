@@ -1,4 +1,4 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Fix
 - Fixes runtime error: `this.recordDealerButton is not a function`.

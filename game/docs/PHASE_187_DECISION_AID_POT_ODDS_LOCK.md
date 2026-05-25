@@ -1,4 +1,4 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

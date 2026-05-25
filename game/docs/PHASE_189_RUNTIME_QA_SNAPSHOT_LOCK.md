@@ -1,6 +1,6 @@
 # Phase 199 — Runtime QA Snapshot Lock
 
-Build: `PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK`
+Build: `PHASE-233-OPTIONAL-MODULE-LOADER-LOCK`
 
 ## Scope
 - Adds `game/modules/runtime_qa.js`.

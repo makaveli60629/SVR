@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
+  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
   "phase": 206,
   "modules_added": [
     "game/modules/bridge_selftest.js",
-    "game/modules/enterprise_bridge_phase232.js"
+    "game/modules/enterprise_bridge_phase233.js"
   ],
   "events": [
     "svr_bridge_selftest_update"

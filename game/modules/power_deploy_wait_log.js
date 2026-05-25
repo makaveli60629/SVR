@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK";
+  const BUILD = "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK";
   const state = {
     build: BUILD,
     phase: 230,
@@ -14,7 +14,7 @@
   }
 
   async function probe(url){
-    const full = url + (url.includes("?") ? "&" : "?") + "v=phase232-" + Date.now();
+    const full = url + (url.includes("?") ? "&" : "?") + "v=phase233-" + Date.now();
     try {
       const r = await fetch(full, { cache: "no-store" });
       const text = await r.text();

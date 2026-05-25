@@ -1,7 +1,7 @@
 # Phase 199 — Bot Street Action Safety Lock
 
 ## Build
-`PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK`
+`PHASE-233-OPTIONAL-MODULE-LOADER-LOCK`
 
 ## Purpose
 This phase locks the poker runtime against scheduled bot-action errors and hardens street betting events before the next polish pass.

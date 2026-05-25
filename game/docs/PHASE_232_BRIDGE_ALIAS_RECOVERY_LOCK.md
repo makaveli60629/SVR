@@ -1,13 +1,13 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Purpose
-Phase 232 fixes the live Phase 230 boot fallback by adding bridge alias files for stale and current main.js imports.
+Phase 233 fixes the live Phase 230 boot fallback by adding bridge alias files for stale and current main.js imports.
 
 ## Direct fix
 - Adds `game/modules/enterprise_bridge_phase229.js`
 - Adds `game/modules/enterprise_bridge_phase230.js`
-- Adds `game/modules/enterprise_bridge_phase231.js`
-- Adds `game/modules/enterprise_bridge_phase232.js`
+- Adds `game/modules/enterprise_bridge_phase233.js`
+- Adds `game/modules/enterprise_bridge_phase233.js`
 - Updates `main.js` to import the stable bridge directly.
 - Adds `game/modules/bridge_alias_recovery.js`
 - Adds F9 alias check panel.
@@ -21,4 +21,4 @@ The live boot report shows `main.js?v=phase230` failed to dynamically import. Th
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase232-bridgealias` and press `F9`.
+Open `/game/?v=phase233-bridgealias` and press `F9`.

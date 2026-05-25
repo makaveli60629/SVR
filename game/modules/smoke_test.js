@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Smoke Test Automation Module
- * Build: PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+ * Build: PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
  * Purpose: run a safe, non-destructive readiness check after deploy before Quest/Desktop testing.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK';
+const BUILD = 'PHASE-233-OPTIONAL-MODULE-LOADER-LOCK';
 const EXPECTED_PHASE = 194;
 
 function bool(value) { return !!value; }

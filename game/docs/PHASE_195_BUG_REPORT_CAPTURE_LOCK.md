@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK`
+Build: `PHASE-233-OPTIONAL-MODULE-LOADER-LOCK`
 
 ## Added
 - In-game bug report capture panel.

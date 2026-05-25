@@ -1,7 +1,7 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Purpose
-Phase 232 adds a Pilot Feedback Export panel so testers can capture one JSON bundle containing build marker, URL, browser/device info, shortcut panel availability, and typed tester notes.
+Phase 233 adds a Pilot Feedback Export panel so testers can capture one JSON bundle containing build marker, URL, browser/device info, shortcut panel availability, and typed tester notes.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 232 adds a Pilot Feedback Export panel so testers can capture one JSON bun
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase232-feedbackexport` and press `F4`.
+Open `/game/?v=phase233-feedbackexport` and press `F4`.

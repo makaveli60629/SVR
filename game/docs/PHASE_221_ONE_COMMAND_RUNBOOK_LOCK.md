@@ -1,7 +1,7 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Purpose
-Phase 232 adds an in-game runbook for the simplified one-command PowerShell update flow.
+Phase 233 adds an in-game runbook for the simplified one-command PowerShell update flow.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 232 adds an in-game runbook for the simplified one-command PowerShell upda
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase232-runbook` and press `N`.
+Open `/game/?v=phase233-runbook` and press `N`.

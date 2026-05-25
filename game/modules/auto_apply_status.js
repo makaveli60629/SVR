@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK";
+  const BUILD = "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK";
   const state = {
     build: BUILD,
     phase: 218,
@@ -15,7 +15,7 @@
     p.id="svr-auto-apply-status";
     p.style.cssText="position:fixed;right:14px;top:76px;z-index:99992;width:min(520px,calc(100vw - 28px));max-height:70vh;overflow:auto;background:rgba(2,4,10,.93);color:#eaf7ff;border:1px solid rgba(128,210,255,.45);border-radius:16px;box-shadow:0 18px 60px rgba(0,0,0,.55);padding:14px;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;display:none";
     p.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><b>SVR Auto Apply Status</b><button id="svrAutoApplyClose" style="border:1px solid #7cf;background:#06131d;color:#eaf7ff;border-radius:999px;padding:4px 10px;cursor:pointer">Close</button></div><hr style="border:0;border-top:1px solid rgba(128,210,255,.25)"><div><b>Build:</b> ${BUILD}</div><div><b>Public page:</b> locked / untouched</div><div><b>Run:</b></div><pre style="white-space:pre-wrap;background:rgba(255,255,255,.06);border-radius:10px;padding:10px">cd C:\\Users\\ronal\\SVR
-powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT-PHASE218.ps1"</pre><div><b>After push:</b> GitHub → Actions → Auto Deploy → Run workflow → main</div><div><b>Test:</b> /game/?v=phase232-autoapplystatus</div>`;
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT-PHASE218.ps1"</pre><div><b>After push:</b> GitHub → Actions → Auto Deploy → Run workflow → main</div><div><b>Test:</b> /game/?v=phase233-autoapplystatus</div>`;
     document.body.appendChild(p);
     p.querySelector("#svrAutoApplyClose").onclick=()=>p.style.display="none";
     return p;

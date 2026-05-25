@@ -1,4 +1,4 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Scope
 - Keeps playable poker priority moving forward.

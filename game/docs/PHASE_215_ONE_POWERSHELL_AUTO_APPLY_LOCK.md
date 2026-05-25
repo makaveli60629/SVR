@@ -1,4 +1,4 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

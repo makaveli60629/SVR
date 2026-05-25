@@ -1,4 +1,4 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 Phase 214 adds a boot route health verifier to confirm the lobby and private scene recovery links resolve after deployment.
 

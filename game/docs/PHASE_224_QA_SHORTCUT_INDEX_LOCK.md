@@ -1,7 +1,7 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Purpose
-Phase 232 adds a master QA shortcut index so testers do not need to remember every panel key.
+Phase 233 adds a master QA shortcut index so testers do not need to remember every panel key.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 232 adds a master QA shortcut index so testers do not need to remember eve
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase232-shortcuts` and press `?` or `/`.
+Open `/game/?v=phase233-shortcuts` and press `?` or `/`.

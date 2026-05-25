@@ -1,9 +1,9 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
-Phase 232 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
+Phase 233 hardens the one-command updater workflow and adds in-game status evidence for the auto-apply process.
 
 ## Test
-Open `/game/?v=phase232-autoapplystatus` and press `I`.
+Open `/game/?v=phase233-autoapplystatus` and press `I`.
 
 ## Locked
 - Public Matrix launch page untouched.

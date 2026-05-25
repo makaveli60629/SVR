@@ -1,7 +1,7 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Purpose
-Phase 232 adds a pilot handoff card so non-technical testers can open one concise panel with the test link, what to verify, what to report, and the support shortcuts.
+Phase 233 adds a pilot handoff card so non-technical testers can open one concise panel with the test link, what to verify, what to report, and the support shortcuts.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 232 adds a pilot handoff card so non-technical testers can open one concis
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase232-handoff` and press `H`.
+Open `/game/?v=phase233-handoff` and press `H`.

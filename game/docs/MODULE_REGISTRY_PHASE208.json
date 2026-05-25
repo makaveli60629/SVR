@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
+  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
   "phase": 208,
   "modules": [
     "runtime_crash_shield.js",
     "bridge_proxy.js",
-    "enterprise_bridge_phase232.js",
+    "enterprise_bridge_phase233.js",
     "event_firewall.js"
   ],
   "public_page_touched": false

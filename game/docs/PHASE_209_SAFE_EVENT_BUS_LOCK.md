@@ -1,11 +1,11 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
 ## Purpose
 Prevent SVR custom-event listener errors from freezing the game.
 
 ## Added
 - `game/modules/safe_event_bus.js`
-- `game/modules/enterprise_bridge_phase232.js`
+- `game/modules/enterprise_bridge_phase233.js`
 - `svr_safe_event_bus_error` telemetry event
 
 ## Locked protections

@@ -1,11 +1,11 @@
 /**
  * SVR Poker — Bridge Proxy Runtime Guard
- * Build: PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+ * Build: PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
  * Purpose: install a no-crash proxy before poker/runtime modules dispatch telemetry.
  * The proxy returns safe functions for any record* method so missing recorder aliases
  * cannot freeze the render loop.
  */
-const BUILD = 'PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK';
+const BUILD = 'PHASE-233-OPTIONAL-MODULE-LOADER-LOCK';
 const STORE_KEY = '__svrBridgeProxyQueue';
 
 function safePayload(value){

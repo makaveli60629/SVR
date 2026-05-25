@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
+  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
   "modules_added": [
     "modules/auto_apply_helper.js",
-    "modules/enterprise_bridge_phase232.js"
+    "modules/enterprise_bridge_phase233.js"
   ],
   "public_page_touched": false,
   "deployment": "direct game folder plus update/game.zip backup"

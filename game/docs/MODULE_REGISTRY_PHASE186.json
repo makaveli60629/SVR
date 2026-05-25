@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
+  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
   "modules": [
     "game/modules/poker_demo.js",
     "game/modules/enterprise_bridge.js"

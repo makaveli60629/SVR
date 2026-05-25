@@ -1,6 +1,6 @@
-# PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK
+# PHASE-233-OPTIONAL-MODULE-LOADER-LOCK
 
-Phase 232 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 233 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

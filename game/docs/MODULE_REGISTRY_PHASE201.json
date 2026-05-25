@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
+  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
   "phase": 201,
   "modulesAdded": [
     "boot.js"

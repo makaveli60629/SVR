@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Load `/game/?v=phase185` without black screen.
-- [ ] Confirm title/version shows `PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK`.
+- [ ] Confirm title/version shows `PHASE-233-OPTIONAL-MODULE-LOADER-LOCK`.
 - [ ] Confirm YOUR TURN countdown updates once per second.
 - [ ] Confirm hand-history panel shows TURN line.
 - [ ] Confirm action log still records player and bot actions.

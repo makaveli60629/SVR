@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK",
+  "build": "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK",
   "public_page_touched": false,
   "modules_added": [
     "game/modules/playtest_wizard.js"

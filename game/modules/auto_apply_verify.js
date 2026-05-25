@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-232-BRIDGE-ALIAS-RECOVERY-LOCK";
+  const BUILD = "PHASE-233-OPTIONAL-MODULE-LOADER-LOCK";
   const state = {
     build: BUILD,
     phase: 219,
@@ -10,7 +10,7 @@
 
   async function checkJson(url){
     try {
-      const r = await fetch(url + (url.includes("?") ? "&" : "?") + "v=phase232-" + Date.now(), { cache: "no-store" });
+      const r = await fetch(url + (url.includes("?") ? "&" : "?") + "v=phase233-" + Date.now(), { cache: "no-store" });
       const text = await r.text();
       let json = null;
       try { json = JSON.parse(text); } catch(_e) {}
