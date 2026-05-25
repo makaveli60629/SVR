@@ -146,6 +146,12 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
 
 function buildButtons(state){
+  const poker = state.poker || {};
+  const legal = poker.legal || {};
+  const callAmount = Math.max(0, Math.round(Number(legal.callAmount || 0)));
+  const minRaise = Math.max(0, Math.round(Number(legal.minRaise || 100)));
+  const callLabel = callAmount > 0 ? `CALL $${callAmount}` : 'CHECK';
+  const raiseLabel = `RAISE +${minRaise}`;
   const buttons = [
     { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'tableScene', label: 'TABLE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
@@ -160,16 +166,17 @@ function buildButtons(state){
     { id: 'reikiRoomScene', label: 'REIKI RM', x: 284, y: 250, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
+    { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 160, h: 58, font: 20, pinchOnly: true, hold: 0.20, margin: 6 },
+    { id: 'pokerNextHand', label: 'NEXT HAND', x: 366, y: 360, w: 122, h: 58, font: 17, pinchOnly: true, hold: 0.20, margin: 6 },
 
     { id: 'pokerFold', label: 'FOLD', x: 24, y: 306, w: 92, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pokerCall', label: 'CALL', x: 124, y: 306, w: 92, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pokerRaise', label: 'RAISE', x: 224, y: 306, w: 92, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pokerCall', label: callLabel, x: 124, y: 306, w: 92, h: 42, font: callAmount > 0 ? 13 : 18, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pokerRaise', label: raiseLabel, x: 224, y: 306, w: 92, h: 42, font: 12, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'pokerAllIn', label: 'ALL-IN', x: 324, y: 306, w: 92, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
+    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 500, y: 178, w: 476, h: 240, font: 58, pinchOnly: true, hold: 0.18, margin: 8 },
   ];
-  if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
-  else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 428, y: 120, w: 548, h: 48, font: 28, pinchOnly: true, hold: 0.18, margin: 8 });
+  if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 500, y: 120, w: 476, h: 48, font: 24, pinchOnly: true, hold: 0.18, margin: 8 });
+  else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 500, y: 120, w: 476, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
   return buttons;
 }
 
@@ -225,6 +232,18 @@ let hoveredId = null;
     ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 430, 152);
     ctx.fillText(`Track: ${state.audioEnabled ? state.trackTitle : 'Paused'}`, 430, 190);
     ctx.fillText(`Zone: ${state.inTableZone ? 'Ready' : 'Walk closer'}`, 430, 228);
+    const poker = state.poker || {};
+    const legal = poker.legal || {};
+    const decision = poker.decisionAid || {};
+    const callAmount = Math.max(0, Math.round(Number(legal.callAmount || 0)));
+    const pokerLine1 = `${poker.actor || 'TABLE'} • ${(poker.stage || 'waiting').toUpperCase()}${poker.remaining ? ' • ' + poker.remaining + 's' : ''}`;
+    const pokerLine2 = `${callAmount > 0 ? 'CALL $' + callAmount : 'CHECK FREE'} • ${decision.pressure || 'WAITING'}${decision.potOddsPct ? ' • ' + decision.potOddsPct + '%' : ''}`;
+    ctx.fillStyle = poker.actor === 'YOU' ? '#8ce5ff' : 'rgba(233,233,255,0.82)';
+    ctx.font = 'bold 22px system-ui, Arial';
+    ctx.fillText(pokerLine1.slice(0, 42), 430, 258);
+    ctx.fillStyle = decision.pressure === 'HIGH PRESSURE' ? '#ffb95f' : '#7ff5c7';
+    ctx.font = '21px system-ui, Arial';
+    ctx.fillText(pokerLine2.slice(0, 46), 430, 286);
     ctx.textAlign = 'right';
     ctx.fillStyle = state.seated ? '#7ff5c7' : state.inTableZone ? '#f6e27f' : 'rgba(233,233,255,0.72)';
     ctx.font = 'bold 28px system-ui, Arial';
@@ -233,7 +252,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Poker: Fold / Call / Raise / All-In • private scenes stay outside lobby • hold TP to aim', 36, 332);
+    ctx.fillText('Poker watch sync: legal action hints • pot odds • fold/call/raise/all-in • next hand', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -284,6 +303,7 @@ let hoveredId = null;
     if (id === 'pokerCall') actions.pokerCall?.();
     if (id === 'pokerRaise') actions.pokerRaise?.();
     if (id === 'pokerAllIn') actions.pokerAllIn?.();
+    if (id === 'pokerNextHand') actions.pokerNextHand?.();
   }
 
   function update(dt, leftHand, rightHand){

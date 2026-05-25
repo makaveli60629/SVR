@@ -1,0 +1,12 @@
+{
+  "phase": 188,
+  "build": "PHASE-190-SESSION-EXPORT-LOCK",
+  "modules": [
+    "game/main.js",
+    "game/modules/watch.js",
+    "game/modules/poker_demo.js",
+    "game/modules/enterprise_bridge.js"
+  ],
+  "publicPageTouched": false,
+  "notes": "Watch console now mirrors poker legal action and decision-aid state."
+}

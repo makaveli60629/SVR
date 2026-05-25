@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-187-DECISION-AID-POT-ODDS-LOCK",
-  "phase": 187,
-  "source": "direct-game-folder",
-  "generatedAt": "2026-05-25T00:00:00Z",
+  "build": "PHASE-190-SESSION-EXPORT-LOCK",
+  "phase": 190,
   "public_page_touched": false,
-  "featureLock": "player decision aid, pot odds, pressure hint telemetry"
+  "game_package_under_25mb_target": true,
+  "source": "direct-game-folder",
+  "featureLock": "session export QA transcript"
 }

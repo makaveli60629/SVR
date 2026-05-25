@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Enterprise Bridge
- * Build: PHASE-187-DECISION-AID-POT-ODDS-LOCK
+ * Build: PHASE-190-SESSION-EXPORT-LOCK
  * Safe browser-side bridge: no SQL strings, no API secrets, no Stripe secrets.
  */
 const SVREnterpriseBridge = {
-  build: 'PHASE-187-DECISION-AID-POT-ODDS-LOCK',
+  build: 'PHASE-190-SESSION-EXPORT-LOCK',
   apiBase: window.SVR_API_BASE || localStorage.getItem('svr_api_base') || '',
   pending: [],
   apiOnline: false,

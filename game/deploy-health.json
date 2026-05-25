@@ -1,6 +1,7 @@
 {
   "status": "ok",
-  "build": "PHASE-187-DECISION-AID-POT-ODDS-LOCK",
-  "phase": 187,
-  "source": "direct-game-folder"
+  "build": "PHASE-190-SESSION-EXPORT-LOCK",
+  "target": "/game",
+  "source": "direct-game-folder",
+  "phase": 189
 }

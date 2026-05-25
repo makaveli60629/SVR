@@ -8,6 +8,8 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import "./modules/enterprise_bridge.js";
+import "./modules/runtime_qa.js";
+import "./modules/session_export.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -98,6 +100,33 @@ const audio = createAudioPlaylist({
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
+
+const pokerHudState = {
+  build: "PHASE-190-SESSION-EXPORT-LOCK",
+  actor: "TABLE",
+  stage: "waiting",
+  action: "waiting",
+  remaining: 0,
+  legal: { callAmount: 0, minRaise: 100, options: ["nextHand"] },
+  decisionAid: { pressure: "WAITING", potOddsPct: 0, hint: "Waiting for poker state", callAmount: 0, pot: 0 },
+  sidePots: [],
+  allInPlayers: []
+};
+function updatePokerHud(partial = {}){
+  if (partial.actor !== undefined) pokerHudState.actor = partial.actor;
+  if (partial.stage !== undefined) pokerHudState.stage = partial.stage;
+  if (partial.action !== undefined) pokerHudState.action = partial.action;
+  if (partial.remaining !== undefined) pokerHudState.remaining = partial.remaining;
+  if (partial.legal) pokerHudState.legal = { ...pokerHudState.legal, ...partial.legal };
+  if (partial.decisionAid) pokerHudState.decisionAid = { ...pokerHudState.decisionAid, ...partial.decisionAid };
+  if (partial.sidePots) pokerHudState.sidePots = partial.sidePots;
+  if (partial.allInPlayers) pokerHudState.allInPlayers = partial.allInPlayers;
+}
+window.addEventListener("svr_watch_turn_indicator_update", (event)=>updatePokerHud(event.detail || {}));
+window.addEventListener("svr_poker_legal_actions_update", (event)=>updatePokerHud(event.detail || {}));
+window.addEventListener("svr_poker_decision_aid_update", (event)=>updatePokerHud(event.detail || {}));
+window.addEventListener("svr_poker_side_pot_resolution", (event)=>updatePokerHud(event.detail || {}));
+window.addEventListener("svr_poker_allin_update", (event)=>updatePokerHud(event.detail || {}));
 
 function currentHeadXZ(){
   if (renderer.xr.isPresenting){
@@ -236,7 +265,17 @@ const watch = createWristWatch({
     seated,
     inTableZone: inTableZone(),
     seatLabel: seatLabel(),
-    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
+    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true,
+    poker: {
+      actor: pokerHudState.actor,
+      stage: pokerHudState.stage,
+      action: pokerHudState.action,
+      remaining: pokerHudState.remaining,
+      legal: { ...pokerHudState.legal },
+      decisionAid: { ...pokerHudState.decisionAid },
+      sidePots: pokerHudState.sidePots,
+      allInPlayers: pokerHudState.allInPlayers
+    }
   }),
   actions: {
     toggleAudio: ()=>audio.toggle(),
@@ -275,7 +314,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: "PHASE-187-DECISION-AID-POT-ODDS-LOCK" } }));
+window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: "PHASE-190-SESSION-EXPORT-LOCK" } }));
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold grip/A/trigger to aim teleport, release to teleport. Poker keys: F/C/R/A/H. Private scene buttons enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
