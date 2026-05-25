@@ -1,0 +1,13 @@
+{
+  "phase": 186,
+  "build": "PHASE-186-DEALER-BLIND-REBUY-LOCK",
+  "modules": [
+    "game/modules/poker_demo.js",
+    "game/modules/enterprise_bridge.js"
+  ],
+  "events": [
+    "svr_poker_dealer_button_update",
+    "svr_poker_rebuy_update"
+  ],
+  "publicPageTouched": false
+}

@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK",
+  "build": "PHASE-186-DEALER-BLIND-REBUY-LOCK",
   "phase": 182,
   "modules": {
     "poker_demo.js": [

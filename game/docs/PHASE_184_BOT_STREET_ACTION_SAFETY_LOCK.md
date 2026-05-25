@@ -1,7 +1,7 @@
 # Phase 185 — Bot Street Action Safety Lock
 
 ## Build
-`PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK`
+`PHASE-186-DEALER-BLIND-REBUY-LOCK`
 
 ## Purpose
 This phase locks the poker runtime against scheduled bot-action errors and hardens street betting events before the next polish pass.

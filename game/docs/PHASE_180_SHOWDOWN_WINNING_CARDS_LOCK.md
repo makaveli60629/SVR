@@ -1,4 +1,4 @@
-# PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK
+# PHASE-186-DEALER-BLIND-REBUY-LOCK
 
 ## Scope
 - Keeps playable poker priority moving forward.

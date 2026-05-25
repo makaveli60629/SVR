@@ -1,6 +1,6 @@
 # Phase 185 — Fold Eligibility + Muck Lock
 
-Build: `PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK`
+Build: `PHASE-186-DEALER-BLIND-REBUY-LOCK`
 
 ## Added
 

@@ -1,6 +1,6 @@
 # Phase 185 — Side Pot Eligibility Lock
 
-Build: `PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK`
+Build: `PHASE-186-DEALER-BLIND-REBUY-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 181 contribution ledger.

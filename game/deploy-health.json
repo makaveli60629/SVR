@@ -1,6 +1,6 @@
 {
   "status": "ok",
-  "build": "PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK",
-  "source": "direct-game-folder",
-  "note": "local package health marker"
+  "build": "PHASE-186-DEALER-BLIND-REBUY-LOCK",
+  "phase": 186,
+  "source": "direct-game-folder"
 }

@@ -82,6 +82,10 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   const actionLog = [];
   const legalState = { stage: 'idle', callAmount: 0, minRaise: 100, options: ['nextHand'], expiresAt: 0 };
   const turnIndicator = { seatIndex: -1, actor: 'TABLE', stage: 'idle', action: 'waiting', remaining: 0, expiresAt: 0, updatedAt: 0 };
+  const REBUY_FLOOR = 100;
+  const REBUY_AMOUNT = 3000;
+  const PLAYER_REBUY_AMOUNT = 5000;
+  const rebuyLedger = [];
 
   function getContributionsLine() {
     if (!current?.contributions) return 'Contributions loading';
@@ -102,6 +106,83 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     return !!current?.foldedPlayers?.has(index);
   }
 
+
+
+  function getDealerBlindLine() {
+    if (!current) return 'BUTTON: waiting • SB waiting • BB waiting';
+    const dealer = players[current.dealerIndex]?.anchor?.name || 'TABLE';
+    const sb = players[current.sbIndex]?.anchor?.name || 'SB';
+    const bb = players[current.bbIndex]?.anchor?.name || 'BB';
+    const nextButton = players[((current.dealerIndex || 0) + 1) % players.length]?.anchor?.name || 'TABLE';
+    return `BUTTON: ${dealer} • SB: ${sb} • BB: ${bb} • NEXT: ${nextButton}`;
+  }
+
+  function getRebuyLine() {
+    if (!rebuyLedger.length) return 'REBUY: none needed';
+    const latest = rebuyLedger.slice(0, 3).map((r) => `${r.player} +$${r.added}`).join('  •  ');
+    return `REBUY: ${latest}`;
+  }
+
+  function publishDealerButtonState(stage = '') {
+    if (!current) return;
+    const payload = {
+      build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK',
+      handNumber,
+      stage: stage || current.stage || 'table',
+      dealerIndex: current.dealerIndex,
+      smallBlindIndex: current.sbIndex,
+      bigBlindIndex: current.bbIndex,
+      dealer: players[current.dealerIndex]?.anchor?.name || 'TABLE',
+      smallBlind: players[current.sbIndex]?.anchor?.name || 'SB',
+      bigBlind: players[current.bbIndex]?.anchor?.name || 'BB',
+      nextDealerIndex: ((current.dealerIndex || 0) + 1) % players.length,
+      line: getDealerBlindLine()
+    };
+    try { window.dispatchEvent(new CustomEvent('svr_poker_dealer_button_update', { detail: payload })); } catch (_) {}
+  }
+
+  function publishRebuyLedger(latest = [], reason = '') {
+    if (!latest.length) return;
+    const payload = {
+      build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK',
+      handNumber,
+      reason: reason || 'table-continuity',
+      latest,
+      ledger: rebuyLedger.slice(0, 12),
+      stacks: playerStacks.slice()
+    };
+    try { window.dispatchEvent(new CustomEvent('svr_poker_rebuy_update', { detail: payload })); } catch (_) {}
+  }
+
+  function ensurePlayableStacks(reason = 'new-hand') {
+    const latest = [];
+    players.forEach((player, index) => {
+      const stack = Math.max(0, Math.round(playerStacks[index] || 0));
+      if (stack > REBUY_FLOOR) return;
+      const target = index === PLAYER_INDEX ? PLAYER_REBUY_AMOUNT : REBUY_AMOUNT;
+      const added = Math.max(0, target - stack);
+      if (added <= 0) return;
+      playerStacks[index] = target;
+      const entry = {
+        hand: handNumber + 1,
+        player: player.anchor.name,
+        seatIndex: index,
+        previousStack: stack,
+        added,
+        newStack: target,
+        reason,
+        at: new Date().toISOString()
+      };
+      latest.push(entry);
+      rebuyLedger.unshift(entry);
+    });
+    if (rebuyLedger.length > 24) rebuyLedger.length = 24;
+    if (latest.length) {
+      paintHistory();
+      publishRebuyLedger(latest, reason);
+    }
+    return latest;
+  }
 
   function summarizeSidePots(sidePots = []) {
     if (!sidePots.length) return 'SIDE POTS: none';
@@ -191,7 +272,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     if (!current.allInPlayers) current.allInPlayers = new Set();
     if ((playerStacks[index] || 0) <= 0 || paid < request) {
       current.allInPlayers.add(index);
-      try { window.dispatchEvent(new CustomEvent('svr_poker_allin_update', { detail: { build: 'PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK', handNumber, player: players[index].anchor.name, seatIndex: index, paid, requested: request, stage: stage || current.stage, pot: current.pot, stacks: playerStacks.slice(), contributions: current.contributions.slice(), allInPlayers: getAllInNames() } })); } catch (_) {}
+      try { window.dispatchEvent(new CustomEvent('svr_poker_allin_update', { detail: { build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK', handNumber, player: players[index].anchor.name, seatIndex: index, paid, requested: request, stage: stage || current.stage, pot: current.pot, stacks: playerStacks.slice(), contributions: current.contributions.slice(), allInPlayers: getAllInNames() } })); } catch (_) {}
     }
     refreshPotStack();
     return paid;
@@ -252,6 +333,9 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     ctx.fillStyle = "#f2d269";
     ctx.font = "bold 39px system-ui";
     ctx.fillText("HAND HISTORY / STACKS", 54, 54);
+    ctx.fillStyle = "rgba(242,210,105,0.88)";
+    ctx.font = "22px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+    ctx.fillText(getDealerBlindLine().slice(0, 112), 54, 84);
 
     const turnActive = turnIndicator.seatIndex >= 0;
     const turnLine = turnActive
@@ -259,53 +343,57 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       : `TURN: ${turnIndicator.actor} • ${turnIndicator.stage.toUpperCase()} • ${turnIndicator.action.toUpperCase()}`;
     ctx.fillStyle = turnIndicator.actor === 'YOU' ? "#8ce5ff" : "#ffffff";
     ctx.font = "bold 29px system-ui";
-    ctx.fillText(turnLine.slice(0, 94), 54, 96);
+    ctx.fillText(turnLine.slice(0, 94), 54, 112);
 
     ctx.fillStyle = "rgba(236,232,255,0.94)";
     ctx.font = "26px system-ui";
     const stackLine = players.map((p, i) => `${p.anchor.name}: $${playerStacks[i]}`).join("  •  ");
-    ctx.fillText(stackLine.slice(0, 118), 54, 134);
+    ctx.fillText(stackLine.slice(0, 118), 54, 144);
 
     ctx.fillStyle = "rgba(140,229,255,0.84)";
     ctx.font = "21px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
-    ctx.fillText(getContributionsLine().slice(0, 124), 54, 166);
+    ctx.fillText(getContributionsLine().slice(0, 124), 54, 174);
 
     const allInLine = getAllInNames().length ? `ALL-IN: ${getAllInNames().join(', ')}` : 'ALL-IN: none';
     ctx.fillStyle = getAllInNames().length ? "#ffb95f" : "rgba(236,232,255,0.52)";
-    ctx.fillText(allInLine, 54, 194);
+    ctx.fillText(allInLine, 54, 202);
 
     const foldedLine = getFoldedNames().length ? `MUCKED/FOLDED: ${getFoldedNames().join(', ')}` : 'MUCKED/FOLDED: none';
     ctx.fillStyle = getFoldedNames().length ? "#ff7da0" : "rgba(236,232,255,0.52)";
-    ctx.fillText(foldedLine, 54, 222);
+    ctx.fillText(foldedLine, 54, 230);
 
     ctx.fillStyle = current?.sidePots?.length ? "#8ce5ff" : "rgba(236,232,255,0.52)";
     ctx.font = "21px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
-    ctx.fillText(current?.sidePots?.length ? summarizeSidePots(current.sidePots).slice(0, 116) : 'SIDE POTS: waiting for showdown', 54, 250);
+    ctx.fillText(current?.sidePots?.length ? summarizeSidePots(current.sidePots).slice(0, 116) : 'SIDE POTS: waiting for showdown', 54, 258);
 
     ctx.fillStyle = "#ffffff";
     ctx.font = "25px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
     if (handHistory.length === 0) {
       ctx.fillStyle = "rgba(236,232,255,0.72)";
-      ctx.fillText("No completed hands yet. Results will lock here after showdown.", 54, 286);
+      ctx.fillText("No completed hands yet. Results will lock here after showdown.", 54, 292);
     } else {
       handHistory.slice(0, 2).forEach((h, i) => {
         ctx.fillStyle = i === 0 ? "#ffffff" : "rgba(236,232,255,0.82)";
         const cardsText = h.winningCards ? ` • WIN ${h.winningCards}` : '';
-        ctx.fillText(`#${h.hand} ${h.winner} won $${h.pot} • ${h.handName}${cardsText}`.slice(0, 86), 54, 284 + i * 30);
+        ctx.fillText(`#${h.hand} ${h.winner} won $${h.pot} • ${h.handName}${cardsText}`.slice(0, 86), 54, 292 + i * 30);
       });
     }
 
+    ctx.fillStyle = rebuyLedger.length ? "#55ffb3" : "rgba(236,232,255,0.52)";
+    ctx.font = "21px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+    ctx.fillText(getRebuyLine().slice(0, 110), 54, 332);
+
     ctx.fillStyle = "#8ce5ff";
     ctx.font = "bold 27px system-ui";
-    ctx.fillText("LIVE ACTION LOG", 54, 350);
+    ctx.fillText("LIVE ACTION LOG", 54, 360);
     ctx.font = "23px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
     if (actionLog.length === 0) {
       ctx.fillStyle = "rgba(236,232,255,0.62)";
-      ctx.fillText("Actions will appear here as bots and player act.", 54, 384);
+      ctx.fillText("Actions will appear here as bots and player act.", 54, 394);
     } else {
       actionLog.slice(0, 3).forEach((a, i) => {
         ctx.fillStyle = i === 0 ? "#ffffff" : "rgba(236,232,255,0.78)";
-        ctx.fillText(`${a.actor}: ${a.action}${a.amount ? ' $' + a.amount : ''} • ${a.stage}`.slice(0, 88), 54, 382 + i * 28);
+        ctx.fillText(`${a.actor}: ${a.action}${a.amount ? ' $' + a.amount : ''} • ${a.stage}`.slice(0, 88), 54, 392 + i * 28);
       });
     }
 
@@ -324,14 +412,14 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     actionLog.unshift(clean);
     if (actionLog.length > 12) actionLog.length = 12;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_action_log_update', { detail: { build: 'PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK', latest: clean, actions: actionLog.slice(0, 12), stacks: playerStacks.slice(), pot: current?.pot || 0 } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_action_log_update', { detail: { build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK', latest: clean, actions: actionLog.slice(0, 12), stacks: playerStacks.slice(), pot: current?.pot || 0 } })); } catch (_) {}
   }
 
   function recordHistory(entry) {
     handHistory.unshift(entry);
     if (handHistory.length > 8) handHistory.length = 8;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_history_update', { detail: { build: 'PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK', latest: entry, history: handHistory.slice(0, 8), stacks: playerStacks.slice() } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_history_update', { detail: { build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK', latest: entry, history: handHistory.slice(0, 8), stacks: playerStacks.slice() } })); } catch (_) {}
   }
 
   function applyStackDelta(index, amount) {
@@ -607,7 +695,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
   function publishTurnIndicator(extra = {}) {
     const payload = {
-      build: 'PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK',
+      build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK',
       handNumber,
       seatIndex: turnIndicator.seatIndex,
       actor: turnIndicator.actor,
@@ -651,7 +739,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
 
   function emitPokerEvent(name, payload = {}) {
-    try { window.dispatchEvent(new CustomEvent(name, { detail: { build: 'PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK', handNumber, ...payload } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent(name, { detail: { build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK', handNumber, ...payload } })); } catch (_) {}
   }
 
   function shiftFutureQueue(delay) {
@@ -675,7 +763,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     legalState.options = computeLegalActions(legalState.callAmount);
     legalState.expiresAt = expiresAt || 0;
     paintHistory();
-    try { window.dispatchEvent(new CustomEvent('svr_poker_legal_actions_update', { detail: { build: 'PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK', handNumber, legal: { ...legalState }, pot: current?.pot || 0, stacks: playerStacks.slice() } })); } catch (_) {}
+    try { window.dispatchEvent(new CustomEvent('svr_poker_legal_actions_update', { detail: { build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK', handNumber, legal: { ...legalState }, pot: current?.pot || 0, stacks: playerStacks.slice() } })); } catch (_) {}
     return legalState;
   }
 
@@ -730,7 +818,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       if (!current.foldedPlayers) current.foldedPlayers = new Set();
       current.foldedPlayers.add(PLAYER_INDEX);
       added = 0;
-      try { window.dispatchEvent(new CustomEvent('svr_poker_fold_eligibility_update', { detail: { build: 'PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK', handNumber, foldedPlayers: getFoldedNames(), seatIndex: PLAYER_INDEX, stage } })); } catch (_) {}
+      try { window.dispatchEvent(new CustomEvent('svr_poker_fold_eligibility_update', { detail: { build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK', handNumber, foldedPlayers: getFoldedNames(), seatIndex: PLAYER_INDEX, stage } })); } catch (_) {}
     }
     else if (action === 'call' || action === 'check') added = callAmount;
     else if (action === 'raise') added = callAmount + legalState.minRaise;
@@ -773,6 +861,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     clearCards();
     clearPotStack();
     resetRingHighlights();
+    ensurePlayableStacks("new-hand");
 
     const dealerIndex = (handNumber - 1) % players.length;
     const sbIndex = (dealerIndex + 1) % players.length;
@@ -789,6 +878,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     const turnAggressor = winner.player.anchor.index;
     const riverAggressor = winner.player.anchor.index;
     current = { handPlayers, board, winner, results, handNumber, dealerIndex, sbIndex, bbIndex, actorIndex: null, pot: 0, stage: "shuffle", contributions: players.map(() => 0), allInPlayers: new Set(), foldedPlayers: new Set(), sidePots: [] };
+    publishDealerButtonState("shuffle");
     refreshPotStack();
     queue = [];
     let t = nowS + 0.85;
@@ -804,6 +894,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       applyActionHighlight(bbIndex);
       recordAction(BOT_NAMES[sbIndex], 'small blind', 10, 'blinds');
       recordAction(BOT_NAMES[bbIndex], 'big blind', 20, 'blinds');
+      publishDealerButtonState("blinds");
     });
 
     for (let round = 0; round < 2; round += 1) {
@@ -934,7 +1025,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const sidePotText = summarizeSidePots(current.sidePots);
       paintStatus(`${primaryWinner} paid • ${winner.result.name}`, `Paid $${potResolution.totalPaid} • ${sidePotText}`.slice(0, 110), "rgba(244,210,105,0.98)");
       statusCb(`HAND ${handNumber} • ${primaryWinner} paid • side pots ${current.sidePots.length} • total paid $${potResolution.totalPaid}`);
-      const handPayload = { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: primaryWinner, handName: winner.result.name, board: boardText, pot: potResolution.totalPaid, winnerHoleCards: winnerCards, winningCards, ranking, contributions: current.contributions ? current.contributions.slice() : [], allInPlayers: getAllInNames(), foldedPlayers: getFoldedNames(), sidePots: current.sidePots, payouts: potResolution.payouts, stacks: playerStacks.slice() };
+      const handPayload = { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: primaryWinner, handName: winner.result.name, board: boardText, pot: potResolution.totalPaid, winnerHoleCards: winnerCards, winningCards, ranking, contributions: current.contributions ? current.contributions.slice() : [], allInPlayers: getAllInNames(), foldedPlayers: getFoldedNames(), sidePots: current.sidePots, payouts: potResolution.payouts, stacks: playerStacks.slice(), dealerButton: getDealerBlindLine(), rebuys: rebuyLedger.slice(0, 8) };
       potResolution.payouts.forEach((amount, seatIndex) => { if (amount > 0) recordAction(players[seatIndex].anchor.name, 'side pot paid', amount, 'showdown'); });
       recordHistory(handPayload);
       emitPokerEvent('svr_poker_hand_result', handPayload);
@@ -1026,7 +1117,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     if (normalized === 'fold') {
       if (!current.foldedPlayers) current.foldedPlayers = new Set();
       current.foldedPlayers.add(PLAYER_INDEX);
-      try { window.dispatchEvent(new CustomEvent('svr_poker_fold_eligibility_update', { detail: { build: 'PHASE-185-TURN-INDICATOR-WATCH-SYNC-LOCK', handNumber, foldedPlayers: getFoldedNames(), seatIndex: PLAYER_INDEX, stage: current.stage } })); } catch (_) {}
+      try { window.dispatchEvent(new CustomEvent('svr_poker_fold_eligibility_update', { detail: { build: 'PHASE-186-DEALER-BLIND-REBUY-LOCK', handNumber, foldedPlayers: getFoldedNames(), seatIndex: PLAYER_INDEX, stage: current.stage } })); } catch (_) {}
     }
     if (normalized === 'raise') freeAdded = 100;
     if (normalized === 'call') freeAdded = 50;
