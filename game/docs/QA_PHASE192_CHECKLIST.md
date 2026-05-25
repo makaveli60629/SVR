@@ -7,4 +7,4 @@
 5. Press **X** and confirm session export downloads.
 6. Confirm no public Matrix launch page files changed.
 
-Build: `PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK`
+Build: `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`

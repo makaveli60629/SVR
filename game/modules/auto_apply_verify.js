@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK";
+  const BUILD = "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK";
   const state = {
     build: BUILD,
     phase: 219,
@@ -10,7 +10,7 @@
 
   async function checkJson(url){
     try {
-      const r = await fetch(url + (url.includes("?") ? "&" : "?") + "v=phase235-" + Date.now(), { cache: "no-store" });
+      const r = await fetch(url + (url.includes("?") ? "&" : "?") + "v=phase236-" + Date.now(), { cache: "no-store" });
       const text = await r.text();
       let json = null;
       try { json = JSON.parse(text); } catch(_e) {}

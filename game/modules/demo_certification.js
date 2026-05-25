@@ -1,10 +1,10 @@
 /**
  * SVR Poker - Demo Certification Lock
- * Build: PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+ * Build: PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
  * Shortcut: Z
  * Purpose: combine QA, smoke, RC, feedback, bug reports, and report bundle into one demo-ready gate.
  */
-const BUILD = 'PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK';
+const BUILD = 'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK';
 const STORE_KEY = 'svr_demo_certifications';
 
 function safeRead(name, fallback = null) {

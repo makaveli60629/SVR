@@ -1,4 +1,4 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
 ## Scope
 - Adds a live decision-aid line for the player turn.

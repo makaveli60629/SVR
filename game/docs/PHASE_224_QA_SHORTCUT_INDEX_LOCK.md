@@ -1,7 +1,7 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
 ## Purpose
-Phase 235 adds a master QA shortcut index so testers do not need to remember every panel key.
+Phase 236 adds a master QA shortcut index so testers do not need to remember every panel key.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 235 adds a master QA shortcut index so testers do not need to remember eve
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase235-shortcuts` and press `?` or `/`.
+Open `/game/?v=phase236-shortcuts` and press `?` or `/`.

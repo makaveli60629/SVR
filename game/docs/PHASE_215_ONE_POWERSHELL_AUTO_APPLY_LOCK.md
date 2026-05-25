@@ -1,4 +1,4 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
 Phase 215 adds the simplified one-file PowerShell update workflow.
 

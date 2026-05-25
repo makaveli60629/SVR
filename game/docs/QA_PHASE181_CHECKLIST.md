@@ -1,7 +1,7 @@
 # QA Phase 199
 
 - [ ] Open `/game/?v=phase183`.
-- [ ] Confirm build says PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+- [ ] Confirm build says PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 - [ ] Start hand and verify history panel shows contribution line.
 - [ ] Press A or ALL-IN and verify stack does not go negative.
 - [ ] Verify all-in name appears in panel.

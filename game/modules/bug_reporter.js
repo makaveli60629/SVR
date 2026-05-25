@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Bug Report Capture
- * Build: PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+ * Build: PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
  * Purpose: capture tester issue reports from inside the game without touching the public Matrix page.
  * No secrets, no SQL strings, no public-page edits.
  */
-const BUILD = 'PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK';
+const BUILD = 'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK';
 const EXPECTED_PHASE = 195;
 const STORE_KEY = 'svr_bug_reports_phase197';
 

@@ -1,4 +1,4 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
 ## Scope
 Adds the tester feedback triage module for structured playtest verdict capture. Public Matrix page untouched.

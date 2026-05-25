@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
   "phase": 199,
   "modules": {
     "bug_reporter": "game/modules/bug_reporter.js",

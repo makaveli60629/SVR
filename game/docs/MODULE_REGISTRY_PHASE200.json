@@ -1,6 +1,6 @@
 {
   "phase": 200,
-  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
   "modules": [
     "enterprise_bridge",
     "runtime_qa",

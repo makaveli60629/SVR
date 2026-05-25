@@ -1,6 +1,6 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
-Phase 235 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
+Phase 236 improves the phase update workflow so the user only needs one stable PowerShell script plus the latest all-in packet.
 
 ## Locked rules
 - Public Matrix launch page untouched.

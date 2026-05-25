@@ -1,6 +1,6 @@
 # Phase 199 — Runtime QA Snapshot Lock
 
-Build: `PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK`
+Build: `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`
 
 ## Scope
 - Adds `game/modules/runtime_qa.js`.

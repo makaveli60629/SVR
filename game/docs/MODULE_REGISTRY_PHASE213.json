@@ -1,9 +1,9 @@
 {
   "phase": 215,
-  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
   "modulesAdded": [
     "game/modules/boot_route_recovery.js",
-    "game/modules/enterprise_bridge_phase235.js"
+    "game/modules/enterprise_bridge_phase236.js"
   ],
   "protected": {
     "publicPageTouched": false,

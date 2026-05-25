@@ -1,4 +1,4 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
 ## Purpose
 Fix the remaining stuck-on-Booting risk by adding a no-Three.js recovery shell. If CDN/import/runtime loading fails, the game no longer remains frozen on Booting.

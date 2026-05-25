@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK";
+  const BUILD = "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,23 +9,24 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase235",
-  "./auto_apply_verify.js?v=phase235",
-  "./one_command_deploy_health.js?v=phase235",
-  "./one_command_runbook.js?v=phase235",
-  "./post_deploy_checklist.js?v=phase235",
-  "./tester_launch_card.js?v=phase235",
-  "./qa_shortcut_index.js?v=phase235",
-  "./pilot_handoff_card.js?v=phase235",
-  "./pilot_ready_summary.js?v=phase235",
-  "./pilot_issue_template.js?v=phase235",
-  "./pilot_feedback_export.js?v=phase235",
-  "./power_deploy_watcher.js?v=phase235",
-  "./power_deploy_wait_log.js?v=phase235",
-  "./power_deploy_smoke_probe.js?v=phase235",
-  "./vr_input_spawn_clear_recovery.js?v=phase235",
-  "./main_import_recovery.js?v=phase235",
-  "./bridge_alias_recovery.js?v=phase235",
+  "./auto_apply_status.js?v=phase236",
+  "./auto_apply_verify.js?v=phase236",
+  "./one_command_deploy_health.js?v=phase236",
+  "./one_command_runbook.js?v=phase236",
+  "./post_deploy_checklist.js?v=phase236",
+  "./tester_launch_card.js?v=phase236",
+  "./qa_shortcut_index.js?v=phase236",
+  "./pilot_handoff_card.js?v=phase236",
+  "./pilot_ready_summary.js?v=phase236",
+  "./pilot_issue_template.js?v=phase236",
+  "./pilot_feedback_export.js?v=phase236",
+  "./power_deploy_watcher.js?v=phase236",
+  "./power_deploy_wait_log.js?v=phase236",
+  "./power_deploy_smoke_probe.js?v=phase236",
+  "./vr_input_spawn_clear_recovery.js?v=phase236",
+  "./vr_input_diagnostic.js?v=phase236",
+  "./main_import_recovery.js?v=phase236",
+  "./bridge_alias_recovery.js?v=phase236",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -42,7 +43,7 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase235"
+  "./auto_apply_git_wrapper_fix.js?v=phase236"
 ];
   const state = {
     build: BUILD,

@@ -1,6 +1,6 @@
 # Phase 199 — Playtest Wizard Lock
 
-Build: `PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK`
+Build: `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`
 
 ## Scope
 - Adds guided playtest wizard overlay.

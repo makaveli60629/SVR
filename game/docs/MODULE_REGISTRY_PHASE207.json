@@ -1,9 +1,9 @@
 {
-  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
   "phase": 207,
   "modules": [
     "game/modules/bridge_proxy.js",
-    "game/modules/enterprise_bridge_phase235.js",
+    "game/modules/enterprise_bridge_phase236.js",
     "game/modules/bridge_selftest.js",
     "game/modules/event_firewall.js"
   ],

@@ -1,7 +1,7 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
 ## Purpose
-Phase 235 adds a Pilot Feedback Export panel so testers can capture one JSON bundle containing build marker, URL, browser/device info, shortcut panel availability, and typed tester notes.
+Phase 236 adds a Pilot Feedback Export panel so testers can capture one JSON bundle containing build marker, URL, browser/device info, shortcut panel availability, and typed tester notes.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 235 adds a Pilot Feedback Export panel so testers can capture one JSON bun
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase235-feedbackexport` and press `F4`.
+Open `/game/?v=phase236-feedbackexport` and press `F4`.

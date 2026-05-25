@@ -1,6 +1,6 @@
 # Phase 213 QA Checklist
 
-1. Open `/game/?v=phase235-routefix`.
+1. Open `/game/?v=phase236-routefix`.
 2. Confirm HUD/build marker shows Phase 213.
 3. Press `R` and confirm Boot Route Recovery opens.
 4. Use a private-scene link from the panel.

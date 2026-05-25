@@ -1,4 +1,4 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
 ## Fix
 - Fixes runtime error: `this.recordDealerButton is not a function`.

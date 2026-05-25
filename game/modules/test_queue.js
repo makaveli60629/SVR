@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Test Queue Dashboard
- * Build: PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+ * Build: PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
  * Purpose: convert tester feedback, bug reports, release candidate checks, and smoke tests into a compact triage queue.
  * Public Matrix launch page is not touched.
  */
-const BUILD = 'PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK';
+const BUILD = 'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK';
 const EXPECTED_PHASE = 197;
 const STORE_KEY = 'svr_test_queue_phase197';
 

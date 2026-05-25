@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
   "phase": 208,
   "modules": [
     "runtime_crash_shield.js",
     "bridge_proxy.js",
-    "enterprise_bridge_phase235.js",
+    "enterprise_bridge_phase236.js",
     "event_firewall.js"
   ],
   "public_page_touched": false

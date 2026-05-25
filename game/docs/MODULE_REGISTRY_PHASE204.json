@@ -1,6 +1,6 @@
 {
   "phase": 204,
-  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
   "modules_added": [
     "modules/event_firewall.js"
   ],

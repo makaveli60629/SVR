@@ -1,6 +1,6 @@
 # Phase 199 — Bug Report Capture Lock
 
-Build: `PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK`
+Build: `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`
 
 ## Added
 - In-game bug report capture panel.

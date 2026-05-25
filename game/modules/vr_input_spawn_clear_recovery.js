@@ -1,5 +1,5 @@
 (function(){
-  const BUILD = "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK";
+  const BUILD = "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK";
   const state = {
     build: BUILD,
     phase: 235,

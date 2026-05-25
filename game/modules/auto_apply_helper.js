@@ -1,8 +1,8 @@
-// PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+// PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 // Runtime helper: documents the hardened one-command phase apply path.
 (function(){
   const state = {
-    build: "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+    build: "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
     phase: 216,
     shortcut: "I",
     command: 'powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\SVR-AUTO-APPLY-NEXT.ps1"',

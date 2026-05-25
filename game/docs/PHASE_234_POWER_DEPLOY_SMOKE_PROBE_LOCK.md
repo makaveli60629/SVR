@@ -1,7 +1,7 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
 ## Purpose
-Phase 235 adds a deploy smoke probe in both PowerShell and the game UI.
+Phase 236 adds a deploy smoke probe in both PowerShell and the game UI.
 
 ## Direct fix
 - Adds `game/modules/power_deploy_smoke_probe.js`
@@ -17,4 +17,4 @@ Phase 235 adds a deploy smoke probe in both PowerShell and the game UI.
 - `update/game.zip` backup preserved.
 
 ## Test
-Open `/game/?v=phase235-smokeprobe` and press `F12`.
+Open `/game/?v=phase236-smokeprobe` and press `F12`.

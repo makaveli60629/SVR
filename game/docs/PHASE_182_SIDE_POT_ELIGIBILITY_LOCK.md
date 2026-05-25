@@ -1,6 +1,6 @@
 # Phase 199 — Side Pot Eligibility Lock
 
-Build: `PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK`
+Build: `PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK`
 
 ## Locked additions
 - Side-pot resolution from the Phase 199 contribution ledger.

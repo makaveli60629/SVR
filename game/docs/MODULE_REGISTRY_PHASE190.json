@@ -1,6 +1,6 @@
 {
   "phase": 199,
-  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
   "modules": [
     {
       "path": "game/modules/session_export.js",

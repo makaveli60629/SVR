@@ -1,7 +1,7 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
 ## Purpose
-Phase 235 adds a tester launch card so testers have one small panel with the URL, shortcut keys, checklist, and expected pass/fail notes.
+Phase 236 adds a tester launch card so testers have one small panel with the URL, shortcut keys, checklist, and expected pass/fail notes.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 235 adds a tester launch card so testers have one small panel with the URL
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase235-testercard` and press `C`.
+Open `/game/?v=phase236-testercard` and press `C`.

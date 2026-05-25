@@ -1,10 +1,10 @@
 /**
  * SVR Poker — Session Export Module
- * Build: PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+ * Build: PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
  * Purpose: capture a compact testing transcript that can be copied/downloaded after a playtest.
  * No public-page edits, no secrets, no SQL strings.
  */
-const BUILD = 'PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK';
+const BUILD = 'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK';
 const MAX_EVENTS = 80;
 const MAX_SNAPSHOTS = 12;
 

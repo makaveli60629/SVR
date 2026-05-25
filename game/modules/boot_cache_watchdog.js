@@ -3,7 +3,7 @@
  * Prevents stale boot/main/version markers from hiding the real deployed phase.
  */
 (function(){
-  const BUILD = 'PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK';
+  const BUILD = 'PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK';
   const state = {
     build: BUILD,
     at: new Date().toISOString(),
@@ -22,7 +22,7 @@
     const hudText = (document.body && document.body.innerText || '').slice(0, 5000);
     mark('hud-build-marker', hudText.includes(BUILD), 'HUD should show the Phase 213 build marker.');
     try {
-      const res = await fetch('./version.json?v=phase235-' + Date.now(), { cache: 'no-store' });
+      const res = await fetch('./version.json?v=phase236-' + Date.now(), { cache: 'no-store' });
       const data = await res.json();
       mark('version-json-phase', String(data.build || '').includes(BUILD) || Number(data.phase) === 210, JSON.stringify(data).slice(0, 500));
     } catch (err) {
@@ -30,7 +30,7 @@
     }
     try {
       const scripts = Array.from(document.scripts || []).map(s => s.src || '').join('\n');
-      mark('boot-cache-query', scripts.includes('boot.js?v=phase235'), scripts || 'No script src found.');
+      mark('boot-cache-query', scripts.includes('boot.js?v=phase236'), scripts || 'No script src found.');
     } catch (err) {
       mark('boot-cache-query', false, err && (err.message || String(err)));
     }

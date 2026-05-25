@@ -1,8 +1,8 @@
 # Phase 213 QA Checklist
 
-- [ ] Open `/game/?v=phase235-markerhealth`.
+- [ ] Open `/game/?v=phase236-markerhealth`.
 - [ ] Confirm the page title shows Phase 213.
-- [ ] Confirm HUD/build marker shows PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK.
+- [ ] Confirm HUD/build marker shows PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK.
 - [ ] Confirm console has no red runtime crash during first 20 seconds.
 - [ ] Confirm `window.SVR_MARKER_HEALTH.run()` returns all required marker checks.
 - [ ] Confirm Booting does not stay permanent.

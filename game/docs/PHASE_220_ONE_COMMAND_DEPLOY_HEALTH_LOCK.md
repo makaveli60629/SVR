@@ -1,7 +1,7 @@
-# PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK
+# PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK
 
 ## Purpose
-Phase 235 adds a simple one-command deploy health surface so the project can confirm whether the latest package is actually visible after GitHub Pages deploy.
+Phase 236 adds a simple one-command deploy health surface so the project can confirm whether the latest package is actually visible after GitHub Pages deploy.
 
 ## Locked boundaries
 - Public Matrix launch page untouched.
@@ -10,4 +10,4 @@ Phase 235 adds a simple one-command deploy health surface so the project can con
 - Site additions are internal admin-only helpers.
 
 ## Test
-Open `/game/?v=phase235-deployhealth` and press `M`.
+Open `/game/?v=phase236-deployhealth` and press `M`.

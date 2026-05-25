@@ -1,6 +1,6 @@
 {
   "phase": 202,
-  "build": "PHASE-235-VR-INPUT-SPAWN-CLEAR-LOCK",
+  "build": "PHASE-236-VR-INPUT-DIAGNOSTIC-LOCK",
   "modules": [
     "boot.js",
     "modules/boot_fallback.js",
