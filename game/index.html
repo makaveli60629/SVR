@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR Poker • Phase 247 Direct Deploy Route Verify Lock</title>
+  <title>SVR Poker â€¢ Phase 247 Direct Deploy Route Verify Lock</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -92,11 +92,11 @@
   <div id="app"></div>
 
   <div id="hud">
-    <div class="pill" id="status">Booting…</div>
+    <div class="pill" id="status">Bootingâ€¦</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
-      <span class="pill" id="mode">Hands: …</span>
+      <span class="pill" id="mode">Hands: â€¦</span>
       <span class="pill">BUILD: PHASE-247-DIRECT-DEPLOY-ROUTE-VERIFY-LOCK</span>
     </div>
   </div>
@@ -118,5 +118,10 @@
   <pre id="err"></pre>
 
   <script type="module" src="./main.js"></script>
+
+<!-- SVR Phase 248: Quest locomotion / hand teleport / lobby Moon Mars lock -->
+<script src="./modules/svr_quest_locomotion_teleport.js"></script>
+<script src="./modules/svr_moon_mars_lobby.js"></script>
 </body>
 </html>
+
