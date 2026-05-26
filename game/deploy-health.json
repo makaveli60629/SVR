@@ -1,9 +1,10 @@
 ﻿{
-    "status":  "phase-248-built",
+    "status":  "phase-250-built",
     "track":  "Game",
     "publicPageTouched":  false,
-    "questLocomotionModule":  "game/modules/svr_quest_locomotion_teleport.js",
-    "lobbyCelestialModule":  "game/modules/svr_moon_mars_lobby.js",
+    "appHubRoom":  "game/app-hub.html",
+    "storeRoom":  "game/store-room.html",
+    "lobbyPortalModule":  "game/modules/svr_app_hub_portal.js",
     "updateZip":  "update/game.zip",
-    "timestamp":  "2026-05-26T16:09:58"
+    "timestamp":  "2026-05-26T16:29:47"
 }

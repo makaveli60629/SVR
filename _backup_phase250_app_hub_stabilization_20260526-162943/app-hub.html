@@ -1,0 +1,306 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SVR App Hub / Store Room</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="svr-phase" content="249-app-hub-store-room-panel" />
+  <style>
+    html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#07020f; }
+    .fallback {
+      position:fixed; left:16px; bottom:16px; z-index:3;
+      color:#fff; font:14px system-ui; background:rgba(0,0,0,.55);
+      padding:10px 12px; border:1px solid rgba(255,255,255,.22); border-radius:12px;
+    }
+    .fallback a { color:#9ffcff; }
+  </style>
+
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="./modules/svr_quest_locomotion_teleport.js"></script>
+
+  <script>
+    (function () {
+      "use strict";
+
+      function waitForAFrame(cb) {
+        if (window.AFRAME) cb();
+        else setTimeout(function () { waitForAFrame(cb); }, 80);
+      }
+
+      waitForAFrame(function () {
+        AFRAME.registerComponent("svr-link-button", {
+          schema: { href: { type: "string", default: "" } },
+          init: function () {
+            var el = this.el;
+            var href = this.data.href;
+            var go = function () {
+              if (!href) return;
+              window.location.href = href;
+            };
+            el.addEventListener("click", go);
+            el.addEventListener("triggerup", go);
+            el.addEventListener("mouseup", go);
+            el.addEventListener("touchend", go);
+          }
+        });
+
+        AFRAME.registerComponent("svr-app-hub-builder", {
+          init: function () {
+            var scene = this.el;
+
+            function make(name, attrs, parent) {
+              var e = document.createElement(name);
+              Object.keys(attrs || {}).forEach(function (key) {
+                e.setAttribute(key, attrs[key]);
+              });
+              (parent || scene).appendChild(e);
+              return e;
+            }
+
+            function text(parent, value, pos, width, size, color, align) {
+              return make("a-text", {
+                value: value,
+                position: pos,
+                width: width || "4",
+                align: align || "center",
+                color: color || "#ffffff",
+                "wrap-count": "30",
+                "font": "kelsonsans"
+              }, parent);
+            }
+
+            function panel(id, title, subtitle, pos, rot, color) {
+              var root = make("a-entity", { id: id, position: pos, rotation: rot || "0 0 0" }, scene);
+              make("a-plane", {
+                width: "3.55",
+                height: "3.05",
+                position: "0 0 0",
+                color: color || "#17102a",
+                material: "shader: standard; roughness: 0.55; metalness: 0.05; emissive: #080314; emissiveIntensity: 0.2"
+              }, root);
+              make("a-plane", {
+                width: "3.38",
+                height: "2.88",
+                position: "0 0 .012",
+                color: "#090415",
+                material: "transparent: true; opacity: 0.78"
+              }, root);
+              text(root, title, "0 1.18 .04", "3.2", "0.28", "#9ffcff");
+              text(root, subtitle, "0 .92 .04", "3.2", "0.16", "#e9defc");
+              return root;
+            }
+
+            function button(parent, label, href, y, accent) {
+              var root = make("a-entity", {
+                class: "clickable",
+                position: "0 " + y + " .055"
+              }, parent);
+
+              if (href) {
+                root.setAttribute("svr-link-button", "href: " + href);
+              }
+
+              make("a-plane", {
+                width: "2.85",
+                height: ".31",
+                color: href ? (accent || "#2d1f55") : "#261b32",
+                material: "shader: standard; roughness: 0.45; emissive: " + (href ? "#160b38" : "#100914") + "; emissiveIntensity: 0.35"
+              }, root);
+
+              text(root, label, "0 -.055 .025", "2.55", "0.14", href ? "#ffffff" : "#cfc7df");
+              return root;
+            }
+
+            #if false
+            # This block is intentionally ignored by JavaScript and kept as an edit note:
+            # Edit the button labels/URLs below to wire your real web-store/site pages.
+            #endif
+
+            make("a-plane", {
+              id: "svr-app-hub-floor",
+              position: "0 0 0",
+              rotation: "-90 0 0",
+              width: "12",
+              height: "12",
+              color: "#0b0716",
+              material: "shader: standard; roughness: 0.9; metalness: 0.02"
+            }, scene);
+
+            make("a-plane", {
+              id: "svr-app-hub-back-wall",
+              position: "0 2 -5.05",
+              width: "12",
+              height: "4",
+              color: "#120920",
+              material: "shader: standard; roughness: 0.8; emissive: #06020c; emissiveIntensity: 0.35"
+            }, scene);
+
+            make("a-plane", {
+              id: "svr-app-hub-left-wall",
+              position: "-6 2 0",
+              rotation: "0 90 0",
+              width: "10",
+              height: "4",
+              color: "#10081c",
+              material: "shader: standard; roughness: 0.8"
+            }, scene);
+
+            make("a-plane", {
+              id: "svr-app-hub-right-wall",
+              position: "6 2 0",
+              rotation: "0 -90 0",
+              width: "10",
+              height: "4",
+              color: "#10081c",
+              material: "shader: standard; roughness: 0.8"
+            }, scene);
+
+            make("a-sky", {
+              color: "#05010c"
+            }, scene);
+
+            make("a-entity", {
+              light: "type: ambient; color: #8a78b8; intensity: 0.55"
+            }, scene);
+
+            make("a-entity", {
+              light: "type: directional; color: #ffffff; intensity: 0.7",
+              position: "1 5 2"
+            }, scene);
+
+            make("a-entity", {
+              light: "type: point; color: #7dfaff; intensity: 0.85; distance: 8",
+              position: "0 2.9 -1.5"
+            }, scene);
+
+            var title = make("a-entity", { position: "0 3.35 -4.85" }, scene);
+            text(title, "SVR APP HUB / STORE ROOM", "0 0 0", "6", "0.38", "#ffffff");
+            text(title, "Editable draft room • Quest check build • Store/site panels wired as portals", "0 -.42 0", "5.6", "0.18", "#9ffcff");
+
+            var gamePanel = panel(
+              "svr-game-room-panel",
+              "GAME ROOMS",
+              "Jump to current private scenes",
+              "-3.75 2.0 -3.15",
+              "0 35 0",
+              "#18102d"
+            );
+
+            button(gamePanel, "MAIN LOBBY", "./index.html", ".55", "#263d8f");
+            button(gamePanel, "SCORPION POKER", "./scorpion.html", ".16", "#5a1535");
+            button(gamePanel, "PGA HUB", "./pga.html", "-.23", "#143f2a");
+            button(gamePanel, "SMOKER LOUNGE", "./smoker-lounge.html", "-.62", "#5a3a18");
+            button(gamePanel, "REIKI PLACEHOLDER", "./reiki.html", "-1.01", "#40306e");
+
+            var storePanel = panel(
+              "svr-store-site-panel",
+              "STORE / SITE PAGES",
+              "Web pages integrated as in-game launch panels",
+              "0 2.0 -4.25",
+              "0 0 0",
+              "#15132c"
+            );
+
+            button(storePanel, "SVR WEB HOME / MATRIX", "../index.html", ".55", "#3d1d7a");
+            button(storePanel, "WEB STORE PAGE", "../store.html", ".16", "#194a55");
+            button(storePanel, "SHOP PAGE", "../shop.html", "-.23", "#194a55");
+            button(storePanel, "SUPPORT PAGE", "../support.html", "-.62", "#314464");
+            button(storePanel, "SPONSOR / PARTNER PAGE", "../sponsors.html", "-1.01", "#533174");
+
+            var appPanel = panel(
+              "svr-app-placeholder-panel",
+              "APP HUB DRAFT",
+              "Temporary editable modules for your next pass",
+              "3.75 2.0 -3.15",
+              "0 -35 0",
+              "#18102d"
+            );
+
+            button(appPanel, "POKER APP TILE - AWAITING FINAL UI", "", ".55", "#2d1f55");
+            button(appPanel, "VR STORE PORTAL - EDIT ME", "./store-room.html", ".16", "#244d5a");
+            button(appPanel, "SPONSOR CONSOLE - PLACEHOLDER", "", "-.23", "#2d1f55");
+            button(appPanel, "CHARITY / GIVEBACK - PLACEHOLDER", "", "-.62", "#2d1f55");
+            button(appPanel, "ADMIN / ANALYTICS - LOCKED", "", "-1.01", "#2d1f55");
+
+            make("a-ring", {
+              position: "0 .025 -1.25",
+              rotation: "-90 0 0",
+              "radius-inner": "0.78",
+              "radius-outer": ".82",
+              color: "#7dfaff",
+              material: "shader: standard; emissive: #1dd6ff; emissiveIntensity: .75"
+            }, scene);
+
+            text(scene, "Stand here. Use Quest controller ray/click, hand pinch, or desktop mouse to open panels.", "0 .08 -1.25", "4.4", "0.14", "#e9defc");
+
+            make("a-sphere", {
+              id: "svr-store-room-moon",
+              position: "-4.8 4.5 -6",
+              radius: ".42",
+              color: "#d7d4c2",
+              material: "shader: standard; emissive: #4d4b3d; emissiveIntensity: .35"
+            }, scene);
+
+            make("a-sphere", {
+              id: "svr-store-room-mars",
+              position: "4.8 4.25 -6.2",
+              radius: ".36",
+              color: "#b75635",
+              material: "shader: standard; emissive: #5c2115; emissiveIntensity: .35"
+            }, scene);
+          }
+        });
+      });
+    })();
+  </script>
+</head>
+
+<body>
+  <div class="fallback">
+    SVR App Hub / Store Room —
+    <a href="./index.html">Lobby</a> |
+    <a href="./scorpion.html">Scorpion</a> |
+    <a href="../store.html">Web Store</a>
+  </div>
+
+  <a-scene
+    id="svr-app-hub-scene"
+    renderer="antialias: true; colorManagement: true"
+    vr-mode-ui="enabled: true"
+    webxr="optionalFeatures: hand-tracking, local-floor, bounded-floor"
+    background="color: #05010c"
+    svr-quest-locomotion-teleport
+    svr-app-hub-builder>
+
+    <a-entity id="svr-player-rig" position="0 0 2.25">
+      <a-entity
+        id="svr-player-camera"
+        camera
+        look-controls
+        wasd-controls
+        position="0 1.6 0">
+        <a-cursor
+          id="svr-desktop-cursor"
+          raycaster="objects: .clickable"
+          fuse="false"
+          material="color: #9ffcff; shader: flat">
+        </a-cursor>
+      </a-entity>
+
+      <a-entity
+        id="svr-hub-right-ray"
+        laser-controls="hand: right"
+        raycaster="objects: .clickable"
+        line="color: #7dfaff; opacity: .85">
+      </a-entity>
+
+      <a-entity
+        id="svr-hub-left-ray"
+        laser-controls="hand: left"
+        raycaster="objects: .clickable"
+        line="color: #b68cff; opacity: .65">
+      </a-entity>
+    </a-entity>
+  </a-scene>
+</body>
+</html>
