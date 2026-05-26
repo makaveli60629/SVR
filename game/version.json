@@ -1,18 +1,6 @@
 {
-    "name":  "SVR Poker Game",
-    "phase":  250,
-    "phaseLabel":  "Phase 250",
-    "date":  "2026-05-26",
-    "updatedAt":  "2026-05-26T17:09:54-05:00",
     "build":  "svr-phase-250-20260526-170954",
     "status":  "phase-250-game-update",
-    "modules":  [
-                    "boot.js",
-                    "main.js",
-                    "modules/optional_module_loader.js",
-                    "modules/svr_phase250_core.js",
-                    "modules/moon_mars_locomotion.js"
-                ],
     "fixes":  [
                   "clean optional module loader",
                   "moon locomotion gravity and movement",
@@ -22,5 +10,24 @@
                   "phase 250 metadata",
                   "deploy health metadata",
                   "fresh update package"
-              ]
+              ],
+    "watchFix":  "fixed-watch-module-phase-251",
+    "name":  "SVR Poker Game",
+    "phase":  253,
+    "phaseLabel":  "Phase 253",
+    "date":  "2026-05-26",
+    "updatedAt":  "2026-05-26T17:44:34-05:00",
+    "update":  "phase-253-hub-user-friendly-hand-controller-navigation",
+    "modules":  [
+                    "boot.js",
+                    "main.js",
+                    "modules/optional_module_loader.js",
+                    "modules/hand_controller_navigation.js",
+                    "modules/hub_user_friendly.js",
+                    "modules/watch.js",
+                    "modules/profile_avatar_bridge.js",
+                    "modules/poker_table_polish.js",
+                    "modules/svr_module_health.js",
+                    "modules/moon_mars_locomotion.js"
+                ]
 }

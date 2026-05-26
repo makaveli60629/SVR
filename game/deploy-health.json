@@ -1,21 +1,34 @@
 {
     "healthy":  true,
-    "phase":  250,
-    "phaseLabel":  "Phase 250",
+    "phase":  253,
+    "phaseLabel":  "Phase 253",
     "date":  "2026-05-26",
-    "updatedAt":  "2026-05-26T17:09:54-05:00",
-    "message":  "SVR Phase 250 game update ready",
+    "updatedAt":  "2026-05-26T17:44:34-05:00",
+    "message":  "Phase 253 hub app is more user friendly with hand and controller navigation",
     "checks":  {
-                   "gameFolder":  true,
-                   "moduleFolder":  true,
-                   "optionalLoader":  true,
-                   "moonMarsLocomotion":  true,
-                   "phase250Core":  true,
-                   "noSiteEdit":  true
+                   "gameOnly":  true,
+                   "rootIndexUntouched":  true,
+                   "siteFolderUntouched":  true,
+                   "siteZipUntouched":  true,
+                   "hubApp":  true,
+                   "hubMenuData":  true,
+                   "handControllerNavigation":  true,
+                   "keyboardNavigation":  true,
+                   "gamepadNavigation":  true,
+                   "vrRaycasterNavigation":  true,
+                   "optionalLoaderClean":  true,
+                   "packageRebuilt":  true
                },
+    "controls":  {
+                     "keyboard":  "Arrow keys or WASD move focus. Enter or Space selects.",
+                     "controller":  "Stick or D-pad moves focus. Trigger or A selects.",
+                     "hand":  "Point/select with ray when A-Frame controllers are present.",
+                     "help":  "Shift+H shows help."
+                 },
     "live":  {
-                 "game":  "https://svrpoker.com/game/?v=phase250-test",
-                 "version":  "https://svrpoker.com/game/version.json?v=phase250-test",
-                 "deployHealth":  "https://svrpoker.com/game/deploy-health.json?v=phase250-test"
+                 "game":  "https://svrpoker.com/game/?v=phase253-test",
+                 "hub":  "https://svrpoker.com/game/hubs/app.html?v=phase253-test",
+                 "version":  "https://svrpoker.com/game/version.json?v=phase253-test",
+                 "deployHealth":  "https://svrpoker.com/game/deploy-health.json?v=phase253-test"
              }
 }

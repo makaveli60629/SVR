@@ -72,7 +72,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading worldâ€¦", { force: true });
+setStatus("Loading worldÃ¢â‚¬Â¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -252,12 +252,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logoâ€¦", { force: true });
+setStatus("Loading logoÃ¢â‚¬Â¦", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 247 locked: direct deploy labels, private route verification, approval-safe Reiki, and site untouched.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingÃ¢â‚¬Â¦");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -351,7 +351,23 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloadingâ€¦");
-  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
+  log("[ERR] WebGL context lost. ReloadingÃ¢â‚¬Â¦");
+  setStatus("WebGL context lost (reloadingÃ¢â‚¬Â¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+(function () {
+  "use strict";
+
+  if (!window.SVR_MAIN_PHASE253_PATCHED) {
+    window.SVR_MAIN_PHASE253_PATCHED = true;
+
+    window.addEventListener("svr:hub-friendly-ready", function (event) {
+      console.log("[SVR main] Hub UX ready", event.detail);
+    });
+
+    window.addEventListener("svr:hub-navigation-ready", function (event) {
+      console.log("[SVR main] Hand/controller navigation ready", event.detail);
+    });
+  }
+})();
