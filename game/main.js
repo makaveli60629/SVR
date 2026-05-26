@@ -253,7 +253,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 96 locked: private routes, approval-safe Reiki, controller watch fallback, and site untouched.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 245 locked: private routes, approval-safe Reiki, controller watch fallback, and site untouched.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

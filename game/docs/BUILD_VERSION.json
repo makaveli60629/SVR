@@ -1,8 +1,10 @@
 {
-  "build": "PHASE-96-APPROVAL-CLEAN-PRIVATE-ROUTES-LOCK",
-  "phase": 96,
+  "build": "PHASE-245-APPROVAL-CLEAN-PRIVATE-ROUTES-LOCK",
+  "phase": 245,
   "date": "2026-05-25",
   "scope": "game-side only, approval cleanup, private scene routes, controller watch fallback",
   "siteTouched": false,
-  "under25MBRequired": true
+  "under25MBRequired": true,
+  "correctedFrom": "prior phase label drift",
+  "note": "Phase numbering corrected to 245 per project sequence."
 }
