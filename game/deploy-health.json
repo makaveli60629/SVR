@@ -1,10 +1,21 @@
-﻿{
-    "status":  "phase-250-built",
-    "track":  "Game",
-    "publicPageTouched":  false,
-    "appHubRoom":  "game/app-hub.html",
-    "storeRoom":  "game/store-room.html",
-    "lobbyPortalModule":  "game/modules/svr_app_hub_portal.js",
-    "updateZip":  "update/game.zip",
-    "timestamp":  "2026-05-26T16:29:47"
+{
+    "healthy":  true,
+    "phase":  250,
+    "phaseLabel":  "Phase 250",
+    "date":  "2026-05-26",
+    "updatedAt":  "2026-05-26T17:09:54-05:00",
+    "message":  "SVR Phase 250 game update ready",
+    "checks":  {
+                   "gameFolder":  true,
+                   "moduleFolder":  true,
+                   "optionalLoader":  true,
+                   "moonMarsLocomotion":  true,
+                   "phase250Core":  true,
+                   "noSiteEdit":  true
+               },
+    "live":  {
+                 "game":  "https://svrpoker.com/game/?v=phase250-test",
+                 "version":  "https://svrpoker.com/game/version.json?v=phase250-test",
+                 "deployHealth":  "https://svrpoker.com/game/deploy-health.json?v=phase250-test"
+             }
 }

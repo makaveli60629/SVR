@@ -43,7 +43,8 @@ function setMode(text){
 
 function log(...args){
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
-  $log.textContent += line + "\n";
+  $log.textContent += line + "
+";
   $log.scrollTop = $log.scrollHeight;
 }
 
@@ -61,15 +62,17 @@ camera.lookAt(0, 1.15, 0);
 
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
-  if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
+  if ($err) $err.textContent = "RUNTIME ERROR:
+" + (e?.error?.stack || e?.message || String(e));
 });
 window.addEventListener("unhandledrejection", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
-  if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e));
+  if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:
+" + (e?.reason?.stack || e?.reason || String(e));
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading world…", { force: true });
+setStatus("Loading worldâ€¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -249,12 +252,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logo…", { force: true });
+setStatus("Loading logoâ€¦", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 247 locked: direct deploy labels, private route verification, approval-safe Reiki, and site untouched.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -348,7 +351,7 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading…");
-  setStatus("WebGL context lost (reloading…)", { force: true });
+  log("[ERR] WebGL context lost. Reloadingâ€¦");
+  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
