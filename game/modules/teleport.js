@@ -1,2 +1,492 @@
-import * as THREE from 'three';
-export function makeTeleport({scene,renderer,player,camera,clamp,status}){let on=true,aim=false,target=new THREE.Vector3(0,0,3.8);const marker=new THREE.Group();scene.add(marker);const disc=new THREE.Mesh(new THREE.CircleGeometry(.62,64),new THREE.MeshBasicMaterial({map:logo(),transparent:true,opacity:.92,side:THREE.DoubleSide,depthWrite:false}));disc.rotation.x=-Math.PI/2;disc.position.y=.045;marker.add(disc);const ring=new THREE.Mesh(new THREE.TorusGeometry(.64,.012,8,64),new THREE.MeshBasicMaterial({color:0xc77dff,transparent:true,opacity:.95}));ring.rotation.x=Math.PI/2;ring.position.y=.052;marker.add(ring);marker.visible=false;const plane=new THREE.Plane(new THREE.Vector3(0,1,0),0);[renderer.xr.getController(0),renderer.xr.getController(1)].forEach(c=>{c.addEventListener('selectstart',()=>{if(on){aim=true;fromController(c)}});c.addEventListener('selectend',()=>{if(on&&aim)jump();aim=false});c.addEventListener('squeezestart',()=>toggle())});addEventListener('keydown',e=>{if(e.code==='KeyF'){if(!on)return;aim=!aim;if(aim)fromCamera();else jump()}if(e.code==='KeyT')toggle()});function update(){marker.visible=on&&aim;if(!on)return;if(renderer.xr.isPresenting&&aim)fromController(renderer.xr.getController(1));if(!renderer.xr.isPresenting&&aim)fromCamera();marker.position.copy(target);ring.rotation.z+=.018}function fromCamera(){const dir=new THREE.Vector3(0,0,-1),pos=new THREE.Vector3(),hit=new THREE.Vector3();camera.getWorldDirection(dir);camera.getWorldPosition(pos);if(new THREE.Ray(pos,dir).intersectPlane(plane,hit))target.copy(limit(hit));else target.copy(limit(new THREE.Vector3(pos.x+dir.x*3.8,0,pos.z+dir.z*3.8)))}function fromController(c){const pos=new THREE.Vector3(),dir=new THREE.Vector3(0,0,-1),hit=new THREE.Vector3();c.getWorldPosition(pos);c.getWorldDirection(dir);if(new THREE.Ray(pos,dir).intersectPlane(plane,hit))target.copy(limit(hit));else fromCamera()}function limit(v){if(clamp){v.x=Math.max(clamp.minX,Math.min(clamp.maxX,v.x));v.z=Math.max(clamp.minZ,Math.min(clamp.maxZ,v.z))}v.y=0;return v}function jump(){player.position.x=target.x;player.position.z=target.z;aim=false;status('Teleported.')}function toggle(){on=!on;aim=false;marker.visible=false;status(on?'Teleport ON':'Teleport OFF');return on}return{update,toggleMode:toggle,enabled:()=>on}}function logo(){const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d'),g=x.createRadialGradient(256,256,10,256,256,240);g.addColorStop(0,'rgba(210,150,255,.72)');g.addColorStop(.55,'rgba(110,35,210,.42)');g.addColorStop(1,'rgba(30,0,60,0)');x.fillStyle=g;x.fillRect(0,0,512,512);x.beginPath();x.arc(256,256,212,0,Math.PI*2);x.fillStyle='rgba(98,26,180,.28)';x.fill();x.lineWidth=20;x.strokeStyle='rgba(220,160,255,.95)';x.stroke();x.font='bold 92px Arial';x.textAlign='center';x.textBaseline='middle';x.fillStyle='white';x.fillText('SVR',256,224);x.font='bold 54px Arial';x.fillText('POKER',256,304);return new THREE.CanvasTexture(c)}
+import * as THREE from "three";
+import { CONFIG } from "./config.js";
+import { isPinching, isFist, aimPoint } from "./gestures.js";
+
+export function createTeleportRig({ scene, renderer, camera, roomClamp, log = console.log }){
+  let baseRefSpace = null;
+  let playerX = CONFIG.SPAWN_X;
+  let playerY = 0;
+  let playerZ = CONFIG.SPAWN_Z;
+  let playerYaw = 0;
+
+  function applyReferenceSpace(){
+    if (!baseRefSpace || !renderer?.xr?.isPresenting) return false;
+    try{
+      const halfYaw = -playerYaw * 0.5;
+      const xform = new XRRigidTransform(
+        { x: -playerX, y: -playerY, z: -playerZ },
+        { x: 0, y: Math.sin(halfYaw), z: 0, w: Math.cos(halfYaw) }
+      );
+      renderer.xr.setReferenceSpace(baseRefSpace.getOffsetReferenceSpace(xform));
+      return true;
+    }catch(err){
+      log("[teleport] reference-space apply failed", err?.message || err);
+      return false;
+    }
+  }
+
+  function setPlayerPose(x, y, z){
+    playerX = x;
+    playerY = y;
+    playerZ = z;
+    return applyReferenceSpace();
+  }
+
+  function setPlayerXZ(x, z){
+    playerX = x;
+    playerZ = z;
+    return applyReferenceSpace();
+  }
+
+  function getPlayerPose(){
+    return { x: playerX, y: playerY, z: playerZ, yaw: playerYaw };
+  }
+
+  function setPlayerYaw(nextYaw){
+    playerYaw = nextYaw;
+    return applyReferenceSpace();
+  }
+
+  const pointer = new THREE.Mesh(
+    new THREE.PlaneGeometry(CONFIG.POINTER_SIZE, CONFIG.POINTER_SIZE),
+    new THREE.MeshBasicMaterial({
+      transparent: true,
+      alphaTest: 0.35,
+      depthWrite: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+      side: THREE.DoubleSide,
+      opacity: 0.96,
+      color: 0xffffff
+    })
+  );
+  pointer.rotation.x = -Math.PI / 2;
+  pointer.position.y = 0.018;
+  pointer.visible = false;
+  scene.add(pointer);
+
+  const ringMat = new THREE.MeshStandardMaterial({
+    color: 0xb48cff,
+    roughness: 0.22,
+    metalness: 0.28,
+    emissive: 0x2a0d3a,
+    emissiveIntensity: 0.0,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.9
+  });
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(CONFIG.RING_INNER, CONFIG.RING_OUTER, 72),
+    ringMat
+  );
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = 0.015;
+  ring.visible = false;
+  scene.add(ring);
+
+  const markerGlow = new THREE.PointLight(0xb48cff, 0, 4.5, 2.0);
+  markerGlow.position.y = 0.4;
+  scene.add(markerGlow);
+
+  function hideArc(){}
+
+  function setGlow(on){
+    ringMat.emissiveIntensity = on ? 1.3 : 0.0;
+    markerGlow.intensity = on ? 2.2 : 0.0;
+  }
+
+  let mode = false;
+  let active = null;
+  let activeMode = "hand";
+  let cooldownUntil = 0;
+  let lastTP = 0;
+  let pinchHoldStart = 0;
+  let triggerHoldStart = 0;
+  let leftHandRef = null;
+  let rightHandRef = null;
+  let leftControllerRef = null;
+  let rightControllerRef = null;
+  let stableTargetMs = 0;
+  let lastAimValid = false;
+  let snapCooldownUntil = 0;
+  let lastLeftToggle = false;
+  let lastRightToggle = false;
+  let lastLeftFistToggle = false;
+  let lastRightFistToggle = false;
+
+  const head = new THREE.Vector3();
+  const headDir = new THREE.Vector3();
+  const controllerOrigin = new THREE.Vector3();
+  const controllerDir = new THREE.Vector3();
+  const smoothedTarget = new THREE.Vector3(0, 0, CONFIG.SPAWN_Z);
+
+  function clampTarget(p){
+    return new THREE.Vector3(
+      THREE.MathUtils.clamp(p.x, -roomClamp, roomClamp),
+      0,
+      THREE.MathUtils.clamp(p.z, -roomClamp, roomClamp)
+    );
+  }
+
+  function teleportByDelta(target){
+    if (!renderer?.xr?.isPresenting || !baseRefSpace) return false;
+    try{
+      const xrCam = renderer.xr.getCamera(camera);
+      if (!xrCam) return false;
+      xrCam.getWorldPosition(head);
+      const dx = target.x - head.x;
+      const dz = target.z - head.z;
+      const prev = { x: playerX, y: playerY, z: playerZ, yaw: playerYaw };
+      playerX += dx;
+      playerZ += dz;
+      if (!applyReferenceSpace()){
+        playerX = prev.x;
+        playerY = prev.y;
+        playerZ = prev.z;
+        playerYaw = prev.yaw;
+        applyReferenceSpace();
+        return false;
+      }
+      return true;
+    }catch(err){
+      log("[teleport] jump failed", err?.message || err);
+      return false;
+    }
+  }
+
+  function controllerGamepad(proxy){
+    return proxy?.userData?.gamepad || proxy?.userData?.inputSource?.gamepad || proxy?.userData?.controller?.inputSource?.gamepad || null;
+  }
+
+  function getStick(gp, side = "left") {
+    if (!gp?.axes?.length) return { x: 0, y: 0 };
+    const axes = gp.axes;
+    let x = 0, y = 0;
+    if (axes.length >= 4) {
+      if (side === "right") {
+        x = axes[2] || 0;
+        y = axes[3] || 0;
+        if (Math.abs(x) < 0.001 && Math.abs(y) < 0.001) {
+          x = axes[0] || 0;
+          y = axes[1] || 0;
+        }
+      } else {
+        x = axes[0] || 0;
+        y = axes[1] || 0;
+      }
+    } else {
+      x = axes[0] || 0;
+      y = axes[1] || 0;
+    }
+    if (Math.abs(x) < 0.14) x = 0;
+    if (Math.abs(y) < 0.14) y = 0;
+    return { x, y };
+  }
+
+  function getButtonValue(gp, idx){
+    return gp?.buttons?.[idx]?.value || 0;
+  }
+
+  function controllerTogglePressed(proxy){
+    const gp = controllerGamepad(proxy);
+    if (!gp) return false;
+    return getButtonValue(gp, 4) > 0.55 || getButtonValue(gp, 5) > 0.55 || getButtonValue(gp, 3) > 0.75;
+  }
+
+  function handNearFace(hand){
+    if (!renderer?.xr?.isPresenting || !hand?.joints?.wrist) return false;
+    const xrCam = renderer.xr.getCamera(camera);
+    if (!xrCam) return false;
+    const headPos = new THREE.Vector3();
+    const wristPos = new THREE.Vector3();
+    xrCam.getWorldPosition(headPos);
+    hand.joints.wrist.getWorldPosition(wristPos);
+    const dist = wristPos.distanceTo(headPos);
+    const relativeY = wristPos.y - headPos.y;
+    const relativeZ = wristPos.z - headPos.z;
+    return dist < 0.34 && relativeY > -0.28 && relativeY < 0.22 && Math.abs(relativeZ) < 0.28;
+  }
+
+  function controllerTriggerValue(proxy){
+    const gp = controllerGamepad(proxy);
+    return getButtonValue(gp, 0);
+  }
+
+  function controllerAimPoint(proxy){
+    const controller = proxy?.userData?.controller;
+    if (!controller) return null;
+    controller.updateWorldMatrix?.(true, false);
+    controller.getWorldPosition(controllerOrigin);
+    controller.getWorldDirection(controllerDir);
+    if (controllerDir.y > -0.08) controllerDir.y = -0.08;
+    controllerDir.normalize();
+    const t = (controllerOrigin.y - 0.0) / (-controllerDir.y);
+    if (!isFinite(t) || t < 0.12) return null;
+    return new THREE.Vector3(
+      controllerOrigin.x + controllerDir.x * Math.min(t, 160),
+      0,
+      controllerOrigin.z + controllerDir.z * Math.min(t, 160)
+    );
+  }
+
+  function toggleMode(preferred = "right"){
+    mode = !mode;
+    if (!mode){
+      active = null;
+      activeMode = "hand";
+      pinchHoldStart = 0;
+      triggerHoldStart = 0;
+      return mode;
+    }
+    const preferredController = preferred === "left" ? leftControllerRef : rightControllerRef;
+    const fallbackController = preferred === "left" ? rightControllerRef : leftControllerRef;
+    const preferredHand = preferred === "left" ? leftHandRef : rightHandRef;
+    const fallbackHand = preferred === "left" ? rightHandRef : leftHandRef;
+    if (preferredController?.joints || fallbackController?.joints){
+      active = preferredController?.joints ? preferredController : fallbackController;
+      activeMode = "controller";
+    } else {
+      active = preferredHand?.joints ? preferredHand : fallbackHand?.joints ? fallbackHand : null;
+      activeMode = "hand";
+    }
+    cooldownUntil = performance.now() + 120;
+    return mode;
+  }
+
+  async function onSessionStart(){
+    const session = renderer.xr.getSession();
+    if (!session) return;
+    baseRefSpace = await session.requestReferenceSpace("local-floor");
+    playerYaw = 0;
+    setPlayerPose(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
+    mode = false;
+    active = null;
+    activeMode = "hand";
+    pointer.visible = false;
+    ring.visible = false;
+    hideArc();
+    setGlow(false);
+  }
+
+  function setLogoTexture(tex){
+    if (!tex) return;
+    tex.anisotropy = 8;
+    pointer.material.map = tex;
+    pointer.material.needsUpdate = true;
+  }
+
+  function movePlayerFromControllers(dt){
+    const leftGp = controllerGamepad(leftControllerRef);
+    const rightGp = controllerGamepad(rightControllerRef);
+    const moveSource = leftGp || rightGp;
+    const turnSource = rightGp || leftGp;
+    const leftStick = getStick(moveSource, "left");
+    const rightStick = getStick(turnSource, "right");
+
+    if (Math.abs(rightStick.x) > 0.72 && performance.now() > snapCooldownUntil){
+      playerYaw += Math.sign(rightStick.x) * (Math.PI / 4);
+      applyReferenceSpace();
+      snapCooldownUntil = performance.now() + 220;
+    }
+
+    const mag = Math.hypot(leftStick.x, leftStick.y);
+    if (mag < 0.12) return;
+
+    const xrCam = renderer.xr.getCamera(camera);
+    xrCam.getWorldDirection(headDir);
+    headDir.y = 0;
+    if (headDir.lengthSq() < 1e-5) headDir.set(0, 0, -1);
+    headDir.normalize();
+    const rightDir = new THREE.Vector3(headDir.z, 0, -headDir.x).normalize();
+    const speed = 2.8;
+    const stepX = (rightDir.x * leftStick.x + headDir.x * (-leftStick.y)) * speed * dt;
+    const stepZ = (rightDir.z * leftStick.x + headDir.z * (-leftStick.y)) * speed * dt;
+    const nextX = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
+    const nextZ = THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp);
+    setPlayerXZ(nextX, nextZ);
+  }
+
+  function update({ dt = 0.016, leftHand, rightHand, leftController, rightController, statusCb = ()=>{}, modeCb = ()=>{} }){
+    const now = performance.now();
+    leftHandRef = leftHand;
+    rightHandRef = rightHand;
+    leftControllerRef = leftController;
+    rightControllerRef = rightController;
+
+    if (renderer?.xr?.isPresenting && (leftControllerRef || rightControllerRef)) movePlayerFromControllers(dt);
+
+    const leftToggle = controllerTogglePressed(leftControllerRef);
+    const rightToggle = controllerTogglePressed(rightControllerRef);
+    if (leftToggle && !lastLeftToggle && now > cooldownUntil){
+      mode = !(mode && active === leftControllerRef);
+      active = mode ? (leftControllerRef || rightControllerRef || leftHandRef || rightHandRef) : null;
+      activeMode = active === leftControllerRef || active === rightControllerRef ? "controller" : "hand";
+      cooldownUntil = now + 220;
+    }
+    if (rightToggle && !lastRightToggle && now > cooldownUntil){
+      mode = !(mode && active === rightControllerRef);
+      active = mode ? (rightControllerRef || leftControllerRef || rightHandRef || leftHandRef) : null;
+      activeMode = active === rightControllerRef || active === leftControllerRef ? "controller" : "hand";
+      cooldownUntil = now + 220;
+    }
+    lastLeftToggle = leftToggle;
+    lastRightToggle = rightToggle;
+
+    if (!leftControllerRef?.joints && !rightControllerRef?.joints){
+      const leftFist = !!leftHandRef?.joints && handNearFace(leftHandRef) && isFist(leftHandRef);
+      const rightFist = !!rightHandRef?.joints && handNearFace(rightHandRef) && isFist(rightHandRef);
+      if (leftFist && !lastLeftFistToggle && now > cooldownUntil){
+        mode = !(mode && active === leftHandRef);
+        active = mode ? leftHandRef : null;
+        activeMode = 'hand';
+        cooldownUntil = now + 320;
+        pinchHoldStart = 0;
+        triggerHoldStart = 0;
+      }
+      if (rightFist && !lastRightFistToggle && now > cooldownUntil){
+        mode = !(mode && active === rightHandRef);
+        active = mode ? rightHandRef : null;
+        activeMode = 'hand';
+        cooldownUntil = now + 320;
+        pinchHoldStart = 0;
+        triggerHoldStart = 0;
+      }
+      lastLeftFistToggle = leftFist;
+      lastRightFistToggle = rightFist;
+    } else {
+      lastLeftFistToggle = false;
+      lastRightFistToggle = false;
+    }
+
+    if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){
+      pointer.visible = false;
+      ring.visible = false;
+      hideArc();
+      setGlow(false);
+      stableTargetMs = 0;
+      lastAimValid = false;
+      statusCb("Waiting for hands or controllers…");
+      modeCb("Input: not tracked");
+      return;
+    }
+
+    if (mode && activeMode === "controller" && !(active?.joints)){
+      active = leftControllerRef?.joints ? leftControllerRef : rightControllerRef?.joints ? rightControllerRef : leftHandRef?.joints ? leftHandRef : rightHandRef?.joints ? rightHandRef : null;
+      activeMode = active === leftControllerRef || active === rightControllerRef ? "controller" : "hand";
+    } else if (mode && activeMode === "hand" && !(active?.joints)){
+      active = leftHandRef?.joints ? leftHandRef : rightHandRef?.joints ? rightHandRef : leftControllerRef?.joints ? leftControllerRef : rightControllerRef?.joints ? rightControllerRef : null;
+      activeMode = active === leftControllerRef || active === rightControllerRef ? "controller" : "hand";
+    }
+
+    if (!mode || !active){
+      pointer.visible = false;
+      ring.visible = false;
+      hideArc();
+      setGlow(false);
+      stableTargetMs = 0;
+      lastAimValid = false;
+      const idleMsg = (leftControllerRef || rightControllerRef)
+        ? "Controllers active • left stick move • right stick snap turn • A/X teleport"
+        : "TELEPORT OFF • press TP or make fist by face";
+      statusCb(idleMsg);
+      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist by face toggles TP");
+      return;
+    }
+
+    setGlow(true);
+
+    const aim = activeMode === "controller" ? controllerAimPoint(active) : aimPoint(active);
+    if (!aim){
+      pointer.visible = false;
+      ring.visible = false;
+      markerGlow.intensity = 0;
+      stableTargetMs = 0;
+      lastAimValid = false;
+      statusCb(activeMode === "controller" ? "CONTROLLER TP ON • hold trigger then release" : "HAND TP ON • hold pinch then release");
+      modeCb(activeMode === "controller" ? "Controllers: TELEPORT ON" : `Hands: TELEPORT ON`);
+      return;
+    }
+
+    const target = clampTarget(aim);
+    if (!lastAimValid){
+      smoothedTarget.copy(target);
+      stableTargetMs = 0;
+    } else {
+      const jitter = smoothedTarget.distanceTo(target);
+      stableTargetMs = jitter < 0.16 ? (stableTargetMs + dt * 1000) : 0;
+      smoothedTarget.lerp(target, jitter < 0.28 ? 0.34 : 0.18);
+    }
+    lastAimValid = true;
+
+    pointer.visible = true;
+    ring.visible = true;
+    pointer.position.copy(smoothedTarget).setY(0.018);
+    ring.position.copy(smoothedTarget).setY(0.015);
+    markerGlow.position.copy(smoothedTarget).setY(0.34);
+
+    if (activeMode === "controller"){
+      const trigger = controllerTriggerValue(active);
+      if (trigger > 0.22 && !active.userData._wasTrigger) triggerHoldStart = now;
+      const held = triggerHoldStart ? (now - triggerHoldStart) : 0;
+      if (active.userData._wasTrigger && trigger <= 0.12 && held > 140 && stableTargetMs > 120 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
+        const ok = teleportByDelta(smoothedTarget);
+        if (ok){
+          lastTP = now + 220;
+          cooldownUntil = now + 240;
+          mode = false;
+          active = null;
+          activeMode = "controller";
+          triggerHoldStart = 0;
+          stableTargetMs = 0;
+          lastAimValid = false;
+          pointer.visible = false;
+          ring.visible = false;
+          hideArc();
+          setGlow(false);
+        }else{
+          cooldownUntil = now + 180;
+          triggerHoldStart = 0;
+          stableTargetMs = 0;
+          statusCb("TELEPORT RESET • aim again");
+        }
+      }
+      if (trigger <= 0.12) triggerHoldStart = 0;
+      active.userData._wasTrigger = trigger > 0.22;
+      modeCb("Controllers: TELEPORT ON");
+      statusCb("CONTROLLER TP ON • hold trigger then release");
+      return;
+    }
+
+    const pinch = isPinching(active);
+    if (active.userData._wasPinching === undefined) active.userData._wasPinching = false;
+    if (pinch && !active.userData._wasPinching) pinchHoldStart = now;
+    const held = pinchHoldStart ? (now - pinchHoldStart) : 0;
+    if (active.userData._wasPinching && !pinch && held > 240 && stableTargetMs > 140 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
+      const ok = teleportByDelta(smoothedTarget);
+      if (ok){
+        lastTP = now + 220;
+        cooldownUntil = now + 260;
+        mode = false;
+        active = null;
+        pinchHoldStart = 0;
+        stableTargetMs = 0;
+        lastAimValid = false;
+        pointer.visible = false;
+        ring.visible = false;
+        hideArc();
+        setGlow(false);
+      } else {
+        cooldownUntil = now + 180;
+        pinchHoldStart = 0;
+        stableTargetMs = 0;
+        statusCb("TELEPORT RESET • aim again");
+      }
+    }
+    if (!pinch) pinchHoldStart = 0;
+    active.userData._wasPinching = pinch;
+    modeCb("Hands: TELEPORT ON");
+    statusCb("HAND TP ON • fist by face toggles • hold pinch then release");
+  }
+
+  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
+}

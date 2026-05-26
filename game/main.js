@@ -1,55 +1,373 @@
-import * as THREE from 'three';
-import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
-import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
-import { makeWorld } from './modules/world.js';
-import { makeControls } from './modules/controls.js';
-import { makeTeleport } from './modules/teleport.js';
-import { makeWatch } from './modules/watch.js';
+import * as THREE from "three";
+import { createCore } from "./modules/core_scene.js";
+import { createDesktopControls } from "./modules/desktop_controls.js";
+import { createHands } from "./modules/hands.js";
+import { createTeleportRig } from "./modules/teleport.js";
+import { buildSkylineRoom } from "./modules/world_skyline.js";
+import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
+import { createAudioPlaylist } from "./modules/audio.js";
+import { createWristWatch } from "./modules/watch.js";
 
-const app=document.getElementById('app'), statusEl=document.getElementById('status'), inputEl=document.getElementById('input'), logEl=document.getElementById('log');
-const log=(...a)=>{logEl.textContent+=a.join(' ')+'\n';};
-const status=t=>statusEl.textContent=t;
-const input=t=>inputEl.textContent=t;
+const params = new URLSearchParams(location.search);
+const IN_IFRAME = window.self !== window.top;
+const EMBED = IN_IFRAME || params.has("embed");
+const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
+const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x050009); scene.fog=new THREE.FogExp2(0x050009,.018);
-const player=new THREE.Group(); scene.add(player);
-const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.05,220); camera.position.set(0,1.6,0); player.add(camera);
-const renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'}); renderer.xr.enabled=true; renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.15)); renderer.setSize(innerWidth,innerHeight); renderer.setClearColor(0x050009,1); app.appendChild(renderer.domElement);
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+const $status = document.getElementById("status");
+const $mode = document.getElementById("mode");
+const $log = document.getElementById("log");
+const $err = document.getElementById("err");
+const $toggleLog = document.getElementById("toggleLog");
+const $toggleJoints = document.getElementById("toggleJoints");
+const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
 
-const world=makeWorld(scene);
-const SAFE={x:0,z:5.8};
-function resetSpawn(){player.position.set(SAFE.x,0,SAFE.z);camera.position.set(0,1.6,0);camera.lookAt(0,1.25,-1.2);status('Safe spawn: outside table, facing table.');}
-resetSpawn();
-
-makeControls({player,camera,dom:renderer.domElement,clamp:world.clamp});
-makeInputModels();
-const teleport=makeTeleport({scene,renderer,player,camera,clamp:world.clamp,status});
-const watch=makeWatch({scene,renderer,camera,player,getState:()=>({teleport:teleport.enabled(),cash:50000,seat:'Standing'})});
-
-function makeInputModels(){
- const cf=new XRControllerModelFactory(), hf=new XRHandModelFactory(), rig=new THREE.Group(); player.add(rig);
- for(let i=0;i<2;i++){
-  const c=renderer.xr.getController(i); c.add(makeRay(i?0xc07cff:0x9c4dff)); c.add(makeGlove(i?'right':'left')); c.addEventListener('connected',e=>input('Input: '+(e.data?.handedness||'controller')+' tracked')); rig.add(c);
-  const g=renderer.xr.getControllerGrip(i); g.add(cf.createControllerModel(g)); rig.add(g);
-  const h=renderer.xr.getHand(i); h.add(hf.createHandModel(h,'mesh')); h.add(makeGlove(i?'right':'left',.65)); h.addEventListener('connected',()=>input('Input: Meta hand tracked')); rig.add(h);
- }
+let lastStatusText = "";
+let lastStatusAt = 0;
+function setStatus(text, { force = false, minGap = 180 } = {}){
+  if (!$status) return;
+  const now = performance.now();
+  if (!force && text === lastStatusText) return;
+  if (!force && lastStatusText && now - lastStatusAt < minGap) return;
+  lastStatusText = text;
+  lastStatusAt = now;
+  $status.textContent = text;
 }
-function makeRay(color){const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(0,0,-5)]);return new THREE.Line(geo,new THREE.LineBasicMaterial({color,transparent:true,opacity:.75}));}
-function makeGlove(side='right',s=1){const g=new THREE.Group(), skin=new THREE.MeshStandardMaterial({color:0xd8b6ff,emissive:0x7a29d8,emissiveIntensity:.18,roughness:.42,transparent:true,opacity:.96}), dark=new THREE.MeshStandardMaterial({color:0x1a0b2c,emissive:0x50158a,emissiveIntensity:.25});const palm=new THREE.Mesh(new THREE.BoxGeometry(.09*s,.045*s,.13*s),dark);palm.position.z=-.018*s;const k=new THREE.Mesh(new THREE.SphereGeometry(.044*s,16,12),skin);k.position.set(0,.002*s,-.088*s);g.add(palm,k);[-.044,-.016,.016,.044].forEach(x=>{const f=new THREE.Mesh(new THREE.CylinderGeometry(.01*s,.01*s,.12*s,10),skin);f.position.set(x*s,.014*s,-.158*s);f.rotation.x=1.25;g.add(f);});return g;}
 
-document.getElementById('reset').onclick=resetSpawn;
-document.getElementById('nav').onclick=()=>document.body.classList.toggle('routesOff');
-document.getElementById('logs').onclick=()=>logEl.style.display=logEl.style.display==='block'?'none':'block';
-document.querySelectorAll('.route').forEach(b=>b.onclick=()=>{if(b.dataset.url) location.href=new URL(b.dataset.url,location.href); else jump(b.dataset.jump);});
-function jump(k){const t=world.targets[k]||world.targets.lobby; player.position.set(t.x,0,t.z); camera.position.y=t.y||1.6; camera.lookAt(t.lx||0,t.ly||1.2,t.lz||-1.2); status('Route: '+k);}
-document.addEventListener('keydown',e=>{if(e.code==='KeyR')resetSpawn(); if(e.code==='Digit1')jump('lobby'); if(e.code==='Digit2')jump('seat'); if(e.code==='Digit3')jump('reiki'); if(e.code==='Digit4')jump('pga');});
+let lastModeText = "";
+function setMode(text){
+  if (!$mode || text === lastModeText) return;
+  lastModeText = text;
+  $mode.textContent = text;
+}
 
-const vr=document.getElementById('vr');
-if(navigator.xr){navigator.xr.isSessionSupported('immersive-vr').then(ok=>{vr.textContent=ok?'Enter VR':'Desktop Preview'; if(ok)vr.onclick=async()=>{const s=await navigator.xr.requestSession('immersive-vr',{optionalFeatures:['local-floor','hand-tracking']});renderer.xr.setReferenceSpaceType('local-floor');await renderer.xr.setSession(s);};});} else {vr.textContent='Desktop Preview';}
-renderer.xr.addEventListener('sessionstart',()=>{input('Input: XR active');status('VR active: Meta hands/controllers enabled.');});
-renderer.xr.addEventListener('sessionend',()=>{input('Input: Desktop ready');status('Desktop preview ready.');});
+function log(...args){
+  const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
+  $log.textContent += line + "
+";
+  $log.scrollTop = $log.scrollHeight;
+}
 
-function safety(){const dx=player.position.x-world.table.x,dz=player.position.z-world.table.z,d=Math.hypot(dx,dz); if(d<2.85){const a=Math.atan2(dz||1,dx);player.position.x=world.table.x+Math.cos(a)*3.3;player.position.z=world.table.z+Math.sin(a)*3.3;status('Auto-corrected: outside table.');}}
-status('Ready. Phase 254: UI cleaned, spawn safe, Meta hands active.'); input('Input: Desktop ready');
-renderer.setAnimationLoop((t)=>{teleport.update();watch.update();world.update(t);safety();renderer.render(scene,camera);});
+$toggleLog.addEventListener("click", ()=>{
+  $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
+});
+
+if (AUTOCAM) document.body.classList.add("preview-mode");
+
+const { scene, camera, renderer } = createCore({ containerId: "app" });
+scene.userData._camera = camera;
+camera.position.set(0, 1.6, 4.8);
+camera.lookAt(0, 1.15, 0);
+
+
+window.addEventListener("error", (e)=>{
+  if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
+  if ($err) $err.textContent = "RUNTIME ERROR:
+" + (e?.error?.stack || e?.message || String(e));
+});
+window.addEventListener("unhandledrejection", (e)=>{
+  if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
+  if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:
+" + (e?.reason?.stack || e?.reason || String(e));
+});
+
+const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
+setStatus("Loading worldÃ¢â‚¬Â¦", { force: true });
+const world = await buildSkylineRoom(scene, { log, renderer });
+const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
+
+const hands = createHands({ scene, renderer, log });
+const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
+
+const audio = createAudioPlaylist({
+  tracks: [
+    { title: "Lobby 07", url: "./assets/audio/07.mp3" }
+  ],
+  onState: (state)=>{
+    if (!$status || renderer.xr.isPresenting) return;
+    if (state.error){
+      setStatus(`Audio: ${state.error}`);
+      return;
+    }
+    if (state.enabled){
+      setStatus(`Now Playing: ${state.trackTitle}`);
+      return;
+    }
+    setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
+  }
+});
+
+let seated = false;
+let seatIndex = -1;
+let cash = 50000;
+
+function currentHeadXZ(){
+  if (renderer.xr.isPresenting){
+    const xrCam = renderer.xr.getCamera(camera);
+    const p = new THREE.Vector3();
+    xrCam.getWorldPosition(p);
+    return p;
+  }
+  return camera.position.clone();
+}
+
+function inTableZone(){
+  const p = currentHeadXZ();
+  return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7);
+}
+
+function seatLabel(){
+  return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing";
+}
+
+function moveDesktopToSeat(seat){
+  camera.position.set(seat.x, 1.12, seat.z);
+  camera.lookAt(0, 1.0, 0);
+}
+
+function joinTable(){
+  if (!inTableZone()) return false;
+  const p = currentHeadXZ();
+  let best = 0;
+  let bestDist = Infinity;
+  seats.forEach((seat, idx)=>{
+    if (seat.label === "Dealer Side") return;
+    const d = Math.hypot(p.x - seat.x, p.z - seat.z);
+    if (d < bestDist){ bestDist = d; best = idx; }
+  });
+  seatIndex = best;
+  seated = true;
+  const seat = seats[best];
+  if (renderer.xr.isPresenting){
+    tp.setPlayerPose(seat.x, -0.42, seat.z);
+  } else {
+    moveDesktopToSeat(seat);
+  }
+  setMode(`Seat: ${seat.label}`);
+  return true;
+}
+
+function leaveTable(){
+  seated = false;
+  seatIndex = -1;
+  if (renderer.xr.isPresenting){
+    tp.setPlayerPose(0, 0, 4.8);
+  } else {
+    camera.position.set(0, 1.6, 4.8);
+    camera.lookAt(0, 1.15, 0);
+  }
+  return true;
+}
+
+function movePlayerToSpot(target, lookTarget = null){
+  if (!target) return;
+  if (renderer.xr.isPresenting){
+    tp.setPlayerPose(target.x, 0, target.z);
+  } else {
+    camera.position.set(target.x, 1.6, target.z);
+    if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z);
+  }
+}
+
+
+function openPrivateScene(path){
+  if (!path) return false;
+  const url = new URL(path, window.location.href);
+  window.location.href = url.toString();
+  return true;
+}
+
+function gotoScene(key){
+  const rec = sceneTargets?.[key];
+  if (!rec?.pos) return false;
+  movePlayerToSpot(rec.pos, rec.look || null);
+  setStatus(`Quick jump: ${key}`, { force: true });
+  return true;
+}
+
+$sceneButtons.forEach((btn)=>{
+  btn.addEventListener("click", ()=>{
+    const route = btn.dataset.route;
+    if (route) return openPrivateScene(route);
+    const key = btn.dataset.scene;
+    if (key) gotoScene(key);
+  });
+});
+
+window.addEventListener("keydown", async (e)=>{
+  if (renderer.xr.isPresenting || e.repeat) return;
+  if (e.code === "KeyM") await audio.toggle();
+  if (e.code === "KeyN") await audio.next();
+  if (e.code === "KeyJ") joinTable();
+  if (e.code === "KeyL") leaveTable();
+  if (e.code === "KeyT") tp.toggleMode();
+  if (e.code === "Digit1") gotoScene("lobby");
+  if (e.code === "Digit2") gotoScene("table");
+  if (e.code === "Digit3") gotoScene("seat");
+  if (e.code === "Digit4") gotoScene("reiki");
+  if (e.code === "Digit5") openPrivateScene("./reiki.html");
+  if (e.code === "Digit6") gotoScene("pga");
+  if (e.code === "Digit7") openPrivateScene("./pga-drive.html");
+  if (e.code === "Digit8") openPrivateScene("./chip-putt.html");
+  if (e.code === "Digit9") openPrivateScene("./store-room.html");
+  if (e.code === "Digit0") openPrivateScene("./scorpion.html");
+});
+
+const watch = createWristWatch({
+  scene,
+  camera,
+  renderer,
+  getState: ()=>({
+    audioEnabled: audio.getState().enabled,
+    trackTitle: audio.getState().trackTitle || "Lobby 07",
+    cash,
+    seated,
+    inTableZone: inTableZone(),
+    seatLabel: seatLabel(),
+    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
+  }),
+  actions: {
+    toggleAudio: ()=>audio.toggle(),
+    nextTrack: ()=>audio.next(),
+    joinTable,
+    leaveTable,
+    toggleTeleport: ()=>tp.toggleMode(),
+    goLobby: ()=>gotoScene("lobby"),
+    goTable: ()=>gotoScene("table"),
+    goSeat: ()=>gotoScene("seat"),
+    goReiki: ()=>gotoScene("reiki"),
+    goPga: ()=>gotoScene("pga"),
+    goLegend: ()=>gotoScene("legends"),
+    goSponsor: ()=>gotoScene("sponsor"),
+    goScorpion: ()=>openPrivateScene("./scorpion.html"),
+    goReikiRoom: ()=>openPrivateScene("./reiki.html"),
+    goPgaDrive: ()=>openPrivateScene("./pga-drive.html"),
+    goChipPutt: ()=>openPrivateScene("./chip-putt.html"),
+    goStore: ()=>openPrivateScene("./store-room.html")
+  }
+});
+
+$toggleJoints.addEventListener("click", ()=>{
+  const on = hands.toggleDebug();
+  $toggleJoints.textContent = on ? "Joints On" : "Joints";
+});
+
+setStatus("Loading logoÃ¢â‚¬Â¦", { force: true });
+const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
+tp.setLogoTexture(logoTexture);
+
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 247 locked: direct deploy labels, private route verification, approval-safe Reiki, and site untouched.", { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingÃ¢â‚¬Â¦");
+
+function setHudVisible(visible){
+  const hud = document.getElementById("hud");
+  if (hud) hud.style.display = (visible && !AUTOCAM) ? "flex" : "none";
+  if ($log) $log.style.display = "none";
+  if ($err) $err.style.display = "none";
+}
+
+if (AUTOCAM) setHudVisible(false);
+if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display","none");
+
+renderer.xr.addEventListener("sessionstart", async ()=>{
+  setHudVisible(false);
+  document.getElementById("sceneNav")?.style.setProperty("display","none");
+  await audio.prime();
+  await audio.start();
+  await tp.onSessionStart();
+});
+renderer.xr.addEventListener("sessionend", ()=>{
+  setHudVisible(true);
+  const nav = document.getElementById("sceneNav");
+  if (nav && !AUTOCAM) nav.style.display = "flex";
+});
+
+let tPrev = performance.now();
+const previewTarget = new THREE.Vector3(0, 1.25, 0);
+const previewPos = new THREE.Vector3();
+const previewShots = [
+  { y: 1.62, r: previewOrbitRadius - 3.5, speed: 0.030, sway: 0.015, lookY: 1.02, targetX: 0.0, targetZ: 0.0, leadX: 0.14, leadZ: 0.08 },
+  { y: 1.68, r: previewOrbitRadius - 3.0, speed: -0.024, sway: 0.018, lookY: 1.04, targetX: 0.1, targetZ: -0.1, leadX: -0.10, leadZ: 0.12 },
+  { y: 1.64, r: previewOrbitRadius - 2.6, speed: 0.022, sway: 0.018, lookY: 1.03, targetX: -0.12, targetZ: 0.04, leadX: 0.10, leadZ: -0.08 }
+];
+
+renderer.setAnimationLoop(()=>{
+  const now = performance.now();
+  const dt = Math.min((now - tPrev) / 1000, 0.033);
+  tPrev = now;
+
+  if (!renderer.xr.isPresenting){
+    if (!AUTOCAM) desktop.update(dt);
+    else {
+      const shotIndex = Math.floor(now / 9000) % previewShots.length;
+      const shot = previewShots[shotIndex];
+      const orbitT = now * 0.001 * shot.speed;
+      previewPos.set(
+        Math.cos(orbitT) * shot.r + shot.leadX * Math.sin(now * 0.00047),
+        shot.y + Math.sin(now * 0.0014 + shotIndex) * shot.sway,
+        Math.sin(orbitT) * shot.r + shot.leadZ * Math.cos(now * 0.00053)
+      );
+      previewTarget.set(shot.targetX, shot.lookY, shot.targetZ);
+      camera.position.lerp(previewPos, 0.06);
+      camera.lookAt(previewTarget);
+    }
+    scene.userData._camera = camera;
+  } else {
+    scene.userData._camera = renderer.xr.getCamera(camera);
+  }
+
+  if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
+
+  hands.update(dt);
+  hands.updateDebug();
+
+  const leftHand = hands.getLeftHand();
+  const rightHand = hands.getRightHand();
+  const leftController = hands.getLeftController();
+  const rightController = hands.getRightController();
+  if (!AUTOCAM || renderer.xr.isPresenting){
+    tp.update({
+      dt,
+      leftHand,
+      rightHand,
+      leftController,
+      rightController,
+      statusCb: (text)=>{ setStatus(text); },
+      modeCb: (text)=>{ setMode(text); }
+    });
+  }
+
+  const leftWatchAnchor = leftHand || leftController;
+  const rightWatchAnchor = rightHand || rightController;
+  if (watch) watch.update(dt, leftWatchAnchor, rightWatchAnchor);
+
+  renderer.render(scene, camera);
+});
+
+const canvasEl = renderer.domElement;
+canvasEl.addEventListener("pointerdown", async ()=>{
+  const st = audio.getState();
+  if (!st.enabled) await audio.start();
+}, { passive: true });
+canvasEl.addEventListener("webglcontextlost", (e)=>{
+  e.preventDefault();
+  log("[ERR] WebGL context lost. ReloadingÃ¢â‚¬Â¦");
+  setStatus("WebGL context lost (reloadingÃ¢â‚¬Â¦)", { force: true });
+  setTimeout(()=>location.reload(), 500);
+}, false);
+
+(function () {
+  "use strict";
+
+  if (!window.SVR_MAIN_PHASE253_PATCHED) {
+    window.SVR_MAIN_PHASE253_PATCHED = true;
+
+    window.addEventListener("svr:hub-friendly-ready", function (event) {
+      console.log("[SVR main] Hub UX ready", event.detail);
+    });
+
+    window.addEventListener("svr:hub-navigation-ready", function (event) {
+      console.log("[SVR main] Hand/controller navigation ready", event.detail);
+    });
+  }
+})();
