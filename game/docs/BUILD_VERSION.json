@@ -1,0 +1,19 @@
+{
+  "build": "PHASE-247-DIRECT-DEPLOY-ROUTE-VERIFY-LOCK",
+  "phase": 247,
+  "date": "2026-05-25",
+  "scope": "game-side only, direct deploy version sync, private scene route verification, no site edits",
+  "siteTouched": false,
+  "gameTouched": true,
+  "under25MBRequired": true,
+  "track": "game-only",
+  "correctedFrom": "Phase 246 version sync private route audit lock",
+  "protectedRules": [
+    "site untouched",
+    "lobby preserved",
+    "private scenes remain separate from lobby",
+    "no unapproved Reiki sponsor or founder branding",
+    "direct /game folder must be committed because workflow deploys committed files",
+    "update/game.zip kept for backup only but /game is the live deploy source"
+  ]
+}
