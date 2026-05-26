@@ -1,10 +1,18 @@
 {
-  "build": "PHASE-245-APPROVAL-CLEAN-PRIVATE-ROUTES-LOCK",
-  "phase": 245,
+  "build": "PHASE-246-VERSION-SYNC-PRIVATE-ROUTE-AUDIT-LOCK",
+  "phase": 246,
   "date": "2026-05-25",
-  "scope": "game-side only, approval cleanup, private scene routes, controller watch fallback",
+  "scope": "game-side only, version sync, deploy-health consistency, private scene route audit, no site edits",
   "siteTouched": false,
+  "gameTouched": true,
   "under25MBRequired": true,
-  "correctedFrom": "prior phase label drift",
-  "note": "Phase numbering corrected to 245 per project sequence."
+  "track": "game-only",
+  "correctedFrom": "Phase 245 private-routes build",
+  "protectedRules": [
+    "site untouched",
+    "lobby preserved",
+    "private scenes remain separate from lobby",
+    "no unapproved Reiki sponsor or founder branding",
+    "direct /game folder must be committed because workflow deploys committed files"
+  ]
 }
