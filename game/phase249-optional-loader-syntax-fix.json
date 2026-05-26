@@ -1,8 +1,0 @@
-﻿{
-    "build":  "PHASE-249-OPTIONAL-LOADER-SYNTAX-FIX-LOCK",
-    "public_page_touched":  false,
-    "fix":  "overwrite optional_module_loader.js with clean comma-separated module list",
-    "reason":  "fix SyntaxError Unexpected string caused by malformed optional_module_loader array",
-    "phase":  249,
-    "generatedAt":  "2026-05-25T23:22:11.6021815Z"
-}

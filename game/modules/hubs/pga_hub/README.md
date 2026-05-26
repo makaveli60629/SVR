@@ -1,4 +1,4 @@
-# PGA Hub Module (Phase 199)
+# PGA Hub Module (Phase 1)
 
 This module locks the Juan Espejo VR Golf / PGA storefront to the southeast wall of the restored lobby.
 

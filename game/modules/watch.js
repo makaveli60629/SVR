@@ -18,8 +18,6 @@ const V3 = new THREE.Vector3();
 const M0 = new THREE.Matrix4();
 const FLIP_Q = new THREE.Quaternion();
 const SCREEN_TILT_Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.34);
-const WATCH_UPRIGHT_ROLL_Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI);
-const WATCH_LOCAL_UP = new THREE.Vector3(0, 1, 0);
 const DISPLAY_MIRRORED = false;
 
 function getJointWorld(hand, names){
@@ -36,20 +34,6 @@ function getJointWorld(hand, names){
 function getActiveCamera(camera, renderer){
   if (renderer?.xr?.isPresenting) return renderer.xr.getCamera(camera);
   return camera || null;
-}
-
-
-function applyCameraUprightRoll(quaternion, camera, renderer){
-  const activeCamera = getActiveCamera(camera, renderer);
-  if (!activeCamera) return { quaternion, rolled: false, dot: 1 };
-  const watchUp = WATCH_LOCAL_UP.clone().applyQuaternion(quaternion).normalize();
-  const camUp = WATCH_LOCAL_UP.clone().applyQuaternion(activeCamera.quaternion).normalize();
-  const dot = watchUp.dot(camUp);
-  if (dot < 0){
-    quaternion.multiply(WATCH_UPRIGHT_ROLL_Q);
-    return { quaternion, rolled: true, dot };
-  }
-  return { quaternion, rolled: false, dot };
 }
 
 function computeForearmPose(hand, camera, renderer, side = 'left'){
@@ -77,14 +61,13 @@ function computeForearmPose(hand, camera, renderer, side = 'left'){
   const quaternion = new THREE.Quaternion().setFromRotationMatrix(M0);
   quaternion.multiply(FLIP_Q);
   quaternion.multiply(SCREEN_TILT_Q);
-  const upright = applyCameraUprightRoll(quaternion, camera, renderer);
 
   const position = wrist.clone()
     .add(forearmDir.clone().multiplyScalar(0.092))
     .add(faceNormal.clone().multiplyScalar(0.020))
     .add(acrossPalm.clone().multiplyScalar(side === 'left' ? -0.004 : 0.004));
 
-  return { position, quaternion, uprightRolled: upright.rolled, uprightDot: upright.dot };
+  return { position, quaternion };
 }
 
 export function createWristWatch({ scene, camera = null, renderer = null, getState = ()=>({}), actions = {} }){
@@ -96,8 +79,6 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
-  tex.generateMipmaps = false;
-  tex.needsUpdate = true;
 
   const group = new THREE.Group();
   group.visible = false;
@@ -132,7 +113,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
   const screenFront = new THREE.Mesh(
     new THREE.PlaneGeometry(plateW * 0.965, plateH * 0.965),
-    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: false, toneMapped: false })
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.FrontSide, depthWrite: false, depthTest: false, toneMapped: false })
   );
   screenFront.renderOrder = 40;
   screenFront.position.z = 0.012;
@@ -165,37 +146,25 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
 
 function buildButtons(state){
-  const poker = state.poker || {};
-  const legal = poker.legal || {};
-  const callAmount = Math.max(0, Math.round(Number(legal.callAmount || 0)));
-  const minRaise = Math.max(0, Math.round(Number(legal.minRaise || 100)));
-  const callLabel = callAmount > 0 ? `CALL $${callAmount}` : 'CHECK';
-  const raiseLabel = `RAISE +${minRaise}`;
   const buttons = [
     { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'tableScene', label: 'TABLE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'seatScene', label: 'SEAT', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'reikiScene', label: 'REIKI HUB', x: 284, y: 146, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
 
-    { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'legendScene', label: 'LEGEND', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'reikiRoomScene', label: 'REIKI RM', x: 24, y: 198, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pgaScene', label: 'PGA HUB', x: 154, y: 198, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pgaDriveScene', label: 'DRIVE', x: 284, y: 198, w: 118, h: 42, font: 21, pinchOnly: true, hold: 0.16, margin: 6 },
 
-    { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'reikiRoomScene', label: 'REIKI RM', x: 284, y: 250, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'chipPuttScene', label: 'CHIP/PUTT', x: 24, y: 250, w: 118, h: 42, font: 15, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'storeScene', label: 'STORE', x: 154, y: 250, w: 118, h: 42, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'scorpionScene', label: 'SCORPION', x: 284, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 160, h: 58, font: 20, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'pokerNextHand', label: 'NEXT HAND', x: 366, y: 360, w: 122, h: 58, font: 17, pinchOnly: true, hold: 0.20, margin: 6 },
-
-    { id: 'pokerFold', label: 'FOLD', x: 24, y: 306, w: 92, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pokerCall', label: callLabel, x: 124, y: 306, w: 92, h: 42, font: callAmount > 0 ? 13 : 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pokerRaise', label: raiseLabel, x: 224, y: 306, w: 92, h: 42, font: 12, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pokerAllIn', label: 'ALL-IN', x: 324, y: 306, w: 92, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 500, y: 178, w: 476, h: 240, font: 58, pinchOnly: true, hold: 0.18, margin: 8 },
+    { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
+    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
   ];
-  if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 500, y: 120, w: 476, h: 48, font: 24, pinchOnly: true, hold: 0.18, margin: 8 });
-  else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 500, y: 120, w: 476, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
+  if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
+  else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 428, y: 120, w: 548, h: 48, font: 28, pinchOnly: true, hold: 0.18, margin: 8 });
   return buttons;
 }
 
@@ -206,37 +175,6 @@ let hoveredId = null;
   let pressLockId = null;
   let lastHovered = null;
   let lastSig = '';
-  let lastWatchUprightState = { build: 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK', phase: 241, uprightRolled: false, uprightDot: 1, side: 'none', visible: false };
-
-
-  function publishWatchInteraction(extra = {}){
-    const now = performance.now();
-    const interacting = !!(extra.visible && (extra.hoveredId || extra.pinching || extra.nearScreen));
-    lastWatchInteractionState = {
-      build: 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK',
-      phase: 242,
-      visible: !!extra.visible,
-      hoveredId: extra.hoveredId || null,
-      pinching: !!extra.pinching,
-      nearScreen: !!extra.nearScreen,
-      interacting,
-      lockUntil: interacting ? now + 320 : Math.max(0, lastWatchInteractionState.lockUntil || 0),
-      side: extra.side || lastWatchInteractionState.side || 'none',
-      updatedAt: now
-    };
-    window.SVR_WATCH_INTERACTION_STATE = lastWatchInteractionState;
-    window.dispatchEvent(new CustomEvent('svr_watch_interaction_update', { detail: lastWatchInteractionState }));
-    return lastWatchInteractionState;
-  }
-
-  function watchTextureHeartbeat(){
-    const now = performance.now();
-    if (now - lastTextureHeartbeat > 550){
-      lastTextureHeartbeat = now;
-      tex.needsUpdate = true;
-      if (screenFront?.material) screenFront.material.needsUpdate = true;
-    }
-  }
 
   function draw(force = false){
     const state = getState();
@@ -282,18 +220,6 @@ let hoveredId = null;
     ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 430, 152);
     ctx.fillText(`Track: ${state.audioEnabled ? state.trackTitle : 'Paused'}`, 430, 190);
     ctx.fillText(`Zone: ${state.inTableZone ? 'Ready' : 'Walk closer'}`, 430, 228);
-    const poker = state.poker || {};
-    const legal = poker.legal || {};
-    const decision = poker.decisionAid || {};
-    const callAmount = Math.max(0, Math.round(Number(legal.callAmount || 0)));
-    const pokerLine1 = `${poker.actor || 'TABLE'} • ${(poker.stage || 'waiting').toUpperCase()}${poker.remaining ? ' • ' + poker.remaining + 's' : ''}`;
-    const pokerLine2 = `${callAmount > 0 ? 'CALL $' + callAmount : 'CHECK FREE'} • ${decision.pressure || 'WAITING'}${decision.potOddsPct ? ' • ' + decision.potOddsPct + '%' : ''}`;
-    ctx.fillStyle = poker.actor === 'YOU' ? '#8ce5ff' : 'rgba(233,233,255,0.82)';
-    ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText(pokerLine1.slice(0, 42), 430, 258);
-    ctx.fillStyle = decision.pressure === 'HIGH PRESSURE' ? '#ffb95f' : '#7ff5c7';
-    ctx.font = '21px system-ui, Arial';
-    ctx.fillText(pokerLine2.slice(0, 46), 430, 286);
     ctx.textAlign = 'right';
     ctx.fillStyle = state.seated ? '#7ff5c7' : state.inTableZone ? '#f6e27f' : 'rgba(233,233,255,0.72)';
     ctx.font = 'bold 28px system-ui, Arial';
@@ -302,7 +228,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Poker watch sync: legal action hints • pot odds • fold/call/raise/all-in • next hand', 36, 332);
+    ctx.fillText('Quick scenes • private rooms open as separate routes • pinch with other hand • hold/release TP', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -341,19 +267,14 @@ let hoveredId = null;
     if (id === 'leave') actions.leaveTable?.();
     if (id === 'teleport') actions.toggleTeleport?.();
     if (id === 'lobby') actions.goLobby?.();
-    if (id === 'tableScene') actions.goTable?.();
     if (id === 'seatScene') actions.goSeat?.();
     if (id === 'reikiScene') actions.goReiki?.();
     if (id === 'pgaScene') actions.goPga?.();
-    if (id === 'legendScene') actions.goLegend?.();
-    if (id === 'sponsorScene') actions.goSponsor?.();
+    if (id === 'pgaDriveScene') actions.goPgaDrive?.();
+    if (id === 'chipPuttScene') actions.goChipPutt?.();
+    if (id === 'storeScene') actions.goStore?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
     if (id === 'reikiRoomScene') actions.goReikiRoom?.();
-    if (id === 'pokerFold') actions.pokerFold?.();
-    if (id === 'pokerCall') actions.pokerCall?.();
-    if (id === 'pokerRaise') actions.pokerRaise?.();
-    if (id === 'pokerAllIn') actions.pokerAllIn?.();
-    if (id === 'pokerNextHand') actions.pokerNextHand?.();
   }
 
   function update(dt, leftHand, rightHand){
@@ -361,9 +282,6 @@ let hoveredId = null;
     if (!anchor?.joints?.wrist){
       group.visible = false;
       hoveredId = null;
-      lastWatchUprightState = { ...lastWatchUprightState, visible: false };
-      window.SVR_WATCH_UPRIGHT_STATE = lastWatchUprightState;
-      publishWatchInteraction({ visible: false });
       draw(true);
       return;
     }
@@ -374,9 +292,6 @@ let hoveredId = null;
     if (!pose){
       group.visible = false;
       hoveredId = null;
-      lastWatchUprightState = { ...lastWatchUprightState, visible: false };
-      window.SVR_WATCH_UPRIGHT_STATE = lastWatchUprightState;
-      publishWatchInteraction({ visible: false });
       draw(true);
       return;
     }
@@ -384,23 +299,11 @@ let hoveredId = null;
     group.visible = true;
     group.position.copy(pose.position);
     group.quaternion.copy(pose.quaternion);
-    lastWatchUprightState = {
-      build: 'PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK',
-      phase: 241,
-      uprightRolled: !!pose.uprightRolled,
-      uprightDot: Number((pose.uprightDot ?? 1).toFixed(3)),
-      side: watchOnLeft ? 'left' : 'right',
-      visible: true,
-      screenFacing: 'camera-readable'
-    };
-    window.SVR_WATCH_UPRIGHT_STATE = lastWatchUprightState;
-    window.dispatchEvent(new CustomEvent('svr_watch_upright_update', { detail: lastWatchUprightState }));
     group.updateMatrixWorld(true);
 
     let nextHovered = null;
     let activeInput = null;
     let bestDepth = Infinity;
-    let nearScreen = false;
     const candidates = watchOnLeft ? [rightHand, leftHand] : [leftHand, rightHand];
     for (const candidate of candidates){
       const tip = candidate?.joints?.['index-finger-tip'];
@@ -408,9 +311,6 @@ let hoveredId = null;
       const tipPos = new THREE.Vector3();
       tip.getWorldPosition(tipPos);
       const local = group.worldToLocal(tipPos.clone());
-      if (local.z > -0.032 && local.z < 0.115 && Math.abs(local.x) < plateW * 0.88 && Math.abs(local.y) < plateH * 0.88){
-        nearScreen = true;
-      }
       if (local.z > -0.018 && local.z < 0.085 && Math.abs(local.x) < plateW * 0.74 && Math.abs(local.y) < plateH * 0.74){
         const hit = localHit(local);
         if (hit){
@@ -426,8 +326,6 @@ let hoveredId = null;
     hoveredId = nextHovered;
 
     const pinching = !!activeInput && isPinching(activeInput);
-    publishWatchInteraction({ visible: true, hoveredId, pinching, nearScreen, side: watchOnLeft ? 'left' : 'right' });
-    watchTextureHeartbeat();
     if (pinching && hoveredId && !pressLockId) pressLockId = hoveredId;
     if (pinching && pressLockId) hoveredId = pressLockId;
     if (!pinching) pressLockId = null;
@@ -457,12 +355,9 @@ let hoveredId = null;
     }
     if (!pinching) pressed = false;
 
-    if (window.SVR_TELEPORT_INPUT_STATE?.lastUpdatedAt || window.SVR_HAND_TELEPORT_STATE?.lastUpdatedAt){
-      watchTextureHeartbeat();
-    }
     draw();
   }
 
   draw(true);
-  return { update, object: group, getUprightState: ()=>({ ...lastWatchUprightState }) };
+  return { update, object: group };
 }

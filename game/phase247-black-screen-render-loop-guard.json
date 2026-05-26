@@ -1,8 +1,0 @@
-﻿{
-    "build":  "PHASE-247-BLACK-SCREEN-RENDER-LOOP-GUARD-LOCK",
-    "public_page_touched":  false,
-    "fix":  "wrap world/hands/teleport/watch/render in safeLoopStep and emergencyRenderFrame",
-    "reason":  "runtime shield continued but screen remained black on Phase 245",
-    "phase":  247,
-    "generatedAt":  "2026-05-25T23:55:02.9922540Z"
-}

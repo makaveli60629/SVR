@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-244-MAIN-RUNTIME-CATCH-FIX-LOCK",
-  "phase": 244,
-  "source": "direct-game-folder",
-  "generatedAt": "2026-05-25T00:00:00Z",
-  "public_page_touched": false,
-  "featureLock": "main.js runtime catch fix, Quest-safe animation error guard, deploy sync retained"
+  "build": "PHASE-96-APPROVAL-CLEAN-PRIVATE-ROUTES-LOCK",
+  "phase": 96,
+  "date": "2026-05-25",
+  "scope": "game-side only, approval cleanup, private scene routes, controller watch fallback",
+  "siteTouched": false,
+  "under25MBRequired": true
 }
