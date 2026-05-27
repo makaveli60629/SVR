@@ -8,13 +8,14 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase257-alignment-lock";
-import "./modules/phase255_control_lock.js?v=phase257-alignment-lock";
-import "./modules/phase256_chip_physics_lock.js?v=phase257-alignment-lock";
-import "./modules/phase257_alignment_lock.js?v=phase257-alignment-lock";
+import "./modules/optional_module_loader.js?v=phase258-kiosk-equip";
+import "./modules/phase255_control_lock.js?v=phase258-kiosk-equip";
+import "./modules/phase256_chip_physics_lock.js?v=phase258-kiosk-equip";
+import "./modules/phase257_alignment_lock.js?v=phase258-kiosk-equip";
+import "./modules/phase258_kiosk_equip_lock.js?v=phase258-kiosk-equip";
 
-const BUILD_LABEL = "PHASE-257-ALIGNMENT-PORTAL-KIOSK-TABLE-LOCK";
-const BUILD_PHASE = 257;
+const BUILD_LABEL = "PHASE-258-KIOSK-VR-EQUIP-ITEMS-LOCK";
+const BUILD_PHASE = 258;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
@@ -265,7 +266,7 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit6") openPrivatePage("./pga-drive.html");
   if (e.code === "Digit7") openPrivatePage("./chip-putt.html");
   if (e.code === "Digit8") openPrivatePage("./store-room.html");
-  if (e.code === "KeyO") storeKiosk.openPanel();
+  if (e.code === "KeyO") { if (window.SVR_STORE_EQUIP_API) window.SVR_STORE_EQUIP_API.open(); else storeKiosk.openPanel(); }
   if (e.code === "Digit9") openPrivatePage("./scorpion.html");
 });
 
@@ -456,6 +457,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 

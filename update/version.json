@@ -1,10 +1,10 @@
 ﻿{
-    "previous":  "PHASE-256-TRUE-CHIP-GRAB-PHYSICS-LOCK",
+    "previous":  "PHASE-257-ALIGNMENT-PORTAL-KIOSK-TABLE-LOCK",
+    "storeUrl":  "https://svrpoker.com/site/store.html",
+    "checkoutEnabled":  false,
     "source":  "direct-game-folder",
-    "build":  "PHASE-257-ALIGNMENT-PORTAL-KIOSK-TABLE-LOCK",
+    "build":  "PHASE-258-KIOSK-VR-EQUIP-ITEMS-LOCK",
     "siteTouched":  false,
-    "dealRule":  "right-to-left visual dealing",
-    "alignment":  "kiosk portals table chips cards moon mars",
-    "updatedAt":  "2026-05-27T02:15:19Z",
-    "next":  "PHASE-258-KIOSK-VR-EQUIP-ITEMS-LOCK"
+    "updatedAt":  "2026-05-27T02:20:21Z",
+    "next":  "PHASE-259-POKER-RIGHT-DEAL-TABLE-READABILITY-LOCK"
 }
