@@ -69,7 +69,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading worldâ€¦", { force: true });
+setStatus("Loading original lobby…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -236,7 +236,7 @@ const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"),
 tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Minor edits only. Wrist quick-jump enabled for Lobby/Seat/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
+setMode(AUTOCAM ? "CAM 3 director" : "Input ready: desktop / Quest hand tracking");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -251,8 +251,7 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
-  await audio.prime();
-  await audio.start();
+  await audio.prime(); audio.stop();
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
@@ -324,7 +323,7 @@ renderer.setAnimationLoop(()=>{
 const canvasEl = renderer.domElement;
 canvasEl.addEventListener("pointerdown", async ()=>{
   const st = audio.getState();
-  if (!st.enabled) await audio.start();
+  audio.stop();
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
@@ -332,4 +331,5 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
 

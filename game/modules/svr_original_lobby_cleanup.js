@@ -1,73 +1,76 @@
-﻿export function applySvrLobbyCleanup({ scene, world, log = ()=>{}, setStatus = ()=>{} } = {}){
-  const KEYWORDS = [
-    "secondfloor", "second floor", "upperfloor", "upper floor",
-    "floor2", "level2", "level 2", "mezzanine", "mezz",
-    "balcony", "upstairs", "stair", "stairs", "catwalk",
-    "skybridge", "bridgefloor", "upperdeck", "upper deck"
+﻿export function applySvrOriginalLobbyCleanup({ scene, log = ()=>{}, setStatus = ()=>{} } = {}){
+  const SECOND_FLOOR_KEYWORDS = [
+    "secondfloor",
+    "second floor",
+    "upperfloor",
+    "upper floor",
+    "floor2",
+    "level2",
+    "level 2",
+    "mezzanine",
+    "mezz",
+    "balcony",
+    "upstairs",
+    "stair",
+    "stairs",
+    "catwalk",
+    "skybridge",
+    "bridgefloor",
+    "upperdeck",
+    "upper deck"
   ];
 
-  let removed = 0;
+  const PROTECT = [
+    "scene",
+    "camera",
+    "player",
+    "rig",
+    "hand",
+    "controller",
+    "watch",
+    "teleport",
+    "floor",
+    "ground",
+    "lobby",
+    "table",
+    "chair",
+    "seat",
+    "card",
+    "chip",
+    "moon",
+    "mars",
+    "skyline",
+    "portal",
+    "sign",
+    "wall"
+  ];
+
+  let hidden = 0;
   let scanned = 0;
 
-  function textOf(obj){
+  function labelOf(obj){
     const parts = [];
     let p = obj;
+
     while (p) {
       if (p.name) parts.push(p.name);
+
       if (p.userData) {
         for (const [k,v] of Object.entries(p.userData)) {
-          if (typeof v === "string") parts.push(k, v);
-          else parts.push(k);
+          parts.push(String(k));
+          if (typeof v === "string") parts.push(v);
         }
       }
+
       p = p.parent;
     }
+
     return parts.join(" ").toLowerCase();
   }
 
-  function isProtected(obj){
-    const s = textOf(obj);
-    return (
-      s.includes("moon") ||
-      s.includes("mars") ||
-      s.includes("table") ||
-      s.includes("watch") ||
-      s.includes("hand") ||
-      s.includes("camera") ||
-      s.includes("player") ||
-      s.includes("skyline") ||
-      s.includes("portal") ||
-      s.includes("floor_marker") ||
-      s.includes("teleport")
-    );
-  }
-
-  function hide(obj, reason){
-    if (!obj || isProtected(obj)) return;
-    obj.visible = false;
-    obj.userData.svrRemovedByCleanup = reason;
-    removed++;
-  }
-
-  function looksLikeUnnamedUpperPlatform(obj){
-    if (!obj.isMesh || !obj.geometry) return false;
-    if (isProtected(obj)) return false;
-
-    obj.updateWorldMatrix(true, false);
-
-    const box = new THREE.Box3().setFromObject(obj);
-    if (!box || !isFinite(box.min.x) || !isFinite(box.max.x)) return false;
-
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-    box.getSize(size);
-    box.getCenter(center);
-
-    const isHighEnough = center.y > 1.75 && center.y < 6.5;
-    const isFlat = size.y < 0.45;
-    const isWide = size.x > 2.8 || size.z > 2.8;
-
-    return isHighEnough && isFlat && isWide;
+  function protectedObject(obj){
+    const label = labelOf(obj);
+    return PROTECT.some(k => label.includes(k));
   }
 
   function run(){
@@ -75,15 +78,15 @@
 
     scene.traverse((obj)=>{
       scanned++;
-      const s = textOf(obj);
+      const label = labelOf(obj);
 
-      if (KEYWORDS.some(k => s.includes(k))) {
-        hide(obj, "keyword-second-floor");
-        return;
-      }
+      if (protectedObject(obj)) return;
 
-      if (looksLikeUnnamedUpperPlatform(obj)) {
-        hide(obj, "unnamed-upper-platform");
+      const match = SECOND_FLOOR_KEYWORDS.some(k => label.includes(k));
+      if (match) {
+        obj.visible = false;
+        obj.userData.svrRemovedReason = "second-floor-cleanup";
+        hidden++;
       }
     });
 
@@ -95,13 +98,13 @@
       });
     } catch(_e) {}
 
-    log("[SVR cleanup] scanned:", scanned, "hidden:", removed);
-    setStatus(`Lobby cleanup: music off, second floor removed (${removed})`, { force: true });
+    try { log("[SVR original lobby cleanup] scanned:", scanned, "hidden:", hidden); } catch(_e) {}
+    try { setStatus(`Original lobby clean: music off, second floor hidden (${hidden})`, { force: true }); } catch(_e) {}
   }
 
-  setTimeout(run, 600);
-  setTimeout(run, 1800);
-  setTimeout(run, 4200);
+  setTimeout(run, 800);
+  setTimeout(run, 2500);
+  setTimeout(run, 5500);
 
   return { run };
 }

@@ -14,24 +14,25 @@
 
   async function toggle(){
     state.enabled = false;
-    emit();
+    stop();
     return false;
   }
 
   async function next(){
     state.enabled = false;
-    emit();
+    stop();
     return false;
   }
 
   async function start(){
     state.enabled = false;
-    emit();
+    stop();
     return false;
   }
 
   function stop(){
     state.enabled = false;
+
     try {
       document.querySelectorAll("audio, video").forEach((el)=>{
         el.pause();
@@ -39,6 +40,7 @@
         el.volume = 0;
       });
     } catch(_e) {}
+
     emit();
   }
 
@@ -53,5 +55,7 @@
   }
 
   stop();
+  emit();
+
   return { toggle, next, start, stop, getState, prime };
 }
