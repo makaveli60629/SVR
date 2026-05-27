@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
@@ -84,36 +84,62 @@ function orientCharacterUpright(obj){
 }
 async function tryLoadGLTF(urls, log, timeoutMs = 12000){
   const loader = new GLTFLoader();
+  const misses = [];
+
   for (const url of urls){
     try{
       const gltf = await withTimeout(loader.loadAsync(url), timeoutMs);
       log("Loaded GLTF:", url);
       return gltf.scene;
-    }catch(_err){ log("GLTF miss:", url); }
+    }catch(_err){
+      misses.push(url);
+    }
   }
+
+  if (misses.length) {
+    log("Optional GLTF unavailable; procedural fallback active.");
+  }
+
   return null;
 }
 async function tryLoadFBX(urls, log, timeoutMs = 12000){
   const loader = new FBXLoader();
+  const misses = [];
+
   for (const url of urls){
     try{
       const fbx = await withTimeout(loader.loadAsync(url), timeoutMs);
       log("Loaded FBX:", url);
       return fbx;
-    }catch(_err){ log("FBX miss:", url); }
+    }catch(_err){
+      misses.push(url);
+    }
   }
+
+  if (misses.length) {
+    log("Optional FBX unavailable; procedural fallback active.");
+  }
+
   return null;
 }
-
 async function tryLoadOBJ(urls, log, timeoutMs = 12000){
   const loader = new OBJLoader();
+  const misses = [];
+
   for (const url of urls){
     try{
       const obj = await withTimeout(loader.loadAsync(url), timeoutMs);
       log("Loaded OBJ:", url);
       return obj;
-    }catch(_err){ log("OBJ miss:", url); }
+    }catch(_err){
+      misses.push(url);
+    }
   }
+
+  if (misses.length) {
+    log("Optional OBJ unavailable; procedural fallback active.");
+  }
+
   return null;
 }
 function canvasTexture(width, height, painter){
@@ -667,7 +693,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.strokeStyle = 'rgba(124,255,226,0.82)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#eafff7'; x.font = 'bold 62px system-ui, Arial'; x.fillText('THE ZEN DEN', w/2, 86);
-    x.fillStyle = '#9cf0d3'; x.font = 'bold 24px system-ui, Arial'; x.fillText('meditate • restore • breathe', w/2, 138);
+    x.fillStyle = '#9cf0d3'; x.font = 'bold 24px system-ui, Arial'; x.fillText('meditate â€¢ restore â€¢ breathe', w/2, 138);
   });
   const zenDenPlate = new THREE.Mesh(new THREE.PlaneGeometry(2.34, 0.46), new THREE.MeshBasicMaterial({ map: zenDenTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   zenDenPlate.position.set(4.95, 4.68, 0.73);
@@ -687,12 +713,12 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Services', 60, y);
     y += 56;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    ['SVR wellness placeholder', 'Meditation reset concept', 'Services pending approval', 'Partner copy pending approval'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 46; });
+    ['SVR wellness placeholder', 'Meditation reset concept', 'Services pending approval', 'Partner copy pending approval'].forEach((line)=>{ x.fillText('â€¢ ' + line, 72, y); y += 46; });
     y += 40;
     x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Book / Explore', 60, y);
     y += 54;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    fillWrappedText(x, 'approval pending • SVR placeholder • Reiki VR entry', 60, y, w - 120, 40);
+    fillWrappedText(x, 'approval pending â€¢ SVR placeholder â€¢ Reiki VR entry', 60, y, w - 120, 40);
   });
   const partnerPanel = new THREE.Mesh(new THREE.PlaneGeometry(3.28, 4.02), new THREE.MeshBasicMaterial({ map: partnerPanelTex, side: THREE.DoubleSide, transparent: true }));
   partnerPanel.position.set(-4.10, 2.18, -2.10);
@@ -709,7 +735,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#f6ffff'; x.font = 'bold 44px system-ui, Arial'; x.fillText('Professional Highlights', 42, 74);
     x.fillStyle = '#bcffe9'; x.font = '32px system-ui, Arial';
     let y = 148;
-    ['Partner approval pending', 'Reiki/wellness placeholder', 'Meditation-forward concept', 'Private room ready for approval'].forEach((line)=>{ x.fillText('• ' + line, 46, y); y += 70; });
+    ['Partner approval pending', 'Reiki/wellness placeholder', 'Meditation-forward concept', 'Private room ready for approval'].forEach((line)=>{ x.fillText('â€¢ ' + line, 46, y); y += 70; });
   });
   const rightInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 1.64), new THREE.MeshBasicMaterial({ map: rightInfoTex, side: THREE.DoubleSide, transparent: true }));
   rightInfo.position.set(4.05, -0.12, -2.08);
@@ -723,14 +749,14 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#f6ffff'; x.font = 'bold 68px system-ui, Arial'; x.fillText('SVR WELLNESS', w/2, 106);
     x.fillStyle = '#bcffe9'; x.font = 'bold 34px system-ui, Arial'; x.fillText('Holistic Healing & Wellness', w/2, 166);
     x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Approval Pending Services', w/2, 296);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki • meditation • appointments • partner-ready wellness hub', w/2, 366);
+    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki â€¢ meditation â€¢ appointments â€¢ partner-ready wellness hub', w/2, 366);
     x.fillStyle = 'rgba(124,255,226,0.16)'; roundRectPath(x, 90, 430, w-180, 138, 28); x.fill();
     x.strokeStyle = 'rgba(124,255,226,0.65)'; x.lineWidth = 6; roundRectPath(x, 90, 430, w-180, 138, 28); x.stroke();
     x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER THE REIKI HUB', w/2, 510);
     x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Use the floor portal to enter the guided Reiki space', w/2, 564);
     x.fillStyle = '#f6ffff'; x.font = 'bold 38px system-ui, Arial'; x.fillText('Professional Highlights', w/2, 716);
-    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('Approval • Wellness • Reiki', w/2, 788);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private sessions • mindful reset • future partner storefront', w/2, 856);
+    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('Approval â€¢ Wellness â€¢ Reiki', w/2, 788);
+    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private sessions â€¢ mindful reset â€¢ future partner storefront', w/2, 856);
   });
   const centerInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.70, 4.02), new THREE.MeshBasicMaterial({ map: centerInfoTex, side: THREE.DoubleSide, transparent: true }));
   centerInfo.position.set(0, 2.18, -2.10);
@@ -1477,7 +1503,7 @@ function addScorpionRoom(scene, R, wallHeight){
     x.lineWidth = 10; x.strokeRect(16,16,w-32,h-32);
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#fff2fb'; x.font = 'bold 86px system-ui, Arial'; x.fillText('SCORPION GAME ROOM', w/2, 100);
-    x.fillStyle = '#ffadd7'; x.font = 'bold 30px system-ui, Arial'; x.fillText('REAL PLAY • TABLE FLOW • PRIVATE ACTION', w/2, 170);
+    x.fillStyle = '#ffadd7'; x.font = 'bold 30px system-ui, Arial'; x.fillText('REAL PLAY â€¢ TABLE FLOW â€¢ PRIVATE ACTION', w/2, 170);
   });
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 1.10), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
   sign.position.set(0, 5.14, -2.72);
@@ -1509,7 +1535,7 @@ function addScorpionRoom(scene, R, wallHeight){
     x.fillStyle = '#fdf5ff'; x.font = 'bold 60px system-ui, Arial'; x.fillText('SCORPION ACCESS', 44, 92);
     x.fillStyle = '#ffc4eb'; x.font = '36px system-ui, Arial'; 
     let y = 180;
-    ['Fast jump from watch', 'Fist near face toggles teleport', 'Reserved for real play flow', 'Modular room for future game scene'].forEach(line=>{ x.fillText('• ' + line, 54, y); y += 92; });
+    ['Fast jump from watch', 'Fist near face toggles teleport', 'Reserved for real play flow', 'Modular room for future game scene'].forEach(line=>{ x.fillText('â€¢ ' + line, 54, y); y += 92; });
   });
   const board = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.56), new THREE.MeshBasicMaterial({ map: boardTex, transparent: true, side: THREE.DoubleSide }));
   board.position.set(-2.34, 2.1, -2.68);
@@ -1633,7 +1659,7 @@ function buildOuterCity(scene, R){
               ctx.fillText("SVR WELLNESS", w2 / 2, 94);
               ctx.fillStyle = "#7bffb7";
               ctx.font = "700 50px system-ui, Arial";
-              ctx.fillText("SVR Reiki • Meditation • Wellness", w2 / 2, 178);
+              ctx.fillText("SVR Reiki â€¢ Meditation â€¢ Wellness", w2 / 2, 178);
             }),
             transparent: true,
             side: THREE.DoubleSide,
@@ -2088,7 +2114,7 @@ function buildFireLightningArch(scene){
   ctx.font = "bold 34px Arial, sans-serif";
   ctx.shadowColor = "#ff6a00";
   ctx.fillStyle = "#fff6d8";
-  ctx.fillText("ELECTRIC HANDS • PORTAL ARCH", 512, 170);
+  ctx.fillText("ELECTRIC HANDS â€¢ PORTAL ARCH", 512, 170);
   const signTex = new THREE.CanvasTexture(signCanvas);
   signTex.colorSpace = THREE.SRGBColorSpace;
   const sign = new THREE.Mesh(
@@ -2151,7 +2177,7 @@ function buildFireLightningArch(scene){
     }
   };
   window.SVR_FIRE_LIGHTNING_ARCH = {
-    build: "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+    build: "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK",
     position: { x: group.position.x, y: group.position.y, z: group.position.z },
     theme: "SVR fire orange, electric cyan, violet logo glow"
   };
@@ -2249,7 +2275,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(rim);
 
   // Phase 252: removed the spawn/back-body teleport-machine style arch.
-  window.SVR_FIRE_LIGHTNING_ARCH = { build: "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK", disabled: true, reason: "removed per Quest teleport alignment feedback" };
+  window.SVR_FIRE_LIGHTNING_ARCH = { build: "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK", disabled: true, reason: "removed per Quest teleport alignment feedback" };
 
   const innerPlatform = null;
 
@@ -2262,7 +2288,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   [
     { angle: -Math.PI * 0.5, kind: "main", title: "MAIN SPONSOR SCREEN", subtitle: "SCARLETT VR POKER", size: [9.4, wallHeight - 0.30], logo: [3.2, 3.2], y: wallHeight * 0.5 },
     { angle: Math.PI * 0.5, kind: "reserve", title: "LEAGUE WALL", subtitle: "SOUTH WALL", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
-    { angle: 0, kind: "reiki", title: "REIKI TIME HUB", subtitle: "RED CARPET • PLANTS • ZEN STORE", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
+    { angle: 0, kind: "reiki", title: "REIKI TIME HUB", subtitle: "RED CARPET â€¢ PLANTS â€¢ ZEN STORE", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
     { angle: Math.PI, kind: "reserve", title: "LEGENDS", subtitle: "HALL OF FAME", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 }
   ].forEach(({ angle, kind, title, subtitle, size, logo, y })=>{
     const matrix = kind === "main" ? createMatrixBillboardTexture("main") : null;
@@ -2813,3 +2839,5 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+
+

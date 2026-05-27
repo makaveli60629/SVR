@@ -4,8 +4,8 @@
  * One failed optional module must not black-screen the lobby.
  */
 (function(){
-  const BUILD = "PHASE-269-RUNTIME-SHIELD-INSTALL-FAILOPEN-LOCK";
-  const TAG = "phase269-runtime-shield-failopen";
+  const BUILD = "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK";
+  const TAG = "phase270-asset-path-loader-smooth";
 
   const modules = [
     "./phase255_control_lock.js",
@@ -87,6 +87,7 @@
 
   emit("svr_phase260_safe_loader_ready", state);
 })();
+
 
 
 

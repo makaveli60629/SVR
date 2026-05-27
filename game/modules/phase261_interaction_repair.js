@@ -4,7 +4,7 @@
  * Loads after game ready; does not block boot.
  */
 (function(){
-  const BUILD = "PHASE-269-RUNTIME-SHIELD-INSTALL-FAILOPEN-LOCK";
+  const BUILD = "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK";
 
   const state = {
     build: BUILD,
@@ -197,6 +197,7 @@
 
   emit("svr_phase261_interaction_repair_ready", state);
 })();
+
 
 
 

@@ -1,9 +1,9 @@
 ﻿{
-    "build":  "PHASE-269-RUNTIME-SHIELD-INSTALL-FAILOPEN-LOCK",
+    "build":  "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK",
     "source":  "direct-game-folder",
     "siteTouched":  false,
-    "previous":  "PHASE-268-RUNTIME-SHIELD-QUIET-VISIBLE-LOBBY-LOCK",
-    "next":  "PHASE-270-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
-    "fix":  "Install runtime shield quiet module and fail-open optional runtime systems",
-    "updatedAt":  "2026-05-27T03:41:52Z"
+    "previous":  "PHASE-269-RUNTIME-SHIELD-INSTALL-FAILOPEN-LOCK",
+    "next":  "PHASE-271-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
+    "fix":  "Add root asset fallback paths and reduce optional model miss spam",
+    "updatedAt":  "2026-05-27T03:50:56Z"
 }

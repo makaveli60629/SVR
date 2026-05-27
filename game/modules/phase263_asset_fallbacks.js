@@ -4,7 +4,7 @@
  */
 import * as THREE from "three";
 
-const BUILD = "PHASE-269-RUNTIME-SHIELD-INSTALL-FAILOPEN-LOCK";
+const BUILD = "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK";
 
 function makeMat(color, roughness = 0.8, metalness = 0.05){
   return new THREE.MeshStandardMaterial({ color, roughness, metalness });
@@ -189,6 +189,7 @@ export function applyPhase263AssetFallbacks(scene){
 
   return result;
 }
+
 
 
 
