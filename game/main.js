@@ -196,6 +196,15 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit8") gotoScene("scorpion");
 });
 
+
+const svrPortalSystem = installSvrPortalWalkthrough({
+  scene,
+  camera,
+  renderer,
+  gotoScene,
+  setStatus,
+  log
+});
 const watch = createWristWatch({
   scene,
   camera,
@@ -236,10 +245,10 @@ setStatus("Loading logoÃ¢â‚¬Â¦", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Music off. Second floor cleanup active.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Hand teleport and physical portals active.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Input ready: desktop / Quest hand tracking");
 window.SVR_GAME_READY = true;
-window.SVR_BOOT_FAILSAFE?.ready("SVR runtime ready. Original lobby active.");
+window.SVR_BOOT_FAILSAFE?.ready("SVR runtime Ready. Original lobby active. Hand teleport and physical portals active.");
 window.dispatchEvent(new CustomEvent("svr:ready", { detail: { build: "PHASE-91-BLACK-BOOT-LOG-RECOVERY-V2", message: "SVR runtime ready" } }));
 
 function setHudVisible(visible){
@@ -335,6 +344,7 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingÃ¢â‚¬Â¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
 
 
 

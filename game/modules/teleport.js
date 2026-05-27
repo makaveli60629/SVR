@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { CONFIG } from "./config.js";
 import { isPinching, isFist, aimPoint } from "./gestures.js";
 
@@ -338,8 +338,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     lastRightToggle = rightToggle;
 
     if (!leftControllerRef?.joints && !rightControllerRef?.joints){
-      const leftFist = !!leftHandRef?.joints && handNearFace(leftHandRef) && isFist(leftHandRef);
-      const rightFist = !!rightHandRef?.joints && handNearFace(rightHandRef) && isFist(rightHandRef);
+      const leftFist = !!leftHandRef?.joints && isFist(leftHandRef);
+      const rightFist = !!rightHandRef?.joints && isFist(rightHandRef);
       if (leftFist && !lastLeftFistToggle && now > cooldownUntil){
         mode = !(mode && active === leftHandRef);
         active = mode ? leftHandRef : null;
@@ -370,8 +370,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       setGlow(false);
       stableTargetMs = 0;
       lastAimValid = false;
-      statusCb("Waiting for hands or controllers…");
-      modeCb("Input: not tracked");
+      statusCb("Waiting for hands or controllersâ€¦");
+      modeCb(renderer?.xr?.isPresenting ? "Input: not tracked" : "Input ready: desktop / Quest");
       return;
     }
 
@@ -391,10 +391,10 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       stableTargetMs = 0;
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
-        ? "Controllers active • left stick move • right stick snap turn • A/X teleport"
-        : "TELEPORT OFF • press TP or make fist by face";
+        ? "Controllers active â€¢ left stick move â€¢ right stick snap turn â€¢ A/X teleport"
+        : "TELEPORT OFF â€¢ press TP or make fist by face";
       statusCb(idleMsg);
-      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist by face toggles TP");
+      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready â€¢ fist by face toggles TP");
       return;
     }
 
@@ -407,7 +407,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       markerGlow.intensity = 0;
       stableTargetMs = 0;
       lastAimValid = false;
-      statusCb(activeMode === "controller" ? "CONTROLLER TP ON • hold trigger then release" : "HAND TP ON • hold pinch then release");
+      statusCb(activeMode === "controller" ? "CONTROLLER TP ON â€¢ hold trigger then release" : "HAND TP ON â€¢ hold pinch then release");
       modeCb(activeMode === "controller" ? "Controllers: TELEPORT ON" : `Hands: TELEPORT ON`);
       return;
     }
@@ -452,13 +452,13 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
           cooldownUntil = now + 180;
           triggerHoldStart = 0;
           stableTargetMs = 0;
-          statusCb("TELEPORT RESET • aim again");
+          statusCb("TELEPORT RESET â€¢ aim again");
         }
       }
       if (trigger <= 0.12) triggerHoldStart = 0;
       active.userData._wasTrigger = trigger > 0.22;
       modeCb("Controllers: TELEPORT ON");
-      statusCb("CONTROLLER TP ON • hold trigger then release");
+      statusCb("CONTROLLER TP ON â€¢ hold trigger then release");
       return;
     }
 
@@ -484,14 +484,15 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
         cooldownUntil = now + 180;
         pinchHoldStart = 0;
         stableTargetMs = 0;
-        statusCb("TELEPORT RESET • aim again");
+        statusCb("TELEPORT RESET â€¢ aim again");
       }
     }
     if (!pinch) pinchHoldStart = 0;
     active.userData._wasPinching = pinch;
     modeCb("Hands: TELEPORT ON");
-    statusCb("HAND TP ON • fist by face toggles • hold pinch then release");
+    statusCb("HAND TP ON â€¢ fist by face toggles â€¢ hold pinch then release");
   }
 
   return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
 }
+
