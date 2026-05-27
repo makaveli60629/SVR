@@ -1,9 +1,0 @@
-{
-  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
-  "phase": 252,
-  "modules": [
-    "game/modules/auto_apply_git_wrapper_fix.js",
-    "game/modules/enterprise_bridge_phase252.js"
-  ],
-  "public_page_touched": false
-}

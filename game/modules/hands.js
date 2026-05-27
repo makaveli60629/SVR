@@ -1,4 +1,3 @@
-﻿/* PHASE-282-GAME-UPDATE-2-STABILITY-LOCK hands/controller fallback lock: hidden controllers, natural hands, right controller fallback. */
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/addons/webxr/XRHandModelFactory.js";
 
@@ -65,163 +64,6 @@ function updateControllerProxy(proxy){
   }
 }
 
-
-const FIRE_LIGHTNING_COLORS = {
-  fire: 0xff6a00,
-  ember: 0xffb000,
-  electric: 0x33e8ff,
-  violet: 0xb48cff,
-  whiteHot: 0xffffee
-};
-
-function createLightningLine(count = 18){
-  const geom = new THREE.BufferGeometry();
-  const arr = new Float32Array(count * 2 * 3);
-  geom.setAttribute("position", new THREE.BufferAttribute(arr, 3));
-  const mat = new THREE.LineBasicMaterial({
-    color: FIRE_LIGHTNING_COLORS.electric,
-    transparent: true,
-    opacity: 0.78,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  });
-  const line = new THREE.LineSegments(geom, mat);
-  line.userData.count = count;
-  line.frustumCulled = false;
-  return line;
-}
-
-function createFireLightningHandGlow(scene, source, handed = "right"){
-  const group = new THREE.Group();
-  group.name = `SVR_${handed}_fire_lightning_hand_glow`;
-  group.visible = false;
-  group.userData.source = source;
-  group.userData.handedness = handed;
-
-  const ringMats = [
-    new THREE.MeshBasicMaterial({ color: FIRE_LIGHTNING_COLORS.fire, transparent: true, opacity: 0.62, blending: THREE.AdditiveBlending, depthWrite: false }),
-    new THREE.MeshBasicMaterial({ color: FIRE_LIGHTNING_COLORS.electric, transparent: true, opacity: 0.78, blending: THREE.AdditiveBlending, depthWrite: false }),
-    new THREE.MeshBasicMaterial({ color: FIRE_LIGHTNING_COLORS.violet, transparent: true, opacity: 0.50, blending: THREE.AdditiveBlending, depthWrite: false })
-  ];
-  const rings = [
-    new THREE.Mesh(new THREE.TorusGeometry(0.095, 0.006, 8, 42), ringMats[0]),
-    new THREE.Mesh(new THREE.TorusGeometry(0.127, 0.005, 8, 42), ringMats[1]),
-    new THREE.Mesh(new THREE.TorusGeometry(0.162, 0.004, 8, 42), ringMats[2])
-  ];
-  rings[0].rotation.x = Math.PI * 0.5;
-  rings[1].rotation.y = Math.PI * 0.5;
-  rings[2].rotation.z = Math.PI * 0.5;
-  rings.forEach(r => {
-    r.renderOrder = 40;
-    group.add(r);
-  });
-
-  const palmOrb = new THREE.Mesh(
-    new THREE.SphereGeometry(0.038, 18, 18),
-    new THREE.MeshBasicMaterial({
-      color: FIRE_LIGHTNING_COLORS.ember,
-      transparent: true,
-      opacity: 0.42,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
-  );
-  palmOrb.position.set(0, -0.004, 0.052);
-  palmOrb.renderOrder = 41;
-  group.add(palmOrb);
-
-  const flame = new THREE.Mesh(
-    new THREE.ConeGeometry(0.026, 0.13, 18, 1, true),
-    new THREE.MeshBasicMaterial({
-      color: FIRE_LIGHTNING_COLORS.fire,
-      transparent: true,
-      opacity: 0.36,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide
-    })
-  );
-  flame.position.set(0, 0.005, 0.115);
-  flame.rotation.x = -Math.PI * 0.5;
-  flame.renderOrder = 41;
-  group.add(flame);
-
-  const lightning = createLightningLine(20);
-  lightning.renderOrder = 42;
-  group.add(lightning);
-
-  const light = new THREE.PointLight(FIRE_LIGHTNING_COLORS.electric, 0.55, 1.35, 2.0);
-  light.position.set(0, 0.02, 0.055);
-  group.add(light);
-
-  group.userData.rings = rings;
-  group.userData.lightning = lightning;
-  group.userData.light = light;
-  group.userData.palmOrb = palmOrb;
-  group.userData.flame = flame;
-  scene.add(group);
-  return group;
-}
-
-function updateFireLightningHandGlow(effect, time = 0){
-  const source = effect?.userData?.source;
-  const wrist = source?.joints?.wrist;
-  if (!wrist){
-    effect.visible = false;
-    return;
-  }
-  wrist.updateWorldMatrix?.(true, false);
-  wrist.getWorldPosition(effect.position);
-  wrist.getWorldQuaternion(effect.quaternion);
-  effect.visible = true;
-
-  const handedSign = effect.userData.handedness === "left" ? -1 : 1;
-  const pulse = 0.5 + 0.5 * Math.sin(time * 7.0 + handedSign);
-  const rings = effect.userData.rings || [];
-  rings.forEach((ring, idx)=>{
-    ring.rotation.x += 0.012 * (idx + 1) * handedSign;
-    ring.rotation.y += 0.018 * (idx + 1);
-    ring.rotation.z += 0.010 * (idx + 1) * -handedSign;
-    const s = 1.0 + Math.sin(time * (3.1 + idx) + idx) * 0.07;
-    ring.scale.setScalar(s);
-    ring.material.opacity = [0.55, 0.72, 0.46][idx] + pulse * 0.14;
-  });
-
-  if (effect.userData.light) effect.userData.light.intensity = 0.35 + pulse * 0.55;
-  if (effect.userData.palmOrb) {
-    effect.userData.palmOrb.scale.setScalar(0.86 + pulse * 0.40);
-    effect.userData.palmOrb.material.opacity = 0.30 + pulse * 0.28;
-  }
-  if (effect.userData.flame) {
-    effect.userData.flame.scale.set(0.9 + pulse * 0.34, 1.0 + pulse * 0.30, 0.9 + pulse * 0.34);
-    effect.userData.flame.material.opacity = 0.25 + pulse * 0.28;
-  }
-
-  const line = effect.userData.lightning;
-  const pos = line?.geometry?.attributes?.position;
-  if (pos){
-    const arr = pos.array;
-    const count = line.userData.count || 18;
-    for (let i = 0; i < count; i++){
-      const a = i / count * Math.PI * 2;
-      const radius = 0.075 + ((i % 3) * 0.022) + Math.sin(time * 6 + i) * 0.006;
-      const x1 = Math.cos(a + time * 1.7) * radius;
-      const y1 = Math.sin(a * 1.37 + time * 2.2) * 0.055;
-      const z1 = 0.055 + Math.sin(a + time * 2.6) * 0.09;
-      const x2 = Math.cos(a + 0.37 + time * 1.9) * (radius + 0.030 + Math.sin(time * 11 + i) * 0.006);
-      const y2 = y1 + Math.cos(a * 1.9 + time * 4.1) * 0.035;
-      const z2 = z1 + Math.sin(a * 1.2 + time * 5.3) * 0.045;
-      const o = i * 6;
-      arr[o] = x1; arr[o+1] = y1; arr[o+2] = z1;
-      arr[o+3] = x2; arr[o+4] = y2; arr[o+5] = z2;
-    }
-    pos.needsUpdate = true;
-    line.material.color.setHex(pulse > 0.5 ? FIRE_LIGHTNING_COLORS.whiteHot : FIRE_LIGHTNING_COLORS.electric);
-    line.material.opacity = 0.55 + pulse * 0.34;
-  }
-}
-
-
 export function createHands({ scene, renderer, log = console.log }){
   const handFactory = new XRHandModelFactory();
   const rawHands = [];
@@ -229,7 +71,6 @@ export function createHands({ scene, renderer, log = console.log }){
   const handDebugGroups = [];
   const controllers = [];
   const controllerProxies = [];
-  const handGlowEffects = [];
   let leftHand = null;
   let rightHand = null;
   let leftControllerProxy = null;
@@ -257,7 +98,6 @@ export function createHands({ scene, renderer, log = console.log }){
     hand.visible = true;
     scene.add(hand);
     rawHands.push(hand);
-    handGlowEffects.push(createFireLightningHandGlow(scene, hand, i === 0 ? "left" : "right"));
     const model = handFactory.createHandModel(hand, "mesh");
     model.visible = true;
     hand.add(model);
@@ -288,9 +128,8 @@ export function createHands({ scene, renderer, log = console.log }){
       const proxy = makeControllerProxy(controller, handed);
       proxy.userData.inputSource = evt?.data || null;
       scene.add(proxy);
-      const glow = createFireLightningHandGlow(scene, proxy, handed);
       const debug = makeDebugGroup(proxy);
-      controllerProxies.push({ controller, proxy, debug, glow });
+      controllerProxies.push({ controller, proxy, debug });
       if (handed === "left") leftControllerProxy = proxy;
       if (handed === "right") rightControllerProxy = proxy;
       log("Controller connected", i, handed);
@@ -303,7 +142,6 @@ export function createHands({ scene, renderer, log = console.log }){
         if (rec.proxy === leftControllerProxy) leftControllerProxy = null;
         if (rec.proxy === rightControllerProxy) rightControllerProxy = null;
         rec.proxy.parent?.remove(rec.proxy);
-        rec.glow?.parent?.remove(rec.glow);
         controllerProxies.splice(idx, 1);
       }
     });
@@ -316,15 +154,6 @@ export function createHands({ scene, renderer, log = console.log }){
     });
     handModels.forEach(m=>{ if (m) m.visible = true; });
     controllerProxies.forEach(({ proxy })=> updateControllerProxy(proxy, dt));
-    const t = performance.now() * 0.001;
-    handGlowEffects.forEach(effect => updateFireLightningHandGlow(effect, t));
-    controllerProxies.forEach(({ glow })=> updateFireLightningHandGlow(glow, t));
-    window.SVR_FIRE_LIGHTNING_HANDS = {
-      build: "PHASE-282-GAME-UPDATE-2-STABILITY-LOCK",
-      rawGlowCount: handGlowEffects.length,
-      controllerGlowCount: controllerProxies.filter(x=>x.glow).length,
-      theme: "fire-orange + electric-cyan + SVR-violet"
-    };
   }
 
   function updateDebug(){
@@ -362,6 +191,3 @@ export function createHands({ scene, renderer, log = console.log }){
     update
   };
 }
-
-
-

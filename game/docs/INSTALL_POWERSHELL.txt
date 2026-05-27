@@ -1,10 +1,10 @@
 C:\Users\ronal\SVR
 
-Copy-Item .\update\game.zip .\update\game_before_phase252_relock.zip -Force
+Copy-Item .\update\game.zip .\update\game_before_phase94_relock.zip -Force
 Copy-Item "$HOME\Downloads\game.zip" .\update\game.zip -Force
 if (Test-Path .\game) { Remove-Item .\game -Recurse -Force }
 Expand-Archive -Path .\update\game.zip -DestinationPath . -Force
 git add .\update\game.zip .\game
-git commit -m "Lock Phase 199 audit relock"
+git commit -m "Lock Phase 94 audit relock"
 git pull --rebase origin main
 git push origin main

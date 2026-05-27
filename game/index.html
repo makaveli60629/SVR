@@ -1,10 +1,11 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker â€¢ Phase 253 Forward Restore Locomotion Kiosk Poker Lock</title>
+  <title>ScarlettVR Poker • Phase 85 Lobby Edit Unlock</title>
   <meta name="theme-color" content="#050508"/>
+  <meta name="svr-build" content="PHASE-85-LOBBY-EDIT-UNLOCK"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
     :root { color-scheme: dark; }
@@ -92,60 +93,28 @@
   <div id="app"></div>
 
   <div id="hud">
-    <div class="pill" id="status">Bootingâ€¦</div>
+    <div class="pill" id="status">Booting…</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
-      <span class="pill" id="mode">Hands: â€¦</span>
-      <span class="pill">BUILD: PHASE-84-TABLE-CLEAROUT-LOCK</span>
+      <span class="pill" id="mode">Hands: …</span>
+      <span class="pill">BUILD: PHASE-85-LOBBY-EDIT-UNLOCK</span>
     </div>
   </div>
 
   <div id="sceneNav">
     <button class="scene-btn" data-scene="lobby">Lobby</button>
     <button class="scene-btn" data-scene="seat">Seat</button>
-    <button class="scene-btn" data-scene="reiki">Reiki Hub</button>
-    <button class="scene-btn" data-url="./reiki.html">Reiki Room</button>
-    <button class="scene-btn" data-scene="pga">PGA Hub</button>
-    <button class="scene-btn" data-url="./pga-drive.html">PGA Drive</button>
-    <button class="scene-btn" data-url="./chip-putt.html">Chip/Putt</button>
-    <button class="scene-btn" data-url="./store-room.html">VR Store</button>
-    <button class="scene-btn" data-url="./smoker-lounge.html">Smoker</button>
-    <button class="scene-btn" data-url="./scorpion.html">Scorpion</button>
+    <button class="scene-btn" data-scene="reiki">Reiki</button>
+    <button class="scene-btn" data-scene="pga">PGA</button>
+    <button class="scene-btn" data-scene="legends">Legend</button>
+    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
+    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
   </div>
 
   <pre id="log"></pre>
   <pre id="err"></pre>
-  <div id="bootRecovery" aria-live="polite"></div>
 
-  <script src="./boot.js?v=phase84-table-clearout-lock"></script>
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

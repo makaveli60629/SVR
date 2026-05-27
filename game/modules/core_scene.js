@@ -1,4 +1,4 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { VRButton } from "three/addons/webxr/VRButton.js";
 
 export function createCore({ containerId = "app" } = {}){
@@ -27,7 +27,10 @@ export function createCore({ containerId = "app" } = {}){
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   document.getElementById(containerId).appendChild(renderer.domElement);
-  const vrButton = VRButton.createButton(renderer, { optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"] });
+  const vrButton = VRButton.createButton(renderer, {
+    requiredFeatures: ["local-floor"],
+    optionalFeatures: ["bounded-floor", "hand-tracking"]
+  });
   vrButton.classList.add("svr-vr-button");
   document.body.appendChild(vrButton);
 
@@ -39,6 +42,3 @@ export function createCore({ containerId = "app" } = {}){
 
   return { scene, camera, renderer };
 }
-
-
-

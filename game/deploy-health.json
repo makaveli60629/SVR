@@ -1,8 +1,0 @@
-{
-  "build": "PHASE-253-FORWARD-RESTORE-LOCOMOTION-KIOSK-POKER-LOCK",
-  "phase": 253,
-  "source": "phase252-forward-baseline",
-  "generatedAt": "2026-05-26T00:00:00Z",
-  "public_page_touched": false,
-  "featureLock": "restore forward phase after rollback; locomotion/watch/teleport lock; interactive store kiosk; private scene portals; right-to-left deal lock; chip physics visual lock"
-}

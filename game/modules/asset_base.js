@@ -1,30 +1,14 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 
-export const ASSET_BASES = (() => {
-  const bases = [
-    // Normal game package path:
-    new URL("../assets/", import.meta.url).toString(),
-
-    // Root repo assets path:
-    new URL("../../assets/", import.meta.url).toString(),
-
-    // Root assets backup path if files were uploaded there:
-    new URL("../../assets/assets_backup/", import.meta.url).toString(),
-
-    // Absolute fallbacks for GitHub Pages:
-    `${location.origin}/game/assets/`,
-    `${location.origin}/assets/`,
-    `${location.origin}/assets/assets_backup/`
-  ];
-
-  return [...new Set(bases)];
-})();
+export const ASSET_BASES = [
+  new URL("../assets/", import.meta.url).toString()
+];
 
 export function assetUrls(...paths){
   const out = [];
   for (const rel of paths){
     for (const base of ASSET_BASES){
-      out.push(base + rel.replace(/^\/+/, ""));
+      out.push(base + rel);
     }
   }
   return [...new Set(out)];
@@ -41,10 +25,8 @@ export async function loadFirstTexture(urls, { colorSpace = null } = {}){
       tex.anisotropy = 8;
       return tex;
     }catch(err){
-      // Try next base path silently.
+      // try next
     }
   }
   return null;
 }
-
-

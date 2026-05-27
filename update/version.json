@@ -1,11 +1,8 @@
 ﻿{
-    "source":  "direct-game-folder",
-    "cacheTag":  "phase84-table-clearout-lock",
-    "build":  "PHASE-84-TABLE-CLEAROUT-LOCK",
-    "next":  "PHASE-85-LOBBY-EMPTY-CENTER-PORTAL-POLISH",
-    "fix":  "Temporary table clearout: hide current lobby table package and all table-attached chips/cards/bots/HUD while preserving lobby, portals, watch, movement, and private routes.",
-    "phase":  84,
-    "previous":  "PHASE-282-GAME-UPDATE-2-STABILITY-LOCK",
-    "updatedAt":  "2026-05-27T18:24:00Z",
-    "siteTouched":  false
+  "build": "PHASE-85-LOBBY-EDIT-UNLOCK",
+  "scope": "game-only",
+  "siteTouched": false,
+  "lobbyEditable": true,
+  "singleLobby": true,
+  "date": "2026-05-27"
 }
