@@ -4,7 +4,7 @@
  */
 import * as THREE from "three";
 
-const BUILD = "PHASE-267-JS-NEWLINE-BOOT-RENDER-REPAIR-LOCK";
+const BUILD = "PHASE-268-RUNTIME-SHIELD-QUIET-VISIBLE-LOBBY-LOCK";
 
 export function startPhase266EarlyRenderLoop({ renderer, scene, camera, statusCb } = {}){
   if (!renderer || !scene || !camera) return null;
@@ -104,6 +104,7 @@ export function createPhase266FallbackWorld(scene, reason = "timeout"){
 
   return fallback;
 }
+
 
 
 

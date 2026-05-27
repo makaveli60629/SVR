@@ -4,7 +4,7 @@
  * Loads after game ready; does not block boot.
  */
 (function(){
-  const BUILD = "PHASE-267-JS-NEWLINE-BOOT-RENDER-REPAIR-LOCK";
+  const BUILD = "PHASE-268-RUNTIME-SHIELD-QUIET-VISIBLE-LOBBY-LOCK";
 
   const state = {
     build: BUILD,
@@ -197,6 +197,7 @@
 
   emit("svr_phase261_interaction_repair_ready", state);
 })();
+
 
 
 

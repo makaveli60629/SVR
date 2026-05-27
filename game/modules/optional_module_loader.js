@@ -1,5 +1,5 @@
 ﻿(function(){
-  const BUILD = "PHASE-267-JS-NEWLINE-BOOT-RENDER-REPAIR-LOCK";
+  const BUILD = "PHASE-268-RUNTIME-SHIELD-QUIET-VISIBLE-LOBBY-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -56,7 +56,7 @@
 ];
   const state = {
     build: BUILD,
-    phase: 267,
+    phase: 268,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -169,6 +169,7 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
 
 
 

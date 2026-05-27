@@ -3,7 +3,7 @@
  * Purpose: capture boot/import/cache evidence and avoid permanent Booting stalls.
  */
 (function(){
-  var BUILD = 'PHASE-267-JS-NEWLINE-BOOT-RENDER-REPAIR-LOCK';
+  var BUILD = 'PHASE-268-RUNTIME-SHIELD-QUIET-VISIBLE-LOBBY-LOCK';
   var startedAt = new Date().toISOString();
   var statusEl = document.getElementById('status');
   var errEl = document.getElementById('err');
@@ -65,6 +65,7 @@
   mainTimer = setTimeout(function(){ if (!ready) { showRecovery('Game did not send ready signal. Opening recovery shell so Booting cannot freeze.', '', false); startFallback('Main runtime timeout before ready signal.', 'Likely CDN/import/cache/runtime module issue.'); } }, 15000);
   import('./main.js?v=phase267-js-newline-boot-repair').then(function(){ imported = true; setStatus('Game module loaded. Building sceneâ€¦'); }).catch(function(error){ imported = false; showRecovery('Failed to import main game module. Booting screen stopped by recovery guard.', error, false); startFallback('Failed to import main game module.', error); });
 })();
+
 
 
 
