@@ -4,7 +4,7 @@
  */
 import * as THREE from "three";
 
-const BUILD = "PHASE-266-EARLY-RENDER-WORLD-TIMEOUT-LOCK";
+const BUILD = "PHASE-267-JS-NEWLINE-BOOT-RENDER-REPAIR-LOCK";
 
 function mat(color, options = {}){
   return new THREE.MeshStandardMaterial({
@@ -231,4 +231,5 @@ export function createPhase265VisibleLobbyShell(scene){
 
   return shell;
 }
+
 

@@ -1,9 +1,9 @@
 ﻿{
-    "build":  "PHASE-266-EARLY-RENDER-WORLD-TIMEOUT-LOCK",
+    "build":  "PHASE-267-JS-NEWLINE-BOOT-RENDER-REPAIR-LOCK",
     "source":  "direct-game-folder",
     "siteTouched":  false,
-    "previous":  "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK",
-    "next":  "PHASE-267-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
-    "fix":  "Start renderer before world/model loading and use fallback world timeout",
-    "updatedAt":  "2026-05-27T03:09:37Z"
+    "previous":  "PHASE-266-EARLY-RENDER-WORLD-TIMEOUT-LOCK",
+    "next":  "PHASE-268-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
+    "fix":  "Repair literal PowerShell newline corruption in main.js",
+    "updatedAt":  "2026-05-27T03:13:46Z"
 }
