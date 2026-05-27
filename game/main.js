@@ -8,11 +8,12 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase261-vr-interaction-repair";
-import "./modules/phase260_safe_interaction_loader.js?v=phase261-vr-interaction-repair";
-import "./modules/phase261_interaction_repair.js?v=phase261-vr-interaction-repair";
-const BUILD_LABEL = "PHASE-261-VR-INTERACTION-REPAIR-LOCK";
-const BUILD_PHASE = 261;
+import "./modules/optional_module_loader.js?v=phase262-poker-table-readability";
+import "./modules/phase260_safe_interaction_loader.js?v=phase262-poker-table-readability";
+import "./modules/phase261_interaction_repair.js?v=phase262-poker-table-readability";
+import "./modules/phase262_poker_table_readability_lock.js?v=phase262-poker-table-readability";
+const BUILD_LABEL = "PHASE-262-POKER-RIGHT-DEAL-TABLE-READABILITY-LOCK";
+const BUILD_PHASE = 262;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
@@ -84,6 +85,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
 setStatus("Loading worldâ€¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
+if (window.SVR_POKER_TABLE_READABILITY) window.SVR_POKER_TABLE_READABILITY.alignPoker(scene);
 if (window.SVR_ALIGNMENT) window.SVR_ALIGNMENT.alignScene(scene);
 if (window.SVR_CHIP_PHYSICS) window.SVR_CHIP_PHYSICS.scan(scene);
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
@@ -457,6 +459,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 

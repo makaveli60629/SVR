@@ -1,9 +1,9 @@
 ﻿{
-    "build":  "PHASE-261-VR-INTERACTION-REPAIR-LOCK",
+    "build":  "PHASE-262-POKER-RIGHT-DEAL-TABLE-READABILITY-LOCK",
     "source":  "direct-game-folder",
     "siteTouched":  false,
-    "previous":  "PHASE-260-RUNTIME-SHIELD-SAFE-INTERACTION-LOADER",
-    "next":  "PHASE-262-POKER-RIGHT-DEAL-TABLE-READABILITY-LOCK",
-    "fix":  "Safe VR interaction repair bridge",
-    "updatedAt":  "2026-05-27T02:36:53Z"
+    "dealRule":  "right-to-left visual dealing; dealer starts with player to dealer left",
+    "previous":  "PHASE-261-VR-INTERACTION-REPAIR-LOCK",
+    "next":  "PHASE-263-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
+    "updatedAt":  "2026-05-27T02:41:39Z"
 }
