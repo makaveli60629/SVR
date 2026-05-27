@@ -1,9 +1,9 @@
 ﻿{
-    "build":  "PHASE-263-MISSING-ASSET-FALLBACK-LOBBY-RENDER-LOCK",
+    "build":  "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK",
     "source":  "direct-game-folder",
     "siteTouched":  false,
-    "previous":  "PHASE-261-VR-INTERACTION-REPAIR-LOCK",
-    "next":  "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK",
-    "fix":  "Procedural fallback models for missing GLB OBJ FBX assets so lobby renders",
-    "updatedAt":  "2026-05-27T02:46:15Z"
+    "previous":  "PHASE-263-MISSING-ASSET-FALLBACK-LOBBY-RENDER-LOCK",
+    "next":  "PHASE-265-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
+    "fix":  "Model asset registry and missing optional path lock",
+    "updatedAt":  "2026-05-27T02:48:37Z"
 }

@@ -4,7 +4,7 @@
  */
 import * as THREE from "three";
 
-const BUILD = "PHASE-263-MISSING-ASSET-FALLBACK-LOBBY-RENDER-LOCK";
+const BUILD = "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK";
 
 function makeMat(color, roughness = 0.8, metalness = 0.05){
   return new THREE.MeshStandardMaterial({ color, roughness, metalness });
@@ -189,3 +189,4 @@ export function applyPhase263AssetFallbacks(scene){
 
   return result;
 }
+

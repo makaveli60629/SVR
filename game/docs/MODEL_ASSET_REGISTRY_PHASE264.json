@@ -1,0 +1,19 @@
+﻿{
+    "build":  "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK",
+    "requiredFallbacks":  [
+                              "phase263 fallback poker table",
+                              "phase263 fallback legend placeholder",
+                              "phase263 fallback plant placeholder",
+                              "phase263 fallback seated placeholder"
+                          ],
+    "siteTouched":  false,
+    "missingOptionalModels":  [
+                                  "assets/models/legend_character.glb",
+                                  "assets/models/legend_animated.glb",
+                                  "assets/models/riki/plant/indoor_plant.obj",
+                                  "assets/models/table.glb",
+                                  "assets/models/sitting_pose.fbx"
+                              ],
+    "mode":  "fallback-first",
+    "updatedAt":  "2026-05-27T02:48:37Z"
+}

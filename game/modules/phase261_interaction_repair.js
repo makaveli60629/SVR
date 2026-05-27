@@ -4,7 +4,7 @@
  * Loads after game ready; does not block boot.
  */
 (function(){
-  const BUILD = "PHASE-263-MISSING-ASSET-FALLBACK-LOBBY-RENDER-LOCK";
+  const BUILD = "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK";
 
   const state = {
     build: BUILD,
@@ -197,5 +197,6 @@
 
   emit("svr_phase261_interaction_repair_ready", state);
 })();
+
 
 

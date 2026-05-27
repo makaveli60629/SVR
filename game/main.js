@@ -1,5 +1,6 @@
 ﻿import * as THREE from "three";
-import { applyPhase263AssetFallbacks } from "./modules/phase263_asset_fallbacks.js?v=phase263-asset-fallback-render";
+import { registerModelAssetLock } from "./modules/phase264_model_asset_registry.js?v=phase264-model-asset-path-lock";
+import { applyPhase263AssetFallbacks } from "./modules/phase263_asset_fallbacks.js?v=phase264-model-asset-path-lock";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -9,13 +10,14 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase263-asset-fallback-render";
-import "./modules/phase260_safe_interaction_loader.js?v=phase263-asset-fallback-render";
-import "./modules/phase261_interaction_repair.js?v=phase263-asset-fallback-render";
-import "./modules/phase262_poker_table_readability_lock.js?v=phase263-asset-fallback-render";
-const BUILD_LABEL = "PHASE-263-MISSING-ASSET-FALLBACK-LOBBY-RENDER-LOCK";
-const BUILD_PHASE = 263;
+import "./modules/optional_module_loader.js?v=phase264-model-asset-path-lock";
+import "./modules/phase260_safe_interaction_loader.js?v=phase264-model-asset-path-lock";
+import "./modules/phase261_interaction_repair.js?v=phase264-model-asset-path-lock";
+import "./modules/phase262_poker_table_readability_lock.js?v=phase264-model-asset-path-lock";
+const BUILD_LABEL = "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK";
+const BUILD_PHASE = 264;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
+registerModelAssetLock();
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -461,6 +463,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 
