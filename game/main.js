@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -69,7 +69,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading world…", { force: true });
+setStatus("Loading worldâ€¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -85,10 +85,10 @@ const audio = createAudioPlaylist({
       return;
     }
     if (state.enabled){
-      setStatus(`Now Playing: ${state.trackTitle}`);
+      setStatus(`Music disabled: ${state.trackTitle}`);
       return;
     }
-    setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
+    setStatus(state.primed ? `Music disabled: ${state.trackTitle}` : `Audio disabled`);
   }
 });
 
@@ -231,12 +231,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logo…", { force: true });
+setStatus("Loading logoâ€¦", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Minor edits only. Wrist quick-jump enabled for Lobby/Seat/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -328,7 +328,8 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading…");
-  setStatus("WebGL context lost (reloading…)", { force: true });
+  log("[ERR] WebGL context lost. Reloadingâ€¦");
+  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
