@@ -1,6 +1,7 @@
 ﻿{
-    "updatedAt":  "2026-05-27T01:38:08Z",
+    "updatedAt":  "2026-05-27T01:48:10Z",
+    "siteTouched":  false,
     "build":  "PHASE-254-BOOT-SHIELD-XR-LOCOMOTION-HOTFIX",
     "source":  "direct-game-folder",
-    "fix":  "XR optional feature boot hotfix"
+    "fix":  "Boot shield XR optional-feature hotfix"
 }

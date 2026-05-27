@@ -40,3 +40,4 @@ export function createCore({ containerId = "app" } = {}){
   return { scene, camera, renderer };
 }
 
+

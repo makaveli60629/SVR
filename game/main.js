@@ -8,7 +8,7 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase252";
+import "./modules/optional_module_loader.js?v=phase254-boot-hotfix";
 
 const BUILD_LABEL = "PHASE-254-BOOT-SHIELD-XR-LOCOMOTION-HOTFIX";
 const BUILD_PHASE = 254;
@@ -449,4 +449,5 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
 

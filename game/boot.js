@@ -66,3 +66,4 @@
   import('./main.js?v=phase254-boot-hotfix').then(function(){ imported = true; setStatus('Game module loaded. Building sceneâ€¦'); }).catch(function(error){ imported = false; showRecovery('Failed to import main game module. Booting screen stopped by recovery guard.', error, false); startFallback('Failed to import main game module.', error); });
 })();
 
+
