@@ -1,6 +1,7 @@
 ﻿import * as THREE from "three";
-import { registerModelAssetLock } from "./modules/phase264_model_asset_registry.js?v=phase264-model-asset-path-lock";
-import { applyPhase263AssetFallbacks } from "./modules/phase263_asset_fallbacks.js?v=phase264-model-asset-path-lock";
+import { createPhase265VisibleLobbyShell } from "./modules/phase265_visible_lobby_shell.js?v=phase265-visible-lobby-shell";
+import { registerModelAssetLock } from "./modules/phase264_model_asset_registry.js?v=phase265-visible-lobby-shell";
+import { applyPhase263AssetFallbacks } from "./modules/phase263_asset_fallbacks.js?v=phase265-visible-lobby-shell";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -10,12 +11,12 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase264-model-asset-path-lock";
-import "./modules/phase260_safe_interaction_loader.js?v=phase264-model-asset-path-lock";
-import "./modules/phase261_interaction_repair.js?v=phase264-model-asset-path-lock";
-import "./modules/phase262_poker_table_readability_lock.js?v=phase264-model-asset-path-lock";
-const BUILD_LABEL = "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK";
-const BUILD_PHASE = 264;
+import "./modules/optional_module_loader.js?v=phase265-visible-lobby-shell";
+import "./modules/phase260_safe_interaction_loader.js?v=phase265-visible-lobby-shell";
+import "./modules/phase261_interaction_repair.js?v=phase265-visible-lobby-shell";
+import "./modules/phase262_poker_table_readability_lock.js?v=phase265-visible-lobby-shell";
+const BUILD_LABEL = "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK";
+const BUILD_PHASE = 265;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 registerModelAssetLock();
 
@@ -72,6 +73,8 @@ window.SVR_SCENE = scene;
 window.SVR_CAMERA = camera;
 window.SVR_RENDERER = renderer;
 scene.userData._camera = camera;
+createPhase265VisibleLobbyShell(scene);
+window.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: BUILD_LABEL, phase: BUILD_PHASE, phase265_core_visible_ready: true, at: new Date().toISOString() } }));
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
 
@@ -396,6 +399,8 @@ renderer.setAnimationLoop(()=>{
       camera.lookAt(previewTarget);
     }
     scene.userData._camera = camera;
+createPhase265VisibleLobbyShell(scene);
+window.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: BUILD_LABEL, phase: BUILD_PHASE, phase265_core_visible_ready: true, at: new Date().toISOString() } }));
   } else {
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
@@ -463,6 +468,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 

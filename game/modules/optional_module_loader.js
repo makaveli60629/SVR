@@ -1,5 +1,5 @@
 ﻿(function(){
-  const BUILD = "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK";
+  const BUILD = "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,32 +9,32 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase264-model-asset-path-lock",
-  "./auto_apply_verify.js?v=phase264-model-asset-path-lock",
-  "./one_command_deploy_health.js?v=phase264-model-asset-path-lock",
-  "./one_command_runbook.js?v=phase264-model-asset-path-lock",
-  "./post_deploy_checklist.js?v=phase264-model-asset-path-lock",
-  "./tester_launch_card.js?v=phase264-model-asset-path-lock",
-  "./qa_shortcut_index.js?v=phase264-model-asset-path-lock",
-  "./pilot_handoff_card.js?v=phase264-model-asset-path-lock",
-  "./pilot_ready_summary.js?v=phase264-model-asset-path-lock",
-  "./pilot_issue_template.js?v=phase264-model-asset-path-lock",
-  "./pilot_feedback_export.js?v=phase264-model-asset-path-lock",
-  "./power_deploy_watcher.js?v=phase264-model-asset-path-lock",
-  "./power_deploy_wait_log.js?v=phase264-model-asset-path-lock",
-  "./power_deploy_smoke_probe.js?v=phase264-model-asset-path-lock",
-  "./vr_input_spawn_clear_recovery.js?v=phase264-model-asset-path-lock",
-  "./vr_input_diagnostic.js?v=phase264-model-asset-path-lock",
-  "./quest_input_autocalibration.js?v=phase264-model-asset-path-lock",
-  "./hand_teleport_pinch_destination.js?v=phase264-model-asset-path-lock",
-  "./hand_teleport_aim_confirm.js?v=phase264-model-asset-path-lock",
-  "./fire_lightning_theme_panel.js?v=phase264-model-asset-path-lock",
-  "./watch_upright_orientation_panel.js?v=phase264-model-asset-path-lock",
-  "./watch_teleport_conflict_guard.js?v=phase264-model-asset-path-lock",
-  "./deploy_sync_force.js?v=phase264-model-asset-path-lock",
-  "./main_runtime_catch_fix.js?v=phase264-model-asset-path-lock",
-  "./main_import_recovery.js?v=phase264-model-asset-path-lock",
-  "./bridge_alias_recovery.js?v=phase264-model-asset-path-lock",
+  "./auto_apply_status.js?v=phase265-visible-lobby-shell",
+  "./auto_apply_verify.js?v=phase265-visible-lobby-shell",
+  "./one_command_deploy_health.js?v=phase265-visible-lobby-shell",
+  "./one_command_runbook.js?v=phase265-visible-lobby-shell",
+  "./post_deploy_checklist.js?v=phase265-visible-lobby-shell",
+  "./tester_launch_card.js?v=phase265-visible-lobby-shell",
+  "./qa_shortcut_index.js?v=phase265-visible-lobby-shell",
+  "./pilot_handoff_card.js?v=phase265-visible-lobby-shell",
+  "./pilot_ready_summary.js?v=phase265-visible-lobby-shell",
+  "./pilot_issue_template.js?v=phase265-visible-lobby-shell",
+  "./pilot_feedback_export.js?v=phase265-visible-lobby-shell",
+  "./power_deploy_watcher.js?v=phase265-visible-lobby-shell",
+  "./power_deploy_wait_log.js?v=phase265-visible-lobby-shell",
+  "./power_deploy_smoke_probe.js?v=phase265-visible-lobby-shell",
+  "./vr_input_spawn_clear_recovery.js?v=phase265-visible-lobby-shell",
+  "./vr_input_diagnostic.js?v=phase265-visible-lobby-shell",
+  "./quest_input_autocalibration.js?v=phase265-visible-lobby-shell",
+  "./hand_teleport_pinch_destination.js?v=phase265-visible-lobby-shell",
+  "./hand_teleport_aim_confirm.js?v=phase265-visible-lobby-shell",
+  "./fire_lightning_theme_panel.js?v=phase265-visible-lobby-shell",
+  "./watch_upright_orientation_panel.js?v=phase265-visible-lobby-shell",
+  "./watch_teleport_conflict_guard.js?v=phase265-visible-lobby-shell",
+  "./deploy_sync_force.js?v=phase265-visible-lobby-shell",
+  "./main_runtime_catch_fix.js?v=phase265-visible-lobby-shell",
+  "./main_import_recovery.js?v=phase265-visible-lobby-shell",
+  "./bridge_alias_recovery.js?v=phase265-visible-lobby-shell",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -51,12 +51,12 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase264-model-asset-path-lock",
-  "./phase264-model-asset-path-lock_forward_restore_manifest.js?v=phase264-model-asset-path-lock"
+  "./auto_apply_git_wrapper_fix.js?v=phase265-visible-lobby-shell",
+  "./phase265-visible-lobby-shell_forward_restore_manifest.js?v=phase265-visible-lobby-shell"
 ];
   const state = {
     build: BUILD,
-    phase: 264,
+    phase: 265,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -169,6 +169,7 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
 
 
 

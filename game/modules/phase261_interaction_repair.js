@@ -4,7 +4,7 @@
  * Loads after game ready; does not block boot.
  */
 (function(){
-  const BUILD = "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK";
+  const BUILD = "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK";
 
   const state = {
     build: BUILD,
@@ -197,6 +197,7 @@
 
   emit("svr_phase261_interaction_repair_ready", state);
 })();
+
 
 
 

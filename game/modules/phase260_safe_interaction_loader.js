@@ -4,8 +4,8 @@
  * One failed optional module must not black-screen the lobby.
  */
 (function(){
-  const BUILD = "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK";
-  const TAG = "phase264-model-asset-path-lock";
+  const BUILD = "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK";
+  const TAG = "phase265-visible-lobby-shell";
 
   const modules = [
     "./phase255_control_lock.js",
@@ -87,6 +87,7 @@
 
   emit("svr_phase260_safe_loader_ready", state);
 })();
+
 
 
 
