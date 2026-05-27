@@ -1,7 +1,7 @@
 ﻿{
     "build":  "PHASE-85-TRUE-LOBBY-KIOSK-SCORPION-CELESTIAL-LOCK",
     "siteTouched":  false,
-    "updatedAtLocal":  "2026-05-26T20:08:26",
+    "updatedAtLocal":  "2026-05-26T20:12:38",
     "track":  "game",
     "phase":  85,
     "deployedFrom":  "Phase 85 PowerShell"
