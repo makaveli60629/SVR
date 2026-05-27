@@ -1,15 +1,16 @@
 {
-  "build": "PHASE-90-GAME-UPDATE-2-0-POKER-PLAYABILITY-LOCK",
-  "phase": 90,
-  "name": "Game Update 2.0 Poker Playability Lock",
-  "track": "game-only",
-  "siteTouched": false,
-  "rules": [
-    "Original lobby only",
-    "No second lobby",
-    "Minor lobby edits only",
-    "Playable poker first",
-    "Private scenes remain separate",
-    "No unapproved Reiki sponsor branding"
-  ]
+    "build":  "PHASE-91-BLACK-BOOT-LOG-RECOVERY-V2",
+    "siteTouched":  false,
+    "track":  "game-only",
+    "name":  "Phase 91 Black Boot Log Recovery V2",
+    "phase":  91,
+    "rules":  [
+                  "Original lobby only",
+                  "No second lobby",
+                  "Game-side only",
+                  "No site edits",
+                  "Visible boot errors before module load",
+                  "Direct /game folder deploy compatible"
+              ],
+    "purpose":  "Black boot/no-log recovery guard. Shows visible boot overlay and catches module import failures."
 }

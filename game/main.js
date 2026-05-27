@@ -1,4 +1,4 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -8,6 +8,7 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 
+window.SVR_BOOT_FAILSAFE?.note("main.js executing after static imports.");
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -237,6 +238,9 @@ tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Minor edits only. Wrist quick-jump enabled for Lobby/Seat/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Input ready: desktop / Quest hand tracking");
+window.SVR_GAME_READY = true;
+window.SVR_BOOT_FAILSAFE?.ready("SVR runtime ready. Original lobby active.");
+window.dispatchEvent(new CustomEvent("svr:ready", { detail: { build: "PHASE-91-BLACK-BOOT-LOG-RECOVERY-V2", message: "SVR runtime ready" } }));
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
