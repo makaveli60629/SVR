@@ -12,7 +12,7 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase267-js-newline-boot-repair";
+import "./modules/optional_module_loader.js?v=phase267-js-newline-repair";
 import "./modules/phase260_safe_interaction_loader.js?v=phase267-js-newline-boot-repair";
 import "./modules/phase261_interaction_repair.js?v=phase267-js-newline-boot-repair";
 import "./modules/phase262_poker_table_readability_lock.js?v=phase267-js-newline-boot-repair";
@@ -475,6 +475,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 
