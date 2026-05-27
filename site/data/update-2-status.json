@@ -1,0 +1,31 @@
+{
+  "label": "SVR_UPDATE_2_0_SITE_STABILITY_LOCK",
+  "sitePhase": "Update 2.0",
+  "siteTouched": true,
+  "publicMatrixPageTouched": false,
+  "rootIndexTouched": false,
+  "gameTouched": false,
+  "zipOnlyDeploy": false,
+  "updatedAt": "2026-05-27T06:06:31Z",
+  "includedFiles": [
+    "site/update-2.html",
+    "site/data/update-2-status.json",
+    "site/docs/UPDATE_2_0_SITE_LOCK.md",
+    "site/docs/UPDATE_2_0_SITE_MANIFEST.json"
+  ],
+  "finished": [
+    "site Update 2.0 status page added",
+    "site Update 2.0 manifest added",
+    "site data status JSON added",
+    "root public Matrix page protected",
+    "game files not touched by this site package"
+  ],
+  "stillToFinish": [
+    "Quest watch orientation final polish",
+    "seated table height alignment",
+    "final card/chip readability polish",
+    "full Quest headset QA pass",
+    "backend/API production wiring after game/site baseline is stable"
+  ],
+  "next": "PHASE-283-QUEST-WATCH-SEATED-TABLE-POLISH"
+}
