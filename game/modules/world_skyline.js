@@ -2177,7 +2177,7 @@ function buildFireLightningArch(scene){
     }
   };
   window.SVR_FIRE_LIGHTNING_ARCH = {
-    build: "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK",
+    build: "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK",
     position: { x: group.position.x, y: group.position.y, z: group.position.z },
     theme: "SVR fire orange, electric cyan, violet logo glow"
   };
@@ -2275,7 +2275,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(rim);
 
   // Phase 252: removed the spawn/back-body teleport-machine style arch.
-  window.SVR_FIRE_LIGHTNING_ARCH = { build: "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK", disabled: true, reason: "removed per Quest teleport alignment feedback" };
+  window.SVR_FIRE_LIGHTNING_ARCH = { build: "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK", disabled: true, reason: "removed per Quest teleport alignment feedback" };
 
   const innerPlatform = null;
 
@@ -2839,5 +2839,6 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+
 
 

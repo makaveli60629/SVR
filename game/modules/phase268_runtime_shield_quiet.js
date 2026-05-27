@@ -4,7 +4,7 @@
  */
 import * as THREE from "three";
 
-const BUILD = "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK";
+const BUILD = "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK";
 
 function hasVisibleScene(){
   return !!(
@@ -124,5 +124,6 @@ export function installPhase268RuntimeShieldQuiet({ scene, renderer, camera } = 
 
   return state;
 }
+
 
 

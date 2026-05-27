@@ -4,8 +4,8 @@
  * One failed optional module must not black-screen the lobby.
  */
 (function(){
-  const BUILD = "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK";
-  const TAG = "phase270-asset-path-loader-smooth";
+  const BUILD = "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK";
+  const TAG = "phase271-teleport-view-performance";
 
   const modules = [
     "./phase255_control_lock.js",
@@ -87,6 +87,7 @@
 
   emit("svr_phase260_safe_loader_ready", state);
 })();
+
 
 
 

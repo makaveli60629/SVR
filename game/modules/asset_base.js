@@ -47,3 +47,4 @@ export async function loadFirstTexture(urls, { colorSpace = null } = {}){
   return null;
 }
 
+

@@ -1,9 +1,9 @@
 ﻿{
-    "build":  "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK",
+    "build":  "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK",
     "source":  "direct-game-folder",
     "siteTouched":  false,
-    "previous":  "PHASE-269-RUNTIME-SHIELD-INSTALL-FAILOPEN-LOCK",
-    "next":  "PHASE-271-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
-    "fix":  "Add root asset fallback paths and reduce optional model miss spam",
-    "updatedAt":  "2026-05-27T03:50:56Z"
+    "previous":  "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK",
+    "next":  "PHASE-272-QUEST-LOCOMOTION-WATCH-POLISH-LOCK",
+    "fix":  "Teleport release completion, hand glow active-only, fallback walls hidden, performance cleanup",
+    "updatedAt":  "2026-05-27T04:00:02Z"
 }
