@@ -8,15 +8,10 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase259-vr-interaction";
-import "./modules/phase255_control_lock.js?v=phase259-vr-interaction";
-import "./modules/phase256_chip_physics_lock.js?v=phase259-vr-interaction";
-import "./modules/phase257_alignment_lock.js?v=phase259-vr-interaction";
-import "./modules/phase258_kiosk_equip_lock.js?v=phase259-vr-interaction";
-import "./modules/phase259_vr_interaction_lock.js?v=phase259-vr-interaction";
-
-const BUILD_LABEL = "PHASE-259-VR-INTERACTION-EVERYTHING-LOCK";
-const BUILD_PHASE = 259;
+import "./modules/optional_module_loader.js?v=phase260-safe-interaction-loader";
+import "./modules/phase260_safe_interaction_loader.js?v=phase260-safe-interaction-loader";
+const BUILD_LABEL = "PHASE-260-RUNTIME-SHIELD-SAFE-INTERACTION-LOADER";
+const BUILD_PHASE = 260;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
@@ -461,6 +456,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 
