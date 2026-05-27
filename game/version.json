@@ -1,6 +1,6 @@
 ﻿{
-    "deployedBy":  "AUTO-DEPLOY-GAME.ps1",
+    "updatedAt":  "2026-05-27T01:38:08Z",
+    "build":  "PHASE-254-BOOT-SHIELD-XR-LOCOMOTION-HOTFIX",
     "source":  "direct-game-folder",
-    "build":  "PHASE-253-FORWARD-RESTORE-LOCOMOTION-KIOSK-POKER-LOCK",
-    "updatedAt":  "2026-05-27T01:30:55Z"
+    "fix":  "XR optional feature boot hotfix"
 }
