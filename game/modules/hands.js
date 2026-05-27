@@ -1,3 +1,4 @@
+﻿/* PHASE-255 hands/controller fallback lock: hidden controllers, natural hands, right controller fallback. */
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/addons/webxr/XRHandModelFactory.js";
 
@@ -361,3 +362,4 @@ export function createHands({ scene, renderer, log = console.log }){
     update
   };
 }
+

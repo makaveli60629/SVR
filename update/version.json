@@ -1,7 +1,8 @@
 ﻿{
-    "updatedAt":  "2026-05-27T01:54:02Z",
-    "siteTouched":  false,
-    "build":  "PHASE-254-BOOT-SHIELD-XR-LOCOMOTION-HOTFIX",
+    "build":  "PHASE-255-QUEST-LOCOMOTION-TELEPORT-WATCH-LOCK",
     "source":  "direct-game-folder",
-    "fix":  "Boot shield XR optional-feature hotfix"
+    "siteTouched":  false,
+    "previous":  "PHASE-254-BOOT-SHIELD-XR-LOCOMOTION-HOTFIX",
+    "next":  "PHASE-256-TRUE-CHIP-GRAB-PHYSICS-LOCK",
+    "updatedAt":  "2026-05-27T02:01:27Z"
 }

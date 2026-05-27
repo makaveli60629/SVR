@@ -1,3 +1,4 @@
+﻿/* PHASE-255 teleport rule lock: hold A/grip/trigger/fist to aim, release to teleport; no instant teleport. */
 import * as THREE from "three";
 import { CONFIG } from "./config.js";
 import { isPinching, isFist, aimPoint } from "./gestures.js";
@@ -348,7 +349,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     pinchHoldStart = 0;
     triggerHoldStart = 0;
     publishHandTeleportState?.({ lastAction: "watch-paused", aimValid: false, target: null });
-    statusCb("WATCH ACTIVE • teleport paused");
+    statusCb("WATCH ACTIVE â€¢ teleport paused");
     modeCb("Watch interaction guard");
   }
 
@@ -532,7 +533,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       setGlow(false);
       stableTargetMs = 0;
       lastAimValid = false;
-      statusCb("Waiting for hands or controllers…");
+      statusCb("Waiting for hands or controllersâ€¦");
       modeCb("Input: not tracked");
       return;
     }
@@ -553,10 +554,10 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       stableTargetMs = 0;
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
-        ? "Controllers active • right stick forward/back • right stick snap turn • fist TP"
-        : "TELEPORT OFF • face pinch/fist toggles ON";
+        ? "Controllers active â€¢ right stick forward/back â€¢ right stick snap turn â€¢ fist TP"
+        : "TELEPORT OFF â€¢ face pinch/fist toggles ON";
       statusCb(idleMsg);
-      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready • right stick moves" : "Hands ready • face pinch/fist toggles TP");
+      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready â€¢ right stick moves" : "Hands ready â€¢ face pinch/fist toggles TP");
       return;
     }
 
@@ -576,11 +577,11 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       lastAimValid = false;
       if (activeMode === "controller" && controllerTriggerValue(active) <= 0.12){
         clearTeleportMode();
-        statusCb("CONTROLLER TP OFF • hold A/grip/trigger to aim");
+        statusCb("CONTROLLER TP OFF â€¢ hold A/grip/trigger to aim");
         modeCb("Controllers ready");
         return;
       }
-      statusCb(activeMode === "controller" ? "CONTROLLER TP ON • hold A/grip/trigger, release to teleport" : "HAND TP ON • point and pinch");
+      statusCb(activeMode === "controller" ? "CONTROLLER TP ON â€¢ hold A/grip/trigger, release to teleport" : "HAND TP ON â€¢ point and pinch");
       modeCb(activeMode === "controller" ? "Controllers: TELEPORT ON" : `Hands: TELEPORT ON`);
       return;
     }
@@ -625,13 +626,13 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
           cooldownUntil = now + 180;
           triggerHoldStart = 0;
           stableTargetMs = 0;
-          statusCb("TELEPORT RESET • aim again");
+          statusCb("TELEPORT RESET â€¢ aim again");
         }
       }
       if (trigger <= 0.12) triggerHoldStart = 0;
       active.userData._wasTrigger = trigger > 0.22;
       modeCb("Controllers: TELEPORT ON");
-      statusCb("CONTROLLER TP ON • hold A/grip/trigger, release to teleport");
+      statusCb("CONTROLLER TP ON â€¢ hold A/grip/trigger, release to teleport");
       return;
     }
 
@@ -656,12 +657,12 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
         cooldownUntil = now + 300;
         clearTeleportMode();
         publishHandTeleportState({ lastAction: "teleported", active: false });
-        statusCb("TELEPORTED • destination accepted");
+        statusCb("TELEPORTED â€¢ destination accepted");
       } else {
         cooldownUntil = now + 180;
         pinchHoldStart = 0;
         stableTargetMs = 0;
-        statusCb("TELEPORT RESET • point again");
+        statusCb("TELEPORT RESET â€¢ point again");
       }
     }
 
@@ -676,8 +677,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       lastAction: nearFace ? "face-toggle-zone" : (lastAimValid ? "aiming-destination" : "aiming-no-target")
     });
     modeCb("Hands: TELEPORT ON");
-    statusCb(nearFace ? "HAND TP ON • face pinch/fist toggles OFF" : (lastAimValid ? "DESTINATION LOCKED • pinch to teleport" : "HAND TP ON • point at floor then pinch"));
+    statusCb(nearFace ? "HAND TP ON â€¢ face pinch/fist toggles OFF" : (lastAimValid ? "DESTINATION LOCKED â€¢ pinch to teleport" : "HAND TP ON â€¢ point at floor then pinch"));
   }
 
   return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode, inputState: { ...inputState } }) };
 }
+

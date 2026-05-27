@@ -1,5 +1,5 @@
 ﻿(function(){
-  const BUILD = "PHASE-254-BOOT-SHIELD-XR-LOCOMOTION-HOTFIX";
+  const BUILD = "PHASE-255-QUEST-LOCOMOTION-TELEPORT-WATCH-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,32 +9,32 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase254-boot-hotfix",
-  "./auto_apply_verify.js?v=phase254-boot-hotfix",
-  "./one_command_deploy_health.js?v=phase254-boot-hotfix",
-  "./one_command_runbook.js?v=phase254-boot-hotfix",
-  "./post_deploy_checklist.js?v=phase254-boot-hotfix",
-  "./tester_launch_card.js?v=phase254-boot-hotfix",
-  "./qa_shortcut_index.js?v=phase254-boot-hotfix",
-  "./pilot_handoff_card.js?v=phase254-boot-hotfix",
-  "./pilot_ready_summary.js?v=phase254-boot-hotfix",
-  "./pilot_issue_template.js?v=phase254-boot-hotfix",
-  "./pilot_feedback_export.js?v=phase254-boot-hotfix",
-  "./power_deploy_watcher.js?v=phase254-boot-hotfix",
-  "./power_deploy_wait_log.js?v=phase254-boot-hotfix",
-  "./power_deploy_smoke_probe.js?v=phase254-boot-hotfix",
-  "./vr_input_spawn_clear_recovery.js?v=phase254-boot-hotfix",
-  "./vr_input_diagnostic.js?v=phase254-boot-hotfix",
-  "./quest_input_autocalibration.js?v=phase254-boot-hotfix",
-  "./hand_teleport_pinch_destination.js?v=phase254-boot-hotfix",
-  "./hand_teleport_aim_confirm.js?v=phase254-boot-hotfix",
-  "./fire_lightning_theme_panel.js?v=phase254-boot-hotfix",
-  "./watch_upright_orientation_panel.js?v=phase254-boot-hotfix",
-  "./watch_teleport_conflict_guard.js?v=phase254-boot-hotfix",
-  "./deploy_sync_force.js?v=phase254-boot-hotfix",
-  "./main_runtime_catch_fix.js?v=phase254-boot-hotfix",
-  "./main_import_recovery.js?v=phase254-boot-hotfix",
-  "./bridge_alias_recovery.js?v=phase254-boot-hotfix",
+  "./auto_apply_status.js?v=phase255-quest-locomotion-watch",
+  "./auto_apply_verify.js?v=phase255-quest-locomotion-watch",
+  "./one_command_deploy_health.js?v=phase255-quest-locomotion-watch",
+  "./one_command_runbook.js?v=phase255-quest-locomotion-watch",
+  "./post_deploy_checklist.js?v=phase255-quest-locomotion-watch",
+  "./tester_launch_card.js?v=phase255-quest-locomotion-watch",
+  "./qa_shortcut_index.js?v=phase255-quest-locomotion-watch",
+  "./pilot_handoff_card.js?v=phase255-quest-locomotion-watch",
+  "./pilot_ready_summary.js?v=phase255-quest-locomotion-watch",
+  "./pilot_issue_template.js?v=phase255-quest-locomotion-watch",
+  "./pilot_feedback_export.js?v=phase255-quest-locomotion-watch",
+  "./power_deploy_watcher.js?v=phase255-quest-locomotion-watch",
+  "./power_deploy_wait_log.js?v=phase255-quest-locomotion-watch",
+  "./power_deploy_smoke_probe.js?v=phase255-quest-locomotion-watch",
+  "./vr_input_spawn_clear_recovery.js?v=phase255-quest-locomotion-watch",
+  "./vr_input_diagnostic.js?v=phase255-quest-locomotion-watch",
+  "./quest_input_autocalibration.js?v=phase255-quest-locomotion-watch",
+  "./hand_teleport_pinch_destination.js?v=phase255-quest-locomotion-watch",
+  "./hand_teleport_aim_confirm.js?v=phase255-quest-locomotion-watch",
+  "./fire_lightning_theme_panel.js?v=phase255-quest-locomotion-watch",
+  "./watch_upright_orientation_panel.js?v=phase255-quest-locomotion-watch",
+  "./watch_teleport_conflict_guard.js?v=phase255-quest-locomotion-watch",
+  "./deploy_sync_force.js?v=phase255-quest-locomotion-watch",
+  "./main_runtime_catch_fix.js?v=phase255-quest-locomotion-watch",
+  "./main_import_recovery.js?v=phase255-quest-locomotion-watch",
+  "./bridge_alias_recovery.js?v=phase255-quest-locomotion-watch",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -51,12 +51,12 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase254-boot-hotfix",
-  "./phase254-boot-hotfix_forward_restore_manifest.js?v=phase254-boot-hotfix"
+  "./auto_apply_git_wrapper_fix.js?v=phase255-quest-locomotion-watch",
+  "./phase255-quest-locomotion-watch_forward_restore_manifest.js?v=phase255-quest-locomotion-watch"
 ];
   const state = {
     build: BUILD,
-    phase: 254,
+    phase: 255,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -169,5 +169,6 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
 
 

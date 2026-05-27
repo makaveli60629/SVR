@@ -1,3 +1,4 @@
+﻿/* PHASE-255 watch upright rule lock: face camera, controller proxy fallback, keep upright. */
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
@@ -286,8 +287,8 @@ let hoveredId = null;
     const legal = poker.legal || {};
     const decision = poker.decisionAid || {};
     const callAmount = Math.max(0, Math.round(Number(legal.callAmount || 0)));
-    const pokerLine1 = `${poker.actor || 'TABLE'} • ${(poker.stage || 'waiting').toUpperCase()}${poker.remaining ? ' • ' + poker.remaining + 's' : ''}`;
-    const pokerLine2 = `${callAmount > 0 ? 'CALL $' + callAmount : 'CHECK FREE'} • ${decision.pressure || 'WAITING'}${decision.potOddsPct ? ' • ' + decision.potOddsPct + '%' : ''}`;
+    const pokerLine1 = `${poker.actor || 'TABLE'} â€¢ ${(poker.stage || 'waiting').toUpperCase()}${poker.remaining ? ' â€¢ ' + poker.remaining + 's' : ''}`;
+    const pokerLine2 = `${callAmount > 0 ? 'CALL $' + callAmount : 'CHECK FREE'} â€¢ ${decision.pressure || 'WAITING'}${decision.potOddsPct ? ' â€¢ ' + decision.potOddsPct + '%' : ''}`;
     ctx.fillStyle = poker.actor === 'YOU' ? '#8ce5ff' : 'rgba(233,233,255,0.82)';
     ctx.font = 'bold 22px system-ui, Arial';
     ctx.fillText(pokerLine1.slice(0, 42), 430, 258);
@@ -302,7 +303,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Poker watch sync: legal action hints • pot odds • fold/call/raise/all-in • next hand', 36, 332);
+    ctx.fillText('Poker watch sync: legal action hints â€¢ pot odds â€¢ fold/call/raise/all-in â€¢ next hand', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -466,3 +467,4 @@ let hoveredId = null;
   draw(true);
   return { update, object: group, getUprightState: ()=>({ ...lastWatchUprightState }) };
 }
+
