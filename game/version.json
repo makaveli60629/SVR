@@ -1,8 +1,9 @@
 ﻿{
-    "build":  "PHASE-255-QUEST-LOCOMOTION-TELEPORT-WATCH-LOCK",
+    "build":  "PHASE-256-TRUE-CHIP-GRAB-PHYSICS-LOCK",
     "source":  "direct-game-folder",
     "siteTouched":  false,
-    "previous":  "PHASE-254-BOOT-SHIELD-XR-LOCOMOTION-HOTFIX",
-    "next":  "PHASE-256-TRUE-CHIP-GRAB-PHYSICS-LOCK",
-    "updatedAt":  "2026-05-27T02:01:27Z"
+    "dealRule":  "right-to-left visual dealing",
+    "previous":  "PHASE-255-QUEST-LOCOMOTION-TELEPORT-WATCH-LOCK",
+    "next":  "PHASE-257-VR-GRAB-EQUIP-STORE-KIOSK-LOCK",
+    "updatedAt":  "2026-05-27T02:04:30Z"
 }

@@ -8,11 +8,12 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase255-quest-locomotion-watch";
-import "./modules/phase255_control_lock.js?v=phase255-quest-locomotion-watch";
+import "./modules/optional_module_loader.js?v=phase256-chip-physics";
+import "./modules/phase255_control_lock.js?v=phase256-chip-physics";
+import "./modules/phase256_chip_physics_lock.js?v=phase256-chip-physics";
 
-const BUILD_LABEL = "PHASE-255-QUEST-LOCOMOTION-TELEPORT-WATCH-LOCK";
-const BUILD_PHASE = 255;
+const BUILD_LABEL = "PHASE-256-TRUE-CHIP-GRAB-PHYSICS-LOCK";
+const BUILD_PHASE = 256;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
@@ -64,6 +65,7 @@ $toggleLog?.addEventListener("click", ()=>{
 if (AUTOCAM) document.body.classList.add("preview-mode");
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
+window.SVR_SCENE = scene;
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
@@ -81,6 +83,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
 setStatus("Loading worldâ€¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
+if (window.SVR_CHIP_PHYSICS) window.SVR_CHIP_PHYSICS.scan(scene);
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
 const storeKiosk = createStoreKioskInteraction({ scene, camera, renderer, sceneTargets, statusCb: (text)=>setStatus(text, { force: true }) });
@@ -389,6 +392,7 @@ renderer.setAnimationLoop(()=>{
   }
 
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
+  if (window.SVR_CHIP_PHYSICS) window.SVR_CHIP_PHYSICS.tick(scene, dt);
     storeKiosk.update(dt);
 
   hands.update(dt);
@@ -450,6 +454,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 

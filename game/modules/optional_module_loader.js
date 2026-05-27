@@ -1,5 +1,5 @@
 ﻿(function(){
-  const BUILD = "PHASE-255-QUEST-LOCOMOTION-TELEPORT-WATCH-LOCK";
+  const BUILD = "PHASE-256-TRUE-CHIP-GRAB-PHYSICS-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,32 +9,32 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase255-quest-locomotion-watch",
-  "./auto_apply_verify.js?v=phase255-quest-locomotion-watch",
-  "./one_command_deploy_health.js?v=phase255-quest-locomotion-watch",
-  "./one_command_runbook.js?v=phase255-quest-locomotion-watch",
-  "./post_deploy_checklist.js?v=phase255-quest-locomotion-watch",
-  "./tester_launch_card.js?v=phase255-quest-locomotion-watch",
-  "./qa_shortcut_index.js?v=phase255-quest-locomotion-watch",
-  "./pilot_handoff_card.js?v=phase255-quest-locomotion-watch",
-  "./pilot_ready_summary.js?v=phase255-quest-locomotion-watch",
-  "./pilot_issue_template.js?v=phase255-quest-locomotion-watch",
-  "./pilot_feedback_export.js?v=phase255-quest-locomotion-watch",
-  "./power_deploy_watcher.js?v=phase255-quest-locomotion-watch",
-  "./power_deploy_wait_log.js?v=phase255-quest-locomotion-watch",
-  "./power_deploy_smoke_probe.js?v=phase255-quest-locomotion-watch",
-  "./vr_input_spawn_clear_recovery.js?v=phase255-quest-locomotion-watch",
-  "./vr_input_diagnostic.js?v=phase255-quest-locomotion-watch",
-  "./quest_input_autocalibration.js?v=phase255-quest-locomotion-watch",
-  "./hand_teleport_pinch_destination.js?v=phase255-quest-locomotion-watch",
-  "./hand_teleport_aim_confirm.js?v=phase255-quest-locomotion-watch",
-  "./fire_lightning_theme_panel.js?v=phase255-quest-locomotion-watch",
-  "./watch_upright_orientation_panel.js?v=phase255-quest-locomotion-watch",
-  "./watch_teleport_conflict_guard.js?v=phase255-quest-locomotion-watch",
-  "./deploy_sync_force.js?v=phase255-quest-locomotion-watch",
-  "./main_runtime_catch_fix.js?v=phase255-quest-locomotion-watch",
-  "./main_import_recovery.js?v=phase255-quest-locomotion-watch",
-  "./bridge_alias_recovery.js?v=phase255-quest-locomotion-watch",
+  "./auto_apply_status.js?v=phase256-chip-physics",
+  "./auto_apply_verify.js?v=phase256-chip-physics",
+  "./one_command_deploy_health.js?v=phase256-chip-physics",
+  "./one_command_runbook.js?v=phase256-chip-physics",
+  "./post_deploy_checklist.js?v=phase256-chip-physics",
+  "./tester_launch_card.js?v=phase256-chip-physics",
+  "./qa_shortcut_index.js?v=phase256-chip-physics",
+  "./pilot_handoff_card.js?v=phase256-chip-physics",
+  "./pilot_ready_summary.js?v=phase256-chip-physics",
+  "./pilot_issue_template.js?v=phase256-chip-physics",
+  "./pilot_feedback_export.js?v=phase256-chip-physics",
+  "./power_deploy_watcher.js?v=phase256-chip-physics",
+  "./power_deploy_wait_log.js?v=phase256-chip-physics",
+  "./power_deploy_smoke_probe.js?v=phase256-chip-physics",
+  "./vr_input_spawn_clear_recovery.js?v=phase256-chip-physics",
+  "./vr_input_diagnostic.js?v=phase256-chip-physics",
+  "./quest_input_autocalibration.js?v=phase256-chip-physics",
+  "./hand_teleport_pinch_destination.js?v=phase256-chip-physics",
+  "./hand_teleport_aim_confirm.js?v=phase256-chip-physics",
+  "./fire_lightning_theme_panel.js?v=phase256-chip-physics",
+  "./watch_upright_orientation_panel.js?v=phase256-chip-physics",
+  "./watch_teleport_conflict_guard.js?v=phase256-chip-physics",
+  "./deploy_sync_force.js?v=phase256-chip-physics",
+  "./main_runtime_catch_fix.js?v=phase256-chip-physics",
+  "./main_import_recovery.js?v=phase256-chip-physics",
+  "./bridge_alias_recovery.js?v=phase256-chip-physics",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -51,12 +51,12 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase255-quest-locomotion-watch",
-  "./phase255-quest-locomotion-watch_forward_restore_manifest.js?v=phase255-quest-locomotion-watch"
+  "./auto_apply_git_wrapper_fix.js?v=phase256-chip-physics",
+  "./phase256-chip-physics_forward_restore_manifest.js?v=phase256-chip-physics"
 ];
   const state = {
     build: BUILD,
-    phase: 255,
+    phase: 256,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -169,6 +169,7 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
 
 
 
