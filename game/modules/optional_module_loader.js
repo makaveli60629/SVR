@@ -1,5 +1,5 @@
 ﻿(function(){
-  const BUILD = "PHASE-256-TRUE-CHIP-GRAB-PHYSICS-LOCK";
+  const BUILD = "PHASE-257-ALIGNMENT-PORTAL-KIOSK-TABLE-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,32 +9,32 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase256-chip-physics",
-  "./auto_apply_verify.js?v=phase256-chip-physics",
-  "./one_command_deploy_health.js?v=phase256-chip-physics",
-  "./one_command_runbook.js?v=phase256-chip-physics",
-  "./post_deploy_checklist.js?v=phase256-chip-physics",
-  "./tester_launch_card.js?v=phase256-chip-physics",
-  "./qa_shortcut_index.js?v=phase256-chip-physics",
-  "./pilot_handoff_card.js?v=phase256-chip-physics",
-  "./pilot_ready_summary.js?v=phase256-chip-physics",
-  "./pilot_issue_template.js?v=phase256-chip-physics",
-  "./pilot_feedback_export.js?v=phase256-chip-physics",
-  "./power_deploy_watcher.js?v=phase256-chip-physics",
-  "./power_deploy_wait_log.js?v=phase256-chip-physics",
-  "./power_deploy_smoke_probe.js?v=phase256-chip-physics",
-  "./vr_input_spawn_clear_recovery.js?v=phase256-chip-physics",
-  "./vr_input_diagnostic.js?v=phase256-chip-physics",
-  "./quest_input_autocalibration.js?v=phase256-chip-physics",
-  "./hand_teleport_pinch_destination.js?v=phase256-chip-physics",
-  "./hand_teleport_aim_confirm.js?v=phase256-chip-physics",
-  "./fire_lightning_theme_panel.js?v=phase256-chip-physics",
-  "./watch_upright_orientation_panel.js?v=phase256-chip-physics",
-  "./watch_teleport_conflict_guard.js?v=phase256-chip-physics",
-  "./deploy_sync_force.js?v=phase256-chip-physics",
-  "./main_runtime_catch_fix.js?v=phase256-chip-physics",
-  "./main_import_recovery.js?v=phase256-chip-physics",
-  "./bridge_alias_recovery.js?v=phase256-chip-physics",
+  "./auto_apply_status.js?v=phase257-alignment-lock",
+  "./auto_apply_verify.js?v=phase257-alignment-lock",
+  "./one_command_deploy_health.js?v=phase257-alignment-lock",
+  "./one_command_runbook.js?v=phase257-alignment-lock",
+  "./post_deploy_checklist.js?v=phase257-alignment-lock",
+  "./tester_launch_card.js?v=phase257-alignment-lock",
+  "./qa_shortcut_index.js?v=phase257-alignment-lock",
+  "./pilot_handoff_card.js?v=phase257-alignment-lock",
+  "./pilot_ready_summary.js?v=phase257-alignment-lock",
+  "./pilot_issue_template.js?v=phase257-alignment-lock",
+  "./pilot_feedback_export.js?v=phase257-alignment-lock",
+  "./power_deploy_watcher.js?v=phase257-alignment-lock",
+  "./power_deploy_wait_log.js?v=phase257-alignment-lock",
+  "./power_deploy_smoke_probe.js?v=phase257-alignment-lock",
+  "./vr_input_spawn_clear_recovery.js?v=phase257-alignment-lock",
+  "./vr_input_diagnostic.js?v=phase257-alignment-lock",
+  "./quest_input_autocalibration.js?v=phase257-alignment-lock",
+  "./hand_teleport_pinch_destination.js?v=phase257-alignment-lock",
+  "./hand_teleport_aim_confirm.js?v=phase257-alignment-lock",
+  "./fire_lightning_theme_panel.js?v=phase257-alignment-lock",
+  "./watch_upright_orientation_panel.js?v=phase257-alignment-lock",
+  "./watch_teleport_conflict_guard.js?v=phase257-alignment-lock",
+  "./deploy_sync_force.js?v=phase257-alignment-lock",
+  "./main_runtime_catch_fix.js?v=phase257-alignment-lock",
+  "./main_import_recovery.js?v=phase257-alignment-lock",
+  "./bridge_alias_recovery.js?v=phase257-alignment-lock",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -51,12 +51,12 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase256-chip-physics",
-  "./phase256-chip-physics_forward_restore_manifest.js?v=phase256-chip-physics"
+  "./auto_apply_git_wrapper_fix.js?v=phase257-alignment-lock",
+  "./phase257-alignment-lock_forward_restore_manifest.js?v=phase257-alignment-lock"
 ];
   const state = {
     build: BUILD,
-    phase: 256,
+    phase: 257,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -169,6 +169,7 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
 
 
 
