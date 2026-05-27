@@ -1,9 +1,10 @@
 ﻿import * as THREE from "three";
-import { installPhase268RuntimeShieldQuiet } from "./modules/phase268_runtime_shield_quiet.js?v=phase271-teleport-view-performance";
-import { startPhase266EarlyRenderLoop, createPhase266FallbackWorld } from "./modules/phase266_boot_render_guard.js?v=phase271-teleport-view-performance";
-import { createPhase265VisibleLobbyShell } from "./modules/phase265_visible_lobby_shell.js?v=phase271-teleport-view-performance";
-import { registerModelAssetLock } from "./modules/phase264_model_asset_registry.js?v=phase271-teleport-view-performance";
-import { applyPhase263AssetFallbacks } from "./modules/phase263_asset_fallbacks.js?v=phase271-teleport-view-performance";
+import { installSVRGameUpdate2Lock } from "./modules/svr_game_update_2_lock.js?v=game-update-2-stability-lock";
+import { installPhase268RuntimeShieldQuiet } from "./modules/phase268_runtime_shield_quiet.js?v=game-update-2-stability-lock";
+import { startPhase266EarlyRenderLoop, createPhase266FallbackWorld } from "./modules/phase266_boot_render_guard.js?v=game-update-2-stability-lock";
+import { createPhase265VisibleLobbyShell } from "./modules/phase265_visible_lobby_shell.js?v=game-update-2-stability-lock";
+import { registerModelAssetLock } from "./modules/phase264_model_asset_registry.js?v=game-update-2-stability-lock";
+import { applyPhase263AssetFallbacks } from "./modules/phase263_asset_fallbacks.js?v=game-update-2-stability-lock";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -13,12 +14,12 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase271-teleport-view-performance";
-import "./modules/phase260_safe_interaction_loader.js?v=phase271-teleport-view-performance";
-import "./modules/phase261_interaction_repair.js?v=phase271-teleport-view-performance";
-import "./modules/phase262_poker_table_readability_lock.js?v=phase271-teleport-view-performance";
-const BUILD_LABEL = "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK";
-const BUILD_PHASE = 271;
+import "./modules/optional_module_loader.js?v=game-update-2-stability-lock";
+import "./modules/phase260_safe_interaction_loader.js?v=game-update-2-stability-lock";
+import "./modules/phase261_interaction_repair.js?v=game-update-2-stability-lock";
+import "./modules/phase262_poker_table_readability_lock.js?v=game-update-2-stability-lock";
+const BUILD_LABEL = "PHASE-282-GAME-UPDATE-2-STABILITY-LOCK";
+const BUILD_PHASE = 282;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 registerModelAssetLock();
 
@@ -74,6 +75,7 @@ const { scene, camera, renderer } = createCore({ containerId: "app" });
 window.SVR_SCENE = scene;
 window.SVR_CAMERA = camera;
 window.SVR_RENDERER = renderer;
+const svrGameUpdate2Lock = installSVRGameUpdate2Lock({ scene, renderer, camera });
 installPhase268RuntimeShieldQuiet({ scene, renderer, camera });
 scene.userData._camera = camera;
 createPhase265VisibleLobbyShell(scene);
@@ -455,6 +457,7 @@ renderer.setAnimationLoop(()=>{
 
   safeRuntimeStep("watch.update", ()=>{ if (watch) watch.update(dt, leftHand, rightHand); });
 
+  svrGameUpdate2Lock?.tick?.();
   renderer.render(scene, camera);
   } catch (error) {
     const message = error?.stack || error?.message || String(error);
@@ -499,6 +502,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 

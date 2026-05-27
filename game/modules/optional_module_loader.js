@@ -1,5 +1,5 @@
 ﻿(function(){
-  const BUILD = "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK";
+  const BUILD = "PHASE-282-GAME-UPDATE-2-STABILITY-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,32 +9,32 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase271-teleport-view-performance",
-  "./auto_apply_verify.js?v=phase271-teleport-view-performance",
-  "./one_command_deploy_health.js?v=phase271-teleport-view-performance",
-  "./one_command_runbook.js?v=phase271-teleport-view-performance",
-  "./post_deploy_checklist.js?v=phase271-teleport-view-performance",
-  "./tester_launch_card.js?v=phase271-teleport-view-performance",
-  "./qa_shortcut_index.js?v=phase271-teleport-view-performance",
-  "./pilot_handoff_card.js?v=phase271-teleport-view-performance",
-  "./pilot_ready_summary.js?v=phase271-teleport-view-performance",
-  "./pilot_issue_template.js?v=phase271-teleport-view-performance",
-  "./pilot_feedback_export.js?v=phase271-teleport-view-performance",
-  "./power_deploy_watcher.js?v=phase271-teleport-view-performance",
-  "./power_deploy_wait_log.js?v=phase271-teleport-view-performance",
-  "./power_deploy_smoke_probe.js?v=phase271-teleport-view-performance",
-  "./vr_input_spawn_clear_recovery.js?v=phase271-teleport-view-performance",
-  "./vr_input_diagnostic.js?v=phase271-teleport-view-performance",
-  "./quest_input_autocalibration.js?v=phase271-teleport-view-performance",
-  "./hand_teleport_pinch_destination.js?v=phase271-teleport-view-performance",
-  "./hand_teleport_aim_confirm.js?v=phase271-teleport-view-performance",
-  "./fire_lightning_theme_panel.js?v=phase271-teleport-view-performance",
-  "./watch_upright_orientation_panel.js?v=phase271-teleport-view-performance",
-  "./watch_teleport_conflict_guard.js?v=phase271-teleport-view-performance",
-  "./deploy_sync_force.js?v=phase271-teleport-view-performance",
-  "./main_runtime_catch_fix.js?v=phase271-teleport-view-performance",
-  "./main_import_recovery.js?v=phase271-teleport-view-performance",
-  "./bridge_alias_recovery.js?v=phase271-teleport-view-performance",
+  "./auto_apply_status.js?v=game-update-2-stability-lock",
+  "./auto_apply_verify.js?v=game-update-2-stability-lock",
+  "./one_command_deploy_health.js?v=game-update-2-stability-lock",
+  "./one_command_runbook.js?v=game-update-2-stability-lock",
+  "./post_deploy_checklist.js?v=game-update-2-stability-lock",
+  "./tester_launch_card.js?v=game-update-2-stability-lock",
+  "./qa_shortcut_index.js?v=game-update-2-stability-lock",
+  "./pilot_handoff_card.js?v=game-update-2-stability-lock",
+  "./pilot_ready_summary.js?v=game-update-2-stability-lock",
+  "./pilot_issue_template.js?v=game-update-2-stability-lock",
+  "./pilot_feedback_export.js?v=game-update-2-stability-lock",
+  "./power_deploy_watcher.js?v=game-update-2-stability-lock",
+  "./power_deploy_wait_log.js?v=game-update-2-stability-lock",
+  "./power_deploy_smoke_probe.js?v=game-update-2-stability-lock",
+  "./vr_input_spawn_clear_recovery.js?v=game-update-2-stability-lock",
+  "./vr_input_diagnostic.js?v=game-update-2-stability-lock",
+  "./quest_input_autocalibration.js?v=game-update-2-stability-lock",
+  "./hand_teleport_pinch_destination.js?v=game-update-2-stability-lock",
+  "./hand_teleport_aim_confirm.js?v=game-update-2-stability-lock",
+  "./fire_lightning_theme_panel.js?v=game-update-2-stability-lock",
+  "./watch_upright_orientation_panel.js?v=game-update-2-stability-lock",
+  "./watch_teleport_conflict_guard.js?v=game-update-2-stability-lock",
+  "./deploy_sync_force.js?v=game-update-2-stability-lock",
+  "./main_runtime_catch_fix.js?v=game-update-2-stability-lock",
+  "./main_import_recovery.js?v=game-update-2-stability-lock",
+  "./bridge_alias_recovery.js?v=game-update-2-stability-lock",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -51,12 +51,12 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase271-teleport-view-performance",
-  "./phase271-teleport-view-performance_forward_restore_manifest.js?v=phase271-teleport-view-performance"
+  "./auto_apply_git_wrapper_fix.js?v=game-update-2-stability-lock",
+  "./game-update-2-stability-lock_forward_restore_manifest.js?v=game-update-2-stability-lock"
 ];
   const state = {
     build: BUILD,
-    phase: 271,
+    phase: 282,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -169,6 +169,7 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
 
 
 

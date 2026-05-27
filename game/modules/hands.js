@@ -1,4 +1,4 @@
-﻿/* PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK hands/controller fallback lock: hidden controllers, natural hands, right controller fallback. */
+﻿/* PHASE-282-GAME-UPDATE-2-STABILITY-LOCK hands/controller fallback lock: hidden controllers, natural hands, right controller fallback. */
 import * as THREE from "three";
 import { XRHandModelFactory } from "three/addons/webxr/XRHandModelFactory.js";
 
@@ -320,7 +320,7 @@ export function createHands({ scene, renderer, log = console.log }){
     handGlowEffects.forEach(effect => updateFireLightningHandGlow(effect, t));
     controllerProxies.forEach(({ glow })=> updateFireLightningHandGlow(glow, t));
     window.SVR_FIRE_LIGHTNING_HANDS = {
-      build: "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK",
+      build: "PHASE-282-GAME-UPDATE-2-STABILITY-LOCK",
       rawGlowCount: handGlowEffects.length,
       controllerGlowCount: controllerProxies.filter(x=>x.glow).length,
       theme: "fire-orange + electric-cyan + SVR-violet"
@@ -362,5 +362,6 @@ export function createHands({ scene, renderer, log = console.log }){
     update
   };
 }
+
 
 

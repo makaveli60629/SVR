@@ -1,9 +1,11 @@
 ﻿{
-    "build":  "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK",
     "source":  "direct-game-folder",
-    "siteTouched":  false,
-    "previous":  "PHASE-270-ASSET-PATH-LOADER-SMOOTH-LOCK",
-    "next":  "PHASE-272-QUEST-LOCOMOTION-WATCH-POLISH-LOCK",
-    "fix":  "Teleport release completion, hand glow active-only, fallback walls hidden, performance cleanup",
-    "updatedAt":  "2026-05-27T04:00:02Z"
+    "cacheTag":  "game-update-2-stability-lock",
+    "build":  "PHASE-282-GAME-UPDATE-2-STABILITY-LOCK",
+    "next":  "PHASE-283-QUEST-WATCH-SEATED-TABLE-POLISH",
+    "fix":  "Game Update 2.0 stability lock with safe PowerShell here-string module write",
+    "phase":  282,
+    "previous":  "PHASE-281-OVERNIGHT-STABILITY-LOCK",
+    "updatedAt":  "2026-05-27T06:21:01Z",
+    "siteTouched":  false
 }

@@ -1,4 +1,4 @@
-﻿/* PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK teleport rule lock: hold A/grip/trigger/fist to aim, release to teleport; no instant teleport. */
+﻿/* PHASE-282-GAME-UPDATE-2-STABILITY-LOCK teleport rule lock: hold A/grip/trigger/fist to aim, release to teleport; no instant teleport. */
 import * as THREE from "three";
 import { CONFIG } from "./config.js";
 import { isPinching, isFist, aimPoint } from "./gestures.js";
@@ -117,8 +117,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let leftFaceGestureArmed = true;
   let rightFaceGestureArmed = true;
   const inputState = {
-    build: "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK",
-    phase: 271,
+    build: "PHASE-282-GAME-UPDATE-2-STABILITY-LOCK",
+    phase: 282,
     rightStickMove: true,
     rightStickTurn: true,
     fistTeleport: true,
@@ -131,8 +131,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   };
 
   const handTeleportState = {
-    build: "PHASE-271-TELEPORT-VIEW-PERFORMANCE-LOCK",
-    phase: 271,
+    build: "PHASE-282-GAME-UPDATE-2-STABILITY-LOCK",
+    phase: 282,
     mode: "face-toggle-point-pinch",
     active: false,
     nearFace: false,
@@ -689,6 +689,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
 
   return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode, inputState: { ...inputState } }) };
 }
+
 
 
 
