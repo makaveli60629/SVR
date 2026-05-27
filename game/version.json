@@ -1,16 +1,21 @@
-{
-    "build":  "PHASE-91-BLACK-BOOT-LOG-RECOVERY-V2",
-    "siteTouched":  false,
+﻿{
+    "build":  "PHASE-92-DUPLICATE-ASYNC-SYNTAX-FIX-V4",
+    "phase":  92,
+    "name":  "Duplicate Async Syntax Fix V4",
     "track":  "game-only",
-    "name":  "Phase 91 Black Boot Log Recovery V2",
-    "phase":  91,
+    "siteTouched":  false,
+    "source":  "direct-game-folder",
+    "fixes":  [
+                  "Remove invalid async async function syntax from game/modules/world_skyline.js",
+                  "Keep Phase 91 visible boot failsafe overlay",
+                  "Commit direct /game files because deploy ignores update zips"
+              ],
     "rules":  [
                   "Original lobby only",
                   "No second lobby",
-                  "Game-side only",
-                  "No site edits",
-                  "Visible boot errors before module load",
-                  "Direct /game folder deploy compatible"
-              ],
-    "purpose":  "Black boot/no-log recovery guard. Shows visible boot overlay and catches module import failures."
+                  "Minor lobby edits only",
+                  "Playable poker first",
+                  "Private scenes remain separate",
+                  "No unapproved Reiki sponsor branding"
+              ]
 }

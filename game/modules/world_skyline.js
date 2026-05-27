@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
@@ -546,7 +546,7 @@ function buildLobbySprites(scene, R, wallHeight){
 }
 
 
-async async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log){
+async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log){
   // PHASE-87: original-lobby-only portal marker.
   // No second lobby, no room shell, no extra walls, no unapproved Reiki sponsor/founder branding.
   const angle = 0;
@@ -2145,3 +2145,4 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+
