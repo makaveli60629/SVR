@@ -4,7 +4,7 @@
  * Loads after game ready; does not block boot.
  */
 (function(){
-  const BUILD = "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK";
+  const BUILD = "PHASE-266-EARLY-RENDER-WORLD-TIMEOUT-LOCK";
 
   const state = {
     build: BUILD,
@@ -197,6 +197,7 @@
 
   emit("svr_phase261_interaction_repair_ready", state);
 })();
+
 
 
 

@@ -1,9 +1,9 @@
 ﻿{
-    "build":  "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK",
+    "build":  "PHASE-266-EARLY-RENDER-WORLD-TIMEOUT-LOCK",
     "source":  "direct-game-folder",
     "siteTouched":  false,
-    "previous":  "PHASE-264-MODEL-ASSET-RESTORE-AND-PATH-LOCK",
-    "next":  "PHASE-266-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
-    "fix":  "Immediate visible fallback lobby shell before model/world loading",
-    "updatedAt":  "2026-05-27T02:53:35Z"
+    "previous":  "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK",
+    "next":  "PHASE-267-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
+    "fix":  "Start renderer before world/model loading and use fallback world timeout",
+    "updatedAt":  "2026-05-27T03:09:37Z"
 }

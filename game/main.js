@@ -1,7 +1,8 @@
 ﻿import * as THREE from "three";
-import { createPhase265VisibleLobbyShell } from "./modules/phase265_visible_lobby_shell.js?v=phase265-visible-lobby-shell";
-import { registerModelAssetLock } from "./modules/phase264_model_asset_registry.js?v=phase265-visible-lobby-shell";
-import { applyPhase263AssetFallbacks } from "./modules/phase263_asset_fallbacks.js?v=phase265-visible-lobby-shell";
+import { startPhase266EarlyRenderLoop, createPhase266FallbackWorld } from "./modules/phase266_boot_render_guard.js?v=phase266-early-render-world-timeout";
+import { createPhase265VisibleLobbyShell } from "./modules/phase265_visible_lobby_shell.js?v=phase266-early-render-world-timeout";
+import { registerModelAssetLock } from "./modules/phase264_model_asset_registry.js?v=phase266-early-render-world-timeout";
+import { applyPhase263AssetFallbacks } from "./modules/phase263_asset_fallbacks.js?v=phase266-early-render-world-timeout";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -11,12 +12,12 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase265-visible-lobby-shell";
-import "./modules/phase260_safe_interaction_loader.js?v=phase265-visible-lobby-shell";
-import "./modules/phase261_interaction_repair.js?v=phase265-visible-lobby-shell";
-import "./modules/phase262_poker_table_readability_lock.js?v=phase265-visible-lobby-shell";
-const BUILD_LABEL = "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK";
-const BUILD_PHASE = 265;
+import "./modules/optional_module_loader.js?v=phase266-early-render-world-timeout";
+import "./modules/phase260_safe_interaction_loader.js?v=phase266-early-render-world-timeout";
+import "./modules/phase261_interaction_repair.js?v=phase266-early-render-world-timeout";
+import "./modules/phase262_poker_table_readability_lock.js?v=phase266-early-render-world-timeout";
+const BUILD_LABEL = "PHASE-266-EARLY-RENDER-WORLD-TIMEOUT-LOCK";
+const BUILD_PHASE = 266;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 registerModelAssetLock();
 
@@ -73,10 +74,7 @@ window.SVR_SCENE = scene;
 window.SVR_CAMERA = camera;
 window.SVR_RENDERER = renderer;
 scene.userData._camera = camera;
-createPhase265VisibleLobbyShell(scene);
-window.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: BUILD_LABEL, phase: BUILD_PHASE, phase265_core_visible_ready: true, at: new Date().toISOString() } }));
-camera.position.set(0, 1.6, 4.8);
-camera.lookAt(0, 1.15, 0);
+createPhase265VisibleLobbyShell(scene);`ncamera.position.set(0, 1.6, 4.8);`ncamera.lookAt(0, 1.15, 0);`nconst phase266EarlyRender = startPhase266EarlyRenderLoop({ renderer, scene, camera, statusCb: (text)=>setStatus(text, { force: true }) });`nwindow.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: BUILD_LABEL, phase: BUILD_PHASE, phase266_early_render_ready: true, at: new Date().toISOString() } }));
 
 
 window.addEventListener("error", (e)=>{
@@ -90,7 +88,14 @@ window.addEventListener("unhandledrejection", (e)=>{
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
 setStatus("Loading worldâ€¦", { force: true });
-const world = await buildSkylineRoom(scene, { log, renderer });
+const world = await Promise.race([
+  buildSkylineRoom(scene, { log, renderer }),
+  new Promise(resolve => setTimeout(() => resolve(createPhase266FallbackWorld(scene, "world-build-timeout")), 4500))
+]).catch(error => {
+  log("[phase266] world build failed; using fallback world", error?.message || error);
+  return createPhase266FallbackWorld(scene, error);
+});
+if (phase266EarlyRender?.markWorldReady) phase266EarlyRender.markWorldReady(world);
 applyPhase263AssetFallbacks(scene);
 if (window.SVR_POKER_TABLE_READABILITY) window.SVR_POKER_TABLE_READABILITY.alignPoker(scene);
 if (window.SVR_ALIGNMENT) window.SVR_ALIGNMENT.alignScene(scene);
@@ -398,10 +403,7 @@ renderer.setAnimationLoop(()=>{
       camera.position.lerp(previewPos, 0.06);
       camera.lookAt(previewTarget);
     }
-    scene.userData._camera = camera;
-createPhase265VisibleLobbyShell(scene);
-window.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: BUILD_LABEL, phase: BUILD_PHASE, phase265_core_visible_ready: true, at: new Date().toISOString() } }));
-  } else {
+    scene.userData._camera = camera;`n  } else {
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
 
@@ -468,6 +470,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 

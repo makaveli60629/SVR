@@ -4,7 +4,7 @@
  */
 import * as THREE from "three";
 
-const BUILD = "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK";
+const BUILD = "PHASE-266-EARLY-RENDER-WORLD-TIMEOUT-LOCK";
 
 function makeMat(color, roughness = 0.8, metalness = 0.05){
   return new THREE.MeshStandardMaterial({ color, roughness, metalness });
@@ -189,5 +189,6 @@ export function applyPhase263AssetFallbacks(scene){
 
   return result;
 }
+
 
 

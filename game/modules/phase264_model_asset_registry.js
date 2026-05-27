@@ -2,7 +2,7 @@
  * SVR Phase 264 — Model Asset Restore and Path Lock
  * Central asset registry so missing optional models do not keep breaking/blanking the lobby.
  */
-const BUILD = "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK";
+const BUILD = "PHASE-266-EARLY-RENDER-WORLD-TIMEOUT-LOCK";
 
 export const SVR_MODEL_ASSET_REGISTRY = {
   build: BUILD,
@@ -50,5 +50,6 @@ export function registerModelAssetLock(){
 
   return SVR_MODEL_ASSET_REGISTRY;
 }
+
 
 

@@ -1,5 +1,5 @@
 ﻿(function(){
-  const BUILD = "PHASE-265-BOOT-VISIBLE-LOBBY-SHELL-LOCK";
+  const BUILD = "PHASE-266-EARLY-RENDER-WORLD-TIMEOUT-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,32 +9,32 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase265-visible-lobby-shell",
-  "./auto_apply_verify.js?v=phase265-visible-lobby-shell",
-  "./one_command_deploy_health.js?v=phase265-visible-lobby-shell",
-  "./one_command_runbook.js?v=phase265-visible-lobby-shell",
-  "./post_deploy_checklist.js?v=phase265-visible-lobby-shell",
-  "./tester_launch_card.js?v=phase265-visible-lobby-shell",
-  "./qa_shortcut_index.js?v=phase265-visible-lobby-shell",
-  "./pilot_handoff_card.js?v=phase265-visible-lobby-shell",
-  "./pilot_ready_summary.js?v=phase265-visible-lobby-shell",
-  "./pilot_issue_template.js?v=phase265-visible-lobby-shell",
-  "./pilot_feedback_export.js?v=phase265-visible-lobby-shell",
-  "./power_deploy_watcher.js?v=phase265-visible-lobby-shell",
-  "./power_deploy_wait_log.js?v=phase265-visible-lobby-shell",
-  "./power_deploy_smoke_probe.js?v=phase265-visible-lobby-shell",
-  "./vr_input_spawn_clear_recovery.js?v=phase265-visible-lobby-shell",
-  "./vr_input_diagnostic.js?v=phase265-visible-lobby-shell",
-  "./quest_input_autocalibration.js?v=phase265-visible-lobby-shell",
-  "./hand_teleport_pinch_destination.js?v=phase265-visible-lobby-shell",
-  "./hand_teleport_aim_confirm.js?v=phase265-visible-lobby-shell",
-  "./fire_lightning_theme_panel.js?v=phase265-visible-lobby-shell",
-  "./watch_upright_orientation_panel.js?v=phase265-visible-lobby-shell",
-  "./watch_teleport_conflict_guard.js?v=phase265-visible-lobby-shell",
-  "./deploy_sync_force.js?v=phase265-visible-lobby-shell",
-  "./main_runtime_catch_fix.js?v=phase265-visible-lobby-shell",
-  "./main_import_recovery.js?v=phase265-visible-lobby-shell",
-  "./bridge_alias_recovery.js?v=phase265-visible-lobby-shell",
+  "./auto_apply_status.js?v=phase266-early-render-world-timeout",
+  "./auto_apply_verify.js?v=phase266-early-render-world-timeout",
+  "./one_command_deploy_health.js?v=phase266-early-render-world-timeout",
+  "./one_command_runbook.js?v=phase266-early-render-world-timeout",
+  "./post_deploy_checklist.js?v=phase266-early-render-world-timeout",
+  "./tester_launch_card.js?v=phase266-early-render-world-timeout",
+  "./qa_shortcut_index.js?v=phase266-early-render-world-timeout",
+  "./pilot_handoff_card.js?v=phase266-early-render-world-timeout",
+  "./pilot_ready_summary.js?v=phase266-early-render-world-timeout",
+  "./pilot_issue_template.js?v=phase266-early-render-world-timeout",
+  "./pilot_feedback_export.js?v=phase266-early-render-world-timeout",
+  "./power_deploy_watcher.js?v=phase266-early-render-world-timeout",
+  "./power_deploy_wait_log.js?v=phase266-early-render-world-timeout",
+  "./power_deploy_smoke_probe.js?v=phase266-early-render-world-timeout",
+  "./vr_input_spawn_clear_recovery.js?v=phase266-early-render-world-timeout",
+  "./vr_input_diagnostic.js?v=phase266-early-render-world-timeout",
+  "./quest_input_autocalibration.js?v=phase266-early-render-world-timeout",
+  "./hand_teleport_pinch_destination.js?v=phase266-early-render-world-timeout",
+  "./hand_teleport_aim_confirm.js?v=phase266-early-render-world-timeout",
+  "./fire_lightning_theme_panel.js?v=phase266-early-render-world-timeout",
+  "./watch_upright_orientation_panel.js?v=phase266-early-render-world-timeout",
+  "./watch_teleport_conflict_guard.js?v=phase266-early-render-world-timeout",
+  "./deploy_sync_force.js?v=phase266-early-render-world-timeout",
+  "./main_runtime_catch_fix.js?v=phase266-early-render-world-timeout",
+  "./main_import_recovery.js?v=phase266-early-render-world-timeout",
+  "./bridge_alias_recovery.js?v=phase266-early-render-world-timeout",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -51,12 +51,12 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase265-visible-lobby-shell",
-  "./phase265-visible-lobby-shell_forward_restore_manifest.js?v=phase265-visible-lobby-shell"
+  "./auto_apply_git_wrapper_fix.js?v=phase266-early-render-world-timeout",
+  "./phase266-early-render-world-timeout_forward_restore_manifest.js?v=phase266-early-render-world-timeout"
 ];
   const state = {
     build: BUILD,
-    phase: 265,
+    phase: 266,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -169,6 +169,7 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
 
 
 
