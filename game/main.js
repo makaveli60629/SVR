@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -70,7 +70,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading original lobby…", { force: true });
+setStatus("Loading original lobbyâ€¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -232,11 +232,11 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logoâ€¦", { force: true });
+setStatus("Loading logoÃ¢â‚¬Â¦", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Minor edits only. Wrist quick-jump enabled for Lobby/Seat/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Music off. Second floor cleanup active.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Input ready: desktop / Quest hand tracking");
 window.SVR_GAME_READY = true;
 window.SVR_BOOT_FAILSAFE?.ready("SVR runtime ready. Original lobby active.");
@@ -331,9 +331,10 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloadingâ€¦");
-  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
+  log("[ERR] WebGL context lost. ReloadingÃ¢â‚¬Â¦");
+  setStatus("WebGL context lost (reloadingÃ¢â‚¬Â¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
 
 

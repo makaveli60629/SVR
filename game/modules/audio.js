@@ -12,27 +12,12 @@
     try { onState({ ...state }); } catch(_e) {}
   }
 
-  async function toggle(){
-    state.enabled = false;
-    stop();
-    return false;
-  }
-
-  async function next(){
-    state.enabled = false;
-    stop();
-    return false;
-  }
-
-  async function start(){
-    state.enabled = false;
-    stop();
-    return false;
-  }
+  async function toggle(){ stop(); return false; }
+  async function next(){ stop(); return false; }
+  async function start(){ stop(); return false; }
 
   function stop(){
     state.enabled = false;
-
     try {
       document.querySelectorAll("audio, video").forEach((el)=>{
         el.pause();
@@ -40,7 +25,6 @@
         el.volume = 0;
       });
     } catch(_e) {}
-
     emit();
   }
 
@@ -50,9 +34,7 @@
     return false;
   }
 
-  function getState(){
-    return { ...state };
-  }
+  function getState(){ return { ...state }; }
 
   stop();
   emit();
