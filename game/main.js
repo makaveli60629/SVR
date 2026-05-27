@@ -22,6 +22,21 @@ const $toggleLog = document.getElementById("toggleLog");
 const $toggleJoints = document.getElementById("toggleJoints");
 const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
 
+const PRIVATE_SCENE_ROUTES = {
+  reikiRoom: './reiki.html',
+  pgaDrive: './pga-drive.html',
+  chipPutt: './chip-putt.html',
+  storeRoom: './store-room.html',
+  scorpionRoom: './scorpion.html',
+  smokerLounge: './smoker-lounge.html'
+};
+const SVR_STORE_PORTAL_URL = 'https://svrpoker.com/site/store.html';
+function openRoute(url){
+  if (!url) return false;
+  try { window.open(url, '_blank', 'noopener,noreferrer'); return true; }
+  catch (_err) { location.href = url; return true; }
+}
+
 let lastStatusText = "";
 let lastStatusAt = 0;
 function setStatus(text, { force = false, minGap = 180 } = {}){
@@ -43,8 +58,7 @@ function setMode(text){
 
 function log(...args){
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
-  $log.textContent += line + "
-";
+  $log.textContent += line + "\n";
   $log.scrollTop = $log.scrollHeight;
 }
 
@@ -62,17 +76,15 @@ camera.lookAt(0, 1.15, 0);
 
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
-  if ($err) $err.textContent = "RUNTIME ERROR:
-" + (e?.error?.stack || e?.message || String(e));
+  if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
 });
 window.addEventListener("unhandledrejection", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
-  if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:
-" + (e?.reason?.stack || e?.reason || String(e));
+  if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e));
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading worldÃ¢â‚¬Â¦", { force: true });
+setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -81,7 +93,9 @@ const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
 const audio = createAudioPlaylist({
   tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" }
+    { title: "Lobby 07", url: "./assets/audio/07.mp3" },
+    { title: "Reiki Time Hub", url: "./assets/audio/reiki_time_hub.mp3" },
+    { title: "SVR After Dark", url: "./assets/audio/svr_after_dark.mp3" }
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
@@ -169,15 +183,8 @@ function movePlayerToSpot(target, lookTarget = null){
   }
 }
 
-
-function openPrivateScene(path){
-  if (!path) return false;
-  const url = new URL(path, window.location.href);
-  window.location.href = url.toString();
-  return true;
-}
-
 function gotoScene(key){
+  if (key === 'storeRoom') return openRoute(PRIVATE_SCENE_ROUTES.storeRoom);
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
@@ -187,8 +194,6 @@ function gotoScene(key){
 
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
-    const route = btn.dataset.route;
-    if (route) return openPrivateScene(route);
     const key = btn.dataset.scene;
     if (key) gotoScene(key);
   });
@@ -205,12 +210,13 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit2") gotoScene("table");
   if (e.code === "Digit3") gotoScene("seat");
   if (e.code === "Digit4") gotoScene("reiki");
-  if (e.code === "Digit5") openPrivateScene("./reiki.html");
-  if (e.code === "Digit6") gotoScene("pga");
-  if (e.code === "Digit7") openPrivateScene("./pga-drive.html");
-  if (e.code === "Digit8") openPrivateScene("./chip-putt.html");
-  if (e.code === "Digit9") openPrivateScene("./store-room.html");
-  if (e.code === "Digit0") openPrivateScene("./scorpion.html");
+  if (e.code === "Digit5") gotoScene("pga");
+  if (e.code === "Digit6") gotoScene("legends");
+  if (e.code === "Digit7") gotoScene("sponsor");
+  if (e.code === "Digit8") gotoScene("scorpion");
+  if (e.code === "Digit9") gotoScene("reikiRoom");
+  if (e.code === "Digit0") gotoScene("storePortal");
+  if (e.code === "KeyO") openRoute(SVR_STORE_PORTAL_URL);
 });
 
 const watch = createWristWatch({
@@ -239,11 +245,10 @@ const watch = createWristWatch({
     goPga: ()=>gotoScene("pga"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
-    goScorpion: ()=>openPrivateScene("./scorpion.html"),
-    goReikiRoom: ()=>openPrivateScene("./reiki.html"),
-    goPgaDrive: ()=>openPrivateScene("./pga-drive.html"),
-    goChipPutt: ()=>openPrivateScene("./chip-putt.html"),
-    goStore: ()=>openPrivateScene("./store-room.html")
+    goScorpion: ()=>gotoScene("scorpion"),
+    goReikiRoom: ()=>gotoScene("reikiRoom"),
+    goStorePortal: ()=>gotoScene("storePortal"),
+    goStoreRoom: ()=>gotoScene("storeRoom")
   }
 });
 
@@ -252,12 +257,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logoÃ¢â‚¬Â¦", { force: true });
+setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 247 locked: direct deploy labels, private route verification, approval-safe Reiki, and site untouched.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingÃ¢â‚¬Â¦");
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Seat/Reiki/PGA/Legend/Sponsor/Scorpion/Store.", { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -337,9 +342,7 @@ renderer.setAnimationLoop(()=>{
     });
   }
 
-  const leftWatchAnchor = leftHand || leftController;
-  const rightWatchAnchor = rightHand || rightController;
-  if (watch) watch.update(dt, leftWatchAnchor, rightWatchAnchor);
+  if (watch) watch.update(dt, leftHand, rightHand);
 
   renderer.render(scene, camera);
 });
@@ -351,23 +354,7 @@ canvasEl.addEventListener("pointerdown", async ()=>{
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. ReloadingÃ¢â‚¬Â¦");
-  setStatus("WebGL context lost (reloadingÃ¢â‚¬Â¦)", { force: true });
+  log("[ERR] WebGL context lost. Reloading…");
+  setStatus("WebGL context lost (reloading…)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
-
-(function () {
-  "use strict";
-
-  if (!window.SVR_MAIN_PHASE253_PATCHED) {
-    window.SVR_MAIN_PHASE253_PATCHED = true;
-
-    window.addEventListener("svr:hub-friendly-ready", function (event) {
-      console.log("[SVR main] Hub UX ready", event.detail);
-    });
-
-    window.addEventListener("svr:hub-navigation-ready", function (event) {
-      console.log("[SVR main] Hand/controller navigation ready", event.detail);
-    });
-  }
-})();

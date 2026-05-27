@@ -1,8 +1,8 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { makeCanvasLabel, roundRect } from "./utils.js";
 
 const SUITS = ["S", "H", "D", "C"];
-const SUIT_SYMBOL = { S: "â™ ", H: "â™¥", D: "â™¦", C: "â™£" };
+const SUIT_SYMBOL = { S: "♠", H: "♥", D: "♦", C: "♣" };
 const SUIT_COLOR = { S: "#101218", C: "#101218", H: "#c71f44", D: "#c71f44" };
 const RANK_LABEL = { 14: "A", 13: "K", 12: "Q", 11: "J", 10: "10", 9: "9", 8: "8", 7: "7", 6: "6", 5: "5", 4: "4", 3: "3", 2: "2" };
 const BOT_NAMES = ["BOT NOVA", "BOT VEGA", "BOT ORBIT", "YOU", "BOT ACE", "BOT LUX"];
@@ -403,22 +403,22 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       current.stage = "blinds";
       current.pot = 30;
       refreshPotStack();
-      paintStatus(`Hand ${handNumber} â€¢ dealer ${BOT_NAMES[dealerIndex]}`, `SB ${BOT_NAMES[sbIndex]} â€¢ BB ${BOT_NAMES[bbIndex]} â€¢ pot $${current.pot}`);
-      statusCb(`HAND ${handNumber} â€¢ blinds live â€¢ pot $${current.pot}`);
+      paintStatus(`Hand ${handNumber} • dealer ${BOT_NAMES[dealerIndex]}`, `SB ${BOT_NAMES[sbIndex]} • BB ${BOT_NAMES[bbIndex]} • pot $${current.pot}`);
+      statusCb(`HAND ${handNumber} • blinds live • pot $${current.pot}`);
       applyActionHighlight(bbIndex);
     });
-    const dealOrder = [...handPlayers].reverse();
+
     for (let round = 0; round < 2; round += 1) {
-      for (let i = 0; i < dealOrder.length; i += 1) {
+      for (let i = 0; i < handPlayers.length; i += 1) {
         t += 0.42;
         schedule(t, () => {
-          const player = dealOrder[i];
+          const player = handPlayers[i];
           const card = player.cards[round];
           addCard(card, player.anchor.cards[round], 0.46, 1.0);
           current.stage = "deal";
           current.actorIndex = player.anchor.index;
           applyActionHighlight(player.anchor.index);
-          paintStatus(`Dealing right-to-left • ${player.anchor.name}`, `${formatCards(player.cards.slice(0, round + 1))} â€¢ pot $${current.pot}`);
+          paintStatus(`Dealing ${player.anchor.name}`, `${formatCards(player.cards.slice(0, round + 1))} • pot $${current.pot}`);
         });
       }
     }
@@ -429,17 +429,17 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const result = current.results.find((r) => r.player.anchor.index === actor)?.result || winner.result;
       const amount = handStrengthToBet(result, "preflop");
       current.actorIndex = actor; current.stage = "preflop"; current.pot += amount; refreshPotStack(); applyActionHighlight(actor);
-      paintStatus(`${BOT_NAMES[actor]} ${result.score[0] >= 2 ? "raises" : "calls"}`, `Preflop â€¢ pot $${current.pot}`);
+      paintStatus(`${BOT_NAMES[actor]} ${result.score[0] >= 2 ? "raises" : "calls"}`, `Preflop • pot $${current.pot}`);
     });
 
     t += 0.52;
-    schedule(t, () => { addBurnCard(0, 0.34); paintStatus("Burn", `Before flop â€¢ pot $${current.pot}`); });
+    schedule(t, () => { addBurnCard(0, 0.34); paintStatus("Burn", `Before flop • pot $${current.pot}`); });
     t += 0.53;
     schedule(t, () => {
       current.stage = "flop";
       for (let i = 0; i < 3; i += 1) addCard(board[i], boardAnchors[i], 0.52, 1.18);
       current.pot += 90; refreshPotStack(); applyActionHighlight(flopAggressor);
-      paintStatus(`Flop â€¢ ${formatCards(board.slice(0, 3))}`, `pot $${current.pot}`);
+      paintStatus(`Flop • ${formatCards(board.slice(0, 3))}`, `pot $${current.pot}`);
     });
     t += 1.2;
     schedule(t, () => {
@@ -448,16 +448,16 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const amount = handStrengthToBet(result, "flop");
       const isBet = result.score[0] >= 1;
       current.actorIndex = actor; current.stage = "flop-action"; current.pot += isBet ? amount : 0; refreshPotStack(); applyActionHighlight(actor);
-      paintStatus(`${BOT_NAMES[actor]} ${isBet ? "bets" : "checks"}`, `Flop â€¢ pot $${current.pot}`);
+      paintStatus(`${BOT_NAMES[actor]} ${isBet ? "bets" : "checks"}`, `Flop • pot $${current.pot}`);
     });
     t += 0.58;
-    schedule(t, () => { addBurnCard(1, 0.34); paintStatus("Burn", `Before turn â€¢ pot $${current.pot}`); });
+    schedule(t, () => { addBurnCard(1, 0.34); paintStatus("Burn", `Before turn • pot $${current.pot}`); });
     t += 0.67;
     schedule(t, () => {
       current.stage = "turn";
       addCard(board[3], boardAnchors[3], 0.52, 1.18);
       current.pot += 60; refreshPotStack(); applyActionHighlight(turnAggressor);
-      paintStatus(`Turn â€¢ ${formatCards(board.slice(0, 4))}`, `pot $${current.pot}`);
+      paintStatus(`Turn • ${formatCards(board.slice(0, 4))}`, `pot $${current.pot}`);
     });
     t += 1.2;
     schedule(t, () => {
@@ -466,16 +466,16 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const amount = handStrengthToBet(result, "turn");
       const isBet = result.score[0] >= 2;
       current.actorIndex = actor; current.stage = "turn-action"; current.pot += isBet ? amount : 0; refreshPotStack(); applyActionHighlight(actor);
-      paintStatus(`${BOT_NAMES[actor]} ${isBet ? "bets" : "checks"}`, `Turn â€¢ pot $${current.pot}`);
+      paintStatus(`${BOT_NAMES[actor]} ${isBet ? "bets" : "checks"}`, `Turn • pot $${current.pot}`);
     });
     t += 0.58;
-    schedule(t, () => { addBurnCard(2, 0.34); paintStatus("Burn", `Before river â€¢ pot $${current.pot}`); });
+    schedule(t, () => { addBurnCard(2, 0.34); paintStatus("Burn", `Before river • pot $${current.pot}`); });
     t += 0.67;
     schedule(t, () => {
       current.stage = "river";
       addCard(board[4], boardAnchors[4], 0.52, 1.18);
       current.pot += 60; refreshPotStack(); applyActionHighlight(riverAggressor);
-      paintStatus(`River â€¢ ${formatCards(board)}`, `pot $${current.pot}`);
+      paintStatus(`River • ${formatCards(board)}`, `pot $${current.pot}`);
     });
     t += 1.2;
     schedule(t, () => {
@@ -484,7 +484,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       const amount = handStrengthToBet(result, "river");
       const isBet = result.score[0] >= 2;
       current.actorIndex = actor; current.stage = "river-action"; current.pot += isBet ? amount : 0; refreshPotStack(); applyActionHighlight(actor);
-      paintStatus(`${BOT_NAMES[actor]} ${isBet ? "shoves" : "checks"}`, `River â€¢ pot $${current.pot}`);
+      paintStatus(`${BOT_NAMES[actor]} ${isBet ? "shoves" : "checks"}`, `River • pot $${current.pot}`);
     });
     t += 1.55;
     schedule(t, () => {
@@ -494,14 +494,14 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       refreshPotStack();
       const winnerCards = formatCards(winner.player.cards);
       const boardText = formatCards(board);
-      paintStatus(`${winner.player.anchor.name} wins â€¢ ${winner.result.name}`, `Pot $${current.pot} â€¢ Hole ${winnerCards} â€¢ Board ${boardText}`, "rgba(244,210,105,0.98)");
-      statusCb(`HAND ${handNumber} â€¢ ${winner.player.anchor.name} wins â€¢ ${winner.result.name} â€¢ pot $${current.pot}`);
+      paintStatus(`${winner.player.anchor.name} wins • ${winner.result.name}`, `Pot $${current.pot} • Hole ${winnerCards} • Board ${boardText}`, "rgba(244,210,105,0.98)");
+      statusCb(`HAND ${handNumber} • ${winner.player.anchor.name} wins • ${winner.result.name} • pot $${current.pot}`);
       log("Poker showdown", { hand: handNumber, dealer: BOT_NAMES[dealerIndex], sb: BOT_NAMES[sbIndex], bb: BOT_NAMES[bbIndex], winner: winner.player.anchor.name, handName: winner.result.name, board: boardText, pot: current.pot });
     });
     t += 4.3;
     schedule(t, () => { planHand(); });
     stepIndex = 0;
-    paintStatus(`Shuffling live deck`, `Hand ${handNumber} â€¢ real 52-card flow`);
+    paintStatus(`Shuffling live deck`, `Hand ${handNumber} • real 52-card flow`);
   }
 
   function orientCardToCamera(mesh) {
@@ -569,4 +569,3 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
   return { update, forceNextHand(){ planHand(); } };
 }
-

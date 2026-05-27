@@ -1,12 +1,8 @@
-{
-  "phase": 247,
-  "appliedAt": "2026-05-25T00:00:00Z",
-  "build": "PHASE-247-DIRECT-DEPLOY-ROUTE-VERIFY-LOCK",
-  "scope": "game-direct-deploy-route-verify-lock",
-  "fix": "synchronized game index, docs build version, private route page labels, and update/version.json to Phase 247; preserved site untouched and private scene routing",
-  "siteTouched": false,
-  "gameTouched": true,
-  "track": "game-only",
-  "previousStableBuild": "PHASE-246-VERSION-SYNC-PRIVATE-ROUTE-AUDIT-LOCK",
-  "nextBuild": "PHASE-248-PLAYABLE-POKER-INPUT-QA-LOCK"
+﻿{
+    "build":  "PHASE-85-TRUE-LOBBY-KIOSK-SCORPION-CELESTIAL-LOCK",
+    "siteTouched":  false,
+    "updatedAtLocal":  "2026-05-26T20:08:26",
+    "track":  "game",
+    "phase":  85,
+    "deployedFrom":  "Phase 85 PowerShell"
 }

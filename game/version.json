@@ -1,33 +1,14 @@
 {
-    "build":  "svr-phase-250-20260526-170954",
-    "status":  "phase-250-game-update",
-    "fixes":  [
-                  "clean optional module loader",
-                  "moon locomotion gravity and movement",
-                  "mars locomotion gravity and movement",
-                  "keyboard smooth movement",
-                  "teleport fallback",
-                  "phase 250 metadata",
-                  "deploy health metadata",
-                  "fresh update package"
-              ],
-    "watchFix":  "fixed-watch-module-phase-251",
-    "name":  "SVR Poker Game",
-    "phase":  253,
-    "phaseLabel":  "Phase 253",
-    "date":  "2026-05-26",
-    "updatedAt":  "2026-05-26T17:44:34-05:00",
-    "update":  "phase-253-hub-user-friendly-hand-controller-navigation",
-    "modules":  [
-                    "boot.js",
-                    "main.js",
-                    "modules/optional_module_loader.js",
-                    "modules/hand_controller_navigation.js",
-                    "modules/hub_user_friendly.js",
-                    "modules/watch.js",
-                    "modules/profile_avatar_bridge.js",
-                    "modules/poker_table_polish.js",
-                    "modules/svr_module_health.js",
-                    "modules/moon_mars_locomotion.js"
-                ]
+  "build": "PHASE-85-TRUE-LOBBY-KIOSK-SCORPION-CELESTIAL-LOCK",
+  "phase": 85,
+  "date": "2026-05-26",
+  "track": "game",
+  "siteTouched": false,
+  "rules": [
+    "true lobby preserved",
+    "store kiosk in official lobby",
+    "celestial lock module",
+    "scorpion table private scene",
+    "zip under 25MB"
+  ]
 }

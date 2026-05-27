@@ -1,7 +1,6 @@
-﻿{
-    "project":  "SVR Poker / ScarlettVR",
-    "phase":  250,
-    "track":  "Game",
-    "label":  "Phase 250 App Hub Store Room Stabilization",
-    "timestamp":  "2026-05-26T16:29:47"
+{
+  "build": "PHASE-85-TRUE-LOBBY-KIOSK-SCORPION-CELESTIAL-LOCK",
+  "phase": 85,
+  "source": "game direct folder and update/game.zip must match",
+  "siteTouched": false
 }
