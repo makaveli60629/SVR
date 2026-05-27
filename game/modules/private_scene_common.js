@@ -1,1 +1,1 @@
-export const SVR_PRIVATE_SCENE_LOCK={build:'PHASE-89-GAME-UPDATE-2-0-MANIFEST-LOCK',routes:['reiki.html','pga-drive.html','chip-putt.html','store-room.html','smoker-lounge.html','scorpion.html']}; if(typeof window!=='undefined') window.SVR_PRIVATE_SCENE_LOCK=SVR_PRIVATE_SCENE_LOCK;
+export const SVR_PRIVATE_SCENE_LOCK={build:'PHASE-90-GAME-UPDATE-2-0-POKER-PLAYABILITY-LOCK',routes:['reiki.html','pga-drive.html','chip-putt.html','store-room.html','smoker-lounge.html','scorpion.html']}; if(typeof window!=='undefined') window.SVR_PRIVATE_SCENE_LOCK=SVR_PRIVATE_SCENE_LOCK;

@@ -1,6 +1,15 @@
 {
-  "build": "PHASE-89-GAME-UPDATE-2-0-MANIFEST-LOCK",
-  "phase": 89,
-  "update": "2.0",
-  "notes": "Game Update 2.0 manifest lock: original lobby only, minor edits only, no second lobby, locomotion/watch/poker baseline preserved, site untouched."
+  "build": "PHASE-90-GAME-UPDATE-2-0-POKER-PLAYABILITY-LOCK",
+  "phase": 90,
+  "name": "Game Update 2.0 Poker Playability Lock",
+  "track": "game-only",
+  "siteTouched": false,
+  "rules": [
+    "Original lobby only",
+    "No second lobby",
+    "Minor lobby edits only",
+    "Playable poker first",
+    "Private scenes remain separate",
+    "No unapproved Reiki sponsor branding"
+  ]
 }

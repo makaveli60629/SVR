@@ -146,6 +146,8 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
 
 function buildButtons(state){
+  const poker = (typeof window !== 'undefined' && window.SVR_POKER_CONTROL?.getState) ? window.SVR_POKER_CONTROL.getState() : null;
+  const callLabel = poker?.waitingForUser ? 'CHECK/CALL' : 'CHECK';
   const buttons = [
     { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'seatScene', label: 'SEAT', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
@@ -157,8 +159,12 @@ function buildButtons(state){
     { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
 
-    { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
+    { id: 'pokerFold', label: 'FOLD', x: 24, y: 306, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.14, margin: 6 },
+    { id: 'pokerCall', label: callLabel, x: 154, y: 306, w: 118, h: 42, font: 16, pinchOnly: true, hold: 0.14, margin: 6 },
+    { id: 'pokerRaise', label: 'RAISE', x: 284, y: 306, w: 118, h: 42, font: 20, pinchOnly: true, hold: 0.14, margin: 6 },
+    { id: 'pokerAllin', label: 'ALL-IN', x: 24, y: 360, w: 118, h: 58, font: 20, pinchOnly: true, hold: 0.18, margin: 6 },
+    { id: 'pokerNext', label: 'NEXT HAND', x: 154, y: 360, w: 248, h: 58, font: 22, pinchOnly: true, hold: 0.18, margin: 6 },
+
     { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
   ];
   if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
@@ -226,7 +232,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • Reiki / PGA / Sponsor / Scorpion • pinch with other hand • fist by face toggles TP', 36, 332);
+    ctx.fillText('Quick scenes + poker controls • F/C/R/A/H keys also work • hold then release to teleport', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -271,6 +277,11 @@ let hoveredId = null;
     if (id === 'legendScene') actions.goLegend?.();
     if (id === 'sponsorScene') actions.goSponsor?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
+    if (id === 'pokerFold') window.SVR_POKER_CONTROL?.playerAction?.('fold');
+    if (id === 'pokerCall') window.SVR_POKER_CONTROL?.playerAction?.('check');
+    if (id === 'pokerRaise') window.SVR_POKER_CONTROL?.playerAction?.('raise');
+    if (id === 'pokerAllin') window.SVR_POKER_CONTROL?.playerAction?.('allin');
+    if (id === 'pokerNext') window.SVR_POKER_CONTROL?.playerAction?.('next');
   }
 
   function update(dt, leftHand, rightHand){
