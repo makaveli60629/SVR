@@ -1,5 +1,5 @@
 {
-  "build": "PHASE-87-ORIGINAL-LOBBY-MINOR-EDIT-LOCK",
-  "phase": 87,
-  "notes": "Original lobby only: removed duplicate room/lobby shells and extra hub walls; kept minor portal markers, Moon/Mars, watch, teleport, and poker table. Site untouched."
+  "build": "PHASE-88-LOCOMOTION-ACTIVE-LOCK",
+  "phase": 88,
+  "notes": "Locomotion active lock: keeps original lobby only, preserves teleport/watch, and reinforces Quest right-stick forward/back movement plus 45 degree snap turn. Site untouched."
 }
