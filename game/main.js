@@ -8,14 +8,15 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase258-kiosk-equip";
-import "./modules/phase255_control_lock.js?v=phase258-kiosk-equip";
-import "./modules/phase256_chip_physics_lock.js?v=phase258-kiosk-equip";
-import "./modules/phase257_alignment_lock.js?v=phase258-kiosk-equip";
-import "./modules/phase258_kiosk_equip_lock.js?v=phase258-kiosk-equip";
+import "./modules/optional_module_loader.js?v=phase259-vr-interaction";
+import "./modules/phase255_control_lock.js?v=phase259-vr-interaction";
+import "./modules/phase256_chip_physics_lock.js?v=phase259-vr-interaction";
+import "./modules/phase257_alignment_lock.js?v=phase259-vr-interaction";
+import "./modules/phase258_kiosk_equip_lock.js?v=phase259-vr-interaction";
+import "./modules/phase259_vr_interaction_lock.js?v=phase259-vr-interaction";
 
-const BUILD_LABEL = "PHASE-258-KIOSK-VR-EQUIP-ITEMS-LOCK";
-const BUILD_PHASE = 258;
+const BUILD_LABEL = "PHASE-259-VR-INTERACTION-EVERYTHING-LOCK";
+const BUILD_PHASE = 259;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
@@ -68,6 +69,8 @@ if (AUTOCAM) document.body.classList.add("preview-mode");
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 window.SVR_SCENE = scene;
+window.SVR_CAMERA = camera;
+window.SVR_RENDERER = renderer;
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
@@ -90,6 +93,7 @@ if (window.SVR_CHIP_PHYSICS) window.SVR_CHIP_PHYSICS.scan(scene);
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
 const storeKiosk = createStoreKioskInteraction({ scene, camera, renderer, sceneTargets, statusCb: (text)=>setStatus(text, { force: true }) });
+if (window.SVR_VR_INTERACTION) window.SVR_VR_INTERACTION.scan(scene);
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -457,6 +461,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 

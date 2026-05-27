@@ -1,5 +1,5 @@
 ﻿(function(){
-  const BUILD = "PHASE-258-KIOSK-VR-EQUIP-ITEMS-LOCK";
+  const BUILD = "PHASE-259-VR-INTERACTION-EVERYTHING-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,32 +9,32 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase258-kiosk-equip",
-  "./auto_apply_verify.js?v=phase258-kiosk-equip",
-  "./one_command_deploy_health.js?v=phase258-kiosk-equip",
-  "./one_command_runbook.js?v=phase258-kiosk-equip",
-  "./post_deploy_checklist.js?v=phase258-kiosk-equip",
-  "./tester_launch_card.js?v=phase258-kiosk-equip",
-  "./qa_shortcut_index.js?v=phase258-kiosk-equip",
-  "./pilot_handoff_card.js?v=phase258-kiosk-equip",
-  "./pilot_ready_summary.js?v=phase258-kiosk-equip",
-  "./pilot_issue_template.js?v=phase258-kiosk-equip",
-  "./pilot_feedback_export.js?v=phase258-kiosk-equip",
-  "./power_deploy_watcher.js?v=phase258-kiosk-equip",
-  "./power_deploy_wait_log.js?v=phase258-kiosk-equip",
-  "./power_deploy_smoke_probe.js?v=phase258-kiosk-equip",
-  "./vr_input_spawn_clear_recovery.js?v=phase258-kiosk-equip",
-  "./vr_input_diagnostic.js?v=phase258-kiosk-equip",
-  "./quest_input_autocalibration.js?v=phase258-kiosk-equip",
-  "./hand_teleport_pinch_destination.js?v=phase258-kiosk-equip",
-  "./hand_teleport_aim_confirm.js?v=phase258-kiosk-equip",
-  "./fire_lightning_theme_panel.js?v=phase258-kiosk-equip",
-  "./watch_upright_orientation_panel.js?v=phase258-kiosk-equip",
-  "./watch_teleport_conflict_guard.js?v=phase258-kiosk-equip",
-  "./deploy_sync_force.js?v=phase258-kiosk-equip",
-  "./main_runtime_catch_fix.js?v=phase258-kiosk-equip",
-  "./main_import_recovery.js?v=phase258-kiosk-equip",
-  "./bridge_alias_recovery.js?v=phase258-kiosk-equip",
+  "./auto_apply_status.js?v=phase259-vr-interaction",
+  "./auto_apply_verify.js?v=phase259-vr-interaction",
+  "./one_command_deploy_health.js?v=phase259-vr-interaction",
+  "./one_command_runbook.js?v=phase259-vr-interaction",
+  "./post_deploy_checklist.js?v=phase259-vr-interaction",
+  "./tester_launch_card.js?v=phase259-vr-interaction",
+  "./qa_shortcut_index.js?v=phase259-vr-interaction",
+  "./pilot_handoff_card.js?v=phase259-vr-interaction",
+  "./pilot_ready_summary.js?v=phase259-vr-interaction",
+  "./pilot_issue_template.js?v=phase259-vr-interaction",
+  "./pilot_feedback_export.js?v=phase259-vr-interaction",
+  "./power_deploy_watcher.js?v=phase259-vr-interaction",
+  "./power_deploy_wait_log.js?v=phase259-vr-interaction",
+  "./power_deploy_smoke_probe.js?v=phase259-vr-interaction",
+  "./vr_input_spawn_clear_recovery.js?v=phase259-vr-interaction",
+  "./vr_input_diagnostic.js?v=phase259-vr-interaction",
+  "./quest_input_autocalibration.js?v=phase259-vr-interaction",
+  "./hand_teleport_pinch_destination.js?v=phase259-vr-interaction",
+  "./hand_teleport_aim_confirm.js?v=phase259-vr-interaction",
+  "./fire_lightning_theme_panel.js?v=phase259-vr-interaction",
+  "./watch_upright_orientation_panel.js?v=phase259-vr-interaction",
+  "./watch_teleport_conflict_guard.js?v=phase259-vr-interaction",
+  "./deploy_sync_force.js?v=phase259-vr-interaction",
+  "./main_runtime_catch_fix.js?v=phase259-vr-interaction",
+  "./main_import_recovery.js?v=phase259-vr-interaction",
+  "./bridge_alias_recovery.js?v=phase259-vr-interaction",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -51,12 +51,12 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase258-kiosk-equip",
-  "./phase258-kiosk-equip_forward_restore_manifest.js?v=phase258-kiosk-equip"
+  "./auto_apply_git_wrapper_fix.js?v=phase259-vr-interaction",
+  "./phase259-vr-interaction_forward_restore_manifest.js?v=phase259-vr-interaction"
 ];
   const state = {
     build: BUILD,
-    phase: 258,
+    phase: 259,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -169,6 +169,7 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
 
 
 

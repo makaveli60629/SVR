@@ -1,10 +1,18 @@
 ﻿{
-    "previous":  "PHASE-257-ALIGNMENT-PORTAL-KIOSK-TABLE-LOCK",
-    "storeUrl":  "https://svrpoker.com/site/store.html",
-    "checkoutEnabled":  false,
+    "build":  "PHASE-259-VR-INTERACTION-EVERYTHING-LOCK",
     "source":  "direct-game-folder",
-    "build":  "PHASE-258-KIOSK-VR-EQUIP-ITEMS-LOCK",
     "siteTouched":  false,
-    "updatedAt":  "2026-05-27T02:20:21Z",
-    "next":  "PHASE-259-POKER-RIGHT-DEAL-TABLE-READABILITY-LOCK"
+    "vrInteractions":  [
+                           "kiosk",
+                           "portal",
+                           "watch",
+                           "chips",
+                           "cards",
+                           "desktop fallback",
+                           "controller select bridge",
+                           "hand select bridge"
+                       ],
+    "previous":  "PHASE-258-KIOSK-VR-EQUIP-ITEMS-LOCK",
+    "next":  "PHASE-260-POKER-RIGHT-DEAL-TABLE-READABILITY-LOCK",
+    "updatedAt":  "2026-05-27T02:27:09Z"
 }
