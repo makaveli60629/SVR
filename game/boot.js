@@ -3,7 +3,7 @@
  * Purpose: capture boot/import/cache evidence and avoid permanent Booting stalls.
  */
 (function(){
-  var BUILD = 'PHASE-282-GAME-UPDATE-2-STABILITY-LOCK';
+  var BUILD = 'PHASE-84-TABLE-CLEAROUT-LOCK';
   var startedAt = new Date().toISOString();
   var statusEl = document.getElementById('status');
   var errEl = document.getElementById('err');
@@ -23,7 +23,7 @@
     if (ready || fallbackStarted) return;
     fallbackStarted = true;
     setStatus('Boot fallback: loading recovery shellâ€¦');
-    import('./modules/boot_fallback.js?v=game-update-2-stability-lock').then(function(){
+    import('./modules/boot_fallback.js?v=phase84-table-clearout-lock').then(function(){
       if (window.SVR_BOOT_FALLBACK && !ready) window.SVR_BOOT_FALLBACK.show(reason, detail);
     }).catch(function(error){
       showRecovery('Fallback shell failed. Manual reload required.', error, false);
@@ -47,14 +47,14 @@
     var fb = document.getElementById('svrBootFallback'); if (fb) fb.style.display = 'none';
   }
   window.SVR_BOOT_GUARD = { build: BUILD, startedAt: startedAt, ready: function(){return ready;}, imported: function(){return imported;}, recoveryShown: function(){return recoveryShown;}, startFallback: startFallback };
-  import('./modules/boot_route_recovery.js?v=game-update-2-stability-lock').catch(function(error){ softReport('Boot route recovery module failed.', error); });
-  import('./modules/boot_route_health.js?v=game-update-2-stability-lock').catch(function(error){ softReport('Boot route health module failed.', error); });
+  import('./modules/boot_route_recovery.js?v=phase84-table-clearout-lock').catch(function(error){ softReport('Boot route recovery module failed.', error); });
+  import('./modules/boot_route_health.js?v=phase84-table-clearout-lock').catch(function(error){ softReport('Boot route health module failed.', error); });
 
   document.addEventListener('click', function(event){
     var target = event.target && event.target.closest && event.target.closest('[data-svr-boot]'); if (!target) return;
     var action = target.getAttribute('data-svr-boot');
     if (action === 'reload') location.reload();
-    if (action === 'cache') location.href = './index.html?v=game-update-2-stability-lock-' + Date.now();
+    if (action === 'cache') location.href = './index.html?v=phase84-table-clearout-lock-' + Date.now();
     if (action === 'fallback') startFallback('Manual recovery shell requested.', '');
   });
   window.addEventListener('svr_game_ready', function(event){ hideRecovery(); setStatus((event.detail && event.detail.preview) ? 'Live preview ready' : 'Ready. Enter VR.'); });
@@ -63,8 +63,9 @@
   setStatus('Boot guard: loading game moduleâ€¦');
   setTimeout(function(){ if (!ready) { showRecovery('Game is taking longer than expected. Recovery shell and route recovery are available.', '', true); if (window.SVR_BOOT_ROUTE_RECOVERY) window.SVR_BOOT_ROUTE_RECOVERY.collect('slow-boot'); } }, 6000);
   mainTimer = setTimeout(function(){ if (!ready) { showRecovery('Game did not send ready signal. Opening recovery shell so Booting cannot freeze.', '', false); startFallback('Main runtime timeout before ready signal.', 'Likely CDN/import/cache/runtime module issue.'); } }, 15000);
-  import('./main.js?v=game-update-2-stability-lock').then(function(){ imported = true; setStatus('Game module loaded. Building sceneâ€¦'); }).catch(function(error){ imported = false; showRecovery('Failed to import main game module. Booting screen stopped by recovery guard.', error, false); startFallback('Failed to import main game module.', error); });
+  import('./main.js?v=phase84-table-clearout-lock').then(function(){ imported = true; setStatus('Game module loaded. Building sceneâ€¦'); }).catch(function(error){ imported = false; showRecovery('Failed to import main game module. Booting screen stopped by recovery guard.', error, false); startFallback('Failed to import main game module.', error); });
 })();
+
 
 
 
