@@ -1,0 +1,10 @@
+{
+  "phase": 252,
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "modulesAdded": [
+    "game/modules/demo_certification.js"
+  ],
+  "keyboardShortcut": "Z",
+  "publicPageTouched": false,
+  "notes": "Combines QA, smoke test, RC checklist, bug reports, tester feedback, queue, and report bundle into one demo certification status."
+}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • Phase 85 True Lobby Kiosk Scorpion Celestial Lock</title>
+  <title>ScarlettVR Poker • Phase 253 Forward Restore Locomotion Kiosk Poker Lock</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -97,26 +97,27 @@
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: …</span>
-      <span class="pill">BUILD: PHASE-85-TRUE-LOBBY-KIOSK-SCORPION-CELESTIAL-LOCK</span>
+      <span class="pill">BUILD: PHASE-253-FORWARD-RESTORE-LOCOMOTION-KIOSK-POKER-LOCK</span>
     </div>
   </div>
 
   <div id="sceneNav">
     <button class="scene-btn" data-scene="lobby">Lobby</button>
     <button class="scene-btn" data-scene="seat">Seat</button>
-    <button class="scene-btn" data-scene="reiki">Reiki</button>
-    <button class="scene-btn" data-scene="reikiRoom">Reiki Room</button>
-    <button class="scene-btn" data-scene="storePortal">Store Kiosk</button>
-    <button class="scene-btn" data-scene="storeRoom">Store Room</button>
-    <button class="scene-btn" data-scene="pga">PGA</button>
-    <button class="scene-btn" data-scene="legends">Legend</button>
-    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
-    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
+    <button class="scene-btn" data-scene="reiki">Reiki Hub</button>
+    <button class="scene-btn" data-url="./reiki.html">Reiki Room</button>
+    <button class="scene-btn" data-scene="pga">PGA Hub</button>
+    <button class="scene-btn" data-url="./pga-drive.html">PGA Drive</button>
+    <button class="scene-btn" data-url="./chip-putt.html">Chip/Putt</button>
+    <button class="scene-btn" data-url="./store-room.html">VR Store</button>
+    <button class="scene-btn" data-url="./smoker-lounge.html">Smoker</button>
+    <button class="scene-btn" data-url="./scorpion.html">Scorpion</button>
   </div>
 
   <pre id="log"></pre>
   <pre id="err"></pre>
+  <div id="bootRecovery" aria-live="polite"></div>
 
-  <script type="module" src="./main.js"></script>
+  <script src="./boot.js?v=phase253"></script>
 </body>
 </html>

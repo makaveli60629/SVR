@@ -1,0 +1,12 @@
+{
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "phase": 252,
+  "modules": [
+    "game/modules/bridge_proxy.js",
+    "game/modules/enterprise_bridge_phase252.js",
+    "game/modules/bridge_selftest.js",
+    "game/modules/event_firewall.js"
+  ],
+  "lock": "Bridge proxy installs before event firewall and poker telemetry so any record* method resolves safely.",
+  "public_page_touched": false
+}

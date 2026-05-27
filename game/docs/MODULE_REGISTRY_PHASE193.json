@@ -1,0 +1,16 @@
+{
+  "phase": 252,
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "modules_added": [
+    "modules/release_candidate.js"
+  ],
+  "keyboard": [
+    "U release checklist",
+    "T smoke test",
+    "V verifier",
+    "Q runtime QA",
+    "X export",
+    "Y copy export"
+  ],
+  "public_page_touched": false
+}

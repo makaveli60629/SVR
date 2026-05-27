@@ -1,0 +1,12 @@
+{
+  "phase": 252,
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "modules": [
+    "boot.js",
+    "modules/boot_cache_watchdog.js",
+    "modules/enterprise_bridge_phase252.js",
+    "modules/safe_event_bus.js",
+    "modules/runtime_crash_shield.js"
+  ],
+  "public_page_touched": false
+}

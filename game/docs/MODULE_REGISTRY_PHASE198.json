@@ -1,0 +1,17 @@
+{
+  "phase": 252,
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "public_page_touched": false,
+  "module": "game/modules/test_report_bundle.js",
+  "shortcut": "B",
+  "purpose": "Bundle QA, bug reports, tester feedback, test queue, smoke/preflight/RC/session events into one downloadable playtest report.",
+  "events": [
+    "svr_test_report_bundle_update"
+  ],
+  "protected": [
+    "root public Matrix launch page",
+    "dealer body disabled",
+    "invisible deal/card logic preserved"
+  ],
+  "deploy": "direct committed /game folder; zip retained as update/game.zip backup artifact"
+}

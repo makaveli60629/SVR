@@ -1,6 +1,6 @@
-{
-  "build": "PHASE-85-TRUE-LOBBY-KIOSK-SCORPION-CELESTIAL-LOCK",
-  "phase": 85,
-  "source": "game direct folder and update/game.zip must match",
-  "siteTouched": false
+﻿{
+    "deployedBy":  "AUTO-DEPLOY-GAME.ps1",
+    "source":  "direct-game-folder",
+    "build":  "PHASE-253-FORWARD-RESTORE-LOCOMOTION-KIOSK-POKER-LOCK",
+    "updatedAt":  "2026-05-27T01:30:55Z"
 }

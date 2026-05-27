@@ -1,0 +1,12 @@
+{
+  "phase": 252,
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "modules": [
+    "game/modules/poker_demo.js",
+    "game/modules/enterprise_bridge.js"
+  ],
+  "events": [
+    "svr_poker_decision_aid_update"
+  ],
+  "publicPageTouched": false
+}

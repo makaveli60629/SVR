@@ -1,0 +1,18 @@
+{
+  "phase": 252,
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "modules_added": [
+    "modules/deploy_verify.js"
+  ],
+  "browser_events": [
+    "svr_deploy_preflight_update"
+  ],
+  "keyboard": [
+    "V deploy verifier",
+    "Q QA overlay",
+    "X session export download",
+    "Y session export copy"
+  ],
+  "public_page_touched": false,
+  "deployment": "direct-game-folder plus update/game.zip backup"
+}

@@ -1,0 +1,13 @@
+{
+  "phase": 252,
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "modules": [
+    "modules/test_queue.js",
+    "modules/tester_feedback.js",
+    "modules/bug_reporter.js",
+    "modules/release_candidate.js",
+    "modules/smoke_test.js",
+    "modules/session_export.js"
+  ],
+  "publicPageTouched": false
+}

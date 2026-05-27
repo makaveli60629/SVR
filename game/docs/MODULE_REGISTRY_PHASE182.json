@@ -1,0 +1,27 @@
+{
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "phase": 252,
+  "modules": {
+    "poker_demo.js": [
+      "side pot eligibility",
+      "payout array",
+      "showdown side pot event"
+    ],
+    "enterprise_bridge.js": [
+      "side_pot_resolution telemetry hook"
+    ],
+    "privateScenes": [
+      "reiki",
+      "pga-drive",
+      "chip-putt",
+      "store-room",
+      "smoker-lounge",
+      "scorpion"
+    ]
+  },
+  "protected": [
+    "public Matrix page",
+    "unapproved sponsor branding",
+    "dealer body disabled"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "phase": 252,
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "modules": [
+    {
+      "path": "game/modules/session_export.js",
+      "purpose": "QA/session transcript export"
+    },
+    {
+      "path": "game/modules/runtime_qa.js",
+      "purpose": "runtime snapshot and Q overlay"
+    },
+    {
+      "path": "game/modules/enterprise_bridge.js",
+      "purpose": "backend event bridge"
+    }
+  ],
+  "events": [
+    "svr_session_export_update",
+    "svr_runtime_qa_snapshot"
+  ],
+  "keyboard": {
+    "Q": "toggle QA overlay",
+    "X": "download session export JSON",
+    "Y": "copy session export JSON"
+  },
+  "public_page_touched": false
+}

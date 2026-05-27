@@ -1,0 +1,36 @@
+{
+  "phase": 252,
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "public_page_touched": false,
+  "modules_added": [
+    "game/modules/playtest_wizard.js"
+  ],
+  "modules_preserved": [
+    "runtime_qa.js",
+    "session_export.js",
+    "deploy_verify.js",
+    "smoke_test.js",
+    "release_candidate.js",
+    "enterprise_bridge.js",
+    "poker_demo.js",
+    "watch.js"
+  ],
+  "events": [
+    "svr_playtest_wizard_update"
+  ],
+  "shortcuts": {
+    "W": "playtest wizard",
+    "V": "deploy preflight",
+    "T": "smoke test",
+    "U": "release candidate",
+    "Q": "runtime QA",
+    "X": "download export",
+    "Y": "copy export"
+  },
+  "locked": [
+    "direct-game-folder-deploy",
+    "under-25mb",
+    "public-matrix-page-untouched",
+    "dealer-body-disabled"
+  ]
+}

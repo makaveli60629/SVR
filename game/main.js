@@ -7,6 +7,12 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
+import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
+import "./modules/optional_module_loader.js?v=phase252";
+
+const BUILD_LABEL = "PHASE-253-FORWARD-RESTORE-LOCOMOTION-KIOSK-POKER-LOCK";
+const BUILD_PHASE = 253;
+window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -21,21 +27,6 @@ const $err = document.getElementById("err");
 const $toggleLog = document.getElementById("toggleLog");
 const $toggleJoints = document.getElementById("toggleJoints");
 const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
-
-const PRIVATE_SCENE_ROUTES = {
-  reikiRoom: './reiki.html',
-  pgaDrive: './pga-drive.html',
-  chipPutt: './chip-putt.html',
-  storeRoom: './store-room.html',
-  scorpionRoom: './scorpion.html',
-  smokerLounge: './smoker-lounge.html'
-};
-const SVR_STORE_PORTAL_URL = 'https://svrpoker.com/site/store.html';
-function openRoute(url){
-  if (!url) return false;
-  try { window.open(url, '_blank', 'noopener,noreferrer'); return true; }
-  catch (_err) { location.href = url; return true; }
-}
 
 let lastStatusText = "";
 let lastStatusAt = 0;
@@ -58,11 +49,14 @@ function setMode(text){
 
 function log(...args){
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
+  console.log("[SVR]", line);
+  if (!$log) return;
   $log.textContent += line + "\n";
   $log.scrollTop = $log.scrollHeight;
 }
 
-$toggleLog.addEventListener("click", ()=>{
+$toggleLog?.addEventListener("click", ()=>{
+  if (!$log) return;
   $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
 });
 
@@ -88,14 +82,14 @@ setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
+const storeKiosk = createStoreKioskInteraction({ scene, camera, renderer, sceneTargets, statusCb: (text)=>setStatus(text, { force: true }) });
+
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
 const audio = createAudioPlaylist({
   tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" },
-    { title: "Reiki Time Hub", url: "./assets/audio/reiki_time_hub.mp3" },
-    { title: "SVR After Dark", url: "./assets/audio/svr_after_dark.mp3" }
+    { title: "Lobby 07", url: "./assets/audio/07.mp3" }
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
@@ -114,6 +108,33 @@ const audio = createAudioPlaylist({
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
+
+const pokerHudState = {
+  build: BUILD_LABEL,
+  actor: "TABLE",
+  stage: "waiting",
+  action: "waiting",
+  remaining: 0,
+  legal: { callAmount: 0, minRaise: 100, options: ["nextHand"] },
+  decisionAid: { pressure: "WAITING", potOddsPct: 0, hint: "Waiting for poker state", callAmount: 0, pot: 0 },
+  sidePots: [],
+  allInPlayers: []
+};
+function updatePokerHud(partial = {}){
+  if (partial.actor !== undefined) pokerHudState.actor = partial.actor;
+  if (partial.stage !== undefined) pokerHudState.stage = partial.stage;
+  if (partial.action !== undefined) pokerHudState.action = partial.action;
+  if (partial.remaining !== undefined) pokerHudState.remaining = partial.remaining;
+  if (partial.legal) pokerHudState.legal = { ...pokerHudState.legal, ...partial.legal };
+  if (partial.decisionAid) pokerHudState.decisionAid = { ...pokerHudState.decisionAid, ...partial.decisionAid };
+  if (partial.sidePots) pokerHudState.sidePots = partial.sidePots;
+  if (partial.allInPlayers) pokerHudState.allInPlayers = partial.allInPlayers;
+}
+window.addEventListener("svr_watch_turn_indicator_update", (event)=>updatePokerHud(event.detail || {}));
+window.addEventListener("svr_poker_legal_actions_update", (event)=>updatePokerHud(event.detail || {}));
+window.addEventListener("svr_poker_decision_aid_update", (event)=>updatePokerHud(event.detail || {}));
+window.addEventListener("svr_poker_side_pot_resolution", (event)=>updatePokerHud(event.detail || {}));
+window.addEventListener("svr_poker_allin_update", (event)=>updatePokerHud(event.detail || {}));
 
 function currentHeadXZ(){
   if (renderer.xr.isPresenting){
@@ -184,7 +205,6 @@ function movePlayerToSpot(target, lookTarget = null){
 }
 
 function gotoScene(key){
-  if (key === 'storeRoom') return openRoute(PRIVATE_SCENE_ROUTES.storeRoom);
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
@@ -192,10 +212,30 @@ function gotoScene(key){
   return true;
 }
 
+function openPrivatePage(url){
+  if (!url) return false;
+  window.location.href = url;
+  return true;
+}
+
+function pokerAction(name){
+  const actions = scene.userData?._pokerActions;
+  const fn = actions?.[name];
+  if (typeof fn === 'function') {
+    fn();
+    setStatus(`Poker: ${name}`, { force: true });
+    return true;
+  }
+  setStatus('Poker controls loading…', { force: true });
+  return false;
+}
+
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
+    const url = btn.dataset.url;
     const key = btn.dataset.scene;
-    if (key) gotoScene(key);
+    if (url) openPrivatePage(url);
+    else if (key) gotoScene(key);
   });
 });
 
@@ -206,17 +246,21 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
+  if (e.code === "KeyF") pokerAction("fold");
+  if (e.code === "KeyC") pokerAction("call");
+  if (e.code === "KeyR") pokerAction("raise");
+  if (e.code === "KeyA") pokerAction("allIn");
+  if (e.code === "KeyH") pokerAction("nextHand");
   if (e.code === "Digit1") gotoScene("lobby");
-  if (e.code === "Digit2") gotoScene("table");
-  if (e.code === "Digit3") gotoScene("seat");
-  if (e.code === "Digit4") gotoScene("reiki");
+  if (e.code === "Digit2") gotoScene("seat");
+  if (e.code === "Digit3") gotoScene("reiki");
+  if (e.code === "Digit4") openPrivatePage("./reiki.html");
   if (e.code === "Digit5") gotoScene("pga");
-  if (e.code === "Digit6") gotoScene("legends");
-  if (e.code === "Digit7") gotoScene("sponsor");
-  if (e.code === "Digit8") gotoScene("scorpion");
-  if (e.code === "Digit9") gotoScene("reikiRoom");
-  if (e.code === "Digit0") gotoScene("storePortal");
-  if (e.code === "KeyO") openRoute(SVR_STORE_PORTAL_URL);
+  if (e.code === "Digit6") openPrivatePage("./pga-drive.html");
+  if (e.code === "Digit7") openPrivatePage("./chip-putt.html");
+  if (e.code === "Digit8") openPrivatePage("./store-room.html");
+  if (e.code === "KeyO") storeKiosk.openPanel();
+  if (e.code === "Digit9") openPrivatePage("./scorpion.html");
 });
 
 const watch = createWristWatch({
@@ -230,7 +274,17 @@ const watch = createWristWatch({
     seated,
     inTableZone: inTableZone(),
     seatLabel: seatLabel(),
-    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
+    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true,
+    poker: {
+      actor: pokerHudState.actor,
+      stage: pokerHudState.stage,
+      action: pokerHudState.action,
+      remaining: pokerHudState.remaining,
+      legal: { ...pokerHudState.legal },
+      decisionAid: { ...pokerHudState.decisionAid },
+      sidePots: pokerHudState.sidePots,
+      allInPlayers: pokerHudState.allInPlayers
+    }
   }),
   actions: {
     toggleAudio: ()=>audio.toggle(),
@@ -246,22 +300,33 @@ const watch = createWristWatch({
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom"),
-    goStorePortal: ()=>gotoScene("storePortal"),
-    goStoreRoom: ()=>gotoScene("storeRoom")
+    goReikiRoom: ()=>openPrivatePage("./reiki.html"),
+    goPgaDrive: ()=>openPrivatePage("./pga-drive.html"),
+    goPgaShort: ()=>openPrivatePage("./chip-putt.html"),
+    goStoreRoom: ()=>openPrivatePage("./store-room.html"),
+    goStoreKiosk: ()=>storeKiosk.openPanel(),
+    goSmoker: ()=>openPrivatePage("./smoker-lounge.html"),
+    goScorpionRoom: ()=>openPrivatePage("./scorpion.html"),
+    pokerFold: ()=>pokerAction("fold"),
+    pokerCall: ()=>pokerAction("call"),
+    pokerRaise: ()=>pokerAction("raise"),
+    pokerAllIn: ()=>pokerAction("allIn"),
+    pokerNextHand: ()=>pokerAction("nextHand")
   }
 });
 
-$toggleJoints.addEventListener("click", ()=>{
+$toggleJoints?.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
-  $toggleJoints.textContent = on ? "Joints On" : "Joints";
+  if ($toggleJoints) $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
 setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Seat/Reiki/PGA/Legend/Sponsor/Scorpion/Store.", { force: true });
+window.dispatchEvent(new CustomEvent("svr_runtime_telemetry", { detail: { event: "boot_ready", preview: AUTOCAM, build: BUILD_LABEL } }));
+window.dispatchEvent(new CustomEvent("svr_game_ready", { detail: { build: BUILD_LABEL, preview: AUTOCAM, at: new Date().toISOString() } }));
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold grip/A/trigger to aim teleport, release to teleport. Poker keys: F/C/R/A/H. QA keys: Q/V/T/U/W/G/X/Y. Private scene buttons enabled. Store kiosk: press O or point/select kiosk.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -297,12 +362,13 @@ const previewShots = [
 ];
 
 renderer.setAnimationLoop(()=>{
+  try {
   const now = performance.now();
   const dt = Math.min((now - tPrev) / 1000, 0.033);
   tPrev = now;
 
   if (!renderer.xr.isPresenting){
-    if (!AUTOCAM) desktop.update(dt);
+    if (!AUTOCAM && desktop) desktop.update(dt);
     else {
       const shotIndex = Math.floor(now / 9000) % previewShots.length;
       const shot = previewShots[shotIndex];
@@ -322,6 +388,7 @@ renderer.setAnimationLoop(()=>{
   }
 
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
+    storeKiosk.update(dt);
 
   hands.update(dt);
   hands.updateDebug();
@@ -345,6 +412,30 @@ renderer.setAnimationLoop(()=>{
   if (watch) watch.update(dt, leftHand, rightHand);
 
   renderer.render(scene, camera);
+  } catch (error) {
+    const message = error?.stack || error?.message || String(error);
+    window.SVR_MAIN_RUNTIME_STATE.animationErrors += 1;
+    window.SVR_MAIN_RUNTIME_STATE.lastAnimationError = {
+      at: new Date().toISOString(),
+      message,
+      count: window.SVR_MAIN_RUNTIME_STATE.animationErrors
+    };
+    console.error("[SVR main animation error]", error);
+    window.dispatchEvent(new CustomEvent("svr_main_runtime_error", {
+      detail: { build: BUILD_LABEL, phase: BUILD_PHASE, message, count: window.SVR_MAIN_RUNTIME_STATE.animationErrors }
+    }));
+
+    const shield = window.SVR_RUNTIME_CRASH_SHIELD;
+    if (shield?.handleAnimationError?.(error, { phase: BUILD_PHASE, build: BUILD_LABEL, module: "main.animationLoop" })) return;
+
+    setStatus("Runtime recovered • check Logs", { force: true, minGap: 0 });
+    if (!renderer.xr.isPresenting && $err) {
+      $err.style.display = "block";
+      $err.textContent = "RUNTIME ERROR RECOVERED:\n" + message;
+    }
+    // Quest-safe: do not throw from the animation loop, because a secondary throw can freeze WebXR.
+    return;
+  }
 });
 
 const canvasEl = renderer.domElement;

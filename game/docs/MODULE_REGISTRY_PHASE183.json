@@ -1,0 +1,17 @@
+{
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "phase": 252,
+  "modules": [
+    "game/modules/poker_demo.js",
+    "game/modules/enterprise_bridge.js",
+    "game/modules/watch.js",
+    "game/modules/world_skyline.js"
+  ],
+  "events": [
+    "svr_poker_fold_eligibility_update",
+    "svr_poker_side_pot_resolution",
+    "svr_poker_showdown_reveal",
+    "svr_poker_hand_result"
+  ],
+  "publicPageTouched": false
+}

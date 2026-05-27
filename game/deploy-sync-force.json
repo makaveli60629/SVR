@@ -1,0 +1,8 @@
+{
+  "build": "PHASE-253-FORWARD-RESTORE-LOCOMOTION-KIOSK-POKER-LOCK",
+  "phase": 252,
+  "generatedAt": "2026-05-25T00:00:00Z",
+  "reason": "force Pages deploy sync and fix Quest runtime error in main.js",
+  "public_page_touched": false,
+  "testUrl": "/game/?v=phase253-mainruntime"
+}

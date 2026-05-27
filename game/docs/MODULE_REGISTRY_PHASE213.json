@@ -1,0 +1,15 @@
+{
+  "phase": 252,
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "modulesAdded": [
+    "game/modules/boot_route_recovery.js",
+    "game/modules/enterprise_bridge_phase252.js"
+  ],
+  "protected": {
+    "publicPageTouched": false,
+    "dealerBodyDisabled": true
+  },
+  "shortcuts": {
+    "R": "Boot route recovery panel"
+  }
+}

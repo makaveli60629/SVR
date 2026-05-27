@@ -1,0 +1,13 @@
+{
+  "build": "PHASE-252-FORWARD-RESTORE-QUEST-POKER-LOCK",
+  "phase": 252,
+  "modulesAdded": [
+    "boot.js"
+  ],
+  "modulesPatched": [
+    "main.js",
+    "modules/enterprise_bridge.js"
+  ],
+  "publicPageTouched": false,
+  "purpose": "Fix stuck Booting screen with guarded dynamic loader and recovery overlay."
+}

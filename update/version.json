@@ -1,8 +1,6 @@
 ﻿{
-    "build":  "PHASE-85-TRUE-LOBBY-KIOSK-SCORPION-CELESTIAL-LOCK",
-    "siteTouched":  false,
-    "updatedAtLocal":  "2026-05-26T20:12:38",
-    "track":  "game",
-    "phase":  85,
-    "deployedFrom":  "Phase 85 PowerShell"
+    "deployedBy":  "AUTO-DEPLOY-GAME.ps1",
+    "source":  "direct-game-folder",
+    "build":  "PHASE-253-FORWARD-RESTORE-LOCOMOTION-KIOSK-POKER-LOCK",
+    "updatedAt":  "2026-05-27T01:30:55Z"
 }
