@@ -1,5 +1,6 @@
 {
-  "build": "PHASE-88-LOCOMOTION-ACTIVE-LOCK",
-  "phase": 88,
-  "notes": "Locomotion active lock: keeps original lobby only, preserves teleport/watch, and reinforces Quest right-stick forward/back movement plus 45 degree snap turn. Site untouched."
+  "build": "PHASE-89-GAME-UPDATE-2-0-MANIFEST-LOCK",
+  "phase": 89,
+  "update": "2.0",
+  "notes": "Game Update 2.0 manifest lock: original lobby only, minor edits only, no second lobby, locomotion/watch/poker baseline preserved, site untouched."
 }
