@@ -1,9 +1,9 @@
 ﻿{
-    "build":  "PHASE-268-RUNTIME-SHIELD-QUIET-VISIBLE-LOBBY-LOCK",
+    "build":  "PHASE-269-RUNTIME-SHIELD-INSTALL-FAILOPEN-LOCK",
     "source":  "direct-game-folder",
     "siteTouched":  false,
-    "previous":  "PHASE-267-JS-NEWLINE-BOOT-RENDER-REPAIR-LOCK",
-    "next":  "PHASE-269-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
-    "fix":  "Suppress non-fatal runtime shield overlay after visible lobby shell is ready",
-    "updatedAt":  "2026-05-27T03:32:05Z"
+    "previous":  "PHASE-268-RUNTIME-SHIELD-QUIET-VISIBLE-LOBBY-LOCK",
+    "next":  "PHASE-270-QUEST-MOVEMENT-TELEPORT-HARDENING-LOCK",
+    "fix":  "Install runtime shield quiet module and fail-open optional runtime systems",
+    "updatedAt":  "2026-05-27T03:41:52Z"
 }

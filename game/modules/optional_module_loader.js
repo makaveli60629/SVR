@@ -1,5 +1,5 @@
 ﻿(function(){
-  const BUILD = "PHASE-268-RUNTIME-SHIELD-QUIET-VISIBLE-LOBBY-LOCK";
+  const BUILD = "PHASE-269-RUNTIME-SHIELD-INSTALL-FAILOPEN-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,32 +9,32 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase267-js-newline-boot-repair",
-  "./auto_apply_verify.js?v=phase267-js-newline-boot-repair",
-  "./one_command_deploy_health.js?v=phase267-js-newline-boot-repair",
-  "./one_command_runbook.js?v=phase267-js-newline-boot-repair",
-  "./post_deploy_checklist.js?v=phase267-js-newline-boot-repair",
-  "./tester_launch_card.js?v=phase267-js-newline-boot-repair",
-  "./qa_shortcut_index.js?v=phase267-js-newline-boot-repair",
-  "./pilot_handoff_card.js?v=phase267-js-newline-boot-repair",
-  "./pilot_ready_summary.js?v=phase267-js-newline-boot-repair",
-  "./pilot_issue_template.js?v=phase267-js-newline-boot-repair",
-  "./pilot_feedback_export.js?v=phase267-js-newline-boot-repair",
-  "./power_deploy_watcher.js?v=phase267-js-newline-boot-repair",
-  "./power_deploy_wait_log.js?v=phase267-js-newline-boot-repair",
-  "./power_deploy_smoke_probe.js?v=phase267-js-newline-boot-repair",
-  "./vr_input_spawn_clear_recovery.js?v=phase267-js-newline-boot-repair",
-  "./vr_input_diagnostic.js?v=phase267-js-newline-boot-repair",
-  "./quest_input_autocalibration.js?v=phase267-js-newline-boot-repair",
-  "./hand_teleport_pinch_destination.js?v=phase267-js-newline-boot-repair",
-  "./hand_teleport_aim_confirm.js?v=phase267-js-newline-boot-repair",
-  "./fire_lightning_theme_panel.js?v=phase267-js-newline-boot-repair",
-  "./watch_upright_orientation_panel.js?v=phase267-js-newline-boot-repair",
-  "./watch_teleport_conflict_guard.js?v=phase267-js-newline-boot-repair",
-  "./deploy_sync_force.js?v=phase267-js-newline-boot-repair",
-  "./main_runtime_catch_fix.js?v=phase267-js-newline-boot-repair",
-  "./main_import_recovery.js?v=phase267-js-newline-boot-repair",
-  "./bridge_alias_recovery.js?v=phase267-js-newline-boot-repair",
+  "./auto_apply_status.js?v=phase269-runtime-shield-failopen",
+  "./auto_apply_verify.js?v=phase269-runtime-shield-failopen",
+  "./one_command_deploy_health.js?v=phase269-runtime-shield-failopen",
+  "./one_command_runbook.js?v=phase269-runtime-shield-failopen",
+  "./post_deploy_checklist.js?v=phase269-runtime-shield-failopen",
+  "./tester_launch_card.js?v=phase269-runtime-shield-failopen",
+  "./qa_shortcut_index.js?v=phase269-runtime-shield-failopen",
+  "./pilot_handoff_card.js?v=phase269-runtime-shield-failopen",
+  "./pilot_ready_summary.js?v=phase269-runtime-shield-failopen",
+  "./pilot_issue_template.js?v=phase269-runtime-shield-failopen",
+  "./pilot_feedback_export.js?v=phase269-runtime-shield-failopen",
+  "./power_deploy_watcher.js?v=phase269-runtime-shield-failopen",
+  "./power_deploy_wait_log.js?v=phase269-runtime-shield-failopen",
+  "./power_deploy_smoke_probe.js?v=phase269-runtime-shield-failopen",
+  "./vr_input_spawn_clear_recovery.js?v=phase269-runtime-shield-failopen",
+  "./vr_input_diagnostic.js?v=phase269-runtime-shield-failopen",
+  "./quest_input_autocalibration.js?v=phase269-runtime-shield-failopen",
+  "./hand_teleport_pinch_destination.js?v=phase269-runtime-shield-failopen",
+  "./hand_teleport_aim_confirm.js?v=phase269-runtime-shield-failopen",
+  "./fire_lightning_theme_panel.js?v=phase269-runtime-shield-failopen",
+  "./watch_upright_orientation_panel.js?v=phase269-runtime-shield-failopen",
+  "./watch_teleport_conflict_guard.js?v=phase269-runtime-shield-failopen",
+  "./deploy_sync_force.js?v=phase269-runtime-shield-failopen",
+  "./main_runtime_catch_fix.js?v=phase269-runtime-shield-failopen",
+  "./main_import_recovery.js?v=phase269-runtime-shield-failopen",
+  "./bridge_alias_recovery.js?v=phase269-runtime-shield-failopen",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -51,12 +51,12 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase267-js-newline-boot-repair",
-  "./phase267-js-newline-boot-repair_forward_restore_manifest.js?v=phase267-js-newline-boot-repair"
+  "./auto_apply_git_wrapper_fix.js?v=phase269-runtime-shield-failopen",
+  "./phase269-runtime-shield-failopen_forward_restore_manifest.js?v=phase269-runtime-shield-failopen"
 ];
   const state = {
     build: BUILD,
-    phase: 268,
+    phase: 269,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -169,6 +169,7 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
 
 
 

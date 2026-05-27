@@ -4,7 +4,7 @@
  */
 import * as THREE from "three";
 
-const BUILD = "PHASE-268-RUNTIME-SHIELD-QUIET-VISIBLE-LOBBY-LOCK";
+const BUILD = "PHASE-269-RUNTIME-SHIELD-INSTALL-FAILOPEN-LOCK";
 
 function hasVisibleScene(){
   return !!(
@@ -124,3 +124,4 @@ export function installPhase268RuntimeShieldQuiet({ scene, renderer, camera } = 
 
   return state;
 }
+
