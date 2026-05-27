@@ -205,6 +205,15 @@ const svrPortalSystem = installSvrPortalWalkthrough({
   setStatus,
   log
 });
+
+const svrPortalSystem = installSvrPortalWalkthrough({
+  scene,
+  camera,
+  renderer,
+  gotoScene,
+  setStatus,
+  log
+});
 const watch = createWristWatch({
   scene,
   camera,
@@ -344,6 +353,7 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingÃ¢â‚¬Â¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
 
 
 

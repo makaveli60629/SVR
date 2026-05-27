@@ -1,0 +1,16 @@
+﻿{
+  "phase": "259",
+  "scope": "game only",
+  "siteTouched": false,
+  "changes": [
+    "runtime error shield",
+    "boot finalizer",
+    "music disabled",
+    "physical portals for Lobby, Seat, Reiki, PGA, Legend, Sponsor, Scorpion",
+    "desktop-safe no-tracked messaging",
+    "fist teleport no longer requires wrist near face",
+    "roomClamp robust clamp fix",
+    "Quest controller teleport retained",
+    "update zips rebuilt"
+  ]
+}

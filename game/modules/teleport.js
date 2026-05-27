@@ -121,10 +121,19 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   const smoothedTarget = new THREE.Vector3(0, 0, CONFIG.SPAWN_Z);
 
   function clampTarget(p){
+    const clampValue = (typeof roomClamp === "number")
+      ? roomClamp
+      : Math.max(
+          Math.abs(roomClamp?.maxX ?? 24),
+          Math.abs(roomClamp?.minX ?? -24),
+          Math.abs(roomClamp?.maxZ ?? 24),
+          Math.abs(roomClamp?.minZ ?? -24)
+        );
+
     return new THREE.Vector3(
-      THREE.MathUtils.clamp(p.x, -roomClamp, roomClamp),
+      THREE.MathUtils.clamp(p.x, -clampValue, clampValue),
       0,
-      THREE.MathUtils.clamp(p.z, -roomClamp, roomClamp)
+      THREE.MathUtils.clamp(p.z, -clampValue, clampValue)
     );
   }
 
@@ -495,4 +504,5 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
 
   return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
 }
+
 

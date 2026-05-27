@@ -8,17 +8,22 @@ export function installSvrPortalWalkthrough({
   setStatus = ()=>{},
   log = ()=>{}
 } = {}){
-  if (!scene || !camera) return { update:()=>{} };
+  if (!scene || !camera) return { update:()=>{}, enterNearest:()=>false };
 
-  const portals = [
-    { key:"lobby",   label:"LOBBY",   x:0.0,   z:7.4,  color:0x7fffdc },
-    { key:"seat",    label:"SEAT",    x:0.0,   z:2.5,  color:0xd7b8ff },
-    { key:"reiki",   label:"REIKI",   x:6.8,   z:3.8,  color:0x46e3c8 },
-    { key:"pga",     label:"PGA",     x:-6.8,  z:3.8,  color:0x48a6ff },
-    { key:"legends", label:"LEGEND",  x:-6.8,  z:-4.2, color:0xb987ff },
-    { key:"sponsor", label:"SPONSOR", x:0.0,   z:8.8,  color:0xf6d365 },
-    { key:"scorpion",label:"SCORPION",x:6.8,   z:-4.2, color:0xff4ab8 }
+  const portalDefs = [
+    { key:"lobby",    label:"LOBBY",    x:0.0,   z:7.4,  color:0x7fffdc },
+    { key:"seat",     label:"SEAT",     x:0.0,   z:2.6,  color:0xd7b8ff },
+    { key:"reiki",    label:"REIKI",    x:6.8,   z:3.8,  color:0x46e3c8 },
+    { key:"pga",      label:"PGA",      x:-6.8,  z:3.8,  color:0x48a6ff },
+    { key:"legends",  label:"LEGEND",   x:-6.8,  z:-4.2, color:0xb987ff },
+    { key:"sponsor",  label:"SPONSOR",  x:0.0,   z:8.8,  color:0xf6d365 },
+    { key:"scorpion", label:"SCORPION", x:6.8,   z:-4.2, color:0xff4ab8 }
   ];
+
+  if (scene.getObjectByName("SVR_PHYSICAL_PORTAL_SYSTEM")) {
+    log("[SVR portal] already installed");
+    return window.SVR_PORTALS_RUNTIME || { update:()=>{}, enterNearest:()=>false };
+  }
 
   const root = new THREE.Group();
   root.name = "SVR_PHYSICAL_PORTAL_SYSTEM";
@@ -35,12 +40,12 @@ export function installSvrPortalWalkthrough({
     canvas.height = 160;
     const ctx = canvas.getContext("2d");
 
-    ctx.clearRect(0,0,512,160);
+    ctx.clearRect(0, 0, 512, 160);
     ctx.font = "bold 44px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#" + color.toString(16).padStart(6,"0");
-    ctx.shadowColor = "rgba(190,120,255,.85)";
+    ctx.shadowColor = "rgba(190,120,255,.90)";
     ctx.shadowBlur = 18;
     ctx.fillText(label, 256, 78);
 
@@ -68,7 +73,7 @@ export function installSvrPortalWalkthrough({
       new THREE.MeshBasicMaterial({
         color: def.color,
         transparent: true,
-        opacity: .22,
+        opacity: .24,
         depthWrite: false
       })
     );
@@ -79,7 +84,7 @@ export function installSvrPortalWalkthrough({
       new THREE.MeshBasicMaterial({
         color: def.color,
         transparent: true,
-        opacity: .88,
+        opacity: .92,
         depthWrite: false
       })
     );
@@ -99,7 +104,7 @@ export function installSvrPortalWalkthrough({
     portalObjects.push(rec);
   }
 
-  portals.forEach(makePortal);
+  portalDefs.forEach(makePortal);
 
   function getHeadPosition(){
     if (renderer?.xr?.isPresenting){
@@ -119,6 +124,7 @@ export function installSvrPortalWalkthrough({
 
     try {
       const ok = gotoScene(rec.key);
+
       if (ok !== false) {
         setStatus(`Portal: ${rec.label}`, { force:true });
         log("[SVR portal] entered", rec.key, reason);
@@ -160,10 +166,10 @@ export function installSvrPortalWalkthrough({
       rec.ring.rotation.z += 1.6 * dt;
 
       if (d < 2.15){
-        rec.pad.material.opacity = .46;
+        rec.pad.material.opacity = .50;
         rec.glow.intensity = 1.6;
       } else {
-        rec.pad.material.opacity = .22;
+        rec.pad.material.opacity = .24;
         rec.glow.intensity = 0.0;
       }
 
@@ -182,6 +188,8 @@ export function installSvrPortalWalkthrough({
     }
   }
 
+  const runtime = { update, enterNearest };
+  window.SVR_PORTALS_RUNTIME = runtime;
   window.SVR_PORTALS = {
     enterNearest,
     enter:key=>enterPortal(portalObjects.find(p=>p.key===key), "api"),
@@ -189,5 +197,5 @@ export function installSvrPortalWalkthrough({
   };
 
   log("[SVR portal] physical portal system installed:", portalObjects.map(p=>p.key).join(", "));
-  return { update, enterNearest };
+  return runtime;
 }
