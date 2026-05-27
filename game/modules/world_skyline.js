@@ -546,68 +546,59 @@ function buildLobbySprites(scene, R, wallHeight){
 }
 
 
+async async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log){
+  // PHASE-87: original-lobby-only portal marker.
+  // No second lobby, no room shell, no extra walls, no unapproved Reiki sponsor/founder branding.
+  const angle = 0;
+  const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
+  const right = new THREE.Vector3(Math.sin(angle), 0, -Math.cos(angle));
+  const center = new THREE.Vector3(Math.cos(angle) * (R - 3.2), 0.01, Math.sin(angle) * (R - 3.2));
 
-function createLobbyPortalTexture(title, subtitle, colorA = '#10101a', colorB = '#3d1b72'){
-  return canvasTexture(1024, 512, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, colorA);
-    g.addColorStop(1, colorB);
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(190,150,255,0.92)';
-    x.lineWidth = 12; roundRectPath(x, 18, 18, w-36, h-36, 34); x.stroke();
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#ffffff'; x.font = 'bold 86px system-ui, Arial'; x.fillText(title, w/2, 190);
-    x.fillStyle = '#d6fff3'; x.font = 'bold 34px system-ui, Arial'; x.fillText(subtitle, w/2, 292);
-    x.fillStyle = 'rgba(255,255,255,0.72)'; x.font = '26px system-ui, Arial'; x.fillText('PORTAL MARKER ONLY — PRIVATE SCENE ROUTE', w/2, 372);
-  });
-}
-
-function addThinLobbyPortal(scene, center, inward, title, subtitle, accent = 0xb48cff){
   const root = new THREE.Group();
   root.position.copy(center);
   root.lookAt(root.position.clone().add(inward));
   scene.add(root);
 
-  const base = new THREE.Mesh(
-    new THREE.BoxGeometry(4.8, 0.08, 1.05),
-    new THREE.MeshStandardMaterial({ color: 0x0a0b10, roughness: 0.82, metalness: 0.10, emissive: accent, emissiveIntensity: 0.08 })
-  );
-  base.position.set(0, 0.04, 0.0);
-  root.add(base);
-
-  const ring = new THREE.Mesh(
-    new THREE.RingGeometry(0.72, 1.02, 64),
-    new THREE.MeshBasicMaterial({ color: accent, transparent: true, opacity: 0.42, side: THREE.DoubleSide, depthWrite: false })
-  );
-  ring.rotation.x = -Math.PI * 0.5;
-  ring.position.set(0, 0.08, 0.20);
-  root.add(ring);
-
+  const signTex = createSponsorPlateTexture("REIKI HUB", "AWAITING APPROVAL • PRIVATE ROOM PORTAL");
   const sign = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.55, 2.2),
-    new THREE.MeshBasicMaterial({ map: createLobbyPortalTexture(title, subtitle), transparent: true, side: THREE.DoubleSide, depthWrite: false })
+    new THREE.PlaneGeometry(4.6, 1.05),
+    new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide, depthWrite: false })
   );
-  sign.position.set(0, 2.15, -0.46);
+  sign.position.set(0, 2.55, 0.10);
   root.add(sign);
 
-  const glow = new THREE.PointLight(accent, 0.85, 7.5, 2.0);
-  glow.position.set(0, 1.35, 0.45);
-  root.add(glow);
-  return root;
-}
+  const slimFrame = new THREE.Mesh(
+    new THREE.TorusGeometry(1.15, 0.035, 12, 80),
+    new THREE.MeshBasicMaterial({ color: 0x74ffd8, transparent: true, opacity: 0.82, depthWrite: false })
+  );
+  slimFrame.rotation.x = Math.PI * 0.5;
+  slimFrame.position.set(0, 0.055, 1.05);
+  root.add(slimFrame);
 
-async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log){
-  const angle = 0;
-  const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
-  const center = new THREE.Vector3(Math.cos(angle) * (R - 4.05), 0.01, Math.sin(angle) * (R - 4.05));
-  addThinLobbyPortal(scene, center, inward, 'REIKI HUB', 'AWAITING APPROVAL • PRIVATE ROOM', 0x7fffd4);
-  const hubTarget = center.clone().addScaledVector(inward, 3.2).setY(0);
-  const roomTarget = center.clone().addScaledVector(inward, 1.3).setY(0);
+  const marker = new THREE.Mesh(
+    new THREE.CircleGeometry(0.92, 48),
+    new THREE.MeshBasicMaterial({ color: 0x25ff9e, transparent: true, opacity: 0.12, depthWrite: false, side: THREE.DoubleSide })
+  );
+  marker.rotation.x = -Math.PI * 0.5;
+  marker.position.set(0, 0.025, 1.05);
+  root.add(marker);
+
+  if (spawnLogoTex){
+    const logo = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.9, 0.9),
+      new THREE.MeshBasicMaterial({ map: spawnLogoTex, transparent: true, side: THREE.DoubleSide, depthWrite: false })
+    );
+    logo.position.set(0, 1.42, 0.12);
+    root.add(logo);
+  }
+
+  const hubTarget = center.clone().addScaledVector(inward, 3.2);
+  const roomTarget = center.clone().addScaledVector(inward, 4.25).addScaledVector(right, 0.0);
   return {
     center: center.clone(),
     target: hubTarget,
     roomTarget,
-    look: center.clone().addScaledVector(inward, -2.0).setY(1.6)
+    look: center.clone().addScaledVector(inward, -1.0)
   };
 }
 
@@ -866,123 +857,31 @@ function createHologramSilhouette(kind = "legend"){
   return group;
 }
 function buildLegendHall(scene, R, wallHeight, log = console.log){
+  // PHASE-87: lightweight Legend marker only. No lobby-within-lobby hall.
   const group = new THREE.Group();
-  const center = new THREE.Vector3(-R * 0.46, 0, -R * 0.36);
+  const angle = -Math.PI * 0.75;
+  const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
+  const center = new THREE.Vector3(Math.cos(angle) * (R - 2.6), 0, Math.sin(angle) * (R - 2.6));
   group.position.copy(center);
+  group.lookAt(group.position.clone().add(inward));
   scene.add(group);
 
-  const base = new THREE.Mesh(
-    new THREE.BoxGeometry(11.0, 0.18, 6.4),
-    new THREE.MeshStandardMaterial({ color: 0x10141d, roughness: 0.78, metalness: 0.12, emissive: 0x0a0f1a, emissiveIntensity: 0.12 })
+  const plaque = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.2, 0.95),
+    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture("LEGEND HUB", "PORTAL MARKER • NO ROOM SHELL"), transparent: true, side: THREE.DoubleSide, depthWrite: false })
   );
-  base.position.y = 0.09;
-  group.add(base);
+  plaque.position.set(0, 2.35, 0.08);
+  group.add(plaque);
 
-  const trim = new THREE.Mesh(
-    new THREE.BoxGeometry(11.2, 0.08, 6.6),
-    new THREE.MeshStandardMaterial({ color: 0x7b57ff, roughness: 0.22, metalness: 0.34, emissive: 0x5521ff, emissiveIntensity: 0.95 })
+  const glow = new THREE.Mesh(
+    new THREE.RingGeometry(0.82, 1.02, 64),
+    new THREE.MeshBasicMaterial({ color: 0xb48cff, transparent: true, opacity: 0.55, side: THREE.DoubleSide, depthWrite: false })
   );
-  trim.position.y = 0.22;
-  group.add(trim);
+  glow.rotation.x = -Math.PI * 0.5;
+  glow.position.set(0, 0.035, 0.9);
+  group.add(glow);
 
-  const backWall = new THREE.Mesh(
-    new THREE.PlaneGeometry(10.2, 5.8),
-    new THREE.MeshStandardMaterial({ color: 0x0b1018, roughness: 0.82, metalness: 0.08, emissive: 0x091120, emissiveIntensity: 0.12, side: THREE.DoubleSide })
-  );
-  backWall.position.set(0, 3.05, -3.16);
-  group.add(backWall);
-
-  const titleTex = createPlaqueTexture("game legends", "hall of fame top 10");
-  const title = new THREE.Mesh(
-    new THREE.PlaneGeometry(5.8, 1.46),
-    new THREE.MeshBasicMaterial({ map: titleTex, transparent: true, side: THREE.DoubleSide })
-  );
-  title.position.set(0, 5.00, -3.05);
-  group.add(title);
-
-  const pedX = [-2.9, 0, 2.9];
-  const labels = ["character model", "scarlett vr", "animated model"];
-  const holoGroups = [];
-  pedX.forEach((xPos, idx)=>{
-    const pedestal = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.86, 0.98, 1.08, 24),
-      new THREE.MeshStandardMaterial({ color: 0x171b22, roughness: 0.65, metalness: 0.24, emissive: 0x0c1018, emissiveIntensity: 0.16 })
-    );
-    pedestal.position.set(xPos, 0.62, -0.3);
-    group.add(pedestal);
-
-    const cap = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.94, 0.94, 0.06, 28),
-      new THREE.MeshStandardMaterial({ color: 0x8bcfff, roughness: 0.18, metalness: 0.42, emissive: 0x4da9ff, emissiveIntensity: 0.65 })
-    );
-    cap.position.set(xPos, 1.18, -0.3);
-    group.add(cap);
-
-    const plaqueTex = createPlaqueTexture(labels[idx], "reserved display");
-    const plaque = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.2, 0.62),
-      new THREE.MeshBasicMaterial({ map: plaqueTex, transparent: true, side: THREE.DoubleSide })
-    );
-    plaque.position.set(xPos, 0.72, 0.82);
-    plaque.rotation.x = -0.42;
-    group.add(plaque);
-
-    const holo = createHologramSilhouette(labels[idx]);
-    holo.position.set(xPos, 1.2, -0.3);
-    group.add(holo);
-    holoGroups.push(holo);
-
-    const spot = new THREE.SpotLight(0xe7f1ff, 13.5, 18, Math.PI * 0.16, 0.26, 1.4);
-    spot.position.set(xPos, 6.2, 1.2);
-    spot.target.position.set(xPos, 1.2, -0.3);
-    spot.castShadow = false;
-    group.add(spot);
-    group.add(spot.target);
-  });
-
-  const postMat = new THREE.MeshStandardMaterial({ color: 0xaab5c8, roughness: 0.32, metalness: 0.55, emissive: 0x1b2432, emissiveIntensity: 0.22 });
-  const ropeMat = new THREE.MeshStandardMaterial({ color: 0x6e4dff, roughness: 0.34, metalness: 0.14, emissive: 0x4522d0, emissiveIntensity: 0.88 });
-  const railPts = [
-    new THREE.Vector3(-4.75, 0, 1.7),
-    new THREE.Vector3( 4.75, 0, 1.7),
-    new THREE.Vector3( 5.2, 0, -2.15),
-    new THREE.Vector3(-5.2, 0, -2.15)
-  ];
-  railPts.forEach((p)=>{
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.09, 1.08, 16), postMat);
-    post.position.copy(p).add(new THREE.Vector3(0, 0.54, 0));
-    group.add(post);
-  });
-  function addRope(a,b,y){
-    const dir = new THREE.Vector3().subVectors(b,a);
-    const len = dir.length();
-    const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, len, 12), ropeMat);
-    rope.position.copy(a).lerp(b, 0.5).add(new THREE.Vector3(0, y, 0));
-    rope.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.clone().normalize());
-    group.add(rope);
-  }
-  for (let i = 0; i < railPts.length; i++){
-    const a = railPts[i];
-    const b = railPts[(i + 1) % railPts.length];
-    addRope(a,b,0.78);
-    addRope(a,b,0.54);
-  }
-
-  const blocker = new THREE.Mesh(
-    new THREE.BoxGeometry(10.8, 0.18, 0.52),
-    new THREE.MeshStandardMaterial({ color: 0x111722, roughness: 0.76, metalness: 0.08, emissive: 0x0d1220, emissiveIntensity: 0.10 })
-  );
-  blocker.position.set(0, 0.09, 1.96);
-  group.add(blocker);
-
-  const fillA = new THREE.PointLight(0x9a7cff, 5.4, 30, 2.0);
-  fillA.position.set(-2.8, 3.8, -1.0);
-  group.add(fillA);
-  const fillB = new THREE.PointLight(0x89d8ff, 5.0, 30, 2.0);
-  fillB.position.set(2.8, 3.8, -1.0);
-  group.add(fillB);
-
-  return { group, holoGroups };
+  return { group, holoGroups: [] };
 }
 
 function buildAlignedLegendHall(scene, R, wallHeight, log = console.log){
@@ -1057,162 +956,83 @@ function chooseBestWallFacingY(obj){
 }
 
 function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
+  // PHASE-87: slim VR Store portal/kiosk only. No extra wall shell.
   const group = new THREE.Group();
   const angle = -Math.PI * 0.25;
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
-  const center = new THREE.Vector3(Math.cos(angle) * (R - 0.54), wallHeight * 0.5, Math.sin(angle) * (R - 0.54));
+  const center = new THREE.Vector3(Math.cos(angle) * (R - 2.7), 0, Math.sin(angle) * (R - 2.7));
   group.position.copy(center);
-  group.rotation.y = Math.atan2(inward.x, inward.z);
+  group.lookAt(group.position.clone().add(inward));
   scene.add(group);
 
-  const wallFrame = new THREE.Mesh(
-    new THREE.BoxGeometry(8.6, wallHeight - 0.5, 0.22),
-    new THREE.MeshStandardMaterial({ color: 0x0c1118, roughness: 0.72, metalness: 0.16, emissive: 0x101a2b, emissiveIntensity: 0.16 })
+  const sign = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.9, 1.08),
+    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture("SVR STORE PORTAL", "https://svrpoker.com/site/store.html"), transparent: true, side: THREE.DoubleSide, depthWrite: false })
   );
-  group.add(wallFrame);
+  sign.position.set(0, 2.55, 0.10);
+  group.add(sign);
 
-  const signX = -2.28;
-  const signZ = 0.12;
-  const modelX = 2.18;
-
-  const signPanel = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.25, wallHeight - 1.25),
-    new THREE.MeshStandardMaterial({ color: 0x060a12, roughness: 0.72, metalness: 0.12, emissive: 0x0e1730, emissiveIntensity: 0.24, side: THREE.DoubleSide })
+  const kiosk = new THREE.Mesh(
+    new THREE.BoxGeometry(1.05, 1.42, 0.10),
+    new THREE.MeshStandardMaterial({ color: 0x111722, roughness: 0.54, metalness: 0.18, emissive: 0x18243d, emissiveIntensity: 0.22 })
   );
-  signPanel.position.set(signX, 0.0, 0.105);
-  group.add(signPanel);
-
-  const storeTex = createStoreDisplayTexture();
-  const screen = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.0, wallHeight - 1.55),
-    new THREE.MeshBasicMaterial({ map: storeTex, side: THREE.DoubleSide })
-  );
-  screen.position.set(signX, -0.02, signZ);
-  group.add(screen);
-
-
-  const plaqueTex = createPlaqueTexture("store wall", "north east");
-  const plaque = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.8, 0.84),
-    new THREE.MeshBasicMaterial({ map: plaqueTex, transparent: true, side: THREE.DoubleSide })
-  );
-  plaque.position.set(signX, wallHeight * 0.39, 0.14);
-  group.add(plaque);
+  kiosk.position.set(0, 0.92, 0.16);
+  group.add(kiosk);
 
   if (spawnLogoTex){
     const logo = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.3, 1.3),
+      new THREE.PlaneGeometry(0.66, 0.66),
       new THREE.MeshBasicMaterial({ map: spawnLogoTex, transparent: true, side: THREE.DoubleSide, depthWrite: false })
     );
-    logo.position.set(signX, wallHeight * 0.18, 0.16);
+    logo.position.set(0, 1.26, 0.23);
     group.add(logo);
   }
 
-  const displayPanel = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.6, wallHeight - 1.32),
-    new THREE.MeshStandardMaterial({ color: 0x070d14, roughness: 0.78, metalness: 0.08, emissive: 0x121c2f, emissiveIntensity: 0.22, side: THREE.DoubleSide })
+  const portal = new THREE.Mesh(
+    new THREE.RingGeometry(0.72, 0.92, 64),
+    new THREE.MeshBasicMaterial({ color: 0x8edcff, transparent: true, opacity: 0.60, side: THREE.DoubleSide, depthWrite: false })
   );
-  displayPanel.position.set(modelX, 0.02, 0.085);
-  group.add(displayPanel);
-
-  const spotA = new THREE.SpotLight(0x9fdcff, 8.5, 24, Math.PI * 0.18, 0.28, 1.3);
-  spotA.position.set(-1.7, wallHeight * 0.86, 3.2);
-  spotA.target.position.set(signX, wallHeight * 0.20, 0.18);
-  group.add(spotA);
-  group.add(spotA.target);
-  const spotB = new THREE.SpotLight(0xc191ff, 9.0, 26, Math.PI * 0.20, 0.24, 1.2);
-  spotB.position.set(1.9, wallHeight * 0.86, 3.2);
-  spotB.target.position.set(modelX, wallHeight * 0.12, 0.18);
-  group.add(spotB);
-  group.add(spotB.target);
-  const modelFill = new THREE.PointLight(0x8fd6ff, 3.4, 16, 2.0);
-  modelFill.position.set(modelX, wallHeight * 0.35, 1.2);
-  group.add(modelFill);
-
-  const modelMount = new THREE.Group();
-  modelMount.position.set(modelX, -(wallHeight * 0.5) + 0.02, 1.10);
-  group.add(modelMount);
-
-  const kioskShell = new THREE.Group();
-  const kioskBody = new THREE.Mesh(
-    new THREE.BoxGeometry(1.34, 2.22, 0.54),
-    new THREE.MeshStandardMaterial({ color: 0x121722, roughness: 0.46, metalness: 0.22, emissive: 0x18243d, emissiveIntensity: 0.26 })
-  );
-  kioskBody.position.y = 1.11;
-  kioskShell.add(kioskBody);
-  const kioskScreen = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.92, 1.36),
-    new THREE.MeshBasicMaterial({ map: storeTex, side: THREE.DoubleSide })
-  );
-  kioskScreen.position.set(0, 1.18, 0.275);
-  kioskShell.add(kioskScreen);
-  const kioskTrim = new THREE.Mesh(
-    new THREE.BoxGeometry(1.02, 1.46, 0.05),
-    new THREE.MeshStandardMaterial({ color: 0xa6dfff, roughness: 0.24, metalness: 0.42, emissive: 0x3d7fff, emissiveIntensity: 0.45 })
-  );
-  kioskTrim.position.set(0, 1.18, 0.26);
-  kioskShell.add(kioskTrim);
-  modelMount.add(kioskShell);
-
-  (async ()=>{
-    let storeModel = await tryLoadGLTF(assetUrls("models/store.glb", "store.glb"), ()=>{}, 9000);
-    if (!storeModel) storeModel = await tryLoadFBX(assetUrls("models/store.fbx", "store.fbx"), ()=>{}, 10000);
-    if (!storeModel) return;
-    touchModelShadows(storeModel);
-    orientCharacterUpright(storeModel);
-    scaleToHeight(storeModel, 2.70);
-    fitDiameter(storeModel, 2.10);
-    storeModel.rotation.set(0, 0, 0);
-    let info = boxSize(storeModel);
-    storeModel.position.set(-info.center.x, -info.box.min.y, -info.center.z + 0.10);
-    info = boxSize(storeModel);
-    storeModel.position.x -= info.center.x * 0.02;
-    storeModel.traverse((child)=>{ if (child.isMesh && child.material){ child.material.emissive = new THREE.Color(0x101828); child.material.emissiveIntensity = 0.06; } });
-    kioskShell.visible = false;
-    modelMount.add(storeModel);
-  })().catch(()=>{});
-
-  const activeBtn = new THREE.Mesh(
-    new THREE.BoxGeometry(0.9, 0.22, 0.08),
-    new THREE.MeshStandardMaterial({ color: 0x8b1e2f, roughness: 0.45, metalness: 0.18, emissive: 0x5a0b18, emissiveIntensity: 0.9 })
-  );
-  activeBtn.position.set(signX, 0.72, 0.20);
-  group.add(activeBtn);
-
-
-  const adTex = createSponsorPlateTexture('AWAITING APPROVAL', 'future sponsor slot');
-  const adHeader = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.26, 0.56),
-    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('SPONSOR SLOT', 'awaiting approval'), transparent: true, side: THREE.DoubleSide })
-  );
-  adHeader.position.set(modelX, wallHeight * 0.39, 0.18);
-  group.add(adHeader);
-
-  const adBillboard = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.42, 4.30),
-    new THREE.MeshBasicMaterial({ map: adTex, transparent: true, side: THREE.DoubleSide })
-  );
-  adBillboard.position.set(modelX, -0.20, 0.15);
-  group.add(adBillboard);
-
-  const activePlaque = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.8, 0.5),
-    new THREE.MeshBasicMaterial({ map: createPlaqueTexture("active", "store entry"), transparent: true, side: THREE.DoubleSide })
-  );
-  activePlaque.position.set(signX, 1.04, 0.18);
-  group.add(activePlaque);
+  portal.rotation.x = -Math.PI * 0.5;
+  portal.position.set(0, 0.035, 1.10);
+  group.add(portal);
 
   return { group };
 }
 
 function addScorpionRoom(scene, R, wallHeight){
+  // PHASE-87: Scorpion is a portal marker only. The full poker room must stay private.
   const angle = Math.PI * 0.24;
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
-  const center = new THREE.Vector3(Math.cos(angle) * (R - 4.6), 0.01, Math.sin(angle) * (R - 4.6));
-  addThinLobbyPortal(scene, center, inward, 'SCORPION', 'PRIVATE POKER ROOM', 0xff7fd0);
+  const center = new THREE.Vector3(Math.cos(angle) * (R - 3.1), 0, Math.sin(angle) * (R - 3.1));
+
+  const root = new THREE.Group();
+  root.position.copy(center);
+  root.lookAt(root.position.clone().add(inward));
+  scene.add(root);
+
+  const sign = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.9, 1.08),
+    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture("SCORPION POKER", "PRIVATE ROOM PORTAL • NO LOBBY WALLS"), transparent: true, side: THREE.DoubleSide, depthWrite: false })
+  );
+  sign.position.set(0, 2.55, 0.10);
+  root.add(sign);
+
+  const portal = new THREE.Mesh(
+    new THREE.RingGeometry(0.78, 1.05, 64),
+    new THREE.MeshBasicMaterial({ color: 0xff70c9, transparent: true, opacity: 0.68, side: THREE.DoubleSide, depthWrite: false })
+  );
+  portal.rotation.x = -Math.PI * 0.5;
+  portal.position.set(0, 0.035, 1.12);
+  root.add(portal);
+
+  const glow = new THREE.PointLight(0xff70c9, 1.2, 8, 2.0);
+  glow.position.set(0, 1.3, 0.9);
+  root.add(glow);
+
   return {
-    target: center.clone().add(inward.clone().multiplyScalar(2.0)).setY(0),
-    look: center.clone().setY(1.6)
+    group: root,
+    target: center.clone().add(inward.clone().multiplyScalar(2.8)).setY(0),
+    look: center.clone().setY(1.5)
   };
 }
 
@@ -1231,7 +1051,7 @@ function buildOuterCity(scene, R){
   const matrix = createMatrixBillboardTexture();
   const billboardUpdaters = [matrix.update];
   const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
-  const zenTex = createSponsorPlateTexture('AWAITING APPROVAL', 'SVR sponsor placeholder');
+  const zenTex = loadUiTexture('./assets/ui/approval-pending-zen-ad.jpg');
 
   const count = 68;
   const adIndices = new Set([4, 11, 20, 28, 36, 44, 52, 60]);
@@ -1323,7 +1143,7 @@ function buildOuterCity(scene, R){
               ctx.fillText("AWAITING APPROVAL", w2 / 2, 94);
               ctx.fillStyle = "#7bffb7";
               ctx.font = "700 50px system-ui, Arial";
-              ctx.fillText("SVR sponsor placeholder • modular slot", w2 / 2, 178);
+              ctx.fillText("Founder-led Reiki • Meditation • Wellness", w2 / 2, 178);
             }),
             transparent: true,
             side: THREE.DoubleSide,
@@ -1980,14 +1800,23 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const chairMat = new THREE.MeshStandardMaterial({ map: chairTex, color: 0xffffff, roughness: 0.62, metalness: 0.12, emissive: 0x12081a, emissiveIntensity: 0.10 });
   const metalMat = new THREE.MeshStandardMaterial({ color: 0x272a31, roughness: 0.35, metalness: 0.55, emissive: 0x0e1016, emissiveIntensity: 0.08 });
   const faceCenter = (x, z)=> Math.atan2(-x, -z);
+  // PHASE-86: front/south chair removed for Quest sightline.
+  // Keep a virtual open player seat at the same south/front position so Seat jump and poker anchors remain stable.
   const seats = [
     makeSeat(scene, 0, -2.48, faceCenter(0, -2.48), "North Edge", chairMat, metalMat),
     makeSeat(scene, -2.28, -1.02, faceCenter(-2.28, -1.02), "Left Front", chairMat, metalMat),
     makeSeat(scene, -2.28, 1.02, faceCenter(-2.28, 1.02), "Left Back", chairMat, metalMat),
-    makeSeat(scene, 0, 2.48, faceCenter(0, 2.48), "South Edge", chairMat, metalMat),
+    { x: 0, z: 2.48, angle: faceCenter(0, 2.48), label: "Open Player Seat", ring: new THREE.Mesh(
+      new THREE.RingGeometry(0.64, 0.71, 48),
+      new THREE.MeshBasicMaterial({ color: 0x56ffcf, transparent: true, opacity: 0.34, side: THREE.DoubleSide, depthWrite: false })
+    ), group: null, openPlayerSeat: true },
     makeSeat(scene, 2.28, -1.02, faceCenter(2.28, -1.02), "Right Front", chairMat, metalMat),
     makeSeat(scene, 2.28, 1.02, faceCenter(2.28, 1.02), "Right Back", chairMat, metalMat)
   ];
+  seats[3].ring.rotation.x = -Math.PI / 2;
+  seats[3].ring.position.set(0, 0.018, 2.48);
+  seats[3].ring.renderOrder = 7;
+  scene.add(seats[3].ring);
 
   const feltTex = await loadFirstTexture(assetUrls("texture/tablefelt.png"), { colorSpace: THREE.SRGBColorSpace });
   let tableTopY = 0.905;
@@ -2141,27 +1970,30 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       wallHeight + 72.0 + Math.sin(t * 0.018) * 0.22,
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
+    // PHASE-86 celestial lock: keep Moon high, visible, and away from buildings.
     moon.position.set(
-      -44 + Math.sin(t * 0.020) * 5.0,
-      wallHeight + 44.0 + Math.sin(t * 0.090) * 1.4,
-      -(R + 128.0) + Math.cos(t * 0.016) * 6.0
+      -38 + Math.sin(t * 0.018) * 3.5,
+      wallHeight + 68.0 + Math.sin(t * 0.050) * 0.8,
+      -(R + 176.0) + Math.cos(t * 0.012) * 3.0
     );
+    moon.visible = true;
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
+    // PHASE-86 celestial lock: keep Mars high, visible, and away from buildings.
     mars.position.set(
-      68 + Math.sin(t * 0.016 + 1.4) * 6.5,
-      wallHeight + 52.0 + Math.sin(t * 0.070 + 0.8) * 1.2,
-      -(R + 154.0) + Math.cos(t * 0.012 + 0.4) * 5.0
+      54 + Math.sin(t * 0.014 + 1.4) * 4.0,
+      wallHeight + 76.0 + Math.sin(t * 0.045 + 0.8) * 0.8,
+      -(R + 202.0) + Math.cos(t * 0.010 + 0.4) * 3.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.045 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.070 + 0.014 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.026 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.050 + 0.014 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{

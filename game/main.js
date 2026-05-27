@@ -13,7 +13,6 @@ const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_LOBBY_PHASE = { build: "PHASE-85-LOBBY-EDIT-UNLOCK", editable: true, mode: "targeted-game-lobby-edits", singleLobby: true };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -89,7 +88,7 @@ const audio = createAudioPlaylist({
       setStatus(`Now Playing: ${state.trackTitle}`);
       return;
     }
-    setStatus("Audio disabled for lobby edit unlock phase");
+    setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
   }
 });
 
@@ -182,7 +181,9 @@ $sceneButtons.forEach((btn)=>{
 
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
-    if (e.code === "KeyJ") joinTable();
+  if (e.code === "KeyM") await audio.toggle();
+  if (e.code === "KeyN") await audio.next();
+  if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
   if (e.code === "Digit1") gotoScene("lobby");
@@ -200,7 +201,7 @@ const watch = createWristWatch({
   renderer,
   getState: ()=>({
     audioEnabled: audio.getState().enabled,
-    trackTitle: "Audio Disabled",
+    trackTitle: audio.getState().trackTitle || "Lobby 07",
     cash,
     seated,
     inTableZone: inTableZone(),
@@ -208,18 +209,20 @@ const watch = createWristWatch({
     teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
   }),
   actions: {
-    toggleAudio: ()=>false,
-    nextTrack: ()=>false,
+    toggleAudio: ()=>audio.toggle(),
+    nextTrack: ()=>audio.next(),
     joinTable,
     leaveTable,
     toggleTeleport: ()=>tp.toggleMode(),
     goLobby: ()=>gotoScene("lobby"),
+    goTable: ()=>gotoScene("table"),
     goSeat: ()=>gotoScene("seat"),
     goReiki: ()=>gotoScene("reiki"),
     goPga: ()=>gotoScene("pga"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
+    goReikiRoom: ()=>gotoScene("reikiRoom")
   }
 });
 
@@ -232,7 +235,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Lobby edit phase unlocked. Single original lobby preserved. Desktop scene buttons enabled for Lobby/Seat/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Minor edits only. Wrist quick-jump enabled for Lobby/Seat/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -248,7 +251,8 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
-  // Audio intentionally disabled in Phase 85 lobby edit unlock.
+  await audio.prime();
+  await audio.start();
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
@@ -319,7 +323,8 @@ renderer.setAnimationLoop(()=>{
 
 const canvasEl = renderer.domElement;
 canvasEl.addEventListener("pointerdown", async ()=>{
-  // Audio intentionally disabled in Phase 85 lobby edit unlock.
+  const st = audio.getState();
+  if (!st.enabled) await audio.start();
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();

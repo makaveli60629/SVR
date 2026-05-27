@@ -6,6 +6,7 @@ const SUIT_SYMBOL = { S: "♠", H: "♥", D: "♦", C: "♣" };
 const SUIT_COLOR = { S: "#101218", C: "#101218", H: "#c71f44", D: "#c71f44" };
 const RANK_LABEL = { 14: "A", 13: "K", 12: "Q", 11: "J", 10: "10", 9: "9", 8: "8", 7: "7", 6: "6", 5: "5", 4: "4", 3: "3", 2: "2" };
 const BOT_NAMES = ["BOT NOVA", "BOT VEGA", "BOT ORBIT", "YOU", "BOT ACE", "BOT LUX"];
+const DEAL_DIRECTION = "LEFT_TO_RIGHT";
 const CHIP_PALETTES = [
   [0x7d4dff,0x2bd4ff,0xf2d269],
   [0xff6fb1,0x2bd4ff,0xf2d269],
@@ -408,11 +409,13 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       applyActionHighlight(bbIndex);
     });
 
+    // PHASE-86: deal right-to-left around the table while preserving fixed seat anchors.
+    const dealOrder = handPlayers.map((_, i) => i);
     for (let round = 0; round < 2; round += 1) {
-      for (let i = 0; i < handPlayers.length; i += 1) {
+      for (const seatOrderIndex of dealOrder) {
         t += 0.42;
         schedule(t, () => {
-          const player = handPlayers[i];
+          const player = handPlayers[seatOrderIndex];
           const card = player.cards[round];
           addCard(card, player.anchor.cards[round], 0.46, 1.0);
           current.stage = "deal";
@@ -501,7 +504,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     t += 4.3;
     schedule(t, () => { planHand(); });
     stepIndex = 0;
-    paintStatus(`Shuffling live deck`, `Hand ${handNumber} • real 52-card flow`);
+    paintStatus(`Shuffling live deck`, `Hand ${handNumber} • ${DEAL_DIRECTION} deal flow`);
   }
 
   function orientCardToCamera(mesh) {

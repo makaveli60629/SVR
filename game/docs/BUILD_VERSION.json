@@ -1,8 +1,4 @@
 {
-  "build": "PHASE-85-LOBBY-EDIT-UNLOCK",
-  "scope": "game-only",
-  "siteTouched": false,
-  "lobbyEditable": true,
-  "singleLobby": true,
-  "date": "2026-05-27"
+  "build": "PHASE-87-ORIGINAL-LOBBY-MINOR-EDIT-LOCK",
+  "phase": 87
 }
