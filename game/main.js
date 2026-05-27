@@ -1,4 +1,5 @@
 ﻿import * as THREE from "three";
+import { applyPhase263AssetFallbacks } from "./modules/phase263_asset_fallbacks.js?v=phase263-asset-fallback-render";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -8,12 +9,12 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createStoreKioskInteraction } from "./modules/store_kiosk_interaction.js";
-import "./modules/optional_module_loader.js?v=phase262-poker-table-readability";
-import "./modules/phase260_safe_interaction_loader.js?v=phase262-poker-table-readability";
-import "./modules/phase261_interaction_repair.js?v=phase262-poker-table-readability";
-import "./modules/phase262_poker_table_readability_lock.js?v=phase262-poker-table-readability";
-const BUILD_LABEL = "PHASE-262-POKER-RIGHT-DEAL-TABLE-READABILITY-LOCK";
-const BUILD_PHASE = 262;
+import "./modules/optional_module_loader.js?v=phase263-asset-fallback-render";
+import "./modules/phase260_safe_interaction_loader.js?v=phase263-asset-fallback-render";
+import "./modules/phase261_interaction_repair.js?v=phase263-asset-fallback-render";
+import "./modules/phase262_poker_table_readability_lock.js?v=phase263-asset-fallback-render";
+const BUILD_LABEL = "PHASE-263-MISSING-ASSET-FALLBACK-LOBBY-RENDER-LOCK";
+const BUILD_PHASE = 263;
 window.SVR_MAIN_RUNTIME_STATE = { build: BUILD_LABEL, phase: BUILD_PHASE, startedAt: new Date().toISOString(), animationErrors: 0, lastAnimationError: null };
 
 const params = new URLSearchParams(location.search);
@@ -85,6 +86,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
 setStatus("Loading worldâ€¦", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
+applyPhase263AssetFallbacks(scene);
 if (window.SVR_POKER_TABLE_READABILITY) window.SVR_POKER_TABLE_READABILITY.alignPoker(scene);
 if (window.SVR_ALIGNMENT) window.SVR_ALIGNMENT.alignScene(scene);
 if (window.SVR_CHIP_PHYSICS) window.SVR_CHIP_PHYSICS.scan(scene);
@@ -459,6 +461,8 @@ canvasEl.addEventListener("webglcontextlost", (e)=>{
   setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
+
 
 
 

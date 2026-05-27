@@ -4,8 +4,8 @@
  * One failed optional module must not black-screen the lobby.
  */
 (function(){
-  const BUILD = "PHASE-262-POKER-RIGHT-DEAL-TABLE-READABILITY-LOCK";
-  const TAG = "phase262-poker-table-readability";
+  const BUILD = "PHASE-263-MISSING-ASSET-FALLBACK-LOBBY-RENDER-LOCK";
+  const TAG = "phase263-asset-fallback-render";
 
   const modules = [
     "./phase255_control_lock.js",
@@ -87,6 +87,7 @@
 
   emit("svr_phase260_safe_loader_ready", state);
 })();
+
 
 
 

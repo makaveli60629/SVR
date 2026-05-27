@@ -4,7 +4,7 @@
  * Loads after game ready; does not block boot.
  */
 (function(){
-  const BUILD = "PHASE-262-POKER-RIGHT-DEAL-TABLE-READABILITY-LOCK";
+  const BUILD = "PHASE-263-MISSING-ASSET-FALLBACK-LOBBY-RENDER-LOCK";
 
   const state = {
     build: BUILD,
@@ -197,4 +197,5 @@
 
   emit("svr_phase261_interaction_repair_ready", state);
 })();
+
 
