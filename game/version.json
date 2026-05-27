@@ -1,9 +1,9 @@
 ﻿{
-    "build":  "PHASE-260-RUNTIME-SHIELD-SAFE-INTERACTION-LOADER",
+    "build":  "PHASE-261-VR-INTERACTION-REPAIR-LOCK",
     "source":  "direct-game-folder",
     "siteTouched":  false,
-    "previous":  "PHASE-258-KIOSK-VR-EQUIP-ITEMS-LOCK",
-    "next":  "PHASE-261-VR-INTERACTION-REPAIR-LOCK",
-    "fix":  "Safe dynamic interaction loader to stop optional modules from tripping runtime shield before lobby render",
-    "updatedAt":  "2026-05-27T02:32:09Z"
+    "previous":  "PHASE-260-RUNTIME-SHIELD-SAFE-INTERACTION-LOADER",
+    "next":  "PHASE-262-POKER-RIGHT-DEAL-TABLE-READABILITY-LOCK",
+    "fix":  "Safe VR interaction repair bridge",
+    "updatedAt":  "2026-05-27T02:36:53Z"
 }

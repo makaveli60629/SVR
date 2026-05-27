@@ -1,5 +1,5 @@
 ﻿(function(){
-  const BUILD = "PHASE-260-RUNTIME-SHIELD-SAFE-INTERACTION-LOADER";
+  const BUILD = "PHASE-261-VR-INTERACTION-REPAIR-LOCK";
   const modules = [
   "./runtime_crash_shield.js",
   "./safe_event_bus.js",
@@ -9,32 +9,32 @@
   "./boot_route_recovery.js",
   "./boot_route_health.js",
   "./auto_apply_helper.js",
-  "./auto_apply_status.js?v=phase260-safe-interaction-loader",
-  "./auto_apply_verify.js?v=phase260-safe-interaction-loader",
-  "./one_command_deploy_health.js?v=phase260-safe-interaction-loader",
-  "./one_command_runbook.js?v=phase260-safe-interaction-loader",
-  "./post_deploy_checklist.js?v=phase260-safe-interaction-loader",
-  "./tester_launch_card.js?v=phase260-safe-interaction-loader",
-  "./qa_shortcut_index.js?v=phase260-safe-interaction-loader",
-  "./pilot_handoff_card.js?v=phase260-safe-interaction-loader",
-  "./pilot_ready_summary.js?v=phase260-safe-interaction-loader",
-  "./pilot_issue_template.js?v=phase260-safe-interaction-loader",
-  "./pilot_feedback_export.js?v=phase260-safe-interaction-loader",
-  "./power_deploy_watcher.js?v=phase260-safe-interaction-loader",
-  "./power_deploy_wait_log.js?v=phase260-safe-interaction-loader",
-  "./power_deploy_smoke_probe.js?v=phase260-safe-interaction-loader",
-  "./vr_input_spawn_clear_recovery.js?v=phase260-safe-interaction-loader",
-  "./vr_input_diagnostic.js?v=phase260-safe-interaction-loader",
-  "./quest_input_autocalibration.js?v=phase260-safe-interaction-loader",
-  "./hand_teleport_pinch_destination.js?v=phase260-safe-interaction-loader",
-  "./hand_teleport_aim_confirm.js?v=phase260-safe-interaction-loader",
-  "./fire_lightning_theme_panel.js?v=phase260-safe-interaction-loader",
-  "./watch_upright_orientation_panel.js?v=phase260-safe-interaction-loader",
-  "./watch_teleport_conflict_guard.js?v=phase260-safe-interaction-loader",
-  "./deploy_sync_force.js?v=phase260-safe-interaction-loader",
-  "./main_runtime_catch_fix.js?v=phase260-safe-interaction-loader",
-  "./main_import_recovery.js?v=phase260-safe-interaction-loader",
-  "./bridge_alias_recovery.js?v=phase260-safe-interaction-loader",
+  "./auto_apply_status.js?v=phase261-vr-interaction-repair",
+  "./auto_apply_verify.js?v=phase261-vr-interaction-repair",
+  "./one_command_deploy_health.js?v=phase261-vr-interaction-repair",
+  "./one_command_runbook.js?v=phase261-vr-interaction-repair",
+  "./post_deploy_checklist.js?v=phase261-vr-interaction-repair",
+  "./tester_launch_card.js?v=phase261-vr-interaction-repair",
+  "./qa_shortcut_index.js?v=phase261-vr-interaction-repair",
+  "./pilot_handoff_card.js?v=phase261-vr-interaction-repair",
+  "./pilot_ready_summary.js?v=phase261-vr-interaction-repair",
+  "./pilot_issue_template.js?v=phase261-vr-interaction-repair",
+  "./pilot_feedback_export.js?v=phase261-vr-interaction-repair",
+  "./power_deploy_watcher.js?v=phase261-vr-interaction-repair",
+  "./power_deploy_wait_log.js?v=phase261-vr-interaction-repair",
+  "./power_deploy_smoke_probe.js?v=phase261-vr-interaction-repair",
+  "./vr_input_spawn_clear_recovery.js?v=phase261-vr-interaction-repair",
+  "./vr_input_diagnostic.js?v=phase261-vr-interaction-repair",
+  "./quest_input_autocalibration.js?v=phase261-vr-interaction-repair",
+  "./hand_teleport_pinch_destination.js?v=phase261-vr-interaction-repair",
+  "./hand_teleport_aim_confirm.js?v=phase261-vr-interaction-repair",
+  "./fire_lightning_theme_panel.js?v=phase261-vr-interaction-repair",
+  "./watch_upright_orientation_panel.js?v=phase261-vr-interaction-repair",
+  "./watch_teleport_conflict_guard.js?v=phase261-vr-interaction-repair",
+  "./deploy_sync_force.js?v=phase261-vr-interaction-repair",
+  "./main_runtime_catch_fix.js?v=phase261-vr-interaction-repair",
+  "./main_import_recovery.js?v=phase261-vr-interaction-repair",
+  "./bridge_alias_recovery.js?v=phase261-vr-interaction-repair",
   "./bridge_proxy.js",
   "./event_firewall.js",
   "./enterprise_bridge.js",
@@ -51,12 +51,12 @@
   "./test_report_bundle.js",
   "./demo_certification.js",
   "./pilot_testing_ready.js",
-  "./auto_apply_git_wrapper_fix.js?v=phase260-safe-interaction-loader",
-  "./phase260-safe-interaction-loader_forward_restore_manifest.js?v=phase260-safe-interaction-loader"
+  "./auto_apply_git_wrapper_fix.js?v=phase261-vr-interaction-repair",
+  "./phase261-vr-interaction-repair_forward_restore_manifest.js?v=phase261-vr-interaction-repair"
 ];
   const state = {
     build: BUILD,
-    phase: 260,
+    phase: 261,
     status: "LOADING",
     publicPageTouched: false,
     loaded: [],
@@ -169,6 +169,7 @@
   window.dispatchEvent(new CustomEvent("svr_optional_module_loader_ready", { detail: api.snapshot() }));
   loadAll();
 })();
+
 
 
 

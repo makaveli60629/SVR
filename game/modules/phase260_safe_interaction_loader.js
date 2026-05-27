@@ -4,8 +4,8 @@
  * One failed optional module must not black-screen the lobby.
  */
 (function(){
-  const BUILD = "PHASE-260-RUNTIME-SHIELD-SAFE-INTERACTION-LOADER";
-  const TAG = "phase260-safe-interaction-loader";
+  const BUILD = "PHASE-261-VR-INTERACTION-REPAIR-LOCK";
+  const TAG = "phase261-vr-interaction-repair";
 
   const modules = [
     "./phase255_control_lock.js",
@@ -13,7 +13,8 @@
     "./phase257_alignment_lock.js",
     "./phase258_kiosk_equip_lock.js",
     "./phase259_vr_interaction_lock.js"
-  ];
+  ,
+    "./phase261_interaction_repair.js"];
 
   const state = {
     build: BUILD,
@@ -86,3 +87,5 @@
 
   emit("svr_phase260_safe_loader_ready", state);
 })();
+
+
