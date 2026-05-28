@@ -1,0 +1,67 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>SVR Poker • Phase 253 Full Boot Fix</title>
+<meta name="theme-color" content="#050508"/>
+<link rel="manifest" href="./manifest.json"/>
+<style>
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:system-ui,Segoe UI,Arial,sans-serif}
+#app{position:fixed;inset:0}
+#hud{position:fixed;left:12px;right:12px;top:12px;z-index:10;display:flex;gap:10px;justify-content:space-between;pointer-events:none}
+.pill,.btn{border:1px solid rgba(180,140,255,.45);background:rgba(0,0,0,.58);color:#fff;border-radius:999px;padding:8px 12px;font-size:12px}
+.btn{pointer-events:auto;cursor:pointer}
+#sceneNav{position:fixed;left:12px;right:12px;bottom:12px;z-index:12;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.scene-btn{border:1px solid rgba(120,255,186,.42);background:rgba(2,10,8,.72);color:#eafff4;border-radius:999px;padding:8px 12px;cursor:pointer;font-size:12px}
+#log{position:fixed;left:12px;right:12px;bottom:60px;z-index:20;display:none;max-height:38vh;overflow:auto;background:rgba(0,0,0,.75);color:#d7d7ff;border:1px solid rgba(180,140,255,.3);border-radius:14px;padding:10px;font:12px monospace;white-space:pre-wrap}
+#err{position:fixed;inset:0;z-index:50;display:none;background:rgba(0,0,0,.92);color:white;padding:18px;font:13px monospace;white-space:pre-wrap;overflow:auto}
+#storeHub{position:fixed;right:14px;bottom:58px;z-index:15;width:min(360px,calc(100vw - 28px));color:white;background:rgba(5,2,15,.72);border:1px solid rgba(127,250,255,.35);border-radius:18px;padding:12px;backdrop-filter:blur(10px)}
+#storeHub h2{margin:0 0 6px;color:#9ffcff;font-size:15px;letter-spacing:.08em}
+#storeHub p{margin:0 0 10px;line-height:1.35}
+#storeHub a{display:inline-block;margin:2px;color:#9ffcff;text-decoration:none;border:1px solid rgba(159,252,255,.28);border-radius:999px;padding:6px 9px;background:rgba(0,0,0,.35)}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="hud">
+  <div class="pill" id="status">Booting…</div>
+  <div style="display:flex;gap:8px">
+    <button class="btn" id="toggleLog">Logs</button>
+    <span class="pill" id="mode">Hands: Ready</span>
+    <span class="pill">BUILD: PHASE-253-FULL-BOOT-FIX-NO-PATCH</span>
+  </div>
+</div>
+
+<div id="storeHub">
+  <h2>Original Lobby Store Hub</h2>
+  <p>Storefront hub restored inside the working lobby runtime. Example items: Avatar Watch Skin, Premium Chip Set, Card Back Pack, Lobby Table Theme, Event Drop Pass.</p>
+  <a href="../site/store.html">Store</a>
+  <a href="../site/profile.html">Profile</a>
+  <a href="./scorpion.html">Scorpion</a>
+  <a href="./app-hub.html">VR Hub</a>
+</div>
+
+<div id="sceneNav">
+  <button class="scene-btn" data-scene="lobby">Lobby</button>
+  <button class="scene-btn" data-scene="seat">Seat</button>
+  <button class="scene-btn" data-scene="reiki">Reiki Hub</button>
+  <button class="scene-btn" data-route="./reiki.html">Reiki Room</button>
+  <button class="scene-btn" data-scene="pga">PGA Hub</button>
+  <button class="scene-btn" data-route="./pga-drive.html">PGA Drive</button>
+  <button class="scene-btn" data-route="./chip-putt.html">Chip/Putt</button>
+  <button class="scene-btn" data-route="./store-room.html">VR Store</button>
+  <button class="scene-btn" data-scene="sponsor">Sponsor</button>
+  <button class="scene-btn" data-route="./scorpion.html">Scorpion</button>
+</div>
+
+<pre id="log"></pre>
+<pre id="err"></pre>
+
+<script type="module" src="./modules/svr_full_lobby_runtime.js"></script>
+</body>
+</html>

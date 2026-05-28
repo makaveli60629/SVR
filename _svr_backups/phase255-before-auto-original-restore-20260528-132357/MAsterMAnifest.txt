@@ -6291,25 +6291,3 @@ Rules:
 
 Source backup:
 FullName
-
-PHASE 255 — AUTO TRUE ORIGINAL LOBBY RESTORE
-Request:
-Previous PowerShell did not restore the real lobby. This phase scans repo backups, selects the best original lobby candidate, restores it, removes generated replacement lobby runtime references, and records the source.
-
-Rules:
-- No generated lobby.
-- No placeholder wall rebuild.
-- Restore true original lobby file from backup.
-- Keep main.js boot path if available.
-- Store hub and locomotion must be embedded only after the restored original lobby boots.
-
-Restored from:
-C:\Users\ronal\SVR\_backups\phase85_20260526_200815\game_before_phase85\index.html
-
-PHASE 256 — REMOVE GENERATED LOBBY RESTORE
-Removed Phase 253 generated runtime.
-Restored game/index.html from older backup:
-C:\Users\ronal\SVR\_backup_phase250_app_hub_stabilization_20260526-162943\index.html
-
-Rule:
-The original lobby backup is source of truth. Do not use generated replacement lobby.

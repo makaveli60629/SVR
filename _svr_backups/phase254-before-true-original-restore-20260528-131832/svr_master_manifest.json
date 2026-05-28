@@ -50,37 +50,5 @@
                                                           "game/index.html",
                                                           "game/modules/svr_full_lobby_runtime.js"
                                                       ]
-                                        },
-    "phase254_true_original_lobby_restore":  {
-                                                 "phase":  254,
-                                                 "lock":  "PHASE-254-TRUE-ORIGINAL-LOBBY-RESTORE",
-                                                 "date":  "2026-05-28",
-                                                 "source_backup":  "FullName",
-                                                 "rule":  "True original lobby is source of truth. Do not replace with generated placeholder lobby.",
-                                                 "restored":  [
-                                                                  "game/index.html from backup",
-                                                                  "matching original JS runtime files if found",
-                                                                  "phase254 manifest lock"
-                                                              ],
-                                                 "next":  [
-                                                              "embed store hub only after original lobby boots",
-                                                              "repair locomotion only against original runtime object names",
-                                                              "do not rebuild lobby geometry"
-                                                          ]
-                                             },
-    "phase255_auto_true_original_lobby_restore":  {
-                                                      "phase":  255,
-                                                      "lock":  "PHASE-255-AUTO-TRUE-ORIGINAL-LOBBY-RESTORE",
-                                                      "date":  "2026-05-28",
-                                                      "restored_from":  "C:\\Users\\ronal\\SVR\\_backups\\phase85_20260526_200815\\game_before_phase85\\index.html",
-                                                      "rule":  "Auto-find and restore true original lobby. Remove generated replacement lobby.",
-                                                      "next":  "After this boots, embed store hub and locomotion into actual runtime only."
-                                                  },
-    "phase256_remove_generated_lobby_restore":  {
-                                                    "phase":  256,
-                                                    "lock":  "PHASE-256-REMOVE-GENERATED-LOBBY-RESTORE",
-                                                    "date":  "2026-05-28",
-                                                    "restored_from":  "C:\\Users\\ronal\\SVR\\_backup_phase250_app_hub_stabilization_20260526-162943\\index.html",
-                                                    "rule":  "Remove Phase 253 generated lobby. Restore older original backup lobby only."
-                                                }
+                                        }
 }
