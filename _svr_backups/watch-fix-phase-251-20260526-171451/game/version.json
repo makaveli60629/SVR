@@ -1,0 +1,26 @@
+{
+    "name":  "SVR Poker Game",
+    "phase":  250,
+    "phaseLabel":  "Phase 250",
+    "date":  "2026-05-26",
+    "updatedAt":  "2026-05-26T17:09:54-05:00",
+    "build":  "svr-phase-250-20260526-170954",
+    "status":  "phase-250-game-update",
+    "modules":  [
+                    "boot.js",
+                    "main.js",
+                    "modules/optional_module_loader.js",
+                    "modules/svr_phase250_core.js",
+                    "modules/moon_mars_locomotion.js"
+                ],
+    "fixes":  [
+                  "clean optional module loader",
+                  "moon locomotion gravity and movement",
+                  "mars locomotion gravity and movement",
+                  "keyboard smooth movement",
+                  "teleport fallback",
+                  "phase 250 metadata",
+                  "deploy health metadata",
+                  "fresh update package"
+              ]
+}

@@ -1,0 +1,51 @@
+﻿{
+    "phase":  250,
+    "track":  "Game",
+    "goal":  "Stabilize App Hub / Store Room, repair invalid JS risk, add lobby portal, improve Quest panel usability, and rebuild deploy ZIP",
+    "protectedFiles":  [
+                           "Public Matrix page not edited",
+                           "Site files not edited",
+                           "Existing assets not removed"
+                       ],
+    "changedFiles":  [
+                         "game/index.html",
+                         "game/store-room.html",
+                         "game/app-hub.html",
+                         "game/modules/svr_app_hub_portal.js",
+                         "game/docs/PHASE_250_MANIFEST.json",
+                         "game/docs/BUILD_VERSION.json",
+                         "game/version.json",
+                         "game/deploy-health.json",
+                         "update/game.zip"
+                     ],
+    "fixesCompleted":  [
+                           "Removed Phase 249 invalid JavaScript preprocessor risk by regenerating App Hub safely",
+                           "Added App Hub portal helper to the lobby",
+                           "Added visible DOM fallback button for non-A-Frame lobby builds",
+                           "Added larger Quest-clickable panel buttons",
+                           "Added route-aware Store / Site Pages panel",
+                           "Added Phase 250 visible version sign",
+                           "Rebuilt update/game.zip"
+                       ],
+    "validation":  [
+                       "Scanned generated App Hub files for invalid #if/#endif fragments",
+                       "Checked lobby portal script injection",
+                       "Checked App Hub / Store panel markers",
+                       "Node syntax check attempted for portal helper when Node is available",
+                       "Public Matrix page untouched"
+                   ],
+    "rollback":  [
+                     "Restore backed-up files from .\\_backup_phase250_app_hub_stabilization_20260526-162943",
+                     "Rebuild update/game.zip from restored game folder"
+                 ],
+    "remainingIssues":  [
+                            "Quest runtime check required",
+                            "Final store/support/sponsor route names may need adjustment if pages live elsewhere",
+                            "Placeholder app tiles remain intentionally editable"
+                        ],
+    "nextPhase":  [
+                      "Quest test /game/app-hub.html and /game/store-room.html",
+                      "Tune panel placement after headset review",
+                      "Continue Scorpion poker readability/action-flow pass"
+                  ]
+}

@@ -1,0 +1,8 @@
+﻿Phase 259 goal:
+- Quest opens page
+- User presses Enter VR once
+- Player starts inside VR Lobby
+- Web HUD is hidden while in VR
+- In-game VR Lobby buttons are the main controls
+- VR Store is accessed inside the game
+- Store can later connect to website checkout / item access

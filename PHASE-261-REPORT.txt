@@ -1,0 +1,12 @@
+﻿PHASE 261 OFFICIAL TEST BUILD
+Updated: 2026-05-26 19:07:33
+
+Confirmed:
+- VR lobby replaces old web-card lobby
+- Moon active
+- Mars active
+- Teleport pads active
+- Quest controller select active
+- Hand select active
+- VR Store inside game
+- Poker room has exactly 6 seats

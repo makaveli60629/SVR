@@ -1,0 +1,42 @@
+﻿<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>scarlett VR Phase 259</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#070012; color:white; font-family:Arial; }
+    #hud { position:fixed; top:16px; left:16px; z-index:5; background:rgba(10,0,25,.82); padding:16px; border:1px solid #d952ff; border-radius:16px; }
+    button { margin:4px; padding:10px 12px; border-radius:10px; border:1px solid #d952ff; background:#5f1fff; color:white; font-weight:bold; }
+  
+    body.xr-active #hud { display:none !important; }
+    body.xr-active #vr-note { display:none !important; }
+</style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="hud" class="desktop-only">
+    <h2>scarlett VR Phase 259</h2>
+    <p>Start Scene: Lobby | VR Ready | Hands Only</p>
+    <button data-route="Lobby">Lobby</button>
+    <button data-route="Seat">Seat / Poker</button>
+    <button data-route="Reiki">Reiki Room</button>
+    <button data-route="PGA">PGA Drive</button>
+    <button data-route="ChipPutt">Chip/Putt</button>
+    <button data-route="VRStore">VR Store</button>
+    <button data-route="Sponsor">Sponsor</button>
+    <button data-route="Scorpion">Scorpion</button>
+    <div id="status">Booting Lobby...</div>
+  </div>
+
+  <script type="module" src="./index.js"></script>
+</body>
+</html>
+

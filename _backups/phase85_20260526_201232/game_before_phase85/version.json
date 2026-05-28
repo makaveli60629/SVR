@@ -1,0 +1,14 @@
+{
+  "build": "PHASE-85-TRUE-LOBBY-KIOSK-SCORPION-CELESTIAL-LOCK",
+  "phase": 85,
+  "date": "2026-05-26",
+  "track": "game",
+  "siteTouched": false,
+  "rules": [
+    "true lobby preserved",
+    "store kiosk in official lobby",
+    "celestial lock module",
+    "scorpion table private scene",
+    "zip under 25MB"
+  ]
+}

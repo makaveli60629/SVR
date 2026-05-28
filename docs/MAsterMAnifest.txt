@@ -6209,3 +6209,25 @@ This keeps loading times incredibly fast when multiple players log in simultaneo
 
 
 
+
+SVR WEB LOBBY LOCOMOTION REPAIR LOCK
+- Restored original lobby/storefront route: game/index.html
+- Preserved modules/private VR room panel logic.
+- Enabled Quest right-controller camera-forward movement.
+- Enabled fist locomotion.
+- Enabled trigger-release teleport leap.
+- Added example store hub items.
+- Permanent modules:
+  <script src="./modules/svr_quest_locomotion_teleport.js"></script>
+  <script src="./modules/svr_lobby_store_hub.js"></script>
+
+SVR WEB LOBBY LOCOMOTION REPAIR LOCK
+- Restored original lobby/storefront route: game/index.html
+- Preserved modules/private VR room panel logic.
+- Enabled Quest right-controller camera-forward movement.
+- Enabled fist locomotion.
+- Enabled trigger-release teleport leap.
+- Added example store hub items.
+- Permanent modules:
+  <script src="./modules/svr_quest_locomotion_teleport.js"></script>
+  <script src="./modules/svr_lobby_store_hub.js"></script>

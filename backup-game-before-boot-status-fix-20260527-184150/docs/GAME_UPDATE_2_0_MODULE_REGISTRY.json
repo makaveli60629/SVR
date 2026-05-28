@@ -1,0 +1,41 @@
+{
+  "build": "PHASE-90-GAME-UPDATE-2-0-POKER-PLAYABILITY-LOCK",
+  "track": "game-only",
+  "baseline": "PHASE-88-LOCOMOTION-ACTIVE-LOCK",
+  "rules": {
+    "originalLobbyOnly": true,
+    "minorLobbyEditsOnly": true,
+    "secondLobbyAllowed": false,
+    "siteTouched": false,
+    "packageLimitMb": 25,
+    "unapprovedReikiBrandingAllowed": false
+  },
+  "activeModules": {
+    "poker": "game/modules/poker_demo.js \u2014 playable action loop with Fold/Check/Call/Raise/All-In/Next Hand",
+    "watch": "game/modules/watch.js \u2014 wrist controls plus poker action buttons",
+    "locomotion": "game/modules/teleport.js \u2014 right stick movement/snap turn and hold-release teleport",
+    "world": "game/modules/world_skyline.js \u2014 original lobby shell and thin portals only",
+    "privateScenes": "game/reiki.html, game/pga-drive.html, game/chip-putt.html, game/store-room.html, game/smoker-lounge.html, game/scorpion.html"
+  },
+  "privateRoutes": [
+    "game/reiki.html",
+    "game/pga-drive.html",
+    "game/chip-putt.html",
+    "game/store-room.html",
+    "game/smoker-lounge.html",
+    "game/scorpion.html"
+  ],
+  "nextRecommendedPhase": "Phase 90 \u2014 Game Update 2.0 Poker Playability Lock",
+  "phase": 90,
+  "currentFocus": "Playable poker first",
+  "siteTouched": false,
+  "lobbyRule": "Original lobby only; no second lobby; minor edits only",
+  "protected": [
+    "root site",
+    "/site",
+    "original lobby shell",
+    "private scene separation",
+    "Reiki approval lock"
+  ],
+  "nextPhase": "Phase 91 \u2014 Poker UX + Watch Status Polish"
+}

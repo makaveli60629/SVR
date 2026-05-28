@@ -1,0 +1,38 @@
+{
+    "phase":  253,
+    "date":  "2026-05-26",
+    "createdAt":  "2026-05-26T17:44:34-05:00",
+    "repoRoot":  "C:\\Users\\ronal\\SVR",
+    "backupRoot":  "C:\\Users\\ronal\\SVR\\_svr_backups\\phase-253-hub-ux-20260526-174434",
+    "changedFiles":  [
+                         "game/boot.js",
+                         "game/main.js",
+                         "game/version.json",
+                         "game/deploy-health.json",
+                         "game/hubs/app.html",
+                         "game/hubs/hub-menu.json",
+                         "game/modules/optional_module_loader.js",
+                         "game/modules/hand_controller_navigation.js",
+                         "game/modules/hub_user_friendly.js",
+                         "game/docs/phase-253-hub-ux-navigation.md",
+                         "update/game.zip"
+                     ],
+    "protected":  [
+                      "index.html at repo root not edited",
+                      "site folder not edited",
+                      "site.zip not edited"
+                  ],
+    "validation":  {
+                       "jsSyntax":  true,
+                       "packageCreated":  true,
+                       "packagePath":  "C:\\Users\\ronal\\SVR\\update\\game.zip",
+                       "packageSha256":  "C396550669F1A03DD9C4A6AF8FC85AFC316A018A795F47AA63E489DD63F838F9",
+                       "packageBytes":  22886454
+                   },
+    "liveTest":  {
+                     "hub":  "https://svrpoker.com/game/hubs/app.html?v=phase253-test",
+                     "game":  "https://svrpoker.com/game/?v=phase253-test",
+                     "version":  "https://svrpoker.com/game/version.json?v=phase253-test",
+                     "deployHealth":  "https://svrpoker.com/game/deploy-health.json?v=phase253-test"
+                 }
+}

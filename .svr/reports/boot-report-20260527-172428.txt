@@ -1,0 +1,32 @@
+SVR Boot Fix Report
+Generated: 05/27/2026 17:24:29
+Project root: C:\Users\ronal\SVR
+
+Boot/loading text hits:
+backup-game-before-original-clean-hotfix-20260527-170619\index.html line 95: <div class="pill" id="status">Booting…</div>
+backups\index-phase260-pre.html line 36: <div id="status">Booting Lobby...</div>
+game\index.html line 122: if (s && /Booting/i.test(s.textContent || "")) {
+site\owner.html line 72: async function gameEvents(){setActive('tabGame');$('dataView').textContent='Loading game events...';const d=await api('/api/admin/game/events');const chips=(d.counts||[]).map(c=>'<span class="pill">'+safe(c.event_type)+': '+safe(c.count)+'</span>').join('');const list=d.events||[];$('dataView').innerHTML='<div>'+chips+'</div>'+(list.map(e=>'<div class="msg"><b>'+safe(e.event_type)+'</b> <span class="pill">'+safe(e.room||'room')+'</span><br><span class="muted">'+safe(e.build||'')+' · '+safe(e.source||'game')+' · '+safe(e.created_at||'')+'</span><br>'+safe(JSON.stringify(e.payload||{}))+'</div>').join('')||'<p>No game events yet.</p>');}
+_backups\phase85_20260526_201232\game_before_phase85\index.html line 95: <div class="pill" id="status">Booting…</div>
+_backup_phase248_game_20260526-160955\index.html line 95: <div class="pill" id="status">Booting…</div>
+js\site_hotfix.js line 74: // default = orange (booting)
+
+Index files patched:
+index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\index.html
+backup-game-20260526-184046\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\backup-game-20260526-184046\index.html
+backup-game-before-original-clean-hotfix-20260527-170619\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\backup-game-before-original-clean-hotfix-20260527-170619\index.html
+docs\design\preview\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\docs\design\preview\index.html
+game\index.html already had watchdog.
+site\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\site\index.html
+site\site\admin\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\site\site\admin\index.html
+_backups\phase85_20260526_200815\game_before_phase85\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\_backups\phase85_20260526_200815\game_before_phase85\index.html
+_backups\phase85_20260526_201232\game_before_phase85\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\_backups\phase85_20260526_201232\game_before_phase85\index.html
+_backup_phase242_public\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\_backup_phase242_public\index.html
+_backup_phase248_game_20260526-160955\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\_backup_phase248_game_20260526-160955\index.html
+_backup_phase250_app_hub_stabilization_20260526-162943\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\_backup_phase250_app_hub_stabilization_20260526-162943\index.html
+_svr_backups\phase-250-20260526-170954\game\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\_svr_backups\phase-250-20260526-170954\game\index.html
+_svr_backups\phase-253-hub-ux-20260526-174434\game\index.html patched. Backup: C:\Users\ronal\SVR\.svr\backups\20260527-172428\_svr_backups\phase-253-hub-ux-20260526-174434\game\index.html
+
+No package.json found.
+
+Created launcher: C:\Users\ronal\SVR\SVR-Start.ps1

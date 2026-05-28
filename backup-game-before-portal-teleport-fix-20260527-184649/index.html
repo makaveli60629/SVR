@@ -1,0 +1,214 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>ScarlettVR Poker â€¢ Phase 91 Black Boot Log Recovery V2</title>
+
+  <style>
+    :root { color-scheme: dark; }
+    html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
+    #hud {
+      position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10;
+      display: flex; gap: 10px; align-items: center; justify-content: space-between;
+      pointer-events: none;
+    }
+    .pill {
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.35);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #e9e9ff;
+      font-size: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      pointer-events: none;
+    }
+    .btn {
+      pointer-events: auto;
+      border: 1px solid rgba(180,140,255,.45);
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn:hover { background: rgba(60,40,90,.55); }
+    #sceneNav{
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+      pointer-events: auto;
+    }
+    .scene-btn{
+      border: 1px solid rgba(120,255,186,.42);
+      background: rgba(2,10,8,.62);
+      color: #eafff4;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      font-size: 12px;
+    }
+    .scene-btn:hover{ background: rgba(10,48,33,.72); }
+    body.preview-mode #sceneNav { display:none !important; }
+    #log {
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10;
+      max-height: 38vh; overflow: auto; display: none;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.25);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: #d7d7ff;
+      font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+    #err {
+      position: fixed; inset: 0; display: none; z-index: 50;
+      background: rgba(0,0,0,.88);
+      color: #fff;
+      padding: 18px;
+      font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      overflow: auto;
+    }
+
+    body.preview-mode #hud,
+    body.preview-mode #log,
+    body.preview-mode #err { display: none !important; }
+  
+    #svrBootOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: radial-gradient(circle at center, rgba(56,18,98,.48), rgba(0,0,0,.96) 60%, #000 100%);
+      color: #fff;
+      box-sizing: border-box;
+      pointer-events: auto;
+    }
+    #svrBootOverlay .svr-boot-card {
+      width: min(920px, 96vw);
+      max-height: 90vh;
+      overflow: auto;
+      border: 1px solid rgba(190,130,255,.5);
+      border-radius: 18px;
+      background: rgba(4,4,10,.88);
+      box-shadow: 0 24px 80px rgba(0,0,0,.75);
+      padding: 18px;
+    }
+    #svrBootOverlay .svr-boot-kicker {
+      color: #80ffd6;
+      font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: .16em;
+      margin-bottom: 8px;
+    }
+    #svrBootOverlay h1 {
+      margin: 0 0 8px 0;
+      color: #f2e9ff;
+      font-size: clamp(24px, 5vw, 44px);
+    }
+    #svrBootOverlay p {
+      margin: 0 0 12px 0;
+      color: #d7ccff;
+      line-height: 1.45;
+    }
+    #svrBootOverlay pre {
+      margin: 12px 0;
+      white-space: pre-wrap;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 12px;
+      color: #d6fff0;
+      font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    #svrBootOverlay .svr-boot-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    #svrBootOverlay button, #svrBootOverlay a {
+      border: 1px solid rgba(128,255,214,.45);
+      background: rgba(0,0,0,.45);
+      color: #eafff7;
+      border-radius: 999px;
+      padding: 8px 12px;
+      text-decoration: none;
+      cursor: pointer;
+      font: 12px system-ui, sans-serif;
+    }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+<meta name="svr-build" content="PHASE-92-DUPLICATE-ASYNC-SYNTAX-FIX-V4"><!-- SVR_MANIFEST_START -->
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#8A2BE2">
+<meta name="application-name" content="SVR Poker">
+<meta name="apple-mobile-web-app-title" content="SVR Poker">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+<script src="./svr-pwa-safe.js" defer></script>
+<!-- SVR_MANIFEST_END -->
+<style id="svr-hide-old-vr-badge">
+  body > div, body > span {
+    max-width: 100vw;
+  }
+</style>
+</head>
+<body data-build="PHASE-92-DUPLICATE-ASYNC-SYNTAX-FIX-V4"><div id="svr-build-label" style="position:fixed;right:10px;top:10px;z-index:9999;color:#d7b8ff;background:rgba(0,0,0,.55);border:1px solid rgba(180,120,255,.45);border-radius:10px;padding:6px 9px;font:11px monospace;pointer-events:none;">BUILD: PHASE-92-DUPLICATE-ASYNC-SYNTAX-FIX-V4</div>
+  <div id="app"></div>
+
+  <div id="hud">
+    <div class="pill" id="status">Booting...</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
+      <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
+      <span class="pill" id="mode">Hands: â€¦</span>
+      <span class="pill">BUILD: PHASE-92-DUPLICATE-ASYNC-SYNTAX-FIX-V4</span>
+    </div>
+  </div>
+
+  <div id="sceneNav">
+    <button class="scene-btn" data-scene="lobby">Lobby</button>
+    <button class="scene-btn" data-scene="seat">Seat</button>
+    <button class="scene-btn" data-scene="reiki">Reiki</button>
+    <button class="scene-btn" data-scene="pga">PGA</button>
+    <button class="scene-btn" data-scene="legends">Legend</button>
+    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
+    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
+  </div>
+
+  <pre id="log"></pre>
+  <pre id="err"></pre>
+
+  <script src="./boot-failsafe.js?v=phase91-black-boot-log-recovery-v2"></script>
+  <script type="module">
+  const boot = window.SVR_BOOT_FAILSAFE;
+  if (boot) boot.note("Dynamic importing main.js...");
+  import("./main.js?v=phase91-black-boot-log-recovery-v2-" + Date.now())
+    .then(() => { if (boot) boot.note("main.js import resolved."); })
+    .catch((error) => { if (boot) boot.fail(error, "main.js import failed"); else console.error(error); });
+</script>
+<script>
+window.SVR_BOOT_WATCHDOG_ORIGINAL_CLEAN = true;
+setTimeout(function(){
+  var s = document.getElementById("status");
+  if (s && /Booting/i.test(s.textContent || "")) {
+    s.textContent = "Boot watchdog active. Recovery overlay will show details.";
+  }
+}, 6500);
+</script>
+</body>
+</html>
+
+
+
+

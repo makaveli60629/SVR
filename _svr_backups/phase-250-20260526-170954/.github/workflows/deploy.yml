@@ -1,0 +1,151 @@
+name: Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout fresh repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y rsync unzip
+
+      - name: Clean build folders
+        run: |
+          set -euo pipefail
+          rm -rf build tmp dist public _site tmp_site
+          mkdir -p build
+
+      - name: Copy committed public site and game
+        run: |
+          set -euo pipefail
+          rsync -av \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'backend' \
+            --exclude 'docs' \
+            --exclude 'update' \
+            --exclude 'Library' \
+            --exclude 'Logs' \
+            --exclude 'Temp' \
+            --exclude 'node_modules' \
+            --exclude 'backend/node_modules' \
+            --exclude '*.zip' \
+            --exclude '*.fbx' \
+            ./ build/ || test $? -eq 24
+
+          chmod -R u+rwX,go+rX build || true
+
+      - name: Validate game folder
+        run: |
+          set -euo pipefail
+
+          if [ ! -f build/game/index.html ]; then
+            echo "ERROR: build/game/index.html missing."
+            echo "The /game folder must be committed directly."
+            exit 1
+          fi
+
+      - name: Stamp deploy health
+        run: |
+          set -euo pipefail
+
+          COMMIT_SHA="${GITHUB_SHA}"
+          DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          BUILD_LABEL="$(grep -oE 'PHASE-[A-Za-z0-9._-]+' build/game/index.html | head -n 1 || true)"
+          if [ -z "${BUILD_LABEL}" ] && [ -f build/game/docs/BUILD_VERSION.json ]; then
+            BUILD_LABEL="$(grep -oE 'PHASE-[A-Za-z0-9._-]+' build/game/docs/BUILD_VERSION.json | head -n 1 || true)"
+          fi
+          if [ -z "${BUILD_LABEL}" ]; then
+            BUILD_LABEL="SVR-DIRECT-FILES-LOCK"
+          fi
+
+          mkdir -p build/game build/site
+
+          cat > build/deploy-health.json <<EOF
+          {
+            "status": "ok",
+            "build": "${BUILD_LABEL}",
+            "commit": "${COMMIT_SHA}",
+            "deployedAt": "${DEPLOY_TIME}",
+            "workflow": "Auto Deploy",
+            "target": "/",
+            "source": "committed-files-no-site-zip"
+          }
+          EOF
+
+          cat > build/game/deploy-health.json <<EOF
+          {
+            "status": "ok",
+            "build": "${BUILD_LABEL}",
+            "commit": "${COMMIT_SHA}",
+            "deployedAt": "${DEPLOY_TIME}",
+            "workflow": "Auto Deploy",
+            "target": "/game",
+            "source": "direct-game-folder"
+          }
+          EOF
+
+          cat > build/game/version.json <<EOF
+          {
+            "build": "${BUILD_LABEL}",
+            "commit": "${COMMIT_SHA}",
+            "deployedAt": "${DEPLOY_TIME}",
+            "source": "direct-game-folder"
+          }
+          EOF
+
+      - name: Validate build output
+        run: |
+          set -euo pipefail
+
+          test -f build/index.html
+          test -f build/site/index.html
+          test -f build/game/index.html
+          test -f build/game/version.json
+          test -f build/game/deploy-health.json
+          test -f build/deploy-health.json
+
+          echo "Public site markers:"
+          grep -R "SVR-MATRIX-RESTORE-LOCK\|Scarlett Holding Company\|binary secret rain" build/index.html build/site/*.html build/site/js/*.js 2>/dev/null || true
+
+          echo "Game phase markers:"
+          grep -R "PHASE-\|SITE-DIRECT-FILES-LOCK" build/game/index.html build/game/version.json build/game/deploy-health.json build/deploy-health.json || true
+
+          echo "Build size:"
+          du -sh build build/game
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

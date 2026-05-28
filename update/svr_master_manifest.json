@@ -1,0 +1,13 @@
+﻿{
+    "build":  "PHASE-279-POKER-SPAWN-VIEW-FINAL-CLEANUP",
+    "cacheTag":  "phase279-poker-spawn-view-final-cleanup",
+    "requiredModules":  [
+                            "game/main.js",
+                            "game/modules/teleport.js",
+                            "game/modules/hands.js",
+                            "game/modules/phase279_poker_spawn_view_final_cleanup.js"
+                        ],
+    "phase":  279,
+    "rule":  "Original lobby only. No duplicate lobby. Hand history/showdown HUD higher. Community cards bigger and higher. Spawn view clear. Floor stable.",
+    "updatedAt":  "2026-05-27T04:58:43Z"
+}

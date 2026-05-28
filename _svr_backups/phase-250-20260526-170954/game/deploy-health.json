@@ -1,0 +1,10 @@
+﻿{
+    "status":  "phase-250-built",
+    "track":  "Game",
+    "publicPageTouched":  false,
+    "appHubRoom":  "game/app-hub.html",
+    "storeRoom":  "game/store-room.html",
+    "lobbyPortalModule":  "game/modules/svr_app_hub_portal.js",
+    "updateZip":  "update/game.zip",
+    "timestamp":  "2026-05-26T16:29:47"
+}

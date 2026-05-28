@@ -1,0 +1,9 @@
+{
+  "build": "PHASE-90-GAME-UPDATE-2-0-POKER-PLAYABILITY-LOCK",
+  "phase": 90,
+  "name": "Game Update 2.0 Poker Playability Lock",
+  "sourceBaseline": "Phase 89 Game Update 2.0 Manifest Lock",
+  "gameOnly": true,
+  "siteTouched": false,
+  "zipLimitMb": 25
+}

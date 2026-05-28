@@ -1,0 +1,15 @@
+{
+  "build": "PHASE-90-GAME-UPDATE-2-0-POKER-PLAYABILITY-LOCK",
+  "phase": 90,
+  "name": "Game Update 2.0 Poker Playability Lock",
+  "track": "game-only",
+  "siteTouched": false,
+  "rules": [
+    "Original lobby only",
+    "No second lobby",
+    "Minor lobby edits only",
+    "Playable poker first",
+    "Private scenes remain separate",
+    "No unapproved Reiki sponsor branding"
+  ]
+}

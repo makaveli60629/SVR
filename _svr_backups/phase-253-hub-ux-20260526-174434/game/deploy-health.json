@@ -1,0 +1,19 @@
+{
+    "healthy":  true,
+    "phase":  251,
+    "phaseLabel":  "Phase 251",
+    "date":  "2026-05-26",
+    "updatedAt":  "2026-05-26T17:14:51-05:00",
+    "message":  "SVR watch module fixed and wired into optional loader",
+    "checks":  {
+                   "watchModule":  true,
+                   "optionalLoader":  true,
+                   "siteUntouched":  true,
+                   "packageRebuilt":  true
+               },
+    "live":  {
+                 "game":  "https://svrpoker.com/game/?v=phase251-watch",
+                 "version":  "https://svrpoker.com/game/version.json?v=phase251-watch",
+                 "deployHealth":  "https://svrpoker.com/game/deploy-health.json?v=phase251-watch"
+             }
+}
