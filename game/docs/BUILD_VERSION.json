@@ -1,11 +1,13 @@
 {
-  "build": "PHASE-91-DIRECT-GAME-AUDIT-REPAIR-LOCK",
-  "label": "Direct Game Audit Repair Lock",
+  "build": "PHASE-92-WEBXR-AUTO-DEPLOY-LOCK",
+  "label": "WebXR Auto Deploy Lock",
+  "scope": "game-only",
+  "date": "2026-05-28",
   "notes": [
-    "boot timeout fallback",
-    "direct private scenes",
-    "locomotion repair",
-    "unapproved brand scrub",
-    "Moon/Mars boot-safe sky"
+    "WebXR-only phase marker locked",
+    "direct /game deploy path preserved",
+    "private scene route cache bumped to phase92",
+    "website/site untouched",
+    "current lobby preserved"
   ]
 }
