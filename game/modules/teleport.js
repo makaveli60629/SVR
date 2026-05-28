@@ -278,7 +278,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   function movePlayerFromControllers(dt){
     const leftGp = controllerGamepad(leftControllerRef);
     const rightGp = controllerGamepad(rightControllerRef);
-    const moveSource = rightGp || leftGp;
+    const moveSource = leftGp || rightGp;
     const turnSource = rightGp || leftGp;
     const leftStick = getStick(moveSource, "left");
     const rightStick = getStick(turnSource, "right");
@@ -386,7 +386,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       stableTargetMs = 0;
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
-        ? "Controllers active • right stick move/snap turn • A/grip/trigger hold-aim release-teleport"
+        ? "Controllers active • left stick move • right stick snap turn • A/X teleport"
         : "TELEPORT OFF • press TP or make fist by face";
       statusCb(idleMsg);
       modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist by face toggles TP");

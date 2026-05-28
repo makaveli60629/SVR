@@ -148,8 +148,8 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 function buildButtons(state){
   const buttons = [
     { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'seatScene', label: 'SEAT', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'storeRoomScene', label: 'STORE', x: 284, y: 146, w: 118, h: 42, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'tableScene', label: 'TABLE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
@@ -157,10 +157,7 @@ function buildButtons(state){
 
     { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
     { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'reikiRoomScene', label: 'REIKI RM', x: 284, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaDriveScene', label: 'DRIVE', x: 414, y: 146, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaChipPuttScene', label: 'CHIP/PUTT', x: 544, y: 146, w: 138, h: 42, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'smokerLoungeScene', label: 'LOUNGE', x: 694, y: 146, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'reikiRoomScene', label: 'ZEN DEN', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
     { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
@@ -272,16 +269,12 @@ let hoveredId = null;
     if (id === 'lobby') actions.goLobby?.();
     if (id === 'tableScene') actions.goTable?.();
     if (id === 'seatScene') actions.goSeat?.();
-    if (id === 'storeRoomScene') actions.goStoreRoom?.();
     if (id === 'reikiScene') actions.goReiki?.();
     if (id === 'pgaScene') actions.goPga?.();
     if (id === 'legendScene') actions.goLegend?.();
     if (id === 'sponsorScene') actions.goSponsor?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
     if (id === 'reikiRoomScene') actions.goReikiRoom?.();
-    if (id === 'pgaDriveScene') actions.goPgaDrive?.();
-    if (id === 'pgaChipPuttScene') actions.goPgaChipPutt?.();
-    if (id === 'smokerLoungeScene') actions.goSmokerLounge?.();
   }
 
   function update(dt, leftHand, rightHand){

@@ -1,16 +1,1 @@
-{
-  "build": "PHASE-87-REAL-TEXTURE-PLANETS-LOCK",
-  "scope": "game-side-only",
-  "siteTouched": false,
-  "lobbyStructure": "preserved",
-  "privateScenes": [
-    "reiki.html",
-    "range.html",
-    "chip-putt.html",
-    "store-room.html",
-    "smoker-lounge.html",
-    "scorpion.html"
-  ],
-  "phase": 87,
-  "label": "Real Texture Moon/Mars Sky Lock"
-}
+{"build":"PHASE-84-BOOT-SAFE-LOBBY-RECOVERY","target":"game","siteTouched":false}

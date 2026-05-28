@@ -7,7 +7,6 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { createPortal, openPrivateScene, installPortalClickHandler } from "./modules/scene_portal_router.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -71,77 +70,8 @@ window.addEventListener("unhandledrejection", (e)=>{
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
 setStatus("Loading world…", { force: true });
-let world;
-try {
-  world = await buildSkylineRoom(scene, { log, renderer });
-} catch (err) {
-  console.error(err);
-  log("[BOOT-SAFE] world build failed, using emergency lobby shell", err?.message || err);
-  setStatus("Boot-safe lobby loaded — world module recovered", { force: true });
-  const g = new THREE.Group();
-  scene.add(g);
-  const floor = new THREE.Mesh(new THREE.CircleGeometry(18, 64), new THREE.MeshBasicMaterial({ color: 0x111018 }));
-  floor.rotation.x = -Math.PI / 2;
-  scene.add(floor);
-  const table = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, 0.18, 64), new THREE.MeshBasicMaterial({ color: 0x104034 }));
-  table.position.y = 0.9;
-  scene.add(table);
-  const moonTex = await loadFirstTexture(assetUrls("texture/moon_diffuse.png"), { colorSpace: THREE.SRGBColorSpace });
-  const moonBump = await loadFirstTexture(assetUrls("texture/moon_bump.png"));
-  const marsTex = await loadFirstTexture(assetUrls("texture/mars/diffuse_1k.jpg"), { colorSpace: THREE.SRGBColorSpace });
-  const marsBump = await loadFirstTexture(assetUrls("texture/mars/bump_1k.jpg"));
-  const makeFallbackPlanet = (name, radius, map, bumpMap, color, glowColor)=>{
-    const g = new THREE.Group();
-    g.name = `${name}_BOOT_SAFE_REAL_TEXTURE_SKY_BODY`;
-    const body = new THREE.Mesh(new THREE.SphereGeometry(radius, 96, 64), new THREE.MeshStandardMaterial({ color, map: map || null, bumpMap: bumpMap || null, bumpScale: bumpMap ? 0.55 : 0, roughness: 0.94, emissive: glowColor, emissiveIntensity: 0.08 }));
-    body.frustumCulled = false;
-    g.add(body);
-    const haloCanvas = document.createElement("canvas");
-    haloCanvas.width = haloCanvas.height = 256;
-    const hctx = haloCanvas.getContext("2d");
-    const grad = hctx.createRadialGradient(128,128,6,128,128,126);
-    grad.addColorStop(0,"rgba(255,255,255,0.75)");
-    grad.addColorStop(0.35,"rgba(255,255,255,0.22)");
-    grad.addColorStop(1,"rgba(255,255,255,0)");
-    hctx.fillStyle = grad; hctx.fillRect(0,0,256,256);
-    const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(haloCanvas), color: glowColor, transparent: true, opacity: 0.18, depthWrite: false, blending: THREE.AdditiveBlending }));
-    halo.scale.set(radius * 9, radius * 9, 1);
-    g.add(halo);
-    const light = new THREE.PointLight(glowColor, name === "Moon" ? 3.2 : 2.1, radius * 120, 1.45);
-    g.add(light);
-    g.userData.body = body;
-    return g;
-  };
-  const moon = makeFallbackPlanet("Moon", 4.6, moonTex, moonBump, 0xf1f3f6, 0xeaf2ff);
-  moon.position.set(-90, 42, -210); scene.add(moon);
-  const mars = makeFallbackPlanet("Mars", 2.7, marsTex, marsBump, 0xd4774e, 0xff9b6b);
-  mars.position.set(110, 48, -240); scene.add(mars);
-  scene.userData._bootPlanetTick = (dt)=>{
-    const t = (scene.userData._bootPlanetTime = (scene.userData._bootPlanetTime || 0) + dt);
-    moon.position.set(-90 + Math.sin(t * 0.008) * 10, 42 + Math.sin(t * 0.035) * 1.4, -210 + Math.cos(t * 0.008) * 12);
-    mars.position.set(110 + Math.sin(t * 0.006 + 1.2) * 12, 48 + Math.sin(t * 0.030) * 1.2, -240 + Math.cos(t * 0.006 + 1.2) * 12);
-    moon.userData.body.rotation.y += dt * 0.085;
-    mars.userData.body.rotation.y += dt * 0.067;
-  };
-  world = {
-    roomClamp: (p)=>p,
-    seats: [{x:0,z:2.9,label:"Player Seat"},{x:2.3,z:1.3,label:"Bot 1"},{x:2.3,z:-1.3,label:"Bot 2"},{x:0,z:-2.9,label:"Bot 3"},{x:-2.3,z:-1.3,label:"Bot 4"},{x:-2.3,z:1.3,label:"Bot 5"}],
-    tableCenter: new THREE.Vector3(0,0,0),
-    joinRadius: 4.5,
-    previewOrbitRadius: 10,
-    sceneTargets: { lobby:{pos:{x:0,z:4.8},look:{x:0,z:0}}, seat:{pos:{x:0,z:2.9},look:{x:0,z:0}}, reiki:{pos:{x:-7,z:-4},look:{x:0,z:0}}, pga:{pos:{x:7,z:-4},look:{x:0,z:0}}, sponsor:{pos:{x:0,z:-8},look:{x:0,z:0}}, scorpion:{pos:{x:6,z:6},look:{x:0,z:0}}, legends:{pos:{x:-6,z:6},look:{x:0,z:0}} }
-  };
-}
+const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
-
-// Phase 85: add modular portal panels only. This preserves the lobby structure and routes full experiences to separate pages.
-createPortal({ scene, label: "REIKI ROOM", sublabel: "PRIVATE MEDITATION", position: new THREE.Vector3(-6.2, 0, -4.8), rotationY: 0.72, key: "reikiRoom", color: 0xff4058 });
-createPortal({ scene, label: "PGA DRIVE", sublabel: "PRIVATE RANGE", position: new THREE.Vector3(6.2, 0, -4.8), rotationY: -0.72, key: "pgaDrive", color: 0x7ff5c7 });
-createPortal({ scene, label: "CHIP + PUTT", sublabel: "PRIVATE SHORT GAME", position: new THREE.Vector3(8.1, 0, -1.5), rotationY: -1.05, key: "pgaChipPutt", color: 0x95ff9f });
-createPortal({ scene, label: "SVR STORE", sublabel: "WEB PORTAL ROOM", position: new THREE.Vector3(-8.1, 0, -1.5), rotationY: 1.05, key: "storeRoom", color: 0xb48cff });
-createPortal({ scene, label: "LOUNGE", sublabel: "PRIVATE SOCIAL ROOM", position: new THREE.Vector3(-7.8, 0, 2.2), rotationY: 1.34, key: "smokerLounge", color: 0xffb86b });
-createPortal({ scene, label: "SCORPION", sublabel: "PRIVATE POKER ROOM", position: new THREE.Vector3(7.8, 0, 2.2), rotationY: -1.34, key: "scorpion", color: 0xd3a13b });
-installPortalClickHandler({ camera, scene, domElement: renderer.domElement });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -149,7 +79,8 @@ const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 const audio = createAudioPlaylist({
   tracks: [
     { title: "Lobby 07", url: "./assets/audio/07.mp3" },
-    
+    { title: "Reiki Time Hub", url: "./assets/audio/reiki_time_hub.mp3" },
+    { title: "SVR After Dark", url: "./assets/audio/svr_after_dark.mp3" }
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
@@ -238,7 +169,6 @@ function movePlayerToSpot(target, lookTarget = null){
 }
 
 function gotoScene(key){
-  if (["reikiRoom","reiki","pgaDrive","pga","pgaChipPutt","chipPutt","storeRoom","smokerLounge","scorpion"].includes(key)) return openPrivateScene(key);
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
@@ -249,9 +179,7 @@ function gotoScene(key){
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
     const key = btn.dataset.scene;
-    const privateKey = btn.dataset.private;
-    if (privateKey) openPrivateScene(privateKey);
-    else if (key) gotoScene(key);
+    if (key) gotoScene(key);
   });
 });
 
@@ -269,10 +197,8 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit5") gotoScene("pga");
   if (e.code === "Digit6") gotoScene("legends");
   if (e.code === "Digit7") gotoScene("sponsor");
-  if (e.code === "Digit8") openPrivateScene("scorpion");
-  if (e.code === "Digit9") openPrivateScene("reikiRoom");
-  if (e.code === "Digit0") openPrivateScene("pgaDrive");
-  if (e.code === "Minus") openPrivateScene("pgaChipPutt");
+  if (e.code === "Digit8") gotoScene("scorpion");
+  if (e.code === "Digit9") gotoScene("reikiRoom");
 });
 
 const watch = createWristWatch({
@@ -301,12 +227,8 @@ const watch = createWristWatch({
     goPga: ()=>gotoScene("pga"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
-    goScorpion: ()=>openPrivateScene("scorpion"),
-    goReikiRoom: ()=>openPrivateScene("reikiRoom"),
-    goPgaDrive: ()=>openPrivateScene("pgaDrive"),
-    goPgaChipPutt: ()=>openPrivateScene("pgaChipPutt"),
-    goStoreRoom: ()=>openPrivateScene("storeRoom"),
-    goSmokerLounge: ()=>openPrivateScene("smokerLounge")
+    goScorpion: ()=>gotoScene("scorpion"),
+    goReikiRoom: ()=>gotoScene("reikiRoom")
   }
 });
 
@@ -319,7 +241,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Locomotion + modular private portals enabled. Lobby structure preserved.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
