@@ -1,1 +1,7 @@
-{"build":"PHASE-84-BOOT-SAFE-LOBBY-RECOVERY","target":"game","siteTouched":false}
+{
+  "build": "PHASE-85-LOCOMOTION-PORTAL-PRIVATE-SCENE-LOCK",
+  "scope": "game-side-only",
+  "siteTouched": false,
+  "lobbyStructure": "preserved",
+  "privateScenes": ["reiki.html", "range.html", "chip-putt.html", "store-room.html", "smoker-lounge.html", "scorpion.html"]
+}
