@@ -1,14 +1,13 @@
 {
-  "build": "PHASE-93-LOBBY-FLOOR-TABLE-LOCOMOTION-SKY-LOCK",
-  "label": "Lobby Floor Table Locomotion Sky Lock",
+  "build": "PHASE-94-REIKI-PORTAL-HOLOGRAM-LOCK",
+  "label": "Reiki Portal Hologram Lock",
   "scope": "game-only",
   "date": "2026-05-28",
   "notes": [
-    "stabilize blinking floor overlays",
-    "neutralize duplicate green tabletop overlay",
-    "align private portals with their hub areas",
-    "raise Moon and Mars high into the sky",
-    "fix Quest right-stick forward/back movement",
-    "fix hold fist/pinch or controller grip/A/trigger release teleport"
+    "preserve Phase 93 lobby floor/table/locomotion/sky fixes",
+    "add visible Reiki Room hologram to Reiki portal",
+    "label hologram REIKI ROOM",
+    "keep website/site untouched",
+    "keep Reiki as private-scene portal"
   ]
 }
