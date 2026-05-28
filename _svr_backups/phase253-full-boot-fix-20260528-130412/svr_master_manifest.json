@@ -30,25 +30,5 @@
                                                                  "game/modules/svr_quest_locomotion_teleport.js",
                                                                  "game/modules/svr_original_lobby_store_hub_embed.js"
                                                              ]
-                                               },
-    "phase253_full_boot_fix_no_patch":  {
-                                            "phase":  253,
-                                            "lock":  "PHASE-253-FULL-BOOT-FIX-NO-PATCH",
-                                            "date":  "2026-05-28",
-                                            "rule":  "No patch overlay. Replace broken boot with full working WebXR lobby runtime.",
-                                            "fixed":  [
-                                                          "Booting screen lock",
-                                                          "Original lobby floor and walls visible",
-                                                          "Store hub visible",
-                                                          "Private VR room nav visible",
-                                                          "Moon and Mars visible",
-                                                          "Quest grip fist locomotion",
-                                                          "Trigger-release teleport leap",
-                                                          "Camera-forward movement"
-                                                      ],
-                                            "files":  [
-                                                          "game/index.html",
-                                                          "game/modules/svr_full_lobby_runtime.js"
-                                                      ]
-                                        }
+                                               }
 }
