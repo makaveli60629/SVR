@@ -1,1 +1,0 @@
-export const SVR_CELESTIAL_LOCK={build:'PHASE-85-TRUE-LOBBY-KIOSK-SCORPION-CELESTIAL-LOCK',moon:{x:-22,y:36,z:-48},mars:{x:24,y:34,z:-54},rule:'Moon and Mars stay high above skyline'}; if(typeof window!=='undefined') window.SVR_CELESTIAL_LOCK=SVR_CELESTIAL_LOCK;

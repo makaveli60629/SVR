@@ -1,9 +1,15 @@
-{
-  "build": "PHASE-90-GAME-UPDATE-2-0-POKER-PLAYABILITY-LOCK",
-  "phase": 90,
-  "name": "Game Update 2.0 Poker Playability Lock",
-  "sourceBaseline": "Phase 89 Game Update 2.0 Manifest Lock",
-  "gameOnly": true,
+﻿{
+  "build": "PHASE-95-ORIGINAL-STOREFRONT-RECOVERY-LOCK",
+  "source": "direct-game-folder-and-update-game-zip",
   "siteTouched": false,
-  "zipLimitMb": 25
+  "rules": [
+    "original lobby restored",
+    "storefront portals restored",
+    "private scenes routed separately",
+    "locomotion preserved",
+    "watch preserved",
+    "Quest controller fallback preserved",
+    "website untouched"
+  ],
+  "updatedAt": "2026-05-28T11:10:55.1138813-05:00"
 }
