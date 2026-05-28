@@ -3,6 +3,7 @@ import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
+import { createLocomotion } from "./modules/locomotion.js";
 import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
@@ -75,6 +76,7 @@ const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTarg
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
+const locomotion = createLocomotion({ renderer, camera, teleportRig: tp, roomClamp, log });
 
 const audio = createAudioPlaylist({
   tracks: [],
@@ -256,11 +258,11 @@ setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Hand teleport and physical portals active.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Input ready: desktop / Quest hand tracking");
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Locomotion, hand teleport, and physical portals active.", { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : "Input ready: desktop / Quest locomotion / hand tracking");
 window.SVR_GAME_READY = true;
-window.SVR_BOOT_FAILSAFE?.ready("SVR runtime Ready. Original lobby active. Hand teleport and physical portals active.");
-window.dispatchEvent(new CustomEvent("svr:ready", { detail: { build: "PHASE-91-BLACK-BOOT-LOG-RECOVERY-V2", message: "SVR runtime ready" } }));
+window.SVR_BOOT_FAILSAFE?.ready("SVR runtime Ready. Original lobby active. Locomotion and teleport active.");
+window.dispatchEvent(new CustomEvent("svr:ready", { detail: { build: "PHASE-93-LOCOMOTION-CACHE-BOOT-LOCK", message: "SVR runtime ready" } }));
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -338,6 +340,7 @@ renderer.setAnimationLoop(()=>{
       statusCb: (text)=>{ setStatus(text); },
       modeCb: (text)=>{ setMode(text); }
     });
+    locomotion.update({ dt, leftController, rightController });
   }
 
   if (watch) watch.update(dt, leftHand, rightHand);
