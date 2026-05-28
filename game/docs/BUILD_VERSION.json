@@ -1,13 +1,14 @@
 {
-  "build": "PHASE-92-WEBXR-AUTO-DEPLOY-LOCK",
-  "label": "WebXR Auto Deploy Lock",
+  "build": "PHASE-93-LOBBY-FLOOR-TABLE-LOCOMOTION-SKY-LOCK",
+  "label": "Lobby Floor Table Locomotion Sky Lock",
   "scope": "game-only",
   "date": "2026-05-28",
   "notes": [
-    "WebXR-only phase marker locked",
-    "direct /game deploy path preserved",
-    "private scene route cache bumped to phase92",
-    "website/site untouched",
-    "current lobby preserved"
+    "stabilize blinking floor overlays",
+    "neutralize duplicate green tabletop overlay",
+    "align private portals with their hub areas",
+    "raise Moon and Mars high into the sky",
+    "fix Quest right-stick forward/back movement",
+    "fix hold fist/pinch or controller grip/A/trigger release teleport"
   ]
 }
