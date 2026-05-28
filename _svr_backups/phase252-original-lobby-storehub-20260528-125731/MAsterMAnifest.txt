@@ -6231,27 +6231,3 @@ SVR WEB LOBBY LOCOMOTION REPAIR LOCK
 - Permanent modules:
   <script src="./modules/svr_quest_locomotion_teleport.js"></script>
   <script src="./modules/svr_lobby_store_hub.js"></script>
-
-PHASE 252 — ORIGINAL LOBBY STORE HUB EMBED LOCK
-Request:
-Restore the original lobby as the source of truth. Do not replace it with a placeholder lobby.
-Embed the original store hub/private VR room portal system back onto the original lobby.
-Keep the store front/hub visible from the lobby and preserve every module previously added.
-
-Required files:
-- game/index.html
-- game/modules/svr_quest_locomotion_teleport.js
-- game/modules/svr_original_lobby_store_hub_embed.js
-- update/svr_master_manifest.json
-
-Movement rules:
-- Quest right controller moves forward based on user camera facing direction.
-- Fist locomotion remains enabled.
-- Trigger-release teleport leap remains enabled.
-- Movement and teleport must not break original lobby runtime.
-
-Store hub rules:
-- Original lobby wall/floor/storefront feeling must remain.
-- Store hub is embedded into the original lobby.
-- Private VR room routes remain available.
-- Example store items are present until live inventory is connected.

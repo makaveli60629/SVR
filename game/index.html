@@ -1,71 +1,129 @@
 ﻿<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>SVR Lobby / Store Hub</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-<script src="./modules/svr_quest_locomotion_teleport.js"></script>
-<script src="./modules/svr_lobby_store_hub.js"></script>
-<style>
-html,body{margin:0;width:100%;height:100%;background:#05010c;overflow:hidden}
-.fallback{position:fixed;left:16px;bottom:16px;z-index:5;color:white;font:14px system-ui;background:rgba(0,0,0,.6);padding:10px 12px;border-radius:12px}
-.fallback a{color:#9ffcff}
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>SVR Poker â€¢ Phase 247 Direct Deploy Route Verify Lock</title>
+  <meta name="theme-color" content="#050508"/>
+  <link rel="manifest" href="./manifest.json"/>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
+    #hud {
+      position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10;
+      display: flex; gap: 10px; align-items: center; justify-content: space-between;
+      pointer-events: none;
+    }
+    .pill {
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.35);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #e9e9ff;
+      font-size: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      pointer-events: none;
+    }
+    .btn {
+      pointer-events: auto;
+      border: 1px solid rgba(180,140,255,.45);
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn:hover { background: rgba(60,40,90,.55); }
+    #sceneNav{
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+      pointer-events: auto;
+    }
+    .scene-btn{
+      border: 1px solid rgba(120,255,186,.42);
+      background: rgba(2,10,8,.62);
+      color: #eafff4;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      font-size: 12px;
+    }
+    .scene-btn:hover{ background: rgba(10,48,33,.72); }
+    body.preview-mode #sceneNav { display:none !important; }
+    #log {
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10;
+      max-height: 38vh; overflow: auto; display: none;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.25);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: #d7d7ff;
+      font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+    #err {
+      position: fixed; inset: 0; display: none; z-index: 50;
+      background: rgba(0,0,0,.88);
+      color: #fff;
+      padding: 18px;
+      font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      overflow: auto;
+    }
+
+    body.preview-mode #hud,
+    body.preview-mode #log,
+    body.preview-mode #err { display: none !important; }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body>
-<div class="fallback">
-SVR Lobby Restored |
-<a href="../site/store.html">Store</a> |
-<a href="../site/profile.html">Profile</a> |
-<a href="../index.html">Public</a>
-</div>
+  <div id="app"></div>
 
-<a-scene background="color:#05010c" vr-mode-ui="enabled:true" webxr="optionalFeatures: hand-tracking, local-floor, bounded-floor">
-<a-sky color="#05010c"></a-sky>
+  <div id="hud">
+    <div class="pill" id="status">Bootingâ€¦</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
+      <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
+      <span class="pill" id="mode">Hands: â€¦</span>
+      <span class="pill">BUILD: PHASE-252-ORIGINAL-LOBBY-STORE-HUB-EMBED-LOCK</span>
+    </div>
+  </div>
 
-<a-plane position="0 0 0" rotation="-90 0 0" width="14" height="14" color="#0b0716"></a-plane>
-<a-plane position="0 2 -5.05" width="14" height="4" color="#120920"></a-plane>
-<a-plane position="-7 2 0" rotation="0 90 0" width="10" height="4" color="#10081c"></a-plane>
-<a-plane position="7 2 0" rotation="0 -90 0" width="10" height="4" color="#10081c"></a-plane>
+  <div id="sceneNav">
+    <button class="scene-btn" data-scene="lobby">Lobby</button>
+    <button class="scene-btn" data-scene="seat">Seat</button>
+    <button class="scene-btn" data-scene="reiki">Reiki Hub</button>
+    <button class="scene-btn" data-route="./reiki.html">Reiki Room</button>
+    <button class="scene-btn" data-scene="pga">PGA Hub</button>
+    <button class="scene-btn" data-route="./pga-drive.html">PGA Drive</button>
+    <button class="scene-btn" data-route="./chip-putt.html">Chip/Putt</button>
+    <button class="scene-btn" data-route="./store-room.html">VR Store</button>
+    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
+    <button class="scene-btn" data-route="./scorpion.html">Scorpion</button>
+  </div>
 
-<a-text value="SVR ORIGINAL LOBBY / STORE FRONT" position="0 3.25 -4.9" align="center" color="#fff" width="7"></a-text>
-<a-text value="Private rooms, portal hub, example store items, Quest locomotion repaired." position="0 2.9 -4.9" align="center" color="#9ffcff" width="6"></a-text>
+  <pre id="log"></pre>
+  <pre id="err"></pre>
 
-<a-entity position="-3.8 1.7 -3.7" rotation="0 35 0">
-<a-plane width="3.4" height="2.8" color="#18102d"></a-plane>
-<a-text value="PRIVATE VR ROOMS" position="0 1 .05" align="center" color="#9ffcff" width="3"></a-text>
-<a-text value="Scorpion Poker\nPGA Hub\nSmoker Lounge\nReiki Room\nVR Store Portal" position="0 .25 .05" align="center" color="#fff" width="3"></a-text>
-</a-entity>
+  <script type="module" src="./main.js"></script>
 
-<a-entity position="0 1.7 -4.35">
-<a-plane width="3.6" height="2.8" color="#15132c"></a-plane>
-<a-text value="STORE HUB" position="0 1 .05" align="center" color="#9ffcff" width="3"></a-text>
-<a-text value="Example Items:\nAvatar Watch Skin\nPremium Chip Set\nCard Back Pack\nLobby Table Theme\nEvent Drop Pass" position="0 .15 .05" align="center" color="#fff" width="3"></a-text>
-</a-entity>
-
-<a-entity position="3.8 1.7 -3.7" rotation="0 -35 0">
-<a-plane width="3.4" height="2.8" color="#18102d"></a-plane>
-<a-text value="SITE MODULES" position="0 1 .05" align="center" color="#9ffcff" width="3"></a-text>
-<a-text value="Profile\nInventory\nDashboard\nMembership\nSponsor Hub" position="0 .25 .05" align="center" color="#fff" width="3"></a-text>
-</a-entity>
-
-<a-ring position="0 .03 -1.25" rotation="-90 0 0" radius-inner=".78" radius-outer=".83" color="#7dfaff"></a-ring>
-<a-text value="Stand here. Right controller moves forward where camera faces. Grip = fist move. Trigger release = leap." position="0 .12 -1.25" align="center" color="#fff" width="5"></a-text>
-
-<a-sphere position="-4.8 4.5 -6" radius=".42" color="#d7d4c2"></a-sphere>
-<a-sphere position="4.8 4.25 -6.2" radius=".36" color="#b75635"></a-sphere>
-
-<a-entity light="type:ambient;color:#8a78b8;intensity:.55"></a-entity>
-<a-entity light="type:directional;color:#fff;intensity:.7" position="1 5 2"></a-entity>
-
-<a-entity id="svr-player-rig" position="0 0 2.25" svr-camera-forward-driver>
-<a-entity id="svr-player-camera" camera look-controls wasd-controls position="0 1.6 0">
-<a-cursor raycaster="objects:.clickable" fuse="false"></a-cursor>
-</a-entity>
-<a-entity laser-controls="hand:right" raycaster="objects:.clickable" line="color:#7dfaff"></a-entity>
-<a-entity laser-controls="hand:left" raycaster="objects:.clickable" line="color:#b68cff"></a-entity>
-</a-entity>
-</a-scene>
+<!-- SVR Phase 248: Quest locomotion / hand teleport / lobby Moon Mars lock -->
+<script src="./modules/svr_quest_locomotion_teleport.js"></script>
+<script src="./modules/svr_moon_mars_lobby.js"></script>
+<script src="./modules/svr_original_lobby_store_hub_embed.js"></script>
 </body>
 </html>
+
+

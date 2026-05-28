@@ -9,5 +9,26 @@
                         ],
     "phase":  279,
     "rule":  "Original lobby only. No duplicate lobby. Hand history/showdown HUD higher. Community cards bigger and higher. Spawn view clear. Floor stable.",
-    "updatedAt":  "2026-05-27T04:58:43Z"
+    "updatedAt":  "2026-05-27T04:58:43Z",
+    "phase252_original_lobby_storehub_embed":  {
+                                                   "phase":  252,
+                                                   "lock":  "PHASE-252-ORIGINAL-LOBBY-STORE-HUB-EMBED-LOCK",
+                                                   "date":  "2026-05-28",
+                                                   "request":  "Restore original lobby and embed original store hub/private VR room modules into it. Do not replace the lobby with a placeholder.",
+                                                   "rules":  [
+                                                                 "Original lobby is source of truth",
+                                                                 "Store hub must be embedded into original lobby",
+                                                                 "Private VR room portals must remain",
+                                                                 "Quest right-controller movement follows camera forward",
+                                                                 "Fist locomotion enabled",
+                                                                 "Trigger-release teleport leap enabled",
+                                                                 "No Unity path",
+                                                                 "Live site and GitHub route only"
+                                                             ],
+                                                   "files":  [
+                                                                 "game/index.html",
+                                                                 "game/modules/svr_quest_locomotion_teleport.js",
+                                                                 "game/modules/svr_original_lobby_store_hub_embed.js"
+                                                             ]
+                                               }
 }

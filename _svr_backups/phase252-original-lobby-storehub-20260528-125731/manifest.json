@@ -1,0 +1,17 @@
+﻿{
+    "name":  "ScarlettVR Poker",
+    "short_name":  "SVR Poker",
+    "start_url":  "./index.html",
+    "display":  "standalone",
+    "background_color":  "#050508",
+    "theme_color":  "#050508",
+    "svr_lobby_locomotion_repair":  {
+                                        "date":  "2026-05-28",
+                                        "game_entry":  "game/index.html",
+                                        "modules":  [
+                                                        "game/modules/svr_quest_locomotion_teleport.js",
+                                                        "game/modules/svr_lobby_store_hub.js"
+                                                    ],
+                                        "enabled":  true
+                                    }
+}
