@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 const PHASE93 = "PHASE-93-LOBBY-FLOOR-TABLE-LOCOMOTION-SKY-LOCK";
+let installedForScene = new WeakSet();
 
 function isMesh(obj){ return !!obj?.isMesh && !!obj.geometry; }
 function isSprite(obj){ return !!obj?.isSprite; }
@@ -25,20 +26,22 @@ function stabilizeFloorOverlays(scene){
   scene.traverse((obj)=>{
     if (!isMesh(obj)) return;
     const { size, center } = boxInfo(obj);
-    if (center.y > 0.035 || size.x < 0.4 || size.z < 0.4 || size.y > 0.08) return;
+    if (center.y > 0.045 || size.x < 0.4 || size.z < 0.4 || size.y > 0.08) return;
     const material = obj.material;
     const isTransparent = Array.isArray(material) ? material.some(m=>m?.transparent) : !!material?.transparent;
     const isFloorLike = /CircleGeometry|PlaneGeometry|ShapeGeometry/.test(String(obj.geometry?.type || "")) || isTransparent;
     if (!isFloorLike) return;
 
-    obj.position.y += 0.004 + floorOverlayIndex * 0.0017;
-    obj.renderOrder = -20 + floorOverlayIndex;
-    obj.userData.phase93FloorStable = true;
+    if (!obj.userData.phase93FloorStable){
+      obj.position.y += 0.006 + floorOverlayIndex * 0.0022;
+      obj.userData.phase93FloorStable = true;
+    }
+    obj.renderOrder = -30 + floorOverlayIndex;
     setMatFlag(obj.material, (mat)=>{
       mat.depthWrite = false;
       mat.polygonOffset = true;
-      mat.polygonOffsetFactor = -4 - floorOverlayIndex;
-      mat.polygonOffsetUnits = -4 - floorOverlayIndex;
+      mat.polygonOffsetFactor = -8 - floorOverlayIndex;
+      mat.polygonOffsetUnits = -8 - floorOverlayIndex;
       mat.needsUpdate = true;
     });
     floorOverlayIndex += 1;
@@ -50,14 +53,14 @@ function darkenDuplicateGreenTableTop(scene){
   scene.traverse((obj)=>{
     if (!isMesh(obj)) return;
     const { size, center } = boxInfo(obj);
-    const flatTableCandidate = center.y > 0.78 && center.y < 1.05 && size.x > 2.8 && size.x < 5.4 && size.z > 1.7 && size.z < 3.8 && size.y < 0.18;
+    const flatTableCandidate = center.y > 0.78 && center.y < 1.08 && size.x > 2.8 && size.x < 5.6 && size.z > 1.7 && size.z < 3.9 && size.y < 0.20;
     if (!flatTableCandidate) return;
 
     setMatFlag(obj.material, (mat)=>{
       const c = mat.color;
-      const looksGreen = c && c.g > c.r * 1.25 && c.g > c.b * 1.05;
-      const isFeltMap = !!mat.map;
-      if (!looksGreen && !isFeltMap && fixed > 0) return;
+      const looksGreen = c && c.g > c.r * 1.18 && c.g > c.b * 1.02;
+      const isPlainFelt = !!mat.map || looksGreen;
+      if (!isPlainFelt && fixed > 0) return;
       mat.color?.set?.(0x15101a);
       mat.emissive?.set?.(0x050306);
       mat.emissiveIntensity = Math.min(mat.emissiveIntensity || 0.02, 0.035);
@@ -110,8 +113,8 @@ function classifyPlanet(mesh){
   if (mesh.position.z > -40 || mesh.position.y < 15) return null;
   const c = mesh.material?.color;
   if (!c) return null;
-  if (c.r > 0.75 && c.g > 0.70 && c.b > 0.70) return "moon";
-  if (c.r > 0.55 && c.g > 0.20 && c.g < 0.55 && c.b < 0.40) return "mars";
+  if (c.r > 0.70 && c.g > 0.65 && c.b > 0.65) return "moon";
+  if (c.r > 0.50 && c.g > 0.16 && c.g < 0.58 && c.b < 0.46) return "mars";
   return null;
 }
 
@@ -119,7 +122,7 @@ function moveNearbyDecor(scene, oldPos, newPos){
   scene.traverse((obj)=>{
     if (!obj?.position || isMesh(obj)) return;
     if (!(isSprite(obj) || isPointLight(obj))) return;
-    if (obj.position.distanceTo(oldPos) > 3.2) return;
+    if (obj.position.distanceTo(oldPos) > 3.5) return;
     obj.position.copy(newPos);
   });
 }
@@ -141,8 +144,11 @@ function raisePlanets(scene){
   });
 }
 
-export function installPhase93LobbyRepair({ scene, world, log = console.log } = {}){
+export function installPhase93LobbyRepair({ scene, world, log = console.log, selfTick = true } = {}){
   if (!scene) return null;
+  if (installedForScene.has(scene)) return scene.userData.phase93RepairApi || null;
+  installedForScene.add(scene);
+
   try{
     stabilizeFloorOverlays(scene);
     darkenDuplicateGreenTableTop(scene);
@@ -153,15 +159,33 @@ export function installPhase93LobbyRepair({ scene, world, log = console.log } = 
   }catch(err){
     console.warn(`[${PHASE93}] install failed`, err);
   }
+
   let accum = 0;
-  return {
+  let last = performance.now();
+  const api = {
     update(dt = 0.016){
       accum += dt;
       raisePlanets(scene);
-      if (accum > 2.5){
+      if (accum > 1.25){
+        stabilizeFloorOverlays(scene);
+        darkenDuplicateGreenTableTop(scene);
         alignPortals(scene, world);
         accum = 0;
       }
     }
   };
+  scene.userData.phase93RepairApi = api;
+
+  if (selfTick){
+    const tick = ()=>{
+      if (!scene.userData.phase93RepairApi) return;
+      const now = performance.now();
+      api.update(Math.min((now - last) / 1000, 0.05));
+      last = now;
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  return api;
 }
