@@ -1,13 +1,10 @@
-name: Auto Deploy
+﻿name: Auto Deploy
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: read
@@ -22,11 +19,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Checkout fresh repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - name: Install tools
         run: |
@@ -34,15 +33,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y rsync unzip
 
-      - name: Clean build folders
+      - name: Build committed site and game
         run: |
           set -euo pipefail
           rm -rf build tmp dist public _site tmp_site
           mkdir -p build
 
-      - name: Copy committed public site and game
-        run: |
-          set -euo pipefail
           rsync -av \
             --exclude '.git' \
             --exclude '.github' \
@@ -63,12 +59,9 @@ jobs:
       - name: Validate game folder
         run: |
           set -euo pipefail
-
-          if [ ! -f build/game/index.html ]; then
-            echo "ERROR: build/game/index.html missing."
-            echo "The /game folder must be committed directly."
-            exit 1
-          fi
+          test -f build/index.html
+          test -f build/site/index.html
+          test -f build/game/index.html
 
       - name: Stamp deploy health
         run: |
@@ -77,9 +70,11 @@ jobs:
           COMMIT_SHA="${GITHUB_SHA}"
           DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           BUILD_LABEL="$(grep -oE 'PHASE-[A-Za-z0-9._-]+' build/game/index.html | head -n 1 || true)"
+
           if [ -z "${BUILD_LABEL}" ] && [ -f build/game/docs/BUILD_VERSION.json ]; then
             BUILD_LABEL="$(grep -oE 'PHASE-[A-Za-z0-9._-]+' build/game/docs/BUILD_VERSION.json | head -n 1 || true)"
           fi
+
           if [ -z "${BUILD_LABEL}" ]; then
             BUILD_LABEL="SVR-DIRECT-FILES-LOCK"
           fi
@@ -122,7 +117,6 @@ jobs:
       - name: Validate build output
         run: |
           set -euo pipefail
-
           test -f build/index.html
           test -f build/site/index.html
           test -f build/game/index.html
@@ -130,17 +124,11 @@ jobs:
           test -f build/game/deploy-health.json
           test -f build/deploy-health.json
 
-          echo "Public site markers:"
-          grep -R "SVR-MATRIX-RESTORE-LOCK\|Scarlett Holding Company\|binary secret rain" build/index.html build/site/*.html build/site/js/*.js 2>/dev/null || true
-
           echo "Game phase markers:"
-          grep -R "PHASE-\|SITE-DIRECT-FILES-LOCK" build/game/index.html build/game/version.json build/game/deploy-health.json build/deploy-health.json || true
+          grep -R "PHASE-\|SVR-DIRECT-FILES-LOCK" build/game/index.html build/game/version.json build/game/deploy-health.json build/deploy-health.json || true
 
           echo "Build size:"
           du -sh build build/game
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -148,4 +136,5 @@ jobs:
           path: build
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
