@@ -5,6 +5,7 @@ import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
 import { createLocomotion } from "./modules/locomotion.js";
 import { buildSkylineRoom } from "./modules/world_skyline.js";
+import { addRestoredStorefronts } from "./modules/storefront_restore.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
@@ -73,6 +74,9 @@ const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: ren
 setStatus("Loading original lobby...", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
+const storefrontLayer = addRestoredStorefronts(scene, { radius: roomClamp || 15 });
+Object.assign(sceneTargets, storefrontLayer.targets || {});
+scene.userData.SVR_STOREFRONTS_RESTORED = true;
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -197,22 +201,13 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit8") gotoScene("scorpion");
 });
 
-// Phase 91 hotfix: duplicate const declarations here caused black boot.
-// Keep one portal walkthrough instance only, and continue if the helper is absent.
 let svrPortalSystem = null;
 const portalWalkthroughInstaller = (typeof installSvrPortalWalkthrough === "function")
   ? installSvrPortalWalkthrough
   : (typeof window.installSvrPortalWalkthrough === "function" ? window.installSvrPortalWalkthrough : null);
 
 if (portalWalkthroughInstaller){
-  svrPortalSystem = portalWalkthroughInstaller({
-    scene,
-    camera,
-    renderer,
-    gotoScene,
-    setStatus,
-    log
-  });
+  svrPortalSystem = portalWalkthroughInstaller({ scene, camera, renderer, gotoScene, setStatus, log });
 } else {
   log("[INFO] Portal walkthrough installer not found; continuing boot without portal walkthrough overlay.");
 }
@@ -258,11 +253,11 @@ setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Locomotion, hand teleport, and physical portals active.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Original lobby active. Storefronts, locomotion, hand teleport, and physical portals active.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Input ready: desktop / Quest locomotion / hand tracking");
 window.SVR_GAME_READY = true;
-window.SVR_BOOT_FAILSAFE?.ready("SVR runtime Ready. Original lobby active. Locomotion and teleport active.");
-window.dispatchEvent(new CustomEvent("svr:ready", { detail: { build: "PHASE-93-LOCOMOTION-CACHE-BOOT-LOCK", message: "SVR runtime ready" } }));
+window.SVR_BOOT_FAILSAFE?.ready("SVR runtime Ready. Storefronts restored. Locomotion and teleport active.");
+window.dispatchEvent(new CustomEvent("svr:ready", { detail: { build: "PHASE-94-STOREFRONT-RESTORE-VIDEO-READY", message: "SVR runtime ready" } }));
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -331,15 +326,7 @@ renderer.setAnimationLoop(()=>{
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
   if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({
-      dt,
-      leftHand,
-      rightHand,
-      leftController,
-      rightController,
-      statusCb: (text)=>{ setStatus(text); },
-      modeCb: (text)=>{ setMode(text); }
-    });
+    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } });
     locomotion.update({ dt, leftController, rightController });
   }
 
