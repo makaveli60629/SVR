@@ -1,4 +1,4 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -59,7 +59,6 @@ scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
 
-
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
@@ -70,7 +69,7 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading original lobbyâ€¦", { force: true });
+setStatus("Loading original lobby...", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
@@ -196,24 +195,27 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit8") gotoScene("scorpion");
 });
 
+// Phase 91 hotfix: duplicate const declarations here caused black boot.
+// Keep one portal walkthrough instance only, and continue if the helper is absent.
+let svrPortalSystem = null;
+const portalWalkthroughInstaller = (typeof installSvrPortalWalkthrough === "function")
+  ? installSvrPortalWalkthrough
+  : (typeof window.installSvrPortalWalkthrough === "function" ? window.installSvrPortalWalkthrough : null);
 
-const svrPortalSystem = installSvrPortalWalkthrough({
-  scene,
-  camera,
-  renderer,
-  gotoScene,
-  setStatus,
-  log
-});
+if (portalWalkthroughInstaller){
+  svrPortalSystem = portalWalkthroughInstaller({
+    scene,
+    camera,
+    renderer,
+    gotoScene,
+    setStatus,
+    log
+  });
+} else {
+  log("[INFO] Portal walkthrough installer not found; continuing boot without portal walkthrough overlay.");
+}
+window.SVR_PORTAL_SYSTEM = svrPortalSystem;
 
-const svrPortalSystem = installSvrPortalWalkthrough({
-  scene,
-  camera,
-  renderer,
-  gotoScene,
-  setStatus,
-  log
-});
 const watch = createWristWatch({
   scene,
   camera,
@@ -250,7 +252,7 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logoÃ¢â‚¬Â¦", { force: true });
+setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
@@ -273,7 +275,8 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
-  await audio.prime(); audio.stop();
+  await audio.prime();
+  audio.stop();
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
@@ -344,17 +347,11 @@ renderer.setAnimationLoop(()=>{
 
 const canvasEl = renderer.domElement;
 canvasEl.addEventListener("pointerdown", async ()=>{
-  const st = audio.getState();
   audio.stop();
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. ReloadingÃ¢â‚¬Â¦");
-  setStatus("WebGL context lost (reloadingÃ¢â‚¬Â¦)", { force: true });
+  log("[ERR] WebGL context lost. Reloading...");
+  setStatus("WebGL context lost (reloading...)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
-
-
-
-
-
