@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const BUILD = "PHASE-91-BLACK-BOOT-LOG-RECOVERY-V2";
+  const BUILD = "PHASE-93-LOCOMOTION-CACHE-BOOT-LOCK";
   const startedAt = Date.now();
   const notes = [];
   let failed = false;
@@ -28,6 +28,23 @@
     if (bootLog) bootLog.textContent = notes.join("\n");
   }
 
+  function reloadNoCache(reason){
+    try {
+      const key = "SVR_AUTO_NOCACHE_RELOAD_" + BUILD;
+      const already = sessionStorage.getItem(key) === "1";
+      if (already) return false;
+      sessionStorage.setItem(key, "1");
+      const url = new URL(location.href);
+      url.searchParams.set("v", BUILD + "-" + Date.now());
+      url.searchParams.set("svrAutoReload", "1");
+      if (reason) url.searchParams.set("reason", String(reason).slice(0, 48));
+      location.replace(url.toString());
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   function ensureOverlay(){
     let overlay = document.getElementById("svrBootOverlay");
     if (!overlay) {
@@ -51,7 +68,9 @@
 
       const reload = document.getElementById("svrBootReload");
       if (reload) reload.addEventListener("click", function(){
-        location.href = location.pathname + "?v=" + Date.now();
+        const url = new URL(location.href);
+        url.searchParams.set("v", Date.now());
+        location.replace(url.toString());
       });
 
       const copy = document.getElementById("svrBootCopy");
@@ -84,6 +103,12 @@
     const text = safeText(error);
     addNote((label || "Boot failure") + ": " + text);
 
+    const staleBootLikely = /svrPortalSystem|already been declared|duplicate/i.test(text);
+    if (staleBootLikely && !new URLSearchParams(location.search).has("svrAutoReload")){
+      addNote("Stale boot signature detected. Auto reloading once with no-cache version URL.");
+      if (reloadNoCache("stale-boot")) return;
+    }
+
     const status = document.getElementById("status");
     if (status) status.textContent = "Boot failed - recovery log is open";
 
@@ -103,6 +128,7 @@
   function markReady(message){
     ready = true;
     window.SVR_GAME_READY = true;
+    try { sessionStorage.removeItem("SVR_AUTO_NOCACHE_RELOAD_" + BUILD); } catch (_) {}
     addNote(message || "SVR ready marker received.");
     const overlay = document.getElementById("svrBootOverlay");
     if (overlay) overlay.style.display = "none";
@@ -156,7 +182,10 @@
 
   setTimeout(function(){
     if (!ready && !failed) {
-      fail("Timed out before window.SVR_GAME_READY / svr:ready. Likely blocked CDN import, missing module, bad top-level await, or asset hang.", "boot timeout");
+      addNote("Boot timeout reached. Trying one automatic no-cache reload before showing recovery.");
+      if (!reloadNoCache("timeout")) {
+        fail("Timed out before window.SVR_GAME_READY / svr:ready. Likely blocked CDN import, missing module, bad top-level await, or asset hang.", "boot timeout");
+      }
     }
   }, 11000);
 
