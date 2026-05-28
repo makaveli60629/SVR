@@ -205,7 +205,7 @@ function movePlayerToSpot(target, lookTarget = null){
 }
 
 function gotoScene(key){
-  if (["reikiRoom","pgaDrive","pgaChipPutt","chipPutt","storeRoom","smokerLounge"].includes(key)) return openPrivateScene(key);
+  if (["reikiRoom","reiki","pgaDrive","pga","pgaChipPutt","chipPutt","storeRoom","smokerLounge","scorpion"].includes(key)) return openPrivateScene(key);
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
@@ -236,7 +236,7 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit5") gotoScene("pga");
   if (e.code === "Digit6") gotoScene("legends");
   if (e.code === "Digit7") gotoScene("sponsor");
-  if (e.code === "Digit8") gotoScene("scorpion");
+  if (e.code === "Digit8") openPrivateScene("scorpion");
   if (e.code === "Digit9") openPrivateScene("reikiRoom");
   if (e.code === "Digit0") openPrivateScene("pgaDrive");
   if (e.code === "Minus") openPrivateScene("pgaChipPutt");
@@ -268,7 +268,7 @@ const watch = createWristWatch({
     goPga: ()=>gotoScene("pga"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
-    goScorpion: ()=>gotoScene("scorpion"),
+    goScorpion: ()=>openPrivateScene("scorpion"),
     goReikiRoom: ()=>openPrivateScene("reikiRoom"),
     goPgaDrive: ()=>openPrivateScene("pgaDrive"),
     goPgaChipPutt: ()=>openPrivateScene("pgaChipPutt"),
