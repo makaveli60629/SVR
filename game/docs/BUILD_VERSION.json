@@ -1,0 +1,11 @@
+{
+  "build": "PHASE-91-DIRECT-GAME-AUDIT-REPAIR-LOCK",
+  "label": "Direct Game Audit Repair Lock",
+  "notes": [
+    "boot timeout fallback",
+    "direct private scenes",
+    "locomotion repair",
+    "unapproved brand scrub",
+    "Moon/Mars boot-safe sky"
+  ]
+}

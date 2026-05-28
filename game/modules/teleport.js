@@ -278,31 +278,28 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   function movePlayerFromControllers(dt){
     const leftGp = controllerGamepad(leftControllerRef);
     const rightGp = controllerGamepad(rightControllerRef);
-    const moveSource = leftGp || rightGp;
-    const turnSource = rightGp || leftGp;
-    const leftStick = getStick(moveSource, "left");
-    const rightStick = getStick(turnSource, "right");
-
-    if (Math.abs(rightStick.x) > 0.72 && performance.now() > snapCooldownUntil){
-      playerYaw += Math.sign(rightStick.x) * (Math.PI / 4);
+    if (!leftGp && !rightGp) return;
+    const leftStick = leftGp ? getStick(leftGp, "left") : { x: 0, y: 0 };
+    const rightStick = rightGp ? getStick(rightGp, "right") : { x: 0, y: 0 };
+    const turnX = Math.abs(rightStick.x) > 0.2 ? rightStick.x : leftStick.x;
+    const moveY = Math.abs(rightStick.y) > 0.12 ? rightStick.y : leftStick.y;
+    if (Math.abs(turnX) > 0.72 && performance.now() > snapCooldownUntil){
+      playerYaw += Math.sign(turnX) * (Math.PI / 4);
       applyReferenceSpace();
       snapCooldownUntil = performance.now() + 220;
     }
-
-    const mag = Math.hypot(leftStick.x, leftStick.y);
-    if (mag < 0.12) return;
-
+    if (Math.abs(moveY) < 0.12) return;
     const xrCam = renderer.xr.getCamera(camera);
     xrCam.getWorldDirection(headDir);
     headDir.y = 0;
     if (headDir.lengthSq() < 1e-5) headDir.set(0, 0, -1);
     headDir.normalize();
-    const rightDir = new THREE.Vector3(headDir.z, 0, -headDir.x).normalize();
-    const speed = 2.8;
-    const stepX = (rightDir.x * leftStick.x + headDir.x * (-leftStick.y)) * speed * dt;
-    const stepZ = (rightDir.z * leftStick.x + headDir.z * (-leftStick.y)) * speed * dt;
-    const nextX = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
-    const nextZ = THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp);
+    const speed = 2.9;
+    const stepX = headDir.x * (-moveY) * speed * dt;
+    const stepZ = headDir.z * (-moveY) * speed * dt;
+    const clampValue = typeof roomClamp === "number" ? roomClamp : 18;
+    const nextX = THREE.MathUtils.clamp(playerX + stepX, -clampValue, clampValue);
+    const nextZ = THREE.MathUtils.clamp(playerZ + stepZ, -clampValue, clampValue);
     setPlayerXZ(nextX, nextZ);
   }
 
