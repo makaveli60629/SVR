@@ -1,7 +1,16 @@
 {
-  "build": "PHASE-85-LOCOMOTION-PORTAL-PRIVATE-SCENE-LOCK",
+  "build": "PHASE-87-REAL-TEXTURE-PLANETS-LOCK",
   "scope": "game-side-only",
   "siteTouched": false,
   "lobbyStructure": "preserved",
-  "privateScenes": ["reiki.html", "range.html", "chip-putt.html", "store-room.html", "smoker-lounge.html", "scorpion.html"]
+  "privateScenes": [
+    "reiki.html",
+    "range.html",
+    "chip-putt.html",
+    "store-room.html",
+    "smoker-lounge.html",
+    "scorpion.html"
+  ],
+  "phase": 87,
+  "label": "Real Texture Moon/Mars Sky Lock"
 }

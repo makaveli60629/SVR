@@ -86,10 +86,43 @@ try {
   const table = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, 0.18, 64), new THREE.MeshBasicMaterial({ color: 0x104034 }));
   table.position.y = 0.9;
   scene.add(table);
-  const moon = new THREE.Mesh(new THREE.SphereGeometry(1.1, 32, 16), new THREE.MeshBasicMaterial({ color: 0xeef4ff }));
-  moon.position.set(-8, 12, -18); scene.add(moon);
-  const mars = new THREE.Mesh(new THREE.SphereGeometry(0.75, 32, 16), new THREE.MeshBasicMaterial({ color: 0xff7a4a }));
-  mars.position.set(8, 11, -20); scene.add(mars);
+  const moonTex = await loadFirstTexture(assetUrls("texture/moon_diffuse.png"), { colorSpace: THREE.SRGBColorSpace });
+  const moonBump = await loadFirstTexture(assetUrls("texture/moon_bump.png"));
+  const marsTex = await loadFirstTexture(assetUrls("texture/mars/diffuse_1k.jpg"), { colorSpace: THREE.SRGBColorSpace });
+  const marsBump = await loadFirstTexture(assetUrls("texture/mars/bump_1k.jpg"));
+  const makeFallbackPlanet = (name, radius, map, bumpMap, color, glowColor)=>{
+    const g = new THREE.Group();
+    g.name = `${name}_BOOT_SAFE_REAL_TEXTURE_SKY_BODY`;
+    const body = new THREE.Mesh(new THREE.SphereGeometry(radius, 96, 64), new THREE.MeshStandardMaterial({ color, map: map || null, bumpMap: bumpMap || null, bumpScale: bumpMap ? 0.55 : 0, roughness: 0.94, emissive: glowColor, emissiveIntensity: 0.08 }));
+    body.frustumCulled = false;
+    g.add(body);
+    const haloCanvas = document.createElement("canvas");
+    haloCanvas.width = haloCanvas.height = 256;
+    const hctx = haloCanvas.getContext("2d");
+    const grad = hctx.createRadialGradient(128,128,6,128,128,126);
+    grad.addColorStop(0,"rgba(255,255,255,0.75)");
+    grad.addColorStop(0.35,"rgba(255,255,255,0.22)");
+    grad.addColorStop(1,"rgba(255,255,255,0)");
+    hctx.fillStyle = grad; hctx.fillRect(0,0,256,256);
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(haloCanvas), color: glowColor, transparent: true, opacity: 0.18, depthWrite: false, blending: THREE.AdditiveBlending }));
+    halo.scale.set(radius * 9, radius * 9, 1);
+    g.add(halo);
+    const light = new THREE.PointLight(glowColor, name === "Moon" ? 3.2 : 2.1, radius * 120, 1.45);
+    g.add(light);
+    g.userData.body = body;
+    return g;
+  };
+  const moon = makeFallbackPlanet("Moon", 4.6, moonTex, moonBump, 0xf1f3f6, 0xeaf2ff);
+  moon.position.set(-90, 42, -210); scene.add(moon);
+  const mars = makeFallbackPlanet("Mars", 2.7, marsTex, marsBump, 0xd4774e, 0xff9b6b);
+  mars.position.set(110, 48, -240); scene.add(mars);
+  scene.userData._bootPlanetTick = (dt)=>{
+    const t = (scene.userData._bootPlanetTime = (scene.userData._bootPlanetTime || 0) + dt);
+    moon.position.set(-90 + Math.sin(t * 0.008) * 10, 42 + Math.sin(t * 0.035) * 1.4, -210 + Math.cos(t * 0.008) * 12);
+    mars.position.set(110 + Math.sin(t * 0.006 + 1.2) * 12, 48 + Math.sin(t * 0.030) * 1.2, -240 + Math.cos(t * 0.006 + 1.2) * 12);
+    moon.userData.body.rotation.y += dt * 0.085;
+    mars.userData.body.rotation.y += dt * 0.067;
+  };
   world = {
     roomClamp: (p)=>p,
     seats: [{x:0,z:2.9,label:"Player Seat"},{x:2.3,z:1.3,label:"Bot 1"},{x:2.3,z:-1.3,label:"Bot 2"},{x:0,z:-2.9,label:"Bot 3"},{x:-2.3,z:-1.3,label:"Bot 4"},{x:-2.3,z:1.3,label:"Bot 5"}],

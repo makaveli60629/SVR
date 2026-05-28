@@ -842,6 +842,71 @@ function createOrbHaloSprite(color = 0xffffff, opacity = 0.5){
     blending: THREE.AdditiveBlending
   }));
 }
+function createTexturedPlanetGroup({
+  name = "Planet",
+  radius = 6,
+  map = null,
+  bumpMap = null,
+  bumpScale = 0.3,
+  color = 0xffffff,
+  emissive = 0x111111,
+  emissiveIntensity = 0.12,
+  glowColor = 0xffffff,
+  glowOpacity = 0.12,
+  glowScale = 7.0
+} = {}){
+  const group = new THREE.Group();
+  group.name = `${name}_GLB_TEXTURED_SKY_BODY`;
+
+  const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(radius, 96, 64),
+    new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.92,
+      metalness: 0.0,
+      map: map || null,
+      bumpMap: bumpMap || null,
+      bumpScale: bumpMap ? bumpScale : 0,
+      emissive,
+      emissiveIntensity
+    })
+  );
+  sphere.name = `${name}_textured_surface`;
+  sphere.frustumCulled = false;
+  group.add(sphere);
+
+  const rim = new THREE.Mesh(
+    new THREE.SphereGeometry(radius * 1.018, 96, 64),
+    new THREE.MeshBasicMaterial({
+      color: glowColor,
+      transparent: true,
+      opacity: glowOpacity * 0.28,
+      side: THREE.BackSide,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    })
+  );
+  rim.name = `${name}_real_glow_rim`;
+  rim.frustumCulled = false;
+  group.add(rim);
+
+  const halo = createOrbHaloSprite(glowColor, glowOpacity);
+  halo.name = `${name}_real_outer_halo`;
+  halo.scale.set(radius * glowScale, radius * glowScale, 1);
+  halo.material.depthTest = false;
+  halo.frustumCulled = false;
+  group.add(halo);
+
+  const light = new THREE.PointLight(glowColor, name.toLowerCase().includes("moon") ? 3.6 : 2.35, radius * 105, 1.45);
+  light.name = `${name}_sky_light`;
+  group.add(light);
+
+  group.userData.surface = sphere;
+  group.userData.halo = halo;
+  group.userData.light = light;
+  group.userData.rim = rim;
+  return group;
+}
 function createMatrixBillboardTexture(variant = "main"){
   const canvas = document.createElement("canvas");
   canvas.width = 1024;
@@ -2198,51 +2263,46 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   earthHalo.visible = false;
   scene.add(earthHalo);
   earthHalo.visible = false;
-  const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(5.6, 56, 56),
-    new THREE.MeshStandardMaterial({
-      color: 0xe9ebef,
-      roughness: 0.99,
-      metalness: 0.0,
-      map: moonTex || null,
-      bumpMap: moonBump || null,
-      bumpScale: moonBump ? 0.94 : 0,
-      emissive: 0x111820,
-      emissiveIntensity: 0.0
-    })
-  );
-  moon.position.set(-164, wallHeight + 178.0, -(R + 548.0));
+  // Phase 87: replace fake procedural planet balls with texture-backed GLB-style sky-body groups.
+  // These remain modular, high above the skyline, and animate with slow rotation + orbit.
+  const moon = createTexturedPlanetGroup({
+    name: "Moon",
+    radius: 7.8,
+    map: moonTex,
+    bumpMap: moonBump,
+    bumpScale: 1.08,
+    color: 0xf1f3f6,
+    emissive: 0x1b2430,
+    emissiveIntensity: 0.16,
+    glowColor: 0xf4f7ff,
+    glowOpacity: 0.20,
+    glowScale: 9.4
+  });
+  moon.position.set(-190, wallHeight + 228.0, -(R + 620.0));
   moon.frustumCulled = false;
   scene.add(moon);
-  const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(44.0, 44.0, 1);
-  moonHalo.material.depthTest = false;
-  moonHalo.visible = true;
-  scene.add(moonHalo);
-  const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(3.1, 44, 44),
-    new THREE.MeshStandardMaterial({
-      color: 0xc56b45,
-      roughness: 0.82,
-      metalness: 0.0,
-      map: marsTex || null,
-      bumpMap: marsBump || null,
-      bumpScale: marsBump ? 0.42 : 0,
-      emissive: 0x1c0904,
-      emissiveIntensity: 0.0
-    })
-  );
-  mars.position.set(232, wallHeight + 196.0, -(R + 678.0));
+  const moonHalo = moon.userData.halo;
+  const moonGlow = moon.userData.light;
+
+  const mars = createTexturedPlanetGroup({
+    name: "Mars",
+    radius: 4.6,
+    map: marsTex,
+    bumpMap: marsBump,
+    bumpScale: 0.58,
+    color: 0xd4774e,
+    emissive: 0x2c0d06,
+    emissiveIntensity: 0.20,
+    glowColor: 0xff9b6b,
+    glowOpacity: 0.18,
+    glowScale: 9.0
+  });
+  mars.position.set(255, wallHeight + 246.0, -(R + 742.0));
   mars.visible = true;
   mars.frustumCulled = false;
-  mars.visible = true; mars.frustumCulled = false; scene.add(mars);
-  mars.visible = true;
-  const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(28.0, 28.0, 1);
-  marsHalo.material.depthTest = false;
-  marsHalo.visible = true;
-  scene.add(marsHalo);
-  marsHalo.visible = true;
+  scene.add(mars);
+  const marsHalo = mars.userData.halo;
+  const marsGlow = mars.userData.light;
   const earthSpark = new THREE.Group();
   for (let i = 0; i < 8; i++){
     const spr = createOrbHaloSprite(i % 2 ? 0x79d8ff : 0xffffff, 0.40);
@@ -2264,11 +2324,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.75, 560, 1.45);
-  scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 1.75, 420, 1.55);
-  scene.add(marsGlow);
-  marsGlow.visible = true;
+  // Moon/Mars glow lights are attached to the texture-backed sky-body groups.
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
   skylineGlow.position.set(0, 34, -(R + 18));
   scene.add(skylineGlow);
@@ -2443,27 +2499,29 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       wallHeight + 72.0 + Math.sin(t * 0.018) * 0.22,
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
+    const moonOrbit = t * 0.0065;
     moon.position.set(
-      -44 + Math.sin(t * 0.020) * 5.0,
-      wallHeight + 44.0 + Math.sin(t * 0.090) * 1.4,
-      -(R + 128.0) + Math.cos(t * 0.016) * 6.0
+      -190 + Math.sin(moonOrbit) * 18.0,
+      wallHeight + 228.0 + Math.sin(t * 0.035) * 2.4,
+      -(R + 620.0) + Math.cos(moonOrbit) * 20.0
     );
-    moon.rotation.y += dt * 0.08;
-    moon.rotation.z = 0.03;
+    moon.userData.surface.rotation.y += dt * 0.085;
+    moon.userData.surface.rotation.z = 0.025;
+    moon.userData.rim.rotation.y -= dt * 0.035;
+
+    const marsOrbit = t * 0.0052 + 1.4;
     mars.position.set(
-      68 + Math.sin(t * 0.016 + 1.4) * 6.5,
-      wallHeight + 52.0 + Math.sin(t * 0.070 + 0.8) * 1.2,
-      -(R + 154.0) + Math.cos(t * 0.012 + 0.4) * 5.0
+      255 + Math.sin(marsOrbit) * 22.0,
+      wallHeight + 246.0 + Math.sin(t * 0.030 + 0.8) * 2.0,
+      -(R + 742.0) + Math.cos(marsOrbit) * 24.0
     );
     mars.visible = true;
-    mars.rotation.y += dt * 0.06;
-    mars.rotation.z = 0.04;
-    moonGlow.position.copy(moon.position);
-    moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.045 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
-    marsGlow.position.copy(mars.position);
-    marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.026 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    mars.userData.surface.rotation.y += dt * 0.067;
+    mars.userData.surface.rotation.z = 0.04;
+    mars.userData.rim.rotation.y -= dt * 0.025;
+
+    moonHalo.material.opacity = 0.145 + 0.025 * (0.5 + 0.5 * Math.sin(t * 0.20));
+    marsHalo.material.opacity = 0.118 + 0.022 * (0.5 + 0.5 * Math.sin(t * 0.23));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{
