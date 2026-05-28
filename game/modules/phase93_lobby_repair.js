@@ -1,0 +1,167 @@
+import * as THREE from "three";
+
+const PHASE93 = "PHASE-93-LOBBY-FLOOR-TABLE-LOCOMOTION-SKY-LOCK";
+
+function isMesh(obj){ return !!obj?.isMesh && !!obj.geometry; }
+function isSprite(obj){ return !!obj?.isSprite; }
+function isPointLight(obj){ return !!obj?.isPointLight; }
+
+function boxInfo(obj){
+  const box = new THREE.Box3().setFromObject(obj);
+  const size = new THREE.Vector3();
+  const center = new THREE.Vector3();
+  box.getSize(size);
+  box.getCenter(center);
+  return { box, size, center };
+}
+
+function setMatFlag(mat, fn){
+  if (Array.isArray(mat)) mat.forEach(fn);
+  else if (mat) fn(mat);
+}
+
+function stabilizeFloorOverlays(scene){
+  let floorOverlayIndex = 0;
+  scene.traverse((obj)=>{
+    if (!isMesh(obj)) return;
+    const { size, center } = boxInfo(obj);
+    if (center.y > 0.035 || size.x < 0.4 || size.z < 0.4 || size.y > 0.08) return;
+    const material = obj.material;
+    const isTransparent = Array.isArray(material) ? material.some(m=>m?.transparent) : !!material?.transparent;
+    const isFloorLike = /CircleGeometry|PlaneGeometry|ShapeGeometry/.test(String(obj.geometry?.type || "")) || isTransparent;
+    if (!isFloorLike) return;
+
+    obj.position.y += 0.004 + floorOverlayIndex * 0.0017;
+    obj.renderOrder = -20 + floorOverlayIndex;
+    obj.userData.phase93FloorStable = true;
+    setMatFlag(obj.material, (mat)=>{
+      mat.depthWrite = false;
+      mat.polygonOffset = true;
+      mat.polygonOffsetFactor = -4 - floorOverlayIndex;
+      mat.polygonOffsetUnits = -4 - floorOverlayIndex;
+      mat.needsUpdate = true;
+    });
+    floorOverlayIndex += 1;
+  });
+}
+
+function darkenDuplicateGreenTableTop(scene){
+  let fixed = 0;
+  scene.traverse((obj)=>{
+    if (!isMesh(obj)) return;
+    const { size, center } = boxInfo(obj);
+    const flatTableCandidate = center.y > 0.78 && center.y < 1.05 && size.x > 2.8 && size.x < 5.4 && size.z > 1.7 && size.z < 3.8 && size.y < 0.18;
+    if (!flatTableCandidate) return;
+
+    setMatFlag(obj.material, (mat)=>{
+      const c = mat.color;
+      const looksGreen = c && c.g > c.r * 1.25 && c.g > c.b * 1.05;
+      const isFeltMap = !!mat.map;
+      if (!looksGreen && !isFeltMap && fixed > 0) return;
+      mat.color?.set?.(0x15101a);
+      mat.emissive?.set?.(0x050306);
+      mat.emissiveIntensity = Math.min(mat.emissiveIntensity || 0.02, 0.035);
+      mat.roughness = Math.max(mat.roughness || 0.7, 0.9);
+      mat.metalness = 0.0;
+      mat.depthWrite = true;
+      mat.polygonOffset = true;
+      mat.polygonOffsetFactor = -1;
+      mat.polygonOffsetUnits = -1;
+      mat.needsUpdate = true;
+      fixed += 1;
+    });
+    obj.userData.phase93TableTopNeutralized = true;
+  });
+}
+
+function faceCenter(group){
+  if (!group) return;
+  const x = group.position.x;
+  const z = group.position.z;
+  group.rotation.y = Math.atan2(-x, -z);
+}
+
+function movePortal(scene, key, x, z, y = 0){
+  const group = scene.getObjectByName(`PORTAL_${key}`);
+  if (!group) return false;
+  group.position.set(x, y, z);
+  faceCenter(group);
+  group.userData.phase93Aligned = true;
+  return true;
+}
+
+function alignPortals(scene, world){
+  const reikiTarget = world?.sceneTargets?.reiki?.pos;
+  const pgaTarget = world?.sceneTargets?.pga?.pos;
+  const sponsorTarget = world?.sceneTargets?.sponsor?.pos;
+  const scorpionTarget = world?.sceneTargets?.scorpion?.pos;
+
+  movePortal(scene, "reikiRoom", reikiTarget?.x ?? -7.35, reikiTarget?.z ?? -2.65);
+  movePortal(scene, "pgaDrive", pgaTarget?.x ?? 7.35, pgaTarget?.z ?? -3.25);
+  movePortal(scene, "pgaChipPutt", (pgaTarget?.x ?? 7.35) + 1.08, (pgaTarget?.z ?? -3.25) + 1.38);
+  movePortal(scene, "storeRoom", sponsorTarget?.x ? sponsorTarget.x * 0.95 : -8.35, sponsorTarget?.z ? sponsorTarget.z * 0.95 : 1.25);
+  movePortal(scene, "smokerLounge", -7.85, 3.55);
+  movePortal(scene, "scorpion", scorpionTarget?.x ?? 7.85, scorpionTarget?.z ?? 3.55);
+}
+
+function classifyPlanet(mesh){
+  if (!isMesh(mesh)) return null;
+  if (!/SphereGeometry/.test(String(mesh.geometry?.type || ""))) return null;
+  if (mesh.position.z > -40 || mesh.position.y < 15) return null;
+  const c = mesh.material?.color;
+  if (!c) return null;
+  if (c.r > 0.75 && c.g > 0.70 && c.b > 0.70) return "moon";
+  if (c.r > 0.55 && c.g > 0.20 && c.g < 0.55 && c.b < 0.40) return "mars";
+  return null;
+}
+
+function moveNearbyDecor(scene, oldPos, newPos){
+  scene.traverse((obj)=>{
+    if (!obj?.position || isMesh(obj)) return;
+    if (!(isSprite(obj) || isPointLight(obj))) return;
+    if (obj.position.distanceTo(oldPos) > 3.2) return;
+    obj.position.copy(newPos);
+  });
+}
+
+function raisePlanets(scene){
+  const t = scene.userData._time || performance.now() * 0.001;
+  scene.traverse((obj)=>{
+    const kind = classifyPlanet(obj);
+    if (!kind) return;
+    const oldPos = obj.position.clone();
+    if (kind === "moon"){
+      obj.position.set(-70 + Math.sin(t * 0.016) * 8.0, 104 + Math.sin(t * 0.05) * 1.8, -238 + Math.cos(t * 0.014) * 8.0);
+    } else if (kind === "mars"){
+      obj.position.set(84 + Math.sin(t * 0.013 + 1.4) * 9.0, 118 + Math.sin(t * 0.04 + 0.8) * 1.5, -282 + Math.cos(t * 0.011 + 0.4) * 9.0);
+    }
+    obj.frustumCulled = false;
+    obj.visible = true;
+    moveNearbyDecor(scene, oldPos, obj.position);
+  });
+}
+
+export function installPhase93LobbyRepair({ scene, world, log = console.log } = {}){
+  if (!scene) return null;
+  try{
+    stabilizeFloorOverlays(scene);
+    darkenDuplicateGreenTableTop(scene);
+    alignPortals(scene, world);
+    raisePlanets(scene);
+    scene.userData.phase93Repair = PHASE93;
+    log?.(`[${PHASE93}] floor/table/portal/sky repair installed`);
+  }catch(err){
+    console.warn(`[${PHASE93}] install failed`, err);
+  }
+  let accum = 0;
+  return {
+    update(dt = 0.016){
+      accum += dt;
+      raisePlanets(scene);
+      if (accum > 2.5){
+        alignPortals(scene, world);
+        accum = 0;
+      }
+    }
+  };
+}
