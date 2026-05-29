@@ -1,14 +1,13 @@
 {
-  "build": "PHASE-102-DESKTOP-HUB-POSITION-TABLE",
-  "label": "Desktop Hub Position Table",
+  "build": "PHASE-103-REIKI-PORTAL-ENTER-MARKER-LOCK",
+  "label": "Reiki Portal Enter Marker Lock",
   "scope": "game-only",
   "date": "2026-05-28",
   "notes": [
-    "add desktop overlay showing live X/Y/Z player position",
-    "show facing direction and nearest portal coordinates",
-    "add copy button for exact portal placement notes",
-    "press P to hide/show the table",
-    "LOCKED: fist/pinch teleport release behavior remains unchanged and preserved",
+    "move Reiki Room portal onto the ENTER REIKI hub marker requested by user screenshot",
+    "lock Reiki Room portal placement at X -7.25, Y 0.00, Z -2.55",
+    "fix desktop hub position table camera/scene capture so X/Y/Z updates correctly",
+    "preserve locked fist/pinch teleport release behavior",
     "website/site untouched"
   ]
 }
