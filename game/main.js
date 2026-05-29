@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -80,14 +80,14 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading world…", { force: true });
+setStatus("Loading worldâ€¦", { force: true });
 let world;
 try {
   world = await withBootTimeout(buildSkylineRoom(scene, { log, renderer }), 5500, "world build");
 } catch (err) {
   console.error(err);
   log("[BOOT-SAFE] world build failed, using emergency lobby shell", err?.message || err);
-  setStatus("Boot-safe lobby loaded — world module recovered", { force: true });
+  setStatus("Boot-safe lobby loaded â€” world module recovered", { force: true });
   const g = new THREE.Group();
   scene.add(g);
   const floor = new THREE.Mesh(new THREE.CircleGeometry(18, 64), new THREE.MeshBasicMaterial({ color: 0x111018 }));
@@ -131,6 +131,7 @@ try {
   };
 }
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
+window.SVR_GAME = { scene, camera, renderer, world, player };
 
 // Phase 91: direct labeled lobby portals. Full experiences remain separate pages.
 createPortal({ scene, label: "REIKI ROOM", sublabel: "PRIVATE MEDITATION", position: new THREE.Vector3(-6.2, 0, -4.8), rotationY: 0.72, key: "reikiRoom", color: 0xff4058 });
@@ -311,12 +312,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logo…", { force: true });
+setStatus("Loading logoâ€¦", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -331,8 +332,7 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
-  await audio.prime();
-  await audio.start();
+  await audio.prime(); audio.stop();
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
@@ -405,11 +405,12 @@ renderer.setAnimationLoop(()=>{
 const canvasEl = renderer.domElement;
 canvasEl.addEventListener("pointerdown", async ()=>{
   const st = audio.getState();
-  if (!st.enabled) await audio.start();
+  audio.stop();
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading…");
-  setStatus("WebGL context lost (reloading…)", { force: true });
+  log("[ERR] WebGL context lost. Reloadingâ€¦");
+  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
+
