@@ -1,2 +1,2 @@
-import "./espresso_contrast_visible_phase117.js?v=phase117";
-console.log("PHASE-117 espresso visible contrast bridge loaded through phase116 path");
+import "./espresso_attach_to_building_phase118.js?v=phase118";
+console.log("PHASE-118 espresso building attachment bridge loaded through phase116 path");
