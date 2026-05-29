@@ -1,14 +1,14 @@
 {
-  "build": "PHASE-96-QUEST-FLOOR-HAND-TELEPORT-HOTFIX",
-  "label": "Quest Floor Hand Teleport Hotfix",
+  "build": "PHASE-97-NORTH-SKY-MOON-MARS-VISIBLE-LOCK",
+  "label": "North Sky Moon Mars Visible Lock",
   "scope": "game-only",
   "date": "2026-05-28",
   "notes": [
-    "disable Quest-blinking transparent floor overlays that cause z-fighting",
-    "preserve portal rings and private-scene routes",
-    "fix hand teleport so fist or pinch hold aims and release teleports",
-    "add fist aiming fallback when finger direction collapses",
-    "preserve textured Moon/Mars in lobby and private rooms",
+    "move Moon and Mars higher into the north sky",
+    "increase visible lobby fallback Moon and Mars size",
+    "ensure lobby always has a north-sky textured Moon/Mars pair",
+    "raise private-room Moon/Mars higher and farther north",
+    "preserve Quest floor and hand teleport hotfix",
     "preserve Reiki portal hologram",
     "website/site untouched"
   ]
