@@ -1,15 +1,14 @@
 {
-  "build": "PHASE-101-FIST-TELEPORT-LOCKED-BASELINE",
-  "label": "Fist Teleport Locked Baseline",
+  "build": "PHASE-102-DESKTOP-HUB-POSITION-TABLE",
+  "label": "Desktop Hub Position Table",
   "scope": "game-only",
   "date": "2026-05-28",
   "notes": [
-    "LOCKED: current fist/pinch teleport release behavior is working and must be preserved",
-    "do not rewrite teleport.js unless the user explicitly asks to change fist teleport",
-    "working behavior: hold fist or pinch, aim at purple target, unclench/release to teleport",
-    "Quest hand tracking drop during unclench must continue to count as release",
-    "future work should target floor blinking/performance without changing fist teleport",
-    "preserve watch orientation fix and north-sky Moon/Mars",
+    "add desktop overlay showing live X/Y/Z player position",
+    "show facing direction and nearest portal coordinates",
+    "add copy button for exact portal placement notes",
+    "press P to hide/show the table",
+    "LOCKED: fist/pinch teleport release behavior remains unchanged and preserved",
     "website/site untouched"
   ]
 }
