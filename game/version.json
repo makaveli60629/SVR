@@ -1,1 +1,14 @@
-{"build":"PHASE-84-BOOT-SAFE-LOBBY-RECOVERY","target":"game","siteTouched":false}
+{
+  "build": "PHASE-145-PLAYER-SHIM-BOOT-LOCK",
+  "target": "game",
+  "scope": "game-only",
+  "siteTouched": false,
+  "source": "direct-game-folder",
+  "fixes": [
+    "resolved game/index.html merge-conflict markers",
+    "added boot-safe global player shim before main.js module load",
+    "kept current lobby and private scene routing intact",
+    "kept website/site untouched"
+  ],
+  "updatedAt": "2026-05-29T00:00:00Z"
+}
