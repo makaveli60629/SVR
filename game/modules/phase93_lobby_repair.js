@@ -1,75 +1,68 @@
 import * as THREE from "three";
 
-const PHASE96 = "PHASE-96-QUEST-FLOOR-HAND-TELEPORT-HOTFIX";
+const PHASE98 = "PHASE-98-QUEST-STABILITY-WATCH-FIST-PERFORMANCE-LOCK";
 let installedForScene = new WeakSet();
 
 function isMesh(obj){ return !!obj?.isMesh && !!obj.geometry; }
 function isSprite(obj){ return !!obj?.isSprite; }
 function isPointLight(obj){ return !!obj?.isPointLight; }
-
-function boxInfo(obj){
-  const box = new THREE.Box3().setFromObject(obj);
-  const size = new THREE.Vector3();
-  const center = new THREE.Vector3();
-  box.getSize(size);
-  box.getCenter(center);
-  return { box, size, center };
-}
-
-function setMatFlag(mat, fn){
-  if (Array.isArray(mat)) mat.forEach(fn);
-  else if (mat) fn(mat);
-}
+function boxInfo(obj){ const box = new THREE.Box3().setFromObject(obj); const size = new THREE.Vector3(); const center = new THREE.Vector3(); box.getSize(size); box.getCenter(center); return { box, size, center }; }
+function setMatFlag(mat, fn){ if (Array.isArray(mat)) mat.forEach(fn); else if (mat) fn(mat); }
 
 function isProtectedFloorObject(obj){
   const n = String(obj.name || "").toLowerCase();
-  if (/portal|gate|ring|pointer|teleport|marker|stand here|stance|ball/.test(n)) return true;
+  if (/portal|gate|ring|pointer|teleport|marker|stand here|stance|ball|button|seat|chair/.test(n)) return true;
   let p = obj.parent;
   while (p){
     const pn = String(p.name || "").toLowerCase();
-    if (/portal|gate|teleport|pga|reiki|scorpion|store|lounge/.test(pn)) return true;
+    if (/portal|gate|teleport|pga|reiki|scorpion|store|lounge|chair|seat/.test(pn)) return true;
     if (p.userData?.portalKey) return true;
     p = p.parent;
   }
   return !!obj.userData?.portalKey;
 }
 
-function stabilizeFloorOverlays(scene){
-  let floorOverlayIndex = 0;
+function hardDisableBlinkingFloorLayers(scene){
+  let hidden = 0;
   scene.traverse((obj)=>{
     if (!isMesh(obj)) return;
-    const { size, center } = boxInfo(obj);
-    if (center.y > 0.060 || size.x < 0.30 || size.z < 0.30 || size.y > 0.09) return;
     if (isProtectedFloorObject(obj)) return;
+    const { size, center } = boxInfo(obj);
+    if (center.y > 0.12 || center.y < -0.03 || size.y > 0.14) return;
     const material = obj.material;
-    const transparent = Array.isArray(material) ? material.some(m=>m?.transparent || m?.opacity < 0.96) : !!(material?.transparent || material?.opacity < 0.96);
-    const floorLike = /CircleGeometry|PlaneGeometry|ShapeGeometry|RingGeometry/.test(String(obj.geometry?.type || "")) || transparent;
-    if (!floorLike) return;
+    const transparent = Array.isArray(material) ? material.some(m=>m?.transparent || m?.opacity < 0.98 || m?.depthWrite === false) : !!(material?.transparent || material?.opacity < 0.98 || material?.depthWrite === false);
+    const lowPlane = /CircleGeometry|PlaneGeometry|ShapeGeometry|RingGeometry/.test(String(obj.geometry?.type || ""));
+    const large = size.x > 1.10 && size.z > 1.10;
+    const name = String(obj.name || "").toLowerCase();
+    const likelyGlow = /glow|halo|carpet|shadow|logo|overlay|floor/.test(name);
 
-    // Quest-safe: large low transparent floor glows z-fight badly. Disable those entirely.
-    const largeBlinkRisk = transparent && size.x > 1.35 && size.z > 1.35 && center.y < 0.035;
-    const duplicateLogoOrGlow = transparent && size.x > 2.2 && size.z > 1.6;
-    if (largeBlinkRisk || duplicateLogoOrGlow){
+    // Quest rule: low large transparent planes fight the real floor in both eyes. Remove them.
+    if ((transparent && lowPlane && large) || (likelyGlow && lowPlane && large && center.y < 0.08)){
       obj.visible = false;
-      obj.userData.phase96FloorHidden = true;
+      obj.layers.disableAll?.();
+      obj.userData.phase98FloorHidden = true;
+      hidden++;
       return;
     }
 
-    if (!obj.userData.phase96FloorStable){
-      obj.position.y = Math.max(obj.position.y + 0.018 + floorOverlayIndex * 0.006, 0.055 + floorOverlayIndex * 0.006);
-      obj.userData.phase96FloorStable = true;
+    // Keep any small functional floor marker but make it deterministic.
+    if (lowPlane && center.y < 0.08){
+      if (!obj.userData.phase98FloorStable){
+        obj.position.y = Math.max(obj.position.y, 0.075 + Math.min(hidden, 8) * 0.004);
+        obj.userData.phase98FloorStable = true;
+      }
+      obj.renderOrder = -120 + hidden;
+      setMatFlag(obj.material, (mat)=>{
+        mat.depthWrite = true;
+        mat.depthTest = true;
+        mat.polygonOffset = true;
+        mat.polygonOffsetFactor = -32 - hidden;
+        mat.polygonOffsetUnits = -32 - hidden;
+        mat.needsUpdate = true;
+      });
     }
-    obj.renderOrder = -80 + floorOverlayIndex;
-    setMatFlag(obj.material, (mat)=>{
-      mat.depthWrite = true;
-      mat.depthTest = true;
-      mat.polygonOffset = true;
-      mat.polygonOffsetFactor = -20 - floorOverlayIndex;
-      mat.polygonOffsetUnits = -20 - floorOverlayIndex;
-      mat.needsUpdate = true;
-    });
-    floorOverlayIndex += 1;
   });
+  scene.userData.phase98HiddenFloorLayerCount = hidden;
 }
 
 function darkenDuplicateGreenTableTop(scene){
@@ -96,24 +89,12 @@ function darkenDuplicateGreenTableTop(scene){
       mat.needsUpdate = true;
       fixed += 1;
     });
-    obj.userData.phase96TableTopNeutralized = true;
+    obj.userData.phase98TableTopNeutralized = true;
   });
 }
 
-function faceCenter(group){
-  if (!group) return;
-  group.rotation.y = Math.atan2(-group.position.x, -group.position.z);
-}
-
-function movePortal(scene, key, x, z, y = 0){
-  const group = scene.getObjectByName(`PORTAL_${key}`);
-  if (!group) return false;
-  group.position.set(x, y, z);
-  faceCenter(group);
-  group.userData.phase96Aligned = true;
-  return true;
-}
-
+function faceCenter(group){ if (group) group.rotation.y = Math.atan2(-group.position.x, -group.position.z); }
+function movePortal(scene, key, x, z, y = 0){ const group = scene.getObjectByName(`PORTAL_${key}`); if (!group) return false; group.position.set(x, y, z); faceCenter(group); group.userData.phase98Aligned = true; return true; }
 function alignPortals(scene, world){
   const reikiTarget = world?.sceneTargets?.reiki?.pos;
   const pgaTarget = world?.sceneTargets?.pga?.pos;
@@ -137,16 +118,7 @@ function classifyPlanet(mesh){
   if (c.r > 0.50 && c.g > 0.16 && c.g < 0.58 && c.b < 0.46) return "mars";
   return null;
 }
-
-function moveNearbyDecor(scene, oldPos, newPos){
-  scene.traverse((obj)=>{
-    if (!obj?.position || isMesh(obj)) return;
-    if (!(isSprite(obj) || isPointLight(obj))) return;
-    if (obj.position.distanceTo(oldPos) > 3.5) return;
-    obj.position.copy(newPos);
-  });
-}
-
+function moveNearbyDecor(scene, oldPos, newPos){ scene.traverse((obj)=>{ if (!obj?.position || isMesh(obj)) return; if (!(isSprite(obj) || isPointLight(obj))) return; if (obj.position.distanceTo(oldPos) > 3.5) return; obj.position.copy(newPos); }); }
 function raisePlanets(scene){
   const t = scene.userData._time || performance.now() * 0.001;
   scene.traverse((obj)=>{
@@ -166,22 +138,23 @@ export function installPhase93LobbyRepair({ scene, world, log = console.log, sel
   if (installedForScene.has(scene)) return scene.userData.phase93RepairApi || null;
   installedForScene.add(scene);
   try{
-    stabilizeFloorOverlays(scene);
+    hardDisableBlinkingFloorLayers(scene);
     darkenDuplicateGreenTableTop(scene);
     alignPortals(scene, world);
     raisePlanets(scene);
-    scene.userData.phase93Repair = PHASE96;
-    log?.(`[${PHASE96}] Quest floor/portal/sky repair installed`);
-  }catch(err){ console.warn(`[${PHASE96}] install failed`, err); }
+    scene.userData.phase93Repair = PHASE98;
+    log?.(`[${PHASE98}] Quest stability repair installed; hidden floor layers: ${scene.userData.phase98HiddenFloorLayerCount || 0}`);
+  }catch(err){ console.warn(`[${PHASE98}] install failed`, err); }
 
   let accum = 0;
   let last = performance.now();
   const api = {
     update(dt = 0.016){
       accum += dt;
+      // Keep this light. Do not traverse every frame on Quest.
       raisePlanets(scene);
-      if (accum > 0.85){
-        stabilizeFloorOverlays(scene);
+      if (accum > 6.0){
+        hardDisableBlinkingFloorLayers(scene);
         darkenDuplicateGreenTableTop(scene);
         alignPortals(scene, world);
         accum = 0;
