@@ -3,7 +3,7 @@ import { CONFIG } from "./config.js";
 import { isPinching, isFist } from "./gestures.js";
 import { openPrivateScene } from "./scene_portal_router.js";
 
-const PHASE140 = "PHASE-140-FORWARD-STEP-HAND-TELEPORT";
+const PHASE141 = "PHASE-141-INVERTED-HAND-AIM-CORRECTION";
 const PORTAL_MAGNET_RADIUS = 1.55;
 const PORTAL_ACTIVATE_RADIUS = 0.92;
 const HAND_STEP = 6.2;
@@ -29,16 +29,22 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let lastPortalAt = 0;
 
   const sourcePos = new THREE.Vector3();
+  const sourceDir = new THREE.Vector3();
   const targetPos = new THREE.Vector3();
   const smoothTarget = new THREE.Vector3(0,0,CONFIG.SPAWN_Z);
   const head = new THREE.Vector3();
   const forward = new THREE.Vector3(0,0,-1);
-  const yAxis = new THREE.Vector3(0,1,0);
   const tmpPortal = new THREE.Vector3();
 
   function xrCam(){ try { return renderer.xr.getCamera(camera) || camera; } catch(_){ return camera; } }
   function headPos(out = head){ try { xrCam().getWorldPosition(out); } catch(_){ out.set(playerX,1.6,playerZ); } return out; }
-  function headForward(out = forward){ try { xrCam().getWorldDirection(out); } catch(_){ out.set(0,0,-1); } out.y = 0; if(out.lengthSq()<0.0001) out.set(0,0,-1); return out.normalize(); }
+  function rawCameraForward(out = forward){ try { xrCam().getWorldDirection(out); } catch(_){ out.set(0,0,-1); } out.y = 0; if(out.lengthSq()<0.0001) out.set(0,0,-1); return out.normalize(); }
+  function handAimForward(out = new THREE.Vector3()){
+    // Phase 141: Quest is reporting the visual hand teleport direction inverted in this scene.
+    // Invert ONLY the hand teleport target vector. Controller locomotion/aim remains unchanged.
+    rawCameraForward(out).multiplyScalar(-1).normalize();
+    return out;
+  }
   function clampXZ(v){ const c = typeof roomClamp === "number" ? roomClamp : 18; v.x = THREE.MathUtils.clamp(v.x,-c,c); v.z = THREE.MathUtils.clamp(v.z,-c,c); v.y = 0; return v; }
 
   function applyReferenceSpace(){
@@ -48,7 +54,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       const xf = new XRRigidTransform({x:-playerX,y:-playerY,z:-playerZ},{x:0,y:Math.sin(h),z:0,w:Math.cos(h)});
       renderer.xr.setReferenceSpace(baseRefSpace.getOffsetReferenceSpace(xf));
       return true;
-    }catch(err){ log("[phase140 teleport] reference-space failed", err?.message || err); return false; }
+    }catch(err){ log("[phase141 teleport] reference-space failed", err?.message || err); return false; }
   }
   function setPlayerPose(x,y,z){ playerX=x; playerY=y; playerZ=z; return applyReferenceSpace(); }
   function setPlayerXZ(x,z){ playerX=x; playerZ=z; return applyReferenceSpace(); }
@@ -107,7 +113,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   function fingertip(hand){ const tip=hand?.joints?.["index-finger-tip"] || hand?.joints?.wrist; if(!tip) return false; tip.getWorldPosition(sourcePos); return true; }
   function handTarget(hand){
     if(!fingertip(hand)) return null;
-    const h=headPos(new THREE.Vector3()); const f=headForward(new THREE.Vector3());
+    const h=headPos(new THREE.Vector3()); const f=handAimForward(new THREE.Vector3());
     lastPortalKey=null;
     targetPos.set(h.x + f.x * HAND_STEP, 0, h.z + f.z * HAND_STEP);
     clampXZ(targetPos);
@@ -124,7 +130,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const turnX=Math.abs(rs.x)>.14?rs.x:ls.x, moveY=Math.abs(rs.y)>.13?rs.y:ls.y;
     if(Math.abs(turnX)>.72 && performance.now()>snapCooldownUntil){ playerYaw+=Math.sign(turnX)*(Math.PI/4); applyReferenceSpace(); snapCooldownUntil=performance.now()+260; }
     if(Math.abs(moveY)<.13) return;
-    const f=headForward(new THREE.Vector3()); const dir=-moveY; const c=typeof roomClamp==='number'?roomClamp:18;
+    const f=rawCameraForward(new THREE.Vector3()); const dir=-moveY; const c=typeof roomClamp==='number'?roomClamp:18;
     setPlayerXZ(THREE.MathUtils.clamp(playerX+f.x*dir*2.65*dt,-c,c),THREE.MathUtils.clamp(playerZ+f.z*dir*2.65*dt,-c,c));
   }
   function jumpTo(target){
@@ -138,7 +144,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const ok=held>70 && now-lastTP>CONFIG.TELEPORT_COOLDOWN_MS && jumpTo(smoothTarget); if(ok) lastTP=now+240; hide(); statusCb(ok?'Teleport complete':'Teleport reset'); modeCb('Teleport off'); return ok;
   }
 
-  async function onSessionStart(){ const s=renderer.xr.getSession(); if(!s) return; baseRefSpace=await s.requestReferenceSpace('local-floor'); playerYaw=0; setPlayerPose(CONFIG.SPAWN_X,0,CONFIG.SPAWN_Z); hide(); console.log(`[${PHASE140}] active`); }
+  async function onSessionStart(){ const s=renderer.xr.getSession(); if(!s) return; baseRefSpace=await s.requestReferenceSpace('local-floor'); playerYaw=0; setPlayerPose(CONFIG.SPAWN_X,0,CONFIG.SPAWN_Z); hide(); console.log(`[${PHASE141}] active`); }
   function setLogoTexture(tex){ if(tex){ tex.anisotropy=4; pointer.material.map=tex; pointer.material.needsUpdate=true; } }
   function toggleMode(){ teleportEnabled=!teleportEnabled; if(!teleportEnabled) hide(); return teleportEnabled; }
   function isEnabled(){ return teleportEnabled; }
@@ -149,14 +155,14 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const hold=activeHold(); const holding=!!hold;
     if(lastHoldActive && !holding){ finish(statusCb,modeCb); lastHoldActive=false; active=null; activeMode='none'; return; }
     if(!teleportEnabled){ hide(); statusCb('Teleport disabled'); modeCb('Teleport OFF'); return; }
-    if(!holding){ hide(); holdStart=0; statusCb((leftControllerRef||rightControllerRef)?'Controllers ready • hold trigger/A/grip to teleport':'Hands ready • fist/pinch forward-step teleport'); modeCb((leftControllerRef||rightControllerRef)?'Controllers ready':'Hands ready'); lastHoldActive=false; return; }
+    if(!holding){ hide(); holdStart=0; statusCb((leftControllerRef||rightControllerRef)?'Controllers ready • hold trigger/A/grip to teleport':'Hands ready • Phase 141 inverted hand aim corrected'); modeCb((leftControllerRef||rightControllerRef)?'Controllers ready':'Hands ready'); lastHoldActive=false; return; }
     if(!lastHoldActive || active!==hold.source){ holdStart=performance.now(); smoothTarget.copy(headPos(new THREE.Vector3())); }
     active=hold.source; activeMode=hold.mode; lastHoldActive=true;
     const target=hold.mode==='controller'?controllerTarget(hold.source):handTarget(hold.source); if(!target){ hide(); return; }
-    smoothTarget.lerp(target,.55); if(smoothTarget.lengthSq()<.01) smoothTarget.copy(target);
+    smoothTarget.lerp(target,.75); if(smoothTarget.lengthSq()<.01) smoothTarget.copy(target);
     const portal=hold.mode==='hand'?nearestPortal(smoothTarget):null; show(smoothTarget,portal); draw(sourcePos,smoothTarget);
     if(hold.mode==='hand' && lastPortalKey){ statusCb(`PORTAL READY • release to enter ${lastPortalKey}`); modeCb('Hands: PORTAL QUICK-SELECT'); }
-    else { statusCb(hold.mode==='hand'?'HAND TP • release to leap forward':'CONTROLLER TP • release to teleport'); modeCb(hold.mode==='hand'?'Hands: FORWARD STEP AIM':'Controllers: TELEPORT AIM'); }
+    else { statusCb(hold.mode==='hand'?'HAND TP • corrected forward marker • release to leap':'CONTROLLER TP • release to teleport'); modeCb(hold.mode==='hand'?'Hands: PHASE141 CORRECTED AIM':'Controllers: TELEPORT AIM'); }
   }
 
   return { onSessionStart,setLogoTexture,update,setPlayerPose,setPlayerXZ,getPlayerPose,setPlayerYaw,toggleMode,isEnabled,getState:()=>({mode:!!lastHoldActive,activeMode,portalKey:lastPortalKey}) };
