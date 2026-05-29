@@ -1,14 +1,14 @@
 {
-  "build": "PHASE-97-NORTH-SKY-MOON-MARS-VISIBLE-LOCK",
-  "label": "North Sky Moon Mars Visible Lock",
+  "build": "PHASE-98-QUEST-STABILITY-WATCH-FIST-PERFORMANCE-LOCK",
+  "label": "Quest Stability Watch Fist Performance Lock",
   "scope": "game-only",
   "date": "2026-05-28",
   "notes": [
-    "move Moon and Mars higher into the north sky",
-    "increase visible lobby fallback Moon and Mars size",
-    "ensure lobby always has a north-sky textured Moon/Mars pair",
-    "raise private-room Moon/Mars higher and farther north",
-    "preserve Quest floor and hand teleport hotfix",
+    "hard-disable large low transparent floor overlays causing Quest z-fighting",
+    "reduce repair/render churn for Quest performance",
+    "fix wrist watch orientation so screen faces user and stays upright",
+    "refine fist/pinch teleport behavior",
+    "preserve north-sky textured Moon/Mars",
     "preserve Reiki portal hologram",
     "website/site untouched"
   ]
