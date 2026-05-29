@@ -1,8 +1,11 @@
 import * as THREE from "three";
 import { CONFIG } from "./config.js";
 import { isPinching, isFist, aimPoint } from "./gestures.js";
+import { openPrivateScene } from "./scene_portal_router.js";
 
-const PHASE111 = "PHASE-111-QUEST-CONTROLLER-FORWARD-CORRECTION";
+const PHASE124 = "PHASE-124-MAGNETIC-FIST-PORTAL-QUICK-SELECT";
+const PORTAL_MAGNET_RADIUS = 1.55;
+const PORTAL_ACTIVATE_RADIUS = 0.92;
 
 export function createTeleportRig({ scene, renderer, camera, roomClamp, log = console.log }){
   let baseRefSpace = null;
@@ -28,6 +31,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let lastReleaseMode = "none";
   let stableTargetMs = 0;
   let lastAimValid = false;
+  let lastReleasePortalKey = null;
+  let lastReleasePortalAt = 0;
+  let lastReleasePortalDist = Infinity;
 
   const head = new THREE.Vector3();
   const headDir = new THREE.Vector3();
@@ -37,6 +43,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   const lastReleaseTarget = new THREE.Vector3(0, 0, CONFIG.SPAWN_Z);
   const tmpQuat = new THREE.Quaternion();
   const yAxis = new THREE.Vector3(0, 1, 0);
+  const tmpPortalPos = new THREE.Vector3();
 
   function applyReferenceSpace(){
     if (!baseRefSpace || !renderer?.xr?.isPresenting) return false;
@@ -90,10 +97,37 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   scene.add(arcLine);
 
   function hideVisualTarget(){ pointer.visible = false; ring.visible = false; arcLine.visible = false; markerGlow.intensity = 0; }
-  function resetAimState(){ stableTargetMs = 0; lastAimValid = false; lastReleaseTargetValid = false; lastReleaseTargetAt = 0; lastReleaseMode = "none"; }
+  function resetAimState(){ stableTargetMs = 0; lastAimValid = false; lastReleaseTargetValid = false; lastReleaseTargetAt = 0; lastReleaseMode = "none"; lastReleasePortalKey = null; lastReleasePortalAt = 0; lastReleasePortalDist = Infinity; }
   function clearTeleportState(resetTarget = false){ active = null; activeMode = "none"; lastHoldActive = false; lastHoldSource = null; holdStart = 0; hideVisualTarget(); if (resetTarget) resetAimState(); }
-  function showTarget(target){ pointer.visible = true; ring.visible = true; pointer.position.copy(target).setY(0.040); ring.position.copy(target).setY(0.036); markerGlow.position.copy(target).setY(0.45); markerGlow.intensity = 2.2; }
+  function showTarget(target, portalHit = null){
+    const activePortal = !!portalHit?.active;
+    pointer.visible = true;
+    ring.visible = true;
+    pointer.position.copy(target).setY(0.040);
+    ring.position.copy(target).setY(0.036);
+    markerGlow.position.copy(target).setY(0.45);
+    markerGlow.intensity = activePortal ? 3.8 : 2.2;
+    ring.material.color.setHex(activePortal ? 0x78ff9f : 0xb48cff);
+    markerGlow.color.setHex(activePortal ? 0x78ff9f : 0xb48cff);
+  }
   function clampTarget(p){ const c = typeof roomClamp === "number" ? roomClamp : 18; return new THREE.Vector3(THREE.MathUtils.clamp(p.x, -c, c), 0, THREE.MathUtils.clamp(p.z, -c, c)); }
+
+  function findNearestPortal(target){
+    let best = null;
+    scene.traverse((obj)=>{
+      const key = obj?.userData?.portalKey;
+      if (!key || !obj.visible) return;
+      obj.getWorldPosition(tmpPortalPos);
+      const dx = tmpPortalPos.x - target.x;
+      const dz = tmpPortalPos.z - target.z;
+      const dist = Math.hypot(dx, dz);
+      if (dist > PORTAL_MAGNET_RADIUS) return;
+      if (!best || dist < best.dist){
+        best = { key, dist, point: new THREE.Vector3(tmpPortalPos.x, 0, tmpPortalPos.z), active: dist <= PORTAL_ACTIVATE_RADIUS };
+      }
+    });
+    return best;
+  }
 
   function teleportByDelta(target){
     if (!renderer?.xr?.isPresenting || !baseRefSpace) return false;
@@ -203,9 +237,6 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     headDir.y = 0;
     if (headDir.lengthSq() < 1e-5) headDir.set(0, 0, -1);
     headDir.normalize();
-    // Quest fix: after applying an offset reference-space snap turn, some browsers still return
-    // the physical headset forward only. Re-apply the virtual snap yaw so stick-up always means
-    // “where I am looking after the turn,” not the old sideways world vector.
     if (Math.abs(playerYaw) > 0.0001) headDir.applyAxisAngle(yAxis, playerYaw).normalize();
     return headDir;
   }
@@ -253,23 +284,51 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
 
   function updateSmoothedTarget(aim, dt, mode){
     const target = clampTarget(aim);
+    const portalHit = mode === "hand" ? findNearestPortal(target) : null;
+    if (portalHit){
+      const strength = portalHit.active ? 0.72 : THREE.MathUtils.clamp(1 - (portalHit.dist / PORTAL_MAGNET_RADIUS), 0.18, 0.42);
+      target.lerp(portalHit.point, strength);
+    }
     if (!lastAimValid){ smoothedTarget.copy(target); stableTargetMs = 100; }
     else {
       const jitter = smoothedTarget.distanceTo(target);
       stableTargetMs = jitter < 0.30 ? stableTargetMs + dt * 1000 : Math.max(0, stableTargetMs - dt * 500);
       smoothedTarget.lerp(target, jitter < 0.42 ? 0.52 : 0.28);
     }
+
+    const activePortalHit = mode === "hand" ? findNearestPortal(smoothedTarget) : null;
     lastAimValid = true;
     lastReleaseTarget.copy(smoothedTarget);
     lastReleaseTargetValid = true;
     lastReleaseTargetAt = performance.now();
     lastReleaseMode = mode || activeMode;
-    showTarget(smoothedTarget);
+    if (activePortalHit?.active){
+      lastReleasePortalKey = activePortalHit.key;
+      lastReleasePortalDist = activePortalHit.dist;
+      lastReleasePortalAt = lastReleaseTargetAt;
+    } else {
+      lastReleasePortalKey = null;
+      lastReleasePortalDist = Infinity;
+      lastReleasePortalAt = 0;
+    }
+    showTarget(smoothedTarget, activePortalHit);
   }
 
   function finishReleaseTeleport(now, statusCb, modeCb){
     const heldMs = holdStart ? (now - holdStart) : 999;
     const targetFresh = lastReleaseTargetValid && (now - lastReleaseTargetAt) < 1400;
+    const portalFresh = lastReleaseMode === "hand" && lastReleasePortalKey && (now - lastReleasePortalAt) < 900 && lastReleasePortalDist <= PORTAL_ACTIVATE_RADIUS;
+
+    if (targetFresh && portalFresh && heldMs > 90){
+      const key = lastReleasePortalKey;
+      clearTeleportState(false);
+      resetAimState();
+      statusCb(`Portal selected: ${key}`);
+      modeCb("Portal quick-select");
+      setTimeout(()=>openPrivateScene(key), 80);
+      return true;
+    }
+
     const allowed = targetFresh && heldMs > 60 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS;
     const ok = allowed && teleportByDelta(lastReleaseTarget);
     if (ok) lastTP = now + 220;
@@ -287,7 +346,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     playerYaw = 0;
     setPlayerPose(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
     clearTeleportState(true);
-    console.log(`[${PHASE111}] fist teleport locked; controller forward corrected`);
+    console.log(`[${PHASE124}] fist teleport locked; magnetic portal quick-select active`);
   }
 
   function setLogoTexture(tex){ if (tex){ tex.anisotropy = 4; pointer.material.map = tex; pointer.material.needsUpdate = true; } }
@@ -317,7 +376,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       activeMode = "none";
       lastHoldSource = null;
       holdStart = 0;
-      statusCb((leftControllerRef || rightControllerRef) ? "Controllers ready • stick forward follows headset view • hold A/grip/trigger to teleport" : "Hands ready • hold fist/pinch, aim, release to teleport");
+      statusCb((leftControllerRef || rightControllerRef) ? "Controllers ready • stick forward follows headset view • hold A/grip/trigger to teleport" : "Hands ready • fist/pinch teleport • portal marker quick-select active");
       modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready");
       return;
     }
@@ -341,9 +400,14 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     else active.joints?.wrist?.getWorldPosition?.(sourcePos);
     drawArc(sourcePos, smoothedTarget);
 
-    statusCb(activeMode === "controller" ? "CONTROLLER TP • release to teleport" : "HAND TP • unclench/release to teleport");
-    modeCb(activeMode === "controller" ? "Controllers: TELEPORT AIM" : "Hands: TELEPORT AIM");
+    if (activeMode === "hand" && lastReleasePortalKey){
+      statusCb(`PORTAL READY • release fist to enter ${lastReleasePortalKey}`);
+      modeCb("Hands: PORTAL QUICK-SELECT");
+    } else {
+      statusCb(activeMode === "controller" ? "CONTROLLER TP • release to teleport" : "HAND TP • unclench/release to teleport");
+      modeCb(activeMode === "controller" ? "Controllers: TELEPORT AIM" : "Hands: TELEPORT AIM");
+    }
   }
 
-  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, isEnabled, getState: ()=>({ mode: !!lastHoldActive, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode: lastHoldActive ? activeMode : lastReleaseMode }) };
+  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, isEnabled, getState: ()=>({ mode: !!lastHoldActive, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode: lastHoldActive ? activeMode : lastReleaseMode, portalKey: lastReleasePortalKey }) };
 }
