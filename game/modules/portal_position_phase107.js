@@ -1,21 +1,24 @@
 import * as THREE from "three";
 
-const PHASE122 = "PHASE-122-STORE-PORTAL-POSITION-LOCK";
+const PHASE123 = "PHASE-123-LOUNGE-PORTAL-POSITION-LOCK";
 
 const TARGETS = Object.freeze({
   reikiRoom: { x: 13.62, y: 0.0, z: 1.40, tag: "PHASE106_REIKI_CURRENT" },
   scorpion: { x: 12.37, y: 0.0, z: 15.19, tag: "PHASE107_SCORPION_CURRENT" },
 
   // User screenshot current position: X -13.87 / Y 1.60 / Z 11.36.
-  // Portals are floor placed at Y 0.00 and split left/right so they do not overlap.
   pgaDrive: { x: -14.85, y: 0.0, z: 11.36, tag: "PHASE121_PGA_DRIVE_USER_POSITION" },
   pgaChipPutt: { x: -12.89, y: 0.0, z: 11.36, tag: "PHASE121_PGA_CHIP_PUTT_USER_POSITION" },
   chipPutt: { x: -12.89, y: 0.0, z: 11.36, tag: "PHASE121_PGA_CHIP_PUTT_USER_POSITION" },
 
   // User screenshot current position for Store portal: X 9.44 / Y 1.60 / Z -15.05.
-  // Portal is floor placed at Y 0.00 while preserving requested X/Z.
   storeRoom: { x: 9.44, y: 0.0, z: -15.05, tag: "PHASE122_STORE_USER_POSITION" },
-  store: { x: 9.44, y: 0.0, z: -15.05, tag: "PHASE122_STORE_USER_POSITION" }
+  store: { x: 9.44, y: 0.0, z: -15.05, tag: "PHASE122_STORE_USER_POSITION" },
+
+  // User screenshot current position for Lounge portal: X -20.74 / Y 1.60 / Z 5.00.
+  // Portal is floor placed at Y 0.00 while preserving requested X/Z.
+  smokerLounge: { x: -20.74, y: 0.0, z: 5.00, tag: "PHASE123_LOUNGE_USER_POSITION" },
+  lounge: { x: -20.74, y: 0.0, z: 5.00, tag: "PHASE123_LOUNGE_USER_POSITION" }
 });
 
 let lastScene = null;
@@ -30,8 +33,8 @@ function applyOne(obj){
   if (!target) return false;
   obj.position.set(target.x, target.y, target.z);
   faceCenter(obj);
-  obj.userData.phase122Placement = target.tag;
-  obj.userData.phase122Locked = true;
+  obj.userData.phase123Placement = target.tag;
+  obj.userData.phase123Locked = true;
   return true;
 }
 
@@ -64,4 +67,4 @@ if (!THREE.WebGLRenderer.prototype.__svrPortalPhase107Render){
 }
 
 setInterval(()=>{ if (lastScene) applyPortalPlacements(lastScene); }, 500);
-console.log(PHASE122, TARGETS);
+console.log(PHASE123, TARGETS);
