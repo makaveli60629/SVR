@@ -1,129 +1,174 @@
 import * as THREE from "three";
 
-const PHASE152_PLANETS = "PHASE-152-Y380-HIGHEST-REAL-PLANETS";
+const PHASE153_PLANETS = "PHASE-153-Y500-HIGHEST-SKY-PLANETS";
 let lastScene = null;
 let installed = false;
 let rig = null;
 
+const PLANET_CONFIG = {
+  moon: {
+    name: "PHASE153_REAL_MOON_Y500_HIGHEST_SKY",
+    kind: "moon",
+    radius: 24,
+    base: new THREE.Vector3(-18, 500, -46),
+    renderOrder: 390000
+  },
+  mars: {
+    name: "PHASE153_REAL_MARS_Y500_HIGHEST_SKY",
+    kind: "mars",
+    radius: 16,
+    base: new THREE.Vector3(24, 500, -54),
+    renderOrder: 390001
+  }
+};
+
 function makePlanetTexture(kind){
   const c = document.createElement("canvas");
-  c.width = c.height = 1024;
+  c.width = 1024;
+  c.height = 1024;
   const x = c.getContext("2d");
   const s = c.width;
   const cx = s / 2;
   const cy = s / 2;
 
-  const g = x.createRadialGradient(s*.34, s*.28, s*.02, cx, cy, s*.56);
+  const gradient = x.createRadialGradient(s * 0.34, s * 0.28, s * 0.02, cx, cy, s * 0.56);
   if (kind === "moon"){
-    g.addColorStop(0, "#ffffff");
-    g.addColorStop(.32, "#eef5ff");
-    g.addColorStop(.70, "#9ba7b8");
-    g.addColorStop(1, "#3e4654");
+    gradient.addColorStop(0.00, "#ffffff");
+    gradient.addColorStop(0.30, "#f1f7ff");
+    gradient.addColorStop(0.68, "#aab6c8");
+    gradient.addColorStop(1.00, "#3e4654");
   } else {
-    g.addColorStop(0, "#ffc58e");
-    g.addColorStop(.34, "#d85b2c");
-    g.addColorStop(.72, "#8d2e18");
-    g.addColorStop(1, "#2d0905");
+    gradient.addColorStop(0.00, "#ffc58e");
+    gradient.addColorStop(0.34, "#d85b2c");
+    gradient.addColorStop(0.72, "#8d2e18");
+    gradient.addColorStop(1.00, "#2d0905");
   }
-  x.fillStyle = g;
-  x.fillRect(0,0,s,s);
+  x.fillStyle = gradient;
+  x.fillRect(0, 0, s, s);
 
   x.save();
   x.beginPath();
-  x.arc(cx, cy, s*.49, 0, Math.PI*2);
+  x.arc(cx, cy, s * 0.49, 0, Math.PI * 2);
   x.clip();
-  if (kind === "moon"){
-    for(let i=0;i<130;i++){
-      x.fillStyle = i % 4 === 0 ? "rgba(255,255,255,.18)" : "rgba(42,50,62,.28)";
+
+  const marks = kind === "moon" ? 150 : 190;
+  for (let i = 0; i < marks; i++){
+    if (kind === "moon"){
+      x.fillStyle = i % 4 === 0 ? "rgba(255,255,255,.18)" : "rgba(42,50,62,.30)";
       x.beginPath();
-      x.arc(Math.random()*s, Math.random()*s, 4 + Math.random()*32, 0, Math.PI*2);
+      x.arc(Math.random() * s, Math.random() * s, 4 + Math.random() * 34, 0, Math.PI * 2);
       x.fill();
-    }
-  } else {
-    for(let i=0;i<170;i++){
-      x.fillStyle = i % 4 === 0 ? "rgba(255,216,150,.25)" : "rgba(48,10,6,.32)";
+    } else {
+      x.fillStyle = i % 4 === 0 ? "rgba(255,216,150,.25)" : "rgba(48,10,6,.34)";
       x.beginPath();
-      x.ellipse(Math.random()*s, Math.random()*s, 18 + Math.random()*130, 4 + Math.random()*18, Math.random()*Math.PI, 0, Math.PI*2);
+      x.ellipse(
+        Math.random() * s,
+        Math.random() * s,
+        18 + Math.random() * 135,
+        4 + Math.random() * 20,
+        Math.random() * Math.PI,
+        0,
+        Math.PI * 2
+      );
       x.fill();
     }
   }
   x.restore();
 
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 4;
-  return t;
+  const texture = new THREE.CanvasTexture(c);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
 }
 
-function hideFakePlanets(scene){
-  scene.traverse((o)=>{
-    const n = String(o?.name || "");
-    if(/PHASE134_.*SKY.*VISIBLE|PHASE134_.*HALO|PHASE143_VISIBLE_MOON|PHASE143_VISIBLE_MARS|PHASE148_HIGH_VISIBLE_MOON|PHASE148_HIGH_VISIBLE_MARS|PHASE142_VISIBLE_LOBBY_MOON|PHASE142_VISIBLE_LOBBY_MARS|PHASE149_REAL_HIGH_SKY_PLANETS|PHASE149_REAL_MOON_HIGH_SKY|PHASE149_REAL_MARS_HIGH_SKY|PHASE150_ULTRA_HIGH_REAL_PLANETS|PHASE150_REAL_MOON_ULTRA_HIGH_SKY|PHASE150_REAL_MARS_ULTRA_HIGH_SKY|PHASE151_BIGGER_CLOSER_ULTRA_HIGH_PLANETS|PHASE151_REAL_MOON_BIGGER_CLOSER_HIGH|PHASE151_REAL_MARS_BIGGER_CLOSER_HIGH/.test(n)){
-      if(!/PHASE152/.test(n)) o.visible = false;
-    }
+function hideOldPlanets(scene){
+  if (!scene) return;
+  scene.traverse((obj)=>{
+    const name = String(obj?.name || "");
+    const isOldPlanet = /PHASE134|PHASE140_CELESTIAL|PHASE142.*MOON|PHASE142.*MARS|PHASE143.*MOON|PHASE143.*MARS|PHASE148.*MOON|PHASE148.*MARS|PHASE149.*MOON|PHASE149.*MARS|PHASE150.*MOON|PHASE150.*MARS|PHASE151.*MOON|PHASE151.*MARS|PHASE152.*MOON|PHASE152.*MARS/.test(name);
+    if (isOldPlanet && !/PHASE153/.test(name)) obj.visible = false;
   });
 }
 
-function makeSpherePlanet(name, kind, radius, position, renderOrder){
-  const mat = new THREE.MeshBasicMaterial({
-    map: makePlanetTexture(kind),
+function makePlanet(config){
+  const material = new THREE.MeshBasicMaterial({
+    map: makePlanetTexture(config.kind),
     color: 0xffffff,
     depthWrite: false,
     depthTest: false,
     toneMapped: false
   });
-  const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, 64, 32), mat);
-  mesh.name = name;
-  mesh.position.copy(position);
-  mesh.renderOrder = renderOrder;
+
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(config.radius, 80, 40), material);
+  mesh.name = config.name;
+  mesh.position.copy(config.base);
+  mesh.renderOrder = config.renderOrder;
   mesh.frustumCulled = false;
-  const glow = new THREE.PointLight(kind === "moon" ? 0xdbeaff : 0xff8f5b, kind === "moon" ? 3.2 : 2.4, 240, 2);
-  glow.name = `${name}_GLOW`;
+
+  const glow = new THREE.PointLight(
+    config.kind === "moon" ? 0xdbeaff : 0xff8f5b,
+    config.kind === "moon" ? 4.0 : 2.8,
+    320,
+    2
+  );
+  glow.name = `${config.name}_GLOW`;
   mesh.add(glow);
+
   return mesh;
 }
 
 function install(scene){
-  if(!scene || installed) return false;
+  if (!scene || installed) return false;
   installed = true;
-  hideFakePlanets(scene);
+  hideOldPlanets(scene);
 
   const group = new THREE.Group();
-  group.name = "PHASE152_Y380_HIGHEST_REAL_PLANETS";
+  group.name = "PHASE153_Y500_HIGHEST_SKY_PLANET_LAYER";
   group.frustumCulled = false;
 
-  const moon = makeSpherePlanet("PHASE152_REAL_MOON_Y380_HIGH", "moon", 18.0, new THREE.Vector3(-18, 380, -46), 370000);
-  const mars = makeSpherePlanet("PHASE152_REAL_MARS_Y380_HIGH", "mars", 12.0, new THREE.Vector3(24, 380, -54), 370001);
+  const moon = makePlanet(PLANET_CONFIG.moon);
+  const mars = makePlanet(PLANET_CONFIG.mars);
+
   group.add(moon, mars);
   scene.add(group);
+
   rig = { group, moon, mars };
-  scene.userData.phase152RealPlanets = rig;
-  console.log(`[${PHASE152_PLANETS}] installed Y=380 highest real planets`);
+  scene.userData.phase153Planets = rig;
+  console.log(`[${PHASE153_PLANETS}] installed`, {
+    moon: { x: PLANET_CONFIG.moon.base.x, y: PLANET_CONFIG.moon.base.y, z: PLANET_CONFIG.moon.base.z, radius: PLANET_CONFIG.moon.radius },
+    mars: { x: PLANET_CONFIG.mars.base.x, y: PLANET_CONFIG.mars.base.y, z: PLANET_CONFIG.mars.base.z, radius: PLANET_CONFIG.mars.radius }
+  });
   return true;
 }
 
 function update(scene, camera){
-  if(!scene) return;
+  if (!scene) return;
   install(scene);
-  hideFakePlanets(scene);
-  if(!rig) return;
-  const t = performance.now() * .001;
-  rig.moon.position.set(-18 + Math.sin(t*.018)*4, 380 + Math.sin(t*.030)*2.0, -46 + Math.cos(t*.014)*1.5);
-  rig.mars.position.set(24 + Math.sin(t*.016 + 1.1)*4, 380 + Math.sin(t*.026 + .8)*2.0, -54 + Math.cos(t*.012 + .5)*1.5);
-  rig.moon.rotation.y += .0012;
-  rig.mars.rotation.y += .0018;
-  if(camera?.far && camera.far < 1200){ camera.far = 1200; camera.updateProjectionMatrix?.(); }
+  hideOldPlanets(scene);
+  if (!rig) return;
+
+  const t = performance.now() * 0.001;
+  rig.moon.position.set(-18 + Math.sin(t * 0.012) * 5, 500 + Math.sin(t * 0.020) * 2.0, -46 + Math.cos(t * 0.010) * 1.5);
+  rig.mars.position.set(24 + Math.sin(t * 0.010 + 1.1) * 5, 500 + Math.sin(t * 0.018 + 0.8) * 2.0, -54 + Math.cos(t * 0.009 + 0.5) * 1.5);
+  rig.moon.rotation.y += 0.0010;
+  rig.mars.rotation.y += 0.0016;
+
+  if (camera?.far && camera.far < 1500){
+    camera.far = 1500;
+    camera.updateProjectionMatrix?.();
+  }
   rig.group.visible = true;
 }
 
 const originalRender = THREE.WebGLRenderer.prototype.render;
-if(!THREE.WebGLRenderer.prototype.__svrPhase152RealPlanets){
-  THREE.WebGLRenderer.prototype.__svrPhase152RealPlanets = true;
-  THREE.WebGLRenderer.prototype.render = function(scene,camera){
+if (!THREE.WebGLRenderer.prototype.__svrPhase153Y500Planets){
+  THREE.WebGLRenderer.prototype.__svrPhase153Y500Planets = true;
+  THREE.WebGLRenderer.prototype.render = function(scene, camera){
     lastScene = scene || lastScene;
-    update(lastScene,camera);
-    return originalRender.call(this,scene,camera);
+    update(lastScene, camera);
+    return originalRender.call(this, scene, camera);
   };
 }
-setInterval(()=>update(lastScene,null),600);
-console.log(`[${PHASE152_PLANETS}] loaded`);
+
+setInterval(()=>update(lastScene, null), 600);
+console.log(`[${PHASE153_PLANETS}] loaded`);
