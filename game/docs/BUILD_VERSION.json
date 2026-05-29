@@ -1,13 +1,13 @@
 {
-  "build": "PHASE-98-QUEST-STABILITY-WATCH-FIST-PERFORMANCE-LOCK",
-  "label": "Quest Stability Watch Fist Performance Lock",
+  "build": "PHASE-99-QUEST-FLOOR-LOWER-NO-BLINK-LOCK",
+  "label": "Quest Floor Lower No Blink Lock",
   "scope": "game-only",
   "date": "2026-05-28",
   "notes": [
-    "hard-disable large low transparent floor overlays causing Quest z-fighting",
-    "reduce repair/render churn for Quest performance",
-    "fix wrist watch orientation so screen faces user and stays upright",
-    "refine fist/pinch teleport behavior",
+    "lower remaining decorative low floor planes below the main floor",
+    "hide broad transparent floor overlays that cause Quest z-fighting",
+    "preserve teleport markers and portal signs",
+    "preserve Phase 98 watch orientation and fist teleport fixes",
     "preserve north-sky textured Moon/Mars",
     "preserve Reiki portal hologram",
     "website/site untouched"
