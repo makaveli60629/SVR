@@ -1,15 +1,14 @@
-﻿{
-  "build": "PHASE-95-ORIGINAL-STOREFRONT-RECOVERY-LOCK",
-  "source": "direct-game-folder-and-update-game-zip",
+{
+  "build": "PHASE-145-PLAYER-SHIM-BOOT-LOCK",
+  "source": "direct-game-folder",
   "siteTouched": false,
   "rules": [
-    "original lobby restored",
-    "storefront portals restored",
+    "direct deploy workflow uses committed /game folder",
+    "root website/site files untouched",
+    "game/index.html conflict markers removed",
+    "player boot shim active before main.js load",
     "private scenes routed separately",
-    "locomotion preserved",
-    "watch preserved",
-    "Quest controller fallback preserved",
-    "website untouched"
+    "watch and Quest fallback preserved"
   ],
-  "updatedAt": "2026-05-28T11:26:42.8511323-05:00"
+  "updatedAt": "2026-05-29T00:00:00Z"
 }
