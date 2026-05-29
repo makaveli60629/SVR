@@ -1,2 +1,2 @@
-import "./espresso_attach_to_building_phase118.js?v=phase118";
-console.log("PHASE-118 espresso building attachment bridge loaded through phase116 path");
+import "./espresso_any_banner_phase120.js?v=phase120";
+console.log("PHASE-120 espresso any-banner bridge loaded through phase116 path");
