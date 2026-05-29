@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const PHASE98 = "PHASE-98-QUEST-STABILITY-WATCH-FIST-PERFORMANCE-LOCK";
+const PHASE99 = "PHASE-99-QUEST-FLOOR-LOWER-NO-BLINK-LOCK";
 let installedForScene = new WeakSet();
 
 function isMesh(obj){ return !!obj?.isMesh && !!obj.geometry; }
@@ -9,60 +9,79 @@ function isPointLight(obj){ return !!obj?.isPointLight; }
 function boxInfo(obj){ const box = new THREE.Box3().setFromObject(obj); const size = new THREE.Vector3(); const center = new THREE.Vector3(); box.getSize(size); box.getCenter(center); return { box, size, center }; }
 function setMatFlag(mat, fn){ if (Array.isArray(mat)) mat.forEach(fn); else if (mat) fn(mat); }
 
-function isProtectedFloorObject(obj){
+function isTeleportMarker(obj){
   const n = String(obj.name || "").toLowerCase();
-  if (/portal|gate|ring|pointer|teleport|marker|stand here|stance|ball|button|seat|chair/.test(n)) return true;
+  if (/pointer|teleport|marker|stand here|stance|ball|button/.test(n)) return true;
   let p = obj.parent;
   while (p){
     const pn = String(p.name || "").toLowerCase();
-    if (/portal|gate|teleport|pga|reiki|scorpion|store|lounge|chair|seat/.test(pn)) return true;
-    if (p.userData?.portalKey) return true;
+    if (/teleport|marker|button/.test(pn)) return true;
     p = p.parent;
   }
-  return !!obj.userData?.portalKey;
+  return false;
 }
 
-function hardDisableBlinkingFloorLayers(scene){
+function isPortalSignOrVertical(obj){
+  const { size } = boxInfo(obj);
+  if (size.y > 0.20) return true;
+  let p = obj;
+  while (p){
+    if (p.userData?.portalKey && size.y > 0.12) return true;
+    p = p.parent;
+  }
+  return false;
+}
+
+function lowerAndStabilizeFloorLayers(scene){
+  let lowered = 0;
   let hidden = 0;
   scene.traverse((obj)=>{
     if (!isMesh(obj)) return;
-    if (isProtectedFloorObject(obj)) return;
+    if (isTeleportMarker(obj)) return;
     const { size, center } = boxInfo(obj);
-    if (center.y > 0.12 || center.y < -0.03 || size.y > 0.14) return;
-    const material = obj.material;
-    const transparent = Array.isArray(material) ? material.some(m=>m?.transparent || m?.opacity < 0.98 || m?.depthWrite === false) : !!(material?.transparent || material?.opacity < 0.98 || material?.depthWrite === false);
-    const lowPlane = /CircleGeometry|PlaneGeometry|ShapeGeometry|RingGeometry/.test(String(obj.geometry?.type || ""));
-    const large = size.x > 1.10 && size.z > 1.10;
-    const name = String(obj.name || "").toLowerCase();
-    const likelyGlow = /glow|halo|carpet|shadow|logo|overlay|floor/.test(name);
+    if (center.y > 0.16 || center.y < -0.12 || size.y > 0.18) return;
 
-    // Quest rule: low large transparent planes fight the real floor in both eyes. Remove them.
-    if ((transparent && lowPlane && large) || (likelyGlow && lowPlane && large && center.y < 0.08)){
+    const geometryType = String(obj.geometry?.type || "");
+    const lowPlane = /CircleGeometry|PlaneGeometry|ShapeGeometry|RingGeometry/.test(geometryType);
+    if (!lowPlane) return;
+    if (isPortalSignOrVertical(obj)) return;
+
+    const material = obj.material;
+    const transparent = Array.isArray(material)
+      ? material.some(m=>m?.transparent || m?.opacity < 0.99 || m?.depthWrite === false)
+      : !!(material?.transparent || material?.opacity < 0.99 || material?.depthWrite === false);
+    const large = size.x > 0.80 && size.z > 0.80;
+    const veryLarge = size.x > 4.0 || size.z > 4.0;
+    const name = String(obj.name || "").toLowerCase();
+    const likelyGlow = /glow|halo|carpet|shadow|logo|overlay|floor|ring|circle/.test(name);
+
+    // Hard kill the broad transparent layers. These are the Quest blink source.
+    if ((transparent && large) || (likelyGlow && large)){
       obj.visible = false;
       obj.layers.disableAll?.();
-      obj.userData.phase98FloorHidden = true;
+      obj.userData.phase99FloorHidden = true;
       hidden++;
       return;
     }
 
-    // Keep any small functional floor marker but make it deterministic.
-    if (lowPlane && center.y < 0.08){
-      if (!obj.userData.phase98FloorStable){
-        obj.position.y = Math.max(obj.position.y, 0.075 + Math.min(hidden, 8) * 0.004);
-        obj.userData.phase98FloorStable = true;
-      }
-      obj.renderOrder = -120 + hidden;
+    // Lower all remaining decorative low rings/planes so they do not sit exactly on the real floor.
+    if (large || veryLarge){
+      obj.position.y = Math.min(obj.position.y, -0.028 - Math.min(lowered, 10) * 0.0025);
+      obj.renderOrder = -220 - lowered;
+      obj.userData.phase99FloorLowered = true;
       setMatFlag(obj.material, (mat)=>{
         mat.depthWrite = true;
         mat.depthTest = true;
         mat.polygonOffset = true;
-        mat.polygonOffsetFactor = -32 - hidden;
-        mat.polygonOffsetUnits = -32 - hidden;
+        mat.polygonOffsetFactor = 24 + lowered;
+        mat.polygonOffsetUnits = 24 + lowered;
         mat.needsUpdate = true;
       });
+      lowered++;
     }
   });
-  scene.userData.phase98HiddenFloorLayerCount = hidden;
+  scene.userData.phase99FloorHidden = hidden;
+  scene.userData.phase99FloorLowered = lowered;
 }
 
 function darkenDuplicateGreenTableTop(scene){
@@ -89,12 +108,12 @@ function darkenDuplicateGreenTableTop(scene){
       mat.needsUpdate = true;
       fixed += 1;
     });
-    obj.userData.phase98TableTopNeutralized = true;
+    obj.userData.phase99TableTopNeutralized = true;
   });
 }
 
 function faceCenter(group){ if (group) group.rotation.y = Math.atan2(-group.position.x, -group.position.z); }
-function movePortal(scene, key, x, z, y = 0){ const group = scene.getObjectByName(`PORTAL_${key}`); if (!group) return false; group.position.set(x, y, z); faceCenter(group); group.userData.phase98Aligned = true; return true; }
+function movePortal(scene, key, x, z, y = 0){ const group = scene.getObjectByName(`PORTAL_${key}`); if (!group) return false; group.position.set(x, y, z); faceCenter(group); group.userData.phase99Aligned = true; return true; }
 function alignPortals(scene, world){
   const reikiTarget = world?.sceneTargets?.reiki?.pos;
   const pgaTarget = world?.sceneTargets?.pga?.pos;
@@ -138,23 +157,22 @@ export function installPhase93LobbyRepair({ scene, world, log = console.log, sel
   if (installedForScene.has(scene)) return scene.userData.phase93RepairApi || null;
   installedForScene.add(scene);
   try{
-    hardDisableBlinkingFloorLayers(scene);
+    lowerAndStabilizeFloorLayers(scene);
     darkenDuplicateGreenTableTop(scene);
     alignPortals(scene, world);
     raisePlanets(scene);
-    scene.userData.phase93Repair = PHASE98;
-    log?.(`[${PHASE98}] Quest stability repair installed; hidden floor layers: ${scene.userData.phase98HiddenFloorLayerCount || 0}`);
-  }catch(err){ console.warn(`[${PHASE98}] install failed`, err); }
+    scene.userData.phase93Repair = PHASE99;
+    log?.(`[${PHASE99}] floor depth repair installed; hidden=${scene.userData.phase99FloorHidden || 0}, lowered=${scene.userData.phase99FloorLowered || 0}`);
+  }catch(err){ console.warn(`[${PHASE99}] install failed`, err); }
 
   let accum = 0;
   let last = performance.now();
   const api = {
     update(dt = 0.016){
       accum += dt;
-      // Keep this light. Do not traverse every frame on Quest.
       raisePlanets(scene);
-      if (accum > 6.0){
-        hardDisableBlinkingFloorLayers(scene);
+      if (accum > 8.0){
+        lowerAndStabilizeFloorLayers(scene);
         darkenDuplicateGreenTableTop(scene);
         alignPortals(scene, world);
         accum = 0;
