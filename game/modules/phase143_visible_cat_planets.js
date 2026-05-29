@@ -1,6 +1,6 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 
-const PHASE143 = "PHASE-143-FORCED-VISIBLE-CAT-PLANETS";
+const PHASE148_PLANETS = "PHASE-148-HIGHER-MOON-MARS";
 let lastScene = null;
 let installed = false;
 
@@ -130,13 +130,12 @@ function install(scene) {
   });
 
   const layer = new THREE.Group();
-  layer.name = "PHASE143_VISIBLE_CAT_AND_PLANETS_LAYER";
+  layer.name = "PHASE148_VISIBLE_CAT_AND_HIGH_PLANETS_LAYER";
   layer.frustumCulled = false;
 
   layer.add(makeVisibleCat());
-
-  const moon = makePlanet("PHASE143_VISIBLE_MOON", 0xffffff, -6.5, 15.8, 14.8, 6.2);
-  const mars = makePlanet("PHASE143_VISIBLE_MARS", 0xc1440e, 6.7, 16.8, 14.6, 4.2);
+  const moon = makePlanet("PHASE148_HIGH_VISIBLE_MOON", 0xffffff, -8.5, 27.5, 15.0, 7.8);
+  const mars = makePlanet("PHASE148_HIGH_VISIBLE_MARS", 0xc1440e, 8.7, 30.5, 14.8, 5.2);
 
   layer.add(moon);
   layer.add(mars);
@@ -146,11 +145,11 @@ function install(scene) {
     const t = performance.now() * 0.001;
     moon.material.rotation = t * 0.035;
     mars.material.rotation = -t * 0.045;
-    moon.position.y = 15.8 + Math.sin(t * 0.25) * 0.15;
-    mars.position.y = 16.8 + Math.cos(t * 0.21) * 0.12;
+    moon.position.y = 27.5 + Math.sin(t * 0.18) * 0.35;
+    mars.position.y = 30.5 + Math.cos(t * 0.16) * 0.28;
   };
 
-  console.log(`[${PHASE143}] visible cat and planets installed`);
+  console.log(`[${PHASE148_PLANETS}] high visible Moon/Mars installed`);
 }
 
 const oldRender = THREE.WebGLRenderer.prototype.render;
@@ -165,4 +164,4 @@ if (!THREE.WebGLRenderer.prototype.__svrPhase143VisibleCatPlanets) {
 }
 
 setInterval(() => install(lastScene), 1000);
-console.log(`[${PHASE143}] loaded`);
+console.log(`[${PHASE148_PLANETS}] loaded`);
