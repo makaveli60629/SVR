@@ -1,4 +1,4 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -69,7 +69,6 @@ scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
 
-
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
@@ -80,16 +79,15 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading worldâ€¦", { force: true });
+setStatus("Loading world…", { force: true });
 let world;
 try {
   world = await withBootTimeout(buildSkylineRoom(scene, { log, renderer }), 5500, "world build");
 } catch (err) {
   console.error(err);
   log("[BOOT-SAFE] world build failed, using emergency lobby shell", err?.message || err);
-  setStatus("Boot-safe lobby loaded â€” world module recovered", { force: true });
-  const g = new THREE.Group();
-  scene.add(g);
+  setStatus("Boot-safe lobby loaded — world module recovered", { force: true });
+  scene.add(new THREE.Group());
   const floor = new THREE.Mesh(new THREE.CircleGeometry(18, 64), new THREE.MeshBasicMaterial({ color: 0x111018 }));
   floor.rotation.x = -Math.PI / 2;
   scene.add(floor);
@@ -105,15 +103,14 @@ try {
     const halo = new THREE.Sprite(new THREE.SpriteMaterial({ color: glowColor, transparent: true, opacity: 0.23, depthWrite: false, blending: THREE.AdditiveBlending }));
     halo.scale.set(radius * 10, radius * 10, 1);
     group.add(halo);
-    const light = new THREE.PointLight(glowColor, name === 'Moon' ? 3.1 : 2.2, radius * 100, 1.4);
-    group.add(light);
+    group.add(new THREE.PointLight(glowColor, name === "Moon" ? 3.1 : 2.2, radius * 100, 1.4));
     group.position.set(x, y, z);
     group.userData.body = body;
     scene.add(group);
     return group;
   };
-  const moon = makeBootPlanet('Moon', 3.7, 0xf3f6ff, 0xdbeaff, -68, 38, -148);
-  const mars = makeBootPlanet('Mars', 2.0, 0xd97954, 0xff986d, 76, 43, -172);
+  const moon = makeBootPlanet("Moon", 3.7, 0xf3f6ff, 0xdbeaff, -68, 38, -148);
+  const mars = makeBootPlanet("Mars", 2.0, 0xd97954, 0xff986d, 76, 43, -172);
   scene.userData._bootPlanetTick = (dt)=>{
     const t = (scene.userData._bootPlanetTime = (scene.userData._bootPlanetTime || 0) + dt);
     moon.position.set(-68 + Math.sin(t * 0.025) * 10, 38 + Math.sin(t * 0.060) * 1.4, -148 + Math.cos(t * 0.025) * 10);
@@ -122,7 +119,7 @@ try {
     mars.userData.body.rotation.y += dt * 0.062;
   };
   world = {
-    roomClamp: (p)=>p,
+    roomClamp: 18,
     seats: [{x:0,z:2.9,label:"Player Seat"},{x:2.3,z:1.3,label:"Bot 1"},{x:2.3,z:-1.3,label:"Bot 2"},{x:0,z:-2.9,label:"Bot 3"},{x:-2.3,z:-1.3,label:"Bot 4"},{x:-2.3,z:1.3,label:"Bot 5"}],
     tableCenter: new THREE.Vector3(0,0,0),
     joinRadius: 4.5,
@@ -131,9 +128,16 @@ try {
   };
 }
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
+
+let tp = null;
+const player = {
+  getPose: ()=> tp?.getPlayerPose?.() || { x: camera.position.x, y: camera.position.y, z: camera.position.z, yaw: camera.rotation.y || 0 },
+  setPose: (x, y = 0, z)=> tp?.setPlayerPose?.(x, y, z),
+  setXZ: (x, z)=> tp?.setPlayerXZ?.(x, z),
+  setYaw: (yaw)=> tp?.setPlayerYaw?.(yaw)
+};
 window.SVR_GAME = { scene, camera, renderer, world, player };
 
-// Phase 91: direct labeled lobby portals. Full experiences remain separate pages.
 createPortal({ scene, label: "REIKI ROOM", sublabel: "PRIVATE MEDITATION", position: new THREE.Vector3(-6.2, 0, -4.8), rotationY: 0.72, key: "reikiRoom", color: 0xff4058 });
 createPortal({ scene, label: "PGA DRIVE", sublabel: "PRIVATE RANGE", position: new THREE.Vector3(6.2, 0, -4.8), rotationY: -0.72, key: "pgaDrive", color: 0x7ff5c7 });
 createPortal({ scene, label: "CHIP + PUTT", sublabel: "PRIVATE SHORT GAME", position: new THREE.Vector3(8.1, 0, -1.5), rotationY: -1.05, key: "pgaChipPutt", color: 0x95ff9f });
@@ -143,23 +147,16 @@ createPortal({ scene, label: "ENTER SCORPION ROOM", sublabel: "PRIVATE POKER SCE
 installPortalClickHandler({ camera, scene, domElement: renderer.domElement });
 
 const hands = createHands({ scene, renderer, log });
-const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
+tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
+window.SVR_GAME.hands = hands;
+window.SVR_GAME.tp = tp;
 
 const audio = createAudioPlaylist({
-  tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" },
-    
-  ],
+  tracks: [{ title: "Lobby 07", url: "./assets/audio/07.mp3" }],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
-    if (state.error){
-      setStatus(`Audio: ${state.error}`);
-      return;
-    }
-    if (state.enabled){
-      setStatus(`Now Playing: ${state.trackTitle}`);
-      return;
-    }
+    if (state.error){ setStatus(`Audio: ${state.error}`); return; }
+    if (state.enabled){ setStatus(`Now Playing: ${state.trackTitle}`); return; }
     setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
   }
 });
@@ -182,15 +179,8 @@ function inTableZone(){
   const p = currentHeadXZ();
   return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7);
 }
-
-function seatLabel(){
-  return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing";
-}
-
-function moveDesktopToSeat(seat){
-  camera.position.set(seat.x, 1.12, seat.z);
-  camera.lookAt(0, 1.0, 0);
-}
+function seatLabel(){ return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing"; }
+function moveDesktopToSeat(seat){ camera.position.set(seat.x, 1.12, seat.z); camera.lookAt(0, 1.0, 0); }
 
 function joinTable(){
   if (!inTableZone()) return false;
@@ -205,11 +195,8 @@ function joinTable(){
   seatIndex = best;
   seated = true;
   const seat = seats[best];
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(seat.x, -0.42, seat.z);
-  } else {
-    moveDesktopToSeat(seat);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(seat.x, -0.42, seat.z);
+  else moveDesktopToSeat(seat);
   setMode(`Seat: ${seat.label}`);
   return true;
 }
@@ -217,23 +204,15 @@ function joinTable(){
 function leaveTable(){
   seated = false;
   seatIndex = -1;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(0, 0, 4.8);
-  } else {
-    camera.position.set(0, 1.6, 4.8);
-    camera.lookAt(0, 1.15, 0);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(0, 0, 4.8);
+  else { camera.position.set(0, 1.6, 4.8); camera.lookAt(0, 1.15, 0); }
   return true;
 }
 
 function movePlayerToSpot(target, lookTarget = null){
   if (!target) return;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(target.x, 0, target.z);
-  } else {
-    camera.position.set(target.x, 1.6, target.z);
-    if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(target.x, 0, target.z);
+  else { camera.position.set(target.x, 1.6, target.z); if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z); }
 }
 
 function gotoScene(key){
@@ -312,12 +291,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logoâ€¦", { force: true });
+setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled.", { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -332,7 +311,8 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
-  await audio.prime(); audio.stop();
+  await audio.prime();
+  audio.stop();
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
@@ -386,33 +366,18 @@ renderer.setAnimationLoop(()=>{
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
   if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({
-      dt,
-      leftHand,
-      rightHand,
-      leftController,
-      rightController,
-      statusCb: (text)=>{ setStatus(text); },
-      modeCb: (text)=>{ setMode(text); }
-    });
+    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>setStatus(text), modeCb: (text)=>setMode(text) });
   }
 
   if (watch) watch.update(dt, leftHand, rightHand);
-
   renderer.render(scene, camera);
 });
 
 const canvasEl = renderer.domElement;
-canvasEl.addEventListener("pointerdown", async ()=>{
-  const st = audio.getState();
-  audio.stop();
-}, { passive: true });
+canvasEl.addEventListener("pointerdown", async ()=>{ audio.stop(); }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
-  log("[ERR] WebGL context lost. Reloadingâ€¦");
-  setStatus("WebGL context lost (reloadingâ€¦)", { force: true });
+  log("[ERR] WebGL context lost. Reloading…");
+  setStatus("WebGL context lost (reloading…)", { force: true });
   setTimeout(()=>location.reload(), 500);
 }, false);
-
-
-
