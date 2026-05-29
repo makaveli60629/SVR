@@ -1,14 +1,14 @@
 {
-  "build": "PHASE-100-FIST-UNCLENCH-RELEASE-TELEPORT-LOCK",
-  "label": "Fist Unclench Release Teleport Lock",
+  "build": "PHASE-101-FIST-TELEPORT-LOCKED-BASELINE",
+  "label": "Fist Teleport Locked Baseline",
   "scope": "game-only",
   "date": "2026-05-28",
   "notes": [
-    "fix unclench/release teleport so it jumps to the last valid target",
-    "handle Quest hand tracking drop during fist release as a teleport release event",
-    "preserve last good teleport target while fist/pinch is held",
-    "do not erase target when aim briefly fails during a clenched fist",
-    "preserve Phase 99 floor depth fix",
+    "LOCKED: current fist/pinch teleport release behavior is working and must be preserved",
+    "do not rewrite teleport.js unless the user explicitly asks to change fist teleport",
+    "working behavior: hold fist or pinch, aim at purple target, unclench/release to teleport",
+    "Quest hand tracking drop during unclench must continue to count as release",
+    "future work should target floor blinking/performance without changing fist teleport",
     "preserve watch orientation fix and north-sky Moon/Mars",
     "website/site untouched"
   ]
