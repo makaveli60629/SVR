@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const PHASE148_PLANETS = "PHASE-148-HIGHER-MOON-MARS";
+const PHASE149_CAT = "PHASE-149-CAT-ONLY-NO-FAKE-PLANETS";
 let lastScene = null;
 let installed = false;
 
@@ -33,7 +33,7 @@ function makeText(title, sub) {
 
 function makeVisibleCat() {
   const root = new THREE.Group();
-  root.name = "PHASE143_VISIBLE_SOUTH_WALL_CAT";
+  root.name = "PHASE149_VISIBLE_SOUTH_WALL_CAT_ONLY";
   root.position.set(0, 0.08, 15.65);
   root.rotation.y = Math.PI;
   root.frustumCulled = false;
@@ -56,14 +56,7 @@ function makeVisibleCat() {
   rim.renderOrder = 300000;
   root.add(rim);
 
-  const fur = new THREE.MeshStandardMaterial({
-    color: 0xb07a4f,
-    roughness: 0.88,
-    metalness: 0,
-    emissive: 0x160806,
-    emissiveIntensity: 0.06
-  });
-
+  const fur = new THREE.MeshStandardMaterial({ color: 0xb07a4f, roughness: 0.88, metalness: 0, emissive: 0x160806, emissiveIntensity: 0.06 });
   const body = new THREE.Mesh(new THREE.SphereGeometry(1, 36, 18), fur);
   body.position.y = 0.68;
   body.scale.set(1.75, 0.62, 0.90);
@@ -77,14 +70,7 @@ function makeVisibleCat() {
 
   const sign = new THREE.Mesh(
     new THREE.PlaneGeometry(3.8, 1.15),
-    new THREE.MeshBasicMaterial({
-      map: makeText("SVR CAT", "south wall companion"),
-      transparent: true,
-      side: THREE.DoubleSide,
-      depthTest: false,
-      depthWrite: false,
-      toneMapped: false
-    })
+    new THREE.MeshBasicMaterial({ map: makeText("SVR CAT", "south wall companion"), transparent: true, side: THREE.DoubleSide, depthTest: false, depthWrite: false, toneMapped: false })
   );
   sign.position.set(0, 2.15, -0.46);
   sign.renderOrder = 300001;
@@ -93,75 +79,45 @@ function makeVisibleCat() {
   const light = new THREE.PointLight(0xffd77b, 3.5, 9, 2);
   light.position.set(0, 1.8, 0.9);
   root.add(light);
-
   return root;
 }
 
-function makePlanet(name, color, x, y, z, size) {
-  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-    color,
-    transparent: true,
-    opacity: 1,
-    depthTest: false,
-    depthWrite: false,
-    toneMapped: false,
-    blending: THREE.AdditiveBlending
-  }));
-  sprite.name = name;
-  sprite.position.set(x, y, z);
-  sprite.scale.set(size, size, 1);
-  sprite.renderOrder = 310000;
-  sprite.frustumCulled = false;
-  return sprite;
+function hideFakePlanets(scene){
+  scene.traverse((o)=>{
+    const n = String(o?.name || "");
+    if(/PHASE143_VISIBLE_MOON|PHASE143_VISIBLE_MARS|PHASE148_HIGH_VISIBLE_MOON|PHASE148_HIGH_VISIBLE_MARS|PHASE142_VISIBLE_LOBBY_MOON|PHASE142_VISIBLE_LOBBY_MARS/.test(n)){
+      o.visible = false;
+    }
+  });
 }
 
 function install(scene) {
   if (!scene || installed) return;
   installed = true;
+  hideFakePlanets(scene);
 
-  [
-    "PHASE142_CELESTIAL_FORCE_LAYER",
-    "PHASE140_CELESTIAL_FORCE_LAYER",
-    "SOUTH_WALL_CAT_DECOR_PHASE136",
-    "SOUTH_WALL_CAT_DECOR_PHASE135"
-  ].forEach((name) => {
+  ["SOUTH_WALL_CAT_DECOR_PHASE136", "SOUTH_WALL_CAT_DECOR_PHASE135"].forEach((name) => {
     const obj = scene.getObjectByName(name);
     if (obj) obj.visible = false;
   });
 
   const layer = new THREE.Group();
-  layer.name = "PHASE148_VISIBLE_CAT_AND_HIGH_PLANETS_LAYER";
+  layer.name = "PHASE149_CAT_ONLY_LAYER";
   layer.frustumCulled = false;
-
   layer.add(makeVisibleCat());
-  const moon = makePlanet("PHASE148_HIGH_VISIBLE_MOON", 0xffffff, -8.5, 27.5, 15.0, 7.8);
-  const mars = makePlanet("PHASE148_HIGH_VISIBLE_MARS", 0xc1440e, 8.7, 30.5, 14.8, 5.2);
-
-  layer.add(moon);
-  layer.add(mars);
   scene.add(layer);
-
-  scene.userData._phase143VisibleTick = () => {
-    const t = performance.now() * 0.001;
-    moon.material.rotation = t * 0.035;
-    mars.material.rotation = -t * 0.045;
-    moon.position.y = 27.5 + Math.sin(t * 0.18) * 0.35;
-    mars.position.y = 30.5 + Math.cos(t * 0.16) * 0.28;
-  };
-
-  console.log(`[${PHASE148_PLANETS}] high visible Moon/Mars installed`);
+  console.log(`[${PHASE149_CAT}] cat-only layer installed; fake planets disabled`);
 }
 
 const oldRender = THREE.WebGLRenderer.prototype.render;
-if (!THREE.WebGLRenderer.prototype.__svrPhase143VisibleCatPlanets) {
-  THREE.WebGLRenderer.prototype.__svrPhase143VisibleCatPlanets = true;
+if (!THREE.WebGLRenderer.prototype.__svrPhase149CatOnly) {
+  THREE.WebGLRenderer.prototype.__svrPhase149CatOnly = true;
   THREE.WebGLRenderer.prototype.render = function(scene, camera) {
     lastScene = scene || lastScene;
     install(lastScene);
-    if (lastScene?.userData?._phase143VisibleTick) lastScene.userData._phase143VisibleTick();
+    if (lastScene) hideFakePlanets(lastScene);
     return oldRender.call(this, scene, camera);
   };
 }
-
-setInterval(() => install(lastScene), 1000);
-console.log(`[${PHASE148_PLANETS}] loaded`);
+setInterval(() => { install(lastScene); if(lastScene) hideFakePlanets(lastScene); }, 1000);
+console.log(`[${PHASE149_CAT}] loaded`);
