@@ -1,14 +1,15 @@
 {
-  "build": "PHASE-95-TEXTURED-MOON-MARS-ALL-ROOMS-LOCK",
-  "label": "Textured Moon Mars All Rooms Lock",
+  "build": "PHASE-96-QUEST-FLOOR-HAND-TELEPORT-HOTFIX",
+  "label": "Quest Floor Hand Teleport Hotfix",
   "scope": "game-only",
   "date": "2026-05-28",
   "notes": [
-    "add procedural textured Moon and Mars module",
-    "texture existing lobby Moon and Mars",
-    "add textured Moon and Mars to all private rooms through private_scene_common",
-    "preserve Phase 93 lobby/locomotion fixes",
-    "preserve Phase 94 Reiki portal hologram",
+    "disable Quest-blinking transparent floor overlays that cause z-fighting",
+    "preserve portal rings and private-scene routes",
+    "fix hand teleport so fist or pinch hold aims and release teleports",
+    "add fist aiming fallback when finger direction collapses",
+    "preserve textured Moon/Mars in lobby and private rooms",
+    "preserve Reiki portal hologram",
     "website/site untouched"
   ]
 }
