@@ -1,15 +1,15 @@
 {
-  "build": "PHASE-99-QUEST-FLOOR-LOWER-NO-BLINK-LOCK",
-  "label": "Quest Floor Lower No Blink Lock",
+  "build": "PHASE-100-FIST-UNCLENCH-RELEASE-TELEPORT-LOCK",
+  "label": "Fist Unclench Release Teleport Lock",
   "scope": "game-only",
   "date": "2026-05-28",
   "notes": [
-    "lower remaining decorative low floor planes below the main floor",
-    "hide broad transparent floor overlays that cause Quest z-fighting",
-    "preserve teleport markers and portal signs",
-    "preserve Phase 98 watch orientation and fist teleport fixes",
-    "preserve north-sky textured Moon/Mars",
-    "preserve Reiki portal hologram",
+    "fix unclench/release teleport so it jumps to the last valid target",
+    "handle Quest hand tracking drop during fist release as a teleport release event",
+    "preserve last good teleport target while fist/pinch is held",
+    "do not erase target when aim briefly fails during a clenched fist",
+    "preserve Phase 99 floor depth fix",
+    "preserve watch orientation fix and north-sky Moon/Mars",
     "website/site untouched"
   ]
 }
