@@ -3,7 +3,7 @@ import { CONFIG } from "./config.js";
 import { isPinching, isFist } from "./gestures.js";
 import { openPrivateScene } from "./scene_portal_router.js";
 
-const PHASE137 = "PHASE-137-CAMERA-FORWARD-FINGERTIP-TELEPORT";
+const PHASE138 = "PHASE-138-NO-BACKWARD-FIST-TELEPORT-GUARD";
 const PORTAL_MAGNET_RADIUS = 1.55;
 const PORTAL_ACTIVATE_RADIUS = 0.92;
 
@@ -46,6 +46,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   const tmpPortalPos = new THREE.Vector3();
   const tmpFingerBase = new THREE.Vector3();
   const tmpFingerDir = new THREE.Vector3();
+  const tmpHead = new THREE.Vector3();
+  const tmpForward = new THREE.Vector3();
 
   function applyReferenceSpace(){
     if (!baseRefSpace || !renderer?.xr?.isPresenting) return false;
@@ -181,10 +183,53 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     return best;
   }
 
+  function getXRCamera(){
+    try { return renderer?.xr?.getCamera?.(camera) || camera; }
+    catch(_err){ return camera; }
+  }
+
+  function cameraWorldForward(out = tmpForward){
+    const xrCam = getXRCamera();
+    try { xrCam.getWorldDirection(out); }
+    catch(_err){ out.set(0,0,-1); }
+    out.y = 0;
+    if (out.lengthSq() < 0.0001) out.set(0,0,-1);
+    out.normalize();
+    if (Math.abs(playerYaw) > 0.0001) out.applyAxisAngle(yAxis, playerYaw).normalize();
+    return out;
+  }
+
+  function getCameraWorldPosition(out = tmpHead){
+    const xrCam = getXRCamera();
+    try { xrCam.getWorldPosition(out); }
+    catch(_err){ out.set(playerX, 1.6, playerZ); }
+    return out;
+  }
+
+  function forceTargetInFront(target, minDist = 3.4, maxDist = 9.5){
+    const camPos = getCameraWorldPosition(tmpHead);
+    const forward = cameraWorldForward(tmpForward);
+    const relX = target.x - camPos.x;
+    const relZ = target.z - camPos.z;
+    let distForward = relX * forward.x + relZ * forward.z;
+
+    // Critical Phase 138 guard: never allow hand teleport target behind the headset.
+    if (!Number.isFinite(distForward) || distForward < minDist){
+      distForward = minDist;
+      target.x = camPos.x + forward.x * distForward;
+      target.z = camPos.z + forward.z * distForward;
+    } else if (distForward > maxDist){
+      target.x = camPos.x + forward.x * maxDist;
+      target.z = camPos.z + forward.z * maxDist;
+    }
+    target.y = 0;
+    return target;
+  }
+
   function teleportByDelta(target){
     if (!renderer?.xr?.isPresenting || !baseRefSpace) return false;
     try{
-      const xrCam = renderer.xr.getCamera(camera);
+      const xrCam = getXRCamera();
       if (!xrCam) return false;
       xrCam.getWorldPosition(head);
       const dx = target.x - head.x;
@@ -240,24 +285,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const t = sourcePos.y / (-sourceDir.y);
     if (!Number.isFinite(t) || t < 0.08) return null;
     lastAimOrigin.copy(sourcePos);
-    return new THREE.Vector3(sourcePos.x + sourceDir.x * Math.min(t, 140), 0, sourcePos.z + sourceDir.z * Math.min(t, 140));
-  }
-
-  function cameraForwardGroundDirection(){
-    const xrCam = renderer.xr.getCamera(camera);
-    xrCam.getWorldDirection(headDir);
-    headDir.y = 0;
-    if (headDir.lengthSq() < 0.0001) headDir.set(0,0,-1);
-    headDir.normalize();
-    return headDir;
-  }
-
-  function headsetDownForwardAim(origin){
-    const forward = cameraForwardGroundDirection();
-    sourceDir.set(forward.x, -0.32, forward.z).normalize();
-    const t = THREE.MathUtils.clamp(origin.y / (-sourceDir.y), 3.8, 9.5);
-    lastAimOrigin.copy(origin);
-    return new THREE.Vector3(origin.x + sourceDir.x * t, 0, origin.z + sourceDir.z * t);
+    const target = new THREE.Vector3(sourcePos.x + sourceDir.x * Math.min(t, 140), 0, sourcePos.z + sourceDir.z * Math.min(t, 140));
+    return target;
   }
 
   function jointWorld(hand, name, out){
@@ -284,12 +313,10 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   function handAimPoint(hand){
     if (!getIndexOrigin(hand)) return null;
 
-    // Phase 137: origin is the index fingertip, but direction is stabilized to the user camera/headset forward.
-    // This prevents the teleport ray from drifting sideways when hand-joint orientation is noisy.
-    const cameraForward = cameraForwardGroundDirection();
-    sourceDir.copy(cameraForward);
+    const camForward = cameraWorldForward(new THREE.Vector3());
+    sourceDir.copy(camForward);
 
-    // A small optional fingertip-direction blend keeps the pointer feeling hand-led without letting it twist sideways.
+    // Use fingertip direction only as a tiny stabilizer and only if it agrees with camera forward.
     const baseNames = ["index-finger-phalanx-distal", "index-finger-phalanx-intermediate", "index-finger-phalanx-proximal", "index-finger-metacarpal"];
     for (const name of baseNames){
       if (jointWorld(hand, name, tmpFingerBase)){
@@ -297,17 +324,20 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
         tmpFingerDir.y = 0;
         if (tmpFingerDir.lengthSq() > 0.00035){
           tmpFingerDir.normalize();
-          const alignment = tmpFingerDir.dot(cameraForward);
-          if (alignment > 0.15) sourceDir.lerp(tmpFingerDir, 0.18).normalize();
+          const align = tmpFingerDir.dot(camForward);
+          if (align > 0.20) sourceDir.lerp(tmpFingerDir, 0.12).normalize();
+          // If the XR camera forward is reversed versus the actual fingertip direction, flip once.
+          if (align < -0.55) sourceDir.copy(camForward).multiplyScalar(-1).normalize();
         }
         break;
       }
     }
 
-    sourceDir.set(sourceDir.x, -0.32, sourceDir.z).normalize();
-    const t = THREE.MathUtils.clamp(sourcePos.y / (-sourceDir.y), 4.0, 9.75);
+    sourceDir.set(sourceDir.x, -0.34, sourceDir.z).normalize();
+    const rayDist = THREE.MathUtils.clamp(sourcePos.y / (-sourceDir.y), 4.5, 9.5);
     lastAimOrigin.copy(sourcePos);
-    return new THREE.Vector3(sourcePos.x + sourceDir.x * t, 0, sourcePos.z + sourceDir.z * t);
+    const target = new THREE.Vector3(sourcePos.x + sourceDir.x * rayDist, 0, sourcePos.z + sourceDir.z * rayDist);
+    return forceTargetInFront(target, 3.4, 9.5);
   }
 
   function getActiveHoldSource(){
@@ -322,15 +352,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     return null;
   }
 
-  function correctedHeadForward(){
-    const xrCam = renderer.xr.getCamera(camera);
-    xrCam.getWorldDirection(headDir);
-    headDir.y = 0;
-    if (headDir.lengthSq() < 1e-5) headDir.set(0, 0, -1);
-    headDir.normalize();
-    if (Math.abs(playerYaw) > 0.0001) headDir.applyAxisAngle(yAxis, playerYaw).normalize();
-    return headDir;
-  }
+  function correctedHeadForward(){ return cameraWorldForward(headDir); }
 
   function movePlayerFromControllers(dt){
     const leftGp = controllerGamepad(leftControllerRef);
@@ -391,17 +413,20 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   }
 
   function updateSmoothedTarget(aim, dt, mode){
-    const target = clampTarget(aim);
+    let target = clampTarget(aim);
+    if (mode === "hand") target = forceTargetInFront(target, 3.2, 9.7);
     const portalHit = mode === "hand" ? findNearestPortal(target) : null;
     if (portalHit){
       const strength = portalHit.active ? 0.74 : THREE.MathUtils.clamp(1 - (portalHit.dist / PORTAL_MAGNET_RADIUS), 0.16, 0.36);
       target.lerp(portalHit.point, strength);
+      if (mode === "hand") target = forceTargetInFront(target, 2.8, 10.0);
     }
     if (!lastAimValid){ smoothedTarget.copy(target); stableTargetMs = 100; }
     else {
       const jitter = smoothedTarget.distanceTo(target);
       stableTargetMs = jitter < 0.36 ? stableTargetMs + dt * 1000 : Math.max(0, stableTargetMs - dt * 430);
       smoothedTarget.lerp(target, jitter < 0.55 ? 0.46 : 0.30);
+      if (mode === "hand") forceTargetInFront(smoothedTarget, 2.8, 10.0);
     }
 
     const activePortalHit = mode === "hand" ? findNearestPortal(smoothedTarget) : null;
@@ -437,6 +462,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       return true;
     }
 
+    if (lastReleaseMode === "hand") forceTargetInFront(lastReleaseTarget, 2.8, 10.0);
     const allowed = targetFresh && heldMs > 70 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS;
     const ok = allowed && teleportByDelta(lastReleaseTarget);
     if (ok) lastTP = now + 240;
@@ -454,7 +480,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     playerYaw = 0;
     setPlayerPose(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
     clearTeleportState(true);
-    console.log(`[${PHASE137}] camera-forward fingertip teleport active`);
+    console.log(`[${PHASE138}] no-backward hand teleport guard active`);
   }
 
   function setLogoTexture(tex){ if (tex){ tex.anisotropy = 4; pointer.material.map = tex; pointer.material.needsUpdate = true; } }
@@ -484,7 +510,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       activeMode = "none";
       lastHoldSource = null;
       holdStart = 0;
-      statusCb((leftControllerRef || rightControllerRef) ? "Controllers ready • stick forward follows headset view • hold A/grip/trigger to teleport" : "Hands ready • fingertip origin + camera-forward teleport • portal quick-select active");
+      statusCb((leftControllerRef || rightControllerRef) ? "Controllers ready • stick forward follows headset view • hold A/grip/trigger to teleport" : "Hands ready • no-backward fingertip teleport guard active");
       modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready");
       return;
     }
@@ -498,8 +524,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const aim = activeMode === "controller" ? controllerAimPoint(active) : handAimPoint(active);
     if (!aim){
       hideVisualTarget();
-      statusCb(activeMode === "controller" ? "CONTROLLER TP • point at the floor" : "HAND TP • index fingertip starts the ray, headset forward controls direction");
-      modeCb(activeMode === "controller" ? "Controller teleport armed" : "Camera-forward teleport armed");
+      statusCb(activeMode === "controller" ? "CONTROLLER TP • point at the floor" : "HAND TP • hold fist/pinch; target is forced in front of your headset");
+      modeCb(activeMode === "controller" ? "Controller teleport armed" : "No-backward teleport armed");
       return;
     }
 
@@ -512,8 +538,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       statusCb(`PORTAL READY • release fist/pinch to enter ${lastReleasePortalKey}`);
       modeCb("Hands: PORTAL QUICK-SELECT");
     } else {
-      statusCb(activeMode === "controller" ? "CONTROLLER TP • release to teleport" : "HAND TP • fingertip origin, headset-forward aim, release to leap");
-      modeCb(activeMode === "controller" ? "Controllers: TELEPORT AIM" : "Hands: CAMERA-FORWARD TELEPORT AIM");
+      statusCb(activeMode === "controller" ? "CONTROLLER TP • release to teleport" : "HAND TP • target locked in front • release to leap");
+      modeCb(activeMode === "controller" ? "Controllers: TELEPORT AIM" : "Hands: NO-BACKWARD TELEPORT AIM");
     }
   }
 
