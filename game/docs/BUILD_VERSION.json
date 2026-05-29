@@ -1,13 +1,18 @@
 {
-  "build": "PHASE-103-REIKI-PORTAL-ENTER-MARKER-LOCK",
-  "label": "Reiki Portal Enter Marker Lock",
+  "build": "PHASE-120-ESPRESSO-ON-ANY-VISIBLE-BANNER",
+  "label": "Espresso On Any Visible Banner",
   "scope": "game-only",
   "date": "2026-05-28",
+  "phase119_status": "unlocked / superseded",
   "notes": [
-    "move Reiki Room portal onto the ENTER REIKI hub marker requested by user screenshot",
-    "lock Reiki Room portal placement at X -7.25, Y 0.00, Z -2.55",
-    "fix desktop hub position table camera/scene capture so X/Y/Z updates correctly",
+    "Phase 119 is no longer the active lock state",
+    "Phase 120 is now the active game build in index.html and BUILD_VERSION.json",
+    "loads espresso_any_banner_phase120.js directly with v=phase120 cache busting",
+    "places Espresso With Cream ad on visible lobby portal/banner signs",
+    "adds a larger Espresso fallback panel above portal banners",
+    "adds a floating fallback banner if no portal sign is found",
     "preserve locked fist/pinch teleport release behavior",
+    "preserve Quest controller forward correction after 45 degree snap turn",
     "website/site untouched"
   ]
 }
