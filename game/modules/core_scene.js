@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { VRButton } from "three/addons/webxr/VRButton.js";
 
-const PHASE108 = "PHASE-108-QUEST-FRAMERATE-BLACK-FRAME-LOCK";
+const PHASE111 = "PHASE-111-QUEST-PERFORMANCE-CONTROLLER-FORWARD-LOCK";
 
 function isQuestLike(){
   const ua = navigator.userAgent || "";
@@ -13,10 +13,10 @@ export function createCore({ containerId = "app" } = {}){
   scene.background = new THREE.Color(0x050508);
 
   const questMode = isQuestLike();
-  const camera = new THREE.PerspectiveCamera(68, window.innerWidth / window.innerHeight, 0.08, questMode ? 900 : 1400);
+  const camera = new THREE.PerspectiveCamera(68, window.innerWidth / window.innerHeight, 0.08, questMode ? 520 : 1100);
 
   const renderer = new THREE.WebGLRenderer({
-    antialias: !questMode,
+    antialias: false,
     alpha: false,
     depth: true,
     stencil: false,
@@ -26,13 +26,13 @@ export function createCore({ containerId = "app" } = {}){
   });
 
   renderer.setClearColor(0x050508, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, questMode ? 0.68 : 0.9));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, questMode ? 0.55 : 0.85));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
-  renderer.xr.setFramebufferScaleFactor?.(questMode ? 0.68 : 0.88);
+  renderer.xr.setFramebufferScaleFactor?.(questMode ? 0.55 : 0.82);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.0;
+  renderer.toneMappingExposure = 0.95;
   renderer.shadowMap.enabled = false;
   renderer.info.autoReset = false;
 
@@ -50,21 +50,22 @@ export function createCore({ containerId = "app" } = {}){
   renderer.xr.addEventListener("sessionstart", ()=>{
     try{
       renderer.info.reset();
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 0.68));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 0.55));
+      renderer.xr.setFramebufferScaleFactor?.(0.55);
       camera.near = 0.08;
-      camera.far = 900;
+      camera.far = 520;
       camera.updateProjectionMatrix();
-      console.log(`[${PHASE108}] Quest/VR performance mode active`);
+      console.log(`[${PHASE111}] Quest performance mode active`);
     }catch(err){
-      console.warn(`[${PHASE108}] VR performance setup failed`, err);
+      console.warn(`[${PHASE111}] VR performance setup failed`, err);
     }
   });
 
   renderer.xr.addEventListener("sessionend", ()=>{
     try{
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, questMode ? 0.68 : 0.9));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, questMode ? 0.55 : 0.85));
       camera.near = 0.08;
-      camera.far = questMode ? 900 : 1400;
+      camera.far = questMode ? 520 : 1100;
       camera.updateProjectionMatrix();
     }catch(_err){}
   });
@@ -73,7 +74,7 @@ export function createCore({ containerId = "app" } = {}){
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, questMode ? 0.68 : 0.9));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, questMode ? 0.55 : 0.85));
   });
 
   return { scene, camera, renderer };
