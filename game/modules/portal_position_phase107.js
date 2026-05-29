@@ -1,8 +1,16 @@
 import * as THREE from "three";
 
+const PHASE121 = "PHASE-121-PGA-DRIVE-PUTT-PORTAL-POSITION-LOCK";
+
 const TARGETS = Object.freeze({
   reikiRoom: { x: 13.62, y: 0.0, z: 1.40, tag: "PHASE106_REIKI_CURRENT" },
-  scorpion: { x: 12.37, y: 0.0, z: 15.19, tag: "PHASE107_SCORPION_CURRENT" }
+  scorpion: { x: 12.37, y: 0.0, z: 15.19, tag: "PHASE107_SCORPION_CURRENT" },
+
+  // User screenshot current position: X -13.87 / Y 1.60 / Z 11.36.
+  // Portals are floor placed at Y 0.00 and split left/right so they do not overlap.
+  pgaDrive: { x: -14.85, y: 0.0, z: 11.36, tag: "PHASE121_PGA_DRIVE_USER_POSITION" },
+  pgaChipPutt: { x: -12.89, y: 0.0, z: 11.36, tag: "PHASE121_PGA_CHIP_PUTT_USER_POSITION" },
+  chipPutt: { x: -12.89, y: 0.0, z: 11.36, tag: "PHASE121_PGA_CHIP_PUTT_USER_POSITION" }
 });
 
 let lastScene = null;
@@ -17,8 +25,8 @@ function applyOne(obj){
   if (!target) return false;
   obj.position.set(target.x, target.y, target.z);
   faceCenter(obj);
-  obj.userData.phase107Placement = target.tag;
-  obj.userData.phase107Locked = true;
+  obj.userData.phase121Placement = target.tag;
+  obj.userData.phase121Locked = true;
   return true;
 }
 
@@ -51,4 +59,4 @@ if (!THREE.WebGLRenderer.prototype.__svrPortalPhase107Render){
 }
 
 setInterval(()=>{ if (lastScene) applyPortalPlacements(lastScene); }, 500);
-console.log("PHASE-107 portal placement lock", TARGETS);
+console.log(PHASE121, TARGETS);
