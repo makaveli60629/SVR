@@ -19,16 +19,20 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let lastHoldActive = false;
   let lastHoldSource = null;
   let holdStart = 0;
-  let stableTargetMs = 0;
-  let lastAimValid = false;
   let lastTP = 0;
   let snapCooldownUntil = 0;
+  let lastReleaseTargetValid = false;
+  let lastReleaseTargetAt = 0;
+  let lastReleaseMode = "none";
+  let stableTargetMs = 0;
+  let lastAimValid = false;
 
   const head = new THREE.Vector3();
   const headDir = new THREE.Vector3();
   const sourcePos = new THREE.Vector3();
   const sourceDir = new THREE.Vector3();
   const smoothedTarget = new THREE.Vector3(0, 0, CONFIG.SPAWN_Z);
+  const lastReleaseTarget = new THREE.Vector3(0, 0, CONFIG.SPAWN_Z);
   const tmpQuat = new THREE.Quaternion();
 
   function applyReferenceSpace(){
@@ -82,13 +86,29 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   arcLine.renderOrder = 198;
   scene.add(arcLine);
 
-  function hideTarget(){
+  function hideVisualTarget(){
     pointer.visible = false;
     ring.visible = false;
     arcLine.visible = false;
     markerGlow.intensity = 0;
+  }
+
+  function resetAimState(){
     stableTargetMs = 0;
     lastAimValid = false;
+    lastReleaseTargetValid = false;
+    lastReleaseTargetAt = 0;
+    lastReleaseMode = "none";
+  }
+
+  function clearTeleportState(resetTarget = false){
+    active = null;
+    activeMode = "none";
+    lastHoldActive = false;
+    lastHoldSource = null;
+    holdStart = 0;
+    hideVisualTarget();
+    if (resetTarget) resetAimState();
   }
 
   function showTarget(target){
@@ -192,8 +212,6 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       if (direct && indexPos.distanceTo(sourcePos) > 0.035) return direct;
     }
 
-    // Fist mode folds the fingers, so index-to-wrist aiming can collapse.
-    // This fallback makes fist-clench teleport work on Quest by aiming from the hand/headset direction.
     try{
       wrist.getWorldQuaternion(tmpQuat);
       sourceDir.set(0, -0.32, -1).applyQuaternion(tmpQuat).normalize();
@@ -261,16 +279,33 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     arcLine.visible = true;
   }
 
-  function updateSmoothedTarget(aim, dt){
+  function updateSmoothedTarget(aim, dt, mode){
     const target = clampTarget(aim);
     if (!lastAimValid){ smoothedTarget.copy(target); stableTargetMs = 100; }
     else {
       const jitter = smoothedTarget.distanceTo(target);
-      stableTargetMs = jitter < 0.24 ? stableTargetMs + dt * 1000 : 0;
-      smoothedTarget.lerp(target, jitter < 0.38 ? 0.45 : 0.25);
+      stableTargetMs = jitter < 0.30 ? stableTargetMs + dt * 1000 : Math.max(0, stableTargetMs - dt * 500);
+      smoothedTarget.lerp(target, jitter < 0.42 ? 0.52 : 0.28);
     }
     lastAimValid = true;
+    lastReleaseTarget.copy(smoothedTarget);
+    lastReleaseTargetValid = true;
+    lastReleaseTargetAt = performance.now();
+    lastReleaseMode = mode || activeMode;
     showTarget(smoothedTarget);
+  }
+
+  function finishReleaseTeleport(now, statusCb, modeCb){
+    const heldMs = holdStart ? (now - holdStart) : 999;
+    const targetFresh = lastReleaseTargetValid && (now - lastReleaseTargetAt) < 1400;
+    const allowed = targetFresh && heldMs > 60 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS;
+    const ok = allowed && teleportByDelta(lastReleaseTarget);
+    if (ok) lastTP = now + 220;
+    clearTeleportState(false);
+    resetAimState();
+    statusCb(ok ? "Teleport complete" : "Teleport reset • aim again");
+    modeCb("Teleport off");
+    return ok;
   }
 
   async function onSessionStart(){
@@ -279,16 +314,11 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     baseRefSpace = await session.requestReferenceSpace("local-floor");
     playerYaw = 0;
     setPlayerPose(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
-    active = null;
-    activeMode = "none";
-    lastHoldActive = false;
-    lastHoldSource = null;
-    holdStart = 0;
-    hideTarget();
+    clearTeleportState(true);
   }
 
   function setLogoTexture(tex){ if (tex){ tex.anisotropy = 8; pointer.material.map = tex; pointer.material.needsUpdate = true; } }
-  function toggleMode(){ teleportEnabled = !teleportEnabled; if (!teleportEnabled) hideTarget(); return teleportEnabled; }
+  function toggleMode(){ teleportEnabled = !teleportEnabled; if (!teleportEnabled) clearTeleportState(true); return teleportEnabled; }
   function isEnabled(){ return teleportEnabled; }
 
   function update({ dt = 0.016, leftHand, rightHand, leftController, rightController, statusCb = ()=>{}, modeCb = ()=>{} }){
@@ -301,37 +331,34 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (renderer?.xr?.isPresenting && (leftControllerRef || rightControllerRef)) movePlayerFromControllers(dt);
 
     const hasInput = !!(leftHandRef?.joints || rightHandRef?.joints || leftControllerRef?.joints || rightControllerRef?.joints);
-    if (!hasInput){ hideTarget(); statusCb("Waiting for hands or controllers…"); modeCb("Input: not tracked"); return; }
-    if (!teleportEnabled){ hideTarget(); statusCb("Teleport disabled"); modeCb("Teleport OFF"); return; }
-
-    const hold = getActiveHoldSource();
+    const hold = hasInput ? getActiveHoldSource() : null;
     const holdActive = !!hold?.source;
 
-    if (lastHoldActive && !holdActive && lastHoldSource && lastAimValid && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
-      const ok = stableTargetMs > 30 && teleportByDelta(smoothedTarget);
-      if (ok) lastTP = now + 220;
-      active = null;
-      activeMode = "none";
-      lastHoldActive = false;
-      lastHoldSource = null;
-      hideTarget();
-      statusCb(ok ? "Teleport complete" : "Teleport reset • aim again");
-      modeCb("Teleport off");
+    // Critical Quest release fix: release/unclench can briefly drop hand tracking. Treat that as release first, not as no-input reset.
+    if (lastHoldActive && !holdActive){
+      finishReleaseTeleport(now, statusCb, modeCb);
       return;
     }
 
+    if (!hasInput){ hideVisualTarget(); statusCb("Waiting for hands or controllers…"); modeCb("Input: not tracked"); return; }
+    if (!teleportEnabled){ clearTeleportState(true); statusCb("Teleport disabled"); modeCb("Teleport OFF"); return; }
+
     if (!holdActive){
+      hideVisualTarget();
       active = null;
       activeMode = "none";
-      lastHoldActive = false;
       lastHoldSource = null;
-      hideTarget();
+      holdStart = 0;
       statusCb((leftControllerRef || rightControllerRef) ? "Controllers ready • right stick move/snap • hold A/grip/trigger to teleport" : "Hands ready • hold fist/pinch, aim, release to teleport");
       modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready");
       return;
     }
 
-    if (!lastHoldActive) holdStart = now;
+    if (!lastHoldActive || lastHoldSource !== hold.source){
+      holdStart = now;
+      stableTargetMs = 0;
+      lastAimValid = false;
+    }
     active = hold.source;
     activeMode = hold.mode;
     lastHoldSource = hold.source;
@@ -339,20 +366,21 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
 
     const aim = activeMode === "controller" ? controllerAimPoint(active) : handAimPoint(active);
     if (!aim){
-      hideTarget();
-      statusCb(activeMode === "controller" ? "CONTROLLER TP • point at the floor" : "HAND TP • point fist/pinch toward the floor");
+      // Do not erase the last good target while clenching; release should still leap to it.
+      hideVisualTarget();
+      statusCb(activeMode === "controller" ? "CONTROLLER TP • point at the floor" : "HAND TP • keep fist/pinch held, aim lower, release to teleport");
       modeCb(activeMode === "controller" ? "Controller teleport armed" : "Hand teleport armed");
       return;
     }
 
-    updateSmoothedTarget(aim, dt);
+    updateSmoothedTarget(aim, dt, activeMode);
     if (activeMode === "controller") active.userData?.controller?.getWorldPosition?.(sourcePos);
     else active.joints?.wrist?.getWorldPosition?.(sourcePos);
     drawArc(sourcePos, smoothedTarget);
 
-    statusCb(activeMode === "controller" ? "CONTROLLER TP • release to teleport" : "HAND TP • release fist/pinch to teleport");
+    statusCb(activeMode === "controller" ? "CONTROLLER TP • release to teleport" : "HAND TP • unclench/release to teleport");
     modeCb(activeMode === "controller" ? "Controllers: TELEPORT AIM" : "Hands: TELEPORT AIM");
   }
 
-  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, isEnabled, getState: ()=>({ mode: !!lastHoldActive, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
+  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, isEnabled, getState: ()=>({ mode: !!lastHoldActive, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode: lastHoldActive ? activeMode : lastReleaseMode }) };
 }
