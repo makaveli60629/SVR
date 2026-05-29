@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const PHASE95 = "PHASE-95-TEXTURED-MOON-MARS-ALL-ROOMS-LOCK";
+const PHASE97 = "PHASE-97-NORTH-SKY-MOON-MARS-VISIBLE-LOCK";
 let cachedMoonTexture = null;
 let cachedMarsTexture = null;
 let cachedMoonBump = null;
@@ -117,62 +117,69 @@ function makeHalo(color, opacity = 0.22){
   x.fillRect(0,0,256,256);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
-  return new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color, transparent: true, opacity: 1, depthWrite: false, blending: THREE.AdditiveBlending }));
+  return new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color, transparent: true, opacity: 1, depthWrite: false, blending: THREE.AdditiveBlending, depthTest: false }));
 }
 
 export function createTexturedMoonMars(scene, options = {}){
-  const moonRadius = options.moonRadius ?? 2.25;
-  const marsRadius = options.marsRadius ?? 1.35;
-  const moonPos = options.moonPosition || new THREE.Vector3(-18, 18, -42);
-  const marsPos = options.marsPosition || new THREE.Vector3(18, 20, -52);
+  const moonRadius = options.moonRadius ?? 3.6;
+  const marsRadius = options.marsRadius ?? 2.2;
+  const moonPos = options.moonPosition || new THREE.Vector3(-26, 72, -96);
+  const marsPos = options.marsPosition || new THREE.Vector3(30, 82, -118);
 
   const group = new THREE.Group();
   group.name = options.name || "SVR_TEXTURED_MOON_MARS";
   group.userData.phase95Planets = true;
+  group.userData.phase97NorthSky = true;
+  group.userData.fixedNorthSky = !!options.fixedNorthSky;
   scene.add(group);
 
   const moon = new THREE.Mesh(
     new THREE.SphereGeometry(moonRadius, 64, 40),
-    new THREE.MeshStandardMaterial({ map: makeMoonTexture(), bumpMap: makeNoiseBump("moon"), bumpScale: 0.12, color: 0xffffff, roughness: 0.88, metalness: 0.0, emissive: 0xdbeaff, emissiveIntensity: 0.05 })
+    new THREE.MeshStandardMaterial({ map: makeMoonTexture(), bumpMap: makeNoiseBump("moon"), bumpScale: 0.12, color: 0xffffff, roughness: 0.88, metalness: 0.0, emissive: 0xdbeaff, emissiveIntensity: 0.08 })
   );
   moon.name = "SVR_TEXTURED_MOON";
+  moon.userData.planetKind = "moon";
   moon.position.copy(moonPos);
   moon.frustumCulled = false;
   group.add(moon);
 
   const moonHalo = makeHalo(0xdbeaff, 0.24);
   moonHalo.name = "SVR_TEXTURED_MOON_HALO";
-  moonHalo.scale.setScalar(moonRadius * 8.5);
+  moonHalo.scale.setScalar(moonRadius * 9.0);
   moon.add(moonHalo);
 
   const mars = new THREE.Mesh(
     new THREE.SphereGeometry(marsRadius, 64, 40),
-    new THREE.MeshStandardMaterial({ map: makeMarsTexture(), bumpMap: makeNoiseBump("mars"), bumpScale: 0.20, color: 0xffffff, roughness: 0.86, metalness: 0.0, emissive: 0x3d1208, emissiveIntensity: 0.05 })
+    new THREE.MeshStandardMaterial({ map: makeMarsTexture(), bumpMap: makeNoiseBump("mars"), bumpScale: 0.20, color: 0xffffff, roughness: 0.86, metalness: 0.0, emissive: 0x3d1208, emissiveIntensity: 0.08 })
   );
   mars.name = "SVR_TEXTURED_MARS";
+  mars.userData.planetKind = "mars";
   mars.position.copy(marsPos);
   mars.frustumCulled = false;
   group.add(mars);
 
   const marsHalo = makeHalo(0xff9b6b, 0.20);
   marsHalo.name = "SVR_TEXTURED_MARS_HALO";
-  marsHalo.scale.setScalar(marsRadius * 9.5);
+  marsHalo.scale.setScalar(marsRadius * 10.0);
   mars.add(marsHalo);
 
-  const moonLight = new THREE.PointLight(0xdbeaff, options.moonLight ?? 2.0, 120, 1.7);
+  const moonLight = new THREE.PointLight(0xdbeaff, options.moonLight ?? 2.2, 160, 1.7);
   moonLight.position.copy(moon.position);
   group.add(moonLight);
-  const marsLight = new THREE.PointLight(0xff9b6b, options.marsLight ?? 1.25, 100, 1.8);
+  const marsLight = new THREE.PointLight(0xff9b6b, options.marsLight ?? 1.45, 140, 1.8);
   marsLight.position.copy(mars.position);
   group.add(marsLight);
 
   group.userData.tick = (dt, t)=>{
     moon.rotation.y += dt * 0.055;
     mars.rotation.y += dt * 0.072;
-    moon.position.x = moonPos.x + Math.sin(t * 0.020) * (options.orbit ?? 1.6);
-    moon.position.y = moonPos.y + Math.sin(t * 0.055) * 0.45;
-    mars.position.x = marsPos.x + Math.sin(t * 0.016 + 1.1) * (options.orbit ?? 1.6);
-    mars.position.y = marsPos.y + Math.sin(t * 0.047 + 0.7) * 0.38;
+    const orbit = options.orbit ?? 1.6;
+    moon.position.x = moonPos.x + Math.sin(t * 0.020) * orbit;
+    moon.position.y = moonPos.y + Math.sin(t * 0.055) * 0.55;
+    moon.position.z = moonPos.z + Math.cos(t * 0.015) * (orbit * 0.55);
+    mars.position.x = marsPos.x + Math.sin(t * 0.016 + 1.1) * orbit;
+    mars.position.y = marsPos.y + Math.sin(t * 0.047 + 0.7) * 0.50;
+    mars.position.z = marsPos.z + Math.cos(t * 0.012 + 0.5) * (orbit * 0.55);
     moonLight.position.copy(moon.position);
     marsLight.position.copy(mars.position);
   };
@@ -181,6 +188,9 @@ export function createTexturedMoonMars(scene, options = {}){
 
 function classifyExistingPlanet(mesh){
   if (!mesh?.isMesh || !/SphereGeometry/.test(String(mesh.geometry?.type || ""))) return null;
+  const n = String(mesh.name || "").toLowerCase();
+  if (/mars/.test(n) || mesh.userData?.planetKind === "mars") return "mars";
+  if (/moon/.test(n) || mesh.userData?.planetKind === "moon") return "moon";
   if (mesh.position.y < 8 || mesh.position.z > -10) return null;
   const c = mesh.material?.color;
   if (!c) return null;
@@ -194,12 +204,28 @@ export function textureExistingMoonMars(scene){
     const kind = classifyExistingPlanet(obj);
     if (!kind || obj.userData.phase95Textured) return;
     obj.userData.phase95Textured = true;
+    obj.userData.planetKind = kind;
     obj.name = kind === "moon" ? "SVR_EXISTING_TEXTURED_MOON" : "SVR_EXISTING_TEXTURED_MARS";
     const map = kind === "moon" ? makeMoonTexture() : makeMarsTexture();
     const bump = kind === "moon" ? makeNoiseBump("moon") : makeNoiseBump("mars");
-    obj.material = new THREE.MeshStandardMaterial({ map, bumpMap: bump, bumpScale: kind === "moon" ? 0.12 : 0.20, color: 0xffffff, roughness: 0.88, metalness: 0.0, emissive: kind === "moon" ? 0xdbeaff : 0x3d1208, emissiveIntensity: 0.04 });
+    obj.material = new THREE.MeshStandardMaterial({ map, bumpMap: bump, bumpScale: kind === "moon" ? 0.12 : 0.20, color: 0xffffff, roughness: 0.88, metalness: 0.0, emissive: kind === "moon" ? 0xdbeaff : 0x3d1208, emissiveIntensity: 0.06 });
     obj.frustumCulled = false;
     obj.visible = true;
+  });
+}
+
+export function ensureNorthSkyMoonMars(scene){
+  if (!scene || scene.getObjectByName?.("SVR_NORTH_SKY_MOON_MARS")) return null;
+  return createTexturedMoonMars(scene, {
+    name: "SVR_NORTH_SKY_MOON_MARS",
+    fixedNorthSky: true,
+    moonRadius: 5.2,
+    marsRadius: 3.25,
+    moonPosition: new THREE.Vector3(-24, 86, -108),
+    marsPosition: new THREE.Vector3(34, 98, -134),
+    moonLight: 3.0,
+    marsLight: 2.1,
+    orbit: 2.2
   });
 }
 
@@ -208,4 +234,4 @@ export function tickTexturedMoonMars(scene, dt = 0.016){
   scene.traverse((obj)=>{ if (obj?.userData?.phase95Planets && obj.userData.tick) obj.userData.tick(dt, t); });
 }
 
-export { PHASE95 };
+export { PHASE97 as PHASE95, PHASE97 };
