@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const PHASE121 = "PHASE-121-PGA-DRIVE-PUTT-PORTAL-POSITION-LOCK";
+const PHASE122 = "PHASE-122-STORE-PORTAL-POSITION-LOCK";
 
 const TARGETS = Object.freeze({
   reikiRoom: { x: 13.62, y: 0.0, z: 1.40, tag: "PHASE106_REIKI_CURRENT" },
@@ -10,7 +10,12 @@ const TARGETS = Object.freeze({
   // Portals are floor placed at Y 0.00 and split left/right so they do not overlap.
   pgaDrive: { x: -14.85, y: 0.0, z: 11.36, tag: "PHASE121_PGA_DRIVE_USER_POSITION" },
   pgaChipPutt: { x: -12.89, y: 0.0, z: 11.36, tag: "PHASE121_PGA_CHIP_PUTT_USER_POSITION" },
-  chipPutt: { x: -12.89, y: 0.0, z: 11.36, tag: "PHASE121_PGA_CHIP_PUTT_USER_POSITION" }
+  chipPutt: { x: -12.89, y: 0.0, z: 11.36, tag: "PHASE121_PGA_CHIP_PUTT_USER_POSITION" },
+
+  // User screenshot current position for Store portal: X 9.44 / Y 1.60 / Z -15.05.
+  // Portal is floor placed at Y 0.00 while preserving requested X/Z.
+  storeRoom: { x: 9.44, y: 0.0, z: -15.05, tag: "PHASE122_STORE_USER_POSITION" },
+  store: { x: 9.44, y: 0.0, z: -15.05, tag: "PHASE122_STORE_USER_POSITION" }
 });
 
 let lastScene = null;
@@ -25,8 +30,8 @@ function applyOne(obj){
   if (!target) return false;
   obj.position.set(target.x, target.y, target.z);
   faceCenter(obj);
-  obj.userData.phase121Placement = target.tag;
-  obj.userData.phase121Locked = true;
+  obj.userData.phase122Placement = target.tag;
+  obj.userData.phase122Locked = true;
   return true;
 }
 
@@ -59,4 +64,4 @@ if (!THREE.WebGLRenderer.prototype.__svrPortalPhase107Render){
 }
 
 setInterval(()=>{ if (lastScene) applyPortalPlacements(lastScene); }, 500);
-console.log(PHASE121, TARGETS);
+console.log(PHASE122, TARGETS);
