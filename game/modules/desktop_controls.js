@@ -2,21 +2,53 @@ import * as THREE from "three";
 import { CONFIG } from "./config.js";
 
 export function createDesktopControls({ camera, domElement }){
-  const state = { yaw: 0, pitch: 0, keys: new Set(), locked: false };
+  const state = { yaw: 0, pitch: 0, keys: new Set(), locked: false, dragging: false, lockFailed: false };
 
-  domElement.addEventListener("click", ()=>{
-    if (!state.locked) domElement.requestPointerLock?.();
-  });
+  function tryLock(){
+    if (state.locked || state.lockFailed || !domElement?.requestPointerLock) return;
+    if (document.visibilityState && document.visibilityState !== "visible") return;
+    try {
+      const req = domElement.requestPointerLock();
+      if (req && typeof req.catch === "function") req.catch(()=>{ state.lockFailed = true; });
+    } catch (_) {
+      state.lockFailed = true;
+    }
+  }
+
+  domElement?.addEventListener("click", tryLock);
   document.addEventListener("pointerlockchange", ()=>{
     state.locked = document.pointerLockElement === domElement;
   });
+  document.addEventListener("pointerlockerror", ()=>{
+    state.lockFailed = true;
+    state.locked = false;
+  });
+
+  domElement?.addEventListener("pointerdown", (e)=>{
+    if (state.locked) return;
+    state.dragging = true;
+    try { domElement.setPointerCapture?.(e.pointerId); } catch (_) {}
+  });
+  domElement?.addEventListener("pointerup", (e)=>{
+    state.dragging = false;
+    try { domElement.releasePointerCapture?.(e.pointerId); } catch (_) {}
+  });
+  domElement?.addEventListener("pointercancel", ()=>{ state.dragging = false; });
+
+  function rotate(dx, dy){
+    const sens = 0.0023;
+    state.yaw -= dx * sens;
+    state.pitch -= dy * sens;
+    state.pitch = Math.max(-1.2, Math.min(1.2, state.pitch));
+  }
 
   document.addEventListener("mousemove", (e)=>{
     if (!state.locked) return;
-    const sens = 0.0023;
-    state.yaw -= e.movementX * sens;
-    state.pitch -= e.movementY * sens;
-    state.pitch = Math.max(-1.2, Math.min(1.2, state.pitch));
+    rotate(e.movementX || 0, e.movementY || 0);
+  });
+  domElement?.addEventListener("pointermove", (e)=>{
+    if (state.locked || !state.dragging) return;
+    rotate(e.movementX || 0, e.movementY || 0);
   });
 
   document.addEventListener("keydown", (e)=>{
@@ -38,10 +70,10 @@ export function createDesktopControls({ camera, domElement }){
     right.copy(fwd).cross(up).normalize();
 
     let mf = 0, mr = 0, mu = 0;
-    if (state.keys.has("KeyW")) mf += 1;
-    if (state.keys.has("KeyS")) mf -= 1;
-    if (state.keys.has("KeyD")) mr += 1;
-    if (state.keys.has("KeyA")) mr -= 1;
+    if (state.keys.has("KeyW") || state.keys.has("ArrowUp")) mf += 1;
+    if (state.keys.has("KeyS") || state.keys.has("ArrowDown")) mf -= 1;
+    if (state.keys.has("KeyD") || state.keys.has("ArrowRight")) mr += 1;
+    if (state.keys.has("KeyA") || state.keys.has("ArrowLeft")) mr -= 1;
     if (state.keys.has("Space")) mu += 1;
     if (state.keys.has("ShiftLeft") || state.keys.has("ShiftRight")) mu -= 1;
 
@@ -53,5 +85,5 @@ export function createDesktopControls({ camera, domElement }){
     camera.position.y = Math.max(0.2, camera.position.y + mu * speed * dt);
   }
 
-  return { update };
+  return { update, state };
 }
