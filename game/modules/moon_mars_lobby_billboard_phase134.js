@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const PHASE161_PLANETS = "PHASE-161-GUARANTEED-VISIBLE-MOON-MARS";
+const PHASE166_PLANETS = "PHASE-166-HIGHER-LOBBY-MOON-MARS";
 let lastScene = null;
 let installed = false;
 let rig = null;
@@ -51,8 +51,8 @@ function hideOldPlanets(scene){
   if(!scene) return;
   scene.traverse((obj)=>{
     const n = String(obj?.name || "");
-    if(/PHASE134|PHASE140_CELESTIAL|PHASE142.*MOON|PHASE142.*MARS|PHASE143.*MOON|PHASE143.*MARS|PHASE148.*MOON|PHASE148.*MARS|PHASE149.*MOON|PHASE149.*MARS|PHASE150.*MOON|PHASE150.*MARS|PHASE151.*MOON|PHASE151.*MARS|PHASE152.*MOON|PHASE152.*MARS|PHASE153.*MOON|PHASE153.*MARS|PHASE154.*MOON|PHASE154.*MARS|PHASE155.*MOON|PHASE155.*MARS|Y700_NORTH_SKY_VISIBLE_PLANET_LAYER/.test(n)){
-      if(!/PHASE161/.test(n)) obj.visible = false;
+    if(/PHASE134|PHASE140_CELESTIAL|PHASE142.*MOON|PHASE142.*MARS|PHASE143.*MOON|PHASE143.*MARS|PHASE148.*MOON|PHASE148.*MARS|PHASE149.*MOON|PHASE149.*MARS|PHASE150.*MOON|PHASE150.*MARS|PHASE151.*MOON|PHASE151.*MARS|PHASE152.*MOON|PHASE152.*MARS|PHASE153.*MOON|PHASE153.*MARS|PHASE154.*MOON|PHASE154.*MARS|PHASE155.*MOON|PHASE155.*MARS|PHASE161.*MOON|PHASE161.*MARS|Y700_NORTH_SKY_VISIBLE_PLANET_LAYER|GUARANTEED_VISIBLE_PLANET_LAYER/.test(n)){
+      if(!/PHASE166/.test(n)) obj.visible = false;
     }
   });
 }
@@ -82,15 +82,15 @@ function install(scene){
   installed = true;
   hideOldPlanets(scene);
   const group = new THREE.Group();
-  group.name = "PHASE161_GUARANTEED_VISIBLE_PLANET_LAYER";
+  group.name = "PHASE166_HIGHER_VISIBLE_PLANET_LAYER";
   group.frustumCulled = false;
-  const moon = makePlanet("PHASE161_VISIBLE_MOON_FORWARD_SKY", "moon", 8.2, 0xffffff);
-  const mars = makePlanet("PHASE161_VISIBLE_MARS_FORWARD_SKY", "mars", 5.3, 0xff7040);
+  const moon = makePlanet("PHASE166_HIGHER_VISIBLE_MOON_FORWARD_SKY", "moon", 9.0, 0xffffff);
+  const mars = makePlanet("PHASE166_HIGHER_VISIBLE_MARS_FORWARD_SKY", "mars", 5.8, 0xff7040);
   group.add(moon, mars);
   scene.add(group);
   rig = { group, moon, mars };
-  scene.userData.phase161Planets = rig;
-  console.log(`[${PHASE161_PLANETS}] installed visible fallback planets`);
+  scene.userData.phase166Planets = rig;
+  console.log(`[${PHASE166_PLANETS}] installed higher visible lobby planets`);
   return true;
 }
 
@@ -99,7 +99,7 @@ function update(scene, camera){
   install(scene);
   hideOldPlanets(scene);
   if(!rig) return;
-  if(camera?.far && camera.far < 900){ camera.far = 900; camera.updateProjectionMatrix?.(); }
+  if(camera?.far && camera.far < 1400){ camera.far = 1400; camera.updateProjectionMatrix?.(); }
 
   const cam = camera || scene.userData.camera;
   const pos = new THREE.Vector3(0,1.6,0);
@@ -113,19 +113,19 @@ function update(scene, camera){
   const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0,1,0)).normalize();
   if(right.lengthSq() < .0001) right.set(1,0,0);
 
-  // Anchored to the user's forward sky view so both planets are always findable above the skyline.
-  rig.moon.position.copy(pos).addScaledVector(fwd, 118).addScaledVector(right, -24);
-  rig.moon.position.y = pos.y + 45;
-  rig.mars.position.copy(pos).addScaledVector(fwd, 132).addScaledVector(right, 25);
-  rig.mars.position.y = pos.y + 56;
+  // Phase 166: raise planets much higher above the player view while keeping them forward and findable.
+  rig.moon.position.copy(pos).addScaledVector(fwd, 142).addScaledVector(right, -32);
+  rig.moon.position.y = pos.y + 88;
+  rig.mars.position.copy(pos).addScaledVector(fwd, 162).addScaledVector(right, 34);
+  rig.mars.position.y = pos.y + 108;
   rig.moon.rotation.y += .0009;
   rig.mars.rotation.y += .00135;
   rig.group.visible = true;
 }
 
 const originalRender = THREE.WebGLRenderer.prototype.render;
-if(!THREE.WebGLRenderer.prototype.__svrPhase161VisiblePlanets){
-  THREE.WebGLRenderer.prototype.__svrPhase161VisiblePlanets = true;
+if(!THREE.WebGLRenderer.prototype.__svrPhase166HigherPlanets){
+  THREE.WebGLRenderer.prototype.__svrPhase166HigherPlanets = true;
   THREE.WebGLRenderer.prototype.render = function(scene,camera){
     lastScene = scene || lastScene;
     if(lastScene) lastScene.userData.camera = camera;
@@ -134,4 +134,4 @@ if(!THREE.WebGLRenderer.prototype.__svrPhase161VisiblePlanets){
   };
 }
 setInterval(()=>update(lastScene,null),900);
-console.log(`[${PHASE161_PLANETS}] loaded`);
+console.log(`[${PHASE166_PLANETS}] loaded`);
