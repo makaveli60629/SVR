@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
-import { createDesktopControls } from "./modules/desktop_controls.js";
+import { createDesktopControls } from "./modules/desktop_controls.js?v=phase162";
 import { createHands } from "./modules/hands.js";
-import { createTeleportRig } from "./modules/teleport.js";
+import { createTeleportRig } from "./modules/teleport.js?v=phase162";
 import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
@@ -74,6 +74,11 @@ window.addEventListener("error", (e)=>{
   if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
 });
 window.addEventListener("unhandledrejection", (e)=>{
+  const text = String(e?.reason?.stack || e?.reason?.message || e?.reason || "");
+  if (/PointerLock|pointer lock|InvalidStateError|WrongDocumentError/i.test(text)) {
+    console.warn("Pointer lock rejection ignored; drag-look fallback remains active.", e?.reason || e);
+    return;
+  }
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e));
 });
