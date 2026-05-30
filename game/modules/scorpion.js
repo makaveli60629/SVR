@@ -1,276 +1,67 @@
 import * as THREE from "three";
-import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 import { bootPrivateScene } from "./private_scene_common.js";
 
-const PHASE159 = "PHASE-159-SCORPION-ROOM-WINDOW-CITY-VIEW";
-const CITY_OBJ_URL = "/assets/assets%20backup/scifi%20downtown%20city.obj";
+const PHASE160 = "PHASE-160-SCORPION-HIGH-SKYLINE-ONE-BOT-PLAYABLE";
 
-function makeTexture(kind = "building"){
-  const c = document.createElement("canvas");
-  c.width = 512;
-  c.height = 512;
-  const x = c.getContext("2d");
-
-  if (kind === "wall"){
-    x.fillStyle = "#05070d";
-    x.fillRect(0,0,512,512);
-    x.strokeStyle = "rgba(211,161,59,.34)";
-    x.lineWidth = 4;
-    for(let y=24;y<512;y+=54){ x.beginPath(); x.moveTo(0,y); x.lineTo(512,y); x.stroke(); }
-    for(let i=0;i<26;i++){
-      x.strokeStyle = i%2 ? "rgba(100,234,255,.12)" : "rgba(180,140,255,.10)";
-      x.strokeRect(Math.random()*512, Math.random()*512, 40+Math.random()*120, 18+Math.random()*52);
-    }
-  } else if (kind === "floor"){
-    x.fillStyle = "#05060a";
-    x.fillRect(0,0,512,512);
-    x.strokeStyle = "rgba(100,234,255,.24)";
-    x.lineWidth = 2;
-    for(let i=0;i<=512;i+=48){ x.beginPath(); x.moveTo(i,0); x.lineTo(i,512); x.stroke(); x.beginPath(); x.moveTo(0,i); x.lineTo(512,i); x.stroke(); }
-    x.strokeStyle = "rgba(211,161,59,.40)";
-    x.lineWidth = 8;
-    x.strokeRect(18,18,476,476);
-  } else if (kind === "road"){
-    x.fillStyle = "#03060b";
-    x.fillRect(0,0,512,512);
-    x.strokeStyle = "rgba(100,234,255,.42)";
-    x.lineWidth = 4;
-    for(let i=0;i<12;i++){ x.beginPath(); x.moveTo(80+i*34,0); x.lineTo(20+i*42,512); x.stroke(); }
-    x.strokeStyle = "rgba(211,161,59,.78)";
-    x.lineWidth = 10;
-    x.setLineDash([28,24]);
-    x.beginPath(); x.moveTo(256,0); x.lineTo(256,512); x.stroke();
-  } else {
-    const g = x.createLinearGradient(0,0,512,512);
-    g.addColorStop(0,"#07111f");
-    g.addColorStop(.45,"#0b2948");
-    g.addColorStop(1,"#02050a");
-    x.fillStyle = g;
-    x.fillRect(0,0,512,512);
-    x.strokeStyle = "rgba(255,255,255,.08)";
-    x.lineWidth = 2;
-    for(let gx=0;gx<512;gx+=64){ x.beginPath(); x.moveTo(gx,0); x.lineTo(gx,512); x.stroke(); }
-    for(let gy=0;gy<512;gy+=58){ x.beginPath(); x.moveTo(0,gy); x.lineTo(512,gy); x.stroke(); }
-    const neonColors = ["#64eaff", "#d3a13b", "#b48cff", "#78ff9f", "#ffffff"];
-    for(let row=0; row<13; row++){
-      for(let col=0; col<6; col++){
-        const lit = Math.random() > .32;
-        x.fillStyle = lit ? neonColors[(row + col) % neonColors.length] : "rgba(8,15,24,.75)";
-        x.globalAlpha = lit ? (.48 + Math.random()*.45) : .45;
-        x.fillRect(34 + col*76, 28 + row*36, 42, 16);
-      }
-    }
-    x.globalAlpha = 1;
-    x.strokeStyle = "rgba(100,234,255,.36)";
-    x.lineWidth = 8;
-    x.strokeRect(14,14,484,484);
-  }
-
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.wrapS = THREE.RepeatWrapping;
-  t.wrapT = THREE.RepeatWrapping;
-  t.anisotropy = 4;
-  return t;
+function tex(draw,w=512,h=512){
+  const c=document.createElement("canvas"); c.width=w; c.height=h; const x=c.getContext("2d"); draw(x,c); const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=2; return t;
 }
-
-function addBox(scene, name, size, pos, mat){
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(size.x,size.y,size.z), mat);
-  mesh.name = name;
-  mesh.position.set(pos.x,pos.y,pos.z);
-  mesh.frustumCulled = false;
-  scene.add(mesh);
-  return mesh;
+function label(title,sub="",stroke="#d3a13b"){
+  return tex((x,c)=>{x.fillStyle="rgba(3,5,10,.94)";x.fillRect(0,0,c.width,c.height);x.strokeStyle=stroke;x.lineWidth=10;x.strokeRect(20,20,c.width-40,c.height-40);x.textAlign="center";x.textBaseline="middle";x.fillStyle="#fff7e3";x.font="900 64px Arial";x.fillText(title,c.width/2,c.height*.42);if(sub){x.fillStyle="#64eaff";x.font="800 28px Arial";x.fillText(sub,c.width/2,c.height*.66);}},1024,256);
 }
+function wallTexture(){return tex((x,c)=>{x.fillStyle="#05070d";x.fillRect(0,0,c.width,c.height);x.strokeStyle="rgba(211,161,59,.30)";x.lineWidth=4;for(let y=28;y<c.height;y+=56){x.beginPath();x.moveTo(0,y);x.lineTo(c.width,y);x.stroke();}for(let i=0;i<35;i++){x.strokeStyle=i%2?"rgba(100,234,255,.11)":"rgba(180,140,255,.10)";x.strokeRect(Math.random()*c.width,Math.random()*c.height,36+Math.random()*140,14+Math.random()*64);}});}
+function floorTexture(){return tex((x,c)=>{x.fillStyle="#05060a";x.fillRect(0,0,c.width,c.height);x.strokeStyle="rgba(100,234,255,.22)";x.lineWidth=2;for(let i=0;i<=c.width;i+=48){x.beginPath();x.moveTo(i,0);x.lineTo(i,c.height);x.stroke();x.beginPath();x.moveTo(0,i);x.lineTo(c.width,i);x.stroke();}x.strokeStyle="rgba(211,161,59,.42)";x.lineWidth=8;x.strokeRect(18,18,c.width-36,c.height-36);});}
+function buildingTexture(){return tex((x,c)=>{const g=x.createLinearGradient(0,0,c.width,c.height);g.addColorStop(0,"#06101e");g.addColorStop(.45,"#0b2948");g.addColorStop(1,"#02050a");x.fillStyle=g;x.fillRect(0,0,c.width,c.height);const colors=["#64eaff","#d3a13b","#b48cff","#78ff9f","#ffffff"];for(let row=0;row<13;row++){for(let col=0;col<6;col++){const lit=Math.random()>.30;x.fillStyle=lit?colors[(row+col)%colors.length]:"rgba(8,15,24,.75)";x.globalAlpha=lit?(.46+Math.random()*.45):.45;x.fillRect(34+col*76,28+row*36,42,16);}}x.globalAlpha=1;x.strokeStyle="rgba(100,234,255,.35)";x.lineWidth=8;x.strokeRect(14,14,c.width-28,c.height-28);});}
+function roadTexture(){return tex((x,c)=>{x.fillStyle="#03060b";x.fillRect(0,0,c.width,c.height);x.strokeStyle="rgba(100,234,255,.38)";x.lineWidth=4;for(let i=0;i<14;i++){x.beginPath();x.moveTo(70+i*35,0);x.lineTo(15+i*44,c.height);x.stroke();}x.strokeStyle="rgba(211,161,59,.76)";x.lineWidth=10;x.setLineDash([28,24]);x.beginPath();x.moveTo(c.width/2,0);x.lineTo(c.width/2,c.height);x.stroke();});}
+function box(scene,name,size,pos,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(size.x,size.y,size.z),mat);m.name=name;m.position.set(pos.x,pos.y,pos.z);m.frustumCulled=false;scene.add(m);return m;}
 
-function addScorpionRoomShell(scene){
-  const wallTex = makeTexture("wall");
-  wallTex.repeat.set(3,1.5);
-  const floorTex = makeTexture("floor");
-  floorTex.repeat.set(5,5);
-
-  const wallMat = new THREE.MeshStandardMaterial({ map: wallTex, color: 0xffffff, roughness: .78, metalness: .04, emissive: 0x05020a, emissiveIntensity: .18 });
-  const floorMat = new THREE.MeshStandardMaterial({ map: floorTex, color: 0xffffff, roughness: .62, metalness: .08, emissive: 0x02070a, emissiveIntensity: .18 });
-  const trimMat = new THREE.MeshBasicMaterial({ color: 0xd3a13b, toneMapped: false });
-  const cyanMat = new THREE.MeshBasicMaterial({ color: 0x64eaff, toneMapped: false });
-
-  addBox(scene,"SCORPION_ROOM_FLOOR",{x:18,y:.16,z:18},{x:0,y:-.03,z:0},floorMat);
-  addBox(scene,"SCORPION_ROOM_CEILING",{x:18,y:.14,z:18},{x:0,y:6.15,z:0},wallMat);
-  addBox(scene,"SCORPION_ROOM_LEFT_WALL",{x:.18,y:6.2,z:18},{x:-9,y:3.05,z:0},wallMat);
-  addBox(scene,"SCORPION_ROOM_RIGHT_WALL",{x:.18,y:6.2,z:18},{x:9,y:3.05,z:0},wallMat);
-  addBox(scene,"SCORPION_ROOM_FRONT_WALL",{x:18,y:6.2,z:.18},{x:0,y:3.05,z:8.95},wallMat);
-
-  // Back wall is split around a big window so the city is truly outside the room.
-  addBox(scene,"SCORPION_BACK_WALL_LEFT_OF_WINDOW",{x:1.5,y:6.2,z:.20},{x:-8.25,y:3.05,z:-8.95},wallMat);
-  addBox(scene,"SCORPION_BACK_WALL_RIGHT_OF_WINDOW",{x:1.5,y:6.2,z:.20},{x:8.25,y:3.05,z:-8.95},wallMat);
-  addBox(scene,"SCORPION_BACK_WALL_ABOVE_WINDOW",{x:15,y:1.0,z:.20},{x:0,y:5.7,z:-8.95},wallMat);
-  addBox(scene,"SCORPION_BACK_WALL_BELOW_WINDOW",{x:15,y:.9,z:.20},{x:0,y:.45,z:-8.95},wallMat);
-
-  addBox(scene,"SCORPION_WINDOW_TOP_GOLD_TRIM",{x:15.3,y:.12,z:.26},{x:0,y:5.18,z:-8.78},trimMat);
-  addBox(scene,"SCORPION_WINDOW_BOTTOM_GOLD_TRIM",{x:15.3,y:.12,z:.26},{x:0,y:.95,z:-8.78},trimMat);
-  addBox(scene,"SCORPION_WINDOW_LEFT_GOLD_TRIM",{x:.12,y:4.35,z:.26},{x:-7.55,y:3.05,z:-8.78},trimMat);
-  addBox(scene,"SCORPION_WINDOW_RIGHT_GOLD_TRIM",{x:.12,y:4.35,z:.26},{x:7.55,y:3.05,z:-8.78},trimMat);
-
-  addBox(scene,"SCORPION_ROOM_CYAN_FLOOR_TRIM_BACK",{x:16.4,y:.04,z:.06},{x:0,y:.07,z:-8.65},cyanMat);
-  addBox(scene,"SCORPION_ROOM_CYAN_FLOOR_TRIM_LEFT",{x:.06,y:.04,z:16.4},{x:-8.65,y:.07,z:0},cyanMat);
-  addBox(scene,"SCORPION_ROOM_CYAN_FLOOR_TRIM_RIGHT",{x:.06,y:.04,z:16.4},{x:8.65,y:.07,z:0},cyanMat);
-
-  const glass = new THREE.Mesh(
-    new THREE.PlaneGeometry(14.6, 4.05),
-    new THREE.MeshBasicMaterial({ color: 0x07111d, transparent: true, opacity: .16, side: THREE.DoubleSide, depthWrite: false })
-  );
-  glass.name = "SCORPION_ROOM_BIG_CITY_WINDOW_GLASS";
-  glass.position.set(0,3.05,-8.68);
-  glass.frustumCulled = false;
-  scene.add(glass);
-
-  const signTex = new THREE.CanvasTexture(Object.assign(document.createElement("canvas"), { width: 1024, height: 256 }));
-  const c = signTex.image;
-  const x = c.getContext("2d");
-  x.fillStyle = "rgba(3,5,10,.9)"; x.fillRect(0,0,1024,256);
-  x.strokeStyle = "#d3a13b"; x.lineWidth = 10; x.strokeRect(20,20,984,216);
-  x.textAlign = "center"; x.fillStyle = "#fff7e3"; x.font = "900 66px Arial"; x.fillText("SCORPION ROOM",512,118);
-  x.fillStyle = "#64eaff"; x.font = "800 28px Arial"; x.fillText("CITY VIEW PRIVATE POKER",512,172);
-  signTex.colorSpace = THREE.SRGBColorSpace;
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(5.8,1.45), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, toneMapped: false }));
-  sign.name = "SCORPION_ROOM_WINDOW_HEADER_SIGN";
-  sign.position.set(0,5.55,-8.55);
-  scene.add(sign);
+function addRoom(scene){
+  scene.background=new THREE.Color(0x02040b);
+  const wTex=wallTexture();wTex.repeat.set(3,1.6);const fTex=floorTexture();fTex.repeat.set(5,5);
+  const wall=new THREE.MeshStandardMaterial({map:wTex,roughness:.78,metalness:.04,emissive:0x05020a,emissiveIntensity:.18});
+  const floor=new THREE.MeshStandardMaterial({map:fTex,roughness:.62,metalness:.08,emissive:0x02070a,emissiveIntensity:.20});
+  const gold=new THREE.MeshBasicMaterial({color:0xd3a13b,toneMapped:false}); const cyan=new THREE.MeshBasicMaterial({color:0x64eaff,toneMapped:false});
+  box(scene,"SCORPION_ROOM_FLOOR_PHASE160",{x:18,y:.16,z:18},{x:0,y:-.03,z:0},floor);
+  box(scene,"SCORPION_ROOM_CEILING_PHASE160",{x:18,y:.14,z:18},{x:0,y:6.15,z:0},wall);
+  box(scene,"SCORPION_ROOM_LEFT_WALL_PHASE160",{x:.18,y:6.2,z:18},{x:-9,y:3.05,z:0},wall);
+  box(scene,"SCORPION_ROOM_RIGHT_WALL_PHASE160",{x:.18,y:6.2,z:18},{x:9,y:3.05,z:0},wall);
+  box(scene,"SCORPION_ROOM_FRONT_WALL_PHASE160",{x:18,y:6.2,z:.18},{x:0,y:3.05,z:8.95},wall);
+  box(scene,"SCORPION_BACK_LEFT_WINDOW_PHASE160",{x:1.15,y:6.2,z:.20},{x:-8.42,y:3.05,z:-8.95},wall);
+  box(scene,"SCORPION_BACK_RIGHT_WINDOW_PHASE160",{x:1.15,y:6.2,z:.20},{x:8.42,y:3.05,z:-8.95},wall);
+  box(scene,"SCORPION_BACK_ABOVE_WINDOW_PHASE160",{x:15.7,y:.78,z:.20},{x:0,y:5.82,z:-8.95},wall);
+  box(scene,"SCORPION_BACK_BELOW_WINDOW_PHASE160",{x:15.7,y:.62,z:.20},{x:0,y:.31,z:-8.95},wall);
+  box(scene,"SCORPION_WINDOW_TOP_GOLD_TRIM_PHASE160",{x:15.7,y:.12,z:.26},{x:0,y:5.32,z:-8.78},gold);
+  box(scene,"SCORPION_WINDOW_BOTTOM_GOLD_TRIM_PHASE160",{x:15.7,y:.12,z:.26},{x:0,y:.67,z:-8.78},gold);
+  box(scene,"SCORPION_WINDOW_LEFT_GOLD_TRIM_PHASE160",{x:.12,y:4.75,z:.26},{x:-7.85,y:3,z:-8.78},gold);
+  box(scene,"SCORPION_WINDOW_RIGHT_GOLD_TRIM_PHASE160",{x:.12,y:4.75,z:.26},{x:7.85,y:3,z:-8.78},gold);
+  box(scene,"SCORPION_CYAN_TRIM_LEFT_PHASE160",{x:.06,y:.04,z:16.4},{x:-8.65,y:.07,z:0},cyan); box(scene,"SCORPION_CYAN_TRIM_RIGHT_PHASE160",{x:.06,y:.04,z:16.4},{x:8.65,y:.07,z:0},cyan);
+  const glass=new THREE.Mesh(new THREE.PlaneGeometry(15.1,4.45),new THREE.MeshBasicMaterial({color:0x07111d,transparent:true,opacity:.12,side:THREE.DoubleSide,depthWrite:false}));glass.name="SCORPION_BIG_HIGH_SKYLINE_WINDOW_GLASS_PHASE160";glass.position.set(0,3,-8.68);scene.add(glass);
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(6.2,1.55),new THREE.MeshBasicMaterial({map:label("SCORPION ROOM","HIGH SKYLINE • ONE BOT TEST"),transparent:true,toneMapped:false}));sign.name="SCORPION_ROOM_PHASE160_HEADER_SIGN";sign.position.set(0,5.48,-8.55);scene.add(sign);
 }
-
+function addSkyline(scene){
+  const city=new THREE.Group();city.name="SCORPION_HIGH_SKYLINE_RANDOM_ENVIRONMENT_PHASE160";const bTex=buildingTexture();const neon=[0x64eaff,0xb48cff,0xffd36b,0x78ff9f];
+  for(let i=0;i<74;i++){const x=-34+Math.random()*68,z=-24-Math.random()*86,w=.9+Math.random()*4.8,d=.9+Math.random()*4.6,h=12+Math.random()*72,base=-34-Math.random()*10;const t=bTex.clone();t.repeat.set(Math.max(1,Math.round(w)),Math.max(3,Math.round(h/7)));const mat=new THREE.MeshStandardMaterial({map:t,color:i%2?0x08345d:0x07101f,roughness:.65,metalness:.12,emissive:0x06101c,emissiveIntensity:.28});const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);b.name="SCORPION_HIGH_SKYLINE_BUILDING_PHASE160";b.position.set(x,base+h/2,z-(i%4)*4);city.add(b);for(let r=0;r<Math.min(16,Math.floor(h/3.8));r++){if(Math.random()<.2)continue;const s=new THREE.Mesh(new THREE.BoxGeometry(w*.78,.045,.018),new THREE.MeshBasicMaterial({color:neon[(i+r)%neon.length],transparent:true,opacity:.58,toneMapped:false}));s.name="SCORPION_HIGH_SKYLINE_WINDOW_STRIP_PHASE160";s.position.set(b.position.x,base+1+r*3.3,b.position.z+d/2+.024);city.add(s);}}
+  const rTex=roadTexture();rTex.repeat.set(1,6);const road=new THREE.Mesh(new THREE.PlaneGeometry(18,105),new THREE.MeshBasicMaterial({map:rTex,side:THREE.DoubleSide,toneMapped:false}));road.name="SCORPION_HIGH_SKYLINE_DROP_ROAD_PHASE160";road.rotation.x=-Math.PI/2;road.position.set(0,-33.7,-70);city.add(road);city.position.set(0,0,-2.5);scene.add(city);
+}
+function cardFace(value,hidden=false){return tex((x,c)=>{x.fillStyle=hidden?"#111827":"#fffaf0";x.fillRect(0,0,c.width,c.height);x.strokeStyle=hidden?"#d3a13b":"#111827";x.lineWidth=18;x.strokeRect(16,16,c.width-32,c.height-32);x.textAlign="center";x.textBaseline="middle";if(hidden){x.fillStyle="#d3a13b";x.font="900 92px Arial";x.fillText("SVR",c.width/2,c.height/2-10);x.fillStyle="#64eaff";x.font="800 36px Arial";x.fillText("POKER",c.width/2,c.height/2+70);}else{x.fillStyle=/♥|♦/.test(value)?"#c91532":"#111827";x.font="900 118px Arial";x.fillText(value,c.width/2,c.height/2);}},360,512);}
+function cardMesh(scene,name,x,y,z,face,hidden=false){const m=new THREE.Mesh(new THREE.PlaneGeometry(.52,.74),new THREE.MeshBasicMaterial({map:cardFace(face,hidden),side:THREE.DoubleSide,toneMapped:false}));m.name=name;m.position.set(x,y,z);m.rotation.x=-Math.PI/2;scene.add(m);return m;}
 function addTable(scene){
-  const table = new THREE.Mesh(
-    new THREE.CylinderGeometry(2.1, 2.1, .18, 96),
-    new THREE.MeshStandardMaterial({ color: 0x10261f, roughness: .88 })
-  );
-  table.name = "SCORPION_SINGLE_SHOW_TABLE";
-  table.position.y = .9;
-  scene.add(table);
-
-  const felt = new THREE.Mesh(
-    new THREE.CircleGeometry(1.9, 96),
-    new THREE.MeshBasicMaterial({ color: 0x0f5138, side: THREE.DoubleSide })
-  );
-  felt.name = "SCORPION_TABLE_FELT";
-  felt.rotation.x = -Math.PI / 2;
-  felt.position.y = 1.0;
-  scene.add(felt);
+  const rail=new THREE.Mesh(new THREE.CylinderGeometry(2.48,2.48,.22,96),new THREE.MeshStandardMaterial({color:0x15070b,roughness:.72,metalness:.08,emissive:0x080101,emissiveIntensity:.18}));rail.name="SCORPION_HEADSUP_TABLE_RAIL_PHASE160";rail.position.y=.88;scene.add(rail);
+  const felt=new THREE.Mesh(new THREE.CylinderGeometry(2.13,2.13,.045,96),new THREE.MeshStandardMaterial({color:0x06402d,roughness:.84,emissive:0x02150f,emissiveIntensity:.18}));felt.name="SCORPION_HEADSUP_TABLE_FELT_PHASE160";felt.position.y=1.02;scene.add(felt);
+  const logo=new THREE.Mesh(new THREE.PlaneGeometry(1.35,.58),new THREE.MeshBasicMaterial({map:label("SVR","SCORPION","#64eaff"),transparent:true,toneMapped:false}));logo.rotation.x=-Math.PI/2;logo.position.set(0,1.055,0);scene.add(logo);
+  const bot=new THREE.Mesh(new THREE.CapsuleGeometry(.28,.86,8,18),new THREE.MeshStandardMaterial({color:0x1b263b,roughness:.68,emissive:0x080b12,emissiveIntensity:.2}));bot.name="SCORPION_ONE_BOT_NOVA_PHASE160";bot.position.set(0,1.12,-3.25);scene.add(bot);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.25,24,12),new THREE.MeshStandardMaterial({color:0x9b6a4f,roughness:.7}));head.position.set(0,1.82,-3.25);scene.add(head);
+  const tag=new THREE.Mesh(new THREE.PlaneGeometry(2.15,.52),new THREE.MeshBasicMaterial({map:label("BOT NOVA","$1000","#64eaff"),transparent:true,toneMapped:false}));tag.position.set(0,2.25,-3.42);scene.add(tag);
+  const pad=new THREE.Mesh(new THREE.RingGeometry(.55,.72,64),new THREE.MeshBasicMaterial({color:0x64eaff,transparent:true,opacity:.5,side:THREE.DoubleSide,toneMapped:false}));pad.rotation.x=-Math.PI/2;pad.position.set(0,.035,3.25);scene.add(pad);
 }
+let state={};function deck(){const suits=["♠","♥","♦","♣"],ranks=["A","K","Q","J","10","9","8","7","6","5","4","3","2"],d=[];for(const r of ranks)for(const s of suits)d.push(`${r}${s}`);for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}return d;}function val(c){return ({A:14,K:13,Q:12,J:11})[c.replace(/[♠♥♦♣]/g,"")]||Number(c.replace(/[♠♥♦♣]/g,""));}function score(cards){return cards.map(val).sort((a,b)=>b-a)[0];}
+function updateHud(){document.getElementById("scorpionStatus")&&(document.getElementById("scorpionStatus").textContent=state.msg);document.getElementById("scorpionCards")&&(document.getElementById("scorpionCards").textContent=`You: ${state.p.join(" ")} • Board: ${state.b.join(" ")||"--"}`);document.getElementById("scorpionStacks")&&(document.getElementById("scorpionStacks").textContent=`You $${state.ps} • Bot $${state.bs} • Pot $${state.pot}`);}
+function drawCards(scene){for(const m of state.meshes||[])scene.remove(m);state.meshes=[];const add=(...a)=>state.meshes.push(cardMesh(scene,...a));add("P1",-.42,1.12,1.28,state.p[0]);add("P2",.22,1.12,1.28,state.p[1]);add("B1",-.42,1.12,-1.28,state.reveal?state.bot[0]:"??",!state.reveal);add("B2",.22,1.12,-1.28,state.reveal?state.bot[1]:"??",!state.reveal);state.b.forEach((c,i)=>add(`BOARD${i}`,-1.25+i*.62,1.13,-.05,c));}
+function newHand(scene){const d=deck();state={deck:d,ps:state.ps??1000,bs:state.bs??1000,pot:60,stage:0,p:[d.pop(),d.pop()],bot:[d.pop(),d.pop()],b:[],reveal:false,meshes:[],msg:"New hand. Blinds posted. Your action."};state.ps-=30;state.bs-=30;drawCards(scene);updateHud();}
+function showdown(scene){state.reveal=true;const p=score([...state.p,...state.b]),b=score([...state.bot,...state.b]);if(p>=b){state.ps+=state.pot;state.msg=`You win $${state.pot}.`; }else{state.bs+=state.pot;state.msg=`Bot wins $${state.pot}.`; }state.pot=0;state.stage=4;drawCards(scene);updateHud();}
+function nextStreet(scene){if(state.stage===0){state.b.push(state.deck.pop(),state.deck.pop(),state.deck.pop());state.stage=1;state.msg="Flop dealt.";}else if(state.stage===1){state.b.push(state.deck.pop());state.stage=2;state.msg="Turn dealt.";}else if(state.stage===2){state.b.push(state.deck.pop());state.stage=3;state.msg="River dealt.";}else showdown(scene);drawCards(scene);updateHud();}
+function act(scene,a){if(a==="new"||state.stage===4)return newHand(scene);if(a==="fold"){state.bs+=state.pot;state.pot=0;state.reveal=true;state.stage=4;state.msg="You folded. Bot wins.";drawCards(scene);updateHud();return;}if(a==="raise"){const bet=Math.min(50,state.ps,state.bs);state.ps-=bet;state.bs-=bet;state.pot+=bet*2;state.msg="Raise 50. Bot calls.";}else state.msg="Check/call.";nextStreet(scene);}
+function hud(scene){const h=document.createElement("div");h.id="scorpionPhase160Hud";h.style.cssText="position:fixed;left:16px;bottom:16px;z-index:1000;max-width:520px;background:rgba(3,5,10,.78);border:1px solid rgba(211,161,59,.75);border-radius:16px;color:#fff7e3;padding:12px 14px;font:13px/1.35 system-ui,Segoe UI,Arial;box-shadow:0 18px 45px rgba(0,0,0,.55);backdrop-filter:blur(8px)";h.innerHTML='<b style="color:#ffd36b">SCORPION ROOM • ONE BOT TEST</b><div id="scorpionStatus" style="margin-top:4px;color:#bffcff">Loading hand…</div><div id="scorpionCards" style="margin-top:5px;color:#fff">Cards: --</div><div id="scorpionStacks" style="margin-top:5px;color:#ffd36b">You $1000 • Bot $1000 • Pot $0</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button data-a="check">Check / Call</button><button data-a="raise">Raise 50</button><button data-a="fold">Fold</button><button data-a="new">Next Hand</button></div><div style="margin-top:7px;color:#c8d5e8;font-size:12px">Keys: C check/call • R raise • F fold • H next hand</div>';document.body.appendChild(h);h.querySelectorAll("button").forEach(b=>{b.style.cssText="border:1px solid rgba(100,234,255,.55);border-radius:999px;background:rgba(12,24,35,.86);color:#fff;padding:8px 11px;font-weight:800;cursor:pointer";});h.addEventListener("click",e=>{const b=e.target.closest("button[data-a]");if(b)act(scene,b.dataset.a);});window.addEventListener("keydown",e=>{const k=e.key.toLowerCase();if(k==="c")act(scene,"check");if(k==="r")act(scene,"raise");if(k==="f")act(scene,"fold");if(k==="h")act(scene,"new");});}
+function lighting(scene){scene.add(new THREE.HemisphereLight(0xbadfff,0x08030a,1.1));const key=new THREE.DirectionalLight(0xffffff,1.1);key.position.set(2,8,5);scene.add(key);const glow=new THREE.PointLight(0xd3a13b,2.4,38,2);glow.position.set(0,3,-8);scene.add(glow);}
 
-function addNeonLine(root, x1, z1, x2, z2, color = 0xd3a13b){
-  const curve = new THREE.LineCurve3(new THREE.Vector3(x1, .045, z1), new THREE.Vector3(x2, .045, z2));
-  const mesh = new THREE.Mesh(
-    new THREE.TubeGeometry(curve, 1, .024, 8, false),
-    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .92, toneMapped: false })
-  );
-  mesh.name = "SCORPION_CITY_NEON_ROAD_LINE";
-  root.add(mesh);
-}
-
-function makeProceduralSciFiCity(scene){
-  const city = new THREE.Group();
-  city.name = "SCORPION_OUTSIDE_WINDOW_TEXTURED_SCIFI_CITY_PHASE159";
-  const neon = [0x64eaff, 0xd3a13b, 0xb48cff, 0x78ff9f];
-  const facadeTextures = [makeTexture("building"), makeTexture("building"), makeTexture("building")];
-
-  for (let i = 0; i < 70; i++){
-    const x = -18 + Math.random() * 36;
-    const z = -12 - Math.random() * 32;
-    const w = .9 + Math.random() * 2.8;
-    const d = .8 + Math.random() * 2.6;
-    const h = 4 + Math.random() * 24;
-    const tex = facadeTextures[i % facadeTextures.length].clone();
-    tex.needsUpdate = true;
-    tex.repeat.set(Math.max(1, Math.round(w)), Math.max(2, Math.round(h / 2.5)));
-    const building = new THREE.Mesh(
-      new THREE.BoxGeometry(w, h, d),
-      new THREE.MeshStandardMaterial({ map: tex, color: 0xffffff, roughness: .62, metalness: .12, emissive: 0x06101c, emissiveIntensity: .28 })
-    );
-    building.name = "SCORPION_OUTSIDE_WINDOW_TEXTURED_CITY_BUILDING";
-    building.position.set(x, h / 2, z);
-    building.frustumCulled = false;
-    city.add(building);
-
-    const rows = Math.min(13, Math.floor(h / 1.2));
-    for (let r = 0; r < rows; r++){
-      const strip = new THREE.Mesh(
-        new THREE.BoxGeometry(w * .82, .04, .016),
-        new THREE.MeshBasicMaterial({ color: neon[(i + r) % neon.length], transparent: true, opacity: .72, toneMapped: false })
-      );
-      strip.name = "SCORPION_OUTSIDE_WINDOW_NEON_STRIP";
-      strip.position.set(x, .8 + r * 1.18, z + d / 2 + .02);
-      city.add(strip);
-    }
-  }
-
-  const roadTexture = makeTexture("road");
-  roadTexture.repeat.set(1, 5);
-  const road = new THREE.Mesh(
-    new THREE.PlaneGeometry(15, 38),
-    new THREE.MeshBasicMaterial({ map: roadTexture, side: THREE.DoubleSide, toneMapped: false })
-  );
-  road.name = "SCORPION_OUTSIDE_WINDOW_TEXTURED_ROAD";
-  road.rotation.x = -Math.PI / 2;
-  road.position.set(0, .025, -22);
-  city.add(road);
-
-  for (let i = 0; i < 11; i++){
-    addNeonLine(city, -2.15, -10 - i * 3.0, -2.15, -12 - i * 3.0, 0x64eaff);
-    addNeonLine(city, 2.15, -10 - i * 3.0, 2.15, -12 - i * 3.0, 0xd3a13b);
-  }
-
-  // Put city just outside the window. Window is at z -8.68; city starts beyond it.
-  city.position.set(0, 0, -4.25);
-  scene.add(city);
-  return city;
-}
-
-async function loadScifiDowntownObj(scene){
-  try{
-    const response = await fetch(CITY_OBJ_URL, { cache: "no-store" });
-    const objText = await response.text();
-    if (!response.ok || objText.trim().length < 32){
-      throw new Error("scifi downtown city OBJ is empty or unavailable in repo deploy");
-    }
-
-    const loader = new OBJLoader();
-    const object = loader.parse(objText);
-    if (!object || object.children.length === 0){
-      throw new Error("scifi downtown city OBJ parsed with no mesh children");
-    }
-
-    const facade = makeTexture("building");
-    facade.repeat.set(8, 12);
-    object.name = "SCORPION_OUTSIDE_WINDOW_OBJ_CITY_PHASE159";
-    object.position.set(0, 0, -15.5);
-    object.rotation.y = Math.PI;
-    object.scale.setScalar(.085);
-    object.traverse((child)=>{
-      if (child.isMesh){
-        child.frustumCulled = false;
-        child.material = new THREE.MeshStandardMaterial({ map: facade, color: 0xffffff, roughness: .65, metalness: .12, emissive: 0x071426, emissiveIntensity: .35 });
-      }
-    });
-    scene.add(object);
-    scene.userData.scorpionCityAsset = { source: CITY_OBJ_URL, loaded: true, textured: true, outsideWindow: true, phase: PHASE159 };
-    console.log(`[${PHASE159}] loaded OBJ city outside Scorpion window`, CITY_OBJ_URL);
-    return object;
-  } catch (err){
-    console.warn(`[${PHASE159}] outside window city fallback active:`, err?.message || err);
-    const fallback = makeProceduralSciFiCity(scene);
-    scene.userData.scorpionCityAsset = { source: CITY_OBJ_URL, loaded: false, fallback: true, textured: true, outsideWindow: true, reason: err?.message || String(err), phase: PHASE159 };
-    return fallback;
-  }
-}
-
-bootPrivateScene({
-  title: "SCORPION ROOM",
-  subtitle: "CITY VIEW PRIVATE POKER",
-  accent: 0xd3a13b,
-  buildLabel: PHASE159,
-  build: ({ scene })=>{
-    addScorpionRoomShell(scene);
-    addTable(scene);
-    loadScifiDowntownObj(scene);
-  }
-});
+bootPrivateScene({title:"SCORPION ROOM",subtitle:"HIGH SKYLINE • ONE BOT TEST",accent:0xd3a13b,buildLabel:PHASE160,build:({scene})=>{lighting(scene);addRoom(scene);addSkyline(scene);addTable(scene);hud(scene);newHand(scene);console.log(`[${PHASE160}] ready`);}});
