@@ -1,0 +1,116 @@
+{
+  "sessionSystem": "multi-vr-meditation-sessions",
+  "sessionControls": [
+    "Start",
+    "Pause",
+    "Resume",
+    "Reset",
+    "Complete",
+    "Return Lobby"
+  ],
+  "progressBoard": {
+    "enabled": true,
+    "fields": [
+      "Session",
+      "Stage",
+      "Breath Cycle",
+      "Elapsed Time",
+      "Status"
+    ]
+  },
+  "sessions": [
+    {
+      "id": "quickReset",
+      "title": "Quick Reset",
+      "durationMinutes": 3,
+      "stages": [
+        "Welcome",
+        "Grounding",
+        "Breathing",
+        "Complete"
+      ],
+      "recommendedMode": "root",
+      "description": "Short calm reset for players between poker sessions."
+    },
+    {
+      "id": "deepBreathing",
+      "title": "Deep Breathing",
+      "durationMinutes": 5,
+      "stages": [
+        "Welcome",
+        "Breathing",
+        "Reflection",
+        "Complete"
+      ],
+      "recommendedMode": "throat",
+      "description": "Slow visual breath guide using the central breathing ring."
+    },
+    {
+      "id": "chakraBalance",
+      "title": "Seven Chakra Balance",
+      "durationMinutes": 7,
+      "stages": [
+        "Root",
+        "Sacral",
+        "Solar",
+        "Heart",
+        "Throat",
+        "Third Eye",
+        "Crown",
+        "Complete"
+      ],
+      "recommendedMode": "allBalance",
+      "description": "Cycles through all seven chakra stations as a visualization."
+    },
+    {
+      "id": "focusMode",
+      "title": "Focus Mode",
+      "durationMinutes": 4,
+      "stages": [
+        "Welcome",
+        "Stillness",
+        "Focus Beam",
+        "Complete"
+      ],
+      "recommendedMode": "thirdEye",
+      "description": "Indigo focus visuals for a calmer return to gameplay."
+    },
+    {
+      "id": "sleepWindDown",
+      "title": "Sleep Wind-Down",
+      "durationMinutes": 8,
+      "stages": [
+        "Dim Lights",
+        "Slow Breath",
+        "Moonlight",
+        "Complete"
+      ],
+      "recommendedMode": "crown",
+      "description": "Soft moonlit visual sequence with reduced particle motion."
+    },
+    {
+      "id": "walkingMeditation",
+      "title": "Walking Meditation Path",
+      "durationMinutes": 6,
+      "stages": [
+        "Start Path",
+        "Waypoint One",
+        "Waypoint Two",
+        "Waypoint Three",
+        "Return Center"
+      ],
+      "recommendedMode": "heart",
+      "description": "Slow circular path around the meditation platform."
+    },
+    {
+      "id": "silentRoom",
+      "title": "Silent Room",
+      "durationMinutes": 0,
+      "stages": [
+        "Open Calm Space"
+      ],
+      "recommendedMode": "none",
+      "description": "No timer. Just a quiet private wellness room."
+    }
+  ]
+}

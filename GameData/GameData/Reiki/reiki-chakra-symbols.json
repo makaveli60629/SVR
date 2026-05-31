@@ -1,0 +1,85 @@
+{
+  "layout": "circular-stations-around-meditation-platform",
+  "medicalClaims": false,
+  "label": "CHAKRA TUNING VISUALIZATION",
+  "disclaimer": "For relaxation and immersive meditation visualization only. No medical or therapeutic claims are active in this build.",
+  "stations": [
+    {
+      "id": "root",
+      "name": "Root",
+      "symbol": "Muladhara placeholder glyph",
+      "position": {
+        "angleDegrees": 180,
+        "radius": 3.2
+      },
+      "colorCue": "deep red",
+      "prompt": "Ground your breath. Feel steady."
+    },
+    {
+      "id": "sacral",
+      "name": "Sacral",
+      "symbol": "Svadhisthana placeholder glyph",
+      "position": {
+        "angleDegrees": 225,
+        "radius": 3.2
+      },
+      "colorCue": "orange",
+      "prompt": "Let the breath flow calmly."
+    },
+    {
+      "id": "solar",
+      "name": "Solar Plexus",
+      "symbol": "Manipura placeholder glyph",
+      "position": {
+        "angleDegrees": 270,
+        "radius": 3.2
+      },
+      "colorCue": "gold/yellow",
+      "prompt": "Center your focus."
+    },
+    {
+      "id": "heart",
+      "name": "Heart",
+      "symbol": "Anahata placeholder glyph",
+      "position": {
+        "angleDegrees": 315,
+        "radius": 3.2
+      },
+      "colorCue": "green",
+      "prompt": "Let the light expand softly."
+    },
+    {
+      "id": "throat",
+      "name": "Throat",
+      "symbol": "Vishuddha placeholder glyph",
+      "position": {
+        "angleDegrees": 45,
+        "radius": 3.2
+      },
+      "colorCue": "blue",
+      "prompt": "Relax your voice and breath."
+    },
+    {
+      "id": "thirdEye",
+      "name": "Third Eye",
+      "symbol": "Ajna placeholder glyph",
+      "position": {
+        "angleDegrees": 90,
+        "radius": 3.2
+      },
+      "colorCue": "indigo",
+      "prompt": "Focus gently ahead."
+    },
+    {
+      "id": "crown",
+      "name": "Crown",
+      "symbol": "Sahasrara placeholder glyph",
+      "position": {
+        "angleDegrees": 0,
+        "radius": 3.2
+      },
+      "colorCue": "violet/white",
+      "prompt": "Lift attention upward."
+    }
+  ]
+}

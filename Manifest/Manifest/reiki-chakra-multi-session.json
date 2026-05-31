@@ -1,0 +1,58 @@
+{
+  "manifestVersion": "1.0.0",
+  "updateId": "reiki-chakra-multi-session-lock",
+  "phaseName": "Reiki Chakra Tuning + Multi VR Meditation Sessions Lock",
+  "phaseNumber": 34,
+  "status": "ready-for-local-apply",
+  "track": "game-side-only",
+  "targetScene": {
+    "id": "reiki-private-room",
+    "file": "game/reiki.html",
+    "type": "private-vr-meditation-scene"
+  },
+  "hardLocks": {
+    "websiteUntouched": true,
+    "lobbyPreserved": true,
+    "privateSceneOnly": true,
+    "approvalSafeOnly": true,
+    "noMedicalClaims": true,
+    "noUnapprovedSponsorBranding": true,
+    "packageUnder25MB": true
+  },
+  "blockedTerms": [
+    "Trueitive",
+    "Truitive",
+    "trueitive.com",
+    "Shyona",
+    "Royston",
+    "founder photo",
+    "outside Reiki website"
+  ],
+  "allowedBranding": [
+    "SVR",
+    "AWAITING APPROVAL",
+    "WAITING FOR APPROVAL"
+  ],
+  "features": [
+    "Seven chakra tuning stations",
+    "Chakra symbol placement manifest",
+    "Tuning mode visual states",
+    "All Balance chakra cycle",
+    "Multiple VR meditation sessions",
+    "Session progress board",
+    "Watch chakra/session controls",
+    "Approval-safe disclaimer panels",
+    "Room comfort controls",
+    "Moonlight completion event placeholder"
+  ],
+  "filesToCreateOrUpdate": {
+    "manifest": "Manifest/reiki-chakra-multi-session.json",
+    "chakraSymbols": "GameData/Reiki/reiki-chakra-symbols.json",
+    "tuningModes": "GameData/Reiki/reiki-tuning-modes.json",
+    "meditationSessions": "GameData/Reiki/reiki-meditation-sessions.json",
+    "watchPanel": "GameData/Reiki/reiki-watch-chakra-session-panel.json",
+    "comfortControls": "GameData/Reiki/reiki-comfort-controls.json",
+    "approvalDisclaimer": "GameData/Reiki/reiki-approval-disclaimer.json",
+    "reportOutput": "Reports/reiki-chakra-multi-session-report.txt"
+  }
+}

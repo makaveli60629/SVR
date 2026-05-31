@@ -1,0 +1,25 @@
+{
+  "panel": "Reiki Chakra + Session Watch Panel",
+  "buttons": [
+    "Root",
+    "Sacral",
+    "Solar",
+    "Heart",
+    "Throat",
+    "Third Eye",
+    "Crown",
+    "All Balance",
+    "Quick Reset",
+    "Deep Breathing",
+    "Chakra Balance",
+    "Focus",
+    "Sleep",
+    "Walking Path",
+    "Pause",
+    "Reset",
+    "Return"
+  ],
+  "controllerFallback": true,
+  "handTracking": true,
+  "notes": "Buttons are placeholders for runtime binding. Keep labels large and readable in VR."
+}

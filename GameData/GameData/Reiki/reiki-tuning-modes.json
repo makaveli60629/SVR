@@ -1,0 +1,91 @@
+{
+  "defaultMode": "allBalance",
+  "audioPolicy": "muted-placeholders-only-until-approved",
+  "modes": [
+    {
+      "id": "root",
+      "visual": "low floor pulse",
+      "particleDirection": "downward/grounding",
+      "breathCycleSeconds": {
+        "inhale": 4,
+        "hold": 2,
+        "exhale": 6
+      }
+    },
+    {
+      "id": "sacral",
+      "visual": "water ripple pond pulse",
+      "particleDirection": "slow spiral",
+      "breathCycleSeconds": {
+        "inhale": 4,
+        "hold": 2,
+        "exhale": 6
+      }
+    },
+    {
+      "id": "solar",
+      "visual": "warm center glow",
+      "particleDirection": "outward short rays",
+      "breathCycleSeconds": {
+        "inhale": 4,
+        "hold": 2,
+        "exhale": 6
+      }
+    },
+    {
+      "id": "heart",
+      "visual": "expanding green aura ring",
+      "particleDirection": "soft outward bloom",
+      "breathCycleSeconds": {
+        "inhale": 5,
+        "hold": 2,
+        "exhale": 7
+      }
+    },
+    {
+      "id": "throat",
+      "visual": "blue wave bands",
+      "particleDirection": "horizontal waves",
+      "breathCycleSeconds": {
+        "inhale": 4,
+        "hold": 2,
+        "exhale": 6
+      }
+    },
+    {
+      "id": "thirdEye",
+      "visual": "indigo focus beam",
+      "particleDirection": "forward beam",
+      "breathCycleSeconds": {
+        "inhale": 4,
+        "hold": 3,
+        "exhale": 6
+      }
+    },
+    {
+      "id": "crown",
+      "visual": "violet upward light column",
+      "particleDirection": "upward rise",
+      "breathCycleSeconds": {
+        "inhale": 5,
+        "hold": 3,
+        "exhale": 8
+      }
+    },
+    {
+      "id": "allBalance",
+      "visual": "seven-stage color cycle",
+      "sequence": [
+        "root",
+        "sacral",
+        "solar",
+        "heart",
+        "throat",
+        "thirdEye",
+        "crown"
+      ],
+      "stageSeconds": 24,
+      "completionEvent": "moonlightAlignment"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "controls": [
+    {
+      "id": "sit",
+      "label": "Sit",
+      "target": "meditation-platform-seat"
+    },
+    {
+      "id": "stand",
+      "label": "Stand",
+      "target": "standing-mat"
+    },
+    {
+      "id": "resetView",
+      "label": "Reset View",
+      "target": "current-session-center"
+    },
+    {
+      "id": "returnLobby",
+      "label": "Return Lobby",
+      "target": "lobby-reiki-portal"
+    },
+    {
+      "id": "startBreathing",
+      "label": "Start Breathing",
+      "target": "breathing-ring"
+    },
+    {
+      "id": "stopBreathing",
+      "label": "Stop Breathing",
+      "target": "breathing-ring"
+    }
+  ],
+  "teleportPolicy": "hold-aim-release-only-no-instant-teleport",
+  "comfortNotes": "Keep path clear, low blink, no forced camera movement."
+}
