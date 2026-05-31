@@ -1,0 +1,18 @@
+.hub-about-hero{grid-template-columns:minmax(0,1fr) minmax(320px,.55fr)}
+.hub-founder-card{text-align:center}
+.hub-founder-card img{width:160px;max-width:65%;margin:0 auto 12px;display:block}
+.mini-note{font-size:.9rem;color:#cbbfe2}
+.hub-store-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.hub-store-card{border:1px solid rgba(255,255,255,.08);border-radius:24px;background:rgba(255,255,255,.035);padding:18px;display:flex;flex-direction:column;gap:10px}
+.hub-logo-slot{min-height:112px;border-radius:20px;border:1px solid rgba(105,232,255,.22);background:radial-gradient(circle at 50% 40%,rgba(105,232,255,.12),transparent 55%),rgba(0,0,0,.2);display:grid;place-content:center;text-align:center}
+.hub-logo-slot span{font-family:Orbitron,Arial,sans-serif;font-weight:900;letter-spacing:.12em;color:#fff}
+.hub-logo-slot small{display:block;margin-top:6px;color:#d9cdec;font-weight:700}
+.hub-facts{margin:0 0 8px;padding-left:18px;color:#d9cdec;line-height:1.5}
+.hub-facts a{color:#69e8ff}
+.metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.metric{border:1px solid rgba(105,232,255,.18);border-radius:18px;background:rgba(0,0,0,.22);padding:14px}
+.metric strong{display:block;font-family:Orbitron,Arial,sans-serif;font-size:1.7rem;color:#fff}
+.metric span{display:block;color:#d9cdec;font-weight:700;margin-top:4px}
+code{color:#d9fbff;background:rgba(105,232,255,.08);border:1px solid rgba(105,232,255,.14);padding:1px 5px;border-radius:7px}
+@media(max-width:1080px){.hub-store-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.hub-store-grid,.metric-grid{grid-template-columns:1fr}.hub-about-hero{grid-template-columns:1fr}}
