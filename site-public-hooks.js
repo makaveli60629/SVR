@@ -1,10 +1,9 @@
 (() => {
-  const API_BASE = window.SVR_API_BASE || 'https://api.svrpoker.com';
+  const API_BASE = window.SVR_AWS_API_BASE || window.SVR_API_BASE || 'https://api.svrpoker.com';
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages_backup';
   const SESSION_KEY = 'svr_site_session_id';
   const STATUS_REFRESH_MS = 30000;
-  const FORCE_ADMIN_ONLINE = false;
 
   let lastAdminState = 'unknown';
 
@@ -29,6 +28,7 @@
       referrer: document.referrer || '',
       sessionId: sessionId(),
       source: 'site',
+      provider: 'aws',
       metadata: { href: location.href, ...metadata }
     });
     try {
@@ -59,7 +59,7 @@
     try { localStorage.setItem(ADMIN_KEY, state); } catch (e) {}
     getAdminBadgeElements().forEach((el) => {
       el.dataset.state = state;
-      el.dataset.source = sourceText || 'api-or-fallback';
+      el.dataset.source = sourceText || 'aws-api-or-fallback';
       el.classList.toggle('online', isOnline);
       el.classList.toggle('offline', !isOnline);
       const text = isOnline ? 'ADMIN ONLINE' : 'ADMIN OFFLINE';
@@ -69,7 +69,7 @@
       el.setAttribute('aria-label', text);
       el.title = text;
     });
-    window.SVR_ADMIN_PRESENCE = { state, isOnline, source: sourceText || 'api-or-fallback', updatedAt: new Date().toISOString() };
+    window.SVR_ADMIN_PRESENCE = { state, isOnline, source: sourceText || 'aws-api-or-fallback', updatedAt: new Date().toISOString() };
   }
 
   function setAdminLoadingState() {
@@ -89,7 +89,7 @@
       const data = await fetchAdminStatus();
       if (!data || data.ok === false) throw new Error(data && data.error ? data.error : 'Invalid admin status payload');
       const online = Boolean(data.isOnline ?? data.online ?? data.adminOnline ?? data.status === 'online');
-      setAdminVisualState(online, 'api');
+      setAdminVisualState(online, 'aws-api');
     } catch (error) {
       const fallback = (() => { try { return localStorage.getItem(ADMIN_KEY); } catch (e) { return null; } })();
       setAdminVisualState(fallback !== 'offline', 'fallback');
@@ -100,7 +100,7 @@
     const response = await fetch(`${API_BASE}/api/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(entry)
+      body: JSON.stringify({ ...entry, provider: 'aws' })
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok || data.ok === false) throw new Error(data.error || `Message request failed: ${response.status}`);
@@ -140,7 +140,7 @@
         track('message_submit_success', { source: entry.source });
       } catch (error) {
         saveLocalMessageBackup({ ...entry, createdAt: new Date().toISOString(), sent: false, error: error.message });
-        if (status) status.textContent = 'Message saved locally. Live API could not be reached yet.';
+        if (status) status.textContent = 'Message saved locally. Live AWS API could not be reached yet.';
         track('message_submit_fallback', { source: entry.source });
       }
     });
