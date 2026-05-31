@@ -551,8 +551,8 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
   const right = new THREE.Vector3(Math.sin(angle), 0, -Math.cos(angle));
   const center = new THREE.Vector3(Math.cos(angle) * (R - 4.05), 0.01, Math.sin(angle) * (R - 4.05));
-  const logoTex = null;
-  const founderTex = null;
+  const logoTex = loadUiTexture('./assets/ui/trueitive-logo.png');
+  const founderTex = loadUiTexture('./assets/ui/trueitive-founder.png');
 
   const floorPad = new THREE.Mesh(
     new THREE.PlaneGeometry(14.2, 7.0),
@@ -643,7 +643,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#dffff7'; x.font = 'bold 84px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 98);
+    x.fillStyle = '#dffff7'; x.font = 'bold 84px system-ui, Arial'; x.fillText('TRUEITIVE.COM', w/2, 98);
   });
   const signB = new THREE.Mesh(new THREE.PlaneGeometry(6.44, 0.70), new THREE.MeshBasicMaterial({ map: signTexB, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   signB.position.copy(signBackB.position).add(new THREE.Vector3(0,0,0.02));
@@ -671,10 +671,10 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.strokeStyle = 'rgba(140,255,231,0.90)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
     x.textAlign = 'left';
     x.fillStyle = '#f6ffff'; x.font = 'bold 62px system-ui, Arial'; x.fillText('Meet the Founder', 60, 110);
-    x.fillStyle = '#bcffe9'; x.font = 'bold 46px system-ui, Arial'; x.fillText('AWAITING APPROVAL', 60, 182);
+    x.fillStyle = '#bcffe9'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Shyona Royston', 60, 182);
     x.fillStyle = '#e5f6f3'; x.font = '34px system-ui, Arial';
     let y = 258;
-    y = fillWrappedText(x, 'Founder of SVR Placeholder Holistic Healing & Wellness, leading the Reiki hub with a professional wellness-first approach for virtual and in-person growth.', 60, y, w - 120, 42);
+    y = fillWrappedText(x, 'Founder of Trueitive Holistic Healing & Wellness, leading the Reiki hub with a professional wellness-first approach for virtual and in-person growth.', 60, y, w - 120, 42);
     y += 78;
     x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Services', 60, y);
     y += 56;
@@ -684,7 +684,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Book / Explore', 60, y);
     y += 54;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    fillWrappedText(x, 'svrpoker.com • state search • founder spotlight • Reiki VR entry', 60, y, w - 120, 40);
+    fillWrappedText(x, 'trueitive.com • state search • founder spotlight • Reiki VR entry', 60, y, w - 120, 40);
   });
   const founderPanel = new THREE.Mesh(new THREE.PlaneGeometry(3.28, 4.02), new THREE.MeshBasicMaterial({ map: founderPanelTex, side: THREE.DoubleSide, transparent: true }));
   founderPanel.position.set(-4.10, 2.18, -2.10);
@@ -701,7 +701,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#f6ffff'; x.font = 'bold 44px system-ui, Arial'; x.fillText('Professional Highlights', 42, 74);
     x.fillStyle = '#bcffe9'; x.font = '32px system-ui, Arial';
     let y = 148;
-    ['Founder of SVR Placeholder', 'Reiki and wellness focus', 'Meditation-forward client care', 'Virtual hub ready for growth'].forEach((line)=>{ x.fillText('• ' + line, 46, y); y += 70; });
+    ['Founder of Trueitive', 'Reiki and wellness focus', 'Meditation-forward client care', 'Virtual hub ready for growth'].forEach((line)=>{ x.fillText('• ' + line, 46, y); y += 70; });
   });
   const rightInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 1.64), new THREE.MeshBasicMaterial({ map: rightInfoTex, side: THREE.DoubleSide, transparent: true }));
   rightInfo.position.set(4.05, -0.12, -2.08);
@@ -712,7 +712,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 68px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 106);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 68px system-ui, Arial'; x.fillText('TRUEITIVE.COM', w/2, 106);
     x.fillStyle = '#bcffe9'; x.font = 'bold 34px system-ui, Arial'; x.fillText('Holistic Healing & Wellness', w/2, 166);
     x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Founder-Led Services', w/2, 296);
     x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki • meditation • appointments • partner-ready wellness hub', w/2, 366);
@@ -733,7 +733,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.strokeStyle = 'rgba(78,255,146,0.90)'; x.lineWidth = 8; roundRectPath(x, 10, 10, w-20, h-20, 24); x.stroke();
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#89ffab'; x.font = 'bold 50px system-ui, Arial'; x.fillText('RESERVED FOR APPROVAL', w/2, 82);
-    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 152);
+    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Shyona Royston', w/2, 152);
   });
   const reservePlaque = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 0.70), new THREE.MeshBasicMaterial({ map: reserveTex, transparent: true, side: THREE.DoubleSide }));
   reservePlaque.position.set(4.05, -1.22, -2.06);
@@ -1401,10 +1401,10 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   group.add(activeBtn);
 
 
-  const adTex = null;
+  const adTex = loadUiTexture('./assets/ui/trueitive-instagram-ad.jpg');
   const adHeader = new THREE.Mesh(
     new THREE.PlaneGeometry(3.26, 0.56),
-    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('SVR PLACEHOLDER', 'sponsor approval pending'), transparent: true, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('TRUEITIVE SPOTLIGHT', 'founder wellness ad'), transparent: true, side: THREE.DoubleSide })
   );
   adHeader.position.set(modelX, wallHeight * 0.39, 0.18);
   group.add(adHeader);
@@ -1533,7 +1533,7 @@ function buildOuterCity(scene, R){
   const matrix = createMatrixBillboardTexture();
   const billboardUpdaters = [matrix.update];
   const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
-  const zenTex = null;
+  const zenTex = loadUiTexture('./assets/ui/trueitive-zen-ad.jpg');
 
   const count = 68;
   const adIndices = new Set([4, 11, 20, 28, 36, 44, 52, 60]);
@@ -1622,7 +1622,7 @@ function buildOuterCity(scene, R){
               ctx.textBaseline = "middle";
               ctx.fillStyle = "#d9ffee";
               ctx.font = "bold 92px system-ui, Arial";
-              ctx.fillText("AWAITING APPROVAL", w2 / 2, 94);
+              ctx.fillText("TRUEITIVE.COM", w2 / 2, 94);
               ctx.fillStyle = "#7bffb7";
               ctx.font = "700 50px system-ui, Arial";
               ctx.fillText("Founder-led Reiki • Meditation • Wellness", w2 / 2, 178);
@@ -2351,8 +2351,8 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   let dealerPose = null;
   const ericTex = await loadFirstTexture(assetUrls("models/eric/rp_eric_rigged_001_dif.jpg"), { colorSpace: THREE.SRGBColorSpace });
   const ericNorm = await loadFirstTexture(assetUrls("models/eric/rp_eric_rigged_001_norm.jpg"));
-  const dealerBase = null; // Phase 84 boot-safe: visible dealer disabled
-  const dealerIdle = null; // Phase 84 boot-safe: visible dealer disabled
+  const dealerBase = await tryLoadFBX(assetUrls("models/eric/eric.fbx"), log, 14000);
+  const dealerIdle = await tryLoadFBX(assetUrls("models/anims/eric_idle.fbx"), log, 14000);
   if (dealerBase){
     dealerActor = dealerBase;
     applyEricMaterial(dealerActor, ericTex, ericNorm);
@@ -2389,7 +2389,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   }
 
   const seatedBots = [];
-  const seatedBotBase = null; // Phase 84 boot-safe: use procedural seated bots
+  const seatedBotBase = await tryLoadFBX(assetUrls("models/bots/male_sitting_pose.fbx"), log, 12000);
   if (seatedBotBase){
     applyEricMaterial(seatedBotBase, ericTex, ericNorm);
     orientCharacterUpright(seatedBotBase);

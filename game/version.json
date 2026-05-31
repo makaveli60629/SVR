@@ -1,15 +1,8 @@
 {
-  "build": "PHASE-146-MAIN-PLAYER-DIRECT-FIX",
-  "target": "game",
-  "scope": "game-only",
-  "siteTouched": false,
-  "source": "direct-game-folder",
-  "fixes": [
-    "fixed game/main.js by defining local player object before window.SVR_GAME export",
-    "removed reliance on emergency index player shim",
-    "kept Phase 142/143 visibility modules loaded",
-    "kept teleport route through modules/teleport.js",
-    "kept website/site untouched"
-  ],
-  "updatedAt": "2026-05-29T00:00:00Z"
+  "build": "PHASE-84-TELEPORT-LOCOMOTION-LOCK",
+  "phase": 84,
+  "name": "Teleporter Locomotion Lock",
+  "updatedAt": "2026-05-31T00:00:00-05:00",
+  "scope": "game-side only: teleport.js locomotion repair, right-stick movement, hold/release teleport, watch controller fallback",
+  "siteTouched": false
 }

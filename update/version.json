@@ -1,14 +1,6 @@
-{
-  "build": "PHASE-145-PLAYER-SHIM-BOOT-LOCK",
-  "source": "direct-game-folder",
-  "siteTouched": false,
-  "rules": [
-    "direct deploy workflow uses committed /game folder",
-    "root website/site files untouched",
-    "game/index.html conflict markers removed",
-    "player boot shim active before main.js load",
-    "private scenes routed separately",
-    "watch and Quest fallback preserved"
-  ],
-  "updatedAt": "2026-05-29T00:00:00Z"
+﻿{
+    "phase":  84,
+    "build":  "PHASE-84-TELEPORT-LOCOMOTION-LOCK",
+    "name":  "Teleport Locomotion Lock",
+    "appliedAt":  "2026-05-31T19:02:34.5666743Z"
 }

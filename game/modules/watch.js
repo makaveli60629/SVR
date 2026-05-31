@@ -16,11 +16,8 @@ const V1 = new THREE.Vector3();
 const V2 = new THREE.Vector3();
 const V3 = new THREE.Vector3();
 const M0 = new THREE.Matrix4();
-const WORLD_UP = new THREE.Vector3(0, 1, 0);
-const LOCAL_UP = new THREE.Vector3(0, 1, 0);
-const LOCAL_FRONT = new THREE.Vector3(0, 0, 1);
-const ROT_Z_PI = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI);
-const ROT_Y_PI = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+const FLIP_Q = new THREE.Quaternion();
+const SCREEN_TILT_Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.34);
 const DISPLAY_MIRRORED = false;
 
 function getJointWorld(hand, names){
@@ -51,31 +48,24 @@ function computeForearmPose(hand, camera, renderer, side = 'left'){
   let faceNormal = V2.crossVectors(acrossPalm, forearmDir).normalize();
 
   const activeCamera = getActiveCamera(camera, renderer);
-  const camPos = new THREE.Vector3();
   if (activeCamera){
+    const camPos = new THREE.Vector3();
     activeCamera.getWorldPosition(camPos);
-    if (faceNormal.dot(camPos.clone().sub(wrist)) < 0) faceNormal.multiplyScalar(-1);
+    if (faceNormal.dot(camPos.sub(wrist)) < 0) faceNormal.multiplyScalar(-1);
   }
 
   acrossPalm = new THREE.Vector3().crossVectors(faceNormal, forearmDir).normalize();
   if (side === 'right') acrossPalm.multiplyScalar(-1);
 
-  const position = wrist.clone()
-    .add(forearmDir.clone().multiplyScalar(0.072))
-    .add(faceNormal.clone().multiplyScalar(0.026))
-    .add(acrossPalm.clone().multiplyScalar(side === 'left' ? -0.003 : 0.003));
-
-  // Quest-safe watch orientation: keep the watch on the forearm, but force the display normal
-  // toward the viewer and force local +Y upright. This removes the upside-down screen bug.
   M0.makeBasis(forearmDir, acrossPalm, faceNormal);
   const quaternion = new THREE.Quaternion().setFromRotationMatrix(M0);
-  if (activeCamera){
-    const toCam = camPos.sub(position).normalize();
-    const front = LOCAL_FRONT.clone().applyQuaternion(quaternion).normalize();
-    if (front.dot(toCam) < 0) quaternion.multiply(ROT_Y_PI);
-    const up = LOCAL_UP.clone().applyQuaternion(quaternion).normalize();
-    if (up.dot(WORLD_UP) < 0) quaternion.multiply(ROT_Z_PI);
-  }
+  quaternion.multiply(FLIP_Q);
+  quaternion.multiply(SCREEN_TILT_Q);
+
+  const position = wrist.clone()
+    .add(forearmDir.clone().multiplyScalar(0.092))
+    .add(faceNormal.clone().multiplyScalar(0.020))
+    .add(acrossPalm.clone().multiplyScalar(side === 'left' ? -0.004 : 0.004));
 
   return { position, quaternion };
 }
@@ -94,8 +84,8 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   group.visible = false;
   scene.add(group);
 
-  const plateW = 0.206;
-  const plateH = 0.106;
+  const plateW = 0.224;
+  const plateH = 0.116;
 
   const frame = new THREE.Mesh(
     new THREE.BoxGeometry(plateW * 0.98, plateH * 0.98, 0.003),
@@ -130,6 +120,13 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   screenFront.rotation.z = 0;
   group.add(screenFront);
 
+  const screenBack = new THREE.Mesh(
+    new THREE.PlaneGeometry(plateW * 0.965, plateH * 0.965),
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.BackSide, depthWrite: false, depthTest: false, opacity: 0.0, toneMapped: false })
+  );
+  screenBack.visible = false;
+
+
   function drawButton(btn, hovered){
     ctx.save();
     ctx.fillStyle = hovered ? 'rgba(180,140,255,0.28)' : 'rgba(255,255,255,0.08)';
@@ -146,27 +143,32 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ctx.restore();
   }
 
-  function buildButtons(state){
-    const buttons = [
-      { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-      { id: 'tableScene', label: 'TABLE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-      { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-      { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-      { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-      { id: 'legendScene', label: 'LEGEND', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
-      { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-      { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-      { id: 'reikiRoomScene', label: 'ZEN DEN', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-      { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
-      { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
-      { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
-    ];
-    if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
-    else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 428, y: 120, w: 548, h: 48, font: 28, pinchOnly: true, hold: 0.18, margin: 8 });
-    return buttons;
-  }
 
-  let hoveredId = null;
+
+function buildButtons(state){
+  const buttons = [
+    { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'tableScene', label: 'TABLE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+
+    { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'legendScene', label: 'LEGEND', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
+
+    { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'reikiRoomScene', label: 'ZEN DEN', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
+
+    { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
+    { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
+    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
+  ];
+  if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
+  else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 428, y: 120, w: 548, h: 48, font: 28, pinchOnly: true, hold: 0.18, margin: 8 });
+  return buttons;
+}
+
+let hoveredId = null;
   let pressed = false;
   let hoverTime = 0;
   let pinchTime = 0;
@@ -176,13 +178,16 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
   function draw(force = false){
     const state = getState();
-    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, tp: state.teleportEnabled });
+    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, sec: new Date().getSeconds() });
     if (!force && sig === lastSig) return;
     lastSig = sig;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    if (DISPLAY_MIRRORED){ ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
+    if (DISPLAY_MIRRORED){
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
     const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
     grad.addColorStop(0, 'rgba(5,8,16,0.90)');
     grad.addColorStop(1, 'rgba(18,10,32,0.94)');
@@ -200,10 +205,12 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 42, 66);
+
     ctx.textAlign = 'right';
     ctx.fillStyle = '#7ff5c7';
     ctx.font = 'bold 40px system-ui, Arial';
     ctx.fillText(`$${Number(state.cash || 0).toLocaleString()}`, 972, 66);
+
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(233,233,255,0.95)';
     ctx.font = 'bold 30px system-ui, Arial';
@@ -217,10 +224,12 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ctx.fillStyle = state.seated ? '#7ff5c7' : state.inTableZone ? '#f6e27f' : 'rgba(233,233,255,0.72)';
     ctx.font = 'bold 28px system-ui, Arial';
     ctx.fillText(state.seated ? 'AT TABLE' : (state.inTableZone ? 'JOIN READY' : 'LOBBY'), 970, 148);
+
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • hold fist/pinch to aim teleport • release to move', 36, 332);
+    ctx.fillText('Quick scenes • Reiki / PGA / Sponsor / Scorpion • pinch with other hand • fist by face toggles TP', 36, 332);
+
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
     tex.needsUpdate = true;
@@ -242,7 +251,10 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
       const nx = (x - cx) / Math.max(btn.w / 2, 1);
       const ny = (y - cy) / Math.max(btn.h / 2, 1);
       const score = nx * nx + ny * ny;
-      if (score < bestScore){ best = btn.id; bestScore = score; }
+      if (score < bestScore){
+        best = btn.id;
+        bestScore = score;
+      }
     }
     return best;
   }
@@ -273,7 +285,9 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
       draw(true);
       return;
     }
+
     const watchOnLeft = anchor === leftHand;
+    const inputHand = watchOnLeft ? rightHand : leftHand;
     const pose = computeForearmPose(anchor, camera, renderer, watchOnLeft ? 'left' : 'right');
     if (!pose){
       group.visible = false;
@@ -281,6 +295,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
       draw(true);
       return;
     }
+
     group.visible = true;
     group.position.copy(pose.position);
     group.quaternion.copy(pose.quaternion);
@@ -296,27 +311,42 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
       const tipPos = new THREE.Vector3();
       tip.getWorldPosition(tipPos);
       const local = group.worldToLocal(tipPos.clone());
-      if (local.z > -0.030 && local.z < 0.095 && Math.abs(local.x) < plateW * 0.80 && Math.abs(local.y) < plateH * 0.80){
+      if (local.z > -0.018 && local.z < 0.085 && Math.abs(local.x) < plateW * 0.74 && Math.abs(local.y) < plateH * 0.74){
         const hit = localHit(local);
         if (hit){
           const depth = Math.abs(local.z);
-          if (depth < bestDepth){ bestDepth = depth; nextHovered = hit; activeInput = candidate; }
+          if (depth < bestDepth){
+            bestDepth = depth;
+            nextHovered = hit;
+            activeInput = candidate;
+          }
         }
       }
     }
     hoveredId = nextHovered;
+
     const pinching = !!activeInput && isPinching(activeInput);
     if (pinching && hoveredId && !pressLockId) pressLockId = hoveredId;
     if (pinching && pressLockId) hoveredId = pressLockId;
     if (!pinching) pressLockId = null;
     if (hoveredId === lastHovered && hoveredId) hoverTime += dt;
-    else { lastHovered = hoveredId; hoverTime = hoveredId ? 0 : 0; pinchTime = 0; if (pressed) pressed = false; if (!hoveredId) pressLockId = null; }
+    else {
+      lastHovered = hoveredId;
+      hoverTime = hoveredId ? 0 : 0;
+      pinchTime = 0;
+      if (pressed) pressed = false;
+      if (!hoveredId) pressLockId = null;
+    }
+
     const buttons = buildButtons(getState());
     const activeBtn = buttons.find(btn => btn.id === hoveredId) || null;
+
     if (hoveredId && pinching) pinchTime += dt;
     else if (!pinching) pinchTime = 0;
+
     const directHold = activeBtn?.hold ?? (activeBtn?.pinchOnly ? 0.12 : 0.10);
     const directPressReady = !!activeBtn && pinching && pinchTime > directHold;
+
     if (hoveredId && !pressed && directPressReady){
       pressed = true;
       activate(hoveredId);
@@ -324,6 +354,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
       pinchTime = 0;
     }
     if (!pinching) pressed = false;
+
     draw();
   }
 

@@ -23,6 +23,7 @@ export const CONFIG = {
 
   DESKTOP_SPEED: 9.0,
   DESKTOP_BOOST: 3.0,
+  XR_MOVE_SPEED: 3.35,
 
   TABLE_TOP_Y: 0.90,
   CHAIR_COUNT: 6

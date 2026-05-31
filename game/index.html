@@ -1,109 +1,121 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>SVR Poker — Phase 168</title>
-  <meta name="theme-color" content="#050508" />
-  <meta http-equiv="refresh" content="1; url=./phase168.html?v=phase168-auto-open" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>ScarlettVR Poker • phase 39 hub scenes ad and pga presentation</title>
+  <meta name="theme-color" content="#050508"/>
+  <link rel="manifest" href="./manifest.json"/>
   <style>
-    html, body {
-      min-height: 100%;
-      margin: 0;
-      background: radial-gradient(circle at center, #171025 0%, #050508 48%, #000 100%);
-      color: #fff;
-      font-family: system-ui, Segoe UI, Arial, sans-serif;
-      overflow: hidden;
+    :root { color-scheme: dark; }
+    html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
+    #hud {
+      position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10;
+      display: flex; gap: 10px; align-items: center; justify-content: space-between;
+      pointer-events: none;
     }
-    .wrap {
-      position: fixed;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      text-align: center;
-    }
-    .card {
-      width: min(680px, 92vw);
-      border: 1px solid rgba(180, 140, 255, .42);
-      border-radius: 28px;
-      padding: 34px 28px;
-      background: rgba(5, 5, 12, .76);
-      box-shadow: 0 0 42px rgba(140, 90, 255, .25), inset 0 0 38px rgba(120, 255, 186, .06);
-      backdrop-filter: blur(10px);
-    }
-    h1 {
-      margin: 0 0 10px;
-      font-size: clamp(34px, 7vw, 68px);
-      letter-spacing: .08em;
-      color: #f4eaff;
-      text-shadow: 0 0 24px rgba(180, 140, 255, .75);
-    }
-    .build {
-      display: inline-block;
-      margin: 12px 0 22px;
-      padding: 8px 13px;
-      border: 1px solid rgba(120, 255, 186, .42);
+    .pill {
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.35);
+      backdrop-filter: blur(8px);
       border-radius: 999px;
-      color: #dfffee;
-      background: rgba(2, 10, 8, .55);
-      font-size: 13px;
-      letter-spacing: .04em;
+      padding: 8px 12px;
+      color: #e9e9ff;
+      font-size: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      pointer-events: none;
     }
-    p {
-      margin: 0 auto 20px;
-      max-width: 520px;
-      color: #d7d2ff;
-      line-height: 1.55;
-      font-size: 16px;
-    }
-    .actions {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 22px;
-    }
-    a, button {
-      appearance: none;
-      border: 1px solid rgba(180, 140, 255, .52);
-      border-radius: 999px;
-      padding: 12px 18px;
-      background: rgba(0, 0, 0, .45);
+    .btn {
+      pointer-events: auto;
+      border: 1px solid rgba(180,140,255,.45);
+      background: rgba(0,0,0,.55);
       color: #fff;
-      text-decoration: none;
-      font-weight: 700;
+      border-radius: 999px;
+      padding: 8px 12px;
       cursor: pointer;
-      box-shadow: 0 0 18px rgba(180, 140, 255, .18);
+      user-select: none;
     }
-    a.primary {
-      border-color: rgba(120, 255, 186, .65);
-      background: rgba(28, 74, 56, .42);
+    .btn:hover { background: rgba(60,40,90,.55); }
+    #sceneNav{
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+      pointer-events: auto;
     }
-    .note {
-      margin-top: 18px;
-      color: #a9a1d8;
-      font-size: 13px;
+    .scene-btn{
+      border: 1px solid rgba(120,255,186,.42);
+      background: rgba(2,10,8,.62);
+      color: #eafff4;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      font-size: 12px;
     }
+    .scene-btn:hover{ background: rgba(10,48,33,.72); }
+    body.preview-mode #sceneNav { display:none !important; }
+    #log {
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10;
+      max-height: 38vh; overflow: auto; display: none;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.25);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: #d7d7ff;
+      font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+    #err {
+      position: fixed; inset: 0; display: none; z-index: 50;
+      background: rgba(0,0,0,.88);
+      color: #fff;
+      padding: 18px;
+      font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      overflow: auto;
+    }
+
+    body.preview-mode #hud,
+    body.preview-mode #log,
+    body.preview-mode #err { display: none !important; }
   </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body>
-  <main class="wrap">
-    <section class="card">
-      <h1>SVR POKER</h1>
-      <div class="build">BUILD: PHASE-168-LOBBY-CLEANUP-TELEPORT-LOCK</div>
-      <p>Opening the active VR lobby now. If your browser does not auto-open, press the button below.</p>
-      <div class="actions">
-        <a class="primary" href="./phase168.html?v=phase168-auto-open">Open Game</a>
-        <a href="../site/">Open Site</a>
-      </div>
-      <div class="note">Quest / Desktop / Preview route locked to Phase 168.</div>
-    </section>
-  </main>
-  <script>
-    setTimeout(function(){
-      window.location.replace('./phase168.html?v=phase168-auto-open');
-    }, 650);
-  </script>
+  <div id="app"></div>
+
+  <div id="hud">
+    <div class="pill" id="status">Booting…</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
+      <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
+      <span class="pill" id="mode">Hands: …</span>
+      <span class="pill">BUILD: PHASE-84-TELEPORT-LOCOMOTION-LOCK</span>
+    </div>
+  </div>
+
+  <div id="sceneNav">
+    <button class="scene-btn" data-scene="lobby">Lobby</button>
+    <button class="scene-btn" data-scene="table">Table</button>
+    <button class="scene-btn" data-scene="seat">Seat</button>
+    <button class="scene-btn" data-scene="reiki">Reiki</button>
+    <button class="scene-btn" data-scene="reikiRoom">Zen Den</button>
+    <button class="scene-btn" data-scene="pga">PGA</button>
+    <button class="scene-btn" data-scene="legends">Legend</button>
+    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
+    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
+  </div>
+
+  <pre id="log"></pre>
+  <pre id="err"></pre>
+
+  <script type="module" src="./main.js"></script>
 </body>
 </html>

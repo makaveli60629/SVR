@@ -1,13 +1,8 @@
 {
-  "build": "PHASE-145-PLAYER-SHIM-BOOT-LOCK",
-  "label": "Player shim boot lock",
-  "scope": "game-only",
-  "siteTouched": false,
-  "date": "2026-05-29",
-  "notes": [
-    "Resolved game/index.html merge conflict markers that were blocking clean boot.",
-    "Added a boot-safe global player shim before main.js loads so main.js no longer crashes when exporting window.SVR_GAME.",
-    "Confirmed direct deploy workflow builds from committed files and excludes update/*.zip and *.fbx.",
-    "Preserved lobby, private scene routing, watch, teleport modules, and site lock."
-  ]
+  "build": "PHASE-84-TELEPORT-LOCOMOTION-LOCK",
+  "phase": 84,
+  "name": "Teleporter Locomotion Lock",
+  "updatedAt": "2026-05-31T00:00:00-05:00",
+  "scope": "game-side only: teleport.js locomotion repair, right-stick movement, hold/release teleport, watch controller fallback",
+  "siteTouched": false
 }
