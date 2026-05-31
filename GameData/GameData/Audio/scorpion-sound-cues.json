@@ -1,0 +1,14 @@
+{
+  "roomId": "scorpion-room",
+  "autoplay": false,
+  "unlock": "user-interaction-or-xr-session",
+  "cues": [
+    "chip-click",
+    "chip-stack",
+    "card-slide",
+    "card-flip",
+    "timer-warning",
+    "winner-sweep",
+    "soft-room-ambience"
+  ]
+}

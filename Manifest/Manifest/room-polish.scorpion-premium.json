@@ -1,0 +1,174 @@
+{
+  "manifestVersion": "1.0.0",
+  "updateId": "scorpion-room-premium-poker-polish-lock",
+  "phaseName": "Scorpion Room Premium Poker Polish Lock",
+  "phaseNumber": 32,
+  "status": "ready-for-local-apply",
+  "targetRoom": {
+    "id": "scorpion-room",
+    "displayName": "Scorpion Room",
+    "type": "private-premium-poker-suite",
+    "cameraMode": "seated-table",
+    "locomotionMode": "locked-seated-with-leave-seat"
+  },
+  "scope": {
+    "primaryGoal": "Polish the Scorpion Room into a premium private seated poker suite while preserving lobby, site, Reiki, PGA, and global movement locks.",
+    "included": [
+      "Premium black/gold/red Scorpion Room atmosphere data",
+      "Casino table polish data with padded rail, pass/bet line, pot glow, and chip/card zones",
+      "Readable poker UI data: pot label, active turn ring, action timer, winner banner, hand history strip",
+      "Player action placeholders: Fold, Check, Call, Raise, All-In, Next Hand",
+      "Bot action bubble placeholders",
+      "Private hand peek placeholder",
+      "Camera3 cinematic room tour data",
+      "Low-cost sound cue manifest placeholders",
+      "Performance and Quest safety checklist",
+      "Validation and report output"
+    ],
+    "excludedForNow": [
+      "Website/site edits",
+      "Lobby redesign",
+      "Reiki or PGA changes",
+      "Real-money gambling",
+      "Final backend multiplayer",
+      "Heavy FBX avatar imports"
+    ]
+  },
+  "locks": {
+    "siteUntouched": true,
+    "preserveOriginalLobby": true,
+    "scorpionPrivateRoomOnly": true,
+    "keepUnder25MB": true,
+    "dealerBodyDisabled": true,
+    "invisibleDealerLogicPreserved": true,
+    "leftToRightDealing": true,
+    "fiveBotsOneOpenSouthSeat": true,
+    "protectQuestControllerFallback": true,
+    "protectHandTeleportFallback": true
+  },
+  "features": {
+    "roomAtmosphere": {
+      "enabled": true,
+      "palette": [
+        "black",
+        "gold",
+        "deep red",
+        "purple accent"
+      ],
+      "elements": [
+        "city overlook glass",
+        "neon safety rail",
+        "Scorpion Room sign",
+        "wall plaque",
+        "low ceiling accent lights",
+        "under-table glow"
+      ]
+    },
+    "tablePolish": {
+      "enabled": true,
+      "elements": [
+        "thick padded rail",
+        "cup holder rings",
+        "center SVR + Scorpion emblem",
+        "gold pass/bet line",
+        "chip stack circles",
+        "raised card zones",
+        "pot highlight glow",
+        "dealer button markers"
+      ]
+    },
+    "pokerUI": {
+      "enabled": true,
+      "potLabel": true,
+      "activeTurnRing": true,
+      "actionTimerSeconds": 20,
+      "winnerBanner": true,
+      "winningHandText": true,
+      "handHistoryStrip": true,
+      "watchYourTurnAlert": true
+    },
+    "actions": {
+      "enabled": true,
+      "buttons": [
+        "Fold",
+        "Check",
+        "Call",
+        "Raise",
+        "All-In",
+        "Next Hand"
+      ],
+      "timeoutRules": {
+        "whenNoBet": "auto-check",
+        "whenFacingBet": "auto-fold"
+      }
+    },
+    "privateHandPeek": {
+      "enabled": true,
+      "mode": "watch-button-placeholder",
+      "futureMode": "grab-or-tilt-cards"
+    },
+    "camera3": {
+      "enabled": true,
+      "mode": "cinematic-room-tour",
+      "speed": "slow",
+      "shots": [
+        "table-close-up",
+        "chip-stacks",
+        "community-cards",
+        "active-player",
+        "city-overlook",
+        "scorpion-sign",
+        "winner-sweep"
+      ]
+    },
+    "soundCues": {
+      "enabled": true,
+      "autoplay": false,
+      "cues": [
+        "chip-click",
+        "chip-stack",
+        "card-slide",
+        "card-flip",
+        "timer-warning",
+        "winner-sweep",
+        "soft-room-ambience"
+      ]
+    }
+  },
+  "filesToCreateOrUpdate": {
+    "manifest": "Manifest/room-polish.scorpion-premium.json",
+    "applyScript": "Tools/SVR-ApplyScorpionPolish.ps1",
+    "roomPolishData": "GameData/Rooms/scorpion-premium-polish.json",
+    "pokerUIData": "GameData/UI/scorpion-poker-ui.json",
+    "pokerActionData": "GameData/Poker/scorpion-actions.json",
+    "camera3Data": "GameData/Camera/scorpion-camera3-tour.json",
+    "audioData": "GameData/Audio/scorpion-sound-cues.json",
+    "reportOutput": "Reports/scorpion-premium-polish-report.txt"
+  },
+  "validation": {
+    "requiredChecks": [
+      "Manifest exists and is valid JSON",
+      "Room polish data is generated",
+      "Poker UI data is generated",
+      "Action button placeholder data is generated",
+      "Camera3 tour data is generated",
+      "Sound cue manifest is generated",
+      "Site files are not modified by this script",
+      "Game zip size rule remains documented",
+      "Report is generated"
+    ],
+    "passCriteria": [
+      "Scorpion polish files exist",
+      "No website/site files are changed by this updater",
+      "Lobby protection flag is present",
+      "Poker action timer is set to 20 seconds",
+      "Left-to-right dealing lock remains true",
+      "Report lists created/updated files"
+    ]
+  },
+  "notes": [
+    "This pack is a safe data/manifest polish layer. It prepares the room polish without rewriting the live game runtime directly.",
+    "Use the generated JSON files as source-of-truth for the next code module pass if needed.",
+    "Private Scorpion Room changes must not affect global lobby movement or other private scenes."
+  ]
+}

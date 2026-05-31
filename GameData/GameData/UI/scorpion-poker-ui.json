@@ -1,0 +1,11 @@
+{
+  "roomId": "scorpion-room",
+  "potLabel": true,
+  "activeTurnRing": true,
+  "actionTimerSeconds": 20,
+  "winnerBanner": true,
+  "winningHandText": true,
+  "handHistoryStrip": true,
+  "watchAlert": "YOUR TURN",
+  "readability": "large-vr-friendly"
+}

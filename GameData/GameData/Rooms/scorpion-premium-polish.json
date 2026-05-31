@@ -1,0 +1,46 @@
+{
+  "roomId": "scorpion-room",
+  "phase": "PHASE-32-SCORPION-PREMIUM-POKER-POLISH-LOCK",
+  "premiumAtmosphere": {
+    "enabled": true,
+    "palette": [
+      "black",
+      "gold",
+      "deep red",
+      "purple accent"
+    ],
+    "elements": [
+      "city overlook glass",
+      "neon safety rail",
+      "Scorpion Room sign",
+      "wall plaque",
+      "low ceiling accent lights",
+      "under-table glow"
+    ]
+  },
+  "tablePolish": {
+    "enabled": true,
+    "elements": [
+      "thick padded rail",
+      "cup holder rings",
+      "center SVR + Scorpion emblem",
+      "gold pass/bet line",
+      "chip stack circles",
+      "raised card zones",
+      "pot highlight glow",
+      "dealer button markers"
+    ]
+  },
+  "locks": {
+    "siteUntouched": true,
+    "preserveOriginalLobby": true,
+    "scorpionPrivateRoomOnly": true,
+    "keepUnder25MB": true,
+    "dealerBodyDisabled": true,
+    "invisibleDealerLogicPreserved": true,
+    "leftToRightDealing": true,
+    "fiveBotsOneOpenSouthSeat": true,
+    "protectQuestControllerFallback": true,
+    "protectHandTeleportFallback": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "roomId": "scorpion-room",
+  "actions": [
+    "Fold",
+    "Check",
+    "Call",
+    "Raise",
+    "All-In",
+    "Next Hand"
+  ],
+  "keyboard": {
+    "Fold": "F",
+    "Check": "K",
+    "Call": "C",
+    "Raise": "R",
+    "All-In": "A",
+    "Next Hand": "H"
+  },
+  "timeout": {
+    "seconds": 20,
+    "noBet": "auto-check",
+    "facingBet": "auto-fold"
+  }
+}

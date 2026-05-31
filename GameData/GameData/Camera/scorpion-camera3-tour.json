@@ -1,0 +1,17 @@
+{
+  "roomId": "scorpion-room",
+  "camera3": {
+    "enabled": true,
+    "loop": true,
+    "speed": "slow",
+    "shots": [
+      "table-close-up",
+      "chip-stacks",
+      "community-cards",
+      "active-player",
+      "city-overlook",
+      "scorpion-sign",
+      "winner-sweep"
+    ]
+  }
+}
