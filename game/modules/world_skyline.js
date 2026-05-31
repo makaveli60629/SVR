@@ -582,6 +582,8 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   const root = new THREE.Group();
   root.position.copy(center);
   root.lookAt(root.position.clone().add(inward));
+  // Phase 92: storefront canvas panels were readable from the wrong side. Flip the root so text faces the lobby.
+  root.rotateY(Math.PI);
   scene.add(root);
 
   const frameMat = new THREE.MeshStandardMaterial({ color: 0x11161a, roughness: 0.28, metalness: 0.30, emissive: 0x14323a, emissiveIntensity: 0.22 });
@@ -659,6 +661,21 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   const signB = new THREE.Mesh(new THREE.PlaneGeometry(6.44, 0.70), new THREE.MeshBasicMaterial({ map: signTexB, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   signB.position.copy(signBackB.position).add(new THREE.Vector3(0,0,0.02));
   root.add(signB);
+
+  // Phase 92: purple chakra symbols for the Reiki storefront. Approval-safe decorative placeholders.
+  const chakraDefs = [
+    ['लं', 'root'], ['वं', 'sacral'], ['रं', 'solar'], ['यं', 'heart'], ['हं', 'throat'], ['ॐ', 'third eye'], ['☸', 'crown']
+  ];
+  chakraDefs.forEach(([symbol, label], idx)=>{
+    const chakraTex = createChakraSymbolTexture(symbol, label);
+    const chakra = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.52, 0.52),
+      new THREE.MeshBasicMaterial({ map: chakraTex, transparent: true, opacity: 0.96, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })
+    );
+    chakra.position.set(-3.55 + idx * 1.18, 3.62, 0.76);
+    chakra.renderOrder = 46;
+    root.add(chakra);
+  });
 
   const logoPlate = new THREE.Mesh(new THREE.PlaneGeometry(0.98, 0.62), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   logoPlate.position.set(-4.95, 4.68, 0.73);
@@ -804,6 +821,16 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   const portalHoloRing = new THREE.Mesh(new THREE.TorusGeometry(1.88, 0.018, 10, 96), portalHoloRingMat);
   portalHoloRing.position.set(0, 0, -0.025);
   portalHolo.add(portalHoloRing);
+  // Phase 92: purple chakra orbit dots around the Reiki portal tag.
+  const holoChakras = ['लं','वं','रं','यं','हं','ॐ','☸'];
+  holoChakras.forEach((symbol, idx)=>{
+    const a = idx * Math.PI * 2 / holoChakras.length - Math.PI / 2;
+    const tex = createChakraSymbolTexture(symbol, '');
+    const disk = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.92, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));
+    disk.position.set(Math.cos(a) * 1.94, Math.sin(a) * 0.86, -0.045);
+    disk.renderOrder = 48;
+    portalHolo.add(disk);
+  });
   scene.userData._reikiPortalHologram = { group: portalHolo, baseY: portalHolo.position.y, panel: portalHoloPanel, ring: portalHoloRing };
 
   const postMat = new THREE.MeshStandardMaterial({ color: 0xd9d1dc, roughness: 0.26, metalness: 0.76, emissive: 0x28333a, emissiveIntensity: 0.12 });
@@ -876,7 +903,8 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     center: center.clone(),
     target: hubTarget,
     roomTarget,
-    look: center.clone().addScaledVector(inward, -2.0)
+    // Phase 92: look target faces the readable side from the lobby/player side.
+    look: center.clone().addScaledVector(inward, 2.0)
   };
 }
 
@@ -1046,131 +1074,152 @@ function createPlaqueTexture(title = "legend", subtitle = "hall of fame"){
 
 
 function createSouthMissionWallTexture(){
-  return canvasTexture(1800, 1200, (x,w,h)=>{
+  return canvasTexture(2400, 1600, (x,w,h)=>{
     const bg = x.createLinearGradient(0,0,w,h);
-    bg.addColorStop(0, '#05060a');
-    bg.addColorStop(0.42, '#140a21');
-    bg.addColorStop(1, '#05060a');
+    bg.addColorStop(0, '#03050a');
+    bg.addColorStop(0.40, '#140923');
+    bg.addColorStop(0.72, '#070a14');
+    bg.addColorStop(1, '#020308');
     x.fillStyle = bg; x.fillRect(0,0,w,h);
 
-    // Neon frame
-    x.strokeStyle = 'rgba(188,140,255,0.96)'; x.lineWidth = 18; roundRectPath(x, 34, 34, w-68, h-68, 46); x.stroke();
-    x.strokeStyle = 'rgba(117,225,255,0.72)'; x.lineWidth = 8; roundRectPath(x, 64, 64, w-128, h-128, 36); x.stroke();
+    // Premium neon frame, readable from table distance.
+    x.strokeStyle = 'rgba(188,140,255,0.98)'; x.lineWidth = 22; roundRectPath(x, 42, 42, w-84, h-84, 58); x.stroke();
+    x.strokeStyle = 'rgba(102,255,226,0.80)'; x.lineWidth = 10; roundRectPath(x, 82, 82, w-164, h-164, 44); x.stroke();
+    x.strokeStyle = 'rgba(255,221,137,0.52)'; x.lineWidth = 5; roundRectPath(x, 116, 116, w-232, h-232, 34); x.stroke();
 
-    // Soft glow behind wing logo
-    const glow = x.createRadialGradient(w/2, 430, 30, w/2, 430, 420);
-    glow.addColorStop(0, 'rgba(255,245,210,0.34)');
-    glow.addColorStop(0.45, 'rgba(188,140,255,0.13)');
+    // Header block.
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.shadowColor = 'rgba(188,140,255,0.98)'; x.shadowBlur = 36;
+    x.fillStyle = '#ffffff'; x.font = '900 118px system-ui, Arial'; x.fillText('ABOUT SVR POKER', w/2, 152);
+    x.shadowColor = 'rgba(117,225,255,0.88)'; x.shadowBlur = 22;
+    x.fillStyle = '#e3fbff'; x.font = '900 58px system-ui, Arial'; x.fillText('PLAY-MONEY POKER • COMMUNITY IMPACT • SPONSOR PORTALS', w/2, 252);
+    x.shadowBlur = 0;
+
+    // Angel wing placeholder emblem, raised and separated from the ad slot.
+    const glow = x.createRadialGradient(w/2, 505, 40, w/2, 505, 500);
+    glow.addColorStop(0, 'rgba(255,244,204,0.38)');
+    glow.addColorStop(0.48, 'rgba(188,140,255,0.14)');
     glow.addColorStop(1, 'rgba(0,0,0,0)');
     x.fillStyle = glow; x.fillRect(0,0,w,h);
-
-    // Angel wing placeholder emblem: drawn locally, no outside brand asset.
     x.save();
-    x.translate(w/2, 342);
-    x.strokeStyle = 'rgba(255,238,184,0.92)';
-    x.lineWidth = 12;
+    x.translate(w/2, 485);
+    x.strokeStyle = 'rgba(255,238,184,0.95)';
+    x.lineWidth = 15;
     x.lineCap = 'round';
     for (const side of [-1, 1]){
       for (let i=0; i<8; i++){
-        const spread = 82 + i*28;
-        const drop = 34 + i*26;
+        const spread = 104 + i*34;
+        const drop = 34 + i*24;
         x.beginPath();
-        x.moveTo(side*70, 22+i*4);
-        x.bezierCurveTo(side*(120+spread), -70+i*8, side*(210+spread), 48+i*16, side*(120+spread*0.32), drop+70);
+        x.moveTo(side*88, 20+i*4);
+        x.bezierCurveTo(side*(145+spread), -98+i*8, side*(260+spread), 50+i*16, side*(142+spread*0.32), drop+82);
         x.stroke();
       }
     }
-    x.strokeStyle = 'rgba(255,220,120,0.96)';
-    x.lineWidth = 10;
-    x.beginPath(); x.ellipse(0, -112, 102, 34, 0, 0, Math.PI*2); x.stroke();
-    x.fillStyle = '#fff7d8'; x.font = 'bold 92px system-ui, Arial'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('SVR', 0, 30);
+    x.strokeStyle = 'rgba(255,223,128,1.0)';
+    x.lineWidth = 12;
+    x.beginPath(); x.ellipse(0, -142, 132, 44, 0, 0, Math.PI*2); x.stroke();
+    x.fillStyle = '#fff7d8'; x.font = '900 126px system-ui, Arial'; x.fillText('SVR', 0, 38);
+    x.fillStyle = 'rgba(255,255,255,0.82)'; x.font = '800 38px system-ui, Arial'; x.fillText('CHARITY MISSION PLACEHOLDER', 0, 128);
     x.restore();
 
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.shadowColor = 'rgba(188,140,255,0.95)'; x.shadowBlur = 30;
-    x.fillStyle = '#ffffff'; x.font = 'bold 86px system-ui, Arial'; x.fillText('ABOUT SVR POKER', w/2, 104);
-    x.shadowColor = 'rgba(117,225,255,0.82)'; x.shadowBlur = 18;
-    x.fillStyle = '#dffcff'; x.font = 'bold 54px system-ui, Arial'; x.fillText('PLAY-MONEY POKER • SPONSORSHIP • COMMUNITY IMPACT', w/2, 186);
-    x.shadowBlur = 0;
-
-    const mission = [
-      'SVR Poker is a play-money VR poker and social destination hub.',
-      'Sponsors, ads, stores, events, and private rooms can support community giveback.',
-      'Mission focus: animal welfare, homelessness relief, poverty relief, and access for isolated or immobile users.',
-      'No real-money gambling. Promotions, prizes, and campaigns require rules, sponsor funding, and legal review.'
+    const cards = [
+      ['MISSION', 'SVR Poker is a play-money VR poker and social destination hub built for fun, community, and future giveback.'],
+      ['HOW IT HELPS', 'Sponsor ads, stores, events, tournaments, and private rooms can support approved community campaigns.'],
+      ['CAUSES', 'Animal welfare • homelessness relief • poverty relief • access for sick, isolated, immobile, or homebound users.'],
+      ['COMPLIANCE', 'No real-money gambling. Prizes, sponsor campaigns, and donations require rules, approval, and legal review.']
     ];
-    x.font = 'bold 39px system-ui, Arial';
-    mission.forEach((line, i)=>{
-      const yy = 612 + i*86;
-      const row = x.createLinearGradient(180, yy-34, w-180, yy+34);
-      row.addColorStop(0, 'rgba(188,140,255,0.12)');
-      row.addColorStop(0.5, i % 2 ? 'rgba(92,255,216,0.22)' : 'rgba(255,224,140,0.20)');
-      row.addColorStop(1, 'rgba(188,140,255,0.12)');
-      x.fillStyle = row; roundRectPath(x, 160, yy-39, w-320, 78, 24); x.fill();
-      x.strokeStyle = i % 2 ? 'rgba(92,255,216,0.45)' : 'rgba(255,224,140,0.42)';
-      x.lineWidth = 4; roundRectPath(x, 160, yy-39, w-320, 78, 24); x.stroke();
-      x.fillStyle = '#f8fbff'; x.fillText(line, w/2, yy);
+    function drawWrapped(text, cx, y, maxWidth, lineHeight){
+      const words = String(text).split(/\s+/);
+      let line = '', lines = [];
+      for (const word of words){
+        const test = line ? line + ' ' + word : word;
+        if (x.measureText(test).width > maxWidth && line){ lines.push(line); line = word; }
+        else line = test;
+      }
+      if (line) lines.push(line);
+      lines.forEach((ln, i)=>x.fillText(ln, cx, y + i*lineHeight));
+      return lines.length;
+    }
+    cards.forEach((card, i)=>{
+      const col = i % 2;
+      const row = Math.floor(i / 2);
+      const bx = 170 + col * 1030;
+      const by = 780 + row * 230;
+      const bw = 990, bh = 178;
+      const g = x.createLinearGradient(bx, by, bx+bw, by+bh);
+      g.addColorStop(0, 'rgba(188,140,255,0.16)');
+      g.addColorStop(0.52, i % 2 ? 'rgba(92,255,216,0.19)' : 'rgba(255,224,140,0.17)');
+      g.addColorStop(1, 'rgba(188,140,255,0.10)');
+      x.fillStyle = g; roundRectPath(x, bx, by, bw, bh, 30); x.fill();
+      x.strokeStyle = i % 2 ? 'rgba(92,255,216,0.55)' : 'rgba(255,224,140,0.52)';
+      x.lineWidth = 5; roundRectPath(x, bx, by, bw, bh, 30); x.stroke();
+      x.textAlign = 'left'; x.textBaseline = 'top';
+      x.fillStyle = i % 2 ? '#8dffdf' : '#ffe28a'; x.font = '900 42px system-ui, Arial'; x.fillText(card[0], bx+42, by+26);
+      x.fillStyle = '#f8fbff'; x.font = '800 32px system-ui, Arial'; drawWrapped(card[1], bx+42, by+82, bw-84, 40);
     });
 
-    // Temporary ad/logo placeholder requested by owner.
-    const px = 310, py = 990, pw = w-620, ph = 126;
+    // Temporary Espresso With Cream placeholder requested by owner.
+    const px = 430, py = 1284, pw = w-860, ph = 190;
     const ad = x.createLinearGradient(px, py, px+pw, py+ph);
-    ad.addColorStop(0, '#27140a'); ad.addColorStop(0.5, '#6f3c1b'); ad.addColorStop(1, '#27140a');
-    x.fillStyle = ad; roundRectPath(x, px, py, pw, ph, 30); x.fill();
-    x.strokeStyle = 'rgba(255,206,132,0.88)'; x.lineWidth = 8; roundRectPath(x, px+8, py+8, pw-16, ph-16, 24); x.stroke();
-    x.fillStyle = '#ffe8c0'; x.font = 'bold 52px system-ui, Arial'; x.fillText('ESPRESSO WITH CREAM', w/2, py+52);
-    x.fillStyle = '#fff7e7'; x.font = 'bold 28px system-ui, Arial'; x.fillText('TEMPORARY PLACEHOLDER FOR CHARITY MISSION / ANGEL WING LOGO', w/2, py+94);
+    ad.addColorStop(0, '#241006'); ad.addColorStop(0.45, '#7c461e'); ad.addColorStop(1, '#231006');
+    x.fillStyle = ad; roundRectPath(x, px, py, pw, ph, 34); x.fill();
+    x.strokeStyle = 'rgba(255,206,132,0.94)'; x.lineWidth = 10; roundRectPath(x, px+10, py+10, pw-20, ph-20, 26); x.stroke();
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#ffe8c0'; x.font = '900 70px system-ui, Arial'; x.fillText('ESPRESSO WITH CREAM', w/2, py+78);
+    x.fillStyle = '#fff7e7'; x.font = '800 34px system-ui, Arial'; x.fillText('TEMPORARY PLACEHOLDER UNTIL FINAL ANGEL-WING MISSION LOGO IS APPROVED', w/2, py+132);
   });
 }
 
 function addSouthMissionWall(scene, R, wallHeight, logoTex = null, espressoTex = null){
   const angle = Math.PI * 0.5;
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
-  const center = new THREE.Vector3(Math.cos(angle) * (R - 0.24), wallHeight * 0.52, Math.sin(angle) * (R - 0.24));
+  const center = new THREE.Vector3(Math.cos(angle) * (R - 0.24), wallHeight * 0.53, Math.sin(angle) * (R - 0.24));
+  const panelW = 14.8;
+  const panelH = Math.max(6.85, wallHeight - 0.12);
   const panel = new THREE.Mesh(
-    new THREE.PlaneGeometry(11.8, Math.max(5.4, wallHeight - 0.64)),
+    new THREE.PlaneGeometry(panelW, panelH),
     new THREE.MeshBasicMaterial({ map: createSouthMissionWallTexture(), transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: true })
   );
-  panel.position.copy(center).addScaledVector(inward, 0.18);
+  panel.position.copy(center).addScaledVector(inward, 0.20);
   panel.lookAt(0, panel.position.y, 0);
   panel.renderOrder = 42;
   scene.add(panel);
 
   const glow = new THREE.Mesh(
-    new THREE.PlaneGeometry(12.3, Math.max(5.8, wallHeight - 0.30)),
-    new THREE.MeshBasicMaterial({ color: 0xa66dff, transparent: true, opacity: 0.10, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })
+    new THREE.PlaneGeometry(panelW + 0.62, panelH + 0.44),
+    new THREE.MeshBasicMaterial({ color: 0xa66dff, transparent: true, opacity: 0.13, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })
   );
   glow.position.copy(panel.position).addScaledVector(inward, 0.03);
   glow.lookAt(0, glow.position.y, 0);
   glow.renderOrder = 41;
   scene.add(glow);
 
-  // Optional small SVR logo cap above the mission panel.
+  // Optional SVR cap above the mission panel, kept clear of the mission text.
   if (logoTex){
     const logo = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.55, 1.55),
+      new THREE.PlaneGeometry(1.35, 1.35),
       new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, side: THREE.DoubleSide, depthWrite: false })
     );
-    logo.position.copy(panel.position).add(new THREE.Vector3(0, Math.max(2.45, wallHeight * 0.28), 0)).addScaledVector(inward, 0.04);
+    logo.position.copy(panel.position).add(new THREE.Vector3(0, panelH * 0.50 + 0.62, 0)).addScaledVector(inward, 0.05);
     logo.lookAt(0, logo.position.y, 0);
     logo.renderOrder = 43;
     scene.add(logo);
   }
 
-
-  // Phase 88: actual Espresso With Cream placeholder tile layered on the mission wall.
+  // Phase 91: larger, cleaner Espresso placeholder tile anchored low so it no longer blocks the wing emblem.
   if (espressoTex){
     const espressoTile = new THREE.Mesh(
-      new THREE.PlaneGeometry(4.35, 1.28),
+      new THREE.PlaneGeometry(5.8, 1.72),
       new THREE.MeshBasicMaterial({ map: espressoTex, transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: true })
     );
-    espressoTile.position.copy(panel.position).add(new THREE.Vector3(0, -2.18, 0)).addScaledVector(inward, 0.065);
+    espressoTile.position.copy(panel.position).add(new THREE.Vector3(0, -panelH * 0.40, 0)).addScaledVector(inward, 0.075);
     espressoTile.lookAt(0, espressoTile.position.y, 0);
     espressoTile.renderOrder = 44;
     scene.add(espressoTile);
     const espressoGlow = new THREE.Mesh(
-      new THREE.PlaneGeometry(4.58, 1.44),
-      new THREE.MeshBasicMaterial({ color: 0xffc47a, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })
+      new THREE.PlaneGeometry(6.06, 1.94),
+      new THREE.MeshBasicMaterial({ color: 0xffc47a, transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })
     );
     espressoGlow.position.copy(espressoTile.position).addScaledVector(inward, 0.02);
     espressoGlow.lookAt(0, espressoGlow.position.y, 0);
@@ -1200,6 +1249,44 @@ function createPortalTagTexture(title = 'PORTAL', subtitle = 'private scene', co
   });
 }
 
+function createChakraSymbolTexture(symbol = 'ॐ', label = 'CHAKRA'){
+  return canvasTexture(420, 420, (x,w,h)=>{
+    x.clearRect(0,0,w,h);
+    const cx = w/2, cy = h/2;
+    const g = x.createRadialGradient(cx, cy, 8, cx, cy, w*0.48);
+    g.addColorStop(0, 'rgba(255,255,255,0.95)');
+    g.addColorStop(0.18, 'rgba(226,185,255,0.84)');
+    g.addColorStop(0.48, 'rgba(164,78,255,0.42)');
+    g.addColorStop(1, 'rgba(88,20,140,0.02)');
+    x.fillStyle = g;
+    x.beginPath(); x.arc(cx, cy, w*0.47, 0, Math.PI*2); x.fill();
+    x.strokeStyle = 'rgba(211,129,255,0.98)';
+    x.lineWidth = 9;
+    x.beginPath(); x.arc(cx, cy, w*0.39, 0, Math.PI*2); x.stroke();
+    x.strokeStyle = 'rgba(255,230,255,0.88)';
+    x.lineWidth = 3;
+    for (let i=0;i<12;i++){
+      const a = i * Math.PI*2/12;
+      const x1 = cx + Math.cos(a) * w*0.29;
+      const y1 = cy + Math.sin(a) * w*0.29;
+      const x2 = cx + Math.cos(a) * w*0.42;
+      const y2 = cy + Math.sin(a) * w*0.42;
+      x.beginPath(); x.moveTo(x1,y1); x.lineTo(x2,y2); x.stroke();
+    }
+    x.shadowColor = '#d58cff';
+    x.shadowBlur = 28;
+    x.fillStyle = '#ffffff';
+    x.textAlign = 'center';
+    x.textBaseline = 'middle';
+    x.font = 'bold 104px system-ui, Arial, sans-serif';
+    x.fillText(symbol, cx, cy - 12);
+    x.shadowBlur = 0;
+    x.fillStyle = 'rgba(238,214,255,0.96)';
+    x.font = 'bold 32px system-ui, Arial, sans-serif';
+    x.fillText(String(label).toUpperCase(), cx, cy + 112);
+  });
+
+
 function addFloatingPortalTag(scene, position, lookTarget, title, subtitle, colorA = '#7effe7', colorB = '#b68cff'){
   if (!position) return null;
   const group = new THREE.Group();
@@ -1216,7 +1303,11 @@ function addFloatingPortalTag(scene, position, lookTarget, title, subtitle, colo
   );
   ring.position.z = -0.035;
   group.add(ring);
-  if (lookTarget) group.lookAt(lookTarget.clone().setY(group.position.y));
+  if (lookTarget) {
+    group.lookAt(lookTarget.clone().setY(group.position.y));
+    // Phase 92: rotate the portal tag face toward the player so canvas text is not mirrored from the back side.
+    group.rotateY(Math.PI);
+  }
   scene.add(group);
   return { group, panel, ring, baseY: group.position.y };
 }
@@ -1239,9 +1330,13 @@ function addVisiblePortalBeacon(scene, position, lookTarget, label, color = 0x7e
   const capTex = createPortalTagTexture(label, 'STEP IN / SELECT BUTTON', '#ffffff', '#7effe7');
   const cap = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 0.62), new THREE.MeshBasicMaterial({ map: capTex, transparent: true, opacity: 0.94, depthWrite: false, side: THREE.DoubleSide }));
   cap.position.y = 2.8;
-  if (lookTarget) cap.lookAt(lookTarget.clone().setY(cap.position.y));
+  // Phase 92: keep cap rotation neutral and rotate the whole beacon to face the player.
+  cap.rotation.set(0, 0, 0);
   group.add(cap);
-  if (lookTarget) group.lookAt(lookTarget.clone().setY(group.position.y));
+  if (lookTarget) {
+    group.lookAt(lookTarget.clone().setY(group.position.y));
+    group.rotateY(Math.PI);
+  }
   scene.add(group);
   return { group, ring, beam, cap, baseY: group.position.y };
 }
@@ -2527,7 +2622,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const lobbyInfoBoards = addSouthMissionWall(scene, R, wallHeight, spawnLogoTex, espressoAdTex);
 
   const portalHolograms = [];
-  portalHolograms.push(addFloatingPortalTag(scene, reikiHub?.target, reikiHub?.look, 'Reiki Portal', 'Trueitive approval pending', '#7effe7', '#ff9fb0'));
+  portalHolograms.push(addFloatingPortalTag(scene, reikiHub?.target, reikiHub?.look, 'Reiki Portal', 'Trueitive / Shyona placeholder', '#7effe7', '#d58cff'));
   if (scene.userData._pgaHub) portalHolograms.push(addFloatingPortalTag(scene, scene.userData._pgaHub.group.position.clone().add(scene.userData._pgaHub.inward.clone().multiplyScalar(3.0)).setY(0), scene.userData._pgaHub.group.position.clone().setY(1.8), 'PGA Portal', 'private golf training', '#8dd6ff', '#ffdf8a'));
   portalHolograms.push(addFloatingPortalTag(scene, loungeStorefront?.target, loungeStorefront?.look, 'SVR Lounge', 'private social room', '#d58cff', '#8dffcf'));
   portalHolograms.push(addFloatingPortalTag(scene, storeWall?.group?.position?.clone().multiplyScalar(0.86).setY(0), storeWall?.group?.position?.clone().setY(1.7), 'VR Store', 'website store portal', '#8dffcf', '#b68cff'));
@@ -2574,7 +2669,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(6.8, 56, 56),
+    new THREE.SphereGeometry(11.2, 72, 72),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2586,16 +2681,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-104, wallHeight + 270.0, -(R + 520.0));
+  moon.position.set(-128, wallHeight + 430.0, -(R + 760.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(68.0, 68.0, 1);
+  moonHalo.scale.set(132.0, 132.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(4.0, 44, 44),
+    new THREE.SphereGeometry(7.2, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2607,13 +2702,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  mars.position.set(148, wallHeight + 300.0, -(R + 610.0));
+  mars.position.set(178, wallHeight + 470.0, -(R + 880.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(45.0, 45.0, 1);
+  marsHalo.scale.set(88.0, 88.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2639,9 +2734,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.75, 560, 1.45);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 3.35, 720, 1.35);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 1.75, 420, 1.55);
+  const marsGlow = new THREE.PointLight(0xff9a72, 2.35, 580, 1.45);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
@@ -2819,26 +2914,26 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
     moon.position.set(
-      -92 + Math.sin(t * 0.016) * 7.0,
-      wallHeight + 270.0 + Math.sin(t * 0.055) * 2.2,
-      -(R + 520.0) + Math.cos(t * 0.012) * 8.0
+      -128 + Math.sin(t * 0.014) * 10.0,
+      wallHeight + 430.0 + Math.sin(t * 0.050) * 4.0,
+      -(R + 760.0) + Math.cos(t * 0.010) * 12.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     mars.position.set(
-      132 + Math.sin(t * 0.014 + 1.4) * 8.5,
-      wallHeight + 305.0 + Math.sin(t * 0.050 + 0.8) * 2.0,
-      -(R + 625.0) + Math.cos(t * 0.010 + 0.4) * 7.0
+      178 + Math.sin(t * 0.012 + 1.4) * 12.0,
+      wallHeight + 470.0 + Math.sin(t * 0.044 + 0.8) * 4.0,
+      -(R + 880.0) + Math.cos(t * 0.009 + 0.4) * 12.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.045 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.060 + 0.014 * (0.5 + 0.5 * Math.sin(t * 0.20));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.026 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.040 + 0.012 * (0.5 + 0.5 * Math.sin(t * 0.22));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{

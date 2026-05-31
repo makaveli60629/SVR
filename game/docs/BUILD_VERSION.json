@@ -1,15 +1,16 @@
 {
-  "build": "PHASE-90-LOUNGE-SKY-LOCK",
-  "phase": 90,
-  "name": "Lounge Sky Lock",
+  "build": "PHASE-91-MISSION-WALL-SKY-SIZE-LOCK",
+  "phase": 91,
+  "name": "Mission Wall Sky Size Lock",
   "date": "2026-05-31",
   "siteTouched": false,
-  "scope": "game-side only: create a clearer SVR Lounge storefront/private scene and raise Moon/Mars much higher behind the skyline",
+  "scope": "game-side only: refine the south mission wall for readability, enlarge the Espresso placeholder placement, and make Moon/Mars larger and higher in the night sky",
   "notes": [
-    "Built a stronger visible SVR Lounge storefront with a doorway arch, portal beam, seating props, larger hologram, and brighter portal target.",
-    "Added a full private lounge page at game/lounge.html and kept game/smoker-lounge.html as a compatible lounge route.",
-    "Raised Moon and Mars much higher and farther behind the skyline in both initial placement and runtime orbit updates.",
-    "Preserved visible portal beacons, Reiki Trueitive/Shyona waiting-for-approval placeholders, and all private scene routes.",
+    "Rebuilt the south About SVR Poker mission wall with larger readable text, shorter wrapped mission blocks, a clearer angel-wing placeholder emblem, and a clean Espresso With Cream placeholder tile.",
+    "Moved the Espresso placeholder lower so it no longer blocks the mission wing emblem.",
+    "Made the Moon larger and higher, with a bigger halo so it reads closer while remaining above the skyline.",
+    "Made Mars larger and higher in the night sky and pushed it farther behind the skyline.",
+    "Preserved all Phase 90 lounge, portal, teleport, Reiki approval placeholder, and private-scene routing locks.",
     "Kept website/site files untouched."
   ],
   "updatedAt": "2026-05-31T00:00:00-05:00"

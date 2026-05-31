@@ -1,15 +1,16 @@
 {
-  "build": "PHASE-90-LOUNGE-SKY-LOCK",
-  "phase": 90,
-  "name": "Lounge Sky Lock",
+  "build": "PHASE-92-REIKI-READABILITY-CHAKRA-LOCK",
+  "phase": 92,
+  "name": "Reiki Readability Chakra Lock",
   "date": "2026-05-31",
   "siteTouched": false,
-  "scope": "game-side only: create a clearer SVR Lounge storefront/private scene and raise Moon/Mars much higher behind the skyline",
+  "scope": "game-side only: fix mirrored Reiki portal/storefront text, add purple chakra symbols to the Reiki hub, preserve approval placeholders, and keep Moon/Mars sky sizing from Phase 91",
   "notes": [
-    "Built a stronger visible SVR Lounge storefront with a doorway arch, portal beam, seating props, larger hologram, and brighter portal target.",
-    "Added a full private lounge page at game/lounge.html and kept game/smoker-lounge.html as a compatible lounge route.",
-    "Raised Moon and Mars much higher and farther behind the skyline in both initial placement and runtime orbit updates.",
-    "Preserved visible portal beacons, Reiki Trueitive/Shyona waiting-for-approval placeholders, and all private scene routes.",
+    "Flipped the Reiki storefront panel orientation so approval placeholder text faces the player instead of showing backward from the rear side.",
+    "Corrected floating portal hologram and portal beacon orientation so canvas-text portal labels face the player cleanly.",
+    "Added seven purple chakra-symbol placeholder disks across the Reiki storefront and a small chakra orbit around the Reiki portal hologram.",
+    "Kept TRUEITIVE / WAITING FOR APPROVAL / By Shyona Royston as placeholder-only text with no live domain, no external link, no founder photo, and no sponsor activation.",
+    "Preserved Phase 91 mission wall, Espresso placeholder tile, Lounge, portal routing, teleport fixes, and higher Moon/Mars sky lock.",
     "Kept website/site files untouched."
   ],
   "updatedAt": "2026-05-31T00:00:00-05:00"
