@@ -159,11 +159,57 @@
     }, { passive: true });
   }
 
+  function wireBannerSlider() {
+    const deck = document.querySelector('[data-svr-slide-deck]');
+    if (!deck || deck.dataset.svrWired === '1') return;
+    deck.dataset.svrWired = '1';
+    const slides = Array.from(deck.querySelectorAll('.svr-slide'));
+    const dotsWrap = document.querySelector('[data-slide-dots]');
+    const counter = document.querySelector('[data-slide-counter]');
+    const prev = document.querySelector('[data-slide-prev]');
+    const next = document.querySelector('[data-slide-next]');
+    const autoplayMs = Math.max(2500, Number(deck.dataset.autoplayMs || 5200));
+    let index = Math.max(0, slides.findIndex((slide) => slide.classList.contains('is-active')));
+    let timer = null;
+    const dots = slides.map((slide, i) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-label', `Open slide ${i + 1}`);
+      button.addEventListener('click', () => show(i, 'dot'));
+      if (dotsWrap) dotsWrap.appendChild(button);
+      return button;
+    });
+    function show(nextIndex, source = 'auto') {
+      if (!slides.length) return;
+      index = (nextIndex + slides.length) % slides.length;
+      slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
+      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
+      if (counter) counter.textContent = `Slide ${index + 1} / ${slides.length}`;
+      const active = slides[index];
+      track('banner_slide_view', { slideId: active.dataset.slideId || `slide-${index + 1}`, slideType: active.dataset.slideType || 'info', slideIndex: index + 1, source });
+      resetTimer();
+    }
+    function resetTimer() {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => show(index + 1, 'auto'), autoplayMs);
+    }
+    if (prev) prev.addEventListener('click', () => show(index - 1, 'prev'));
+    if (next) next.addEventListener('click', () => show(index + 1, 'next'));
+    deck.addEventListener('click', (event) => {
+      const link = event.target.closest && event.target.closest('a');
+      if (!link) return;
+      const active = slides[index];
+      track('banner_slide_click', { slideId: active.dataset.slideId || `slide-${index + 1}`, slideType: active.dataset.slideType || 'info', slideIndex: index + 1, label: link.textContent.trim(), href: link.href });
+    });
+    show(index, 'boot');
+  }
+
   function boot() {
     setAdminLoadingState();
     paintAdminState();
     wireMessageForm();
     wireClicks();
+    wireBannerSlider();
     track('page_view');
     setTimeout(paintAdminState, 1500);
     setInterval(paintAdminState, STATUS_REFRESH_MS);
