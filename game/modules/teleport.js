@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { CONFIG } from "./config.js";
 import { isPinching, isFist, aimPoint } from "./gestures.js";
 
-const TELEPORT_BUILD_LABEL = "PHASE-84-TELEPORT-LOCOMOTION-LOCK";
+const TELEPORT_BUILD_LABEL = "PHASE-87-SOUTH-MISSION-SKY-LOCK";
 
 export function createTeleportRig({ scene, renderer, camera, roomClamp, log = console.log }){
   let baseRefSpace = null;
@@ -114,6 +114,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let lastLeftFist = false;
   let lastRightFist = false;
   let lastGoodAimAt = 0;
+  let hasLatchedTarget = false;
+  const latchedTarget = new THREE.Vector3(0, 0, CONFIG.SPAWN_Z);
 
   const head = new THREE.Vector3();
   const headDir = new THREE.Vector3();
@@ -426,7 +428,29 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     holdStart = 0;
     stableTargetMs = 0;
     lastAimValid = false;
+    hasLatchedTarget = false;
     clearMarker();
+  }
+
+  function tryReleaseTeleport(now, heldMs, statusCb){
+    const targetAge = now - lastGoodAimAt;
+    const hasFreshAim = hasLatchedTarget && targetAge < 380;
+    const stableEnough = stableTargetMs > 45 || targetAge < 260;
+    if (!(heldMs > 110 && hasFreshAim && stableEnough && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS)) return false;
+    const ok = teleportByDelta(latchedTarget);
+    if (ok){
+      lastTP = now + 220;
+      cooldownUntil = now + 220;
+      if (active?.userData) active.userData._wasTeleportHold = false;
+      finishTeleportReset();
+      statusCb("Teleport complete", { force: true });
+      return true;
+    }
+    cooldownUntil = now + 180;
+    holdStart = 0;
+    stableTargetMs = 0;
+    statusCb("TELEPORT RESET • aim again", { force: true });
+    return true;
   }
 
   function update({ dt = 0.016, leftHand, rightHand, leftController, rightController, statusCb = ()=>{}, modeCb = ()=>{} }){
@@ -458,10 +482,10 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
         lastAimValid = false;
       }
     } else if (directHoldMode && activeMode === "controller" && controllerHoldValue(active) <= 0.12){
-      // Release is handled below if the aim was valid. If not valid, just reset cleanly.
-      if (!lastAimValid) finishTeleportReset();
+      // Release is handled below from the latched marker. Only reset if no valid target was ever acquired.
+      if (!lastAimValid && !hasLatchedTarget) finishTeleportReset();
     } else if (directHoldMode && activeMode === "hand" && !handHoldPressed(active)){
-      if (!lastAimValid) finishTeleportReset();
+      if (!lastAimValid && !hasLatchedTarget) finishTeleportReset();
     }
 
     // Optional fist-by-face toggle preserved for users who prefer watch/toggle mode, but direct hold is now primary.
@@ -511,9 +535,15 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
 
     setGlow(true);
 
+    const holdValue = activeMode === "controller" ? controllerHoldValue(active) : (handHoldPressed(active) ? 1 : 0);
+    if (holdValue > 0.18 && !active.userData._wasTeleportHold) holdStart = now;
+    const held = holdStart ? (now - holdStart) : 0;
+    const released = active.userData._wasTeleportHold && holdValue <= 0.12;
+
     const aim = activeMode === "controller" ? controllerAimPoint(active) : safeHandAimPoint(active);
     if (!aim){
-      const recentlyValid = now - lastGoodAimAt < 140;
+      if (released && tryReleaseTeleport(now, held, statusCb)) return;
+      const recentlyValid = now - lastGoodAimAt < 220;
       if (!recentlyValid){
         pointer.visible = false;
         ring.visible = false;
@@ -543,27 +573,10 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     pointer.position.copy(smoothedTarget).setY(0.018);
     ring.position.copy(smoothedTarget).setY(0.015);
     markerGlow.position.copy(smoothedTarget).setY(0.34);
+    latchedTarget.copy(smoothedTarget);
+    hasLatchedTarget = true;
 
-    const holdValue = activeMode === "controller" ? controllerHoldValue(active) : (handHoldPressed(active) ? 1 : 0);
-    if (holdValue > 0.18 && !active.userData._wasTeleportHold) holdStart = now;
-    const held = holdStart ? (now - holdStart) : 0;
-    const released = active.userData._wasTeleportHold && holdValue <= 0.12;
-
-    if (released && held > 180 && stableTargetMs > 100 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
-      const ok = teleportByDelta(smoothedTarget);
-      if (ok){
-        lastTP = now + 220;
-        cooldownUntil = now + 220;
-        active.userData._wasTeleportHold = false;
-        finishTeleportReset();
-        statusCb("Teleport complete", { force: true });
-        return;
-      }
-      cooldownUntil = now + 180;
-      holdStart = 0;
-      stableTargetMs = 0;
-      statusCb("TELEPORT RESET • aim again");
-    }
+    if (released && tryReleaseTeleport(now, held, statusCb)) return;
 
     if (holdValue <= 0.12){
       holdStart = 0;

@@ -146,23 +146,27 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 
 
 function buildButtons(state){
-  const buttons = [
-    { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'tableScene', label: 'TABLE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-
-    { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'legendScene', label: 'LEGEND', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
-
-    { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'reikiRoomScene', label: 'ZEN DEN', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-
-    { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
+  const sceneButtons = [
+    ['lobby', 'LOBBY'], ['tableScene', 'TABLE'], ['seatScene', 'SEAT'], ['reikiScene', 'REIKI'],
+    ['reikiRoomScene', 'REIKI RM'], ['pgaScene', 'PGA'], ['pgaDriveScene', 'DRIVE'], ['chipPuttScene', 'CHIP/PUTT'],
+    ['storeScene', 'STORE'], ['loungeScene', 'LOUNGE'], ['loungeRoomScene', 'LOUNGE RM'], ['legendScene', 'LEGEND'],
+    ['sponsorScene', 'SPONSOR'], ['scorpionScene', 'SCORPION']
   ];
+  const buttons = [];
+  const startX = 24;
+  const startY = 140;
+  const bw = 92;
+  const bh = 36;
+  const gapX = 6;
+  const gapY = 8;
+  sceneButtons.forEach(([id, label], idx)=>{
+    const col = idx % 4;
+    const row = Math.floor(idx / 4);
+    buttons.push({ id, label, x: startX + col * (bw + gapX), y: startY + row * (bh + gapY), w: bw, h: bh, font: label.length > 8 ? 13 : 15, pinchOnly: true, hold: 0.14, margin: 5 });
+  });
+  buttons.push({ id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 });
+  buttons.push({ id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 });
+  buttons.push({ id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 });
   if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
   else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 428, y: 120, w: 548, h: 48, font: 28, pinchOnly: true, hold: 0.18, margin: 8 });
   return buttons;
@@ -228,7 +232,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • Reiki / PGA / Sponsor / Scorpion • pinch with other hand • fist by face toggles TP', 36, 332);
+    ctx.fillText('Quick portals • hold pinch over a button • release locomotion teleports from latched marker', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -275,6 +279,11 @@ let hoveredId = null;
     if (id === 'sponsorScene') actions.goSponsor?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
     if (id === 'reikiRoomScene') actions.goReikiRoom?.();
+    if (id === 'pgaDriveScene') actions.goPgaDrive?.();
+    if (id === 'chipPuttScene') actions.goChipPutt?.();
+    if (id === 'storeScene') actions.goStore?.();
+    if (id === 'loungeScene') actions.goLounge?.();
+    if (id === 'loungeRoomScene') actions.goLoungeRoom?.();
   }
 
   function update(dt, leftHand, rightHand){

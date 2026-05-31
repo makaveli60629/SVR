@@ -7,6 +7,9 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
+import { installSvrEventBus } from "./modules/svr_event_bus.js";
+
+installSvrEventBus();
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -170,7 +173,13 @@ function movePlayerToSpot(target, lookTarget = null){
 
 function gotoScene(key){
   const rec = sceneTargets?.[key];
-  if (!rec?.pos) return false;
+  if (!rec) return false;
+  if (rec.url){
+    setStatus(`Opening portal: ${key}`, { force: true });
+    window.location.href = rec.url;
+    return true;
+  }
+  if (!rec.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
   setStatus(`Quick jump: ${key}`, { force: true });
   return true;
@@ -199,6 +208,9 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit7") gotoScene("sponsor");
   if (e.code === "Digit8") gotoScene("scorpion");
   if (e.code === "Digit9") gotoScene("reikiRoom");
+  if (e.code === "Digit0") gotoScene("lounge");
+  if (e.code === "Minus") gotoScene("store");
+  if (e.code === "Equal") gotoScene("loungeRoom");
 });
 
 const watch = createWristWatch({
@@ -228,7 +240,12 @@ const watch = createWristWatch({
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom")
+    goReikiRoom: ()=>gotoScene("reikiRoom"),
+    goPgaDrive: ()=>gotoScene("pgaDrive"),
+    goChipPutt: ()=>gotoScene("chipPutt"),
+    goStore: ()=>gotoScene("store"),
+    goLounge: ()=>gotoScene("lounge"),
+    goLoungeRoom: ()=>gotoScene("loungeRoom")
   }
 });
 
@@ -241,7 +258,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold pinch/fist/A/grip/trigger to aim; release to teleport. All lobby/private portal routes enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

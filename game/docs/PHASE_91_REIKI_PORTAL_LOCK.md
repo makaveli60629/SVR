@@ -1,7 +1,8 @@
-# Phase 91 Reiki portal lock
+# Superseded Reiki Approval Note
 
-- Rebuilt the Reiki front with a premium storefront pass inspired by the provided reference image.
-- Added TRUEITIVE.COM text on the front glass.
-- Added warm interior display lighting.
-- Added a step-to-enter portal pad in front of the Reiki door.
-- Added a dedicated Reiki room destination with a return-to-lobby pad.
+This older note has been sanitized because all unapproved Reiki sponsor/founder/domain branding is disabled in the live game runtime.
+
+Current rule:
+- Reiki hub uses SVR branding only.
+- Public-facing partner/founder/domain content remains replaced with red `AWAITING APPROVAL` placeholders until written approval is received.
+- Use current build docs instead of this superseded audit note.

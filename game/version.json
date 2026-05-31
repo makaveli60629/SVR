@@ -1,8 +1,16 @@
 {
-  "build": "PHASE-84-TELEPORT-LOCOMOTION-LOCK",
-  "phase": 84,
-  "name": "Teleporter Locomotion Lock",
-  "updatedAt": "2026-05-31T00:00:00-05:00",
-  "scope": "game-side only: teleport.js locomotion repair, right-stick movement, hold/release teleport, watch controller fallback",
-  "siteTouched": false
+  "build": "PHASE-88-REFINED-MISSION-PORTAL-SKY-LOCK",
+  "phase": 88,
+  "name": "Refined Mission Portal Sky Lock",
+  "date": "2026-05-31",
+  "siteTouched": false,
+  "scope": "game-side only: refined south mission wall, Espresso placeholder ad, portal hologram tags, Lounge storefront polish, higher Moon/Mars sky pass, local event-bus bridge",
+  "notes": [
+    "Rewrote the SVR mission/about language for play-money poker, sponsorship, community giveback, and legal safety.",
+    "Added actual Espresso With Cream placeholder ad art to the south mission wall while keeping the angel-wing charity emblem as a placeholder.",
+    "Added readable hologram tags for the main portal destinations without adding private rooms into the lobby.",
+    "Raised Moon and Mars higher and farther behind the skyline with a calmer slow drift.",
+    "Kept Reiki approval-safe: no external Reiki sponsor, founder, or domain branding.",
+    "Kept website/site files untouched."
+  ]
 }
