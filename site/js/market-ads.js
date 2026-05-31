@@ -1,5 +1,12 @@
-
 (() => {
+  const luxuryHref = 'phase102-luxury.css?v=phase102-luxury-polish';
+  if (!document.querySelector(`link[href="${luxuryHref}"]`)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = luxuryHref;
+    document.head.appendChild(link);
+  }
+
   const ads = [
     {label:"Sponsor Sample", img:"assets/marketing/espresso-ad.svg", title:"Espresso With Cream", copy:"Sample sponsor creative for website banners and future VR building-wall placements.", href:"sponsor-event.html"},
     {label:"SVR Store", img:"assets/marketing/store-feature.svg", title:"SVR Store", copy:"Digital items, apparel concepts, sponsor products, and collectible drops.", href:"store.html"},
