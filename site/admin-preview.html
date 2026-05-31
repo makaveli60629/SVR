@@ -1,1 +1,101 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>SVR Poker | Admin Preview</title><meta name="description" content="SVR Poker full interactive site update with connected badges, AI chat room, game bridge, profile, sponsors, ads, store, and VR UI."/><link rel="icon" href="../logo.png" type="image/png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="site-phase09.css"/></head><body class="svr9 "><canvas id="binary-rain" aria-hidden="true"></canvas><div class="page"><nav class="nav"><a class="brand" href="phase09.html"><img src="assets/brand/logo.png" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>All In • Site + Game</span></div></a><div class="links"><span class="svr-status-stack"><span>Admin Online</span><span>Server Online</span><span>Database Online</span></span><a href="phase09.html">Home</a><a href="login.html">Login</a><a href="profile.html">Profile</a><a href="chat-room.html">AI Chat</a><a href="vr-ui.html">VR UI</a><a href="../game/index.html">Game</a></div></nav><main class="shell"><section class="section hero"><div><span class="tag">Admin Preview</span><h1>Owner Panel</h1><p class="lead">Safe admin preview for players, rooms, sponsors, ads, and game routing.</p><p class="copy">This public-safe preview exposes no secrets and is for presentation and layout validation.</p></div><aside class="card"><div data-profile-card></div></aside></section><section class="section"><h2>Review Tables</h2><div class="grid3"><article class="card"><h3>Players</h3><div data-player-table></div></article><article class="card"><h3>Rooms</h3><div data-room-table></div></article><article class="card"><h3>Ads</h3><div data-ad-table></div></article></div></section><footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="../index.html">Public Launch</a><a class="btn primary" href="../game/index.html">Preview Game</a><a class="btn secondary" href="store.html">Store</a></div></footer></main></div><script src="../matrix.js"></script><script src="../site-public-hooks.js"></script><script src="js/phase09-site-game-ai.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SVR Poker | Admin Preview</title>
+<meta name="description" content="Private-safe SVR Poker admin preview with AWS visitor analytics, admin status, messages, and hub review panels."/>
+<link rel="icon" href="../logo.webp" type="image/webp"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site-market.css"/>
+</head>
+<body class="svr-market">
+<canvas id="binary-rain" aria-hidden="true"></canvas>
+<div class="market-page">
+<nav class="market-nav">
+<a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Admin Preview</span></div></a>
+<div class="market-links"><span class="status-pill">ADMIN ONLINE</span><a href="index.html">Home</a><a href="about.html">About</a><a href="store.html">Store</a><a href="contact.html">Contact</a></div>
+</nav>
+<main class="market-shell">
+<section class="hero">
+<div>
+<span class="kicker">Owner Dashboard Preview</span>
+<h1>Private Site Intelligence</h1>
+<p class="lead">This admin preview is where site visit counts, message activity, hub status, and future AWS analytics should be reviewed privately.</p>
+<p class="copy">The public Matrix launch page must not display visitor totals. Page views are tracked silently through the shared hook and should be stored through the AWS API analytics endpoint.</p>
+<div class="trust-strip"><span>AWS analytics only</span><span>Public counter hidden</span><span>Admin review only</span><span>No frontend secrets</span></div>
+</div>
+<aside class="hero-card admin-metric-card">
+<h3>Visitor Counter</h3>
+<div class="metric-grid">
+<div class="metric"><strong id="visit-total">—</strong><span>Total page views</span></div>
+<div class="metric"><strong id="visit-unique">—</strong><span>Unique sessions</span></div>
+<div class="metric"><strong id="visit-today">—</strong><span>Views today</span></div>
+<div class="metric"><strong id="visit-store">—</strong><span>Store clicks</span></div>
+</div>
+<p id="visitor-counter-status" class="mini-note">Waiting for AWS analytics API. This panel is admin-only and does not show on the public page.</p>
+</aside>
+</section>
+
+<section class="section">
+<div class="head"><div><span class="tag">AWS Data Wiring</span><h2>Required private endpoints</h2></div><p>Use AWS for all live data. The public site should call a secured API; the admin panel should read aggregate analytics only after owner authentication.</p></div>
+<div class="grid3">
+<article class="card"><h3>Visitor analytics</h3><p><code>POST /api/analytics/event</code> records silent page views and button clicks. <code>GET /api/admin/analytics/summary</code> returns private counts for this panel.</p></article>
+<article class="card"><h3>Messages</h3><p><code>POST /api/messages</code> saves visitor questions, sponsor inquiries, and support requests to AWS-backed storage.</p></article>
+<article class="card"><h3>Admin status</h3><p><code>GET /api/admin/status</code> powers the Admin Online / Offline indicator. Admin controls should require authentication.</p></article>
+</div>
+</section>
+
+<section class="section">
+<div class="head"><div><span class="tag">Hub Review</span><h2>Founder and partner readiness</h2></div><p>Each hub can carry founder, partner, logo, site, and store data after approval. Unapproved details stay as placeholders.</p></div>
+<div class="grid4">
+<article class="card approval"><h3>Reiki Hub</h3><p>Awaiting approval. Keep placeholders only until approved founder/logo/site assets are cleared.</p></article>
+<article class="card"><h3>PGA Hub</h3><p>Partner profile, logo, training page, and store category can be managed from admin after final approval.</p></article>
+<article class="card"><h3>Smoker Lounge</h3><p>Private social lounge store and event placement category.</p></article>
+<article class="card"><h3>SVR Store</h3><p>Official SVR items, VR accessories, and partner products after approval.</p></article>
+</div>
+</section>
+
+<section class="section">
+<div class="head"><div><span class="tag">Private Notes</span><h2>Do not expose</h2></div></div>
+<div class="grid2">
+<article class="card"><h3>Never public</h3><p>Visitor totals, raw analytics, IP records, admin logs, AWS credentials, database secrets, payment secrets, and private partner review notes.</p></article>
+<article class="card"><h3>Public-safe</h3><p>Approved partner pages, general store previews, public mission text, sponsor inquiry forms, and legal/trust statements.</p></article>
+</div>
+</section>
+
+<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="../index.html">Public Launch</a><a class="btn primary" href="about.html">About Hubs</a><a class="btn secondary" href="store.html">Store</a></div></footer>
+</main></div>
+<script>
+window.SVR_AWS_API_BASE = window.SVR_AWS_API_BASE || window.SVR_API_BASE || 'https://api.svrpoker.com';
+(async function loadVisitorSummary(){
+  const status = document.getElementById('visitor-counter-status');
+  const fields = {
+    total: document.getElementById('visit-total'),
+    unique: document.getElementById('visit-unique'),
+    today: document.getElementById('visit-today'),
+    store: document.getElementById('visit-store')
+  };
+  function setFallback(){
+    Object.values(fields).forEach((el) => { if (el) el.textContent = 'Pending'; });
+    if (status) status.textContent = 'AWS analytics endpoint not connected yet. Page views are still being attempted silently through the public hook.';
+  }
+  try {
+    const response = await fetch(`${window.SVR_AWS_API_BASE}/api/admin/analytics/summary`, { cache: 'no-store', headers: { 'Accept': 'application/json' } });
+    if (!response.ok) throw new Error(`Analytics summary failed: ${response.status}`);
+    const data = await response.json();
+    const summary = data.summary || data;
+    if (fields.total) fields.total.textContent = summary.totalPageViews ?? summary.totalViews ?? 0;
+    if (fields.unique) fields.unique.textContent = summary.uniqueSessions ?? summary.sessions ?? 0;
+    if (fields.today) fields.today.textContent = summary.viewsToday ?? summary.today ?? 0;
+    if (fields.store) fields.store.textContent = summary.storeClicks ?? 0;
+    if (status) status.textContent = 'Visitor counter loaded from AWS analytics summary.';
+  } catch (error) {
+    setFallback();
+  }
+})();
+</script>
+<script src="../matrix.js"></script><script src="../site-public-hooks.js"></script>
+</body></html>
