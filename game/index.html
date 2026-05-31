@@ -1,2 +1,109 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>SVR Poker Phase 168</title></head><body><p>SVR Poker Phase 168 active.</p><p><a href="./phase168.html?v=phase168-lobby-cleanup-teleport-lock">Open game</a></p></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>SVR Poker — Phase 168</title>
+  <meta name="theme-color" content="#050508" />
+  <meta http-equiv="refresh" content="1; url=./phase168.html?v=phase168-auto-open" />
+  <style>
+    html, body {
+      min-height: 100%;
+      margin: 0;
+      background: radial-gradient(circle at center, #171025 0%, #050508 48%, #000 100%);
+      color: #fff;
+      font-family: system-ui, Segoe UI, Arial, sans-serif;
+      overflow: hidden;
+    }
+    .wrap {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+    }
+    .card {
+      width: min(680px, 92vw);
+      border: 1px solid rgba(180, 140, 255, .42);
+      border-radius: 28px;
+      padding: 34px 28px;
+      background: rgba(5, 5, 12, .76);
+      box-shadow: 0 0 42px rgba(140, 90, 255, .25), inset 0 0 38px rgba(120, 255, 186, .06);
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(34px, 7vw, 68px);
+      letter-spacing: .08em;
+      color: #f4eaff;
+      text-shadow: 0 0 24px rgba(180, 140, 255, .75);
+    }
+    .build {
+      display: inline-block;
+      margin: 12px 0 22px;
+      padding: 8px 13px;
+      border: 1px solid rgba(120, 255, 186, .42);
+      border-radius: 999px;
+      color: #dfffee;
+      background: rgba(2, 10, 8, .55);
+      font-size: 13px;
+      letter-spacing: .04em;
+    }
+    p {
+      margin: 0 auto 20px;
+      max-width: 520px;
+      color: #d7d2ff;
+      line-height: 1.55;
+      font-size: 16px;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+    a, button {
+      appearance: none;
+      border: 1px solid rgba(180, 140, 255, .52);
+      border-radius: 999px;
+      padding: 12px 18px;
+      background: rgba(0, 0, 0, .45);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(180, 140, 255, .18);
+    }
+    a.primary {
+      border-color: rgba(120, 255, 186, .65);
+      background: rgba(28, 74, 56, .42);
+    }
+    .note {
+      margin-top: 18px;
+      color: #a9a1d8;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <h1>SVR POKER</h1>
+      <div class="build">BUILD: PHASE-168-LOBBY-CLEANUP-TELEPORT-LOCK</div>
+      <p>Opening the active VR lobby now. If your browser does not auto-open, press the button below.</p>
+      <div class="actions">
+        <a class="primary" href="./phase168.html?v=phase168-auto-open">Open Game</a>
+        <a href="../site/">Open Site</a>
+      </div>
+      <div class="note">Quest / Desktop / Preview route locked to Phase 168.</div>
+    </section>
+  </main>
+  <script>
+    setTimeout(function(){
+      window.location.replace('./phase168.html?v=phase168-auto-open');
+    }, 650);
+  </script>
+</body>
+</html>
