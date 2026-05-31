@@ -1,1 +1,39 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SVR Private Scene</title><link rel="stylesheet" href="./private-scene.css"><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script></head><body><div id="app"></div><div class="hud"><div class="pill" id="status">Loading private scene…</div><button class="btn" id="backLobby">Return to Lobby</button></div><script type="module" src="./modules/scorpion.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>SVR Scorpion Room — PHASE-179-SCORPION-LABEL-CACHE-LOCK</title>
+  <meta name="theme-color" content="#02040b" />
+  <link rel="stylesheet" href="./private-scene.css?v=phase179" />
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+  <style>
+    #svrPhaseLabel {
+      position: fixed;
+      left: 12px;
+      top: 58px;
+      z-index: 1200;
+      padding: 9px 13px;
+      border: 1px solid rgba(211,161,59,.78);
+      border-radius: 999px;
+      background: rgba(3,5,10,.78);
+      color: #fff7e3;
+      font: 800 12px/1.2 system-ui, Segoe UI, Arial;
+      letter-spacing: .04em;
+      box-shadow: 0 12px 28px rgba(0,0,0,.45), 0 0 18px rgba(211,161,59,.18);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+    #svrPhaseLabel b { color: #64eaff; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div class="hud">
+    <div class="pill" id="status">Scorpion loading • PHASE-179 label/cache lock</div>
+    <button class="btn" id="backLobby">Return to Lobby</button>
+  </div>
+  <div id="svrPhaseLabel">SCORPION ROOM • <b>PHASE 179</b> • PLAYABLE POLISH LOCK</div>
+  <script type="module" src="./modules/scorpion.js?v=phase179-scorpion-playable-polish"></script>
+</body>
+</html>
