@@ -1,0 +1,25 @@
+{
+  "phase": 89,
+  "build": "PHASE-89-VISIBLE-PORTAL-APPROVAL-LOCK",
+  "siteTouched": false,
+  "changes": [
+    "visible portal beacons",
+    "Reiki approval placeholder labels",
+    "external Trueitive domain removed",
+    "portal route visibility repair"
+  ],
+  "blockedLiveContent": [
+    "external Trueitive domain",
+    "external sponsor website",
+    "founder photo",
+    "unapproved sponsor media"
+  ],
+  "preserved": [
+    "teleport pinch release",
+    "controller locomotion",
+    "private scenes",
+    "lounge storefront",
+    "mission wall",
+    "moon and mars high sky"
+  ]
+}

@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-88-REFINED-MISSION-PORTAL-SKY-LOCK",
-  "phase": 88,
-  "name": "Refined Mission Portal Sky Lock",
+  "build": "PHASE-89-VISIBLE-PORTAL-APPROVAL-LOCK",
+  "phase": 89,
+  "name": "Visible Portal Approval Lock",
   "date": "2026-05-31",
   "siteTouched": false,
-  "scope": "game-side only: refined south mission wall, Espresso placeholder ad, portal hologram tags, Lounge storefront polish, higher Moon/Mars sky pass, local event-bus bridge",
+  "scope": "game-side only: visible portal beacons, Reiki Trueitive/Shyona approval placeholders, route visibility repair, preserve teleport locomotion and private scenes",
   "notes": [
     "Rewrote the SVR mission/about language for play-money poker, sponsorship, community giveback, and legal safety.",
     "Added actual Espresso With Cream placeholder ad art to the south mission wall while keeping the angel-wing charity emblem as a placeholder.",
@@ -12,5 +12,6 @@
     "Raised Moon and Mars higher and farther behind the skyline with a calmer slow drift.",
     "Kept Reiki approval-safe: no external Reiki sponsor, founder, or domain branding.",
     "Kept website/site files untouched."
-  ]
+  ],
+  "updatedAt": "2026-05-31T00:00:00-05:00"
 }
