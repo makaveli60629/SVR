@@ -1,0 +1,331 @@
+{
+  "manifestVersion": "1.0.0",
+  "updateId": "scorpion-room-table-integration",
+  "phaseName": "Scorpion Room Table Integration",
+  "phaseNumber": 31,
+  "status": "ready-for-local-apply",
+  "owner": "Project Owner",
+  "targetRoom": {
+    "id": "scorpion-room",
+    "displayName": "Scorpion Room",
+    "type": "private-multiplayer-card-room",
+    "cameraMode": "seated-table",
+    "locomotionMode": "locked-seated"
+  },
+  "scope": {
+    "primaryGoal": "Restore and upgrade the Scorpion Room as a seated poker-style multiplayer table environment with controlled camera, card/chip logic, avatar presence, wrist-watch UI planning, and safe sky object placement.",
+    "included": [
+      "Seated player camera position at card table",
+      "Camera3 slow guided room pan support",
+      "Poker-style left-to-right card dealing flow",
+      "Private player hand visibility",
+      "Shared community card visibility",
+      "Chip interaction placeholders",
+      "Chip sound trigger placeholders",
+      "Basic avatar seat placement",
+      "Multiplayer state sync groundwork",
+      "Wrist watch hologram UI placeholder",
+      "Moon and Mars sky placement rules",
+      "Error logging hooks",
+      "Room reset/test hooks",
+      "Performance validation checks"
+    ],
+    "excludedForNow": [
+      "Real-money gambling",
+      "Final multiplayer backend deployment",
+      "Final 3D avatar marketplace",
+      "Final production login system",
+      "External payment systems"
+    ]
+  },
+  "roomRules": {
+    "playerSeats": {
+      "enabled": true,
+      "seatCount": 6,
+      "seatOrder": "left-to-right-clockwise",
+      "defaultSeatHeight": 1.2,
+      "lockPlayerToSeat": true,
+      "allowStandingMovement": false,
+      "allowTableLean": true
+    },
+    "camera": {
+      "mainCamera": {
+        "mode": "seated",
+        "height": 1.2,
+        "lockPosition": true,
+        "lockRotation": false,
+        "notes": "Player should feel seated at the Scorpion Room table. Avoid free locomotion during active card play."
+      },
+      "camera3": {
+        "enabled": true,
+        "mode": "guided-room-pan",
+        "speed": "slow",
+        "loop": true,
+        "pathStyle": "smooth-tour",
+        "targets": [
+          "main-table",
+          "player-seats",
+          "chip-area",
+          "watch-ui-zone",
+          "sky-view-zone",
+          "room-decor"
+        ],
+        "notes": "Camera3 should tour the room slowly without clipping through table, avatars, walls, or ceiling."
+      }
+    },
+    "cards": {
+      "enabled": true,
+      "gameStyle": "poker-inspired",
+      "dealOrder": "left-to-right",
+      "privateHands": true,
+      "communityCards": true,
+      "hideOtherPlayerCards": true,
+      "showOwnCardsOnly": true,
+      "burnCards": false,
+      "defaultDeckCount": 1,
+      "shuffleBeforeDeal": true,
+      "cardZones": {
+        "deck": "table.deckZone",
+        "discard": "table.discardZone",
+        "community": "table.communityZone",
+        "playerHandPrefix": "seat.handZone."
+      }
+    },
+    "chips": {
+      "enabled": true,
+      "physicsEnabled": true,
+      "soundEnabled": true,
+      "allowPickup": true,
+      "allowStacking": true,
+      "allowThrowing": false,
+      "chipZones": {
+        "bank": "table.chipBankZone",
+        "pot": "table.potZone",
+        "playerStackPrefix": "seat.chipStack."
+      },
+      "sounds": {
+        "pickup": "audio/chips/pickup",
+        "drop": "audio/chips/drop",
+        "stack": "audio/chips/stack",
+        "pot": "audio/chips/pot"
+      }
+    },
+    "avatars": {
+      "enabled": true,
+      "seatAnchored": true,
+      "showHead": true,
+      "showHands": true,
+      "showBody": false,
+      "placeholderStyle": "simple-head-and-hands",
+      "future3DAvatarReady": true,
+      "avatarSlots": [
+        "seat.1.avatar",
+        "seat.2.avatar",
+        "seat.3.avatar",
+        "seat.4.avatar",
+        "seat.5.avatar",
+        "seat.6.avatar"
+      ]
+    },
+    "watchUI": {
+      "enabled": true,
+      "mode": "wrist-hologram-placeholder",
+      "activation": "tap-watch",
+      "panels": [
+        "profile",
+        "inventory",
+        "room-status",
+        "table-actions",
+        "settings"
+      ],
+      "notes": "Watch should eventually connect to player profile, inventory, avatar selection, and table status."
+    },
+    "multiplayer": {
+      "enabled": true,
+      "mode": "state-sync-groundwork",
+      "authoritativeHost": true,
+      "syncObjects": [
+        "cards",
+        "chips",
+        "seats",
+        "avatars",
+        "turnState",
+        "communityCards",
+        "potState"
+      ],
+      "events": [
+        "playerJoined",
+        "playerSeated",
+        "playerLeft",
+        "deckShuffled",
+        "cardDealt",
+        "cardRevealed",
+        "chipMoved",
+        "turnAdvanced",
+        "roundReset"
+      ],
+      "notes": "This manifest prepares the room for multiplayer without assuming a final backend yet."
+    }
+  },
+  "skyObjects": {
+    "enabled": true,
+    "objects": [
+      {
+        "id": "moon",
+        "displayName": "Moon",
+        "enabled": true,
+        "placement": {
+          "relativeTo": "main-building",
+          "direction": "behind-building-from-player-view",
+          "height": "high-sky",
+          "avoidLobbyCrossing": true,
+          "avoidBuildingClip": true
+        },
+        "orbit": {
+          "enabled": true,
+          "radius": 350,
+          "speed": 0.015,
+          "tiltDegrees": 8,
+          "safeLayer": "SkyObjects",
+          "collisions": false
+        },
+        "scale": 18
+      },
+      {
+        "id": "mars",
+        "displayName": "Mars",
+        "enabled": true,
+        "placement": {
+          "relativeTo": "main-building",
+          "direction": "behind-building-from-player-view",
+          "height": "high-sky",
+          "avoidLobbyCrossing": true,
+          "avoidBuildingClip": true
+        },
+        "orbit": {
+          "enabled": true,
+          "radius": 500,
+          "speed": 0.009,
+          "tiltDegrees": 14,
+          "safeLayer": "SkyObjects",
+          "collisions": false
+        },
+        "scale": 12
+      }
+    ]
+  },
+  "repairTargets": {
+    "lobbyProtection": {
+      "preserveOriginalLobby": true,
+      "disableSecondLobbyWall": true,
+      "disableSecondFloorIfBreakingNavigation": true,
+      "preserveNewFeaturesThatDoNotBreakOriginalLayout": true
+    },
+    "locomotionProtection": {
+      "protectFistLocomotion": true,
+      "protectTeleportLeap": true,
+      "preventRoomUpdateFromDisablingMovementScripts": true,
+      "allowScorpionRoomSeatedLockOnlyInsideRoom": true
+    },
+    "pathProtection": {
+      "normalizePaths": true,
+      "detectMissingAssets": true,
+      "detectDuplicateRoomObjects": true,
+      "backupBeforeChange": true
+    }
+  },
+  "validation": {
+    "requiredChecks": [
+      {
+        "id": "check-room-exists",
+        "description": "Confirm Scorpion Room scene or room file exists."
+      },
+      {
+        "id": "check-table-anchor",
+        "description": "Confirm main card table anchor exists."
+      },
+      {
+        "id": "check-seat-anchors",
+        "description": "Confirm six player seat anchors exist or create placeholders."
+      },
+      {
+        "id": "check-camera3-path",
+        "description": "Confirm Camera3 path exists or create guided pan placeholder."
+      },
+      {
+        "id": "check-card-zones",
+        "description": "Confirm deck, discard, community, and player hand zones exist."
+      },
+      {
+        "id": "check-chip-zones",
+        "description": "Confirm chip bank, pot, and player chip stack zones exist."
+      },
+      {
+        "id": "check-sky-objects",
+        "description": "Confirm Moon and Mars are high, behind building, collision-free, and not crossing play area."
+      },
+      {
+        "id": "check-locomotion-flags",
+        "description": "Confirm fist locomotion and teleport leap are not globally disabled."
+      },
+      {
+        "id": "check-performance",
+        "description": "Check excessive lights, colliders, particles, update loops, and duplicate objects."
+      },
+      {
+        "id": "check-error-log",
+        "description": "Generate readable update and error report after apply."
+      }
+    ],
+    "passCriteria": [
+      "Scorpion Room loads without missing critical anchors.",
+      "Player starts seated at the table.",
+      "Cards can be assigned left-to-right.",
+      "Own cards are private.",
+      "Community cards are shared.",
+      "Chip zones exist.",
+      "Camera3 can pan through the room safely.",
+      "Moon and Mars are visible in sky without clipping.",
+      "Original lobby protection remains enabled.",
+      "Fist locomotion and teleport leap are protected outside seated room mode.",
+      "Update report is generated."
+    ]
+  },
+  "filesToCreateOrUpdate": {
+    "manifest": "Manifest/room-update.scorpion-table.json",
+    "updateScript": "Tools/SVR-ApplyRoomUpdate.ps1",
+    "roomData": "GameData/Rooms/scorpion-room.json",
+    "cardData": "GameData/Cards/scorpion-card-state.json",
+    "chipData": "GameData/Chips/scorpion-chip-state.json",
+    "avatarSeatData": "GameData/Avatars/scorpion-seat-avatars.json",
+    "watchUIData": "GameData/UI/watch-hologram-panels.json",
+    "skyData": "GameData/Sky/sky-objects.moon-mars.json",
+    "reportOutput": "Reports/scorpion-room-update-report.txt"
+  },
+  "featureFlags": {
+    "SCORPION_ROOM_ENABLED": true,
+    "SCORPION_SEATED_CAMERA": true,
+    "SCORPION_CAMERA3_GUIDED_PAN": true,
+    "SCORPION_CARD_DEALING": true,
+    "SCORPION_PRIVATE_HANDS": true,
+    "SCORPION_CHIPS": true,
+    "SCORPION_CHIP_SOUNDS": true,
+    "SCORPION_AVATAR_SEATS": true,
+    "SCORPION_WATCH_UI_PLACEHOLDER": true,
+    "SCORPION_MULTIPLAYER_GROUNDWORK": true,
+    "SKY_MOON_ENABLED": true,
+    "SKY_MARS_ENABLED": true,
+    "PROTECT_ORIGINAL_LOBBY": true,
+    "DISABLE_SECOND_LOBBY_WALL": true,
+    "DISABLE_BAD_SECOND_FLOOR": true,
+    "PROTECT_FIST_LOCOMOTION": true,
+    "PROTECT_TELEPORT_LEAP": true
+  },
+  "notes": [
+    "This manifest does not claim local files have already been changed.",
+    "This is the source-of-truth scope for the next PowerShell apply script.",
+    "Room update should back up existing files before writing changes.",
+    "Any missing anchors should be created as placeholders rather than blocking the update.",
+    "The Scorpion Room seated lock must not break global movement in the rest of the game."
+  ]
+}
