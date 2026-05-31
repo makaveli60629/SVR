@@ -2,7 +2,8 @@
   const layers = [
     'phase102-luxury.css?v=phase102-luxury-polish',
     'phase103-floating-menu-fix.css?v=menu-layer-fix',
-    'phase104-alignment-polish.css?v=alignment-polish'
+    'phase104-alignment-polish.css?v=alignment-polish',
+    'store-alignment-fix.css?v=store-align-hero-fix'
   ];
   layers.forEach((href) => {
     if (!document.querySelector(`link[href="${href}"]`)) {
