@@ -1,11 +1,16 @@
 (() => {
-  const luxuryHref = 'phase102-luxury.css?v=phase102-luxury-polish';
-  if (!document.querySelector(`link[href="${luxuryHref}"]`)) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = luxuryHref;
-    document.head.appendChild(link);
-  }
+  const layers = [
+    'phase102-luxury.css?v=phase102-luxury-polish',
+    'phase103-floating-menu-fix.css?v=menu-layer-fix'
+  ];
+  layers.forEach((href) => {
+    if (!document.querySelector(`link[href="${href}"]`)) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      document.head.appendChild(link);
+    }
+  });
 
   const ads = [
     {label:"Sponsor Sample", img:"assets/marketing/espresso-ad.svg", title:"Espresso With Cream", copy:"Sample sponsor creative for website banners and future VR building-wall placements.", href:"sponsor-event.html"},
