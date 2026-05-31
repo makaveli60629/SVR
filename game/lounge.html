@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SVR Lounge • Private Social Room</title>
+  <link rel="stylesheet" href="./private_scene_style.css">
+  <style>
+    body{background:#030106;}
+    .lounge-room{min-height:100vh;display:grid;place-items:center;padding:32px;box-sizing:border-box;position:relative;overflow:hidden;background:
+      radial-gradient(circle at 24% 14%,rgba(213,140,255,.30),transparent 26%),
+      radial-gradient(circle at 74% 8%,rgba(141,255,207,.16),transparent 24%),
+      linear-gradient(180deg,#05010a,#110719 48%,#030106);}
+    .lounge-room:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 0 9%,rgba(213,140,255,.10) 9.4% 9.8%,transparent 10.4% 100%),repeating-linear-gradient(90deg,transparent 0 74px,rgba(255,255,255,.025) 75px 76px);opacity:.58;pointer-events:none;}
+    .lounge-stage{position:relative;width:min(1120px,95vw);border:1px solid rgba(213,140,255,.55);border-radius:32px;background:rgba(8,4,18,.82);box-shadow:0 28px 95px rgba(0,0,0,.66),0 0 110px rgba(213,140,255,.20);padding:30px;overflow:hidden;}
+    .window{height:190px;border-radius:24px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,#050716,#020207);position:relative;overflow:hidden;margin-bottom:22px;}
+    .moon{position:absolute;right:10%;top:22px;width:68px;height:68px;border-radius:50%;background:radial-gradient(circle at 34% 32%,#fff,#cfd6e8 62%,#727a91);box-shadow:0 0 52px rgba(240,246,255,.62);}
+    .mars{position:absolute;left:18%;top:42px;width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffd0aa,#b45b35 70%,#532412);box-shadow:0 0 36px rgba(255,137,83,.46);}
+    .skyline{position:absolute;left:0;right:0;bottom:0;height:72px;background:linear-gradient(0deg,#05040a,#111326);clip-path:polygon(0 100%,0 45%,6% 45%,6% 22%,13% 22%,13% 55%,20% 55%,20% 10%,27% 10%,27% 44%,34% 44%,34% 28%,43% 28%,43% 52%,50% 52%,50% 16%,58% 16%,58% 47%,66% 47%,66% 24%,75% 24%,75% 58%,84% 58%,84% 34%,92% 34%,92% 20%,100% 20%,100% 100%);}
+    .header{display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}.kicker{letter-spacing:.26em;text-transform:uppercase;color:#8dffcf;font-weight:900;font-size:13px}.title{font-size:clamp(42px,7vw,84px);line-height:.88;margin:8px 0;text-transform:uppercase}.badge{border:1px solid rgba(141,255,207,.46);border-radius:999px;padding:10px 14px;color:#dffff5;background:rgba(141,255,207,.08);font-weight:900}.subtitle{color:#ded7ff;font-size:clamp(18px,2.4vw,24px);max-width:860px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:26px 0}.card{border:1px solid rgba(255,255,255,.13);border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.035));padding:18px;min-height:96px}.card b{display:block;color:#fff;margin-bottom:7px}.card span{color:#c9c2df}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}.btn{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px 18px;text-decoration:none;color:#fff;background:linear-gradient(90deg,#7a49ff,#26d7a0);font-weight:900}.btn.secondary{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2)}
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+  <main class="lounge-room">
+    <section class="lounge-stage">
+      <div class="window"><div class="mars"></div><div class="moon"></div><div class="skyline"></div></div>
+      <div class="header"><div><div class="kicker">Private Scene Route</div><h1 class="title">SVR Lounge</h1></div><div class="badge">LOUNGE CREATED</div></div>
+      <p class="subtitle">A private social room for saved-hand replays, conversation, sponsor-safe events, and future watch/table jumbotron moments. This room stays separate from the main lobby so the lobby remains clean and fast.</p>
+      <div class="grid">
+        <div class="card"><b>Replay Jumbotron</b><span>Reserved for big wins, showdown replays, tournament highlights, and future CAM 3 clips.</span></div>
+        <div class="card"><b>Conversation Seating</b><span>Social seating concept for VR guests between hands without crowding the poker table.</span></div>
+        <div class="card"><b>Portal Ready</b><span>The lobby storefront routes here as a private destination instead of placing the lounge inside the lobby.</span></div>
+        <div class="card"><b>Approval Safe</b><span>No restricted product sales or unapproved sponsor claims are active in this lounge.</span></div>
+      </div>
+      <div class="actions"><a class="btn" href="./index.html">Return to Lobby</a><a class="btn secondary" href="./index.html?vr=1">Open Main Game</a></div>
+    </section>
+  </main>
+</body>
+</html>

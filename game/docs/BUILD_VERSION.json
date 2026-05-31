@@ -1,16 +1,15 @@
 {
-  "build": "PHASE-89-VISIBLE-PORTAL-APPROVAL-LOCK",
-  "phase": 89,
-  "name": "Visible Portal Approval Lock",
+  "build": "PHASE-90-LOUNGE-SKY-LOCK",
+  "phase": 90,
+  "name": "Lounge Sky Lock",
   "date": "2026-05-31",
   "siteTouched": false,
-  "scope": "game-side only: refined south mission wall, Espresso placeholder ad, portal hologram tags, Lounge storefront polish, higher Moon/Mars sky pass, local event-bus bridge",
+  "scope": "game-side only: create a clearer SVR Lounge storefront/private scene and raise Moon/Mars much higher behind the skyline",
   "notes": [
-    "Rewrote the SVR mission/about language for play-money poker, sponsorship, community giveback, and legal safety.",
-    "Added actual Espresso With Cream placeholder ad art to the south mission wall while keeping the angel-wing charity emblem as a placeholder.",
-    "Added readable hologram tags for the main portal destinations without adding private rooms into the lobby.",
-    "Raised Moon and Mars higher and farther behind the skyline with a calmer slow drift.",
-    "Kept Reiki approval-safe: no external Reiki sponsor, founder, or domain branding.",
+    "Built a stronger visible SVR Lounge storefront with a doorway arch, portal beam, seating props, larger hologram, and brighter portal target.",
+    "Added a full private lounge page at game/lounge.html and kept game/smoker-lounge.html as a compatible lounge route.",
+    "Raised Moon and Mars much higher and farther behind the skyline in both initial placement and runtime orbit updates.",
+    "Preserved visible portal beacons, Reiki Trueitive/Shyona waiting-for-approval placeholders, and all private scene routes.",
     "Kept website/site files untouched."
   ],
   "updatedAt": "2026-05-31T00:00:00-05:00"

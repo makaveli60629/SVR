@@ -1684,11 +1684,11 @@ function createLoungeDisplayTexture(){
     x.fillStyle=g; x.fillRect(0,0,w,h);
     x.strokeStyle='rgba(205,140,255,0.95)'; x.lineWidth=14; roundRectPath(x,18,18,w-36,h-36,34); x.stroke();
     x.textAlign='center'; x.textBaseline='middle';
-    x.fillStyle='#fff7ff'; x.font='bold 96px system-ui, Arial'; x.fillText('SVR LOUNGE', w/2, 142);
-    x.fillStyle='#d7b8ff'; x.font='bold 42px system-ui, Arial'; x.fillText('PRIVATE SOCIAL ROOM', w/2, 222);
-    x.fillStyle='rgba(255,255,255,0.88)'; x.font='32px system-ui, Arial';
-    ['Saved hands replay wall', 'Conversation lounge', 'Future VIP sponsor events', 'No sales or restricted products'].forEach((line,i)=>x.fillText('• '+line, w/2, 326+i*64));
-    x.fillStyle='#8dffcf'; x.font='bold 50px system-ui, Arial'; x.fillText('ENTER LOUNGE PORTAL', w/2, 636);
+    x.fillStyle='#fff7ff'; x.font='bold 104px system-ui, Arial'; x.fillText('SVR LOUNGE', w/2, 132);
+    x.fillStyle='#d7b8ff'; x.font='bold 46px system-ui, Arial'; x.fillText('PRIVATE SOCIAL ROOM CREATED', w/2, 214);
+    x.fillStyle='rgba(255,255,255,0.90)'; x.font='32px system-ui, Arial';
+    ['Replay jumbotron wall', 'Conversation lounge seating', 'VIP social meetup space', 'No restricted product sales'].forEach((line,i)=>x.fillText('• '+line, w/2, 320+i*62));
+    x.fillStyle='#8dffcf'; x.font='bold 52px system-ui, Arial'; x.fillText('ENTER PRIVATE LOUNGE', w/2, 640);
   });
 }
 
@@ -1705,17 +1705,17 @@ function addLoungeStorefront(scene, R, wallHeight, spawnLogoTex){
   const trimMat = new THREE.MeshStandardMaterial({ color: 0xc68bff, roughness: 0.18, metalness: 0.48, emissive: 0x6d2fff, emissiveIntensity: 0.92 });
   const glassMat = new THREE.MeshStandardMaterial({ color: 0xcc9bff, transparent: true, opacity: 0.10, roughness: 0.08, metalness: 0.18, emissive: 0x4d1f78, emissiveIntensity: 0.20, side: THREE.DoubleSide });
 
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(10.4, 0.12, 5.8), new THREE.MeshStandardMaterial({ color: 0x100816, roughness: 0.86, metalness: 0.06, emissive: 0x220a32, emissiveIntensity: 0.18 }));
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(11.6, 0.12, 6.4), new THREE.MeshStandardMaterial({ color: 0x100816, roughness: 0.86, metalness: 0.06, emissive: 0x220a32, emissiveIntensity: 0.18 }));
   floor.position.set(0, 0.06, 0.34); root.add(floor);
-  const rear = new THREE.Mesh(new THREE.BoxGeometry(10.6, 5.8, 0.18), frameMat);
+  const rear = new THREE.Mesh(new THREE.BoxGeometry(11.6, 6.2, 0.18), frameMat);
   rear.position.set(0, 2.9, -2.56); root.add(rear);
-  const header = new THREE.Mesh(new THREE.BoxGeometry(10.6, 0.22, 0.26), trimMat);
+  const header = new THREE.Mesh(new THREE.BoxGeometry(11.7, 0.28, 0.34), trimMat);
   header.position.set(0, 5.82, 0.86); root.add(header);
-  [-5.20, 5.20].forEach((x)=>{ const col = new THREE.Mesh(new THREE.BoxGeometry(0.18, 5.65, 0.28), trimMat); col.position.set(x,2.82,0.86); root.add(col); });
+  [-5.70, 5.70].forEach((x)=>{ const col = new THREE.Mesh(new THREE.BoxGeometry(0.24, 5.95, 0.34), trimMat); col.position.set(x,2.82,0.86); root.add(col); });
 
   const signTex = createLoungeDisplayTexture();
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(6.3, 3.78), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
-  sign.position.set(0, 3.05, -2.45); root.add(sign);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(7.15, 4.18), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
+  sign.position.set(0, 3.10, -2.45); root.add(sign);
 
   const portalTex = canvasTexture(1024,1024,(x,w,h)=>{
     const g=x.createRadialGradient(w/2,h/2,80,w/2,h/2,430);
@@ -1724,33 +1724,54 @@ function addLoungeStorefront(scene, R, wallHeight, spawnLogoTex){
     x.strokeStyle='rgba(200,146,255,0.95)'; x.lineWidth=18; x.beginPath(); x.arc(w/2,h/2,262,0,Math.PI*2); x.stroke();
     x.fillStyle='#fff7ff'; x.textAlign='center'; x.font='bold 84px system-ui, Arial'; x.fillText('LOUNGE', w/2, h/2+28);
   });
-  const portal = new THREE.Mesh(new THREE.CircleGeometry(1.16,64), new THREE.MeshBasicMaterial({ map: portalTex, transparent:true, side:THREE.DoubleSide, depthWrite:false }));
-  portal.rotation.x = -Math.PI * 0.5; portal.position.set(0,0.034,1.65); root.add(portal);
+  const portal = new THREE.Mesh(new THREE.CircleGeometry(1.36,64), new THREE.MeshBasicMaterial({ map: portalTex, transparent:true, side:THREE.DoubleSide, depthWrite:false }));
+  portal.rotation.x = -Math.PI * 0.5; portal.position.set(0,0.034,1.74); root.add(portal);
 
-  const desk = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.64, 0.92), new THREE.MeshStandardMaterial({ color:0x27162e, roughness:0.52, metalness:0.14, emissive:0x341449, emissiveIntensity:0.22 }));
-  desk.position.set(0,0.62,0.30); root.add(desk);
+  // Phase 90: create a real visible lounge doorway/arch so the lounge reads as a destination, not just a flat sign.
+  const archMat = new THREE.MeshBasicMaterial({ color:0xd58cff, transparent:true, opacity:0.72, depthWrite:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending });
+  const loungeArch = new THREE.Mesh(new THREE.TorusGeometry(1.54, 0.035, 12, 112), archMat);
+  loungeArch.position.set(0, 1.42, 1.72);
+  loungeArch.scale.y = 1.34;
+  root.add(loungeArch);
+  const portalBeam = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.72, 3.35, 32, 1, true), new THREE.MeshBasicMaterial({ color:0xd58cff, transparent:true, opacity:0.13, depthWrite:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending }));
+  portalBeam.position.set(0, 1.67, 1.74);
+  root.add(portalBeam);
+  [-1.88, 1.88].forEach((x)=>{
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.055,0.055,3.15,14), trimMat);
+    post.position.set(x,1.58,1.72);
+    root.add(post);
+    const orb = new THREE.Mesh(new THREE.SphereGeometry(0.13,16,16), new THREE.MeshBasicMaterial({ color:0xd58cff, transparent:true, opacity:0.86 }));
+    orb.position.set(x,3.22,1.72);
+    root.add(orb);
+  });
+
+  const desk = new THREE.Mesh(new THREE.BoxGeometry(6.0, 0.66, 1.0), new THREE.MeshStandardMaterial({ color:0x27162e, roughness:0.52, metalness:0.14, emissive:0x341449, emissiveIntensity:0.22 }));
+  desk.position.set(0,0.62,0.18); root.add(desk);
   const couchMat = new THREE.MeshStandardMaterial({ color:0x2b1738, roughness:0.72, metalness:0.06, emissive:0x321043, emissiveIntensity:0.18 });
-  [-3.2,3.2].forEach((x)=>{ const couch = new THREE.Mesh(new THREE.BoxGeometry(1.8,0.56,0.86), couchMat); couch.position.set(x,0.50,1.0); root.add(couch); });
+  [-3.55,3.55].forEach((x)=>{
+    const couch = new THREE.Mesh(new THREE.BoxGeometry(2.15,0.58,0.94), couchMat); couch.position.set(x,0.50,1.03); root.add(couch);
+    const back = new THREE.Mesh(new THREE.BoxGeometry(2.15,0.84,0.22), couchMat); back.position.set(x,0.92,1.48); root.add(back);
+  });
 
   if (spawnLogoTex){
     const logo = new THREE.Mesh(new THREE.PlaneGeometry(1.0,1.0), new THREE.MeshBasicMaterial({ map:spawnLogoTex, transparent:true, side:THREE.DoubleSide, depthWrite:false }));
     logo.position.set(-4.16,4.56,-2.42); root.add(logo);
   }
-  const light = new THREE.PointLight(0xc68bff, 2.2, 18, 2.0); light.position.set(0,3.8,1.5); root.add(light);
+  const light = new THREE.PointLight(0xc68bff, 3.4, 24, 2.0); light.position.set(0,3.8,1.5); root.add(light);
 
   // Phase 88: readable lounge hologram tag above the storefront portal.
-  const loungeHoloTex = createPortalTagTexture('SVR LOUNGE', 'private social room', '#d58cff', '#8dffcf');
-  const loungeHolo = new THREE.Mesh(new THREE.PlaneGeometry(3.35, 1.18), new THREE.MeshBasicMaterial({ map:loungeHoloTex, transparent:true, opacity:0.84, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending }));
-  loungeHolo.position.set(0, 2.05, 1.78);
+  const loungeHoloTex = createPortalTagTexture('SVR LOUNGE', 'private social room live', '#d58cff', '#8dffcf');
+  const loungeHolo = new THREE.Mesh(new THREE.PlaneGeometry(4.15, 1.42), new THREE.MeshBasicMaterial({ map:loungeHoloTex, transparent:true, opacity:0.84, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending }));
+  loungeHolo.position.set(0, 2.46, 2.10);
   root.add(loungeHolo);
-  const loungeHoloRing = new THREE.Mesh(new THREE.TorusGeometry(1.68, 0.015, 8, 80), new THREE.MeshBasicMaterial({ color:0xd58cff, transparent:true, opacity:0.36, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending }));
-  loungeHoloRing.position.set(0, 2.05, 1.74);
+  const loungeHoloRing = new THREE.Mesh(new THREE.TorusGeometry(2.12, 0.018, 8, 96), new THREE.MeshBasicMaterial({ color:0xd58cff, transparent:true, opacity:0.36, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending }));
+  loungeHoloRing.position.set(0, 2.46, 2.06);
   root.add(loungeHoloRing);
   root.userData.loungeHolo = { panel:loungeHolo, ring:loungeHoloRing, baseY:loungeHolo.position.y };
 
   return {
     root,
-    target: center.clone().add(inward.clone().multiplyScalar(3.0)).setY(0),
+    target: center.clone().add(inward.clone().multiplyScalar(3.35)).setY(0),
     roomTarget: center.clone().add(inward.clone().multiplyScalar(1.45)).setY(0),
     look: center.clone().setY(1.7)
   };
@@ -2553,7 +2574,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(5.6, 56, 56),
+    new THREE.SphereGeometry(6.8, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2565,16 +2586,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-92, wallHeight + 188.0, -(R + 360.0));
+  moon.position.set(-104, wallHeight + 270.0, -(R + 520.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(54.0, 54.0, 1);
+  moonHalo.scale.set(68.0, 68.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(3.1, 44, 44),
+    new THREE.SphereGeometry(4.0, 44, 44),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2586,13 +2607,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  mars.position.set(126, wallHeight + 210.0, -(R + 430.0));
+  mars.position.set(148, wallHeight + 300.0, -(R + 610.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(34.0, 34.0, 1);
+  marsHalo.scale.set(45.0, 45.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2798,16 +2819,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
     moon.position.set(
-      -64 + Math.sin(t * 0.016) * 5.0,
-      wallHeight + 128.0 + Math.sin(t * 0.055) * 1.6,
-      -(R + 285.0) + Math.cos(t * 0.012) * 6.0
+      -92 + Math.sin(t * 0.016) * 7.0,
+      wallHeight + 270.0 + Math.sin(t * 0.055) * 2.2,
+      -(R + 520.0) + Math.cos(t * 0.012) * 8.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     mars.position.set(
-      96 + Math.sin(t * 0.014 + 1.4) * 6.5,
-      wallHeight + 152.0 + Math.sin(t * 0.050 + 0.8) * 1.4,
-      -(R + 348.0) + Math.cos(t * 0.010 + 0.4) * 5.0
+      132 + Math.sin(t * 0.014 + 1.4) * 8.5,
+      wallHeight + 305.0 + Math.sin(t * 0.050 + 0.8) * 2.0,
+      -(R + 625.0) + Math.cos(t * 0.010 + 0.4) * 7.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;
@@ -2985,7 +3006,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     chipPutt: { url: './chip-putt.html' },
     store: { url: './store-room.html' },
     lounge: loungeStorefront ? { pos: loungeStorefront.target.clone(), look: loungeStorefront.look.clone() } : null,
-    loungeRoom: { url: './smoker-lounge.html' },
+    loungeRoom: { url: './lounge.html' },
     legends: {
       pos: new THREE.Vector3(legendHall.group.position.x * 0.82, 0, legendHall.group.position.z * 0.82),
       look: legendHall.group.position.clone().setY(1.8)
