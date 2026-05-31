@@ -1,60 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SVR Poker | Member Registration</title>
-  <meta name="description" content="Register interest for SVR Poker membership, launch updates, tester access, sponsor events, and community impact campaigns." />
-  <link rel="icon" href="../logo.webp" type="image/webp" />
-  <link rel="stylesheet" href="../style.css" />
-  <style>
-    .phase-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;align-items:center}.phase-hero img{width:100%;border-radius:24px;border:1px solid rgba(128,248,255,.25);box-shadow:0 0 28px rgba(128,248,255,.16)}.form-card{border:1px solid rgba(128,248,255,.28);border-radius:22px;background:rgba(5,0,16,.72);padding:22px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}textarea{width:100%;min-height:130px;background:rgba(4,0,14,.9);color:#fff;border:1px solid rgba(128,248,255,.45);border-radius:14px;padding:12px}select{width:100%;background:rgba(4,0,14,.9);color:#fff;border:1px solid rgba(128,248,255,.45);border-radius:14px;padding:12px}label{display:block;color:#d8c7e8;font-weight:700}.status-box{margin-top:12px;color:#80f8ff}.logic-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.logic-strip article{border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px;background:rgba(0,0,0,.24)}@media(max-width:850px){.phase-hero,.form-grid,.logic-strip{grid-template-columns:1fr}}
-  </style>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SVR Poker | Register</title>
+<meta name="description" content="Register for SVR Poker early access, profile creation, game login, store sandbox access, and sponsor updates."/>
+<link rel="icon" href="../logo.webp" type="image/webp"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site-market.css"/><link rel="stylesheet" href="final-polish.css"/>
 </head>
-<body>
-  <canvas id="binary-rain" aria-hidden="true"></canvas>
-  <div class="site-shell">
-    <nav class="site-nav">
-      <div class="nav-brand"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Member Intake</span></div></div>
-      <div class="nav-links"><a href="index.html">Site Home</a><a href="store.html">Store</a><a href="billboards.html">Billboards</a><a href="sponsorship.html">Sponsorship</a><a href="../index.html">Launch</a></div>
-    </nav>
-    <main class="site-card">
-      <section class="section phase-hero">
-        <div>
-          <div class="card-tag">Database Population</div>
-          <h1 class="section-title">Member Registration</h1>
-          <p class="section-copy">This page collects structured member interest for the AWS database through the live SVR API. It is designed for player population growth, tester onboarding, sponsor-event interest, and future member access.</p>
-          <div class="logic-strip">
-            <article><h3>1. Register</h3><p>Visitor submits voluntary member interest.</p></article>
-            <article><h3>2. Save</h3><p>API stores the record as a member lead.</p></article>
-            <article><h3>3. Review</h3><p>Owner panel shows member population privately.</p></article>
-          </div>
-        </div>
-        <img src="assets/images/member-population-update.svg" alt="SVR member population dashboard visual">
-      </section>
-      <section class="section form-card">
-        <h2 class="section-title">Join the SVR member population list</h2>
-        <form id="member-register-form">
-          <div class="form-grid">
-            <label>Name<input name="name" type="text" placeholder="Your name" required></label>
-            <label>Email<input name="email" type="email" placeholder="you@example.com" required></label>
-            <label>Phone optional<input name="phone" type="text" placeholder="Optional"></label>
-            <label>Interest<select name="interest"><option value="member_waitlist">Member waitlist</option><option value="tester">Game tester</option><option value="sponsor_event">Sponsor event updates</option><option value="community_cause">Community cause updates</option><option value="store_updates">Store updates</option></select></label>
-          </div>
-          <label>Message<textarea name="message" placeholder="Tell us what you want access to: poker demo, VR testing, store updates, sponsor events, or community impact campaigns."></textarea></label>
-          <label class="section-copy"><input name="consent" type="checkbox" style="width:auto;margin-right:8px" required> I agree to be contacted about SVR Poker updates. No payment is collected here.</label>
-          <button class="btn btn-primary" type="submit">Submit Registration</button>
-          <p id="register-status" class="status-box">Ready.</p>
-        </form>
-      </section>
-    </main>
-  </div>
-  <script src="../matrix.js"></script>
-  <script>
-    const API='https://api.svrpoker.com';
-    const form=document.getElementById('member-register-form');
-    const status=document.getElementById('register-status');
-    form.addEventListener('submit',async(e)=>{e.preventDefault();status.textContent='Saving registration...';const fd=new FormData(form);const interest=fd.get('interest')||'member_waitlist';const body={leadType:'member_'+interest,name:fd.get('name'),email:fd.get('email'),phone:fd.get('phone'),organization:'SVR Member Population',message:fd.get('message')||('Member registration interest: '+interest),source:'site/register.html',consent:fd.get('consent')==='on'};try{const res=await fetch(API+'/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await res.json();if(!res.ok||data.ok===false)throw new Error(data.error||'Registration failed');status.textContent='Saved. Your registration was added to the SVR member population list.';form.reset();}catch(err){status.textContent='Could not reach live API. Please try again or use the contact page. '+err.message;}});
-  </script>
-</body>
-</html>
+<body class="svr-market"><canvas id="binary-rain" aria-hidden="true"></canvas><div class="market-page"><nav class="market-nav"><a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Early Access</span></div></a><div class="market-links"><span class="status-pill">ADMIN ONLINE</span><a href="index.html">Home</a><a class="active" href="register.html">Register</a><a href="profile.html">Profile</a><a href="store.html">Store</a><a href="sponsorship.html">Sponsors</a><a href="contact.html">Contact</a></div></nav><main class="market-shell">
+<section class="hero"><div><span class="kicker">Register</span><h1>Claim Your SVR Profile</h1><p class="lead">Create an early-access profile for the website, game identity, store wishlist, future avatar inventory, event notices, and sponsor-safe updates.</p><p class="copy">Live login should be connected through AWS authentication. This page is wired as a polished signup concept now and ready to connect to email or phone verification when the backend is active.</p><div class="trust-strip"><span>AWS auth direction</span><span>Purchases sandbox only</span><span>Profile + game login path</span><span>Early access list</span></div></div><aside class="hero-card"><form class="svr-form" id="svr-register-form"><span class="svr-eyebrow">Early Access Signup</span><label>Display Name<input name="displayName" autocomplete="nickname" placeholder="Your player name"></label><label>Email<input name="email" type="email" autocomplete="email" placeholder="you@example.com"></label><label>Phone Optional<input name="phone" autocomplete="tel" placeholder="For future SMS code"></label><label>Interest<select name="interest"><option>Player profile</option><option>Store / avatar items</option><option>Sponsor / partner</option><option>Tester / early access</option></select></label><button class="btn primary" type="submit">Register Interest</button><p class="svr-form-status" id="svr-register-status"></p><small>No live payment. No public visitor counter. Verification will route through AWS when activated.</small></form></aside></section>
+<section class="section"><div class="head"><div><span class="tag">How it will work</span><h2>One account across site + game</h2></div></div><div class="svr-step-list"><div class="svr-step"><h3>Register</h3><p>Visitor signs up with email or phone and receives a verification code after AWS auth is connected.</p></div><div class="svr-step"><h3>Create Profile</h3><p>Player chooses display name, avatar direction, favorite room, and communication preferences.</p></div><div class="svr-step"><h3>Enter Game</h3><p>The same account connects to game identity, future chip balance, rooms, inventory, and events.</p></div><div class="svr-step"><h3>Browse Store</h3><p>Purchases stay in sandbox until launch approval, but users can wishlist and preview products.</p></div></div></section>
+<section class="section"><div class="svr-final-grid three"><article class="svr-polish-card"><span class="svr-eyebrow">Player</span><h3>Player profile</h3><p>Name, avatar preference, favorite hub, wishlist, event interest, and game access path.</p></article><article class="svr-polish-card"><span class="svr-eyebrow">Sponsor</span><h3>Partner lead</h3><p>Business type, campaign goal, preferred hub, logo/site approval status, and contact notes.</p></article><article class="svr-polish-card"><span class="svr-eyebrow">Admin</span><h3>Private review</h3><p>Admin can review leads, visitor counts, banner clicks, and signup interest privately.</p></article></div></section>
+<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="../index.html">Public Launch</a><a class="btn primary" href="profile.html">Profile Preview</a><a class="btn secondary" href="store.html">Store</a></div></footer></main></div><script src="../matrix.js"></script><script src="../site-public-hooks.js"></script><script>document.getElementById('svr-register-form')?.addEventListener('submit',function(e){e.preventDefault();const data=Object.fromEntries(new FormData(e.currentTarget).entries());localStorage.setItem('svr_register_interest',JSON.stringify({...data,createdAt:new Date().toISOString()}));document.getElementById('svr-register-status').textContent='Saved locally for preview. AWS registration endpoint can connect next.';});</script></body></html>
