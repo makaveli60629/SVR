@@ -5,8 +5,6 @@
   const SESSION_KEY = 'svr_site_session_id';
   const STATUS_REFRESH_MS = 30000;
 
-  let lastAdminState = 'unknown';
-
   function sessionId() {
     try {
       let id = localStorage.getItem(SESSION_KEY);
@@ -55,7 +53,6 @@
 
   function setAdminVisualState(isOnline, sourceText) {
     const state = isOnline ? 'online' : 'offline';
-    lastAdminState = state;
     try { localStorage.setItem(ADMIN_KEY, state); } catch (e) {}
     getAdminBadgeElements().forEach((el) => {
       el.dataset.state = state;
@@ -228,30 +225,70 @@
     }
   }
 
+  function injectFloatingMenuStyles() {
+    if (document.getElementById('svr-global-floating-menu-style')) return;
+    const style = document.createElement('style');
+    style.id = 'svr-global-floating-menu-style';
+    style.textContent = `
+      .svr-body-menu-btn{position:fixed!important;top:10px!important;right:10px!important;z-index:2147483647!important;border:1px solid rgba(105,232,255,.48)!important;border-radius:999px!important;background:linear-gradient(135deg,rgba(105,232,255,.30),rgba(255,91,233,.22))!important;color:#fff!important;font-family:Orbitron,Arial,sans-serif!important;font-weight:900!important;letter-spacing:.06em!important;text-transform:uppercase!important;padding:9px 13px!important;box-shadow:0 20px 58px rgba(0,0,0,.66)!important;backdrop-filter:blur(18px)!important;pointer-events:auto!important;isolation:isolate!important}
+      .svr-body-menu-panel{position:fixed!important;top:56px!important;right:9px!important;width:min(315px,calc(100vw - 18px))!important;z-index:2147483646!important;display:none!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;padding:10px!important;border-radius:20px!important;border:1px solid rgba(105,232,255,.38)!important;background:rgba(5,5,14,.985)!important;box-shadow:0 30px 96px rgba(0,0,0,.84)!important;backdrop-filter:blur(20px)!important;pointer-events:auto!important;isolation:isolate!important}
+      .svr-body-menu-panel.is-open{display:grid!important}
+      .svr-body-menu-panel a,.svr-body-menu-panel span{display:flex!important;align-items:center!important;justify-content:center!important;min-height:40px!important;padding:8px!important;border-radius:14px!important;border:1px solid rgba(255,255,255,.10)!important;background:rgba(255,255,255,.065)!important;color:#fff!important;text-decoration:none!important;font-weight:800!important;font-size:.84rem!important;text-align:center!important}
+      .svr-body-menu-panel span{font-family:Orbitron,Arial,sans-serif!important;font-size:.64rem!important;color:#a7ff80!important;letter-spacing:.08em!important}
+      .svr-touch-nav .market-links{display:none!important}
+      @media(max-width:420px){.svr-body-menu-panel{width:min(292px,calc(100vw - 18px))!important;right:9px!important;top:56px!important}.svr-body-menu-btn{top:10px!important;right:10px!important}}
+    `;
+    document.head.appendChild(style);
+  }
+
   function wireTouchNavigation() {
     const nav = document.querySelector('.market-nav');
     const links = document.querySelector('.market-links');
-    if (!nav || !links || nav.dataset.touchNavWired === '1') return;
-    const isAndroid = /Android/i.test(navigator.userAgent || '');
+    if (!nav || !links || document.getElementById('svr-body-floating-menu')) return;
     const isTouchSmall = window.matchMedia && window.matchMedia('(pointer: coarse), (max-width: 760px)').matches;
+    const isAndroid = /Android/i.test(navigator.userAgent || '');
     if (!isAndroid && !isTouchSmall) return;
-    nav.dataset.touchNavWired = '1';
+    injectFloatingMenuStyles();
+    document.body.classList.add('svr-global-floating-menu-enabled');
     nav.classList.add('svr-touch-nav');
-    const toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'svr-nav-toggle';
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.textContent = 'Menu';
-    links.classList.add('is-collapsed');
-    const brand = nav.querySelector('.market-brand');
-    if (brand && brand.nextSibling) nav.insertBefore(toggle, brand.nextSibling);
-    else nav.prepend(toggle);
-    toggle.addEventListener('click', () => {
-      const open = links.classList.toggle('is-open');
-      links.classList.toggle('is-collapsed', !open);
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.textContent = open ? 'Close Menu' : 'Menu';
+
+    const btn = document.createElement('button');
+    btn.id = 'svr-body-floating-menu';
+    btn.className = 'svr-body-menu-btn';
+    btn.type = 'button';
+    btn.textContent = 'Menu';
+    btn.setAttribute('aria-expanded', 'false');
+
+    const panel = document.createElement('div');
+    panel.id = 'svr-body-floating-menu-panel';
+    panel.className = 'svr-body-menu-panel';
+    Array.from(links.children).forEach((child) => {
+      const copy = child.cloneNode(true);
+      if (copy.tagName === 'A') {
+        copy.addEventListener('click', () => {
+          panel.classList.remove('is-open');
+          btn.textContent = 'Menu';
+          btn.setAttribute('aria-expanded', 'false');
+        });
+      }
+      panel.appendChild(copy);
     });
+
+    btn.addEventListener('click', () => {
+      const open = panel.classList.toggle('is-open');
+      btn.textContent = open ? 'Close' : 'Menu';
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        panel.classList.remove('is-open');
+        btn.textContent = 'Menu';
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.body.appendChild(btn);
+    document.body.appendChild(panel);
   }
 
   function boot() {
