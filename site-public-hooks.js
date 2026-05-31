@@ -1,5 +1,5 @@
 (() => {
-  const API_BASE = window.SVR_AWS_API_BASE || window.SVR_API_BASE || 'https://api.svrpoker.com';
+  const API_BASE = window.SVR_SERVER_API_BASE || window.SVR_API_BASE || 'https://api.svrpoker.com';
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages_backup';
   const SESSION_KEY = 'svr_site_session_id';
@@ -28,7 +28,7 @@
       referrer: document.referrer || '',
       sessionId: sessionId(),
       source: 'site',
-      provider: 'aws',
+      provider: 'server',
       metadata: { href: location.href, ...metadata }
     });
     try {
@@ -59,7 +59,7 @@
     try { localStorage.setItem(ADMIN_KEY, state); } catch (e) {}
     getAdminBadgeElements().forEach((el) => {
       el.dataset.state = state;
-      el.dataset.source = sourceText || 'aws-api-or-fallback';
+      el.dataset.source = sourceText || 'server-api-or-fallback';
       el.classList.toggle('online', isOnline);
       el.classList.toggle('offline', !isOnline);
       const text = isOnline ? 'ADMIN ONLINE' : 'ADMIN OFFLINE';
@@ -69,7 +69,7 @@
       el.setAttribute('aria-label', text);
       el.title = text;
     });
-    window.SVR_ADMIN_PRESENCE = { state, isOnline, source: sourceText || 'aws-api-or-fallback', updatedAt: new Date().toISOString() };
+    window.SVR_ADMIN_PRESENCE = { state, isOnline, source: sourceText || 'server-api-or-fallback', updatedAt: new Date().toISOString() };
   }
 
   function setAdminLoadingState() {
@@ -89,7 +89,7 @@
       const data = await fetchAdminStatus();
       if (!data || data.ok === false) throw new Error(data && data.error ? data.error : 'Invalid admin status payload');
       const online = Boolean(data.isOnline ?? data.online ?? data.adminOnline ?? data.status === 'online');
-      setAdminVisualState(online, 'aws-api');
+      setAdminVisualState(online, 'server-api');
     } catch (error) {
       const fallback = (() => { try { return localStorage.getItem(ADMIN_KEY); } catch (e) { return null; } })();
       setAdminVisualState(fallback !== 'offline', 'fallback');
@@ -100,7 +100,7 @@
     const response = await fetch(`${API_BASE}/api/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ ...entry, provider: 'aws' })
+      body: JSON.stringify({ ...entry, provider: 'server' })
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok || data.ok === false) throw new Error(data.error || `Message request failed: ${response.status}`);
@@ -140,7 +140,7 @@
         track('message_submit_success', { source: entry.source });
       } catch (error) {
         saveLocalMessageBackup({ ...entry, createdAt: new Date().toISOString(), sent: false, error: error.message });
-        if (status) status.textContent = 'Message saved locally. Live AWS API could not be reached yet.';
+        if (status) status.textContent = 'Message saved locally. Live server connection could not be reached yet.';
         track('message_submit_fallback', { source: entry.source });
       }
     });
@@ -184,7 +184,7 @@
       index = (nextIndex + slides.length) % slides.length;
       slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
       dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
-      if (counter) counter.textContent = `Slide ${index + 1} / ${slides.length}`;
+      if (counter) counter.textContent = '';
       const active = slides[index];
       track('banner_slide_view', { slideId: active.dataset.slideId || `slide-${index + 1}`, slideType: active.dataset.slideType || 'info', slideIndex: index + 1, source });
       resetTimer();
@@ -204,12 +204,65 @@
     show(index, 'boot');
   }
 
+  function refinePublicText() {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((node) => {
+      if (!node.nodeValue) return;
+      node.nodeValue = node.nodeValue
+        .replace(/AWS/g, 'server')
+        .replace(/Azure/g, 'server')
+        .replace(/A director-camera view of the SVR Poker lobby, built for visitors, sponsors, testers, and future VR portal previews\./g, 'Step into SVR Poker: a premium social poker destination built for players, partners, private rooms, storefronts, tournaments, and community impact.')
+        .replace(/The site now uses a stronger cinematic poker visual direction: competitive energy, community, rewards, and clean navigation\. Internal infrastructure details stay private so the website remains professional and customer-facing\./g, 'Register your profile, explore the store, preview the rooms, and see how sponsors can become part of a polished VR-ready poker world.');
+    });
+    const liveCopy = document.querySelector('.live-copy');
+    if (liveCopy) {
+      const kicker = liveCopy.querySelector('.kicker');
+      const title = liveCopy.querySelector('h1');
+      if (kicker) kicker.textContent = 'Premium Social Poker';
+      if (title) title.textContent = 'SVR Poker';
+      const trust = liveCopy.querySelectorAll('.trust-strip span');
+      const labels = ['Play-Money Poker', 'Private Rooms', 'Sponsor Ready', 'Store Preview'];
+      trust.forEach((span, i) => { if (labels[i]) span.textContent = labels[i]; });
+    }
+  }
+
+  function wireTouchNavigation() {
+    const nav = document.querySelector('.market-nav');
+    const links = document.querySelector('.market-links');
+    if (!nav || !links || nav.dataset.touchNavWired === '1') return;
+    const isAndroid = /Android/i.test(navigator.userAgent || '');
+    const isTouchSmall = window.matchMedia && window.matchMedia('(pointer: coarse), (max-width: 760px)').matches;
+    if (!isAndroid && !isTouchSmall) return;
+    nav.dataset.touchNavWired = '1';
+    nav.classList.add('svr-touch-nav');
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'svr-nav-toggle';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.textContent = 'Menu';
+    links.classList.add('is-collapsed');
+    const brand = nav.querySelector('.market-brand');
+    if (brand && brand.nextSibling) nav.insertBefore(toggle, brand.nextSibling);
+    else nav.prepend(toggle);
+    toggle.addEventListener('click', () => {
+      const open = links.classList.toggle('is-open');
+      links.classList.toggle('is-collapsed', !open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.textContent = open ? 'Close Menu' : 'Menu';
+    });
+  }
+
   function boot() {
+    document.body.classList.add('svr-polished-site');
     setAdminLoadingState();
     paintAdminState();
     wireMessageForm();
     wireClicks();
     wireBannerSlider();
+    refinePublicText();
+    wireTouchNavigation();
     track('page_view');
     setTimeout(paintAdminState, 1500);
     setInterval(paintAdminState, STATUS_REFRESH_MS);
