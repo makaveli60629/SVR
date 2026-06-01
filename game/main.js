@@ -155,7 +155,7 @@ function gotoScene(key){
   return true;
 }
 function openRikiHologram(){
-  setStatus("Reiki hologram is lobby-zone only. Use Reiki area.", { force: true });
+  setStatus("Reiki hologram is in the Reiki storefront audio zone.", { force: true });
   gotoScene("reiki");
   return true;
 }
@@ -173,6 +173,7 @@ function findActivePortal(){
 function activatePortal(){
   const portal = activePortal || findActivePortal();
   if (!portal){ setStatus("No portal in range. Walk onto a storefront glow.", { force: true }); return false; }
+  if (portal.key === "reiki") lobbyVisibilityLock?.primeReikiAudio?.();
   if (portal.route){
     setStatus(`Opening ${portal.label}...`, { force: true });
     window.location.href = portal.route;
@@ -193,8 +194,8 @@ $sceneButtons.forEach((btn)=>{
 
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
-  if (e.code === "KeyM") setStatus("Audio disabled for Phase 96C", { force: true });
-  if (e.code === "KeyN") setStatus("Audio disabled for Phase 96C", { force: true });
+  if (e.code === "KeyM") setStatus("Audio disabled globally; Reiki has low proximity audio.", { force: true });
+  if (e.code === "KeyN") setStatus("Audio disabled globally; Reiki has low proximity audio.", { force: true });
   if (e.code === "KeyP") { positionPanelVisible = !positionPanelVisible; if ($positionPanel) $positionPanel.style.display = positionPanelVisible ? "block" : "none"; }
   if (e.code === "KeyE") activatePortal();
   if (e.code === "KeyJ") joinTable();
@@ -223,7 +224,7 @@ const watch = createWristWatch({
     teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
   }),
   actions: {
-    toggleAudio: ()=>setStatus("Audio disabled for Phase 96C", { force: true }),
+    toggleAudio: ()=>setStatus("Audio disabled globally; Reiki has low proximity audio.", { force: true }),
     nextTrack: activatePortal,
     openRikiHologram,
     joinTable,
@@ -249,7 +250,7 @@ $toggleJoints?.addEventListener("click", ()=>{
 setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Portals active. Press E near storefront. Audio off.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Reiki audio zone status added. Press E near storefront. Press P for panel.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
 
 function setHudVisible(visible){
@@ -278,8 +279,9 @@ function updatePositionPanel(now){
   if (!$positionPanel || !positionPanelVisible || AUTOCAM) return;
   const p = currentHeadXZ();
   const portalNames = portalTargets.map(p=>p.label).join(", ") || "none";
+  const reikiState = lobbyVisibilityLock?.getReikiAudioState?.() || null;
   $positionPanel.innerHTML = `<strong>SVR POSITION PANEL</strong>\n` +
-    `Build: Phase 96C\n` +
+    `Build: Phase 96E\n` +
     `Scene: ${currentSceneKey}\n` +
     `Camera: x ${fmt(p.x)} / y ${fmt(p.y)} / z ${fmt(p.z)}\n` +
     `Table: x ${fmt(tableCenter.x)} / z ${fmt(tableCenter.z)}\n` +
@@ -287,8 +289,12 @@ function updatePositionPanel(now){
     `Table zone: ${inTableZone() ? "YES" : "NO"}\n` +
     `Active portal: ${activePortal ? `${activePortal.label} (${fmt(activePortal.distance)}m)` : "none"}\n` +
     `Portal targets: ${portalNames}\n` +
+    `Reiki video: ${reikiState?.videoOn ? "ON" : "WAIT"}\n` +
+    `Reiki audio: ${reikiState ? (reikiState.near ? "NEAR" : "FAR") : "OFF"}\n` +
+    `Reiki primed: ${reikiState?.primed ? "YES" : "NO"}\n` +
+    `Reiki volume: ${fmt(reikiState?.volume || 0)} / ${fmt(reikiState?.maxVolume || 0)}\n` +
     `Teleport: ${tp.isEnabled ? (tp.isEnabled() ? "ON" : "OFF") : "READY"}\n` +
-    `Audio: OFF\n` +
+    `Audio: GLOBAL OFF / REIKI LOW ZONE\n` +
     `Tip: press E near storefront / P panel`;
 }
 
@@ -338,7 +344,10 @@ renderer.setAnimationLoop(()=>{
 });
 
 const canvasEl = renderer.domElement;
-canvasEl.addEventListener("pointerdown", async ()=>{ setStatus("Portals active. Press E near storefront glow.", { force: true }); }, { passive: true });
+canvasEl.addEventListener("pointerdown", async ()=>{
+  lobbyVisibilityLock?.primeReikiAudio?.();
+  setStatus("Reiki audio primed. Walk near Reiki storefront for low audio.", { force: true });
+}, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
   log("[ERR] WebGL context lost. Reloading...");
