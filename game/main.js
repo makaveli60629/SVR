@@ -10,7 +10,6 @@ import { installLobbyVisibilityLock } from "./modules/lobby_visibility_lock.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
-const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 const AUDIO_DISABLED = true;
@@ -21,7 +20,10 @@ const $log = document.getElementById("log");
 const $err = document.getElementById("err");
 const $toggleLog = document.getElementById("toggleLog");
 const $toggleJoints = document.getElementById("toggleJoints");
+const $togglePosition = document.getElementById("togglePosition");
+const $positionPanel = document.getElementById("positionPanel");
 const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
+let positionPanelVisible = params.has("pos") || params.has("debug");
 
 let lastStatusText = "";
 let lastStatusAt = 0;
@@ -44,15 +46,21 @@ function setMode(text){
 
 function log(...args){
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
+  if (!$log) return;
   $log.textContent += line + "\n";
   $log.scrollTop = $log.scrollHeight;
 }
 
-$toggleLog.addEventListener("click", ()=>{
+$toggleLog?.addEventListener("click", ()=>{
   $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
+});
+$togglePosition?.addEventListener("click", ()=>{
+  positionPanelVisible = !positionPanelVisible;
+  if ($positionPanel) $positionPanel.style.display = positionPanelVisible ? "block" : "none";
 });
 
 if (AUTOCAM) document.body.classList.add("preview-mode");
+if ($positionPanel) $positionPanel.style.display = (positionPanelVisible && !AUTOCAM) ? "block" : "none";
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData._camera = camera;
@@ -77,19 +85,11 @@ const lobbyVisibilityLock = installLobbyVisibilityLock({ scene });
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
-const audio = {
-  getState: ()=>({ enabled: false, primed: false, trackTitle: "Audio disabled", error: null }),
-  toggle: async ()=>false,
-  next: async ()=>false,
-  prime: async ()=>false,
-  start: async ()=>false,
-  stop: async ()=>false
-};
 window.SVR_AUDIO_DISABLED = true;
-
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
+let currentSceneKey = "lobby";
 
 function currentHeadXZ(){
   if (renderer.xr.isPresenting){
@@ -100,21 +100,17 @@ function currentHeadXZ(){
   }
   return camera.position.clone();
 }
-
 function inTableZone(){
   const p = currentHeadXZ();
   return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7);
 }
-
 function seatLabel(){
   return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing";
 }
-
 function moveDesktopToSeat(seat){
   camera.position.set(seat.x, 1.12, seat.z);
   camera.lookAt(0, 1.0, 0);
 }
-
 function joinTable(){
   if (!inTableZone()) return false;
   const p = currentHeadXZ();
@@ -127,55 +123,42 @@ function joinTable(){
   });
   seatIndex = best;
   seated = true;
+  currentSceneKey = "seat";
   const seat = seats[best];
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(seat.x, -0.42, seat.z);
-  } else {
-    moveDesktopToSeat(seat);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(seat.x, -0.42, seat.z);
+  else moveDesktopToSeat(seat);
   setMode(`Seat: ${seat.label}`);
   return true;
 }
-
 function leaveTable(){
   seated = false;
   seatIndex = -1;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(0, 0, 4.8);
-  } else {
-    camera.position.set(0, 1.6, 4.8);
-    camera.lookAt(0, 1.15, 0);
-  }
+  currentSceneKey = "lobby";
+  if (renderer.xr.isPresenting) tp.setPlayerPose(0, 0, 4.8);
+  else { camera.position.set(0, 1.6, 4.8); camera.lookAt(0, 1.15, 0); }
   return true;
 }
-
 function movePlayerToSpot(target, lookTarget = null){
   if (!target) return;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(target.x, 0, target.z);
-  } else {
-    camera.position.set(target.x, 1.6, target.z);
-    if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(target.x, 0, target.z);
+  else { camera.position.set(target.x, 1.6, target.z); if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z); }
 }
-
 function gotoScene(key){
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
+  currentSceneKey = key;
   movePlayerToSpot(rec.pos, rec.look || null);
   setStatus(`Quick jump: ${key}`, { force: true });
   return true;
 }
-
 function openRikiHologram(){
-  window.location.href = "./riki-hologram.html?zone=riki";
+  setStatus("Reiki hologram is lobby-zone only. Use Reiki area.", { force: true });
+  gotoScene("reiki");
   return true;
 }
 
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
-    const route = btn.dataset.route;
-    if (route){ window.location.href = route; return; }
     const key = btn.dataset.scene;
     if (key) gotoScene(key);
   });
@@ -183,27 +166,24 @@ $sceneButtons.forEach((btn)=>{
 
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
-  if (e.code === "KeyM") setStatus("Audio disabled for Phase 94", { force: true });
-  if (e.code === "KeyN") setStatus("Audio disabled for Phase 94", { force: true });
-  if (e.code === "KeyH") openRikiHologram();
+  if (e.code === "KeyM") setStatus("Audio disabled for Phase 96A", { force: true });
+  if (e.code === "KeyN") setStatus("Audio disabled for Phase 96A", { force: true });
+  if (e.code === "KeyP") { positionPanelVisible = !positionPanelVisible; if ($positionPanel) $positionPanel.style.display = positionPanelVisible ? "block" : "none"; }
   if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
   if (e.code === "Digit1") gotoScene("lobby");
   if (e.code === "Digit2") gotoScene("seat");
   if (e.code === "Digit3") gotoScene("reiki");
-  if (e.code === "Digit4") openRikiHologram();
+  if (e.code === "Digit4") gotoScene("reikiRoom");
   if (e.code === "Digit5") gotoScene("pga");
   if (e.code === "Digit6") gotoScene("legends");
   if (e.code === "Digit7") gotoScene("sponsor");
   if (e.code === "Digit8") gotoScene("scorpion");
-  if (e.code === "Digit9") gotoScene("reikiRoom");
 });
 
 const watch = createWristWatch({
-  scene,
-  camera,
-  renderer,
+  scene, camera, renderer,
   getState: ()=>({
     audioEnabled: false,
     trackTitle: "Audio off",
@@ -215,7 +195,7 @@ const watch = createWristWatch({
     teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
   }),
   actions: {
-    toggleAudio: ()=>setStatus("Audio disabled for Phase 94", { force: true }),
+    toggleAudio: ()=>setStatus("Audio disabled for Phase 96A", { force: true }),
     nextTrack: openRikiHologram,
     openRikiHologram,
     joinTable,
@@ -233,7 +213,7 @@ const watch = createWristWatch({
   }
 });
 
-$toggleJoints.addEventListener("click", ()=>{
+$toggleJoints?.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
@@ -241,8 +221,7 @@ $toggleJoints.addEventListener("click", ()=>{
 setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Storefronts, ads, Moon and Mars visibility lock active. Audio off.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Position panel restored. Audio off.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
 
 function setHudVisible(visible){
@@ -250,11 +229,11 @@ function setHudVisible(visible){
   if (hud) hud.style.display = (visible && !AUTOCAM) ? "flex" : "none";
   if ($log) $log.style.display = "none";
   if ($err) $err.style.display = "none";
+  if ($positionPanel) $positionPanel.style.display = (visible && positionPanelVisible && !AUTOCAM) ? "block" : "none";
 }
 
 if (AUTOCAM) setHudVisible(false);
 if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display","none");
-
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
@@ -265,6 +244,24 @@ renderer.xr.addEventListener("sessionend", ()=>{
   const nav = document.getElementById("sceneNav");
   if (nav && !AUTOCAM) nav.style.display = "flex";
 });
+
+const fmt = (n)=>Number(n || 0).toFixed(2);
+function updatePositionPanel(now){
+  if (!$positionPanel || !positionPanelVisible || AUTOCAM) return;
+  const p = currentHeadXZ();
+  const portalKeys = Object.keys(sceneTargets || {}).join(", ") || "none";
+  $positionPanel.innerHTML = `<strong>SVR POSITION PANEL</strong>\n` +
+    `Build: Phase 96A\n` +
+    `Scene: ${currentSceneKey}\n` +
+    `Camera: x ${fmt(p.x)} / y ${fmt(p.y)} / z ${fmt(p.z)}\n` +
+    `Table: x ${fmt(tableCenter.x)} / z ${fmt(tableCenter.z)}\n` +
+    `Seat: ${seatLabel()}\n` +
+    `Table zone: ${inTableZone() ? "YES" : "NO"}\n` +
+    `Teleport: ${tp.isEnabled ? (tp.isEnabled() ? "ON" : "OFF") : "READY"}\n` +
+    `Audio: OFF\n` +
+    `Portal targets: ${portalKeys}\n` +
+    `Tip: press P to hide/show`;
+}
 
 let tPrev = performance.now();
 const previewTarget = new THREE.Vector3(0, 1.25, 0);
@@ -291,9 +288,7 @@ renderer.setAnimationLoop(()=>{
       camera.lookAt(previewTarget);
     }
     scene.userData._camera = camera;
-  } else {
-    scene.userData._camera = renderer.xr.getCamera(camera);
-  }
+  } else scene.userData._camera = renderer.xr.getCamera(camera);
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
   lobbyVisibilityLock?.update?.(now * 0.001, dt);
   hands.update(dt);
@@ -302,21 +297,17 @@ renderer.setAnimationLoop(()=>{
   const rightHand = hands.getRightHand();
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
-  if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } });
-  }
+  if (!AUTOCAM || renderer.xr.isPresenting) tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } });
   if (watch) watch.update(dt, leftHand, rightHand);
+  updatePositionPanel(now);
   renderer.render(scene, camera);
 });
 
-canvasElSetup();
-function canvasElSetup(){
-  const canvasEl = renderer.domElement;
-  canvasEl.addEventListener("pointerdown", async ()=>{ setStatus("Audio off. Storefronts, ads, Moon and Mars visibility lock active.", { force: true }); }, { passive: true });
-  canvasEl.addEventListener("webglcontextlost", (e)=>{
-    e.preventDefault();
-    log("[ERR] WebGL context lost. Reloading...");
-    setStatus("WebGL context lost (reloading...)", { force: true });
-    setTimeout(()=>location.reload(), 500);
-  }, false);
-}
+const canvasEl = renderer.domElement;
+canvasEl.addEventListener("pointerdown", async ()=>{ setStatus("Audio off. Position panel available with P.", { force: true }); }, { passive: true });
+canvasEl.addEventListener("webglcontextlost", (e)=>{
+  e.preventDefault();
+  log("[ERR] WebGL context lost. Reloading...");
+  setStatus("WebGL context lost (reloading...)", { force: true });
+  setTimeout(()=>location.reload(), 500);
+}, false);
