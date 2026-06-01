@@ -1,19 +1,17 @@
 {
-  "build": "PHASE-99-HARD-BOOT-ESCAPE-STORE-HUBS",
-  "phase": 99,
-  "name": "Hard Boot Escape and Store Hubs",
+  "build": "PHASE-100-MINIMAL-BOOTABLE-GAME-ENTRY",
+  "phase": 100,
+  "name": "Minimal Bootable Game Entry",
   "date": "2026-06-01",
   "siteTouched": true,
-  "scope": "combined game boot escape plus website store navigation/population for SVR, Reiki approval-safe, PGA, Scorpion, Lounge, VR gear, and sponsor lanes",
+  "scope": "make /game/index.html a zero-dependency bootable entry and isolate the full WebXR build at /game/full.html",
   "notes": [
-    "Added an HTML-level emergency boot-safe lobby to game/index.html so the page escapes the Booting overlay even if main.js, Three.js, or a heavy module never resolves.",
-    "Emergency lobby includes direct links to full game reload, Reiki Store, PGA Store, SVR Store, Scorpion Room, and PGA Range.",
-    "Kept full WebXR/WebEx module loading active while adding a 6.2 second hard timeout escape above the JavaScript module chain.",
-    "Updated site/store.html with quick navigation buttons above SVR Store: SVR Store, Reiki Store, PGA Store, Scorpion, Lounge, VR Gear, and Sponsors.",
-    "Populated Reiki Store with approval-safe placeholders only: no unapproved founder names, photos, outside domains, logos, or third-party Reiki business branding.",
-    "Populated PGA Store, Scorpion Store, Lounge Store, VR Store, Sponsor Store, and SVR Store lanes with sandbox-only products and no live checkout.",
-    "Updated Android/Quest browser CSS for the store quick nav and mobile touch layout.",
-    "No Unity and no Azure. This remains WebXR/WebEx plus static website/store work."
+    "Replaced /game/index.html with a small zero-dependency HTML/CSS page that does not import Three.js, main.js, or any heavy game module.",
+    "Created /game/full.html as the separate full WebXR loader for the heavy 3D build, preserving the debug path without blocking the public game entry.",
+    "The game entry now immediately shows SVR Game Lobby, Moon, Mars, store buttons, Reiki Store, PGA Store, PGA Range, and Scorpion Room links.",
+    "If /game/ still shows the old boot screen after deployment, the issue is confirmed as deployment/cache/path serving stale files rather than code inside /game/index.html.",
+    "Website store Phase 99 hub navigation remains active: SVR Store, Reiki Store, PGA Store, Scorpion, Lounge, VR Gear, and Sponsors.",
+    "No Unity and no Azure. This remains WebEx/WebXR static game and website work."
   ],
   "updatedAt": "2026-06-01T00:00:00-05:00"
 }
