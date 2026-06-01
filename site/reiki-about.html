@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SVR Reiki Hub preview page with an approval-pending hologram video presentation." />
+  <title>SVR Reiki Hub | Hologram Preview</title>
+  <link rel="stylesheet" href="./reiki-about-video.css" />
+</head>
+<body>
+  <main class="reiki-page">
+    <section class="hero">
+      <p class="eyebrow">SVR Poker • Reiki Hub Preview</p>
+      <h1>Reiki Hologram Experience</h1>
+      <p class="lead">
+        A calm approval-pending wellness preview for the SVR social hub. This section is a placeholder presentation layer until final partner approval is complete.
+      </p>
+      <div class="approval">AWAITING APPROVAL • SVR PLACEHOLDER CONTENT</div>
+      <nav class="actions" aria-label="Page actions">
+        <a href="./index.html">Back to Site</a>
+        <a href="./store.html">Open Store</a>
+        <a href="../game/reiki-video-portal.html?zone=reiki" target="_blank" rel="noopener">Open VR Hologram</a>
+      </nav>
+    </section>
+
+    <section class="hologram-section" aria-label="Reiki hologram video preview">
+      <div class="hologram-card">
+        <div class="hologram-frame">
+          <video id="reikiVideo" src="./assets/video/reiki_hologram.mp4" controls playsinline preload="metadata" poster="" aria-label="Reiki hologram preview video"></video>
+          <div class="scanlines"></div>
+          <div class="corner corner-a"></div>
+          <div class="corner corner-b"></div>
+          <div class="corner corner-c"></div>
+          <div class="corner corner-d"></div>
+        </div>
+        <div class="base-glow"></div>
+      </div>
+      <aside class="info-panel">
+        <h2>About This Preview</h2>
+        <p>
+          This video is placed here as a neat public-facing preview while the Reiki partner/founder content remains locked behind approval.
+        </p>
+        <ul>
+          <li>Video is user-controlled and does not autoplay with sound.</li>
+          <li>No unapproved founder names, photos, websites, or outside branding are shown.</li>
+          <li>The visual style matches SVR’s cyan/purple hologram theme.</li>
+        </ul>
+        <div class="status-grid">
+          <span>Branding</span><strong>SVR Placeholder</strong>
+          <span>Approval</span><strong>Pending</strong>
+          <span>Audio</span><strong>User controlled</strong>
+          <span>Game impact</span><strong>None</strong>
+        </div>
+      </aside>
+    </section>
+
+    <section class="mission-card">
+      <h2>Future Reiki Hub Direction</h2>
+      <p>
+        The final approved Reiki page can later include verified partner details, services, founder biography, booking links, and expanded wellness experiences. For now, this page stays clean, professional, and approval-safe.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const video = document.getElementById('reikiVideo');
+      if (!video) return;
+      video.volume = 0.55;
+      video.pause();
+    })();
+  </script>
+</body>
+</html>
