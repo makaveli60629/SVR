@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR Reiki Hologram Portal</title>
+  <title>SVR Reiki Hologram Portal • Audio Zone</title>
   <style>
     :root{color-scheme:dark;--cyan:#58fff4;--violet:#b56cff;--red:#ff4040;}
     html,body{margin:0;min-height:100%;background:#020006;color:#eaffff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow-x:hidden;}
@@ -26,26 +26,28 @@
   <main class="wrap">
     <section class="portal">
       <div class="top">
-        <h1>SVR Reiki Hologram Portal</h1>
+        <h1>SVR Reiki Hologram Audio Zone</h1>
         <span class="badge">AWAITING APPROVAL</span>
       </div>
       <div class="videoShell">
-        <video id="vid" src="./assets/video/reiki_hologram.mp4" controls playsinline preload="metadata"></video>
+        <video id="vid" src="./assets/video/reiki_hologram.mp4" controls playsinline preload="metadata" muted></video>
         <div class="scan"></div>
       </div>
       <div class="controls">
         <button id="play">Play / Pause</button>
-        <button id="mute">Mute</button>
+        <button id="mute">Sound On / Off</button>
         <button id="down">Volume -</button>
         <button id="up">Volume +</button>
-        <a class="btn" href="./index.html?v=phase85-reiki-inactive-portal">Back to Game</a>
+        <a class="btn" href="./index.html?v=phase86-reiki-audio-zone-lock">Back to Game</a>
       </div>
-      <p class="note">Inactive portal mode: this video is isolated from the main lobby so it cannot break boot. Click/tap to start audio.</p>
+      <p class="note">Reiki audio zone: hologram sound is isolated from the lobby. Sound starts only here after you press Play and Sound On.</p>
     </section>
   </main>
   <script>
     const v=document.getElementById('vid');
-    document.getElementById('play').onclick=()=>v.paused?v.play():v.pause();
+    v.volume = 0.75;
+    v.muted = true;
+    document.getElementById('play').onclick=()=>{ if(v.paused){ v.play(); } else { v.pause(); } };
     document.getElementById('mute').onclick=()=>{v.muted=!v.muted;};
     document.getElementById('down').onclick=()=>{v.volume=Math.max(0,+(v.volume-.1).toFixed(2));};
     document.getElementById('up').onclick=()=>{v.volume=Math.min(1,+(v.volume+.1).toFixed(2));};

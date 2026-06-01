@@ -1,5 +1,12 @@
 {
-  "build": "PHASE-85-REIKI-INACTIVE-PORTAL-LOCK",
+  "build": "PHASE-86-REIKI-AUDIO-ZONE-LOCK",
   "date": "2026-06-01",
-  "scope": "game-side only; inactive Reiki MP4 portal; boot fallback"
+  "scope": "game-side only; inactive Reiki MP4 portal; boot fallback",
+  "phase": 86,
+  "label": "Reiki Audio Zone + Lobby Music Toggle Lock",
+  "notes": [
+    "Lobby music stays off until M key or watch MUSIC toggle.",
+    "XR session primes audio only; it does not start lobby music.",
+    "Reiki hologram MP4 sound is isolated to reiki-video-portal.html and gated to the Reiki area."
+  ]
 }

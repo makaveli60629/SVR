@@ -166,6 +166,17 @@ function movePlayerToSpot(target, lookTarget = null){
   }
 }
 
+function distanceToTarget(key){
+  const rec = sceneTargets?.[key];
+  if (!rec?.pos) return Infinity;
+  const p = currentHeadXZ();
+  return Math.hypot(p.x - rec.pos.x, p.z - rec.pos.z);
+}
+
+function isInReikiArea(){
+  return distanceToTarget("reiki") <= 3.6 || distanceToTarget("reikiRoom") <= 4.2;
+}
+
 function gotoScene(key){
   if (key === "reikiVideoPortal") return openReikiVideoPortal();
   const rec = sceneTargets?.[key];
@@ -177,7 +188,11 @@ function gotoScene(key){
 
 
 function openReikiVideoPortal(){
-  window.location.href = "./reiki-video-portal.html?v=phase85";
+  if (!isInReikiArea()){
+    setStatus("Reiki hologram audio unlocks at the Reiki storefront. Jump to Reiki first.", { force: true });
+    return false;
+  }
+  window.location.href = "./reiki-video-portal.html?v=phase86-reiki-audio-zone";
   return true;
 }
 
@@ -190,7 +205,7 @@ function createInactiveReikiPortal(){
   const mat = new THREE.MeshBasicMaterial({ color: 0x34fff4, transparent: true, opacity: 0.22, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
   const frameMat = new THREE.MeshBasicMaterial({ color: 0xb46cff, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
   const pane = new THREE.Mesh(new THREE.PlaneGeometry(1.85, 1.05), mat);
-  pane.userData.href = "./reiki-video-portal.html?v=phase85";
+  pane.userData.href = "./reiki-video-portal.html?v=phase86-reiki-audio-zone";
   group.add(pane);
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.67, 0.018, 12, 96), frameMat);
   ring.position.z = 0.02;
@@ -205,8 +220,8 @@ function createInactiveReikiPortal(){
   ctx.fillStyle = "#eaffff"; ctx.font = "bold 58px system-ui, Arial"; ctx.textAlign = "center";
   ctx.fillText("REIKI VIDEO PORTAL", 512, 150);
   ctx.fillStyle = "#ffdddd"; ctx.font = "bold 42px system-ui, Arial"; ctx.fillText("AWAITING APPROVAL", 512, 232);
-  ctx.fillStyle = "#bffcff"; ctx.font = "30px system-ui, Arial"; ctx.fillText("Inactive MP4 hologram", 512, 308);
-  ctx.fillText("Click/tap to open player", 512, 360);
+  ctx.fillStyle = "#bffcff"; ctx.font = "30px system-ui, Arial"; ctx.fillText("Hologram sound unlocks here", 512, 308);
+  ctx.fillText("Click/tap from Reiki area", 512, 360);
   const tex = new THREE.CanvasTexture(canvas); tex.colorSpace = THREE.SRGBColorSpace;
   const text = new THREE.Mesh(new THREE.PlaneGeometry(1.75, .88), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide }));
   text.position.z = 0.03; group.add(text);
@@ -293,7 +308,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. M / watch MUSIC toggles lobby music. Reiki hologram sound unlocks only at Reiki storefront.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -309,8 +324,10 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
+  // Audio is intentionally primed only. Lobby music stays OFF until the user presses
+  // M or the wrist-watch MUSIC button. Reiki hologram audio stays isolated to the
+  // Reiki video portal.
   await audio.prime();
-  await audio.start();
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
@@ -381,8 +398,9 @@ renderer.setAnimationLoop(()=>{
 
 const canvasEl = renderer.domElement;
 canvasEl.addEventListener("pointerdown", async ()=>{
-  const st = audio.getState();
-  if (!st.enabled) await audio.start();
+  // User gesture primes browser audio unlock only. Lobby music still requires
+  // explicit M key / watch MUSIC toggle.
+  await audio.prime();
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
