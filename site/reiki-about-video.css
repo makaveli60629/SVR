@@ -10,33 +10,17 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: Arial, Helvetica, sans-serif; }
-body {
-  background:
-    radial-gradient(circle at 16% 24%, rgba(85, 246, 255, 0.20), transparent 28%),
-    radial-gradient(circle at 78% 60%, rgba(155, 92, 255, 0.24), transparent 30%),
-    linear-gradient(135deg, #020617, #09090b 52%, #111827);
-  overflow-x: hidden;
-}
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.12;
-  background-image:
-    linear-gradient(rgba(85,246,255,.18) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(155,92,255,.18) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: radial-gradient(circle at center, black, transparent 78%);
-}
-.reiki-page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 56px 0 70px; }
+body { background: radial-gradient(circle at 16% 24%, rgba(85, 246, 255, 0.20), transparent 28%), radial-gradient(circle at 78% 60%, rgba(155, 92, 255, 0.24), transparent 30%), linear-gradient(135deg, #020617, #09090b 52%, #111827); overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: 0.12; background-image: linear-gradient(rgba(85,246,255,.18) 1px, transparent 1px), linear-gradient(90deg, rgba(155,92,255,.18) 1px, transparent 1px); background-size: 42px 42px; mask-image: radial-gradient(circle at center, black, transparent 78%); }
+.reiki-page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 56px 0 70px; position: relative; z-index: 1; }
 .hero { text-align: center; margin-bottom: 34px; }
 .eyebrow { color: var(--cyan); text-transform: uppercase; letter-spacing: .18em; font-size: 13px; font-weight: 700; }
 h1 { margin: 10px 0 14px; font-size: clamp(40px, 7vw, 84px); line-height: .95; text-shadow: 0 0 28px rgba(85,246,255,.32); }
 .lead { max-width: 780px; margin: 0 auto; color: var(--muted); font-size: clamp(17px, 2.1vw, 23px); line-height: 1.45; }
-.approval { display: inline-flex; margin: 22px auto 18px; padding: 9px 16px; border: 1px solid rgba(255,75,75,.7); border-radius: 999px; color: #fff; background: rgba(255,75,75,.12); box-shadow: 0 0 22px rgba(255,75,75,.18); font-weight: 800; letter-spacing: .08em; font-size: 12px; }
-.actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-.actions a { color: var(--text); text-decoration: none; border: 1px solid rgba(85,246,255,.45); border-radius: 999px; padding: 11px 16px; background: rgba(85,246,255,.08); box-shadow: 0 0 18px rgba(85,246,255,.10); }
+.approval { display: inline-flex; margin: 22px 6px 8px; padding: 9px 16px; border: 1px solid rgba(255,75,75,.7); border-radius: 999px; color: #fff; background: rgba(255,75,75,.12); box-shadow: 0 0 22px rgba(255,75,75,.18); font-weight: 800; letter-spacing: .08em; font-size: 12px; text-transform: uppercase; }
+.approval.small { margin-top: 4px; color: #ffd6d6; background: rgba(255,75,75,.08); }
+.actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.actions a { color: var(--text); text-decoration: none; border: 1px solid rgba(85,246,255,.45); border-radius: 999px; padding: 11px 16px; background: rgba(85,246,255,.08); box-shadow: 0 0 18px rgba(85,246,255,.10); font-weight: 800; }
 .actions a:hover { background: rgba(85,246,255,.18); }
 .hologram-section { display: grid; grid-template-columns: minmax(300px, 0.95fr) minmax(280px, 0.8fr); gap: 28px; align-items: center; }
 .hologram-card { position: relative; padding: 22px; border-radius: 34px; background: linear-gradient(135deg, rgba(85,246,255,.10), rgba(155,92,255,.10)); border: 1px solid rgba(85,246,255,.28); box-shadow: 0 0 52px rgba(85,246,255,.15); }
@@ -53,8 +37,12 @@ video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; ba
 .info-panel h2, .mission-card h2 { margin: 0 0 12px; font-size: 28px; }
 .info-panel p, .mission-card p, li { color: var(--muted); line-height: 1.55; }
 ul { padding-left: 20px; }
+.logo-lock { margin: 16px 0; border: 1px dashed rgba(255,75,75,.55); border-radius: 22px; padding: 20px; background: rgba(255,75,75,.07); text-align: center; }
+.logo-lock strong { display: block; font-size: clamp(28px, 5vw, 48px); letter-spacing: .14em; text-shadow: 0 0 18px rgba(255,75,75,.28); }
+.logo-lock span { display: block; margin-top: 8px; color: #ffb7b7; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
 .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.12); }
 .status-grid span { color: var(--muted); }
 .status-grid strong { color: var(--cyan); text-align: right; }
 .mission-card { margin-top: 28px; text-align: center; }
+.footer-clean { margin-top: 28px; text-align: center; color: var(--muted); font-size: 14px; }
 @media (max-width: 860px) { .hologram-section { grid-template-columns: 1fr; } .reiki-page { padding-top: 34px; } }
