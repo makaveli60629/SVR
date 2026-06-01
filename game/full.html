@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>SVR Poker Full WebXR Loader</title>
+  <meta name="theme-color" content="#050508"/>
+  <style>
+    html,body{margin:0;height:100%;background:#000;color:#fff;font-family:system-ui,Arial,sans-serif;overflow:hidden}#app{position:fixed;inset:0}.boot{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 20% 20%,rgba(105,232,255,.16),transparent 34%),#020205;z-index:5}.card{width:min(620px,calc(100vw - 32px));border:1px solid rgba(105,232,255,.32);border-radius:28px;background:rgba(5,5,14,.86);padding:24px;text-align:center;box-shadow:0 30px 100px rgba(0,0,0,.7)}a,button{border:1px solid rgba(105,232,255,.36);border-radius:999px;background:rgba(105,232,255,.1);color:#fff;text-decoration:none;padding:10px 14px;font-weight:800;cursor:pointer}.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}.primary{background:linear-gradient(135deg,rgba(255,91,233,.86),rgba(92,72,255,.86))}
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+  <div class="boot" id="boot">
+    <div class="card">
+      <h1>SVR Full WebXR</h1>
+      <p id="bootText">Loading full WebXR module...</p>
+      <div class="actions"><a class="primary" href="./index.html?v=phase100-lite">Back to Bootable Lobby</a><button onclick="location.reload()">Reload Full</button><a href="../site/store.html">Store</a></div>
+    </div>
+  </div>
+  <script>
+    window.__SVR_BOOT = { ready:false, stage:'full-loader', startedAt:Date.now() };
+    window.svrBootStage = function(stage){ window.__SVR_BOOT.stage = stage; const el=document.getElementById('bootText'); if(el) el.textContent=stage; };
+    window.svrBootReady = function(){ window.__SVR_BOOT.ready=true; const b=document.getElementById('boot'); if(b) b.style.display='none'; };
+    setTimeout(function(){ if(!window.__SVR_BOOT.ready){ const el=document.getElementById('bootText'); if(el) el.textContent='Full WebXR is still loading. Use Back to Bootable Lobby while we debug this module.'; } }, 8000);
+  </script>
+  <script type="module">
+    window.svrBootStage('Importing main.js...');
+    import('./main.js?v=phase100-full-webxr').catch(function(err){
+      const el=document.getElementById('bootText');
+      if(el) el.textContent='Full WebXR import failed: '+(err && (err.message || err.stack) || String(err));
+    });
+  </script>
+</body>
+</html>
