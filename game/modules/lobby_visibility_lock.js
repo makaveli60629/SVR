@@ -27,6 +27,46 @@ function makeTexture(title, subtitle, color = "#69e8ff"){
   return texture;
 }
 
+function makePlanetTexture(kind = "moon"){
+  const canvas = document.createElement("canvas");
+  canvas.width = 2048;
+  canvas.height = 2048;
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width;
+  const h = canvas.height;
+  const grad = ctx.createRadialGradient(w * 0.36, h * 0.32, 50, w / 2, h / 2, w * 0.5);
+  if (kind === "mars"){
+    grad.addColorStop(0, "#ffd8ac");
+    grad.addColorStop(0.42, "#d87540");
+    grad.addColorStop(0.78, "#87301f");
+    grad.addColorStop(1, "#3f140d");
+  } else {
+    grad.addColorStop(0, "#ffffff");
+    grad.addColorStop(0.45, "#e4e8f2");
+    grad.addColorStop(0.78, "#a7adbc");
+    grad.addColorStop(1, "#5f6470");
+  }
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+  ctx.globalAlpha = kind === "mars" ? 0.16 : 0.12;
+  ctx.fillStyle = kind === "mars" ? "#35130d" : "#424757";
+  const marks = kind === "mars" ? 180 : 240;
+  for (let i = 0; i < marks; i++){
+    const x = Math.random() * w;
+    const y = Math.random() * h;
+    const r = 10 + Math.random() * (kind === "mars" ? 54 : 74);
+    ctx.beginPath();
+    ctx.ellipse(x, y, r, r * (0.42 + Math.random() * 0.48), Math.random() * Math.PI, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 8;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 function addPanel(root, title, subtitle, x, y, z, color, width = 3.1, height = 1.55){
   const panel = new THREE.Mesh(
     new THREE.PlaneGeometry(width, height),
@@ -58,18 +98,23 @@ function addStorefront(root, title, subtitle, x, z, color){
   return group;
 }
 
-function addOrb(root, color, x, y, z, scale){
+function addOrb(root, color, x, y, z, scale, kind = "moon"){
   const group = new THREE.Group();
   group.position.set(x, y, z);
   root.add(group);
   const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(scale, 40, 24),
-    new THREE.MeshBasicMaterial({ color })
+    new THREE.SphereGeometry(scale, 64, 42),
+    new THREE.MeshBasicMaterial({ map: makePlanetTexture(kind), color: 0xffffff })
   );
   group.add(sphere);
-  const glow = new THREE.PointLight(color, 1.4, 80, 1.5);
+  const glow = new THREE.PointLight(color, 1.95, 145, 1.35);
   group.add(glow);
-  return { group, sphere };
+  const halo = new THREE.Mesh(
+    new THREE.SphereGeometry(scale * 1.18, 48, 28),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.16, side: THREE.BackSide, depthWrite: false })
+  );
+  group.add(halo);
+  return { group, sphere, halo };
 }
 
 function addReikiVideoPanel(root){
@@ -110,7 +155,7 @@ function addReikiVideoPanel(root){
 
 export function installLobbyVisibilityLock({ scene }){
   const root = new THREE.Group();
-  root.name = "SVR_BootSafe_Visibility_Lock";
+  root.name = "SVR_Phase96B_PlanetScale_Lock";
   scene.add(root);
 
   addStorefront(root, "Reiki", "Private Room", -5.6, -5.8, "#7fffd4");
@@ -125,17 +170,23 @@ export function installLobbyVisibilityLock({ scene }){
   addPanel(root, "SVR Store", "Gear and avatar items", -9.8, 5.4, -2.6, "#ffd36b", 4.1, 1.55);
   addPanel(root, "Play With Purpose", "Community impact", 0, 5.8, 10.4, "#69e8ff", 5.2, 1.7);
 
-  const moon = addOrb(root, 0xeaf2ff, 0, 16.4, -22, 2.15);
-  const mars = addOrb(root, 0xff7f4f, -12, 14.8, 16.5, 1.32);
+  const moon = addOrb(root, 0xeaf2ff, -2.0, 23.5, -33.0, 3.45, "moon");
+  const mars = addOrb(root, 0xff7f4f, 14.0, 21.4, -39.0, 2.10, "mars");
 
   return {
     update(t = 0, dt = 0.016){
-      moon.group.position.x = Math.sin(t * 0.05) * 1.8;
-      moon.group.position.z = -22 + Math.cos(t * 0.05) * 1.2;
-      moon.sphere.rotation.y += dt * 0.045;
-      mars.group.position.x = -12 + Math.sin(t * 0.043) * 1.5;
-      mars.group.position.z = 16.5 + Math.cos(t * 0.043) * 1.0;
-      mars.sphere.rotation.y += dt * 0.06;
+      moon.group.position.x = -2.0 + Math.sin(t * 0.036) * 4.8;
+      moon.group.position.y = 23.5 + Math.sin(t * 0.021) * 0.8;
+      moon.group.position.z = -33.0 + Math.cos(t * 0.036) * 3.2;
+      moon.sphere.rotation.y += dt * 0.055;
+      moon.sphere.rotation.x += dt * 0.006;
+      moon.halo.rotation.y += dt * 0.025;
+      mars.group.position.x = 14.0 + Math.sin(t * 0.031) * 5.8;
+      mars.group.position.y = 21.4 + Math.sin(t * 0.019) * 0.6;
+      mars.group.position.z = -39.0 + Math.cos(t * 0.031) * 4.4;
+      mars.sphere.rotation.y += dt * 0.082;
+      mars.sphere.rotation.x += dt * 0.008;
+      mars.halo.rotation.y += dt * 0.03;
     }
   };
 }
