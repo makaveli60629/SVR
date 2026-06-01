@@ -179,6 +179,7 @@ function isInReikiArea(){
 
 function gotoScene(key){
   if (key === "reikiVideoPortal") return openReikiVideoPortal();
+  if (PRIVATE_SCENE_PAGES[key]) return openPrivateScenePage(key);
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
@@ -187,12 +188,28 @@ function gotoScene(key){
 }
 
 
+const PRIVATE_SCENE_PAGES = {
+  reikiPrivate: "./reiki.html?v=phase89",
+  pgaDrive: "./pga-drive.html?v=phase89",
+  chipPutt: "./chip-putt.html?v=phase89",
+  storeRoom: "./store-room.html?v=phase89",
+  smokerLounge: "./smoker-lounge.html?v=phase89",
+  scorpionRoom: "./scorpion.html?v=phase89"
+};
+
+function openPrivateScenePage(key){
+  const href = PRIVATE_SCENE_PAGES[key];
+  if (!href) return false;
+  window.location.href = href;
+  return true;
+}
+
 function openReikiVideoPortal(){
   if (!isInReikiArea()){
     setStatus("Reiki hologram stays paused and only activates from the Reiki storefront. Jump to Reiki first.", { force: true });
     return false;
   }
-  window.location.href = "./reiki-video-portal.html?v=phase88-reiki-hologram-pause-lock&zone=reiki";
+  window.location.href = "./reiki-video-portal.html?v=phase89-reiki-hologram-pause-lock&zone=reiki";
   return true;
 }
 
@@ -264,7 +281,7 @@ function createInactiveReikiPortal(){
   const mat = new THREE.MeshBasicMaterial({ color: 0x34fff4, transparent: true, opacity: 0.22, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
   const frameMat = new THREE.MeshBasicMaterial({ color: 0xb46cff, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
   const pane = new THREE.Mesh(new THREE.PlaneGeometry(1.85, 1.05), mat);
-  pane.userData.href = "./reiki-video-portal.html?v=phase88-reiki-hologram-pause-lock&zone=reiki";
+  pane.userData.href = "./reiki-video-portal.html?v=phase89-reiki-hologram-pause-lock&zone=reiki";
   group.add(pane);
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.67, 0.018, 12, 96), frameMat);
   ring.position.z = 0.02;
@@ -325,6 +342,9 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit9") openReikiVideoPortal();
   if (e.code === "Digit0") gotoScene("store");
   if (e.code === "KeyO") openStorePortal();
+  if (e.code === "KeyD") gotoScene("pgaDrive");
+  if (e.code === "KeyC") gotoScene("chipPutt");
+  if (e.code === "KeyU") gotoScene("smokerLounge");
 });
 
 const watch = createWristWatch({
@@ -353,6 +373,10 @@ const watch = createWristWatch({
     goPga: ()=>gotoScene("pga"),
     goStore: ()=>gotoScene("store"),
     openStore: ()=>openStorePortal(),
+    goStoreRoom: ()=>gotoScene("storeRoom"),
+    goPgaDrive: ()=>gotoScene("pgaDrive"),
+    goChipPutt: ()=>gotoScene("chipPutt"),
+    goLounge: ()=>gotoScene("smokerLounge"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
@@ -372,7 +396,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Right stick moves/snaps. M or watch toggles lobby music. Reiki hologram only plays from Reiki. Store portal ready.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Phase 89 ready. Right stick moves/snaps. Hold A/grip/trigger to aim TP. Store/lobby portals and private scenes are ready.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

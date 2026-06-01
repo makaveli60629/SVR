@@ -1,14 +1,13 @@
 {
-  "build": "PHASE-88-LOCOMOTION-STORE-LOBBY-READY-LOCK",
-  "phase": 88,
-  "name": "Locomotion Store Lobby Ready Lock",
+  "build": "PHASE-89-PRIVATE-SCENES-STORE-LOBBY-READY-LOCK",
+  "phase": 89,
+  "name": "Private Scenes Store Lobby Ready Lock",
   "notes": [
-    "Quest/Oculus locomotion re-locked: right stick up/down moves forward/back and right stick left/right snap-turns 45 degrees.",
-    "Controller teleport reworked to hold A/grip/trigger to aim and release to teleport, avoiding accidental instant teleport and stuck toggle states.",
-    "Lobby music remains manual only through M key or the watch music button.",
-    "Reiki hologram remains paused by default and activates only from the Reiki area route.",
-    "Store portal added as a VR lobby web portal pointing to https://svrpoker.com/site/store.html.",
-    "Unapproved Reiki sponsor/founder runtime assets and references removed; SVR awaiting-approval placeholders preserved.",
-    "Site untouched. Game-side only."
+    "Keeps Phase 88 locomotion locks and increases controller movement speed slightly for Quest testing.",
+    "Adds standalone private-scene pages for Reiki, PGA Drive, Chip/Putt, Store Room, Smoker Lounge, and Scorpion Room.",
+    "Keeps the main lobby as a portal hub; private experiences are separated from the lobby boot path.",
+    "Keeps lobby music manual only and Reiki hologram paused until opened from the Reiki route.",
+    "Adds Store Room shell with the official store URL: https://svrpoker.com/site/store.html.",
+    "Site untouched. Game-side only. Package remains under 25 MB."
   ]
 }
