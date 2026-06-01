@@ -1,26 +1,131 @@
 {
+  "status": {
+    "mode": "sandbox_preview_only",
+    "checkoutEnabled": false,
+    "androidReady": true,
+    "vrPortalReady": true,
+    "note": "Sample catalog only. No live sales, no exposed payment keys, and no live checkout until owner approval."
+  },
   "svr": [
-    "Starter Chip Pack",
-    "Neon Watch Skin",
-    "Scarlett Table Felt",
-    "Founder Badge"
+    {
+      "name": "SVR Neon Hat",
+      "category": "Avatar",
+      "price": "$24.99 sandbox",
+      "status": "Preview only",
+      "description": "Player hat concept for future profile and avatar locker previews."
+    },
+    {
+      "name": "Black Felt Table Theme",
+      "category": "Table",
+      "price": "Digital sample",
+      "status": "Sandbox",
+      "description": "Premium casino-style felt with SVR center mark and pass-line layout."
+    },
+    {
+      "name": "Forearm Watch Skin",
+      "category": "Watch",
+      "price": "Member drop",
+      "status": "Coming soon",
+      "description": "Cosmetic watch shell for VR identity and future membership drops."
+    },
+    {
+      "name": "Scorpion Room Pass",
+      "category": "Room",
+      "price": "Access sample",
+      "status": "No charge",
+      "description": "Preview-only access card concept for private poker room promotion."
+    },
+    {
+      "name": "Founder Badge",
+      "category": "Profile",
+      "price": "Invite sample",
+      "status": "Pending launch",
+      "description": "Early supporter profile badge for future account dashboards."
+    },
+    {
+      "name": "Tournament Badge",
+      "category": "Event",
+      "price": "Event reward",
+      "status": "Rules review",
+      "description": "Limited profile badge for future sponsor-funded play-money events."
+    }
   ],
   "reiki": [
-    "Reiki Hub Tee",
-    "Meditation Candle Set",
-    "Calm Room Pass",
-    "Breathing Guide Card"
+    {
+      "name": "Meditation Room Token",
+      "category": "Wellness",
+      "price": "Pending",
+      "status": "Awaiting approval",
+      "description": "Approval-safe placeholder item for future Reiki room experiences."
+    },
+    {
+      "name": "Calm Room Pass",
+      "category": "Access",
+      "price": "Preview only",
+      "status": "Awaiting approval",
+      "description": "Non-branded access concept for a private meditation destination."
+    },
+    {
+      "name": "Breathing Guide Card",
+      "category": "Digital guide",
+      "price": "Sample",
+      "status": "Awaiting approval",
+      "description": "Guided breathing content placeholder with no third-party branding."
+    }
   ],
   "pga": [
-    "PGA Range Tee",
-    "Virtual Club Grip Skin",
-    "Putting Drill Pack",
-    "Sponsor Golf Banner"
+    {
+      "name": "Golf Training Pack",
+      "category": "PGA",
+      "price": "Partner sample",
+      "status": "Approval needed",
+      "description": "Partner-friendly example for future golf lesson or training product."
+    },
+    {
+      "name": "Virtual Club Grip Skin",
+      "category": "Equipment",
+      "price": "Digital sample",
+      "status": "Preview only",
+      "description": "Future cosmetic club grip for PGA private range play."
+    },
+    {
+      "name": "Putting Drill Pack",
+      "category": "Training",
+      "price": "Sandbox",
+      "status": "Coming soon",
+      "description": "Short-game practice content for the private Chip/Putt room."
+    }
   ],
   "smoker": [
-    "Lounge Hoodie",
-    "Glass Art Display Slot",
-    "Lounge Room Theme",
-    "Sponsor Shelf Card"
+    {
+      "name": "Lounge Hoodie",
+      "category": "Apparel",
+      "price": "Sample",
+      "status": "Preview only",
+      "description": "Conversation-lounge apparel concept for future store testing."
+    },
+    {
+      "name": "Glass Art Display Slot",
+      "category": "Sponsor shelf",
+      "price": "Sponsor sample",
+      "status": "Approval needed",
+      "description": "Private lounge shelf placement concept for sponsor presentation."
+    },
+    {
+      "name": "Lounge Room Theme",
+      "category": "Room skin",
+      "price": "Digital sample",
+      "status": "Future",
+      "description": "Room mood concept for future private social lounge customization."
+    }
+  ],
+  "support": [
+    {
+      "name": "SVRhelp Development Support",
+      "category": "Support",
+      "price": "Donation optional",
+      "status": "Site development only",
+      "description": "Cash App support option for site development and expansion costs only."
+    }
   ]
 }
