@@ -316,13 +316,12 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const mag = Math.hypot(moveStick.x, moveStick.y);
     if (mag < 0.12) return;
 
-    const xrCam = renderer.xr.getCamera(camera);
-    xrCam.getWorldDirection(headDir);
-    headDir.y = 0;
-    if (headDir.lengthSq() < 1e-5) headDir.set(0, 0, -1);
-    headDir.normalize();
-    const rightDir = new THREE.Vector3(headDir.z, 0, -headDir.x).normalize();
-    const speed = 3.65;
+    // Phase 90 locomotion lock: movement is anchored to the floor/rig yaw,
+    // not to the current headset look direction. Snap-turn changes playerYaw,
+    // then right-stick forward moves into that new forward every time.
+    headDir.set(Math.sin(playerYaw), 0, -Math.cos(playerYaw)).normalize();
+    const rightDir = new THREE.Vector3(Math.cos(playerYaw), 0, Math.sin(playerYaw)).normalize();
+    const speed = 3.85;
     const stepX = (rightDir.x * moveStick.x + headDir.x * (-moveStick.y)) * speed * dt;
     const stepZ = (rightDir.z * moveStick.x + headDir.z * (-moveStick.y)) * speed * dt;
     const nextX = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
@@ -431,7 +430,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       stableTargetMs = 0;
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
-        ? "Controllers active • right stick move/snap • hold A/grip/trigger to TP"
+        ? "Controllers active • right stick floor-move/snap • hold A/grip/trigger to TP"
         : "TELEPORT OFF • press TP or make fist by face";
       statusCb(idleMsg);
       modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist by face toggles TP");

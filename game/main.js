@@ -189,12 +189,12 @@ function gotoScene(key){
 
 
 const PRIVATE_SCENE_PAGES = {
-  reikiPrivate: "./reiki.html?v=phase89",
-  pgaDrive: "./pga-drive.html?v=phase89",
-  chipPutt: "./chip-putt.html?v=phase89",
-  storeRoom: "./store-room.html?v=phase89",
-  smokerLounge: "./smoker-lounge.html?v=phase89",
-  scorpionRoom: "./scorpion.html?v=phase89"
+  reikiPrivate: "./reiki.html?v=phase90",
+  pgaDrive: "./pga-drive.html?v=phase90",
+  chipPutt: "./chip-putt.html?v=phase90",
+  storeRoom: "./store-room.html?v=phase90",
+  smokerLounge: "./smoker-lounge.html?v=phase90",
+  scorpionRoom: "./scorpion.html?v=phase90"
 };
 
 function openPrivateScenePage(key){
@@ -209,7 +209,7 @@ function openReikiVideoPortal(){
     setStatus("Reiki hologram stays paused and only activates from the Reiki storefront. Jump to Reiki first.", { force: true });
     return false;
   }
-  window.location.href = "./reiki-video-portal.html?v=phase89-reiki-hologram-pause-lock&zone=reiki";
+  window.location.href = "./reiki-video-portal.html?v=phase90-reiki-hologram-pause-lock&zone=reiki";
   return true;
 }
 
@@ -274,14 +274,14 @@ function createStoreWebPortal(){
 
 function createInactiveReikiPortal(){
   const group = new THREE.Group();
-  group.name = "Inactive Reiki Video Portal";
-  const target = sceneTargets?.reiki?.pos || new THREE.Vector3(-6, 0, -2.5);
-  group.position.set(target.x + 1.55, 1.65, target.z + 0.15);
-  group.lookAt(0, 1.35, 0);
+  group.name = "Reiki Wall Hologram Portal";
+  const target = sceneTargets?.reikiRoom?.pos || sceneTargets?.reiki?.pos || new THREE.Vector3(-6, 0, -2.5);
+  group.position.set(target.x + 1.25, 1.78, target.z - 1.38);
+  group.lookAt(sceneTargets?.reiki?.look || new THREE.Vector3(0, 1.35, 0));
   const mat = new THREE.MeshBasicMaterial({ color: 0x34fff4, transparent: true, opacity: 0.22, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
   const frameMat = new THREE.MeshBasicMaterial({ color: 0xb46cff, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
   const pane = new THREE.Mesh(new THREE.PlaneGeometry(1.85, 1.05), mat);
-  pane.userData.href = "./reiki-video-portal.html?v=phase89-reiki-hologram-pause-lock&zone=reiki";
+  pane.userData.href = "./reiki-video-portal.html?v=phase90-reiki-hologram-pause-lock&zone=reiki";
   group.add(pane);
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.67, 0.018, 12, 96), frameMat);
   ring.position.z = 0.02;
@@ -294,10 +294,10 @@ function createInactiveReikiPortal(){
   ctx.fillStyle = "rgba(0,8,18,.74)"; ctx.fillRect(0,0,1024,512);
   ctx.strokeStyle = "rgba(88,255,244,.92)"; ctx.lineWidth = 10; ctx.strokeRect(24,24,976,464);
   ctx.fillStyle = "#eaffff"; ctx.font = "bold 58px system-ui, Arial"; ctx.textAlign = "center";
-  ctx.fillText("REIKI VIDEO PORTAL", 512, 150);
+  ctx.fillText("REIKI HOLOGRAM", 512, 150);
   ctx.fillStyle = "#ffdddd"; ctx.font = "bold 42px system-ui, Arial"; ctx.fillText("AWAITING APPROVAL", 512, 232);
-  ctx.fillStyle = "#bffcff"; ctx.font = "30px system-ui, Arial"; ctx.fillText("Paused hologram portal", 512, 308);
-  ctx.fillText("Play only inside Reiki area", 512, 360);
+  ctx.fillStyle = "#bffcff"; ctx.font = "30px system-ui, Arial"; ctx.fillText("Paused by wall / plant", 512, 308);
+  ctx.fillText("Only plays from Reiki area", 512, 360);
   const tex = new THREE.CanvasTexture(canvas); tex.colorSpace = THREE.SRGBColorSpace;
   const text = new THREE.Mesh(new THREE.PlaneGeometry(1.75, .88), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide }));
   text.position.z = 0.03; group.add(text);
@@ -396,7 +396,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Phase 89 ready. Right stick moves/snaps. Hold A/grip/trigger to aim TP. Store/lobby portals and private scenes are ready.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Phase 90 ready. Floor-anchored locomotion, Reiki wall hologram, storefronts, billboards, Moon and Mars locked.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

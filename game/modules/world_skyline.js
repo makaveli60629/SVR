@@ -830,6 +830,35 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     });
   }
 
+
+  // Phase 90: polished inactive Reiki hologram staged by the Reiki wall, tucked behind/right of a plant.
+  // This is a lightweight animated portal marker; the MP4 stays paused in reiki-video-portal.html until the player opens it from the Reiki area.
+  const holoTex = canvasTexture(1024, 768, (ctx,w,h)=>{
+    const g = ctx.createLinearGradient(0,0,w,h); g.addColorStop(0,'rgba(2,20,26,0.96)'); g.addColorStop(1,'rgba(17,5,30,0.94)');
+    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle = 'rgba(88,255,244,0.95)'; ctx.lineWidth = 12; roundRectPath(ctx, 24,24,w-48,h-48,36); ctx.stroke();
+    ctx.strokeStyle = 'rgba(180,108,255,0.42)'; ctx.lineWidth = 4;
+    for(let y=90;y<h-80;y+=42){ ctx.beginPath(); ctx.moveTo(70,y); ctx.lineTo(w-70,y); ctx.stroke(); }
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#eaffff'; ctx.font='bold 76px system-ui, Arial'; ctx.fillText('REIKI HOLOGRAM', w/2, 142);
+    ctx.fillStyle='#75ffd6'; ctx.font='bold 42px system-ui, Arial'; ctx.fillText('PAUSED UNTIL YOU ENTER', w/2, 246);
+    ctx.fillStyle='#ffdddd'; ctx.font='bold 40px system-ui, Arial'; ctx.fillText('AWAITING APPROVAL', w/2, 334);
+    ctx.fillStyle='#bffcff'; ctx.font='32px system-ui, Arial'; ctx.fillText('Open from Reiki area to play video + sound', w/2, 448);
+    ctx.fillStyle='#ffffff'; ctx.font='bold 34px system-ui, Arial'; ctx.fillText('WATCH BUTTON: REIKI VIDEO', w/2, 548);
+  });
+  const holoGroup = new THREE.Group();
+  holoGroup.name = 'Reiki Wall Hologram Portal Prop';
+  holoGroup.position.copy(center).addScaledVector(right, 3.85).addScaledVector(inward, -1.72).add(new THREE.Vector3(0, 1.85, 0));
+  holoGroup.lookAt(center.clone().addScaledVector(inward, 2.8).setY(1.55));
+  const holoPane = new THREE.Mesh(new THREE.PlaneGeometry(2.15, 1.58), new THREE.MeshBasicMaterial({ map: holoTex, transparent: true, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
+  holoGroup.add(holoPane);
+  const holoRing = new THREE.Mesh(new THREE.TorusGeometry(0.86, 0.022, 12, 96), new THREE.MeshBasicMaterial({ color: 0x5ef7ff, transparent: true, opacity: 0.68, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));
+  holoRing.scale.set(1.38, 0.86, 1); holoRing.position.z = 0.035; holoGroup.add(holoRing);
+  const holoBase = new THREE.Mesh(new THREE.CircleGeometry(0.88, 48), new THREE.MeshBasicMaterial({ color: 0x5ef7ff, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));
+  holoBase.rotation.x = -Math.PI * 0.5; holoBase.position.set(0, -1.56, 0.06); holoGroup.add(holoBase);
+  const holoLight = new THREE.PointLight(0x5ef7ff, 2.4, 10, 2.0); holoLight.position.set(0, 0.3, 0.45); holoGroup.add(holoLight);
+  scene.add(holoGroup);
+
   const reikiFillA = new THREE.PointLight(0x6effd2, 2.6, 18, 2.0);
   reikiFillA.position.copy(center).add(new THREE.Vector3(-2.6, 2.8, 0.8));
   scene.add(reikiFillA);
@@ -1290,6 +1319,95 @@ function chooseBestWallFacingY(obj){
   obj.rotation.y = bestRot;
   obj.updateMatrixWorld(true);
   return bestRot;
+}
+
+
+function createStorefrontCanvasTexture(title, subtitle, lines = [], colors = {}){
+  return canvasTexture(1200, 900, (ctx,w,h)=>{
+    const bgA = colors.bgA || '#050813';
+    const bgB = colors.bgB || '#160922';
+    const neon = colors.neon || '#5ef7ff';
+    const accent = colors.accent || '#b46cff';
+    const warm = colors.warm || '#ffdd88';
+    const g = ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,bgA); g.addColorStop(1,bgB);
+    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+    ctx.shadowColor = neon; ctx.shadowBlur = 24;
+    ctx.strokeStyle = neon; ctx.lineWidth = 14; roundRectPath(ctx, 28, 28, w-56, h-56, 42); ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    for(let y=120; y<h-80; y+=84){ ctx.fillRect(70,y,w-140,2); }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 92px system-ui, Arial'; ctx.fillText(title, w/2, 150);
+    ctx.fillStyle = neon; ctx.font = 'bold 44px system-ui, Arial'; ctx.fillText(subtitle, w/2, 238);
+    ctx.fillStyle = accent; ctx.font = 'bold 40px system-ui, Arial'; ctx.fillText('PRIVATE SCENE PORTAL', w/2, 322);
+    ctx.textAlign = 'left'; ctx.fillStyle = '#effcff'; ctx.font = '34px system-ui, Arial';
+    let yy = 420;
+    lines.forEach((line)=>{ ctx.fillText('• ' + line, 120, yy); yy += 58; });
+    ctx.textAlign = 'center';
+    ctx.fillStyle = warm; ctx.font = 'bold 44px system-ui, Arial'; ctx.fillText('STEP IN • SELECT ON WATCH', w/2, h-122);
+  });
+}
+
+function addFreestandingPortalStorefront(scene, R, wallHeight, { angle, title, subtitle, lines, neon = 0x5ef7ff, accent = 0xb46cff, targetKey = '' } = {}){
+  const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
+  const center = new THREE.Vector3(Math.cos(angle) * (R - 5.15), 0.0, Math.sin(angle) * (R - 5.15));
+  const root = new THREE.Group();
+  root.name = `${title || 'SVR'} Freestanding Storefront`;
+  root.position.copy(center);
+  root.lookAt(root.position.clone().add(inward));
+  scene.add(root);
+
+  const baseMat = new THREE.MeshStandardMaterial({ color: 0x090d14, roughness: 0.72, metalness: 0.18, emissive: 0x07111f, emissiveIntensity: 0.28 });
+  const neonMat = new THREE.MeshStandardMaterial({ color: neon, roughness: 0.18, metalness: 0.50, emissive: neon, emissiveIntensity: 0.85 });
+  const glassMat = new THREE.MeshStandardMaterial({ color: neon, transparent: true, opacity: 0.08, roughness: 0.05, metalness: 0.18, emissive: neon, emissiveIntensity: 0.22, side: THREE.DoubleSide });
+
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(6.4, 0.10, 3.9), baseMat);
+  floor.position.set(0, 0.05, 0.25);
+  root.add(floor);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(6.4, 3.45, 0.18), baseMat);
+  back.position.set(0, 1.74, -1.58);
+  root.add(back);
+  const header = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.18, 0.24), neonMat);
+  header.position.set(0, 3.42, -1.45);
+  root.add(header);
+  [-3.18,3.18].forEach((x)=>{
+    const col = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.35, 0.22), neonMat);
+    col.position.set(x,1.74,-1.42); root.add(col);
+  });
+  const sideGlassL = new THREE.Mesh(new THREE.PlaneGeometry(3.25, 3.1), glassMat);
+  sideGlassL.position.set(-3.16,1.68,0.02); sideGlassL.rotation.y = Math.PI*0.5; root.add(sideGlassL);
+  const sideGlassR = sideGlassL.clone(); sideGlassR.position.x = 3.16; sideGlassR.rotation.y = -Math.PI*0.5; root.add(sideGlassR);
+
+  const tex = createStorefrontCanvasTexture(title, subtitle, lines || [], { neon: `#${neon.toString(16).padStart(6,'0')}`, accent: `#${accent.toString(16).padStart(6,'0')}` });
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(5.45, 3.25), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide }));
+  sign.position.set(0,1.88,-1.455); root.add(sign);
+  const portal = new THREE.Mesh(new THREE.RingGeometry(0.82, 1.08, 64), new THREE.MeshBasicMaterial({ color: neon, transparent: true, opacity: 0.55, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
+  portal.rotation.x = -Math.PI*0.5; portal.position.set(0,0.08,1.38); root.add(portal);
+  const glow = new THREE.PointLight(neon, 2.1, 12, 2.0); glow.position.set(0,1.8,0.5); root.add(glow);
+  root.userData.targetKey = targetKey;
+  return { root, center: center.clone(), inward, target: center.clone().add(inward.clone().multiplyScalar(2.6)).setY(0), look: center.clone().add(inward.clone().multiplyScalar(-1.3)).setY(1.6) };
+}
+
+function addSkylineMegaBillboards(scene, R){
+  const ads = [
+    { a: -0.42, text: ['SVR STORE', 'GEAR • WATCH • AVATARS'], c: 0x5ef7ff },
+    { a: 0.42, text: ['REIKI HOLOGRAM', 'AWAITING APPROVAL'], c: 0x75ffd6 },
+    { a: -1.22, text: ['SMOKER LOUNGE', 'PRIVATE SOCIAL ROOM'], c: 0xb46cff },
+    { a: 1.38, text: ['SCORPION ROOM', 'PRIVATE POKER'], c: 0xffd36a }
+  ];
+  ads.forEach(({a,text,c},idx)=>{
+    const outward = new THREE.Vector3(Math.cos(a),0,Math.sin(a));
+    const pos = outward.clone().multiplyScalar(R + 28 + idx * 1.2);
+    const tex = createAdBillboardTexture(text);
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(8.5, 5.0), new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }));
+    sign.position.set(pos.x, 24 + (idx % 2) * 3, pos.z);
+    sign.lookAt(sign.position.clone().sub(outward));
+    scene.add(sign);
+    const light = new THREE.PointLight(c, 1.5, 35, 2.0);
+    light.position.copy(sign.position).add(new THREE.Vector3(0,2,0));
+    scene.add(light);
+  });
 }
 
 function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
@@ -2182,6 +2300,25 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   await populateLegendPedestals(legendHall, spawnLogoTex, log);
   const storeWall = buildStoreWall(scene, R, wallHeight, spawnLogoTex);
   addPgaHub(scene, { radius: R, wallHeight, log });
+  const svrStorefront = addFreestandingPortalStorefront(scene, R, wallHeight, {
+    angle: -Math.PI * 0.34,
+    title: 'SVR STORE',
+    subtitle: 'WEB STORE • GEAR • WATCHES',
+    lines: ['store page opens outside game', 'avatar gear and watches later', 'keeps lobby smooth'],
+    neon: 0x5ef7ff,
+    accent: 0xb46cff,
+    targetKey: 'storeRoom'
+  });
+  const smokerStorefront = addFreestandingPortalStorefront(scene, R, wallHeight, {
+    angle: -Math.PI * 0.58,
+    title: 'SMOKER LOUNGE',
+    subtitle: 'PRIVATE SOCIAL ROOM',
+    lines: ['private hangout destination', 'future replay board and jumbotron', 'lounge stays outside lobby'],
+    neon: 0xb46cff,
+    accent: 0x5ef7ff,
+    targetKey: 'smokerLounge'
+  });
+  addSkylineMegaBillboards(scene, R);
   const reikiHub = await addRikiArea(scene, R, wallHeight, spawnLogoTex, log);
   const scorpionRoom = addScorpionRoom(scene, R, wallHeight);
   const lobbyInfoBoards = addLobbyInfoBoards(scene, R, wallHeight);
@@ -2459,26 +2596,26 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
     moon.position.set(
-      -44 + Math.sin(t * 0.020) * 5.0,
-      wallHeight + 44.0 + Math.sin(t * 0.090) * 1.4,
-      -(R + 128.0) + Math.cos(t * 0.016) * 6.0
+      -50 + Math.sin(t * 0.018) * 5.0,
+      wallHeight + 64.0 + Math.sin(t * 0.070) * 1.6,
+      -(R + 150.0) + Math.cos(t * 0.014) * 7.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     mars.position.set(
-      68 + Math.sin(t * 0.016 + 1.4) * 6.5,
-      wallHeight + 52.0 + Math.sin(t * 0.070 + 0.8) * 1.2,
-      -(R + 154.0) + Math.cos(t * 0.012 + 0.4) * 5.0
+      82 + Math.sin(t * 0.014 + 1.4) * 6.5,
+      wallHeight + 70.0 + Math.sin(t * 0.060 + 0.8) * 1.3,
+      -(R + 182.0) + Math.cos(t * 0.010 + 0.4) * 6.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.06;
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.045 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.070 + 0.014 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.026 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.042 + 0.012 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{
@@ -2618,10 +2755,11 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       pos: new THREE.Vector3(storeWall.group.position.x * 0.86, 0, storeWall.group.position.z * 0.86),
       look: storeWall.group.position.clone().setY(1.6)
     },
-    store: {
+    store: svrStorefront ? { pos: svrStorefront.target.clone(), look: svrStorefront.look.clone() } : {
       pos: new THREE.Vector3(storeWall.group.position.x * 0.78, 0, storeWall.group.position.z * 0.78),
       look: storeWall.group.position.clone().setY(1.6)
     },
+    smokerLounge: smokerStorefront ? { pos: smokerStorefront.target.clone(), look: smokerStorefront.look.clone() } : null,
     scorpion: scorpionRoom ? { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() } : null
   };
 
