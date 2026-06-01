@@ -1,12 +1,14 @@
 {
-  "build": "PHASE-87-REIKI-HOLOGRAM-PAUSE-POLISH-LOCK",
-  "phase": 87,
-  "name": "Reiki Hologram Pause Polish Lock",
+  "build": "PHASE-88-LOCOMOTION-STORE-LOBBY-READY-LOCK",
+  "phase": 88,
+  "name": "Locomotion Store Lobby Ready Lock",
   "notes": [
-    "Reiki hologram portal is visually upgraded with stronger cyan/purple hologram frame, particles, scanlines, and status plate.",
-    "Hologram video stays paused by default.",
-    "Playback controls remain disabled unless the portal is opened from the Reiki area route.",
-    "Lobby music remains manual on/off only via M key or watch music button.",
+    "Quest/Oculus locomotion re-locked: right stick up/down moves forward/back and right stick left/right snap-turns 45 degrees.",
+    "Controller teleport reworked to hold A/grip/trigger to aim and release to teleport, avoiding accidental instant teleport and stuck toggle states.",
+    "Lobby music remains manual only through M key or the watch music button.",
+    "Reiki hologram remains paused by default and activates only from the Reiki area route.",
+    "Store portal added as a VR lobby web portal pointing to https://svrpoker.com/site/store.html.",
+    "Unapproved Reiki sponsor/founder runtime assets and references removed; SVR awaiting-approval placeholders preserved.",
     "Site untouched. Game-side only."
   ]
 }

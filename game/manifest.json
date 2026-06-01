@@ -5,6 +5,6 @@
   "display": "standalone",
   "background_color": "#050508",
   "theme_color": "#050508",
-  "build": "PHASE-86-REIKI-AUDIO-ZONE-LOCK",
-  "phase": 86
+  "build": "PHASE-88-LOCOMOTION-STORE-LOBBY-READY-LOCK",
+  "phase": 88
 }
