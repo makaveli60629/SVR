@@ -280,8 +280,8 @@ $toggleJoints?.addEventListener("click", ()=>{
 setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Walking position panel active. Press P / C. Press E near storefront.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
+setStatus(AUTOCAM ? "CAM 3 walkthrough ready" : "Ready. Walking position panel active. Press P / C. Press E near storefront.", { force: true });
+setMode(AUTOCAM ? "CAM 3 hub walkthrough" : "Hands: waiting...");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -317,7 +317,7 @@ function updatePositionPanel(now){
   lastPlacementLine = `PLACE HERE: x ${fmt(p.x)} / y ${fmt(p.y)} / z ${fmt(p.z)} / yaw ${fmt(yaw)} / scene ${currentSceneKey}`;
   $positionPanel.innerHTML = `<strong>SVR WALKING DIAGNOSTIC PANEL</strong>\n` +
     `<span class="placementLine">${lastPlacementLine}</span>\n` +
-    `Build: Phase 98E\n` +
+    `Build: Camera Update / Phase 98R\n` +
     `Scene: ${currentSceneKey}\n` +
     `<span class="diagLine">Camera/player: x ${fmt(p.x)} / y ${fmt(p.y)} / z ${fmt(p.z)}</span>\n` +
     `Facing yaw: ${fmt(yaw)} deg\n` +
@@ -342,11 +342,52 @@ function updatePositionPanel(now){
 let tPrev = performance.now();
 const previewTarget = new THREE.Vector3(0, 1.25, 0);
 const previewPos = new THREE.Vector3();
-const previewShots = [
-  { y: 1.62, r: previewOrbitRadius - 3.5, speed: 0.030, sway: 0.015, lookY: 1.02, targetX: 0.0, targetZ: 0.0, leadX: 0.14, leadZ: 0.08 },
-  { y: 1.68, r: previewOrbitRadius - 3.0, speed: -0.024, sway: 0.018, lookY: 1.04, targetX: 0.1, targetZ: -0.1, leadX: -0.10, leadZ: 0.12 },
-  { y: 1.64, r: previewOrbitRadius - 2.6, speed: 0.022, sway: 0.018, lookY: 1.03, targetX: -0.12, targetZ: 0.04, leadX: 0.10, leadZ: -0.08 }
+const previewLook = new THREE.Vector3();
+const previewFrom = new THREE.Vector3();
+const previewTo = new THREE.Vector3();
+const previewLookFrom = new THREE.Vector3();
+const previewLookTo = new THREE.Vector3();
+const previewRoute = [
+  { name:"Lobby opening hero", duration:6500, pos:[0,3.20,12.5], look:[0,1.25,0] },
+  { name:"Poker table approach", duration:7000, pos:[-4.8,2.25,7.0], look:[0,1.10,0] },
+  { name:"Table sweep", duration:7600, pos:[5.6,2.18,4.9], look:[0,1.05,0] },
+  { name:"Reiki portal approach", duration:7200, pos:[-4.7,2.05,-6.7], look:[-5.6,1.8,-9.15] },
+  { name:"Reiki glass room reveal", duration:8200, pos:[15.0,2.25,-2.4], look:[20.69,1.85,-5.40] },
+  { name:"Reiki hologram close look", duration:9200, pos:[18.3,2.05,-2.25], look:[20.69,1.78,-5.40] },
+  { name:"Reiki wide showroom", duration:7600, pos:[23.7,2.55,-1.8], look:[19.25,1.75,-4.90] },
+  { name:"PGA hub", duration:6500, pos:[1.8,2.20,-5.7], look:[0,1.75,-9.25] },
+  { name:"Smoker lounge hub", duration:6500, pos:[7.8,2.15,-5.9], look:[5.6,1.75,-9.15] },
+  { name:"SVR store hub", duration:7000, pos:[-6.7,2.25,2.5], look:[-9.25,1.75,0.8] },
+  { name:"Scorpion room portal", duration:7000, pos:[6.9,2.25,2.6], look:[9.25,1.75,0.8] },
+  { name:"Final lobby skyline sweep", duration:8500, pos:[0,4.15,14.8], look:[0,1.45,0] }
 ];
+const routeDuration = previewRoute.reduce((sum, shot)=>sum + shot.duration, 0);
+function smoothStep01(v){
+  const x = THREE.MathUtils.clamp(v, 0, 1);
+  return x * x * (3 - 2 * x);
+}
+function updatePreviewCamera(now){
+  let t = now % routeDuration;
+  let index = 0;
+  for (; index < previewRoute.length; index++){
+    if (t <= previewRoute[index].duration) break;
+    t -= previewRoute[index].duration;
+  }
+  const a = previewRoute[index % previewRoute.length];
+  const b = previewRoute[(index + 1) % previewRoute.length];
+  const k = smoothStep01(t / Math.max(1, a.duration));
+  previewFrom.fromArray(a.pos);
+  previewTo.fromArray(b.pos);
+  previewLookFrom.fromArray(a.look);
+  previewLookTo.fromArray(b.look);
+  previewPos.lerpVectors(previewFrom, previewTo, k);
+  previewLook.lerpVectors(previewLookFrom, previewLookTo, k);
+  previewPos.y += Math.sin(now * 0.0012) * 0.045;
+  previewLook.y += Math.sin(now * 0.0009 + 1.2) * 0.025;
+  camera.position.lerp(previewPos, 0.065);
+  previewTarget.lerp(previewLook, 0.10);
+  camera.lookAt(previewTarget);
+}
 
 renderer.setAnimationLoop(()=>{
   const now = performance.now();
@@ -354,15 +395,7 @@ renderer.setAnimationLoop(()=>{
   tPrev = now;
   if (!renderer.xr.isPresenting){
     if (!AUTOCAM) desktop.update(dt);
-    else {
-      const shotIndex = Math.floor(now / 9000) % previewShots.length;
-      const shot = previewShots[shotIndex];
-      const orbitT = now * 0.001 * shot.speed;
-      previewPos.set(Math.cos(orbitT) * shot.r + shot.leadX * Math.sin(now * 0.00047), shot.y + Math.sin(now * 0.0014 + shotIndex) * shot.sway, Math.sin(orbitT) * shot.r + shot.leadZ * Math.cos(now * 0.00053));
-      previewTarget.set(shot.targetX, shot.lookY, shot.targetZ);
-      camera.position.lerp(previewPos, 0.06);
-      camera.lookAt(previewTarget);
-    }
+    else updatePreviewCamera(now);
     scene.userData._camera = camera;
   } else scene.userData._camera = renderer.xr.getCamera(camera);
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
