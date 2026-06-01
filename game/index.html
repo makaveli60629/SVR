@@ -1,30 +1,121 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>SVR Game Lobby</title>
-<style>
-html,body{margin:0;min-height:100%;background:#020205;color:white;font-family:system-ui,Arial,sans-serif}body{background:radial-gradient(circle at 20% 15%,rgba(105,232,255,.22),transparent 30%),radial-gradient(circle at 80% 15%,rgba(255,91,233,.16),transparent 30%),#020205}.page{min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(980px,100%);border:1px solid rgba(105,232,255,.32);border-radius:28px;background:rgba(5,5,14,.86);box-shadow:0 30px 100px rgba(0,0,0,.72);padding:28px}.top{display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}.moon{width:82px;height:82px;border-radius:50%;background:#e8e6ff;box-shadow:0 0 60px rgba(232,230,255,.9)}.mars{width:48px;height:48px;border-radius:50%;background:#d76b3a;box-shadow:0 0 40px rgba(215,107,58,.8)}h1{font-size:clamp(2.4rem,7vw,5rem);margin:.2em 0;text-transform:uppercase;letter-spacing:.08em}.lead{font-size:1.15rem;line-height:1.45;color:#e9e2ff}.badges{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.badges span{border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06);padding:8px 10px;font-weight:800}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}.btn{display:grid;gap:5px;align-content:center;min-height:94px;border-radius:20px;border:1px solid rgba(105,232,255,.25);background:rgba(255,255,255,.055);color:white;text-decoration:none;padding:14px}.btn strong{text-transform:uppercase;letter-spacing:.05em}.btn span{color:#c9eaff}.primary{background:linear-gradient(135deg,rgba(255,91,233,.78),rgba(92,72,255,.78))}.note{margin-top:18px;color:#cfc8e8;line-height:1.45}@media(max-width:720px){.grid{grid-template-columns:1fr}.card{padding:18px}.top{justify-content:center;text-align:center}}
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>ScarlettVR Poker • phase 84 Reiki hologram video lock</title>
+  <meta name="theme-color" content="#050508"/>
+  <link rel="manifest" href="./manifest.json"/>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
+    #hud {
+      position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10;
+      display: flex; gap: 10px; align-items: center; justify-content: space-between;
+      pointer-events: none;
+    }
+    .pill {
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.35);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #e9e9ff;
+      font-size: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      pointer-events: none;
+    }
+    .btn {
+      pointer-events: auto;
+      border: 1px solid rgba(180,140,255,.45);
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn:hover { background: rgba(60,40,90,.55); }
+    #sceneNav{
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+      pointer-events: auto;
+    }
+    .scene-btn{
+      border: 1px solid rgba(120,255,186,.42);
+      background: rgba(2,10,8,.62);
+      color: #eafff4;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      font-size: 12px;
+    }
+    .scene-btn:hover{ background: rgba(10,48,33,.72); }
+    body.preview-mode #sceneNav { display:none !important; }
+    #log {
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10;
+      max-height: 38vh; overflow: auto; display: none;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.25);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: #d7d7ff;
+      font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+    #err {
+      position: fixed; inset: 0; display: none; z-index: 50;
+      background: rgba(0,0,0,.88);
+      color: #fff;
+      padding: 18px;
+      font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      overflow: auto;
+    }
+
+    body.preview-mode #hud,
+    body.preview-mode #log,
+    body.preview-mode #err { display: none !important; }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body>
-<main class="page">
-<section class="card">
-<div class="top"><div class="moon"></div><div class="mars"></div></div>
-<h1>SVR Game Lobby</h1>
-<p class="lead">Phase 100 bootable entry. This page has no external module dependency, so it should display immediately while the full 3D build is isolated for debugging.</p>
-<div class="badges"><span>Web game</span><span>Android ready</span><span>Store routes active</span><span>Moon and Mars visible</span></div>
-<div class="grid">
-<a class="btn primary" href="./full.html?v=phase100-full"><strong>Launch Full Build</strong><span>Open the heavy 3D module separately.</span></a>
-<a class="btn" href="../site/store.html#svr-store"><strong>SVR Store</strong><span>Main store lane.</span></a>
-<a class="btn" href="../site/store.html#reiki-store"><strong>Reiki Store</strong><span>Approval-safe wellness lane.</span></a>
-<a class="btn" href="../site/store.html#pga-store"><strong>PGA Store</strong><span>Golf training lane.</span></a>
-<a class="btn" href="./range.html"><strong>PGA Range</strong><span>Open range route.</span></a>
-<a class="btn" href="./scorpion.html"><strong>Scorpion Room</strong><span>Open private room route.</span></a>
-</div>
-<p class="note">Audit result: if this page still does not change after deploy, the live site is not serving the latest committed file or the deployment/cache path is stale.</p>
-</section>
-</main>
+  <div id="app"></div>
+
+  <div id="hud">
+    <div class="pill" id="status">Booting…</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
+      <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
+      <span class="pill" id="mode">Hands: …</span>
+      <span class="pill">BUILD: PHASE-84-REIKI-HOLOGRAM-VIDEO-LOCK</span>
+    </div>
+  </div>
+
+  <div id="sceneNav">
+    <button class="scene-btn" data-scene="lobby">Lobby</button>
+    <button class="scene-btn" data-scene="table">Table</button>
+    <button class="scene-btn" data-scene="seat">Seat</button>
+    <button class="scene-btn" data-scene="reiki">Reiki</button>
+    <button class="scene-btn" data-scene="reikiRoom">Reiki Room</button>
+    <button class="scene-btn" data-scene="pga">PGA</button>
+    <button class="scene-btn" data-scene="legends">Legend</button>
+    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
+    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
+  </div>
+
+  <pre id="log"></pre>
+  <pre id="err"></pre>
+
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
