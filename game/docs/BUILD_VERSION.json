@@ -1,17 +1,18 @@
 {
-  "build": "PHASE-91-MISSION-WALL-SKY-SIZE-LOCK",
-  "phase": 91,
-  "name": "Mission Wall Sky Size Lock",
-  "date": "2026-05-31",
+  "build": "PHASE-98-BOOT-SAFE-WORLD-FALLBACK",
+  "phase": 98,
+  "name": "Boot Safe World Fallback",
+  "date": "2026-06-01",
   "siteTouched": false,
-  "scope": "game-side only: refine the south mission wall for readability, enlarge the Espresso placeholder placement, and make Moon/Mars larger and higher in the night sky",
+  "scope": "game-side only: audit stuck boot path and prevent world/module asset stalls from trapping the game on the boot overlay",
   "notes": [
-    "Rebuilt the south About SVR Poker mission wall with larger readable text, shorter wrapped mission blocks, a clearer angel-wing placeholder emblem, and a clean Espresso With Cream placeholder tile.",
-    "Moved the Espresso placeholder lower so it no longer blocks the mission wing emblem.",
-    "Made the Moon larger and higher, with a bigger halo so it reads closer while remaining above the skyline.",
-    "Made Mars larger and higher in the night sky and pushed it farther behind the skyline.",
-    "Preserved all Phase 90 lounge, portal, teleport, Reiki approval placeholder, and private-scene routing locks.",
-    "Kept website/site files untouched."
+    "Audited active boot path: game/index.html is now native-module clean and imports game/main.js with a cache-busted native dynamic import.",
+    "Found active risk in game/main.js: boot waited for buildSkylineRoom() before creating hands, teleport, watch, and before calling window.svrBootReady().",
+    "Added an 8.5 second timeout around buildSkylineRoom() and a procedural boot-safe fallback lobby so the game opens even when heavy room assets or world construction stalls.",
+    "Added a timeout around logo texture loading so missing logo assets cannot block boot completion.",
+    "Wrapped watch creation and animation loop with safety guards so failures do not trap the user at Booting.",
+    "Fallback lobby preserves table, floor, walls, Moon, Mars, portal labels, seat markers, teleport room clamp, scene targets, and controller/hand boot flow.",
+    "No Unity, no Azure, no site public Matrix launch page edits. This is WebXR/WebEx game-side only."
   ],
-  "updatedAt": "2026-05-31T00:00:00-05:00"
+  "updatedAt": "2026-06-01T00:00:00-05:00"
 }
