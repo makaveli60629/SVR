@@ -197,11 +197,11 @@ function addOrb(root, color, x, y, z, scale, kind = "moon"){
     new THREE.MeshBasicMaterial({ map: makePlanetTexture(kind), color: 0xffffff })
   );
   group.add(sphere);
-  const glow = new THREE.PointLight(color, 1.95, 145, 1.35);
+  const glow = new THREE.PointLight(color, 2.25, 220, 1.35);
   group.add(glow);
   const halo = new THREE.Mesh(
-    new THREE.SphereGeometry(scale * 1.18, 48, 28),
-    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.16, side: THREE.BackSide, depthWrite: false })
+    new THREE.SphereGeometry(scale * 1.22, 48, 28),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.18, side: THREE.BackSide, depthWrite: false })
   );
   group.add(halo);
   return { group, sphere, halo };
@@ -209,13 +209,13 @@ function addOrb(root, color, x, y, z, scale, kind = "moon"){
 
 function addReikiVideoPanel(root){
   const group = new THREE.Group();
-  const center = new THREE.Vector3(-5.6, 1.62, -5.77);
+  const center = new THREE.Vector3(-5.6, 1.64, -8.98);
   group.position.copy(center);
-  group.rotation.y = Math.atan2(5.6, 5.8);
+  group.rotation.y = Math.atan2(5.6, 9.15);
   root.add(group);
   const frame = new THREE.Mesh(
-    new THREE.BoxGeometry(2.18, 1.42, 0.08),
-    new THREE.MeshStandardMaterial({ color: 0x120818, roughness: 0.45, metalness: 0.1, emissive: 0x30104a, emissiveIntensity: 0.34 })
+    new THREE.BoxGeometry(2.22, 1.46, 0.08),
+    new THREE.MeshStandardMaterial({ color: 0x120818, roughness: 0.45, metalness: 0.1, emissive: 0x30104a, emissiveIntensity: 0.38 })
   );
   group.add(frame);
   const video = document.createElement("video");
@@ -230,7 +230,7 @@ function addReikiVideoPanel(root){
   let primed = false;
   let currentVolume = 0;
   const maxVolume = 0.055;
-  const zoneCenter = new THREE.Vector3(-5.6, 1.6, -5.8);
+  const zoneCenter = new THREE.Vector3(-5.6, 1.6, -9.15);
   const primeAudio = ()=>{
     primed = true;
     video.muted = false;
@@ -241,23 +241,23 @@ function addReikiVideoPanel(root){
   const texture = new THREE.VideoTexture(video);
   texture.colorSpace = THREE.SRGBColorSpace;
   const screen = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.96, 1.12),
+    new THREE.PlaneGeometry(2.00, 1.14),
     new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, toneMapped: false })
   );
   screen.position.z = 0.055;
   group.add(screen);
   const label = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.1, 0.30),
-    new THREE.MeshBasicMaterial({ map: makeTexture("Reiki Hologram", "Low audio zone", "#7fffd4"), transparent: true, side: THREE.DoubleSide })
+    new THREE.PlaneGeometry(2.14, 0.30),
+    new THREE.MeshBasicMaterial({ map: makeTexture("Reiki Hologram", "Low audio portal", "#7fffd4"), transparent: true, side: THREE.DoubleSide })
   );
-  label.position.set(0, 0.88, 0.06);
+  label.position.set(0, 0.90, 0.06);
   group.add(label);
   const glow = new THREE.Mesh(
-    new THREE.RingGeometry(0.88, 1.20, 64),
-    new THREE.MeshBasicMaterial({ color: 0x7fffd4, transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false })
+    new THREE.RingGeometry(0.92, 1.26, 64),
+    new THREE.MeshBasicMaterial({ color: 0x7fffd4, transparent: true, opacity: 0.30, side: THREE.DoubleSide, depthWrite: false })
   );
   glow.rotation.x = -Math.PI * 0.5;
-  glow.position.set(0, -1.58, 0.70);
+  glow.position.set(0, -1.60, 0.76);
   group.add(glow);
   return {
     group,
@@ -289,7 +289,7 @@ function addReikiVideoPanel(root){
 
 export function installLobbyVisibilityLock({ scene }){
   const root = new THREE.Group();
-  root.name = "SVR_Phase98A_Scorpion_Route_Lobby_Align";
+  root.name = "SVR_Phase98D_HighSky_ReikiAligned";
   scene.add(root);
 
   const portals = [
@@ -314,8 +314,8 @@ export function installLobbyVisibilityLock({ scene }){
   addPanel(root, "Scorpion Room", "Playable poker now open", 8.9, 5.40, 5.35, "#b48cff", 4.6, 1.55);
   addPanel(root, "Play With Purpose", "Community impact", 0, 6.45, 11.35, "#69e8ff", 6.5, 1.9);
 
-  const moon = addOrb(root, 0xeaf2ff, -2.0, 24.8, -34.0, 3.75, "moon");
-  const mars = addOrb(root, 0xff7f4f, 14.0, 22.6, -41.0, 2.35, "mars");
+  const moon = addOrb(root, 0xeaf2ff, -4.0, 42.0, -64.0, 5.10, "moon");
+  const mars = addOrb(root, 0xff7f4f, 18.0, 38.0, -74.0, 3.10, "mars");
 
   return {
     portals,
@@ -325,15 +325,15 @@ export function installLobbyVisibilityLock({ scene }){
     update(t = 0, dt = 0.016){
       const cam = scene.userData?._camera;
       reikiVideo.updateAudio(cam, dt);
-      moon.group.position.x = -2.0 + Math.sin(t * 0.036) * 4.8;
-      moon.group.position.y = 24.8 + Math.sin(t * 0.021) * 0.8;
-      moon.group.position.z = -34.0 + Math.cos(t * 0.036) * 3.2;
+      moon.group.position.x = -4.0 + Math.sin(t * 0.026) * 7.0;
+      moon.group.position.y = 42.0 + Math.sin(t * 0.017) * 1.2;
+      moon.group.position.z = -64.0 + Math.cos(t * 0.026) * 4.4;
       moon.sphere.rotation.y += dt * 0.055;
       moon.sphere.rotation.x += dt * 0.006;
       moon.halo.rotation.y += dt * 0.025;
-      mars.group.position.x = 14.0 + Math.sin(t * 0.031) * 5.8;
-      mars.group.position.y = 22.6 + Math.sin(t * 0.019) * 0.6;
-      mars.group.position.z = -41.0 + Math.cos(t * 0.031) * 4.4;
+      mars.group.position.x = 18.0 + Math.sin(t * 0.023) * 7.8;
+      mars.group.position.y = 38.0 + Math.sin(t * 0.014) * 0.95;
+      mars.group.position.z = -74.0 + Math.cos(t * 0.023) * 5.8;
       mars.sphere.rotation.y += dt * 0.082;
       mars.sphere.rotation.x += dt * 0.008;
       mars.halo.rotation.y += dt * 0.03;
