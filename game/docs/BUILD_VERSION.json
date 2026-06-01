@@ -1,17 +1,17 @@
 {
-  "build": "PHASE-100-MINIMAL-BOOTABLE-GAME-ENTRY",
-  "phase": 100,
-  "name": "Minimal Bootable Game Entry",
+  "build": "PHASE-101-FULL-BUILD-STAGED-AUDIT",
+  "phase": 101,
+  "name": "Full Build Staged Audit",
   "date": "2026-06-01",
-  "siteTouched": true,
-  "scope": "make /game/index.html a zero-dependency bootable entry and isolate the full WebXR build at /game/full.html",
+  "siteTouched": false,
+  "scope": "keep /game/index.html locked as the working safe lobby and convert /game/full.html into a staged diagnostic loader for the heavy WebXR build",
   "notes": [
-    "Replaced /game/index.html with a small zero-dependency HTML/CSS page that does not import Three.js, main.js, or any heavy game module.",
-    "Created /game/full.html as the separate full WebXR loader for the heavy 3D build, preserving the debug path without blocking the public game entry.",
-    "The game entry now immediately shows SVR Game Lobby, Moon, Mars, store buttons, Reiki Store, PGA Store, PGA Range, and Scorpion Room links.",
-    "If /game/ still shows the old boot screen after deployment, the issue is confirmed as deployment/cache/path serving stale files rather than code inside /game/index.html.",
-    "Website store Phase 99 hub navigation remains active: SVR Store, Reiki Store, PGA Store, Scorpion, Lounge, VR Gear, and Sponsors.",
-    "No Unity and no Azure. This remains WebEx/WebXR static game and website work."
+    "Kept /game/index.html as the minimal bootable safe game entry. Do not replace it while debugging the full build.",
+    "Added /game/modules/full_boot_audit.js to test Three.js and each full-build module one at a time with visible OK/FAIL output.",
+    "Updated /game/full.html to use the staged audit module instead of importing main.js blindly.",
+    "The full audit renders a basic Three.js fallback scene first, then imports core_scene, desktop_controls, asset_base, audio, event bus, teleport, hands, watch, and world_skyline modules in sequence.",
+    "This isolates the exact failing full-build module without breaking the public /game/ entry page.",
+    "No Unity and no Azure. This remains WebEx/WebXR static game-side work."
   ],
   "updatedAt": "2026-06-01T00:00:00-05:00"
 }
