@@ -140,42 +140,43 @@ function addStorefront(root, title, subtitle, x, z, color, portalKey, options = 
   root.add(group);
   const colorObj = new THREE.Color(color);
   const colorHex = colorObj.getHex();
+  const width = options.width || 3.2;
   const body = new THREE.Mesh(
-    new THREE.BoxGeometry(options.width || 3.2, 3.05, 0.28),
+    new THREE.BoxGeometry(width, 3.05, 0.28),
     new THREE.MeshStandardMaterial({ color: 0x080d18, roughness: 0.74, metalness: 0.06, emissive: 0x101625, emissiveIntensity: 0.20 })
   );
   body.position.y = 1.50;
   group.add(body);
   const inset = new THREE.Mesh(
-    new THREE.BoxGeometry((options.width || 3.2) - 0.42, 2.12, 0.06),
+    new THREE.BoxGeometry(width - 0.42, 2.12, 0.06),
     new THREE.MeshStandardMaterial({ color: 0x03060d, roughness: 0.85, metalness: 0.02, emissive: colorHex, emissiveIntensity: 0.055 })
   );
   inset.position.set(0, 1.34, 0.17);
   group.add(inset);
   const glass = new THREE.Mesh(
-    new THREE.PlaneGeometry((options.width || 3.2) - 0.82, 1.58),
+    new THREE.PlaneGeometry(width - 0.82, 1.58),
     new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.14, side: THREE.DoubleSide, depthWrite: false })
   );
   glass.position.set(0, 1.28, 0.205);
   group.add(glass);
   const sign = new THREE.Mesh(
-    new THREE.PlaneGeometry((options.width || 3.2) - 0.20, 0.82),
+    new THREE.PlaneGeometry(width - 0.20, 0.82),
     new THREE.MeshBasicMaterial({ map: makeTexture(title, subtitle, color), transparent: true, side: THREE.DoubleSide, depthWrite: false })
   );
   sign.position.set(0, 2.78, 0.225);
   group.add(sign);
   const trimMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.32, metalness: 0.26, emissive: colorHex, emissiveIntensity: 0.50 });
-  const top = new THREE.Mesh(new THREE.BoxGeometry((options.width || 3.2) + 0.22, 0.08, 0.18), trimMat);
+  const top = new THREE.Mesh(new THREE.BoxGeometry(width + 0.22, 0.08, 0.18), trimMat);
   top.position.set(0, 3.06, 0.21);
   group.add(top);
   const bottom = top.clone();
   bottom.position.y = 0.06;
   group.add(bottom);
   const left = new THREE.Mesh(new THREE.BoxGeometry(0.08, 3.0, 0.18), trimMat);
-  left.position.set(-((options.width || 3.2) / 2 + 0.08), 1.54, 0.21);
+  left.position.set(-(width / 2 + 0.08), 1.54, 0.21);
   group.add(left);
   const right = left.clone();
-  right.position.x = ((options.width || 3.2) / 2 + 0.08);
+  right.position.x = (width / 2 + 0.08);
   group.add(right);
   const marker = new THREE.Mesh(
     new THREE.RingGeometry(0.62, 0.92, 64),
@@ -288,32 +289,33 @@ function addReikiVideoPanel(root){
 
 export function installLobbyVisibilityLock({ scene }){
   const root = new THREE.Group();
-  root.name = "SVR_Phase97_Wall_Storefront_Ad_Polish";
+  root.name = "SVR_Phase98A_Scorpion_Route_Lobby_Align";
   scene.add(root);
 
   const portals = [
-    { key: "reiki", label: "Reiki", target: "reiki", position: new THREE.Vector3(-5.6, 0, -5.8) },
-    { key: "pga", label: "PGA", target: "pga", position: new THREE.Vector3(0, 0, -6.8) },
-    { key: "smoker", label: "Smoker Lounge", target: "sponsor", position: new THREE.Vector3(5.6, 0, -5.8) },
-    { key: "store", label: "SVR Store", route: "../site/store.html", position: new THREE.Vector3(-8.8, 0, 0.8) },
-    { key: "scorpion", label: "Scorpion Room", target: "scorpion", position: new THREE.Vector3(8.8, 0, 0.8) }
+    { key: "reiki", label: "Reiki", target: "reiki", position: new THREE.Vector3(-5.6, 0, -9.15) },
+    { key: "pga", label: "PGA", target: "pga", position: new THREE.Vector3(0, 0, -9.25) },
+    { key: "smoker", label: "Smoker Lounge", target: "sponsor", position: new THREE.Vector3(5.6, 0, -9.15) },
+    { key: "store", label: "SVR Store", route: "../site/store.html", position: new THREE.Vector3(-9.25, 0, 0.8) },
+    { key: "scorpion", label: "Scorpion Room", route: "./scorpion.html?v=phase98-playable", position: new THREE.Vector3(9.25, 0, 0.8) }
   ];
 
   addStorefront(root, "Reiki", "Hologram Portal", -5.6, -9.15, "#7fffd4", "reiki", { width: 3.35 });
   addStorefront(root, "PGA", "Golf Training", 0, -9.25, "#69e8ff", "pga", { width: 3.35 });
   addStorefront(root, "Smoker", "Lounge", 5.6, -9.15, "#ff8bd7", "smoker", { width: 3.35 });
   addStorefront(root, "SVR Store", "Web Portal", -9.25, 0.8, "#ffd36b", "store", { width: 3.55 });
-  addStorefront(root, "Scorpion", "Poker Room", 9.25, 0.8, "#b48cff", "scorpion", { width: 3.55 });
+  addStorefront(root, "Scorpion", "Play Poker", 9.25, 0.8, "#b48cff", "scorpion", { width: 3.55 });
   addStorefront(root, "Sponsor", "Ad Wall", 0, 9.25, "#a7ff80", "sponsor", { width: 3.55 });
   const reikiVideo = addReikiVideoPanel(root);
 
-  addPanel(root, "Sponsor Board", "Future partner surface", 0, 6.25, -11.35, "#a7ff80", 6.5, 1.9);
-  addPanel(root, "Espresso With Cream", "Tier 1 sponsor", 8.9, 6.05, -5.35, "#ffb477", 4.6, 1.55);
-  addPanel(root, "SVR Store", "Official brand", -8.9, 6.05, -5.35, "#ffd36b", 4.6, 1.55, makeSvrLogoAdTexture());
-  addPanel(root, "Play With Purpose", "Community impact", 0, 6.25, 11.35, "#69e8ff", 6.5, 1.9);
+  addPanel(root, "Sponsor Board", "Future partner surface", 0, 6.45, -11.35, "#a7ff80", 6.5, 1.9);
+  addPanel(root, "Espresso With Cream", "Tier 1 sponsor", 8.9, 6.20, -5.35, "#ffb477", 4.6, 1.55);
+  addPanel(root, "SVR Store", "Official brand", -8.9, 6.20, -5.35, "#ffd36b", 4.6, 1.55, makeSvrLogoAdTexture());
+  addPanel(root, "Scorpion Room", "Playable poker now open", 8.9, 5.40, 5.35, "#b48cff", 4.6, 1.55);
+  addPanel(root, "Play With Purpose", "Community impact", 0, 6.45, 11.35, "#69e8ff", 6.5, 1.9);
 
-  const moon = addOrb(root, 0xeaf2ff, -2.0, 23.5, -33.0, 3.45, "moon");
-  const mars = addOrb(root, 0xff7f4f, 14.0, 21.4, -39.0, 2.10, "mars");
+  const moon = addOrb(root, 0xeaf2ff, -2.0, 24.8, -34.0, 3.75, "moon");
+  const mars = addOrb(root, 0xff7f4f, 14.0, 22.6, -41.0, 2.35, "mars");
 
   return {
     portals,
@@ -324,14 +326,14 @@ export function installLobbyVisibilityLock({ scene }){
       const cam = scene.userData?._camera;
       reikiVideo.updateAudio(cam, dt);
       moon.group.position.x = -2.0 + Math.sin(t * 0.036) * 4.8;
-      moon.group.position.y = 23.5 + Math.sin(t * 0.021) * 0.8;
-      moon.group.position.z = -33.0 + Math.cos(t * 0.036) * 3.2;
+      moon.group.position.y = 24.8 + Math.sin(t * 0.021) * 0.8;
+      moon.group.position.z = -34.0 + Math.cos(t * 0.036) * 3.2;
       moon.sphere.rotation.y += dt * 0.055;
       moon.sphere.rotation.x += dt * 0.006;
       moon.halo.rotation.y += dt * 0.025;
       mars.group.position.x = 14.0 + Math.sin(t * 0.031) * 5.8;
-      mars.group.position.y = 21.4 + Math.sin(t * 0.019) * 0.6;
-      mars.group.position.z = -39.0 + Math.cos(t * 0.031) * 4.4;
+      mars.group.position.y = 22.6 + Math.sin(t * 0.019) * 0.6;
+      mars.group.position.z = -41.0 + Math.cos(t * 0.031) * 4.4;
       mars.sphere.rotation.y += dt * 0.082;
       mars.sphere.rotation.x += dt * 0.008;
       mars.halo.rotation.y += dt * 0.03;
