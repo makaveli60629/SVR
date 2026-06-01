@@ -72,6 +72,42 @@ function addOrb(root, color, x, y, z, scale){
   return { group, sphere };
 }
 
+function addReikiVideoPanel(root){
+  const group = new THREE.Group();
+  group.position.set(-5.6, 1.7, -5.45);
+  group.rotation.y = Math.atan2(5.6, 5.45);
+  root.add(group);
+  const frame = new THREE.Mesh(
+    new THREE.BoxGeometry(2.55, 1.62, 0.08),
+    new THREE.MeshStandardMaterial({ color: 0x120818, roughness: 0.45, metalness: 0.1, emissive: 0x30104a, emissiveIntensity: 0.28 })
+  );
+  group.add(frame);
+  const video = document.createElement("video");
+  video.src = "../site/assets/video/reiki_hologram.mp4";
+  video.muted = true;
+  video.loop = true;
+  video.playsInline = true;
+  video.autoplay = true;
+  video.preload = "metadata";
+  video.volume = 0.02;
+  video.play().catch(()=>{});
+  const texture = new THREE.VideoTexture(video);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.32, 1.32),
+    new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, toneMapped: false })
+  );
+  screen.position.z = 0.055;
+  group.add(screen);
+  const label = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.4, 0.34),
+    new THREE.MeshBasicMaterial({ map: makeTexture("Reiki Video", "Muted lobby preview", "#7fffd4"), transparent: true, side: THREE.DoubleSide })
+  );
+  label.position.set(0, 0.98, 0.06);
+  group.add(label);
+  return { group, video };
+}
+
 export function installLobbyVisibilityLock({ scene }){
   const root = new THREE.Group();
   root.name = "SVR_BootSafe_Visibility_Lock";
@@ -82,21 +118,24 @@ export function installLobbyVisibilityLock({ scene }){
   addStorefront(root, "Smoker", "Lounge", 5.6, -5.8, "#ff8bd7");
   addStorefront(root, "SVR Store", "Portal", -6.8, 1.4, "#ffd36b");
   addStorefront(root, "Scorpion", "Poker Room", 6.8, 1.4, "#b48cff");
+  addReikiVideoPanel(root);
 
   addPanel(root, "Sponsor Board", "Future partner surface", 0, 5.8, -10.4, "#a7ff80", 5.2, 1.7);
   addPanel(root, "Espresso With Cream", "Tier 1 sponsor", 9.8, 5.4, -2.6, "#ffb477", 4.1, 1.55);
   addPanel(root, "SVR Store", "Gear and avatar items", -9.8, 5.4, -2.6, "#ffd36b", 4.1, 1.55);
   addPanel(root, "Play With Purpose", "Community impact", 0, 5.8, 10.4, "#69e8ff", 5.2, 1.7);
 
-  const moon = addOrb(root, 0xeaf2ff, 0, 14.2, -18, 1.65);
-  const mars = addOrb(root, 0xff7f4f, -12, 12.6, 13.4, 0.95);
+  const moon = addOrb(root, 0xeaf2ff, 0, 16.4, -22, 2.15);
+  const mars = addOrb(root, 0xff7f4f, -12, 14.8, 16.5, 1.32);
 
   return {
     update(t = 0, dt = 0.016){
-      moon.group.position.x = Math.sin(t * 0.05) * 1.1;
-      moon.sphere.rotation.y += dt * 0.035;
-      mars.group.position.x = -12 + Math.sin(t * 0.043) * 1.0;
-      mars.sphere.rotation.y += dt * 0.052;
+      moon.group.position.x = Math.sin(t * 0.05) * 1.8;
+      moon.group.position.z = -22 + Math.cos(t * 0.05) * 1.2;
+      moon.sphere.rotation.y += dt * 0.045;
+      mars.group.position.x = -12 + Math.sin(t * 0.043) * 1.5;
+      mars.group.position.z = 16.5 + Math.cos(t * 0.043) * 1.0;
+      mars.sphere.rotation.y += dt * 0.06;
     }
   };
 }
