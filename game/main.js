@@ -6,6 +6,7 @@ import { createTeleportRig } from "./modules/teleport.js";
 import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createWristWatch } from "./modules/watch.js";
+import { installLobbyVisibilityLock } from "./modules/lobby_visibility_lock.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -71,6 +72,7 @@ const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: ren
 setStatus("Loading world...", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
+const lobbyVisibilityLock = installLobbyVisibilityLock({ scene });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -181,8 +183,8 @@ $sceneButtons.forEach((btn)=>{
 
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
-  if (e.code === "KeyM") setStatus("Audio disabled for Phase 93", { force: true });
-  if (e.code === "KeyN") setStatus("Audio disabled for Phase 93", { force: true });
+  if (e.code === "KeyM") setStatus("Audio disabled for Phase 94", { force: true });
+  if (e.code === "KeyN") setStatus("Audio disabled for Phase 94", { force: true });
   if (e.code === "KeyH") openRikiHologram();
   if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
@@ -213,7 +215,7 @@ const watch = createWristWatch({
     teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
   }),
   actions: {
-    toggleAudio: ()=>setStatus("Audio disabled for Phase 93", { force: true }),
+    toggleAudio: ()=>setStatus("Audio disabled for Phase 94", { force: true }),
     nextTrack: openRikiHologram,
     openRikiHologram,
     joinTable,
@@ -240,7 +242,7 @@ setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Audio is off. Riki hologram route added. Hold/aim/release teleport only.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Storefronts, ads, Moon and Mars visibility lock active. Audio off.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
 
 function setHudVisible(visible){
@@ -293,6 +295,7 @@ renderer.setAnimationLoop(()=>{
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
+  lobbyVisibilityLock?.update?.(now * 0.001, dt);
   hands.update(dt);
   hands.updateDebug();
   const leftHand = hands.getLeftHand();
@@ -309,7 +312,7 @@ renderer.setAnimationLoop(()=>{
 canvasElSetup();
 function canvasElSetup(){
   const canvasEl = renderer.domElement;
-  canvasEl.addEventListener("pointerdown", async ()=>{ setStatus("Audio off. Use Riki Hologram button for presentation route.", { force: true }); }, { passive: true });
+  canvasEl.addEventListener("pointerdown", async ()=>{ setStatus("Audio off. Storefronts, ads, Moon and Mars visibility lock active.", { force: true }); }, { passive: true });
   canvasEl.addEventListener("webglcontextlost", (e)=>{
     e.preventDefault();
     log("[ERR] WebGL context lost. Reloading...");
