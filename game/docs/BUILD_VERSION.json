@@ -1,15 +1,8 @@
 {
-  "build": "PHASE-90-LOCOMOTION-REIKI-STOREFRONT-LOBBY-READY-LOCK",
-  "phase": 90,
-  "name": "Locomotion Reiki Storefront Lobby Ready Lock",
+  "build": "PHASE-84-REIKI-HOLOGRAM-VIDEO-LOCK",
+  "scope": "game-side-only",
   "siteTouched": false,
-  "gameSideOnly": true,
-  "notes": [
-    "Controller locomotion is floor/rig-yaw anchored instead of headset-look anchored.",
-    "Right-stick snap turn changes the new forward direction for stick movement.",
-    "Teleport remains hold-to-aim and release-to-teleport on the floor.",
-    "Reiki hologram is staged by the Reiki wall behind/near plants and opens paused until entered from Reiki area.",
-    "Added freestanding Smoker Lounge and SVR Store storefronts.",
-    "Added skyline billboard buildings and raised Moon/Mars visibility."
-  ]
+  "video": "game/assets/video/reiki_hologram.mp4",
+  "sourceUpload": "1000034627.mp4",
+  "notes": "Compressed MP4 hologram player for Reiki area with volume controls."
 }

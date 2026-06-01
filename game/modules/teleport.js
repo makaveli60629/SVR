@@ -158,55 +158,29 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     return proxy?.userData?.gamepad || proxy?.userData?.inputSource?.gamepad || proxy?.userData?.controller?.inputSource?.gamepad || null;
   }
 
-  function deadzone(v, dz = 0.16){
-    return Math.abs(v || 0) < dz ? 0 : (v || 0);
-  }
-
   function getStick(gp, side = "left") {
     if (!gp?.axes?.length) return { x: 0, y: 0 };
     const axes = gp.axes;
-    let x = 0;
-    let y = 0;
-
-    // Quest/WebXR layouts are inconsistent across browsers. Prefer the requested
-    // side, then fall back to the strongest axis pair so right-controller-only
-    // movement never silently dies.
-    if (side === "right" && axes.length >= 4) {
-      x = axes[2] || 0;
-      y = axes[3] || 0;
-      if (Math.hypot(x, y) < 0.08) {
-        x = axes[0] || 0;
-        y = axes[1] || 0;
-      }
-    } else if (side === "left") {
-      x = axes[0] || 0;
-      y = axes[1] || 0;
-      if (Math.hypot(x, y) < 0.08 && axes.length >= 4) {
+    let x = 0, y = 0;
+    if (axes.length >= 4) {
+      if (side === "right") {
         x = axes[2] || 0;
         y = axes[3] || 0;
+        if (Math.abs(x) < 0.001 && Math.abs(y) < 0.001) {
+          x = axes[0] || 0;
+          y = axes[1] || 0;
+        }
+      } else {
+        x = axes[0] || 0;
+        y = axes[1] || 0;
       }
     } else {
       x = axes[0] || 0;
       y = axes[1] || 0;
     }
-
-    return { x: deadzone(x), y: deadzone(y) };
-  }
-
-  function combineMoveStick(leftGp, rightGp){
-    const left = getStick(leftGp, "left");
-    const right = getStick(rightGp, "right");
-    // Right controller has priority because this project locks right-stick
-    // forward/back as the Quest fallback.
-    const primary = Math.hypot(right.x, right.y) >= Math.hypot(left.x, left.y) ? right : left;
-    return primary;
-  }
-
-  function controllerAimHeld(proxy){
-    const gp = controllerGamepad(proxy);
-    if (!gp) return false;
-    // 0 trigger, 1 grip/squeeze, 4/5 shoulders, 3 A/B style button fallback.
-    return getButtonValue(gp, 0) > 0.18 || getButtonValue(gp, 1) > 0.18 || getButtonValue(gp, 4) > 0.55 || getButtonValue(gp, 5) > 0.55 || getButtonValue(gp, 3) > 0.75;
+    if (Math.abs(x) < 0.14) x = 0;
+    if (Math.abs(y) < 0.14) y = 0;
+    return { x, y };
   }
 
   function getButtonValue(gp, idx){
@@ -214,9 +188,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   }
 
   function controllerTogglePressed(proxy){
-    // Legacy toggle is intentionally disabled for controllers. Controllers now use
-    // hold-to-aim / release-to-teleport so the player never gets stuck in TP mode.
-    return false;
+    const gp = controllerGamepad(proxy);
+    if (!gp) return false;
+    return getButtonValue(gp, 4) > 0.55 || getButtonValue(gp, 5) > 0.55 || getButtonValue(gp, 3) > 0.75;
   }
 
   function handNearFace(hand){
@@ -304,26 +278,29 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   function movePlayerFromControllers(dt){
     const leftGp = controllerGamepad(leftControllerRef);
     const rightGp = controllerGamepad(rightControllerRef);
-    const moveStick = combineMoveStick(leftGp, rightGp);
-    const turnStick = getStick(rightGp || leftGp, rightGp ? "right" : "left");
+    const moveSource = leftGp || rightGp;
+    const turnSource = rightGp || leftGp;
+    const leftStick = getStick(moveSource, "left");
+    const rightStick = getStick(turnSource, "right");
 
-    if (Math.abs(turnStick.x) > 0.72 && performance.now() > snapCooldownUntil){
-      playerYaw += Math.sign(turnStick.x) * (Math.PI / 4);
+    if (Math.abs(rightStick.x) > 0.72 && performance.now() > snapCooldownUntil){
+      playerYaw += Math.sign(rightStick.x) * (Math.PI / 4);
       applyReferenceSpace();
-      snapCooldownUntil = performance.now() + 230;
+      snapCooldownUntil = performance.now() + 220;
     }
 
-    const mag = Math.hypot(moveStick.x, moveStick.y);
+    const mag = Math.hypot(leftStick.x, leftStick.y);
     if (mag < 0.12) return;
 
-    // Phase 90 locomotion lock: movement is anchored to the floor/rig yaw,
-    // not to the current headset look direction. Snap-turn changes playerYaw,
-    // then right-stick forward moves into that new forward every time.
-    headDir.set(Math.sin(playerYaw), 0, -Math.cos(playerYaw)).normalize();
-    const rightDir = new THREE.Vector3(Math.cos(playerYaw), 0, Math.sin(playerYaw)).normalize();
-    const speed = 3.85;
-    const stepX = (rightDir.x * moveStick.x + headDir.x * (-moveStick.y)) * speed * dt;
-    const stepZ = (rightDir.z * moveStick.x + headDir.z * (-moveStick.y)) * speed * dt;
+    const xrCam = renderer.xr.getCamera(camera);
+    xrCam.getWorldDirection(headDir);
+    headDir.y = 0;
+    if (headDir.lengthSq() < 1e-5) headDir.set(0, 0, -1);
+    headDir.normalize();
+    const rightDir = new THREE.Vector3(headDir.z, 0, -headDir.x).normalize();
+    const speed = 2.8;
+    const stepX = (rightDir.x * leftStick.x + headDir.x * (-leftStick.y)) * speed * dt;
+    const stepZ = (rightDir.z * leftStick.x + headDir.z * (-leftStick.y)) * speed * dt;
     const nextX = THREE.MathUtils.clamp(playerX + stepX, -roomClamp, roomClamp);
     const nextZ = THREE.MathUtils.clamp(playerZ + stepZ, -roomClamp, roomClamp);
     setPlayerXZ(nextX, nextZ);
@@ -337,27 +314,6 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     rightControllerRef = rightController;
 
     if (renderer?.xr?.isPresenting && (leftControllerRef || rightControllerRef)) movePlayerFromControllers(dt);
-
-    // Direct controller locomotion lock: hold A/grip/trigger to aim, release to teleport.
-    // This runs without requiring the watch TP toggle. Watch TP remains available for hand mode.
-    const controllerHeld = controllerAimHeld(rightControllerRef) || controllerAimHeld(leftControllerRef);
-    const heldController = controllerAimHeld(rightControllerRef) ? rightControllerRef : controllerAimHeld(leftControllerRef) ? leftControllerRef : null;
-    const lastHeldController = rightControllerRef?.userData?._svrHeld ? rightControllerRef : leftControllerRef?.userData?._svrHeld ? leftControllerRef : null;
-    if (renderer?.xr?.isPresenting && (heldController || lastHeldController)){
-      if (heldController){
-        mode = true;
-        active = heldController;
-        activeMode = "controller";
-        if (!heldController.userData._svrHeld){
-          heldController.userData._svrHeld = true;
-          triggerHoldStart = now;
-        }
-      } else if (lastHeldController){
-        mode = true;
-        active = lastHeldController;
-        activeMode = "controller";
-      }
-    }
 
     const leftToggle = controllerTogglePressed(leftControllerRef);
     const rightToggle = controllerTogglePressed(rightControllerRef);
@@ -430,7 +386,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       stableTargetMs = 0;
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
-        ? "Controllers active • right stick floor-move/snap • hold A/grip/trigger to TP"
+        ? "Controllers active • left stick move • right stick snap turn • A/X teleport"
         : "TELEPORT OFF • press TP or make fist by face";
       statusCb(idleMsg);
       modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist by face toggles TP");
@@ -446,7 +402,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       markerGlow.intensity = 0;
       stableTargetMs = 0;
       lastAimValid = false;
-      statusCb(activeMode === "controller" ? "CONTROLLER TP ON • release A/grip/trigger to teleport" : "HAND TP ON • hold pinch then release");
+      statusCb(activeMode === "controller" ? "CONTROLLER TP ON • hold trigger then release" : "HAND TP ON • hold pinch then release");
       modeCb(activeMode === "controller" ? "Controllers: TELEPORT ON" : `Hands: TELEPORT ON`);
       return;
     }
@@ -469,7 +425,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     markerGlow.position.copy(smoothedTarget).setY(0.34);
 
     if (activeMode === "controller"){
-      const trigger = controllerAimHeld(active) ? 1 : 0;
+      const trigger = controllerTriggerValue(active);
       if (trigger > 0.22 && !active.userData._wasTrigger) triggerHoldStart = now;
       const held = triggerHoldStart ? (now - triggerHoldStart) : 0;
       if (active.userData._wasTrigger && trigger <= 0.12 && held > 140 && stableTargetMs > 120 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
@@ -477,7 +433,6 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
         if (ok){
           lastTP = now + 220;
           cooldownUntil = now + 240;
-          active.userData._svrHeld = false;
           mode = false;
           active = null;
           activeMode = "controller";
@@ -489,20 +444,16 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
           hideArc();
           setGlow(false);
         }else{
-          active.userData._svrHeld = false;
           cooldownUntil = now + 180;
           triggerHoldStart = 0;
           stableTargetMs = 0;
           statusCb("TELEPORT RESET • aim again");
         }
       }
-      if (trigger <= 0.12) {
-        triggerHoldStart = 0;
-        active.userData._svrHeld = false;
-      }
+      if (trigger <= 0.12) triggerHoldStart = 0;
       active.userData._wasTrigger = trigger > 0.22;
       modeCb("Controllers: TELEPORT ON");
-      statusCb("CONTROLLER TP ON • release A/grip/trigger to teleport");
+      statusCb("CONTROLLER TP ON • hold trigger then release");
       return;
     }
 
@@ -537,9 +488,5 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     statusCb("HAND TP ON • fist by face toggles • hold pinch then release");
   }
 
-  return {
-    onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode,
-    isEnabled: ()=>!!mode,
-    getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode })
-  };
+  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
 }

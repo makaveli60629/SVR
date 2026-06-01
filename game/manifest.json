@@ -4,7 +4,5 @@
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050508",
-  "theme_color": "#050508",
-  "build": "PHASE-90-LOCOMOTION-REIKI-STOREFRONT-LOBBY-READY-LOCK",
-  "phase": 90
+  "theme_color": "#050508"
 }
