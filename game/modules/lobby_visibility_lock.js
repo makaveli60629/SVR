@@ -27,6 +27,53 @@ function makeTexture(title, subtitle, color = "#69e8ff"){
   return texture;
 }
 
+function makeSvrLogoAdTexture(){
+  const canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d");
+  function drawBase(){
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    grad.addColorStop(0, "#03040c");
+    grad.addColorStop(0.55, "#140824");
+    grad.addColorStop(1, "#040914");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "#69e8ff";
+    ctx.lineWidth = 14;
+    ctx.strokeRect(28, 28, canvas.width - 56, canvas.height - 56);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 58px Arial";
+    ctx.fillText("SVR POKER", 512, 304);
+    ctx.fillStyle = "#ffd36b";
+    ctx.font = "800 31px Arial";
+    ctx.fillText("OFFICIAL BRAND • STORE • SOCIAL VR", 512, 370);
+    ctx.fillStyle = "#b48cff";
+    ctx.font = "800 26px Arial";
+    ctx.fillText("SVRPOKER.COM", 512, 422);
+  }
+  drawBase();
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  const img = new Image();
+  img.onload = ()=>{
+    drawBase();
+    const size = 170;
+    ctx.save();
+    ctx.shadowColor = "#69e8ff";
+    ctx.shadowBlur = 32;
+    ctx.drawImage(img, 512 - size / 2, 74, size, size);
+    ctx.restore();
+    texture.needsUpdate = true;
+  };
+  img.onerror = ()=>{ texture.needsUpdate = true; };
+  img.src = "../logo.webp";
+  return texture;
+}
+
 function makePlanetTexture(kind = "moon"){
   const canvas = document.createElement("canvas");
   canvas.width = 2048;
@@ -67,10 +114,10 @@ function makePlanetTexture(kind = "moon"){
   return texture;
 }
 
-function addPanel(root, title, subtitle, x, y, z, color, width = 3.1, height = 1.55){
+function addPanel(root, title, subtitle, x, y, z, color, width = 3.1, height = 1.55, texture = null){
   const panel = new THREE.Mesh(
     new THREE.PlaneGeometry(width, height),
-    new THREE.MeshBasicMaterial({ map: makeTexture(title, subtitle, color), transparent: true, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ map: texture || makeTexture(title, subtitle, color), transparent: true, side: THREE.DoubleSide })
   );
   panel.position.set(x, y, z);
   panel.lookAt(0, y, 0);
@@ -78,10 +125,11 @@ function addPanel(root, title, subtitle, x, y, z, color, width = 3.1, height = 1
   return panel;
 }
 
-function addStorefront(root, title, subtitle, x, z, color){
+function addStorefront(root, title, subtitle, x, z, color, portalKey){
   const group = new THREE.Group();
   group.position.set(x, 0, z);
   group.rotation.y = Math.atan2(-x, -z);
+  group.userData.portalKey = portalKey;
   root.add(group);
   const body = new THREE.Mesh(
     new THREE.BoxGeometry(2.25, 2.15, 0.20),
@@ -95,6 +143,13 @@ function addStorefront(root, title, subtitle, x, z, color){
   );
   sign.position.set(0, 2.55, 0.13);
   group.add(sign);
+  const marker = new THREE.Mesh(
+    new THREE.RingGeometry(0.55, 0.78, 48),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color(color).getHex(), transparent: true, opacity: 0.42, side: THREE.DoubleSide, depthWrite: false })
+  );
+  marker.rotation.x = -Math.PI * 0.5;
+  marker.position.set(0, 0.035, 0.72);
+  group.add(marker);
   return group;
 }
 
@@ -155,25 +210,34 @@ function addReikiVideoPanel(root){
 
 export function installLobbyVisibilityLock({ scene }){
   const root = new THREE.Group();
-  root.name = "SVR_Phase96B_PlanetScale_Lock";
+  root.name = "SVR_Phase96C_Portal_Logo_Lock";
   scene.add(root);
 
-  addStorefront(root, "Reiki", "Private Room", -5.6, -5.8, "#7fffd4");
-  addStorefront(root, "PGA", "Golf Training", 0, -6.8, "#69e8ff");
-  addStorefront(root, "Smoker", "Lounge", 5.6, -5.8, "#ff8bd7");
-  addStorefront(root, "SVR Store", "Portal", -6.8, 1.4, "#ffd36b");
-  addStorefront(root, "Scorpion", "Poker Room", 6.8, 1.4, "#b48cff");
+  const portals = [
+    { key: "reiki", label: "Reiki", target: "reiki", position: new THREE.Vector3(-5.6, 0, -5.8) },
+    { key: "pga", label: "PGA", target: "pga", position: new THREE.Vector3(0, 0, -6.8) },
+    { key: "smoker", label: "Smoker Lounge", target: "sponsor", position: new THREE.Vector3(5.6, 0, -5.8) },
+    { key: "store", label: "SVR Store", route: "../site/store.html", position: new THREE.Vector3(-6.8, 0, 1.4) },
+    { key: "scorpion", label: "Scorpion Room", target: "scorpion", position: new THREE.Vector3(6.8, 0, 1.4) }
+  ];
+
+  addStorefront(root, "Reiki", "Private Room", -5.6, -5.8, "#7fffd4", "reiki");
+  addStorefront(root, "PGA", "Golf Training", 0, -6.8, "#69e8ff", "pga");
+  addStorefront(root, "Smoker", "Lounge", 5.6, -5.8, "#ff8bd7", "smoker");
+  addStorefront(root, "SVR Store", "Portal", -6.8, 1.4, "#ffd36b", "store");
+  addStorefront(root, "Scorpion", "Poker Room", 6.8, 1.4, "#b48cff", "scorpion");
   addReikiVideoPanel(root);
 
   addPanel(root, "Sponsor Board", "Future partner surface", 0, 5.8, -10.4, "#a7ff80", 5.2, 1.7);
   addPanel(root, "Espresso With Cream", "Tier 1 sponsor", 9.8, 5.4, -2.6, "#ffb477", 4.1, 1.55);
-  addPanel(root, "SVR Store", "Gear and avatar items", -9.8, 5.4, -2.6, "#ffd36b", 4.1, 1.55);
+  addPanel(root, "SVR Store", "Official brand", -9.8, 5.4, -2.6, "#ffd36b", 4.1, 1.55, makeSvrLogoAdTexture());
   addPanel(root, "Play With Purpose", "Community impact", 0, 5.8, 10.4, "#69e8ff", 5.2, 1.7);
 
   const moon = addOrb(root, 0xeaf2ff, -2.0, 23.5, -33.0, 3.45, "moon");
   const mars = addOrb(root, 0xff7f4f, 14.0, 21.4, -39.0, 2.10, "mars");
 
   return {
+    portals,
     update(t = 0, dt = 0.016){
       moon.group.position.x = -2.0 + Math.sin(t * 0.036) * 4.8;
       moon.group.position.y = 23.5 + Math.sin(t * 0.021) * 0.8;
