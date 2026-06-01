@@ -189,10 +189,10 @@ function gotoScene(key){
 
 function openReikiVideoPortal(){
   if (!isInReikiArea()){
-    setStatus("Reiki hologram audio unlocks at the Reiki storefront. Jump to Reiki first.", { force: true });
+    setStatus("Reiki hologram stays paused and only activates from the Reiki storefront. Jump to Reiki first.", { force: true });
     return false;
   }
-  window.location.href = "./reiki-video-portal.html?v=phase86-reiki-audio-zone";
+  window.location.href = "./reiki-video-portal.html?v=phase87-reiki-hologram-pause-lock&zone=reiki";
   return true;
 }
 
@@ -205,7 +205,7 @@ function createInactiveReikiPortal(){
   const mat = new THREE.MeshBasicMaterial({ color: 0x34fff4, transparent: true, opacity: 0.22, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
   const frameMat = new THREE.MeshBasicMaterial({ color: 0xb46cff, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
   const pane = new THREE.Mesh(new THREE.PlaneGeometry(1.85, 1.05), mat);
-  pane.userData.href = "./reiki-video-portal.html?v=phase86-reiki-audio-zone";
+  pane.userData.href = "./reiki-video-portal.html?v=phase87-reiki-hologram-pause-lock&zone=reiki";
   group.add(pane);
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.67, 0.018, 12, 96), frameMat);
   ring.position.z = 0.02;
@@ -220,8 +220,8 @@ function createInactiveReikiPortal(){
   ctx.fillStyle = "#eaffff"; ctx.font = "bold 58px system-ui, Arial"; ctx.textAlign = "center";
   ctx.fillText("REIKI VIDEO PORTAL", 512, 150);
   ctx.fillStyle = "#ffdddd"; ctx.font = "bold 42px system-ui, Arial"; ctx.fillText("AWAITING APPROVAL", 512, 232);
-  ctx.fillStyle = "#bffcff"; ctx.font = "30px system-ui, Arial"; ctx.fillText("Hologram sound unlocks here", 512, 308);
-  ctx.fillText("Click/tap from Reiki area", 512, 360);
+  ctx.fillStyle = "#bffcff"; ctx.font = "30px system-ui, Arial"; ctx.fillText("Paused hologram portal", 512, 308);
+  ctx.fillText("Play only inside Reiki area", 512, 360);
   const tex = new THREE.CanvasTexture(canvas); tex.colorSpace = THREE.SRGBColorSpace;
   const text = new THREE.Mesh(new THREE.PlaneGeometry(1.75, .88), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide }));
   text.position.z = 0.03; group.add(text);
@@ -308,7 +308,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. M / watch MUSIC toggles lobby music. Reiki hologram sound unlocks only at Reiki storefront.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. M / watch MUSIC toggles lobby music. Reiki hologram stays paused and only plays from the Reiki area.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
