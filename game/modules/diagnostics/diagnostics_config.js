@@ -1,0 +1,20 @@
+export const diagnosticPanelConfig = {
+  enabled: false,
+  productionVisible: false,
+  flag: 'SHOW_DIAGNOSTICS',
+  panels: {
+    playerSession: true,
+    pokerState: true,
+    network: true,
+    webSocket: true,
+    seatState: true,
+    walletTest: true,
+    sceneObjectCount: true,
+    vrInput: true,
+    teleport: true,
+    portals: true,
+    sponsors: true,
+    riki: true,
+    charity: true,
+  },
+};

@@ -1,14 +1,6 @@
 ﻿{
-    "build":  "PHASE-90-LOCOMOTION-REIKI-STOREFRONT-LOBBY-READY-LOCK",
-    "siteTouched":  false,
-    "notes":  [
-                  "Floor/rig-yaw anchored controller locomotion",
-                  "Right-stick snap turn sets new forward direction",
-                  "Reiki wall hologram staged behind/near plants and paused until Reiki route",
-                  "Freestanding SVR Store and Smoker Lounge storefronts",
-                  "Skyline billboards plus raised Moon and Mars"
-              ],
-    "name":  "Locomotion Reiki Storefront Lobby Ready Lock",
-    "phase":  90,
-    "updatedAt":  "2026-06-01T05:36:46Z"
+  "build": "RIKI-UPDATE-PHASE-92-MODULE-PREP",
+  "milestone": "Riki Update Phase 92",
+  "gameZip": "update/game.zip",
+  "siteTouched": false
 }
