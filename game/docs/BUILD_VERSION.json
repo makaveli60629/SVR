@@ -1,18 +1,19 @@
 {
-  "build": "PHASE-98-BOOT-SAFE-WORLD-FALLBACK",
-  "phase": 98,
-  "name": "Boot Safe World Fallback",
+  "build": "PHASE-99-HARD-BOOT-ESCAPE-STORE-HUBS",
+  "phase": 99,
+  "name": "Hard Boot Escape and Store Hubs",
   "date": "2026-06-01",
-  "siteTouched": false,
-  "scope": "game-side only: audit stuck boot path and prevent world/module asset stalls from trapping the game on the boot overlay",
+  "siteTouched": true,
+  "scope": "combined game boot escape plus website store navigation/population for SVR, Reiki approval-safe, PGA, Scorpion, Lounge, VR gear, and sponsor lanes",
   "notes": [
-    "Audited active boot path: game/index.html is now native-module clean and imports game/main.js with a cache-busted native dynamic import.",
-    "Found active risk in game/main.js: boot waited for buildSkylineRoom() before creating hands, teleport, watch, and before calling window.svrBootReady().",
-    "Added an 8.5 second timeout around buildSkylineRoom() and a procedural boot-safe fallback lobby so the game opens even when heavy room assets or world construction stalls.",
-    "Added a timeout around logo texture loading so missing logo assets cannot block boot completion.",
-    "Wrapped watch creation and animation loop with safety guards so failures do not trap the user at Booting.",
-    "Fallback lobby preserves table, floor, walls, Moon, Mars, portal labels, seat markers, teleport room clamp, scene targets, and controller/hand boot flow.",
-    "No Unity, no Azure, no site public Matrix launch page edits. This is WebXR/WebEx game-side only."
+    "Added an HTML-level emergency boot-safe lobby to game/index.html so the page escapes the Booting overlay even if main.js, Three.js, or a heavy module never resolves.",
+    "Emergency lobby includes direct links to full game reload, Reiki Store, PGA Store, SVR Store, Scorpion Room, and PGA Range.",
+    "Kept full WebXR/WebEx module loading active while adding a 6.2 second hard timeout escape above the JavaScript module chain.",
+    "Updated site/store.html with quick navigation buttons above SVR Store: SVR Store, Reiki Store, PGA Store, Scorpion, Lounge, VR Gear, and Sponsors.",
+    "Populated Reiki Store with approval-safe placeholders only: no unapproved founder names, photos, outside domains, logos, or third-party Reiki business branding.",
+    "Populated PGA Store, Scorpion Store, Lounge Store, VR Store, Sponsor Store, and SVR Store lanes with sandbox-only products and no live checkout.",
+    "Updated Android/Quest browser CSS for the store quick nav and mobile touch layout.",
+    "No Unity and no Azure. This remains WebXR/WebEx plus static website/store work."
   ],
   "updatedAt": "2026-06-01T00:00:00-05:00"
 }
