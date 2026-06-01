@@ -9,6 +9,7 @@ import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { installSvrEventBus } from "./modules/svr_event_bus.js";
 
+window.svrBootStage?.("Installing SVR event bus…");
 installSvrEventBus();
 
 const params = new URLSearchParams(location.search);
@@ -28,6 +29,7 @@ const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn
 let lastStatusText = "";
 let lastStatusAt = 0;
 function setStatus(text, { force = false, minGap = 180 } = {}){
+  window.svrBootStage?.(text);
   if (!$status) return;
   const now = performance.now();
   if (!force && text === lastStatusText) return;
@@ -56,11 +58,11 @@ $toggleLog.addEventListener("click", ()=>{
 
 if (AUTOCAM) document.body.classList.add("preview-mode");
 
+setStatus("Creating renderer…", { force: true });
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
-
 
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
@@ -76,9 +78,11 @@ setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
+setStatus("Loading hands and teleport…", { force: true });
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
+setStatus("Loading audio…", { force: true });
 const audio = createAudioPlaylist({
   tracks: [
     { title: "Lobby 07", url: "./assets/audio/07.mp3" },
@@ -213,6 +217,7 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Equal") gotoScene("loungeRoom");
 });
 
+setStatus("Loading watch…", { force: true });
 const watch = createWristWatch({
   scene,
   camera,
@@ -257,9 +262,9 @@ $toggleJoints.addEventListener("click", ()=>{
 setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-
 setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Hold pinch/fist/A/grip/trigger to aim; release to teleport. All lobby/private portal routes enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+window.svrBootReady?.();
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
