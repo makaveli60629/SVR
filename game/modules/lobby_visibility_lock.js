@@ -135,7 +135,7 @@ function addPanel(root, title, subtitle, x, y, z, color, width = 3.1, height = 1
 function addStorefront(root, title, subtitle, x, z, color, portalKey, options = {}){
   const group = new THREE.Group();
   group.position.set(x, 0, z);
-  group.rotation.y = Math.atan2(-x, -z);
+  group.rotation.y = options.rotationY ?? Math.atan2(-x, -z);
   group.userData.portalKey = portalKey;
   root.add(group);
   const colorObj = new THREE.Color(color);
@@ -188,6 +188,21 @@ function addStorefront(root, title, subtitle, x, z, color, portalKey, options = 
   return group;
 }
 
+function addConnectorLine(root, from, to, color = 0x7fffd4){
+  const start = new THREE.Vector3(from.x, 0.045, from.z);
+  const end = new THREE.Vector3(to.x, 0.045, to.z);
+  const mid = start.clone().add(end).multiplyScalar(0.5);
+  const len = start.distanceTo(end);
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(0.10, 0.035, len),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.38, depthWrite: false })
+  );
+  mesh.position.copy(mid);
+  mesh.rotation.y = Math.atan2(to.x - from.x, to.z - from.z);
+  root.add(mesh);
+  return mesh;
+}
+
 function addOrb(root, color, x, y, z, scale, kind = "moon"){
   const group = new THREE.Group();
   group.position.set(x, y, z);
@@ -209,13 +224,13 @@ function addOrb(root, color, x, y, z, scale, kind = "moon"){
 
 function addReikiVideoPanel(root){
   const group = new THREE.Group();
-  const center = new THREE.Vector3(-5.6, 1.64, -8.98);
+  const center = new THREE.Vector3(14.31, 1.64, -3.80);
   group.position.copy(center);
-  group.rotation.y = Math.atan2(5.6, 9.15);
+  group.rotation.y = Math.atan2(-14.31, 3.80);
   root.add(group);
   const frame = new THREE.Mesh(
-    new THREE.BoxGeometry(2.22, 1.46, 0.08),
-    new THREE.MeshStandardMaterial({ color: 0x120818, roughness: 0.45, metalness: 0.1, emissive: 0x30104a, emissiveIntensity: 0.38 })
+    new THREE.BoxGeometry(2.72, 1.74, 0.08),
+    new THREE.MeshStandardMaterial({ color: 0x120818, roughness: 0.45, metalness: 0.1, emissive: 0x30104a, emissiveIntensity: 0.42 })
   );
   group.add(frame);
   const video = document.createElement("video");
@@ -230,7 +245,7 @@ function addReikiVideoPanel(root){
   let primed = false;
   let currentVolume = 0;
   const maxVolume = 0.055;
-  const zoneCenter = new THREE.Vector3(-5.6, 1.6, -9.15);
+  const zoneCenter = new THREE.Vector3(14.31, 1.6, -3.80);
   const primeAudio = ()=>{
     primed = true;
     video.muted = false;
@@ -241,23 +256,23 @@ function addReikiVideoPanel(root){
   const texture = new THREE.VideoTexture(video);
   texture.colorSpace = THREE.SRGBColorSpace;
   const screen = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.00, 1.14),
+    new THREE.PlaneGeometry(2.46, 1.38),
     new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, toneMapped: false })
   );
   screen.position.z = 0.055;
   group.add(screen);
   const label = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.14, 0.30),
-    new THREE.MeshBasicMaterial({ map: makeTexture("Reiki Hologram", "Low audio portal", "#7fffd4"), transparent: true, side: THREE.DoubleSide })
+    new THREE.PlaneGeometry(2.62, 0.34),
+    new THREE.MeshBasicMaterial({ map: makeTexture("Reiki Hologram", "Expanded hub audio zone", "#7fffd4"), transparent: true, side: THREE.DoubleSide })
   );
-  label.position.set(0, 0.90, 0.06);
+  label.position.set(0, 1.07, 0.06);
   group.add(label);
   const glow = new THREE.Mesh(
-    new THREE.RingGeometry(0.92, 1.26, 64),
-    new THREE.MeshBasicMaterial({ color: 0x7fffd4, transparent: true, opacity: 0.30, side: THREE.DoubleSide, depthWrite: false })
+    new THREE.RingGeometry(1.18, 1.62, 64),
+    new THREE.MeshBasicMaterial({ color: 0x7fffd4, transparent: true, opacity: 0.32, side: THREE.DoubleSide, depthWrite: false })
   );
   glow.rotation.x = -Math.PI * 0.5;
-  glow.position.set(0, -1.60, 0.76);
+  glow.position.set(0, -1.64, 0.84);
   group.add(glow);
   return {
     group,
@@ -289,18 +304,24 @@ function addReikiVideoPanel(root){
 
 export function installLobbyVisibilityLock({ scene }){
   const root = new THREE.Group();
-  root.name = "SVR_Phase98D_HighSky_ReikiAligned";
+  root.name = "SVR_Phase98F_Reiki_Hub_Expanded_To_Walked_Position";
   scene.add(root);
 
+  const reikiMain = new THREE.Vector3(-5.6, 0, -9.15);
+  const reikiExpanded = new THREE.Vector3(14.31, 0, -3.80);
+
   const portals = [
-    { key: "reiki", label: "Reiki", target: "reiki", position: new THREE.Vector3(-5.6, 0, -9.15) },
+    { key: "reiki", label: "Reiki Main", target: "reiki", position: reikiMain.clone() },
+    { key: "reikiExpanded", label: "Reiki Hologram Hub", target: "reiki", position: reikiExpanded.clone() },
     { key: "pga", label: "PGA", target: "pga", position: new THREE.Vector3(0, 0, -9.25) },
     { key: "smoker", label: "Smoker Lounge", target: "sponsor", position: new THREE.Vector3(5.6, 0, -9.15) },
     { key: "store", label: "SVR Store", route: "../site/store.html", position: new THREE.Vector3(-9.25, 0, 0.8) },
     { key: "scorpion", label: "Scorpion Room", route: "./scorpion.html?v=phase98-playable", position: new THREE.Vector3(9.25, 0, 0.8) }
   ];
 
-  addStorefront(root, "Reiki", "Hologram Portal", -5.6, -9.15, "#7fffd4", "reiki", { width: 3.35 });
+  addStorefront(root, "Reiki", "Main Portal", -5.6, -9.15, "#7fffd4", "reiki", { width: 3.35 });
+  addStorefront(root, "Reiki", "Expanded Hologram Hub", 14.31, -3.80, "#7fffd4", "reikiExpanded", { width: 4.15 });
+  addConnectorLine(root, reikiMain, reikiExpanded, 0x7fffd4);
   addStorefront(root, "PGA", "Golf Training", 0, -9.25, "#69e8ff", "pga", { width: 3.35 });
   addStorefront(root, "Smoker", "Lounge", 5.6, -9.15, "#ff8bd7", "smoker", { width: 3.35 });
   addStorefront(root, "SVR Store", "Web Portal", -9.25, 0.8, "#ffd36b", "store", { width: 3.55 });
@@ -308,6 +329,7 @@ export function installLobbyVisibilityLock({ scene }){
   addStorefront(root, "Sponsor", "Ad Wall", 0, 9.25, "#a7ff80", "sponsor", { width: 3.55 });
   const reikiVideo = addReikiVideoPanel(root);
 
+  addPanel(root, "Reiki Expansion", "Hologram hub now placed here", 14.31, 4.10, -3.80, "#7fffd4", 4.8, 1.35);
   addPanel(root, "Sponsor Board", "Future partner surface", 0, 6.45, -11.35, "#a7ff80", 6.5, 1.9);
   addPanel(root, "Espresso With Cream", "Tier 1 sponsor", 8.9, 6.20, -5.35, "#ffb477", 4.6, 1.55);
   addPanel(root, "SVR Store", "Official brand", -8.9, 6.20, -5.35, "#ffd36b", 4.6, 1.55, makeSvrLogoAdTexture());
