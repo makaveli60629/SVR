@@ -21,9 +21,13 @@ const $err = document.getElementById("err");
 const $toggleLog = document.getElementById("toggleLog");
 const $toggleJoints = document.getElementById("toggleJoints");
 const $togglePosition = document.getElementById("togglePosition");
+const $copyPosition = document.getElementById("copyPosition");
 const $positionPanel = document.getElementById("positionPanel");
+const $positionToast = document.getElementById("positionToast");
 const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn"));
-let positionPanelVisible = params.has("pos") || params.has("debug");
+let positionPanelVisible = params.has("pos") || params.has("debug") || params.has("place");
+let lastPlacementLine = "";
+let lastPositionSample = null;
 
 let lastStatusText = "";
 let lastStatusAt = 0;
@@ -51,6 +55,24 @@ function log(...args){
   $log.scrollTop = $log.scrollHeight;
 }
 
+function showToast(text = "Position copied"){
+  if (!$positionToast) return;
+  $positionToast.textContent = text;
+  $positionToast.style.display = "block";
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>{ $positionToast.style.display = "none"; }, 1350);
+}
+
+async function copyCurrentPosition(){
+  if (!lastPlacementLine) return;
+  try {
+    await navigator.clipboard.writeText(lastPlacementLine);
+    showToast("Position copied");
+  } catch {
+    showToast("Read position line to me");
+  }
+}
+
 $toggleLog?.addEventListener("click", ()=>{
   $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
 });
@@ -58,6 +80,7 @@ $togglePosition?.addEventListener("click", ()=>{
   positionPanelVisible = !positionPanelVisible;
   if ($positionPanel) $positionPanel.style.display = positionPanelVisible ? "block" : "none";
 });
+$copyPosition?.addEventListener("click", copyCurrentPosition);
 
 if (AUTOCAM) document.body.classList.add("preview-mode");
 if ($positionPanel) $positionPanel.style.display = (positionPanelVisible && !AUTOCAM) ? "block" : "none";
@@ -102,6 +125,12 @@ function currentHeadXZ(){
     return p;
   }
   return camera.position.clone();
+}
+function cameraYawDeg(){
+  const dir = new THREE.Vector3();
+  const cam = renderer.xr.isPresenting ? renderer.xr.getCamera(camera) : camera;
+  cam.getWorldDirection(dir);
+  return THREE.MathUtils.radToDeg(Math.atan2(dir.x, dir.z));
 }
 function inTableZone(){
   const p = currentHeadXZ();
@@ -197,6 +226,7 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "KeyM") setStatus("Audio disabled globally; Reiki has low proximity audio.", { force: true });
   if (e.code === "KeyN") setStatus("Audio disabled globally; Reiki has low proximity audio.", { force: true });
   if (e.code === "KeyP") { positionPanelVisible = !positionPanelVisible; if ($positionPanel) $positionPanel.style.display = positionPanelVisible ? "block" : "none"; }
+  if (e.code === "KeyC") copyCurrentPosition();
   if (e.code === "KeyE") activatePortal();
   if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
@@ -250,7 +280,7 @@ $toggleJoints?.addEventListener("click", ()=>{
 setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Reiki audio zone status added. Press E near storefront. Press P for panel.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Walking position panel active. Press P / C. Press E near storefront.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
 
 function setHudVisible(visible){
@@ -278,24 +308,35 @@ const fmt = (n)=>Number(n || 0).toFixed(2);
 function updatePositionPanel(now){
   if (!$positionPanel || !positionPanelVisible || AUTOCAM) return;
   const p = currentHeadXZ();
+  const yaw = cameraYawDeg();
   const portalNames = portalTargets.map(p=>p.label).join(", ") || "none";
   const reikiState = lobbyVisibilityLock?.getReikiAudioState?.() || null;
-  $positionPanel.innerHTML = `<strong>SVR POSITION PANEL</strong>\n` +
-    `Build: Phase 96E\n` +
+  const nearestPortal = activePortal || findActivePortal();
+  const speed = lastPositionSample ? Math.hypot(p.x - lastPositionSample.x, p.z - lastPositionSample.z) / Math.max(0.001, (now - lastPositionSample.t) / 1000) : 0;
+  lastPositionSample = { x: p.x, z: p.z, t: now };
+  lastPlacementLine = `PLACE HERE: x ${fmt(p.x)} / y ${fmt(p.y)} / z ${fmt(p.z)} / yaw ${fmt(yaw)} / scene ${currentSceneKey}`;
+  $positionPanel.innerHTML = `<strong>SVR WALKING DIAGNOSTIC PANEL</strong>\n` +
+    `<span class="placementLine">${lastPlacementLine}</span>\n` +
+    `Build: Phase 98E\n` +
     `Scene: ${currentSceneKey}\n` +
-    `Camera: x ${fmt(p.x)} / y ${fmt(p.y)} / z ${fmt(p.z)}\n` +
-    `Table: x ${fmt(tableCenter.x)} / z ${fmt(tableCenter.z)}\n` +
+    `<span class="diagLine">Camera/player: x ${fmt(p.x)} / y ${fmt(p.y)} / z ${fmt(p.z)}</span>\n` +
+    `Facing yaw: ${fmt(yaw)} deg\n` +
+    `Move speed: ${fmt(speed)} units/sec\n` +
+    `Table center: x ${fmt(tableCenter.x)} / z ${fmt(tableCenter.z)}\n` +
     `Seat: ${seatLabel()}\n` +
     `Table zone: ${inTableZone() ? "YES" : "NO"}\n` +
-    `Active portal: ${activePortal ? `${activePortal.label} (${fmt(activePortal.distance)}m)` : "none"}\n` +
+    `Nearest/active portal: ${nearestPortal ? `${nearestPortal.label} (${fmt(nearestPortal.distance || 0)}m)` : "none"}\n` +
     `Portal targets: ${portalNames}\n` +
     `Reiki video: ${reikiState?.videoOn ? "ON" : "WAIT"}\n` +
     `Reiki audio: ${reikiState ? (reikiState.near ? "NEAR" : "FAR") : "OFF"}\n` +
     `Reiki primed: ${reikiState?.primed ? "YES" : "NO"}\n` +
     `Reiki volume: ${fmt(reikiState?.volume || 0)} / ${fmt(reikiState?.maxVolume || 0)}\n` +
     `Teleport: ${tp.isEnabled ? (tp.isEnabled() ? "ON" : "OFF") : "READY"}\n` +
-    `Audio: GLOBAL OFF / REIKI LOW ZONE\n` +
-    `Tip: press E near storefront / P panel`;
+    `Audio: GLOBAL OFF / REIKI LOW ZONE\n\n` +
+    `<button id="panelCopyBtn" type="button">Copy PLACE HERE line</button>\n` +
+    `<span class="smallTip">Press P to show/hide • Press C to copy • Stand where you want an object, then send me the PLACE HERE line.</span>`;
+  const btn = document.getElementById("panelCopyBtn");
+  if (btn) btn.onclick = copyCurrentPosition;
 }
 
 let tPrev = performance.now();
