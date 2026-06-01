@@ -174,14 +174,17 @@ function addOrb(root, color, x, y, z, scale, kind = "moon"){
 
 function addReikiVideoPanel(root){
   const group = new THREE.Group();
-  group.position.set(-5.6, 1.7, -5.45);
-  group.rotation.y = Math.atan2(5.6, 5.45);
+  const center = new THREE.Vector3(-5.6, 1.55, -5.58);
+  group.position.copy(center);
+  group.rotation.y = Math.atan2(5.6, 5.8);
   root.add(group);
+
   const frame = new THREE.Mesh(
-    new THREE.BoxGeometry(2.55, 1.62, 0.08),
-    new THREE.MeshStandardMaterial({ color: 0x120818, roughness: 0.45, metalness: 0.1, emissive: 0x30104a, emissiveIntensity: 0.28 })
+    new THREE.BoxGeometry(2.06, 1.34, 0.08),
+    new THREE.MeshStandardMaterial({ color: 0x120818, roughness: 0.45, metalness: 0.1, emissive: 0x30104a, emissiveIntensity: 0.34 })
   );
   group.add(frame);
+
   const video = document.createElement("video");
   video.src = "../site/assets/video/reiki_hologram.mp4";
   video.muted = true;
@@ -189,28 +192,84 @@ function addReikiVideoPanel(root){
   video.playsInline = true;
   video.autoplay = true;
   video.preload = "metadata";
-  video.volume = 0.02;
+  video.volume = 0.0;
   video.play().catch(()=>{});
+
+  let primed = false;
+  let currentVolume = 0;
+  const maxVolume = 0.055;
+  const zoneCenter = new THREE.Vector3(-5.6, 1.6, -5.8);
+  const primeAudio = ()=>{
+    primed = true;
+    video.muted = false;
+    video.play().catch(()=>{});
+  };
+  window.addEventListener("pointerdown", primeAudio, { once: true, passive: true });
+  window.addEventListener("keydown", primeAudio, { once: true });
+
   const texture = new THREE.VideoTexture(video);
   texture.colorSpace = THREE.SRGBColorSpace;
   const screen = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.32, 1.32),
+    new THREE.PlaneGeometry(1.86, 1.05),
     new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, toneMapped: false })
   );
   screen.position.z = 0.055;
   group.add(screen);
+
   const label = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.4, 0.34),
-    new THREE.MeshBasicMaterial({ map: makeTexture("Reiki Video", "Muted lobby preview", "#7fffd4"), transparent: true, side: THREE.DoubleSide })
+    new THREE.PlaneGeometry(2.0, 0.30),
+    new THREE.MeshBasicMaterial({ map: makeTexture("Reiki Hologram", "Portal audio zone", "#7fffd4"), transparent: true, side: THREE.DoubleSide })
   );
-  label.position.set(0, 0.98, 0.06);
+  label.position.set(0, 0.84, 0.06);
   group.add(label);
-  return { group, video };
+
+  const glow = new THREE.Mesh(
+    new THREE.RingGeometry(0.80, 1.12, 64),
+    new THREE.MeshBasicMaterial({ color: 0x7fffd4, transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false })
+  );
+  glow.rotation.x = -Math.PI * 0.5;
+  glow.position.set(0, -1.50, 0.62);
+  group.add(glow);
+
+  return {
+    group,
+    video,
+    zoneCenter,
+    getState(){
+      return {
+        videoOn: !video.paused,
+        primed,
+        near: currentVolume > 0.004,
+        volume: currentVolume,
+        maxVolume
+      };
+    },
+    primeAudio,
+    updateAudio(camera, dt = 0.016){
+      if (!camera) return;
+      const camPos = new THREE.Vector3();
+      camera.getWorldPosition(camPos);
+      const dx = camPos.x - zoneCenter.x;
+      const dz = camPos.z - zoneCenter.z;
+      const dist = Math.hypot(dx, dz);
+      const nearRadius = 3.25;
+      const fadeRadius = 5.25;
+      let target = 0;
+      if (dist < fadeRadius){
+        const k = THREE.MathUtils.clamp((fadeRadius - dist) / (fadeRadius - nearRadius), 0, 1);
+        target = maxVolume * k;
+      }
+      currentVolume = THREE.MathUtils.lerp(currentVolume, target, Math.min(1, dt * 2.8));
+      video.volume = primed ? currentVolume : 0;
+      video.muted = !primed || currentVolume < 0.002;
+      if (video.paused) video.play().catch(()=>{});
+    }
+  };
 }
 
 export function installLobbyVisibilityLock({ scene }){
   const root = new THREE.Group();
-  root.name = "SVR_Phase96C_Portal_Logo_Lock";
+  root.name = "SVR_Phase96D_Reiki_Hologram_AudioZone";
   scene.add(root);
 
   const portals = [
@@ -221,12 +280,12 @@ export function installLobbyVisibilityLock({ scene }){
     { key: "scorpion", label: "Scorpion Room", target: "scorpion", position: new THREE.Vector3(6.8, 0, 1.4) }
   ];
 
-  addStorefront(root, "Reiki", "Private Room", -5.6, -5.8, "#7fffd4", "reiki");
+  addStorefront(root, "Reiki", "Hologram Portal", -5.6, -5.8, "#7fffd4", "reiki");
   addStorefront(root, "PGA", "Golf Training", 0, -6.8, "#69e8ff", "pga");
   addStorefront(root, "Smoker", "Lounge", 5.6, -5.8, "#ff8bd7", "smoker");
   addStorefront(root, "SVR Store", "Portal", -6.8, 1.4, "#ffd36b", "store");
   addStorefront(root, "Scorpion", "Poker Room", 6.8, 1.4, "#b48cff", "scorpion");
-  addReikiVideoPanel(root);
+  const reikiVideo = addReikiVideoPanel(root);
 
   addPanel(root, "Sponsor Board", "Future partner surface", 0, 5.8, -10.4, "#a7ff80", 5.2, 1.7);
   addPanel(root, "Espresso With Cream", "Tier 1 sponsor", 9.8, 5.4, -2.6, "#ffb477", 4.1, 1.55);
@@ -238,7 +297,12 @@ export function installLobbyVisibilityLock({ scene }){
 
   return {
     portals,
+    reikiVideo,
+    primeReikiAudio: reikiVideo.primeAudio,
+    getReikiAudioState: reikiVideo.getState,
     update(t = 0, dt = 0.016){
+      const cam = scene.userData?._camera;
+      reikiVideo.updateAudio(cam, dt);
       moon.group.position.x = -2.0 + Math.sin(t * 0.036) * 4.8;
       moon.group.position.y = 23.5 + Math.sin(t * 0.021) * 0.8;
       moon.group.position.z = -33.0 + Math.cos(t * 0.036) * 3.2;
