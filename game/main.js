@@ -5,7 +5,6 @@ import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
 import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
-import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 
 const params = new URLSearchParams(location.search);
@@ -13,6 +12,7 @@ const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
+const AUDIO_DISABLED = true;
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -58,7 +58,6 @@ scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
 
-
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
@@ -69,30 +68,22 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading world…", { force: true });
+setStatus("Loading world...", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
-const audio = createAudioPlaylist({
-  tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" }
-  ],
-  onState: (state)=>{
-    if (!$status || renderer.xr.isPresenting) return;
-    if (state.error){
-      setStatus(`Audio: ${state.error}`);
-      return;
-    }
-    if (state.enabled){
-      setStatus(`Now Playing: ${state.trackTitle}`);
-      return;
-    }
-    setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
-  }
-});
+const audio = {
+  getState: ()=>({ enabled: false, primed: false, trackTitle: "Audio disabled", error: null }),
+  toggle: async ()=>false,
+  next: async ()=>false,
+  prime: async ()=>false,
+  start: async ()=>false,
+  stop: async ()=>false
+};
+window.SVR_AUDIO_DISABLED = true;
 
 let seated = false;
 let seatIndex = -1;
@@ -174,8 +165,15 @@ function gotoScene(key){
   return true;
 }
 
+function openRikiHologram(){
+  window.location.href = "./riki-hologram.html?zone=riki";
+  return true;
+}
+
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
+    const route = btn.dataset.route;
+    if (route){ window.location.href = route; return; }
     const key = btn.dataset.scene;
     if (key) gotoScene(key);
   });
@@ -183,15 +181,16 @@ $sceneButtons.forEach((btn)=>{
 
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
-  if (e.code === "KeyM") await audio.toggle();
-  if (e.code === "KeyN") await audio.next();
+  if (e.code === "KeyM") setStatus("Audio disabled for Phase 93", { force: true });
+  if (e.code === "KeyN") setStatus("Audio disabled for Phase 93", { force: true });
+  if (e.code === "KeyH") openRikiHologram();
   if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
   if (e.code === "Digit1") gotoScene("lobby");
-  if (e.code === "Digit2") gotoScene("table");
-  if (e.code === "Digit3") gotoScene("seat");
-  if (e.code === "Digit4") gotoScene("reiki");
+  if (e.code === "Digit2") gotoScene("seat");
+  if (e.code === "Digit3") gotoScene("reiki");
+  if (e.code === "Digit4") openRikiHologram();
   if (e.code === "Digit5") gotoScene("pga");
   if (e.code === "Digit6") gotoScene("legends");
   if (e.code === "Digit7") gotoScene("sponsor");
@@ -204,8 +203,9 @@ const watch = createWristWatch({
   camera,
   renderer,
   getState: ()=>({
-    audioEnabled: audio.getState().enabled,
-    trackTitle: audio.getState().trackTitle || "Lobby 07",
+    audioEnabled: false,
+    trackTitle: "Audio off",
+    audioDisabled: AUDIO_DISABLED,
     cash,
     seated,
     inTableZone: inTableZone(),
@@ -213,8 +213,9 @@ const watch = createWristWatch({
     teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
   }),
   actions: {
-    toggleAudio: ()=>audio.toggle(),
-    nextTrack: ()=>audio.next(),
+    toggleAudio: ()=>setStatus("Audio disabled for Phase 93", { force: true }),
+    nextTrack: openRikiHologram,
+    openRikiHologram,
     joinTable,
     leaveTable,
     toggleTeleport: ()=>tp.toggleMode(),
@@ -235,12 +236,12 @@ $toggleJoints.addEventListener("click", ()=>{
   $toggleJoints.textContent = on ? "Joints On" : "Joints";
 });
 
-setStatus("Loading logo…", { force: true });
+setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 92 module prep active. Enter VR. Hold/aim/release teleport only. Riki/Reiki and sponsor placeholders are awaiting approval.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Audio is off. Riki hologram route added. Hold/aim/release teleport only.", { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -255,8 +256,6 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
-  await audio.prime();
-  await audio.start();
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
@@ -278,18 +277,13 @@ renderer.setAnimationLoop(()=>{
   const now = performance.now();
   const dt = Math.min((now - tPrev) / 1000, 0.033);
   tPrev = now;
-
   if (!renderer.xr.isPresenting){
     if (!AUTOCAM) desktop.update(dt);
     else {
       const shotIndex = Math.floor(now / 9000) % previewShots.length;
       const shot = previewShots[shotIndex];
       const orbitT = now * 0.001 * shot.speed;
-      previewPos.set(
-        Math.cos(orbitT) * shot.r + shot.leadX * Math.sin(now * 0.00047),
-        shot.y + Math.sin(now * 0.0014 + shotIndex) * shot.sway,
-        Math.sin(orbitT) * shot.r + shot.leadZ * Math.cos(now * 0.00053)
-      );
+      previewPos.set(Math.cos(orbitT) * shot.r + shot.leadX * Math.sin(now * 0.00047), shot.y + Math.sin(now * 0.0014 + shotIndex) * shot.sway, Math.sin(orbitT) * shot.r + shot.leadZ * Math.cos(now * 0.00053));
       previewTarget.set(shot.targetX, shot.lookY, shot.targetZ);
       camera.position.lerp(previewPos, 0.06);
       camera.lookAt(previewTarget);
@@ -298,41 +292,28 @@ renderer.setAnimationLoop(()=>{
   } else {
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
-
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
-
   hands.update(dt);
   hands.updateDebug();
-
   const leftHand = hands.getLeftHand();
   const rightHand = hands.getRightHand();
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
   if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({
-      dt,
-      leftHand,
-      rightHand,
-      leftController,
-      rightController,
-      statusCb: (text)=>{ setStatus(text); },
-      modeCb: (text)=>{ setMode(text); }
-    });
+    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } });
   }
-
   if (watch) watch.update(dt, leftHand, rightHand);
-
   renderer.render(scene, camera);
 });
 
-const canvasEl = renderer.domElement;
-canvasEl.addEventListener("pointerdown", async ()=>{
-  const st = audio.getState();
-  if (!st.enabled) await audio.start();
-}, { passive: true });
-canvasEl.addEventListener("webglcontextlost", (e)=>{
-  e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading…");
-  setStatus("WebGL context lost (reloading…)", { force: true });
-  setTimeout(()=>location.reload(), 500);
-}, false);
+canvasElSetup();
+function canvasElSetup(){
+  const canvasEl = renderer.domElement;
+  canvasEl.addEventListener("pointerdown", async ()=>{ setStatus("Audio off. Use Riki Hologram button for presentation route.", { force: true }); }, { passive: true });
+  canvasEl.addEventListener("webglcontextlost", (e)=>{
+    e.preventDefault();
+    log("[ERR] WebGL context lost. Reloading...");
+    setStatus("WebGL context lost (reloading...)", { force: true });
+    setTimeout(()=>location.reload(), 500);
+  }, false);
+}
