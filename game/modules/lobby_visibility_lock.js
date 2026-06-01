@@ -51,15 +51,15 @@ function makePlanetTexture(kind = "moon"){
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.needsUpdate = true; return t;
 }
 
-function makeVolumeTexture(volume = .095, muted = false){
-  const c = document.createElement("canvas"); c.width = 1400; c.height = 720; const x = c.getContext("2d"); const pct = Math.round(volume * 1000);
+function makeVolumeTexture(volume = .30, muted = false){
+  const c = document.createElement("canvas"); c.width = 1400; c.height = 720; const x = c.getContext("2d"); const pct = Math.round(volume * 100);
   x.fillStyle = "rgba(0,0,0,.84)"; x.fillRect(0,0,c.width,c.height);
   const grad = x.createLinearGradient(0,0,c.width,c.height); grad.addColorStop(0,"rgba(127,255,212,.16)"); grad.addColorStop(1,"rgba(180,140,255,.10)"); x.fillStyle = grad; x.fillRect(0,0,c.width,c.height);
   x.strokeStyle = muted ? "#ff6b7f" : COLORS.reiki; x.lineWidth = 18; x.strokeRect(36,36,c.width-72,c.height-72);
   x.textAlign = "center"; x.textBaseline = "middle"; x.shadowColor = muted ? "#ff6b7f" : COLORS.reiki; x.shadowBlur = 26; x.fillStyle = "#fff"; x.font = "900 78px Arial"; x.fillText("REIKI HOLOGRAM VOLUME",700,122);
   x.shadowBlur = 8; x.fillStyle = muted ? "#ff6b7f" : COLORS.reiki; x.font = "900 64px Arial"; x.fillText(muted ? "MUTED" : `VOLUME ${pct}%`,700,232);
   x.fillStyle = "rgba(255,255,255,.14)"; x.fillRect(185,318,1030,70); x.strokeStyle = "rgba(255,255,255,.38)"; x.lineWidth = 4; x.strokeRect(185,318,1030,70);
-  x.fillStyle = muted ? "#ff6b7f" : COLORS.reiki; x.fillRect(185,318,Math.max(10,1030*Math.min(1,volume/.18)),70);
+  x.fillStyle = muted ? "#ff6b7f" : COLORS.reiki; x.fillRect(185,318,Math.max(10,1030*Math.min(1,volume/.50)),70);
   x.shadowBlur = 0; x.fillStyle = "#ffffff"; x.font = "900 40px Arial"; x.fillText("[  LOWER   ]       [  HIGHER   ]       U = MUTE",700,478);
   x.fillStyle = "#c9fff1"; x.font = "800 32px Arial"; x.fillText("Click once in the game to unlock sound",700,558); x.fillText("Walk into the Reiki glass hub to hear the hologram",700,610);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.needsUpdate = true; return t;
@@ -80,7 +80,7 @@ function addPortal(root,cfg){
 function addConnector(root,a,b){ const start=new THREE.Vector3(a.x,.04,a.z), end=new THREE.Vector3(b.x,.04,b.z), mid=start.clone().add(end).multiplyScalar(.5); const mesh=new THREE.Mesh(new THREE.BoxGeometry(.10,.035,start.distanceTo(end)), new THREE.MeshBasicMaterial({ color:0x7fffd4, transparent:true, opacity:.28, depthWrite:false })); mesh.position.copy(mid); mesh.rotation.y=Math.atan2(b.x-a.x,b.z-a.z); root.add(mesh); }
 
 function addGlassHubExpansion(root){
-  const group = new THREE.Group(); group.name = "SVR_Reiki_Expanded_Glass_Hub_Phase98N"; root.add(group);
+  const group = new THREE.Group(); group.name = "SVR_Reiki_Expanded_Glass_Hub_Phase98O"; root.add(group);
   const glassMat = new THREE.MeshBasicMaterial({ color:0x7fffd4, transparent:true, opacity:.14, side:THREE.DoubleSide, depthWrite:false });
   const edgeMat = new THREE.MeshBasicMaterial({ color:0x7fffd4, transparent:true, opacity:.46, depthWrite:false });
   const floorMat = new THREE.MeshBasicMaterial({ color:0x7fffd4, transparent:true, opacity:.09, side:THREE.DoubleSide, depthWrite:false });
@@ -107,13 +107,13 @@ function addOrb(root,color,x,y,z,scale,kind){
 function addReikiVideo(root){
   const g = new THREE.Group(); g.position.set(20.69,1.74,-5.40); g.rotation.y=REIKI_YAW; root.add(g);
   const video = document.createElement("video"); video.src="../site/assets/video/reiki_hologram.mp4"; video.muted=true; video.loop=true; video.playsInline=true; video.autoplay=true; video.preload="auto"; video.volume=0; video.play().catch(()=>{});
-  let primed=false,currentVolume=0,maxVolume=.095,panel=null,muted=false;
+  let primed=false,currentVolume=0,maxVolume=.30,panel=null,muted=false;
   const zoneCenter = new THREE.Vector3(20.69,1.6,-5.40);
   const refreshPanel=()=>{ if(!panel) return; const tex=makeVolumeTexture(maxVolume,muted); panel.material.map?.dispose?.(); panel.material.map=tex; panel.material.needsUpdate=true; };
-  const setMaxVolume=(v)=>{ maxVolume=THREE.MathUtils.clamp(v,0,.18); if(maxVolume>.001) muted=false; refreshPanel(); };
+  const setMaxVolume=(v)=>{ maxVolume=THREE.MathUtils.clamp(v,0,.50); if(maxVolume>.001) muted=false; refreshPanel(); };
   const primeAudio=()=>{ primed=true; video.muted=muted; video.play().catch(()=>{}); refreshPanel(); };
   window.addEventListener("pointerdown",primeAudio,{once:true,passive:true}); window.addEventListener("keydown",primeAudio,{once:true});
-  window.addEventListener("keydown",(e)=>{ if(e.repeat) return; if(e.code==="BracketRight"||e.code==="Equal"){ muted=false; setMaxVolume(maxVolume+.015); } if(e.code==="BracketLeft"||e.code==="Minus"){ setMaxVolume(maxVolume-.015); } if(e.code==="KeyU"){ muted=!muted; refreshPanel(); } });
+  window.addEventListener("keydown",(e)=>{ if(e.repeat) return; if(e.code==="BracketRight"||e.code==="Equal"){ muted=false; setMaxVolume(maxVolume+.025); } if(e.code==="BracketLeft"||e.code==="Minus"){ setMaxVolume(maxVolume-.025); } if(e.code==="KeyU"){ muted=!muted; refreshPanel(); } });
   window.SVR_REIKI_AUDIO = { primeAudio, setVolume:setMaxVolume, getVolume:()=>maxVolume, mute:()=>{muted=true;refreshPanel();}, unmute:()=>{muted=false;refreshPanel();}, toggleMute:()=>{muted=!muted;refreshPanel();} };
   const tex = new THREE.VideoTexture(video); tex.colorSpace=THREE.SRGBColorSpace; tex.minFilter=THREE.LinearFilter; tex.magFilter=THREE.LinearFilter;
   const wallGlow = new THREE.Mesh(new THREE.PlaneGeometry(3.7,2.18), new THREE.MeshBasicMaterial({ color:0x7fffd4, transparent:true, opacity:.080, side:THREE.DoubleSide, depthWrite:false })); wallGlow.position.z=.010; g.add(wallGlow);
@@ -125,12 +125,12 @@ function addReikiVideo(root){
 }
 
 export function installLobbyVisibilityLock({ scene }){
-  const root = new THREE.Group(); root.name="SVR_Phase98N_Locomotion_Volume_High_Texture_Planets"; scene.add(root);
+  const root = new THREE.Group(); root.name="SVR_Phase98O_Reiki_MP4_Volume_30"; scene.add(root);
   const reikiMain = new THREE.Vector3(-5.6,0,-9.15), reikiExact = new THREE.Vector3(20.69,0,-5.40);
   const portals = [ {key:"reiki",label:"Reiki Main",target:"reiki",position:reikiMain.clone()}, {key:"reikiExpanded",label:"Reiki Hologram Hub",target:"reiki",position:reikiExact.clone()}, {key:"pga",label:"PGA",target:"pga",position:new THREE.Vector3(0,0,-9.25)}, {key:"smoker",label:"Smoker Lounge",target:"sponsor",position:new THREE.Vector3(5.6,0,-9.15)}, {key:"store",label:"SVR Store",route:"../site/store.html",position:new THREE.Vector3(-9.25,0,.8)}, {key:"scorpion",label:"Scorpion Room",route:"./scorpion.html?v=phase98-playable",position:new THREE.Vector3(9.25,0,.8)} ];
   addGlassHubExpansion(root); addPortal(root,{key:"reiki",title:"Reiki",subtitle:"Main Portal",icon:"REI",color:COLORS.reiki,x:-5.6,z:-9.15}); addPortal(root,{key:"reikiExpanded",title:"Reiki",subtitle:"Hologram Hub",icon:"REI",color:COLORS.reiki,x:20.69,z:-5.40,rotationY:REIKI_YAW}); addPortal(root,{key:"pga",title:"PGA",subtitle:"Training",icon:"PGA",color:COLORS.pga,x:0,z:-9.25}); addPortal(root,{key:"smoker",title:"Smoker",subtitle:"Lounge",icon:"SMK",color:COLORS.smoker,x:5.6,z:-9.15}); addPortal(root,{key:"store",title:"SVR Store",subtitle:"Web Portal",icon:"SVR",color:COLORS.store,x:-9.25,z:.8}); addPortal(root,{key:"scorpion",title:"Scorpion",subtitle:"Play Poker",icon:"SCP",color:COLORS.scorpion,x:9.25,z:.8}); addPortal(root,{key:"sponsor",title:"Sponsor",subtitle:"Ad Wall",icon:"AD",color:COLORS.sponsor,x:0,z:9.25}); addConnector(root,reikiMain,reikiExact);
   const reikiVideo = addReikiVideo(root);
-  addPanel(root,"Reiki Hologram","MP4 playing / volume panel active",20.69,4.35,-5.40,COLORS.reiki,5.2,1.35); addPanel(root,"Sponsor Board","Future partner surface",0,6.45,-11.35,COLORS.sponsor,6.5,1.9); addPanel(root,"Espresso With Cream","Tier 1 sponsor",8.9,6.2,-5.35,"#ffb477",4.6,1.55); addPanel(root,"SVR Store","Official brand",-8.9,6.2,-5.35,COLORS.store,4.6,1.55); addPanel(root,"Scorpion Room","Playable poker now open",8.9,5.4,5.35,COLORS.scorpion,4.6,1.55); addPanel(root,"Play With Purpose","Community impact",0,6.45,11.35,COLORS.pga,6.5,1.9);
+  addPanel(root,"Reiki Hologram","MP4 volume set to 30 percent",20.69,4.35,-5.40,COLORS.reiki,5.2,1.35); addPanel(root,"Sponsor Board","Future partner surface",0,6.45,-11.35,COLORS.sponsor,6.5,1.9); addPanel(root,"Espresso With Cream","Tier 1 sponsor",8.9,6.2,-5.35,"#ffb477",4.6,1.55); addPanel(root,"SVR Store","Official brand",-8.9,6.2,-5.35,COLORS.store,4.6,1.55); addPanel(root,"Scorpion Room","Playable poker now open",8.9,5.4,5.35,COLORS.scorpion,4.6,1.55); addPanel(root,"Play With Purpose","Community impact",0,6.45,11.35,COLORS.pga,6.5,1.9);
   const moon = addOrb(root,0x7898d8,-10,72,-126,5.75,"moon");
   const mars = addOrb(root,0xd64c2b,24,66,-145,3.55,"mars");
   return { portals, reikiVideo, primeReikiAudio:reikiVideo.primeAudio, getReikiAudioState:reikiVideo.getState, update(t=0,dt=.016){ const cam=scene.userData?._camera; reikiVideo.updateAudio(cam,dt); moon.group.position.set(-10+Math.sin(t*.012)*7.5,72+Math.sin(t*.008)*.85,-126+Math.cos(t*.012)*4.8); moon.sphere.rotation.y+=dt*.032; moon.halo.rotation.y+=dt*.012; mars.group.position.set(24+Math.sin(t*.010)*8.0,66+Math.sin(t*.007)*.7,-145+Math.cos(t*.010)*5.7); mars.sphere.rotation.y+=dt*.056; mars.halo.rotation.y+=dt*.016; } };
