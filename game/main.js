@@ -81,6 +81,7 @@ setStatus("Loading world...", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 const lobbyVisibilityLock = installLobbyVisibilityLock({ scene });
+const portalTargets = Array.isArray(lobbyVisibilityLock?.portals) ? lobbyVisibilityLock.portals : [];
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -90,6 +91,8 @@ let seated = false;
 let seatIndex = -1;
 let cash = 50000;
 let currentSceneKey = "lobby";
+let activePortal = null;
+let lastPortalStatus = "";
 
 function currentHeadXZ(){
   if (renderer.xr.isPresenting){
@@ -156,6 +159,30 @@ function openRikiHologram(){
   gotoScene("reiki");
   return true;
 }
+function findActivePortal(){
+  const p = currentHeadXZ();
+  let best = null;
+  let bestDist = Infinity;
+  for (const portal of portalTargets){
+    if (!portal?.position) continue;
+    const d = Math.hypot(p.x - portal.position.x, p.z - portal.position.z);
+    if (d < 1.55 && d < bestDist){ best = portal; bestDist = d; }
+  }
+  return best ? { ...best, distance: bestDist } : null;
+}
+function activatePortal(){
+  const portal = activePortal || findActivePortal();
+  if (!portal){ setStatus("No portal in range. Walk onto a storefront glow.", { force: true }); return false; }
+  if (portal.route){
+    setStatus(`Opening ${portal.label}...`, { force: true });
+    window.location.href = portal.route;
+    return true;
+  }
+  const target = portal.target || portal.key;
+  const ok = gotoScene(target);
+  setStatus(ok ? `Portal activated: ${portal.label}` : `Portal target not ready: ${portal.label}`, { force: true });
+  return ok;
+}
 
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
@@ -166,9 +193,10 @@ $sceneButtons.forEach((btn)=>{
 
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
-  if (e.code === "KeyM") setStatus("Audio disabled for Phase 96A", { force: true });
-  if (e.code === "KeyN") setStatus("Audio disabled for Phase 96A", { force: true });
+  if (e.code === "KeyM") setStatus("Audio disabled for Phase 96C", { force: true });
+  if (e.code === "KeyN") setStatus("Audio disabled for Phase 96C", { force: true });
   if (e.code === "KeyP") { positionPanelVisible = !positionPanelVisible; if ($positionPanel) $positionPanel.style.display = positionPanelVisible ? "block" : "none"; }
+  if (e.code === "KeyE") activatePortal();
   if (e.code === "KeyJ") joinTable();
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
@@ -186,7 +214,7 @@ const watch = createWristWatch({
   scene, camera, renderer,
   getState: ()=>({
     audioEnabled: false,
-    trackTitle: "Audio off",
+    trackTitle: activePortal ? `Portal: ${activePortal.label}` : "Audio off",
     audioDisabled: AUDIO_DISABLED,
     cash,
     seated,
@@ -195,8 +223,8 @@ const watch = createWristWatch({
     teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
   }),
   actions: {
-    toggleAudio: ()=>setStatus("Audio disabled for Phase 96A", { force: true }),
-    nextTrack: openRikiHologram,
+    toggleAudio: ()=>setStatus("Audio disabled for Phase 96C", { force: true }),
+    nextTrack: activatePortal,
     openRikiHologram,
     joinTable,
     leaveTable,
@@ -221,7 +249,7 @@ $toggleJoints?.addEventListener("click", ()=>{
 setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Position panel restored. Audio off.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Portals active. Press E near storefront. Audio off.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
 
 function setHudVisible(visible){
@@ -249,18 +277,19 @@ const fmt = (n)=>Number(n || 0).toFixed(2);
 function updatePositionPanel(now){
   if (!$positionPanel || !positionPanelVisible || AUTOCAM) return;
   const p = currentHeadXZ();
-  const portalKeys = Object.keys(sceneTargets || {}).join(", ") || "none";
+  const portalNames = portalTargets.map(p=>p.label).join(", ") || "none";
   $positionPanel.innerHTML = `<strong>SVR POSITION PANEL</strong>\n` +
-    `Build: Phase 96A\n` +
+    `Build: Phase 96C\n` +
     `Scene: ${currentSceneKey}\n` +
     `Camera: x ${fmt(p.x)} / y ${fmt(p.y)} / z ${fmt(p.z)}\n` +
     `Table: x ${fmt(tableCenter.x)} / z ${fmt(tableCenter.z)}\n` +
     `Seat: ${seatLabel()}\n` +
     `Table zone: ${inTableZone() ? "YES" : "NO"}\n` +
+    `Active portal: ${activePortal ? `${activePortal.label} (${fmt(activePortal.distance)}m)` : "none"}\n` +
+    `Portal targets: ${portalNames}\n` +
     `Teleport: ${tp.isEnabled ? (tp.isEnabled() ? "ON" : "OFF") : "READY"}\n` +
     `Audio: OFF\n` +
-    `Portal targets: ${portalKeys}\n` +
-    `Tip: press P to hide/show`;
+    `Tip: press E near storefront / P panel`;
 }
 
 let tPrev = performance.now();
@@ -291,6 +320,11 @@ renderer.setAnimationLoop(()=>{
   } else scene.userData._camera = renderer.xr.getCamera(camera);
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
   lobbyVisibilityLock?.update?.(now * 0.001, dt);
+  activePortal = findActivePortal();
+  if (activePortal){
+    const msg = `Portal ready: ${activePortal.label} — press E`;
+    if (msg !== lastPortalStatus){ setStatus(msg, { force: true }); lastPortalStatus = msg; }
+  } else lastPortalStatus = "";
   hands.update(dt);
   hands.updateDebug();
   const leftHand = hands.getLeftHand();
@@ -304,7 +338,7 @@ renderer.setAnimationLoop(()=>{
 });
 
 const canvasEl = renderer.domElement;
-canvasEl.addEventListener("pointerdown", async ()=>{ setStatus("Audio off. Position panel available with P.", { force: true }); }, { passive: true });
+canvasEl.addEventListener("pointerdown", async ()=>{ setStatus("Portals active. Press E near storefront glow.", { force: true }); }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
   log("[ERR] WebGL context lost. Reloading...");
