@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>SVR Reiki Hologram Portal</title>
+  <style>
+    :root{color-scheme:dark;--cyan:#58fff4;--violet:#b56cff;--red:#ff4040;}
+    html,body{margin:0;min-height:100%;background:#020006;color:#eaffff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow-x:hidden;}
+    body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 50% 42%,rgba(68,255,240,.18),transparent 36%),radial-gradient(circle at 50% 80%,rgba(181,108,255,.16),transparent 40%),linear-gradient(#020006,#000);pointer-events:none;}
+    .wrap{position:relative;z-index:1;min-height:100vh;display:grid;place-items:center;padding:24px;}
+    .portal{width:min(980px,96vw);border:1px solid rgba(88,255,244,.42);border-radius:28px;background:linear-gradient(180deg,rgba(5,18,28,.82),rgba(2,0,8,.92));box-shadow:0 0 42px rgba(88,255,244,.22), inset 0 0 36px rgba(181,108,255,.12);padding:18px;}
+    .top{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+    .badge{border:1px solid rgba(255,64,64,.7);color:#ffdede;border-radius:999px;padding:8px 12px;background:rgba(70,0,0,.42);font-weight:800;letter-spacing:.04em;}
+    h1{font-size:clamp(20px,4vw,38px);margin:0;text-shadow:0 0 18px rgba(88,255,244,.7);}
+    .videoShell{position:relative;border-radius:22px;overflow:hidden;border:1px solid rgba(181,108,255,.5);box-shadow:0 0 34px rgba(181,108,255,.25);background:#000;}
+    video{display:block;width:100%;max-height:70vh;background:#000;filter:saturate(1.08) contrast(1.04);}
+    .scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(88,255,244,.08) 0 1px,transparent 1px 8px);mix-blend-mode:screen;pointer-events:none;opacity:.34;}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
+    button,a.btn{border:1px solid rgba(88,255,244,.45);background:rgba(0,24,30,.78);color:#eaffff;border-radius:999px;padding:11px 16px;text-decoration:none;cursor:pointer;font-weight:800;box-shadow:0 0 18px rgba(88,255,244,.12);}
+    button:hover,a.btn:hover{background:rgba(42,0,70,.8);}
+    .note{text-align:center;color:#bfefff;font-size:13px;margin:12px 0 0;line-height:1.45;}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="portal">
+      <div class="top">
+        <h1>SVR Reiki Hologram Portal</h1>
+        <span class="badge">AWAITING APPROVAL</span>
+      </div>
+      <div class="videoShell">
+        <video id="vid" src="./assets/video/reiki_hologram.mp4" controls playsinline preload="metadata"></video>
+        <div class="scan"></div>
+      </div>
+      <div class="controls">
+        <button id="play">Play / Pause</button>
+        <button id="mute">Mute</button>
+        <button id="down">Volume -</button>
+        <button id="up">Volume +</button>
+        <a class="btn" href="./index.html?v=phase85-reiki-inactive-portal">Back to Game</a>
+      </div>
+      <p class="note">Inactive portal mode: this video is isolated from the main lobby so it cannot break boot. Click/tap to start audio.</p>
+    </section>
+  </main>
+  <script>
+    const v=document.getElementById('vid');
+    document.getElementById('play').onclick=()=>v.paused?v.play():v.pause();
+    document.getElementById('mute').onclick=()=>{v.muted=!v.muted;};
+    document.getElementById('down').onclick=()=>{v.volume=Math.max(0,+(v.volume-.1).toFixed(2));};
+    document.getElementById('up').onclick=()=>{v.volume=Math.min(1,+(v.volume+.1).toFixed(2));};
+  </script>
+</body>
+</html>

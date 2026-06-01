@@ -1,8 +1,5 @@
 {
-  "build": "PHASE-84-REIKI-HOLOGRAM-VIDEO-LOCK",
-  "scope": "game-side-only",
-  "siteTouched": false,
-  "video": "game/assets/video/reiki_hologram.mp4",
-  "sourceUpload": "1000034627.mp4",
-  "notes": "Compressed MP4 hologram player for Reiki area with volume controls."
+  "build": "PHASE-85-REIKI-INACTIVE-PORTAL-LOCK",
+  "date": "2026-06-01",
+  "scope": "game-side only; inactive Reiki MP4 portal; boot fallback"
 }
