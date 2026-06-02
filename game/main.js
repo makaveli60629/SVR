@@ -7,7 +7,6 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createWristWatch } from "./modules/watch.js";
 import { installLobbyVisibilityLock } from "./modules/lobby_visibility_lock.js";
-import { installReikiHubLogoLock } from "./modules/reiki_hub_logo_lock.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -105,18 +104,12 @@ setStatus("Loading world...", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 const lobbyVisibilityLock = installLobbyVisibilityLock({ scene });
-const reikiHubLogoLock = installReikiHubLogoLock(scene);
 const portalTargets = Array.isArray(lobbyVisibilityLock?.portals) ? lobbyVisibilityLock.portals : [];
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
 window.SVR_AUDIO_DISABLED = true;
-window.SVR_REIKI_HUB_LOGO_LOCK = {
-  status: "installed",
-  hubLogo: "official lotus circuit Reiki Hub mark",
-  partnerNote: "Truitive/Trueitive is partner/founder layer, not the Reiki Hub logo."
-};
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
@@ -191,7 +184,7 @@ function gotoScene(key){
   return true;
 }
 function openRikiHologram(){
-  setStatus("Reiki Hub uses the official lotus circuit logo. Hologram zone is approval-gated.", { force: true });
+  setStatus("Reiki hologram is in the Reiki storefront audio zone.", { force: true });
   gotoScene("reiki");
   return true;
 }
@@ -287,7 +280,7 @@ $toggleJoints?.addEventListener("click", ()=>{
 setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-setStatus(AUTOCAM ? "CAM 3 walkthrough ready" : "Ready. Reiki Hub official logo lock active. Press P / C. Press E near storefront.", { force: true });
+setStatus(AUTOCAM ? "CAM 3 walkthrough ready" : "Ready. Walking position panel active. Press P / C. Press E near storefront.", { force: true });
 setMode(AUTOCAM ? "CAM 3 hub walkthrough" : "Hands: waiting...");
 
 function setHudVisible(visible){
@@ -347,8 +340,7 @@ function updatePositionPanel(){
   const placement = `PLACEMENT ${sceneKey}: x=${p.x.toFixed(2)}, y=${p.y.toFixed(2)}, z=${p.z.toFixed(2)}, yaw=${yaw.toFixed(1)}deg`;
   lastPlacementLine = placement;
   const active = activePortal ? `${activePortal.label} (${activePortal.distance.toFixed(2)}m)` : "none";
-  const reikiLock = window.SVR_REIKI_HUB_LOGO_LOCK?.status || "pending";
-  $positionPanel.innerHTML = `<strong>SVR WALKING DIAGNOSTIC PANEL</strong>\n<span class="placementLine">${placement}</span>\n<span class="diagLine">scene: ${sceneKey}</span>\n<span class="diagLine">seat: ${seatLabel()}</span>\n<span class="diagLine">portal: ${active}</span>\n<span class="diagLine">reikiLogoLock: ${reikiLock}</span>\n<span class="smallTip">P toggles this panel. C copies the placement line. E activates a nearby storefront portal.</span>`;
+  $positionPanel.innerHTML = `<strong>SVR WALKING DIAGNOSTIC PANEL</strong>\n<span class="placementLine">${placement}</span>\n<span class="diagLine">scene: ${sceneKey}</span>\n<span class="diagLine">seat: ${seatLabel()}</span>\n<span class="diagLine">portal: ${active}</span>\n<span class="smallTip">P toggles this panel. C copies the placement line. E activates a nearby storefront portal.</span>`;
 }
 
 function updatePortals(){
