@@ -7,6 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createWristWatch } from "./modules/watch.js";
 import { installLobbyVisibilityLock } from "./modules/lobby_visibility_lock.js";
+import { installReikiHubLogoLock } from "./modules/reiki_hub_logo_lock.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -104,12 +105,18 @@ setStatus("Loading world...", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 const lobbyVisibilityLock = installLobbyVisibilityLock({ scene });
+const reikiHubLogoLock = installReikiHubLogoLock(scene);
 const portalTargets = Array.isArray(lobbyVisibilityLock?.portals) ? lobbyVisibilityLock.portals : [];
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
 window.SVR_AUDIO_DISABLED = true;
+window.SVR_REIKI_HUB_LOGO_LOCK = {
+  status: "installed",
+  hubLogo: "official lotus circuit Reiki Hub mark",
+  partnerNote: "Truitive/Trueitive is partner/founder layer, not the Reiki Hub logo."
+};
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
@@ -184,7 +191,7 @@ function gotoScene(key){
   return true;
 }
 function openRikiHologram(){
-  setStatus("Reiki hologram is in the Reiki storefront audio zone.", { force: true });
+  setStatus("Reiki Hub uses the official lotus circuit logo. Hologram zone is approval-gated.", { force: true });
   gotoScene("reiki");
   return true;
 }
@@ -243,7 +250,7 @@ window.addEventListener("keydown", async (e)=>{
 
 const watch = createWristWatch({
   scene, camera, renderer,
-  getState: ()=>({
+  getState: () => ({
     audioEnabled: false,
     trackTitle: activePortal ? `Portal: ${activePortal.label}` : "Audio off",
     audioDisabled: AUDIO_DISABLED,
@@ -254,21 +261,21 @@ const watch = createWristWatch({
     teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
   }),
   actions: {
-    toggleAudio: ()=>setStatus("Audio disabled globally; Reiki has low proximity audio.", { force: true }),
+    toggleAudio: () => setStatus("Audio disabled globally; Reiki has low proximity audio.", { force: true }),
     nextTrack: activatePortal,
     openRikiHologram,
     joinTable,
     leaveTable,
-    toggleTeleport: ()=>tp.toggleMode(),
-    goLobby: ()=>gotoScene("lobby"),
-    goTable: ()=>gotoScene("table"),
-    goSeat: ()=>gotoScene("seat"),
-    goReiki: ()=>gotoScene("reiki"),
-    goPga: ()=>gotoScene("pga"),
-    goLegend: ()=>gotoScene("legends"),
-    goSponsor: ()=>gotoScene("sponsor"),
-    goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom")
+    toggleTeleport: () => tp.toggleMode(),
+    goLobby: () => gotoScene("lobby"),
+    goTable: () => gotoScene("table"),
+    goSeat: () => gotoScene("seat"),
+    goReiki: () => gotoScene("reiki"),
+    goPga: () => gotoScene("pga"),
+    goLegend: () => gotoScene("legends"),
+    goSponsor: () => gotoScene("sponsor"),
+    goScorpion: () => gotoScene("scorpion"),
+    goReikiRoom: () => gotoScene("reikiRoom")
   }
 });
 
@@ -280,7 +287,7 @@ $toggleJoints?.addEventListener("click", ()=>{
 setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-setStatus(AUTOCAM ? "CAM 3 walkthrough ready" : "Ready. Walking position panel active. Press P / C. Press E near storefront.", { force: true });
+setStatus(AUTOCAM ? "CAM 3 walkthrough ready" : "Ready. Reiki Hub official logo lock active. Press P / C. Press E near storefront.", { force: true });
 setMode(AUTOCAM ? "CAM 3 hub walkthrough" : "Hands: waiting...");
 
 function setHudVisible(visible){
@@ -292,139 +299,77 @@ function setHudVisible(visible){
 }
 
 if (AUTOCAM) setHudVisible(false);
-if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display","none");
+if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display", "none");
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
-  document.getElementById("sceneNav")?.style.setProperty("display","none");
+  document.getElementById("sceneNav")?.style.setProperty("display", "none");
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
   setHudVisible(true);
   const nav = document.getElementById("sceneNav");
-  if (nav && !AUTOCAM) nav.style.display = "flex";
+  if (nav) nav.style.display = "flex";
 });
 
-const fmt = (n)=>Number(n || 0).toFixed(2);
-function updatePositionPanel(now){
+const clock = new THREE.Clock();
+let previewAngle = -0.85;
+let lastSnapAt = 0;
+
+function updateDesktopSnap(dt){
+  if (!desktop || seated) return;
+  const input = desktop.update(dt, roomClamp);
+  if (input.snapLeft || input.snapRight){
+    const now = performance.now();
+    if (now - lastSnapAt > 180){
+      const yaw = (input.snapLeft ? 45 : -45) * Math.PI / 180;
+      camera.rotation.y += yaw;
+      lastSnapAt = now;
+    }
+  }
+}
+
+function updatePreviewCam(t){
+  previewAngle += 0.010;
+  const radius = previewOrbitRadius || 17.5;
+  const y = 2.25 + Math.sin(t * 0.38) * 0.25;
+  const x = Math.cos(previewAngle) * radius;
+  const z = Math.sin(previewAngle) * radius;
+  camera.position.set(x, y, z);
+  camera.lookAt(0, 1.18, 0);
+}
+
+function updatePositionPanel(){
   if (!$positionPanel || !positionPanelVisible || AUTOCAM) return;
   const p = currentHeadXZ();
   const yaw = cameraYawDeg();
-  const portalNames = portalTargets.map(p=>p.label).join(", ") || "none";
-  const reikiState = lobbyVisibilityLock?.getReikiAudioState?.() || null;
-  const nearestPortal = activePortal || findActivePortal();
-  const speed = lastPositionSample ? Math.hypot(p.x - lastPositionSample.x, p.z - lastPositionSample.z) / Math.max(0.001, (now - lastPositionSample.t) / 1000) : 0;
-  lastPositionSample = { x: p.x, z: p.z, t: now };
-  lastPlacementLine = `PLACE HERE: x ${fmt(p.x)} / y ${fmt(p.y)} / z ${fmt(p.z)} / yaw ${fmt(yaw)} / scene ${currentSceneKey}`;
-  $positionPanel.innerHTML = `<strong>SVR WALKING DIAGNOSTIC PANEL</strong>\n` +
-    `<span class="placementLine">${lastPlacementLine}</span>\n` +
-    `Build: Camera Update / Phase 98R\n` +
-    `Scene: ${currentSceneKey}\n` +
-    `<span class="diagLine">Camera/player: x ${fmt(p.x)} / y ${fmt(p.y)} / z ${fmt(p.z)}</span>\n` +
-    `Facing yaw: ${fmt(yaw)} deg\n` +
-    `Move speed: ${fmt(speed)} units/sec\n` +
-    `Table center: x ${fmt(tableCenter.x)} / z ${fmt(tableCenter.z)}\n` +
-    `Seat: ${seatLabel()}\n` +
-    `Table zone: ${inTableZone() ? "YES" : "NO"}\n` +
-    `Nearest/active portal: ${nearestPortal ? `${nearestPortal.label} (${fmt(nearestPortal.distance || 0)}m)` : "none"}\n` +
-    `Portal targets: ${portalNames}\n` +
-    `Reiki video: ${reikiState?.videoOn ? "ON" : "WAIT"}\n` +
-    `Reiki audio: ${reikiState ? (reikiState.near ? "NEAR" : "FAR") : "OFF"}\n` +
-    `Reiki primed: ${reikiState?.primed ? "YES" : "NO"}\n` +
-    `Reiki volume: ${fmt(reikiState?.volume || 0)} / ${fmt(reikiState?.maxVolume || 0)}\n` +
-    `Teleport: ${tp.isEnabled ? (tp.isEnabled() ? "ON" : "OFF") : "READY"}\n` +
-    `Audio: GLOBAL OFF / REIKI LOW ZONE\n\n` +
-    `<button id="panelCopyBtn" type="button">Copy PLACE HERE line</button>\n` +
-    `<span class="smallTip">Press P to show/hide • Press C to copy • Stand where you want an object, then send me the PLACE HERE line.</span>`;
-  const btn = document.getElementById("panelCopyBtn");
-  if (btn) btn.onclick = copyCurrentPosition;
+  lastPositionSample = { x: p.x, y: p.y, z: p.z, yaw };
+  const sceneKey = currentSceneKey || "lobby";
+  const placement = `PLACEMENT ${sceneKey}: x=${p.x.toFixed(2)}, y=${p.y.toFixed(2)}, z=${p.z.toFixed(2)}, yaw=${yaw.toFixed(1)}deg`;
+  lastPlacementLine = placement;
+  const active = activePortal ? `${activePortal.label} (${activePortal.distance.toFixed(2)}m)` : "none";
+  const reikiLock = window.SVR_REIKI_HUB_LOGO_LOCK?.status || "pending";
+  $positionPanel.innerHTML = `<strong>SVR WALKING DIAGNOSTIC PANEL</strong>\n<span class="placementLine">${placement}</span>\n<span class="diagLine">scene: ${sceneKey}</span>\n<span class="diagLine">seat: ${seatLabel()}</span>\n<span class="diagLine">portal: ${active}</span>\n<span class="diagLine">reikiLogoLock: ${reikiLock}</span>\n<span class="smallTip">P toggles this panel. C copies the placement line. E activates a nearby storefront portal.</span>`;
 }
 
-let tPrev = performance.now();
-const previewTarget = new THREE.Vector3(0, 1.25, 0);
-const previewPos = new THREE.Vector3();
-const previewLook = new THREE.Vector3();
-const previewFrom = new THREE.Vector3();
-const previewTo = new THREE.Vector3();
-const previewLookFrom = new THREE.Vector3();
-const previewLookTo = new THREE.Vector3();
-const previewRoute = [
-  { name:"Lobby opening hero", duration:6500, pos:[0,3.20,12.5], look:[0,1.25,0] },
-  { name:"Poker table approach", duration:7000, pos:[-4.8,2.25,7.0], look:[0,1.10,0] },
-  { name:"Table sweep", duration:7600, pos:[5.6,2.18,4.9], look:[0,1.05,0] },
-  { name:"Reiki portal approach", duration:7200, pos:[-4.7,2.05,-6.7], look:[-5.6,1.8,-9.15] },
-  { name:"Reiki glass room reveal", duration:8200, pos:[15.0,2.25,-2.4], look:[20.69,1.85,-5.40] },
-  { name:"Reiki hologram close look", duration:9200, pos:[18.3,2.05,-2.25], look:[20.69,1.78,-5.40] },
-  { name:"Reiki wide showroom", duration:7600, pos:[23.7,2.55,-1.8], look:[19.25,1.75,-4.90] },
-  { name:"PGA hub", duration:6500, pos:[1.8,2.20,-5.7], look:[0,1.75,-9.25] },
-  { name:"Smoker lounge hub", duration:6500, pos:[7.8,2.15,-5.9], look:[5.6,1.75,-9.15] },
-  { name:"SVR store hub", duration:7000, pos:[-6.7,2.25,2.5], look:[-9.25,1.75,0.8] },
-  { name:"Scorpion room portal", duration:7000, pos:[6.9,2.25,2.6], look:[9.25,1.75,0.8] },
-  { name:"Final lobby skyline sweep", duration:8500, pos:[0,4.15,14.8], look:[0,1.45,0] }
-];
-const routeDuration = previewRoute.reduce((sum, shot)=>sum + shot.duration, 0);
-function smoothStep01(v){
-  const x = THREE.MathUtils.clamp(v, 0, 1);
-  return x * x * (3 - 2 * x);
-}
-function updatePreviewCamera(now){
-  let t = now % routeDuration;
-  let index = 0;
-  for (; index < previewRoute.length; index++){
-    if (t <= previewRoute[index].duration) break;
-    t -= previewRoute[index].duration;
+function updatePortals(){
+  activePortal = findActivePortal();
+  const text = activePortal ? `Portal ready: ${activePortal.label} — press E / watch action` : "Walk onto a storefront glow. Press E to enter.";
+  if (!AUTOCAM && text !== lastPortalStatus){
+    lastPortalStatus = text;
+    setStatus(text);
   }
-  const a = previewRoute[index % previewRoute.length];
-  const b = previewRoute[(index + 1) % previewRoute.length];
-  const k = smoothStep01(t / Math.max(1, a.duration));
-  previewFrom.fromArray(a.pos);
-  previewTo.fromArray(b.pos);
-  previewLookFrom.fromArray(a.look);
-  previewLookTo.fromArray(b.look);
-  previewPos.lerpVectors(previewFrom, previewTo, k);
-  previewLook.lerpVectors(previewLookFrom, previewLookTo, k);
-  previewPos.y += Math.sin(now * 0.0012) * 0.045;
-  previewLook.y += Math.sin(now * 0.0009 + 1.2) * 0.025;
-  camera.position.lerp(previewPos, 0.065);
-  previewTarget.lerp(previewLook, 0.10);
-  camera.lookAt(previewTarget);
 }
 
 renderer.setAnimationLoop(()=>{
-  const now = performance.now();
-  const dt = Math.min((now - tPrev) / 1000, 0.033);
-  tPrev = now;
-  if (!renderer.xr.isPresenting){
-    if (!AUTOCAM) desktop.update(dt);
-    else updatePreviewCamera(now);
-    scene.userData._camera = camera;
-  } else scene.userData._camera = renderer.xr.getCamera(camera);
-  if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
-  lobbyVisibilityLock?.update?.(now * 0.001, dt);
-  activePortal = findActivePortal();
-  if (activePortal){
-    const msg = `Portal ready: ${activePortal.label} — press E`;
-    if (msg !== lastPortalStatus){ setStatus(msg, { force: true }); lastPortalStatus = msg; }
-  } else lastPortalStatus = "";
-  hands.update(dt);
-  hands.updateDebug();
-  const leftHand = hands.getLeftHand();
-  const rightHand = hands.getRightHand();
-  const leftController = hands.getLeftController();
-  const rightController = hands.getRightController();
-  if (!AUTOCAM || renderer.xr.isPresenting) tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } });
-  if (watch) watch.update(dt, leftHand, rightHand);
-  updatePositionPanel(now);
+  const dt = Math.min(0.05, clock.getDelta());
+  const t = clock.elapsedTime;
+  if (AUTOCAM) updatePreviewCam(t);
+  updateDesktopSnap(dt);
+  updatePortals();
+  updatePositionPanel();
+  hands.update(dt, t);
+  tp.update(dt, t, hands);
+  watch.update(dt, t, hands);
+  world.update?.(dt, t);
   renderer.render(scene, camera);
 });
-
-const canvasEl = renderer.domElement;
-canvasEl.addEventListener("pointerdown", async ()=>{
-  lobbyVisibilityLock?.primeReikiAudio?.();
-  setStatus("Reiki audio primed. Walk near Reiki storefront for low audio.", { force: true });
-}, { passive: true });
-canvasEl.addEventListener("webglcontextlost", (e)=>{
-  e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading...");
-  setStatus("WebGL context lost (reloading...)", { force: true });
-  setTimeout(()=>location.reload(), 500);
-}, false);
