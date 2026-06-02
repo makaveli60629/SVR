@@ -307,10 +307,21 @@ renderer.xr.addEventListener("sessionend", ()=>{
 const clock = new THREE.Clock();
 let previewAngle = -0.85;
 let lastSnapAt = 0;
+let desktopSnapWarned = false;
 
 function updateDesktopSnap(dt){
   if (!desktop || seated) return;
-  const input = desktop.update(dt, roomClamp);
+  let input = {};
+  try {
+    input = desktop.update?.(dt, roomClamp) || {};
+  } catch (err) {
+    if (!desktopSnapWarned) {
+      desktopSnapWarned = true;
+      console.warn("SVR desktop controls update skipped", err);
+      setStatus("Desktop controls recovered from input warning.", { force: true });
+    }
+    return;
+  }
   if (input.snapLeft || input.snapRight){
     const now = performance.now();
     if (now - lastSnapAt > 180){
@@ -323,8 +334,8 @@ function updateDesktopSnap(dt){
 
 function updatePreviewCam(t){
   previewAngle += 0.010;
-  const radius = previewOrbitRadius || 17.5;
-  const y = 2.25 + Math.sin(t * 0.38) * 0.25;
+  const radius = THREE.MathUtils.clamp(previewOrbitRadius || 17.5, 8, 20);
+  const y = THREE.MathUtils.clamp(2.25 + Math.sin(t * 0.38) * 0.25, 1.65, 3.2);
   const x = Math.cos(previewAngle) * radius;
   const z = Math.sin(previewAngle) * radius;
   camera.position.set(x, y, z);
