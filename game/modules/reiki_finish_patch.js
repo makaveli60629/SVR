@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const PATCH_NAME = "SVR_Phase98SE_Reiki_Finish_Patch";
+const PATCH_NAME = "SVR_Phase98SG_Reiki_Audio_Containment_Patch";
 const REIKI_COLOR = 0x7fffd4;
 const RED_CARPET = 0x7b1024;
 const SILVER = 0xd8dee8;
@@ -178,7 +178,7 @@ function addCleanHologram(scene, videoTexture) {
   edge.name = "SVR_Reiki_Clean_Hologram_Edge";
   root.add(edge);
 
-  const glow = new THREE.PointLight(REIKI_COLOR, 0.28, 5.5, 2.0);
+  const glow = new THREE.PointLight(REIKI_COLOR, 0.22, 4.5, 2.0);
   glow.position.set(20.35, 1.8, -6.36);
   glow.name = "SVR_Reiki_Clean_Soft_Light";
   root.add(glow);
@@ -190,14 +190,17 @@ function addCleanHologram(scene, videoTexture) {
   return root;
 }
 
-function primeAudio(video) {
+function primeVideoWithoutGlobalAudio(video) {
   const unlock = () => {
     try {
-      video.muted = false;
-      video.volume = 1;
+      // Keep the hologram visually active but never globally audible from spawn.
+      // The original lobby_visibility_lock proximity zone remains the only audio controller.
+      video.muted = true;
+      video.volume = 0;
       video.play?.().catch?.(() => {});
     } catch {}
   };
+  unlock();
   window.addEventListener("pointerdown", unlock, { once: true, passive: true });
   window.addEventListener("keydown", unlock, { once: true });
 }
@@ -208,14 +211,15 @@ export function installReikiFinishPatch({ scene }) {
   if (!existing?.texture) return false;
   hideOldHologramPieces(scene, existing.parent);
   addCleanHologram(scene, existing.texture);
-  if (existing.video) primeAudio(existing.video);
+  if (existing.video) primeVideoWithoutGlobalAudio(existing.video);
   window.SVR_REIKI_FINISH_PATCH = {
-    phase: "98S-E",
+    phase: "98S-G",
     status: "installed",
     hologram: "single-flat-inward-facing",
     backgroundPanelRemoved: true,
     uShapeRemoved: true,
-    audioPrimedOnUserGesture: true
+    globalSpawnAudioBlocked: true,
+    proximityAudioControllerPreserved: true
   };
   return true;
 }
