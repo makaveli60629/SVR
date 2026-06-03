@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>SVR Poker | Presentation Hub</title>
+<meta name="description" content="Presentation hub for SVR Poker game preview, Reiki approval-safe preview, store, sponsorship, and contact links."/>
+<link rel="icon" href="../logo.webp" type="image/webp"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site-market.css"/>
+<link rel="stylesheet" href="final-polish.css"/>
+<style>
+  .presentation-hero{min-height:calc(100vh - 140px);display:grid;place-items:center;padding:44px 18px;}
+  .presentation-card{width:min(1120px,100%);border:1px solid rgba(127,255,212,.28);border-radius:32px;background:linear-gradient(135deg,rgba(4,8,16,.92),rgba(25,10,45,.9));box-shadow:0 30px 90px rgba(0,0,0,.48),0 0 36px rgba(127,255,212,.12);padding:34px;position:relative;overflow:hidden;}
+  .presentation-card:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 30% 20%,rgba(127,255,212,.12),transparent 34%),radial-gradient(circle at 70% 35%,rgba(180,140,255,.12),transparent 38%);pointer-events:none;}
+  .presentation-inner{position:relative;z-index:1;display:grid;grid-template-columns:280px 1fr;gap:32px;align-items:center;}
+  .presentation-logo{display:grid;place-items:center;border:1px solid rgba(255,255,255,.12);border-radius:28px;background:rgba(0,0,0,.34);padding:24px;min-height:260px;}
+  .presentation-logo img{width:min(210px,80%);filter:drop-shadow(0 0 24px rgba(127,255,212,.38));}
+  .presentation-copy .kicker{color:#7fffd4;text-transform:uppercase;letter-spacing:.18em;font-weight:900;}
+  .presentation-copy h1{font-family:Orbitron,Audiowide,Arial,sans-serif;font-size:clamp(42px,7vw,84px);line-height:.95;margin:16px 0 12px;color:#fff;text-shadow:0 0 24px rgba(180,140,255,.32);}
+  .presentation-copy p{max-width:760px;color:#dfeaff;font-size:1.18rem;line-height:1.55;}
+  .presentation-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:26px;}
+  .presentation-actions a{display:flex;flex-direction:column;gap:4px;text-decoration:none;border:1px solid rgba(127,255,212,.28);border-radius:20px;padding:18px 20px;background:rgba(0,0,0,.34);color:#fff;transition:transform .18s ease, border-color .18s ease, background .18s ease;}
+  .presentation-actions a:hover{transform:translateY(-2px);border-color:rgba(127,255,212,.65);background:rgba(127,255,212,.08);}
+  .presentation-actions strong{font-family:Orbitron,Arial,sans-serif;font-size:1.02rem;}
+  .presentation-actions span{color:#aeb8d8;font-weight:700;}
+  .presentation-note{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;}
+  .presentation-note span{border:1px solid rgba(255,255,255,.13);border-radius:999px;padding:8px 12px;color:#eafff4;background:rgba(255,255,255,.05);font-weight:800;font-size:.9rem;}
+  @media(max-width:780px){.presentation-inner{grid-template-columns:1fr}.presentation-logo{min-height:190px}.presentation-actions{grid-template-columns:1fr}.presentation-card{padding:22px}}
+</style>
+</head>
+<body class="svr-market">
+<canvas id="binary-rain" aria-hidden="true"></canvas>
+<div class="market-page">
+<nav class="market-nav">
+  <a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Presentation Hub</span></div></a>
+  <div class="market-links"><span class="status-pill">PRESENTATION READY</span><a href="index.html">Home</a><a href="store.html">Store</a><a href="sponsorship.html">Sponsors</a><a href="contact.html">Contact</a></div>
+</nav>
+<main class="market-shell presentation-hero">
+  <section class="presentation-card" aria-label="SVR Poker presentation links">
+    <div class="presentation-inner">
+      <div class="presentation-logo"><img src="../logo.webp" alt="SVR Poker logo"></div>
+      <div class="presentation-copy">
+        <span class="kicker">SVR Presentation</span>
+        <h1>Strata VR Poker</h1>
+        <p>Use this page as the clean presentation launcher for the SVR Poker website, game preview, Reiki approval-safe preview, store, sponsorship, and contact flow.</p>
+        <div class="presentation-actions">
+          <a href="../game/?v=phase98sq-presentation-safe&amp;present=1" target="_blank" rel="noopener"><strong>Open Game Preview</strong><span>Clean presentation-safe lobby link</span></a>
+          <a href="reiki-about.html" target="_blank" rel="noopener"><strong>Open Reiki Preview</strong><span>Approval-safe wellness preview</span></a>
+          <a href="store.html?v=phase98sp-store-placeholders" target="_blank" rel="noopener"><strong>Open Store</strong><span>Sample items and Reiki book placeholder</span></a>
+          <a href="sponsorship.html" target="_blank" rel="noopener"><strong>Open Sponsorship</strong><span>Sponsor path and advertising overview</span></a>
+          <a href="about.html" target="_blank" rel="noopener"><strong>Open About</strong><span>Mission, community, and platform summary</span></a>
+          <a href="contact.html" target="_blank" rel="noopener"><strong>Open Contact</strong><span>Follow-up and support flow</span></a>
+        </div>
+        <div class="presentation-note"><span>No live checkout</span><span>Reiki awaiting approval</span><span>Play-money platform</span><span>Presentation-safe link</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p></footer>
+</div>
+<script src="../matrix.js"></script><script src="../site-public-hooks.js"></script>
+</body>
+</html>
