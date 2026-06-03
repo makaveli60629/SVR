@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR Poker - Phase 98S-O Minimal Reiki Polish</title>
+  <title>SVR Poker - Phase 98S-Q Presentation Safe Mode</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -19,6 +19,9 @@
     .scene-btn{ border: 1px solid rgba(120,255,186,.42); background: rgba(2,10,8,.62); color: #eafff4; border-radius: 999px; padding: 8px 12px; cursor: pointer; box-shadow: 0 10px 28px rgba(0,0,0,.35); font-size: 12px; }
     .scene-btn:hover{ background: rgba(10,48,33,.72); }
     body.preview-mode #sceneNav { display:none !important; }
+    body.presentation-safe #hud, body.presentation-safe #log, body.presentation-safe #err, body.presentation-safe #positionPanel, body.presentation-safe #positionToast { display: none !important; }
+    body.presentation-safe #sceneNav { opacity: .18; transition: opacity .2s ease; }
+    body.presentation-safe #sceneNav:hover { opacity: 1; }
     #positionPanel { position: fixed; right: 12px; top: 64px; z-index: 14; width: min(460px, calc(100vw - 24px)); max-height: calc(100vh - 92px); overflow: auto; display: none; background: rgba(0,0,0,.76); border: 2px solid rgba(105,232,255,.72); border-radius: 18px; padding: 12px 14px; color: #dffcff; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; box-shadow: 0 20px 60px rgba(0,0,0,.62), 0 0 28px rgba(105,232,255,.18); white-space: pre-wrap; pointer-events: auto; }
     #positionPanel strong { color: #ffffff; font-size: 13px; }
     #positionPanel .placementLine { display:block; margin: 8px 0; padding: 8px 10px; border: 1px solid rgba(255,211,107,.55); border-radius: 12px; background: rgba(255,211,107,.09); color: #fff3c6; font-weight: 800; }
@@ -36,6 +39,12 @@
   </script>
 </head>
 <body>
+  <script>
+    (function(){
+      const p = new URLSearchParams(location.search);
+      if (p.has('present') || p.has('presentation')) document.body.classList.add('presentation-safe');
+    })();
+  </script>
   <div id="app"></div>
   <div id="hud">
     <div class="pill" id="status">Booting...</div>
@@ -45,7 +54,7 @@
       <button class="btn" id="copyPosition" title="Copy current placement line">Copy Pos</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: ...</span>
-      <span class="pill">BUILD: PHASE-98S-O-MINIMAL-REIKI-POLISH</span>
+      <span class="pill">BUILD: PHASE-98S-Q-PRESENTATION-SAFE-MODE</span>
     </div>
   </div>
   <div id="sceneNav">
