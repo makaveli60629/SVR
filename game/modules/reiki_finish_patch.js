@@ -1,9 +1,10 @@
 import * as THREE from "three";
 
-const PATCH_NAME = "SVR_Phase98SO_Reiki_Minimal_Presentation_Polish";
+const PATCH_NAME = "SVR_Phase98SV_Surgical_Fix_01_Reiki_Hologram_Flip";
 const REIKI_COLOR = 0x7fffd4;
 const RED_CARPET = 0x7b1024;
 const SILVER = 0xd8dee8;
+const INWARD_FACE_YAW = Math.PI;
 
 function makeLabelTexture(title, subtitle = "", color = "#7fffd4") {
   const canvas = document.createElement("canvas");
@@ -47,7 +48,7 @@ function addLabel(root) {
     })
   );
   label.position.set(20.35, 0.82, -6.76);
-  label.rotation.y = 0;
+  label.rotation.y = INWARD_FACE_YAW;
   label.name = "SVR_Reiki_Minimal_Approval_Label";
   root.add(label);
 }
@@ -104,10 +105,10 @@ function addRails(root) {
 }
 
 function addGlassHint(root) {
-  const glassMat = new THREE.MeshBasicMaterial({ color: REIKI_COLOR, transparent: true, opacity: 0.055, side: THREE.DoubleSide, depthWrite: false });
+  const glassMat = new THREE.MeshBasicMaterial({ color: REIKI_COLOR, transparent: true, opacity: 0.045, side: THREE.DoubleSide, depthWrite: false });
   const back = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 2.55), glassMat);
   back.position.set(20.35, 1.72, -7.16);
-  back.rotation.y = 0;
+  back.rotation.y = INWARD_FACE_YAW;
   back.name = "SVR_Reiki_Minimal_Back_Glass_Hint";
   root.add(back);
 }
@@ -141,7 +142,7 @@ function hideOldHologramPieces(scene, videoParent) {
   scene.traverse((object) => {
     if (!object.isMesh) return;
     const name = String(object.name || "");
-    if (name.startsWith("SVR_Reiki_Minimal") || name.startsWith("SVR_Phase98SO")) return;
+    if (name.startsWith("SVR_Reiki_Minimal") || name.startsWith("SVR_Phase98S")) return;
     const p = worldPositionOf(object);
     const nearOldPatch = Math.abs(p.x - 20.35) < 7.2 && Math.abs(p.z + 5.2) < 3.8 && /Reiki|Riki|Hologram|Rope|Carpet|Glass|Approval/i.test(name);
     const nearOldLabel = Math.abs(p.x - 20.35) < 2.5 && Math.abs(p.y - 0.68) < 0.55 && Math.abs(p.z + 6.92) < 0.9;
@@ -158,7 +159,7 @@ function addCleanHologram(scene, videoTexture) {
     new THREE.PlaneGeometry(3.25, 1.86),
     new THREE.MeshBasicMaterial({
       map: videoTexture,
-      side: THREE.DoubleSide,
+      side: THREE.FrontSide,
       toneMapped: false,
       transparent: true,
       opacity: 1,
@@ -166,7 +167,7 @@ function addCleanHologram(scene, videoTexture) {
     })
   );
   screen.position.set(20.35, 1.86, -7.02);
-  screen.rotation.y = 0;
+  screen.rotation.y = INWARD_FACE_YAW;
   screen.name = "SVR_Reiki_Minimal_Single_Hologram";
   root.add(screen);
 
@@ -177,7 +178,7 @@ function addCleanHologram(scene, videoTexture) {
   edge.name = "SVR_Reiki_Minimal_Hologram_Edge";
   root.add(edge);
 
-  const glow = new THREE.PointLight(REIKI_COLOR, 0.13, 3.2, 2.0);
+  const glow = new THREE.PointLight(REIKI_COLOR, 0.10, 3.0, 2.0);
   glow.position.set(20.35, 1.8, -6.48);
   glow.name = "SVR_Reiki_Minimal_Soft_Light";
   root.add(glow);
@@ -204,7 +205,7 @@ function primeVideoWithoutGlobalAudio(video) {
 
 export function installReikiFinishPatch({ scene }) {
   if (!scene || scene.getObjectByName(PATCH_NAME)) return false;
-  const oldG = scene.getObjectByName("SVR_Phase98SG_Reiki_Audio_Containment_Patch");
+  const oldG = scene.getObjectByName("SVR_Phase98SO_Reiki_Minimal_Presentation_Polish") || scene.getObjectByName("SVR_Phase98SG_Reiki_Audio_Containment_Patch");
   if (oldG) oldG.visible = false;
   const existing = findExistingVideo(scene);
   if (!existing?.texture) return false;
@@ -212,11 +213,11 @@ export function installReikiFinishPatch({ scene }) {
   addCleanHologram(scene, existing.texture);
   if (existing.video) primeVideoWithoutGlobalAudio(existing.video);
   window.SVR_REIKI_FINISH_PATCH = {
-    phase: "98S-O",
+    phase: "98S-V",
+    surgicalFix: "01",
     status: "installed",
-    hologram: "minimal-single-flat-inward-facing",
+    hologram: "flipped-180-frontside-inward-facing",
     presentationSafe: true,
-    broadOverlayReduced: true,
     globalSpawnAudioBlocked: true,
     proximityAudioControllerPreserved: true
   };
