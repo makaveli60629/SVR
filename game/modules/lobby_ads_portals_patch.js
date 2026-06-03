@@ -1,13 +1,13 @@
 import * as THREE from "three";
 
-const PATCH_NAME = "SVR_Phase98SJ_Lobby_Ads_Portals_Alignment_Lock";
+const PATCH_NAME = "SVR_Phase98SK_Duplicate_Portal_Cleanup_Wall_Fit";
 
 const HUBS = [
-  { key:"reiki", title:"REIKI HUB", sub:"hologram showroom", x:20.35, z:-5.15, color:"#7fffd4" },
-  { key:"pga", title:"PGA TRAINING", sub:"drive • chip • putt", x:0, z:-9.25, color:"#69e8ff" },
-  { key:"store", title:"SVR STORE", sub:"gear • cards • merch", x:-8.65, z:-8.05, color:"#ffd36b" },
-  { key:"smoker", title:"SMOKER LOUNGE", sub:"private social room", x:5.6, z:-9.15, color:"#ff8bd7" },
-  { key:"scorpion", title:"SCORPION ROOM", sub:"playable poker", x:12.78, z:15.75, color:"#b48cff", yaw:THREE.MathUtils.degToRad(51.78) }
+  { key:"reiki", title:"REIKI HUB", sub:"hologram showroom", x:20.35, z:-5.15, color:"#7fffd4", wallW:4.9, yaw:THREE.MathUtils.degToRad(90) },
+  { key:"pga", title:"PGA TRAINING", sub:"drive • chip • putt", x:0, z:-9.25, color:"#69e8ff", wallW:4.9, yaw:0 },
+  { key:"store", title:"SVR STORE", sub:"gear • cards • merch", x:-8.65, z:-8.05, color:"#ffd36b", wallW:4.9, yaw:THREE.MathUtils.degToRad(-28) },
+  { key:"smoker", title:"SMOKER LOUNGE", sub:"private social room", x:5.6, z:-9.15, color:"#ff8bd7", wallW:4.9, yaw:THREE.MathUtils.degToRad(18) },
+  { key:"scorpion", title:"SCORPION ROOM", sub:"playable poker", x:12.78, z:15.75, color:"#b48cff", wallW:4.9, yaw:THREE.MathUtils.degToRad(51.78) }
 ];
 
 function makeCanvasTexture(w, h, painter) {
@@ -25,8 +25,8 @@ function makeCanvasTexture(w, h, painter) {
 
 function drawFrame(ctx, w, h, color) {
   const g = ctx.createLinearGradient(0, 0, w, h);
-  g.addColorStop(0, "rgba(4,9,20,.96)");
-  g.addColorStop(1, "rgba(22,6,28,.96)");
+  g.addColorStop(0, "rgba(4,9,20,.97)");
+  g.addColorStop(1, "rgba(22,6,28,.97)");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, w, h);
   ctx.strokeStyle = color;
@@ -92,50 +92,99 @@ function boardTexture() {
   });
 }
 
+function worldPositionOf(object) {
+  const p = new THREE.Vector3();
+  object.getWorldPosition(p);
+  return p;
+}
+
+function suppressOldPortalClutter(scene) {
+  const protectedPrefixes = ["SVR_Phase98", "SVR_Hero_Moon", "SVR_Hero_Mars"];
+  scene.traverse((object) => {
+    if (!object.isMesh || !object.visible) return;
+    const name = String(object.name || "");
+    if (protectedPrefixes.some(prefix => name.startsWith(prefix))) return;
+    const p = worldPositionOf(object);
+    for (const hub of HUBS) {
+      const d = Math.hypot(p.x - hub.x, p.z - hub.z);
+      const nearFloorPortal = d < 1.85 && p.y < 1.2;
+      const nearOldSign = d < 2.45 && p.y > 1.1 && p.y < 3.8;
+      const isLikelyOldPortal = /portal|ring|glow|label|logo/i.test(name) || object.geometry?.type === "RingGeometry" || object.geometry?.type === "CircleGeometry";
+      if ((nearFloorPortal || nearOldSign) && isLikelyOldPortal) {
+        object.visible = false;
+      }
+    }
+  });
+}
+
 function addWallStorefront(root, hub) {
   const g = new THREE.Group();
-  g.name = `SVR_${hub.key}_Portal_Storefront_Attached`;
+  g.name = `SVR_Phase98SK_${hub.key}_Storefront_WallFit`;
   g.position.set(hub.x, 0, hub.z);
-  if (hub.yaw !== undefined) g.rotation.y = hub.yaw;
-  else g.lookAt(0, 0, 0);
+  g.rotation.y = hub.yaw ?? 0;
   root.add(g);
 
-  const frame = new THREE.Mesh(
-    new THREE.BoxGeometry(4.2, 3.3, 0.22),
-    new THREE.MeshStandardMaterial({ color: 0x070b12, roughness: 0.68, metalness: 0.18, emissive: 0x071020, emissiveIntensity: 0.26 })
+  const shell = new THREE.Mesh(
+    new THREE.BoxGeometry(hub.wallW, 3.75, 0.34),
+    new THREE.MeshStandardMaterial({ color: 0x060a11, roughness: 0.72, metalness: 0.20, emissive: 0x071020, emissiveIntensity: 0.28 })
   );
-  frame.position.set(0, 1.68, -0.04);
-  g.add(frame);
+  shell.position.set(0, 1.88, -0.18);
+  shell.name = `SVR_Phase98SK_${hub.key}_Attached_Backwall`;
+  g.add(shell);
+
+  const sideL = new THREE.Mesh(
+    new THREE.BoxGeometry(0.18, 3.45, 1.22),
+    new THREE.MeshStandardMaterial({ color: 0x090f18, roughness: 0.68, metalness: 0.16, emissive: 0x071020, emissiveIntensity: 0.18 })
+  );
+  sideL.position.set(-(hub.wallW * 0.5) + 0.09, 1.72, 0.38);
+  sideL.name = `SVR_Phase98SK_${hub.key}_Left_ReturnWall`;
+  g.add(sideL);
+  const sideR = sideL.clone();
+  sideR.position.x = (hub.wallW * 0.5) - 0.09;
+  sideR.name = `SVR_Phase98SK_${hub.key}_Right_ReturnWall`;
+  g.add(sideR);
+
+  const canopy = new THREE.Mesh(
+    new THREE.BoxGeometry(hub.wallW + 0.28, 0.18, 1.42),
+    new THREE.MeshStandardMaterial({ color: new THREE.Color(hub.color), roughness: 0.18, metalness: 0.50, emissive: new THREE.Color(hub.color), emissiveIntensity: 0.45 })
+  );
+  canopy.position.set(0, 3.74, 0.30);
+  canopy.name = `SVR_Phase98SK_${hub.key}_CanopyTrim`;
+  g.add(canopy);
 
   const sign = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.85, 1.42),
+    new THREE.PlaneGeometry(4.15, 1.30),
     new THREE.MeshBasicMaterial({ map: signTexture(hub.title, hub.sub, hub.color), transparent: true, side: THREE.DoubleSide, depthWrite: false })
   );
-  sign.position.set(0, 2.78, 0.09);
+  sign.position.set(0, 2.82, 0.02);
+  sign.name = `SVR_Phase98SK_${hub.key}_CleanSign`;
   g.add(sign);
 
   const portal = new THREE.Mesh(
-    new THREE.RingGeometry(0.72, 1.04, 80),
-    new THREE.MeshBasicMaterial({ color: new THREE.Color(hub.color), transparent: true, opacity: 0.70, side: THREE.DoubleSide, depthWrite: false })
+    new THREE.RingGeometry(0.64, 0.94, 80),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color(hub.color), transparent: true, opacity: 0.76, side: THREE.DoubleSide, depthWrite: false })
   );
   portal.rotation.x = -Math.PI / 2;
-  portal.position.set(0, 0.05, 1.05);
+  portal.position.set(0, 0.052, 0.58);
+  portal.name = `SVR_Phase98SK_${hub.key}_PortalRing_InStorefront`;
   g.add(portal);
 
   const glow = new THREE.Mesh(
-    new THREE.CircleGeometry(1.02, 80),
-    new THREE.MeshBasicMaterial({ color: new THREE.Color(hub.color), transparent: true, opacity: 0.13, side: THREE.DoubleSide, depthWrite: false })
+    new THREE.CircleGeometry(0.96, 80),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color(hub.color), transparent: true, opacity: 0.12, side: THREE.DoubleSide, depthWrite: false })
   );
   glow.rotation.x = -Math.PI / 2;
-  glow.position.set(0, 0.04, 1.05);
+  glow.position.set(0, 0.045, 0.58);
+  glow.name = `SVR_Phase98SK_${hub.key}_PortalGlow_InStorefront`;
   g.add(glow);
 
-  const trim = new THREE.Mesh(
-    new THREE.BoxGeometry(4.45, 0.10, 0.16),
-    new THREE.MeshStandardMaterial({ color: new THREE.Color(hub.color), roughness: 0.22, metalness: 0.55, emissive: new THREE.Color(hub.color), emissiveIntensity: 0.55 })
+  const foot = new THREE.Mesh(
+    new THREE.BoxGeometry(hub.wallW + 0.12, 0.10, 1.42),
+    new THREE.MeshStandardMaterial({ color: 0x090b12, roughness: 0.82, metalness: 0.08, emissive: 0x080912, emissiveIntensity: 0.10 })
   );
-  trim.position.set(0, 3.38, 0.04);
-  g.add(trim);
+  foot.position.set(0, 0.05, 0.30);
+  foot.name = `SVR_Phase98SK_${hub.key}_BaseFoot`;
+  g.add(foot);
 
   return g;
 }
@@ -147,7 +196,7 @@ function addLobbyAd(root, title, sub, pos, rotY, w = 7.0, h = 3.1, accent = "#ff
   );
   mesh.position.copy(pos);
   mesh.rotation.y = rotY;
-  mesh.name = `SVR_Ad_${title.replace(/\s+/g, "_")}`;
+  mesh.name = `SVR_Phase98SK_Ad_${title.replace(/\s+/g, "_")}`;
   root.add(mesh);
   return mesh;
 }
@@ -159,7 +208,7 @@ function addBoards(root) {
   );
   board.position.set(0, 4.0, 10.6);
   board.rotation.y = Math.PI;
-  board.name = "SVR_Lobby_Leaderboard_Board";
+  board.name = "SVR_Phase98SK_Lobby_Leaderboard_Board";
   root.add(board);
 
   addLobbyAd(root, "SVR POKER", "WELCOME TO STRATA VR POKER", new THREE.Vector3(0, 7.2, -12.6), 0, 9.4, 3.3, "#b48cff");
@@ -169,6 +218,10 @@ function addBoards(root) {
 
 export function installLobbyAdsPortalsPatch({ scene }) {
   if (!scene || scene.getObjectByName(PATCH_NAME)) return false;
+  suppressOldPortalClutter(scene);
+  const old = scene.getObjectByName("SVR_Phase98SJ_Lobby_Ads_Portals_Alignment_Lock");
+  if (old) old.visible = false;
+
   const root = new THREE.Group();
   root.name = PATCH_NAME;
   scene.add(root);
@@ -177,8 +230,10 @@ export function installLobbyAdsPortalsPatch({ scene }) {
   addBoards(root);
 
   window.SVR_LOBBY_ADS_PORTALS_PATCH = {
-    phase: "98S-J",
+    phase: "98S-K",
     installed: true,
+    oldOverlayHidden: Boolean(old),
+    duplicateSuppression: true,
     hubs: HUBS.map(h => h.key),
     ads: ["SVR Poker welcome", "All In", "Espresso With Cream"],
     leaderboard: true,
