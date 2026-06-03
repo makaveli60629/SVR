@@ -1,13 +1,13 @@
-# Phase 42 — Example Wellness Placeholder L.A. building ad update
+# Phase 42 — Trueitive L.A. building ad update
 
 ## Changes
-- Updated the Example Wellness Placeholder building ad artwork to include:
-  - `AWAITING APPROVAL.COM / L.A.`
+- Updated the Trueitive building ad artwork to include:
+  - `TRUEITIVE.COM / L.A.`
   - green neon presentation styling
   - founder-led wellness positioning
 - Replaced both:
-  - `assets/ui/approval-placeholder-video.jpg`
-  - `assets/ui/approval-placeholder-panel.jpg`
+  - `assets/ui/trueitive-instagram-ad.jpg`
+  - `assets/ui/trueitive-zen-ad.jpg`
 - Kept the current scene, teleport, Meta hands, and skyline baseline unchanged.
 
 ## Purpose

@@ -1,0 +1,15 @@
+{
+  "phase": "PHASE-96-ROOMS-PORTAL-ROUTING-LOCK",
+  "lobbyRule": "storefront portals only",
+  "privateRoutes": {
+    "reikiRoom": "game/reiki.html",
+    "pgaDrive": "game/pga-drive.html",
+    "pgaChipPutt": "game/chip-putt.html",
+    "store": "game/store-room.html",
+    "smoker": "game/smoker-lounge.html",
+    "scorpion": "game/scorpion.html"
+  },
+  "storePortalUrl": "https://svrpoker.com/site/store.html",
+  "siteTouched": false,
+  "approvalLock": "No unapproved Reiki sponsor/founder branding in runtime"
+}

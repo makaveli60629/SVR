@@ -1,12 +1,6 @@
 {
-  "build": "RIKI-UPDATE-PHASE-92-MODULE-PREP",
-  "milestone": "Riki Update \u2014 Phase 92",
-  "nextMilestone": "Riki Update \u2014 Phase 93",
+  "build": "PHASE-96-ROOMS-PORTAL-ROUTING-LOCK",
+  "scope": "game-side-only",
   "siteTouched": false,
-  "approvalLabel": "Awaiting approval by Shyann Royston",
-  "safeDefaults": {
-    "bookingEnabled": false,
-    "storePurchaseEnabled": false,
-    "diagnosticsProductionVisible": false
-  }
+  "storePortalUrl": "https://svrpoker.com/site/store.html"
 }

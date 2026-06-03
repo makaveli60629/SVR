@@ -34,10 +34,6 @@ export function createCore({ containerId = "app" } = {}){
   vrButton.classList.add("svr-vr-button");
   document.body.appendChild(vrButton);
 
-  window.SVR_SCENE = scene;
-  window.SVR_CAMERA = camera;
-  window.SVR_RENDERER = renderer;
-
   window.addEventListener("resize", ()=>{
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();

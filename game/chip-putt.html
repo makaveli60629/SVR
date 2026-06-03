@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>PGA Chip + Putt</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#02030a;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}#app{position:fixed;inset:0}.hud{position:fixed;left:14px;right:14px;top:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;z-index:5;pointer-events:none}.pill,.btn{border:1px solid rgba(185,140,255,.45);background:rgba(0,0,0,.62);border-radius:999px;padding:9px 13px;box-shadow:0 10px 28px rgba(0,0,0,.35);backdrop-filter:blur(8px)}.pill{pointer-events:none}.btn{color:#fff;cursor:pointer;pointer-events:auto}.roomTitle{font-weight:800}.sub{opacity:.82;font-size:12px}.storeFrame{position:fixed;right:18px;bottom:18px;width:min(46vw,620px);height:min(58vh,560px);border:1px solid rgba(125,255,199,.45);border-radius:18px;z-index:4;background:#000;box-shadow:0 20px 80px rgba(0,0,0,.55)}@media(max-width:780px){.storeFrame{left:12px;right:12px;width:auto;height:42vh}.hud{flex-direction:column;align-items:flex-start}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud"><div class="pill"><div class="roomTitle" id="roomTitle">PGA Chip + Putt</div><div class="sub" id="roomSubtitle">Private short-game room • chip and putt practice</div><div class="sub" id="portalUrl"></div></div><div style="display:flex;gap:8px"><button class="btn" id="backLobby">Return Lobby</button><button class="btn" id="enterVr">Enter VR</button></div></div>
+<script type="module">
+import { bootPrivateScene } from './modules/private_scene_common.js';
+bootPrivateScene({ title: 'PGA Chip + Putt', subtitle: 'Private short-game room • chip and putt practice', kind: 'chip', accent: 0xffd166, store: false });
+</script>
+</body>
+</html>

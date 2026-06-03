@@ -1,6 +1,6 @@
 ﻿{
-  "build": "RIKI-UPDATE-PHASE-92-MODULE-PREP",
-  "milestone": "Riki Update Phase 92",
-  "gameZip": "update/game.zip",
-  "siteTouched": false
+    "scope":  "game-side-only",
+    "storePortalUrl":  "https://svrpoker.com/site/store.html",
+    "build":  "PHASE-96-ROOMS-PORTAL-ROUTING-LOCK",
+    "siteTouched":  false
 }
