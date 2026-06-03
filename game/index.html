@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR Poker - Phase 98S-W Room Portal Enablement Lock</title>
+  <title>SVR Poker - Phase 98S-X Lobby Hub Restore</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -37,6 +37,10 @@
     (function(){
       const p = new URLSearchParams(location.search);
       if (p.has('present') || p.has('presentation')) document.body.classList.add('presentation-safe');
+      window.SVR_MUSIC_OFF_DEFAULT = true;
+      window.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('audio,video').forEach(function(el){ try { el.muted = true; el.volume = 0; } catch(e){} });
+      }, { once:true });
     })();
   </script>
   <div id="app"></div>
@@ -48,7 +52,7 @@
       <button class="btn" id="copyPosition" title="Copy current placement line">Copy Pos</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: ...</span>
-      <span class="pill">BUILD: PHASE-98S-W-ROOM-PORTAL-ENABLEMENT-LOCK</span>
+      <span class="pill">BUILD: PHASE-98S-X-LOBBY-HUB-RESTORE-MUSIC-OFF</span>
     </div>
   </div>
   <div id="sceneNav">
@@ -73,5 +77,6 @@
   <script type="module" src="./modules/moon_mars_finish_patch.js"></script>
   <script type="module" src="./modules/android_controls_lock.js"></script>
   <script type="module" src="./modules/room_portal_routes_lock.js"></script>
+  <script type="module" src="./modules/lobby_hub_restore_safe.js"></script>
 </body>
 </html>
