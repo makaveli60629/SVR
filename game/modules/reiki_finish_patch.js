@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const PATCH_NAME = "SVR_Phase98SG_Reiki_Audio_Containment_Patch";
+const PATCH_NAME = "SVR_Phase98SO_Reiki_Minimal_Presentation_Polish";
 const REIKI_COLOR = 0x7fffd4;
 const RED_CARPET = 0x7b1024;
 const SILVER = 0xd8dee8;
@@ -11,7 +11,7 @@ function makeLabelTexture(title, subtitle = "", color = "#7fffd4") {
   canvas.height = 384;
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "rgba(0,0,0,.72)";
+  ctx.fillStyle = "rgba(0,0,0,.78)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.strokeStyle = color;
   ctx.lineWidth = 8;
@@ -19,15 +19,15 @@ function makeLabelTexture(title, subtitle = "", color = "#7fffd4") {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.shadowColor = color;
-  ctx.shadowBlur = 14;
+  ctx.shadowBlur = 12;
   ctx.fillStyle = "#ffffff";
-  ctx.font = "900 58px Arial";
+  ctx.font = "900 56px Arial";
   ctx.fillText(String(title).toUpperCase(), 512, 145);
   if (subtitle) {
-    ctx.shadowBlur = 6;
+    ctx.shadowBlur = 5;
     ctx.fillStyle = color;
-    ctx.font = "800 30px Arial";
-    ctx.fillText(String(subtitle).toUpperCase(), 512, 240);
+    ctx.font = "800 28px Arial";
+    ctx.fillText(String(subtitle).toUpperCase(), 512, 238);
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -38,7 +38,7 @@ function makeLabelTexture(title, subtitle = "", color = "#7fffd4") {
 
 function addLabel(root) {
   const label = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.65, 0.82),
+    new THREE.PlaneGeometry(3.15, 0.68),
     new THREE.MeshBasicMaterial({
       map: makeLabelTexture("AWAITING APPROVAL", "Reiki hologram"),
       transparent: true,
@@ -46,74 +46,70 @@ function addLabel(root) {
       depthWrite: false
     })
   );
-  label.position.set(20.35, 0.70, -6.86);
+  label.position.set(20.35, 0.82, -6.76);
   label.rotation.y = 0;
-  label.name = "SVR_Reiki_Clean_Hologram_Label";
+  label.name = "SVR_Reiki_Minimal_Approval_Label";
   root.add(label);
 }
 
 function addCarpet(root) {
   const carpet = new THREE.Mesh(
-    new THREE.PlaneGeometry(12.9, 2.78),
-    new THREE.MeshBasicMaterial({ color: RED_CARPET, transparent: true, opacity: 0.72, side: THREE.DoubleSide, depthWrite: false })
+    new THREE.PlaneGeometry(6.2, 1.62),
+    new THREE.MeshBasicMaterial({ color: RED_CARPET, transparent: true, opacity: 0.58, side: THREE.DoubleSide, depthWrite: false })
   );
   carpet.rotation.x = -Math.PI / 2;
-  carpet.position.set(20.0, 0.061, -4.94);
-  carpet.name = "SVR_Reiki_Red_Carpet_Final_Overlay";
+  carpet.position.set(20.35, 0.064, -5.03);
+  carpet.name = "SVR_Reiki_Minimal_Red_Carpet";
   root.add(carpet);
 }
 
-function addSilverRope(root, x1, z1, x2, z2) {
+function addSilverPost(root, x, z) {
+  const pole = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.046, 0.046, 0.88, 18),
+    new THREE.MeshStandardMaterial({ color: SILVER, metalness: 0.9, roughness: 0.16 })
+  );
+  pole.position.set(x, 0.44, z);
+  pole.name = "SVR_Reiki_Minimal_Silver_Post";
+  root.add(pole);
+  const cap = new THREE.Mesh(
+    new THREE.SphereGeometry(0.105, 18, 12),
+    new THREE.MeshStandardMaterial({ color: 0xf6f8ff, metalness: 0.95, roughness: 0.1 })
+  );
+  cap.position.set(x, 0.91, z);
+  cap.name = "SVR_Reiki_Minimal_Silver_Post_Cap";
+  root.add(cap);
+}
+
+function addRope(root, x1, z1, x2, z2) {
   const dx = x2 - x1;
   const dz = z2 - z1;
   const len = Math.hypot(dx, dz);
   const rope = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.035, 0.035, len, 18),
+    new THREE.CylinderGeometry(0.026, 0.026, len, 16),
     new THREE.MeshBasicMaterial({ color: 0x9b1025 })
   );
-  rope.position.set((x1 + x2) / 2, 0.86, (z1 + z2) / 2);
+  rope.position.set((x1 + x2) / 2, 0.76, (z1 + z2) / 2);
   rope.rotation.z = Math.PI / 2;
   rope.rotation.y = Math.atan2(dx, dz);
-  rope.name = "SVR_Reiki_Final_Red_Rope";
+  rope.name = "SVR_Reiki_Minimal_Red_Rope";
   root.add(rope);
-
-  for (const [x, z] of [[x1, z1], [x2, z2]]) {
-    const pole = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.058, 0.058, 1.08, 20),
-      new THREE.MeshStandardMaterial({ color: SILVER, metalness: 0.92, roughness: 0.14 })
-    );
-    pole.position.set(x, 0.54, z);
-    pole.name = "SVR_Reiki_Final_Silver_Post";
-    root.add(pole);
-    const cap = new THREE.Mesh(
-      new THREE.SphereGeometry(0.125, 20, 14),
-      new THREE.MeshStandardMaterial({ color: 0xf6f8ff, metalness: 0.95, roughness: 0.1 })
-    );
-    cap.position.set(x, 1.10, z);
-    cap.name = "SVR_Reiki_Final_Silver_Post_Cap";
-    root.add(cap);
-  }
 }
 
 function addRails(root) {
-  addSilverRope(root, 13.8, -2.04, 17.9, -2.04);
-  addSilverRope(root, 21.8, -2.04, 25.9, -2.04);
-  addSilverRope(root, 13.8, -2.95, 13.8, -7.05);
-  addSilverRope(root, 25.9, -2.95, 25.9, -7.05);
+  const leftA = [17.5, -3.92], leftB = [17.5, -6.28];
+  const rightA = [23.2, -3.92], rightB = [23.2, -6.28];
+  [leftA, leftB, rightA, rightB].forEach(([x,z]) => addSilverPost(root, x, z));
+  addRope(root, leftA[0], leftA[1], leftB[0], leftB[1]);
+  addRope(root, rightA[0], rightA[1], rightB[0], rightB[1]);
 }
 
 function addGlassHint(root) {
-  const glassMat = new THREE.MeshBasicMaterial({ color: REIKI_COLOR, transparent: true, opacity: 0.095, side: THREE.DoubleSide, depthWrite: false });
-  const left = new THREE.Mesh(new THREE.PlaneGeometry(4.95, 3.1), glassMat);
-  left.position.set(13.0, 1.72, -4.85);
-  left.rotation.y = Math.PI / 2;
-  left.name = "SVR_Reiki_Final_Left_Glass";
-  root.add(left);
-  const right = new THREE.Mesh(new THREE.PlaneGeometry(4.95, 3.1), glassMat);
-  right.position.set(26.75, 1.72, -4.85);
-  right.rotation.y = -Math.PI / 2;
-  right.name = "SVR_Reiki_Final_Right_Glass";
-  root.add(right);
+  const glassMat = new THREE.MeshBasicMaterial({ color: REIKI_COLOR, transparent: true, opacity: 0.055, side: THREE.DoubleSide, depthWrite: false });
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 2.55), glassMat);
+  back.position.set(20.35, 1.72, -7.16);
+  back.rotation.y = 0;
+  back.name = "SVR_Reiki_Minimal_Back_Glass_Hint";
+  root.add(back);
 }
 
 function worldPositionOf(object) {
@@ -131,7 +127,7 @@ function findExistingVideo(scene) {
     const isVideo = image && typeof image.play === "function" && typeof image.pause === "function";
     if (!isVideo) return;
     const p = worldPositionOf(object);
-    if (Math.abs(p.x - 20.35) < 4.5 && Math.abs(p.z + 7.05) < 2.2) {
+    if (Math.abs(p.x - 20.35) < 4.8 && Math.abs(p.z + 7.05) < 2.4) {
       found = { mesh: object, texture: map, video: image, parent: object.parent };
     }
   });
@@ -143,10 +139,13 @@ function hideOldHologramPieces(scene, videoParent) {
     for (const child of videoParent.children) child.visible = false;
   }
   scene.traverse((object) => {
-    if (!object.isMesh || object.name?.startsWith("SVR_Reiki_Clean")) return;
+    if (!object.isMesh) return;
+    const name = String(object.name || "");
+    if (name.startsWith("SVR_Reiki_Minimal") || name.startsWith("SVR_Phase98SO")) return;
     const p = worldPositionOf(object);
-    const nearOldLabel = Math.abs(p.x - 20.35) < 2.5 && Math.abs(p.y - 0.68) < 0.45 && Math.abs(p.z + 6.92) < 0.7;
-    if (nearOldLabel) object.visible = false;
+    const nearOldPatch = Math.abs(p.x - 20.35) < 7.2 && Math.abs(p.z + 5.2) < 3.8 && /Reiki|Riki|Hologram|Rope|Carpet|Glass|Approval/i.test(name);
+    const nearOldLabel = Math.abs(p.x - 20.35) < 2.5 && Math.abs(p.y - 0.68) < 0.55 && Math.abs(p.z + 6.92) < 0.9;
+    if (nearOldPatch || nearOldLabel) object.visible = false;
   });
 }
 
@@ -156,7 +155,7 @@ function addCleanHologram(scene, videoTexture) {
   scene.add(root);
 
   const screen = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.9, 2.18),
+    new THREE.PlaneGeometry(3.25, 1.86),
     new THREE.MeshBasicMaterial({
       map: videoTexture,
       side: THREE.DoubleSide,
@@ -166,21 +165,21 @@ function addCleanHologram(scene, videoTexture) {
       depthWrite: false
     })
   );
-  screen.position.set(20.35, 1.88, -7.04);
+  screen.position.set(20.35, 1.86, -7.02);
   screen.rotation.y = 0;
-  screen.name = "SVR_Reiki_Clean_Single_Hologram";
+  screen.name = "SVR_Reiki_Minimal_Single_Hologram";
   root.add(screen);
 
-  const edgeMat = new THREE.LineBasicMaterial({ color: REIKI_COLOR, transparent: true, opacity: 0.82 });
-  const edge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(4.0, 2.26)), edgeMat);
+  const edgeMat = new THREE.LineBasicMaterial({ color: REIKI_COLOR, transparent: true, opacity: 0.72 });
+  const edge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(3.34, 1.95)), edgeMat);
   edge.position.copy(screen.position);
   edge.rotation.copy(screen.rotation);
-  edge.name = "SVR_Reiki_Clean_Hologram_Edge";
+  edge.name = "SVR_Reiki_Minimal_Hologram_Edge";
   root.add(edge);
 
-  const glow = new THREE.PointLight(REIKI_COLOR, 0.22, 4.5, 2.0);
-  glow.position.set(20.35, 1.8, -6.36);
-  glow.name = "SVR_Reiki_Clean_Soft_Light";
+  const glow = new THREE.PointLight(REIKI_COLOR, 0.13, 3.2, 2.0);
+  glow.position.set(20.35, 1.8, -6.48);
+  glow.name = "SVR_Reiki_Minimal_Soft_Light";
   root.add(glow);
 
   addLabel(root);
@@ -193,8 +192,6 @@ function addCleanHologram(scene, videoTexture) {
 function primeVideoWithoutGlobalAudio(video) {
   const unlock = () => {
     try {
-      // Keep the hologram visually active but never globally audible from spawn.
-      // The original lobby_visibility_lock proximity zone remains the only audio controller.
       video.muted = true;
       video.volume = 0;
       video.play?.().catch?.(() => {});
@@ -207,17 +204,19 @@ function primeVideoWithoutGlobalAudio(video) {
 
 export function installReikiFinishPatch({ scene }) {
   if (!scene || scene.getObjectByName(PATCH_NAME)) return false;
+  const oldG = scene.getObjectByName("SVR_Phase98SG_Reiki_Audio_Containment_Patch");
+  if (oldG) oldG.visible = false;
   const existing = findExistingVideo(scene);
   if (!existing?.texture) return false;
   hideOldHologramPieces(scene, existing.parent);
   addCleanHologram(scene, existing.texture);
   if (existing.video) primeVideoWithoutGlobalAudio(existing.video);
   window.SVR_REIKI_FINISH_PATCH = {
-    phase: "98S-G",
+    phase: "98S-O",
     status: "installed",
-    hologram: "single-flat-inward-facing",
-    backgroundPanelRemoved: true,
-    uShapeRemoved: true,
+    hologram: "minimal-single-flat-inward-facing",
+    presentationSafe: true,
+    broadOverlayReduced: true,
     globalSpawnAudioBlocked: true,
     proximityAudioControllerPreserved: true
   };
