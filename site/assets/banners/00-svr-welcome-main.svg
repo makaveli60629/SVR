@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="720" viewBox="0 0 1600 720" role="img" aria-labelledby="title desc">
+  <title id="title">SVR Poker Welcome Banner</title>
+  <desc id="desc">Welcome banner for Strata VR Poker using the main SVR Poker logo and premium neon branding.</desc>
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="45%" r="70%">
+      <stop offset="0" stop-color="#2f1256" stop-opacity="1"/>
+      <stop offset="0.42" stop-color="#070916" stop-opacity="1"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="1"/>
+    </radialGradient>
+    <linearGradient id="edge" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#7fffd4"/>
+      <stop offset="0.48" stop-color="#b48cff"/>
+      <stop offset="1" stop-color="#69e8ff"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1600" height="720" fill="url(#bgGlow)"/>
+  <g opacity="0.22">
+    <path d="M0 120 H1600 M0 240 H1600 M0 360 H1600 M0 480 H1600 M0 600 H1600" stroke="#69e8ff" stroke-width="1"/>
+    <path d="M160 0 V720 M320 0 V720 M480 0 V720 M640 0 V720 M800 0 V720 M960 0 V720 M1120 0 V720 M1280 0 V720 M1440 0 V720" stroke="#b48cff" stroke-width="1"/>
+  </g>
+  <rect x="42" y="42" width="1516" height="636" rx="42" fill="rgba(0,0,0,0.42)" stroke="url(#edge)" stroke-width="8"/>
+  <rect x="78" y="78" width="1444" height="564" rx="32" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="3"/>
+  <circle cx="314" cy="360" r="164" fill="rgba(127,255,212,0.09)" stroke="url(#edge)" stroke-width="8" filter="url(#glow)"/>
+  <image href="../../../logo.webp" x="188" y="234" width="252" height="252" preserveAspectRatio="xMidYMid meet"/>
+  <text x="890" y="254" text-anchor="middle" font-family="Orbitron, Audiowide, Arial, sans-serif" font-size="104" font-weight="900" fill="#ffffff" filter="url(#glow)">SVR POKER</text>
+  <text x="890" y="348" text-anchor="middle" font-family="Orbitron, Arial, sans-serif" font-size="54" font-weight="800" fill="#7fffd4">WELCOME TO STRATA VR POKER</text>
+  <text x="890" y="426" text-anchor="middle" font-family="Rajdhani, Arial, sans-serif" font-size="36" font-weight="700" fill="#dfeaff">Premium social VR poker • sponsor hubs • tournaments • community impact</text>
+  <g font-family="Rajdhani, Arial, sans-serif" font-size="30" font-weight="800" text-anchor="middle">
+    <rect x="600" y="500" width="230" height="58" rx="29" fill="rgba(127,255,212,0.13)" stroke="#7fffd4" stroke-width="3"/>
+    <text x="715" y="538" fill="#eafff4">PREVIEW SITE</text>
+    <rect x="870" y="500" width="230" height="58" rx="29" fill="rgba(180,140,255,0.13)" stroke="#b48cff" stroke-width="3"/>
+    <text x="985" y="538" fill="#f4ecff">PREVIEW GAME</text>
+    <rect x="1140" y="500" width="230" height="58" rx="29" fill="rgba(105,232,255,0.13)" stroke="#69e8ff" stroke-width="3"/>
+    <text x="1255" y="538" fill="#e9fbff">JOIN SVR</text>
+  </g>
+</svg>
