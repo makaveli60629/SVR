@@ -72,15 +72,24 @@ const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: ren
 setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
+const BUILD_LABEL = "PHASE-96-ROOMS-PORTAL-ROUTING-LOCK";
+const PRIVATE_ROUTES = {
+  reikiRoom: "./reiki.html",
+  pgaDrive: "./pga-drive.html",
+  pgaChipPutt: "./chip-putt.html",
+  store: "./store-room.html",
+  smoker: "./smoker-lounge.html",
+  scorpion: "./scorpion.html"
+};
+window.SVR_BUILD_LABEL = BUILD_LABEL;
+window.SVR_PRIVATE_ROUTES = PRIVATE_ROUTES;
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
 const audio = createAudioPlaylist({
   tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" },
-    { title: "Reiki Time Hub", url: "./assets/audio/reiki_time_hub.mp3" },
-    { title: "SVR After Dark", url: "./assets/audio/svr_after_dark.mp3" }
+    { title: "Lobby 07", url: "./assets/audio/07.mp3" }
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
@@ -169,6 +178,11 @@ function movePlayerToSpot(target, lookTarget = null){
 }
 
 function gotoScene(key){
+  if (PRIVATE_ROUTES[key]){
+    setStatus(`Opening private room: ${key}`, { force: true });
+    location.href = PRIVATE_ROUTES[key];
+    return true;
+  }
   const rec = sceneTargets?.[key];
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
@@ -191,14 +205,15 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "KeyL") leaveTable();
   if (e.code === "KeyT") tp.toggleMode();
   if (e.code === "Digit1") gotoScene("lobby");
-  if (e.code === "Digit2") gotoScene("table");
-  if (e.code === "Digit3") gotoScene("seat");
-  if (e.code === "Digit4") gotoScene("reiki");
+  if (e.code === "Digit2") gotoScene("seat");
+  if (e.code === "Digit3") gotoScene("reiki");
+  if (e.code === "Digit4") gotoScene("reikiRoom");
   if (e.code === "Digit5") gotoScene("pga");
-  if (e.code === "Digit6") gotoScene("legends");
-  if (e.code === "Digit7") gotoScene("sponsor");
-  if (e.code === "Digit8") gotoScene("scorpion");
-  if (e.code === "Digit9") gotoScene("reikiRoom");
+  if (e.code === "Digit6") gotoScene("pgaDrive");
+  if (e.code === "Digit7") gotoScene("pgaChipPutt");
+  if (e.code === "Digit8") gotoScene("store");
+  if (e.code === "Digit9") gotoScene("smoker");
+  if (e.code === "Digit0") gotoScene("scorpion");
 });
 
 const watch = createWristWatch({
@@ -224,11 +239,15 @@ const watch = createWristWatch({
     goTable: ()=>gotoScene("table"),
     goSeat: ()=>gotoScene("seat"),
     goReiki: ()=>gotoScene("reiki"),
+    goReikiRoom: ()=>gotoScene("reikiRoom"),
     goPga: ()=>gotoScene("pga"),
+    goPgaDrive: ()=>gotoScene("pgaDrive"),
+    goPgaChipPutt: ()=>gotoScene("pgaChipPutt"),
+    goStore: ()=>gotoScene("store"),
+    goSmoker: ()=>gotoScene("smoker"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
-    goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom")
+    goScorpion: ()=>gotoScene("scorpion")
   }
 });
 
@@ -241,7 +260,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Rooms and storefront routes locked. Lobby storefronts stay in-lobby; Reiki/PGA/Store/Smoker/Scorpion open as private rooms.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

@@ -148,16 +148,20 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
 function buildButtons(state){
   const buttons = [
     { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'tableScene', label: 'TABLE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'seatScene', label: 'SEAT', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'storeScene', label: 'STORE', x: 284, y: 146, w: 118, h: 42, font: 21, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'legendScene', label: 'LEGEND', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'reikiRoomScene', label: 'ROOM', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pgaScene', label: 'PGA', x: 284, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
 
-    { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'reikiRoomScene', label: 'REIKI ROOM', x: 284, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pgaDriveScene', label: 'DRIVE', x: 24, y: 250, w: 118, h: 42, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'pgaChipPuttScene', label: 'CHIP', x: 154, y: 250, w: 118, h: 42, font: 21, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'scorpionScene', label: 'SCORPION', x: 284, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
+
+    { id: 'smokerScene', label: 'SMOKER', x: 24, y: 302, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'sponsorScene', label: 'SPONSOR', x: 154, y: 302, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
+    { id: 'legendScene', label: 'LEGEND', x: 284, y: 302, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
 
     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
     { id: 'next', label: 'NEXT TRACK', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
@@ -228,7 +232,7 @@ let hoveredId = null;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
     ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • Reiki / PGA / Sponsor / Scorpion • pinch with other hand • fist by face toggles TP', 36, 332);
+    ctx.fillText('Storefronts + private rooms • Reiki / PGA / Store / Smoker / Scorpion • hold to aim TP, release to jump', 36, 332);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -267,11 +271,14 @@ let hoveredId = null;
     if (id === 'leave') actions.leaveTable?.();
     if (id === 'teleport') actions.toggleTeleport?.();
     if (id === 'lobby') actions.goLobby?.();
-    if (id === 'tableScene') actions.goTable?.();
     if (id === 'seatScene') actions.goSeat?.();
     if (id === 'reikiScene') actions.goReiki?.();
     if (id === 'pgaScene') actions.goPga?.();
+    if (id === 'pgaDriveScene') actions.goPgaDrive?.();
+    if (id === 'pgaChipPuttScene') actions.goPgaChipPutt?.();
     if (id === 'legendScene') actions.goLegend?.();
+    if (id === 'storeScene') actions.goStore?.();
+    if (id === 'smokerScene') actions.goSmoker?.();
     if (id === 'sponsorScene') actions.goSponsor?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
     if (id === 'reikiRoomScene') actions.goReikiRoom?.();
