@@ -1,8 +1,7 @@
 ﻿{
-    "scope":  "game-only",
-    "build":  "PHASE-100-3.0-STOREFRONT-AI-LOCK",
+    "phase":  "Update 3.0 / Phase 100",
+    "updatedAtUtc":  "2026-06-04T04:23:08Z",
     "siteTouched":  false,
-    "phase":  "Phase 100 / Update 3.0",
-    "backendSecretsIncluded":  false,
-    "createdAtUtc":  "2026-06-04T03:52:29Z"
+    "build":  "PHASE-100-UPDATE-3.0-PRESENT-MOMENT-LOCK",
+    "baseline":  "98S/Q presentation safety mode overlay"
 }
