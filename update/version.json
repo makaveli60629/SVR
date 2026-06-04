@@ -1,6 +1,7 @@
 ﻿{
-    "scope":  "game-side-only",
-    "storePortalUrl":  "https://svrpoker.com/site/store.html",
-    "build":  "PHASE-96-ROOMS-PORTAL-ROUTING-LOCK",
-    "siteTouched":  false
+    "phase":  "Phase 100 / Update 3.0",
+    "updatedAtUtc":  "2026-06-04T03:50:36Z",
+    "build":  "PHASE-100-3.0-STOREFRONT-AI-LOCK",
+    "siteTouched":  false,
+    "gameZip":  "update/game.zip"
 }

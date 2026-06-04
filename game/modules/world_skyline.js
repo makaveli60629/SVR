@@ -545,26 +545,115 @@ function buildLobbySprites(scene, R, wallHeight){
   return group;
 }
 
-function createApprovalPortraitTexture(){
-  return canvasTexture(900, 1200, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, '#16040a');
-    g.addColorStop(1, '#08080d');
+
+
+function addReikiPresentationHolograms(scene, root, founderTex, logoTex){
+  const holograms = scene.userData._svrHolograms || (scene.userData._svrHolograms = []);
+  const holoRoot = new THREE.Group();
+  holoRoot.name = 'SVR_PHASE99_REIKI_PRESENTATION_HOLOGRAMS';
+  holoRoot.position.set(0, 2.28, -0.72);
+  root.add(holoRoot);
+
+  const frameMat = new THREE.MeshBasicMaterial({ color: 0x82fff2, transparent: true, opacity: 0.42, depthWrite: false, side: THREE.DoubleSide });
+  const glassMat = new THREE.MeshBasicMaterial({ color: 0x8ffff5, transparent: true, opacity: 0.13, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  const founderMat = new THREE.MeshBasicMaterial({ map: founderTex || null, color: 0xffffff, transparent: true, opacity: 0.82, depthWrite: false, side: THREE.DoubleSide });
+  const logoMat = new THREE.MeshBasicMaterial({ map: logoTex || null, color: 0xffffff, transparent: true, opacity: 0.88, depthWrite: false, side: THREE.DoubleSide });
+
+  const pedestal = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.35, 1.62, 0.16, 48),
+    new THREE.MeshStandardMaterial({ color: 0x071315, roughness: 0.34, metalness: 0.72, emissive: 0x0d6a64, emissiveIntensity: 0.26 })
+  );
+  pedestal.position.set(0, -1.98, 0.03);
+  holoRoot.add(pedestal);
+
+  const baseRing = new THREE.Mesh(new THREE.TorusGeometry(1.48, 0.025, 12, 96), frameMat.clone());
+  baseRing.position.set(0, -1.87, 0.055);
+  baseRing.rotation.x = Math.PI * 0.5;
+  holoRoot.add(baseRing);
+
+  const portrait = new THREE.Mesh(new THREE.PlaneGeometry(1.88, 2.72), founderMat);
+  portrait.position.set(0, -0.28, 0.00);
+  portrait.renderOrder = 82;
+  holoRoot.add(portrait);
+
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(2.16, 3.05), glassMat.clone());
+  glow.position.set(0, -0.28, 0.025);
+  glow.renderOrder = 81;
+  holoRoot.add(glow);
+
+  const backGlow = glow.clone();
+  backGlow.position.z = -0.03;
+  backGlow.material = glassMat.clone();
+  backGlow.material.opacity = 0.09;
+  holoRoot.add(backGlow);
+
+  const logo = new THREE.Mesh(new THREE.PlaneGeometry(0.82, 0.52), logoMat);
+  logo.position.set(0, 1.36, 0.04);
+  logo.renderOrder = 83;
+  holoRoot.add(logo);
+
+  const titleTex = canvasTexture(950, 260, (x,w,h)=>{
+    x.clearRect(0,0,w,h);
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0,'rgba(4,18,18,0.92)'); g.addColorStop(1,'rgba(12,4,10,0.88)');
     x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(255,68,96,0.95)';
-    x.lineWidth = 16; x.strokeRect(28,28,w-56,h-56);
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#ffffff'; x.font = 'bold 74px system-ui, Arial';
-    x.fillText('SVR REIKI HUB', w/2, 170);
-    x.fillStyle = '#ff516c'; x.font = 'bold 78px system-ui, Arial';
-    x.fillText('AWAITING', w/2, 465);
-    x.fillText('APPROVAL', w/2, 560);
-    x.fillStyle = '#ffe5ea'; x.font = '34px system-ui, Arial';
-    x.fillText('Founder / partner details disabled', w/2, 760);
-    x.fillText('until written approval is received.', w/2, 812);
-    x.fillStyle = '#b7fff0'; x.font = 'bold 42px system-ui, Arial';
-    x.fillText('SVR PLACEHOLDER', w/2, 1010);
+    x.strokeStyle = 'rgba(146,255,241,0.92)'; x.lineWidth = 7; x.strokeRect(12,12,w-24,h-24);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.fillStyle='#f4fffb'; x.font='bold 50px system-ui, Arial'; x.fillText('TRUITIVE / REIKI PREVIEW', w/2, 84);
+    x.fillStyle='#ff6b6b'; x.font='bold 36px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 150);
+    x.fillStyle='#aefff0'; x.font='bold 24px system-ui, Arial'; x.fillText('presentation hologram • media placeholder active', w/2, 210);
   });
+  const title = new THREE.Mesh(new THREE.PlaneGeometry(2.95, 0.78), new THREE.MeshBasicMaterial({ map: titleTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+  title.position.set(0, 1.82, 0.05);
+  title.renderOrder = 84;
+  holoRoot.add(title);
+
+  const scanTex = canvasTexture(512, 512, (x,w,h)=>{
+    x.clearRect(0,0,w,h);
+    for (let y=0; y<h; y+=10){
+      x.fillStyle = y % 20 === 0 ? 'rgba(140,255,240,0.22)' : 'rgba(140,255,240,0.07)';
+      x.fillRect(0,y,w,2);
+    }
+    const rg = x.createRadialGradient(w/2,h/2,12,w/2,h/2,w/2);
+    rg.addColorStop(0,'rgba(170,255,245,0.18)'); rg.addColorStop(1,'rgba(0,0,0,0)');
+    x.fillStyle = rg; x.fillRect(0,0,w,h);
+  });
+  const scan = new THREE.Mesh(new THREE.PlaneGeometry(2.32, 3.16), new THREE.MeshBasicMaterial({ map: scanTex, transparent: true, opacity: 0.40, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
+  scan.position.set(0, -0.28, 0.075);
+  scan.renderOrder = 85;
+  holoRoot.add(scan);
+
+  const ringA = new THREE.Mesh(new THREE.TorusGeometry(1.34, 0.018, 10, 96), frameMat.clone());
+  ringA.position.set(0, -0.25, 0.09);
+  holoRoot.add(ringA);
+  const ringB = new THREE.Mesh(new THREE.TorusGeometry(1.05, 0.014, 10, 96), frameMat.clone());
+  ringB.position.set(0, -0.25, 0.10);
+  holoRoot.add(ringB);
+
+  const sideMat = founderMat.clone();
+  sideMat.opacity = 0.22;
+  const ghostL = new THREE.Mesh(new THREE.PlaneGeometry(1.05, 1.58), sideMat);
+  ghostL.position.set(-1.62, -0.32, -0.02);
+  ghostL.rotation.y = 0.22;
+  ghostL.renderOrder = 80;
+  holoRoot.add(ghostL);
+  const ghostR = ghostL.clone();
+  ghostR.position.x = 1.62;
+  ghostR.rotation.y = -0.22;
+  holoRoot.add(ghostR);
+
+  const beam = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.36, 1.30, 3.9, 48, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0x80fff0, transparent: true, opacity: 0.055, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide })
+  );
+  beam.position.set(0, -0.40, 0.01);
+  holoRoot.add(beam);
+
+  const light = new THREE.PointLight(0x7dfff0, 0.88, 8.5, 2.2);
+  light.position.set(0, 0.30, 0.40);
+  holoRoot.add(light);
+
+  holograms.push({ root: holoRoot, portrait, glow, backGlow, logo, title, scan, ringA, ringB, ghostL, ghostR, beam, light, phase: Math.random() * Math.PI * 2 });
+  return holoRoot;
 }
 
 
@@ -573,8 +662,8 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
   const right = new THREE.Vector3(Math.sin(angle), 0, -Math.cos(angle));
   const center = new THREE.Vector3(Math.cos(angle) * (R - 4.05), 0.01, Math.sin(angle) * (R - 4.05));
-  const logoTex = spawnLogoTex;
-  const founderTex = createApprovalPortraitTexture();
+  const logoTex = loadUiTexture('./assets/ui/trueitive-logo.png');
+  const founderTex = loadUiTexture('./assets/ui/trueitive-founder.png');
 
   const floorPad = new THREE.Mesh(
     new THREE.PlaneGeometry(14.2, 7.0),
@@ -665,7 +754,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#dffff7'; x.font = 'bold 84px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 98);
+    x.fillStyle = '#dffff7'; x.font = 'bold 84px system-ui, Arial'; x.fillText('TRUEITIVE.COM', w/2, 98);
   });
   const signB = new THREE.Mesh(new THREE.PlaneGeometry(6.44, 0.70), new THREE.MeshBasicMaterial({ map: signTexB, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   signB.position.copy(signBackB.position).add(new THREE.Vector3(0,0,0.02));
@@ -680,8 +769,8 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.82)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#eafff7'; x.font = 'bold 62px system-ui, Arial'; x.fillText('REIKI ROOM', w/2, 86);
-    x.fillStyle = '#9cf0d3'; x.font = 'bold 24px system-ui, Arial'; x.fillText('private meditation scene', w/2, 138);
+    x.fillStyle = '#eafff7'; x.font = 'bold 62px system-ui, Arial'; x.fillText('THE ZEN DEN', w/2, 86);
+    x.fillStyle = '#9cf0d3'; x.font = 'bold 24px system-ui, Arial'; x.fillText('meditate • restore • breathe', w/2, 138);
   });
   const zenDenPlate = new THREE.Mesh(new THREE.PlaneGeometry(2.34, 0.46), new THREE.MeshBasicMaterial({ map: zenDenTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   zenDenPlate.position.set(4.95, 4.68, 0.73);
@@ -692,21 +781,21 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(140,255,231,0.90)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
     x.textAlign = 'left';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 62px system-ui, Arial'; x.fillText('Approval Placeholder', 60, 110);
-    x.fillStyle = '#bcffe9'; x.font = 'bold 46px system-ui, Arial'; x.fillText('AWAITING APPROVAL', 60, 182);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 62px system-ui, Arial'; x.fillText('Meet the Founder', 60, 110);
+    x.fillStyle = '#bcffe9'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Shyona Royston', 60, 182);
     x.fillStyle = '#e5f6f3'; x.font = '34px system-ui, Arial';
     let y = 258;
-    y = fillWrappedText(x, 'SVR Reiki Hub storefront placeholder. Partner/founder names, photos, websites, and sponsor claims remain disabled until written approval is received.', 60, y, w - 120, 42);
+    y = fillWrappedText(x, 'Founder of Trueitive Holistic Healing & Wellness, leading the Reiki hub with a professional wellness-first approach for virtual and in-person growth.', 60, y, w - 120, 42);
     y += 78;
     x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Services', 60, y);
     y += 56;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    ['Private meditation room route', 'SVR approval placeholder panels', 'Partner content disabled', 'Sponsor-ready modular storefront'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 46; });
+    ['Founder-led Reiki sessions', 'Meditation and reset support', 'Massage / bodywork referrals', 'Holistic wellness guidance'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 46; });
     y += 40;
     x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Book / Explore', 60, y);
     y += 54;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    fillWrappedText(x, 'SVR placeholder • approval pending • private Reiki room route', 60, y, w - 120, 40);
+    fillWrappedText(x, 'trueitive.com • state search • founder spotlight • Reiki VR entry', 60, y, w - 120, 40);
   });
   const founderPanel = new THREE.Mesh(new THREE.PlaneGeometry(3.28, 4.02), new THREE.MeshBasicMaterial({ map: founderPanelTex, side: THREE.DoubleSide, transparent: true }));
   founderPanel.position.set(-4.10, 2.18, -2.10);
@@ -715,6 +804,8 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   const portraitPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 4.02), new THREE.MeshBasicMaterial({ map: founderTex, side: THREE.DoubleSide }));
   portraitPanel.position.set(4.05, 2.18, -2.10);
   root.add(portraitPanel);
+
+  addReikiPresentationHolograms(scene, root, founderTex, logoTex);
 
   const rightInfoTex = canvasTexture(900, 520, (x,w,h)=>{
     const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#0b1114'); g.addColorStop(1, '#141016');
@@ -734,17 +825,17 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 68px system-ui, Arial'; x.fillText('SVR REIKI HUB', w/2, 106);
-    x.fillStyle = '#bcffe9'; x.font = 'bold 34px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 166);
-    x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Private Meditation Route', w/2, 296);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki • meditation • sponsor-ready placeholder', w/2, 366);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 68px system-ui, Arial'; x.fillText('TRUEITIVE.COM', w/2, 106);
+    x.fillStyle = '#bcffe9'; x.font = 'bold 34px system-ui, Arial'; x.fillText('Holistic Healing & Wellness', w/2, 166);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Founder-Led Services', w/2, 296);
+    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki • meditation • appointments • partner-ready wellness hub', w/2, 366);
     x.fillStyle = 'rgba(124,255,226,0.16)'; roundRectPath(x, 90, 430, w-180, 138, 28); x.fill();
     x.strokeStyle = 'rgba(124,255,226,0.65)'; x.lineWidth = 6; roundRectPath(x, 90, 430, w-180, 138, 28); x.stroke();
-    x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER REIKI ROOM', w/2, 510);
-    x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Use the route button to enter the private room', w/2, 564);
-    x.fillStyle = '#f6ffff'; x.font = 'bold 38px system-ui, Arial'; x.fillText('Approval Status', w/2, 716);
-    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 788);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('No sponsor/founder branding active in runtime', w/2, 856);
+    x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER THE REIKI HUB', w/2, 510);
+    x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Use the floor portal to enter the guided Reiki space', w/2, 564);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 38px system-ui, Arial'; x.fillText('Professional Highlights', w/2, 716);
+    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('Founder • Wellness • Reiki', w/2, 788);
+    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private sessions • mindful reset • future partner storefront', w/2, 856);
   });
   const centerInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.70, 4.02), new THREE.MeshBasicMaterial({ map: centerInfoTex, side: THREE.DoubleSide, transparent: true }));
   centerInfo.position.set(0, 2.18, -2.10);
@@ -755,7 +846,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.strokeStyle = 'rgba(78,255,146,0.90)'; x.lineWidth = 8; roundRectPath(x, 10, 10, w-20, h-20, 24); x.stroke();
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#89ffab'; x.font = 'bold 50px system-ui, Arial'; x.fillText('RESERVED FOR APPROVAL', w/2, 82);
-    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('SVR PLACEHOLDER', w/2, 152);
+    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Shyona Royston', w/2, 152);
   });
   const reservePlaque = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 0.70), new THREE.MeshBasicMaterial({ map: reserveTex, transparent: true, side: THREE.DoubleSide }));
   reservePlaque.position.set(4.05, -1.22, -2.06);
@@ -1423,10 +1514,10 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   group.add(activeBtn);
 
 
-  const adTex = createAdBillboardTexture(['REIKI HUB', 'AWAITING APPROVAL']);
+  const adTex = loadUiTexture('./assets/ui/trueitive-instagram-ad.jpg');
   const adHeader = new THREE.Mesh(
     new THREE.PlaneGeometry(3.26, 0.56),
-    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('REIKI HUB', 'awaiting approval'), transparent: true, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('TRUEITIVE SPOTLIGHT', 'founder wellness ad'), transparent: true, side: THREE.DoubleSide })
   );
   adHeader.position.set(modelX, wallHeight * 0.39, 0.18);
   group.add(adHeader);
@@ -1555,7 +1646,7 @@ function buildOuterCity(scene, R){
   const matrix = createMatrixBillboardTexture();
   const billboardUpdaters = [matrix.update];
   const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
-  const zenTex = createAdBillboardTexture(['REIKI HUB', 'SVR PLACEHOLDER']);
+  const zenTex = loadUiTexture('./assets/ui/trueitive-zen-ad.jpg');
 
   const count = 68;
   const adIndices = new Set([4, 11, 20, 28, 36, 44, 52, 60]);
@@ -1644,10 +1735,10 @@ function buildOuterCity(scene, R){
               ctx.textBaseline = "middle";
               ctx.fillStyle = "#d9ffee";
               ctx.font = "bold 92px system-ui, Arial";
-              ctx.fillText("REIKI HUB", w2 / 2, 94);
+              ctx.fillText("TRUEITIVE.COM", w2 / 2, 94);
               ctx.fillStyle = "#7bffb7";
               ctx.font = "700 50px system-ui, Arial";
-              ctx.fillText("AWAITING APPROVAL • SVR PLACEHOLDER", w2 / 2, 178);
+              ctx.fillText("Founder-led Reiki • Meditation • Wellness", w2 / 2, 178);
             }),
             transparent: true,
             side: THREE.DoubleSide,
@@ -2541,6 +2632,25 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     city.billboardUpdaters.forEach(fn=>fn(t));
     tickPgaHub(scene, t);
     wallPanelUpdaters.forEach(fn=>fn(t));
+    if (scene.userData._svrHolograms?.length){
+      scene.userData._svrHolograms.forEach((h, i)=>{
+        const ph = h.phase || 0;
+        const pulse = 0.5 + 0.5 * Math.sin(t * 1.45 + ph);
+        h.root.position.y = 2.28 + Math.sin(t * 0.85 + ph) * 0.035;
+        h.ringA.rotation.z += dt * (0.68 + i * 0.04);
+        h.ringB.rotation.z -= dt * (0.92 + i * 0.05);
+        h.scan.position.y = -0.34 + Math.sin(t * 1.8 + ph) * 0.075;
+        h.scan.material.opacity = 0.28 + pulse * 0.18;
+        h.portrait.material.opacity = 0.70 + pulse * 0.14;
+        h.glow.material.opacity = 0.10 + pulse * 0.075;
+        h.backGlow.material.opacity = 0.055 + pulse * 0.055;
+        h.logo.material.opacity = 0.72 + pulse * 0.18;
+        h.ghostL.material.opacity = 0.14 + pulse * 0.10;
+        h.ghostR.material.opacity = 0.14 + (1 - pulse) * 0.10;
+        h.beam.material.opacity = 0.035 + pulse * 0.035;
+        h.light.intensity = 0.55 + pulse * 0.38;
+      });
+    }
     legendHall.holoGroups.forEach((holo, i)=>{
       const core = holo.userData.core;
       if (core){
