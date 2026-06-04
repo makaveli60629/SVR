@@ -9,6 +9,7 @@ import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyUpdate30PresentMoment } from "./modules/update_3_0_present_moment.js";
 import { enhanceReikiStorefront3 } from "./modules/reiki_storefront_3_0.js";
+import { applyReikiPhase105Override } from "./modules/reiki_phase105_override.js";
 import { createAndroidControls } from "./modules/android_controls.js";
 
 const params = new URLSearchParams(location.search);
@@ -78,14 +79,13 @@ const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
 enhanceReikiStorefront3(scene, { log });
+applyReikiPhase105Override(scene, { log });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
 const audio = createAudioPlaylist({
-  tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" }
-  ],
+  tracks: [{ title: "Lobby 07", url: "./assets/audio/07.mp3" }],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
     if (state.error){ setStatus(`Audio: ${state.error}`); return; }
@@ -113,14 +113,8 @@ function inTableZone(){
   return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7);
 }
 
-function seatLabel(){
-  return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing";
-}
-
-function moveDesktopToSeat(seat){
-  camera.position.set(seat.x, 1.12, seat.z);
-  camera.lookAt(0, 1.0, 0);
-}
+function seatLabel(){ return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing"; }
+function moveDesktopToSeat(seat){ camera.position.set(seat.x, 1.12, seat.z); camera.lookAt(0, 1.0, 0); }
 
 function joinTable(){
   if (!inTableZone()) return false;
@@ -167,9 +161,7 @@ function gotoScene(key){
 const update30 = applyUpdate30PresentMoment({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene });
 const androidControls = createAndroidControls({ camera, renderer, gotoScene, joinTable, leaveTable, setStatus });
 
-$sceneButtons.forEach((btn)=>{
-  btn.addEventListener("click", ()=>{ const key = btn.dataset.scene; if (key) gotoScene(key); });
-});
+$sceneButtons.forEach((btn)=>{ btn.addEventListener("click", ()=>{ const key = btn.dataset.scene; if (key) gotoScene(key); }); });
 
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
@@ -193,14 +185,9 @@ window.addEventListener("keydown", async (e)=>{
 });
 
 const watch = createWristWatch({
-  scene,
-  camera,
-  renderer,
+  scene, camera, renderer,
   getState: ()=>({ audioEnabled: audio.getState().enabled, trackTitle: audio.getState().trackTitle || "Lobby 07", cash, seated, inTableZone: inTableZone(), seatLabel: seatLabel(), teleportEnabled: tp.isEnabled ? tp.isEnabled() : true }),
-  actions: {
-    toggleAudio: ()=>audio.toggle(), nextTrack: ()=>audio.next(), joinTable, leaveTable, toggleTeleport: ()=>tp.toggleMode(),
-    goLobby: ()=>gotoScene("lobby"), goTable: ()=>gotoScene("table"), goSeat: ()=>gotoScene("seat"), goReiki: ()=>gotoScene("reiki"), goPga: ()=>gotoScene("pga"), goLegend: ()=>gotoScene("legends"), goSponsor: ()=>gotoScene("sponsor"), goScorpion: ()=>gotoScene("scorpion"), goReikiRoom: ()=>gotoScene("reikiRoom"), goPgaDrive: ()=>gotoScene("pgaDrive"), goChipPutt: ()=>gotoScene("chipPutt"), goVrStore: ()=>gotoScene("vrStore")
-  }
+  actions: { toggleAudio: ()=>audio.toggle(), nextTrack: ()=>audio.next(), joinTable, leaveTable, toggleTeleport: ()=>tp.toggleMode(), goLobby: ()=>gotoScene("lobby"), goTable: ()=>gotoScene("table"), goSeat: ()=>gotoScene("seat"), goReiki: ()=>gotoScene("reiki"), goPga: ()=>gotoScene("pga"), goLegend: ()=>gotoScene("legends"), goSponsor: ()=>gotoScene("sponsor"), goScorpion: ()=>gotoScene("scorpion"), goReikiRoom: ()=>gotoScene("reikiRoom"), goPgaDrive: ()=>gotoScene("pgaDrive"), goChipPutt: ()=>gotoScene("chipPutt"), goVrStore: ()=>gotoScene("vrStore") }
 });
 
 $toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $toggleJoints.textContent = on ? "Joints On" : "Joints"; });
@@ -248,7 +235,6 @@ renderer.setAnimationLoop(()=>{
   const now = performance.now();
   const dt = Math.min((now - tPrev) / 1000, 0.033);
   tPrev = now;
-
   if (!renderer.xr.isPresenting){
     if (!AUTOCAM) desktop.update(dt);
     else {
@@ -262,31 +248,19 @@ renderer.setAnimationLoop(()=>{
     }
     androidControls.update(dt);
     scene.userData._camera = camera;
-  } else {
-    scene.userData._camera = renderer.xr.getCamera(camera);
-  }
-
+  } else { scene.userData._camera = renderer.xr.getCamera(camera); }
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
   hands.update(dt);
   hands.updateDebug();
-
   const leftHand = hands.getLeftHand();
   const rightHand = hands.getRightHand();
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
-  if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } });
-  }
-
+  if (!AUTOCAM || renderer.xr.isPresenting){ tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } }); }
   if (watch) watch.update(dt, leftHand, rightHand);
   renderer.render(scene, camera);
 });
 
 const canvasEl = renderer.domElement;
 canvasEl.addEventListener("pointerdown", async ()=>{ const st = audio.getState(); if (!st.enabled) await audio.start(); }, { passive: true });
-canvasEl.addEventListener("webglcontextlost", (e)=>{
-  e.preventDefault();
-  log("[ERR] WebGL context lost. Reloading…");
-  setStatus("WebGL context lost (reloading…)", { force: true });
-  setTimeout(()=>location.reload(), 500);
-}, false);
+canvasEl.addEventListener("webglcontextlost", (e)=>{ e.preventDefault(); log("[ERR] WebGL context lost. Reloading…"); setStatus("WebGL context lost (reloading…)", { force: true }); setTimeout(()=>location.reload(), 500); }, false);
