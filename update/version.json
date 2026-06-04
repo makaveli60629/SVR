@@ -1,7 +1,6 @@
 ﻿{
-    "deployedFrom":  "Phase 88 apply script",
-    "build":  "PHASE-88-OCULUS-LOBBY-REIKI-PRESENTATION-LOCK",
-    "updatedAt":  "2026-06-04T02:01:50.1249350Z",
-    "siteTouched":  false,
-    "track":  "game-only"
+    "phase":  99,
+    "build":  "PHASE-99-HOLOGRAM-RESTORE-LOCK",
+    "updatedAt":  "2026-06-04T02:05:45Z",
+    "note":  "Reiki/Truitive hologram presentation layer restored; site untouched."
 }

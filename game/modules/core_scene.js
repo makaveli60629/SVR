@@ -8,7 +8,7 @@ export function createCore({ containerId = "app" } = {}){
   const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.2, 1600);
 
   const renderer = new THREE.WebGLRenderer({
-    antialias: false,
+    antialias: true,
     alpha: false,
     depth: true,
     stencil: false,
@@ -17,15 +17,14 @@ export function createCore({ containerId = "app" } = {}){
   });
 
   renderer.setClearColor(0x050508, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 0.72));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 0.9));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.68;
+  renderer.toneMappingExposure = 1.05;
   renderer.shadowMap.enabled = false;
-  renderer.shadowMap.type = THREE.BasicShadowMap;
-  if (renderer.xr && renderer.xr.setFramebufferScaleFactor) renderer.xr.setFramebufferScaleFactor(0.72);
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   document.getElementById(containerId).appendChild(renderer.domElement);
   const vrButton = VRButton.createButton(renderer, {
