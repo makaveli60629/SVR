@@ -59,14 +59,14 @@ function buildProfileTexture(){
     ctx.fill();
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 42px Arial";
-    ctx.fillText("SOUTH-WEST WALL • PGA HUB", 92, 126);
+    ctx.fillText("PGA GOLF TRAINING HUB", 92, 126);
 
     ctx.fillStyle = "#ffffff";
     ctx.font = "700 92px Arial";
-    ctx.fillText("JUAN E. ESPEJO", 92, 254);
+    ctx.fillText("JUAN ESPEJO", 92, 254);
     ctx.fillStyle = "#ffc2c9";
     ctx.font = "600 40px Arial";
-    ctx.fillText("PGA Pro • Maryville Golf Academy Founder", 92, 324);
+    ctx.fillText("PGA Pro • Golf Academy / Training Partner", 92, 324);
 
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 48px Arial";
@@ -264,24 +264,24 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     group.add(infoPanel);
 
     const portraitBack = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.26, 3.06),
+      new THREE.PlaneGeometry(2.72, 2.72),
       new THREE.MeshBasicMaterial({ color: 0x0f0709, side: THREE.DoubleSide })
     );
-    portraitBack.position.set(3.92, 3.04, 0.16);
+    portraitBack.position.set(3.92, 3.30, 0.16);
     group.add(portraitBack);
 
     const portrait = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.04, 2.84),
+      new THREE.PlaneGeometry(2.46, 2.46),
       new THREE.MeshBasicMaterial({ map: buildPortraitTexture(), transparent: true, side: THREE.DoubleSide })
     );
-    portrait.position.set(3.92, 3.04, 0.19);
+    portrait.position.set(3.92, 3.30, 0.19);
     group.add(portrait);
 
     const badge = new THREE.Mesh(
       new THREE.CircleGeometry(0.62, 64),
       new THREE.MeshBasicMaterial({ map: buildBadgeTexture(), transparent: true, side: THREE.DoubleSide })
     );
-    badge.position.set(4.98, 5.04, 0.20);
+    badge.position.set(4.96, 5.22, 0.20);
     group.add(badge);
 
     const badgeFrame = new THREE.Mesh(
@@ -295,7 +295,7 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
       new THREE.PlaneGeometry(4.16, 0.88),
       new THREE.MeshBasicMaterial({ map: buildReserveTexture(), side: THREE.DoubleSide, transparent: true })
     );
-    reservePlaque.position.set(4.08, 1.10, 0.20);
+    reservePlaque.position.set(4.08, 1.18, 0.20);
     group.add(reservePlaque);
 
     const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.82), softGlass);
@@ -305,13 +305,13 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     frontGlassR.position.x = 2.62;
     group.add(frontGlassR);
 
-    const fillA = new THREE.PointLight(0xff4456, 4.2, 16, 2.0);
+    const fillA = new THREE.PointLight(0xff4456, 1.45, 13, 2.0);
     fillA.position.set(-0.4, 4.8, 1.34);
     group.add(fillA);
-    const fillB = new THREE.PointLight(0xffb0ba, 2.7, 13, 2.0);
+    const fillB = new THREE.PointLight(0xffb0ba, 0.95, 11, 2.0);
     fillB.position.set(4.1, 5.1, 1.20);
     group.add(fillB);
-    const fillC = new THREE.PointLight(0x73ff97, 1.0, 8, 2.0);
+    const fillC = new THREE.PointLight(0x73ff97, 0.40, 7, 2.0);
     fillC.position.set(1.0, 0.54, 1.06);
     group.add(fillC);
 
@@ -358,7 +358,7 @@ export function tickPgaHub(scene, t = 0){
   const hub = scene?.userData?._pgaHub;
   if (!hub) return;
   if (hub.badgeFrame?.material) hub.badgeFrame.material.emissiveIntensity = 0.88 + Math.sin(t * 1.6) * 0.16;
-  if (hub.fillA) hub.fillA.intensity = 4.2 + Math.sin(t * 1.2) * 0.24;
-  if (hub.fillB) hub.fillB.intensity = 2.6 + Math.sin(t * 1.0 + 0.6) * 0.14;
-  if (hub.fillC) hub.fillC.intensity = 1.0 + Math.sin(t * 1.3 + 1.1) * 0.10;
+  if (hub.fillA) hub.fillA.intensity = 1.45 + Math.sin(t * 1.2) * 0.08;
+  if (hub.fillB) hub.fillB.intensity = 0.95 + Math.sin(t * 1.0 + 0.6) * 0.06;
+  if (hub.fillC) hub.fillC.intensity = 0.40 + Math.sin(t * 1.3 + 1.1) * 0.04;
 }

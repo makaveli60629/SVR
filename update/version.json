@@ -1,6 +1,7 @@
 ﻿{
-    "scope":  "game-side-only",
-    "storePortalUrl":  "https://svrpoker.com/site/store.html",
-    "build":  "PHASE-96-ROOMS-PORTAL-ROUTING-LOCK",
-    "siteTouched":  false
+    "deployedFrom":  "Phase 88 apply script",
+    "build":  "PHASE-88-OCULUS-LOBBY-REIKI-PRESENTATION-LOCK",
+    "updatedAt":  "2026-06-04T02:01:50.1249350Z",
+    "siteTouched":  false,
+    "track":  "game-only"
 }

@@ -1,6 +1,7 @@
 {
-  "build": "PHASE-96-ROOMS-PORTAL-ROUTING-LOCK",
-  "scope": "game-side-only",
+  "build": "PHASE-88-OCULUS-LOBBY-REIKI-PRESENTATION-LOCK",
+  "track": "game-only",
   "siteTouched": false,
-  "storePortalUrl": "https://svrpoker.com/site/store.html"
+  "packageLimit": "under 25 MB",
+  "notes": "Oculus performance/brightness, moon/Mars, Reiki/Truitive presentation, Espresso ad, PGA profile cleanup"
 }
