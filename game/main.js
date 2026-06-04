@@ -9,6 +9,7 @@ import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyUpdate30PresentMoment } from "./modules/update_3_0_present_moment.js";
 import { enhanceReikiStorefront3 } from "./modules/reiki_storefront_3_0.js";
+import { createAndroidControls } from "./modules/android_controls.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -87,14 +88,8 @@ const audio = createAudioPlaylist({
   ],
   onState: (state)=>{
     if (!$status || renderer.xr.isPresenting) return;
-    if (state.error){
-      setStatus(`Audio: ${state.error}`);
-      return;
-    }
-    if (state.enabled){
-      setStatus(`Now Playing: ${state.trackTitle}`);
-      return;
-    }
+    if (state.error){ setStatus(`Audio: ${state.error}`); return; }
+    if (state.enabled){ setStatus(`Now Playing: ${state.trackTitle}`); return; }
     setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
   }
 });
@@ -140,11 +135,8 @@ function joinTable(){
   seatIndex = best;
   seated = true;
   const seat = seats[best];
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(seat.x, -0.42, seat.z);
-  } else {
-    moveDesktopToSeat(seat);
-  }
+  if (renderer.xr.isPresenting){ tp.setPlayerPose(seat.x, -0.42, seat.z); }
+  else { moveDesktopToSeat(seat); }
   setMode(`Seat: ${seat.label}`);
   return true;
 }
@@ -152,31 +144,20 @@ function joinTable(){
 function leaveTable(){
   seated = false;
   seatIndex = -1;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(0, 0, 4.8);
-  } else {
-    camera.position.set(0, 1.6, 4.8);
-    camera.lookAt(0, 1.15, 0);
-  }
+  if (renderer.xr.isPresenting){ tp.setPlayerPose(0, 0, 4.8); }
+  else { camera.position.set(0, 1.6, 4.8); camera.lookAt(0, 1.15, 0); }
   return true;
 }
 
 function movePlayerToSpot(target, lookTarget = null){
   if (!target) return;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(target.x, 0, target.z);
-  } else {
-    camera.position.set(target.x, 1.6, target.z);
-    if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z);
-  }
+  if (renderer.xr.isPresenting){ tp.setPlayerPose(target.x, 0, target.z); }
+  else { camera.position.set(target.x, 1.6, target.z); if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z); }
 }
 
 function gotoScene(key){
   const rec = sceneTargets?.[key];
-  if (rec?.href) {
-    window.location.href = rec.href;
-    return true;
-  }
+  if (rec?.href) { window.location.href = rec.href; return true; }
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
   setStatus(`Quick jump: ${key}`, { force: true });
@@ -184,12 +165,10 @@ function gotoScene(key){
 }
 
 const update30 = applyUpdate30PresentMoment({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene });
+const androidControls = createAndroidControls({ camera, renderer, gotoScene, joinTable, leaveTable, setStatus });
 
 $sceneButtons.forEach((btn)=>{
-  btn.addEventListener("click", ()=>{
-    const key = btn.dataset.scene;
-    if (key) gotoScene(key);
-  });
+  btn.addEventListener("click", ()=>{ const key = btn.dataset.scene; if (key) gotoScene(key); });
 });
 
 window.addEventListener("keydown", async (e)=>{
@@ -217,46 +196,20 @@ const watch = createWristWatch({
   scene,
   camera,
   renderer,
-  getState: ()=>({
-    audioEnabled: audio.getState().enabled,
-    trackTitle: audio.getState().trackTitle || "Lobby 07",
-    cash,
-    seated,
-    inTableZone: inTableZone(),
-    seatLabel: seatLabel(),
-    teleportEnabled: tp.isEnabled ? tp.isEnabled() : true
-  }),
+  getState: ()=>({ audioEnabled: audio.getState().enabled, trackTitle: audio.getState().trackTitle || "Lobby 07", cash, seated, inTableZone: inTableZone(), seatLabel: seatLabel(), teleportEnabled: tp.isEnabled ? tp.isEnabled() : true }),
   actions: {
-    toggleAudio: ()=>audio.toggle(),
-    nextTrack: ()=>audio.next(),
-    joinTable,
-    leaveTable,
-    toggleTeleport: ()=>tp.toggleMode(),
-    goLobby: ()=>gotoScene("lobby"),
-    goTable: ()=>gotoScene("table"),
-    goSeat: ()=>gotoScene("seat"),
-    goReiki: ()=>gotoScene("reiki"),
-    goPga: ()=>gotoScene("pga"),
-    goLegend: ()=>gotoScene("legends"),
-    goSponsor: ()=>gotoScene("sponsor"),
-    goScorpion: ()=>gotoScene("scorpion"),
-    goReikiRoom: ()=>gotoScene("reikiRoom"),
-    goPgaDrive: ()=>gotoScene("pgaDrive"),
-    goChipPutt: ()=>gotoScene("chipPutt"),
-    goVrStore: ()=>gotoScene("vrStore")
+    toggleAudio: ()=>audio.toggle(), nextTrack: ()=>audio.next(), joinTable, leaveTable, toggleTeleport: ()=>tp.toggleMode(),
+    goLobby: ()=>gotoScene("lobby"), goTable: ()=>gotoScene("table"), goSeat: ()=>gotoScene("seat"), goReiki: ()=>gotoScene("reiki"), goPga: ()=>gotoScene("pga"), goLegend: ()=>gotoScene("legends"), goSponsor: ()=>gotoScene("sponsor"), goScorpion: ()=>gotoScene("scorpion"), goReikiRoom: ()=>gotoScene("reikiRoom"), goPgaDrive: ()=>gotoScene("pgaDrive"), goChipPutt: ()=>gotoScene("chipPutt"), goVrStore: ()=>gotoScene("vrStore")
   }
 });
 
-$toggleJoints?.addEventListener("click", ()=>{
-  const on = hands.toggleDebug();
-  $toggleJoints.textContent = on ? "Joints On" : "Joints";
-});
+$toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $toggleJoints.textContent = on ? "Joints On" : "Joints"; });
 
 setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Desktop, Android touch, and wrist quick-jump enabled.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -302,22 +255,18 @@ renderer.setAnimationLoop(()=>{
       const shotIndex = Math.floor(now / 9000) % previewShots.length;
       const shot = previewShots[shotIndex];
       const orbitT = now * 0.001 * shot.speed;
-      previewPos.set(
-        Math.cos(orbitT) * shot.r + shot.leadX * Math.sin(now * 0.00047),
-        shot.y + Math.sin(now * 0.0014 + shotIndex) * shot.sway,
-        Math.sin(orbitT) * shot.r + shot.leadZ * Math.cos(now * 0.00053)
-      );
+      previewPos.set(Math.cos(orbitT) * shot.r + shot.leadX * Math.sin(now * 0.00047), shot.y + Math.sin(now * 0.0014 + shotIndex) * shot.sway, Math.sin(orbitT) * shot.r + shot.leadZ * Math.cos(now * 0.00053));
       previewTarget.set(shot.targetX, shot.lookY, shot.targetZ);
       camera.position.lerp(previewPos, 0.06);
       camera.lookAt(previewTarget);
     }
+    androidControls.update(dt);
     scene.userData._camera = camera;
   } else {
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
 
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
-
   hands.update(dt);
   hands.updateDebug();
 
@@ -326,27 +275,15 @@ renderer.setAnimationLoop(()=>{
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
   if (!AUTOCAM || renderer.xr.isPresenting){
-    tp.update({
-      dt,
-      leftHand,
-      rightHand,
-      leftController,
-      rightController,
-      statusCb: (text)=>{ setStatus(text); },
-      modeCb: (text)=>{ setMode(text); }
-    });
+    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } });
   }
 
   if (watch) watch.update(dt, leftHand, rightHand);
-
   renderer.render(scene, camera);
 });
 
 const canvasEl = renderer.domElement;
-canvasEl.addEventListener("pointerdown", async ()=>{
-  const st = audio.getState();
-  if (!st.enabled) await audio.start();
-}, { passive: true });
+canvasEl.addEventListener("pointerdown", async ()=>{ const st = audio.getState(); if (!st.enabled) await audio.start(); }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
   log("[ERR] WebGL context lost. Reloading…");
