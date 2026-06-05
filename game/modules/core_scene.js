@@ -27,7 +27,7 @@ export function createCore({ containerId = "app" } = {}){
   renderer.xr.setFramebufferScaleFactor?.(isQuest ? 0.72 : 0.9);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = isQuest ? 0.92 : 1.0;
+  renderer.toneMappingExposure = isQuest ? 0.90 : 1.0;
   shadowOff(renderer);
 
   document.getElementById(containerId).appendChild(renderer.domElement);
@@ -38,6 +38,8 @@ export function createCore({ containerId = "app" } = {}){
   vrButton.classList.add("svr-vr-button");
   document.body.appendChild(vrButton);
 
+  window.SVR_RENDERER = renderer;
+  window.SVR_MAIN_CAMERA = camera;
   window.SVR_RENDER_PROFILE = {
     isQuest,
     isMobile,
