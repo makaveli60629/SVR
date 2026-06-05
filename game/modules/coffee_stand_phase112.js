@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { applyReikiLuxuryCleanup12 } from "./reiki_luxury_cleanup_1_2.js";
 
 const BUILD = "PHASE-113-COFFEE-STAND-ASSEMBLED-TABLE-FACING-LOCK";
 const TARGET = new THREE.Vector3(15.84, 0, -16.44);
@@ -114,13 +115,13 @@ function yawLocalPositiveZToward(from, to) {
 
 export function applyPhase112CoffeeStandMove(scene, { log = console.log } = {}) {
   if (!scene) return null;
+  applyReikiLuxuryCleanup12?.(scene, { log });
   removePriorCoffeeStands(scene);
   const hidden = hideOldStandPieces(scene);
 
   const root = new THREE.Group();
   root.name = "SVR_PHASE113_COFFEE_STAND_ASSEMBLED";
   root.position.copy(TARGET);
-  // Local +Z faces the poker table/lobby center, so the counter front and sign face the table.
   root.rotation.y = yawLocalPositiveZToward(TARGET, TABLE_CENTER);
   scene.add(root);
 
@@ -131,7 +132,6 @@ export function applyPhase112CoffeeStandMove(scene, { log = console.log } = {}) 
   const shelf = new THREE.MeshStandardMaterial({ color: 0x151b24, roughness: .46, metalness: .16 });
   const glass = new THREE.MeshStandardMaterial({ color: 0xa7fff7, transparent: true, opacity: .20, roughness: .05, metalness: .12, emissive: 0x1b7d78, emissiveIntensity: .22, side: THREE.DoubleSide, depthWrite: false });
 
-  // One assembled kiosk: base, body, counter, back panel, shelves, and canopy connected.
   addBox(root, "SVR_PHASE113_KIOSK_BASE", [3.25, .18, 1.48], [0, .09, .03], dark);
   addBox(root, "SVR_PHASE113_FRONT_BODY_SOLID", [3.08, .92, .24], [0, .62, .68], face);
   addBox(root, "SVR_PHASE113_BACK_BODY_SOLID", [3.08, .92, .22], [0, .62, -.66], dark);
@@ -146,31 +146,22 @@ export function applyPhase112CoffeeStandMove(scene, { log = console.log } = {}) 
   addBox(root, "SVR_PHASE113_NEON_FRONT_BASE_TRIM", [3.42, .06, .08], [0, .22, .84], trim);
   addBox(root, "SVR_PHASE113_NEON_COUNTER_TRIM", [3.34, .05, .08], [0, 1.26, .92], trim);
 
-  // Clean shelves locked into the back panel.
   addBox(root, "SVR_PHASE113_SHELF_LOWER", [2.34, .08, .20], [0, 1.18, -.68], shelf);
   addBox(root, "SVR_PHASE113_SHELF_MIDDLE", [2.34, .08, .20], [0, 1.50, -.68], shelf);
   addBox(root, "SVR_PHASE113_SHELF_UPPER", [2.34, .08, .20], [0, 1.82, -.68], shelf);
 
-  // Small merch/coffee items placed on the connected counter so it no longer looks dismantled.
   createCup(root, -.76, .42, 0xf1f1f1);
   createCup(root, -.45, .42, 0x8ffff0);
   createCup(root, -.14, .42, 0xffd06a);
   createEspressoMachine(root, .62, .30);
 
-  // Front glass menu panel and sign face the poker table.
   addPlane(root, "SVR_PHASE113_MENU_GLASS_PANEL", [1.18, .74], [-.98, 1.64, .96], glass, [0, 0, 0]);
-  const espressoSign = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.92, .84),
-    new THREE.MeshBasicMaterial({ map: makeSign("ESPRESSO STAND", "Facing poker table • sponsor merch"), transparent: true, side: THREE.DoubleSide, depthWrite: false })
-  );
+  const espressoSign = new THREE.Mesh(new THREE.PlaneGeometry(2.92, .84), new THREE.MeshBasicMaterial({ map: makeSign("ESPRESSO STAND", "Facing poker table • sponsor merch"), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   espressoSign.name = "SVR_PHASE113_COFFEE_SIGN_TABLE_FACING";
   espressoSign.position.set(0, 2.55, .86);
   root.add(espressoSign);
 
-  const floorMarker = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.95, 2.12, .035, 72),
-    new THREE.MeshBasicMaterial({ color: 0x8ffff0, transparent: true, opacity: .14, depthWrite: false, blending: THREE.AdditiveBlending })
-  );
+  const floorMarker = new THREE.Mesh(new THREE.CylinderGeometry(1.95, 2.12, .035, 72), new THREE.MeshBasicMaterial({ color: 0x8ffff0, transparent: true, opacity: .14, depthWrite: false, blending: THREE.AdditiveBlending }));
   floorMarker.name = "SVR_PHASE113_COFFEE_POSITION_MARKER";
   floorMarker.position.y = .03;
   root.add(floorMarker);
@@ -189,11 +180,11 @@ export function applyPhase112CoffeeStandMove(scene, { log = console.log } = {}) 
 
   const panel = document.getElementById("svr-position-panel");
   if (panel) {
-    panel.textContent = `SVR POSITION PANEL\n${BUILD}\nCoffee stand assembled at X ${TARGET.x.toFixed(2)}  Z ${TARGET.z.toFixed(2)}\nFacing poker table/lobby center\nOld fixture pieces hidden: ${hidden}`;
+    panel.textContent = `SVR POSITION PANEL\n${BUILD}\nCoffee stand assembled at X ${TARGET.x.toFixed(2)}  Z ${TARGET.z.toFixed(2)}\nFacing lobby center\nOld fixture pieces hidden: ${hidden}`;
   }
 
-  scene.userData.SVR_PHASE113_COFFEE_STAND = { build: BUILD, target: { x: TARGET.x, z: TARGET.z }, facing: "poker-table-center", hidden };
+  scene.userData.SVR_PHASE113_COFFEE_STAND = { build: BUILD, target: { x: TARGET.x, z: TARGET.z }, facing: "lobby-center", hidden, reikiCleanupLoaded: !!window.SVR_REIKI_LUXURY_CLEANUP_12 };
   window.SVR_PHASE113_COFFEE_STAND = scene.userData.SVR_PHASE113_COFFEE_STAND;
-  log?.("Phase 113 coffee stand assembled and table-facing", scene.userData.SVR_PHASE113_COFFEE_STAND);
+  log?.("Phase 113 coffee stand assembled; Reiki cleanup bridge checked", scene.userData.SVR_PHASE113_COFFEE_STAND);
   return root;
 }
