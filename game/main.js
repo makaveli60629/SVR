@@ -1,4 +1,4 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
@@ -180,8 +180,9 @@ setTimeout(async () => {
   await safeImport("Phase 121 OBJ Skyline", "./modules/obj_skyline_loader.js", m => m.applyObjSkylineBackground?.(scene, { log }));
   await safeImport("Update 3 Portals", "./modules/update_3_0_present_moment.js", m => m.applyUpdate30PresentMoment?.({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene }));
   await safeImport("RICI Update 101 Reiki 1.1 Mother Module", "./modules/reiki_update_101_1_1_mother_module.js", m => m.applyRiciUpdate101MotherModule?.(scene, { log, gotoScene, camera, renderer }));
+  await safeImport("RICI Photo Controls Fix", "./modules/reiki_update_101_1_1_photo_controls_fix.js", m => m.applyRiciUpdate101PhotoControlsFix?.(scene, { log }));
   await safeImport("Coffee Phase113", "./modules/coffee_stand_phase112.js", m => m.applyPhase112CoffeeStandMove?.(scene, { log }));
-  setStatus("Ready. RICI Update 101 / Reiki 1.1 mother module loaded.", { force: true });
+  setStatus("Ready. RICI Update 101 / Reiki 1.1 photo controls loaded.", { force: true });
 }, 200);
 
 function setHudVisible(visible) {
@@ -235,4 +236,3 @@ renderer.setAnimationLoop(() => {
 const canvasEl = renderer.domElement;
 canvasEl.addEventListener("pointerdown", async () => { const st = audio.getState(); if (!st.enabled) await audio.start(); }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", e => { e.preventDefault(); log("[ERR] WebGL context lost. Reloading..."); setStatus("WebGL context lost (reloading...)", { force: true }); setTimeout(() => location.reload(), 500); }, false);
-
