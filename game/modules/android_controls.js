@@ -12,9 +12,11 @@ export function createAndroidControls({ camera, renderer, gotoScene, joinTable, 
       <button data-act="use" class="svr-action-main">ACTION</button>
       <button data-act="next">SLIDE ▶</button>
     </div>
+    <div class="svr-zone-label" hidden>INTERACTION ZONE</div>
     <div class="svr-mini-actions">
       <button data-act="menu">Menu</button>
       <button data-act="reiki">Reiki</button>
+      <button data-act="store">Store</button>
     </div>`;
   const style = document.createElement('style');
   style.textContent = `
@@ -25,6 +27,8 @@ export function createAndroidControls({ camera, renderer, gotoScene, joinTable, 
     #svr-android-controls .svr-knob{width:44px;height:44px;border-radius:999px;background:rgba(140,255,242,.66);box-shadow:0 0 18px rgba(140,255,242,.48);transform:translate(0,0)}
     #svr-android-controls .svr-actions{position:absolute;top:14px;right:12px;display:flex;gap:8px;pointer-events:auto;max-width:96vw;overflow-x:auto;padding-bottom:2px}
     #svr-android-controls .svr-actions[hidden]{display:none!important}
+    #svr-android-controls .svr-zone-label{position:absolute;top:56px;right:16px;color:#eaffff;background:rgba(0,12,16,.72);border:1px solid rgba(140,255,242,.50);border-radius:999px;padding:6px 10px;font-size:10px;font-weight:900;letter-spacing:.10em;box-shadow:0 0 16px rgba(0,255,230,.12)}
+    #svr-android-controls .svr-zone-label[hidden]{display:none!important}
     #svr-android-controls .svr-mini-actions{position:absolute;top:14px;left:12px;display:flex;gap:7px;pointer-events:auto;opacity:.82}
     #svr-android-controls button{border:1px solid rgba(140,255,242,.62);background:rgba(0,12,16,.78);color:#eaffff;border-radius:999px;padding:9px 12px;font-weight:900;font-size:12px;min-width:66px;white-space:nowrap;box-shadow:0 0 14px rgba(0,255,230,.10)}
     #svr-android-controls .svr-action-main{background:rgba(0,115,72,.86);border-color:rgba(120,255,180,.86);color:#ffffff;min-width:78px}
@@ -35,6 +39,7 @@ export function createAndroidControls({ camera, renderer, gotoScene, joinTable, 
   document.body.appendChild(root);
 
   const actions = root.querySelector('.svr-actions');
+  const zoneLabel = root.querySelector('.svr-zone-label');
   const pads = { left: { x:0, y:0, active:false }, right: { x:0, y:0, active:false } };
   function setupPad(which) {
     const el = root.querySelector(which === 'left' ? '.svr-left' : '.svr-right');
@@ -62,27 +67,35 @@ export function createAndroidControls({ camera, renderer, gotoScene, joinTable, 
   }
   setupPad('left'); setupPad('right');
 
-  function holo(action) {
-    if (!window.SVR_REIKI_INTERACTION_ACTIVE) { setStatus?.('Stand in the green interaction circle', { force:true }); return false; }
-    const api = window.SVR_RICI_UPDATE_101_CAROUSEL;
-    if (!api) { setStatus?.('Hologram not ready yet', { force:true }); return false; }
-    if (action === 'prev') api.prev?.();
-    if (action === 'next') api.next?.();
-    if (action === 'use') api.activate?.();
-    setStatus?.(`Hologram: ${action === 'use' ? 'action' : 'slide'}`, { force:true });
+  function activeApi() {
+    if (window.SVR_STORE_INTERACTION_ACTIVE && window.SVR_STORE_CAROUSEL_12) return { label: 'SVR Store', api: window.SVR_STORE_CAROUSEL_12 };
+    if (window.SVR_REIKI_INTERACTION_ACTIVE && window.SVR_RICI_UPDATE_101_CAROUSEL) return { label: 'Reiki', api: window.SVR_RICI_UPDATE_101_CAROUSEL };
+    return null;
+  }
+  function slide(action) {
+    const target = activeApi();
+    if (!target) { setStatus?.('Stand in an interaction circle', { force:true }); return false; }
+    if (action === 'prev') target.api.prev?.();
+    if (action === 'next') target.api.next?.();
+    if (action === 'use') target.api.activate?.();
+    setStatus?.(`${target.label}: ${action === 'use' ? 'action' : 'slide'}`, { force:true });
     return true;
   }
 
   root.querySelector('[data-act="menu"]')?.addEventListener('click', () => document.body.classList.toggle('svr-nav-open'));
   root.querySelector('[data-act="reiki"]')?.addEventListener('click', () => gotoScene?.('reiki'));
-  root.querySelector('[data-act="prev"]')?.addEventListener('click', () => holo('prev'));
-  root.querySelector('[data-act="next"]')?.addEventListener('click', () => holo('next'));
-  root.querySelector('[data-act="use"]')?.addEventListener('click', () => holo('use'));
+  root.querySelector('[data-act="store"]')?.addEventListener('click', () => gotoScene?.('vrStore'));
+  root.querySelector('[data-act="prev"]')?.addEventListener('click', () => slide('prev'));
+  root.querySelector('[data-act="next"]')?.addEventListener('click', () => slide('next'));
+  root.querySelector('[data-act="use"]')?.addEventListener('click', () => slide('use'));
 
   const yaw = { value: camera.rotation.y || 0 };
   return {
     update(dt = 0.016) {
-      actions.hidden = !window.SVR_REIKI_INTERACTION_ACTIVE;
+      const target = activeApi();
+      actions.hidden = !target;
+      zoneLabel.hidden = !target;
+      if (target) zoneLabel.textContent = `${target.label.toUpperCase()} ZONE`;
       const l = pads.left, r = pads.right;
       yaw.value -= r.x * dt * 1.95;
       camera.rotation.y = yaw.value;
