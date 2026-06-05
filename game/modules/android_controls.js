@@ -7,14 +7,13 @@ export function createAndroidControls({ camera, renderer, gotoScene, joinTable, 
   root.innerHTML = `
     <div class="svr-pad svr-left"><div class="svr-label">MOVE</div><div class="svr-knob"></div></div>
     <div class="svr-pad svr-right"><div class="svr-label">TURN</div><div class="svr-knob"></div></div>
-    <div class="svr-actions">
+    <div class="svr-actions" hidden>
       <button data-act="prev">SLIDE ◀</button>
       <button data-act="use" class="svr-action-main">ACTION</button>
       <button data-act="next">SLIDE ▶</button>
     </div>
     <div class="svr-mini-actions">
-      <button data-act="seat">Seat</button>
-      <button data-act="leave">Leave</button>
+      <button data-act="menu">Menu</button>
       <button data-act="reiki">Reiki</button>
     </div>`;
   const style = document.createElement('style');
@@ -25,7 +24,8 @@ export function createAndroidControls({ camera, renderer, gotoScene, joinTable, 
     #svr-android-controls .svr-label{position:absolute;top:12px;font-size:10px;font-weight:900;color:rgba(230,255,255,.65);letter-spacing:.08em;text-shadow:0 0 8px rgba(0,255,230,.35)}
     #svr-android-controls .svr-knob{width:44px;height:44px;border-radius:999px;background:rgba(140,255,242,.66);box-shadow:0 0 18px rgba(140,255,242,.48);transform:translate(0,0)}
     #svr-android-controls .svr-actions{position:absolute;top:14px;right:12px;display:flex;gap:8px;pointer-events:auto;max-width:96vw;overflow-x:auto;padding-bottom:2px}
-    #svr-android-controls .svr-mini-actions{position:absolute;top:58px;right:12px;display:flex;gap:7px;pointer-events:auto;opacity:.78}
+    #svr-android-controls .svr-actions[hidden]{display:none!important}
+    #svr-android-controls .svr-mini-actions{position:absolute;top:14px;left:12px;display:flex;gap:7px;pointer-events:auto;opacity:.82}
     #svr-android-controls button{border:1px solid rgba(140,255,242,.62);background:rgba(0,12,16,.78);color:#eaffff;border-radius:999px;padding:9px 12px;font-weight:900;font-size:12px;min-width:66px;white-space:nowrap;box-shadow:0 0 14px rgba(0,255,230,.10)}
     #svr-android-controls .svr-action-main{background:rgba(0,115,72,.86);border-color:rgba(120,255,180,.86);color:#ffffff;min-width:78px}
     #svr-android-controls button:active{background:rgba(0,95,92,.92)}
@@ -34,6 +34,7 @@ export function createAndroidControls({ camera, renderer, gotoScene, joinTable, 
   document.head.appendChild(style);
   document.body.appendChild(root);
 
+  const actions = root.querySelector('.svr-actions');
   const pads = { left: { x:0, y:0, active:false }, right: { x:0, y:0, active:false } };
   function setupPad(which) {
     const el = root.querySelector(which === 'left' ? '.svr-left' : '.svr-right');
@@ -62,8 +63,9 @@ export function createAndroidControls({ camera, renderer, gotoScene, joinTable, 
   setupPad('left'); setupPad('right');
 
   function holo(action) {
+    if (!window.SVR_REIKI_INTERACTION_ACTIVE) { setStatus?.('Stand in the green interaction circle', { force:true }); return false; }
     const api = window.SVR_RICI_UPDATE_101_CAROUSEL;
-    if (!api) { setStatus?.('Hologram controls ready near Reiki console', { force:true }); return false; }
+    if (!api) { setStatus?.('Hologram not ready yet', { force:true }); return false; }
     if (action === 'prev') api.prev?.();
     if (action === 'next') api.next?.();
     if (action === 'use') api.activate?.();
@@ -71,8 +73,7 @@ export function createAndroidControls({ camera, renderer, gotoScene, joinTable, 
     return true;
   }
 
-  root.querySelector('[data-act="seat"]')?.addEventListener('click', () => { joinTable?.(); setStatus?.('Android: seat', { force:true }); });
-  root.querySelector('[data-act="leave"]')?.addEventListener('click', () => { leaveTable?.(); setStatus?.('Android: leave', { force:true }); });
+  root.querySelector('[data-act="menu"]')?.addEventListener('click', () => document.body.classList.toggle('svr-nav-open'));
   root.querySelector('[data-act="reiki"]')?.addEventListener('click', () => gotoScene?.('reiki'));
   root.querySelector('[data-act="prev"]')?.addEventListener('click', () => holo('prev'));
   root.querySelector('[data-act="next"]')?.addEventListener('click', () => holo('next'));
@@ -81,6 +82,7 @@ export function createAndroidControls({ camera, renderer, gotoScene, joinTable, 
   const yaw = { value: camera.rotation.y || 0 };
   return {
     update(dt = 0.016) {
+      actions.hidden = !window.SVR_REIKI_INTERACTION_ACTIVE;
       const l = pads.left, r = pads.right;
       yaw.value -= r.x * dt * 1.95;
       camera.rotation.y = yaw.value;
