@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker - Lobby Organization 1.2</title>
+  <title>ScarlettVR Poker - Lobby Organization 1.3D</title>
   <meta name="theme-color" content="#050508"/>
-  <link rel="manifest" href="./manifest.json?v=lobby-org-1-2-nav-clean"/>
+  <link rel="manifest" href="./manifest.json?v=lobby-org-1-3d-desktop-parity"/>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preload" href="./main.js?v=lobby-org-1-2-nav-clean" as="script" crossorigin="anonymous">
+  <link rel="preload" href="./main.js?v=lobby-org-1-3d-desktop-parity" as="script" crossorigin="anonymous">
   <style>
     :root { color-scheme: dark; }
     html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
@@ -22,7 +22,8 @@
     body.svr-nav-open #sceneNav { display: flex; }
     .scene-btn { border: 1px solid rgba(120,255,186,.42); background: rgba(2,10,8,.72); color: #eafff4; border-radius: 999px; padding: 8px 12px; cursor: pointer; box-shadow: 0 10px 28px rgba(0,0,0,.35); font-size: 12px; text-align: left; min-width: 148px; }
     .scene-btn:hover { background: rgba(10,48,33,.72); }
-    body.preview-mode #sceneNav, body.preview-mode #sceneMenuToggle { display:none !important; }
+    body.preview-mode #sceneNav, body.preview-mode #sceneMenuToggle, body.preview-mode #desktopHint { display:none !important; }
+    #desktopHint { position: fixed; right: 12px; bottom: 12px; z-index: 13; pointer-events: none; background: rgba(0,0,0,.52); border: 1px solid rgba(180,140,255,.34); color: rgba(245,240,255,.82); border-radius: 999px; padding: 8px 12px; font-size: 11px; font-weight: 800; letter-spacing: .03em; }
     #log { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10; max-height: 38vh; overflow: auto; display: none; background: rgba(0,0,0,.55); border: 1px solid rgba(0,255,204,.25); border-radius: 14px; padding: 10px 12px; color: #d7fff8; font: 12px/1.35 ui-monospace, monospace; white-space: pre-wrap; }
     #err { position: fixed; inset: 0; display: none; z-index: 50; background: rgba(0,0,0,.88); color: #fff; padding: 18px; font: 13px/1.45 ui-monospace, monospace; overflow: auto; }
     body.preview-mode #hud, body.preview-mode #log, body.preview-mode #err { display: none !important; }
@@ -52,25 +53,45 @@
       <div class="splash-step" id="splashStep">Starting renderer...</div>
       <div class="splash-bar"><div class="splash-fill" id="splashFill"></div></div>
       <div class="splash-hint" id="splashHint">Comfort mode active. Core lobby loads first; luxury modules continue in sequence.</div>
-      <div class="splash-build" id="splashBuild">LOBBY-ORG-1-2-NAV-CLEAN</div>
+      <div class="splash-build" id="splashBuild">LOBBY-ORG-1-3D-DESKTOP-PARITY</div>
     </div>
   </div>
   <div id="app"></div>
   <div id="hud">
-    <div class="pill" id="status">Booting Lobby Organization 1.2...</div>
+    <div class="pill" id="status">Booting Lobby Organization 1.3D...</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: ...</span>
-      <span class="pill">BUILD: LOBBY-ORG-1-2</span>
+      <span class="pill">BUILD: LOBBY-ORG-1-3D</span>
     </div>
   </div>
   <button id="sceneMenuToggle" type="button">Destinations ▾</button>
   <div id="sceneNav">
     <button class="scene-btn" data-scene="lobby">Lobby</button><button class="scene-btn" data-scene="seat">Seat</button><button class="scene-btn" data-scene="reiki">Reiki</button><button class="scene-btn" data-scene="reikiRoom">Reiki Room</button><button class="scene-btn" data-scene="reikiTalk">Reiki Talk</button><button class="scene-btn" data-scene="pgaDrive">PGA Drive</button><button class="scene-btn" data-scene="chipPutt">Chip/Putt</button><button class="scene-btn" data-scene="vrStore">VR Store</button><button class="scene-btn" data-scene="smokerLounge">Smoker</button><button class="scene-btn" data-scene="scorpionRoom">Scorpion Room</button><button class="scene-btn" data-scene="pga">PGA</button><button class="scene-btn" data-scene="legends">Legend</button><button class="scene-btn" data-scene="sponsor">Sponsor</button><button class="scene-btn" data-scene="scorpion">Scorpion</button>
   </div>
+  <div id="desktopHint">Desktop carousel: [ previous  ] next  Enter action</div>
   <pre id="log"></pre><pre id="err"></pre>
-  <script>document.getElementById('sceneMenuToggle')?.addEventListener('click',()=>document.body.classList.toggle('svr-nav-open'));</script>
-  <script type="module" src="./main.js?v=lobby-org-1-2-nav-clean"></script>
+  <script>
+    document.getElementById('sceneMenuToggle')?.addEventListener('click',()=>document.body.classList.toggle('svr-nav-open'));
+    function activeCarousel(){
+      if (window.SVR_STORE_INTERACTION_ACTIVE && window.SVR_STORE_CAROUSEL_12) return { label:'SVR Store', api: window.SVR_STORE_CAROUSEL_12 };
+      if (window.SVR_REIKI_INTERACTION_ACTIVE && window.SVR_RICI_UPDATE_101_CAROUSEL) return { label:'Reiki', api: window.SVR_RICI_UPDATE_101_CAROUSEL };
+      return null;
+    }
+    window.addEventListener('keydown', (e)=>{
+      if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
+      const tag = (document.activeElement?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      const target = activeCarousel();
+      if (!target) return;
+      if (e.code === 'BracketLeft' || e.code === 'Comma') { target.api.prev?.(); e.preventDefault(); }
+      if (e.code === 'BracketRight' || e.code === 'Period') { target.api.next?.(); e.preventDefault(); }
+      if (e.code === 'Enter' || e.code === 'Space') { target.api.activate?.(); e.preventDefault(); }
+      const status = document.getElementById('status');
+      if (status) status.textContent = `${target.label}: keyboard carousel control`;
+    });
+  </script>
+  <script type="module" src="./main.js?v=lobby-org-1-3d-desktop-parity"></script>
 </body>
 </html>
