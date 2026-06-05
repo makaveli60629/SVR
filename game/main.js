@@ -9,7 +9,7 @@ import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createAndroidControls } from "./modules/android_controls.js";
 
-const BUILD = "PHASE-118-SAFE-BOOT-OPTIONAL-MODULES-LOCK";
+const BUILD = "PHASE-119-SAFE-BOOT-ORGANIZED-REIKI-STOREFRONT-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -208,23 +208,17 @@ setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus("Ready. Safe boot active. Loading optional polish modules...", { force: true });
+setStatus("Ready. Safe boot active. Loading Phase 119 organized storefront...", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
-window.SVR_PHASE118_SAFE_BOOT = { build: BUILD };
+window.SVR_PHASE119_SAFE_BOOT = { build: BUILD };
 
-// Optional modules are deliberately dynamic. A broken polish module can no longer lock the lobby on Booting.
 setTimeout(async () => {
   await safeImport("Phase 115 Sky", "./modules/phase115_sky_planets_locomotion_status.js", m => m.applyPhase115SkyPlanets?.(scene, { log }));
   await safeImport("Phase 115 OBJ Skyline", "./modules/obj_skyline_loader.js", m => m.applyObjSkylineBackground?.(scene, { log }));
   await safeImport("Update 3 Portals", "./modules/update_3_0_present_moment.js", m => m.applyUpdate30PresentMoment?.({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene }));
-  await safeImport("Reiki Storefront 3", "./modules/reiki_storefront_3_0.js", m => m.enhanceReikiStorefront3?.(scene, { log }));
-  await safeImport("Reiki Phase105 Cleanup", "./modules/reiki_phase105_override.js", m => m.applyReikiPhase105Override?.(scene, { log }));
-  await safeImport("Reiki Wall Cutout", "./modules/reiki_wall_cutout.js", m => m.applyReikiWallCutout?.(scene, { log }));
-  await safeImport("Reiki Phase110 Cleanup", "./modules/reiki_phase110_polish.js", m => m.applyReikiPhase110Polish?.(scene, { log }));
-  await safeImport("Reiki Phase114 Cleanup", "./modules/reiki_phase114_declutter.js", m => m.applyReikiPhase114Declutter?.(scene, { log }));
-  await safeImport("Reiki Phase116 Walkthrough", "./modules/reiki_phase116_walkthrough.js", m => m.applyReikiPhase116Walkthrough?.(scene, { log }));
+  await safeImport("Reiki Phase119 Organized", "./modules/reiki_phase119_organized_storefront.js", m => m.applyReikiPhase119OrganizedStorefront?.(scene, { log, gotoScene }));
   await safeImport("Coffee Phase113", "./modules/coffee_stand_phase112.js", m => m.applyPhase112CoffeeStandMove?.(scene, { log }));
-  setStatus("Ready. Phase 118 safe boot loaded optional polish modules.", { force: true });
+  setStatus("Ready. Phase 119 organized Reiki storefront loaded.", { force: true });
 }, 200);
 
 function setHudVisible(visible){
