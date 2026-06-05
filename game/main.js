@@ -13,6 +13,7 @@ import { enhanceReikiStorefront3 } from "./modules/reiki_storefront_3_0.js";
 import { applyReikiPhase105Override } from "./modules/reiki_phase105_override.js";
 import { applyReikiWallCutout } from "./modules/reiki_wall_cutout.js";
 import { applyReikiPhase110Polish } from "./modules/reiki_phase110_polish.js";
+import { applyPhase112CoffeeStandMove } from "./modules/coffee_stand_phase112.js";
 import { createAndroidControls } from "./modules/android_controls.js";
 
 const params = new URLSearchParams(location.search);
@@ -92,6 +93,7 @@ enhanceReikiStorefront3(scene, { log });
 applyReikiPhase105Override(scene, { log });
 applyReikiWallCutout(scene, { log });
 applyReikiPhase110Polish(scene, { log });
+applyPhase112CoffeeStandMove(scene, { log });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
