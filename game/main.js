@@ -9,7 +9,7 @@ import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createAndroidControls } from "./modules/android_controls.js";
 
-const BUILD = "LOBBY-ORG-1-2-CAM3-LIVE-PREVIEW-ROUTE";
+const BUILD = "LOBBY-ORG-1-3G-ROUTE-AUDIT-DIRECT-LOADER-CLEAN";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director" || params.get("cam") === "cam3" || params.get("cam") === "preview";
@@ -36,7 +36,7 @@ function setSplash(text, pct = splashProgress, hint = null) {
   if (hint && $splashHint) $splashHint.textContent = hint;
 }
 function hideSplash(reason = "ready") {
-  setSplash("Lobby ready", 100, "You can enter VR now. Extra showroom modules continue safely in the background.");
+  setSplash("Lobby ready", 100, "You can enter now. Extra showroom modules continue safely in the background.");
   window.SVR_SPLASH_READY_REASON = reason;
   setTimeout(() => document.body.classList.add("svr-ready"), 180);
 }
@@ -78,7 +78,7 @@ setSplash("Preparing splash screen...", 8);
 $toggleLog?.addEventListener("click", () => { $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none"; });
 if (AUTOCAM) document.body.classList.add("preview-mode");
 
-setSplash("Starting WebXR renderer...", 14);
+setSplash("Starting renderer...", 14);
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData._camera = camera;
 window.SVR_CAMERA = camera;
@@ -165,11 +165,12 @@ function loadShowroomModules() {
   safeImport("Phase 121 Sky", "./modules/phase121_sky_fix.js", m => m.applyPhase121SkyFix?.(scene, { log }), 78)
     .then(() => safeImport("Phase 121 OBJ Skyline", "./modules/obj_skyline_loader.js", m => m.applyObjSkylineBackground?.(scene, { log }), 82))
     .then(() => safeImport("Update 3 Portals", "./modules/update_3_0_present_moment.js", m => m.applyUpdate30PresentMoment?.({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene }), 86))
+    .then(() => safeImport("Portal Route Audit 1.3", "./modules/portal_route_audit_cleanup_1_3.js", m => m.applyPortalRouteAuditCleanup13?.(scene, { log }), 88))
     .then(() => safeImport("Controller Pointer Bridge 1.2", "./modules/controller_pointer_bridge_1_2.js", m => m.applyControllerPointerBridge12?.(scene, { log }), 89))
     .then(() => safeImport("RICI Update 101 Reiki 1.1 Mother Module", "./modules/reiki_update_101_1_1_mother_module.js", m => m.applyRiciUpdate101MotherModule?.(scene, { log, gotoScene, camera, renderer }), 92))
     .then(() => safeImport("RICI Photo Controls Fix", "./modules/reiki_update_101_1_1_photo_controls_fix.js", m => m.applyRiciUpdate101PhotoControlsFix?.(scene, { log }), 95))
     .then(() => safeImport("Coffee Phase113", "./modules/coffee_stand_phase112.js", m => m.applyPhase112CoffeeStandMove?.(scene, { log }), 97))
-    .then(() => { setStatus("Ready. Lobby Organization 1.2 fully loaded.", { force: true }); hideSplash("all-modules-loaded"); })
+    .then(() => { setStatus("Ready. Lobby Organization 1.3G fully loaded.", { force: true }); hideSplash("all-modules-loaded"); })
     .catch(() => hideSplash("module-chain-safe-fallback"));
 }
 setTimeout(() => hideSplash("core-lobby-ready"), 1100);
