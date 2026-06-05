@@ -1,6 +1,7 @@
 import * as THREE from "three";
+import { applyEspressoDailyCashStore12 } from "./espresso_daily_cash_store_1_2.js";
 
-const BUILD = "LOBBY-ORG-1-2-REIKI-INTERACTION-GATE";
+const BUILD = "LOBBY-ORG-1-2-REIKI-INTERACTION-GATE-ESPRESSO-BRIDGE";
 
 function makePanelTexture(title, lines) {
   const c = document.createElement("canvas");
@@ -60,6 +61,7 @@ function allowMutedVideo() {
 }
 
 export function applyReikiInteractionGate12(scene, { log = console.log } = {}) {
+  applyEspressoDailyCashStore12?.(scene, { log });
   const root = scene?.getObjectByName("SVR_RICI_UPDATE_101_MOTHER_MODULE_LOCK");
   if (!root || root.getObjectByName("SVR_REIKI_INTERACTION_GATE_12_LOCK")) return null;
 
@@ -117,7 +119,8 @@ export function applyReikiInteractionGate12(scene, { log = console.log } = {}) {
     build: BUILD,
     activeFlag: "SVR_REIKI_INTERACTION_ACTIVE",
     videoOnlyOnCard: true,
-    androidControlsGate: true
+    androidControlsGate: true,
+    espressoBridge: !!window.SVR_ESPRESSO_DAILY_CASH_STORE_12
   };
   log?.("Reiki interaction gate loaded", window.SVR_REIKI_INTERACTION_GATE_12);
   return lock;
