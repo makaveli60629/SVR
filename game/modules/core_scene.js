@@ -5,10 +5,14 @@ export function createCore({ containerId = "app" } = {}){
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x050508);
 
-  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.2, 1600);
+  const ua = navigator.userAgent || "";
+  const isQuest = /Quest|OculusBrowser|Meta Quest/i.test(ua);
+  const isMobile = isQuest || /Android|Mobile|iPhone|iPad/i.test(ua);
+
+  const camera = new THREE.PerspectiveCamera(isQuest ? 68 : 70, window.innerWidth / window.innerHeight, 0.2, 1600);
 
   const renderer = new THREE.WebGLRenderer({
-    antialias: true,
+    antialias: !isMobile,
     alpha: false,
     depth: true,
     stencil: false,
@@ -17,14 +21,14 @@ export function createCore({ containerId = "app" } = {}){
   });
 
   renderer.setClearColor(0x050508, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 0.9));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isQuest ? 0.72 : isMobile ? 0.82 : 0.95));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
+  renderer.xr.setFramebufferScaleFactor?.(isQuest ? 0.72 : 0.9);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
-  renderer.shadowMap.enabled = false;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMappingExposure = isQuest ? 0.92 : 1.0;
+  shadowOff(renderer);
 
   document.getElementById(containerId).appendChild(renderer.domElement);
   const vrButton = VRButton.createButton(renderer, {
@@ -34,6 +38,15 @@ export function createCore({ containerId = "app" } = {}){
   vrButton.classList.add("svr-vr-button");
   document.body.appendChild(vrButton);
 
+  window.SVR_RENDER_PROFILE = {
+    isQuest,
+    isMobile,
+    pixelRatio: renderer.getPixelRatio(),
+    framebufferScale: isQuest ? 0.72 : 0.9,
+    antialias: !isMobile,
+    build: "LOBBY-ORG-1-2-COMFORT-RENDERER"
+  };
+
   window.addEventListener("resize", ()=>{
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -41,4 +54,9 @@ export function createCore({ containerId = "app" } = {}){
   });
 
   return { scene, camera, renderer };
+}
+
+function shadowOff(renderer){
+  renderer.shadowMap.enabled = false;
+  renderer.shadowMap.type = THREE.BasicShadowMap;
 }
