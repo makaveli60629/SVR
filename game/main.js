@@ -4,21 +4,12 @@ import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
 import { buildSkylineRoom } from "./modules/world_skyline.js";
-import { applyObjSkylineBackground } from "./modules/obj_skyline_loader.js";
-import { applyPhase115SkyPlanets } from "./modules/phase115_sky_planets_locomotion_status.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { applyUpdate30PresentMoment } from "./modules/update_3_0_present_moment.js";
-import { enhanceReikiStorefront3 } from "./modules/reiki_storefront_3_0.js";
-import { applyReikiPhase105Override } from "./modules/reiki_phase105_override.js";
-import { applyReikiWallCutout } from "./modules/reiki_wall_cutout.js";
-import { applyReikiPhase110Polish } from "./modules/reiki_phase110_polish.js";
-import { applyReikiPhase114Declutter } from "./modules/reiki_phase114_declutter.js";
-import { applyReikiPhase116Walkthrough } from "./modules/reiki_phase116_walkthrough.js";
-import { applyPhase112CoffeeStandMove } from "./modules/coffee_stand_phase112.js";
 import { createAndroidControls } from "./modules/android_controls.js";
 
+const BUILD = "PHASE-118-SAFE-BOOT-OPTIONAL-MODULES-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
@@ -54,9 +45,24 @@ function setMode(text){
 
 function log(...args){
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
+  console.log("[SVR]", ...args);
   if ($log) {
     $log.textContent += line + "\n";
     $log.scrollTop = $log.scrollHeight;
+  }
+}
+
+async function safeImport(label, path, fn) {
+  try {
+    const mod = await import(path);
+    await fn(mod);
+    log(`${label}: loaded`);
+    return true;
+  } catch (err) {
+    const message = err?.stack || err?.message || String(err);
+    log(`${label}: failed safely`, message);
+    window[`SVR_${label.replace(/\W+/g, "_").toUpperCase()}_ERROR`] = message;
+    return false;
   }
 }
 
@@ -68,39 +74,25 @@ if (AUTOCAM) document.body.classList.add("preview-mode");
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData._camera = camera;
+window.SVR_CAMERA = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
 
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
+  log("Runtime error", e?.error?.stack || e?.message || String(e));
 });
 window.addEventListener("unhandledrejection", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e));
+  log("Unhandled rejection", e?.reason?.stack || e?.reason || String(e));
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
 setStatus("Loading world...", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
-
-applyPhase115SkyPlanets(scene, { log });
-
-setTimeout(() => {
-  applyObjSkylineBackground(scene, { log }).catch((err) => {
-    log("Phase 115 OBJ skyline failed safely", err?.message || err);
-    window.SVR_PHASE115_OBJ_SKYLINE_ERROR = String(err?.message || err);
-  });
-}, 800);
-
-enhanceReikiStorefront3(scene, { log });
-applyReikiPhase105Override(scene, { log });
-applyReikiWallCutout(scene, { log });
-applyReikiPhase110Polish(scene, { log });
-applyReikiPhase114Declutter(scene, { log });
-applyReikiPhase116Walkthrough(scene, { log });
-applyPhase112CoffeeStandMove(scene, { log });
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -179,7 +171,6 @@ function gotoScene(key){
   return true;
 }
 
-const update30 = applyUpdate30PresentMoment({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene });
 const androidControls = createAndroidControls({ camera, renderer, gotoScene, joinTable, leaveTable, setStatus });
 
 $sceneButtons.forEach((btn)=>{ btn.addEventListener("click", ()=>{ const key = btn.dataset.scene; if (key) gotoScene(key); }); });
@@ -217,8 +208,24 @@ setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 116 Reiki walkthrough, Phase 115 sky, textured OBJ skyline, and locomotion are active.", { force: true });
+setStatus("Ready. Safe boot active. Loading optional polish modules...", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
+window.SVR_PHASE118_SAFE_BOOT = { build: BUILD };
+
+// Optional modules are deliberately dynamic. A broken polish module can no longer lock the lobby on Booting.
+setTimeout(async () => {
+  await safeImport("Phase 115 Sky", "./modules/phase115_sky_planets_locomotion_status.js", m => m.applyPhase115SkyPlanets?.(scene, { log }));
+  await safeImport("Phase 115 OBJ Skyline", "./modules/obj_skyline_loader.js", m => m.applyObjSkylineBackground?.(scene, { log }));
+  await safeImport("Update 3 Portals", "./modules/update_3_0_present_moment.js", m => m.applyUpdate30PresentMoment?.({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene }));
+  await safeImport("Reiki Storefront 3", "./modules/reiki_storefront_3_0.js", m => m.enhanceReikiStorefront3?.(scene, { log }));
+  await safeImport("Reiki Phase105 Cleanup", "./modules/reiki_phase105_override.js", m => m.applyReikiPhase105Override?.(scene, { log }));
+  await safeImport("Reiki Wall Cutout", "./modules/reiki_wall_cutout.js", m => m.applyReikiWallCutout?.(scene, { log }));
+  await safeImport("Reiki Phase110 Cleanup", "./modules/reiki_phase110_polish.js", m => m.applyReikiPhase110Polish?.(scene, { log }));
+  await safeImport("Reiki Phase114 Cleanup", "./modules/reiki_phase114_declutter.js", m => m.applyReikiPhase114Declutter?.(scene, { log }));
+  await safeImport("Reiki Phase116 Walkthrough", "./modules/reiki_phase116_walkthrough.js", m => m.applyReikiPhase116Walkthrough?.(scene, { log }));
+  await safeImport("Coffee Phase113", "./modules/coffee_stand_phase112.js", m => m.applyPhase112CoffeeStandMove?.(scene, { log }));
+  setStatus("Ready. Phase 118 safe boot loaded optional polish modules.", { force: true });
+}, 200);
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -257,7 +264,7 @@ renderer.setAnimationLoop(()=>{
   const dt = Math.min((now - tPrev) / 1000, 0.033);
   tPrev = now;
   if (!renderer.xr.isPresenting){
-    if (!AUTOCAM) desktop.update(dt);
+    if (!AUTOCAM) desktop?.update(dt);
     else {
       const shotIndex = Math.floor(now / 9000) % previewShots.length;
       const shot = previewShots[shotIndex];
