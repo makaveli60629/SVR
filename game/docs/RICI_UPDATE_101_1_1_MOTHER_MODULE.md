@@ -1,4 +1,4 @@
-# RICI / Reiki Update 101 — 1.1 Mother Module
+﻿# RICI / Reiki Update 101 — 1.1 Mother Module
 
 ## Build
 RICI-UPDATE-101-1-1-MOTHER-MODULE-LOCK
@@ -28,7 +28,7 @@ This is the master reusable sponsor/partner storefront module. Reiki is the firs
 ## Carousel cards
 - Intro video
 - About
-- Symbols
+- Reiki symbols
 - Services
 - Store preview
 - VIP promo
@@ -54,6 +54,6 @@ game/modules/reiki_update_101_1_1_mother_module.js
 - Red ropes connected.
 - Activation circle visible.
 - Q/E changes hologram cards.
-- Portal card opens private room.
+- Portal card opens private Reiki room.
 - Red AWAITING APPROVAL visible.
 - No unapproved official claim.

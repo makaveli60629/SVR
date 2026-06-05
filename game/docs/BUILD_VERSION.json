@@ -1,7 +1,9 @@
 ﻿{
-    "phase":  "Update 3.0 / Phase 100",
-    "updatedAtUtc":  "2026-06-04T04:23:08Z",
-    "siteTouched":  false,
-    "build":  "PHASE-100-UPDATE-3.0-PRESENT-MOMENT-LOCK",
-    "baseline":  "98S/Q presentation safety mode overlay"
+  "build": "RICI-UPDATE-101-1-1-MOTHER-MODULE-LOCK",
+  "phase": "RICI Update 101 / Reiki 1.1",
+  "scope": "game-side Reiki mother module",
+  "siteTouched": false,
+  "approvalSafe": true,
+  "packetDriven": true,
+  "updatedAt": "2026-06-05T00:31:50"
 }

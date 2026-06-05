@@ -1,4 +1,4 @@
-{
+﻿{
   "build": "RICI-UPDATE-101-1-1-MOTHER-MODULE-LOCK",
   "moduleType": "sponsor_partner_hologram_carousel",
   "approval": {
@@ -27,13 +27,41 @@
   },
   "carousel": {
     "cards": [
-      { "type": "video", "title": "INTRO VIDEO", "lines": ["Presentation media", "Narrow hologram format", "Tap once for audio"] },
-      { "type": "about", "title": "ABOUT", "lines": ["Wellness profile", "Partner info slot", "Approval-safe placeholder"] },
-      { "type": "symbols", "title": "SYMBOLS", "lines": ["Root • Sacral • Solar", "Heart • Throat • Vision", "Crown • Balance • Calm"] },
-      { "type": "services", "title": "SERVICES", "lines": ["Private sessions", "Energy balancing", "Guided meditation"] },
-      { "type": "store", "title": "STORE PREVIEW", "lines": ["Session packages", "Product cards", "Website store link"] },
-      { "type": "promo", "title": "VIP PROMO", "lines": ["Future profile rewards", "Coupon-ready", "No live discounts yet"] },
-      { "type": "portal", "title": "ENTER ROOM", "lines": ["Private room", "Meditation destination", "Activate portal"] }
+      {
+        "type": "video",
+        "title": "INTRO VIDEO",
+        "lines": ["Reiki presentation media", "Narrow hologram format", "Tap once for audio"]
+      },
+      {
+        "type": "about",
+        "title": "ABOUT",
+        "lines": ["Wellness profile", "Founder/practitioner slot", "Approval-safe placeholder"]
+      },
+      {
+        "type": "symbols",
+        "title": "REIKI SYMBOLS",
+        "lines": ["Root • Sacral • Solar", "Heart • Throat • Vision", "Crown • Balance • Calm"]
+      },
+      {
+        "type": "services",
+        "title": "SERVICES",
+        "lines": ["Private sessions", "Energy balancing", "Guided meditation"]
+      },
+      {
+        "type": "store",
+        "title": "STORE PREVIEW",
+        "lines": ["Session packages", "Product cards", "Website store link"]
+      },
+      {
+        "type": "promo",
+        "title": "VIP PROMO",
+        "lines": ["Future profile rewards", "Coupon-ready", "No live discounts yet"]
+      },
+      {
+        "type": "portal",
+        "title": "ENTER ROOM",
+        "lines": ["Private Reiki room", "Meditation destination", "Activate portal"]
+      }
     ]
   }
 }
