@@ -9,10 +9,10 @@ import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createAndroidControls } from "./modules/android_controls.js";
 
-const BUILD = "LOBBY-ORG-1-2-SPLASH-STAGED-BOOT";
+const BUILD = "LOBBY-ORG-1-2-CAM3-LIVE-PREVIEW-ROUTE";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
-const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
+const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director" || params.get("cam") === "cam3" || params.get("cam") === "preview";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 
 const $status = document.getElementById("status");
@@ -72,10 +72,7 @@ async function safeImport(label, path, fn, pct = null) {
     return false;
   }
 }
-function idle(fn, delay = 120) {
-  if (window.requestIdleCallback) requestIdleCallback(fn, { timeout: 1600 });
-  else setTimeout(fn, delay);
-}
+function idle(fn, delay = 120) { if (window.requestIdleCallback) requestIdleCallback(fn, { timeout: 1600 }); else setTimeout(fn, delay); }
 
 setSplash("Preparing splash screen...", 8);
 $toggleLog?.addEventListener("click", () => { $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none"; });
@@ -125,10 +122,7 @@ setSplash("Input systems ready", 60);
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
-function currentHeadXZ() {
-  if (renderer.xr.isPresenting) { const xrCam = renderer.xr.getCamera(camera); const p = new THREE.Vector3(); xrCam.getWorldPosition(p); return p; }
-  return camera.position.clone();
-}
+function currentHeadXZ() { if (renderer.xr.isPresenting) { const xrCam = renderer.xr.getCamera(camera); const p = new THREE.Vector3(); xrCam.getWorldPosition(p); return p; } return camera.position.clone(); }
 function inTableZone() { const p = currentHeadXZ(); return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7); }
 function seatLabel() { return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing"; }
 function moveDesktopToSeat(seat) { camera.position.set(seat.x, 1.12, seat.z); camera.lookAt(0, 1.0, 0); }
@@ -162,7 +156,7 @@ $toggleJoints?.addEventListener("click", () => { const on = hands.toggleDebug();
 setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
+setMode(AUTOCAM ? "CAM 3 live preview" : "Hands: waiting...");
 window.SVR_RICI_UPDATE_101_SAFE_BOOT = { build: BUILD };
 setStatus("Ready. Core lobby loaded. Showroom modules staging...", { force: true });
 setSplash("Core lobby ready", 76, "You can enter while extra skyline and sponsor modules finish loading.");
@@ -190,14 +184,51 @@ renderer.xr.addEventListener("sessionend", () => { setHudVisible(true); const na
 let tPrev = performance.now();
 const previewTarget = new THREE.Vector3(0, 1.25, 0);
 const previewPos = new THREE.Vector3();
-const previewShots = [
-  { y: 1.62, r: previewOrbitRadius - 3.5, speed: 0.030, sway: 0.015, lookY: 1.02, targetX: 0.0, targetZ: 0.0, leadX: 0.14, leadZ: 0.08 },
-  { y: 1.68, r: previewOrbitRadius - 3.0, speed: -0.024, sway: 0.018, lookY: 1.04, targetX: 0.1, targetZ: -0.1, leadX: -0.10, leadZ: 0.12 },
-  { y: 1.64, r: previewOrbitRadius - 2.6, speed: 0.022, sway: 0.018, lookY: 1.03, targetX: -0.12, targetZ: 0.04, leadX: 0.10, leadZ: -0.08 }
+const camA = new THREE.Vector3();
+const camB = new THREE.Vector3();
+const lookA = new THREE.Vector3();
+const lookB = new THREE.Vector3();
+function v(x, y, z) { return new THREE.Vector3(x, y, z); }
+function eased(x) { x = THREE.MathUtils.clamp(x, 0, 1); return x * x * (3 - 2 * x); }
+const cam3Route = [
+  { label: "Poker table hero", dur: 4.0, pos: v(0.0, 4.4, 13.5), look: v(0.0, 1.05, 0.0) },
+  { label: "Seated gameplay pass", dur: 3.8, pos: v(7.7, 2.15, 6.4), look: v(0.0, 1.02, 0.0) },
+  { label: "Reiki storefront", dur: 4.2, pos: v(15.2, 2.6, 4.0), look: v(10.4, 1.65, -0.3) },
+  { label: "Portal directory", dur: 3.6, pos: v(-13.2, 2.7, 8.7), look: v(-18.3, 2.5, 0.2) },
+  { label: "PGA and sponsor wall", dur: 3.8, pos: v(-9.4, 2.7, -13.8), look: v(-17.0, 2.6, -17.0) },
+  { label: "Coffee and store corner", dur: 3.5, pos: v(10.8, 2.35, -11.8), look: v(15.8, 1.45, -16.4) },
+  { label: "Skyline ads and moon", dur: 4.2, pos: v(0.0, 8.5, 18.0), look: v(-36.0, 68.0, -150.0) },
+  { label: "Full lobby overview", dur: 4.2, pos: v(-11.5, 5.25, 13.2), look: v(0.0, 1.45, -2.4) }
 ];
+const routeTotal = cam3Route.reduce((sum, shot) => sum + shot.dur, 0);
+function updateCam3(now) {
+  const t = (now * 0.001) % routeTotal;
+  let acc = 0;
+  let index = 0;
+  for (let i = 0; i < cam3Route.length; i++) {
+    if (t <= acc + cam3Route[i].dur) { index = i; break; }
+    acc += cam3Route[i].dur;
+  }
+  const shot = cam3Route[index];
+  const next = cam3Route[(index + 1) % cam3Route.length];
+  const k = eased((t - acc) / shot.dur);
+  camA.copy(shot.pos);
+  camB.copy(next.pos);
+  lookA.copy(shot.look);
+  lookB.copy(next.look);
+  previewPos.lerpVectors(camA, camB, k);
+  previewTarget.lerpVectors(lookA, lookB, k);
+  previewPos.y += Math.sin(now * 0.00075 + index) * 0.10;
+  previewTarget.y += Math.sin(now * 0.00055 + index) * 0.04;
+  camera.position.lerp(previewPos, 0.085);
+  camera.lookAt(previewTarget);
+  if (window.SVR_CAM3_LIVE_PREVIEW?.shot !== shot.label) window.SVR_CAM3_LIVE_PREVIEW = { build: BUILD, shot: shot.label, index: index + 1, total: cam3Route.length, loopSeconds: Math.round(routeTotal) };
+}
+window.SVR_CAM3_LIVE_PREVIEW = { build: BUILD, route: "short showroom loop", shots: cam3Route.map(s => s.label), loopSeconds: Math.round(routeTotal) };
+
 renderer.setAnimationLoop(() => {
   const now = performance.now(); const dt = Math.min((now - tPrev) / 1000, 0.033); tPrev = now;
-  if (!renderer.xr.isPresenting) { if (!AUTOCAM) desktop?.update(dt); else { const shotIndex = Math.floor(now / 9000) % previewShots.length; const shot = previewShots[shotIndex]; const orbitT = now * 0.001 * shot.speed; previewPos.set(Math.cos(orbitT) * shot.r + shot.leadX * Math.sin(now * 0.00047), shot.y + Math.sin(now * 0.0014 + shotIndex) * shot.sway, Math.sin(orbitT) * shot.r + shot.leadZ * Math.cos(now * 0.00053)); previewTarget.set(shot.targetX, shot.lookY, shot.targetZ); camera.position.lerp(previewPos, 0.06); camera.lookAt(previewTarget); } androidControls.update(dt); scene.userData._camera = camera; }
+  if (!renderer.xr.isPresenting) { if (!AUTOCAM) desktop?.update(dt); else updateCam3(now); androidControls.update(dt); scene.userData._camera = camera; }
   else scene.userData._camera = renderer.xr.getCamera(camera);
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
   hands.update(dt); hands.updateDebug();
