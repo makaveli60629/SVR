@@ -9,10 +9,9 @@ import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createAndroidControls } from "./modules/android_controls.js";
 
-const BUILD = "PHASE-121-SAFE-BOOT-SKYLINE-REIKI-LOCOMOTION-LOCK";
+const BUILD = "PHASE-122-SAFE-BOOT-REIKI-SHOWCASE-STOREFRONT-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
-const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 
@@ -26,7 +25,7 @@ const $sceneButtons = Array.from(document.querySelectorAll("#sceneNav .scene-btn
 
 let lastStatusText = "";
 let lastStatusAt = 0;
-function setStatus(text, { force = false, minGap = 180 } = {}){
+function setStatus(text, { force = false, minGap = 180 } = {}) {
   if (!$status) return;
   const now = performance.now();
   if (!force && text === lastStatusText) return;
@@ -35,23 +34,12 @@ function setStatus(text, { force = false, minGap = 180 } = {}){
   lastStatusAt = now;
   $status.textContent = text;
 }
-
-let lastModeText = "";
-function setMode(text){
-  if (!$mode || text === lastModeText) return;
-  lastModeText = text;
-  $mode.textContent = text;
-}
-
-function log(...args){
+function setMode(text) { if ($mode) $mode.textContent = text; }
+function log(...args) {
   const line = args.map(a => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" ");
   console.log("[SVR]", ...args);
-  if ($log) {
-    $log.textContent += line + "\n";
-    $log.scrollTop = $log.scrollHeight;
-  }
+  if ($log) { $log.textContent += line + "\n"; $log.scrollTop = $log.scrollHeight; }
 }
-
 async function safeImport(label, path, fn) {
   try {
     const mod = await import(path);
@@ -66,10 +54,7 @@ async function safeImport(label, path, fn) {
   }
 }
 
-$toggleLog?.addEventListener("click", ()=>{
-  $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none";
-});
-
+$toggleLog?.addEventListener("click", () => { $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none"; });
 if (AUTOCAM) document.body.classList.add("preview-mode");
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
@@ -78,12 +63,12 @@ window.SVR_CAMERA = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
 
-window.addEventListener("error", (e)=>{
+window.addEventListener("error", e => {
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
   log("Runtime error", e?.error?.stack || e?.message || String(e));
 });
-window.addEventListener("unhandledrejection", (e)=>{
+window.addEventListener("unhandledrejection", e => {
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e));
   log("Unhandled rejection", e?.reason?.stack || e?.reason || String(e));
@@ -96,23 +81,21 @@ const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTarg
 
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
-
 const audio = createAudioPlaylist({
   tracks: [{ title: "Lobby 07", url: "./assets/audio/07.mp3" }],
-  onState: (state)=>{
+  onState: state => {
     if (!$status || renderer.xr.isPresenting) return;
-    if (state.error){ setStatus(`Audio: ${state.error}`); return; }
-    if (state.enabled){ setStatus(`Now Playing: ${state.trackTitle}`); return; }
-    setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
+    if (state.error) { setStatus(`Audio: ${state.error}`); return; }
+    if (state.enabled) { setStatus(`Now Playing: ${state.trackTitle}`); return; }
+    setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : "Audio Locked: tap once to unlock");
   }
 });
 
 let seated = false;
 let seatIndex = -1;
 let cash = 50000;
-
-function currentHeadXZ(){
-  if (renderer.xr.isPresenting){
+function currentHeadXZ() {
+  if (renderer.xr.isPresenting) {
     const xrCam = renderer.xr.getCamera(camera);
     const p = new THREE.Vector3();
     xrCam.getWorldPosition(p);
@@ -120,49 +103,33 @@ function currentHeadXZ(){
   }
   return camera.position.clone();
 }
-
-function inTableZone(){
-  const p = currentHeadXZ();
-  return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7);
-}
-
-function seatLabel(){ return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing"; }
-function moveDesktopToSeat(seat){ camera.position.set(seat.x, 1.12, seat.z); camera.lookAt(0, 1.0, 0); }
-
-function joinTable(){
+function inTableZone() { const p = currentHeadXZ(); return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7); }
+function seatLabel() { return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing"; }
+function moveDesktopToSeat(seat) { camera.position.set(seat.x, 1.12, seat.z); camera.lookAt(0, 1.0, 0); }
+function joinTable() {
   if (!inTableZone()) return false;
   const p = currentHeadXZ();
-  let best = 0;
-  let bestDist = Infinity;
-  seats.forEach((seat, idx)=>{
-    if (seat.label === "Dealer Side") return;
-    const d = Math.hypot(p.x - seat.x, p.z - seat.z);
-    if (d < bestDist){ bestDist = d; best = idx; }
-  });
+  let best = 0, bestDist = Infinity;
+  seats.forEach((seat, idx) => { if (seat.label === "Dealer Side") return; const d = Math.hypot(p.x - seat.x, p.z - seat.z); if (d < bestDist) { bestDist = d; best = idx; } });
   seatIndex = best;
   seated = true;
   const seat = seats[best];
-  if (renderer.xr.isPresenting){ tp.setPlayerPose(seat.x, -0.42, seat.z); }
-  else { moveDesktopToSeat(seat); }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(seat.x, -0.42, seat.z); else moveDesktopToSeat(seat);
   setMode(`Seat: ${seat.label}`);
   return true;
 }
-
-function leaveTable(){
+function leaveTable() {
   seated = false;
   seatIndex = -1;
-  if (renderer.xr.isPresenting){ tp.setPlayerPose(0, 0, 4.8); }
-  else { camera.position.set(0, 1.6, 4.8); camera.lookAt(0, 1.15, 0); }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(0, 0, 4.8); else { camera.position.set(0, 1.6, 4.8); camera.lookAt(0, 1.15, 0); }
   return true;
 }
-
-function movePlayerToSpot(target, lookTarget = null){
+function movePlayerToSpot(target, lookTarget = null) {
   if (!target) return;
-  if (renderer.xr.isPresenting){ tp.setPlayerPose(target.x, 0, target.z); }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(target.x, 0, target.z);
   else { camera.position.set(target.x, 1.6, target.z); if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z); }
 }
-
-function gotoScene(key){
+function gotoScene(key) {
   const rec = sceneTargets?.[key];
   if (rec?.href) { window.location.href = rec.href; return true; }
   if (!rec?.pos) return false;
@@ -172,10 +139,8 @@ function gotoScene(key){
 }
 
 const androidControls = createAndroidControls({ camera, renderer, gotoScene, joinTable, leaveTable, setStatus });
-
-$sceneButtons.forEach((btn)=>{ btn.addEventListener("click", ()=>{ const key = btn.dataset.scene; if (key) gotoScene(key); }); });
-
-window.addEventListener("keydown", async (e)=>{
+$sceneButtons.forEach(btn => btn.addEventListener("click", () => { const key = btn.dataset.scene; if (key) gotoScene(key); }));
+window.addEventListener("keydown", async e => {
   if (renderer.xr.isPresenting || e.repeat) return;
   if (e.code === "KeyM") await audio.toggle();
   if (e.code === "KeyN") await audio.next();
@@ -198,51 +163,37 @@ window.addEventListener("keydown", async (e)=>{
 
 const watch = createWristWatch({
   scene, camera, renderer,
-  getState: ()=>({ audioEnabled: audio.getState().enabled, trackTitle: audio.getState().trackTitle || "Lobby 07", cash, seated, inTableZone: inTableZone(), seatLabel: seatLabel(), teleportEnabled: tp.isEnabled ? tp.isEnabled() : true }),
-  actions: { toggleAudio: ()=>audio.toggle(), nextTrack: ()=>audio.next(), joinTable, leaveTable, toggleTeleport: ()=>tp.toggleMode(), goLobby: ()=>gotoScene("lobby"), goTable: ()=>gotoScene("table"), goSeat: ()=>gotoScene("seat"), goReiki: ()=>gotoScene("reiki"), goPga: ()=>gotoScene("pga"), goLegend: ()=>gotoScene("legends"), goSponsor: ()=>gotoScene("sponsor"), goScorpion: ()=>gotoScene("scorpion"), goReikiRoom: ()=>gotoScene("reikiRoom"), goPgaDrive: ()=>gotoScene("pgaDrive"), goChipPutt: ()=>gotoScene("chipPutt"), goVrStore: ()=>gotoScene("vrStore") }
+  getState: () => ({ audioEnabled: audio.getState().enabled, trackTitle: audio.getState().trackTitle || "Lobby 07", cash, seated, inTableZone: inTableZone(), seatLabel: seatLabel(), teleportEnabled: tp.isEnabled ? tp.isEnabled() : true }),
+  actions: { toggleAudio: () => audio.toggle(), nextTrack: () => audio.next(), joinTable, leaveTable, toggleTeleport: () => tp.toggleMode(), goLobby: () => gotoScene("lobby"), goTable: () => gotoScene("table"), goSeat: () => gotoScene("seat"), goReiki: () => gotoScene("reiki"), goPga: () => gotoScene("pga"), goLegend: () => gotoScene("legends"), goSponsor: () => gotoScene("sponsor"), goScorpion: () => gotoScene("scorpion"), goReikiRoom: () => gotoScene("reikiRoom"), goPgaDrive: () => gotoScene("pgaDrive"), goChipPutt: () => gotoScene("chipPutt"), goVrStore: () => gotoScene("vrStore") }
 });
-
-$toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $toggleJoints.textContent = on ? "Joints On" : "Joints"; });
+$toggleJoints?.addEventListener("click", () => { const on = hands.toggleDebug(); $toggleJoints.textContent = on ? "Joints On" : "Joints"; });
 
 setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-
-setStatus("Ready. Phase 121 safe boot active. Loading sky, skyline, Reiki, and locomotion fixes...", { force: true });
+setStatus("Ready. Phase 122 safe boot active. Loading showcase modules...", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
-window.SVR_PHASE121_SAFE_BOOT = { build: BUILD };
+window.SVR_PHASE122_SAFE_BOOT = { build: BUILD };
 
 setTimeout(async () => {
   await safeImport("Phase 121 Sky", "./modules/phase121_sky_fix.js", m => m.applyPhase121SkyFix?.(scene, { log }));
   await safeImport("Phase 121 OBJ Skyline", "./modules/obj_skyline_loader.js", m => m.applyObjSkylineBackground?.(scene, { log }));
   await safeImport("Update 3 Portals", "./modules/update_3_0_present_moment.js", m => m.applyUpdate30PresentMoment?.({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene }));
-  await safeImport("Reiki Phase121 Rearrange", "./modules/phase121_reiki_rearrange.js", m => m.applyPhase121ReikiRearrange?.(scene, { log, gotoScene }));
+  await safeImport("Reiki Phase122 Showcase", "./modules/reiki_phase122_showcase_storefront.js", m => m.applyReikiPhase122Showcase?.(scene, { log, gotoScene }));
   await safeImport("Coffee Phase113", "./modules/coffee_stand_phase112.js", m => m.applyPhase112CoffeeStandMove?.(scene, { log }));
-  setStatus("Ready. Phase 121 fixes loaded.", { force: true });
+  setStatus("Ready. Phase 122 Reiki showcase loaded.", { force: true });
 }, 200);
 
-function setHudVisible(visible){
+function setHudVisible(visible) {
   const hud = document.getElementById("hud");
   if (hud) hud.style.display = (visible && !AUTOCAM) ? "flex" : "none";
   if ($log) $log.style.display = "none";
   if ($err) $err.style.display = "none";
 }
-
 if (AUTOCAM) setHudVisible(false);
-if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display","none");
-
-renderer.xr.addEventListener("sessionstart", async ()=>{
-  setHudVisible(false);
-  document.getElementById("sceneNav")?.style.setProperty("display","none");
-  await audio.prime();
-  await audio.start();
-  await tp.onSessionStart();
-});
-renderer.xr.addEventListener("sessionend", ()=>{
-  setHudVisible(true);
-  const nav = document.getElementById("sceneNav");
-  if (nav && !AUTOCAM) nav.style.display = "flex";
-});
+if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display", "none");
+renderer.xr.addEventListener("sessionstart", async () => { setHudVisible(false); document.getElementById("sceneNav")?.style.setProperty("display", "none"); await audio.prime(); await audio.start(); await tp.onSessionStart(); });
+renderer.xr.addEventListener("sessionend", () => { setHudVisible(true); const nav = document.getElementById("sceneNav"); if (nav && !AUTOCAM) nav.style.display = "flex"; });
 
 let tPrev = performance.now();
 const previewTarget = new THREE.Vector3(0, 1.25, 0);
@@ -252,12 +203,11 @@ const previewShots = [
   { y: 1.68, r: previewOrbitRadius - 3.0, speed: -0.024, sway: 0.018, lookY: 1.04, targetX: 0.1, targetZ: -0.1, leadX: -0.10, leadZ: 0.12 },
   { y: 1.64, r: previewOrbitRadius - 2.6, speed: 0.022, sway: 0.018, lookY: 1.03, targetX: -0.12, targetZ: 0.04, leadX: 0.10, leadZ: -0.08 }
 ];
-
-renderer.setAnimationLoop(()=>{
+renderer.setAnimationLoop(() => {
   const now = performance.now();
   const dt = Math.min((now - tPrev) / 1000, 0.033);
   tPrev = now;
-  if (!renderer.xr.isPresenting){
+  if (!renderer.xr.isPresenting) {
     if (!AUTOCAM) desktop?.update(dt);
     else {
       const shotIndex = Math.floor(now / 9000) % previewShots.length;
@@ -270,7 +220,7 @@ renderer.setAnimationLoop(()=>{
     }
     androidControls.update(dt);
     scene.userData._camera = camera;
-  } else { scene.userData._camera = renderer.xr.getCamera(camera); }
+  } else scene.userData._camera = renderer.xr.getCamera(camera);
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
   hands.update(dt);
   hands.updateDebug();
@@ -278,11 +228,10 @@ renderer.setAnimationLoop(()=>{
   const rightHand = hands.getRightHand();
   const leftController = hands.getLeftController();
   const rightController = hands.getRightController();
-  if (!AUTOCAM || renderer.xr.isPresenting){ tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } }); }
+  if (!AUTOCAM || renderer.xr.isPresenting) tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: text => setStatus(text), modeCb: text => setMode(text) });
   if (watch) watch.update(dt, leftHand, rightHand);
   renderer.render(scene, camera);
 });
-
 const canvasEl = renderer.domElement;
-canvasEl.addEventListener("pointerdown", async ()=>{ const st = audio.getState(); if (!st.enabled) await audio.start(); }, { passive: true });
-canvasEl.addEventListener("webglcontextlost", (e)=>{ e.preventDefault(); log("[ERR] WebGL context lost. Reloading..."); setStatus("WebGL context lost (reloading...)", { force: true }); setTimeout(()=>location.reload(), 500); }, false);
+canvasEl.addEventListener("pointerdown", async () => { const st = audio.getState(); if (!st.enabled) await audio.start(); }, { passive: true });
+canvasEl.addEventListener("webglcontextlost", e => { e.preventDefault(); log("[ERR] WebGL context lost. Reloading..."); setStatus("WebGL context lost (reloading...)", { force: true }); setTimeout(() => location.reload(), 500); }, false);
