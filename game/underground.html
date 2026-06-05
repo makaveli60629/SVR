@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>SVR Underground Garage Poker Room</title>
+  <meta name="theme-color" content="#05070a"/>
+  <style>
+    :root{color-scheme:dark}
+    html,body{height:100%;margin:0;background:#05070a;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    #app{position:fixed;inset:0}
+    canvas{display:block;width:100%;height:100%;background:#05070a;outline:none}
+    #boot{position:fixed;left:12px;right:12px;bottom:12px;z-index:5;background:rgba(0,0,0,.68);border:1px solid rgba(140,255,242,.55);border-radius:14px;color:#dffffb;padding:10px 12px;font:12px/1.35 ui-monospace,monospace;white-space:pre-wrap}
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+  <pre id="boot">Loading underground garage poker room...</pre>
+  <script type="module" src="./underground_main.js?v=phase117-underground-garage"></script>
+</body>
+</html>
