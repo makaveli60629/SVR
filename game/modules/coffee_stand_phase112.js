@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { applyReikiLuxuryCleanup12 } from "./reiki_luxury_cleanup_1_2.js";
 import { applyPortalPlazaDirectory12 } from "./portal_plaza_directory_1_2.js";
 import { applyReikiInteractionGate12 } from "./reiki_interaction_gate_1_2.js";
+import { applySvrStorefrontModule12 } from "./svr_storefront_module_1_2.js";
 
 const BUILD = "PHASE-113-COFFEE-STAND-ASSEMBLED-TABLE-FACING-LOCK";
 const TARGET = new THREE.Vector3(15.84, 0, -16.44);
@@ -50,6 +51,7 @@ export function applyPhase112CoffeeStandMove(scene, { log = console.log } = {}) 
   applyReikiLuxuryCleanup12?.(scene, { log });
   applyPortalPlazaDirectory12?.(scene, { log });
   applyReikiInteractionGate12?.(scene, { log });
+  applySvrStorefrontModule12?.(scene, { log });
   removePriorCoffeeStands(scene);
   const hidden = hideOldStandPieces(scene);
   const root = new THREE.Group();
@@ -71,9 +73,9 @@ export function applyPhase112CoffeeStandMove(scene, { log = console.log } = {}) 
   const floorMarker = new THREE.Mesh(new THREE.CylinderGeometry(1.95, 2.12, .035, 72), new THREE.MeshBasicMaterial({ color: 0x8ffff0, transparent: true, opacity: .14, depthWrite: false, blending: THREE.AdditiveBlending })); floorMarker.name = "SVR_PHASE113_COFFEE_POSITION_MARKER"; floorMarker.position.y = .03; root.add(floorMarker);
   const light = new THREE.PointLight(0x8ffff0, .66, 6.2, 2.1); light.position.set(0, 2.0, .80); root.add(light);
   const oldTick = scene.onBeforeRender; scene.onBeforeRender = function(...args) { oldTick?.apply(this, args); const t = performance.now(); floorMarker.material.opacity = .10 + Math.sin(t * .002) * .035; light.intensity = .50 + Math.sin(t * .0022) * .14; };
-  const panel = document.getElementById("svr-position-panel"); if (panel) panel.textContent = `SVR POSITION PANEL\n${BUILD}\nCoffee stand X ${TARGET.x.toFixed(2)} Z ${TARGET.z.toFixed(2)}\nPortal plaza loaded: ${!!window.SVR_PORTAL_PLAZA_DIRECTORY_12}\nReiki interaction gate loaded: ${!!window.SVR_REIKI_INTERACTION_GATE_12}\nOld fixture pieces hidden: ${hidden}`;
-  scene.userData.SVR_PHASE113_COFFEE_STAND = { build: BUILD, target: { x: TARGET.x, z: TARGET.z }, facing: "lobby-center", hidden, reikiCleanupLoaded: !!window.SVR_REIKI_LUXURY_CLEANUP_12, portalPlazaLoaded: !!window.SVR_PORTAL_PLAZA_DIRECTORY_12, interactionGateLoaded: !!window.SVR_REIKI_INTERACTION_GATE_12, forestDeferred: true };
+  const panel = document.getElementById("svr-position-panel"); if (panel) panel.textContent = `SVR POSITION PANEL\n${BUILD}\nCoffee stand X ${TARGET.x.toFixed(2)} Z ${TARGET.z.toFixed(2)}\nSVR storefront loaded: ${!!window.SVR_STOREFRONT_MODULE_12}\nPortal plaza loaded: ${!!window.SVR_PORTAL_PLAZA_DIRECTORY_12}\nReiki interaction gate loaded: ${!!window.SVR_REIKI_INTERACTION_GATE_12}\nOld fixture pieces hidden: ${hidden}`;
+  scene.userData.SVR_PHASE113_COFFEE_STAND = { build: BUILD, target: { x: TARGET.x, z: TARGET.z }, facing: "lobby-center", hidden, reikiCleanupLoaded: !!window.SVR_REIKI_LUXURY_CLEANUP_12, portalPlazaLoaded: !!window.SVR_PORTAL_PLAZA_DIRECTORY_12, interactionGateLoaded: !!window.SVR_REIKI_INTERACTION_GATE_12, svrStorefrontLoaded: !!window.SVR_STOREFRONT_MODULE_12, forestDeferred: true };
   window.SVR_PHASE113_COFFEE_STAND = scene.userData.SVR_PHASE113_COFFEE_STAND;
-  log?.("Phase 113 coffee stand assembled; interaction gate wired", scene.userData.SVR_PHASE113_COFFEE_STAND);
+  log?.("Phase 113 coffee stand assembled; SVR storefront wired", scene.userData.SVR_PHASE113_COFFEE_STAND);
   return root;
 }
