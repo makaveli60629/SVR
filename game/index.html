@@ -1,11 +1,13 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker - RICI Update 101 Reiki 1.1</title>
+  <title>ScarlettVR Poker - Lobby Organization 1.2</title>
   <meta name="theme-color" content="#050508"/>
-  <link rel="manifest" href="./manifest.json?v=rici-update-101-1-1"/>
+  <link rel="manifest" href="./manifest.json?v=lobby-org-1-2-splash"/>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preload" href="./main.js?v=lobby-org-1-2-splash" as="script" crossorigin="anonymous">
   <style>
     :root { color-scheme: dark; }
     html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
@@ -22,25 +24,50 @@
     #log { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10; max-height: 38vh; overflow: auto; display: none; background: rgba(0,0,0,.55); border: 1px solid rgba(0,255,204,.25); border-radius: 14px; padding: 10px 12px; color: #d7fff8; font: 12px/1.35 ui-monospace, monospace; white-space: pre-wrap; }
     #err { position: fixed; inset: 0; display: none; z-index: 50; background: rgba(0,0,0,.88); color: #fff; padding: 18px; font: 13px/1.45 ui-monospace, monospace; overflow: auto; }
     body.preview-mode #hud, body.preview-mode #log, body.preview-mode #err { display: none !important; }
+
+    #splash { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: radial-gradient(circle at 50% 28%, rgba(0,255,204,.18), transparent 28%), radial-gradient(circle at 70% 64%, rgba(180,140,255,.12), transparent 34%), #020307; transition: opacity .45s ease, visibility .45s ease; }
+    body.svr-ready #splash { opacity: 0; visibility: hidden; pointer-events: none; }
+    body.preview-mode #splash { display: none !important; }
+    .splash-card { width: min(560px, calc(100vw - 36px)); border: 1px solid rgba(0,255,204,.42); border-radius: 28px; padding: 28px; background: linear-gradient(180deg, rgba(8,15,24,.88), rgba(5,8,15,.70)); box-shadow: 0 0 70px rgba(0,255,204,.12), 0 28px 90px rgba(0,0,0,.78); color: #fff; text-align: center; }
+    .splash-logo { width: 132px; height: 132px; object-fit: contain; filter: drop-shadow(0 0 24px rgba(0,255,204,.42)); animation: svrPulse 2.6s ease-in-out infinite; }
+    .splash-title { margin: 12px 0 4px; font-size: clamp(30px, 6vw, 56px); font-weight: 950; letter-spacing: .06em; }
+    .splash-sub { color: #bdfdf2; font-weight: 800; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
+    .splash-step { min-height: 22px; margin-top: 22px; color: #eafffb; font-size: 14px; font-weight: 750; }
+    .splash-bar { height: 12px; overflow: hidden; border-radius: 999px; border: 1px solid rgba(0,255,204,.30); background: rgba(255,255,255,.08); margin: 18px 0 10px; }
+    .splash-fill { height: 100%; width: 4%; border-radius: inherit; background: linear-gradient(90deg, #00ffcc, #b48cff, #ffd15c); box-shadow: 0 0 18px rgba(0,255,204,.55); transition: width .25s ease; }
+    .splash-hint { color: rgba(255,255,255,.68); font-size: 12px; line-height: 1.45; }
+    .splash-build { margin-top: 12px; color: rgba(255,255,255,.45); font: 11px/1.3 ui-monospace, monospace; }
+    @keyframes svrPulse { 0%,100% { transform: scale(1); opacity: .92; } 50% { transform: scale(1.035); opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .splash-logo { animation: none; } #splash, .splash-fill { transition: none; } }
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body>
+  <div id="splash" aria-live="polite">
+    <div class="splash-card">
+      <img class="splash-logo" src="./assets/ui/logo.png" alt="SVR" onerror="this.onerror=null;this.src='./logo.png';">
+      <div class="splash-title">SVR POKER</div>
+      <div class="splash-sub">Loading WebXR Lobby</div>
+      <div class="splash-step" id="splashStep">Starting renderer...</div>
+      <div class="splash-bar"><div class="splash-fill" id="splashFill"></div></div>
+      <div class="splash-hint" id="splashHint">Quest comfort mode active. Core lobby loads first; luxury modules continue in sequence.</div>
+      <div class="splash-build" id="splashBuild">LOBBY-ORG-1-2-SPLASH</div>
+    </div>
+  </div>
   <div id="app"></div>
   <div id="hud">
-    <div class="pill" id="status">Booting RICI Update 101 / Reiki 1.1...</div>
+    <div class="pill" id="status">Booting Lobby Organization 1.2...</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: ...</span>
-      <span class="pill">BUILD: RICI-UPDATE-101-1-1-MOTHER-MODULE-LOCK</span>
+      <span class="pill">BUILD: LOBBY-ORG-1-2-SPLASH</span>
     </div>
   </div>
   <div id="sceneNav">
     <button class="scene-btn" data-scene="lobby">Lobby</button><button class="scene-btn" data-scene="seat">Seat</button><button class="scene-btn" data-scene="reiki">Reiki</button><button class="scene-btn" data-scene="reikiRoom">Reiki Room</button><button class="scene-btn" data-scene="reikiTalk">Reiki Talk</button><button class="scene-btn" data-scene="pgaDrive">PGA Drive</button><button class="scene-btn" data-scene="chipPutt">Chip/Putt</button><button class="scene-btn" data-scene="vrStore">VR Store</button><button class="scene-btn" data-scene="smokerLounge">Smoker</button><button class="scene-btn" data-scene="scorpionRoom">Scorpion Room</button><button class="scene-btn" data-scene="pga">PGA</button><button class="scene-btn" data-scene="legends">Legend</button><button class="scene-btn" data-scene="sponsor">Sponsor</button><button class="scene-btn" data-scene="scorpion">Scorpion</button>
   </div>
   <pre id="log"></pre><pre id="err"></pre>
-  <script type="module" src="./main.js?v=rici-update-101-1-1"></script>
+  <script type="module" src="./main.js?v=lobby-org-1-2-splash"></script>
 </body>
 </html>
-
