@@ -5,6 +5,7 @@ import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
 import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { applyObjSkylineBackground } from "./modules/obj_skyline_loader.js";
+import { applyPhase115SkyPlanets } from "./modules/phase115_sky_planets_locomotion_status.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
@@ -14,6 +15,7 @@ import { applyReikiPhase105Override } from "./modules/reiki_phase105_override.js
 import { applyReikiWallCutout } from "./modules/reiki_wall_cutout.js";
 import { applyReikiPhase110Polish } from "./modules/reiki_phase110_polish.js";
 import { applyReikiPhase114Declutter } from "./modules/reiki_phase114_declutter.js";
+import { applyReikiPhase116Walkthrough } from "./modules/reiki_phase116_walkthrough.js";
 import { applyPhase112CoffeeStandMove } from "./modules/coffee_stand_phase112.js";
 import { createAndroidControls } from "./modules/android_controls.js";
 
@@ -83,10 +85,12 @@ setStatus("Loading world...", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 
+applyPhase115SkyPlanets(scene, { log });
+
 setTimeout(() => {
   applyObjSkylineBackground(scene, { log }).catch((err) => {
-    log("Phase 84 OBJ skyline failed safely", err?.message || err);
-    window.SVR_PHASE84_OBJ_SKYLINE_ERROR = String(err?.message || err);
+    log("Phase 115 OBJ skyline failed safely", err?.message || err);
+    window.SVR_PHASE115_OBJ_SKYLINE_ERROR = String(err?.message || err);
   });
 }, 800);
 
@@ -95,6 +99,7 @@ applyReikiPhase105Override(scene, { log });
 applyReikiWallCutout(scene, { log });
 applyReikiPhase110Polish(scene, { log });
 applyReikiPhase114Declutter(scene, { log });
+applyReikiPhase116Walkthrough(scene, { log });
 applyPhase112CoffeeStandMove(scene, { log });
 
 const hands = createHands({ scene, renderer, log });
@@ -212,7 +217,7 @@ setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Desktop, Android touch, OBJ skyline safe-load, and wrist quick-jump enabled.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 116 Reiki walkthrough, Phase 115 sky, textured OBJ skyline, and locomotion are active.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
 
 function setHudVisible(visible){
