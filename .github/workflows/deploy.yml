@@ -1,4 +1,4 @@
-﻿name: Auto Deploy
+name: Auto Deploy
 
 on:
   push:
@@ -69,11 +69,7 @@ jobs:
 
           COMMIT_SHA="${GITHUB_SHA}"
           DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          BUILD_LABEL="$(grep -oE 'PHASE-[A-Za-z0-9._-]+' build/game/index.html | head -n 1 || true)"
-
-          if [ -z "${BUILD_LABEL}" ] && [ -f build/game/docs/BUILD_VERSION.json ]; then
-            BUILD_LABEL="$(grep -oE 'PHASE-[A-Za-z0-9._-]+' build/game/docs/BUILD_VERSION.json | head -n 1 || true)"
-          fi
+          BUILD_LABEL="$(grep -oE 'RICI-[A-Za-z0-9._-]+|PHASE-[A-Za-z0-9._-]+' build/game/index.html build/game/main.js build/game/docs/BUILD_VERSION.json 2>/dev/null | head -n 1 | sed 's/^.*://')"
 
           if [ -z "${BUILD_LABEL}" ]; then
             BUILD_LABEL="SVR-DIRECT-FILES-LOCK"
@@ -123,9 +119,12 @@ jobs:
           test -f build/game/version.json
           test -f build/game/deploy-health.json
           test -f build/deploy-health.json
+          test -f build/game/modules/reiki_update_101_1_1_mother_module.js
+          test -f build/game/modules/reiki_update_101_1_1_photo_controls_fix.js
+          test -f build/game/assets/reiki-info-photo.js
 
-          echo "Game phase markers:"
-          grep -R "PHASE-\|SVR-DIRECT-FILES-LOCK" build/game/index.html build/game/version.json build/game/deploy-health.json build/deploy-health.json || true
+          echo "Game build markers:"
+          grep -R "RICI-\|PHASE-\|SVR-DIRECT-FILES-LOCK" build/game/index.html build/game/main.js build/game/version.json build/game/deploy-health.json build/deploy-health.json || true
 
           echo "Build size:"
           du -sh build build/game
@@ -138,5 +137,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-
