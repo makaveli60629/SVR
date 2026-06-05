@@ -1,9 +1,10 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
-import { buildSkylineRoom } from "./modules/world_skyline.js";`r`nimport { applyObjSkylineBackground } from "./modules/obj_skyline_loader.js";
+import { buildSkylineRoom } from "./modules/world_skyline.js";
+import { applyObjSkylineBackground } from "./modules/obj_skyline_loader.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
@@ -76,9 +77,16 @@ window.addEventListener("unhandledrejection", (e)=>{
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading worldâ€¦", { force: true });
+setStatus("Loading world...", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
-const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;`r`napplyObjSkylineBackground(scene, { log });
+const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
+
+setTimeout(() => {
+  applyObjSkylineBackground(scene, { log }).catch((err) => {
+    log("Phase 84 OBJ skyline failed safely", err?.message || err);
+    window.SVR_PHASE84_OBJ_SKYLINE_ERROR = String(err?.message || err);
+  });
+}, 800);
 
 enhanceReikiStorefront3(scene, { log });
 applyReikiPhase105Override(scene, { log });
@@ -196,12 +204,12 @@ const watch = createWristWatch({
 
 $toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $toggleJoints.textContent = on ? "Joints On" : "Joints"; });
 
-setStatus("Loading logoâ€¦", { force: true });
+setStatus("Loading logo...", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Desktop, Android touch, and wrist quick-jump enabled.", { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waitingâ€¦");
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Desktop, Android touch, OBJ skyline safe-load, and wrist quick-jump enabled.", { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting...");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -267,5 +275,4 @@ renderer.setAnimationLoop(()=>{
 
 const canvasEl = renderer.domElement;
 canvasEl.addEventListener("pointerdown", async ()=>{ const st = audio.getState(); if (!st.enabled) await audio.start(); }, { passive: true });
-canvasEl.addEventListener("webglcontextlost", (e)=>{ e.preventDefault(); log("[ERR] WebGL context lost. Reloadingâ€¦"); setStatus("WebGL context lost (reloadingâ€¦)", { force: true }); setTimeout(()=>location.reload(), 500); }, false);
-
+canvasEl.addEventListener("webglcontextlost", (e)=>{ e.preventDefault(); log("[ERR] WebGL context lost. Reloading..."); setStatus("WebGL context lost (reloading...)", { force: true }); setTimeout(()=>location.reload(), 500); }, false);
