@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import { applyEspressoDailyCashStore12 } from "./espresso_daily_cash_store_1_2.js";
 import { applyReikiSymbolsPlaceholder12 } from "./reiki_symbols_placeholder_1_2.js";
+import { applyPortalRouteAuditCleanup13 } from "./portal_route_audit_cleanup_1_3.js";
 
-const BUILD = "LOBBY-ORG-1-2-REIKI-INTERACTION-GATE-SYMBOLS-BRIDGE";
+const BUILD = "LOBBY-ORG-1-3F-REIKI-GATE-PORTAL-ROUTE-AUDIT-BRIDGE";
 
 function makePanelTexture(title, lines) {
   const c = document.createElement("canvas");
@@ -64,6 +65,7 @@ function allowMutedVideo() {
 export function applyReikiInteractionGate12(scene, { log = console.log } = {}) {
   applyEspressoDailyCashStore12?.(scene, { log });
   applyReikiSymbolsPlaceholder12?.(scene, { log });
+  applyPortalRouteAuditCleanup13?.(scene, { log });
   const root = scene?.getObjectByName("SVR_RICI_UPDATE_101_MOTHER_MODULE_LOCK");
   if (!root || root.getObjectByName("SVR_REIKI_INTERACTION_GATE_12_LOCK")) return null;
 
@@ -123,7 +125,8 @@ export function applyReikiInteractionGate12(scene, { log = console.log } = {}) {
     videoOnlyOnCard: true,
     androidControlsGate: true,
     espressoBridge: !!window.SVR_ESPRESSO_DAILY_CASH_STORE_12,
-    symbolsBridge: !!window.SVR_REIKI_SYMBOLS_PLACEHOLDER_12
+    symbolsBridge: !!window.SVR_REIKI_SYMBOLS_PLACEHOLDER_12,
+    portalRouteAuditBridge: !!window.SVR_PORTAL_ROUTE_AUDIT_CLEANUP_13
   };
   log?.("Reiki interaction gate loaded", window.SVR_REIKI_INTERACTION_GATE_12);
   return lock;
