@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const BUILD = "LOBBY-ORG-1-3-SVR-STOREFRONT-CAROUSEL-GIVEAWAY-KIOSK";
+const BUILD = "LOBBY-ORG-1-3D-SVR-STORE-INTERACTION-ZONE-ACTION-API";
 const ROOT_POS = new THREE.Vector3(-10.8, 0, -17.65);
 const LOOK_AT = new THREE.Vector3(0, 1.2, 0);
 
@@ -30,22 +30,11 @@ function makeTexture(title, lines = [], opts = {}) {
   x.fillText(title, c.width / 2, opts.titleY || 132, c.width - 90);
   x.shadowBlur = 7; x.fillStyle = opts.lineColor || "#eaffff"; x.font = opts.lineFont || "800 40px system-ui,Arial";
   lines.forEach((line, i) => x.fillText(line, c.width / 2, (opts.startY || 285) + i * (opts.gap || 78), c.width - 110));
-  if (opts.footer) {
-    x.fillStyle = opts.footerColor || "rgba(255,255,255,.68)"; x.font = "900 28px system-ui,Arial";
-    x.fillText(opts.footer, c.width / 2, c.height - 90, c.width - 110);
-  }
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 8;
-  return tex;
+  if (opts.footer) { x.fillStyle = opts.footerColor || "rgba(255,255,255,.68)"; x.font = "900 28px system-ui,Arial"; x.fillText(opts.footer, c.width / 2, c.height - 90, c.width - 110); }
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; return tex;
 }
-
-function logoTexture() {
-  return makeTexture("SVR", ["DAILY", "GIVEAWAY"], { w: 720, h: 720, titleFont: "900 170px system-ui,Arial", titleY: 190, startY: 390, gap: 76, border: "rgba(0,255,204,.92)", glow: "rgba(0,255,204,.8)", bg0: "#02070a", bg1: "#090525", bg2: "#041d1b" });
-}
-function mat(color, opts = {}) {
-  return new THREE.MeshStandardMaterial({ color, roughness: opts.roughness ?? 0.38, metalness: opts.metalness ?? 0.24, emissive: opts.emissive ?? 0x000000, emissiveIntensity: opts.emissiveIntensity ?? 0, transparent: opts.opacity !== undefined, opacity: opts.opacity ?? 1, side: opts.side || THREE.FrontSide, depthWrite: opts.depthWrite ?? true });
-}
+function logoTexture() { return makeTexture("SVR", ["DAILY", "GIVEAWAY"], { w: 720, h: 720, titleFont: "900 170px system-ui,Arial", titleY: 190, startY: 390, gap: 76, border: "rgba(0,255,204,.92)", glow: "rgba(0,255,204,.8)", bg0: "#02070a", bg1: "#090525", bg2: "#041d1b" }); }
+function mat(color, opts = {}) { return new THREE.MeshStandardMaterial({ color, roughness: opts.roughness ?? 0.38, metalness: opts.metalness ?? 0.24, emissive: opts.emissive ?? 0x000000, emissiveIntensity: opts.emissiveIntensity ?? 0, transparent: opts.opacity !== undefined, opacity: opts.opacity ?? 1, side: opts.side || THREE.FrontSide, depthWrite: opts.depthWrite ?? true }); }
 function basicMap(texture, opacity = 0.97) { return new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false, toneMapped: false }); }
 function glow(color, opacity = .16) { return new THREE.MeshBasicMaterial({ color, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }); }
 function addBox(root, name, size, pos, material) { const m = new THREE.Mesh(new THREE.BoxGeometry(size[0], size[1], size[2]), material); m.name = name; m.position.set(pos[0], pos[1], pos[2]); root.add(m); return m; }
@@ -73,18 +62,12 @@ export function applySvrStorefrontModule12(scene, { log = console.log } = {}) {
   addBox(root, "SVR_STORE_LEFT_COLUMN_CLEAN", [0.18, 4.6, 0.32], [-4.9, 2.35, -1.08], purple);
   addBox(root, "SVR_STORE_RIGHT_COLUMN_CLEAN", [0.18, 4.6, 0.32], [4.9, 2.35, -1.08], purple);
   addBox(root, "SVR_STORE_GLASS_FRONT_CLEAN", [9.4, 3.6, 0.06], [0, 2.18, 0.28], glass);
-
   addPanel(root, "SVR_STORE_FRONT_MARQUEE_CLEAN", [5.2, .96], [0, 4.18, .38], makeTexture("SVR STORE", ["premium storefront hub", "store carousel + daily giveaway"], { w: 1200, h: 360, titleFont: "900 78px system-ui,Arial", titleY: 98, startY: 210, gap: 46, border: "rgba(180,140,255,.94)" }), .98);
 
   const carousel = addPanel(root, "SVR_STORE_SINGLE_CAROUSEL_PANEL", [3.45, 3.05], [-1.32, 2.32, .44], makeTexture(CARDS[0].title, CARDS[0].lines, { footer: "SLIDE / ACTION READY" }), .98);
   let active = 0;
-  function setCard(i) {
-    active = (i + CARDS.length) % CARDS.length;
-    const card = CARDS[active];
-    carousel.material.map = makeTexture(card.title, card.lines, { border: active === 1 ? "rgba(255,209,92,.92)" : "rgba(180,140,255,.88)", glow: active === 1 ? "rgba(255,209,92,.75)" : "rgba(180,140,255,.72)", footer: `CARD ${active + 1} / ${CARDS.length}` });
-    carousel.material.needsUpdate = true;
-    window.SVR_STORE_CAROUSEL_12_ACTIVE = { index: active, card };
-  }
+  function setCard(i) { active = (i + CARDS.length) % CARDS.length; const card = CARDS[active]; carousel.material.map = makeTexture(card.title, card.lines, { border: active === 1 ? "rgba(255,209,92,.92)" : "rgba(180,140,255,.88)", glow: active === 1 ? "rgba(255,209,92,.75)" : "rgba(180,140,255,.72)", footer: `CARD ${active + 1} / ${CARDS.length}` }); carousel.material.needsUpdate = true; window.SVR_STORE_CAROUSEL_12_ACTIVE = { index: active, card }; }
+  function activateStore() { if (CARDS[active]?.title === "DAILY GIVEAWAY") { window.SVR_DAILY_GIVEAWAY_SELECTED = true; return true; } window.open("/site/store.html", "_blank", "noopener,noreferrer"); return true; }
 
   const kiosk = new THREE.Group(); kiosk.name = "SVR_DAILY_GIVEAWAY_KIOSK_LOCK"; kiosk.position.set(2.35, 0, .72); root.add(kiosk);
   addBox(kiosk, "SVR_DAILY_GIVEAWAY_KIOSK_BASE", [1.52, .22, 1.08], [0, .11, 0], dark);
@@ -98,24 +81,25 @@ export function applySvrStorefrontModule12(scene, { log = console.log } = {}) {
   const prev = addPanel(root, "SVR_STORE_CAROUSEL_PREV_BUTTON", [.72, .38], [-3.48, .98, .58], makeTexture("◀", ["SLIDE"], { w: 420, h: 260, titleFont: "900 90px system-ui,Arial", titleY: 88, startY: 172, gap: 38, border: "rgba(0,255,204,.88)" }), .96);
   const next = addPanel(root, "SVR_STORE_CAROUSEL_NEXT_BUTTON", [.72, .38], [.86, .98, .58], makeTexture("▶", ["SLIDE"], { w: 420, h: 260, titleFont: "900 90px system-ui,Arial", titleY: 88, startY: 172, gap: 38, border: "rgba(0,255,204,.88)" }), .96);
   const action = addPanel(root, "SVR_STORE_CAROUSEL_ACTION_BUTTON", [1.06, .38], [-1.32, .98, .59], makeTexture("ACTION", ["open later"], { w: 520, h: 260, titleFont: "900 52px system-ui,Arial", titleY: 82, startY: 164, gap: 38, border: "rgba(255,209,92,.88)", glow: "rgba(255,209,92,.65)" }), .96);
-  prev.userData.activate = () => setCard(active - 1);
-  next.userData.activate = () => setCard(active + 1);
-  action.userData.activate = () => { if (CARDS[active]?.title === "DAILY GIVEAWAY") window.SVR_DAILY_GIVEAWAY_SELECTED = true; else window.open("/site/store.html", "_blank", "noopener,noreferrer"); };
+  prev.userData.activate = () => setCard(active - 1); next.userData.activate = () => setCard(active + 1); action.userData.activate = activateStore;
 
   const ring = new THREE.Mesh(new THREE.RingGeometry(0.92, 1.08, 96), glow(0xb48cff, .35)); ring.name = "SVR_STORE_INTERACTION_RING"; ring.rotation.x = -Math.PI / 2; ring.position.set(-1.32, 0.08, 1.32); ring.renderOrder = 480; root.add(ring);
   addPlant(root, -4.35, 0.85, 0.84); addPlant(root, 4.35, 0.85, 0.84);
 
+  const camPos = new THREE.Vector3(); const local = new THREE.Vector3();
   const oldTick = scene.onBeforeRender;
   scene.onBeforeRender = function(...args) {
     oldTick?.apply(this, args);
     const t = performance.now() * 0.001;
-    ring.rotation.z += 0.0014; ring.material.opacity = 0.26 + Math.sin(t * 1.1) * 0.06;
+    const cam = scene.userData?._camera || window.SVR_CAMERA || window.SVR_MAIN_CAMERA;
+    if (cam?.getWorldPosition) { cam.getWorldPosition(camPos); local.copy(root.worldToLocal(camPos.clone())); window.SVR_STORE_INTERACTION_ACTIVE = Math.hypot(local.x - ring.position.x, local.z - ring.position.z) < 2.25; } else window.SVR_STORE_INTERACTION_ACTIVE = false;
+    ring.rotation.z += 0.0014; ring.material.opacity = window.SVR_STORE_INTERACTION_ACTIVE ? 0.54 : 0.26 + Math.sin(t * 1.1) * 0.06;
     holoGlow.rotation.z += 0.006; logo.rotation.y += 0.012; halo.material.opacity = 0.055 + Math.sin(t * 2.0) * 0.018;
   };
 
-  window.SVR_STORE_CAROUSEL_12 = { build: BUILD, cards: CARDS, setCard, next: () => setCard(active + 1), prev: () => setCard(active - 1), getActive: () => ({ index: active, card: CARDS[active] }) };
-  window.SVR_STOREFRONT_MODULE_12 = { build: BUILD, position: ROOT_POS.toArray(), consolidatedCarousel: true, dailyGiveawayKiosk: true, modularPacketReady: true, checkoutLive: false, databaseLive: false };
+  window.SVR_STORE_CAROUSEL_12 = { build: BUILD, cards: CARDS, setCard, next: () => setCard(active + 1), prev: () => setCard(active - 1), activate: activateStore, getActive: () => ({ index: active, card: CARDS[active] }) };
+  window.SVR_STOREFRONT_MODULE_12 = { build: BUILD, position: ROOT_POS.toArray(), consolidatedCarousel: true, dailyGiveawayKiosk: true, storeInteractionZone: true, modularPacketReady: true, checkoutLive: false, databaseLive: false };
   scene.userData.SVR_STOREFRONT_MODULE_12 = window.SVR_STOREFRONT_MODULE_12;
-  log?.("SVR storefront carousel/giveaway kiosk 1.3 loaded", window.SVR_STOREFRONT_MODULE_12);
+  log?.("SVR storefront interaction zone/action API 1.3D loaded", window.SVR_STOREFRONT_MODULE_12);
   return root;
 }
