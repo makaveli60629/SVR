@@ -179,10 +179,11 @@ setTimeout(async () => {
   await safeImport("Phase 121 Sky", "./modules/phase121_sky_fix.js", m => m.applyPhase121SkyFix?.(scene, { log }));
   await safeImport("Phase 121 OBJ Skyline", "./modules/obj_skyline_loader.js", m => m.applyObjSkylineBackground?.(scene, { log }));
   await safeImport("Update 3 Portals", "./modules/update_3_0_present_moment.js", m => m.applyUpdate30PresentMoment?.({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene }));
+  await safeImport("Controller Pointer Bridge 1.2", "./modules/controller_pointer_bridge_1_2.js", m => m.applyControllerPointerBridge12?.(scene, { log }));
   await safeImport("RICI Update 101 Reiki 1.1 Mother Module", "./modules/reiki_update_101_1_1_mother_module.js", m => m.applyRiciUpdate101MotherModule?.(scene, { log, gotoScene, camera, renderer }));
   await safeImport("RICI Photo Controls Fix", "./modules/reiki_update_101_1_1_photo_controls_fix.js", m => m.applyRiciUpdate101PhotoControlsFix?.(scene, { log }));
   await safeImport("Coffee Phase113", "./modules/coffee_stand_phase112.js", m => m.applyPhase112CoffeeStandMove?.(scene, { log }));
-  setStatus("Ready. RICI Update 101 / Reiki 1.1 photo controls loaded.", { force: true });
+  setStatus("Ready. Lobby Organization 1.2 controller pointer + Reiki cleanup loaded.", { force: true });
 }, 200);
 
 function setHudVisible(visible) {
