@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker - Lobby Organization 1.4I</title>
-  <meta name="theme-color" content="#050508"/>
-  <link rel="manifest" href="./manifest.json?v=lobby-org-1-4i-teleport-polish"/>
+  <title>ScarlettVR Poker - Lobby Organization 1.5A</title>
+  <meta name="theme-color" content="#030307"/>
+  <link rel="manifest" href="./manifest.json?v=lobby-org-1-5a-pipeline-loader"/>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preload" href="./main.js?v=lobby-org-1-4i-teleport-polish" as="script" crossorigin="anonymous">
+  <link rel="preload" href="./main.js?v=lobby-org-1-5a-pipeline-loader" as="script" crossorigin="anonymous">
   <style>
     :root { color-scheme: dark; }
     html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
@@ -27,32 +27,57 @@
     #log { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10; max-height: 38vh; overflow: auto; display: none; background: rgba(0,0,0,.55); border: 1px solid rgba(0,255,204,.25); border-radius: 14px; padding: 10px 12px; color: #d7fff8; font: 12px/1.35 ui-monospace, monospace; white-space: pre-wrap; }
     #err { position: fixed; inset: 0; display: none; z-index: 50; background: rgba(0,0,0,.88); color: #fff; padding: 18px; font: 13px/1.45 ui-monospace, monospace; overflow: auto; }
     body.preview-mode #hud, body.preview-mode #log, body.preview-mode #err { display: none !important; }
-    #splash { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: radial-gradient(circle at 50% 28%, rgba(0,255,204,.18), transparent 28%), radial-gradient(circle at 70% 64%, rgba(180,140,255,.12), transparent 34%), #020307; transition: opacity .35s ease, visibility .35s ease; }
-    body.svr-ready #splash { opacity: 0; visibility: hidden; pointer-events: none; }
-    body.preview-mode #splash { display: none !important; }
-    .splash-card { width: min(560px, calc(100vw - 36px)); border: 1px solid rgba(0,255,204,.42); border-radius: 28px; padding: 28px; background: linear-gradient(180deg, rgba(8,15,24,.88), rgba(5,8,15,.70)); box-shadow: 0 0 70px rgba(0,255,204,.12), 0 28px 90px rgba(0,0,0,.78); color: #fff; text-align: center; }
-    .splash-logo { width: 132px; height: 132px; object-fit: contain; filter: drop-shadow(0 0 24px rgba(0,255,204,.42)); animation: svrPulse 2.6s ease-in-out infinite; }
-    .splash-title { margin: 12px 0 4px; font-size: clamp(30px, 6vw, 56px); font-weight: 950; letter-spacing: .06em; }
-    .splash-sub { color: #bdfdf2; font-weight: 800; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
-    .splash-step { min-height: 22px; margin-top: 22px; color: #eafffb; font-size: 14px; font-weight: 750; }
-    .splash-bar { height: 12px; overflow: hidden; border-radius: 999px; border: 1px solid rgba(0,255,204,.30); background: rgba(255,255,255,.08); margin: 18px 0 10px; }
-    .splash-fill { height: 100%; width: 4%; border-radius: inherit; background: linear-gradient(90deg, #00ffcc, #b48cff, #ffd15c); box-shadow: 0 0 18px rgba(0,255,204,.55); transition: width .25s ease; }
-    .splash-hint { color: rgba(255,255,255,.68); font-size: 12px; line-height: 1.45; }
-    .splash-build { margin-top: 12px; color: rgba(255,255,255,.45); font: 11px/1.3 ui-monospace, monospace; }
+    #splash, #vr-loading-screen { position: fixed; inset: 0; z-index: 999999; display: grid; place-items: center; background: radial-gradient(circle at 50% 22%, rgba(0,255,255,.18), transparent 24%), radial-gradient(circle at 70% 68%, rgba(188,0,221,.16), transparent 34%), #030307; transition: opacity .60s cubic-bezier(.25,1,.5,1), visibility .60s cubic-bezier(.25,1,.5,1); pointer-events: auto; }
+    body.svr-ready #splash, body.svr-ready #vr-loading-screen { opacity: 0; visibility: hidden; pointer-events: none; }
+    body.preview-mode #splash, body.preview-mode #vr-loading-screen { display: none !important; }
+    .splash-card { width: min(620px, calc(100vw - 36px)); border: 2px solid #00ffff; border-radius: 30px; padding: 30px; background: linear-gradient(180deg, rgba(3,3,7,.96), rgba(5,8,15,.86)); box-shadow: inset 0 0 18px rgba(0,255,255,.16), 0 0 42px rgba(0,255,255,.22), 0 28px 90px rgba(0,0,0,.78); color: #fff; text-align: center; }
+    .splash-logo { width: 132px; height: 132px; object-fit: contain; filter: drop-shadow(0 0 28px rgba(0,255,255,.62)); animation: svrPulse 2.6s ease-in-out infinite; }
+    .splash-title { margin: 10px 0 4px; font-size: clamp(34px, 7vw, 62px); font-weight: 950; letter-spacing: .13em; color: #00ffff; text-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff; }
+    .splash-sub { color: #ffffff; font-weight: 500; font-size: 15px; letter-spacing: .26em; text-transform: uppercase; }
+    .splash-step { display:inline-block; min-height: 22px; margin-top: 24px; color: #fff; font-size: 14px; font-weight: 900; letter-spacing:.11em; text-transform:uppercase; background:rgba(0,255,255,.10); border:2px solid #00ffff; border-radius:999px; padding:10px 24px; box-shadow: inset 0 0 12px rgba(0,255,255,.20), 0 0 15px rgba(0,255,255,.15); }
+    .splash-bar { width:min(420px,82vw); height: 10px; overflow: hidden; border-radius: 999px; border: 2px solid #ffffff; background: #101020; margin: 20px auto 12px; box-shadow: 0 0 20px rgba(0,255,255,.20); }
+    .splash-fill { height: 100%; width: 4%; border-radius: inherit; background: linear-gradient(90deg, #00ffff, #bc00dd); box-shadow: 0 0 18px rgba(0,255,255,.70); transition: width .15s ease-out; }
+    .splash-hint { color: rgba(255,255,255,.74); font-size: 12px; line-height: 1.45; }
+    .splash-build { margin-top: 12px; color: rgba(255,255,255,.50); font: 11px/1.3 ui-monospace, monospace; }
     @keyframes svrPulse { 0%,100% { transform: scale(1); opacity: .92; } 50% { transform: scale(1.035); opacity: 1; } }
-    @media (prefers-reduced-motion: reduce) { .splash-logo { animation: none; } #splash, .splash-fill { transition: none; } }
+    @media (prefers-reduced-motion: reduce) { .splash-logo { animation: none; } #splash, #vr-loading-screen, .splash-fill { transition: none; } }
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body>
-  <div id="splash" aria-live="polite"><div class="splash-card"><img class="splash-logo" src="./assets/ui/logo.png" alt="SVR" onerror="this.onerror=null;this.src='./logo.png';"><div class="splash-title">SVR POKER</div><div class="splash-sub">Loading Lobby</div><div class="splash-step" id="splashStep">Starting renderer...</div><div class="splash-bar"><div class="splash-fill" id="splashFill"></div></div><div class="splash-hint" id="splashHint">Fast entry active. Core lobby loads first; showroom modules stage softly.</div><div class="splash-build" id="splashBuild">LOBBY-ORG-1-4I-TELEPORT-POLISH</div></div></div>
+  <div id="splash" aria-live="polite">
+    <div class="splash-card">
+      <img class="splash-logo" src="./assets/ui/logo.png" alt="SVR" onerror="this.onerror=null;this.src='./logo.png';">
+      <div class="splash-title">SCARLETT VR</div>
+      <div class="splash-sub">POKER LOBBY</div>
+      <div class="splash-step" id="splashStep">INITIALIZING CORE ENGINE...</div>
+      <div class="splash-bar"><div class="splash-fill" id="splashFill"></div></div>
+      <div class="splash-hint" id="splashHint">High-contrast pipeline loader active. Graphics warm up before entry.</div>
+      <div class="splash-build" id="splashBuild">LOBBY-ORG-1-5A-PIPELINE-LOADER</div>
+    </div>
+  </div>
   <div id="app"></div>
-  <div id="hud"><div class="pill" id="status">Booting Lobby Organization 1.4I...</div><div style="display:flex;gap:8px;align-items:center;"><button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button><button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button><span class="pill" id="mode">Hands: ...</span><span class="pill">BUILD: LOBBY-ORG-1-4I</span></div></div>
+  <div id="hud"><div class="pill" id="status">Booting Lobby Organization 1.5A...</div><div style="display:flex;gap:8px;align-items:center;"><button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button><button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button><span class="pill" id="mode">Hands: ...</span><span class="pill">BUILD: LOBBY-ORG-1-5A</span></div></div>
   <button id="sceneMenuToggle" type="button">Destinations ▾</button>
   <div id="sceneNav"><button class="scene-btn" data-scene="lobby">Lobby</button><button class="scene-btn" data-scene="seat">Seat</button><button class="scene-btn" data-scene="reiki">Reiki</button><button class="scene-btn" data-scene="reikiRoom">Reiki Room</button><button class="scene-btn" data-scene="reikiTalk">Reiki Talk</button><button class="scene-btn" data-scene="pgaDrive">PGA Drive</button><button class="scene-btn" data-scene="chipPutt">Chip/Putt</button><button class="scene-btn" data-scene="vrStore">VR Store</button><button class="scene-btn" data-scene="smokerLounge">Smoker</button><button class="scene-btn" data-scene="scorpionRoom">Scorpion Room</button><button class="scene-btn" data-scene="pga">PGA</button><button class="scene-btn" data-scene="legends">Legend</button><button class="scene-btn" data-scene="sponsor">Sponsor</button><button class="scene-btn" data-scene="scorpion">Scorpion</button></div>
   <div id="desktopHint">Desktop carousel: [ previous  ] next  Enter action</div>
   <pre id="log"></pre><pre id="err"></pre>
   <script>
+    (function(){
+      const step = () => document.getElementById('splashStep');
+      const fill = () => document.getElementById('splashFill');
+      window.updateLoadingProgress = function(percent, stageText){
+        const p = Math.min(Math.max(parseInt(percent || 0), 0), 100);
+        const f = fill(); const s = step();
+        if (f) f.style.width = p + '%';
+        if (s) s.textContent = `${String(stageText || 'LOADING').toUpperCase()}: ${p}%`;
+        window.SVR_LOADER_ASSETS_DONE = p >= 100;
+      };
+      window.signalPipelineReady = function(){
+        window.SVR_LOADER_PIPELINE_DONE = true;
+        const s = step(); if (s) { s.style.borderColor = '#00ff00'; s.style.color = '#00ff00'; s.style.boxShadow = '0 0 18px #00ff00'; s.textContent = 'ALL SYSTEMS NOMINAL - ENTERING LOBBY'; }
+      };
+    })();
     document.getElementById('sceneMenuToggle')?.addEventListener('click',()=>document.body.classList.toggle('svr-nav-open'));
     function activeCarousel(){
       if (window.SVR_PGA_INTERACTION_ACTIVE && window.SVR_PGA_CAROUSEL_14) return { label:'PGA Golf', api: window.SVR_PGA_CAROUSEL_14 };
@@ -73,6 +98,6 @@
       if (status) status.textContent = `${target.label}: keyboard carousel control`;
     });
   </script>
-  <script type="module" src="./main.js?v=lobby-org-1-4i-teleport-polish"></script>
+  <script type="module" src="./main.js?v=lobby-org-1-5a-pipeline-loader"></script>
 </body>
 </html>
