@@ -7,6 +7,7 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
+import { applyUpdate30PresentMoment } from "./modules/update_3_0_present_moment.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -170,11 +171,26 @@ function movePlayerToSpot(target, lookTarget = null){
 
 function gotoScene(key){
   const rec = sceneTargets?.[key];
+  if (rec?.href){
+    window.location.href = rec.href;
+    return true;
+  }
   if (!rec?.pos) return false;
   movePlayerToSpot(rec.pos, rec.look || null);
   setStatus(`Quick jump: ${key}`, { force: true });
   return true;
 }
+
+applyUpdate30PresentMoment({
+  scene,
+  camera,
+  renderer,
+  sceneTargets,
+  setStatus,
+  log,
+  gotoScene
+});
+
 
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{

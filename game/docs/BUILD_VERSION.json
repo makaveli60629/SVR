@@ -1,18 +1,32 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-85-QUEST-QA-STOREFRONT-MOTHER-MODULE-LOCK",
+  "build": "UPDATE-3.0-PHASE-100-PRESENT-MOMENT-CORRECTED-LOCK",
   "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 85,
-  "focus": "Quest locomotion QA, storefront mother-module lock, PGA/SVR Store routing structure, sprite/planet atmosphere preservation",
-  "protected": ["public website", "site pages", "current lobby baseline"],
-  "mustVerify": [
-    "Quest controller teleport ray stays in front of headset",
-    "Right-stick forward follows headset yaw",
-    "Grip/A/trigger hold aims teleport and release teleports",
-    "PGA hub acts as a mother storefront module",
-    "Store portal remains shifted away from spotlight ad",
-    "Reiki green sprites and table purple sprites rise upward"
+  "phase": 100,
+  "focus": "Corrected present-moment restore: Phase 86 clean Reiki/store rollback baseline plus Phase 100 private rooms and hologram portal overlay.",
+  "baseline": "UPDATE-3.0-PHASE-86-REIKI-STORE-ROLLBACK-HOTFIX",
+  "overlays": [
+    "SVR_UPDATE_3.0_PRESENT_MOMENT_PATCH.zip"
+  ],
+  "protected": [
+    "public website",
+    "site pages",
+    "current lobby baseline"
+  ],
+  "restored": [
+    "private scene pages",
+    "Reiki hologram stage",
+    "storefront route buttons",
+    "PGA Drive/Chip-Putt private route",
+    "VR Store private room",
+    "Smoker Lounge private room",
+    "Scorpion private room"
+  ],
+  "fixed": [
+    "old Reiki store runtime assets blocked",
+    "unapproved old store model loading disabled",
+    "private scenes restored"
   ]
 }

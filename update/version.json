@@ -1,8 +1,6 @@
 ﻿{
-  "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-85-QUEST-QA-STOREFRONT-MOTHER-MODULE-LOCK",
-  "phase": 85,
-  "track": "game-only",
-  "siteTouched": false,
-  "created": "2026-06-06"
+    "phase":  100,
+    "build":  "UPDATE-3.0-PHASE-100-PRESENT-MOMENT-CORRECTED-LOCK",
+    "updatedAt":  "2026-06-06T19:56:56Z",
+    "note":  "Corrected Update 3.0 present moment lock; Phase 86 clean Reiki/store rollback base plus Phase 100 private-room overlay; site untouched."
 }

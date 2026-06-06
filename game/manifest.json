@@ -1,13 +1,13 @@
 {
-  "name": "SVR Poker Game",
+  "name": "ScarlettVR Poker",
   "short_name": "SVR Poker",
   "start_url": "./index.html",
   "display": "fullscreen",
   "background_color": "#050508",
   "theme_color": "#7b2cff",
-  "build": "UPDATE-3.0-PHASE-85-QUEST-QA-STOREFRONT-MOTHER-MODULE-LOCK",
+  "build": "UPDATE-3.0-PHASE-100-PRESENT-MOMENT-CORRECTED-LOCK",
   "version": "Update 3.0",
-  "phase": 85,
+  "phase": 86,
   "siteTouched": false,
   "track": "game-only"
 }
