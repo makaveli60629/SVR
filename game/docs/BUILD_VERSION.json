@@ -1,12 +1,12 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
+  "build": "UPDATE-3.0-PHASE-108-MOON-MARS-SKY-TEXTURE-LOCK",
   "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 107,
-  "focus": "Restore Reiki Hub to the uploaded screenshot reference: old plus remodeled storefront, red carpet, ropes, plants, founder/info panels, interactive hologram video carousel button, and approval-safe module routing.",
-  "baseline": "UPDATE-3.0-PHASE-106-REIKI-OLD-NEW-HOLOGRAM-BUTTON-LOCK",
+  "phase": 108,
+  "focus": "Reiki Hub remains locked. Raise and enlarge the textured Moon and Mars in the lobby and private rooms, keep Mars orbiting the Moon, and preserve Quest locomotion/storefront locks.",
+  "baseline": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
   "reference": "game/docs/REIKI_TARGET_SNAPSHOT_PHASE107.png",
   "locked": [
     "Reiki screenshot visual match storefront",
@@ -16,6 +16,16 @@
     "music disabled/audio payload removed",
     "Quest locomotion and teleport forward guard preserved",
     "Moon/Mars sky sizing/orbit preserved",
-    "site untouched"
+    "site untouched",
+    "Reiki Hub locked untouched",
+    "Moon/Mars high sky texture lock",
+    "Mars orbiting Moon reinforced",
+    "Private room textured planets"
+  ],
+  "criticalRules": [
+    "Do not touch Reiki Hub until user says unlock the Reiki Hub",
+    "Update both /game and /update/game.zip together",
+    "Do not deploy stale game.zip from Downloads",
+    "Verify visible BUILD label before testing"
   ]
 }
