@@ -1,15 +1,16 @@
 # Reiki Hub Lock Rule
 
 ## Status
-LOCKED until user explicitly unlocks Reiki Hub.
+LOCKED until user explicitly says: `unlock the Reiki Hub`.
 
-## Rule
-Do not edit, replace, remodel, remove, reposition, recolor, rename, redesign, compress, simplify, or rebuild the Reiki Hub, Reiki storefront, Reiki mother module, Reiki hologram carousel, Reiki video portal, Reiki private room, Reiki plants, ropes, red carpet, teal trim, founder/info panels, right visual panel, center hologram slot, or Reiki carousel buttons unless the user explicitly says:
+## Active visual baseline
+Phase 107 screenshot-confirmed Reiki Hub.
 
-`unlock the Reiki Hub`
+## Do not touch
+Do not edit, replace, remodel, remove, reposition, recolor, rename, redesign, compress, simplify, or rebuild the Reiki Hub, Reiki storefront, Reiki mother module, Reiki hologram carousel, Reiki video portal, Reiki private room, Reiki plants, ropes, red carpet, teal trim, founder/info panels, right visual panel, center hologram slot, or Reiki carousel buttons.
 
-## Locked visual baseline
-The Reiki visual baseline is the screenshot-confirmed Phase 107 style.
+## Allowed while locked
+Moon/Mars, Quest controls, poker, PGA, SVR Store, Smoker Lounge, buildings, ad tiers, performance, and non-Reiki modules may be updated.
 
-## Scope
-Future game updates may touch Quest locomotion, sky, planets, PGA, SVR Store, Smoker Lounge, Scorpion Room, poker, buildings, ads, or performance, but they must not alter Reiki Hub files or visuals while this lock is active.
+## Date
+2026-06-06

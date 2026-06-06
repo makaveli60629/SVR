@@ -1,31 +1,26 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-108-MOON-MARS-SKY-TEXTURE-LOCK",
+  "build": "UPDATE-3.0-PHASE-109-REIKI-LOCKED-MOON-MARS-HIGH-GLOW-LOCK",
   "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 108,
-  "focus": "Reiki Hub remains locked. Raise and enlarge the textured Moon and Mars in the lobby and private rooms, keep Mars orbiting the Moon, and preserve Quest locomotion/storefront locks.",
+  "phase": 109,
+  "focus": "Restore the Phase 107 screenshot-confirmed Reiki Hub unchanged while refining Moon/Mars high sky placement, textures, moon glow, and Mars orbit.",
   "baseline": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
-  "reference": "game/docs/REIKI_TARGET_SNAPSHOT_PHASE107.png",
-  "locked": [
-    "Reiki screenshot visual match storefront",
-    "old plus new Reiki mother module",
-    "interactive Video Hologram carousel card",
-    "Reiki private room and video portal preserved",
-    "music disabled/audio payload removed",
-    "Quest locomotion and teleport forward guard preserved",
-    "Moon/Mars sky sizing/orbit preserved",
-    "site untouched",
-    "Reiki Hub locked untouched",
-    "Moon/Mars high sky texture lock",
-    "Mars orbiting Moon reinforced",
-    "Private room textured planets"
+  "skySource": "Phase 108 sky texture changes, adjusted higher with stronger moon glow",
+  "protected": [
+    "Reiki Hub locked; do not touch until user says unlock the Reiki Hub",
+    "public website",
+    "site pages",
+    "Phase 107 Reiki screenshot visual baseline"
   ],
-  "criticalRules": [
-    "Do not touch Reiki Hub until user says unlock the Reiki Hub",
-    "Update both /game and /update/game.zip together",
-    "Do not deploy stale game.zip from Downloads",
-    "Verify visible BUILD label before testing"
+  "locked": [
+    "Reiki Hub frozen",
+    "Reiki hologram carousel frozen",
+    "Moon high and larger",
+    "Mars high and orbiting Moon",
+    "Moon/Mars textures preserved",
+    "music disabled",
+    "Quest locomotion and teleport fixes preserved"
   ]
 }
