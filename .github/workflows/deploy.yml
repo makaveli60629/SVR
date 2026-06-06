@@ -2,9 +2,11 @@ name: Auto Deploy
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: read
@@ -13,133 +15,124 @@ permissions:
 
 concurrency:
   group: pages-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
-      - name: Checkout fresh repo
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install tools
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y rsync unzip
+        run: sudo apt-get update && sudo apt-get install -y unzip rsync
 
-      - name: Build committed site and game
+      - name: Prepare build from committed site/game files
         run: |
           set -euo pipefail
-          rm -rf build tmp dist public _site tmp_site
+          rm -rf build tmp
           mkdir -p build
 
           rsync -av \
             --exclude '.git' \
             --exclude '.github' \
+            --exclude 'update' \
             --exclude 'backend' \
             --exclude 'docs' \
-            --exclude 'update' \
             --exclude 'Library' \
             --exclude 'Logs' \
             --exclude 'Temp' \
-            --exclude 'node_modules' \
-            --exclude 'backend/node_modules' \
             --exclude '*.zip' \
             --exclude '*.fbx' \
             ./ build/ || test $? -eq 24
 
-          chmod -R u+rwX,go+rX build || true
-
-      - name: Validate game folder
-        run: |
-          set -euo pipefail
-          test -f build/index.html
-          test -f build/site/index.html
-          test -f build/game/index.html
-
-      - name: Stamp deploy health
+      - name: Apply game update zip if present
         run: |
           set -euo pipefail
 
-          COMMIT_SHA="${GITHUB_SHA}"
-          DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          BUILD_LABEL="SVR-DIRECT-FILES-LOCK"
+          flatten_zip() {
+            ZIP="$1"
+            TARGET="$2"
+            LABEL="$3"
 
-          for file in build/game/index.html build/game/main.js build/game/docs/BUILD_VERSION.json; do
-            if [ -f "$file" ]; then
-              FOUND="$(grep -aohE 'RICI-[A-Za-z0-9._-]+|PHASE-[A-Za-z0-9._-]+' "$file" 2>/dev/null | head -n 1 || true)"
-              if [ -n "$FOUND" ]; then
-                BUILD_LABEL="$FOUND"
-                break
+            if [ ! -f "$ZIP" ]; then
+              echo "No $LABEL zip found at $ZIP; using committed $TARGET folder."
+              return 0
+            fi
+
+            echo "Applying $LABEL from $ZIP into $TARGET"
+            rm -rf tmp "$TARGET"
+            mkdir -p tmp "$TARGET"
+
+            unzip -o "$ZIP" -d tmp
+            chmod -R u+rwX,go+rX tmp || true
+
+            SRC="tmp"
+            if [ -f tmp/index.html ]; then
+              SRC="tmp"
+            elif [ -f tmp/game/index.html ]; then
+              SRC="tmp/game"
+            else
+              INNER="$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1 || true)"
+              if [ -n "$INNER" ] && [ -f "$INNER/index.html" ]; then
+                SRC="$INNER"
               fi
             fi
-          done
 
-          mkdir -p build/game build/site
+            if [ ! -f "$SRC/index.html" ]; then
+              echo "ERROR: $LABEL zip has no deployable index.html"
+              exit 1
+            fi
 
-          cat > build/deploy-health.json <<EOF
-          {
-            "status": "ok",
-            "build": "${BUILD_LABEL}",
-            "commit": "${COMMIT_SHA}",
-            "deployedAt": "${DEPLOY_TIME}",
-            "workflow": "Auto Deploy",
-            "target": "/",
-            "source": "committed-files-no-site-zip"
+            cp -a "$SRC"/. "$TARGET"/
+            chmod -R u+rwX,go+rX "$TARGET" || true
+            rm -rf tmp
           }
-          EOF
+
+          flatten_zip update/game.zip build/game game
+
+      - name: Stamp game deploy health
+        run: |
+          set -euo pipefail
+          mkdir -p build/game
+          COMMIT_SHA="${GITHUB_SHA}"
+          DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          BUILD_LABEL="GAME-AUTO-DEPLOY-LOCK"
+
+          if [ -f build/game/version.json ]; then
+            EXISTING_LABEL="$(grep -o 'PHASE-[A-Z0-9._-]*' build/game/version.json | head -n1 || true)"
+            if [ -n "$EXISTING_LABEL" ]; then BUILD_LABEL="$EXISTING_LABEL"; fi
+          fi
 
           cat > build/game/deploy-health.json <<EOF
           {
             "status": "ok",
-            "build": "${BUILD_LABEL}",
             "commit": "${COMMIT_SHA}",
             "deployedAt": "${DEPLOY_TIME}",
             "workflow": "Auto Deploy",
             "target": "/game",
-            "source": "direct-game-folder"
+            "build": "${BUILD_LABEL}"
           }
           EOF
 
-          cat > build/game/version.json <<EOF
-          {
-            "build": "${BUILD_LABEL}",
-            "commit": "${COMMIT_SHA}",
-            "deployedAt": "${DEPLOY_TIME}",
-            "source": "direct-game-folder"
-          }
-          EOF
-
-      - name: Validate build output
+      - name: Validate build
         run: |
           set -euo pipefail
           test -f build/index.html
-          test -f build/site/index.html
           test -f build/game/index.html
-          test -f build/game/version.json
           test -f build/game/deploy-health.json
-          test -f build/deploy-health.json
-          test -f build/game/modules/reiki_update_101_1_1_mother_module.js
-          test -f build/game/modules/reiki_update_101_1_1_photo_controls_fix.js
-          test -f build/game/assets/reiki-info-photo.js
 
-          echo "Game build markers:"
-          grep -aR "RICI-\|PHASE-\|SVR-DIRECT-FILES-LOCK" build/game/index.html build/game/main.js build/game/version.json build/game/deploy-health.json build/deploy-health.json || true
+          echo "Game build label search:"
+          grep -R "PHASE-\|BUILD:" -n build/game/index.html build/game/version.json 2>/dev/null || true
 
-          echo "Build size:"
-          du -sh build build/game
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
-      - name: Upload Pages artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: build
 
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - name: Deploy
         uses: actions/deploy-pages@v4
