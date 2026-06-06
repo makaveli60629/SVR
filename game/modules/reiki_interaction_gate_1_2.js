@@ -3,7 +3,9 @@ import { applyEspressoDailyCashStore12 } from "./espresso_daily_cash_store_1_2.j
 import { applyReikiSymbolsPlaceholder12 } from "./reiki_symbols_placeholder_1_2.js";
 import { applyPortalRouteAuditCleanup13 } from "./portal_route_audit_cleanup_1_3.js";
 
-const BUILD = "LOBBY-ORG-1-4E-REIKI-VIDEO-AUDIO-OPEN";
+const BUILD = "LOBBY-ORG-1-4H-REIKI-VIDEO-AUDIO-BOOST";
+const REIKI_VOLUME = 1.0;
+const REIKI_GAIN = 1.65;
 
 function makePanelTexture(title, lines) {
   const c = document.createElement("canvas");
@@ -39,6 +41,26 @@ function getVideo() {
   return window.SVR_REIKI_HOLOGRAM_VIDEO?.element || document.getElementById("svr-reiki-hologram-video");
 }
 
+function boostVideoAudio(video) {
+  if (!video || video._svrReikiGainReady) return !!video?._svrReikiGainReady;
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return false;
+    const ctx = window.SVR_REIKI_AUDIO_CONTEXT || new AudioCtx();
+    window.SVR_REIKI_AUDIO_CONTEXT = ctx;
+    const source = ctx.createMediaElementSource(video);
+    const gain = ctx.createGain();
+    gain.gain.value = REIKI_GAIN;
+    source.connect(gain).connect(ctx.destination);
+    video._svrReikiGainReady = true;
+    video._svrReikiGainNode = gain;
+    window.SVR_REIKI_VIDEO_GAIN_NODE = gain;
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 function stopVideo(reset = false) {
   const video = getVideo();
   if (!video) return false;
@@ -58,18 +80,20 @@ function playVideoWithOpenAudio() {
   video.preload = "auto";
   video.muted = false;
   video.defaultMuted = false;
-  video.volume = 1.0;
+  video.volume = REIKI_VOLUME;
   video.playsInline = true;
+  const boosted = boostVideoAudio(video);
+  try { window.SVR_REIKI_AUDIO_CONTEXT?.resume?.(); } catch (_) {}
   const p = video.play?.();
   if (p?.catch) {
     p.catch(() => {
       video.muted = false;
-      video.volume = 1.0;
+      video.volume = REIKI_VOLUME;
       window.SVR_REIKI_VIDEO_STATE = "audio-blocked-needs-user-action";
     });
   }
-  window.SVR_REIKI_VIDEO_STATE = "playing-audio-open-volume-1";
-  window.SVR_REIKI_VIDEO_VOLUME_LOCK = { muted: video.muted, volume: video.volume, build: BUILD };
+  window.SVR_REIKI_VIDEO_STATE = boosted ? "playing-audio-boosted" : "playing-audio-open-volume-1";
+  window.SVR_REIKI_VIDEO_VOLUME_LOCK = { muted: video.muted, volume: video.volume, gain: boosted ? REIKI_GAIN : 1.0, build: BUILD };
   return true;
 }
 
@@ -95,11 +119,11 @@ export function applyReikiInteractionGate12(scene, { log = console.log } = {}) {
   lock.add(ring);
 
   const hint = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.55, 0.72),
-    new THREE.MeshBasicMaterial({ map: makePanelTexture("INTERACTION ZONE", ["stand here", "slide/action controls appear"]), transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false, toneMapped: false })
+    new THREE.PlaneGeometry(1.55, 0.42),
+    new THREE.MeshBasicMaterial({ map: makePanelTexture("CONTROL PAD", ["grip aim", "trigger / slide"]), transparent: true, opacity: 0.82, side: THREE.DoubleSide, depthWrite: false, toneMapped: false })
   );
   hint.name = "SVR_REIKI_GREEN_INTERACTION_HINT";
-  hint.position.set(0, 0.76, -1.2);
+  hint.position.set(0, 0.46, 0.72);
   hint.renderOrder = 391;
   lock.add(hint);
 
@@ -136,11 +160,13 @@ export function applyReikiInteractionGate12(scene, { log = console.log } = {}) {
     videoOnlyOnCard: true,
     androidControlsGate: true,
     videoAudioOpen: true,
-    videoVolume: 1.0,
+    videoVolume: REIKI_VOLUME,
+    videoGain: REIKI_GAIN,
+    worldHintOnly: true,
     espressoBridge: !!window.SVR_ESPRESSO_DAILY_CASH_STORE_12,
     symbolsBridge: !!window.SVR_REIKI_SYMBOLS_PLACEHOLDER_12,
     portalRouteAuditBridge: !!window.SVR_PORTAL_ROUTE_AUDIT_CLEANUP_13
   };
-  log?.("Reiki interaction gate audio-open loaded", window.SVR_REIKI_INTERACTION_GATE_12);
+  log?.("Reiki interaction gate boosted audio loaded", window.SVR_REIKI_INTERACTION_GATE_12);
   return lock;
 }
