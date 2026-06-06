@@ -3,7 +3,7 @@ import { applyEspressoDailyCashStore12 } from "./espresso_daily_cash_store_1_2.j
 import { applyReikiSymbolsPlaceholder12 } from "./reiki_symbols_placeholder_1_2.js";
 import { applyPortalRouteAuditCleanup13 } from "./portal_route_audit_cleanup_1_3.js";
 
-const BUILD = "LOBBY-ORG-1-3F-REIKI-GATE-PORTAL-ROUTE-AUDIT-BRIDGE";
+const BUILD = "LOBBY-ORG-1-4E-REIKI-VIDEO-AUDIO-OPEN";
 
 function makePanelTexture(title, lines) {
   const c = document.createElement("canvas");
@@ -52,13 +52,24 @@ function stopVideo(reset = false) {
   return true;
 }
 
-function allowMutedVideo() {
+function playVideoWithOpenAudio() {
   const video = getVideo();
   if (!video) return false;
-  video.muted = true;
-  video.volume = 0;
-  video.play?.().catch?.(() => {});
-  window.SVR_REIKI_VIDEO_STATE = "card-visible-muted";
+  video.preload = "auto";
+  video.muted = false;
+  video.defaultMuted = false;
+  video.volume = 1.0;
+  video.playsInline = true;
+  const p = video.play?.();
+  if (p?.catch) {
+    p.catch(() => {
+      video.muted = false;
+      video.volume = 1.0;
+      window.SVR_REIKI_VIDEO_STATE = "audio-blocked-needs-user-action";
+    });
+  }
+  window.SVR_REIKI_VIDEO_STATE = "playing-audio-open-volume-1";
+  window.SVR_REIKI_VIDEO_VOLUME_LOCK = { muted: video.muted, volume: video.volume, build: BUILD };
   return true;
 }
 
@@ -85,7 +96,7 @@ export function applyReikiInteractionGate12(scene, { log = console.log } = {}) {
 
   const hint = new THREE.Mesh(
     new THREE.PlaneGeometry(2.55, 0.72),
-    new THREE.MeshBasicMaterial({ map: makePanelTexture("INTERACTION ZONE", ["stand here", "slide and action controls appear"]), transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false, toneMapped: false })
+    new THREE.MeshBasicMaterial({ map: makePanelTexture("INTERACTION ZONE", ["stand here", "slide/action controls appear"]), transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false, toneMapped: false })
   );
   hint.name = "SVR_REIKI_GREEN_INTERACTION_HINT";
   hint.position.set(0, 0.76, -1.2);
@@ -116,7 +127,7 @@ export function applyReikiInteractionGate12(scene, { log = console.log } = {}) {
 
     const activeCard = window.SVR_REIKI_CAROUSEL_12_ACTIVE?.card || window.SVR_RICI_UPDATE_101_CAROUSEL?.getActiveCard?.();
     if (!activeCard || activeCard.type !== "video") stopVideo(false);
-    else allowMutedVideo();
+    else playVideoWithOpenAudio();
   };
 
   window.SVR_REIKI_INTERACTION_GATE_12 = {
@@ -124,10 +135,12 @@ export function applyReikiInteractionGate12(scene, { log = console.log } = {}) {
     activeFlag: "SVR_REIKI_INTERACTION_ACTIVE",
     videoOnlyOnCard: true,
     androidControlsGate: true,
+    videoAudioOpen: true,
+    videoVolume: 1.0,
     espressoBridge: !!window.SVR_ESPRESSO_DAILY_CASH_STORE_12,
     symbolsBridge: !!window.SVR_REIKI_SYMBOLS_PLACEHOLDER_12,
     portalRouteAuditBridge: !!window.SVR_PORTAL_ROUTE_AUDIT_CLEANUP_13
   };
-  log?.("Reiki interaction gate loaded", window.SVR_REIKI_INTERACTION_GATE_12);
+  log?.("Reiki interaction gate audio-open loaded", window.SVR_REIKI_INTERACTION_GATE_12);
   return lock;
 }
