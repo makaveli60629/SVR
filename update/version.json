@@ -1,6 +1,8 @@
-﻿{
-    "updatedAt":  "2026-06-06T17:57:18Z",
-    "build":  "PHASE-84-QUEST-CONTROLLER-SKY-LOBBY-POLISH-LOCK",
-    "siteTouched":  false,
-    "gameZip":  "update/game.zip"
+{
+  "updatedAt": "2026-06-06T18:30:00Z",
+  "version": "Update 1.5",
+  "build": "UPDATE-1.5-STABILITY-BUILD",
+  "track": "game-only",
+  "siteTouched": false,
+  "gameZip": "update/game.zip"
 }
