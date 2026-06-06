@@ -8,6 +8,7 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyUpdate30PresentMoment } from "./modules/update_3_0_present_moment.js";
+import { applyUpdate30VisualCleanup101 } from "./modules/update_3_0_visual_cleanup_101.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -77,25 +78,16 @@ const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTarg
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
-const audio = createAudioPlaylist({
-  tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" },
-    { title: "Reiki Time Hub", url: "./assets/audio/reiki_time_hub.mp3" },
-    { title: "SVR After Dark", url: "./assets/audio/svr_after_dark.mp3" }
-  ],
-  onState: (state)=>{
-    if (!$status || renderer.xr.isPresenting) return;
-    if (state.error){
-      setStatus(`Audio: ${state.error}`);
-      return;
-    }
-    if (state.enabled){
-      setStatus(`Now Playing: ${state.trackTitle}`);
-      return;
-    }
-    setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
-  }
-});
+const audio = {
+  toggle: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
+  next: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
+  prime: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
+  start: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
+  stop: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
+  getState: ()=>({ enabled:false, primed:false, trackTitle:'Music Disabled', error:null })
+};
+window.SVR_AUDIO_DISABLED = true;
+
 
 let seated = false;
 let seatIndex = -1;
@@ -191,6 +183,16 @@ applyUpdate30PresentMoment({
   gotoScene
 });
 
+applyUpdate30VisualCleanup101({
+  scene,
+  camera,
+  renderer,
+  sceneTargets,
+  setStatus,
+  log,
+  gotoScene
+});
+
 
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
@@ -277,8 +279,7 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
-  await audio.prime();
-  await audio.start();
+  // Phase 101: music removed by request.
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
@@ -349,8 +350,7 @@ renderer.setAnimationLoop(()=>{
 
 const canvasEl = renderer.domElement;
 canvasEl.addEventListener("pointerdown", async ()=>{
-  const st = audio.getState();
-  if (!st.enabled) await audio.start();
+  // Phase 101: no lobby music/autoplay. Pointer input remains available for WebXR.
 }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();

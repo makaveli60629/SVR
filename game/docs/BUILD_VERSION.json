@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-100-PRESENT-MOMENT-CORRECTED-LOCK",
+  "build": "UPDATE-3.0-PHASE-101-REIKI-SKY-NO-MUSIC-REFINE-LOCK",
   "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 100,
-  "focus": "Corrected present-moment restore: Phase 86 clean Reiki/store rollback baseline plus Phase 100 private rooms and hologram portal overlay.",
+  "phase": 101,
+  "focus": "Remove music, restore reinforced Reiki storefront, add high textured Moon/Mars with Mars orbiting Moon, preserve corrected Update 3.0 private room baseline.",
   "baseline": "UPDATE-3.0-PHASE-86-REIKI-STORE-ROLLBACK-HOTFIX",
   "overlays": [
     "SVR_UPDATE_3.0_PRESENT_MOMENT_PATCH.zip"
@@ -27,6 +27,11 @@
   "fixed": [
     "old Reiki store runtime assets blocked",
     "unapproved old store model loading disabled",
-    "private scenes restored"
+    "private scenes restored",
+    "music disabled/removed",
+    "Moon and Mars made higher/larger/textured",
+    "Mars orbiting Moon reinforced",
+    "new Reiki storefront overlay restored",
+    "green Reiki sprites and purple table sprites reinforced"
   ]
 }

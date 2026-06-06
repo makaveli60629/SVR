@@ -1,6 +1,9 @@
 ﻿{
-    "phase":  100,
-    "build":  "UPDATE-3.0-PHASE-100-PRESENT-MOMENT-CORRECTED-LOCK",
-    "updatedAt":  "2026-06-06T19:56:56Z",
-    "note":  "Corrected Update 3.0 present moment lock; Phase 86 clean Reiki/store rollback base plus Phase 100 private-room overlay; site untouched."
+  "version": "Update 3.0",
+  "build": "UPDATE-3.0-PHASE-101-REIKI-SKY-NO-MUSIC-REFINE-LOCK",
+  "phase": 101,
+  "track": "game-only",
+  "siteTouched": false,
+  "audio": "disabled",
+  "created": "2026-06-06"
 }
