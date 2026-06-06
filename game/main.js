@@ -8,6 +8,7 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyReikiMotherHologramButton106 } from "./modules/update_3_0_reiki_mother_hologram_button_106.js";
+import { applyReikiSnapshot107 } from "./modules/update_3_0_reiki_snapshot_107.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;

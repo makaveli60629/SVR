@@ -1,30 +1,21 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-106-REIKI-OLD-NEW-HOLOGRAM-BUTTON-LOCK",
+  "build": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
   "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 106,
-  "baseline": "UPDATE-3.0-PHASE-105-REIKI-REFERENCE-RESTORE-LOCK",
-  "referenceSources": [
-    "svr_phase92_reiki_readability_chakra_lock_game.zip",
-    "game-phase85-reiki-inactive-portal-lock.zip",
-    "svr-webex-reiki-hologram-demo.zip"
-  ],
-  "focus": "Restore the old + new remodeled Reiki mother module with the video hologram in an interactive carousel button, while preserving no-music, Quest locomotion/teleport fixes, private scenes, and sky improvements.",
+  "phase": 107,
+  "focus": "Restore Reiki Hub to the uploaded screenshot reference: old plus remodeled storefront, red carpet, ropes, plants, founder/info panels, interactive hologram video carousel button, and approval-safe module routing.",
+  "baseline": "UPDATE-3.0-PHASE-106-REIKI-OLD-NEW-HOLOGRAM-BUTTON-LOCK",
+  "reference": "game/docs/REIKI_TARGET_SNAPSHOT_PHASE107.png",
   "locked": [
-    "Phase 92 Reiki readability/chakra visual reference restored as overlay",
-    "Phase 85/Webex Reiki hologram MP4 restored",
-    "interactive Reiki Video/Hologram button in carousel",
-    "private Reiki room video access preserved",
-    "music disabled and audio files removed",
-    "old store model loading blocked",
+    "Reiki screenshot visual match storefront",
+    "old plus new Reiki mother module",
+    "interactive Video Hologram carousel card",
+    "Reiki private room and video portal preserved",
+    "music disabled/audio payload removed",
+    "Quest locomotion and teleport forward guard preserved",
+    "Moon/Mars sky sizing/orbit preserved",
     "site untouched"
-  ],
-  "criticalRules": [
-    "Do not rebuild Reiki from Phase 101/102/103/104 visual-only layers",
-    "Reiki visual reference is Phase 92 + Phase 85 video + Webex demo video",
-    "Update both /game and /update/game.zip together",
-    "Verify visible BUILD label before testing"
   ]
 }
