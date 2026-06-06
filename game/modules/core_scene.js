@@ -17,17 +17,12 @@ export function createCore({ containerId = "app" } = {}){
   });
 
   renderer.setClearColor(0x050508, 1);
-  
-  const ua = navigator.userAgent || "";
-  const isQuest = /Quest|OculusBrowser|Meta Quest/i.test(ua);
-  const maxPixelRatio = isQuest ? 1.18 : 1.5;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
-
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 0.9));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.10;
+  renderer.toneMappingExposure = 1.05;
   renderer.shadowMap.enabled = false;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 

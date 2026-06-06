@@ -1,8 +1,30 @@
-﻿{
-    "build":  "UPDATE-3.0-PHASE-104-ROLLBACK-RECOVERY-REIKI-MOTHER-LOCK",
-    "version":  "Update 3.0",
-    "siteTouched":  false,
-    "note":  "Phase 104 rollback recovery master lock. /game and /update/game.zip synchronized.",
-    "track":  "game-only",
-    "created":  "2026-06-06T20:54:56Z"
+{
+  "version": "Update 3.0",
+  "build": "UPDATE-3.0-PHASE-105-REIKI-REFERENCE-RESTORE-LOCK",
+  "created": "2026-06-06",
+  "track": "game-only",
+  "siteTouched": false,
+  "phase": 105,
+  "focus": "Restore the Reiki hub from the correct Phase 87/88 reference packages, including the paused hologram video portal/carousel look, while preserving no-music, Quest locomotion, old-store blocking, and higher/larger textured Moon/Mars orbit behavior.",
+  "referenceSources": [
+    "game-phase87-reiki-hologram-pause-polish-lock.zip",
+    "game-phase88-locomotion-store-lobby-ready-lock.zip"
+  ],
+  "locked": [
+    "Phase 87/88 Reiki storefront look restored",
+    "Reiki hologram video portal restored using game/assets/video/reiki_hologram.mp4",
+    "Hologram remains paused unless opened from Reiki route",
+    "Lobby music removed/no audio autoplay",
+    "Quest teleport ray uses forward guard and visible arc/marker",
+    "Quest right-stick movement remains headset-forward",
+    "Moon/Mars high, larger, textured, with Mars orbiting Moon",
+    "Old store.fbx/store.glb blocked",
+    "Private scene files preserved where available"
+  ],
+  "criticalRules": [
+    "Do not use Phase 85/101/103/104 as visual reference for Reiki",
+    "Use Phase 87/88 as the Reiki visual reference",
+    "Update /game and /update/game.zip together",
+    "No website/site edits"
+  ]
 }

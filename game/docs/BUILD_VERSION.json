@@ -1,28 +1,30 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-104-ROLLBACK-RECOVERY-REIKI-MOTHER-LOCK",
+  "build": "UPDATE-3.0-PHASE-105-REIKI-REFERENCE-RESTORE-LOCK",
   "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 104,
-  "focus": "Rollback recovery: preserve the current lobby, restore the rich Reiki mother module with hologram/video carousel, lock no-music, Quest locomotion/teleport, high textured Moon/Mars, and keep all private scene routes synchronized.",
-  "baseline": "UPDATE-3.0-PHASE-103-REIKI-MOTHER-QUEST-SKY-STOREFRONT-LOCK",
-  "recoveredFrom": "Rollback after incorrect Phase 85/101/103 drift reports",
+  "phase": 105,
+  "focus": "Restore the Reiki hub from the correct Phase 87/88 reference packages, including the paused hologram video portal/carousel look, while preserving no-music, Quest locomotion, old-store blocking, and higher/larger textured Moon/Mars orbit behavior.",
+  "referenceSources": [
+    "game-phase87-reiki-hologram-pause-polish-lock.zip",
+    "game-phase88-locomotion-store-lobby-ready-lock.zip"
+  ],
   "locked": [
-    "Reiki mother module with large storefront frame",
-    "hologram/video carousel in lobby Reiki area",
-    "hologram/video carousel in private Reiki room",
-    "Reiki about/store/meditation/approval cards",
-    "music disabled and audio payload not shipped",
-    "Quest controller right-stick headset-forward movement",
-    "Quest teleport ray forward guard and visible SVR marker",
-    "Moon/Mars higher larger textured orbit setup",
-    "PGA/SVR Store/Smoker/Scorpion private routes preserved"
+    "Phase 87/88 Reiki storefront look restored",
+    "Reiki hologram video portal restored using game/assets/video/reiki_hologram.mp4",
+    "Hologram remains paused unless opened from Reiki route",
+    "Lobby music removed/no audio autoplay",
+    "Quest teleport ray uses forward guard and visible arc/marker",
+    "Quest right-stick movement remains headset-forward",
+    "Moon/Mars high, larger, textured, with Mars orbiting Moon",
+    "Old store.fbx/store.glb blocked",
+    "Private scene files preserved where available"
   ],
   "criticalRules": [
-    "Do not apply Phase 85 again",
-    "Do not deploy stale Downloads/game.zip",
+    "Do not use Phase 85/101/103/104 as visual reference for Reiki",
+    "Use Phase 87/88 as the Reiki visual reference",
     "Update /game and /update/game.zip together",
-    "This Phase 104 zip is the master recovery baseline after rollback"
+    "No website/site edits"
   ]
 }

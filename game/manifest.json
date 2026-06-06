@@ -2,12 +2,9 @@
   "name": "ScarlettVR Poker",
   "short_name": "SVR Poker",
   "start_url": "./index.html",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#050508",
-  "theme_color": "#7b2cff",
-  "build": "UPDATE-3.0-PHASE-104-ROLLBACK-RECOVERY-REIKI-MOTHER-LOCK",
-  "version": "Update 3.0",
-  "phase": 101,
-  "siteTouched": false,
-  "track": "game-only"
+  "theme_color": "#050508",
+  "build": "PHASE-88-LOCOMOTION-STORE-LOBBY-READY-LOCK",
+  "phase": 88
 }

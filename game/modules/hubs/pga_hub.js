@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { addMotherCarousel } from "./mother_module.js";
 
 function makeCanvasTexture(painter, width = 1024, height = 1024){
   const canvas = document.createElement("canvas");
@@ -60,14 +59,14 @@ function buildProfileTexture(){
     ctx.fill();
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 42px Arial";
-    ctx.fillText("SOUTH-WEST WALL • GOLF ACADEMY", 92, 126);
+    ctx.fillText("SOUTH-WEST WALL • PGA HUB", 92, 126);
 
     ctx.fillStyle = "#ffffff";
     ctx.font = "700 92px Arial";
-    ctx.fillText("JUAN ESPEJO", 92, 254);
+    ctx.fillText("JUAN E. ESPEJO", 92, 254);
     ctx.fillStyle = "#ffc2c9";
     ctx.font = "600 40px Arial";
-    ctx.fillText("PGA Pro • Golf Academy (Maryville)", 92, 324);
+    ctx.fillText("PGA Pro • Maryville Golf Academy Founder", 92, 324);
 
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 48px Arial";
@@ -75,7 +74,7 @@ function buildProfileTexture(){
     ctx.fillStyle = "#f7f0f2";
     ctx.font = "500 38px Arial";
     let y = drawWrappedText(ctx,
-      "Combined old/new golf academy storefront. Reserved for Juan Espejo PGA training, lessons, driving range, chip and putt modules, and future approved academy media. Built as one mother module so the private golf rooms stay separate from the lobby.",
+      "Dedicated VR golf storefront reserved for training, lessons, academy promotion, and future branded PGA media. Built as a professional modular client hub so it can be refined without disturbing the main lobby baseline.",
       92, 474, w - 184, 46);
 
     y += 76;
@@ -102,10 +101,10 @@ function buildProfileTexture(){
     ctx.stroke();
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 34px Arial";
-    ctx.fillText("WAITING APPROVAL", 108, h - 172);
+    ctx.fillText("RESERVED SPOTLIGHT", 108, h - 172);
     ctx.fillStyle = "#ffffff";
     ctx.font = "700 42px Arial";
-    ctx.fillText("JUAN ESPEJO GOLF ACADEMY", 108, h - 118);
+    ctx.fillText("VR GOLF / PGA HUB", 108, h - 118);
   }, 1100, 1500);
 }
 
@@ -161,10 +160,10 @@ function buildReserveTexture(){
     ctx.fillStyle = "#ff7784";
     ctx.textAlign = "center";
     ctx.font = "700 64px Arial";
-    ctx.fillText("WAITING FOR", w / 2, 96);
+    ctx.fillText("RESERVED FOR", w / 2, 96);
     ctx.fillStyle = "#ffffff";
     ctx.font = "700 74px Arial";
-    ctx.fillText("APPROVAL", w / 2, 184);
+    ctx.fillText("JUAN ESPEJO", w / 2, 184);
   }, 900, 240);
 }
 
@@ -246,8 +245,8 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
           ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
           ctx.strokeStyle = 'rgba(255,208,214,0.86)'; ctx.lineWidth = 10; roundRect(ctx, 18, 18, w-36, h-36, 24); ctx.stroke();
           ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillStyle = '#fff7f8'; ctx.font = '700 88px Arial'; ctx.fillText('JUAN ESPEJO GOLF ACADEMY', w/2, 98);
-          ctx.fillStyle = 'rgba(255,176,186,0.98)'; ctx.font = '700 34px Arial'; ctx.fillText('PGA TRAINING • DRIVE RANGE • CHIP + PUTT • MARYVILLE', w/2, 184);
+          ctx.fillStyle = '#fff7f8'; ctx.font = '700 88px Arial'; ctx.fillText('JUAN ESPEJO PGA HUB', w/2, 98);
+          ctx.fillStyle = 'rgba(255,176,186,0.98)'; ctx.font = '700 34px Arial'; ctx.fillText('GOLF LESSONS • TRAINING • ACADEMY • SPONSOR SHOWCASE', w/2, 184);
         }, 1700, 240),
         transparent: true,
         side: THREE.DoubleSide,
@@ -298,12 +297,6 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     );
     reservePlaque.position.set(4.08, 1.10, 0.20);
     group.add(reservePlaque);
-    addMotherCarousel(group, [
-      { title: "DRIVE RANGE", subtitle: "private full-swing room", status: "TELEPORT: PGA DRIVE", route: "pgaDrive", color: "#0e5cff" },
-      { title: "CHIP + PUTT", subtitle: "short-game private room", status: "TELEPORT: CHIP + PUTT", route: "pgaChipPutt", color: "#0d8b3a" },
-      { title: "ACADEMY INFO", subtitle: "Juan Espejo Golf Academy", status: "MARYVILLE • WAITING APPROVAL", route: "pga", color: "#7a0b18" },
-      { title: "APPROVAL", subtitle: "media and sponsor lock", status: "WAITING APPROVAL", route: "pgaWall", color: "#a01828" }
-    ], { y: 1.94, z: 1.23, cardWidth: 2.06, cardHeight: 0.88, spread: 2.15 });
 
     const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.82), softGlass);
     frontGlassL.position.set(-2.62, 3.18, 1.14);
