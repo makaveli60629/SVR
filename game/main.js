@@ -7,13 +7,14 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
+import { applyReikiMotherHologramButton106 } from "./modules/update_3_0_reiki_mother_hologram_button_106.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE105 = { build: 'UPDATE-3.0-PHASE-105-REIKI-REFERENCE-RESTORE-LOCK', source: 'Phase 87/88 Reiki hub reference restored' };
+window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-106-REIKI-OLD-NEW-HOLOGRAM-BUTTON-LOCK', source: 'Phase 92 readability/chakra + Phase 85/Webex video hologram restored on Phase 105/Quest base' };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -77,23 +78,15 @@ const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTarg
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
-const audio = createAudioPlaylist({
-  tracks: [
-    { title: "Lobby 07", url: "./assets/audio/07.mp3" }
-  ],
-  onState: (state)=>{
-    if (!$status || renderer.xr.isPresenting) return;
-    if (state.error){
-      setStatus(`Audio: ${state.error}`);
-      return;
-    }
-    if (state.enabled){
-      setStatus(`Now Playing: ${state.trackTitle}`);
-      return;
-    }
-    setStatus(state.primed ? `Music Ready: ${state.trackTitle}` : `Audio Locked: tap once to unlock`);
-  }
-});
+const audio = {
+  toggle: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
+  next: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
+  prime: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
+  start: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
+  stop: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
+  getState: ()=>({ enabled:false, primed:false, trackTitle:'Music Disabled', error:null })
+};
+window.SVR_AUDIO_DISABLED = true;
 
 let seated = false;
 let seatIndex = -1;
@@ -363,6 +356,7 @@ const watch = createWristWatch({
 
 createInactiveReikiPortal();
 createStoreWebPortal();
+applyReikiMotherHologramButton106({ scene, camera, renderer, sceneTargets, setStatus, log });
 
 $toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
@@ -373,7 +367,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Right stick moves/snaps. M or watch toggles lobby music. Reiki hologram only plays from Reiki. Store portal ready.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Right stick moves/snaps. Music disabled. Reiki hologram opens from the interactive carousel button. Store portal ready.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

@@ -1391,6 +1391,7 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   modelMount.add(kioskShell);
 
   (async ()=>{
+    return; // Phase 106: old heavy store model disabled; lightweight SVR store shell only.
     let storeModel = await tryLoadGLTF(assetUrls("models/store.glb", "store.glb"), ()=>{}, 9000);
     if (!storeModel) storeModel = await tryLoadFBX(assetUrls("models/store.fbx", "store.fbx"), ()=>{}, 10000);
     if (!storeModel) return;
