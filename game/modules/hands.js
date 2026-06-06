@@ -11,7 +11,39 @@ function makeControllerProxy(controller, handed = "right"){
   const proxy = new THREE.Group();
   proxy.userData.controller = controller;
   proxy.userData.handedness = handed;
-  proxy.visible = false;
+  proxy.visible = true;
+  proxy.name = `${handed}-quest-controller-proxy`;
+
+  const side = handed === "left" ? -1 : 1;
+  const bodyMat = new THREE.MeshStandardMaterial({
+    color: 0x17191f,
+    roughness: 0.46,
+    metalness: 0.38,
+    emissive: 0x080913,
+    emissiveIntensity: 0.18
+  });
+  const trimMat = new THREE.MeshStandardMaterial({
+    color: handed === "left" ? 0x78c8ff : 0xb48cff,
+    roughness: 0.34,
+    metalness: 0.32,
+    emissive: handed === "left" ? 0x0a2638 : 0x2a0d3a,
+    emissiveIntensity: 0.55
+  });
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.045, 0.155, 8, 16), bodyMat);
+  body.rotation.x = Math.PI * 0.50;
+  body.position.set(0, -0.012, -0.025);
+  proxy.add(body);
+  const face = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.022, 0.058), trimMat);
+  face.position.set(0.010 * side, 0.002, -0.100);
+  proxy.add(face);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.006, 10, 28), trimMat);
+  ring.rotation.x = Math.PI * 0.50;
+  ring.position.set(0.018 * side, 0.015, -0.152);
+  proxy.add(ring);
+  const triggerPad = new THREE.Mesh(new THREE.BoxGeometry(0.033, 0.010, 0.040), trimMat);
+  triggerPad.position.set(0, -0.040, -0.085);
+  proxy.add(triggerPad);
+
   proxy.joints = {
     wrist: makeProxyJoint("wrist"),
     "thumb-tip": makeProxyJoint("thumb-tip"),
@@ -153,7 +185,7 @@ export function createHands({ scene, renderer, log = console.log }){
       if (h) h.visible = true;
     });
     handModels.forEach(m=>{ if (m) m.visible = true; });
-    controllerProxies.forEach(({ proxy })=> updateControllerProxy(proxy, dt));
+    controllerProxies.forEach(({ proxy })=>{ if (proxy) proxy.visible = true; updateControllerProxy(proxy, dt); });
   }
 
   function updateDebug(){

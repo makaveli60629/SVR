@@ -1,9 +1,6 @@
 ﻿{
-  "build": "RICI-UPDATE-101-1-1-MOTHER-MODULE-LOCK",
-  "phase": "RICI Update 101 / Reiki 1.1",
-  "scope": "game-side Reiki mother module",
-  "siteTouched": false,
-  "approvalSafe": true,
-  "packetDriven": true,
-  "updatedAt": "2026-06-05T00:31:50"
+    "updatedAt":  "2026-06-06T17:57:18Z",
+    "build":  "PHASE-84-QUEST-CONTROLLER-SKY-LOBBY-POLISH-LOCK",
+    "siteTouched":  false,
+    "gameZip":  "update/game.zip"
 }
