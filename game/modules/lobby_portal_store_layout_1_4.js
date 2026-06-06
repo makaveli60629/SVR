@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const BUILD = "LOBBY-ORG-1-4G-EMERGENCY-REIKI-STORE-ALIGNMENT";
+const BUILD = "LOBBY-ORG-1-4J-REIKI-ANCHOR-STORE-LOCK";
 const CENTER = new THREE.Vector3(0, 1.25, 0);
 
 const LAYOUT = {
@@ -22,7 +22,7 @@ function moveObject(scene, cfg) {
   if (!obj) return false;
   obj.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
   faceLobby(obj, cfg);
-  obj.userData.SVR_LAYOUT_14G_LOCKED = true;
+  obj.userData.SVR_LAYOUT_14J_LOCKED = true;
   return true;
 }
 function makeTexture(title, sub, color = "#8ffff0") {
@@ -38,11 +38,10 @@ function makeTexture(title, sub, color = "#8ffff0") {
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4; return tex;
 }
 function addLabel(scene, key, cfg) {
-  const old = scene.getObjectByName(`SVR_LAYOUT_14F_LABEL_${key}`) || scene.getObjectByName(`SVR_LAYOUT_14G_LABEL_${key}`);
-  if (old?.parent) old.parent.remove(old);
-  const mat = new THREE.MeshBasicMaterial({ map: makeTexture(cfg.label, key === "store" ? "replaces old coffee ad zone" : "organized hub zone", `#${cfg.color.toString(16).padStart(6, "0")}`), transparent: true, side: THREE.DoubleSide, depthWrite: false, toneMapped: false });
+  [`SVR_LAYOUT_14F_LABEL_${key}`, `SVR_LAYOUT_14G_LABEL_${key}`, `SVR_LAYOUT_14J_LABEL_${key}`].forEach(name => { const old = scene.getObjectByName(name); if (old?.parent) old.parent.remove(old); });
+  const mat = new THREE.MeshBasicMaterial({ map: makeTexture(cfg.label, key === "store" ? "locked old coffee ad zone" : "locked hub zone", `#${cfg.color.toString(16).padStart(6, "0")}`), transparent: true, side: THREE.DoubleSide, depthWrite: false, toneMapped: false });
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.9, .82), mat);
-  mesh.name = `SVR_LAYOUT_14G_LABEL_${key}`;
+  mesh.name = `SVR_LAYOUT_14J_LABEL_${key}`;
   mesh.position.set(cfg.pos[0], 3.05, cfg.pos[2] + 0.62);
   mesh.renderOrder = 820;
   mesh.lookAt(0, 2.2, 0);
@@ -50,11 +49,11 @@ function addLabel(scene, key, cfg) {
   return mesh;
 }
 function addFloorPath(scene) {
-  ["SVR_LAYOUT_14F_CENTER_PORTAL_PATH_LOCK", "SVR_LAYOUT_14G_CENTER_PORTAL_PATH_LOCK"].forEach(name => { const old = scene.getObjectByName(name); if (old?.parent) old.parent.remove(old); });
-  const root = new THREE.Group(); root.name = "SVR_LAYOUT_14G_CENTER_PORTAL_PATH_LOCK"; scene.add(root);
+  ["SVR_LAYOUT_14F_CENTER_PORTAL_PATH_LOCK", "SVR_LAYOUT_14G_CENTER_PORTAL_PATH_LOCK", "SVR_LAYOUT_14J_CENTER_PORTAL_PATH_LOCK"].forEach(name => { const old = scene.getObjectByName(name); if (old?.parent) old.parent.remove(old); });
+  const root = new THREE.Group(); root.name = "SVR_LAYOUT_14J_CENTER_PORTAL_PATH_LOCK"; scene.add(root);
   const mat = new THREE.MeshBasicMaterial({ color: 0x8ffff0, transparent: true, opacity: .065, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false });
   const ring = new THREE.Mesh(new THREE.RingGeometry(5.0, 5.22, 96), mat.clone());
-  ring.name = "SVR_LAYOUT_14G_CENTER_WALK_RING"; ring.rotation.x = -Math.PI / 2; ring.position.y = .028; root.add(ring);
+  ring.name = "SVR_LAYOUT_14J_CENTER_WALK_RING"; ring.rotation.x = -Math.PI / 2; ring.position.y = .028; root.add(ring);
   return root;
 }
 function hideTree(obj) { if (!obj) return 0; let count = 0; obj.visible = false; count++; obj.traverse?.(c => { c.visible = false; count++; }); return count; }
@@ -66,6 +65,7 @@ function hideRemovedZones(scene) {
     const n = String(obj.name || "");
     if (/ESPRESSO|WHIPPED|CREAM|COFFEE_STAND|DAILY_CASH_STORE/i.test(n)) hidden += hideTree(obj);
     if (/SVR_UPDATE3_PORTAL_.*PGA|SVR_PORTAL_BUTTON_.*PGA|PGA.*PORTAL/i.test(n) && !/SVR_PGA_GOLF_STOREFRONT_14_LOCK|SVR_PGA_CAROUSEL|SVR_PGA_INTERACTION/i.test(n)) hidden += hideTree(obj);
+    if (/RICI|RICKY|RICKI/i.test(n) && /SIGN|BANNER|MARQUEE/i.test(n) && !/REIKI_HUB_BIG_RED_APPROVAL_SIGN_14H/i.test(n)) hidden += hideTree(obj);
   });
   return hidden;
 }
@@ -75,19 +75,33 @@ function openReikiSightline(scene) {
   let adjusted = 0;
   root.traverse(obj => {
     const n = String(obj.name || "");
-    if (/MAIN_SIGN|APPROVAL_SIGN_FRONT_LOCK|TOP_GLASS_HEADER/i.test(n)) {
-      obj.position.y += /MAIN_SIGN/.test(n) ? 0.55 : 0.35;
-      obj.renderOrder = Math.max(obj.renderOrder || 0, 880);
-      if (obj.material) { obj.material.depthWrite = false; obj.material.needsUpdate = true; }
+    if (/MAIN_SIGN|APPROVAL_SIGN_FRONT_LOCK|TOP_GLASS_HEADER/i.test(n) && !/REIKI_HUB_BIG_RED_APPROVAL_SIGN_14H/i.test(n)) {
+      obj.visible = false;
       adjusted++;
     }
     if (/ACTIVE_HOLOGRAM_CARD|REIKI_HOLOGRAM_VIDEO|REIKI_HOLOGRAM_VIDEO_FRAME|VIDEO_PROMPT|HOLOGRAM_BEAM|ACTIVATION_RING/i.test(n)) {
-      obj.renderOrder = Math.max(obj.renderOrder || 0, 910);
+      obj.renderOrder = Math.max(obj.renderOrder || 0, 930);
       obj.visible = true;
       adjusted++;
     }
   });
   return adjusted;
+}
+function installAnchorGuard(scene) {
+  if (scene.userData.SVR_REIKI_ANCHOR_GUARD_14J) return false;
+  scene.userData.SVR_REIKI_ANCHOR_GUARD_14J = true;
+  const oldTick = scene.onBeforeRender;
+  let tick = 0;
+  scene.onBeforeRender = function(...args) {
+    oldTick?.apply(this, args);
+    tick++;
+    if (tick % 20 !== 0) return;
+    const reiki = scene.getObjectByName(LAYOUT.reiki.name);
+    const store = scene.getObjectByName(LAYOUT.store.name);
+    if (reiki) { reiki.position.set(...LAYOUT.reiki.pos); reiki.rotation.set(0, LAYOUT.reiki.yaw, 0); }
+    if (store) { store.position.set(...LAYOUT.store.pos); faceLobby(store, LAYOUT.store); }
+  };
+  return true;
 }
 
 export function applyLobbyPortalStoreLayout14(scene, { log = console.log } = {}) {
@@ -100,8 +114,9 @@ export function applyLobbyPortalStoreLayout14(scene, { log = console.log } = {})
   const path = addFloorPath(scene); lock.add(path);
   const hiddenRemovedZones = hideRemovedZones(scene);
   const reikiSightlineAdjusted = openReikiSightline(scene);
-  window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14 = { build: BUILD, moved, hiddenRemovedZones, reikiSightlineAdjusted, layout: Object.fromEntries(Object.entries(LAYOUT).map(([k, v]) => [k, { name: v.name, pos: v.pos, label: v.label }])), goal: "restore Reiki alignment, remove espresso, place SVR store in coffee ad zone, reduce duplicate PGA portals" };
+  const anchorGuardInstalled = installAnchorGuard(scene);
+  window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14 = { build: BUILD, moved, hiddenRemovedZones, reikiSightlineAdjusted, anchorGuardInstalled, layout: Object.fromEntries(Object.entries(LAYOUT).map(([k, v]) => [k, { name: v.name, pos: v.pos, label: v.label }])), goal: "permanently lock Reiki/store anchors and suppress misspelled/duplicate signs" };
   scene.userData.SVR_LOBBY_PORTAL_STORE_LAYOUT_14 = window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14;
-  log?.("Emergency Reiki/store layout 1.4G loaded", window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14);
+  log?.("Reiki/store anchor lock 1.4J loaded", window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14);
   return lock;
 }
