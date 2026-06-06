@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const BUILD = "LOBBY-ORG-1-3I-QUEST-PERFORMANCE-STABILITY";
+const BUILD = "LOBBY-ORG-1-4E-QUEST-CLARITY-STABILITY";
 
 function profile() {
   const ua = navigator.userAgent || "";
@@ -12,25 +12,14 @@ function profile() {
 
 function tuneRenderer(renderer, p) {
   if (!renderer) return {};
-  const before = {
-    pixelRatio: renderer.getPixelRatio?.(),
-    toneMappingExposure: renderer.toneMappingExposure
-  };
-  const targetPixelRatio = p.isQuest ? 0.66 : p.isAndroid ? 0.78 : Math.min(window.devicePixelRatio || 1, 1.0);
+  const before = { pixelRatio: renderer.getPixelRatio?.(), toneMappingExposure: renderer.toneMappingExposure };
+  const targetPixelRatio = p.isQuest ? 0.78 : p.isAndroid ? 0.84 : Math.min(window.devicePixelRatio || 1, 1.05);
   renderer.setPixelRatio?.(targetPixelRatio);
-  renderer.xr?.setFramebufferScaleFactor?.(p.isQuest ? 0.66 : p.isMobile ? 0.82 : 0.95);
-  renderer.xr?.setFoveation?.(p.isQuest ? 1.0 : 0.75);
+  renderer.xr?.setFramebufferScaleFactor?.(p.isQuest ? 0.78 : p.isMobile ? 0.86 : 1.0);
+  renderer.xr?.setFoveation?.(p.isQuest ? 0.72 : 0.55);
   renderer.shadowMap.enabled = false;
-  renderer.toneMappingExposure = p.isQuest ? 0.84 : p.isMobile ? 0.92 : 1.0;
-  return {
-    before,
-    after: {
-      pixelRatio: renderer.getPixelRatio?.(),
-      framebufferScale: p.isQuest ? 0.66 : p.isMobile ? 0.82 : 0.95,
-      toneMappingExposure: renderer.toneMappingExposure,
-      foveation: p.isQuest ? 1.0 : 0.75
-    }
-  };
+  renderer.toneMappingExposure = p.isQuest ? 0.98 : p.isMobile ? 1.0 : 1.04;
+  return { before, after: { pixelRatio: renderer.getPixelRatio?.(), framebufferScale: p.isQuest ? 0.78 : p.isMobile ? 0.86 : 1.0, toneMappingExposure: renderer.toneMappingExposure, foveation: p.isQuest ? 0.72 : 0.55 } };
 }
 
 function stableTransparentMaterial(mat) {
@@ -38,8 +27,8 @@ function stableTransparentMaterial(mat) {
   let changed = false;
   if (mat.transparent || mat.opacity < 1) {
     mat.depthWrite = false;
-    mat.alphaTest = Math.max(mat.alphaTest || 0, 0.015);
-    if (mat.opacity > 0.98 && /BasicMaterial|MeshBasicMaterial/i.test(mat.type || "")) mat.opacity = 0.98;
+    mat.alphaTest = Math.max(mat.alphaTest || 0, 0.02);
+    if (mat.opacity > 0.985 && /BasicMaterial|MeshBasicMaterial/i.test(mat.type || "")) mat.opacity = 0.985;
     mat.needsUpdate = true;
     changed = true;
   }
@@ -47,67 +36,43 @@ function stableTransparentMaterial(mat) {
 }
 
 function optimizeSceneMaterials(scene) {
-  let materials = 0;
-  let meshes = 0;
-  let sprites = 0;
-  let transparentFixed = 0;
+  let materials = 0, meshes = 0, sprites = 0, transparentFixed = 0;
   scene.traverse((obj) => {
     if (!obj) return;
-    if (obj.isMesh) {
-      meshes++;
-      obj.castShadow = false;
-      obj.receiveShadow = false;
-      obj.frustumCulled = true;
-    }
+    if (obj.isMesh) { meshes++; obj.castShadow = false; obj.receiveShadow = false; obj.frustumCulled = obj.name && /MOON|MARS|SKY/i.test(obj.name) ? false : true; }
     if (obj.isSprite) {
-      sprites++;
-      obj.frustumCulled = true;
+      sprites++; obj.frustumCulled = obj.name && /MOON|MARS|SKY/i.test(obj.name) ? false : true;
       const n = String(obj.name || "");
-      if (/FIREFLY|SPRITE|DUST|PARTICLE|GLOW/i.test(n) && obj.material?.opacity > 0.38) {
-        obj.material.opacity = 0.38;
-        obj.material.needsUpdate = true;
-      }
+      if (/FIREFLY|SPRITE|DUST|PARTICLE/i.test(n) && obj.material?.opacity > 0.28) { obj.material.opacity = 0.28; obj.material.needsUpdate = true; }
+      if (/GLOW/i.test(n) && obj.material?.opacity > 0.42) { obj.material.opacity = 0.42; obj.material.needsUpdate = true; }
     }
     const mats = Array.isArray(obj.material) ? obj.material : obj.material ? [obj.material] : [];
-    mats.forEach((m) => {
-      materials++;
-      if (stableTransparentMaterial(m)) transparentFixed++;
-      if (m.map) {
-        m.map.anisotropy = Math.min(m.map.anisotropy || 1, 4);
-        m.map.needsUpdate = true;
-      }
-    });
+    mats.forEach((m) => { materials++; if (stableTransparentMaterial(m)) transparentFixed++; if (m.map) { m.map.anisotropy = Math.min(Math.max(m.map.anisotropy || 1, 2), 4); m.map.needsUpdate = true; } });
   });
   return { meshes, sprites, materials, transparentFixed };
 }
 
 function installFrameGuard(scene, renderer, p) {
   const samples = [];
-  let last = performance.now();
-  let lastOptimize = 0;
+  let last = performance.now(), lastOptimize = 0, downshifted = false;
   const oldTick = scene.onBeforeRender;
   scene.onBeforeRender = function(...args) {
     oldTick?.apply(this, args);
-    const now = performance.now();
-    const dt = now - last;
-    last = now;
-    samples.push(dt);
-    if (samples.length > 90) samples.shift();
-    if (now - lastOptimize > 2400) {
+    const now = performance.now(); const dt = now - last; last = now;
+    samples.push(dt); if (samples.length > 120) samples.shift();
+    if (now - lastOptimize > 3000) {
       lastOptimize = now;
       const avg = samples.reduce((a, b) => a + b, 0) / Math.max(1, samples.length);
       const fps = avg > 0 ? Math.round(1000 / avg) : 0;
       window.SVR_PERFORMANCE_STABILITY_13I.fpsEstimate = fps;
-      if (p.isQuest && fps && fps < 58) {
-        renderer.setPixelRatio?.(0.62);
-        renderer.xr?.setFramebufferScaleFactor?.(0.62);
-        window.SVR_PERFORMANCE_STABILITY_13I.dynamicDownshift = true;
+      if (p.isQuest && fps && fps < 48 && !downshifted) {
+        renderer.setPixelRatio?.(0.72);
+        renderer.xr?.setFramebufferScaleFactor?.(0.72);
+        downshifted = true;
+        window.SVR_PERFORMANCE_STABILITY_13I.dynamicDownshift = "clarity-safe 0.72";
       }
-      if (fps && fps < 45) {
-        scene.traverse((obj) => {
-          const n = String(obj.name || "");
-          if (/FIREFLY|SPRITE|DUST|PARTICLE/i.test(n)) obj.visible = false;
-        });
+      if (fps && fps < 40) {
+        scene.traverse((obj) => { const n = String(obj.name || ""); if (/FIREFLY|DUST|PARTICLE/i.test(n)) obj.visible = false; });
         window.SVR_PERFORMANCE_STABILITY_13I.particleCull = true;
       }
     }
@@ -116,13 +81,7 @@ function installFrameGuard(scene, renderer, p) {
 
 function removeBlackBlockers(scene) {
   let hidden = 0;
-  scene.traverse((obj) => {
-    const n = String(obj.name || "");
-    if (/BLACK.*BLOCKER|DEBUG.*BOX|TEMP.*WALL|PLACEHOLDER.*BLOCK/i.test(n)) {
-      obj.visible = false;
-      hidden++;
-    }
-  });
+  scene.traverse((obj) => { const n = String(obj.name || ""); if (/BLACK.*BLOCKER|DEBUG.*BOX|TEMP.*WALL|PLACEHOLDER.*BLOCK/i.test(n)) { obj.visible = false; hidden++; } });
   return hidden;
 }
 
@@ -130,26 +89,13 @@ export function applyPerformanceStability13(scene, { log = console.log } = {}) {
   if (!scene || scene.getObjectByName("SVR_PERFORMANCE_STABILITY_13I_LOCK")) return null;
   const renderer = window.SVR_RENDERER;
   const p = profile();
-  const lock = new THREE.Group();
-  lock.name = "SVR_PERFORMANCE_STABILITY_13I_LOCK";
-  scene.add(lock);
-
+  const lock = new THREE.Group(); lock.name = "SVR_PERFORMANCE_STABILITY_13I_LOCK"; scene.add(lock);
   const rendererTune = tuneRenderer(renderer, p);
   const materialPass = optimizeSceneMaterials(scene);
   const hiddenBlackBlockers = removeBlackBlockers(scene);
   installFrameGuard(scene, renderer, p);
-
-  window.SVR_PERFORMANCE_STABILITY_13I = {
-    build: BUILD,
-    profile: p,
-    rendererTune,
-    materialPass,
-    hiddenBlackBlockers,
-    dynamicDownshift: false,
-    particleCull: false,
-    goal: "reduce Quest shimmer, blink, load pressure, and frame dips"
-  };
+  window.SVR_PERFORMANCE_STABILITY_13I = { build: BUILD, profile: p, rendererTune, materialPass, hiddenBlackBlockers, dynamicDownshift: false, particleCull: false, clarityMode: true, goal: "reduce Quest grain/chop while keeping frame stability" };
   scene.userData.SVR_PERFORMANCE_STABILITY_13I = window.SVR_PERFORMANCE_STABILITY_13I;
-  log?.("Performance stability 1.3I loaded", window.SVR_PERFORMANCE_STABILITY_13I);
+  log?.("Performance clarity/stability 1.4E loaded", window.SVR_PERFORMANCE_STABILITY_13I);
   return lock;
 }
