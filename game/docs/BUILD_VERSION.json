@@ -1,37 +1,32 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-101-REIKI-SKY-NO-MUSIC-REFINE-LOCK",
+  "build": "UPDATE-3.0-PHASE-103-REIKI-MOTHER-QUEST-SKY-STOREFRONT-LOCK",
   "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 101,
-  "focus": "Remove music, restore reinforced Reiki storefront, add high textured Moon/Mars with Mars orbiting Moon, preserve corrected Update 3.0 private room baseline.",
-  "baseline": "UPDATE-3.0-PHASE-86-REIKI-STORE-ROLLBACK-HOTFIX",
-  "overlays": [
-    "SVR_UPDATE_3.0_PRESENT_MOMENT_PATCH.zip"
-  ],
+  "phase": 103,
+  "focus": "Lockdown recovery build: restore Reiki mother module with hologram/video carousel, preserve no-music lock, Quest locomotion/teleport forward guard, high textured Moon/Mars with Mars orbiting Moon, and modular storefront routing for PGA/SVR Store/Smoker/Scorpion.",
+  "baseline": "UPDATE-3.0-PHASE-102-REIKI-HOLOGRAM-CAROUSEL-RESTORE-LOCK",
   "protected": [
     "public website",
     "site pages",
-    "current lobby baseline"
+    "current lobby baseline",
+    "no rollback to Phase 85 or older Reiki store"
   ],
-  "restored": [
-    "private scene pages",
-    "Reiki hologram stage",
-    "storefront route buttons",
-    "PGA Drive/Chip-Putt private route",
-    "VR Store private room",
-    "Smoker Lounge private room",
-    "Scorpion private room"
+  "locked": [
+    "Reiki mother module hologram/video carousel",
+    "private Reiki room carousel",
+    "music disabled and audio payload removed",
+    "Quest right-stick headset-forward locomotion",
+    "Quest controller TP ray forward guard",
+    "Moon/Mars higher larger textured orbit setup",
+    "private scene routes",
+    "storefront mother-module pattern"
   ],
-  "fixed": [
-    "old Reiki store runtime assets blocked",
-    "unapproved old store model loading disabled",
-    "private scenes restored",
-    "music disabled/removed",
-    "Moon and Mars made higher/larger/textured",
-    "Mars orbiting Moon reinforced",
-    "new Reiki storefront overlay restored",
-    "green Reiki sprites and purple table sprites reinforced"
+  "criticalRules": [
+    "Update both /game and /update/game.zip together",
+    "Do not deploy stale game.zip from Downloads",
+    "Verify visible BUILD label before testing",
+    "No unapproved Reiki sponsor/founder branding"
   ]
 }

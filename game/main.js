@@ -9,6 +9,7 @@ import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyUpdate30PresentMoment } from "./modules/update_3_0_present_moment.js";
 import { applyUpdate30VisualCleanup101 } from "./modules/update_3_0_visual_cleanup_101.js";
+import { applyReikiHologramCarousel102 } from "./modules/update_3_0_reiki_hologram_carousel_102.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -191,6 +192,12 @@ applyUpdate30VisualCleanup101({
   setStatus,
   log,
   gotoScene
+});
+
+applyReikiHologramCarousel102({
+  scene,
+  setStatus,
+  log
 });
 
 

@@ -1,9 +1,8 @@
 ﻿{
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-101-REIKI-SKY-NO-MUSIC-REFINE-LOCK",
-  "phase": 101,
+  "build": "UPDATE-3.0-PHASE-103-REIKI-MOTHER-QUEST-SKY-STOREFRONT-LOCK",
+  "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "audio": "disabled",
-  "created": "2026-06-06"
+  "note": "Phase 103 lockdown: /game and /update/game.zip synchronized."
 }
