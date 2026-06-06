@@ -3,28 +3,27 @@
 ## Purpose
 This folder preserves working state, priorities, and handoff notes so progress is not lost between phases.
 
-## Current locked phase
-**PHASE-103-STABILITY-AUDIT-LOCK**
+## Current locked version
+**UPDATE-1.5-STABILITY-BUILD**
 
-Phase 103 is a stability/audit lock. It does not add heavy visual loops. It verifies and records that the current modular boot path is aligned around game/site/data interaction, private-room portals, AWS-ready public API fallback data, and stable locomotion.
+Update 1.5 is the current working target. Numeric phase names are now subordinate labels only. Do not roll the repo backward to Phase 84 when the active goal is Update 1.5.
 
 ## Current package baseline
 Current repo baseline:
 - `main` branch
 - Game boot path: `game/index.html`
-- Loaded bridge: `game/modules/sponsor_billboard_bridge.js`
-- Stability verifier: `game/modules/phase103_stability_audit.js`
+- Game-only track
+- Site and public website remain locked and must not be edited in this game track.
 
 ## Locked baselines
-- Official forearm watch baseline is the reference watch.
+- Official forearm watch baseline remains the reference watch.
 - Watch screen should face the user/upward and stay readable.
-- Watch hologram should remain off until activated or triggered by watch/teleport state.
 - Correct spelling is **Reiki**.
 - Reiki public/sponsor branding remains approval-safe unless explicitly approved.
-- Use **AWS-ready secure API architecture** for data; do not expose backend/database/payment/admin secrets in browser code.
+- Use secure API architecture for data. Do not expose backend/database/payment/admin secrets in browser code.
 - Game modules must remain removable/swappable.
 - Private rooms must remain separate scenes/routes, not full rooms embedded inside the lobby.
-- Quest/Android/desktop locomotion must remain a locked module, not scattered across unrelated files.
+- Quest, Android, and desktop locomotion must remain locked modules, not scattered across unrelated files.
 
 ## Current implemented areas
 - Main lobby shell
@@ -37,22 +36,33 @@ Current repo baseline:
 - Chip/Putt private room route
 - VR Store private room route
 - Smoker Lounge private room route
-- Corrected Espresso With Cream ad asset path
-- AWS-ready public data fallback bridge
 - Camera-forward locomotion module
 - Teleport release commit guard
-- Purple hand fire teleport-state indicator
-- Green Reiki approval-safe hub polish module
-- High Moon and Mars smart polish module
+- Moon and Mars sky polish track
+- Reiki approval-safe hub polish track
 
-## Locomotion lock
-- Left stick / Android movement stick = camera-forward movement.
-- Right stick = 45-degree snap turn only.
-- Controller trigger/A-style hold = aim teleport.
-- Release = commit teleport once, then teleport turns off.
-- Hand tracking: fist enables teleport; aim; pinch/clench release commits movement; teleport turns off.
-- Purple hand fire shows only when teleport is ON.
-- Heavy scene scans must not run every frame in the stable boot path.
+## Update 1.5 control lock
+- Android movement is working and must not be touched unless explicitly requested.
+- Desktop movement is working and must not be touched unless explicitly requested.
+- Quest controller movement needs the active fix path:
+  - right stick up/down = camera-facing forward/back movement
+  - right stick left/right = 45-degree snap turn
+  - no sideways drift when the headset is turned 45 degrees
+- Quest controllers should be visible as controllers.
+- Grip/squeeze should show teleport ray and SVR logo marker.
+- Trigger should commit teleport/leap when teleport is aimed.
+- A button should toggle action laser.
+- Trigger while action laser is active should activate UI/raycastable buttons.
+- Hand/fist teleport is secondary after controller stability.
+
+## Moon and Mars lock
+- Remove duplicate geometry-only Moon/Mars props.
+- Use textured planet meshes only.
+- Moon must be bigger and higher.
+- Mars must be slightly bigger and higher.
+- Mars should orbit the Moon.
+- Add denser stars and lightweight constellation clusters.
+- Keep sky objects above the skyline and away from building collision.
 
 ## Private room routes
 - `game/scorpion.html`
@@ -63,36 +73,28 @@ Current repo baseline:
 - `game/smoker-lounge.html`
 
 ## Site/game/data target
-- Site stays professional and populated with public-facing copy.
+- Site stays professional and locked.
 - Game uses bridge/fallback data for profile, rooms, ads, store products, manifest, and game events.
-- Secure API default remains `https://api.svrpoker.com`.
-- Public pages should not mention internal database/cloud work in user-facing copy.
+- Secure API default remains external to browser secrets.
 - Browser code must never include private database credentials, Stripe/payment secrets, or admin secrets.
 
 ## Current priority order
-1. Verify teleport release does not freeze.
-2. Verify Quest/Android controller movement.
-3. Verify watch alignment and hologram activation behavior.
-4. Verify private-room portal routing.
-5. Verify Scorpion room one-table poker presentation.
-6. Verify Reiki green approval-safe area with red carpet, red ropes, and plants.
-7. Continue poker gameplay lock: dealing, readable cards, timer, pot, winner banner.
+1. Fix deploy/workflow extraction so Update 1.5 can publish reliably.
+2. Sync build labels away from Phase 84 and into Update 1.5.
+3. Verify Quest controller camera-forward locomotion.
+4. Verify grip teleport marker and trigger commit.
+5. Verify A-button action laser and trigger activation.
+6. Verify Moon/Mars scale, height, texture, orbit, and duplicate removal.
+7. Verify lobby remains intact and site is untouched.
 
 ## Known open items
 - Full playable poker interaction is not finished.
 - Dealer/card gameplay still needs full lock.
 - Watch hologram still needs final activation-only polish.
-- Android virtual-stick UI may need a visible on-screen fallback if browser Gamepad axes are absent.
 - Private-room interiors need deeper visual polish after locomotion is stable.
-- Site admin/profile/store pages still need final live API connection once AWS backend endpoints are available.
+- Site admin/profile/store pages still need final live API connection once backend endpoints are available.
 
-## Asset notes
-- Store build currently expects `store.glb` / `store.fbx` when available.
-- Plant assets should remain staged around Reiki, with procedural fallback if assets are missing.
-- Espresso ad uses the corrected uploaded cup image through `game/assets/ads/espresso_lobby_wall_ad_phase91.svg` and the current cache-busted patch.
-
-## Latest Phase 103 note
-- Added `game/modules/phase103_stability_audit.js`.
-- Chained Phase 103 through `game/modules/sponsor_billboard_bridge.js`.
-- Runtime status object: `window.SVR_PHASE103_STABILITY`.
-- This phase is a hard audit lock before adding more visuals or gameplay features.
+## Latest Update 1.5 note
+- Update 1.5 supersedes the Phase 84 label for current work.
+- Phase 84 should be treated as an accidental/old label unless specifically referenced as an internal patch label.
+- The current objective is Update 1.5 Stability Build: sky, Quest controller locomotion, deploy extraction, route stability, and approval-safe storefront polish.
