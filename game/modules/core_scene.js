@@ -17,12 +17,12 @@ export function createCore({ containerId = "app" } = {}){
   });
 
   renderer.setClearColor(0x050508, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.18));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.12));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.94;
+  renderer.toneMappingExposure = 0.88;
   renderer.shadowMap.enabled = false;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -35,10 +35,10 @@ export function createCore({ containerId = "app" } = {}){
   document.body.appendChild(vrButton);
   renderer.xr.addEventListener?.("sessionstart", ()=>{
     // Quest polish: keep headset rendering crisp without pushing the GPU into dropped frames.
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.05));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.00));
   });
   renderer.xr.addEventListener?.("sessionend", ()=>{
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.18));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.12));
   });
 
 

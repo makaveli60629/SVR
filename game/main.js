@@ -241,7 +241,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Quest: right stick forward/back + snap turn, grip aims TP, trigger leaps, A toggles action laser. Desktop/Android unchanged.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Update 1.5 ready. Quest: camera-forward movement, grip aims TP, trigger leaps, A toggles action laser. Android/Desktop unchanged.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

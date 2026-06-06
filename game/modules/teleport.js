@@ -266,7 +266,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   function controllerTogglePressed(proxy){
     const gp = controllerGamepad(proxy);
     if (!gp) return false;
-    // Phase 84: grip/squeeze arms teleport. A/B are reserved for the action laser.
+    // Update 1.5: grip/squeeze arms teleport. A/B are reserved for the action laser.
     return getButtonValue(gp, 1) > 0.35;
   }
 

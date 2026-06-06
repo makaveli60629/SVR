@@ -417,7 +417,7 @@ async function createPreferredTable(scene, tableTopY = 0.90, feltTex = null, log
   return { group: realTable, topY: feltY, felt: feltMesh || overlay || null };
 }
 function buildStars(scene, R){
-  const count = 4300;
+  const count = 5200;
   const pos = new Float32Array(count * 3);
   const col = new Float32Array(count * 3);
   for (let i = 0; i < count; i++){
@@ -844,7 +844,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
       scene.add(plant);
     });
 
-    // Phase 84 Reiki storefront plant polish: fuller bushes and hanging greenery so the storefront feels alive.
+    // Update 1.5 Reiki storefront plant polish: fuller bushes and hanging greenery so the storefront feels alive.
     const bushMat = new THREE.MeshStandardMaterial({ color: 0x1f8f54, roughness: 0.92, metalness: 0.0, emissive: 0x082516, emissiveIntensity: 0.18, side: THREE.DoubleSide });
     const flowerMat = new THREE.MeshStandardMaterial({ color: 0x9d6dff, roughness: 0.88, metalness: 0.0, emissive: 0x230d38, emissiveIntensity: 0.22 });
     [[-5.55,1.20],[5.55,1.20],[-4.95,-0.85],[4.95,-0.85],[-1.25,1.85],[1.25,1.85]].forEach(([ox,oz], idx)=>{
@@ -2274,11 +2274,11 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-74, wallHeight + 118.0, -(R + 250.0));
+  moon.position.set(-78, wallHeight + 132.0, -(R + 282.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(74.0, 74.0, 1);
+  moonHalo.scale.set(92.0, 92.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
@@ -2295,13 +2295,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  mars.position.set(-42, wallHeight + 126.0, -(R + 258.0));
+  mars.position.set(-36, wallHeight + 142.0, -(R + 294.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(36.0, 36.0, 1);
+  marsHalo.scale.set(46.0, 46.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2490,6 +2490,21 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       seatedBots.push({ anchor, bot, seatIdx, phase: idx * 0.75, pose });
     });
   }
+  if (!seatedBotBase){
+    // Update 1.5 procedural seated fallback bots. This keeps the table modelized even when heavy uploaded FBX/BLEND assets are staged but not shipped.
+    const botSeatIndices = [0, 1, 2, 4, 5];
+    const botTints = [0xeee9ff, 0xf8eadf, 0xdcecff, 0xf0dcff, 0xdffff0];
+    botSeatIndices.forEach((seatIdx, idx)=>{
+      const seat = seats[seatIdx];
+      const bot = createProceduralSeatedBot(botTints[idx % botTints.length]);
+      const anchor = new THREE.Group();
+      const inward = new THREE.Vector3(-seat.x, 0, -seat.z).normalize();
+      anchor.position.set(seat.x * 0.95 + inward.x * 0.10, 0.02, seat.z * 0.95 + inward.z * 0.10);
+      anchor.add(bot);
+      scene.add(anchor);
+      seatedBots.push({ anchor, bot, seatIdx, phase: idx * 0.75, pose: null });
+    });
+  }
 
 
   scene.userData._tickWorld = (dt)=>{
@@ -2509,26 +2524,26 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     const moonOrbit = t * 0.010;
     moon.position.set(
       -70 + Math.sin(moonOrbit) * 8.0,
-      wallHeight + 122.0 + Math.sin(t * 0.042) * 1.6,
-      -(R + 258.0) + Math.cos(moonOrbit) * 8.0
+      wallHeight + 138.0 + Math.sin(t * 0.042) * 1.9,
+      -(R + 292.0) + Math.cos(moonOrbit) * 10.0
     );
     moon.rotation.y += dt * 0.105;
     moon.rotation.z = 0.03;
     const marsOrbit = t * 0.080;
     mars.position.set(
-      moon.position.x + Math.cos(marsOrbit) * 36.0,
-      moon.position.y + 7.0 + Math.sin(marsOrbit * 1.2) * 4.0,
-      moon.position.z + Math.sin(marsOrbit) * 18.0
+      moon.position.x + Math.cos(marsOrbit) * 44.0,
+      moon.position.y + 11.0 + Math.sin(marsOrbit * 1.2) * 5.5,
+      moon.position.z + Math.sin(marsOrbit) * 24.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.092;
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.045 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.060 + 0.014 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.026 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.036 + 0.012 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{
@@ -2579,7 +2594,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     rim.material.emissiveIntensity = 0.18;
     seats.forEach((seat)=>{ seat.ring.material.opacity = 0.60; });
     stars.spriteGroup.rotation.y += dt * 0.00018;
-    if (stars.constellationGroup) stars.constellationGroup.rotation.y += dt * 0.00010;
+    if (stars.constellationGroup) stars.constellationGroup.rotation.y += dt * 0.00012;
     stars.pts.material.opacity = 0.86;
     if (lobbyInfoBoards?.length) lobbyInfoBoards.forEach((rec, idx)=>{ const bob = Math.sin(t * 1.2 + rec.phase) * 0.04; rec.board.position.y = 1.72 + bob; rec.glow.position.y = rec.board.position.y; rec.glow.material.opacity = 0.10 + 0.06 * (0.5 + 0.5 * Math.sin(t * 1.4 + idx)); });
     city.billboardUpdaters.forEach(fn=>fn(t));
