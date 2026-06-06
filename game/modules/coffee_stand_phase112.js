@@ -5,8 +5,9 @@ import { applyReikiInteractionGate12 } from "./reiki_interaction_gate_1_2.js";
 import { applySvrStorefrontModule12 } from "./svr_storefront_module_1_2.js";
 import { applyPgaGolfStorefront14 } from "./pga_golf_storefront_module_1_4.js";
 import { applyLobbyPortalStoreLayout14 } from "./lobby_portal_store_layout_1_4.js";
+import { applyReikiScorpionPolish14 } from "./reiki_scorpion_polish_1_4.js";
 
-const BUILD = "PHASE-114F-PORTAL-STOREFRONT-ORGANIZED-CHAIN-LOCK";
+const BUILD = "PHASE-114H-REIKI-SCORPION-POLISH-CHAIN-LOCK";
 const TARGET = new THREE.Vector3(15.84, 0, -16.44);
 const OLD_CENTER = new THREE.Vector3(15.16, 0, -11.17);
 const TABLE_CENTER = new THREE.Vector3(0, 1.2, 0);
@@ -60,9 +61,10 @@ export function applyPhase112CoffeeStandMove(scene, { log = console.log } = {}) 
   const light = new THREE.PointLight(0x8ffff0, .66, 6.2, 2.1); light.position.set(0, 2.0, .80); root.add(light);
   const oldTick = scene.onBeforeRender; scene.onBeforeRender = function(...args) { oldTick?.apply(this, args); const t = performance.now(); floorMarker.material.opacity = .10 + Math.sin(t * .002) * .035; light.intensity = .50 + Math.sin(t * .0022) * .14; };
   applyLobbyPortalStoreLayout14?.(scene, { log });
-  const panel = document.getElementById("svr-position-panel"); if (panel) panel.textContent = `SVR POSITION PANEL\n${BUILD}\nLayout organizer loaded: ${!!window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14}\nCoffee stand X ${TARGET.x.toFixed(2)} Z ${TARGET.z.toFixed(2)}\nPGA storefront loaded: ${!!window.SVR_PGA_GOLF_STOREFRONT_14}\nSVR storefront loaded: ${!!window.SVR_STOREFRONT_MODULE_12}\nReiki gate loaded: ${!!window.SVR_REIKI_INTERACTION_GATE_12}\nOld fixture pieces hidden: ${hidden}`;
-  scene.userData.SVR_PHASE113_COFFEE_STAND = { build: BUILD, target: { x: TARGET.x, z: TARGET.z }, facing: "lobby-center", hidden, reikiCleanupLoaded: !!window.SVR_REIKI_LUXURY_CLEANUP_12, portalPlazaLoaded: !!window.SVR_PORTAL_PLAZA_DIRECTORY_12, interactionGateLoaded: !!window.SVR_REIKI_INTERACTION_GATE_12, svrStorefrontLoaded: !!window.SVR_STOREFRONT_MODULE_12, pgaStorefrontLoaded: !!window.SVR_PGA_GOLF_STOREFRONT_14, layoutOrganizerLoaded: !!window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14, forestDeferred: true };
+  applyReikiScorpionPolish14?.(scene, { log });
+  const panel = document.getElementById("svr-position-panel"); if (panel) panel.textContent = `SVR POSITION PANEL\n${BUILD}\nLayout organizer loaded: ${!!window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14}\nReiki/Scorpion polish loaded: ${!!window.SVR_REIKI_SCORPION_POLISH_14H}\nCoffee stand X ${TARGET.x.toFixed(2)} Z ${TARGET.z.toFixed(2)}\nPGA storefront loaded: ${!!window.SVR_PGA_GOLF_STOREFRONT_14}\nSVR storefront loaded: ${!!window.SVR_STOREFRONT_MODULE_12}\nReiki gate loaded: ${!!window.SVR_REIKI_INTERACTION_GATE_12}\nOld fixture pieces hidden: ${hidden}`;
+  scene.userData.SVR_PHASE113_COFFEE_STAND = { build: BUILD, target: { x: TARGET.x, z: TARGET.z }, facing: "lobby-center", hidden, reikiCleanupLoaded: !!window.SVR_REIKI_LUXURY_CLEANUP_12, portalPlazaLoaded: !!window.SVR_PORTAL_PLAZA_DIRECTORY_12, interactionGateLoaded: !!window.SVR_REIKI_INTERACTION_GATE_12, svrStorefrontLoaded: !!window.SVR_STOREFRONT_MODULE_12, pgaStorefrontLoaded: !!window.SVR_PGA_GOLF_STOREFRONT_14, layoutOrganizerLoaded: !!window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14, reikiScorpionPolishLoaded: !!window.SVR_REIKI_SCORPION_POLISH_14H, forestDeferred: true };
   window.SVR_PHASE113_COFFEE_STAND = scene.userData.SVR_PHASE113_COFFEE_STAND;
-  log?.("Phase 114F chain complete with organized portal/store layout", scene.userData.SVR_PHASE113_COFFEE_STAND);
+  log?.("Phase 114H chain complete with Reiki/Scorpion polish", scene.userData.SVR_PHASE113_COFFEE_STAND);
   return root;
 }
