@@ -1,0 +1,50 @@
+﻿{
+    "generatedAt":  "2026-05-29T14:44:47",
+    "root":  "SVR_PortalSideFeatures",
+    "placementRule":  "near existing portal but not blocking portal, spawn, teleporter, or locomotion paths",
+    "clearPath":  {
+                      "id":  "SVR_Portal_ClearPath_DoNotBlock",
+                      "enabled":  true,
+                      "radius":  7,
+                      "purpose":  "Keep portal access open"
+                  },
+    "objects":  [
+                    {
+                        "id":  "SVR_NewLounge_A",
+                        "type":  "lounge",
+                        "enabled":  true,
+                        "positionOffsetFromPortal":  {
+                                                         "right":  10,
+                                                         "forward":  7,
+                                                         "up":  0
+                                                     },
+                        "anchor":  "SVR_Lounge_A_PlayerAnchor",
+                        "placeholderGeometry":  true
+                    },
+                    {
+                        "id":  "SVR_NewLounge_B",
+                        "type":  "lounge",
+                        "enabled":  true,
+                        "positionOffsetFromPortal":  {
+                                                         "right":  22,
+                                                         "forward":  7,
+                                                         "up":  0
+                                                     },
+                        "anchor":  "SVR_Lounge_B_PlayerAnchor",
+                        "placeholderGeometry":  true
+                    },
+                    {
+                        "id":  "SVR_Storefront_NextToPortal",
+                        "type":  "storefront",
+                        "enabled":  true,
+                        "positionOffsetFromPortal":  {
+                                                         "right":  16,
+                                                         "forward":  18,
+                                                         "up":  0
+                                                     },
+                        "anchor":  "SVR_Storefront_InteractionAnchor",
+                        "placeholderGeometry":  true,
+                        "note":  "Replace placeholder with final storefront art when assets are ready."
+                    }
+                ]
+}

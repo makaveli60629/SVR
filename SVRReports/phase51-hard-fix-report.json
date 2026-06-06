@@ -1,0 +1,26 @@
+﻿{
+    "tool":  "SVR-Phase51-Hard-Fix",
+    "phase":  51,
+    "generatedAt":  "2026-05-29T14:48:19",
+    "projectRoot":  "C:\\Users\\ronal\\SVR",
+    "backupRoot":  "C:\\Users\\ronal\\SVR\\SVR_Backups\\Phase51_HardFix_20260529-144805",
+    "result":  "Phase 51 hard duplicate overlay fix prepared/applied locally.",
+    "verificationNeeded":  [
+                               "Run the game.",
+                               "Confirm only one floor remains.",
+                               "Confirm only one tabletop remains.",
+                               "Confirm Moon and Mars are high behind the main building.",
+                               "Confirm lounges and storefront are beside the portal.",
+                               "Confirm portal and teleporter paths are not blocked."
+                           ],
+    "changes":  [
+                    "Wrote runtime hard duplicate fix: public/svr/phase51-runtime-hard-fix.js",
+                    "Wrote source copy: src/svr/phase51-runtime-hard-fix.js",
+                    "Wrote config/svr/phase51-hard-fix.json",
+                    "Wrote data/svr/phase51-hard-fix.json"
+                ],
+    "warnings":  [
+                     "Skipped JSON file because it could not be safely parsed: C:\\Users\\ronal\\SVR\\api\\package-lock.json — Cannot process argument because the value of argument \"name\" is not valid. Change the value of the \"name\" argument and run the operation again.",
+                     "Skipped JSON file because it could not be safely parsed: C:\\Users\\ronal\\SVR\\backend\\package-lock.json — Cannot process argument because the value of argument \"name\" is not valid. Change the value of the \"name\" argument and run the operation again."
+                 ]
+}

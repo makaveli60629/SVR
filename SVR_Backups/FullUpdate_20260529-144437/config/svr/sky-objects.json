@@ -1,0 +1,73 @@
+﻿{
+    "generatedAt":  "2026-05-29T14:39:20",
+    "skyRoot":  {
+                    "id":  "SVR_SkyRoot",
+                    "enabled":  true,
+                    "position":  {
+                                     "x":  0,
+                                     "y":  65,
+                                     "z":  140
+                                 },
+                    "collision":  "none"
+                },
+    "objects":  [
+                    {
+                        "id":  "SVR_Moon",
+                        "type":  "skyBody",
+                        "enabled":  true,
+                        "visible":  true,
+                        "collision":  "none",
+                        "position":  {
+                                         "x":  -35,
+                                         "y":  97,
+                                         "z":  160
+                                     },
+                        "scale":  {
+                                      "x":  18,
+                                      "y":  18,
+                                      "z":  18
+                                  },
+                        "material":  {
+                                         "color":  "#D3D7E6",
+                                         "emissive":  "#AAB0C8",
+                                         "roughness":  1
+                                     },
+                        "orbit":  {
+                                      "pivot":  "SVR_SkyRoot",
+                                      "radius":  145,
+                                      "degreesPerSecond":  0.08,
+                                      "safeBehindMainBuilding":  true,
+                                      "neverCrossLobbyPlayArea":  true
+                                  }
+                    },
+                    {
+                        "id":  "SVR_Mars",
+                        "type":  "skyBody",
+                        "enabled":  true,
+                        "visible":  true,
+                        "collision":  "none",
+                        "position":  {
+                                         "x":  48,
+                                         "y":  107,
+                                         "z":  186
+                                     },
+                        "scale":  {
+                                      "x":  11,
+                                      "y":  11,
+                                      "z":  11
+                                  },
+                        "material":  {
+                                         "color":  "#D94A2A",
+                                         "emissive":  "#8E2D1F",
+                                         "roughness":  1
+                                     },
+                        "orbit":  {
+                                      "pivot":  "SVR_SkyRoot",
+                                      "radius":  170,
+                                      "degreesPerSecond":  0.05,
+                                      "safeBehindMainBuilding":  true,
+                                      "neverCrossLobbyPlayArea":  true
+                                  }
+                    }
+                ]
+}

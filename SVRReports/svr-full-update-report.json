@@ -1,0 +1,27 @@
+﻿{
+    "tool":  "SVR-Full-Update",
+    "generatedAt":  "2026-05-29T14:44:48",
+    "projectRoot":  "C:\\Users\\ronal\\SVR",
+    "backupRoot":  "C:\\Users\\ronal\\SVR\\SVR_Backups\\FullUpdate_20260529-144437",
+    "summary":  {
+                    "duplicateFloorAndTabletopCleanup":  "Safe disable pass completed. Original floor/tabletop protected.",
+                    "moonAndMars":  "Written to config/svr/sky-objects.json",
+                    "portalLoungesAndStorefront":  "Written to config/svr/portal-side-features.json",
+                    "teleporter":  "Written to config/svr/teleporter-config.json",
+                    "adapter":  "Written to src/svr/svr-full-update-adapter.js"
+                },
+    "changes":  [
+                    "Wrote config/svr/world.manifest.json",
+                    "Wrote config/svr/duplicate-cleanup-rules.json",
+                    "Wrote config/svr/sky-objects.json",
+                    "Wrote config/svr/portal-side-features.json",
+                    "Wrote config/svr/teleporter-config.json",
+                    "Wrote config/svr/phase-status.json",
+                    "Wrote src/svr/svr-full-update-adapter.js"
+                ],
+    "warnings":  [
+                     "Skipped JSON scan for C:\\Users\\ronal\\SVR\\api\\package-lock.json because it could not be parsed safely: Cannot process argument because the value of argument \"name\" is not valid. Change the value of the \"name\" argument and run the operation again.",
+                     "Skipped JSON scan for C:\\Users\\ronal\\SVR\\backend\\package-lock.json because it could not be parsed safely: Cannot process argument because the value of argument \"name\" is not valid. Change the value of the \"name\" argument and run the operation again.",
+                     "Skipped JSON scan for C:\\Users\\ronal\\SVR\\backend\\temporal\\package.json because it could not be parsed safely: The property \u0027Name\u0027 cannot be found on this object. Verify that the property exists."
+                 ]
+}

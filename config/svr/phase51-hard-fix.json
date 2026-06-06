@@ -1,0 +1,124 @@
+﻿{
+    "phase":  51,
+    "name":  "Hard Duplicate Overlay Fix",
+    "generatedAt":  "2026-05-29T14:48:15",
+    "engine":  "engine-neutral",
+    "unityRequired":  false,
+    "goals":  {
+                  "removeDuplicateFloorOverlay":  true,
+                  "removeDuplicateTabletopOverlay":  true,
+                  "preserveOriginalFloor":  true,
+                  "preserveOriginalTabletop":  true,
+                  "preserveOriginalLobby":  true,
+                  "keepPortalPathClear":  true,
+                  "repairMoonAndMars":  true,
+                  "repairPortalLounges":  true,
+                  "repairStorefrontNextToPortal":  true,
+                  "protectTeleporter":  true,
+                  "protectFistLocomotion":  true,
+                  "protectTeleportLeap":  true
+              },
+    "duplicateCleanup":  {
+                             "mode":  "hard-safe-disable",
+                             "destructiveDelete":  false,
+                             "detection":  [
+                                               "object label",
+                                               "duplicate/overlay/second/copy/clone words",
+                                               "floor/tabletop category",
+                                               "matching rounded position",
+                                               "matching rounded scale",
+                                               "runtime scene traversal",
+                                               "DOM overlay fallback"
+                                           ],
+                             "protected":  [
+                                               "original floor",
+                                               "original tabletop",
+                                               "main floor",
+                                               "main tabletop",
+                                               "lobby floor",
+                                               "base floor"
+                                           ]
+                         },
+    "moon":  {
+                 "id":  "SVR_Moon",
+                 "enabled":  true,
+                 "collision":  "none",
+                 "position":  {
+                                  "x":  -35,
+                                  "y":  97,
+                                  "z":  160
+                              },
+                 "scale":  {
+                               "x":  18,
+                               "y":  18,
+                               "z":  18
+                           },
+                 "orbit":  {
+                               "pivot":  "SVR_SkyRoot",
+                               "degreesPerSecond":  0.08,
+                               "behindMainBuilding":  true,
+                               "neverCrossLobby":  true
+                           }
+             },
+    "mars":  {
+                 "id":  "SVR_Mars",
+                 "enabled":  true,
+                 "collision":  "none",
+                 "position":  {
+                                  "x":  48,
+                                  "y":  107,
+                                  "z":  186
+                              },
+                 "scale":  {
+                               "x":  11,
+                               "y":  11,
+                               "z":  11
+                           },
+                 "orbit":  {
+                               "pivot":  "SVR_SkyRoot",
+                               "degreesPerSecond":  0.05,
+                               "behindMainBuilding":  true,
+                               "neverCrossLobby":  true
+                           }
+             },
+    "portalSideFeatures":  {
+                               "root":  "SVR_PortalSideFeatures",
+                               "clearPath":  "SVR_Portal_ClearPath_DoNotBlock",
+                               "lounges":  [
+                                               {
+                                                   "id":  "SVR_NewLounge_A",
+                                                   "enabled":  true,
+                                                   "offsetFromPortal":  {
+                                                                            "right":  10,
+                                                                            "forward":  7,
+                                                                            "up":  0
+                                                                        }
+                                               },
+                                               {
+                                                   "id":  "SVR_NewLounge_B",
+                                                   "enabled":  true,
+                                                   "offsetFromPortal":  {
+                                                                            "right":  22,
+                                                                            "forward":  7,
+                                                                            "up":  0
+                                                                        }
+                                               }
+                                           ],
+                               "storefront":  {
+                                                  "id":  "SVR_Storefront_NextToPortal",
+                                                  "enabled":  true,
+                                                  "offsetFromPortal":  {
+                                                                           "right":  16,
+                                                                           "forward":  18,
+                                                                           "up":  0
+                                                                       }
+                                              }
+                           },
+    "teleporter":  {
+                       "enabled":  true,
+                       "cooldownSeconds":  0.65,
+                       "destinationRequired":  true,
+                       "keepPortalPathClear":  true,
+                       "protectLocomotion":  true
+                   }
+}

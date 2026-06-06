@@ -1,0 +1,30 @@
+﻿{
+    "generatedAt":  "2026-05-29T14:39:21",
+    "enabled":  true,
+    "repairMode":  "engine-neutral",
+    "requiredObjects":  [
+                            "Teleporter",
+                            "TeleportDestination",
+                            "PlayerSpawn",
+                            "Portal",
+                            "SVR_Portal_ClearPath_DoNotBlock"
+                        ],
+    "validation":  {
+                       "destinationRequired":  true,
+                       "spawnAnchorRequired":  true,
+                       "cooldownSeconds":  0.65,
+                       "blockInvalidLanding":  true,
+                       "keepPortalPathClear":  true,
+                       "preserveFistLocomotion":  true,
+                       "preserveTeleportLeap":  true
+                   },
+    "defaultDestination":  {
+                               "id":  "SVR_TeleportDestination_Default",
+                               "enabled":  true,
+                               "position":  {
+                                                "x":  0,
+                                                "y":  1,
+                                                "z":  2
+                                            }
+                           }
+}

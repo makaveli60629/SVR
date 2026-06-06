@@ -1,0 +1,34 @@
+﻿{
+    "generatedAt":  "2026-05-29T14:39:20",
+    "mode":  "safe-disable-not-delete",
+    "keep":  [
+                 "original floor",
+                 "original tabletop",
+                 "original lobby floor",
+                 "original table top"
+             ],
+    "disableWhenNameContains":  [
+                                    "duplicate floor",
+                                    "overlay floor",
+                                    "second floor",
+                                    "floor2",
+                                    "floor_2",
+                                    "floor-2",
+                                    "extra floor",
+                                    "duplicate tabletop",
+                                    "overlay tabletop",
+                                    "second tabletop",
+                                    "tabletop2",
+                                    "tabletop_2",
+                                    "tabletop-2",
+                                    "duplicate table top",
+                                    "overlay table top",
+                                    "second table top"
+                                ],
+    "disableFieldsApplied":  {
+                                 "enabled":  false,
+                                 "active":  false,
+                                 "visible":  false,
+                                 "disabledBy":  "SVR full update duplicate cleanup"
+                             }
+}

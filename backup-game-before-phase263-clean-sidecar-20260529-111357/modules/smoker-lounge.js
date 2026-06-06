@@ -1,0 +1,1 @@
+import * as THREE from "three";import { bootPrivateScene } from "./private_scene_common.js";bootPrivateScene({title:"SMOKER LOUNGE",subtitle:"PRIVATE SOCIAL ROOM",accent:0xffb86b,build:({scene})=>{const sofa=new THREE.Mesh(new THREE.BoxGeometry(4,.45,1),new THREE.MeshStandardMaterial({color:0x302015}));sofa.position.set(0,.45,-1.4);scene.add(sofa);}});

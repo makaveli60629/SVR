@@ -1,0 +1,26 @@
+﻿{
+    "tool":  "SVR-Full-Update",
+    "generatedAt":  "2026-05-29T14:39:19",
+    "phase":  "Full engine-neutral world update",
+    "activeEngine":  "engine-neutral",
+    "rules":  {
+                  "unityRequired":  false,
+                  "preserveOriginalLobby":  true,
+                  "preserveOriginalFloor":  true,
+                  "preserveOriginalTabletop":  true,
+                  "disableDuplicateFloor":  true,
+                  "disableDuplicateTabletop":  true,
+                  "disableSecondWall":  true,
+                  "disableSecondFloor":  true,
+                  "keepPortalPathClear":  true
+              },
+    "features":  {
+                     "teleporterRepair":  true,
+                     "teleportLeap":  true,
+                     "fistLocomotion":  true,
+                     "moonAndMars":  true,
+                     "portalSideLounges":  true,
+                     "portalSideStorefront":  true,
+                     "duplicateOverlayCleanup":  true
+                 }
+}

@@ -1,0 +1,1 @@
+Teleport stability pass: disabled heavy teleport arc geometry updates and switched to direct target placement. Audio reliability pass: auto-start on XR session start, improved unlock retry flow, and pointerdown fallback start.
