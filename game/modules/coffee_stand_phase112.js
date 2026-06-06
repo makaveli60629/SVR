@@ -4,8 +4,9 @@ import { applyPortalPlazaDirectory12 } from "./portal_plaza_directory_1_2.js";
 import { applyReikiInteractionGate12 } from "./reiki_interaction_gate_1_2.js";
 import { applySvrStorefrontModule12 } from "./svr_storefront_module_1_2.js";
 import { applyPgaGolfStorefront14 } from "./pga_golf_storefront_module_1_4.js";
+import { applyLobbyPortalStoreLayout14 } from "./lobby_portal_store_layout_1_4.js";
 
-const BUILD = "PHASE-114-PGA-GOLF-STOREFRONT-CHAIN-LOCK";
+const BUILD = "PHASE-114F-PORTAL-STOREFRONT-ORGANIZED-CHAIN-LOCK";
 const TARGET = new THREE.Vector3(15.84, 0, -16.44);
 const OLD_CENTER = new THREE.Vector3(15.16, 0, -11.17);
 const TABLE_CENTER = new THREE.Vector3(0, 1.2, 0);
@@ -19,29 +20,16 @@ function makeSign(title, sub = "") {
   g.addColorStop(0, "#061016");
   g.addColorStop(.55, "#15101d");
   g.addColorStop(1, "#0b241f");
-  x.fillStyle = g;
-  x.fillRect(0, 0, c.width, c.height);
-  x.strokeStyle = "rgba(140,255,242,.94)";
-  x.lineWidth = 10;
-  x.strokeRect(20, 20, c.width - 40, c.height - 40);
-  x.textAlign = "center";
-  x.textBaseline = "middle";
-  x.shadowColor = "rgba(140,255,242,.68)";
-  x.shadowBlur = 18;
-  x.fillStyle = "#ffffff";
-  x.font = "900 64px system-ui,Arial";
-  x.fillText(title, c.width / 2, 130, c.width - 90);
-  x.fillStyle = "#cafff8";
-  x.font = "800 34px system-ui,Arial";
-  x.fillText(sub, c.width / 2, 225, c.width - 90);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 8;
-  return t;
+  x.fillStyle = g; x.fillRect(0, 0, c.width, c.height);
+  x.strokeStyle = "rgba(140,255,242,.94)"; x.lineWidth = 10; x.strokeRect(20, 20, c.width - 40, c.height - 40);
+  x.textAlign = "center"; x.textBaseline = "middle"; x.shadowColor = "rgba(140,255,242,.68)"; x.shadowBlur = 18;
+  x.fillStyle = "#ffffff"; x.font = "900 64px system-ui,Arial"; x.fillText(title, c.width / 2, 130, c.width - 90);
+  x.fillStyle = "#cafff8"; x.font = "800 34px system-ui,Arial"; x.fillText(sub, c.width / 2, 225, c.width - 90);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
 }
 function addBox(root, name, size, pos, mat) { const mesh = new THREE.Mesh(new THREE.BoxGeometry(size[0], size[1], size[2]), mat); mesh.name = name; mesh.position.set(pos[0], pos[1], pos[2]); root.add(mesh); return mesh; }
 function addPlane(root, name, size, pos, mat, rot = [0,0,0]) { const mesh = new THREE.Mesh(new THREE.PlaneGeometry(size[0], size[1]), mat); mesh.name = name; mesh.position.set(pos[0], pos[1], pos[2]); mesh.rotation.set(rot[0], rot[1], rot[2]); mesh.renderOrder = 210; root.add(mesh); return mesh; }
-function createCup(root, x, z, color = 0xffffff) { const cupMat = new THREE.MeshStandardMaterial({ color, roughness: .48, metalness: .03 }); const cup = new THREE.Mesh(new THREE.CylinderGeometry(.11, .09, .28, 24), cupMat); cup.name = "SVR_PHASE113_COFFEE_CUP"; cup.position.set(x, 1.17, z); root.add(cup); const lid = new THREE.Mesh(new THREE.CylinderGeometry(.115, .105, .035, 24), new THREE.MeshStandardMaterial({ color: 0xf2f2f2, roughness: .35 })); lid.name = "SVR_PHASE113_COFFEE_CUP_LID"; lid.position.set(x, 1.33, z); root.add(lid); return cup; }
+function createCup(root, x, z, color = 0xffffff) { const cupMat = new THREE.MeshStandardMaterial({ color, roughness: .48, metalness: .03 }); const cup = new THREE.Mesh(new THREE.CylinderGeometry(.11, .09, .28, 20), cupMat); cup.name = "SVR_PHASE113_COFFEE_CUP"; cup.position.set(x, 1.17, z); root.add(cup); const lid = new THREE.Mesh(new THREE.CylinderGeometry(.115, .105, .035, 20), new THREE.MeshStandardMaterial({ color: 0xf2f2f2, roughness: .35 })); lid.name = "SVR_PHASE113_COFFEE_CUP_LID"; lid.position.set(x, 1.33, z); root.add(lid); return cup; }
 function createEspressoMachine(root, x, z) { const metal = new THREE.MeshStandardMaterial({ color: 0xcbd2dc, roughness: .24, metalness: .55, emissive: 0x101824, emissiveIntensity: .06 }); const dark = new THREE.MeshStandardMaterial({ color: 0x08090c, roughness: .52, metalness: .18 }); addBox(root, "SVR_PHASE113_ESPRESSO_MACHINE_BODY", [.54, .42, .36], [x, 1.30, z], metal); addBox(root, "SVR_PHASE113_ESPRESSO_MACHINE_FACE", [.42, .24, .045], [x, 1.32, z + .205], dark); addBox(root, "SVR_PHASE113_ESPRESSO_MACHINE_TOP", [.62, .08, .42], [x, 1.55, z], metal); }
 function hideOldStandPieces(scene) { const box = new THREE.Box3(); const size = new THREE.Vector3(); const center = new THREE.Vector3(); let hidden = 0; scene.updateMatrixWorld(true); scene.traverse((obj) => { if (!obj.isMesh || !obj.visible || !obj.geometry) return; const name = String(obj.name || ""); if (/table|chair|card|chip|bot|dealer|poker|portal|planet|moon|mars|hologram|chakra|plant|rope|pole|carpet|glass|sign|wall|skyline|building|sprite|star|SVR_PHASE113|SVR_PHASE112/i.test(name)) return; box.setFromObject(obj); box.getSize(size); box.getCenter(center); const nearOld = Math.abs(center.x - OLD_CENTER.x) < 5.8 && Math.abs(center.z - OLD_CENTER.z) < 4.8 && center.y < 3.4; const fixtureLike = size.y < 3.0 && Math.max(size.x, size.z) < 5.5 && Math.max(size.x, size.z) > .30; const notFloor = size.y > .045 || center.y > .10; if (nearOld && fixtureLike && notFloor) { obj.visible = false; obj.userData.SVR_PHASE113_OLD_COFFEE_STAND_HIDDEN = true; hidden++; } }); return hidden; }
 function removePriorCoffeeStands(scene) { ["SVR_PHASE112_COFFEE_STAND_RELOCATED", "SVR_PHASE113_COFFEE_STAND_ASSEMBLED"].forEach((name) => { const o = scene.getObjectByName(name); if (o?.parent) o.parent.remove(o); }); }
@@ -56,11 +44,7 @@ export function applyPhase112CoffeeStandMove(scene, { log = console.log } = {}) 
   applyPgaGolfStorefront14?.(scene, { log });
   removePriorCoffeeStands(scene);
   const hidden = hideOldStandPieces(scene);
-  const root = new THREE.Group();
-  root.name = "SVR_PHASE113_COFFEE_STAND_ASSEMBLED";
-  root.position.copy(TARGET);
-  root.rotation.y = yawLocalPositiveZToward(TARGET, TABLE_CENTER);
-  scene.add(root);
+  const root = new THREE.Group(); root.name = "SVR_PHASE113_COFFEE_STAND_ASSEMBLED"; root.position.copy(TARGET); root.rotation.y = yawLocalPositiveZToward(TARGET, TABLE_CENTER); scene.add(root);
   const dark = new THREE.MeshStandardMaterial({ color: 0x05070a, roughness: .66, metalness: .10, emissive: 0x020506, emissiveIntensity: .10 });
   const face = new THREE.MeshStandardMaterial({ color: 0x090d12, roughness: .60, metalness: .12, emissive: 0x03070a, emissiveIntensity: .12 });
   const white = new THREE.MeshStandardMaterial({ color: 0xe9edf4, roughness: .34, metalness: .08, emissive: 0x111820, emissiveIntensity: .06 });
@@ -75,9 +59,10 @@ export function applyPhase112CoffeeStandMove(scene, { log = console.log } = {}) 
   const floorMarker = new THREE.Mesh(new THREE.CylinderGeometry(1.95, 2.12, .035, 72), new THREE.MeshBasicMaterial({ color: 0x8ffff0, transparent: true, opacity: .14, depthWrite: false, blending: THREE.AdditiveBlending })); floorMarker.name = "SVR_PHASE113_COFFEE_POSITION_MARKER"; floorMarker.position.y = .03; root.add(floorMarker);
   const light = new THREE.PointLight(0x8ffff0, .66, 6.2, 2.1); light.position.set(0, 2.0, .80); root.add(light);
   const oldTick = scene.onBeforeRender; scene.onBeforeRender = function(...args) { oldTick?.apply(this, args); const t = performance.now(); floorMarker.material.opacity = .10 + Math.sin(t * .002) * .035; light.intensity = .50 + Math.sin(t * .0022) * .14; };
-  const panel = document.getElementById("svr-position-panel"); if (panel) panel.textContent = `SVR POSITION PANEL\n${BUILD}\nCoffee stand X ${TARGET.x.toFixed(2)} Z ${TARGET.z.toFixed(2)}\nPGA storefront loaded: ${!!window.SVR_PGA_GOLF_STOREFRONT_14}\nSVR storefront loaded: ${!!window.SVR_STOREFRONT_MODULE_12}\nReiki gate loaded: ${!!window.SVR_REIKI_INTERACTION_GATE_12}\nOld fixture pieces hidden: ${hidden}`;
-  scene.userData.SVR_PHASE113_COFFEE_STAND = { build: BUILD, target: { x: TARGET.x, z: TARGET.z }, facing: "lobby-center", hidden, reikiCleanupLoaded: !!window.SVR_REIKI_LUXURY_CLEANUP_12, portalPlazaLoaded: !!window.SVR_PORTAL_PLAZA_DIRECTORY_12, interactionGateLoaded: !!window.SVR_REIKI_INTERACTION_GATE_12, svrStorefrontLoaded: !!window.SVR_STOREFRONT_MODULE_12, pgaStorefrontLoaded: !!window.SVR_PGA_GOLF_STOREFRONT_14, forestDeferred: true };
+  applyLobbyPortalStoreLayout14?.(scene, { log });
+  const panel = document.getElementById("svr-position-panel"); if (panel) panel.textContent = `SVR POSITION PANEL\n${BUILD}\nLayout organizer loaded: ${!!window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14}\nCoffee stand X ${TARGET.x.toFixed(2)} Z ${TARGET.z.toFixed(2)}\nPGA storefront loaded: ${!!window.SVR_PGA_GOLF_STOREFRONT_14}\nSVR storefront loaded: ${!!window.SVR_STOREFRONT_MODULE_12}\nReiki gate loaded: ${!!window.SVR_REIKI_INTERACTION_GATE_12}\nOld fixture pieces hidden: ${hidden}`;
+  scene.userData.SVR_PHASE113_COFFEE_STAND = { build: BUILD, target: { x: TARGET.x, z: TARGET.z }, facing: "lobby-center", hidden, reikiCleanupLoaded: !!window.SVR_REIKI_LUXURY_CLEANUP_12, portalPlazaLoaded: !!window.SVR_PORTAL_PLAZA_DIRECTORY_12, interactionGateLoaded: !!window.SVR_REIKI_INTERACTION_GATE_12, svrStorefrontLoaded: !!window.SVR_STOREFRONT_MODULE_12, pgaStorefrontLoaded: !!window.SVR_PGA_GOLF_STOREFRONT_14, layoutOrganizerLoaded: !!window.SVR_LOBBY_PORTAL_STORE_LAYOUT_14, forestDeferred: true };
   window.SVR_PHASE113_COFFEE_STAND = scene.userData.SVR_PHASE113_COFFEE_STAND;
-  log?.("Phase 114 chain complete with PGA storefront", scene.userData.SVR_PHASE113_COFFEE_STAND);
+  log?.("Phase 114F chain complete with organized portal/store layout", scene.userData.SVR_PHASE113_COFFEE_STAND);
   return root;
 }
