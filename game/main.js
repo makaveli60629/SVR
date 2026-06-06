@@ -10,6 +10,7 @@ import { createWristWatch } from "./modules/watch.js";
 import { applyUpdate30PresentMoment } from "./modules/update_3_0_present_moment.js";
 import { applyUpdate30VisualCleanup101 } from "./modules/update_3_0_visual_cleanup_101.js";
 import { applyReikiHologramCarousel102 } from "./modules/update_3_0_reiki_hologram_carousel_102.js";
+import { applyReikiMotherModule104 } from "./modules/update_3_0_reiki_mother_lock_104.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
@@ -198,6 +199,16 @@ applyReikiHologramCarousel102({
   scene,
   setStatus,
   log
+});
+
+applyReikiMotherModule104({
+  scene,
+  camera,
+  renderer,
+  sceneTargets,
+  setStatus,
+  log,
+  gotoScene
 });
 
 

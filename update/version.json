@@ -1,8 +1,8 @@
 ﻿{
-  "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-103-REIKI-MOTHER-QUEST-SKY-STOREFRONT-LOCK",
-  "created": "2026-06-06",
-  "track": "game-only",
-  "siteTouched": false,
-  "note": "Phase 103 lockdown: /game and /update/game.zip synchronized."
+    "build":  "UPDATE-3.0-PHASE-104-ROLLBACK-RECOVERY-REIKI-MOTHER-LOCK",
+    "version":  "Update 3.0",
+    "siteTouched":  false,
+    "note":  "Phase 104 rollback recovery master lock. /game and /update/game.zip synchronized.",
+    "track":  "game-only",
+    "created":  "2026-06-06T20:54:56Z"
 }
