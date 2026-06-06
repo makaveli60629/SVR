@@ -1,0 +1,26 @@
+{
+  "phase": 85,
+  "build": "UPDATE-3.0-PHASE-85-QUEST-QA-STOREFRONT-MOTHER-MODULE-LOCK",
+  "siteTouched": false,
+  "modulePattern": "mother-storefront",
+  "requiredStructure": [
+    "storefront frame",
+    "info card",
+    "approval/status card",
+    "portal card carousel",
+    "private scene route"
+  ],
+  "lockedModules": {
+    "reiki": "storefront portal only; private Reiki scene route",
+    "pga": "Juan Espejo Golf Academy Maryville storefront; Drive/Chip/Putt cards",
+    "svrStore": "full storefront structure; store portal shifted away from spotlight ad",
+    "smoker": "southwest side near golf area; private lounge route",
+    "scorpion": "private enclosed poker route"
+  },
+  "questControls": {
+    "rightStickY": "headset-facing forward/back",
+    "rightStickX": "45 degree snap turn",
+    "teleport": "hold grip/A/trigger or fist/pinch, aim, release",
+    "noInstantTeleport": true
+  }
+}

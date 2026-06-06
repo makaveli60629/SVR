@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { addMotherCarousel } from "./mother_module.js";
 
 function makeCanvasTexture(painter, width = 1024, height = 1024){
   const canvas = document.createElement("canvas");
@@ -297,34 +298,12 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     );
     reservePlaque.position.set(4.08, 1.10, 0.20);
     group.add(reservePlaque);
-    const cardSpecs = [
-      ["DRIVE RANGE", "private full-swing room", -2.7],
-      ["CHIP + PUTT", "short-game private room", 0.0],
-      ["APPROVAL", "academy media pending", 2.7]
-    ];
-    cardSpecs.forEach(([title, sub, xPos], idx)=>{
-      const card = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.25, 0.96),
-        new THREE.MeshBasicMaterial({
-          map: makeCanvasTexture((ctx,w,h)=>{
-            const g = ctx.createLinearGradient(0,0,w,h);
-            g.addColorStop(0, idx === 1 ? '#073118' : '#17090c');
-            g.addColorStop(1, idx === 1 ? '#0d4d2d' : '#3a0b12');
-            ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-            ctx.strokeStyle = idx === 1 ? 'rgba(115,255,151,0.95)' : 'rgba(255,100,120,0.92)';
-            ctx.lineWidth = 8; roundRect(ctx, 10, 10, w-20, h-20, 22); ctx.stroke();
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#ffffff'; ctx.font = '700 54px Arial'; ctx.fillText(title, w/2, 78);
-            ctx.fillStyle = idx === 1 ? '#c8ffd9' : '#ffd8de'; ctx.font = '600 28px Arial'; ctx.fillText(sub, w/2, 145);
-          }, 760, 220),
-          transparent: true,
-          side: THREE.DoubleSide,
-          depthWrite: false
-        })
-      );
-      card.position.set(xPos, 1.94, 1.23);
-      group.add(card);
-    });
+    addMotherCarousel(group, [
+      { title: "DRIVE RANGE", subtitle: "private full-swing room", status: "TELEPORT: PGA DRIVE", route: "pgaDrive", color: "#0e5cff" },
+      { title: "CHIP + PUTT", subtitle: "short-game private room", status: "TELEPORT: CHIP + PUTT", route: "pgaChipPutt", color: "#0d8b3a" },
+      { title: "ACADEMY INFO", subtitle: "Juan Espejo Golf Academy", status: "MARYVILLE • WAITING APPROVAL", route: "pga", color: "#7a0b18" },
+      { title: "APPROVAL", subtitle: "media and sponsor lock", status: "WAITING APPROVAL", route: "pgaWall", color: "#a01828" }
+    ], { y: 1.94, z: 1.23, cardWidth: 2.06, cardHeight: 0.88, spread: 2.15 });
 
     const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.82), softGlass);
     frontGlassL.position.set(-2.62, 3.18, 1.14);

@@ -1,4 +1,18 @@
 {
-  "build": "UPDATE-3.0-PHASE-84-QUEST-LOCOMOTION-LOBBY-POLISH",
-  "scope": "Quest teleport, right-stick movement, planets, sprites, PGA/storefront polish"
+  "version": "Update 3.0",
+  "build": "UPDATE-3.0-PHASE-85-QUEST-QA-STOREFRONT-MOTHER-MODULE-LOCK",
+  "created": "2026-06-06",
+  "track": "game-only",
+  "siteTouched": false,
+  "phase": 85,
+  "focus": "Quest locomotion QA, storefront mother-module lock, PGA/SVR Store routing structure, sprite/planet atmosphere preservation",
+  "protected": ["public website", "site pages", "current lobby baseline"],
+  "mustVerify": [
+    "Quest controller teleport ray stays in front of headset",
+    "Right-stick forward follows headset yaw",
+    "Grip/A/trigger hold aims teleport and release teleports",
+    "PGA hub acts as a mother storefront module",
+    "Store portal remains shifted away from spotlight ad",
+    "Reiki green sprites and table purple sprites rise upward"
+  ]
 }
