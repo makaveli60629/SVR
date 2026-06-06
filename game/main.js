@@ -9,11 +9,15 @@ import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createAndroidControls } from "./modules/android_controls.js";
 
-const BUILD = "LOBBY-ORG-1-3I-PERFORMANCE-STABILITY";
+const BUILD = "LOBBY-ORG-1-4C-FAST-ENTRY-LAZY-SHOWROOM";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director" || params.get("cam") === "cam3" || params.get("cam") === "preview";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
+const UA = navigator.userAgent || "";
+const IS_QUEST = /Quest|OculusBrowser|Meta Quest/i.test(UA);
+const IS_MOBILE = IS_QUEST || /Android|iPhone|iPad|Mobile/i.test(UA);
+const FULL_SHOWROOM = params.has("full") || params.get("quality") === "full" || params.get("showroom") === "full";
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -36,9 +40,9 @@ function setSplash(text, pct = splashProgress, hint = null) {
   if (hint && $splashHint) $splashHint.textContent = hint;
 }
 function hideSplash(reason = "ready") {
-  setSplash("Lobby ready", 100, "You can enter now. Extra showroom modules continue safely in the background.");
+  setSplash("Lobby ready", 100, "You can enter now. Optional storefront modules load softly after the lobby is usable.");
   window.SVR_SPLASH_READY_REASON = reason;
-  setTimeout(() => document.body.classList.add("svr-ready"), 180);
+  setTimeout(() => document.body.classList.add("svr-ready"), 120);
 }
 function setStatus(text, { force = false, minGap = 180 } = {}) {
   if (!$status) return;
@@ -62,17 +66,18 @@ async function safeImport(label, path, fn, pct = null) {
     const mod = await import(path);
     await fn(mod);
     log(`${label}: loaded`);
-    if (pct !== null) setSplash(`${label} loaded`, pct + 4);
+    if (pct !== null) setSplash(`${label} loaded`, pct + 3);
     return true;
   } catch (err) {
     const message = err?.stack || err?.message || String(err);
     log(`${label}: failed safely`, message);
     window[`SVR_${label.replace(/\W+/g, "_").toUpperCase()}_ERROR`] = message;
-    if (pct !== null) setSplash(`${label} skipped safely`, pct + 3);
+    if (pct !== null) setSplash(`${label} skipped safely`, pct + 2);
     return false;
   }
 }
-function idle(fn, delay = 120) { if (window.requestIdleCallback) requestIdleCallback(fn, { timeout: 1600 }); else setTimeout(fn, delay); }
+function idle(fn, delay = 120) { if (window.requestIdleCallback) requestIdleCallback(fn, { timeout: 1800 }); else setTimeout(fn, delay); }
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 setSplash("Preparing splash screen...", 8);
 $toggleLog?.addEventListener("click", () => { $log.style.display = ($log.style.display === "none" || !$log.style.display) ? "block" : "none"; });
@@ -80,6 +85,7 @@ if (AUTOCAM) document.body.classList.add("preview-mode");
 
 setSplash("Starting renderer...", 14);
 const { scene, camera, renderer } = createCore({ containerId: "app" });
+window.SVR_RENDERER = renderer;
 scene.userData._camera = camera;
 window.SVR_CAMERA = camera;
 camera.position.set(0, 1.6, 4.8);
@@ -158,24 +164,45 @@ const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"),
 tp.setLogoTexture(logoTexture);
 setMode(AUTOCAM ? "CAM 3 live preview" : "Hands: waiting...");
 window.SVR_RICI_UPDATE_101_SAFE_BOOT = { build: BUILD };
-setStatus("Ready. Core lobby loaded. Showroom modules staging...", { force: true });
-setSplash("Core lobby ready", 76, "You can enter while extra skyline and sponsor modules finish loading.");
+setStatus("Ready. Core lobby loaded. Optional modules will load softly.", { force: true });
+setSplash("Core lobby ready", 82, "You can enter now. Storefronts load in staggered background batches.");
+hideSplash("core-lobby-fast-entry");
 
-function loadShowroomModules() {
-  safeImport("Performance Stability 1.3", "./modules/performance_stability_1_3.js", m => m.applyPerformanceStability13?.(scene, { log }), 77)
-    .then(() => safeImport("Phase 121 Sky", "./modules/phase121_sky_fix.js", m => m.applyPhase121SkyFix?.(scene, { log }), 78))
-    .then(() => safeImport("Phase 121 OBJ Skyline", "./modules/obj_skyline_loader.js", m => m.applyObjSkylineBackground?.(scene, { log }), 82))
-    .then(() => safeImport("Update 3 Portals", "./modules/update_3_0_present_moment.js", m => m.applyUpdate30PresentMoment?.({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene }), 86))
-    .then(() => safeImport("Portal Route Audit 1.3", "./modules/portal_route_audit_cleanup_1_3.js", m => m.applyPortalRouteAuditCleanup13?.(scene, { log }), 88))
-    .then(() => safeImport("Controller Pointer Bridge 1.2", "./modules/controller_pointer_bridge_1_2.js", m => m.applyControllerPointerBridge12?.(scene, { log }), 89))
-    .then(() => safeImport("RICI Update 101 Reiki 1.1 Mother Module", "./modules/reiki_update_101_1_1_mother_module.js", m => m.applyRiciUpdate101MotherModule?.(scene, { log, gotoScene, camera, renderer }), 92))
-    .then(() => safeImport("RICI Photo Controls Fix", "./modules/reiki_update_101_1_1_photo_controls_fix.js", m => m.applyRiciUpdate101PhotoControlsFix?.(scene, { log }), 95))
-    .then(() => safeImport("Coffee Phase113", "./modules/coffee_stand_phase112.js", m => m.applyPhase112CoffeeStandMove?.(scene, { log }), 97))
-    .then(() => { setStatus("Ready. Lobby Organization 1.3I fully loaded.", { force: true }); hideSplash("all-modules-loaded"); })
-    .catch(() => hideSplash("module-chain-safe-fallback"));
+async function loadCriticalModules() {
+  await safeImport("Performance Stability 1.4", "./modules/performance_stability_1_3.js", m => m.applyPerformanceStability13?.(scene, { log }), 84);
+  await sleep(250);
+  await safeImport("Phase 121 Sky", "./modules/phase121_sky_fix.js", m => m.applyPhase121SkyFix?.(scene, { log }), 88);
+  await sleep(250);
+  await safeImport("Portal Route Audit 1.4", "./modules/portal_route_audit_cleanup_1_3.js", m => m.applyPortalRouteAuditCleanup13?.(scene, { log }), 92);
+  await sleep(250);
+  await safeImport("Controller Pointer Bridge", "./modules/controller_pointer_bridge_1_2.js", m => m.applyControllerPointerBridge12?.(scene, { log }), 94);
+  window.SVR_FAST_ENTRY_LOADER_14C.criticalDone = true;
+  setStatus("Core ready. Showroom modules are queued in background.", { force: true });
 }
-setTimeout(() => hideSplash("core-lobby-ready"), 1100);
-idle(loadShowroomModules, 180);
+
+async function loadShowroomModules() {
+  await sleep(IS_QUEST ? 4500 : 2600);
+  await safeImport("Update 3 Portals", "./modules/update_3_0_present_moment.js", m => m.applyUpdate30PresentMoment?.({ scene, camera, renderer, world, sceneTargets, setStatus, log, gotoScene }), 95);
+  await sleep(IS_QUEST ? 1600 : 800);
+  if (!IS_MOBILE || FULL_SHOWROOM || AUTOCAM) {
+    await safeImport("OBJ Skyline Optional", "./modules/obj_skyline_loader.js", m => m.applyObjSkylineBackground?.(scene, { log }), 96);
+    await sleep(900);
+  } else {
+    window.SVR_FAST_ENTRY_LOADER_14C.objSkylineSkippedForQuest = true;
+    log("OBJ Skyline Optional: skipped on mobile/Quest fast-entry mode. Add ?full=1 to force it.");
+  }
+  await safeImport("Reiki Mother Module", "./modules/reiki_update_101_1_1_mother_module.js", m => m.applyRiciUpdate101MotherModule?.(scene, { log, gotoScene, camera, renderer }), 97);
+  await sleep(IS_QUEST ? 1800 : 900);
+  await safeImport("Reiki Photo Controls Fix", "./modules/reiki_update_101_1_1_photo_controls_fix.js", m => m.applyRiciUpdate101PhotoControlsFix?.(scene, { log }), 98);
+  await sleep(IS_QUEST ? 1800 : 900);
+  await safeImport("Storefront Chain", "./modules/coffee_stand_phase112.js", m => m.applyPhase112CoffeeStandMove?.(scene, { log }), 99);
+  setStatus("Ready. Lobby Organization 1.4C showroom loaded.", { force: true });
+  window.SVR_FAST_ENTRY_LOADER_14C.showroomDone = true;
+}
+
+window.SVR_FAST_ENTRY_LOADER_14C = { build: BUILD, isQuest: IS_QUEST, isMobile: IS_MOBILE, fullShowroom: FULL_SHOWROOM, criticalDone: false, showroomDone: false, strategy: "fast core entry + staggered optional showroom loading" };
+idle(loadCriticalModules, 120);
+idle(loadShowroomModules, 850);
 
 function setHudVisible(visible) { const hud = document.getElementById("hud"); if (hud) hud.style.display = (visible && !AUTOCAM) ? "flex" : "none"; if ($log) $log.style.display = "none"; if ($err) $err.style.display = "none"; }
 if (AUTOCAM) setHudVisible(false);
