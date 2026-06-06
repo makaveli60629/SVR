@@ -7,10 +7,16 @@ LOCKED until user explicitly says: `unlock the Reiki Hub`.
 Phase 107 screenshot-confirmed Reiki Hub.
 
 ## Do not touch
-Do not edit, replace, remodel, remove, reposition, recolor, rename, redesign, compress, simplify, or rebuild the Reiki Hub, Reiki storefront, Reiki mother module, Reiki hologram carousel, Reiki video portal, Reiki private room, Reiki plants, ropes, red carpet, teal trim, founder/info panels, right visual panel, center hologram slot, or Reiki carousel buttons.
+Do not edit, replace, remodel, remove, reposition, recolor, rename, redesign, compress, simplify, or rebuild the Reiki Hub, Reiki storefront, Reiki mother module, Reiki hologram carousel, Reiki video portal, Reiki private room, Reiki plants, ropes, red carpet, teal trim, founder/info panels, right visual panel, center hologram slot, Reiki carousel buttons, Reiki video route, or Reiki hologram media reference.
+
+## Hard block
+Do not apply any pasted A-Frame `index.html` / `world.js` Reiki manifest over the current game. The current SVR game runtime is modular Three.js/WebXR, not the standalone A-Frame Reiki demo. Any A-Frame Reiki packet, 1.4H packet, 1.4C packet, or RICI-UPDATE-101 packet must be treated as reference-only and must never replace `game/index.html` or the active lobby runtime.
 
 ## Allowed while locked
-Moon/Mars, Quest controls, poker, PGA, SVR Store, Smoker Lounge, buildings, ad tiers, performance, and non-Reiki modules may be updated.
+Moon/Mars, Quest controls, poker, PGA, SVR Store, Smoker Lounge, buildings, ad tiers, performance, and non-Reiki modules may be updated only if they do not alter or overwrite Reiki visuals or Reiki routes.
+
+## Deploy safety
+Any future game package must verify this file exists and must not remove it. Any update that changes Reiki must be rejected unless the user first says exactly: `unlock the Reiki Hub`.
 
 ## Date
 2026-06-06
