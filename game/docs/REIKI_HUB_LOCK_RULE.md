@@ -6,6 +6,28 @@ LOCKED until user explicitly says: `unlock the Reiki Hub`.
 ## Active visual baseline
 Phase 107 screenshot-confirmed Reiki Hub.
 
+The protected visual target is the user-provided screenshot dated `Screenshot 2026-06-04 001555.png`, showing:
+
+- wide teal storefront frame
+- red carpet
+- rope queue on both sides
+- plant line and centerpiece plant
+- left founder/about panel
+- center portrait/hologram slot
+- right visual panel
+- stacked title/card panels above the center
+- Reiki / Riki storefront signage
+- interactive hologram/carousel button behavior preserved
+
+## Reference package
+Use `game-phase107-reiki-snapshot-visual-match-lock.zip` as the Reiki visual reference package.
+
+Reference checksum from the user-provided checksum file:
+
+```text
+7a5bdcddb8b814686f8ce0adfd555dc6a31ad43b3e40d98257afc56d00462c65  /mnt/data/game-phase107-reiki-snapshot-visual-match-lock.zip
+```
+
 ## Do not touch
 Do not edit, replace, remodel, remove, reposition, recolor, rename, redesign, compress, simplify, or rebuild the Reiki Hub, Reiki storefront, Reiki mother module, Reiki hologram carousel, Reiki video portal, Reiki private room, Reiki plants, ropes, red carpet, teal trim, founder/info panels, right visual panel, center hologram slot, Reiki carousel buttons, Reiki video route, or Reiki hologram media reference.
 
