@@ -59,14 +59,14 @@ function buildProfileTexture(){
     ctx.fill();
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 42px Arial";
-    ctx.fillText("SOUTH-WEST WALL • PGA HUB", 92, 126);
+    ctx.fillText("SOUTH-WEST WALL • GOLF ACADEMY", 92, 126);
 
     ctx.fillStyle = "#ffffff";
     ctx.font = "700 92px Arial";
-    ctx.fillText("JUAN E. ESPEJO", 92, 254);
+    ctx.fillText("JUAN ESPEJO", 92, 254);
     ctx.fillStyle = "#ffc2c9";
     ctx.font = "600 40px Arial";
-    ctx.fillText("PGA Pro • Maryville Golf Academy Founder", 92, 324);
+    ctx.fillText("PGA Pro • Golf Academy (Maryville)", 92, 324);
 
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 48px Arial";
@@ -74,7 +74,7 @@ function buildProfileTexture(){
     ctx.fillStyle = "#f7f0f2";
     ctx.font = "500 38px Arial";
     let y = drawWrappedText(ctx,
-      "Dedicated VR golf storefront reserved for training, lessons, academy promotion, and future branded PGA media. Built as a professional modular client hub so it can be refined without disturbing the main lobby baseline.",
+      "Combined old/new golf academy storefront. Reserved for Juan Espejo PGA training, lessons, driving range, chip and putt modules, and future approved academy media. Built as one mother module so the private golf rooms stay separate from the lobby.",
       92, 474, w - 184, 46);
 
     y += 76;
@@ -101,10 +101,10 @@ function buildProfileTexture(){
     ctx.stroke();
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 34px Arial";
-    ctx.fillText("RESERVED SPOTLIGHT", 108, h - 172);
+    ctx.fillText("WAITING APPROVAL", 108, h - 172);
     ctx.fillStyle = "#ffffff";
     ctx.font = "700 42px Arial";
-    ctx.fillText("VR GOLF / PGA HUB", 108, h - 118);
+    ctx.fillText("JUAN ESPEJO GOLF ACADEMY", 108, h - 118);
   }, 1100, 1500);
 }
 
@@ -160,10 +160,10 @@ function buildReserveTexture(){
     ctx.fillStyle = "#ff7784";
     ctx.textAlign = "center";
     ctx.font = "700 64px Arial";
-    ctx.fillText("RESERVED FOR", w / 2, 96);
+    ctx.fillText("WAITING FOR", w / 2, 96);
     ctx.fillStyle = "#ffffff";
     ctx.font = "700 74px Arial";
-    ctx.fillText("JUAN ESPEJO", w / 2, 184);
+    ctx.fillText("APPROVAL", w / 2, 184);
   }, 900, 240);
 }
 
@@ -245,8 +245,8 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
           ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
           ctx.strokeStyle = 'rgba(255,208,214,0.86)'; ctx.lineWidth = 10; roundRect(ctx, 18, 18, w-36, h-36, 24); ctx.stroke();
           ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillStyle = '#fff7f8'; ctx.font = '700 88px Arial'; ctx.fillText('JUAN ESPEJO PGA HUB', w/2, 98);
-          ctx.fillStyle = 'rgba(255,176,186,0.98)'; ctx.font = '700 34px Arial'; ctx.fillText('GOLF LESSONS • TRAINING • ACADEMY • SPONSOR SHOWCASE', w/2, 184);
+          ctx.fillStyle = '#fff7f8'; ctx.font = '700 88px Arial'; ctx.fillText('JUAN ESPEJO GOLF ACADEMY', w/2, 98);
+          ctx.fillStyle = 'rgba(255,176,186,0.98)'; ctx.font = '700 34px Arial'; ctx.fillText('PGA TRAINING • DRIVE RANGE • CHIP + PUTT • MARYVILLE', w/2, 184);
         }, 1700, 240),
         transparent: true,
         side: THREE.DoubleSide,
@@ -297,6 +297,34 @@ export function addPgaHub(scene, { radius = 26, wallHeight = 6.6, log = console.
     );
     reservePlaque.position.set(4.08, 1.10, 0.20);
     group.add(reservePlaque);
+    const cardSpecs = [
+      ["DRIVE RANGE", "private full-swing room", -2.7],
+      ["CHIP + PUTT", "short-game private room", 0.0],
+      ["APPROVAL", "academy media pending", 2.7]
+    ];
+    cardSpecs.forEach(([title, sub, xPos], idx)=>{
+      const card = new THREE.Mesh(
+        new THREE.PlaneGeometry(2.25, 0.96),
+        new THREE.MeshBasicMaterial({
+          map: makeCanvasTexture((ctx,w,h)=>{
+            const g = ctx.createLinearGradient(0,0,w,h);
+            g.addColorStop(0, idx === 1 ? '#073118' : '#17090c');
+            g.addColorStop(1, idx === 1 ? '#0d4d2d' : '#3a0b12');
+            ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+            ctx.strokeStyle = idx === 1 ? 'rgba(115,255,151,0.95)' : 'rgba(255,100,120,0.92)';
+            ctx.lineWidth = 8; roundRect(ctx, 10, 10, w-20, h-20, 22); ctx.stroke();
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#ffffff'; ctx.font = '700 54px Arial'; ctx.fillText(title, w/2, 78);
+            ctx.fillStyle = idx === 1 ? '#c8ffd9' : '#ffd8de'; ctx.font = '600 28px Arial'; ctx.fillText(sub, w/2, 145);
+          }, 760, 220),
+          transparent: true,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        })
+      );
+      card.position.set(xPos, 1.94, 1.23);
+      group.add(card);
+    });
 
     const frontGlassL = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.82), softGlass);
     frontGlassL.position.set(-2.62, 3.18, 1.14);

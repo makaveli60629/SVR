@@ -17,12 +17,17 @@ export function createCore({ containerId = "app" } = {}){
   });
 
   renderer.setClearColor(0x050508, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.12));
+  
+  const ua = navigator.userAgent || "";
+  const isQuest = /Quest|OculusBrowser|Meta Quest/i.test(ua);
+  const maxPixelRatio = isQuest ? 1.18 : 1.5;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
+
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.88;
+  renderer.toneMappingExposure = 1.10;
   renderer.shadowMap.enabled = false;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -33,14 +38,6 @@ export function createCore({ containerId = "app" } = {}){
   });
   vrButton.classList.add("svr-vr-button");
   document.body.appendChild(vrButton);
-  renderer.xr.addEventListener?.("sessionstart", ()=>{
-    // Quest polish: keep headset rendering crisp without pushing the GPU into dropped frames.
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.00));
-  });
-  renderer.xr.addEventListener?.("sessionend", ()=>{
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.12));
-  });
-
 
   window.addEventListener("resize", ()=>{
     camera.aspect = window.innerWidth / window.innerHeight;

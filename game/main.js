@@ -195,6 +195,8 @@ window.addEventListener("keydown", async (e)=>{
   if (e.code === "Digit3") gotoScene("seat");
   if (e.code === "Digit4") gotoScene("reiki");
   if (e.code === "Digit5") gotoScene("pga");
+  if (e.code === "Digit0") gotoScene("pgaDrive");
+  if (e.code === "Minus") gotoScene("pgaChipPutt");
   if (e.code === "Digit6") gotoScene("legends");
   if (e.code === "Digit7") gotoScene("sponsor");
   if (e.code === "Digit8") gotoScene("scorpion");
@@ -225,6 +227,8 @@ const watch = createWristWatch({
     goSeat: ()=>gotoScene("seat"),
     goReiki: ()=>gotoScene("reiki"),
     goPga: ()=>gotoScene("pga"),
+    goPgaDrive: ()=>gotoScene("pgaDrive"),
+    goPgaChipPutt: ()=>gotoScene("pgaChipPutt"),
     goLegend: ()=>gotoScene("legends"),
     goSponsor: ()=>gotoScene("sponsor"),
     goScorpion: ()=>gotoScene("scorpion"),
@@ -241,7 +245,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Update 1.5 ready. Quest: camera-forward movement, grip aims TP, trigger leaps, A toggles action laser. Android/Desktop unchanged.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Fist near face toggles teleport. Desktop scene buttons enabled. Wrist quick-jump enabled for Lobby/Table/Reiki/PGA/Legend/Sponsor/Scorpion.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

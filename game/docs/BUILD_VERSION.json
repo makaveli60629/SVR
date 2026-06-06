@@ -1,8 +1,4 @@
 {
-  "version": "Update 1.5",
-  "build": "UPDATE-1.5-STABILITY-BUILD",
-  "created": "2026-06-06",
-  "track": "game-only",
-  "siteTouched": false,
-  "assetPolicy": "Uploaded rigged human, animation, and plant source files audited as source-stage assets; heavy BLEND/MA/RAR files are not shipped in runtime zip."
+  "build": "UPDATE-3.0-PHASE-84-QUEST-LOCOMOTION-LOBBY-POLISH",
+  "scope": "Quest teleport, right-stick movement, planets, sprites, PGA/storefront polish"
 }

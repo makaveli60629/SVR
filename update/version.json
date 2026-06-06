@@ -1,8 +1,5 @@
 ﻿{
-  "updatedAt": "2026-06-06T18:45:00Z",
-  "version": "Update 1.5",
-  "build": "UPDATE-1.5-STABILITY-BUILD",
-  "track": "game-only",
-  "siteTouched": false,
-  "gameZip": "update/game.zip"
+  "build": "UPDATE-3.0-PHASE-84-QUEST-LOCOMOTION-LOBBY-POLISH",
+  "target": "game",
+  "notes": "Quest teleport ray, forward locomotion, moon Mars orbit, sprites, PGA/storefront polish"
 }
