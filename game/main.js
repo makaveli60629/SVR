@@ -7,15 +7,14 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createAudioPlaylist } from "./modules/audio.js";
 import { createWristWatch } from "./modules/watch.js";
-import { applyReikiMotherHologramButton106 } from "./modules/update_3_0_reiki_mother_hologram_button_106.js";
-import { applyReikiSnapshot107 } from "./modules/update_3_0_reiki_snapshot_107.js";
+import { applyReikiCleanCarousel113 } from "./modules/update_3_0_reiki_clean_carousel_113.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-106-REIKI-OLD-NEW-HOLOGRAM-BUTTON-LOCK', source: 'Phase 92 readability/chakra + Phase 85/Webex video hologram restored on Phase 105/Quest base' };
+window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-113-REIKI-1-4G-FRONT-CLEAN-LOCK', source: '1.4G Reiki storefront backup with clean non-overlapping hologram carousel' };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -355,9 +354,9 @@ const watch = createWristWatch({
   }
 });
 
-createInactiveReikiPortal();
+/* Phase 113: do not stack the old inactive portal or Phase 106 large panel over the Reiki storefront. */
 createStoreWebPortal();
-applyReikiMotherHologramButton106({ scene, camera, renderer, sceneTargets, setStatus, log });
+applyReikiCleanCarousel113({ scene, camera, renderer, sceneTargets, setStatus, log });
 
 $toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
@@ -368,7 +367,7 @@ setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Right stick moves/snaps. Music disabled. Reiki hologram opens from the interactive carousel button. Store portal ready.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Right stick moves/snaps. Music disabled. Reiki storefront front cleaned and hologram carousel ready. Store portal ready.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

@@ -1,21 +1,27 @@
 {
-  "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
-  "created": "2026-06-06",
+  "version": "1.4.1",
+  "build": "VERSION-1.4.1-MOON-MARS-QUEST-LOCOMOTION-LOCK",
+  "created": "2026-06-07",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 107,
-  "focus": "Restore Reiki Hub to the uploaded screenshot reference: old plus remodeled storefront, red carpet, ropes, plants, founder/info panels, interactive hologram video carousel button, and approval-safe module routing.",
-  "baseline": "UPDATE-3.0-PHASE-106-REIKI-OLD-NEW-HOLOGRAM-BUTTON-LOCK",
-  "reference": "game/docs/REIKI_TARGET_SNAPSHOT_PHASE107.png",
+  "baseline": "Emergency Realignment Reiki Front Layout 1.4G / Phase 113-style locked lobby baseline",
+  "scope": "Only sky Moon/Mars and Quest locomotion/teleport alignment. Lobby/Reiki/storefront layout is locked and untouched.",
   "locked": [
-    "Reiki screenshot visual match storefront",
-    "old plus new Reiki mother module",
-    "interactive Video Hologram carousel card",
-    "Reiki private room and video portal preserved",
-    "music disabled/audio payload removed",
-    "Quest locomotion and teleport forward guard preserved",
-    "Moon/Mars sky sizing/orbit preserved",
-    "site untouched"
+    "Reiki Hub/storefront locked; do not touch unless user says unlock the Reiki Hub",
+    "Lobby layout locked",
+    "Storefronts/private routes locked",
+    "No lobby music autoplay",
+    "Moon/Mars high sky textured glow",
+    "Mars orbits Moon",
+    "Quest right stick forward/back uses headset-forward direction",
+    "Quest right stick left/right uses 45-degree snap turn",
+    "Quest grip/A arms teleport and trigger release teleports",
+    "Teleport ray forced in front, never behind"
+  ],
+  "criticalRules": [
+    "Do not alter Reiki files or visuals",
+    "Do not alter lobby objects except sky Moon/Mars",
+    "Do not restore old phase packages over this baseline",
+    "Update /game and /update/game.zip together"
   ]
 }

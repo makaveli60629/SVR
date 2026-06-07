@@ -262,18 +262,21 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       tmpHeadForward.normalize();
 
       const flat = new THREE.Vector3(controllerDir.x, 0, controllerDir.z);
+      let safeFlat = tmpHeadForward.clone();
       if (flat.lengthSq() > 1e-5){
         flat.normalize();
-        // Quest target-ray/grip transforms can report the ray backward on some browser builds.
-        // If the ray points behind the user's head direction, flip the horizontal ray so the TP arc stays in front.
-        if (flat.dot(tmpHeadForward) < -0.10){
-          controllerDir.x *= -1;
-          controllerDir.z *= -1;
+        // Version 1.4.1 Quest lock: never allow the teleport ray to resolve behind the player.
+        // Some Quest browser builds report the grip/target-ray transform reversed; flip it, then
+        // blend back toward headset-forward if it is still too sideways for a usable forward arc.
+        if (flat.dot(tmpHeadForward) < 0.0) flat.multiplyScalar(-1);
+        if (flat.dot(tmpHeadForward) < 0.20) {
+          safeFlat.copy(tmpHeadForward);
+        } else {
+          safeFlat.copy(flat).lerp(tmpHeadForward, 0.18).normalize();
         }
-      } else {
-        controllerDir.x = tmpHeadForward.x;
-        controllerDir.z = tmpHeadForward.z;
       }
+      controllerDir.x = safeFlat.x;
+      controllerDir.z = safeFlat.z;
     }
 
     if (controllerDir.y > -0.10) controllerDir.y = -0.42;
@@ -355,8 +358,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       snapCooldownUntil = performance.now() + 220;
     }
 
-    // Quest lock: right stick Y is forward/back. Right stick X is snap-turn only.
-    // Left stick Y remains a fallback, and left stick X is optional strafe.
+    // Version 1.4.1 Quest lock: right stick Y is headset-forward/back. Right stick X is snap-turn only.
+    // Forward is always the current headset-facing direction after snap turn; left stick remains fallback/strafe.
     const moveY = Math.abs(rightStick.y) > 0.12 ? rightStick.y : leftStick.y;
     const strafeX = Math.abs(leftStick.x) > 0.12 ? leftStick.x : 0;
     const mag = Math.hypot(strafeX, moveY);
