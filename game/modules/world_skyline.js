@@ -2215,46 +2215,46 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(11.2, 72, 72),
+    new THREE.SphereGeometry(17.2, 96, 96),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
       metalness: 0.0,
       map: moonTex || null,
       bumpMap: moonBump || null,
-      bumpScale: moonBump ? 0.94 : 0,
-      emissive: 0x111820,
-      emissiveIntensity: 0.0
+      bumpScale: moonBump ? 1.22 : 0,
+      emissive: 0x182230,
+      emissiveIntensity: 0.018
     })
   );
-  moon.position.set(-164, wallHeight + 178.0, -(R + 548.0));
+  moon.position.set(-106, wallHeight + 268.0, -(R + 560.0));
   moon.frustumCulled = false;
   scene.add(moon);
-  const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(64.0, 64.0, 1);
+  const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.18);
+  moonHalo.scale.set(142.0, 142.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(6.2, 56, 56),
+    new THREE.SphereGeometry(8.8, 72, 72),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
       metalness: 0.0,
       map: marsTex || null,
       bumpMap: marsBump || null,
-      bumpScale: marsBump ? 0.42 : 0,
-      emissive: 0x1c0904,
-      emissiveIntensity: 0.0
+      bumpScale: marsBump ? 0.68 : 0,
+      emissive: 0x2a0d05,
+      emissiveIntensity: 0.014
     })
   );
-  mars.position.set(232, wallHeight + 196.0, -(R + 678.0));
+  mars.position.set(-40, wallHeight + 286.0, -(R + 615.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
-  const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(38.0, 38.0, 1);
+  const marsHalo = createOrbHaloSprite(0xff9b6b, 0.12);
+  marsHalo.scale.set(66.0, 66.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2280,9 +2280,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.75, 560, 1.45);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 5.2, 860, 1.22);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 1.75, 420, 1.55);
+  const marsGlow = new THREE.PointLight(0xff9a72, 2.4, 560, 1.42);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);

@@ -1,6 +1,8 @@
 ﻿{
-  "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
-  "phase": 107,
-  "siteTouched": false
+    "version":  "Update 3.0",
+    "build":  "UPDATE-3.0-PHASE-112-REIKI-BACKUP-RETRY-HIGH-SKY-LOCK",
+    "source":  "user-uploaded gameback up reiki.zip + high Moon/Mars sky patch",
+    "siteTouched":  false,
+    "created":  "2026-06-06",
+    "phase":  112
 }
