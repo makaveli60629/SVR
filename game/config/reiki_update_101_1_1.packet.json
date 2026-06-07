@@ -1,0 +1,67 @@
+﻿{
+  "build": "RICI-UPDATE-101-1-1-MOTHER-MODULE-LOCK",
+  "moduleType": "sponsor_partner_hologram_carousel",
+  "approval": {
+    "approved": false,
+    "statusText": "AWAITING APPROVAL",
+    "requiredNotice": "PRESENTATION MOCKUP ONLY - NOT FINAL / NOT OFFICIAL"
+  },
+  "brand": {
+    "displayName": "RICI / REIKI HUB",
+    "domain": "PARTNER DOMAIN PENDING"
+  },
+  "store": {
+    "url": "https://svrpoker.com/site/store.html",
+    "enabled": true,
+    "checkoutEnabled": false
+  },
+  "portal": {
+    "href": "./reiki.html?v=rici-101-1-1",
+    "destination": "private_reiki_room"
+  },
+  "profilePromos": {
+    "enabledLater": true,
+    "vipCouponsFuture": true,
+    "liveDiscountsEnabled": false,
+    "notes": "Future VIP/profile rewards can connect after backend profile system is approved."
+  },
+  "carousel": {
+    "cards": [
+      {
+        "type": "video",
+        "title": "INTRO VIDEO",
+        "lines": ["Reiki presentation media", "Narrow hologram format", "Tap once for audio"]
+      },
+      {
+        "type": "about",
+        "title": "ABOUT",
+        "lines": ["Wellness profile", "Founder/practitioner slot", "Approval-safe placeholder"]
+      },
+      {
+        "type": "symbols",
+        "title": "REIKI SYMBOLS",
+        "lines": ["Root • Sacral • Solar", "Heart • Throat • Vision", "Crown • Balance • Calm"]
+      },
+      {
+        "type": "services",
+        "title": "SERVICES",
+        "lines": ["Private sessions", "Energy balancing", "Guided meditation"]
+      },
+      {
+        "type": "store",
+        "title": "STORE PREVIEW",
+        "lines": ["Session packages", "Product cards", "Website store link"]
+      },
+      {
+        "type": "promo",
+        "title": "VIP PROMO",
+        "lines": ["Future profile rewards", "Coupon-ready", "No live discounts yet"]
+      },
+      {
+        "type": "portal",
+        "title": "ENTER ROOM",
+        "lines": ["Private Reiki room", "Meditation destination", "Activate portal"]
+      }
+    ]
+  }
+}

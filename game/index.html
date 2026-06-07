@@ -3,145 +3,76 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR Poker • Version 1.4.1 Moon/Mars + Quest Locomotion Lock</title>
+  <title>ScarlettVR Poker - Lobby Organization 1.4C</title>
   <meta name="theme-color" content="#050508"/>
-  <link rel="manifest" href="./manifest.json"/>
+  <link rel="manifest" href="./manifest.json?v=lobby-org-1-4c-fast-entry"/>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preload" href="./main.js?v=lobby-org-1-4c-fast-entry" as="script" crossorigin="anonymous">
   <style>
     :root { color-scheme: dark; }
     html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
     #app { position: fixed; inset: 0; }
     canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
-    #hud {
-      position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10;
-      display: flex; gap: 10px; align-items: center; justify-content: space-between;
-      pointer-events: none;
-    }
-    .pill {
-      background: rgba(0,0,0,.55);
-      border: 1px solid rgba(180,140,255,.35);
-      backdrop-filter: blur(8px);
-      border-radius: 999px;
-      padding: 8px 12px;
-      color: #e9e9ff;
-      font-size: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.5);
-      pointer-events: none;
-    }
-    .btn {
-      pointer-events: auto;
-      border: 1px solid rgba(180,140,255,.45);
-      background: rgba(0,0,0,.55);
-      color: #fff;
-      border-radius: 999px;
-      padding: 8px 12px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .btn:hover { background: rgba(60,40,90,.55); }
-    #sceneNav{
-      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12;
-      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
-      pointer-events: auto;
-    }
-    .scene-btn{
-      border: 1px solid rgba(120,255,186,.42);
-      background: rgba(2,10,8,.62);
-      color: #eafff4;
-      border-radius: 999px;
-      padding: 8px 12px;
-      cursor: pointer;
-      box-shadow: 0 10px 28px rgba(0,0,0,.35);
-      font-size: 12px;
-    }
-    .scene-btn:hover{ background: rgba(10,48,33,.72); }
-    body.preview-mode #sceneNav { display:none !important; }
-    #log {
-      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10;
-      max-height: 38vh; overflow: auto; display: none;
-      background: rgba(0,0,0,.55);
-      border: 1px solid rgba(180,140,255,.25);
-      border-radius: 14px;
-      padding: 10px 12px;
-      color: #d7d7ff;
-      font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      white-space: pre-wrap;
-    }
-    #err {
-      position: fixed; inset: 0; display: none; z-index: 50;
-      background: rgba(0,0,0,.88);
-      color: #fff;
-      padding: 18px;
-      font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      overflow: auto;
-    }
-
-    body.preview-mode #hud,
-    body.preview-mode #log,
-    body.preview-mode #err { display: none !important; }
-
-    #bootFallback{position:fixed;inset:0;z-index:45;display:none;place-items:center;background:radial-gradient(circle at 50% 45%,rgba(88,255,244,.16),transparent 36%),#000;color:#eaffff;padding:24px;text-align:center;}
-    #bootFallback .card{max-width:620px;border:1px solid rgba(88,255,244,.42);border-radius:24px;background:rgba(0,8,14,.86);box-shadow:0 0 34px rgba(88,255,244,.18);padding:22px;}
-    #bootFallback h2{margin:0 0 8px;text-shadow:0 0 18px rgba(88,255,244,.7);}
-    #bootFallback p{color:#bfefff;line-height:1.45;}
-    #bootFallback a{display:inline-block;margin-top:10px;border:1px solid rgba(181,108,255,.55);border-radius:999px;padding:12px 16px;color:#fff;text-decoration:none;background:rgba(40,0,70,.72);font-weight:800;}
-
+    #hud { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10; display: flex; gap: 10px; align-items: center; justify-content: space-between; pointer-events: none; }
+    .pill { background: rgba(0,0,0,.55); border: 1px solid rgba(0,255,204,.35); backdrop-filter: blur(8px); border-radius: 999px; padding: 8px 12px; color: #e9fffb; font-size: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.5); pointer-events: none; }
+    .btn { pointer-events: auto; border: 1px solid rgba(0,255,204,.45); background: rgba(0,0,0,.55); color: #fff; border-radius: 999px; padding: 8px 12px; cursor: pointer; user-select: none; }
+    .btn:hover { background: rgba(0,80,70,.55); }
+    #sceneMenuToggle { position: fixed; left: 12px; bottom: 12px; z-index: 14; pointer-events: auto; border: 1px solid rgba(120,255,186,.55); background: rgba(2,10,8,.78); color: #eafff4; border-radius: 999px; padding: 10px 14px; cursor: pointer; box-shadow: 0 10px 28px rgba(0,0,0,.35); font-weight: 900; }
+    #sceneNav { position: fixed; left: 12px; bottom: 58px; z-index: 12; display: none; flex-direction: column; gap: 8px; pointer-events: auto; max-height: 60vh; overflow: auto; padding: 10px; border: 1px solid rgba(120,255,186,.26); border-radius: 18px; background: rgba(0,0,0,.64); backdrop-filter: blur(8px); }
+    body.svr-nav-open #sceneNav { display: flex; }
+    .scene-btn { border: 1px solid rgba(120,255,186,.42); background: rgba(2,10,8,.72); color: #eafff4; border-radius: 999px; padding: 8px 12px; cursor: pointer; box-shadow: 0 10px 28px rgba(0,0,0,.35); font-size: 12px; text-align: left; min-width: 148px; }
+    .scene-btn:hover { background: rgba(10,48,33,.72); }
+    body.preview-mode #sceneNav, body.preview-mode #sceneMenuToggle, body.preview-mode #desktopHint { display:none !important; }
+    #desktopHint { position: fixed; right: 12px; bottom: 12px; z-index: 13; pointer-events: none; background: rgba(0,0,0,.52); border: 1px solid rgba(180,140,255,.34); color: rgba(245,240,255,.82); border-radius: 999px; padding: 8px 12px; font-size: 11px; font-weight: 800; letter-spacing: .03em; }
+    #log { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10; max-height: 38vh; overflow: auto; display: none; background: rgba(0,0,0,.55); border: 1px solid rgba(0,255,204,.25); border-radius: 14px; padding: 10px 12px; color: #d7fff8; font: 12px/1.35 ui-monospace, monospace; white-space: pre-wrap; }
+    #err { position: fixed; inset: 0; display: none; z-index: 50; background: rgba(0,0,0,.88); color: #fff; padding: 18px; font: 13px/1.45 ui-monospace, monospace; overflow: auto; }
+    body.preview-mode #hud, body.preview-mode #log, body.preview-mode #err { display: none !important; }
+    #splash { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: radial-gradient(circle at 50% 28%, rgba(0,255,204,.18), transparent 28%), radial-gradient(circle at 70% 64%, rgba(180,140,255,.12), transparent 34%), #020307; transition: opacity .35s ease, visibility .35s ease; }
+    body.svr-ready #splash { opacity: 0; visibility: hidden; pointer-events: none; }
+    body.preview-mode #splash { display: none !important; }
+    .splash-card { width: min(560px, calc(100vw - 36px)); border: 1px solid rgba(0,255,204,.42); border-radius: 28px; padding: 28px; background: linear-gradient(180deg, rgba(8,15,24,.88), rgba(5,8,15,.70)); box-shadow: 0 0 70px rgba(0,255,204,.12), 0 28px 90px rgba(0,0,0,.78); color: #fff; text-align: center; }
+    .splash-logo { width: 132px; height: 132px; object-fit: contain; filter: drop-shadow(0 0 24px rgba(0,255,204,.42)); animation: svrPulse 2.6s ease-in-out infinite; }
+    .splash-title { margin: 12px 0 4px; font-size: clamp(30px, 6vw, 56px); font-weight: 950; letter-spacing: .06em; }
+    .splash-sub { color: #bdfdf2; font-weight: 800; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
+    .splash-step { min-height: 22px; margin-top: 22px; color: #eafffb; font-size: 14px; font-weight: 750; }
+    .splash-bar { height: 12px; overflow: hidden; border-radius: 999px; border: 1px solid rgba(0,255,204,.30); background: rgba(255,255,255,.08); margin: 18px 0 10px; }
+    .splash-fill { height: 100%; width: 4%; border-radius: inherit; background: linear-gradient(90deg, #00ffcc, #b48cff, #ffd15c); box-shadow: 0 0 18px rgba(0,255,204,.55); transition: width .25s ease; }
+    .splash-hint { color: rgba(255,255,255,.68); font-size: 12px; line-height: 1.45; }
+    .splash-build { margin-top: 12px; color: rgba(255,255,255,.45); font: 11px/1.3 ui-monospace, monospace; }
+    @keyframes svrPulse { 0%,100% { transform: scale(1); opacity: .92; } 50% { transform: scale(1.035); opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .splash-logo { animation: none; } #splash, .splash-fill { transition: none; } }
   </style>
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body>
+  <div id="splash" aria-live="polite"><div class="splash-card"><img class="splash-logo" src="./assets/ui/logo.png" alt="SVR" onerror="this.onerror=null;this.src='./logo.png';"><div class="splash-title">SVR POKER</div><div class="splash-sub">Loading Lobby</div><div class="splash-step" id="splashStep">Starting renderer...</div><div class="splash-bar"><div class="splash-fill" id="splashFill"></div></div><div class="splash-hint" id="splashHint">Fast entry active. Core lobby loads first; storefront modules stage softly.</div><div class="splash-build" id="splashBuild">LOBBY-ORG-1-4C-FAST-ENTRY</div></div></div>
   <div id="app"></div>
-
-  <div id="bootFallback">
-    <div class="card">
-      <h2>SVR Game Boot Fallback</h2>
-      <p>The full 3D lobby is still loading or a browser module stalled. Lobby music is manual only, and Reiki hologram stays paused and only plays after entering through the Reiki area portal.</p>
-      <a href="./reiki-video-portal.html?v=phase88-reiki-hologram-pause-lock">Open Reiki Hologram Carousel</a>
-    </div>
-  </div>
-
-
-  <div id="hud">
-    <div class="pill" id="status">Booting…</div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
-      <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
-      <span class="pill" id="mode">Hands: …</span>
-      <span class="pill">BUILD: VERSION-1.4.1-MOON-MARS-QUEST-LOCOMOTION-LOCK</span>
-    </div>
-  </div>
-
-  <div id="sceneNav">
-    <button class="scene-btn" data-scene="lobby">Lobby</button>
-    <button class="scene-btn" data-scene="seat">Seat</button>
-    <button class="scene-btn" data-scene="reiki">Reiki</button>
-    <button class="scene-btn" data-scene="reikiVideoPortal">Reiki Video</button>
-    <button class="scene-btn" data-scene="pga">PGA</button>
-    <button class="scene-btn" data-scene="store">Store</button>
-    <button class="scene-btn" data-scene="legends">Legend</button>
-    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
-    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
-  </div>
-
-  <pre id="log"></pre>
-  <pre id="err"></pre>
-
-
+  <div id="hud"><div class="pill" id="status">Booting Lobby Organization 1.4C...</div><div style="display:flex;gap:8px;align-items:center;"><button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button><button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button><span class="pill" id="mode">Hands: ...</span><span class="pill">BUILD: LOBBY-ORG-1-4C</span></div></div>
+  <button id="sceneMenuToggle" type="button">Destinations ▾</button>
+  <div id="sceneNav"><button class="scene-btn" data-scene="lobby">Lobby</button><button class="scene-btn" data-scene="seat">Seat</button><button class="scene-btn" data-scene="reiki">Reiki</button><button class="scene-btn" data-scene="reikiRoom">Reiki Room</button><button class="scene-btn" data-scene="reikiTalk">Reiki Talk</button><button class="scene-btn" data-scene="pgaDrive">PGA Drive</button><button class="scene-btn" data-scene="chipPutt">Chip/Putt</button><button class="scene-btn" data-scene="vrStore">VR Store</button><button class="scene-btn" data-scene="smokerLounge">Smoker</button><button class="scene-btn" data-scene="scorpionRoom">Scorpion Room</button><button class="scene-btn" data-scene="pga">PGA</button><button class="scene-btn" data-scene="legends">Legend</button><button class="scene-btn" data-scene="sponsor">Sponsor</button><button class="scene-btn" data-scene="scorpion">Scorpion</button></div>
+  <div id="desktopHint">Desktop carousel: [ previous  ] next  Enter action</div>
+  <pre id="log"></pre><pre id="err"></pre>
   <script>
-    window.__SVR_BOOT_STARTED__ = Date.now();
-    setTimeout(function(){
-      var s=document.getElementById('status');
-      var fb=document.getElementById('bootFallback');
-      if(s && fb && /Booting/i.test(s.textContent || '')) fb.style.display='grid';
-    }, 4500);
+    document.getElementById('sceneMenuToggle')?.addEventListener('click',()=>document.body.classList.toggle('svr-nav-open'));
+    function activeCarousel(){
+      if (window.SVR_PGA_INTERACTION_ACTIVE && window.SVR_PGA_CAROUSEL_14) return { label:'PGA Golf', api: window.SVR_PGA_CAROUSEL_14 };
+      if (window.SVR_STORE_INTERACTION_ACTIVE && window.SVR_STORE_CAROUSEL_12) return { label:'SVR Store', api: window.SVR_STORE_CAROUSEL_12 };
+      if (window.SVR_REIKI_INTERACTION_ACTIVE && window.SVR_RICI_UPDATE_101_CAROUSEL) return { label:'Reiki', api: window.SVR_RICI_UPDATE_101_CAROUSEL };
+      return null;
+    }
+    window.addEventListener('keydown', (e)=>{
+      if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
+      const tag = (document.activeElement?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      const target = activeCarousel();
+      if (!target) return;
+      if (e.code === 'BracketLeft' || e.code === 'Comma') { target.api.prev?.(); e.preventDefault(); }
+      if (e.code === 'BracketRight' || e.code === 'Period') { target.api.next?.(); e.preventDefault(); }
+      if (e.code === 'Enter' || e.code === 'Space') { target.api.activate?.(); e.preventDefault(); }
+      const status = document.getElementById('status');
+      if (status) status.textContent = `${target.label}: keyboard carousel control`;
+    });
   </script>
-
-  <script type="module" src="./main.js"></script>
+  <script type="module" src="./main.js?v=lobby-org-1-4c-fast-entry"></script>
 </body>
 </html>

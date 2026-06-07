@@ -21,7 +21,7 @@ This phase builds on the phase 38 VR baseline and keeps the current live-control
   - Sponsor
   - Scorpion game room
 - Added a new Scorpion game room module as a separate scene target area
-- Added the uploaded AWAITING_APPROVAL Instagram screenshot as a clear sponsor/building ad billboard
+- Added the uploaded Trueitive Instagram screenshot as a clear sponsor/building ad billboard
 - Raised Moon and Mars farther behind the skyline with stronger night-sky presence
 - Kept lobby music path with 07.mp3 available through the watch console
 
