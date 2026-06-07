@@ -1,5 +1,17 @@
-{
-  "version": "1.4.1",
-  "build": "VERSION-1.4.1-MOON-MARS-QUEST-LOCOMOTION-LOCK",
-  "siteTouched": false
+﻿{
+    "build":  "VERSION-1.4.1A-SKY-QUEST-ONLY-SAFE-PATCH",
+    "version":  "1.4.1A",
+    "siteTouched":  false,
+    "created":  "2026-06-07T03:24:09Z",
+    "protected":  [
+                      "Reiki Hub/storefront",
+                      "lobby layout",
+                      "site",
+                      "poker",
+                      "private routes"
+                  ],
+    "scope":  [
+                  "Moon/Mars sky only",
+                  "Quest locomotion/teleport direction only"
+              ]
 }

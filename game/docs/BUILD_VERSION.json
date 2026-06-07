@@ -1,27 +1,17 @@
-{
-  "version": "1.4.1",
-  "build": "VERSION-1.4.1-MOON-MARS-QUEST-LOCOMOTION-LOCK",
-  "created": "2026-06-07",
-  "track": "game-only",
-  "siteTouched": false,
-  "baseline": "Emergency Realignment Reiki Front Layout 1.4G / Phase 113-style locked lobby baseline",
-  "scope": "Only sky Moon/Mars and Quest locomotion/teleport alignment. Lobby/Reiki/storefront layout is locked and untouched.",
-  "locked": [
-    "Reiki Hub/storefront locked; do not touch unless user says unlock the Reiki Hub",
-    "Lobby layout locked",
-    "Storefronts/private routes locked",
-    "No lobby music autoplay",
-    "Moon/Mars high sky textured glow",
-    "Mars orbits Moon",
-    "Quest right stick forward/back uses headset-forward direction",
-    "Quest right stick left/right uses 45-degree snap turn",
-    "Quest grip/A arms teleport and trigger release teleports",
-    "Teleport ray forced in front, never behind"
-  ],
-  "criticalRules": [
-    "Do not alter Reiki files or visuals",
-    "Do not alter lobby objects except sky Moon/Mars",
-    "Do not restore old phase packages over this baseline",
-    "Update /game and /update/game.zip together"
-  ]
+﻿{
+    "build":  "VERSION-1.4.1A-SKY-QUEST-ONLY-SAFE-PATCH",
+    "version":  "1.4.1A",
+    "siteTouched":  false,
+    "created":  "2026-06-07T03:24:09Z",
+    "protected":  [
+                      "Reiki Hub/storefront",
+                      "lobby layout",
+                      "site",
+                      "poker",
+                      "private routes"
+                  ],
+    "scope":  [
+                  "Moon/Mars sky only",
+                  "Quest locomotion/teleport direction only"
+              ]
 }
