@@ -1,1 +1,6 @@
-{"build":"UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK","phase":106,"siteTouched":false}
+﻿{
+  "version": "Update 3.0",
+  "build": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
+  "phase": 107,
+  "siteTouched": false
+}

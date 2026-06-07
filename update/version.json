@@ -1,9 +1,6 @@
 ﻿{
-    "build":  "UPDATE-3.0-PHASE-111-REIKI-TRUE-BACKUP-HIGH-SKY-LOCK",
-    "version":  "Update 3.0",
-    "source":  "gameback up reiki.zip + high sky patch",
-    "siteTouched":  false,
-    "script":  "fixed A-Frame guard; data-scene no longer false-positive",
-    "created":  "2026-06-06",
-    "phase":  111
+  "version": "Update 3.0",
+  "build": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
+  "phase": 107,
+  "siteTouched": false
 }

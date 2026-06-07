@@ -2215,46 +2215,46 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(15.8, 96, 96),
+    new THREE.SphereGeometry(11.2, 72, 72),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
       metalness: 0.0,
       map: moonTex || null,
       bumpMap: moonBump || null,
-      bumpScale: moonBump ? 1.18 : 0,
+      bumpScale: moonBump ? 0.94 : 0,
       emissive: 0x111820,
-      emissiveIntensity: 0.015
+      emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-72, wallHeight + 224.0, -(R + 420.0));
+  moon.position.set(-164, wallHeight + 178.0, -(R + 548.0));
   moon.frustumCulled = false;
   scene.add(moon);
-  const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.16);
-  moonHalo.scale.set(118.0, 118.0, 1);
+  const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
+  moonHalo.scale.set(64.0, 64.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(8.4, 72, 72),
+    new THREE.SphereGeometry(6.2, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
       metalness: 0.0,
       map: marsTex || null,
       bumpMap: marsBump || null,
-      bumpScale: marsBump ? 0.58 : 0,
+      bumpScale: marsBump ? 0.42 : 0,
       emissive: 0x1c0904,
-      emissiveIntensity: 0.012
+      emissiveIntensity: 0.0
     })
   );
-  mars.position.set(-20, wallHeight + 242.0, -(R + 452.0));
+  mars.position.set(232, wallHeight + 196.0, -(R + 678.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
-  const marsHalo = createOrbHaloSprite(0xff9b6b, 0.11);
-  marsHalo.scale.set(54.0, 54.0, 1);
+  const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
+  marsHalo.scale.set(38.0, 38.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2280,9 +2280,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 4.8, 760, 1.32);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.75, 560, 1.45);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 2.2, 520, 1.45);
+  const marsGlow = new THREE.PointLight(0xff9a72, 1.75, 420, 1.55);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
@@ -2459,29 +2459,29 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       wallHeight + 72.0 + Math.sin(t * 0.018) * 0.22,
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
-    // Phase 111: Reiki remains restored from backup; only sky objects move higher.
+    // Phase 105: keep the Phase 87/88 Reiki hub, but restore the higher/larger Update 3.0 sky lock.
     moon.position.set(
-      -72 + Math.sin(t * 0.010) * 5.5,
-      wallHeight + 224.0 + Math.sin(t * 0.050) * 2.2,
-      -(R + 420.0) + Math.cos(t * 0.010) * 6.0
+      -58 + Math.sin(t * 0.018) * 4.5,
+      wallHeight + 94.0 + Math.sin(t * 0.070) * 1.8,
+      -(R + 228.0) + Math.cos(t * 0.014) * 5.0
     );
-    moon.rotation.y += dt * 0.075;
+    moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
-    const marsOrbit = t * 0.14;
+    const marsOrbit = t * 0.16;
     mars.position.set(
-      moon.position.x + Math.cos(marsOrbit) * 46.0,
-      moon.position.y + 12.0 + Math.sin(marsOrbit * 1.25) * 7.0,
-      moon.position.z + Math.sin(marsOrbit) * 34.0 - 14.0
+      moon.position.x + Math.cos(marsOrbit) * 28.0,
+      moon.position.y + 7.0 + Math.sin(marsOrbit * 1.35) * 4.0,
+      moon.position.z + Math.sin(marsOrbit) * 22.0 - 10.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.09;
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.110 + 0.018 * (0.5 + 0.5 * Math.sin(t * 0.18));
+    moonHalo.material.opacity = 0.045 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.055 + 0.014 * (0.5 + 0.5 * Math.sin(t * 0.22));
+    marsHalo.material.opacity = 0.026 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{
