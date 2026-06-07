@@ -1,22 +1,23 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-109-REIKI-LOCKED-MOON-MARS-HIGH-GLOW-LOCK",
+  "build": "UPDATE-3.0-PHASE-110-REIKI-RESTORE-HIGH-SKY-LOCK",
   "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 109,
-  "focus": "Restore the Phase 107 screenshot-confirmed Reiki Hub unchanged while refining Moon/Mars high sky placement, textures, moon glow, and Mars orbit.",
+  "phase": 110,
+  "focus": "Restore Phase 107 screenshot-confirmed Reiki Hub only, preserve all Reiki module working elements, and move Moon/Mars much higher with textures, glow, and Mars orbit.",
   "baseline": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
-  "skySource": "Phase 108 sky texture changes, adjusted higher with stronger moon glow",
+  "skySource": "Phase 109 sky intent reapplied onto Phase 107 Reiki baseline without altering Reiki modules.",
   "protected": [
-    "Reiki Hub locked; do not touch until user says unlock the Reiki Hub",
+    "Reiki Hub restored and locked",
     "public website",
     "site pages",
-    "Phase 107 Reiki screenshot visual baseline"
+    "no A-Frame 1.4H overwrite"
   ],
   "locked": [
-    "Reiki Hub frozen",
-    "Reiki hologram carousel frozen",
+    "Phase 107 Reiki Hub visual baseline",
+    "Reiki hologram/video carousel route",
+    "Reiki private room route",
     "Moon high and larger",
     "Mars high and orbiting Moon",
     "Moon/Mars textures preserved",
