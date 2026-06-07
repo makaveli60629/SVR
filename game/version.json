@@ -1,20 +1,9 @@
 ﻿{
-    "version":  "1.4G",
-    "siteTouched":  false,
-    "protected":  [
-                      "Reiki",
-                      "site",
-                      "lobby storefront layout",
-                      "poker"
-                  ],
-    "build":  "VERSION-1.4G-SKY-LOCOMOTION-NOZIP-DEPLOY",
-    "deployMode":  "direct-game-folder-no-update-zip",
-    "scope":  [
-                  "Moon/Mars sky",
-                  "Quest locomotion",
-                  "Quest teleport grip+trigger",
-                  "performance blink reduction"
-              ],
-    "created":  "2026-06-07T03:52:18Z",
-    "reikiTouched":  false
+  "version": "1.4.8",
+  "build": "VERSION-1.4.8-BOOT-LOADER-RESCUE",
+  "scope": "game boot loader rescue only",
+  "siteTouched": false,
+  "reikiTouched": false,
+  "protected": ["Reiki storefront hub", "website", "site", "public Matrix page"],
+  "updatedAt": "2026-06-07T11:33:10.7271564-05:00"
 }

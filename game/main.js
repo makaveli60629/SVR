@@ -1,3 +1,11 @@
+﻿/* SVR_1_4_8_BOOT_READY_SIGNAL */
+window.SVR_AUDIO_DISABLED = true;
+setTimeout(() => {
+  try {
+    window.dispatchEvent(new CustomEvent("svr-ready", { detail: { source: "main.js 1.4.8 fallback ready" } }));
+    window.dispatchEvent(new CustomEvent("SVR_READY", { detail: { source: "main.js 1.4.8 fallback ready" } }));
+  } catch(e) {}
+}, 1400);
 import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
@@ -96,13 +104,13 @@ window.addEventListener("error", e => {
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e));
   log("Runtime error", e?.error?.stack || e?.message || String(e));
-  if (!document.body.classList.contains("svr-ready")) setSplash("Error caught — safe boot screen active", 100, "Open Logs for details. The loader prevented a blank boot screen.");
+  if (!document.body.classList.contains("svr-ready")) setSplash("Error caught â€” safe boot screen active", 100, "Open Logs for details. The loader prevented a blank boot screen.");
 });
 window.addEventListener("unhandledrejection", e => {
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
   if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e));
   log("Unhandled rejection", e?.reason?.stack || e?.reason || String(e));
-  if (!document.body.classList.contains("svr-ready")) setSplash("Promise error caught — safe boot screen active", 100, "Open Logs for details. The loader prevented a blank boot screen.");
+  if (!document.body.classList.contains("svr-ready")) setSplash("Promise error caught â€” safe boot screen active", 100, "Open Logs for details. The loader prevented a blank boot screen.");
 });
 
 const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
@@ -258,3 +266,4 @@ renderer.setAnimationLoop(() => {
 const canvasEl = renderer.domElement;
 canvasEl.addEventListener("pointerdown", async () => { document.body.classList.add("svr-ready"); const st = audio.getState(); if (!st.enabled) await audio.start(); }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", e => { e.preventDefault(); log("[ERR] WebGL context lost. Reloading..."); setStatus("WebGL context lost (reloading...)", { force: true }); setTimeout(() => location.reload(), 500); }, false);
+

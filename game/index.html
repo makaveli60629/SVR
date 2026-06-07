@@ -1,13 +1,13 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>ScarlettVR Poker - Lobby Organization 1.4C</title>
   <meta name="theme-color" content="#050508"/>
-  <link rel="manifest" href="./manifest.json?v=lobby-org-1-4c-fast-entry"/>
+  <link rel="manifest" href="./manifest.json?v=VERSION-1.4.8-BOOT-LOADER-RESCUE"/>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preload" href="./main.js?v=lobby-org-1-4c-fast-entry" as="script" crossorigin="anonymous">
+  <link rel="preload" href="./main.js?v=VERSION-1.4.8-BOOT-LOADER-RESCUE" as="script" crossorigin="anonymous">
   <style>
     :root { color-scheme: dark; }
     html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
@@ -45,10 +45,10 @@
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body>
-  <div id="splash" aria-live="polite"><div class="splash-card"><img class="splash-logo" src="./assets/ui/logo.png" alt="SVR" onerror="this.onerror=null;this.src='./logo.png';"><div class="splash-title">SVR POKER</div><div class="splash-sub">Loading Lobby</div><div class="splash-step" id="splashStep">Starting renderer...</div><div class="splash-bar"><div class="splash-fill" id="splashFill"></div></div><div class="splash-hint" id="splashHint">Fast entry active. Core lobby loads first; storefront modules stage softly.</div><div class="splash-build" id="splashBuild">LOBBY-ORG-1-4C-FAST-ENTRY</div></div></div>
+  <div id="splash" aria-live="polite"><div class="splash-card"><img class="splash-logo" src="./assets/ui/logo.png" alt="SVR" onerror="this.onerror=null;this.src='./logo.png';"><div class="splash-title">SVR POKER</div><div class="splash-sub">Loading Lobby</div><div class="splash-step" id="splashStep">Starting renderer...</div><div class="splash-bar"><div class="splash-fill" id="splashFill"></div></div><div class="splash-hint" id="splashHint">Fast entry active. Core lobby loads first; storefront modules stage softly.</div><div class="splash-build" id="splashBuild">VERSION-1.4.8-BOOT-LOADER-RESCUE</div></div></div>
   <div id="app"></div>
   <div id="hud"><div class="pill" id="status">Booting Lobby Organization 1.4C...</div><div style="display:flex;gap:8px;align-items:center;"><button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button><button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button><span class="pill" id="mode">Hands: ...</span><span class="pill">BUILD: LOBBY-ORG-1-4C</span></div></div>
-  <button id="sceneMenuToggle" type="button">Destinations ▾</button>
+  <button id="sceneMenuToggle" type="button">Destinations â–¾</button>
   <div id="sceneNav"><button class="scene-btn" data-scene="lobby">Lobby</button><button class="scene-btn" data-scene="seat">Seat</button><button class="scene-btn" data-scene="reiki">Reiki</button><button class="scene-btn" data-scene="reikiRoom">Reiki Room</button><button class="scene-btn" data-scene="reikiTalk">Reiki Talk</button><button class="scene-btn" data-scene="pgaDrive">PGA Drive</button><button class="scene-btn" data-scene="chipPutt">Chip/Putt</button><button class="scene-btn" data-scene="vrStore">VR Store</button><button class="scene-btn" data-scene="smokerLounge">Smoker</button><button class="scene-btn" data-scene="scorpionRoom">Scorpion Room</button><button class="scene-btn" data-scene="pga">PGA</button><button class="scene-btn" data-scene="legends">Legend</button><button class="scene-btn" data-scene="sponsor">Sponsor</button><button class="scene-btn" data-scene="scorpion">Scorpion</button></div>
   <div id="desktopHint">Desktop carousel: [ previous  ] next  Enter action</div>
   <pre id="log"></pre><pre id="err"></pre>
@@ -73,6 +73,7 @@
       if (status) status.textContent = `${target.label}: keyboard carousel control`;
     });
   </script>
-  <script type="module" src="./main.js?v=lobby-org-1-4c-fast-entry"></script>
+  <script src="./svr_1_4_8_boot_rescue.js?v=1-4-8-boot-loader-rescue"></script>
+<script type="module" src="./main.js?v=1-4-8-boot-loader-rescue"></script>
 </body>
 </html>
