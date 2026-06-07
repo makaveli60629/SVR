@@ -1,31 +1,21 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-112-REIKI-BACKUP-RETRY-HIGH-SKY-LOCK",
+  "build": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
   "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 112,
-  "focus": "Use the user-uploaded gameback up reiki.zip as the grounded Reiki source, preserve the old plus remodeled Reiki storefront/hologram module, and patch only Moon/Mars placement/scale/glow higher in the sky.",
-  "baseline": "uploaded gameback up reiki.zip / Phase 107 Reiki snapshot visual match",
-  "protected": [
-    "public website",
-    "site pages",
-    "Reiki storefront/mother module from uploaded backup",
-    "interactive hologram/video carousel button",
-    "private Reiki room and video portal",
-    "Quest movement/teleport fixes"
-  ],
+  "phase": 107,
+  "focus": "Restore Reiki Hub to the uploaded screenshot reference: old plus remodeled storefront, red carpet, ropes, plants, founder/info panels, interactive hologram video carousel button, and approval-safe module routing.",
+  "baseline": "UPDATE-3.0-PHASE-106-REIKI-OLD-NEW-HOLOGRAM-BUTTON-LOCK",
+  "reference": "game/docs/REIKI_TARGET_SNAPSHOT_PHASE107.png",
   "locked": [
-    "old plus new remodeled Reiki storefront",
-    "Reiki mother module",
-    "hologram/video carousel button",
-    "Moon and Mars high sky textured glow",
-    "Mars orbiting Moon",
-    "music disabled/no lobby music auto-start"
-  ],
-  "criticalRules": [
-    "Do not use 1.4H A-Frame manifests",
-    "Do not overwrite Reiki from later failed Phase 111 backup unless explicitly requested",
-    "Update /game and /update/game.zip together"
+    "Reiki screenshot visual match storefront",
+    "old plus new Reiki mother module",
+    "interactive Video Hologram carousel card",
+    "Reiki private room and video portal preserved",
+    "music disabled/audio payload removed",
+    "Quest locomotion and teleport forward guard preserved",
+    "Moon/Mars sky sizing/orbit preserved",
+    "site untouched"
   ]
 }
