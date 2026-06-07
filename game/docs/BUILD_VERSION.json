@@ -1,27 +1,30 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-110-REIKI-RESTORE-HIGH-SKY-LOCK",
+  "build": "UPDATE-3.0-PHASE-111-REIKI-TRUE-BACKUP-HIGH-SKY-LOCK",
   "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 110,
-  "focus": "Restore Phase 107 screenshot-confirmed Reiki Hub only, preserve all Reiki module working elements, and move Moon/Mars much higher with textures, glow, and Mars orbit.",
-  "baseline": "UPDATE-3.0-PHASE-107-REIKI-SNAPSHOT-VISUAL-MATCH-LOCK",
-  "skySource": "Phase 109 sky intent reapplied onto Phase 107 Reiki baseline without altering Reiki modules.",
+  "phase": 111,
+  "focus": "Restore the exact user-provided Reiki backup hub/storefront module while moving Moon and Mars much higher with full textures, stronger Moon glow, Mars orbiting Moon, music disabled, and site untouched.",
+  "baseline": "gameback up reiki.zip / Phase 107 screenshot-confirmed Reiki Hub",
   "protected": [
-    "Reiki Hub restored and locked",
+    "Reiki Hub restored from uploaded backup and locked",
     "public website",
     "site pages",
-    "no A-Frame 1.4H overwrite"
+    "Quest movement/teleport fixes"
   ],
   "locked": [
-    "Phase 107 Reiki Hub visual baseline",
-    "Reiki hologram/video carousel route",
-    "Reiki private room route",
-    "Moon high and larger",
-    "Mars high and orbiting Moon",
-    "Moon/Mars textures preserved",
-    "music disabled",
-    "Quest locomotion and teleport fixes preserved"
+    "old plus new remodeled Reiki storefront",
+    "Reiki mother module",
+    "interactive hologram/video carousel button",
+    "private Reiki room and video portal",
+    "Moon/Mars high sky textured glow",
+    "Mars orbiting Moon",
+    "music disabled"
+  ],
+  "criticalRules": [
+    "Do not use 1.4H A-Frame manifests",
+    "Do not overwrite Reiki unless user says unlock the Reiki Hub",
+    "Update /game and /update/game.zip together"
   ]
 }
