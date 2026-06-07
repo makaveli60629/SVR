@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { CONFIG } from "./config.js";
 import { isPinching, isFist, aimPoint } from "./gestures.js";
 
@@ -62,12 +62,11 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (Math.abs(x) < 0.20) x = 0; if (Math.abs(y) < 0.20) y = 0; return { x, y };
   }
   function getButtonValue(gp, idx){ return gp?.buttons?.[idx]?.value || 0; }
-  function controllerTogglePressed(proxy){ const gp = controllerGamepad(proxy); if (!gp) return false; return getButtonValue(gp, 4) > 0.55 || getButtonValue(gp, 5) > 0.55 || getButtonValue(gp, 3) > 0.75; }
-  function handNearFace(hand){
-    if (!renderer?.xr?.isPresenting || !hand?.joints?.wrist) return false; const xrCam = renderer.xr.getCamera(camera); if (!xrCam) return false;
-    const headPos = new THREE.Vector3(), wristPos = new THREE.Vector3(); xrCam.getWorldPosition(headPos); hand.joints.wrist.getWorldPosition(wristPos);
-    const dist = wristPos.distanceTo(headPos), relativeY = wristPos.y - headPos.y, relativeZ = wristPos.z - headPos.z;
-    return dist < 0.34 && relativeY > -0.28 && relativeY < 0.22 && Math.abs(relativeZ) < 0.28;
+  function controllerTogglePressed(proxy){
+    const gp = controllerGamepad(proxy);
+    if (!gp) return false;
+    // SVR_1_4G_GRIP_TELEPORT_LOCK: grip/squeeze arms teleport. A/B remain fallback.
+    return getButtonValue(gp, 1) > 0.35 || getButtonValue(gp, 4) > 0.55 || getButtonValue(gp, 5) > 0.55;
   }
   function controllerTriggerValue(proxy){ return getButtonValue(controllerGamepad(proxy), 0); }
   function controllerAimPoint(proxy){
@@ -144,10 +143,10 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       if (rightFist && !lastRightFistToggle && now > cooldownUntil){ mode = !(mode && active === rightHandRef); active = mode ? rightHandRef : null; activeMode = 'hand'; cooldownUntil = now + 320; pinchHoldStart = 0; triggerHoldStart = 0; }
       lastLeftFistToggle = leftFist; lastRightFistToggle = rightFist;
     } else { lastLeftFistToggle = false; lastRightFistToggle = false; }
-    if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){ pointer.visible = false; ring.visible = false; hideArc(); setGlow(false); stableTargetMs = 0; lastAimValid = false; statusCb("Waiting for hands or controllers…"); modeCb("Input: not tracked"); return; }
+    if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){ pointer.visible = false; ring.visible = false; hideArc(); setGlow(false); stableTargetMs = 0; lastAimValid = false; statusCb("Waiting for hands or controllersâ€¦"); modeCb("Input: not tracked"); return; }
     if (mode && activeMode === "controller" && !(active?.joints)){ active = leftControllerRef?.joints ? leftControllerRef : rightControllerRef?.joints ? rightControllerRef : leftHandRef?.joints ? leftHandRef : rightHandRef?.joints ? rightHandRef : null; activeMode = active === leftControllerRef || active === rightControllerRef ? "controller" : "hand"; }
     else if (mode && activeMode === "hand" && !(active?.joints)){ active = leftHandRef?.joints ? leftHandRef : rightHandRef?.joints ? rightHandRef : leftControllerRef?.joints ? leftControllerRef : rightControllerRef?.joints ? rightControllerRef : null; activeMode = active === leftControllerRef || active === rightControllerRef ? "controller" : "hand"; }
-    if (!mode || !active){ pointer.visible = false; ring.visible = false; hideArc(); setGlow(false); stableTargetMs = 0; lastAimValid = false; statusCb((leftControllerRef || rightControllerRef) ? "Controllers active • headset facing = forward • snap-turn locked" : "TELEPORT OFF • press watch or fist near face"); modeCb((leftControllerRef || rightControllerRef) ? "Input: controllers + head-forward locomotion" : "Teleport: off"); return; }
+    if (!mode || !active){ pointer.visible = false; ring.visible = false; hideArc(); setGlow(false); stableTargetMs = 0; lastAimValid = false; statusCb((leftControllerRef || rightControllerRef) ? "Controllers active â€¢ headset facing = forward â€¢ snap-turn locked" : "TELEPORT OFF â€¢ press watch or fist near face"); modeCb((leftControllerRef || rightControllerRef) ? "Input: controllers + head-forward locomotion" : "Teleport: off"); return; }
     let target = null;
     if (activeMode === "controller") target = controllerAimPoint(active);
     else if (active?.joints) target = aimPoint(active);
@@ -161,8 +160,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (pinch && stableTargetMs > 110 && now - lastTP > 650){
       const ok = teleportByDelta(smoothedTarget); lastTP = now; pointer.visible = false; ring.visible = false; setGlow(false); mode = false; active = null; activeMode = "hand"; pinchHoldStart = 0; triggerHoldStart = 0;
       statusCb(ok ? "Teleported" : "Teleport failed");
-    } else statusCb(activeMode === "controller" ? "Controller teleport aim • trigger to jump" : "Hand teleport aim • pinch to jump");
+    } else statusCb(activeMode === "controller" ? "Controller teleport aim â€¢ trigger to jump" : "Hand teleport aim â€¢ pinch to jump");
   }
 
   return { update, onSessionStart, setLogoTexture, toggleMode, isEnabled: ()=>mode, setPlayerPose, getPlayerPose, setPlayerYaw };
 }
+

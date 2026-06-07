@@ -1,9 +1,20 @@
 ﻿{
-  "build": "RICI-UPDATE-101-1-1-MOTHER-MODULE-LOCK",
-  "phase": "RICI Update 101 / Reiki 1.1",
-  "scope": "game-side Reiki mother module",
-  "siteTouched": false,
-  "approvalSafe": true,
-  "packetDriven": true,
-  "updatedAt": "2026-06-05T00:31:50"
+    "version":  "1.4G",
+    "siteTouched":  false,
+    "protected":  [
+                      "Reiki",
+                      "site",
+                      "lobby storefront layout",
+                      "poker"
+                  ],
+    "build":  "VERSION-1.4G-SKY-LOCOMOTION-NOZIP-DEPLOY",
+    "deployMode":  "direct-game-folder-no-update-zip",
+    "scope":  [
+                  "Moon/Mars sky",
+                  "Quest locomotion",
+                  "Quest teleport grip+trigger",
+                  "performance blink reduction"
+              ],
+    "created":  "2026-06-07T03:52:18Z",
+    "reikiTouched":  false
 }

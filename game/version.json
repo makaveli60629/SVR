@@ -1,17 +1,20 @@
 ﻿{
-    "build":  "VERSION-1.4.1A-SKY-QUEST-ONLY-SAFE-PATCH",
-    "version":  "1.4.1A",
+    "version":  "1.4G",
     "siteTouched":  false,
-    "created":  "2026-06-07T03:24:09Z",
     "protected":  [
-                      "Reiki Hub/storefront",
-                      "lobby layout",
+                      "Reiki",
                       "site",
-                      "poker",
-                      "private routes"
+                      "lobby storefront layout",
+                      "poker"
                   ],
+    "build":  "VERSION-1.4G-SKY-LOCOMOTION-NOZIP-DEPLOY",
+    "deployMode":  "direct-game-folder-no-update-zip",
     "scope":  [
-                  "Moon/Mars sky only",
-                  "Quest locomotion/teleport direction only"
-              ]
+                  "Moon/Mars sky",
+                  "Quest locomotion",
+                  "Quest teleport grip+trigger",
+                  "performance blink reduction"
+              ],
+    "created":  "2026-06-07T03:52:18Z",
+    "reikiTouched":  false
 }

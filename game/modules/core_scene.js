@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 import { VRButton } from "three/addons/webxr/VRButton.js";
 
 export function createCore({ containerId = "app" } = {}){
@@ -21,9 +21,11 @@ export function createCore({ containerId = "app" } = {}){
   });
 
   renderer.setClearColor(0x050508, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isQuest ? 0.72 : isMobile ? 0.82 : 0.95));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 0.72));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
+  // SVR_1_4G_PERFORMANCE_LOCK: Quest blink/blank-frame reduction.
+  renderer.xr.setFramebufferScaleFactor?.(0.72);
   renderer.xr.setFramebufferScaleFactor?.(isQuest ? 0.72 : 0.9);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -62,3 +64,4 @@ function shadowOff(renderer){
   renderer.shadowMap.enabled = false;
   renderer.shadowMap.type = THREE.BasicShadowMap;
 }
+
