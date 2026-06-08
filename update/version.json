@@ -1,6 +1,6 @@
 ﻿{
-  "build": "VERSION-1.6.3-FORCE-LIVE-SKY-NO-REIKI",
-  "phase": "1.6.3",
-  "scope": "game only; force live phase label; hard-lock Moon/Mars; no Reiki room touch",
-  "updatedAt": "2026-06-08T15:48:37.8243995-05:00"
+  "build": "VERSION-1.6.4-MOON-MARS-HEIGHT-4500-MARS-300",
+  "phase": "1.6.4",
+  "scope": "game only; hard force Moon/Mars height 4500; Mars size 300; no Reiki touch",
+  "updatedAt": "2026-06-08T16:11:31.0110288-05:00"
 }

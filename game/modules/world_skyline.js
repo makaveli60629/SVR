@@ -1,4 +1,5 @@
-﻿/* VERSION-1.6.3-FORCE-LIVE-SKY-NO-REIKI: final high Moon/Mars force, no Reiki room touch. */
+﻿/* VERSION-1.6.4-MOON-MARS-HEIGHT-4500-MARS-300: final force high sky. */
+/* VERSION-1.6.3-FORCE-LIVE-SKY-NO-REIKI: final high Moon/Mars force, no Reiki room touch. */
 /* VERSION-1.6.2-BUILDING-TIER-RESTRUCTURE-MOON-LOCK: Moon/Mars height 3000 size 340; building tier corridor lock. */
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
@@ -2229,7 +2230,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.018
     })
   );
-  moon.position.set(-185, wallHeight + 3000.0, -(R + 2150.0));
+  moon.position.set(-260, wallHeight + 4500.0, -(R + 3100.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.18);
@@ -2250,7 +2251,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.014
     })
   );
-  mars.position.set(145, wallHeight + 3150.0, -(R + 2450.0));
+  mars.position.set(240, wallHeight + 4500.0, -(R + 3550.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
@@ -2639,6 +2640,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+
 
 
 
