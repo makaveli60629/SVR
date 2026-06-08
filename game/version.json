@@ -2,5 +2,5 @@
   "build": "VERSION-1.5.4-REIKI-HUD-SCOPE-FIX",
   "phase": "1.5.4",
   "scope": "game only; global Reiki popup removed; Reiki HUD scoped to storefront",
-  "updatedAt": "2026-06-08T13:00:21.9867999-05:00"
+  "updatedAt": "2026-06-08T13:16:29.6132455-05:00"
 }
