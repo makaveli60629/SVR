@@ -1,0 +1,56 @@
+﻿{
+  "build": "VERSION-1.6.2-BUILDING-TIER-RESTRUCTURE-MOON-LOCK",
+  "coreRule": "Buildings must be viewable from the lobby and must never block Moon/Mars from the lobby north/up sightline.",
+  "moon": {
+    "height": 3000,
+    "scale": 340,
+    "texture": "game/assets/textures/moon.jpg",
+    "lock": true
+  },
+  "mars": {
+    "height": 3000,
+    "scale": 340,
+    "texture": "game/assets/textures/mars.jpg",
+    "lock": true
+  },
+  "planetSightlineCorridor": {
+    "minX": -760,
+    "maxX": 560,
+    "minZ": -3100,
+    "maxZ": -600,
+    "maxY": 260,
+    "maxScaleY": 0.95,
+    "rule": "Any building inside this corridor is capped or moved out. Do not add sponsor signage here."
+  },
+  "tiers": [
+    {
+      "tier": 1,
+      "name": "Major Sponsor Megatron Buildings",
+      "purpose": "large paid/featured sponsor anchor buildings",
+      "locations": ["far north-left", "far north-right", "east outer ring", "west outer ring"],
+      "maxY": 360,
+      "viewableFromLobby": true,
+      "notAllowed": "center north Moon/Mars corridor"
+    },
+    {
+      "tier": 2,
+      "name": "Mid Sponsor Banner Buildings",
+      "purpose": "medium sponsor banners and secondary storefront support",
+      "locations": ["low north sides", "east/west ring"],
+      "maxY": 220,
+      "viewableFromLobby": true,
+      "notAllowed": "above planet corridor cap"
+    },
+    {
+      "tier": 3,
+      "name": "Low Local Ad / City Filler",
+      "purpose": "small banners, local ad placeholders, skyline filler",
+      "locations": ["front low ring", "side low ring"],
+      "maxY": 125,
+      "viewableFromLobby": true,
+      "notAllowed": "blocking Moon/Mars or storefront text"
+    }
+  ],
+  "permanentLock": true,
+  "nextRule": "After building tiers are visually confirmed from the lobby, lock Moon/Mars final values."
+}

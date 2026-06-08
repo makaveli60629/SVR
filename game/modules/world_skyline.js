@@ -1,4 +1,5 @@
-﻿import * as THREE from "three";
+﻿/* VERSION-1.6.2-BUILDING-TIER-RESTRUCTURE-MOON-LOCK: Moon/Mars height 3000 size 340; building tier corridor lock. */
+import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
@@ -2637,6 +2638,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+
 
 
 
