@@ -1,6 +1,6 @@
 ﻿{
-  "build": "VERSION-1.6.2-BUILDING-TIER-RESTRUCTURE-MOON-LOCK",
-  "phase": "1.6.2",
-  "scope": "game only; building tier restructure first; Moon/Mars height 3000 size 340",
-  "updatedAt": "2026-06-08T15:28:17.4970608-05:00"
+  "build": "VERSION-1.6.3-FORCE-LIVE-SKY-NO-REIKI",
+  "phase": "1.6.3",
+  "scope": "game only; force live phase label; hard-lock Moon/Mars; no Reiki room touch",
+  "updatedAt": "2026-06-08T15:47:00.9325966-05:00"
 }
