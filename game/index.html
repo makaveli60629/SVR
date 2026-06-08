@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>SVR Poker • Phase 84B Performance Preloader Android Sky Lock</title>
+  <meta name="theme-color" content="#050508"/>
+  <link rel="manifest" href="./manifest.json"/>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { height: 100%; margin: 0; background: #000; overflow: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; width: 100%; height: 100%; background: #000; outline: none; }
+    #hud {
+      position: fixed; left: 12px; right: 12px; top: 12px; z-index: 10;
+      display: flex; gap: 10px; align-items: center; justify-content: space-between;
+      pointer-events: none;
+    }
+    .pill {
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.35);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #e9e9ff;
+      font-size: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      pointer-events: none;
+    }
+    .btn {
+      pointer-events: auto;
+      border: 1px solid rgba(180,140,255,.45);
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn:hover { background: rgba(60,40,90,.55); }
+    #sceneNav{
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 12;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+      pointer-events: auto;
+    }
+    .scene-btn{
+      border: 1px solid rgba(120,255,186,.42);
+      background: rgba(2,10,8,.62);
+      color: #eafff4;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      font-size: 12px;
+    }
+    .scene-btn:hover{ background: rgba(10,48,33,.72); }
+    body.preview-mode #sceneNav { display:none !important; }
+    #log {
+      position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10;
+      max-height: 38vh; overflow: auto; display: none;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(180,140,255,.25);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: #d7d7ff;
+      font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+    #err {
+      position: fixed; inset: 0; display: none; z-index: 50;
+      background: rgba(0,0,0,.88);
+      color: #fff;
+      padding: 18px;
+      font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      overflow: auto;
+    }
+
+    body.preview-mode #hud,
+    body.preview-mode #log,
+    body.preview-mode #err { display: none !important; }
+    #svr-preloader{
+      position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px;
+      background: radial-gradient(circle at 50% 35%, rgba(84,39,140,.34), rgba(0,0,0,.94) 52%, #000 100%);
+      color:#f5f0ff; text-align:center; transition:opacity .45s ease, visibility .45s ease;
+    }
+    #svr-preloader.svr-ready{ opacity:0; visibility:hidden; pointer-events:none; }
+    .svr-loader-logo{ width:96px; height:96px; object-fit:contain; filter:drop-shadow(0 0 24px rgba(190,120,255,.8)); animation:svrPulse 1.8s ease-in-out infinite; }
+    .svr-loader-title{ font-weight:800; letter-spacing:.14em; font-size:15px; text-transform:uppercase; }
+    .svr-loader-note{ color:#cfc2ff; font-size:12px; max-width:320px; line-height:1.4; }
+    .svr-loader-bar{ width:220px; height:4px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.12); }
+    .svr-loader-bar::after{ content:""; display:block; width:46%; height:100%; border-radius:999px; background:linear-gradient(90deg,#77f6ff,#b875ff,#fff); animation:svrLoad 1.2s ease-in-out infinite; }
+    @keyframes svrLoad{ 0%{ transform:translateX(-120%);} 100%{ transform:translateX(260%);} }
+    @keyframes svrPulse{ 0%,100%{ transform:scale(1); opacity:.92;} 50%{ transform:scale(1.045); opacity:1;} }
+
+    .android-controls{ position:fixed; inset:0; pointer-events:none; z-index:30; touch-action:none; }
+    .android-stick-zone{ position:absolute; left:22px; bottom:24px; width:148px; height:148px; pointer-events:auto; touch-action:none; }
+    .android-stick-base{ position:absolute; inset:14px; border-radius:50%; border:1px solid rgba(130,245,255,.42); background:rgba(0,0,0,.46); box-shadow:0 0 22px rgba(90,190,255,.20); }
+    .android-stick-knob{ position:absolute; left:50%; top:50%; width:54px; height:54px; transform:translate(-50%,-50%); border-radius:50%; background:rgba(160,110,255,.72); border:1px solid rgba(255,255,255,.55); box-shadow:0 0 24px rgba(180,125,255,.44); }
+    .android-stick-label{ position:absolute; left:0; right:0; bottom:-8px; font:700 11px/1 system-ui; letter-spacing:.14em; color:#dffaff; text-align:center; text-shadow:0 1px 8px #000; }
+    .android-turn-zone{ position:absolute; right:22px; bottom:32px; display:flex; gap:12px; pointer-events:auto; }
+    .android-turn-btn{ width:58px; height:58px; border-radius:18px; border:1px solid rgba(130,245,255,.42); background:rgba(0,0,0,.52); color:#fff; font-size:28px; box-shadow:0 0 22px rgba(90,190,255,.20); }
+    .android-controls-disabled .android-controls,
+    body:not(.android-controls-enabled) .android-controls,
+    body.preview-mode .android-controls{ display:none !important; opacity:0 !important; pointer-events:none !important; }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="svr-preloader" role="status" aria-live="polite">
+    <img class="svr-loader-logo" src="./assets/ui/logo.png" alt="SVR Poker logo"/>
+    <div class="svr-loader-title">Loading SVR Poker</div>
+    <div class="svr-loader-note">Optimizing sky, controllers, and Android-only movement controls…</div>
+    <div class="svr-loader-bar" aria-hidden="true"></div>
+  </div>
+  <div id="app"></div>
+
+  <div id="hud">
+    <div class="pill" id="status">Booting…</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
+      <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
+      <span class="pill" id="mode">Hands: …</span>
+      <span class="pill">BUILD: PHASE-84B-PERFORMANCE-PRELOADER-ANDROID-SKY-LOCK</span>
+    </div>
+  </div>
+
+  <div id="sceneNav">
+    <button class="scene-btn" data-scene="lobby">Lobby</button>
+    <button class="scene-btn" data-scene="table">Table</button>
+    <button class="scene-btn" data-scene="seat">Seat</button>
+    <button class="scene-btn" data-scene="reiki">Reiki</button>
+    <button class="scene-btn" data-scene="reikiRoom">Reiki Room</button>
+    <button class="scene-btn" data-scene="pga">PGA</button>
+    <button class="scene-btn" data-scene="legends">Legend</button>
+    <button class="scene-btn" data-scene="sponsor">Sponsor</button>
+    <button class="scene-btn" data-scene="scorpion">Scorpion</button>
+  </div>
+
+  <pre id="log"></pre>
+  <pre id="err"></pre>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

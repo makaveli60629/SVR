@@ -1,20 +1,7 @@
 ﻿{
-    "version":  "1.4G",
+    "updatedAt":  "2026-06-08T03:03:09Z",
+    "build":  "PHASE-84B-PERFORMANCE-PRELOADER-ANDROID-SKY-LOCK",
+    "gameZip":  "update/game.zip",
     "siteTouched":  false,
-    "protected":  [
-                      "Reiki",
-                      "site",
-                      "lobby storefront layout",
-                      "poker"
-                  ],
-    "build":  "VERSION-1.4G-SKY-LOCOMOTION-NOZIP-DEPLOY",
-    "deployMode":  "direct-game-folder-no-update-zip",
-    "scope":  [
-                  "Moon/Mars sky",
-                  "Quest locomotion",
-                  "Quest teleport grip+trigger",
-                  "performance blink reduction"
-              ],
-    "created":  "2026-06-07T03:52:18Z",
-    "reikiTouched":  false
+    "track":  "game-only"
 }

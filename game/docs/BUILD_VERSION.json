@@ -1,0 +1,14 @@
+{
+  "build": "PHASE-84B-PERFORMANCE-PRELOADER-ANDROID-SKY-LOCK",
+  "created": "2026-06-08",
+  "track": "game-only",
+  "siteTouched": false,
+  "locks": [
+    "Android joystick visible only on Android browser",
+    "Desktop and Quest/WebXR hide Android joystick overlay",
+    "Moon larger, higher, textured, rotating",
+    "Mars larger, higher, textured, orbiting Moon",
+    "Preloader splash added",
+    "Hot path object allocations reduced"
+  ]
+}
