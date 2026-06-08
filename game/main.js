@@ -14,7 +14,7 @@ const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-119-REIKI-TRUEITIVE-1-4G-HOLOGRAM-FRONT-FINAL-LOCK', source: '1.4G Reiki storefront backup with clean non-overlapping hologram carousel' };
+window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK', source: '1.4G Reiki storefront backup with Phase 120 yaw-only alignment and high Moon/Mars lock' };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -370,7 +370,7 @@ tp.setLogoTexture(logoTexture);
 
 window.__SVR_GAME_READY__ = true;
 const __svrBootFallback = document.getElementById('bootFallback'); if (__svrBootFallback){ __svrBootFallback.style.opacity='0'; __svrBootFallback.style.pointerEvents='none'; setTimeout(()=>{__svrBootFallback.style.display='none';},420); }
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Right stick moves/snaps. Music disabled. Phase 119 Reiki storefront locked. Store portal ready.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Right stick moves/snaps. Music disabled. Phase 120 Reiki storefront alignment locked. Store portal ready.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

@@ -2227,11 +2227,11 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.018
     })
   );
-  moon.position.set(-64, wallHeight + 136.0, -(R + 285.0));
+  moon.position.set(-58, wallHeight + 188.0, -(R + 336.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.18);
-  moonHalo.scale.set(158.0, 158.0, 1);
+  moonHalo.scale.set(184.0, 184.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
@@ -2248,13 +2248,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.014
     })
   );
-  mars.position.set(-18, wallHeight + 152.0, -(R + 325.0));
+  mars.position.set(-6, wallHeight + 216.0, -(R + 380.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.12);
-  marsHalo.scale.set(82.0, 82.0, 1);
+  marsHalo.scale.set(96.0, 96.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2462,16 +2462,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     // Phase 105: keep the Phase 87/88 Reiki hub, but restore the higher/larger Update 3.0 sky lock.
     moon.position.set(
       -48 + Math.sin(t * 0.018) * 4.5,
-      wallHeight + 142.0 + Math.sin(t * 0.070) * 1.8,
-      -(R + 286.0) + Math.cos(t * 0.014) * 5.0
+      wallHeight + 192.0 + Math.sin(t * 0.070) * 2.2,
+      -(R + 340.0) + Math.cos(t * 0.014) * 6.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     const marsOrbit = t * 0.16;
     mars.position.set(
       moon.position.x + Math.cos(marsOrbit) * 43.0,
-      moon.position.y + 14.0 + Math.sin(marsOrbit * 1.35) * 6.5,
-      moon.position.z + Math.sin(marsOrbit) * 34.0 - 10.0
+      moon.position.y + 24.0 + Math.sin(marsOrbit * 1.35) * 7.5,
+      moon.position.z + Math.sin(marsOrbit) * 42.0 - 14.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.09;

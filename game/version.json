@@ -1,9 +1,9 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-119-REIKI-TRUEITIVE-1-4G-HOLOGRAM-FRONT-FINAL-LOCK",
+  "build": "UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK",
   "created": "2026-06-08",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 119,
-  "focus": "Final restore of screenshot-matched Trueitive/Reiki 1.4G storefront: glass frame extension, long red carpet, red ropes/stanchions, plants, founder/about/store/video slide hologram, proximity audio, high Moon/Mars, no lobby music."
+  "phase": 120,
+  "focus": "Fix Reiki storefront alignment so red carpet/glass extension stays level, restore screenshot-style Trueitive storefront, keep hologram carousel, raise Moon and Mars higher."
 }

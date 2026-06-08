@@ -1,7 +1,7 @@
 # Phase 119 — Trueitive Reiki 1.4G Hologram Front Final Lock
 
 ## Build label
-UPDATE-3.0-PHASE-119-REIKI-TRUEITIVE-1-4G-HOLOGRAM-FRONT-FINAL-LOCK
+UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK
 
 ## Owner screenshot target
 This restores the storefront toward the screenshot-approved 1.4G Reiki/Trueitive presentation structure.

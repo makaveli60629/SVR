@@ -1,7 +1,7 @@
 # Phase 117 — Reiki Trueitive Storefront + Loading + Moon/Mars Lock
 
 ## Build label
-`UPDATE-3.0-PHASE-119-REIKI-TRUEITIVE-1-4G-HOLOGRAM-FRONT-FINAL-LOCK`
+`UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK`
 
 ## Source
 Built from the Phase 115 restore/no-music backup and Phase 113 handoff rules.
@@ -17,7 +17,7 @@ Built from the Phase 115 restore/no-music backup and Phase 113 handoff rules.
 - Keeps public website untouched.
 
 ## Verify
-- HUD/build label should show `UPDATE-3.0-PHASE-119-REIKI-TRUEITIVE-1-4G-HOLOGRAM-FRONT-FINAL-LOCK`.
+- HUD/build label should show `UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK`.
 - Reiki front should show Trueitive/Reiki presentation, not a generic missing placeholder.
 - Hologram carousel button/portal should remain accessible.
 - Moon and Mars should be visible above the skyline.

@@ -58,7 +58,7 @@ function cylinderBetween(a,b, radius, mat){
 }
 
 export function applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, sceneTargets, setStatus=()=>{}, log=()=>{} }={}){
-  if(!scene || scene.userData._phase119ReikiTrueitiveStorefront) return scene?.userData?._phase119ReikiTrueitiveStorefront || null;
+  if(!scene || scene.userData._phase120ReikiTrueitiveStorefront) return scene?.userData?._phase119ReikiTrueitiveStorefront || null;
   const rec = sceneTargets?.reiki || sceneTargets?.reikiRoom;
   if(!rec?.pos || !rec?.look) return null;
 
@@ -73,7 +73,14 @@ export function applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, scen
   const group = new THREE.Group();
   group.name = 'PHASE119 TRUEITIVE 1.4G STOREFRONT GLASS EXTENSION FINAL';
   group.position.copy(center);
-  group.lookAt(front.x, 1.55, front.z);
+  // Phase 120 alignment fix:
+  // Do not use lookAt() with a higher Y target here. That pitched the whole storefront
+  // upward, turning the red carpet/glass extension into a giant canopy over the player.
+  // The 1.4G storefront uses local +Z as the red-carpet entrance direction, so yaw only.
+  const entryDir = new THREE.Vector3().subVectors(front, center);
+  entryDir.y = 0;
+  if (entryDir.lengthSq() < 0.0001) entryDir.set(0, 0, 1); else entryDir.normalize();
+  group.rotation.set(0, Math.atan2(entryDir.x, entryDir.z), 0);
   scene.add(group);
 
   const matTeal = new THREE.MeshStandardMaterial({ color:0x7dfff0, roughness:.18, metalness:.48, emissive:0x1cbca8, emissiveIntensity:1.08 });
@@ -84,7 +91,10 @@ export function applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, scen
 
   // Long red carpet runway / presentation entry.
   const carpet = new THREE.Mesh(new THREE.PlaneGeometry(5.25, 9.6), matRed);
-  carpet.rotation.x = -Math.PI/2; carpet.position.set(0, .018, 2.55); group.add(carpet);
+  carpet.rotation.x = -Math.PI / 2;
+  carpet.position.set(0, 0.021, 2.55);
+  carpet.renderOrder = 8;
+  group.add(carpet);
   const carpetEdgeL = new THREE.Mesh(new THREE.BoxGeometry(.08,.06,9.6), matTeal); carpetEdgeL.position.set(-2.68,.055,2.55); group.add(carpetEdgeL);
   const carpetEdgeR = carpetEdgeL.clone(); carpetEdgeR.position.x=2.68; group.add(carpetEdgeR);
 
@@ -172,7 +182,7 @@ export function applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, scen
   const prime = async()=>{ userPrimed=true; if(near){ video.muted=false; try{ await video.play(); activated=true; }catch(_e){} } };
   window.addEventListener('pointerdown', prime, {passive:true});
   window.addEventListener('keydown', prime);
-  scene.userData._tickReikiPhase119 = (dt=0)=>{
+  scene.userData._tickReikiPhase120 = (dt=0)=>{
     const t=performance.now()*0.001;
     slideMeshes.forEach((m,idx)=>{
       const a=t*.55+m.userData.baseAngle; const r=.98;
@@ -190,13 +200,13 @@ export function applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, scen
     }
   };
   const prevTick = scene.userData._tickWorld;
-  if(prevTick && !scene.userData._phase119WrappedTick){
-    scene.userData._tickWorld = (dt)=>{ prevTick(dt); if(scene.userData._tickReikiPhase119) scene.userData._tickReikiPhase119(dt); };
-    scene.userData._phase119WrappedTick=true;
+  if(prevTick && !scene.userData._phase120WrappedTick){
+    scene.userData._tickWorld = (dt)=>{ prevTick(dt); if(scene.userData._tickReikiPhase120) scene.userData._tickReikiPhase120(dt); };
+    scene.userData._phase120WrappedTick=true;
   }
 
-  scene.userData._phase119ReikiTrueitiveStorefront = { group, video, slider };
+  scene.userData._phase120ReikiTrueitiveStorefront = { group, video, slider };
   setStatus('Trueitive Reiki 1.4G storefront restored. Hologram audio zone armed.');
-  log?.('Phase 119 Trueitive/Reiki storefront final overlay active');
-  return scene.userData._phase119ReikiTrueitiveStorefront;
+  log?.('Phase 120 Reiki storefront alignment + high Moon/Mars lock active');
+  return scene.userData._phase120ReikiTrueitiveStorefront;
 }
