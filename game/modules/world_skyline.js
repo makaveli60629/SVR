@@ -1,4 +1,5 @@
-﻿/* VERSION-1.6.5-SINGLE-SKY-CONTROLLER-LOCK: one sky controller only, no 1.6.3/1.6.4 back-and-forth. */
+﻿/* VERSION-1.6.6-CELESTIAL-BODIES-NEON-LOCK: celestial-bodies.js is the single sky controller. */
+/* VERSION-1.6.5-SINGLE-SKY-CONTROLLER-LOCK: one sky controller only, no 1.6.3/1.6.4 back-and-forth. */
 /* VERSION-1.6.4-MOON-MARS-HEIGHT-4500-MARS-300: final force high sky. */
 /* VERSION-1.6.3-FORCE-LIVE-SKY-NO-REIKI: final high Moon/Mars force, no Reiki room touch. */
 /* VERSION-1.6.2-BUILDING-TIER-RESTRUCTURE-MOON-LOCK: Moon/Mars height 3000 size 340; building tier corridor lock. */
@@ -2641,6 +2642,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+
 
 
 

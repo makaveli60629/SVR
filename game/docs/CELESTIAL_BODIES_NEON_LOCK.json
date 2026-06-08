@@ -1,0 +1,28 @@
+﻿{
+  "build": "VERSION-1.6.6-CELESTIAL-BODIES-NEON-LOCK",
+  "module": "game/modules/celestial-bodies.js",
+  "rule": "celestial-bodies.js is the only active Moon/Mars sky controller. Old sky modules are removed from index.html.",
+  "moon": {
+    "position": [-280, 4500, -3200],
+    "scale": [340, 340, 340],
+    "texture": "game/assets/textures/moon.jpg",
+    "lighting": "#9B30FF directional neon edge light"
+  },
+  "mars": {
+    "position": [260, 4500, -3700],
+    "scale": [300, 300, 300],
+    "texture": "game/assets/textures/mars.jpg",
+    "lighting": "#FF007F directional neon edge light"
+  },
+  "performance": {
+    "raycastable": false,
+    "oldDuplicatesHidden": true,
+    "buildingCorridorCapped": true
+  },
+  "protected": {
+    "reikiRoomTouched": false,
+    "siteTouched": false,
+    "lobbyRebuilt": false
+  },
+  "locked": true
+}
