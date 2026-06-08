@@ -1,9 +1,6 @@
-{
-  "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK",
-  "created": "2026-06-08",
-  "track": "game-only",
-  "siteTouched": false,
-  "phase": 120,
-  "focus": "Fix Reiki storefront alignment so red carpet/glass extension stays level, restore screenshot-style Trueitive storefront, keep hologram carousel, raise Moon and Mars higher."
+﻿{
+  "build": "VERSION-1.5.3-REIKI-CAROUSEL-SKY-LOCK",
+  "phase": "1.5.3",
+  "scope": "game only; Reiki carousel storefront; high Moon/Mars sky lock",
+  "updatedAt": "2026-06-08T01:58:59.3955245-05:00"
 }
