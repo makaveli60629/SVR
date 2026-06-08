@@ -1,6 +1,6 @@
 ﻿{
-  "build": "VERSION-1.5.6-REIKI-STOREFRONT-WALL-LAYOUT",
-  "phase": "1.5.6",
-  "scope": "game only; Reiki storefront wall layout; no popup overlay",
-  "updatedAt": "2026-06-08T14:03:46.2138049-05:00"
+  "build": "VERSION-1.5.7-MOON-HEIGHT-FORWARD-STICK-FIX",
+  "phase": "1.5.7",
+  "scope": "game only; moon higher; camera-forward controller stick",
+  "updatedAt": "2026-06-08T14:15:12.2682743-05:00"
 }
