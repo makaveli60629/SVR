@@ -1,6 +1,6 @@
 ﻿{
-  "build": "VERSION-1.5.3-REIKI-CAROUSEL-SKY-LOCK",
-  "phase": "1.5.3",
-  "scope": "game only; Reiki carousel storefront; high Moon/Mars sky lock",
-  "updatedAt": "2026-06-08T13:45:37.3125521-05:00"
+  "build": "VERSION-1.5.6-REIKI-STOREFRONT-WALL-LAYOUT",
+  "phase": "1.5.6",
+  "scope": "game only; Reiki storefront wall layout; no popup overlay",
+  "updatedAt": "2026-06-08T14:01:59.4877250-05:00"
 }
