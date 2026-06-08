@@ -1,0 +1,20 @@
+﻿{
+  "build": "VERSION-1.6.1-MOON-MARS-HEIGHT-3000-SIZE-350",
+  "rule": "Moon and Mars are locked to height 3000 and size 350. They orbit the lobby outline on a high north/up arc.",
+  "height": 3000,
+  "size": 350,
+  "moon": {
+    "height": 3000,
+    "scale": 350,
+    "orbitRadius": 1880,
+    "texture": "game/assets/textures/moon.jpg"
+  },
+  "mars": {
+    "height": 3000,
+    "scale": 350,
+    "orbitRadius": 2220,
+    "texture": "game/assets/textures/mars.jpg"
+  },
+  "visibilityRule": "Buildings and banners inside the north sky corridor are capped below the planet sightline.",
+  "locked": true
+}

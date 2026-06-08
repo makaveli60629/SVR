@@ -1,6 +1,6 @@
 ﻿{
-  "build": "VERSION-1.5.9-LOBBY-ORBIT-SKY-LOCK",
-  "phase": "1.5.9",
-  "scope": "game only; Moon/Mars lobby-outline high orbit; visibility corridor",
-  "updatedAt": "2026-06-08T14:40:59.9708255-05:00"
+  "build": "VERSION-1.6.1-MOON-MARS-HEIGHT-3000-SIZE-350",
+  "phase": "1.6.1",
+  "scope": "game only; Moon/Mars height 3000 size 350",
+  "updatedAt": "2026-06-08T15:11:50.8846707-05:00"
 }
