@@ -1,6 +1,6 @@
 ﻿{
-  "build": "VERSION-1.5.8-SKYLINE-TIER-LOCK",
-  "phase": "1.5.8",
-  "scope": "game only; permanent skyline tier lock; high Moon/Mars visibility corridor",
-  "updatedAt": "2026-06-08T14:29:54.5440968-05:00"
+  "build": "VERSION-1.5.9-LOBBY-ORBIT-SKY-LOCK",
+  "phase": "1.5.9",
+  "scope": "game only; Moon/Mars lobby-outline high orbit; visibility corridor",
+  "updatedAt": "2026-06-08T14:40:59.9708255-05:00"
 }

@@ -1,0 +1,41 @@
+﻿{
+  "build": "VERSION-1.5.9-LOBBY-ORBIT-SKY-LOCK",
+  "rule": "Moon and Mars orbit the lobby/city outline at very high altitude and must stay visible above buildings.",
+  "orbit": {
+    "center": { "x": 0, "y": 0, "z": -60 },
+    "moon": {
+      "radius": 1280,
+      "height": 1020,
+      "scale": 132,
+      "speed": 0.000030,
+      "spin": 0.000150,
+      "phase": -1.05,
+      "texture": "game/assets/textures/moon.jpg"
+    },
+    "mars": {
+      "radius": 1520,
+      "height": 1080,
+      "scale": 66,
+      "speed": 0.000044,
+      "spin": 0.000210,
+      "phase": -0.62,
+      "texture": "game/assets/textures/mars.jpg"
+    }
+  },
+  "visibility": {
+    "description": "Planets stay on the high north/up arc. Skyline objects in the corridor are capped/lowered, not removed.",
+    "buildingCapCorridor": {
+      "minX": -360,
+      "maxX": 180,
+      "minZ": -1900,
+      "maxZ": -680,
+      "maxY": 330,
+      "maxScaleY": 1.16
+    }
+  },
+  "locked": true,
+  "doNotMoveWithoutUpdating": [
+    "game/docs/SKYLINE_TIER_LOCK.json",
+    "game/docs/LOBBY_ORBIT_SKY_LOCK.json"
+  ]
+}

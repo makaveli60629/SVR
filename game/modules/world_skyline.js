@@ -2227,7 +2227,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.018
     })
   );
-  moon.position.set(-165, wallHeight + 860.0, -(R + 1220.0));
+  moon.position.set(-165, wallHeight + 1000.0, -(R + 1220.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.18);
@@ -2248,7 +2248,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.014
     })
   );
-  mars.position.set(-38, wallHeight + 905.0, -(R + 1390.0));
+  mars.position.set(-38, wallHeight + 1060.0, -(R + 1390.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
@@ -2637,6 +2637,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+
 
 
 
