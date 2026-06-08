@@ -2,5 +2,5 @@
   "build": "VERSION-1.6.5-SINGLE-SKY-CONTROLLER-LOCK",
   "phase": "1.6.5",
   "scope": "game only; remove old sky modules; one Moon/Mars controller; no Reiki touch",
-  "updatedAt": "2026-06-08T16:24:20.7485352-05:00"
+  "updatedAt": "2026-06-08T16:26:08.6812400-05:00"
 }
