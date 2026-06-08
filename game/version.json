@@ -1,6 +1,6 @@
 ﻿{
-  "build": "VERSION-1.5.7-MOON-HEIGHT-FORWARD-STICK-FIX",
-  "phase": "1.5.7",
-  "scope": "game only; moon higher; camera-forward controller stick",
-  "updatedAt": "2026-06-08T14:15:12.2682743-05:00"
+  "build": "VERSION-1.5.8-SKYLINE-TIER-LOCK",
+  "phase": "1.5.8",
+  "scope": "game only; permanent skyline tier lock; high Moon/Mars visibility corridor",
+  "updatedAt": "2026-06-08T14:29:54.5440968-05:00"
 }

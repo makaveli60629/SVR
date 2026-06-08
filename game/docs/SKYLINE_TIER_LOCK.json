@@ -1,0 +1,77 @@
+﻿{
+  "build": "VERSION-1.5.8-SKYLINE-TIER-LOCK",
+  "lockedRule": "Moon/Mars must be visible above the skyline. No building, billboard, portal, hologram, or ad panel may occupy the north sky corridor.",
+  "moon": {
+    "position": [-165, 880, -1220],
+    "scale": 128,
+    "texture": "game/assets/textures/moon.jpg",
+    "purpose": "Permanent real/textured moon visible above skyline"
+  },
+  "mars": {
+    "position": [-38, 925, -1390],
+    "scale": 64,
+    "texture": "game/assets/textures/mars.jpg",
+    "purpose": "Permanent real/textured Mars visible above skyline"
+  },
+  "clearSightlineCorridor": {
+    "minX": -260,
+    "maxX": 95,
+    "minZ": -1550,
+    "maxZ": -720,
+    "maxBuildingY": 285,
+    "maxHeightScaleY": 1.22,
+    "rule": "Buildings inside this corridor get capped/lowered, never raised."
+  },
+  "tiers": [
+    {
+      "id": "T1-MEGATRON-NORTH",
+      "tier": 1,
+      "purpose": "Primary sponsor megatron / north skyline anchor",
+      "location": "north outer skyline, behind lobby wall",
+      "position": { "x": -360, "y": 150, "z": -980 },
+      "maxY": 320,
+      "lock": true,
+      "rule": "Never place in Moon/Mars sightline corridor."
+    },
+    {
+      "id": "T1-MEGATRON-EAST",
+      "tier": 1,
+      "purpose": "Primary sponsor megatron / east skyline anchor",
+      "location": "east outer skyline",
+      "position": { "x": 620, "y": 155, "z": -250 },
+      "maxY": 340,
+      "lock": true
+    },
+    {
+      "id": "T1-MEGATRON-WEST",
+      "tier": 1,
+      "purpose": "Primary sponsor megatron / west skyline anchor",
+      "location": "west outer skyline",
+      "position": { "x": -620, "y": 155, "z": -250 },
+      "maxY": 340,
+      "lock": true
+    },
+    {
+      "id": "T2-MID-BANNER-RING",
+      "tier": 2,
+      "purpose": "Mid sponsor banner building set",
+      "location": "outer side ring, below planet sightline",
+      "maxY": 255,
+      "lock": true
+    },
+    {
+      "id": "T3-SMALL-BANNER-LOW",
+      "tier": 3,
+      "purpose": "Small local ads and decorative city filler",
+      "location": "low front skyline and side fillers",
+      "maxY": 145,
+      "lock": true
+    }
+  ],
+  "doNotTouch": [
+    "Reiki storefront runtime",
+    "website/site",
+    "private Reiki room route",
+    "lobby baseline layout"
+  ]
+}
