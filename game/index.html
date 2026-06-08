@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • Update 3.0 Phase 116 Reiki Screenshot Storefront No Music Lock</title>
+  <title>ScarlettVR Poker • Phase 115 Restore Phase 113 Reiki No Music Lock</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -79,13 +79,16 @@
     body.preview-mode #log,
     body.preview-mode #err { display: none !important; }
 
-    #bootFallback{position:fixed;inset:0;z-index:45;display:none;place-items:center;background:radial-gradient(circle at 50% 45%,rgba(88,255,244,.16),transparent 36%),#000;color:#eaffff;padding:24px;text-align:center;}
-    #posPanel{position:fixed;right:12px;top:84px;z-index:14;min-width:270px;max-width:360px;background:rgba(0,8,18,.74);border:1px solid rgba(94,247,255,.48);border-radius:16px;color:#eaffff;font:12px/1.35 ui-monospace,Consolas,monospace;padding:10px 12px;box-shadow:0 0 24px rgba(94,247,255,.14);white-space:pre-wrap;backdrop-filter:blur(8px);}
-    #posPanel b{color:#9ffcff;font-family:system-ui,Arial,sans-serif;font-size:13px;}
+    #bootFallback{position:fixed;inset:0;z-index:45;display:grid;place-items:center;background:radial-gradient(circle at 50% 45%,rgba(88,255,244,.16),transparent 36%),#000;color:#eaffff;padding:24px;text-align:center;}
     #bootFallback .card{max-width:620px;border:1px solid rgba(88,255,244,.42);border-radius:24px;background:rgba(0,8,14,.86);box-shadow:0 0 34px rgba(88,255,244,.18);padding:22px;}
     #bootFallback h2{margin:0 0 8px;text-shadow:0 0 18px rgba(88,255,244,.7);}
     #bootFallback p{color:#bfefff;line-height:1.45;}
     #bootFallback a{display:inline-block;margin-top:10px;border:1px solid rgba(181,108,255,.55);border-radius:999px;padding:12px 16px;color:#fff;text-decoration:none;background:rgba(40,0,70,.72);font-weight:800;}
+
+
+    #bootFallback .loader{width:58px;height:58px;border-radius:999px;border:4px solid rgba(88,255,244,.22);border-top-color:#58fff4;margin:0 auto 14px;animation:svrSpin 1.05s linear infinite;box-shadow:0 0 18px rgba(88,255,244,.38);}
+    #bootFallback .statusline{margin-top:10px;color:#ffccd9;font-weight:900;letter-spacing:.06em;}
+    @keyframes svrSpin{to{transform:rotate(360deg)}}
 
   </style>
   <script type="importmap">
@@ -102,9 +105,11 @@
 
   <div id="bootFallback">
     <div class="card">
-      <h2>SVR Game Boot Fallback</h2>
-      <p>The full 3D lobby is still loading or a browser module stalled. Lobby music is manual only, and Reiki hologram stays paused and only plays after entering through the Reiki area portal.</p>
-      <a href="./reiki-video-portal.html?v=phase92-reiki-complete-update">Open Reiki Hologram Portal</a>
+      <div class="loader" aria-hidden="true"></div>
+      <h2>SVR Poker Loading</h2>
+      <p>Loading Scarlett VR Poker, Reiki storefront, hologram carousel, Moon, Mars, private rooms, and poker table. Lobby music is disabled.</p>
+      <div class="statusline">PHASE 117 RESTORE LOCK</div>
+      <a href="./reiki-video-portal.html?v=phase88-reiki-hologram-pause-lock">Open Reiki Hologram Carousel</a>
     </div>
   </div>
 
@@ -115,7 +120,7 @@
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: …</span>
-      <span class="pill">BUILD: UPDATE-3.0-PHASE-116-REIKI-SCREENSHOT-STOREFRONT-NO-MUSIC-LOCK</span>
+      <span class="pill">BUILD: UPDATE-3.0-PHASE-118-REIKI-1-4G-STOREFRONT-FINAL-RESTORE-LOCK</span>
     </div>
   </div>
 
@@ -124,13 +129,8 @@
     <button class="scene-btn" data-scene="seat">Seat</button>
     <button class="scene-btn" data-scene="reiki">Reiki</button>
     <button class="scene-btn" data-scene="reikiVideoPortal">Reiki Video</button>
-    <button class="scene-btn" data-scene="reikiAbout">Reiki About</button>
     <button class="scene-btn" data-scene="pga">PGA</button>
-    <button class="scene-btn" data-scene="pgaDrive">Drive</button>
-    <button class="scene-btn" data-scene="chipPutt">Chip/Putt</button>
     <button class="scene-btn" data-scene="store">Store</button>
-    <button class="scene-btn" data-scene="storeRoom">Store Room</button>
-    <button class="scene-btn" data-scene="smokerLounge">Lounge</button>
     <button class="scene-btn" data-scene="legends">Legend</button>
     <button class="scene-btn" data-scene="sponsor">Sponsor</button>
     <button class="scene-btn" data-scene="scorpion">Scorpion</button>

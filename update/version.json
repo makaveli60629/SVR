@@ -1,7 +1,9 @@
-﻿{
-    "updatedAt":  "2026-06-08T04:14:04Z",
-    "build":  "PHASE-84B-TRUEITIVE-REIKI-STORE-HOLOGRAM-ALIGNMENT-FIX",
-    "gameZip":  "update/game.zip",
-    "siteTouched":  false,
-    "track":  "game-only"
+{
+  "version": "Update 3.0",
+  "build": "UPDATE-3.0-PHASE-118-REIKI-1-4G-STOREFRONT-FINAL-RESTORE-LOCK",
+  "created": "2026-06-08",
+  "track": "game-only",
+  "siteTouched": false,
+  "phase": 118,
+  "focus": "Final restore of Phase 113 / 1.4G Trueitive Reiki storefront: teal frame, red carpet, stanchion ropes, plants, hologram carousel/video, loading screen, high Moon/Mars, no lobby music."
 }
