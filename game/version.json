@@ -1,6 +1,6 @@
 ﻿{
-  "build": "VERSION-1.5.4-REIKI-HUD-SCOPE-FIX",
-  "phase": "1.5.4",
-  "scope": "game only; global Reiki popup removed; Reiki HUD scoped to storefront",
-  "updatedAt": "2026-06-08T13:16:29.6132455-05:00"
+  "build": "VERSION-1.5.3-REIKI-CAROUSEL-SKY-LOCK",
+  "phase": "1.5.3",
+  "scope": "game only; Reiki carousel storefront; high Moon/Mars sky lock",
+  "updatedAt": "2026-06-08T13:45:37.3125521-05:00"
 }
