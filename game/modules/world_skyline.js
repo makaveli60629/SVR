@@ -417,29 +417,29 @@ async function createPreferredTable(scene, tableTopY = 0.90, feltTex = null, log
   return { group: realTable, topY: feltY, felt: feltMesh || overlay || null };
 }
 function buildStars(scene, R){
-  const count = 4300;
+  const count = 3200;
   const pos = new Float32Array(count * 3);
   const col = new Float32Array(count * 3);
   for (let i = 0; i < count; i++){
-    const rr = R + 210 + Math.random() * 500;
+    const rr = R + 180 + Math.random() * 420;
     const theta = Math.random() * Math.PI * 2;
-    const phi = Math.random() * Math.PI * 0.52 + 0.015;
+    const phi = Math.random() * Math.PI * 0.58 + 0.02;
     pos[i*3+0] = Math.cos(theta) * Math.sin(phi) * rr;
-    pos[i*3+1] = Math.cos(phi) * rr * 0.98 + 118;
+    pos[i*3+1] = Math.cos(phi) * rr * 0.95 + 90;
     pos[i*3+2] = Math.sin(theta) * Math.sin(phi) * rr;
-    const tint = 0.84 + Math.random() * 0.16;
+    const tint = 0.88 + Math.random() * 0.12;
     col[i*3+0] = tint;
-    col[i*3+1] = 0.90 + Math.random() * 0.10;
+    col[i*3+1] = 0.92 + Math.random() * 0.08;
     col[i*3+2] = 0.98 + Math.random() * 0.02;
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
   const pts = new THREE.Points(geo, new THREE.PointsMaterial({
-    size: 0.18,
+    size: 0.14,
     sizeAttenuation: true,
     transparent: true,
-    opacity: 0.96,
+    opacity: 0.98,
     map: makeSpriteTexture(),
     vertexColors: true,
     depthWrite: false,
@@ -449,54 +449,25 @@ function buildStars(scene, R){
   scene.add(pts);
 
   const spriteGroup = new THREE.Group();
-  for (let i = 0; i < 112; i++){
+  for (let i = 0; i < 48; i++){
     const spr = new THREE.Sprite(new THREE.SpriteMaterial({
       map: makeSpriteTexture(),
       color: new THREE.Color(i % 9 === 0 ? 0xb48cff : (i % 5 === 0 ? 0x9fe4ff : 0xffffff)),
       transparent: true,
-      opacity: 0.38 + Math.random() * 0.22,
+      opacity: 0.34 + Math.random() * 0.20,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       depthTest: true
     }));
-    spr.scale.setScalar(0.055 + Math.random() * 0.15);
-    const rr = R + 240 + Math.random() * 390;
+    spr.scale.setScalar(0.038 + Math.random() * 0.12);
+    const rr = R + 220 + Math.random() * 360;
     const theta = Math.random() * Math.PI * 2;
-    const y = 180 + Math.random() * 300;
+    const y = 120 + Math.random() * 180;
     spr.position.set(Math.cos(theta) * rr, y, Math.sin(theta) * rr);
     spriteGroup.add(spr);
   }
   scene.add(spriteGroup);
-
-  const constellationGroup = new THREE.Group();
-  const lineMat = new THREE.LineBasicMaterial({ color: 0x9fe4ff, transparent: true, opacity: 0.30, depthWrite: false, blending: THREE.AdditiveBlending });
-  const starMat = new THREE.SpriteMaterial({ map: makeSpriteTexture(), color: 0xdfefff, transparent: true, opacity: 0.78, depthWrite: false, blending: THREE.AdditiveBlending });
-  const patterns = [
-    [[0,0],[1.2,.6],[2.2,.2],[3.0,1.1],[4.0,.8]],
-    [[0,0],[.7,1.0],[1.6,1.2],[2.2,.4],[3.0,.9],[3.7,0]],
-    [[0,0],[.9,.5],[1.8,0],[2.4,.8],[3.4,1.0],[4.1,.4]],
-    [[0,0],[.8,.8],[1.7,.35],[2.5,1.25],[3.2,.45]],
-    [[0,0],[.6,.7],[1.4,1.4],[2.2,.7],[3.0,0],[3.8,.65]]
-  ];
-  patterns.forEach((pat, idx)=>{
-    const baseTheta = -Math.PI * 0.78 + idx * 0.36;
-    const baseR = R + 395 + idx * 28;
-    const baseY = 178 + (idx % 3) * 32;
-    const scale = 9.5 + idx * 1.3;
-    const pts2 = pat.map(([x,y]) => new THREE.Vector3(Math.cos(baseTheta) * baseR + x * scale, baseY + y * scale, Math.sin(baseTheta) * baseR - idx * 10));
-    for (let i=0; i<pts2.length-1; i++){
-      const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([pts2[i], pts2[i+1]]), lineMat.clone());
-      constellationGroup.add(line);
-    }
-    pts2.forEach((p)=>{
-      const spr = new THREE.Sprite(starMat.clone());
-      spr.scale.setScalar(0.42);
-      spr.position.copy(p);
-      constellationGroup.add(spr);
-    });
-  });
-  scene.add(constellationGroup);
-  return { pts, spriteGroup, constellationGroup };
+  return { pts, spriteGroup };
 }
 
 function buildLobbySprites(scene, R, wallHeight){
@@ -580,8 +551,23 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
   const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
   const right = new THREE.Vector3(Math.sin(angle), 0, -Math.cos(angle));
   const center = new THREE.Vector3(Math.cos(angle) * (R - 4.05), 0.01, Math.sin(angle) * (R - 4.05));
-  const logoTex = spawnLogoTex;
-  const founderTex = spawnLogoTex;
+  const logoTex = spawnLogoTex || canvasTexture(512, 512, (x,w,h)=>{
+    x.fillStyle = '#071014'; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(124,255,226,.9)'; x.lineWidth = 18; x.strokeRect(26,26,w-52,h-52);
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#eaffff'; x.font = 'bold 86px system-ui, Arial'; x.fillText('SVR', w/2, h/2 - 32);
+    x.fillStyle = '#ff6677'; x.font = 'bold 40px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, h/2 + 58);
+  });
+  const founderTex = canvasTexture(900, 1200, (x,w,h)=>{
+    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#140810'); g.addColorStop(1, '#071014');
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    x.strokeStyle = 'rgba(255,92,116,.92)'; x.lineWidth = 18; x.strokeRect(34,34,w-68,h-68);
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#ffffff'; x.font = 'bold 82px system-ui, Arial'; x.fillText('REIKI HUB', w/2, h/2 - 92);
+    x.fillStyle = '#ff6677'; x.font = 'bold 70px system-ui, Arial'; x.fillText('AWAITING', w/2, h/2 + 8);
+    x.fillText('APPROVAL', w/2, h/2 + 92);
+    x.fillStyle = '#cffff8'; x.font = '36px system-ui, Arial'; x.fillText('Sponsor / founder media disabled', w/2, h/2 + 174);
+  });
 
   const floorPad = new THREE.Mesh(
     new THREE.PlaneGeometry(14.2, 7.0),
@@ -658,8 +644,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(166,255,238,0.95)'; x.lineWidth = 10; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 82px system-ui, Arial'; x.fillText('TRUEITIVE REIKI', w/2, 88);
-    x.fillStyle = '#7dffb2'; x.font = 'bold 34px system-ui, Arial'; x.fillText('POLISHED PRESENTATION', w/2, 152);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 90px system-ui, Arial'; x.fillText('REIKI HUB', w/2, 110);
   });
   const signA = new THREE.Mesh(new THREE.PlaneGeometry(7.62, 0.88), new THREE.MeshBasicMaterial({ map: signTexA, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   signA.position.copy(signBackA.position).add(new THREE.Vector3(0,0,0.02));
@@ -673,8 +658,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#dffff7'; x.font = 'bold 70px system-ui, Arial'; x.fillText('TRUEITIVE • 霊気', w/2, 78);
-    x.fillStyle = '#7dffb2'; x.font = 'bold 34px system-ui, Arial'; x.fillText('HOLOGRAM PRESENTATION', w/2, 144);
+    x.fillStyle = '#dffff7'; x.font = 'bold 84px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 98);
   });
   const signB = new THREE.Mesh(new THREE.PlaneGeometry(6.44, 0.70), new THREE.MeshBasicMaterial({ map: signTexB, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   signB.position.copy(signBackB.position).add(new THREE.Vector3(0,0,0.02));
@@ -701,27 +685,27 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(140,255,231,0.90)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
     x.textAlign = 'left';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 60px system-ui, Arial'; x.fillText('Trueitive Presentation', 60, 110);
-    x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('POLISHED DEMO MODE', 60, 182);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 62px system-ui, Arial'; x.fillText('Meet the Founder', 60, 110);
+    x.fillStyle = '#bcffe9'; x.font = 'bold 46px system-ui, Arial'; x.fillText('AWAITING APPROVAL', 60, 182);
     x.fillStyle = '#e5f6f3'; x.font = '34px system-ui, Arial';
     let y = 258;
-    y = fillWrappedText(x, 'Polished Reiki / Trueitive storefront presentation restored for demo review. Hologram stage is preserved while the full private meditation room remains a separate route.', 60, y, w - 120, 42);
+    y = fillWrappedText(x, 'Founder of SVR Reiki approval placeholder, leading the Reiki hub with a professional wellness-first approach for virtual and in-person growth.', 60, y, w - 120, 42);
     y += 78;
     x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Services', 60, y);
     y += 56;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    ['Hologram presentation stage', 'Premium Reiki storefront', 'Private meditation route', 'Toggleable approval/demo content'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 46; });
+    ['SVR Reiki sessions', 'Meditation and reset support', 'Massage / bodywork referrals', 'Holistic wellness guidance'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 46; });
     y += 40;
     x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Book / Explore', 60, y);
     y += 54;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    fillWrappedText(x, 'Trueitive demo presentation • private Reiki room entry • removable approval layer', 60, y, w - 120, 40);
+    fillWrappedText(x, 'approval pending • state search • founder spotlight • Reiki VR entry', 60, y, w - 120, 40);
   });
   const founderPanel = new THREE.Mesh(new THREE.PlaneGeometry(3.28, 4.02), new THREE.MeshBasicMaterial({ map: founderPanelTex, side: THREE.DoubleSide, transparent: true }));
   founderPanel.position.set(-4.10, 2.18, -2.10);
   root.add(founderPanel);
 
-  const portraitPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 4.02), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, side: THREE.DoubleSide }));
+  const portraitPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 4.02), new THREE.MeshBasicMaterial({ map: founderTex, side: THREE.DoubleSide }));
   portraitPanel.position.set(4.05, 2.18, -2.10);
   root.add(portraitPanel);
 
@@ -732,7 +716,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#f6ffff'; x.font = 'bold 44px system-ui, Arial'; x.fillText('Professional Highlights', 42, 74);
     x.fillStyle = '#bcffe9'; x.font = '32px system-ui, Arial';
     let y = 148;
-    ['Trueitive presentation restored', 'Reiki and wellness focus', 'Hologram controls preserved', 'Private room route ready'].forEach((line)=>{ x.fillText('• ' + line, 46, y); y += 70; });
+    ['Reiki sponsor approval pending', 'Reiki and wellness focus', 'Meditation-forward client care', 'Virtual hub ready for growth'].forEach((line)=>{ x.fillText('• ' + line, 46, y); y += 70; });
   });
   const rightInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 1.64), new THREE.MeshBasicMaterial({ map: rightInfoTex, side: THREE.DoubleSide, transparent: true }));
   rightInfo.position.set(4.05, -0.12, -2.08);
@@ -743,57 +727,28 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = g; x.fillRect(0,0,w,h);
     x.strokeStyle = 'rgba(124,255,226,0.88)'; x.lineWidth = 10; x.strokeRect(18,18,w-36,h-36);
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#f6ffff'; x.font = 'bold 62px system-ui, Arial'; x.fillText('TRUEITIVE REIKI', w/2, 106);
-    x.fillStyle = '#bcffe9'; x.font = 'bold 34px system-ui, Arial'; x.fillText('霊気 • 癒 • 和 • 光', w/2, 166);
-    x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('HOLOGRAM DEMO PREVIEW', w/2, 296);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 68px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 106);
+    x.fillStyle = '#bcffe9'; x.font = 'bold 34px system-ui, Arial'; x.fillText('Holistic Healing & Wellness', w/2, 166);
+    x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Founder-Led Services', w/2, 296);
     x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki • meditation • appointments • partner-ready wellness hub', w/2, 366);
     x.fillStyle = 'rgba(124,255,226,0.16)'; roundRectPath(x, 90, 430, w-180, 138, 28); x.fill();
     x.strokeStyle = 'rgba(124,255,226,0.65)'; x.lineWidth = 6; roundRectPath(x, 90, 430, w-180, 138, 28); x.stroke();
     x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER THE REIKI HUB', w/2, 510);
     x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Use the floor portal to enter the guided Reiki space', w/2, 564);
     x.fillStyle = '#f6ffff'; x.font = 'bold 38px system-ui, Arial'; x.fillText('Professional Highlights', w/2, 716);
-    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('霊気 • 癒し • 調和', w/2, 788);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private room • mindful reset • polished demo storefront', w/2, 856);
+    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('Reiki • Meditation • Approval Pending', w/2, 788);
+    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private sessions • mindful reset • future partner storefront', w/2, 856);
   });
   const centerInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.70, 4.02), new THREE.MeshBasicMaterial({ map: centerInfoTex, side: THREE.DoubleSide, transparent: true }));
   centerInfo.position.set(0, 2.18, -2.10);
   root.add(centerInfo);
 
-  // Phase 84B hotfix: restore polished Trueitive/Reiki hologram presentation without bringing the full Reiki room into the lobby.
-  const holoTex = canvasTexture(1280, 720, (x,w,h)=>{
-    const g = x.createLinearGradient(0,0,w,h); g.addColorStop(0, '#02060a'); g.addColorStop(0.45, '#073135'); g.addColorStop(1, '#10001f');
-    x.fillStyle = g; x.fillRect(0,0,w,h);
-    x.strokeStyle = 'rgba(124,255,226,0.92)'; x.lineWidth = 12; roundRectPath(x, 18, 18, w-36, h-36, 28); x.stroke();
-    x.strokeStyle = 'rgba(179,0,255,0.52)'; x.lineWidth = 5; roundRectPath(x, 58, 58, w-116, h-116, 22); x.stroke();
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#eaffff'; x.font = 'bold 82px system-ui, Arial'; x.fillText('TRUEITIVE', w/2, 142);
-    x.fillStyle = '#7dffb2'; x.font = 'bold 48px system-ui, Arial'; x.fillText('REIKI HOLOGRAM PRESENTATION', w/2, 226);
-    x.fillStyle = 'rgba(124,255,226,0.22)'; roundRectPath(x, 190, 286, w-380, 154, 34); x.fill();
-    x.fillStyle = '#f6ffff'; x.font = 'bold 44px system-ui, Arial'; x.fillText('PLAY  •  NEXT  •  PRIVATE ROOM', w/2, 364);
-    x.fillStyle = '#bcffe9'; x.font = '32px system-ui, Arial'; x.fillText('Polished demo storefront — full Reiki scene remains private', w/2, 512);
-    x.fillStyle = '#b380ff'; x.font = 'bold 36px system-ui, Arial'; x.fillText('SVR PRESENTATION MODE', w/2, 612);
-  });
-  const holoStage = new THREE.Group();
-  holoStage.position.set(0, 2.18, 0.86);
-  root.add(holoStage);
-  const holoGlow = new THREE.Mesh(new THREE.PlaneGeometry(4.40, 2.70), new THREE.MeshBasicMaterial({ color: 0x00fff0, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
-  holoStage.add(holoGlow);
-  const holoPanel = new THREE.Mesh(new THREE.PlaneGeometry(3.92, 2.20), new THREE.MeshBasicMaterial({ map: holoTex, transparent: true, opacity: 0.88, depthWrite: false, side: THREE.DoubleSide }));
-  holoPanel.position.z = 0.035;
-  holoStage.add(holoPanel);
-  const holoBase = new THREE.Mesh(new THREE.BoxGeometry(4.22, 0.18, 0.42), new THREE.MeshStandardMaterial({ color: 0x0a1820, roughness: 0.34, metalness: 0.34, emissive: 0x00a388, emissiveIntensity: 0.95 }));
-  holoBase.position.set(0, -1.26, 0.06);
-  holoStage.add(holoBase);
-  const holoWire = new THREE.Mesh(new THREE.PlaneGeometry(3.92, 2.20), new THREE.MeshBasicMaterial({ color: 0x7dffea, wireframe: true, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide }));
-  holoWire.position.z = 0.05;
-  holoStage.add(holoWire);
-
   const reserveTex = canvasTexture(960, 220, (x,w,h)=>{
     x.fillStyle = '#0d1714'; roundRectPath(x, 0, 0, w, h, 28); x.fill();
     x.strokeStyle = 'rgba(78,255,146,0.90)'; x.lineWidth = 8; roundRectPath(x, 10, 10, w-20, h-20, 24); x.stroke();
     x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillStyle = '#7dffb2'; x.font = 'bold 48px system-ui, Arial'; x.fillText('TRUEITIVE DEMO', w/2, 82);
-    x.fillStyle = '#f6fff8'; x.font = 'bold 36px system-ui, Arial'; x.fillText('PRESENTATION MODE', w/2, 152);
+    x.fillStyle = '#89ffab'; x.font = 'bold 50px system-ui, Arial'; x.fillText('RESERVED FOR APPROVAL', w/2, 82);
+    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('AWAITING APPROVAL', w/2, 152);
   });
   const reservePlaque = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 0.70), new THREE.MeshBasicMaterial({ map: reserveTex, transparent: true, side: THREE.DoubleSide }));
   reservePlaque.position.set(4.05, -1.22, -2.06);
@@ -873,40 +828,36 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
       plant.rotation.y = Math.PI * (0.15 + idx * 0.11);
       scene.add(plant);
     });
-
-    // Phase 84 Reiki storefront plant polish: fuller bushes and hanging greenery so the storefront feels alive.
-    const bushMat = new THREE.MeshStandardMaterial({ color: 0x1f8f54, roughness: 0.92, metalness: 0.0, emissive: 0x082516, emissiveIntensity: 0.18, side: THREE.DoubleSide });
-    const flowerMat = new THREE.MeshStandardMaterial({ color: 0x9d6dff, roughness: 0.88, metalness: 0.0, emissive: 0x230d38, emissiveIntensity: 0.22 });
-    [[-5.55,1.20],[5.55,1.20],[-4.95,-0.85],[4.95,-0.85],[-1.25,1.85],[1.25,1.85]].forEach(([ox,oz], idx)=>{
-      const bush = new THREE.Group();
-      for (let j=0; j<7; j++){
-        const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.22 + (j%3)*0.045, 12, 10), bushMat);
-        leaf.scale.set(1.05 + (j%2)*0.35, 0.62 + (j%3)*0.13, 0.92);
-        leaf.position.set((j-3)*0.08, 0.42 + (j%3)*0.09, Math.sin(j)*0.10);
-        bush.add(leaf);
-      }
-      const bloom = new THREE.Mesh(new THREE.SphereGeometry(0.055, 10, 8), flowerMat);
-      bloom.position.set(0.08, 0.72, 0.04);
-      bush.add(bloom);
-      bush.position.copy(center).addScaledVector(right, ox).addScaledVector(inward, oz);
-      bush.rotation.y = angle + Math.PI + (idx%2 ? 0.18 : -0.18);
-      scene.add(bush);
-    });
-    [[-3.6,3.16],[0,3.28],[3.6,3.16]].forEach(([ox, yLift], idx)=>{
-      const hang = new THREE.Group();
-      const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.13,0.20,18), new THREE.MeshStandardMaterial({ color: 0x2c2128, roughness: 0.72, metalness: 0.12 }));
-      hang.add(pot);
-      for (let j=0; j<9; j++){
-        const vine = new THREE.Mesh(new THREE.CylinderGeometry(0.010,0.014,0.46 + (j%3)*0.11,8), bushMat);
-        vine.position.set(Math.cos(j)*0.13, -0.28 - (j%3)*0.07, Math.sin(j)*0.08);
-        vine.rotation.z = (j-4)*0.065;
-        hang.add(vine);
-      }
-      hang.position.copy(center).addScaledVector(right, ox).addScaledVector(inward, -1.42);
-      hang.position.y = yLift;
-      scene.add(hang);
-    });
   }
+
+
+  // Phase 90: polished inactive Reiki hologram staged by the Reiki wall, tucked behind/right of a plant.
+  // This is a lightweight animated portal marker; the MP4 stays paused in reiki-video-portal.html until the player opens it from the Reiki area.
+  const holoTex = canvasTexture(1024, 768, (ctx,w,h)=>{
+    const g = ctx.createLinearGradient(0,0,w,h); g.addColorStop(0,'rgba(2,20,26,0.96)'); g.addColorStop(1,'rgba(17,5,30,0.94)');
+    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle = 'rgba(88,255,244,0.95)'; ctx.lineWidth = 12; roundRectPath(ctx, 24,24,w-48,h-48,36); ctx.stroke();
+    ctx.strokeStyle = 'rgba(180,108,255,0.42)'; ctx.lineWidth = 4;
+    for(let y=90;y<h-80;y+=42){ ctx.beginPath(); ctx.moveTo(70,y); ctx.lineTo(w-70,y); ctx.stroke(); }
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#eaffff'; ctx.font='bold 76px system-ui, Arial'; ctx.fillText('REIKI HOLOGRAM', w/2, 142);
+    ctx.fillStyle='#75ffd6'; ctx.font='bold 42px system-ui, Arial'; ctx.fillText('PLAYING IN REIKI AREA', w/2, 246);
+    ctx.fillStyle='#ffdddd'; ctx.font='bold 40px system-ui, Arial'; ctx.fillText('AWAITING APPROVAL', w/2, 334);
+    ctx.fillStyle='#bffcff'; ctx.font='32px system-ui, Arial'; ctx.fillText('Centered video hologram active in Reiki zone', w/2, 448);
+    ctx.fillStyle='#ffffff'; ctx.font='bold 34px system-ui, Arial'; ctx.fillText('WATCH BUTTON: REIKI VIDEO', w/2, 548);
+  });
+  const holoGroup = new THREE.Group();
+  holoGroup.name = 'Reiki Wall Hologram Portal Prop';
+  holoGroup.position.copy(center).addScaledVector(right, 0.0).addScaledVector(inward, 0.55).add(new THREE.Vector3(0, 2.05, 0));
+  holoGroup.lookAt(center.clone().addScaledVector(inward, 2.8).setY(1.55));
+  const holoPane = new THREE.Mesh(new THREE.PlaneGeometry(3.20, 1.82), new THREE.MeshBasicMaterial({ map: holoTex, transparent: true, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
+  holoGroup.add(holoPane);
+  const holoRing = new THREE.Mesh(new THREE.TorusGeometry(0.86, 0.022, 12, 96), new THREE.MeshBasicMaterial({ color: 0x5ef7ff, transparent: true, opacity: 0.68, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));
+  holoRing.scale.set(1.38, 0.86, 1); holoRing.position.z = 0.035; holoGroup.add(holoRing);
+  const holoBase = new THREE.Mesh(new THREE.CircleGeometry(0.88, 48), new THREE.MeshBasicMaterial({ color: 0x5ef7ff, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));
+  holoBase.rotation.x = -Math.PI * 0.5; holoBase.position.set(0, -1.56, 0.06); holoGroup.add(holoBase);
+  const holoLight = new THREE.PointLight(0x5ef7ff, 2.4, 10, 2.0); holoLight.position.set(0, 0.3, 0.45); holoGroup.add(holoLight);
+  scene.add(holoGroup);
 
   const reikiFillA = new THREE.PointLight(0x6effd2, 2.6, 18, 2.0);
   reikiFillA.position.copy(center).add(new THREE.Vector3(-2.6, 2.8, 0.8));
@@ -1370,6 +1321,95 @@ function chooseBestWallFacingY(obj){
   return bestRot;
 }
 
+
+function createStorefrontCanvasTexture(title, subtitle, lines = [], colors = {}){
+  return canvasTexture(1200, 900, (ctx,w,h)=>{
+    const bgA = colors.bgA || '#050813';
+    const bgB = colors.bgB || '#160922';
+    const neon = colors.neon || '#5ef7ff';
+    const accent = colors.accent || '#b46cff';
+    const warm = colors.warm || '#ffdd88';
+    const g = ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,bgA); g.addColorStop(1,bgB);
+    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+    ctx.shadowColor = neon; ctx.shadowBlur = 24;
+    ctx.strokeStyle = neon; ctx.lineWidth = 14; roundRectPath(ctx, 28, 28, w-56, h-56, 42); ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    for(let y=120; y<h-80; y+=84){ ctx.fillRect(70,y,w-140,2); }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 92px system-ui, Arial'; ctx.fillText(title, w/2, 150);
+    ctx.fillStyle = neon; ctx.font = 'bold 44px system-ui, Arial'; ctx.fillText(subtitle, w/2, 238);
+    ctx.fillStyle = accent; ctx.font = 'bold 40px system-ui, Arial'; ctx.fillText('PRIVATE SCENE PORTAL', w/2, 322);
+    ctx.textAlign = 'left'; ctx.fillStyle = '#effcff'; ctx.font = '34px system-ui, Arial';
+    let yy = 420;
+    lines.forEach((line)=>{ ctx.fillText('• ' + line, 120, yy); yy += 58; });
+    ctx.textAlign = 'center';
+    ctx.fillStyle = warm; ctx.font = 'bold 44px system-ui, Arial'; ctx.fillText('STEP IN • SELECT ON WATCH', w/2, h-122);
+  });
+}
+
+function addFreestandingPortalStorefront(scene, R, wallHeight, { angle, title, subtitle, lines, neon = 0x5ef7ff, accent = 0xb46cff, targetKey = '' } = {}){
+  const inward = new THREE.Vector3(-Math.cos(angle), 0, -Math.sin(angle));
+  const center = new THREE.Vector3(Math.cos(angle) * (R - 5.15), 0.0, Math.sin(angle) * (R - 5.15));
+  const root = new THREE.Group();
+  root.name = `${title || 'SVR'} Freestanding Storefront`;
+  root.position.copy(center);
+  root.lookAt(root.position.clone().add(inward));
+  scene.add(root);
+
+  const baseMat = new THREE.MeshStandardMaterial({ color: 0x090d14, roughness: 0.72, metalness: 0.18, emissive: 0x07111f, emissiveIntensity: 0.28 });
+  const neonMat = new THREE.MeshStandardMaterial({ color: neon, roughness: 0.18, metalness: 0.50, emissive: neon, emissiveIntensity: 0.85 });
+  const glassMat = new THREE.MeshStandardMaterial({ color: neon, transparent: true, opacity: 0.08, roughness: 0.05, metalness: 0.18, emissive: neon, emissiveIntensity: 0.22, side: THREE.DoubleSide });
+
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(6.4, 0.10, 3.9), baseMat);
+  floor.position.set(0, 0.05, 0.25);
+  root.add(floor);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(6.4, 3.45, 0.18), baseMat);
+  back.position.set(0, 1.74, -1.58);
+  root.add(back);
+  const header = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.18, 0.24), neonMat);
+  header.position.set(0, 3.42, -1.45);
+  root.add(header);
+  [-3.18,3.18].forEach((x)=>{
+    const col = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.35, 0.22), neonMat);
+    col.position.set(x,1.74,-1.42); root.add(col);
+  });
+  const sideGlassL = new THREE.Mesh(new THREE.PlaneGeometry(3.25, 3.1), glassMat);
+  sideGlassL.position.set(-3.16,1.68,0.02); sideGlassL.rotation.y = Math.PI*0.5; root.add(sideGlassL);
+  const sideGlassR = sideGlassL.clone(); sideGlassR.position.x = 3.16; sideGlassR.rotation.y = -Math.PI*0.5; root.add(sideGlassR);
+
+  const tex = createStorefrontCanvasTexture(title, subtitle, lines || [], { neon: `#${neon.toString(16).padStart(6,'0')}`, accent: `#${accent.toString(16).padStart(6,'0')}` });
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(5.45, 3.25), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide }));
+  sign.position.set(0,1.88,-1.455); root.add(sign);
+  const portal = new THREE.Mesh(new THREE.RingGeometry(0.82, 1.08, 64), new THREE.MeshBasicMaterial({ color: neon, transparent: true, opacity: 0.55, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
+  portal.rotation.x = -Math.PI*0.5; portal.position.set(0,0.08,1.38); root.add(portal);
+  const glow = new THREE.PointLight(neon, 2.1, 12, 2.0); glow.position.set(0,1.8,0.5); root.add(glow);
+  root.userData.targetKey = targetKey;
+  return { root, center: center.clone(), inward, target: center.clone().add(inward.clone().multiplyScalar(2.6)).setY(0), look: center.clone().add(inward.clone().multiplyScalar(-1.3)).setY(1.6) };
+}
+
+function addSkylineMegaBillboards(scene, R){
+  const ads = [
+    { a: -0.42, text: ['SVR STORE', 'GEAR • WATCH • AVATARS'], c: 0x5ef7ff },
+    { a: 0.42, text: ['REIKI HOLOGRAM', 'AWAITING APPROVAL'], c: 0x75ffd6 },
+    { a: -1.22, text: ['SMOKER LOUNGE', 'PRIVATE SOCIAL ROOM'], c: 0xb46cff },
+    { a: 1.38, text: ['SCORPION ROOM', 'PRIVATE POKER'], c: 0xffd36a }
+  ];
+  ads.forEach(({a,text,c},idx)=>{
+    const outward = new THREE.Vector3(Math.cos(a),0,Math.sin(a));
+    const pos = outward.clone().multiplyScalar(R + 28 + idx * 1.2);
+    const tex = createAdBillboardTexture(text);
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(8.5, 5.0), new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }));
+    sign.position.set(pos.x, 24 + (idx % 2) * 3, pos.z);
+    sign.lookAt(sign.position.clone().sub(outward));
+    scene.add(sign);
+    const light = new THREE.PointLight(c, 1.5, 35, 2.0);
+    light.position.copy(sign.position).add(new THREE.Vector3(0,2,0));
+    scene.add(light);
+  });
+}
+
 function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   const group = new THREE.Group();
   const angle = -Math.PI * 0.25;
@@ -1494,10 +1534,10 @@ function buildStoreWall(scene, R, wallHeight, spawnLogoTex){
   group.add(activeBtn);
 
 
-  const adTex = createAdBillboardTexture(['REIKI', 'AWAITING APPROVAL']);
+  const adTex = createAdBillboardTexture(['SVR STORE', 'WEB PORTAL']);
   const adHeader = new THREE.Mesh(
     new THREE.PlaneGeometry(3.26, 0.56),
-    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('REIKI PREVIEW', 'awaiting approval'), transparent: true, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ map: createSponsorPlateTexture('SVR STORE PORTAL', 'approval placeholder'), transparent: true, side: THREE.DoubleSide })
   );
   adHeader.position.set(modelX, wallHeight * 0.39, 0.18);
   group.add(adHeader);
@@ -1626,7 +1666,7 @@ function buildOuterCity(scene, R){
   const matrix = createMatrixBillboardTexture();
   const billboardUpdaters = [matrix.update];
   const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
-  const zenTex = createAdBillboardTexture(['REIKI ROOM', 'AWAITING APPROVAL']);
+  const zenTex = createAdBillboardTexture(['REIKI HUB', 'AWAITING APPROVAL']);
 
   const count = 68;
   const adIndices = new Set([4, 11, 20, 28, 36, 44, 52, 60]);
@@ -1715,10 +1755,10 @@ function buildOuterCity(scene, R){
               ctx.textBaseline = "middle";
               ctx.fillStyle = "#d9ffee";
               ctx.font = "bold 92px system-ui, Arial";
-              ctx.fillText("REIKI ROOM", w2 / 2, 94);
+              ctx.fillText("AWAITING APPROVAL", w2 / 2, 94);
               ctx.fillStyle = "#7bffb7";
               ctx.font = "700 50px system-ui, Arial";
-              ctx.fillText("霊気 • 癒 • 和 • 光", w2 / 2, 178);
+              ctx.fillText("SVR Reiki • Meditation • Wellness", w2 / 2, 178);
             }),
             transparent: true,
             side: THREE.DoubleSide,
@@ -2260,6 +2300,25 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   await populateLegendPedestals(legendHall, spawnLogoTex, log);
   const storeWall = buildStoreWall(scene, R, wallHeight, spawnLogoTex);
   addPgaHub(scene, { radius: R, wallHeight, log });
+  const svrStorefront = addFreestandingPortalStorefront(scene, R, wallHeight, {
+    angle: -Math.PI * 0.34,
+    title: 'SVR STORE',
+    subtitle: 'WEB STORE • GEAR • WATCHES',
+    lines: ['store page opens outside game', 'avatar gear and watches later', 'keeps lobby smooth'],
+    neon: 0x5ef7ff,
+    accent: 0xb46cff,
+    targetKey: 'storeRoom'
+  });
+  const smokerStorefront = addFreestandingPortalStorefront(scene, R, wallHeight, {
+    angle: -Math.PI * 0.58,
+    title: 'SMOKER LOUNGE',
+    subtitle: 'PRIVATE SOCIAL ROOM',
+    lines: ['private hangout destination', 'future replay board and jumbotron', 'lounge stays outside lobby'],
+    neon: 0xb46cff,
+    accent: 0x5ef7ff,
+    targetKey: 'smokerLounge'
+  });
+  addSkylineMegaBillboards(scene, R);
   const reikiHub = await addRikiArea(scene, R, wallHeight, spawnLogoTex, log);
   const scorpionRoom = addScorpionRoom(scene, R, wallHeight);
   const lobbyInfoBoards = addLobbyInfoBoards(scene, R, wallHeight);
@@ -2292,7 +2351,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(13.2, 64, 64),
+    new THREE.SphereGeometry(8.8, 56, 56),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2304,16 +2363,19 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  moon.position.set(-86, wallHeight + 156.0, -(R + 315.0));
+  moon.position.set(-26, wallHeight + 68.0, -(R + 82.0));
   moon.frustumCulled = false;
+  moon.material.depthTest = false;
+  moon.material.depthWrite = false;
+  moon.renderOrder = 90;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.10);
-  moonHalo.scale.set(104.0, 104.0, 1);
+  moonHalo.scale.set(76.0, 76.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(6.4, 56, 56),
+    new THREE.SphereGeometry(5.2, 44, 44),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2325,13 +2387,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.0
     })
   );
-  mars.position.set(-44, wallHeight + 168.0, -(R + 326.0));
+  mars.position.set(42, wallHeight + 76.0, -(R + 104.0));
   mars.visible = true;
   mars.frustumCulled = false;
+  mars.material.depthTest = false;
+  mars.material.depthWrite = false;
+  mars.renderOrder = 91;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.08);
-  marsHalo.scale.set(48.0, 48.0, 1);
+  marsHalo.scale.set(46.0, 46.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2357,9 +2422,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
   scene.add(earthGlow);
   earthGlow.visible = false;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 3.9, 720, 1.45);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.75, 560, 1.45);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 2.3, 520, 1.55);
+  const marsGlow = new THREE.PointLight(0xff9a72, 1.75, 420, 1.55);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
@@ -2536,29 +2601,27 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       wallHeight + 72.0 + Math.sin(t * 0.018) * 0.22,
       -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
     );
-    const moonOrbit = t * 0.010;
     moon.position.set(
-      -86 + Math.sin(moonOrbit) * 10.0,
-      wallHeight + 162.0 + Math.sin(t * 0.038) * 1.4,
-      -(R + 320.0) + Math.cos(moonOrbit) * 10.0
+      -24 + Math.sin(t * 0.012) * 2.6,
+      wallHeight + 74.0 + Math.sin(t * 0.045) * 1.0,
+      -(R + 72.0) + Math.cos(t * 0.010) * 2.2
     );
-    moon.rotation.y += dt * 0.105;
+    moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
-    const marsOrbit = t * 0.080;
     mars.position.set(
-      moon.position.x + Math.cos(marsOrbit) * 48.0,
-      moon.position.y + 9.0 + Math.sin(marsOrbit * 1.2) * 5.0,
-      moon.position.z + Math.sin(marsOrbit) * 24.0
+      38 + Math.sin(t * 0.010 + 1.4) * 3.1,
+      wallHeight + 82.0 + Math.sin(t * 0.036 + 0.8) * 0.8,
+      -(R + 92.0) + Math.cos(t * 0.008 + 0.4) * 2.0
     );
     mars.visible = true;
-    mars.rotation.y += dt * 0.092;
+    mars.rotation.y += dt * 0.06;
     mars.rotation.z = 0.04;
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.055 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.16 + 0.026 * (0.5 + 0.5 * Math.sin(t * 0.24));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.034 + 0.010 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.12 + 0.020 * (0.5 + 0.5 * Math.sin(t * 0.28));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{
@@ -2609,8 +2672,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     rim.material.emissiveIntensity = 0.18;
     seats.forEach((seat)=>{ seat.ring.material.opacity = 0.60; });
     stars.spriteGroup.rotation.y += dt * 0.00018;
-    if (stars.constellationGroup) stars.constellationGroup.rotation.y += dt * 0.00010;
-    stars.pts.material.opacity = 0.86;
+    stars.pts.material.opacity = 0.82;
     if (lobbyInfoBoards?.length) lobbyInfoBoards.forEach((rec, idx)=>{ const bob = Math.sin(t * 1.2 + rec.phase) * 0.04; rec.board.position.y = 1.72 + bob; rec.glow.position.y = rec.board.position.y; rec.glow.material.opacity = 0.10 + 0.06 * (0.5 + 0.5 * Math.sin(t * 1.4 + idx)); });
     city.billboardUpdaters.forEach(fn=>fn(t));
     tickPgaHub(scene, t);
@@ -2699,6 +2761,11 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       pos: new THREE.Vector3(storeWall.group.position.x * 0.86, 0, storeWall.group.position.z * 0.86),
       look: storeWall.group.position.clone().setY(1.6)
     },
+    store: svrStorefront ? { pos: svrStorefront.target.clone(), look: svrStorefront.look.clone() } : {
+      pos: new THREE.Vector3(storeWall.group.position.x * 0.78, 0, storeWall.group.position.z * 0.78),
+      look: storeWall.group.position.clone().setY(1.6)
+    },
+    smokerLounge: smokerStorefront ? { pos: smokerStorefront.target.clone(), look: smokerStorefront.look.clone() } : null,
     scorpion: scorpionRoom ? { pos: scorpionRoom.target.clone(), look: scorpionRoom.look.clone() } : null
   };
 

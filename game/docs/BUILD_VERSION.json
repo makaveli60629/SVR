@@ -1,14 +1,27 @@
 {
-  "build": "PHASE-84B-TRUEITIVE-REIKI-STORE-HOLOGRAM-ALIGNMENT-FIX",
-  "created": "2026-06-08",
+  "version": "Update 3.0",
+  "build": "UPDATE-3.0-PHASE-116-REIKI-SCREENSHOT-STOREFRONT-NO-MUSIC-LOCK",
+  "created": "2026-06-06",
   "track": "game-only",
   "siteTouched": false,
-  "locks": [
-    "Android joystick visible only on Android browser",
-    "Desktop and Quest/WebXR hide Android joystick overlay",
-    "Moon larger, higher, textured, rotating",
-    "Mars larger, higher, textured, orbiting Moon",
-    "Preloader splash added",
-    "Hot path object allocations reduced"
+  "phase": 116,
+  "focus": "Restore the screenshot-matching Reiki storefront from Phase 92 complete update lock while disabling all lobby music/audio autoplay.",
+  "baseline": "PHASE-92-REIKI-COMPLETE-UPDATE-LOCK plus no-music patch",
+  "protected": [
+    "Reiki storefront / store hub front from uploaded screenshots",
+    "Reiki hologram alignment row and centered hologram visual",
+    "private Reiki room and video portal",
+    "public website and site pages untouched"
+  ],
+  "locked": [
+    "Reiki storefront must not be touched unless user says unlock the Reiki Hub",
+    "no lobby music",
+    "no audio files in package",
+    "window.SVR_AUDIO_DISABLED = true"
+  ],
+  "criticalRules": [
+    "Do not restore Phase 111/112/113/115 if the user asks for the screenshot storefront",
+    "Do not apply A-Frame/1.4H manifests",
+    "Update /game and /update/game.zip together"
   ]
 }

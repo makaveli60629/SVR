@@ -4,5 +4,7 @@
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050508",
-  "theme_color": "#050508"
+  "theme_color": "#050508",
+  "build": "PHASE-92-REIKI-COMPLETE-UPDATE-LOCK",
+  "phase": 92
 }

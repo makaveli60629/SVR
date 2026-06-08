@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>SVR Poker • Phase 84B Performance Preloader Android Sky Lock</title>
+  <title>ScarlettVR Poker • Update 3.0 Phase 116 Reiki Screenshot Storefront No Music Lock</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -78,30 +78,15 @@
     body.preview-mode #hud,
     body.preview-mode #log,
     body.preview-mode #err { display: none !important; }
-    #svr-preloader{
-      position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px;
-      background: radial-gradient(circle at 50% 35%, rgba(84,39,140,.34), rgba(0,0,0,.94) 52%, #000 100%);
-      color:#f5f0ff; text-align:center; transition:opacity .45s ease, visibility .45s ease;
-    }
-    #svr-preloader.svr-ready{ opacity:0; visibility:hidden; pointer-events:none; }
-    .svr-loader-logo{ width:96px; height:96px; object-fit:contain; filter:drop-shadow(0 0 24px rgba(190,120,255,.8)); animation:svrPulse 1.8s ease-in-out infinite; }
-    .svr-loader-title{ font-weight:800; letter-spacing:.14em; font-size:15px; text-transform:uppercase; }
-    .svr-loader-note{ color:#cfc2ff; font-size:12px; max-width:320px; line-height:1.4; }
-    .svr-loader-bar{ width:220px; height:4px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.12); }
-    .svr-loader-bar::after{ content:""; display:block; width:46%; height:100%; border-radius:999px; background:linear-gradient(90deg,#77f6ff,#b875ff,#fff); animation:svrLoad 1.2s ease-in-out infinite; }
-    @keyframes svrLoad{ 0%{ transform:translateX(-120%);} 100%{ transform:translateX(260%);} }
-    @keyframes svrPulse{ 0%,100%{ transform:scale(1); opacity:.92;} 50%{ transform:scale(1.045); opacity:1;} }
 
-    .android-controls{ position:fixed; inset:0; pointer-events:none; z-index:30; touch-action:none; }
-    .android-stick-zone{ position:absolute; left:22px; bottom:24px; width:148px; height:148px; pointer-events:auto; touch-action:none; }
-    .android-stick-base{ position:absolute; inset:14px; border-radius:50%; border:1px solid rgba(130,245,255,.42); background:rgba(0,0,0,.46); box-shadow:0 0 22px rgba(90,190,255,.20); }
-    .android-stick-knob{ position:absolute; left:50%; top:50%; width:54px; height:54px; transform:translate(-50%,-50%); border-radius:50%; background:rgba(160,110,255,.72); border:1px solid rgba(255,255,255,.55); box-shadow:0 0 24px rgba(180,125,255,.44); }
-    .android-stick-label{ position:absolute; left:0; right:0; bottom:-8px; font:700 11px/1 system-ui; letter-spacing:.14em; color:#dffaff; text-align:center; text-shadow:0 1px 8px #000; }
-    .android-turn-zone{ position:absolute; right:22px; bottom:32px; display:flex; gap:12px; pointer-events:auto; }
-    .android-turn-btn{ width:58px; height:58px; border-radius:18px; border:1px solid rgba(130,245,255,.42); background:rgba(0,0,0,.52); color:#fff; font-size:28px; box-shadow:0 0 22px rgba(90,190,255,.20); }
-    .android-controls-disabled .android-controls,
-    body:not(.android-controls-enabled) .android-controls,
-    body.preview-mode .android-controls{ display:none !important; opacity:0 !important; pointer-events:none !important; }
+    #bootFallback{position:fixed;inset:0;z-index:45;display:none;place-items:center;background:radial-gradient(circle at 50% 45%,rgba(88,255,244,.16),transparent 36%),#000;color:#eaffff;padding:24px;text-align:center;}
+    #posPanel{position:fixed;right:12px;top:84px;z-index:14;min-width:270px;max-width:360px;background:rgba(0,8,18,.74);border:1px solid rgba(94,247,255,.48);border-radius:16px;color:#eaffff;font:12px/1.35 ui-monospace,Consolas,monospace;padding:10px 12px;box-shadow:0 0 24px rgba(94,247,255,.14);white-space:pre-wrap;backdrop-filter:blur(8px);}
+    #posPanel b{color:#9ffcff;font-family:system-ui,Arial,sans-serif;font-size:13px;}
+    #bootFallback .card{max-width:620px;border:1px solid rgba(88,255,244,.42);border-radius:24px;background:rgba(0,8,14,.86);box-shadow:0 0 34px rgba(88,255,244,.18);padding:22px;}
+    #bootFallback h2{margin:0 0 8px;text-shadow:0 0 18px rgba(88,255,244,.7);}
+    #bootFallback p{color:#bfefff;line-height:1.45;}
+    #bootFallback a{display:inline-block;margin-top:10px;border:1px solid rgba(181,108,255,.55);border-radius:999px;padding:12px 16px;color:#fff;text-decoration:none;background:rgba(40,0,70,.72);font-weight:800;}
+
   </style>
   <script type="importmap">
   {
@@ -113,13 +98,16 @@
   </script>
 </head>
 <body>
-  <div id="svr-preloader" role="status" aria-live="polite">
-    <img class="svr-loader-logo" src="./assets/ui/logo.png" alt="SVR Poker logo"/>
-    <div class="svr-loader-title">Loading SVR Poker</div>
-    <div class="svr-loader-note">Optimizing sky, controllers, and Android-only movement controls…</div>
-    <div class="svr-loader-bar" aria-hidden="true"></div>
-  </div>
   <div id="app"></div>
+
+  <div id="bootFallback">
+    <div class="card">
+      <h2>SVR Game Boot Fallback</h2>
+      <p>The full 3D lobby is still loading or a browser module stalled. Lobby music is manual only, and Reiki hologram stays paused and only plays after entering through the Reiki area portal.</p>
+      <a href="./reiki-video-portal.html?v=phase92-reiki-complete-update">Open Reiki Hologram Portal</a>
+    </div>
+  </div>
+
 
   <div id="hud">
     <div class="pill" id="status">Booting…</div>
@@ -127,17 +115,22 @@
       <button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button>
       <button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button>
       <span class="pill" id="mode">Hands: …</span>
-      <span class="pill">BUILD: PHASE-84B-TRUEITIVE-REIKI-STORE-HOLOGRAM-ALIGNMENT-FIX</span>
+      <span class="pill">BUILD: UPDATE-3.0-PHASE-116-REIKI-SCREENSHOT-STOREFRONT-NO-MUSIC-LOCK</span>
     </div>
   </div>
 
   <div id="sceneNav">
     <button class="scene-btn" data-scene="lobby">Lobby</button>
-    <button class="scene-btn" data-scene="table">Table</button>
     <button class="scene-btn" data-scene="seat">Seat</button>
     <button class="scene-btn" data-scene="reiki">Reiki</button>
-    <button class="scene-btn" data-scene="reikiRoom">Reiki Room</button>
+    <button class="scene-btn" data-scene="reikiVideoPortal">Reiki Video</button>
+    <button class="scene-btn" data-scene="reikiAbout">Reiki About</button>
     <button class="scene-btn" data-scene="pga">PGA</button>
+    <button class="scene-btn" data-scene="pgaDrive">Drive</button>
+    <button class="scene-btn" data-scene="chipPutt">Chip/Putt</button>
+    <button class="scene-btn" data-scene="store">Store</button>
+    <button class="scene-btn" data-scene="storeRoom">Store Room</button>
+    <button class="scene-btn" data-scene="smokerLounge">Lounge</button>
     <button class="scene-btn" data-scene="legends">Legend</button>
     <button class="scene-btn" data-scene="sponsor">Sponsor</button>
     <button class="scene-btn" data-scene="scorpion">Scorpion</button>
@@ -145,6 +138,16 @@
 
   <pre id="log"></pre>
   <pre id="err"></pre>
+
+
+  <script>
+    window.__SVR_BOOT_STARTED__ = Date.now();
+    setTimeout(function(){
+      var s=document.getElementById('status');
+      var fb=document.getElementById('bootFallback');
+      if(s && fb && /Booting/i.test(s.textContent || '')) fb.style.display='grid';
+    }, 4500);
+  </script>
 
   <script type="module" src="./main.js"></script>
 </body>
