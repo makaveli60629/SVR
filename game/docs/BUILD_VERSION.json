@@ -1,9 +1,0 @@
-﻿{
-  "version": "1.4.8",
-  "build": "VERSION-1.4.8-BOOT-LOADER-RESCUE",
-  "scope": "game boot loader rescue only",
-  "siteTouched": false,
-  "reikiTouched": false,
-  "protected": ["Reiki storefront hub", "website", "site", "public Matrix page"],
-  "updatedAt": "2026-06-07T11:33:10.7271564-05:00"
-}
