@@ -2215,7 +2215,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   scene.add(earthHalo);
   earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(22.0, 96, 96),
+    new THREE.SphereGeometry(27.0, 96, 96),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2227,16 +2227,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.018
     })
   );
-  moon.position.set(-54, wallHeight + 94.0, -(R + 215.0));
+  moon.position.set(-64, wallHeight + 136.0, -(R + 285.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.18);
-  moonHalo.scale.set(112.0, 112.0, 1);
+  moonHalo.scale.set(158.0, 158.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(11.5, 72, 72),
+    new THREE.SphereGeometry(14.5, 72, 72),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2248,13 +2248,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.014
     })
   );
-  mars.position.set(-18, wallHeight + 104.0, -(R + 244.0));
+  mars.position.set(-18, wallHeight + 152.0, -(R + 325.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.12);
-  marsHalo.scale.set(58.0, 58.0, 1);
+  marsHalo.scale.set(82.0, 82.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2462,16 +2462,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     // Phase 105: keep the Phase 87/88 Reiki hub, but restore the higher/larger Update 3.0 sky lock.
     moon.position.set(
       -48 + Math.sin(t * 0.018) * 4.5,
-      wallHeight + 102.0 + Math.sin(t * 0.070) * 1.8,
-      -(R + 206.0) + Math.cos(t * 0.014) * 5.0
+      wallHeight + 142.0 + Math.sin(t * 0.070) * 1.8,
+      -(R + 286.0) + Math.cos(t * 0.014) * 5.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     const marsOrbit = t * 0.16;
     mars.position.set(
-      moon.position.x + Math.cos(marsOrbit) * 34.0,
-      moon.position.y + 9.0 + Math.sin(marsOrbit * 1.35) * 5.0,
-      moon.position.z + Math.sin(marsOrbit) * 26.0 - 8.0
+      moon.position.x + Math.cos(marsOrbit) * 43.0,
+      moon.position.y + 14.0 + Math.sin(marsOrbit * 1.35) * 6.5,
+      moon.position.z + Math.sin(marsOrbit) * 34.0 - 10.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.09;

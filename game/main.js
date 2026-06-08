@@ -7,13 +7,14 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyReikiCleanCarousel113 } from "./modules/update_3_0_reiki_clean_carousel_113.js";
+import { applyPhase119ReikiTrueitiveStorefrontFinal } from "./modules/reiki_phase119_trueitive_storefront_final.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-118-REIKI-1-4G-STOREFRONT-FINAL-RESTORE-LOCK', source: '1.4G Reiki storefront backup with clean non-overlapping hologram carousel' };
+window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-119-REIKI-TRUEITIVE-1-4G-HOLOGRAM-FRONT-FINAL-LOCK', source: '1.4G Reiki storefront backup with clean non-overlapping hologram carousel' };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -356,6 +357,7 @@ const watch = createWristWatch({
 /* Phase 113: do not stack the old inactive portal or Phase 106 large panel over the Reiki storefront. */
 createStoreWebPortal();
 applyReikiCleanCarousel113({ scene, camera, renderer, sceneTargets, setStatus, log });
+applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, sceneTargets, setStatus, log });
 
 $toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
@@ -368,7 +370,7 @@ tp.setLogoTexture(logoTexture);
 
 window.__SVR_GAME_READY__ = true;
 const __svrBootFallback = document.getElementById('bootFallback'); if (__svrBootFallback){ __svrBootFallback.style.opacity='0'; __svrBootFallback.style.pointerEvents='none'; setTimeout(()=>{__svrBootFallback.style.display='none';},420); }
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Right stick moves/snaps. Music disabled. Phase 113 Reiki storefront locked. Store portal ready.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Right stick moves/snaps. Music disabled. Phase 119 Reiki storefront locked. Store portal ready.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

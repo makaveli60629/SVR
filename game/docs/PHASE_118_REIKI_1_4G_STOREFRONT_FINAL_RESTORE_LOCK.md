@@ -1,7 +1,7 @@
 # Phase 118 — Reiki 1.4G Storefront Final Restore Lock
 
 ## Build label
-UPDATE-3.0-PHASE-118-REIKI-1-4G-STOREFRONT-FINAL-RESTORE-LOCK
+UPDATE-3.0-PHASE-119-REIKI-TRUEITIVE-1-4G-HOLOGRAM-FRONT-FINAL-LOCK
 
 ## Purpose
 Fix the failed Phase 117 apply-label mismatch and restore the screenshot-approved Reiki/Trueitive storefront structure.
