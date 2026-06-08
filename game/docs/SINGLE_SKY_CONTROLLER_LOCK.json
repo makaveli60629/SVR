@@ -1,0 +1,37 @@
+﻿{
+  "build": "VERSION-1.6.5-SINGLE-SKY-CONTROLLER-LOCK",
+  "reason": "1.6.3 and 1.6.4 were fighting/back-and-forth. This removes old sky module script tags and makes one final sky controller.",
+  "oldModulesRemovedFromIndex": [
+    "svr_phase_1_5_7_moon_height_forward_stick_fix.js",
+    "svr_phase_1_5_8_skyline_tier_lock.js",
+    "svr_phase_1_5_9_lobby_orbit_sky_lock.js",
+    "svr_phase_1_6_0_moon_mars_height_1999_size_300.js",
+    "svr_phase_1_6_1_moon_mars_height_3000_size_350.js",
+    "svr_phase_1_6_2_building_tier_restructure_moon_lock.js",
+    "svr_phase_1_6_3_force_live_sky_no_reiki.js",
+    "svr_phase_1_6_4_moon_mars_height_4500_mars_300.js"
+  ],
+  "moon": {
+    "height": 4500,
+    "scale": 340,
+    "position": [-280, 4500, -3200],
+    "texture": "game/assets/textures/moon.jpg"
+  },
+  "mars": {
+    "height": 4500,
+    "scale": 300,
+    "position": [260, 4500, -3700],
+    "texture": "game/assets/textures/mars.jpg"
+  },
+  "buildingCap": {
+    "minX": -1200,
+    "maxX": 1050,
+    "minZ": -4400,
+    "maxZ": -650,
+    "maxY": 180,
+    "maxScaleY": 0.70
+  },
+  "reikiTouched": false,
+  "siteTouched": false,
+  "lock": true
+}

@@ -1,6 +1,6 @@
 ﻿{
-  "build": "VERSION-1.6.4-MOON-MARS-HEIGHT-4500-MARS-300",
-  "phase": "1.6.4",
-  "scope": "game only; hard force Moon/Mars height 4500; Mars size 300; no Reiki touch",
-  "updatedAt": "2026-06-08T16:11:31.0110288-05:00"
+  "build": "VERSION-1.6.5-SINGLE-SKY-CONTROLLER-LOCK",
+  "phase": "1.6.5",
+  "scope": "game only; remove old sky modules; one Moon/Mars controller; no Reiki touch",
+  "updatedAt": "2026-06-08T16:24:20.7485352-05:00"
 }
