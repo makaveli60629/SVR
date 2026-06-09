@@ -1,4 +1,5 @@
-﻿/* VERSION-1.6.7-GLASS-WALL-CELESTIAL-POSITION-LOCK: sky fallback + wall glass attached. */
+﻿/* VERSION-1.6.9-MOON-MARS-HEIGHT-8000-SIZE-800: Moon/Mars high sky lock. */
+/* VERSION-1.6.7-GLASS-WALL-CELESTIAL-POSITION-LOCK: sky fallback + wall glass attached. */
 /* VERSION-1.6.6-CELESTIAL-BODIES-NEON-LOCK: celestial-bodies.js is the single sky controller. */
 /* VERSION-1.6.5-SINGLE-SKY-CONTROLLER-LOCK: one sky controller only, no 1.6.3/1.6.4 back-and-forth. */
 /* VERSION-1.6.4-MOON-MARS-HEIGHT-4500-MARS-300: final force high sky. */
@@ -2233,7 +2234,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.018
     })
   );
-  moon.position.set(-320, wallHeight + 5200.0, -(R + 3600.0));
+  moon.position.set(-620, wallHeight + 8000.0, -(R + 6200.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.18);
@@ -2254,7 +2255,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.014
     })
   );
-  mars.position.set(300, wallHeight + 5200.0, -(R + 4100.0));
+  mars.position.set(680, wallHeight + 8000.0, -(R + 7200.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
@@ -2643,6 +2644,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
+
 
 
 
