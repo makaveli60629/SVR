@@ -1,6 +1,8 @@
 ﻿{
-  "build": "VERSION-1.7.1-VIBES-THEATER-STOREFRONT-LOCK",
-  "phase": "1.7.1",
-  "scope": "game only; VIBES Theater west wall storefront",
-  "updatedAt": "2026-06-10T15:22:15.6624734-05:00"
+  "build": "VERSION-1.7.3-FORCE-VISIBLE-LOBBY-POLISH-AUDIT-FIX",
+  "phase": "1.7.3",
+  "scope": "game only; force-visible lobby polish audit/fix",
+  "testUrl": "https://svrpoker.com/game/?v=1-7-3-force-visible-lobby-polish",
+  "debugUrl": "https://svrpoker.com/game/?v=1-7-3-force-visible-lobby-polish&debug=1",
+  "updatedAt": "2026-06-10T15:53:31.6606590-05:00"
 }
