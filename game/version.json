@@ -1,8 +1,8 @@
 ﻿{
-  "build": "VERSION-1.7.3-FORCE-VISIBLE-LOBBY-POLISH-AUDIT-FIX",
-  "phase": "1.7.3",
-  "scope": "game only; force-visible lobby polish audit/fix",
-  "testUrl": "https://svrpoker.com/game/?v=1-7-3-force-visible-lobby-polish",
-  "debugUrl": "https://svrpoker.com/game/?v=1-7-3-force-visible-lobby-polish&debug=1",
-  "updatedAt": "2026-06-10T15:53:31.6606590-05:00"
+  "build": "VERSION-1.7.4-LOBBY-POLISH-DEPLOY-VISIBILITY-RESCUE",
+  "phase": "1.7.4",
+  "scope": "game only; deploy visibility rescue for lobby polish",
+  "testUrl": "https://svrpoker.com/game/?v=1-7-4-lobby-polish-rescue",
+  "debugUrl": "https://svrpoker.com/game/?v=1-7-4-lobby-polish-rescue&debug=1",
+  "updatedAt": "2026-06-10T17:12:41.4473939-05:00"
 }
