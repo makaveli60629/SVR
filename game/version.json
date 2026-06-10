@@ -1,6 +1,6 @@
 ﻿{
-  "build": "VERSION-1.7.2-REIKI-SIGN-GLASS-REMOVE-LOCK",
-  "phase": "1.7.2",
-  "scope": "game only; remove Reiki founder sign and storefront glass",
-  "updatedAt": "2026-06-09T22:17:46.3286104-05:00"
+  "build": "VERSION-1.7.1-VIBES-THEATER-STOREFRONT-LOCK",
+  "phase": "1.7.1",
+  "scope": "game only; VIBES Theater west wall storefront",
+  "updatedAt": "2026-06-10T14:40:18.4632768-05:00"
 }
