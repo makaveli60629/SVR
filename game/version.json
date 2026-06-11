@@ -1,7 +1,7 @@
 ﻿{
-  "build": "VERSION-1.7.5-COSMIC-VIBEZ-SINGLE-RUNTIME-LOCK",
-  "phase": "1.7.5",
-  "scope": "game only; cosmic sky, VIBEZ theater, position display, duplicate runtime cleanup",
-  "testUrl": "https://svrpoker.com/game/?v=1-7-5-cosmic-vibez-single-runtime",
-  "updatedAt": "2026-06-10T21:55:35.1656836-05:00"
+  "build": "VERSION-1.7.6-VIBEZ-THEATER-HIGH-SKY-FORCE-LOCK",
+  "phase": "1.7.6",
+  "scope": "game only; VIBEZ theater force visible, Moon/Mars higher, position display always, duplicate runtime cleanup",
+  "testUrl": "https://svrpoker.com/game/?v=1-7-6-vibez-theater-high-sky",
+  "updatedAt": "2026-06-10T22:22:51.6273285-05:00"
 }
