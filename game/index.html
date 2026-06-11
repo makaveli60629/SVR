@@ -153,11 +153,197 @@
 <script src="./modules/svr_phase_1_5_3_reiki_carousel_sky_lock.js?v=1-5-3-reiki-carousel-sky-lock"></script>
 <script src="./modules/svr_phase_1_5_6_reiki_storefront_wall_layout.js?v=1-5-6-wall-layout"></script>
 <script type="module" src="./main.js?v=1-7-6-vibez-theater-high-sky"></script>
-<script src="./modules/svr_phase_1_7_1_moon_mars_higher_lock.js?v=1-7-1-higher"></script>
-<script src="./modules/svr_phase_1_7_2_reiki_sign_glass_remove_lock.js?v=1-7-2-reiki-cleanup"></script>
-<script src="./modules/svr_phase_1_7_6_vibez_theater_high_sky_force_lock.js?v=1-7-6-vibez-theater-high-sky"></script>
+<!-- SVR PHASE 248 DIRECT LIVE FIX START -->
+<script>
+(function(){
+  const BUILD = "PHASE-248-DIRECT-LIVE-VIBEZ-COSMIC-FIX";
+  window.SVR_BUILD_LABEL = BUILD;
+  window.SVR_PHASE_248_DIRECT_FIX = true;
+
+  function cssText(obj){ return Object.entries(obj).map(([k,v])=>k+":"+v).join(";"); }
+
+  function installProof(){
+    let badge = document.getElementById("svr248ProofBadge");
+    if(!badge){
+      badge = document.createElement("div");
+      badge.id = "svr248ProofBadge";
+      badge.style.cssText = cssText({
+        position:"fixed", left:"10px", top:"10px", zIndex:"2147483647",
+        background:"linear-gradient(135deg,rgba(0,0,0,.96),rgba(35,0,65,.96))",
+        border:"2px solid #20ffb0", borderRadius:"12px",
+        boxShadow:"0 0 26px rgba(32,255,176,.75)",
+        color:"#eaffff", font:"900 12px Arial,sans-serif",
+        padding:"10px 12px", pointerEvents:"none", maxWidth:"470px"
+      });
+      document.body.appendChild(badge);
+    }
+    badge.innerHTML =
+      "<div style='color:#20ffb0'>SVR PHASE 248 LIVE FIX ACTIVE</div>" +
+      "<div>"+BUILD+"</div>" +
+      "<div style='color:#ffe69a;font-size:11px;margin-top:4px'>Direct index patch loaded. VIBEZ + Moon/Mars forced.</div>";
+  }
+
+  function hideOldBadges(){
+    document.querySelectorAll("div,span,button").forEach(n=>{
+      const t = n.textContent || "";
+      if((t.includes("VERSION-1.7.") || t.includes("PHASE-247") || t.includes("PHASE-246")) &&
+         !n.closest("#svr248ProofBadge") && !n.closest("#svr248PositionPanel")){
+        n.style.display = "none";
+      }
+    });
+  }
+
+  function installPosition(){
+    let el = document.getElementById("svr248PositionPanel");
+    if(!el){
+      el = document.createElement("div");
+      el.id = "svr248PositionPanel";
+      el.style.cssText = cssText({
+        position:"fixed", left:"10px", bottom:"10px", zIndex:"2147483647",
+        minWidth:"350px", maxWidth:"510px", background:"rgba(0,0,0,.85)",
+        border:"2px solid #9b6cff", borderRadius:"12px",
+        boxShadow:"0 0 22px rgba(155,108,255,.6)",
+        color:"#eaffff", font:"900 11px Consolas,monospace",
+        padding:"10px 12px", pointerEvents:"none", whiteSpace:"pre-line"
+      });
+      document.body.appendChild(el);
+    }
+    function loop(){
+      let p={x:0,y:0,z:0}, yaw=0;
+      try{
+        const rig=document.querySelector("#rig")||document.querySelector("#playerRig")||document.querySelector("[camera-rig]");
+        const cam=document.querySelector("[camera]")||document.querySelector("a-camera");
+        if(rig && rig.object3D){ p=rig.object3D.position; yaw=rig.object3D.rotation.y*180/Math.PI; }
+        else if(cam && cam.object3D && window.THREE){ const wp=new THREE.Vector3(); cam.object3D.getWorldPosition(wp); p=wp; yaw=cam.object3D.rotation.y*180/Math.PI; }
+      }catch(e){}
+      el.textContent =
+        "BUILD: "+BUILD+"\n"+
+        "POSITION DISPLAY: ALWAYS ON\n"+
+        "PLAYER X/Y/Z: "+Number(p.x||0).toFixed(2)+" / "+Number(p.y||0).toFixed(2)+" / "+Number(p.z||0).toFixed(2)+"\n"+
+        "YAW: "+Number(yaw||0).toFixed(1)+"Â°\n"+
+        "VIBEZ THEATER: FORCE VISIBLE LEFT/WEST\n"+
+        "MOON: 0 260 -210 | SCALE 95\n"+
+        "MARS: 115 315 -195 | SCALE 70\n"+
+        "OLD RUNTIME BADGES: HIDDEN";
+      requestAnimationFrame(loop);
+    }
+    loop();
+  }
+
+  function removeById(id){ const n=document.getElementById(id); if(n && n.parentNode) n.parentNode.removeChild(n); }
+  function make(tag, attrs){
+    const el=document.createElement(tag);
+    Object.entries(attrs||{}).forEach(([k,v])=>el.setAttribute(k,v));
+    return el;
+  }
+
+  function faceCamera(el){
+    try{
+      const cam=document.querySelector("[camera]") || document.querySelector("a-camera");
+      if(cam && cam.object3D && el.object3D){
+        const wp=new THREE.Vector3();
+        cam.object3D.getWorldPosition(wp);
+        el.object3D.lookAt(wp);
+      }
+    }catch(e){}
+  }
+
+  function addAFrame(){
+    const scene=document.querySelector("a-scene");
+    if(!scene) return false;
+
+    removeById("svr248-vibez-theater");
+    removeById("svr248-cosmic-layer");
+
+    const cosmic=make("a-entity",{id:"svr248-cosmic-layer"});
+    cosmic.appendChild(make("a-sphere",{
+      id:"svr248-moon",
+      position:"0 260 -210",
+      radius:"1",
+      scale:"95 95 95",
+      material:"shader: flat; color: #ffffff; src: ./assets/textures/moon.jpg; side: double"
+    }));
+    cosmic.appendChild(make("a-sphere",{
+      id:"svr248-mars",
+      position:"115 315 -195",
+      radius:"1",
+      scale:"70 70 70",
+      material:"shader: flat; color: #ff6844; src: ./assets/textures/mars.jpg; side: double"
+    }));
+    for(let i=0;i<110;i++){
+      const x=(Math.random()*360-180).toFixed(1);
+      const y=(90+Math.random()*190).toFixed(1);
+      const z=(-90-Math.random()*240).toFixed(1);
+      cosmic.appendChild(make("a-sphere",{
+        position:`${x} ${y} ${z}`, radius:(.25+Math.random()*.5).toFixed(2),
+        material:"shader: flat; color: #ffffff; opacity: 0.85"
+      }));
+    }
+    scene.appendChild(cosmic);
+
+    const theater=make("a-entity",{id:"svr248-vibez-theater", position:"-6.7 2.55 -3.35"});
+    theater.appendChild(make("a-plane",{width:"7.4",height:"4.5",position:"0 0 0",material:"color:#05020c; opacity:0.96; side:double"}));
+    theater.appendChild(make("a-plane",{width:"7.8",height:".18",position:"0 2.32 .03",material:"color:#ffcc66; shader:flat; side:double"}));
+    theater.appendChild(make("a-plane",{width:"7.8",height:".12",position:"0 -2.32 .03",material:"color:#00eaff; shader:flat; side:double"}));
+    theater.appendChild(make("a-text",{value:"SVR VIBEZ THEATER",align:"center",width:"7.2",position:"0 1.55 .09",color:"#ffe69a",side:"double"}));
+    theater.appendChild(make("a-text",{value:"VR CINEMA â€¢ STORIES â€¢ PREMIERES",align:"center",width:"5.8",position:"0 .98 .09",color:"#9fffff",side:"double"}));
+    theater.appendChild(make("a-plane",{width:"4.9",height:"1.55",position:"0 -.25 .06",material:"color:#070011; opacity:.98; side:double"}));
+    theater.appendChild(make("a-text",{value:"COMING SOON\\nCOMMUNITY STORIES\\nFEATURE SCREENINGS",align:"center",width:"4.4",position:"0 -.33 .12",color:"#ffffff",side:"double"}));
+    theater.appendChild(make("a-plane",{width:"3.0",height:".6",position:"0 -1.75 .08",material:"color:#001b24; opacity:.95; side:double"}));
+    theater.appendChild(make("a-text",{value:"ENTER VR CINEMA",align:"center",width:"3.0",position:"0 -1.78 .15",color:"#aaffff",side:"double"}));
+    theater.appendChild(make("a-ring",{position:"0 -2.55 1.35",rotation:"-90 0 0","radius-inner":"1.0","radius-outer":"1.35",material:"color:#ffcc66; shader:flat; opacity:.75; side:double"}));
+    scene.appendChild(theater);
+    setTimeout(()=>faceCamera(theater),350);
+
+    window.SVR_PHASE_248_AFRAME = true;
+    return true;
+  }
+
+  function addThree(){
+    if(!window.THREE) return false;
+    let scene=null;
+    const af=document.querySelector("a-scene");
+    if(af && af.object3D) scene=af.object3D;
+    if(!scene && window.scene && window.scene.add) scene=window.scene;
+    if(!scene) return false;
+
+    const old=scene.getObjectByName("SVR_PHASE_248_THREE_ROOT");
+    if(old && old.parent) old.parent.remove(old);
+
+    const root=new THREE.Group();
+    root.name="SVR_PHASE_248_THREE_ROOT";
+
+    const mat=(c)=>new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide});
+    const moon=new THREE.Mesh(new THREE.SphereGeometry(1,64,32),mat(0xffffff));
+    moon.name="SVR248_MOON"; moon.position.set(0,260,-210); moon.scale.set(95,95,95); root.add(moon);
+    const mars=new THREE.Mesh(new THREE.SphereGeometry(1,64,32),mat(0xff6844));
+    mars.name="SVR248_MARS"; mars.position.set(115,315,-195); mars.scale.set(70,70,70); root.add(mars);
+
+    scene.add(root);
+    window.SVR_PHASE_248_THREE = true;
+    return true;
+  }
+
+  let applied=false;
+  function apply(){
+    installProof();
+    installPosition();
+    hideOldBadges();
+    const ok = addAFrame() || addThree();
+    if(ok) applied=true;
+    window.SVR_PHASE_248_AUDIT={build:BUILD, applied, time:new Date().toISOString()};
+  }
+
+  document.addEventListener("DOMContentLoaded", apply);
+  window.addEventListener("load",()=>setTimeout(apply,300));
+  [700,1400,2500,4200,6500,9000].forEach(ms=>setTimeout(apply,ms));
+  setInterval(()=>{ installProof(); installPosition(); hideOldBadges(); if(!applied) apply(); },5000);
+})();
+</script>
+<!-- SVR PHASE 248 DIRECT LIVE FIX END -->
 </body>
 </html>
+
 
 
 
