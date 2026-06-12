@@ -1,7 +1,7 @@
-{
+﻿{
   "schemaVersion": "1.1",
   "module": "svr-sponsor-event-template",
-  "status": "sample_draft_only",
+  "status": "sample_Private Review_only",
   "active": true,
   "sponsor": {
     "name": "Espresso with Cream Caf\u00e9",
@@ -73,7 +73,7 @@
     "cause_interest_click"
   ],
   "adminWorkflow": [
-    "draft",
+    "Private Review",
     "art_review",
     "sponsor_review",
     "cause_partner_review",
