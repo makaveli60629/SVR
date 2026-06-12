@@ -21,22 +21,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
       - name: Free runner disk before checkout
         shell: bash
         run: |
           set +e
-          echo "Disk before cleanup:"
           df -h
           sudo rm -rf /usr/share/dotnet || true
           sudo rm -rf /usr/local/lib/android || true
           sudo rm -rf /opt/ghc || true
           sudo rm -rf /opt/hostedtoolcache/CodeQL || true
-          sudo rm -rf /usr/local/share/boost || true
           docker system prune -af || true
           sudo apt-get clean || true
-          echo "Disk after cleanup:"
           df -h
 
       - name: Checkout public files only
@@ -68,84 +64,25 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           rm -rf build
           mkdir -p build
-
-          copy_file_if_exists() {
-            if [ -f "$1" ]; then
-              mkdir -p "build/$(dirname "$1")"
-              cp "$1" "build/$1"
-            fi
-          }
-
-          copy_dir_if_exists() {
-            if [ -d "$1" ]; then
-              mkdir -p "build/$1"
-              cp -a "$1"/. "build/$1"/
-            fi
-          }
-
-          copy_file_if_exists index.html
-          copy_file_if_exists style.css
-          copy_file_if_exists launch.css
-          copy_file_if_exists matrix.js
-          copy_file_if_exists site-public-hooks.js
-          copy_file_if_exists logo.png
-          copy_file_if_exists logo.webp
-          copy_file_if_exists favicon.ico
-          copy_file_if_exists .nojekyll
-
-          copy_dir_if_exists site
-          copy_dir_if_exists game
-          copy_dir_if_exists reiki
-          copy_dir_if_exists android
-          copy_dir_if_exists downloads
-          copy_dir_if_exists presentations
-          copy_dir_if_exists presentation
-
+          copy_file(){ if [ -f "$1" ]; then mkdir -p "build/$(dirname "$1")"; cp "$1" "build/$1"; fi; }
+          copy_dir(){ if [ -d "$1" ]; then mkdir -p "build/$1"; cp -a "$1"/. "build/$1"/; fi; }
+          for f in index.html style.css launch.css matrix.js site-public-hooks.js logo.png logo.webp favicon.ico .nojekyll; do copy_file "$f"; done
+          for d in site game reiki android downloads presentations presentation; do copy_dir "$d"; done
           touch build/.nojekyll
-
-          mkdir -p build/reiki
-          mkdir -p build/android
-          mkdir -p build/downloads
-          mkdir -p build/site/presentations/reiki
-          mkdir -p build/site/android
-          mkdir -p build/site/downloads
-          mkdir -p build/game
-
-          if [ ! -f build/site/presentations/reiki/index.html ]; then
-            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>Trueitive / REIKI Presentation</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>Trueitive / REIKI Presentation</h1><p>Prepared for private review.</p><p><a style="color:#ffd36a" href="/game/?scene=lobby&focus=reiki-storefront&source=trueitive-review">Open VR REIKI Storefront Preview</a></p><p><a style="color:#7ffcff" href="/android/">Open Android Demo Page</a></p></body></html>' > build/site/presentations/reiki/index.html
-          fi
-
-          if [ ! -f build/site/android/index.html ]; then
-            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Android Demo</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Android Demo</h1><p>The Android APK demo is being finalized.</p><p><a style="color:#ffd36a" href="/reiki/">Open Trueitive / REIKI Presentation</a></p></body></html>' > build/site/android/index.html
-          fi
-
-          if [ ! -f build/site/downloads/index.html ]; then
-            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Downloads</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Downloads</h1><p>The APK direct file will appear after the demo build is finalized.</p><p><a style="color:#ffd36a" href="/android/">Open Android Demo Page</a></p></body></html>' > build/site/downloads/index.html
-          fi
-
-          if [ ! -f build/reiki/index.html ]; then
-            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/presentations/reiki/"><a href="/site/presentations/reiki/">Open Trueitive / REIKI Presentation</a>' > build/reiki/index.html
-          fi
-
-          if [ ! -f build/android/index.html ]; then
-            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/android/"><a href="/site/android/">Open Android Demo Page</a>' > build/android/index.html
-          fi
-
-          if [ ! -f build/downloads/index.html ]; then
-            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/downloads/"><a href="/site/downloads/">Open Downloads</a>' > build/downloads/index.html
-          fi
-
-          DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          printf '{\n  "status": "ok",\n  "build": "PHASE-1.7.9C-PREPARE-BUILD-EXIT4-FIX",\n  "commit": "%s",\n  "deployedAt": "%s"\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" > build/deploy-health.json
+          mkdir -p build/reiki build/android build/downloads build/site/presentations/reiki build/site/android build/site/downloads build/game
+          if [ ! -f build/site/presentations/reiki/index.html ]; then printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>Trueitive / REIKI Presentation</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>Trueitive / REIKI Presentation</h1><p>Prepared for private partner review.</p><p><a style="color:#ffd36a" href="/game/?scene=lobby&focus=reiki-storefront&source=trueitive-review&svr30sky=1">Open VR REIKI Storefront Preview</a></p><p><a style="color:#7ffcff" href="/android/">Open Android Demo Page</a></p></body></html>' > build/site/presentations/reiki/index.html; fi
+          if [ ! -f build/site/android/index.html ]; then printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Android Demo</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Android Demo</h1><p>The Android APK demo is being finalized.</p><p><a style="color:#ffd36a" href="/reiki/">Open Trueitive / REIKI Presentation</a></p></body></html>' > build/site/android/index.html; fi
+          if [ ! -f build/site/downloads/index.html ]; then printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Downloads</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Downloads</h1><p>The APK direct file will appear after the demo build is finalized.</p><p><a style="color:#ffd36a" href="/android/">Open Android Demo Page</a></p></body></html>' > build/site/downloads/index.html; fi
+          if [ ! -f build/reiki/index.html ]; then printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/presentations/reiki/"><a href="/site/presentations/reiki/">Open Trueitive / REIKI Presentation</a>' > build/reiki/index.html; fi
+          if [ ! -f build/android/index.html ]; then printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/android/"><a href="/site/android/">Open Android Demo Page</a>' > build/android/index.html; fi
+          if [ ! -f build/downloads/index.html ]; then printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/downloads/"><a href="/site/downloads/">Open Downloads</a>' > build/downloads/index.html; fi
+          T="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          printf '{\n "status":"ok",\n "build":"SVR-UPDATE-3.0-MASTER-STABILITY-LOCK",\n "commit":"%s",\n "deployedAt":"%s"\n}\n' "$GITHUB_SHA" "$T" > build/deploy-health.json
           cp build/deploy-health.json build/game/deploy-health.json
-
-          echo "Build contents sample:"
           find build -maxdepth 3 -type f | sort > /tmp/svr-build-files.txt
-          sed -n '1,220p' /tmp/svr-build-files.txt | sed 's#^# - #'
-          echo "Disk after build:"
+          sed -n '1,240p' /tmp/svr-build-files.txt | sed 's#^# - #'
           df -h
 
       - name: Validate routes before upload

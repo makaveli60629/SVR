@@ -41,3 +41,6 @@ _svr_local_backups/
 
 **/keystore.properties
 
+
+_svr_private_drafts_archive/
+

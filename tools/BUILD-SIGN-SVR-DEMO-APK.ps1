@@ -1,0 +1,1 @@
+﻿param([Parameter(Mandatory=$true)][string]$RepoRoot) Write-Host "Build APK from android\SVRPokerDemo using Android Studio/Gradle, then copy app-release.apk to site\downloads\svr-poker-demo.apk. Production signing keys must not be committed." -ForegroundColor Cyan
