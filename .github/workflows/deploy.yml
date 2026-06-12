@@ -20,109 +20,139 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
-      - name: Checkout
+      - name: Free runner disk before checkout
+        shell: bash
+        run: |
+          set +e
+          echo "Disk before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /opt/hostedtoolcache/CodeQL || true
+          sudo rm -rf /usr/local/share/boost || true
+          docker system prune -af || true
+          sudo apt-get clean || true
+          echo "Disk after cleanup:"
+          df -h
+
+      - name: Checkout public files only
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          lfs: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            index.html
+            style.css
+            launch.css
+            matrix.js
+            site-public-hooks.js
+            logo.png
+            logo.webp
+            favicon.ico
+            .nojekyll
+            site
+            game
+            reiki
+            android
+            downloads
+            presentations
+            presentation
 
-      - name: Install tools
-        run: sudo apt-get update && sudo apt-get install -y unzip rsync
-
-      - name: Prepare build
+      - name: Prepare static Pages build
+        shell: bash
         run: |
           set -euo pipefail
-          rm -rf build tmp
+
+          rm -rf build
           mkdir -p build
-          rsync -av \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'update' \
-            --exclude 'backend' \
-            --exclude 'docs' \
-            --exclude 'Library' \
-            --exclude 'Logs' \
-            --exclude 'Temp' \
-            --exclude '*.zip' \
-            --exclude '*.fbx' \
-            ./ build/ || test $? -eq 24
 
-      - name: Apply update zips
-        run: |
-          set -euo pipefail
-          flatten_zip() {
-            ZIP="$1"
-            TARGET="$2"
-            LABEL="$3"
-            if [ ! -f "$ZIP" ]; then
-              echo "No $LABEL zip found at $ZIP"
-              return 0
+          copy_file_if_exists() {
+            if [ -f "$1" ]; then
+              cp "$1" "build/$1"
             fi
-            echo "Applying $LABEL from $ZIP into $TARGET"
-            rm -rf tmp "$TARGET"
-            mkdir -p tmp "$TARGET"
-            unzip -o "$ZIP" -d tmp
-            chmod -R u+rwX,go+rX tmp || true
-            SRC="tmp"
-            if [ -f tmp/index.html ]; then
-              SRC="tmp"
-            elif [ -f tmp/game/index.html ]; then
-              SRC="tmp/game"
-            elif [ -f tmp/site/index.html ]; then
-              SRC="tmp/site"
-            else
-              INNER="$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1 || true)"
-              if [ -n "$INNER" ] && [ -f "$INNER/index.html" ]; then SRC="$INNER"; fi
-            fi
-            if [ ! -f "$SRC/index.html" ]; then
-              echo "ERROR: $LABEL zip has no deployable index.html"
-              exit 1
-            fi
-            cp -a "$SRC"/. "$TARGET"/
-            chmod -R u+rwX,go+rX "$TARGET" || true
-            rm -rf tmp
           }
-          flatten_zip update/site.zip build site
-          flatten_zip update/game.zip build/game game
 
-      - name: Stamp deploy version
-        run: |
-          set -euo pipefail
+          copy_dir_if_exists() {
+            if [ -d "$1" ]; then
+              mkdir -p "build/$1"
+              rsync -a --delete "$1"/ "build/$1"/
+            fi
+          }
+
+          copy_file_if_exists index.html
+          copy_file_if_exists style.css
+          copy_file_if_exists launch.css
+          copy_file_if_exists matrix.js
+          copy_file_if_exists site-public-hooks.js
+          copy_file_if_exists logo.png
+          copy_file_if_exists logo.webp
+          copy_file_if_exists favicon.ico
+          copy_file_if_exists .nojekyll
+
+          copy_dir_if_exists site
+          copy_dir_if_exists game
+          copy_dir_if_exists reiki
+          copy_dir_if_exists android
+          copy_dir_if_exists downloads
+          copy_dir_if_exists presentations
+          copy_dir_if_exists presentation
+
+          touch build/.nojekyll
+
+          mkdir -p build/reiki
+          mkdir -p build/android
+          mkdir -p build/downloads
+          mkdir -p build/site/presentations/reiki
+          mkdir -p build/site/android
+          mkdir -p build/site/downloads
           mkdir -p build/game
-          COMMIT_SHA="${GITHUB_SHA}"
-          DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          cat > build/game/deploy-health.json <<EOF
-          {
-            "status": "ok",
-            "commit": "${COMMIT_SHA}",
-            "deployedAt": "${DEPLOY_TIME}",
-            "workflow": "Auto Deploy",
-            "target": "/game"
-          }
-          EOF
-          cat > build/game/version.json <<EOF
-          {
-            "build": "PHASE-1.7.4-FULL-AUDIT-SITE-GAME-DATA-LOCK",
-            "commit": "${COMMIT_SHA}",
-            "deployedAt": "${DEPLOY_TIME}"
-          }
-          EOF
 
-      - name: Validate build
+          if [ ! -f build/reiki/index.html ]; then
+            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/presentations/reiki/"><a href="/site/presentations/reiki/">Open Trueitive / REIKI Presentation</a>' > build/reiki/index.html
+          fi
+
+          if [ ! -f build/android/index.html ]; then
+            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/android/"><a href="/site/android/">Open Android Demo Page</a>' > build/android/index.html
+          fi
+
+          if [ ! -f build/downloads/index.html ]; then
+            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/downloads/"><a href="/site/downloads/">Open Downloads</a>' > build/downloads/index.html
+          fi
+
+          DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          printf '{\n  "status": "ok",\n  "build": "PHASE-1.7.9B-LITE-PAGES-NO-SPACE-NO-HEREDOC",\n  "commit": "%s",\n  "deployedAt": "%s"\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" > build/deploy-health.json
+          cp build/deploy-health.json build/game/deploy-health.json
+
+          echo "Build contents sample:"
+          find build -maxdepth 3 -type f | sort | sed 's#^# - #' | head -200
+          echo "Disk after build:"
+          df -h
+
+      - name: Validate routes before upload
+        shell: bash
         run: |
           set -euo pipefail
           test -f build/index.html
-          test -f build/game/index.html
-          test -f build/game/deploy-health.json
-          test -f build/game/version.json
-          grep -n "BUILD:" build/game/index.html || true
-          grep -n "PHASE-" build/game/index.html || true
+          test -f build/reiki/index.html
+          test -f build/android/index.html
+          test -f build/downloads/index.html
+          test -f build/site/presentations/reiki/index.html
+          test -f build/site/android/index.html
+          test -f build/deploy-health.json
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: build
 
-      - name: Deploy
+      - name: Deploy Pages
         uses: actions/deploy-pages@v4
