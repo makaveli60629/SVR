@@ -1,9 +1,15 @@
-{
-  "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK",
-  "created": "2026-06-08",
-  "track": "game-only",
-  "siteTouched": false,
-  "phase": 120,
-  "focus": "Fix Reiki storefront alignment so red carpet/glass extension stays level, restore screenshot-style Trueitive storefront, keep hologram carousel, raise Moon and Mars higher."
+﻿{
+  "build": "PHASE-1.7.4-FULL-AUDIT-SITE-GAME-DATA-LOCK",
+  "phase": "1.7.4",
+  "scope": "full repo/site/game/data audit; APK route; RICI route; deployment zip health",
+  "updatedAt": "2026-06-12T13:07:24.9492983-05:00",
+  "rules": [
+    "Playable poker first",
+    "Lobby storefront portals only",
+    "Private scenes contain full experiences",
+    "Quest controller fallback preserved",
+    "Android fallback preserved",
+    "No secrets in frontend",
+    "game.zip under 25MB"
+  ]
 }

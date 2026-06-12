@@ -1,4 +1,4 @@
-name: Auto Deploy
+﻿name: Auto Deploy
 
 on:
   push:
@@ -20,170 +20,89 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install tools
-        run: sudo apt-get update && sudo apt-get install -y rsync python3
+        run: sudo apt-get update && sudo apt-get install -y unzip rsync
 
-      - name: Prepare lean public build
+      - name: Prepare build
         run: |
           set -euo pipefail
           rm -rf build tmp
           mkdir -p build
+          rsync -av \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'update' \
+            --exclude 'backend' \
+            --exclude 'docs' \
+            --exclude 'Library' \
+            --exclude 'Logs' \
+            --exclude 'Temp' \
+            --exclude '*.zip' \
+            --exclude '*.fbx' \
+            ./ build/ || test $? -eq 24
 
-          copy_file() {
-            SRC="$1"
-            if [ -f "$SRC" ]; then
-              mkdir -p "build/$(dirname "$SRC")"
-              cp -a "$SRC" "build/$SRC"
-              echo "Copied file: $SRC"
-            fi
-          }
-
-          copy_dir() {
-            SRC="$1"
-            if [ -d "$SRC" ]; then
-              mkdir -p "build/$SRC"
-              rsync -a "$SRC"/ "build/$SRC"/
-              echo "Copied dir: $SRC"
-            fi
-          }
-
-          copy_file index.html
-          copy_file style.css
-          copy_file launch.css
-          copy_file matrix.js
-          copy_file site-public-hooks.js
-          copy_file logo.png
-          copy_file logo.webp
-          copy_file manifest.json
-          copy_file favicon.ico
-          copy_file CNAME
-
-          copy_dir site
-          copy_dir css
-          copy_dir js
-          copy_dir img
-          copy_dir setup
-
-          if [ ! -f build/index.html ]; then
-            echo "ERROR: root index.html missing from public build"
-            exit 1
-          fi
-
-      - name: Apply game update zip if present
+      - name: Apply update zips
         run: |
           set -euo pipefail
-
-          safe_extract_zip() {
-            ZIP="$1"
-            DEST="$2"
-
-            python3 - "$ZIP" "$DEST" <<'PY'
-          import os
-          import sys
-          import zipfile
-
-          zip_path = sys.argv[1]
-          dest = sys.argv[2]
-          os.makedirs(dest, exist_ok=True)
-
-          with zipfile.ZipFile(zip_path) as zf:
-              for member in zf.infolist():
-                  name = member.filename.replace("\\", "/")
-                  if not name or name.startswith("/") or ".." in name.split("/"):
-                      print(f"Skipping unsafe zip member: {member.filename}")
-                      continue
-
-                  target = os.path.abspath(os.path.join(dest, name))
-                  root = os.path.abspath(dest)
-                  if not target.startswith(root + os.sep) and target != root:
-                      print(f"Skipping outside-target zip member: {member.filename}")
-                      continue
-
-                  if member.is_dir() or name.endswith("/"):
-                      os.makedirs(target, exist_ok=True)
-                      continue
-
-                  os.makedirs(os.path.dirname(target), exist_ok=True)
-                  with zf.open(member) as src, open(target, "wb") as out:
-                      out.write(src.read())
-
-          print(f"Extracted {zip_path} into {dest}")
-          PY
-          }
-
           flatten_zip() {
             ZIP="$1"
             TARGET="$2"
             LABEL="$3"
-
             if [ ! -f "$ZIP" ]; then
-              echo "No $LABEL zip found at $ZIP; using committed fallback if available."
-              if [ -d game ]; then
-                mkdir -p "$TARGET"
-                rsync -a --exclude '*.fbx' --exclude '*.zip' game/ "$TARGET"/
-              fi
+              echo "No $LABEL zip found at $ZIP"
               return 0
             fi
-
             echo "Applying $LABEL from $ZIP into $TARGET"
             rm -rf tmp "$TARGET"
             mkdir -p tmp "$TARGET"
-
-            safe_extract_zip "$ZIP" tmp
+            unzip -o "$ZIP" -d tmp
             chmod -R u+rwX,go+rX tmp || true
-
             SRC="tmp"
             if [ -f tmp/index.html ]; then
               SRC="tmp"
             elif [ -f tmp/game/index.html ]; then
               SRC="tmp/game"
+            elif [ -f tmp/site/index.html ]; then
+              SRC="tmp/site"
             else
               INNER="$(find tmp -mindepth 1 -maxdepth 1 -type d | head -n1 || true)"
-              if [ -n "$INNER" ] && [ -f "$INNER/index.html" ]; then
-                SRC="$INNER"
-              fi
+              if [ -n "$INNER" ] && [ -f "$INNER/index.html" ]; then SRC="$INNER"; fi
             fi
-
             if [ ! -f "$SRC/index.html" ]; then
               echo "ERROR: $LABEL zip has no deployable index.html"
-              echo "Top-level extracted files:"
-              find tmp -maxdepth 2 -type f | sort | head -50 || true
               exit 1
             fi
-
             cp -a "$SRC"/. "$TARGET"/
             chmod -R u+rwX,go+rX "$TARGET" || true
             rm -rf tmp
           }
-
+          flatten_zip update/site.zip build site
           flatten_zip update/game.zip build/game game
 
-      - name: Stamp game deploy health
+      - name: Stamp deploy version
         run: |
           set -euo pipefail
           mkdir -p build/game
           COMMIT_SHA="${GITHUB_SHA}"
           DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          BUILD_LABEL="UPDATE-1.5-STABILITY-BUILD"
-
-          if [ -f build/game/docs/BUILD_VERSION.json ]; then
-            EXISTING_LABEL="$(grep -o 'UPDATE-[A-Z0-9._-]*\\|PHASE-[A-Z0-9._-]*' build/game/docs/BUILD_VERSION.json | head -n1 || true)"
-            if [ -n "$EXISTING_LABEL" ]; then BUILD_LABEL="$EXISTING_LABEL"; fi
-          fi
-
           cat > build/game/deploy-health.json <<EOF
           {
             "status": "ok",
             "commit": "${COMMIT_SHA}",
             "deployedAt": "${DEPLOY_TIME}",
             "workflow": "Auto Deploy",
-            "target": "/game",
-            "build": "${BUILD_LABEL}"
+            "target": "/game"
+          }
+          EOF
+          cat > build/game/version.json <<EOF
+          {
+            "build": "PHASE-1.7.4-FULL-AUDIT-SITE-GAME-DATA-LOCK",
+            "commit": "${COMMIT_SHA}",
+            "deployedAt": "${DEPLOY_TIME}"
           }
           EOF
 
@@ -193,9 +112,9 @@ jobs:
           test -f build/index.html
           test -f build/game/index.html
           test -f build/game/deploy-health.json
-
-          echo "Game build label search:"
-          grep -R "UPDATE-\\|PHASE-\\|BUILD:" -n build/game/index.html build/game/docs/BUILD_VERSION.json build/game/deploy-health.json 2>/dev/null || true
+          test -f build/game/version.json
+          grep -n "BUILD:" build/game/index.html || true
+          grep -n "PHASE-" build/game/index.html || true
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

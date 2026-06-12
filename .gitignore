@@ -1,4 +1,4 @@
-# Unity generated
+﻿# Unity generated
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -32,3 +32,9 @@ api/.env.local
 api/node_modules/
 .env
 .env.local
+backend/.env
+*.jks
+*.keystore
+android/keystores/
+_svr_local_backups/
+

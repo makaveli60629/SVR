@@ -1,7 +1,15 @@
 ﻿{
-  "build": "PHASE-248-DIRECT-LIVE-VIBEZ-COSMIC-FIX",
-  "phase": "248",
-  "scope": "direct game/index.html patch; VIBEZ Theater visible; Moon/Mars high; position display always",
-  "testUrl": "https://svrpoker.com/game/?v=phase-248-direct-live-vibez-cosmic-fix",
-  "updatedAt": "2026-06-10T23:09:41.5950105-05:00"
+  "build": "PHASE-1.7.4-FULL-AUDIT-SITE-GAME-DATA-LOCK",
+  "phase": "1.7.4",
+  "scope": "full repo/site/game/data audit; APK route; RICI route; deployment zip health",
+  "updatedAt": "2026-06-12T13:07:24.9492983-05:00",
+  "rules": [
+    "Playable poker first",
+    "Lobby storefront portals only",
+    "Private scenes contain full experiences",
+    "Quest controller fallback preserved",
+    "Android fallback preserved",
+    "No secrets in frontend",
+    "game.zip under 25MB"
+  ]
 }
