@@ -1,8 +1,5 @@
-import { applyReikiPhase136FlipOrbit } from "./reiki_phase136_flip_orbit.js";
+import { applyPhase137PlanetStabilizer } from "./reiki_phase137_planet_stabilizer.js";
 
-// Compatibility wrapper: main.js still calls the older Reiki entry point.
-// Phase 136 flips the storefront so the user sees the front, beautifies the wall layout,
-// keeps one interactive hologram screen, and adds the Earth lobby orbit system.
 export function applyPhase119ReikiTrueitiveStorefrontFinal(args = {}){
-  return applyReikiPhase136FlipOrbit(args);
+  return applyPhase137PlanetStabilizer(args);
 }
