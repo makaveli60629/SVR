@@ -1,8 +1,8 @@
-const LABEL = "UPDATE-3.0-PHASE-161-WELLNESS-HUB-LUXURY-STOREFRONT-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-162-ALL-HUB-LUXURY-STOREFRONTS-HUD-LOCK";
 function syncLabels(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE106.source = "Phase 161 Wellness Hub luxury storefront lock.";
+  window.SVR_PHASE106.source = "Phase 162 all hub luxury storefronts and premium holographic HUD lock.";
   document.title = `ScarlettVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
