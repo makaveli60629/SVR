@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 129",
-  "build": "UPDATE-3.0-PHASE-129-REIKI-STOREFRONT-CAROUSEL-STORE-FRONTS-LOCK",
+  "version": "Update 3.0 Phase 130",
+  "build": "UPDATE-3.0-PHASE-130-REIKI-ONE-DISPLAY-NO-FLOOR-TABS-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Restored Phase 128 baseline and added Phase 129 Reiki/storefront cleanup."
+  "notes": "Reiki one-display cleanup, no floor tabs, plant clutter hidden, three founder/info columns added."
 }
