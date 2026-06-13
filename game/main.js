@@ -8,16 +8,17 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { CONFIG } from "./modules/config.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyPhase119ReikiTrueitiveStorefrontFinal } from "./modules/reiki_phase119_trueitive_storefront_final.js";
+import { addNathanWalkingNPCPhase131 } from "./modules/npc_nathan_walker_phase131.js";
 import "./modules/asset_registry_phase122.js";
 import { addPhase123AdBannerBuildings } from "./modules/ad_banner_buildings_phase123.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-130-REIKI-ONE-DISPLAY-NO-FLOOR-TABS-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-131-NATHAN-WALKING-NPC-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 130: Reiki one-display cleanup, no floor tabs, Phase 129 storefronts preserved, Phase 128 high planet baseline preserved" };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 131: Nathan walking NPC patrol wired; Phase 130 Reiki cleanup and Phase 128 high planet baseline preserved" };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -301,6 +302,7 @@ const watch = createWristWatch({
 
 createStoreWebPortal();
 applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, renderer, sceneTargets, setStatus, log });
+addNathanWalkingNPCPhase131({ scene, sceneTargets, setStatus, log });
 
 $toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
@@ -357,7 +359,6 @@ renderer.setAnimationLoop(()=>{
   const now = performance.now();
   const dt = Math.min((now - tPrev) / 1000, 0.033);
   tPrev = now;
-
   if (!renderer.xr.isPresenting){
     if (!AUTOCAM) desktop.update(dt);
     else {
@@ -377,13 +378,10 @@ renderer.setAnimationLoop(()=>{
   } else {
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
-
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
   if (scene.userData._phase123AdBanners?.userData?.tick) scene.userData._phase123AdBanners.userData.tick(scene.userData._time || (now * 0.001));
-
   hands.update(dt);
   hands.updateDebug();
-
   const leftHand = hands.getLeftHand();
   const rightHand = hands.getRightHand();
   const leftController = hands.getLeftController();
@@ -399,7 +397,6 @@ renderer.setAnimationLoop(()=>{
       modeCb: (text)=>{ setMode(text); }
     });
   }
-
   if (watch) watch.update(dt, leftHand, rightHand);
   renderer.render(scene, camera);
 });
