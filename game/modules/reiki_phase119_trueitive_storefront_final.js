@@ -7,6 +7,7 @@ import { applyPhase158ReikiStorefrontDebrandLock } from "./phase158_reiki_storef
 import { applyPhase159VibezGeometryStorefront } from "./phase159_vibez_geometry_storefront.js";
 import { applyPhase160OrbitalPlanetStarfield } from "./phase160_orbital_planet_starfield.js";
 import { applyPhase161WellnessLuxuryStorefront } from "./phase161_wellness_luxury_storefront.js";
+import { applyPhase162AllHubLuxuryStorefronts } from "./phase162_all_hub_luxury_storefronts.js";
 
 async function applyPhase119ReikiStorefrontFinal(args = {}){
   const result = await applyPhase143WallAlignedSkylineAds(args);
@@ -18,6 +19,7 @@ async function applyPhase119ReikiStorefrontFinal(args = {}){
   applyPhase159VibezGeometryStorefront(args, result);
   applyPhase160OrbitalPlanetStarfield(args, result);
   applyPhase161WellnessLuxuryStorefront(args, result);
+  applyPhase162AllHubLuxuryStorefronts(args, result);
   return result;
 }
 
