@@ -1,8 +1,8 @@
 {
-  "phase": "SITE-PHASE03-STORE-REFINE-ZENDEN-APPROVAL",
+  "phase": "UPDATE-3.0-PHASE-158-REIKI-STOREFRONT-DEBRAND-LOCK",
   "checkoutEnabled": false,
   "approvalMarkers": {
-    "reiki": "WAITING APPROVAL \u2022 ZEN DEN"
+    "reiki": "SPONSOR PLACEHOLDER ONLY"
   },
   "categories": [
     "SVR Game Store",
@@ -14,7 +14,8 @@
   "notes": [
     "Root public Matrix page is not modified by this patch.",
     "All products are sample placeholders for sandbox cart logic only.",
-    "Stripe checkout remains disabled until secure backend approval."
+    "Stripe checkout remains disabled until secure backend approval.",
+    "Reiki hub sponsor branding is registry-controlled only."
   ],
   "cashApp": "$SVRhelp"
 }
