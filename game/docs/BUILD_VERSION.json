@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-141-VISIBLE-PLANETS-PROFESSIONAL-STOREFRONT-LOCK",
+  "build": "UPDATE-3.0-PHASE-142-FULL-LOBBY-REMODEL-VISIBLE-PLANETS-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "141",
-  "summary": "Makes the planet system visibly readable from the lobby by replacing Phase 140 planets with a lower, closer, larger Earth/Moon/Mars showcase orbit; Earth is the largest, Moon follows Earth, and Mars moves closer/farther slowly. Also upgrades the Reiki storefront with a cleaner professional black/glass facade, premium marquee, stronger red carpet entrance, gold stanchion poles, sagging red velvet ropes, plants, and polished hologram/meditation pod. Vibes Theater gets a blue marquee polish.",
-  "label": "UPDATE-3.0-PHASE-141-VISIBLE-PLANETS-PROFESSIONAL-STOREFRONT-LOCK",
-  "notes": "Game-only update. Website/site untouched. Phase 140 lobby expansion remains active.",
-  "updated": "2026-06-13T07:55:00Z"
+  "phase": "142",
+  "summary": "Full lobby remodel patch: forces the planets into a big visible north-sky showcase, disables earlier planet groups, keeps Earth largest with Moon and Mars following slowly, hides guide lines, and overlays a more professional Trueitive Reiki glass storefront with black facade, marquee, red carpet, gold poles, and sagging red ropes.",
+  "label": "UPDATE-3.0-PHASE-142-FULL-LOBBY-REMODEL-VISIBLE-PLANETS-LOCK",
+  "notes": "Game-only update. Website/site untouched.",
+  "updated": "2026-06-13T08:10:00Z"
 }
