@@ -8,13 +8,14 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyReikiCleanCarousel113 } from "./modules/update_3_0_reiki_clean_carousel_113.js";
 import { applyPhase119ReikiTrueitiveStorefrontFinal } from "./modules/reiki_phase119_trueitive_storefront_final.js";
+import "./modules/asset_registry_phase122.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-121-MOON-MARS-HIGH-NO-BACKGROUND-BUILDINGS-LOCK', source: '1.4G Reiki storefront backup with Phase 120 yaw-only alignment and high Moon/Mars lock' };
+window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-122-GLOVES-EARTH-ASSET-ADD-LOCK', source: '1.4G Reiki storefront backup with Phase 120 yaw-only alignment and high Moon/Mars lock' };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
