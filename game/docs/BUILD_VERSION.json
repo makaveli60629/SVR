@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-128-HIGHER-BIGGER-EARTH-MOON-MARS-ORBIT-LOCK",
+  "build": "UPDATE-3.0-PHASE-129-REIKI-STOREFRONT-CAROUSEL-STORE-FRONTS-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "128",
-  "summary": "Fitted Quest glove overlay, lighter high-sky planets/stars, hand teleport release/hold fallback, freeze/black-corner performance cleanup.",
-  "label": "UPDATE-3.0-PHASE-128-HIGHER-BIGGER-EARTH-MOON-MARS-ORBIT-LOCK",
-  "notes": "Higher sky solar-system cluster: larger Earth anchor, smaller Moon orbiting Earth, Mars orbiting Earth/Moon cluster; Quest performance preserved.",
-  "updated": "2026-06-13T02:45:00Z"
+  "phase": "129",
+  "summary": "Restores Phase 128 game baseline, cleans the Reiki presentation storefront, moves glass/wall elements back for open carpet space, keeps Trueitive presentation with WAITING FOR APPROVAL, and adds Vibes Theater, SVR Store, PGA Expansion, and Scorpion storefront portals.",
+  "label": "UPDATE-3.0-PHASE-129-REIKI-STOREFRONT-CAROUSEL-STORE-FRONTS-LOCK",
+  "notes": "Game-only branch based on Phase 128. Website/site untouched. Reiki carousel remains compact and presentation-ready with approval label.",
+  "updated": "2026-06-13T04:10:00Z"
 }
