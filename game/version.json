@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-174-WALL-GUARD-LATE-CLEANUP-LOCK",
-  "track": "wall-guard-late-cleanup",
+  "build": "UPDATE-3.0-PHASE-174A-AUDIT-PATCH-LOCK",
+  "track": "wall-guard-audit-patch",
   "siteTouched": false,
-  "phase": "174",
-  "summary": "Late cleanup guard added after boot while preserving the Phase 173 single octagon wall.",
-  "label": "UPDATE-3.0-PHASE-174-WALL-GUARD-LATE-CLEANUP-LOCK",
-  "notes": "Preserves storefront panels, locomotion audit, sponsor schedule loader, and locomotion/deal logic.",
-  "updated": "2026-06-14T01:35:00Z"
+  "phase": "174A",
+  "summary": "Audit patch added after Phase 174 to preserve locomotion visuals while hiding late duplicate planets, wall layers, and background clutter.",
+  "label": "UPDATE-3.0-PHASE-174A-AUDIT-PATCH-LOCK",
+  "notes": "Preserves Phase 173 single wall, sponsor module, Moon/Mars approved sky objects, teleport hand glow, watch, controllers, and Android/Desktop controls.",
+  "updated": "2026-06-14T01:50:00Z"
 }
