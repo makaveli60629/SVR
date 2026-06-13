@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "svr-public-broadcast-v1",
+  "mode": "demo-replay",
+  "title": "SVR Demo Broadcast Loop",
+  "cardsPolicy": "no private cards shown during live action; revealed cards only after showdown or replay approval",
+  "frames": [
+    { "t": 0, "headline": "WELCOME TO SVR POKER", "pot": 0, "action": "Lobby demo broadcast ready", "board": [], "stacks": [50000, 50000, 50000, 50000, 50000, 50000] },
+    { "t": 5, "headline": "DEMO HAND 001", "pot": 300, "action": "Blinds posted: 100 / 200", "board": [], "stacks": [49900, 49800, 50000, 50000, 50000, 50000] },
+    { "t": 10, "headline": "PRE-FLOP ACTION", "pot": 900, "action": "Seat 3 raises to 700", "board": [], "stacks": [49900, 49800, 49300, 50000, 50000, 50000] },
+    { "t": 15, "headline": "FLOP", "pot": 2100, "action": "Board: A♠ 8♦ 3♣", "board": ["A♠", "8♦", "3♣"], "stacks": [49200, 49800, 49300, 50000, 50000, 50000] },
+    { "t": 20, "headline": "TURN", "pot": 4100, "action": "Seat 1 calls 1000", "board": ["A♠", "8♦", "3♣", "J♥"], "stacks": [48200, 49800, 48300, 50000, 50000, 50000] },
+    { "t": 25, "headline": "RIVER", "pot": 7900, "action": "Seat 3 bets 1900", "board": ["A♠", "8♦", "3♣", "J♥", "2♠"], "stacks": [48200, 49800, 46400, 50000, 50000, 50000] },
+    { "t": 30, "headline": "HAND COMPLETE", "pot": 7900, "action": "Winner: Seat 3. Cards reveal only in replay mode.", "board": ["A♠", "8♦", "3♣", "J♥", "2♠"], "stacks": [48200, 49800, 54300, 50000, 50000, 50000] }
+  ]
+}
