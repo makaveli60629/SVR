@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SVR Poker | Official 404</title>
+  <meta name="description" content="Official SVR Poker 404 page." />
+  <link rel="icon" href="./logo.png" type="image/png" />
+  <style>
+    :root { color-scheme: dark; --cyan:#58fff4; --violet:#b56cff; --pink:#ff5ceb; --ink:#030008; --text:#effcff; }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; margin: 0; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--text); background: radial-gradient(circle at 50% 20%, rgba(181,108,255,.22), transparent 32%), radial-gradient(circle at 50% 70%, rgba(88,255,244,.13), transparent 42%), #000; overflow-x: hidden; }
+    body::before { content:""; position: fixed; inset: 0; pointer-events: none; background: linear-gradient(120deg, transparent 0 18%, rgba(88,255,244,.06) 19%, transparent 20% 58%, rgba(255,92,235,.05) 59%, transparent 60%); opacity:.72; }
+    .page { min-height: 100svh; display: grid; place-items: center; padding: 28px; }
+    .card { width: min(760px, 100%); text-align: center; border: 1px solid rgba(88,255,244,.42); border-radius: 30px; background: linear-gradient(180deg, rgba(0,8,14,.88), rgba(5,0,16,.88)); box-shadow: 0 0 42px rgba(88,255,244,.18), 0 0 66px rgba(181,108,255,.12); padding: clamp(24px, 5vw, 46px); }
+    .logo { width: min(300px, 70vw); height: auto; display: block; margin: 0 auto 12px; filter: drop-shadow(0 0 20px rgba(255,92,235,.55)) drop-shadow(0 0 18px rgba(88,255,244,.38)); }
+    .code { margin: 12px 0 0; color: #ffccd9; font-weight: 900; letter-spacing: .12em; font-size: 14px; text-transform: uppercase; }
+    h1 { margin: 10px 0 8px; font-size: clamp(34px, 7vw, 74px); line-height: .95; text-shadow: 0 0 24px rgba(88,255,244,.62); }
+    p { margin: 10px auto; max-width: 620px; color: #bfefff; line-height: 1.55; font-size: clamp(16px, 2.4vw, 19px); }
+    .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 24px; }
+    a { color: #fff; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 12px 18px; border-radius: 999px; border: 1px solid rgba(88,255,244,.48); text-decoration: none; font-weight: 900; background: rgba(4, 18, 26, .74); box-shadow: 0 12px 28px rgba(0,0,0,.34); }
+    .btn.primary { border-color: rgba(255,92,235,.72); background: linear-gradient(135deg, rgba(92,0,134,.86), rgba(9,34,48,.86)); }
+    .btn:hover, .btn:focus-visible { transform: translateY(-1px); outline: none; box-shadow: 0 0 24px rgba(88,255,244,.22), 0 14px 32px rgba(0,0,0,.38); }
+    .foot { margin-top: 24px; color: rgba(239,252,255,.68); font-size: 13px; letter-spacing: .04em; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="card" aria-labelledby="missing-page-title">
+      <img class="logo" src="./logo.png" alt="SVR Poker logo" />
+      <div class="code">Official SVR Poker Error Page</div>
+      <h1 id="missing-page-title">404</h1>
+      <p>The requested SVR route is not available, was moved, or has not been published yet.</p>
+      <p>Use the official navigation below to return to a live SVR page.</p>
+      <nav class="actions" aria-label="404 recovery navigation">
+        <a class="btn primary" href="./index.html">Return Home</a>
+        <a class="btn" href="./site/index.html">Preview Site</a>
+        <a class="btn" href="./game/index.html">Launch VR Room</a>
+      </nav>
+      <div class="foot">SVR Poker • Scarlett Holding LLC • Team Nova</div>
+    </section>
+  </main>
+</body>
+</html>
