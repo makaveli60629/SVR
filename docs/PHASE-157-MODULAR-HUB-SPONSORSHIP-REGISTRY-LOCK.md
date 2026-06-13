@@ -7,7 +7,9 @@ Phase 157 removes the retired Reiki sponsor module behavior, removes Reiki video
 - Kept the Reiki store/hub structure active as a generic placeholder.
 - Removed Reiki video media from the active site Reiki preview page.
 - Removed Reiki video media from the active site About hub section.
-- Removed video playback from the active game Reiki storefront/hologram module.
+- Removed video playback from the active game Reiki storefront/hub module.
+- Disabled the standalone game Reiki video portal and replaced it with a no-media placeholder page.
+- Removed the Reiki Video button from the game navigation bar.
 - Kept the game Reiki hub as a slide/card placeholder instead of a video module.
 - Added `game/modules/hub_sponsorship_registry_phase157.js`.
 - Added `site/js/hub-sponsorship-registry.js`.
@@ -48,6 +50,7 @@ No retired sponsor name, company name, profile name, website link, logo, photo, 
 ## Files changed
 - `site/reiki-about.html`
 - `site/about.html`
+- `game/reiki-video-portal.html`
 - `game/modules/reiki_hologram_phase133.js`
 - `game/modules/hub_sponsorship_registry_phase157.js`
 - `site/js/hub-sponsorship-registry.js`
@@ -61,11 +64,12 @@ No retired sponsor name, company name, profile name, website link, logo, photo, 
 ## Verification checklist
 1. Open the Reiki site preview and confirm there is no video player.
 2. Open the About page and confirm the hub section has no video player.
-3. Enter the game lobby and confirm the Reiki hub still exists.
-4. Confirm the Reiki hub display is slide/card placeholder content, not video playback.
-5. Confirm sponsor slots appear as placeholders through the registry.
-6. Confirm Vibes Theater is excluded from the sponsor registry.
-7. Confirm prior skyline ring, moving moon glow, Quest hands, teleport, watch, and poker baseline remain intact.
+3. Open the old game Reiki video portal and confirm it is disabled as a placeholder page.
+4. Enter the game lobby and confirm the Reiki hub still exists.
+5. Confirm the Reiki hub display is slide/card placeholder content, not video playback.
+6. Confirm sponsor slots appear as placeholders through the registry.
+7. Confirm Vibes Theater is excluded from the sponsor registry.
+8. Confirm prior skyline ring, moving moon glow, Quest hands, teleport, watch, and poker baseline remain intact.
 
 ## Locked label
 `UPDATE-3.0-PHASE-157-MODULAR-HUB-SPONSORSHIP-REGISTRY-LOCK`
