@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 142",
-  "build": "UPDATE-3.0-PHASE-142-FULL-LOBBY-REMODEL-VISIBLE-PLANETS-LOCK",
+  "version": "Update 3.0 Phase 143",
+  "build": "UPDATE-3.0-PHASE-143-WALL-ALIGNED-SKYLINE-ADS-HIGH-PLANETS-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Full lobby remodel patch with big visible north-sky planets and professional Trueitive Reiki glass storefront overlay."
+  "notes": "Wall aligned signs, permanent high-rise backdrop buildings, table-facing ad banners, higher textured north-sky planets, and hidden old guide lines."
 }
