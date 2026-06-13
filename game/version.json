@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-155-SKYLINE-AD-RING-MOON-GLOW-LOCK",
-  "track": "skyline-ad-ring-and-moving-moon-glow",
+  "build": "UPDATE-3.0-PHASE-156-REIKI-SPONSOR-PLACEHOLDER-LOCK",
+  "track": "reiki-sponsor-placeholder-lock",
   "siteTouched": true,
-  "phase": "155",
-  "summary": "Skyline and moon glow correction pass. Buildings are aligned in a full surrounding ring around the lobby, towers are taller and wider for ad banners, and the moon glow now follows/pulses with the raised moon.",
-  "label": "UPDATE-3.0-PHASE-155-SKYLINE-AD-RING-MOON-GLOW-LOCK",
-  "notes": "Preserves Phase 154 high small textured planets, Reiki hologram pod button outside video, Phase 152 post-boot verification, Quest hands, teleport, watch, and poker room baseline.",
-  "updated": "2026-06-13T19:15:00Z"
+  "phase": "156",
+  "summary": "Reiki sponsor cleanup pass. Prior named sponsor branding is removed from active Reiki site pages and active game modules, replaced with generic placeholder content, and locked behind written approval before any sponsor details return.",
+  "label": "UPDATE-3.0-PHASE-156-REIKI-SPONSOR-PLACEHOLDER-LOCK",
+  "notes": "Preserves Phase 155 skyline ad ring and moving moon glow, Phase 154 high small textured planets, Reiki hologram pod button outside video, Quest hands, teleport, watch, and poker room baseline.",
+  "updated": "2026-06-13T19:30:00Z"
 }
