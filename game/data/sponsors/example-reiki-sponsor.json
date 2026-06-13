@@ -21,10 +21,10 @@
   ],
   "schedule": {
     "timezone": "America/Chicago",
-    "startDate": "2026-07-01",
-    "endDate": "2026-08-01",
-    "days": ["Friday", "Saturday", "Sunday"],
-    "hours": ["18:00", "22:00"]
+    "startDate": "2026-06-01",
+    "endDate": "2026-12-31",
+    "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "hours": ["00:00", "23:59"]
   },
   "assets": {
     "logoUrl": "",
@@ -40,6 +40,6 @@
   "admin": {
     "approvedBy": "SVR Admin",
     "approvedAt": "2026-06-13T23:59:00Z",
-    "notes": "Static example. Future admin dashboard will write this profile automatically."
+    "notes": "Static active demo. Schedule window intentionally active so Phase 172C can be verified in-game."
   }
 }
