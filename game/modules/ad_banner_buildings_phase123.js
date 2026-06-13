@@ -170,7 +170,7 @@ export function addPhase123AdBannerBuildings({ scene, radius, wallHeight, logoTe
   const bannerWidth = 5.05;
   const bannerHeight = Math.min(8.9, Math.max(7.4, wallHeight - 0.85));
   const buildingDepth = 0.20;
-  // Phase 126: embed the 8 banner faces into the inner lobby wall, facing the table.
+  // Phase 127: embed the 8 banner faces into the inner lobby wall, facing the table.
   const placementRadius = Math.max(11.0, radius - 0.82);
   const bannerRecords = [];
 
@@ -239,6 +239,6 @@ export function addPhase123AdBannerBuildings({ scene, radius, wallHeight, logoTe
     });
   };
   scene.add(root);
-  if (typeof log === "function") log("Phase 126: 8 wall-embedded table-facing ad banner panels active.");
+  if (typeof log === "function") log("Phase 127: 8 wall-embedded table-facing ad banner panels active.");
   return root;
 }

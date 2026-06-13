@@ -1,8 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-126-HIGH-SOLAR-SYSTEM-MILKY-WAY-WALL-BANNERS-TP-PERFORMANCE-LOCK",
+  "build": "UPDATE-3.0-PHASE-128-HIGHER-BIGGER-EARTH-MOON-MARS-ORBIT-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "126",
-  "summary": "Higher Earth/Moon/Mars orbit cluster, Milky Way/stars, embedded wall banners, hand teleport release fix, glove visibility, performance/blink reduction"
+  "phase": "128",
+  "summary": "Fitted Quest glove overlay, lighter high-sky planets/stars, hand teleport release/hold fallback, freeze/black-corner performance cleanup.",
+  "label": "UPDATE-3.0-PHASE-128-HIGHER-BIGGER-EARTH-MOON-MARS-ORBIT-LOCK",
+  "notes": "Higher sky solar-system cluster: larger Earth anchor, smaller Moon orbiting Earth, Mars orbiting Earth/Moon cluster; Quest performance preserved.",
+  "updated": "2026-06-13T02:45:00Z"
 }
