@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-154-HIGH-SMALL-TEXTURED-PLANETS-LOCK",
-  "track": "high-small-textured-planets-and-hologram-pod-button",
+  "build": "UPDATE-3.0-PHASE-155-SKYLINE-AD-RING-MOON-GLOW-LOCK",
+  "track": "skyline-ad-ring-and-moving-moon-glow",
   "siteTouched": true,
-  "phase": "154",
-  "summary": "Planet and Reiki pod correction pass. Planets are raised higher, scaled down much smaller, re-textured with moon crater, Mars surface, and Earth detail, and the hologram pod control is moved outside the video with SVR logo-color glow.",
-  "label": "UPDATE-3.0-PHASE-154-HIGH-SMALL-TEXTURED-PLANETS-LOCK",
-  "notes": "Preserves Phase 152 post-boot verification, Phase 150 hard visual refine, extra-thin silver poles, no-overlay storefront, cleaner skyline, Quest hands, and poker room baseline.",
-  "updated": "2026-06-13T19:00:00Z"
+  "phase": "155",
+  "summary": "Skyline and moon glow correction pass. Buildings are aligned in a full surrounding ring around the lobby, towers are taller and wider for ad banners, and the moon glow now follows/pulses with the raised moon.",
+  "label": "UPDATE-3.0-PHASE-155-SKYLINE-AD-RING-MOON-GLOW-LOCK",
+  "notes": "Preserves Phase 154 high small textured planets, Reiki hologram pod button outside video, Phase 152 post-boot verification, Quest hands, teleport, watch, and poker room baseline.",
+  "updated": "2026-06-13T19:15:00Z"
 }
