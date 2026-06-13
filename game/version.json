@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-147-LIVE-DEPLOYMENT-QUEST-PERFORMANCE-PASS",
-  "track": "live-deployment-quest-performance",
+  "build": "UPDATE-3.0-PHASE-148-QUEST-FPS-RENDER-OPTIMIZATION-LOCK",
+  "track": "quest-fps-render-optimization",
   "siteTouched": true,
-  "phase": "147",
-  "summary": "Live deployment check and Quest lobby performance pass. Official logo loading screen remains active, loading-screen hologram button remains removed, route 404 coverage remains active, and build label advances to Phase 147.",
-  "label": "UPDATE-3.0-PHASE-147-LIVE-DEPLOYMENT-QUEST-PERFORMANCE-PASS",
-  "notes": "Preserves Phase 143 skyline planet lobby work and Phase 144 through 146 loading route safety work.",
-  "updated": "2026-06-13T17:15:00Z"
+  "phase": "148",
+  "summary": "Quest FPS cleanup and lobby render optimization lock. Adds adaptive Quest/mobile pixel ratio, XR framebuffer scaling, foveation, shadow disable pass, mesh frustum culling, texture anisotropy clamp, and optional banner/debug tick throttling.",
+  "label": "UPDATE-3.0-PHASE-148-QUEST-FPS-RENDER-OPTIMIZATION-LOCK",
+  "notes": "Preserves Phase 147 deployment label path, Phase 145 route safety, official logo loading screen, visible planets, storefront polish, Quest hands, and poker room baseline.",
+  "updated": "2026-06-13T17:30:00Z"
 }
