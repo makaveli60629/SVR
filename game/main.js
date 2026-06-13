@@ -12,14 +12,16 @@ import { addNathanWalkingNPCPhase131 } from "./modules/npc_nathan_walker_phase13
 import "./modules/asset_registry_phase122.js";
 import { addPhase123AdBannerBuildings } from "./modules/ad_banner_buildings_phase123.js";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
+import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-148-QUEST-FPS-RENDER-OPTIMIZATION-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-165-ANDROID-SMART-STICK-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 148: Quest FPS cleanup, render pixel-ratio lock, foveation lock, shadow-off pass, and optional animation throttle; Phase 147 deployment baseline preserved" };
+const ANDROID_SMART = /Android/i.test(navigator.userAgent || "") && !params.has("desktop") && !AUTOCAM;
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 165: Android-only smart layout lock, touch sticks enabled for mobile browser movement/look, Quest/WebXR controls preserved untouched." };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -59,6 +61,7 @@ $toggleLog.addEventListener("click", ()=>{
 });
 
 if (AUTOCAM) document.body.classList.add("preview-mode");
+if (ANDROID_SMART) document.body.classList.add("android-smart-client");
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 const perf = createPhase148QuestPerfPass({ renderer, scene, log });
@@ -75,12 +78,13 @@ window.addEventListener("unhandledrejection", (e)=>{
   if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e));
 });
 
-const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: renderer.domElement });
+const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
 setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
+const androidSmart = createAndroidSmartControls({ camera, renderer, roomClamp, enabled: ANDROID_SMART, setStatus, setMode });
 
 const audio = {
   toggle: async ()=>({ enabled:false, trackTitle:'Music Disabled' }),
@@ -318,14 +322,15 @@ scene.userData._phase123AdBanners = phase123AdBanners;
 perf.lockSceneForQuest();
 
 window.__SVR_GAME_READY__ = true;
+window.__SVR_ANDROID_SMART_LOCK__ = ANDROID_SMART;
 const __svrBootFallback = document.getElementById('bootFallback');
 if (__svrBootFallback){
   __svrBootFallback.style.opacity='0';
   __svrBootFallback.style.pointerEvents='none';
   setTimeout(()=>{__svrBootFallback.style.display='none';},420);
 }
-setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${BUILD_LABEL}`, { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
+setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks locked` : `Ready. ${BUILD_LABEL}`, { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android smart controls locked" : "Hands: waiting…");
 
 function setHudVisible(visible){
   const hud = document.getElementById("hud");
@@ -364,8 +369,9 @@ renderer.setAnimationLoop(()=>{
   tPrev = now;
   const optionalTick = perf.optionalTickAllowed();
   if (!renderer.xr.isPresenting){
-    if (!AUTOCAM) desktop.update(dt);
-    else {
+    if (!AUTOCAM && desktop) desktop.update(dt);
+    if (!AUTOCAM && androidSmart?.isAndroid) androidSmart.update(dt);
+    if (AUTOCAM) {
       const shotIndex = Math.floor(now / 9000) % previewShots.length;
       const shot = previewShots[shotIndex];
       const orbitT = now * 0.001 * shot.speed;
