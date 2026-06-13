@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-131-NATHAN-WALKING-NPC-LOCK",
+  "build": "UPDATE-3.0-PHASE-133-REIKI-INTERACTIVE-HOLOGRAM-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "131",
-  "summary": "Adds Nathan walking NPC patrol wiring. Loads the uploaded RenderPeople Nathan walking FBX when committed at the expected asset path, with a procedural fallback walker so the scene does not break if the binary asset is missing.",
-  "label": "UPDATE-3.0-PHASE-131-NATHAN-WALKING-NPC-LOCK",
-  "notes": "Game-only hotfix. Phase 130 Reiki cleanup and Phase 129 storefront portals preserved. Binary FBX asset must be committed separately at game/assets/npc/nathan/rp_nathan_animated_003_walking_u3d.fbx.",
-  "updated": "2026-06-13T04:55:00Z"
+  "phase": "133",
+  "summary": "Rebuilds Reiki storefront into one clean interactive hologram display. Old wall overlay panels are replaced by a covered presentation wall, the video is first, NEXT/BACK slide controls are active, founder info is on the left, Shyona Royston picture panel is on the right, and a 7-chakra/Reiki symbol slide is included.",
+  "label": "UPDATE-3.0-PHASE-133-REIKI-INTERACTIVE-HOLOGRAM-LOCK",
+  "notes": "Game-only update. Nathan NPC and storefront work preserved. Upload Shyona final photo to game/assets/ui/shyona_royston.png to replace the placeholder portrait automatically.",
+  "updated": "2026-06-13T05:20:00Z"
 }
