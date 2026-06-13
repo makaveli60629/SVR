@@ -13,36 +13,6 @@
 <link rel="stylesheet" href="phase93-visual.css"/>
 <link rel="stylesheet" href="phase94-device-slider.css?v=site-polish"/>
 <link rel="stylesheet" href="final-polish.css?v=site-polish"/>
-<style>
-  .svr-site-android-demo-btn {
-    position: fixed;
-    right: 18px;
-    bottom: 18px;
-    z-index: 99999;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 138px;
-    padding: 12px 18px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #ffd36a, #9b6cff);
-    color: #050009;
-    font: 900 14px Arial, sans-serif;
-    text-decoration: none;
-    white-space: nowrap;
-    box-shadow: 0 0 24px rgba(155,108,255,.5);
-  }
-  .svr-site-android-demo-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
-  @media (max-width: 680px) {
-    .svr-site-android-demo-btn {
-      right: 50%;
-      transform: translateX(50%);
-      bottom: 14px;
-      min-width: 160px;
-    }
-    .svr-site-android-demo-btn:hover { transform: translateX(50%) translateY(-1px); }
-  }
-</style>
 </head>
 <body class="svr-market">
 <canvas id="binary-rain" aria-hidden="true"></canvas>
@@ -75,8 +45,4 @@
 </main></div>
 <script src="../matrix.js"></script><script src="../site-public-hooks.js"></script><script src="js/market-ads.js"></script>
 <script>(function(){const frame=document.getElementById('svrLiveGameFrame');const fallback=document.getElementById('previewFallback');if(!frame||!fallback)return;let loaded=false;frame.addEventListener('load',function(){loaded=true;fallback.classList.add('is-hidden');});setTimeout(function(){if(!loaded){fallback.innerHTML='<strong>Preview is still loading.</strong><span>Use Open Full Game if the browser is blocking the embedded view.</span>';fallback.classList.add('is-warning');}},6500);})();</script>
-
-<!-- SVR SITE ANDROID DEMO BUTTON - SINGLE INSTANCE LOCK -->
-<a id="svr-android-demo-button" class="svr-site-android-demo-btn" href="/android/" aria-label="Open Android demo download">Android Demo</a>
-<!-- /SVR SITE ANDROID DEMO BUTTON -->
 </body></html>
