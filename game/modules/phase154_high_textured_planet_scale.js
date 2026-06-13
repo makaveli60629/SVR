@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+const REIKI_ROOM_URL = "./reiki.html?v=phase154-high-small-textured-planets-pod-button";
+
 function makeTexture(width, height, draw){
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -12,6 +14,20 @@ function makeTexture(width, height, draw){
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
   return texture;
+}
+
+function rounded(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
 
 function makeMoonTexture(){
@@ -125,11 +141,157 @@ function makeHalo(color, opacity, size){
   return halo;
 }
 
-export function applyPhase154HighTexturedPlanetScale(args = {}, result = {}){
+function logoButtonTexture(label){
+  return makeTexture(900, 360, (ctx, w, h)=>{
+    ctx.clearRect(0, 0, w, h);
+    const glow = ctx.createRadialGradient(w * .5, h * .5, 10, w * .5, h * .5, w * .55);
+    glow.addColorStop(0, "rgba(91,255,244,.95)");
+    glow.addColorStop(.38, "rgba(181,88,255,.52)");
+    glow.addColorStop(.72, "rgba(255,210,110,.24)");
+    glow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, w, h);
+    const bg = ctx.createLinearGradient(80, 52, w - 80, h - 52);
+    bg.addColorStop(0, "rgba(4,14,28,.90)");
+    bg.addColorStop(.52, "rgba(30,8,58,.92)");
+    bg.addColorStop(1, "rgba(2,18,24,.90)");
+    ctx.fillStyle = bg;
+    rounded(ctx, 86, 58, w - 172, h - 116, 72);
+    ctx.fill();
+    const stroke = ctx.createLinearGradient(92, 70, w - 92, h - 70);
+    stroke.addColorStop(0, "#58fff4");
+    stroke.addColorStop(.45, "#b558ff");
+    stroke.addColorStop(1, "#ffd56e");
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 18;
+    rounded(ctx, 86, 58, w - 172, h - 116, 72);
+    ctx.stroke();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.shadowColor = "#58fff4";
+    ctx.shadowBlur = 24;
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 72px system-ui, Arial";
+    ctx.fillText(label, w / 2, h / 2 - 18, w - 210);
+    ctx.shadowColor = "#b558ff";
+    ctx.shadowBlur = 18;
+    ctx.fillStyle = "#dffcff";
+    ctx.font = "800 30px system-ui, Arial";
+    ctx.fillText("SVR HOLOGRAM CONTROL", w / 2, h / 2 + 58, w - 220);
+  });
+}
+
+function makeLogoButton(label){
+  const button = new THREE.Group();
+  button.name = `PHASE154 LOGO COLOR HOLOGRAM ${label} BUTTON OUTSIDE VIDEO`;
+  const halo = new THREE.Mesh(new THREE.PlaneGeometry(1.95, .82), new THREE.MeshBasicMaterial({ map: logoButtonTexture(label), transparent: true, opacity: .32, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
+  halo.name = `${button.name} GLOW HALO`;
+  halo.position.z = -.016;
+  const core = new THREE.Mesh(new THREE.PlaneGeometry(1.42, .52), new THREE.MeshBasicMaterial({ map: logoButtonTexture(label), transparent: true, opacity: .97, side: THREE.DoubleSide, depthWrite: false }));
+  core.name = `${button.name} HIT CORE`;
+  core.userData.phase154Button = true;
+  core.userData.href = REIKI_ROOM_URL;
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(.52, .018, 12, 92), new THREE.MeshBasicMaterial({ color: 0x58fff4, transparent: true, opacity: .82, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
+  ring.name = `${button.name} CYAN PURPLE RING`;
+  ring.scale.set(1.40, .42, 1);
+  ring.position.z = .018;
+  button.add(halo, core, ring);
+  button.userData.core = core;
+  button.userData.halo = halo;
+  button.userData.ring = ring;
+  return button;
+}
+
+function findReikiGroup(scene, result){
+  return result?.group || scene.userData?._phase136Reiki?.group || scene.userData?._phase135ReikiWallAligned?.group || null;
+}
+
+function refineSlideButtons(group){
+  if (!group || group.userData._phase154SlideButtonsMoved) return [];
+  const moved = [];
+  group.traverse((obj)=>{
+    if (!obj?.isMesh || !obj.geometry?.parameters) return;
+    const gp = obj.geometry.parameters;
+    const isSmallButton = Math.abs((gp.width || 0) - .92) < .08 && Math.abs((gp.height || 0) - .40) < .08 && obj.position.y < 1.12;
+    if (!isSmallButton) return;
+    const label = obj.position.x < 0 ? "BACK" : "NEXT";
+    obj.name = `PHASE154 LOGO COLOR ${label} SLIDE BUTTON OUTSIDE VIDEO`;
+    obj.material = new THREE.MeshBasicMaterial({ map: logoButtonTexture(label), transparent: true, opacity: .98, side: THREE.DoubleSide, depthWrite: false });
+    obj.position.x = obj.position.x < 0 ? -2.45 : 2.45;
+    obj.position.y = .46;
+    obj.position.z = obj.position.z >= 0 ? 1.32 : -1.22;
+    obj.scale.set(1.22, 1.05, 1);
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(1.32, .60), new THREE.MeshBasicMaterial({ map: logoButtonTexture(label), transparent: true, opacity: .22, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
+    glow.name = `${obj.name} GLOW ONLY`;
+    glow.position.copy(obj.position);
+    glow.position.z += obj.position.z >= 0 ? -.02 : .02;
+    glow.rotation.copy(obj.rotation);
+    obj.parent?.add(glow);
+    moved.push(obj, glow);
+  });
+  group.userData._phase154SlideButtonsMoved = true;
+  return moved;
+}
+
+function refineHologramPod(args = {}, result = {}){
   const scene = args.scene;
-  if (!scene || scene.userData._phase154HighTexturedPlanets) return result;
+  if (!scene || scene.userData._phase154HologramPodButton) return;
+  const group = findReikiGroup(scene, result);
+  if (!group) return;
+  let pod = null;
+  group.traverse((obj)=>{
+    if (!pod && String(obj.name || "").includes("PHASE140 REIKI INTERACTIVE HOLOGRAM POD")) pod = obj;
+  });
+  const slideGlowObjects = refineSlideButtons(group);
+  const interactive = [];
+  if (pod){
+    pod.traverse((obj)=>{
+      if (!obj?.isMesh) return;
+      if (obj.userData?.href || String(obj.name || "").includes("ENTER")) obj.visible = false;
+    });
+    const enter = makeLogoButton("ENTER");
+    enter.position.set(0, .28, 1.34);
+    enter.rotation.x = -Math.PI * .08;
+    pod.add(enter);
+    interactive.push(enter.userData.core, enter.userData.ring);
+  }
+  if (interactive.length && args.renderer?.domElement && args.camera){
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    args.renderer.domElement.addEventListener("pointerdown", (ev)=>{
+      const rect = args.renderer.domElement.getBoundingClientRect();
+      mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, args.camera);
+      const hit = raycaster.intersectObjects(interactive, true)[0];
+      if (hit) window.location.href = REIKI_ROOM_URL;
+    }, { passive: true });
+  }
+  const previousTick = scene.userData._tickWorld;
+  scene.userData._tickWorld = (dt)=>{
+    previousTick?.(dt);
+    const pulse = .72 + Math.sin(performance.now() * .004) * .18;
+    if (pod){
+      pod.traverse((obj)=>{
+        if (!String(obj.name || "").includes("PHASE154 LOGO COLOR")) return;
+        if (obj.material?.opacity !== undefined) obj.material.opacity = Math.max(.18, Math.min(.98, obj.name.includes("GLOW") ? pulse * .32 : pulse));
+        if (obj.name.includes("RING")) obj.rotation.z += dt * 1.35;
+      });
+    }
+    slideGlowObjects.forEach((obj)=>{
+      if (obj?.material?.opacity !== undefined && obj.name.includes("GLOW")) obj.material.opacity = pulse * .26;
+    });
+  };
+  scene.userData._phase154HologramPodButton = true;
+  window.SVR_PHASE154_POD_BUTTON = true;
+  args.log?.("Phase 154 logo-color hologram pod button active and moved outside video");
+}
+
+function refinePlanets(args = {}, result = {}){
+  const scene = args.scene;
+  if (!scene || scene.userData._phase154HighTexturedPlanets) return;
   const state = scene.userData._phase143HigherPlanets || scene.userData._phase141ShowcasePlanets;
-  if (!state?.group || !state?.moon || !state?.mars) return result;
+  if (!state?.group || !state?.moon || !state?.mars) return;
 
   const { group, earth, moon, mars } = state;
   group.name = "PHASE154 HIGH SMALL TEXTURED PLANETS NORTH SKY";
@@ -156,14 +318,14 @@ export function applyPhase154HighTexturedPlanetScale(args = {}, result = {}){
     previousUpdate?.(dt);
     const t = performance.now() * 0.001;
     if (earth){
-      earth.position.set(-42 + Math.sin(t * 0.018) * 5, 108 + Math.sin(t * 0.020) * 2.0, -178);
+      earth.position.set(-46 + Math.sin(t * 0.018) * 5, 126 + Math.sin(t * 0.020) * 2.0, -198);
       earth.rotation.y += dt * 0.014;
       earth.visible = true;
       earth.frustumCulled = false;
       earthHalo.position.copy(earth.position);
     }
-    moon.position.set(4 + Math.cos(t * 0.028) * 6, 96 + Math.sin(t * 0.024) * 1.6, -146);
-    mars.position.set(42 + Math.sin(t * 0.023) * 7, 104 + Math.sin(t * 0.021) * 1.8, -168);
+    moon.position.set(0 + Math.cos(t * 0.028) * 6, 118 + Math.sin(t * 0.024) * 1.6, -168);
+    mars.position.set(46 + Math.sin(t * 0.023) * 7, 126 + Math.sin(t * 0.021) * 1.8, -190);
     moon.rotation.y += dt * 0.020;
     mars.rotation.y += dt * 0.018;
     moon.visible = true;
@@ -172,13 +334,20 @@ export function applyPhase154HighTexturedPlanetScale(args = {}, result = {}){
     mars.frustumCulled = false;
     moonHalo.position.copy(moon.position);
     marsHalo.position.copy(mars.position);
-    skyLight.position.set(0, 110, -155);
+    skyLight.position.set(0, 126, -176);
   };
 
   state._phase154Refined = true;
   scene.userData._phase154HighTexturedPlanets = true;
   window.SVR_PHASE154_REFINED = true;
   args.log?.("Phase 154 high, small, textured planets active");
-  args.setStatus?.("Phase 154: planets raised, scaled down, and re-textured", { force: true });
+}
+
+export function applyPhase154HighTexturedPlanetScale(args = {}, result = {}){
+  const scene = args.scene;
+  if (!scene) return result;
+  refinePlanets(args, result);
+  refineHologramPod(args, result);
+  args.setStatus?.("Phase 154: planets high/small/textured; hologram pod button glows outside video", { force: true });
   return result;
 }
