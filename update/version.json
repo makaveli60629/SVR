@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 136",
-  "build": "UPDATE-3.0-PHASE-136-REIKI-FLIP-EARTH-ORBIT-LOCK",
+  "version": "Update 3.0 Phase 137",
+  "build": "UPDATE-3.0-PHASE-137-STABLE-PLANET-ORBIT-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Flipped Reiki storefront to front-facing, beautified the wall layout, kept one portrait hologram display, and added Earth orbiting the lobby with Moon and Mars following Earth."
+  "notes": "Planet orbit update for Earth, Moon, and Mars."
 }
