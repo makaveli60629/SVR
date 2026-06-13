@@ -17,13 +17,14 @@ Phase 159 rebuilds the VIBEZ Theater storefront in geometry using the black/cyan
 - Adds a purple theater carpet with cyan trim.
 - Adds a circular VIBEZ floor portal texture.
 - Keeps Vibes Theater excluded from the sponsor registry.
-- Updates `game/index.html`, `game/phase141_label_fix.js`, and `game/version.json` to Phase 159.
+- Updates `game/index.html`, `game/phase141_label_fix.js`, `game/phase152_post_boot_verify.js`, and `game/version.json` to Phase 159.
 
 ## Files changed
 - `game/modules/phase159_vibez_geometry_storefront.js`
 - `game/modules/reiki_phase119_trueitive_storefront_final.js`
 - `game/index.html`
 - `game/phase141_label_fix.js`
+- `game/phase152_post_boot_verify.js`
 - `game/version.json`
 - `docs/PHASE-159-VIBEZ-GEOMETRY-STOREFRONT-LOCK.md`
 
