@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 131",
-  "build": "UPDATE-3.0-PHASE-131-NATHAN-WALKING-NPC-LOCK",
+  "version": "Update 3.0 Phase 133",
+  "build": "UPDATE-3.0-PHASE-133-REIKI-INTERACTIVE-HOLOGRAM-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Nathan walking NPC patrol wired with fallback. Commit FBX asset to game/assets/npc/nathan/rp_nathan_animated_003_walking_u3d.fbx for the uploaded animated model."
+  "notes": "Reiki storefront rebuilt into one interactive hologram display with video first, NEXT/BACK slides, founder info left, Shyona picture panel right, and 7-chakra/Reiki slide."
 }
