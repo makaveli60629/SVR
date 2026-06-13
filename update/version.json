@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 135",
-  "build": "UPDATE-3.0-PHASE-135-EXPANDED-LOBBY-WALL-ALIGNMENT-LOCK",
+  "version": "Update 3.0 Phase 136",
+  "build": "UPDATE-3.0-PHASE-136-REIKI-FLIP-EARTH-ORBIT-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Expanded lobby radius to 32, pushed wall systems outward, hidden old Reiki overlay clutter, wall-aligned founder info and founder picture panels, and kept one portrait hologram screen."
+  "notes": "Flipped Reiki storefront to front-facing, beautified the wall layout, kept one portrait hologram display, and added Earth orbiting the lobby with Moon and Mars following Earth."
 }
