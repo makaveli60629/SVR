@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-142-FULL-LOBBY-REMODEL-VISIBLE-PLANETS-LOCK",
+  "build": "UPDATE-3.0-PHASE-143-WALL-ALIGNED-SKYLINE-ADS-HIGH-PLANETS-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "142",
-  "summary": "Full lobby remodel patch: forces the planets into a big visible north-sky showcase, disables earlier planet groups, keeps Earth largest with Moon and Mars following slowly, hides guide lines, and overlays a more professional Trueitive Reiki glass storefront with black facade, marquee, red carpet, gold poles, and sagging red ropes.",
-  "label": "UPDATE-3.0-PHASE-142-FULL-LOBBY-REMODEL-VISIBLE-PLANETS-LOCK",
-  "notes": "Game-only update. Website/site untouched.",
-  "updated": "2026-06-13T08:10:00Z"
+  "phase": "143",
+  "summary": "Aligns signs and panels to face the lobby walls/table center, restores a permanent high-rise backdrop ring, adds wall-facing ad banner planes on the backdrop buildings, raises the textured Earth/Moon/Mars system into the north sky, and hides old sky guide lines and duplicate planet systems.",
+  "label": "UPDATE-3.0-PHASE-143-WALL-ALIGNED-SKYLINE-ADS-HIGH-PLANETS-LOCK",
+  "notes": "Game-only update. Buildings are procedural permanent backdrop towers with table-facing ad slots.",
+  "updated": "2026-06-13T08:25:00Z"
 }
