@@ -1,8 +1,9 @@
-﻿{
-  "version": "Update 3.0 Phase 124",
-  "build": "UPDATE-3.0-PHASE-124-EARTH-MOON-HIGH-HAND-TELEPORT-LOCK",
+{
+  "version": "Update 3.0 Phase 129",
+  "build": "UPDATE-3.0-PHASE-129-REIKI-STOREFRONT-CAROUSEL-STORE-FRONTS-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
-  "gameZip": "update/game.zip"
+  "gameZip": "update/game.zip",
+  "notes": "Restored Phase 128 baseline and added Phase 129 Reiki/storefront cleanup."
 }
