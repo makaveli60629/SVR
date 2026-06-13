@@ -1,11 +1,3 @@
-﻿/* VERSION-1.7.1-MOON-MARS-HIGHER-LOCK */
-/* VERSION-1.6.9-MOON-MARS-HEIGHT-8000-SIZE-800: Moon/Mars high sky lock. */
-/* VERSION-1.6.7-GLASS-WALL-CELESTIAL-POSITION-LOCK: sky fallback + wall glass attached. */
-/* VERSION-1.6.6-CELESTIAL-BODIES-NEON-LOCK: celestial-bodies.js is the single sky controller. */
-/* VERSION-1.6.5-SINGLE-SKY-CONTROLLER-LOCK: one sky controller only, no 1.6.3/1.6.4 back-and-forth. */
-/* VERSION-1.6.4-MOON-MARS-HEIGHT-4500-MARS-300: final force high sky. */
-/* VERSION-1.6.3-FORCE-LIVE-SKY-NO-REIKI: final high Moon/Mars force, no Reiki room touch. */
-/* VERSION-1.6.2-BUILDING-TIER-RESTRUCTURE-MOON-LOCK: Moon/Mars height 3000 size 340; building tier corridor lock. */
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
@@ -682,7 +674,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.strokeStyle = 'rgba(124,255,226,0.82)'; x.lineWidth = 8; x.strokeRect(12,12,w-24,h-24);
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#eafff7'; x.font = 'bold 62px system-ui, Arial'; x.fillText('THE ZEN DEN', w/2, 86);
-    x.fillStyle = '#9cf0d3'; x.font = 'bold 24px system-ui, Arial'; x.fillText('meditate â€¢ restore â€¢ breathe', w/2, 138);
+    x.fillStyle = '#9cf0d3'; x.font = 'bold 24px system-ui, Arial'; x.fillText('meditate • restore • breathe', w/2, 138);
   });
   const zenDenPlate = new THREE.Mesh(new THREE.PlaneGeometry(2.34, 0.46), new THREE.MeshBasicMaterial({ map: zenDenTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   zenDenPlate.position.set(4.95, 4.68, 0.73);
@@ -702,12 +694,12 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Services', 60, y);
     y += 56;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    ['SVR Reiki sessions', 'Meditation and reset support', 'Massage / bodywork referrals', 'Holistic wellness guidance'].forEach((line)=>{ x.fillText('â€¢ ' + line, 72, y); y += 46; });
+    ['SVR Reiki sessions', 'Meditation and reset support', 'Massage / bodywork referrals', 'Holistic wellness guidance'].forEach((line)=>{ x.fillText('• ' + line, 72, y); y += 46; });
     y += 40;
     x.fillStyle = '#bcffe9'; x.font = 'bold 40px system-ui, Arial'; x.fillText('Book / Explore', 60, y);
     y += 54;
     x.fillStyle = '#f6ffff'; x.font = '34px system-ui, Arial';
-    fillWrappedText(x, 'approval pending â€¢ state search â€¢ founder spotlight â€¢ Reiki VR entry', 60, y, w - 120, 40);
+    fillWrappedText(x, 'approval pending • state search • founder spotlight • Reiki VR entry', 60, y, w - 120, 40);
   });
   const founderPanel = new THREE.Mesh(new THREE.PlaneGeometry(3.28, 4.02), new THREE.MeshBasicMaterial({ map: founderPanelTex, side: THREE.DoubleSide, transparent: true }));
   founderPanel.position.set(-4.10, 2.18, -2.10);
@@ -724,7 +716,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#f6ffff'; x.font = 'bold 44px system-ui, Arial'; x.fillText('Professional Highlights', 42, 74);
     x.fillStyle = '#bcffe9'; x.font = '32px system-ui, Arial';
     let y = 148;
-    ['Reiki sponsor approval pending', 'Reiki and wellness focus', 'Meditation-forward client care', 'Virtual hub ready for growth'].forEach((line)=>{ x.fillText('â€¢ ' + line, 46, y); y += 70; });
+    ['Reiki sponsor approval pending', 'Reiki and wellness focus', 'Meditation-forward client care', 'Virtual hub ready for growth'].forEach((line)=>{ x.fillText('• ' + line, 46, y); y += 70; });
   });
   const rightInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.94, 1.64), new THREE.MeshBasicMaterial({ map: rightInfoTex, side: THREE.DoubleSide, transparent: true }));
   rightInfo.position.set(4.05, -0.12, -2.08);
@@ -738,14 +730,14 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.fillStyle = '#f6ffff'; x.font = 'bold 68px system-ui, Arial'; x.fillText('TRUEITIVE REIKI', w/2, 106);
     x.fillStyle = '#bcffe9'; x.font = 'bold 34px system-ui, Arial'; x.fillText('Holistic Healing & Wellness Presentation', w/2, 166);
     x.fillStyle = '#f6ffff'; x.font = 'bold 46px system-ui, Arial'; x.fillText('Founder-Led Services', w/2, 296);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki â€¢ meditation â€¢ appointments â€¢ partner-ready wellness hub', w/2, 366);
+    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Reiki • meditation • appointments • partner-ready wellness hub', w/2, 366);
     x.fillStyle = 'rgba(124,255,226,0.16)'; roundRectPath(x, 90, 430, w-180, 138, 28); x.fill();
     x.strokeStyle = 'rgba(124,255,226,0.65)'; x.lineWidth = 6; roundRectPath(x, 90, 430, w-180, 138, 28); x.stroke();
     x.fillStyle = '#7dffb2'; x.font = 'bold 42px system-ui, Arial'; x.fillText('ENTER THE REIKI HUB', w/2, 510);
     x.fillStyle = '#bcffe9'; x.font = '31px system-ui, Arial'; x.fillText('Use the floor portal to enter the guided Reiki space', w/2, 564);
     x.fillStyle = '#f6ffff'; x.font = 'bold 38px system-ui, Arial'; x.fillText('Professional Highlights', w/2, 716);
-    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('Reiki â€¢ Meditation â€¢ Approval Pending', w/2, 788);
-    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private sessions â€¢ mindful reset â€¢ future partner storefront', w/2, 856);
+    x.fillStyle = '#bcffe9'; x.font = '60px system-ui, Arial'; x.fillText('Reiki • Meditation • Approval Pending', w/2, 788);
+    x.fillStyle = '#d4fff3'; x.font = '31px system-ui, Arial'; x.fillText('Private sessions • mindful reset • future partner storefront', w/2, 856);
   });
   const centerInfo = new THREE.Mesh(new THREE.PlaneGeometry(2.70, 4.02), new THREE.MeshBasicMaterial({ map: centerInfoTex, side: THREE.DoubleSide, transparent: true }));
   centerInfo.position.set(0, 2.18, -2.10);
@@ -756,7 +748,7 @@ async function addRikiArea(scene, R, wallHeight, spawnLogoTex, log = console.log
     x.strokeStyle = 'rgba(78,255,146,0.90)'; x.lineWidth = 8; roundRectPath(x, 10, 10, w-20, h-20, 24); x.stroke();
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#89ffab'; x.font = 'bold 50px system-ui, Arial'; x.fillText('TRUEITIVE STOREFRONT', w/2, 82);
-    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('HOLOGRAM â€¢ SLIDES â€¢ PRIVATE ROOM', w/2, 152);
+    x.fillStyle = '#f6fff8'; x.font = 'bold 40px system-ui, Arial'; x.fillText('HOLOGRAM • SLIDES • PRIVATE ROOM', w/2, 152);
   });
   const reservePlaque = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 0.70), new THREE.MeshBasicMaterial({ map: reserveTex, transparent: true, side: THREE.DoubleSide }));
   reservePlaque.position.set(4.05, -1.22, -2.06);
@@ -1493,7 +1485,7 @@ function addScorpionRoom(scene, R, wallHeight){
     x.lineWidth = 10; x.strokeRect(16,16,w-32,h-32);
     x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillStyle = '#fff2fb'; x.font = 'bold 86px system-ui, Arial'; x.fillText('SCORPION GAME ROOM', w/2, 100);
-    x.fillStyle = '#ffadd7'; x.font = 'bold 30px system-ui, Arial'; x.fillText('REAL PLAY â€¢ TABLE FLOW â€¢ PRIVATE ACTION', w/2, 170);
+    x.fillStyle = '#ffadd7'; x.font = 'bold 30px system-ui, Arial'; x.fillText('REAL PLAY • TABLE FLOW • PRIVATE ACTION', w/2, 170);
   });
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 1.10), new THREE.MeshBasicMaterial({ map: signTex, transparent: true, side: THREE.DoubleSide }));
   sign.position.set(0, 5.14, -2.72);
@@ -1525,7 +1517,7 @@ function addScorpionRoom(scene, R, wallHeight){
     x.fillStyle = '#fdf5ff'; x.font = 'bold 60px system-ui, Arial'; x.fillText('SCORPION ACCESS', 44, 92);
     x.fillStyle = '#ffc4eb'; x.font = '36px system-ui, Arial'; 
     let y = 180;
-    ['Fast jump from watch', 'Fist near face toggles teleport', 'Reserved for real play flow', 'Modular room for future game scene'].forEach(line=>{ x.fillText('â€¢ ' + line, 54, y); y += 92; });
+    ['Fast jump from watch', 'Fist near face toggles teleport', 'Reserved for real play flow', 'Modular room for future game scene'].forEach(line=>{ x.fillText('• ' + line, 54, y); y += 92; });
   });
   const board = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.56), new THREE.MeshBasicMaterial({ map: boardTex, transparent: true, side: THREE.DoubleSide }));
   board.position.set(-2.34, 2.1, -2.68);
@@ -1649,7 +1641,7 @@ function buildOuterCity(scene, R){
               ctx.fillText("AWAITING APPROVAL", w2 / 2, 94);
               ctx.fillStyle = "#7bffb7";
               ctx.font = "700 50px system-ui, Arial";
-              ctx.fillText("SVR Reiki â€¢ Meditation â€¢ Wellness", w2 / 2, 178);
+              ctx.fillText("SVR Reiki • Meditation • Wellness", w2 / 2, 178);
             }),
             transparent: true,
             side: THREE.DoubleSide,
@@ -2112,7 +2104,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   [
     { angle: -Math.PI * 0.5, kind: "main", title: "MAIN SPONSOR SCREEN", subtitle: "SCARLETT VR POKER", size: [9.4, wallHeight - 0.30], logo: [3.2, 3.2], y: wallHeight * 0.5 },
     { angle: Math.PI * 0.5, kind: "reserve", title: "LEAGUE WALL", subtitle: "SOUTH WALL", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
-    { angle: 0, kind: "reiki", title: "REIKI TIME HUB", subtitle: "RED CARPET â€¢ PLANTS â€¢ ZEN STORE", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
+    { angle: 0, kind: "reiki", title: "REIKI TIME HUB", subtitle: "RED CARPET • PLANTS • ZEN STORE", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 },
     { angle: Math.PI, kind: "reserve", title: "LEGENDS", subtitle: "HALL OF FAME", size: [6.8, wallHeight - 0.46], logo: [1.8, 1.8], y: wallHeight * 0.5 }
   ].forEach(({ angle, kind, title, subtitle, size, logo, y })=>{
     const matrix = kind === "main" ? createMatrixBillboardTexture("main") : null;
@@ -2235,7 +2227,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.018
     })
   );
-  moon.position.set(-900, wallHeight + 12000.0, -(R + 9000.0));
+  moon.position.set(-58, wallHeight + 188.0, -(R + 336.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.18);
@@ -2256,7 +2248,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.014
     })
   );
-  mars.position.set(950, wallHeight + 12200.0, -(R + 10400.0));
+  mars.position.set(-6, wallHeight + 216.0, -(R + 380.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
@@ -2645,21 +2637,3 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     sceneTargets
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
