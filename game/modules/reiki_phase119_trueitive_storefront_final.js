@@ -4,6 +4,7 @@ import { applyPhase154HighTexturedPlanetScale } from "./phase154_high_textured_p
 import { applyPhase155SkylineAdRingMoonGlow } from "./phase155_skyline_ad_ring_moon_glow.js";
 import { applyHubSponsorshipRegistryPhase157 } from "./hub_sponsorship_registry_phase157.js";
 import { applyPhase158ReikiStorefrontDebrandLock } from "./phase158_reiki_storefront_debrand_lock.js";
+import { applyPhase159VibezGeometryStorefront } from "./phase159_vibez_geometry_storefront.js";
 
 export async function applyPhase119ReikiTrueitiveStorefrontFinal(args = {}){
   const result = await applyPhase143WallAlignedSkylineAds(args);
@@ -12,5 +13,6 @@ export async function applyPhase119ReikiTrueitiveStorefrontFinal(args = {}){
   applyPhase155SkylineAdRingMoonGlow(args, result);
   applyHubSponsorshipRegistryPhase157(args, result);
   applyPhase158ReikiStorefrontDebrandLock(args, result);
+  applyPhase159VibezGeometryStorefront(args, result);
   return result;
 }
