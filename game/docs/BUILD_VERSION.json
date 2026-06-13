@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-137-STABLE-PLANET-ORBIT-LOCK",
+  "build": "UPDATE-3.0-PHASE-138-REIKI-LONG-CARPET-BENT-ROPE-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "137",
-  "summary": "Stabilizes the planet system: one Earth orbit around the lobby, with Moon and Mars following Earth at readable scale and smooth height.",
-  "label": "UPDATE-3.0-PHASE-137-STABLE-PLANET-ORBIT-LOCK",
-  "notes": "Game-only update. Website/site untouched. Phase 136 flipped Reiki storefront remains active.",
-  "updated": "2026-06-13T06:40:00Z"
+  "phase": "138",
+  "summary": "Refines the Reiki storefront entrance: hides the old pole and rope clutter, replaces the carpet with a longer narrower red runner, adds gold trim, and installs new curved red rope rails that bend cleanly along the carpet.",
+  "label": "UPDATE-3.0-PHASE-138-REIKI-LONG-CARPET-BENT-ROPE-LOCK",
+  "notes": "Game-only update. Website/site untouched. Phase 137 stable planets remain active.",
+  "updated": "2026-06-13T06:55:00Z"
 }
