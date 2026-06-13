@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const LABEL = "UPDATE-3.0-PHASE-179-CENTERPIECE-GUIDANCE-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-183-ARCH-TOP-BLOCK-CONNECTION-LOCK";
 
 function tex(w,h,draw){
   const c=document.createElement("canvas"); c.width=w; c.height=h;
@@ -27,20 +27,43 @@ function addColumn(root,x,z){
   const glow=new THREE.MeshBasicMaterial({color:0x7ffcff,transparent:true,opacity:.32});
   const base=new THREE.Mesh(new THREE.CylinderGeometry(.34,.42,.18,32),stone); base.position.y=.09; group.add(base);
   const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.22,.25,2.75,32),stone); shaft.position.y=1.55; group.add(shaft);
-  const top=new THREE.Mesh(new THREE.CylinderGeometry(.44,.34,.22,32),stone); top.position.y=3.0; group.add(top);
+  const top=new THREE.Mesh(new THREE.CylinderGeometry(.48,.36,.24,32),stone); top.position.y=3.0; group.add(top);
+  const capital=new THREE.Mesh(new THREE.BoxGeometry(.74,.16,.48),stone); capital.name="PHASE183_COLUMN_CAPITAL_CONNECTOR_PLATE"; capital.position.y=3.16; capital.rotation.y=-Math.atan2(z,x); group.add(capital);
   const ring1=new THREE.Mesh(new THREE.TorusGeometry(.29,.018,8,48),glow); ring1.rotation.x=Math.PI/2; ring1.position.y=.42; group.add(ring1);
   const ring2=new THREE.Mesh(new THREE.TorusGeometry(.29,.018,8,48),glow); ring2.rotation.x=Math.PI/2; ring2.position.y=2.72; group.add(ring2);
   group.position.set(x,0,z); root.add(group); return group;
 }
+function addConnectedBeam(root,x1,z1,x2,z2){
+  const dx=x2-x1;
+  const dz=z2-z1;
+  const len=Math.hypot(dx,dz);
+  const mx=(x1+x2)/2;
+  const mz=(z1+z2)/2;
+  const stone=new THREE.MeshStandardMaterial({color:0xd8d0c2,roughness:.74,metalness:.04,emissive:0x17120d,emissiveIntensity:.08});
+  const beam=new THREE.Mesh(new THREE.BoxGeometry(len+.52,.24,.38),stone);
+  beam.name="PHASE183_CONNECTED_ARCH_TOP_BEAM";
+  beam.position.set(mx,3.22,mz);
+  // Box length runs on local X. This rotation aligns the beam exactly between both column capitals.
+  beam.rotation.y=-Math.atan2(dz,dx);
+  root.add(beam);
+
+  const trimMat=new THREE.MeshBasicMaterial({color:0xffdf8a,transparent:true,opacity:.36,blending:THREE.AdditiveBlending,depthWrite:false});
+  const underGlow=new THREE.Mesh(new THREE.BoxGeometry(len+.42,.035,.44),trimMat);
+  underGlow.name="PHASE183_CONNECTED_ARCH_UNDERGLOW";
+  underGlow.position.set(mx,3.045,mz);
+  underGlow.rotation.y=beam.rotation.y;
+  root.add(underGlow);
+  return beam;
+}
 function addArch(root,a,r){
   const x1=Math.cos(a-.20)*r, z1=Math.sin(a-.20)*r;
   const x2=Math.cos(a+.20)*r, z2=Math.sin(a+.20)*r;
-  addColumn(root,x1,z1); addColumn(root,x2,z2);
-  const beam=new THREE.Mesh(new THREE.BoxGeometry(2.1,.24,.34),new THREE.MeshStandardMaterial({color:0xd8d0c2,roughness:.74,emissive:0x17120d,emissiveIntensity:.08}));
-  beam.name="PHASE179_ARCH_TOP_BEAM";
-  const mx=(x1+x2)/2, mz=(z1+z2)/2; beam.position.set(mx,3.18,mz); beam.lookAt(0,3.18,0); beam.rotation.y+=Math.PI/2; root.add(beam);
-  const glow=new THREE.Mesh(new THREE.TorusGeometry(1.06,.025,12,80),new THREE.MeshBasicMaterial({color:0xffdf8a,transparent:true,opacity:.28,depthWrite:false}));
-  glow.name="PHASE179_SOFT_ARCH_GLOW"; glow.scale.y=.48; glow.position.set(mx,3.05,mz); glow.lookAt(0,3.05,0); root.add(glow);
+  addColumn(root,x1,z1);
+  addColumn(root,x2,z2);
+  addConnectedBeam(root,x1,z1,x2,z2);
+  const mx=(x1+x2)/2, mz=(z1+z2)/2;
+  const glow=new THREE.Mesh(new THREE.TorusGeometry(1.06,.025,12,80),new THREE.MeshBasicMaterial({color:0xffdf8a,transparent:true,opacity:.20,depthWrite:false}));
+  glow.name="PHASE183_SOFT_CONNECTED_ARCH_GLOW"; glow.scale.y=.48; glow.position.set(mx,3.05,mz); glow.lookAt(0,3.05,0); root.add(glow);
 }
 function addMiniTable(root,idx,a,r){
   const g=new THREE.Group(); g.name=`PHASE179_TABLE_SELECTOR_${idx}`;
@@ -71,8 +94,8 @@ export function installPhase179CenterpieceGuidance(){
   }
   root.userData.tick=(t)=>{ rim.rotation.z=t*.12; rail.rotation.z=-t*.035; };
   scene.add(root);
-  window.SVR_PHASE179_CENTERPIECE={label:LABEL,locked:true,features:["lowered center floor","rail","roman columns","arches","play sign","table selector holograms","scorpion room sign"],checkedAt:new Date().toISOString()};
-  console.log("[Phase179] centerpiece guidance active");
+  window.SVR_PHASE179_CENTERPIECE={label:LABEL,locked:true,features:["lowered center floor","rail","roman columns","connected arch top beams","play sign","table selector holograms","scorpion room sign"],checkedAt:new Date().toISOString()};
+  console.log("[Phase183] centerpiece arch top blocks aligned and connected");
   return root;
 }
 export function autoInstallPhase179CenterpieceGuidance(){
