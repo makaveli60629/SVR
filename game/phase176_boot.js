@@ -3,14 +3,14 @@ import { installPhase178Bounds } from "./modules/phase178_bounds.js";
 import { autoInstallPhase179CenterpieceGuidance } from "./modules/phase179_centerpiece_guidance.js";
 import { autoInstallPhase180TableSelector } from "./modules/phase180_table_selector.js";
 import { autoInstallPhase183RomanMezzanineAds } from "./modules/phase183_roman_mezzanine_ads.js";
+import { autoInstallPhase184LobbyExperiencePolish } from "./modules/phase184_lobby_experience_polish.js";
 
-const LABEL = "UPDATE-3.0-PHASE-183-ROMAN-MEZZANINE-ADS-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-184-LOBBY-POLISH-LOCK";
 
 function sync(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE182 = { build: "UPDATE-3.0-PHASE-182-EXPANDED-ORIGINAL-WALL-LOCK", active: true, octagonRemoved: true, lobbyShape: "expanded-original-rectangle" };
-  window.SVR_PHASE183 = { build: LABEL, active: true, mezzanineAds: true };
+  window.SVR_PHASE184 = { build: LABEL, active: true };
   document.title = `SVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach(el=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
@@ -37,5 +37,6 @@ installPhase178Bounds();
 autoInstallPhase179CenterpieceGuidance();
 autoInstallPhase180TableSelector();
 autoInstallPhase183RomanMezzanineAds();
+autoInstallPhase184LobbyExperiencePolish();
 setTimeout(removeArenaShell, 1000);
 setTimeout(removeArenaShell, 3000);
