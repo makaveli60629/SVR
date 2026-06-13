@@ -4,36 +4,117 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SVR Poker | Admin Preview</title>
-<meta name="description" content="Private-safe SVR Poker admin preview with AWS visitor analytics, admin status, messages, banner analytics, and hub review panels."/>
+<meta name="description" content="Private-safe SVR Poker admin preview with API health, visitor analytics, admin status, messages, banner analytics, and hub review panels."/>
 <link rel="icon" href="../logo.webp" type="image/webp"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site-market.css"/>
 <link rel="stylesheet" href="hub-admin.css"/>
+<style>
+  .api-health-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:16px}
+  .api-health-card{border:1px solid rgba(112,255,231,.18);background:rgba(4,8,20,.72);border-radius:18px;padding:16px;box-shadow:0 18px 50px rgba(0,0,0,.28)}
+  .api-health-card h3{margin:0 0 8px;font-size:1rem;letter-spacing:.05em}
+  .api-health-card p{margin:0;color:rgba(255,255,255,.72);font-size:.92rem;line-height:1.35}
+  .api-pill{display:inline-flex;align-items:center;gap:8px;margin-bottom:10px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-weight:900;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase}
+  .api-pill::before{content:'';width:8px;height:8px;border-radius:999px;background:#ffd36a;box-shadow:0 0 12px rgba(255,211,106,.7)}
+  .api-health-card[data-state="online"] .api-pill{color:#8fffe1;border-color:rgba(143,255,225,.4)}
+  .api-health-card[data-state="online"] .api-pill::before{background:#8fffe1;box-shadow:0 0 14px rgba(143,255,225,.8)}
+  .api-health-card[data-state="offline"] .api-pill{color:#ff8fa3;border-color:rgba(255,143,163,.38)}
+  .api-health-card[data-state="offline"] .api-pill::before{background:#ff5b7f;box-shadow:0 0 14px rgba(255,91,127,.8)}
+  .api-health-card[data-state="pending"] .api-pill{color:#ffd36a;border-color:rgba(255,211,106,.36)}
+  .api-health-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .api-health-actions button{cursor:pointer;border:1px solid rgba(143,255,225,.32);background:rgba(143,255,225,.10);color:#fff;border-radius:999px;padding:9px 13px;font-weight:900;letter-spacing:.04em}
+  .api-health-meta{margin-top:10px;color:rgba(255,255,255,.62);font-size:.84rem}
+</style>
 </head>
 <body class="svr-market">
 <canvas id="binary-rain" aria-hidden="true"></canvas>
 <div class="market-page"><nav class="market-nav"><a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Admin Preview</span></div></a><div class="market-links"><span class="status-pill">ADMIN ONLINE</span><a href="index.html">Home</a><a href="about.html">About</a><a href="store.html">Store</a><a href="contact.html">Contact</a></div></nav>
 <main class="market-shell">
-<section class="hero"><div><span class="kicker">Owner Dashboard Preview</span><h1>Private Site Intelligence</h1><p class="lead">This admin preview is where site visit counts, message activity, banner activity, hub status, and future AWS analytics should be reviewed privately.</p><p class="copy">The public Matrix launch page must not display visitor totals. Page views and banner views are tracked silently through the shared hook and should be stored through the AWS API analytics endpoint.</p><div class="trust-strip"><span>AWS analytics only</span><span>Public counter hidden</span><span>Admin review only</span><span>No frontend secrets</span></div></div><aside class="hero-card admin-metric-card"><h3>Visitor Counter</h3><div class="metric-grid"><div class="metric"><strong id="visit-total">—</strong><span>Total page views</span></div><div class="metric"><strong id="visit-unique">—</strong><span>Unique sessions</span></div><div class="metric"><strong id="visit-today">—</strong><span>Views today</span></div><div class="metric"><strong id="visit-store">—</strong><span>Store clicks</span></div></div><p id="visitor-counter-status" class="mini-note">Waiting for AWS analytics API. This panel is admin-only and does not show on the public page.</p></aside></section>
-<section class="section"><div class="head"><div><span class="tag">Banner Control Center</span><h2>Slides 1–10</h2></div><p>These are the current public homepage ad/info banner examples. Views and clicks are wired as AWS analytics events: <code>banner_slide_view</code> and <code>banner_slide_click</code>.</p></div><div class="grid2"><article class="card"><h3>Banner analytics</h3><div class="metric-grid"><div class="metric"><strong id="banner-views">—</strong><span>Banner views</span></div><div class="metric"><strong id="banner-clicks">—</strong><span>Banner clicks</span></div></div><p id="banner-status" class="mini-note">Waiting for AWS banner analytics summary.</p></article><article class="card"><h3>Wiring target</h3><p><code>GET /api/admin/analytics/banner-summary</code> should return total banner views, clicks, top slide, and per-slide counts. Public users never see these totals.</p></article></div><div class="grid4"><article class="card"><h3>01 Welcome</h3><p>General SVR platform intro.</p></article><article class="card"><h3>02 Store</h3><p>SVR Store preview and store clicks.</p></article><article class="card"><h3>03 Reiki</h3><p>Approval-safe Reiki hub preview.</p></article><article class="card"><h3>04 PGA</h3><p>Golf hub and training path.</p></article><article class="card"><h3>05 Lounge</h3><p>Smoker Lounge store path.</p></article><article class="card"><h3>06 Scorpion</h3><p>Private poker room preview.</p></article><article class="card"><h3>07 Membership</h3><p>Member path and dashboard.</p></article><article class="card"><h3>08 Sponsors</h3><p>Sponsor placement path.</p></article><article class="card"><h3>09 Impact</h3><p>Community purpose story.</p></article><article class="card"><h3>10 Contact</h3><p>Partner contact path.</p></article></div></section>
-<section class="section"><div class="head"><div><span class="tag">AWS Data Wiring</span><h2>Required private endpoints</h2></div><p>Use AWS for all live data. The public site should call a secured API; the admin panel should read aggregate analytics only after owner authentication.</p></div><div class="grid3"><article class="card"><h3>Visitor analytics</h3><p><code>POST /api/analytics/event</code> records silent page views and button clicks. <code>GET /api/admin/analytics/summary</code> returns private counts for this panel.</p></article><article class="card"><h3>Messages</h3><p><code>POST /api/messages</code> saves visitor questions, sponsor inquiries, and support requests to AWS-backed storage.</p></article><article class="card"><h3>Admin status</h3><p><code>GET /api/admin/status</code> powers the Admin Online / Offline indicator. Admin controls should require authentication.</p></article></div></section>
-<section class="section"><div class="head"><div><span class="tag">Hub Review</span><h2>Founder and partner readiness</h2></div><p>Each hub can carry founder, partner, logo, site, and store data after approval. Unapproved details stay as placeholders.</p></div><div class="grid4"><article class="card approval"><h3>Reiki Hub</h3><p>Awaiting approval. Keep placeholders only until approved founder/logo/site assets are cleared.</p></article><article class="card"><h3>PGA Hub</h3><p>Partner profile, logo, training page, and store category can be managed from admin after final approval.</p></article><article class="card"><h3>Smoker Lounge</h3><p>Private social lounge store and event placement category.</p></article><article class="card"><h3>SVR Store</h3><p>Official SVR items, VR accessories, and partner products after approval.</p></article></div></section>
-<section class="section"><div class="head"><div><span class="tag">Private Notes</span><h2>Do not expose</h2></div></div><div class="grid2"><article class="card"><h3>Never public</h3><p>Visitor totals, raw analytics, IP records, admin logs, AWS credentials, database secrets, payment secrets, and private partner review notes.</p></article><article class="card"><h3>Public-safe</h3><p>Approved partner pages, general store previews, public mission text, sponsor inquiry forms, and legal/trust statements.</p></article></div></section>
+<section class="hero"><div><span class="kicker">Owner Dashboard Preview</span><h1>Private Site Intelligence</h1><p class="lead">This admin preview is where site visit counts, message activity, banner activity, hub status, API health, and future analytics should be reviewed privately.</p><p class="copy">The public Matrix launch page must not display visitor totals. Page views and banner views are tracked silently through the shared hook and should be stored through the API analytics endpoint.</p><div class="trust-strip"><span>API health</span><span>Public counter hidden</span><span>Admin review only</span><span>No frontend secrets</span></div></div><aside class="hero-card admin-metric-card"><h3>Visitor Counter</h3><div class="metric-grid"><div class="metric"><strong id="visit-total">—</strong><span>Total page views</span></div><div class="metric"><strong id="visit-unique">—</strong><span>Unique sessions</span></div><div class="metric"><strong id="visit-today">—</strong><span>Views today</span></div><div class="metric"><strong id="visit-store">—</strong><span>Store clicks</span></div></div><p id="visitor-counter-status" class="mini-note">Waiting for analytics API. This panel is admin-only and does not show on the public page.</p></aside></section>
+<section class="section" id="api-health"><div class="head"><div><span class="tag">Live API Health</span><h2>Endpoint status check</h2></div><p>This checks whether the public site hooks can reach the backend, message route, admin status route, analytics route, store route, and deploy-health files. It does not expose secrets.</p></div><div class="api-health-actions"><button type="button" id="rerun-api-health">Run health check again</button><span class="mini-note" id="api-health-summary">Waiting to check endpoints…</span></div><div class="api-health-grid" id="api-health-grid"></div><p class="api-health-meta" id="api-health-base">API base: pending</p></section>
+<section class="section"><div class="head"><div><span class="tag">Banner Control Center</span><h2>Slides 1–10</h2></div><p>These are the current public homepage ad/info banner examples. Views and clicks are wired as analytics events: <code>banner_slide_view</code> and <code>banner_slide_click</code>.</p></div><div class="grid2"><article class="card"><h3>Banner analytics</h3><div class="metric-grid"><div class="metric"><strong id="banner-views">—</strong><span>Banner views</span></div><div class="metric"><strong id="banner-clicks">—</strong><span>Banner clicks</span></div></div><p id="banner-status" class="mini-note">Waiting for banner analytics summary.</p></article><article class="card"><h3>Wiring target</h3><p><code>GET /api/admin/analytics/banner-summary</code> should return total banner views, clicks, top slide, and per-slide counts. Public users never see these totals.</p></article></div><div class="grid4"><article class="card"><h3>01 Welcome</h3><p>General SVR platform intro.</p></article><article class="card"><h3>02 Store</h3><p>SVR Store preview and store clicks.</p></article><article class="card"><h3>03 Reiki</h3><p>Approval-safe Reiki hub preview.</p></article><article class="card"><h3>04 PGA</h3><p>Golf hub and training path.</p></article><article class="card"><h3>05 Lounge</h3><p>Smoker Lounge store path.</p></article><article class="card"><h3>06 Scorpion</h3><p>Private poker room preview.</p></article><article class="card"><h3>07 Membership</h3><p>Member path and dashboard.</p></article><article class="card"><h3>08 Sponsors</h3><p>Sponsor placement path.</p></article><article class="card"><h3>09 Impact</h3><p>Community purpose story.</p></article><article class="card"><h3>10 Contact</h3><p>Partner contact path.</p></article></div></section>
+<section class="section"><div class="head"><div><span class="tag">Data Wiring</span><h2>Required private endpoints</h2></div><p>Use a secured API for all live data. The public site should call public-safe routes; owner/admin panels should read aggregate analytics only after owner authentication.</p></div><div class="grid3"><article class="card"><h3>Visitor analytics</h3><p><code>POST /api/analytics/event</code> records silent page views and button clicks. <code>GET /api/admin/analytics/summary</code> returns private counts for this panel.</p></article><article class="card"><h3>Messages</h3><p><code>POST /api/messages</code> saves visitor questions, sponsor inquiries, and support requests to backend storage.</p></article><article class="card"><h3>Admin status</h3><p><code>GET /api/admin/status</code> powers the Admin Online / Offline indicator. Admin controls should require authentication.</p></article></div></section>
+<section class="section"><div class="head"><div><span class="tag">Hub Review</span><h2>Founder and partner readiness</h2></div><p>Each hub can carry founder, partner, logo, site, and store data after approval. Unapproved details stay as placeholders unless a presentation/demo exception is explicitly locked.</p></div><div class="grid4"><article class="card approval"><h3>Reiki Hub</h3><p>Presentation exception may show the polished Trueitive/Reiki storefront for private partner review. Keep it removable if approval status changes.</p></article><article class="card"><h3>PGA Hub</h3><p>Partner profile, logo, training page, and store category can be managed from admin after final approval.</p></article><article class="card"><h3>Smoker Lounge</h3><p>Private social lounge store and event placement category.</p></article><article class="card"><h3>SVR Store</h3><p>Official SVR items, VR accessories, and partner products after approval.</p></article></div></section>
+<section class="section"><div class="head"><div><span class="tag">Private Notes</span><h2>Do not expose</h2></div></div><div class="grid2"><article class="card"><h3>Never public</h3><p>Visitor totals, raw analytics, IP records, admin logs, credentials, database secrets, payment secrets, and private partner review notes.</p></article><article class="card"><h3>Public-safe</h3><p>Approved partner pages, general store previews, public mission text, sponsor inquiry forms, and legal/trust statements.</p></article></div></section>
 <footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="../index.html">Public Launch</a><a class="btn primary" href="about.html">About Hubs</a><a class="btn secondary" href="store.html">Store</a></div></footer>
 </main></div>
 <script>
 window.SVR_AWS_API_BASE = window.SVR_AWS_API_BASE || window.SVR_API_BASE || 'https://api.svrpoker.com';
+(function wireApiHealth(){
+  const API_BASE = window.SVR_AWS_API_BASE;
+  const grid = document.getElementById('api-health-grid');
+  const summary = document.getElementById('api-health-summary');
+  const base = document.getElementById('api-health-base');
+  const rerun = document.getElementById('rerun-api-health');
+  if (base) base.textContent = `API base: ${API_BASE}`;
+  const checks = [
+    { id:'site-deploy', name:'Site deploy-health', method:'GET', url:'/deploy-health.json', kind:'json' },
+    { id:'game-deploy', name:'Game deploy-health', method:'GET', url:'/game/deploy-health.json', kind:'json' },
+    { id:'api-health', name:'Backend /api/health', method:'GET', url:`${API_BASE}/api/health`, kind:'json' },
+    { id:'admin-status', name:'Admin status', method:'GET', url:`${API_BASE}/api/admin/status`, kind:'json' },
+    { id:'messages', name:'Messages API', method:'OPTIONS', url:`${API_BASE}/api/messages`, kind:'status' },
+    { id:'analytics', name:'Analytics event API', method:'OPTIONS', url:`${API_BASE}/api/analytics/event`, kind:'status' },
+    { id:'store-products', name:'Store products API', method:'GET', url:`${API_BASE}/api/store/products`, kind:'json' }
+  ];
+  function renderPending(){
+    if (!grid) return;
+    grid.innerHTML = checks.map((check) => `<article class="api-health-card" id="health-${check.id}" data-state="pending"><span class="api-pill">Checking</span><h3>${check.name}</h3><p>${check.method} ${check.url}</p></article>`).join('');
+  }
+  function setCard(check, state, message){
+    const card = document.getElementById(`health-${check.id}`);
+    if (!card) return;
+    card.dataset.state = state;
+    const pill = card.querySelector('.api-pill');
+    const p = card.querySelector('p');
+    if (pill) pill.textContent = state === 'online' ? 'Online' : state === 'offline' ? 'Offline' : 'Checking';
+    if (p) p.textContent = message;
+  }
+  async function checkOne(check){
+    const started = performance.now();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6500);
+    try {
+      const response = await fetch(check.url, { method: check.method, cache:'no-store', headers:{ 'Accept':'application/json' }, signal: controller.signal });
+      clearTimeout(timer);
+      const ms = Math.round(performance.now() - started);
+      if (!response.ok && response.status !== 204) throw new Error(`HTTP ${response.status}`);
+      let details = `${response.status || 204} OK • ${ms}ms`;
+      if (check.kind === 'json' && response.status !== 204) {
+        const data = await response.clone().json().catch(() => null);
+        if (data && (data.status || data.build || data.database || data.isOnline !== undefined)) {
+          details += ` • ${JSON.stringify({ status:data.status, build:data.build, database:data.database, isOnline:data.isOnline }).replace(/[{}]/g,'')}`;
+        }
+      }
+      setCard(check, 'online', details);
+      return true;
+    } catch (error) {
+      clearTimeout(timer);
+      setCard(check, 'offline', `${check.method} ${check.url} failed: ${error.message || error}`);
+      return false;
+    }
+  }
+  async function runChecks(){
+    renderPending();
+    if (summary) summary.textContent = 'Checking endpoints…';
+    const results = await Promise.all(checks.map(checkOne));
+    const online = results.filter(Boolean).length;
+    if (summary) summary.textContent = `${online}/${checks.length} checks online. ${online === checks.length ? 'All checked endpoints are reachable.' : 'Some endpoints still need backend/deploy attention.'}`;
+    window.SVR_API_HEALTH = { checkedAt:new Date().toISOString(), online, total:checks.length };
+  }
+  if (rerun) rerun.addEventListener('click', runChecks);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', runChecks); else runChecks();
+})();
 (async function loadVisitorSummary(){
   const status = document.getElementById('visitor-counter-status');
   const fields = { total: document.getElementById('visit-total'), unique: document.getElementById('visit-unique'), today: document.getElementById('visit-today'), store: document.getElementById('visit-store') };
-  function setFallback(){ Object.values(fields).forEach((el) => { if (el) el.textContent = 'Pending'; }); if (status) status.textContent = 'AWS analytics endpoint not connected yet. Page views are still being attempted silently through the public hook.'; }
-  try { const response = await fetch(`${window.SVR_AWS_API_BASE}/api/admin/analytics/summary`, { cache: 'no-store', headers: { 'Accept': 'application/json' } }); if (!response.ok) throw new Error(`Analytics summary failed: ${response.status}`); const data = await response.json(); const summary = data.summary || data; if (fields.total) fields.total.textContent = summary.totalPageViews ?? summary.totalViews ?? 0; if (fields.unique) fields.unique.textContent = summary.uniqueSessions ?? summary.sessions ?? 0; if (fields.today) fields.today.textContent = summary.viewsToday ?? summary.today ?? 0; if (fields.store) fields.store.textContent = summary.storeClicks ?? 0; if (status) status.textContent = 'Visitor counter loaded from AWS analytics summary.'; } catch (error) { setFallback(); }
+  function setFallback(){ Object.values(fields).forEach((el) => { if (el) el.textContent = 'Pending'; }); if (status) status.textContent = 'Analytics endpoint not connected yet. Page views are still being attempted silently through the public hook.'; }
+  try { const response = await fetch(`${window.SVR_AWS_API_BASE}/api/admin/analytics/summary`, { cache: 'no-store', headers: { 'Accept': 'application/json' } }); if (!response.ok) throw new Error(`Analytics summary failed: ${response.status}`); const data = await response.json(); const summary = data.summary || data; if (fields.total) fields.total.textContent = summary.totalPageViews ?? summary.totalViews ?? 0; if (fields.unique) fields.unique.textContent = summary.uniqueSessions ?? summary.sessions ?? 0; if (fields.today) fields.today.textContent = summary.viewsToday ?? summary.today ?? 0; if (fields.store) fields.store.textContent = summary.storeClicks ?? 0; if (status) status.textContent = 'Visitor counter loaded from analytics summary.'; } catch (error) { setFallback(); }
 })();
 (async function loadBannerSummary(){
   const status = document.getElementById('banner-status'); const views = document.getElementById('banner-views'); const clicks = document.getElementById('banner-clicks');
-  try { const response = await fetch(`${window.SVR_AWS_API_BASE}/api/admin/analytics/banner-summary`, { cache: 'no-store', headers: { 'Accept': 'application/json' } }); if (!response.ok) throw new Error(`Banner summary failed: ${response.status}`); const data = await response.json(); const summary = data.summary || data; if (views) views.textContent = summary.bannerViews ?? summary.views ?? 0; if (clicks) clicks.textContent = summary.bannerClicks ?? summary.clicks ?? 0; if (status) status.textContent = `Top slide: ${summary.topSlide || 'pending live data'}.`; } catch(error) { if (views) views.textContent = 'Pending'; if (clicks) clicks.textContent = 'Pending'; if (status) status.textContent = 'AWS banner analytics endpoint not connected yet.'; }
+  try { const response = await fetch(`${window.SVR_AWS_API_BASE}/api/admin/analytics/banner-summary`, { cache: 'no-store', headers: { 'Accept': 'application/json' } }); if (!response.ok) throw new Error(`Banner summary failed: ${response.status}`); const data = await response.json(); const summary = data.summary || data; if (views) views.textContent = summary.bannerViews ?? summary.views ?? 0; if (clicks) clicks.textContent = summary.bannerClicks ?? summary.clicks ?? 0; if (status) status.textContent = `Top slide: ${summary.topSlide || 'pending live data'}.`; } catch(error) { if (views) views.textContent = 'Pending'; if (clicks) clicks.textContent = 'Pending'; if (status) status.textContent = 'Banner analytics endpoint not connected yet.'; }
 })();
 </script>
 <script src="../matrix.js"></script><script src="../site-public-hooks.js"></script>
