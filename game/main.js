@@ -13,15 +13,16 @@ import "./modules/asset_registry_phase122.js";
 import { addPhase123AdBannerBuildings } from "./modules/ad_banner_buildings_phase123.js";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
+import { installLobbyCommandCenterPhase167 } from "./modules/lobby_command_center_phase167.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-166-FREEZE-GUARD-STABILITY-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-167-LOBBY-COMMAND-CENTER-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 const ANDROID_SMART = /Android/i.test(navigator.userAgent || "") && !params.has("desktop") && !AUTOCAM;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 166: freeze guard stability lock, adaptive mobile/Quest render throttle, Android smart stick lock preserved, Quest/WebXR controls preserved." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 167: modular lobby command center for ads, notifications, leaderboards, events, and hologram logos; Phase 166 freeze guard and Android smart controls preserved." };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -308,6 +309,7 @@ const watch = createWristWatch({
 createStoreWebPortal();
 applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, renderer, sceneTargets, setStatus, log });
 addNathanWalkingNPCPhase131({ scene, sceneTargets, setStatus, log });
+const phase167CommandCenter = installLobbyCommandCenterPhase167({ scene, log, enabled: true });
 
 $toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
@@ -324,13 +326,14 @@ perf.lockSceneForQuest();
 window.__SVR_GAME_READY__ = true;
 window.__SVR_ANDROID_SMART_LOCK__ = ANDROID_SMART;
 window.__SVR_PHASE166_FREEZE_LOCK__ = true;
+window.__SVR_PHASE167_COMMAND_CENTER_LOCK__ = true;
 const __svrBootFallback = document.getElementById('bootFallback');
 if (__svrBootFallback){
   __svrBootFallback.style.opacity='0';
   __svrBootFallback.style.pointerEvents='none';
   setTimeout(()=>{__svrBootFallback.style.display='none';},420);
 }
-setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks + freeze guard locked` : `Ready. ${BUILD_LABEL}`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks + command center locked` : `Ready. ${BUILD_LABEL}`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android smart controls locked" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -393,6 +396,7 @@ renderer.setAnimationLoop(()=>{
   }
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
   if (optionalTick && scene.userData._phase123AdBanners?.userData?.tick) scene.userData._phase123AdBanners.userData.tick(scene.userData._time || (now * 0.001));
+  if (optionalTick && phase167CommandCenter?.userData?.tick) phase167CommandCenter.userData.tick(scene.userData._time || (now * 0.001));
   hands.update(dt);
   if (optionalTick) hands.updateDebug();
   const leftHand = hands.getLeftHand();
