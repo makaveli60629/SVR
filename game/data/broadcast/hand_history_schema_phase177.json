@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "svr-hand-history-schema-v1",
+  "phase": "177",
+  "tables": {
+    "events": ["eventId", "eventName", "eventType", "startTime", "status", "featuredTableId"],
+    "tables": ["tableId", "eventId", "tableType", "sceneLocation", "maxSeats", "state"],
+    "hands": ["handId", "tableId", "eventId", "startedAt", "endedAt", "smallBlind", "bigBlind", "potTotal", "winnerId"],
+    "hand_players": ["handId", "playerId", "seat", "stackStart", "stackEnd", "privateCards", "status"],
+    "hand_actions": ["handId", "sequence", "street", "playerId", "actionType", "amount", "potAfter", "timestamp"],
+    "public_replay_frames": ["handId", "frame", "visibleState", "allowCardReveal", "createdAt"],
+    "media_queue": ["itemId", "mode", "sourceId", "priority", "startsAt", "endsAt", "status"]
+  },
+  "publicFeedRule": "During active play, public screens may show board, pot, stacks, seat actions, timers, and results. Private player cards stay hidden until approved replay or showdown reveal.",
+  "adminFeedRule": "Admin review can access private cards and full hand reconstruction for audit and fraud review."
+}
