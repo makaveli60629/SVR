@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-128-HIGHER-BIGGER-EARTH-MOON-MARS-ORBIT-LOCK",
-  "track": "game-only",
-  "siteTouched": false,
-  "phase": "128",
-  "summary": "Fitted Quest glove overlay, lighter high-sky planets/stars, hand teleport release/hold fallback, freeze/black-corner performance cleanup.",
-  "label": "UPDATE-3.0-PHASE-128-HIGHER-BIGGER-EARTH-MOON-MARS-ORBIT-LOCK",
-  "notes": "Higher sky solar-system cluster: larger Earth anchor, smaller Moon orbiting Earth, Mars orbiting Earth/Moon cluster; Quest performance preserved.",
-  "updated": "2026-06-13T02:45:00Z"
+  "build": "UPDATE-3.0-PHASE-144-OFFICIAL-LOGO-LOADING-404-LOCK",
+  "track": "game-plus-site-404",
+  "siteTouched": true,
+  "phase": "144",
+  "summary": "Official SVR logo added to the VR loading fallback, Reiki hologram carousel button removed from the loading screen, and official site 404 page added.",
+  "label": "UPDATE-3.0-PHASE-144-OFFICIAL-LOGO-LOADING-404-LOCK",
+  "notes": "Keeps Phase 143 wall-aligned skyline, ads, high planets, Quest hands, and poker room intact while polishing loading and site error handling.",
+  "updated": "2026-06-13T16:30:00Z"
 }
