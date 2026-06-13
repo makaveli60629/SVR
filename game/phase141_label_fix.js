@@ -1,8 +1,8 @@
-const LABEL = "UPDATE-3.0-PHASE-158-REIKI-STOREFRONT-DEBRAND-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-159-VIBEZ-GEOMETRY-STOREFRONT-LOCK";
 function syncLabels(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE106.source = "Phase 158 Reiki storefront debrand lock. Retired sponsor storefront signs are covered, Zen Den removed from active store data, and placeholder-only signs are active.";
+  window.SVR_PHASE106.source = "Phase 159 VIBEZ geometry storefront lock. VIBEZ Theater rebuilt with black glass, cyan/purple neon geometry, marquee bulbs, posters, carpet, and floor portal.";
   document.title = `ScarlettVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
