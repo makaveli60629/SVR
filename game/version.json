@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-173-SINGLE-OCTAGON-WALL-LOCOMOTION-AUDIT-LOCK",
-  "track": "single-octagon-wall-locomotion-audit",
+  "build": "UPDATE-3.0-PHASE-174-WALL-GUARD-LATE-CLEANUP-LOCK",
+  "track": "wall-guard-late-cleanup",
   "siteTouched": false,
-  "phase": "173",
-  "summary": "Single real octagon wall overlay and cleanup lock. Hides duplicate wall rings/background buildings, restores clean storefront panels inside the octagon, and adds runtime locomotion audit markers.",
-  "label": "UPDATE-3.0-PHASE-173-SINGLE-OCTAGON-WALL-LOCOMOTION-AUDIT-LOCK",
-  "notes": "Preserves Phase 172C sponsor schedule loader, Phase 169 teleport/deal logic, Android smart controls, and clean Moon/Mars sky. Physical platform locomotion still requires Quest/Android/Desktop testing.",
-  "updated": "2026-06-14T01:20:00Z"
+  "phase": "174",
+  "summary": "Late cleanup guard added after boot while preserving the Phase 173 single octagon wall.",
+  "label": "UPDATE-3.0-PHASE-174-WALL-GUARD-LATE-CLEANUP-LOCK",
+  "notes": "Preserves storefront panels, locomotion audit, sponsor schedule loader, and locomotion/deal logic.",
+  "updated": "2026-06-14T01:35:00Z"
 }
