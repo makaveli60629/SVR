@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-163-REALISTIC-LOBBY-STOREFRONT-ALIGNMENT-LOCK",
-  "track": "realistic-lobby-storefront-alignment",
+  "build": "UPDATE-3.0-PHASE-164-LEGENDS-STATUES-COMPACT-LOBBY-WALLS-LOCK",
+  "track": "legends-statues-compact-lobby-walls",
   "siteTouched": true,
-  "phase": "163",
-  "summary": "Realistic lobby storefront alignment pass. The hub storefronts are rebuilt into a compact aligned ring with realistic facades, glass display windows, double-door structure, canopy/signage, professional HUD buttons, and cleaner sightlines.",
-  "label": "UPDATE-3.0-PHASE-163-REALISTIC-LOBBY-STOREFRONT-ALIGNMENT-LOCK",
-  "notes": "Preserves Phase 162 HUD direction, Phase 160 orbital planets/starfield, VIBEZ identity, sponsor registry lock, Quest hands, teleport, watch, and poker baseline.",
-  "updated": "2026-06-13T21:15:00Z"
+  "phase": "164",
+  "summary": "Legends Hall and compact lobby correction pass. Adds armored Legends Hall statue displays, moves the storefront ring closer to the center, scales hub storefronts down slightly, and closes the lobby with compact wall panels near the HUD/storefront ring.",
+  "label": "UPDATE-3.0-PHASE-164-LEGENDS-STATUES-COMPACT-LOBBY-WALLS-LOCK",
+  "notes": "Preserves Phase 163 realistic storefronts, Phase 160 planets/starfield, VIBEZ identity, sponsor registry lock, Quest hands, teleport, watch, and poker baseline.",
+  "updated": "2026-06-13T21:30:00Z"
 }
