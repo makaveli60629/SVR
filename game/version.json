@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-149-POLES-PLANETS-SKYLINE-REFINE-LOCK",
-  "track": "visual-refinement",
+  "build": "UPDATE-3.0-PHASE-150-VISUAL-HARD-REFINE-LOCK",
+  "track": "hard-visual-refinement",
   "siteTouched": true,
-  "phase": "149",
-  "summary": "Refined Reiki storefront poles to thin silver stanchions, removed the glass beam overlay, forced a visible north-sky moon and Mars lock, and upgraded backdrop buildings with better spacing, window texture, rooftop caps, and antennas.",
-  "label": "UPDATE-3.0-PHASE-149-POLES-PLANETS-SKYLINE-REFINE-LOCK",
-  "notes": "Preserves Phase 148 Quest render optimization, Phase 145 route safety, official logo loading screen, Quest hands, and poker room baseline.",
-  "updated": "2026-06-13T17:45:00Z"
+  "phase": "150",
+  "summary": "Hard visual refinement pass. Poles are extra thin silver, overlay objects are hidden, moon and Mars are lower and larger, and skyline buildings are cleaned with better spacing and window detail.",
+  "label": "UPDATE-3.0-PHASE-150-VISUAL-HARD-REFINE-LOCK",
+  "notes": "Preserves Phase 149 visual module, Phase 148 Quest render work, Phase 145 route safety, logo loading screen, Quest hands, and poker room baseline.",
+  "updated": "2026-06-13T18:00:00Z"
 }
