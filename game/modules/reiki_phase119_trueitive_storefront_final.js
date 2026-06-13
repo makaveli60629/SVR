@@ -1,5 +1,5 @@
-import { applyPhase142QuickLobbyRemodel } from "./phase142_quick_lobby_remodel.js";
+import { applyPhase143WallAlignedSkylineAds } from "./phase143_wall_aligned_skyline_ads.js";
 
 export function applyPhase119ReikiTrueitiveStorefrontFinal(args = {}){
-  return applyPhase142QuickLobbyRemodel(args);
+  return applyPhase143WallAlignedSkylineAds(args);
 }
