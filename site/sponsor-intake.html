@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SVR Poker | Sponsor Intake Module</title>
+<meta name="description" content="No-code SVR sponsor intake packet for hub placement, website placement, store links, schedules, and game-module approval."/>
+<link rel="icon" href="../logo.webp" type="image/webp"/>
+<link rel="stylesheet" href="site-market.css"/>
+<link rel="stylesheet" href="final-polish.css"/>
+<style>
+  .intake-shell{max-width:1180px;margin:0 auto;padding:28px 18px 80px}.intake-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.intake-card{background:rgba(2,8,16,.78);border:1px solid rgba(127,255,242,.28);border-radius:22px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.38)}.intake-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{color:#c8ffff;font-weight:800;font-size:13px;letter-spacing:.05em;text-transform:uppercase}input,select,textarea{background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.18);border-radius:14px;color:#fff;padding:12px;font:inherit}textarea{min-height:106px;resize:vertical}.output{white-space:pre-wrap;background:#02050a;border:1px solid rgba(127,255,242,.28);border-radius:16px;padding:14px;max-height:560px;overflow:auto;font:12px/1.45 ui-monospace,Consolas,monospace;color:#dff}.notice{color:#bfefff}.status-chip{display:inline-flex;border:1px solid rgba(127,255,242,.35);border-radius:999px;padding:6px 10px;color:#7ffcff;font-weight:900;margin:4px 6px 4px 0}.actions-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}@media(max-width:860px){.intake-grid,.intake-form{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="svr-market">
+<canvas id="binary-rain" aria-hidden="true"></canvas>
+<div class="market-page">
+<nav class="market-nav"><a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Sponsor Intake</span></div></a><div class="market-links"><span class="status-pill">ADMIN ONLINE</span><a href="index.html">Home</a><a class="active" href="sponsor-intake.html">Sponsor Intake</a><a href="sponsorship.html">Sponsors</a><a href="store.html">Store</a><a href="contact.html">Contact</a></div></nav>
+<main class="intake-shell">
+<section class="hero"><div><span class="kicker">Phase 172A</span><h1>No-code sponsor packet builder</h1><p class="lead">Fill in sponsor information once. The packet becomes the approved profile the website and game can read for logos, hub placement, store links, slides, schedules, and portal display.</p><p class="copy">This static version generates the sponsor JSON packet. The next admin step stores approvals automatically, but the structure is already locked.</p><div><span class="status-chip">Logo</span><span class="status-chip">Website</span><span class="status-chip">Store Link</span><span class="status-chip">Hub</span><span class="status-chip">Schedule</span><span class="status-chip">Approval</span></div></div><aside class="hero-card"><img src="assets/marketing/sponsor-premium.svg" alt="Sponsor module"></aside></section>
+<section class="intake-grid">
+<article class="intake-card"><h2>Sponsor registration packet</h2><p class="notice">Uploads are represented as file names/paths for now. When backend storage is attached, these fields will point to uploaded assets automatically.</p>
+<form id="sponsorForm" class="intake-form">
+<div class="field"><label>Sponsor name</label><input name="sponsorName" value="Example Reiki Sponsor" required></div>
+<div class="field"><label>Contact person</label><input name="contactPerson" value="Demo Sponsor Contact"></div>
+<div class="field"><label>Email</label><input name="contactEmail" type="email" value="sponsor@example.com"></div>
+<div class="field"><label>Phone</label><input name="phone" value=""></div>
+<div class="field"><label>Website</label><input name="website" value="https://example.com"></div>
+<div class="field"><label>Store URL</label><input name="storeUrl" value="https://example.com/store"></div>
+<div class="field"><label>Hub placement</label><select name="hub"><option value="wellness">Wellness / Reiki Hub</option><option value="pga">PGA Hub</option><option value="sponsor">Sponsor Hub</option><option value="store">Store Hub</option><option value="legends">Legends Hub</option><option value="scorpion">Scorpion Room</option></select></div>
+<div class="field"><label>Category</label><select name="category"><option value="wellness">Wellness</option><option value="golf">Golf</option><option value="retail">Retail</option><option value="community">Community</option><option value="event">Event</option></select></div>
+<div class="field"><label>Logo file/path</label><input name="logoUrl" placeholder="uploads/sponsor-logo.png"></div>
+<div class="field"><label>Banner file/path</label><input name="bannerUrl" placeholder="uploads/sponsor-banner.png"></div>
+<div class="field"><label>Start date</label><input name="startDate" type="date" value="2026-07-01"></div>
+<div class="field"><label>End date</label><input name="endDate" type="date" value="2026-08-01"></div>
+<div class="field"><label>Days</label><input name="days" value="Friday, Saturday, Sunday"></div>
+<div class="field"><label>Hours</label><input name="hours" value="18:00, 22:00"></div>
+<div class="field full"><label>Short offer</label><input name="shortOffer" value="Meditation, wellness sessions, and sponsor-safe community support."></div>
+<div class="field full"><label>Description</label><textarea name="description">A wellness sponsor profile used to prove the no-code sponsorship module. Replace this data with approved sponsor information and the game hub updates without changing code.</textarea></div>
+<div class="field full"><label>Approval status</label><select name="approvalStatus"><option value="pending">Pending review</option><option value="approved-demo" selected>Approved demo</option><option value="approved">Approved live</option><option value="denied">Denied</option></select></div>
+<div class="field full"><label><input name="approved" type="checkbox" checked> Approved for demo/game display</label></div>
+</form>
+<div class="actions-row"><button class="btn primary" id="buildPacket" type="button">Build Packet</button><button class="btn secondary" id="copyPacket" type="button">Copy JSON</button><button class="btn ghost" id="downloadPacket" type="button">Download JSON</button></div>
+</article>
+<aside class="intake-card"><h2>Generated sponsor JSON</h2><p class="notice">This is the packet the game module reads after approval.</p><pre id="packetOutput" class="output"></pre></aside>
+</section>
+</main>
+<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="sponsorship.html">Sponsorship</a><a class="btn primary" href="../game/?v=phase172-sponsor-module">Preview Game</a></div></footer>
+</div>
+<script src="../matrix.js"></script>
+<script>
+const form=document.getElementById('sponsorForm');const out=document.getElementById('packetOutput');
+function slug(s){return String(s||'sponsor').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)||'sponsor'}
+function packet(){const f=new FormData(form);const name=f.get('sponsorName');const hub=f.get('hub');return {schemaVersion:'svr-sponsor-v1',approved:!!f.get('approved'),approvalStatus:f.get('approvalStatus'),sponsorId:slug(name),sponsorName:name,contactPerson:f.get('contactPerson'),contactEmail:f.get('contactEmail'),phone:f.get('phone'),category:f.get('category'),hub,placementName:hub==='wellness'?'Wellness / Reiki Hub':hub,logoText:String(name||'SVR').split(/\s+/).map(x=>x[0]).join('').slice(0,6).toUpperCase(),website:f.get('website'),storeUrl:f.get('storeUrl'),description:f.get('description'),shortOffer:f.get('shortOffer'),bannerLines:['Approved Sponsor Profile','Hub Placement Ready','Logo + Website + Store + Schedule'],schedule:{timezone:'America/Chicago',startDate:f.get('startDate'),endDate:f.get('endDate'),days:String(f.get('days')||'').split(',').map(s=>s.trim()).filter(Boolean),hours:String(f.get('hours')||'').split(',').map(s=>s.trim()).filter(Boolean)},assets:{logoUrl:f.get('logoUrl'),bannerUrl:f.get('bannerUrl'),slideUrl:''},display:{tier:'hub-demo',accentColor:'#5fffd8',showPortal:true,showSchedule:true},admin:{approvedBy:'SVR Admin',approvedAt:new Date().toISOString(),notes:'Generated by sponsor-intake.html'}}}
+function render(){out.textContent=JSON.stringify(packet(),null,2)}
+document.getElementById('buildPacket').onclick=render;form.addEventListener('input',render);document.getElementById('copyPacket').onclick=async()=>{await navigator.clipboard.writeText(out.textContent);alert('Sponsor JSON copied.');};document.getElementById('downloadPacket').onclick=()=>{const p=packet();const blob=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${p.sponsorId}.json`;a.click();URL.revokeObjectURL(a.href);};render();
+</script>
+</body>
+</html>
