@@ -1,17 +1,17 @@
-const LABEL = "UPDATE-3.0-PHASE-154-HIGH-SMALL-TEXTURED-PLANETS-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-155-SKYLINE-AD-RING-MOON-GLOW-LOCK";
 
 function setBuildLabels(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE106.source = "Phase 154 high small textured planets lock. Post-boot verification preserved without any visible overlay.";
+  window.SVR_PHASE106.source = "Phase 155 skyline ad ring and moving moon glow lock. Post-boot verification preserved without any visible overlay.";
   window.SVR_PHASE152 = {
     build: LABEL,
     purpose: "post-boot verification without adding any visible overlay",
-    preserves: ["extra-thin silver poles", "hidden glass beam overlay", "high small textured moon and Mars", "clean skyline", "logo-color hologram pod button", "Quest hands", "teleport", "watch"]
+    preserves: ["extra-thin silver poles", "hidden glass beam overlay", "high small textured moon and Mars", "aligned skyline ad ring", "moving moon glow", "logo-color hologram pod button", "Quest hands", "teleport", "watch"]
   };
-  window.SVR_PHASE154 = {
+  window.SVR_PHASE155 = {
     build: LABEL,
-    purpose: "raise planets high, scale them down, restore texture detail, and keep hologram pod button outside the video"
+    purpose: "align tall wide ad buildings around the full lobby and animate moon glow with the raised moon"
   };
   document.title = `ScarlettVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
@@ -33,13 +33,14 @@ function verifyState(){
   window.SVR_PHASE152_VERIFY = {
     label: LABEL,
     gameReady: !!window.__SVR_GAME_READY__,
-    phase150Refined: !!window.SVR_PHASE150_REFINED,
     phase154Refined: !!window.SVR_PHASE154_REFINED,
+    phase155Refined: !!window.SVR_PHASE155_REFINED,
+    movingMoonGlow: !!window.SVR_PHASE155_MOON_GLOW_MOVES,
     hologramPodButton: !!window.SVR_PHASE154_POD_BUTTON,
     noVisibleBootOverlayAfterReady: !window.__SVR_GAME_READY__ || bootHidden,
     checkedAt: new Date().toISOString()
   };
-  window.SVR_PHASE154_VERIFY = window.SVR_PHASE152_VERIFY;
+  window.SVR_PHASE155_VERIFY = window.SVR_PHASE152_VERIFY;
 }
 
 function syncPhase152(){
