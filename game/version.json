@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-153-NATURAL-PLANET-SCALE-LOCK",
-  "track": "natural-planet-scale",
+  "build": "UPDATE-3.0-PHASE-154-HIGH-SMALL-TEXTURED-PLANETS-LOCK",
+  "track": "high-small-textured-planets-and-hologram-pod-button",
   "siteTouched": true,
-  "phase": "153",
-  "summary": "Planet scale correction pass. Moon, Mars, Earth, and glow halos are reduced to a more natural size while staying visible in the north sky.",
-  "label": "UPDATE-3.0-PHASE-153-NATURAL-PLANET-SCALE-LOCK",
+  "phase": "154",
+  "summary": "Planet and Reiki pod correction pass. Planets are raised higher, scaled down much smaller, re-textured with moon crater, Mars surface, and Earth detail, and the hologram pod control is moved outside the video with SVR logo-color glow.",
+  "label": "UPDATE-3.0-PHASE-154-HIGH-SMALL-TEXTURED-PLANETS-LOCK",
   "notes": "Preserves Phase 152 post-boot verification, Phase 150 hard visual refine, extra-thin silver poles, no-overlay storefront, cleaner skyline, Quest hands, and poker room baseline.",
-  "updated": "2026-06-13T18:45:00Z"
+  "updated": "2026-06-13T19:00:00Z"
 }
