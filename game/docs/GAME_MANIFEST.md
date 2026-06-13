@@ -112,8 +112,8 @@ Source package used for this phase:
 
 
 ## Phase 35 audit / restore
-- Restored the AWAITING_APPROVAL founder image and logo assets into the Reiki hub.
-- Rewrote the Reiki three-column storefront copy to read more professional and founder-led.
+- Restored the SVR approval image and logo assets into the Reiki hub.
+- Rewrote the Reiki three-column storefront copy to read more professional and approval-pending.
 - Moved the PGA hub to the south-west wall.
 - Raised Moon and Mars higher behind the city skyline and increased their glow.
 - Added 07.mp3 as the first lobby music track.
@@ -131,4 +131,4 @@ Source package used for this phase:
 - donor modular split preserved
 
 ## Phase 42 modular overlay
-- AWAITING_APPROVAL building ad refreshed to `AWAITING_APPROVAL.COM / L.A.` in neon green presentation styling.
+- SVR building ad refreshed to `AWAITING APPROVAL / L.A.` in neon green presentation styling.

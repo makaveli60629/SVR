@@ -66,7 +66,7 @@ function buildProfileTexture(){
     ctx.fillText("JUAN E. ESPEJO", 92, 254);
     ctx.fillStyle = "#ffc2c9";
     ctx.font = "600 40px Arial";
-    ctx.fillText("PGA Pro • Maryville Golf Academy Founder", 92, 324);
+    ctx.fillText("PGA Pro • Miraville Golf Academy Founder", 92, 324);
 
     ctx.fillStyle = "#ff7784";
     ctx.font = "700 48px Arial";
