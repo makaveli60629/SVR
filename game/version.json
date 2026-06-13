@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-160-ORBITAL-PLANETS-STARFIELD-LOCK",
-  "track": "orbital-planets-starfield",
+  "build": "UPDATE-3.0-PHASE-161-WELLNESS-HUB-LUXURY-STOREFRONT-LOCK",
+  "track": "wellness-hub-luxury-storefront",
   "siteTouched": true,
-  "phase": "160",
-  "summary": "Planet and starfield correction pass. Moon, Mars, and Earth are scaled larger, separated around the lobby sky on independent orbital paths, Earth is slightly larger and farther away, and the starfield is replaced with non-pattern clustered/random layers.",
-  "label": "UPDATE-3.0-PHASE-160-ORBITAL-PLANETS-STARFIELD-LOCK",
-  "notes": "Preserves Phase 159 VIBEZ geometry storefront, Phase 158 Reiki debrand lock, Phase 157 modular sponsor registry, skyline ad ring, moving moon glow logic replacement, Quest hands, teleport, watch, and poker room baseline.",
-  "updated": "2026-06-13T20:30:00Z"
+  "phase": "161",
+  "summary": "Wellness Hub luxury storefront pass. The Wellness Hub gets a clean black-glass geometric facade, green-gold neon structure, integrated hologram carousel, placeholder sponsor panels, and a larger floor portal while preserving the sponsor-registry lock.",
+  "label": "UPDATE-3.0-PHASE-161-WELLNESS-HUB-LUXURY-STOREFRONT-LOCK",
+  "notes": "Preserves Phase 160 orbital planets and starfield, Phase 159 VIBEZ storefront, Phase 158 Reiki debrand, Phase 157 sponsor registry, Quest hands, teleport, watch, and poker baseline.",
+  "updated": "2026-06-13T20:45:00Z"
 }
