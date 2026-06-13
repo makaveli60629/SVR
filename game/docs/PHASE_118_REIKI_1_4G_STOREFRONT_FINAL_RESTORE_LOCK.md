@@ -1,7 +1,7 @@
 # Phase 118 — Reiki 1.4G Storefront Final Restore Lock
 
 ## Build label
-UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK
+UPDATE-3.0-PHASE-121-MOON-MARS-HIGH-NO-BACKGROUND-BUILDINGS-LOCK
 
 ## Purpose
 Fix the failed Phase 117 apply-label mismatch and restore the screenshot-approved Reiki/Trueitive storefront structure.

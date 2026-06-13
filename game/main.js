@@ -14,7 +14,7 @@ const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK', source: '1.4G Reiki storefront backup with Phase 120 yaw-only alignment and high Moon/Mars lock' };
+window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-121-MOON-MARS-HIGH-NO-BACKGROUND-BUILDINGS-LOCK', source: '1.4G Reiki storefront backup with Phase 120 yaw-only alignment and high Moon/Mars lock' };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");

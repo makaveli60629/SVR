@@ -1,9 +1,9 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK",
-  "created": "2026-06-08",
+  "build": "UPDATE-3.0-PHASE-121-MOON-MARS-HIGH-NO-BACKGROUND-BUILDINGS-LOCK",
+  "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
-  "phase": 120,
-  "focus": "Fix Reiki storefront alignment so red carpet/glass extension stays level, restore screenshot-style Trueitive storefront, keep hologram carousel, raise Moon and Mars higher."
+  "phase": 121,
+  "focus": "Raise Moon and Mars higher and remove the background building skyline ring while preserving Reiki storefront and no-music lock."
 }

@@ -1,7 +1,7 @@
 # Phase 120 — Reiki Storefront Alignment + Moon/Mars High Lock
 
 ## Build label
-UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK
+UPDATE-3.0-PHASE-121-MOON-MARS-HIGH-NO-BACKGROUND-BUILDINGS-LOCK
 
 ## Fixes
 - Corrects Reiki storefront alignment from the Phase 119 screenshot issue.

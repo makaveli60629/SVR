@@ -1535,128 +1535,13 @@ function addScorpionRoom(scene, R, wallHeight){
 }
 
 function buildOuterCity(scene, R){
+  // Phase 121: background skyline/building ring removed by owner request.
+  // Keep a disabled group and empty updater list so downstream animation code stays safe.
   const group = new THREE.Group();
-  const glassMats = [
-    new THREE.MeshStandardMaterial({ color: 0x9fdfff, roughness: 0.14, metalness: 0.32, emissive: 0x15396a, emissiveIntensity: 1.26 }),
-    new THREE.MeshStandardMaterial({ color: 0xb993ff, roughness: 0.16, metalness: 0.30, emissive: 0x31125f, emissiveIntensity: 1.16 }),
-    new THREE.MeshStandardMaterial({ color: 0x8bd7ff, roughness: 0.12, metalness: 0.32, emissive: 0x1c4e84, emissiveIntensity: 1.32 })
-  ];
-  const bodyMats = [
-    new THREE.MeshStandardMaterial({ color: 0x07101a, roughness: 0.68, metalness: 0.24, emissive: 0x091624, emissiveIntensity: 0.84 }),
-    new THREE.MeshStandardMaterial({ color: 0x09131f, roughness: 0.62, metalness: 0.28, emissive: 0x0c1b2d, emissiveIntensity: 0.92 }),
-    new THREE.MeshStandardMaterial({ color: 0x0a1219, roughness: 0.64, metalness: 0.26, emissive: 0x0d1828, emissiveIntensity: 0.88 })
-  ];
-  const matrix = createMatrixBillboardTexture();
-  const billboardUpdaters = [matrix.update];
-  const adTex = createAdBillboardTexture(["SVRPOKER.COM", "ALL IN"]);
-  const zenTex = createAdBillboardTexture(['REIKI HUB', 'AWAITING APPROVAL']);
-
-  const count = 68;
-  const adIndices = new Set([4, 11, 20, 28, 36, 44, 52, 60]);
-  for (let i = 0; i < count; i++){
-    const a = (i / count) * Math.PI * 2;
-    const rr = (R + 14) + Math.random() * 22;
-    const h = 18 + Math.random() * 34;
-    const w = 3.8 + Math.random() * 6.8;
-    const d = 3.2 + Math.random() * 6.2;
-    const x = Math.cos(a) * rr;
-    const z = Math.sin(a) * rr;
-    const style = i % 6;
-    const bodyMat = bodyMats[i % bodyMats.length];
-    const glassMat = glassMats[i % glassMats.length];
-    let bodyGeo;
-    if (style === 0) bodyGeo = new THREE.BoxGeometry(w, h, d);
-    else if (style === 1) bodyGeo = new THREE.CylinderGeometry(w * 0.48, w * 0.62, h, 12);
-    else if (style === 2) bodyGeo = new THREE.BoxGeometry(w * 0.92, h, d * 0.76);
-    else if (style === 3) bodyGeo = new THREE.CylinderGeometry(w * 0.52, w * 0.58, h, 10);
-    else if (style === 4) bodyGeo = new THREE.BoxGeometry(w * 0.84, h, d * 1.18);
-    else bodyGeo = new THREE.BoxGeometry(w * 1.08, h, d * 0.88);
-
-    const body = new THREE.Mesh(bodyGeo, bodyMat);
-    body.position.set(x, h * 0.5, z);
-    body.rotation.y = -a + Math.PI / 2;
-    body.castShadow = true;
-    body.receiveShadow = true;
-    group.add(body);
-
-    const outward = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
-    const frontInset = d * 0.5 + 0.08;
-
-    const frontGlass = new THREE.Mesh(
-      new THREE.PlaneGeometry(Math.max(2.2, w * 0.80), Math.max(10, h * 0.88)),
-      glassMat
-    );
-    frontGlass.position.set(x - outward.x * frontInset, h * 0.52, z - outward.z * frontInset);
-    frontGlass.lookAt(frontGlass.position.clone().sub(outward));
-    group.add(frontGlass);
-
-    const stripCount = 3 + (Math.random() * 3 | 0);
-    for (let s2 = 0; s2 < stripCount; s2++){
-      const strip = new THREE.Mesh(new THREE.PlaneGeometry(Math.max(1.8, w * 0.86), 0.24), glassMat);
-      strip.position.set(x - outward.x * (frontInset - 0.02), 4 + ((s2 + 1) / (stripCount + 1)) * (h - 6), z - outward.z * (frontInset - 0.02));
-      strip.lookAt(strip.position.clone().sub(outward));
-      group.add(strip);
-    }
-
-    if (i % 6 === 0){
-      const poleH = 3.4 + Math.random() * 5.0;
-      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, poleH, 8), glassMat);
-      pole.position.set(x, h + poleH * 0.5, z);
-      group.add(pole);
-      const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), glassMat);
-      beacon.position.set(x, h + poleH, z);
-      group.add(beacon);
-    }
-
-    if (adIndices.has(i)){
-      const tex = (i === 20 || i === 52) ? zenTex : (i % 2 ? matrix.texture : adTex);
-      if (tex) tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
-      const bw = Math.max(4.4, w * 0.92);
-      const bh = Math.max(9.6, h * 0.56);
-      const bill = new THREE.Mesh(
-        new THREE.PlaneGeometry(bw, bh),
-        new THREE.MeshBasicMaterial({ map: tex, transparent: false, side: THREE.DoubleSide })
-      );
-      bill.position.set(x - outward.x * (w * 0.52 + 0.44), Math.min(h * 0.56, 22), z - outward.z * (w * 0.52 + 0.44));
-      bill.lookAt(bill.position.clone().sub(outward));
-      group.add(bill);
-
-      if (tex === zenTex){
-        const neon = new THREE.Mesh(
-          new THREE.PlaneGeometry(bw, 1.48),
-          new THREE.MeshBasicMaterial({
-            map: canvasTexture(1500, 260, (ctx,w2,h2)=>{
-              const g = ctx.createLinearGradient(0,0,w2,h2);
-              g.addColorStop(0, "rgba(2,28,15,0.92)");
-              g.addColorStop(1, "rgba(3,8,6,0.96)");
-              ctx.fillStyle = g; ctx.fillRect(0,0,w2,h2);
-              ctx.strokeStyle = "rgba(86,255,176,0.96)";
-              ctx.lineWidth = 10;
-              roundRectPath(ctx, 12, 12, w2 - 24, h2 - 24, 26);
-              ctx.stroke();
-              ctx.textAlign = "center";
-              ctx.textBaseline = "middle";
-              ctx.fillStyle = "#d9ffee";
-              ctx.font = "bold 92px system-ui, Arial";
-              ctx.fillText("AWAITING APPROVAL", w2 / 2, 94);
-              ctx.fillStyle = "#7bffb7";
-              ctx.font = "700 50px system-ui, Arial";
-              ctx.fillText("SVR Reiki • Meditation • Wellness", w2 / 2, 178);
-            }),
-            transparent: true,
-            side: THREE.DoubleSide,
-            depthWrite: false
-          })
-        );
-        neon.position.copy(bill.position).add(new THREE.Vector3(0, -bh * 0.58, 0.02));
-        neon.lookAt(neon.position.clone().sub(outward));
-        group.add(neon);
-      }
-    }
-  }
-
+  group.name = "SVRBackgroundBuildingsRemoved_Phase121";
+  group.visible = false;
   scene.add(group);
-  return { group, billboardUpdaters };
+  return { group, billboardUpdaters: [] };
 }
 
 function makeSeat(scene, x, z, angle, label, chairMat, metalMat){
@@ -2227,11 +2112,11 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.018
     })
   );
-  moon.position.set(-58, wallHeight + 188.0, -(R + 336.0));
+  moon.position.set(-64, wallHeight + 292.0, -(R + 510.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.18);
-  moonHalo.scale.set(184.0, 184.0, 1);
+  moonHalo.scale.set(210.0, 210.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
@@ -2248,13 +2133,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.014
     })
   );
-  mars.position.set(-6, wallHeight + 216.0, -(R + 380.0));
+  mars.position.set(-6, wallHeight + 330.0, -(R + 558.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.12);
-  marsHalo.scale.set(96.0, 96.0, 1);
+  marsHalo.scale.set(118.0, 118.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2285,8 +2170,8 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const marsGlow = new THREE.PointLight(0xff9a72, 2.4, 560, 1.42);
   scene.add(marsGlow);
   marsGlow.visible = true;
-  const skylineGlow = new THREE.PointLight(0x3b74ff, 4.8, 300, 1.7);
-  skylineGlow.position.set(0, 34, -(R + 18));
+  const skylineGlow = new THREE.PointLight(0x3b74ff, 0.0, 1, 1.7);
+  skylineGlow.position.set(0, 260, -(R + 510));
   scene.add(skylineGlow);
   const accentGlow = new THREE.PointLight(0x92c2ff, 0.7, 70, 2.0);
   accentGlow.position.set(-9, 8, 7);
@@ -2461,17 +2346,17 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     );
     // Phase 105: keep the Phase 87/88 Reiki hub, but restore the higher/larger Update 3.0 sky lock.
     moon.position.set(
-      -48 + Math.sin(t * 0.018) * 4.5,
-      wallHeight + 192.0 + Math.sin(t * 0.070) * 2.2,
-      -(R + 340.0) + Math.cos(t * 0.014) * 6.0
+      -64 + Math.sin(t * 0.018) * 4.5,
+      wallHeight + 292.0 + Math.sin(t * 0.070) * 2.2,
+      -(R + 510.0) + Math.cos(t * 0.014) * 6.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     const marsOrbit = t * 0.16;
     mars.position.set(
-      moon.position.x + Math.cos(marsOrbit) * 43.0,
-      moon.position.y + 24.0 + Math.sin(marsOrbit * 1.35) * 7.5,
-      moon.position.z + Math.sin(marsOrbit) * 42.0 - 14.0
+      moon.position.x + Math.cos(marsOrbit) * 58.0,
+      moon.position.y + 42.0 + Math.sin(marsOrbit * 1.35) * 10.5,
+      moon.position.z + Math.sin(marsOrbit) * 56.0 - 24.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.09;

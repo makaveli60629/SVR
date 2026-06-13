@@ -1,7 +1,7 @@
 # Phase 115 — Restore Phase 113 Reiki + No Music Lock
 
 ## Build
-`UPDATE-3.0-PHASE-120-REIKI-STOREFRONT-ALIGNMENT-MOON-MARS-HIGH-LOCK`
+`UPDATE-3.0-PHASE-121-MOON-MARS-HIGH-NO-BACKGROUND-BUILDINGS-LOCK`
 
 ## Purpose
 Restore the approved Phase 113 Reiki 1.4G front clean storefront and enforce no lobby music.
