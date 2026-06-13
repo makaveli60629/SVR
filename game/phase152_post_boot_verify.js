@@ -1,9 +1,9 @@
-const LABEL = "UPDATE-3.0-PHASE-175-LOBBY-POLISH-AUDIT-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-176-ARENA-SCREEN-LOCK";
 function setBuildLabels(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE106.source = "Phase 175 active.";
-  window.SVR_PHASE175 = { build: LABEL };
+  window.SVR_PHASE106.source = "Phase 176 active.";
+  window.SVR_PHASE176 = { build: LABEL };
   document.title = `SVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
@@ -17,13 +17,12 @@ function hideBoot(){
   boot.style.display = "none";
 }
 function verifyState(){
-  window.SVR_PHASE175_VERIFY = {
+  window.SVR_PHASE176_VERIFY = {
     label: LABEL,
     gameReady: !!window.__SVR_GAME_READY__,
     singleWall: window.SVR_PHASE173_SINGLE_WALL || null,
     lobbyAudit: window.SVR_PHASE175_LOBBY_AUDIT || null,
-    locomotionAudit: window.SVR_PHASE173_LOCOMOTION_AUDIT || null,
-    sponsorSchedule: window.SVR_PHASE172C_SPONSOR_SCHEDULE || null,
+    arena: window.SVR_PHASE176_BROADCAST || null,
     checkedAt: new Date().toISOString()
   };
 }
