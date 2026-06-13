@@ -15,9 +15,9 @@
 <body class="svr-market">
 <canvas id="binary-rain" aria-hidden="true"></canvas>
 <div class="market-page">
-<nav class="market-nav"><a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Sponsor Intake</span></div></a><div class="market-links"><span class="status-pill">ADMIN ONLINE</span><a href="index.html">Home</a><a class="active" href="sponsor-intake.html">Sponsor Intake</a><a href="sponsorship.html">Sponsors</a><a href="store.html">Store</a><a href="contact.html">Contact</a></div></nav>
+<nav class="market-nav"><a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Sponsor Intake</span></div></a><div class="market-links"><span class="status-pill">ADMIN ONLINE</span><a href="index.html">Home</a><a class="active" href="sponsor-intake.html">Sponsor Intake</a><a href="admin-sponsors.html">Admin Sponsors</a><a href="sponsorship.html">Sponsors</a><a href="store.html">Store</a><a href="contact.html">Contact</a></div></nav>
 <main class="intake-shell">
-<section class="hero"><div><span class="kicker">Phase 172A</span><h1>No-code sponsor packet builder</h1><p class="lead">Fill in sponsor information once. The packet becomes the approved profile the website and game can read for logos, hub placement, store links, slides, schedules, and portal display.</p><p class="copy">This static version generates the sponsor JSON packet. The next admin step stores approvals automatically, but the structure is already locked.</p><div><span class="status-chip">Logo</span><span class="status-chip">Website</span><span class="status-chip">Store Link</span><span class="status-chip">Hub</span><span class="status-chip">Schedule</span><span class="status-chip">Approval</span></div></div><aside class="hero-card"><img src="assets/marketing/sponsor-premium.svg" alt="Sponsor module"></aside></section>
+<section class="hero"><div><span class="kicker">Phase 172B</span><h1>No-code sponsor packet builder</h1><p class="lead">Fill in sponsor information once. The packet becomes the approved profile the website and game can read for logos, hub placement, store links, slides, schedules, and portal display.</p><p class="copy">After the packet is built, move it through the Sponsor Admin dashboard for approval, denial, pause, expiration, preview, and export.</p><div><span class="status-chip">Logo</span><span class="status-chip">Website</span><span class="status-chip">Store Link</span><span class="status-chip">Hub</span><span class="status-chip">Schedule</span><span class="status-chip">Approval</span></div></div><aside class="hero-card"><img src="assets/marketing/sponsor-premium.svg" alt="Sponsor module"></aside></section>
 <section class="intake-grid">
 <article class="intake-card"><h2>Sponsor registration packet</h2><p class="notice">Uploads are represented as file names/paths for now. When backend storage is attached, these fields will point to uploaded assets automatically.</p>
 <form id="sponsorForm" class="intake-form">
@@ -40,12 +40,12 @@
 <div class="field full"><label>Approval status</label><select name="approvalStatus"><option value="pending">Pending review</option><option value="approved-demo" selected>Approved demo</option><option value="approved">Approved live</option><option value="denied">Denied</option></select></div>
 <div class="field full"><label><input name="approved" type="checkbox" checked> Approved for demo/game display</label></div>
 </form>
-<div class="actions-row"><button class="btn primary" id="buildPacket" type="button">Build Packet</button><button class="btn secondary" id="copyPacket" type="button">Copy JSON</button><button class="btn ghost" id="downloadPacket" type="button">Download JSON</button></div>
+<div class="actions-row"><button class="btn primary" id="buildPacket" type="button">Build Packet</button><button class="btn secondary" id="copyPacket" type="button">Copy JSON</button><button class="btn ghost" id="downloadPacket" type="button">Download JSON</button><a class="btn secondary" href="admin-sponsors.html">Open Admin Dashboard</a></div>
 </article>
 <aside class="intake-card"><h2>Generated sponsor JSON</h2><p class="notice">This is the packet the game module reads after approval.</p><pre id="packetOutput" class="output"></pre></aside>
 </section>
 </main>
-<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="sponsorship.html">Sponsorship</a><a class="btn primary" href="../game/?v=phase172-sponsor-module">Preview Game</a></div></footer>
+<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="sponsorship.html">Sponsorship</a><a class="btn primary" href="admin-sponsors.html">Admin Sponsors</a><a class="btn secondary" href="../game/?v=phase172b-sponsor-admin">Preview Game</a></div></footer>
 </div>
 <script src="../matrix.js"></script>
 <script>
