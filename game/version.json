@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-150-VISUAL-HARD-REFINE-LOCK",
-  "track": "hard-visual-refinement",
+  "build": "UPDATE-3.0-PHASE-151-RUNTIME-LABEL-CONSISTENCY-LOCK",
+  "track": "runtime-label-consistency",
   "siteTouched": true,
-  "phase": "150",
-  "summary": "Hard visual refinement pass. Poles are extra thin silver, overlay objects are hidden, moon and Mars are lower and larger, and skyline buildings are cleaned with better spacing and window detail.",
-  "label": "UPDATE-3.0-PHASE-150-VISUAL-HARD-REFINE-LOCK",
-  "notes": "Preserves Phase 149 visual module, Phase 148 Quest render work, Phase 145 route safety, logo loading screen, Quest hands, and poker room baseline.",
-  "updated": "2026-06-13T18:00:00Z"
+  "phase": "151",
+  "summary": "Runtime label consistency pass. Loading screen, HUD build pill, document title, version metadata, and window.SVR_PHASE106 are aligned to Phase 151 while preserving Phase 150 visual hard refine.",
+  "label": "UPDATE-3.0-PHASE-151-RUNTIME-LABEL-CONSISTENCY-LOCK",
+  "notes": "Preserves extra-thin silver poles, no-overlay storefront, visible moon and Mars, cleaner skyline, Phase 148 Quest render work, and poker room baseline.",
+  "updated": "2026-06-13T18:15:00Z"
 }
