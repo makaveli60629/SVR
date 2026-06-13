@@ -11,14 +11,15 @@ import { applyPhase119ReikiTrueitiveStorefrontFinal } from "./modules/reiki_phas
 import { addNathanWalkingNPCPhase131 } from "./modules/npc_nathan_walker_phase131.js";
 import "./modules/asset_registry_phase122.js";
 import { addPhase123AdBannerBuildings } from "./modules/ad_banner_buildings_phase123.js";
+import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-131-NATHAN-WALKING-NPC-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-148-QUEST-FPS-RENDER-OPTIMIZATION-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 131: Nathan walking NPC patrol wired; Phase 130 Reiki cleanup and Phase 128 high planet baseline preserved" };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 148: Quest FPS cleanup, render pixel-ratio lock, foveation lock, shadow-off pass, and optional animation throttle; Phase 147 deployment baseline preserved" };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -60,6 +61,7 @@ $toggleLog.addEventListener("click", ()=>{
 if (AUTOCAM) document.body.classList.add("preview-mode");
 
 const { scene, camera, renderer } = createCore({ containerId: "app" });
+const perf = createPhase148QuestPerfPass({ renderer, scene, log });
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
@@ -77,7 +79,6 @@ const desktop = AUTOCAM ? null : createDesktopControls({ camera, domElement: ren
 setStatus("Loading world…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
-
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
 
@@ -271,7 +272,7 @@ const watch = createWristWatch({
   scene,
   camera,
   renderer,
-  getState: ()=>({
+  getState: ()=>( {
     audioEnabled: audio.getState().enabled,
     trackTitle: audio.getState().trackTitle || "Music Disabled",
     cash,
@@ -314,6 +315,7 @@ const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"),
 tp.setLogoTexture(logoTexture);
 const phase123AdBanners = addPhase123AdBannerBuildings({ scene, radius: CONFIG.ROOM_RADIUS, wallHeight: CONFIG.WALL_HEIGHT * 0.56, logoTexture, log });
 scene.userData._phase123AdBanners = phase123AdBanners;
+perf.lockSceneForQuest();
 
 window.__SVR_GAME_READY__ = true;
 const __svrBootFallback = document.getElementById('bootFallback');
@@ -336,6 +338,7 @@ if (AUTOCAM) setHudVisible(false);
 if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display","none");
 
 renderer.xr.addEventListener("sessionstart", async ()=>{
+  perf.onXRSessionStart();
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
   await tp.onSessionStart();
@@ -359,6 +362,7 @@ renderer.setAnimationLoop(()=>{
   const now = performance.now();
   const dt = Math.min((now - tPrev) / 1000, 0.033);
   tPrev = now;
+  const optionalTick = perf.optionalTickAllowed();
   if (!renderer.xr.isPresenting){
     if (!AUTOCAM) desktop.update(dt);
     else {
@@ -379,9 +383,9 @@ renderer.setAnimationLoop(()=>{
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
-  if (scene.userData._phase123AdBanners?.userData?.tick) scene.userData._phase123AdBanners.userData.tick(scene.userData._time || (now * 0.001));
+  if (optionalTick && scene.userData._phase123AdBanners?.userData?.tick) scene.userData._phase123AdBanners.userData.tick(scene.userData._time || (now * 0.001));
   hands.update(dt);
-  hands.updateDebug();
+  if (optionalTick) hands.updateDebug();
   const leftHand = hands.getLeftHand();
   const rightHand = hands.getRightHand();
   const leftController = hands.getLeftController();
