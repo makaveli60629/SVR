@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-134-TRUEITIVE-HOLOGRAM-PORTRAIT-LOCK",
+  "build": "UPDATE-3.0-PHASE-135-EXPANDED-LOBBY-WALL-ALIGNMENT-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "134",
-  "summary": "Refines the Reiki hologram using Trueitive.com presentation wording, red AWAITING APPROVAL badges, a taller portrait center video/display to stop the founder image from looking stretched wide, founder info on the left wall, Shyona Royston image panel on the right wall, and chakra/Reiki slides in the one-screen hologram.",
-  "label": "UPDATE-3.0-PHASE-134-TRUEITIVE-HOLOGRAM-PORTRAIT-LOCK",
-  "notes": "Game-only update. Trueitive.com content is presented with approval-pending labeling. Upload approved Shyona image to game/assets/ui/shyona_royston.png.",
-  "updated": "2026-06-13T05:45:00Z"
+  "phase": "135",
+  "summary": "Expands the lobby radius from 24 to 32, pushes wall systems outward, hides old Reiki overlay clutter, fixes founder info to the left wall, fixes the founder picture panel to the right wall, and keeps the portrait hologram/video display as one clean forward screen.",
+  "label": "UPDATE-3.0-PHASE-135-EXPANDED-LOBBY-WALL-ALIGNMENT-LOCK",
+  "notes": "Game-only update. Website/site untouched. The founder photo still loads from game/assets/ui/shyona_royston.png.",
+  "updated": "2026-06-13T06:05:00Z"
 }
