@@ -15,7 +15,45 @@ function makeCanvasTexture(width, height, painter){
 function safeText(value, fallback = ""){
   return String(value || fallback).replace(/[<>]/g, "");
 }
-function drawSponsorPanel(profile){
+function parseDateOnly(value){
+  if(!value) return null;
+  const d = new Date(`${value}T00:00:00`);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+function minutesFromHHMM(value){
+  const m = String(value || "").match(/^(\d{1,2}):(\d{2})$/);
+  if(!m) return null;
+  const hh = Math.max(0, Math.min(23, Number(m[1])));
+  const mm = Math.max(0, Math.min(59, Number(m[2])));
+  return hh * 60 + mm;
+}
+function dayName(date){
+  return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][date.getDay()];
+}
+export function evaluateSponsorSchedule(profile, now = new Date()){
+  const status = String(profile?.approvalStatus || "").toLowerCase();
+  if(!profile?.approved || ["denied","paused","expired"].includes(status)) return { active:false, reason:`not active: ${status || "not approved"}` };
+  const schedule = profile?.schedule || {};
+  const start = parseDateOnly(schedule.startDate);
+  const end = parseDateOnly(schedule.endDate);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if(start && today < start) return { active:false, reason:`starts ${schedule.startDate}` };
+  if(end && today > end) return { active:false, reason:`ended ${schedule.endDate}` };
+  const days = Array.isArray(schedule.days) ? schedule.days.map(d=>String(d).toLowerCase()) : [];
+  if(days.length && !days.includes(dayName(now).toLowerCase())) return { active:false, reason:`off schedule today (${dayName(now)})` };
+  const hours = Array.isArray(schedule.hours) ? schedule.hours : [];
+  if(hours.length >= 2){
+    const open = minutesFromHHMM(hours[0]);
+    const close = minutesFromHHMM(hours[1]);
+    const current = now.getHours() * 60 + now.getMinutes();
+    if(open !== null && close !== null){
+      const inWindow = open <= close ? current >= open && current <= close : current >= open || current <= close;
+      if(!inWindow) return { active:false, reason:`outside hours ${hours[0]}-${hours[1]}` };
+    }
+  }
+  return { active:true, reason:"approved and in schedule" };
+}
+function drawSponsorPanel(profile, scheduleState){
   const accent = profile?.display?.accentColor || "#5fffd8";
   return makeCanvasTexture(1600, 980, (ctx,w,h)=>{
     const g = ctx.createLinearGradient(0,0,w,h);
@@ -24,7 +62,7 @@ function drawSponsorPanel(profile){
     ctx.strokeStyle = accent; ctx.lineWidth = 14; ctx.strokeRect(34,34,w-68,h-68);
     ctx.fillStyle = "rgba(255,255,255,.07)"; ctx.fillRect(78,74,w-156,112);
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillStyle = accent; ctx.font = "900 42px system-ui,Arial"; ctx.fillText("APPROVED SPONSOR MODULE", w/2, 130);
+    ctx.fillStyle = accent; ctx.font = "900 42px system-ui,Arial"; ctx.fillText(scheduleState?.active ? "ACTIVE APPROVED SPONSOR" : "APPROVED SPONSOR • WAITING SCHEDULE", w/2, 130);
     ctx.fillStyle = "#ffffff"; ctx.font = "900 86px system-ui,Arial"; ctx.fillText(safeText(profile?.sponsorName,"Sponsor Name"), w/2, 282);
     ctx.fillStyle = accent; ctx.font = "800 44px system-ui,Arial"; ctx.fillText(safeText(profile?.placementName,"Hub Placement"), w/2, 360);
     ctx.fillStyle = "#dffcff"; ctx.font = "700 34px system-ui,Arial";
@@ -34,10 +72,12 @@ function drawSponsorPanel(profile){
     if(line) ctx.fillText(line,w/2,yy);
     const schedule = profile?.schedule || {};
     ctx.fillStyle = "rgba(255,255,255,.08)"; ctx.fillRect(150,690,1300,132);
-    ctx.fillStyle = accent; ctx.font = "900 34px system-ui,Arial"; ctx.fillText("SCHEDULE", w/2, 730);
-    ctx.fillStyle = "#ffffff"; ctx.font = "700 32px system-ui,Arial";
-    ctx.fillText(`${safeText(schedule.days?.join(" / "),"Days pending")}  •  ${safeText(schedule.hours?.join(" - "),"Hours pending")}`, w/2, 780);
-    ctx.fillStyle = "#ffdf8a"; ctx.font = "800 30px system-ui,Arial"; ctx.fillText(safeText(profile?.website,"website pending"), w/2, 880);
+    ctx.fillStyle = accent; ctx.font = "900 34px system-ui,Arial"; ctx.fillText("SCHEDULE STATUS", w/2, 730);
+    ctx.fillStyle = scheduleState?.active ? "#8dffb4" : "#ffdf8a"; ctx.font = "800 30px system-ui,Arial";
+    ctx.fillText(safeText(scheduleState?.reason,"schedule pending"), w/2, 772);
+    ctx.fillStyle = "#ffffff"; ctx.font = "700 25px system-ui,Arial";
+    ctx.fillText(`${safeText(schedule.days?.join(" / "),"Days pending")} • ${safeText(schedule.hours?.join(" - "),"Hours pending")}`, w/2, 812);
+    ctx.fillStyle = "#ffdf8a"; ctx.font = "800 30px system-ui,Arial"; ctx.fillText(safeText(profile?.website,"website pending"), w/2, 890);
   });
 }
 function drawLogo(profile){
@@ -68,15 +108,19 @@ function placeOnCircle(obj, radius, angle){
   obj.position.set(Math.cos(angle)*radius,0,Math.sin(angle)*radius);
   obj.lookAt(0, obj.position.y, 0);
 }
-export async function installPhase172SponsorModule({ scene, log = console.log, enabled = true, profileUrl = "./data/sponsors/example-reiki-sponsor.json" } = {}){
+export async function installPhase172SponsorModule({ scene, log = console.log, enabled = true, profileUrl = "./data/sponsors/example-reiki-sponsor.json", forceSchedule = false } = {}){
   if(!enabled || !scene) return null;
   let profile;
   try{ profile = await fetchProfile(profileUrl); }
   catch(err){ log("[Phase172 Sponsor] profile load skipped", err?.message || err); return null; }
+  const scheduleState = evaluateSponsorSchedule(profile);
+  const allowDisplay = forceSchedule || scheduleState.active;
+  window.SVR_PHASE172C_SPONSOR_SCHEDULE = { sponsorId:profile?.sponsorId || null, sponsorName:profile?.sponsorName || null, active:scheduleState.active, reason:scheduleState.reason, forced:forceSchedule, profileUrl };
   if(!profile?.approved){ log("[Phase172 Sponsor] profile not approved", profile?.sponsorId || "unknown"); return null; }
+  if(!allowDisplay){ log(`[Phase172 Sponsor] approved but not displayed: ${scheduleState.reason}`); return null; }
   const root = new THREE.Group();
-  root.name = `PHASE172_SPONSOR_MODULE_${safeText(profile.sponsorId,"approved")}`;
-  const panel = new THREE.Mesh(new THREE.PlaneGeometry(3.8,2.32), new THREE.MeshBasicMaterial({ map:drawSponsorPanel(profile), transparent:true, side:THREE.DoubleSide, depthWrite:false }));
+  root.name = `PHASE172C_SCHEDULED_SPONSOR_MODULE_${safeText(profile.sponsorId,"approved")}`;
+  const panel = new THREE.Mesh(new THREE.PlaneGeometry(3.8,2.32), new THREE.MeshBasicMaterial({ map:drawSponsorPanel(profile, scheduleState), transparent:true, side:THREE.DoubleSide, depthWrite:false }));
   panel.position.set(0,2.25,-0.35); panel.renderOrder = 70; root.add(panel);
   const logo = new THREE.Mesh(new THREE.CircleGeometry(.58,48), new THREE.MeshBasicMaterial({ map:drawLogo(profile), transparent:false, side:THREE.DoubleSide }));
   logo.position.set(0,1.02,.48); root.add(logo);
@@ -89,8 +133,9 @@ export async function installPhase172SponsorModule({ scene, log = console.log, e
   placeOnCircle(root, radius, angle);
   scene.add(root);
   root.userData.profile = profile;
+  root.userData.scheduleState = scheduleState;
   root.userData.tick = (t)=>{ portal.rotation.z = t*.75; logo.rotation.z = Math.sin(t*.7)*.03; };
-  window.SVR_PHASE172_SPONSOR_MODULE = { locked:true, loaded:true, sponsorId:profile.sponsorId, sponsorName:profile.sponsorName, hub:profile.hub, approved:profile.approved, profileUrl };
-  log(`[Phase172 Sponsor] Loaded approved sponsor ${profile.sponsorName} into ${profile.hub} hub.`);
+  window.SVR_PHASE172_SPONSOR_MODULE = { locked:true, loaded:true, sponsorId:profile.sponsorId, sponsorName:profile.sponsorName, hub:profile.hub, approved:profile.approved, scheduleActive:scheduleState.active, scheduleReason:scheduleState.reason, profileUrl };
+  log(`[Phase172 Sponsor] Loaded scheduled sponsor ${profile.sponsorName} into ${profile.hub} hub. ${scheduleState.reason}`);
   return root;
 }
