@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-146-DEPLOYMENT-SMOKE-TEST-LOCK",
-  "track": "deployment-verification",
+  "build": "UPDATE-3.0-PHASE-147-LIVE-DEPLOYMENT-QUEST-PERFORMANCE-PASS",
+  "track": "live-deployment-quest-performance",
   "siteTouched": true,
-  "phase": "146",
-  "summary": "Deployment verification lock. Official logo loading screen remains active, loading-screen hologram button remains removed, route 404 coverage remains active, and build label advances to Phase 146.",
-  "label": "UPDATE-3.0-PHASE-146-DEPLOYMENT-SMOKE-TEST-LOCK",
-  "notes": "Preserves Phase 143 skyline planet lobby work and Phase 144 145 loading route safety.",
-  "updated": "2026-06-13T17:00:00Z"
+  "phase": "147",
+  "summary": "Live deployment check and Quest lobby performance pass. Official logo loading screen remains active, loading-screen hologram button remains removed, route 404 coverage remains active, and build label advances to Phase 147.",
+  "label": "UPDATE-3.0-PHASE-147-LIVE-DEPLOYMENT-QUEST-PERFORMANCE-PASS",
+  "notes": "Preserves Phase 143 skyline planet lobby work and Phase 144 through 146 loading route safety work.",
+  "updated": "2026-06-13T17:15:00Z"
 }
