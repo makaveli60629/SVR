@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 133",
-  "build": "UPDATE-3.0-PHASE-133-REIKI-INTERACTIVE-HOLOGRAM-LOCK",
+  "version": "Update 3.0 Phase 134",
+  "build": "UPDATE-3.0-PHASE-134-TRUEITIVE-HOLOGRAM-PORTRAIT-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Reiki storefront rebuilt into one interactive hologram display with video first, NEXT/BACK slides, founder info left, Shyona picture panel right, and 7-chakra/Reiki slide."
+  "notes": "Trueitive.com Reiki content, red AWAITING APPROVAL labels, taller portrait video/hologram display, founder info left, Shyona image right, chakra/Reiki slides."
 }
