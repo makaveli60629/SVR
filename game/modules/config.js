@@ -1,6 +1,6 @@
 export const CONFIG = {
-  ROOM_RADIUS: 32,
-  WALL_HEIGHT: 16,
+  ROOM_RADIUS: 42,
+  WALL_HEIGHT: 18,
   SPAWN_X: 0,
   SPAWN_Z: 4.2,
 
