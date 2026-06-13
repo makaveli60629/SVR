@@ -10,6 +10,7 @@ import { applyPhase161WellnessLuxuryStorefront } from "./phase161_wellness_luxur
 import { applyPhase162AllHubLuxuryStorefronts } from "./phase162_all_hub_luxury_storefronts.js";
 import { applyPhase162PremiumHubHudUpgrade } from "./phase162_premium_hub_hud_upgrade.js";
 import { applyPhase163RealisticLobbyStorefrontAlignment } from "./phase163_realistic_lobby_storefront_alignment.js";
+import { applyPhase164LegendsStatuesCompactWalls } from "./phase164_legends_statues_compact_walls.js";
 
 async function applyPhase119ReikiStorefrontFinal(args = {}){
   const result = await applyPhase143WallAlignedSkylineAds(args);
@@ -24,6 +25,7 @@ async function applyPhase119ReikiStorefrontFinal(args = {}){
   applyPhase162AllHubLuxuryStorefronts(args, result);
   applyPhase162PremiumHubHudUpgrade(args, result);
   applyPhase163RealisticLobbyStorefrontAlignment(args, result);
+  applyPhase164LegendsStatuesCompactWalls(args, result);
   return result;
 }
 
