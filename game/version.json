@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-172B-SPONSOR-ADMIN-APPROVAL-FLOW-LOCK",
-  "track": "sponsor-admin-approval-flow",
+  "build": "UPDATE-3.0-PHASE-172C-SCHEDULED-SPONSOR-LOADER-LOCK",
+  "track": "scheduled-sponsor-loader",
   "siteTouched": true,
-  "phase": "172B",
-  "summary": "Sponsor admin dashboard with pending sponsor queue, approve/deny/pause/expire actions, preview game, copy/export JSON, and sponsor inventory slot map.",
-  "label": "UPDATE-3.0-PHASE-172B-SPONSOR-ADMIN-APPROVAL-FLOW-LOCK",
-  "notes": "Preserves Phase 172A sponsor module architecture and adds static admin approval workflow ready for backend storage.",
-  "updated": "2026-06-14T00:45:00Z"
+  "phase": "172C",
+  "summary": "Schedule-based sponsor loader. Approved sponsors only display when current date, day, and hour match the approved schedule window.",
+  "label": "UPDATE-3.0-PHASE-172C-SCHEDULED-SPONSOR-LOADER-LOCK",
+  "notes": "Preserves Phase 172B admin approval flow. The example sponsor is active for live demo verification; expired, paused, denied, or off-schedule sponsors do not display.",
+  "updated": "2026-06-14T01:00:00Z"
 }
