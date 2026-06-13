@@ -1,5 +1,5 @@
-import { applyPhase138CarpetRopeRefine } from "./reiki_phase138_carpet_rope_refine.js";
+import { applyPhase139UploadedAdsBackground } from "./reiki_phase139_ads_background.js";
 
 export function applyPhase119ReikiTrueitiveStorefrontFinal(args = {}){
-  return applyPhase138CarpetRopeRefine(args);
+  return applyPhase139UploadedAdsBackground(args);
 }
