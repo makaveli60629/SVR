@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-139-UPLOADED-ADS-REIKI-BACKGROUND-LOCK",
+  "build": "UPDATE-3.0-PHASE-140-CINEMATIC-PLANETS-REIKI-POD-VIBES-THEATER-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "139",
-  "summary": "Adds uploaded Espresso With Cream ad texture to lobby wall ads, adds the uploaded Trueitive founder photo to the Reiki right-wall/founder display, adds a Buddha-style Reiki background panel using the provided URL with fallback art, and preserves the Phase 138 long narrow carpet and bent red ropes.",
-  "label": "UPDATE-3.0-PHASE-139-UPLOADED-ADS-REIKI-BACKGROUND-LOCK",
-  "notes": "Game-only update. Website/site untouched. Uploaded images are embedded as optimized WebP data textures for WebXR reliability.",
-  "updated": "2026-06-13T07:10:00Z"
+  "phase": "140",
+  "summary": "Expands the lobby circumference, upgrades Earth/Moon/Mars into a slower larger cinematic orbit with visible procedural textures, hides old sky guide lines and duplicate planet systems, adds a star/aura atmosphere, refines Reiki with glass storefront walls, classic gold stanchion poles with sagging red velvet ropes, plants, chakra wall icons, and an interactive hologram pod/meditation portal, and adds a blue Vibes Theater storefront opposite Reiki.",
+  "label": "UPDATE-3.0-PHASE-140-CINEMATIC-PLANETS-REIKI-POD-VIBES-THEATER-LOCK",
+  "notes": "Game-only update. Website/site untouched. Phase 139 uploaded ads and Reiki background are preserved.",
+  "updated": "2026-06-13T07:35:00Z"
 }
