@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-152-POST-BOOT-VERIFY-NO-OVERLAY-LOCK",
-  "track": "post-boot-verification",
+  "build": "UPDATE-3.0-PHASE-153-NATURAL-PLANET-SCALE-LOCK",
+  "track": "natural-planet-scale",
   "siteTouched": true,
-  "phase": "152",
-  "summary": "Post-boot verification pass. Adds a non-visual runtime verifier, confirms labels, hides the boot fallback after readiness, and exposes window.SVR_PHASE152_VERIFY without adding any visible overlay.",
-  "label": "UPDATE-3.0-PHASE-152-POST-BOOT-VERIFY-NO-OVERLAY-LOCK",
-  "notes": "Preserves Phase 150 hard visual refine, Phase 151 label consistency, Quest render work, route safety, logo loading screen, Quest hands, and poker room baseline.",
-  "updated": "2026-06-13T18:30:00Z"
+  "phase": "153",
+  "summary": "Planet scale correction pass. Moon, Mars, Earth, and glow halos are reduced to a more natural size while staying visible in the north sky.",
+  "label": "UPDATE-3.0-PHASE-153-NATURAL-PLANET-SCALE-LOCK",
+  "notes": "Preserves Phase 152 post-boot verification, Phase 150 hard visual refine, extra-thin silver poles, no-overlay storefront, cleaner skyline, Quest hands, and poker room baseline.",
+  "updated": "2026-06-13T18:45:00Z"
 }
