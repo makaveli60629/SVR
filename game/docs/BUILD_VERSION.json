@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-133-REIKI-INTERACTIVE-HOLOGRAM-LOCK",
+  "build": "UPDATE-3.0-PHASE-134-TRUEITIVE-HOLOGRAM-PORTRAIT-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "133",
-  "summary": "Rebuilds Reiki storefront into one clean interactive hologram display. Old wall overlay panels are replaced by a covered presentation wall, the video is first, NEXT/BACK slide controls are active, founder info is on the left, Shyona Royston picture panel is on the right, and a 7-chakra/Reiki symbol slide is included.",
-  "label": "UPDATE-3.0-PHASE-133-REIKI-INTERACTIVE-HOLOGRAM-LOCK",
-  "notes": "Game-only update. Nathan NPC and storefront work preserved. Upload Shyona final photo to game/assets/ui/shyona_royston.png to replace the placeholder portrait automatically.",
-  "updated": "2026-06-13T05:20:00Z"
+  "phase": "134",
+  "summary": "Refines the Reiki hologram using Trueitive.com presentation wording, red AWAITING APPROVAL badges, a taller portrait center video/display to stop the founder image from looking stretched wide, founder info on the left wall, Shyona Royston image panel on the right wall, and chakra/Reiki slides in the one-screen hologram.",
+  "label": "UPDATE-3.0-PHASE-134-TRUEITIVE-HOLOGRAM-PORTRAIT-LOCK",
+  "notes": "Game-only update. Trueitive.com content is presented with approval-pending labeling. Upload approved Shyona image to game/assets/ui/shyona_royston.png.",
+  "updated": "2026-06-13T05:45:00Z"
 }
