@@ -24,6 +24,49 @@ function makeControllerProxy(controller, handed = "right"){
   return proxy;
 }
 
+
+function makeGloveVisual(handed = "right"){
+  const side = handed === "left" ? -1 : 1;
+  const root = new THREE.Group();
+  root.name = `SVR_Phase125_Protective_Glove_${handed}`;
+  const black = new THREE.MeshStandardMaterial({ color: 0x08080c, roughness: 0.48, metalness: 0.18, emissive: 0x020205, emissiveIntensity: 0.05 });
+  const purple = new THREE.MeshBasicMaterial({ color: handed === "left" ? 0xb48cff : 0x75fff2, transparent: true, opacity: 0.82, depthWrite: false, blending: THREE.AdditiveBlending });
+  const palm = new THREE.Mesh(new THREE.BoxGeometry(0.072, 0.026, 0.090), black);
+  palm.position.set(0, -0.006, 0.040);
+  root.add(palm);
+  const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.055, 0.038, 24), black.clone());
+  cuff.rotation.x = Math.PI / 2;
+  cuff.position.set(0, -0.002, -0.010);
+  root.add(cuff);
+  const glow = new THREE.Mesh(new THREE.TorusGeometry(0.054, 0.0045, 8, 32), purple);
+  glow.rotation.x = Math.PI / 2;
+  glow.position.copy(cuff.position);
+  root.add(glow);
+  for (let i = 0; i < 4; i++){
+    const x = side * (-0.027 + i * 0.018);
+    const knuckle = new THREE.Mesh(new THREE.SphereGeometry(0.010, 12, 8), purple);
+    knuckle.position.set(x, 0.006, 0.078);
+    root.add(knuckle);
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(0.010, 0.010, 0.050), black.clone());
+    strip.position.set(x, 0.004, 0.108);
+    root.add(strip);
+  }
+  const thumb = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.014, 0.052), black.clone());
+  thumb.position.set(side * 0.050, -0.010, 0.060);
+  thumb.rotation.y = side * 0.60;
+  root.add(thumb);
+  return root;
+}
+
+function attachGlove(parent, handed = "right"){
+  if (!parent || parent.userData?.svrGlove) return null;
+  const glove = makeGloveVisual(handed);
+  glove.visible = true;
+  parent.add(glove);
+  parent.userData.svrGlove = glove;
+  return glove;
+}
+
 function updateControllerProxy(proxy){
   const controller = proxy?.userData?.controller;
   if (!controller) return;
@@ -101,6 +144,7 @@ export function createHands({ scene, renderer, log = console.log }){
     const model = handFactory.createHandModel(hand, "mesh");
     model.visible = true;
     hand.add(model);
+    attachGlove(hand, i === 0 ? "left" : "right");
     handModels.push(model);
     handDebugGroups.push(makeDebugGroup(hand));
 
@@ -128,6 +172,8 @@ export function createHands({ scene, renderer, log = console.log }){
       const proxy = makeControllerProxy(controller, handed);
       proxy.userData.inputSource = evt?.data || null;
       scene.add(proxy);
+      attachGlove(proxy, handed);
+      proxy.visible = true;
       const debug = makeDebugGroup(proxy);
       controllerProxies.push({ controller, proxy, debug });
       if (handed === "left") leftControllerProxy = proxy;
@@ -153,7 +199,7 @@ export function createHands({ scene, renderer, log = console.log }){
       if (h) h.visible = true;
     });
     handModels.forEach(m=>{ if (m) m.visible = true; });
-    controllerProxies.forEach(({ proxy })=> updateControllerProxy(proxy, dt));
+    controllerProxies.forEach(({ proxy })=>{ proxy.visible = true; updateControllerProxy(proxy, dt); });
   }
 
   function updateDebug(){

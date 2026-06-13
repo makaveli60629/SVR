@@ -17,7 +17,7 @@ const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-124-EARTH-MOON-HIGH-HAND-TELEPORT-LOCK', source: 'Earth enabled in high sky; Moon larger/higher; hand teleport module reinforced; Phase 123 ad buildings preserved' };
+window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-125-AUDIT-RESTORE-SKY-BANNERS-WATCH-GLOVES-LOCK', source: 'Audit restore: visible Earth/Moon/Mars orbit cluster, brighter sprites, 8 visible table-facing banner buildings, upright watch, glove visuals, hand teleport preserved' };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -375,7 +375,7 @@ scene.userData._phase123AdBanners = phase123AdBanners;
 
 window.__SVR_GAME_READY__ = true;
 const __svrBootFallback = document.getElementById('bootFallback'); if (__svrBootFallback){ __svrBootFallback.style.opacity='0'; __svrBootFallback.style.pointerEvents='none'; setTimeout(()=>{__svrBootFallback.style.display='none';},420); }
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Earth/Moon/Mars high sky locked. Hand teleport enabled. Phase 123 ad banners preserved.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 125 audit restore: high sky cluster, hand teleport, gloves, banners, upright watch.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){

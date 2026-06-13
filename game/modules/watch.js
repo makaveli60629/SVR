@@ -19,6 +19,7 @@ const M0 = new THREE.Matrix4();
 const FLIP_Q = new THREE.Quaternion();
 const SCREEN_TILT_Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.34);
 const DISPLAY_MIRRORED = false;
+const DISPLAY_ROTATED_180 = true; // Phase 125: user reported upside-down watch; rotate visual + hit map together.
 
 function getJointWorld(hand, names){
   if (!hand?.joints) return null;
@@ -117,7 +118,7 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   );
   screenFront.renderOrder = 40;
   screenFront.position.z = 0.012;
-  screenFront.rotation.z = 0;
+  screenFront.rotation.z = DISPLAY_ROTATED_180 ? Math.PI : 0;
   group.add(screenFront);
 
   const screenBack = new THREE.Mesh(
@@ -238,7 +239,8 @@ let hoveredId = null;
   function localHit(local){
     const state = getState();
     let x = ((local.x / plateW) + 0.5) * canvas.width;
-    const y = ((-local.y / plateH) + 0.5) * canvas.height;
+    let y = ((-local.y / plateH) + 0.5) * canvas.height;
+    if (DISPLAY_ROTATED_180){ x = canvas.width - x; y = canvas.height - y; }
     if (DISPLAY_MIRRORED) x = canvas.width - x;
     let best = null;
     let bestScore = Infinity;
