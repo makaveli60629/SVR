@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-129-REIKI-STOREFRONT-CAROUSEL-STORE-FRONTS-LOCK",
+  "build": "UPDATE-3.0-PHASE-130-REIKI-ONE-DISPLAY-NO-FLOOR-TABS-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "129",
-  "summary": "Restores Phase 128 game baseline, cleans the Reiki presentation storefront, moves glass/wall elements back for open carpet space, keeps Trueitive presentation with WAITING FOR APPROVAL, and adds Vibes Theater, SVR Store, PGA Expansion, and Scorpion storefront portals.",
-  "label": "UPDATE-3.0-PHASE-129-REIKI-STOREFRONT-CAROUSEL-STORE-FRONTS-LOCK",
-  "notes": "Game-only branch based on Phase 128. Website/site untouched. Reiki carousel remains compact and presentation-ready with approval label.",
-  "updated": "2026-06-13T04:10:00Z"
+  "phase": "130",
+  "summary": "Reiki storefront cleanup: removed Reiki-area plant clutter, hides floor tabs/portal plaques, replaces spinning carousel tabs with one slideable display, and adds three founder/info columns with portrait-style presentation panels.",
+  "label": "UPDATE-3.0-PHASE-130-REIKI-ONE-DISPLAY-NO-FLOOR-TABS-LOCK",
+  "notes": "Game-only hotfix. Website/site untouched. Storefront portals from Phase 129 remain preserved.",
+  "updated": "2026-06-13T04:35:00Z"
 }
