@@ -1,5 +1,5 @@
-import { applyPhase141VisiblePlanetsProfessionalStorefront } from "./phase141_visible_planets_professional_storefront.js";
+import { applyPhase142QuickLobbyRemodel } from "./phase142_quick_lobby_remodel.js";
 
 export function applyPhase119ReikiTrueitiveStorefrontFinal(args = {}){
-  return applyPhase141VisiblePlanetsProfessionalStorefront(args);
+  return applyPhase142QuickLobbyRemodel(args);
 }
