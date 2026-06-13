@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-148-QUEST-FPS-RENDER-OPTIMIZATION-LOCK",
-  "track": "quest-fps-render-optimization",
+  "build": "UPDATE-3.0-PHASE-149-POLES-PLANETS-SKYLINE-REFINE-LOCK",
+  "track": "visual-refinement",
   "siteTouched": true,
-  "phase": "148",
-  "summary": "Quest FPS cleanup and lobby render optimization lock. Adds adaptive Quest/mobile pixel ratio, XR framebuffer scaling, foveation, shadow disable pass, mesh frustum culling, texture anisotropy clamp, and optional banner/debug tick throttling.",
-  "label": "UPDATE-3.0-PHASE-148-QUEST-FPS-RENDER-OPTIMIZATION-LOCK",
-  "notes": "Preserves Phase 147 deployment label path, Phase 145 route safety, official logo loading screen, visible planets, storefront polish, Quest hands, and poker room baseline.",
-  "updated": "2026-06-13T17:30:00Z"
+  "phase": "149",
+  "summary": "Refined Reiki storefront poles to thin silver stanchions, removed the glass beam overlay, forced a visible north-sky moon and Mars lock, and upgraded backdrop buildings with better spacing, window texture, rooftop caps, and antennas.",
+  "label": "UPDATE-3.0-PHASE-149-POLES-PLANETS-SKYLINE-REFINE-LOCK",
+  "notes": "Preserves Phase 148 Quest render optimization, Phase 145 route safety, official logo loading screen, Quest hands, and poker room baseline.",
+  "updated": "2026-06-13T17:45:00Z"
 }
