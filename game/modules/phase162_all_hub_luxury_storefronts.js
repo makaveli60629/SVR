@@ -28,8 +28,7 @@ function panelTexture(title, subtitle, accent="#58fff4", gold="#ffd56e"){
 function floorTexture(title, accent="#58fff4", gold="#ffd56e"){
   return tex(1024,1024,(x,w,h)=>{
     x.clearRect(0,0,w,h);
-    const g=x.createRadialGradient(w/2,h/2,40,w/2,h/2,450); g.addColorStop(0,"rgba(255,255,255,.75)"); g.addColorStop(.34,accent.replace("#","rgba("));
-    x.fillStyle=accent; x.globalAlpha=.24; x.fillRect(0,0,w,h); x.globalAlpha=1;
+    x.fillStyle=accent; x.globalAlpha=.22; x.fillRect(0,0,w,h); x.globalAlpha=1;
     x.strokeStyle=gold; x.lineWidth=18; x.beginPath(); x.arc(w/2,h/2,282,0,Math.PI*2); x.stroke();
     x.strokeStyle=accent; x.lineWidth=11; x.beginPath(); x.arc(w/2,h/2,216,0,Math.PI*2); x.stroke();
     x.textAlign="center"; x.textBaseline="middle"; x.fillStyle="#fff"; x.font="900 74px system-ui,Arial"; x.fillText(title,w/2,h/2+135,w-130);
@@ -69,7 +68,7 @@ function hideOldHubObjects(scene, centers){
     }
   });
 }
-function buildHub(scene, sceneTargets, cfg, index){
+function buildHub(scene, sceneTargets, cfg){
   const {pos, face} = placement(sceneTargets, cfg);
   const group = new THREE.Group(); group.name = `PHASE162 LUXURY HUB STOREFRONT ${cfg.key.toUpperCase()}`;
   group.position.copy(pos); group.position.y=0; group.lookAt(face.x,1.55,face.z);
@@ -98,7 +97,7 @@ export function applyPhase162AllHubLuxuryStorefronts(args={}, result={}){
   const sceneTargets=args.sceneTargets||{};
   const centers=HUBS.map(h=>placement(sceneTargets,h).pos);
   hideOldHubObjects(scene, centers);
-  const groups=HUBS.map((h,i)=>buildHub(scene,sceneTargets,h,i));
+  const groups=HUBS.map((h)=>buildHub(scene,sceneTargets,h));
   const oldTick=scene.userData._tickWorld;
   scene.userData._tickWorld=(dt=.016)=>{oldTick?.(dt);const t=performance.now()*.001;groups.forEach((g,idx)=>{g.children.forEach(o=>{if(o.isMesh&&o.geometry?.type==="SphereGeometry"&&o.material?.opacity!==undefined)o.material.opacity=.45+Math.sin(t*2.2+idx+o.position.x)*.28;});});};
   scene.userData._phase162AllHubLuxury={groups};
