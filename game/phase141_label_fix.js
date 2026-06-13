@@ -1,8 +1,8 @@
-const LABEL = "UPDATE-3.0-PHASE-153-NATURAL-PLANET-SCALE-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-154-HIGH-SMALL-TEXTURED-PLANETS-LOCK";
 function syncLabels(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE106.source = "Phase 153 natural planet scale lock. Moon, Mars, Earth, and halos reduced while preserving Phase 150 visual hard refine and Phase 152 post-boot verification.";
+  window.SVR_PHASE106.source = "Phase 154 high small textured planets lock. Planets raised high, scaled down, re-textured, and hologram pod button moved outside the video with SVR logo-color glow.";
   document.title = `ScarlettVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
