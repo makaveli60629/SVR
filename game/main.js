@@ -5,17 +5,19 @@ import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
 import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
+import { CONFIG } from "./modules/config.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyReikiCleanCarousel113 } from "./modules/update_3_0_reiki_clean_carousel_113.js";
 import { applyPhase119ReikiTrueitiveStorefrontFinal } from "./modules/reiki_phase119_trueitive_storefront_final.js";
 import "./modules/asset_registry_phase122.js";
+import { addPhase123AdBannerBuildings } from "./modules/ad_banner_buildings_phase123.js";
 
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-122-GLOVES-EARTH-ASSET-ADD-LOCK', source: '1.4G Reiki storefront backup with Phase 120 yaw-only alignment and high Moon/Mars lock' };
+window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-124-EARTH-MOON-HIGH-HAND-TELEPORT-LOCK', source: 'Earth enabled in high sky; Moon larger/higher; hand teleport module reinforced; Phase 123 ad buildings preserved' };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -368,10 +370,12 @@ $toggleJoints.addEventListener("click", ()=>{
 setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
+const phase123AdBanners = addPhase123AdBannerBuildings({ scene, radius: CONFIG.ROOM_RADIUS, wallHeight: CONFIG.WALL_HEIGHT * 0.56, logoTexture, log });
+scene.userData._phase123AdBanners = phase123AdBanners;
 
 window.__SVR_GAME_READY__ = true;
 const __svrBootFallback = document.getElementById('bootFallback'); if (__svrBootFallback){ __svrBootFallback.style.opacity='0'; __svrBootFallback.style.pointerEvents='none'; setTimeout(()=>{__svrBootFallback.style.display='none';},420); }
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Right stick moves/snaps. Music disabled. Phase 120 Reiki storefront alignment locked. Store portal ready.", { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : "Ready. Enter VR. Earth/Moon/Mars high sky locked. Hand teleport enabled. Phase 123 ad banners preserved.", { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -434,6 +438,7 @@ renderer.setAnimationLoop(()=>{
   }
 
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
+  if (scene.userData._phase123AdBanners?.userData?.tick) scene.userData._phase123AdBanners.userData.tick(scene.userData._time || (now * 0.001));
 
   hands.update(dt);
   hands.updateDebug();

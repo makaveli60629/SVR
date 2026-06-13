@@ -2076,31 +2076,44 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const moonBump = await loadFirstTexture(assetUrls("texture/moon_bump.png"));
   const marsTex = await loadFirstTexture(assetUrls("texture/mars/diffuse_1k.jpg"), { colorSpace: THREE.SRGBColorSpace });
   const marsBump = await loadFirstTexture(assetUrls("texture/mars/bump_1k.jpg"));
+  const earthTex = await loadFirstTexture(assetUrls("texture/earth/earth_albedo_1k.webp"), { colorSpace: THREE.SRGBColorSpace });
+  const earthBump = await loadFirstTexture(assetUrls("texture/earth/earth_bump_1k.jpg"));
+  const earthCloudTex = await loadFirstTexture(assetUrls("texture/earth/earth_clouds_1k.webp"), { colorSpace: THREE.SRGBColorSpace });
   const earth = new THREE.Mesh(
-    new THREE.SphereGeometry(9.4, 48, 48),
+    new THREE.SphereGeometry(21.0, 72, 72),
     new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      roughness: 0.88,
+      roughness: 0.82,
       metalness: 0.0,
-      map: makeEarthTexture(),
-      emissive: 0x000000,
-      emissiveIntensity: 0.0
+      map: earthTex || makeEarthTexture(),
+      bumpMap: earthBump || null,
+      bumpScale: earthBump ? 0.42 : 0,
+      emissive: 0x061020,
+      emissiveIntensity: 0.04
     })
   );
-  earth.position.set(0, wallHeight + 54.0, -(R + 140));
-  earth.visible = false;
+  earth.position.set(76, wallHeight + 372.0, -(R + 660.0));
+  earth.visible = true;
   earth.frustumCulled = false;
   earth.rotation.z = 0.24;
-  earth.visible = false; earth.frustumCulled = false; scene.add(earth);
-  earth.visible = false;
-  const earthHalo = createOrbHaloSprite(0x6bc4ff, 0.0);
-  earthHalo.scale.set(92, 92, 1);
+  scene.add(earth);
+  let earthClouds = null;
+  if (earthCloudTex){
+    earthClouds = new THREE.Mesh(
+      new THREE.SphereGeometry(21.45, 72, 72),
+      new THREE.MeshBasicMaterial({ map: earthCloudTex, transparent: true, opacity: 0.36, side: THREE.DoubleSide, depthWrite: false })
+    );
+    earthClouds.frustumCulled = false;
+    earthClouds.visible = true;
+    scene.add(earthClouds);
+  }
+  const earthHalo = createOrbHaloSprite(0x6bc4ff, 0.16);
+  earthHalo.scale.set(142, 142, 1);
   earthHalo.material.depthTest = false;
-  earthHalo.visible = false;
+  earthHalo.visible = true;
   scene.add(earthHalo);
-  earthHalo.visible = false;
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(27.0, 96, 96),
+    new THREE.SphereGeometry(38.0, 96, 96),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2112,16 +2125,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.018
     })
   );
-  moon.position.set(-64, wallHeight + 292.0, -(R + 510.0));
+  moon.position.set(-92, wallHeight + 438.0, -(R + 755.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.18);
-  moonHalo.scale.set(210.0, 210.0, 1);
+  moonHalo.scale.set(292.0, 292.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(14.5, 72, 72),
+    new THREE.SphereGeometry(19.0, 72, 72),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2133,13 +2146,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.014
     })
   );
-  mars.position.set(-6, wallHeight + 330.0, -(R + 558.0));
+  mars.position.set(-14, wallHeight + 462.0, -(R + 812.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.12);
-  marsHalo.scale.set(118.0, 118.0, 1);
+  marsHalo.scale.set(154.0, 154.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2151,7 +2164,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     spr.material.depthTest = false;
     earthSpark.add(spr);
   }
-  earthSpark.visible = false;
+  earthSpark.visible = true;
   scene.add(earthSpark);
   const moonSpark = new THREE.Group();
   for (let i = 0; i < 6; i++){
@@ -2162,9 +2175,9 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   }
   moonSpark.visible = false;
   scene.add(moonSpark);
-  const earthGlow = new THREE.PointLight(0x70c8ff, 0.0, 220, 1.8);
+  const earthGlow = new THREE.PointLight(0x70c8ff, 2.15, 620, 1.55);
   scene.add(earthGlow);
-  earthGlow.visible = false;
+  earthGlow.visible = true;
   const moonGlow = new THREE.PointLight(0xeaf2ff, 5.2, 860, 1.22);
   scene.add(moonGlow);
   const marsGlow = new THREE.PointLight(0xff9a72, 2.4, 560, 1.42);
@@ -2334,29 +2347,45 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     scene.userData._time = (scene.userData._time || 0) + dt;
     const t = scene.userData._time;
     pokerDemo.update(t, dt);
-    earth.visible = false;
-    earth.rotation.y += dt * 0.05;
-    earth.rotation.z = 0.02;
-    const cityOrbit = t * 0.012;
-    const cityRadius = R + 112.0;
+    earth.visible = true;
+    earth.rotation.y += dt * 0.045;
+    earth.rotation.z = 0.24;
+    const earthOrbit = t * 0.006;
     earth.position.set(
-      Math.cos(cityOrbit) * (cityRadius * 0.14),
-      wallHeight + 72.0 + Math.sin(t * 0.018) * 0.22,
-      -(cityRadius * 1.18) + Math.sin(cityOrbit) * 16.0
+      76 + Math.cos(earthOrbit) * 10.0,
+      wallHeight + 372.0 + Math.sin(t * 0.030) * 2.0,
+      -(R + 660.0) + Math.sin(earthOrbit) * 12.0
     );
-    // Phase 105: keep the Phase 87/88 Reiki hub, but restore the higher/larger Update 3.0 sky lock.
+    if (earthClouds){
+      earthClouds.visible = true;
+      earthClouds.position.copy(earth.position);
+      earthClouds.rotation.y -= dt * 0.018;
+      earthClouds.rotation.z = 0.24;
+    }
+    earthHalo.position.copy(earth.position);
+    earthHalo.material.opacity = 0.13 + 0.022 * (0.5 + 0.5 * Math.sin(t * 0.18));
+    earthGlow.position.copy(earth.position);
+    if (earthSpark){
+      earthSpark.visible = true;
+      earthSpark.position.copy(earth.position);
+      earthSpark.children.forEach((spr, i)=>{
+        const a = t * 0.24 + i * 0.78;
+        spr.position.set(Math.cos(a) * (28 + i * 0.8), Math.sin(a * 1.7) * 3.4, Math.sin(a) * (27 + i * 0.7));
+      });
+    }
+    // Phase 124: high-sky planet lock. Earth enabled, Moon bigger/higher, Mars orbits Moon higher.
     moon.position.set(
-      -64 + Math.sin(t * 0.018) * 4.5,
-      wallHeight + 292.0 + Math.sin(t * 0.070) * 2.2,
-      -(R + 510.0) + Math.cos(t * 0.014) * 6.0
+      -92 + Math.sin(t * 0.018) * 5.0,
+      wallHeight + 438.0 + Math.sin(t * 0.070) * 3.0,
+      -(R + 755.0) + Math.cos(t * 0.014) * 8.0
     );
     moon.rotation.y += dt * 0.08;
     moon.rotation.z = 0.03;
     const marsOrbit = t * 0.16;
     mars.position.set(
-      moon.position.x + Math.cos(marsOrbit) * 58.0,
-      moon.position.y + 42.0 + Math.sin(marsOrbit * 1.35) * 10.5,
-      moon.position.z + Math.sin(marsOrbit) * 56.0 - 24.0
+      moon.position.x + Math.cos(marsOrbit) * 78.0,
+      moon.position.y + 58.0 + Math.sin(marsOrbit * 1.35) * 14.5,
+      moon.position.z + Math.sin(marsOrbit) * 74.0 - 32.0
     );
     mars.visible = true;
     mars.rotation.y += dt * 0.09;

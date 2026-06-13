@@ -1,9 +1,7 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-122-GLOVES-EARTH-ASSET-ADD-LOCK",
+  "build": "UPDATE-3.0-PHASE-124-EARTH-MOON-HIGH-HAND-TELEPORT-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
-  "siteTouched": false,
-  "phase": 122,
-  "focus": "Add uploaded protective gear gloves and optimized Earth texture assets as runtime-safe registered assets without auto-loading heavy content."
+  "siteTouched": false
 }

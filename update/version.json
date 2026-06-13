@@ -1,15 +1,8 @@
 ﻿{
-  "build": "PHASE-1.7.4-FULL-AUDIT-SITE-GAME-DATA-LOCK",
-  "phase": "1.7.4",
-  "scope": "full repo/site/game/data audit; APK route; RICI route; deployment zip health",
-  "updatedAt": "2026-06-12T13:07:24.9492983-05:00",
-  "rules": [
-    "Playable poker first",
-    "Lobby storefront portals only",
-    "Private scenes contain full experiences",
-    "Quest controller fallback preserved",
-    "Android fallback preserved",
-    "No secrets in frontend",
-    "game.zip under 25MB"
-  ]
+  "version": "Update 3.0 Phase 124",
+  "build": "UPDATE-3.0-PHASE-124-EARTH-MOON-HIGH-HAND-TELEPORT-LOCK",
+  "created": "2026-06-13",
+  "track": "game-only",
+  "siteTouched": false,
+  "gameZip": "update/game.zip"
 }

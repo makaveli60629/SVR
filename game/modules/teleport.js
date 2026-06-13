@@ -146,6 +146,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let lastRightToggle = false;
   let lastLeftFistToggle = false;
   let lastRightFistToggle = false;
+  let leftFistHoldStart = 0;
+  let rightFistHoldStart = 0;
 
   const head = new THREE.Vector3();
   const headDir = new THREE.Vector3();
@@ -402,31 +404,36 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     lastLeftToggle = leftToggle;
     lastRightToggle = rightToggle;
 
-    if (!leftControllerRef?.joints && !rightControllerRef?.joints){
-      const leftFist = !!leftHandRef?.joints && handNearFace(leftHandRef) && isFist(leftHandRef);
-      const rightFist = !!rightHandRef?.joints && handNearFace(rightHandRef) && isFist(rightHandRef);
-      if (leftFist && !lastLeftFistToggle && now > cooldownUntil){
-        mode = !(mode && active === leftHandRef);
-        active = mode ? leftHandRef : null;
-        activeMode = 'hand';
-        cooldownUntil = now + 320;
-        pinchHoldStart = 0;
-        triggerHoldStart = 0;
-      }
-      if (rightFist && !lastRightFistToggle && now > cooldownUntil){
-        mode = !(mode && active === rightHandRef);
-        active = mode ? rightHandRef : null;
-        activeMode = 'hand';
-        cooldownUntil = now + 320;
-        pinchHoldStart = 0;
-        triggerHoldStart = 0;
-      }
-      lastLeftFistToggle = leftFist;
-      lastRightFistToggle = rightFist;
-    } else {
-      lastLeftFistToggle = false;
-      lastRightFistToggle = false;
+    // Phase 124 hand teleport module: hands can toggle teleport even when controller fallback exists.
+    // Fist is debounced with a short hold so accidental finger curls do not fire.
+    const leftFist = !!leftHandRef?.joints && (handNearFace(leftHandRef) || true) && isFist(leftHandRef);
+    const rightFist = !!rightHandRef?.joints && (handNearFace(rightHandRef) || true) && isFist(rightHandRef);
+    if (leftFist && !leftFistHoldStart) leftFistHoldStart = now;
+    if (rightFist && !rightFistHoldStart) rightFistHoldStart = now;
+    const leftFistHeld = leftFist && (now - leftFistHoldStart > 180);
+    const rightFistHeld = rightFist && (now - rightFistHoldStart > 180);
+    if (leftFistHeld && !lastLeftFistToggle && now > cooldownUntil){
+      mode = !(mode && active === leftHandRef);
+      active = mode ? leftHandRef : null;
+      activeMode = 'hand';
+      cooldownUntil = now + 360;
+      pinchHoldStart = 0;
+      triggerHoldStart = 0;
+      stableTargetMs = 0;
     }
+    if (rightFistHeld && !lastRightFistToggle && now > cooldownUntil){
+      mode = !(mode && active === rightHandRef);
+      active = mode ? rightHandRef : null;
+      activeMode = 'hand';
+      cooldownUntil = now + 360;
+      pinchHoldStart = 0;
+      triggerHoldStart = 0;
+      stableTargetMs = 0;
+    }
+    if (!leftFist) leftFistHoldStart = 0;
+    if (!rightFist) rightFistHoldStart = 0;
+    lastLeftFistToggle = leftFistHeld;
+    lastRightFistToggle = rightFistHeld;
 
     if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){
       pointer.visible = false;
@@ -457,9 +464,9 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       lastAimValid = false;
       const idleMsg = (leftControllerRef || rightControllerRef)
         ? "Controllers active • right stick forward/back • right stick snap • hold grip/A/trigger to aim TP"
-        : "TELEPORT OFF • press TP or make fist by face";
+        : "TELEPORT OFF • make fist to arm hand TP, then pinch-release to leap";
       statusCb(idleMsg);
-      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready" : "Hands ready • fist by face toggles TP");
+      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready • hand TP also available" : "Hands ready • fist toggles TP");
       return;
     }
 
@@ -556,7 +563,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (!pinch) pinchHoldStart = 0;
     active.userData._wasPinching = pinch;
     modeCb("Hands: TELEPORT ON");
-    statusCb("HAND TP ON • fist by face toggles • hold pinch then release");
+    statusCb("HAND TP ON • aim with index • hold pinch then release to leap • fist toggles off");
   }
 
   return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState: ()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
