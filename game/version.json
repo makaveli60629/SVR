@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-164-LEGENDS-STATUES-COMPACT-LOBBY-WALLS-LOCK",
-  "track": "legends-statues-compact-lobby-walls",
-  "siteTouched": true,
-  "phase": "164",
-  "summary": "Legends Hall and compact lobby correction pass. Adds armored Legends Hall statue displays, moves the storefront ring closer to the center, scales hub storefronts down slightly, and closes the lobby with compact wall panels near the HUD/storefront ring.",
-  "label": "UPDATE-3.0-PHASE-164-LEGENDS-STATUES-COMPACT-LOBBY-WALLS-LOCK",
-  "notes": "Preserves Phase 163 realistic storefronts, Phase 160 planets/starfield, VIBEZ identity, sponsor registry lock, Quest hands, teleport, watch, and poker baseline.",
-  "updated": "2026-06-13T21:30:00Z"
+  "build": "UPDATE-3.0-PHASE-171-CLEAN-INNER-OCTAGON-MOON-MARS-LOCK",
+  "track": "clean-inner-octagon-moon-mars",
+  "siteTouched": false,
+  "phase": "171",
+  "summary": "Clean inner octagon lock. Background skyline/buildings hidden, old Phase 123 ad-building ring hidden, Earth removed/hidden, large textured Moon and textured Mars active in north sky.",
+  "label": "UPDATE-3.0-PHASE-171-CLEAN-INNER-OCTAGON-MOON-MARS-LOCK",
+  "notes": "Preserves Phase 169 purple hand teleport, controller locomotion, expanded octagon hub pods, left-to-right poker dealing, and Phase 170 diagnostics.",
+  "updated": "2026-06-13T23:59:00Z"
 }
