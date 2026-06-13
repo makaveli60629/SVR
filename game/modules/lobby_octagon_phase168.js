@@ -1,155 +1,249 @@
 import * as THREE from "three";
 
+const LABEL = "UPDATE-3.0-PHASE-182-EXPANDED-ORIGINAL-WALL-LOCK";
+
 function makeCanvasTexture(width, height, painter){
   const canvas = document.createElement("canvas");
-  canvas.width = width; canvas.height = height;
+  canvas.width = width;
+  canvas.height = height;
   const ctx = canvas.getContext("2d");
   painter(ctx, width, height, canvas);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 1;
+  tex.anisotropy = 2;
   tex.generateMipmaps = true;
   return tex;
 }
-function roundRect(ctx, x, y, w, h, r){
-  const rr = Math.min(r, w * 0.5, h * 0.5);
-  ctx.beginPath(); ctx.moveTo(x + rr, y); ctx.arcTo(x + w, y, x + w, y + h, rr); ctx.arcTo(x + w, y + h, x, y + h, rr); ctx.arcTo(x, y + h, x, y, rr); ctx.arcTo(x, y, x + w, y, rr); ctx.closePath();
-}
-function signTexture({ title, subtitle, accent = "#7ffcff", slot = "" }){
-  return makeCanvasTexture(1400, 560, (ctx,w,h)=>{
-    const bg = ctx.createLinearGradient(0,0,w,h); bg.addColorStop(0,"#05070c"); bg.addColorStop(1,"#13051f");
-    ctx.fillStyle = bg; ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle = accent; ctx.lineWidth = 12; roundRect(ctx,30,30,w-60,h-60,40); ctx.stroke();
-    ctx.fillStyle = "rgba(255,255,255,.07)"; roundRect(ctx,74,62,250,72,28); ctx.fill();
-    ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillStyle = accent; ctx.font = "900 32px system-ui,Arial"; ctx.fillText(slot,199,98);
-    ctx.fillStyle = "#fff"; ctx.font = "900 72px system-ui,Arial"; ctx.fillText(title,w/2,230);
-    ctx.fillStyle = accent; ctx.font = "800 36px system-ui,Arial"; ctx.fillText(subtitle,w/2,314);
-    ctx.fillStyle = "#dbeaff"; ctx.font = "700 27px system-ui,Arial"; ctx.fillText("Interactive pod • slide display • portal-ready",w/2,410);
+
+function makeWallLabelTexture(title, subtitle, accent = "#7ffcff"){
+  return makeCanvasTexture(1600, 420, (ctx, w, h)=>{
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, "#030711");
+    g.addColorStop(0.55, "#09091a");
+    g.addColorStop(1, "#13051f");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 12;
+    ctx.strokeRect(26, 26, w - 52, h - 52);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 78px system-ui, Arial";
+    ctx.fillText(title, w / 2, 162);
+    ctx.fillStyle = accent;
+    ctx.font = "800 42px system-ui, Arial";
+    ctx.fillText(subtitle, w / 2, 246);
+    ctx.fillStyle = "#d9eaff";
+    ctx.font = "700 28px system-ui, Arial";
+    ctx.fillText("Expanded original-wall lobby • octagon shell removed", w / 2, 318);
   });
 }
-function bannerTexture({ title, subtitle, slot, accent = "#7ffcff" }){
-  return makeCanvasTexture(1600, 720, (ctx,w,h)=>{
-    const bg = ctx.createLinearGradient(0,0,w,h); bg.addColorStop(0,"#05070c"); bg.addColorStop(.5,"#10121d"); bg.addColorStop(1,"#070611");
-    ctx.fillStyle = bg; ctx.fillRect(0,0,w,h);
-    ctx.globalAlpha = .18; ctx.strokeStyle = accent; ctx.lineWidth = 3;
-    for(let x=-w;x<w*2;x+=96){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x+h*.55,h); ctx.stroke(); }
-    ctx.globalAlpha = 1; ctx.shadowColor = accent; ctx.shadowBlur = 26; ctx.strokeStyle = accent; ctx.lineWidth = 14; roundRect(ctx,34,34,w-68,h-68,46); ctx.stroke(); ctx.shadowBlur = 0;
-    ctx.fillStyle = "rgba(255,255,255,.07)"; roundRect(ctx,82,78,300,86,30); ctx.fill();
-    ctx.fillStyle = accent; ctx.font = "900 38px system-ui,Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(slot,232,122);
-    ctx.textAlign = "left"; ctx.fillStyle = "#ffffff"; ctx.font = "900 86px system-ui,Arial"; ctx.fillText(title,92,310);
-    ctx.fillStyle = accent; ctx.font = "800 44px system-ui,Arial"; ctx.fillText(subtitle,98,392);
-    ctx.fillStyle = "#dbeaff"; ctx.font = "700 34px system-ui,Arial"; ctx.fillText("Wide Tier 1 banner slider surface",98,500);
-    ctx.fillStyle = "rgba(255,255,255,.74)"; ctx.font = "700 26px system-ui,Arial"; ctx.textAlign = "right"; ctx.fillText("PHASE 169 EXPANDED LOBBY",w-92,h-82);
+
+function disposeObject(obj){
+  if (!obj) return;
+  obj.traverse?.((child)=>{
+    if (child.geometry) child.geometry.dispose?.();
+    const mat = child.material;
+    if (Array.isArray(mat)) mat.forEach(m=>m.dispose?.());
+    else mat?.dispose?.();
   });
 }
-function placeOnCircle(obj, radius, angle, y = 0){ obj.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius); obj.lookAt(0, y, 0); }
-function makeWallSegment({ length, height, mat, trimMat }){
+
+function hideOctagonAndArena(scene){
+  const hidden = [];
+  const killNames = [
+    /PHASE168/i,
+    /PHASE169/i,
+    /PHASE173/i,
+    /SOLID_OCTAGON/i,
+    /SINGLE_OCTAGON/i,
+    /OCTAGON_WALL/i,
+    /CENTER_SPECTATOR_RING/i,
+    /CENTER_FEATURED_TABLE_STAGE/i,
+    /PHASE176_JUMBOTRON/i,
+    /PHASE176_RING_LABEL/i,
+    /PHASE176_PUBLIC_BROADCAST_CAMERA/i,
+    /PHASE176_LOBBY_ARENA_BROADCAST_ROOT/i
+  ];
+  scene.traverse((obj)=>{
+    if (!obj || obj === scene) return;
+    const name = String(obj.name || "");
+    if (killNames.some(rx=>rx.test(name))){
+      obj.visible = false;
+      hidden.push(name || obj.type);
+    }
+  });
+  const oldKeys = [
+    "_phase168SolidOctagonLobby",
+    "_phase168SolidOctagon",
+    "_phase169ExpandedLobby",
+    "_phase173SingleWall",
+    "_phase176ArenaBroadcast"
+  ];
+  oldKeys.forEach((key)=>{
+    const obj = scene.userData?.[key];
+    if (obj){ obj.visible = false; hidden.push(key); }
+  });
+  return hidden;
+}
+
+function makeWall(width, height, depth, mat){
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), mat);
+  wall.castShadow = false;
+  wall.receiveShadow = true;
+  return wall;
+}
+
+function addTrim(root, x, y, z, sx, sy, sz, color = 0x7ffcff){
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(sx, sy, sz),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.64, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  mesh.position.set(x, y, z);
+  root.add(mesh);
+  return mesh;
+}
+
+function addWallPanel(root, name, title, subtitle, pos, rotY, accent){
+  const panel = new THREE.Mesh(
+    new THREE.PlaneGeometry(7.6, 2.0),
+    new THREE.MeshBasicMaterial({ map: makeWallLabelTexture(title, subtitle, accent), transparent: true, side: THREE.DoubleSide, depthWrite: false })
+  );
+  panel.name = name;
+  panel.position.copy(pos);
+  panel.rotation.y = rotY;
+  panel.renderOrder = 40;
+  root.add(panel);
+  return panel;
+}
+
+function addPortalPad(root, name, x, z, color){
   const group = new THREE.Group();
-  const wall = new THREE.Mesh(new THREE.BoxGeometry(length, height, 0.30), mat); wall.position.y = height * 0.5; group.add(wall);
-  const top = new THREE.Mesh(new THREE.BoxGeometry(length + 0.14, 0.12, 0.36), trimMat); top.position.y = height + 0.07; group.add(top);
-  const bottom = top.clone(); bottom.position.y = 0.08; group.add(bottom);
+  group.name = name;
+  group.position.set(x, 0.035, z);
+  const pad = new THREE.Mesh(
+    new THREE.CircleGeometry(1.15, 48),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false })
+  );
+  pad.rotation.x = -Math.PI / 2;
+  group.add(pad);
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.86, 0.022, 10, 96),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.72, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  ring.position.y = 0.94;
+  group.add(ring);
+  group.userData.tick = (t)=>{ ring.rotation.z = t * 0.85; ring.rotation.y = Math.sin(t * 0.55) * 0.10; };
+  root.add(group);
   return group;
-}
-function makePillar({ title, subtitle, slot, accent, width = 8.7, height = 6.5 }){
-  const group = new THREE.Group(); group.name = `Phase169 Cardinal Pillar ${slot}`;
-  const color = new THREE.Color(accent);
-  const bodyMat = new THREE.MeshStandardMaterial({ color:0x080a10, roughness:.58, metalness:.30, emissive:color.clone().multiplyScalar(.09), emissiveIntensity:.35 });
-  const trimMat = new THREE.MeshBasicMaterial({ color, transparent:true, opacity:.72, blending:THREE.AdditiveBlending, depthWrite:false });
-  const body = new THREE.Mesh(new THREE.BoxGeometry(width + .65, height + .55, .50), bodyMat); body.position.y = height * .5 + .15; group.add(body);
-  const banner = new THREE.Mesh(new THREE.PlaneGeometry(width, height * .66), new THREE.MeshBasicMaterial({ map:bannerTexture({ title, subtitle, slot, accent }), transparent:true, side:THREE.DoubleSide, depthWrite:false }));
-  banner.position.set(0, height * .56 + .18, .265); banner.renderOrder = 45; group.add(banner);
-  const top = new THREE.Mesh(new THREE.BoxGeometry(width + .9, .12, .18), trimMat); top.position.set(0,height+.62,.31);
-  const bot = top.clone(); bot.position.y = .34;
-  const left = new THREE.Mesh(new THREE.BoxGeometry(.12, height+.45, .18), trimMat); left.position.set(-width*.5-.25,height*.5+.25,.31);
-  const right = left.clone(); right.position.x = width*.5+.25; group.add(top, bot, left, right);
-  return group;
-}
-function makeHubPod({ title, subtitle, slot, accent = "#b55cff", portal = "PORTAL" }){
-  const root = new THREE.Group(); root.name = `Phase169 Hub Pod ${title}`;
-  const color = new THREE.Color(accent);
-  const pad = new THREE.Mesh(new THREE.CircleGeometry(1.85, 40), new THREE.MeshStandardMaterial({ color:0x0b0b13, roughness:.82, metalness:.08, emissive:color.clone().multiplyScalar(.08), emissiveIntensity:.35, side:THREE.DoubleSide }));
-  pad.rotation.x = -Math.PI/2; pad.position.y = .024; root.add(pad);
-  const panel = new THREE.Mesh(new THREE.PlaneGeometry(3.3,1.32), new THREE.MeshBasicMaterial({ map:signTexture({ title, subtitle, accent, slot }), transparent:true, side:THREE.DoubleSide, depthWrite:false }));
-  panel.position.set(0,2.15,-.32); root.add(panel);
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(.78,.025,12,96), new THREE.MeshBasicMaterial({ color, transparent:true, opacity:.62, blending:THREE.AdditiveBlending, side:THREE.DoubleSide, depthWrite:false }));
-  ring.position.set(0,1.10,.48); root.add(ring);
-  const portalLabel = new THREE.Mesh(new THREE.PlaneGeometry(1.35,.34), new THREE.MeshBasicMaterial({ map:signTexture({ title:portal, subtitle:"tap / point / select", accent, slot:"GO" }), transparent:true, side:THREE.DoubleSide, depthWrite:false }));
-  portalLabel.scale.set(.62,.62,.62); portalLabel.position.set(0,.58,.55); root.add(portalLabel);
-  root.userData.tick = (t)=>{ ring.rotation.z = t*.7; ring.rotation.y = Math.sin(t*.45)*.10; };
-  return root;
-}
-function makeLegendMannequin(x, z, color = 0xbfa6ff){
-  const group = new THREE.Group(); group.position.set(x,0,z);
-  const mat = new THREE.MeshStandardMaterial({ color, roughness:.52, metalness:.30, emissive:new THREE.Color(color).multiplyScalar(.07), emissiveIntensity:.45 });
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(.22,.30,.10,16), mat); base.position.y=.05;
-  const legs = new THREE.Mesh(new THREE.CylinderGeometry(.13,.15,.82,14), mat); legs.position.y=.48;
-  const torso = new THREE.Mesh(new THREE.CapsuleGeometry(.22,.62,8,16), mat); torso.position.y=1.08;
-  const head = new THREE.Mesh(new THREE.SphereGeometry(.19,18,12), mat); head.position.y=1.62;
-  const shoulder = new THREE.Mesh(new THREE.BoxGeometry(.72,.12,.18), mat); shoulder.position.y=1.32;
-  group.add(base, legs, torso, head, shoulder); return group;
-}
-function makeLegendsHub(){
-  const root = makeHubPod({ title:"LEGENDS HUB", subtitle:"Hall of Fame • Champions", slot:"LEGENDS", accent:"#d7b6ff", portal:"HALL" });
-  [-.72,0,.72].forEach((x,idx)=>root.add(makeLegendMannequin(x,.64, idx===1 ? 0xffd987 : 0xbca4ff)));
-  return root;
 }
 
 export function installPhase168SolidOctagonLobby({ scene, log = console.log, enabled = true } = {}){
   if (!enabled || !scene) return null;
 
-  // Aggressively remove/hide prior background/building clutter. Phase 169 keeps only the expanded octagon, cardinal pillars, and hub pods.
-  const hidden = [];
-  scene.traverse((obj)=>{
-    const n = String(obj.name || "");
-    if (/PHASE123_Eight_Table_Facing_Ad_Banner_Buildings|AdBuilding|BannerBuilding|skyline|building/i.test(n)){
-      if (!/PHASE169|Phase169|Phase168_SOLID/i.test(n)){ obj.visible = false; hidden.push(n); }
-    }
+  // Backwards-compatible function name. It now restores the expanded original rectangular lobby and removes the octagon shell.
+  const existing = scene.getObjectByName("PHASE182_EXPANDED_ORIGINAL_RECTANGULAR_LOBBY_WALL_LOCK");
+  if (existing) return existing;
+
+  const hidden = hideOctagonAndArena(scene);
+  const root = new THREE.Group();
+  root.name = "PHASE182_EXPANDED_ORIGINAL_RECTANGULAR_LOBBY_WALL_LOCK";
+
+  const halfW = 31.5;
+  const halfD = 24.0;
+  const wallHeight = 5.35;
+  const wallDepth = 0.42;
+  const wallMat = new THREE.MeshStandardMaterial({
+    color: 0x070a12,
+    roughness: 0.82,
+    metalness: 0.08,
+    emissive: 0x080820,
+    emissiveIntensity: 0.32
   });
-  const oldAdRoot = scene.userData?._phase123AdBanners || scene.getObjectByName("PHASE123_Eight_Table_Facing_Ad_Banner_Buildings");
-  if (oldAdRoot){ oldAdRoot.visible = false; hidden.push(oldAdRoot.name); }
 
-  const root = new THREE.Group(); root.name = "PHASE169_EXPANDED_SOLID_OCTAGON_HUB_PODS_LOCOMOTION_LOCK"; scene.add(root);
-  const R = 17.75;
-  const side = 2 * R * Math.tan(Math.PI / 8) + 0.55;
-  const wallHeight = 4.65;
-  const wallMat = new THREE.MeshStandardMaterial({ color:0x06080d, roughness:.74, metalness:.20, emissive:0x09091b, emissiveIntensity:.22 });
-  const trimMat = new THREE.MeshBasicMaterial({ color:0x7b5cff, transparent:true, opacity:.34, blending:THREE.AdditiveBlending, depthWrite:false });
-  for (let i=0;i<8;i++){
-    const angle = i * Math.PI / 4 + Math.PI / 8;
-    const seg = makeWallSegment({ length:side, height:wallHeight, mat:wallMat, trimMat });
-    seg.name = `Phase169_NoGap_Expanded_Octagon_Wall_${i+1}`;
-    placeOnCircle(seg, R, angle, 0); root.add(seg);
-  }
-  [
-    { angle:-Math.PI/2, title:"TIER 1 NORTH", subtitle:"Premium sponsor slider", slot:"NORTH", accent:"#7ffcff" },
-    { angle:0, title:"TIER 1 EAST", subtitle:"Leaderboard sponsor face", slot:"EAST", accent:"#ffe28a" },
-    { angle:Math.PI/2, title:"TIER 1 SOUTH", subtitle:"Notifications sponsor face", slot:"SOUTH", accent:"#ff8ad8" },
-    { angle:Math.PI, title:"TIER 1 WEST", subtitle:"Events sponsor face", slot:"WEST", accent:"#8dffb4" }
-  ].forEach((cfg)=>{ const p = makePillar(cfg); placeOnCircle(p, R - .14, cfg.angle, 0); p.position.y = .04; root.add(p); });
+  const north = makeWall(halfW * 2, wallHeight, wallDepth, wallMat);
+  north.name = "PHASE182_ORIGINAL_NORTH_WALL";
+  north.position.set(0, wallHeight / 2, -halfD);
+  root.add(north);
 
-  const pods = [
-    { angle:-Math.PI*.25, radius:11.8, title:"PGA HUB", subtitle:"Training range portal", slot:"PGA", accent:"#6fb8ff", portal:"RANGE" },
-    { angle:0, radius:11.8, title:"SPONSOR HUB", subtitle:"Approved partner pod", slot:"SPONSOR", accent:"#7ffcff", portal:"ADS" },
-    { angle:Math.PI*.25, radius:11.8, title:"WELLNESS HUB", subtitle:"Slide + hologram portal", slot:"WELLNESS", accent:"#5fffd8", portal:"ROOM" },
-    { angle:Math.PI*.50, radius:12.0, title:"SVR STORE", subtitle:"Shop and preview portal", slot:"STORE", accent:"#b88cff", portal:"STORE" },
-    { angle:Math.PI*.75, radius:11.8, title:"SCORPION ROOM", subtitle:"Private table portal", slot:"ROOM", accent:"#ff5b8c", portal:"PLAY" },
-    { angle:-Math.PI*.75, radius:11.8, title:"LEGENDS HUB", subtitle:"Hall of Fame restored", slot:"LEGENDS", accent:"#d7b6ff", portal:"HALL" }
+  const south = north.clone();
+  south.name = "PHASE182_ORIGINAL_SOUTH_WALL";
+  south.position.z = halfD;
+  root.add(south);
+
+  const east = makeWall(wallDepth, wallHeight, halfD * 2, wallMat);
+  east.name = "PHASE182_ORIGINAL_EAST_WALL";
+  east.position.set(halfW, wallHeight / 2, 0);
+  root.add(east);
+
+  const west = east.clone();
+  west.name = "PHASE182_ORIGINAL_WEST_WALL";
+  west.position.x = -halfW;
+  root.add(west);
+
+  addTrim(root, 0, wallHeight + 0.08, -halfD + 0.24, halfW * 2, 0.08, 0.08);
+  addTrim(root, 0, wallHeight + 0.08, halfD - 0.24, halfW * 2, 0.08, 0.08);
+  addTrim(root, halfW - 0.24, wallHeight + 0.08, 0, 0.08, 0.08, halfD * 2);
+  addTrim(root, -halfW + 0.24, wallHeight + 0.08, 0, 0.08, 0.08, halfD * 2);
+  addTrim(root, 0, 0.16, -halfD + 0.24, halfW * 2, 0.06, 0.06, 0xb48cff);
+  addTrim(root, 0, 0.16, halfD - 0.24, halfW * 2, 0.06, 0.06, 0xb48cff);
+  addTrim(root, halfW - 0.24, 0.16, 0, 0.06, 0.06, halfD * 2, 0xb48cff);
+  addTrim(root, -halfW + 0.24, 0.16, 0, 0.06, 0.06, halfD * 2, 0xb48cff);
+
+  addWallPanel(root, "PHASE182_NORTH_FEATURE_WALL", "SVR POKER", "Original expanded lobby wall restored", new THREE.Vector3(0, 2.85, -halfD + 0.30), 0, "#7ffcff");
+  addWallPanel(root, "PHASE182_SOUTH_ABOUT_WALL", "MISSION + ABOUT", "Sponsor-ready public message wall", new THREE.Vector3(0, 2.85, halfD - 0.30), Math.PI, "#ff8ad8");
+  addWallPanel(root, "PHASE182_EAST_STORE_WALL", "STORE + SPONSOR", "Portal surfaces stay on the wall", new THREE.Vector3(halfW - 0.30, 2.85, 0), -Math.PI / 2, "#ffe28a");
+  addWallPanel(root, "PHASE182_WEST_EVENTS_WALL", "EVENTS + LEGENDS", "Expanded walking space preserved", new THREE.Vector3(-halfW + 0.30, 2.85, 0), Math.PI / 2, "#8dffb4");
+
+  const pads = [
+    addPortalPad(root, "PHASE182_REIKI_PORTAL_PAD", -18.0, -17.5, 0x5fffd8),
+    addPortalPad(root, "PHASE182_PGA_PORTAL_PAD", 18.0, -17.5, 0x6fb8ff),
+    addPortalPad(root, "PHASE182_STORE_PORTAL_PAD", 24.5, 5.5, 0xb88cff),
+    addPortalPad(root, "PHASE182_SCORPION_PORTAL_PAD", -24.5, 5.5, 0xff5b8c)
   ];
-  pods.forEach((cfg)=>{
-    const pod = cfg.slot === "LEGENDS" ? makeLegendsHub() : makeHubPod(cfg);
-    placeOnCircle(pod, cfg.radius, cfg.angle, 0); pod.position.y = .04; root.add(pod);
-  });
 
-  const pts = [];
-  for(let i=0;i<8;i++){ const a = i * Math.PI/4 + Math.PI/8; pts.push(new THREE.Vector3(Math.cos(a)*(R-.62), .035, Math.sin(a)*(R-.62))); }
-  pts.push(pts[0].clone());
-  const ring = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color:0xd7b6ff, transparent:true, opacity:.70 }));
-  ring.name = "Phase169 Expanded Solid Octagon Floor Seam"; root.add(ring);
-  root.userData.tick = (t)=>{ ring.material.opacity = .56 + Math.sin(t*.8)*.08; root.children.forEach(c=>c.userData?.tick?.(t)); };
+  const seamPts = [
+    new THREE.Vector3(-halfW + 0.7, 0.04, -halfD + 0.7),
+    new THREE.Vector3( halfW - 0.7, 0.04, -halfD + 0.7),
+    new THREE.Vector3( halfW - 0.7, 0.04,  halfD - 0.7),
+    new THREE.Vector3(-halfW + 0.7, 0.04,  halfD - 0.7),
+    new THREE.Vector3(-halfW + 0.7, 0.04, -halfD + 0.7)
+  ];
+  const seam = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(seamPts),
+    new THREE.LineBasicMaterial({ color: 0xd7b6ff, transparent: true, opacity: 0.70 })
+  );
+  seam.name = "PHASE182_EXPANDED_RECTANGULAR_FLOOR_SEAM";
+  root.add(seam);
 
-  scene.userData._phase168SolidOctagonLobby = root;
-  window.SVR_PHASE169_EXPANDED_LOBBY = { locked:true, radius:R, oldBackgroundBuildingsHidden:hidden.length, walls:8, cardinalPillars:4, hubPods:pods.length, notes:"Expanded lobby with no generic background buildings, aligned hub pods, portal displays, and four Tier 1 pillar faces." };
-  log(`[Phase169] Expanded lobby installed. Hidden background/building objects=${hidden.length}. Radius=${R}. Hub pods=${pods.length}.`);
+  root.userData.tick = (t)=>{
+    seam.material.opacity = 0.54 + Math.sin(t * 0.8) * 0.08;
+    pads.forEach(p=>p.userData?.tick?.(t));
+  };
+
+  scene.add(root);
+  scene.userData._phase182ExpandedOriginalWall = root;
+  window.SVR_PHASE182_EXPANDED_ORIGINAL_WALL = {
+    label: LABEL,
+    locked: true,
+    shape: "expanded-rectangle",
+    octagonRemoved: true,
+    halfWidth: halfW,
+    halfDepth: halfD,
+    wallHeight,
+    hiddenObjects: hidden.length,
+    note: "Original expanded wall boundary restored. Phase168/169/173/176 octagon/arena shell hidden."
+  };
+  log(`[Phase182] expanded original rectangular lobby wall installed; octagon/arena objects hidden=${hidden.length}`);
   return root;
+}
+
+export function autoInstallPhase168SolidOctagonLobby(){
+  const start = performance.now();
+  const timer = setInterval(()=>{
+    const scene = window.__SVR_SCENE__;
+    if (scene){ clearInterval(timer); installPhase168SolidOctagonLobby({ scene, log: console.log, enabled: true }); }
+    else if (performance.now() - start > 12000){ clearInterval(timer); console.warn("[Phase182] scene not found for expanded original wall install"); }
+  }, 250);
 }
