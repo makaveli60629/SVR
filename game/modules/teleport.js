@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { CONFIG } from "./config.js";
 import { isPinching, isFist } from "./gestures.js";
+import { constrainLobbyBounds } from "./phase178_bounds.js";
 
 export function createTeleportRig({ scene, renderer, camera, roomClamp, log = console.log }){
   let baseRefSpace = null;
@@ -24,6 +25,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let rightHandRef = null;
   let leftControllerRef = null;
   let rightControllerRef = null;
+  let wallBlocks = 0;
 
   const vHead = new THREE.Vector3();
   const vHeadDir = new THREE.Vector3();
@@ -32,9 +34,15 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   const vWrist = new THREE.Vector3();
   const vIndex = new THREE.Vector3();
   const vThumb = new THREE.Vector3();
-  const vPalm = new THREE.Vector3();
   const vTarget = new THREE.Vector3(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
   const vSmooth = new THREE.Vector3(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
+
+  function solidXZ(x,z){
+    const p = constrainLobbyBounds(x,z);
+    if(p.blocked) wallBlocks++;
+    window.SVR_PHASE178_TELEPORT_BOUNDS = { locked:true, wallBlocks, last:{ x:p.x, z:p.z, blocked:p.blocked }, checkedAt:new Date().toISOString() };
+    return p;
+  }
 
   function applyReferenceSpace(){
     if (!baseRefSpace || !renderer?.xr?.isPresenting) return false;
@@ -47,15 +55,15 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       renderer.xr.setReferenceSpace(baseRefSpace.getOffsetReferenceSpace(xform));
       return true;
     }catch(err){
-      log("[Phase169 teleport] reference-space apply failed", err?.message || err);
+      log("[Phase178 teleport] reference-space apply failed", err?.message || err);
       return false;
     }
   }
 
-  function setPlayerPose(x, y, z){ playerX = x; playerY = y; playerZ = z; return applyReferenceSpace(); }
-  function setPlayerXZ(x, z){ playerX = x; playerZ = z; return applyReferenceSpace(); }
+  function setPlayerPose(x, y, z){ const p = solidXZ(x,z); playerX = p.x; playerY = y; playerZ = p.z; return applyReferenceSpace(); }
+  function setPlayerXZ(x, z){ const p = solidXZ(x,z); playerX = p.x; playerZ = p.z; return applyReferenceSpace(); }
   function setPlayerYaw(nextYaw){ playerYaw = nextYaw; return applyReferenceSpace(); }
-  function getPlayerPose(){ return { x: playerX, y: playerY, z: playerZ, yaw: playerYaw }; }
+  function getPlayerPose(){ return { x: playerX, y: playerY, z: playerZ, yaw: playerYaw, wallBlocks }; }
 
   const pointer = new THREE.Mesh(
     new THREE.PlaneGeometry(CONFIG.POINTER_SIZE, CONFIG.POINTER_SIZE),
@@ -119,12 +127,8 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   }
 
   function clampTarget(p){
-    const limit = Math.max(2, roomClamp - 1.2);
-    return vTarget.set(
-      THREE.MathUtils.clamp(p.x, -limit, limit),
-      0,
-      THREE.MathUtils.clamp(p.z, -limit, limit)
-    );
+    const q = solidXZ(p.x,p.z);
+    return vTarget.set(q.x,0,q.z);
   }
 
   function updateArc(origin, target){
@@ -154,11 +158,12 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       xrCam.getWorldPosition(vHead);
       const dx = target.x - vHead.x;
       const dz = target.z - vHead.z;
-      playerX += dx;
-      playerZ += dz;
+      const p = solidXZ(playerX + dx, playerZ + dz);
+      playerX = p.x;
+      playerZ = p.z;
       return applyReferenceSpace();
     }catch(err){
-      log("[Phase169 teleport] jump failed", err?.message || err);
+      log("[Phase178 teleport] jump failed", err?.message || err);
       return false;
     }
   }
@@ -215,8 +220,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     const speed = 3.25;
     const stepX = (right.x * strafeX + forward.x * (-moveY)) * speed * dt;
     const stepZ = (right.z * strafeX + forward.z * (-moveY)) * speed * dt;
-    const limit = Math.max(2, roomClamp - 1.1);
-    setPlayerXZ(THREE.MathUtils.clamp(playerX + stepX, -limit, limit), THREE.MathUtils.clamp(playerZ + stepZ, -limit, limit));
+    setPlayerXZ(playerX + stepX, playerZ + stepZ);
   }
 
   function controllerAim(proxy){
@@ -256,9 +260,6 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     wrist.getWorldPosition(vWrist);
     index.getWorldPosition(vIndex);
     if (thumb) thumb.getWorldPosition(vThumb); else vThumb.copy(vIndex);
-
-    // Solid hand TP aim: fist arms purple, then use the wrist-to-index ray. If the fist curl makes the ray too short,
-    // fall back to the user's current head-facing direction so the arc stays in front instead of behind.
     vDir.copy(vIndex).sub(vWrist);
     const forward = getXRHeadForward();
     const shortRay = vDir.lengthSq() < 0.006;
@@ -266,9 +267,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     else {
       vDir.normalize();
       const flat = new THREE.Vector3(vDir.x, 0, vDir.z);
-      if (flat.lengthSq() > 1e-5 && flat.normalize().dot(forward) < -0.20){
-        vDir.x *= -1; vDir.z *= -1;
-      }
+      if (flat.lengthSq() > 1e-5 && flat.normalize().dot(forward) < -0.20){ vDir.x *= -1; vDir.z *= -1; }
     }
     if (vDir.y > -0.07) vDir.y = -0.38;
     vDir.normalize();
@@ -307,121 +306,49 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   function update({ dt = 0.016, leftHand, rightHand, leftController, rightController, statusCb = ()=>{}, modeCb = ()=>{} }){
     const now = performance.now();
     leftHandRef = leftHand; rightHandRef = rightHand; leftControllerRef = leftController; rightControllerRef = rightController;
-
     if (renderer?.xr?.isPresenting && (leftControllerRef || rightControllerRef)) movePlayerFromControllers(dt);
-
     const leftFist = !!leftHandRef?.joints && isFist(leftHandRef);
     const rightFist = !!rightHandRef?.joints && isFist(rightHandRef);
     const leftToggle = controllerTogglePressed(leftControllerRef);
     const rightToggle = controllerTogglePressed(rightControllerRef);
-
-    if (leftFist && !lastLeftFist && now > cooldownUntil){
-      mode = !(mode && active === leftHandRef);
-      active = mode ? leftHandRef : null;
-      activeMode = "hand";
-      cooldownUntil = now + 360;
-      pinchHoldStart = 0;
-    }
-    if (rightFist && !lastRightFist && now > cooldownUntil){
-      mode = !(mode && active === rightHandRef);
-      active = mode ? rightHandRef : null;
-      activeMode = "hand";
-      cooldownUntil = now + 360;
-      pinchHoldStart = 0;
-    }
-    if (leftToggle && !lastLeftToggle && now > cooldownUntil){
-      mode = !(mode && active === leftControllerRef);
-      active = mode ? (leftControllerRef || rightControllerRef) : null;
-      activeMode = "controller";
-      cooldownUntil = now + 260;
-      triggerHoldStart = 0;
-    }
-    if (rightToggle && !lastRightToggle && now > cooldownUntil){
-      mode = !(mode && active === rightControllerRef);
-      active = mode ? (rightControllerRef || leftControllerRef) : null;
-      activeMode = "controller";
-      cooldownUntil = now + 260;
-      triggerHoldStart = 0;
-    }
+    if (leftFist && !lastLeftFist && now > cooldownUntil){ mode = !(mode && active === leftHandRef); active = mode ? leftHandRef : null; activeMode = "hand"; cooldownUntil = now + 360; pinchHoldStart = 0; }
+    if (rightFist && !lastRightFist && now > cooldownUntil){ mode = !(mode && active === rightHandRef); active = mode ? rightHandRef : null; activeMode = "hand"; cooldownUntil = now + 360; pinchHoldStart = 0; }
+    if (leftToggle && !lastLeftToggle && now > cooldownUntil){ mode = !(mode && active === leftControllerRef); active = mode ? (leftControllerRef || rightControllerRef) : null; activeMode = "controller"; cooldownUntil = now + 260; triggerHoldStart = 0; }
+    if (rightToggle && !lastRightToggle && now > cooldownUntil){ mode = !(mode && active === rightControllerRef); active = mode ? (rightControllerRef || leftControllerRef) : null; activeMode = "controller"; cooldownUntil = now + 260; triggerHoldStart = 0; }
     lastLeftFist = leftFist; lastRightFist = rightFist; lastLeftToggle = leftToggle; lastRightToggle = rightToggle;
-
-    if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){
-      hideVisuals();
-      statusCb("Waiting for Quest hands or controllers…");
-      modeCb("Input: not tracked");
-      return;
-    }
-
-    if (!mode || !active){
-      hideVisuals();
-      statusCb((leftControllerRef || rightControllerRef) ? "Controllers ready • right stick move/snap • grip/trigger aims TP • hands can fist-arm purple TP" : "Hands ready • make a fist to arm purple TP, aim, then pinch to teleport");
-      modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready • hand TP ready" : "Hands ready • fist arms TP");
-      return;
-    }
-
+    if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){ hideVisuals(); statusCb("Waiting for Quest hands or controllers…"); modeCb("Input: not tracked"); return; }
+    if (!mode || !active){ hideVisuals(); statusCb((leftControllerRef || rightControllerRef) ? "Controllers ready • right stick move/snap • grip/trigger aims TP • walls locked" : "Hands ready • fist arms TP • walls locked"); modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready • walls locked" : "Hands ready • walls locked"); return; }
     if (activeMode === "hand" && !active?.joints) active = rightHandRef?.joints ? rightHandRef : leftHandRef?.joints ? leftHandRef : null;
     if (activeMode === "controller" && !active?.joints) active = rightControllerRef?.joints ? rightControllerRef : leftControllerRef?.joints ? leftControllerRef : null;
     if (!active){ mode = false; hideVisuals(); return; }
-
     const target = activeMode === "controller" ? controllerAim(active) : handAim(active);
-    if (!target){
-      hideVisuals();
-      setPurpleVisuals(true);
-      statusCb(activeMode === "hand" ? "PURPLE TP ARMED • lower/aim hand, then pinch" : "CONTROLLER TP ARMED • aim at floor");
-      modeCb(activeMode === "hand" ? "Hands: PURPLE TP ARMED" : "Controllers: TP ARMED");
-      return;
-    }
-
+    if (!target){ hideVisuals(); setPurpleVisuals(true); statusCb(activeMode === "hand" ? "PURPLE TP ARMED • lower/aim hand, then pinch" : "CONTROLLER TP ARMED • aim at floor"); modeCb(activeMode === "hand" ? "Hands: PURPLE TP ARMED" : "Controllers: TP ARMED"); return; }
     vSmooth.lerp(target, vSmooth.distanceTo(target) > 1.2 ? 0.72 : 0.36);
-    pointer.visible = true;
-    ring.visible = true;
-    pointer.position.copy(vSmooth).setY(0.018);
-    ring.position.copy(vSmooth).setY(0.015);
-    glow.position.copy(vSmooth).setY(0.38);
-    setPurpleVisuals(true);
-
+    pointer.visible = true; ring.visible = true;
+    pointer.position.copy(vSmooth).setY(0.018); ring.position.copy(vSmooth).setY(0.015); glow.position.copy(vSmooth).setY(0.38); setPurpleVisuals(true);
     const origin = activeMode === "controller" ? vOrigin.clone() : handPalmPosition(active);
     updateArc(origin, vSmooth);
     if (activeMode === "hand" && origin) handGlow.position.copy(origin);
-
     if (activeMode === "controller"){
       const trigger = controllerTriggerValue(active);
       if (trigger > 0.20 && !active.userData._wasTrigger) triggerHoldStart = now;
       const held = triggerHoldStart ? now - triggerHoldStart : 0;
-      if (active.userData._wasTrigger && trigger <= 0.12 && held > 90 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
-        if (teleportByDelta(vSmooth)){
-          lastTP = now;
-          mode = false; active = null; triggerHoldStart = 0; hideVisuals();
-        }
-      }
+      if (active.userData._wasTrigger && trigger <= 0.12 && held > 90 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){ if (teleportByDelta(vSmooth)){ lastTP = now; mode = false; active = null; triggerHoldStart = 0; hideVisuals(); } }
       if (trigger <= 0.12) triggerHoldStart = 0;
       active.userData._wasTrigger = trigger > 0.20;
-      statusCb("CONTROLLER TP ARMED • aim forward • release trigger/grip to teleport");
-      modeCb("Controllers: TELEPORT ON");
-      return;
+      statusCb("CONTROLLER TP ARMED • release trigger/grip • wall boundary locked"); modeCb("Controllers: TELEPORT ON"); return;
     }
-
     const pinch = isPinching(active);
     if (active.userData._wasPinching === undefined) active.userData._wasPinching = false;
     if (pinch && !active.userData._wasPinching) pinchHoldStart = now;
     const held = pinchHoldStart ? now - pinchHoldStart : 0;
     if ((pinch && held > 110 || (active.userData._wasPinching && !pinch && held > 45)) && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
-      if (teleportByDelta(vSmooth)){
-        lastTP = now;
-        mode = false;
-        active = null;
-        pinchHoldStart = 0;
-        active.userData._wasPinching = false;
-        hideVisuals();
-        statusCb("HAND TELEPORT COMPLETE");
-        return;
-      }
+      if (teleportByDelta(vSmooth)){ lastTP = now; mode = false; active = null; pinchHoldStart = 0; active.userData._wasPinching = false; hideVisuals(); statusCb("HAND TELEPORT COMPLETE • wall boundary locked"); return; }
     }
     if (!pinch) pinchHoldStart = 0;
     active.userData._wasPinching = pinch;
-    statusCb("PURPLE HAND TP ARMED • aim where you want to go • pinch to teleport • fist again cancels");
+    statusCb("PURPLE HAND TP ARMED • pinch to teleport • walls locked");
     modeCb("Hands: PURPLE TELEPORT ON");
   }
-
-  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState:()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode }) };
+  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState:()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode, wallBlocks }) };
 }
