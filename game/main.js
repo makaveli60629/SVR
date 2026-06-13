@@ -14,15 +14,16 @@ import { addPhase123AdBannerBuildings } from "./modules/ad_banner_buildings_phas
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 import { installLobbyCommandCenterPhase167 } from "./modules/lobby_command_center_phase167.js";
+import { installPhase168SolidOctagonLobby } from "./modules/lobby_octagon_phase168.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-167-LOBBY-COMMAND-CENTER-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-168-SOLID-OCTAGON-FOUR-PILLARS-LEGENDS-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 const ANDROID_SMART = /Android/i.test(navigator.userAgent || "") && !params.has("desktop") && !AUTOCAM;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 167: modular lobby command center for ads, notifications, leaderboards, events, and hologram logos; Phase 166 freeze guard and Android smart controls preserved." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 168: solid octagon lobby shell, generic eight-building ad ring hidden, four cardinal Tier 1 pillar buildings active, Legends hub restored; Phase 166 freeze guard and locomotion preserved." };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -321,19 +322,21 @@ const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"),
 tp.setLogoTexture(logoTexture);
 const phase123AdBanners = addPhase123AdBannerBuildings({ scene, radius: CONFIG.ROOM_RADIUS, wallHeight: CONFIG.WALL_HEIGHT * 0.56, logoTexture, log });
 scene.userData._phase123AdBanners = phase123AdBanners;
+const phase168SolidOctagon = installPhase168SolidOctagonLobby({ scene, log, enabled: true });
 perf.lockSceneForQuest();
 
 window.__SVR_GAME_READY__ = true;
 window.__SVR_ANDROID_SMART_LOCK__ = ANDROID_SMART;
 window.__SVR_PHASE166_FREEZE_LOCK__ = true;
 window.__SVR_PHASE167_COMMAND_CENTER_LOCK__ = true;
+window.__SVR_PHASE168_SOLID_OCTAGON_LOCK__ = true;
 const __svrBootFallback = document.getElementById('bootFallback');
 if (__svrBootFallback){
   __svrBootFallback.style.opacity='0';
   __svrBootFallback.style.pointerEvents='none';
   setTimeout(()=>{__svrBootFallback.style.display='none';},420);
 }
-setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks + command center locked` : `Ready. ${BUILD_LABEL}`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks + octagon locked` : `Ready. ${BUILD_LABEL}`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android smart controls locked" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -395,8 +398,9 @@ renderer.setAnimationLoop(()=>{
     scene.userData._camera = renderer.xr.getCamera(camera);
   }
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
-  if (optionalTick && scene.userData._phase123AdBanners?.userData?.tick) scene.userData._phase123AdBanners.userData.tick(scene.userData._time || (now * 0.001));
+  if (optionalTick && scene.userData._phase123AdBanners?.visible && scene.userData._phase123AdBanners?.userData?.tick) scene.userData._phase123AdBanners.userData.tick(scene.userData._time || (now * 0.001));
   if (optionalTick && phase167CommandCenter?.userData?.tick) phase167CommandCenter.userData.tick(scene.userData._time || (now * 0.001));
+  if (optionalTick && phase168SolidOctagon?.userData?.tick) phase168SolidOctagon.userData.tick(scene.userData._time || (now * 0.001));
   hands.update(dt);
   if (optionalTick) hands.updateDebug();
   const leftHand = hands.getLeftHand();
