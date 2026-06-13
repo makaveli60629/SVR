@@ -7,17 +7,17 @@ import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { CONFIG } from "./modules/config.js";
 import { createWristWatch } from "./modules/watch.js";
-import { applyReikiCleanCarousel113 } from "./modules/update_3_0_reiki_clean_carousel_113.js";
 import { applyPhase119ReikiTrueitiveStorefrontFinal } from "./modules/reiki_phase119_trueitive_storefront_final.js";
 import "./modules/asset_registry_phase122.js";
 import { addPhase123AdBannerBuildings } from "./modules/ad_banner_buildings_phase123.js";
 
+const BUILD_LABEL = "UPDATE-3.0-PHASE-130-REIKI-ONE-DISPLAY-NO-FLOOR-TABS-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-window.SVR_PHASE106 = { build: 'UPDATE-3.0-PHASE-128-HIGHER-BIGGER-EARTH-MOON-MARS-ORBIT-LOCK', source: 'Phase 128: higher solar cluster, larger Earth, smaller Moon, Moon and Mars orbit Earth' };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 130: Reiki one-display cleanup, no floor tabs, Phase 129 storefronts preserved, Phase 128 high planet baseline preserved" };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -62,7 +62,6 @@ const { scene, camera, renderer } = createCore({ containerId: "app" });
 scene.userData._camera = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
-
 
 window.addEventListener("error", (e)=>{
   if (!renderer.xr.isPresenting && $err) $err.style.display = "block";
@@ -132,11 +131,8 @@ function joinTable(){
   seatIndex = best;
   seated = true;
   const seat = seats[best];
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(seat.x, -0.42, seat.z);
-  } else {
-    moveDesktopToSeat(seat);
-  }
+  if (renderer.xr.isPresenting) tp.setPlayerPose(seat.x, -0.42, seat.z);
+  else moveDesktopToSeat(seat);
   setMode(`Seat: ${seat.label}`);
   return true;
 }
@@ -144,9 +140,8 @@ function joinTable(){
 function leaveTable(){
   seated = false;
   seatIndex = -1;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(0, 0, 4.8);
-  } else {
+  if (renderer.xr.isPresenting) tp.setPlayerPose(0, 0, 4.8);
+  else {
     camera.position.set(0, 1.6, 4.8);
     camera.lookAt(0, 1.15, 0);
   }
@@ -155,9 +150,8 @@ function leaveTable(){
 
 function movePlayerToSpot(target, lookTarget = null){
   if (!target) return;
-  if (renderer.xr.isPresenting){
-    tp.setPlayerPose(target.x, 0, target.z);
-  } else {
+  if (renderer.xr.isPresenting) tp.setPlayerPose(target.x, 0, target.z);
+  else {
     camera.position.set(target.x, 1.6, target.z);
     if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z);
   }
@@ -183,13 +177,12 @@ function gotoScene(key){
   return true;
 }
 
-
 function openReikiVideoPortal(){
   if (!isInReikiArea()){
     setStatus("Reiki hologram stays paused and only activates from the Reiki storefront. Jump to Reiki first.", { force: true });
     return false;
   }
-  window.location.href = "./reiki-video-portal.html?v=phase105-reiki-reference-restore&zone=reiki";
+  window.location.href = "./reiki-video-portal.html?v=phase130-reiki-one-display&zone=reiki";
   return true;
 }
 
@@ -207,19 +200,14 @@ function createStoreWebPortal(){
   group.name = "SVR Store Web Portal";
   group.position.set(rec.pos.x + 0.35, 1.7, rec.pos.z - 0.35);
   if (rec.look) group.lookAt(rec.look.x, 1.45, rec.look.z);
-
   const glowMat = new THREE.MeshBasicMaterial({ color: 0x5ef7ff, transparent: true, opacity: 0.20, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
   const pane = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 1.12), glowMat);
   pane.userData.href = "https://svrpoker.com/site/store.html";
   group.add(pane);
-  const frame = new THREE.Mesh(
-    new THREE.TorusGeometry(0.82, 0.018, 12, 112),
-    new THREE.MeshBasicMaterial({ color: 0x9b5cff, transparent: true, opacity: 0.66, side: THREE.DoubleSide })
-  );
+  const frame = new THREE.Mesh(new THREE.TorusGeometry(0.82, 0.018, 12, 112), new THREE.MeshBasicMaterial({ color: 0x9b5cff, transparent: true, opacity: 0.66, side: THREE.DoubleSide }));
   frame.scale.set(1.42, 0.72, 1);
   frame.position.z = 0.025;
   group.add(frame);
-
   const canvas = document.createElement("canvas");
   canvas.width = 1200; canvas.height = 650;
   const ctx = canvas.getContext("2d");
@@ -238,7 +226,6 @@ function createStoreWebPortal(){
   panel.position.z = 0.035;
   group.add(panel);
   scene.add(group);
-
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
   renderer.domElement.addEventListener("pointerdown", (ev)=>{
@@ -251,51 +238,6 @@ function createStoreWebPortal(){
   });
   return group;
 }
-
-function createInactiveReikiPortal(){
-  const group = new THREE.Group();
-  group.name = "Inactive Reiki Video Portal";
-  const target = sceneTargets?.reiki?.pos || new THREE.Vector3(-6, 0, -2.5);
-  group.position.set(target.x + 1.55, 1.65, target.z + 0.15);
-  group.lookAt(0, 1.35, 0);
-  const mat = new THREE.MeshBasicMaterial({ color: 0x34fff4, transparent: true, opacity: 0.22, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
-  const frameMat = new THREE.MeshBasicMaterial({ color: 0xb46cff, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
-  const pane = new THREE.Mesh(new THREE.PlaneGeometry(1.85, 1.05), mat);
-  pane.userData.href = "./reiki-video-portal.html?v=phase105-reiki-reference-restore&zone=reiki";
-  group.add(pane);
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.67, 0.018, 12, 96), frameMat);
-  ring.position.z = 0.02;
-  ring.scale.set(1.42, .78, 1);
-  group.add(ring);
-  const canvas = document.createElement("canvas");
-  canvas.width = 1024; canvas.height = 512;
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0,0,1024,512);
-  ctx.fillStyle = "rgba(0,8,18,.74)"; ctx.fillRect(0,0,1024,512);
-  ctx.strokeStyle = "rgba(88,255,244,.92)"; ctx.lineWidth = 10; ctx.strokeRect(24,24,976,464);
-  ctx.fillStyle = "#eaffff"; ctx.font = "bold 58px system-ui, Arial"; ctx.textAlign = "center";
-  ctx.fillText("REIKI VIDEO PORTAL", 512, 150);
-  ctx.fillStyle = "#ffdddd"; ctx.font = "bold 42px system-ui, Arial"; ctx.fillText("AWAITING APPROVAL", 512, 232);
-  ctx.fillStyle = "#bffcff"; ctx.font = "30px system-ui, Arial"; ctx.fillText("Paused hologram portal", 512, 308);
-  ctx.fillText("Play only inside Reiki area", 512, 360);
-  const tex = new THREE.CanvasTexture(canvas); tex.colorSpace = THREE.SRGBColorSpace;
-  const text = new THREE.Mesh(new THREE.PlaneGeometry(1.75, .88), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide }));
-  text.position.z = 0.03; group.add(text);
-  scene.add(group);
-
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
-  renderer.domElement.addEventListener("pointerdown", (ev)=>{
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
-    raycaster.setFromCamera(mouse, camera);
-    const hit = raycaster.intersectObjects([pane, text], false)[0];
-    if(hit) openReikiVideoPortal();
-  });
-  return group;
-}
-
 
 $sceneButtons.forEach((btn)=>{
   btn.addEventListener("click", ()=>{
@@ -357,10 +299,8 @@ const watch = createWristWatch({
   }
 });
 
-/* Phase 113: do not stack the old inactive portal or Phase 106 large panel over the Reiki storefront. */
 createStoreWebPortal();
-applyReikiCleanCarousel113({ scene, camera, renderer, sceneTargets, setStatus, log });
-applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, sceneTargets, setStatus, log });
+applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, renderer, sceneTargets, setStatus, log });
 
 $toggleJoints.addEventListener("click", ()=>{
   const on = hands.toggleDebug();
@@ -374,8 +314,13 @@ const phase123AdBanners = addPhase123AdBannerBuildings({ scene, radius: CONFIG.R
 scene.userData._phase123AdBanners = phase123AdBanners;
 
 window.__SVR_GAME_READY__ = true;
-const __svrBootFallback = document.getElementById('bootFallback'); if (__svrBootFallback){ __svrBootFallback.style.opacity='0'; __svrBootFallback.style.pointerEvents='none'; setTimeout(()=>{__svrBootFallback.style.display='none';},420); }
-setStatus(AUTOCAM ? "Live preview ready" : "Ready. Phase 127: fitted gloves, teleport travel fallback, lighter sky, freeze/black-corner cleanup.", { force: true });
+const __svrBootFallback = document.getElementById('bootFallback');
+if (__svrBootFallback){
+  __svrBootFallback.style.opacity='0';
+  __svrBootFallback.style.pointerEvents='none';
+  setTimeout(()=>{__svrBootFallback.style.display='none';},420);
+}
+setStatus(AUTOCAM ? "Live preview ready" : `Ready. ${BUILD_LABEL}`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -391,10 +336,6 @@ if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProp
 renderer.xr.addEventListener("sessionstart", async ()=>{
   setHudVisible(false);
   document.getElementById("sceneNav")?.style.setProperty("display","none");
-  // Audio is intentionally primed only. Lobby music stays OFF until the user presses
-  // M or the wrist-watch MUSIC button. Reiki hologram audio stays isolated to the
-  // Reiki video portal.
-  // Phase 105: music removed by request; no audio prime/autoplay.
   await tp.onSessionStart();
 });
 renderer.xr.addEventListener("sessionend", ()=>{
@@ -460,16 +401,11 @@ renderer.setAnimationLoop(()=>{
   }
 
   if (watch) watch.update(dt, leftHand, rightHand);
-
   renderer.render(scene, camera);
 });
 
 const canvasEl = renderer.domElement;
-canvasEl.addEventListener("pointerdown", async ()=>{
-  // User gesture primes browser audio unlock only. Lobby music still requires
-  // explicit M key / watch MUSIC toggle.
-  await audio.prime();
-}, { passive: true });
+canvasEl.addEventListener("pointerdown", async ()=>{ await audio.prime(); }, { passive: true });
 canvasEl.addEventListener("webglcontextlost", (e)=>{
   e.preventDefault();
   log("[ERR] WebGL context lost. Reloading…");
