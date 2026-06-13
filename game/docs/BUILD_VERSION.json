@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-138-REIKI-LONG-CARPET-BENT-ROPE-LOCK",
+  "build": "UPDATE-3.0-PHASE-139-UPLOADED-ADS-REIKI-BACKGROUND-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "138",
-  "summary": "Refines the Reiki storefront entrance: hides the old pole and rope clutter, replaces the carpet with a longer narrower red runner, adds gold trim, and installs new curved red rope rails that bend cleanly along the carpet.",
-  "label": "UPDATE-3.0-PHASE-138-REIKI-LONG-CARPET-BENT-ROPE-LOCK",
-  "notes": "Game-only update. Website/site untouched. Phase 137 stable planets remain active.",
-  "updated": "2026-06-13T06:55:00Z"
+  "phase": "139",
+  "summary": "Adds uploaded Espresso With Cream ad texture to lobby wall ads, adds the uploaded Trueitive founder photo to the Reiki right-wall/founder display, adds a Buddha-style Reiki background panel using the provided URL with fallback art, and preserves the Phase 138 long narrow carpet and bent red ropes.",
+  "label": "UPDATE-3.0-PHASE-139-UPLOADED-ADS-REIKI-BACKGROUND-LOCK",
+  "notes": "Game-only update. Website/site untouched. Uploaded images are embedded as optimized WebP data textures for WebXR reliability.",
+  "updated": "2026-06-13T07:10:00Z"
 }
