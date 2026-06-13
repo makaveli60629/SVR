@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-130-REIKI-ONE-DISPLAY-NO-FLOOR-TABS-LOCK",
+  "build": "UPDATE-3.0-PHASE-131-NATHAN-WALKING-NPC-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "130",
-  "summary": "Reiki storefront cleanup: removed Reiki-area plant clutter, hides floor tabs/portal plaques, replaces spinning carousel tabs with one slideable display, and adds three founder/info columns with portrait-style presentation panels.",
-  "label": "UPDATE-3.0-PHASE-130-REIKI-ONE-DISPLAY-NO-FLOOR-TABS-LOCK",
-  "notes": "Game-only hotfix. Website/site untouched. Storefront portals from Phase 129 remain preserved.",
-  "updated": "2026-06-13T04:35:00Z"
+  "phase": "131",
+  "summary": "Adds Nathan walking NPC patrol wiring. Loads the uploaded RenderPeople Nathan walking FBX when committed at the expected asset path, with a procedural fallback walker so the scene does not break if the binary asset is missing.",
+  "label": "UPDATE-3.0-PHASE-131-NATHAN-WALKING-NPC-LOCK",
+  "notes": "Game-only hotfix. Phase 130 Reiki cleanup and Phase 129 storefront portals preserved. Binary FBX asset must be committed separately at game/assets/npc/nathan/rp_nathan_animated_003_walking_u3d.fbx.",
+  "updated": "2026-06-13T04:55:00Z"
 }
