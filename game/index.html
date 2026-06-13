@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>ScarlettVR Poker • UPDATE-3.0-PHASE-152-POST-BOOT-VERIFY-NO-OVERLAY-LOCK</title>
+  <title>ScarlettVR Poker • UPDATE-3.0-PHASE-153-NATURAL-PLANET-SCALE-LOCK</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -35,13 +35,13 @@
 </head>
 <body>
   <div id="app"></div>
-  <div id="bootFallback"><div class="card"><img class="boot-logo" src="../logo.png" alt="SVR Poker logo"/><div class="loader" aria-hidden="true"></div><h2>SVR Poker Loading</h2><p>Loading Phase 152 post-boot verification: no visible overlay after ready, Phase 150 visual hard refine preserved, extra-thin silver poles, visible moon and Mars, cleaner skyline, and poker room.</p><div class="statusline">PHASE 152 POST-BOOT VERIFY NO-OVERLAY LOCK</div></div></div>
-  <div id="hud"><div class="pill" id="status">Booting…</div><div style="display:flex;gap:8px;align-items:center;"><button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button><button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button><span class="pill" id="mode">Hands: …</span><span class="pill">BUILD: UPDATE-3.0-PHASE-152-POST-BOOT-VERIFY-NO-OVERLAY-LOCK</span></div></div>
+  <div id="bootFallback"><div class="card"><img class="boot-logo" src="../logo.png" alt="SVR Poker logo"/><div class="loader" aria-hidden="true"></div><h2>SVR Poker Loading</h2><p>Loading Phase 153 natural planet scale: moon, Mars, Earth, and halos reduced while keeping the planets visible in the north sky, with poles, skyline, no-overlay, and poker room preserved.</p><div class="statusline">PHASE 153 NATURAL PLANET SCALE LOCK</div></div></div>
+  <div id="hud"><div class="pill" id="status">Booting…</div><div style="display:flex;gap:8px;align-items:center;"><button class="btn" id="toggleLog" title="Show/Hide logs">Logs</button><button class="btn" id="toggleJoints" title="Toggle joint debug spheres">Joints</button><span class="pill" id="mode">Hands: …</span><span class="pill">BUILD: UPDATE-3.0-PHASE-153-NATURAL-PLANET-SCALE-LOCK</span></div></div>
   <div id="sceneNav"><button class="scene-btn" data-scene="lobby">Lobby</button><button class="scene-btn" data-scene="seat">Seat</button><button class="scene-btn" data-scene="reiki">Reiki</button><button class="scene-btn" data-scene="reikiVideoPortal">Reiki Video</button><button class="scene-btn" data-scene="pga">PGA</button><button class="scene-btn" data-scene="store">Store</button><button class="scene-btn" data-scene="legends">Legend</button><button class="scene-btn" data-scene="sponsor">Sponsor</button><button class="scene-btn" data-scene="scorpion">Scorpion</button></div>
   <pre id="log"></pre><pre id="err"></pre>
   <script>window.__SVR_BOOT_STARTED__=Date.now();setTimeout(function(){var s=document.getElementById('status');var fb=document.getElementById('bootFallback');if(s&&fb&&/Booting/i.test(s.textContent||''))fb.style.display='grid';},4500);</script>
-  <script type="module" src="./main.js?v=phase152-post-boot"></script>
-  <script type="module" src="./phase141_label_fix.js?v=phase152-post-boot"></script>
-  <script type="module" src="./phase152_post_boot_verify.js?v=phase152-post-boot"></script>
+  <script type="module" src="./main.js?v=phase153-planet-scale"></script>
+  <script type="module" src="./phase141_label_fix.js?v=phase153-planet-scale"></script>
+  <script type="module" src="./phase152_post_boot_verify.js?v=phase153-planet-scale"></script>
 </body>
 </html>
