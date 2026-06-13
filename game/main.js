@@ -14,14 +14,14 @@ import { addPhase123AdBannerBuildings } from "./modules/ad_banner_buildings_phas
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-165-ANDROID-SMART-STICK-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-166-FREEZE-GUARD-STABILITY-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 const ANDROID_SMART = /Android/i.test(navigator.userAgent || "") && !params.has("desktop") && !AUTOCAM;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 165: Android-only smart layout lock, touch sticks enabled for mobile browser movement/look, Quest/WebXR controls preserved untouched." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 166: freeze guard stability lock, adaptive mobile/Quest render throttle, Android smart stick lock preserved, Quest/WebXR controls preserved." };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -323,13 +323,14 @@ perf.lockSceneForQuest();
 
 window.__SVR_GAME_READY__ = true;
 window.__SVR_ANDROID_SMART_LOCK__ = ANDROID_SMART;
+window.__SVR_PHASE166_FREEZE_LOCK__ = true;
 const __svrBootFallback = document.getElementById('bootFallback');
 if (__svrBootFallback){
   __svrBootFallback.style.opacity='0';
   __svrBootFallback.style.pointerEvents='none';
   setTimeout(()=>{__svrBootFallback.style.display='none';},420);
 }
-setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks locked` : `Ready. ${BUILD_LABEL}`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks + freeze guard locked` : `Ready. ${BUILD_LABEL}`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android smart controls locked" : "Hands: waiting…");
 
 function setHudVisible(visible){
@@ -365,8 +366,10 @@ const previewShots = [
 
 renderer.setAnimationLoop(()=>{
   const now = performance.now();
-  const dt = Math.min((now - tPrev) / 1000, 0.033);
+  const rawDt = Math.min((now - tPrev) / 1000, 0.20);
+  const dt = Math.min(rawDt, 0.033);
   tPrev = now;
+  perf.reportFrame?.(rawDt, (text)=>setStatus(text, { force: true }));
   const optionalTick = perf.optionalTickAllowed();
   if (!renderer.xr.isPresenting){
     if (!AUTOCAM && desktop) desktop.update(dt);
