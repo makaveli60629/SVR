@@ -1,8 +1,8 @@
-const LABEL = "UPDATE-3.0-PHASE-160-ORBITAL-PLANETS-STARFIELD-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-161-WELLNESS-HUB-LUXURY-STOREFRONT-LOCK";
 function syncLabels(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE106.source = "Phase 160 orbital planets and starfield lock. Moon, Mars, and Earth are scaled bigger, separated around the lobby sky, and backed by a non-pattern starfield.";
+  window.SVR_PHASE106.source = "Phase 161 Wellness Hub luxury storefront lock.";
   document.title = `ScarlettVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
