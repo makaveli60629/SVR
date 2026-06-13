@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-172A-SPONSOR-MODULE-ARCHITECTURE-LOCK",
-  "track": "sponsor-module-architecture",
+  "build": "UPDATE-3.0-PHASE-172B-SPONSOR-ADMIN-APPROVAL-FLOW-LOCK",
+  "track": "sponsor-admin-approval-flow",
   "siteTouched": true,
-  "phase": "172A",
-  "summary": "No-code sponsor intake packet builder, approved sponsor JSON profile, and game-side sponsor module loader for approved hub display.",
-  "label": "UPDATE-3.0-PHASE-172A-SPONSOR-MODULE-ARCHITECTURE-LOCK",
-  "notes": "Preserves Phase 171 clean inner octagon, Phase 169 locomotion, and left-to-right poker dealing. Sponsor data is modular and can be approved, replaced, or disabled without game code changes.",
-  "updated": "2026-06-14T00:30:00Z"
+  "phase": "172B",
+  "summary": "Sponsor admin dashboard with pending sponsor queue, approve/deny/pause/expire actions, preview game, copy/export JSON, and sponsor inventory slot map.",
+  "label": "UPDATE-3.0-PHASE-172B-SPONSOR-ADMIN-APPROVAL-FLOW-LOCK",
+  "notes": "Preserves Phase 172A sponsor module architecture and adds static admin approval workflow ready for backend storage.",
+  "updated": "2026-06-14T00:45:00Z"
 }
