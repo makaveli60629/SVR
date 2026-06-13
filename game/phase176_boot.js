@@ -3,12 +3,13 @@ import { installPhase178Bounds } from "./modules/phase178_bounds.js";
 import { autoInstallPhase179CenterpieceGuidance } from "./modules/phase179_centerpiece_guidance.js";
 import { autoInstallPhase180TableSelector } from "./modules/phase180_table_selector.js";
 
-const LABEL = "UPDATE-3.0-PHASE-182-EXPANDED-ORIGINAL-WALL-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-183-ARCH-TOP-BLOCK-CONNECTION-LOCK";
 
 function sync(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE182 = { build: LABEL, active: true, octagonRemoved: true, lobbyShape: "expanded-original-rectangle" };
+  window.SVR_PHASE182 = { build: "UPDATE-3.0-PHASE-182-EXPANDED-ORIGINAL-WALL-LOCK", active: true, octagonRemoved: true, lobbyShape: "expanded-original-rectangle" };
+  window.SVR_PHASE183 = { build: LABEL, active: true, archTopBlocksConnected: true };
   document.title = `SVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach(el=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
