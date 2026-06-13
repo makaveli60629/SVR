@@ -1,13 +1,17 @@
-const LABEL = "UPDATE-3.0-PHASE-152-POST-BOOT-VERIFY-NO-OVERLAY-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-153-NATURAL-PLANET-SCALE-LOCK";
 
 function setBuildLabels(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE106.source = "Phase 152 post boot verification. Phase 150 visual hard refine and Phase 151 runtime label consistency preserved.";
+  window.SVR_PHASE106.source = "Phase 153 natural planet scale lock. Post-boot verification preserved without any visible overlay.";
   window.SVR_PHASE152 = {
     build: LABEL,
     purpose: "post-boot verification without adding any visible overlay",
-    preserves: ["extra-thin silver poles", "hidden glass beam overlay", "visible moon and Mars", "clean skyline", "Quest hands", "teleport", "watch"]
+    preserves: ["extra-thin silver poles", "hidden glass beam overlay", "natural-scale moon and Mars", "clean skyline", "Quest hands", "teleport", "watch"]
+  };
+  window.SVR_PHASE153 = {
+    build: LABEL,
+    purpose: "reduce oversized planets while keeping them visible in the north sky"
   };
   document.title = `ScarlettVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
@@ -30,10 +34,11 @@ function verifyState(){
     label: LABEL,
     gameReady: !!window.__SVR_GAME_READY__,
     phase150Refined: !!window.SVR_PHASE150_REFINED,
-    phase149Refined: !!window.SVR_PHASE149_REFINED,
+    phase153Refined: !!window.SVR_PHASE153_REFINED,
     noVisibleBootOverlayAfterReady: !window.__SVR_GAME_READY__ || bootHidden,
     checkedAt: new Date().toISOString()
   };
+  window.SVR_PHASE153_VERIFY = window.SVR_PHASE152_VERIFY;
 }
 
 function syncPhase152(){
