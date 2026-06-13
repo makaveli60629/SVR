@@ -1,17 +1,17 @@
-const LABEL = "UPDATE-3.0-PHASE-153-NATURAL-PLANET-SCALE-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-154-HIGH-SMALL-TEXTURED-PLANETS-LOCK";
 
 function setBuildLabels(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE106.source = "Phase 153 natural planet scale lock. Post-boot verification preserved without any visible overlay.";
+  window.SVR_PHASE106.source = "Phase 154 high small textured planets lock. Post-boot verification preserved without any visible overlay.";
   window.SVR_PHASE152 = {
     build: LABEL,
     purpose: "post-boot verification without adding any visible overlay",
-    preserves: ["extra-thin silver poles", "hidden glass beam overlay", "natural-scale moon and Mars", "clean skyline", "Quest hands", "teleport", "watch"]
+    preserves: ["extra-thin silver poles", "hidden glass beam overlay", "high small textured moon and Mars", "clean skyline", "logo-color hologram pod button", "Quest hands", "teleport", "watch"]
   };
-  window.SVR_PHASE153 = {
+  window.SVR_PHASE154 = {
     build: LABEL,
-    purpose: "reduce oversized planets while keeping them visible in the north sky"
+    purpose: "raise planets high, scale them down, restore texture detail, and keep hologram pod button outside the video"
   };
   document.title = `ScarlettVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
@@ -34,11 +34,12 @@ function verifyState(){
     label: LABEL,
     gameReady: !!window.__SVR_GAME_READY__,
     phase150Refined: !!window.SVR_PHASE150_REFINED,
-    phase153Refined: !!window.SVR_PHASE153_REFINED,
+    phase154Refined: !!window.SVR_PHASE154_REFINED,
+    hologramPodButton: !!window.SVR_PHASE154_POD_BUTTON,
     noVisibleBootOverlayAfterReady: !window.__SVR_GAME_READY__ || bootHidden,
     checkedAt: new Date().toISOString()
   };
-  window.SVR_PHASE153_VERIFY = window.SVR_PHASE152_VERIFY;
+  window.SVR_PHASE154_VERIFY = window.SVR_PHASE152_VERIFY;
 }
 
 function syncPhase152(){
