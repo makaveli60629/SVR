@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-157-MODULAR-HUB-SPONSORSHIP-REGISTRY-LOCK",
-  "track": "modular-hub-sponsorship-registry",
+  "build": "UPDATE-3.0-PHASE-158-REIKI-STOREFRONT-DEBRAND-LOCK",
+  "track": "reiki-storefront-debrand-lock",
   "siteTouched": true,
-  "phase": "157",
-  "summary": "Sponsor system correction pass. Reiki sponsor video media is removed, active Reiki surfaces remain generic placeholders, and a modular sponsorship registry is added for all hubs except Vibes Theater so sponsors can be added or removed without hard-coded rebuilds.",
-  "label": "UPDATE-3.0-PHASE-157-MODULAR-HUB-SPONSORSHIP-REGISTRY-LOCK",
-  "notes": "Preserves Reiki store placeholder, Phase 155 skyline ad ring and moving moon glow, Phase 154 high small textured planets, Quest hands, teleport, watch, and poker room baseline.",
-  "updated": "2026-06-13T19:45:00Z"
+  "phase": "158",
+  "summary": "Reiki storefront debrand pass. Visible retired sponsor signage and Zen Den storefront signage are covered with clean Reiki Hub placeholder signs, active store data is sanitized, and the sponsor registry remains the only approved path for future sponsor details.",
+  "label": "UPDATE-3.0-PHASE-158-REIKI-STOREFRONT-DEBRAND-LOCK",
+  "notes": "Preserves Phase 157 modular hub sponsorship registry, Reiki store placeholder, Phase 155 skyline ad ring and moving moon glow, Quest hands, teleport, watch, and poker room baseline.",
+  "updated": "2026-06-13T20:00:00Z"
 }
