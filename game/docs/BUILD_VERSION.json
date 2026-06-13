@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-136-REIKI-FLIP-EARTH-ORBIT-LOCK",
+  "build": "UPDATE-3.0-PHASE-137-STABLE-PLANET-ORBIT-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "136",
-  "summary": "Flips the Reiki storefront so the user sees the front instead of the back, beautifies the wall-aligned Reiki presentation, keeps the founder info left and founder picture right, preserves one interactive portrait hologram screen, and adds an Earth orbit system where Earth orbits the lobby while Moon and Mars follow Earth and rotate.",
-  "label": "UPDATE-3.0-PHASE-136-REIKI-FLIP-EARTH-ORBIT-LOCK",
-  "notes": "Game-only update. Website/site untouched. Founder photo still loads from game/assets/ui/shyona_royston.png.",
-  "updated": "2026-06-13T06:25:00Z"
+  "phase": "137",
+  "summary": "Stabilizes the planet system: one Earth orbit around the lobby, with Moon and Mars following Earth at readable scale and smooth height.",
+  "label": "UPDATE-3.0-PHASE-137-STABLE-PLANET-ORBIT-LOCK",
+  "notes": "Game-only update. Website/site untouched. Phase 136 flipped Reiki storefront remains active.",
+  "updated": "2026-06-13T06:40:00Z"
 }
