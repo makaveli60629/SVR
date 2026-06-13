@@ -1,4 +1,4 @@
-const LABEL = "UPDATE-3.0-PHASE-137-STABLE-PLANET-ORBIT-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-138-REIKI-LONG-CARPET-BENT-ROPE-LOCK";
 function syncLabels(){
   document.title = `ScarlettVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
