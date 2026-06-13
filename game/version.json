@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-145-OFFICIAL-ROUTE-404-SAFETY-LOCK",
-  "track": "game-plus-site-route-safety",
+  "build": "UPDATE-3.0-PHASE-146-DEPLOYMENT-SMOKE-TEST-LOCK",
+  "track": "deployment-verification",
   "siteTouched": true,
-  "phase": "145",
-  "summary": "Expanded official route safety with section-level 404 pages, preserved the official logo loading screen, and kept the hologram button removed from the loading screen.",
-  "label": "UPDATE-3.0-PHASE-145-OFFICIAL-ROUTE-404-SAFETY-LOCK",
-  "notes": "Keeps Phase 144 loading/logo/404 work and Phase 143 lobby/skyline/planet polish intact while adding route recovery coverage for site and game paths.",
-  "updated": "2026-06-13T16:45:00Z"
+  "phase": "146",
+  "summary": "Deployment verification lock. Official logo loading screen remains active, loading-screen hologram button remains removed, route 404 coverage remains active, and build label advances to Phase 146.",
+  "label": "UPDATE-3.0-PHASE-146-DEPLOYMENT-SMOKE-TEST-LOCK",
+  "notes": "Preserves Phase 143 skyline planet lobby work and Phase 144 145 loading route safety.",
+  "updated": "2026-06-13T17:00:00Z"
 }
