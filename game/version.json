@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-158-REIKI-STOREFRONT-DEBRAND-LOCK",
-  "track": "reiki-storefront-debrand-lock",
+  "build": "UPDATE-3.0-PHASE-159-VIBEZ-GEOMETRY-STOREFRONT-LOCK",
+  "track": "vibez-geometry-storefront",
   "siteTouched": true,
-  "phase": "158",
-  "summary": "Reiki storefront debrand pass. Visible retired sponsor signage and Zen Den storefront signage are covered with clean Reiki Hub placeholder signs, active store data is sanitized, and the sponsor registry remains the only approved path for future sponsor details.",
-  "label": "UPDATE-3.0-PHASE-158-REIKI-STOREFRONT-DEBRAND-LOCK",
-  "notes": "Preserves Phase 157 modular hub sponsorship registry, Reiki store placeholder, Phase 155 skyline ad ring and moving moon glow, Quest hands, teleport, watch, and poker room baseline.",
-  "updated": "2026-06-13T20:00:00Z"
+  "phase": "159",
+  "summary": "VIBEZ storefront geometry pass. VIBEZ Theater is rebuilt with black glass, cyan/purple neon geometry, stacked storefront signs, poster panels, marquee bulbs, carpet, and a VIBEZ floor portal while preserving sponsor-registry exclusion for Vibes Theater.",
+  "label": "UPDATE-3.0-PHASE-159-VIBEZ-GEOMETRY-STOREFRONT-LOCK",
+  "notes": "Preserves Phase 158 Reiki storefront debrand lock, Phase 157 modular sponsor registry, Phase 155 skyline ad ring and moving moon glow, Quest hands, teleport, watch, and poker room baseline.",
+  "updated": "2026-06-13T20:15:00Z"
 }
