@@ -1,5 +1,5 @@
-import { applyPhase139UploadedAdsBackground } from "./reiki_phase139_ads_background.js";
+import { applyPhase140LobbyReikiTheaterOverhaul } from "./phase140_lobby_reiki_theater_overhaul.js";
 
 export function applyPhase119ReikiTrueitiveStorefrontFinal(args = {}){
-  return applyPhase139UploadedAdsBackground(args);
+  return applyPhase140LobbyReikiTheaterOverhaul(args);
 }
