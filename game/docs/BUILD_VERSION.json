@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-182-EXPANDED-ORIGINAL-WALL-LOCK",
+  "build": "UPDATE-3.0-PHASE-183-ARCH-TOP-BLOCK-CONNECTION-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "182",
-  "summary": "Restores the expanded original-style rectangular lobby wall, removes the visible octagon shell, hides Phase 176 arena/jumbotron clutter, and expands the lobby bounds so the player can use the larger room again.",
-  "label": "UPDATE-3.0-PHASE-182-EXPANDED-ORIGINAL-WALL-LOCK",
-  "notes": "Game-only update. Poker table, watch, teleport, storefront routes, and private scene buttons preserved.",
-  "updated": "2026-06-13T22:30:00Z"
+  "phase": "183",
+  "summary": "Turns and aligns the lobby top arch blocks so they connect cleanly between the column capitals while preserving the expanded original-wall lobby from Phase 182.",
+  "label": "UPDATE-3.0-PHASE-183-ARCH-TOP-BLOCK-CONNECTION-LOCK",
+  "notes": "Game-only update. Connected arch beams, capital connector plates, and subtle underglow added. Site untouched.",
+  "updated": "2026-06-13T22:45:00Z"
 }
