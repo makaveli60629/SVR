@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 const LABEL = "UPDATE-3.0-PHASE-175-LOBBY-POLISH-AUDIT-LOCK";
-const KEEP_RE = /PHASE173|PHASE174|PHASE175|PHASE171_BIG_TEXTURED_MOON|PHASE171_TEXTURED_MARS|PHASE172|SPONSOR_MODULE|Teleport|TELEPORT|Purple_Fist|Hand_Glow|WristWatch|Watch|Controller|Hand/i;
+const KEEP_RE = /PHASE173|PHASE174|PHASE175|PHASE176|PHASE171_BIG_TEXTURED_MOON|PHASE171_TEXTURED_MARS|PHASE172|SPONSOR_MODULE|Teleport|TELEPORT|Purple_Fist|Hand_Glow|WristWatch|Watch|Controller|Hand/i;
 const REMOVE_RE = /building|skyline|tower|city|adbuilding|bannerbuilding|billboard|phase123|phase164|phase168|phase169|compact.*wall|lobby.*wall|octagon.*wall|ring.*wall|earth|globe|planet|old.*moon|old.*mars|fake.*moon|fake.*mars/i;
 
 function worldDistance(obj){
