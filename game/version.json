@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-161-WELLNESS-HUB-LUXURY-STOREFRONT-LOCK",
-  "track": "wellness-hub-luxury-storefront",
+  "build": "UPDATE-3.0-PHASE-162-ALL-HUB-LUXURY-STOREFRONTS-HUD-LOCK",
+  "track": "all-hub-luxury-storefronts-premium-hud",
   "siteTouched": true,
-  "phase": "161",
-  "summary": "Wellness Hub luxury storefront pass. The Wellness Hub gets a clean black-glass geometric facade, green-gold neon structure, integrated hologram carousel, placeholder sponsor panels, and a larger floor portal while preserving the sponsor-registry lock.",
-  "label": "UPDATE-3.0-PHASE-161-WELLNESS-HUB-LUXURY-STOREFRONT-LOCK",
-  "notes": "Preserves Phase 160 orbital planets and starfield, Phase 159 VIBEZ storefront, Phase 158 Reiki debrand, Phase 157 sponsor registry, Quest hands, teleport, watch, and poker baseline.",
-  "updated": "2026-06-13T20:45:00Z"
+  "phase": "162",
+  "summary": "All-hub storefront correction pass. Wellness and the other lobby hubs are rebuilt as consistent luxury black-glass geometry storefronts with premium holographic HUD slates, emerald/gold neon edges, tactile Z-compression button logic, and no floor clutter.",
+  "label": "UPDATE-3.0-PHASE-162-ALL-HUB-LUXURY-STOREFRONTS-HUD-LOCK",
+  "notes": "Preserves Phase 161 Wellness Hub direction, Phase 160 orbital planets and starfield, Phase 159 VIBEZ storefront, Phase 158 Reiki debrand, Phase 157 sponsor registry, Quest hands, teleport, watch, and poker baseline.",
+  "updated": "2026-06-13T21:00:00Z"
 }
