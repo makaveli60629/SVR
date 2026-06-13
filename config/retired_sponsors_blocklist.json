@@ -1,0 +1,21 @@
+{
+  "version": "UPDATE-3.0-PHASE-157-MODULAR-HUB-SPONSORSHIP-REGISTRY-LOCK",
+  "rule": "These retired sponsor strings must not be added to active game or site surfaces without explicit owner approval in a new phase request.",
+  "blocked_terms": [
+    "Trueitive",
+    "Truitive",
+    "Truetive",
+    "trueitive.com",
+    "Shyona Royston",
+    "Shanna Royston"
+  ],
+  "applies_to": [
+    "site",
+    "game",
+    "reiki hub",
+    "booking pages",
+    "sponsor ads",
+    "hologram panels",
+    "storefront panels"
+  ]
+}
