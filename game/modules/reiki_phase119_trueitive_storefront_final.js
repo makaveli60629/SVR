@@ -1,5 +1,5 @@
-import { applyPhase140LobbyReikiTheaterOverhaul } from "./phase140_lobby_reiki_theater_overhaul.js";
+import { applyPhase140Final } from "./phase140_final_wrapper.js";
 
 export function applyPhase119ReikiTrueitiveStorefrontFinal(args = {}){
-  return applyPhase140LobbyReikiTheaterOverhaul(args);
+  return applyPhase140Final(args);
 }
