@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-143-WALL-ALIGNED-SKYLINE-ADS-HIGH-PLANETS-LOCK",
+  "build": "UPDATE-3.0-PHASE-182-EXPANDED-ORIGINAL-WALL-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "143",
-  "summary": "Aligns signs and panels to face the lobby walls/table center, restores a permanent high-rise backdrop ring, adds wall-facing ad banner planes on the backdrop buildings, raises the textured Earth/Moon/Mars system into the north sky, and hides old sky guide lines and duplicate planet systems.",
-  "label": "UPDATE-3.0-PHASE-143-WALL-ALIGNED-SKYLINE-ADS-HIGH-PLANETS-LOCK",
-  "notes": "Game-only update. Buildings are procedural permanent backdrop towers with table-facing ad slots.",
-  "updated": "2026-06-13T08:25:00Z"
+  "phase": "182",
+  "summary": "Restores the expanded original-style rectangular lobby wall, removes the visible octagon shell, hides Phase 176 arena/jumbotron clutter, and expands the lobby bounds so the player can use the larger room again.",
+  "label": "UPDATE-3.0-PHASE-182-EXPANDED-ORIGINAL-WALL-LOCK",
+  "notes": "Game-only update. Poker table, watch, teleport, storefront routes, and private scene buttons preserved.",
+  "updated": "2026-06-13T22:30:00Z"
 }
