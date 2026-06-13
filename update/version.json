@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 134",
-  "build": "UPDATE-3.0-PHASE-134-TRUEITIVE-HOLOGRAM-PORTRAIT-LOCK",
+  "version": "Update 3.0 Phase 135",
+  "build": "UPDATE-3.0-PHASE-135-EXPANDED-LOBBY-WALL-ALIGNMENT-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Trueitive.com Reiki content, red AWAITING APPROVAL labels, taller portrait video/hologram display, founder info left, Shyona image right, chakra/Reiki slides."
+  "notes": "Expanded lobby radius to 32, pushed wall systems outward, hidden old Reiki overlay clutter, wall-aligned founder info and founder picture panels, and kept one portrait hologram screen."
 }
