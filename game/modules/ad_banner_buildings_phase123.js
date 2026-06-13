@@ -167,11 +167,11 @@ export function addPhase123AdBannerBuildings({ scene, radius, wallHeight, logoTe
     emissiveIntensity: 0.16
   });
 
-  const bannerWidth = 4.05;
-  const bannerHeight = Math.min(10.9, Math.max(8.2, wallHeight + 2.65));
-  const buildingDepth = 0.95;
-  // Phase 125: keep the 8 ad buildings clearly inside the lobby wall and facing the table.
-  const placementRadius = Math.max(13.5, Math.min(radius - 7.0, 17.25));
+  const bannerWidth = 5.05;
+  const bannerHeight = Math.min(8.9, Math.max(7.4, wallHeight - 0.85));
+  const buildingDepth = 0.20;
+  // Phase 126: embed the 8 banner faces into the inner lobby wall, facing the table.
+  const placementRadius = Math.max(11.0, radius - 0.82);
   const bannerRecords = [];
 
   placements.forEach((cfg, idx)=>{
@@ -180,24 +180,24 @@ export function addPhase123AdBannerBuildings({ scene, radius, wallHeight, logoTe
     group.name = `Phase123_TableFacingAdBuilding_${idx + 1}`;
     const x = Math.cos(cfg.angle) * placementRadius;
     const z = Math.sin(cfg.angle) * placementRadius;
-    group.position.set(x, bannerHeight * 0.5 + 0.25, z);
-    group.lookAt(0, bannerHeight * 0.48, 0);
+    group.position.set(x, bannerHeight * 0.5 + 0.72, z);
+    group.lookAt(0, bannerHeight * 0.55, 0);
 
-    const tower = new THREE.Mesh(new THREE.BoxGeometry(bannerWidth + 0.62, bannerHeight + 0.72, buildingDepth), bodyMat.clone());
+    const tower = new THREE.Mesh(new THREE.BoxGeometry(bannerWidth + 0.32, bannerHeight + 0.40, buildingDepth), bodyMat.clone());
     tower.material.emissive = accentColor.clone().multiplyScalar(0.12);
-    tower.position.z = -0.08;
+    tower.position.z = -0.045;
     group.add(tower);
 
     const glass = new THREE.Mesh(new THREE.PlaneGeometry(bannerWidth + 0.14, bannerHeight + 0.18), glassMat.clone());
-    glass.position.z = 0.435;
+    glass.position.z = 0.118; glass.material.depthWrite = false; glass.material.depthTest = false;
     group.add(glass);
 
     const tex = makeBannerTexture({ ...cfg, index: idx + 1 });
     const banner = new THREE.Mesh(
       new THREE.PlaneGeometry(bannerWidth, bannerHeight),
-      new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide })
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, depthTest: false })
     );
-    banner.position.z = 0.475;
+    banner.position.z = 0.135;
     banner.renderOrder = 36;
     group.add(banner);
 
@@ -208,7 +208,7 @@ export function addPhase123AdBannerBuildings({ scene, radius, wallHeight, logoTe
         new THREE.PlaneGeometry(0.74, 0.74),
         new THREE.MeshBasicMaterial({ map: logoTexture, transparent: true, side: THREE.DoubleSide, depthWrite: false })
       );
-      logo.position.set(0, bannerHeight * 0.28, 0.515);
+      logo.position.set(0, bannerHeight * 0.28, 0.155);
       logo.renderOrder = 38;
       group.add(logo);
     }
@@ -218,11 +218,11 @@ export function addPhase123AdBannerBuildings({ scene, radius, wallHeight, logoTe
       new THREE.MeshStandardMaterial({ color: 0x080612, metalness: 0.44, roughness: 0.44, emissive: accentColor, emissiveIntensity: 0.08 })
     );
     base.rotation.y = Math.PI / 6;
-    base.position.set(0, -bannerHeight * 0.5 - 0.44, -0.04);
+    base.position.set(0, -bannerHeight * 0.5 - 0.25, -0.02);
     group.add(base);
 
     const uplight = new THREE.PointLight(accentColor, 0.65, 7.5, 2.2);
-    uplight.position.set(0, -bannerHeight * 0.5 + 0.34, 1.15);
+    uplight.position.set(0, -bannerHeight * 0.5 + 0.32, 0.30);
     group.add(uplight);
 
     root.add(group);
@@ -234,11 +234,11 @@ export function addPhase123AdBannerBuildings({ scene, radius, wallHeight, logoTe
     bannerRecords.forEach((rec, idx)=>{
       const pulse = 0.5 + 0.5 * Math.sin(time * 0.95 + rec.phase);
       rec.banner.material.opacity = 0.98;
-      rec.light.intensity = rec.baseIntensity + pulse * 0.42;
-      rec.group.position.y += Math.sin(time * 0.8 + idx) * 0.0008;
+      rec.light.intensity = rec.baseIntensity + pulse * 0.10;
+      // No position jitter; prevents VR shimmer/blinking.
     });
   };
   scene.add(root);
-  if (typeof log === "function") log("Phase 125: verified 8 visible table-facing ad banner buildings.");
+  if (typeof log === "function") log("Phase 126: 8 wall-embedded table-facing ad banner panels active.");
   return root;
 }

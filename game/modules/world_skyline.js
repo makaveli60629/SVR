@@ -417,7 +417,7 @@ async function createPreferredTable(scene, tableTopY = 0.90, feltTex = null, log
   return { group: realTable, topY: feltY, felt: feltMesh || overlay || null };
 }
 function buildStars(scene, R){
-  const count = 3200;
+  const count = 5200; // Phase 126: denser starfield / Milky Way visibility
   const pos = new Float32Array(count * 3);
   const col = new Float32Array(count * 3);
   for (let i = 0; i < count; i++){
@@ -436,36 +436,63 @@ function buildStars(scene, R){
   geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
   const pts = new THREE.Points(geo, new THREE.PointsMaterial({
-    size: 0.14,
+    size: 0.19,
     sizeAttenuation: true,
     transparent: true,
-    opacity: 0.98,
+    opacity: 1.0,
     map: makeSpriteTexture(),
     vertexColors: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
-    depthTest: true
+    depthTest: false
   }));
+  pts.renderOrder = -20;
   scene.add(pts);
 
   const spriteGroup = new THREE.Group();
-  for (let i = 0; i < 76; i++){
+  for (let i = 0; i < 132; i++){
     const spr = new THREE.Sprite(new THREE.SpriteMaterial({
       map: makeSpriteTexture(),
       color: new THREE.Color(i % 9 === 0 ? 0xb48cff : (i % 5 === 0 ? 0x9fe4ff : 0xffffff)),
       transparent: true,
-      opacity: 0.46 + Math.random() * 0.24,
+      opacity: 0.58 + Math.random() * 0.28,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       depthTest: true
     }));
-    spr.scale.setScalar(0.055 + Math.random() * 0.16);
+    spr.scale.setScalar(0.075 + Math.random() * 0.22);
     const rr = R + 220 + Math.random() * 360;
     const theta = Math.random() * Math.PI * 2;
-    const y = 120 + Math.random() * 180;
+    const y = 155 + Math.random() * 250;
     spr.position.set(Math.cos(theta) * rr, y, Math.sin(theta) * rr);
     spriteGroup.add(spr);
   }
+
+  // Phase 126: visible Milky Way band using a small set of bright, non-flickering sprites.
+  const milkyWay = new THREE.Group();
+  milkyWay.name = "SVR_Phase126_MilkyWay_Band";
+  for (let i = 0; i < 96; i++){
+    const u = i / 95;
+    const theta = -Math.PI * 0.82 + u * Math.PI * 1.64;
+    const rr = R + 420 + Math.sin(u * Math.PI) * 125;
+    const spr = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: makeSpriteTexture(),
+      color: new THREE.Color(i % 4 === 0 ? 0x9bdfff : (i % 3 === 0 ? 0xd6c5ff : 0xffffff)),
+      transparent: true,
+      opacity: 0.36 + Math.random() * 0.28,
+      depthWrite: false,
+      depthTest: false,
+      blending: THREE.AdditiveBlending
+    }));
+    const wobble = (Math.random() - 0.5) * 90;
+    spr.scale.setScalar(0.16 + Math.random() * 0.38);
+    spr.position.set(Math.cos(theta) * rr, 235 + Math.sin(u * Math.PI) * 175 + wobble * 0.08, Math.sin(theta) * rr - 160);
+    spr.renderOrder = -18;
+    milkyWay.add(spr);
+  }
+  scene.add(milkyWay);
+  spriteGroup.userData.milkyWay = milkyWay;
+
   scene.add(spriteGroup);
   return { pts, spriteGroup };
 }
@@ -473,7 +500,7 @@ function buildStars(scene, R){
 function buildLobbySprites(scene, R, wallHeight){
   const group = new THREE.Group();
   const colors = [0xe67cff, 0xff77d7, 0x86e3ff, 0xc08dff, 0xf6fbff, 0xbfe8ff];
-  for (let i = 0; i < 34; i++){
+  for (let i = 0; i < 54; i++){
     const spr = new THREE.Sprite(new THREE.SpriteMaterial({
       map: makeSpriteTexture(),
       color: colors[i % colors.length],
@@ -2080,7 +2107,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   const earthBump = await loadFirstTexture(assetUrls("texture/earth/earth_bump_1k.jpg"));
   const earthCloudTex = await loadFirstTexture(assetUrls("texture/earth/earth_clouds_1k.webp"), { colorSpace: THREE.SRGBColorSpace });
   const earth = new THREE.Mesh(
-    new THREE.SphereGeometry(24.0, 72, 72),
+    new THREE.SphereGeometry(42.0, 80, 80),
     new THREE.MeshStandardMaterial({
       color: 0xffffff,
       roughness: 0.82,
@@ -2092,7 +2119,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.04
     })
   );
-  earth.position.set(70, wallHeight + 122.0, -(R + 260.0));
+  earth.position.set(0, wallHeight + 286.0, -(R + 392.0));
   earth.visible = true;
   earth.frustumCulled = false;
   earth.rotation.z = 0.24;
@@ -2100,7 +2127,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   let earthClouds = null;
   if (earthCloudTex){
     earthClouds = new THREE.Mesh(
-      new THREE.SphereGeometry(21.45, 72, 72),
+      new THREE.SphereGeometry(43.2, 80, 80),
       new THREE.MeshBasicMaterial({ map: earthCloudTex, transparent: true, opacity: 0.36, side: THREE.DoubleSide, depthWrite: false })
     );
     earthClouds.frustumCulled = false;
@@ -2108,12 +2135,12 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     scene.add(earthClouds);
   }
   const earthHalo = createOrbHaloSprite(0x6bc4ff, 0.16);
-  earthHalo.scale.set(158, 158, 1);
+  earthHalo.scale.set(292, 292, 1);
   earthHalo.material.depthTest = false;
   earthHalo.visible = true;
   scene.add(earthHalo);
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(48.0, 96, 96),
+    new THREE.SphereGeometry(30.0, 88, 88),
     new THREE.MeshStandardMaterial({
       color: 0xe9ebef,
       roughness: 0.99,
@@ -2125,16 +2152,16 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.018
     })
   );
-  moon.position.set(-40, wallHeight + 132.0, -(R + 275.0));
+  moon.position.set(-62, wallHeight + 292.0, -(R + 404.0));
   moon.frustumCulled = false;
   scene.add(moon);
   const moonHalo = createOrbHaloSprite(0xf4f7ff, 0.18);
-  moonHalo.scale.set(352.0, 352.0, 1);
+  moonHalo.scale.set(218.0, 218.0, 1);
   moonHalo.material.depthTest = false;
   moonHalo.visible = true;
   scene.add(moonHalo);
   const mars = new THREE.Mesh(
-    new THREE.SphereGeometry(22.0, 72, 72),
+    new THREE.SphereGeometry(20.0, 72, 72),
     new THREE.MeshStandardMaterial({
       color: 0xc56b45,
       roughness: 0.82,
@@ -2146,13 +2173,13 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
       emissiveIntensity: 0.014
     })
   );
-  mars.position.set(32, wallHeight + 152.0, -(R + 310.0));
+  mars.position.set(126, wallHeight + 330.0, -(R + 438.0));
   mars.visible = true;
   mars.frustumCulled = false;
   mars.visible = true; mars.frustumCulled = false; scene.add(mars);
   mars.visible = true;
   const marsHalo = createOrbHaloSprite(0xff9b6b, 0.12);
-  marsHalo.scale.set(182.0, 182.0, 1);
+  marsHalo.scale.set(168.0, 168.0, 1);
   marsHalo.material.depthTest = false;
   marsHalo.visible = true;
   scene.add(marsHalo);
@@ -2175,12 +2202,12 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
   }
   moonSpark.visible = false;
   scene.add(moonSpark);
-  const earthGlow = new THREE.PointLight(0x70c8ff, 2.15, 620, 1.55);
+  const earthGlow = new THREE.PointLight(0x70c8ff, 1.35, 540, 1.65);
   scene.add(earthGlow);
   earthGlow.visible = true;
-  const moonGlow = new THREE.PointLight(0xeaf2ff, 5.2, 860, 1.22);
+  const moonGlow = new THREE.PointLight(0xeaf2ff, 2.6, 620, 1.35);
   scene.add(moonGlow);
-  const marsGlow = new THREE.PointLight(0xff9a72, 2.4, 560, 1.42);
+  const marsGlow = new THREE.PointLight(0xff9a72, 1.25, 420, 1.55);
   scene.add(marsGlow);
   marsGlow.visible = true;
   const skylineGlow = new THREE.PointLight(0x3b74ff, 0.0, 1, 1.7);
@@ -2347,66 +2374,67 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     scene.userData._time = (scene.userData._time || 0) + dt;
     const t = scene.userData._time;
     pokerDemo.update(t, dt);
-    // Phase 125: visible high-sky planet lock. Moon is the main anchor, Earth orbits near it, and Mars orbits both.
-    const moonAnchor = { x: -36, y: wallHeight + 138.0, z: -(R + 270.0) };
-    const moonDrift = t * 0.018;
-    const moonX = moonAnchor.x + Math.sin(moonDrift) * 5.0;
-    const moonY = moonAnchor.y + Math.sin(t * 0.070) * 3.0;
-    const moonZ = moonAnchor.z + Math.cos(t * 0.014) * 8.0;
+    // Phase 126: high visible mini-solar-system. Earth is the main anchor, Moon orbits Earth, Mars orbits both.
+    const earthAnchor = { x: 0, y: wallHeight + 292.0, z: -(R + 395.0) };
+    const earthX = earthAnchor.x + Math.sin(t * 0.012) * 4.0;
+    const earthY = earthAnchor.y + Math.sin(t * 0.055) * 2.0;
+    const earthZ = earthAnchor.z + Math.cos(t * 0.011) * 6.0;
 
     earth.visible = true;
-    earth.rotation.y += dt * 0.055;
+    earth.position.set(earthX, earthY, earthZ);
+    earth.rotation.y += dt * 0.032;
     earth.rotation.z = 0.24;
-    const earthOrbit = t * 0.055;
-    earth.position.set(
-      moonX + Math.cos(earthOrbit) * 70.0,
-      moonY - 18.0 + Math.sin(earthOrbit * 1.2) * 8.0,
-      moonZ + Math.sin(earthOrbit) * 42.0 - 10.0
-    );
     if (earthClouds){
       earthClouds.visible = true;
       earthClouds.position.copy(earth.position);
-      earthClouds.rotation.y -= dt * 0.018;
-      earthClouds.rotation.z = 0.24;
+      earthClouds.rotation.copy(earth.rotation);
+      earthClouds.rotation.y += t * 0.020;
     }
     earthHalo.position.copy(earth.position);
-    earthHalo.material.opacity = 0.13 + 0.022 * (0.5 + 0.5 * Math.sin(t * 0.18));
+    earthHalo.material.opacity = 0.16 + 0.018 * (0.5 + 0.5 * Math.sin(t * 0.22));
     earthGlow.position.copy(earth.position);
     if (earthSpark){
       earthSpark.visible = true;
-      earthSpark.position.copy(earth.position);
       earthSpark.children.forEach((spr, i)=>{
-        const a = t * 0.24 + i * 0.78;
-        spr.position.set(Math.cos(a) * (28 + i * 0.8), Math.sin(a * 1.7) * 3.4, Math.sin(a) * (27 + i * 0.7));
+        const a = t * 0.22 + i * (Math.PI * 2 / Math.max(1, earthSpark.children.length));
+        spr.position.set(earth.position.x + Math.cos(a) * 48.0, earth.position.y + Math.sin(a * 1.2) * 7.0, earth.position.z + Math.sin(a) * 48.0);
       });
     }
-    moon.position.set(moonX, moonY, moonZ);
-    moon.rotation.y += dt * 0.08;
+
+    const moonOrbit = t * 0.030;
+    moon.position.set(
+      earth.position.x + Math.cos(moonOrbit) * 86.0,
+      earth.position.y + 18.0 + Math.sin(moonOrbit * 1.18) * 12.0,
+      earth.position.z + Math.sin(moonOrbit) * 58.0 - 8.0
+    );
+    moon.rotation.y += dt * 0.065;
     moon.rotation.z = 0.03;
+
     const centerX = (moon.position.x + earth.position.x) * 0.5;
     const centerY = (moon.position.y + earth.position.y) * 0.5;
     const centerZ = (moon.position.z + earth.position.z) * 0.5;
-    const marsOrbit = t * 0.115;
+    const marsOrbit = t * 0.018;
     mars.position.set(
-      centerX + Math.cos(marsOrbit) * 112.0,
-      centerY + 24.0 + Math.sin(marsOrbit * 1.35) * 16.0,
-      centerZ + Math.sin(marsOrbit) * 86.0 - 22.0
+      centerX + Math.cos(marsOrbit) * 168.0,
+      centerY + 38.0 + Math.sin(marsOrbit * 1.24) * 18.0,
+      centerZ + Math.sin(marsOrbit) * 122.0 - 20.0
     );
     mars.visible = true;
-    mars.rotation.y += dt * 0.09;
+    mars.rotation.y += dt * 0.075;
     mars.rotation.z = 0.04;
+
     moonGlow.position.copy(moon.position);
     moonHalo.position.copy(moon.position);
-    moonHalo.material.opacity = 0.15 + 0.020 * (0.5 + 0.5 * Math.sin(t * 0.24));
+    moonHalo.material.opacity = 0.14 + 0.014 * (0.5 + 0.5 * Math.sin(t * 0.18));
     marsGlow.position.copy(mars.position);
     marsHalo.position.copy(mars.position);
-    marsHalo.material.opacity = 0.11 + 0.018 * (0.5 + 0.5 * Math.sin(t * 0.28));
+    marsHalo.material.opacity = 0.10 + 0.012 * (0.5 + 0.5 * Math.sin(t * 0.20));
     if (lobbySprites){
       const tiny = lobbySprites.userData?.tiny || null;
       lobbySprites.children.forEach((spr, i)=>{
         if (!spr || spr === tiny || !spr.isSprite) return;
-        spr.position.y = (spr.userData.baseY || spr.position.y) + Math.sin(t * 0.65 + (spr.userData.phase || 0)) * 0.10;
-        if (spr.material && 'opacity' in spr.material) spr.material.opacity = 0.30 + 0.08 * (0.5 + 0.5 * Math.sin(t * 0.45 + i));
+        spr.position.y = (spr.userData.baseY || spr.position.y) + Math.sin(t * 0.38 + (spr.userData.phase || 0)) * 0.045;
+        if (spr.material && 'opacity' in spr.material) spr.material.opacity = 0.44;
       });
       if (tiny?.children){
         tiny.children.forEach((spr, i)=>{
@@ -2415,7 +2443,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
           spr.position.x = Math.cos((spr.userData.angle || 0) + t * 0.04) * (spr.userData.radius || 1);
           spr.position.z = Math.sin((spr.userData.angle || 0) + t * 0.04) * (spr.userData.radius || 1);
           if (spr.position.y > wallHeight + 6) spr.position.y = 0.20;
-          if (spr.material && 'opacity' in spr.material) spr.material.opacity = 0.05 + 0.03 * (0.5 + 0.5 * Math.sin(t * 0.42 + i));
+          if (spr.material && 'opacity' in spr.material) spr.material.opacity = 0.06;
         });
       }
       const snow = lobbySprites.userData?.snow || null;
@@ -2450,7 +2478,7 @@ export async function buildSkylineRoom(scene, { log = console.log } = {}){
     });
     rim.material.emissiveIntensity = 0.18;
     seats.forEach((seat)=>{ seat.ring.material.opacity = 0.60; });
-    stars.spriteGroup.rotation.y += dt * 0.00018;
+    stars.spriteGroup.rotation.y += dt * 0.00008; if (stars.spriteGroup.userData.milkyWay) stars.spriteGroup.userData.milkyWay.rotation.y += dt * 0.00005;
     stars.pts.material.opacity = 0.82;
     if (lobbyInfoBoards?.length) lobbyInfoBoards.forEach((rec, idx)=>{ const bob = Math.sin(t * 1.2 + rec.phase) * 0.04; rec.board.position.y = 1.72 + bob; rec.glow.position.y = rec.board.position.y; rec.glow.material.opacity = 0.10 + 0.06 * (0.5 + 0.5 * Math.sin(t * 1.4 + idx)); });
     city.billboardUpdaters.forEach(fn=>fn(t));

@@ -31,30 +31,32 @@ function makeGloveVisual(handed = "right"){
   root.name = `SVR_Phase125_Protective_Glove_${handed}`;
   const black = new THREE.MeshStandardMaterial({ color: 0x08080c, roughness: 0.48, metalness: 0.18, emissive: 0x020205, emissiveIntensity: 0.05 });
   const purple = new THREE.MeshBasicMaterial({ color: handed === "left" ? 0xb48cff : 0x75fff2, transparent: true, opacity: 0.82, depthWrite: false, blending: THREE.AdditiveBlending });
-  const palm = new THREE.Mesh(new THREE.BoxGeometry(0.072, 0.026, 0.090), black);
-  palm.position.set(0, -0.006, 0.040);
+  const palm = new THREE.Mesh(new THREE.BoxGeometry(0.150, 0.048, 0.170), black);
+  palm.position.set(0, -0.010, 0.060);
   root.add(palm);
-  const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.055, 0.038, 24), black.clone());
+  const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.074, 0.086, 0.060, 24), black.clone());
   cuff.rotation.x = Math.PI / 2;
-  cuff.position.set(0, -0.002, -0.010);
+  cuff.position.set(0, -0.004, -0.030);
   root.add(cuff);
-  const glow = new THREE.Mesh(new THREE.TorusGeometry(0.054, 0.0045, 8, 32), purple);
+  const glow = new THREE.Mesh(new THREE.TorusGeometry(0.086, 0.0065, 8, 32), purple);
   glow.rotation.x = Math.PI / 2;
   glow.position.copy(cuff.position);
   root.add(glow);
   for (let i = 0; i < 4; i++){
-    const x = side * (-0.027 + i * 0.018);
-    const knuckle = new THREE.Mesh(new THREE.SphereGeometry(0.010, 12, 8), purple);
-    knuckle.position.set(x, 0.006, 0.078);
+    const x = side * (-0.055 + i * 0.037);
+    const knuckle = new THREE.Mesh(new THREE.SphereGeometry(0.017, 12, 8), purple);
+    knuckle.position.set(x, 0.010, 0.132);
     root.add(knuckle);
-    const strip = new THREE.Mesh(new THREE.BoxGeometry(0.010, 0.010, 0.050), black.clone());
-    strip.position.set(x, 0.004, 0.108);
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(0.020, 0.018, 0.100), black.clone());
+    strip.position.set(x, 0.006, 0.180);
     root.add(strip);
   }
-  const thumb = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.014, 0.052), black.clone());
-  thumb.position.set(side * 0.050, -0.010, 0.060);
+  const thumb = new THREE.Mesh(new THREE.BoxGeometry(0.032, 0.024, 0.095), black.clone());
+  thumb.position.set(side * 0.092, -0.018, 0.094);
   thumb.rotation.y = side * 0.60;
   root.add(thumb);
+  root.scale.setScalar(1.28);
+  root.userData.phase126GloveCover = true;
   return root;
 }
 

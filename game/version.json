@@ -1,6 +1,8 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-125-AUDIT-RESTORE-SKY-BANNERS-WATCH-GLOVES-LOCK",
+  "build": "UPDATE-3.0-PHASE-126-HIGH-SOLAR-SYSTEM-MILKY-WAY-WALL-BANNERS-TP-PERFORMANCE-LOCK",
   "track": "game-only",
-  "siteTouched": false
+  "siteTouched": false,
+  "phase": "126",
+  "summary": "Higher Earth/Moon/Mars orbit cluster, Milky Way/stars, embedded wall banners, hand teleport release fix, glove visibility, performance/blink reduction"
 }
