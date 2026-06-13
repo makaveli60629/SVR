@@ -142,7 +142,6 @@ function addStorefront(scene, sceneTargets, key, opts = {}){
   group.position.copy(rec.pos).addScaledVector(dir, opts.forward ?? 1.18);
   group.rotation.y = Math.atan2(dir.x, dir.z);
   scene.add(group);
-
   const accent = new THREE.Color(opts.color || 0x7dfff0);
   const trim = new THREE.MeshStandardMaterial({ color: accent, roughness: .22, metalness: .42, emissive: accent, emissiveIntensity: .70 });
   const dark = new THREE.MeshStandardMaterial({ color: 0x080a10, roughness: .82, metalness: .08, emissive: 0x07050d, emissiveIntensity: .14 });
@@ -189,11 +188,40 @@ function addOtherStorefronts(scene, sceneTargets){
   return scene.userData._phase130OtherStorefronts;
 }
 
+function removeReikiPlantAndFloorClutter(scene, sceneTargets){
+  const rec = sceneTargets?.reiki || sceneTargets?.reikiRoom;
+  if (!scene || !rec?.pos || !rec?.look) return;
+  const inward = new THREE.Vector3().subVectors(rec.pos, rec.look);
+  inward.y = 0;
+  if (inward.lengthSq() < 0.0001) return;
+  inward.normalize();
+  const center = rec.pos.clone().addScaledVector(inward, -3.2);
+  const right = new THREE.Vector3(-inward.z, 0, inward.x).normalize();
+  const plantOffsets = [[-5.0,1.8],[-5.0,0.1],[-4.2,-1.45],[-3.2,-2.05],[-2.0,1.55],[2.0,1.55],[3.2,-2.05],[4.2,-1.45],[5.0,0.1],[5.0,1.8]];
+  const plantTargets = plantOffsets.map(([ox, oz])=>center.clone().addScaledVector(right, ox).addScaledVector(inward, oz));
+  const pos = new THREE.Vector3();
+  for (const obj of scene.children){
+    if (!obj || obj.name?.startsWith('PHASE130')) continue;
+    obj.getWorldPosition(pos);
+    if (plantTargets.some((p)=>p.distanceTo(pos) < 0.85)) obj.visible = false;
+  }
+  scene.traverse((obj)=>{
+    if (!obj?.isMesh || obj.parent?.name?.startsWith('PHASE130')) return;
+    obj.getWorldPosition(pos);
+    const local = pos.clone().sub(center);
+    const x = local.dot(right);
+    const z = local.dot(inward);
+    const isLowFloorTab = pos.y < 0.28 && Math.abs(x) < 2.15 && z > -0.8 && z < 2.5 && obj.material?.map;
+    const isFloorCircle = pos.y < 0.28 && Math.abs(x) < 1.55 && z > -0.2 && z < 1.8 && obj.geometry?.type === 'CircleGeometry';
+    if (isLowFloorTab || isFloorCircle) obj.visible = false;
+  });
+}
+
 export function applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, renderer, sceneTargets, setStatus = ()=>{}, log = ()=>{} } = {}){
   if (!scene || scene.userData._phase130ReikiDisplay) return scene?.userData?._phase130ReikiDisplay || null;
   const rec = sceneTargets?.reiki || sceneTargets?.reikiRoom;
   if (!rec?.pos || !rec?.look) return null;
-
+  removeReikiPlantAndFloorClutter(scene, sceneTargets);
   const front = rec.pos.clone();
   const look = rec.look.clone();
   const dir = new THREE.Vector3().subVectors(look, front);
@@ -233,7 +261,6 @@ export function applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, rend
   const title = new THREE.Mesh(new THREE.PlaneGeometry(7.4, .86), new THREE.MeshBasicMaterial({ map: makePanelTexture('TRUEITIVE PRESENTATION', ['One clean display', 'No floor tabs', 'Approval-ready demo'], '#7dfff0', 'WAITING FOR APPROVAL'), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   title.position.set(0, 5.02, -1.22);
   group.add(title);
-
   const leftCol = new THREE.Mesh(new THREE.PlaneGeometry(2.18, 3.18), new THREE.MeshBasicMaterial({ map: makeFounderColumnTexture('FOUNDER', ['Trueitive wellness', 'Reiki / meditation', 'Booking path', 'Approval review']), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   leftCol.position.set(-3.65, 2.44, -1.00);
   group.add(leftCol);
@@ -271,11 +298,8 @@ export function applyPhase119ReikiTrueitiveStorefrontFinal({ scene, camera, rend
   videoPlane.position.z += .012;
   group.add(videoPlane);
 
-  const buttonMat = new THREE.MeshBasicMaterial({ transparent: true, side: THREE.DoubleSide, depthWrite: false });
-  const prevBtn = new THREE.Mesh(new THREE.PlaneGeometry(.82, .38), buttonMat.clone());
-  const nextBtn = new THREE.Mesh(new THREE.PlaneGeometry(.82, .38), buttonMat.clone());
-  prevBtn.material.map = makePanelTexture('BACK', ['Previous'], '#b58cff', '');
-  nextBtn.material.map = makePanelTexture('NEXT', ['Advance'], '#7dffb2', '');
+  const prevBtn = new THREE.Mesh(new THREE.PlaneGeometry(.82, .38), new THREE.MeshBasicMaterial({ map: makePanelTexture('BACK', ['Previous'], '#b58cff', ''), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+  const nextBtn = new THREE.Mesh(new THREE.PlaneGeometry(.82, .38), new THREE.MeshBasicMaterial({ map: makePanelTexture('NEXT', ['Advance'], '#7dffb2', ''), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
   prevBtn.position.set(-1.78, 1.04, .82);
   nextBtn.position.set(1.78, 1.04, .82);
   group.add(prevBtn, nextBtn);
