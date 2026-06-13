@@ -1,8 +1,8 @@
-const LABEL = "UPDATE-3.0-PHASE-152-POST-BOOT-VERIFY-NO-OVERLAY-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-153-NATURAL-PLANET-SCALE-LOCK";
 function syncLabels(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE106.source = "Phase 152 post boot verification. Phase 150 visual hard refine and Phase 151 runtime label consistency preserved.";
+  window.SVR_PHASE106.source = "Phase 153 natural planet scale lock. Moon, Mars, Earth, and halos reduced while preserving Phase 150 visual hard refine and Phase 152 post-boot verification.";
   document.title = `ScarlettVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
