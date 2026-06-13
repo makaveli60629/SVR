@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "svr-sponsor-v1",
+  "approved": true,
+  "approvalStatus": "approved-demo",
+  "sponsorId": "example-reiki-sponsor",
+  "sponsorName": "Example Reiki Sponsor",
+  "contactPerson": "Demo Sponsor Contact",
+  "contactEmail": "sponsor@example.com",
+  "category": "wellness",
+  "hub": "wellness",
+  "placementName": "Wellness / Reiki Hub",
+  "logoText": "REIKI",
+  "website": "https://example.com",
+  "storeUrl": "https://example.com/store",
+  "description": "A wellness sponsor profile used to prove the no-code sponsorship module. Replace this data with approved sponsor information and the game hub updates without changing code.",
+  "shortOffer": "Meditation, wellness sessions, and sponsor-safe community support.",
+  "bannerLines": [
+    "Approved Sponsor Demo",
+    "Wellness Hub Placement",
+    "Logo + Website + Store + Schedule"
+  ],
+  "schedule": {
+    "timezone": "America/Chicago",
+    "startDate": "2026-07-01",
+    "endDate": "2026-08-01",
+    "days": ["Friday", "Saturday", "Sunday"],
+    "hours": ["18:00", "22:00"]
+  },
+  "assets": {
+    "logoUrl": "",
+    "bannerUrl": "",
+    "slideUrl": ""
+  },
+  "display": {
+    "tier": "hub-demo",
+    "accentColor": "#5fffd8",
+    "showPortal": true,
+    "showSchedule": true
+  },
+  "admin": {
+    "approvedBy": "SVR Admin",
+    "approvedAt": "2026-06-13T23:59:00Z",
+    "notes": "Static example. Future admin dashboard will write this profile automatically."
+  }
+}
