@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-162-ALL-HUB-LUXURY-STOREFRONTS-HUD-LOCK",
-  "track": "all-hub-luxury-storefronts-premium-hud",
+  "build": "UPDATE-3.0-PHASE-163-REALISTIC-LOBBY-STOREFRONT-ALIGNMENT-LOCK",
+  "track": "realistic-lobby-storefront-alignment",
   "siteTouched": true,
-  "phase": "162",
-  "summary": "All-hub storefront correction pass. Wellness and the other lobby hubs are rebuilt as consistent luxury black-glass geometry storefronts with premium holographic HUD slates, emerald/gold neon edges, tactile Z-compression button logic, and no floor clutter.",
-  "label": "UPDATE-3.0-PHASE-162-ALL-HUB-LUXURY-STOREFRONTS-HUD-LOCK",
-  "notes": "Preserves Phase 161 Wellness Hub direction, Phase 160 orbital planets and starfield, Phase 159 VIBEZ storefront, Phase 158 Reiki debrand, Phase 157 sponsor registry, Quest hands, teleport, watch, and poker baseline.",
-  "updated": "2026-06-13T21:00:00Z"
+  "phase": "163",
+  "summary": "Realistic lobby storefront alignment pass. The hub storefronts are rebuilt into a compact aligned ring with realistic facades, glass display windows, double-door structure, canopy/signage, professional HUD buttons, and cleaner sightlines.",
+  "label": "UPDATE-3.0-PHASE-163-REALISTIC-LOBBY-STOREFRONT-ALIGNMENT-LOCK",
+  "notes": "Preserves Phase 162 HUD direction, Phase 160 orbital planets/starfield, VIBEZ identity, sponsor registry lock, Quest hands, teleport, watch, and poker baseline.",
+  "updated": "2026-06-13T21:15:00Z"
 }
