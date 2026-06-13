@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 130",
-  "build": "UPDATE-3.0-PHASE-130-REIKI-ONE-DISPLAY-NO-FLOOR-TABS-LOCK",
+  "version": "Update 3.0 Phase 131",
+  "build": "UPDATE-3.0-PHASE-131-NATHAN-WALKING-NPC-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Reiki one-display cleanup, no floor tabs, plant clutter hidden, three founder/info columns added."
+  "notes": "Nathan walking NPC patrol wired with fallback. Commit FBX asset to game/assets/npc/nathan/rp_nathan_animated_003_walking_u3d.fbx for the uploaded animated model."
 }
