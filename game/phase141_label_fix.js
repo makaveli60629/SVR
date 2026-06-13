@@ -1,8 +1,8 @@
-const LABEL = "UPDATE-3.0-PHASE-151-RUNTIME-LABEL-CONSISTENCY-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-152-POST-BOOT-VERIFY-NO-OVERLAY-LOCK";
 function syncLabels(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE106.source = "Phase 151 runtime label consistency lock. Phase 150 visual hard refine preserved.";
+  window.SVR_PHASE106.source = "Phase 152 post boot verification. Phase 150 visual hard refine and Phase 151 runtime label consistency preserved.";
   document.title = `ScarlettVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach((el)=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
