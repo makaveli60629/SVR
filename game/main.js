@@ -16,15 +16,16 @@ import { createAndroidSmartControls } from "./modules/android_smart_controls.js"
 import { installLobbyCommandCenterPhase167 } from "./modules/lobby_command_center_phase167.js";
 import { installPhase168SolidOctagonLobby } from "./modules/lobby_octagon_phase168.js";
 import { installPhase171LobbyCleanupSky } from "./modules/lobby_cleanup_sky_phase171.js";
+import { installPhase172SponsorModule } from "./modules/sponsor_loader_phase172.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-171-CLEAN-INNER-OCTAGON-MOON-MARS-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-172A-SPONSOR-MODULE-ARCHITECTURE-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 const ANDROID_SMART = /Android/i.test(navigator.userAgent || "") && !params.has("desktop") && !AUTOCAM;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 171: remove background buildings, keep everything inside expanded octagon, remove/hide Earth, add big textured Moon and textured Mars; Phase 169 locomotion/deal order preserved." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 172A: no-code sponsor packet architecture, approved sponsor JSON loader, game-side sponsor pod display; Phase 171 clean lobby preserved." };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -55,6 +56,9 @@ if (ANDROID_SMART) document.body.classList.add("android-smart-client");
 const { scene, camera, renderer } = createCore({ containerId: "app" });
 const perf = createPhase148QuestPerfPass({ renderer, scene, log });
 scene.userData._camera = camera;
+window.__SVR_SCENE__ = scene;
+window.__SVR_RENDERER__ = renderer;
+window.__SVR_CAMERA__ = camera;
 camera.position.set(0, 1.6, 4.8);
 camera.lookAt(0, 1.15, 0);
 
@@ -140,6 +144,7 @@ const phase123AdBanners = addPhase123AdBannerBuildings({ scene, radius: CONFIG.R
 scene.userData._phase123AdBanners = phase123AdBanners;
 const phase168SolidOctagon = installPhase168SolidOctagonLobby({ scene, log, enabled: true });
 const phase171CleanupSky = installPhase171LobbyCleanupSky({ scene, log, enabled: true });
+const phase172SponsorModule = await installPhase172SponsorModule({ scene, log, enabled: !params.has("noSponsors") });
 perf.lockSceneForQuest();
 
 window.__SVR_GAME_READY__ = true;
@@ -148,9 +153,10 @@ window.__SVR_PHASE166_FREEZE_LOCK__ = true;
 window.__SVR_PHASE167_COMMAND_CENTER_LOCK__ = true;
 window.__SVR_PHASE168_SOLID_OCTAGON_LOCK__ = true;
 window.__SVR_PHASE171_CLEAN_INNER_OCTAGON_LOCK__ = true;
+window.__SVR_PHASE172_SPONSOR_MODULE_LOCK__ = !!phase172SponsorModule;
 const __svrBootFallback = document.getElementById('bootFallback');
 if (__svrBootFallback){ __svrBootFallback.style.opacity='0'; __svrBootFallback.style.pointerEvents='none'; setTimeout(()=>{__svrBootFallback.style.display='none';},420); }
-setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks + clean octagon locked` : `Ready. ${BUILD_LABEL}`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks + sponsor module locked` : `Ready. ${BUILD_LABEL}`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android smart controls locked" : "Hands: waiting…");
 function setHudVisible(visible){ const hud = document.getElementById("hud"); if (hud) hud.style.display = (visible && !AUTOCAM) ? "flex" : "none"; if ($log) $log.style.display = "none"; if ($err) $err.style.display = "none"; }
 if (AUTOCAM) setHudVisible(false);
@@ -184,6 +190,7 @@ renderer.setAnimationLoop(()=>{
   if (optionalTick && phase167CommandCenter?.userData?.tick) phase167CommandCenter.userData.tick(scene.userData._time || (now * 0.001));
   if (optionalTick && phase168SolidOctagon?.userData?.tick) phase168SolidOctagon.userData.tick(scene.userData._time || (now * 0.001));
   if (optionalTick && phase171CleanupSky?.userData?.tick) phase171CleanupSky.userData.tick(scene.userData._time || (now * 0.001));
+  if (optionalTick && phase172SponsorModule?.userData?.tick) phase172SponsorModule.userData.tick(scene.userData._time || (now * 0.001));
   hands.update(dt);
   if (optionalTick) hands.updateDebug();
   const leftHand = hands.getLeftHand(); const rightHand = hands.getRightHand(); const leftController = hands.getLeftController(); const rightController = hands.getRightController();
