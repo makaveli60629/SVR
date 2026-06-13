@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-135-EXPANDED-LOBBY-WALL-ALIGNMENT-LOCK",
+  "build": "UPDATE-3.0-PHASE-136-REIKI-FLIP-EARTH-ORBIT-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "135",
-  "summary": "Expands the lobby radius from 24 to 32, pushes wall systems outward, hides old Reiki overlay clutter, fixes founder info to the left wall, fixes the founder picture panel to the right wall, and keeps the portrait hologram/video display as one clean forward screen.",
-  "label": "UPDATE-3.0-PHASE-135-EXPANDED-LOBBY-WALL-ALIGNMENT-LOCK",
-  "notes": "Game-only update. Website/site untouched. The founder photo still loads from game/assets/ui/shyona_royston.png.",
-  "updated": "2026-06-13T06:05:00Z"
+  "phase": "136",
+  "summary": "Flips the Reiki storefront so the user sees the front instead of the back, beautifies the wall-aligned Reiki presentation, keeps the founder info left and founder picture right, preserves one interactive portrait hologram screen, and adds an Earth orbit system where Earth orbits the lobby while Moon and Mars follow Earth and rotate.",
+  "label": "UPDATE-3.0-PHASE-136-REIKI-FLIP-EARTH-ORBIT-LOCK",
+  "notes": "Game-only update. Website/site untouched. Founder photo still loads from game/assets/ui/shyona_royston.png.",
+  "updated": "2026-06-13T06:25:00Z"
 }
