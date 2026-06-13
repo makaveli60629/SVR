@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-156-REIKI-SPONSOR-PLACEHOLDER-LOCK",
-  "track": "reiki-sponsor-placeholder-lock",
+  "build": "UPDATE-3.0-PHASE-157-MODULAR-HUB-SPONSORSHIP-REGISTRY-LOCK",
+  "track": "modular-hub-sponsorship-registry",
   "siteTouched": true,
-  "phase": "156",
-  "summary": "Reiki sponsor cleanup pass. Prior named sponsor branding is removed from active Reiki site pages and active game modules, replaced with generic placeholder content, and locked behind written approval before any sponsor details return.",
-  "label": "UPDATE-3.0-PHASE-156-REIKI-SPONSOR-PLACEHOLDER-LOCK",
-  "notes": "Preserves Phase 155 skyline ad ring and moving moon glow, Phase 154 high small textured planets, Reiki hologram pod button outside video, Quest hands, teleport, watch, and poker room baseline.",
-  "updated": "2026-06-13T19:30:00Z"
+  "phase": "157",
+  "summary": "Sponsor system correction pass. Reiki sponsor video media is removed, active Reiki surfaces remain generic placeholders, and a modular sponsorship registry is added for all hubs except Vibes Theater so sponsors can be added or removed without hard-coded rebuilds.",
+  "label": "UPDATE-3.0-PHASE-157-MODULAR-HUB-SPONSORSHIP-REGISTRY-LOCK",
+  "notes": "Preserves Reiki store placeholder, Phase 155 skyline ad ring and moving moon glow, Phase 154 high small textured planets, Quest hands, teleport, watch, and poker room baseline.",
+  "updated": "2026-06-13T19:45:00Z"
 }
