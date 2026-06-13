@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 141",
-  "build": "UPDATE-3.0-PHASE-141-VISIBLE-PLANETS-PROFESSIONAL-STOREFRONT-LOCK",
+  "version": "Update 3.0 Phase 142",
+  "build": "UPDATE-3.0-PHASE-142-FULL-LOBBY-REMODEL-VISIBLE-PLANETS-LOCK",
   "created": "2026-06-13",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Visible lower/larger Earth-Moon-Mars orbit, more professional Reiki storefront facade, premium marquee, gold stanchions, sagging red velvet ropes, plants, polished pod, and Vibes Theater polish."
+  "notes": "Full lobby remodel patch with big visible north-sky planets and professional Trueitive Reiki glass storefront overlay."
 }
