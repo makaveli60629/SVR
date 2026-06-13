@@ -3,7 +3,8 @@ import { applyPhase142QuickLobbyRemodel } from "./phase142_quick_lobby_remodel.j
 
 function makeTexture(w, h, draw){
   const c = document.createElement("canvas");
-  c.width = w; c.height = h;
+  c.width = w;
+  c.height = h;
   const ctx = c.getContext("2d");
   draw(ctx, w, h);
   const t = new THREE.CanvasTexture(c);
@@ -104,7 +105,7 @@ function addPermanentBackdrop(scene){
   if(scene.userData._phase143BackdropBuildings) return;
   const ads = [
     adTexture("SVR POKER","sponsor tower"),
-    adTexture("TRUEITIVE","reiki wellness preview","#b58cff"),
+    adTexture("REIKI HUB","sponsor placeholder","#b58cff"),
     adTexture("ESPRESSO","with cream ad slot","#ffd37b"),
     adTexture("VIBES","VR theater","#65b7ff"),
     adTexture("PGA HUB","golf training","#7dffb2")
