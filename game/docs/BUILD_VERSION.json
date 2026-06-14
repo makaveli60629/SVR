@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-191-DUPLICATE-FLOOR-AUTHORITY-LOCK",
+  "build": "UPDATE-3.0-PHASE-192-LOBBY-VISUAL-CLEANUP-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "191",
-  "summary": "Fixes launch blocker #95 by enforcing one authoritative visual floor, hiding duplicate lower/upper floor and old second-floor systems, keeping collision/teleport authority mathematical at Y=0, and preserving Phase 190 Quest controller teleport forward behavior.",
-  "label": "UPDATE-3.0-PHASE-191-DUPLICATE-FLOOR-AUTHORITY-LOCK",
-  "notes": "Game-only update. Site untouched. Phase 190 controller forward teleport lock preserved.",
-  "updated": "2026-06-14T01:25:00Z"
+  "phase": "192",
+  "summary": "Cleans the current lobby view by hiding oversized vertical slabs, balcony/canopy clutter, duplicate upper floor remnants, old arena pieces, and compacting desktop overlay controls while adding clean modular wall/kiosk panels for Play, Wellness, PGA, Store, and Scorpion.",
+  "label": "UPDATE-3.0-PHASE-192-LOBBY-VISUAL-CLEANUP-LOCK",
+  "notes": "Game-only update. Site untouched. Preserves Phase 190 controller forward teleport and Phase 191 floor authority.",
+  "updated": "2026-06-14T01:40:00Z"
 }
