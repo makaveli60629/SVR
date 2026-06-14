@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-175-LOBBY-POLISH-AUDIT-LOCK",
-  "track": "lobby-polish-audit",
+  "build": "UPDATE-3.0-PHASE-186-DEPLOY-SYNC-CLEANUP-LOCK",
+  "track": "official-lobby-look-deploy-sync",
   "siteTouched": false,
-  "phase": "175",
-  "summary": "Corrected stale cache busting, added a stronger lobby polish remover, and locked the visible lobby to one octagon wall with background buildings removed.",
-  "label": "UPDATE-3.0-PHASE-175-LOBBY-POLISH-AUDIT-LOCK",
-  "notes": "Preserves locomotion, sponsor schedule loader, watch, Quest controls, Android controls, desktop preview, Moon/Mars, and storefront panels.",
-  "updated": "2026-06-14T02:10:00Z"
+  "phase": "186",
+  "summary": "Forces the latest official Roman luxury lobby look to load, updates stale cache labels, keeps table selector and bounds active, and hides old background building/skyline objects.",
+  "label": "UPDATE-3.0-PHASE-186-DEPLOY-SYNC-CLEANUP-LOCK",
+  "notes": "Official look is Phase 185. Phase 186 corrects deployment visibility, cache busting, and background-building cleanup while preserving locomotion, Quest controls, Android controls, watch, table selector, store hubs, and lobby bounds.",
+  "updated": "2026-06-14T03:25:00Z"
 }
