@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.1-G",
-  "build": "UPDATE-3.1-G-HANDS-FIST-TELEPORT-ARC-REALIGN-LOCK",
+  "version": "Update 3.1-H",
+  "build": "UPDATE-3.1-H-CACHE-BUSTED-HANDS-FIST-RUNTIME-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Hands-first fist teleport lock. Removes the created controller visual, keeps Oculus hands, uses fist-only aim/release-to-leap, replaces square teleport visuals with round cyan/purple particle arcs, adds fist aura feedback, strengthens face-square overlay cleanup, and keeps the runtime title on 3.1-G."
+  "notes": "Cache-busted runtime fix for no-visible-change issue. main.js now imports new wrapper modules for hands and movement so Quest/browser module cache must fetch the updated Oculus-hands-only fist teleport runtime. phase176 also uses a cache-busted 3.1-H sync module."
 }
