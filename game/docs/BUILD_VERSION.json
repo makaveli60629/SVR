@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-209-QUEST-LOCOMOTION-TELEPORT-STAIR-SKY-LOCK",
+  "build": "UPDATE-3.0-PHASE-216-SCIFI-CITY-SECOND-FLOOR-BACKGROUND-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "209",
-  "summary": "Quest recovery and control fix: removes screen-attached black square overlays, changes right-stick movement to headset-forward only with no strafe drift, makes A/grip/trigger hold-release teleport work, doubles the Moon size with procedural crater texture, enlarges Mars with texture, raises both higher in the sky with rotation/orbit motion, and adds stair/upstairs floor height support.",
-  "label": "UPDATE-3.0-PHASE-209-QUEST-LOCOMOTION-TELEPORT-STAIR-SKY-LOCK",
-  "notes": "Game-only update. Site untouched. Stability remains prioritized; Phase 208 performance validation stays active.",
-  "updated": "2026-06-14T06:55:00Z"
+  "phase": "216",
+  "summary": "Adds the uploaded sci-fi city material as an elevated north/side skyline background behind the upstairs lobby so it is visible from the second floor, while preserving the Phase 215 upright stance, clean sky, Moon/Mars, and no-face-overlay protections.",
+  "label": "UPDATE-3.0-PHASE-216-SCIFI-CITY-SECOND-FLOOR-BACKGROUND-LOCK",
+  "notes": "Game-only update. Site untouched. Uses a compressed embedded skyline texture derived from the uploaded scifi city.zip. The uploaded RAR moon package could be listed but could not be extracted in this runtime, so Phase 215 Moon/Mars remain active.",
+  "updated": "2026-06-14T07:15:00Z"
 }
