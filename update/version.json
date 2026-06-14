@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.1-A",
-  "build": "UPDATE-3.1-A-VERSION-SYNC-LOCK",
+  "version": "Update 3.1-B",
+  "build": "UPDATE-3.1-B-LOBBY-STRUCTURE-COMPLETION-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Update 3.1-A build marker. Site untouched. Runtime marker is attached through phase176_boot.js. Diagnostics use the same build label."
+  "notes": "Lobby structure completion layer: floor Moon dome kill, sky Moon eye candy, solid upstairs floors, red carpets, Roman patio columns, city windows, and sealed spawn arrival wall. Diagnostics remain active."
 }
