@@ -9,7 +9,7 @@ import { createWristWatch } from "./modules/watch.js";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-195-CLEAN-GEOMETRY-LOBBY-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-199-GRAND-ATRIUM-STRUCTURE-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
@@ -19,7 +19,7 @@ const ANDROID_SMART = /Android/i.test(navigator.userAgent || "") && !params.has(
 window.SVR_DISABLE_LEGACY_SKYLINE = true;
 window.SVR_REFINED_LOBBY_GEOMETRY = true;
 window.SVR_BACKGROUND_BUILDINGS_REMOVED = true;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 195: clean geometry world bypasses legacy skyline/world builder completely." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 199: grand two-floor atrium structure with module bays; legacy skyline/world builder remains bypassed." };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -53,14 +53,14 @@ scene.userData._camera = camera;
 window.__SVR_SCENE__ = scene;
 window.__SVR_RENDERER__ = renderer;
 window.__SVR_CAMERA__ = camera;
-camera.position.set(0, 1.6, 4.8);
-camera.lookAt(0, 1.15, 0);
+camera.position.set(0, 1.6, 7.0);
+camera.lookAt(0, 1.35, -1.0);
 
 window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e)); });
 window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
 const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading clean geometry lobby…", { force: true });
+setStatus("Loading grand atrium structure…", { force: true });
 const world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 const hands = createHands({ scene, renderer, log });
@@ -92,13 +92,13 @@ function joinTable(){
   if (renderer.xr.isPresenting) tp.setPlayerPose(seat.x, -0.42, seat.z); else moveDesktopToSeat(seat);
   setMode(`Seat: ${seat.label}`); return true;
 }
-function leaveTable(){ seated = false; seatIndex = -1; if (renderer.xr.isPresenting) tp.setPlayerPose(0, 0, 4.8); else { camera.position.set(0, 1.6, 4.8); camera.lookAt(0, 1.15, 0); } return true; }
+function leaveTable(){ seated = false; seatIndex = -1; if (renderer.xr.isPresenting) tp.setPlayerPose(0, 0, 7.0); else { camera.position.set(0, 1.6, 7.0); camera.lookAt(0, 1.35, -1.0); } return true; }
 function movePlayerToSpot(target, lookTarget = null){ if (!target) return; if (renderer.xr.isPresenting) tp.setPlayerPose(target.x, 0, target.z); else { camera.position.set(target.x, 1.6, target.z); if (lookTarget) camera.lookAt(lookTarget.x, 1.45, lookTarget.z); } }
 function gotoScene(key){ const rec = sceneTargets?.[key]; if (!rec?.pos) return false; movePlayerToSpot(rec.pos, rec.look || null); setStatus(`Quick jump: ${key}`, { force: true }); return true; }
 function openStorePortal(){ const url = "https://svrpoker.com/site/store.html"; window.open(url, "_blank", "noopener,noreferrer"); setStatus("SVR Store portal opened.", { force: true }); return true; }
 function createStoreWebPortal(){
   const rec = sceneTargets?.store; if (!rec?.pos) return null;
-  const group = new THREE.Group(); group.name = "PHASE195_SVR_STORE_WEB_PORTAL"; group.position.set(rec.pos.x + 0.45, 1.55, rec.pos.z - 0.35); if (rec.look) group.lookAt(rec.look.x, 1.45, rec.look.z);
+  const group = new THREE.Group(); group.name = "PHASE199_SVR_STORE_WEB_PORTAL"; group.position.set(rec.pos.x + 0.45, 1.55, rec.pos.z - 0.35); if (rec.look) group.lookAt(rec.look.x, 1.45, rec.look.z);
   const pane = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 1.02), new THREE.MeshBasicMaterial({ color:0x5ef7ff, transparent:true, opacity:0.18, side:THREE.DoubleSide, blending:THREE.AdditiveBlending })); pane.userData.href = "https://svrpoker.com/site/store.html"; group.add(pane);
   const canvas = document.createElement("canvas"); canvas.width = 900; canvas.height = 500; const ctx = canvas.getContext("2d");
   ctx.fillStyle = "#050713"; ctx.fillRect(0,0,900,500); ctx.strokeStyle = "#7ffcff"; ctx.lineWidth = 12; ctx.strokeRect(24,24,852,452); ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillStyle="#fff"; ctx.font="900 58px system-ui,Arial"; ctx.fillText("SVR STORE",450,150); ctx.fillStyle="#ffdf8a"; ctx.font="800 34px system-ui,Arial"; ctx.fillText("Click to open web store",450,265); ctx.fillStyle="#bffcff"; ctx.font="700 24px system-ui,Arial"; ctx.fillText("Store opens outside the game",450,350);
@@ -126,7 +126,7 @@ $toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $
 setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-window.SVR_PHASE195_LEGACY_WORLD_BYPASSED = true;
+window.SVR_PHASE199_GRAND_ATRIUM_MAIN = true;
 perf.lockSceneForQuest();
 
 window.__SVR_GAME_READY__ = true;
@@ -138,15 +138,15 @@ setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android smart controls loc
 function setHudVisible(visible){ const hud = document.getElementById("hud"); if (hud) hud.style.display = (visible && !AUTOCAM) ? "flex" : "none"; if ($log) $log.style.display = "none"; if ($err) $err.style.display = "none"; }
 if (AUTOCAM) setHudVisible(false);
 if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display","none");
-renderer.xr.addEventListener("sessionstart", async ()=>{ perf.onXRSessionStart(); setHudVisible(false); document.getElementById("sceneNav")?.style.setProperty("display","none"); await tp.onSessionStart(); });
-renderer.xr.addEventListener("sessionend", ()=>{ setHudVisible(true); const nav = document.getElementById("sceneNav"); if (nav && !AUTOCAM) nav.style.display = "flex"; });
+renderer.xr.addEventListener("sessionstart", async ()=>{ perf.onXRSessionStart(); setHudVisible(false); document.body.classList.add("xr-active"); document.getElementById("sceneNav")?.style.setProperty("display","none"); await tp.onSessionStart(); });
+renderer.xr.addEventListener("sessionend", ()=>{ document.body.classList.remove("xr-active"); setHudVisible(true); const nav = document.getElementById("sceneNav"); if (nav && !AUTOCAM) nav.style.display = "flex"; });
 
 let tPrev = performance.now();
-const previewTarget = new THREE.Vector3(0, 1.25, 0);
+const previewTarget = new THREE.Vector3(0, 1.45, -1.0);
 const previewPos = new THREE.Vector3();
 const previewShots = [
-  { y: 1.62, r: previewOrbitRadius - 2.0, speed: 0.022, sway: 0.010, lookY: 1.15, targetX: 0.0, targetZ: 0.0, leadX: 0.10, leadZ: 0.08 },
-  { y: 1.70, r: previewOrbitRadius - 1.4, speed: -0.018, sway: 0.012, lookY: 1.18, targetX: 0.0, targetZ: -0.1, leadX: -0.08, leadZ: 0.10 }
+  { y: 1.72, r: previewOrbitRadius - 2.6, speed: 0.018, sway: 0.010, lookY: 1.25, targetX: 0.0, targetZ: -1.2, leadX: 0.10, leadZ: 0.08 },
+  { y: 1.82, r: previewOrbitRadius - 2.0, speed: -0.014, sway: 0.012, lookY: 1.32, targetX: 0.0, targetZ: -2.1, leadX: -0.08, leadZ: 0.10 }
 ];
 renderer.setAnimationLoop(()=>{
   const now = performance.now();
