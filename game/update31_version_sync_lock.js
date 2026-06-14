@@ -1,4 +1,4 @@
-const LABEL = "UPDATE-3.1-C-MOON-PHASE-HARD-LOCK";
+const LABEL = "UPDATE-3.1-D-QUEST-ALIGNMENT-CONTROL-OVERLAY-FIX";
 
 function stamp(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
@@ -9,9 +9,10 @@ function stamp(){
   window.SVR_UPDATE31 = Object.assign(window.SVR_UPDATE31 || {}, {
     build: LABEL,
     active: true,
-    phase: "3.1-C",
+    phase: "3.1-D",
     versionSync: true,
-    moonPhaseHardLock: true,
+    questAlignmentFix: true,
+    diagnosticPanelsOff: true,
     oneMoonOnly: true,
     deployPath: "direct-game-folder",
     checkedAt: new Date().toISOString()
@@ -22,16 +23,9 @@ function stamp(){
   });
 }
 
-function showBadge(){
-  let badge = document.getElementById("svrUpdate31Badge");
-  if(!badge){
-    badge = document.createElement("div");
-    badge.id = "svrUpdate31Badge";
-    badge.style.cssText = "position:fixed;right:10px;bottom:10px;z-index:2147483646;background:rgba(8,5,18,.82);color:#eaf8ff;border:1px solid rgba(255,217,138,.82);border-radius:10px;padding:8px 10px;font:11px ui-monospace,Consolas,monospace;pointer-events:none;max-width:390px";
-    document.body.appendChild(badge);
-  }
-  const diag = window.SVR_DIAG_LOG || [];
-  badge.innerHTML = `<b style="color:#ffd98a">UPDATE 3.1-C</b><br>${LABEL}<br><span style="color:#7ffcff">one Moon + phase hard lock</span><br>diag entries: ${diag.length}`;
+function removePanels(){
+  document.getElementById("svrUpdate31Badge")?.remove();
+  document.getElementById("svrDiagPanel")?.remove();
 }
 
 function loadModules(){
@@ -41,20 +35,15 @@ function loadModules(){
   }
   if(!window.SVR_UPDATE31_C_MODULE_REQUESTED){
     window.SVR_UPDATE31_C_MODULE_REQUESTED = true;
-    import("./update31_moon_phase_hard_lock.js").catch(err=>console.error("Update 3.1-C module load failed", err));
+    import("./update31_moon_phase_hard_lock.js").catch(err=>console.error("Update 3.1-D moon module load failed", err));
   }
 }
 
 function install(){
   stamp();
-  showBadge();
+  removePanels();
   loadModules();
-  if(!window.SVR_UPDATE31_C_LOGGED){
-    window.SVR_UPDATE31_C_LOGGED = true;
-    console.warn(`[SVR] ${LABEL}: one Moon and phase hard lock active`);
-  }
 }
 
 install();
-setInterval(install, 700);
 [250,800,1800,3500,7000].forEach(ms=>setTimeout(install,ms));
