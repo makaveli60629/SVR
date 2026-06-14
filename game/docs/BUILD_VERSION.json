@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-K-PHASE-231-VISIBLE-LOBBY-LUXURY-POLISH-LOCK",
+  "build": "UPDATE-3.1-L-PHASE-232-STABLE-LITE-POLISH-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-K / Phase 231",
-  "summary": "Adds visible luxury lobby polish over the stable Phase 230 runtime: polished marble floor overlay, brighter red carpet, gold table ring, balcony rails, cyan light strips, arch/column overlays, jumbotron panels, portal signage, and an active Phase 231 label.",
-  "label": "UPDATE-3.1-K-PHASE-231-VISIBLE-LOBBY-LUXURY-POLISH-LOCK",
-  "notes": "Game-only update. Site untouched. Phase 229 compatibility loader now chains Phase 230 moon safety and Phase 231 visual lobby polish.",
-  "updated": "2026-06-14T17:35:00-05:00"
+  "phase": "3.1-L / Phase 232",
+  "summary": "Stable lite polish pass. Phase 229 chains Phase 230 moon safety and Phase 232 lightweight floor, carpet, ring, and trim polish.",
+  "label": "UPDATE-3.1-L-PHASE-232-STABLE-LITE-POLISH-LOCK",
+  "notes": "Game-only update. Site untouched. Uses a lightweight visual layer for safer Quest testing.",
+  "updated": "2026-06-14T17:45:00-05:00"
 }
