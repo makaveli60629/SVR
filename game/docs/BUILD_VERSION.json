@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-220-UPSTAIRS-DESTINATION-FLOW-DEMO-CAPTURE-LOCK",
+  "build": "UPDATE-3.0-PHASE-221-MOON-TEXTURE-BUMP-POLISH-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "220",
-  "summary": "Adds an intentional upstairs destination flow: stair-to-overlook path lights, City View markers, a safe return-to-lobby pad, Webex/demo capture spots, and subtle city reveal shimmer while preserving the Phase 219 OBJ-derived skyline layer.",
-  "label": "UPDATE-3.0-PHASE-220-UPSTAIRS-DESTINATION-FLOW-DEMO-CAPTURE-LOCK",
-  "notes": "Game-only update. Site untouched. Preserves Phase 219 OBJ city silhouette, Phase 218 overlook polish, Phase 216 uploaded city background, Phase 215 Moon/Mars, upright stance, teleport, and no-face-overlay protections.",
-  "updated": "2026-06-14T08:25:00Z"
+  "phase": "221",
+  "summary": "Adds a stronger cratered Moon material and bump-style relief polish based on the uploaded Moon diffuse/bump references while preserving the current Moon orbit, Mars orbit, second-floor city layers, and lobby baseline.",
+  "label": "UPDATE-3.0-PHASE-221-MOON-TEXTURE-BUMP-POLISH-LOCK",
+  "notes": "Game-only update. Site untouched. The uploaded Moon texture references were used as the visual target for the runtime crater diffuse/bump material. The uploaded FBX is not activated in this pass to avoid adding loader/runtime risk; the existing orbiting Moon mesh is preserved and re-skinned.",
+  "updated": "2026-06-14T08:45:00Z"
 }
