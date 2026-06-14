@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-193-SKYLINE-POPIN-GEOMETRY-REFINE-LOCK",
+  "build": "UPDATE-3.0-PHASE-194-CLEAN-ROOM-SINGLE-LABEL-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "193",
-  "summary": "Stops legacy background buildings/skyline from flashing during load by installing a preload scene filter before main world boot, then refines the lobby into a cleaner modular rectangular room with wall-aligned storefront panels, columns, trims, and lightweight ceiling guide rings.",
-  "label": "UPDATE-3.0-PHASE-193-SKYLINE-POPIN-GEOMETRY-REFINE-LOCK",
-  "notes": "Game-only update. Site untouched. Preserves Phase 190 controller forward teleport, Phase 191 floor authority, and Phase 192 HUD cleanup.",
-  "updated": "2026-06-14T02:00:00Z"
+  "phase": "194",
+  "summary": "Disables legacy background building, ad-building, octagon, old skyline cleanup, and sponsor architecture modules directly in main boot so the lobby no longer flashes old geometry during loading. The Phase 187 stabilizer is now passive and no longer overwrites the visible build label.",
+  "label": "UPDATE-3.0-PHASE-194-CLEAN-ROOM-SINGLE-LABEL-LOCK",
+  "notes": "Game-only update. Site untouched. Preserves Phase 190 controller forward teleport, Phase 191 floor authority, Phase 192 HUD cleanup, and Phase 193 refined room geometry.",
+  "updated": "2026-06-14T02:25:00Z"
 }
