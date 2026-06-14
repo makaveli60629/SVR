@@ -5,27 +5,25 @@ import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
 import { buildSkylineRoom } from "./modules/world_skyline.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
-import { CONFIG } from "./modules/config.js";
 import { createWristWatch } from "./modules/watch.js";
 import { applyPhase119ReikiTrueitiveStorefrontFinal } from "./modules/reiki_phase119_trueitive_storefront_final.js";
 import { addNathanWalkingNPCPhase131 } from "./modules/npc_nathan_walker_phase131.js";
 import "./modules/asset_registry_phase122.js";
-import { addPhase123AdBannerBuildings } from "./modules/ad_banner_buildings_phase123.js";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 import { installLobbyCommandCenterPhase167 } from "./modules/lobby_command_center_phase167.js";
-import { installPhase168SolidOctagonLobby } from "./modules/lobby_octagon_phase168.js";
-import { installPhase171LobbyCleanupSky } from "./modules/lobby_cleanup_sky_phase171.js";
-import { installPhase172SponsorModule } from "./modules/sponsor_loader_phase172.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-172A-SPONSOR-MODULE-ARCHITECTURE-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-194-BACKGROUND-BUILDINGS-REMOVED-SINGLE-PHASE-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const EMBED = IN_IFRAME || params.has("embed");
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
 const ANDROID_SMART = /Android/i.test(navigator.userAgent || "") && !params.has("desktop") && !AUTOCAM;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 172A: no-code sponsor packet architecture, approved sponsor JSON loader, game-side sponsor pod display; Phase 171 clean lobby preserved." };
+window.SVR_DISABLE_LEGACY_SKYLINE = true;
+window.SVR_REFINED_LOBBY_GEOMETRY = true;
+window.SVR_BACKGROUND_BUILDINGS_REMOVED = true;
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 194: legacy skyline/ad-building/octagon modules disabled at main boot; single visible build label locked." };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -66,7 +64,7 @@ window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $
 window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
 const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading world…", { force: true });
+setStatus("Loading Phase 194 clean lobby…", { force: true });
 const world = await buildSkylineRoom(scene, { log, renderer });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 const hands = createHands({ scene, renderer, log });
@@ -140,23 +138,24 @@ $toggleJoints.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $t
 setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-const phase123AdBanners = addPhase123AdBannerBuildings({ scene, radius: CONFIG.ROOM_RADIUS, wallHeight: CONFIG.WALL_HEIGHT * 0.56, logoTexture, log });
-scene.userData._phase123AdBanners = phase123AdBanners;
-const phase168SolidOctagon = installPhase168SolidOctagonLobby({ scene, log, enabled: true });
-const phase171CleanupSky = installPhase171LobbyCleanupSky({ scene, log, enabled: true });
-const phase172SponsorModule = await installPhase172SponsorModule({ scene, log, enabled: !params.has("noSponsors") });
+const phase123AdBanners = null;
+const phase168SolidOctagon = null;
+const phase171CleanupSky = null;
+const phase172SponsorModule = null;
+scene.userData._phase123AdBanners = null;
+window.SVR_PHASE194_LEGACY_MODULES_DISABLED = true;
 perf.lockSceneForQuest();
 
 window.__SVR_GAME_READY__ = true;
 window.__SVR_ANDROID_SMART_LOCK__ = ANDROID_SMART;
 window.__SVR_PHASE166_FREEZE_LOCK__ = true;
 window.__SVR_PHASE167_COMMAND_CENTER_LOCK__ = true;
-window.__SVR_PHASE168_SOLID_OCTAGON_LOCK__ = true;
-window.__SVR_PHASE171_CLEAN_INNER_OCTAGON_LOCK__ = true;
-window.__SVR_PHASE172_SPONSOR_MODULE_LOCK__ = !!phase172SponsorModule;
+window.__SVR_PHASE168_SOLID_OCTAGON_LOCK__ = false;
+window.__SVR_PHASE171_CLEAN_INNER_OCTAGON_LOCK__ = false;
+window.__SVR_PHASE172_SPONSOR_MODULE_LOCK__ = false;
 const __svrBootFallback = document.getElementById('bootFallback');
 if (__svrBootFallback){ __svrBootFallback.style.opacity='0'; __svrBootFallback.style.pointerEvents='none'; setTimeout(()=>{__svrBootFallback.style.display='none';},420); }
-setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks + sponsor module locked` : `Ready. ${BUILD_LABEL}`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks locked` : `Ready. ${BUILD_LABEL}`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android smart controls locked" : "Hands: waiting…");
 function setHudVisible(visible){ const hud = document.getElementById("hud"); if (hud) hud.style.display = (visible && !AUTOCAM) ? "flex" : "none"; if ($log) $log.style.display = "none"; if ($err) $err.style.display = "none"; }
 if (AUTOCAM) setHudVisible(false);
@@ -186,11 +185,7 @@ renderer.setAnimationLoop(()=>{
     scene.userData._camera = camera;
   } else scene.userData._camera = renderer.xr.getCamera(camera);
   if (scene.userData._tickWorld) scene.userData._tickWorld(dt);
-  if (optionalTick && scene.userData._phase123AdBanners?.visible && scene.userData._phase123AdBanners?.userData?.tick) scene.userData._phase123AdBanners.userData.tick(scene.userData._time || (now * 0.001));
   if (optionalTick && phase167CommandCenter?.userData?.tick) phase167CommandCenter.userData.tick(scene.userData._time || (now * 0.001));
-  if (optionalTick && phase168SolidOctagon?.userData?.tick) phase168SolidOctagon.userData.tick(scene.userData._time || (now * 0.001));
-  if (optionalTick && phase171CleanupSky?.userData?.tick) phase171CleanupSky.userData.tick(scene.userData._time || (now * 0.001));
-  if (optionalTick && phase172SponsorModule?.userData?.tick) phase172SponsorModule.userData.tick(scene.userData._time || (now * 0.001));
   hands.update(dt);
   if (optionalTick) hands.updateDebug();
   const leftHand = hands.getLeftHand(); const rightHand = hands.getRightHand(); const leftController = hands.getLeftController(); const rightController = hands.getRightController();
