@@ -24,67 +24,7 @@ function makeControllerProxy(controller, handed = "right"){
   return proxy;
 }
 
-function makeControllerVisual(handed = "right"){
-  const root = new THREE.Group();
-  root.name = handed === "right" ? "PHASE226_RIGHT_QUEST_CONTROLLER_VISIBLE_MODEL" : "PHASE226_LEFT_QUEST_CONTROLLER_VISIBLE_MODEL";
-  const shell = new THREE.Mesh(
-    new THREE.BoxGeometry(0.055, 0.145, 0.045),
-    new THREE.MeshStandardMaterial({ color:0xd8dce8, roughness:.5, metalness:.08, emissive:0x111827, emissiveIntensity:.05 })
-  );
-  shell.name = "PHASE226_CONTROLLER_BODY";
-  shell.position.set(0, -0.035, -0.018);
-  root.add(shell);
-
-  const face = new THREE.Mesh(
-    new THREE.BoxGeometry(0.074, 0.028, 0.052),
-    new THREE.MeshStandardMaterial({ color:0xf4f6fb, roughness:.42, metalness:.04 })
-  );
-  face.name = "PHASE226_CONTROLLER_FACE_PLATE";
-  face.position.set(0, 0.056, -0.026);
-  root.add(face);
-
-  const grip = new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.025, 0.105, 6, 12),
-    new THREE.MeshStandardMaterial({ color:0x1e2430, roughness:.75, metalness:.02 })
-  );
-  grip.name = "PHASE226_CONTROLLER_GRIP";
-  grip.position.set(0, -0.112, 0.000);
-  grip.rotation.x = 0.10;
-  root.add(grip);
-
-  const trigger = new THREE.Mesh(
-    new THREE.BoxGeometry(0.040, 0.033, 0.010),
-    new THREE.MeshStandardMaterial({ color:0x10151f, roughness:.66 })
-  );
-  trigger.name = "PHASE226_CONTROLLER_TRIGGER";
-  trigger.position.set(0, 0.012, -0.060);
-  root.add(trigger);
-
-  const thumb = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.013, 0.013, 0.010, 18),
-    new THREE.MeshStandardMaterial({ color:0x2b3344, roughness:.62 })
-  );
-  thumb.name = "PHASE226_CONTROLLER_THUMBSTICK";
-  thumb.rotation.x = Math.PI / 2;
-  thumb.position.set(handed === "right" ? -0.019 : 0.019, 0.074, -0.020);
-  root.add(thumb);
-
-  const glow = new THREE.Mesh(
-    new THREE.RingGeometry(0.022, 0.027, 32),
-    new THREE.MeshBasicMaterial({ color:0x7ffcff, transparent:true, opacity:.34, depthWrite:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending })
-  );
-  glow.name = "PHASE226_CONTROLLER_CYAN_STATUS_RING";
-  glow.position.set(0, 0.090, -0.021);
-  glow.rotation.x = Math.PI / 2;
-  root.add(glow);
-
-  root.visible = false;
-  root.scale.setScalar(1.0);
-  return root;
-}
-
 function attachGlove(){
-  // Phase 197: no visible glove/proxy overlay. Keep real WebXR hand mesh only.
   window.SVR_PHASE197_HAND_OVERLAY_DISABLED = true;
   return null;
 }
@@ -142,7 +82,8 @@ export function createHands({ scene, renderer, log = console.log }){
   let rightControllerProxy = null;
   let debugOn = false;
   window.SVR_PHASE197_HAND_OVERLAY_DISABLED = true;
-  window.SVR_PHASE226_RIGHT_CONTROLLER_VISIBLE = true;
+  window.SVR_PHASE227_OCULUS_HANDS_ONLY = true;
+  window.SVR_PHASE226_RIGHT_CONTROLLER_VISIBLE = false;
 
   function makeDebugGroup(parent){
     const group = new THREE.Group();
@@ -199,10 +140,7 @@ export function createHands({ scene, renderer, log = console.log }){
       attachGlove(proxy, handed);
       proxy.visible = false;
       const debug = makeDebugGroup(proxy);
-      const visual = makeControllerVisual(handed);
-      controller.add(visual);
-      controller.userData.phase226Visual = visual;
-      controllerProxies.push({ controller, proxy, debug, visual, handed });
+      controllerProxies.push({ controller, proxy, debug });
       if (handed === "left") leftControllerProxy = proxy;
       if (handed === "right") rightControllerProxy = proxy;
       log("Controller connected", i, handed);
@@ -214,7 +152,6 @@ export function createHands({ scene, renderer, log = console.log }){
         const rec = controllerProxies[idx];
         if (rec.proxy === leftControllerProxy) leftControllerProxy = null;
         if (rec.proxy === rightControllerProxy) rightControllerProxy = null;
-        rec.visual?.parent?.remove(rec.visual);
         rec.proxy.parent?.remove(rec.proxy);
         controllerProxies.splice(idx, 1);
       }
@@ -224,10 +161,12 @@ export function createHands({ scene, renderer, log = console.log }){
   function update(dt = 0.016){
     controllers.forEach(c=>{
       if (!c) return;
-      const visual = c.userData?.phase226Visual;
-      const handed = c.inputSource?.handedness || visual?.name?.includes("RIGHT") ? "right" : "left";
-      c.visible = true;
-      if (visual) visual.visible = handed === "right";
+      c.visible = false;
+      if (c.userData?.phase226Visual){
+        c.userData.phase226Visual.visible = false;
+        c.userData.phase226Visual.parent?.remove(c.userData.phase226Visual);
+        c.userData.phase226Visual = null;
+      }
     });
     rawHands.forEach(h=>{ if (h) h.visible = true; });
     handModels.forEach(m=>{ if (m) m.visible = true; });
