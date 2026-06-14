@@ -1,3 +1,4 @@
+import "./update31_version_sync_lock.js";
 import { installPhase177HandHistoryPublicFilter } from "./modules/phase177_hand_history_public_filter.js";
 import { installPhase178Bounds } from "./modules/phase178_bounds.js";
 import { autoInstallPhase191FloorAuthorityLock } from "./modules/phase191_floor_authority_lock.js";
