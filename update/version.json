@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 221",
-  "build": "UPDATE-3.0-PHASE-221-MOON-TEXTURE-BUMP-POLISH-LOCK",
+  "version": "Update 3.0 Phase 222",
+  "build": "UPDATE-3.0-PHASE-222-MOON-SKY-ANCHOR-FIX-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Adds a cratered Moon diffuse/bump polish layer based on the uploaded Moon references while preserving the existing Moon orbit, Mars orbit, Phase 220 upstairs flow, city layers, teleport and no-face-overlay protections. Auto Deploy runs on push to main."
+  "notes": "Emergency fixes the Moon floor-dome bug by purging non-sky Moon meshes and anchoring one cratered Moon high in the sky. Preserves Mars, city layers, upstairs flow, teleport and no-face-overlay protections. Auto Deploy runs on push to main."
 }
