@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-208-QUEST-PERFORMANCE-VALIDATION-LOCK",
+  "build": "UPDATE-3.0-PHASE-209-QUEST-LOCOMOTION-TELEPORT-STAIR-SKY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "208",
-  "summary": "Quest performance validation pass: keeps Phase 207 freeze recovery active, adds a lightweight 90-second performance monitor, clamps Quest render scale, records avg/min FPS and long-frame counts, and avoids scene traversal loops or new visual content.",
-  "label": "UPDATE-3.0-PHASE-208-QUEST-PERFORMANCE-VALIDATION-LOCK",
-  "notes": "Game-only update. Site untouched. No new scenery or lobby redesign; this phase validates headset stability after the freeze recovery lock.",
-  "updated": "2026-06-14T06:35:00Z"
+  "phase": "209",
+  "summary": "Quest recovery and control fix: removes screen-attached black square overlays, changes right-stick movement to headset-forward only with no strafe drift, makes A/grip/trigger hold-release teleport work, doubles the Moon size with procedural crater texture, enlarges Mars with texture, raises both higher in the sky with rotation/orbit motion, and adds stair/upstairs floor height support.",
+  "label": "UPDATE-3.0-PHASE-209-QUEST-LOCOMOTION-TELEPORT-STAIR-SKY-LOCK",
+  "notes": "Game-only update. Site untouched. Stability remains prioritized; Phase 208 performance validation stays active.",
+  "updated": "2026-06-14T06:55:00Z"
 }
