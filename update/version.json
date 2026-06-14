@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 208",
-  "build": "UPDATE-3.0-PHASE-208-QUEST-PERFORMANCE-VALIDATION-LOCK",
+  "version": "Update 3.0 Phase 209",
+  "build": "UPDATE-3.0-PHASE-209-QUEST-LOCOMOTION-TELEPORT-STAIR-SKY-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Quest performance validation lock: keeps freeze recovery active, adds lightweight FPS/long-frame runtime stats, clamps Quest render scale, and avoids new scenery or repeated scene scans. Auto Deploy runs on push to main."
+  "notes": "Quest control and sky lock: no face black squares, headset-forward movement with no strafe drift, hold-release A/grip/trigger teleport, doubled textured Moon, enlarged textured Mars, higher orbiting sky objects, and stair/upstairs floor height support. Auto Deploy runs on push to main."
 }
