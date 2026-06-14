@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-203-CAROUSEL-INTERACTION-ROUTE-LOCK",
+  "build": "UPDATE-3.0-PHASE-204-VISUAL-GUIDE-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "203",
-  "summary": "Makes the Wellness carousel functional with Next and Back slide switching, visible button labels, Meditation Room routing, desktop pointer support, and XR select support for key lobby targets.",
-  "label": "UPDATE-3.0-PHASE-203-CAROUSEL-INTERACTION-ROUTE-LOCK",
-  "notes": "Game-only update. Site untouched. Uses Phase 202 storefront shells as the visual base and keeps approval-safe placeholders only.",
-  "updated": "2026-06-14T05:35:00Z"
+  "phase": "204",
+  "summary": "Adds visible guidance labels for the Wellness carousel and storefront route controls so Quest users can clearly see Back, Next, Enter Room, Store, PGA, and Scorpion interaction points before using them.",
+  "label": "UPDATE-3.0-PHASE-204-VISUAL-GUIDE-LOCK",
+  "notes": "Game-only update. Site untouched. Uses Phase 203 interaction logic as the base and adds clear guide labels for presentation/testing.",
+  "updated": "2026-06-14T05:55:00Z"
 }
