@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const LABEL = "UPDATE-3.0-PHASE-199-GRAND-ATRIUM-FLOOR-AUTHORITY-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-200-ORDERED-GRAND-LOBBY-FLOOR-AUTHORITY-LOCK";
 const OFFICIAL_VISUAL_FLOORS = ["PHASE185_OFFICIAL_POLISHED_MARBLE_FLOOR", "PHASE195_ONE_VISUAL_FLOOR"];
 
 function isOfficialVisualFloor(name){
@@ -8,7 +8,7 @@ function isOfficialVisualFloor(name){
 }
 
 function isAllowedFloorDecoration(name){
-  return /PHASE199_|PHASE198_UPSTAIRS|PHASE198_.*PAD|PHASE198_CENTER_CARPET_PATH|PHASE198_ROOM_TRIM|PHASE195_SUBTLE_FLOOR_GRID|PHASE195_.*PAD|PHASE185_FLOOR_INLAY_RING|Teleport|TELEPORT|Portal|PORTAL|PAD|Pointer|POINTER|Ring|RING|Watch|Hand|Controller/i.test(String(name || ""));
+  return /PHASE200_|PHASE199_|PHASE198_|PHASE195_SUBTLE_FLOOR_GRID|PHASE195_.*PAD|PHASE185_FLOOR_INLAY_RING|Teleport|TELEPORT|Portal|PORTAL|PAD|Pointer|POINTER|Ring|RING|Watch|Hand|Controller/i.test(String(name || ""));
 }
 
 function isDuplicateFloorLike(obj){
@@ -60,6 +60,7 @@ function scanAndLock(scene){
     teleportSurface: "teleport-ray-y0-plus-constrainLobbyBounds",
     upstairsVisualAllowed: true,
     grandAtriumStructureAllowed: true,
+    orderedGrandLobbyAllowed: true,
     hiddenDuplicateFloors: hidden,
     remainingFloorLikeNames: visibleFloorLike.slice(0, 18),
     checkedAt: new Date().toISOString()
@@ -75,18 +76,14 @@ export function installPhase191FloorAuthorityLock(){
   setTimeout(()=>scanAndLock(scene), 200);
   setTimeout(()=>scanAndLock(scene), 900);
   setInterval(()=>scanAndLock(scene), 1100);
-  console.log(`[Phase199] floor authority locked; hidden duplicate floors=${state.hidden}`);
+  console.log(`[Phase200] floor authority locked; hidden duplicate floors=${state.hidden}`);
   return window.SVR_PHASE191_FLOOR_AUTHORITY;
 }
 
 export function autoInstallPhase191FloorAuthorityLock(){
   const start = performance.now();
-  const id = setInterval(()=>{
-    if (window.__SVR_SCENE__){
-      clearInterval(id);
-      installPhase191FloorAuthorityLock();
-    } else if (performance.now() - start > 16000){
-      clearInterval(id);
-    }
-  }, 350);
+  const id=setInterval(()=>{
+    if(window.__SVR_SCENE__){ clearInterval(id); installPhase191FloorAuthorityLock(); }
+    else if(performance.now()-start>16000){ clearInterval(id); }
+  },350);
 }
