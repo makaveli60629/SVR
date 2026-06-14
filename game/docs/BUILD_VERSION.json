@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-J-PHASE-230-MOON-OFF-TABLE-LABEL-LOCK",
+  "build": "UPDATE-3.1-K-PHASE-231-VISIBLE-LOBBY-LUXURY-POLISH-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-J / Phase 230",
-  "summary": "Phase 230 is active through the Phase 229 compatibility loader. It shows a Phase 230 label and forces one smaller Moon and one smaller Mars high and far behind the lobby so the Moon no longer covers the poker table.",
-  "label": "UPDATE-3.1-J-PHASE-230-MOON-OFF-TABLE-LABEL-LOCK",
-  "notes": "Game-only update. Site untouched. Phase 229 now chains to the Phase 230 guard so the clean index can keep loading the same stable path while activating Phase 230.",
-  "updated": "2026-06-14T17:20:00-05:00"
+  "phase": "3.1-K / Phase 231",
+  "summary": "Adds visible luxury lobby polish over the stable Phase 230 runtime: polished marble floor overlay, brighter red carpet, gold table ring, balcony rails, cyan light strips, arch/column overlays, jumbotron panels, portal signage, and an active Phase 231 label.",
+  "label": "UPDATE-3.1-K-PHASE-231-VISIBLE-LOBBY-LUXURY-POLISH-LOCK",
+  "notes": "Game-only update. Site untouched. Phase 229 compatibility loader now chains Phase 230 moon safety and Phase 231 visual lobby polish.",
+  "updated": "2026-06-14T17:35:00-05:00"
 }
