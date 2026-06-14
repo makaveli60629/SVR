@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const LABEL = "UPDATE-3.1-B-LOBBY-STRUCTURE-COMPLETION-LOCK";
+const LABEL = "UPDATE-3.1-C-MOON-PHASE-HARD-LOCK";
 const logStore = window.SVR_DIAG_LOG = window.SVR_DIAG_LOG || [];
 const MAX_LOGS = 30;
 let panelMesh = null;
@@ -23,7 +23,7 @@ function stamp(){
   window.SVR_CURRENT_UPDATE = "3.1";
   window.SVR_NO_FACE_OVERLAY = true;
   window.SVR_PHASE223 = { build:LABEL, active:true, phaseDisplay:true, diagLog:true, update31Synced:true };
-  window.SVR_UPDATE31 = Object.assign(window.SVR_UPDATE31 || {}, { build:LABEL, active:true, phase:"3.1-B", diagnosticSynced:true });
+  window.SVR_UPDATE31 = Object.assign(window.SVR_UPDATE31 || {}, { build:LABEL, active:true, phase:"3.1-C", diagnosticSynced:true, moonPhaseHardLock:true });
   document.title = `SVR Poker • ${LABEL}`;
 }
 
@@ -56,7 +56,7 @@ function ensureDom(){
 
 function drawDom(){
   const p = ensureDom();
-  const mods = ["211","212","213","214","215","207","216","217","218","219","220","222","223","31B"].filter(x=>x==="31B"?window.SVR_UPDATE31:window[`SVR_PHASE${x}`]).join(" ");
+  const mods = ["211","212","213","214","215","207","216","217","218","219","220","222","223","31C"].filter(x=>x==="31C"?window.SVR_UPDATE31:window[`SVR_PHASE${x}`]).join(" ");
   const rows = logStore.slice(-10).reverse().map(r=>`<div><b>[${r.level}]</b> ${r.t} ${escape(r.msg)}</div>`).join("");
   p.innerHTML = `<b style="color:#7ffcff">SVR DIAG</b><button style="float:right" onclick="this.parentElement.style.display='none'">hide</button><br><b>PHASE:</b> ${LABEL}<br><b>MODULES:</b> ${mods||"waiting"}<br><b>POS:</b> ${posText()}<br><b>ERRORS:</b> ${logStore.filter(x=>x.level==="ERROR").length} <b>WARN:</b> ${logStore.filter(x=>x.level==="WARN").length}<hr>${rows||"No captured errors."}`;
 }
@@ -78,7 +78,7 @@ function ensureWorld(){
   panelTexture = new THREE.CanvasTexture(panelCanvas);
   panelTexture.colorSpace = THREE.SRGBColorSpace;
   panelMesh = new THREE.Mesh(new THREE.PlaneGeometry(4.8,2.4), new THREE.MeshBasicMaterial({map:panelTexture,transparent:true,side:THREE.DoubleSide,depthWrite:false}));
-  panelMesh.name = "UPDATE31B_WORLD_DIAGNOSTIC_PANEL_NOT_CAMERA_ATTACHED";
+  panelMesh.name = "UPDATE31C_WORLD_DIAGNOSTIC_PANEL_NOT_CAMERA_ATTACHED";
   panelMesh.position.set(-7.4,2.55,-6.2);
   panelMesh.rotation.y = Math.PI*.16;
   scene.add(panelMesh);
@@ -102,9 +102,9 @@ function drawWorld(){
 
 function install(){
   stamp(); hook(); drawDom(); drawWorld();
-  if(!window.SVR_PHASE223_BOOT_LOGGED){ window.SVR_PHASE223_BOOT_LOGGED=true; addLog("INFO","Update 3.1-B diagnostic active"); }
+  if(!window.SVR_PHASE223_BOOT_LOGGED){ window.SVR_PHASE223_BOOT_LOGGED=true; addLog("INFO","Update 3.1-C diagnostic active"); }
 }
 
 install();
-setInterval(install,1500);
+setInterval(install,650);
 [250,800,1800,3500,7000].forEach(ms=>setTimeout(install,ms));
