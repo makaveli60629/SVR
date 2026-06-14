@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-197-LOBBY-RECOVERY-LOCK",
+  "build": "UPDATE-3.0-PHASE-198-TWO-FLOOR-LOBBY-RESTORE-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "197",
-  "summary": "Recovers the lobby view after Phase 196 reports by removing old diagnostic/phase-bounce scripts from index boot, hiding the full-screen boot overlay, reducing desktop HUD clutter, disabling visible glove/controller-proxy hand objects, and preserving the clean geometry lobby runtime.",
-  "label": "UPDATE-3.0-PHASE-197-LOBBY-RECOVERY-LOCK",
-  "notes": "Game-only update. Site untouched. Clean Phase 195/196 lobby retained; overlay scripts and visible hand add-ons disabled.",
-  "updated": "2026-06-14T03:25:00Z"
+  "phase": "198",
+  "summary": "Restores the requested upstairs/two-floor lobby as clean controlled geometry instead of the old unstable skyline/octagon stack. Adds an upstairs balcony surface, railings, guard glass, stair steps, upstairs Legends/Sponsor/Events panels, and keeps the lower module bays, poker table, one Moon, one Mars, no background buildings, hidden hand overlays, and simplified boot chain.",
+  "label": "UPDATE-3.0-PHASE-198-TWO-FLOOR-LOBBY-RESTORE-LOCK",
+  "notes": "Game-only update. Site untouched. Phase 197 overlay recovery preserved while restoring the upstairs/two-floor lobby look.",
+  "updated": "2026-06-14T03:45:00Z"
 }
