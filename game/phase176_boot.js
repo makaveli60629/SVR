@@ -4,12 +4,12 @@ import { autoInstallPhase180TableSelector } from "./modules/phase180_table_selec
 import { autoInstallPhase185OfficialLobbyLook } from "./modules/phase185_official_lobby_look.js";
 import { installPhase186DeploySyncCleanup } from "./modules/phase186_deploy_sync_cleanup.js";
 
-const LABEL = "UPDATE-3.0-PHASE-186-DEPLOY-SYNC-CLEANUP-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-186B-DEPLOY-SYNC-CLEANUP-HOTFIX";
 
 function sync(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE186 = { build: LABEL, active: true, deploySync: true };
+  window.SVR_PHASE186 = { build: LABEL, active: true, deploySync: true, hotfix: true };
   document.title = `SVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach(el=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
