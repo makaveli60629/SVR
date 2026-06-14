@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 220",
-  "build": "UPDATE-3.0-PHASE-220-UPSTAIRS-DESTINATION-FLOW-DEMO-CAPTURE-LOCK",
+  "version": "Update 3.0 Phase 221",
+  "build": "UPDATE-3.0-PHASE-221-MOON-TEXTURE-BUMP-POLISH-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Adds upstairs destination flow: route lights from stairs to the city overlook, City View markers, return-to-lobby pad, Webex/demo capture spots, and subtle city shimmer. Preserves Phase 219 OBJ-derived skyline, Phase 218 overlook polish, Phase 216 city backdrop, Phase 215 Moon/Mars, teleport and no-face-overlay protections. Auto Deploy runs on push to main."
+  "notes": "Adds a cratered Moon diffuse/bump polish layer based on the uploaded Moon references while preserving the existing Moon orbit, Mars orbit, Phase 220 upstairs flow, city layers, teleport and no-face-overlay protections. Auto Deploy runs on push to main."
 }
