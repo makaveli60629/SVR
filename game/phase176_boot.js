@@ -3,7 +3,7 @@ import { installPhase177HandHistoryPublicFilter } from "./modules/phase177_hand_
 import { installPhase178Bounds } from "./modules/phase178_bounds.js";
 import { autoInstallPhase191FloorAuthorityLock } from "./modules/phase191_floor_authority_lock.js";
 
-const LABEL = "UPDATE-3.1-A-VERSION-SYNC-LOCK";
+const LABEL = "UPDATE-3.1-B-LOBBY-STRUCTURE-COMPLETION-LOCK";
 
 function sync(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
@@ -17,7 +17,7 @@ function sync(){
   window.SVR_NO_FACE_OVERLAY = true;
   window.SVR_PHASE222 = { build: LABEL, active: true, moonSkyOnly: true, floorDomeRemoved: true };
   window.SVR_PHASE223 = { build: LABEL, active: true, phaseDisplay: true, diagLog: true };
-  window.SVR_UPDATE31 = Object.assign(window.SVR_UPDATE31 || {}, { build: LABEL, active: true, phase: "3.1-A", bootSynced: true });
+  window.SVR_UPDATE31 = Object.assign(window.SVR_UPDATE31 || {}, { build: LABEL, active: true, phase: "3.1-B", bootSynced: true });
   document.title = `SVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach(el=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
