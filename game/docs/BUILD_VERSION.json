@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-C-MOON-PHASE-HARD-LOCK",
+  "build": "UPDATE-3.1-D-QUEST-ALIGNMENT-CONTROL-OVERLAY-FIX",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-C",
-  "summary": "Hard locks the runtime to one Moon only and stops phase drift by repeatedly enforcing the Update 3.1-C label after older phase modules finish loading.",
-  "label": "UPDATE-3.1-C-MOON-PHASE-HARD-LOCK",
-  "notes": "Game-only update. Site untouched. Removes extra Moon meshes from older phase modules, creates one high left sky Moon, and keeps diagnostics reporting 3.1-C.",
-  "updated": "2026-06-14T14:55:00-05:00"
+  "phase": "3.1-D",
+  "summary": "Fixes Quest alignment problems by stopping phase/title drift, restoring visible upstairs floors, removing stuck diagnostic/transparent view panels, improving snap-turn forward movement, adding close/far teleport control, adding magnetic target assist, and locking a textured rotating Moon high in the sky.",
+  "label": "UPDATE-3.1-D-QUEST-ALIGNMENT-CONTROL-OVERLAY-FIX",
+  "notes": "Game-only update. Site untouched. This pass focuses on Oculus/Quest movement, overlay cleanup, upstairs floor alignment, floor color visibility, teleport range, magnet selection, and Moon/Mars sky lock.",
+  "updated": "2026-06-14T15:20:00-05:00"
 }
