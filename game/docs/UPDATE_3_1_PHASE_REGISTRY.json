@@ -1,0 +1,49 @@
+{
+  "currentUpdate": "3.1",
+  "currentPhase": "3.1-A",
+  "currentBuild": "UPDATE-3.1-A-VERSION-SYNC-LOCK",
+  "track": "game-only",
+  "siteTouched": false,
+  "sourceOfTruth": {
+    "gameRuntime": "game/",
+    "entry": "game/index.html",
+    "boot": "game/phase176_boot.js",
+    "diag": "game/phase223_phase_diag_log.js",
+    "buildVersion": "game/docs/BUILD_VERSION.json",
+    "deployMarker": "update/version.json"
+  },
+  "rules": [
+    "Do not touch website files in this game track.",
+    "Do not replace the current lobby baseline.",
+    "Keep Android, desktop, Quest hands, and Quest controller fallback.",
+    "Every phase must update version files together.",
+    "Keep diagnostics available until lobby is stable."
+  ],
+  "nextPhases": [
+    {
+      "id": "3.1-B",
+      "name": "Lobby Structure Completion",
+      "scope": ["upstairs floors", "red carpet", "Roman table patio", "spawn wall seal", "city windows"]
+    },
+    {
+      "id": "3.1-C",
+      "name": "Sky Moon Window Fix",
+      "scope": ["Moon high and larger", "textured Moon", "Mars secondary", "city through windows"]
+    },
+    {
+      "id": "3.1-D",
+      "name": "Module Routing Audit",
+      "scope": ["portals", "private scenes", "store URL", "route status"]
+    },
+    {
+      "id": "3.1-E",
+      "name": "Cross Platform Controls Audit",
+      "scope": ["Quest hands", "Quest controller", "Android", "desktop", "teleport hold release"]
+    },
+    {
+      "id": "3.1-F",
+      "name": "Multiplayer Placeholder Test",
+      "scope": ["two clients", "pill avatars", "name tags", "connection diagnostics"]
+    }
+  ]
+}
