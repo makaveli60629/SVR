@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-  <title>SVR Poker • UPDATE-3.0-PHASE-223-PHASE-DISPLAY-DIAG-ERROR-LOG-LOCK</title>
+  <title>SVR Poker • UPDATE-3.1-D-QUEST-ALIGNMENT-CONTROL-OVERLAY-FIX</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>:root{color-scheme:dark}html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overscroll-behavior:none;touch-action:none}#app{position:fixed;inset:0}canvas{display:block;width:100%;height:100%;background:#000;outline:none;touch-action:none}#hud,#sceneNav,#log,#err,#bootFallback,#status,#mode{display:none!important;opacity:0!important;pointer-events:none!important;visibility:hidden!important}.pill,.btn,.scene-btn{display:none!important}.svr-vr-button{font-size:10px!important;opacity:.46!important;max-width:145px!important;background:rgba(0,0,0,.35)!important;border:1px solid rgba(255,255,255,.18)!important}</style>
@@ -11,24 +11,25 @@
 </head>
 <body>
   <div id="app"></div><div id="bootFallback"></div>
-  <div id="hud"><div class="pill" id="status">Loading…</div><div><button class="btn" id="toggleLog">Logs</button><button class="btn" id="toggleJoints">Joints</button><span class="pill" id="mode">Input: standby</span><span class="pill">BUILD: UPDATE-3.0-PHASE-223-PHASE-DISPLAY-DIAG-ERROR-LOG-LOCK</span></div></div>
+  <div id="hud"><div class="pill" id="status">Loading…</div><div><button class="btn" id="toggleLog">Logs</button><button class="btn" id="toggleJoints">Joints</button><span class="pill" id="mode">Input: standby</span><span class="pill">BUILD: UPDATE-3.1-D-QUEST-ALIGNMENT-CONTROL-OVERLAY-FIX</span></div></div>
   <div id="sceneNav"><button class="scene-btn" data-scene="lobby">Lobby</button><button class="scene-btn" data-scene="seat">Seat</button><button class="scene-btn" data-scene="reiki">Wellness</button><button class="scene-btn" data-scene="pga">PGA</button><button class="scene-btn" data-scene="store">Store</button><button class="scene-btn" data-scene="legends">Legend</button><button class="scene-btn" data-scene="sponsor">Sponsor</button><button class="scene-btn" data-scene="scorpion">Scorpion</button></div>
   <pre id="log"></pre><pre id="err"></pre>
   <script>window.__SVR_BOOT_STARTED__=Date.now();window.SVR_OFFICIAL_LOBBY_ONLY=true;window.SVR_DISABLE_LEGACY_SKYLINE=true;window.SVR_REFINED_LOBBY_GEOMETRY=true;window.SVR_BACKGROUND_BUILDINGS_REMOVED=true;window.SVR_HAND_OVERLAY_DISABLED=true;window.SVR_NO_FACE_OVERLAY=true;</script>
-  <script type="module" src="./main.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase176_boot.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase211_quest_stability_scene_fix.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase212_stair_walk_ramp_lock.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase213_lobby_finish.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase214_upstairs_floor_color_lock.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase215_upright_overlay_sky_clean.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase207_scifi_city_background.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase216_city_final_label.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase217_city_depth_observation.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase218_overlook_polish.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase219_scifi_obj_silhouette_lock.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase220_upstairs_destination_flow.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase222_moon_sky_anchor_fix.js?v=phase223-diag-log"></script>
-  <script type="module" src="./phase223_phase_diag_log.js?v=phase223-diag-log"></script>
+  <script type="module" src="./main.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase176_boot.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase211_quest_stability_scene_fix.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase212_stair_walk_ramp_lock.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase213_lobby_finish.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase214_upstairs_floor_color_lock.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase215_upright_overlay_sky_clean.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase207_scifi_city_background.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase216_city_final_label.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase217_city_depth_observation.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase218_overlook_polish.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase219_scifi_obj_silhouette_lock.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase220_upstairs_destination_flow.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase222_moon_sky_anchor_fix.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase223_phase_diag_log.js?v=phase224-quest-alignment-control-overlay-fix"></script>
+  <script type="module" src="./phase224_quest_alignment_control_overlay_fix.js?v=phase224-quest-alignment-control-overlay-fix"></script>
 </body>
 </html>
