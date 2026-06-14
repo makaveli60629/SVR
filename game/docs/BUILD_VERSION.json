@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-E-UPLOADED-FLOOR-TABLE-TEXTURE-REUSE-LOCK",
+  "build": "UPDATE-3.1-F-SINGLE-RUNTIME-QUEST-CONTROLLER-OVERLAY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-E",
-  "summary": "Adds a Quest-safe uploaded texture reuse pass for the new 38-floor and table2 packages. Registers reusable floor/table source maps, adds generated material overlays matched to those packages, refreshes main/upstairs floor surfaces, adds table felt/leather/wood finish overlays, and keeps heavy FBX/MAX files held for later optimized conversion.",
-  "label": "UPDATE-3.1-E-UPLOADED-FLOOR-TABLE-TEXTURE-REUSE-LOCK",
-  "notes": "Game-only update. Site untouched. Textures can help immediately; models are useful but should be converted/optimized before runtime WebXR use.",
-  "updated": "2026-06-14T15:45:00-05:00"
+  "phase": "3.1-F",
+  "summary": "Locks the game to one current 3.1 runtime, disables old 3.1-B/3.1-C auto-imports, removes face-stuck transparent overlay squares, makes the right Quest controller visible, changes Quest forward movement to the current headset/camera direction, improves teleport close/far distance control, preserves one high moon and one Mars, and keeps the site untouched.",
+  "label": "UPDATE-3.1-F-SINGLE-RUNTIME-QUEST-CONTROLLER-OVERLAY-LOCK",
+  "notes": "Game-only update. Site untouched. Designed to stop browser-title phase bouncing, duplicate moon/Mars layers, old lobby structure overlays, and the Oculus face-square overlay while keeping the latest lobby modules active.",
+  "updated": "2026-06-14T16:10:00-05:00"
 }
