@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-183-ARCH-TOP-BLOCK-CONNECTION-LOCK",
+  "build": "UPDATE-3.0-PHASE-190-QUEST-CONTROLLER-FORWARD-TELEPORT-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "183",
-  "summary": "Turns and aligns the lobby top arch blocks so they connect cleanly between the column capitals while preserving the expanded original-wall lobby from Phase 182.",
-  "label": "UPDATE-3.0-PHASE-183-ARCH-TOP-BLOCK-CONNECTION-LOCK",
-  "notes": "Game-only update. Connected arch beams, capital connector plates, and subtle underglow added. Site untouched.",
-  "updated": "2026-06-13T22:45:00Z"
+  "phase": "190",
+  "summary": "Fixes Quest/Oculus controller teleport direction by using WebXR local -Z target-ray as controller forward, adds a safe +Z fallback only when needed, preserves right-stick movement/snap-turn, and keeps hold-to-aim/release-to-teleport behavior.",
+  "label": "UPDATE-3.0-PHASE-190-QUEST-CONTROLLER-FORWARD-TELEPORT-LOCK",
+  "notes": "Game-only update for GitHub issue #96. Site untouched. Phase 189 sky/floor hardlock preserved.",
+  "updated": "2026-06-14T01:05:00Z"
 }
