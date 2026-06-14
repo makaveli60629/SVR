@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-186B-DEPLOY-SYNC-CLEANUP-HOTFIX",
-  "track": "official-lobby-look-deploy-sync-hotfix",
+  "build": "UPDATE-3.0-PHASE-187-OFFICIAL-LOBBY-STABILIZER-LOCK",
+  "track": "official-lobby-look-stabilizer",
   "siteTouched": false,
-  "phase": "186B",
-  "summary": "Hotfixes the cleanup crash caused by non-object scene userData, keeps the official Phase 185 Roman luxury lobby active, and refreshes loader cache labels.",
-  "label": "UPDATE-3.0-PHASE-186B-DEPLOY-SYNC-CLEANUP-HOTFIX",
-  "notes": "Fixes TypeError: Cannot create property visible on boolean true. Preserves locomotion, Quest controls, Android controls, watch, table selector, store hubs, moon/Mars, and lobby bounds.",
-  "updated": "2026-06-14T03:45:00Z"
+  "phase": "187",
+  "summary": "Stops old Phase 173/175/176 label and visual installers from bouncing back, loads the stabilizer before main, and keeps the official Phase 185 Roman luxury lobby as the only intended presentation.",
+  "label": "UPDATE-3.0-PHASE-187-OFFICIAL-LOBBY-STABILIZER-LOCK",
+  "notes": "Disables stale phase label scripts, preloads the official-lobby-only stabilizer, keeps Phase 185 look active, and preserves locomotion, Quest controls, Android controls, watch, table selector, store hubs, moon/Mars, and lobby bounds.",
+  "updated": "2026-06-14T04:05:00Z"
 }
