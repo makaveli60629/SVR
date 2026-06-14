@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 222",
-  "build": "UPDATE-3.0-PHASE-222-MOON-SKY-ANCHOR-FIX-LOCK",
+  "version": "Update 3.0 Phase 223",
+  "build": "UPDATE-3.0-PHASE-223-PHASE-DISPLAY-DIAG-ERROR-LOG-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Emergency fixes the Moon floor-dome bug by purging non-sky Moon meshes and anchoring one cratered Moon high in the sky. Preserves Mars, city layers, upstairs flow, teleport and no-face-overlay protections. Auto Deploy runs on push to main."
+  "notes": "Adds visible phase display and diagnostic status panel for testing. Preserves Phase 222 Moon sky anchor, city layers, teleport and view protections. Auto Deploy runs on push to main."
 }
