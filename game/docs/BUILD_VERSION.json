@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-216-SCIFI-CITY-SECOND-FLOOR-BACKGROUND-LOCK",
+  "build": "UPDATE-3.0-PHASE-217-CITY-DEPTH-OBSERVATION-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "216",
-  "summary": "Adds the uploaded sci-fi city material as an elevated north/side skyline background behind the upstairs lobby so it is visible from the second floor, while preserving the Phase 215 upright stance, clean sky, Moon/Mars, and no-face-overlay protections.",
-  "label": "UPDATE-3.0-PHASE-216-SCIFI-CITY-SECOND-FLOOR-BACKGROUND-LOCK",
-  "notes": "Game-only update. Site untouched. Uses a compressed embedded skyline texture derived from the uploaded scifi city.zip. The uploaded RAR moon package could be listed but could not be extracted in this runtime, so Phase 215 Moon/Mars remain active.",
-  "updated": "2026-06-14T07:15:00Z"
+  "phase": "217",
+  "summary": "Adds a procedural foreground city-depth layer and second-floor observation sightline over the uploaded sci-fi city backdrop, so the upstairs lobby reads as a city overlook rather than a flat background image.",
+  "label": "UPDATE-3.0-PHASE-217-CITY-DEPTH-OBSERVATION-LOCK",
+  "notes": "Game-only update. Site untouched. Preserves Phase 216 uploaded city backdrop, Phase 215 Moon/Mars, upright stance, no-face-overlay protections, and current lobby structure.",
+  "updated": "2026-06-14T07:30:00Z"
 }
