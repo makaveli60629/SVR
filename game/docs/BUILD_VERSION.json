@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-204-VISUAL-GUIDE-LOCK",
+  "build": "UPDATE-3.0-PHASE-206-FACE-OVERLAY-REMOVAL-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "204",
-  "summary": "Adds visible guidance labels for the Wellness carousel and storefront route controls so Quest users can clearly see Back, Next, Enter Room, Store, PGA, and Scorpion interaction points before using them.",
-  "label": "UPDATE-3.0-PHASE-204-VISUAL-GUIDE-LOCK",
-  "notes": "Game-only update. Site untouched. Uses Phase 203 interaction logic as the base and adds clear guide labels for presentation/testing.",
-  "updated": "2026-06-14T05:55:00Z"
+  "phase": "206",
+  "summary": "Emergency Quest face-overlay fix: removes Phase 204 visual-guide planes from the active lobby boot chain, suppresses black/HTML overlays in XR, removes face/view overlay objects from the scene and camera, and locks the game to a no-face-overlay runtime state.",
+  "label": "UPDATE-3.0-PHASE-206-FACE-OVERLAY-REMOVAL-LOCK",
+  "notes": "Game-only update. Site untouched. Keeps Phase 203 carousel interactions active while removing the visible guide-label overlay that could appear stuck to the player's view.",
+  "updated": "2026-06-14T06:05:00Z"
 }
