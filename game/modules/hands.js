@@ -24,76 +24,10 @@ function makeControllerProxy(controller, handed = "right"){
   return proxy;
 }
 
-
-function makeGloveVisual(handed = "right"){
-  const side = handed === "left" ? -1 : 1;
-  const root = new THREE.Group();
-  root.name = `SVR_Phase127_Fitted_Hand_Glove_${handed}`;
-
-  // Phase 127: fitted Quest hand overlay.  Previous Phase 126 glove was intentionally large
-  // and read as a floating object.  This version is a slim cuff + palm/knuckle overlay so the
-  // Meta hand mesh remains visible and performance stays light.
-  const black = new THREE.MeshStandardMaterial({
-    color: 0x06070a,
-    roughness: 0.62,
-    metalness: 0.06,
-    emissive: 0x010102,
-    emissiveIntensity: 0.025,
-    depthWrite: true
-  });
-  const trim = new THREE.MeshBasicMaterial({
-    color: handed === "left" ? 0x9f7cff : 0x64fff0,
-    transparent: true,
-    opacity: 0.62,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending
-  });
-
-  const palm = new THREE.Mesh(new THREE.BoxGeometry(0.070, 0.018, 0.088), black);
-  palm.position.set(0, -0.006, 0.040);
-  root.add(palm);
-
-  const backPlate = new THREE.Mesh(new THREE.BoxGeometry(0.058, 0.012, 0.052), black.clone());
-  backPlate.position.set(0, 0.006, 0.074);
-  root.add(backPlate);
-
-  const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.040, 0.045, 0.034, 18), black.clone());
-  cuff.rotation.x = Math.PI / 2;
-  cuff.position.set(0, -0.002, -0.030);
-  root.add(cuff);
-
-  const cuffGlow = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.0032, 6, 24), trim);
-  cuffGlow.rotation.x = Math.PI / 2;
-  cuffGlow.position.copy(cuff.position);
-  root.add(cuffGlow);
-
-  for (let i = 0; i < 4; i++){
-    const x = side * (-0.026 + i * 0.0175);
-    const knuckle = new THREE.Mesh(new THREE.SphereGeometry(0.0065, 8, 6), trim);
-    knuckle.position.set(x, 0.012, 0.106);
-    root.add(knuckle);
-    const fingerGuard = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.006, 0.046), black.clone());
-    fingerGuard.position.set(x, 0.008, 0.130);
-    root.add(fingerGuard);
-  }
-
-  const thumb = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.010, 0.044), black.clone());
-  thumb.position.set(side * 0.043, -0.010, 0.064);
-  thumb.rotation.y = side * 0.48;
-  root.add(thumb);
-
-  root.position.set(0, 0.000, -0.004);
-  root.scale.setScalar(0.84);
-  root.userData.phase127FittedGlove = true;
-  return root;
-}
-function attachGlove(parent, handed = "right"){
-  if (!parent || parent.userData?.svrGlove) return null;
-  const glove = makeGloveVisual(handed);
-  glove.visible = true;
-  parent.add(glove);
-  parent.userData.svrGlove = glove;
-  return glove;
+function attachGlove(){
+  // Phase 197: no visible glove/proxy overlay. Keep real WebXR hand mesh only.
+  window.SVR_PHASE197_HAND_OVERLAY_DISABLED = true;
+  return null;
 }
 
 function updateControllerProxy(proxy){
@@ -148,6 +82,7 @@ export function createHands({ scene, renderer, log = console.log }){
   let leftControllerProxy = null;
   let rightControllerProxy = null;
   let debugOn = false;
+  window.SVR_PHASE197_HAND_OVERLAY_DISABLED = true;
 
   function makeDebugGroup(parent){
     const group = new THREE.Group();
@@ -202,7 +137,7 @@ export function createHands({ scene, renderer, log = console.log }){
       proxy.userData.inputSource = evt?.data || null;
       scene.add(proxy);
       attachGlove(proxy, handed);
-      proxy.visible = true;
+      proxy.visible = false;
       const debug = makeDebugGroup(proxy);
       controllerProxies.push({ controller, proxy, debug });
       if (handed === "left") leftControllerProxy = proxy;
@@ -224,11 +159,9 @@ export function createHands({ scene, renderer, log = console.log }){
 
   function update(dt = 0.016){
     controllers.forEach(c=>{ if (c) c.visible = false; });
-    rawHands.forEach((h, idx)=>{
-      if (h) h.visible = true;
-    });
+    rawHands.forEach(h=>{ if (h) h.visible = true; });
     handModels.forEach(m=>{ if (m) m.visible = true; });
-    controllerProxies.forEach(({ proxy })=>{ proxy.visible = true; updateControllerProxy(proxy, dt); });
+    controllerProxies.forEach(({ proxy })=>{ proxy.visible = false; updateControllerProxy(proxy, dt); });
   }
 
   function updateDebug(){
