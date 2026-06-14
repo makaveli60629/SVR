@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-188-SECOND-FLOOR-VISIBILITY-LOCK",
-  "track": "official-lobby-second-floor",
+  "build": "UPDATE-3.0-PHASE-189-SKY-FLOOR-HARDLOCK",
+  "track": "official-lobby-hardlock",
   "siteTouched": false,
-  "phase": "188",
-  "summary": "Adds a clearly visible upper balcony ring with storefront labels, gold banisters, support columns, stair visuals, and access pads.",
-  "label": "UPDATE-3.0-PHASE-188-SECOND-FLOOR-VISIBILITY-LOCK",
-  "notes": "Preserves official look, stabilizer, locomotion, bounds, watch, table selector, Quest controls, Android controls, moon and Mars, and store hubs.",
-  "updated": "2026-06-14T04:22:00Z"
+  "phase": "189",
+  "summary": "Adds a strong visible upper floor and keeps the official lobby look active.",
+  "label": "UPDATE-3.0-PHASE-189-SKY-FLOOR-HARDLOCK",
+  "notes": "Preserves movement, bounds, watch, table selector, hubs, moon and Mars.",
+  "updated": "2026-06-14T04:36:00Z"
 }
