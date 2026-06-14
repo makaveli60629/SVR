@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-207-QUEST-FREEZE-RECOVERY-LOCK",
+  "build": "UPDATE-3.0-PHASE-208-QUEST-PERFORMANCE-VALIDATION-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "207",
-  "summary": "Quest freeze recovery: simplifies the game boot chain, removes duplicate Phase 203/204 overlay boots from index, replaces the Phase 206 repeated overlay scan with a bounded cleanup guard, and limits floor-authority scene scans so the headset is not hit by constant scene traversals.",
-  "label": "UPDATE-3.0-PHASE-207-QUEST-FREEZE-RECOVERY-LOCK",
-  "notes": "Game-only update. Site untouched. Primary goal is headset stability and no-freeze runtime behavior; lobby structure and storefront content are preserved.",
-  "updated": "2026-06-14T06:20:00Z"
+  "phase": "208",
+  "summary": "Quest performance validation pass: keeps Phase 207 freeze recovery active, adds a lightweight 90-second performance monitor, clamps Quest render scale, records avg/min FPS and long-frame counts, and avoids scene traversal loops or new visual content.",
+  "label": "UPDATE-3.0-PHASE-208-QUEST-PERFORMANCE-VALIDATION-LOCK",
+  "notes": "Game-only update. Site untouched. No new scenery or lobby redesign; this phase validates headset stability after the freeze recovery lock.",
+  "updated": "2026-06-14T06:35:00Z"
 }
