@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.1-E",
-  "build": "UPDATE-3.1-E-UPLOADED-FLOOR-TABLE-TEXTURE-REUSE-LOCK",
+  "version": "Update 3.1-F",
+  "build": "UPDATE-3.1-F-SINGLE-RUNTIME-QUEST-CONTROLLER-OVERLAY-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Uploaded floor/table texture reuse pass. Registers 38-floor.zip and table2.zip materials, applies Quest-safe floor/table overlays, improves table felt/leather/wood finish, and holds heavy FBX/MAX model files for future optimized conversion."
+  "notes": "Single-runtime Quest control and overlay lock. Disables old 3.1-B/3.1-C auto-imports, keeps one active build label, removes face-stuck transparent square overlays, makes the right Quest controller visible, locks movement forward to the headset/camera direction, expands teleport close/far control, and normalizes Moon/Mars duplicates."
 }
