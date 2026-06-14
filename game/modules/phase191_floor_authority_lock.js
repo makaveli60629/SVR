@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const LABEL = "UPDATE-3.0-PHASE-200-ORDERED-GRAND-LOBBY-FLOOR-AUTHORITY-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-202-STOREFRONT-FLOOR-AUTHORITY-LOCK";
 const OFFICIAL_VISUAL_FLOORS = ["PHASE185_OFFICIAL_POLISHED_MARBLE_FLOOR", "PHASE195_ONE_VISUAL_FLOOR"];
 
 function isOfficialVisualFloor(name){
@@ -8,7 +8,7 @@ function isOfficialVisualFloor(name){
 }
 
 function isAllowedFloorDecoration(name){
-  return /PHASE200_|PHASE199_|PHASE198_|PHASE195_SUBTLE_FLOOR_GRID|PHASE195_.*PAD|PHASE185_FLOOR_INLAY_RING|Teleport|TELEPORT|Portal|PORTAL|PAD|Pointer|POINTER|Ring|RING|Watch|Hand|Controller/i.test(String(name || ""));
+  return /PHASE202_|PHASE201_|PHASE200_|PHASE199_|PHASE198_|PHASE195_SUBTLE_FLOOR_GRID|PHASE195_.*PAD|PHASE185_FLOOR_INLAY_RING|Teleport|TELEPORT|Portal|PORTAL|PAD|Pointer|POINTER|Ring|RING|Watch|Hand|Controller/i.test(String(name || ""));
 }
 
 function isDuplicateFloorLike(obj){
@@ -61,6 +61,8 @@ function scanAndLock(scene){
     upstairsVisualAllowed: true,
     grandAtriumStructureAllowed: true,
     orderedGrandLobbyAllowed: true,
+    storefrontShellsAllowed: true,
+    hubContentAllowed: true,
     hiddenDuplicateFloors: hidden,
     remainingFloorLikeNames: visibleFloorLike.slice(0, 18),
     checkedAt: new Date().toISOString()
@@ -76,7 +78,7 @@ export function installPhase191FloorAuthorityLock(){
   setTimeout(()=>scanAndLock(scene), 200);
   setTimeout(()=>scanAndLock(scene), 900);
   setInterval(()=>scanAndLock(scene), 1100);
-  console.log(`[Phase200] floor authority locked; hidden duplicate floors=${state.hidden}`);
+  console.log(`[Phase202] floor authority locked; hidden duplicate floors=${state.hidden}`);
   return window.SVR_PHASE191_FLOOR_AUTHORITY;
 }
 
