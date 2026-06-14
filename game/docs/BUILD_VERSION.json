@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-202-STOREFRONT-SHELLS-HOLOGRAM-FRAMES-LOCK",
+  "build": "UPDATE-3.0-PHASE-203-CAROUSEL-INTERACTION-ROUTE-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "202",
-  "summary": "Adds organized storefront shells and presentation frames on top of the Phase 200/201 ordered grand lobby: Wellness hologram carousel frame with Next/Back/meditation portal controls, PGA practice preview frame, SVR Store display racks, Scorpion private door frame, polished jumbotron shells, entry pads, bay glass, bay counters, and extra accent lights.",
-  "label": "UPDATE-3.0-PHASE-202-STOREFRONT-SHELLS-HOLOGRAM-FRAMES-LOCK",
-  "notes": "Game-only update. Site untouched. Approval-safe placeholders only; no unapproved external names, photos, logos, or sponsor URLs were added.",
-  "updated": "2026-06-14T05:15:00Z"
+  "phase": "203",
+  "summary": "Makes the Wellness carousel functional with Next and Back slide switching, visible button labels, Meditation Room routing, desktop pointer support, and XR select support for key lobby targets.",
+  "label": "UPDATE-3.0-PHASE-203-CAROUSEL-INTERACTION-ROUTE-LOCK",
+  "notes": "Game-only update. Site untouched. Uses Phase 202 storefront shells as the visual base and keeps approval-safe placeholders only.",
+  "updated": "2026-06-14T05:35:00Z"
 }
