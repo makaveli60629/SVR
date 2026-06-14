@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-187-OFFICIAL-LOBBY-STABILIZER-LOCK",
-  "track": "official-lobby-look-stabilizer",
+  "build": "UPDATE-3.0-PHASE-188-SECOND-FLOOR-VISIBILITY-LOCK",
+  "track": "official-lobby-second-floor",
   "siteTouched": false,
-  "phase": "187",
-  "summary": "Stops old Phase 173/175/176 label and visual installers from bouncing back, loads the stabilizer before main, and keeps the official Phase 185 Roman luxury lobby as the only intended presentation.",
-  "label": "UPDATE-3.0-PHASE-187-OFFICIAL-LOBBY-STABILIZER-LOCK",
-  "notes": "Disables stale phase label scripts, preloads the official-lobby-only stabilizer, keeps Phase 185 look active, and preserves locomotion, Quest controls, Android controls, watch, table selector, store hubs, moon/Mars, and lobby bounds.",
-  "updated": "2026-06-14T04:05:00Z"
+  "phase": "188",
+  "summary": "Adds a clearly visible upper balcony ring with storefront labels, gold banisters, support columns, stair visuals, and access pads.",
+  "label": "UPDATE-3.0-PHASE-188-SECOND-FLOOR-VISIBILITY-LOCK",
+  "notes": "Preserves official look, stabilizer, locomotion, bounds, watch, table selector, Quest controls, Android controls, moon and Mars, and store hubs.",
+  "updated": "2026-06-14T04:22:00Z"
 }
