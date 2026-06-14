@@ -5,9 +5,14 @@ const RED = 0x7e1014;
 const GOLD = 0xffd98a;
 const CYAN = 0x7ffcff;
 const STONE = 0x141722;
-const SKY_MOON_POS = new THREE.Vector3(-15.5, 26.5, -43);
 
+function activeBuild(){ return String(window.SVR_CURRENT_BUILD || window.SVR_UPDATE31?.build || ""); }
+function cLockActive(){ return activeBuild().includes("UPDATE-3.1-C") || window.SVR_UPDATE31?.phase === "3.1-C"; }
 function stamp(){
+  if (cLockActive()){
+    window.SVR_UPDATE31 = Object.assign(window.SVR_UPDATE31 || {}, { lobbyStructureCompletion:true, phaseBPassive:true });
+    return;
+  }
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
   window.SVR_CURRENT_BUILD = LABEL;
@@ -31,61 +36,25 @@ function stamp(){
   });
 }
 
-function mat(color, opacity=1){
-  return new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity, side: THREE.DoubleSide, depthWrite: opacity >= 1 });
-}
-function glow(color, opacity=.36){
-  return new THREE.MeshBasicMaterial({ color, transparent:true, opacity, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending });
-}
-function box(root,name,sx,sy,sz,x,y,z,material,ry=0){
-  const m = new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz), material);
-  m.name=name; m.position.set(x,y,z); m.rotation.y=ry; root.add(m); return m;
-}
-function cyl(root,name,r,h,x,y,z,material){
-  const m = new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,28), material);
-  m.name=name; m.position.set(x,y,z); root.add(m); return m;
-}
-function plane(root,name,w,h,x,y,z,material,rx=-Math.PI/2,ry=0){
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(w,h), material);
-  m.name=name; m.position.set(x,y,z); m.rotation.x=rx; m.rotation.y=ry; root.add(m); return m;
-}
-
-function makeMoonTexture(){
-  const c=document.createElement("canvas"); c.width=1024; c.height=512; const ctx=c.getContext("2d");
-  const g=ctx.createLinearGradient(0,0,c.width,c.height);
-  g.addColorStop(0,"#d7d9dc"); g.addColorStop(.36,"#a4aab1"); g.addColorStop(.56,"#59616d"); g.addColorStop(.78,"#c6c8ca"); g.addColorStop(1,"#666c75");
-  ctx.fillStyle=g; ctx.fillRect(0,0,c.width,c.height);
-  function mare(x,y,rx,ry,a){ctx.beginPath(); ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2); ctx.fillStyle=`rgba(25,29,36,${a})`; ctx.fill();}
-  [[540,235,170,70,.34],[720,255,120,48,.30],[305,310,140,58,.24],[790,145,78,38,.25]].forEach(v=>mare(...v));
-  function crater(x,y,r,a){const rg=ctx.createRadialGradient(x-r*.2,y-r*.2,r*.05,x,y,r); rg.addColorStop(0,`rgba(255,255,255,${.25*a})`); rg.addColorStop(.55,`rgba(90,95,104,${.14*a})`); rg.addColorStop(.70,`rgba(10,12,18,${.36*a})`); rg.addColorStop(.88,`rgba(235,238,242,${.20*a})`); rg.addColorStop(1,"rgba(255,255,255,0)"); ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();}
-  [[115,280,45,1.1],[260,355,32,1],[390,310,42,.9],[640,345,58,1.1],[830,290,38,.9],[905,380,32,.8]].forEach(v=>crater(...v));
-  for(let i=0;i<300;i++) crater(Math.random()*c.width, Math.random()*c.height, 2+Math.pow(Math.random(),2.1)*22, .24+Math.random()*.44);
-  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=4; return t;
-}
+function mat(color, opacity=1){ return new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity, side: THREE.DoubleSide, depthWrite: opacity >= 1 }); }
+function glow(color, opacity=.36){ return new THREE.MeshBasicMaterial({ color, transparent:true, opacity, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending }); }
+function box(root,name,sx,sy,sz,x,y,z,material,ry=0){ const m = new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz), material); m.name=name; m.position.set(x,y,z); m.rotation.y=ry; root.add(m); return m; }
+function cyl(root,name,r,h,x,y,z,material){ const m = new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,28), material); m.name=name; m.position.set(x,y,z); root.add(m); return m; }
+function plane(root,name,w,h,x,y,z,material,rx=-Math.PI/2,ry=0){ const m = new THREE.Mesh(new THREE.PlaneGeometry(w,h), material); m.name=name; m.position.set(x,y,z); m.rotation.x=rx; m.rotation.y=ry; root.add(m); return m; }
 
 function purgeBadFloorMoons(scene){
   const remove=[];
   scene.traverse(o=>{
     if(!o.isMesh || !o.geometry) return;
     const n=String(o.name||"");
+    if(/UPDATE31C_ONLY_SKY_MOON|UPDATE31C_ONLY_SKY_MOON_HALO/i.test(n)) return;
     o.geometry.computeBoundingSphere?.();
     const r=(o.geometry.boundingSphere?.radius||0) * Math.max(o.scale.x||1,o.scale.y||1,o.scale.z||1);
     const wp=new THREE.Vector3(); o.getWorldPosition(wp);
     const looksLikeMoon = /moon/i.test(n) || (r>2.4 && r<18 && wp.y<8 && o.material && String(o.material.type||"").includes("Material"));
-    const keepSky = /UPDATE31B_SKY_MOON|PHASE222_SKY_ANCHORED/i.test(n) && wp.y>10;
-    if(looksLikeMoon && !keepSky) remove.push(o);
+    if(looksLikeMoon) remove.push(o);
   });
   remove.forEach(o=>o.parent?.remove(o));
-}
-
-function addSkyMoon(scene, root){
-  let old = scene.getObjectByName("UPDATE31B_SKY_MOON_LEFT_EYE_CANDY");
-  if(old) old.parent?.remove(old);
-  const moon = new THREE.Mesh(new THREE.SphereGeometry(6.2,96,64), new THREE.MeshStandardMaterial({ map:makeMoonTexture(), roughness:.9, metalness:0, emissive:0x20283a, emissiveIntensity:.30 }));
-  moon.name="UPDATE31B_SKY_MOON_LEFT_EYE_CANDY"; moon.position.copy(SKY_MOON_POS); scene.add(moon);
-  const halo = new THREE.Mesh(new THREE.SphereGeometry(6.75,64,32), glow(0xe7efff,.075));
-  halo.name="UPDATE31B_SKY_MOON_HALO"; halo.position.copy(SKY_MOON_POS); scene.add(halo);
-  window.SVR_UPDATE31_MOON = { x:SKY_MOON_POS.x, y:SKY_MOON_POS.y, z:SKY_MOON_POS.z, size:6.2 };
 }
 
 function addRedCarpetAndFloors(root){
@@ -106,8 +75,7 @@ function addRedCarpetAndFloors(root){
 function addRomanPatio(root){
   const stone=mat(0x2a2b35,.94), trim=glow(GOLD,.42), red=mat(RED,.72);
   plane(root,"UPDATE31B_TABLE_PATIO_RED_CENTER_CARPET",7.2,5.8,0,.045,-2.0,red);
-  const pts=[[-6,-4.9],[-3,-5.9],[3,-5.9],[6,-4.9],[-6,1.2],[6,1.2]];
-  pts.forEach(([x,z],i)=>{
+  [[-6,-4.9],[-3,-5.9],[3,-5.9],[6,-4.9],[-6,1.2],[6,1.2]].forEach(([x,z],i)=>{
     cyl(root,`UPDATE31B_ROMAN_PATIO_COLUMN_${i+1}`,.18,3.1,x,1.55,z,stone);
     cyl(root,`UPDATE31B_ROMAN_PATIO_COLUMN_GLOW_${i+1}`,.205,.035,x,3.1,z,trim);
     cyl(root,`UPDATE31B_ROMAN_PATIO_BASE_${i+1}`,.30,.14,x,.07,z,stone);
@@ -161,7 +129,6 @@ function install(){
   const old=scene.getObjectByName("UPDATE31B_LOBBY_STRUCTURE_COMPLETION_ROOT");
   if(old) old.parent?.remove(old);
   const root=new THREE.Group(); root.name="UPDATE31B_LOBBY_STRUCTURE_COMPLETION_ROOT"; scene.add(root);
-  addSkyMoon(scene, root);
   addRedCarpetAndFloors(root);
   addRomanPatio(root);
   addWindowsAndCity(root);
