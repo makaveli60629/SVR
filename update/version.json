@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.1-C",
-  "build": "UPDATE-3.1-C-MOON-PHASE-HARD-LOCK",
+  "version": "Update 3.1-D",
+  "build": "UPDATE-3.1-D-QUEST-ALIGNMENT-CONTROL-OVERLAY-FIX",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Hard lock fix for three Moon bug and phase drift. Keeps exactly one high sky Moon, removes old Moon meshes, and repeatedly enforces the 3.1-C phase label. Diagnostics remain active."
+  "notes": "Quest alignment/control fix. Stops phase/title drift, removes stuck transparent diagnostic squares, restores upstairs floors and floor color clarity, fixes forward movement after 45-degree snap turns, expands teleport close/far aim control, adds magnetic target assist, and locks a textured rotating Moon high in the sky."
 }
