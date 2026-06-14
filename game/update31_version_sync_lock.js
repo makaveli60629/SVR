@@ -13,13 +13,6 @@ function stamp(){
     versionSync: true,
     lobbyStructureCompletion: true,
     deployPath: "direct-game-folder",
-    requiredFiles: [
-      "game/index.html",
-      "game/phase176_boot.js",
-      "game/phase223_phase_diag_log.js",
-      "game/docs/BUILD_VERSION.json",
-      "update/version.json"
-    ],
     checkedAt: new Date().toISOString()
   });
   document.title = `SVR Poker • ${LABEL}`;
@@ -33,16 +26,23 @@ function showBadge(){
   if(!badge){
     badge = document.createElement("div");
     badge.id = "svrUpdate31Badge";
-    badge.style.cssText = "position:fixed;right:10px;bottom:10px;z-index:2147483646;background:rgba(8,5,18,.82);color:#eaf8ff;border:1px solid rgba(255,217,138,.82);border-radius:10px;padding:8px 10px;font:11px ui-monospace,Consolas,monospace;box-shadow:0 0 16px rgba(255,217,138,.18);pointer-events:none;max-width:390px";
+    badge.style.cssText = "position:fixed;right:10px;bottom:10px;z-index:2147483646;background:rgba(8,5,18,.82);color:#eaf8ff;border:1px solid rgba(255,217,138,.82);border-radius:10px;padding:8px 10px;font:11px ui-monospace,Consolas,monospace;pointer-events:none;max-width:390px";
     document.body.appendChild(badge);
   }
   const diag = window.SVR_DIAG_LOG || [];
-  badge.innerHTML = `<b style="color:#ffd98a">UPDATE 3.1-B</b><br>${LABEL}<br><span style="color:#7ffcff">lobby structure completion active</span><br>diag entries: ${diag.length}`;
+  badge.innerHTML = `<b style="color:#ffd98a">UPDATE 3.1-B</b><br>${LABEL}<br><span style="color:#7ffcff">lobby structure active</span><br>diag entries: ${diag.length}`;
+}
+
+function loadStructure(){
+  if(window.SVR_UPDATE31_B_MODULE_REQUESTED) return;
+  window.SVR_UPDATE31_B_MODULE_REQUESTED = true;
+  import("./update31_lobby_structure_completion.js").catch(err=>console.error("Update 3.1-B module load failed", err));
 }
 
 function install(){
   stamp();
   showBadge();
+  loadStructure();
   if(!window.SVR_UPDATE31_B_LOGGED){
     window.SVR_UPDATE31_B_LOGGED = true;
     console.warn(`[SVR] ${LABEL}: lobby structure completion marker active`);
