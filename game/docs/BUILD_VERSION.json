@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-200-ORDERED-GRAND-LOBBY-STRUCTURE-LOCK",
+  "build": "UPDATE-3.0-PHASE-201-HUB-CONTENT-RESTORE-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "200",
-  "summary": "Corrects the scattered Phase 199 structure into an ordered two-floor grand lobby: straight rear wall, evenly spaced columns, aligned module bays, U-shaped upstairs walkway, guard glass, visible warm/cyan lighting, portal pads, poker table area, one Moon, one Mars, and no legacy background buildings.",
-  "label": "UPDATE-3.0-PHASE-200-ORDERED-GRAND-LOBBY-STRUCTURE-LOCK",
-  "notes": "Game-only update. Site untouched. Auto Deploy is triggered by push to main; this phase focuses on structure order, lighting, and alignment before restoring final store hubs and advertisements.",
-  "updated": "2026-06-14T04:35:00Z"
+  "phase": "201",
+  "summary": "Restores organized hub content on top of the ordered Phase 200 grand lobby structure: readable module panels, approval-safe Wellness/Reiki panel, PGA panel, Play Game panel, SVR Store panel, Scorpion panel, Tier 1 jumbotron ad slots, Daily Bonus kiosk, Sponsor kiosk, rope guides, floor arrows, kiosk bases, and extra accent lighting.",
+  "label": "UPDATE-3.0-PHASE-201-HUB-CONTENT-RESTORE-LOCK",
+  "notes": "Game-only update. Site untouched. Content is approval-safe; actual sponsor creatives and final store/hologram media can be layered next after visual verification.",
+  "updated": "2026-06-14T04:55:00Z"
 }
