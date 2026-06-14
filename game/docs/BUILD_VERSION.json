@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-I-FINAL-PHASE-LABEL-MOON-REALIGN-LOCK",
+  "build": "UPDATE-3.1-J-PHASE-230-MOON-OFF-TABLE-LABEL-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-I / Phase 229",
-  "summary": "Adds a clean final game entrypoint, a final phase label, guarded browser title/build values, and a safe high-sky Moon plus Mars positioned away from the table.",
-  "label": "UPDATE-3.1-I-FINAL-PHASE-LABEL-MOON-REALIGN-LOCK",
-  "notes": "Game-only update. Site untouched. Addresses phase label clarity, runtime consistency, and Moon position over the table.",
-  "updated": "2026-06-14T17:10:00-05:00"
+  "phase": "3.1-J / Phase 230",
+  "summary": "Phase 230 is active through the Phase 229 compatibility loader. It shows a Phase 230 label and forces one smaller Moon and one smaller Mars high and far behind the lobby so the Moon no longer covers the poker table.",
+  "label": "UPDATE-3.1-J-PHASE-230-MOON-OFF-TABLE-LABEL-LOCK",
+  "notes": "Game-only update. Site untouched. Phase 229 now chains to the Phase 230 guard so the clean index can keep loading the same stable path while activating Phase 230.",
+  "updated": "2026-06-14T17:20:00-05:00"
 }
