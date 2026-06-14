@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-199-GRAND-ATRIUM-STRUCTURE-LOCK",
+  "build": "UPDATE-3.0-PHASE-200-ORDERED-GRAND-LOBBY-STRUCTURE-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "199",
-  "summary": "Builds the grand two-floor atrium structure to match the supplied lobby concept more closely: curved colonnade, repeated arch bays, continuous upstairs balcony rail, guard glass, module bays, central Play Game structure, jumbotron placeholders, daily bonus and sponsor kiosks, polished floor path, one Moon, one Mars, and no legacy background buildings.",
-  "label": "UPDATE-3.0-PHASE-199-GRAND-ATRIUM-STRUCTURE-LOCK",
-  "notes": "Game-only update. Site untouched. This phase focuses on the structural shell first; store hubs, final ads, sponsor images, and detailed signage can be layered next after structure approval.",
-  "updated": "2026-06-14T04:10:00Z"
+  "phase": "200",
+  "summary": "Corrects the scattered Phase 199 structure into an ordered two-floor grand lobby: straight rear wall, evenly spaced columns, aligned module bays, U-shaped upstairs walkway, guard glass, visible warm/cyan lighting, portal pads, poker table area, one Moon, one Mars, and no legacy background buildings.",
+  "label": "UPDATE-3.0-PHASE-200-ORDERED-GRAND-LOBBY-STRUCTURE-LOCK",
+  "notes": "Game-only update. Site untouched. Auto Deploy is triggered by push to main; this phase focuses on structure order, lighting, and alignment before restoring final store hubs and advertisements.",
+  "updated": "2026-06-14T04:35:00Z"
 }
