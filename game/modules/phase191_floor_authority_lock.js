@@ -1,14 +1,15 @@
 import * as THREE from "three";
 
-const LABEL = "UPDATE-3.0-PHASE-202-STOREFRONT-FLOOR-AUTHORITY-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-207-FLOOR-AUTHORITY-FREEZE-GUARD";
 const OFFICIAL_VISUAL_FLOORS = ["PHASE185_OFFICIAL_POLISHED_MARBLE_FLOOR", "PHASE195_ONE_VISUAL_FLOOR"];
+let installedOnce = false;
 
 function isOfficialVisualFloor(name){
   return OFFICIAL_VISUAL_FLOORS.includes(String(name || ""));
 }
 
 function isAllowedFloorDecoration(name){
-  return /PHASE202_|PHASE201_|PHASE200_|PHASE199_|PHASE198_|PHASE195_SUBTLE_FLOOR_GRID|PHASE195_.*PAD|PHASE185_FLOOR_INLAY_RING|Teleport|TELEPORT|Portal|PORTAL|PAD|Pointer|POINTER|Ring|RING|Watch|Hand|Controller/i.test(String(name || ""));
+  return /PHASE207_|PHASE206_|PHASE205_|PHASE204_|PHASE203_|PHASE202_|PHASE201_|PHASE200_|PHASE199_|PHASE198_|PHASE195_SUBTLE_FLOOR_GRID|PHASE195_.*PAD|PHASE185_FLOOR_INLAY_RING|Teleport|TELEPORT|Portal|PORTAL|PAD|Pointer|POINTER|Ring|RING|Watch|Hand|Controller/i.test(String(name || ""));
 }
 
 function isDuplicateFloorLike(obj){
@@ -63,6 +64,8 @@ function scanAndLock(scene){
     orderedGrandLobbyAllowed: true,
     storefrontShellsAllowed: true,
     hubContentAllowed: true,
+    freezeGuard: true,
+    repeatedScansDisabled: true,
     hiddenDuplicateFloors: hidden,
     remainingFloorLikeNames: visibleFloorLike.slice(0, 18),
     checkedAt: new Date().toISOString()
@@ -74,11 +77,13 @@ function scanAndLock(scene){
 export function installPhase191FloorAuthorityLock(){
   const scene = window.__SVR_SCENE__;
   if (!scene) return null;
+  if (installedOnce && window.SVR_PHASE191_FLOOR_AUTHORITY) return window.SVR_PHASE191_FLOOR_AUTHORITY;
+  installedOnce = true;
   const state = scanAndLock(scene);
-  setTimeout(()=>scanAndLock(scene), 200);
+  setTimeout(()=>scanAndLock(scene), 220);
   setTimeout(()=>scanAndLock(scene), 900);
-  setInterval(()=>scanAndLock(scene), 1100);
-  console.log(`[Phase202] floor authority locked; hidden duplicate floors=${state.hidden}`);
+  setTimeout(()=>scanAndLock(scene), 2400);
+  console.log(`[Phase207] floor authority freeze guard locked; hidden duplicate floors=${state.hidden}`);
   return window.SVR_PHASE191_FLOOR_AUTHORITY;
 }
 
@@ -86,6 +91,6 @@ export function autoInstallPhase191FloorAuthorityLock(){
   const start = performance.now();
   const id=setInterval(()=>{
     if(window.__SVR_SCENE__){ clearInterval(id); installPhase191FloorAuthorityLock(); }
-    else if(performance.now()-start>16000){ clearInterval(id); }
-  },350);
+    else if(performance.now()-start>12000){ clearInterval(id); }
+  },500);
 }
