@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-221-MOON-TEXTURE-BUMP-POLISH-LOCK",
+  "build": "UPDATE-3.0-PHASE-222-MOON-SKY-ANCHOR-FIX-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "221",
-  "summary": "Adds a stronger cratered Moon material and bump-style relief polish based on the uploaded Moon diffuse/bump references while preserving the current Moon orbit, Mars orbit, second-floor city layers, and lobby baseline.",
-  "label": "UPDATE-3.0-PHASE-221-MOON-TEXTURE-BUMP-POLISH-LOCK",
-  "notes": "Game-only update. Site untouched. The uploaded Moon texture references were used as the visual target for the runtime crater diffuse/bump material. The uploaded FBX is not activated in this pass to avoid adding loader/runtime risk; the existing orbiting Moon mesh is preserved and re-skinned.",
-  "updated": "2026-06-14T08:45:00Z"
+  "phase": "222",
+  "summary": "Emergency fixes the Moon appearing as a large dome on the floor by removing non-sky Moon meshes and creating a single cratered Moon anchored high in the sky, while preserving Mars and the lobby/city layers.",
+  "label": "UPDATE-3.0-PHASE-222-MOON-SKY-ANCHOR-FIX-LOCK",
+  "notes": "Game-only update. Site untouched. The Moon is now forced to a sky-only anchor and floor dome Moon objects are purged. Mars orbit, city layers, teleport, and no-face-overlay protections remain active.",
+  "updated": "2026-06-14T09:00:00Z"
 }
