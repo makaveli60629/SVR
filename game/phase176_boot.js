@@ -6,12 +6,13 @@ import { installPhase186DeploySyncCleanup } from "./modules/phase186_deploy_sync
 import { autoInstallPhase188SecondFloorVisibility } from "./modules/phase188_second_floor_visibility.js";
 import { autoInstallPhase189SkyFloorHardlock } from "./modules/phase189_sky_floor_hardlock.js";
 
-const LABEL = "UPDATE-3.0-PHASE-189-SKY-FLOOR-HARDLOCK";
+const LABEL = "UPDATE-3.0-PHASE-190-QUEST-CONTROLLER-FORWARD-TELEPORT-LOCK";
 
 function sync(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
-  window.SVR_PHASE189 = { build: LABEL, active: true, skyFloorHardlock: true };
+  window.SVR_PHASE189 = { build: "UPDATE-3.0-PHASE-189-SKY-FLOOR-HARDLOCK", active: true, skyFloorHardlock: true };
+  window.SVR_PHASE190 = { build: LABEL, active: true, questControllerForwardTeleportLock: true };
   document.title = `SVR Poker • ${LABEL}`;
   document.querySelectorAll(".pill").forEach(el=>{
     if ((el.textContent || "").includes("BUILD:")) el.textContent = `BUILD: ${LABEL}`;
