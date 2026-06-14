@@ -1,7 +1,7 @@
 {
   "currentUpdate": "3.1",
-  "currentPhase": "3.1-A",
-  "currentBuild": "UPDATE-3.1-A-VERSION-SYNC-LOCK",
+  "currentPhase": "3.1-B",
+  "currentBuild": "UPDATE-3.1-B-LOBBY-STRUCTURE-COMPLETION-LOCK",
   "track": "game-only",
   "siteTouched": false,
   "sourceOfTruth": {
@@ -19,16 +19,23 @@
     "Every phase must update version files together.",
     "Keep diagnostics available until lobby is stable."
   ],
-  "nextPhases": [
+  "completed": [
+    {
+      "id": "3.1-A",
+      "name": "Version Sync Lock",
+      "result": "Runtime marker, boot label, diagnostics, and version docs synced."
+    },
     {
       "id": "3.1-B",
       "name": "Lobby Structure Completion",
-      "scope": ["upstairs floors", "red carpet", "Roman table patio", "spawn wall seal", "city windows"]
-    },
+      "result": "Adds floor-dome purge, sky Moon, solid upstairs floors, red carpets, Roman patio columns, city windows, and sealed spawn wall."
+    }
+  ],
+  "nextPhases": [
     {
       "id": "3.1-C",
       "name": "Sky Moon Window Fix",
-      "scope": ["Moon high and larger", "textured Moon", "Mars secondary", "city through windows"]
+      "scope": ["Moon high and larger", "textured Moon", "Mars secondary", "city through windows", "no floor dome"]
     },
     {
       "id": "3.1-D",
