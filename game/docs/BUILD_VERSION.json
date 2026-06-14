@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-G-HANDS-FIST-TELEPORT-ARC-REALIGN-LOCK",
+  "build": "UPDATE-3.1-H-CACHE-BUSTED-HANDS-FIST-RUNTIME-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-G",
-  "summary": "Removes the created Quest controller visual, returns to Oculus hands, changes hand teleport to fist-only aim and release-to-leap, replaces square teleport particles with round cyan/purple particle arcs, adds cyan/purple fist aura feedback, strengthens face-square overlay cleanup, and keeps the final runtime label locked to 3.1-G.",
-  "label": "UPDATE-3.1-G-HANDS-FIST-TELEPORT-ARC-REALIGN-LOCK",
-  "notes": "Game-only update. Site untouched. This phase prioritizes Oculus hands, fist teleport behavior, non-square teleport visuals, hand glow feedback, and stable phase alignment.",
-  "updated": "2026-06-14T16:35:00-05:00"
+  "phase": "3.1-H",
+  "summary": "Fixes the no-visible-change problem by cache-busting nested game modules. Main now imports new hands and movement wrapper modules, which force the browser to fetch the current Oculus-hands-only and fist-teleport runtime instead of stale cached modules.",
+  "label": "UPDATE-3.1-H-CACHE-BUSTED-HANDS-FIST-RUNTIME-LOCK",
+  "notes": "Game-only update. Site untouched. This phase directly targets Quest/browser module caching: main.js now imports hands_phase228.js and movement_phase228.js, and phase176 uses update31_version_sync_phase228.js.",
+  "updated": "2026-06-14T16:55:00-05:00"
 }
