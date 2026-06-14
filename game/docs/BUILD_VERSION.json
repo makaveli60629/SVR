@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-217-CITY-DEPTH-OBSERVATION-LOCK",
+  "build": "UPDATE-3.0-PHASE-218-SECOND-FLOOR-OVERLOOK-POLISH-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "217",
-  "summary": "Adds a procedural foreground city-depth layer and second-floor observation sightline over the uploaded sci-fi city backdrop, so the upstairs lobby reads as a city overlook rather than a flat background image.",
-  "label": "UPDATE-3.0-PHASE-217-CITY-DEPTH-OBSERVATION-LOCK",
-  "notes": "Game-only update. Site untouched. Preserves Phase 216 uploaded city backdrop, Phase 215 Moon/Mars, upright stance, no-face-overlay protections, and current lobby structure.",
-  "updated": "2026-06-14T07:30:00Z"
+  "phase": "218",
+  "summary": "Adds a second-floor overlook polish layer with clear walking markers, standing/photo spots, low benches, subtle glass reflections, and a non-blocking view rail over the Phase 217 city-depth skyline.",
+  "label": "UPDATE-3.0-PHASE-218-SECOND-FLOOR-OVERLOOK-POLISH-LOCK",
+  "notes": "Game-only update. Site untouched. Preserves Phase 217 city-depth skyline, Phase 216 uploaded city backdrop, Phase 215 Moon/Mars, upright stance, current lobby structure, and no-face-overlay protections.",
+  "updated": "2026-06-14T07:45:00Z"
 }
