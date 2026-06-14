@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 201",
-  "build": "UPDATE-3.0-PHASE-201-HUB-CONTENT-RESTORE-LOCK",
+  "version": "Update 3.0 Phase 202",
+  "build": "UPDATE-3.0-PHASE-202-STOREFRONT-SHELLS-HOLOGRAM-FRAMES-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Hub content restored on ordered grand lobby: module panels, approval-safe Wellness/Reiki content, PGA bay, Play Game bay, Store bay, Scorpion bay, Tier 1 jumbotron slots, Daily Bonus kiosk, Sponsor kiosk, ropes, floor arrows, and accent lighting. Auto Deploy runs on push to main."
+  "notes": "Storefront shells and hologram/carousel frames restored on ordered grand lobby: Wellness carousel frame, PGA practice frame, Store display racks, Scorpion private door, polished jumbotron shells, entry pads, bay glass, bay counters, approval-safe placeholders only. Auto Deploy runs on push to main."
 }
