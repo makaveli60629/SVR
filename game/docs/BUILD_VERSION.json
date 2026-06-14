@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-196-LOBBY-MODULE-BAY-POLISH-LOCK",
+  "build": "UPDATE-3.0-PHASE-197-LOBBY-RECOVERY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "196",
-  "summary": "Polishes the Phase 195 clean-geometry lobby into a more presentable module-bay room: stronger architectural columns, cleaner wall panels, better table detail, center carpet path, portal pads, subtle ceiling guide, one Moon, one Mars, no skyline/background buildings, and no legacy geometry stack.",
-  "label": "UPDATE-3.0-PHASE-196-LOBBY-MODULE-BAY-POLISH-LOCK",
-  "notes": "Game-only update. Site untouched. Keeps Phase 195 clean world bypass, Quest teleport, hands/controllers, watch, scene buttons, and floor authority.",
-  "updated": "2026-06-14T03:05:00Z"
+  "phase": "197",
+  "summary": "Recovers the lobby view after Phase 196 reports by removing old diagnostic/phase-bounce scripts from index boot, hiding the full-screen boot overlay, reducing desktop HUD clutter, disabling visible glove/controller-proxy hand objects, and preserving the clean geometry lobby runtime.",
+  "label": "UPDATE-3.0-PHASE-197-LOBBY-RECOVERY-LOCK",
+  "notes": "Game-only update. Site untouched. Clean Phase 195/196 lobby retained; overlay scripts and visible hand add-ons disabled.",
+  "updated": "2026-06-14T03:25:00Z"
 }
