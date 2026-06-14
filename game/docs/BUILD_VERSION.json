@@ -1,11 +1,11 @@
 {
-  "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-223-PHASE-DISPLAY-DIAG-ERROR-LOG-LOCK",
+  "version": "Update 3.1",
+  "build": "UPDATE-3.1-A-VERSION-SYNC-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "223",
-  "summary": "Adds a visible phase display and diagnostic error log in both DOM and world-space scene panel so the active phase, module status, warnings, and runtime errors can be seen during testing.",
-  "label": "UPDATE-3.0-PHASE-223-PHASE-DISPLAY-DIAG-ERROR-LOG-LOCK",
-  "notes": "Game-only update. Site untouched. Captures console errors, console warnings, window errors, and unhandled promise rejections. The world-space diagnostic panel is not attached to the camera to avoid face overlay problems.",
-  "updated": "2026-06-14T09:15:00Z"
+  "phase": "3.1-A",
+  "summary": "Locks the active game build marker for Update 3.1-A before lobby geometry work continues.",
+  "label": "UPDATE-3.1-A-VERSION-SYNC-LOCK",
+  "notes": "Game-only update. Site untouched. Adds the Update 3.1-A runtime marker through phase176_boot.js and syncs the diagnostic label.",
+  "updated": "2026-06-14T14:25:00-05:00"
 }
