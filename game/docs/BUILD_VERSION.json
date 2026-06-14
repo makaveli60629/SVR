@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-B-LOBBY-STRUCTURE-COMPLETION-LOCK",
+  "build": "UPDATE-3.1-C-MOON-PHASE-HARD-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-B",
-  "summary": "Adds lobby structure completion layer: kills the bad floor Moon dome, adds sky Moon eye candy, solid upstairs floor sections, red upstairs/stair carpets, Roman patio columns around the table area, city window frames, and a sealed spawn arrival wall.",
-  "label": "UPDATE-3.1-B-LOBBY-STRUCTURE-COMPLETION-LOCK",
-  "notes": "Game-only update. Site untouched. Loaded through the Update 3.1 runtime marker and phase176 boot chain. Diagnostics remain active.",
-  "updated": "2026-06-14T14:40:00-05:00"
+  "phase": "3.1-C",
+  "summary": "Hard locks the runtime to one Moon only and stops phase drift by repeatedly enforcing the Update 3.1-C label after older phase modules finish loading.",
+  "label": "UPDATE-3.1-C-MOON-PHASE-HARD-LOCK",
+  "notes": "Game-only update. Site untouched. Removes extra Moon meshes from older phase modules, creates one high left sky Moon, and keeps diagnostics reporting 3.1-C.",
+  "updated": "2026-06-14T14:55:00-05:00"
 }
