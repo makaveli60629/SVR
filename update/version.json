@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 202",
-  "build": "UPDATE-3.0-PHASE-202-STOREFRONT-SHELLS-HOLOGRAM-FRAMES-LOCK",
+  "version": "Update 3.0 Phase 203",
+  "build": "UPDATE-3.0-PHASE-203-CAROUSEL-INTERACTION-ROUTE-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Storefront shells and hologram/carousel frames restored on ordered grand lobby: Wellness carousel frame, PGA practice frame, Store display racks, Scorpion private door, polished jumbotron shells, entry pads, bay glass, bay counters, approval-safe placeholders only. Auto Deploy runs on push to main."
+  "notes": "Carousel interaction route lock: Wellness Next/Back buttons switch slides, Meditation button routes to the meditation page, desktop pointer and XR select interactions are installed, Auto Deploy runs on push to main."
 }
