@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.1-D",
-  "build": "UPDATE-3.1-D-QUEST-ALIGNMENT-CONTROL-OVERLAY-FIX",
+  "version": "Update 3.1-E",
+  "build": "UPDATE-3.1-E-UPLOADED-FLOOR-TABLE-TEXTURE-REUSE-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Quest alignment/control fix. Stops phase/title drift, removes stuck transparent diagnostic squares, restores upstairs floors and floor color clarity, fixes forward movement after 45-degree snap turns, expands teleport close/far aim control, adds magnetic target assist, and locks a textured rotating Moon high in the sky."
+  "notes": "Uploaded floor/table texture reuse pass. Registers 38-floor.zip and table2.zip materials, applies Quest-safe floor/table overlays, improves table felt/leather/wood finish, and holds heavy FBX/MAX model files for future optimized conversion."
 }
