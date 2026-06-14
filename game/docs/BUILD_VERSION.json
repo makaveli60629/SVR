@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-206-FACE-OVERLAY-REMOVAL-LOCK",
+  "build": "UPDATE-3.0-PHASE-207-QUEST-FREEZE-RECOVERY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "206",
-  "summary": "Emergency Quest face-overlay fix: removes Phase 204 visual-guide planes from the active lobby boot chain, suppresses black/HTML overlays in XR, removes face/view overlay objects from the scene and camera, and locks the game to a no-face-overlay runtime state.",
-  "label": "UPDATE-3.0-PHASE-206-FACE-OVERLAY-REMOVAL-LOCK",
-  "notes": "Game-only update. Site untouched. Keeps Phase 203 carousel interactions active while removing the visible guide-label overlay that could appear stuck to the player's view.",
-  "updated": "2026-06-14T06:05:00Z"
+  "phase": "207",
+  "summary": "Quest freeze recovery: simplifies the game boot chain, removes duplicate Phase 203/204 overlay boots from index, replaces the Phase 206 repeated overlay scan with a bounded cleanup guard, and limits floor-authority scene scans so the headset is not hit by constant scene traversals.",
+  "label": "UPDATE-3.0-PHASE-207-QUEST-FREEZE-RECOVERY-LOCK",
+  "notes": "Game-only update. Site untouched. Primary goal is headset stability and no-freeze runtime behavior; lobby structure and storefront content are preserved.",
+  "updated": "2026-06-14T06:20:00Z"
 }
