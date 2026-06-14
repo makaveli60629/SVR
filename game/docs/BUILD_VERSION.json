@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-H-CACHE-BUSTED-HANDS-FIST-RUNTIME-LOCK",
+  "build": "UPDATE-3.1-I-FINAL-PHASE-LABEL-MOON-REALIGN-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-H",
-  "summary": "Fixes the no-visible-change problem by cache-busting nested game modules. Main now imports new hands and movement wrapper modules, which force the browser to fetch the current Oculus-hands-only and fist-teleport runtime instead of stale cached modules.",
-  "label": "UPDATE-3.1-H-CACHE-BUSTED-HANDS-FIST-RUNTIME-LOCK",
-  "notes": "Game-only update. Site untouched. This phase directly targets Quest/browser module caching: main.js now imports hands_phase228.js and movement_phase228.js, and phase176 uses update31_version_sync_phase228.js.",
-  "updated": "2026-06-14T16:55:00-05:00"
+  "phase": "3.1-I / Phase 229",
+  "summary": "Adds a clean final game entrypoint, a final phase label, guarded browser title/build values, and a safe high-sky Moon plus Mars positioned away from the table.",
+  "label": "UPDATE-3.1-I-FINAL-PHASE-LABEL-MOON-REALIGN-LOCK",
+  "notes": "Game-only update. Site untouched. Addresses phase label clarity, runtime consistency, and Moon position over the table.",
+  "updated": "2026-06-14T17:10:00-05:00"
 }
