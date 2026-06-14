@@ -11,7 +11,7 @@ import { createWristWatch } from "./modules/watch.js";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-202-STOREFRONT-SHELLS-HOLOGRAM-FRAMES-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-208-QUEST-PERFORMANCE-VALIDATION-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
@@ -21,7 +21,7 @@ const ANDROID_SMART = /Android/i.test(navigator.userAgent || "") && !params.has(
 window.SVR_DISABLE_LEGACY_SKYLINE = true;
 window.SVR_REFINED_LOBBY_GEOMETRY = true;
 window.SVR_BACKGROUND_BUILDINGS_REMOVED = true;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 202: adds storefront shells, hologram carousel frames, jumbotron frames, and module bay props on the Phase 200/201 ordered lobby." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 208: Quest performance validation lock; preserves Phase 201/202 lobby content while validating freeze recovery and headset stability." };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -62,7 +62,7 @@ window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $
 window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
 const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading storefront shells and hologram frames…", { force: true });
+setStatus("Loading Quest performance validation…", { force: true });
 const world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
 installPhase201HubContentRestore({ scene, camera, renderer, log });
 installPhase202StorefrontShells({ scene, camera, renderer, log });
@@ -130,7 +130,7 @@ $toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $
 setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-window.SVR_PHASE202_STOREFRONT_MAIN = true;
+window.SVR_PHASE208_PERFORMANCE_MAIN = true;
 perf.lockSceneForQuest();
 
 window.__SVR_GAME_READY__ = true;
