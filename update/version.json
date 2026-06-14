@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.1-I Phase 229",
-  "build": "UPDATE-3.1-I-FINAL-PHASE-LABEL-MOON-REALIGN-LOCK",
+  "version": "Update 3.1-J Phase 230",
+  "build": "UPDATE-3.1-J-PHASE-230-MOON-OFF-TABLE-LABEL-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Final phase label and Moon realign pass. The game entrypoint now loads the clean runtime and the Phase 229 guard. A visible phase label is added, the browser title is held on Phase 229, and the Moon/Mars are placed high in the sky away from the table."
+  "notes": "Phase 230 label and Moon position fix. Phase 229 now chains into Phase 230. Phase 230 removes older Moon/Mars objects and places a smaller Moon and Mars high and far behind the lobby so the Moon does not cover the table."
 }
