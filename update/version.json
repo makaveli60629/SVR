@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 206",
-  "build": "UPDATE-3.0-PHASE-206-FACE-OVERLAY-REMOVAL-LOCK",
+  "version": "Update 3.0 Phase 207",
+  "build": "UPDATE-3.0-PHASE-207-QUEST-FREEZE-RECOVERY-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Emergency Quest face-overlay fix: removes Phase 204 visual-guide planes from active boot, suppresses black/HTML overlays in XR, removes face/view overlay objects from scene and camera, and keeps Phase 203 interactions active. Auto Deploy runs on push to main."
+  "notes": "Quest freeze recovery: simplified index boot chain, bounded face-overlay cleanup, disabled persistent boot cleanup loops, limited floor authority scans, and preserved lobby/storefront content. Auto Deploy runs on push to main."
 }
