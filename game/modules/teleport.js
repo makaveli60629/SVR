@@ -3,6 +3,8 @@ import { CONFIG } from "./config.js";
 import { isPinching, isFist } from "./gestures.js";
 import { constrainLobbyBounds } from "./phase178_bounds.js";
 
+const PHASE184_LABEL = "UPDATE-3.0-PHASE-184-QUEST-CONTROLLER-FORWARD-TELEPORT-LOCK";
+
 export function createTeleportRig({ scene, renderer, camera, roomClamp, log = console.log }){
   let baseRefSpace = null;
   let playerX = CONFIG.SPAWN_X;
@@ -26,16 +28,20 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   let leftControllerRef = null;
   let rightControllerRef = null;
   let wallBlocks = 0;
+  let controllerRayFlips = 0;
 
   const vHead = new THREE.Vector3();
   const vHeadDir = new THREE.Vector3();
   const vOrigin = new THREE.Vector3();
   const vDir = new THREE.Vector3();
+  const vAltDir = new THREE.Vector3();
+  const vControllerRight = new THREE.Vector3();
   const vWrist = new THREE.Vector3();
   const vIndex = new THREE.Vector3();
   const vThumb = new THREE.Vector3();
   const vTarget = new THREE.Vector3(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
   const vSmooth = new THREE.Vector3(CONFIG.SPAWN_X, 0, CONFIG.SPAWN_Z);
+  const qWorld = new THREE.Quaternion();
 
   function solidXZ(x,z){
     const p = constrainLobbyBounds(x,z);
@@ -55,7 +61,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       renderer.xr.setReferenceSpace(baseRefSpace.getOffsetReferenceSpace(xform));
       return true;
     }catch(err){
-      log("[Phase178 teleport] reference-space apply failed", err?.message || err);
+      log("[Phase184 teleport] reference-space apply failed", err?.message || err);
       return false;
     }
   }
@@ -63,7 +69,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
   function setPlayerPose(x, y, z){ const p = solidXZ(x,z); playerX = p.x; playerY = y; playerZ = p.z; return applyReferenceSpace(); }
   function setPlayerXZ(x, z){ const p = solidXZ(x,z); playerX = p.x; playerZ = p.z; return applyReferenceSpace(); }
   function setPlayerYaw(nextYaw){ playerYaw = nextYaw; return applyReferenceSpace(); }
-  function getPlayerPose(){ return { x: playerX, y: playerY, z: playerZ, yaw: playerYaw, wallBlocks }; }
+  function getPlayerPose(){ return { x: playerX, y: playerY, z: playerZ, yaw: playerYaw, wallBlocks, controllerRayFlips }; }
 
   const pointer = new THREE.Mesh(
     new THREE.PlaneGeometry(CONFIG.POINTER_SIZE, CONFIG.POINTER_SIZE),
@@ -97,7 +103,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
 
   const handGlowMat = new THREE.MeshBasicMaterial({ color:0xb55cff, transparent:true, opacity:0.0, blending:THREE.AdditiveBlending, depthWrite:false });
   const handGlow = new THREE.Mesh(new THREE.SphereGeometry(0.115, 20, 12), handGlowMat);
-  handGlow.name = "Phase169_Purple_Fist_Hand_Glow";
+  handGlow.name = "Phase184_Purple_Fist_Hand_Glow";
   handGlow.visible = false;
   handGlow.renderOrder = 1001;
   scene.add(handGlow);
@@ -163,7 +169,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       playerZ = p.z;
       return applyReferenceSpace();
     }catch(err){
-      log("[Phase178 teleport] jump failed", err?.message || err);
+      log("[Phase184 teleport] jump failed", err?.message || err);
       return false;
     }
   }
@@ -223,23 +229,55 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     setPlayerXZ(playerX + stepX, playerZ + stepZ);
   }
 
+  function rayScore(dir, headForward){
+    const flat = vAltDir.set(dir.x, 0, dir.z);
+    if (flat.lengthSq() < 1e-5) return -999;
+    flat.normalize();
+    return flat.dot(headForward);
+  }
+
+  function chooseControllerForward(controller){
+    controller.updateWorldMatrix?.(true, false);
+    controller.getWorldQuaternion(qWorld);
+
+    // WebXR controller target rays normally point down local -Z.
+    const minusZ = new THREE.Vector3(0, 0, -1).applyQuaternion(qWorld).normalize();
+    const plusZ = new THREE.Vector3(0, 0, 1).applyQuaternion(qWorld).normalize();
+    const headForward = getXRHeadForward().clone();
+
+    const minusScore = rayScore(minusZ, headForward);
+    const plusScore = rayScore(plusZ, headForward);
+    const chosen = plusScore > minusScore + 0.28 ? plusZ : minusZ;
+    if (chosen === plusZ) controllerRayFlips++;
+
+    vControllerRight.set(1,0,0).applyQuaternion(qWorld).normalize();
+    window.SVR_PHASE184_CONTROLLER_RAY = {
+      label: PHASE184_LABEL,
+      locked: true,
+      source: chosen === plusZ ? "local +Z fallback" : "local -Z target-ray",
+      minusScore: Number(minusScore.toFixed(3)),
+      plusScore: Number(plusScore.toFixed(3)),
+      flips: controllerRayFlips,
+      checkedAt: new Date().toISOString()
+    };
+    return chosen;
+  }
+
   function controllerAim(proxy){
     const controller = proxy?.userData?.controller || proxy;
     if (!controller) return null;
     controller.updateWorldMatrix?.(true, false);
     controller.getWorldPosition(vOrigin);
-    controller.getWorldDirection(vDir);
-    const forward = getXRHeadForward();
-    const flat = new THREE.Vector3(vDir.x, 0, vDir.z);
-    if (flat.lengthSq() > 1e-5){
-      flat.normalize();
-      if (flat.dot(forward) < -0.10){ vDir.x *= -1; vDir.z *= -1; }
-    }
+    vDir.copy(chooseControllerForward(controller));
+
+    // If the controller is level or slightly up, force a safe floor intersection in the same horizontal direction.
     if (vDir.y > -0.08) vDir.y = -0.44;
     vDir.normalize();
+
     const t = vOrigin.y / (-vDir.y);
     if (!isFinite(t) || t < 0.12) return null;
-    return clampTarget(new THREE.Vector3(vOrigin.x + vDir.x * Math.min(t, 120), 0, vOrigin.z + vDir.z * Math.min(t, 120))).clone();
+    const dist = Math.min(t, 120);
+    return clampTarget(new THREE.Vector3(vOrigin.x + vDir.x * dist, 0, vOrigin.z + vDir.z * dist)).clone();
   }
 
   function handPalmPosition(hand){
@@ -300,6 +338,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     activeMode = "hand";
     pinchHoldStart = 0;
     triggerHoldStart = 0;
+    controllerRayFlips = 0;
     hideVisuals();
   }
 
@@ -317,12 +356,12 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     if (rightToggle && !lastRightToggle && now > cooldownUntil){ mode = !(mode && active === rightControllerRef); active = mode ? (rightControllerRef || leftControllerRef) : null; activeMode = "controller"; cooldownUntil = now + 260; triggerHoldStart = 0; }
     lastLeftFist = leftFist; lastRightFist = rightFist; lastLeftToggle = leftToggle; lastRightToggle = rightToggle;
     if (!leftHandRef?.joints && !rightHandRef?.joints && !leftControllerRef?.joints && !rightControllerRef?.joints){ hideVisuals(); statusCb("Waiting for Quest hands or controllers…"); modeCb("Input: not tracked"); return; }
-    if (!mode || !active){ hideVisuals(); statusCb((leftControllerRef || rightControllerRef) ? "Controllers ready • right stick move/snap • grip/trigger aims TP • walls locked" : "Hands ready • fist arms TP • walls locked"); modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready • walls locked" : "Hands ready • walls locked"); return; }
+    if (!mode || !active){ hideVisuals(); statusCb((leftControllerRef || rightControllerRef) ? "Controllers ready • right stick move/snap • hold A/grip/trigger for forward TP" : "Hands ready • fist arms TP • walls locked"); modeCb((leftControllerRef || rightControllerRef) ? "Controllers ready • Phase184 ray lock" : "Hands ready • walls locked"); return; }
     if (activeMode === "hand" && !active?.joints) active = rightHandRef?.joints ? rightHandRef : leftHandRef?.joints ? leftHandRef : null;
     if (activeMode === "controller" && !active?.joints) active = rightControllerRef?.joints ? rightControllerRef : leftControllerRef?.joints ? leftControllerRef : null;
     if (!active){ mode = false; hideVisuals(); return; }
     const target = activeMode === "controller" ? controllerAim(active) : handAim(active);
-    if (!target){ hideVisuals(); setPurpleVisuals(true); statusCb(activeMode === "hand" ? "PURPLE TP ARMED • lower/aim hand, then pinch" : "CONTROLLER TP ARMED • aim at floor"); modeCb(activeMode === "hand" ? "Hands: PURPLE TP ARMED" : "Controllers: TP ARMED"); return; }
+    if (!target){ hideVisuals(); setPurpleVisuals(true); statusCb(activeMode === "hand" ? "PURPLE TP ARMED • lower/aim hand, then pinch" : "CONTROLLER TP ARMED • aim right controller at floor"); modeCb(activeMode === "hand" ? "Hands: PURPLE TP ARMED" : "Controllers: TP ARMED"); return; }
     vSmooth.lerp(target, vSmooth.distanceTo(target) > 1.2 ? 0.72 : 0.36);
     pointer.visible = true; ring.visible = true;
     pointer.position.copy(vSmooth).setY(0.018); ring.position.copy(vSmooth).setY(0.015); glow.position.copy(vSmooth).setY(0.38); setPurpleVisuals(true);
@@ -333,10 +372,12 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
       const trigger = controllerTriggerValue(active);
       if (trigger > 0.20 && !active.userData._wasTrigger) triggerHoldStart = now;
       const held = triggerHoldStart ? now - triggerHoldStart : 0;
-      if (active.userData._wasTrigger && trigger <= 0.12 && held > 90 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){ if (teleportByDelta(vSmooth)){ lastTP = now; mode = false; active = null; triggerHoldStart = 0; hideVisuals(); } }
+      if (active.userData._wasTrigger && trigger <= 0.12 && held > 90 && now - lastTP > CONFIG.TELEPORT_COOLDOWN_MS){
+        if (teleportByDelta(vSmooth)){ lastTP = now; mode = false; active = null; triggerHoldStart = 0; hideVisuals(); }
+      }
       if (trigger <= 0.12) triggerHoldStart = 0;
       active.userData._wasTrigger = trigger > 0.20;
-      statusCb("CONTROLLER TP ARMED • release trigger/grip • wall boundary locked"); modeCb("Controllers: TELEPORT ON"); return;
+      statusCb("CONTROLLER TP ARMED • release A/grip/trigger • forward ray locked"); modeCb("Controllers: PHASE184 FORWARD TP"); return;
     }
     const pinch = isPinching(active);
     if (active.userData._wasPinching === undefined) active.userData._wasPinching = false;
@@ -350,5 +391,5 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log = co
     statusCb("PURPLE HAND TP ARMED • pinch to teleport • walls locked");
     modeCb("Hands: PURPLE TELEPORT ON");
   }
-  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, getState:()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode, wallBlocks }) };
+  return { onSessionStart, setLogoTexture, update, setPlayerPose, setPlayerXZ, getPlayerPose, setPlayerYaw, toggleMode, isEnabled:()=>mode, getState:()=>({ mode, activeHand: active === rightHandRef || active === rightControllerRef ? "right" : active === leftHandRef || active === leftControllerRef ? "left" : "none", activeMode, wallBlocks, controllerRayFlips }) };
 }
