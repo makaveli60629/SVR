@@ -1,4 +1,8 @@
-const LABEL = "UPDATE-3.1-D-QUEST-ALIGNMENT-CONTROL-OVERLAY-FIX";
+const LABEL = "UPDATE-3.1-F-SINGLE-RUNTIME-QUEST-CONTROLLER-OVERLAY-LOCK";
+
+function newerRuntimeLocked(){
+  return !!window.SVR_PHASE226?.active || String(window.SVR_LOCKED_FINAL_BUILD || "").includes("UPDATE-3.1-F");
+}
 
 function stamp(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
@@ -9,10 +13,12 @@ function stamp(){
   window.SVR_UPDATE31 = Object.assign(window.SVR_UPDATE31 || {}, {
     build: LABEL,
     active: true,
-    phase: "3.1-D",
+    phase: "3.1-F",
     versionSync: true,
-    questAlignmentFix: true,
+    questControllerVisual: true,
+    singleRuntimeLock: true,
     diagnosticPanelsOff: true,
+    legacyAutoloadDisabled: true,
     oneMoonOnly: true,
     deployPath: "direct-game-folder",
     checkedAt: new Date().toISOString()
@@ -29,14 +35,15 @@ function removePanels(){
 }
 
 function loadModules(){
-  if(!window.SVR_UPDATE31_B_MODULE_REQUESTED){
-    window.SVR_UPDATE31_B_MODULE_REQUESTED = true;
-    import("./update31_lobby_structure_completion.js").catch(err=>console.error("Update 3.1-B module load failed", err));
-  }
-  if(!window.SVR_UPDATE31_C_MODULE_REQUESTED){
-    window.SVR_UPDATE31_C_MODULE_REQUESTED = true;
-    import("./update31_moon_phase_hard_lock.js").catch(err=>console.error("Update 3.1-D moon module load failed", err));
-  }
+  // Phase 226: disabled old 3.1-B / 3.1-C auto-imports.
+  // Those modules were re-stamping older titles and adding duplicate floors/moons/world layers.
+  window.SVR_UPDATE31_LEGACY_AUTOLOAD_DISABLED = true;
+  window.SVR_UPDATE31_B_MODULE_REQUESTED = true;
+  window.SVR_UPDATE31_C_MODULE_REQUESTED = true;
+  window.SVR_UPDATE31_LEGACY_MODULES_HELD = [
+    "update31_lobby_structure_completion.js",
+    "update31_moon_phase_hard_lock.js"
+  ];
 }
 
 function install(){
@@ -46,4 +53,4 @@ function install(){
 }
 
 install();
-[250,800,1800,3500,7000].forEach(ms=>setTimeout(install,ms));
+[250,800,1800,3500,7000].forEach(ms=>setTimeout(()=>{ if(!newerRuntimeLocked()) install(); },ms));
