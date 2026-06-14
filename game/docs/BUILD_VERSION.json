@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-222-MOON-SKY-ANCHOR-FIX-LOCK",
+  "build": "UPDATE-3.0-PHASE-223-PHASE-DISPLAY-DIAG-ERROR-LOG-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "222",
-  "summary": "Emergency fixes the Moon appearing as a large dome on the floor by removing non-sky Moon meshes and creating a single cratered Moon anchored high in the sky, while preserving Mars and the lobby/city layers.",
-  "label": "UPDATE-3.0-PHASE-222-MOON-SKY-ANCHOR-FIX-LOCK",
-  "notes": "Game-only update. Site untouched. The Moon is now forced to a sky-only anchor and floor dome Moon objects are purged. Mars orbit, city layers, teleport, and no-face-overlay protections remain active.",
-  "updated": "2026-06-14T09:00:00Z"
+  "phase": "223",
+  "summary": "Adds a visible phase display and diagnostic error log in both DOM and world-space scene panel so the active phase, module status, warnings, and runtime errors can be seen during testing.",
+  "label": "UPDATE-3.0-PHASE-223-PHASE-DISPLAY-DIAG-ERROR-LOG-LOCK",
+  "notes": "Game-only update. Site untouched. Captures console errors, console warnings, window errors, and unhandled promise rejections. The world-space diagnostic panel is not attached to the camera to avoid face overlay problems.",
+  "updated": "2026-06-14T09:15:00Z"
 }
