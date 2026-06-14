@@ -1,4 +1,4 @@
-const LABEL = "UPDATE-3.0-PHASE-186-DEPLOY-SYNC-CLEANUP-LOCK";
+const LABEL = "UPDATE-3.0-PHASE-186B-DEPLOY-SYNC-CLEANUP-HOTFIX";
 
 const REMOVE_PATTERNS = [
   /building/i,
@@ -20,8 +20,6 @@ const REMOVE_PATTERNS = [
 ];
 const KEEP_PATTERNS = [
   /PHASE185/i,
-  /PHASE184/i,
-  /PHASE183/i,
   /PHASE181/i,
   /PHASE180/i,
   /PHASE178/i,
@@ -41,14 +39,24 @@ const KEEP_PATTERNS = [
   /Moon/i,
   /Mars/i
 ];
+function isObject3D(v){ return !!v && typeof v === "object" && (v.isObject3D || "visible" in v || typeof v.traverse === "function"); }
 function shouldKeep(obj){
   const n = String(obj?.name || "");
   return KEEP_PATTERNS.some(rx=>rx.test(n));
 }
 function shouldHide(obj){
-  if(!obj || obj.isScene || shouldKeep(obj)) return false;
+  if(!isObject3D(obj) || obj.isScene || shouldKeep(obj)) return false;
   const n = String(obj.name || "");
   return REMOVE_PATTERNS.some(rx=>rx.test(n));
+}
+function safeHide(v){
+  if(!isObject3D(v)) return 0;
+  let count = 0;
+  if(v.visible !== false){ v.visible = false; count++; }
+  if(typeof v.traverse === "function"){
+    v.traverse(child=>{ if(child && child !== v && child.visible !== false){ child.visible = false; count++; } });
+  }
+  return count;
 }
 export function installPhase186DeploySyncCleanup(){
   const started = performance.now();
@@ -63,8 +71,7 @@ export function installPhase186DeploySyncCleanup(){
     if(scene.userData){
       for(const key of Object.keys(scene.userData)){
         if(/phase123|adBanners|skyline|building|tower|city/i.test(key)){
-          const v = scene.userData[key];
-          if(v && v.visible !== false){ v.visible = false; hidden++; }
+          hidden += safeHide(scene.userData[key]);
         }
       }
     }
@@ -77,6 +84,6 @@ export function installPhase186DeploySyncCleanup(){
       checkedAt: new Date().toISOString()
     };
   }, 700);
-  console.log("[Phase186] deploy sync cleanup active");
+  console.log("[Phase186B] deploy sync cleanup hotfix active");
   return timer;
 }
