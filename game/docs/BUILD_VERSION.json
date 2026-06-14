@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-218-SECOND-FLOOR-OVERLOOK-POLISH-LOCK",
+  "build": "UPDATE-3.0-PHASE-219-SCIFI-OBJ-SILHOUETTE-SKYLINE-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "218",
-  "summary": "Adds a second-floor overlook polish layer with clear walking markers, standing/photo spots, low benches, subtle glass reflections, and a non-blocking view rail over the Phase 217 city-depth skyline.",
-  "label": "UPDATE-3.0-PHASE-218-SECOND-FLOOR-OVERLOOK-POLISH-LOCK",
-  "notes": "Game-only update. Site untouched. Preserves Phase 217 city-depth skyline, Phase 216 uploaded city backdrop, Phase 215 Moon/Mars, upright stance, current lobby structure, and no-face-overlay protections.",
-  "updated": "2026-06-14T07:45:00Z"
+  "phase": "219",
+  "summary": "Adds a Quest-safe reduced skyline layer derived from the uploaded Scifi downtown city OBJ. The new layer uses 39 reduced skyline stacks calculated from the uploaded OBJ vertex bounds so the second-floor city background reads with real model-based depth without re-enabling legacy skyline clutter.",
+  "label": "UPDATE-3.0-PHASE-219-SCIFI-OBJ-SILHOUETTE-SKYLINE-LOCK",
+  "notes": "Game-only update. Site untouched. Preserves Phase 218 overlook polish, Phase 217 city-depth observation, Phase 216 uploaded city background, Phase 215 Moon/Mars, upright stance, teleport, and no-face-overlay protections.",
+  "updated": "2026-06-14T08:05:00Z"
 }
