@@ -5,7 +5,15 @@ const GOLD = 0xffd98a;
 const CYAN = 0x7ffcff;
 const RED = 0x7e1014;
 
+function newerRuntimeLocked(){
+  return !!window.SVR_PHASE226?.active || String(window.SVR_LOCKED_FINAL_BUILD || "").includes("UPDATE-3.1-F");
+}
+
 function stamp(){
+  if(newerRuntimeLocked()){
+    window.SVR_PHASE225 = Object.assign(window.SVR_PHASE225 || {}, { active:true, phase:"3.1-E", supersededBy:"3.1-F" });
+    return;
+  }
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
   window.SVR_CURRENT_BUILD = LABEL;
@@ -82,6 +90,7 @@ function glow(color, opacity=.35){ return new THREE.MeshBasicMaterial({ color, t
 function plane(root,name,w,h,x,y,z,mat,rx=-Math.PI/2,ry=0){ const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),mat); m.name=name; m.position.set(x,y,z); m.rotation.x=rx; m.rotation.y=ry; root.add(m); return m; }
 function box(root,name,sx,sy,sz,x,y,z,mat){ const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat); m.name=name; m.position.set(x,y,z); root.add(m); return m; }
 function label(root){
+  if(newerRuntimeLocked()) return;
   const c=document.createElement("canvas"); c.width=1024; c.height=256;
   const ctx=c.getContext("2d");
   ctx.fillStyle="rgba(2,4,13,.86)"; ctx.fillRect(0,0,c.width,c.height);
