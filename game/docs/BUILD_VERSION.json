@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-190-QUEST-CONTROLLER-FORWARD-TELEPORT-LOCK",
+  "build": "UPDATE-3.0-PHASE-191-DUPLICATE-FLOOR-AUTHORITY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "190",
-  "summary": "Fixes Quest/Oculus controller teleport direction by using WebXR local -Z target-ray as controller forward, adds a safe +Z fallback only when needed, preserves right-stick movement/snap-turn, and keeps hold-to-aim/release-to-teleport behavior.",
-  "label": "UPDATE-3.0-PHASE-190-QUEST-CONTROLLER-FORWARD-TELEPORT-LOCK",
-  "notes": "Game-only update for GitHub issue #96. Site untouched. Phase 189 sky/floor hardlock preserved.",
-  "updated": "2026-06-14T01:05:00Z"
+  "phase": "191",
+  "summary": "Fixes launch blocker #95 by enforcing one authoritative visual floor, hiding duplicate lower/upper floor and old second-floor systems, keeping collision/teleport authority mathematical at Y=0, and preserving Phase 190 Quest controller teleport forward behavior.",
+  "label": "UPDATE-3.0-PHASE-191-DUPLICATE-FLOOR-AUTHORITY-LOCK",
+  "notes": "Game-only update. Site untouched. Phase 190 controller forward teleport lock preserved.",
+  "updated": "2026-06-14T01:25:00Z"
 }
