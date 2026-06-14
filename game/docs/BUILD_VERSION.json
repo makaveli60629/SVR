@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-D-QUEST-ALIGNMENT-CONTROL-OVERLAY-FIX",
+  "build": "UPDATE-3.1-E-UPLOADED-FLOOR-TABLE-TEXTURE-REUSE-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-D",
-  "summary": "Fixes Quest alignment problems by stopping phase/title drift, restoring visible upstairs floors, removing stuck diagnostic/transparent view panels, improving snap-turn forward movement, adding close/far teleport control, adding magnetic target assist, and locking a textured rotating Moon high in the sky.",
-  "label": "UPDATE-3.1-D-QUEST-ALIGNMENT-CONTROL-OVERLAY-FIX",
-  "notes": "Game-only update. Site untouched. This pass focuses on Oculus/Quest movement, overlay cleanup, upstairs floor alignment, floor color visibility, teleport range, magnet selection, and Moon/Mars sky lock.",
-  "updated": "2026-06-14T15:20:00-05:00"
+  "phase": "3.1-E",
+  "summary": "Adds a Quest-safe uploaded texture reuse pass for the new 38-floor and table2 packages. Registers reusable floor/table source maps, adds generated material overlays matched to those packages, refreshes main/upstairs floor surfaces, adds table felt/leather/wood finish overlays, and keeps heavy FBX/MAX files held for later optimized conversion.",
+  "label": "UPDATE-3.1-E-UPLOADED-FLOOR-TABLE-TEXTURE-REUSE-LOCK",
+  "notes": "Game-only update. Site untouched. Textures can help immediately; models are useful but should be converted/optimized before runtime WebXR use.",
+  "updated": "2026-06-14T15:45:00-05:00"
 }
