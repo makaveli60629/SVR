@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-192-LOBBY-VISUAL-CLEANUP-LOCK",
+  "build": "UPDATE-3.0-PHASE-193-SKYLINE-POPIN-GEOMETRY-REFINE-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "192",
-  "summary": "Cleans the current lobby view by hiding oversized vertical slabs, balcony/canopy clutter, duplicate upper floor remnants, old arena pieces, and compacting desktop overlay controls while adding clean modular wall/kiosk panels for Play, Wellness, PGA, Store, and Scorpion.",
-  "label": "UPDATE-3.0-PHASE-192-LOBBY-VISUAL-CLEANUP-LOCK",
-  "notes": "Game-only update. Site untouched. Preserves Phase 190 controller forward teleport and Phase 191 floor authority.",
-  "updated": "2026-06-14T01:40:00Z"
+  "phase": "193",
+  "summary": "Stops legacy background buildings/skyline from flashing during load by installing a preload scene filter before main world boot, then refines the lobby into a cleaner modular rectangular room with wall-aligned storefront panels, columns, trims, and lightweight ceiling guide rings.",
+  "label": "UPDATE-3.0-PHASE-193-SKYLINE-POPIN-GEOMETRY-REFINE-LOCK",
+  "notes": "Game-only update. Site untouched. Preserves Phase 190 controller forward teleport, Phase 191 floor authority, and Phase 192 HUD cleanup.",
+  "updated": "2026-06-14T02:00:00Z"
 }
