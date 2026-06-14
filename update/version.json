@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.1-H",
-  "build": "UPDATE-3.1-H-CACHE-BUSTED-HANDS-FIST-RUNTIME-LOCK",
+  "version": "Update 3.1-I Phase 229",
+  "build": "UPDATE-3.1-I-FINAL-PHASE-LABEL-MOON-REALIGN-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Cache-busted runtime fix for no-visible-change issue. main.js now imports new wrapper modules for hands and movement so Quest/browser module cache must fetch the updated Oculus-hands-only fist teleport runtime. phase176 also uses a cache-busted 3.1-H sync module."
+  "notes": "Final phase label and Moon realign pass. The game entrypoint now loads the clean runtime and the Phase 229 guard. A visible phase label is added, the browser title is held on Phase 229, and the Moon/Mars are placed high in the sky away from the table."
 }
