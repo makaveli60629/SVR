@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 217",
-  "build": "UPDATE-3.0-PHASE-217-CITY-DEPTH-OBSERVATION-LOCK",
+  "version": "Update 3.0 Phase 218",
+  "build": "UPDATE-3.0-PHASE-218-SECOND-FLOOR-OVERLOOK-POLISH-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Adds procedural foreground city-depth towers plus a second-floor City Overlook observation sightline over the uploaded sci-fi city backdrop. Preserves Phase 216 backdrop, Phase 215 Moon/Mars, teleport and no-face-overlay protections. Auto Deploy runs on push to main."
+  "notes": "Adds second-floor overlook polish: clear walking markers, stand/photo spots, side benches, subtle glass reflections, and a non-blocking view rail over the Phase 217 city-depth skyline. Preserves Phase 216 city backdrop, Phase 215 Moon/Mars, teleport and no-face-overlay protections. Auto Deploy runs on push to main."
 }
