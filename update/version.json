@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 200",
-  "build": "UPDATE-3.0-PHASE-200-ORDERED-GRAND-LOBBY-STRUCTURE-LOCK",
+  "version": "Update 3.0 Phase 201",
+  "build": "UPDATE-3.0-PHASE-201-HUB-CONTENT-RESTORE-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Ordered grand two-floor lobby structure, aligned rear and side columns, U-shaped upstairs walkway, visible lighting pass, aligned module bays, one Moon, one Mars, no legacy background buildings. Auto Deploy runs on push to main."
+  "notes": "Hub content restored on ordered grand lobby: module panels, approval-safe Wellness/Reiki content, PGA bay, Play Game bay, Store bay, Scorpion bay, Tier 1 jumbotron slots, Daily Bonus kiosk, Sponsor kiosk, ropes, floor arrows, and accent lighting. Auto Deploy runs on push to main."
 }
