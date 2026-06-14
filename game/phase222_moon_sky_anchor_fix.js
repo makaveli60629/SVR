@@ -3,7 +3,15 @@ import * as THREE from "three";
 const LABEL = "UPDATE-3.0-PHASE-222-MOON-SKY-ANCHOR-FIX-LOCK";
 const SKY_POS = new THREE.Vector3(-8, 24, -38);
 
+function isUpdate31HardLocked(){
+  return window.SVR_CURRENT_UPDATE === "3.1" || String(window.SVR_CURRENT_BUILD || "").startsWith("UPDATE-3.1") || window.SVR_UPDATE31?.active;
+}
+
 function stamp(){
+  if (isUpdate31HardLocked()){
+    window.SVR_PHASE222 = Object.assign(window.SVR_PHASE222 || {}, { active:true, bypassedByUpdate31:true, oldMoonCreationDisabled:true });
+    return;
+  }
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
   window.SVR_NO_FACE_OVERLAY = true;
@@ -45,23 +53,6 @@ function makeMoonTexture(){
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
 }
 
-function makeBumpTexture(){
-  const c = document.createElement("canvas");
-  c.width = 1024; c.height = 512;
-  const ctx = c.getContext("2d");
-  const g = ctx.createLinearGradient(0,0,c.width,c.height);
-  g.addColorStop(0,"#b8b8b8"); g.addColorStop(.5,"#737373"); g.addColorStop(1,"#9f9f9f");
-  ctx.fillStyle = g; ctx.fillRect(0,0,c.width,c.height);
-  function crater(x,y,r){
-    const rg=ctx.createRadialGradient(x-r*.16,y-r*.2,r*.05,x,y,r);
-    rg.addColorStop(0,"rgba(255,255,255,.36)"); rg.addColorStop(.52,"rgba(125,125,125,.18)"); rg.addColorStop(.66,"rgba(20,20,20,.45)"); rg.addColorStop(.86,"rgba(245,245,245,.30)"); rg.addColorStop(1,"rgba(128,128,128,0)");
-    ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-  }
-  for(let i=0;i<520;i++) crater(Math.random()*c.width,Math.random()*c.height,2+Math.pow(Math.random(),2.4)*25);
-  [[112,280,50],[335,320,64],[755,260,74],[895,350,42],[600,145,48]].forEach(v=>crater(...v));
-  return new THREE.CanvasTexture(c);
-}
-
 function purgeFloorMoons(scene){
   const remove = [];
   scene.traverse(o=>{
@@ -75,48 +66,23 @@ function createMoon(scene){
   let moon = scene.getObjectByName("PHASE222_SKY_ANCHORED_CRATER_MOON");
   if (!moon){
     moon = new THREE.Mesh(new THREE.SphereGeometry(5.1,96,64), new THREE.MeshStandardMaterial({
-      map: makeMoonTexture(), bumpMap: makeBumpTexture(), bumpScale: .38, roughness:.9, metalness:0, emissive:0x20283a, emissiveIntensity:.31
+      map: makeMoonTexture(), roughness:.9, metalness:0, emissive:0x20283a, emissiveIntensity:.31
     }));
     moon.name = "PHASE222_SKY_ANCHORED_CRATER_MOON";
     scene.add(moon);
   }
   moon.position.copy(SKY_POS);
-  moon.scale.setScalar(1);
   moon.visible = true;
-  let halo = scene.getObjectByName("PHASE222_MOON_HALO");
-  if (!halo){
-    halo = new THREE.Mesh(new THREE.SphereGeometry(5.55,64,32), new THREE.MeshBasicMaterial({ color:0xe7efff, transparent:true, opacity:.09, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.BackSide }));
-    halo.name = "PHASE222_MOON_HALO";
-    scene.add(halo);
-  }
-  halo.position.copy(moon.position);
-  halo.visible = true;
   return moon;
 }
 
 function install(){
   stamp();
+  if (isUpdate31HardLocked()) return true;
   const scene = window.__SVR_SCENE__;
   if (!scene) return false;
   purgeFloorMoons(scene);
-  const moon = createMoon(scene);
-  if (!scene.userData._phase222MoonAnchorTick){
-    scene.userData._phase222MoonAnchorTick = true;
-    const oldTick = scene.userData._tickWorld;
-    scene.userData._tickWorld = (dt)=>{
-      if (typeof oldTick === "function") oldTick(dt);
-      const t = performance.now() * .001;
-      const m = scene.getObjectByName("PHASE222_SKY_ANCHORED_CRATER_MOON");
-      const h = scene.getObjectByName("PHASE222_MOON_HALO");
-      if (m){
-        m.position.set(SKY_POS.x + Math.sin(t*.025)*1.1, SKY_POS.y, SKY_POS.z + Math.cos(t*.025));
-        m.rotation.y = t*.07;
-        if (h){ h.position.copy(m.position); h.scale.setScalar(1 + Math.sin(t*.9)*.012); }
-      }
-      const mars = scene.getObjectByName("PHASE215_FINAL_SINGLE_TEXTURED_MARS") || scene.getObjectByName("PHASE221_FINAL_TEXTURED_MARS");
-      if (mars && m){ mars.position.set(m.position.x+Math.cos(t*.07)*8, m.position.y-1.6, m.position.z-5+Math.sin(t*.07)*2); mars.rotation.y=t*.13; mars.visible=true; }
-    };
-  }
+  createMoon(scene);
   window.SVR_PHASE222_MOON_SKY_ANCHOR_INSTALLED = true;
   return true;
 }
