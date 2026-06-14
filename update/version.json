@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 203",
-  "build": "UPDATE-3.0-PHASE-203-CAROUSEL-INTERACTION-ROUTE-LOCK",
+  "version": "Update 3.0 Phase 204",
+  "build": "UPDATE-3.0-PHASE-204-VISUAL-GUIDE-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Carousel interaction route lock: Wellness Next/Back buttons switch slides, Meditation button routes to the meditation page, desktop pointer and XR select interactions are installed, Auto Deploy runs on push to main."
+  "notes": "Visual guide lock: labels for Back, Next, Enter Room, Store, PGA, and Scorpion are installed above the Phase 203 interactive controls. Auto Deploy runs on push to main."
 }
