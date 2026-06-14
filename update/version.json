@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 204",
-  "build": "UPDATE-3.0-PHASE-204-VISUAL-GUIDE-LOCK",
+  "version": "Update 3.0 Phase 206",
+  "build": "UPDATE-3.0-PHASE-206-FACE-OVERLAY-REMOVAL-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Visual guide lock: labels for Back, Next, Enter Room, Store, PGA, and Scorpion are installed above the Phase 203 interactive controls. Auto Deploy runs on push to main."
+  "notes": "Emergency Quest face-overlay fix: removes Phase 204 visual-guide planes from active boot, suppresses black/HTML overlays in XR, removes face/view overlay objects from scene and camera, and keeps Phase 203 interactions active. Auto Deploy runs on push to main."
 }
