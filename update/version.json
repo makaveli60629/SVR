@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.1-B",
-  "build": "UPDATE-3.1-B-LOBBY-STRUCTURE-COMPLETION-LOCK",
+  "version": "Update 3.1-C",
+  "build": "UPDATE-3.1-C-MOON-PHASE-HARD-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Lobby structure completion layer: floor Moon dome kill, sky Moon eye candy, solid upstairs floors, red carpets, Roman patio columns, city windows, and sealed spawn arrival wall. Diagnostics remain active."
+  "notes": "Hard lock fix for three Moon bug and phase drift. Keeps exactly one high sky Moon, removes old Moon meshes, and repeatedly enforces the 3.1-C phase label. Diagnostics remain active."
 }
