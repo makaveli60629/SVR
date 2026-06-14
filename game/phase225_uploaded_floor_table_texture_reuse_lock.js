@@ -6,12 +6,13 @@ const CYAN = 0x7ffcff;
 const RED = 0x7e1014;
 
 function newerRuntimeLocked(){
-  return !!window.SVR_PHASE226?.active || String(window.SVR_LOCKED_FINAL_BUILD || "").includes("UPDATE-3.1-F");
+  const locked = String(window.SVR_LOCKED_FINAL_BUILD || "");
+  return !!window.SVR_PHASE227?.active || !!window.SVR_PHASE226?.active || locked.includes("UPDATE-3.1-G") || locked.includes("UPDATE-3.1-F");
 }
 
 function stamp(){
   if(newerRuntimeLocked()){
-    window.SVR_PHASE225 = Object.assign(window.SVR_PHASE225 || {}, { active:true, phase:"3.1-E", supersededBy:"3.1-F" });
+    window.SVR_PHASE225 = Object.assign(window.SVR_PHASE225 || {}, { active:true, phase:"3.1-E", supersededBy:"3.1-G" });
     return;
   }
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
