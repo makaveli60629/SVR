@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const LABEL = "UPDATE-3.0-PHASE-223-PHASE-DISPLAY-DIAG-ERROR-LOG-LOCK";
+const LABEL = "UPDATE-3.1-A-VERSION-SYNC-LOCK";
 const MAX = 24;
 const logStore = window.SVR_DIAG_LOG = window.SVR_DIAG_LOG || [];
 
@@ -18,6 +18,8 @@ function push(level, msg, detail=""){
 function stamp(){
   window.SVR_PHASE106 = window.SVR_PHASE106 || {};
   window.SVR_PHASE106.build = LABEL;
+  window.SVR_CURRENT_BUILD = LABEL;
+  window.SVR_CURRENT_UPDATE = "3.1";
   window.SVR_NO_FACE_OVERLAY = true;
   window.SVR_PHASE223 = {
     build: LABEL,
@@ -27,8 +29,10 @@ function stamp(){
     catchesErrors: true,
     scenePanel: true,
     domPanel: true,
+    update31Synced: true,
     checkedAt: new Date().toISOString()
   };
+  window.SVR_UPDATE31 = Object.assign(window.SVR_UPDATE31 || {}, { build: LABEL, active: true, phase: "3.1-A", diagnosticSynced: true });
   document.title = `SVR Poker • ${LABEL}`;
 }
 
@@ -48,7 +52,8 @@ function makeDom(){
 
 function renderDom(){
   const panel = makeDom();
-  const modules = ["211","212","213","214","215","207","216","217","218","219","220","222","223"].filter(p=>{
+  const modules = ["211","212","213","214","215","207","216","217","218","219","220","222","223","31A"].filter(p=>{
+    if(p==="31A") return window.SVR_UPDATE31;
     if(p==="207") return window.SVR_PHASE207 || window.SVR_PHASE207_CITY_INSTALLED;
     return window[`SVR_PHASE${p}`] || window[`SVR_PHASE${p}_CITY_DEPTH_INSTALLED`] || window[`SVR_PHASE${p}_MOON_SKY_ANCHOR_INSTALLED`];
   }).join(" ");
@@ -103,7 +108,7 @@ function makeScenePanel(){
   diagTexture = new THREE.CanvasTexture(diagCanvas);
   diagTexture.colorSpace = THREE.SRGBColorSpace;
   diagMesh = new THREE.Mesh(new THREE.PlaneGeometry(4.6,2.3), new THREE.MeshBasicMaterial({ map:diagTexture, transparent:true, side:THREE.DoubleSide, depthWrite:false }));
-  diagMesh.name = "PHASE223_WORLD_DIAGNOSTIC_PANEL_NOT_CAMERA_ATTACHED";
+  diagMesh.name = "UPDATE31A_WORLD_DIAGNOSTIC_PANEL_NOT_CAMERA_ATTACHED";
   diagMesh.position.set(-7.2,2.55,-6.2);
   diagMesh.rotation.y = Math.PI * .16;
   diagMesh.renderOrder = 90;
@@ -141,7 +146,7 @@ function install(){
   renderDom();
   makeScenePanel();
   updateSceneTexture();
-  if(!window.SVR_PHASE223_BOOT_LOGGED){ window.SVR_PHASE223_BOOT_LOGGED = true; push("INFO", "Phase display and diagnostic log active"); }
+  if(!window.SVR_PHASE223_BOOT_LOGGED){ window.SVR_PHASE223_BOOT_LOGGED = true; push("INFO", "Update 3.1-A diagnostic and version sync active"); }
   return true;
 }
 
