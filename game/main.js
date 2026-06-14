@@ -5,12 +5,13 @@ import { createHands } from "./modules/hands.js";
 import { createTeleportRig } from "./modules/teleport.js";
 import { buildPhase195CleanLobbyWorld } from "./modules/phase195_clean_lobby_world.js";
 import { installPhase201HubContentRestore } from "./modules/phase201_hub_content_restore.js";
+import { installPhase202StorefrontShells } from "./modules/phase202_storefront_shells.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
-const BUILD_LABEL = "UPDATE-3.0-PHASE-201-HUB-CONTENT-RESTORE-LOCK";
+const BUILD_LABEL = "UPDATE-3.0-PHASE-202-STOREFRONT-SHELLS-HOLOGRAM-FRAMES-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
@@ -20,7 +21,7 @@ const ANDROID_SMART = /Android/i.test(navigator.userAgent || "") && !params.has(
 window.SVR_DISABLE_LEGACY_SKYLINE = true;
 window.SVR_REFINED_LOBBY_GEOMETRY = true;
 window.SVR_BACKGROUND_BUILDINGS_REMOVED = true;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 201: restores ordered hub content, ad slots, ropes, arrows, and module panels on the Phase 200 grand lobby structure." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 202: adds storefront shells, hologram carousel frames, jumbotron frames, and module bay props on the Phase 200/201 ordered lobby." };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -61,9 +62,10 @@ window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $
 window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
 const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading ordered grand lobby and hub content…", { force: true });
+setStatus("Loading storefront shells and hologram frames…", { force: true });
 const world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
 installPhase201HubContentRestore({ scene, camera, renderer, log });
+installPhase202StorefrontShells({ scene, camera, renderer, log });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -100,7 +102,7 @@ function gotoScene(key){ const rec = sceneTargets?.[key]; if (!rec?.pos) return 
 function openStorePortal(){ const url = "https://svrpoker.com/site/store.html"; window.open(url, "_blank", "noopener,noreferrer"); setStatus("SVR Store portal opened.", { force: true }); return true; }
 function createStoreWebPortal(){
   const rec = sceneTargets?.store; if (!rec?.pos) return null;
-  const group = new THREE.Group(); group.name = "PHASE201_SVR_STORE_WEB_PORTAL"; group.position.set(rec.pos.x + 0.45, 1.55, rec.pos.z - 0.35); if (rec.look) group.lookAt(rec.look.x, 1.45, rec.look.z);
+  const group = new THREE.Group(); group.name = "PHASE202_SVR_STORE_WEB_PORTAL"; group.position.set(rec.pos.x + 0.45, 1.55, rec.pos.z - 0.35); if (rec.look) group.lookAt(rec.look.x, 1.45, rec.look.z);
   const pane = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 1.02), new THREE.MeshBasicMaterial({ color:0x5ef7ff, transparent:true, opacity:0.18, side:THREE.DoubleSide, blending:THREE.AdditiveBlending })); pane.userData.href = "https://svrpoker.com/site/store.html"; group.add(pane);
   const canvas = document.createElement("canvas"); canvas.width = 900; canvas.height = 500; const ctx = canvas.getContext("2d");
   ctx.fillStyle = "#050713"; ctx.fillRect(0,0,900,500); ctx.strokeStyle = "#7ffcff"; ctx.lineWidth = 12; ctx.strokeRect(24,24,852,452); ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillStyle="#fff"; ctx.font="900 58px system-ui,Arial"; ctx.fillText("SVR STORE",450,150); ctx.fillStyle="#ffdf8a"; ctx.font="800 34px system-ui,Arial"; ctx.fillText("Click to open web store",450,265); ctx.fillStyle="#bffcff"; ctx.font="700 24px system-ui,Arial"; ctx.fillText("Store opens outside the game",450,350);
@@ -128,7 +130,7 @@ $toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $
 setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
-window.SVR_PHASE201_HUB_CONTENT_MAIN = true;
+window.SVR_PHASE202_STOREFRONT_MAIN = true;
 perf.lockSceneForQuest();
 
 window.__SVR_GAME_READY__ = true;
