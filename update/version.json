@@ -1,9 +1,9 @@
 {
-  "version": "Update 3.0 Phase 209",
-  "build": "UPDATE-3.0-PHASE-209-QUEST-LOCOMOTION-TELEPORT-STAIR-SKY-LOCK",
+  "version": "Update 3.0 Phase 216",
+  "build": "UPDATE-3.0-PHASE-216-SCIFI-CITY-SECOND-FLOOR-BACKGROUND-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
   "gameZip": "update/game.zip",
-  "notes": "Quest control and sky lock: no face black squares, headset-forward movement with no strafe drift, hold-release A/grip/trigger teleport, doubled textured Moon, enlarged textured Mars, higher orbiting sky objects, and stair/upstairs floor height support. Auto Deploy runs on push to main."
+  "notes": "Adds the uploaded sci-fi city skyline behind the upstairs/north lobby so it is visible from the second floor. Preserves Phase 215 upright stance, clean sky, Moon/Mars, teleport and no-face-overlay protections. Auto Deploy runs on push to main."
 }
