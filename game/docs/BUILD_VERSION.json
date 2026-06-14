@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-L-PHASE-232-STABLE-LITE-POLISH-LOCK",
+  "build": "UPDATE-3.1-M-PHASE-233-SAFE-ENTRY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-L / Phase 232",
-  "summary": "Stable lite polish pass. Phase 229 chains Phase 230 moon safety and Phase 232 lightweight floor, carpet, ring, and trim polish.",
-  "label": "UPDATE-3.1-L-PHASE-232-STABLE-LITE-POLISH-LOCK",
-  "notes": "Game-only update. Site untouched. Uses a lightweight visual layer for safer Quest testing.",
-  "updated": "2026-06-14T17:45:00-05:00"
+  "phase": "3.1-M / Phase 233",
+  "summary": "Safe entry pass for black screen recovery. The game index now loads main.js only and removes the extra polish/sky phase module chain from the active entry path.",
+  "label": "UPDATE-3.1-M-PHASE-233-SAFE-ENTRY-LOCK",
+  "notes": "Game-only update. Site untouched. This restores the safest runtime path first so the lobby can load again before adding visual layers back one by one.",
+  "updated": "2026-06-14T17:55:00-05:00"
 }
