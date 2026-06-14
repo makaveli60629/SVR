@@ -1,11 +1,11 @@
 {
   "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-194-CLEAN-ROOM-SINGLE-LABEL-LOCK",
+  "build": "UPDATE-3.0-PHASE-195-CLEAN-GEOMETRY-LOBBY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "194",
-  "summary": "Disables legacy background building, ad-building, octagon, old skyline cleanup, and sponsor architecture modules directly in main boot so the lobby no longer flashes old geometry during loading. The Phase 187 stabilizer is now passive and no longer overwrites the visible build label.",
-  "label": "UPDATE-3.0-PHASE-194-CLEAN-ROOM-SINGLE-LABEL-LOCK",
-  "notes": "Game-only update. Site untouched. Preserves Phase 190 controller forward teleport, Phase 191 floor authority, Phase 192 HUD cleanup, and Phase 193 refined room geometry.",
-  "updated": "2026-06-14T02:25:00Z"
+  "phase": "195",
+  "summary": "Replaces the legacy world_skyline runtime path with a clean dedicated lobby world builder. Removes duplicate moons, old background buildings, skyline rings, octagon remnants, old sponsor architecture, post-boot geometry installers, and stacked/disfigured geometry. Preserves teleport, hands/controllers, watch, scene buttons, one visual floor, one Moon, one Mars, table area, and modular storefront panels.",
+  "label": "UPDATE-3.0-PHASE-195-CLEAN-GEOMETRY-LOBBY-LOCK",
+  "notes": "Game-only update. Site untouched. This is a clean geometry reset for the lobby runtime.",
+  "updated": "2026-06-14T02:45:00Z"
 }
