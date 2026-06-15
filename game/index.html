@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-  <title>SVR Poker • PHASE-240-GRAND-PALACE-REFERENCE-LOBBY-LOCK</title>
+  <title>SVR Poker • PHASE-241-SINGLE-LOBBY-LAYER-CLEANUP-LOCK</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -19,16 +19,15 @@
 </head>
 <body>
   <div id="app"></div>
-  <div id="svr-phase-label" class="phase-label">PHASE 240 ACTIVE • GRAND PALACE LOBBY</div>
-  <div id="bootFallback"><section class="boot-card"><span class="pill">PHASE 240 ACTIVE</span><h1>SVR POKER</h1><h2>GRAND PALACE LOBBY LOCK</h2><p>Runtime is loading. This screen clears when the lobby renderer appears.</p></section></div>
-  <div id="hud"><span class="hud-pill" id="status">Loading Phase 240 Grand Palace Lobby…</span><span class="hud-pill" id="mode">Mode: Boot</span><button class="scene-btn" id="toggleLog" type="button">Log</button><button class="scene-btn" id="toggleJoints" type="button">Joints</button></div>
+  <div id="svr-phase-label" class="phase-label">PHASE 241 ACTIVE • SINGLE LOBBY LAYER</div>
+  <div id="bootFallback"><section class="boot-card"><span class="pill">PHASE 241 ACTIVE</span><h1>SVR POKER</h1><h2>SINGLE LOBBY LAYER CLEANUP</h2><p>Runtime is loading. This screen clears when the lobby renderer appears.</p></section></div>
+  <div id="hud"><span class="hud-pill" id="status">Loading Phase 241 single lobby cleanup…</span><span class="hud-pill" id="mode">Mode: Boot</span><button class="scene-btn" id="toggleLog" type="button">Log</button><button class="scene-btn" id="toggleJoints" type="button">Joints</button></div>
   <div id="sceneNav"><button class="scene-btn" data-scene="lobby" type="button">Lobby</button><button class="scene-btn" data-scene="table" type="button">Table</button><button class="scene-btn" data-scene="seat" type="button">Seat</button><button class="scene-btn" data-scene="reiki" type="button">Wellness</button><button class="scene-btn" data-scene="pga" type="button">PGA</button><button class="scene-btn" data-scene="store" type="button">Store</button><button class="scene-btn" data-scene="legends" type="button">Legend</button><button class="scene-btn" data-scene="sponsor" type="button">Sponsor</button><button class="scene-btn" data-scene="scorpion" type="button">Scorpion</button></div>
   <pre id="log"></pre><pre id="err"></pre>
-  <script>window.__SVR_BOOT_STARTED__=Date.now();window.SVR_OFFICIAL_LOBBY_ONLY=true;window.SVR_DISABLE_LEGACY_SKYLINE=true;window.SVR_REFINED_LOBBY_GEOMETRY=true;window.SVR_BACKGROUND_BUILDINGS_REMOVED=true;window.SVR_HAND_OVERLAY_DISABLED=true;window.SVR_NO_FACE_OVERLAY=true;window.SVR_LOCKED_FINAL_BUILD="PHASE-240-GRAND-PALACE-REFERENCE-LOBBY-LOCK";window.SVR_PHASE240={build:"PHASE-240-GRAND-PALACE-REFERENCE-LOBBY-LOCK",active:true,siteTouched:false,referenceLobby:true};</script>
-  <script type="module" src="./main.js?v=phase240-runtime-main"></script>
-  <script type="module" src="./phase237_runtime_watchdog_lock.js?v=phase240-watchdog"></script>
-  <script type="module" src="./phase238_roman_canopy_lobby_arch_blueprint_lock.js?v=phase240-roman-canopy-base"></script>
-  <script type="module" src="./phase239_roman_canopy_pillar_smoothing_lock.js?v=phase240-smooth-canopy"></script>
-  <script type="module" src="./phase240_grand_palace_reference_lobby_lock.js?v=phase240-grand-palace"></script>
+  <script>window.__SVR_BOOT_STARTED__=Date.now();window.SVR_OFFICIAL_LOBBY_ONLY=true;window.SVR_DISABLE_LEGACY_SKYLINE=true;window.SVR_REFINED_LOBBY_GEOMETRY=true;window.SVR_BACKGROUND_BUILDINGS_REMOVED=true;window.SVR_HAND_OVERLAY_DISABLED=true;window.SVR_NO_FACE_OVERLAY=true;window.SVR_LOCKED_FINAL_BUILD="PHASE-241-SINGLE-LOBBY-LAYER-CLEANUP-LOCK";window.SVR_PHASE241={build:"PHASE-241-SINGLE-LOBBY-LAYER-CLEANUP-LOCK",active:true,siteTouched:false,singleLayer:true};</script>
+  <script type="module" src="./main.js?v=phase241-runtime-main"></script>
+  <script type="module" src="./phase237_runtime_watchdog_lock.js?v=phase241-watchdog"></script>
+  <script type="module" src="./phase240_grand_palace_reference_lobby_lock.js?v=phase241-grand-palace-single"></script>
+  <script type="module" src="./phase241_single_lobby_layer_cleanup_lock.js?v=phase241-single-layer-cleanup"></script>
 </body>
 </html>
