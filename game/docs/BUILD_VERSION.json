@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-238-ROMAN-CANOPY-LOBBY-ARCH-BLUEPRINT-LOCK",
+  "build": "PHASE-239-ROMAN-CANOPY-PILLAR-SMOOTHING-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-R / Phase 238",
-  "summary": "Adds the blueprint-style Roman canopy/chuppah architecture into the live 3D WebXR lobby: four central smooth pillars around the poker table, gold arch beams, soft canopy top, corner pillars, rear/side arcade arches, and cyan/gold trim while preserving the current lobby runtime.",
-  "label": "PHASE-238-ROMAN-CANOPY-LOBBY-ARCH-BLUEPRINT-LOCK",
-  "notes": "Game-only update. Site untouched. This implements the requested reference-picture lobby direction as real 3D geometry in the virtual reality game, not a generated image.",
-  "updated": "2026-06-14T19:55:00-05:00"
+  "phase": "3.1-S / Phase 239",
+  "summary": "Refines the Roman canopy/chuppah direction with a smoother central four-pillar canopy around the poker table, rounded capitals, gold rings, cyan fluting, cleaner corner pillars, and repeated rear/side arcade arches throughout the lobby.",
+  "label": "PHASE-239-ROMAN-CANOPY-PILLAR-SMOOTHING-LOCK",
+  "notes": "Game-only update. Site untouched. Phase 239 loads after the Phase 238 base and replaces its root with a smoother Roman canopy/pillar system so the current lobby is preserved while the architecture becomes cleaner.",
+  "updated": "2026-06-14T20:10:00-05:00"
 }
