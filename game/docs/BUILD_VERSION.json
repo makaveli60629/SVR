@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-243-LOBBY-FINISH-ROUTER-CACHE-CLEAN-LOCK",
+  "build": "PHASE-244-FINISHED-PALACE-LOBBY-BUILD-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-W / Phase 243",
-  "summary": "Removes the old Phase 237 watchdog script from game/index.html entirely and replaces it with a clean Phase 243 lobby finish router. This prevents stale Phase 237 UI labels and loads the Phase 240 Grand Palace layer plus Phase 241 single-layer cleanup through one current router.",
-  "label": "PHASE-243-LOBBY-FINISH-ROUTER-CACHE-CLEAN-LOCK",
-  "notes": "Game-only update. Site untouched. Fixes live page stuck on Phase 237 by removing the Phase 237 entry point, refreshing cache keys, and routing finished lobby geometry through phase243_lobby_finish_router_lock.js.",
-  "updated": "2026-06-14T21:18:00-05:00"
+  "phase": "3.1-X / Phase 244",
+  "summary": "Finishes the visible lobby build by adding a solid polished marble floor, finished perimeter walls, stronger side/rear columns, balcony railings, central canopy/table selector, storefront faces, jumbotrons, banner sliders, daily bonus kiosk, sponsor board, Legends panel, portal pads, high Moon/Mars, and stronger lighting.",
+  "label": "PHASE-244-FINISHED-PALACE-LOBBY-BUILD-LOCK",
+  "notes": "Game-only update. Site untouched. This phase focuses on filling out the sparse open lobby seen in desktop preview and making the lobby read like a completed palace/casino hub while preserving movement, watch, private scene routing, and poker routes.",
+  "updated": "2026-06-14T21:32:00-05:00"
 }
