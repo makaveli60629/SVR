@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-237-RUNTIME-WATCHDOG-LOCK",
+  "build": "PHASE-238-ROMAN-CANOPY-LOBBY-ARCH-BLUEPRINT-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-Q / Phase 237",
-  "summary": "Adds a runtime watchdog over the live game entry. The page loads main.js and then clears the boot overlay once a canvas, renderer, or scene appears. Errors are surfaced in the visible error panel instead of silently leaving the player guessing.",
-  "label": "PHASE-237-RUNTIME-WATCHDOG-LOCK",
-  "notes": "Game-only update. Site untouched. Designed as the next safe step after the Phase 234/236 recovery path worked on PC.",
-  "updated": "2026-06-14T19:35:00-05:00"
+  "phase": "3.1-R / Phase 238",
+  "summary": "Adds the blueprint-style Roman canopy/chuppah architecture into the live 3D WebXR lobby: four central smooth pillars around the poker table, gold arch beams, soft canopy top, corner pillars, rear/side arcade arches, and cyan/gold trim while preserving the current lobby runtime.",
+  "label": "PHASE-238-ROMAN-CANOPY-LOBBY-ARCH-BLUEPRINT-LOCK",
+  "notes": "Game-only update. Site untouched. This implements the requested reference-picture lobby direction as real 3D geometry in the virtual reality game, not a generated image.",
+  "updated": "2026-06-14T19:55:00-05:00"
 }
