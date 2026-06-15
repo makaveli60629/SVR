@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-259-ROMAN-CANOPY-COLONNADE-POLISH-LOCK",
+  "build": "PHASE-260-ROMAN-CANOPY-ARCHWAY-FINAL-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-AM / Phase 259",
-  "summary": "Adds the next Roman canopy polish layer: central chuppah-style canopy base, smoother stone/gold pillars, taller corner pillars, rear colonnade arches, side pillar rhythm, red runner, and cyan underlighting while preserving the current lobby.",
-  "label": "PHASE-259-ROMAN-CANOPY-COLONNADE-POLISH-LOCK",
-  "notes": "Site untouched. Current lobby preserved. Phase 259 loads after Phase 257 and Phase 258 as a targeted visual polish layer only.",
-  "updated": "2026-06-15T12:35:00-05:00"
+  "phase": "3.1-AN / Phase 260",
+  "summary": "Adds a center Roman canopy, smoother stone and gold pillars, raised base, silk roof, cyan underglow, corner pillars, rear arches, and side colonnade polish across the lobby.",
+  "label": "PHASE-260-ROMAN-CANOPY-ARCHWAY-FINAL-LOCK",
+  "notes": "Site untouched. Current lobby preserved. Targeted visual polish layer only.",
+  "updated": "2026-06-15T12:55:00-05:00"
 }
