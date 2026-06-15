@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-O-PHASE-235-LABEL-DIAG-DISPLAY-LOCK",
+  "build": "PHASE-236-LIVE-RUNTIME-RESUME-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-O / Phase 235",
-  "summary": "Permanent phase label and diagnostic display added to the game entry. Safe entry remains active while runtime modules stay paused for controlled repair.",
-  "label": "UPDATE-3.1-O-PHASE-235-LABEL-DIAG-DISPLAY-LOCK",
-  "notes": "Game-only update. Site untouched. Always show phase label and diagnostics on the active game entry.",
-  "updated": "2026-06-14T18:15:00-05:00"
+  "phase": "3.1-P / Phase 236",
+  "summary": "Resumes the live game runtime from the Phase 235 diagnostic pause screen. The entry now loads main.js again and keeps a temporary boot overlay that clears when the lobby is ready.",
+  "label": "PHASE-236-LIVE-RUNTIME-RESUME-LOCK",
+  "notes": "Game-only update. Site untouched. Phase 235 static repair screen removed from active entry.",
+  "updated": "2026-06-14T19:20:00-05:00"
 }
