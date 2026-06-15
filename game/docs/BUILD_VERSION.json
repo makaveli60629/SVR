@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "UPDATE-3.1-N-PHASE-234-SAFE-ENTRY-LOCK",
+  "build": "UPDATE-3.1-O-PHASE-235-LABEL-DIAG-DISPLAY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-N / Phase 234",
-  "summary": "Safe entry lock. The game entry now serves a lightweight Phase 234 page so the live route can be checked before modules are added back.",
-  "label": "UPDATE-3.1-N-PHASE-234-SAFE-ENTRY-LOCK",
-  "notes": "Game-only update. Site untouched.",
-  "updated": "2026-06-14T18:05:00-05:00"
+  "phase": "3.1-O / Phase 235",
+  "summary": "Permanent phase label and diagnostic display added to the game entry. Safe entry remains active while runtime modules stay paused for controlled repair.",
+  "label": "UPDATE-3.1-O-PHASE-235-LABEL-DIAG-DISPLAY-LOCK",
+  "notes": "Game-only update. Site untouched. Always show phase label and diagnostics on the active game entry.",
+  "updated": "2026-06-14T18:15:00-05:00"
 }
