@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-241-SINGLE-LOBBY-LAYER-CLEANUP-LOCK",
+  "build": "PHASE-242-LOBBY-FINISH-RUNTIME-ROUTER-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-U / Phase 241",
-  "summary": "Fixes double lobby architecture by stopping Phase 238/239 Roman canopy overlays from loading and adding a cleanup guard that removes duplicate older architecture roots. Phase 240 Grand Palace layer remains as the single active reference-lobby geometry overlay.",
-  "label": "PHASE-241-SINGLE-LOBBY-LAYER-CLEANUP-LOCK",
-  "notes": "Game-only update. Site untouched. Resolves duplicate columns/canopies/geometry seen after stacked Phase 238, Phase 239, and Phase 240 runtime overlays loaded together.",
-  "updated": "2026-06-14T20:55:00-05:00"
+  "phase": "3.1-V / Phase 242",
+  "summary": "Fixes the live Phase 237 label/runtime issue by turning the old watchdog into a Phase 242 lobby-finish router. It dynamically loads the Phase 240 Grand Palace layer and Phase 241 cleanup guard, stops Phase 237 from overwriting the UI, and refreshes cache keys in game/index.html.",
+  "label": "PHASE-242-LOBBY-FINISH-RUNTIME-ROUTER-LOCK",
+  "notes": "Game-only update. Site untouched. Resolves live page stuck on Phase 237 and ensures the finished lobby layer is routed even when stale cached watchdog paths are used.",
+  "updated": "2026-06-14T21:08:00-05:00"
 }
