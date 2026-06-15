@@ -5,14 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SVR Poker | Public Launch Page</title>
   <meta name="description" content="SVR Poker public launch page." />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="icon" href="./logo.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./launch.css" />
-  <link rel="stylesheet" href="./launch-overrides.css" />
+  <link rel="stylesheet" href="./launch.css?v=phase101d" />
+  <link rel="stylesheet" href="./launch-overrides.css?v=phase101d" />
 </head>
-<body class="launch-body">
+<body class="launch-body" data-build="PHASE-101D-LIVE-ROUTE-CACHE-BUST-LOCK">
   <canvas id="binary-rain" aria-hidden="true"></canvas>
 
   <main class="launch-page">
@@ -35,8 +38,8 @@
     </div>
 
     <div class="action-row" id="control-dock-container" aria-label="SVR control dock">
-      <a class="btn btn-primary" href="./site/index.html">Preview Site</a>
-      <a class="btn btn-secondary" href="./game/index.html">Launch VR Room</a>
+      <a class="btn btn-primary" href="./site/index.html?v=phase101d">Preview Site</a>
+      <a class="btn btn-secondary" href="./game/index.html?v=phase101d-live-route-lock">Launch VR Room</a>
       <a class="btn btn-ghost" href="./site/index.html#message">Leave Message</a>
     </div>
 
@@ -46,8 +49,8 @@
     </footer>
   </main>
 
-  <script src="./matrix.js"></script>
-  <script src="./site-local-counter.js"></script>
-  <script src="./site-public-hooks.js"></script>
+  <script src="./matrix.js?v=phase101d"></script>
+  <script src="./site-local-counter.js?v=phase101d"></script>
+  <script src="./site-public-hooks.js?v=phase101d"></script>
 </body>
 </html>
