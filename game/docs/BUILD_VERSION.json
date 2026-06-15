@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-250-LOBBY-FINAL-TABLE-SEAT-LOCK",
+  "build": "PHASE-251-PORTAL-FINAL-ROUTING-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-AD / Phase 250",
-  "summary": "Locks the lobby as a finished hub and adds the final poker table seat pass with one open south seat, five bot seat labels, dealer label, pot marker, table status panel, and final lobby seal.",
-  "label": "PHASE-250-LOBBY-FINAL-TABLE-SEAT-LOCK",
-  "notes": "Game-only update. Site untouched.",
-  "updated": "2026-06-14T22:48:00-05:00"
+  "phase": "3.1-AE / Phase 251",
+  "summary": "Finalizes lobby portal routing signs and route registry for Wellness, PGA, Play, Store, and Scorpion. Store points to the SVR web store. Game-only update.",
+  "label": "PHASE-251-PORTAL-FINAL-ROUTING-LOCK",
+  "notes": "Site untouched.",
+  "updated": "2026-06-14T23:02:00-05:00"
 }
