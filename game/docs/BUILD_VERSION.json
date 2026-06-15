@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-251-PORTAL-FINAL-ROUTING-LOCK",
+  "build": "PHASE-253-INTERACTION-VALIDATION-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-AE / Phase 251",
-  "summary": "Finalizes lobby portal routing signs and route registry for Wellness, PGA, Play, Store, and Scorpion. Store points to the SVR web store. Game-only update.",
-  "label": "PHASE-251-PORTAL-FINAL-ROUTING-LOCK",
+  "phase": "3.1-AG / Phase 253",
+  "summary": "Adds interaction validation zones for Wellness, PGA, Play, Store, Scorpion, and the open seat. Adds a confirm helper for portal and seat validation.",
+  "label": "PHASE-253-INTERACTION-VALIDATION-LOCK",
   "notes": "Site untouched.",
-  "updated": "2026-06-14T23:02:00-05:00"
+  "updated": "2026-06-14T23:18:00-05:00"
 }
