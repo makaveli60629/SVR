@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-239-ROMAN-CANOPY-PILLAR-SMOOTHING-LOCK",
+  "build": "PHASE-240-GRAND-PALACE-REFERENCE-LOBBY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-S / Phase 239",
-  "summary": "Refines the Roman canopy/chuppah direction with a smoother central four-pillar canopy around the poker table, rounded capitals, gold rings, cyan fluting, cleaner corner pillars, and repeated rear/side arcade arches throughout the lobby.",
-  "label": "PHASE-239-ROMAN-CANOPY-PILLAR-SMOOTHING-LOCK",
-  "notes": "Game-only update. Site untouched. Phase 239 loads after the Phase 238 base and replaces its root with a smoother Roman canopy/pillar system so the current lobby is preserved while the architecture becomes cleaner.",
-  "updated": "2026-06-14T20:10:00-05:00"
+  "phase": "3.1-T / Phase 240",
+  "summary": "Adds the Grand Palace reference lobby geometry layer inspired by the provided screenshot: curved palace colonnade, two-tier balcony rails, central Play Game selector, storefront portal faces, Tier 1/Tier 2 sponsor boards, Daily Bonus kiosk, Legends pedestal, Sponsor board, and high visible Moon/Mars sky treatment.",
+  "label": "PHASE-240-GRAND-PALACE-REFERENCE-LOBBY-LOCK",
+  "notes": "Game-only update. Site untouched. Current Phase 239 lobby remains the baseline; Phase 240 adds a removable geometry overlay that moves the lobby toward the supplied luxury VR casino reference without rewriting movement, watch, poker, or private-scene routing.",
+  "updated": "2026-06-14T20:40:00-05:00"
 }
