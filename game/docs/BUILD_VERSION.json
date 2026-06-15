@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-256-LEFT-TO-RIGHT-DEAL-ORDER-LOCK",
+  "build": "PHASE-257-ROMAN-CANOPY-LOBBY-ARCH-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-AJ / Phase 256",
-  "summary": "Locks poker card dealing to always run left-to-right, adds a deal-order registry, validates the sequence, and keeps community cards ordered flop one through river.",
-  "label": "PHASE-256-LEFT-TO-RIGHT-DEAL-ORDER-LOCK",
-  "notes": "Site untouched.",
-  "updated": "2026-06-15T00:01:00-05:00"
+  "phase": "3.1-AK / Phase 257",
+  "summary": "Adds a centered Roman canopy with smooth pillars, gold beams, corner pillars, and repeated arch details around the lobby.",
+  "label": "PHASE-257-ROMAN-CANOPY-LOBBY-ARCH-LOCK",
+  "notes": "Site untouched. Current lobby preserved.",
+  "updated": "2026-06-15T12:05:00-05:00"
 }
