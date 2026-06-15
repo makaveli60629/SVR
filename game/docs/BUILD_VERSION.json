@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-240-GRAND-PALACE-REFERENCE-LOBBY-LOCK",
+  "build": "PHASE-241-SINGLE-LOBBY-LAYER-CLEANUP-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-T / Phase 240",
-  "summary": "Adds the Grand Palace reference lobby geometry layer inspired by the provided screenshot: curved palace colonnade, two-tier balcony rails, central Play Game selector, storefront portal faces, Tier 1/Tier 2 sponsor boards, Daily Bonus kiosk, Legends pedestal, Sponsor board, and high visible Moon/Mars sky treatment.",
-  "label": "PHASE-240-GRAND-PALACE-REFERENCE-LOBBY-LOCK",
-  "notes": "Game-only update. Site untouched. Current Phase 239 lobby remains the baseline; Phase 240 adds a removable geometry overlay that moves the lobby toward the supplied luxury VR casino reference without rewriting movement, watch, poker, or private-scene routing.",
-  "updated": "2026-06-14T20:40:00-05:00"
+  "phase": "3.1-U / Phase 241",
+  "summary": "Fixes double lobby architecture by stopping Phase 238/239 Roman canopy overlays from loading and adding a cleanup guard that removes duplicate older architecture roots. Phase 240 Grand Palace layer remains as the single active reference-lobby geometry overlay.",
+  "label": "PHASE-241-SINGLE-LOBBY-LAYER-CLEANUP-LOCK",
+  "notes": "Game-only update. Site untouched. Resolves duplicate columns/canopies/geometry seen after stacked Phase 238, Phase 239, and Phase 240 runtime overlays loaded together.",
+  "updated": "2026-06-14T20:55:00-05:00"
 }
