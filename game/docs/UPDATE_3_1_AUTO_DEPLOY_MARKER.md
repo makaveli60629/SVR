@@ -6,15 +6,18 @@ Auto deploy requested and triggered by repo push.
 ## Deploy target
 - Branch: `main`
 - Workflow: `.github/workflows/deploy.yml`
-- Scope: game documentation / Update 3.1 handoff deployment marker
+- Scope: game runtime cleanup / Phase 279 overlay cleanup and Android guard
 
 ## Reason
-The Update 3.1 repo audit and lobby completion handoff has been committed. This marker commit intentionally triggers the existing GitHub Pages auto deploy workflow so the latest repo state is deployed.
+Phase 279 was committed to reduce duplicate overlays, hide duplicate scene markers, guard Android canvas black-screen behavior, and keep the current table interaction stack intact.
 
 ## Current handoff
-- `game/docs/UPDATE_3_1_REPO_AUDIT_LOBBY_COMPLETION_HANDOFF.md`
+- `docs/phase279_overlay_cleanup_android_guard_manifest.md`
+- `game/phase279_overlay_cleanup_android_guard_lock.js`
 
 ## Notes
-No website files were edited by this marker.
-No runtime lobby code was changed by this marker.
+No public website files were edited by this marker.
 This is a deploy trigger / trace file only.
+
+## Trigger
+2026-06-15 Phase 279 cleanup deploy trigger.
