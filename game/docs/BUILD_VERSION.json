@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-254-JOIN-TABLE-FLOW-LOCK",
+  "build": "PHASE-255-DEALER-BOT-READINESS-FLOW-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-AH / Phase 254",
-  "summary": "Adds the join table flow: open seat confirmation, table state, bot readiness panel, dealer readiness panel, and join helpers for the south player seat.",
-  "label": "PHASE-254-JOIN-TABLE-FLOW-LOCK",
+  "phase": "3.1-AI / Phase 255",
+  "summary": "Adds dealer and bot readiness state for the table flow, including five ready bots, dealer state, deck-ready state, and first-hand preparation helper.",
+  "label": "PHASE-255-DEALER-BOT-READINESS-FLOW-LOCK",
   "notes": "Site untouched.",
-  "updated": "2026-06-14T23:32:00-05:00"
+  "updated": "2026-06-14T23:45:00-05:00"
 }
