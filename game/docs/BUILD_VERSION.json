@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-249-GEOMETRY-SMOOTHNESS-LOCK",
+  "build": "PHASE-250-LOBBY-FINAL-TABLE-SEAT-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-AC / Phase 249",
-  "summary": "Adds a geometry smoothness pass for the lobby with a cleaner aisle guide, open south seat marker, softer glow, less visual noise, and mesh culling.",
-  "label": "PHASE-249-GEOMETRY-SMOOTHNESS-LOCK",
+  "phase": "3.1-AD / Phase 250",
+  "summary": "Locks the lobby as a finished hub and adds the final poker table seat pass with one open south seat, five bot seat labels, dealer label, pot marker, table status panel, and final lobby seal.",
+  "label": "PHASE-250-LOBBY-FINAL-TABLE-SEAT-LOCK",
   "notes": "Game-only update. Site untouched.",
-  "updated": "2026-06-14T22:34:00-05:00"
+  "updated": "2026-06-14T22:48:00-05:00"
 }
