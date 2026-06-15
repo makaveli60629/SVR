@@ -115,11 +115,11 @@ jobs:
           mkdir -p build/site/presentations/reiki build/site/android build/site/downloads build/game
 
           if [ ! -f build/site/presentations/reiki/index.html ]; then
-            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>Trueitive / REIKI Presentation</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>Trueitive / REIKI Presentation</h1><p>Prepared for private partner review.</p><p><a style="color:#ffd36a" href="/game/?scene=lobby&focus=reiki-storefront&source=trueitive-review&svr30sky=1">Open VR REIKI Storefront Preview</a></p><p><a style="color:#7ffcff" href="/android/">Open Android Demo Page</a></p></body></html>' > build/site/presentations/reiki/index.html
+            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Reiki Presentation</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Reiki Presentation</h1><p>Prepared for private review. Partner-specific materials remain awaiting approval.</p><p><a style="color:#ffd36a" href="/game/?scene=lobby&focus=reiki-storefront&svr30sky=1">Open VR Reiki Storefront Preview</a></p><p><a style="color:#7ffcff" href="/android/">Open Android Demo Page</a></p></body></html>' > build/site/presentations/reiki/index.html
           fi
 
           if [ ! -f build/site/android/index.html ]; then
-            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Android Demo</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Android Demo</h1><p>The Android APK demo is being finalized.</p><p><a style="color:#ffd36a" href="/reiki/">Open Trueitive / REIKI Presentation</a></p></body></html>' > build/site/android/index.html
+            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Android Demo</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Android Demo</h1><p>The Android APK demo is being finalized.</p><p><a style="color:#ffd36a" href="/reiki/">Open Reiki Presentation</a></p></body></html>' > build/site/android/index.html
           fi
 
           if [ ! -f build/site/downloads/index.html ]; then
@@ -127,7 +127,7 @@ jobs:
           fi
 
           if [ ! -f build/reiki/index.html ]; then
-            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/presentations/reiki/"><a href="/site/presentations/reiki/">Open Trueitive / REIKI Presentation</a>' > build/reiki/index.html
+            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/presentations/reiki/"><a href="/site/presentations/reiki/">Open Reiki Presentation</a>' > build/reiki/index.html
           fi
 
           if [ ! -f build/android/index.html ]; then
