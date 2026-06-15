@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-  <title>SVR Poker • PHASE-236-LIVE-RUNTIME-RESUME-LOCK</title>
+  <title>SVR Poker • PHASE-237-RUNTIME-WATCHDOG-LOCK</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -19,12 +19,13 @@
 </head>
 <body>
   <div id="app"></div>
-  <div id="svr-phase-label" class="phase-label">PHASE 236 ACTIVE • LIVE RUNTIME</div>
-  <div id="bootFallback"><section class="boot-card"><span class="pill">PHASE 236 ACTIVE</span><h1>SVR POKER</h1><h2>LIVE RUNTIME RESUME LOCK</h2><p>Runtime is loading. This screen clears automatically when the lobby is ready.</p></section></div>
-  <div id="hud"><span class="hud-pill" id="status">Loading Phase 236 runtime…</span><span class="hud-pill" id="mode">Mode: Boot</span><button class="scene-btn" id="toggleLog" type="button">Log</button><button class="scene-btn" id="toggleJoints" type="button">Joints</button></div>
+  <div id="svr-phase-label" class="phase-label">PHASE 237 ACTIVE • RUNTIME WATCHDOG</div>
+  <div id="bootFallback"><section class="boot-card"><span class="pill">PHASE 237 ACTIVE</span><h1>SVR POKER</h1><h2>RUNTIME WATCHDOG LOCK</h2><p>Runtime is loading. This screen clears when the lobby renderer appears.</p></section></div>
+  <div id="hud"><span class="hud-pill" id="status">Loading Phase 237 runtime…</span><span class="hud-pill" id="mode">Mode: Boot</span><button class="scene-btn" id="toggleLog" type="button">Log</button><button class="scene-btn" id="toggleJoints" type="button">Joints</button></div>
   <div id="sceneNav"><button class="scene-btn" data-scene="lobby" type="button">Lobby</button><button class="scene-btn" data-scene="table" type="button">Table</button><button class="scene-btn" data-scene="seat" type="button">Seat</button><button class="scene-btn" data-scene="reiki" type="button">Reiki</button><button class="scene-btn" data-scene="pga" type="button">PGA</button><button class="scene-btn" data-scene="store" type="button">Store</button><button class="scene-btn" data-scene="legends" type="button">Legend</button><button class="scene-btn" data-scene="sponsor" type="button">Sponsor</button><button class="scene-btn" data-scene="scorpion" type="button">Scorpion</button></div>
   <pre id="log"></pre><pre id="err"></pre>
-  <script>window.__SVR_BOOT_STARTED__=Date.now();window.SVR_OFFICIAL_LOBBY_ONLY=true;window.SVR_DISABLE_LEGACY_SKYLINE=true;window.SVR_REFINED_LOBBY_GEOMETRY=true;window.SVR_BACKGROUND_BUILDINGS_REMOVED=true;window.SVR_HAND_OVERLAY_DISABLED=true;window.SVR_NO_FACE_OVERLAY=true;window.SVR_LOCKED_FINAL_BUILD="PHASE-236-LIVE-RUNTIME-RESUME-LOCK";window.SVR_PHASE236={build:"PHASE-236-LIVE-RUNTIME-RESUME-LOCK",active:true,liveRuntime:true,siteTouched:false};setTimeout(()=>{if(!window.__SVR_GAME_READY__){const s=document.getElementById('status');if(s)s.textContent='Still loading runtime… check console if this stays.'}},9000);</script>
-  <script type="module" src="./main.js?v=phase236-live-runtime-resume"></script>
+  <script>window.__SVR_BOOT_STARTED__=Date.now();window.SVR_OFFICIAL_LOBBY_ONLY=true;window.SVR_DISABLE_LEGACY_SKYLINE=true;window.SVR_REFINED_LOBBY_GEOMETRY=true;window.SVR_BACKGROUND_BUILDINGS_REMOVED=true;window.SVR_HAND_OVERLAY_DISABLED=true;window.SVR_NO_FACE_OVERLAY=true;window.SVR_LOCKED_FINAL_BUILD="PHASE-237-RUNTIME-WATCHDOG-LOCK";window.SVR_PHASE237={build:"PHASE-237-RUNTIME-WATCHDOG-LOCK",active:true,liveRuntime:true,siteTouched:false};</script>
+  <script type="module" src="./main.js?v=phase237-runtime-main"></script>
+  <script type="module" src="./phase237_runtime_watchdog_lock.js?v=phase237-watchdog"></script>
 </body>
 </html>
