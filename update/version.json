@@ -1,9 +1,8 @@
 {
-  "version": "Update 3.1-J Phase 230",
-  "build": "UPDATE-3.1-J-PHASE-230-MOON-OFF-TABLE-LABEL-LOCK",
+  "version": "Update 3.1-S Phase 239",
+  "build": "PHASE-239-ROMAN-CANOPY-PILLAR-SMOOTHING-LOCK",
   "created": "2026-06-14",
   "track": "game-only",
   "siteTouched": false,
-  "gameZip": "update/game.zip",
-  "notes": "Phase 230 label and Moon position fix. Phase 229 now chains into Phase 230. Phase 230 removes older Moon/Mars objects and places a smaller Moon and Mars high and far behind the lobby so the Moon does not cover the table."
+  "notes": "Roman canopy and smooth pillar refinement. Adds chuppah-style central canopy, smoother Roman pillars, corner pillars, and perimeter arcade arches while preserving the lobby and leaving the site untouched."
 }
