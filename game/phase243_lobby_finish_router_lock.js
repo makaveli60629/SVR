@@ -1,18 +1,18 @@
-const LABEL = "PHASE-245-LOBBY-ORGANIZATION-TEXTURE-CLEANUP-LOCK";
+const LABEL = "PHASE-246-PILLAR-STOREFRONT-ALIGNMENT-LOCK";
 const FINISH_LAYERS = [
-  "./phase241_single_lobby_layer_cleanup_lock.js?v=phase245-single-layer-cleanup",
-  "./phase244_finished_palace_lobby_build_lock.js?v=phase245-finished-lobby",
-  "./phase245_lobby_organization_texture_cleanup_lock.js?v=phase245-org-texture-cleanup"
+  "./phase241_single_lobby_layer_cleanup_lock.js?v=phase246-single-layer-cleanup",
+  "./phase244_finished_palace_lobby_build_lock.js?v=phase246-finished-lobby",
+  "./phase245_lobby_organization_texture_cleanup_lock.js?v=phase246-org-texture-cleanup",
+  "./phase246_pillar_storefront_alignment_lock.js?v=phase246-pillar-storefront-align"
 ];
 
 function stamp(){
-  window.SVR_PHASE245 = {
+  window.SVR_PHASE246 = {
     build: LABEL,
     active: true,
     router: true,
     siteTouched: false,
-    removesPhase237Entry: true,
-    removesPhase240DuplicateLayer: true,
+    pillarStorefrontAlignment: true,
     checkedAt: new Date().toISOString()
   };
   window.SVR_LOCKED_FINAL_BUILD = LABEL;
@@ -48,16 +48,16 @@ async function loadLayersOnce(){
       await import(url);
       loaded.push(url);
     } catch (err){
-      console.warn("[SVR Phase245] finish layer import failed", url, err);
+      console.warn("[SVR Phase246] finish layer import failed", url, err);
       showError(`Finish layer failed: ${url}`);
     }
   }
-  window.SVR_PHASE245.loadedFinishLayers = loaded;
+  window.SVR_PHASE246.loadedFinishLayers = loaded;
   return loaded;
 }
 async function boot(){
   stamp();
-  setLabel("PHASE 245 ACTIVE • LOBBY ORGANIZATION CLEANUP");
+  setLabel("PHASE 246 ACTIVE • PILLAR/STOREFRONT ALIGNMENT");
   await loadLayersOnce();
   let checks = 0;
   const timer = setInterval(()=>{
@@ -65,10 +65,10 @@ async function boot(){
     if (hasRuntime() || checks > 100){
       if (hasRuntime()){
         window.__SVR_GAME_READY__ = true;
-        setLabel("PHASE 245 ACTIVE • ORGANIZED LOBBY READY");
+        setLabel("PHASE 246 ACTIVE • ALIGNED LOBBY READY");
         hideBoot();
       } else {
-        setLabel("PHASE 245 ACTIVE • SAFE ENTRY WAITING");
+        setLabel("PHASE 246 ACTIVE • SAFE ENTRY WAITING");
       }
       clearInterval(timer);
     }
