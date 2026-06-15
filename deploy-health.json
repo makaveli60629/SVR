@@ -1,0 +1,8 @@
+{
+  "status": "repo-marker",
+  "build": "SVR-PHASE-101B-STALE-LIVE-ROUTE-DEPLOY-LOCK",
+  "commit": "6829ccd53c2376e59a95e694c568787413df5f79",
+  "updatedAt": "2026-06-15T21:15:00Z",
+  "customDomain": "svrpoker.com",
+  "purpose": "Branch-source fallback marker for live route deployment verification."
+}
