@@ -1,11 +1,11 @@
 {
-  "version": "Update 3.0",
-  "build": "UPDATE-3.0-PHASE-189-SKY-FLOOR-HARDLOCK",
-  "track": "official-lobby-hardlock",
+  "version": "Update 3.1",
+  "build": "PHASE-101A-BOOT-LOAD-SCREEN-RECOVERY-LOCK",
+  "track": "webxr-boot-recovery-lock",
   "siteTouched": false,
-  "phase": "189",
-  "summary": "Adds a strong visible upper floor and keeps the official lobby look active.",
-  "label": "UPDATE-3.0-PHASE-189-SKY-FLOOR-HARDLOCK",
-  "notes": "Preserves movement, bounds, watch, table selector, hubs, moon and Mars.",
-  "updated": "2026-06-14T04:36:00Z"
+  "phase": "101A",
+  "summary": "Restores main runtime loading from game/index.html and adds boot-safe recovery so the game cannot remain stuck on the loading screen.",
+  "label": "PHASE-101A-BOOT-LOAD-SCREEN-RECOVERY-LOCK",
+  "notes": "Preserves WebXR game path, Quest controls, Android compatibility, Phase 94/Phase 200 lobby lineage, watch, teleport, hubs, moon and Mars. Does not rebuild website.",
+  "updated": "2026-06-15T19:45:00Z"
 }
