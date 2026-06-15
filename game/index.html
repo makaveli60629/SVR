@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-  <title>SVR Poker • PHASE-259-ROMAN-CANOPY-COLONNADE-POLISH-LOCK</title>
+  <title>SVR Poker • PHASE-101-BOOT-LOAD-SCREEN-RECOVERY-LOCK</title>
   <meta name="theme-color" content="#050508"/>
   <link rel="manifest" href="./manifest.json"/>
   <style>
@@ -19,13 +19,15 @@
 </head>
 <body>
   <div id="app"></div>
-  <div id="svr-phase-label" class="phase-label">PHASE 259 ACTIVE • ROMAN CANOPY POLISH</div>
-  <div id="bootFallback"><section class="boot-card"><span class="pill">PHASE 259 ACTIVE</span><h1>SVR POKER</h1><h2>ROMAN CANOPY COLONNADE POLISH</h2><p>Runtime is loading. This screen clears when the lobby renderer appears.</p></section></div>
-  <div id="hud"><span class="hud-pill" id="status">Loading Phase 259 Roman canopy colonnade polish…</span><span class="hud-pill" id="mode">Mode: Boot</span><button class="scene-btn" id="toggleLog" type="button">Log</button><button class="scene-btn" id="toggleJoints" type="button">Joints</button></div>
+  <div id="svr-phase-label" class="phase-label">PHASE 101 ACTIVE • BOOT RECOVERY</div>
+  <div id="bootFallback"><section class="boot-card"><span class="pill">PHASE 101 ACTIVE</span><h1>SVR POKER</h1><h2>BOOT LOAD SCREEN RECOVERY</h2><p>Runtime is loading. If the full lobby runtime stalls, the boot-safe lobby will recover automatically.</p></section></div>
+  <div id="hud"><span class="hud-pill" id="status">Loading Phase 101 boot recovery…</span><span class="hud-pill" id="mode">Mode: Boot</span><button class="scene-btn" id="toggleLog" type="button">Log</button><button class="scene-btn" id="toggleJoints" type="button">Joints</button></div>
   <div id="sceneNav"><button class="scene-btn" data-scene="lobby" type="button">Lobby</button><button class="scene-btn" data-scene="table" type="button">Table</button><button class="scene-btn" data-scene="seat" type="button">Seat</button><button class="scene-btn" data-scene="reiki" type="button">Wellness</button><button class="scene-btn" data-scene="pga" type="button">PGA</button><button class="scene-btn" data-scene="store" type="button">Store</button><button class="scene-btn" data-scene="legends" type="button">Legend</button><button class="scene-btn" data-scene="sponsor" type="button">Sponsor</button><button class="scene-btn" data-scene="scorpion" type="button">Scorpion</button></div>
   <pre id="log"></pre><pre id="err"></pre>
-  <script type="module" src="./phase257_roman_canopy_lobby_arch_lock.js?v=phase259-roman-canopy-base"></script>
-  <script type="module" src="./phase258_roman_canopy_smooth_lobby_lock.js?v=phase259-smooth-roman-canopy"></script>
-  <script type="module" src="./phase259_roman_canopy_colonnade_polish_lock.js?v=phase259-colonnade-polish"></script>
+  <script type="module" src="./phase101_boot_load_screen_recovery.js?v=phase101-boot-load-screen-recovery"></script>
+  <script type="module" src="./main.js?v=phase101-restore-main-runtime"></script>
+  <script type="module" src="./phase257_roman_canopy_lobby_arch_lock.js?v=phase101-roman-canopy-base"></script>
+  <script type="module" src="./phase258_roman_canopy_smooth_lobby_lock.js?v=phase101-smooth-roman-canopy"></script>
+  <script type="module" src="./phase259_roman_canopy_colonnade_polish_lock.js?v=phase101-colonnade-polish"></script>
 </body>
 </html>
