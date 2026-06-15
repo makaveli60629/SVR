@@ -1,0 +1,9 @@
+const BUILD="PHASE-279-OVERLAY-CLEANUP-ANDROID-GUARD-LOCK";
+const KEEP_IDS=new Set(["svr-phase-label","status","bootFallback","svr-phase277-status-marker"]);
+function cleanDom(){const removed=[];for(const el of Array.from(document.querySelectorAll("body > div"))){const id=el.id||"";const txt=(el.textContent||"").toUpperCase();const fixed=(getComputedStyle(el).position==="fixed");const marker=txt.includes("PHASE")||txt.includes("SVR TABLE")||txt.includes("READY")||txt.includes("CHECKING");if(fixed&&marker&&!KEEP_IDS.has(id)){removed.push(id||txt.slice(0,24));el.remove();}}
+return removed;}
+function trimScene(){const scene=window.__SVR_SCENE__;const names=[];if(!scene)return names;const seen=new Set();scene.traverse(o=>{if(!o.name)return;if(seen.has(o.name)&&/(PHASE27|READY|STATUS|FEEDBACK|HITBOX)/.test(o.name)){o.visible=false;names.push(o.name)}else seen.add(o.name);});return names;}
+function androidGuard(){const c=document.querySelector("canvas");const ok=!!c&&c.width>0&&c.height>0;document.body.style.background="#05070d";if(!ok&&window.__SVR_RENDERER__){try{window.__SVR_RENDERER__.setSize(innerWidth,innerHeight,false)}catch{}}return ok;}
+function run(){const removedDom=cleanDom();const hiddenScene=trimScene();const canvasOk=androidGuard();window.SVR_PHASE279_STATE={build:BUILD,active:true,removedDom,hiddenScene,canvasOk,updatedAt:new Date().toISOString()};const s=document.getElementById("status");if(s)s.textContent="Phase 279 cleanup active";return window.SVR_PHASE279_STATE;}
+function install(){window.SVR_RUN_OVERLAY_CLEANUP=run;window.SVR_PHASE279={build:BUILD,active:true,siteTouched:false,helper:"SVR_RUN_OVERLAY_CLEANUP",checkedAt:new Date().toISOString()};window.SVR_LOCKED_FINAL_BUILD=BUILD;setInterval(run,6000);setTimeout(run,1200);const l=document.getElementById("svr-phase-label");if(l)l.textContent="PHASE 279 ACTIVE CLEANUP";}
+setTimeout(install,1000);
