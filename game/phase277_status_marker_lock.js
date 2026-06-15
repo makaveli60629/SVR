@@ -3,3 +3,4 @@ function update(){const qa=window.SVR_RUN_FINAL_QA?window.SVR_RUN_FINAL_QA():win
 function install(){window.SVR_UPDATE_READY_MARKER=update;setInterval(update,4000);setTimeout(update,1200);window.SVR_PHASE277_READY_MARKER={build:BUILD,active:true,siteTouched:false,helper:"SVR_UPDATE_READY_MARKER",checkedAt:new Date().toISOString()};window.SVR_LOCKED_FINAL_BUILD=BUILD;const l=document.getElementById("svr-phase-label");if(l)l.textContent="PHASE 277 ACTIVE STATUS MARKER";const s=document.getElementById("status");if(s)s.textContent="Phase 277 status marker installed"}
 setTimeout(install,900);
 import("./phase278.js?v=278chain").catch(()=>{});
+import("./phase279_overlay_cleanup_android_guard_lock.js?v=279chain").catch(()=>{});
