@@ -55,12 +55,17 @@ jobs:
             index.html
             style.css
             launch.css
+            launch-overrides.css
             matrix.js
+            site-local-counter.js
             site-public-hooks.js
             logo.png
             logo.webp
             favicon.ico
+            CNAME
             .nojekyll
+            deploy-health.json
+            phase100-deploy.json
             site
             game
             reiki
@@ -73,6 +78,8 @@ jobs:
             docs/PHASE_100_AWS_WEBEX_DEPLOYMENT_NOTES.md
             docs/PHASE_100_QA_CHECKLIST.md
             docs/PHASE_100_HANDOFF.md
+            docs/PHASE_101_LIVE_DEPLOY_QA_WEBXR_ROUTE_VERIFY.md
+            docs/PHASE_101A_BOOT_LOAD_SCREEN_RECOVERY_PATCH.md
 
       - name: Prepare static Pages build
         shell: bash
@@ -99,11 +106,14 @@ jobs:
           copy_file_if_exists index.html
           copy_file_if_exists style.css
           copy_file_if_exists launch.css
+          copy_file_if_exists launch-overrides.css
           copy_file_if_exists matrix.js
+          copy_file_if_exists site-local-counter.js
           copy_file_if_exists site-public-hooks.js
           copy_file_if_exists logo.png
           copy_file_if_exists logo.webp
           copy_file_if_exists favicon.ico
+          copy_file_if_exists CNAME
           copy_file_if_exists .nojekyll
 
           copy_dir_if_exists site
@@ -157,12 +167,13 @@ jobs:
           fi
 
           DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          printf '{\n  "status": "ok",\n  "build": "SVR-PHASE-100-AUTO-DEPLOY",\n  "commit": "%s",\n  "deployedAt": "%s",\n  "gameZipStatus": "%s",\n  "gameZipBytes": "%s"\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" "$GAME_ZIP_STATUS" "$GAME_ZIP_BYTES" > build/deploy-health.json
+          printf '{\n  "status": "ok",\n  "build": "SVR-PHASE-101B-STALE-LIVE-ROUTE-DEPLOY-LOCK",\n  "commit": "%s",\n  "deployedAt": "%s",\n  "gameZipStatus": "%s",\n  "gameZipBytes": "%s",\n  "customDomain": "svrpoker.com"\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" "$GAME_ZIP_STATUS" "$GAME_ZIP_BYTES" > build/deploy-health.json
           cp build/deploy-health.json build/game/deploy-health.json
           cp build/deploy-health.json build/phase100-deploy.json
+          cp build/deploy-health.json build/phase101b-deploy.json
 
           find build -maxdepth 3 -type f | sort > /tmp/svr-build-files.txt
-          sed -n '1,260p' /tmp/svr-build-files.txt | sed 's#^# - #'
+          sed -n '1,280p' /tmp/svr-build-files.txt | sed 's#^# - #'
           df -h
 
       - name: Validate routes before upload
@@ -170,6 +181,7 @@ jobs:
         run: |
           set -euo pipefail
           test -f build/index.html
+          test -f build/CNAME
           test -f build/reiki/index.html
           test -f build/android/index.html
           test -f build/downloads/index.html
@@ -179,6 +191,7 @@ jobs:
           test -f build/deploy-health.json
           test -f build/game/deploy-health.json
           test -f build/phase100-deploy.json
+          test -f build/phase101b-deploy.json
           if [ ! -f build/update/game.zip ]; then
             echo "::warning::build/update/game.zip was not found; Pages deploy will continue with health warning"
           fi
