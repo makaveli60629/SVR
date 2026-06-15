@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-244-FINISHED-PALACE-LOBBY-BUILD-LOCK",
+  "build": "PHASE-245-LOBBY-ORGANIZATION-TEXTURE-CLEANUP-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-X / Phase 244",
-  "summary": "Finishes the visible lobby build by adding a solid polished marble floor, finished perimeter walls, stronger side/rear columns, balcony railings, central canopy/table selector, storefront faces, jumbotrons, banner sliders, daily bonus kiosk, sponsor board, Legends panel, portal pads, high Moon/Mars, and stronger lighting.",
-  "label": "PHASE-244-FINISHED-PALACE-LOBBY-BUILD-LOCK",
-  "notes": "Game-only update. Site untouched. This phase focuses on filling out the sparse open lobby seen in desktop preview and making the lobby read like a completed palace/casino hub while preserving movement, watch, private scene routing, and poker routes.",
-  "updated": "2026-06-14T21:32:00-05:00"
+  "phase": "3.1-Y / Phase 245",
+  "summary": "Organizes and cleans the finished palace lobby: removes duplicate Phase 240 layer, removes duplicate Moon/Mars objects, adds one final Moon and one final Mars, adds upright upper colosseum arches, adds skyline silhouettes through upper windows, adds wall texture bands, and clarifies storefront panels.",
+  "label": "PHASE-245-LOBBY-ORGANIZATION-TEXTURE-CLEANUP-LOCK",
+  "notes": "Game-only update. Site untouched. This phase answers the visual audit: no stacked planets, no extra Phase 240 geometry, upright upper arches, more solid walls, more organized storefront panels, and procedural texture cleanup without requiring external texture files yet.",
+  "updated": "2026-06-14T21:48:00-05:00"
 }
