@@ -1,19 +1,20 @@
-const LABEL = "PHASE-247-MATERIAL-TEXTURE-LOCK";
+const LABEL = "PHASE-248-QUEST-PERFORMANCE-READABILITY-LOCK";
 const FINISH_LAYERS = [
-  "./phase241_single_lobby_layer_cleanup_lock.js?v=phase247-single-layer-cleanup",
-  "./phase244_finished_palace_lobby_build_lock.js?v=phase247-finished-lobby",
-  "./phase245_lobby_organization_texture_cleanup_lock.js?v=phase247-org-texture-cleanup",
-  "./phase246_pillar_storefront_alignment_lock.js?v=phase247-pillar-storefront-align",
-  "./phase247_material_texture_lock.js?v=phase247-material-texture"
+  "./phase241_single_lobby_layer_cleanup_lock.js?v=phase248-single-layer-cleanup",
+  "./phase244_finished_palace_lobby_build_lock.js?v=phase248-finished-lobby",
+  "./phase245_lobby_organization_texture_cleanup_lock.js?v=phase248-org-texture-cleanup",
+  "./phase246_pillar_storefront_alignment_lock.js?v=phase248-pillar-storefront-align",
+  "./phase247_material_texture_lock.js?v=phase248-material-texture",
+  "./phase248_quest_performance_readability_lock.js?v=phase248-quest-readability"
 ];
 
 function stamp(){
-  window.SVR_PHASE247 = {
+  window.SVR_PHASE248 = {
     build: LABEL,
     active: true,
     router: true,
     siteTouched: false,
-    materialTextureLock: true,
+    questPerformanceReadability: true,
     checkedAt: new Date().toISOString()
   };
   window.SVR_LOCKED_FINAL_BUILD = LABEL;
@@ -49,16 +50,16 @@ async function loadLayersOnce(){
       await import(url);
       loaded.push(url);
     } catch (err){
-      console.warn("[SVR Phase247] finish layer import failed", url, err);
+      console.warn("[SVR Phase248] finish layer import failed", url, err);
       showError(`Finish layer failed: ${url}`);
     }
   }
-  window.SVR_PHASE247.loadedFinishLayers = loaded;
+  window.SVR_PHASE248.loadedFinishLayers = loaded;
   return loaded;
 }
 async function boot(){
   stamp();
-  setLabel("PHASE 247 ACTIVE • MATERIAL TEXTURE LOCK");
+  setLabel("PHASE 248 ACTIVE • QUEST READABILITY");
   await loadLayersOnce();
   let checks = 0;
   const timer = setInterval(()=>{
@@ -66,10 +67,10 @@ async function boot(){
     if (hasRuntime() || checks > 100){
       if (hasRuntime()){
         window.__SVR_GAME_READY__ = true;
-        setLabel("PHASE 247 ACTIVE • TEXTURED LOBBY READY");
+        setLabel("PHASE 248 ACTIVE • QUEST READABILITY READY");
         hideBoot();
       } else {
-        setLabel("PHASE 247 ACTIVE • SAFE ENTRY WAITING");
+        setLabel("PHASE 248 ACTIVE • SAFE ENTRY WAITING");
       }
       clearInterval(timer);
     }
