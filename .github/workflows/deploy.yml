@@ -1,4 +1,4 @@
-﻿name: Auto Deploy
+name: Auto Deploy
 
 on:
   push:
@@ -68,6 +68,11 @@ jobs:
             downloads
             presentations
             presentation
+            update
+            docs/PHASE_100_FULL_DEMO_POLISH_MANIFEST.md
+            docs/PHASE_100_AWS_WEBEX_DEPLOYMENT_NOTES.md
+            docs/PHASE_100_QA_CHECKLIST.md
+            docs/PHASE_100_HANDOFF.md
 
       - name: Prepare static Pages build
         shell: bash
@@ -108,10 +113,11 @@ jobs:
           copy_dir_if_exists downloads
           copy_dir_if_exists presentations
           copy_dir_if_exists presentation
+          copy_dir_if_exists update
 
           touch build/.nojekyll
 
-          mkdir -p build/reiki build/android build/downloads
+          mkdir -p build/reiki build/android build/downloads build/update
           mkdir -p build/site/presentations/reiki build/site/android build/site/downloads build/game
 
           if [ ! -f build/site/presentations/reiki/index.html ]; then
@@ -138,12 +144,25 @@ jobs:
             printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/downloads/"><a href="/site/downloads/">Open Downloads</a>' > build/downloads/index.html
           fi
 
+          GAME_ZIP_STATUS="missing"
+          GAME_ZIP_BYTES="0"
+          if [ -f build/update/game.zip ]; then
+            GAME_ZIP_STATUS="present"
+            GAME_ZIP_BYTES="$(wc -c < build/update/game.zip | tr -d ' ')"
+            if [ "$GAME_ZIP_BYTES" -gt 26214400 ]; then
+              echo "::warning::update/game.zip is larger than 25 MB: ${GAME_ZIP_BYTES} bytes"
+            fi
+          else
+            echo "::warning::update/game.zip is missing from this deployment artifact"
+          fi
+
           DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          printf '{\n  "status": "ok",\n  "build": "SVR-AUTO-DEPLOY-CONFIRM-LOCK",\n  "commit": "%s",\n  "deployedAt": "%s"\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" > build/deploy-health.json
+          printf '{\n  "status": "ok",\n  "build": "SVR-PHASE-100-AUTO-DEPLOY",\n  "commit": "%s",\n  "deployedAt": "%s",\n  "gameZipStatus": "%s",\n  "gameZipBytes": "%s"\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" "$GAME_ZIP_STATUS" "$GAME_ZIP_BYTES" > build/deploy-health.json
           cp build/deploy-health.json build/game/deploy-health.json
+          cp build/deploy-health.json build/phase100-deploy.json
 
           find build -maxdepth 3 -type f | sort > /tmp/svr-build-files.txt
-          sed -n '1,220p' /tmp/svr-build-files.txt | sed 's#^# - #'
+          sed -n '1,260p' /tmp/svr-build-files.txt | sed 's#^# - #'
           df -h
 
       - name: Validate routes before upload
@@ -158,6 +177,11 @@ jobs:
           test -f build/site/android/index.html
           test -f build/site/downloads/index.html
           test -f build/deploy-health.json
+          test -f build/game/deploy-health.json
+          test -f build/phase100-deploy.json
+          if [ ! -f build/update/game.zip ]; then
+            echo "::warning::build/update/game.zip was not found; Pages deploy will continue with health warning"
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
