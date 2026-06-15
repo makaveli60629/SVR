@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-246-PILLAR-STOREFRONT-ALIGNMENT-LOCK",
+  "build": "PHASE-249-GEOMETRY-SMOOTHNESS-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-Z / Phase 246",
-  "summary": "Aligns the lobby by hiding older crowded pillar groups, replacing the center canopy with cleaner spacing, lining up storefronts in one readable row, adding clear portal pads, reducing dark placeholder backings, and reinforcing upright upper arches.",
-  "label": "PHASE-246-PILLAR-STOREFRONT-ALIGNMENT-LOCK",
-  "notes": "Game-only update. Site untouched. This phase focuses on clean alignment and readability from spawn before final art assets are added.",
-  "updated": "2026-06-14T22:02:00-05:00"
+  "phase": "3.1-AC / Phase 249",
+  "summary": "Adds a geometry smoothness pass for the lobby with a cleaner aisle guide, open south seat marker, softer glow, less visual noise, and mesh culling.",
+  "label": "PHASE-249-GEOMETRY-SMOOTHNESS-LOCK",
+  "notes": "Game-only update. Site untouched.",
+  "updated": "2026-06-14T22:34:00-05:00"
 }
