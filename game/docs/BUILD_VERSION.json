@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-258-ROMAN-CANOPY-SMOOTH-LOBBY-LOCK",
+  "build": "PHASE-259-ROMAN-CANOPY-COLONNADE-POLISH-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-AL / Phase 258",
-  "summary": "Refines the central Roman canopy/chuppah-style lobby feature with smoother fluted pillars, corner pillars, gold arch rhythm throughout the lobby, cyan trim, and a stronger central canopy identity.",
-  "label": "PHASE-258-ROMAN-CANOPY-SMOOTH-LOBBY-LOCK",
-  "notes": "Site untouched. Current lobby preserved. Phase 258 loads after Phase 257 and replaces the Phase 257 canopy layer with a smoother Roman canopy/pillar rhythm.",
-  "updated": "2026-06-15T12:20:00-05:00"
+  "phase": "3.1-AM / Phase 259",
+  "summary": "Adds the next Roman canopy polish layer: central chuppah-style canopy base, smoother stone/gold pillars, taller corner pillars, rear colonnade arches, side pillar rhythm, red runner, and cyan underlighting while preserving the current lobby.",
+  "label": "PHASE-259-ROMAN-CANOPY-COLONNADE-POLISH-LOCK",
+  "notes": "Site untouched. Current lobby preserved. Phase 259 loads after Phase 257 and Phase 258 as a targeted visual polish layer only.",
+  "updated": "2026-06-15T12:35:00-05:00"
 }
