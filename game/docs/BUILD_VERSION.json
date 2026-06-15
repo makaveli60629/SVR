@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-257-ROMAN-CANOPY-LOBBY-ARCH-LOCK",
+  "build": "PHASE-258-ROMAN-CANOPY-SMOOTH-LOBBY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-AK / Phase 257",
-  "summary": "Adds a centered Roman canopy with smooth pillars, gold beams, corner pillars, and repeated arch details around the lobby.",
-  "label": "PHASE-257-ROMAN-CANOPY-LOBBY-ARCH-LOCK",
-  "notes": "Site untouched. Current lobby preserved.",
-  "updated": "2026-06-15T12:05:00-05:00"
+  "phase": "3.1-AL / Phase 258",
+  "summary": "Refines the central Roman canopy/chuppah-style lobby feature with smoother fluted pillars, corner pillars, gold arch rhythm throughout the lobby, cyan trim, and a stronger central canopy identity.",
+  "label": "PHASE-258-ROMAN-CANOPY-SMOOTH-LOBBY-LOCK",
+  "notes": "Site untouched. Current lobby preserved. Phase 258 loads after Phase 257 and replaces the Phase 257 canopy layer with a smoother Roman canopy/pillar rhythm.",
+  "updated": "2026-06-15T12:20:00-05:00"
 }
