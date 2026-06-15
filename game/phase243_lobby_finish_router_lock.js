@@ -1,16 +1,18 @@
-const LABEL = "PHASE-243-LOBBY-FINISH-ROUTER-CACHE-CLEAN-LOCK";
+const LABEL = "PHASE-245-LOBBY-ORGANIZATION-TEXTURE-CLEANUP-LOCK";
 const FINISH_LAYERS = [
-  "./phase240_grand_palace_reference_lobby_lock.js?v=phase243-grand-palace-single",
-  "./phase241_single_lobby_layer_cleanup_lock.js?v=phase243-single-layer-cleanup"
+  "./phase241_single_lobby_layer_cleanup_lock.js?v=phase245-single-layer-cleanup",
+  "./phase244_finished_palace_lobby_build_lock.js?v=phase245-finished-lobby",
+  "./phase245_lobby_organization_texture_cleanup_lock.js?v=phase245-org-texture-cleanup"
 ];
 
 function stamp(){
-  window.SVR_PHASE243 = {
+  window.SVR_PHASE245 = {
     build: LABEL,
     active: true,
     router: true,
     siteTouched: false,
     removesPhase237Entry: true,
+    removesPhase240DuplicateLayer: true,
     checkedAt: new Date().toISOString()
   };
   window.SVR_LOCKED_FINAL_BUILD = LABEL;
@@ -46,16 +48,16 @@ async function loadLayersOnce(){
       await import(url);
       loaded.push(url);
     } catch (err){
-      console.warn("[SVR Phase243] finish layer import failed", url, err);
+      console.warn("[SVR Phase245] finish layer import failed", url, err);
       showError(`Finish layer failed: ${url}`);
     }
   }
-  window.SVR_PHASE243.loadedFinishLayers = loaded;
+  window.SVR_PHASE245.loadedFinishLayers = loaded;
   return loaded;
 }
 async function boot(){
   stamp();
-  setLabel("PHASE 243 ACTIVE • LOBBY FINISH ROUTER");
+  setLabel("PHASE 245 ACTIVE • LOBBY ORGANIZATION CLEANUP");
   await loadLayersOnce();
   let checks = 0;
   const timer = setInterval(()=>{
@@ -63,10 +65,10 @@ async function boot(){
     if (hasRuntime() || checks > 100){
       if (hasRuntime()){
         window.__SVR_GAME_READY__ = true;
-        setLabel("PHASE 243 ACTIVE • FINISHED LOBBY READY");
+        setLabel("PHASE 245 ACTIVE • ORGANIZED LOBBY READY");
         hideBoot();
       } else {
-        setLabel("PHASE 243 ACTIVE • SAFE ENTRY WAITING");
+        setLabel("PHASE 245 ACTIVE • SAFE ENTRY WAITING");
       }
       clearInterval(timer);
     }
