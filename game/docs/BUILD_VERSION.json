@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-253-INTERACTION-VALIDATION-LOCK",
+  "build": "PHASE-254-JOIN-TABLE-FLOW-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-AG / Phase 253",
-  "summary": "Adds interaction validation zones for Wellness, PGA, Play, Store, Scorpion, and the open seat. Adds a confirm helper for portal and seat validation.",
-  "label": "PHASE-253-INTERACTION-VALIDATION-LOCK",
+  "phase": "3.1-AH / Phase 254",
+  "summary": "Adds the join table flow: open seat confirmation, table state, bot readiness panel, dealer readiness panel, and join helpers for the south player seat.",
+  "label": "PHASE-254-JOIN-TABLE-FLOW-LOCK",
   "notes": "Site untouched.",
-  "updated": "2026-06-14T23:18:00-05:00"
+  "updated": "2026-06-14T23:32:00-05:00"
 }
