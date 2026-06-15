@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-236-LIVE-RUNTIME-RESUME-LOCK",
+  "build": "PHASE-237-RUNTIME-WATCHDOG-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-P / Phase 236",
-  "summary": "Resumes the live game runtime from the Phase 235 diagnostic pause screen. The entry now loads main.js again and keeps a temporary boot overlay that clears when the lobby is ready.",
-  "label": "PHASE-236-LIVE-RUNTIME-RESUME-LOCK",
-  "notes": "Game-only update. Site untouched. Phase 235 static repair screen removed from active entry.",
-  "updated": "2026-06-14T19:20:00-05:00"
+  "phase": "3.1-Q / Phase 237",
+  "summary": "Adds a runtime watchdog over the live game entry. The page loads main.js and then clears the boot overlay once a canvas, renderer, or scene appears. Errors are surfaced in the visible error panel instead of silently leaving the player guessing.",
+  "label": "PHASE-237-RUNTIME-WATCHDOG-LOCK",
+  "notes": "Game-only update. Site untouched. Designed as the next safe step after the Phase 234/236 recovery path worked on PC.",
+  "updated": "2026-06-14T19:35:00-05:00"
 }
