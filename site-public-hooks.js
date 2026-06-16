@@ -4,6 +4,7 @@
   const MESSAGE_KEY = 'svr_public_messages_backup';
   const SESSION_KEY = 'svr_site_session_id';
   const STATUS_REFRESH_MS = 30000;
+  const PUBLIC_ADMIN_DEFAULT_ONLINE = false;
 
   function sessionId() {
     try {
@@ -66,13 +67,11 @@
       el.setAttribute('aria-label', text);
       el.title = text;
     });
-    window.SVR_ADMIN_PRESENCE = { state, isOnline, source: sourceText || 'server-api-or-fallback', updatedAt: new Date().toISOString() };
+    window.SVR_ADMIN_PRESENCE = { state, isOnline, source: sourceText || 'server-api-or-fallback', updatedAt: new Date().toISOString(), build: 'PHASE-101N-PUBLIC-ADMIN-OFFLINE-FALLBACK-LOCK' };
   }
 
   function setAdminLoadingState() {
-    const fallback = (() => { try { return localStorage.getItem(ADMIN_KEY); } catch (e) { return null; } })();
-    if (fallback === 'offline') setAdminVisualState(false, 'local-loading');
-    else setAdminVisualState(true, 'loading');
+    setAdminVisualState(PUBLIC_ADMIN_DEFAULT_ONLINE, 'public-default-offline');
   }
 
   async function fetchAdminStatus() {
@@ -86,10 +85,10 @@
       const data = await fetchAdminStatus();
       if (!data || data.ok === false) throw new Error(data && data.error ? data.error : 'Invalid admin status payload');
       const online = Boolean(data.isOnline ?? data.online ?? data.adminOnline ?? data.status === 'online');
-      setAdminVisualState(online, 'server-api');
+      const fresh = !data.updatedAt || (Date.now() - Date.parse(data.updatedAt)) < 180000;
+      setAdminVisualState(online && fresh, fresh ? 'server-api' : 'server-api-stale-offline');
     } catch (error) {
-      const fallback = (() => { try { return localStorage.getItem(ADMIN_KEY); } catch (e) { return null; } })();
-      setAdminVisualState(fallback !== 'offline', 'fallback');
+      setAdminVisualState(PUBLIC_ADMIN_DEFAULT_ONLINE, 'api-fallback-offline');
     }
   }
 
@@ -218,7 +217,7 @@
       const kicker = liveCopy.querySelector('.kicker');
       const title = liveCopy.querySelector('h1');
       if (kicker) kicker.textContent = 'Premium Social Poker';
-      if (title) title.textContent = 'SVR Poker';
+      if (title) title.textContent = 'Play, connect, and build inside SVR Poker.';
       const trust = liveCopy.querySelectorAll('.trust-strip span');
       const labels = ['Play-Money Poker', 'Private Rooms', 'Sponsor Ready', 'Store Preview'];
       trust.forEach((span, i) => { if (labels[i]) span.textContent = labels[i]; });
