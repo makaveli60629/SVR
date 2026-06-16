@@ -1,3 +1,5 @@
+import "./phase101l_quest_live_qa_smoke_test.js?v=phase101l-quest-live-qa-smoke-test";
+
 const LABEL = "PHASE-101K-QUEST-PERFORMANCE-CLEANUP-LOCK";
 
 window.SVR_PHASE101K_PERFORMANCE = {
@@ -5,6 +7,7 @@ window.SVR_PHASE101K_PERFORMANCE = {
   active: true,
   purpose: "Quest/WebXR frame stability pass without redesigning the lobby.",
   siteTouched: false,
+  qaSmokeTest: true,
   checkedAt: new Date().toISOString()
 };
 
