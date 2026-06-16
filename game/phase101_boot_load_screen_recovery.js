@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const LABEL = "PHASE-101-BOOT-LOAD-SCREEN-RECOVERY-LOCK";
+const LABEL = "PHASE-101Q-BOOT-LOAD-SCREEN-RECOVERY-LOCK";
 const STARTED_AT = Date.now();
 
 window.SVR_PHASE101_BOOT_RECOVERY = {
@@ -23,12 +23,15 @@ function logBoot(message){
 }
 
 function hideBoot(reason){
+  try { window.SVR_RELEASE_BOOT?.(reason); } catch {}
+  document.body.classList.add("boot-released");
   const boot = document.getElementById("bootFallback");
   if(boot){
     boot.style.opacity = "0";
     boot.style.pointerEvents = "none";
-    setTimeout(() => { boot.style.display = "none"; }, 380);
+    boot.style.display = "none";
   }
+  window.__SVR_GAME_READY__ = true;
   window.SVR_PHASE101_BOOT_RECOVERY.cleared = true;
   window.SVR_PHASE101_BOOT_RECOVERY.clearReason = reason;
   window.SVR_PHASE101_BOOT_RECOVERY.clearMs = Date.now() - STARTED_AT;
@@ -42,6 +45,7 @@ function showErrorPanel(title, detail){
     err.textContent = `${title}\n${detail || ""}`.trim();
   }
   logBoot(title);
+  setTimeout(() => hideBoot("error-panel-release"), 400);
 }
 
 function makeLabel(text, sub){
@@ -67,14 +71,14 @@ function makeLabel(text, sub){
   ctx.fillText(sub, canvas.width/2, 300);
   ctx.fillStyle = "#bffcff";
   ctx.font = "700 24px system-ui,Arial";
-  ctx.fillText("Phase 101 boot-safe renderer", canvas.width/2, 382);
+  ctx.fillText("Phase 101Q boot-safe renderer", canvas.width/2, 382);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
 
 function createBootSafeLobby(){
-  if(window.__SVR_SCENE__ || window.__SVR_RENDERER__) return false;
+  if(window.__SVR_SCENE__ || window.__SVR_RENDERER__) { hideBoot("existing-runtime"); return false; }
   const app = document.getElementById("app");
   if(!app) return false;
 
@@ -152,8 +156,6 @@ function createBootSafeLobby(){
   mars.position.set(5.5, 8.2, -19.0);
   scene.add(mars);
 
-  function roomClamp(x,z){ return { x: THREE.MathUtils.clamp(x, -15.2, 15.2), z: THREE.MathUtils.clamp(z, -12.8, 13.5) }; }
-
   scene.userData._camera = camera;
   scene.userData._tickWorld = (dt) => {
     moon.rotation.y += dt * 0.03;
@@ -166,7 +168,6 @@ function createBootSafeLobby(){
   window.__SVR_BOOT_SAFE_LOBBY__ = true;
   window.__SVR_GAME_READY__ = true;
   window.SVR_PHASE101_BOOT_RECOVERY.fallbackRenderer = true;
-  window.SVR_PHASE101_BOOT_RECOVERY.roomClamp = true;
 
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -183,7 +184,7 @@ function createBootSafeLobby(){
     renderer.render(scene, camera);
   });
 
-  hideBoot("phase101-fallback-renderer");
+  hideBoot("phase101q-fallback-renderer");
   setText("mode", "Boot-safe lobby");
   logBoot("Boot-safe lobby recovered. Full runtime did not initialize in time.");
   return true;
@@ -191,12 +192,12 @@ function createBootSafeLobby(){
 
 window.addEventListener("error", (event) => {
   window.SVR_PHASE101_BOOT_RECOVERY.lastError = event?.error?.stack || event?.message || String(event);
-  showErrorPanel("Runtime error captured by Phase 101 boot recovery.", window.SVR_PHASE101_BOOT_RECOVERY.lastError);
+  showErrorPanel("Runtime error captured by Phase 101Q boot recovery.", window.SVR_PHASE101_BOOT_RECOVERY.lastError);
 });
 
 window.addEventListener("unhandledrejection", (event) => {
   window.SVR_PHASE101_BOOT_RECOVERY.lastRejection = event?.reason?.stack || event?.reason || String(event?.reason || event);
-  showErrorPanel("Runtime promise rejection captured by Phase 101 boot recovery.", window.SVR_PHASE101_BOOT_RECOVERY.lastRejection);
+  showErrorPanel("Runtime promise rejection captured by Phase 101Q boot recovery.", window.SVR_PHASE101_BOOT_RECOVERY.lastRejection);
 });
 
 const clearTimer = setInterval(() => {
@@ -205,23 +206,23 @@ const clearTimer = setInterval(() => {
     clearInterval(clearTimer);
     return;
   }
-  if(window.__SVR_SCENE__ && window.__SVR_RENDERER__ && Date.now() - STARTED_AT > 1800){
+  if(window.__SVR_SCENE__ && window.__SVR_RENDERER__ && Date.now() - STARTED_AT > 1200){
     hideBoot("scene-visible-before-ready");
     clearInterval(clearTimer);
   }
-}, 250);
+}, 200);
 
 setTimeout(() => {
   if(!window.__SVR_SCENE__ && !window.__SVR_RENDERER__){
     createBootSafeLobby();
+  }else{
+    hideBoot("runtime-or-scene-detected-timeout");
   }
-}, 5200);
+}, 3600);
 
 setTimeout(() => {
-  if(!window.__SVR_GAME_READY__ && window.__SVR_SCENE__ && window.__SVR_RENDERER__){
-    hideBoot("scene-visible-timeout");
-    logBoot("Scene visible. Loader cleared by Phase 101 timeout guard.");
-  }
-}, 8200);
+  hideBoot("absolute-timeout-release");
+  logBoot("Loader cleared by Phase 101Q absolute timeout guard.");
+}, 6200);
 
-logBoot("Phase 101 boot recovery armed.");
+logBoot("Phase 101Q boot recovery armed.");
