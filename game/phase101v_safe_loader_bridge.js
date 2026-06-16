@@ -1,19 +1,20 @@
 // Phase 101V - Safe Loader Bridge
 // Late-loads Quest portal QA, live verification, fix pass, presentation QA,
-// and final release-candidate lock without changing core boot recovery.
+// final release-candidate lock, and bug-sweep checklist without changing core boot recovery.
 
 const LABEL = "PHASE-101V-SAFE-LOADER-BRIDGE-LOCK";
 
 window.SVR_PHASE101V_SAFE_LOADER_BRIDGE = {
   build: LABEL,
   active: true,
-  purpose: "Safely bridge Quest QA, live verification, fix pass, presentation QA, and final RC lock without changing core boot recovery.",
+  purpose: "Safely bridge Quest QA, live verification, fix pass, presentation QA, final RC lock, and bug sweep without changing core boot recovery.",
   bootTouched: false,
   siteTouched: false,
   phase101wBridge: true,
   phase101xBridge: true,
   phase101yBridge: true,
   phase102aBridge: true,
+  phase102bBridge: true,
   checkedAt: new Date().toISOString()
 };
 
@@ -102,24 +103,45 @@ async function loadReleaseCandidate(){
   }
 }
 
+async function loadBugSweep(){
+  if(window.__SVR_PHASE101V_LOADED_102B__) return window.SVR_PHASE102B_BUG_SWEEP || null;
+  window.__SVR_PHASE101V_LOADED_102B__ = true;
+  try {
+    await loadReleaseCandidate();
+    const mod = await import("./phase102b_release_candidate_bug_sweep_checklist.js?v=phase102b-bridge");
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.loaded102B = true;
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.checkedAt = new Date().toISOString();
+    return mod;
+  } catch (error) {
+    window.__SVR_PHASE101V_LOADED_102B__ = false;
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.error102B = String(error?.message || error);
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.checkedAt = new Date().toISOString();
+    return null;
+  }
+}
+
 window.SVR_LOAD_PHASE101U_QA = loadQuestPortalQa;
 window.SVR_LOAD_PHASE101W_VERIFY = loadQuestLiveVerify;
 window.SVR_LOAD_PHASE101X_FIX = loadQuestFixPass;
 window.SVR_LOAD_PHASE101Y_PRESENTATION_QA = loadPresentationQa;
 window.SVR_LOAD_PHASE102A_RC = loadReleaseCandidate;
+window.SVR_LOAD_PHASE102B_BUG_SWEEP = loadBugSweep;
 
 setTimeout(loadQuestPortalQa, 1200);
 setTimeout(loadQuestLiveVerify, 2400);
 setTimeout(loadQuestFixPass, 3600);
 setTimeout(loadPresentationQa, 4800);
 setTimeout(loadReleaseCandidate, 6000);
-setTimeout(loadQuestPortalQa, 7600);
-setTimeout(loadQuestLiveVerify, 8800);
-setTimeout(loadQuestFixPass, 10000);
-setTimeout(loadPresentationQa, 11200);
-setTimeout(loadReleaseCandidate, 12400);
-setTimeout(loadQuestPortalQa, 14000);
-setTimeout(loadQuestLiveVerify, 15200);
-setTimeout(loadQuestFixPass, 16400);
-setTimeout(loadPresentationQa, 17600);
-setTimeout(loadReleaseCandidate, 18800);
+setTimeout(loadBugSweep, 7200);
+setTimeout(loadQuestPortalQa, 9000);
+setTimeout(loadQuestLiveVerify, 10200);
+setTimeout(loadQuestFixPass, 11400);
+setTimeout(loadPresentationQa, 12600);
+setTimeout(loadReleaseCandidate, 13800);
+setTimeout(loadBugSweep, 15000);
+setTimeout(loadQuestPortalQa, 16800);
+setTimeout(loadQuestLiveVerify, 18000);
+setTimeout(loadQuestFixPass, 19200);
+setTimeout(loadPresentationQa, 20400);
+setTimeout(loadReleaseCandidate, 21600);
+setTimeout(loadBugSweep, 22800);
