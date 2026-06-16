@@ -1,10 +1,12 @@
 (() => {
   const API_BASE = window.SVR_SERVER_API_BASE || window.SVR_API_BASE || 'https://api.svrpoker.com';
   const ADMIN_KEY = 'svr_admin_presence';
+  const ADMIN_PAYLOAD_KEY = 'svr_admin_presence_payload';
   const MESSAGE_KEY = 'svr_public_messages_backup';
   const SESSION_KEY = 'svr_site_session_id';
   const STATUS_REFRESH_MS = 30000;
   const PUBLIC_ADMIN_DEFAULT_ONLINE = false;
+  const ADMIN_PAYLOAD_MAX_AGE_MS = 1000 * 60 * 60 * 8;
 
   function sessionId() {
     try {
@@ -16,6 +18,23 @@
       return id;
     } catch (e) {
       return `svr-site-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    }
+  }
+
+  function readFreshAdminPayload(){
+    try {
+      const raw = localStorage.getItem(ADMIN_PAYLOAD_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      const updated = Date.parse(data.updatedAt || data.createdAt || '');
+      const expires = Date.parse(data.expiresAt || '');
+      const freshByUpdated = Number.isFinite(updated) && Date.now() - updated < ADMIN_PAYLOAD_MAX_AGE_MS;
+      const freshByExpires = Number.isFinite(expires) && Date.now() < expires;
+      if (!data || !/online|offline/i.test(String(data.state || ''))) return null;
+      if (!freshByUpdated && !freshByExpires) return null;
+      return data;
+    } catch (e) {
+      return null;
     }
   }
 
@@ -67,11 +86,13 @@
       el.setAttribute('aria-label', text);
       el.title = text;
     });
-    window.SVR_ADMIN_PRESENCE = { state, isOnline, source: sourceText || 'server-api-or-fallback', updatedAt: new Date().toISOString(), build: 'PHASE-101N-PUBLIC-ADMIN-OFFLINE-FALLBACK-LOCK' };
+    window.SVR_ADMIN_PRESENCE = { state, isOnline, source: sourceText || 'server-api-or-fallback', updatedAt: new Date().toISOString(), build: 'PHASE-101O-ADMIN-PRESENCE-BRIDGE-LOCK' };
   }
 
   function setAdminLoadingState() {
-    setAdminVisualState(PUBLIC_ADMIN_DEFAULT_ONLINE, 'public-default-offline');
+    const payload = readFreshAdminPayload();
+    if (payload) setAdminVisualState(payload.state === 'online', 'fresh-admin-panel-bridge-loading');
+    else setAdminVisualState(PUBLIC_ADMIN_DEFAULT_ONLINE, 'public-default-offline');
   }
 
   async function fetchAdminStatus() {
@@ -81,6 +102,11 @@
   }
 
   async function paintAdminState() {
+    const panelPayload = readFreshAdminPayload();
+    if (panelPayload) {
+      setAdminVisualState(panelPayload.state === 'online', 'fresh-admin-panel-bridge');
+      return;
+    }
     try {
       const data = await fetchAdminStatus();
       if (!data || data.ok === false) throw new Error(data && data.error ? data.error : 'Invalid admin status payload');
