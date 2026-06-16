@@ -9,12 +9,12 @@
     :root{--bg:#07000d;--panel:rgba(24,5,40,.92);--line:#8b49b9;--cyan:#80f8ff;--green:#58ff96;--red:#ff5f7e;--gold:#ffd879;--text:#f8edff;--muted:#c8b6d8}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 10%,rgba(128,248,255,.16),transparent 34%),radial-gradient(circle at 80% 20%,rgba(255,85,223,.18),transparent 34%),linear-gradient(135deg,#020006,#07000d 45%,#160024);color:var(--text);font-family:Arial,Helvetica,sans-serif}main{max-width:1260px;margin:auto;padding:24px}.card{border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:18px;margin:14px 0;box-shadow:0 0 24px rgba(161,70,255,.18)}h1{margin:0 0 8px;font-size:clamp(1.7rem,4vw,2.6rem)}h2{margin:0 0 12px;color:var(--cyan)}.grid{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:14px}.stats{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px}.stat{border:1px solid rgba(128,248,255,.28);border-radius:16px;background:rgba(0,0,0,.24);padding:14px}.stat b{display:block;font-size:1.7rem;color:#fff}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}input{width:100%;background:#090012;color:white;border:1px solid rgba(128,248,255,.55);border-radius:12px;padding:12px;margin:6px 0}button,a.btn{background:#3b1459;color:white;border:1px solid #a867ff;border-radius:12px;padding:11px 14px;cursor:pointer;text-decoration:none;font-weight:700}button:hover,a.btn:hover{border-color:var(--cyan)}button.good{background:rgba(88,255,150,.16)}button.bad{background:rgba(255,95,126,.16)}.good{color:var(--green)}.bad{color:var(--red)}.gold{color:var(--gold)}.muted{color:var(--muted)}.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:7px 11px;margin:4px 6px 4px 0;color:var(--muted)}.status-pill{font-weight:800;color:#fff}.status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 10px currentColor}.status-online{color:var(--green)}.status-offline{color:var(--red)}.msg{border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px;margin:10px 0;background:rgba(0,0,0,.24);white-space:pre-wrap}.msg.unread{border-color:var(--cyan)}table{width:100%;border-collapse:collapse;margin-top:10px}td,th{border-bottom:1px solid rgba(255,255,255,.12);padding:8px;text-align:left;vertical-align:top}code{color:var(--cyan)}@media(max-width:900px){main{padding:14px}.grid,.stats{grid-template-columns:1fr}}
   </style>
 </head>
-<body>
+<body data-build="PHASE-101O-OWNER-ADMIN-PRESENCE-BRIDGE-LOCK">
 <main>
   <div class="card">
     <h1>SVR Owner Admin</h1>
     <div class="muted">Private owner panel. Public visitors cannot see traffic counters, member population, billboard requests, or database intake details.</div>
-    <div id="status" class="pill status-pill"><span class="status-dot status-offline"></span>Checking API status...</div>
+    <div id="status" class="pill status-pill"><span class="status-dot status-offline"></span>Admin Offline</div>
     <div id="counts" class="pill">Active -- · Unread -- · Archived --</div>
     <div id="memberCounts" class="pill">Members: --</div>
     <div id="billboardCounts" class="pill">Billboards: --</div>
@@ -26,16 +26,16 @@
       <label class="muted">Owner email</label><input id="email" type="email" value="owner@svrpoker.local" autocomplete="username">
       <label class="muted">Owner password</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter private owner password">
       <div class="row"><button id="loginBtn">Log In</button><button id="logoutBtn" class="bad">Log Out</button></div>
-      <p id="loginNote" class="muted">Local counter fallback is active until the live owner API routes are connected.</p>
+      <p id="loginNote" class="muted">Admin presence defaults offline until owner login or Set Admin Online is pressed.</p>
     </div>
     <div class="card">
       <h2>Live Controls</h2>
       <div class="row">
         <button id="onlineBtn" class="good">Set Admin Online</button><button id="offlineBtn" class="bad">Set Admin Offline</button>
         <button id="analyticsBtn">Traffic Dashboard</button><button id="refreshBtn">Messages</button><button id="healthBtn">API Health</button>
-        <a class="btn" href="/" target="_blank" rel="noopener">Public Site</a><a class="btn" href="admin-preview.html" target="_blank" rel="noopener">Admin Preview</a>
+        <a class="btn" href="/?v=phase101o-admin-check" target="_blank" rel="noopener">Public Site</a><a class="btn" href="admin-preview.html" target="_blank" rel="noopener">Admin Preview</a>
       </div>
-      <p id="controlNote" class="muted"></p>
+      <p id="controlNote" class="muted">Presence bridge ready.</p>
     </div>
   </section>
 
@@ -48,25 +48,88 @@
   const LOCAL_ANALYTICS_KEY = 'svr_local_analytics_backup';
   const LOCAL_MESSAGES_KEY = 'svr_public_messages_backup';
   const LOCAL_ADMIN_KEY = 'svr_admin_presence';
+  const LOCAL_ADMIN_PAYLOAD_KEY = 'svr_admin_presence_payload';
+  const LOCAL_ADMIN_SESSION_KEY = 'SVR_ADMIN_SESSION';
+  const PRESENCE_TTL_MS = 1000 * 60 * 60 * 8;
   const $ = (id) => document.getElementById(id);
-  const safe = (s) => String(s || '').replace(/[&<>\"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const safe = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const n = (v) => Number(v || 0).toLocaleString();
   function readJson(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch (error) { return fallback; } }
   function write(key, value) { try { localStorage.setItem(key, value); } catch (error) {} }
+  function remove(key) { try { localStorage.removeItem(key); } catch (error) {} }
   function localMessages() { const list = readJson(LOCAL_MESSAGES_KEY, []); return Array.isArray(list) ? list : []; }
   function localAnalytics() { return readJson(LOCAL_ANALYTICS_KEY, {}); }
   function messageCounts() { const list = localMessages(); const active = list.filter((m) => !m.archived_at && !m.archived).length; const unread = list.filter((m) => !m.is_read && !m.read).length; return { active, unread, archived: list.length - active, total: list.length }; }
   function analyticsSummary() { const store = localAnalytics(); const today = new Date().toISOString().slice(0, 10); const day = (store.days && store.days[today]) || {}; return { allPageViews:Number(store.totalPageViews||0), allEvents:Number(store.totalEvents||0), sessions: store.sessions ? Object.keys(store.sessions).length : 0, todayViews:Number(day.pageViews||0), todayEvents:Number(day.events||0), todaySessions:day.sessions ? Object.keys(day.sessions).length : 0, storeClicks:Number(store.storeClicks||0), gameClicks:Number(store.gameClicks||0), supportClicks:Number(store.supportClicks||0), updatedAt:store.updatedAt || 'pending' }; }
-  function setStatus() { const online = (() => { try { return localStorage.getItem(LOCAL_ADMIN_KEY) !== 'offline'; } catch (e) { return true; } })(); $('status').innerHTML = online ? '<span class="status-dot status-online"></span>Admin Online' : '<span class="status-dot status-offline"></span>Admin Offline'; $('status').className = `pill status-pill ${online ? 'good' : 'bad'}`; }
+
+  function readPresence(){
+    const rawState = (() => { try { return localStorage.getItem(LOCAL_ADMIN_KEY); } catch (e) { return null; } })();
+    const payload = readJson(LOCAL_ADMIN_PAYLOAD_KEY, null);
+    if (payload && /online|offline/i.test(String(payload.state || ''))) {
+      const updated = Date.parse(payload.updatedAt || '');
+      const expires = Date.parse(payload.expiresAt || '');
+      const fresh = (Number.isFinite(expires) && Date.now() < expires) || (Number.isFinite(updated) && Date.now() - updated < PRESENCE_TTL_MS);
+      if (fresh) return payload.state === 'online';
+    }
+    return rawState === 'online';
+  }
+
+  function writePresence(value, source = 'owner-panel'){
+    const state = value ? 'online' : 'offline';
+    const now = new Date();
+    const payload = {
+      state,
+      isOnline: !!value,
+      source,
+      updatedAt: now.toISOString(),
+      expiresAt: new Date(now.getTime() + PRESENCE_TTL_MS).toISOString(),
+      build: 'PHASE-101O-OWNER-ADMIN-PRESENCE-BRIDGE-LOCK'
+    };
+    write(LOCAL_ADMIN_KEY, state);
+    write(LOCAL_ADMIN_PAYLOAD_KEY, JSON.stringify(payload));
+    window.SVR_OWNER_ADMIN_PRESENCE = payload;
+    try { window.dispatchEvent(new CustomEvent('svr-admin-presence-change', { detail: payload })); } catch (e) {}
+    return payload;
+  }
+
+  function setStatus() {
+    const online = readPresence();
+    $('status').innerHTML = online ? '<span class="status-dot status-online"></span>Admin Online' : '<span class="status-dot status-offline"></span>Admin Offline';
+    $('status').className = `pill status-pill ${online ? 'good' : 'bad'}`;
+  }
   function paintTop() { const c = messageCounts(); $('counts').textContent = `Active ${c.active} · Unread ${c.unread} · Archived ${c.archived}`; $('memberCounts').textContent = 'Members: API pending'; $('billboardCounts').textContent = 'Billboards: API pending'; setStatus(); }
   function paintAnalytics(note = '') { const a = analyticsSummary(); const cards = [['All Page Views',a.allPageViews],['Unique Sessions',a.sessions],['Today Views',a.todayViews],['Today Sessions',a.todaySessions],['All Events',a.allEvents],['Today Events',a.todayEvents],['Store Clicks',a.storeClicks],['Game Clicks',a.gameClicks],['Support Clicks',a.supportClicks],['Messages Local',messageCounts().total],['Members','API pending'],['Billboards','API pending']]; $('analytics').innerHTML = '<div class="stats">' + cards.map((c) => `<div class="stat"><span class="muted">${safe(c[0])}</span><b>${safe(c[1])}</b></div>`).join('') + `</div><p class="muted">${safe(note || 'Hidden local fallback counter is active. Live API counters will replace this when backend routes are online.')}</p><p class="muted">Last local update: ${safe(a.updatedAt)}</p>`; }
   function paintMessages() { paintTop(); const list = localMessages(); if (!list.length) { $('dataView').innerHTML = 'No local messages saved in this browser yet. Live API messages may still be pending until the backend route is restored.'; return; } $('dataView').innerHTML = list.slice().reverse().map((m, i) => `<div class="msg ${m.sent ? '' : 'unread'}"><b>${safe(m.subject || 'Local message')}</b> <span class="pill">${m.sent ? 'Sent backup' : 'Local fallback'}</span><br><span class="muted">From: ${safe(m.name || 'Anonymous')} ${safe(m.email || '')}<br>${safe(m.createdAt || m.created_at || '')} · ${safe(m.source || 'site')}</span><br><br>${safe(m.message || '')}<br><br><span class="muted">Local ID: ${i + 1}</span></div>`).join(''); }
   async function api(path, opts = {}) { const res = await fetch(API + path, Object.assign({ cache:'no-store', headers:{ Accept:'application/json' } }, opts)); const data = await res.json().catch(() => ({})); if (!res.ok || data.ok === false) throw new Error(data.error || data.detail || `HTTP ${res.status}`); return data; }
+
+  async function syncPresenceApi(value){
+    const body = JSON.stringify({ isOnline: !!value, online: !!value, adminOnline: !!value, status: value ? 'online' : 'offline', source: 'owner-panel', updatedAt: new Date().toISOString() });
+    const opts = { method:'POST', headers:{ 'Content-Type':'application/json', Accept:'application/json' }, body };
+    const endpoints = ['/api/admin/status', '/api/admin/presence'];
+    const errors = [];
+    for (const path of endpoints){
+      try { await api(path, opts); return { ok:true, path }; }
+      catch (error) { errors.push(`${path}: ${error.message}`); }
+    }
+    return { ok:false, error: errors.join(' | ') };
+  }
+
+  async function setOnline(value) {
+    const payload = writePresence(value, value ? 'owner-panel-online-button' : 'owner-panel-offline-button');
+    paintTop();
+    $('controlNote').textContent = value ? 'Admin Online set locally. Syncing API...' : 'Admin Offline set locally. Syncing API...';
+    const apiResult = await syncPresenceApi(value);
+    if (apiResult.ok) $('controlNote').textContent = `${value ? 'Admin Online' : 'Admin Offline'} set locally and synced through ${apiResult.path}.`;
+    else $('controlNote').textContent = `${value ? 'Admin Online' : 'Admin Offline'} set locally. Live API sync unavailable: ${apiResult.error}`;
+    window.SVR_OWNER_ADMIN_PRESENCE_SYNC = { payload, apiResult, checkedAt: new Date().toISOString() };
+    paintTop();
+  }
+
   async function tryLiveAnalytics() { $('analytics').textContent = 'Checking live API counters...'; try { const d = await api('/api/admin/analytics/summary'); const t = d.totals || d.summary || d || {}; const cards = [['All Page Views',t.all_page_views ?? t.totalPageViews ?? t.totalViews],['Unique Sessions',t.all_sessions ?? t.uniqueSessions ?? t.sessions],['Today Views',t.viewsToday ?? t.page_views_24h],['Store Clicks',t.storeClicks],['All Events',t.all_events ?? t.totalEvents]]; $('analytics').innerHTML = '<div class="stats">' + cards.map((c) => `<div class="stat"><span class="muted">${safe(c[0])}</span><b>${n(c[1])}</b></div>`).join('') + '</div><p class="good">Live API counters loaded.</p>'; $('controlNote').textContent = 'Live API counters loaded.'; } catch (error) { paintAnalytics(`Live API counter route unavailable: ${error.message}. Showing hidden local fallback counters instead.`); $('controlNote').textContent = 'Live API unavailable; local fallback counter shown.'; } }
-  async function health() { const checks = ['/api/health','/api/admin/status','/api/admin/analytics/summary','/api/messages','/api/store/products']; $('dataView').innerHTML = '<p class="muted">Checking endpoints...</p>'; const rows = []; for (const path of checks) { try { await api(path, { method: path === '/api/messages' ? 'OPTIONS' : 'GET' }); rows.push(`<tr><td>${safe(path)}</td><td class="good">Online</td></tr>`); } catch (e) { rows.push(`<tr><td>${safe(path)}</td><td class="bad">${safe(e.message)}</td></tr>`); } } $('dataView').innerHTML = '<table><thead><tr><th>Endpoint</th><th>Status</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>'; }
-  function setOnline(value) { write(LOCAL_ADMIN_KEY, value ? 'online' : 'offline'); paintTop(); $('controlNote').textContent = value ? 'Admin Online set locally.' : 'Admin Offline set locally.'; }
-  async function login() { $('loginNote').textContent = 'Checking owner API...'; try { await api('/api/admin/login', { method:'POST', headers:{ 'Content-Type':'application/json', Accept:'application/json' }, body:JSON.stringify({ email:$('email').value.trim(), password:$('password').value }) }); $('loginNote').textContent = 'Owner API login route responded.'; } catch (error) { $('loginNote').textContent = `API route not found. Local owner counter mode active: ${error.message}`; } $('password').value = ''; await tryLiveAnalytics(); paintMessages(); }
-  function boot() { paintTop(); paintAnalytics(); paintMessages(); $('loginBtn').onclick = login; $('logoutBtn').onclick = () => { $('loginNote').textContent = 'Logged out locally in this browser.'; }; $('onlineBtn').onclick = () => setOnline(true); $('offlineBtn').onclick = () => setOnline(false); $('analyticsBtn').onclick = tryLiveAnalytics; $('refreshBtn').onclick = paintMessages; $('healthBtn').onclick = health; $('tabMessages').onclick = paintMessages; $('tabHealth').onclick = health; }
+  async function health() { const checks = ['/api/health','/api/admin/status','/api/admin/presence','/api/admin/analytics/summary','/api/messages','/api/store/products']; $('dataView').innerHTML = '<p class="muted">Checking endpoints...</p>'; const rows = []; for (const path of checks) { try { await api(path, { method: 'GET' }); rows.push(`<tr><td>${safe(path)}</td><td class="good">GET Online</td></tr>`); } catch (e) { rows.push(`<tr><td>${safe(path)}</td><td class="bad">${safe(e.message)}</td></tr>`); } } $('dataView').innerHTML = '<table><thead><tr><th>Endpoint</th><th>Status</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>'; }
+  async function login() { $('loginNote').textContent = 'Checking owner API...'; try { await api('/api/admin/login', { method:'POST', headers:{ 'Content-Type':'application/json', Accept:'application/json' }, body:JSON.stringify({ email:$('email').value.trim(), password:$('password').value }) }); $('loginNote').textContent = 'Owner API login route responded. Admin set online.'; } catch (error) { $('loginNote').textContent = `API route not found. Local owner counter mode active: ${error.message}. Admin set online locally.`; } $('password').value = ''; await setOnline(true); await tryLiveAnalytics(); paintMessages(); }
+  async function logout() { remove(LOCAL_ADMIN_SESSION_KEY); $('loginNote').textContent = 'Logged out. Admin set offline.'; await setOnline(false); }
+  function boot() { paintTop(); paintAnalytics(); paintMessages(); $('loginBtn').onclick = login; $('logoutBtn').onclick = logout; $('onlineBtn').onclick = () => setOnline(true); $('offlineBtn').onclick = () => setOnline(false); $('analyticsBtn').onclick = tryLiveAnalytics; $('refreshBtn').onclick = paintMessages; $('healthBtn').onclick = health; $('tabMessages').onclick = paintMessages; $('tabHealth').onclick = health; window.SVR_OWNER_ADMIN_PANEL = { build:'PHASE-101O-OWNER-ADMIN-PRESENCE-BRIDGE-LOCK', setOnline, logout, readPresence, health }; }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
 </script>
