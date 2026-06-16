@@ -1,5 +1,5 @@
 // Phase 101V - Safe Loader Bridge
-// Late-loads Quest portal QA, live verification, and the Phase 101X fix pass
+// Late-loads Quest portal QA, live verification, fix pass, and presentation QA
 // without changing core boot recovery.
 
 const LABEL = "PHASE-101V-SAFE-LOADER-BRIDGE-LOCK";
@@ -7,11 +7,12 @@ const LABEL = "PHASE-101V-SAFE-LOADER-BRIDGE-LOCK";
 window.SVR_PHASE101V_SAFE_LOADER_BRIDGE = {
   build: LABEL,
   active: true,
-  purpose: "Safely bridge Quest controller portal QA, live verification, and fix pass after Phase 101T without changing core boot recovery.",
+  purpose: "Safely bridge Quest controller portal QA, live verification, fix pass, and presentation QA after Phase 101T without changing core boot recovery.",
   bootTouched: false,
   siteTouched: false,
   phase101wBridge: true,
   phase101xBridge: true,
+  phase101yBridge: true,
   checkedAt: new Date().toISOString()
 };
 
@@ -66,16 +67,37 @@ async function loadQuestFixPass(){
   }
 }
 
+async function loadPresentationQa(){
+  if(window.__SVR_PHASE101V_LOADED_101Y__) return window.SVR_PHASE101Y_PRESENTATION_QA || null;
+  window.__SVR_PHASE101V_LOADED_101Y__ = true;
+  try {
+    await loadQuestFixPass();
+    const mod = await import("./phase101y_lobby_visual_final_qa_presentation_lock.js?v=phase101y-bridge");
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.loaded101Y = true;
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.checkedAt = new Date().toISOString();
+    return mod;
+  } catch (error) {
+    window.__SVR_PHASE101V_LOADED_101Y__ = false;
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.error101Y = String(error?.message || error);
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.checkedAt = new Date().toISOString();
+    return null;
+  }
+}
+
 window.SVR_LOAD_PHASE101U_QA = loadQuestPortalQa;
 window.SVR_LOAD_PHASE101W_VERIFY = loadQuestLiveVerify;
 window.SVR_LOAD_PHASE101X_FIX = loadQuestFixPass;
+window.SVR_LOAD_PHASE101Y_PRESENTATION_QA = loadPresentationQa;
 
 setTimeout(loadQuestPortalQa, 1200);
 setTimeout(loadQuestLiveVerify, 2400);
 setTimeout(loadQuestFixPass, 3600);
-setTimeout(loadQuestPortalQa, 5200);
-setTimeout(loadQuestLiveVerify, 6400);
-setTimeout(loadQuestFixPass, 7600);
-setTimeout(loadQuestPortalQa, 9200);
-setTimeout(loadQuestLiveVerify, 10400);
-setTimeout(loadQuestFixPass, 11600);
+setTimeout(loadPresentationQa, 4800);
+setTimeout(loadQuestPortalQa, 6400);
+setTimeout(loadQuestLiveVerify, 7600);
+setTimeout(loadQuestFixPass, 8800);
+setTimeout(loadPresentationQa, 10000);
+setTimeout(loadQuestPortalQa, 11600);
+setTimeout(loadQuestLiveVerify, 12800);
+setTimeout(loadQuestFixPass, 14000);
+setTimeout(loadPresentationQa, 15200);
