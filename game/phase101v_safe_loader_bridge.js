@@ -1,18 +1,19 @@
 // Phase 101V - Safe Loader Bridge
-// Late-loads Quest portal QA, live verification, fix pass, and presentation QA
-// without changing core boot recovery.
+// Late-loads Quest portal QA, live verification, fix pass, presentation QA,
+// and final release-candidate lock without changing core boot recovery.
 
 const LABEL = "PHASE-101V-SAFE-LOADER-BRIDGE-LOCK";
 
 window.SVR_PHASE101V_SAFE_LOADER_BRIDGE = {
   build: LABEL,
   active: true,
-  purpose: "Safely bridge Quest controller portal QA, live verification, fix pass, and presentation QA after Phase 101T without changing core boot recovery.",
+  purpose: "Safely bridge Quest QA, live verification, fix pass, presentation QA, and final RC lock without changing core boot recovery.",
   bootTouched: false,
   siteTouched: false,
   phase101wBridge: true,
   phase101xBridge: true,
   phase101yBridge: true,
+  phase102aBridge: true,
   checkedAt: new Date().toISOString()
 };
 
@@ -84,20 +85,41 @@ async function loadPresentationQa(){
   }
 }
 
+async function loadReleaseCandidate(){
+  if(window.__SVR_PHASE101V_LOADED_102A__) return window.SVR_PHASE102A_RELEASE_CANDIDATE || null;
+  window.__SVR_PHASE101V_LOADED_102A__ = true;
+  try {
+    await loadPresentationQa();
+    const mod = await import("./phase102a_final_lobby_release_candidate_lock.js?v=phase102a-bridge");
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.loaded102A = true;
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.checkedAt = new Date().toISOString();
+    return mod;
+  } catch (error) {
+    window.__SVR_PHASE101V_LOADED_102A__ = false;
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.error102A = String(error?.message || error);
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.checkedAt = new Date().toISOString();
+    return null;
+  }
+}
+
 window.SVR_LOAD_PHASE101U_QA = loadQuestPortalQa;
 window.SVR_LOAD_PHASE101W_VERIFY = loadQuestLiveVerify;
 window.SVR_LOAD_PHASE101X_FIX = loadQuestFixPass;
 window.SVR_LOAD_PHASE101Y_PRESENTATION_QA = loadPresentationQa;
+window.SVR_LOAD_PHASE102A_RC = loadReleaseCandidate;
 
 setTimeout(loadQuestPortalQa, 1200);
 setTimeout(loadQuestLiveVerify, 2400);
 setTimeout(loadQuestFixPass, 3600);
 setTimeout(loadPresentationQa, 4800);
-setTimeout(loadQuestPortalQa, 6400);
-setTimeout(loadQuestLiveVerify, 7600);
-setTimeout(loadQuestFixPass, 8800);
-setTimeout(loadPresentationQa, 10000);
-setTimeout(loadQuestPortalQa, 11600);
-setTimeout(loadQuestLiveVerify, 12800);
-setTimeout(loadQuestFixPass, 14000);
-setTimeout(loadPresentationQa, 15200);
+setTimeout(loadReleaseCandidate, 6000);
+setTimeout(loadQuestPortalQa, 7600);
+setTimeout(loadQuestLiveVerify, 8800);
+setTimeout(loadQuestFixPass, 10000);
+setTimeout(loadPresentationQa, 11200);
+setTimeout(loadReleaseCandidate, 12400);
+setTimeout(loadQuestPortalQa, 14000);
+setTimeout(loadQuestLiveVerify, 15200);
+setTimeout(loadQuestFixPass, 16400);
+setTimeout(loadPresentationQa, 17600);
+setTimeout(loadReleaseCandidate, 18800);
