@@ -1,13 +1,13 @@
 // Phase 101V - Safe Loader Bridge
 // Late-loads Quest portal QA, live verification, fix pass, presentation QA,
-// final release-candidate lock, and bug-sweep checklist without changing core boot recovery.
+// final RC lock, bug-sweep checklist, and Webex presenter mode without changing core boot recovery.
 
 const LABEL = "PHASE-101V-SAFE-LOADER-BRIDGE-LOCK";
 
 window.SVR_PHASE101V_SAFE_LOADER_BRIDGE = {
   build: LABEL,
   active: true,
-  purpose: "Safely bridge Quest QA, live verification, fix pass, presentation QA, final RC lock, and bug sweep without changing core boot recovery.",
+  purpose: "Safely bridge Quest QA, live verification, fix pass, presentation QA, final RC lock, bug sweep, and presenter mode without changing core boot recovery.",
   bootTouched: false,
   siteTouched: false,
   phase101wBridge: true,
@@ -15,6 +15,7 @@ window.SVR_PHASE101V_SAFE_LOADER_BRIDGE = {
   phase101yBridge: true,
   phase102aBridge: true,
   phase102bBridge: true,
+  phase102cBridge: true,
   checkedAt: new Date().toISOString()
 };
 
@@ -120,12 +121,30 @@ async function loadBugSweep(){
   }
 }
 
+async function loadPresenterMode(){
+  if(window.__SVR_PHASE101V_LOADED_102C__) return window.SVR_PHASE102C_PRESENTER_MODE || null;
+  window.__SVR_PHASE101V_LOADED_102C__ = true;
+  try {
+    await loadBugSweep();
+    const mod = await import("./phase102c_webex_demo_presenter_mode_lock.js?v=phase102c-bridge");
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.loaded102C = true;
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.checkedAt = new Date().toISOString();
+    return mod;
+  } catch (error) {
+    window.__SVR_PHASE101V_LOADED_102C__ = false;
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.error102C = String(error?.message || error);
+    window.SVR_PHASE101V_SAFE_LOADER_BRIDGE.checkedAt = new Date().toISOString();
+    return null;
+  }
+}
+
 window.SVR_LOAD_PHASE101U_QA = loadQuestPortalQa;
 window.SVR_LOAD_PHASE101W_VERIFY = loadQuestLiveVerify;
 window.SVR_LOAD_PHASE101X_FIX = loadQuestFixPass;
 window.SVR_LOAD_PHASE101Y_PRESENTATION_QA = loadPresentationQa;
 window.SVR_LOAD_PHASE102A_RC = loadReleaseCandidate;
 window.SVR_LOAD_PHASE102B_BUG_SWEEP = loadBugSweep;
+window.SVR_LOAD_PHASE102C_PRESENTER_MODE = loadPresenterMode;
 
 setTimeout(loadQuestPortalQa, 1200);
 setTimeout(loadQuestLiveVerify, 2400);
@@ -133,15 +152,18 @@ setTimeout(loadQuestFixPass, 3600);
 setTimeout(loadPresentationQa, 4800);
 setTimeout(loadReleaseCandidate, 6000);
 setTimeout(loadBugSweep, 7200);
-setTimeout(loadQuestPortalQa, 9000);
-setTimeout(loadQuestLiveVerify, 10200);
-setTimeout(loadQuestFixPass, 11400);
-setTimeout(loadPresentationQa, 12600);
-setTimeout(loadReleaseCandidate, 13800);
-setTimeout(loadBugSweep, 15000);
-setTimeout(loadQuestPortalQa, 16800);
-setTimeout(loadQuestLiveVerify, 18000);
-setTimeout(loadQuestFixPass, 19200);
-setTimeout(loadPresentationQa, 20400);
-setTimeout(loadReleaseCandidate, 21600);
-setTimeout(loadBugSweep, 22800);
+setTimeout(loadPresenterMode, 8400);
+setTimeout(loadQuestPortalQa, 10200);
+setTimeout(loadQuestLiveVerify, 11400);
+setTimeout(loadQuestFixPass, 12600);
+setTimeout(loadPresentationQa, 13800);
+setTimeout(loadReleaseCandidate, 15000);
+setTimeout(loadBugSweep, 16200);
+setTimeout(loadPresenterMode, 17400);
+setTimeout(loadQuestPortalQa, 19200);
+setTimeout(loadQuestLiveVerify, 20400);
+setTimeout(loadQuestFixPass, 21600);
+setTimeout(loadPresentationQa, 22800);
+setTimeout(loadReleaseCandidate, 24000);
+setTimeout(loadBugSweep, 25200);
+setTimeout(loadPresenterMode, 26400);
