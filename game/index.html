@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-  <title>SVR Poker • PHASE-101R-HARD-BOOT-RESET-LOCK</title>
+  <title>SVR Poker • PHASE-101S-FINISHED-LOBBY-LOCK</title>
   <meta name="theme-color" content="#050508"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
-  <link rel="manifest" href="./manifest.json?v=phase101r"/>
+  <link rel="manifest" href="./manifest.json?v=phase101s"/>
   <style>
     :root{color-scheme:dark;--cyan:#7ffcff;--gold:#ffd98a;--bg:#02040b;--purple:#b55cff}
     html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overscroll-behavior:none;touch-action:none}
@@ -17,59 +17,60 @@
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-101R-HARD-BOOT-RESET-LOCK">
+<body data-build="PHASE-101S-FINISHED-LOBBY-LOCK">
   <div id="app"></div>
   <div id="safeStage">
     <section class="safe-card">
-      <span class="pill">PHASE 101R ACTIVE</span>
+      <span class="pill">PHASE 101S ACTIVE</span>
       <h1>SVR POKER</h1>
-      <h2>Hard Boot Reset</h2>
-      <p id="safeStatus">Clearing stale cache and starting the lobby...</p>
+      <h2>Finished Lobby Lock</h2>
+      <p id="safeStatus">Starting the finished lobby...</p>
       <div>
         <button class="btn cyan" id="startRuntimeBtn" type="button">Start Lobby Now</button>
         <button class="btn" id="clearCacheBtn" type="button">Clear Game Cache</button>
-        <a class="btn" href="./index.html?v=phase101r-hard-reset-manual">Reload Fresh</a>
+        <a class="btn" href="./index.html?v=phase101s-finished-lobby-manual">Reload Fresh</a>
       </div>
     </section>
   </div>
   <div id="bootFallback"></div><div id="hud"><span id="status"></span><span id="mode"></span><button id="toggleLog" type="button">Log</button><button id="toggleJoints" type="button">Joints</button></div><div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      var BUILD='PHASE-101R-HARD-BOOT-RESET-LOCK';
+      var BUILD='PHASE-101S-FINISHED-LOBBY-LOCK';
       var loaded=false;
       var status=document.getElementById('safeStatus');
-      window.SVR_PHASE101R_BOOT_RESET={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString()};
-      function note(msg){ if(status) status.textContent=msg; window.SVR_PHASE101R_BOOT_RESET.lastMessage=msg; window.SVR_PHASE101R_BOOT_RESET.checkedAt=new Date().toISOString(); }
-      function release(reason){ document.body.classList.add('boot-released','runtime-visible'); window.__SVR_GAME_READY__=true; window.SVR_GAME_READY=true; window.SVR_PHASE101R_BOOT_RESET.released=true; window.SVR_PHASE101R_BOOT_RESET.reason=reason; window.SVR_PHASE101R_BOOT_RESET.releasedAt=new Date().toISOString(); }
+      window.SVR_PHASE101S_BOOT={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString()};
+      function note(msg){ if(status) status.textContent=msg; window.SVR_PHASE101S_BOOT.lastMessage=msg; window.SVR_PHASE101S_BOOT.checkedAt=new Date().toISOString(); }
+      function release(reason){ document.body.classList.add('boot-released','runtime-visible'); window.__SVR_GAME_READY__=true; window.SVR_GAME_READY=true; window.SVR_PHASE101S_BOOT.released=true; window.SVR_PHASE101S_BOOT.reason=reason; window.SVR_PHASE101S_BOOT.releasedAt=new Date().toISOString(); }
       window.SVR_RELEASE_BOOT=release;
       async function clearBrowserCaches(){
-        try{ if(navigator.serviceWorker){ var regs=await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(function(r){return r.unregister();})); window.SVR_PHASE101R_BOOT_RESET.serviceWorkersUnregistered=regs.length; } }catch(e){ window.SVR_PHASE101R_BOOT_RESET.swError=String(e.message||e); }
-        try{ if(window.caches){ var keys=await caches.keys(); await Promise.all(keys.map(function(k){return caches.delete(k);})); window.SVR_PHASE101R_BOOT_RESET.cachesDeleted=keys.length; } }catch(e){ window.SVR_PHASE101R_BOOT_RESET.cacheError=String(e.message||e); }
+        try{ if(navigator.serviceWorker){ var regs=await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(function(r){return r.unregister();})); window.SVR_PHASE101S_BOOT.serviceWorkersUnregistered=regs.length; } }catch(e){ window.SVR_PHASE101S_BOOT.swError=String(e.message||e); }
+        try{ if(window.caches){ var keys=await caches.keys(); await Promise.all(keys.map(function(k){return caches.delete(k);})); window.SVR_PHASE101S_BOOT.cachesDeleted=keys.length; } }catch(e){ window.SVR_PHASE101S_BOOT.cacheError=String(e.message||e); }
       }
       function addModule(src){ return new Promise(function(resolve,reject){ var s=document.createElement('script'); s.type='module'; s.src=src; s.onload=resolve; s.onerror=function(){reject(new Error('Failed '+src));}; document.body.appendChild(s); }); }
       async function startRuntime(){
-        if(loaded) return; loaded=true; window.SVR_PHASE101R_BOOT_RESET.loaded=true;
-        note('Starting SVR runtime...');
+        if(loaded) return; loaded=true; window.SVR_PHASE101S_BOOT.loaded=true;
+        note('Starting SVR finished lobby...');
         try{
-          await addModule('./phase101_boot_load_screen_recovery.js?v=phase101r');
-          await addModule('./phase101_partial_runtime_render_guard.js?v=phase101r');
-          await addModule('./phase101_render_marker_cleanup.js?v=phase101r');
-          await addModule('./main.js?v=phase101r');
-          setTimeout(function(){ addModule('./phase260_roman_canopy_archway_final_lock.js?v=phase101r').catch(function(e){window.SVR_PHASE101R_BOOT_RESET.errors.push(String(e.message||e));}); },650);
-          note('Runtime launched. Releasing boot screen...');
-          setTimeout(function(){ release('phase101r-runtime-loader'); },900);
+          await addModule('./phase101_boot_load_screen_recovery.js?v=phase101s');
+          await addModule('./phase101_partial_runtime_render_guard.js?v=phase101s');
+          await addModule('./phase101_render_marker_cleanup.js?v=phase101s');
+          await addModule('./main.js?v=phase101s');
+          setTimeout(function(){ addModule('./phase260_roman_canopy_archway_final_lock.js?v=phase101s').catch(function(e){window.SVR_PHASE101S_BOOT.errors.push(String(e.message||e));}); },500);
+          setTimeout(function(){ addModule('./phase101s_finished_lobby_lock.js?v=phase101s').catch(function(e){window.SVR_PHASE101S_BOOT.errors.push(String(e.message||e));}); },950);
+          note('Finished lobby launched. Releasing boot screen...');
+          setTimeout(function(){ release('phase101s-finished-lobby-loader'); },900);
         }catch(e){
-          window.SVR_PHASE101R_BOOT_RESET.errors.push(String(e.message||e));
+          window.SVR_PHASE101S_BOOT.errors.push(String(e.message||e));
           note('Runtime module failed, showing boot-safe fallback...');
-          try{ await addModule('./phase101_boot_load_screen_recovery.js?v=phase101r-fallback'); }catch(_e){}
-          setTimeout(function(){ release('phase101r-fallback-after-error'); },900);
+          try{ await addModule('./phase101_boot_load_screen_recovery.js?v=phase101s-fallback'); }catch(_e){}
+          setTimeout(function(){ release('phase101s-fallback-after-error'); },900);
         }
       }
       document.getElementById('startRuntimeBtn').addEventListener('click', startRuntime);
-      document.getElementById('clearCacheBtn').addEventListener('click', async function(){ note('Clearing cache...'); await clearBrowserCaches(); note('Cache cleared. Starting lobby...'); startRuntime(); });
-      window.addEventListener('error',function(e){ window.SVR_PHASE101R_BOOT_RESET.errors.push(String(e.message||e.error||e)); release('error-release'); });
-      window.addEventListener('unhandledrejection',function(e){ window.SVR_PHASE101R_BOOT_RESET.errors.push(String((e.reason&&e.reason.message)||e.reason||e)); release('promise-release'); });
-      clearBrowserCaches().finally(function(){ note('Cache checked. Starting lobby...'); setTimeout(startRuntime,350); });
+      document.getElementById('clearCacheBtn').addEventListener('click', async function(){ note('Clearing cache...'); await clearBrowserCaches(); note('Cache cleared. Starting finished lobby...'); startRuntime(); });
+      window.addEventListener('error',function(e){ window.SVR_PHASE101S_BOOT.errors.push(String(e.message||e.error||e)); release('error-release'); });
+      window.addEventListener('unhandledrejection',function(e){ window.SVR_PHASE101S_BOOT.errors.push(String((e.reason&&e.reason.message)||e.reason||e)); release('promise-release'); });
+      clearBrowserCaches().finally(function(){ note('Cache checked. Starting finished lobby...'); setTimeout(startRuntime,350); });
       setTimeout(function(){ if(!window.__SVR_RENDERER__&&!window.__SVR_SCENE__) startRuntime(); },1800);
       setTimeout(function(){ release('absolute-release'); },5200);
     })();
