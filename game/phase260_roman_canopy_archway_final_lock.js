@@ -2,6 +2,7 @@ import * as THREE from "three";
 import "./phase101g_hud_overlay_cleanup.js?v=phase101g-hud-overlay-cleanup";
 import "./phase101h_scene_geometry_cleanup.js?v=phase101h-scene-geometry-cleanup";
 import "./phase101i_camera_spawn_path_polish.js?v=phase101i-camera-spawn-path-polish";
+import "./phase101k_quest_performance_cleanup.js?v=phase101k-quest-performance-cleanup";
 
 const LABEL = "PHASE-260-ROMAN-CANOPY-ARCHWAY-FINAL-LOCK";
 const ROOT = "PHASE260_ROMAN_CANOPY_ARCHWAY_FINAL_ROOT";
@@ -36,7 +37,7 @@ function pillar(root, name, x, z, h = 3.55, r = 0.17){
   cyl(root, name + "_UPPER_GOLD_CAP", r*2.25, .16, x, h+.22, z, gold);
 }
 function stamp(){
-  window.SVR_PHASE260 = { build: LABEL, active: true, romanCanopyFinal: true, archwayLobbyStyle: true, hudCleanup: true, sceneCleanup: true, cameraPathPolish: true, siteTouched: false, checkedAt: new Date().toISOString() };
+  window.SVR_PHASE260 = { build: LABEL, active: true, romanCanopyFinal: true, archwayLobbyStyle: true, hudCleanup: true, sceneCleanup: true, cameraPathPolish: true, questPerformanceCleanup: true, siteTouched: false, checkedAt: new Date().toISOString() };
   window.SVR_LOCKED_FINAL_BUILD = LABEL;
   try { document.title = `SVR Poker • ${LABEL}`; } catch {}
   const phase = document.getElementById("svr-phase-label"); if(phase) phase.textContent = "PHASE 260 ACTIVE • ROMAN CANOPY ARCHWAY";
