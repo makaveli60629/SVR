@@ -5,6 +5,7 @@ import "./phase101i_camera_spawn_path_polish.js?v=phase101i-camera-spawn-path-po
 import "./phase101k_quest_performance_cleanup.js?v=phase101k-quest-performance-cleanup";
 
 const LABEL = "PHASE-260-ROMAN-CANOPY-ARCHWAY-FINAL-LOCK";
+const DISPLAY_LABEL = "PHASE-101M-CURRENT-STACK-VISIBLE-LOCK";
 const ROOT = "PHASE260_ROMAN_CANOPY_ARCHWAY_FINAL_ROOT";
 const GOLD = 0xffd98a;
 const STONE = 0xd8d0bc;
@@ -38,10 +39,19 @@ function pillar(root, name, x, z, h = 3.55, r = 0.17){
 }
 function stamp(){
   window.SVR_PHASE260 = { build: LABEL, active: true, romanCanopyFinal: true, archwayLobbyStyle: true, hudCleanup: true, sceneCleanup: true, cameraPathPolish: true, questPerformanceCleanup: true, siteTouched: false, checkedAt: new Date().toISOString() };
-  window.SVR_LOCKED_FINAL_BUILD = LABEL;
-  try { document.title = `SVR Poker • ${LABEL}`; } catch {}
-  const phase = document.getElementById("svr-phase-label"); if(phase) phase.textContent = "PHASE 260 ACTIVE • ROMAN CANOPY ARCHWAY";
-  const status = document.getElementById("status"); if(status) status.textContent = "Phase 260 Roman canopy archway and corner pillar style loaded";
+  window.SVR_PHASE101M_CURRENT_STACK = {
+    build: DISPLAY_LABEL,
+    active: true,
+    visibleBuild: true,
+    phase260GeometryPreserved: true,
+    loadedStack: ["101G HUD cleanup", "101H geometry cleanup", "101I camera/path polish", "101J locomotion forward lock", "101K Quest performance", "101L live QA"],
+    siteTouched: false,
+    checkedAt: new Date().toISOString()
+  };
+  window.SVR_LOCKED_FINAL_BUILD = DISPLAY_LABEL;
+  try { document.title = `SVR Poker • ${DISPLAY_LABEL}`; } catch {}
+  const phase = document.getElementById("svr-phase-label"); if(phase) phase.textContent = "PHASE 101M ACTIVE • CURRENT STACK • PHASE 260 GEOMETRY";
+  const status = document.getElementById("status"); if(status) status.textContent = "Phase 101M current stack loaded • Phase 260 geometry preserved";
 }
 function build(scene){
   const old = scene.getObjectByName(ROOT); if(old) old.parent?.remove(old);
@@ -66,7 +76,7 @@ function build(scene){
   [[-13.4,-10.2],[13.4,-10.2],[-13.4,6.9],[13.4,6.9]].forEach(([x,z], i) => pillar(root, `PHASE260_SMOOTH_CORNER_LOBBY_PILLAR_${i}`, x, z, 3.86, .25));
   for(let i=0;i<8;i++){ const x=-10.5+i*3; pillar(root, `PHASE260_REAR_ARCHWAY_PILLAR_${i}`, x, -11.85, 2.86, .105); torusArch(root, `PHASE260_REAR_ARCHWAY_GLOW_${i}`, 1.16, .02, x, 2.82, -11.72, 0, 1.05, goldGlow); }
   [-1,1].forEach(side => { for(let i=0;i<5;i++){ const z=-8.8+i*3.55; pillar(root, `PHASE260_SIDE_${side}_SMOOTH_PILLAR_${i}`, side*13.55, z, 2.72, .095); box(root, `PHASE260_SIDE_${side}_CYAN_ARCH_LIGHT_${i}`, .04, .035, 2.0, side*13.22, 2.92, z, cyan); } });
-  window.SVR_PHASE260_GEOMETRY = { build: LABEL, centerRomanCanopy: true, smoothCornerPillars: 4, rearArchways: 8, sidePillars: 10, checkedAt:new Date().toISOString() };
+  window.SVR_PHASE260_GEOMETRY = { build: LABEL, visibleBuild: DISPLAY_LABEL, centerRomanCanopy: true, smoothCornerPillars: 4, rearArchways: 8, sidePillars: 10, checkedAt:new Date().toISOString() };
 }
 function install(){ stamp(); const scene = window.__SVR_SCENE__; if(!scene) return false; build(scene); return true; }
 stamp();
