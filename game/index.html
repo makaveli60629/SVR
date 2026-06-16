@@ -3,55 +3,76 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-  <title>SVR Poker • PHASE-101Q-EMERGENCY-BOOT-RECOVERY-LOCK</title>
+  <title>SVR Poker • PHASE-101R-HARD-BOOT-RESET-LOCK</title>
   <meta name="theme-color" content="#050508"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
-  <link rel="manifest" href="./manifest.json?v=phase101q"/>
+  <link rel="manifest" href="./manifest.json?v=phase101r"/>
   <style>
-    :root{color-scheme:dark;--cyan:#7ffcff;--gold:#ffd98a;--bg:#02040b}
+    :root{color-scheme:dark;--cyan:#7ffcff;--gold:#ffd98a;--bg:#02040b;--purple:#b55cff}
     html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overscroll-behavior:none;touch-action:none}
-    #app{position:fixed;inset:0}canvas{display:block;width:100%;height:100%;background:#000;outline:none;touch-action:none}
-    .phase-label{position:fixed;right:10px;top:10px;z-index:999999;background:rgba(0,0,0,.82);border:1px solid var(--cyan);color:var(--cyan);font:800 11px system-ui,Arial;padding:7px 10px;border-radius:8px;pointer-events:none;letter-spacing:.04em}
-    #bootFallback{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:radial-gradient(circle at 50% 34%,rgba(127,252,255,.13),rgba(3,5,12,.96) 48%,#000 100%);transition:opacity .35s ease}.boot-card{width:min(90vw,620px);border:1px solid rgba(127,252,255,.75);border-radius:18px;background:rgba(0,0,0,.62);box-shadow:0 0 36px rgba(127,252,255,.22);padding:26px;text-align:center}.boot-card h1{margin:6px 0 8px;color:#fff;font-size:clamp(32px,6vw,64px);letter-spacing:.04em}.boot-card h2{margin:0 0 18px;color:var(--cyan);font-size:clamp(16px,3vw,28px)}.boot-card p{color:#d7eaff}.pill{display:inline-block;border:1px solid var(--gold);border-radius:999px;color:var(--gold);padding:7px 12px;font-weight:900;font-size:12px;letter-spacing:.08em}
-    #hud{position:fixed;left:10px;top:10px;z-index:30;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.hud-pill{border:1px solid rgba(127,252,255,.6);background:rgba(0,0,0,.55);border-radius:999px;padding:6px 10px;color:#dff;white-space:nowrap;font:700 12px system-ui}#sceneNav{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:31;display:flex;gap:7px;flex-wrap:wrap;justify-content:center;max-width:96vw}.scene-btn{border:1px solid rgba(255,217,138,.55);background:rgba(6,8,18,.72);color:#ffd98a;border-radius:10px;padding:9px 11px;font:800 12px system-ui;cursor:pointer}.scene-btn:hover{background:rgba(255,217,138,.16)}
-    #log,#err{position:fixed;left:10px;bottom:70px;z-index:60;width:min(720px,92vw);max-height:38vh;overflow:auto;display:none;white-space:pre-wrap;border:1px solid rgba(255,80,80,.7);background:rgba(0,0,0,.86);color:#fff;padding:10px;border-radius:10px;font:12px ui-monospace,Consolas,monospace}#err{color:#ffb8b8}.preview-mode #hud,.preview-mode #sceneNav,.preview-mode .phase-label{display:none!important}.boot-released #bootFallback{opacity:0!important;pointer-events:none!important}.boot-released #bootFallback{display:none!important}@media(max-width:720px){#sceneNav{bottom:10px}.scene-btn{font-size:11px;padding:8px}.hud-pill{font-size:11px}}
+    #app{position:fixed;inset:0;background:radial-gradient(circle at 50% 42%,rgba(127,252,255,.12),#02040b 48%,#000 100%)}canvas{display:block;width:100%;height:100%;background:#000;outline:none;touch-action:none}
+    #safeStage{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,rgba(127,252,255,.14),rgba(5,5,18,.96) 48%,#000 100%)}.safe-card{width:min(92vw,720px);border:1px solid rgba(127,252,255,.72);border-radius:22px;background:rgba(0,0,0,.68);box-shadow:0 0 42px rgba(127,252,255,.20);padding:26px;text-align:center}.safe-card h1{margin:6px 0 8px;font-size:clamp(34px,7vw,72px);letter-spacing:.04em}.safe-card h2{margin:0 0 14px;color:var(--cyan);font-size:clamp(16px,3vw,28px)}.safe-card p{color:#d7eaff}.pill{display:inline-block;border:1px solid var(--gold);border-radius:999px;color:var(--gold);padding:7px 12px;font-weight:900;font-size:12px;letter-spacing:.08em}.btn{display:inline-flex;align-items:center;justify-content:center;margin:6px;border:1px solid rgba(255,217,138,.65);border-radius:12px;background:rgba(255,217,138,.12);color:#ffd98a;padding:10px 14px;font-weight:900;text-decoration:none;cursor:pointer}.btn.cyan{border-color:rgba(127,252,255,.68);color:#bffcff;background:rgba(127,252,255,.10)}#bootFallback{display:none!important;opacity:0!important;pointer-events:none!important}.phase-label,#sceneNav,#log,#err,#hud{display:none!important}.boot-released #safeStage{opacity:0;pointer-events:none;transition:opacity .25s ease}.runtime-visible #safeStage{display:none!important}
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-101Q-EMERGENCY-BOOT-RECOVERY-LOCK">
+<body data-build="PHASE-101R-HARD-BOOT-RESET-LOCK">
   <div id="app"></div>
-  <div id="svr-phase-label" class="phase-label">PHASE 101Q ACTIVE • BOOT RECOVERY</div>
-  <div id="bootFallback"><section class="boot-card"><span class="pill">PHASE 101Q ACTIVE</span><h1>SVR POKER</h1><h2>BOOT RECOVERY LOADING</h2><p>Runtime is loading. A hard guard will release this screen even if a late polish module stalls.</p></section></div>
-  <div id="hud"><span class="hud-pill" id="status">Loading Phase 101Q boot recovery…</span><span class="hud-pill" id="mode">Mode: Boot</span><button class="scene-btn" id="toggleLog" type="button">Log</button><button class="scene-btn" id="toggleJoints" type="button">Joints</button></div>
-  <div id="sceneNav"><button class="scene-btn" data-scene="lobby" type="button">Lobby</button><button class="scene-btn" data-scene="table" type="button">Table</button><button class="scene-btn" data-scene="seat" type="button">Seat</button><button class="scene-btn" data-scene="reiki" type="button">Wellness</button><button class="scene-btn" data-scene="pga" type="button">PGA</button><button class="scene-btn" data-scene="store" type="button">Store</button><button class="scene-btn" data-scene="legends" type="button">Legend</button><button class="scene-btn" data-scene="sponsor" type="button">Sponsor</button><button class="scene-btn" data-scene="scorpion" type="button">Scorpion</button></div>
-  <pre id="log"></pre><pre id="err"></pre>
+  <div id="safeStage">
+    <section class="safe-card">
+      <span class="pill">PHASE 101R ACTIVE</span>
+      <h1>SVR POKER</h1>
+      <h2>Hard Boot Reset</h2>
+      <p id="safeStatus">Clearing stale cache and starting the lobby...</p>
+      <div>
+        <button class="btn cyan" id="startRuntimeBtn" type="button">Start Lobby Now</button>
+        <button class="btn" id="clearCacheBtn" type="button">Clear Game Cache</button>
+        <a class="btn" href="./index.html?v=phase101r-hard-reset-manual">Reload Fresh</a>
+      </div>
+    </section>
+  </div>
+  <div id="bootFallback"></div><div id="hud"><span id="status"></span><span id="mode"></span><button id="toggleLog" type="button">Log</button><button id="toggleJoints" type="button">Joints</button></div><div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      window.SVR_PHASE101Q_BOOT_GUARD={build:'PHASE-101Q-EMERGENCY-BOOT-RECOVERY-LOCK',active:true,startedAt:new Date().toISOString(),errors:[]};
-      function release(reason){
-        document.body.classList.add('boot-released');
-        var boot=document.getElementById('bootFallback');
-        if(boot){boot.style.opacity='0';boot.style.pointerEvents='none';boot.style.display='none';}
-        var status=document.getElementById('status');
-        if(status) status.textContent='Phase 101Q runtime visible • '+reason;
-        window.SVR_GAME_READY=true;
-        window.SVR_PHASE101Q_BOOT_GUARD.released=true;
-        window.SVR_PHASE101Q_BOOT_GUARD.reason=reason;
-        window.SVR_PHASE101Q_BOOT_GUARD.releasedAt=new Date().toISOString();
-      }
+      var BUILD='PHASE-101R-HARD-BOOT-RESET-LOCK';
+      var loaded=false;
+      var status=document.getElementById('safeStatus');
+      window.SVR_PHASE101R_BOOT_RESET={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString()};
+      function note(msg){ if(status) status.textContent=msg; window.SVR_PHASE101R_BOOT_RESET.lastMessage=msg; window.SVR_PHASE101R_BOOT_RESET.checkedAt=new Date().toISOString(); }
+      function release(reason){ document.body.classList.add('boot-released','runtime-visible'); window.__SVR_GAME_READY__=true; window.SVR_GAME_READY=true; window.SVR_PHASE101R_BOOT_RESET.released=true; window.SVR_PHASE101R_BOOT_RESET.reason=reason; window.SVR_PHASE101R_BOOT_RESET.releasedAt=new Date().toISOString(); }
       window.SVR_RELEASE_BOOT=release;
-      window.addEventListener('error',function(e){window.SVR_PHASE101Q_BOOT_GUARD.errors.push(String(e.message||e.error||e)); setTimeout(function(){release('error guard');},250);});
-      window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE101Q_BOOT_GUARD.errors.push(String((e.reason&&e.reason.message)||e.reason||e)); setTimeout(function(){release('promise guard');},250);});
-      setTimeout(function(){ if(window.__SVR_RENDERER__||window.__SVR_SCENE__||document.querySelector('canvas')) release('runtime detected'); },2600);
-      setTimeout(function(){ release('timeout guard'); },5200);
+      async function clearBrowserCaches(){
+        try{ if(navigator.serviceWorker){ var regs=await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(function(r){return r.unregister();})); window.SVR_PHASE101R_BOOT_RESET.serviceWorkersUnregistered=regs.length; } }catch(e){ window.SVR_PHASE101R_BOOT_RESET.swError=String(e.message||e); }
+        try{ if(window.caches){ var keys=await caches.keys(); await Promise.all(keys.map(function(k){return caches.delete(k);})); window.SVR_PHASE101R_BOOT_RESET.cachesDeleted=keys.length; } }catch(e){ window.SVR_PHASE101R_BOOT_RESET.cacheError=String(e.message||e); }
+      }
+      function addModule(src){ return new Promise(function(resolve,reject){ var s=document.createElement('script'); s.type='module'; s.src=src; s.onload=resolve; s.onerror=function(){reject(new Error('Failed '+src));}; document.body.appendChild(s); }); }
+      async function startRuntime(){
+        if(loaded) return; loaded=true; window.SVR_PHASE101R_BOOT_RESET.loaded=true;
+        note('Starting SVR runtime...');
+        try{
+          await addModule('./phase101_boot_load_screen_recovery.js?v=phase101r');
+          await addModule('./phase101_partial_runtime_render_guard.js?v=phase101r');
+          await addModule('./phase101_render_marker_cleanup.js?v=phase101r');
+          await addModule('./main.js?v=phase101r');
+          setTimeout(function(){ addModule('./phase260_roman_canopy_archway_final_lock.js?v=phase101r').catch(function(e){window.SVR_PHASE101R_BOOT_RESET.errors.push(String(e.message||e));}); },650);
+          note('Runtime launched. Releasing boot screen...');
+          setTimeout(function(){ release('phase101r-runtime-loader'); },900);
+        }catch(e){
+          window.SVR_PHASE101R_BOOT_RESET.errors.push(String(e.message||e));
+          note('Runtime module failed, showing boot-safe fallback...');
+          try{ await addModule('./phase101_boot_load_screen_recovery.js?v=phase101r-fallback'); }catch(_e){}
+          setTimeout(function(){ release('phase101r-fallback-after-error'); },900);
+        }
+      }
+      document.getElementById('startRuntimeBtn').addEventListener('click', startRuntime);
+      document.getElementById('clearCacheBtn').addEventListener('click', async function(){ note('Clearing cache...'); await clearBrowserCaches(); note('Cache cleared. Starting lobby...'); startRuntime(); });
+      window.addEventListener('error',function(e){ window.SVR_PHASE101R_BOOT_RESET.errors.push(String(e.message||e.error||e)); release('error-release'); });
+      window.addEventListener('unhandledrejection',function(e){ window.SVR_PHASE101R_BOOT_RESET.errors.push(String((e.reason&&e.reason.message)||e.reason||e)); release('promise-release'); });
+      clearBrowserCaches().finally(function(){ note('Cache checked. Starting lobby...'); setTimeout(startRuntime,350); });
+      setTimeout(function(){ if(!window.__SVR_RENDERER__&&!window.__SVR_SCENE__) startRuntime(); },1800);
+      setTimeout(function(){ release('absolute-release'); },5200);
     })();
   </script>
-  <script type="module" src="./phase101_boot_load_screen_recovery.js?v=phase101q-boot-load-screen-recovery"></script>
-  <script type="module" src="./phase101_partial_runtime_render_guard.js?v=phase101q-partial-runtime-render-guard"></script>
-  <script type="module" src="./phase101_render_marker_cleanup.js?v=phase101q-marker-cleanup"></script>
-  <script type="module" src="./main.js?v=phase101q-restore-main-runtime"></script>
-  <script type="module" src="./phase260_roman_canopy_archway_final_lock.js?v=phase101q-current-stack-visible-lock"></script>
 </body>
 </html>
