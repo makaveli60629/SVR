@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-260-ROMAN-CANOPY-ARCHWAY-FINAL-LOCK",
+  "build": "PHASE-261-ROMAN-CANOPY-PILLAR-SMOOTH-LOBBY-LOCK",
   "track": "game-only",
   "siteTouched": false,
-  "phase": "3.1-AN / Phase 260",
-  "summary": "Adds a center Roman canopy, smoother stone and gold pillars, raised base, silk roof, cyan underglow, corner pillars, rear arches, and side colonnade polish across the lobby.",
-  "label": "PHASE-260-ROMAN-CANOPY-ARCHWAY-FINAL-LOCK",
-  "notes": "Site untouched. Current lobby preserved. Targeted visual polish layer only.",
-  "updated": "2026-06-15T12:55:00-05:00"
+  "phase": "3.1-AO / Phase 261",
+  "summary": "Refines the center Roman canopy/chuppah-style structure with smoother stone pillars, gold beams, silk roof, soft valances, cyan underglow, central gold oculus ring, corner pillars, rear colonnade arches, and side pillar language across the lobby.",
+  "label": "PHASE-261-ROMAN-CANOPY-PILLAR-SMOOTH-LOBBY-LOCK",
+  "notes": "Site untouched. Current lobby preserved. Targeted game-side visual polish layer only.",
+  "updated": "2026-06-16T00:00:00-05:00"
 }
