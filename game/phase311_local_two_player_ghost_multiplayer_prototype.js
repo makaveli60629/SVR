@@ -64,8 +64,9 @@ function tick(){
   const now=performance.now();
   const cam=cameraPos();
   const admin={ x:cam.x, y:1.3, z:cam.z, device:"local camera" };
+  const remote = window.SVR_PHASE312_REMOTE_PLAYER_FRAME;
   const t=now*.00035;
-  const ghost={ x:Math.cos(t)*4.2, y:1.3, z:-1.8+Math.sin(t)*3.1, device:"simulated Android" };
+  const ghost=remote ? { x:Number(remote.x||0), y:1.3, z:Number(remote.z||0), device:"manual remote presence" } : { x:Math.cos(t)*4.2, y:1.3, z:-1.8+Math.sin(t)*3.1, device:"simulated Android" };
   localPill.position.set(admin.x,0,admin.z);
   ghostPill.position.set(ghost.x,0,ghost.z);
   state.players.admin = { ...state.players.admin, ...admin };
@@ -92,6 +93,7 @@ function install(){
     active:true,
     realNetworkConnected:false,
     freeLocalPrototype:true,
+    phase312Chained:true,
     players:["admin-local","android-ghost"],
     emits:"svr-local-ghost-multiplayer-frame",
     nextServerStep:"replace ghost transport with WebSocket presence server",
@@ -107,3 +109,4 @@ function install(){
 install();
 setInterval(()=>{install(); tick();},250);
 [500,1200,2500,5000].forEach(d=>setTimeout(tick,d));
+import("./phase312_free_manual_presence_transport_lock.js?v=phase312-manual-presence").catch(e=>{window.SVR_PHASE312_IMPORT_ERROR=String(e?.message||e);});
