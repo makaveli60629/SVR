@@ -6,12 +6,13 @@ import { createTeleportRig } from "./modules/movement_phase228.js";
 import { buildPhase195CleanLobbyWorld } from "./modules/phase195_clean_lobby_world.js";
 import { installPhase201HubContentRestore } from "./modules/phase201_hub_content_restore.js";
 import { installPhase202StorefrontShells } from "./modules/phase202_storefront_shells.js";
+import { installPhase262GeometrySkyAlignmentLock } from "./modules/phase262_geometry_sky_alignment_lock.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createWristWatch } from "./modules/watch.js";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
-const BUILD_LABEL = "UPDATE-3.1-H-CACHE-BUSTED-HANDS-FIST-RUNTIME-LOCK";
+const BUILD_LABEL = "PHASE-262-NO-TRUITIVE-GEOMETRY-SKY-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
@@ -23,8 +24,9 @@ window.SVR_REFINED_LOBBY_GEOMETRY = true;
 window.SVR_BACKGROUND_BUILDINGS_REMOVED = true;
 window.SVR_LOCKED_FINAL_BUILD = BUILD_LABEL;
 window.SVR_NO_FACE_OVERLAY = true;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 228: cache-busted hands + fist movement runtime lock; bypasses stale nested module cache." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 262: no-Truitive geometry, duplicate storefront, Moon/Mars alignment lock." };
 window.SVR_PHASE228_MAIN_IMPORT_LOCK = { build: BUILD_LABEL, handsModule: "hands_phase228.js", movementModule: "movement_phase228.js", checkedAt: new Date().toISOString() };
+window.SVR_PHASE262_LOCK = { build: BUILD_LABEL, phase261BaselinePreserved: true, noTruitive: true, geometryAlignment: true };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -65,10 +67,11 @@ window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $
 window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
 const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading cache-busted hands/fist runtime…", { force: true });
+setStatus("Loading Phase 262 aligned lobby runtime…", { force: true });
 const world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
 installPhase201HubContentRestore({ scene, camera, renderer, log });
 installPhase202StorefrontShells({ scene, camera, renderer, log });
+installPhase262GeometrySkyAlignmentLock({ scene, camera, renderer, log });
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -128,6 +131,7 @@ const watch = createWristWatch({
   actions: { toggleAudio: ()=>audio.toggle(), nextTrack: ()=>audio.next(), joinTable, leaveTable, toggleTeleport: ()=>tp.toggleMode(), goLobby: ()=>gotoScene("lobby"), goTable: ()=>gotoScene("table"), goSeat: ()=>gotoScene("seat"), goReiki: ()=>gotoScene("reiki"), goPga: ()=>gotoScene("pga"), goStore: ()=>gotoScene("store"), openStore: ()=>openStorePortal(), goLegend: ()=>gotoScene("legends"), goSponsor: ()=>gotoScene("sponsor"), goScorpion: ()=>gotoScene("scorpion"), goReikiRoom: ()=>gotoScene("reikiRoom") }
 });
 createStoreWebPortal();
+installPhase262GeometrySkyAlignmentLock({ scene, camera, renderer, log });
 $toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $toggleJoints.textContent = on ? "Joints On" : "Joints"; });
 
 setStatus("Loading logo…", { force: true });
