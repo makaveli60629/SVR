@@ -48,6 +48,7 @@ function install(){
     build: LABEL,
     active: true,
     targetCount: Object.keys(TARGETS).length,
+    phase301Chained: true,
     siteTouched: false,
     publicRootTouched: false,
     checkedAt: new Date().toISOString()
@@ -58,3 +59,4 @@ function install(){
 }
 install();
 setInterval(install, 3000);
+import("./phase301_xr_storefront_route_execution_lock.js?v=phase301-xr-route").catch(e=>{window.SVR_PHASE301_IMPORT_ERROR=String(e?.message||e);});
