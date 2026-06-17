@@ -72,6 +72,7 @@ function install(){
     listensFor:"svr-scorpion-seat-reserved",
     emits:"svr-scorpion-seat-snap-complete",
     target:SEAT_TARGET,
+    phase306Chained:true,
     siteTouched:false,
     publicRootTouched:false,
     checkedAt:new Date().toISOString()
@@ -82,3 +83,4 @@ function install(){
 }
 install();
 setInterval(()=>{install(); retry();},2500);
+import("./phase306_scorpion_action_hud_lock.js?v=phase306-action-hud").catch(e=>{window.SVR_PHASE306_IMPORT_ERROR=String(e?.message||e);});
