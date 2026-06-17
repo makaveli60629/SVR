@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { CONFIG } from "./config.js";
-import { isFist } from "./gestures.js";
+import { isFist, isPinching } from "./gestures.js";
 import { constrainLobbyBounds } from "./phase178_bounds.js";
 
-const LABEL = "PHASE-101J-TELEPORT-RAY-FORWARD-LOCK";
+const LABEL = "PHASE-292-PINCH-RELEASE-TELEPORT-LOCK";
 const CYAN = 0x7ffcff;
 const PURPLE = 0xb55cff;
 const GOLD = 0xffd98a;
@@ -29,20 +29,23 @@ function particleTexture(){
 
 export function createTeleportRig({ scene, renderer, camera, roomClamp, log=console.log }){
   let baseRefSpace=null, playerX=CONFIG.SPAWN_X, playerY=0, playerZ=CONFIG.SPAWN_Z, playerYaw=0;
-  let seated=false, mode=false, active=null, activeMode="hand";
+  let seated=false, mode=false, active=null, activeMode="hand", handGestureMode="pinch";
   let lastTP=0, triggerHoldStart=0, fistHoldStart=0, snapCooldownUntil=0;
   let aimDist=6.2, leftHandRef=null, rightHandRef=null, leftControllerRef=null, rightControllerRef=null, wallBlocks=0;
   const vHead=new THREE.Vector3(), vHead2=new THREE.Vector3(), vForward=new THREE.Vector3(), vYawForward=new THREE.Vector3(), vOrigin=new THREE.Vector3(), vDir=new THREE.Vector3(), vTarget=new THREE.Vector3(), vSmooth=new THREE.Vector3(CONFIG.SPAWN_X,0,CONFIG.SPAWN_Z), vWrist=new THREE.Vector3(), vIndex=new THREE.Vector3(), qWorld=new THREE.Quaternion();
 
-  window.SVR_PHASE101J_LOCOMOTION = {
+  window.SVR_PHASE292_PINCH_RELEASE_TELEPORT_LOCK = {
     build: LABEL,
     active: true,
+    pinchReleaseLeap: true,
+    fistFallbackPreserved: true,
     teleportRayForwardLock: true,
     headForwardMove: true,
     controllerFallback: true,
-    handFistTeleport: true,
+    siteTouched: false,
     checkedAt: new Date().toISOString()
   };
+  window.SVR_PHASE101J_LOCOMOTION = window.SVR_PHASE292_PINCH_RELEASE_TELEPORT_LOCK;
 
   function floorHeightAt(x,z){
     const f=window.SVR_PHASE227_FLOOR_HEIGHT||window.SVR_PHASE226_FLOOR_HEIGHT||window.SVR_PHASE224_FLOOR_HEIGHT||window.SVR_PHASE215_FLOOR_HEIGHT||window.SVR_PHASE214_FLOOR_HEIGHT||window.SVR_PHASE213_FLOOR_HEIGHT||window.SVR_PHASE212_FLOOR_HEIGHT;
@@ -56,7 +59,7 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log=cons
   function solidXZ(x,z){const p=constrainLobbyBounds(x,z); if(p.blocked)wallBlocks++; return p;}
   function applyReferenceSpace(){
     if(!baseRefSpace||!renderer?.xr?.isPresenting) return false;
-    try{const h=-playerYaw*.5; const xf=new XRRigidTransform({x:-playerX,y:-playerY,z:-playerZ},{x:0,y:Math.sin(h),z:0,w:Math.cos(h)}); renderer.xr.setReferenceSpace(baseRefSpace.getOffsetReferenceSpace(xf)); return true;}catch(e){log("[101J] ref failed",e?.message||e); return false;}
+    try{const h=-playerYaw*.5; const xf=new XRRigidTransform({x:-playerX,y:-playerY,z:-playerZ},{x:0,y:Math.sin(h),z:0,w:Math.cos(h)}); renderer.xr.setReferenceSpace(baseRefSpace.getOffsetReferenceSpace(xf)); return true;}catch(e){log("[292] ref failed",e?.message||e); return false;}
   }
   function xrHead(out){const xr=renderer.xr.getCamera(camera); if(!xr)return false; xr.getWorldPosition(out); return true;}
   function targetStandingY(){return floorHeightAt(playerX,playerZ) + STAND_EYE_Y;}
@@ -81,23 +84,23 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log=cons
 
   const pTex = particleTexture();
   const pointer=new THREE.Mesh(new THREE.CircleGeometry(CONFIG.POINTER_SIZE*.82,64),new THREE.MeshBasicMaterial({color:CYAN,map:pTex,transparent:true,alphaTest:.06,opacity:.88,side:THREE.DoubleSide,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending}));
-  pointer.name="PHASE101J_ROUND_TELEPORT_LOGO_TARGET"; pointer.rotation.x=-Math.PI/2; pointer.renderOrder=4000; pointer.visible=false; scene.add(pointer);
+  pointer.name="PHASE292_PINCH_RELEASE_TELEPORT_LOGO_TARGET"; pointer.rotation.x=-Math.PI/2; pointer.renderOrder=4000; pointer.visible=false; scene.add(pointer);
   const ring=new THREE.Mesh(new THREE.RingGeometry(.62,1.08,128),new THREE.MeshBasicMaterial({color:PURPLE,transparent:true,opacity:.90,side:THREE.DoubleSide,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending}));
-  ring.name="PHASE101J_PURPLE_CYAN_TARGET_RING"; ring.rotation.x=-Math.PI/2; ring.visible=false; ring.renderOrder=3999; scene.add(ring);
+  ring.name="PHASE292_PINCH_RELEASE_TARGET_RING"; ring.rotation.x=-Math.PI/2; ring.visible=false; ring.renderOrder=3999; scene.add(ring);
 
   const beamGeo=new THREE.BufferGeometry();
   const beam=new THREE.Points(beamGeo,new THREE.PointsMaterial({map:pTex,color:CYAN,size:.185,sizeAttenuation:true,transparent:true,alphaTest:.04,opacity:.88,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending}));
-  beam.name="PHASE101J_FORWARD_LOCKED_TELEPORT_ARC"; beam.frustumCulled=false; beam.visible=false; beam.renderOrder=4001; scene.add(beam);
+  beam.name="PHASE292_PINCH_FORWARD_TELEPORT_ARC"; beam.frustumCulled=false; beam.visible=false; beam.renderOrder=4001; scene.add(beam);
   const beam2Geo=new THREE.BufferGeometry();
   const beam2=new THREE.Points(beam2Geo,new THREE.PointsMaterial({map:pTex,color:PURPLE,size:.115,sizeAttenuation:true,transparent:true,alphaTest:.04,opacity:.70,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending}));
-  beam2.name="PHASE101J_FORWARD_LOCKED_PURPLE_ARC"; beam2.frustumCulled=false; beam2.visible=false; beam2.renderOrder=4002; scene.add(beam2);
+  beam2.name="PHASE292_PINCH_PURPLE_ARC"; beam2.frustumCulled=false; beam2.visible=false; beam2.renderOrder=4002; scene.add(beam2);
   const lineGeo=new THREE.BufferGeometry();
   const line=new THREE.Line(lineGeo,new THREE.LineBasicMaterial({color:GOLD,transparent:true,opacity:.32,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending}));
-  line.name="PHASE101J_FORWARD_LOCKED_GOLD_ARC_SPINE"; line.visible=false; line.renderOrder=4000; scene.add(line);
+  line.name="PHASE292_PINCH_GOLD_ARC_SPINE"; line.visible=false; line.renderOrder=4000; scene.add(line);
   const glow=new THREE.PointLight(CYAN,0,8,1.8); scene.add(glow);
   const auraGeo=new THREE.BufferGeometry();
   const aura=new THREE.Points(auraGeo,new THREE.PointsMaterial({map:pTex,color:CYAN,size:.095,sizeAttenuation:true,transparent:true,alphaTest:.04,opacity:.0,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending}));
-  aura.name="PHASE101J_FIST_ACTIVE_AURA"; aura.visible=false; scene.add(aura);
+  aura.name="PHASE292_PINCH_ACTIVE_AURA"; aura.visible=false; scene.add(aura);
 
   function setLogoTexture(tex){if(tex){tex.anisotropy=1; pointer.material.map=tex; pointer.material.needsUpdate=true;}}
   function hideVisuals(){pointer.visible=false;ring.visible=false;beam.visible=false;beam2.visible=false;line.visible=false;glow.intensity=0;aura.visible=false;aura.material.opacity=0;}
@@ -146,32 +149,37 @@ export function createTeleportRig({ scene, renderer, camera, roomClamp, log=cons
     best.y=0; if(best.lengthSq()<.001) best.copy(hf); return forwardLockedDirection(best,"hand");
   }
   function handAim(h){const wrist=h?.joints?.wrist,index=h?.joints?.["index-finger-tip"]; if(!wrist)return null; const dir=handDirectionFromWrist(wrist,index); vDir.copy(dir); vOrigin.copy(vWrist); const t=clampTarget(vOrigin.x+vDir.x*aimDist,vOrigin.z+vDir.z*aimDist).clone(); return magneticTarget(t)||t;}
-  function teleportByDelta(target){if(!renderer?.xr?.isPresenting||!baseRefSpace)return false;try{const xr=renderer.xr.getCamera(camera);if(!xr)return false;xr.getWorldPosition(vHead);const p=solidXZ(playerX+(target.x-vHead.x),playerZ+(target.z-vHead.z));playerX=p.x;playerZ=p.z;if(!seated)playerY=floorHeightAt(playerX,playerZ);window.SVR_PHASE101J_LAST_TELEPORT={build:LABEL,targetX:Number(target.x.toFixed(2)),targetZ:Number(target.z.toFixed(2)),playerX:Number(playerX.toFixed(2)),playerZ:Number(playerZ.toFixed(2)),checkedAt:new Date().toISOString()};return applyReferenceSpace();}catch(e){log("[101J] teleport failed",e?.message||e);return false;}}
+  function teleportByDelta(target){if(!renderer?.xr?.isPresenting||!baseRefSpace)return false;try{const xr=renderer.xr.getCamera(camera);if(!xr)return false;xr.getWorldPosition(vHead);const p=solidXZ(playerX+(target.x-vHead.x),playerZ+(target.z-vHead.z));playerX=p.x;playerZ=p.z;if(!seated)playerY=floorHeightAt(playerX,playerZ);window.SVR_PHASE101J_LAST_TELEPORT={build:LABEL,targetX:Number(target.x.toFixed(2)),targetZ:Number(target.z.toFixed(2)),playerX:Number(playerX.toFixed(2)),playerZ:Number(playerZ.toFixed(2)),gesture:handGestureMode,checkedAt:new Date().toISOString()};return applyReferenceSpace();}catch(e){log("[292] teleport failed",e?.message||e);return false;}}
   function toggleMode(preferred="right"){mode=!mode;if(!mode){active=null;hideVisuals();return false;}aimDist=6.2;active=preferred==="left"?(leftControllerRef||leftHandRef):(rightHandRef||leftHandRef||rightControllerRef||leftControllerRef);activeMode=(active===leftHandRef||active===rightHandRef)?"hand":"controller";triggerHoldStart=performance.now();return true;}
   async function onSessionStart(){const session=renderer.xr.getSession();if(!session)return;baseRefSpace=await session.requestReferenceSpace("local-floor");playerX=CONFIG.SPAWN_X;playerY=0;playerZ=CONFIG.SPAWN_Z;playerYaw=0;seated=false;mode=false;active=null;aimDist=6.2;hideVisuals();applyReferenceSpace();setTimeout(maintainStanding,250);window.SVR_PHASE101J_SESSION={build:LABEL,started:true,spawnX:playerX,spawnZ:playerZ,checkedAt:new Date().toISOString()};}
   function update({dt=.016,leftHand,rightHand,leftController,rightController,statusCb=()=>{},modeCb=()=>{}}){
     leftHandRef=leftHand; rightHandRef=rightHand; leftControllerRef=leftController; rightControllerRef=rightController; maintainStanding();
     const handsAvailable=!!(leftHandRef?.joints||rightHandRef?.joints);
     if(renderer?.xr?.isPresenting&&(leftControllerRef||rightControllerRef)&&!handsAvailable) moveControllers(dt);
-    const now=performance.now(), rc=rightControllerRef||leftControllerRef, hold=triggerValue(rc), lf=!!leftHandRef?.joints&&isFist(leftHandRef), rf=!!rightHandRef?.joints&&isFist(rightHandRef);
-    window.SVR_PHASE101J_SMOKE={build:LABEL,xr:!!renderer?.xr?.isPresenting,handsAvailable,controllerAvailable:!!(leftControllerRef||rightControllerRef),mode,activeMode,headForwardMove:true,rayForwardLock:true,checkedAt:new Date().toISOString()};
+    const now=performance.now(), rc=rightControllerRef||leftControllerRef, hold=triggerValue(rc), lf=!!leftHandRef?.joints&&isFist(leftHandRef), rf=!!rightHandRef?.joints&&isFist(rightHandRef), lp=!!leftHandRef?.joints&&isPinching(leftHandRef), rp=!!rightHandRef?.joints&&isPinching(rightHandRef);
+    window.SVR_PHASE101J_SMOKE={build:LABEL,xr:!!renderer?.xr?.isPresenting,handsAvailable,controllerAvailable:!!(leftControllerRef||rightControllerRef),mode,activeMode,handGestureMode,pinchReleaseLeap:true,headForwardMove:true,rayForwardLock:true,checkedAt:new Date().toISOString()};
     if(handsAvailable){
+      const pinchHand = rp ? rightHandRef : (lp ? leftHandRef : null);
       const fistHand = rf ? rightHandRef : (lf ? leftHandRef : null);
+      const startHand = pinchHand || fistHand;
+      const activePinch = active === rightHandRef ? rp : active === leftHandRef ? lp : false;
       const activeFist = active === rightHandRef ? rf : active === leftHandRef ? lf : false;
-      if(!mode && fistHand){ mode=true; active=fistHand; activeMode="hand"; fistHoldStart=now; aimDist=6.2; }
-      if(!mode || !active){ hideVisuals(); statusCb("Ready • make fist to aim, release fist to leap"); modeCb("hands fist teleport"); return; }
+      const activeHeld = handGestureMode === "pinch" ? activePinch : activeFist;
+      if(!mode && startHand){ mode=true; active=startHand; activeMode="hand"; handGestureMode=pinchHand?"pinch":"fist"; fistHoldStart=now; aimDist=6.2; }
+      if(!mode || !active){ hideVisuals(); statusCb("Ready • pinch to aim, release pinch to leap"); modeCb("hands pinch teleport"); return; }
       const target=handAim(active); if(!target){ hideVisuals(); return; }
       vSmooth.lerp(target,vSmooth.distanceTo(target)>1.5?.70:.42); showVisuals(vSmooth); updateBeam(vWrist.clone(),vSmooth); updateAura(vWrist.clone());
       const held=fistHoldStart?now-fistHoldStart:0;
-      if(!activeFist && held>90 && now-lastTP>CONFIG.TELEPORT_COOLDOWN_MS){ if(teleportByDelta(vSmooth)){lastTP=now; mode=false; active=null; fistHoldStart=0; hideVisuals(); return;} }
-      if(!activeFist && held<=90){ mode=false; active=null; fistHoldStart=0; hideVisuals(); return; }
-      statusCb("Fist TP ON • forward ray locked • release to leap"); modeCb(window.SVR_PHASE101J_MAGNETIC_LOCK?"magnet target":"fist forward arc"); return;
+      if(!activeHeld && held>90 && now-lastTP>CONFIG.TELEPORT_COOLDOWN_MS){ if(teleportByDelta(vSmooth)){lastTP=now; mode=false; active=null; fistHoldStart=0; hideVisuals(); return;} }
+      if(!activeHeld && held<=90){ mode=false; active=null; fistHoldStart=0; hideVisuals(); return; }
+      const label = handGestureMode === "pinch" ? "Pinch TP ON • release pinch to leap" : "Fist TP ON • release fist to leap";
+      statusCb(`${label} • forward ray locked`); modeCb(window.SVR_PHASE101J_MAGNETIC_LOCK?"magnet target":`${handGestureMode} forward arc`); return;
     }
     if(renderer?.xr?.isPresenting&&(leftControllerRef||rightControllerRef)) moveControllers(dt);
     if(hold>.18&&rc){ if(!mode||active!==rc){mode=true;active=rc;activeMode="controller";triggerHoldStart=now;aimDist=6.2;} }
-    if(!mode||!active){hideVisuals();statusCb((leftControllerRef||rightControllerRef)?"Ready • hold grip/trigger, ray locked forward":"Ready • fist teleport");modeCb("standing lock");return;}
+    if(!mode||!active){hideVisuals();statusCb((leftControllerRef||rightControllerRef)?"Ready • hold grip/trigger, ray locked forward":"Ready • pinch teleport");modeCb("standing lock");return;}
     const target=controllerAim(active); if(!target){hideVisuals();return;} vSmooth.lerp(target,vSmooth.distanceTo(target)>1.5?.70:.38); showVisuals(vSmooth); updateBeam(vOrigin.clone(),vSmooth);
     const cur=triggerValue(active),held=triggerHoldStart?now-triggerHoldStart:0; if(cur<=.12&&held>70&&now-lastTP>CONFIG.TELEPORT_COOLDOWN_MS){if(teleportByDelta(vSmooth)){lastTP=now;mode=false;active=null;hideVisuals();return;}} if(cur<=.12){mode=false;active=null;hideVisuals();return;} statusCb("Grip TP • forward ray locked • release to leap"); modeCb(window.SVR_PHASE101J_MAGNETIC_LOCK?"magnet target":"controller forward arc");
   }
-  return {onSessionStart,setLogoTexture,update,setPlayerPose,setPlayerXZ,getPlayerPose,setPlayerYaw,toggleMode,isEnabled:()=>mode,getState:()=>({mode,activeMode,seated,aimDist,wallBlocks,build:LABEL})};
+  return {onSessionStart,setLogoTexture,update,setPlayerPose,setPlayerXZ,getPlayerPose,setPlayerYaw,toggleMode,isEnabled:()=>mode,getState:()=>({mode,activeMode,handGestureMode,seated,aimDist,wallBlocks,build:LABEL})};
 }
