@@ -27,7 +27,7 @@ function pulse(detail){
   dot.name="PHASE318_DEAL_TARGET_DOT";dot.position.copy(to);dot.renderOrder=451;r.add(dot);
   const ring=new THREE.Mesh(new THREE.RingGeometry(.22,.33,64),new THREE.MeshBasicMaterial({color:0x7ffcff,transparent:true,opacity:.68,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));
   ring.name="PHASE318_DEAL_TARGET_RING";ring.rotation.x=-Math.PI/2;ring.position.set(to.x,.09,to.z);r.add(ring);
-  lastPulse={build:LABEL,active:true,from:{x:from.x,y:from.y,z:from.z},to:{x:to.x,y:to.y,z:to.z},seatIndex:detail.seatIndex,player:detail.name||null,card:detail.card||null,direction:"left-to-right",siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  lastPulse={build:LABEL,active:true,from:{x:from.x,y:from.y,z:from.z},to:{x:to.x,y:to.y,z:to.z},seatIndex:detail.seatIndex,player:detail.name||null,card:detail.card||null,direction:"left-to-right",phase319Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_PHASE318_DEAL_PATH_PULSE_STATE=lastPulse;
   try{window.dispatchEvent(new CustomEvent("svr-deal-path-pulse-updated",{detail:lastPulse}));}catch{}
   status(`Deal path pulse: seat ${detail.seatIndex||"?"}`);
@@ -37,8 +37,9 @@ function install(){
   if(installed)return true;installed=true;
   window.addEventListener("svr-left-to-right-card-dealt",e=>pulse(e.detail));
   window.SVR_PHASE318_REFRESH_DEAL_PATH=()=>pulse(window.SVR_PHASE314_LAST_DEALT_CARD||{});
-  window.SVR_PHASE318_DEAL_PATH_PULSE_LOCK={build:LABEL,active:true,listensFor:"svr-left-to-right-card-dealt",emits:"svr-deal-path-pulse-updated",siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE318_DEAL_PATH_PULSE_LOCK={build:LABEL,active:true,listensFor:"svr-left-to-right-card-dealt",emits:"svr-deal-path-pulse-updated",phase319Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_LIVE_BUILD_POINTER=LABEL;window.SVR_LOCKED_FINAL_BUILD=LABEL;
   return true;
 }
 install();setInterval(()=>{install();},5000);
+import("./phase319_room_access_buttons_android_guard_lock.js?v=phase319-room-buttons-android-guard").catch(e=>{window.SVR_PHASE319_IMPORT_ERROR=String(e?.message||e);});
