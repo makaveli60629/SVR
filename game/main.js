@@ -12,7 +12,7 @@ import { createWristWatch } from "./modules/watch.js";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
-const BUILD_LABEL = "PHASE-264-QUEST-SCREENSHOT-MICRO-ALIGNMENT-LOCK";
+const BUILD_LABEL = "PHASE-265-PILLAR-SIGN-CLEARANCE-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
@@ -24,9 +24,9 @@ window.SVR_REFINED_LOBBY_GEOMETRY = true;
 window.SVR_BACKGROUND_BUILDINGS_REMOVED = true;
 window.SVR_LOCKED_FINAL_BUILD = BUILD_LABEL;
 window.SVR_NO_FACE_OVERLAY = true;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 264: Quest screenshot micro-alignment over Phase 261/263 new lobby." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 265: rear pillars moved into sign gaps over Phase 261/263 new lobby." };
 window.SVR_PHASE228_MAIN_IMPORT_LOCK = { build: BUILD_LABEL, handsModule: "hands_phase228.js", movementModule: "movement_phase228.js", checkedAt: new Date().toISOString() };
-window.SVR_PHASE264_LOCK = { build: BUILD_LABEL, phase261BaselinePreserved: true, noTruitive: true, microAlignment: true };
+window.SVR_PHASE265_LOCK = { build: BUILD_LABEL, phase261BaselinePreserved: true, noTruitive: true, pillarSignClearance: true };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -67,7 +67,7 @@ window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $
 window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
 const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading Phase 264 micro-aligned lobby runtime…", { force: true });
+setStatus("Loading Phase 265 pillar/sign-clearance runtime…", { force: true });
 const world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
 installPhase201HubContentRestore({ scene, camera, renderer, log });
 installPhase202StorefrontShells({ scene, camera, renderer, log });
