@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-267-RUNTIME-LABEL-SYNC-LOCK",
-  "track": "game-only-runtime-label-sync-lock",
+  "build": "PHASE-268-FINAL-RUNTIME-CACHE-SYNC-LOCK",
+  "track": "game-only-final-runtime-cache-sync-lock",
   "siteTouched": false,
-  "phase": "3.1-AT / Phase 267",
-  "summary": "Keeps Phase 266 Quest LOD cleanup and changes the late finished-lobby file into a lightweight runtime label shim. This keeps the active runtime on Phase 267 while preserving pillar/sign clearance and the high Moon/Mars lock.",
-  "label": "PHASE-267-RUNTIME-LABEL-SYNC-LOCK",
-  "notes": "No website changes. No old lobby restore. No Phase 84 poker rollback. Current Roman canopy/new lobby remains the active baseline.",
+  "phase": "3.1-AU / Phase 268",
+  "summary": "Hardens the final runtime label and cache sync shim so stale labels are overwritten after late modules load while preserving pillar/sign clearance, Quest LOD cleanup, and the high Moon/Mars lock.",
+  "label": "PHASE-268-FINAL-RUNTIME-CACHE-SYNC-LOCK",
+  "notes": "Game-only update. Site untouched. Current Roman canopy/new lobby remains the active baseline. Phase 84 remains rejected.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
