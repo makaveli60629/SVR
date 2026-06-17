@@ -77,6 +77,7 @@ function install(){
     openSeat:OPEN_SEAT,
     listensFor:"svr-scorpion-table-join",
     emits:"svr-scorpion-seat-reserved",
+    phase305Chained:true,
     siteTouched:false,
     publicRootTouched:false,
     checkedAt:new Date().toISOString()
@@ -87,3 +88,4 @@ function install(){
 }
 install();
 setInterval(()=>{ install(); if(session) showState(session); },4000);
+import("./phase305_scorpion_reserved_seat_snap_lock.js?v=phase305-seat-snap").catch(e=>{window.SVR_PHASE305_IMPORT_ERROR=String(e?.message||e);});
