@@ -1,1 +1,1 @@
-{"version":"Update 3.1 Phase 284","build":"PHASE-284-PILLAR-OBSTRUCTION-SCAN-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 284 scans for duplicate rear column obstructions and hides door-center blockers."}
+{"version":"Update 3.1 Phase 285","build":"PHASE-285-LIVE-DEPLOY-AND-QUEST-QA-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 285 adds live deploy and Quest QA snapshot instrumentation."}
