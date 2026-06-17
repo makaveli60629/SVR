@@ -1,26 +1,28 @@
 import * as THREE from "three";
 
-const LABEL = "PHASE-262-NO-TRUITIVE-GEOMETRY-SKY-LOCK";
+const LABEL = "PHASE-263-GEOMETRY-SKY-HARD-LOCK";
 
-function objectName(obj){
-  return String(obj?.name || "");
-}
+function objectName(obj){ return String(obj?.name || ""); }
 function hideObject(obj){
   if (!obj) return;
   obj.visible = false;
-  obj.userData.phase262Hidden = true;
-  obj.traverse?.((child)=>{ child.visible = false; child.userData.phase262Hidden = true; });
+  obj.userData.phase263Hidden = true;
+  obj.traverse?.((child)=>{ child.visible = false; child.userData.phase263Hidden = true; });
 }
 function showObject(obj){
   if (!obj) return;
   obj.visible = true;
   obj.traverse?.((child)=>{ child.visible = true; });
 }
-function setTransparentSafety(obj, opacity = 0.10){
+function collect(scene, predicate){
+  const out = [];
+  scene.traverse((obj)=>{ if (predicate(obj)) out.push(obj); });
+  return out;
+}
+function softenMaterials(obj, opacity){
   obj?.traverse?.((child)=>{
     const mats = Array.isArray(child.material) ? child.material : child.material ? [child.material] : [];
     mats.forEach((mat)=>{
-      if (!mat) return;
       mat.transparent = true;
       mat.opacity = Math.min(mat.opacity ?? 1, opacity);
       mat.depthWrite = false;
@@ -28,23 +30,36 @@ function setTransparentSafety(obj, opacity = 0.10){
     });
   });
 }
-function collect(scene, predicate){
-  const out = [];
-  scene.traverse((obj)=>{ if (predicate(obj)) out.push(obj); });
-  return out;
-}
 function keepSinglePlanet(scene, token, keepName, applyPose){
   const matches = collect(scene, (obj)=>objectName(obj).toUpperCase().includes(token));
   let keep = scene.getObjectByName(keepName) || matches.find((obj)=>obj.isMesh || obj.isGroup) || null;
   matches.forEach((obj)=>{
+    const name = objectName(obj).toUpperCase();
+    if (name.startsWith("PHASE262_") || name.startsWith("PHASE263_")) return;
     if (obj === keep || keep?.parent === obj || obj.parent === keep) return;
-    if (obj.isMesh || obj.isGroup || objectName(obj).toUpperCase().includes("LOCKED")) hideObject(obj);
+    if (obj.isMesh || obj.isGroup || name.includes("LOCKED")) hideObject(obj);
   });
-  if (keep){
-    showObject(keep);
-    applyPose(keep);
-  }
+  if (keep){ showObject(keep); applyPose(keep); }
   return keep;
+}
+function hideUnsupportedOverlay(){
+  try{
+    if (!document.getElementById("phase263-clean-overlay-style")){
+      const style = document.createElement("style");
+      style.id = "phase263-clean-overlay-style";
+      style.textContent = "[data-phase263-hidden='true']{display:none!important;visibility:hidden!important;opacity:0!important;}";
+      document.head.appendChild(style);
+    }
+    Array.from(document.querySelectorAll("body *")).forEach((node)=>{
+      const txt = String(node.textContent || "").trim().toUpperCase();
+      if (txt === "VR NOT SUPPORTED" || txt.includes("VR NOT SUPPORTED")){
+        node.style.display = "none";
+        node.style.visibility = "hidden";
+        node.style.opacity = "0";
+        node.setAttribute("data-phase263-hidden", "true");
+      }
+    });
+  }catch(_err){}
 }
 function alignStorefrontShells(scene){
   const root = scene.getObjectByName("PHASE202_STOREFRONT_SHELLS_ROOT");
@@ -57,96 +72,73 @@ function alignStorefrontShells(scene){
   }).forEach(hideObject);
 
   const shellPositions = {
-    PHASE202_WELLNESS_STOREFRONT_SHELL: [-12, -13.18],
-    PHASE202_PGA_STOREFRONT_SHELL: [-6, -13.18],
-    PHASE202_PLAY_STOREFRONT_SHELL: [0, -13.18],
-    PHASE202_STORE_STOREFRONT_SHELL: [6, -13.18],
-    PHASE202_SCORPION_STOREFRONT_SHELL: [12, -13.18]
+    PHASE202_WELLNESS_STOREFRONT_SHELL: [-12, -13.44],
+    PHASE202_PGA_STOREFRONT_SHELL: [-6, -13.44],
+    PHASE202_PLAY_STOREFRONT_SHELL: [0, -13.44],
+    PHASE202_STORE_STOREFRONT_SHELL: [6, -13.44],
+    PHASE202_SCORPION_STOREFRONT_SHELL: [12, -13.44]
   };
   Object.entries(shellPositions).forEach(([name, [x,z]])=>{
     const obj = root.getObjectByName(name);
-    if (!obj) return;
-    obj.position.x = x;
-    obj.position.z = z;
+    if (obj){ obj.position.x = x; obj.position.z = z; }
   });
 
-  const trimTargets = [
-    ["PHASE202_WELLNESS_HOLOGRAM_CAROUSEL_FRAME", -12, -11.48, 0.82],
-    ["PHASE202_PGA_PRACTICE_PREVIEW_FRAME", -6, -11.52, 0.86],
-    ["PHASE202_STORE_DISPLAY_RACKS", 6, -11.42, 0.78],
-    ["PHASE202_SCORPION_PRIVATE_DOOR_FRAME", 12, -11.54, 0.88]
-  ];
-  trimTargets.forEach(([name, x, z, scale])=>{
+  [
+    ["PHASE202_WELLNESS_HOLOGRAM_CAROUSEL_FRAME", -12, -11.64, 0.74],
+    ["PHASE202_PGA_PRACTICE_PREVIEW_FRAME", -6, -11.68, 0.78],
+    ["PHASE202_STORE_DISPLAY_RACKS", 6, -11.58, 0.68],
+    ["PHASE202_SCORPION_PRIVATE_DOOR_FRAME", 12, -11.70, 0.78]
+  ].forEach(([name, x, z, scale])=>{
     const obj = root.getObjectByName(name);
-    if (!obj) return;
-    obj.position.set(x, 0, z);
-    obj.scale.setScalar(scale);
+    if (obj){ obj.position.set(x,0,z); obj.scale.setScalar(scale); }
   });
 
   const storeRack = root.getObjectByName("PHASE202_STORE_DISPLAY_RACKS");
   if (storeRack){
-    storeRack.traverse((obj)=>{
-      if (objectName(obj).includes("PRODUCT_PLINTH")) setTransparentSafety(obj, 0.72);
-    });
+    storeRack.traverse((obj)=>{ if (objectName(obj).includes("PRODUCT_PLINTH")) softenMaterials(obj, 0.38); });
   }
   return { storefrontRoot:true };
 }
 function alignColumns(scene){
-  // Keep the Roman architecture, but push only the three center column GROUPS back enough that storefronts read cleanly.
-  collect(scene, (obj)=>/^PHASE200_REAR_ORDERED_COLUMN_(3|4|5)$/.test(objectName(obj).toUpperCase())).forEach((obj)=>{
-    obj.position.z = -16.42;
-    obj.scale.x = 0.86;
-    obj.scale.z = 0.86;
+  collect(scene, (obj)=>/^PHASE200_REAR_ORDERED_COLUMN_\d+$/.test(objectName(obj).toUpperCase())).forEach((obj)=>{
+    obj.position.z = -16.78;
+    obj.scale.x = 0.70;
+    obj.scale.z = 0.70;
+    obj.traverse((child)=>{
+      const n = objectName(child).toUpperCase();
+      if (n.includes("CAP") || n.includes("BASE")) child.scale.x = Math.min(child.scale.x, 0.76);
+    });
   });
 }
 function alignPlanets(scene){
   const moon = keepSinglePlanet(scene, "MOON", "PHASE200_SINGLE_VISIBLE_MOON_LOCKED", (obj)=>{
-    obj.position.set(-8.4, 16.6, -31.5);
-    obj.scale.setScalar(0.78);
+    obj.position.set(-9.8,18.4,-36.0);
+    obj.scale.setScalar(0.64);
     obj.renderOrder = 5;
-    obj.userData.phase262SkyLocked = true;
+    obj.userData.phase263SkyLocked = true;
   });
   const mars = keepSinglePlanet(scene, "MARS", "PHASE200_SINGLE_VISIBLE_MARS_LOCKED", (obj)=>{
-    obj.position.set(6.8, 15.2, -35.0);
-    obj.scale.setScalar(0.82);
+    obj.position.set(8.2,16.9,-39.5);
+    obj.scale.setScalar(0.66);
     obj.renderOrder = 5;
-    obj.userData.phase262SkyLocked = true;
+    obj.userData.phase263SkyLocked = true;
   });
-
   const root = scene.getObjectByName("PHASE200_ORDERED_GRAND_LOBBY_ROOT") || scene;
-  if (moon && !scene.getObjectByName("PHASE262_MOON_SOFT_HALO")){
-    const halo = new THREE.Mesh(
-      new THREE.RingGeometry(1.25, 1.62, 96),
-      new THREE.MeshBasicMaterial({ color:0xdde6ff, transparent:true, opacity:0.11, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide })
-    );
-    halo.name = "PHASE262_MOON_SOFT_HALO";
-    halo.position.copy(moon.position);
-    halo.rotation.x = Math.PI * 0.5;
-    root.add(halo);
+  let moonHalo = scene.getObjectByName("PHASE263_MOON_SOFT_HALO") || scene.getObjectByName("PHASE262_MOON_SOFT_HALO");
+  if (moon && !moonHalo){
+    moonHalo = new THREE.Mesh(new THREE.RingGeometry(0.96,1.28,96), new THREE.MeshBasicMaterial({ color:0xdde6ff, transparent:true, opacity:0.09, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
+    moonHalo.name = "PHASE263_MOON_SOFT_HALO";
+    root.add(moonHalo);
   }
-  if (mars && !scene.getObjectByName("PHASE262_MARS_SOFT_HALO")){
-    const halo = new THREE.Mesh(
-      new THREE.RingGeometry(0.62, 0.88, 80),
-      new THREE.MeshBasicMaterial({ color:0xff8b67, transparent:true, opacity:0.10, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide })
-    );
-    halo.name = "PHASE262_MARS_SOFT_HALO";
-    halo.position.copy(mars.position);
-    halo.rotation.x = Math.PI * 0.5;
-    root.add(halo);
+  if (moon && moonHalo){ moonHalo.name = "PHASE263_MOON_SOFT_HALO"; moonHalo.visible = true; moonHalo.position.copy(moon.position); moonHalo.rotation.x = Math.PI * 0.5; }
+  let marsHalo = scene.getObjectByName("PHASE263_MARS_SOFT_HALO") || scene.getObjectByName("PHASE262_MARS_SOFT_HALO");
+  if (mars && !marsHalo){
+    marsHalo = new THREE.Mesh(new THREE.RingGeometry(0.44,0.64,80), new THREE.MeshBasicMaterial({ color:0xff8b67, transparent:true, opacity:0.08, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
+    marsHalo.name = "PHASE263_MARS_SOFT_HALO";
+    root.add(marsHalo);
   }
+  if (mars && marsHalo){ marsHalo.name = "PHASE263_MARS_SOFT_HALO"; marsHalo.visible = true; marsHalo.position.copy(mars.position); marsHalo.rotation.x = Math.PI * 0.5; }
   return { moon:!!moon, mars:!!mars };
-}
-function hideUnsupportedOverlay(){
-  try{
-    const nodes = Array.from(document.querySelectorAll("body *"));
-    nodes.forEach((node)=>{
-      const txt = String(node.textContent || "").trim().toUpperCase();
-      if (txt === "VR NOT SUPPORTED"){
-        node.style.display = "none";
-        node.setAttribute("data-phase262-hidden", "true");
-      }
-    });
-  }catch(_err){ /* DOM cleanup is non-critical. */ }
 }
 function applyApprovalSafety(scene){
   const rejected = ["TRUEITIVE", "TRUITIVE", "SHYONA", "ROYSTON", "FOUNDER"];
@@ -158,22 +150,22 @@ function applyOnce(scene){
   alignColumns(scene);
   const planets = alignPlanets(scene);
   applyApprovalSafety(scene);
-  window.SVR_PHASE262_GEOMETRY_SKY_LOCK = {
+  window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK = {
     label: LABEL,
     locked: true,
     duplicatePhase200ArchPanelsHidden: true,
     storefrontGeometryTightened: !!shells.storefrontRoot,
+    rearColumnsSlimmedAndPushedBack: true,
     moonHighBackLocked: planets.moon,
     marsHighBackLocked: planets.mars,
     noTruitiveRuntimePolicy: true,
     checkedAt: new Date().toISOString()
   };
+  window.SVR_PHASE262_GEOMETRY_SKY_LOCK = window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK;
 }
-
 export function installPhase262GeometrySkyAlignmentLock({ scene, log = console.log } = {}){
   if (!scene) return null;
-  const delays = [0, 250, 900, 2200];
-  delays.forEach((delay)=>setTimeout(()=>applyOnce(scene), delay));
-  log(`[Phase262] geometry / duplicate storefront / moon-Mars alignment lock installed`);
-  return window.SVR_PHASE262_GEOMETRY_SKY_LOCK || { label: LABEL, pending:true };
+  [0,180,650,1400,2800].forEach((delay)=>setTimeout(()=>applyOnce(scene), delay));
+  log(`[Phase263] hard geometry / duplicate storefront / moon-Mars alignment lock installed`);
+  return window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK || { label: LABEL, pending:true };
 }
