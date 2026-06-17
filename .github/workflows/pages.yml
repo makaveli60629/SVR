@@ -32,7 +32,17 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             index.html
+            style.css
+            launch.css
+            launch-overrides.css
+            matrix.js
+            site-local-counter.js
+            site-public-hooks.js
+            logo.png
+            logo.webp
+            favicon.ico
             CNAME
+            .nojekyll
             404.html
             game
             site
@@ -47,11 +57,26 @@ jobs:
           set -euo pipefail
           mkdir -p _pages
           cp -f index.html _pages/index.html 2>/dev/null || true
+          cp -f style.css _pages/style.css 2>/dev/null || true
+          cp -f launch.css _pages/launch.css 2>/dev/null || true
+          cp -f launch-overrides.css _pages/launch-overrides.css 2>/dev/null || true
+          cp -f matrix.js _pages/matrix.js 2>/dev/null || true
+          cp -f site-local-counter.js _pages/site-local-counter.js 2>/dev/null || true
+          cp -f site-public-hooks.js _pages/site-public-hooks.js 2>/dev/null || true
+          cp -f logo.png _pages/logo.png 2>/dev/null || true
+          cp -f logo.webp _pages/logo.webp 2>/dev/null || true
+          cp -f favicon.ico _pages/favicon.ico 2>/dev/null || true
           cp -f CNAME _pages/CNAME 2>/dev/null || true
+          cp -f .nojekyll _pages/.nojekyll 2>/dev/null || touch _pages/.nojekyll
           cp -f 404.html _pages/404.html 2>/dev/null || true
           if [ -d game ]; then rsync -a --prune-empty-dirs --exclude='*.zip' --exclude='*.fbx' --exclude='*.blend' --exclude='*.psd' --exclude='*.tmp' --exclude='*.7z' --exclude='*.rar' --exclude='_backups/' --exclude='backup-game-*/' game/ _pages/game/; fi
           if [ -d site ]; then rsync -a --prune-empty-dirs --exclude='*.zip' --exclude='*.fbx' --exclude='*.blend' --exclude='*.psd' --exclude='*.tmp' --exclude='*.7z' --exclude='*.rar' --exclude='_backups/' --exclude='backup-game-*/' site/ _pages/site/; fi
           if [ -d update ]; then mkdir -p _pages/update && find update -maxdepth 1 -type f ! -name '*.zip' -exec cp -f {} _pages/update/ \;; fi
+          test -f _pages/index.html
+          test -f _pages/launch.css
+          test -f _pages/launch-overrides.css
+          test -f _pages/matrix.js
+          test -f _pages/logo.png
           du -sh _pages
 
       - name: Upload Pages artifact
