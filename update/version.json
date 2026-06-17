@@ -1,8 +1,8 @@
 {
-  "version": "Update 3.1 Phase 262",
-  "build": "PHASE-262-NO-TRUITIVE-GEOMETRY-SKY-LOCK",
+  "version": "Update 3.1 Phase 263",
+  "build": "PHASE-263-GEOMETRY-SKY-HARD-LOCK",
   "created": "2026-06-16",
-  "track": "game-only-lobby-geometry-sky-lock",
+  "track": "game-only-lobby-geometry-sky-hard-lock",
   "siteTouched": false,
-  "notes": "Phase 262 keeps the Phase 261 new lobby baseline, fixes duplicate storefront/arch geometry, raises Moon and Mars, hides unsupported overlay text, and locks the no-Truitive/no-founder runtime policy. No website changes."
+  "notes": "Phase 263 hardens the Phase 262 geometry and sky pass. It keeps the Phase 261 new lobby, pushes/slims rear columns, moves storefront shells farther back, reduces protruding store blocks, raises Moon and Mars high/back, and keeps the no-Truitive/no-founder policy."
 }
