@@ -109,6 +109,7 @@ function install(){
     actions:ACTIONS.map(a=>a.key),
     listensFor:"svr-scorpion-seat-snap-complete",
     emits:"svr-scorpion-player-action / svr-poker-player-action",
+    phase307Chained:true,
     playMoneyOnly:true,
     siteTouched:false,
     publicRootTouched:false,
@@ -120,3 +121,4 @@ function install(){
 }
 install();
 setInterval(()=>{install(); if(activeSession) showHud(activeSession);},5000);
+import("./phase307_scorpion_action_state_feedback_lock.js?v=phase307-action-state").catch(e=>{window.SVR_PHASE307_IMPORT_ERROR=String(e?.message||e);});
