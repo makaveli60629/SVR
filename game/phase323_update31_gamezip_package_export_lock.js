@@ -9,7 +9,7 @@ function prep(){return window.SVR_UPDATE31_FINAL_PACK_PREP_STATE||window.SVR_PHA
 function makeState(){
   const p=prep();
   const ready=!!p.readyForZipPrep;
-  const state={build:LABEL,active:true,readyForGameZip:ready,sourceBuild:p.build||"pending",zipName:"game.zip",rootRule:"game/index.html must become index.html at the zip root",command:COMMAND,verifyCommand:VERIFY,copyToUpdateCommand:"Copy-Item .\\game.zip .\\update\\game.zip -Force",commitCommand:"git add game.zip update/game.zip game/version.json update/version.json game/docs && git commit -m \"Update 3.1 game package\" && git push",siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  const state={build:LABEL,active:true,readyForGameZip:ready,sourceBuild:p.build||"pending",zipName:"game.zip",rootRule:"game/index.html must become index.html at the zip root",command:COMMAND,verifyCommand:VERIFY,copyToUpdateCommand:"Copy-Item .\\game.zip .\\update\\game.zip -Force",commitCommand:"git add game.zip update/game.zip game/version.json update/version.json game/docs && git commit -m \"Update 3.1 game package\" && git push",phase324Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_PHASE323_UPDATE31_GAMEZIP_PACKAGE_EXPORT_STATE=state;
   window.SVR_UPDATE31_GAMEZIP_PACKAGE_EXPORT_STATE=state;
   return state;
@@ -26,7 +26,8 @@ function install(){
   window.addEventListener("svr-update31-final-prep",()=>setTimeout(audit,120));
   window.SVR_PHASE323_COPY_UPDATE31_PACKAGE_COMMANDS=copyPlan;
   window.SVR_PHASE323_AUDIT_UPDATE31_GAMEZIP_EXPORT=audit;
-  window.SVR_PHASE323_UPDATE31_GAMEZIP_PACKAGE_EXPORT_LOCK={build:LABEL,active:true,source:"SVR_UPDATE31_FINAL_PACK_PREP_STATE",zipName:"game.zip",siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE323_UPDATE31_GAMEZIP_PACKAGE_EXPORT_LOCK={build:LABEL,active:true,source:"SVR_UPDATE31_FINAL_PACK_PREP_STATE",zipName:"game.zip",phase324Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_LIVE_BUILD_POINTER=LABEL;window.SVR_LOCKED_FINAL_BUILD=LABEL;audit();return true;
 }
 install();setInterval(audit,3000);
+import("./phase324_update31_version_sync_recovery_lock.js?v=phase324-version-sync").catch(e=>{window.SVR_PHASE324_IMPORT_ERROR=String(e?.message||e);});
