@@ -90,6 +90,7 @@ function install(){
     build: LABEL,
     active:true,
     targetCount:Object.keys(TARGETS).length,
+    phase302Chained:true,
     siteTouched:false,
     publicRootTouched:false,
     checkedAt:new Date().toISOString()
@@ -100,3 +101,4 @@ function install(){
 }
 install();
 setInterval(()=>{ install(); retryPending(); }, 2500);
+import("./phase302_scorpion_table_selector_hologram_lock.js?v=phase302-scorpion-selector").catch(e=>{window.SVR_PHASE302_IMPORT_ERROR=String(e?.message||e);});
