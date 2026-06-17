@@ -1,8 +1,8 @@
 {
-  "version": "Update 3.1 Phase 269",
-  "build": "PHASE-269-BOOT-CACHE-BUSTER-SYNC-LOCK",
+  "version": "Update 3.1 Phase 270",
+  "build": "PHASE-270-LIVE-BUILD-POINTER-LOCK",
   "created": "2026-06-16",
-  "track": "game-only-boot-cache-buster-sync-lock",
+  "track": "game-only-live-build-pointer-lock",
   "siteTouched": false,
-  "notes": "Phase 269 updates the game boot loader to cache-busted module URLs and forces late runtime labels to resolve to Phase 269. It preserves Phase 265 pillar/sign clearance, Phase 266 Quest LOD cleanup, high Moon/Mars placement, no Phase 84, and no old lobby."
+  "notes": "Phase 270 updates the boot loader and runtime shim to Phase 270 cache-busted module URLs and exposes SVR_LIVE_BUILD_POINTER."
 }
