@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -29,10 +29,26 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      - name: Build lightweight Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _pages
+          mkdir -p _pages
+          cp -f index.html _pages/index.html 2>/dev/null || true
+          cp -f CNAME _pages/CNAME 2>/dev/null || true
+          cp -f 404.html _pages/404.html 2>/dev/null || true
+          [ -d game ] && cp -R game _pages/game
+          [ -d site ] && cp -R site _pages/site
+          [ -d update ] && mkdir -p _pages/update && find update -maxdepth 1 -type f ! -name "*.zip" -exec cp -f {} _pages/update/ \;
+          find _pages -type f \( -name "*.zip" -o -name "*.fbx" -o -name "*.blend" -o -name "*.psd" -o -name "*.tmp" \) -delete
+          find _pages -type d \( -name "_backups" -o -name "backup-game-*" -o -name ".git" \) -prune -exec rm -rf {} +
+          du -sh _pages
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _pages
 
       - name: Deploy to GitHub Pages
         id: deployment
