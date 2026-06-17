@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-263-GEOMETRY-SKY-HARD-LOCK",
-  "track": "game-only-lobby-geometry-sky-hard-lock",
+  "build": "PHASE-265-PILLAR-SIGN-CLEARANCE-LOCK",
+  "track": "game-only-pillar-sign-clearance-lock",
   "siteTouched": false,
-  "phase": "3.1-AQ / Phase 263",
-  "summary": "Hardens Phase 262 by moving storefronts farther back, reducing duplicate/protruding store geometry, slimming and pushing rear columns back, raising Moon/Mars farther into the sky, and reinforcing the no-Truitive runtime policy.",
-  "label": "PHASE-263-GEOMETRY-SKY-HARD-LOCK",
-  "notes": "No website changes. No old lobby restore. No Phase 84 poker rollback. Current Roman canopy/new lobby remains the active baseline.",
+  "phase": "3.1-AR / Phase 265",
+  "summary": "Moves the rear Roman pillars out of the storefront sign faces and into the gaps between bays, slims the pillars, pushes them farther behind the storefront wall, raises signs slightly, and preserves the Phase 261 new lobby baseline.",
+  "label": "PHASE-265-PILLAR-SIGN-CLEARANCE-LOCK",
+  "notes": "No website changes. No old lobby restore. No Phase 84 poker rollback. Pillars now clear the storefront signs instead of blocking them.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
