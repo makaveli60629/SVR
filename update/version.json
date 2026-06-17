@@ -1,8 +1,8 @@
 {
-  "version": "Update 3.1 Phase 268",
-  "build": "PHASE-268-FINAL-RUNTIME-CACHE-SYNC-LOCK",
+  "version": "Update 3.1 Phase 269",
+  "build": "PHASE-269-BOOT-CACHE-BUSTER-SYNC-LOCK",
   "created": "2026-06-16",
-  "track": "game-only-final-runtime-cache-sync-lock",
+  "track": "game-only-boot-cache-buster-sync-lock",
   "siteTouched": false,
-  "notes": "Phase 268 hardens the runtime label/cache shim so stale labels are overwritten after late modules load. It preserves Phase 265 pillar/sign clearance, Phase 266 Quest LOD cleanup, high Moon/Mars placement, no Phase 84, and no old lobby."
+  "notes": "Phase 269 updates the game boot loader to cache-busted module URLs and forces late runtime labels to resolve to Phase 269. It preserves Phase 265 pillar/sign clearance, Phase 266 Quest LOD cleanup, high Moon/Mars placement, no Phase 84, and no old lobby."
 }
