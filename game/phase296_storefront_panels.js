@@ -70,3 +70,4 @@ function apply(){
  window.SVR_LIVE_BUILD_POINTER=LABEL; window.SVR_LOCKED_FINAL_BUILD=LABEL; return true;
 }
 apply(); let n=0; const t=setInterval(()=>{n++; if(apply()||n>90) clearInterval(t);},250);
+import("./phase300_storefront_route_feedback_lock.js?v=phase300-route-feedback").catch(e=>{window.SVR_PHASE300_ROUTE_FEEDBACK_ERROR=String(e?.message||e);});
