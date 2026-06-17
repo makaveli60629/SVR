@@ -1,8 +1,8 @@
 {
-  "version": "Update 3.1 Phase 263",
-  "build": "PHASE-263-GEOMETRY-SKY-HARD-LOCK",
+  "version": "Update 3.1 Phase 265",
+  "build": "PHASE-265-PILLAR-SIGN-CLEARANCE-LOCK",
   "created": "2026-06-16",
-  "track": "game-only-lobby-geometry-sky-hard-lock",
+  "track": "game-only-pillar-sign-clearance-lock",
   "siteTouched": false,
-  "notes": "Phase 263 hardens the Phase 262 geometry and sky pass. It keeps the Phase 261 new lobby, pushes/slims rear columns, moves storefront shells farther back, reduces protruding store blocks, raises Moon and Mars high/back, and keeps the no-Truitive/no-founder policy."
+  "notes": "Phase 265 moves the rear Roman pillars into bay gaps so they no longer sit in front of storefront signs. It also slims/pushes pillars back, raises signs slightly, keeps Moon/Mars high/back, preserves Phase 261 lobby, and keeps no-Truitive/no-founder policy."
 }
