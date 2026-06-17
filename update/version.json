@@ -1,1 +1,1 @@
-{"version":"Update 3.1 Phase 286","build":"PHASE-286-QUEST-INPUT-PRIORITY-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 286 protects Quest controller fallback input while hand tracking is present."}
+{"version":"Update 3.1 Phase 287","build":"PHASE-287-PLAYER-PILL-AVATAR-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 287 adds visible admin and player pill avatars as game-side placeholders."}
