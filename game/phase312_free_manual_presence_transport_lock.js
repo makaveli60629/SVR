@@ -146,6 +146,7 @@ function install(){
     active:true,
     realServerConnected:false,
     freeManualPairing:true,
+    phase313Chained:true,
     functions:["SVR_PHASE312_CREATE_OFFER","SVR_PHASE312_ACCEPT_OFFER","SVR_PHASE312_ACCEPT_ANSWER","SVR_PHASE312_DISCONNECT"],
     siteTouched:false,
     publicRootTouched:false,
@@ -158,3 +159,4 @@ function install(){
 }
 install();
 setInterval(()=>{install(); syncState();},5000);
+import("./phase313_left_to_right_card_deal_guard_lock.js?v=phase313-left-right-deal").catch(e=>{window.SVR_PHASE313_IMPORT_ERROR=String(e?.message||e);});
