@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-262-NO-TRUITIVE-GEOMETRY-SKY-LOCK",
-  "track": "game-only-lobby-geometry-sky-lock",
+  "build": "PHASE-263-GEOMETRY-SKY-HARD-LOCK",
+  "track": "game-only-lobby-geometry-sky-hard-lock",
   "siteTouched": false,
-  "phase": "3.1-AP / Phase 262",
-  "summary": "Preserves the Phase 261 Roman canopy/new lobby baseline while hiding duplicate old arch panels, tightening storefront shell geometry, pushing intersecting center columns back, raising Moon and Mars high/back in the sky, hiding VR-not-supported overlay text, and locking no-Truitive/no-founder runtime policy.",
-  "label": "PHASE-262-NO-TRUITIVE-GEOMETRY-SKY-LOCK",
-  "notes": "Game-side only. Site untouched. No Phase 84 rollback. No old lobby restore. Current lobby preserved. Truitive/Trueitive/founder branding remains rejected.",
+  "phase": "3.1-AQ / Phase 263",
+  "summary": "Hardens the Phase 262 cleanup by pushing and slimming rear columns, moving storefront shells farther back, reducing protruding store display geometry, preserving only one high/back Moon and Mars with clean halos, and strengthening the VR-not-supported overlay suppression.",
+  "label": "PHASE-263-GEOMETRY-SKY-HARD-LOCK",
+  "notes": "Game-side only. Site untouched. Phase 261 new lobby remains active. No Phase 84 rollback. Truitive/Trueitive/founder branding remains rejected.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
