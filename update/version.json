@@ -1,8 +1,1 @@
-{
-  "version": "Update 3.1 Phase 270",
-  "build": "PHASE-270-LIVE-BUILD-POINTER-LOCK",
-  "created": "2026-06-16",
-  "track": "game-only-live-build-pointer-lock",
-  "siteTouched": false,
-  "notes": "Phase 270 updates the boot loader and runtime shim to Phase 270 cache-busted module URLs and exposes SVR_LIVE_BUILD_POINTER."
-}
+{"version":"Update 3.1 Phase 271","build":"PHASE-271-RUNTIME-HEALTH-AUDIT-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 271 boot/runtime sync."}
