@@ -1,1 +1,1 @@
-export { createTeleportRig } from "./teleport_phase101j_forward_lock.js?v=phase101jforwardlock";
+export { createTeleportRig } from "./movement_phase286_input_lock.js?v=phase286-input-priority";
