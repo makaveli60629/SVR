@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-266-QUEST-LOD-PERFORMANCE-CLEANUP-LOCK",
-  "track": "game-only-quest-lod-performance-cleanup-lock",
+  "build": "PHASE-267-RUNTIME-LABEL-SYNC-LOCK",
+  "track": "game-only-runtime-label-sync-lock",
   "siteTouched": false,
-  "phase": "3.1-AS / Phase 266",
-  "summary": "Preserves the pillar/sign clearance lock and adds Quest performance cleanup by reducing decorative render load, hiding the floor grid, lowering star/glow intensity, capping pixel ratio, and freezing static lobby meshes where safe.",
-  "label": "PHASE-266-QUEST-LOD-PERFORMANCE-CLEANUP-LOCK",
+  "phase": "3.1-AT / Phase 267",
+  "summary": "Keeps Phase 266 Quest LOD cleanup and changes the late finished-lobby file into a lightweight runtime label shim. This keeps the active runtime on Phase 267 while preserving pillar/sign clearance and the high Moon/Mars lock.",
+  "label": "PHASE-267-RUNTIME-LABEL-SYNC-LOCK",
   "notes": "No website changes. No old lobby restore. No Phase 84 poker rollback. Current Roman canopy/new lobby remains the active baseline.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
