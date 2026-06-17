@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-265-PILLAR-SIGN-CLEARANCE-LOCK",
-  "track": "game-only-pillar-sign-clearance-lock",
+  "build": "PHASE-266-QUEST-LOD-PERFORMANCE-CLEANUP-LOCK",
+  "track": "game-only-quest-lod-performance-cleanup-lock",
   "siteTouched": false,
-  "phase": "3.1-AR / Phase 265",
-  "summary": "Moves the rear Roman pillars out of the storefront sign faces and into the gaps between bays, slims the pillars, pushes them farther behind the storefront wall, raises signs slightly, and preserves the Phase 261 new lobby baseline with no Truitive/Trueitive/founder content.",
-  "label": "PHASE-265-PILLAR-SIGN-CLEARANCE-LOCK",
-  "notes": "Game-side only. Site untouched. Phase 261 new lobby remains active. No Phase 84 rollback. Pillars are rearranged to avoid covering storefront signs.",
+  "phase": "3.1-AS / Phase 266",
+  "summary": "Preserves Phase 265 pillar/sign clearance while adding Quest LOD cleanup: hides the floor grid, reduces star-field density/opacity, reduces decorative glow opacity, disables shadow map, caps renderer pixel ratio, freezes static lobby meshes, keeps Moon/Mars high-back, and preserves no-Truitive/no-founder policy.",
+  "label": "PHASE-266-QUEST-LOD-PERFORMANCE-CLEANUP-LOCK",
+  "notes": "Game-side only. Site untouched. Phase 261 new lobby remains active. No Phase 84 rollback. Pillar/sign clearance remains preserved.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
