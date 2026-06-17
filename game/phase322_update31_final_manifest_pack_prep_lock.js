@@ -9,7 +9,7 @@ function compute(){
   const qa=readiness();
   const gates={canvas:!!qa.mobileCoverageReady,rooms:!!qa.roomButtonsReady,movement:!!qa.movementReady,pokerDeal:!!qa.pokerDealReady,android:!!qa.androidReady,desktop:!!qa.desktopReady};
   const ready=Object.values(gates).every(Boolean);
-  const state={build:LABEL,active:true,readyForZipPrep:ready,gates,qaBuild:qa.build||"pending",files:fileList(),zipRootRule:"index.html must stay at game zip root",publicRootTouched:false,siteTouched:false,nextStep:ready?"create game.zip from game/ root":"complete device QA then create package",checkedAt:new Date().toISOString()};
+  const state={build:LABEL,active:true,readyForZipPrep:ready,gates,qaBuild:qa.build||"pending",files:fileList(),zipRootRule:"index.html must stay at game zip root",phase323Chained:true,publicRootTouched:false,siteTouched:false,nextStep:ready?"create game.zip from game/ root":"complete device QA then create package",checkedAt:new Date().toISOString()};
   window.SVR_PHASE322_UPDATE31_FINAL_MANIFEST_PACK_PREP_STATE=state;
   window.SVR_UPDATE31_FINAL_PACK_PREP_STATE=state;
   return state;
@@ -29,7 +29,8 @@ function install(){
   if(installed)return true;installed=true;
   window.addEventListener("svr-update31-stability-qa",()=>setTimeout(audit,100));
   window.SVR_PHASE322_AUDIT_UPDATE31_FINAL_PREP=audit;
-  window.SVR_PHASE322_UPDATE31_FINAL_MANIFEST_PACK_PREP_LOCK={build:LABEL,active:true,source:"SVR_UPDATE31_READY_STATE",checks:["canvas","rooms","movement","pokerDeal","android","desktop"],siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE322_UPDATE31_FINAL_MANIFEST_PACK_PREP_LOCK={build:LABEL,active:true,source:"SVR_UPDATE31_READY_STATE",checks:["canvas","rooms","movement","pokerDeal","android","desktop"],phase323Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_LIVE_BUILD_POINTER=LABEL;window.SVR_LOCKED_FINAL_BUILD=LABEL;audit();return true;
 }
 install();setInterval(audit,3000);
+import("./phase323_update31_gamezip_package_export_lock.js?v=phase323-gamezip-export").catch(e=>{window.SVR_PHASE323_IMPORT_ERROR=String(e?.message||e);});
