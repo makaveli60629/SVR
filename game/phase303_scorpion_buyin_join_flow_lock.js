@@ -88,6 +88,7 @@ function install(){
     active:true,
     actions:"J Join / S Spectate / Escape Cancel",
     route:"private-room",
+    phase304Chained:true,
     siteTouched:false,
     publicRootTouched:false,
     checkedAt:new Date().toISOString()
@@ -98,3 +99,4 @@ function install(){
 }
 install();
 setInterval(install,3000);
+import("./phase304_scorpion_seat_reservation_lock.js?v=phase304-seat-reservation").catch(e=>{window.SVR_PHASE304_IMPORT_ERROR=String(e?.message||e);});
