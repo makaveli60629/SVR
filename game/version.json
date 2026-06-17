@@ -1,11 +1,1 @@
-{
-  "version": "Update 3.1",
-  "build": "PHASE-270-LIVE-BUILD-POINTER-LOCK",
-  "track": "game-only-live-build-pointer-lock",
-  "siteTouched": false,
-  "phase": "3.1-AW / Phase 270",
-  "summary": "Updates the game boot loader and late runtime shim to Phase 270 cache-busted module URLs and exposes SVR_LIVE_BUILD_POINTER while preserving Quest LOD cleanup and pillar sign clearance.",
-  "label": "PHASE-270-LIVE-BUILD-POINTER-LOCK",
-  "notes": "Game-only update. Site untouched. Current new lobby remains the active baseline.",
-  "updated": "2026-06-16T00:00:00-05:00"
-}
+{"version":"Update 3.1","build":"PHASE-282-VERSION-POINTER-RESYNC-LOCK","track":"game-version-pointer-resync-lock","siteTouched":false,"phase":"3.1-BI / Phase 282","summary":"Phase 282 resyncs stale game and update version pointers after the pillar correction phases.","label":"PHASE-282-VERSION-POINTER-RESYNC-LOCK","notes":"Game-side metadata only. Site untouched. Phase 281 game code remains active.","updated":"2026-06-16T00:00:00-05:00"}
