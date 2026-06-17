@@ -1,13 +1,13 @@
 import * as THREE from "three";
 
-const LABEL = "PHASE-265-PILLAR-SIGN-CLEARANCE-LOCK";
+const LABEL = "PHASE-266-QUEST-LOD-PERFORMANCE-CLEANUP-LOCK";
 
 function objectName(obj){ return String(obj?.name || ""); }
 function hideObject(obj){
   if (!obj) return;
   obj.visible = false;
-  obj.userData.phase265Hidden = true;
-  obj.traverse?.((child)=>{ child.visible = false; child.userData.phase265Hidden = true; });
+  obj.userData.phase266Hidden = true;
+  obj.traverse?.((child)=>{ child.visible = false; child.userData.phase266Hidden = true; });
 }
 function showObject(obj){
   if (!obj) return;
@@ -19,15 +19,18 @@ function collect(scene, predicate){
   scene.traverse((obj)=>{ if (predicate(obj)) out.push(obj); });
   return out;
 }
-function softenMaterials(obj, opacity){
+function forEachMaterial(obj, cb){
   obj?.traverse?.((child)=>{
     const mats = Array.isArray(child.material) ? child.material : child.material ? [child.material] : [];
-    mats.forEach((mat)=>{
-      mat.transparent = true;
-      mat.opacity = Math.min(mat.opacity ?? 1, opacity);
-      mat.depthWrite = false;
-      mat.needsUpdate = true;
-    });
+    mats.forEach((mat)=>{ if (mat) cb(mat, child); });
+  });
+}
+function softenMaterials(obj, opacity){
+  forEachMaterial(obj, (mat)=>{
+    mat.transparent = true;
+    mat.opacity = Math.min(mat.opacity ?? 1, opacity);
+    mat.depthWrite = false;
+    mat.needsUpdate = true;
   });
 }
 function keepSinglePlanet(scene, token, keepName, applyPose){
@@ -35,7 +38,7 @@ function keepSinglePlanet(scene, token, keepName, applyPose){
   let keep = scene.getObjectByName(keepName) || matches.find((obj)=>obj.isMesh || obj.isGroup) || null;
   matches.forEach((obj)=>{
     const name = objectName(obj).toUpperCase();
-    if (name.startsWith("PHASE262_") || name.startsWith("PHASE263_") || name.startsWith("PHASE264_") || name.startsWith("PHASE265_")) return;
+    if (name.startsWith("PHASE262_") || name.startsWith("PHASE263_") || name.startsWith("PHASE264_") || name.startsWith("PHASE265_") || name.startsWith("PHASE266_")) return;
     if (obj === keep || keep?.parent === obj || obj.parent === keep) return;
     if (obj.isMesh || obj.isGroup || name.includes("LOCKED")) hideObject(obj);
   });
@@ -44,10 +47,10 @@ function keepSinglePlanet(scene, token, keepName, applyPose){
 }
 function hideUnsupportedOverlay(){
   try{
-    if (!document.getElementById("phase265-clean-overlay-style")){
+    if (!document.getElementById("phase266-clean-overlay-style")){
       const style = document.createElement("style");
-      style.id = "phase265-clean-overlay-style";
-      style.textContent = "[data-phase265-hidden='true']{display:none!important;visibility:hidden!important;opacity:0!important;}";
+      style.id = "phase266-clean-overlay-style";
+      style.textContent = "[data-phase266-hidden='true']{display:none!important;visibility:hidden!important;opacity:0!important;}";
       document.head.appendChild(style);
     }
     Array.from(document.querySelectorAll("body *")).forEach((node)=>{
@@ -56,7 +59,7 @@ function hideUnsupportedOverlay(){
         node.style.display = "none";
         node.style.visibility = "hidden";
         node.style.opacity = "0";
-        node.setAttribute("data-phase265-hidden", "true");
+        node.setAttribute("data-phase266-hidden", "true");
       }
     });
   }catch(_err){}
@@ -107,7 +110,7 @@ function alignStorefrontShells(scene){
 
   const storeRack = root.getObjectByName("PHASE202_STORE_DISPLAY_RACKS");
   if (storeRack){
-    storeRack.traverse((obj)=>{ if (objectName(obj).includes("PRODUCT_PLINTH")) softenMaterials(obj, 0.26); });
+    storeRack.traverse((obj)=>{ if (objectName(obj).includes("PRODUCT_PLINTH")) softenMaterials(obj, 0.22); });
   }
   return { storefrontRoot:true };
 }
@@ -126,12 +129,12 @@ function alignColumns(scene){
     if (!obj) return;
     obj.position.x = x;
     obj.position.z = z;
-    obj.scale.x = 0.58;
-    obj.scale.z = 0.58;
-    obj.userData.phase265MovedToSignGap = true;
+    obj.scale.x = 0.56;
+    obj.scale.z = 0.56;
+    obj.userData.phase266MovedToSignGap = true;
     obj.traverse((child)=>{
       const n = objectName(child).toUpperCase();
-      if (n.includes("CAP") || n.includes("BASE")) child.scale.x = Math.min(child.scale.x, 0.62);
+      if (n.includes("CAP") || n.includes("BASE")) child.scale.x = Math.min(child.scale.x, 0.60);
     });
   });
 }
@@ -140,60 +143,94 @@ function alignPlanets(scene){
     obj.position.set(-10.4,19.2,-39.0);
     obj.scale.setScalar(0.60);
     obj.renderOrder = 5;
-    obj.userData.phase265SkyLocked = true;
+    obj.userData.phase266SkyLocked = true;
   });
   const mars = keepSinglePlanet(scene, "MARS", "PHASE200_SINGLE_VISIBLE_MARS_LOCKED", (obj)=>{
     obj.position.set(8.8,17.6,-42.0);
     obj.scale.setScalar(0.62);
     obj.renderOrder = 5;
-    obj.userData.phase265SkyLocked = true;
+    obj.userData.phase266SkyLocked = true;
   });
   const root = scene.getObjectByName("PHASE200_ORDERED_GRAND_LOBBY_ROOT") || scene;
-  let moonHalo = scene.getObjectByName("PHASE265_MOON_SOFT_HALO") || scene.getObjectByName("PHASE264_MOON_SOFT_HALO") || scene.getObjectByName("PHASE263_MOON_SOFT_HALO") || scene.getObjectByName("PHASE262_MOON_SOFT_HALO");
+  let moonHalo = scene.getObjectByName("PHASE266_MOON_SOFT_HALO") || scene.getObjectByName("PHASE265_MOON_SOFT_HALO") || scene.getObjectByName("PHASE264_MOON_SOFT_HALO") || scene.getObjectByName("PHASE263_MOON_SOFT_HALO") || scene.getObjectByName("PHASE262_MOON_SOFT_HALO");
   if (moon && !moonHalo){
     moonHalo = new THREE.Mesh(new THREE.RingGeometry(0.90,1.18,96), new THREE.MeshBasicMaterial({ color:0xdde6ff, transparent:true, opacity:0.08, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
-    moonHalo.name = "PHASE265_MOON_SOFT_HALO";
+    moonHalo.name = "PHASE266_MOON_SOFT_HALO";
     root.add(moonHalo);
   }
-  if (moon && moonHalo){ moonHalo.name = "PHASE265_MOON_SOFT_HALO"; moonHalo.visible = true; moonHalo.position.copy(moon.position); moonHalo.rotation.x = Math.PI * 0.5; }
-  let marsHalo = scene.getObjectByName("PHASE265_MARS_SOFT_HALO") || scene.getObjectByName("PHASE264_MARS_SOFT_HALO") || scene.getObjectByName("PHASE263_MARS_SOFT_HALO") || scene.getObjectByName("PHASE262_MARS_SOFT_HALO");
+  if (moon && moonHalo){ moonHalo.name = "PHASE266_MOON_SOFT_HALO"; moonHalo.visible = true; moonHalo.position.copy(moon.position); moonHalo.rotation.x = Math.PI * 0.5; }
+  let marsHalo = scene.getObjectByName("PHASE266_MARS_SOFT_HALO") || scene.getObjectByName("PHASE265_MARS_SOFT_HALO") || scene.getObjectByName("PHASE264_MARS_SOFT_HALO") || scene.getObjectByName("PHASE263_MARS_SOFT_HALO") || scene.getObjectByName("PHASE262_MARS_SOFT_HALO");
   if (mars && !marsHalo){
     marsHalo = new THREE.Mesh(new THREE.RingGeometry(0.40,0.58,80), new THREE.MeshBasicMaterial({ color:0xff8b67, transparent:true, opacity:0.07, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
-    marsHalo.name = "PHASE265_MARS_SOFT_HALO";
+    marsHalo.name = "PHASE266_MARS_SOFT_HALO";
     root.add(marsHalo);
   }
-  if (mars && marsHalo){ marsHalo.name = "PHASE265_MARS_SOFT_HALO"; marsHalo.visible = true; marsHalo.position.copy(mars.position); marsHalo.rotation.x = Math.PI * 0.5; }
+  if (mars && marsHalo){ marsHalo.name = "PHASE266_MARS_SOFT_HALO"; marsHalo.visible = true; marsHalo.position.copy(mars.position); marsHalo.rotation.x = Math.PI * 0.5; }
   return { moon:!!moon, mars:!!mars };
 }
 function applyApprovalSafety(scene){
   const rejected = ["TRUEITIVE", "TRUITIVE", "SHYONA", "ROYSTON", "FOUNDER"];
   collect(scene, (obj)=>rejected.some((token)=>objectName(obj).toUpperCase().includes(token))).forEach(hideObject);
 }
-function applyOnce(scene){
+function applyQuestLod(scene, renderer){
+  try{
+    if (renderer?.setPixelRatio){ renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.35)); }
+    if (renderer?.shadowMap) renderer.shadowMap.enabled = false;
+  }catch(_err){}
+
+  const floorGrid = scene.getObjectByName("PHASE200_SUBTLE_ORDERED_FLOOR_GRID");
+  if (floorGrid) hideObject(floorGrid);
+
+  collect(scene, (obj)=>objectName(obj).toUpperCase().includes("STAR_FIELD")).forEach((obj)=>{
+    if (obj.material){ obj.material.size = Math.min(obj.material.size || 0.038, 0.026); obj.material.opacity = Math.min(obj.material.opacity || 0.88, 0.58); obj.material.needsUpdate = true; }
+  });
+
+  collect(scene, (obj)=>{
+    const n = objectName(obj).toUpperCase();
+    return n.includes("LIGHT_BULB") || n.includes("LOWER_GLOW") || n.includes("UPPER_GLOW") || n.includes("NEON") || n.includes("CRESTRING");
+  }).forEach((obj)=>softenMaterials(obj, 0.34));
+
+  ["PHASE200_ORDERED_GRAND_LOBBY_ROOT", "PHASE202_STOREFRONT_SHELLS_ROOT"].forEach((name)=>{
+    const root = scene.getObjectByName(name);
+    root?.traverse((obj)=>{
+      const n = objectName(obj).toUpperCase();
+      if (!obj.isMesh || n.includes("MOON") || n.includes("MARS") || n.includes("HALO")) return;
+      obj.updateMatrix();
+      obj.matrixAutoUpdate = false;
+    });
+  });
+}
+function applyOnce(scene, renderer){
   hideUnsupportedOverlay();
   const shells = alignStorefrontShells(scene);
   alignColumns(scene);
   const planets = alignPlanets(scene);
   applyApprovalSafety(scene);
-  window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK = {
+  applyQuestLod(scene, renderer);
+  window.SVR_PHASE266_QUEST_LOD_PERFORMANCE_CLEANUP_LOCK = {
     label: LABEL,
     locked: true,
     columnsMovedIntoBayGaps: true,
     duplicatePhase200ArchPanelsHidden: true,
     storefrontGeometryTightened: !!shells.storefrontRoot,
-    storefrontSignsRaised: true,
+    questLodCleanup: true,
+    floorGridHidden: true,
+    starFieldReduced: true,
+    glowOpacityReduced: true,
+    staticLobbyMeshesFrozen: true,
     moonHighBackLocked: planets.moon,
     marsHighBackLocked: planets.mars,
     noTruitiveRuntimePolicy: true,
     checkedAt: new Date().toISOString()
   };
-  window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK = window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK;
-  window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK = window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK;
-  window.SVR_PHASE262_GEOMETRY_SKY_LOCK = window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK;
+  window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK = window.SVR_PHASE266_QUEST_LOD_PERFORMANCE_CLEANUP_LOCK;
+  window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK = window.SVR_PHASE266_QUEST_LOD_PERFORMANCE_CLEANUP_LOCK;
+  window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK = window.SVR_PHASE266_QUEST_LOD_PERFORMANCE_CLEANUP_LOCK;
+  window.SVR_PHASE262_GEOMETRY_SKY_LOCK = window.SVR_PHASE266_QUEST_LOD_PERFORMANCE_CLEANUP_LOCK;
 }
-export function installPhase262GeometrySkyAlignmentLock({ scene, log = console.log } = {}){
+export function installPhase262GeometrySkyAlignmentLock({ scene, renderer, log = console.log } = {}){
   if (!scene) return null;
-  [0,160,520,1200,2400,4200].forEach((delay)=>setTimeout(()=>applyOnce(scene), delay));
-  log(`[Phase265] pillar sign-clearance alignment lock installed`);
-  return window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK || { label: LABEL, pending:true };
+  [0,160,520,1200,2400,4200].forEach((delay)=>setTimeout(()=>applyOnce(scene, renderer), delay));
+  log(`[Phase266] Quest LOD performance cleanup lock installed`);
+  return window.SVR_PHASE266_QUEST_LOD_PERFORMANCE_CLEANUP_LOCK || { label: LABEL, pending:true };
 }
