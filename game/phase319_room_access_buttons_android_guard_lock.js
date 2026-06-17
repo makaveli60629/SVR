@@ -59,7 +59,7 @@ function goRoom(room){
   try{if(window.SVR_PHASE301_EXECUTE_ROUTE&&room.target!=="lobby")moved=!!window.SVR_PHASE301_EXECUTE_ROUTE(detail);}catch(e){window.SVR_PHASE319_ROUTE_ERROR=String(e?.message||e);}
   if(!moved)moved=fallbackMove(room.pos);
   try{window.dispatchEvent(new CustomEvent("svr-portal-selected",{detail}));}catch{}
-  window.SVR_PHASE319_LAST_ROOM_BUTTON={build:LABEL,...detail,moved,android:isAndroid(),siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE319_LAST_ROOM_BUTTON={build:LABEL,...detail,moved,android:isAndroid(),phase320Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   status(`Room button: ${room.label}`);
   return window.SVR_PHASE319_LAST_ROOM_BUTTON;
 }
@@ -75,7 +75,8 @@ function install(){
   if(installed)return true;installed=true;
   setVh();injectStyle();makePanel();installGuards();resizeRenderer();releaseBlackOverlays();
   window.SVR_PHASE319_GO_ROOM=(key)=>{const r=ROOMS.find(x=>x.key===key||x.target===key||x.label.toLowerCase()===String(key).toLowerCase());return r?goRoom(r):null;};
-  window.SVR_PHASE319_ROOM_ACCESS_BUTTONS_ANDROID_GUARD_LOCK={build:LABEL,active:true,roomCount:ROOMS.length,rooms:ROOMS.map(r=>({key:r.key,label:r.label,target:r.target})),androidGuard:true,fixes:"mobile viewport black-side guard plus desktop/android room buttons",siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE319_ROOM_ACCESS_BUTTONS_ANDROID_GUARD_LOCK={build:LABEL,active:true,roomCount:ROOMS.length,rooms:ROOMS.map(r=>({key:r.key,label:r.label,target:r.target})),androidGuard:true,phase320Chained:true,fixes:"mobile viewport black-side guard plus desktop/android room buttons",siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_LIVE_BUILD_POINTER=LABEL;window.SVR_LOCKED_FINAL_BUILD=LABEL;status("Room access buttons armed");return true;
 }
 install();setInterval(()=>{install();resizeRenderer();},3000);
+import("./phase320_android_desktop_movement_pad_guard_lock.js?v=phase320-move-pad").catch(e=>{window.SVR_PHASE320_IMPORT_ERROR=String(e?.message||e);});
