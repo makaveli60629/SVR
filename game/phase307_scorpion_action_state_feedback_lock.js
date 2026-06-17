@@ -108,6 +108,7 @@ function install(){
     active:true,
     listensFor:"svr-scorpion-player-action",
     emits:"svr-scorpion-action-state-updated",
+    phase308Chained:true,
     playMoneyOnly:true,
     siteTouched:false,
     publicRootTouched:false,
@@ -119,3 +120,4 @@ function install(){
 }
 install();
 setInterval(()=>{install(); if(window.SVR_PHASE307_SCORPION_ACTION_STATE) showPanel();},6000);
+import("./phase308_scorpion_bot_response_lock.js?v=phase308-bot-response").catch(e=>{window.SVR_PHASE308_IMPORT_ERROR=String(e?.message||e);});
