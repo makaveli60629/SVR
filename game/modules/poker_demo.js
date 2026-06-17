@@ -7,6 +7,7 @@ const SUIT_COLOR = { S:"#101218", C:"#101218", H:"#c71f44", D:"#c71f44" };
 const RANK_LABEL = { 14:"A", 13:"K", 12:"Q", 11:"J", 10:"10", 9:"9", 8:"8", 7:"7", 6:"6", 5:"5", 4:"4", 3:"3", 2:"2" };
 const BOT_NAMES = ["BOT NOVA", "BOT VEGA", "BOT ORBIT", "YOU", "BOT ACE", "BOT LUX"];
 const CHIP_PALETTES = [[0x7d4dff,0x2bd4ff,0xf2d269],[0xff6fb1,0x2bd4ff,0xf2d269],[0x7d4dff,0x55ffb3,0xf2d269],[0xf2d269,0x2bd4ff,0xff6fb1],[0xff9457,0x2bd4ff,0x7d4dff],[0x55ffb3,0xff6fb1,0xf2d269]];
+const LEFT_TO_RIGHT_DEAL_DIRECTION = "LEFT_TO_RIGHT_X_ASCENDING";
 
 export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY = 0.90, statusCb = () => {}, log = console.log }){
   const group = new THREE.Group();
@@ -62,7 +63,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
 
   buildSeatChips();
   paintStatus("Left-to-right deal locked", "Cards start at left seat, then next player, next player, around the table");
-  window.SVR_PHASE169_DEAL_ORDER = players.map(p=>({ dealIndex:p.dealIndex, originalIndex:p.originalIndex, name:p.name, x:p.seat.x, z:p.seat.z }));
+  publishDealOrder("initial-lock");
 
   function makeDynamicPanel(width, height, worldW, worldH){
     const { canvas, ctx, texture } = makeCanvasLabel({ width, height, draw(drawCtx,w,h){ drawCtx.clearRect(0,0,w,h); } });
@@ -110,6 +111,26 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   function createDeck(){ const deck = []; for(const suit of SUITS) for(let rank=2; rank<=14; rank++) deck.push({ rank, suit }); return deck; }
   function shuffle(deck){ for(let i=deck.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } return deck; }
   function formatCards(cards){ return cards.map(c=>`${RANK_LABEL[c.rank]}${SUIT_SYMBOL[c.suit]}`).join(" "); }
+  function publishDealOrder(reason = "runtime"){
+    const order = players.map(p=>({ dealIndex:p.dealIndex, originalIndex:p.originalIndex, name:p.name, x:p.seat.x, z:p.seat.z }));
+    window.SVR_PHASE169_DEAL_ORDER = order;
+    window.SVR_POKER_LEFT_TO_RIGHT_DEAL_ENFORCED = {
+      build:"PHASE-314-POKER-DEAL-SCHEDULER-LEFT-TO-RIGHT-HARD-LOCK",
+      direction:"left-to-right",
+      sort:"seat.x ascending, z tie-breaker",
+      reason,
+      order,
+      checkedAt:new Date().toISOString()
+    };
+    return order;
+  }
+  function recordDealStep(round, seatIndex, player, card){
+    const step = { handNumber, round:round+1, seatIndex:seatIndex+1, dealIndex:player.dealIndex, name:player.name, x:player.seat.x, z:player.seat.z, card:`${RANK_LABEL[card.rank]}${SUIT_SYMBOL[card.suit]}`, direction:"left-to-right", at:new Date().toISOString() };
+    window.SVR_PHASE314_LAST_DEALT_CARD = step;
+    window.SVR_PHASE314_LEFT_TO_RIGHT_DEAL_SEQUENCE = [...(window.SVR_PHASE314_LEFT_TO_RIGHT_DEAL_SEQUENCE || []), step];
+    try{ window.dispatchEvent(new CustomEvent("svr-left-to-right-card-dealt",{detail:step})); }catch{}
+    return step;
+  }
 
   function buildSeatChips(){
     players.forEach((player, idx)=>{
@@ -148,6 +169,8 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   function planHand(){
     handNumber++;
     clearAllCards(); clearPotStack(); resetRingHighlights(); queue = []; stepIndex = 0;
+    window.SVR_PHASE314_LEFT_TO_RIGHT_DEAL_SEQUENCE = [];
+    publishDealOrder(`hand-${handNumber}`);
     const deck = shuffle(createDeck());
     players.forEach(p=>{ p.hand = [deck.shift(), deck.shift()]; });
     const board = [deck.shift(),deck.shift(),deck.shift(),deck.shift(),deck.shift()];
@@ -160,7 +183,7 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
       for(let i=0; i<players.length; i++){
         const player = players[i];
         t += .42;
-        schedule(t,()=>{ addCard(player.hand[round], player.cards[round], .46, 1.0); applyActionHighlight(player); paintStatus(`Dealing ${player.name}`, `Round ${round+1} • seat ${i+1}/${players.length} • ${formatCards(player.hand.slice(0, round+1))}`); });
+        schedule(t,()=>{ recordDealStep(round, i, player, player.hand[round]); addCard(player.hand[round], player.cards[round], .46, 1.0); applyActionHighlight(player); paintStatus(`Dealing ${player.name}`, `LEFT→RIGHT • Round ${round+1} • seat ${i+1}/${players.length} • ${formatCards(player.hand.slice(0, round+1))}`); });
       }
     }
     t += .70; schedule(t,()=>{ addCard(null, burnAnchors[0], .34, .74); paintStatus("Burn", `Before flop • pot $${current.pot}`); });
@@ -169,9 +192,9 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
     t += .55; schedule(t,()=>{ addCard(board[3], boardAnchors[3], .52, 1.18); current.pot += 60; refreshPotStack(34); paintStatus(`Turn • ${formatCards(board.slice(0,4))}`, `pot $${current.pot}`); });
     t += 1.15; schedule(t,()=>{ addCard(null, burnAnchors[2], .34, .74); paintStatus("Burn", `Before river • pot $${current.pot}`); });
     t += .55; schedule(t,()=>{ addCard(board[4], boardAnchors[4], .52, 1.18); current.pot += 60; refreshPotStack(38); paintStatus(`River • ${formatCards(board)}`, `pot $${current.pot}`); });
-    t += 1.25; schedule(t,()=>{ applyWinnerHighlight(winner); paintStatus(`${winner.name} wins`, `Pot $${current.pot} • left-to-right deal order verified`, "rgba(244,210,105,0.98)"); statusCb(`HAND ${handNumber} • ${winner.name} wins • deal order left-to-right`); log("Phase169 poker hand", { order:players.map(p=>p.name), winner:winner.name }); });
+    t += 1.25; schedule(t,()=>{ applyWinnerHighlight(winner); paintStatus(`${winner.name} wins`, `Pot $${current.pot} • left-to-right deal order verified`, "rgba(244,210,105,0.98)"); statusCb(`HAND ${handNumber} • ${winner.name} wins • deal order left-to-right`); log("Phase314 poker hand", { order:players.map(p=>p.name), sequence:window.SVR_PHASE314_LEFT_TO_RIGHT_DEAL_SEQUENCE, winner:winner.name }); });
     t += 4.0; schedule(t,()=>planHand());
-    paintStatus("Shuffling live deck", `Hand ${handNumber} • left-to-right deal order locked`);
+    paintStatus("Shuffling live deck", `Hand ${handNumber} • left-to-right deal order hard locked`);
   }
   function orientCardToCamera(mesh){ const cam = scene.userData?._camera; if (!cam) return; const ry = Math.atan2(cam.position.x - mesh.position.x, cam.position.z - mesh.position.z); mesh.rotation.set(0, ry, 0); }
   function updateAnimations(){ for(let i=animations.length-1;i>=0;i--){ const anim=animations[i]; const span=Math.max(.0001, anim.end-anim.start); const t=THREE.MathUtils.clamp((nowS-anim.start)/span,0,1); const eased=1-Math.pow(1-t,3); anim.mesh.position.lerpVectors(anim.fromPos,anim.toPos,eased); anim.mesh.position.y += Math.sin(eased*Math.PI)*.22; orientCardToCamera(anim.mesh); if(t>=1) animations.splice(i,1); } }
@@ -180,5 +203,5 @@ export function createPokerDemo({ scene, seats = [], chairRings = [], tableTopY 
   function updateSeatChips(){ players.forEach((p,idx)=>p.chips.forEach((s,j)=>{ s.position.y=s.userData.baseY+Math.sin(nowS*1.6+idx*.5+j*.7)*.005; })); }
   function updateStatusFacing(){ const cam=scene.userData?._camera; if(!cam) return; const ry=Math.atan2(cam.position.x-statusPanel.mesh.position.x, cam.position.z-statusPanel.mesh.position.z); statusPanel.mesh.rotation.set(0,ry,0); }
   function update(now){ nowS=now; if(!current) planHand(); while(queue[stepIndex] && nowS>=queue[stepIndex].at){ const ref=queue; queue[stepIndex].fn(); if(queue!==ref) break; stepIndex++; } updateAnimations(); updateCardsHover(); updatePotStack(); updateSeatChips(); updateStatusFacing(); }
-  return { update, forceNextHand(){ planHand(); } };
+  return { update, forceNextHand(){ planHand(); }, getDealOrder(){ return publishDealOrder("api-check"); } };
 }
