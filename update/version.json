@@ -1,8 +1,8 @@
 {
-  "version": "Update 3.1 Phase 266",
-  "build": "PHASE-266-QUEST-LOD-PERFORMANCE-CLEANUP-LOCK",
+  "version": "Update 3.1 Phase 267",
+  "build": "PHASE-267-RUNTIME-LABEL-SYNC-LOCK",
   "created": "2026-06-16",
-  "track": "game-only-quest-lod-performance-cleanup-lock",
+  "track": "game-only-runtime-label-sync-lock",
   "siteTouched": false,
-  "notes": "Phase 266 preserves Phase 265 pillar/sign clearance and adds Quest LOD cleanup: floor grid hidden, star field reduced, glow opacity reduced, shadow map disabled, renderer pixel ratio capped, and static lobby meshes frozen where safe."
+  "notes": "Phase 267 keeps Phase 266 Quest LOD cleanup and adds a runtime label shim so the active runtime reports Phase 267 while preserving pillar/sign clearance, high Moon/Mars placement, no Phase 84, and no old lobby."
 }
