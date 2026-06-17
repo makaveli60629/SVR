@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-267-RUNTIME-LABEL-SYNC-LOCK",
-  "track": "game-only-runtime-label-sync-lock",
+  "build": "PHASE-268-FINAL-RUNTIME-CACHE-SYNC-LOCK",
+  "track": "game-only-final-runtime-cache-sync-lock",
   "siteTouched": false,
-  "phase": "3.1-AT / Phase 267",
-  "summary": "Keeps Phase 266 Quest LOD cleanup and changes the late finished-lobby file into a lightweight runtime label shim. This keeps the active runtime on Phase 267 while preserving pillar/sign clearance and the high Moon/Mars lock.",
-  "label": "PHASE-267-RUNTIME-LABEL-SYNC-LOCK",
-  "notes": "Game-side only. Site untouched. Phase 261 new lobby remains active. No Phase 84 rollback. No old lobby. No Truitive or founder content.",
+  "phase": "3.1-AU / Phase 268",
+  "summary": "Keeps Phase 266 Quest LOD cleanup and Phase 267 label-sync behavior, then hardens the late-load compatibility shim so stale Phase 261-267 labels are overwritten and legacy finished-lobby geometry remains suppressed.",
+  "label": "PHASE-268-FINAL-RUNTIME-CACHE-SYNC-LOCK",
+  "notes": "Game-side only. Site untouched. Phase 261 new lobby remains active. Phase 265 pillar/sign clearance and Phase 266 Quest LOD cleanup remain preserved. No Phase 84 rollback. No old lobby. No Truitive or founder content.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
