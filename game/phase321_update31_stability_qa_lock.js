@@ -29,7 +29,7 @@ function collect(){
   const desktopReady=rendererReady&&roomButtonsReady&&movementReady;
   const androidReady=mobileCoverageReady&&roomButtonsReady&&movementReady;
   const readyForPackage=desktopReady&&androidReady&&pokerDealReady;
-  checks={build:LABEL,active:true,viewport:{w:vw,h:vh},canvas:{clientWidth:cw,clientHeight:ch,width:dw,height:dh},rendererReady,cameraReady,viewportReady,mobileCoverageReady,roomButtonsReady,movementReady,pokerDealReady,desktopReady,androidReady,readyForPackage,lastRoom,lastMove,lastDeal,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  checks={build:LABEL,active:true,viewport:{w:vw,h:vh},canvas:{clientWidth:cw,clientHeight:ch,width:dw,height:dh},rendererReady,cameraReady,viewportReady,mobileCoverageReady,roomButtonsReady,movementReady,pokerDealReady,desktopReady,androidReady,readyForPackage,phase322Chained:true,lastRoom,lastMove,lastDeal,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_PHASE321_UPDATE31_STABILITY_QA_STATE=checks;
   window.SVR_UPDATE31_READY_STATE=checks;
   if(!mobileCoverageReady)fixViewport();
@@ -57,7 +57,8 @@ function install(){
   window.addEventListener("resize",audit,{passive:true});window.visualViewport?.addEventListener?.("resize",audit,{passive:true});window.visualViewport?.addEventListener?.("scroll",audit,{passive:true});
   window.addEventListener("pointerdown",audit,{passive:true});window.addEventListener("keydown",audit,{passive:true});
   window.SVR_PHASE321_AUDIT_UPDATE31_STABILITY=audit;
-  window.SVR_PHASE321_UPDATE31_STABILITY_QA_LOCK={build:LABEL,active:true,checks:["canvas","roomButtons","movementPad","pokerDeal","androidViewport","desktopPreview"],siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE321_UPDATE31_STABILITY_QA_LOCK={build:LABEL,active:true,checks:["canvas","roomButtons","movementPad","pokerDeal","androidViewport","desktopPreview"],phase322Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_LIVE_BUILD_POINTER=LABEL;window.SVR_LOCKED_FINAL_BUILD=LABEL;audit();return true;
 }
 install();setInterval(audit,2500);
+import("./phase322_update31_final_manifest_pack_prep_lock.js?v=phase322-final-prep").catch(e=>{window.SVR_PHASE322_IMPORT_ERROR=String(e?.message||e);});
