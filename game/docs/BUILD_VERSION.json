@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-269-BOOT-CACHE-BUSTER-SYNC-LOCK",
-  "track": "game-only-boot-cache-buster-sync-lock",
+  "build": "PHASE-270-LIVE-BUILD-POINTER-LOCK",
+  "track": "game-only-live-build-pointer-lock",
   "siteTouched": false,
-  "phase": "3.1-AV / Phase 269",
-  "summary": "Updates the game boot loader to Phase 269 cache-busted module URLs, keeps Phase 266 Quest LOD cleanup, keeps Phase 265 pillar/sign clearance, and forces late runtime labels to resolve to Phase 269.",
-  "label": "PHASE-269-BOOT-CACHE-BUSTER-SYNC-LOCK",
-  "notes": "Game-side only. Site untouched. Phase 261 new lobby remains active. No Phase 84 rollback. No old lobby. No Truitive or founder content.",
+  "phase": "3.1-AW / Phase 270",
+  "summary": "Updates the game boot loader and late runtime shim to Phase 270 cache-busted module URLs, exposes SVR_LIVE_BUILD_POINTER, keeps Phase 266 Quest LOD cleanup, and keeps Phase 265 pillar/sign clearance.",
+  "label": "PHASE-270-LIVE-BUILD-POINTER-LOCK",
+  "notes": "Game-side only. Site untouched. Phase 261 new lobby remains active. No Phase 84 rollback. No Truitive or founder content.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
