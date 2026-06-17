@@ -1,4 +1,4 @@
-const LABEL = "PHASE-268-FINAL-RUNTIME-CACHE-SYNC-LOCK";
+const LABEL = "PHASE-269-BOOT-CACHE-BUSTER-SYNC-LOCK";
 const LEGACY_ROOT = "PHASE101S_FINISHED_LOBBY_ROOT";
 
 function removeLegacyFinishedLobbyRoot(scene){
@@ -10,24 +10,25 @@ function syncRuntimeLabel(){
   try { document.title = `SVR Poker • ${LABEL}`; } catch {}
   try { document.body?.setAttribute("data-build", LABEL); } catch {}
   const status = document.getElementById("status");
-  if (status && /PHASE-26[1-7]|Phase 26[1-7]|PHASE-101S/i.test(status.textContent || "")) status.textContent = `Ready. ${LABEL}`;
+  if (status && /PHASE-26[1-8]|Phase 26[1-8]|PHASE-101S/i.test(status.textContent || "")) status.textContent = `Ready. ${LABEL}`;
   window.SVR_LOCKED_FINAL_BUILD = LABEL;
-  window.SVR_PHASE268_FINAL_RUNTIME_CACHE_SYNC_LOCK = {
+  window.SVR_PHASE269_BOOT_CACHE_BUSTER_SYNC_LOCK = {
     build: LABEL,
     active: true,
-    finalRuntimeLabelShim: true,
+    bootCacheBuster: true,
     lateLegacyGeometrySuppressed: true,
     phase261BaselinePreserved: true,
     phase265PillarSignClearancePreserved: true,
     phase266QuestLodPreserved: true,
-    phase267RuntimeLabelSyncPreserved: true,
+    phase268RuntimeCacheSyncPreserved: true,
     noPhase84: true,
     noOldLobby: true,
     noTruitive: true,
     siteTouched: false,
     checkedAt: new Date().toISOString()
   };
-  window.SVR_PHASE267_RUNTIME_LABEL_SYNC_LOCK = window.SVR_PHASE268_FINAL_RUNTIME_CACHE_SYNC_LOCK;
+  window.SVR_PHASE268_FINAL_RUNTIME_CACHE_SYNC_LOCK = window.SVR_PHASE269_BOOT_CACHE_BUSTER_SYNC_LOCK;
+  window.SVR_PHASE267_RUNTIME_LABEL_SYNC_LOCK = window.SVR_PHASE269_BOOT_CACHE_BUSTER_SYNC_LOCK;
   window.SVR_PHASE101S_FINISHED_LOBBY = {
     build: LABEL,
     active: true,
@@ -43,8 +44,8 @@ function install(){
   if (!scene) return false;
   const removed = removeLegacyFinishedLobbyRoot(scene);
   syncRuntimeLabel();
-  window.SVR_PHASE268_FINAL_RUNTIME_CACHE_SYNC_LOCK.legacyRootRemoved = removed;
-  window.SVR_RELEASE_BOOT?.("phase268-final-runtime-cache-sync-loaded");
+  window.SVR_PHASE269_BOOT_CACHE_BUSTER_SYNC_LOCK.legacyRootRemoved = removed;
+  window.SVR_RELEASE_BOOT?.("phase269-boot-cache-buster-sync-loaded");
   return true;
 }
 
@@ -53,8 +54,8 @@ let tries = 0;
 const timer = setInterval(() => {
   tries += 1;
   if (install() || tries > 90) clearInterval(timer);
-}, 180);
-setTimeout(install, 600);
-setTimeout(install, 1800);
-setTimeout(install, 3600);
-setTimeout(install, 7200);
+}, 160);
+setTimeout(install, 500);
+setTimeout(install, 1500);
+setTimeout(install, 3200);
+setTimeout(install, 6400);
