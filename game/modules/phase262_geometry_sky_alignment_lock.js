@@ -1,13 +1,13 @@
 import * as THREE from "three";
 
-const LABEL = "PHASE-263-GEOMETRY-SKY-HARD-LOCK";
+const LABEL = "PHASE-264-QUEST-SCREENSHOT-MICRO-ALIGNMENT-LOCK";
 
 function objectName(obj){ return String(obj?.name || ""); }
 function hideObject(obj){
   if (!obj) return;
   obj.visible = false;
-  obj.userData.phase263Hidden = true;
-  obj.traverse?.((child)=>{ child.visible = false; child.userData.phase263Hidden = true; });
+  obj.userData.phase264Hidden = true;
+  obj.traverse?.((child)=>{ child.visible = false; child.userData.phase264Hidden = true; });
 }
 function showObject(obj){
   if (!obj) return;
@@ -35,7 +35,7 @@ function keepSinglePlanet(scene, token, keepName, applyPose){
   let keep = scene.getObjectByName(keepName) || matches.find((obj)=>obj.isMesh || obj.isGroup) || null;
   matches.forEach((obj)=>{
     const name = objectName(obj).toUpperCase();
-    if (name.startsWith("PHASE262_") || name.startsWith("PHASE263_")) return;
+    if (name.startsWith("PHASE262_") || name.startsWith("PHASE263_") || name.startsWith("PHASE264_")) return;
     if (obj === keep || keep?.parent === obj || obj.parent === keep) return;
     if (obj.isMesh || obj.isGroup || name.includes("LOCKED")) hideObject(obj);
   });
@@ -44,10 +44,10 @@ function keepSinglePlanet(scene, token, keepName, applyPose){
 }
 function hideUnsupportedOverlay(){
   try{
-    if (!document.getElementById("phase263-clean-overlay-style")){
+    if (!document.getElementById("phase264-clean-overlay-style")){
       const style = document.createElement("style");
-      style.id = "phase263-clean-overlay-style";
-      style.textContent = "[data-phase263-hidden='true']{display:none!important;visibility:hidden!important;opacity:0!important;}";
+      style.id = "phase264-clean-overlay-style";
+      style.textContent = "[data-phase264-hidden='true']{display:none!important;visibility:hidden!important;opacity:0!important;}";
       document.head.appendChild(style);
     }
     Array.from(document.querySelectorAll("body *")).forEach((node)=>{
@@ -56,7 +56,7 @@ function hideUnsupportedOverlay(){
         node.style.display = "none";
         node.style.visibility = "hidden";
         node.style.opacity = "0";
-        node.setAttribute("data-phase263-hidden", "true");
+        node.setAttribute("data-phase264-hidden", "true");
       }
     });
   }catch(_err){}
@@ -72,22 +72,34 @@ function alignStorefrontShells(scene){
   }).forEach(hideObject);
 
   const shellPositions = {
-    PHASE202_WELLNESS_STOREFRONT_SHELL: [-12, -13.44],
-    PHASE202_PGA_STOREFRONT_SHELL: [-6, -13.44],
-    PHASE202_PLAY_STOREFRONT_SHELL: [0, -13.44],
-    PHASE202_STORE_STOREFRONT_SHELL: [6, -13.44],
-    PHASE202_SCORPION_STOREFRONT_SHELL: [12, -13.44]
+    PHASE202_WELLNESS_STOREFRONT_SHELL: [-12, -13.54],
+    PHASE202_PGA_STOREFRONT_SHELL: [-6, -13.54],
+    PHASE202_PLAY_STOREFRONT_SHELL: [0, -13.54],
+    PHASE202_STORE_STOREFRONT_SHELL: [6, -13.54],
+    PHASE202_SCORPION_STOREFRONT_SHELL: [12, -13.54]
   };
   Object.entries(shellPositions).forEach(([name, [x,z]])=>{
     const obj = root.getObjectByName(name);
     if (obj){ obj.position.x = x; obj.position.z = z; }
   });
 
+  const signPositions = {
+    PHASE202_WELLNESS_STOREFRONT_SHELL_SIGN: [-12, 2.52, -12.54],
+    PHASE202_PGA_STOREFRONT_SHELL_SIGN: [-6, 2.52, -12.54],
+    PHASE202_PLAY_STOREFRONT_SHELL_SIGN: [0, 2.52, -12.54],
+    PHASE202_STORE_STOREFRONT_SHELL_SIGN: [6, 2.52, -12.54],
+    PHASE202_SCORPION_STOREFRONT_SHELL_SIGN: [12, 2.52, -12.54]
+  };
+  Object.entries(signPositions).forEach(([name, [x,y,z]])=>{
+    const obj = root.getObjectByName(name);
+    if (obj){ obj.position.set(x,y,z); obj.renderOrder = 180; }
+  });
+
   [
-    ["PHASE202_WELLNESS_HOLOGRAM_CAROUSEL_FRAME", -12, -11.64, 0.74],
-    ["PHASE202_PGA_PRACTICE_PREVIEW_FRAME", -6, -11.68, 0.78],
-    ["PHASE202_STORE_DISPLAY_RACKS", 6, -11.58, 0.68],
-    ["PHASE202_SCORPION_PRIVATE_DOOR_FRAME", 12, -11.70, 0.78]
+    ["PHASE202_WELLNESS_HOLOGRAM_CAROUSEL_FRAME", -12, -11.82, 0.68],
+    ["PHASE202_PGA_PRACTICE_PREVIEW_FRAME", -6, -11.86, 0.72],
+    ["PHASE202_STORE_DISPLAY_RACKS", 6, -11.82, 0.56],
+    ["PHASE202_SCORPION_PRIVATE_DOOR_FRAME", 12, -11.88, 0.72]
   ].forEach(([name, x, z, scale])=>{
     const obj = root.getObjectByName(name);
     if (obj){ obj.position.set(x,0,z); obj.scale.setScalar(scale); }
@@ -95,49 +107,49 @@ function alignStorefrontShells(scene){
 
   const storeRack = root.getObjectByName("PHASE202_STORE_DISPLAY_RACKS");
   if (storeRack){
-    storeRack.traverse((obj)=>{ if (objectName(obj).includes("PRODUCT_PLINTH")) softenMaterials(obj, 0.38); });
+    storeRack.traverse((obj)=>{ if (objectName(obj).includes("PRODUCT_PLINTH")) softenMaterials(obj, 0.30); });
   }
   return { storefrontRoot:true };
 }
 function alignColumns(scene){
   collect(scene, (obj)=>/^PHASE200_REAR_ORDERED_COLUMN_\d+$/.test(objectName(obj).toUpperCase())).forEach((obj)=>{
-    obj.position.z = -16.78;
-    obj.scale.x = 0.70;
-    obj.scale.z = 0.70;
+    obj.position.z = -17.05;
+    obj.scale.x = 0.62;
+    obj.scale.z = 0.62;
     obj.traverse((child)=>{
       const n = objectName(child).toUpperCase();
-      if (n.includes("CAP") || n.includes("BASE")) child.scale.x = Math.min(child.scale.x, 0.76);
+      if (n.includes("CAP") || n.includes("BASE")) child.scale.x = Math.min(child.scale.x, 0.68);
     });
   });
 }
 function alignPlanets(scene){
   const moon = keepSinglePlanet(scene, "MOON", "PHASE200_SINGLE_VISIBLE_MOON_LOCKED", (obj)=>{
-    obj.position.set(-9.8,18.4,-36.0);
-    obj.scale.setScalar(0.64);
+    obj.position.set(-10.4,19.2,-39.0);
+    obj.scale.setScalar(0.60);
     obj.renderOrder = 5;
-    obj.userData.phase263SkyLocked = true;
+    obj.userData.phase264SkyLocked = true;
   });
   const mars = keepSinglePlanet(scene, "MARS", "PHASE200_SINGLE_VISIBLE_MARS_LOCKED", (obj)=>{
-    obj.position.set(8.2,16.9,-39.5);
-    obj.scale.setScalar(0.66);
+    obj.position.set(8.8,17.6,-42.0);
+    obj.scale.setScalar(0.62);
     obj.renderOrder = 5;
-    obj.userData.phase263SkyLocked = true;
+    obj.userData.phase264SkyLocked = true;
   });
   const root = scene.getObjectByName("PHASE200_ORDERED_GRAND_LOBBY_ROOT") || scene;
-  let moonHalo = scene.getObjectByName("PHASE263_MOON_SOFT_HALO") || scene.getObjectByName("PHASE262_MOON_SOFT_HALO");
+  let moonHalo = scene.getObjectByName("PHASE264_MOON_SOFT_HALO") || scene.getObjectByName("PHASE263_MOON_SOFT_HALO") || scene.getObjectByName("PHASE262_MOON_SOFT_HALO");
   if (moon && !moonHalo){
-    moonHalo = new THREE.Mesh(new THREE.RingGeometry(0.96,1.28,96), new THREE.MeshBasicMaterial({ color:0xdde6ff, transparent:true, opacity:0.09, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
-    moonHalo.name = "PHASE263_MOON_SOFT_HALO";
+    moonHalo = new THREE.Mesh(new THREE.RingGeometry(0.90,1.18,96), new THREE.MeshBasicMaterial({ color:0xdde6ff, transparent:true, opacity:0.08, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
+    moonHalo.name = "PHASE264_MOON_SOFT_HALO";
     root.add(moonHalo);
   }
-  if (moon && moonHalo){ moonHalo.name = "PHASE263_MOON_SOFT_HALO"; moonHalo.visible = true; moonHalo.position.copy(moon.position); moonHalo.rotation.x = Math.PI * 0.5; }
-  let marsHalo = scene.getObjectByName("PHASE263_MARS_SOFT_HALO") || scene.getObjectByName("PHASE262_MARS_SOFT_HALO");
+  if (moon && moonHalo){ moonHalo.name = "PHASE264_MOON_SOFT_HALO"; moonHalo.visible = true; moonHalo.position.copy(moon.position); moonHalo.rotation.x = Math.PI * 0.5; }
+  let marsHalo = scene.getObjectByName("PHASE264_MARS_SOFT_HALO") || scene.getObjectByName("PHASE263_MARS_SOFT_HALO") || scene.getObjectByName("PHASE262_MARS_SOFT_HALO");
   if (mars && !marsHalo){
-    marsHalo = new THREE.Mesh(new THREE.RingGeometry(0.44,0.64,80), new THREE.MeshBasicMaterial({ color:0xff8b67, transparent:true, opacity:0.08, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
-    marsHalo.name = "PHASE263_MARS_SOFT_HALO";
+    marsHalo = new THREE.Mesh(new THREE.RingGeometry(0.40,0.58,80), new THREE.MeshBasicMaterial({ color:0xff8b67, transparent:true, opacity:0.07, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
+    marsHalo.name = "PHASE264_MARS_SOFT_HALO";
     root.add(marsHalo);
   }
-  if (mars && marsHalo){ marsHalo.name = "PHASE263_MARS_SOFT_HALO"; marsHalo.visible = true; marsHalo.position.copy(mars.position); marsHalo.rotation.x = Math.PI * 0.5; }
+  if (mars && marsHalo){ marsHalo.name = "PHASE264_MARS_SOFT_HALO"; marsHalo.visible = true; marsHalo.position.copy(mars.position); marsHalo.rotation.x = Math.PI * 0.5; }
   return { moon:!!moon, mars:!!mars };
 }
 function applyApprovalSafety(scene){
@@ -150,22 +162,24 @@ function applyOnce(scene){
   alignColumns(scene);
   const planets = alignPlanets(scene);
   applyApprovalSafety(scene);
-  window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK = {
+  window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK = {
     label: LABEL,
     locked: true,
     duplicatePhase200ArchPanelsHidden: true,
     storefrontGeometryTightened: !!shells.storefrontRoot,
+    storefrontSignsRaised: true,
     rearColumnsSlimmedAndPushedBack: true,
     moonHighBackLocked: planets.moon,
     marsHighBackLocked: planets.mars,
     noTruitiveRuntimePolicy: true,
     checkedAt: new Date().toISOString()
   };
-  window.SVR_PHASE262_GEOMETRY_SKY_LOCK = window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK;
+  window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK = window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK;
+  window.SVR_PHASE262_GEOMETRY_SKY_LOCK = window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK;
 }
 export function installPhase262GeometrySkyAlignmentLock({ scene, log = console.log } = {}){
   if (!scene) return null;
   [0,180,650,1400,2800].forEach((delay)=>setTimeout(()=>applyOnce(scene), delay));
-  log(`[Phase263] hard geometry / duplicate storefront / moon-Mars alignment lock installed`);
-  return window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK || { label: LABEL, pending:true };
+  log(`[Phase264] Quest screenshot micro-alignment lock installed`);
+  return window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK || { label: LABEL, pending:true };
 }
