@@ -75,7 +75,7 @@ function texture(){
   });
   ctx.textAlign="center";
   ctx.fillStyle="#e8f4ff"; ctx.font="700 22px system-ui,Arial"; ctx.fillText(`Last: ${qa.lastEvent}`,540,410);
-  ctx.fillStyle="#ffffff"; ctx.font="700 20px system-ui,Arial"; ctx.fillText("Once complete, Phase 311 can begin local two-player / ghost multiplayer prototype",540,450);
+  ctx.fillStyle="#ffffff"; ctx.font="700 20px system-ui,Arial"; ctx.fillText("Phase 311 local ghost multiplayer prototype is now chained",540,450);
   const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
 }
 function clearPanel(){
@@ -108,6 +108,7 @@ function install(){
     build:LABEL,
     active:true,
     steps:STEPS,
+    phase311Chained:true,
     nextRecommended:"PHASE-311-LOCAL-TWO-PLAYER-GHOST-MULTIPLAYER-PROTOTYPE",
     siteTouched:false,
     publicRootTouched:false,
@@ -121,3 +122,4 @@ function install(){
 }
 install();
 setInterval(()=>{install(); showPanel();},9000);
+import("./phase311_local_two_player_ghost_multiplayer_prototype.js?v=phase311-local-ghost").catch(e=>{window.SVR_PHASE311_IMPORT_ERROR=String(e?.message||e);});
