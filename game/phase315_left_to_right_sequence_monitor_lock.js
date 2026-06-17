@@ -39,7 +39,7 @@ function ingest(detail){
   if(!detail)return null;
   if(detail.seatIndex===1&&detail.round===1)sequence=[];
   sequence.push(detail);valid=validate(sequence);
-  const state={build:LABEL,active:true,direction:"left-to-right",valid,cardCount:sequence.length,lastCard:detail,sequence:[...sequence],source:"svr-left-to-right-card-dealt",siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  const state={build:LABEL,active:true,direction:"left-to-right",valid,cardCount:sequence.length,lastCard:detail,sequence:[...sequence],source:"svr-left-to-right-card-dealt",phase316Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_PHASE315_LEFT_TO_RIGHT_SEQUENCE_MONITOR_STATE=state;
   window.SVR_LIVE_LEFT_TO_RIGHT_CARD_SEQUENCE=state;
   try{window.dispatchEvent(new CustomEvent("svr-left-to-right-sequence-monitor",{detail:state}));}catch{}
@@ -50,7 +50,8 @@ function install(){
   if(installed)return true;installed=true;
   window.addEventListener("svr-left-to-right-card-dealt",e=>ingest(e.detail));
   window.SVR_PHASE315_AUDIT_LEFT_TO_RIGHT_SEQUENCE=()=>{seed();return window.SVR_PHASE315_LEFT_TO_RIGHT_SEQUENCE_MONITOR_STATE||{build:LABEL,active:true,valid,sequence};};
-  window.SVR_PHASE315_LEFT_TO_RIGHT_SEQUENCE_MONITOR_LOCK={build:LABEL,active:true,listensFor:"svr-left-to-right-card-dealt",emits:"svr-left-to-right-sequence-monitor",siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE315_LEFT_TO_RIGHT_SEQUENCE_MONITOR_LOCK={build:LABEL,active:true,listensFor:"svr-left-to-right-card-dealt",emits:"svr-left-to-right-sequence-monitor",phase316Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_LIVE_BUILD_POINTER=LABEL;window.SVR_LOCKED_FINAL_BUILD=LABEL;seed();draw();return true;
 }
 install();setInterval(()=>{install();seed();draw();},5000);
+import("./phase316_deal_order_seat_badges_lock.js?v=phase316-seat-badges").catch(e=>{window.SVR_PHASE316_IMPORT_ERROR=String(e?.message||e);});
