@@ -29,13 +29,14 @@ function draw(){
   });
   return true;
 }
-function onCard(d){if(d?.seatIndex)activeSeatIndex=Number(d.seatIndex);draw();const state={build:LABEL,active:true,activeSeatIndex,activePlayer:d?.name||null,arrowCount:order().length,direction:"left-to-right",siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};window.SVR_PHASE317_DEAL_DIRECTION_TABLE_ARROWS_STATE=state;try{window.dispatchEvent(new CustomEvent("svr-deal-direction-arrows-updated",{detail:state}));}catch{}status("Deal direction arrows updated");return state;}
+function onCard(d){if(d?.seatIndex)activeSeatIndex=Number(d.seatIndex);draw();const state={build:LABEL,active:true,activeSeatIndex,activePlayer:d?.name||null,arrowCount:order().length,direction:"left-to-right",phase318Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};window.SVR_PHASE317_DEAL_DIRECTION_TABLE_ARROWS_STATE=state;try{window.dispatchEvent(new CustomEvent("svr-deal-direction-arrows-updated",{detail:state}));}catch{}status("Deal direction arrows updated");return state;}
 function install(){
   if(installed)return true;installed=true;
   window.addEventListener("svr-left-to-right-card-dealt",e=>onCard(e.detail));
   window.addEventListener("svr-deal-order-seat-badges-updated",e=>{activeSeatIndex=Number(e.detail?.activeSeatIndex||activeSeatIndex||0);draw();});
   window.SVR_PHASE317_REFRESH_DEAL_ARROWS=draw;
-  window.SVR_PHASE317_DEAL_DIRECTION_TABLE_ARROWS_LOCK={build:LABEL,active:true,source:"SVR_PHASE169_DEAL_ORDER",listensFor:"svr-left-to-right-card-dealt",siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE317_DEAL_DIRECTION_TABLE_ARROWS_LOCK={build:LABEL,active:true,source:"SVR_PHASE169_DEAL_ORDER",listensFor:"svr-left-to-right-card-dealt",phase318Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_LIVE_BUILD_POINTER=LABEL;window.SVR_LOCKED_FINAL_BUILD=LABEL;draw();return true;
 }
 install();setInterval(()=>{install();draw();},6000);
+import("./phase318_deal_path_pulse_lock.js?v=phase318-deal-path").catch(e=>{window.SVR_PHASE318_IMPORT_ERROR=String(e?.message||e);});
