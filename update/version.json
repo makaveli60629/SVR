@@ -1,1 +1,1 @@
-{"version":"Update 3.1 Phase 289","build":"PHASE-289-CONNECTION-BACKEND-HANDOFF-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 289 locks the connection backend handoff requirements."}
+{"version":"Update 3.1 Phase 290","build":"PHASE-290-WEBSOCKET-PRESENCE-CLIENT-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 290 adds a disabled presence client connector."}
