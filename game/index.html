@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-  <title>SVR Poker • PHASE-261-ROMAN-CANOPY-PILLAR-SMOOTH-LOBBY-LOCK</title>
+  <title>SVR Poker • PHASE-266-QUEST-LOD-PERFORMANCE-CLEANUP-LOCK</title>
   <meta name="theme-color" content="#050508"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
-  <link rel="manifest" href="./manifest.json?v=phase261"/>
+  <link rel="manifest" href="./manifest.json?v=phase266"/>
   <style>
     :root{color-scheme:dark;--cyan:#7ffcff;--gold:#ffd98a;--bg:#02040b;--purple:#b55cff}
     html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overscroll-behavior:none;touch-action:none}
@@ -17,66 +17,65 @@
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-261-ROMAN-CANOPY-PILLAR-SMOOTH-LOBBY-LOCK">
+<body data-build="PHASE-266-QUEST-LOD-PERFORMANCE-CLEANUP-LOCK">
   <div id="app"></div>
   <div id="safeStage">
     <section class="safe-card">
-      <span class="pill">PHASE 261 ACTIVE</span>
+      <span class="pill">PHASE 266 ACTIVE</span>
       <h1>SVR POKER</h1>
-      <h2>Roman Canopy + Smooth Pillar Lobby Lock</h2>
-      <p id="safeStatus">Starting lobby. Roman canopy and pillar polish will load after the base scene...</p>
+      <h2>Quest LOD + Pillar/Sign Clearance Lock</h2>
+      <p id="safeStatus">Starting lobby. Performance cleanup and aligned storefront geometry will load after the base scene...</p>
       <div>
         <button class="btn cyan" id="startRuntimeBtn" type="button">Start Lobby Now</button>
         <button class="btn" id="clearCacheBtn" type="button">Clear Game Cache</button>
-        <a class="btn" href="./index.html?v=phase261-roman-canopy-manual">Reload Fresh</a>
+        <a class="btn" href="./index.html?v=phase266-quest-lod-manual">Reload Fresh</a>
       </div>
     </section>
   </div>
   <div id="bootFallback"></div><div id="hud"><span id="status"></span><span id="mode"></span><button id="toggleLog" type="button">Log</button><button id="toggleJoints" type="button">Joints</button></div><div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      var BUILD='PHASE-261-ROMAN-CANOPY-PILLAR-SMOOTH-LOBBY-LOCK';
+      var BUILD='PHASE-266-QUEST-LOD-PERFORMANCE-CLEANUP-LOCK';
       var loaded=false;
       var status=document.getElementById('safeStatus');
-      window.SVR_PHASE261_BOOT={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString()};
-      function note(msg){ if(status) status.textContent=msg; window.SVR_PHASE261_BOOT.lastMessage=msg; window.SVR_PHASE261_BOOT.checkedAt=new Date().toISOString(); }
+      window.SVR_PHASE266_BOOT={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString()};
+      function note(msg){ if(status) status.textContent=msg; window.SVR_PHASE266_BOOT.lastMessage=msg; window.SVR_PHASE266_BOOT.checkedAt=new Date().toISOString(); }
       function hideOverlay(reason){
         document.body.classList.add('boot-released','runtime-visible','overlay-released');
         var safe=document.getElementById('safeStage');
         if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';safe.setAttribute('aria-hidden','true');}
         window.__SVR_GAME_READY__=true; window.SVR_GAME_READY=true;
-        window.SVR_PHASE261_BOOT.overlayReleased=true;
-        window.SVR_PHASE261_BOOT.reason=reason;
-        window.SVR_PHASE261_BOOT.releasedAt=new Date().toISOString();
+        window.SVR_PHASE266_BOOT.overlayReleased=true;
+        window.SVR_PHASE266_BOOT.reason=reason;
+        window.SVR_PHASE266_BOOT.releasedAt=new Date().toISOString();
       }
       function release(reason){ hideOverlay(reason||'release'); }
       window.SVR_RELEASE_BOOT=release;
       window.SVR_FORCE_HIDE_SAFE_STAGE=hideOverlay;
-      async function clearBrowserCaches(){try{if(navigator.serviceWorker){var regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(function(r){return r.unregister();}));window.SVR_PHASE261_BOOT.serviceWorkersUnregistered=regs.length;}}catch(e){window.SVR_PHASE261_BOOT.swError=String(e.message||e);}try{if(window.caches){var keys=await caches.keys();await Promise.all(keys.map(function(k){return caches.delete(k);}));window.SVR_PHASE261_BOOT.cachesDeleted=keys.length;}}catch(e){window.SVR_PHASE261_BOOT.cacheError=String(e.message||e);}}
+      async function clearBrowserCaches(){try{if(navigator.serviceWorker){var regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(function(r){return r.unregister();}));window.SVR_PHASE266_BOOT.serviceWorkersUnregistered=regs.length;}}catch(e){window.SVR_PHASE266_BOOT.swError=String(e.message||e);}try{if(window.caches){var keys=await caches.keys();await Promise.all(keys.map(function(k){return caches.delete(k);}));window.SVR_PHASE266_BOOT.cachesDeleted=keys.length;}}catch(e){window.SVR_PHASE266_BOOT.cacheError=String(e.message||e);}}
       function addModule(src){ return new Promise(function(resolve,reject){ var s=document.createElement('script'); s.type='module'; s.src=src; s.onload=resolve; s.onerror=function(){reject(new Error('Failed '+src));}; document.body.appendChild(s); }); }
       async function startRuntime(){
-        if(loaded) return; loaded=true; window.SVR_PHASE261_BOOT.loaded=true;
-        note('Starting SVR Roman canopy lobby path...');
+        if(loaded) return; loaded=true; window.SVR_PHASE266_BOOT.loaded=true;
+        note('Starting SVR Phase 266 Quest LOD lobby path...');
         try{
-          await addModule('./phase101_boot_load_screen_recovery.js?v=phase261');
-          await addModule('./phase101_partial_runtime_render_guard.js?v=phase261');
-          await addModule('./phase101_render_marker_cleanup.js?v=phase261');
-          await addModule('./main.js?v=phase261');
-          setTimeout(function(){ addModule('./phase101s_finished_lobby_lock.js?v=phase261').catch(function(e){window.SVR_PHASE261_BOOT.errors.push(String(e.message||e));}); },700);
-          setTimeout(function(){ addModule('./phase101t_lobby_interaction_portal_qa_lock.js?v=phase261').catch(function(e){window.SVR_PHASE261_BOOT.errors.push(String(e.message||e));}); },1250);
-          setTimeout(function(){ addModule('./phase101v_safe_loader_bridge.js?v=phase261').catch(function(e){window.SVR_PHASE261_BOOT.errors.push(String(e.message||e));}); },1750);
-          setTimeout(function(){ addModule('./phase261_roman_canopy_pillar_smooth_lobby_lock.js?v=phase261-final').catch(function(e){window.SVR_PHASE261_BOOT.errors.push(String(e.message||e));}); },2300);
-          setTimeout(function(){ addModule('./phase261_roman_canopy_pillar_smooth_lobby_lock.js?v=phase261-final-repeat').catch(function(e){window.SVR_PHASE261_BOOT.errors.push(String(e.message||e));}); },6200);
-          note('Lobby launched. Roman canopy and pillar polish armed...');
-          setTimeout(function(){ hideOverlay('phase261-runtime-launched'); },350);
-        }catch(e){window.SVR_PHASE261_BOOT.errors.push(String(e.message||e));note('Runtime module failed, showing boot-safe fallback...');try{await addModule('./phase101_boot_load_screen_recovery.js?v=phase261-fallback');}catch(_e){}setTimeout(function(){hideOverlay('phase261-fallback-after-error');},650);}
+          await addModule('./phase101_boot_load_screen_recovery.js?v=phase266');
+          await addModule('./phase101_partial_runtime_render_guard.js?v=phase266');
+          await addModule('./phase101_render_marker_cleanup.js?v=phase266');
+          await addModule('./main.js?v=phase266-quest-lod');
+          setTimeout(function(){ addModule('./phase101s_finished_lobby_lock.js?v=phase266').catch(function(e){window.SVR_PHASE266_BOOT.errors.push(String(e.message||e));}); },700);
+          setTimeout(function(){ addModule('./phase101t_lobby_interaction_portal_qa_lock.js?v=phase266').catch(function(e){window.SVR_PHASE266_BOOT.errors.push(String(e.message||e));}); },1250);
+          setTimeout(function(){ addModule('./phase101v_safe_loader_bridge.js?v=phase266').catch(function(e){window.SVR_PHASE266_BOOT.errors.push(String(e.message||e));}); },1750);
+          setTimeout(function(){ addModule('./phase261_roman_canopy_pillar_smooth_lobby_lock.js?v=phase266-preserve').catch(function(e){window.SVR_PHASE266_BOOT.errors.push(String(e.message||e));}); },2300);
+          note('Lobby launched. Phase 266 Quest LOD cleanup armed...');
+          setTimeout(function(){ hideOverlay('phase266-runtime-launched'); },350);
+        }catch(e){window.SVR_PHASE266_BOOT.errors.push(String(e.message||e));note('Runtime module failed, showing boot-safe fallback...');try{await addModule('./phase101_boot_load_screen_recovery.js?v=phase266-fallback');}catch(_e){}setTimeout(function(){hideOverlay('phase266-fallback-after-error');},650);}
       }
       document.getElementById('startRuntimeBtn').addEventListener('click', startRuntime);
       document.getElementById('clearCacheBtn').addEventListener('click', async function(){ note('Clearing cache...'); await clearBrowserCaches(); note('Cache cleared. Starting lobby...'); startRuntime(); });
-      window.addEventListener('error',function(e){window.SVR_PHASE261_BOOT.errors.push(String(e.message||e.error||e)); hideOverlay('error-release');});
-      window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE261_BOOT.errors.push(String((e.reason&&e.reason.message)||e.reason||e)); hideOverlay('promise-release');});
+      window.addEventListener('error',function(e){window.SVR_PHASE266_BOOT.errors.push(String(e.message||e.error||e)); hideOverlay('error-release');});
+      window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE266_BOOT.errors.push(String((e.reason&&e.reason.message)||e.reason||e)); hideOverlay('promise-release');});
       var overlayWatch=setInterval(function(){if(window.__SVR_RENDERER__||window.__SVR_SCENE__||document.querySelector('canvas')){hideOverlay('scene-or-canvas-detected');clearInterval(overlayWatch);}},250);
-      clearBrowserCaches().finally(function(){note('Cache checked. Starting Roman canopy lobby...'); setTimeout(startRuntime,250);});
+      clearBrowserCaches().finally(function(){note('Cache checked. Starting Phase 266 lobby...'); setTimeout(startRuntime,250);});
       setTimeout(function(){if(!window.__SVR_RENDERER__&&!window.__SVR_SCENE__) startRuntime();},1200);
       setTimeout(function(){hideOverlay('absolute-overlay-release-1800ms');},1800);
     })();
