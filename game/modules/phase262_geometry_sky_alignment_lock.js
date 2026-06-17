@@ -5,15 +5,6 @@ const LABEL = "PHASE-262-NO-TRUITIVE-GEOMETRY-SKY-LOCK";
 function objectName(obj){
   return String(obj?.name || "");
 }
-function disposeObject(obj){
-  if (!obj) return;
-  if (obj.geometry?.dispose) obj.geometry.dispose();
-  const mats = Array.isArray(obj.material) ? obj.material : obj.material ? [obj.material] : [];
-  mats.forEach((mat)=>{
-    if (mat?.map?.dispose) mat.map.dispose();
-    if (mat?.dispose) mat.dispose();
-  });
-}
 function hideObject(obj){
   if (!obj) return;
   obj.visible = false;
@@ -47,7 +38,6 @@ function keepSinglePlanet(scene, token, keepName, applyPose){
   let keep = scene.getObjectByName(keepName) || matches.find((obj)=>obj.isMesh || obj.isGroup) || null;
   matches.forEach((obj)=>{
     if (obj === keep || keep?.parent === obj || obj.parent === keep) return;
-    // Avoid hiding documentation lights accidentally; only hide obvious mesh/group planet duplicates.
     if (obj.isMesh || obj.isGroup || objectName(obj).toUpperCase().includes("LOCKED")) hideObject(obj);
   });
   if (keep){
@@ -60,7 +50,6 @@ function alignStorefrontShells(scene){
   const root = scene.getObjectByName("PHASE202_STOREFRONT_SHELLS_ROOT");
   if (!root) return { storefrontRoot:false };
 
-  // Hide old Phase200 arch labels/recesses behind the Phase202 storefront shells.
   const bayTokens = ["WELLNESS_ARCH_BAY", "PGA_ARCH_BAY", "PLAY_ARCH_BAY", "STORE_ARCH_BAY", "SCORPION_ARCH_BAY"];
   collect(scene, (obj)=>{
     const n = objectName(obj).toUpperCase();
@@ -94,7 +83,6 @@ function alignStorefrontShells(scene){
     obj.scale.setScalar(scale);
   });
 
-  // Store display plinths were reading as duplicate black blocks in front of the store sign.
   const storeRack = root.getObjectByName("PHASE202_STORE_DISPLAY_RACKS");
   if (storeRack){
     storeRack.traverse((obj)=>{
@@ -104,11 +92,8 @@ function alignStorefrontShells(scene){
   return { storefrontRoot:true };
 }
 function alignColumns(scene){
-  // Keep the Roman architecture, but prevent pillars from visually cutting the storefront faces.
-  collect(scene, (obj)=>{
-    const n = objectName(obj).toUpperCase();
-    return n.includes("REAR_ORDERED_COLUMN") && (n.includes("_3") || n.includes("_4") || n.includes("_5"));
-  }).forEach((obj)=>{
+  // Keep the Roman architecture, but push only the three center column GROUPS back enough that storefronts read cleanly.
+  collect(scene, (obj)=>/^PHASE200_REAR_ORDERED_COLUMN_(3|4|5)$/.test(objectName(obj).toUpperCase())).forEach((obj)=>{
     obj.position.z = -16.42;
     obj.scale.x = 0.86;
     obj.scale.z = 0.86;
@@ -164,7 +149,6 @@ function hideUnsupportedOverlay(){
   }catch(_err){ /* DOM cleanup is non-critical. */ }
 }
 function applyApprovalSafety(scene){
-  // Runtime safety pass for rejected sponsor/founder paths.
   const rejected = ["TRUEITIVE", "TRUITIVE", "SHYONA", "ROYSTON", "FOUNDER"];
   collect(scene, (obj)=>rejected.some((token)=>objectName(obj).toUpperCase().includes(token))).forEach(hideObject);
 }
