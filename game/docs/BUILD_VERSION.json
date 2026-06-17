@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-268-FINAL-RUNTIME-CACHE-SYNC-LOCK",
-  "track": "game-only-final-runtime-cache-sync-lock",
+  "build": "PHASE-269-BOOT-CACHE-BUSTER-SYNC-LOCK",
+  "track": "game-only-boot-cache-buster-sync-lock",
   "siteTouched": false,
-  "phase": "3.1-AU / Phase 268",
-  "summary": "Keeps Phase 266 Quest LOD cleanup and Phase 267 label-sync behavior, then hardens the late-load compatibility shim so stale Phase 261-267 labels are overwritten and legacy finished-lobby geometry remains suppressed.",
-  "label": "PHASE-268-FINAL-RUNTIME-CACHE-SYNC-LOCK",
-  "notes": "Game-side only. Site untouched. Phase 261 new lobby remains active. Phase 265 pillar/sign clearance and Phase 266 Quest LOD cleanup remain preserved. No Phase 84 rollback. No old lobby. No Truitive or founder content.",
+  "phase": "3.1-AV / Phase 269",
+  "summary": "Updates the game boot loader to Phase 269 cache-busted module URLs, keeps Phase 266 Quest LOD cleanup, keeps Phase 265 pillar/sign clearance, and forces late runtime labels to resolve to Phase 269.",
+  "label": "PHASE-269-BOOT-CACHE-BUSTER-SYNC-LOCK",
+  "notes": "Game-side only. Site untouched. Phase 261 new lobby remains active. No Phase 84 rollback. No old lobby. No Truitive or founder content.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
