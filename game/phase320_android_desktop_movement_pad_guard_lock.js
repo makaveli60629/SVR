@@ -46,14 +46,15 @@ function tick(t){
   requestAnimationFrame(tick);if(!lastTick)lastTick=t;const dt=Math.min(.05,Math.max(.001,(t-lastTick)/1000));lastTick=t;
   const f=(hold.f?1:0)-(hold.b?1:0),side=(hold.r?1:0)-(hold.l?1:0);if(!f&&!side)return;
   release();resize();const p=pos();const d=direction();const rv=rightVec();const speed=2.4;const nx=p.x+(d.x*f+rv.x*side)*speed*dt;const nz=p.z+(d.z*f+rv.z*side)*speed*dt;const moved=setXZ(nx,nz);
-  window.SVR_PHASE320_LAST_MOVEMENT={build:LABEL,active:true,moved,x:nx,z:nz,input:{forward:f,side},siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE320_LAST_MOVEMENT={build:LABEL,active:true,moved,x:nx,z:nz,input:{forward:f,side},phase321Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
 }
 function keys(e,on){const k=e.key?.toLowerCase?.();if(["w","arrowup"].includes(k))hold.f=on;if(["s","arrowdown"].includes(k))hold.b=on;if(["a","arrowleft"].includes(k))hold.l=on;if(["d","arrowright"].includes(k))hold.r=on;if(on&&["q"].includes(k))snap(-Math.PI/4);if(on&&["e"].includes(k))snap(Math.PI/4);}
 function install(){
   if(installed)return true;installed=true;injectStyle();makePad();resize();release();
   window.addEventListener("resize",resize,{passive:true});window.visualViewport?.addEventListener?.("resize",resize,{passive:true});window.visualViewport?.addEventListener?.("scroll",resize,{passive:true});
   window.addEventListener("keydown",e=>keys(e,true));window.addEventListener("keyup",e=>keys(e,false));
-  window.SVR_PHASE320_ANDROID_DESKTOP_MOVEMENT_PAD_GUARD_LOCK={build:LABEL,active:true,controls:"WASD/arrow keys plus on-screen pad",androidGuard:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE320_ANDROID_DESKTOP_MOVEMENT_PAD_GUARD_LOCK={build:LABEL,active:true,controls:"WASD/arrow keys plus on-screen pad",androidGuard:true,phase321Chained:true,siteTouched:false,publicRootTouched:false,checkedAt:new Date().toISOString()};
   window.SVR_PHASE320_RESIZE_VIEW=resize;window.SVR_LIVE_BUILD_POINTER=LABEL;window.SVR_LOCKED_FINAL_BUILD=LABEL;status("Android/Desktop movement pad armed");requestAnimationFrame(tick);return true;
 }
 install();setInterval(()=>{install();resize();},3000);
+import("./phase321_update31_stability_qa_lock.js?v=phase321-stability-qa").catch(e=>{window.SVR_PHASE321_IMPORT_ERROR=String(e?.message||e);});
