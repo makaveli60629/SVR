@@ -94,6 +94,7 @@ function apply(){
     active:true,
     tableCount:TABLES.length,
     keys:"7 Main / 8 VIP / 9 Replay",
+    phase303Chained:true,
     siteTouched:false,
     publicRootTouched:false,
     checkedAt:new Date().toISOString()
@@ -106,3 +107,4 @@ apply();
 let tries=0;
 const timer=setInterval(()=>{tries+=1; if(apply()||tries>120) clearInterval(timer);},250);
 [600,1400,2800,5200,9000,14000].forEach(d=>setTimeout(apply,d));
+import("./phase303_scorpion_buyin_join_flow_lock.js?v=phase303-buyin-join").catch(e=>{window.SVR_PHASE303_IMPORT_ERROR=String(e?.message||e);});
