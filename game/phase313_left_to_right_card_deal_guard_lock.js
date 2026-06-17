@@ -66,6 +66,7 @@ function audit(){
     order,
     source:"SVR_PHASE169_DEAL_ORDER",
     rule:"sort by table x ascending; never right-to-left",
+    phase315Chained:true,
     siteTouched:false,
     publicRootTouched:false,
     checkedAt:new Date().toISOString()
@@ -94,3 +95,4 @@ function install(){
 install();
 setInterval(audit,3500);
 [600,1500,3000,6000].forEach(d=>setTimeout(audit,d));
+import("./phase315_left_to_right_sequence_monitor_lock.js?v=phase315-sequence-monitor").catch(e=>{window.SVR_PHASE315_IMPORT_ERROR=String(e?.message||e);});
