@@ -104,6 +104,7 @@ function install(){
     listensFor:"svr-scorpion-action-state-updated",
     emits:"svr-scorpion-bot-response-complete",
     botCount:BOTS.length,
+    phase309Chained:true,
     playMoneyOnly:true,
     siteTouched:false,
     publicRootTouched:false,
@@ -115,3 +116,4 @@ function install(){
 }
 install();
 setInterval(()=>{install(); if(window.SVR_PHASE308_SCORPION_BOT_RESPONSE_STATE) showPanel();},7000);
+import("./phase309_scorpion_showdown_payout_lock.js?v=phase309-showdown-payout").catch(e=>{window.SVR_PHASE309_IMPORT_ERROR=String(e?.message||e);});
