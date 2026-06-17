@@ -1,13 +1,13 @@
 import * as THREE from "three";
 
-const LABEL = "PHASE-264-QUEST-SCREENSHOT-MICRO-ALIGNMENT-LOCK";
+const LABEL = "PHASE-265-PILLAR-SIGN-CLEARANCE-LOCK";
 
 function objectName(obj){ return String(obj?.name || ""); }
 function hideObject(obj){
   if (!obj) return;
   obj.visible = false;
-  obj.userData.phase264Hidden = true;
-  obj.traverse?.((child)=>{ child.visible = false; child.userData.phase264Hidden = true; });
+  obj.userData.phase265Hidden = true;
+  obj.traverse?.((child)=>{ child.visible = false; child.userData.phase265Hidden = true; });
 }
 function showObject(obj){
   if (!obj) return;
@@ -35,7 +35,7 @@ function keepSinglePlanet(scene, token, keepName, applyPose){
   let keep = scene.getObjectByName(keepName) || matches.find((obj)=>obj.isMesh || obj.isGroup) || null;
   matches.forEach((obj)=>{
     const name = objectName(obj).toUpperCase();
-    if (name.startsWith("PHASE262_") || name.startsWith("PHASE263_") || name.startsWith("PHASE264_")) return;
+    if (name.startsWith("PHASE262_") || name.startsWith("PHASE263_") || name.startsWith("PHASE264_") || name.startsWith("PHASE265_")) return;
     if (obj === keep || keep?.parent === obj || obj.parent === keep) return;
     if (obj.isMesh || obj.isGroup || name.includes("LOCKED")) hideObject(obj);
   });
@@ -44,10 +44,10 @@ function keepSinglePlanet(scene, token, keepName, applyPose){
 }
 function hideUnsupportedOverlay(){
   try{
-    if (!document.getElementById("phase264-clean-overlay-style")){
+    if (!document.getElementById("phase265-clean-overlay-style")){
       const style = document.createElement("style");
-      style.id = "phase264-clean-overlay-style";
-      style.textContent = "[data-phase264-hidden='true']{display:none!important;visibility:hidden!important;opacity:0!important;}";
+      style.id = "phase265-clean-overlay-style";
+      style.textContent = "[data-phase265-hidden='true']{display:none!important;visibility:hidden!important;opacity:0!important;}";
       document.head.appendChild(style);
     }
     Array.from(document.querySelectorAll("body *")).forEach((node)=>{
@@ -56,7 +56,7 @@ function hideUnsupportedOverlay(){
         node.style.display = "none";
         node.style.visibility = "hidden";
         node.style.opacity = "0";
-        node.setAttribute("data-phase264-hidden", "true");
+        node.setAttribute("data-phase265-hidden", "true");
       }
     });
   }catch(_err){}
@@ -72,11 +72,11 @@ function alignStorefrontShells(scene){
   }).forEach(hideObject);
 
   const shellPositions = {
-    PHASE202_WELLNESS_STOREFRONT_SHELL: [-12, -13.54],
-    PHASE202_PGA_STOREFRONT_SHELL: [-6, -13.54],
-    PHASE202_PLAY_STOREFRONT_SHELL: [0, -13.54],
-    PHASE202_STORE_STOREFRONT_SHELL: [6, -13.54],
-    PHASE202_SCORPION_STOREFRONT_SHELL: [12, -13.54]
+    PHASE202_WELLNESS_STOREFRONT_SHELL: [-12, -13.58],
+    PHASE202_PGA_STOREFRONT_SHELL: [-6, -13.58],
+    PHASE202_PLAY_STOREFRONT_SHELL: [0, -13.58],
+    PHASE202_STORE_STOREFRONT_SHELL: [6, -13.58],
+    PHASE202_SCORPION_STOREFRONT_SHELL: [12, -13.58]
   };
   Object.entries(shellPositions).forEach(([name, [x,z]])=>{
     const obj = root.getObjectByName(name);
@@ -84,22 +84,22 @@ function alignStorefrontShells(scene){
   });
 
   const signPositions = {
-    PHASE202_WELLNESS_STOREFRONT_SHELL_SIGN: [-12, 2.52, -12.54],
-    PHASE202_PGA_STOREFRONT_SHELL_SIGN: [-6, 2.52, -12.54],
-    PHASE202_PLAY_STOREFRONT_SHELL_SIGN: [0, 2.52, -12.54],
-    PHASE202_STORE_STOREFRONT_SHELL_SIGN: [6, 2.52, -12.54],
-    PHASE202_SCORPION_STOREFRONT_SHELL_SIGN: [12, 2.52, -12.54]
+    PHASE202_WELLNESS_STOREFRONT_SHELL_SIGN: [-12, 2.58, -12.64],
+    PHASE202_PGA_STOREFRONT_SHELL_SIGN: [-6, 2.58, -12.64],
+    PHASE202_PLAY_STOREFRONT_SHELL_SIGN: [0, 2.58, -12.64],
+    PHASE202_STORE_STOREFRONT_SHELL_SIGN: [6, 2.58, -12.64],
+    PHASE202_SCORPION_STOREFRONT_SHELL_SIGN: [12, 2.58, -12.64]
   };
   Object.entries(signPositions).forEach(([name, [x,y,z]])=>{
     const obj = root.getObjectByName(name);
-    if (obj){ obj.position.set(x,y,z); obj.renderOrder = 180; }
+    if (obj){ obj.position.set(x,y,z); obj.renderOrder = 190; }
   });
 
   [
-    ["PHASE202_WELLNESS_HOLOGRAM_CAROUSEL_FRAME", -12, -11.82, 0.68],
-    ["PHASE202_PGA_PRACTICE_PREVIEW_FRAME", -6, -11.86, 0.72],
-    ["PHASE202_STORE_DISPLAY_RACKS", 6, -11.82, 0.56],
-    ["PHASE202_SCORPION_PRIVATE_DOOR_FRAME", 12, -11.88, 0.72]
+    ["PHASE202_WELLNESS_HOLOGRAM_CAROUSEL_FRAME", -12, -11.94, 0.66],
+    ["PHASE202_PGA_PRACTICE_PREVIEW_FRAME", -6, -11.98, 0.70],
+    ["PHASE202_STORE_DISPLAY_RACKS", 6, -11.94, 0.52],
+    ["PHASE202_SCORPION_PRIVATE_DOOR_FRAME", 12, -12.00, 0.70]
   ].forEach(([name, x, z, scale])=>{
     const obj = root.getObjectByName(name);
     if (obj){ obj.position.set(x,0,z); obj.scale.setScalar(scale); }
@@ -107,18 +107,31 @@ function alignStorefrontShells(scene){
 
   const storeRack = root.getObjectByName("PHASE202_STORE_DISPLAY_RACKS");
   if (storeRack){
-    storeRack.traverse((obj)=>{ if (objectName(obj).includes("PRODUCT_PLINTH")) softenMaterials(obj, 0.30); });
+    storeRack.traverse((obj)=>{ if (objectName(obj).includes("PRODUCT_PLINTH")) softenMaterials(obj, 0.26); });
   }
   return { storefrontRoot:true };
 }
 function alignColumns(scene){
-  collect(scene, (obj)=>/^PHASE200_REAR_ORDERED_COLUMN_\d+$/.test(objectName(obj).toUpperCase())).forEach((obj)=>{
-    obj.position.z = -17.05;
-    obj.scale.x = 0.62;
-    obj.scale.z = 0.62;
+  const gapMap = {
+    PHASE200_REAR_ORDERED_COLUMN_1: [-17.8, -17.18],
+    PHASE200_REAR_ORDERED_COLUMN_2: [-15.0, -17.18],
+    PHASE200_REAR_ORDERED_COLUMN_3: [-9.0, -17.18],
+    PHASE200_REAR_ORDERED_COLUMN_4: [-3.0, -17.18],
+    PHASE200_REAR_ORDERED_COLUMN_5: [3.0, -17.18],
+    PHASE200_REAR_ORDERED_COLUMN_6: [9.0, -17.18],
+    PHASE200_REAR_ORDERED_COLUMN_7: [15.0, -17.18]
+  };
+  Object.entries(gapMap).forEach(([name, [x,z]])=>{
+    const obj = scene.getObjectByName(name);
+    if (!obj) return;
+    obj.position.x = x;
+    obj.position.z = z;
+    obj.scale.x = 0.58;
+    obj.scale.z = 0.58;
+    obj.userData.phase265MovedToSignGap = true;
     obj.traverse((child)=>{
       const n = objectName(child).toUpperCase();
-      if (n.includes("CAP") || n.includes("BASE")) child.scale.x = Math.min(child.scale.x, 0.68);
+      if (n.includes("CAP") || n.includes("BASE")) child.scale.x = Math.min(child.scale.x, 0.62);
     });
   });
 }
@@ -127,29 +140,29 @@ function alignPlanets(scene){
     obj.position.set(-10.4,19.2,-39.0);
     obj.scale.setScalar(0.60);
     obj.renderOrder = 5;
-    obj.userData.phase264SkyLocked = true;
+    obj.userData.phase265SkyLocked = true;
   });
   const mars = keepSinglePlanet(scene, "MARS", "PHASE200_SINGLE_VISIBLE_MARS_LOCKED", (obj)=>{
     obj.position.set(8.8,17.6,-42.0);
     obj.scale.setScalar(0.62);
     obj.renderOrder = 5;
-    obj.userData.phase264SkyLocked = true;
+    obj.userData.phase265SkyLocked = true;
   });
   const root = scene.getObjectByName("PHASE200_ORDERED_GRAND_LOBBY_ROOT") || scene;
-  let moonHalo = scene.getObjectByName("PHASE264_MOON_SOFT_HALO") || scene.getObjectByName("PHASE263_MOON_SOFT_HALO") || scene.getObjectByName("PHASE262_MOON_SOFT_HALO");
+  let moonHalo = scene.getObjectByName("PHASE265_MOON_SOFT_HALO") || scene.getObjectByName("PHASE264_MOON_SOFT_HALO") || scene.getObjectByName("PHASE263_MOON_SOFT_HALO") || scene.getObjectByName("PHASE262_MOON_SOFT_HALO");
   if (moon && !moonHalo){
     moonHalo = new THREE.Mesh(new THREE.RingGeometry(0.90,1.18,96), new THREE.MeshBasicMaterial({ color:0xdde6ff, transparent:true, opacity:0.08, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
-    moonHalo.name = "PHASE264_MOON_SOFT_HALO";
+    moonHalo.name = "PHASE265_MOON_SOFT_HALO";
     root.add(moonHalo);
   }
-  if (moon && moonHalo){ moonHalo.name = "PHASE264_MOON_SOFT_HALO"; moonHalo.visible = true; moonHalo.position.copy(moon.position); moonHalo.rotation.x = Math.PI * 0.5; }
-  let marsHalo = scene.getObjectByName("PHASE264_MARS_SOFT_HALO") || scene.getObjectByName("PHASE263_MARS_SOFT_HALO") || scene.getObjectByName("PHASE262_MARS_SOFT_HALO");
+  if (moon && moonHalo){ moonHalo.name = "PHASE265_MOON_SOFT_HALO"; moonHalo.visible = true; moonHalo.position.copy(moon.position); moonHalo.rotation.x = Math.PI * 0.5; }
+  let marsHalo = scene.getObjectByName("PHASE265_MARS_SOFT_HALO") || scene.getObjectByName("PHASE264_MARS_SOFT_HALO") || scene.getObjectByName("PHASE263_MARS_SOFT_HALO") || scene.getObjectByName("PHASE262_MARS_SOFT_HALO");
   if (mars && !marsHalo){
     marsHalo = new THREE.Mesh(new THREE.RingGeometry(0.40,0.58,80), new THREE.MeshBasicMaterial({ color:0xff8b67, transparent:true, opacity:0.07, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
-    marsHalo.name = "PHASE264_MARS_SOFT_HALO";
+    marsHalo.name = "PHASE265_MARS_SOFT_HALO";
     root.add(marsHalo);
   }
-  if (mars && marsHalo){ marsHalo.name = "PHASE264_MARS_SOFT_HALO"; marsHalo.visible = true; marsHalo.position.copy(mars.position); marsHalo.rotation.x = Math.PI * 0.5; }
+  if (mars && marsHalo){ marsHalo.name = "PHASE265_MARS_SOFT_HALO"; marsHalo.visible = true; marsHalo.position.copy(mars.position); marsHalo.rotation.x = Math.PI * 0.5; }
   return { moon:!!moon, mars:!!mars };
 }
 function applyApprovalSafety(scene){
@@ -162,24 +175,25 @@ function applyOnce(scene){
   alignColumns(scene);
   const planets = alignPlanets(scene);
   applyApprovalSafety(scene);
-  window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK = {
+  window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK = {
     label: LABEL,
     locked: true,
+    columnsMovedIntoBayGaps: true,
     duplicatePhase200ArchPanelsHidden: true,
     storefrontGeometryTightened: !!shells.storefrontRoot,
     storefrontSignsRaised: true,
-    rearColumnsSlimmedAndPushedBack: true,
     moonHighBackLocked: planets.moon,
     marsHighBackLocked: planets.mars,
     noTruitiveRuntimePolicy: true,
     checkedAt: new Date().toISOString()
   };
-  window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK = window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK;
-  window.SVR_PHASE262_GEOMETRY_SKY_LOCK = window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK;
+  window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK = window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK;
+  window.SVR_PHASE263_GEOMETRY_SKY_HARD_LOCK = window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK;
+  window.SVR_PHASE262_GEOMETRY_SKY_LOCK = window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK;
 }
 export function installPhase262GeometrySkyAlignmentLock({ scene, log = console.log } = {}){
   if (!scene) return null;
-  [0,180,650,1400,2800].forEach((delay)=>setTimeout(()=>applyOnce(scene), delay));
-  log(`[Phase264] Quest screenshot micro-alignment lock installed`);
-  return window.SVR_PHASE264_QUEST_SCREENSHOT_MICRO_ALIGNMENT_LOCK || { label: LABEL, pending:true };
+  [0,160,520,1200,2400,4200].forEach((delay)=>setTimeout(()=>applyOnce(scene), delay));
+  log(`[Phase265] pillar sign-clearance alignment lock installed`);
+  return window.SVR_PHASE265_PILLAR_SIGN_CLEARANCE_LOCK || { label: LABEL, pending:true };
 }
