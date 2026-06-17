@@ -1,4 +1,4 @@
-const LABEL = "PHASE-276-PILLAR-DOORWAY-ALIGNMENT-LOCK";
+const LABEL = "PHASE-277-PILLAR-ALIGNMENT-BOOT-CACHE-LOCK";
 const LEGACY_ROOT = "PHASE101S_FINISHED_LOBBY_ROOT";
 const COLUMNS = {
   PHASE200_REAR_ORDERED_COLUMN_1: [-15.4, -15.78],
@@ -20,7 +20,7 @@ function alignColumn(obj, x, z){
   obj.position.z = z;
   obj.scale.x = 0.42;
   obj.scale.z = 0.42;
-  obj.userData.phase276DoorwayAligned = true;
+  obj.userData.phase277DoorwayAligned = true;
   obj.traverse?.((child)=>{
     const n = String(child.name || "").toUpperCase();
     if (n.includes("CAP") || n.includes("BASE")){
@@ -40,7 +40,7 @@ function alignRearPillars(scene){
     extra.position.z = -15.92;
     extra.scale.x = 0.38;
     extra.scale.z = 0.38;
-    extra.userData.phase276OuterEndCap = true;
+    extra.userData.phase277OuterEndCap = true;
   }
 }
 function syncRuntimeLabel(){
@@ -50,12 +50,13 @@ function syncRuntimeLabel(){
   if (status) status.textContent = `Ready. ${LABEL}`;
   window.SVR_LOCKED_FINAL_BUILD = LABEL;
   window.SVR_LIVE_BUILD_POINTER = LABEL;
-  window.SVR_PHASE276_PILLAR_DOORWAY_ALIGNMENT_LOCK = {
+  window.SVR_PHASE277_PILLAR_ALIGNMENT_BOOT_CACHE_LOCK = {
     build: LABEL,
     active: true,
     rearColumnsAlignedToDoorwayJambs: true,
     centerDoorwayCleared: true,
     signFacesCleared: true,
+    cacheBusted: true,
     siteTouched: false,
     checkedAt: new Date().toISOString()
   };
@@ -66,9 +67,9 @@ function install(){
   if (scene){
     const removed = removeLegacyFinishedLobbyRoot(scene);
     alignRearPillars(scene);
-    window.SVR_PHASE276_PILLAR_DOORWAY_ALIGNMENT_LOCK.legacyRootRemoved = removed;
+    window.SVR_PHASE277_PILLAR_ALIGNMENT_BOOT_CACHE_LOCK.legacyRootRemoved = removed;
   }
-  window.SVR_RELEASE_BOOT?.("phase276-pillar-doorway-alignment-loaded");
+  window.SVR_RELEASE_BOOT?.("phase277-pillar-alignment-boot-cache-loaded");
   return !!scene;
 }
 
