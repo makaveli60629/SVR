@@ -1,1 +1,1 @@
-{"version":"Update 3.1 Phase 278","build":"PHASE-278-ROOT-PILLAR-DOORWAY-GEOMETRY-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 278 root geometry aligns rear pillars with doorway jambs and updates boot cache keys."}
+{"version":"Update 3.1 Phase 282","build":"PHASE-282-VERSION-POINTER-RESYNC-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 282 resyncs stale version pointers after the pillar correction phases."}
