@@ -11,6 +11,7 @@ window.SVR_PHASE101T_LOBBY_QA = {
   bootTouched: false,
   siteTouched: false,
   phase295TrimChain: true,
+  phase296StorefrontChain: true,
   checkedAt: new Date().toISOString()
 };
 
@@ -193,3 +194,5 @@ setTimeout(install, 5200);
 setTimeout(install, 9000);
 window.SVR_RUN_PHASE101T_QA = () => runQa(window.__SVR_SCENE__);
 import("./phase295_storefront_doorway_trim_lock.js?v=phase295-trim-chain").catch((e)=>{ window.SVR_PHASE295_CHAIN_ERROR = String(e?.message || e); });
+import("./phase296_storefront_presence_lock.js?v=phase296-presence-chain").catch((e)=>{ window.SVR_PHASE296_CHAIN_ERROR = String(e?.message || e); });
+import("./phase296_storefront_panels.js?v=phase296-panels-chain").catch((e)=>{ window.SVR_PHASE296_PANEL_ERROR = String(e?.message || e); });
