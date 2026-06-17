@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-262-NO-TRUITIVE-GEOMETRY-SKY-LOCK",
-  "track": "game-only-lobby-geometry-sky-lock",
+  "build": "PHASE-263-GEOMETRY-SKY-HARD-LOCK",
+  "track": "game-only-lobby-geometry-sky-hard-lock",
   "siteTouched": false,
-  "phase": "3.1-AP / Phase 262",
-  "summary": "Locks the Phase 261 new lobby baseline, removes duplicate old arch-panel visuals from the active storefront wall, raises Moon and Mars high/back, tightens storefront geometry, and blocks rejected Truitive/Trueitive/founder runtime paths.",
-  "label": "PHASE-262-NO-TRUITIVE-GEOMETRY-SKY-LOCK",
+  "phase": "3.1-AQ / Phase 263",
+  "summary": "Hardens Phase 262 by moving storefronts farther back, reducing duplicate/protruding store geometry, slimming and pushing rear columns back, raising Moon/Mars farther into the sky, and reinforcing the no-Truitive runtime policy.",
+  "label": "PHASE-263-GEOMETRY-SKY-HARD-LOCK",
   "notes": "No website changes. No old lobby restore. No Phase 84 poker rollback. Current Roman canopy/new lobby remains the active baseline.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
