@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-261-ROMAN-CANOPY-PILLAR-SMOOTH-LOBBY-LOCK",
-  "track": "game-only",
+  "build": "PHASE-262-NO-TRUITIVE-GEOMETRY-SKY-LOCK",
+  "track": "game-only-lobby-geometry-sky-lock",
   "siteTouched": false,
-  "phase": "3.1-AO / Phase 261",
-  "summary": "Refines the center Roman canopy/chuppah-style structure with smoother stone pillars, gold beams, silk roof, soft valances, cyan underglow, central gold oculus ring, corner pillars, rear colonnade arches, and side pillar language across the lobby.",
-  "label": "PHASE-261-ROMAN-CANOPY-PILLAR-SMOOTH-LOBBY-LOCK",
-  "notes": "Site untouched. Current lobby preserved. Targeted game-side visual polish layer only.",
+  "phase": "3.1-AP / Phase 262",
+  "summary": "Preserves the Phase 261 Roman canopy/new lobby baseline while hiding duplicate old arch panels, tightening storefront shell geometry, pushing intersecting center columns back, raising Moon and Mars high/back in the sky, hiding VR-not-supported overlay text, and locking no-Truitive/no-founder runtime policy.",
+  "label": "PHASE-262-NO-TRUITIVE-GEOMETRY-SKY-LOCK",
+  "notes": "Game-side only. Site untouched. No Phase 84 rollback. No old lobby restore. Current lobby preserved. Truitive/Trueitive/founder branding remains rejected.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
