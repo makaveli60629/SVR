@@ -1,11 +1,11 @@
 {
   "version": "Update 3.1",
-  "build": "PHASE-268-FINAL-RUNTIME-CACHE-SYNC-LOCK",
-  "track": "game-only-final-runtime-cache-sync-lock",
+  "build": "PHASE-269-BOOT-CACHE-BUSTER-SYNC-LOCK",
+  "track": "game-only-boot-cache-buster-sync-lock",
   "siteTouched": false,
-  "phase": "3.1-AU / Phase 268",
-  "summary": "Hardens the final runtime label and cache sync shim so stale labels are overwritten after late modules load while preserving pillar/sign clearance, Quest LOD cleanup, and the high Moon/Mars lock.",
-  "label": "PHASE-268-FINAL-RUNTIME-CACHE-SYNC-LOCK",
-  "notes": "Game-only update. Site untouched. Current Roman canopy/new lobby remains the active baseline. Phase 84 remains rejected.",
+  "phase": "3.1-AV / Phase 269",
+  "summary": "Updates the game boot loader to Phase 269 cache-busted module URLs and forces late runtime labels to resolve to Phase 269 while preserving pillar sign clearance and Quest LOD cleanup.",
+  "label": "PHASE-269-BOOT-CACHE-BUSTER-SYNC-LOCK",
+  "notes": "Game-only update. Site untouched. Current new lobby remains the active baseline. Phase 84 remains rejected.",
   "updated": "2026-06-16T00:00:00-05:00"
 }
