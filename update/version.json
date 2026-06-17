@@ -1,1 +1,1 @@
-{"version":"Update 3.1 Phase 276","build":"PHASE-276-PILLAR-DOORWAY-ALIGNMENT-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 276 aligns rear pillars with doorway jambs and clears sign faces."}
+{"version":"Update 3.1 Phase 277","build":"PHASE-277-PILLAR-ALIGNMENT-BOOT-CACHE-LOCK","created":"2026-06-16","siteTouched":false,"notes":"Phase 277 cache-busts the boot loader so pillar alignment loads fresh."}
