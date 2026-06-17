@@ -118,6 +118,7 @@ function install(){
     listensFor:"svr-scorpion-bot-response-complete",
     emits:"svr-scorpion-showdown-payout-complete",
     players:PLAYERS,
+    phase310Chained:true,
     playMoneyOnly:true,
     siteTouched:false,
     publicRootTouched:false,
@@ -129,3 +130,4 @@ function install(){
 }
 install();
 setInterval(()=>{install(); if(window.SVR_PHASE309_SCORPION_SHOWDOWN_PAYOUT_STATE) showPanel();},8000);
+import("./phase310_scorpion_poker_loop_qa_lock.js?v=phase310-loop-qa").catch(e=>{window.SVR_PHASE310_IMPORT_ERROR=String(e?.message||e);});
