@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-294-RUNTIME-LABEL-APPROVAL-CLEANUP-LOCK",
-  "commit": "phase-294-auto-deploy-trigger",
+  "build": "SVR-PHASE-295-REIKI-APPROVAL-OVERLAY-LOCK",
+  "commit": "phase-295-auto-deploy-trigger",
   "updatedAt": "2026-06-17T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 294 game runtime label cleanup and PGA range alias updates."
+  "purpose": "Auto Deploy trigger after Phase 295 Reiki approval overlay runtime patch."
 }
