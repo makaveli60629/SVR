@@ -12,6 +12,7 @@ window.SVR_PHASE101T_LOBBY_QA = {
   siteTouched: false,
   phase295TrimChain: true,
   phase296StorefrontChain: true,
+  phase85PortalChain: true,
   checkedAt: new Date().toISOString()
 };
 
@@ -102,6 +103,7 @@ function announcePortal(zone){
   window.SVR_PHASE101T_LAST_PORTAL = payload;
   setStatus(`${label} portal selected • target: ${target}`);
   try { window.dispatchEvent(new CustomEvent("svr-portal-selected", { detail: payload })); } catch {}
+  try { window.SVR_GO_PORTAL?.(payload.key); } catch {}
   return payload;
 }
 function installPointerInteraction(scene, camera){
@@ -196,3 +198,4 @@ window.SVR_RUN_PHASE101T_QA = () => runQa(window.__SVR_SCENE__);
 import("./phase295_storefront_doorway_trim_lock.js?v=phase295-trim-chain").catch((e)=>{ window.SVR_PHASE295_CHAIN_ERROR = String(e?.message || e); });
 import("./phase296_storefront_presence_lock.js?v=phase296-presence-chain").catch((e)=>{ window.SVR_PHASE296_CHAIN_ERROR = String(e?.message || e); });
 import("./phase296_storefront_panels.js?v=phase296-panels-chain").catch((e)=>{ window.SVR_PHASE296_PANEL_ERROR = String(e?.message || e); });
+import("./phase85_portal_enable_solid_lobby_lock.js?v=phase85-portal-solid-chain").catch((e)=>{ window.SVR_PHASE85_PORTAL_ERROR = String(e?.message || e); });
