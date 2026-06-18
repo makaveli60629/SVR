@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-AUTO-DEPLOY-TRIGGER-2026-06-17",
-  "commit": "auto-deploy-triggered-from-chat",
+  "build": "SVR-PHASE-294-RUNTIME-LABEL-APPROVAL-CLEANUP-LOCK",
+  "commit": "phase-294-auto-deploy-trigger",
   "updatedAt": "2026-06-17T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Manual Auto Deploy trigger from ChatGPT after repository permission confirmation. Workflow will stamp the final deployed health file during Pages build."
+  "purpose": "Auto Deploy trigger after Phase 294 game runtime label cleanup and PGA range alias updates."
 }
