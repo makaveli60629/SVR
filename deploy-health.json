@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-102-USER-FRIENDLY-FAST-LAUNCH-NO-PHASE-TEXT-LOCK",
-  "commit": "phase-102-auto-deploy-trigger",
+  "build": "SVR-PHASE-103-QUEST-CONTROL-VIEW-POLISH-LOCK",
+  "commit": "phase-103-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 102 user-friendly fast launch, player-facing phase text removal, clean lobby protection, and second-floor visibility lock."
+  "purpose": "Auto Deploy trigger after Phase 103 Quest standing locomotion, direct hand teleport, view cleanup, lighting, textures, and table polish lock."
 }
