@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-87-WATCH-POKER-CONTROLS-LOCK",
-  "commit": "phase-87-auto-deploy-trigger",
+  "build": "SVR-PHASE-88-VR-CARD-CHIP-INTERACTION-LOCK",
+  "commit": "phase-88-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 87 wrist watch poker controls lock."
+  "purpose": "Auto Deploy trigger after Phase 88 VR card and chip interaction lock."
 }
