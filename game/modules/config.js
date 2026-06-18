@@ -2,7 +2,7 @@ export const CONFIG = {
   ROOM_RADIUS: 42,
   WALL_HEIGHT: 18,
   SPAWN_X: 0,
-  SPAWN_Z: 4.2,
+  SPAWN_Z: 7.2,
 
   POINTER_SIZE: 1.05,
   RING_INNER: 0.56,
