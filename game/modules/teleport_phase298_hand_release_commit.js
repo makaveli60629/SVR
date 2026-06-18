@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { createTeleportRig as baseRig } from "./teleport_phase101j_forward_lock.js?v=phase298-hand-release-base";
+import { createTeleportRig as baseRig } from "./teleport_phase103_standing_direct_lock.js?v=phase103-standing-direct-base";
 import { isFist, isPinching } from "./gestures.js";
 
 const LABEL = "PHASE-298-HAND-TELEPORT-RELEASE-COMMIT-LOCK";
@@ -63,6 +63,7 @@ export function createTeleportRig(opts){
       afterX: Number((afterPose?.x || 0).toFixed(2)),
       afterZ: Number((afterPose?.z || 0).toFixed(2)),
       movedBeforeFallback: Number(moved.toFixed(3)),
+      phase103Base: true,
       siteTouched: false,
       pokerLogicTouched: false,
       checkedAt: new Date().toISOString()
@@ -100,6 +101,7 @@ export function createTeleportRig(opts){
       markerStillVisible,
       lastCachedAgeMs: hasCachedTarget ? Math.round(performance.now() - cachedAt) : null,
       releaseCommitsOnLetGo: true,
+      phase103Base: true,
       checkedAt: new Date().toISOString()
     };
   };
@@ -119,6 +121,7 @@ export function createTeleportRig(opts){
     active: true,
     wrapperInstalled: true,
     releaseCommitsLastValidTarget: true,
+    phase103Base: true,
     siteTouched: false,
     pokerLogicTouched: false,
     checkedAt: new Date().toISOString()
