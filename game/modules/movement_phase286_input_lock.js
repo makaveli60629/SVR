@@ -1,6 +1,6 @@
-import { createTeleportRig as baseRig } from "./teleport_phase98_hand_aim_release_lock.js?v=phase98-stable-hand-aim-release";
+import { createTeleportRig as baseRig } from "./teleport_phase98_hand_aim_release_lock.js?v=phase103-standing-direct-hand-bridge";
 
-const LABEL = "PHASE-98-HAND-AIM-RELEASE-TELEPORT-LOCK";
+const LABEL = "PHASE-103-STANDING-LOCOMOTION-DIRECT-HAND-LOCK";
 
 function pad(proxy){
   return proxy?.userData?.gamepad || proxy?.userData?.inputSource?.gamepad || null;
@@ -19,13 +19,15 @@ export function createTeleportRig(opts){
   rig.update = (args = {}) => {
     const xr = !!opts?.renderer?.xr?.isPresenting;
     const usingPad = livePad(args.leftController) || livePad(args.rightController);
-    window.SVR_PHASE98_HAND_AIM_RELEASE_TELEPORT_LOCK = {
+    window.SVR_PHASE103_STANDING_LOCOMOTION_DIRECT_HAND_LOCK = {
       build: LABEL,
       active: true,
       xr,
       usingPad,
       controllerFallbackProtected: true,
+      standingWhileStickMoving: true,
       headForwardMoveProtected: true,
+      directHandTeleportProtected: true,
       rayProtected: true,
       handPinchAimVisibleBeforeRelease: true,
       handReleaseOnlyCommit: true,
