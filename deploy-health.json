@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-99-CLEAN-EXPANDED-LOBBY-REBUILD-LOCK",
-  "commit": "phase-99-auto-deploy-trigger",
+  "build": "SVR-PHASE-100-CLEAN-LOBBY-ACCEPTANCE-QA-LOCK",
+  "commit": "phase-100-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 99 clean expanded lobby rebuild, quick load, corrected doorway geometry, free spawn, and solid floor lock."
+  "purpose": "Auto Deploy trigger after Phase 100 clean lobby acceptance QA, solid geometry verification, spawn clearance, corrected doorways, and fast boot lock."
 }
