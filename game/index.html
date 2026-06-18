@@ -16,12 +16,12 @@
 </head>
 <body data-build="PHASE-101-SECOND-FLOOR-VISIBILITY-FINAL-QA-LOCK">
   <div id="app"></div>
-  <div id="safeStage"><section class="safe-card"><span class="pill">PHASE 101 FINAL QA</span><h1>SVR POKER</h1><h2>Second Floor Visibility Lock</h2><p id="safeStatus">Loading clean lobby, then second-floor safety floor, then final QA. The floor must stay visible after cleanup.</p><div><button class="btn cyan" id="startRuntimeBtn" type="button">Start Lobby Now</button><a class="btn" href="./index.html?v=phase101-manual-refresh">Reload Fresh</a></div></section></div>
+  <div id="safeStage"><section class="safe-card"><span class="pill">PHASE 101 FINAL QA</span><h1>SVR POKER</h1><h2>Second Floor Visibility Lock</h2><p id="safeStatus">Loading clean lobby, then second-floor safety floor, then final visibility QA. The floor must stay visible after cleanup.</p><div><button class="btn cyan" id="startRuntimeBtn" type="button">Start Lobby Now</button><a class="btn" href="./index.html?v=phase101-manual-refresh">Reload Fresh</a></div></section></div>
   <div id="bootFallback"></div><div id="hud"><span id="status"></span><span id="mode"></span><button id="toggleLog" type="button">Log</button><button id="toggleJoints" type="button">Joints</button></div><div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
       var BUILD='PHASE-101-SECOND-FLOOR-VISIBILITY-FINAL-QA-LOCK';var loaded=false;var status=document.getElementById('safeStatus');
-      window.SVR_PHASE101_BOOT={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString(),quickLoad:true,oldPhaseVisualStack:false,secondFloorAfterCleanup:true};
+      window.SVR_PHASE101_BOOT={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString(),quickLoad:true,oldPhaseVisualStack:false,secondFloorAfterCleanup:true,visibilityQALast:true};
       function note(msg){if(status)status.textContent=msg;window.SVR_PHASE101_BOOT.lastMessage=msg;window.SVR_PHASE101_BOOT.checkedAt=new Date().toISOString();}
       function hideOverlay(reason){document.body.classList.add('boot-released','runtime-visible','overlay-released');var safe=document.getElementById('safeStage');if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';safe.setAttribute('aria-hidden','true');}window.__SVR_GAME_READY__=true;window.SVR_GAME_READY=true;window.SVR_PHASE101_BOOT.overlayReleased=true;window.SVR_PHASE101_BOOT.reason=reason;window.SVR_PHASE101_BOOT.releasedAt=new Date().toISOString();}
       window.SVR_RELEASE_BOOT=hideOverlay;window.SVR_FORCE_HIDE_SAFE_STAGE=hideOverlay;
@@ -39,6 +39,8 @@
         await addModule('./phase98_second_floor_safety_floor_lock.js?v=phase101-second-floor-after-cleanup');
         note('Running acceptance QA...');
         await addModule('./phase100_clean_lobby_acceptance_qa_lock.js?v=phase101-acceptance-qa-visible-floor');
+        note('Running final second-floor visibility QA...');
+        await addModule('./phase101_second_floor_visibility_final_qa_lock.js?v=phase101-final-visible-floor-qa');
         note('Clean lobby accepted. Second floor visible.');
         setTimeout(function(){hideOverlay('phase101-second-floor-visible');},180);
       }catch(e){window.SVR_PHASE101_BOOT.errors.push(String(e.message||e));note('Runtime fallback released.');setTimeout(function(){hideOverlay('phase101-fallback-release');},500);}}
