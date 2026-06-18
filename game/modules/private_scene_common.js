@@ -16,7 +16,7 @@ function t(title, sub){
 
 function addReturn(){
   const a = document.createElement('a');
-  a.href = './index.html?v=phase139-return';
+  a.href = './index.html?v=phase294-return';
   a.textContent = 'Return to Lobby';
   a.style.cssText = 'position:fixed;left:14px;top:14px;z-index:5;padding:10px 14px;border-radius:999px;border:1px solid rgba(140,255,240,.55);background:rgba(0,0,0,.62);color:white;text-decoration:none;font:700 13px system-ui';
   document.body.appendChild(a);
@@ -34,14 +34,14 @@ function makeCarouselCard(title, lines=[]){
 }
 
 function addPrivateReikiHologramCarousel(scene){
-  const group = new THREE.Group(); group.name = 'SVR_PHASE139_PRIVATE_REIKI_HOLOGRAM_VIDEO_CAROUSEL'; scene.add(group);
+  const group = new THREE.Group(); group.name = 'SVR_PHASE294_PRIVATE_REIKI_APPROVAL_SAFE_CAROUSEL'; scene.add(group);
   const glowMat = new THREE.MeshBasicMaterial({color:0x8ffff0,transparent:true,opacity:.12,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false});
   const beam = new THREE.Mesh(new THREE.CylinderGeometry(.5,1.9,4.2,64,1,true),glowMat); beam.position.set(0,2.1,-.5); group.add(beam);
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(5.3,3.0),new THREE.MeshBasicMaterial({map:t('REIKI HOLOGRAM','Buddha background\nTrueitive preview\nAWAITING APPROVAL'),transparent:true,side:THREE.DoubleSide,depthWrite:false}));
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(5.3,3.0),new THREE.MeshBasicMaterial({map:t('REIKI HOLDING ROOM','approved media slot\nSVR preview only\nAWAITING APPROVAL'),transparent:true,side:THREE.DoubleSide,depthWrite:false}));
   screen.position.set(0,3.15,-3.85); group.add(screen);
   const ring = new THREE.Mesh(new THREE.TorusGeometry(2.15,.035,12,128),new THREE.MeshBasicMaterial({color:0x8ffff0,transparent:true,opacity:.84,depthWrite:false,blending:THREE.AdditiveBlending}));
   ring.rotation.x = Math.PI/2; ring.position.set(0,.18,-.5); group.add(ring);
-  const cards = [makeCarouselCard('VIDEO SLOT',['approved media','carousel panel']),makeCarouselCard('REIKI STORE',['session cards','wellness items']),makeCarouselCard('MEDITATION',['breathing ring','quiet room']),makeCarouselCard('APPROVAL',['Trueitive preview','awaiting approval'])];
+  const cards = [makeCarouselCard('VIDEO SLOT',['approved media','carousel panel']),makeCarouselCard('REIKI STORE',['approval-safe','wellness placeholders']),makeCarouselCard('MEDITATION',['breathing ring','quiet room']),makeCarouselCard('APPROVAL',['SVR placeholder','awaiting approval'])];
   cards.forEach((card,i)=>{card.userData.a=i/cards.length*Math.PI*2; group.add(card);});
   const light = new THREE.PointLight(0x8ffff0,1.65,12,2); light.position.set(0,3,-2.5); group.add(light);
   group.userData.tick = (dt,time)=>{ ring.rotation.z+=dt*.7; beam.rotation.y+=dt*.2; light.intensity=1.15+.45*Math.sin(time*1.8); cards.forEach((card,i)=>{const a=card.userData.a+time*.28; card.position.set(Math.cos(a)*3.25,2.05+Math.sin(time+i)*.1,-.6+Math.sin(a)*1.3); card.lookAt(0,2.15,-.6); card.material.opacity=Math.sin(a)>-.45?1:.45;}); };
@@ -61,7 +61,7 @@ function fallbackBuddhaTexture(){
 function addBackgroundImage(scene, url){
   const mat = new THREE.MeshBasicMaterial({map:fallbackBuddhaTexture(),transparent:true,opacity:.48,side:THREE.DoubleSide,depthWrite:false});
   const wall = new THREE.Mesh(new THREE.PlaneGeometry(15.5,9.0), mat);
-  wall.name = 'PHASE139 REIKI PRIVATE BUDDHA BACKGROUND';
+  wall.name = 'PHASE294 REIKI PRIVATE APPROVAL-SAFE BACKGROUND';
   wall.position.set(0,4.1,-7.4);
   scene.add(wall);
   const loader = new THREE.TextureLoader(); loader.crossOrigin = 'anonymous';
