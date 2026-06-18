@@ -2,17 +2,17 @@ import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands_phase228.js";
-import { createTeleportRig } from "./modules/movement_phase228.js";
+import { createTeleportRig } from "./modules/movement_phase228.js?v=phase99-clean-lobby-hand-teleport";
 import { buildPhase195CleanLobbyWorld } from "./modules/phase195_clean_lobby_world.js";
 import { installPhase201HubContentRestore } from "./modules/phase201_hub_content_restore.js";
 import { installPhase202StorefrontShells } from "./modules/phase202_storefront_shells.js";
 import { installPhase262GeometrySkyAlignmentLock } from "./modules/phase262_geometry_sky_alignment_lock.js";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
-import { createWristWatch } from "./modules/watch.js";
+import { createWristWatch } from "./modules/watch.js?v=phase99-clean-lobby-watch";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
-const BUILD_LABEL = "PHASE-294-RUNTIME-LABEL-APPROVAL-CLEANUP-LOCK";
+const BUILD_LABEL = "PHASE-99-CLEAN-EXPANDED-LOBBY-REBUILD-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
@@ -24,8 +24,8 @@ window.SVR_REFINED_LOBBY_GEOMETRY = true;
 window.SVR_BACKGROUND_BUILDINGS_REMOVED = true;
 window.SVR_LOCKED_FINAL_BUILD = BUILD_LABEL;
 window.SVR_NO_FACE_OVERLAY = true;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 294: runtime label alignment and approval-safe private-scene cleanup over Phase 293 lobby visual truth lock." };
-window.SVR_PHASE228_MAIN_IMPORT_LOCK = { build: BUILD_LABEL, handsModule: "hands_phase228.js", movementModule: "movement_phase228.js", checkedAt: new Date().toISOString() };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 99: clean expanded lobby rebuild, quick load, stable hand teleport, corrected doorway geometry." };
+window.SVR_PHASE228_MAIN_IMPORT_LOCK = { build: BUILD_LABEL, handsModule: "hands_phase228.js", movementModule: "movement_phase228.js?v=phase99-clean-lobby-hand-teleport", checkedAt: new Date().toISOString() };
 window.SVR_PHASE294_LOCK = { build: BUILD_LABEL, phase293BaselinePreserved: true, noUnapprovedReikiBranding: true, rangeAliasAdded: true };
 
 const $status = document.getElementById("status");
@@ -67,7 +67,7 @@ window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $
 window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
 const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading Phase 294 runtime/approval cleanup lock…", { force: true });
+setStatus("Loading clean expanded lobby…", { force: true });
 const world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
 installPhase201HubContentRestore({ scene, camera, renderer, log });
 installPhase202StorefrontShells({ scene, camera, renderer, log });
@@ -144,7 +144,7 @@ window.__SVR_ANDROID_SMART_LOCK__ = ANDROID_SMART;
 const __svrBootFallback = document.getElementById("bootFallback");
 if (__svrBootFallback){ __svrBootFallback.style.opacity="0"; __svrBootFallback.style.pointerEvents="none"; setTimeout(()=>{__svrBootFallback.style.display="none";},420); }
 setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks locked` : `Ready. ${BUILD_LABEL}`, { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android smart controls locked" : "Hands: waiting…");
+setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android smart controls locked" : "Hands: pinch and hold to aim, release to teleport");
 function setHudVisible(visible){ const hud = document.getElementById("hud"); if (hud) hud.style.display = (visible && !AUTOCAM) ? "flex" : "none"; if ($log) $log.style.display = "none"; if ($err) $err.style.display = "none"; }
 if (AUTOCAM) setHudVisible(false);
 if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display","none");
@@ -175,10 +175,7 @@ renderer.setAnimationLoop(()=>{
   hands.update(dt);
   if (optionalTick) hands.updateDebug();
   const leftHand = hands.getLeftHand(); const rightHand = hands.getRightHand(); const leftController = hands.getLeftController(); const rightController = hands.getRightController();
-  if (!AUTOCAM || renderer.xr.isPresenting){ tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb: (text)=>{ setStatus(text); }, modeCb: (text)=>{ setMode(text); } }); }
-  if (watch) watch.update(dt, leftHand, rightHand);
+  if (!AUTOCAM || renderer.xr.isPresenting){ tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb:setStatus, modeCb:setMode }); }
+  if (renderer.xr.isPresenting || !AUTOCAM) watch.update(dt, { leftHand, rightHand, leftController, rightController });
   renderer.render(scene, camera);
 });
-const canvasEl = renderer.domElement;
-canvasEl.addEventListener("pointerdown", async ()=>{ await audio.prime(); }, { passive: true });
-canvasEl.addEventListener("webglcontextlost", (e)=>{ e.preventDefault(); log("[ERR] WebGL context lost. Reloading…"); setStatus("WebGL context lost (reloading…)", { force: true }); setTimeout(()=>location.reload(), 500); }, false);
