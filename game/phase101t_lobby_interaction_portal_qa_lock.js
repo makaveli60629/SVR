@@ -15,6 +15,7 @@ window.SVR_PHASE101T_LOBBY_QA = {
   phase85PortalChain: true,
   phase86PokerChain: true,
   phase88CardChipChain: true,
+  phase89PerformanceChain: true,
   checkedAt: new Date().toISOString()
 };
 
@@ -203,3 +204,4 @@ import("./phase296_storefront_panels.js?v=phase296-panels-chain").catch((e)=>{ w
 import("./phase85_portal_enable_solid_lobby_lock.js?v=phase85-portal-solid-chain").catch((e)=>{ window.SVR_PHASE85_PORTAL_ERROR = String(e?.message || e); });
 import("./phase86_playable_poker_core_lock.js?v=phase86-playable-poker-chain").catch((e)=>{ window.SVR_PHASE86_POKER_ERROR = String(e?.message || e); });
 import("./phase88_vr_card_chip_interaction_lock.js?v=phase88-card-chip-chain").catch((e)=>{ window.SVR_PHASE88_CARD_CHIP_ERROR = String(e?.message || e); });
+import("./phase89_quest_performance_stability_lock.js?v=phase89-quest-perf-chain").catch((e)=>{ window.SVR_PHASE89_PERF_ERROR = String(e?.message || e); });
