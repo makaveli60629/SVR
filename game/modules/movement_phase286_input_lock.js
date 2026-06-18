@@ -1,6 +1,6 @@
-import { createTeleportRig as baseRig } from "./teleport_phase101j_forward_lock.js?v=phase101jforwardlock";
+import { createTeleportRig as baseRig } from "./teleport_phase298_hand_release_commit.js?v=phase298-hand-teleport-fix";
 
-const LABEL = "PHASE-286-QUEST-INPUT-PRIORITY-LOCK";
+const LABEL = "PHASE-298-HAND-TELEPORT-FIX";
 
 function pad(proxy){
   return proxy?.userData?.gamepad || proxy?.userData?.inputSource?.gamepad || null;
@@ -19,14 +19,15 @@ export function createTeleportRig(opts){
   rig.update = (args = {}) => {
     const xr = !!opts?.renderer?.xr?.isPresenting;
     const usingPad = livePad(args.leftController) || livePad(args.rightController);
-    window.SVR_PHASE286_QUEST_INPUT_PRIORITY_LOCK = {
+    window.SVR_PHASE298_HAND_TELEPORT_FIX = {
       build: LABEL,
       active: true,
       xr,
       usingPad,
       controllerFallbackProtected: true,
       headForwardMoveProtected: true,
-      teleportForwardRayProtected: true,
+      rayProtected: true,
+      handLetGoFix: true,
       siteTouched: false,
       checkedAt: new Date().toISOString()
     };
