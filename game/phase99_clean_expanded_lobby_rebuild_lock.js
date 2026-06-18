@@ -8,7 +8,7 @@ const PURPLE = 0x9b4dff;
 const WALL = 0x070914;
 const FLOOR = 0x0b0e16;
 const CLEAR_RE = /PHASE9[0-8]|UPDATE4|DAILY_PICK|WALLET_GATEWAY|LOCATOR|SIGHTLINE|COMFORT|QA|AUDIT|GUIDE|ROPE|EXTRA|DUPLICATE|TEMP|DEBUG/i;
-const KEEP_RE = /POKER|TABLE|CARD|CHIP|ACTION|WATCH|HAND|TELEPORT|RAY|ARC|TARGET|PORTAL|PGA|WELLNESS|STORE|SCORPION|MOON|MARS|PLAYER|BOT|CHAIR|DEALER/i;
+const KEEP_RE = /POKER|TABLE|CARD|CHIP|ACTION|WATCH|HAND|TELEPORT|RAY|ARC|TARGET|PORTAL|PGA|WELLNESS|STORE|SCORPION|MOON|MARS|PLAYER|BOT|CHAIR|DEALER|FLOOR|SECOND_FLOOR|BALCONY|PHASE98_SECOND_FLOOR/i;
 let installed = false;
 
 const DOORWAYS = [
@@ -45,10 +45,6 @@ function signTexture(title, sub, color){
   ctx.fillStyle="#bffcff"; ctx.font="800 39px system-ui,Arial"; ctx.fillText(sub,512,305);
   const tex=new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=2; return tex;
 }
-function localToWorld(cfg, lx, ly, lz){
-  const a=cfg.ry||0, ca=Math.cos(a), sa=Math.sin(a);
-  return new THREE.Vector3(cfg.x + lx*ca + lz*sa, ly, cfg.z + lz*ca - lx*sa);
-}
 function makePanel(root, name, geom, material, pos, ry=0){
   const mesh = new THREE.Mesh(geom, material);
   mesh.name = name;
@@ -65,12 +61,6 @@ function clearOldCrowd(scene){
   scene.traverse((obj)=>{
     const n=String(obj.name||"");
     if(!n) return;
-    if(CLEAR_RE.test(n) && !KEEP_RE.test(n)){
-      obj.visible=false;
-      obj.userData.phase99HiddenAsCrowd=true;
-      hidden++;
-      return;
-    }
     if(KEEP_RE.test(n)){
       obj.visible=true;
       obj.renderOrder=Math.max(obj.renderOrder||0,500);
@@ -80,6 +70,13 @@ function clearOldCrowd(scene){
         mats.forEach(m=>{ if(m){ m.depthWrite=false; m.needsUpdate=true; }});
       }
       protectedCore++;
+      return;
+    }
+    if(CLEAR_RE.test(n)){
+      obj.visible=false;
+      obj.userData.phase99HiddenAsCrowd=true;
+      hidden++;
+      return;
     }
   });
   return {hidden, protectedCore};
@@ -167,8 +164,9 @@ function solidify(scene){
   let solid=0;
   scene.traverse(o=>{
     const n=String(o.name||"");
-    if(/PHASE99|PORTAL|FLOOR|WALL|DOORWAY|PILLAR|THRESHOLD|TABLE|CARD|CHIP|ACTION/.test(n)){
+    if(/PHASE99|PHASE98_SECOND_FLOOR|PORTAL|FLOOR|WALL|DOORWAY|PILLAR|THRESHOLD|TABLE|CARD|CHIP|ACTION/.test(n)){
       o.userData.phase99Solidified=true;
+      o.visible=true;
       if(o.isMesh){ o.frustumCulled=false; solid++; }
     }
   });
@@ -190,6 +188,7 @@ function install(){
   window.SVR_PHASE99_CLEAN_EXPANDED_LOBBY_REBUILD_LOCK={
     build:LABEL,
     active:true,
+    phase101SecondFloorProtected:true,
     mode:"single organized final layout pass",
     lobbySize:"34 x 28 floor, expanded wall bounds, clean spawn",
     spawn:{x:0,z:7.2,freeRadius:3.8,firstTimeView:viewSet},
