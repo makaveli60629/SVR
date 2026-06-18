@@ -1,6 +1,6 @@
-import { createTeleportRig as baseRig } from "./teleport_phase298_hand_release_commit.js?v=phase298-hand-teleport-fix";
+import { createTeleportRig as baseRig } from "./teleport_phase98_hand_aim_release_lock.js?v=phase98-stable-hand-aim-release";
 
-const LABEL = "PHASE-298-HAND-TELEPORT-FIX";
+const LABEL = "PHASE-98-HAND-AIM-RELEASE-TELEPORT-LOCK";
 
 function pad(proxy){
   return proxy?.userData?.gamepad || proxy?.userData?.inputSource?.gamepad || null;
@@ -19,7 +19,7 @@ export function createTeleportRig(opts){
   rig.update = (args = {}) => {
     const xr = !!opts?.renderer?.xr?.isPresenting;
     const usingPad = livePad(args.leftController) || livePad(args.rightController);
-    window.SVR_PHASE298_HAND_TELEPORT_FIX = {
+    window.SVR_PHASE98_HAND_AIM_RELEASE_TELEPORT_LOCK = {
       build: LABEL,
       active: true,
       xr,
@@ -27,7 +27,10 @@ export function createTeleportRig(opts){
       controllerFallbackProtected: true,
       headForwardMoveProtected: true,
       rayProtected: true,
-      handLetGoFix: true,
+      handPinchAimVisibleBeforeRelease: true,
+      handReleaseOnlyCommit: true,
+      stableHandProxy: true,
+      secondFloorPatchExpected: true,
       siteTouched: false,
       checkedAt: new Date().toISOString()
     };
