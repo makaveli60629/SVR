@@ -12,7 +12,7 @@ import { createWristWatch } from "./modules/watch.js";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
-const BUILD_LABEL = "PHASE-265-PILLAR-SIGN-CLEARANCE-LOCK";
+const BUILD_LABEL = "PHASE-294-RUNTIME-LABEL-APPROVAL-CLEANUP-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
@@ -24,9 +24,9 @@ window.SVR_REFINED_LOBBY_GEOMETRY = true;
 window.SVR_BACKGROUND_BUILDINGS_REMOVED = true;
 window.SVR_LOCKED_FINAL_BUILD = BUILD_LABEL;
 window.SVR_NO_FACE_OVERLAY = true;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 265: rear pillars moved into sign gaps over Phase 261/263 new lobby." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 294: runtime label alignment and approval-safe private-scene cleanup over Phase 293 lobby visual truth lock." };
 window.SVR_PHASE228_MAIN_IMPORT_LOCK = { build: BUILD_LABEL, handsModule: "hands_phase228.js", movementModule: "movement_phase228.js", checkedAt: new Date().toISOString() };
-window.SVR_PHASE265_LOCK = { build: BUILD_LABEL, phase261BaselinePreserved: true, noTruitive: true, pillarSignClearance: true };
+window.SVR_PHASE294_LOCK = { build: BUILD_LABEL, phase293BaselinePreserved: true, noUnapprovedReikiBranding: true, rangeAliasAdded: true };
 
 const $status = document.getElementById("status");
 const $mode = document.getElementById("mode");
@@ -67,7 +67,7 @@ window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $
 window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
 const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading Phase 265 pillar/sign-clearance runtime…", { force: true });
+setStatus("Loading Phase 294 runtime/approval cleanup lock…", { force: true });
 const world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
 installPhase201HubContentRestore({ scene, camera, renderer, log });
 installPhase202StorefrontShells({ scene, camera, renderer, log });
@@ -117,7 +117,6 @@ function createStoreWebPortal(){
   const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2(); renderer.domElement.addEventListener("pointerdown", (ev)=>{ const rect = renderer.domElement.getBoundingClientRect(); mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1; mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1; raycaster.setFromCamera(mouse, camera); const hit = raycaster.intersectObjects([pane, panel], false)[0]; if (hit) openStorePortal(); });
   return group;
 }
-
 $sceneButtons.forEach((btn)=>{ btn.addEventListener("click", ()=>{ const key = btn.dataset.scene; if (key === "store") openStorePortal(); else if (key) gotoScene(key); }); });
 window.addEventListener("keydown", async (e)=>{
   if (renderer.xr.isPresenting || e.repeat) return;
