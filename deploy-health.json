@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-90-RELEASE-CANDIDATE-AUDIT-LOCK",
-  "commit": "phase-90-auto-deploy-trigger",
+  "build": "SVR-PHASE-91-HEADSET-QA-FIX-PASS-LOCK",
+  "commit": "phase-91-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 90 release candidate audit lock."
+  "purpose": "Auto Deploy trigger after Phase 91 headset QA fix pass lock."
 }
