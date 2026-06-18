@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-96-UPDATE-4-WORLD-LAYER-LOCK",
-  "commit": "phase-96-auto-deploy-trigger",
+  "build": "SVR-PHASE-97-LOBBY-DECLUTTER-OPEN-FLOOR-LOCK",
+  "commit": "phase-97-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 96 Update 4.0 world layer lock."
+  "purpose": "Auto Deploy trigger after Phase 97 lobby declutter and open floor lock."
 }
