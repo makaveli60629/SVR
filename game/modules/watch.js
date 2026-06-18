@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
+const PHASE87_LABEL = "PHASE-87-WATCH-POKER-CONTROLS-LOCK";
 function rr(c, x, y, w, h, r){
   c.beginPath();
   c.moveTo(x + r, y);
@@ -19,7 +20,7 @@ const M0 = new THREE.Matrix4();
 const FLIP_Q = new THREE.Quaternion();
 const SCREEN_TILT_Q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.34);
 const DISPLAY_MIRRORED = false;
-const DISPLAY_ROTATED_180 = true; // Phase 125: user reported upside-down watch; rotate visual + hit map together.
+const DISPLAY_ROTATED_180 = true;
 
 function getJointWorld(hand, names){
   if (!hand?.joints) return null;
@@ -127,16 +128,15 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   );
   screenBack.visible = false;
 
-
   function drawButton(btn, hovered){
     ctx.save();
     ctx.fillStyle = hovered ? 'rgba(180,140,255,0.28)' : 'rgba(255,255,255,0.08)';
-    ctx.strokeStyle = hovered ? 'rgba(180,140,255,0.95)' : 'rgba(180,140,255,0.35)';
+    ctx.strokeStyle = hovered ? 'rgba(180,140,255,0.95)' : btn.stroke || 'rgba(180,140,255,0.35)';
     ctx.lineWidth = hovered ? 5 : 3;
     rr(ctx, btn.x, btn.y, btn.w, btn.h, 18);
     ctx.fill();
     ctx.stroke();
-    ctx.fillStyle = hovered ? '#ffffff' : '#e8e8ff';
+    ctx.fillStyle = hovered ? '#ffffff' : (btn.text || '#e8e8ff');
     ctx.font = `bold ${btn.font || 28}px system-ui, Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -144,30 +144,37 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ctx.restore();
   }
 
+ function pokerState(){ return window.SVR_PHASE86_POKER_STATE || {}; }
+ function pokerActionLabel(id){ return ({ pokerFold:'FOLD', pokerCheck:'CHECK', pokerCall:'CALL', pokerRaise:'RAISE', pokerAllIn:'ALL-IN', pokerNext:'NEXT' })[id] || id; }
+ function buildButtons(state){
+   const buttons = [
+     { id: 'lobby', label: 'LOBBY', x: 24, y: 142, w: 110, h: 38, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
+     { id: 'storeScene', label: 'STORE', x: 144, y: 142, w: 110, h: 38, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
+     { id: 'seatScene', label: 'SEAT', x: 264, y: 142, w: 110, h: 38, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
 
+     { id: 'reikiScene', label: 'REIKI', x: 24, y: 188, w: 110, h: 38, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
+     { id: 'pgaScene', label: 'PGA', x: 144, y: 188, w: 110, h: 38, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
+     { id: 'legendScene', label: 'LEGEND', x: 264, y: 188, w: 110, h: 38, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
 
-function buildButtons(state){
-  const buttons = [
-    { id: 'lobby', label: 'LOBBY', x: 24, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'storeScene', label: 'STORE', x: 154, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'seatScene', label: 'SEAT', x: 284, y: 146, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
+     { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 234, w: 110, h: 38, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
+     { id: 'scorpionScene', label: 'SCORPION', x: 144, y: 234, w: 110, h: 38, font: 15, pinchOnly: true, hold: 0.16, margin: 6 },
+     { id: 'reikiRoomScene', label: 'R-ROOM', x: 264, y: 234, w: 110, h: 38, font: 16, pinchOnly: true, hold: 0.16, margin: 6 },
 
-    { id: 'reikiScene', label: 'REIKI', x: 24, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'pgaScene', label: 'PGA', x: 154, y: 198, w: 118, h: 42, font: 22, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'legendScene', label: 'LEGEND', x: 284, y: 198, w: 118, h: 42, font: 19, pinchOnly: true, hold: 0.16, margin: 6 },
+     { id: 'pokerFold', label: 'FOLD', x: 408, y: 116, w: 132, h: 42, font: 21, pinchOnly: true, hold: 0.14, margin: 7, stroke:'rgba(255,91,140,.75)', text:'#ffd6e1' },
+     { id: 'pokerCheck', label: 'CHECK', x: 552, y: 116, w: 132, h: 42, font: 20, pinchOnly: true, hold: 0.14, margin: 7, stroke:'rgba(127,252,255,.75)', text:'#d8ffff' },
+     { id: 'pokerCall', label: 'CALL', x: 696, y: 116, w: 132, h: 42, font: 21, pinchOnly: true, hold: 0.14, margin: 7, stroke:'rgba(134,255,183,.75)', text:'#dfffea' },
+     { id: 'pokerRaise', label: 'RAISE', x: 840, y: 116, w: 132, h: 42, font: 20, pinchOnly: true, hold: 0.14, margin: 7, stroke:'rgba(255,217,138,.75)', text:'#fff0c6' },
+     { id: 'pokerAllIn', label: 'ALL-IN', x: 408, y: 168, w: 274, h: 42, font: 23, pinchOnly: true, hold: 0.18, margin: 7, stroke:'rgba(255,255,255,.82)', text:'#ffffff' },
+     { id: 'pokerNext', label: 'NEXT HAND', x: 696, y: 168, w: 276, h: 42, font: 22, pinchOnly: true, hold: 0.18, margin: 7, stroke:'rgba(189,124,255,.80)', text:'#f0dcff' },
 
-    { id: 'sponsorScene', label: 'SPONSOR', x: 24, y: 250, w: 118, h: 42, font: 18, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'scorpionScene', label: 'SCORPION', x: 154, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-    { id: 'reikiRoomScene', label: 'R-VIDEO', x: 284, y: 250, w: 118, h: 42, font: 17, pinchOnly: true, hold: 0.16, margin: 6 },
-
-    { id: 'audio', label: state.audioEnabled ? 'LOBBY MUSIC ON' : 'LOBBY MUSIC OFF', x: 24, y: 360, w: 156, h: 58, font: 24, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'storeOpen', label: 'OPEN STORE', x: 194, y: 360, w: 172, h: 58, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
-    { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 428, y: 178, w: 548, h: 240, font: 64, pinchOnly: true, hold: 0.18, margin: 8 },
-  ];
-  if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 428, y: 120, w: 548, h: 48, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
-  else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 428, y: 120, w: 548, h: 48, font: 28, pinchOnly: true, hold: 0.18, margin: 8 });
-  return buttons;
-}
+     { id: 'audio', label: state.audioEnabled ? 'MUSIC ON' : 'MUSIC OFF', x: 24, y: 348, w: 156, h: 56, font: 22, pinchOnly: true, hold: 0.20, margin: 6 },
+     { id: 'storeOpen', label: 'OPEN STORE', x: 194, y: 348, w: 172, h: 56, font: 21, pinchOnly: true, hold: 0.20, margin: 6 },
+     { id: 'teleport', label: state.teleportEnabled ? 'TP ON' : 'TP OFF', x: 408, y: 224, w: 564, h: 180, font: 58, pinchOnly: true, hold: 0.18, margin: 8 },
+   ];
+   if (state.seated) buttons.push({ id: 'leave', label: 'LEAVE TABLE', x: 408, y: 58, w: 564, h: 44, font: 24, pinchOnly: true, hold: 0.18, margin: 8 });
+   else if (state.inTableZone) buttons.push({ id: 'join', label: 'QUICK SIT', x: 408, y: 58, w: 564, h: 44, font: 26, pinchOnly: true, hold: 0.18, margin: 8 });
+   return buttons;
+ }
 
 let hoveredId = null;
   let pressed = false;
@@ -179,7 +186,8 @@ let hoveredId = null;
 
   function draw(force = false){
     const state = getState();
-    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, sec: new Date().getSeconds() });
+    const ps = pokerState();
+    const sig = JSON.stringify({ h: hoveredId, t: state.trackTitle, ae: state.audioEnabled, c: state.cash, s: state.seated, z: state.inTableZone, seat: state.seatLabel, tp:state.teleportEnabled, pokerPhase:ps.phase, pokerPot:ps.pot, pokerWinner:ps.winner?.name, sec: new Date().getSeconds() });
     if (!force && sig === lastSig) return;
     lastSig = sig;
 
@@ -202,34 +210,34 @@ let hoveredId = null;
 
     const now = new Date();
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 58px system-ui, Arial';
+    ctx.font = 'bold 48px system-ui, Arial';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 42, 66);
+    ctx.fillText(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 42, 60);
 
     ctx.textAlign = 'right';
     ctx.fillStyle = '#7ff5c7';
-    ctx.font = 'bold 40px system-ui, Arial';
-    ctx.fillText(`$${Number(state.cash || 0).toLocaleString()}`, 972, 66);
+    ctx.font = 'bold 34px system-ui, Arial';
+    ctx.fillText(`$${Number(state.cash || 0).toLocaleString()}`, 972, 60);
 
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(233,233,255,0.95)';
-    ctx.font = 'bold 30px system-ui, Arial';
-    ctx.fillText('SVR WRIST CONSOLE', 34, 112);
+    ctx.font = 'bold 27px system-ui, Arial';
+    ctx.fillText('SVR WRIST CONSOLE', 34, 105);
     ctx.fillStyle = 'rgba(233,233,255,0.78)';
-    ctx.font = '25px system-ui, Arial';
-    ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 430, 152);
-    ctx.fillText(`Lobby music: ${state.audioEnabled ? 'On' : 'Off'}`, 430, 190);
-    ctx.fillText(`Zone: ${state.inTableZone ? 'Ready' : 'Walk closer'}`, 430, 228);
+    ctx.font = '21px system-ui, Arial';
+    ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 430, 238);
+    ctx.fillText(`Poker: ${(ps.phase || 'ready').toUpperCase()} • Pot ${ps.pot ?? 0}`, 430, 270);
+    ctx.fillText(`Winner: ${ps.winner?.name || '—'} • TP ${state.teleportEnabled ? 'ON' : 'OFF'}`, 430, 302);
     ctx.textAlign = 'right';
     ctx.fillStyle = state.seated ? '#7ff5c7' : state.inTableZone ? '#f6e27f' : 'rgba(233,233,255,0.72)';
-    ctx.font = 'bold 28px system-ui, Arial';
-    ctx.fillText(state.seated ? 'AT TABLE' : (state.inTableZone ? 'JOIN READY' : 'LOBBY'), 970, 148);
+    ctx.font = 'bold 24px system-ui, Arial';
+    ctx.fillText(state.seated ? 'AT TABLE' : (state.inTableZone ? 'JOIN READY' : 'LOBBY'), 970, 92);
 
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(180,140,255,0.92)';
-    ctx.font = 'bold 22px system-ui, Arial';
-    ctx.fillText('Quick scenes • Store / Reiki / PGA / Sponsor / Scorpion • Music manual only', 36, 332);
+    ctx.font = 'bold 19px system-ui, Arial';
+    ctx.fillText('Poker row active • Fold / Check / Call / Raise / All-In / Next', 36, 326);
 
     for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
     ctx.restore();
@@ -261,6 +269,14 @@ let hoveredId = null;
     return best;
   }
 
+  function emitPoker(action){
+    const payload={ build:PHASE87_LABEL, action, source:'watch', tableKey:'lobby-main', seatId:'SOUTH_PLAYER', playMoneyOnly:true, createdAt:new Date().toISOString() };
+    window.SVR_PHASE87_LAST_WATCH_POKER_ACTION=payload;
+    try { window.dispatchEvent(new CustomEvent('svr-poker-player-action', { detail: payload })); } catch {}
+    try { window.dispatchEvent(new CustomEvent('svr-watch-poker-action', { detail: payload })); } catch {}
+    window.SVR_PHASE87_WATCH_POKER_CONTROLS_LOCK={ build:PHASE87_LABEL, active:true, lastAction:payload, siteTouched:false, checkedAt:new Date().toISOString() };
+    return payload;
+  }
   function activate(id){
     if (!id) return;
     if (id === 'audio') actions.toggleAudio?.();
@@ -279,6 +295,12 @@ let hoveredId = null;
     if (id === 'sponsorScene') actions.goSponsor?.();
     if (id === 'scorpionScene') actions.goScorpion?.();
     if (id === 'reikiRoomScene') actions.goReikiRoom?.();
+    if (id === 'pokerFold') emitPoker('fold');
+    if (id === 'pokerCheck') emitPoker('check');
+    if (id === 'pokerCall') emitPoker('call');
+    if (id === 'pokerRaise') emitPoker('raise');
+    if (id === 'pokerAllIn') emitPoker('all_in');
+    if (id === 'pokerNext') emitPoker('next');
   }
 
   function update(dt, leftHand, rightHand){
@@ -363,5 +385,6 @@ let hoveredId = null;
   }
 
   draw(true);
+  window.SVR_PHASE87_WATCH_POKER_CONTROLS_LOCK={ build:PHASE87_LABEL, active:true, actions:['fold','check','call','raise','all_in','next'], siteTouched:false, checkedAt:new Date().toISOString() };
   return { update, object: group };
 }
