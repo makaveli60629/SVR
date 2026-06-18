@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-84-LOBBY-VISUAL-MATCH-PORTAL-POLISH-LOCK",
-  "commit": "phase-84-auto-deploy-trigger",
+  "build": "SVR-PHASE-85-PORTAL-ENABLE-SOLID-LOBBY-LOCK",
+  "commit": "phase-85-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 84 lobby visual match and portal polish lock."
+  "purpose": "Auto Deploy trigger after Phase 85 portal enable and solid lobby optimization lock."
 }
