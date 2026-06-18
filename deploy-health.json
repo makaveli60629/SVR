@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-295-REIKI-APPROVAL-OVERLAY-LOCK",
-  "commit": "phase-295-auto-deploy-trigger",
+  "build": "SVR-PHASE-296-LOBBY-ARCH-DOORWAY-ALIGNMENT-LOCK",
+  "commit": "phase-296-auto-deploy-trigger",
   "updatedAt": "2026-06-17T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 295 Reiki approval overlay runtime patch."
+  "purpose": "Auto Deploy trigger after Phase 296 lobby arch doorway alignment and display readability patch."
 }
