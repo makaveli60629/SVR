@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-98-HAND-TELEPORT-SECOND-FLOOR-FIX-LOCK",
-  "commit": "phase-98-auto-deploy-trigger",
+  "build": "SVR-PHASE-99-CLEAN-EXPANDED-LOBBY-REBUILD-LOCK",
+  "commit": "phase-99-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 98 stable hand teleport aim/release and second floor safety floor lock."
+  "purpose": "Auto Deploy trigger after Phase 99 clean expanded lobby rebuild, quick load, corrected doorway geometry, free spawn, and solid floor lock."
 }
