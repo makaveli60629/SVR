@@ -3,54 +3,55 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-  <title>SVR Poker • PHASE-90-RELEASE-CANDIDATE-AUDIT-LOCK</title>
+  <title>SVR Poker • PHASE-91-HEADSET-QA-FIX-PASS-LOCK</title>
   <meta name="theme-color" content="#050508"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
-  <link rel="manifest" href="./manifest.json?v=phase90"/>
+  <link rel="manifest" href="./manifest.json?v=phase91"/>
   <style>
     html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}#app{position:fixed;inset:0;background:radial-gradient(circle at 50% 42%,rgba(127,252,255,.12),#02040b 48%,#000 100%)}canvas{display:block;width:100%;height:100%;background:#000;outline:none}#safeStage{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,rgba(127,252,255,.14),rgba(5,5,18,.96) 48%,#000 100%)}.safe-card{width:min(92vw,720px);border:1px solid rgba(127,252,255,.72);border-radius:22px;background:rgba(0,0,0,.68);box-shadow:0 0 42px rgba(127,252,255,.20);padding:26px;text-align:center}.safe-card h1{margin:6px 0 8px;font-size:clamp(34px,7vw,72px);letter-spacing:.04em}.safe-card h2{margin:0 0 14px;color:#7ffcff;font-size:clamp(16px,3vw,28px)}.safe-card p{color:#d7eaff}.pill{display:inline-block;border:1px solid #ffd98a;border-radius:999px;color:#ffd98a;padding:7px 12px;font-weight:900;font-size:12px;letter-spacing:.08em}.btn{display:inline-flex;align-items:center;justify-content:center;margin:6px;border:1px solid rgba(255,217,138,.65);border-radius:12px;background:rgba(255,217,138,.12);color:#ffd98a;padding:10px 14px;font-weight:900;text-decoration:none;cursor:pointer}.btn.cyan{border-color:rgba(127,252,255,.68);color:#bffcff;background:rgba(127,252,255,.10)}#bootFallback{display:none!important;opacity:0!important;pointer-events:none!important}.phase-label,#sceneNav,#log,#err,#hud{display:none!important}.boot-released #safeStage,.runtime-visible #safeStage,.overlay-released #safeStage{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-90-RELEASE-CANDIDATE-AUDIT-LOCK">
+<body data-build="PHASE-91-HEADSET-QA-FIX-PASS-LOCK">
   <div id="app"></div>
-  <div id="safeStage"><section class="safe-card"><span class="pill">PHASE 90 ACTIVE</span><h1>SVR POKER</h1><h2>Release Candidate Audit Lock</h2><p id="safeStatus">Starting lobby. Portals, poker, watch controls, card/chip pads, Quest performance, and Moon/Mars checks are armed.</p><div><button class="btn cyan" id="startRuntimeBtn" type="button">Start Lobby Now</button><a class="btn" href="./index.html?v=phase90-manual-refresh">Reload Fresh</a></div></section></div>
+  <div id="safeStage"><section class="safe-card"><span class="pill">PHASE 91 ACTIVE</span><h1>SVR POKER</h1><h2>Headset QA Fix Pass</h2><p id="safeStatus">Starting lobby. Headset QA safety, teleport release checks, watch poker buttons, cards, chips, and performance checks are armed.</p><div><button class="btn cyan" id="startRuntimeBtn" type="button">Start Lobby Now</button><a class="btn" href="./index.html?v=phase91-manual-refresh">Reload Fresh</a></div></section></div>
   <div id="bootFallback"></div><div id="hud"><span id="status"></span><span id="mode"></span><button id="toggleLog" type="button">Log</button><button id="toggleJoints" type="button">Joints</button></div><div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      var BUILD='PHASE-90-RELEASE-CANDIDATE-AUDIT-LOCK';var loaded=false;var status=document.getElementById('safeStatus');
-      window.SVR_PHASE90_BOOT={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString()};
-      function note(msg){if(status)status.textContent=msg;window.SVR_PHASE90_BOOT.lastMessage=msg;window.SVR_PHASE90_BOOT.checkedAt=new Date().toISOString();}
-      function hideOverlay(reason){document.body.classList.add('boot-released','runtime-visible','overlay-released');var safe=document.getElementById('safeStage');if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';safe.setAttribute('aria-hidden','true');}window.__SVR_GAME_READY__=true;window.SVR_GAME_READY=true;window.SVR_PHASE90_BOOT.overlayReleased=true;window.SVR_PHASE90_BOOT.reason=reason;window.SVR_PHASE90_BOOT.releasedAt=new Date().toISOString();}
+      var BUILD='PHASE-91-HEADSET-QA-FIX-PASS-LOCK';var loaded=false;var status=document.getElementById('safeStatus');
+      window.SVR_PHASE91_BOOT={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString()};
+      function note(msg){if(status)status.textContent=msg;window.SVR_PHASE91_BOOT.lastMessage=msg;window.SVR_PHASE91_BOOT.checkedAt=new Date().toISOString();}
+      function hideOverlay(reason){document.body.classList.add('boot-released','runtime-visible','overlay-released');var safe=document.getElementById('safeStage');if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';safe.setAttribute('aria-hidden','true');}window.__SVR_GAME_READY__=true;window.SVR_GAME_READY=true;window.SVR_PHASE91_BOOT.overlayReleased=true;window.SVR_PHASE91_BOOT.reason=reason;window.SVR_PHASE91_BOOT.releasedAt=new Date().toISOString();}
       window.SVR_RELEASE_BOOT=hideOverlay;window.SVR_FORCE_HIDE_SAFE_STAGE=hideOverlay;
       function addModule(src){return new Promise(function(resolve,reject){var s=document.createElement('script');s.type='module';s.src=src;s.onload=resolve;s.onerror=function(){reject(new Error('Failed '+src));};document.body.appendChild(s);});}
-      async function startRuntime(){if(loaded)return;loaded=true;window.SVR_PHASE90_BOOT.loaded=true;note('Starting Phase 90 runtime audit...');try{
-        await addModule('./phase101_boot_load_screen_recovery.js?v=phase90');
-        await addModule('./phase101_partial_runtime_render_guard.js?v=phase90');
-        await addModule('./phase101_render_marker_cleanup.js?v=phase90');
-        await addModule('./main.js?v=phase90-main-runtime');
-        await addModule('./phase101s_finished_lobby_lock.js?v=phase90-shim');
-        await addModule('./phase285_live_deploy_quest_qa_lock.js?v=phase90-qa');
-        await addModule('./phase288_multiplayer_status_lock.js?v=phase90-status');
-        await addModule('./phase290_presence_client_lock.js?v=phase90-presence');
-        await addModule('./phase291_player_slot_mapper.js?v=phase90-slots');
-        await addModule('./phase292_admin_pill_user_group_lock.js?v=phase90-admin-pill');
-        await addModule('./phase293_lobby_visual_truth_lock.js?v=phase90-visual');
-        await addModule('./phase295_reiki_runtime_debrand_overlay.js?v=phase90-approval-overlay');
-        setTimeout(function(){addModule('./phase101t_lobby_interaction_portal_qa_lock.js?v=phase90').catch(function(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e));});},900);
-        setTimeout(function(){addModule('./phase101v_safe_loader_bridge.js?v=phase90').catch(function(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e));});},1500);
-        setTimeout(function(){addModule('./phase261_roman_canopy_pillar_smooth_lobby_lock.js?v=phase90-preserve').catch(function(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e));});},2200);
-        setTimeout(function(){addModule('./phase101s_finished_lobby_lock.js?v=phase90-final').catch(function(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e));});},2800);
-        setTimeout(function(){addModule('./phase285_live_deploy_quest_qa_lock.js?v=phase90-final').catch(function(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e));});},3400);
-        setTimeout(function(){addModule('./phase292_admin_pill_user_group_lock.js?v=phase90-final').catch(function(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e));});},3900);
-        setTimeout(function(){addModule('./phase293_lobby_visual_truth_lock.js?v=phase90-final').catch(function(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e));});},4300);
-        setTimeout(function(){addModule('./phase295_reiki_runtime_debrand_overlay.js?v=phase90-final').catch(function(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e));});},4700);
-        setTimeout(function(){addModule('./phase90_release_candidate_audit_lock.js?v=phase90-rc-audit').catch(function(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e));});},6200);
-        note('Lobby launched. Phase 90 release candidate audit armed.');setTimeout(function(){hideOverlay('phase90-runtime-launched');},350);
-      }catch(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e));note('Runtime failed. Releasing overlay.');setTimeout(function(){hideOverlay('phase90-fallback-release');},650);}}
-      document.getElementById('startRuntimeBtn').addEventListener('click',startRuntime);window.addEventListener('error',function(e){window.SVR_PHASE90_BOOT.errors.push(String(e.message||e.error||e));hideOverlay('error-release');});window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE90_BOOT.errors.push(String((e.reason&&e.reason.message)||e.reason||e));hideOverlay('promise-release');});var overlayWatch=setInterval(function(){if(window.__SVR_RENDERER__||window.__SVR_SCENE__||document.querySelector('canvas')){hideOverlay('scene-or-canvas-detected');clearInterval(overlayWatch);}},250);setTimeout(startRuntime,250);setTimeout(function(){if(!window.__SVR_RENDERER__&&!window.__SVR_SCENE__)startRuntime();},1200);setTimeout(function(){hideOverlay('absolute-overlay-release-1800ms');},1800);
+      async function startRuntime(){if(loaded)return;loaded=true;window.SVR_PHASE91_BOOT.loaded=true;note('Starting Phase 91 headset QA pass...');try{
+        await addModule('./phase101_boot_load_screen_recovery.js?v=phase91');
+        await addModule('./phase101_partial_runtime_render_guard.js?v=phase91');
+        await addModule('./phase101_render_marker_cleanup.js?v=phase91');
+        await addModule('./main.js?v=phase91-main-runtime');
+        await addModule('./phase101s_finished_lobby_lock.js?v=phase91-shim');
+        await addModule('./phase285_live_deploy_quest_qa_lock.js?v=phase91-qa');
+        await addModule('./phase288_multiplayer_status_lock.js?v=phase91-status');
+        await addModule('./phase290_presence_client_lock.js?v=phase91-presence');
+        await addModule('./phase291_player_slot_mapper.js?v=phase91-slots');
+        await addModule('./phase292_admin_pill_user_group_lock.js?v=phase91-admin-pill');
+        await addModule('./phase293_lobby_visual_truth_lock.js?v=phase91-visual');
+        await addModule('./phase295_reiki_runtime_debrand_overlay.js?v=phase91-approval-overlay');
+        setTimeout(function(){addModule('./phase101t_lobby_interaction_portal_qa_lock.js?v=phase91').catch(function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));});},900);
+        setTimeout(function(){addModule('./phase101v_safe_loader_bridge.js?v=phase91').catch(function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));});},1500);
+        setTimeout(function(){addModule('./phase261_roman_canopy_pillar_smooth_lobby_lock.js?v=phase91-preserve').catch(function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));});},2200);
+        setTimeout(function(){addModule('./phase101s_finished_lobby_lock.js?v=phase91-final').catch(function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));});},2800);
+        setTimeout(function(){addModule('./phase285_live_deploy_quest_qa_lock.js?v=phase91-final').catch(function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));});},3400);
+        setTimeout(function(){addModule('./phase292_admin_pill_user_group_lock.js?v=phase91-final').catch(function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));});},3900);
+        setTimeout(function(){addModule('./phase293_lobby_visual_truth_lock.js?v=phase91-final').catch(function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));});},4300);
+        setTimeout(function(){addModule('./phase295_reiki_runtime_debrand_overlay.js?v=phase91-final').catch(function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));});},4700);
+        setTimeout(function(){addModule('./phase90_release_candidate_audit_lock.js?v=phase91-rc-audit').catch(function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));});},6200);
+        setTimeout(function(){addModule('./phase91_headset_qa_fix_pass_lock.js?v=phase91-headset-qa').catch(function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));});},7600);
+        note('Lobby launched. Phase 91 headset QA fix pass armed.');setTimeout(function(){hideOverlay('phase91-runtime-launched');},350);
+      }catch(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e));note('Runtime failed. Releasing overlay.');setTimeout(function(){hideOverlay('phase91-fallback-release');},650);}}
+      document.getElementById('startRuntimeBtn').addEventListener('click',startRuntime);window.addEventListener('error',function(e){window.SVR_PHASE91_BOOT.errors.push(String(e.message||e.error||e));hideOverlay('error-release');});window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE91_BOOT.errors.push(String((e.reason&&e.reason.message)||e.reason||e));hideOverlay('promise-release');});var overlayWatch=setInterval(function(){if(window.__SVR_RENDERER__||window.__SVR_SCENE__||document.querySelector('canvas')){hideOverlay('scene-or-canvas-detected');clearInterval(overlayWatch);}},250);setTimeout(startRuntime,250);setTimeout(function(){if(!window.__SVR_RENDERER__&&!window.__SVR_SCENE__)startRuntime();},1200);setTimeout(function(){hideOverlay('absolute-overlay-release-1800ms');},1800);
     })();
   </script>
 </body>
