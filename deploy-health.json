@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-92-LOBBY-BEAUTY-PASS-LOCK",
-  "commit": "phase-92-auto-deploy-trigger",
+  "build": "SVR-PHASE-93-LOBBY-COMPOSITION-SKYLINE-DEPTH-LOCK",
+  "commit": "phase-93-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 92 lobby beauty pass lock."
+  "purpose": "Auto Deploy trigger after Phase 93 lobby composition and skyline depth lock."
 }
