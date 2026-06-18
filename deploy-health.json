@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-94-STOREFRONT-PRECISION-PROFESSIONAL-FINISH-LOCK",
-  "commit": "phase-94-auto-deploy-trigger",
+  "build": "SVR-PHASE-95-LOBBY-LIGHTING-SIGHTLINE-POLISH-LOCK",
+  "commit": "phase-95-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 94 storefront precision and professional lobby finish lock."
+  "purpose": "Auto Deploy trigger after Phase 95 lobby lighting and sightline polish lock."
 }
