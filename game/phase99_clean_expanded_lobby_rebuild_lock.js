@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const LABEL = "PHASE-99-CLEAN-EXPANDED-LOBBY-REBUILD-LOCK";
+const LABEL = "PHASE-113-EXPANDED-LOBBY-ORGANIZATION-ALIGNMENT-LOCK";
 const ROOT = "PHASE99_CLEAN_EXPANDED_LOBBY_REBUILD_ROOT";
 const GOLD = 0xffd98a;
 const CYAN = 0x7ffcff;
@@ -12,11 +12,11 @@ const KEEP_RE = /POKER|TABLE|CARD|CHIP|ACTION|WATCH|HAND|TELEPORT|RAY|ARC|TARGET
 let installed = false;
 
 const DOORWAYS = [
-  { key:"wellness", title:"WELLNESS", sub:"AWAITING APPROVAL", x:-11.6, y:1.85, z:-12.18, w:3.6, h:3.2, ry:0, c:PURPLE },
-  { key:"poker", title:"POKER", sub:"MAIN TABLE", x:0, y:1.95, z:-12.22, w:4.4, h:3.4, ry:0, c:GOLD },
-  { key:"pga", title:"PGA RANGE", sub:"TRAINING PORTAL", x:11.6, y:1.85, z:-12.18, w:3.6, h:3.2, ry:0, c:CYAN },
-  { key:"store", title:"SVR STORE", sub:"WEB PORTAL", x:15.55, y:1.85, z:2.2, w:3.35, h:3.0, ry:-Math.PI/2, c:GOLD },
-  { key:"scorpion", title:"SCORPION", sub:"PRIVATE ROOM", x:15.55, y:1.85, z:-7.2, w:3.35, h:3.0, ry:-Math.PI/2, c:PURPLE }
+  { key:"wellness", title:"WELLNESS", sub:"AWAITING APPROVAL", x:-16.2, y:1.9, z:-18.72, w:4.25, h:3.35, ry:0, c:PURPLE },
+  { key:"poker", title:"POKER", sub:"MAIN TABLE", x:0, y:2.0, z:-18.76, w:4.9, h:3.55, ry:0, c:GOLD },
+  { key:"pga", title:"PGA RANGE", sub:"TRAINING PORTAL", x:16.2, y:1.9, z:-18.72, w:4.25, h:3.35, ry:0, c:CYAN },
+  { key:"store", title:"SVR STORE", sub:"WEB PORTAL", x:23.55, y:1.9, z:5.8, w:3.85, h:3.15, ry:-Math.PI/2, c:GOLD },
+  { key:"scorpion", title:"SCORPION", sub:"PRIVATE ROOM", x:23.55, y:1.9, z:-8.8, w:3.85, h:3.15, ry:-Math.PI/2, c:PURPLE }
 ];
 
 function mat(color, opts={}){
@@ -53,6 +53,7 @@ function makePanel(root, name, geom, material, pos, ry=0){
   mesh.receiveShadow = false;
   mesh.castShadow = false;
   mesh.userData.phase99Solid = true;
+  mesh.userData.phase113ExpandedAligned = true;
   root.add(mesh);
   return mesh;
 }
@@ -82,17 +83,17 @@ function clearOldCrowd(scene){
   return {hidden, protectedCore};
 }
 function buildLargeRoom(root){
-  makePanel(root,"PHASE99_EXPANDED_SOLID_MAIN_FLOOR",new THREE.BoxGeometry(34,.14,28),mat(FLOOR,{roughness:.42,metalness:.12,emissive:0x020308,emissiveIntensity:.12}),new THREE.Vector3(0,-.02,-1.6));
-  makePanel(root,"PHASE99_FREE_SPAWN_CLEAR_ZONE",new THREE.CircleGeometry(3.8,96),glow(CYAN,.10),new THREE.Vector3(0,.08,7.4)).rotation.x=-Math.PI/2;
-  makePanel(root,"PHASE99_FIRST_TIME_USER_MAIN_WALKWAY",new THREE.PlaneGeometry(4.8,18.5),glow(GOLD,.08),new THREE.Vector3(0,.09,-1.4)).rotation.x=-Math.PI/2;
-  makePanel(root,"PHASE99_SOLID_REAR_WALL",new THREE.BoxGeometry(34,5.2,.24),mat(WALL,{roughness:.52,metalness:.05,emissive:0x03050c,emissiveIntensity:.18}),new THREE.Vector3(0,2.55,-12.65));
-  makePanel(root,"PHASE99_SOLID_LEFT_WALL",new THREE.BoxGeometry(.24,5.2,28),mat(WALL,{roughness:.52,metalness:.05,emissive:0x03050c,emissiveIntensity:.18}),new THREE.Vector3(-17.05,2.55,-1.6));
-  makePanel(root,"PHASE99_SOLID_RIGHT_WALL",new THREE.BoxGeometry(.24,5.2,28),mat(WALL,{roughness:.52,metalness:.05,emissive:0x03050c,emissiveIntensity:.18}),new THREE.Vector3(17.05,2.55,-1.6));
-  makePanel(root,"PHASE99_SOLID_FRONT_LOW_WALL",new THREE.BoxGeometry(34,2.2,.22),mat(WALL,{roughness:.52,metalness:.05,emissive:0x03050c,emissiveIntensity:.12}),new THREE.Vector3(0,1.1,12.25));
+  makePanel(root,"PHASE99_EXPANDED_SOLID_MAIN_FLOOR",new THREE.BoxGeometry(48,.14,38),mat(FLOOR,{roughness:.42,metalness:.12,emissive:0x020308,emissiveIntensity:.12}),new THREE.Vector3(0,-.02,-1.6));
+  makePanel(root,"PHASE99_FREE_SPAWN_CLEAR_ZONE",new THREE.CircleGeometry(4.7,96),glow(CYAN,.10),new THREE.Vector3(0,.08,10.6)).rotation.x=-Math.PI/2;
+  makePanel(root,"PHASE99_FIRST_TIME_USER_MAIN_WALKWAY",new THREE.PlaneGeometry(5.3,27.5),glow(GOLD,.075),new THREE.Vector3(0,.09,-2.9)).rotation.x=-Math.PI/2;
+  makePanel(root,"PHASE99_SOLID_REAR_WALL",new THREE.BoxGeometry(48,5.4,.24),mat(WALL,{roughness:.52,metalness:.05,emissive:0x03050c,emissiveIntensity:.18}),new THREE.Vector3(0,2.6,-19.0));
+  makePanel(root,"PHASE99_SOLID_LEFT_WALL",new THREE.BoxGeometry(.24,5.4,38),mat(WALL,{roughness:.52,metalness:.05,emissive:0x03050c,emissiveIntensity:.18}),new THREE.Vector3(-24.05,2.6,-1.6));
+  makePanel(root,"PHASE99_SOLID_RIGHT_WALL",new THREE.BoxGeometry(.24,5.4,38),mat(WALL,{roughness:.52,metalness:.05,emissive:0x03050c,emissiveIntensity:.18}),new THREE.Vector3(24.05,2.6,-1.6));
+  makePanel(root,"PHASE99_SOLID_FRONT_LOW_WALL",new THREE.BoxGeometry(48,2.15,.22),mat(WALL,{roughness:.52,metalness:.05,emissive:0x03050c,emissiveIntensity:.12}),new THREE.Vector3(0,1.08,17.25));
   [
-    [0,.24,-12.42,33.2,.08,0,"REAR_BASE"],[0,4.92,-12.42,33.2,.08,0,"REAR_CROWN"],
-    [-16.82,.24,-1.6,27.6,.08,Math.PI/2,"LEFT_BASE"],[-16.82,4.92,-1.6,27.6,.08,Math.PI/2,"LEFT_CROWN"],
-    [16.82,.24,-1.6,27.6,.08,-Math.PI/2,"RIGHT_BASE"],[16.82,4.92,-1.6,27.6,.08,-Math.PI/2,"RIGHT_CROWN"]
+    [0,.24,-18.76,47.2,.08,0,"REAR_BASE"],[0,5.08,-18.76,47.2,.08,0,"REAR_CROWN"],
+    [-23.82,.24,-1.6,37.5,.08,Math.PI/2,"LEFT_BASE"],[-23.82,5.08,-1.6,37.5,.08,Math.PI/2,"LEFT_CROWN"],
+    [23.82,.24,-1.6,37.5,.08,-Math.PI/2,"RIGHT_BASE"],[23.82,5.08,-1.6,37.5,.08,-Math.PI/2,"RIGHT_CROWN"]
   ].forEach(([x,y,z,w,d,ry,name])=>{
     const trim=makePanel(root,`PHASE99_CONTINUOUS_PURPLE_TRIM_${name}`,new THREE.BoxGeometry(w,.05,d),mat(PURPLE,{roughness:.25,metalness:.35,emissive:PURPLE,emissiveIntensity:.32}),new THREE.Vector3(x,y,z),ry);
     trim.renderOrder=90;
@@ -102,61 +103,67 @@ function buildDoorway(root,cfg){
   const group=new THREE.Group();
   group.name=`PHASE99_CORRECT_DOORWAY_${cfg.key.toUpperCase()}`;
   group.position.set(cfg.x,0,cfg.z); group.rotation.y=cfg.ry||0; root.add(group);
-  const back=new THREE.Mesh(new THREE.PlaneGeometry(cfg.w+.7,cfg.h+.55),new THREE.MeshBasicMaterial({color:0x02040a,transparent:true,opacity:.86,side:THREE.DoubleSide,depthWrite:false}));
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(cfg.w+.85,cfg.h+.62),new THREE.MeshBasicMaterial({color:0x02040a,transparent:true,opacity:.86,side:THREE.DoubleSide,depthWrite:false}));
   back.name=`${group.name}_FLUSH_WALL_SIGN_BACKPLATE`;
   back.position.set(0,cfg.y,.018);
   back.renderOrder=510; group.add(back);
-  const sign=new THREE.Mesh(new THREE.PlaneGeometry(cfg.w*.78,cfg.h*.34),new THREE.MeshBasicMaterial({map:signTexture(cfg.title,cfg.sub,cfg.c),transparent:true,side:THREE.DoubleSide,depthWrite:false}));
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(cfg.w*.76,cfg.h*.34),new THREE.MeshBasicMaterial({map:signTexture(cfg.title,cfg.sub,cfg.c),transparent:true,side:THREE.DoubleSide,depthWrite:false}));
   sign.name=`${group.name}_SIGN_AFFIXED_IN_WALL`;
-  sign.position.set(0,cfg.y+.22,.001);
+  sign.position.set(0,cfg.y+.22,.006);
   sign.renderOrder=540; group.add(sign);
-  const pillarX=cfg.w*.62;
+  const pillarX=cfg.w*.64;
   [-pillarX,pillarX].forEach((x,i)=>{
-    const p=new THREE.Mesh(new THREE.BoxGeometry(.32,cfg.h+.75,.36),mat(0x161925,{roughness:.42,metalness:.12,emissive:i?0x052029:0x160820,emissiveIntensity:.16}));
+    const p=new THREE.Mesh(new THREE.BoxGeometry(.36,cfg.h+.82,.42),mat(0x161925,{roughness:.42,metalness:.12,emissive:i?0x052029:0x160820,emissiveIntensity:.16}));
     p.name=`${group.name}_${i?"RIGHT":"LEFT"}_SIDE_PILLAR_CORRECT`;
-    p.position.set(x,cfg.y,.08);
+    p.position.set(x,cfg.y,.10);
     p.renderOrder=95;
     group.add(p);
-    const stripe=new THREE.Mesh(new THREE.BoxGeometry(.035,cfg.h+.62,.035),glow(i?CYAN:cfg.c,.46));
+    const stripe=new THREE.Mesh(new THREE.BoxGeometry(.04,cfg.h+.66,.04),glow(i?CYAN:cfg.c,.46));
     stripe.name=`${p.name}_NEON_INNER_EDGE`;
-    stripe.position.set(x + (i?-.18:.18),cfg.y,.23);
+    stripe.position.set(x + (i?-.21:.21),cfg.y,.25);
     stripe.renderOrder=545; group.add(stripe);
   });
-  const top=new THREE.Mesh(new THREE.BoxGeometry(cfg.w*1.45,.24,.38),mat(GOLD,{roughness:.30,metalness:.36,emissive:0x3a2605,emissiveIntensity:.22}));
+  const top=new THREE.Mesh(new THREE.BoxGeometry(cfg.w*1.48,.26,.42),mat(GOLD,{roughness:.30,metalness:.36,emissive:0x3a2605,emissiveIntensity:.22}));
   top.name=`${group.name}_SOLID_TOP_HEADER`;
-  top.position.set(0,cfg.y+cfg.h*.58,.09); top.renderOrder=96; group.add(top);
-  const arch=new THREE.Mesh(new THREE.TorusGeometry(cfg.w*.58,.045,12,96,Math.PI),new THREE.MeshBasicMaterial({color:cfg.c,transparent:true,opacity:.82,depthWrite:false}));
+  top.position.set(0,cfg.y+cfg.h*.58,.11); top.renderOrder=96; group.add(top);
+  const arch=new THREE.Mesh(new THREE.TorusGeometry(cfg.w*.60,.048,12,96,Math.PI),new THREE.MeshBasicMaterial({color:cfg.c,transparent:true,opacity:.82,depthWrite:false}));
   arch.name=`${group.name}_CORRECT_UPSIDE_DOWN_U_ARCH`;
-  arch.position.set(0,cfg.y+cfg.h*.48,.28);
+  arch.position.set(0,cfg.y+cfg.h*.48,.30);
   arch.rotation.z=Math.PI;
   arch.renderOrder=546;
   group.add(arch);
-  const floor=new THREE.Mesh(new THREE.BoxGeometry(cfg.w*1.05,.07,1.2),mat(0x101521,{roughness:.44,metalness:.16,emissive:cfg.c,emissiveIntensity:.08}));
+  const floor=new THREE.Mesh(new THREE.BoxGeometry(cfg.w*1.10,.07,1.35),mat(0x101521,{roughness:.44,metalness:.16,emissive:cfg.c,emissiveIntensity:.08}));
   floor.name=`${group.name}_SOLID_PORTAL_THRESHOLD_FLOOR`;
-  floor.position.set(0,.06,1.02);
+  floor.position.set(0,.06,1.08);
   floor.userData.svrTeleportFloor=true;
   floor.userData.svrWalkable=true;
   group.add(floor);
 }
 function buildOrganizedZones(root){
   DOORWAYS.forEach(cfg=>buildDoorway(root,cfg));
-  const tableRing=new THREE.Mesh(new THREE.RingGeometry(3.15,3.55,96),glow(GOLD,.18));
+  const tableRing=new THREE.Mesh(new THREE.RingGeometry(3.25,3.68,96),glow(GOLD,.18));
   tableRing.name="PHASE99_TABLE_FOCUS_RING_SINGLE_CLEAN";
   tableRing.rotation.x=-Math.PI/2;
   tableRing.position.set(0,.11,-2.7);
   tableRing.renderOrder=505;
   root.add(tableRing);
-  const spawnLabelTex=signTexture("WELCOME", "Look ahead • walk to table or portal", CYAN);
-  const spawnSign=new THREE.Mesh(new THREE.PlaneGeometry(3.4,1.05),new THREE.MeshBasicMaterial({map:spawnLabelTex,transparent:true,side:THREE.DoubleSide,depthWrite:false}));
+  const clearBuffer=new THREE.Mesh(new THREE.RingGeometry(5.2,5.55,128),glow(CYAN,.055));
+  clearBuffer.name="PHASE113_TABLE_CLEAR_BUFFER_RING_NO_STOREFRONTS_INSIDE";
+  clearBuffer.rotation.x=-Math.PI/2;
+  clearBuffer.position.set(0,.105,-2.7);
+  clearBuffer.renderOrder=504;
+  root.add(clearBuffer);
+  const spawnLabelTex=signTexture("WELCOME", "Open lobby • table center • portals on walls", CYAN);
+  const spawnSign=new THREE.Mesh(new THREE.PlaneGeometry(4.1,1.18),new THREE.MeshBasicMaterial({map:spawnLabelTex,transparent:true,side:THREE.DoubleSide,depthWrite:false}));
   spawnSign.name="PHASE99_FIRST_TIME_USER_WELCOME_VIEW_SIGN";
-  spawnSign.position.set(0,2.2,9.85);
+  spawnSign.position.set(0,2.25,13.9);
   spawnSign.rotation.y=Math.PI;
   spawnSign.renderOrder=530;
   root.add(spawnSign);
 }
 function firstTimeView(camera){
   if(!camera || window.__SVR_RENDERER__?.xr?.isPresenting) return false;
-  camera.position.set(0,1.62,7.2);
+  camera.position.set(0,1.62,10.6);
   camera.lookAt(0,1.55,-3.0);
   return true;
 }
@@ -166,6 +173,7 @@ function solidify(scene){
     const n=String(o.name||"");
     if(/PHASE99|PHASE98_SECOND_FLOOR|PORTAL|FLOOR|WALL|DOORWAY|PILLAR|THRESHOLD|TABLE|CARD|CHIP|ACTION/.test(n)){
       o.userData.phase99Solidified=true;
+      o.userData.phase113ExpandedAligned=true;
       o.visible=true;
       if(o.isMesh){ o.frustumCulled=false; solid++; }
     }
@@ -189,10 +197,12 @@ function install(){
     build:LABEL,
     active:true,
     phase101SecondFloorProtected:true,
-    mode:"single organized final layout pass",
-    lobbySize:"34 x 28 floor, expanded wall bounds, clean spawn",
-    spawn:{x:0,z:7.2,freeRadius:3.8,firstTimeView:viewSet},
-    doorways:DOORWAYS.map(d=>({key:d.key,sign:"affixed in wall",pillars:"left and right",arch:"correct U arch",solid:true})),
+    phase113ExpandedAligned:true,
+    mode:"expanded organized portal-hub final layout",
+    lobbySize:"48 x 38 floor, widened walls, clear center table zone",
+    spawn:{x:0,z:10.6,freeRadius:4.7,firstTimeView:viewSet},
+    tableClearBufferRadius:5.55,
+    doorways:DOORWAYS.map(d=>({key:d.key,x:d.x,z:d.z,sign:"affixed in wall",pillars:"left and right",arch:"correct U arch",solid:true})),
     cleanup,
     solidifiedMeshes:solid,
     quickLoad:true,
