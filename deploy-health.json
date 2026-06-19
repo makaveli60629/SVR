@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-125-QUEST-POKER-HITBOXES",
-  "commit": "phase-125-marker",
+  "build": "SVR-PHASE-126-QUEST-LIVE-QA",
+  "commit": "phase-126-marker",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 125 marker."
+  "purpose": "Phase 126 marker."
 }
