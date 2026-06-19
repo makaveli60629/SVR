@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-116-PORTAL-ROUTE-ACTIVATION-LOCK",
-  "commit": "phase-116-auto-deploy-trigger",
+  "build": "SVR-PHASE-117-LUXURY-LOBBY-POLISH-LOCK",
+  "commit": "phase-117-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 116 deploy marker."
+  "purpose": "Phase 117 deploy marker."
 }
