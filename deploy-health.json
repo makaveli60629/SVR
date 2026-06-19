@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-110-POKER-READINESS-LOCK",
-  "commit": "phase-110-auto-deploy-trigger",
+  "build": "SVR-PHASE-111-POKER-ACTION-FOCUS-LOCK",
+  "commit": "phase-111-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 110 deploy marker."
+  "purpose": "Phase 111 deploy marker."
 }
