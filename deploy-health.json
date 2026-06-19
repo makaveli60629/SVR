@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-108-DUPLICATE-TABLE-REMOVAL-LOCK",
-  "commit": "phase-108-auto-deploy-trigger",
+  "build": "SVR-PHASE-109-SINGLE-TABLE-POKER-FOCUS-LOCK",
+  "commit": "phase-109-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger for duplicate table removal."
+  "purpose": "Auto Deploy trigger for single table poker focus guard."
 }
