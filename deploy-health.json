@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-121-LOBBY-ACCEPTANCE-QA",
-  "commit": "phase-121-marker",
+  "build": "SVR-PHASE-122-POKER-ACTION-FEEDBACK",
+  "commit": "phase-122-marker",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 121 marker."
+  "purpose": "Phase 122 marker."
 }
