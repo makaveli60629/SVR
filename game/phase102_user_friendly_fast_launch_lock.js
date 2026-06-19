@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 const LABEL = "PHASE-102-USER-FRIENDLY-FAST-LAUNCH-NO-PHASE-TEXT-LOCK";
 const ROOT = "PHASE102_USER_FRIENDLY_FAST_LAUNCH_ROOT";
 
@@ -77,6 +79,7 @@ function install(){
     cleanLobbyProtected: true,
     secondFloorVisibleProtected: true,
     handTeleportProtected: true,
+    phase103ImportFixed: true,
     uiChanged,
     hiddenLabels,
     protectedItems,
