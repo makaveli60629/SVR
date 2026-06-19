@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-103-QUEST-CONTROL-VIEW-POLISH-LOCK",
-  "commit": "phase-103-auto-deploy-trigger",
+  "build": "SVR-PHASE-103-RUNTIME-ERROR-CLEANUP-CLEAN-LAUNCH-LOCK",
+  "commit": "phase-103-runtime-cleanup-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 103 Quest standing locomotion, direct hand teleport, view cleanup, lighting, textures, and table polish lock."
+  "purpose": "Auto Deploy trigger after Phase 103 runtime import cleanup, clean launch protection, no visible phase text, second-floor visibility protection, and final lobby polish lock."
 }
