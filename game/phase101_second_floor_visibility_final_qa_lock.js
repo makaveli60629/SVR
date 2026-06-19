@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 const LABEL = "PHASE-101-SECOND-FLOOR-VISIBILITY-FINAL-QA-LOCK";
 const ROOT = "PHASE101_SECOND_FLOOR_VISIBILITY_FINAL_QA_ROOT";
 
@@ -55,6 +57,7 @@ function install(){
     report,
     loadedAfterPhase99Cleanup: true,
     loadedAfterPhase100QA: true,
+    phase103ImportFixed: true,
     siteTouched:false,
     publicRootTouched:false,
     pokerLogicTouched:false,
