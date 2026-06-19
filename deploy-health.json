@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-107-QUEST-LIVE-QA-HARNESS-LOCK",
-  "commit": "phase-107-auto-deploy-trigger",
+  "build": "SVR-PHASE-108-DUPLICATE-TABLE-REMOVAL-LOCK",
+  "commit": "phase-108-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger for Phase 107 Quest QA baseline."
+  "purpose": "Auto Deploy trigger for duplicate table removal."
 }
