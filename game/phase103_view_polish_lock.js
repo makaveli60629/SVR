@@ -19,12 +19,6 @@ function softTexture(){
   }
   const tex=new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(8,7); return tex;
 }
-function feltTexture(){
-  const c=document.createElement("canvas"); c.width=512; c.height=256;
-  const ctx=c.getContext("2d"); ctx.fillStyle="#07160f"; ctx.fillRect(0,0,512,256);
-  for(let i=0;i<4000;i++){ ctx.fillStyle=`rgba(40,${70+Math.random()*80},55,${.02+Math.random()*.03})`; ctx.fillRect(Math.random()*512,Math.random()*256,1,1); }
-  const tex=new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; return tex;
-}
 function clearView(scene, renderer){
   let hidden=0;
   document.querySelectorAll("#bootFallback,#hud,#log,#err,#sceneNav,.phase-label").forEach(el=>{ el.style.display="none"; el.style.opacity="0"; el.style.pointerEvents="none"; hidden++; });
@@ -75,13 +69,15 @@ function fixSigns(scene){
   });
   return fixed;
 }
-function addMainTableSurface(scene){
-  const old=scene.getObjectByName("PHASE103_MAIN_TABLE_SURFACE"); if(old) old.parent?.remove(old);
-  const group=new THREE.Group(); group.name="PHASE103_MAIN_TABLE_SURFACE"; group.position.set(0,.02,-2.7); scene.add(group);
-  const base=new THREE.Mesh(new THREE.CylinderGeometry(3.35,3.48,.18,96),new THREE.MeshStandardMaterial({color:0x060607,roughness:.36,metalness:.28,emissive:0x020202,emissiveIntensity:.08})); base.scale.z=.62; base.position.y=.72; group.add(base);
-  const top=new THREE.Mesh(new THREE.CylinderGeometry(2.92,2.98,.05,96),new THREE.MeshStandardMaterial({map:feltTexture(),color:0xffffff,roughness:.72,metalness:0,emissive:0x03110a,emissiveIntensity:.22})); top.scale.z=.56; top.position.y=.84; top.renderOrder=430; group.add(top);
-  const rail=new THREE.Mesh(new THREE.TorusGeometry(2.98,.12,16,128),new THREE.MeshStandardMaterial({color:0x161015,roughness:.34,metalness:.22,emissive:0x0a0408,emissiveIntensity:.12})); rail.scale.z=.56; rail.rotation.x=Math.PI/2; rail.position.y=.91; rail.renderOrder=431; group.add(rail);
-  return true;
+function removeDuplicateTableSurface(scene){
+  let removed=0;
+  let old=scene.getObjectByName("PHASE103_MAIN_TABLE_SURFACE");
+  while(old){
+    old.parent?.remove(old);
+    removed++;
+    old=scene.getObjectByName("PHASE103_MAIN_TABLE_SURFACE");
+  }
+  return { removed, created:false, reason:"Removed Phase 103 overlay table; original poker table is preserved." };
 }
 function enhancePlanets(scene){
   let changed=0;
@@ -101,9 +97,9 @@ function install(){
   const textured=applySurfaceTextures(scene);
   const lights=addLights(scene);
   const signs=fixSigns(scene);
-  const table=addMainTableSurface(scene);
+  const table=removeDuplicateTableSurface(scene);
   const planets=enhancePlanets(scene);
-  window.SVR_PHASE103_VIEW_POLISH_LOCK={build:LABEL,active:true,hidden,textured,lights,signs,table,planets,blackOverlayRemoved:true,desktopPanelsMinimized:true,siteTouched:false,publicRootTouched:false,pokerLogicTouched:false,watchTouched:false,movementTouched:false,privateScenesTouched:false,questSafe:true,checkedAt:new Date().toISOString()};
+  window.SVR_PHASE103_VIEW_POLISH_LOCK={build:LABEL,active:true,hidden,textured,lights,signs,table,planets,duplicateTableRemoved:true,blackOverlayRemoved:true,desktopPanelsMinimized:true,siteTouched:false,publicRootTouched:false,pokerLogicTouched:false,watchTouched:false,movementTouched:false,privateScenesTouched:false,questSafe:true,checkedAt:new Date().toISOString()};
   window.SVR_LIVE_BUILD_POINTER=LABEL; window.SVR_LOCKED_FINAL_BUILD=LABEL;
   return true;
 }
