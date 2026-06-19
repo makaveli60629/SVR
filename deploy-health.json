@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-106-PRODUCTION-DEMO-LOCK",
-  "commit": "phase-106-auto-deploy-trigger",
+  "build": "SVR-PHASE-107-QUEST-LIVE-QA-HARNESS-LOCK",
+  "commit": "phase-107-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 106 production demo baseline lock, clean boot handoff manifest, and Scarlett Poker VR player-facing launch lock."
+  "purpose": "Auto Deploy trigger for Phase 107 Quest QA baseline."
 }
