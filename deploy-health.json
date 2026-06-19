@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-105-SINGLE-CLEAN-BOOT-CONSOLIDATION-LOCK",
-  "commit": "phase-105-auto-deploy-trigger",
+  "build": "SVR-PHASE-106-PRODUCTION-DEMO-LOCK",
+  "commit": "phase-106-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 105 single clean boot consolidation, redundant QA removal from player boot, clean lobby protection, and second-floor visibility lock."
+  "purpose": "Auto Deploy trigger after Phase 106 production demo baseline lock, clean boot handoff manifest, and Scarlett Poker VR player-facing launch lock."
 }
