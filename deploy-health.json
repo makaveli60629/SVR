@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-113-EXPANDED-LOBBY-ALIGNMENT-LOCK",
-  "commit": "phase-113-auto-deploy-trigger",
+  "build": "SVR-PHASE-114-LOBBY-NO-CROWDING-ALIGNMENT-GUARD",
+  "commit": "phase-114-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 113 deploy marker."
+  "purpose": "Phase 114 deploy marker."
 }
