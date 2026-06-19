@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-112-HAND-PINCH-POKER-BUTTON-SELECTION-LOCK",
-  "commit": "phase-112-auto-deploy-trigger",
+  "build": "SVR-PHASE-113-EXPANDED-LOBBY-ALIGNMENT-LOCK",
+  "commit": "phase-113-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 112 deploy marker."
+  "purpose": "Phase 113 deploy marker."
 }
