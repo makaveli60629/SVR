@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-104-BOOT-INTEGRITY-CLEAN-RUNTIME-AUDIT-LOCK",
-  "commit": "phase-104-auto-deploy-trigger",
+  "build": "SVR-PHASE-105-SINGLE-CLEAN-BOOT-CONSOLIDATION-LOCK",
+  "commit": "phase-105-auto-deploy-trigger",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Auto Deploy trigger after Phase 104 boot integrity audit, clean runtime protection, second-level visibility protection, no visible phase text, and final lobby stability lock."
+  "purpose": "Auto Deploy trigger after Phase 105 single clean boot consolidation, redundant QA removal from player boot, clean lobby protection, and second-floor visibility lock."
 }
