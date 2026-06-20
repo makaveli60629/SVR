@@ -1,1 +1,1 @@
-export { createTeleportRig } from "./movement_phase286_input_lock.js?v=phase103-motion-cache";
+export { createTeleportRig } from "./movement_phase135_playability_control_lock.js?v=phase135-playability-control";
