@@ -1,0 +1,47 @@
+name: Package Game Zip
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'game/**'
+      - '.github/workflows/package-game.yml'
+
+permissions:
+  contents: read
+
+env:
+  ARTIFACT_NAME: game-zip
+
+jobs:
+  package-game:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify game root
+        run: |
+          test -f game/index.html
+          test -f game/main.js
+
+      - name: Build zip with game contents at root
+        run: |
+          rm -rf package-out
+          mkdir -p package-out
+          cd game
+          zip -r ../package-out/game.zip . -x '*.DS_Store'
+          cd ..
+          unzip -l package-out/game.zip | head -80
+          unzip -l package-out/game.zip | grep -q 'index.html'
+          if unzip -l package-out/game.zip | grep -q 'game/index.html'; then
+            echo 'ERROR: game/index.html is nested. index.html must be at zip root.'
+            exit 1
+          fi
+
+      - name: Upload game zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: package-out/game.zip
+          if-no-files-found: error
