@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import { createTeleportRig as baseRig } from "./movement_phase286_input_lock.js?v=phase135-control-base";
+import { createTeleportRig as baseRig } from "./movement_phase286_input_lock.js?v=phase136-control-base";
 import { isFist, isPinching } from "./gestures.js";
 
-const LABEL = "PHASE-135-PLAYABILITY-MOVEMENT-CONTROL-LOCK";
+const LABEL = "PHASE-136-PLAYABILITY-MOVEMENT-POKER-ACTION-GUARD";
 const MIN_HAND_AIM_MS = 680;
 const MOVE_SPEED = 5.25;
 const BOOST_SPEED = 0.85;
@@ -43,6 +43,7 @@ export function createTeleportRig(opts){
   let revertedEarly = 0;
   let correctedForward = 0;
   let boostedForward = 0;
+  let pokerTeleportBlocks = 0;
 
   function setPose(p){
     if(!p) return false;
@@ -55,16 +56,22 @@ export function createTeleportRig(opts){
     const before = rig.getPlayerPose?.();
     const now = performance.now();
     const handHeldBefore = anyHand(args);
-    if(handHeldBefore && !aiming){ aiming = true; aimStartedAt = now; }
+    const blockHandTeleportForPoker = !!window.SVR_PHASE136_BLOCK_TELEPORT_FOR_POKER_ACTION;
+    const updateArgs = blockHandTeleportForPoker ? { ...args, leftHand:null, rightHand:null } : args;
+    if(blockHandTeleportForPoker) pokerTeleportBlocks++;
+    if(handHeldBefore && !blockHandTeleportForPoker && !aiming){ aiming = true; aimStartedAt = now; }
 
-    originalUpdate(args);
+    originalUpdate(updateArgs);
 
     const after = rig.getPlayerPose?.();
     const moved = poseDist(before, after);
     const heldAge = aiming ? now - aimStartedAt : 0;
     const releasedThisFrame = aiming && wasHeld && !handHeldBefore;
 
-    if(aiming && handHeldBefore && moved > .035){
+    if(blockHandTeleportForPoker && moved > .02){
+      setPose(before);
+      revertedEarly++;
+    }else if(aiming && handHeldBefore && moved > .035){
       setPose(before);
       revertedEarly++;
     }else if(releasedThisFrame && heldAge < MIN_HAND_AIM_MS && moved > .035){
@@ -95,14 +102,16 @@ export function createTeleportRig(opts){
       }
     }
 
-    if(releasedThisFrame || (!handHeldBefore && aiming && heldAge > 1200)){ aiming = false; aimStartedAt = 0; }
-    wasHeld = handHeldBefore;
+    if(releasedThisFrame || blockHandTeleportForPoker || (!handHeldBefore && aiming && heldAge > 1200)){ aiming = false; aimStartedAt = 0; }
+    wasHeld = handHeldBefore && !blockHandTeleportForPoker;
 
     window.SVR_PHASE135_PLAYABILITY_MOVEMENT_CONTROL_LOCK = {
       build: LABEL,
       active: true,
       minHandAimMs: MIN_HAND_AIM_MS,
       handReleaseOnlyCommitGuard: true,
+      pokerActionTeleportBlock: true,
+      pokerTeleportBlocks,
       earlyHandJumpReverts: revertedEarly,
       headForwardStickCorrection: true,
       correctedForward,
@@ -113,6 +122,7 @@ export function createTeleportRig(opts){
       siteTouched: false,
       checkedAt: new Date().toISOString()
     };
+    window.SVR_PHASE136_PLAYABILITY_MOVEMENT_POKER_ACTION_GUARD = window.SVR_PHASE135_PLAYABILITY_MOVEMENT_CONTROL_LOCK;
   };
 
   return rig;
