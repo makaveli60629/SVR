@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-130-FINAL-DEMO",
-  "commit": "phase-130-marker",
+  "build": "SVR-PHASE-131-MANUAL-QUEST-TEST",
+  "commit": "phase-131-marker",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 130 marker."
+  "purpose": "Phase 131 marker."
 }
