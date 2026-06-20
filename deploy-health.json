@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-132-PREP",
-  "commit": "phase-132-marker",
+  "build": "SVR-PHASE-133-ARTIFACT-WORKFLOW",
+  "commit": "phase-133-marker",
   "updatedAt": "2026-06-18T00:00:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 132 marker."
+  "purpose": "Phase 133 marker."
 }
