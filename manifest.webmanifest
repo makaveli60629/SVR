@@ -1,7 +1,7 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "Install the SVR Poker companion app to launch the VR poker room, store, support, and project updates from your device.",
+  "description": "Install the SVR Poker companion app to launch the VR poker room, store, support, downloads, and project updates from your device.",
   "id": "/?source=pwa",
   "start_url": "/?source=pwa",
   "scope": "/",
@@ -45,6 +45,13 @@
       "short_name": "Store",
       "description": "Open the SVR Poker store preview.",
       "url": "/site/store.html?source=pwa-shortcut",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Downloads",
+      "short_name": "Downloads",
+      "description": "Open the SVR app download and install page.",
+      "url": "/downloads/?source=pwa-shortcut",
       "icons": [{ "src": "/logo.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
