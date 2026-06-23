@@ -1,13 +1,12 @@
 import * as THREE from "three";
-import { createTeleportRig as baseRig } from "./movement_phase286_input_lock.js?v=phase137-control-base";
+import { createTeleportRig as baseRig } from "./movement_phase286_input_lock.js?v=phase138-control-base";
 import { isFist, isPinching } from "./gestures.js";
 
-const LABEL = "PHASE-137-FIST-ARMED-TELEPORT-RELEASE-COMMIT-LOCK";
-const MIN_HAND_AIM_MS = 220;
-const MOVE_SPEED = 5.25;
-const BOOST_SPEED = 0.85;
-const FIST_TOGGLE_COOLDOWN_MS = 520;
-const FIST_LOOK_DOT = 0.50;
+const LABEL = "PHASE-138-FIST-TELEPORT-HEAD-FORWARD-CONTROLLER-LOCK";
+const MIN_HAND_AIM_MS = 180;
+const MOVE_SPEED = 5.65;
+const FIST_TOGGLE_COOLDOWN_MS = 390;
+const FIST_LOOK_DOT = 0.18;
 
 const vHead = new THREE.Vector3();
 const vHand = new THREE.Vector3();
@@ -61,7 +60,7 @@ function handWorldPosition(hand){
 }
 function lookingAtHand(hand, renderer, camera){
   const hp = handWorldPosition(hand);
-  if(!hp) return false;
+  if(!hp) return true;
   const src = xrCamera(renderer,camera);
   src?.updateWorldMatrix?.(true,false);
   src?.getWorldPosition?.(vHead);
@@ -80,8 +79,7 @@ export function createTeleportRig(opts){
   let wasHeld = false;
   let wasFist = false;
   let revertedEarly = 0;
-  let correctedForward = 0;
-  let boostedForward = 0;
+  let forcedForward = 0;
   let pokerTeleportBlocks = 0;
   let fistTeleportArmed = false;
   let lastFistToggleAt = 0;
@@ -99,11 +97,11 @@ export function createTeleportRig(opts){
     const fistNow = lf || rf;
     const fistEdge = fistNow && !wasFist;
     const hand = rf ? args.rightHand : args.leftHand;
-    const lookOk = hand ? lookingAtHand(hand, opts.renderer, opts.camera) : false;
+    const lookOk = hand ? lookingAtHand(hand, opts.renderer, opts.camera) : true;
     if(fistEdge && lookOk && now - lastFistToggleAt > FIST_TOGGLE_COOLDOWN_MS){
       fistTeleportArmed = !fistTeleportArmed;
       lastFistToggleAt = now;
-      window.SVR_PHASE137_FIST_TELEPORT_TOGGLE_EVENT = {
+      window.SVR_PHASE138_FIST_TELEPORT_TOGGLE_EVENT = {
         build: LABEL,
         armed: fistTeleportArmed,
         side: rf ? "right" : "left",
@@ -122,7 +120,7 @@ export function createTeleportRig(opts){
     const rawPinch = anyPinch(args);
     const rawHandHeld = anyHand(args);
     const blockHandTeleportForPoker = !!window.SVR_PHASE136_BLOCK_TELEPORT_FOR_POKER_ACTION;
-    const recentlyToggled = now - lastFistToggleAt < 360;
+    const recentlyToggled = now - lastFistToggleAt < 260;
 
     let updateArgs = args;
     if(blockHandTeleportForPoker){
@@ -133,7 +131,7 @@ export function createTeleportRig(opts){
     }else if(!fistTeleportArmed && rawPinch){
       updateArgs = { ...updateArgs, leftHand:null, rightHand:null };
       blockedUnarmedPinches++;
-    }else if(fistTeleportArmed && !rawPinch){
+    }else if(!fistTeleportArmed && rawHandHeld && !rawPinch){
       updateArgs = { ...updateArgs, leftHand:null, rightHand:null };
     }
 
@@ -160,25 +158,12 @@ export function createTeleportRig(opts){
 
     const y = stickY(args);
     const state = rig.getState?.() || {};
-    if(opts?.renderer?.xr?.isPresenting && y && !state.mode && !rawHandHeld){
-      const p0 = before;
-      const p1 = rig.getPlayerPose?.();
-      const dx = Number((p1?.x||0) - (p0?.x||0));
-      const dz = Number((p1?.z||0) - (p0?.z||0));
-      const movedLen = Math.hypot(dx,dz);
+    if(opts?.renderer?.xr?.isPresenting && y && !state.mode && !rawHandHeld && before){
       const f = headForward(opts.renderer, opts.camera);
       const move = -y;
-      if(movedLen > .002){
-        const d = new THREE.Vector3(dx,0,dz).normalize();
-        const dot = d.dot(f);
-        if(dot < .72){
-          rig.setPlayerXZ?.(p0.x + f.x * move * MOVE_SPEED * (args.dt || .016), p0.z + f.z * move * MOVE_SPEED * (args.dt || .016));
-          correctedForward++;
-        }else{
-          rig.setPlayerXZ?.(p1.x + f.x * move * BOOST_SPEED * (args.dt || .016), p1.z + f.z * move * BOOST_SPEED * (args.dt || .016));
-          boostedForward++;
-        }
-      }
+      const dt = Math.min(Math.max(args.dt || .016, .008), .05);
+      rig.setPlayerXZ?.(before.x + f.x * move * MOVE_SPEED * dt, before.z + f.z * move * MOVE_SPEED * dt);
+      forcedForward++;
     }
 
     if(releasedThisFrame || blockHandTeleportForPoker || (!handHeldBefore && aiming && heldAge > 1200)){ aiming = false; aimStartedAt = 0; }
@@ -199,8 +184,8 @@ export function createTeleportRig(opts){
       pokerTeleportBlocks,
       earlyHandJumpReverts: revertedEarly,
       headForwardStickCorrection: true,
-      correctedForward,
-      boostedForward,
+      forcedHeadForwardStickMovement: true,
+      forcedForward,
       moveSpeed: MOVE_SPEED,
       handAiming: aiming,
       heldAgeMs: Math.round(heldAge || 0),
@@ -210,6 +195,7 @@ export function createTeleportRig(opts){
     window.SVR_PHASE135_PLAYABILITY_MOVEMENT_CONTROL_LOCK = stateNow;
     window.SVR_PHASE136_PLAYABILITY_MOVEMENT_POKER_ACTION_GUARD = stateNow;
     window.SVR_PHASE137_FIST_ARMED_TELEPORT_RELEASE_COMMIT_LOCK = stateNow;
+    window.SVR_PHASE138_FIST_TELEPORT_HEAD_FORWARD_CONTROLLER_LOCK = stateNow;
   };
 
   return rig;
