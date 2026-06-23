@@ -1,7 +1,6 @@
 import * as THREE from "three";
 
 const LABEL = "PHASE-141-QUEST-MOVEMENT-TELEPORT-FINAL-LOCK";
-const BADGE_TEXT = "PHASE 141 • QUEST CONTROL LOCK";
 const ROOT = "PHASE141_QUEST_MOVEMENT_TELEPORT_FINAL_ROOT";
 const CONTROLLER_RE = /oculus|quest|controller\s*(model|mesh)|left.*controller|right.*controller/i;
 
@@ -17,9 +16,10 @@ function hideControllerMeshes(scene){
   return hidden;
 }
 function installBadge(){
+  if(window.SVR_SUPPRESS_PHASE_BADGES) return;
   let badge = document.getElementById("svrPhaseBadge");
   if(!badge){ badge = document.createElement("div"); badge.id = "svrPhaseBadge"; document.body.appendChild(badge); }
-  badge.textContent = BADGE_TEXT;
+  badge.textContent = "QUEST CONTROL LOCK";
   let style = document.getElementById("phase141-quest-control-style");
   if(!style){
     style = document.createElement("style");
@@ -40,8 +40,8 @@ function qa(scene){
   const movement = window.SVR_PHASE141_QUEST_MOVEMENT_TELEPORT_FINAL_LOCK || {};
   const state = {
     build: LABEL,
-    badge: document.getElementById("svrPhaseBadge")?.textContent || null,
     active: true,
+    authorityType: "quest-controls-only",
     rightStickForwardBackHeadDirection: movement.rightStickForwardBackHeadDirection === true,
     snapTurn45: movement.rightStickSnapTurn45 === true,
     controllerButtonHoldAimReleaseTeleport: movement.controllerButtonHoldAimReleaseTeleport === true,
@@ -49,7 +49,6 @@ function qa(scene){
     pinchOnlyLeapBlocked: movement.pinchOnlyLeapBlocked === true,
     controllerMeshesHidden: true,
     hiddenControllerMeshes: window.SVR_PHASE141_CONTROLLER_MESHES_HIDDEN || 0,
-    phase140DealDisplayLockStillExpected: !!window.SVR_PHASE140_BUILD_AUTHORITY_LOCK,
     siteTouched: false,
     checkedAt: new Date().toISOString()
   };
@@ -61,12 +60,11 @@ function install(){
   const scene = window.__SVR_SCENE__;
   hideControllerMeshes(scene);
   installSceneRoot(scene);
-  window.SVR_LIVE_BUILD_POINTER = LABEL;
-  window.SVR_LOCKED_FINAL_BUILD = LABEL;
   window.SVR_PHASE141_BUILD_AUTHORITY_LOCK = {
     build: LABEL,
     active: true,
-    finalAuthority: true,
+    authorityType: "quest-controls-only",
+    finalAuthority: false,
     questControlsFinal: true,
     siteTouched: false,
     checkedAt: new Date().toISOString()
@@ -76,10 +74,4 @@ function install(){
   return true;
 }
 install();
-let ticks = 0;
-const timer = setInterval(()=>{
-  ticks++;
-  install();
-  if(ticks > 180) clearInterval(timer);
-}, 350);
-[1000,2500,5000,8500,13000,21000,34000,55000].forEach(ms=>setTimeout(install, ms));
+[1000,2500,5000,8500].forEach(ms=>setTimeout(install, ms));
