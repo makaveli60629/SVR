@@ -1,5 +1,5 @@
 (() => {
-  const BUILD = 'SITE-SUPPORT-CHAT-BOT-NATIVE-DETAILS-LOCK';
+  const BUILD = 'SITE-SUPPORT-CHAT-BOT-APP-INSTALL-LOCK';
   const API_BASE = window.SVR_SERVER_API_BASE || window.SVR_API_BASE || 'https://api.svrpoker.com';
   const STORE_KEY = 'svr_support_chat_messages';
   const SESSION_KEY = 'svr_support_chat_session';
@@ -112,10 +112,31 @@
     document.getElementById('svrSupportChatPanel')?.remove();
     document.getElementById('svr-inline-support-chat')?.remove();
   }
+  function ensureAppInstallLoader(){
+    if (window.SVR_APP_INSTALL_LOADED || document.getElementById('svr-app-install-loader')) return;
+    if (!document.querySelector('link[rel="manifest"]')) {
+      const manifest = document.createElement('link');
+      manifest.rel = 'manifest';
+      manifest.href = '/manifest.webmanifest?v=phase102-pwa';
+      document.head.appendChild(manifest);
+    }
+    if (!document.querySelector('meta[name="theme-color"]')) {
+      const theme = document.createElement('meta');
+      theme.name = 'theme-color';
+      theme.content = '#9b4dff';
+      document.head.appendChild(theme);
+    }
+    const script = document.createElement('script');
+    script.id = 'svr-app-install-loader';
+    script.src = '/app-install.js?v=phase102-pwa';
+    script.defer = true;
+    document.head.appendChild(script);
+  }
   function inject(){
     if(document.getElementById('svrSupportChatNative')) return;
     removeOldWidgets();
     injectStyle();
+    ensureAppInstallLoader();
     const details = document.createElement('details');
     details.id = 'svrSupportChatNative';
     details.innerHTML = `
@@ -160,8 +181,12 @@
     const line = document.getElementById('svrSupportAdminLine');
     if(root) root.classList.toggle('is-offline', !online);
     if(line) line.textContent = online ? 'Admin Online • send a message' : 'Admin Offline • message will be saved';
-    window.SVR_SUPPORT_CHAT_BOT = { build:BUILD, active:true, nativeDetails:true, adminOnline:online, apiBase:API_BASE, safeFallback:true, checkedAt:new Date().toISOString() };
+    window.SVR_SUPPORT_CHAT_BOT = { build:BUILD, active:true, nativeDetails:true, adminOnline:online, apiBase:API_BASE, safeFallback:true, appInstallLoader:true, checkedAt:new Date().toISOString() };
   }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inject);
-  else inject();
+  function boot(){
+    ensureAppInstallLoader();
+    inject();
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
