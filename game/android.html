@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <title>SVR Poker Android Lite</title>
+  <meta name="theme-color" content="#050508">
+  <style>
+    html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}#app{position:fixed;inset:0;background:#02040b}canvas{display:block;width:100%;height:100%;background:#000;outline:none}#safeStage{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:#000}.safe-card{width:min(92vw,720px);border:1px solid rgba(141,255,180,.72);border-radius:22px;background:rgba(0,0,0,.72);box-shadow:0 0 42px rgba(141,255,180,.20);padding:26px;text-align:center}.safe-card h1{margin:6px 0 8px;font-size:clamp(32px,7vw,64px);letter-spacing:.04em}.safe-card h2{margin:0 0 14px;color:#8dffb4;font-size:clamp(16px,3vw,28px)}.safe-card p{color:#d7eaff}.pill{display:inline-block;border:1px solid #8dffb4;border-radius:999px;color:#8dffb4;padding:7px 12px;font-weight:900;font-size:12px;letter-spacing:.08em}.btn{display:inline-flex;align-items:center;justify-content:center;margin:6px;border:1px solid rgba(141,255,180,.65);border-radius:12px;background:rgba(141,255,180,.12);color:#8dffb4;padding:10px 14px;font-weight:900;text-decoration:none;cursor:pointer}.phase-label,#sceneNav,#log,#err,#hud,#svrPhaseBadge{display:none!important}.boot-released #safeStage,.runtime-visible #safeStage,.overlay-released #safeStage{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+  </style>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body data-build="PHASE-146-ANDROID-LITE-DEDICATED-ROUTE-LOCK">
+  <div id="app"></div>
+  <div id="safeStage"><section class="safe-card"><span class="pill">ANDROID LITE</span><h1>SVR POKER</h1><h2>Stable Android Route</h2><p id="safeStatus">Loading Android Lite lobby...</p><button class="btn" id="startRuntimeBtn" type="button">Start Android Lite</button><a class="btn" href="./index.html?v=phase145-standard">Standard Game</a></section></div>
+  <div id="bootFallback"></div><div id="hud"><span id="status"></span><span id="mode"></span><button id="toggleLog" type="button">Log</button><button id="toggleJoints" type="button">Joints</button></div><div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
+  <script>
+    (function(){
+      var BUILD='PHASE-146-ANDROID-LITE-DEDICATED-ROUTE-LOCK';
+      var loaded=false;
+      var status=document.getElementById('safeStatus');
+      window.SVR_SUPPRESS_PHASE_BADGES=true;
+      var MODULES=['./phase101_boot_load_screen_recovery.js?v=phase146android','./phase101_partial_runtime_render_guard.js?v=phase146android','./main.js?v=phase146android','./phase145_android_black_screen_recovery_lock.js?v=phase146android','./phase146_android_lite_performance_hud_lock.js?v=phase146android','./phase120_luxury_lobby_stability_performance_lock.js?v=phase146android','./phase142_playable_poker_core_authority_lock.js?v=phase146android'];
+      window.SVR_PHASE146_ANDROID_ROUTE={build:BUILD,active:true,androidLite:true,moduleCount:MODULES.length,questMovementLoaded:false,singleAuthority:'phase142-poker-core',startedAt:new Date().toISOString()};
+      window.SVR_PERFORMANCE_PROFILE={build:BUILD,mode:'android-lite-dedicated-route',moduleCount:MODULES.length,androidQuestModuleSkipped:true,androidBlackScreenRecovery:true,androidLiteHud:true,checkedAt:new Date().toISOString()};
+      function note(msg){if(status)status.textContent=msg;window.SVR_PHASE146_ANDROID_ROUTE.lastMessage=msg;window.SVR_PHASE146_ANDROID_ROUTE.checkedAt=new Date().toISOString();}
+      function hideOverlay(reason){document.body.classList.add('boot-released','runtime-visible','overlay-released');var safe=document.getElementById('safeStage');if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';safe.setAttribute('aria-hidden','true');}window.__SVR_GAME_READY__=true;window.SVR_GAME_READY=true;window.SVR_PHASE146_ANDROID_ROUTE.reason=reason;window.SVR_PHASE146_ANDROID_ROUTE.releasedAt=new Date().toISOString();}
+      window.SVR_RELEASE_BOOT=hideOverlay;window.SVR_FORCE_HIDE_SAFE_STAGE=hideOverlay;
+      function addModule(src){return new Promise(function(resolve,reject){var s=document.createElement('script');s.type='module';s.src=src;s.onload=resolve;s.onerror=function(){reject(new Error('Failed '+src));};document.body.appendChild(s);});}
+      async function startRuntime(){if(loaded)return;loaded=true;note('Preparing Android Lite...');try{for(var i=0;i<MODULES.length;i++){note('Loading '+(i+1)+' / '+MODULES.length);await addModule(MODULES[i]);}window.SVR_LIVE_BUILD_POINTER='PHASE-142-PLAYABLE-POKER-CORE-AUTHORITY-LOCK';window.SVR_LOCKED_FINAL_BUILD='PHASE-142-PLAYABLE-POKER-CORE-AUTHORITY-LOCK';note('Lobby ready.');setTimeout(function(){hideOverlay('phase146-android-lite-ready');},120);}catch(e){window.SVR_PHASE146_ANDROID_ROUTE.errors=[String(e.message||e)];note('Lobby ready.');setTimeout(function(){hideOverlay('phase146-android-lite-fallback');},500);}}
+      document.getElementById('startRuntimeBtn').addEventListener('click',startRuntime);
+      window.addEventListener('error',function(e){window.SVR_PHASE146_ANDROID_ROUTE.error=String(e.message||e.error||e);hideOverlay('error-release');});
+      window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE146_ANDROID_ROUTE.error=String((e.reason&&e.reason.message)||e.reason||e);hideOverlay('promise-release');});
+      setTimeout(startRuntime,100);
+      setTimeout(function(){hideOverlay('absolute-overlay-release-1800ms');},1800);
+    })();
+  </script>
+</body>
+</html>
