@@ -1,21 +1,21 @@
-const SVR_PWA_CACHE = 'svr-poker-pwa-phase102-v1';
+const SVR_PWA_CACHE = 'svr-poker-pwa-phase145-stability-v1';
 const SVR_CORE_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.webmanifest',
   '/offline.html',
-  '/launch.css',
-  '/launch-overrides.css',
   '/matrix.js',
   '/site-public-hooks.js',
   '/support-chat-bot.js',
+  '/app-install.js',
+  '/pwa-app-install.js',
   '/logo.png',
   '/logo.webp',
   '/site/index.html',
   '/site/app.html',
   '/site/store.html',
   '/site/contact.html',
-  '/game/index.html'
+  '/downloads/index.html',
+  '/game/index.html',
+  '/game/phase145_android_black_screen_recovery_lock.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -37,7 +37,7 @@ self.addEventListener('activate', (event) => {
 async function networkFirst(request) {
   const cache = await caches.open(SVR_PWA_CACHE);
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { cache: 'no-store' });
     if (response && response.ok) cache.put(request, response.clone()).catch(() => undefined);
     return response;
   } catch (error) {
@@ -65,12 +65,12 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (request.mode === 'navigate' || url.pathname.startsWith('/game/')) {
+  if (request.mode === 'navigate' || url.pathname.startsWith('/game/') || /app-install\.js|pwa-app-install\.js|manifest\.webmanifest/i.test(url.pathname)) {
     event.respondWith(networkFirst(request));
     return;
   }
 
-  if (/\.(css|js|png|webp|svg|ico|webmanifest)$/i.test(url.pathname)) {
+  if (/\.(css|png|webp|svg|ico)$/i.test(url.pathname)) {
     event.respondWith(cacheFirst(request));
     return;
   }
