@@ -1,12 +1,15 @@
-const SVR_PWA_CACHE = 'svr-poker-pwa-phase145-stability-v1';
+const SVR_PWA_CACHE = 'svr-poker-pwa-phase154-update-manager-v1';
 const SVR_CORE_ASSETS = [
   '/manifest.webmanifest',
   '/offline.html',
   '/matrix.js',
   '/site-public-hooks.js',
   '/support-chat-bot.js',
+  '/support-lead-routing.js',
   '/app-install.js',
   '/pwa-app-install.js',
+  '/app-update-checker.js',
+  '/update/app-version.json',
   '/logo.png',
   '/logo.webp',
   '/site/index.html',
@@ -15,7 +18,10 @@ const SVR_CORE_ASSETS = [
   '/site/contact.html',
   '/downloads/index.html',
   '/game/index.html',
-  '/game/phase145_android_black_screen_recovery_lock.js'
+  '/game/android.html',
+  '/game/phase145_android_black_screen_recovery_lock.js',
+  '/game/phase150_android_tap_move_no_black_fallback.js',
+  '/game/phase153_android_safe_mode_polish_lock.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -32,6 +38,10 @@ self.addEventListener('activate', (event) => {
       .then((keys) => Promise.all(keys.filter((key) => key !== SVR_PWA_CACHE).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event?.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 async function networkFirst(request) {
@@ -65,7 +75,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (request.mode === 'navigate' || url.pathname.startsWith('/game/') || /app-install\.js|pwa-app-install\.js|manifest\.webmanifest/i.test(url.pathname)) {
+  if (request.mode === 'navigate' || url.pathname.startsWith('/game/') || url.pathname.startsWith('/update/') || /app-install\.js|pwa-app-install\.js|app-update-checker\.js|manifest\.webmanifest|deploy-health\.json/i.test(url.pathname)) {
     event.respondWith(networkFirst(request));
     return;
   }
