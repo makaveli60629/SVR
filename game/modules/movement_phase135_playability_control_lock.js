@@ -8,6 +8,15 @@ const MOVE_SPEED = 5.65;
 const FIST_TOGGLE_COOLDOWN_MS = 390;
 const FIST_LOOK_DOT = 0.18;
 
+if(!window.SVR_PHASE138_CLEAN_VIEW_RUNTIME_IMPORT_REQUESTED){
+  window.SVR_PHASE138_CLEAN_VIEW_RUNTIME_IMPORT_REQUESTED = true;
+  setTimeout(()=>{
+    import("../phase138_clean_view_single_stair_lock.js?v=phase138-clean-view-single-stair").catch(e=>{
+      window.SVR_PHASE138_CLEAN_VIEW_IMPORT_ERROR = String(e?.message || e);
+    });
+  }, 0);
+}
+
 const vHead = new THREE.Vector3();
 const vHand = new THREE.Vector3();
 const vDir = new THREE.Vector3();
