@@ -1,11 +1,11 @@
 import * as THREE from "three";
 
-const LABEL = "UPDATE-3.0-PHASE-182-EXPANDED-ORIGINAL-WALL-BOUNDS-LOCK";
-const HALF_W = 30.65;
-const HALF_D = 23.15;
-const PLAYER_R = 0.42;
-const X_LIM = HALF_W - PLAYER_R;
-const Z_LIM = HALF_D - PLAYER_R;
+const LABEL = "PHASE-155-TIGHT-LOBBY-WALL-PERIMETER-LOCK";
+const FLOOR_LIMIT_X = 18.50;
+const FLOOR_LIMIT_Z = 15.40;
+const PLAYER_R = 0.45;
+const X_LIM = FLOOR_LIMIT_X - PLAYER_R;
+const Z_LIM = FLOOR_LIMIT_Z - PLAYER_R;
 
 export function constrainLobbyBounds(x, z){
   const ox = Number.isFinite(x) ? x : 0;
@@ -36,14 +36,18 @@ export function installPhase178Bounds(){
     window.SVR_PHASE178_BOUNDS = {
       label: LABEL,
       locked: true,
-      shape: "expanded-rectangle",
-      halfWidth: HALF_W,
-      halfDepth: HALF_D,
+      shape: "phase200-tight-lobby-rectangle",
+      floorLimitX: FLOOR_LIMIT_X,
+      floorLimitZ: FLOOR_LIMIT_Z,
+      xLimit: X_LIM,
+      zLimit: Z_LIM,
       playerRadius: PLAYER_R,
       desktopCorrections: hits,
+      voidEscapeBlocked: true,
+      wallPerimeterLocked: true,
       checkedAt: new Date().toISOString()
     };
   }, 120);
-  console.log("[Phase178/182] expanded original rectangular lobby bounds active");
+  console.log("[Phase155] tight lobby wall perimeter bounds active");
   return timer;
 }
