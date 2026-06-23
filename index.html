@@ -9,18 +9,14 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <meta name="theme-color" content="#9b4dff" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="SVR Poker" />
-  <link rel="manifest" href="./manifest.webmanifest?v=phase102-pwa" />
-  <link rel="apple-touch-icon" href="./logo.png" />
   <link rel="icon" href="./logo.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./launch.css?v=phase102-pwa" />
-  <link rel="stylesheet" href="./launch-overrides.css?v=phase102-pwa" />
+  <link rel="stylesheet" href="./launch.css?v=phase104-public-no-app-button" />
+  <link rel="stylesheet" href="./launch-overrides.css?v=phase104-public-no-app-button" />
 </head>
-<body class="launch-body" data-build="PHASE-102-PWA-DOWNLOAD-APP-LOCK">
+<body class="launch-body" data-build="PHASE-104-PUBLIC-NO-APP-BUTTON-LOCK">
   <canvas id="binary-rain" aria-hidden="true"></canvas>
 
   <main class="launch-page">
@@ -43,8 +39,7 @@
     </div>
 
     <div class="action-row" id="control-dock-container" aria-label="SVR control dock">
-      <a class="btn btn-primary" href="./site/index.html?v=phase102-pwa">Preview Site</a>
-      <button class="btn btn-primary" type="button" data-svr-install-app>Download App</button>
+      <a class="btn btn-primary" href="./site/index.html?v=phase104-site-menu-app">Preview Site</a>
       <a class="btn btn-secondary" href="./game/index.html?v=phase102-current-stack">Launch VR Room</a>
       <a class="btn btn-ghost" href="./site/index.html#message">Leave Message</a>
     </div>
@@ -55,11 +50,10 @@
     </footer>
   </main>
 
-  <script src="./app-install.js?v=phase102-pwa" defer></script>
-  <script src="./matrix.js?v=phase102-pwa"></script>
-  <script src="./site-local-counter.js?v=phase102-pwa"></script>
-  <script src="./site-public-hooks.js?v=phase102-pwa"></script>
-  <script src="./support-chat-bot.js?v=support-chat-phase102-pwa"></script>
+  <script src="./matrix.js?v=phase104-public-no-app-button"></script>
+  <script src="./site-local-counter.js?v=phase104-public-no-app-button"></script>
+  <script src="./site-public-hooks.js?v=phase104-public-no-app-button"></script>
+  <script src="./support-chat-bot.js?v=support-chat-phase104-public-no-app-button"></script>
   <script>
     (() => {
       if (document.getElementById('svr-inline-support-chat')) return;
