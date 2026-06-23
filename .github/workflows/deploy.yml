@@ -61,8 +61,10 @@ jobs:
             site-public-hooks.js
             support-chat-bot.js
             pwa-app-install.js
+            app-install.js
             manifest.webmanifest
             pwa-sw.js
+            sw.js
             offline.html
             logo.png
             logo.webp
@@ -117,8 +119,10 @@ jobs:
           copy_file_if_exists site-public-hooks.js
           copy_file_if_exists support-chat-bot.js
           copy_file_if_exists pwa-app-install.js
+          copy_file_if_exists app-install.js
           copy_file_if_exists manifest.webmanifest
           copy_file_if_exists pwa-sw.js
+          copy_file_if_exists sw.js
           copy_file_if_exists offline.html
           copy_file_if_exists logo.png
           copy_file_if_exists logo.webp
@@ -149,7 +153,7 @@ jobs:
           fi
 
           if [ ! -f build/site/downloads/index.html ]; then
-            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Downloads</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Downloads</h1><p>The APK direct file will appear after the demo build is finalized.</p><p><a style="color:#ffd36a" href="/android/">Open Android Demo Page</a></p></body></html>' > build/site/downloads/index.html
+            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Downloads</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Downloads</h1><p>The app installer and Android package slot are routed through the downloads page.</p><p><a style="color:#ffd36a" href="/downloads/?install=1">Open Downloads</a></p></body></html>' > build/site/downloads/index.html
           fi
 
           if [ ! -f build/reiki/index.html ]; then
@@ -166,7 +170,7 @@ jobs:
 
           while IFS= read -r html_file; do
             if ! grep -q 'pwa-app-install.js' "$html_file"; then
-              perl -0pi -e 's#</body>#  <script src="/pwa-app-install.js?v=phase104siteonly"></script>\n</body>#i' "$html_file" || true
+              perl -0pi -e 's#</body>#  <script src="/pwa-app-install.js?v=phase110sitebutton"></script>\n</body>#i' "$html_file" || true
             fi
             if ! grep -q 'manifest.webmanifest' "$html_file"; then
               perl -0pi -e 's#</head>#  <link rel="manifest" href="/manifest.webmanifest" />\n  <meta name="theme-color" content="#9b4dff" />\n</head>#i' "$html_file" || true
@@ -186,12 +190,13 @@ jobs:
           fi
 
           DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          printf '{\n  "status": "ok",\n  "build": "SVR-PHASE-104-SITE-ONLY-APP-MENU-LOCK",\n  "commit": "%s",\n  "deployedAt": "%s",\n  "gameZipStatus": "%s",\n  "gameZipBytes": "%s",\n  "customDomain": "svrpoker.com"\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" "$GAME_ZIP_STATUS" "$GAME_ZIP_BYTES" > build/deploy-health.json
+          printf '{\n  "status": "ok",\n  "build": "SVR-PHASE-110-MODULAR-APP-DOWNLOAD-LOCK",\n  "commit": "%s",\n  "deployedAt": "%s",\n  "gameZipStatus": "%s",\n  "gameZipBytes": "%s",\n  "customDomain": "svrpoker.com"\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" "$GAME_ZIP_STATUS" "$GAME_ZIP_BYTES" > build/deploy-health.json
           cp build/deploy-health.json build/game/deploy-health.json
           cp build/deploy-health.json build/phase100-deploy.json
           cp build/deploy-health.json build/phase101b-deploy.json
           cp build/deploy-health.json build/phase102-app-deploy.json
           cp build/deploy-health.json build/phase104-site-app-deploy.json
+          cp build/deploy-health.json build/phase110-app-download-deploy.json
 
           find build -maxdepth 3 -type f | sort > /tmp/svr-build-files.txt
           sed -n '1,280p' /tmp/svr-build-files.txt | sed 's#^# - #'
@@ -205,6 +210,8 @@ jobs:
           test -f build/CNAME
           test -f build/manifest.webmanifest
           test -f build/pwa-sw.js
+          test -f build/sw.js
+          test -f build/app-install.js
           test -f build/pwa-app-install.js
           test -f build/offline.html
           test -f build/site/app.html
@@ -220,6 +227,7 @@ jobs:
           test -f build/phase101b-deploy.json
           test -f build/phase102-app-deploy.json
           test -f build/phase104-site-app-deploy.json
+          test -f build/phase110-app-download-deploy.json
           test -f build/support-chat-bot.js
           if grep -q 'pwa-app-install.js\|data-svr-install-app\|Download App' build/index.html; then
             echo "::error::Public index.html must not contain the app install button or app installer script"
