@@ -1,31 +1,13 @@
 import * as THREE from "three";
-import { createTeleportRig as baseRig } from "./movement_phase286_input_lock.js?v=phase138-control-base";
+import { createTeleportRig as baseRig } from "./movement_phase286_input_lock.js?v=phase141-control-base";
 import { isFist, isPinching } from "./gestures.js";
 
-const LABEL = "PHASE-138-FIST-TELEPORT-HEAD-FORWARD-CONTROLLER-LOCK";
-const MIN_HAND_AIM_MS = 180;
-const MOVE_SPEED = 5.65;
-const FIST_TOGGLE_COOLDOWN_MS = 390;
-const FIST_LOOK_DOT = 0.18;
+const LABEL = "PHASE-141-QUEST-MOVEMENT-TELEPORT-FINAL-LOCK";
+const MOVE_SPEED = 5.85;
+const CONTROLLER_HIDE_RE = /oculus|quest|controller\s*(model|mesh|ray|grip)|left.*controller|right.*controller/i;
 
-if(!window.SVR_PHASE138_CLEAN_VIEW_RUNTIME_IMPORT_REQUESTED){
-  window.SVR_PHASE138_CLEAN_VIEW_RUNTIME_IMPORT_REQUESTED = true;
-  setTimeout(()=>{
-    import("../phase138_clean_view_single_stair_lock.js?v=phase138-clean-view-single-stair").catch(e=>{
-      window.SVR_PHASE138_CLEAN_VIEW_IMPORT_ERROR = String(e?.message || e);
-    });
-  }, 0);
-}
-
-const vHead = new THREE.Vector3();
-const vHand = new THREE.Vector3();
 const vDir = new THREE.Vector3();
-const vToHand = new THREE.Vector3();
 
-function held(hand){
-  if(!hand?.joints) return false;
-  try { return !!(isPinching(hand) || isFist(hand)); } catch { return false; }
-}
 function pinching(hand){
   if(!hand?.joints) return false;
   try { return !!isPinching(hand); } catch { return false; }
@@ -34,19 +16,23 @@ function fisted(hand){
   if(!hand?.joints) return false;
   try { return !!isFist(hand); } catch { return false; }
 }
-function anyHand(args){ return held(args?.leftHand) || held(args?.rightHand); }
 function anyPinch(args){ return pinching(args?.leftHand) || pinching(args?.rightHand); }
 function anyFist(args){ return fisted(args?.leftHand) || fisted(args?.rightHand); }
+function anyHandGesture(args){ return anyPinch(args) || anyFist(args); }
 function poseDist(a,b){ return Math.hypot(Number((a?.x||0)-(b?.x||0)), Number((a?.z||0)-(b?.z||0))); }
 function pad(proxy){ return proxy?.userData?.gamepad || proxy?.userData?.inputSource?.gamepad || proxy?.userData?.controller?.inputSource?.gamepad || null; }
 function axes(proxy){ return Array.from(pad(proxy)?.axes || []); }
-function stickY(args){
+function stick(args){
   const r = axes(args?.rightController), l = axes(args?.leftController);
-  let y = 0;
-  if(r.length >= 4) y = Number(r[3] || 0);
+  let x = 0, y = 0;
+  if(r.length >= 4){ x = Number(r[2] || 0); y = Number(r[3] || 0); }
+  if(Math.abs(x) < .14 && r.length >= 2) x = Number(r[0] || 0);
   if(Math.abs(y) < .14 && r.length >= 2) y = Number(r[1] || 0);
+  if(Math.abs(x) < .14 && l.length >= 2) x = Number(l[0] || 0);
   if(Math.abs(y) < .14 && l.length >= 2) y = Number(l[1] || 0);
-  return Math.abs(y) > .16 ? y : 0;
+  if(Math.abs(x) < .18) x = 0;
+  if(Math.abs(y) < .18) y = 0;
+  return {x,y};
 }
 function xrCamera(renderer,camera){
   const xr = renderer?.xr?.isPresenting ? renderer.xr.getCamera?.(camera) : camera;
@@ -60,40 +46,26 @@ function headForward(renderer,camera){
   if(vDir.lengthSq() < 1e-5) vDir.set(0,0,-1);
   return vDir.normalize();
 }
-function handWorldPosition(hand){
-  const wrist = hand?.joints?.wrist || hand?.joints?.["index-finger-tip"];
-  if(!wrist) return null;
-  wrist.updateWorldMatrix?.(true,false);
-  wrist.getWorldPosition(vHand);
-  return vHand;
-}
-function lookingAtHand(hand, renderer, camera){
-  const hp = handWorldPosition(hand);
-  if(!hp) return true;
-  const src = xrCamera(renderer,camera);
-  src?.updateWorldMatrix?.(true,false);
-  src?.getWorldPosition?.(vHead);
-  const f = headForward(renderer,camera).clone();
-  vToHand.copy(hp).sub(vHead);
-  if(vToHand.lengthSq() < .01) return true;
-  vToHand.normalize();
-  return f.dot(vToHand) > FIST_LOOK_DOT;
+function hideControllerMeshes(scene){
+  let hidden = 0;
+  scene?.traverse?.(o=>{
+    const n = String(o.name || "");
+    if(!CONTROLLER_HIDE_RE.test(n)) return;
+    if(/hand|proxy|watch|pointer|teleport|arc|ring/i.test(n)) return;
+    if(o.visible !== false){ o.visible = false; hidden++; }
+  });
+  return hidden;
 }
 
 export function createTeleportRig(opts){
   const rig = baseRig(opts);
   const originalUpdate = rig.update.bind(rig);
-  let aiming = false;
-  let aimStartedAt = 0;
-  let wasHeld = false;
-  let wasFist = false;
-  let revertedEarly = 0;
+  let blockedPinchOnly = 0;
   let forcedForward = 0;
+  let snapPass = 0;
+  let hiddenControllerMeshes = 0;
   let pokerTeleportBlocks = 0;
-  let fistTeleportArmed = false;
-  let lastFistToggleAt = 0;
-  let blockedUnarmedPinches = 0;
-  let releasePasses = 0;
+  let earlyJumpReverts = 0;
 
   function setPose(p){
     if(!p) return false;
@@ -101,110 +73,73 @@ export function createTeleportRig(opts){
     if(typeof rig.setPlayerXZ === "function") return rig.setPlayerXZ(p.x, p.z);
     return false;
   }
-  function toggleByFist(args, now){
-    const lf = fisted(args.leftHand), rf = fisted(args.rightHand);
-    const fistNow = lf || rf;
-    const fistEdge = fistNow && !wasFist;
-    const hand = rf ? args.rightHand : args.leftHand;
-    const lookOk = hand ? lookingAtHand(hand, opts.renderer, opts.camera) : true;
-    if(fistEdge && lookOk && now - lastFistToggleAt > FIST_TOGGLE_COOLDOWN_MS){
-      fistTeleportArmed = !fistTeleportArmed;
-      lastFistToggleAt = now;
-      window.SVR_PHASE138_FIST_TELEPORT_TOGGLE_EVENT = {
-        build: LABEL,
-        armed: fistTeleportArmed,
-        side: rf ? "right" : "left",
-        lookOk,
-        checkedAt: new Date().toISOString()
-      };
-      return true;
-    }
-    return false;
-  }
 
   rig.update = (args = {}) => {
     const before = rig.getPlayerPose?.();
-    const now = performance.now();
-    const fistToggleFrame = toggleByFist(args, now);
     const rawPinch = anyPinch(args);
-    const rawHandHeld = anyHand(args);
-    const blockHandTeleportForPoker = !!window.SVR_PHASE136_BLOCK_TELEPORT_FOR_POKER_ACTION;
-    const recentlyToggled = now - lastFistToggleAt < 260;
-
+    const rawFist = anyFist(args);
+    const rawGesture = anyHandGesture(args);
+    const blockForPoker = !!window.SVR_PHASE136_BLOCK_TELEPORT_FOR_POKER_ACTION;
     let updateArgs = args;
-    if(blockHandTeleportForPoker){
+
+    hiddenControllerMeshes += hideControllerMeshes(opts?.scene);
+
+    if(blockForPoker){
       updateArgs = { ...updateArgs, leftHand:null, rightHand:null };
       pokerTeleportBlocks++;
-    }else if(fistToggleFrame || recentlyToggled){
+    }else if(rawPinch && !rawFist){
       updateArgs = { ...updateArgs, leftHand:null, rightHand:null };
-    }else if(!fistTeleportArmed && rawPinch){
-      updateArgs = { ...updateArgs, leftHand:null, rightHand:null };
-      blockedUnarmedPinches++;
-    }else if(!fistTeleportArmed && rawHandHeld && !rawPinch){
-      updateArgs = { ...updateArgs, leftHand:null, rightHand:null };
+      blockedPinchOnly++;
     }
-
-    const handHeldBefore = anyHand(updateArgs);
-    if(handHeldBefore && !aiming){ aiming = true; aimStartedAt = now; }
 
     originalUpdate(updateArgs);
 
     const after = rig.getPlayerPose?.();
     const moved = poseDist(before, after);
-    const heldAge = aiming ? now - aimStartedAt : 0;
-    const releasedThisFrame = aiming && wasHeld && !handHeldBefore;
+    const state = rig.getState?.() || {};
+    const s = stick(args);
 
-    if(blockHandTeleportForPoker && moved > .02){
+    if(blockForPoker && moved > .02){
       setPose(before);
-      revertedEarly++;
-    }else if(aiming && handHeldBefore && moved > .035){
-      setPose(before);
-      revertedEarly++;
-    }else if(releasedThisFrame){
-      releasePasses++;
-      if(moved > .05) fistTeleportArmed = false;
+      earlyJumpReverts++;
     }
 
-    const y = stickY(args);
-    const state = rig.getState?.() || {};
-    if(opts?.renderer?.xr?.isPresenting && y && !state.mode && !rawHandHeld && before){
-      const f = headForward(opts.renderer, opts.camera);
-      const move = -y;
+    if(opts?.renderer?.xr?.isPresenting && s.y && !state.mode && !rawGesture && before){
+      const f = headForward(opts.renderer, opts.camera).clone();
+      const move = -s.y;
       const dt = Math.min(Math.max(args.dt || .016, .008), .05);
       rig.setPlayerXZ?.(before.x + f.x * move * MOVE_SPEED * dt, before.z + f.z * move * MOVE_SPEED * dt);
       forcedForward++;
     }
-
-    if(releasedThisFrame || blockHandTeleportForPoker || (!handHeldBefore && aiming && heldAge > 1200)){ aiming = false; aimStartedAt = 0; }
-    wasHeld = handHeldBefore && !blockHandTeleportForPoker;
-    wasFist = anyFist(args);
+    if(Math.abs(s.x) > .18) snapPass++;
 
     const stateNow = {
       build: LABEL,
       active: true,
-      minHandAimMs: MIN_HAND_AIM_MS,
-      fistTeleportArmed,
-      fistLookToggle: true,
-      pinchRequiresFistArm: true,
-      handReleaseCommitPass: true,
-      releasePasses,
-      blockedUnarmedPinches,
+      rightStickForwardBackHeadDirection: true,
+      rightStickSnapTurn45: true,
+      controllerButtonHoldAimReleaseTeleport: true,
+      aGripTriggerHoldReleaseTeleport: true,
+      fistGripHoldAimReleaseTeleport: true,
+      pinchOnlyLeapBlocked: true,
+      blockedPinchOnly,
       pokerActionTeleportBlock: true,
       pokerTeleportBlocks,
-      earlyHandJumpReverts: revertedEarly,
-      headForwardStickCorrection: true,
+      earlyJumpReverts,
       forcedHeadForwardStickMovement: true,
       forcedForward,
+      snapTurnInputPasses: snapPass,
       moveSpeed: MOVE_SPEED,
-      handAiming: aiming,
-      heldAgeMs: Math.round(heldAge || 0),
+      controllerMeshesHidden: true,
+      hiddenControllerMeshes,
+      handProxyPreserved: true,
       siteTouched: false,
       checkedAt: new Date().toISOString()
     };
-    window.SVR_PHASE135_PLAYABILITY_MOVEMENT_CONTROL_LOCK = stateNow;
-    window.SVR_PHASE136_PLAYABILITY_MOVEMENT_POKER_ACTION_GUARD = stateNow;
-    window.SVR_PHASE137_FIST_ARMED_TELEPORT_RELEASE_COMMIT_LOCK = stateNow;
+    window.SVR_PHASE141_QUEST_MOVEMENT_TELEPORT_FINAL_LOCK = stateNow;
     window.SVR_PHASE138_FIST_TELEPORT_HEAD_FORWARD_CONTROLLER_LOCK = stateNow;
+    window.SVR_PHASE137_FIST_ARMED_TELEPORT_RELEASE_COMMIT_LOCK = stateNow;
+    window.SVR_PHASE135_PLAYABILITY_MOVEMENT_CONTROL_LOCK = stateNow;
   };
 
   return rig;
