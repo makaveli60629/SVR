@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-AUTO-DEPLOY-ALL-CURRENT-PHASES",
-  "commit": "auto-deploy-all-current-phases",
-  "updatedAt": "2026-06-22T21:40:00-05:00",
+  "build": "SVR-PHASE-139-LOBBY-ALIGNMENT-MODULE-ACTIVATION-FINALIZER",
+  "commit": "phase-139-lobby-alignment-module-activation-finalizer",
+  "updatedAt": "2026-06-22T21:55:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Trigger GitHub Pages Auto Deploy for all currently committed game/site phases."
+  "purpose": "Phase 139 marker: clean lobby authority, one stair route, and room module activation."
 }
