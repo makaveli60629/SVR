@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-138-CLEAN-VIEW-SINGLE-STAIR",
-  "commit": "phase-138-clean-view-marker",
-  "updatedAt": "2026-06-20T12:20:00-05:00",
+  "build": "SVR-AUTO-DEPLOY-ALL-CURRENT-PHASES",
+  "commit": "auto-deploy-all-current-phases",
+  "updatedAt": "2026-06-22T21:40:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 138 clean view marker."
+  "purpose": "Trigger GitHub Pages Auto Deploy for all currently committed game/site phases."
 }
