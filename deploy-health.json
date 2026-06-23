@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-138-VR-ALIGNMENT-INPUT-SKY-WATCH-FINAL",
-  "commit": "phase-138-marker",
-  "updatedAt": "2026-06-20T12:05:00-05:00",
+  "build": "SVR-PHASE-138-CLEAN-VIEW-SINGLE-STAIR",
+  "commit": "phase-138-clean-view-marker",
+  "updatedAt": "2026-06-20T12:20:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 138 marker."
+  "purpose": "Phase 138 clean view marker."
 }
