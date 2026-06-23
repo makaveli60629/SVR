@@ -1,35 +1,58 @@
-﻿{
-    "name":  "SVR Poker",
-    "short_name":  "SVR Poker",
-    "description":  "SVR Poker launch page and VR room.",
-    "start_url":  "./index.html",
-    "scope":  "./",
-    "display":  "standalone",
-    "display_override":  [
-                             "window-controls-overlay",
-                             "standalone",
-                             "minimal-ui",
-                             "browser"
-                         ],
-    "background_color":  "#050008",
-    "theme_color":  "#8A2BE2",
-    "orientation":  "landscape",
-    "categories":  [
-                       "games",
-                       "entertainment"
-                   ],
-    "icons":  [
-                  {
-                      "src":  "./icons/icon.svg",
-                      "sizes":  "any",
-                      "type":  "image/svg+xml",
-                      "purpose":  "any"
-                  },
-                  {
-                      "src":  "./icons/maskable-icon.svg",
-                      "sizes":  "any",
-                      "type":  "image/svg+xml",
-                      "purpose":  "maskable"
-                  }
-              ]
+{
+  "name": "SVR Poker",
+  "short_name": "SVR Poker",
+  "description": "Install the SVR Poker companion app to launch the VR poker room, store, support, and project updates from your device.",
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "background_color": "#030008",
+  "theme_color": "#9b4dff",
+  "categories": ["games", "entertainment", "social"],
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Launch VR Room",
+      "short_name": "VR Room",
+      "description": "Open the SVR Poker WebXR game room.",
+      "url": "/game/index.html?source=pwa-shortcut",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Open Store",
+      "short_name": "Store",
+      "description": "Open the SVR Poker store preview.",
+      "url": "/site/store.html?source=pwa-shortcut",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Contact Support",
+      "short_name": "Support",
+      "description": "Open the SVR support and message page.",
+      "url": "/site/contact.html?source=pwa-shortcut",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
 }
