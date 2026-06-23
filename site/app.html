@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SVR Poker | Download App</title>
+  <meta name="description" content="Install the SVR Poker companion app for quick access to the VR poker room, store, support, and project updates." />
+  <meta name="theme-color" content="#9b4dff" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="../logo.webp" type="image/webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="site-market.css" />
+  <style>
+    .app-shell{padding:34px;display:grid;gap:22px}.app-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.72fr);gap:22px;align-items:center}.app-card{border:1px solid rgba(105,232,255,.24);border-radius:28px;background:rgba(255,255,255,.045);padding:22px;box-shadow:0 25px 80px rgba(0,0,0,.36)}.app-logo{width:min(260px,70vw);display:block;margin:0 auto 16px;filter:drop-shadow(0 0 24px rgba(105,232,255,.26))}.app-install-status{margin-top:12px;color:#ffd98a;font-weight:800}.app-list{display:grid;gap:10px;margin:16px 0 0;padding:0;list-style:none}.app-list li{padding:11px 12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(0,0,0,.18);color:#e9dcff}.signing-lock{border-color:rgba(255,217,138,.32);background:rgba(255,217,138,.06)}@media(max-width:900px){.app-hero{grid-template-columns:1fr}.app-shell{padding:22px}}
+  </style>
+</head>
+<body class="svr-market">
+  <canvas id="binary-rain" aria-hidden="true"></canvas>
+  <div class="market-page">
+    <nav class="market-nav">
+      <a class="market-brand" href="index.html"><img src="../logo.webp" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>App Download</span></div></a>
+      <div class="market-links"><span class="status-pill">ADMIN ONLINE</span><a href="index.html">Home</a><a href="store.html">Store</a><a href="../game/index.html">Launch VR Room</a><a href="contact.html">Contact</a><a href="app.html" data-svr-app-install>Download App</a></div>
+    </nav>
+    <main class="market-shell app-shell">
+      <section class="app-hero">
+        <div>
+          <span class="kicker">SVR Companion App</span>
+          <h1>Download SVR Poker.</h1>
+          <p class="lead">Install SVR Poker on your device for fast access to the VR poker room, store, support, public updates, and future member features.</p>
+          <div class="actions">
+            <a class="btn primary" href="app.html" data-svr-app-install>Install App</a>
+            <a class="btn secondary" href="../game/index.html?source=app-page">Launch VR Room</a>
+            <a class="btn ghost" href="store.html">Open Store</a>
+          </div>
+          <p class="app-install-status" id="svrAppInstallStatus">Use the Install App button. If your browser does not show an install prompt, use your browser menu and choose Add to Home Screen / Install App.</p>
+        </div>
+        <aside class="app-card">
+          <img class="app-logo" src="../logo.webp" alt="SVR Poker logo" />
+          <h2>Included</h2>
+          <ul class="app-list">
+            <li>Installable PWA app shell</li>
+            <li>VR room launcher</li>
+            <li>Store and support shortcuts</li>
+            <li>Offline fallback page</li>
+            <li>Secure HTTPS app delivery</li>
+          </ul>
+        </aside>
+      </section>
+      <section class="grid2">
+        <article class="card">
+          <h3>Android / Desktop</h3>
+          <p>Use the Install App button or your browser menu. Android Chrome and desktop Chrome/Edge typically show the install prompt when the PWA requirements are met.</p>
+        </article>
+        <article class="card">
+          <h3>Quest / VR</h3>
+          <p>Use this app page as a launcher. For full WebXR play, open the VR room in a WebXR-capable browser and press Enter VR inside the game.</p>
+        </article>
+        <article class="card signing-lock">
+          <h3>Signed APK Status</h3>
+          <p>The live download button does not point to an unsigned APK. Native Android APK/AAB signing is locked until the private keystore is added through GitHub Actions secrets. Do not commit keystores or passwords to the repo.</p>
+        </article>
+        <article class="card">
+          <h3>Safe Build Rule</h3>
+          <p>This phase adds the app shell and header download route only. The game files and poker lobby are not rewritten by this app page.</p>
+        </article>
+      </section>
+      <footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p></footer>
+    </main>
+  </div>
+  <script src="../matrix.js"></script>
+  <script src="../site-public-hooks.js"></script>
+  <script src="../support-chat-bot.js?v=phase102-pwa-app-download"></script>
+</body>
+</html>
