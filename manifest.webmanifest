@@ -2,8 +2,8 @@
   "name": "SVR Poker",
   "short_name": "SVR Poker",
   "description": "Install the SVR Poker companion app to launch the VR poker room, store, support, downloads, and project updates from your device.",
-  "id": "/?source=pwa",
-  "start_url": "/?source=pwa",
+  "id": "/site/?source=pwa",
+  "start_url": "/site/?source=pwa",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -13,53 +13,14 @@
   "categories": ["games", "entertainment", "social"],
   "lang": "en-US",
   "icons": [
-    {
-      "src": "/logo.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/logo.webp",
-      "sizes": "512x512",
-      "type": "image/webp",
-      "purpose": "any"
-    }
+    {"src": "/logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {
-      "name": "Launch VR Room",
-      "short_name": "VR Room",
-      "description": "Open the SVR Poker WebXR game room.",
-      "url": "/game/index.html?source=pwa-shortcut",
-      "icons": [{ "src": "/logo.png", "sizes": "192x192", "type": "image/png" }]
-    },
-    {
-      "name": "Open Store",
-      "short_name": "Store",
-      "description": "Open the SVR Poker store preview.",
-      "url": "/site/store.html?source=pwa-shortcut",
-      "icons": [{ "src": "/logo.png", "sizes": "192x192", "type": "image/png" }]
-    },
-    {
-      "name": "Downloads",
-      "short_name": "Downloads",
-      "description": "Open the SVR app download and install page.",
-      "url": "/downloads/?source=pwa-shortcut",
-      "icons": [{ "src": "/logo.png", "sizes": "192x192", "type": "image/png" }]
-    },
-    {
-      "name": "Contact Support",
-      "short_name": "Support",
-      "description": "Open the SVR support and message page.",
-      "url": "/site/contact.html?source=pwa-shortcut",
-      "icons": [{ "src": "/logo.png", "sizes": "192x192", "type": "image/png" }]
-    }
+    {"name": "Launch VR Room", "short_name": "VR Room", "description": "Open the SVR Poker WebXR game room.", "url": "/game/index.html?source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Open Site", "short_name": "Site", "description": "Open the SVR Poker site hub.", "url": "/site/?source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Downloads", "short_name": "Downloads", "description": "Open the SVR app download and install page.", "url": "/downloads/?source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Contact Support", "short_name": "Support", "description": "Open the SVR support and message page.", "url": "/site/contact.html?source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }
