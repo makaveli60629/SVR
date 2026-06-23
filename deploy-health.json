@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-141-QUEST-MOVEMENT-TELEPORT-FINAL-LOCK",
-  "commit": "phase-141-quest-movement-teleport-final-lock",
-  "updatedAt": "2026-06-23T00:25:00-05:00",
+  "build": "SVR-PHASE-142-PLAYABLE-POKER-CORE-AUTHORITY-LOCK",
+  "commit": "phase-142-playable-poker-core-authority-lock",
+  "updatedAt": "2026-06-23T00:40:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 141 marker: Quest right-stick movement, snap turn, hold-release teleport, and accidental pinch teleport prevention."
+  "purpose": "Phase 142 marker: play-money poker core actions, pot state, bot turns, streets, and showdown."
 }
