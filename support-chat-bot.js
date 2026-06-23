@@ -1,8 +1,9 @@
 (() => {
-  const BUILD = 'SITE-SVR-AI-SUPPORT-BOT-FIT-LOCK';
+  const BUILD = 'PHASE-106-GREEN-AI-SUPPORT-ONLINE-LOCK';
   const API_BASE = window.SVR_SERVER_API_BASE || window.SVR_API_BASE || 'https://api.svrpoker.com';
   const STORE_KEY = 'svr_support_chat_messages';
   const SESSION_KEY = 'svr_support_chat_session';
+  const AI_ONLINE_LABEL = 'AI SUPPORT ONLINE';
   const QUICK = [
     { key: 'game', label: 'Game help', text: 'I need help with the VR poker game.' },
     { key: 'sponsor', label: 'Sponsorship', text: 'I want information about sponsorship or advertising.' },
@@ -39,6 +40,21 @@
     const badge = document.querySelector('.admin-status,.status-pill,[data-admin-pill]');
     return /ADMIN ONLINE/i.test(String(badge?.textContent || ''));
   }
+  function paintSupportPresence(online){
+    const label = online ? 'ADMIN ONLINE' : AI_ONLINE_LABEL;
+    document.querySelectorAll('.admin-status,[data-admin-pill],.status-pill').forEach((badge) => {
+      const text = String(badge.textContent || '').toUpperCase();
+      const isAdminBadge = badge.matches('.admin-status,[data-admin-pill]') || text.includes('ADMIN ONLINE') || text.includes('ADMIN OFFLINE') || text.includes(AI_ONLINE_LABEL);
+      if(!isAdminBadge) return;
+      badge.textContent = label;
+      badge.dataset.state = 'online';
+      badge.dataset.source = online ? 'admin-live' : 'ai-support-online-fallback';
+      badge.classList.add('online', 'ai-support-online');
+      badge.classList.remove('offline');
+      badge.setAttribute('aria-label', label);
+      badge.title = label;
+    });
+  }
   function botReply(text){
     const q = String(text || '').toLowerCase();
     if(/game|vr|quest|oculus|move|teleport|controller|poker/.test(q)){
@@ -51,7 +67,7 @@
       return 'Store help: the SVR store is currently in preview/sandbox mode. Checkout and payments stay disabled until approved. You can browse the store preview and request help with items, membership, or future avatar gear.';
     }
     if(/admin|owner|contact|email|ronald|call/.test(q)){
-      return 'Admin contact: leave your name, email, and message here. The bot saves the message locally and tries to send it to SVR support when the backend is available. You can also email admin@svrpoker.com.';
+      return 'Admin contact: leave your name, email, and message here. The AI support bot saves the message locally and tries to send it to SVR support when the backend is available. You can also email admin@svrpoker.com.';
     }
     if(/donate|cash|support|fund|help expand|svrhelp/.test(q)){
       return 'Support development: donations/support are for site development and expansion costs only. Cash App is $SVRhelp. This is separate from gameplay and is not gambling or a poker prize.';
@@ -69,19 +85,20 @@
     const style = document.createElement('style');
     style.id = 'svr-support-chat-style';
     style.textContent = `
+      .admin-status.ai-support-online,.status-pill.ai-support-online,[data-admin-pill].ai-support-online{background:linear-gradient(135deg,rgba(141,255,180,.98),rgba(48,255,120,.90))!important;border-color:rgba(141,255,180,.90)!important;color:#021006!important;box-shadow:0 0 20px rgba(141,255,180,.38),0 12px 38px rgba(0,0,0,.30)!important;text-shadow:none!important}
       #svrSupportChatNative{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));z-index:2147483647;width:min(390px,calc(100vw - 24px));font-family:Rajdhani,system-ui,Arial;color:#fff;pointer-events:none}
-      #svrSupportChatNative summary{list-style:none;pointer-events:auto;float:right;border:1px solid rgba(127,252,255,.82);border-radius:999px;background:linear-gradient(135deg,rgba(127,252,255,.96),rgba(155,77,255,.94));color:#02040a;font:900 13px Orbitron,system-ui,Arial;padding:13px 16px;box-shadow:0 20px 70px rgba(0,0,0,.72),0 0 24px rgba(127,252,255,.30);cursor:pointer;letter-spacing:.06em;text-transform:uppercase;user-select:none}
+      #svrSupportChatNative summary{list-style:none;pointer-events:auto;float:right;border:1px solid rgba(141,255,180,.92);border-radius:999px;background:linear-gradient(135deg,rgba(141,255,180,.98),rgba(48,255,120,.92));color:#021006;font:900 13px Orbitron,system-ui,Arial;padding:13px 16px;box-shadow:0 20px 70px rgba(0,0,0,.72),0 0 26px rgba(141,255,180,.42);cursor:pointer;letter-spacing:.06em;text-transform:uppercase;user-select:none}
       #svrSupportChatNative summary::-webkit-details-marker{display:none}
-      #svrSupportChatNative .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#8dffb4;margin-right:8px;box-shadow:0 0 12px #8dffb4}
-      #svrSupportChatNative.is-offline .dot{background:#ffd98a;box-shadow:0 0 12px #ffd98a}
+      #svrSupportChatNative .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#021006;margin-right:8px;box-shadow:0 0 8px rgba(2,16,6,.45)}
+      #svrSupportChatNative.is-offline .dot{background:#021006;box-shadow:0 0 8px rgba(2,16,6,.45)}
       #svrSupportChatNative[open] summary{margin-bottom:10px}
-      .svr-chat-native-panel{clear:both;pointer-events:auto;display:none;border:1px solid rgba(127,252,255,.55);border-radius:22px;background:rgba(3,5,14,.985);box-shadow:0 30px 100px rgba(0,0,0,.84),0 0 28px rgba(127,252,255,.16);backdrop-filter:blur(20px);overflow:hidden;height:min(660px,calc(100vh - 112px));max-height:calc(100vh - 112px)}
+      .svr-chat-native-panel{clear:both;pointer-events:auto;display:none;border:1px solid rgba(141,255,180,.45);border-radius:22px;background:rgba(3,5,14,.985);box-shadow:0 30px 100px rgba(0,0,0,.84),0 0 28px rgba(141,255,180,.16);backdrop-filter:blur(20px);overflow:hidden;height:min(660px,calc(100vh - 112px));max-height:calc(100vh - 112px)}
       #svrSupportChatNative[open] .svr-chat-native-panel{display:grid;grid-template-rows:auto 1fr auto}
-      .svr-chat-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.10);background:linear-gradient(135deg,rgba(127,252,255,.13),rgba(155,77,255,.10))}
-      .svr-chat-head strong{font-family:Orbitron,system-ui,Arial;font-size:14px;color:#bffcff;letter-spacing:.06em}.svr-chat-head span{font-size:12px;color:#ffd98a}.svr-chat-mini{font-size:11px;color:#cfefff;opacity:.82;margin-top:3px}
-      .svr-chat-body{padding:13px;overflow:auto;min-height:140px}.svr-chat-msg{margin:8px 0;padding:10px 12px;border-radius:16px;line-height:1.28;font-size:15px;white-space:pre-wrap}.svr-chat-msg.bot{background:rgba(127,252,255,.10);border:1px solid rgba(127,252,255,.20);color:#eafcff}.svr-chat-msg.user{background:rgba(255,217,138,.13);border:1px solid rgba(255,217,138,.25);color:#fff8df;margin-left:32px}.svr-chat-msg.ai{border-color:rgba(155,77,255,.38);background:rgba(155,77,255,.14)}
-      .svr-chat-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}.svr-chat-quick button{border:1px solid rgba(127,252,255,.28);border-radius:13px;background:rgba(255,255,255,.065);color:#fff;font-weight:800;padding:9px;cursor:pointer;min-height:38px}.svr-chat-quick button:hover{background:rgba(127,252,255,.14)}
-      .svr-chat-form{display:grid;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.22)}.svr-chat-form input,.svr-chat-form textarea{width:100%;box-sizing:border-box;border:1px solid rgba(127,252,255,.26);border-radius:13px;background:rgba(0,0,0,.34);color:#fff;padding:10px;font:700 14px Rajdhani,system-ui,Arial;outline:none}.svr-chat-form textarea{min-height:78px;max-height:145px;resize:vertical}.svr-chat-form button[type="submit"]{border:1px solid rgba(255,217,138,.62);border-radius:14px;background:linear-gradient(135deg,rgba(255,217,138,.96),rgba(127,252,255,.80));color:#080812;font:900 13px Orbitron,system-ui,Arial;padding:11px;cursor:pointer;text-transform:uppercase}.svr-chat-note{font-size:12px;color:#bffcff;opacity:.86;text-align:center}.svr-chat-status{font-size:12px;color:#ffd98a;text-align:center;min-height:16px}.svr-chat-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+      .svr-chat-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.10);background:linear-gradient(135deg,rgba(141,255,180,.13),rgba(127,252,255,.08))}
+      .svr-chat-head strong{font-family:Orbitron,system-ui,Arial;font-size:14px;color:#bffcff;letter-spacing:.06em}.svr-chat-head span{font-size:12px;color:#8dffb4;font-weight:900}.svr-chat-mini{font-size:11px;color:#cfefff;opacity:.82;margin-top:3px}
+      .svr-chat-body{padding:13px;overflow:auto;min-height:140px}.svr-chat-msg{margin:8px 0;padding:10px 12px;border-radius:16px;line-height:1.28;font-size:15px;white-space:pre-wrap}.svr-chat-msg.bot{background:rgba(127,252,255,.10);border:1px solid rgba(127,252,255,.20);color:#eafcff}.svr-chat-msg.user{background:rgba(255,217,138,.13);border:1px solid rgba(255,217,138,.25);color:#fff8df;margin-left:32px}.svr-chat-msg.ai{border-color:rgba(141,255,180,.38);background:rgba(141,255,180,.12)}
+      .svr-chat-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}.svr-chat-quick button{border:1px solid rgba(141,255,180,.30);border-radius:13px;background:rgba(255,255,255,.065);color:#fff;font-weight:800;padding:9px;cursor:pointer;min-height:38px}.svr-chat-quick button:hover{background:rgba(141,255,180,.14)}
+      .svr-chat-form{display:grid;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.22)}.svr-chat-form input,.svr-chat-form textarea{width:100%;box-sizing:border-box;border:1px solid rgba(141,255,180,.28);border-radius:13px;background:rgba(0,0,0,.34);color:#fff;padding:10px;font:700 14px Rajdhani,system-ui,Arial;outline:none}.svr-chat-form textarea{min-height:78px;max-height:145px;resize:vertical}.svr-chat-form button[type="submit"]{border:1px solid rgba(141,255,180,.72);border-radius:14px;background:linear-gradient(135deg,rgba(141,255,180,.98),rgba(127,252,255,.80));color:#080812;font:900 13px Orbitron,system-ui,Arial;padding:11px;cursor:pointer;text-transform:uppercase}.svr-chat-note{font-size:12px;color:#bffcff;opacity:.86;text-align:center}.svr-chat-status{font-size:12px;color:#8dffb4;text-align:center;min-height:16px}.svr-chat-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
       @media(max-width:520px){#svrSupportChatNative{right:12px;bottom:12px;width:calc(100vw - 24px)}.svr-chat-native-panel{height:min(620px,calc(100vh - 92px));max-height:calc(100vh - 92px)}.svr-chat-fields{grid-template-columns:1fr}.svr-chat-quick{grid-template-columns:1fr}.svr-chat-msg.user{margin-left:0}}
     `;
     document.head.appendChild(style);
@@ -134,9 +151,9 @@
     const details = document.createElement('details');
     details.id = 'svrSupportChatNative';
     details.innerHTML = `
-      <summary><span class="dot"></span>AI Support</summary>
+      <summary><span class="dot"></span>AI Support Online</summary>
       <section class="svr-chat-native-panel" aria-label="SVR AI support chat bot">
-        <header class="svr-chat-head"><div><strong>SVR AI Support Bot</strong><br><span id="svrSupportAdminLine">Checking admin status...</span><div class="svr-chat-mini">Game • Store • Sponsorship • Admin help</div></div></header>
+        <header class="svr-chat-head"><div><strong>SVR AI Support Bot</strong><br><span id="svrSupportAdminLine">AI SUPPORT ONLINE • messages saved for admin</span><div class="svr-chat-mini">Game • Store • Sponsorship • Admin help</div></div></header>
         <div class="svr-chat-body" id="svrSupportChatBody"></div>
         <form class="svr-chat-form" id="svrSupportChatForm">
           <div class="svr-chat-quick">${QUICK.map(q=>`<button type="button" data-chat="${q.key}">${q.label}</button>`).join('')}</div>
@@ -144,7 +161,7 @@
           <textarea name="message" placeholder="Ask the SVR AI bot or leave a support message"></textarea>
           <button type="submit">Ask / Send</button>
           <div class="svr-chat-status" id="svrSupportChatStatus"></div>
-          <div class="svr-chat-note">AI replies instantly. Messages are saved locally and sent to SVR support when the backend is available.</div>
+          <div class="svr-chat-note">AI support is online. Messages are saved locally and sent to SVR support when the backend is available.</div>
         </form>
       </section>
     `;
@@ -167,15 +184,16 @@
     });
     addMessage('Welcome. I am the SVR AI Support Bot. I can answer quick questions about the game, store, sponsorship, admin contact, donations, and project status.', 'bot ai');
     updateAdminLine();
-    setInterval(updateAdminLine, 30000);
+    setInterval(updateAdminLine, 5000);
   }
   function updateAdminLine(){
     const online = adminOnline();
     const root = document.getElementById('svrSupportChatNative');
     const line = document.getElementById('svrSupportAdminLine');
-    if(root) root.classList.toggle('is-offline', !online);
-    if(line) line.textContent = online ? 'Admin Online • live support possible' : 'Admin Offline • AI + saved messages';
-    window.SVR_SUPPORT_CHAT_BOT = { build:BUILD, active:true, aiSupport:true, nativeDetails:true, adminOnline:online, apiBase:API_BASE, safeFallback:true, checkedAt:new Date().toISOString() };
+    if(root) root.classList.remove('is-offline');
+    paintSupportPresence(online);
+    if(line) line.textContent = online ? 'ADMIN ONLINE • live support possible' : 'AI SUPPORT ONLINE • messages saved for admin';
+    window.SVR_SUPPORT_CHAT_BOT = { build:BUILD, active:true, aiSupport:true, aiSupportOnline:true, nativeDetails:true, adminOnline:online, visibleStatus: online ? 'ADMIN ONLINE' : AI_ONLINE_LABEL, apiBase:API_BASE, safeFallback:true, checkedAt:new Date().toISOString() };
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inject);
   else inject();
