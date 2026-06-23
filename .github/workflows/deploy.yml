@@ -60,6 +60,9 @@ jobs:
             site-local-counter.js
             site-public-hooks.js
             support-chat-bot.js
+            app-install.js
+            manifest.webmanifest
+            sw.js
             logo.png
             logo.webp
             favicon.ico
@@ -81,6 +84,7 @@ jobs:
             docs/PHASE_100_HANDOFF.md
             docs/PHASE_101_LIVE_DEPLOY_QA_WEBXR_ROUTE_VERIFY.md
             docs/PHASE_101A_BOOT_LOAD_SCREEN_RECOVERY_PATCH.md
+            docs/PHASE_102_PWA_APP_INSTALL_DOWNLOAD_LOCK.md
 
       - name: Prepare static Pages build
         shell: bash
@@ -112,6 +116,9 @@ jobs:
           copy_file_if_exists site-local-counter.js
           copy_file_if_exists site-public-hooks.js
           copy_file_if_exists support-chat-bot.js
+          copy_file_if_exists app-install.js
+          copy_file_if_exists manifest.webmanifest
+          copy_file_if_exists sw.js
           copy_file_if_exists logo.png
           copy_file_if_exists logo.webp
           copy_file_if_exists favicon.ico
@@ -141,7 +148,7 @@ jobs:
           fi
 
           if [ ! -f build/site/downloads/index.html ]; then
-            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Downloads</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Downloads</h1><p>The APK direct file will appear after the demo build is finalized.</p><p><a style="color:#ffd36a" href="/android/">Open Android Demo Page</a></p></body></html>' > build/site/downloads/index.html
+            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/downloads/"><a href="/downloads/">Open SVR App Downloads</a>' > build/site/downloads/index.html
           fi
 
           if [ ! -f build/reiki/index.html ]; then
@@ -169,10 +176,11 @@ jobs:
           fi
 
           DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          printf '{\n  "status": "ok",\n  "build": "SVR-PHASE-101B-STALE-LIVE-ROUTE-DEPLOY-LOCK",\n  "commit": "%s",\n  "deployedAt": "%s",\n  "gameZipStatus": "%s",\n  "gameZipBytes": "%s",\n  "customDomain": "svrpoker.com"\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" "$GAME_ZIP_STATUS" "$GAME_ZIP_BYTES" > build/deploy-health.json
+          printf '{\n  "status": "ok",\n  "build": "SVR-PHASE-102-PWA-APP-INSTALL-DOWNLOAD-LOCK",\n  "commit": "%s",\n  "deployedAt": "%s",\n  "gameZipStatus": "%s",\n  "gameZipBytes": "%s",\n  "customDomain": "svrpoker.com",\n  "pwa": { "manifest": true, "serviceWorker": true, "installButton": true }\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" "$GAME_ZIP_STATUS" "$GAME_ZIP_BYTES" > build/deploy-health.json
           cp build/deploy-health.json build/game/deploy-health.json
           cp build/deploy-health.json build/phase100-deploy.json
           cp build/deploy-health.json build/phase101b-deploy.json
+          cp build/deploy-health.json build/phase102-pwa-deploy.json
 
           find build -maxdepth 3 -type f | sort > /tmp/svr-build-files.txt
           sed -n '1,280p' /tmp/svr-build-files.txt | sed 's#^# - #'
@@ -184,9 +192,12 @@ jobs:
           set -euo pipefail
           test -f build/index.html
           test -f build/CNAME
+          test -f build/manifest.webmanifest
+          test -f build/app-install.js
+          test -f build/sw.js
+          test -f build/downloads/index.html
           test -f build/reiki/index.html
           test -f build/android/index.html
-          test -f build/downloads/index.html
           test -f build/site/presentations/reiki/index.html
           test -f build/site/android/index.html
           test -f build/site/downloads/index.html
@@ -194,6 +205,7 @@ jobs:
           test -f build/game/deploy-health.json
           test -f build/phase100-deploy.json
           test -f build/phase101b-deploy.json
+          test -f build/phase102-pwa-deploy.json
           test -f build/support-chat-bot.js
           if [ ! -f build/update/game.zip ]; then
             echo "::warning::build/update/game.zip was not found; Pages deploy will continue with health warning"
