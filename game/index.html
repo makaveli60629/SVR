@@ -8,75 +8,76 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
-  <link rel="manifest" href="./manifest.json?v=phase138"/>
+  <link rel="manifest" href="./manifest.json?v=phase139"/>
   <style>
     html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}#app{position:fixed;inset:0;background:#02040b}canvas{display:block;width:100%;height:100%;background:#000;outline:none}#safeStage{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:#000}.safe-card{width:min(92vw,720px);border:1px solid rgba(127,252,255,.72);border-radius:22px;background:rgba(0,0,0,.72);box-shadow:0 0 42px rgba(127,252,255,.20);padding:26px;text-align:center}.safe-card h1{margin:6px 0 8px;font-size:clamp(34px,7vw,72px);letter-spacing:.04em}.safe-card h2{margin:0 0 14px;color:#7ffcff;font-size:clamp(16px,3vw,28px)}.safe-card p{color:#d7eaff}.pill{display:inline-block;border:1px solid #ffd98a;border-radius:999px;color:#ffd98a;padding:7px 12px;font-weight:900;font-size:12px;letter-spacing:.08em}.btn{display:inline-flex;align-items:center;justify-content:center;margin:6px;border:1px solid rgba(255,217,138,.65);border-radius:12px;background:rgba(255,217,138,.12);color:#ffd98a;padding:10px 14px;font-weight:900;text-decoration:none;cursor:pointer}.btn.cyan{border-color:rgba(127,252,255,.68);color:#bffcff;background:rgba(127,252,255,.10)}#bootFallback{display:none!important;opacity:0!important;pointer-events:none!important}.phase-label,#sceneNav,#log,#err,#hud{display:none!important}.boot-released #safeStage,.runtime-visible #safeStage,.overlay-released #safeStage{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-138-VR-ALIGNMENT-INPUT-SKY-WATCH-FINAL" data-player-facing-build="SCARLETT-POKER-VR-PRODUCTION-DEMO">
+<body data-build="PHASE-139-LOBBY-ALIGNMENT-MODULE-ACTIVATION-FINALIZER" data-player-facing-build="SCARLETT-POKER-VR-PRODUCTION-DEMO">
   <div id="app"></div>
-  <div id="safeStage"><section class="safe-card"><span class="pill">SCARLETT POKER VR</span><h1>SCARLETT POKER VR</h1><h2>Luxury Lobby</h2><p id="safeStatus">Loading Scarlett Poker VR lobby...</p><div><button class="btn cyan" id="startRuntimeBtn" type="button">Start Lobby Now</button><a class="btn" href="./index.html?v=phase138-manual-refresh">Reload Fresh</a></div></section></div>
+  <div id="safeStage"><section class="safe-card"><span class="pill">SCARLETT POKER VR</span><h1>SCARLETT POKER VR</h1><h2>Luxury Lobby</h2><p id="safeStatus">Loading Scarlett Poker VR lobby...</p><div><button class="btn cyan" id="startRuntimeBtn" type="button">Start Lobby Now</button><a class="btn" href="./index.html?v=phase139-manual-refresh">Reload Fresh</a></div></section></div>
   <div id="bootFallback"></div><div id="hud"><span id="status"></span><span id="mode"></span><button id="toggleLog" type="button">Log</button><button id="toggleJoints" type="button">Joints</button></div><div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      var BUILD='PHASE-138-VR-ALIGNMENT-INPUT-SKY-WATCH-FINAL';var loaded=false;var status=document.getElementById('safeStatus');
-      window.SVR_PHASE138_BOOT={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString(),quickLoad:true,playerFacingPhaseText:true,spawnDeclutter:true,controllerLaser:true,watchRestore:true,stairAlignment:true,skyRebuild:true};
-      function note(msg){if(status)status.textContent=msg;window.SVR_PHASE138_BOOT.lastMessage=msg;window.SVR_PHASE138_BOOT.checkedAt=new Date().toISOString();}
-      function hideOverlay(reason){document.body.classList.add('boot-released','runtime-visible','overlay-released');var safe=document.getElementById('safeStage');if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';safe.setAttribute('aria-hidden','true');}window.__SVR_GAME_READY__=true;window.SVR_GAME_READY=true;window.SVR_PHASE138_BOOT.overlayReleased=true;window.SVR_PHASE138_BOOT.reason=reason;window.SVR_PHASE138_BOOT.releasedAt=new Date().toISOString();}
+      var BUILD='PHASE-139-LOBBY-ALIGNMENT-MODULE-ACTIVATION-FINALIZER';var loaded=false;var status=document.getElementById('safeStatus');
+      window.SVR_PHASE139_BOOT={build:BUILD,active:true,loaded:false,errors:[],startedAt:new Date().toISOString(),quickLoad:true,playerFacingPhaseText:true,finalAuthority:true,cleanLobby:true,moduleRoutes:true,oneStair:true};
+      function note(msg){if(status)status.textContent=msg;window.SVR_PHASE139_BOOT.lastMessage=msg;window.SVR_PHASE139_BOOT.checkedAt=new Date().toISOString();}
+      function hideOverlay(reason){document.body.classList.add('boot-released','runtime-visible','overlay-released');var safe=document.getElementById('safeStage');if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';safe.setAttribute('aria-hidden','true');}window.__SVR_GAME_READY__=true;window.SVR_GAME_READY=true;window.SVR_PHASE139_BOOT.overlayReleased=true;window.SVR_PHASE139_BOOT.reason=reason;window.SVR_PHASE139_BOOT.releasedAt=new Date().toISOString();}
       window.SVR_RELEASE_BOOT=hideOverlay;window.SVR_FORCE_HIDE_SAFE_STAGE=hideOverlay;
       function addModule(src){return new Promise(function(resolve,reject){var s=document.createElement('script');s.type='module';s.src=src;s.onload=resolve;s.onerror=function(){reject(new Error('Failed '+src));};document.body.appendChild(s);});}
-      async function startRuntime(){if(loaded)return;loaded=true;window.SVR_PHASE138_BOOT.loaded=true;note('Preparing lobby...');try{
-        await addModule('./phase101_boot_load_screen_recovery.js?v=phase138');
-        await addModule('./phase101_partial_runtime_render_guard.js?v=phase138');
-        await addModule('./phase101_render_marker_cleanup.js?v=phase138');
-        await addModule('./main.js?v=phase138-runtime');
+      async function startRuntime(){if(loaded)return;loaded=true;window.SVR_PHASE139_BOOT.loaded=true;note('Preparing lobby...');try{
+        await addModule('./phase101_boot_load_screen_recovery.js?v=phase139');
+        await addModule('./phase101_partial_runtime_render_guard.js?v=phase139');
+        await addModule('./phase101_render_marker_cleanup.js?v=phase139');
+        await addModule('./main.js?v=phase139-runtime');
         note('Opening lobby...');
-        await addModule('./phase101t_lobby_interaction_portal_qa_lock.js?v=phase138');
-        await addModule('./phase99_clean_expanded_lobby_rebuild_lock.js?v=phase138');
-        await addModule('./phase98_second_floor_safety_floor_lock.js?v=phase138');
-        await addModule('./phase101_second_floor_visibility_final_qa_lock.js?v=phase138');
-        await addModule('./phase103_view_polish_lock.js?v=phase138');
-        await addModule('./phase104_boot_integrity_clean_runtime_audit_lock.js?v=phase138');
-        await addModule('./phase105_single_clean_boot_consolidation_lock.js?v=phase138');
-        await addModule('./phase106_production_demo_lock.js?v=phase138');
-        await addModule('./phase107_quest_live_qa_harness_lock.js?v=phase138');
-        await addModule('./phase108_duplicate_table_removal_lock.js?v=phase138');
-        await addModule('./phase109_single_table_poker_focus_lock.js?v=phase138');
-        await addModule('./phase110_poker_playability_readiness_lock.js?v=phase138');
-        await addModule('./phase111_poker_action_focus_lock.js?v=phase138');
-        await addModule('./phase112_hand_pinch_poker_button_selection_lock.js?v=phase138');
-        await addModule('./phase113_expanded_lobby_alignment_lock.js?v=phase138');
-        await addModule('./phase114_lobby_no_crowding_alignment_guard.js?v=phase138');
-        await addModule('./phase115_left_wall_portal_balance_alignment_lock.js?v=phase138');
-        await addModule('./phase116_portal_route_activation_navigation_lock.js?v=phase138');
-        await addModule('./phase117_luxury_lobby_visual_polish_lock.js?v=phase138');
-        await addModule('./phase118_luxury_depth_wayfinding_polish_lock.js?v=phase138');
-        await addModule('./phase119_luxury_lobby_final_composition_directory_lock.js?v=phase138');
-        await addModule('./phase120_luxury_lobby_stability_performance_lock.js?v=phase138');
-        await addModule('./phase121_luxury_lobby_acceptance_qa_lock.js?v=phase138');
-        await addModule('./phase122_poker_table_action_feedback_focus_lock.js?v=phase138');
-        await addModule('./phase123_poker_turn_pot_display_feedback_lock.js?v=phase138');
-        await addModule('./phase124_poker_action_accessibility_hotkey_lock.js?v=phase138');
-        await addModule('./phase125_quest_poker_button_hitbox_selection_lock.js?v=phase138');
-        await addModule('./phase126_quest_live_playability_audit_fix_lock.js?v=phase138');
-        await addModule('./phase127_poker_round_flow_dealer_prompt_lock.js?v=phase138');
-        await addModule('./phase128_admin_player_presence_pills_preview_lock.js?v=phase138');
-        await addModule('./phase129_storefront_route_preview_portal_polish_lock.js?v=phase138');
-        await addModule('./phase130_production_demo_final_readiness_lock.js?v=phase138');
-        await addModule('./phase131_manual_quest_demo_test_handoff_lock.js?v=phase138');
-        await addModule('./phase132_fresh_game_package_prep_release_notes_lock.js?v=phase138');
-        await addModule('./phase133_artifact_workflow_lock.js?v=phase138');
-        await addModule('./phase135_vr_playability_declutter_lobby_lock.js?v=phase138');
-        await addModule('./phase136_quest_poker_action_stair_safety_lock.js?v=phase138');
-        await addModule('./phase137_vr_spawn_declutter_fist_sky_stairs_preview_lock.js?v=phase138');
-        await addModule('./phase138_vr_alignment_input_sky_watch_final_lock.js?v=phase138');
+        await addModule('./phase101t_lobby_interaction_portal_qa_lock.js?v=phase139');
+        await addModule('./phase99_clean_expanded_lobby_rebuild_lock.js?v=phase139');
+        await addModule('./phase98_second_floor_safety_floor_lock.js?v=phase139');
+        await addModule('./phase101_second_floor_visibility_final_qa_lock.js?v=phase139');
+        await addModule('./phase103_view_polish_lock.js?v=phase139');
+        await addModule('./phase104_boot_integrity_clean_runtime_audit_lock.js?v=phase139');
+        await addModule('./phase105_single_clean_boot_consolidation_lock.js?v=phase139');
+        await addModule('./phase106_production_demo_lock.js?v=phase139');
+        await addModule('./phase107_quest_live_qa_harness_lock.js?v=phase139');
+        await addModule('./phase108_duplicate_table_removal_lock.js?v=phase139');
+        await addModule('./phase109_single_table_poker_focus_lock.js?v=phase139');
+        await addModule('./phase110_poker_playability_readiness_lock.js?v=phase139');
+        await addModule('./phase111_poker_action_focus_lock.js?v=phase139');
+        await addModule('./phase112_hand_pinch_poker_button_selection_lock.js?v=phase139');
+        await addModule('./phase113_expanded_lobby_alignment_lock.js?v=phase139');
+        await addModule('./phase114_lobby_no_crowding_alignment_guard.js?v=phase139');
+        await addModule('./phase115_left_wall_portal_balance_alignment_lock.js?v=phase139');
+        await addModule('./phase116_portal_route_activation_navigation_lock.js?v=phase139');
+        await addModule('./phase117_luxury_lobby_visual_polish_lock.js?v=phase139');
+        await addModule('./phase118_luxury_depth_wayfinding_polish_lock.js?v=phase139');
+        await addModule('./phase119_luxury_lobby_final_composition_directory_lock.js?v=phase139');
+        await addModule('./phase120_luxury_lobby_stability_performance_lock.js?v=phase139');
+        await addModule('./phase121_luxury_lobby_acceptance_qa_lock.js?v=phase139');
+        await addModule('./phase122_poker_table_action_feedback_focus_lock.js?v=phase139');
+        await addModule('./phase123_poker_turn_pot_display_feedback_lock.js?v=phase139');
+        await addModule('./phase124_poker_action_accessibility_hotkey_lock.js?v=phase139');
+        await addModule('./phase125_quest_poker_button_hitbox_selection_lock.js?v=phase139');
+        await addModule('./phase126_quest_live_playability_audit_fix_lock.js?v=phase139');
+        await addModule('./phase127_poker_round_flow_dealer_prompt_lock.js?v=phase139');
+        await addModule('./phase128_admin_player_presence_pills_preview_lock.js?v=phase139');
+        await addModule('./phase129_storefront_route_preview_portal_polish_lock.js?v=phase139');
+        await addModule('./phase130_production_demo_final_readiness_lock.js?v=phase139');
+        await addModule('./phase131_manual_quest_demo_test_handoff_lock.js?v=phase139');
+        await addModule('./phase132_fresh_game_package_prep_release_notes_lock.js?v=phase139');
+        await addModule('./phase133_artifact_workflow_lock.js?v=phase139');
+        await addModule('./phase135_vr_playability_declutter_lobby_lock.js?v=phase139');
+        await addModule('./phase136_quest_poker_action_stair_safety_lock.js?v=phase139');
+        await addModule('./phase137_vr_spawn_declutter_fist_sky_stairs_preview_lock.js?v=phase139');
+        await addModule('./phase138_vr_alignment_input_sky_watch_final_lock.js?v=phase139');
+        await addModule('./phase139_lobby_alignment_module_activation_finalizer.js?v=phase139');
         note('Lobby ready.');
-        setTimeout(function(){hideOverlay('phase138-ready');},120);
-      }catch(e){window.SVR_PHASE138_BOOT.errors.push(String(e.message||e));note('Lobby ready.');setTimeout(function(){hideOverlay('phase138-fallback-release');},500);}}
+        setTimeout(function(){hideOverlay('phase139-ready');},120);
+      }catch(e){window.SVR_PHASE139_BOOT.errors.push(String(e.message||e));note('Lobby ready.');setTimeout(function(){hideOverlay('phase139-fallback-release');},500);}}
       document.getElementById('startRuntimeBtn').addEventListener('click',startRuntime);
-      window.addEventListener('error',function(e){window.SVR_PHASE138_BOOT.errors.push(String(e.message||e.error||e));hideOverlay('error-release');});
-      window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE138_BOOT.errors.push(String((e.reason&&e.reason.message)||e.reason||e));hideOverlay('promise-release');});
+      window.addEventListener('error',function(e){window.SVR_PHASE139_BOOT.errors.push(String(e.message||e.error||e));hideOverlay('error-release');});
+      window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE139_BOOT.errors.push(String((e.reason&&e.reason.message)||e.reason||e));hideOverlay('promise-release');});
       var overlayWatch=setInterval(function(){if(window.__SVR_RENDERER__||window.__SVR_SCENE__||document.querySelector('canvas')){hideOverlay('scene-or-canvas-detected');clearInterval(overlayWatch);}},250);
       setTimeout(startRuntime,100);
       setTimeout(function(){if(!window.__SVR_RENDERER__&&!window.__SVR_SCENE__)startRuntime();},800);
