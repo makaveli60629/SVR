@@ -11,8 +11,9 @@ import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createWristWatch } from "./modules/watch.js?v=phase99-clean-lobby-watch";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
+import { installPhase149LobbyFitAlignmentLock } from "./phase149_lobby_fit_alignment_lock.js";
 
-const BUILD_LABEL = "PHASE-99-CLEAN-EXPANDED-LOBBY-REBUILD-LOCK";
+const BUILD_LABEL = "PHASE-149-LOBBY-FIT-ALIGNMENT-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
@@ -24,7 +25,7 @@ window.SVR_REFINED_LOBBY_GEOMETRY = true;
 window.SVR_BACKGROUND_BUILDINGS_REMOVED = true;
 window.SVR_LOCKED_FINAL_BUILD = BUILD_LABEL;
 window.SVR_NO_FACE_OVERLAY = true;
-window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 99: clean expanded lobby rebuild, quick load, stable hand teleport, corrected doorway geometry." };
+window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 149: lobby fit alignment lock, safe Android movement, corrected doorway geometry." };
 window.SVR_PHASE228_MAIN_IMPORT_LOCK = { build: BUILD_LABEL, handsModule: "hands_phase228.js", movementModule: "movement_phase228.js?v=phase99-clean-lobby-hand-teleport", checkedAt: new Date().toISOString() };
 window.SVR_PHASE294_LOCK = { build: BUILD_LABEL, phase293BaselinePreserved: true, noUnapprovedReikiBranding: true, rangeAliasAdded: true };
 
@@ -69,9 +70,12 @@ window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenti
 const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
 setStatus("Loading clean expanded lobby…", { force: true });
 const world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
+window.SVR_WORLD_REF = world;
 installPhase201HubContentRestore({ scene, camera, renderer, log });
 installPhase202StorefrontShells({ scene, camera, renderer, log });
 installPhase262GeometrySkyAlignmentLock({ scene, camera, renderer, log });
+installPhase149LobbyFitAlignmentLock({ scene, camera, renderer, world });
+setTimeout(()=>installPhase149LobbyFitAlignmentLock({ scene, camera, renderer, world }), 1200);
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -143,8 +147,8 @@ window.__SVR_GAME_READY__ = true;
 window.__SVR_ANDROID_SMART_LOCK__ = ANDROID_SMART;
 const __svrBootFallback = document.getElementById("bootFallback");
 if (__svrBootFallback){ __svrBootFallback.style.opacity="0"; __svrBootFallback.style.pointerEvents="none"; setTimeout(()=>{__svrBootFallback.style.display="none";},420); }
-setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android sticks locked` : `Ready. ${BUILD_LABEL}`, { force: true });
-setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android smart controls locked" : "Hands: pinch and hold to aim, release to teleport");
+setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android safe movement` : `Ready. ${BUILD_LABEL}`, { force: true });
+setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android safe movement locked" : "Hands: pinch and hold to aim, release to teleport");
 function setHudVisible(visible){ const hud = document.getElementById("hud"); if (hud) hud.style.display = (visible && !AUTOCAM) ? "flex" : "none"; if ($log) $log.style.display = "none"; if ($err) $err.style.display = "none"; }
 if (AUTOCAM) setHudVisible(false);
 if (renderer.xr.isPresenting) document.getElementById("sceneNav")?.style.setProperty("display","none");
