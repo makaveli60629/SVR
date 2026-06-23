@@ -1,4 +1,4 @@
-const SVR_PWA_CACHE = 'svr-poker-pwa-phase154-update-manager-v1';
+const SVR_PWA_CACHE = 'svr-poker-pwa-phase155-lobby-barrier-v1';
 const SVR_CORE_ASSETS = [
   '/manifest.webmanifest',
   '/offline.html',
@@ -21,7 +21,8 @@ const SVR_CORE_ASSETS = [
   '/game/android.html',
   '/game/phase145_android_black_screen_recovery_lock.js',
   '/game/phase150_android_tap_move_no_black_fallback.js',
-  '/game/phase153_android_safe_mode_polish_lock.js'
+  '/game/phase153_android_safe_mode_polish_lock.js',
+  '/game/phase155_lobby_barrier_balcony_table_lock.js'
 ];
 
 self.addEventListener('install', (event) => {
