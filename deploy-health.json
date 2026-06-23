@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-142-PLAYABLE-POKER-CORE-AUTHORITY-LOCK",
-  "commit": "phase-142-playable-poker-core-authority-lock",
-  "updatedAt": "2026-06-23T00:40:00-05:00",
+  "build": "SVR-PHASE-156-TABLE2-STOOL-TEXTURE-ASSET-LOCK",
+  "commit": "phase-156-table2-stool-texture-asset-lock",
+  "updatedAt": "2026-06-23T16:40:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 142 marker: play-money poker core actions, pot state, bot turns, streets, and showdown."
+  "purpose": "Phase 156 marker: uploaded Table 2 texture materials, procedural table, and stool visuals added game-side only."
 }
