@@ -10,27 +10,27 @@
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-147-ANDROID-CONTROLS-AUTHORITY-ROUTE-LOCK">
+<body data-build="PHASE-150-ANDROID-TAP-MOVE-NO-BLACK-ROUTE-LOCK">
   <div id="app"></div>
-  <div id="safeStage"><section class="safe-card"><span class="pill">ANDROID LITE</span><h1>SVR POKER</h1><h2>Controls Authority</h2><p id="safeStatus">Loading Android Lite lobby...</p><button class="btn" id="startRuntimeBtn" type="button">Start Android Lite</button><a class="btn" href="./index.html?v=phase145-standard">Standard Game</a></section></div>
+  <div id="safeStage"><section class="safe-card"><span class="pill">ANDROID SAFE MODE</span><h1>SVR POKER</h1><h2>Tap-Move Fallback</h2><p id="safeStatus">Loading Android safe tap-move lobby...</p><button class="btn" id="startRuntimeBtn" type="button">Start Safe Mode</button><a class="btn" href="./index.html?v=phase145-standard">Standard Game</a></section></div>
   <div id="bootFallback"></div><div id="hud"><span id="status"></span><span id="mode"></span><button id="toggleLog" type="button">Log</button><button id="toggleJoints" type="button">Joints</button></div><div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      var BUILD='PHASE-147-ANDROID-CONTROLS-AUTHORITY-ROUTE-LOCK';
+      var BUILD='PHASE-150-ANDROID-TAP-MOVE-NO-BLACK-ROUTE-LOCK';
       var loaded=false;
       var status=document.getElementById('safeStatus');
       window.SVR_SUPPRESS_PHASE_BADGES=true;
-      var MODULES=['./phase101_boot_load_screen_recovery.js?v=phase147android','./phase101_partial_runtime_render_guard.js?v=phase147android','./main.js?v=phase147android','./phase145_android_black_screen_recovery_lock.js?v=phase147android','./phase146_android_lite_performance_hud_lock.js?v=phase147android','./phase147_android_controls_authority_lock.js?v=phase147android','./phase120_luxury_lobby_stability_performance_lock.js?v=phase147android','./phase142_playable_poker_core_authority_lock.js?v=phase147android'];
-      window.SVR_PHASE147_ANDROID_ROUTE={build:BUILD,active:true,androidLite:true,moduleCount:MODULES.length,questMovementLoaded:false,controlsAuthority:true,singleAuthority:'phase142-poker-core',startedAt:new Date().toISOString()};
-      window.SVR_PERFORMANCE_PROFILE={build:BUILD,mode:'android-lite-controls-authority',moduleCount:MODULES.length,androidQuestModuleSkipped:true,androidBlackScreenRecovery:true,androidLiteHud:true,androidControlsAuthority:true,checkedAt:new Date().toISOString()};
-      function note(msg){if(status)status.textContent=msg;window.SVR_PHASE147_ANDROID_ROUTE.lastMessage=msg;window.SVR_PHASE147_ANDROID_ROUTE.checkedAt=new Date().toISOString();}
-      function hideOverlay(reason){document.body.classList.add('boot-released','runtime-visible','overlay-released');var safe=document.getElementById('safeStage');if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';safe.setAttribute('aria-hidden','true');}window.__SVR_GAME_READY__=true;window.SVR_GAME_READY=true;window.SVR_PHASE147_ANDROID_ROUTE.reason=reason;window.SVR_PHASE147_ANDROID_ROUTE.releasedAt=new Date().toISOString();}
+      var MODULES=['./phase101_boot_load_screen_recovery.js?v=phase150android','./phase101_partial_runtime_render_guard.js?v=phase150android','./main.js?v=phase150android','./phase145_android_black_screen_recovery_lock.js?v=phase150android','./phase146_android_lite_performance_hud_lock.js?v=phase150android','./phase147_android_controls_authority_lock.js?v=phase150android','./phase150_android_tap_move_no_black_fallback.js?v=phase150android','./phase120_luxury_lobby_stability_performance_lock.js?v=phase150android','./phase142_playable_poker_core_authority_lock.js?v=phase150android'];
+      window.SVR_PHASE150_ANDROID_ROUTE={build:BUILD,active:true,androidLite:true,tapMoveFallback:true,walkDefaultOff:true,moduleCount:MODULES.length,questMovementLoaded:false,controlsAuthority:true,singleAuthority:'phase142-poker-core',startedAt:new Date().toISOString()};
+      window.SVR_PERFORMANCE_PROFILE={build:BUILD,mode:'android-tap-move-no-black-fallback',moduleCount:MODULES.length,androidQuestModuleSkipped:true,androidBlackScreenRecovery:true,androidLiteHud:true,androidControlsAuthority:true,tapMoveFallback:true,checkedAt:new Date().toISOString()};
+      function note(msg){if(status)status.textContent=msg;window.SVR_PHASE150_ANDROID_ROUTE.lastMessage=msg;window.SVR_PHASE150_ANDROID_ROUTE.checkedAt=new Date().toISOString();}
+      function hideOverlay(reason){document.body.classList.add('boot-released','runtime-visible','overlay-released');var safe=document.getElementById('safeStage');if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';safe.setAttribute('aria-hidden','true');}window.__SVR_GAME_READY__=true;window.SVR_GAME_READY=true;window.SVR_PHASE150_ANDROID_ROUTE.reason=reason;window.SVR_PHASE150_ANDROID_ROUTE.releasedAt=new Date().toISOString();}
       window.SVR_RELEASE_BOOT=hideOverlay;window.SVR_FORCE_HIDE_SAFE_STAGE=hideOverlay;
       function addModule(src){return new Promise(function(resolve,reject){var s=document.createElement('script');s.type='module';s.src=src;s.onload=resolve;s.onerror=function(){reject(new Error('Failed '+src));};document.body.appendChild(s);});}
-      async function startRuntime(){if(loaded)return;loaded=true;note('Preparing Android Controls Authority...');try{for(var i=0;i<MODULES.length;i++){note('Loading '+(i+1)+' / '+MODULES.length);await addModule(MODULES[i]);}window.SVR_LIVE_BUILD_POINTER='PHASE-142-PLAYABLE-POKER-CORE-AUTHORITY-LOCK';window.SVR_LOCKED_FINAL_BUILD='PHASE-142-PLAYABLE-POKER-CORE-AUTHORITY-LOCK';note('Lobby ready.');setTimeout(function(){hideOverlay('phase147-android-controls-authority-ready');},120);}catch(e){window.SVR_PHASE147_ANDROID_ROUTE.errors=[String(e.message||e)];note('Lobby ready.');setTimeout(function(){hideOverlay('phase147-android-controls-fallback');},500);}}
+      async function startRuntime(){if(loaded)return;loaded=true;note('Preparing Android Safe Mode...');try{for(var i=0;i<MODULES.length;i++){note('Loading '+(i+1)+' / '+MODULES.length);await addModule(MODULES[i]);}window.SVR_LIVE_BUILD_POINTER='PHASE-142-PLAYABLE-POKER-CORE-AUTHORITY-LOCK';window.SVR_LOCKED_FINAL_BUILD='PHASE-142-PLAYABLE-POKER-CORE-AUTHORITY-LOCK';note('Lobby ready.');setTimeout(function(){hideOverlay('phase150-android-tap-move-ready');},120);}catch(e){window.SVR_PHASE150_ANDROID_ROUTE.errors=[String(e.message||e)];note('Lobby ready.');setTimeout(function(){hideOverlay('phase150-android-safe-fallback');},500);}}
       document.getElementById('startRuntimeBtn').addEventListener('click',startRuntime);
-      window.addEventListener('error',function(e){window.SVR_PHASE147_ANDROID_ROUTE.error=String(e.message||e.error||e);hideOverlay('error-release');});
-      window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE147_ANDROID_ROUTE.error=String((e.reason&&e.reason.message)||e.reason||e);hideOverlay('promise-release');});
+      window.addEventListener('error',function(e){window.SVR_PHASE150_ANDROID_ROUTE.error=String(e.message||e.error||e);hideOverlay('error-release');});
+      window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE150_ANDROID_ROUTE.error=String((e.reason&&e.reason.message)||e.reason||e);hideOverlay('promise-release');});
       setTimeout(startRuntime,100);
       setTimeout(function(){hideOverlay('absolute-overlay-release-1800ms');},1800);
     })();
