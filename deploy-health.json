@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-139-LOBBY-ALIGNMENT-MODULE-ACTIVATION-FINALIZER",
-  "commit": "phase-139-lobby-alignment-module-activation-finalizer",
-  "updatedAt": "2026-06-22T21:55:00-05:00",
+  "build": "SVR-PHASE-140-DEAL-DISPLAY-REMOVAL-BUILD-AUTHORITY-LOCK",
+  "commit": "phase-140-deal-display-removal-build-authority-lock",
+  "updatedAt": "2026-06-23T00:10:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 139 marker: clean lobby authority, one stair route, and room module activation."
+  "purpose": "Phase 140 marker: remove left-right deal displays, prevent phase bounce, preserve poker deal logic."
 }
