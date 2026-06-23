@@ -59,6 +59,7 @@ jobs:
             matrix.js
             site-local-counter.js
             site-public-hooks.js
+            support-chat-bot.js
             logo.png
             logo.webp
             favicon.ico
@@ -110,6 +111,7 @@ jobs:
           copy_file_if_exists matrix.js
           copy_file_if_exists site-local-counter.js
           copy_file_if_exists site-public-hooks.js
+          copy_file_if_exists support-chat-bot.js
           copy_file_if_exists logo.png
           copy_file_if_exists logo.webp
           copy_file_if_exists favicon.ico
@@ -192,6 +194,7 @@ jobs:
           test -f build/game/deploy-health.json
           test -f build/phase100-deploy.json
           test -f build/phase101b-deploy.json
+          test -f build/support-chat-bot.js
           if [ ! -f build/update/game.zip ]; then
             echo "::warning::build/update/game.zip was not found; Pages deploy will continue with health warning"
           fi
