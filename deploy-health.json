@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-157-ACTUAL-FBX-TABLE-NO-BLINK-LOCK",
-  "commit": "phase-157-actual-fbx-table-no-blink-lock",
-  "updatedAt": "2026-06-23T17:10:00-05:00",
+  "build": "SVR-PHASE-158-ACTUAL-FBX-TABLE-SCALE-ORIENTATION-LOCK",
+  "commit": "phase-158-actual-fbx-table-scale-orientation-lock",
+  "updatedAt": "2026-06-23T17:35:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 157 marker: stable uploaded table asset loader."
+  "purpose": "Phase 158 marker: scaled and oriented actual FBX table, removed geometric fallback tables, and removed floating site download button."
 }
