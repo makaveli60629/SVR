@@ -1,6 +1,9 @@
-﻿{
-  "build": "PHASE-161-GEOMETRY-TABLE-REMOVED-FBX-FLOOR-LOCK",
-  "gameBuild": "PHASE-161-GEOMETRY-TABLE-REMOVED-FBX-FLOOR-LOCK",
+{
+  "build": "PHASE-165-TABLE-CLEAN-DEPLOY-WORKFLOW-LOCK",
+  "gameBuild": "PHASE-165-TABLE-CLEAN-DEPLOY-WORKFLOW-LOCK",
+  "previousGameBuild": "PHASE-164-FBX-TABLE-FINAL-ALIGNMENT-SEAT-ANCHOR-LOCK",
   "siteTouched": false,
-  "updatedAt": "2026-06-23T22:36:07.5792256-05:00"
+  "workflow": "Auto Deploy",
+  "tableAuthority": "FBX table only",
+  "updatedAt": "2026-06-24"
 }
