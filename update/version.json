@@ -1,11 +1,10 @@
 {
-  "build": "PHASE-169-DEMO-QA-POSITION-SKY-OVERLAY-MODULE-LOCK",
-  "gameBuild": "PHASE-169-DEMO-QA-POSITION-SKY-OVERLAY-MODULE-LOCK",
+  "build": "PHASE-170-TELEPORT-AIM-COMMIT-LOCK",
+  "gameBuild": "PHASE-170-TELEPORT-AIM-COMMIT-LOCK",
+  "previousGameBuild": "PHASE-169-DEMO-QA-POSITION-SKY-OVERLAY-MODULE-LOCK",
   "locomotionLock": "PHASE-169-UNIFIED-LOCOMOTION-TELEPORT-POLISH-LOCK",
-  "previousGameBuild": "PHASE-168-PLAYABLE-POKER-DEMO-SIMULATION-LOCK",
   "siteTouched": false,
   "moduleRule": "index activates modules only",
-  "positionDisplay": "laptop desktop only",
-  "skyAuthority": "modular moon mars",
+  "teleportRule": "toggle on off, hold aim, release to move",
   "updatedAt": "2026-06-24"
 }
