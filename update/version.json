@@ -1,8 +1,10 @@
 {
-  "build": "PHASE-168-PLAYABLE-POKER-DEMO-SIMULATION-LOCK",
-  "gameBuild": "PHASE-168-PLAYABLE-POKER-DEMO-SIMULATION-LOCK",
-  "previousGameBuild": "PHASE-167-FBX-TABLE-FELT-PASSLINE-LOGO-LOCK",
+  "build": "PHASE-169-DEMO-QA-POSITION-SKY-OVERLAY-MODULE-LOCK",
+  "gameBuild": "PHASE-169-DEMO-QA-POSITION-SKY-OVERLAY-MODULE-LOCK",
+  "previousGameBuild": "PHASE-168-PLAYABLE-POKER-DEMO-SIMULATION-LOCK",
   "siteTouched": false,
-  "tableAuthority": "FBX table with fitted felt leather hand rest and playable demo",
+  "moduleRule": "index activates modules only",
+  "positionDisplay": "laptop desktop only",
+  "skyAuthority": "modular moon mars",
   "updatedAt": "2026-06-24"
 }
