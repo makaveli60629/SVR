@@ -1,1 +1,1 @@
-export { createTeleportRig } from "./movement_phase169_locomotion_polish_lock.js?v=phase169-locomotion-polish";
+export { createTeleportRig } from "./movement_phase170_teleport_lock.js?v=phase170-aim-commit";
