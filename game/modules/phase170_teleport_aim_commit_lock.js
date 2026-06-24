@@ -1,62 +1,59 @@
 import * as THREE from "three";
 
-const LABEL = "PHASE-171-HAND-TELEPORT-RELEASE-GATE-FACE-FIST-TOGGLE-LOCK";
-const ROOT_NAME = "PHASE171_HAND_TELEPORT_RELEASE_GATE_ROOT";
-const MIN_AIM_MS = 380;
-const STABLE_TARGET_MS = 120;
+const LABEL = "PHASE-173-STABLE-HAND-PINCH-TELEPORT-LOCK";
+const ROOT_NAME = "PHASE173_STABLE_HAND_PINCH_TELEPORT_ROOT";
+const MIN_AIM_MS = 550;
+const STABLE_TARGET_MS = 520;
+const TARGET_DRIFT_LIMIT = 0.075;
+const FACE_TOGGLE_COOLDOWN_MS = 950;
 const SAFE_Y = 0;
-const FACE_TOGGLE_COOLDOWN_MS = 900;
 
-let scene = null;
-let camera = null;
-let renderer = null;
-let rig = null;
-let root = null;
-let rayLine = null;
-let marker = null;
+let scene, camera, renderer, rig;
+let root, rayLine, marker;
 let enabled = false;
 let aiming = false;
+let moveArmed = false;
 let aimStartedAt = 0;
+let stableStartedAt = 0;
 let target = null;
-let lastTargetAt = 0;
+let stableTarget = null;
 let preAimPose = null;
 let lastAllowedMoveAt = 0;
 let patched = false;
 let wasAimHeld = false;
-let wasToggleHeld = false;
 let wasFaceFistHeld = false;
+let wasButtonToggleHeld = false;
 let suppressUntilHandRelease = false;
 let lastFaceToggleAt = 0;
 let lastPanel = null;
 let installStarted = false;
 
-function now(){ return performance.now(); }
+function t(){ return performance.now(); }
 function isQuest(){ return /Quest|Oculus|Meta Quest/i.test(navigator.userAgent || ""); }
 function getRig(){ return window.SVR_TELEPORT_RIG_REF || window.SVR_TELEPORT_RIG || null; }
-function getXrCamPos(){
+function camObj(){ return renderer?.xr?.isPresenting ? renderer.xr.getCamera(camera) : camera; }
+function playerPose(){
   const p = new THREE.Vector3();
-  if(renderer?.xr?.isPresenting){ renderer.xr.getCamera(camera).getWorldPosition(p); return p; }
-  return camera?.position?.clone?.() || p;
+  if(renderer?.xr?.isPresenting) renderer.xr.getCamera(camera).getWorldPosition(p);
+  else if(camera) p.copy(camera.position);
+  return { x:p.x, z:p.z };
 }
-function roomClampPoint(p){
-  const x = THREE.MathUtils.clamp(p.x, -17.5, 17.5);
-  const z = THREE.MathUtils.clamp(p.z, -15.8, 15.8);
-  return new THREE.Vector3(x, SAFE_Y, z);
+function clampPoint(p){
+  return new THREE.Vector3(THREE.MathUtils.clamp(p.x, -17.5, 17.5), SAFE_Y, THREE.MathUtils.clamp(p.z, -15.8, 15.8));
 }
-function setPlayerPose(x, y=0, z){
-  lastAllowedMoveAt = now();
+function setPose(x, y=0, z){
+  lastAllowedMoveAt = t();
   if(rig?.setPlayerPose){ rig.setPlayerPose(x,y,z); return true; }
   if(camera){ camera.position.x = x; camera.position.z = z; return true; }
   return false;
 }
-function currentPoseXZ(){ const p=getXrCamPos(); return { x:p.x, z:p.z }; }
-function restorePoseIfOldSystemMoved(){
+function restoreIfMovedByOldPath(){
   if(!preAimPose) return;
-  const p = currentPoseXZ();
-  const d = Math.hypot(p.x-preAimPose.x, p.z-preAimPose.z);
-  if(d > 0.45 && now() - lastAllowedMoveAt > 420){
-    setPlayerPose(preAimPose.x, 0, preAimPose.z);
-    window.SVR_PHASE171_LAST_OLD_HAND_MOVE_BLOCK = { build:LABEL, restored:true, distance:+d.toFixed(3), checkedAt:new Date().toISOString() };
+  const p = playerPose();
+  const d = Math.hypot(p.x - preAimPose.x, p.z - preAimPose.z);
+  if(d > 0.32 && t() - lastAllowedMoveAt > 260){
+    setPose(preAimPose.x, 0, preAimPose.z);
+    window.SVR_PHASE173_LAST_DRIFT_BLOCK = { build:LABEL, restored:true, distance:+d.toFixed(3), checkedAt:new Date().toISOString() };
   }
 }
 function ensureRoot(){
@@ -65,226 +62,232 @@ function ensureRoot(){
   const old = scene.getObjectByName?.(ROOT_NAME);
   if(old) old.parent?.remove(old);
   root = new THREE.Group(); root.name = ROOT_NAME; scene.add(root);
-  const mat = new THREE.LineBasicMaterial({ color:0x7ffcff, transparent:true, opacity:.96 });
-  const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0,0,-1)]);
-  rayLine = new THREE.Line(geo, mat); rayLine.name = "PHASE171_HAND_TELEPORT_AIM_RAY_RELEASE_ONLY"; root.add(rayLine);
-  const ringGeo = new THREE.RingGeometry(.20,.34,56);
-  const ringMat = new THREE.MeshBasicMaterial({ color:0x7ffcff, transparent:true, opacity:.84, side:THREE.DoubleSide, depthWrite:false });
-  marker = new THREE.Mesh(ringGeo, ringMat); marker.name = "PHASE171_HAND_TELEPORT_TARGET_MARKER_RELEASE_ONLY"; marker.rotation.x = -Math.PI/2; root.add(marker);
+  rayLine = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0,0,-1)]),
+    new THREE.LineBasicMaterial({ color:0x7ffcff, transparent:true, opacity:.96 })
+  );
+  rayLine.name = "PHASE173_STABLE_HAND_AIM_RAY_NO_MOVE_UNTIL_RELEASE";
+  root.add(rayLine);
+  marker = new THREE.Mesh(
+    new THREE.RingGeometry(.20,.34,56),
+    new THREE.MeshBasicMaterial({ color:0x7ffcff, transparent:true, opacity:.86, side:THREE.DoubleSide, depthWrite:false })
+  );
+  marker.name = "PHASE173_STABLE_TARGET_MARKER_RELEASE_ONLY";
+  marker.rotation.x = -Math.PI/2;
+  root.add(marker);
   root.visible = false;
   return root;
 }
-function handPosition(){
-  const hand = window.SVR_PHASE170_HAND_SOURCE;
-  const wrist = hand?.joints?.wrist;
-  const tip = hand?.joints?.["index-finger-tip"] || hand?.joints?.["middle-finger-tip"];
+function input(){ return window.SVR_PHASE170_HAND_INPUT || {}; }
+function handObj(){ return window.SVR_PHASE170_HAND_SOURCE || null; }
+function handPoint(){
+  const h = handObj();
+  const tip = h?.joints?.["index-finger-tip"] || h?.joints?.["middle-finger-tip"];
+  const wrist = h?.joints?.wrist;
   const out = new THREE.Vector3();
   if(tip){ tip.getWorldPosition(out); return out; }
   if(wrist){ wrist.getWorldPosition(out); return out; }
   return null;
 }
 function faceFistHeld(){
-  const input = window.SVR_PHASE170_HAND_INPUT;
-  if(!input?.held || !(input.leftFist || input.rightFist)) return false;
-  const hp = handPosition();
+  const i = input();
+  if(!i.held || !(i.leftFist || i.rightFist)) return false;
+  const hp = handPoint();
   if(!hp || !camera) return false;
-  const cp = getXrCamPos();
+  const cp3 = new THREE.Vector3();
+  const cam = camObj();
+  cam.getWorldPosition(cp3);
   const fwd = new THREE.Vector3();
-  const cam = renderer?.xr?.isPresenting ? renderer.xr.getCamera(camera) : camera;
-  cam.getWorldDirection(fwd); fwd.normalize();
-  const v = hp.clone().sub(cp);
+  cam.getWorldDirection(fwd).normalize();
+  const v = hp.clone().sub(cp3);
   const dist = v.length();
-  if(dist < 0.08 || dist > 0.72) return false;
+  if(dist < 0.10 || dist > 0.70) return false;
   const dot = fwd.dot(v.clone().normalize());
-  const vertical = hp.y - cp.y;
-  return dot > 0.24 && vertical > -0.38 && vertical < 0.22;
+  const vertical = hp.y - cp3.y;
+  return dot > 0.28 && vertical > -0.38 && vertical < 0.24;
 }
 function handAimSource(){
-  const hand = window.SVR_PHASE170_HAND_SOURCE;
-  const wrist = hand?.joints?.wrist;
-  const tip = hand?.joints?.["index-finger-tip"] || hand?.joints?.["middle-finger-tip"];
+  const h = handObj();
+  const wrist = h?.joints?.wrist;
+  const tip = h?.joints?.["index-finger-tip"] || h?.joints?.["middle-finger-tip"];
   if(!wrist || !tip) return null;
-  const wristPos = new THREE.Vector3();
-  const tipPos = new THREE.Vector3();
-  wrist.getWorldPosition(wristPos);
-  tip.getWorldPosition(tipPos);
-  const dir = tipPos.clone().sub(wristPos);
+  const wp = new THREE.Vector3(), tp = new THREE.Vector3();
+  wrist.getWorldPosition(wp); tip.getWorldPosition(tp);
+  const dir = tp.clone().sub(wp);
   if(dir.lengthSq() < 0.000001) return null;
   dir.normalize();
-  if(dir.y > -0.045) dir.y = -0.045;
+  if(dir.y > -0.06) dir.y = -0.06;
   dir.normalize();
-  return { pos:tipPos, dir, hand:true };
+  return { pos:tp, dir };
 }
-function aimSource(){
-  const handSrc = window.SVR_PHASE170_HAND_INPUT?.held ? handAimSource() : null;
-  if(handSrc) return handSrc;
-  const src = { pos:new THREE.Vector3(), dir:new THREE.Vector3(0,0,-1), hand:false };
-  const controller = renderer?.xr?.getController?.(0);
-  if(renderer?.xr?.isPresenting && controller){
-    controller.updateMatrixWorld(true);
-    src.pos.setFromMatrixPosition(controller.matrixWorld);
-    src.dir.set(0,0,-1).applyQuaternion(controller.getWorldQuaternion(new THREE.Quaternion())).normalize();
-    return src;
+function controllerHeld(){
+  const session = renderer?.xr?.getSession?.();
+  const sources = session ? Array.from(session.inputSources || []) : [];
+  for(const s of sources){
+    const gp = s.gamepad;
+    if(gp?.buttons?.[0]?.pressed || gp?.buttons?.[1]?.pressed) return true;
   }
-  camera.updateMatrixWorld?.(true);
-  camera.getWorldPosition(src.pos);
-  camera.getWorldDirection(src.dir);
-  return src;
+  return false;
 }
+function controllerTogglePressed(){
+  const session = renderer?.xr?.getSession?.();
+  const sources = session ? Array.from(session.inputSources || []) : [];
+  for(const s of sources){
+    const gp = s.gamepad;
+    if(gp?.buttons?.[4]?.pressed || gp?.buttons?.[5]?.pressed || gp?.buttons?.[3]?.pressed) return true;
+  }
+  return false;
+}
+function held(){ return controllerHeld() || !!input().held; }
+function resetStability(){ stableTarget = null; target = null; stableStartedAt = t(); }
 function updateTarget(){
-  const src = aimSource();
-  const plane = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
+  const src = input().held ? handAimSource() : null;
+  const fallback = { pos:new THREE.Vector3(), dir:new THREE.Vector3(0,0,-1) };
+  let aim = src || fallback;
+  if(!src){ const c = camObj(); c.updateMatrixWorld?.(true); c.getWorldPosition(aim.pos); c.getWorldDirection(aim.dir); }
+  const plane = new THREE.Plane(new THREE.Vector3(0,1,0),0);
   const hit = new THREE.Vector3();
-  if(!new THREE.Ray(src.pos, src.dir).intersectPlane(plane, hit)) return null;
-  const safe = roomClampPoint(hit);
-  if(!target || safe.distanceTo(target) > 0.08){ lastTargetAt = now(); }
-  target = safe;
+  if(!new THREE.Ray(aim.pos, aim.dir).intersectPlane(plane, hit)) return null;
+  const next = clampPoint(hit);
+  if(!stableTarget || next.distanceTo(stableTarget) > TARGET_DRIFT_LIMIT){
+    stableTarget = next.clone();
+    stableStartedAt = t();
+  }else{
+    stableTarget.lerp(next, 0.28);
+  }
+  target = stableTarget.clone();
   const r = ensureRoot();
   if(r){
     r.visible = enabled && aiming;
-    rayLine.geometry.setFromPoints([src.pos, target.clone().setY(.04)]);
+    rayLine.geometry.setFromPoints([aim.pos, target.clone().setY(.04)]);
     marker.position.copy(target).setY(.035);
-    const ready = now() - aimStartedAt >= MIN_AIM_MS && now() - lastTargetAt >= STABLE_TARGET_MS;
+    const ready = t() - aimStartedAt >= MIN_AIM_MS && t() - stableStartedAt >= STABLE_TARGET_MS;
     marker.material.color.setHex(ready ? 0x8dffb4 : 0x7ffcff);
     rayLine.material.color.setHex(ready ? 0x8dffb4 : 0x7ffcff);
   }
   return target;
 }
-function controllerHeld(){
-  const session = renderer?.xr?.getSession?.();
-  const sources = session ? Array.from(session.inputSources || []) : [];
-  for(const src of sources){
-    const gp = src.gamepad; if(!gp?.buttons) continue;
-    if(gp.buttons[0]?.pressed || gp.buttons[1]?.pressed) return true;
-  }
-  return false;
-}
-function handHeld(){ return !!window.SVR_PHASE170_HAND_INPUT?.held; }
-function aimHeld(){ return controllerHeld() || handHeld(); }
-function isTogglePressed(){
-  const session = renderer?.xr?.getSession?.();
-  const sources = session ? Array.from(session.inputSources || []) : [];
-  for(const src of sources){
-    const gp = src.gamepad; if(!gp?.buttons) continue;
-    if(gp.buttons[4]?.pressed || gp.buttons[5]?.pressed || gp.buttons[3]?.pressed) return true;
-  }
-  return false;
-}
 function toggleTeleport(force){
   enabled = typeof force === "boolean" ? force : !enabled;
-  if(!enabled) endAim(false);
+  if(!enabled) cancelAim("toggle_off");
   window.SVR_PHASE170_TELEPORT_ENABLED = enabled;
-  window.SVR_PHASE171_LAST_TOGGLE = { build:LABEL, enabled, checkedAt:new Date().toISOString() };
+  window.SVR_PHASE173_LAST_TOGGLE = { build:LABEL, enabled, checkedAt:new Date().toISOString() };
   return enabled;
 }
 function beginAim(){
   if(!enabled || aiming || suppressUntilHandRelease) return;
   aiming = true;
-  aimStartedAt = now();
-  lastTargetAt = aimStartedAt;
-  preAimPose = currentPoseXZ();
+  moveArmed = true;
+  aimStartedAt = t();
+  preAimPose = playerPose();
+  resetStability();
   updateTarget();
 }
-function endAim(move){
-  if(!aiming) return false;
-  updateTarget();
-  const held = now() - aimStartedAt;
-  const stable = now() - lastTargetAt;
-  const ok = !!move && !!target && held >= MIN_AIM_MS && stable >= STABLE_TARGET_MS;
+function cancelAim(reason="cancelled"){
   aiming = false;
+  moveArmed = false;
   if(root) root.visible = false;
-  if(ok){
-    setPlayerPose(target.x, 0, target.z);
-    window.SVR_PHASE171_LAST_RELEASE_MOVE = { build:LABEL, x:+target.x.toFixed(3), z:+target.z.toFixed(3), heldMs:Math.round(held), stableMs:Math.round(stable), checkedAt:new Date().toISOString() };
-    return true;
+  window.SVR_PHASE173_LAST_CANCEL = { build:LABEL, reason, checkedAt:new Date().toISOString() };
+}
+function releaseAim(){
+  if(!aiming || !moveArmed){ cancelAim("not_armed"); return false; }
+  updateTarget();
+  const heldMs = t() - aimStartedAt;
+  const stableMs = t() - stableStartedAt;
+  const ok = !!enabled && !!target && heldMs >= MIN_AIM_MS && stableMs >= STABLE_TARGET_MS;
+  aiming = false;
+  moveArmed = false;
+  if(root) root.visible = false;
+  if(!ok){
+    if(preAimPose) setPose(preAimPose.x, 0, preAimPose.z);
+    window.SVR_PHASE173_LAST_NO_MOVE_RELEASE = { build:LABEL, heldMs:Math.round(heldMs), stableMs:Math.round(stableMs), checkedAt:new Date().toISOString() };
+    return false;
   }
-  if(preAimPose && move){ setPlayerPose(preAimPose.x, 0, preAimPose.z); }
-  window.SVR_PHASE171_LAST_CANCEL = { build:LABEL, reason: move ? "aim_not_ready" : "cancelled", heldMs:Math.round(held), stableMs:Math.round(stable), checkedAt:new Date().toISOString() };
-  return false;
+  setPose(target.x, 0, target.z);
+  window.SVR_PHASE173_LAST_RELEASE_MOVE = { build:LABEL, x:+target.x.toFixed(3), z:+target.z.toFixed(3), heldMs:Math.round(heldMs), stableMs:Math.round(stableMs), checkedAt:new Date().toISOString() };
+  return true;
 }
 function patchRig(){
   rig = getRig();
   if(!rig || patched) return false;
   patched = true;
-  const originalToggle = typeof rig.toggleMode === "function" ? rig.toggleMode.bind(rig) : null;
   rig.toggleMode = () => toggleTeleport();
   rig.isEnabled = () => enabled;
-  rig.phase171OriginalToggleMode = originalToggle;
   window.SVR_SAFE_TELEPORT_TOGGLE = toggleTeleport;
-  window.SVR_SAFE_TELEPORT_CANCEL = () => endAim(false);
-  window.SVR_SAFE_TELEPORT_MOVE = () => endAim(true);
+  window.SVR_SAFE_TELEPORT_CANCEL = cancelAim;
+  window.SVR_SAFE_TELEPORT_MOVE = releaseAim;
   window.SVR_PHASE170_HAND_TELEPORT_AUTHORITY = true;
   return true;
 }
 function installPanel(){
-  if(isQuest()) return;
-  if(lastPanel?.isConnected) return;
+  if(isQuest() || lastPanel?.isConnected) return;
   const p = document.createElement("div");
-  p.id = "svr-phase171-teleport-panel";
+  p.id = "svr-phase173-teleport-panel";
   p.style.cssText = "position:fixed;right:10px;bottom:10px;z-index:2147483646;padding:9px 11px;border:1px solid rgba(141,255,180,.65);border-radius:12px;background:rgba(0,0,0,.72);color:#dff;font:12px ui-monospace,monospace;white-space:pre;pointer-events:none";
   document.body.appendChild(p); lastPanel = p;
 }
 function updatePanel(){
   if(!lastPanel) return;
-  const input = window.SVR_PHASE170_HAND_INPUT;
+  const stableMs = aiming ? Math.max(0, t() - stableStartedAt) : 0;
   lastPanel.textContent = [
-    "SVR HAND TELEPORT RELEASE-GATE",
+    "SVR STABLE HAND TELEPORT",
     `enabled: ${enabled ? "ON" : "OFF"}`,
+    `pinch/fist: ${input().held ? "HELD" : "--"}`,
     `aiming: ${aiming ? "YES" : "NO"}`,
-    `face fist toggle: ${faceFistHeld() ? "HELD" : "--"}`,
-    `hand: ${input?.held ? input.source || "held" : "--"}`,
+    `stable: ${Math.round(stableMs)}ms / ${STABLE_TARGET_MS}ms`,
     `target: ${target ? `x:${target.x.toFixed(2)} z:${target.z.toFixed(2)}` : "--"}`,
-    "Fist near face toggles ON/OFF | hold away to aim | release moves"
+    "OFF blocks pinch | hold steady | release moves once"
   ].join("\n");
 }
 function tick(){
-  patchRig();
-  ensureRoot();
-  const togglePressed = isTogglePressed();
-  if(togglePressed && !wasToggleHeld) toggleTeleport();
-  wasToggleHeld = togglePressed;
+  patchRig(); ensureRoot();
+  const btnToggle = controllerTogglePressed();
+  if(btnToggle && !wasButtonToggleHeld) toggleTeleport();
+  wasButtonToggleHeld = btnToggle;
 
-  const held = aimHeld();
+  const h = held();
   const faceToggle = faceFistHeld();
-  if(faceToggle && !wasFaceFistHeld && now() - lastFaceToggleAt > FACE_TOGGLE_COOLDOWN_MS){
-    lastFaceToggleAt = now();
+  if(faceToggle && !wasFaceFistHeld && t() - lastFaceToggleAt > FACE_TOGGLE_COOLDOWN_MS){
+    lastFaceToggleAt = t();
+    preAimPose = playerPose();
     suppressUntilHandRelease = true;
-    endAim(false);
-    preAimPose = currentPoseXZ();
+    cancelAim("face_fist_toggle");
     toggleTeleport();
   }
   wasFaceFistHeld = faceToggle;
-  if(!held) suppressUntilHandRelease = false;
+  if(!h) suppressUntilHandRelease = false;
 
-  const aimAllowedHeld = held && !faceToggle && !suppressUntilHandRelease;
-  if(enabled && aimAllowedHeld && !wasAimHeld) beginAim();
-  if(enabled && aimAllowedHeld && aiming){ updateTarget(); restorePoseIfOldSystemMoved(); }
-  if(wasAimHeld && !aimAllowedHeld) endAim(true);
-  if((aiming || suppressUntilHandRelease || (held && !enabled)) && preAimPose) restorePoseIfOldSystemMoved();
-  wasAimHeld = aimAllowedHeld;
+  if(!enabled && h){
+    if(!preAimPose) preAimPose = playerPose();
+    restoreIfMovedByOldPath();
+    wasAimHeld = false;
+    updatePanel();
+  }else{
+    const allowed = enabled && h && !faceToggle && !suppressUntilHandRelease;
+    if(allowed && !wasAimHeld) beginAim();
+    if(allowed && aiming){ updateTarget(); restoreIfMovedByOldPath(); }
+    if(wasAimHeld && !allowed) releaseAim();
+    if(!allowed && aiming) cancelAim("not_allowed");
+    wasAimHeld = allowed;
+    updatePanel();
+  }
 
-  updatePanel();
-  const input = window.SVR_PHASE170_HAND_INPUT || null;
   window.SVR_PHASE170_TELEPORT_AIM_COMMIT_LOCK = {
-    build:LABEL, active:true, enabled, aiming, noMoveUntilRelease:true, faceFistToggle:true,
-    handTeleportFixed:true, handAimBeforeMove:true, releaseToMove:true, baseHandAutoMoveSuppressed:true,
-    togglePatched:patched, rigFound:!!rig, handHeld:!!input?.held, faceFistHeld:faceToggle, suppressUntilHandRelease,
-    handSource:input?.source || null, target:target ? {x:+target.x.toFixed(3), z:+target.z.toFixed(3)} : null,
+    build:LABEL, active:true, enabled, aiming, pinchOnlyWhenTeleportOn:true, noMoveUntilRelease:true,
+    stableHandTeleport:true, stableTargetMs:STABLE_TARGET_MS, targetDriftLimit:TARGET_DRIFT_LIMIT,
+    baseHandAutoMoveSuppressed:true, rigFound:!!rig, handHeld:!!input().held, faceFistHeld:faceToggle,
+    target:target ? {x:+target.x.toFixed(3), z:+target.z.toFixed(3)} : null,
     siteTouched:false, checkedAt:new Date().toISOString()
   };
 }
 function install(){
   scene = window.__SVR_SCENE__; camera = window.__SVR_CAMERA__; renderer = window.__SVR_RENDERER__;
   if(!scene || !camera || !renderer) return false;
-  installPanel();
-  patchRig();
-  window.addEventListener("keydown", e=>{
-    if(e.code === "KeyT"){ e.preventDefault(); toggleTeleport(); }
-    if(e.code === "Escape") endAim(false);
-  }, { capture:true });
+  installPanel(); patchRig();
+  window.addEventListener("keydown", e=>{ if(e.code === "KeyT"){ e.preventDefault(); toggleTeleport(); } if(e.code === "Escape") cancelAim("escape"); }, { capture:true });
   if(!installStarted){ installStarted = true; setInterval(tick, 50); }
   window.SVR_RUN_PHASE170_TELEPORT_AUDIT = () => window.SVR_PHASE170_TELEPORT_AIM_COMMIT_LOCK;
-  window.SVR_RUN_PHASE171_HAND_TELEPORT_AUDIT = () => window.SVR_PHASE170_TELEPORT_AIM_COMMIT_LOCK;
+  window.SVR_RUN_PHASE173_HAND_TELEPORT_AUDIT = () => window.SVR_PHASE170_TELEPORT_AIM_COMMIT_LOCK;
   window.SVR_LOCKED_FINAL_BUILD = LABEL; window.SVR_LIVE_BUILD_POINTER = LABEL;
   return true;
 }
