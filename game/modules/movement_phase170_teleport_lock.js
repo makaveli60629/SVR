@@ -1,13 +1,16 @@
 import { createTeleportRig as phase169Rig } from "./movement_phase169_locomotion_polish_lock.js?v=phase169-locomotion-polish";
 import { isFist, isPinching } from "./gestures.js";
 
-const LABEL = "PHASE-170-HAND-TELEPORT-AIM-RELEASE-LOCK";
+const LABEL = "PHASE-171-HAND-TELEPORT-RELEASE-GATE-FACE-FIST-TOGGLE-LOCK";
 
-function handHeld(hand){
+function safeFist(hand){
   if(!hand?.joints) return false;
-  try { return !!isPinching(hand) || !!isFist(hand); } catch { return false; }
+  try { return !!isFist(hand); } catch { return false; }
 }
-
+function safePinch(hand){
+  if(!hand?.joints) return false;
+  try { return !!isPinching(hand); } catch { return false; }
+}
 function handLabel(leftHeld, rightHeld){
   if(rightHeld) return "right-hand";
   if(leftHeld) return "left-hand";
@@ -22,8 +25,12 @@ export function createTeleportRig(opts){
   const baseUpdate = typeof rig.update === "function" ? rig.update.bind(rig) : null;
   if(baseUpdate){
     rig.update = (args = {}) => {
-      const leftHeld = handHeld(args.leftHand);
-      const rightHeld = handHeld(args.rightHand);
+      const leftFist = safeFist(args.leftHand);
+      const rightFist = safeFist(args.rightHand);
+      const leftPinch = safePinch(args.leftHand);
+      const rightPinch = safePinch(args.rightHand);
+      const leftHeld = leftFist || leftPinch;
+      const rightHeld = rightFist || rightPinch;
       const held = leftHeld || rightHeld;
       const sourceHand = rightHeld ? args.rightHand : leftHeld ? args.leftHand : null;
 
@@ -32,6 +39,10 @@ export function createTeleportRig(opts){
         held,
         leftHeld,
         rightHeld,
+        leftFist,
+        rightFist,
+        leftPinch,
+        rightPinch,
         source: handLabel(leftHeld, rightHeld),
         checkedAt: new Date().toISOString()
       };
@@ -47,6 +58,7 @@ export function createTeleportRig(opts){
     build: LABEL,
     active: true,
     handInputExported: true,
+    fistPinchStateExported: true,
     baseHandTeleportSuppressedWhenPhase170Active: true,
     phase169LocomotionPreserved: true,
     siteTouched: false,
