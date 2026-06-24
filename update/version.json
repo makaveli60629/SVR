@@ -1,7 +1,1 @@
-{
-  "build": "PHASE-177-QA-COORDINATE-CAPTURE-LOCK",
-  "gameBuild": "PHASE-177-QA-COORDINATE-CAPTURE-LOCK",
-  "previousGameBuild": "PHASE-176-LIVE-QA-AUTHORITY-LOCK",
-  "siteTouched": false,
-  "updatedAt": "2026-06-24"
-}
+{"build":"PHASE178","gameBuild":"PHASE178","previousGameBuild":"PHASE177","siteTouched":false,"updatedAt":"2026-06-24"}
