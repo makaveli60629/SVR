@@ -1,9 +1,8 @@
 {
-  "build": "PHASE-165-TABLE-CLEAN-DEPLOY-WORKFLOW-LOCK",
-  "gameBuild": "PHASE-165-TABLE-CLEAN-DEPLOY-WORKFLOW-LOCK",
-  "previousGameBuild": "PHASE-164-FBX-TABLE-FINAL-ALIGNMENT-SEAT-ANCHOR-LOCK",
+  "build": "PHASE-166-FBX-TABLE-SURFACE-ANCHOR-LOCK",
+  "gameBuild": "PHASE-166-FBX-TABLE-SURFACE-ANCHOR-LOCK",
+  "previousGameBuild": "PHASE-165-TABLE-CLEAN-DEPLOY-WORKFLOW-LOCK",
   "siteTouched": false,
-  "workflow": "Auto Deploy",
   "tableAuthority": "FBX table only",
   "updatedAt": "2026-06-24"
 }
