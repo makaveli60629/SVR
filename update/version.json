@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-167-FBX-TABLE-FELT-PASSLINE-LOGO-LOCK",
-  "gameBuild": "PHASE-167-FBX-TABLE-FELT-PASSLINE-LOGO-LOCK",
-  "previousGameBuild": "PHASE-166-FBX-TABLE-SURFACE-ANCHOR-LOCK",
+  "build": "PHASE-168-PLAYABLE-POKER-DEMO-SIMULATION-LOCK",
+  "gameBuild": "PHASE-168-PLAYABLE-POKER-DEMO-SIMULATION-LOCK",
+  "previousGameBuild": "PHASE-167-FBX-TABLE-FELT-PASSLINE-LOGO-LOCK",
   "siteTouched": false,
-  "tableAuthority": "FBX table with felt pass line and logo",
+  "tableAuthority": "FBX table with fitted felt leather hand rest and playable demo",
   "updatedAt": "2026-06-24"
 }
