@@ -1,7 +1,7 @@
 ﻿import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-const LABEL = 'PHASE-161-GEOMETRY-TABLE-REMOVED-FBX-FLOOR-LOCK';
+const LABEL = 'PHASE-164-FBX-TABLE-FINAL-ALIGNMENT-SEAT-ANCHOR-LOCK';
 const ROOT = 'PHASE159_FBX_TABLE_FLAT_SCALE_FIX_ROOT';
 const FBX_CANDIDATES = [
   './assets/table.fbx',
@@ -60,6 +60,12 @@ function removeBadTables(host){
       /^PHASE156_TABLE2_/.test(name) ||
       /^PHASE155_ENHANCED_REAL_TABLE_FALLBACK/.test(name) ||
       /^PHASE155_RESTORED_ASSET_TABLE/.test(name) ||
+      /^PHASE200_INTENDED_LOBBY_POKER_TABLE_LOCKED/.test(name) ||
+      /^PHASE200_CLEAN_CHAIR_/.test(name) ||
+      /^PHASE200_TABLE_/.test(name) ||
+      /^PHASE159_SEAT_GUIDE_ROOT/.test(name) ||
+      /^PHASE159_OPEN_PLAYER_STOOL/.test(name) ||
+      /^PHASE159_BOT_STOOL_/.test(name) ||
       /^PHASE158_ACTUAL_FBX_TABLE_SCALE_ROOT/.test(name)
     ) kill.push(o);
   });
@@ -232,7 +238,7 @@ function install(scene=window.__SVR_SCENE__){
     root.name=ROOT;
     root.position.set(0,0,0.75);
     host.add(root);
-    addSeats(root);
+    // Phase 164: visible seat/stool guide disabled. Keep only invisible seat anchors from world.seats.
   }
   hideOld(host);
   loadFbxInto(root);
@@ -265,4 +271,5 @@ function install(scene=window.__SVR_SCENE__){
 [250,700,1400,2600,5000,9000].forEach(ms=>setTimeout(()=>install(),ms));
 setInterval(()=>install(),2000);
 install();
+
 

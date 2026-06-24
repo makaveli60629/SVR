@@ -13,7 +13,7 @@ import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 import { installPhase149LobbyFitAlignmentLock } from "./phase149_lobby_fit_alignment_lock.js";
 
-const BUILD_LABEL = "PHASE-161-GEOMETRY-TABLE-REMOVED-FBX-FLOOR-LOCK";
+const BUILD_LABEL = "PHASE-164-FBX-TABLE-FINAL-ALIGNMENT-SEAT-ANCHOR-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
@@ -28,6 +28,7 @@ window.SVR_NO_FACE_OVERLAY = true;
 window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 149: lobby fit alignment lock, safe Android movement, corrected doorway geometry." };
 window.SVR_PHASE228_MAIN_IMPORT_LOCK = { build: BUILD_LABEL, handsModule: "hands_phase228.js", movementModule: "movement_phase228.js?v=phase99-clean-lobby-hand-teleport", checkedAt: new Date().toISOString() };
 window.SVR_PHASE294_LOCK = { build: BUILD_LABEL, phase293BaselinePreserved: true, noUnapprovedReikiBranding: true, rangeAliasAdded: true };
+window.SVR_PHASE164_TABLE_AREA_AUTHORITY = { build: BUILD_LABEL, fakeGeometryTableRemoved: true, fbxTableOnly: true, siteTouched: false, checkedAt: new Date().toISOString() };
 window.SVR_PHASE161_TABLE_FBX_FLOOR_LOCK = { build: BUILD_LABEL, geometryTableRemoved: true, fbxFloorAligned: true, siteTouched: false, checkedAt: new Date().toISOString() };
 
 const $status = document.getElementById("status");
@@ -184,4 +185,5 @@ renderer.setAnimationLoop(()=>{
   if (renderer.xr.isPresenting || !AUTOCAM) watch.update(dt, { leftHand, rightHand, leftController, rightController });
   renderer.render(scene, camera);
 });
+
 

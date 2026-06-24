@@ -1,4 +1,4 @@
-import * as THREE from "three";
+﻿import * as THREE from "three";
 
 const LABEL = "UPDATE-3.0-PHASE-200-ORDERED-GRAND-LOBBY-STRUCTURE-LOCK";
 const HALF_W = 19.5;
@@ -157,7 +157,7 @@ function addArchBay(root, name, x, title, sub, color){
   arch.position.set(x,2.95,-16.18);
   arch.rotation.z = Math.PI;
   root.add(arch);
-  addPanel(root,`${name}_SIGN`,title,sub,"walk up • select",x,3.95,-16.13,0,color,2.42,0.82);
+  addPanel(root,`${name}_SIGN`,title,sub,"walk up â€¢ select",x,3.95,-16.13,0,color,2.42,0.82);
 }
 function addModuleWalls(root){
   addArchBay(root,"PHASE200_WELLNESS_ARCH_BAY",-12,"WELLNESS","Reiki / Meditation","#a77cff");
@@ -306,7 +306,7 @@ export async function buildPhase195CleanLobbyWorld(scene, { log = console.log } 
   addOrderedColumns(root);
   addModuleWalls(root);
   addUpstairs(root);
-  addTable(root);
+  // Phase 164: procedural geometry poker table disabled. Real FBX table is the only visible table authority.
   addPortalPad(root,"PHASE200_PLAY_PAD",0,-4.2,GOLD);
   addPortalPad(root,"PHASE200_WELLNESS_PAD",-12,-12.6,PURPLE);
   addPortalPad(root,"PHASE200_PGA_PAD",-6,-12.6,CYAN);
@@ -342,8 +342,9 @@ export async function buildPhase195CleanLobbyWorld(scene, { log = console.log } 
     if(root.userData.moon) root.userData.moon.rotation.y = t*0.028;
     if(root.userData.mars) root.userData.mars.rotation.y = t*0.052;
   };
-  window.SVR_PHASE200_ORDERED_GRAND_LOBBY = { label:LABEL, locked:true, orderedStructure:true, pillarsAligned:true, lightingPass:true, twoFloorLobby:true, moduleBays:true, oneMoon:true, oneMars:true, noBackgroundBuildings:true, checkedAt:new Date().toISOString() };
+  window.SVR_PHASE200_ORDERED_GRAND_LOBBY = { label:LABEL, locked:true, orderedStructure:true, pillarsAligned:true, lightingPass:true, twoFloorLobby:true, moduleBays:true, oneMoon:true, oneMars:true, noBackgroundBuildings:true, proceduralTableDisabled:true, fbxTableAuthority:true, checkedAt:new Date().toISOString() };
   window.SVR_PHASE195_CLEAN_WORLD = { label:LABEL, locked:true, legacyWorldSkylineBypassed:true, twoFloorLobby:true, noBackgroundBuildings:true, checkedAt:new Date().toISOString() };
   log(`[Phase200] ordered grand lobby structure active: aligned columns, two floors, lighting pass`);
   return { roomClamp, seats, tableCenter:new THREE.Vector3(0,0,0.75), joinRadius:3.9, previewOrbitRadius:13.2, sceneTargets };
 }
+
