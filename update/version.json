@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-172-FLOOR-LOGO-FELT-FIT-RAIL-CLEANUP-LOCK",
-  "gameBuild": "PHASE-172-FLOOR-LOGO-FELT-FIT-RAIL-CLEANUP-LOCK",
-  "previousGameBuild": "PHASE-171-HAND-TELEPORT-RELEASE-GATE-FACE-FIST-TOGGLE-LOCK",
+  "build": "PHASE-173-STABLE-HAND-PINCH-TELEPORT-LOCK",
+  "gameBuild": "PHASE-173-STABLE-HAND-PINCH-TELEPORT-LOCK",
+  "previousGameBuild": "PHASE-172-FLOOR-LOGO-FELT-FIT-RAIL-CLEANUP-LOCK",
   "locomotionLock": "PHASE-169-UNIFIED-LOCOMOTION-TELEPORT-POLISH-LOCK",
   "siteTouched": false,
   "moduleRule": "index activates modules only",
-  "tableVisualRule": "floor logo felt fit table cleanup",
+  "teleportRule": "pinch and fist ignored while off, stable target required before move",
   "updatedAt": "2026-06-24"
 }
