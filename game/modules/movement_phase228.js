@@ -1,1 +1,1 @@
-export { createTeleportRig } from "./movement_phase135_playability_control_lock.js?v=phase135-playability-control";
+export { createTeleportRig } from "./movement_phase169_locomotion_polish_lock.js?v=phase169-locomotion-polish";
