@@ -1,6 +1,7 @@
 {
   "build": "PHASE-169-DEMO-QA-POSITION-SKY-OVERLAY-MODULE-LOCK",
   "gameBuild": "PHASE-169-DEMO-QA-POSITION-SKY-OVERLAY-MODULE-LOCK",
+  "locomotionLock": "PHASE-169-UNIFIED-LOCOMOTION-TELEPORT-POLISH-LOCK",
   "previousGameBuild": "PHASE-168-PLAYABLE-POKER-DEMO-SIMULATION-LOCK",
   "siteTouched": false,
   "moduleRule": "index activates modules only",
