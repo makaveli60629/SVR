@@ -1,8 +1,8 @@
-﻿import * as THREE from "three";
+import * as THREE from "three";
 import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands_phase228.js";
-import { createTeleportRig } from "./modules/movement_phase228.js?v=phase99-clean-lobby-hand-teleport";
+import { createTeleportRig } from "./modules/movement_phase228.js?v=phase169-locomotion-polish";
 import { buildPhase195CleanLobbyWorld } from "./modules/phase195_clean_lobby_world.js";
 import { installPhase201HubContentRestore } from "./modules/phase201_hub_content_restore.js";
 import { installPhase202StorefrontShells } from "./modules/phase202_storefront_shells.js";
@@ -13,7 +13,7 @@ import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 import { installPhase149LobbyFitAlignmentLock } from "./phase149_lobby_fit_alignment_lock.js";
 
-const BUILD_LABEL = "PHASE-164-FBX-TABLE-FINAL-ALIGNMENT-SEAT-ANCHOR-LOCK";
+const BUILD_LABEL = "PHASE-169-UNIFIED-LOCOMOTION-TELEPORT-POLISH-LOCK";
 const params = new URLSearchParams(location.search);
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
@@ -26,7 +26,8 @@ window.SVR_BACKGROUND_BUILDINGS_REMOVED = true;
 window.SVR_LOCKED_FINAL_BUILD = BUILD_LABEL;
 window.SVR_NO_FACE_OVERLAY = true;
 window.SVR_PHASE106 = { build: BUILD_LABEL, source: "Phase 149: lobby fit alignment lock, safe Android movement, corrected doorway geometry." };
-window.SVR_PHASE228_MAIN_IMPORT_LOCK = { build: BUILD_LABEL, handsModule: "hands_phase228.js", movementModule: "movement_phase228.js?v=phase99-clean-lobby-hand-teleport", checkedAt: new Date().toISOString() };
+window.SVR_PHASE228_MAIN_IMPORT_LOCK = { build: BUILD_LABEL, handsModule: "hands_phase228.js", movementModule: "movement_phase228.js?v=phase169-locomotion-polish", checkedAt: new Date().toISOString() };
+window.SVR_PHASE169_LOCOMOTION_MAIN_IMPORT_LOCK = { build: BUILD_LABEL, unifiedHandsAndControllers: true, yAxisSafetyGuard: true, siteTouched: false, checkedAt: new Date().toISOString() };
 window.SVR_PHASE294_LOCK = { build: BUILD_LABEL, phase293BaselinePreserved: true, noUnapprovedReikiBranding: true, rangeAliasAdded: true };
 window.SVR_PHASE164_TABLE_AREA_AUTHORITY = { build: BUILD_LABEL, fakeGeometryTableRemoved: true, fbxTableOnly: true, siteTouched: false, checkedAt: new Date().toISOString() };
 window.SVR_PHASE161_TABLE_FBX_FLOOR_LOCK = { build: BUILD_LABEL, geometryTableRemoved: true, fbxFloorAligned: true, siteTouched: false, checkedAt: new Date().toISOString() };
@@ -70,7 +71,7 @@ window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $
 window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
 const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading clean expanded lobbyâ€¦", { force: true });
+setStatus("Loading clean expanded lobby…", { force: true });
 const world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
 window.SVR_WORLD_REF = world;
 installPhase201HubContentRestore({ scene, camera, renderer, log });
@@ -139,7 +140,7 @@ createStoreWebPortal();
 installPhase262GeometrySkyAlignmentLock({ scene, camera, renderer, log });
 $toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $toggleJoints.textContent = on ? "Joints On" : "Joints"; });
 
-setStatus("Loading logoâ€¦", { force: true });
+setStatus("Loading logo…", { force: true });
 const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
 tp.setLogoTexture(logoTexture);
 window.SVR_PHASE208_PERFORMANCE_MAIN = true;
@@ -149,7 +150,7 @@ window.__SVR_GAME_READY__ = true;
 window.__SVR_ANDROID_SMART_LOCK__ = ANDROID_SMART;
 const __svrBootFallback = document.getElementById("bootFallback");
 if (__svrBootFallback){ __svrBootFallback.style.opacity="0"; __svrBootFallback.style.pointerEvents="none"; setTimeout(()=>{__svrBootFallback.style.display="none";},420); }
-setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} â€¢ Android safe movement` : `Ready. ${BUILD_LABEL}`, { force: true });
+setStatus(AUTOCAM ? "Live preview ready" : ANDROID_SMART ? `Ready. ${BUILD_LABEL} • Android safe movement` : `Ready. ${BUILD_LABEL}`, { force: true });
 setMode(AUTOCAM ? "CAM 3 director" : ANDROID_SMART ? "Android safe movement locked" : "Hands: pinch and hold to aim, release to teleport");
 function setHudVisible(visible){ const hud = document.getElementById("hud"); if (hud) hud.style.display = (visible && !AUTOCAM) ? "flex" : "none"; if ($log) $log.style.display = "none"; if ($err) $err.style.display = "none"; }
 if (AUTOCAM) setHudVisible(false);
@@ -185,5 +186,3 @@ renderer.setAnimationLoop(()=>{
   if (renderer.xr.isPresenting || !AUTOCAM) watch.update(dt, { leftHand, rightHand, leftController, rightController });
   renderer.render(scene, camera);
 });
-
-
