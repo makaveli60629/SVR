@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-171-HAND-TELEPORT-RELEASE-GATE-FACE-FIST-TOGGLE-LOCK",
-  "gameBuild": "PHASE-171-HAND-TELEPORT-RELEASE-GATE-FACE-FIST-TOGGLE-LOCK",
-  "previousGameBuild": "PHASE-170-HAND-TELEPORT-AIM-RELEASE-LOCK",
+  "build": "PHASE-172-FLOOR-LOGO-FELT-FIT-RAIL-CLEANUP-LOCK",
+  "gameBuild": "PHASE-172-FLOOR-LOGO-FELT-FIT-RAIL-CLEANUP-LOCK",
+  "previousGameBuild": "PHASE-171-HAND-TELEPORT-RELEASE-GATE-FACE-FIST-TOGGLE-LOCK",
   "locomotionLock": "PHASE-169-UNIFIED-LOCOMOTION-TELEPORT-POLISH-LOCK",
   "siteTouched": false,
   "moduleRule": "index activates modules only",
-  "teleportRule": "fist near face toggles on off, hold away to aim, release to move",
+  "tableVisualRule": "floor logo felt fit table cleanup",
   "updatedAt": "2026-06-24"
 }
