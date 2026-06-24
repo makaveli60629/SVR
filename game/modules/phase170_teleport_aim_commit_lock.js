@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const LABEL = "PHASE-170-TELEPORT-AIM-COMMIT-LOCK";
+const LABEL = "PHASE-170-HAND-TELEPORT-AIM-RELEASE-LOCK";
 const ROOT_NAME = "PHASE170_TELEPORT_AIM_COMMIT_LOCK_ROOT";
 const MIN_AIM_MS = 420;
 const STABLE_TARGET_MS = 180;
@@ -19,16 +19,16 @@ let aimStartedAt = 0;
 let target = null;
 let lastTargetAt = 0;
 let preAimPose = null;
-let lastAllowedCommitAt = 0;
+let lastAllowedMoveAt = 0;
 let patched = false;
-let wasTriggerHeld = false;
+let wasAimHeld = false;
 let wasToggleHeld = false;
 let lastPanel = null;
 let installStarted = false;
 
 function now(){ return performance.now(); }
 function isQuest(){ return /Quest|Oculus|Meta Quest/i.test(navigator.userAgent || ""); }
-function getRig(){ return window.SVR_TELEPORT_RIG_REF || window.SVR_TELEPORT_RIG || window.__SVR_TELEPORT_RIG__ || null; }
+function getRig(){ return window.SVR_TELEPORT_RIG_REF || window.SVR_TELEPORT_RIG || null; }
 function getXrCamPos(){
   const p = new THREE.Vector3();
   if(renderer?.xr?.isPresenting){ renderer.xr.getCamera(camera).getWorldPosition(p); return p; }
@@ -40,19 +40,19 @@ function roomClampPoint(p){
   return new THREE.Vector3(x, SAFE_Y, z);
 }
 function setPlayerPose(x, y=0, z){
-  lastAllowedCommitAt = now();
+  lastAllowedMoveAt = now();
   if(rig?.setPlayerPose){ rig.setPlayerPose(x,y,z); return true; }
   if(camera){ camera.position.x = x; camera.position.z = z; return true; }
   return false;
 }
 function currentPoseXZ(){ const p=getXrCamPos(); return { x:p.x, z:p.z }; }
-function restorePreAimIfAutoJumped(){
+function restorePreAimIfOldSystemMoved(){
   if(!aiming || !preAimPose) return;
   const p = currentPoseXZ();
   const d = Math.hypot(p.x-preAimPose.x, p.z-preAimPose.z);
-  if(d > 0.55 && now() - lastAllowedCommitAt > 750){
+  if(d > 0.55 && now() - lastAllowedMoveAt > 750){
     setPlayerPose(preAimPose.x, 0, preAimPose.z);
-    window.SVR_PHASE170_LAST_AUTO_JUMP_BLOCK = { build:LABEL, restored:true, distance:+d.toFixed(3), checkedAt:new Date().toISOString() };
+    window.SVR_PHASE170_LAST_HAND_AUTO_MOVE_BLOCK = { build:LABEL, restored:true, distance:+d.toFixed(3), checkedAt:new Date().toISOString() };
   }
 }
 function ensureRoot(){
@@ -63,15 +63,33 @@ function ensureRoot(){
   root = new THREE.Group(); root.name = ROOT_NAME; scene.add(root);
   const mat = new THREE.LineBasicMaterial({ color:0x7ffcff, transparent:true, opacity:.92 });
   const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0,0,-1)]);
-  rayLine = new THREE.Line(geo, mat); rayLine.name = "PHASE170_TELEPORT_AIM_RAY_HOLD_ONLY"; root.add(rayLine);
+  rayLine = new THREE.Line(geo, mat); rayLine.name = "PHASE170_HAND_TELEPORT_AIM_RAY_HOLD_ONLY"; root.add(rayLine);
   const ringGeo = new THREE.RingGeometry(.20,.32,48);
   const ringMat = new THREE.MeshBasicMaterial({ color:0x7ffcff, transparent:true, opacity:.78, side:THREE.DoubleSide, depthWrite:false });
-  marker = new THREE.Mesh(ringGeo, ringMat); marker.name = "PHASE170_TELEPORT_TARGET_MARKER_RELEASE_TO_COMMIT"; marker.rotation.x = -Math.PI/2; root.add(marker);
+  marker = new THREE.Mesh(ringGeo, ringMat); marker.name = "PHASE170_HAND_TELEPORT_TARGET_MARKER_RELEASE_TO_MOVE"; marker.rotation.x = -Math.PI/2; root.add(marker);
   root.visible = false;
   return root;
 }
+function handAimSource(){
+  const hand = window.SVR_PHASE170_HAND_SOURCE;
+  const wrist = hand?.joints?.wrist;
+  const tip = hand?.joints?.["index-finger-tip"] || hand?.joints?.["middle-finger-tip"];
+  if(!wrist || !tip) return null;
+  const wristPos = new THREE.Vector3();
+  const tipPos = new THREE.Vector3();
+  wrist.getWorldPosition(wristPos);
+  tip.getWorldPosition(tipPos);
+  const dir = tipPos.clone().sub(wristPos);
+  if(dir.lengthSq() < 0.000001) return null;
+  dir.normalize();
+  if(dir.y > -0.045) dir.y = -0.045;
+  dir.normalize();
+  return { pos:tipPos, dir, hand:true };
+}
 function aimSource(){
-  const src = { pos:new THREE.Vector3(), dir:new THREE.Vector3(0,0,-1) };
+  const handSrc = window.SVR_PHASE170_HAND_INPUT?.held ? handAimSource() : null;
+  if(handSrc) return handSrc;
+  const src = { pos:new THREE.Vector3(), dir:new THREE.Vector3(0,0,-1), hand:false };
   const controller = renderer?.xr?.getController?.(0);
   if(renderer?.xr?.isPresenting && controller){
     controller.updateMatrixWorld(true);
@@ -104,7 +122,7 @@ function updateTarget(){
   }
   return target;
 }
-function isTriggerHeld(){
+function controllerHeld(){
   const session = renderer?.xr?.getSession?.();
   const sources = session ? Array.from(session.inputSources || []) : [];
   for(const src of sources){
@@ -117,6 +135,8 @@ function isTriggerHeld(){
   }
   return false;
 }
+function handHeld(){ return !!window.SVR_PHASE170_HAND_INPUT?.held; }
+function aimHeld(){ return controllerHeld() || handHeld(); }
 function isTogglePressed(){
   const session = renderer?.xr?.getSession?.();
   const sources = session ? Array.from(session.inputSources || []) : [];
@@ -140,21 +160,21 @@ function beginAim(){
   preAimPose = currentPoseXZ();
   updateTarget();
 }
-function endAim(commit){
+function endAim(move){
   if(!aiming) return false;
   updateTarget();
   const held = now() - aimStartedAt;
   const stable = now() - lastTargetAt;
-  const ok = !!commit && !!target && held >= MIN_AIM_MS && stable >= STABLE_TARGET_MS;
+  const ok = !!move && !!target && held >= MIN_AIM_MS && stable >= STABLE_TARGET_MS;
   aiming = false;
   if(root) root.visible = false;
   if(ok){
     setPlayerPose(target.x, 0, target.z);
-    window.SVR_PHASE170_LAST_COMMIT = { build:LABEL, x:+target.x.toFixed(3), z:+target.z.toFixed(3), heldMs:Math.round(held), stableMs:Math.round(stable), checkedAt:new Date().toISOString() };
+    window.SVR_PHASE170_LAST_HAND_RELEASE_MOVE = { build:LABEL, x:+target.x.toFixed(3), z:+target.z.toFixed(3), heldMs:Math.round(held), stableMs:Math.round(stable), checkedAt:new Date().toISOString() };
     return true;
   }
-  if(preAimPose && commit){ setPlayerPose(preAimPose.x, 0, preAimPose.z); }
-  window.SVR_PHASE170_LAST_CANCEL = { build:LABEL, reason: commit ? "aim_not_ready" : "cancelled", heldMs:Math.round(held), stableMs:Math.round(stable), checkedAt:new Date().toISOString() };
+  if(preAimPose && move){ setPlayerPose(preAimPose.x, 0, preAimPose.z); }
+  window.SVR_PHASE170_LAST_HAND_CANCEL = { build:LABEL, reason: move ? "aim_not_ready" : "cancelled", heldMs:Math.round(held), stableMs:Math.round(stable), checkedAt:new Date().toISOString() };
   return false;
 }
 function patchRig(){
@@ -167,7 +187,8 @@ function patchRig(){
   rig.phase170OriginalToggleMode = originalToggle;
   window.SVR_SAFE_TELEPORT_TOGGLE = toggleTeleport;
   window.SVR_SAFE_TELEPORT_CANCEL = () => endAim(false);
-  window.SVR_SAFE_TELEPORT_COMMIT = () => endAim(true);
+  window.SVR_SAFE_TELEPORT_MOVE = () => endAim(true);
+  window.SVR_PHASE170_HAND_TELEPORT_AUTHORITY = true;
   return true;
 }
 function installPanel(){
@@ -180,12 +201,14 @@ function installPanel(){
 }
 function updatePanel(){
   if(!lastPanel) return;
+  const input = window.SVR_PHASE170_HAND_INPUT;
   lastPanel.textContent = [
-    "SVR TELEPORT AIM-COMMIT",
+    "SVR HAND TELEPORT AIM-RELEASE",
     `enabled: ${enabled ? "ON" : "OFF"}`,
     `aiming: ${aiming ? "YES" : "NO"}`,
+    `hand: ${input?.held ? input.source || "held" : "--"}`,
     `target: ${target ? `x:${target.x.toFixed(2)} z:${target.z.toFixed(2)}` : "--"}`,
-    "T/A toggles | hold trigger/grip aim | release commit"
+    "Watch/T toggles | hold fist/pinch to aim | release to move"
   ].join("\n");
 }
 function tick(){
@@ -194,15 +217,17 @@ function tick(){
   const togglePressed = isTogglePressed();
   if(togglePressed && !wasToggleHeld) toggleTeleport();
   wasToggleHeld = togglePressed;
-  const held = isTriggerHeld();
-  if(enabled && held && !wasTriggerHeld) beginAim();
-  if(enabled && held && aiming){ updateTarget(); restorePreAimIfAutoJumped(); }
-  if(wasTriggerHeld && !held) endAim(true);
-  wasTriggerHeld = held;
+  const held = aimHeld();
+  if(enabled && held && !wasAimHeld) beginAim();
+  if(enabled && held && aiming){ updateTarget(); restorePreAimIfOldSystemMoved(); }
+  if(wasAimHeld && !held) endAim(true);
+  wasAimHeld = held;
   updatePanel();
+  const input = window.SVR_PHASE170_HAND_INPUT || null;
   window.SVR_PHASE170_TELEPORT_AIM_COMMIT_LOCK = {
-    build:LABEL, active:true, enabled, aiming, aimBeforeCommit:true, releaseToTeleport:true,
-    autoPointJumpBlocked:true, togglePatched:patched, rigFound:!!rig, target:target ? {x:+target.x.toFixed(3), z:+target.z.toFixed(3)} : null,
+    build:LABEL, active:true, enabled, aiming, handTeleportFixed:true, handAimBeforeMove:true, releaseToMove:true,
+    baseHandAutoMoveSuppressed:true, togglePatched:patched, rigFound:!!rig, handHeld:!!input?.held, handSource:input?.source || null,
+    target:target ? {x:+target.x.toFixed(3), z:+target.z.toFixed(3)} : null,
     siteTouched:false, checkedAt:new Date().toISOString()
   };
 }
