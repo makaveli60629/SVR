@@ -8,19 +8,19 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta http-equiv="Expires" content="0"/>
-<link rel="manifest" href="./manifest.json?v=phase177"/>
+<link rel="manifest" href="./manifest.json?v=phase178"/>
 <style>
 html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}#app{position:fixed;inset:0;background:#02040b}canvas{display:block;width:100%;height:100%;background:#000;outline:none}#safeStage{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:#000}.safe-card{width:min(92vw,720px);border:1px solid rgba(127,252,255,.72);border-radius:22px;background:rgba(0,0,0,.72);box-shadow:0 0 42px rgba(127,252,255,.20);padding:26px;text-align:center}.pill{display:inline-block;border:1px solid #8dffb4;border-radius:999px;color:#8dffb4;padding:7px 12px;font-weight:900;font-size:12px}.btn{margin:6px;border:1px solid rgba(127,252,255,.68);border-radius:12px;background:rgba(127,252,255,.10);color:#bffcff;padding:10px 14px;font-weight:900;cursor:pointer}#bootFallback,.phase-label,#sceneNav,#log,#err,#hud,#svrPhaseBadge{display:none!important;opacity:0!important;pointer-events:none!important}.boot-released #safeStage,.runtime-visible #safeStage,.overlay-released #safeStage{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-177-QA-MARKER-COORDINATE-CAPTURE-LOCK" data-player-facing-build="SVR-POKER-VR-PRODUCTION-DEMO">
+<body data-build="PHASE-178-STRUCTURE-WATCH-LOGO-LOCK" data-player-facing-build="SVR-POKER-VR-PRODUCTION-DEMO">
 <div id="app"></div>
-<div id="safeStage"><section class="safe-card"><span class="pill">GAME BOOT</span><h1>SVR POKER VR</h1><h2>QA Marker Coordinate Capture</h2><p id="safeStatus">Loading game modules...</p><button class="btn" id="startRuntimeBtn" type="button">Start Game Now</button></section></div>
+<div id="safeStage"><section class="safe-card"><span class="pill">GAME BOOT</span><h1>SVR POKER VR</h1><h2>Structure Watch Logo Lock</h2><p id="safeStatus">Loading game modules...</p><button class="btn" id="startRuntimeBtn" type="button">Start Game Now</button></section></div>
 <div id="bootFallback"></div><div id="hud"><span id="status"></span><span id="mode"></span><button id="toggleLog" type="button">Log</button><button id="toggleJoints" type="button">Joints</button></div><div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
 <script>
 (function(){
-var BUILD='PHASE-177-QA-MARKER-COORDINATE-CAPTURE-LOCK';
+var BUILD='PHASE-178-STRUCTURE-WATCH-LOGO-LOCK';
 var loaded=false;
 var status=document.getElementById('safeStatus');
 var ua=navigator.userAgent||'';
@@ -30,40 +30,42 @@ var params=new URLSearchParams(location.search);
 var fullQa=params.has('fullphases')||params.get('qa')==='1';
 window.SVR_SUPPRESS_PHASE_BADGES=true;
 var CORE_MODULES=[
-'./phase101_boot_load_screen_recovery.js?v=phase177',
-'./phase101_partial_runtime_render_guard.js?v=phase177',
-'./main.js?v=phase177-runtime',
-'./phase155_lobby_barrier_balcony_table_lock.js?v=phase177',
-'./phase156_table2_stool_texture_lock.js?v=phase177',
-'./phase161_geometry_table_fbx_floor_lock.js?v=phase177',
-'./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=phase177',
-'./phase166_fbx_table_surface_anchor_lock.js?v=phase177',
-'./phase167_fbx_table_felt_passline_logo_lock.js?v=phase177',
-'./phase168_playable_poker_demo_simulation_lock.js?v=phase177',
-'./modules/phase172_floor_logo_felt_rail_cleanup_lock.js?v=phase177',
-'./modules/phase169_demo_qa_position_overhead_sky_overlay_lock.js?v=phase177',
-'./modules/phase170_teleport_aim_commit_lock.js?v=phase177',
-'./modules/phase175_runtime_authority_cache_bust_lock.js?v=phase177',
-'./modules/phase176_live_qa_authority_lock.js?v=phase177',
-'./modules/phase177_qa_marker_coordinate_capture_lock.js?v=phase177',
-'./phase145_android_black_screen_recovery_lock.js?v=phase177',
-'./phase120_luxury_lobby_stability_performance_lock.js?v=phase177'
+'./phase101_boot_load_screen_recovery.js?v=phase178',
+'./phase101_partial_runtime_render_guard.js?v=phase178',
+'./main.js?v=phase178-runtime',
+'./phase155_lobby_barrier_balcony_table_lock.js?v=phase178',
+'./phase156_table2_stool_texture_lock.js?v=phase178',
+'./phase161_geometry_table_fbx_floor_lock.js?v=phase178',
+'./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=phase178',
+'./phase166_fbx_table_surface_anchor_lock.js?v=phase178',
+'./phase167_fbx_table_felt_passline_logo_lock.js?v=phase178',
+'./phase168_playable_poker_demo_simulation_lock.js?v=phase178',
+'./modules/phase172_floor_logo_felt_rail_cleanup_lock.js?v=phase178',
+'./modules/phase169_demo_qa_position_overhead_sky_overlay_lock.js?v=phase178',
+'./modules/phase170_teleport_aim_commit_lock.js?v=phase178',
+'./modules/phase175_runtime_authority_cache_bust_lock.js?v=phase178',
+'./modules/phase176_live_qa_authority_lock.js?v=phase178',
+'./modules/phase177_qa_marker_coordinate_capture_lock.js?v=phase178',
+'./modules/phase178_structure_watch_logo_lock.js?v=phase178',
+'./phase145_android_black_screen_recovery_lock.js?v=phase178',
+'./phase120_luxury_lobby_stability_performance_lock.js?v=phase178'
 ];
-var QUEST_MODULES=['./phase141_quest_movement_teleport_final_lock.js?v=phase177'];
-var POKER_MODULES=['./phase142_playable_poker_core_authority_lock.js?v=phase177'];
+var QUEST_MODULES=['./phase141_quest_movement_teleport_final_lock.js?v=phase178'];
+var POKER_MODULES=['./phase142_playable_poker_core_authority_lock.js?v=phase178'];
 var MODULES=CORE_MODULES.concat((isQuest||fullQa)?QUEST_MODULES:[],POKER_MODULES);
-window.SVR_PHASE177_BOOT={build:BUILD,active:true,loaded:false,errors:[],siteTouched:false,moduleRule:'index activates modules only',moduleCount:MODULES.length,isAndroid:isAndroid,isQuest:isQuest,phase177Markers:true,checkedAt:new Date().toISOString()};
-window.SVR_PHASE176_BOOT=window.SVR_PHASE177_BOOT;
-window.SVR_PHASE175_BOOT=window.SVR_PHASE177_BOOT;
-window.SVR_PHASE174_BOOT=window.SVR_PHASE177_BOOT;
-function note(msg){if(status)status.textContent=msg;window.SVR_PHASE177_BOOT.lastMessage=msg;window.SVR_PHASE177_BOOT.checkedAt=new Date().toISOString();}
-function hideOverlay(reason){document.body.classList.add('boot-released','runtime-visible','overlay-released','svr-xr-clean-view');var safe=document.getElementById('safeStage');if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';}window.__SVR_GAME_READY__=true;window.SVR_GAME_READY=true;window.SVR_PHASE177_BOOT.overlayReleased=true;window.SVR_PHASE177_BOOT.reason=reason;}
+window.SVR_PHASE178_BOOT={build:BUILD,active:true,loaded:false,errors:[],siteTouched:false,moduleRule:'index activates modules only',moduleCount:MODULES.length,isAndroid:isAndroid,isQuest:isQuest,phase178Structure:true,checkedAt:new Date().toISOString()};
+window.SVR_PHASE177_BOOT=window.SVR_PHASE178_BOOT;
+window.SVR_PHASE176_BOOT=window.SVR_PHASE178_BOOT;
+window.SVR_PHASE175_BOOT=window.SVR_PHASE178_BOOT;
+window.SVR_PHASE174_BOOT=window.SVR_PHASE178_BOOT;
+function note(msg){if(status)status.textContent=msg;window.SVR_PHASE178_BOOT.lastMessage=msg;window.SVR_PHASE178_BOOT.checkedAt=new Date().toISOString();}
+function hideOverlay(reason){document.body.classList.add('boot-released','runtime-visible','overlay-released','svr-xr-clean-view');var safe=document.getElementById('safeStage');if(safe){safe.style.display='none';safe.style.opacity='0';safe.style.visibility='hidden';safe.style.pointerEvents='none';}window.__SVR_GAME_READY__=true;window.SVR_GAME_READY=true;window.SVR_PHASE178_BOOT.overlayReleased=true;window.SVR_PHASE178_BOOT.reason=reason;}
 window.SVR_RELEASE_BOOT=hideOverlay;window.SVR_FORCE_HIDE_SAFE_STAGE=hideOverlay;
 function addModule(src){return new Promise(function(resolve,reject){var s=document.createElement('script');s.type='module';s.src=src;s.onload=resolve;s.onerror=function(){reject(new Error('Failed '+src));};document.body.appendChild(s);});}
-async function startRuntime(){if(loaded)return;loaded=true;window.SVR_PHASE177_BOOT.loaded=true;try{for(var i=0;i<MODULES.length;i++){note('Loading module '+(i+1)+' / '+MODULES.length);await addModule(MODULES[i]);}window.SVR_LIVE_BUILD_POINTER=BUILD;window.SVR_LOCKED_FINAL_BUILD=BUILD;note('Game ready.');setTimeout(function(){hideOverlay('phase177-ready');},120);}catch(e){window.SVR_PHASE177_BOOT.errors.push(String(e.message||e));note('Game ready with fallback.');setTimeout(function(){hideOverlay('phase177-fallback');},450);}}
+async function startRuntime(){if(loaded)return;loaded=true;window.SVR_PHASE178_BOOT.loaded=true;try{for(var i=0;i<MODULES.length;i++){note('Loading module '+(i+1)+' / '+MODULES.length);await addModule(MODULES[i]);}window.SVR_LIVE_BUILD_POINTER=BUILD;window.SVR_LOCKED_FINAL_BUILD=BUILD;note('Game ready.');setTimeout(function(){hideOverlay('phase178-ready');},120);}catch(e){window.SVR_PHASE178_BOOT.errors.push(String(e.message||e));note('Game ready with fallback.');setTimeout(function(){hideOverlay('phase178-fallback');},450);}}
 document.getElementById('startRuntimeBtn').addEventListener('click',startRuntime);
-window.addEventListener('error',function(e){window.SVR_PHASE177_BOOT.errors.push(String(e.message||e.error||e));hideOverlay('error-release');});
-window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE177_BOOT.errors.push(String((e.reason&&e.reason.message)||e.reason||e));hideOverlay('promise-release');});
+window.addEventListener('error',function(e){window.SVR_PHASE178_BOOT.errors.push(String(e.message||e.error||e));hideOverlay('error-release');});
+window.addEventListener('unhandledrejection',function(e){window.SVR_PHASE178_BOOT.errors.push(String((e.reason&&e.reason.message)||e.reason||e));hideOverlay('promise-release');});
 setTimeout(startRuntime,100);
 setTimeout(function(){hideOverlay('absolute-overlay-release-1800ms');},1800);
 })();
