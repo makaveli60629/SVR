@@ -1,8 +1,8 @@
 {
-  "build": "PHASE-166-FBX-TABLE-SURFACE-ANCHOR-LOCK",
-  "gameBuild": "PHASE-166-FBX-TABLE-SURFACE-ANCHOR-LOCK",
-  "previousGameBuild": "PHASE-165-TABLE-CLEAN-DEPLOY-WORKFLOW-LOCK",
+  "build": "PHASE-167-FBX-TABLE-FELT-PASSLINE-LOGO-LOCK",
+  "gameBuild": "PHASE-167-FBX-TABLE-FELT-PASSLINE-LOGO-LOCK",
+  "previousGameBuild": "PHASE-166-FBX-TABLE-SURFACE-ANCHOR-LOCK",
   "siteTouched": false,
-  "tableAuthority": "FBX table only",
+  "tableAuthority": "FBX table with felt pass line and logo",
   "updatedAt": "2026-06-24"
 }
