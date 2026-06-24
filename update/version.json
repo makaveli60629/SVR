@@ -1,10 +1,11 @@
 {
-  "build": "PHASE-173-STABLE-HAND-PINCH-TELEPORT-LOCK",
-  "gameBuild": "PHASE-173-STABLE-HAND-PINCH-TELEPORT-LOCK",
-  "previousGameBuild": "PHASE-172-FLOOR-LOGO-FELT-FIT-RAIL-CLEANUP-LOCK",
+  "build": "PHASE-174-STABLE-FLOOR-HAND-TELEPORT-TABLE-SKY-LOCK",
+  "gameBuild": "PHASE-174-STABLE-FLOOR-HAND-TELEPORT-TABLE-SKY-LOCK",
+  "previousGameBuild": "PHASE-173-STABLE-HAND-PINCH-TELEPORT-LOCK",
   "locomotionLock": "PHASE-169-UNIFIED-LOCOMOTION-TELEPORT-POLISH-LOCK",
   "siteTouched": false,
   "moduleRule": "index activates modules only",
-  "teleportRule": "pinch and fist ignored while off, stable target required before move",
+  "teleportRule": "pinch blocked while off, stable release only, current floor locked",
+  "visualRule": "table aligned, floor logo fitted, clean sky",
   "updatedAt": "2026-06-24"
 }
