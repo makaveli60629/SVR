@@ -1,10 +1,10 @@
 {
-  "build": "PHASE-170-TELEPORT-AIM-COMMIT-LOCK",
-  "gameBuild": "PHASE-170-TELEPORT-AIM-COMMIT-LOCK",
-  "previousGameBuild": "PHASE-169-DEMO-QA-POSITION-SKY-OVERLAY-MODULE-LOCK",
+  "build": "PHASE-170-HAND-TELEPORT-AIM-RELEASE-LOCK",
+  "gameBuild": "PHASE-170-HAND-TELEPORT-AIM-RELEASE-LOCK",
+  "previousGameBuild": "PHASE-170-TELEPORT-AIM-COMMIT-LOCK",
   "locomotionLock": "PHASE-169-UNIFIED-LOCOMOTION-TELEPORT-POLISH-LOCK",
   "siteTouched": false,
   "moduleRule": "index activates modules only",
-  "teleportRule": "toggle on off, hold aim, release to move",
+  "teleportRule": "hands hold to aim, release to move, no instant hand jump",
   "updatedAt": "2026-06-24"
 }
