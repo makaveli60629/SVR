@@ -1,8 +1,8 @@
 {
   "status": "repo-marker",
-  "build": "SVR-PHASE-158-ACTUAL-FBX-TABLE-SCALE-ORIENTATION-LOCK",
-  "commit": "phase-158-actual-fbx-table-scale-orientation-lock",
-  "updatedAt": "2026-06-23T17:35:00-05:00",
+  "build": "SVR-PHASE-159-FBX-TABLE-FLAT-SCALE-FIX-LOCK",
+  "commit": "phase-159-fbx-table-flat-scale-fix-lock",
+  "updatedAt": "2026-06-23T19:35:00-05:00",
   "customDomain": "svrpoker.com",
-  "purpose": "Phase 158 marker: scaled and oriented actual FBX table, removed geometric fallback tables, and removed floating site download button."
+  "purpose": "Phase 159 marker: flatten/scale uploaded FBX poker table, remove wall/upright table issue, preserve stool sizing and old table cleanup."
 }
