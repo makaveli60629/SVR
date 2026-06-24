@@ -1,11 +1,11 @@
 {
-  "build": "PHASE-175-RUNTIME-AUTHORITY-CACHE-BUST-LOCK",
-  "gameBuild": "PHASE-175-RUNTIME-AUTHORITY-CACHE-BUST-LOCK",
-  "previousGameBuild": "PHASE-174-STABLE-FLOOR-HAND-TELEPORT-TABLE-SKY-LOCK",
+  "build": "PHASE-176-LIVE-QA-AUTHORITY-LOCK",
+  "gameBuild": "PHASE-176-LIVE-QA-AUTHORITY-LOCK",
+  "previousGameBuild": "PHASE-175-RUNTIME-AUTHORITY-CACHE-BUST-LOCK",
   "locomotionLock": "PHASE-174-STABLE-FLOOR-HAND-TELEPORT-LOCK",
   "siteTouched": false,
   "moduleRule": "index activates modules only",
-  "cacheRule": "all game modules cache busted to phase175",
-  "visualRule": "phase174 table sky overlay retained",
+  "cacheRule": "all active game modules cache busted to phase176",
+  "qaRule": "runtime live audit keeps teleport table sky and overlay status visible",
   "updatedAt": "2026-06-24"
 }
