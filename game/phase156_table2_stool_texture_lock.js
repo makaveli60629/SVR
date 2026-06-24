@@ -1,7 +1,7 @@
-import * as THREE from 'three';
+﻿import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-const LABEL = 'PHASE-159-FBX-TABLE-FLAT-SCALE-FIX-LOCK';
+const LABEL = 'PHASE-161-GEOMETRY-TABLE-REMOVED-FBX-FLOOR-LOCK';
 const ROOT = 'PHASE159_FBX_TABLE_FLAT_SCALE_FIX_ROOT';
 const FBX_CANDIDATES = [
   './assets/table.fbx',
@@ -15,7 +15,7 @@ const FBX_CANDIDATES = [
 const STOOL_RING_RADIUS = 3.24;
 const TARGET_TABLE_LENGTH = 4.28;
 const TARGET_TABLE_DEPTH = 2.18;
-const TABLE_BOTTOM_Y = 0.74;
+const TABLE_BOTTOM_Y = 0.02;
 const CENTER_Z_OFFSET = 0.0;
 
 let loading = false;
@@ -190,7 +190,7 @@ function normalizeToStools(obj){
     finalPosition: { x:+obj.position.x.toFixed(3), y:+obj.position.y.toFixed(3), z:+obj.position.z.toFixed(3) },
     finalRotation: { x:+obj.rotation.x.toFixed(3), y:+obj.rotation.y.toFixed(3), z:+obj.rotation.z.toFixed(3) },
     finalScale: +obj.scale.x.toFixed(5),
-    flatTableCheck: b.size.y < Math.max(b.size.x,b.size.z) * 0.75
+    floorAligned:true, geometricFallbackRemoved:true, flatTableCheck: b.size.y < Math.max(b.size.x,b.size.z) * 0.75
   };
 }
 async function fbxExists(url){
@@ -265,3 +265,4 @@ function install(scene=window.__SVR_SCENE__){
 [250,700,1400,2600,5000,9000].forEach(ms=>setTimeout(()=>install(),ms));
 setInterval(()=>install(),2000);
 install();
+

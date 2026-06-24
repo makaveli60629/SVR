@@ -1,1 +1,8 @@
-{"version":"Update 3.1","build":"PHASE-324-UPDATE-3-1-VERSION-SYNC-RECOVERY-LOCK","track":"update-31-version-sync-recovery-lock","siteTouched":false,"phase":"3.1-CX / Phase 324","summary":"Phase 324 adds runtime version sync recovery state after the Phase 323 export helper and keeps version status visible.","label":"PHASE-324-UPDATE-3-1-VERSION-SYNC-RECOVERY-LOCK","notes":"Game-side only. Public root page untouched and locked.","updated":"2026-06-16T00:00:00-05:00"}
+﻿{
+  "build": "PHASE-161-GEOMETRY-TABLE-REMOVED-FBX-FLOOR-LOCK",
+  "scope": "game-only",
+  "geometryTableRemoved": true,
+  "fbxTableFloorAligned": true,
+  "siteTouched": false,
+  "updatedAt": "2026-06-23T22:36:07.5682253-05:00"
+}

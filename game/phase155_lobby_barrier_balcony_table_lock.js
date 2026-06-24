@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+﻿import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
@@ -143,18 +143,38 @@ function installEnhancedFallbackTable(scene){
   [base,cushion,top].forEach(m=>{ m.receiveShadow=true; });
 }
 
+
+function phase161RemoveLegacyGeometryTables(scene){
+  const root = sceneRoot(scene); if(!root) return 0;
+  const kill = [];
+  root.traverse?.(o=>{
+    const name = String(o.name||'');
+    if(
+      name === 'PHASE155_ENHANCED_REAL_TABLE_FALLBACK' ||
+      name === 'PHASE155_RESTORED_ASSET_TABLE' ||
+      name.startsWith('PHASE155_TABLE_') ||
+      name.startsWith('PHASE156_TABLE2_') ||
+      name.startsWith('PHASE157_STABLE_') ||
+      name.startsWith('PHASE158_ACTUAL_FBX_TABLE_SCALE_ROOT')
+    ) kill.push(o);
+  });
+  kill.forEach(o=>o.parent?.remove(o));
+  window.SVR_PHASE161_GEOMETRY_TABLE_PURGE_FROM_PHASE155 = { build:'PHASE-161-GEOMETRY-TABLE-REMOVED-FBX-FLOOR-LOCK', removed:kill.length, fallbackDisabled:true, checkedAt:new Date().toISOString() };
+  return kill.length;
+}
 function install(scene=window.__SVR_SCENE__){
   if(!scene) return false;
   const balconyPieces = sealBalcony(scene);
   const blockers = installPerimeterVisuals(scene);
   suppressOculusOverlay();
-  tryLoadTableModel(scene);
+  phase161RemoveLegacyGeometryTables(scene);
   let clamps = window.SVR_PHASE155_LOBBY_BARRIER?.cameraClamps || 0;
   if(!window.__SVR_RENDERER__?.xr?.isPresenting && clampCamera()) clamps++;
-  window.SVR_PHASE155_LOBBY_BARRIER = { build:LABEL, active:true, balconyFloorTouchesWall:true, glassRailsConnectedToFloor:true, voidPerimeterVisualBlockers:blockers, tightBounds:SAFE, oculusOverlaySuppressed:true, cameraClamps:clamps, tableRestoreAttempted:true, balconyPieces, checkedAt:new Date().toISOString() };
+  window.SVR_PHASE155_LOBBY_BARRIER = { build:LABEL, active:true, balconyFloorTouchesWall:true, glassRailsConnectedToFloor:true, voidPerimeterVisualBlockers:blockers, tightBounds:SAFE, oculusOverlaySuppressed:true, cameraClamps:clamps, tableRestoreAttempted:false, phase161GeometryTableFallbackDisabled:true, balconyPieces, checkedAt:new Date().toISOString() };
   return true;
 }
 
 window.SVR_RUN_PHASE155_LOBBY_BARRIER_FIX = () => install();
 [500,1200,2500,5000].forEach(ms=>setTimeout(()=>install(),ms));
 setInterval(()=>install(),1500);
+
