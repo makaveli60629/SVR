@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
-const BUILD='PHASE-88-ISOLATED-SCORPION-TABLE-TEST';
+const BUILD='PHASE-89-ISOLATED-SCORPION-TABLE-SURFACE-GRAB';
 const app=document.getElementById('app'), hud=document.getElementById('hud');
 let scene,camera,renderer,room,tableObj,seat={forward:.42,height:0},locked=true;
 init();
@@ -14,7 +14,8 @@ async function init(){
   room=new THREE.Group();room.name='PHASE200_ORDERED_GRAND_LOBBY_ROOT';scene.add(room);
   buildRoom();await loadTable();buildFallbackIfNeeded();buildSeatMarkers();
   window.SVR_LOCKED_FINAL_BUILD=BUILD;window.SVR_LIVE_BUILD_POINTER=BUILD;
-  await import('./modules/p85_poker_truth_lock.js?v=phase88');
+  await import('./modules/p85_poker_truth_lock.js?v=phase89');
+  await import('./modules/p89_surface_grab_lock.js?v=phase89');
   reseat(true);wireButtons();addEventListener('resize',resize);renderer.setAnimationLoop(loop);
 }
 function mat(c){return new THREE.MeshStandardMaterial({color:c,roughness:.75,metalness:.08,side:THREE.DoubleSide})}
@@ -23,11 +24,11 @@ function buildRoom(){box('SCORPION_FLOOR',0,-.04,0,10,.08,8,0x13060b);box('SCORP
 async function loadTable(){try{const fbx=await new Promise((res,rej)=>new FBXLoader().load('./assets/table.fbx',res,undefined,rej));fbx.name='PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED';fbx.position.set(0,0,0);fbx.scale.setScalar(.01);room.add(fbx);tableObj=fbx;normalizeTable();}catch(e){console.warn('table.fbx load failed, using fallback',e)}}
 function buildFallbackIfNeeded(){if(tableObj)return;const g=new THREE.Group();g.name='PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED';room.add(g);const top=box('FALLBACK_TABLE_TOP',0,.72,0,3.2,.12,1.65,0x101010);g.add(top);const felt=box('FALLBACK_TABLE_FELT',0,.79,0,2.65,.035,1.15,0x062014);g.add(felt);tableObj=g;}
 function normalizeTable(){const b=new THREE.Box3().setFromObject(tableObj),s=new THREE.Vector3(),c=new THREE.Vector3();b.getSize(s);b.getCenter(c);const targetW=3.2;const scale=targetW/Math.max(.001,s.x);tableObj.scale.multiplyScalar(scale);tableObj.updateMatrixWorld(true);const b2=new THREE.Box3().setFromObject(tableObj),c2=new THREE.Vector3();b2.getCenter(c2);tableObj.position.x-=c2.x;tableObj.position.z-=c2.z;tableObj.position.y-=b2.min.y;}
-function tableInfo(){if(!tableObj)return null;tableObj.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(tableObj),s=new THREE.Vector3(),c=new THREE.Vector3();b.getSize(s);b.getCenter(c);return{b,s,c,top:b.max.y,halfZ:Math.max(.75,s.z*.5),halfX:Math.max(1.2,s.x*.5)}}
+function tableInfo(){if(!tableObj)return null;tableObj.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(tableObj),s=new THREE.Vector3(),c=new THREE.Vector3();b.getSize(s);b.getCenter(c);return{b,s,c,top:b.max.y,halfZ:Math.max(.75,s.z*.5),halfX:Math.max(1.2,s.x*.5),playY:b.max.y-.152}}
 function buildSeatMarkers(){const i=tableInfo();if(!i)return;const geo=new THREE.RingGeometry(.18,.21,32);const m=new THREE.MeshBasicMaterial({color:0x7ffcff,side:THREE.DoubleSide});const ring=new THREE.Mesh(geo,m);ring.name='SCORPION_PLAYER_SEAT_RING';ring.rotation.x=-Math.PI/2;ring.position.set(i.c.x,.025,i.c.z+i.halfZ*.74);room.add(ring)}
 function reseat(force=false){const i=tableInfo();if(!i)return;const z=i.c.z+i.halfZ*(.72-seat.forward);const eye=new THREE.Vector3(i.c.x,i.top+1.02+seat.height,z);const target=new THREE.Vector3(i.c.x,i.top+.04,i.c.z-i.halfZ*.12);const xr=renderer.xr.isPresenting;if(xr){const rig=window.SVR_PLAYER_RIG||window.SVR_TABLE_RIG;if(rig?.setPlayerPose)rig.setPlayerPose(eye.x,0,eye.z);else camera.position.copy(eye)}else{camera.position.copy(eye);camera.lookAt(target)}window.SVR_SCORPION_SEAT={eye:{x:+eye.x.toFixed(2),y:+eye.y.toFixed(2),z:+eye.z.toFixed(2)},target:{x:+target.x.toFixed(2),y:+target.y.toFixed(2),z:+target.z.toFixed(2)},seat};}
 function wireButtons(){document.getElementById('closer').onclick=()=>{seat.forward=Math.min(.68,seat.forward+.05);reseat(true)};document.getElementById('back').onclick=()=>{seat.forward=Math.max(.1,seat.forward-.05);reseat(true)};document.getElementById('up').onclick=()=>{seat.height=Math.min(.3,seat.height+.04);reseat(true)};document.getElementById('down').onclick=()=>{seat.height=Math.max(-.25,seat.height-.04);reseat(true)};document.getElementById('lock').onclick=()=>{locked=!locked;hudMsg()};document.getElementById('newhand').onclick=()=>window.SVR_POKER_NEXT_HAND?.()}
-function hudMsg(){const p=new THREE.Vector3();camera.getWorldPosition(p);hud.innerHTML=`<b>${BUILD}</b><br>Mode: isolated Scorpion table<br>Seat lock: ${locked?'ON':'OFF'}<br>Camera: X ${p.x.toFixed(2)} Y ${p.y.toFixed(2)} Z ${p.z.toFixed(2)}<br>Offset: forward ${seat.forward.toFixed(2)} height ${seat.height.toFixed(2)}<br>Commands: SVR_RUN_PHASE85_POKER_AUDIT(), SVR_POKER_NEXT_HAND()`}
+function hudMsg(){const p=new THREE.Vector3();camera.getWorldPosition(p);const i=tableInfo();hud.innerHTML=`<b>${BUILD}</b><br>Mode: isolated Scorpion table<br>Seat lock: ${locked?'ON':'OFF'}<br>Camera: X ${p.x.toFixed(2)} Y ${p.y.toFixed(2)} Z ${p.z.toFixed(2)}<br>Offset: forward ${seat.forward.toFixed(2)} height ${seat.height.toFixed(2)}<br>Play surface: ${i?i.playY.toFixed(3):'waiting'}<br>Grab: select/squeeze chip or card and release to throw<br>Commands: SVR_RUN_PHASE89_SURFACE_AUDIT(), SVR_POKER_NEXT_HAND()`}
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
 function loop(){if(locked&&!renderer.xr.isPresenting)reseat(false);hudMsg();renderer.render(scene,camera)}
 </script></body></html>
