@@ -4,7 +4,8 @@
     'phase103-floating-menu-fix.css?v=menu-layer-fix',
     'phase104-alignment-polish.css?v=alignment-polish',
     'store-alignment-fix.css?v=store-align-hero-fix',
-    'site-android-readiness.css?v=android-store-banner-lock'
+    'site-android-readiness.css?v=android-store-banner-lock',
+    'vibez.css?v=vibez-four-ad-intro'
   ];
 
   layers.forEach((href) => {
@@ -15,6 +16,39 @@
       document.head.appendChild(link);
     }
   });
+
+  function wireVibezCampaign(){
+    const navLinks = document.querySelector('.market-links');
+    if (navLinks && !navLinks.querySelector('a[href="vibez.html"]')) {
+      const link = document.createElement('a');
+      link.href = 'vibez.html';
+      link.textContent = 'VIBEZ';
+      link.className = 'vibez-nav-link';
+      const contact = navLinks.querySelector('a[href="contact.html"]');
+      navLinks.insertBefore(link, contact || null);
+    }
+
+    const slideDeck = document.querySelector('[data-svr-slide-deck]');
+    if (slideDeck && !slideDeck.querySelector('[data-slide-id="slide-vibez"]')) {
+      const slide = document.createElement('article');
+      slide.className = 'svr-slide svr-art-slide vibez-sponsor-slide';
+      slide.dataset.slideId = 'slide-vibez';
+      slide.dataset.slideType = 'vibez';
+      slide.innerHTML = `<img src="assets/banners/vibez-intro-banner.svg" alt="((( VIBEZ ))) early access creator app banner"><div class="svr-slide-overlay"><a class="btn primary" href="vibez.html">Open VIBEZ</a><a class="btn secondary" href="vibez.html#download">Download App</a></div>`;
+      slideDeck.appendChild(slide);
+    }
+
+    const marketShell = document.querySelector('.market-shell');
+    const firstHero = document.getElementById('live-game') || document.querySelector('.hero, .section');
+    if (marketShell && firstHero && !document.getElementById('vibez-ad-module')) {
+      const module = document.createElement('section');
+      module.id = 'vibez-ad-module';
+      module.className = 'vibez-ad-module';
+      module.setAttribute('aria-label','VIBEZ sponsor introduction ad');
+      module.innerHTML = `<a href="vibez.html" aria-label="Open VIBEZ page"><img src="assets/banners/vibez-intro-banner.svg" alt="((( VIBEZ ))) create post react be seen banner"></a><div class="vibez-ad-copy"><div><strong>((( VIBEZ )))</strong><span>First sponsor app module • short-form creator platform • early access page live</span></div><a class="btn primary" href="vibez.html">Open VIBEZ</a></div>`;
+      marketShell.insertBefore(module, firstHero);
+    }
+  }
 
   function wireBodyFloatingMenu(){
     const navLinks = document.querySelector('.market-links');
@@ -144,7 +178,7 @@
   }
 
   const ads = [
-    {label:'Sponsor Sample', img:'assets/marketing/espresso-ad.svg', title:'Espresso With Cream', copy:'Sample sponsor creative for website banners and future VR building-wall placements.', href:'sponsor-event.html'},
+    {label:'VIBEZ Intro', img:'assets/banners/vibez-intro-banner.svg', title:'((( VIBEZ )))', copy:'First sponsor app module: short-form creator expression, early access, and future app download path.', href:'vibez.html'},
     {label:'SVR Store', img:'assets/marketing/store-feature.svg', title:'SVR Store', copy:'Digital items, apparel concepts, sponsor products, and collectible drops.', href:'store.html'},
     {label:'Billboard Package', img:'assets/marketing/billboard-wall.svg', title:'VR Billboard', copy:'Lobby wall, private room, storefront, and event-signage placement.', href:'billboards.html'},
     {label:'Android Ready', img:'assets/marketing/mobile-vr.svg', title:'Android + Quest Ready', copy:'Large touch targets, lightweight banners, and VR portal-friendly layout.', href:'membership.html'}
@@ -159,6 +193,7 @@
 
   function boot(){
     document.documentElement.classList.toggle('is-android', /Android/i.test(navigator.userAgent || ''));
+    wireVibezCampaign();
     wireBodyFloatingMenu();
     wireBannerSliders();
     wireAds();
