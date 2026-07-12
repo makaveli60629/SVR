@@ -1,8 +1,10 @@
-﻿{
-  "build": "PHASE-161-GEOMETRY-TABLE-REMOVED-FBX-FLOOR-LOCK",
+{
+  "build": "PHASE-321-ANDROID-LOBBY-PRODUCTION-AUDIT-LOCK",
   "scope": "game-only",
-  "geometryTableRemoved": true,
-  "fbxTableFloorAligned": true,
+  "androidProductionRoute": true,
+  "plannedLobbyPreserved": true,
+  "fullLobbyTouchBounds": true,
+  "previewModulesIsolated": true,
   "siteTouched": false,
-  "updatedAt": "2026-06-23T22:36:07.5682253-05:00"
+  "updatedAt": "2026-07-12T00:00:00-05:00"
 }
