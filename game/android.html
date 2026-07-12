@@ -23,13 +23,13 @@
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-321-ANDROID-LOBBY-PRODUCTION-AUDIT-LOCK">
+<body data-build="PHASE-322-FULL-LOBBY-VISUAL-FINISH-LOCK">
   <div id="app"></div>
   <div id="safeStage">
     <section class="safe-card">
       <span class="pill">ANDROID LOBBY</span>
       <h1>SVR POKER</h1>
-      <p id="safeStatus">Loading the planned lobby and touch controls…</p>
+      <p id="safeStatus">Loading the finished lobby and touch controls…</p>
       <button class="btn" id="startRuntimeBtn" type="button">Start Lobby</button>
     </section>
   </div>
@@ -38,14 +38,15 @@
   <div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      const BUILD = "PHASE-321-ANDROID-LOBBY-PRODUCTION-AUDIT-LOCK";
+      const BUILD = "PHASE-322-FULL-LOBBY-VISUAL-FINISH-LOCK";
       const modules = [
-        "./phase101_boot_load_screen_recovery.js?v=phase321",
-        "./phase101_partial_runtime_render_guard.js?v=phase321",
-        "./main.js?v=phase321",
-        "./phase145_android_black_screen_recovery_lock.js?v=phase321",
-        "./phase321_android_lobby_production_lock.js?v=phase321",
-        "./phase142_playable_poker_core_authority_lock.js?v=phase321"
+        "./phase101_boot_load_screen_recovery.js?v=phase322",
+        "./phase101_partial_runtime_render_guard.js?v=phase322",
+        "./main.js?v=phase322",
+        "./phase145_android_black_screen_recovery_lock.js?v=phase322",
+        "./modules/phase322_full_lobby_visual_finish_lock.js?v=phase322",
+        "./phase321_android_lobby_production_lock.js?v=phase322",
+        "./phase142_playable_poker_core_authority_lock.js?v=phase322"
       ];
       let started = false;
       const status = document.getElementById("safeStatus");
@@ -77,12 +78,12 @@
             note(`Loading lobby ${i+1} / ${modules.length}`);
             await addModule(modules[i]);
           }
-          note("Lobby ready");
-          setTimeout(()=>release("phase321-ready"),180);
+          note("Finished lobby ready");
+          setTimeout(()=>release("phase322-ready"),180);
         }catch(error){
           window.SVR_ANDROID_PRODUCTION_ROUTE.error = String(error?.message || error);
           note("Recovery mode active");
-          setTimeout(()=>release("phase321-recovery"),700);
+          setTimeout(()=>release("phase322-recovery"),700);
         }
       }
       document.getElementById("startRuntimeBtn")?.addEventListener("click", start);
