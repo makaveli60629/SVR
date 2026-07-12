@@ -8,7 +8,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="manifest" href="./manifest.json?v=phase321">
+  <link rel="manifest" href="./manifest.json?v=phase322">
   <style>
     html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}
     #app{position:fixed;inset:0;background:#02040b}
@@ -27,53 +27,53 @@
       const alreadyAndroid = /\/android\.html$/i.test(location.pathname);
       if(android && !quest && !preview && !alreadyAndroid && !params.has("standard") && !params.has("desktop")){
         window.SVR_ANDROID_REDIRECTING = true;
-        location.replace(`./android.html${location.search || "?v=phase321"}`);
+        location.replace(`./android.html${location.search || "?v=phase322"}`);
       }
     })();
   </script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-321-ANDROID-LOBBY-PRODUCTION-AUDIT-LOCK">
+<body data-build="PHASE-322-FULL-LOBBY-VISUAL-FINISH-LOCK">
   <div id="app"></div>
-  <div id="safeStage"><div class="card"><h1>SVR POKER VR</h1><p id="safeStatus">Loading the planned lobby…</p><button id="startRuntimeBtn">Start Game</button></div></div>
+  <div id="safeStage"><div class="card"><h1>SVR POKER VR</h1><p id="safeStatus">Loading the finished lobby…</p><button id="startRuntimeBtn">Start Game</button></div></div>
   <pre id="log"></pre><pre id="err"></pre>
   <script type="module">
     if (!window.SVR_ANDROID_REDIRECTING){
       const params = new URLSearchParams(location.search);
       const preview = window.self !== window.top || params.has("preview") || params.has("live") || params.get("cam") === "director";
       const modules = [
-        "./phase101_boot_load_screen_recovery.js?v=phase321",
-        "./phase101_partial_runtime_render_guard.js?v=phase321",
-        "./main.js?v=phase321",
-        "./phase156_table2_stool_texture_lock.js?v=phase321",
-        "./phase161_geometry_table_fbx_floor_lock.js?v=phase321",
-        "./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=phase321",
-        "./modules/phase195_vr_room_portal_system_lock.js?v=phase321",
-        "./modules/phase199_fbx_table_runtime_diagnostic_lock.js?v=phase321",
-        "./modules/phase200_clean_runtime_authority_lock.js?v=phase321",
-        "./modules/phase201_master_runtime_audit_panel_lock.js?v=phase321",
-        "./modules/phase202_fbx_asset_path_recovery_lock.js?v=phase321",
-        "./modules/phase203_table_asset_resolver_lock.js?v=phase321",
-        "./modules/phase211_no_blink_visual_stabilizer_lock.js?v=phase321",
-        "./modules/phase212_stable_poker_labels_chips_lock.js?v=phase321",
-        "./modules/phase213_active_module_audit_update_lock.js?v=phase321",
-        "./modules/phase214_static_cards_chips_lights_lock.js?v=phase321",
-        "./modules/phase215_table_geometry_controller_watch_panel_lock.js?v=phase321",
-        "./modules/phase216_planned_lobby_look_finish_lock.js?v=phase321",
-        "./modules/p222_spawn.js?v=phase321",
-        "./modules/p225_lock.js?v=phase321",
-        "./modules/p85_poker_truth_lock.js?v=phase321",
-        "./modules/p86_seated_lock.js?v=phase321",
-        "./modules/p87_scorpion_seat_authority.js?v=phase321",
-        "./phase145_android_black_screen_recovery_lock.js?v=phase321",
-        "./phase142_playable_poker_core_authority_lock.js?v=phase321"
+        "./phase101_boot_load_screen_recovery.js?v=phase322",
+        "./phase101_partial_runtime_render_guard.js?v=phase322",
+        "./main.js?v=phase322",
+        "./phase156_table2_stool_texture_lock.js?v=phase322",
+        "./phase161_geometry_table_fbx_floor_lock.js?v=phase322",
+        "./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=phase322",
+        "./modules/phase195_vr_room_portal_system_lock.js?v=phase322",
+        "./modules/phase199_fbx_table_runtime_diagnostic_lock.js?v=phase322",
+        "./modules/phase200_clean_runtime_authority_lock.js?v=phase322",
+        "./modules/phase201_master_runtime_audit_panel_lock.js?v=phase322",
+        "./modules/phase202_fbx_asset_path_recovery_lock.js?v=phase322",
+        "./modules/phase203_table_asset_resolver_lock.js?v=phase322",
+        "./modules/phase211_no_blink_visual_stabilizer_lock.js?v=phase322",
+        "./modules/phase212_stable_poker_labels_chips_lock.js?v=phase322",
+        "./modules/phase213_active_module_audit_update_lock.js?v=phase322",
+        "./modules/phase214_static_cards_chips_lights_lock.js?v=phase322",
+        "./modules/phase215_table_geometry_controller_watch_panel_lock.js?v=phase322",
+        "./modules/phase322_full_lobby_visual_finish_lock.js?v=phase322",
+        "./modules/p222_spawn.js?v=phase322",
+        "./modules/p225_lock.js?v=phase322",
+        "./modules/p85_poker_truth_lock.js?v=phase322",
+        "./modules/p86_seated_lock.js?v=phase322",
+        "./modules/p87_scorpion_seat_authority.js?v=phase322",
+        "./phase145_android_black_screen_recovery_lock.js?v=phase322",
+        "./phase142_playable_poker_core_authority_lock.js?v=phase322"
       ];
       if (preview){
-        modules.push("./modules/phase94_android_lobby_cinematic_preview_lock.js?v=phase321");
-        modules.push("./modules/phase95_android_lobby_beauty_preview_upgrade.js?v=phase321");
+        modules.push("./modules/phase94_android_lobby_cinematic_preview_lock.js?v=phase322");
+        modules.push("./modules/phase95_android_lobby_beauty_preview_upgrade.js?v=phase322");
       }
       for (const src of modules) await import(src);
-      window.SVR_PHASE321_BOOT = { build:"PHASE-321-ANDROID-LOBBY-PRODUCTION-AUDIT-LOCK", active:true, preview, siteTouched:false, checkedAt:new Date().toISOString() };
+      window.SVR_PHASE322_BOOT = { build:"PHASE-322-FULL-LOBBY-VISUAL-FINISH-LOCK", active:true, preview, siteTouched:false, checkedAt:new Date().toISOString() };
       setTimeout(()=>{
         document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-xr-clean-view");
         document.getElementById("safeStage")?.remove();
