@@ -6,19 +6,19 @@ Auto deploy requested and triggered by repo push.
 ## Deploy target
 - Branch: `main`
 - Workflow: `.github/workflows/deploy.yml`
-- Scope: current game boot / Phase 323 table resting point alignment
+- Scope: Android game route / Phase 324 smart entry controls
 
 ## Reason
-Phase 323 was committed directly into the current `game/index.html` boot chain. It hides the older floating card/chip roots and rebuilds table cards, pot, and chip stacks at a calculated resting surface so they sit on the table instead of floating in the air. It also loads the visible-hand cleanup from the active Phase 322/323 boot path instead of relying on the older Phase 277 chain.
+Phase 324 adds Android-smart game entry and on-screen controls so the game can be played from an Android phone without a computer. Android users get an Enter Android Game button, left movement stick, right turn stick, and table action buttons. Quest/Oculus users remain on the VR path.
 
 ## Current handoff
 - `game/index.html`
-- `game/modules/phase323_table_resting_point_alignment_lock.js`
-- `game/phase281_visible_hands_sky_cleanup_lock.js`
+- `game/android.html`
+- `game/phase324_android_game_entry_controls_lock.js`
 
 ## Notes
 No public website files were edited by this marker.
 This is a deploy trigger / trace file only.
 
 ## Trigger
-2026-06-15 Phase 323 table resting point alignment deploy trigger.
+2026-06-15 Phase 324 Android game entry controls deploy trigger.
