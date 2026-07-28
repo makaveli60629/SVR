@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <title>SVR Poker — Android Lobby</title>
+  <title>SVR Poker — Android Game</title>
   <meta name="theme-color" content="#050508">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -23,14 +23,14 @@
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-322-FULL-LOBBY-VISUAL-FINISH-LOCK">
+<body data-build="PHASE-324-ANDROID-GAME-ENTRY-CONTROLS-LOCK">
   <div id="app"></div>
   <div id="safeStage">
     <section class="safe-card">
-      <span class="pill">ANDROID LOBBY</span>
+      <span class="pill">ANDROID GAME</span>
       <h1>SVR POKER</h1>
       <p id="safeStatus">Loading the finished lobby and touch controls…</p>
-      <button class="btn" id="startRuntimeBtn" type="button">Start Lobby</button>
+      <button class="btn" id="startRuntimeBtn" type="button">Enter Android Game</button>
     </section>
   </div>
   <div id="bootFallback"></div>
@@ -38,15 +38,17 @@
   <div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      const BUILD = "PHASE-322-FULL-LOBBY-VISUAL-FINISH-LOCK";
+      const BUILD = "PHASE-324-ANDROID-GAME-ENTRY-CONTROLS-LOCK";
       const modules = [
-        "./phase101_boot_load_screen_recovery.js?v=phase322",
-        "./phase101_partial_runtime_render_guard.js?v=phase322",
-        "./main.js?v=phase322",
-        "./phase145_android_black_screen_recovery_lock.js?v=phase322",
-        "./modules/phase322_full_lobby_visual_finish_lock.js?v=phase322",
-        "./phase321_android_lobby_production_lock.js?v=phase322",
-        "./phase142_playable_poker_core_authority_lock.js?v=phase322"
+        "./phase101_boot_load_screen_recovery.js?v=phase324",
+        "./phase101_partial_runtime_render_guard.js?v=phase324",
+        "./main.js?v=phase324",
+        "./phase145_android_black_screen_recovery_lock.js?v=phase324",
+        "./modules/phase322_full_lobby_visual_finish_lock.js?v=phase324",
+        "./modules/phase323_table_resting_point_alignment_lock.js?v=phase324",
+        "./phase321_android_lobby_production_lock.js?v=phase324",
+        "./phase324_android_game_entry_controls_lock.js?v=phase324",
+        "./phase142_playable_poker_core_authority_lock.js?v=phase324"
       ];
       let started = false;
       const status = document.getElementById("safeStatus");
@@ -54,7 +56,7 @@
       window.SVR_ANDROID_PRODUCTION_ROUTE = { build:BUILD, active:true, modules:[...modules], siteTouched:false, startedAt:new Date().toISOString() };
       function note(message){ if(status) status.textContent = message; window.SVR_ANDROID_PRODUCTION_ROUTE.lastMessage = message; }
       function release(reason){
-        document.body.classList.add("boot-released","runtime-visible","overlay-released");
+        document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-android-game-controls");
         document.getElementById("safeStage")?.remove();
         window.__SVR_GAME_READY__ = true;
         window.SVR_GAME_READY = true;
@@ -75,22 +77,24 @@
         started = true;
         try{
           for(let i=0;i<modules.length;i++){
-            note(`Loading lobby ${i+1} / ${modules.length}`);
+            note(`Loading Android game ${i+1} / ${modules.length}`);
             await addModule(modules[i]);
           }
-          note("Finished lobby ready");
-          setTimeout(()=>release("phase322-ready"),180);
+          note("Android game controls ready");
+          setTimeout(()=>release("phase324-ready"),180);
         }catch(error){
           window.SVR_ANDROID_PRODUCTION_ROUTE.error = String(error?.message || error);
           note("Recovery mode active");
-          setTimeout(()=>release("phase322-recovery"),700);
+          setTimeout(()=>release("phase324-recovery"),700);
         }
       }
       document.getElementById("startRuntimeBtn")?.addEventListener("click", start);
+      window.SVR_ENTER_ANDROID_GAME_FROM_BUTTON = start;
       window.addEventListener("error",()=>setTimeout(()=>release("window-error-release"),250));
       window.addEventListener("unhandledrejection",()=>setTimeout(()=>release("promise-error-release"),250));
-      setTimeout(start,80);
-      setTimeout(()=>release("absolute-release"),4500);
+      setTimeout(()=>{ if(!started) note("Tap Enter Android Game"); },320);
+      setTimeout(start,1400);
+      setTimeout(()=>release("absolute-release"),5200);
     })();
   </script>
 </body>
