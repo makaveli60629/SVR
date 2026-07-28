@@ -4,3 +4,4 @@ function install(){window.SVR_UPDATE_READY_MARKER=update;setInterval(update,4000
 setTimeout(install,900);
 import("./phase278.js?v=278chain").catch(()=>{});
 import("./phase279_overlay_cleanup_android_guard_lock.js?v=279chain").catch(()=>{});
+import("./phase280_oculus_controller_hand_proxy_lock.js?v=280chain").catch(()=>{});
