@@ -6,18 +6,18 @@ Auto deploy requested and triggered by repo push.
 ## Deploy target
 - Branch: `main`
 - Workflow: `.github/workflows/deploy.yml`
-- Scope: game runtime cleanup / Phase 279 overlay cleanup and Android guard
+- Scope: game runtime controller hand visibility / Phase 280
 
 ## Reason
-Phase 279 was committed to reduce duplicate overlays, hide duplicate scene markers, guard Android canvas black-screen behavior, and keep the current table interaction stack intact.
+Phase 280 was committed to show Oculus controller hand proxies when Quest controllers are active and real hand tracking is not active. This helps table interaction and object picking while the user is standing at the poker table with controllers.
 
 ## Current handoff
-- `docs/phase279_overlay_cleanup_android_guard_manifest.md`
-- `game/phase279_overlay_cleanup_android_guard_lock.js`
+- `game/phase280_oculus_controller_hand_proxy_lock.js`
+- `game/phase277_status_marker_lock.js` chains Phase 280 after the current loaded cleanup chain.
 
 ## Notes
 No public website files were edited by this marker.
 This is a deploy trigger / trace file only.
 
 ## Trigger
-2026-06-15 Phase 279 cleanup deploy trigger.
+2026-06-15 Phase 280 Oculus controller hand visibility deploy trigger.
