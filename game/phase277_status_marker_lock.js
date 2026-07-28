@@ -5,3 +5,4 @@ setTimeout(install,900);
 import("./phase278.js?v=278chain").catch(()=>{});
 import("./phase279_overlay_cleanup_android_guard_lock.js?v=279chain").catch(()=>{});
 import("./phase280_oculus_controller_hand_proxy_lock.js?v=280chain").catch(()=>{});
+import("./phase281_visible_hands_sky_cleanup_lock.js?v=281chain").catch(()=>{});
