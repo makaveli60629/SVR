@@ -1,3 +1,4 @@
+import * as THREE from "three";
 const BUILD="PHASE-324-ANDROID-GAME-ENTRY-CONTROLS-LOCK";
 const ua=navigator.userAgent||"";
 const isQuest=/Quest|Oculus|Meta Quest/i.test(ua);
