@@ -8,7 +8,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="manifest" href="./manifest.json?v=phase324">
+  <link rel="manifest" href="./manifest.json?v=phase328">
   <style>
     html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}
     #app{position:fixed;inset:0;background:#02040b}
@@ -27,13 +27,13 @@
       const alreadyAndroid = /\/android\.html$/i.test(location.pathname);
       if(android && !quest && !preview && !alreadyAndroid && !params.has("standard") && !params.has("desktop")){
         window.SVR_ANDROID_REDIRECTING = true;
-        location.replace(`./android.html${location.search || "?v=phase324"}`);
+        location.replace(`./android.html${location.search || "?channel=stable"}`);
       }
     })();
   </script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-324-ANDROID-GAME-ENTRY-CONTROLS-LOCK">
+<body data-build="PHASE-328-DIRECTOR-PREVIEW-TABLE-SHOWCASE-LOCK">
   <div id="app"></div>
   <div id="safeStage"><div class="card"><h1>SVR POKER VR</h1><p id="safeStatus">Loading the finished lobby…</p><button id="startRuntimeBtn">Start Game</button></div></div>
   <pre id="log"></pre><pre id="err"></pre>
@@ -42,41 +42,42 @@
       const params = new URLSearchParams(location.search);
       const preview = window.self !== window.top || params.has("preview") || params.has("live") || params.get("cam") === "director";
       const modules = [
-        "./phase101_boot_load_screen_recovery.js?v=phase324",
-        "./phase101_partial_runtime_render_guard.js?v=phase324",
-        "./main.js?v=phase324",
-        "./phase156_table2_stool_texture_lock.js?v=phase324",
-        "./phase161_geometry_table_fbx_floor_lock.js?v=phase324",
-        "./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=phase324",
-        "./modules/phase195_vr_room_portal_system_lock.js?v=phase324",
-        "./modules/phase199_fbx_table_runtime_diagnostic_lock.js?v=phase324",
-        "./modules/phase200_clean_runtime_authority_lock.js?v=phase324",
-        "./modules/phase201_master_runtime_audit_panel_lock.js?v=phase324",
-        "./modules/phase202_fbx_asset_path_recovery_lock.js?v=phase324",
-        "./modules/phase203_table_asset_resolver_lock.js?v=phase324",
-        "./modules/phase211_no_blink_visual_stabilizer_lock.js?v=phase324",
-        "./modules/phase212_stable_poker_labels_chips_lock.js?v=phase324",
-        "./modules/phase213_active_module_audit_update_lock.js?v=phase324",
-        "./modules/phase214_static_cards_chips_lights_lock.js?v=phase324",
-        "./modules/phase215_table_geometry_controller_watch_panel_lock.js?v=phase324",
-        "./modules/phase322_full_lobby_visual_finish_lock.js?v=phase324",
-        "./modules/p222_spawn.js?v=phase324",
-        "./modules/p225_lock.js?v=phase324",
-        "./modules/p85_poker_truth_lock.js?v=phase324",
-        "./modules/p86_seated_lock.js?v=phase324",
-        "./modules/p87_scorpion_seat_authority.js?v=phase324",
-        "./phase145_android_black_screen_recovery_lock.js?v=phase324",
-        "./phase142_playable_poker_core_authority_lock.js?v=phase324",
-        "./phase281_visible_hands_sky_cleanup_lock.js?v=phase324",
-        "./modules/phase323_table_resting_point_alignment_lock.js?v=phase324",
-        "./phase324_android_game_entry_controls_lock.js?v=phase324"
+        "./phase101_boot_load_screen_recovery.js?v=phase328",
+        "./phase101_partial_runtime_render_guard.js?v=phase328",
+        "./main.js?v=phase328",
+        "./phase156_table2_stool_texture_lock.js?v=phase328",
+        "./phase161_geometry_table_fbx_floor_lock.js?v=phase328",
+        "./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=phase328",
+        "./modules/phase195_vr_room_portal_system_lock.js?v=phase328",
+        "./modules/phase199_fbx_table_runtime_diagnostic_lock.js?v=phase328",
+        "./modules/phase200_clean_runtime_authority_lock.js?v=phase328",
+        "./modules/phase201_master_runtime_audit_panel_lock.js?v=phase328",
+        "./modules/phase202_fbx_asset_path_recovery_lock.js?v=phase328",
+        "./modules/phase203_table_asset_resolver_lock.js?v=phase328",
+        "./modules/phase211_no_blink_visual_stabilizer_lock.js?v=phase328",
+        "./modules/phase212_stable_poker_labels_chips_lock.js?v=phase328",
+        "./modules/phase213_active_module_audit_update_lock.js?v=phase328",
+        "./modules/phase214_static_cards_chips_lights_lock.js?v=phase328",
+        "./modules/phase215_table_geometry_controller_watch_panel_lock.js?v=phase328",
+        "./modules/phase322_full_lobby_visual_finish_lock.js?v=phase328",
+        "./modules/p222_spawn.js?v=phase328",
+        "./modules/p225_lock.js?v=phase328",
+        "./modules/p85_poker_truth_lock.js?v=phase328",
+        "./modules/p86_seated_lock.js?v=phase328",
+        "./modules/p87_scorpion_seat_authority.js?v=phase328",
+        "./phase145_android_black_screen_recovery_lock.js?v=phase328",
+        "./phase142_playable_poker_core_authority_lock.js?v=phase328",
+        "./phase281_visible_hands_sky_cleanup_lock.js?v=phase328",
+        "./modules/phase323_table_resting_point_alignment_lock.js?v=phase328",
+        "./phase324_android_game_entry_controls_lock.js?v=phase328"
       ];
       if (preview){
-        modules.push("./modules/phase94_android_lobby_cinematic_preview_lock.js?v=phase324");
-        modules.push("./modules/phase95_android_lobby_beauty_preview_upgrade.js?v=phase324");
+        modules.push("./modules/phase94_android_lobby_cinematic_preview_lock.js?v=phase328");
+        modules.push("./modules/phase95_android_lobby_beauty_preview_upgrade.js?v=phase328");
+        modules.push("./modules/phase328_director_preview_table_showcase_lock.js?v=phase328");
       }
       for (const src of modules) await import(src);
-      window.SVR_PHASE324_BOOT = { build:"PHASE-324-ANDROID-GAME-ENTRY-CONTROLS-LOCK", active:true, preview, siteTouched:false, checkedAt:new Date().toISOString() };
+      window.SVR_PHASE328_BOOT = { build:"PHASE-328-DIRECTOR-PREVIEW-TABLE-SHOWCASE-LOCK", active:true, preview, siteTouched:false, checkedAt:new Date().toISOString() };
       setTimeout(()=>{
         document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-xr-clean-view");
         document.getElementById("safeStage")?.remove();
