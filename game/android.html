@@ -23,11 +23,11 @@
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-329-ANDROID-TABLE-PLAYTEST-UX-LOCK">
+<body data-build="PHASE-330-ANDROID-UX-CLEANUP-AND-MASTER-HANDOFF-LOCK">
   <div id="app"></div>
   <div id="safeStage">
     <section class="safe-card">
-      <span class="pill">ANDROID TABLE UX</span>
+      <span class="pill">ANDROID UX CLEANUP</span>
       <h1>SVR POKER</h1>
       <p id="safeStatus">Loading stable Android table play mode…</p>
       <button class="btn" id="startRuntimeBtn" type="button">Enter Android Game</button>
@@ -38,7 +38,7 @@
   <div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      const BUILD = "PHASE-329-ANDROID-TABLE-PLAYTEST-UX-LOCK";
+      const BUILD = "PHASE-330-ANDROID-UX-CLEANUP-AND-MASTER-HANDOFF-LOCK";
       const params = new URLSearchParams(location.search);
       if(!params.has("channel")) params.set("channel","stable");
       const modules = [
@@ -60,18 +60,27 @@
         "./phase325_android_controls_table_unifier_lock.js?v=android-rc2",
         "./phase326_android_playable_polish_lock.js?v=android-rc2",
         "./phase327_android_apk_release_candidate_lock.js?v=android-rc2",
-        "./modules/phase328_director_preview_table_showcase_lock.js?v=android-rc2",
-        "./phase329_android_table_playtest_ux_lock.js?v=android-rc2",
-        "./phase142_playable_poker_core_authority_lock.js?v=android-rc2"
+        "./phase329_android_table_playtest_ux_lock.js?v=phase330",
+        "./phase142_playable_poker_core_authority_lock.js?v=android-rc2",
+        "./modules/phase330_android_ux_cleanup_master_handoff_lock.js?v=phase330"
       ];
       let started = false;
       const status = document.getElementById("safeStatus");
       window.SVR_SUPPRESS_PHASE_BADGES = true;
       window.SVR_ANDROID_RELEASE_CHANNEL = "stable";
-      window.SVR_ANDROID_PRODUCTION_ROUTE = { build:BUILD, channel:"stable", apkVersionName:"0.1.0-rc1", apkVersionCode:1, active:true, modules:[...modules], siteTouched:false, startedAt:new Date().toISOString() };
+      window.SVR_ANDROID_PRODUCTION_ROUTE = {
+        build: BUILD,
+        channel: "stable",
+        apkVersionName: "0.1.0-rc1",
+        apkVersionCode: 1,
+        active: true,
+        modules: [...modules],
+        siteTouched: false,
+        startedAt: new Date().toISOString()
+      };
       function note(message){ if(status) status.textContent = message; window.SVR_ANDROID_PRODUCTION_ROUTE.lastMessage = message; }
       function release(reason){
-        document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-android-game-controls","svr-phase326-android","svr-phase327-android-release","svr-phase329-android");
+        document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-android-game-controls","svr-phase326-android","svr-phase327-android-release","svr-phase329-android","svr-phase330-android");
         document.getElementById("safeStage")?.remove();
         window.__SVR_GAME_READY__ = true;
         window.SVR_GAME_READY = true;
@@ -95,12 +104,12 @@
             note(`Loading Android UX ${i+1} / ${modules.length}`);
             await addModule(modules[i]);
           }
-          note("Android table UX ready");
-          setTimeout(()=>release("phase329-ready"),180);
+          note("Android UX cleanup ready");
+          setTimeout(()=>release("phase330-ready"),180);
         }catch(error){
           window.SVR_ANDROID_PRODUCTION_ROUTE.error = String(error?.message || error);
           note("Recovery mode active");
-          setTimeout(()=>release("phase329-recovery"),700);
+          setTimeout(()=>release("phase330-recovery"),700);
         }
       }
       document.getElementById("startRuntimeBtn")?.addEventListener("click", start);
