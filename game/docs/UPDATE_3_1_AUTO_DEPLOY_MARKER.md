@@ -6,20 +6,21 @@ Auto deploy requested and triggered by repo push.
 ## Deploy target
 - Branch: `main`
 - Workflow: `.github/workflows/deploy.yml`
-- Scope: Android game route / Phase 326 playable polish
+- Scope: Android release candidate / Phase 327 APK update policy lock
 
 ## Reason
-Phase 326 makes Android the temporary primary play path. It removes duplicate Android control overlays, keeps one active control set, fixes left/right movement and look direction, adds smoother lobby lighting, keeps the table visible, adds sit/lobby/center positioning, shows player-facing card display, adds a turn banner, highlights playable buttons, and adds a raise amount slider.
+Phase 327 locks the Android game into a stable release-candidate channel so the app can point at one stable Android game route without prompting testers to update after every phase. APK updates are held until a stable Android playtest batch is approved and the APK versionCode/package/signing needs to change.
 
 ## Current handoff
 - `game/android.html`
-- `game/phase326_android_playable_polish_lock.js`
-- `game/phase325_android_controls_table_unifier_lock.js`
-- `game/modules/phase323_table_resting_point_alignment_lock.js`
+- `game/phase327_android_apk_release_candidate_lock.js`
+- `game/android-release.json`
+- `game/manifest.json`
+- `android/index.html`
+- `site/downloads/index.html`
 
 ## Notes
-No public website files were edited by this marker.
-This is a deploy trigger / trace file only.
+This phase updates the website Android/download pages and web-game Android route. It does not generate a signed native APK binary because no Android native source/signing setup was found in the repo search.
 
 ## Trigger
-2026-07-30 Phase 326 Android playable polish deploy trigger.
+2026-07-30 Phase 327 Android APK release candidate deploy trigger.
