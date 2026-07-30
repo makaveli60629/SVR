@@ -1,0 +1,17 @@
+{
+  "name": "SVR Poker Android",
+  "channel": "stable",
+  "status": "release-candidate",
+  "apkVersionName": "0.1.0-rc1",
+  "apkVersionCode": 1,
+  "webEntry": "/game/android.html?channel=stable",
+  "forceUpdate": false,
+  "showUpdatePrompt": false,
+  "nextApkDrop": "Only after the Android web game passes a stable playtest batch.",
+  "currentGameBuild": "PHASE-327-ANDROID-APK-RELEASE-CANDIDATE-LOCK",
+  "notes": [
+    "Do not force testers to update the APK every phase.",
+    "Use the stable Android web route for ongoing game logic updates.",
+    "Build a new native APK only when native app code, package, permissions, signing, icon, or release channel changes."
+  ]
+}
