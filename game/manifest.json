@@ -1,10 +1,16 @@
 {
   "name": "ScarlettVR Poker",
   "short_name": "SVR Poker",
-  "start_url": "./index.html",
+  "start_url": "./android.html?channel=stable",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "landscape-primary",
   "background_color": "#050508",
   "theme_color": "#050508",
-  "build": "PHASE-88-LOCOMOTION-STORE-LOBBY-READY-LOCK",
-  "phase": 88
+  "build": "PHASE-327-ANDROID-APK-RELEASE-CANDIDATE-LOCK",
+  "phase": 327,
+  "android_channel": "stable",
+  "apk_version_name": "0.1.0-rc1",
+  "apk_version_code": 1,
+  "force_update": false
 }
