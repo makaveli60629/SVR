@@ -9,11 +9,12 @@
   "showUpdatePrompt": false,
   "previewEntry": "/game/index.html?preview=1&cam=director&autocam=1&embed=1&v=phase328-director",
   "nextApkDrop": "Only after the Android web game passes a stable playtest batch.",
-  "currentGameBuild": "PHASE-328-DIRECTOR-PREVIEW-TABLE-SHOWCASE-LOCK",
+  "currentGameBuild": "PHASE-329-ANDROID-TABLE-PLAYTEST-UX-LOCK",
   "notes": [
     "Do not force testers to update the APK every phase.",
     "Use the stable Android web route for ongoing game logic updates.",
-    "Director preview is cleaned through the preview route only and does not change normal gameplay routing.",
+    "Phase 329 improves Android table controls, seated state, card tray readability, action feedback, and one-control-set guarding.",
+    "Director preview remains separate from live Android play routing.",
     "Build a new native APK only when native app code, package, permissions, signing, icon, WebView shell, or release channel changes."
   ]
 }
