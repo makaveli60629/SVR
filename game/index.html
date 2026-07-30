@@ -8,7 +8,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="manifest" href="./manifest.json?v=phase328">
+  <link rel="manifest" href="./manifest.json?v=phase330">
   <style>
     html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}
     #app{position:fixed;inset:0;background:#02040b}
@@ -33,7 +33,7 @@
   </script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-328-DIRECTOR-PREVIEW-TABLE-SHOWCASE-LOCK">
+<body data-build="PHASE-330-ANDROID-UX-CLEANUP-AND-MASTER-HANDOFF-LOCK">
   <div id="app"></div>
   <div id="safeStage"><div class="card"><h1>SVR POKER VR</h1><p id="safeStatus">Loading the finished lobby…</p><button id="startRuntimeBtn">Start Game</button></div></div>
   <pre id="log"></pre><pre id="err"></pre>
@@ -74,10 +74,17 @@
       if (preview){
         modules.push("./modules/phase94_android_lobby_cinematic_preview_lock.js?v=phase328");
         modules.push("./modules/phase95_android_lobby_beauty_preview_upgrade.js?v=phase328");
-        modules.push("./modules/phase328_director_preview_table_showcase_lock.js?v=phase328");
+        modules.push("./modules/phase328_director_preview_table_showcase_lock.js?v=phase330");
+        modules.push("./modules/phase330_android_ux_cleanup_master_handoff_lock.js?v=phase330");
       }
       for (const src of modules) await import(src);
-      window.SVR_PHASE328_BOOT = { build:"PHASE-328-DIRECTOR-PREVIEW-TABLE-SHOWCASE-LOCK", active:true, preview, siteTouched:false, checkedAt:new Date().toISOString() };
+      window.SVR_PHASE330_BOOT = {
+        build:"PHASE-330-ANDROID-UX-CLEANUP-AND-MASTER-HANDOFF-LOCK",
+        active:true,
+        preview,
+        siteTouched:false,
+        checkedAt:new Date().toISOString()
+      };
       setTimeout(()=>{
         document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-xr-clean-view");
         document.getElementById("safeStage")?.remove();
