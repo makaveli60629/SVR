@@ -23,13 +23,13 @@
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-328-DIRECTOR-PREVIEW-TABLE-SHOWCASE-LOCK">
+<body data-build="PHASE-329-ANDROID-TABLE-PLAYTEST-UX-LOCK">
   <div id="app"></div>
   <div id="safeStage">
     <section class="safe-card">
-      <span class="pill">ANDROID RELEASE CANDIDATE</span>
+      <span class="pill">ANDROID TABLE UX</span>
       <h1>SVR POKER</h1>
-      <p id="safeStatus">Loading stable Android play mode…</p>
+      <p id="safeStatus">Loading stable Android table play mode…</p>
       <button class="btn" id="startRuntimeBtn" type="button">Enter Android Game</button>
     </section>
   </div>
@@ -38,30 +38,31 @@
   <div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      const BUILD = "PHASE-328-DIRECTOR-PREVIEW-TABLE-SHOWCASE-LOCK";
+      const BUILD = "PHASE-329-ANDROID-TABLE-PLAYTEST-UX-LOCK";
       const params = new URLSearchParams(location.search);
       if(!params.has("channel")) params.set("channel","stable");
       const modules = [
-        "./phase101_boot_load_screen_recovery.js?v=android-rc1",
-        "./phase101_partial_runtime_render_guard.js?v=android-rc1",
-        "./main.js?v=android-rc1",
-        "./phase156_table2_stool_texture_lock.js?v=android-rc1",
-        "./phase161_geometry_table_fbx_floor_lock.js?v=android-rc1",
-        "./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=android-rc1",
-        "./modules/phase199_fbx_table_runtime_diagnostic_lock.js?v=android-rc1",
-        "./modules/phase200_clean_runtime_authority_lock.js?v=android-rc1",
-        "./modules/phase202_fbx_asset_path_recovery_lock.js?v=android-rc1",
-        "./modules/phase203_table_asset_resolver_lock.js?v=android-rc1",
-        "./phase145_android_black_screen_recovery_lock.js?v=android-rc1",
-        "./modules/phase322_full_lobby_visual_finish_lock.js?v=android-rc1",
-        "./modules/phase323_table_resting_point_alignment_lock.js?v=android-rc1",
-        "./phase321_android_lobby_production_lock.js?v=android-rc1",
-        "./phase324_android_game_entry_controls_lock.js?v=android-rc1",
-        "./phase325_android_controls_table_unifier_lock.js?v=android-rc1",
-        "./phase326_android_playable_polish_lock.js?v=android-rc1",
-        "./phase327_android_apk_release_candidate_lock.js?v=android-rc1",
-        "./modules/phase328_director_preview_table_showcase_lock.js?v=android-rc1",
-        "./phase142_playable_poker_core_authority_lock.js?v=android-rc1"
+        "./phase101_boot_load_screen_recovery.js?v=android-rc2",
+        "./phase101_partial_runtime_render_guard.js?v=android-rc2",
+        "./main.js?v=android-rc2",
+        "./phase156_table2_stool_texture_lock.js?v=android-rc2",
+        "./phase161_geometry_table_fbx_floor_lock.js?v=android-rc2",
+        "./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=android-rc2",
+        "./modules/phase199_fbx_table_runtime_diagnostic_lock.js?v=android-rc2",
+        "./modules/phase200_clean_runtime_authority_lock.js?v=android-rc2",
+        "./modules/phase202_fbx_asset_path_recovery_lock.js?v=android-rc2",
+        "./modules/phase203_table_asset_resolver_lock.js?v=android-rc2",
+        "./phase145_android_black_screen_recovery_lock.js?v=android-rc2",
+        "./modules/phase322_full_lobby_visual_finish_lock.js?v=android-rc2",
+        "./modules/phase323_table_resting_point_alignment_lock.js?v=android-rc2",
+        "./phase321_android_lobby_production_lock.js?v=android-rc2",
+        "./phase324_android_game_entry_controls_lock.js?v=android-rc2",
+        "./phase325_android_controls_table_unifier_lock.js?v=android-rc2",
+        "./phase326_android_playable_polish_lock.js?v=android-rc2",
+        "./phase327_android_apk_release_candidate_lock.js?v=android-rc2",
+        "./modules/phase328_director_preview_table_showcase_lock.js?v=android-rc2",
+        "./phase329_android_table_playtest_ux_lock.js?v=android-rc2",
+        "./phase142_playable_poker_core_authority_lock.js?v=android-rc2"
       ];
       let started = false;
       const status = document.getElementById("safeStatus");
@@ -70,7 +71,7 @@
       window.SVR_ANDROID_PRODUCTION_ROUTE = { build:BUILD, channel:"stable", apkVersionName:"0.1.0-rc1", apkVersionCode:1, active:true, modules:[...modules], siteTouched:false, startedAt:new Date().toISOString() };
       function note(message){ if(status) status.textContent = message; window.SVR_ANDROID_PRODUCTION_ROUTE.lastMessage = message; }
       function release(reason){
-        document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-android-game-controls","svr-phase326-android","svr-phase327-android-release");
+        document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-android-game-controls","svr-phase326-android","svr-phase327-android-release","svr-phase329-android");
         document.getElementById("safeStage")?.remove();
         window.__SVR_GAME_READY__ = true;
         window.SVR_GAME_READY = true;
@@ -91,15 +92,15 @@
         started = true;
         try{
           for(let i=0;i<modules.length;i++){
-            note(`Loading Android RC1 ${i+1} / ${modules.length}`);
+            note(`Loading Android UX ${i+1} / ${modules.length}`);
             await addModule(modules[i]);
           }
-          note("Android RC1 ready");
-          setTimeout(()=>release("phase328-ready"),180);
+          note("Android table UX ready");
+          setTimeout(()=>release("phase329-ready"),180);
         }catch(error){
           window.SVR_ANDROID_PRODUCTION_ROUTE.error = String(error?.message || error);
           note("Recovery mode active");
-          setTimeout(()=>release("phase328-recovery"),700);
+          setTimeout(()=>release("phase329-recovery"),700);
         }
       }
       document.getElementById("startRuntimeBtn")?.addEventListener("click", start);
