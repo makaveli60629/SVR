@@ -7,14 +7,15 @@
   "webEntry": "/game/android.html?channel=stable",
   "forceUpdate": false,
   "showUpdatePrompt": false,
-  "previewEntry": "/game/index.html?preview=1&cam=director&autocam=1&embed=1&v=phase330-director",
+  "previewEntry": "/game/index.html?preview=1&cam=director&autocam=1&embed=1&v=phase332-director",
   "nextApkDrop": "Only after the Android web game passes a stable playtest batch.",
-  "currentGameBuild": "PHASE-330-ANDROID-UX-CLEANUP-AND-MASTER-HANDOFF-LOCK",
+  "currentGameBuild": "PHASE-332-PRO-TABLE-CHIP-PHYSICS-PASS-LINE-LOCK",
   "notes": [
     "Do not force testers to update the APK every phase.",
     "Use the stable Android web route for ongoing game logic and UX updates.",
-    "Phase 330 strengthens one-control-set enforcement, moves the card tray beside the action cluster, improves seated alignment, and adds Android/director QA helpers.",
-    "Director preview remains separate from live Android play routing and contains no Android controls or visible runtime overlays.",
+    "Phase 332 permanently locks the existing table asset, felt/leather/trim materials, smaller denomination chips, Quest chip gravity, pass-line betting, and table-surface alignment.",
+    "Quest/Oculus physics remains on the separate WebXR route; Android keeps its stable touch-first route.",
+    "Director preview remains separate and must contain no Android controls or visible runtime overlays.",
     "Build a new native APK only when native app code, package, permissions, signing, icon, WebView shell, or release channel changes."
   ]
 }
