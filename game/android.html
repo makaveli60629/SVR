@@ -23,7 +23,7 @@
   </style>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-327-ANDROID-APK-RELEASE-CANDIDATE-LOCK">
+<body data-build="PHASE-328-DIRECTOR-PREVIEW-TABLE-SHOWCASE-LOCK">
   <div id="app"></div>
   <div id="safeStage">
     <section class="safe-card">
@@ -38,7 +38,7 @@
   <div id="sceneNav"></div><pre id="log"></pre><pre id="err"></pre>
   <script>
     (function(){
-      const BUILD = "PHASE-327-ANDROID-APK-RELEASE-CANDIDATE-LOCK";
+      const BUILD = "PHASE-328-DIRECTOR-PREVIEW-TABLE-SHOWCASE-LOCK";
       const params = new URLSearchParams(location.search);
       if(!params.has("channel")) params.set("channel","stable");
       const modules = [
@@ -60,6 +60,7 @@
         "./phase325_android_controls_table_unifier_lock.js?v=android-rc1",
         "./phase326_android_playable_polish_lock.js?v=android-rc1",
         "./phase327_android_apk_release_candidate_lock.js?v=android-rc1",
+        "./modules/phase328_director_preview_table_showcase_lock.js?v=android-rc1",
         "./phase142_playable_poker_core_authority_lock.js?v=android-rc1"
       ];
       let started = false;
@@ -94,11 +95,11 @@
             await addModule(modules[i]);
           }
           note("Android RC1 ready");
-          setTimeout(()=>release("phase327-ready"),180);
+          setTimeout(()=>release("phase328-ready"),180);
         }catch(error){
           window.SVR_ANDROID_PRODUCTION_ROUTE.error = String(error?.message || error);
           note("Recovery mode active");
-          setTimeout(()=>release("phase327-recovery"),700);
+          setTimeout(()=>release("phase328-recovery"),700);
         }
       }
       document.getElementById("startRuntimeBtn")?.addEventListener("click", start);
