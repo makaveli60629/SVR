@@ -6,21 +6,20 @@ Auto deploy requested and triggered by repo push.
 ## Deploy target
 - Branch: `main`
 - Workflow: `.github/workflows/deploy.yml`
-- Scope: Android stable route and director preview / Phase 328
+- Scope: Android stable route / Phase 329 table playtest UX
 
 ## Reason
-Phase 328 keeps the Android stable release-candidate route active while improving the director preview route used by the website iframe. It adds a clean third-camera table showcase, removes preview overlays, adds a table-surface SVR logo, improves preview lighting, and preserves the no-forced-APK-update policy.
+Phase 329 improves the Android stable game route without forcing a native APK update. It adds stronger one-control-set guarding, seated-state persistence, table-facing card display refresh, action button highlighting, button feedback, amount control cleanup, Android performance guard, and QA helpers for Android table testing.
 
 ## Current handoff
 - `game/android.html`
-- `game/index.html`
-- `game/modules/phase328_director_preview_table_showcase_lock.js`
+- `game/phase329_android_table_playtest_ux_lock.js`
+- `game/phase326_android_playable_polish_lock.js`
 - `game/android-release.json`
-- `game/manifest.json`
-- `docs/phase328_android_preview_audit_manifest.md`
+- `docs/competition_footage_reference_manifest_2026_07_30.md`
 
 ## Notes
-This updates web-game routing and release manifests only. It does not generate a signed native APK binary because package/signing/native source confirmation is still required.
+This updates the web-game Android route only. It does not force a native APK update and does not redesign the public website.
 
 ## Trigger
-2026-07-30 Phase 328 Android stable and director preview deploy trigger.
+2026-07-30 Phase 329 Android table playtest UX deploy trigger.
