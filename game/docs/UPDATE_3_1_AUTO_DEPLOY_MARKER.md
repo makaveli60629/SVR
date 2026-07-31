@@ -1,41 +1,39 @@
-# Update 3.1 Auto Deploy Marker
+# Phase 336 Auto Deploy Marker
 
 ## Status
-Phase 335 is prepared for automatic deployment through a merge to `main`.
+Phase 336 is prepared on a dedicated branch. Merging its pull request into `main` triggers the configured Auto Deploy workflow.
 
 ## Deploy target
 - Branch trigger: `main`
 - Workflow: `.github/workflows/deploy.yml`
 - Workflow events: push to `main` and manual `workflow_dispatch`
-- Scope: Oculus gameplay stability plus existing clean director-preview QA
+- Scope: Quest/WebXR gameplay plus the existing stable Android and director routes
 
-## Phase
-`PHASE-335-OCULUS-ACCEPTANCE-GAMEPLAY-STABILITY-LOCK`
+## Build
+`PHASE-336-AUTHORITATIVE-POKER-RULES-POT-SETTLEMENT-LOCK`
 
-## Phase 335 payload
+## Phase 336 payload
+- `game/modules/p85_poker_truth_lock.js`
+- `game/modules/phase336_poker_evaluator.js`
+- `game/modules/phase336_authoritative_engine.js`
+- `game/modules/phase336_poker_visual_bridge.js`
+- `game/modules/phase336_authoritative_poker_rules_pot_settlement_lock.js`
 - `game/index.html`
-- `game/modules/phase335_oculus_acceptance_gameplay_stability_lock.js`
 - `game/manifest.json`
 - `game/android-release.json`
-- `game/docs/PHASE_335_OCULUS_ACCEPTANCE_GAMEPLAY_STABILITY_LOCK.md`
-- `docs/phase335_oculus_acceptance_gameplay_stability_lock.md`
-
-## Locked behavior
-- Phase 334 professional table, pass line, logo, chips, cards, Eric bots, gestures, and seated calibration remain active.
-- Old headset-blocking overlays remain suppressed.
-- Chips outside accepted table bounds are recovered.
-- Player cards remain visible and headset-facing.
-- Duplicate poker actions are debounced.
-- QA panel is hidden unless explicitly enabled.
+- `game/docs/PHASE_336_AUTHORITATIVE_POKER_RULES_POT_SETTLEMENT_LOCK.md`
+- `game/docs/UPDATE_3_1_AUTO_DEPLOY_MARKER.md`
+- `docs/phase336_authoritative_poker_rules_pot_settlement_lock.md`
 
 ## Locked release policy
 - APK version name: `0.1.0-rc1`
 - APK version code: `1`
 - Forced update: `false`
 - Update prompt: `false`
-- Stable Android web entry: `/game/android.html?channel=stable`
+- Stable Android entry: `/game/android.html?channel=stable`
 
 ## Protected scope
-- No public-site redesign.
-- No sponsor or partner changes.
-- No claim of completed networked multiplayer.
+- Public website untouched.
+- Sponsor and partner content untouched.
+- Existing uploaded table remains the sole table authority.
+- Phase 336 does not claim completed server-authoritative multiplayer.

@@ -8,7 +8,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="manifest" href="./manifest.json?v=phase335">
+  <link rel="manifest" href="./manifest.json?v=phase336">
   <style>
     html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}
     #app{position:fixed;inset:0;background:#02040b}
@@ -33,66 +33,71 @@
   </script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-335-OCULUS-ACCEPTANCE-GAMEPLAY-STABILITY-LOCK">
+<body data-build="PHASE-336-AUTHORITATIVE-POKER-RULES-POT-SETTLEMENT-LOCK">
   <div id="app"></div>
-  <div id="safeStage"><div class="card"><h1>SVR POKER VR</h1><p id="safeStatus">Loading Oculus acceptance and gameplay stability systems…</p><button id="startRuntimeBtn">Start Game</button></div></div>
+  <div id="safeStage"><div class="card"><h1>SVR POKER VR</h1><p id="safeStatus">Loading authoritative poker rules, exact chip accounting, and pot settlement…</p><button id="startRuntimeBtn">Start Game</button></div></div>
   <pre id="log"></pre><pre id="err"></pre>
   <script type="module">
     if (!window.SVR_ANDROID_REDIRECTING){
       const params = new URLSearchParams(location.search);
       const preview = window.self !== window.top || params.has("preview") || params.has("live") || params.get("cam") === "director";
       const modules = [
-        "./phase101_boot_load_screen_recovery.js?v=phase335",
-        "./phase101_partial_runtime_render_guard.js?v=phase335",
-        "./main.js?v=phase335",
-        "./phase156_table2_stool_texture_lock.js?v=phase335",
-        "./phase161_geometry_table_fbx_floor_lock.js?v=phase335",
-        "./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=phase335",
-        "./modules/phase195_vr_room_portal_system_lock.js?v=phase335",
-        "./modules/phase199_fbx_table_runtime_diagnostic_lock.js?v=phase335",
-        "./modules/phase200_clean_runtime_authority_lock.js?v=phase335",
-        "./modules/phase201_master_runtime_audit_panel_lock.js?v=phase335",
-        "./modules/phase202_fbx_asset_path_recovery_lock.js?v=phase335",
-        "./modules/phase203_table_asset_resolver_lock.js?v=phase335",
-        "./modules/phase211_no_blink_visual_stabilizer_lock.js?v=phase335",
-        "./modules/phase212_stable_poker_labels_chips_lock.js?v=phase335",
-        "./modules/phase213_active_module_audit_update_lock.js?v=phase335",
-        "./modules/phase214_static_cards_chips_lights_lock.js?v=phase335",
-        "./modules/phase215_table_geometry_controller_watch_panel_lock.js?v=phase335",
-        "./modules/phase322_full_lobby_visual_finish_lock.js?v=phase335",
-        "./modules/p222_spawn.js?v=phase335",
-        "./modules/p225_lock.js?v=phase335",
-        "./modules/p85_poker_truth_lock.js?v=phase335",
-        "./modules/p86_seated_lock.js?v=phase335",
-        "./modules/p87_scorpion_seat_authority.js?v=phase335",
-        "./phase145_android_black_screen_recovery_lock.js?v=phase335",
-        "./phase142_playable_poker_core_authority_lock.js?v=phase335",
-        "./phase281_visible_hands_sky_cleanup_lock.js?v=phase335",
-        "./modules/phase323_table_resting_point_alignment_lock.js?v=phase335",
-        "./modules/phase331_quest_meta_hands_table_interaction_lock.js?v=phase335",
-        "./modules/phase332_pro_table_chip_physics_pass_line_lock.js?v=phase335",
-        "./modules/phase333_quest_shader_gameplay_polish_lock.js?v=phase335",
-        "./modules/phase334_table_layout_gesture_poker_lock.js?v=phase335",
-        "./modules/phase335_oculus_acceptance_gameplay_stability_lock.js?v=phase335",
-        "./phase324_android_game_entry_controls_lock.js?v=phase335"
+        "./phase101_boot_load_screen_recovery.js?v=phase336",
+        "./phase101_partial_runtime_render_guard.js?v=phase336",
+        "./main.js?v=phase336",
+        "./phase156_table2_stool_texture_lock.js?v=phase336",
+        "./phase161_geometry_table_fbx_floor_lock.js?v=phase336",
+        "./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=phase336",
+        "./modules/phase195_vr_room_portal_system_lock.js?v=phase336",
+        "./modules/phase199_fbx_table_runtime_diagnostic_lock.js?v=phase336",
+        "./modules/phase200_clean_runtime_authority_lock.js?v=phase336",
+        "./modules/phase201_master_runtime_audit_panel_lock.js?v=phase336",
+        "./modules/phase202_fbx_asset_path_recovery_lock.js?v=phase336",
+        "./modules/phase203_table_asset_resolver_lock.js?v=phase336",
+        "./modules/phase211_no_blink_visual_stabilizer_lock.js?v=phase336",
+        "./modules/phase212_stable_poker_labels_chips_lock.js?v=phase336",
+        "./modules/phase213_active_module_audit_update_lock.js?v=phase336",
+        "./modules/phase214_static_cards_chips_lights_lock.js?v=phase336",
+        "./modules/phase215_table_geometry_controller_watch_panel_lock.js?v=phase336",
+        "./modules/phase322_full_lobby_visual_finish_lock.js?v=phase336",
+        "./modules/p222_spawn.js?v=phase336",
+        "./modules/p225_lock.js?v=phase336",
+        "./modules/p85_poker_truth_lock.js?v=phase336",
+        "./modules/phase336_authoritative_poker_rules_pot_settlement_lock.js?v=phase336",
+        "./modules/p86_seated_lock.js?v=phase336",
+        "./modules/p87_scorpion_seat_authority.js?v=phase336",
+        "./phase145_android_black_screen_recovery_lock.js?v=phase336",
+        "./phase142_playable_poker_core_authority_lock.js?v=phase336",
+        "./phase281_visible_hands_sky_cleanup_lock.js?v=phase336",
+        "./modules/phase323_table_resting_point_alignment_lock.js?v=phase336",
+        "./modules/phase331_quest_meta_hands_table_interaction_lock.js?v=phase336",
+        "./modules/phase332_pro_table_chip_physics_pass_line_lock.js?v=phase336",
+        "./modules/phase333_quest_shader_gameplay_polish_lock.js?v=phase336",
+        "./modules/phase334_table_layout_gesture_poker_lock.js?v=phase336",
+        "./modules/phase335_oculus_acceptance_gameplay_stability_lock.js?v=phase336",
+        "./phase324_android_game_entry_controls_lock.js?v=phase336"
       ];
       if (preview){
-        modules.push("./modules/phase94_android_lobby_cinematic_preview_lock.js?v=phase335");
-        modules.push("./modules/phase95_android_lobby_beauty_preview_upgrade.js?v=phase335");
-        modules.push("./modules/phase328_director_preview_table_showcase_lock.js?v=phase335");
-        modules.push("./modules/phase330_android_ux_cleanup_master_handoff_lock.js?v=phase335");
+        modules.push("./modules/phase94_android_lobby_cinematic_preview_lock.js?v=phase336");
+        modules.push("./modules/phase95_android_lobby_beauty_preview_upgrade.js?v=phase336");
+        modules.push("./modules/phase328_director_preview_table_showcase_lock.js?v=phase336");
+        modules.push("./modules/phase330_android_ux_cleanup_master_handoff_lock.js?v=phase336");
       }
       for (const src of modules) await import(src);
-      window.SVR_PHASE335_BOOT = {
-        build:"PHASE-335-OCULUS-ACCEPTANCE-GAMEPLAY-STABILITY-LOCK",
+      window.SVR_PHASE336_BOOT = {
+        build:"PHASE-336-AUTHORITATIVE-POKER-RULES-POT-SETTLEMENT-LOCK",
         active:true,
         preview,
         phase332ChipPhysicsPreserved:true,
         phase333ShadersAndControlsPreserved:true,
         phase334TableGestureLayoutPreserved:true,
-        oculusAcceptance:true,
-        fullHandStability:true,
-        clearSightlineGovernor:true,
+        authoritativePokerRules:true,
+        exactChipAccounting:true,
+        variableRaises:true,
+        sidePots:true,
+        splitPots:true,
+        burnCardAuthority:true,
+        persistentHandRecovery:true,
         seatedAutoCorrection:true,
         chipRecovery:true,
         cardVisibilityRepair:true,
@@ -103,7 +108,7 @@
         checkedAt:new Date().toISOString()
       };
       setTimeout(()=>{
-        document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-xr-clean-view","svr-phase335-oculus-stability");
+        document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-xr-clean-view","svr-phase336-authoritative-poker");
         document.getElementById("safeStage")?.remove();
         window.__SVR_GAME_READY__ = true;
         window.SVR_GAME_READY = true;
