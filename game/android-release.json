@@ -4,20 +4,20 @@
   "status": "release-candidate",
   "apkVersionName": "0.1.0-rc1",
   "apkVersionCode": 1,
-  "webEntry": "/game/android.html?channel=stable&v=phase339",
+  "webEntry": "/game/android.html?channel=stable",
   "forceUpdate": false,
   "showUpdatePrompt": false,
   "manualUpdateOnly": true,
-  "previewEntry": "/game/camera3.html?v=phase339",
+  "previewEntry": "/game/camera3.html?v=phase340",
   "nextApkDrop": "Only after the user explicitly requests the next APK update.",
-  "currentGameBuild": "PHASE-339-ANDROID-SINGLE-AUTHORITY-TABLE-CAMERA3-LOCK",
+  "currentGameBuild": "PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK",
   "notes": [
-    "Android now loads one controller authority instead of Phases 324, 325, 326, 329, and 330 together.",
-    "Phase 339 keeps one MOVE stick and one LOOK stick and continuously removes legacy duplicate roots.",
-    "Android now loads Phase 336 poker rules, Phase 337 pot settlement, and Phase 338 bankroll synchronization.",
-    "The uploaded table is the sole table authority and the SVR logo is centered from measured table geometry.",
-    "Camera 3 uses the dedicated lightweight table orbit route instead of the full production game.",
-    "App update prompts are disabled; updates are manual-only until the user requests the next APK update.",
-    "Quest, Android, desktop, and director routes remain separate platform adapters."
+    "Phase 340 replaces accumulated route boot lists with one deduplicated platform loader.",
+    "Android keeps one Phase 326 control authority governed by Phase 339 and Phase 340.",
+    "Quest, desktop, Android, and Camera 3 now load explicit platform manifests.",
+    "Phase 340 instruments event listeners and renderer animation-loop assignments and audits runtime ownership.",
+    "Phase 340 enforces one uploaded-table authority, one table-area logo authority, and hides known legacy presentation objects.",
+    "Phase 340 prewarms textures and shaders before releasing the loading screen.",
+    "APK update prompts remain disabled and updates remain manual-only."
   ]
 }
