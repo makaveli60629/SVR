@@ -1,5 +1,5 @@
 export const BUILD = 'PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK';
-export const VERSION = 'phase341';
+export const VERSION = 'phase342';
 
 const REGISTRY = [
   'modules/phase340_runtime_authority_registry.js'
@@ -33,7 +33,8 @@ const POKER_CORE = [
 const SETTLEMENT_PRESENTATION = [
   'modules/phase337_physical_pot_winner_settlement_lock.js',
   'modules/phase338_bankroll_chip_inventory_sync_lock.js',
-  'modules/phase341_canonical_table_geometry_card_motion_lock.js'
+  'modules/phase341_canonical_table_geometry_card_motion_lock.js',
+  'modules/phase342_adaptive_performance_asset_pipeline_lock.js'
 ];
 
 const DESKTOP_PRESENTATION = [
