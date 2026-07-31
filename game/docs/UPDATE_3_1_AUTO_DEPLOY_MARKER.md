@@ -1,36 +1,41 @@
 # Update 3.1 Auto Deploy Marker
 
 ## Status
-Phase 334 is prepared on a dedicated GitHub branch. Auto Deploy will trigger only after the Phase 334 pull request is merged into `main`.
+Phase 335 is prepared for automatic deployment through a merge to `main`.
 
 ## Deploy target
 - Branch trigger: `main`
 - Workflow: `.github/workflows/deploy.yml`
 - Workflow events: push to `main` and manual `workflow_dispatch`
-- Scope: Quest/Oculus poker-table layout, cards, chips, bots, seat calibration, and gesture gameplay
+- Scope: Oculus gameplay stability plus existing clean director-preview QA
 
 ## Phase
-`PHASE-334-TABLE-LAYOUT-GESTURE-POKER-LOCK`
+`PHASE-335-OCULUS-ACCEPTANCE-GAMEPLAY-STABILITY-LOCK`
 
-## Phase 334 payload
+## Phase 335 payload
 - `game/index.html`
-- `game/modules/phase334_table_layout_gesture_poker_lock.js`
+- `game/modules/phase335_oculus_acceptance_gameplay_stability_lock.js`
 - `game/manifest.json`
 - `game/android-release.json`
-- `game/docs/PHASE_334_TABLE_LAYOUT_GESTURE_POKER_LOCK.md`
-- `docs/phase334_table_layout_gesture_poker_lock.md`
+- `game/docs/PHASE_335_OCULUS_ACCEPTANCE_GAMEPLAY_STABILITY_LOCK.md`
+- `docs/phase335_oculus_acceptance_gameplay_stability_lock.md`
 
-## Preserved systems
-- Existing uploaded table authority
-- Phase 332 chip geometry, gravity, bounce, and physical betting
-- Phase 333 material/shader polish and action authority
-- Android stable route
-- APK `0.1.0-rc1`, code `1`
-- `forceUpdate: false`
-- `showUpdatePrompt: false`
+## Locked behavior
+- Phase 334 professional table, pass line, logo, chips, cards, Eric bots, gestures, and seated calibration remain active.
+- Old headset-blocking overlays remain suppressed.
+- Chips outside accepted table bounds are recovered.
+- Player cards remain visible and headset-facing.
+- Duplicate poker actions are debounced.
+- QA panel is hidden unless explicitly enabled.
+
+## Locked release policy
+- APK version name: `0.1.0-rc1`
+- APK version code: `1`
+- Forced update: `false`
+- Update prompt: `false`
+- Stable Android web entry: `/game/android.html?channel=stable`
 
 ## Protected scope
-- Public website untouched
-- Sponsor/partner content untouched
-- No native APK rebuild
-- No network multiplayer claim
+- No public-site redesign.
+- No sponsor or partner changes.
+- No claim of completed networked multiplayer.
