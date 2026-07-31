@@ -7,12 +7,13 @@
   "orientation": "portrait-primary",
   "background_color": "#050508",
   "theme_color": "#050508",
-  "build": "PHASE-338-BANKROLL-CHIP-INVENTORY-SYNC-LOCK",
-  "phase": 338,
+  "build": "PHASE-339-ANDROID-SINGLE-AUTHORITY-TABLE-CAMERA3-LOCK",
+  "phase": 339,
   "android_channel": "stable",
   "apk_version_name": "0.1.0-rc1",
   "apk_version_code": 1,
   "force_update": false,
   "show_update_prompt": false,
-  "next_apk_drop": "Only after an approved stable Android playtest batch."
+  "manual_update_only": true,
+  "next_apk_drop": "Only after the user explicitly requests the next APK update."
 }
