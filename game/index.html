@@ -8,7 +8,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="manifest" href="./manifest.json?v=phase337">
+  <link rel="manifest" href="./manifest.json?v=phase338">
   <style>
     html,body{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}
     #app{position:fixed;inset:0;background:#02040b}
@@ -33,60 +33,61 @@
   </script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-337-PHYSICAL-POT-WINNER-SETTLEMENT-LOCK">
+<body data-build="PHASE-338-BANKROLL-CHIP-INVENTORY-SYNC-LOCK">
   <div id="app"></div>
-  <div id="safeStage"><div class="card"><h1>SVR POKER VR</h1><p id="safeStatus">Loading physical main pots, side pots, blind markers, and winner settlement…</p><button id="startRuntimeBtn">Start Game</button></div></div>
+  <div id="safeStage"><div class="card"><h1>SVR POKER VR</h1><p id="safeStatus">Loading authoritative bankroll and physical chip-inventory synchronization…</p><button id="startRuntimeBtn">Start Game</button></div></div>
   <pre id="log"></pre><pre id="err"></pre>
   <script type="module">
     if (!window.SVR_ANDROID_REDIRECTING){
       const params = new URLSearchParams(location.search);
       const preview = window.self !== window.top || params.has("preview") || params.has("live") || params.get("cam") === "director";
       const modules = [
-        "./phase101_boot_load_screen_recovery.js?v=phase337",
-        "./phase101_partial_runtime_render_guard.js?v=phase337",
-        "./main.js?v=phase337",
-        "./phase156_table2_stool_texture_lock.js?v=phase337",
-        "./phase161_geometry_table_fbx_floor_lock.js?v=phase337",
-        "./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=phase337",
-        "./modules/phase195_vr_room_portal_system_lock.js?v=phase337",
-        "./modules/phase199_fbx_table_runtime_diagnostic_lock.js?v=phase337",
-        "./modules/phase200_clean_runtime_authority_lock.js?v=phase337",
-        "./modules/phase201_master_runtime_audit_panel_lock.js?v=phase337",
-        "./modules/phase202_fbx_asset_path_recovery_lock.js?v=phase337",
-        "./modules/phase203_table_asset_resolver_lock.js?v=phase337",
-        "./modules/phase211_no_blink_visual_stabilizer_lock.js?v=phase337",
-        "./modules/phase212_stable_poker_labels_chips_lock.js?v=phase337",
-        "./modules/phase213_active_module_audit_update_lock.js?v=phase337",
-        "./modules/phase214_static_cards_chips_lights_lock.js?v=phase337",
-        "./modules/phase215_table_geometry_controller_watch_panel_lock.js?v=phase337",
-        "./modules/phase322_full_lobby_visual_finish_lock.js?v=phase337",
-        "./modules/p222_spawn.js?v=phase337",
-        "./modules/p225_lock.js?v=phase337",
-        "./modules/p85_poker_truth_lock.js?v=phase337",
-        "./modules/phase336_authoritative_poker_rules_pot_settlement_lock.js?v=phase337",
-        "./modules/p86_seated_lock.js?v=phase337",
-        "./modules/p87_scorpion_seat_authority.js?v=phase337",
-        "./phase145_android_black_screen_recovery_lock.js?v=phase337",
-        "./phase142_playable_poker_core_authority_lock.js?v=phase337",
-        "./phase281_visible_hands_sky_cleanup_lock.js?v=phase337",
-        "./modules/phase323_table_resting_point_alignment_lock.js?v=phase337",
-        "./modules/phase331_quest_meta_hands_table_interaction_lock.js?v=phase337",
-        "./modules/phase332_pro_table_chip_physics_pass_line_lock.js?v=phase337",
-        "./modules/phase333_quest_shader_gameplay_polish_lock.js?v=phase337",
-        "./modules/phase334_table_layout_gesture_poker_lock.js?v=phase337",
-        "./modules/phase335_oculus_acceptance_gameplay_stability_lock.js?v=phase337",
-        "./modules/phase337_physical_pot_winner_settlement_lock.js?v=phase337",
-        "./phase324_android_game_entry_controls_lock.js?v=phase337"
+        "./phase101_boot_load_screen_recovery.js?v=phase338",
+        "./phase101_partial_runtime_render_guard.js?v=phase338",
+        "./main.js?v=phase338",
+        "./phase156_table2_stool_texture_lock.js?v=phase338",
+        "./phase161_geometry_table_fbx_floor_lock.js?v=phase338",
+        "./phase164_fbx_table_final_alignment_seat_anchor_lock.js?v=phase338",
+        "./modules/phase195_vr_room_portal_system_lock.js?v=phase338",
+        "./modules/phase199_fbx_table_runtime_diagnostic_lock.js?v=phase338",
+        "./modules/phase200_clean_runtime_authority_lock.js?v=phase338",
+        "./modules/phase201_master_runtime_audit_panel_lock.js?v=phase338",
+        "./modules/phase202_fbx_asset_path_recovery_lock.js?v=phase338",
+        "./modules/phase203_table_asset_resolver_lock.js?v=phase338",
+        "./modules/phase211_no_blink_visual_stabilizer_lock.js?v=phase338",
+        "./modules/phase212_stable_poker_labels_chips_lock.js?v=phase338",
+        "./modules/phase213_active_module_audit_update_lock.js?v=phase338",
+        "./modules/phase214_static_cards_chips_lights_lock.js?v=phase338",
+        "./modules/phase215_table_geometry_controller_watch_panel_lock.js?v=phase338",
+        "./modules/phase322_full_lobby_visual_finish_lock.js?v=phase338",
+        "./modules/p222_spawn.js?v=phase338",
+        "./modules/p225_lock.js?v=phase338",
+        "./modules/p85_poker_truth_lock.js?v=phase338",
+        "./modules/phase336_authoritative_poker_rules_pot_settlement_lock.js?v=phase338",
+        "./modules/p86_seated_lock.js?v=phase338",
+        "./modules/p87_scorpion_seat_authority.js?v=phase338",
+        "./phase145_android_black_screen_recovery_lock.js?v=phase338",
+        "./phase142_playable_poker_core_authority_lock.js?v=phase338",
+        "./phase281_visible_hands_sky_cleanup_lock.js?v=phase338",
+        "./modules/phase323_table_resting_point_alignment_lock.js?v=phase338",
+        "./modules/phase331_quest_meta_hands_table_interaction_lock.js?v=phase338",
+        "./modules/phase332_pro_table_chip_physics_pass_line_lock.js?v=phase338",
+        "./modules/phase333_quest_shader_gameplay_polish_lock.js?v=phase338",
+        "./modules/phase334_table_layout_gesture_poker_lock.js?v=phase338",
+        "./modules/phase335_oculus_acceptance_gameplay_stability_lock.js?v=phase338",
+        "./modules/phase337_physical_pot_winner_settlement_lock.js?v=phase338",
+        "./modules/phase338_bankroll_chip_inventory_sync_lock.js?v=phase338",
+        "./phase324_android_game_entry_controls_lock.js?v=phase338"
       ];
       if (preview){
-        modules.push("./modules/phase94_android_lobby_cinematic_preview_lock.js?v=phase337");
-        modules.push("./modules/phase95_android_lobby_beauty_preview_upgrade.js?v=phase337");
-        modules.push("./modules/phase328_director_preview_table_showcase_lock.js?v=phase337");
-        modules.push("./modules/phase330_android_ux_cleanup_master_handoff_lock.js?v=phase337");
+        modules.push("./modules/phase94_android_lobby_cinematic_preview_lock.js?v=phase338");
+        modules.push("./modules/phase95_android_lobby_beauty_preview_upgrade.js?v=phase338");
+        modules.push("./modules/phase328_director_preview_table_showcase_lock.js?v=phase338");
+        modules.push("./modules/phase330_android_ux_cleanup_master_handoff_lock.js?v=phase338");
       }
       for (const src of modules) await import(src);
-      window.SVR_PHASE337_BOOT = {
-        build:"PHASE-337-PHYSICAL-POT-WINNER-SETTLEMENT-LOCK",
+      window.SVR_PHASE338_BOOT = {
+        build:"PHASE-338-BANKROLL-CHIP-INVENTORY-SYNC-LOCK",
         active:true,
         preview,
         phase332ChipPhysicsPreserved:true,
@@ -94,20 +95,20 @@
         phase334TableGestureLayoutPreserved:true,
         phase335OculusStabilityPreserved:true,
         phase336AuthoritativeRulesPreserved:true,
-        authoritativePotVisuals:true,
-        mainAndSidePotStacks:true,
-        exactWinnerSettlement:true,
-        splitPotAnimation:true,
-        dealerBlindMarkers:true,
-        currentTurnMarker:true,
-        physicalChipCollection:true,
-        automatedPotQA:true,
-        qaHiddenByDefault:true,
+        phase337PhysicalPotSettlementPreserved:true,
+        authoritativeBankrollSync:true,
+        exactVisibleChipValue:true,
+        heldAndThrownChipAccounting:true,
+        winLossInventoryAnimation:true,
+        splitPotAwardSync:true,
+        bustedPlayerInventoryState:true,
+        questChipBudgetGovernor:true,
+        automatedBankrollQA:true,
         siteTouched:false,
         checkedAt:new Date().toISOString()
       };
       setTimeout(()=>{
-        document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-xr-clean-view","svr-phase337-pot-settlement");
+        document.body.classList.add("boot-released","runtime-visible","overlay-released","svr-xr-clean-view","svr-phase338-bankroll-sync");
         document.getElementById("safeStage")?.remove();
         window.__SVR_GAME_READY__ = true;
         window.SVR_GAME_READY = true;
