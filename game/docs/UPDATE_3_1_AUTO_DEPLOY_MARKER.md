@@ -1,39 +1,36 @@
 # Update 3.1 Auto Deploy Marker
 
 ## Status
-Phase 330 update prepared on a dedicated branch. Auto Deploy will trigger when the Phase 330 pull request is merged to `main`.
+Phase 334 is prepared on a dedicated GitHub branch. Auto Deploy will trigger only after the Phase 334 pull request is merged into `main`.
 
 ## Deploy target
 - Branch trigger: `main`
 - Workflow: `.github/workflows/deploy.yml`
 - Workflow events: push to `main` and manual `workflow_dispatch`
-- Scope: Android stable route plus clean director-preview QA
+- Scope: Quest/Oculus poker-table layout, cards, chips, bots, seat calibration, and gesture gameplay
 
 ## Phase
-`PHASE-330-ANDROID-UX-CLEANUP-AND-MASTER-HANDOFF-LOCK`
+`PHASE-334-TABLE-LAYOUT-GESTURE-POKER-LOCK`
 
-## Update marker verification
-This file is inside `/game`, and the deploy workflow copies the committed `/game` directory into the GitHub Pages artifact. A merge commit to `main` changes repository content and therefore triggers the configured push workflow.
-
-## Phase 330 payload
-- `game/android.html`
+## Phase 334 payload
 - `game/index.html`
-- `game/phase329_android_table_playtest_ux_lock.js`
-- `game/modules/phase328_director_preview_table_showcase_lock.js`
-- `game/modules/phase330_android_ux_cleanup_master_handoff_lock.js`
-- `game/android-release.json`
+- `game/modules/phase334_table_layout_gesture_poker_lock.js`
 - `game/manifest.json`
-- `game/docs/PHASE_330_ANDROID_UX_CLEANUP_MASTER_HANDOFF_LOCK.md`
-- `docs/phase330_android_ux_cleanup_master_handoff_lock.md`
+- `game/android-release.json`
+- `game/docs/PHASE_334_TABLE_LAYOUT_GESTURE_POKER_LOCK.md`
+- `docs/phase334_table_layout_gesture_poker_lock.md`
 
-## Locked release policy
-- APK version name: `0.1.0-rc1`
-- APK version code: `1`
-- Forced update: `false`
-- Update prompt: `false`
-- Stable web entry: `/game/android.html?channel=stable`
+## Preserved systems
+- Existing uploaded table authority
+- Phase 332 chip geometry, gravity, bounce, and physical betting
+- Phase 333 material/shader polish and action authority
+- Android stable route
+- APK `0.1.0-rc1`, code `1`
+- `forceUpdate: false`
+- `showUpdatePrompt: false`
 
 ## Protected scope
-- No public-site redesign.
-- No unapproved sponsor/partner changes.
-- Existing table asset remains the authority.
+- Public website untouched
+- Sponsor/partner content untouched
+- No native APK rebuild
+- No network multiplayer claim
