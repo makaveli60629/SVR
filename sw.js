@@ -1,4 +1,4 @@
-const SVR_CACHE = 'svr-pwa-install-download-lock-01';
+const SVR_CACHE = 'svr-pwa-install-download-lock-02-matrix-rain';
 const SVR_SHELL = [
   '/',
   '/index.html',
@@ -43,6 +43,22 @@ self.addEventListener('fetch', (event) => {
   // Keep WebXR/game runtime network-first to avoid stale lobby/controller code.
   if (url.pathname.startsWith('/game/')) {
     event.respondWith(fetch(request).catch(() => caches.match(request)));
+    return;
+  }
+
+  // Matrix rain must never remain stuck on an old cached visual build.
+  if (url.pathname === '/matrix.js') {
+    event.respondWith(
+      fetch(new Request(request, { cache: 'no-store' }))
+        .then((response) => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            caches.open(SVR_CACHE).then((cache) => cache.put(request, copy)).catch(() => undefined);
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
     return;
   }
 
