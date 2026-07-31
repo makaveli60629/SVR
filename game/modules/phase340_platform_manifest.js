@@ -1,5 +1,5 @@
 export const BUILD = 'PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK';
-export const VERSION = 'phase343';
+export const VERSION = 'phase344';
 
 const REGISTRY = [
   'modules/phase340_runtime_authority_registry.js'
@@ -64,7 +64,8 @@ const ANDROID = [
 ];
 
 const ANDROID_FINAL = [
-  'modules/phase343_android_gameplay_hud_seated_table_view_lock.js'
+  'modules/phase343_android_gameplay_hud_seated_table_view_lock.js',
+  'modules/phase344_android_full_hand_acceptance_input_lock.js'
 ];
 
 const CAMERA3 = [
