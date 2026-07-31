@@ -1,9 +1,9 @@
 (() => {
-  const BUILD = 'PHASE-154-APP-UPDATE-MANAGER-LOCK';
+  const BUILD = 'PHASE-342-MANUAL-UPDATE-POLICY-LOCK';
   const MANIFEST_URL = '/update/app-version.json';
   const HEALTH_URL = '/deploy-health.json';
   const STORE_KEY = 'svr_app_update_seen';
-  const CHECK_MS = 1000 * 60 * 5;
+  const CHECK_MS = 1000 * 60 * 15;
   const isStandalone = window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
 
   function nowIso(){ return new Date().toISOString(); }
@@ -15,8 +15,7 @@
     return response.json();
   }
   function normalizeManifest(manifest, health){
-    const h = health || {};
-    const m = manifest || {};
+    const h = health || {}, m = manifest || {};
     return {
       build: m.build || h.build || 'unknown',
       commit: m.commit || h.commit || '',
@@ -25,12 +24,14 @@
       gameUrl: m.gameUrl || '/game/index.html',
       androidSafeUrl: m.androidSafeUrl || '/game/android.html',
       downloadsUrl: m.downloadsUrl || '/downloads/?install=1',
-      apkVersionCode: Number(m.apkVersionCode || 0),
-      apkVersionName: m.apkVersionName || '',
+      apkVersionCode: Number(m.apkVersionCode || 1),
+      apkVersionName: m.apkVersionName || '0.1.0-rc1',
       apkUrl: m.apkUrl || '',
       apkSha256: m.apkSha256 || '',
       packageName: m.packageName || 'com.svrpoker.app',
       required: Boolean(m.required || false),
+      showUpdatePrompt: m.showUpdatePrompt === true,
+      manualUpdateOnly: m.manualUpdateOnly !== false,
       message: m.message || 'A new SVR update is available.'
     };
   }
@@ -45,9 +46,7 @@
     if(document.getElementById('svr-app-update-style')) return;
     const style = document.createElement('style');
     style.id = 'svr-app-update-style';
-    style.textContent = `
-      #svrAppUpdateBanner{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2147483647;width:min(94vw,720px);display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid rgba(141,255,180,.66);border-radius:18px;background:rgba(0,0,0,.84);box-shadow:0 0 34px rgba(141,255,180,.22),0 24px 80px rgba(0,0,0,.72);backdrop-filter:blur(14px);padding:12px 14px;color:#fff;font-family:system-ui,Arial,sans-serif}.svr-update-copy{display:grid;gap:3px}.svr-update-copy strong{font-size:13px;color:#8dffb4;letter-spacing:.06em;text-transform:uppercase}.svr-update-copy span{font-size:12px;color:#eaffff}.svr-update-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.svr-update-actions button,.svr-update-actions a{border:1px solid rgba(141,255,180,.56);border-radius:999px;background:rgba(141,255,180,.12);color:#eafff1;text-decoration:none;font:900 11px system-ui,Arial;padding:8px 10px;cursor:pointer}.svr-update-actions .primary{background:linear-gradient(135deg,rgba(141,255,180,.96),rgba(127,252,255,.84));color:#02070a}.svr-update-actions .danger{border-color:rgba(255,91,140,.58);color:#ffdbe7;background:rgba(255,91,140,.13)}@media(max-width:640px){#svrAppUpdateBanner{grid-template-columns:1fr;bottom:8px}.svr-update-actions{justify-content:stretch}.svr-update-actions button,.svr-update-actions a{flex:1;text-align:center}}
-    `;
+    style.textContent = `#svrAppUpdateBanner{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2147483647;width:min(94vw,720px);display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid rgba(141,255,180,.66);border-radius:18px;background:rgba(0,0,0,.84);box-shadow:0 0 34px rgba(141,255,180,.22),0 24px 80px rgba(0,0,0,.72);backdrop-filter:blur(14px);padding:12px 14px;color:#fff;font-family:system-ui,Arial,sans-serif}.svr-update-copy{display:grid;gap:3px}.svr-update-copy strong{font-size:13px;color:#8dffb4;letter-spacing:.06em;text-transform:uppercase}.svr-update-copy span{font-size:12px;color:#eaffff}.svr-update-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.svr-update-actions button,.svr-update-actions a{border:1px solid rgba(141,255,180,.56);border-radius:999px;background:rgba(141,255,180,.12);color:#eafff1;text-decoration:none;font:900 11px system-ui,Arial;padding:8px 10px;cursor:pointer}.svr-update-actions .primary{background:linear-gradient(135deg,rgba(141,255,180,.96),rgba(127,252,255,.84));color:#02070a}.svr-update-actions .danger{border-color:rgba(255,91,140,.58);color:#ffdbe7;background:rgba(255,91,140,.13)}@media(max-width:640px){#svrAppUpdateBanner{grid-template-columns:1fr;bottom:8px}.svr-update-actions{justify-content:stretch}.svr-update-actions button,.svr-update-actions a{flex:1;text-align:center}}`;
     document.head.appendChild(style);
   }
   async function refreshServiceWorker(){
@@ -73,10 +72,7 @@
     const banner = document.createElement('div');
     banner.id = 'svrAppUpdateBanner';
     const shortCommit = current.commit ? current.commit.slice(0,7) : 'latest';
-    banner.innerHTML = `
-      <div class="svr-update-copy"><strong>${current.required ? 'SVR update required' : 'SVR update available'}</strong><span>${current.message}</span><span>Build: ${current.build || 'latest'} • Commit: ${shortCommit}</span></div>
-      <div class="svr-update-actions"><button class="primary" type="button" data-svr-update-reload>Update Now</button><a href="${current.androidSafeUrl}?v=${encodeURIComponent(current.commit || Date.now())}">Android Safe</a><a href="${current.downloadsUrl}">Downloads</a>${current.apkUrl ? `<a href="${current.apkUrl}">APK</a>` : ''}<button class="danger" type="button" data-svr-update-dismiss>Later</button></div>
-    `;
+    banner.innerHTML = `<div class="svr-update-copy"><strong>${current.required ? 'SVR update required' : 'SVR manual update'}</strong><span>${current.message}</span><span>Build: ${current.build || 'latest'} • Commit: ${shortCommit}</span></div><div class="svr-update-actions"><button class="primary" type="button" data-svr-update-reload>Update Now</button><a href="${current.androidSafeUrl}?v=${encodeURIComponent(current.commit || Date.now())}">Android Safe</a><a href="${current.downloadsUrl}">Downloads</a>${current.apkUrl ? `<a href="${current.apkUrl}">APK</a>` : ''}<button class="danger" type="button" data-svr-update-dismiss>Close</button></div>`;
     banner.querySelector('[data-svr-update-reload]')?.addEventListener('click', async () => {
       writeSeen({ build: current.build, commit: current.commit, deployedAt: current.deployedAt, updatedAt: nowIso() });
       await refreshServiceWorker();
@@ -89,20 +85,20 @@
     });
     document.body.appendChild(banner);
   }
-  async function check({ quiet=false } = {}){
-    let manifest = null;
-    let health = null;
+  async function check({ manual=false } = {}){
+    let manifest = null, health = null;
     try { manifest = await fetchJson(MANIFEST_URL); } catch(error){ window.SVR_APP_UPDATE_LAST_MANIFEST_ERROR = String(error.message || error); }
     try { health = await fetchJson(HEALTH_URL); } catch(error){ window.SVR_APP_UPDATE_LAST_HEALTH_ERROR = String(error.message || error); }
-    const current = normalizeManifest(manifest, health);
-    const seen = readSeen();
-    if(!seen.commit && current.commit){ writeSeen({ build: current.build, commit: current.commit, deployedAt: current.deployedAt, firstSeenAt: nowIso() }); }
+    const current = normalizeManifest(manifest, health), seen = readSeen();
+    if(!seen.commit && current.commit) writeSeen({ build: current.build, commit: current.commit, deployedAt: current.deployedAt, firstSeenAt: nowIso() });
     const updateAvailable = isNewer(current, seen);
-    window.SVR_APP_UPDATE_MANAGER = { build: BUILD, active:true, standalone:isStandalone, updateAvailable, current, seen, manifestUrl:MANIFEST_URL, healthUrl:HEALTH_URL, checkedAt:nowIso() };
-    if(updateAvailable && !quiet) showBanner(current);
+    const automaticPromptAllowed = current.showUpdatePrompt && !current.manualUpdateOnly;
+    window.SVR_APP_UPDATE_MANAGER = { build: BUILD, active:true, standalone:isStandalone, updateAvailable, automaticPromptAllowed, current, seen, manifestUrl:MANIFEST_URL, healthUrl:HEALTH_URL, checkedAt:nowIso() };
+    if(updateAvailable && (manual || automaticPromptAllowed)) showBanner(current);
     return window.SVR_APP_UPDATE_MANAGER;
   }
-  window.SVR_CHECK_FOR_APP_UPDATE = () => check({ quiet:false });
-  window.addEventListener('load', () => setTimeout(() => check({ quiet:false }), 1200));
-  setInterval(() => check({ quiet:true }).then((state)=>{ if(state.updateAvailable) showBanner(state.current); }).catch(()=>{}), CHECK_MS);
+  window.SVR_CHECK_FOR_APP_UPDATE = () => check({ manual:true });
+  window.SVR_SHOW_APP_UPDATE_BUTTON = () => check({ manual:true });
+  window.addEventListener('load', () => setTimeout(() => check({ manual:false }), 1200));
+  setInterval(() => check({ manual:false }).catch(()=>{}), CHECK_MS);
 })();
