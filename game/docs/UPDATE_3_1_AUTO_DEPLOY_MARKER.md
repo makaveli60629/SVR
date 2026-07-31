@@ -1,7 +1,7 @@
-# Phase 341 Auto Deploy Marker
+# Phase 342 Auto Deploy Marker
 
 ## Build
-`PHASE-341-CANONICAL-TABLE-GEOMETRY-CARD-MOTION-LOCK`
+`PHASE-342-ADAPTIVE-PERFORMANCE-ASSET-PIPELINE-LOCK`
 
 ## Deploy target
 - Branch trigger: `main`
@@ -9,26 +9,37 @@
 - Workflow events: push to `main` and manual `workflow_dispatch`
 
 ## Payload
-- `game/modules/phase341_table_coordinate_model.js`
-- `game/modules/phase341_canonical_table_geometry_card_motion_lock.js`
+- `game/modules/phase342_adaptive_performance_asset_pipeline_lock.js`
+- `game/tools/phase342_asset_audit.mjs`
+- `game/modules/asset_base.js`
 - `game/modules/phase340_platform_manifest.js`
-- `game/index.html`
-- `game/android.html`
-- `game/camera3.html`
-- `game/manifest.json`
-- `game/android-release.json`
-- Phase 341 documentation
+- `.github/workflows/phase342-performance-audit.yml`
+- `.github/workflows/phase342-asset-pipeline.yml`
+- `app-update-checker.js`
+- `sw.js`
+- Android, Quest/desktop, and Camera 3 entries
+- Phase 342 release manifests and documentation
 
-## Locked geometry and gameplay
-- One uploaded FBX table body.
-- One centered logo at 22% of felt width.
-- White/gold pass line inset 0.0508 m.
-- South/front open player seat.
-- Dealer-left-to-right two-round deal.
-- One card pool and one Phase 336 action authority.
+## Locked performance behavior
+- Android target: 45 FPS.
+- Quest target: 72 FPS.
+- Desktop target: 60 FPS.
+- Camera 3 target: 30 FPS.
+- Adaptive resolution changes require sustained pressure.
+- Texture and shader prewarming remain enabled.
+- Phase 341 table/card geometry remains authoritative.
 
-## Release lock
-- APK `0.1.0-rc1`, code `1`
-- Force update: false
-- Update prompt: false
-- Manual update only: true
+## Locked update behavior
+- APK version: `0.1.0-rc1`
+- APK version code: `1`
+- Forced update: `false`
+- Automatic update prompt: `false`
+- Manual update only: `true`
+
+## Runtime QA
+```js
+window.SVR_PHASE342_AUDIT()
+window.SVR_PHASE342_SET_QUALITY('balanced')
+window.SVR_PHASE342_REPREWARM()
+window.SVR_CHECK_FOR_APP_UPDATE()
+```

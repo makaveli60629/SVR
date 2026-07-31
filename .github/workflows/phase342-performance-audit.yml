@@ -1,0 +1,44 @@
+name: Phase 342 Performance Audit
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          lfs: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate Phase 342 JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check game/modules/phase342_adaptive_performance_asset_pipeline_lock.js
+          node --check game/tools/phase342_asset_audit.mjs
+          node --check app-update-checker.js
+      - name: Generate current asset audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p phase342-audit
+          node game/tools/phase342_asset_audit.mjs game/assets phase342-audit/phase342_asset_audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase342-performance-audit
+          path: phase342-audit/phase342_asset_audit.json
+          if-no-files-found: error
+          retention-days: 30

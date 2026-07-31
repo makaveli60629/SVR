@@ -1,0 +1,54 @@
+name: Phase 342 Asset Optimization
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_path:
+        description: Asset directory to audit and optimize
+        required: false
+        default: game/assets
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Audit production assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p phase342-output/audit phase342-output/optimized
+          node game/tools/phase342_asset_audit.mjs "${{ inputs.source_path }}" phase342-output/audit/phase342_asset_audit.json
+      - name: Install glTF optimization tools
+        run: npm install --global @gltf-transform/cli
+      - name: Optimize existing GLB and glTF assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r file; do
+            rel="${file#${{ inputs.source_path }}/}"
+            out="phase342-output/optimized/${rel%.*}.glb"
+            mkdir -p "$(dirname "$out")"
+            gltf-transform optimize "$file" "$out" --compress meshopt --texture-compress webp || cp "$file" "$out"
+          done < <(find "${{ inputs.source_path }}" -type f \( -iname '*.glb' -o -iname '*.gltf' \) | sort)
+      - name: Preserve conversion queue
+        shell: bash
+        run: cp phase342-output/audit/phase342_asset_audit.json phase342-output/optimized/conversion-queue.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase342-optimized-assets
+          path: phase342-output
+          if-no-files-found: error
+          retention-days: 14

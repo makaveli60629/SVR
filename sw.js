@@ -1,4 +1,4 @@
-const SVR_CACHE = 'svr-pwa-install-download-lock-02-matrix-rain';
+const SVR_CACHE = 'svr-pwa-phase342-performance-manual-update';
 const SVR_SHELL = [
   '/',
   '/index.html',
@@ -34,31 +34,26 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+function networkFirst(request) {
+  return fetch(new Request(request, { cache: 'no-store' }))
+    .then((response) => {
+      if (response && response.ok) {
+        const copy = response.clone();
+        caches.open(SVR_CACHE).then((cache) => cache.put(request, copy)).catch(() => undefined);
+      }
+      return response;
+    })
+    .catch(() => caches.match(request));
+}
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Keep WebXR/game runtime network-first to avoid stale lobby/controller code.
-  if (url.pathname.startsWith('/game/')) {
-    event.respondWith(fetch(request).catch(() => caches.match(request)));
-    return;
-  }
-
-  // Matrix rain must never remain stuck on an old cached visual build.
-  if (url.pathname === '/matrix.js') {
-    event.respondWith(
-      fetch(new Request(request, { cache: 'no-store' }))
-        .then((response) => {
-          if (response && response.ok) {
-            const copy = response.clone();
-            caches.open(SVR_CACHE).then((cache) => cache.put(request, copy)).catch(() => undefined);
-          }
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
+  if (url.pathname.startsWith('/game/') || url.pathname === '/matrix.js' || url.pathname === '/app-update-checker.js' || url.pathname.startsWith('/update/')) {
+    event.respondWith(networkFirst(request));
     return;
   }
 
