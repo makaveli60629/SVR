@@ -1,0 +1,8 @@
+{
+  "build": "PHASE-345-PLAYER-LOGIN-PROFILE-DAILY-REWARD-API-LOCK",
+  "apiBase": "",
+  "allowDemoFallback": true,
+  "dailyRewardChips": 5000,
+  "minimumActivitySeconds": 300,
+  "notes": "Set apiBase to the deployed secure backend URL, for example https://api.svrpoker.com/api. Do not place secrets in this file."
+}
