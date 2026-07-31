@@ -10,14 +10,15 @@
   "manualUpdateOnly": true,
   "previewEntry": "/game/camera3.html?v=phase342",
   "nextApkDrop": "Only after the user explicitly requests the next APK update.",
-  "currentGameBuild": "PHASE-343-ANDROID-GAMEPLAY-HUD-SEATED-TABLE-VIEW-LOCK",
+  "currentGameBuild": "PHASE-344-ANDROID-FULL-HAND-ACCEPTANCE-INPUT-LOCK",
   "notes": [
-    "Phase 343 reorganizes the Android HUD into separate status, community-card, hole-card, action, raise, and movement zones.",
-    "The permanent raise controls and duplicate quick-position buttons are removed from normal gameplay view.",
-    "The raise slider opens only after the player taps RAISE.",
-    "SIT now measures the canonical table and places the camera close to the south/front seat while aiming at the felt center.",
-    "Five community-card slots display the same Phase 336 community state used by the 3D table cards.",
-    "The single MOVE stick, single LOOK stick, authoritative poker actions, Phase 341 table geometry, and Phase 342 performance governor are preserved.",
-    "Automatic update prompts remain disabled and APK installation remains manual-only."
+    "Phase 344 wraps the Phase 336 poker APIs with a single-fire Android action broker.",
+    "Repeated taps of the same action are blocked for 650 ms; NEXT HAND is blocked for 1100 ms.",
+    "Accepted actions show one short confirmation and temporarily lock non-seat actions.",
+    "The seated-view watchdog waits for sustained drift before recentering the canonical table.",
+    "The five-slot community strip is repaired and resynchronized from the Phase 336 state when necessary.",
+    "Every hand records observed streets, community-card count, player-hole-card count, action sequence, and winners.",
+    "A guided full-hand QA helper can play check/call decisions for up to five hands and report whether preflop through showdown completed with five community cards.",
+    "The Phase 343 organized HUD, Phase 342 performance governor, and manual-only APK policy remain preserved."
   ]
 }
