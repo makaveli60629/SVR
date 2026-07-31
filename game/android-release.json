@@ -8,16 +8,15 @@
   "forceUpdate": false,
   "showUpdatePrompt": false,
   "manualUpdateOnly": true,
-  "previewEntry": "/game/camera3.html?v=phase340",
+  "previewEntry": "/game/camera3.html?v=phase341",
   "nextApkDrop": "Only after the user explicitly requests the next APK update.",
-  "currentGameBuild": "PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK",
+  "currentGameBuild": "PHASE-341-CANONICAL-TABLE-GEOMETRY-CARD-MOTION-LOCK",
   "notes": [
-    "Phase 340 replaces accumulated route boot lists with one deduplicated platform loader.",
-    "Android keeps one Phase 326 control authority governed by Phase 339 and Phase 340.",
-    "Quest, desktop, Android, and Camera 3 now load explicit platform manifests.",
-    "Phase 340 instruments event listeners and renderer animation-loop assignments and audits runtime ownership.",
-    "Phase 340 enforces one uploaded-table authority, one table-area logo authority, and hides known legacy presentation objects.",
-    "Phase 340 prewarms textures and shaders before releasing the loading screen.",
+    "Phase 341 keeps the uploaded FBX table as the sole table body and normalizes felt, rail, and trim materials.",
+    "One table-local coordinate model drives the south/front player seat, bots, pass line, logo, burn pile, muck, hole cards, and community cards.",
+    "Phase 341 replaces duplicate static card planes with one reusable animated card pool.",
+    "Hole cards deal left-to-right in two rounds; burns, flop, turn, river, folds, and showdown flips animate from the Phase 336 state.",
+    "Android keeps one MOVE stick and one LOOK stick and routes poker buttons directly to Phase 336.",
     "APK update prompts remain disabled and updates remain manual-only."
   ]
 }
