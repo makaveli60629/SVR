@@ -1,5 +1,5 @@
 export const BUILD = 'PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK';
-export const VERSION = 'phase342';
+export const VERSION = 'phase343';
 
 const REGISTRY = [
   'modules/phase340_runtime_authority_registry.js'
@@ -63,6 +63,10 @@ const ANDROID = [
   'phase339_android_single_authority_lock.js'
 ];
 
+const ANDROID_FINAL = [
+  'modules/phase343_android_gameplay_hud_seated_table_view_lock.js'
+];
+
 const CAMERA3 = [
   'modules/phase339_camera3_table_orbit_lock.js'
 ];
@@ -105,7 +109,7 @@ export function manifestFor(platform = detectPlatform()) {
       ...CAMERA3
     ]);
   }
-  if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION]);
+  if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL]);
   if (value === 'quest') return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...QUEST, ...SETTLEMENT_PRESENTATION]);
   return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...DESKTOP_PRESENTATION, ...SETTLEMENT_PRESENTATION]);
 }
