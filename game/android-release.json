@@ -10,15 +10,14 @@
   "manualUpdateOnly": true,
   "previewEntry": "/game/camera3.html?v=phase342",
   "nextApkDrop": "Only after the user explicitly requests the next APK update.",
-  "currentGameBuild": "PHASE-344-ANDROID-FULL-HAND-ACCEPTANCE-INPUT-LOCK",
+  "currentGameBuild": "PHASE-345-PLAYER-LOGIN-PROFILE-DAILY-REWARD-API-LOCK",
   "notes": [
-    "Phase 344 wraps the Phase 336 poker APIs with a single-fire Android action broker.",
-    "Repeated taps of the same action are blocked for 650 ms; NEXT HAND is blocked for 1100 ms.",
-    "Accepted actions show one short confirmation and temporarily lock non-seat actions.",
-    "The seated-view watchdog waits for sustained drift before recentering the canonical table.",
-    "The five-slot community strip is repaired and resynchronized from the Phase 336 state when necessary.",
-    "Every hand records observed streets, community-card count, player-hole-card count, action sequence, and winners.",
-    "A guided full-hand QA helper can play check/call decisions for up to five hands and report whether preflop through showdown completed with five community cards.",
-    "The Phase 343 organized HUD, Phase 342 performance governor, and manual-only APK policy remain preserved."
+    "Phase 345 adds one shared player account client for the website, Android, Quest, and PC routes.",
+    "Authenticated game routes create activity sessions and send one heartbeat per minute while the game is visible.",
+    "The secure backend contract supports registration, login, HTTP-only sessions, profile records, game sessions, and transactional daily rewards.",
+    "The default daily reward is 5,000 play-money chips after 300 verified active seconds and at least three accepted heartbeats.",
+    "Local demo mode is explicitly labeled and never claims to populate the production database.",
+    "The Android Phase 343 HUD, Phase 344 input lock, and Phase 342 performance governor remain preserved.",
+    "APK update prompts remain disabled and installation remains manual-only."
   ]
 }
