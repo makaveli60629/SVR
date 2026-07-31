@@ -1,0 +1,45 @@
+name: Phase 345 Account API Check
+
+on:
+  pull_request:
+    paths:
+      - 'site/js/phase345-*.js'
+      - 'site/config/player-api.json'
+      - 'site/login.html'
+      - 'site/profile.html'
+      - 'site/register.html'
+      - 'game/modules/phase345_*.js'
+      - 'game/modules/phase340_platform_manifest.js'
+      - 'backend/phase345/**'
+      - '.github/workflows/phase345-account-api-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate browser and game modules
+        run: |
+          node --check site/js/phase345-player-account-client.js
+          node --check site/js/phase345-demo-activity-persistence.js
+          node --check game/modules/phase345_player_account_activity_bridge.js
+          node --check game/modules/phase340_platform_manifest.js
+      - name: Validate JSON records
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('site/config/player-api.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('game/manifest.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('game/android-release.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('backend/phase345/package.json','utf8'))"
+      - name: Validate backend
+        working-directory: backend/phase345
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npm run check
