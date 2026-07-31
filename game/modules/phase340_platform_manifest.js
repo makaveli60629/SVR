@@ -1,5 +1,5 @@
 export const BUILD = 'PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK';
-export const VERSION = 'phase344';
+export const VERSION = 'phase345';
 
 const REGISTRY = [
   'modules/phase340_runtime_authority_registry.js'
@@ -35,6 +35,10 @@ const SETTLEMENT_PRESENTATION = [
   'modules/phase338_bankroll_chip_inventory_sync_lock.js',
   'modules/phase341_canonical_table_geometry_card_motion_lock.js',
   'modules/phase342_adaptive_performance_asset_pipeline_lock.js'
+];
+
+const ACCOUNT_ACTIVITY = [
+  'modules/phase345_player_account_activity_bridge.js'
 ];
 
 const DESKTOP_PRESENTATION = [
@@ -110,9 +114,9 @@ export function manifestFor(platform = detectPlatform()) {
       ...CAMERA3
     ]);
   }
-  if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL]);
-  if (value === 'quest') return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...QUEST, ...SETTLEMENT_PRESENTATION]);
-  return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...DESKTOP_PRESENTATION, ...SETTLEMENT_PRESENTATION]);
+  if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...ACCOUNT_ACTIVITY]);
+  if (value === 'quest') return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...QUEST, ...SETTLEMENT_PRESENTATION, ...ACCOUNT_ACTIVITY]);
+  return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...DESKTOP_PRESENTATION, ...SETTLEMENT_PRESENTATION, ...ACCOUNT_ACTIVITY]);
 }
 
 export function validateManifest(platform = detectPlatform()) {
@@ -126,7 +130,7 @@ export function validateManifest(platform = detectPlatform()) {
     }
   }
   if (platform === 'camera3') {
-    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js']) {
+    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js']) {
       if (normalized.some((x) => x.endsWith(old))) forbidden.push(old);
     }
   }
