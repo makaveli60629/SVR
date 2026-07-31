@@ -1,4 +1,4 @@
-import { account } from '../../site/js/phase345-player-account-client.js?v=phase345';
+import { account } from '../../site/js/phase345-demo-activity-persistence.js?v=phase345';
 
 const BUILD = 'PHASE-345-PLAYER-LOGIN-PROFILE-DAILY-REWARD-API-LOCK';
 const state = {
