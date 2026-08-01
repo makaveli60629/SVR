@@ -31,6 +31,8 @@ const state = {
 const CRITICAL = new Set([
   'main.js',
   'modules/phase355_android_poker_boot_order_lock.js',
+  'modules/phase356_quest_runtime_boot_lock.js',
+  'modules/phase356_quest_poker_boot_order_lock.js',
   'modules/phase336_authoritative_poker_rules_pot_settlement_lock.js',
   'modules/phase356_quest_full_game_acceptance_smoothness_lock.js'
 ]);
@@ -63,6 +65,27 @@ function release(reason) {
 
 function wait(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 
+function safeWalk(root, visitor, limit = 14000) {
+  if (typeof window.SVR_PHASE356_SAFE_WALK === 'function') return window.SVR_PHASE356_SAFE_WALK(root, visitor, limit);
+  if (!root) return 0;
+  const stack = [root];
+  const seen = new Set();
+  let count = 0;
+  while (stack.length && count < limit) {
+    const object = stack.pop();
+    if (!object || seen.has(object)) continue;
+    seen.add(object);
+    count += 1;
+    try { visitor(object); } catch {}
+    const children = Array.isArray(object.children) ? object.children : [];
+    for (let index = children.length - 1; index >= 0; index -= 1) {
+      const child = children[index];
+      if (child && child !== object && !seen.has(child)) stack.push(child);
+    }
+  }
+  return count;
+}
+
 async function waitForRuntime(timeoutMs = 6500) {
   const started = performance.now();
   while (performance.now() - started < timeoutMs) {
@@ -74,24 +97,22 @@ async function waitForRuntime(timeoutMs = 6500) {
 
 function sanitizeSceneMaterials(scene) {
   let invalid = 0;
-  try {
-    scene.traverse((object) => {
-      if (!object?.isMesh) return;
-      if (Array.isArray(object.material)) {
-        const valid = object.material.filter((material) => material?.isMaterial === true);
-        if (valid.length !== object.material.length) {
-          invalid += object.material.length - valid.length;
-          if (valid.length) object.material = valid;
-          else object.visible = false;
-        }
-      } else if (!object.material?.isMaterial) {
-        invalid += 1;
-        object.visible = false;
+  safeWalk(scene, (object) => {
+    if (!object?.isMesh) return;
+    if (Array.isArray(object.material)) {
+      const valid = object.material.filter((material) => material?.isMaterial === true);
+      if (valid.length !== object.material.length) {
+        invalid += object.material.length - valid.length;
+        if (valid.length) object.material = valid;
+        else object.visible = false;
       }
-      object.castShadow = false;
-      object.receiveShadow = false;
-    });
-  } catch {}
+    } else if (!object.material?.isMaterial) {
+      invalid += 1;
+      object.visible = false;
+    }
+    object.castShadow = false;
+    object.receiveShadow = false;
+  });
   return invalid;
 }
 
@@ -104,6 +125,7 @@ async function prewarmRuntime() {
   const scene = window.__SVR_SCENE__;
   const camera = window.__SVR_CAMERA__;
   window.SVR_PHASE355_GOVERN?.();
+  window.SVR_PHASE356_BOOT_GOVERN?.();
   window.SVR_PHASE340_APPLY_RENDERER_BUDGET?.(state.platform);
   if (state.platform === 'quest') {
     try { renderer.setPixelRatio(Math.min(Number(devicePixelRatio || 1), 1.25)); } catch {}
@@ -114,23 +136,21 @@ async function prewarmRuntime() {
   let textures = 0;
   const textureLimit = state.platform === 'android' ? 28 : state.platform === 'quest' ? 44 : 64;
 
-  try {
-    scene.traverse((object) => {
-      if (!object?.material || textures >= textureLimit) return;
-      const materials = Array.isArray(object.material) ? object.material : [object.material];
-      for (const material of materials.filter((entry) => entry?.isMaterial)) {
-        for (const key of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap', 'alphaMap']) {
-          const texture = material?.[key];
-          if (texture && textures < textureLimit) {
-            try {
-              renderer.initTexture?.(texture);
-              textures += 1;
-            } catch {}
-          }
+  safeWalk(scene, (object) => {
+    if (!object?.material || textures >= textureLimit) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    for (const material of materials.filter((entry) => entry?.isMaterial)) {
+      for (const key of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap', 'alphaMap']) {
+        const texture = material?.[key];
+        if (texture && textures < textureLimit) {
+          try {
+            renderer.initTexture?.(texture);
+            textures += 1;
+          } catch {}
         }
       }
-    });
-  } catch {}
+    }
+  });
 
   let compiled = false;
   let method = 'none';
@@ -180,7 +200,7 @@ async function importList(paths, deferred = false) {
     }
     if (deferred) {
       window.SVR_PHASE355_GOVERN?.();
-      window.SVR_PHASE356_QA?.();
+      window.SVR_PHASE356_BOOT_GOVERN?.();
       await wait(state.platform === 'quest' ? 80 : 40);
     }
   }
@@ -222,20 +242,25 @@ function scheduleDeferred() {
     const started = performance.now();
     await importList(state.deferredModules, true);
     window.SVR_PHASE355_GOVERN?.();
+    window.SVR_PHASE356_BOOT_GOVERN?.();
     window.SVR_PHASE340_GOVERN?.();
     state.deferredTotalMs = +(performance.now() - started).toFixed(1);
     state.deferredReadyAt = new Date().toISOString();
     window.SVR_PHASE340_PLATFORM_STATE = state;
     window.dispatchEvent(new CustomEvent('svr:platform-deferred-ready', { detail: auditSnapshot() }));
   };
+  const execute = () => run().catch((error) => {
+    state.deferredFatal = String(error?.stack || error?.message || error);
+  });
+  const acceptanceMode = state.platform === 'quest' && new URLSearchParams(location.search).get('acceptance') === '1';
+  if (acceptanceMode) {
+    window.addEventListener('svr:phase356-acceptance', () => setTimeout(execute, 1000), { once: true });
+    return;
+  }
   if (typeof requestIdleCallback === 'function') {
-    requestIdleCallback(() => run().catch((error) => {
-      state.deferredFatal = String(error?.stack || error?.message || error);
-    }), { timeout: state.platform === 'quest' ? 6500 : 5000 });
+    requestIdleCallback(execute, { timeout: state.platform === 'quest' ? 6500 : 5000 });
   } else {
-    setTimeout(() => run().catch((error) => {
-      state.deferredFatal = String(error?.stack || error?.message || error);
-    }), state.platform === 'quest' ? 3600 : 2600);
+    setTimeout(execute, state.platform === 'quest' ? 3600 : 2600);
   }
 }
 
@@ -259,6 +284,7 @@ export async function bootPlatform(options = {}) {
   status('Finishing table, cards, and shaders…');
   state.prewarm = await prewarmRuntime();
   window.SVR_PHASE355_GOVERN?.();
+  window.SVR_PHASE356_BOOT_GOVERN?.();
   window.SVR_PHASE340_GOVERN?.();
   state.audit = window.SVR_PHASE340_AUTHORITY_AUDIT?.() || null;
   state.totalMs = +(performance.now() - state.startedPerf).toFixed(1);
