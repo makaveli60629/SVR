@@ -1,0 +1,24 @@
+{
+  "name": "svr-player-account-api-phase352",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "SVR Poker production account lifecycle API with revocable sessions, email verification, password recovery, privacy export, and account deletion.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node src/server.js",
+    "check": "node --check src/server.js && node tools/preflight.mjs --static"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "helmet": "^8.1.0",
+    "mssql": "^11.0.1",
+    "nodemailer": "^7.0.5",
+    "zod": "^4.0.14"
+  }
+}
