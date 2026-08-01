@@ -7,13 +7,16 @@
   "orientation": "portrait-primary",
   "background_color": "#050508",
   "theme_color": "#050508",
-  "build": "PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK",
-  "phase": 346,
+  "build": "PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK",
+  "phase": 347,
   "android_channel": "stable",
   "apk_version_name": "0.1.0-rc1",
   "apk_version_code": 1,
+  "release_ready": false,
   "force_update": false,
   "show_update_prompt": false,
   "manual_update_only": true,
-  "next_apk_drop": "Only after the user explicitly requests the next APK update."
+  "next_apk_version_name": "0.1.0-rc2",
+  "next_apk_version_code": 2,
+  "next_apk_drop": "Only after the existing wrapper source and signing identity are restored and a signed package is verified."
 }
