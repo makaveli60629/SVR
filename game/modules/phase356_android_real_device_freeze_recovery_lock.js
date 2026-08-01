@@ -179,7 +179,7 @@ function ensureLightweightAvatars() {
     { x: -1.3, z: -1.45, color: 0x2d0711, accent: 0xff4f78 },
     { x: 0, z: -1.78, color: 0x241a08, accent: 0xffd36a },
     { x: 1.3, z: -1.45, color: 0x052b20, accent: 0x68f5bf },
-    { x: 2.15, z: -1.45, color: 0x26134f, accent: 0xb37cff }
+    { x: 2.15, z: -0.55, color: 0x26134f, accent: 0xb37cff }
   ];
   seats.forEach((seat, index) => {
     const avatar = createAvatar(seat.color, seat.accent, `PHASE356_BOT_AVATAR_${index + 1}`);
