@@ -26,13 +26,15 @@ requireText(runtime, 'data-hole="0"', 'hole-slot-zero');
 requireText(runtime, 'data-hole="1"', 'hole-slot-one');
 requireText(runtime, "window.SVR_PHASE347_RUN_FULL_HAND_QA", 'full-hand-qa');
 requireText(platform, "phase347_android_single_controller_seated_gameplay_apk_release_lock.js", 'platform-module');
-requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...sharedTail, ...ANDROID_INTEGRITY]);", 'android-runtime-assembly');
+requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...ANDROID_FOUNDATION, ...ANDROID_POKER, ...ANDROID_FINAL]);", 'android-critical-runtime-assembly');
+requireText(platform, 'export function deferredManifestFor', 'android-deferred-runtime-export');
 requireText(platform, "const controllerIndex = normalized.findIndex", 'runtime-controller-index');
-requireText(platform, "const profileIndex = normalized.findIndex", 'runtime-profile-index');
-requireText(platform, "const avatarIndex = normalized.findIndex", 'runtime-avatar-index');
-requireText(platform, "const presenceIndex = normalized.findIndex", 'runtime-presence-index');
+requireText(platform, "const profileIndex = normalizedDeferred.findIndex", 'deferred-profile-index');
+requireText(platform, "const avatarIndex = normalizedDeferred.findIndex", 'deferred-avatar-index');
+requireText(platform, "const presenceIndex = normalizedDeferred.findIndex", 'deferred-presence-index');
 requireText(platform, "const dedupeIndex = normalized.findIndex", 'runtime-dedupe-index');
-requireText(platform, "controllerIndex < 0 || profileIndex <= controllerIndex || avatarIndex <= profileIndex", 'runtime-order-validator');
+requireText(platform, "hardeningIndex < 0 || mainIndex <= hardeningIndex || pokerBootIndex <= mainIndex", 'critical-order-validator');
+requireText(platform, "profileIndex < 0 || avatarIndex <= profileIndex || presenceIndex <= avatarIndex", 'deferred-order-validator');
 requireText(checker, 'current.releaseReady && current.apkUrl && current.apkVersionCode > installed', 'conditional-apk-menu');
 requireText(androidPage, 'm.releaseReady===true&&m.apkUrl', 'android-page-conditional-download');
 requireText(downloadsPage, 'm.releaseReady===true&&m.apkUrl', 'downloads-page-conditional-download');
@@ -59,7 +61,7 @@ console.log(JSON.stringify({
   platformVersion,
   controller: 'single-visible-authority',
   horizontalInput: 'direct',
-  runtimeOrderValidation: 'assembled-manifest-with-later-integrity-tail',
+  runtimeOrderValidation: 'critical-gameplay-first-with-deferred-profile-presence-tail',
   cards: { hole: 2, community: 5, floating: 7 },
   apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, next: release.nextApkVersionName, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
