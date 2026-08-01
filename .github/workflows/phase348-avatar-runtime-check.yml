@@ -1,0 +1,48 @@
+name: Phase 348 Avatar Runtime Check
+
+on:
+  pull_request:
+    paths:
+      - 'game/modules/phase348_ingame_player_avatar_presence_performance_lock.js'
+      - 'game/modules/phase340_platform_manifest.js'
+      - 'game/tools/phase348-avatar-runtime-static-test.mjs'
+      - 'game/index.html'
+      - 'game/android.html'
+      - 'game/manifest.json'
+      - 'game/android-release.json'
+      - 'game/assets/models/eric/eric.fbx'
+      - 'game/assets/models/claudia/claudia.fbx'
+      - '.github/workflows/phase348-avatar-runtime-check.yml'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate JavaScript syntax
+        run: |
+          node --check game/modules/phase348_ingame_player_avatar_presence_performance_lock.js
+          node --check game/modules/phase340_platform_manifest.js
+          node --check game/tools/phase348-avatar-runtime-static-test.mjs
+      - name: Validate avatar runtime contract
+        run: node game/tools/phase348-avatar-runtime-static-test.mjs
+      - name: Validate protected regression modules
+        run: |
+          node --check game/modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js
+          node --check game/modules/phase346_player_avatar_profile_bridge.js
+          node --check game/modules/phase345_player_account_activity_bridge.js
+      - name: Validate release JSON
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('game/manifest.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('game/android-release.json','utf8'))"
