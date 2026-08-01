@@ -30,6 +30,11 @@ const state = {
 
 const CRITICAL = new Set([
   'modules/phase356_android_real_device_freeze_recovery_lock.js',
+  'modules/phase358_quest_incremental_shader_compile_lock.js',
+  'modules/phase358_quest_runtime_boot_lock.js',
+  'modules/phase358_quest_uploaded_table_authority_lock.js',
+  'modules/phase358_quest_poker_boot_order_lock.js',
+  'modules/phase358_quest_full_game_acceptance_smoothness_lock.js',
   'main.js',
   'modules/phase355_android_poker_boot_order_lock.js',
   'modules/phase336_authoritative_poker_rules_pot_settlement_lock.js'
@@ -51,7 +56,7 @@ function release(reason) {
   if (state.readyAt) return;
   document.body.classList.add(
     'boot-released', 'runtime-visible', 'overlay-released', 'ready',
-    `svr-platform-${state.platform}`, 'svr-phase340', 'svr-phase355', 'svr-phase356'
+    `svr-platform-${state.platform}`, 'svr-phase340', 'svr-phase355', 'svr-phase356', 'svr-phase358'
   );
   document.getElementById('safeStage')?.remove();
   window.__SVR_GAME_READY__ = true;
@@ -96,13 +101,15 @@ function sanitizeSceneMaterials(scene) {
 }
 
 async function prewarmRuntime() {
-  const available = await waitForRuntime(state.platform === 'camera3' ? 3600 : 5500);
+  const runtimeTimeout = state.platform === 'camera3' ? 3600 : state.platform === 'quest' ? 6500 : 5500;
+  const available = await waitForRuntime(runtimeTimeout);
   if (!available) return { available: false, compiled: false, textures: 0, invalidMaterials: 0 };
 
   const renderer = window.__SVR_RENDERER__;
   const scene = window.__SVR_SCENE__;
   const camera = window.__SVR_CAMERA__;
   window.SVR_PHASE356_GOVERN?.({ fullScan: false });
+  window.SVR_PHASE358_BOOT_GOVERN?.();
   window.SVR_PHASE340_APPLY_RENDERER_BUDGET?.(state.platform);
 
   // Real Android devices can keep compileAsync running after Promise.race,
@@ -113,6 +120,19 @@ async function prewarmRuntime() {
       available: true,
       compiled: false,
       method: 'android-incremental-frame-compilation',
+      textures: 0,
+      invalidMaterials: 0
+    };
+  }
+
+  // Quest uses incremental frame compilation during the critical table boot.
+  // This avoids sparse FBX material arrays reaching Three.js compileAsync.
+  if (state.platform === 'quest') {
+    window.SVR_PHASE358_BOOT_GOVERN?.();
+    return {
+      available: true,
+      compiled: false,
+      method: 'quest-incremental-frame-compilation',
       textures: 0,
       invalidMaterials: 0
     };
@@ -185,7 +205,11 @@ async function importList(paths, deferred = false) {
         throw error;
       }
     }
-    if (deferred) await wait(80);
+    if (deferred) {
+      window.SVR_PHASE356_GOVERN?.({ fullScan: false });
+      window.SVR_PHASE358_BOOT_GOVERN?.();
+      await wait(state.platform === 'quest' ? 80 : 40);
+    }
   }
 }
 
@@ -205,6 +229,7 @@ function auditSnapshot() {
     prewarm: state.prewarm,
     authority: window.SVR_PHASE340_AUTHORITY_AUDIT?.() || state.audit,
     phase356: window.SVR_PHASE356_QA?.() || null,
+    phase358: window.SVR_PHASE358_QA?.() || null,
     renderer: window.__SVR_RENDERER__?.info ? {
       calls: window.__SVR_RENDERER__.info.render?.calls || 0,
       triangles: window.__SVR_RENDERER__.info.render?.triangles || 0,
@@ -223,19 +248,26 @@ function scheduleDeferred() {
   const run = async () => {
     const started = performance.now();
     await importList(state.deferredModules, true);
+    window.SVR_PHASE356_GOVERN?.({ fullScan: false });
+    window.SVR_PHASE358_BOOT_GOVERN?.();
+    window.SVR_PHASE340_GOVERN?.();
     state.deferredTotalMs = +(performance.now() - started).toFixed(1);
     state.deferredReadyAt = new Date().toISOString();
     window.SVR_PHASE340_PLATFORM_STATE = state;
     window.dispatchEvent(new CustomEvent('svr:platform-deferred-ready', { detail: auditSnapshot() }));
   };
+  const execute = () => run().catch((error) => {
+    state.deferredFatal = String(error?.stack || error?.message || error);
+  });
+  const acceptanceMode = state.platform === 'quest' && new URLSearchParams(location.search).get('acceptance') === '1';
+  if (acceptanceMode) {
+    window.addEventListener('svr:phase358-acceptance', () => setTimeout(execute, 1000), { once: true });
+    return;
+  }
   if (typeof requestIdleCallback === 'function') {
-    requestIdleCallback(() => run().catch((error) => {
-      state.deferredFatal = String(error?.stack || error?.message || error);
-    }), { timeout: 7000 });
+    requestIdleCallback(execute, { timeout: state.platform === 'quest' ? 6500 : 7000 });
   } else {
-    setTimeout(() => run().catch((error) => {
-      state.deferredFatal = String(error?.stack || error?.message || error);
-    }), 4000);
+    setTimeout(execute, state.platform === 'quest' ? 3600 : 4000);
   }
 }
 
@@ -259,13 +291,16 @@ export async function bootPlatform(options = {}) {
   status('Finishing table and cards…');
   state.prewarm = await prewarmRuntime();
   window.SVR_PHASE356_GOVERN?.({ fullScan: false });
+  window.SVR_PHASE358_BOOT_GOVERN?.();
   window.SVR_PHASE340_GOVERN?.();
   state.audit = window.SVR_PHASE340_AUTHORITY_AUDIT?.() || null;
   state.totalMs = +(performance.now() - state.startedPerf).toFixed(1);
   window.SVR_PHASE340_PLATFORM_STATE = state;
   window.SVR_PHASE340_AUDIT = auditSnapshot;
 
-  release('phase356-android-real-device-ready');
+  if (state.platform === 'android') release('phase356-android-real-device-ready');
+  else if (state.platform === 'quest') release('phase358-quest-critical-ready');
+  else release(`phase356-${state.platform}-ready`);
   status(`${state.platform} ready`);
   window.dispatchEvent(new CustomEvent('svr:platform-ready', { detail: auditSnapshot() }));
   scheduleDeferred();
