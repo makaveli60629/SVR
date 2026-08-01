@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const read = (path) => fs.readFileSync(path, 'utf8');
 const runtime = read('game/modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js');
+const handDriver = read('game/modules/phase355_android_full_hand_driver_compatibility_lock.js');
 const platform = read('game/modules/phase340_platform_manifest.js');
 const checker = read('app-update-checker.js');
 const androidPage = read('site/android/index.html');
@@ -25,15 +26,21 @@ requireText(runtime, "Array.from({ length: 5 }", 'five-community-slots');
 requireText(runtime, 'data-hole="0"', 'hole-slot-zero');
 requireText(runtime, 'data-hole="1"', 'hole-slot-one');
 requireText(runtime, "window.SVR_PHASE347_RUN_FULL_HAND_QA", 'full-hand-qa');
+requireText(handDriver, "window.SVR_PHASE344_RUN_FULL_HAND_QA = driveHand", 'phase344-driver-compatibility');
+requireText(handDriver, "totalStacks === 6000", 'hand-driver-chip-conservation');
+requireText(handDriver, "['preflop', 'flop', 'turn', 'river', 'showdown']", 'hand-driver-all-streets');
 requireText(platform, "phase347_android_single_controller_seated_gameplay_apk_release_lock.js", 'platform-module');
+requireText(platform, "phase355_android_full_hand_driver_compatibility_lock.js", 'platform-hand-driver');
 requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...ANDROID_FOUNDATION, ...ANDROID_POKER, ...ANDROID_FINAL]);", 'android-critical-runtime-assembly');
 requireText(platform, 'export function deferredManifestFor', 'android-deferred-runtime-export');
 requireText(platform, "const controllerIndex = normalized.findIndex", 'runtime-controller-index');
+requireText(platform, "const handDriverIndex = normalized.findIndex", 'runtime-hand-driver-index');
 requireText(platform, "const profileIndex = normalizedDeferred.findIndex", 'deferred-profile-index');
 requireText(platform, "const avatarIndex = normalizedDeferred.findIndex", 'deferred-avatar-index');
 requireText(platform, "const presenceIndex = normalizedDeferred.findIndex", 'deferred-presence-index');
 requireText(platform, "const dedupeIndex = normalized.findIndex", 'runtime-dedupe-index');
-requireText(platform, "hardeningIndex < 0 || mainIndex <= hardeningIndex || pokerBootIndex <= mainIndex", 'critical-order-validator');
+requireText(platform, "handDriverIndex <= controllerIndex", 'critical-order-validator');
+requireText(platform, "dedupeIndex <= handDriverIndex", 'dedupe-after-driver-validator');
 requireText(platform, "profileIndex < 0 || avatarIndex <= profileIndex || presenceIndex <= avatarIndex", 'deferred-order-validator');
 requireText(checker, 'current.releaseReady && current.apkUrl && current.apkVersionCode > installed', 'conditional-apk-menu');
 requireText(androidPage, 'm.releaseReady===true&&m.apkUrl', 'android-page-conditional-download');
@@ -61,7 +68,7 @@ console.log(JSON.stringify({
   platformVersion,
   controller: 'single-visible-authority',
   horizontalInput: 'direct',
-  runtimeOrderValidation: 'critical-gameplay-first-with-deferred-profile-presence-tail',
+  runtimeOrderValidation: 'critical-gameplay-and-full-hand-driver-first-with-deferred-profile-presence-tail',
   cards: { hole: 2, community: 5, floating: 7 },
   apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, next: release.nextApkVersionName, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
