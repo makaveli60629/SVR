@@ -1,14 +1,24 @@
 {
   "build": "PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK",
-  "version": 1,
+  "version": 2,
   "avatarModels": [
     {
-      "id": "svr-player",
-      "label": "SVR Player",
-      "assetUrl": "/game/assets/models/player.glb",
-      "format": "glb",
+      "id": "eric",
+      "label": "Eric",
+      "assetUrl": "/game/assets/models/eric/eric.fbx",
+      "format": "fbx",
       "default": true,
-      "targetHeightMeters": 1.72
+      "targetHeightMeters": 1.78,
+      "role": "starter-player-body"
+    },
+    {
+      "id": "claudia",
+      "label": "Claudia",
+      "assetUrl": "/game/assets/models/claudia/claudia.fbx",
+      "format": "fbx",
+      "default": false,
+      "targetHeightMeters": 1.70,
+      "role": "starter-player-body"
     }
   ],
   "palettes": [
@@ -49,14 +59,14 @@
     ]
   },
   "presets": [
-    { "id": "table-ready", "label": "Table Ready", "outfit": { "palette": "midnight", "headwear": "cap", "eyewear": "none", "top": "jacket", "shoes": "sneakers", "accessory": "watch" } },
-    { "id": "scorpion-vip", "label": "Scorpion VIP", "outfit": { "palette": "scorpion", "headwear": "none", "eyewear": "visor", "top": "vest", "shoes": "boots", "accessory": "chain" } },
-    { "id": "founder", "label": "Founder", "outfit": { "palette": "gold", "headwear": "crown", "eyewear": "neon", "top": "jacket", "shoes": "boots", "accessory": "badge" } },
-    { "id": "social-lounge", "label": "Social Lounge", "outfit": { "palette": "royal", "headwear": "beanie", "eyewear": "neon", "top": "hoodie", "shoes": "sneakers", "accessory": "watch" } }
+    { "id": "table-ready", "label": "Table Ready", "outfit": { "modelId": "eric", "palette": "midnight", "headwear": "cap", "eyewear": "none", "top": "jacket", "shoes": "sneakers", "accessory": "watch" } },
+    { "id": "scorpion-vip", "label": "Scorpion VIP", "outfit": { "modelId": "claudia", "palette": "scorpion", "headwear": "none", "eyewear": "visor", "top": "vest", "shoes": "boots", "accessory": "chain" } },
+    { "id": "founder", "label": "Founder", "outfit": { "modelId": "eric", "palette": "gold", "headwear": "crown", "eyewear": "neon", "top": "jacket", "shoes": "boots", "accessory": "badge" } },
+    { "id": "social-lounge", "label": "Social Lounge", "outfit": { "modelId": "claudia", "palette": "royal", "headwear": "beanie", "eyewear": "neon", "top": "hoodie", "shoes": "sneakers", "accessory": "watch" } }
   ],
   "defaultOutfit": {
     "schemaVersion": 1,
-    "modelId": "svr-player",
+    "modelId": "eric",
     "palette": "midnight",
     "headwear": "none",
     "eyewear": "none",
