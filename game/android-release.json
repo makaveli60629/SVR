@@ -12,9 +12,11 @@
   "nextApkDrop": "Only after the user explicitly requests the next APK update.",
   "currentGameBuild": "PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK",
   "notes": [
-    "Phase 346 adds a dedicated live avatar dressing room using the existing player.glb asset.",
-    "Profiles now display the saved avatar and equipped outfit in a live Three.js preview.",
+    "Phase 346 adds a dedicated live avatar dressing room using the verified Eric and Claudia FBX bodies already present on main.",
+    "Eric is the default player body and Claudia is selectable; their poker-table NPC instances remain separate.",
+    "Profiles now display the saved avatar body and equipped outfit in a live Three.js preview.",
     "Starter wardrobe equipment includes color themes, hats, eyewear, jackets, vests, hoodies, shoes, watches, chains, and badges.",
+    "The viewer supports FBX plus future GLB/glTF bodies and uses a safe procedural mannequin on load failure.",
     "The same schema-versioned outfit record is shared with Android, Quest, PC, the secure Phase 345 profile API, and the future Unity client.",
     "Camera 3 remains free of account and avatar activity modules.",
     "The Android Phase 343 HUD, Phase 344 input lock, Phase 342 performance governor, and Phase 345 account activity remain preserved.",
