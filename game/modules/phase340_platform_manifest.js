@@ -57,7 +57,8 @@ const QUEST_FOUNDATION = [
   'modules/phase356_quest_runtime_boot_lock.js',
   'phase101_boot_load_screen_recovery.js',
   'phase101_partial_runtime_render_guard.js',
-  'main.js'
+  'main.js',
+  'modules/phase356_quest_uploaded_table_authority_lock.js'
 ];
 const QUEST_POKER_BOOT = ['modules/phase356_quest_poker_boot_order_lock.js'];
 const QUEST_INPUT = [
@@ -215,6 +216,7 @@ export function validateManifest(platform = detectPlatform()) {
     const questOrder = [
       'phase356_quest_runtime_boot_lock.js',
       'main.js',
+      'phase356_quest_uploaded_table_authority_lock.js',
       'phase356_quest_poker_boot_order_lock.js',
       'phase331_quest_meta_hands_table_interaction_lock.js',
       'phase334_table_layout_gesture_poker_lock.js',
