@@ -2,9 +2,7 @@ import { account } from './phase345-demo-activity-persistence.js?v=phase346';
 import { SVRAvatarViewer, BUILD } from './phase346-avatar-viewer.js?v=phase346';
 
 const canvas = document.getElementById('profileAvatarCanvas');
-let viewer = null;
-let catalog = null;
-let lastOutfit = '';
+let viewer = null, catalog = null, lastOutfit = '';
 
 async function ensure() {
   if (!canvas) return null;
@@ -18,11 +16,12 @@ async function ensure() {
   const profile = account.snapshot().profile;
   if (!profile) return viewer;
   const outfit = profile.equippedOutfit && Object.keys(profile.equippedOutfit).length ? profile.equippedOutfit : catalog.defaultOutfit;
-  const key = JSON.stringify({ url: profile.avatarUrl, outfit });
+  const model = catalog.avatarModels.find((entry) => entry.id === outfit.modelId) || catalog.avatarModels[0];
+  const modelUrl = profile.avatarUrl || new URL(model.assetUrl, location.origin).href;
+  const key = JSON.stringify({ url: modelUrl, outfit });
   if (key !== lastOutfit) {
     lastOutfit = key;
-    const modelUrl = profile.avatarUrl || '/game/assets/models/player.glb';
-    if (!viewer.modelLoaded || viewer.modelUrl !== modelUrl) await viewer.loadModel(modelUrl, 1.72);
+    if (!viewer.modelLoaded || viewer.modelUrl !== modelUrl) await viewer.loadModel(modelUrl, Number(model.targetHeightMeters || 1.72));
     viewer.applyOutfit(outfit);
   }
   return viewer;
