@@ -1,0 +1,27 @@
+name: Phase 359 Release Consolidation Check
+
+on:
+  pull_request:
+    paths:
+      - 'docs/SVR_RELEASE_STATUS.json'
+      - 'site/roadmap.html'
+      - 'game/android-release.json'
+      - 'game/quest-release.json'
+      - 'game/manifest.json'
+      - 'game/tools/phase359-release-consolidation-static-test.mjs'
+      - '.github/workflows/phase359-release-consolidation.yml'
+  workflow_dispatch:
+
+jobs:
+  release-truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate release records and roadmap
+        run: |
+          node --check game/tools/phase359-release-consolidation-static-test.mjs
+          node game/tools/phase359-release-consolidation-static-test.mjs
