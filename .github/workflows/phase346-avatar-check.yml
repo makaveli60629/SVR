@@ -16,6 +16,9 @@ on:
       - '.github/workflows/phase346-avatar-check.yml'
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: read
 
@@ -46,5 +49,9 @@ jobs:
           test -f game/avatar.html
           grep -q 'phase346_player_avatar_profile_bridge.js' game/modules/phase340_platform_manifest.js
           grep -q "modules/phase346_player_avatar_profile_bridge.js'" game/modules/phase340_platform_manifest.js
-          grep -q 'PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK' game/manifest.json
+          grep -q 'PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK' site/data/avatar-catalog.json
           grep -q 'manual_update_only.*true' game/manifest.json
+          if awk '/const CAMERA3 =/,/function unique/' game/modules/phase340_platform_manifest.js | grep -q 'phase346_player_avatar_profile_bridge.js'; then
+            echo 'Phase 346 avatar bridge must not be in the Camera 3 module list.' >&2
+            exit 1
+          fi
