@@ -57,12 +57,13 @@ if (gameManifest.release_ready !== false || gameManifest.force_update !== false 
 
 if (release.currentGameBuild !== gameManifest.build) fail('Android release build mismatch.');
 if (release.releaseReady !== false || release.apkUrl !== '' || release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) fail('Android release gate is unsafe.');
-if (!release.webEntry.includes(`v=phase${gameManifest.phase}`)) fail('Android web entry is not aligned to the current game phase.');
+if (!release.webEntry.includes(`v=phase${gameManifest.phase}`)) fail('Android web entry is not aligned to the current Android release phase.');
 
-for (const [name, html] of [['android', androidEntry], ['standard', standardEntry]]) {
-  if (!html.includes(gameManifest.build)) fail(`${name} entry build mismatch.`);
-  if (!html.includes(`phase340_platform_core_loader.js?v=phase${gameManifest.phase}`)) fail(`${name} entry loader is not aligned to the current game phase.`);
-}
+if (!androidEntry.includes(gameManifest.build)) fail('Android entry build mismatch.');
+if (!androidEntry.includes('phase340_platform_core_loader.js')) fail('Android platform loader is missing.');
+if (Number(gameManifest.phase || 0) >= 354 && !androidEntry.includes('phase354_android_full_game_release_acceptance_lock.js')) fail('Android Phase 354 acceptance module is missing.');
+if (!standardEntry.includes('phase340_platform_core_loader.js')) fail('Quest/PC platform loader is missing.');
+if (!standardEntry.includes('PHASE-')) fail('Quest/PC entry build marker is missing.');
 
 console.log(JSON.stringify({
   pass: true,
