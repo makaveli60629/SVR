@@ -26,10 +26,18 @@ requireText(runtime, 'data-hole="0"', 'hole-slot-zero');
 requireText(runtime, 'data-hole="1"', 'hole-slot-one');
 requireText(runtime, "window.SVR_PHASE347_RUN_FULL_HAND_QA", 'full-hand-qa');
 requireText(platform, "phase347_android_single_controller_seated_gameplay_apk_release_lock.js", 'platform-module');
-requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...ACCOUNT_ACTIVITY, ...INGAME_AVATAR]);", 'android-runtime-load-order');
+requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...sharedTail]);", 'android-runtime-assembly');
 requireText(checker, 'current.releaseReady && current.apkUrl && current.apkVersionCode > installed', 'conditional-apk-menu');
 requireText(androidPage, 'm.releaseReady===true&&m.apkUrl', 'android-page-conditional-download');
 requireText(downloadsPage, 'm.releaseReady===true&&m.apkUrl', 'downloads-page-conditional-download');
+
+const controllerIndex = platform.indexOf('phase347_android_single_controller_seated_gameplay_apk_release_lock.js');
+const accountIndex = platform.indexOf('phase345_player_account_activity_bridge.js');
+const profileIndex = platform.indexOf('phase346_player_avatar_profile_bridge.js');
+const avatarIndex = platform.indexOf('phase348_ingame_player_avatar_presence_performance_lock.js');
+const presenceIndex = platform.indexOf('phase349_multiplayer_presence_seat_reconnect_lock.js');
+if (!(controllerIndex >= 0 && accountIndex > controllerIndex && profileIndex > accountIndex && avatarIndex > profileIndex)) errors.push('android-runtime-load-order');
+if (presenceIndex >= 0 && presenceIndex <= avatarIndex) errors.push('later-runtime-before-avatar');
 
 const platformVersion = Number(platform.match(/export const VERSION = 'phase(\d+)'/)?.[1] || 0);
 if (platformVersion < 347) errors.push('platform-version-regressed');
@@ -37,6 +45,7 @@ if (Number(manifest.phase || 0) < 347) errors.push('manifest-phase-regressed');
 if (!String(manifest.build || '').startsWith('PHASE-')) errors.push('manifest-build-missing');
 if (manifest.force_update !== false || manifest.show_update_prompt !== false || manifest.manual_update_only !== true) errors.push('manifest-update-policy');
 if (!String(release.currentGameBuild || '').startsWith('PHASE-')) errors.push('release-build-missing');
+if (release.currentGameBuild !== manifest.build) errors.push('release-manifest-build-mismatch');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('release-update-policy');
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.apkVersionCode !== 1 || release.nextApkVersionCode !== 2) errors.push('apk-version-gate');
@@ -52,7 +61,7 @@ console.log(JSON.stringify({
   platformVersion,
   controller: 'single-visible-authority',
   horizontalInput: 'direct',
-  runtimeOrder: ['ANDROID_FINAL', 'ACCOUNT_ACTIVITY', 'INGAME_AVATAR'],
+  runtimeOrder: ['ANDROID_FINAL', 'ACCOUNT_ACTIVITY', 'INGAME_AVATAR', 'LATER_SHARED_MODULES'],
   cards: { hole: 2, community: 5, floating: 7 },
   apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, next: release.nextApkVersionName, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
