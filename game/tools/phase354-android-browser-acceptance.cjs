@@ -13,12 +13,48 @@ const { chromium } = require('playwright');
   page.on('console', (message) => {
     if (message.type() === 'error') errors.push(message.text());
   });
-  await page.goto(`${base}/game/android.html?channel=stable&v=phase354&acceptance=1`, { waitUntil: 'domcontentloaded', timeout: 120000 });
-  await page.waitForFunction(() => window.SVR_PHASE354_ACCEPTANCE_RESULT && window.SVR_PHASE354_ACCEPTANCE_RESULT.finishedAt, null, { timeout: 240000 });
-  const result = await page.evaluate(() => ({ acceptance: window.SVR_PHASE354_ACCEPTANCE_RESULT, qa: window.SVR_PHASE354_QA?.() || null }));
-  console.log(JSON.stringify({ ...result, browserErrors: errors.slice(-20) }, null, 2));
+
+  await page.goto(`${base}/game/android.html?channel=stable&v=phase354&acceptance=1`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 120000
+  });
+
+  let timedOut = false;
+  try {
+    await page.waitForFunction(
+      () => window.SVR_PHASE354_ACCEPTANCE_RESULT?.finishedAt,
+      null,
+      { timeout: 230000 }
+    );
+  } catch (error) {
+    timedOut = true;
+    errors.push(String(error.message || error));
+  }
+
+  const result = await page.evaluate(() => ({
+    acceptance: window.SVR_PHASE354_ACCEPTANCE_RESULT || null,
+    progress: window.SVR_PHASE354_PROGRESS || null,
+    qa: window.SVR_PHASE354_QA?.() || window.SVR_PHASE354_QA_STATE || null,
+    runtime: {
+      platformReady: Boolean(window.SVR_PLATFORM_READY),
+      controllerRoot: document.querySelectorAll('#svr347Root').length,
+      tableAuthority: Boolean(window.SVR_TABLE_AUTHORITY || window.SVR_PHASE341_TABLE_LAYOUT),
+      pokerAction: typeof window.SVR_POKER_ACTION,
+      resetPoker: typeof window.SVR_RESET_POKER_TABLE,
+      phase344Driver: typeof window.SVR_PHASE344_RUN_FULL_HAND_QA,
+      phase354Runner: typeof window.SVR_PHASE354_RUN_ANDROID_FULL_GAME_ACCEPTANCE,
+      phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
+      handNo: window.SVR_PHASE336_POKER_STATE?.handNo || 0,
+      community: window.SVR_PHASE336_POKER_STATE?.community?.length || 0,
+      waitingHuman: Boolean(window.SVR_PHASE336_POKER_STATE?.waitingHuman),
+      lastAction: window.SVR_PHASE336_POKER_STATE?.lastAction || null
+    }
+  }));
+
+  const output = { ...result, timedOut, browserErrors: errors.slice(-30) };
+  console.log(JSON.stringify(output, null, 2));
   await browser.close();
-  if (!result.acceptance?.pass) process.exit(1);
+  if (timedOut || !result.acceptance?.pass) process.exit(1);
 })().catch((error) => {
   console.error(error);
   process.exit(1);
