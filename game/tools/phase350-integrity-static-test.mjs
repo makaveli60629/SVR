@@ -63,8 +63,9 @@ requireText(platform, 'phase350_android_controller_dom_deduplication_lock.js', '
 requireText(platform, 'phase350_camera3_visibility_lighting_lock.js', 'camera3-lighting-manifest');
 requireText(platform, 'dedupeIndex !== normalized.length - 1', 'android-dedupe-final-validator');
 requireText(platform, 'lightIndex !== normalized.length - 1', 'camera3-lighting-final-validator');
-requireText(platform, 'phase350-android-load-order', 'android-load-order-label');
+requireText(platform, 'phase355-android-critical-load-order', 'android-load-order-label');
 requireText(platform, 'phase350-camera3-load-order', 'camera3-load-order-label');
+requireText(platform, 'deferredManifestFor', 'android-deferred-export');
 
 requireText(roadmap, 'Phase 351', 'roadmap-phase351');
 requireText(roadmap, 'Production Account Deployment', 'roadmap-account-deployment');
@@ -92,7 +93,7 @@ console.log(JSON.stringify({
   protectedBuild: 'PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK',
   profileAvatar: showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
   camera3: 'dedicated-lighting-authority',
-  androidController: 'physical-dom-deduplication',
+  androidController: 'physical-dom-deduplication-after-critical-gameplay-boot',
   roadmap: 'ordered-major-milestones',
   apkLocked: true
 }, null, 2));

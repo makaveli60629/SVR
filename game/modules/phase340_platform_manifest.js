@@ -1,5 +1,5 @@
-export const BUILD = 'PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK';
-export const VERSION = 'phase350';
+export const BUILD = 'PHASE-355-ANDROID-RUNTIME-SMOOTHNESS-HARDENING-LOCK';
+export const VERSION = 'phase355';
 
 const REGISTRY = [
   'modules/phase340_runtime_authority_registry.js'
@@ -71,20 +71,33 @@ const QUEST = [
   'modules/phase335_oculus_acceptance_gameplay_stability_lock.js'
 ];
 
-const ANDROID = [
-  'modules/phase322_full_lobby_visual_finish_lock.js',
-  'phase326_android_playable_polish_lock.js',
-  'phase339_android_single_authority_lock.js'
+const ANDROID_FOUNDATION = [
+  'modules/phase355_android_runtime_smoothness_hardening_lock.js',
+  'phase101_boot_load_screen_recovery.js',
+  'phase101_partial_runtime_render_guard.js',
+  'main.js'
+];
+
+const ANDROID_POKER = [
+  'modules/phase355_android_poker_boot_order_lock.js',
+  'modules/phase337_physical_pot_winner_settlement_lock.js',
+  'modules/phase338_bankroll_chip_inventory_sync_lock.js',
+  'modules/phase342_adaptive_performance_asset_pipeline_lock.js'
 ];
 
 const ANDROID_FINAL = [
   'modules/phase343_android_gameplay_hud_seated_table_view_lock.js',
   'modules/phase344_android_full_hand_acceptance_input_lock.js',
-  'modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js'
+  'modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js',
+  'modules/phase355_android_full_hand_driver_compatibility_lock.js',
+  'modules/phase350_android_controller_dom_deduplication_lock.js'
 ];
 
-const ANDROID_INTEGRITY = [
-  'modules/phase350_android_controller_dom_deduplication_lock.js'
+const ANDROID_DEFERRED = [
+  'modules/phase322_full_lobby_visual_finish_lock.js',
+  ...ACCOUNT_ACTIVITY,
+  ...INGAME_AVATAR,
+  ...MULTIPLAYER_PRESENCE
 ];
 
 const CAMERA3 = [
@@ -130,31 +143,66 @@ export function manifestFor(platform = detectPlatform()) {
       ...CAMERA3
     ]);
   }
+  if (value === 'android') return unique([...REGISTRY, ...ANDROID_FOUNDATION, ...ANDROID_POKER, ...ANDROID_FINAL]);
   const sharedTail = [...ACCOUNT_ACTIVITY, ...INGAME_AVATAR, ...MULTIPLAYER_PRESENCE];
-  if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...sharedTail, ...ANDROID_INTEGRITY]);
   if (value === 'quest') return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...QUEST, ...SETTLEMENT_PRESENTATION, ...sharedTail]);
   return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...DESKTOP_PRESENTATION, ...SETTLEMENT_PRESENTATION, ...sharedTail]);
 }
 
+export function deferredManifestFor(platform = detectPlatform()) {
+  return String(platform || '').toLowerCase() === 'android' ? unique(ANDROID_DEFERRED) : [];
+}
+
 export function validateManifest(platform = detectPlatform()) {
   const modules = manifestFor(platform);
+  const deferred = deferredManifestFor(platform);
   const normalized = modules.map((x) => x.replace(/[?#].*$/, ''));
-  const duplicates = normalized.filter((x, i) => normalized.indexOf(x) !== i);
+  const normalizedDeferred = deferred.map((x) => x.replace(/[?#].*$/, ''));
+  const combined = [...normalized, ...normalizedDeferred];
+  const duplicates = combined.filter((x, i) => combined.indexOf(x) !== i);
   const forbidden = [];
+
   if (platform === 'android') {
-    for (const old of ['phase324_android_game_entry_controls_lock.js','phase325_android_controls_table_unifier_lock.js','phase329_android_table_playtest_ux_lock.js','modules/phase330_android_ux_cleanup_master_handoff_lock.js']) {
-      if (normalized.some((x) => x.endsWith(old))) forbidden.push(old);
-    }
+    const retired = [
+      'phase156_table2_stool_texture_lock.js',
+      'phase161_geometry_table_fbx_floor_lock.js',
+      'phase164_fbx_table_final_alignment_seat_anchor_lock.js',
+      'modules/phase202_fbx_asset_path_recovery_lock.js',
+      'modules/phase203_table_asset_resolver_lock.js',
+      'phase326_android_playable_polish_lock.js',
+      'phase339_android_single_authority_lock.js',
+      'phase324_android_game_entry_controls_lock.js',
+      'phase325_android_controls_table_unifier_lock.js',
+      'phase329_android_table_playtest_ux_lock.js',
+      'modules/phase330_android_ux_cleanup_master_handoff_lock.js'
+    ];
+    for (const old of retired) if (combined.some((x) => x.endsWith(old))) forbidden.push(old);
+
+    const hardeningIndex = normalized.findIndex((x) => x.endsWith('phase355_android_runtime_smoothness_hardening_lock.js'));
+    const mainIndex = normalized.findIndex((x) => x.endsWith('main.js'));
+    const pokerBootIndex = normalized.findIndex((x) => x.endsWith('phase355_android_poker_boot_order_lock.js'));
     const controllerIndex = normalized.findIndex((x) => x.endsWith('phase347_android_single_controller_seated_gameplay_apk_release_lock.js'));
-    const profileIndex = normalized.findIndex((x) => x.endsWith('phase346_player_avatar_profile_bridge.js'));
-    const avatarIndex = normalized.findIndex((x) => x.endsWith('phase348_ingame_player_avatar_presence_performance_lock.js'));
-    const presenceIndex = normalized.findIndex((x) => x.endsWith('phase349_multiplayer_presence_seat_reconnect_lock.js'));
-    const seatBridgeIndex = normalized.findIndex((x) => x.endsWith('phase349_presence_gameplay_seat_bridge.js'));
+    const handDriverIndex = normalized.findIndex((x) => x.endsWith('phase355_android_full_hand_driver_compatibility_lock.js'));
     const dedupeIndex = normalized.findIndex((x) => x.endsWith('phase350_android_controller_dom_deduplication_lock.js'));
-    if (controllerIndex < 0 || profileIndex <= controllerIndex || avatarIndex <= profileIndex || presenceIndex <= avatarIndex || seatBridgeIndex <= presenceIndex || dedupeIndex <= seatBridgeIndex || dedupeIndex !== normalized.length - 1) {
-      forbidden.push('phase350-android-load-order');
+    if (hardeningIndex < 0
+      || mainIndex <= hardeningIndex
+      || pokerBootIndex <= mainIndex
+      || controllerIndex <= pokerBootIndex
+      || handDriverIndex <= controllerIndex
+      || dedupeIndex <= handDriverIndex
+      || dedupeIndex !== normalized.length - 1) {
+      forbidden.push('phase355-android-critical-load-order');
+    }
+
+    const profileIndex = normalizedDeferred.findIndex((x) => x.endsWith('phase346_player_avatar_profile_bridge.js'));
+    const avatarIndex = normalizedDeferred.findIndex((x) => x.endsWith('phase348_ingame_player_avatar_presence_performance_lock.js'));
+    const presenceIndex = normalizedDeferred.findIndex((x) => x.endsWith('phase349_multiplayer_presence_seat_reconnect_lock.js'));
+    const seatBridgeIndex = normalizedDeferred.findIndex((x) => x.endsWith('phase349_presence_gameplay_seat_bridge.js'));
+    if (profileIndex < 0 || avatarIndex <= profileIndex || presenceIndex <= avatarIndex || seatBridgeIndex <= presenceIndex) {
+      forbidden.push('phase355-android-deferred-load-order');
     }
   }
+
   if (platform === 'camera3') {
     for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js','modules/phase346_player_avatar_profile_bridge.js','modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js','modules/phase348_ingame_player_avatar_presence_performance_lock.js','modules/phase349_multiplayer_presence_seat_reconnect_lock.js','modules/phase349_presence_gameplay_seat_bridge.js','modules/phase350_android_controller_dom_deduplication_lock.js']) {
       if (normalized.some((x) => x.endsWith(old))) forbidden.push(old);
@@ -163,13 +211,16 @@ export function validateManifest(platform = detectPlatform()) {
     const lightIndex = normalized.findIndex((x) => x.endsWith('phase350_camera3_visibility_lighting_lock.js'));
     if (orbitIndex < 0 || lightIndex <= orbitIndex || lightIndex !== normalized.length - 1) forbidden.push('phase350-camera3-load-order');
   }
+
   return {
     build: BUILD,
     platform,
     moduleCount: modules.length,
+    deferredModuleCount: deferred.length,
     duplicates,
     forbidden,
     pass: duplicates.length === 0 && forbidden.length === 0,
-    modules
+    modules,
+    deferred
   };
 }
