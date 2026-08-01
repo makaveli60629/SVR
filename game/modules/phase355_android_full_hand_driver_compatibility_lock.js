@@ -1,0 +1,199 @@
+import { state, players } from './phase336_authoritative_engine.js';
+
+export const BUILD = 'PHASE-355-ANDROID-FULL-HAND-DRIVER-COMPATIBILITY-LOCK';
+const ACTIVE = (window.SVR_PLATFORM || '').toLowerCase() === 'android'
+  || /\/game\/android\.html$/i.test(location.pathname)
+  || (/Android/i.test(navigator.userAgent || '') && !/Quest|Oculus|Meta Quest/i.test(navigator.userAgent || ''));
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+let running = false;
+let lastResult = null;
+const history = [];
+
+function snapshot(record) {
+  const phase = String(state.phase || 'idle').toLowerCase();
+  if (phase && !record.phases.includes(phase)) record.phases.push(phase);
+  record.communityMax = Math.max(record.communityMax, state.community?.length || 0);
+  record.holeCards = Math.max(record.holeCards, players.find((player) => player.human)?.hand?.length || 0);
+  const sequence = Number(state.actionSeq || 0);
+  if (sequence !== record.lastSequence) {
+    record.lastSequence = sequence;
+    record.actions.push({
+      sequence,
+      phase,
+      message: state.lastAction || '',
+      at: new Date().toISOString()
+    });
+    record.actions = record.actions.slice(-36);
+  }
+}
+
+function settlementPass() {
+  const totalStacks = players.reduce((sum, player) => sum + Number(player.stack || 0), 0);
+  return {
+    winners: (state.winners || []).map((winner) => ({
+      name: winner.name,
+      amount: winner.amount,
+      label: winner.label
+    })),
+    settledPot: Number(state.settledPot || 0),
+    totalStacks,
+    pass: (state.winners || []).length > 0
+      && Number(state.settledPot || 0) > 0
+      && totalStacks === 6000
+  };
+}
+
+function chooseAction() {
+  const legal = window.SVR_POKER_LEGAL_ACTIONS?.() || [];
+  if (legal.includes('check')) return 'check';
+  if (legal.includes('call')) return 'call';
+  if (legal.includes('allin')) return 'allin';
+  if (legal.includes('fold')) return 'fold';
+  return legal[0] || null;
+}
+
+async function driveHand(options = {}) {
+  if (!ACTIVE) return { build: BUILD, pass: false, error: 'ANDROID_ONLY' };
+  if (running) return lastResult || { build: BUILD, pass: false, running: true };
+  running = true;
+  const timeoutMs = Math.max(15000, Math.min(90000, Number(options.timeoutMs || 60000)));
+  const maxHands = Math.max(1, Math.min(5, Number(options.maxHands || 3)));
+  const started = performance.now();
+  const result = {
+    build: BUILD,
+    pass: false,
+    attempts: 0,
+    timeoutMs,
+    maxHands,
+    record: null,
+    audit: null,
+    error: null,
+    startedAt: new Date().toISOString()
+  };
+
+  try {
+    if (typeof window.SVR_POKER_ACTION !== 'function' || typeof window.SVR_RESET_POKER_TABLE !== 'function') {
+      throw new Error('POKER_ENGINE_NOT_READY');
+    }
+    window.SVR_RESET_POKER_TABLE(1000);
+    let handledSequence = -1;
+    let handNumber = Number(state.handNo || 0);
+    let record = {
+      build: BUILD,
+      handNo: handNumber,
+      startedAt: new Date().toISOString(),
+      phases: [],
+      communityMax: 0,
+      holeCards: 0,
+      actions: [],
+      lastSequence: -1,
+      completed: false,
+      pass: false
+    };
+
+    while (performance.now() - started < timeoutMs && result.attempts < maxHands) {
+      if (Number(state.handNo || 0) !== handNumber) {
+        handNumber = Number(state.handNo || 0);
+        handledSequence = -1;
+        record = {
+          build: BUILD,
+          handNo: handNumber,
+          startedAt: new Date().toISOString(),
+          phases: [],
+          communityMax: 0,
+          holeCards: 0,
+          actions: [],
+          lastSequence: -1,
+          completed: false,
+          pass: false
+        };
+      }
+
+      snapshot(record);
+      if (state.waitingHuman && Number(state.actionSeq || 0) !== handledSequence) {
+        const action = chooseAction();
+        if (action) {
+          handledSequence = Number(state.actionSeq || 0);
+          window.SVR_POKER_ACTION(action);
+        }
+      }
+
+      if (String(state.phase || '').toLowerCase() === 'showdown') {
+        await wait(180);
+        snapshot(record);
+        const settlement = settlementPass();
+        record.completed = true;
+        record.finishedAt = new Date().toISOString();
+        record.winners = settlement.winners;
+        record.settledPot = settlement.settledPot;
+        record.totalStacks = settlement.totalStacks;
+        record.pass = ['preflop', 'flop', 'turn', 'river', 'showdown'].every((phase) => record.phases.includes(phase))
+          && record.communityMax === 5
+          && record.holeCards === 2
+          && settlement.pass;
+        history.unshift({ ...record, phases: record.phases.slice(), actions: record.actions.slice() });
+        history.splice(8);
+        result.attempts += 1;
+        if (record.pass) {
+          result.pass = true;
+          result.record = record;
+          break;
+        }
+        if (result.attempts < maxHands) {
+          window.SVR_POKER_NEXT_HAND?.();
+          handledSequence = -1;
+        }
+      }
+      await wait(140);
+    }
+
+    if (!result.record && history[0]) result.record = history[0];
+    result.timeout = !result.pass && performance.now() - started >= timeoutMs;
+    result.audit = {
+      phase: state.phase,
+      handNo: state.handNo,
+      community: state.community?.length || 0,
+      holeCards: players.find((player) => player.human)?.hand?.length || 0,
+      waitingHuman: Boolean(state.waitingHuman),
+      legalActions: window.SVR_POKER_LEGAL_ACTIONS?.() || [],
+      settlement: settlementPass(),
+      controller: window.SVR_PHASE347_QA?.() || null,
+      phase355: window.SVR_PHASE355_QA?.() || null
+    };
+  } catch (error) {
+    result.error = String(error?.stack || error?.message || error);
+  } finally {
+    result.elapsedMs = +(performance.now() - started).toFixed(1);
+    result.finishedAt = new Date().toISOString();
+    running = false;
+    lastResult = result;
+    window.SVR_PHASE355_FULL_HAND_RESULT = result;
+  }
+  return result;
+}
+
+function qa() {
+  const result = {
+    build: BUILD,
+    active: ACTIVE,
+    installed: typeof window.SVR_PHASE355_RUN_FULL_HAND_QA === 'function',
+    phase344Alias: typeof window.SVR_PHASE344_RUN_FULL_HAND_QA === 'function',
+    pokerAction: typeof window.SVR_POKER_ACTION,
+    resetPoker: typeof window.SVR_RESET_POKER_TABLE,
+    lastResult,
+    history: history.slice(0, 3),
+    checkedAt: new Date().toISOString()
+  };
+  result.pass = result.active && result.installed && result.phase344Alias
+    && result.pokerAction === 'function' && result.resetPoker === 'function';
+  window.SVR_PHASE355_HAND_DRIVER_QA_STATE = result;
+  return result;
+}
+
+if (ACTIVE) {
+  window.SVR_PHASE355_RUN_FULL_HAND_QA = driveHand;
+  window.SVR_PHASE344_RUN_FULL_HAND_QA = driveHand;
+  window.SVR_PHASE355_HAND_DRIVER_QA = qa;
+  window.SVR_PHASE355_HAND_HISTORY = history;
+}
