@@ -1,5 +1,5 @@
 export const BUILD = 'PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK';
-export const VERSION = 'phase348';
+export const VERSION = 'phase349';
 
 const REGISTRY = [
   'modules/phase340_runtime_authority_registry.js'
@@ -44,6 +44,10 @@ const ACCOUNT_ACTIVITY = [
 
 const INGAME_AVATAR = [
   'modules/phase348_ingame_player_avatar_presence_performance_lock.js'
+];
+
+const MULTIPLAYER_PRESENCE = [
+  'modules/phase349_multiplayer_presence_seat_reconnect_lock.js'
 ];
 
 const DESKTOP_PRESENTATION = [
@@ -120,9 +124,10 @@ export function manifestFor(platform = detectPlatform()) {
       ...CAMERA3
     ]);
   }
-  if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...ACCOUNT_ACTIVITY, ...INGAME_AVATAR]);
-  if (value === 'quest') return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...QUEST, ...SETTLEMENT_PRESENTATION, ...ACCOUNT_ACTIVITY, ...INGAME_AVATAR]);
-  return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...DESKTOP_PRESENTATION, ...SETTLEMENT_PRESENTATION, ...ACCOUNT_ACTIVITY, ...INGAME_AVATAR]);
+  const sharedTail = [...ACCOUNT_ACTIVITY, ...INGAME_AVATAR, ...MULTIPLAYER_PRESENCE];
+  if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...sharedTail]);
+  if (value === 'quest') return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...QUEST, ...SETTLEMENT_PRESENTATION, ...sharedTail]);
+  return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...DESKTOP_PRESENTATION, ...SETTLEMENT_PRESENTATION, ...sharedTail]);
 }
 
 export function validateManifest(platform = detectPlatform()) {
@@ -137,12 +142,13 @@ export function validateManifest(platform = detectPlatform()) {
     const controllerIndex = normalized.findIndex((x) => x.endsWith('phase347_android_single_controller_seated_gameplay_apk_release_lock.js'));
     const profileIndex = normalized.findIndex((x) => x.endsWith('phase346_player_avatar_profile_bridge.js'));
     const avatarIndex = normalized.findIndex((x) => x.endsWith('phase348_ingame_player_avatar_presence_performance_lock.js'));
-    if (controllerIndex < 0 || profileIndex <= controllerIndex || avatarIndex <= profileIndex || avatarIndex !== normalized.length - 1) {
-      forbidden.push('phase348-android-load-order');
+    const presenceIndex = normalized.findIndex((x) => x.endsWith('phase349_multiplayer_presence_seat_reconnect_lock.js'));
+    if (controllerIndex < 0 || profileIndex <= controllerIndex || avatarIndex <= profileIndex || presenceIndex <= avatarIndex || presenceIndex !== normalized.length - 1) {
+      forbidden.push('phase349-android-load-order');
     }
   }
   if (platform === 'camera3') {
-    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js','modules/phase346_player_avatar_profile_bridge.js','modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js','modules/phase348_ingame_player_avatar_presence_performance_lock.js']) {
+    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js','modules/phase346_player_avatar_profile_bridge.js','modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js','modules/phase348_ingame_player_avatar_presence_performance_lock.js','modules/phase349_multiplayer_presence_seat_reconnect_lock.js']) {
       if (normalized.some((x) => x.endsWith(old))) forbidden.push(old);
     }
   }
