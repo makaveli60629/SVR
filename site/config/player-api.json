@@ -1,8 +1,10 @@
 {
-  "build": "PHASE-345-PLAYER-LOGIN-PROFILE-DAILY-REWARD-API-LOCK",
+  "build": "PHASE-349-MULTIPLAYER-PRESENCE-SEAT-RECONNECT-LOCK",
   "apiBase": "",
+  "presenceApiBase": "",
   "allowDemoFallback": true,
+  "allowLocalPresenceSimulation": true,
   "dailyRewardChips": 5000,
   "minimumActivitySeconds": 300,
-  "notes": "Set apiBase to the deployed secure backend URL, for example https://api.svrpoker.com/api. Do not place secrets in this file."
+  "notes": "Set apiBase and presenceApiBase to approved HTTPS backend URLs. Until presenceApiBase is configured, Phase 349 runs a clearly labeled same-browser simulation only. Do not place secrets in this file."
 }

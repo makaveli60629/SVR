@@ -1,0 +1,40 @@
+name: Phase 349 Presence Check
+
+on:
+  pull_request:
+    paths:
+      - 'game/modules/phase349_**'
+      - 'game/modules/phase340_platform_manifest.js'
+      - 'game/tools/phase349-presence-static-test.mjs'
+      - 'backend/phase349/**'
+      - 'site/config/player-api.json'
+      - 'game/manifest.json'
+      - 'game/android-release.json'
+      - '.github/workflows/phase349-presence-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate browser modules
+        run: |
+          node --check game/modules/phase349_multiplayer_presence_seat_reconnect_lock.js
+          node --check game/modules/phase349_presence_gameplay_seat_bridge.js
+          node --check game/modules/phase340_platform_manifest.js
+          node --check game/tools/phase349-presence-static-test.mjs
+      - name: Validate release and runtime contract
+        run: node game/tools/phase349-presence-static-test.mjs
+      - name: Install presence service dependencies
+        working-directory: backend/phase349
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Validate presence service syntax
+        working-directory: backend/phase349
+        run: npm run check

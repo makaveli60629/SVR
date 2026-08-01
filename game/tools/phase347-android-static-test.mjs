@@ -26,7 +26,12 @@ requireText(runtime, 'data-hole="0"', 'hole-slot-zero');
 requireText(runtime, 'data-hole="1"', 'hole-slot-one');
 requireText(runtime, "window.SVR_PHASE347_RUN_FULL_HAND_QA", 'full-hand-qa');
 requireText(platform, "phase347_android_single_controller_seated_gameplay_apk_release_lock.js", 'platform-module');
-requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...ACCOUNT_ACTIVITY, ...INGAME_AVATAR]);", 'android-runtime-load-order');
+requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...sharedTail]);", 'android-runtime-assembly');
+requireText(platform, "const controllerIndex = normalized.findIndex", 'runtime-controller-index');
+requireText(platform, "const profileIndex = normalized.findIndex", 'runtime-profile-index');
+requireText(platform, "const avatarIndex = normalized.findIndex", 'runtime-avatar-index');
+requireText(platform, "const presenceIndex = normalized.findIndex", 'runtime-presence-index');
+requireText(platform, "controllerIndex < 0 || profileIndex <= controllerIndex || avatarIndex <= profileIndex", 'runtime-order-validator');
 requireText(checker, 'current.releaseReady && current.apkUrl && current.apkVersionCode > installed', 'conditional-apk-menu');
 requireText(androidPage, 'm.releaseReady===true&&m.apkUrl', 'android-page-conditional-download');
 requireText(downloadsPage, 'm.releaseReady===true&&m.apkUrl', 'downloads-page-conditional-download');
@@ -37,6 +42,7 @@ if (Number(manifest.phase || 0) < 347) errors.push('manifest-phase-regressed');
 if (!String(manifest.build || '').startsWith('PHASE-')) errors.push('manifest-build-missing');
 if (manifest.force_update !== false || manifest.show_update_prompt !== false || manifest.manual_update_only !== true) errors.push('manifest-update-policy');
 if (!String(release.currentGameBuild || '').startsWith('PHASE-')) errors.push('release-build-missing');
+if (release.currentGameBuild !== manifest.build) errors.push('release-manifest-build-mismatch');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('release-update-policy');
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.apkVersionCode !== 1 || release.nextApkVersionCode !== 2) errors.push('apk-version-gate');
@@ -52,7 +58,7 @@ console.log(JSON.stringify({
   platformVersion,
   controller: 'single-visible-authority',
   horizontalInput: 'direct',
-  runtimeOrder: ['ANDROID_FINAL', 'ACCOUNT_ACTIVITY', 'INGAME_AVATAR'],
+  runtimeOrderValidation: 'assembled-manifest',
   cards: { hole: 2, community: 5, floating: 7 },
   apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, next: release.nextApkVersionName, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
