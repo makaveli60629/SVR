@@ -27,17 +27,14 @@ requireText(runtime, 'data-hole="1"', 'hole-slot-one');
 requireText(runtime, "window.SVR_PHASE347_RUN_FULL_HAND_QA", 'full-hand-qa');
 requireText(platform, "phase347_android_single_controller_seated_gameplay_apk_release_lock.js", 'platform-module');
 requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...sharedTail]);", 'android-runtime-assembly');
+requireText(platform, "const controllerIndex = normalized.findIndex", 'runtime-controller-index');
+requireText(platform, "const profileIndex = normalized.findIndex", 'runtime-profile-index');
+requireText(platform, "const avatarIndex = normalized.findIndex", 'runtime-avatar-index');
+requireText(platform, "const presenceIndex = normalized.findIndex", 'runtime-presence-index');
+requireText(platform, "controllerIndex < 0 || profileIndex <= controllerIndex || avatarIndex <= profileIndex", 'runtime-order-validator');
 requireText(checker, 'current.releaseReady && current.apkUrl && current.apkVersionCode > installed', 'conditional-apk-menu');
 requireText(androidPage, 'm.releaseReady===true&&m.apkUrl', 'android-page-conditional-download');
 requireText(downloadsPage, 'm.releaseReady===true&&m.apkUrl', 'downloads-page-conditional-download');
-
-const controllerIndex = platform.indexOf('phase347_android_single_controller_seated_gameplay_apk_release_lock.js');
-const accountIndex = platform.indexOf('phase345_player_account_activity_bridge.js');
-const profileIndex = platform.indexOf('phase346_player_avatar_profile_bridge.js');
-const avatarIndex = platform.indexOf('phase348_ingame_player_avatar_presence_performance_lock.js');
-const presenceIndex = platform.indexOf('phase349_multiplayer_presence_seat_reconnect_lock.js');
-if (!(controllerIndex >= 0 && accountIndex > controllerIndex && profileIndex > accountIndex && avatarIndex > profileIndex)) errors.push('android-runtime-load-order');
-if (presenceIndex >= 0 && presenceIndex <= avatarIndex) errors.push('later-runtime-before-avatar');
 
 const platformVersion = Number(platform.match(/export const VERSION = 'phase(\d+)'/)?.[1] || 0);
 if (platformVersion < 347) errors.push('platform-version-regressed');
@@ -61,7 +58,7 @@ console.log(JSON.stringify({
   platformVersion,
   controller: 'single-visible-authority',
   horizontalInput: 'direct',
-  runtimeOrder: ['ANDROID_FINAL', 'ACCOUNT_ACTIVITY', 'INGAME_AVATAR', 'LATER_SHARED_MODULES'],
+  runtimeOrderValidation: 'assembled-manifest',
   cards: { hole: 2, community: 5, floating: 7 },
   apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, next: release.nextApkVersionName, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
