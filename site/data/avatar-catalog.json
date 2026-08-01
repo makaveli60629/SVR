@@ -1,0 +1,67 @@
+{
+  "build": "PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK",
+  "version": 1,
+  "avatarModels": [
+    {
+      "id": "svr-player",
+      "label": "SVR Player",
+      "assetUrl": "/game/assets/models/player.glb",
+      "format": "glb",
+      "default": true,
+      "targetHeightMeters": 1.72
+    }
+  ],
+  "palettes": [
+    { "id": "midnight", "label": "Midnight", "bodyTint": "#d8dbe4", "primary": "#11172a", "secondary": "#7ffcff", "metal": "#b9c7d8" },
+    { "id": "scorpion", "label": "Scorpion", "bodyTint": "#e3d7ca", "primary": "#2d0711", "secondary": "#ff4f78", "metal": "#d6a84a" },
+    { "id": "emerald", "label": "Emerald", "bodyTint": "#dedfd6", "primary": "#052b20", "secondary": "#68f5bf", "metal": "#d7e8df" },
+    { "id": "royal", "label": "Royal", "bodyTint": "#ded8e6", "primary": "#26134f", "secondary": "#b37cff", "metal": "#f2d98a" },
+    { "id": "gold", "label": "Gold Room", "bodyTint": "#eadfcf", "primary": "#241a08", "secondary": "#ffd36a", "metal": "#fff1b4" }
+  ],
+  "categories": {
+    "headwear": [
+      { "id": "none", "label": "No Hat", "generator": "none", "ownedByDefault": true },
+      { "id": "cap", "label": "SVR Cap", "generator": "cap", "ownedByDefault": true },
+      { "id": "beanie", "label": "Night Beanie", "generator": "beanie", "ownedByDefault": true },
+      { "id": "crown", "label": "Founder Crown", "generator": "crown", "ownedByDefault": true }
+    ],
+    "eyewear": [
+      { "id": "none", "label": "No Glasses", "generator": "none", "ownedByDefault": true },
+      { "id": "neon", "label": "Neon Frames", "generator": "glasses-round", "ownedByDefault": true },
+      { "id": "visor", "label": "VR Visor", "generator": "visor", "ownedByDefault": true }
+    ],
+    "top": [
+      { "id": "none", "label": "Base Outfit", "generator": "none", "ownedByDefault": true },
+      { "id": "jacket", "label": "Casino Jacket", "generator": "jacket", "ownedByDefault": true },
+      { "id": "vest", "label": "Dealer Vest", "generator": "vest", "ownedByDefault": true },
+      { "id": "hoodie", "label": "SVR Hoodie", "generator": "hoodie", "ownedByDefault": true }
+    ],
+    "shoes": [
+      { "id": "none", "label": "Base Shoes", "generator": "none", "ownedByDefault": true },
+      { "id": "sneakers", "label": "Neon Sneakers", "generator": "sneakers", "ownedByDefault": true },
+      { "id": "boots", "label": "Black Boots", "generator": "boots", "ownedByDefault": true }
+    ],
+    "accessory": [
+      { "id": "none", "label": "No Accessory", "generator": "none", "ownedByDefault": true },
+      { "id": "chain", "label": "Gold Chain", "generator": "chain", "ownedByDefault": true },
+      { "id": "watch", "label": "SVR Watch", "generator": "watch", "ownedByDefault": true },
+      { "id": "badge", "label": "Founder Badge", "generator": "badge", "ownedByDefault": true }
+    ]
+  },
+  "presets": [
+    { "id": "table-ready", "label": "Table Ready", "outfit": { "palette": "midnight", "headwear": "cap", "eyewear": "none", "top": "jacket", "shoes": "sneakers", "accessory": "watch" } },
+    { "id": "scorpion-vip", "label": "Scorpion VIP", "outfit": { "palette": "scorpion", "headwear": "none", "eyewear": "visor", "top": "vest", "shoes": "boots", "accessory": "chain" } },
+    { "id": "founder", "label": "Founder", "outfit": { "palette": "gold", "headwear": "crown", "eyewear": "neon", "top": "jacket", "shoes": "boots", "accessory": "badge" } },
+    { "id": "social-lounge", "label": "Social Lounge", "outfit": { "palette": "royal", "headwear": "beanie", "eyewear": "neon", "top": "hoodie", "shoes": "sneakers", "accessory": "watch" } }
+  ],
+  "defaultOutfit": {
+    "schemaVersion": 1,
+    "modelId": "svr-player",
+    "palette": "midnight",
+    "headwear": "none",
+    "eyewear": "none",
+    "top": "jacket",
+    "shoes": "sneakers",
+    "accessory": "watch"
+  }
+}
