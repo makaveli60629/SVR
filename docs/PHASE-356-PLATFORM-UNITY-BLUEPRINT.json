@@ -1,0 +1,63 @@
+{
+  "build": "PHASE-356-PLATFORM-UNITY-BLUEPRINT-LOCK",
+  "phase": 356,
+  "primaryPlatform": "android",
+  "platforms": {
+    "android": {
+      "entry": "/game/android.html?channel=stable&v=phase356",
+      "rendererProfile": "mobile-low-overhead",
+      "controls": "phase347-single-move-look-action-controller",
+      "avatarProfile": "five-lightweight-table-avatars"
+    },
+    "quest": {
+      "entry": "/game/index.html",
+      "rendererProfile": "webxr-hands-controller-fallback"
+    },
+    "desktop": {
+      "entry": "/game/index.html",
+      "rendererProfile": "desktop-web-preview"
+    },
+    "camera3": {
+      "entry": "/game/camera3.html?v=phase356",
+      "rendererProfile": "director-presentation"
+    },
+    "website": {
+      "entry": "/site/index.html",
+      "profile": "/site/profile.html",
+      "support": "/api/ai/support"
+    }
+  },
+  "sharedAuthorities": [
+    "poker-rules",
+    "pot-settlement",
+    "player-profile",
+    "equipped-outfit",
+    "platform-detection",
+    "single-controller-contract",
+    "deployment-release-record"
+  ],
+  "profileFields": [
+    "avatarUrl",
+    "equippedOutfit.modelId",
+    "equippedOutfit.palette",
+    "equippedOutfit.headwear",
+    "equippedOutfit.eyewear",
+    "equippedOutfit.top",
+    "equippedOutfit.shoes",
+    "equippedOutfit.accessory"
+  ],
+  "unityMapping": {
+    "PokerAuthority": "phase336-authoritative-engine",
+    "AndroidInput": "phase347-single-controller",
+    "AvatarProvider": "profileFields-to-Unity-AvatarProvider",
+    "PlatformResolver": "phase340-detectPlatform-equivalent",
+    "RecoveryController": "phase356-low-power-and-reload-contract"
+  },
+  "apkPolicy": {
+    "apkVersionName": "0.1.0-rc1",
+    "apkVersionCode": 1,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true
+  }
+}
