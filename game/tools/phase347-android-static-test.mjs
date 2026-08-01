@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const read = (path) => fs.readFileSync(path, 'utf8');
 const runtime = read('game/modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js');
+const recovery = read('game/modules/phase356_android_real_device_freeze_recovery_lock.js');
 const engine = read('game/modules/phase336_authoritative_engine.js');
 const handDriver = read('game/modules/phase355_android_full_hand_driver_compatibility_lock.js');
 const platform = read('game/modules/phase340_platform_manifest.js');
@@ -37,19 +38,25 @@ requireText(handDriver, "window.SVR_POKER_QA_PASSIVE_BOTS = previousPassiveMode"
 requireText(handDriver, "totalStacks === 6000", 'hand-driver-chip-conservation');
 requireText(handDriver, "['preflop', 'flop', 'turn', 'river', 'showdown']", 'hand-driver-all-streets');
 requireText(handDriver, "activeRecord = makeRecord(result.attempts + 1)", 'retry-record-recreation');
+requireText(platform, "phase356_android_real_device_freeze_recovery_lock.js", 'phase356-recovery-module');
 requireText(platform, "phase347_android_single_controller_seated_gameplay_apk_release_lock.js", 'platform-module');
 requireText(platform, "phase355_android_full_hand_driver_compatibility_lock.js", 'platform-hand-driver');
 requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...ANDROID_FOUNDATION, ...ANDROID_POKER, ...ANDROID_FINAL]);", 'android-critical-runtime-assembly');
 requireText(platform, 'export function deferredManifestFor', 'android-deferred-runtime-export');
+requireText(platform, 'const ANDROID_DEFERRED = []', 'android-background-work-disabled');
+requireText(platform, "const recoveryIndex = normalized.findIndex", 'runtime-recovery-index');
 requireText(platform, "const controllerIndex = normalized.findIndex", 'runtime-controller-index');
 requireText(platform, "const handDriverIndex = normalized.findIndex", 'runtime-hand-driver-index');
-requireText(platform, "const profileIndex = normalizedDeferred.findIndex", 'deferred-profile-index');
-requireText(platform, "const avatarIndex = normalizedDeferred.findIndex", 'deferred-avatar-index');
-requireText(platform, "const presenceIndex = normalizedDeferred.findIndex", 'deferred-presence-index');
 requireText(platform, "const dedupeIndex = normalized.findIndex", 'runtime-dedupe-index');
+requireText(platform, "mainIndex <= recoveryIndex", 'recovery-before-main-validator');
 requireText(platform, "handDriverIndex <= controllerIndex", 'critical-order-validator');
 requireText(platform, "dedupeIndex <= handDriverIndex", 'dedupe-after-driver-validator');
-requireText(platform, "profileIndex < 0 || avatarIndex <= profileIndex || presenceIndex <= avatarIndex", 'deferred-order-validator');
+requireText(platform, "normalizedDeferred.length !== 0", 'zero-deferred-validator');
+requireText(platform, "phase356-android-background-deferred-work", 'zero-deferred-error-label');
+requireText(recovery, 'PHASE356_ANDROID_LIGHTWEIGHT_TABLE_AVATARS', 'lightweight-table-avatars');
+requireText(recovery, 'inspected < 240', 'bounded-scene-inspection');
+requireText(recovery, 'gap > 1800', 'frame-gap-watchdog');
+requireText(recovery, 'window.SVR_PHASE356_ENTER_LOW_POWER', 'low-power-recovery');
 requireText(checker, 'current.releaseReady && current.apkUrl && current.apkVersionCode > installed', 'conditional-apk-menu');
 requireText(androidPage, 'm.releaseReady===true&&m.apkUrl', 'android-page-conditional-download');
 requireText(downloadsPage, 'm.releaseReady===true&&m.apkUrl', 'downloads-page-conditional-download');
@@ -64,6 +71,7 @@ if (release.currentGameBuild !== manifest.build) errors.push('release-manifest-b
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('release-update-policy');
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.apkVersionCode !== 1 || release.nextApkVersionCode !== 2) errors.push('apk-version-gate');
+if (Number(manifest.phase || 0) >= 356 && release.realDeviceValidation?.pending !== true) errors.push('real-device-validation-must-remain-pending');
 
 if (errors.length) {
   console.error(JSON.stringify({ pass: false, errors }, null, 2));
@@ -77,7 +85,8 @@ console.log(JSON.stringify({
   controller: 'single-visible-authority',
   horizontalInput: 'direct',
   qaBots: 'deterministic-check-call-mode-enabled-only-during-acceptance-and-restored-afterward',
-  runtimeOrderValidation: 'critical-gameplay-and-full-hand-driver-first-with-deferred-profile-presence-tail',
+  runtimeOrderValidation: 'phase356-recovery-before-main-critical-gameplay-and-driver-with-zero-background-deferred-work',
+  avatars: 'five-lightweight-table-opponents-without-fbx-presence-downloads',
   cards: { hole: 2, community: 5, floating: 7 },
   apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, next: release.nextApkVersionName, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
