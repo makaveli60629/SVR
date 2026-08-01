@@ -1,0 +1,52 @@
+name: Phase 354 Android Full Game Acceptance
+
+on:
+  pull_request:
+    paths:
+      - 'game/android.html'
+      - 'game/modules/phase336_authoritative_engine.js'
+      - 'game/modules/phase344_android_full_hand_acceptance_input_lock.js'
+      - 'game/modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js'
+      - 'game/modules/phase350_android_controller_dom_deduplication_lock.js'
+      - 'game/modules/phase354_android_full_game_release_acceptance_lock.js'
+      - 'game/tools/phase354-android-browser-acceptance.cjs'
+      - '.github/workflows/phase354-android-full-game-acceptance.yml'
+  workflow_dispatch:
+
+jobs:
+  android-full-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Static syntax checks
+        run: |
+          node --check game/modules/phase354_android_full_game_release_acceptance_lock.js
+          node --check game/tools/phase354-android-browser-acceptance.cjs
+          grep -q 'PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK' game/android.html
+          grep -q 'phase354_android_full_game_release_acceptance_lock.js' game/android.html
+          grep -q 'SVR_PHASE354_RUN_ANDROID_FULL_GAME_ACCEPTANCE' game/modules/phase354_android_full_game_release_acceptance_lock.js
+          grep -q 'totalStacks === 6000' game/modules/phase354_android_full_game_release_acceptance_lock.js
+          grep -q 'nextHand?.advanced' game/modules/phase354_android_full_game_release_acceptance_lock.js
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+      - name: Start local site
+        run: |
+          python3 -m http.server 4173 > /tmp/svr-http.log 2>&1 &
+          echo $! > /tmp/svr-http.pid
+          sleep 2
+      - name: Run Android full-game acceptance
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase354-android-browser-acceptance.cjs
+      - name: Upload HTTP log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase354-http-log
+          path: /tmp/svr-http.log
