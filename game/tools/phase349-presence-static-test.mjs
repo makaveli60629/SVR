@@ -27,7 +27,10 @@ requireText(seatBridge, "SVR_PHASE349_RELEASE_SEAT", 'gameplay-seat-release');
 
 requireText(platform, "phase349_multiplayer_presence_seat_reconnect_lock.js", 'presence-module');
 requireText(platform, "phase349_presence_gameplay_seat_bridge.js", 'seat-bridge-module');
-requireText(platform, "const sharedTail = [...ACCOUNT_ACTIVITY, ...INGAME_AVATAR, ...MULTIPLAYER_PRESENCE]", 'shared-presence-tail');
+requireText(platform, "const SHARED_SOCIAL = [", 'shared-presence-tail');
+requireText(platform, "...ACCOUNT_ACTIVITY", 'shared-account-tail');
+requireText(platform, "...INGAME_AVATAR", 'shared-avatar-tail');
+requireText(platform, "...MULTIPLAYER_PRESENCE", 'shared-presence-modules');
 requireText(platform, "const ANDROID_DEFERRED = []", 'android-background-presence-disabled');
 requireText(platform, "phase356-android-background-deferred-work", 'android-zero-background-validator');
 requireText(platform, "phase356_android_real_device_freeze_recovery_lock.js", 'android-recovery-module');
@@ -39,7 +42,8 @@ const avatarIndex = platform.indexOf("'modules/phase348_ingame_player_avatar_pre
 const presenceIndex = platform.indexOf("'modules/phase349_multiplayer_presence_seat_reconnect_lock.js'");
 const bridgeIndex = platform.indexOf("'modules/phase349_presence_gameplay_seat_bridge.js'");
 if (!(profileIndex >= 0 && avatarIndex > profileIndex && presenceIndex > avatarIndex && bridgeIndex > presenceIndex)) errors.push('presence-declaration-order');
-const cameraValidation = platform.slice(platform.indexOf("if (platform === 'camera3')"));
+const cameraValidationStart = platform.indexOf("if (value === 'camera3')", platform.indexOf('export function validateManifest'));
+const cameraValidation = cameraValidationStart >= 0 ? platform.slice(cameraValidationStart) : '';
 if (!cameraValidation.includes('phase349_multiplayer_presence_seat_reconnect_lock.js') || !cameraValidation.includes('phase349_presence_gameplay_seat_bridge.js')) errors.push('camera3-exclusion-validator');
 
 requireText(server, "app.post('/api/presence/join'", 'server-join');
@@ -77,7 +81,7 @@ console.log(JSON.stringify({
   transport: 'local-simulation-until-presenceApiBase-configured',
   authority: { presence: true, seats: true, pokerState: false },
   androidLoadPolicy: 'phase356-disabled-during-table-play-to-prevent-real-device-freezes',
-  questDesktopLoadPolicy: 'profile-avatar-presence-shared-tail-preserved',
+  questDesktopLoadPolicy: 'profile-avatar-presence-shared-tail-preserved-and-deferred-on-quest',
   camera3Excluded: true,
   apk: { version: release.apkVersionName, code: release.apkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));

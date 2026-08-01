@@ -1,0 +1,61 @@
+name: Phase 358 Quest Full Game Acceptance
+
+on:
+  pull_request:
+    paths:
+      - 'game/index.html'
+      - 'game/assets/table.fbx'
+      - 'game/modules/phase340_platform_manifest.js'
+      - 'game/modules/phase340_platform_core_loader.js'
+      - 'game/modules/phase358_quest_incremental_shader_compile_lock.js'
+      - 'game/modules/phase358_quest_runtime_boot_lock.js'
+      - 'game/modules/phase358_quest_uploaded_table_authority_lock.js'
+      - 'game/modules/phase358_quest_poker_boot_order_lock.js'
+      - 'game/modules/phase358_quest_pot_display_authority_lock.js'
+      - 'game/modules/phase358_quest_full_game_acceptance_smoothness_lock.js'
+      - 'game/tools/phase358-quest-static-test.mjs'
+      - 'game/tools/phase358-quest-browser-acceptance.cjs'
+      - 'game/quest-release.json'
+      - '.github/workflows/phase358-quest-full-game-acceptance.yml'
+  workflow_dispatch:
+
+jobs:
+  quest-full-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate Quest contracts and syntax
+        run: |
+          node --check game/modules/phase340_platform_manifest.js
+          node --check game/modules/phase340_platform_core_loader.js
+          node --check game/modules/phase358_quest_incremental_shader_compile_lock.js
+          node --check game/modules/phase358_quest_runtime_boot_lock.js
+          node --check game/modules/phase358_quest_uploaded_table_authority_lock.js
+          node --check game/modules/phase358_quest_poker_boot_order_lock.js
+          node --check game/modules/phase358_quest_pot_display_authority_lock.js
+          node --check game/modules/phase358_quest_full_game_acceptance_smoothness_lock.js
+          node --check game/tools/phase358-quest-browser-acceptance.cjs
+          node game/tools/phase358-quest-static-test.mjs
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+      - name: Start local site
+        run: |
+          python3 -m http.server 4173 > /tmp/svr-phase358-http.log 2>&1 &
+          echo $! > /tmp/svr-phase358-http.pid
+          sleep 2
+      - name: Run Quest browser full-game acceptance
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase358-quest-browser-acceptance.cjs
+      - name: Upload HTTP log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase358-quest-http-log
+          path: /tmp/svr-phase358-http.log
