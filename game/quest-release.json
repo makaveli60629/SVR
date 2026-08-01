@@ -1,0 +1,38 @@
+{
+  "name": "SVR Poker Quest WebXR",
+  "channel": "stable",
+  "status": "quest-browser-full-game-acceptance-pending",
+  "webEntry": "/game/index.html?platform=quest&v=phase356",
+  "currentGameBuild": "PHASE-356-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK",
+  "handsPrimary": true,
+  "controllerFallback": true,
+  "snapTurnDegrees": 45,
+  "movementReference": "headset-look-direction",
+  "teleportPolicy": "hold-to-aim-release-to-teleport",
+  "androidControlsAllowed": false,
+  "criticalStartupBudgetMs": 45000,
+  "browserAcceptance": {
+    "passed": false,
+    "pending": true,
+    "questUserAgent": true,
+    "fullHandRequired": true,
+    "nextHandRequired": true,
+    "cleanConsoleRequired": true,
+    "physicalQuestSessionTested": false
+  },
+  "productTruth": {
+    "localPlayMoneyAgainstBots": true,
+    "serverAuthoritativeMultiplayer": false,
+    "physicalHandTrackingAcceptanceRequired": true,
+    "physicalControllerAcceptanceRequired": true,
+    "physicalTeleportAcceptanceRequired": true
+  },
+  "androidApkUnchanged": {
+    "versionName": "0.1.0-rc1",
+    "versionCode": 1,
+    "releaseReady": false,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true
+  }
+}
