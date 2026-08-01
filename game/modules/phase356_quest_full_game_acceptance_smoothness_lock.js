@@ -148,7 +148,8 @@ async function waitForRuntime(timeoutMs = 120000) {
     );
     window.SVR_PHASE356_PROGRESS = {
       stage: 'waiting-runtime', elapsedMs: Math.round(performance.now() - started), loaded: loaded.length,
-      failed: platformState().failed || [], ready, at: new Date().toISOString()
+      failed: platformState().failed || [], uploadedTable: window.SVR_PHASE356_UPLOADED_TABLE_QA?.() || null,
+      ready, at: new Date().toISOString()
     };
     if (ready) return true;
     await wait(150);
@@ -162,19 +163,22 @@ async function driveFullHand(timeoutMs = 75000) {
   const phases = [];
   let communityMax = 0;
   let holeCards = 0;
-  let handledSequence = -1;
+  let lastHumanActionAt = 0;
+  let humanActions = 0;
   try {
     window.SVR_POKER_QA_PASSIVE_BOTS = true;
     window.SVR_RESET_POKER_TABLE(1000);
     while (performance.now() - started < timeoutMs) {
+      const now = performance.now();
       const phase = String(state.phase || 'idle').toLowerCase();
       if (!phases.includes(phase)) phases.push(phase);
       communityMax = Math.max(communityMax, state.community?.length || 0);
       holeCards = Math.max(holeCards, players.find((player) => player.human)?.hand?.length || 0);
-      if (state.waitingHuman && Number(state.actionSeq || 0) !== handledSequence) {
+      if (state.waitingHuman && now - lastHumanActionAt >= 240) {
         const action = chooseAction();
         if (action) {
-          handledSequence = Number(state.actionSeq || 0);
+          lastHumanActionAt = now;
+          humanActions += 1;
           window.SVR_POKER_ACTION(action);
         }
       }
@@ -183,11 +187,11 @@ async function driveFullHand(timeoutMs = 75000) {
         const settlement = settlementAudit();
         const pass = ['preflop', 'flop', 'turn', 'river', 'showdown'].every((item) => phases.includes(item))
           && communityMax === 5 && holeCards === 2 && settlement.pass;
-        return { pass, phases, communityMax, holeCards, settlement, elapsedMs: +(performance.now() - started).toFixed(1) };
+        return { pass, phases, communityMax, holeCards, humanActions, settlement, elapsedMs: +(performance.now() - started).toFixed(1) };
       }
       await wait(40);
     }
-    return { pass: false, timeout: true, phases, communityMax, holeCards, settlement: settlementAudit(), elapsedMs: +(performance.now() - started).toFixed(1) };
+    return { pass: false, timeout: true, phases, communityMax, holeCards, humanActions, settlement: settlementAudit(), elapsedMs: +(performance.now() - started).toFixed(1) };
   } finally {
     if (previousPassive === undefined) delete window.SVR_POKER_QA_PASSIVE_BOTS;
     else window.SVR_POKER_QA_PASSIVE_BOTS = previousPassive;
@@ -287,7 +291,7 @@ function install() {
     forwardReference: 'headset-look-direction', uploadedTableRequired: true,
     fullGameBrowserAcceptance: true, physicalQuestInputAcceptanceRequired: true, installedAt
   };
-  if (PARAMS.get('acceptance') === '1') setTimeout(() => runAcceptance(), 700);
+  if (PARAMS.get('acceptance') === '1' && PARAMS.get('manual') !== '1') setTimeout(() => runAcceptance(), 700);
 }
 
 install();
