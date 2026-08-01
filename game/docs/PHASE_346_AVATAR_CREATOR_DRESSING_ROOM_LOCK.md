@@ -11,14 +11,19 @@ Phase 346 adds one player-avatar record shared by the website, Android, Quest, P
 - Game avatar route: `/game/avatar.html?v=phase346`
 - Profile live preview: `/site/profile.html?v=phase346`
 
-## Avatar authority
-- Default model: `/game/assets/models/player.glb`
-- Target preview height: 1.72 meters
+## Verified avatar authority
+- Eric body: `/game/assets/models/eric/eric.fbx`, normalized to 1.78 meters
+- Claudia body: `/game/assets/models/claudia/claudia.fbx`, normalized to 1.70 meters
+- Default player body: Eric
+- Supported viewer formats: FBX, GLB, and glTF
 - Safe fallback: lightweight procedural mannequin
-- Eric and Claudia remain NPC assets and are not player-avatar authorities.
+- Eric and Claudia NPC instances remain separate from dressing-room player clones.
 - The dressing room does not load the poker lobby or Camera 3 runtime.
 
+The first Phase 346 validation run rejected a stale `/game/assets/models/player.glb` reference because that file is not present on current `main`. The corrected catalog resolves only models verified in the repository, and CI checks every catalog path before merge.
+
 ## Starter wardrobe
+- Two verified body choices
 - Five color palettes
 - Headwear: none, SVR cap, beanie, founder crown
 - Eyewear: none, neon frames, VR visor
@@ -28,15 +33,15 @@ Phase 346 adds one player-avatar record shared by the website, Android, Quest, P
 - Four complete presets
 - Randomize, reset, save, camera reset, auto rotate, and portrait capture
 
-The current `player.glb` contains one skinned mesh and one material rather than modular clothing meshes. Phase 346 therefore uses independent lightweight equipment layers in the dressing-room preview. The saved schema already supports replacing each generated layer with dedicated GLB equipment later.
+The verified FBX bodies are complete rigged characters rather than modular clothing collections. Phase 346 therefore adds independent lightweight equipment layers in the dressing-room preview. The saved schema already supports replacing each generated layer with dedicated FBX/GLB equipment later.
 
 ## Saved profile schema
 ```json
 {
-  "avatarUrl": "/game/assets/models/player.glb",
+  "avatarUrl": "https://svrpoker.com/game/assets/models/eric/eric.fbx",
   "equippedOutfit": {
     "schemaVersion": 1,
-    "modelId": "svr-player",
+    "modelId": "eric",
     "palette": "midnight",
     "headwear": "cap",
     "eyewear": "none",
@@ -59,7 +64,7 @@ window.SVR_PHASE346_AVATAR_BRIDGE_QA()
 window.SVR_OPEN_AVATAR_ROOM()
 ```
 
-Camera 3 explicitly excludes the account and avatar bridges.
+The bridge includes `modelUrl`, `modelFormat`, `targetHeightMeters`, and the complete outfit record. Camera 3 explicitly excludes the account and avatar bridges.
 
 ## Dressing-room QA
 ```js
@@ -79,6 +84,7 @@ Unity should consume the same profile record and resolve:
 3. Palette IDs to material presets.
 4. Inventory ownership before equipping non-starter items.
 5. A safe mannequin when any asset fails.
+6. Eric and Claudia player prefabs separately from poker-table NPC prefabs.
 
 ## Protected locks
 - Phase 336 remains poker-ledger authority.
