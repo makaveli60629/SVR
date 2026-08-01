@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 export const BUILD = 'PHASE-356-QUEST-POT-DISPLAY-AUTHORITY-LOCK';
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -16,17 +18,7 @@ async function install(timeoutMs = 8000) {
     if (display) {
       let marker = display.children?.find?.((child) => child?.name === 'PHASE333_PHASE356_QUEST_POT_DISPLAY_AUTHORITY');
       if (!marker) {
-        const Object3D = display.constructor?.prototype?.isSprite
-          ? display.constructor.prototype.constructor
-          : null;
-        marker = Object3D ? new Object3D() : null;
-        if (!marker || marker.isSprite) {
-          marker = document.createElement ? null : marker;
-        }
-        if (!marker) {
-          const THREE = await import('three');
-          marker = new THREE.Object3D();
-        }
+        marker = new THREE.Object3D();
         marker.name = 'PHASE333_PHASE356_QUEST_POT_DISPLAY_AUTHORITY';
         marker.userData = { phase356PotDisplayAuthority: true };
         display.add(marker);
