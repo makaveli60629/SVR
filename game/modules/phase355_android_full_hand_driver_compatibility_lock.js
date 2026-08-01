@@ -38,6 +38,7 @@ function settlementPass() {
     })),
     settledPot: Number(state.settledPot || 0),
     totalStacks,
+    fundedPlayers: players.filter((player) => Number(player.stack || 0) > 0).length,
     pass: (state.winners || []).length > 0
       && Number(state.settledPot || 0) > 0
       && totalStacks === 6000
@@ -46,10 +47,25 @@ function settlementPass() {
 
 function chooseAction() {
   const legal = window.SVR_POKER_LEGAL_ACTIONS?.() || [];
+  const human = players.find((player) => player.human) || players[0];
+  const phase = String(state.phase || '').toLowerCase();
+  const needed = Math.max(0, Number(state.currentBet || 0) - Number(human?.bet || 0));
+  const stack = Math.max(0, Number(human?.stack || 0));
+
   if (legal.includes('check')) return 'check';
-  if (legal.includes('call')) return 'call';
-  if (legal.includes('allin')) return 'allin';
+
+  if (legal.includes('call')) {
+    // The acceptance driver must prove every street and also leave at least two
+    // funded players for NEXT HAND. It therefore folds oversized late-street
+    // calls instead of allowing a single test hand to eliminate the table.
+    const lateStreet = phase === 'turn' || phase === 'river';
+    const expensive = needed >= Math.max(80, Math.floor(stack * 0.38));
+    if (lateStreet && expensive && legal.includes('fold')) return 'fold';
+    return 'call';
+  }
+
   if (legal.includes('fold')) return 'fold';
+  if (legal.includes('allin')) return 'allin';
   return legal[0] || null;
 }
 
@@ -128,10 +144,12 @@ async function driveHand(options = {}) {
         record.winners = settlement.winners;
         record.settledPot = settlement.settledPot;
         record.totalStacks = settlement.totalStacks;
-        record.pass = ['preflop', 'flop', 'turn', 'river', 'showdown'].every((phase) => record.phases.includes(phase))
+        record.fundedPlayers = settlement.fundedPlayers;
+        record.pass = ['preflop', 'flop', 'turn', 'river', 'showdown'].every((phaseName) => record.phases.includes(phaseName))
           && record.communityMax === 5
           && record.holeCards === 2
-          && settlement.pass;
+          && settlement.pass
+          && settlement.fundedPlayers >= 2;
         history.unshift({ ...record, phases: record.phases.slice(), actions: record.actions.slice() });
         history.splice(8);
         result.attempts += 1;
@@ -141,7 +159,7 @@ async function driveHand(options = {}) {
           break;
         }
         if (result.attempts < maxHands) {
-          window.SVR_POKER_NEXT_HAND?.();
+          window.SVR_RESET_POKER_TABLE(1000);
           handledSequence = -1;
         }
       }
