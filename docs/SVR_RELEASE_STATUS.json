@@ -1,0 +1,147 @@
+{
+  "project": "SVR Poker",
+  "statusVersion": 1,
+  "projectPhase": 359,
+  "build": "PHASE-359-RELEASE-CONSOLIDATION-BLOCKER-LOCK",
+  "generatedAt": "2026-08-01",
+  "repository": "makaveli60629/SVR",
+  "defaultBranch": "main",
+  "currentMainCommitBeforePhase359": "d28d6d2cffdf65cbe9ed508b9c30775693049f59",
+  "platforms": {
+    "androidWeb": {
+      "phase": 357,
+      "build": "PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK",
+      "route": "/game/android.html?channel=stable&v=phase357",
+      "automatedBrowserAcceptance": "passed",
+      "physicalDeviceAcceptance": "pending-owner-test",
+      "features": [
+        "single MOVE and LOOK controller",
+        "direct camera correction to the south table edge after SIT",
+        "active-player, bet, call amount, and last-action indicators",
+        "winner, settled pot, winning hand, hole cards, and board display",
+        "ANTE UP / NEXT HAND continuation",
+        "real-device freeze recovery and low-power controls"
+      ]
+    },
+    "questWebXR": {
+      "phase": 358,
+      "build": "PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK",
+      "route": "/game/index.html?platform=quest&v=phase358",
+      "automatedBrowserAcceptance": "passed",
+      "physicalHeadsetAcceptance": "pending-owner-test",
+      "features": [
+        "Meta hands primary",
+        "Quest controller fallback",
+        "headset-look forward movement",
+        "45-degree snap turn",
+        "hold-to-aim and release-to-teleport",
+        "uploaded FBX table authority",
+        "incremental Quest shader compilation",
+        "complete local hand and next-hand acceptance"
+      ]
+    },
+    "desktopWeb": {
+      "route": "/game/index.html?desktop=1",
+      "status": "supported-secondary-platform",
+      "automatedFullReleaseAcceptance": "not-separately-certified"
+    },
+    "camera3": {
+      "phase": 350,
+      "route": "/game/camera3.html?v=phase350",
+      "status": "spectator-only",
+      "accountAvatarPresenceExcluded": true
+    }
+  },
+  "gameAuthority": {
+    "pokerRules": "Phase 336 local authoritative engine",
+    "tableAndCards": "Phase 341 canonical coordinate authority",
+    "dealingDirection": "LEFT_TO_RIGHT",
+    "tableSeats": "five bots plus one open south/front player seat",
+    "serverAuthoritativePoker": false,
+    "serverAuthoritativeCards": false,
+    "serverAuthoritativeBalances": false
+  },
+  "androidApk": {
+    "packageName": "com.svrpoker.app",
+    "versionName": "0.1.0-rc1",
+    "versionCode": 1,
+    "releaseReady": false,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true,
+    "nextVersion": "0.1.0-rc2",
+    "blockers": [
+      "original native wrapper source is not present in the repository",
+      "original signing identity is not available to this GitHub workflow",
+      "no signed version-code-2 APK has been produced or upgrade-tested"
+    ]
+  },
+  "accounts": {
+    "browserClient": "implemented",
+    "demoFallback": "implemented-and-labeled",
+    "productionApiContract": "implemented-in-backend/phase345",
+    "productionHttpsDeployment": "blocked-external-infrastructure",
+    "azureSqlMigrationExecution": "blocked-external-infrastructure",
+    "secretsCommittedToGitHub": false
+  },
+  "presence": {
+    "localSimulation": "implemented-and-labeled",
+    "apiContract": "implemented-in-backend/phase349",
+    "seatLeaseContract": "implemented",
+    "productionHttpsDeployment": "blocked-external-infrastructure",
+    "multiDeviceProductionAcceptance": "pending-backend-deployment",
+    "pokerStateSynchronized": false
+  },
+  "website": {
+    "matrixLaunchPage": "locked",
+    "profileShowroom": "implemented",
+    "avatarDressingRoom": "implemented",
+    "supportInterface": "implemented-with-offline-fallback",
+    "productionAiEndpoint": "requires-server-secret-and-backend-deployment",
+    "siteIntegrity": "automated-regression-passing"
+  },
+  "remainingExternalGates": [
+    {
+      "id": "ANDROID_REAL_DEVICE",
+      "type": "physical-hardware",
+      "needed": "Owner completes multiple Android hands and verifies Phase 357 seating and display behavior."
+    },
+    {
+      "id": "QUEST_PHYSICAL_ACCEPTANCE",
+      "type": "physical-hardware",
+      "needed": "Owner verifies hands, controllers, locomotion, teleport, room-scale tracking, reach, and comfort in a Quest headset."
+    },
+    {
+      "id": "PRODUCTION_ACCOUNT_DEPLOYMENT",
+      "type": "private-cloud-access",
+      "needed": "Approved HTTPS host, Azure SQL access, and secrets configured outside GitHub."
+    },
+    {
+      "id": "PRODUCTION_PRESENCE_DEPLOYMENT",
+      "type": "private-cloud-access",
+      "needed": "Phase 349 API and seat migration deployed, then tested across authenticated devices."
+    },
+    {
+      "id": "SERVER_AUTHORITATIVE_POKER",
+      "type": "new-backend-system",
+      "needed": "Secure room server for deck, cards, actions, pots, snapshots, reconnect, and balance integrity."
+    },
+    {
+      "id": "APK_RC2",
+      "type": "private-native-signing-assets",
+      "needed": "Restore wrapper source and signing identity, then produce and verify a signed code-2 APK."
+    },
+    {
+      "id": "UNITY_PRODUCTION_CLIENT",
+      "type": "future-native-project",
+      "needed": "Implement the existing platform blueprint as Unity scenes, prefabs, input adapters, networking, and builds."
+    }
+  ],
+  "releaseRules": [
+    "No local simulation is described as production internet multiplayer.",
+    "No physical-device acceptance is claimed from Chromium emulation.",
+    "No database secret, signing key, or private key is committed to GitHub.",
+    "No APK update is exposed without a signed package, checksum, and upgrade test.",
+    "No server-authoritative poker claim is made until a secure room server passes multi-device acceptance."
+  ]
+}
