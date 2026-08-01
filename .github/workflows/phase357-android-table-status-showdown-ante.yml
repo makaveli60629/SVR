@@ -1,0 +1,51 @@
+name: Phase 357 Android Table Status Showdown Ante Check
+
+on:
+  pull_request:
+    paths:
+      - 'game/android.html'
+      - 'game/manifest.json'
+      - 'game/android-release.json'
+      - 'game/modules/phase357_android_table_status_showdown_ante_lock.js'
+      - 'game/modules/phase357_android_direct_camera_seat_fix.js'
+      - 'game/tools/phase357-android-table-status-showdown-ante-static-test.mjs'
+      - 'game/tools/phase357-android-browser-acceptance.cjs'
+      - 'game/tools/phase347-android-static-test.mjs'
+      - '.github/workflows/phase357-android-table-status-showdown-ante.yml'
+  workflow_dispatch:
+
+jobs:
+  android-table-status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate Phase 357 syntax and contracts
+        run: |
+          node --check game/modules/phase357_android_table_status_showdown_ante_lock.js
+          node --check game/modules/phase357_android_direct_camera_seat_fix.js
+          node --check game/tools/phase357-android-browser-acceptance.cjs
+          node game/tools/phase357-android-table-status-showdown-ante-static-test.mjs
+          node game/tools/phase347-android-static-test.mjs
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+      - name: Start local site
+        run: |
+          python3 -m http.server 4173 > /tmp/svr-phase357-http.log 2>&1 &
+          echo $! > /tmp/svr-phase357-http.pid
+          sleep 2
+      - name: Run Android seating and showdown acceptance
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase357-android-browser-acceptance.cjs
+      - name: Upload HTTP log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase357-android-http-log
+          path: /tmp/svr-phase357-http.log

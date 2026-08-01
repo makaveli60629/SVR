@@ -1,4 +1,4 @@
-const SVR_CACHE = 'svr-pwa-phase356-android-site-ai-professionalism';
+const SVR_CACHE = 'svr-pwa-phase357-android-table-status-showdown-ante';
 const SVR_SHELL = [
   '/',
   '/index.html',

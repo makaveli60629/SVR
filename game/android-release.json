@@ -1,20 +1,20 @@
 {
   "name": "SVR Poker Android",
   "channel": "stable",
-  "status": "real-device-freeze-hotfix-awaiting-owner-playtest",
+  "status": "table-status-showdown-ante-refinement-awaiting-owner-playtest",
   "packageName": "com.svrpoker.app",
   "apkVersionName": "0.1.0-rc1",
   "apkVersionCode": 1,
   "apkUrl": "",
   "apkSha256": "",
   "releaseReady": false,
-  "webEntry": "/game/android.html?channel=stable&v=phase356",
+  "webEntry": "/game/android.html?channel=stable&v=phase357",
   "downloadsUrl": "/downloads/",
   "forceUpdate": false,
   "showUpdatePrompt": false,
   "manualUpdateOnly": true,
   "previewEntry": "/game/camera3.html?v=phase350",
-  "currentGameBuild": "PHASE-356-ANDROID-REAL-DEVICE-FREEZE-RECOVERY-LOCK",
+  "currentGameBuild": "PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK",
   "browserAcceptance": {
     "passed": true,
     "workflow": "Phase 354 Android Full Game Acceptance",
@@ -36,19 +36,18 @@
     "raisedPotDisplayPassed": true
   },
   "realDeviceValidation": {
-    "phase": 356,
+    "phase": 357,
     "passed": false,
     "pending": true,
-    "reportedIssue": "APK-hosted Android web game freezes before a full game is completed",
     "ownerPlaytestRequired": true,
-    "target": "Complete multiple hands and NEXT HAND without a frozen screen or controls",
+    "target": "Verify SIT moves the camera to the table edge, turn and bet indicators remain readable, showdown identifies the winner and winning cards, and ANTE UP starts the next hand.",
     "changes": [
-      "Removed Android shader compileAsync prewarm",
-      "Removed background deferred lobby/account/FBX avatar/presence loading",
-      "Replaced repeated full-scene scans with one bounded scan",
-      "Added frame-gap and WebGL context recovery",
-      "Added five lightweight table avatars",
-      "Capped normal Android pixel ratio at 1.0 and recovery mode at 0.78"
+      "Corrects the actual Android camera world position after SIT and RECENTER",
+      "Shows the active player, current bet, amount to call, and last action",
+      "Shows all six players' current hand bets and most recent actions",
+      "Shows winner, settled pot, winning hand name, winner hole cards, and board",
+      "Shows an immediate ANTE UP / NEXT HAND prompt after showdown",
+      "Preserves the Phase 356 freeze recovery and Phase 347 single controller"
     ]
   },
   "nextApkVersionName": "0.1.0-rc2",
@@ -57,13 +56,11 @@
   "updateMessage": "An optional SVR Poker Android update is available.",
   "updateMenuPolicy": "Hidden unless releaseReady is true, apkUrl is non-empty, and apkVersionCode is newer than the installed code.",
   "notes": [
-    "Phase 356 changes the remotely loaded Android web runtime and does not require reinstalling APK 0.1.0-rc1.",
-    "The owner reported a real Android freeze, so the earlier browser smoothness result is retained only as historical automated acceptance and is not treated as real-device proof.",
-    "Android no longer runs shader compileAsync after the table appears.",
-    "Android no longer loads lobby decoration, account, FBX avatar, or network presence modules in the background during play.",
-    "Five low-poly table avatars provide visual players without FBX downloads or animation overhead.",
-    "A frame-gap watchdog lowers rendering resolution and exposes Continue Low Power and Reload Table recovery controls.",
-    "The single Phase 347 MOVE/LOOK/action controller remains authoritative.",
+    "Phase 357 changes the remotely loaded Android web runtime and does not require reinstalling APK 0.1.0-rc1.",
+    "The owner reported that SIT did not move the view close enough and that turn, bet, winner, winning-hand, and next-hand information was missing.",
+    "Phase 357 measures the camera in world space and moves the rig by the exact camera-to-seat delta.",
+    "The authoritative Phase 336 state remains the source for turns, bets, pots, winners, cards, and hand labels.",
+    "The showdown prompt uses the phrase ANTE UP while accurately stating that the next hand is a $10 / $20 blind hand.",
     "APK version name 0.1.0-rc1, version code 1, manual-update-only, forceUpdate false, and showUpdatePrompt false remain locked.",
     "No native Android wrapper source, signing identity, or installable RC2 APK is currently present in the repository."
   ]
