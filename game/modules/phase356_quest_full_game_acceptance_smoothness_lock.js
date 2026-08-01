@@ -11,12 +11,28 @@ let lastResult = null;
 let installedAt = null;
 let governedAt = null;
 
-function platformState() {
-  return window.SVR_PHASE340_PLATFORM_STATE || {};
-}
+function platformState() { return window.SVR_PHASE340_PLATFORM_STATE || {}; }
+function loadedModules() { return [...(platformState().loaded || []), ...(platformState().deferredLoaded || [])]; }
 
-function loadedModules() {
-  return [...(platformState().loaded || []), ...(platformState().deferredLoaded || [])];
+function safeWalk(root, visitor, limit = 14000) {
+  if (typeof window.SVR_PHASE356_SAFE_WALK === 'function') return window.SVR_PHASE356_SAFE_WALK(root, visitor, limit);
+  if (!root) return 0;
+  const stack = [root];
+  const seen = new Set();
+  let count = 0;
+  while (stack.length && count < limit) {
+    const object = stack.pop();
+    if (!object || seen.has(object)) continue;
+    seen.add(object);
+    count += 1;
+    try { visitor(object); } catch {}
+    const children = Array.isArray(object.children) ? object.children : [];
+    for (let index = children.length - 1; index >= 0; index -= 1) {
+      const child = children[index];
+      if (child && child !== object && !seen.has(child)) stack.push(child);
+    }
+  }
+  return count;
 }
 
 function configureRenderer() {
@@ -40,10 +56,7 @@ function configureRenderer() {
 
 function removeAndroidControls() {
   let removed = 0;
-  for (const selector of [
-    '#svr347Root', '#svr343Root', '#svr326Root', '#svr339Root',
-    '[data-svr-android-controller]', '.svr-android-controller', '.virtual-stick'
-  ]) {
+  for (const selector of ['#svr347Root','#svr343Root','#svr326Root','#svr339Root','[data-svr-android-controller]','.svr-android-controller','.virtual-stick']) {
     for (const element of document.querySelectorAll(selector)) {
       element.remove();
       removed += 1;
@@ -55,26 +68,20 @@ function removeAndroidControls() {
 function sceneObjects() {
   const scene = window.__SVR_SCENE__;
   const names = [];
-  scene?.traverse?.((object) => names.push(String(object.name || '')));
+  safeWalk(scene, (object) => names.push(String(object.name || '')));
   return { scene, names };
 }
 
 function tableAudit() {
   const { scene, names } = sceneObjects();
   const qa = window.SVR_PHASE334_TABLE_QA?.() || window.SVR_PHASE335_TABLE_QA?.() || null;
-  const table = names.find((name) => /PHASE159_ACTUAL_UPLOADED_TABLE|PHASE159_FBX_TABLE|PHASE200_INTENDED_LOBBY_POKER_TABLE|PHASE341_CANONICAL_TABLE/i.test(name)) || null;
+  const table = names.find((name) => /PHASE356_QUEST_TABLE_FALLBACK|PHASE159_ACTUAL_UPLOADED_TABLE|PHASE159_FBX_TABLE|PHASE200_INTENDED_LOBBY_POKER_TABLE|PHASE341_CANONICAL_TABLE/i.test(name)) || null;
   const logo = names.find((name) => /PHASE334_CENTER_LOGO_ROOT|PHASE331_SVR_TABLE_CENTER_LOGO|PHASE341_CANONICAL_CENTER_LOGO/i.test(name)) || null;
   const potDisplay = names.find((name) => /PHASE331_UPRIGHT_TRANSLUCENT_POT_DISPLAY|PHASE333.*POT|P85_POT_LABEL/i.test(name)) || null;
-  const holeMeshes = names.filter((name) => /^P85_HAND_0_[01]$/i.test(name)).length;
-  const communityMeshes = names.filter((name) => /^P85_COMM_\d+$/i.test(name)).length;
+  const holeMeshes = names.filter((name) => /^(?:P85_HAND_0_[01]|PHASE341_HOLE_0_[01])$/i.test(name)).length;
+  const communityMeshes = names.filter((name) => /^(?:P85_COMM_\d+|PHASE341_COMMUNITY_[0-4])$/i.test(name)).length;
   return {
-    scene: Boolean(scene),
-    table,
-    logo,
-    potDisplay,
-    holeMeshes,
-    communityMeshes,
-    phase334: qa,
+    scene: Boolean(scene), table, logo, potDisplay, holeMeshes, communityMeshes, phase334: qa,
     pass: Boolean(scene && table && logo && potDisplay && holeMeshes >= 2 && communityMeshes >= 5)
   };
 }
@@ -115,11 +122,9 @@ function settlementAudit() {
 }
 
 function chooseAction() {
-  const legal = window.SVR_POKER_LEGAL_ACTIONS?.() || [];
-  if (legal.includes('check')) return 'check';
-  if (legal.includes('call')) return 'call';
-  if (legal.includes('fold')) return 'fold';
-  return null;
+  const human = players.find((player) => player.human);
+  if (!human || human.folded || human.allIn || human.stack <= 0) return null;
+  return Math.max(0, Number(state.currentBet || 0) - Number(human.bet || 0)) > 0 ? 'call' : 'check';
 }
 
 async function waitForRuntime(timeoutMs = 120000) {
@@ -133,19 +138,16 @@ async function waitForRuntime(timeoutMs = 120000) {
       && typeof window.SVR_POKER_ACTION === 'function'
       && typeof window.SVR_RESET_POKER_TABLE === 'function'
       && typeof window.SVR_POKER_NEXT_HAND === 'function'
+      && window.SVR_PHASE356_POKER_BOOT_QA?.().pass === true
       && loaded.some((path) => path.endsWith('phase334_table_layout_gesture_poker_lock.js'))
       && loaded.some((path) => path.endsWith('phase335_oculus_acceptance_gameplay_stability_lock.js'))
     );
     window.SVR_PHASE356_PROGRESS = {
-      stage: 'waiting-runtime',
-      elapsedMs: Math.round(performance.now() - started),
-      loaded: loaded.length,
-      failed: platformState().failed || [],
-      ready,
-      at: new Date().toISOString()
+      stage: 'waiting-runtime', elapsedMs: Math.round(performance.now() - started), loaded: loaded.length,
+      failed: platformState().failed || [], ready, at: new Date().toISOString()
     };
     if (ready) return true;
-    await wait(200);
+    await wait(150);
   }
   return false;
 }
@@ -173,13 +175,13 @@ async function driveFullHand(timeoutMs = 75000) {
         }
       }
       if (phase === 'showdown') {
-        await wait(150);
+        await wait(180);
         const settlement = settlementAudit();
         const pass = ['preflop', 'flop', 'turn', 'river', 'showdown'].every((item) => phases.includes(item))
           && communityMax === 5 && holeCards === 2 && settlement.pass;
         return { pass, phases, communityMax, holeCards, settlement, elapsedMs: +(performance.now() - started).toFixed(1) };
       }
-      await wait(45);
+      await wait(40);
     }
     return { pass: false, timeout: true, phases, communityMax, holeCards, settlement: settlementAudit(), elapsedMs: +(performance.now() - started).toFixed(1) };
   } finally {
@@ -194,31 +196,18 @@ async function runAcceptance(options = {}) {
   running = true;
   const started = performance.now();
   const report = {
-    build: BUILD,
-    platform: 'quest',
-    startedAt: new Date().toISOString(),
-    browserStackAcceptance: true,
-    physicalQuestSessionTested: false,
-    runtimeReady: false,
-    startupMs: null,
-    input: null,
-    table: null,
-    renderer: null,
-    hand: null,
-    nextHand: null,
-    failedModules: [],
-    deferredFailedModules: [],
-    pass: false,
-    error: null
+    build: BUILD, platform: 'quest', startedAt: new Date().toISOString(), browserStackAcceptance: true,
+    physicalQuestSessionTested: false, runtimeReady: false, startupMs: null, input: null, table: null,
+    renderer: null, hand: null, nextHand: null, failedModules: [], deferredFailedModules: [], pass: false, error: null
   };
   try {
     report.runtimeReady = await waitForRuntime(Number(options.runtimeTimeoutMs || 120000));
-    report.startupMs = +(performance.now() - started).toFixed(1);
+    report.startupMs = Number(platformState().totalMs || (performance.now() - started).toFixed(1));
     if (!report.runtimeReady) throw new Error(`QUEST_RUNTIME_TIMEOUT:${JSON.stringify(window.SVR_PHASE356_PROGRESS || {})}`);
     report.renderer = configureRenderer();
     report.input = inputAudit();
-    report.table = tableAudit();
     report.hand = await driveFullHand(Number(options.handTimeoutMs || 75000));
+    report.table = tableAudit();
     if (report.hand?.pass) {
       const previous = Number(state.handNo || 0);
       const accepted = window.SVR_POKER_NEXT_HAND();
@@ -230,12 +219,9 @@ async function runAcceptance(options = {}) {
     report.physicalQuestSessionTested = Boolean(window.__SVR_RENDERER__?.xr?.isPresenting);
     report.pass = report.runtimeReady
       && report.startupMs <= Number(options.startupBudgetMs || 45000)
-      && report.input?.pass === true
-      && report.table?.pass === true
-      && report.renderer?.xrEnabled === true
-      && report.renderer?.shadows === false
-      && report.hand?.pass === true
-      && report.nextHand?.advanced === true
+      && report.input?.pass === true && report.table?.pass === true
+      && report.renderer?.xrEnabled === true && report.renderer?.shadows === false
+      && report.hand?.pass === true && report.nextHand?.advanced === true
       && report.failedModules.length === 0;
   } catch (error) {
     report.error = String(error?.stack || error?.message || error);
@@ -253,18 +239,13 @@ async function runAcceptance(options = {}) {
 function qa() {
   removeAndroidControls();
   const result = {
-    build: BUILD,
-    active: ACTIVE,
-    installedAt,
-    governedAt,
-    renderer: configureRenderer(),
-    input: inputAudit(),
-    table: tableAudit(),
-    platform: window.SVR_PHASE340_AUDIT?.() || platformState(),
-    fullGameAcceptance: lastResult,
+    build: BUILD, active: ACTIVE, installedAt, governedAt, renderer: configureRenderer(), input: inputAudit(),
+    table: tableAudit(), pokerBoot: window.SVR_PHASE356_POKER_BOOT_QA?.() || null,
+    platform: window.SVR_PHASE340_AUDIT?.() || platformState(), fullGameAcceptance: lastResult,
     checkedAt: new Date().toISOString()
   };
-  result.pass = result.active && result.input.pass && result.table.pass && result.renderer?.xrEnabled === true && result.renderer?.shadows === false;
+  result.pass = result.active && result.input.pass && result.table.pass && result.pokerBoot?.pass === true
+    && result.renderer?.xrEnabled === true && result.renderer?.shadows === false;
   window.SVR_PHASE356_QA_STATE = result;
   return result;
 }
@@ -278,24 +259,19 @@ function install() {
     removeAndroidControls();
     configureRenderer();
   }, delay));
-  setInterval(() => {
+  const interval = setInterval(() => {
     removeAndroidControls();
     configureRenderer();
+    if (!document.documentElement.isConnected) clearInterval(interval);
   }, 1800);
   window.SVR_PHASE356_QA = qa;
   window.SVR_PHASE356_RUN_QUEST_FULL_GAME_ACCEPTANCE = runAcceptance;
   window.SVR_PHASE356_STATE = {
-    build: BUILD,
-    active: true,
-    handsPrimary: true,
-    controllerFallback: true,
-    snapTurnDegrees: 45,
-    forwardReference: 'headset-look-direction',
-    fullGameBrowserAcceptance: true,
-    physicalQuestInputAcceptanceRequired: true,
-    installedAt
+    build: BUILD, active: true, handsPrimary: true, controllerFallback: true, snapTurnDegrees: 45,
+    forwardReference: 'headset-look-direction', fullGameBrowserAcceptance: true,
+    physicalQuestInputAcceptanceRequired: true, installedAt
   };
-  if (PARAMS.get('acceptance') === '1') setTimeout(() => runAcceptance(), 900);
+  if (PARAMS.get('acceptance') === '1') setTimeout(() => runAcceptance(), 700);
 }
 
 install();
