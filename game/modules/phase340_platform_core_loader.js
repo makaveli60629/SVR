@@ -29,6 +29,7 @@ const state = {
 };
 
 const CRITICAL = new Set([
+  'modules/phase356_android_real_device_freeze_recovery_lock.js',
   'main.js',
   'modules/phase355_android_poker_boot_order_lock.js',
   'modules/phase336_authoritative_poker_rules_pot_settlement_lock.js'
@@ -50,7 +51,7 @@ function release(reason) {
   if (state.readyAt) return;
   document.body.classList.add(
     'boot-released', 'runtime-visible', 'overlay-released', 'ready',
-    `svr-platform-${state.platform}`, 'svr-phase340', 'svr-phase355'
+    `svr-platform-${state.platform}`, 'svr-phase340', 'svr-phase355', 'svr-phase356'
   );
   document.getElementById('safeStage')?.remove();
   window.__SVR_GAME_READY__ = true;
@@ -101,11 +102,25 @@ async function prewarmRuntime() {
   const renderer = window.__SVR_RENDERER__;
   const scene = window.__SVR_SCENE__;
   const camera = window.__SVR_CAMERA__;
-  window.SVR_PHASE355_GOVERN?.();
+  window.SVR_PHASE356_GOVERN?.({ fullScan: false });
   window.SVR_PHASE340_APPLY_RENDERER_BUDGET?.(state.platform);
+
+  // Real Android devices can keep compileAsync running after Promise.race,
+  // which causes a visible freeze after the table appears. Phase 356 skips
+  // shader precompile on Android and lets normal frames compile incrementally.
+  if (state.platform === 'android') {
+    return {
+      available: true,
+      compiled: false,
+      method: 'android-incremental-frame-compilation',
+      textures: 0,
+      invalidMaterials: 0
+    };
+  }
+
   const invalidMaterials = sanitizeSceneMaterials(scene);
   let textures = 0;
-  const textureLimit = state.platform === 'android' ? 28 : 64;
+  const textureLimit = state.platform === 'camera3' ? 48 : 64;
 
   try {
     scene.traverse((object) => {
@@ -130,10 +145,7 @@ async function prewarmRuntime() {
   try {
     if (typeof renderer.compileAsync === 'function') {
       method = 'compileAsync';
-      await Promise.race([
-        renderer.compileAsync(scene, camera),
-        wait(state.platform === 'android' ? 900 : 1800)
-      ]);
+      await renderer.compileAsync(scene, camera);
       compiled = true;
     } else if (typeof renderer.compile === 'function') {
       method = 'compile';
@@ -173,10 +185,7 @@ async function importList(paths, deferred = false) {
         throw error;
       }
     }
-    if (deferred) {
-      window.SVR_PHASE355_GOVERN?.();
-      await wait(40);
-    }
+    if (deferred) await wait(80);
   }
 }
 
@@ -195,7 +204,7 @@ function auditSnapshot() {
     deferredTotalMs: state.deferredTotalMs,
     prewarm: state.prewarm,
     authority: window.SVR_PHASE340_AUTHORITY_AUDIT?.() || state.audit,
-    phase355: window.SVR_PHASE355_QA?.() || null,
+    phase356: window.SVR_PHASE356_QA?.() || null,
     renderer: window.__SVR_RENDERER__?.info ? {
       calls: window.__SVR_RENDERER__.info.render?.calls || 0,
       triangles: window.__SVR_RENDERER__.info.render?.triangles || 0,
@@ -214,8 +223,6 @@ function scheduleDeferred() {
   const run = async () => {
     const started = performance.now();
     await importList(state.deferredModules, true);
-    window.SVR_PHASE355_GOVERN?.();
-    window.SVR_PHASE340_GOVERN?.();
     state.deferredTotalMs = +(performance.now() - started).toFixed(1);
     state.deferredReadyAt = new Date().toISOString();
     window.SVR_PHASE340_PLATFORM_STATE = state;
@@ -224,11 +231,11 @@ function scheduleDeferred() {
   if (typeof requestIdleCallback === 'function') {
     requestIdleCallback(() => run().catch((error) => {
       state.deferredFatal = String(error?.stack || error?.message || error);
-    }), { timeout: 5000 });
+    }), { timeout: 7000 });
   } else {
     setTimeout(() => run().catch((error) => {
       state.deferredFatal = String(error?.stack || error?.message || error);
-    }), 2600);
+    }), 4000);
   }
 }
 
@@ -249,16 +256,16 @@ export async function bootPlatform(options = {}) {
   window.SVR_PHASE340_MANIFEST = manifestAudit;
 
   await importList(state.modules, false);
-  status('Finishing table, cards, and shaders…');
+  status('Finishing table and cards…');
   state.prewarm = await prewarmRuntime();
-  window.SVR_PHASE355_GOVERN?.();
+  window.SVR_PHASE356_GOVERN?.({ fullScan: false });
   window.SVR_PHASE340_GOVERN?.();
   state.audit = window.SVR_PHASE340_AUTHORITY_AUDIT?.() || null;
   state.totalMs = +(performance.now() - state.startedPerf).toFixed(1);
   window.SVR_PHASE340_PLATFORM_STATE = state;
   window.SVR_PHASE340_AUDIT = auditSnapshot;
 
-  release('phase355-android-critical-ready');
+  release('phase356-android-real-device-ready');
   status(`${state.platform} ready`);
   window.dispatchEvent(new CustomEvent('svr:platform-ready', { detail: auditSnapshot() }));
   scheduleDeferred();
