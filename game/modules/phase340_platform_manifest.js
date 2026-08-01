@@ -1,5 +1,5 @@
 export const BUILD = 'PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK';
-export const VERSION = 'phase349';
+export const VERSION = 'phase350';
 
 const REGISTRY = [
   'modules/phase340_runtime_authority_registry.js'
@@ -83,8 +83,13 @@ const ANDROID_FINAL = [
   'modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js'
 ];
 
+const ANDROID_INTEGRITY = [
+  'modules/phase350_android_controller_dom_deduplication_lock.js'
+];
+
 const CAMERA3 = [
-  'modules/phase339_camera3_table_orbit_lock.js'
+  'modules/phase339_camera3_table_orbit_lock.js',
+  'modules/phase350_camera3_visibility_lighting_lock.js'
 ];
 
 function unique(items) {
@@ -126,7 +131,7 @@ export function manifestFor(platform = detectPlatform()) {
     ]);
   }
   const sharedTail = [...ACCOUNT_ACTIVITY, ...INGAME_AVATAR, ...MULTIPLAYER_PRESENCE];
-  if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...sharedTail]);
+  if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...sharedTail, ...ANDROID_INTEGRITY]);
   if (value === 'quest') return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...QUEST, ...SETTLEMENT_PRESENTATION, ...sharedTail]);
   return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...DESKTOP_PRESENTATION, ...SETTLEMENT_PRESENTATION, ...sharedTail]);
 }
@@ -145,14 +150,18 @@ export function validateManifest(platform = detectPlatform()) {
     const avatarIndex = normalized.findIndex((x) => x.endsWith('phase348_ingame_player_avatar_presence_performance_lock.js'));
     const presenceIndex = normalized.findIndex((x) => x.endsWith('phase349_multiplayer_presence_seat_reconnect_lock.js'));
     const seatBridgeIndex = normalized.findIndex((x) => x.endsWith('phase349_presence_gameplay_seat_bridge.js'));
-    if (controllerIndex < 0 || profileIndex <= controllerIndex || avatarIndex <= profileIndex || presenceIndex <= avatarIndex || seatBridgeIndex <= presenceIndex || seatBridgeIndex !== normalized.length - 1) {
-      forbidden.push('phase349-android-load-order');
+    const dedupeIndex = normalized.findIndex((x) => x.endsWith('phase350_android_controller_dom_deduplication_lock.js'));
+    if (controllerIndex < 0 || profileIndex <= controllerIndex || avatarIndex <= profileIndex || presenceIndex <= avatarIndex || seatBridgeIndex <= presenceIndex || dedupeIndex <= seatBridgeIndex || dedupeIndex !== normalized.length - 1) {
+      forbidden.push('phase350-android-load-order');
     }
   }
   if (platform === 'camera3') {
-    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js','modules/phase346_player_avatar_profile_bridge.js','modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js','modules/phase348_ingame_player_avatar_presence_performance_lock.js','modules/phase349_multiplayer_presence_seat_reconnect_lock.js','modules/phase349_presence_gameplay_seat_bridge.js']) {
+    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js','modules/phase346_player_avatar_profile_bridge.js','modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js','modules/phase348_ingame_player_avatar_presence_performance_lock.js','modules/phase349_multiplayer_presence_seat_reconnect_lock.js','modules/phase349_presence_gameplay_seat_bridge.js','modules/phase350_android_controller_dom_deduplication_lock.js']) {
       if (normalized.some((x) => x.endsWith(old))) forbidden.push(old);
     }
+    const orbitIndex = normalized.findIndex((x) => x.endsWith('phase339_camera3_table_orbit_lock.js'));
+    const lightIndex = normalized.findIndex((x) => x.endsWith('phase350_camera3_visibility_lighting_lock.js'));
+    if (orbitIndex < 0 || lightIndex <= orbitIndex || lightIndex !== normalized.length - 1) forbidden.push('phase350-camera3-load-order');
   }
   return {
     build: BUILD,
