@@ -1,9 +1,9 @@
 {
   "name": "svr-player-account-api",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "SVR Poker Phase 345 secure player login, profile, activity session, and daily reward API.",
+  "description": "SVR Poker player accounts, rewards, platform context, and GPT support API.",
   "engines": {
     "node": ">=20"
   },
@@ -21,6 +21,7 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mssql": "^11.0.1",
-    "zod": "^4.0.14"
+    "openai": "^5.0.0",
+    "zod": "^3.25.76"
   }
 }

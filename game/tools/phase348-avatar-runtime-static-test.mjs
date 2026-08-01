@@ -3,6 +3,7 @@ import fs from 'node:fs';
 const read = (path) => fs.readFileSync(path, 'utf8');
 const fail = (message) => { throw new Error(message); };
 const runtime = read('game/modules/phase348_ingame_player_avatar_presence_performance_lock.js');
+const androidRuntime = read('game/modules/phase356_android_real_device_freeze_recovery_lock.js');
 const platform = read('game/modules/phase340_platform_manifest.js');
 const gameManifest = JSON.parse(read('game/manifest.json'));
 const release = JSON.parse(read('game/android-release.json'));
@@ -42,13 +43,18 @@ if (!runtime.includes('THREE.FrontSide')) fail('First-person interior-head prote
 const phase346Index = platform.indexOf('phase346_player_avatar_profile_bridge.js');
 const phase348Index = platform.indexOf('phase348_ingame_player_avatar_presence_performance_lock.js');
 const phase349Index = platform.indexOf('phase349_multiplayer_presence_seat_reconnect_lock.js');
-if (phase346Index < 0 || phase348Index <= phase346Index) fail('Phase 348 must load after the Phase 346 profile bridge.');
-if (phase349Index >= 0 && phase349Index <= phase348Index) fail('Later presence modules must load after Phase 348.');
+if (phase346Index < 0 || phase348Index <= phase346Index) fail('Phase 348 must remain after the Phase 346 profile bridge for Quest and desktop.');
+if (phase349Index >= 0 && phase349Index <= phase348Index) fail('Later presence modules must remain after Phase 348 for Quest and desktop.');
 const platformVersion = Number(platform.match(/export const VERSION = 'phase(\d+)'/)?.[1] || 0);
 if (platformVersion < 348) fail('Platform version regressed below Phase 348.');
 const camera3Block = platform.slice(platform.indexOf('const CAMERA3 ='), platform.indexOf('function unique'));
 if (camera3Block.includes('phase348_ingame_player_avatar_presence_performance_lock.js')) fail('Camera 3 must not load Phase 348.');
-if (!platform.includes('avatarIndex <= profileIndex')) fail('Android avatar load-order validation is missing.');
+if (!platform.includes('const ANDROID_DEFERRED = []')) fail('Android must disable background FBX avatar loading in Phase 356.');
+if (!platform.includes('phase356_android_real_device_freeze_recovery_lock.js')) fail('Android Phase 356 recovery runtime is missing.');
+if (!platform.includes('phase356-android-background-deferred-work')) fail('Android zero-background-work validation is missing.');
+for (const token of ['PHASE356_ANDROID_LIGHTWEIGHT_TABLE_AVATARS', 'PHASE356_BOT_AVATAR_', 'renderer.setPixelRatio(target)', 'inspected < 240']) {
+  if (!androidRuntime.includes(token)) fail(`Android lightweight avatar token missing: ${token}`);
+}
 
 if (Number(gameManifest.phase || 0) < 348) fail('game/manifest.json phase regressed below 348.');
 if (!String(gameManifest.build || '').startsWith('PHASE-')) fail('Game manifest build is missing.');
@@ -58,6 +64,7 @@ if (gameManifest.release_ready !== false || gameManifest.force_update !== false 
 if (release.currentGameBuild !== gameManifest.build) fail('Android release build mismatch.');
 if (release.releaseReady !== false || release.apkUrl !== '' || release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) fail('Android release gate is unsafe.');
 if (!release.webEntry.includes(`v=phase${gameManifest.phase}`)) fail('Android web entry is not aligned to the current Android release phase.');
+if (Number(gameManifest.phase || 0) >= 356 && release.realDeviceValidation?.pending !== true) fail('Real Android validation must remain pending until owner testing.');
 
 if (!androidEntry.includes(gameManifest.build)) fail('Android entry build mismatch.');
 if (!androidEntry.includes('phase340_platform_core_loader.js')) fail('Android platform loader is missing.');
@@ -72,7 +79,7 @@ console.log(JSON.stringify({
   platformVersion,
   verifiedModels: ['eric', 'claudia'],
   budgets: {
-    android: { updateHz: 24, animationHz: 18, equipment: 6 },
+    android: { mode: 'phase356-five-lightweight-table-avatars', fbxBackgroundLoading: false },
     quest: { updateHz: 30, animationHz: 24, equipment: 5 },
     desktop: { updateHz: 60, animationHz: 30, equipment: 8 }
   },

@@ -4,6 +4,7 @@ const read = (path) => fs.readFileSync(path, 'utf8');
 const runtime = read('game/modules/phase349_multiplayer_presence_seat_reconnect_lock.js');
 const seatBridge = read('game/modules/phase349_presence_gameplay_seat_bridge.js');
 const platform = read('game/modules/phase340_platform_manifest.js');
+const androidRuntime = read('game/modules/phase356_android_real_device_freeze_recovery_lock.js');
 const server = read('backend/phase349/src/server.js');
 const schema = read('backend/phase349/sql/001_phase349_presence_seat_leases.sql');
 const config = JSON.parse(read('site/config/player-api.json'));
@@ -26,11 +27,11 @@ requireText(seatBridge, "SVR_PHASE349_RELEASE_SEAT", 'gameplay-seat-release');
 
 requireText(platform, "phase349_multiplayer_presence_seat_reconnect_lock.js", 'presence-module');
 requireText(platform, "phase349_presence_gameplay_seat_bridge.js", 'seat-bridge-module');
-requireText(platform, "const presenceIndex = normalizedDeferred.findIndex", 'deferred-presence-load-order-index');
-requireText(platform, "const seatBridgeIndex = normalizedDeferred.findIndex", 'deferred-seat-bridge-load-order-index');
-requireText(platform, "presenceIndex <= avatarIndex || seatBridgeIndex <= presenceIndex", 'presence-load-order-validator');
 requireText(platform, "const sharedTail = [...ACCOUNT_ACTIVITY, ...INGAME_AVATAR, ...MULTIPLAYER_PRESENCE]", 'shared-presence-tail');
-requireText(platform, "const ANDROID_DEFERRED =", 'android-deferred-presence-tail');
+requireText(platform, "const ANDROID_DEFERRED = []", 'android-background-presence-disabled');
+requireText(platform, "phase356-android-background-deferred-work", 'android-zero-background-validator');
+requireText(platform, "phase356_android_real_device_freeze_recovery_lock.js", 'android-recovery-module');
+requireText(androidRuntime, 'PHASE356_ANDROID_LIGHTWEIGHT_TABLE_AVATARS', 'android-local-lightweight-opponents');
 const platformVersion = Number(platform.match(/export const VERSION = 'phase(\d+)'/)?.[1] || 0);
 if (platformVersion < 349) errors.push('platform-version-regressed');
 const profileIndex = platform.indexOf("'modules/phase346_player_avatar_profile_bridge.js'");
@@ -62,6 +63,7 @@ if (!String(manifest.build || '').startsWith('PHASE-')) errors.push('manifest-bu
 if (release.currentGameBuild !== manifest.build) errors.push('release-manifest-build-mismatch');
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('apk-policy');
+if (Number(manifest.phase || 0) >= 356 && release.realDeviceValidation?.pending !== true) errors.push('real-device-validation-must-remain-pending');
 
 if (errors.length) {
   console.error(JSON.stringify({ pass: false, errors }, null, 2));
@@ -74,7 +76,8 @@ console.log(JSON.stringify({
   platformVersion,
   transport: 'local-simulation-until-presenceApiBase-configured',
   authority: { presence: true, seats: true, pokerState: false },
-  androidLoadPolicy: 'deferred-until-table-playable',
+  androidLoadPolicy: 'phase356-disabled-during-table-play-to-prevent-real-device-freezes',
+  questDesktopLoadPolicy: 'profile-avatar-presence-shared-tail-preserved',
   camera3Excluded: true,
   apk: { version: release.apkVersionName, code: release.apkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
