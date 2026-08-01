@@ -1,5 +1,5 @@
 export const BUILD = 'PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK';
-export const VERSION = 'phase345';
+export const VERSION = 'phase346';
 
 const REGISTRY = [
   'modules/phase340_runtime_authority_registry.js'
@@ -38,7 +38,8 @@ const SETTLEMENT_PRESENTATION = [
 ];
 
 const ACCOUNT_ACTIVITY = [
-  'modules/phase345_player_account_activity_bridge.js'
+  'modules/phase345_player_account_activity_bridge.js',
+  'modules/phase346_player_avatar_profile_bridge.js'
 ];
 
 const DESKTOP_PRESENTATION = [
@@ -130,7 +131,7 @@ export function validateManifest(platform = detectPlatform()) {
     }
   }
   if (platform === 'camera3') {
-    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js']) {
+    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js','modules/phase346_player_avatar_profile_bridge.js']) {
       if (normalized.some((x) => x.endsWith(old))) forbidden.push(old);
     }
   }
