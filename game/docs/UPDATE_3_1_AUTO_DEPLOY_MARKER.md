@@ -1,78 +1,89 @@
-# Phase 350 Auto Deploy Marker
+# Phase 356 Auto Deploy Marker
 
 ## Build
-`PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK`
+`PHASE-356-ANDROID-REAL-DEVICE-FREEZE-RECOVERY-LOCK`
 
 ## Deploy targets
 - Static website/game trigger: push to `main`
 - Static workflow: `.github/workflows/deploy.yml`
-- Phase 350 validation workflow: `.github/workflows/phase350-site-integrity-check.yml`
+- Phase 356 validation workflow: `.github/workflows/phase356-android-site-ai-check.yml`
+- Android full-hand validation: `.github/workflows/phase354-android-full-game-acceptance.yml`
 
-## Runtime payload
-- `site/js/phase350-profile-avatar-recovery.js`
-- `site/profile.html`
-- `game/modules/phase350_camera3_visibility_lighting_lock.js`
-- `game/modules/phase350_android_controller_dom_deduplication_lock.js`
-- `game/modules/phase340_platform_manifest.js`
-- `game/index.html`
+## Static runtime payload
 - `game/android.html`
-- `game/camera3.html`
-- `game/manifest.json`
 - `game/android-release.json`
+- `game/manifest.json`
+- `game/modules/phase340_platform_manifest.js`
+- `game/modules/phase340_platform_core_loader.js`
+- `game/modules/phase356_android_real_device_freeze_recovery_lock.js`
+- `matrix.js`
+- `support-chat-bot.js`
+- `site/js/phase356-profile-legend-pedestal.js`
+- `sw.js`
+- Phase 356 tests, platform blueprint, and handoff manifest
 
-## Website integrity payload
-- `site/data/public-page-registry.json`
-- `site/tools/phase350-site-integrity-audit.mjs`
-- `site/roadmap.html`
-- `game/tools/phase350-integrity-static-test.mjs`
-- `.github/workflows/phase350-site-integrity-check.yml`
-- Phase 350 documentation
+## Android real-device freeze locks
+- Phase 347 remains the only Android MOVE, LOOK, seated movement, and poker-action controller.
+- Android shader `compileAsync` prewarming is disabled.
+- Android deferred lobby, account, FBX-avatar, and presence modules are disabled during table play.
+- Scene inspection is bounded to one startup pass capped at 240 nodes.
+- Standard Android pixel ratio is capped at 1.0; recovery mode uses 0.78.
+- Shadows remain disabled.
+- Five lightweight table opponents replace background FBX avatar loading.
+- Frame-gap and WebGL context-loss recovery are active.
+- `Continue Low Power` and `Reload Table` controls are visible when recovery is required.
+- Phase 336 poker rules, settlement, legal actions, cards, and NEXT HAND remain authoritative.
 
-## Profile avatar locks
-- Immediate visible fallback before 3D loading.
-- Bounded account, catalog, viewer-module, and model-loading time.
-- Visible status and Retry controls.
-- ResizeObserver fallback for older Android WebViews.
-- Blank indefinite loading state is not permitted.
+## Website presentation locks
+- Matrix secret phrase bursts are delayed and staggered.
+- Desktop phrase interval: 9 seconds.
+- Touch/mobile phrase interval: 12 seconds.
+- Reduced-motion phrase interval: 18 seconds.
+- Profile showroom displays the local Eric FBX as a rotating `SVR LEGEND` on a professional pedestal.
+- A procedural lightweight legend remains available if the FBX cannot load.
 
-## Camera 3 locks
-- Dedicated spectator lighting authority.
-- Minimum five active lights.
-- ACES filmic exposure at or above 1.1.
-- Deep-navy background and fog removal.
-- Shadows disabled.
-- Camera 3 remains account/avatar/presence/controller free.
+## AI support locks
+- The website uses a full-height, scrollable, platform-aware support panel.
+- Frontend route: `POST /api/ai/support`.
+- Offline SVR knowledge remains available when the GPT backend is unavailable.
+- Browser code contains no OpenAI secret.
+- Production GPT requires `OPENAI_API_KEY` on the separately deployed Node backend.
+- Static deployment does not deploy or configure the Node backend.
 
-## Android controller locks
-- Phase 347 remains the only visible controller authority.
-- Legacy roots are physically removed, not only hidden.
-- External virtual sticks are removed.
-- Duplicate Phase 347 roots are removed.
-- MutationObserver and periodic sweeps repair late duplicates.
-
-## Website locks
-- Canonical pages are release-blocking.
-- Canonical local links/assets/anchors must resolve.
-- Historical and optional pages remain visible as audit warnings.
-- Site integrity report is uploaded for every Phase 350 PR.
-- Public roadmap records completed, blocked, and next major milestones.
+## Platform and Unity blueprint
+- Android, Quest, desktop, Camera 3, website, profile, controls, poker authority, and recovery contracts are recorded in `docs/PHASE-356-PLATFORM-UNITY-BLUEPRINT.json`.
+- Unity should consume the shared authorities and profile fields rather than duplicate page-specific logic.
 
 ## Runtime QA
 ```js
-window.SVR_PHASE350_PROFILE_AVATAR_QA()
-window.SVR_PHASE350_PROFILE_AVATAR_RETRY()
-window.SVR_PHASE350_CAMERA3_QA()
-window.SVR_PHASE350_CAMERA3_RELIGHT()
-window.SVR_PHASE350_ANDROID_CONTROLLER_QA()
-window.SVR_PHASE350_ANDROID_CONTROLLER_SWEEP()
+window.SVR_PHASE356_QA()
+window.SVR_PHASE356_ENTER_LOW_POWER('manual-test')
+window.SVR_PHASE347_QA?.()
+window.SVR_PHASE356_PROFILE_LEGEND_QA?.()
+window.SVR_PHASE340_AUDIT?.()
 ```
+
+## Validation status
+- Phase 345 Account API Check: passed
+- Phase 346 Avatar Check: passed
+- Phase 347 Android Check: passed
+- Phase 348 Avatar Runtime Check: passed
+- Phase 349 Presence Check: passed
+- Phase 350 Site Integrity Check: passed
+- Phase 351 Profile Showroom Check: passed
+- Phase 353 VR Avatar Check: passed
+- Phase 354 Android Full Game Acceptance: passed
+- Phase 356 Android Site AI Check: passed
+- Real owner-device Android acceptance: pending
 
 ## APK release gate
 - Current APK: `0.1.0-rc1`, code `1`
 - Reserved next APK: `0.1.0-rc2`, code `2`
 - Signed native package present: false
+- Native wrapper source/signing identity present: false
 - `releaseReady`: false
 - APK URL: empty
 - Forced update: false
 - Automatic update prompt: false
 - Manual update only: true
+- Phase 356 updates the remote stable web runtime used by the installed RC1 wrapper; it does not claim a newly signed APK.
