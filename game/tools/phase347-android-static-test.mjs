@@ -1,0 +1,53 @@
+import fs from 'node:fs';
+
+const read = (path) => fs.readFileSync(path, 'utf8');
+const runtime = read('game/modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js');
+const platform = read('game/modules/phase340_platform_manifest.js');
+const checker = read('app-update-checker.js');
+const androidPage = read('site/android/index.html');
+const downloadsPage = read('site/downloads/index.html');
+const release = JSON.parse(read('game/android-release.json'));
+const manifest = JSON.parse(read('game/manifest.json'));
+const errors = [];
+
+function requireText(source, needle, label) {
+  if (!source.includes(needle)) errors.push(label);
+}
+
+requireText(runtime, "const rightAmount = moveStick.x;", 'lobby-horizontal-direction');
+requireText(runtime, 'seatX += moveStick.x', 'seated-horizontal-direction');
+if (runtime.includes('const rightAmount = -moveStick.x') || runtime.includes('seatX -= moveStick.x')) errors.push('horizontal-inversion-returned');
+requireText(runtime, "#svr326Root", 'legacy-controller-hidden');
+requireText(runtime, "PHASE347_ANDROID_CAMERA_CARD_OVERLAY", 'floating-card-overlay');
+requireText(runtime, "PHASE347_ANDROID_CENTER_LOGO_ROOT", 'android-logo');
+requireText(runtime, "PHASE347_ANDROID_RAISED_TRANSLUCENT_POT_DISPLAY", 'raised-pot');
+requireText(runtime, "Array.from({ length: 5 }", 'five-community-slots');
+requireText(runtime, 'data-hole="0"', 'hole-slot-zero');
+requireText(runtime, 'data-hole="1"', 'hole-slot-one');
+requireText(runtime, "window.SVR_PHASE347_RUN_FULL_HAND_QA", 'full-hand-qa');
+requireText(platform, "export const VERSION = 'phase347';", 'platform-version');
+requireText(platform, "phase347_android_single_controller_seated_gameplay_apk_release_lock.js", 'platform-module');
+requireText(checker, 'current.releaseReady && current.apkUrl && current.apkVersionCode > installed', 'conditional-apk-menu');
+requireText(androidPage, 'm.releaseReady===true&&m.apkUrl', 'android-page-conditional-download');
+requireText(downloadsPage, 'm.releaseReady===true&&m.apkUrl', 'downloads-page-conditional-download');
+
+if (manifest.build !== 'PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK') errors.push('manifest-build');
+if (manifest.phase !== 347) errors.push('manifest-phase');
+if (manifest.force_update !== false || manifest.show_update_prompt !== false || manifest.manual_update_only !== true) errors.push('manifest-update-policy');
+if (release.currentGameBuild !== 'PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK') errors.push('release-build');
+if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('release-update-policy');
+if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
+if (release.apkVersionCode !== 1 || release.nextApkVersionCode !== 2) errors.push('apk-version-gate');
+
+if (errors.length) {
+  console.error(JSON.stringify({ pass: false, errors }, null, 2));
+  process.exit(1);
+}
+console.log(JSON.stringify({
+  pass: true,
+  build: release.currentGameBuild,
+  controller: 'single-visible-authority',
+  horizontalInput: 'direct',
+  cards: { hole: 2, community: 5, floating: 7 },
+  apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, next: release.nextApkVersionName, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
+}, null, 2));
