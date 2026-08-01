@@ -1,0 +1,28 @@
+name: Phase 357 Android Table Status Showdown Ante Check
+
+on:
+  pull_request:
+    paths:
+      - 'game/android.html'
+      - 'game/manifest.json'
+      - 'game/android-release.json'
+      - 'game/modules/phase357_android_table_status_showdown_ante_lock.js'
+      - 'game/tools/phase357-android-table-status-showdown-ante-static-test.mjs'
+      - 'game/tools/phase347-android-static-test.mjs'
+      - '.github/workflows/phase357-android-table-status-showdown-ante.yml'
+  workflow_dispatch:
+
+jobs:
+  android-table-status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate Phase 357 syntax and contracts
+        run: |
+          node --check game/modules/phase357_android_table_status_showdown_ante_lock.js
+          node game/tools/phase357-android-table-status-showdown-ante-static-test.mjs
+          node game/tools/phase347-android-static-test.mjs
