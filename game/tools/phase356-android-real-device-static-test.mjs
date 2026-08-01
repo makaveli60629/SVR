@@ -50,7 +50,9 @@ requireText(android, 'showUpdatePrompt:false', 'update-prompt-lock');
 if (release.realDeviceValidation?.pending !== true || release.realDeviceValidation?.ownerPlaytestRequired !== true) throw new Error('Real-device playtest must remain pending');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) throw new Error('APK update policy changed');
 if (release.apkVersionName !== '0.1.0-rc1' || release.apkVersionCode !== 1) throw new Error('APK version lock changed');
-if (webManifest.phase !== 356 || webManifest.apk_version_code !== 1) throw new Error('Web manifest phase/APK mismatch');
+if (Number(webManifest.phase || 0) < 356 || webManifest.apk_version_code !== 1) throw new Error('Web manifest phase/APK regression');
+if (!String(webManifest.build || '').startsWith('PHASE-')) throw new Error('Web manifest build missing');
+if (release.currentGameBuild !== webManifest.build) throw new Error('Release and web manifest build mismatch');
 
 requireText(matrix, 'phraseIntervalSeconds = reducedMotion ? 18 : coarsePointer ? 12 : 9', 'secret-phrase-slowdown');
 requireText(matrix, 'phraseStaggerSeconds', 'secret-letter-stagger');
@@ -81,7 +83,9 @@ if (!unityBlueprint.sharedAuthorities.includes('poker-rules')) throw new Error('
 
 console.log(JSON.stringify({
   pass: true,
-  phase: 356,
+  protectedPhase: 356,
+  currentPhase: webManifest.phase,
+  currentBuild: webManifest.build,
   android: {
     deferredModules: 0,
     shaderPrecompile: 'disabled-on-android',
