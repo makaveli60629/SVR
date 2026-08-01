@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const read = (path) => fs.readFileSync(path, 'utf8');
 const runtime = read('game/modules/phase357_android_table_status_showdown_ante_lock.js');
+const directCamera = read('game/modules/phase357_android_direct_camera_seat_fix.js');
 const android = read('game/android.html');
 const manifest = JSON.parse(read('game/manifest.json'));
 const release = JSON.parse(read('game/android-release.json'));
@@ -14,7 +15,7 @@ function requireText(source, needle, label) {
 requireText(runtime, 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK', 'build-label');
 requireText(runtime, 'function desiredSeatCamera', 'close-seat-target');
 requireText(runtime, 'metrics.depth * 0.5 + edgeOffset', 'table-edge-distance');
-requireText(runtime, 'function moveRigByWorldDelta', 'camera-world-delta-correction');
+requireText(runtime, 'function moveRigByWorldDelta', 'xr-camera-world-delta-correction');
 requireText(runtime, "button.dataset?.ui === 'seat'", 'sit-button-intercept');
 requireText(runtime, "button.id === 'svr347Recenter'", 'recenter-button-intercept');
 requireText(runtime, 'svr357TurnPanel', 'turn-panel');
@@ -32,9 +33,19 @@ requireText(runtime, "window.SVR_PHASE357_QA", 'runtime-qa');
 requireText(runtime, "window.SVR_PHASE357_RECENTER", 'recenter-api');
 requireText(runtime, "window.SVR_PHASE357_ANTE_UP", 'ante-api');
 
+requireText(directCamera, 'PHASE-357-ANDROID-DIRECT-CAMERA-SEAT-FIX', 'direct-camera-build');
+requireText(directCamera, 'renderer()?.xr?.isPresenting', 'xr-exclusion');
+requireText(directCamera, 'camera.position.x = local.x', 'direct-camera-x');
+requireText(directCamera, 'camera.position.z = local.z', 'direct-camera-z');
+requireText(directCamera, "correct('seat-transition'", 'seat-transition-correction');
+requireText(directCamera, 'window.SVR_PHASE357_DIRECT_CAMERA_CORRECT', 'direct-camera-api');
+requireText(directCamera, 'window.SVR_PHASE357_DIRECT_CAMERA_QA', 'direct-camera-qa');
+
 const bootIndex = android.indexOf("await bootPlatform({forcedPlatform:'android'})");
 const phase357Index = android.indexOf("phase357_android_table_status_showdown_ante_lock.js?v=phase357");
+const directCameraIndex = android.indexOf("phase357_android_direct_camera_seat_fix.js?v=phase357");
 if (bootIndex < 0 || phase357Index <= bootIndex) errors.push('phase357-must-load-after-platform-boot');
+if (directCameraIndex <= phase357Index) errors.push('direct-camera-fix-must-load-last');
 requireText(android, 'data-build="PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK"', 'android-page-build');
 requireText(android, 'manifest.json?v=phase357', 'android-manifest-cache-version');
 
@@ -59,7 +70,7 @@ if (errors.length) {
 console.log(JSON.stringify({
   pass: true,
   build: manifest.build,
-  closeSeat: 'camera-world-delta-to-south-table-edge',
+  closeSeat: 'direct-non-xr-camera-to-south-table-edge-with-xr-rig-preserved',
   turnDisplay: ['active player', 'current bet', 'amount to call', 'last action', 'six player bet strip'],
   showdown: ['winner', 'amount won', 'hand name', 'winner hole cards', 'community board'],
   continuation: 'immediate ante-up prompt starts authoritative next hand',
