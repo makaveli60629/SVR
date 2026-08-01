@@ -4,9 +4,11 @@ const read = (file) => fs.readFileSync(file, 'utf8');
 const profileRecovery = read('site/js/phase350-profile-avatar-recovery.js');
 const profilePage = read('site/profile.html');
 const profileShowroom = fs.existsSync('site/js/phase351-profile-showroom.js') ? read('site/js/phase351-profile-showroom.js') : '';
+const phase356Legend = fs.existsSync('site/js/phase356-profile-legend-pedestal.js') ? read('site/js/phase356-profile-legend-pedestal.js') : '';
 const camera3 = read('game/modules/phase350_camera3_visibility_lighting_lock.js');
 const androidDedupe = read('game/modules/phase350_android_controller_dom_deduplication_lock.js');
 const platform = read('game/modules/phase340_platform_manifest.js');
+const matrix = read('matrix.js');
 const roadmap = read('site/roadmap.html');
 const manifest = JSON.parse(read('game/manifest.json'));
 const release = JSON.parse(read('game/android-release.json'));
@@ -34,6 +36,12 @@ if (showroomLoaded) {
   requireText(profilePage, 'id="avatarRetry"', 'profile-visible-retry-button');
 }
 if (profilePage.includes('phase346-profile-avatar-preview.js')) errors.push('old-profile-preview-still-loaded');
+if (Number(manifest.phase || 0) >= 356) {
+  requireText(matrix, 'phase356-profile-legend-pedestal.js', 'phase356-profile-legend-injection');
+  requireText(phase356Legend, 'PHASE356_LEGEND_PEDESTAL', 'phase356-profile-legend-pedestal');
+  requireText(phase356Legend, '/game/assets/models/eric/eric.fbx', 'phase356-profile-verified-model');
+  requireText(phase356Legend, 'proceduralLegend', 'phase356-profile-fallback');
+}
 
 for (const token of [
   'PHASE350_CAMERA3_LIGHTING_ROOT',
@@ -63,9 +71,10 @@ requireText(platform, 'phase350_android_controller_dom_deduplication_lock.js', '
 requireText(platform, 'phase350_camera3_visibility_lighting_lock.js', 'camera3-lighting-manifest');
 requireText(platform, 'dedupeIndex !== normalized.length - 1', 'android-dedupe-final-validator');
 requireText(platform, 'lightIndex !== normalized.length - 1', 'camera3-lighting-final-validator');
-requireText(platform, 'phase355-android-critical-load-order', 'android-load-order-label');
+requireText(platform, 'phase356-android-critical-load-order', 'android-load-order-label');
 requireText(platform, 'phase350-camera3-load-order', 'camera3-load-order-label');
 requireText(platform, 'deferredManifestFor', 'android-deferred-export');
+requireText(platform, 'const ANDROID_DEFERRED = []', 'phase356-zero-background-work');
 
 requireText(roadmap, 'Phase 351', 'roadmap-phase351');
 requireText(roadmap, 'Production Account Deployment', 'roadmap-account-deployment');
@@ -91,7 +100,7 @@ if (errors.length) {
 console.log(JSON.stringify({
   pass: true,
   protectedBuild: 'PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK',
-  profileAvatar: showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
+  profileAvatar: Number(manifest.phase || 0) >= 356 ? 'phase356-live-legend-pedestal-over-phase351-showroom' : showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
   camera3: 'dedicated-lighting-authority',
   androidController: 'physical-dom-deduplication-after-critical-gameplay-boot',
   roadmap: 'ordered-major-milestones',
