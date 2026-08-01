@@ -8,12 +8,18 @@ const stats = {
   build: BUILD,
   active: ACTIVE,
   fallbackTableCreated: false,
+  potDisplayCreated: false,
   invalidMaterials: 0,
   androidRootsRemoved: 0,
   rendererBudgetApplied: false,
   startedAt: new Date().toISOString(),
   lastError: null
 };
+let potDisplay = null;
+let potCanvas = null;
+let potContext = null;
+let potTexture = null;
+let lastPot = -1;
 
 const svgData = (markup) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup)}`;
 const TILE = {
@@ -79,14 +85,26 @@ function safeWalk(root, visitor, limit = 12000) {
   return count;
 }
 
+function safeFind(root, name) {
+  let found = null;
+  safeWalk(root, (object) => {
+    if (!found && object?.name === name) found = object;
+  });
+  return found;
+}
+
 function scene() { return window.__SVR_SCENE__ || null; }
-function worldRoot() { return scene()?.getObjectByName?.('PHASE200_ORDERED_GRAND_LOBBY_ROOT') || scene(); }
+function worldRoot() {
+  const current = scene();
+  return safeFind(current, 'PHASE200_ORDERED_GRAND_LOBBY_ROOT') || current;
+}
 
 function validTable(candidate) {
   if (!candidate) return false;
+  if (candidate.name === 'PHASE356_QUEST_TABLE_FALLBACK') return true;
   try {
-    candidate.updateWorldMatrix?.(true, true);
-    const box = new THREE.Box3().setFromObject(candidate);
+    candidate.updateWorldMatrix?.(true, false);
+    const box = new THREE.Box3().setFromObject(candidate, true);
     const size = new THREE.Vector3();
     box.getSize(size);
     return !box.isEmpty() && size.x > 1.5 && size.z > 0.8;
@@ -95,13 +113,13 @@ function validTable(candidate) {
 
 function findTable() {
   const root = worldRoot();
-  const candidates = [
-    window.SVR_TABLE_AUTHORITY,
-    root?.getObjectByName?.('PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED'),
-    root?.getObjectByName?.('PHASE159_FBX_TABLE_FLAT_SCALE_FIX_ROOT'),
-    root?.getObjectByName?.('PHASE200_INTENDED_LOBBY_POKER_TABLE_LOCKED'),
-    root?.getObjectByName?.('PHASE356_QUEST_TABLE_FALLBACK')
+  const names = [
+    'PHASE356_QUEST_TABLE_FALLBACK',
+    'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED',
+    'PHASE159_FBX_TABLE_FLAT_SCALE_FIX_ROOT',
+    'PHASE200_INTENDED_LOBBY_POKER_TABLE_LOCKED'
   ];
+  const candidates = [window.SVR_TABLE_AUTHORITY, ...names.map((name) => safeFind(root, name))];
   return candidates.find(validTable) || null;
 }
 
@@ -113,7 +131,7 @@ function ensureTable() {
     window.SVR_TABLE_AUTHORITY = existing;
     return existing;
   }
-  root.getObjectByName?.('PHASE356_QUEST_TABLE_FALLBACK')?.removeFromParent?.();
+  safeFind(root, 'PHASE356_QUEST_TABLE_FALLBACK')?.removeFromParent?.();
   const group = new THREE.Group();
   group.name = 'PHASE356_QUEST_TABLE_FALLBACK';
   group.position.set(0, 0, 0.75);
@@ -150,12 +168,82 @@ function ensureTable() {
   return group;
 }
 
+function drawPot(amount = 0) {
+  if (!potContext || !potCanvas || !potTexture) return;
+  const value = Math.max(0, Math.floor(Number(amount) || 0));
+  if (value === lastPot) return;
+  lastPot = value;
+  const g = potContext;
+  const w = potCanvas.width;
+  const h = potCanvas.height;
+  g.clearRect(0, 0, w, h);
+  g.fillStyle = 'rgba(3,8,18,.72)';
+  g.strokeStyle = 'rgba(127,252,255,.92)';
+  g.lineWidth = 8;
+  g.beginPath();
+  g.roundRect?.(8, 8, w - 16, h - 16, 24);
+  if (typeof g.roundRect !== 'function') g.rect(8, 8, w - 16, h - 16);
+  g.fill();
+  g.stroke();
+  g.fillStyle = '#7ffcff';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.font = '900 42px Arial, sans-serif';
+  g.fillText('POT', w / 2, 48);
+  g.fillStyle = '#ffffff';
+  g.font = '900 74px Arial, sans-serif';
+  g.fillText(`$${value.toLocaleString()}`, w / 2, 118);
+  potTexture.needsUpdate = true;
+}
+
+function ensurePotDisplay() {
+  const root = worldRoot();
+  if (!ACTIVE || !root) return null;
+  const existing = safeFind(root, 'PHASE356_QUEST_RAISED_TRANSLUCENT_POT_DISPLAY');
+  if (existing) {
+    potDisplay = existing;
+    return existing;
+  }
+  potCanvas = document.createElement('canvas');
+  potCanvas.width = 512;
+  potCanvas.height = 160;
+  potContext = potCanvas.getContext('2d');
+  potTexture = new THREE.CanvasTexture(potCanvas);
+  potTexture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.SpriteMaterial({
+    map: potTexture,
+    transparent: true,
+    opacity: 0.96,
+    depthTest: false,
+    depthWrite: false,
+    toneMapped: false
+  });
+  potDisplay = new THREE.Sprite(material);
+  potDisplay.name = 'PHASE356_QUEST_RAISED_TRANSLUCENT_POT_DISPLAY';
+  potDisplay.position.set(0, 1.72, 0.72);
+  potDisplay.scale.set(1.55, 0.48, 1);
+  potDisplay.renderOrder = 9356;
+  root.add(potDisplay);
+  stats.potDisplayCreated = true;
+  drawPot(window.SVR_PHASE336_POKER_STATE?.pot || window.SVR_PHASE85_POKER_STATE?.pot || 0);
+  return potDisplay;
+}
+
+function updatePot(event) {
+  const amount = event?.detail?.pot
+    ?? window.SVR_PHASE336_POKER_STATE?.pot
+    ?? window.SVR_PHASE85_POKER_STATE?.pot
+    ?? 0;
+  ensurePotDisplay();
+  drawPot(amount);
+}
+
 function sanitizeScene() {
   const current = scene();
   if (!current) return 0;
   let repaired = 0;
   safeWalk(current, (object) => {
-    if (!object?.isMesh) return;
+    if (!object?.isMesh && !object?.isSprite) return;
     const materials = Array.isArray(object.material) ? object.material : [object.material];
     const valid = materials.filter((material) => material?.isMaterial === true);
     if (valid.length !== materials.length) {
@@ -201,17 +289,26 @@ function govern() {
   if (!ACTIVE) return stats;
   removeAndroidControls();
   ensureTable();
+  ensurePotDisplay();
+  updatePot();
   sanitizeScene();
   applyRendererBudget();
   stats.checkedAt = new Date().toISOString();
-  window.SVR_PHASE356_BOOT_STATE = { ...stats, table: findTable()?.name || null };
+  window.SVR_PHASE356_BOOT_STATE = {
+    ...stats,
+    table: findTable()?.name || null,
+    potDisplay: potDisplay?.name || null,
+    pot: lastPot
+  };
   return window.SVR_PHASE356_BOOT_STATE;
 }
 
 if (ACTIVE) {
   installImageSubstitutions();
   window.SVR_PHASE356_SAFE_WALK = safeWalk;
+  window.SVR_PHASE356_SAFE_FIND = safeFind;
   window.SVR_PHASE356_BOOT_GOVERN = govern;
+  window.addEventListener('svr:poker-state', updatePot);
   [0, 100, 250, 500, 900, 1500, 2600, 4200].forEach((delay) => setTimeout(govern, delay));
   window.addEventListener('svr:platform-ready', () => setTimeout(govern, 0));
 }
