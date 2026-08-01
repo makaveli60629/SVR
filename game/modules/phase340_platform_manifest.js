@@ -47,7 +47,8 @@ const INGAME_AVATAR = [
 ];
 
 const MULTIPLAYER_PRESENCE = [
-  'modules/phase349_multiplayer_presence_seat_reconnect_lock.js'
+  'modules/phase349_multiplayer_presence_seat_reconnect_lock.js',
+  'modules/phase349_presence_gameplay_seat_bridge.js'
 ];
 
 const DESKTOP_PRESENTATION = [
@@ -143,12 +144,13 @@ export function validateManifest(platform = detectPlatform()) {
     const profileIndex = normalized.findIndex((x) => x.endsWith('phase346_player_avatar_profile_bridge.js'));
     const avatarIndex = normalized.findIndex((x) => x.endsWith('phase348_ingame_player_avatar_presence_performance_lock.js'));
     const presenceIndex = normalized.findIndex((x) => x.endsWith('phase349_multiplayer_presence_seat_reconnect_lock.js'));
-    if (controllerIndex < 0 || profileIndex <= controllerIndex || avatarIndex <= profileIndex || presenceIndex <= avatarIndex || presenceIndex !== normalized.length - 1) {
+    const seatBridgeIndex = normalized.findIndex((x) => x.endsWith('phase349_presence_gameplay_seat_bridge.js'));
+    if (controllerIndex < 0 || profileIndex <= controllerIndex || avatarIndex <= profileIndex || presenceIndex <= avatarIndex || seatBridgeIndex <= presenceIndex || seatBridgeIndex !== normalized.length - 1) {
       forbidden.push('phase349-android-load-order');
     }
   }
   if (platform === 'camera3') {
-    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js','modules/phase346_player_avatar_profile_bridge.js','modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js','modules/phase348_ingame_player_avatar_presence_performance_lock.js','modules/phase349_multiplayer_presence_seat_reconnect_lock.js']) {
+    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js','modules/phase346_player_avatar_profile_bridge.js','modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js','modules/phase348_ingame_player_avatar_presence_performance_lock.js','modules/phase349_multiplayer_presence_seat_reconnect_lock.js','modules/phase349_presence_gameplay_seat_bridge.js']) {
       if (normalized.some((x) => x.endsWith(old))) forbidden.push(old);
     }
   }
