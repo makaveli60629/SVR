@@ -4,42 +4,67 @@ import assert from 'node:assert/strict';
 const read = (path) => fs.readFileSync(path, 'utf8');
 const manifest = read('game/modules/phase340_platform_manifest.js');
 const loader = read('game/modules/phase340_platform_core_loader.js');
+const boot = read('game/modules/phase356_quest_runtime_boot_lock.js');
+const pokerBoot = read('game/modules/phase356_quest_poker_boot_order_lock.js');
 const runtime = read('game/modules/phase356_quest_full_game_acceptance_smoothness_lock.js');
 const index = read('game/index.html');
 const release = JSON.parse(read('game/quest-release.json'));
 
 assert.match(manifest, /PHASE-356-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK/);
 assert.match(manifest, /VERSION = 'phase356'/);
+assert.match(manifest, /const QUEST_FOUNDATION =/);
+assert.match(manifest, /phase356_quest_runtime_boot_lock\.js/);
+assert.match(manifest, /phase356_quest_poker_boot_order_lock\.js/);
 assert.match(manifest, /phase331_quest_meta_hands_table_interaction_lock\.js/);
 assert.match(manifest, /phase334_table_layout_gesture_poker_lock\.js/);
 assert.match(manifest, /phase335_oculus_acceptance_gameplay_stability_lock\.js/);
 assert.match(manifest, /phase356_quest_full_game_acceptance_smoothness_lock\.js/);
-assert.match(manifest, /const QUEST_DEFERRED = \[\.\.\.SHARED_SOCIAL\]/);
+assert.match(manifest, /const QUEST_DEFERRED = \[\.\.\.LOBBY, \.\.\.SHARED_SOCIAL\]/);
 assert.match(manifest, /params\.get\('platform'\) === 'quest'/);
 assert.match(manifest, /phase356-quest-critical-load-order/);
 assert.match(manifest, /phase356-quest-deferred-load-order/);
+assert.match(manifest, /questOrder\.at\(-1\) !== normalized\.length - 1/);
 
-const questBlock = manifest.slice(manifest.indexOf("if (value === 'quest')"), manifest.indexOf("if (value === 'camera3')"));
-assert.doesNotMatch(questBlock, /phase347_android_single_controller/);
-assert.doesNotMatch(questBlock, /phase350_android_controller/);
+const questAssembly = manifest.slice(manifest.indexOf("if (value === 'quest') return"), manifest.indexOf("return unique([...REGISTRY, ...FOUNDATION"));
+assert.doesNotMatch(questAssembly, /phase156_table2_stool_texture_lock/);
+assert.doesNotMatch(questAssembly, /phase202_fbx_asset_path_recovery_lock/);
+assert.doesNotMatch(questAssembly, /phase347_android_single_controller/);
+assert.doesNotMatch(questAssembly, /phase350_android_controller/);
+
+assert.match(boot, /PHASE-356-QUEST-RUNTIME-BOOT-LOCK/);
+assert.match(boot, /PHASE356_QUEST_TABLE_FALLBACK/);
+assert.match(boot, /SVR_PHASE356_SAFE_WALK/);
+assert.match(boot, /renderer\.shadowMap\.enabled = false/);
+assert.match(boot, /renderer\.xr\.enabled = true/);
+assert.match(pokerBoot, /PHASE-356-QUEST-POKER-BOOT-ORDER-LOCK/);
+assert.match(pokerBoot, /await import\('\.\/phase341_canonical_table_geometry_card_motion_lock\.js'\)/);
+assert.match(pokerBoot, /await import\('\.\/p85_poker_truth_lock\.js'\)/);
+assert.match(pokerBoot, /PHASE341_COMMUNITY_4/);
+assert.match(pokerBoot, /SVR_PHASE356_POKER_BOOT_QA/);
 
 assert.match(loader, /'svr-phase356'/);
 assert.match(loader, /state\.platform === 'quest' \? 44 : 64/);
 assert.match(loader, /renderer\.xr\.enabled = true/);
-assert.match(loader, /phase356_quest_full_game_acceptance_smoothness_lock\.js/);
+assert.match(loader, /phase356_quest_runtime_boot_lock\.js/);
+assert.match(loader, /phase356_quest_poker_boot_order_lock\.js/);
+assert.match(loader, /window\.SVR_PHASE356_SAFE_WALK/);
+assert.match(loader, /svr:phase356-acceptance/);
 assert.match(loader, /phase356-\$\{state\.platform\}-critical-ready/);
 
 assert.match(runtime, /SVR_PHASE356_RUN_QUEST_FULL_GAME_ACCEPTANCE/);
 assert.match(runtime, /SVR_POKER_QA_PASSIVE_BOTS = true/);
+assert.match(runtime, /Math\.max\(0, Number\(state\.currentBet/);
 assert.match(runtime, /\['preflop', 'flop', 'turn', 'river', 'showdown'\]/);
 assert.match(runtime, /totalStacks === 6000/);
 assert.match(runtime, /snapTurnDegrees: 45/);
 assert.match(runtime, /forwardReference: 'headset-look-direction'/);
 assert.match(runtime, /physicalQuestInputAcceptanceRequired: true/);
 assert.match(runtime, /androidRoots === 0/);
+assert.match(runtime, /PHASE341_COMMUNITY_\[0-4\]/);
 
 assert.match(index, /PHASE-356-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK/);
 assert.match(index, /phase340_platform_core_loader\.js\?v=phase356/);
+assert.match(index, /if\(s\)s\.textContent='Recovery mode active'/);
 assert.equal(release.status, 'quest-browser-full-game-acceptance-pending');
 assert.equal(release.handsPrimary, true);
 assert.equal(release.controllerFallback, true);
@@ -51,4 +76,4 @@ assert.equal(release.androidApkUnchanged.versionName, '0.1.0-rc1');
 assert.equal(release.androidApkUnchanged.forceUpdate, false);
 assert.equal(release.androidApkUnchanged.showUpdatePrompt, false);
 
-console.log('Phase 356 Quest static contract passed.');
+console.log('Phase 356 Quest poker-first static contract passed.');
