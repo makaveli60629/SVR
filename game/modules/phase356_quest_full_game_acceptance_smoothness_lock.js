@@ -238,10 +238,21 @@ async function runAcceptance(options = {}) {
 
 function qa() {
   removeAndroidControls();
+  const currentPlatform = platformState();
   const result = {
     build: BUILD, active: ACTIVE, installedAt, governedAt, renderer: configureRenderer(), input: inputAudit(),
     table: tableAudit(), pokerBoot: window.SVR_PHASE356_POKER_BOOT_QA?.() || null,
-    platform: window.SVR_PHASE340_AUDIT?.() || platformState(), fullGameAcceptance: lastResult,
+    platform: {
+      build: currentPlatform.build,
+      platform: currentPlatform.platform,
+      loaded: [...(currentPlatform.loaded || [])],
+      failed: [...(currentPlatform.failed || [])],
+      deferredLoaded: [...(currentPlatform.deferredLoaded || [])],
+      deferredFailed: [...(currentPlatform.deferredFailed || [])],
+      totalMs: currentPlatform.totalMs,
+      readyAt: currentPlatform.readyAt
+    },
+    fullGameAcceptance: lastResult,
     checkedAt: new Date().toISOString()
   };
   result.pass = result.active && result.input.pass && result.table.pass && result.pokerBoot?.pass === true
