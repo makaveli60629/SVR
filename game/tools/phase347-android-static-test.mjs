@@ -26,6 +26,7 @@ requireText(runtime, 'data-hole="0"', 'hole-slot-zero');
 requireText(runtime, 'data-hole="1"', 'hole-slot-one');
 requireText(runtime, "window.SVR_PHASE347_RUN_FULL_HAND_QA", 'full-hand-qa');
 requireText(platform, "phase347_android_single_controller_seated_gameplay_apk_release_lock.js", 'platform-module');
+requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...FOUNDATION, ...ANDROID, ...POKER_CORE, ...SETTLEMENT_PRESENTATION, ...ANDROID_FINAL, ...ACCOUNT_ACTIVITY, ...INGAME_AVATAR]);", 'android-runtime-load-order');
 requireText(checker, 'current.releaseReady && current.apkUrl && current.apkVersionCode > installed', 'conditional-apk-menu');
 requireText(androidPage, 'm.releaseReady===true&&m.apkUrl', 'android-page-conditional-download');
 requireText(downloadsPage, 'm.releaseReady===true&&m.apkUrl', 'downloads-page-conditional-download');
@@ -40,10 +41,6 @@ if (release.forceUpdate !== false || release.showUpdatePrompt !== false || relea
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.apkVersionCode !== 1 || release.nextApkVersionCode !== 2) errors.push('apk-version-gate');
 
-const controllerIndex = platform.indexOf('phase347_android_single_controller_seated_gameplay_apk_release_lock.js');
-const accountIndex = platform.indexOf('phase345_player_account_activity_bridge.js');
-if (controllerIndex < 0 || (accountIndex >= 0 && controllerIndex > accountIndex)) errors.push('controller-load-order-regressed');
-
 if (errors.length) {
   console.error(JSON.stringify({ pass: false, errors }, null, 2));
   process.exit(1);
@@ -55,6 +52,7 @@ console.log(JSON.stringify({
   platformVersion,
   controller: 'single-visible-authority',
   horizontalInput: 'direct',
+  runtimeOrder: ['ANDROID_FINAL', 'ACCOUNT_ACTIVITY', 'INGAME_AVATAR'],
   cards: { hole: 2, community: 5, floating: 7 },
   apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, next: release.nextApkVersionName, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
