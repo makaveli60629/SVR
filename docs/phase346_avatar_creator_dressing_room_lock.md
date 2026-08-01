@@ -10,8 +10,17 @@ Phase 346 adds a dedicated live 3D avatar dressing room, a live profile preview,
 - `/site/profile.html?v=phase346`
 - `/game/avatar.html?v=phase346`
 
-## Current avatar pipeline
-The existing `/game/assets/models/player.glb` is normalized to a 1.72-meter preview avatar. Because that GLB is a single skinned mesh rather than a modular clothing set, starter clothing and accessories are independent lightweight preview layers. The saved outfit record is provider-neutral and can later map to dedicated GLB or Unity equipment assets.
+## Verified avatar pipeline
+Current `main` contains two verified rigged bodies:
+
+- `/game/assets/models/eric/eric.fbx`
+- `/game/assets/models/claudia/claudia.fbx`
+
+Eric is the default player body and Claudia is selectable. Both are normalized in the preview, while their poker NPC instances remain separate. The viewer also supports future GLB/glTF bodies and uses a procedural mannequin if any selected asset fails.
+
+The original draft referenced `player.glb`, but the Phase 346 CI gate correctly proved that asset is absent from current `main`. The corrected catalog and workflow now verify every model path, format, height, default body, and preset before merge.
+
+Because the current FBX bodies are complete character models rather than modular clothing sets, starter clothing and accessories are independent lightweight preview layers. The saved outfit record is provider-neutral and can later map to dedicated FBX/GLB assets or Unity equipment prefabs.
 
 ## Runtime QA
 ```js
