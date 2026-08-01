@@ -44,7 +44,7 @@ if (platformVersion < 348) fail('Platform version regressed below Phase 348.');
 const camera3Block = platform.slice(platform.indexOf('const CAMERA3 ='), platform.indexOf('function unique'));
 if (camera3Block.includes('phase348_ingame_player_avatar_presence_performance_lock.js')) fail('Camera 3 must not load Phase 348.');
 if (!platform.includes('avatarIndex <= profileIndex')) fail('Deferred avatar load-order validation is missing.');
-if (!platform.includes('const QUEST_DEFERRED = [...SHARED_SOCIAL]')) fail('Quest avatar must be deferred through the shared social tail.');
+if (!platform.includes('const QUEST_DEFERRED = [...LOBBY, ...SHARED_SOCIAL]')) fail('Quest avatar must be deferred after poker-ready lobby scheduling.');
 
 if (Number(gameManifest.phase || 0) < 348) fail('game/manifest.json phase regressed below 348.');
 if (!String(gameManifest.build || '').startsWith('PHASE-')) fail('Game manifest build is missing.');
