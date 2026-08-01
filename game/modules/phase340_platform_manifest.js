@@ -51,6 +51,12 @@ const MULTIPLAYER_PRESENCE = [
   'modules/phase349_presence_gameplay_seat_bridge.js'
 ];
 
+const SHARED_SOCIAL = [
+  ...ACCOUNT_ACTIVITY,
+  ...INGAME_AVATAR,
+  ...MULTIPLAYER_PRESENCE
+];
+
 const DESKTOP_PRESENTATION = [
   'modules/phase323_table_resting_point_alignment_lock.js',
   'modules/phase332_pro_table_chip_physics_pass_line_lock.js',
@@ -58,8 +64,20 @@ const DESKTOP_PRESENTATION = [
   'modules/phase335_oculus_acceptance_gameplay_stability_lock.js'
 ];
 
-const QUEST = [
-  'modules/phase199_fbx_table_runtime_diagnostic_lock.js',
+const QUEST_FOUNDATION = [
+  'modules/phase358_quest_incremental_shader_compile_lock.js',
+  'modules/phase358_quest_runtime_boot_lock.js',
+  'phase101_boot_load_screen_recovery.js',
+  'phase101_partial_runtime_render_guard.js',
+  'main.js',
+  'modules/phase358_quest_uploaded_table_authority_lock.js'
+];
+
+const QUEST_POKER_BOOT = [
+  'modules/phase358_quest_poker_boot_order_lock.js'
+];
+
+const QUEST_INPUT = [
   'modules/p86_seated_lock.js',
   'modules/p87_scorpion_seat_authority.js',
   'phase281_visible_hands_sky_cleanup_lock.js',
@@ -69,6 +87,22 @@ const QUEST = [
   'modules/phase333_quest_shader_gameplay_polish_lock.js',
   'modules/phase334_table_layout_gesture_poker_lock.js',
   'modules/phase335_oculus_acceptance_gameplay_stability_lock.js'
+];
+
+const QUEST_SETTLEMENT = [
+  'modules/phase337_physical_pot_winner_settlement_lock.js',
+  'modules/phase338_bankroll_chip_inventory_sync_lock.js',
+  'modules/phase342_adaptive_performance_asset_pipeline_lock.js'
+];
+
+const QUEST_ACCEPTANCE = [
+  'modules/phase358_quest_pot_display_authority_lock.js',
+  'modules/phase358_quest_full_game_acceptance_smoothness_lock.js'
+];
+
+const QUEST_DEFERRED = [
+  ...LOBBY,
+  ...SHARED_SOCIAL
 ];
 
 const ANDROID_FOUNDATION = [
@@ -119,7 +153,7 @@ export function detectPlatform() {
   const ua = navigator.userAgent || '';
   if (path.endsWith('/camera3.html') || params.get('cam') === 'director' || params.has('director')) return 'camera3';
   if (path.endsWith('/android.html')) return 'android';
-  if (/Quest|Oculus|Meta Quest/i.test(ua)) return 'quest';
+  if (params.get('platform') === 'quest' || /Quest|Oculus|Meta Quest/i.test(ua)) return 'quest';
   if (/Android/i.test(ua) && !params.has('desktop') && !params.has('standard')) return 'android';
   return 'desktop';
 }
@@ -142,25 +176,37 @@ export function manifestFor(platform = detectPlatform()) {
     ]);
   }
   if (value === 'android') return unique([...REGISTRY, ...ANDROID_FOUNDATION, ...ANDROID_POKER, ...ANDROID_FINAL]);
-  const sharedTail = [...ACCOUNT_ACTIVITY, ...INGAME_AVATAR, ...MULTIPLAYER_PRESENCE];
-  if (value === 'quest') return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...QUEST, ...SETTLEMENT_PRESENTATION, ...sharedTail]);
-  return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...DESKTOP_PRESENTATION, ...SETTLEMENT_PRESENTATION, ...sharedTail]);
+  if (value === 'quest') {
+    return unique([
+      ...REGISTRY,
+      ...QUEST_FOUNDATION,
+      ...QUEST_POKER_BOOT,
+      ...QUEST_INPUT,
+      ...QUEST_SETTLEMENT,
+      ...QUEST_ACCEPTANCE
+    ]);
+  }
+  return unique([...REGISTRY, ...FOUNDATION, ...LOBBY, ...POKER_CORE, ...DESKTOP_PRESENTATION, ...SETTLEMENT_PRESENTATION, ...SHARED_SOCIAL]);
 }
 
 export function deferredManifestFor(platform = detectPlatform()) {
-  return String(platform || '').toLowerCase() === 'android' ? unique(ANDROID_DEFERRED) : [];
+  const value = String(platform || '').toLowerCase();
+  if (value === 'android') return unique(ANDROID_DEFERRED);
+  if (value === 'quest') return unique(QUEST_DEFERRED);
+  return [];
 }
 
 export function validateManifest(platform = detectPlatform()) {
-  const modules = manifestFor(platform);
-  const deferred = deferredManifestFor(platform);
+  const value = String(platform || '').toLowerCase();
+  const modules = manifestFor(value);
+  const deferred = deferredManifestFor(value);
   const normalized = modules.map((item) => item.replace(/[?#].*$/, ''));
   const normalizedDeferred = deferred.map((item) => item.replace(/[?#].*$/, ''));
   const combined = [...normalized, ...normalizedDeferred];
   const duplicates = combined.filter((item, index) => combined.indexOf(item) !== index);
   const forbidden = [];
 
-  if (platform === 'android') {
+  if (value === 'android') {
     const retired = [
       'modules/phase355_android_runtime_smoothness_hardening_lock.js',
       'phase156_table2_stool_texture_lock.js',
@@ -195,7 +241,49 @@ export function validateManifest(platform = detectPlatform()) {
     if (normalizedDeferred.length !== 0) forbidden.push('phase356-android-background-deferred-work');
   }
 
-  if (platform === 'camera3') {
+  if (value === 'quest') {
+    const retiredQuest = [
+      'phase156_table2_stool_texture_lock.js',
+      'phase161_geometry_table_fbx_floor_lock.js',
+      'phase164_fbx_table_final_alignment_seat_anchor_lock.js',
+      'modules/phase202_fbx_asset_path_recovery_lock.js',
+      'modules/phase203_table_asset_resolver_lock.js',
+      'modules/phase343_android_gameplay_hud_seated_table_view_lock.js',
+      'modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js',
+      'modules/phase350_android_controller_dom_deduplication_lock.js',
+      'modules/phase355_android_runtime_smoothness_hardening_lock.js',
+      'modules/phase356_android_real_device_freeze_recovery_lock.js'
+    ];
+    for (const old of retiredQuest) if (normalized.some((item) => item.endsWith(old))) forbidden.push(old);
+
+    const questOrder = [
+      'phase358_quest_incremental_shader_compile_lock.js',
+      'phase358_quest_runtime_boot_lock.js',
+      'main.js',
+      'phase358_quest_uploaded_table_authority_lock.js',
+      'phase358_quest_poker_boot_order_lock.js',
+      'phase331_quest_meta_hands_table_interaction_lock.js',
+      'phase334_table_layout_gesture_poker_lock.js',
+      'phase335_oculus_acceptance_gameplay_stability_lock.js',
+      'phase358_quest_pot_display_authority_lock.js',
+      'phase358_quest_full_game_acceptance_smoothness_lock.js'
+    ].map((name) => normalized.findIndex((item) => item.endsWith(name)));
+    if (questOrder.some((index) => index < 0)
+      || questOrder.some((index, position) => position > 0 && index <= questOrder[position - 1])
+      || questOrder.at(-1) !== normalized.length - 1) {
+      forbidden.push('phase358-quest-critical-load-order');
+    }
+
+    const profileIndex = normalizedDeferred.findIndex((item) => item.endsWith('phase346_player_avatar_profile_bridge.js'));
+    const avatarIndex = normalizedDeferred.findIndex((item) => item.endsWith('phase348_ingame_player_avatar_presence_performance_lock.js'));
+    const presenceIndex = normalizedDeferred.findIndex((item) => item.endsWith('phase349_multiplayer_presence_seat_reconnect_lock.js'));
+    const seatBridgeIndex = normalizedDeferred.findIndex((item) => item.endsWith('phase349_presence_gameplay_seat_bridge.js'));
+    if (profileIndex < 0 || avatarIndex <= profileIndex || presenceIndex <= avatarIndex || seatBridgeIndex <= presenceIndex) {
+      forbidden.push('phase358-quest-deferred-load-order');
+    }
+  }
+
+  if (value === 'camera3') {
     for (const old of [
       'modules/phase322_full_lobby_visual_finish_lock.js',
       'phase326_android_playable_polish_lock.js',
@@ -217,7 +305,7 @@ export function validateManifest(platform = detectPlatform()) {
 
   return {
     build: BUILD,
-    platform,
+    platform: value,
     moduleCount: modules.length,
     deferredModuleCount: deferred.length,
     duplicates,
