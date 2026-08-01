@@ -1,0 +1,50 @@
+name: Phase 346 Avatar Check
+
+on:
+  pull_request:
+    paths:
+      - 'site/avatar.html'
+      - 'site/profile.html'
+      - 'site/data/avatar-catalog.json'
+      - 'site/js/phase346-*.js'
+      - 'site/tools/phase346-avatar-catalog-test.mjs'
+      - 'game/avatar.html'
+      - 'game/modules/phase346_player_avatar_profile_bridge.js'
+      - 'game/modules/phase340_platform_manifest.js'
+      - 'game/manifest.json'
+      - 'game/android-release.json'
+      - '.github/workflows/phase346-avatar-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate avatar modules
+        run: |
+          node --check site/js/phase346-avatar-viewer.js
+          node --check site/js/phase346-avatar-room.js
+          node --check site/js/phase346-profile-avatar-preview.js
+          node --check game/modules/phase346_player_avatar_profile_bridge.js
+          node --check game/modules/phase340_platform_manifest.js
+      - name: Validate catalog and model
+        run: node site/tools/phase346-avatar-catalog-test.mjs
+      - name: Validate release JSON
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('game/manifest.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('game/android-release.json','utf8'))"
+      - name: Validate routes and platform isolation
+        run: |
+          test -f site/avatar.html
+          test -f game/avatar.html
+          grep -q 'phase346_player_avatar_profile_bridge.js' game/modules/phase340_platform_manifest.js
+          grep -q "modules/phase346_player_avatar_profile_bridge.js'" game/modules/phase340_platform_manifest.js
+          grep -q 'PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK' game/manifest.json
+          grep -q 'manual_update_only.*true' game/manifest.json
