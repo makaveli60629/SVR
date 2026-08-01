@@ -2,7 +2,7 @@ import { account } from './phase345-demo-activity-persistence.js?v=phase346';
 import { SVRAvatarViewer, BUILD } from './phase346-avatar-viewer.js?v=phase346';
 
 const CATALOG_URL = '/site/data/avatar-catalog.json?v=phase346';
-const MODEL_URL = '/game/assets/models/player.glb';
+const MODEL_URL = new URL('/game/assets/models/player.glb', location.origin).href;
 const state = { build: BUILD, ready: false, catalog: null, viewer: null, outfit: null, accountMode: 'loading', saved: false, lastError: null };
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
