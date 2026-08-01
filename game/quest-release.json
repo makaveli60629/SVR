@@ -1,0 +1,59 @@
+{
+  "name": "SVR Poker Quest WebXR",
+  "channel": "stable-web",
+  "phase": 358,
+  "build": "PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK",
+  "webEntry": "/game/index.html?platform=quest&v=phase358",
+  "browserAcceptance": {
+    "passed": false,
+    "pendingWorkflow": true,
+    "requirements": [
+      "Quest platform detection",
+      "uploaded table authority",
+      "hands-primary and controller-fallback contracts",
+      "zero Android controller roots",
+      "two player cards and five community-card meshes",
+      "preflop, flop, turn, river, showdown",
+      "winner and settled pot",
+      "exactly 6000 chips conserved",
+      "next hand advancement",
+      "startup under 45 seconds",
+      "zero browser, console, same-origin HTTP, and request failures"
+    ]
+  },
+  "physicalQuestAcceptance": {
+    "passed": false,
+    "pending": true,
+    "requiresHeadset": true,
+    "checklist": [
+      "real hand joints",
+      "controller sticks",
+      "headset-look forward movement",
+      "45-degree snap turn",
+      "hold-to-aim and release-to-teleport",
+      "room-scale tracking",
+      "seated comfort and reach"
+    ]
+  },
+  "productTruth": {
+    "localPlayMoneyVsFiveBots": true,
+    "serverAuthoritativePoker": false,
+    "serverAuthoritativeBalances": false,
+    "productionMultiplayerCards": false
+  },
+  "androidApkPolicy": {
+    "versionName": "0.1.0-rc1",
+    "versionCode": 1,
+    "releaseReady": false,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true
+  },
+  "protectedAuthorities": [
+    "Phase 336 poker rules and settlement",
+    "Phase 341 table and card coordinates",
+    "Phase 347 Android single controller",
+    "Phase 356 Android freeze recovery",
+    "Phase 357 Android seating and showdown presentation"
+  ]
+}
