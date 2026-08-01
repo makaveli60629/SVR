@@ -76,7 +76,10 @@ const QUEST_SETTLEMENT = [
   'modules/phase338_bankroll_chip_inventory_sync_lock.js',
   'modules/phase342_adaptive_performance_asset_pipeline_lock.js'
 ];
-const QUEST_ACCEPTANCE = ['modules/phase356_quest_full_game_acceptance_smoothness_lock.js'];
+const QUEST_ACCEPTANCE = [
+  'modules/phase356_quest_pot_display_authority_lock.js',
+  'modules/phase356_quest_full_game_acceptance_smoothness_lock.js'
+];
 const QUEST_DEFERRED = [...LOBBY, ...SHARED_SOCIAL];
 
 const ANDROID_FOUNDATION = [
@@ -216,6 +219,7 @@ export function validateManifest(platform = detectPlatform()) {
       'phase331_quest_meta_hands_table_interaction_lock.js',
       'phase334_table_layout_gesture_poker_lock.js',
       'phase335_oculus_acceptance_gameplay_stability_lock.js',
+      'phase356_quest_pot_display_authority_lock.js',
       'phase356_quest_full_game_acceptance_smoothness_lock.js'
     ].map((name) => normalized.findIndex((x) => x.endsWith(name)));
     if (questOrder.some((index) => index < 0)
