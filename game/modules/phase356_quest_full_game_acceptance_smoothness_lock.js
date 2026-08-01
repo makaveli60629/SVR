@@ -75,14 +75,17 @@ function sceneObjects() {
 function tableAudit() {
   const { scene, names } = sceneObjects();
   const qa = window.SVR_PHASE334_TABLE_QA?.() || window.SVR_PHASE335_TABLE_QA?.() || null;
-  const table = names.find((name) => /PHASE356_QUEST_TABLE_FALLBACK|PHASE159_ACTUAL_UPLOADED_TABLE|PHASE159_FBX_TABLE|PHASE200_INTENDED_LOBBY_POKER_TABLE|PHASE341_CANONICAL_TABLE/i.test(name)) || null;
+  const table = names.find((name) => name === 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED') || null;
+  const uploadedTableAuthority = window.SVR_TABLE_AUTHORITY?.name === 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED';
+  const fallbackPresent = names.includes('PHASE356_QUEST_TABLE_FALLBACK');
   const logo = names.find((name) => /PHASE334_CENTER_LOGO_ROOT|PHASE331_SVR_TABLE_CENTER_LOGO|PHASE341_CANONICAL_CENTER_LOGO/i.test(name)) || null;
   const potDisplay = names.find((name) => /PHASE331_UPRIGHT_TRANSLUCENT_POT_DISPLAY|PHASE333.*POT|P85_POT_LABEL/i.test(name)) || null;
   const holeMeshes = names.filter((name) => /^(?:P85_HAND_0_[01]|PHASE341_HOLE_0_[01])$/i.test(name)).length;
   const communityMeshes = names.filter((name) => /^(?:P85_COMM_\d+|PHASE341_COMMUNITY_[0-4])$/i.test(name)).length;
   return {
-    scene: Boolean(scene), table, logo, potDisplay, holeMeshes, communityMeshes, phase334: qa,
-    pass: Boolean(scene && table && logo && potDisplay && holeMeshes >= 2 && communityMeshes >= 5)
+    scene: Boolean(scene), table, uploadedTableAuthority, fallbackPresent, logo, potDisplay,
+    holeMeshes, communityMeshes, phase334: qa,
+    pass: Boolean(scene && table && uploadedTableAuthority && !fallbackPresent && logo && potDisplay && holeMeshes >= 2 && communityMeshes >= 5)
   };
 }
 
@@ -138,6 +141,7 @@ async function waitForRuntime(timeoutMs = 120000) {
       && typeof window.SVR_POKER_ACTION === 'function'
       && typeof window.SVR_RESET_POKER_TABLE === 'function'
       && typeof window.SVR_POKER_NEXT_HAND === 'function'
+      && window.SVR_PHASE356_UPLOADED_TABLE_QA?.().pass === true
       && window.SVR_PHASE356_POKER_BOOT_QA?.().pass === true
       && loaded.some((path) => path.endsWith('phase334_table_layout_gesture_poker_lock.js'))
       && loaded.some((path) => path.endsWith('phase335_oculus_acceptance_gameplay_stability_lock.js'))
@@ -241,7 +245,8 @@ function qa() {
   const currentPlatform = platformState();
   const result = {
     build: BUILD, active: ACTIVE, installedAt, governedAt, renderer: configureRenderer(), input: inputAudit(),
-    table: tableAudit(), pokerBoot: window.SVR_PHASE356_POKER_BOOT_QA?.() || null,
+    table: tableAudit(), uploadedTable: window.SVR_PHASE356_UPLOADED_TABLE_QA?.() || null,
+    pokerBoot: window.SVR_PHASE356_POKER_BOOT_QA?.() || null,
     platform: {
       build: currentPlatform.build,
       platform: currentPlatform.platform,
@@ -255,8 +260,8 @@ function qa() {
     fullGameAcceptance: lastResult,
     checkedAt: new Date().toISOString()
   };
-  result.pass = result.active && result.input.pass && result.table.pass && result.pokerBoot?.pass === true
-    && result.renderer?.xrEnabled === true && result.renderer?.shadows === false;
+  result.pass = result.active && result.input.pass && result.table.pass && result.uploadedTable?.pass === true
+    && result.pokerBoot?.pass === true && result.renderer?.xrEnabled === true && result.renderer?.shadows === false;
   window.SVR_PHASE356_QA_STATE = result;
   return result;
 }
@@ -279,8 +284,8 @@ function install() {
   window.SVR_PHASE356_RUN_QUEST_FULL_GAME_ACCEPTANCE = runAcceptance;
   window.SVR_PHASE356_STATE = {
     build: BUILD, active: true, handsPrimary: true, controllerFallback: true, snapTurnDegrees: 45,
-    forwardReference: 'headset-look-direction', fullGameBrowserAcceptance: true,
-    physicalQuestInputAcceptanceRequired: true, installedAt
+    forwardReference: 'headset-look-direction', uploadedTableRequired: true,
+    fullGameBrowserAcceptance: true, physicalQuestInputAcceptanceRequired: true, installedAt
   };
   if (PARAMS.get('acceptance') === '1') setTimeout(() => runAcceptance(), 700);
 }
