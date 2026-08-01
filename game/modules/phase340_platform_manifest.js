@@ -1,5 +1,5 @@
 export const BUILD = 'PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK';
-export const VERSION = 'phase346';
+export const VERSION = 'phase347';
 
 const REGISTRY = [
   'modules/phase340_runtime_authority_registry.js'
@@ -70,7 +70,8 @@ const ANDROID = [
 
 const ANDROID_FINAL = [
   'modules/phase343_android_gameplay_hud_seated_table_view_lock.js',
-  'modules/phase344_android_full_hand_acceptance_input_lock.js'
+  'modules/phase344_android_full_hand_acceptance_input_lock.js',
+  'modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js'
 ];
 
 const CAMERA3 = [
@@ -129,9 +130,11 @@ export function validateManifest(platform = detectPlatform()) {
     for (const old of ['phase324_android_game_entry_controls_lock.js','phase325_android_controls_table_unifier_lock.js','phase329_android_table_playtest_ux_lock.js','modules/phase330_android_ux_cleanup_master_handoff_lock.js']) {
       if (normalized.some((x) => x.endsWith(old))) forbidden.push(old);
     }
+    const finalIndex = normalized.findIndex((x) => x.endsWith('phase347_android_single_controller_seated_gameplay_apk_release_lock.js'));
+    if (finalIndex !== normalized.length - ACCOUNT_ACTIVITY.length - 1) forbidden.push('phase347-not-final-android-presentation');
   }
   if (platform === 'camera3') {
-    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js','modules/phase346_player_avatar_profile_bridge.js']) {
+    for (const old of ['modules/phase322_full_lobby_visual_finish_lock.js','phase326_android_playable_polish_lock.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase345_player_account_activity_bridge.js','modules/phase346_player_avatar_profile_bridge.js','modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js']) {
       if (normalized.some((x) => x.endsWith(old))) forbidden.push(old);
     }
   }
