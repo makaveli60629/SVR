@@ -10,14 +10,16 @@
   "manualUpdateOnly": true,
   "previewEntry": "/game/camera3.html?v=phase342",
   "nextApkDrop": "Only after the user explicitly requests the next APK update.",
-  "currentGameBuild": "PHASE-345-PLAYER-LOGIN-PROFILE-DAILY-REWARD-API-LOCK",
+  "currentGameBuild": "PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK",
   "notes": [
-    "Phase 345 adds one shared player account client for the website, Android, Quest, and PC routes.",
-    "Authenticated game routes create activity sessions and send one heartbeat per minute while the game is visible.",
-    "The secure backend contract supports registration, login, HTTP-only sessions, profile records, game sessions, and transactional daily rewards.",
-    "The default daily reward is 5,000 play-money chips after 300 verified active seconds and at least three accepted heartbeats.",
-    "Local demo mode is explicitly labeled and never claims to populate the production database.",
-    "The Android Phase 343 HUD, Phase 344 input lock, and Phase 342 performance governor remain preserved.",
+    "Phase 346 adds a dedicated live avatar dressing room using the verified Eric and Claudia FBX bodies already present on main.",
+    "Eric is the default player body and Claudia is selectable; their poker-table NPC instances remain separate.",
+    "Profiles now display the saved avatar body and equipped outfit in a live Three.js preview.",
+    "Starter wardrobe equipment includes color themes, hats, eyewear, jackets, vests, hoodies, shoes, watches, chains, and badges.",
+    "The viewer supports FBX plus future GLB/glTF bodies and uses a safe procedural mannequin on load failure.",
+    "The same schema-versioned outfit record is shared with Android, Quest, PC, the secure Phase 345 profile API, and the future Unity client.",
+    "Camera 3 remains free of account and avatar activity modules.",
+    "The Android Phase 343 HUD, Phase 344 input lock, Phase 342 performance governor, and Phase 345 account activity remain preserved.",
     "APK update prompts remain disabled and installation remains manual-only."
   ]
 }

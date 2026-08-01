@@ -1,50 +1,51 @@
-# Phase 345 Auto Deploy Marker
+# Phase 346 Auto Deploy Marker
 
 ## Build
-`PHASE-345-PLAYER-LOGIN-PROFILE-DAILY-REWARD-API-LOCK`
+`PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK`
 
 ## Deploy targets
 - Static website/game trigger: push to `main`
 - Static workflow: `.github/workflows/deploy.yml`
-- Validation workflow: `.github/workflows/phase345-account-api-check.yml`
+- Avatar validation workflow: `.github/workflows/phase346-avatar-check.yml`
 
-## Static payload
-- `site/login.html`
-- `site/register.html`
+## Payload
+- `site/avatar.html`
 - `site/profile.html`
-- `site/config/player-api.json`
-- `site/js/phase345-player-account-client.js`
-- `site/js/phase345-demo-activity-persistence.js`
-- `game/modules/phase345_player_account_activity_bridge.js`
+- `site/data/avatar-catalog.json`
+- `site/js/phase346-avatar-viewer.js`
+- `site/js/phase346-avatar-room.js`
+- `site/js/phase346-profile-avatar-preview.js`
+- `site/tools/phase346-avatar-catalog-test.mjs`
+- `game/avatar.html`
+- `game/modules/phase346_player_avatar_profile_bridge.js`
 - `game/modules/phase340_platform_manifest.js`
-- Android and Quest/desktop entries
-- Phase 345 release records and documentation
+- Android and Quest/desktop entry versions
+- Phase 346 release records and documentation
 
-## Backend payload
-- `backend/phase345/package.json`
-- `backend/phase345/src/server.js`
-- `backend/phase345/sql/001_phase345_player_accounts.sql`
-- `backend/phase345/.env.example`
-- `backend/phase345/README.md`
-
-The backend folder is not deployed by GitHub Pages. It must be deployed separately to an approved Node host after the Azure SQL migration and environment configuration are completed.
-
-## Account locks
-- Production passwords are bcrypt-hashed.
-- Production authentication uses an HTTP-only cookie.
-- Frontend files contain no SQL connection string, JWT secret, password hash, or production credential.
-- Daily rewards require verified activity and use a serializable database transaction.
-- Demo mode is visibly labeled and writes only to the local device.
+## Avatar locks
+- Default player body: `/game/assets/models/eric/eric.fbx`
+- Alternate player body: `/game/assets/models/claudia/claudia.fbx`
+- Eric preview height: 1.78 meters
+- Claudia preview height: 1.70 meters
+- Viewer formats: FBX, GLB, and glTF
+- One schema-versioned `equippedOutfit` profile record
+- Safe procedural mannequin if a selected model cannot load
+- Android, Quest, and desktop receive the avatar profile bridge
+- Camera 3 receives no account or avatar session bridge
+- Poker-table Eric and Claudia NPC instances remain separate
+- CI verifies every catalog model path before merge
 
 ## Runtime QA
 ```js
-window.SVR_PLAYER_ACCOUNT.snapshot()
-window.SVR_PHASE345_ACCOUNT_QA()
-window.SVR_PHASE345_START_SESSION()
-window.SVR_PHASE345_HEARTBEAT()
-window.SVR_PHASE345_END_SESSION()
-window.SVR_PHASE345_DEMO_ACTIVITY.read()
+window.SVR_PHASE346_AVATAR_QA()
+window.SVR_PHASE346_PROFILE_AVATAR_QA()
+window.SVR_PHASE346_AVATAR_BRIDGE_QA()
+window.SVR_PLAYER_AVATAR_PROFILE
+window.SVR_OPEN_AVATAR_ROOM()
 ```
+
+## Database truth
+The Phase 345 secure backend already accepts and stores `avatarUrl` and `equippedOutfit`. Production database saving remains disabled until that backend is deployed and the public player API configuration receives its approved HTTPS URL. Demo outfits remain local and visibly labeled.
 
 ## Locked APK behavior
 - APK version: `0.1.0-rc1`
