@@ -37,7 +37,7 @@ requireText(directCamera, 'PHASE-357-ANDROID-DIRECT-CAMERA-SEAT-FIX', 'direct-ca
 requireText(directCamera, 'renderer()?.xr?.isPresenting', 'xr-exclusion');
 requireText(directCamera, 'camera.position.x = local.x', 'direct-camera-x');
 requireText(directCamera, 'camera.position.z = local.z', 'direct-camera-z');
-requireText(directCamera, "correct('seat-transition'", 'seat-transition-correction');
+requireText(directCamera, "'seat-transition' : 'seated-watchdog'", 'seat-transition-correction');
 requireText(directCamera, 'window.SVR_PHASE357_DIRECT_CAMERA_CORRECT', 'direct-camera-api');
 requireText(directCamera, 'window.SVR_PHASE357_DIRECT_CAMERA_QA', 'direct-camera-qa');
 
