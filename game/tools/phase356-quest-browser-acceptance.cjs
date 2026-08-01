@@ -1,7 +1,7 @@
 const { chromium } = require('playwright');
 
 const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
-const url = `${base}/game/index.html?platform=quest&acceptance=1&v=phase356`;
+const url = `${base}/game/index.html?platform=quest&v=phase356`;
 const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) OculusBrowser/35.0.0.0.0 Chrome/126.0.0.0 Mobile VR Safari/537.36 Quest 3';
 
 (async () => {
