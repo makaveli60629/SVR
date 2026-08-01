@@ -26,10 +26,11 @@ requireText(seatBridge, "SVR_PHASE349_RELEASE_SEAT", 'gameplay-seat-release');
 
 requireText(platform, "phase349_multiplayer_presence_seat_reconnect_lock.js", 'presence-module');
 requireText(platform, "phase349_presence_gameplay_seat_bridge.js", 'seat-bridge-module');
-requireText(platform, "const presenceIndex = normalized.findIndex", 'presence-load-order-index');
-requireText(platform, "const seatBridgeIndex = normalized.findIndex", 'seat-bridge-load-order-index');
+requireText(platform, "const presenceIndex = normalizedDeferred.findIndex", 'deferred-presence-load-order-index');
+requireText(platform, "const seatBridgeIndex = normalizedDeferred.findIndex", 'deferred-seat-bridge-load-order-index');
 requireText(platform, "presenceIndex <= avatarIndex || seatBridgeIndex <= presenceIndex", 'presence-load-order-validator');
 requireText(platform, "const sharedTail = [...ACCOUNT_ACTIVITY, ...INGAME_AVATAR, ...MULTIPLAYER_PRESENCE]", 'shared-presence-tail');
+requireText(platform, "const ANDROID_DEFERRED =", 'android-deferred-presence-tail');
 const platformVersion = Number(platform.match(/export const VERSION = 'phase(\d+)'/)?.[1] || 0);
 if (platformVersion < 349) errors.push('platform-version-regressed');
 const profileIndex = platform.indexOf("'modules/phase346_player_avatar_profile_bridge.js'");
@@ -73,6 +74,7 @@ console.log(JSON.stringify({
   platformVersion,
   transport: 'local-simulation-until-presenceApiBase-configured',
   authority: { presence: true, seats: true, pokerState: false },
+  androidLoadPolicy: 'deferred-until-table-playable',
   camera3Excluded: true,
   apk: { version: release.apkVersionName, code: release.apkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
