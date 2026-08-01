@@ -17,6 +17,22 @@ const visible = (element) => {
 };
 const cardText = (card) => card ? `${card.r}${{ S: '♠', H: '♥', D: '♦', C: '♣' }[card.s] || ''}` : '•';
 
+function progress(stage, detail = {}) {
+  window.SVR_PHASE354_PROGRESS = {
+    build: BUILD,
+    stage,
+    phase: state.phase,
+    handNo: state.handNo,
+    waitingHuman: state.waitingHuman,
+    community: state.community?.length || 0,
+    legalActions: window.SVR_POKER_LEGAL_ACTIONS?.() || [],
+    actionSeq: state.actionSeq,
+    lastAction: state.lastAction,
+    at: new Date().toISOString(),
+    ...detail
+  };
+}
+
 function syncCards() {
   const human = players.find((player) => player.human) || players[0];
   const holes = [...document.querySelectorAll('#svr347Hole [data-hole]')];
@@ -91,74 +107,51 @@ function tableAudit() {
   return { logo: Boolean(logo), potDisplay: Boolean(pot), table: Boolean(window.SVR_TABLE_AUTHORITY || window.SVR_PHASE341_TABLE_LAYOUT) };
 }
 
-function chooseHumanAction() {
-  const legal = new Set(window.SVR_POKER_LEGAL_ACTIONS?.() || []);
-  if (legal.has('check')) return 'check';
-  if (legal.has('call')) return 'call';
-  if (legal.has('allin')) return 'allin';
-  if (legal.has('fold')) return 'fold';
-  return null;
-}
-
-async function completeOneHand(timeoutMs = 90000) {
-  const startedAt = performance.now();
-  const phases = new Set();
-  const actions = [];
-  const startingHand = Number(state.handNo || 0);
-  while (performance.now() - startedAt < timeoutMs) {
-    phases.add(String(state.phase || 'idle').toLowerCase());
-    syncCards();
-    if (state.phase === 'showdown') {
-      const audit = window.SVR_RUN_PHASE336_POKER_AUDIT?.();
-      return {
-        completed: true,
-        handNo: state.handNo,
-        phases: [...phases],
-        community: state.community.length,
-        burn: state.burn.length,
-        winners: state.winners?.map((winner) => ({ name: winner.name, amount: winner.amount, label: winner.label })) || [],
-        settledPot: state.settledPot,
-        totalStacks: players.reduce((sum, player) => sum + Number(player.stack || 0), 0),
-        actions,
-        audit
-      };
-    }
-    if (state.waitingHuman) {
-      const action = chooseHumanAction();
-      if (action) {
-        const accepted = window.SVR_POKER_ACTION?.(action);
-        actions.push({ phase: state.phase, action, accepted: accepted !== false });
-      }
-    }
-    if (Number(state.handNo || 0) < startingHand) throw new Error('HAND_NUMBER_REWOUND');
-    await wait(90);
+async function waitForRuntime(timeoutMs = 120000) {
+  const started = performance.now();
+  while (performance.now() - started < timeoutMs) {
+    const ready = typeof window.SVR_PHASE344_RUN_FULL_HAND_QA === 'function'
+      && typeof window.SVR_POKER_ACTION === 'function'
+      && typeof window.SVR_RESET_POKER_TABLE === 'function'
+      && document.querySelector('#svr347Root')
+      && (window.SVR_TABLE_AUTHORITY || window.SVR_PHASE341_TABLE_LAYOUT);
+    progress('waiting-runtime', { elapsedMs: Math.round(performance.now() - started), ready: Boolean(ready) });
+    if (ready) return true;
+    await wait(250);
   }
-  return { completed: false, handNo: state.handNo, phases: [...phases], community: state.community.length, actions, timeout: true };
+  return false;
 }
 
 async function runAcceptance(options = {}) {
   if (!ACTIVE) return { build: BUILD, pass: false, error: 'ANDROID_ONLY' };
   if (running) return lastResult || { build: BUILD, pass: false, running: true };
   running = true;
-  const maxHands = Math.max(1, Math.min(6, Number(options.maxHands || 4)));
-  const timeoutMs = Math.max(30000, Number(options.timeoutMs || 90000));
+  const runtimeTimeoutMs = Math.max(30000, Math.min(150000, Number(options.runtimeTimeoutMs || 120000)));
+  const handTimeoutMs = Math.max(30000, Math.min(90000, Number(options.handTimeoutMs || 90000)));
+  const maxHands = Math.max(1, Math.min(5, Number(options.maxHands || 5)));
   const report = {
     build: BUILD,
     startedAt: new Date().toISOString(),
+    runtimeTimeoutMs,
+    handTimeoutMs,
     maxHands,
-    attempts: [],
+    runtimeReady: false,
+    handDriver: null,
     controllerBefore: null,
     controllerAfter: null,
     cards: null,
     table: null,
     seat: null,
     nextHand: null,
+    settlement: null,
     updatePolicy: { ...(window.SVR_ANDROID_UPDATE_POLICY || {}) },
     pass: false,
     error: null
   };
   try {
-    for (let i = 0; i < 80 && (!window.SVR_POKER_ACTION || !document.querySelector('#svr347Root')); i += 1) await wait(125);
+    report.runtimeReady = await waitForRuntime(runtimeTimeoutMs);
+    if (!report.runtimeReady) throw new Error(`ANDROID_RUNTIME_TIMEOUT:${JSON.stringify(window.SVR_PHASE354_PROGRESS || {})}`);
+    progress('runtime-ready');
     report.controllerBefore = controllerAudit();
     const seated = window.SVR_PHASE347_SIT?.() ?? window.SVR_PHASE343_SIT?.();
     await wait(950);
@@ -167,27 +160,38 @@ async function runAcceptance(options = {}) {
       state: window.SVR_PHASE347_STATE || window.SVR_PHASE343_STATE || null,
       button: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || null
     };
-    window.SVR_RESET_POKER_TABLE?.(1000);
-    for (let attempt = 0; attempt < maxHands; attempt += 1) {
-      if (attempt > 0 && state.phase === 'showdown') window.SVR_POKER_NEXT_HAND?.();
-      const hand = await completeOneHand(timeoutMs);
-      report.attempts.push(hand);
-      if (hand.completed && hand.community === 5 && hand.winners.length > 0 && hand.totalStacks === 6000) break;
-    }
-    const acceptedHand = report.attempts.find((hand) => hand.completed && hand.community === 5 && hand.winners?.length > 0 && hand.totalStacks === 6000) || null;
+    progress('running-hand-driver');
+    report.handDriver = await window.SVR_PHASE344_RUN_FULL_HAND_QA({ maxHands, timeoutMs: handTimeoutMs });
+    progress('hand-driver-finished', { handPass: report.handDriver?.pass === true });
+    syncCards();
     report.cards = cardAudit();
     report.table = tableAudit();
     report.controllerAfter = controllerAudit();
-    if (acceptedHand) {
+    report.settlement = {
+      phase: state.phase,
+      community: state.community?.length || 0,
+      burn: state.burn?.length || 0,
+      winners: state.winners?.map((winner) => ({ name: winner.name, amount: winner.amount, label: winner.label })) || [],
+      settledPot: Number(state.settledPot || 0),
+      totalStacks: players.reduce((sum, player) => sum + Number(player.stack || 0), 0),
+      phases: report.handDriver?.record?.phases || [],
+      recordPass: report.handDriver?.record?.pass === true
+    };
+    if (report.handDriver?.pass) {
       const previous = Number(state.handNo || 0);
       const nextAccepted = window.SVR_POKER_NEXT_HAND?.();
-      for (let i = 0; i < 40 && Number(state.handNo || 0) <= previous; i += 1) await wait(100);
+      for (let i = 0; i < 50 && Number(state.handNo || 0) <= previous; i += 1) await wait(100);
       report.nextHand = { commandAccepted: nextAccepted !== false, previous, current: Number(state.handNo || 0), advanced: Number(state.handNo || 0) > previous };
     }
-    report.pass = Boolean(acceptedHand)
+    report.pass = report.runtimeReady
+      && report.handDriver?.pass === true
       && report.controllerBefore.pass && report.controllerAfter.pass
       && report.cards.pass && report.table.table && report.table.logo && report.table.potDisplay
       && report.seat.commandAccepted && report.nextHand?.advanced
+      && report.settlement.community === 5
+      && report.settlement.winners.length > 0
+      && report.settlement.settledPot > 0
+      && report.settlement.totalStacks === 6000
       && report.updatePolicy.forceUpdate === false
       && report.updatePolicy.showUpdatePrompt === false
       && report.updatePolicy.manualUpdateOnly === true;
@@ -198,6 +202,7 @@ async function runAcceptance(options = {}) {
     running = false;
     lastResult = report;
     window.SVR_PHASE354_ACCEPTANCE_RESULT = report;
+    progress('finished', { pass: report.pass, error: report.error });
     window.dispatchEvent(new CustomEvent('svr:phase354-acceptance', { detail: report }));
   }
   return report;
@@ -211,6 +216,7 @@ function qa() {
     cards: cardAudit(),
     table: tableAudit(),
     poker: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null,
+    progress: window.SVR_PHASE354_PROGRESS || null,
     fullGameAcceptance: lastResult,
     updatePolicy: { ...(window.SVR_ANDROID_UPDATE_POLICY || {}) },
     checkedAt: new Date().toISOString()
@@ -223,13 +229,14 @@ function qa() {
 
 function install() {
   if (!ACTIVE) return;
+  progress('installed');
   [300, 900, 1800, 3500].forEach((delay) => setTimeout(() => { window.SVR_PHASE350_ANDROID_CONTROLLER_SWEEP?.(); syncCards(); }, delay));
   setInterval(syncCards, 650);
   window.addEventListener('svr:poker-state', syncCards);
   window.SVR_PHASE354_QA = qa;
   window.SVR_PHASE354_RUN_ANDROID_FULL_GAME_ACCEPTANCE = runAcceptance;
   window.SVR_PHASE354_STATE = { build: BUILD, active: true, installedAt: new Date().toISOString() };
-  if (new URLSearchParams(location.search).get('acceptance') === '1') setTimeout(() => runAcceptance(), 4200);
+  if (new URLSearchParams(location.search).get('acceptance') === '1') setTimeout(() => runAcceptance(), 1200);
 }
 
 install();
