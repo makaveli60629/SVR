@@ -1,58 +1,70 @@
-# Phase 349 Auto Deploy Marker
+# Phase 350 Auto Deploy Marker
 
 ## Build
-`PHASE-349-MULTIPLAYER-PRESENCE-SEAT-RECONNECT-LOCK`
+`PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK`
 
 ## Deploy targets
 - Static website/game trigger: push to `main`
 - Static workflow: `.github/workflows/deploy.yml`
-- Presence validation workflow: `.github/workflows/phase349-presence-check.yml`
+- Phase 350 validation workflow: `.github/workflows/phase350-site-integrity-check.yml`
 
-## Static payload
-- `game/modules/phase349_multiplayer_presence_seat_reconnect_lock.js`
-- `game/modules/phase349_presence_gameplay_seat_bridge.js`
+## Runtime payload
+- `site/js/phase350-profile-avatar-recovery.js`
+- `site/profile.html`
+- `game/modules/phase350_camera3_visibility_lighting_lock.js`
+- `game/modules/phase350_android_controller_dom_deduplication_lock.js`
 - `game/modules/phase340_platform_manifest.js`
 - `game/index.html`
 - `game/android.html`
+- `game/camera3.html`
 - `game/manifest.json`
 - `game/android-release.json`
-- `site/config/player-api.json`
-- Phase 349 validation and documentation
 
-## Backend payload
-- `backend/phase349/src/server.js`
-- `backend/phase349/sql/001_phase349_presence_seat_leases.sql`
-- `backend/phase349/package.json`
-- `backend/phase349/.env.example`
-- `backend/phase349/README.md`
+## Website integrity payload
+- `site/data/public-page-registry.json`
+- `site/tools/phase350-site-integrity-audit.mjs`
+- `site/roadmap.html`
+- `game/tools/phase350-integrity-static-test.mjs`
+- `.github/workflows/phase350-site-integrity-check.yml`
+- Phase 350 documentation
 
-The static deploy does not deploy the Node presence service. Production presence requires a separately approved HTTPS backend deployment and Azure SQL migration.
+## Profile avatar locks
+- Immediate visible fallback before 3D loading.
+- Bounded account, catalog, viewer-module, and model-loading time.
+- Visible status and Retry controls.
+- ResizeObserver fallback for older Android WebViews.
+- Blank indefinite loading state is not permitted.
 
-## Presence locks
-- One active presence identity per player per room.
-- One owner per seat per room.
-- Valid seats: 0–5.
-- Sitting claims canonical seat `0`.
-- Leaving releases the seat.
-- Heartbeats expire stale presence and seat leases.
-- Reconnect replaces the old player session.
-- Duplicate remote player IDs collapse to the newest heartbeat.
-- Camera 3 receives no account/avatar/presence modules.
+## Camera 3 locks
+- Dedicated spectator lighting authority.
+- Minimum five active lights.
+- ACES filmic exposure at or above 1.1.
+- Deep-navy background and fog removal.
+- Shadows disabled.
+- Camera 3 remains account/avatar/presence/controller free.
 
-## Transport truth
-- `presenceApiBase` remains empty.
-- Current mode is same-browser simulation only.
-- Internet multiplayer is not claimed.
-- Poker state remains local and is not synchronized by Phase 349.
+## Android controller locks
+- Phase 347 remains the only visible controller authority.
+- Legacy roots are physically removed, not only hidden.
+- External virtual sticks are removed.
+- Duplicate Phase 347 roots are removed.
+- MutationObserver and periodic sweeps repair late duplicates.
+
+## Website locks
+- Canonical pages are release-blocking.
+- Canonical local links/assets/anchors must resolve.
+- Historical and optional pages remain visible as audit warnings.
+- Site integrity report is uploaded for every Phase 350 PR.
+- Public roadmap records completed, blocked, and next major milestones.
 
 ## Runtime QA
 ```js
-window.SVR_PHASE349_QA()
-window.SVR_PHASE349_SEAT_BRIDGE_QA()
-window.SVR_PHASE349_STATE()
-window.SVR_PHASE349_TRANSPORT()
-window.SVR_PHASE349_CLAIM_SEAT(0)
-window.SVR_PHASE349_RELEASE_SEAT()
+window.SVR_PHASE350_PROFILE_AVATAR_QA()
+window.SVR_PHASE350_PROFILE_AVATAR_RETRY()
+window.SVR_PHASE350_CAMERA3_QA()
+window.SVR_PHASE350_CAMERA3_RELIGHT()
+window.SVR_PHASE350_ANDROID_CONTROLLER_QA()
+window.SVR_PHASE350_ANDROID_CONTROLLER_SWEEP()
 ```
 
 ## APK release gate
