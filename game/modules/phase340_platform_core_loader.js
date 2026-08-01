@@ -31,7 +31,8 @@ const state = {
 const CRITICAL = new Set([
   'main.js',
   'modules/phase355_android_poker_boot_order_lock.js',
-  'modules/phase336_authoritative_poker_rules_pot_settlement_lock.js'
+  'modules/phase336_authoritative_poker_rules_pot_settlement_lock.js',
+  'modules/phase356_quest_full_game_acceptance_smoothness_lock.js'
 ]);
 
 function status(message) {
@@ -50,7 +51,7 @@ function release(reason) {
   if (state.readyAt) return;
   document.body.classList.add(
     'boot-released', 'runtime-visible', 'overlay-released', 'ready',
-    `svr-platform-${state.platform}`, 'svr-phase340', 'svr-phase355'
+    `svr-platform-${state.platform}`, 'svr-phase340', 'svr-phase356'
   );
   document.getElementById('safeStage')?.remove();
   window.__SVR_GAME_READY__ = true;
@@ -62,7 +63,7 @@ function release(reason) {
 
 function wait(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 
-async function waitForRuntime(timeoutMs = 5500) {
+async function waitForRuntime(timeoutMs = 6500) {
   const started = performance.now();
   while (performance.now() - started < timeoutMs) {
     if (window.__SVR_RENDERER__ && window.__SVR_SCENE__ && window.__SVR_CAMERA__) return true;
@@ -95,7 +96,8 @@ function sanitizeSceneMaterials(scene) {
 }
 
 async function prewarmRuntime() {
-  const available = await waitForRuntime(state.platform === 'camera3' ? 3600 : 5500);
+  const timeout = state.platform === 'camera3' ? 3600 : state.platform === 'quest' ? 6500 : 5500;
+  const available = await waitForRuntime(timeout);
   if (!available) return { available: false, compiled: false, textures: 0, invalidMaterials: 0 };
 
   const renderer = window.__SVR_RENDERER__;
@@ -103,9 +105,14 @@ async function prewarmRuntime() {
   const camera = window.__SVR_CAMERA__;
   window.SVR_PHASE355_GOVERN?.();
   window.SVR_PHASE340_APPLY_RENDERER_BUDGET?.(state.platform);
+  if (state.platform === 'quest') {
+    try { renderer.setPixelRatio(Math.min(Number(devicePixelRatio || 1), 1.25)); } catch {}
+    try { renderer.shadowMap.enabled = false; } catch {}
+    try { renderer.xr.enabled = true; } catch {}
+  }
   const invalidMaterials = sanitizeSceneMaterials(scene);
   let textures = 0;
-  const textureLimit = state.platform === 'android' ? 28 : 64;
+  const textureLimit = state.platform === 'android' ? 28 : state.platform === 'quest' ? 44 : 64;
 
   try {
     scene.traverse((object) => {
@@ -130,10 +137,8 @@ async function prewarmRuntime() {
   try {
     if (typeof renderer.compileAsync === 'function') {
       method = 'compileAsync';
-      await Promise.race([
-        renderer.compileAsync(scene, camera),
-        wait(state.platform === 'android' ? 900 : 1800)
-      ]);
+      const compileBudget = state.platform === 'android' ? 900 : state.platform === 'quest' ? 1200 : 1800;
+      await Promise.race([renderer.compileAsync(scene, camera), wait(compileBudget)]);
       compiled = true;
     } else if (typeof renderer.compile === 'function') {
       method = 'compile';
@@ -175,7 +180,8 @@ async function importList(paths, deferred = false) {
     }
     if (deferred) {
       window.SVR_PHASE355_GOVERN?.();
-      await wait(40);
+      window.SVR_PHASE356_QA?.();
+      await wait(state.platform === 'quest' ? 80 : 40);
     }
   }
 }
@@ -196,6 +202,7 @@ function auditSnapshot() {
     prewarm: state.prewarm,
     authority: window.SVR_PHASE340_AUTHORITY_AUDIT?.() || state.audit,
     phase355: window.SVR_PHASE355_QA?.() || null,
+    phase356: window.SVR_PHASE356_QA?.() || null,
     renderer: window.__SVR_RENDERER__?.info ? {
       calls: window.__SVR_RENDERER__.info.render?.calls || 0,
       triangles: window.__SVR_RENDERER__.info.render?.triangles || 0,
@@ -224,11 +231,11 @@ function scheduleDeferred() {
   if (typeof requestIdleCallback === 'function') {
     requestIdleCallback(() => run().catch((error) => {
       state.deferredFatal = String(error?.stack || error?.message || error);
-    }), { timeout: 5000 });
+    }), { timeout: state.platform === 'quest' ? 6500 : 5000 });
   } else {
     setTimeout(() => run().catch((error) => {
       state.deferredFatal = String(error?.stack || error?.message || error);
-    }), 2600);
+    }), state.platform === 'quest' ? 3600 : 2600);
   }
 }
 
@@ -258,7 +265,7 @@ export async function bootPlatform(options = {}) {
   window.SVR_PHASE340_PLATFORM_STATE = state;
   window.SVR_PHASE340_AUDIT = auditSnapshot;
 
-  release('phase355-android-critical-ready');
+  release(`phase356-${state.platform}-critical-ready`);
   status(`${state.platform} ready`);
   window.dispatchEvent(new CustomEvent('svr:platform-ready', { detail: auditSnapshot() }));
   scheduleDeferred();
