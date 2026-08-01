@@ -23,13 +23,17 @@
 - Phase 346 release records and documentation
 
 ## Avatar locks
-- Default player model: `/game/assets/models/player.glb`
-- Target dressing-room height: 1.72 meters
+- Default player body: `/game/assets/models/eric/eric.fbx`
+- Alternate player body: `/game/assets/models/claudia/claudia.fbx`
+- Eric preview height: 1.78 meters
+- Claudia preview height: 1.70 meters
+- Viewer formats: FBX, GLB, and glTF
 - One schema-versioned `equippedOutfit` profile record
-- Safe procedural mannequin if the GLB cannot load
+- Safe procedural mannequin if a selected model cannot load
 - Android, Quest, and desktop receive the avatar profile bridge
 - Camera 3 receives no account or avatar session bridge
-- Eric and Claudia remain NPC assets
+- Poker-table Eric and Claudia NPC instances remain separate
+- CI verifies every catalog model path before merge
 
 ## Runtime QA
 ```js
