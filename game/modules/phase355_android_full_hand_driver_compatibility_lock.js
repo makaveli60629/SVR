@@ -10,11 +10,32 @@ let running = false;
 let lastResult = null;
 const history = [];
 
+function makeRecord(attempt) {
+  return {
+    build: BUILD,
+    attempt,
+    handNo: Number(state.handNo || 0),
+    startedAt: new Date().toISOString(),
+    phases: [],
+    communityMax: 0,
+    holeCards: 0,
+    actions: [],
+    lastSequence: -1,
+    completed: false,
+    pass: false
+  };
+}
+
 function snapshot(record) {
+  if (!record) return;
+  record.handNo = Number(state.handNo || record.handNo || 0);
   const phase = String(state.phase || 'idle').toLowerCase();
   if (phase && !record.phases.includes(phase)) record.phases.push(phase);
   record.communityMax = Math.max(record.communityMax, state.community?.length || 0);
-  record.holeCards = Math.max(record.holeCards, players.find((player) => player.human)?.hand?.length || 0);
+  record.holeCards = Math.max(
+    record.holeCards,
+    players.find((player) => player.human)?.hand?.length || 0
+  );
   const sequence = Number(state.actionSeq || 0);
   if (sequence !== record.lastSequence) {
     record.lastSequence = sequence;
@@ -24,12 +45,13 @@ function snapshot(record) {
       message: state.lastAction || '',
       at: new Date().toISOString()
     });
-    record.actions = record.actions.slice(-36);
+    record.actions = record.actions.slice(-48);
   }
 }
 
 function settlementPass() {
   const totalStacks = players.reduce((sum, player) => sum + Number(player.stack || 0), 0);
+  const fundedPlayers = players.filter((player) => Number(player.stack || 0) > 0).length;
   return {
     winners: (state.winners || []).map((winner) => ({
       name: winner.name,
@@ -38,50 +60,66 @@ function settlementPass() {
     })),
     settledPot: Number(state.settledPot || 0),
     totalStacks,
-    fundedPlayers: players.filter((player) => Number(player.stack || 0) > 0).length,
+    fundedPlayers,
     pass: (state.winners || []).length > 0
       && Number(state.settledPot || 0) > 0
       && totalStacks === 6000
+      && fundedPlayers >= 2
   };
 }
 
 function chooseAction() {
   const legal = window.SVR_POKER_LEGAL_ACTIONS?.() || [];
-  const human = players.find((player) => player.human) || players[0];
-  const phase = String(state.phase || '').toLowerCase();
-  const needed = Math.max(0, Number(state.currentBet || 0) - Number(human?.bet || 0));
-  const stack = Math.max(0, Number(human?.stack || 0));
-
   if (legal.includes('check')) return 'check';
-
-  if (legal.includes('call')) {
-    // The acceptance driver must prove every street and also leave at least two
-    // funded players for NEXT HAND. It therefore folds oversized late-street
-    // calls instead of allowing a single test hand to eliminate the table.
-    const lateStreet = phase === 'turn' || phase === 'river';
-    const expensive = needed >= Math.max(80, Math.floor(stack * 0.38));
-    if (lateStreet && expensive && legal.includes('fold')) return 'fold';
-    return 'call';
-  }
-
+  if (legal.includes('call')) return 'call';
   if (legal.includes('fold')) return 'fold';
-  if (legal.includes('allin')) return 'allin';
-  return legal[0] || null;
+  return null;
+}
+
+function finalizeRecord(record) {
+  snapshot(record);
+  const settlement = settlementPass();
+  record.completed = true;
+  record.finishedAt = new Date().toISOString();
+  record.winners = settlement.winners;
+  record.settledPot = settlement.settledPot;
+  record.totalStacks = settlement.totalStacks;
+  record.fundedPlayers = settlement.fundedPlayers;
+  record.pass = ['preflop', 'flop', 'turn', 'river', 'showdown']
+    .every((phase) => record.phases.includes(phase))
+    && record.communityMax === 5
+    && record.holeCards === 2
+    && settlement.pass;
+  history.unshift({
+    ...record,
+    phases: record.phases.slice(),
+    actions: record.actions.slice(),
+    winners: record.winners.slice()
+  });
+  history.splice(8);
+  return record.pass;
 }
 
 async function driveHand(options = {}) {
   if (!ACTIVE) return { build: BUILD, pass: false, error: 'ANDROID_ONLY' };
   if (running) return lastResult || { build: BUILD, pass: false, running: true };
+
   running = true;
   const timeoutMs = Math.max(15000, Math.min(90000, Number(options.timeoutMs || 60000)));
   const maxHands = Math.max(1, Math.min(5, Number(options.maxHands || 3)));
   const started = performance.now();
+  const previousPassiveMode = window.SVR_POKER_QA_PASSIVE_BOTS;
+  let activeRecord = null;
+  let handledSequence = -1;
+  const stateListener = () => snapshot(activeRecord);
+
   const result = {
     build: BUILD,
     pass: false,
     attempts: 0,
     timeoutMs,
     maxHands,
+    deterministicBots: true,
     record: null,
     audit: null,
     error: null,
@@ -89,81 +127,50 @@ async function driveHand(options = {}) {
   };
 
   try {
-    if (typeof window.SVR_POKER_ACTION !== 'function' || typeof window.SVR_RESET_POKER_TABLE !== 'function') {
+    if (typeof window.SVR_POKER_ACTION !== 'function'
+      || typeof window.SVR_RESET_POKER_TABLE !== 'function') {
       throw new Error('POKER_ENGINE_NOT_READY');
     }
+
+    window.SVR_POKER_QA_PASSIVE_BOTS = true;
+    window.addEventListener('svr:poker-state', stateListener);
+
+    activeRecord = makeRecord(1);
     window.SVR_RESET_POKER_TABLE(1000);
-    let handledSequence = -1;
-    let handNumber = Number(state.handNo || 0);
-    let record = {
-      build: BUILD,
-      handNo: handNumber,
-      startedAt: new Date().toISOString(),
-      phases: [],
-      communityMax: 0,
-      holeCards: 0,
-      actions: [],
-      lastSequence: -1,
-      completed: false,
-      pass: false
-    };
+    activeRecord.handNo = Number(state.handNo || 0);
+    snapshot(activeRecord);
 
     while (performance.now() - started < timeoutMs && result.attempts < maxHands) {
-      if (Number(state.handNo || 0) !== handNumber) {
-        handNumber = Number(state.handNo || 0);
-        handledSequence = -1;
-        record = {
-          build: BUILD,
-          handNo: handNumber,
-          startedAt: new Date().toISOString(),
-          phases: [],
-          communityMax: 0,
-          holeCards: 0,
-          actions: [],
-          lastSequence: -1,
-          completed: false,
-          pass: false
-        };
-      }
+      snapshot(activeRecord);
 
-      snapshot(record);
       if (state.waitingHuman && Number(state.actionSeq || 0) !== handledSequence) {
-        const action = chooseAction();
-        if (action) {
+        const selected = chooseAction();
+        if (selected) {
           handledSequence = Number(state.actionSeq || 0);
-          window.SVR_POKER_ACTION(action);
+          window.SVR_POKER_ACTION(selected);
         }
       }
 
       if (String(state.phase || '').toLowerCase() === 'showdown') {
-        await wait(180);
-        snapshot(record);
-        const settlement = settlementPass();
-        record.completed = true;
-        record.finishedAt = new Date().toISOString();
-        record.winners = settlement.winners;
-        record.settledPot = settlement.settledPot;
-        record.totalStacks = settlement.totalStacks;
-        record.fundedPlayers = settlement.fundedPlayers;
-        record.pass = ['preflop', 'flop', 'turn', 'river', 'showdown'].every((phaseName) => record.phases.includes(phaseName))
-          && record.communityMax === 5
-          && record.holeCards === 2
-          && settlement.pass
-          && settlement.fundedPlayers >= 2;
-        history.unshift({ ...record, phases: record.phases.slice(), actions: record.actions.slice() });
-        history.splice(8);
+        await wait(90);
         result.attempts += 1;
-        if (record.pass) {
+        const passed = finalizeRecord(activeRecord);
+        if (passed) {
           result.pass = true;
-          result.record = record;
+          result.record = activeRecord;
           break;
         }
+
         if (result.attempts < maxHands) {
-          window.SVR_RESET_POKER_TABLE(1000);
           handledSequence = -1;
+          activeRecord = makeRecord(result.attempts + 1);
+          window.SVR_RESET_POKER_TABLE(1000);
+          activeRecord.handNo = Number(state.handNo || 0);
+          snapshot(activeRecord);
         }
       }
-      await wait(140);
+
+      await wait(45);
     }
 
     if (!result.record && history[0]) result.record = history[0];
@@ -177,17 +184,22 @@ async function driveHand(options = {}) {
       legalActions: window.SVR_POKER_LEGAL_ACTIONS?.() || [],
       settlement: settlementPass(),
       controller: window.SVR_PHASE347_QA?.() || null,
-      phase355: window.SVR_PHASE355_QA?.() || null
+      phase355: window.SVR_PHASE355_QA?.() || null,
+      qaPassiveBots: window.SVR_POKER_QA_PASSIVE_BOTS === true
     };
   } catch (error) {
     result.error = String(error?.stack || error?.message || error);
   } finally {
+    window.removeEventListener('svr:poker-state', stateListener);
+    if (previousPassiveMode === undefined) delete window.SVR_POKER_QA_PASSIVE_BOTS;
+    else window.SVR_POKER_QA_PASSIVE_BOTS = previousPassiveMode;
     result.elapsedMs = +(performance.now() - started).toFixed(1);
     result.finishedAt = new Date().toISOString();
     running = false;
     lastResult = result;
     window.SVR_PHASE355_FULL_HAND_RESULT = result;
   }
+
   return result;
 }
 
@@ -199,12 +211,17 @@ function qa() {
     phase344Alias: typeof window.SVR_PHASE344_RUN_FULL_HAND_QA === 'function',
     pokerAction: typeof window.SVR_POKER_ACTION,
     resetPoker: typeof window.SVR_RESET_POKER_TABLE,
+    passiveModeLeaked: window.SVR_POKER_QA_PASSIVE_BOTS === true,
     lastResult,
     history: history.slice(0, 3),
     checkedAt: new Date().toISOString()
   };
-  result.pass = result.active && result.installed && result.phase344Alias
-    && result.pokerAction === 'function' && result.resetPoker === 'function';
+  result.pass = result.active
+    && result.installed
+    && result.phase344Alias
+    && result.pokerAction === 'function'
+    && result.resetPoker === 'function'
+    && !result.passiveModeLeaked;
   window.SVR_PHASE355_HAND_DRIVER_QA_STATE = result;
   return result;
 }
