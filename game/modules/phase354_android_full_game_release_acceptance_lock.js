@@ -1,19 +1,24 @@
+import * as THREE from 'three';
 import { state, players } from './phase336_authoritative_engine.js';
 
 const BUILD = 'PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK';
 const ACTIVE = (window.SVR_PLATFORM || '').toLowerCase() === 'android'
   || /\/game\/android\.html$/i.test(location.pathname)
   || (/Android/i.test(navigator.userAgent || '') && !/Quest|Oculus|Meta Quest/i.test(navigator.userAgent || ''));
-
+const POT_NAME = 'PHASE354_ANDROID_RAISED_TRANSLUCENT_POT_DISPLAY';
 let running = false;
 let lastResult = null;
 let repairs = 0;
+let potSprite = null;
+let potCanvas = null;
+let potContext = null;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const visible = (element) => {
   if (!element) return false;
   const style = getComputedStyle(element);
   const rect = element.getBoundingClientRect();
-  return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity || 1) > 0 && rect.width > 0 && rect.height > 0;
+  return style.display !== 'none' && style.visibility !== 'hidden'
+    && Number(style.opacity || 1) > 0 && rect.width > 0 && rect.height > 0;
 };
 const cardText = (card) => card ? `${card.r}${{ S: '♠', H: '♥', D: '♦', C: '♣' }[card.s] || ''}` : '•';
 
@@ -31,6 +36,79 @@ function progress(stage, detail = {}) {
     at: new Date().toISOString(),
     ...detail
   };
+}
+
+function roundedRect(context, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.lineTo(x + width - r, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + r);
+  context.lineTo(x + width, y + height - r);
+  context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  context.lineTo(x + r, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - r);
+  context.lineTo(x, y + r);
+  context.quadraticCurveTo(x, y, x + r, y);
+  context.closePath();
+}
+
+function paintPot() {
+  if (!potContext || !potCanvas) return;
+  const amount = Number(state.pot || state.settledPot || 0);
+  potContext.clearRect(0, 0, potCanvas.width, potCanvas.height);
+  potContext.fillStyle = 'rgba(2,8,18,.68)';
+  roundedRect(potContext, 8, 8, potCanvas.width - 16, potCanvas.height - 16, 34);
+  potContext.fill();
+  potContext.strokeStyle = 'rgba(255,217,138,.88)';
+  potContext.lineWidth = 5;
+  potContext.stroke();
+  potContext.textAlign = 'center';
+  potContext.textBaseline = 'middle';
+  potContext.fillStyle = '#dffcff';
+  potContext.font = '900 34px system-ui';
+  potContext.fillText('POT', potCanvas.width / 2, 56);
+  potContext.fillStyle = '#ffd98a';
+  potContext.font = '950 58px system-ui';
+  potContext.fillText(`$${amount.toLocaleString()}`, potCanvas.width / 2, 120);
+  if (potSprite?.material?.map) potSprite.material.map.needsUpdate = true;
+}
+
+function ensurePotDisplay() {
+  const scene = window.__SVR_SCENE__;
+  const layout = window.SVR_PHASE341_TABLE_LAYOUT;
+  if (!scene || !layout) return null;
+  const existing = scene.getObjectByName?.(POT_NAME);
+  if (existing) {
+    potSprite = existing;
+    paintPot();
+    return existing;
+  }
+  potCanvas = document.createElement('canvas');
+  potCanvas.width = 512;
+  potCanvas.height = 176;
+  potContext = potCanvas.getContext('2d');
+  const texture = new THREE.CanvasTexture(potCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+    toneMapped: false
+  });
+  potSprite = new THREE.Sprite(material);
+  potSprite.name = POT_NAME;
+  potSprite.renderOrder = 9354;
+  potSprite.scale.set(1.38, .47, 1);
+  potSprite.position.set(
+    Number(layout.center?.x || 0),
+    Number(layout.top || 1) + .58,
+    Number(layout.center?.z || 0) - Number(layout.size?.z || 1.5) * .08
+  );
+  scene.add(potSprite);
+  paintPot();
+  return potSprite;
 }
 
 function syncCards() {
@@ -53,12 +131,15 @@ function syncCards() {
     slot.classList.toggle('empty', !card);
     slot.classList.toggle('red', /[♥♦]/.test(text));
   });
+  ensurePotDisplay();
+  paintPot();
 }
 
 function controllerAudit() {
   window.SVR_PHASE350_ANDROID_CONTROLLER_SWEEP?.();
   const authority = document.querySelector('#svr347Root');
   const buttons = authority ? [...authority.querySelectorAll('#svr347Actions button')] : [];
+  const legacy = window.SVR_PHASE350_ANDROID_CONTROLLER_QA?.() || null;
   const result = {
     roots: document.querySelectorAll('#svr347Root').length,
     move: authority?.querySelectorAll('#svr347Move').length || 0,
@@ -67,11 +148,10 @@ function controllerAudit() {
     buttons: buttons.length,
     buttonLabels: buttons.map((button) => button.textContent.trim()),
     visible: Boolean(authority && visible(authority)),
-    legacy: window.SVR_PHASE350_ANDROID_CONTROLLER_QA?.() || null
+    legacy
   };
   result.pass = result.roots === 1 && result.move === 1 && result.look === 1
-    && result.actions === 1 && result.buttons === 6 && result.visible
-    && result.legacy?.pass === true;
+    && result.actions === 1 && result.buttons === 6 && result.visible && legacy?.pass === true;
   return result;
 }
 
@@ -99,27 +179,43 @@ function cardAudit() {
 }
 
 function tableAudit() {
+  ensurePotDisplay();
   const scene = window.__SVR_SCENE__;
   const logo = scene?.getObjectByName?.('PHASE347_ANDROID_TABLE_LOGO_ROOT')
     || scene?.getObjectByName?.('PHASE341_CANONICAL_CENTER_LOGO_ROOT');
-  const pot = scene?.getObjectByName?.('PHASE347_ANDROID_POT_DISPLAY')
+  const pot = scene?.getObjectByName?.(POT_NAME)
+    || scene?.getObjectByName?.('PHASE347_ANDROID_POT_DISPLAY')
     || scene?.getObjectByName?.('PHASE347_ANDROID_OVERLAY_ROOT');
-  return { logo: Boolean(logo), potDisplay: Boolean(pot), table: Boolean(window.SVR_TABLE_AUTHORITY || window.SVR_PHASE341_TABLE_LAYOUT) };
+  return {
+    logo: Boolean(logo),
+    potDisplay: Boolean(pot),
+    potDisplayName: pot?.name || null,
+    table: Boolean(window.SVR_TABLE_AUTHORITY || window.SVR_PHASE341_TABLE_LAYOUT)
+  };
 }
 
 async function waitForRuntime(timeoutMs = 120000) {
   const started = performance.now();
   while (performance.now() - started < timeoutMs) {
+    window.SVR_PHASE350_ANDROID_CONTROLLER_SWEEP?.();
+    ensurePotDisplay();
     const ready = typeof window.SVR_PHASE344_RUN_FULL_HAND_QA === 'function'
       && typeof window.SVR_POKER_ACTION === 'function'
       && typeof window.SVR_RESET_POKER_TABLE === 'function'
+      && typeof window.SVR_PHASE350_ANDROID_CONTROLLER_QA === 'function'
+      && window.SVR_PHASE350_ANDROID_CONTROLLER_QA()?.pass === true
       && document.querySelector('#svr347Root')
-      && (window.SVR_TABLE_AUTHORITY || window.SVR_PHASE341_TABLE_LAYOUT);
+      && (window.SVR_TABLE_AUTHORITY || window.SVR_PHASE341_TABLE_LAYOUT)
+      && Boolean(scenePot());
     progress('waiting-runtime', { elapsedMs: Math.round(performance.now() - started), ready: Boolean(ready) });
     if (ready) return true;
     await wait(250);
   }
   return false;
+}
+
+function scenePot() {
+  return window.__SVR_SCENE__?.getObjectByName?.(POT_NAME) || null;
 }
 
 async function runAcceptance(options = {}) {
@@ -162,6 +258,7 @@ async function runAcceptance(options = {}) {
     };
     progress('running-hand-driver');
     report.handDriver = await window.SVR_PHASE344_RUN_FULL_HAND_QA({ maxHands, timeoutMs: handTimeoutMs });
+    await wait(150);
     progress('hand-driver-finished', { handPass: report.handDriver?.pass === true });
     syncCards();
     report.cards = cardAudit();
@@ -181,7 +278,12 @@ async function runAcceptance(options = {}) {
       const previous = Number(state.handNo || 0);
       const nextAccepted = window.SVR_POKER_NEXT_HAND?.();
       for (let i = 0; i < 50 && Number(state.handNo || 0) <= previous; i += 1) await wait(100);
-      report.nextHand = { commandAccepted: nextAccepted !== false, previous, current: Number(state.handNo || 0), advanced: Number(state.handNo || 0) > previous };
+      report.nextHand = {
+        commandAccepted: nextAccepted !== false,
+        previous,
+        current: Number(state.handNo || 0),
+        advanced: Number(state.handNo || 0) > previous
+      };
     }
     report.pass = report.runtimeReady
       && report.handDriver?.pass === true
@@ -222,6 +324,7 @@ function qa() {
     checkedAt: new Date().toISOString()
   };
   result.pass = result.controller.pass && result.cards.pass && result.table.table
+    && result.table.logo && result.table.potDisplay
     && result.updatePolicy.forceUpdate === false && result.updatePolicy.showUpdatePrompt === false;
   window.SVR_PHASE354_QA_STATE = result;
   return result;
@@ -230,7 +333,10 @@ function qa() {
 function install() {
   if (!ACTIVE) return;
   progress('installed');
-  [300, 900, 1800, 3500].forEach((delay) => setTimeout(() => { window.SVR_PHASE350_ANDROID_CONTROLLER_SWEEP?.(); syncCards(); }, delay));
+  [300, 900, 1800, 3500].forEach((delay) => setTimeout(() => {
+    window.SVR_PHASE350_ANDROID_CONTROLLER_SWEEP?.();
+    syncCards();
+  }, delay));
   setInterval(syncCards, 650);
   window.addEventListener('svr:poker-state', syncCards);
   window.SVR_PHASE354_QA = qa;
