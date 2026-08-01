@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 export const BUILD = 'PHASE-340-PLATFORM-CORE-EXTRACTION-AUTHORITY-LOCK';
 const TABLE_PRIORITY = [
+  'PHASE356_QUEST_TABLE_FALLBACK',
   'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED',
   'PHASE159_FBX_TABLE_FLAT_SCALE_FIX_ROOT',
   'PHASE200_INTENDED_LOBBY_POKER_TABLE_LOCKED',
@@ -18,14 +19,49 @@ const state = {
   eventCounts: new Map(),
   animationLoopAssignments: 0,
   animationLoopClears: 0,
-  governedAt: null
+  governedAt: null,
+  traversalLimitHits: 0,
+  lastError: null
 };
 
 function platform() {
   return window.SVR_PLATFORM || document.body?.dataset?.platform || 'desktop';
 }
 function scene() { return window.__SVR_SCENE__ || null; }
-function root() { const s = scene(); return s?.getObjectByName?.('PHASE200_ORDERED_GRAND_LOBBY_ROOT') || s; }
+
+function safeWalk(start, visitor, limit = 16000) {
+  if (!start) return 0;
+  const stack = [start];
+  const seen = new Set();
+  let count = 0;
+  while (stack.length && count < limit) {
+    const object = stack.pop();
+    if (!object || seen.has(object)) continue;
+    seen.add(object);
+    count += 1;
+    try { visitor(object); } catch {}
+    const children = Array.isArray(object.children) ? object.children : [];
+    for (let index = children.length - 1; index >= 0; index -= 1) {
+      const child = children[index];
+      if (child && child !== object && !seen.has(child)) stack.push(child);
+    }
+  }
+  if (stack.length) state.traversalLimitHits += 1;
+  return count;
+}
+
+function safeFind(start, name) {
+  let found = null;
+  safeWalk(start, (object) => {
+    if (!found && object?.name === name) found = object;
+  });
+  return found;
+}
+
+function root() {
+  const current = scene();
+  return safeFind(current, 'PHASE200_ORDERED_GRAND_LOBBY_ROOT') || current;
+}
 
 function instrumentEvents() {
   if (EventTarget.prototype.__svrPhase340Instrumented) return;
@@ -65,10 +101,13 @@ function instrumentAnimationLoops() {
 }
 
 function topLevel(items) {
+  const set = new Set(items);
   return items.filter((candidate) => {
-    let parent = candidate.parent;
-    while (parent) {
-      if (items.includes(parent)) return false;
+    const seen = new Set();
+    let parent = candidate?.parent;
+    while (parent && !seen.has(parent)) {
+      if (set.has(parent)) return false;
+      seen.add(parent);
       parent = parent.parent;
     }
     return true;
@@ -76,16 +115,17 @@ function topLevel(items) {
 }
 
 function tableCandidates() {
-  const r = root();
-  if (!r) return [];
+  const currentRoot = root();
+  if (!currentRoot) return [];
   const values = [];
-  for (const name of TABLE_PRIORITY) {
-    const object = r.getObjectByName?.(name);
+  const add = (object) => {
     if (object && !values.includes(object)) values.push(object);
-  }
-  r.traverse?.((object) => {
+  };
+  add(window.SVR_TABLE_AUTHORITY);
+  for (const name of TABLE_PRIORITY) add(safeFind(currentRoot, name));
+  safeWalk(currentRoot, (object) => {
     if (!object?.name || values.includes(object)) return;
-    if (/TABLE.*(?:FBX|LOCKED|FALLBACK|ROOT)/i.test(object.name) && !/CARD|CHIP|LABEL|POT|BUTTON/i.test(object.name)) values.push(object);
+    if (/TABLE.*(?:FBX|LOCKED|FALLBACK|ROOT)/i.test(object.name) && !/CARD|CHIP|LABEL|POT|BUTTON/i.test(object.name)) add(object);
   });
   return topLevel(values);
 }
@@ -99,6 +139,8 @@ function enforceTableAuthority() {
   });
   const authority = values[0];
   authority.visible = true;
+  window.SVR_TABLE_AUTHORITY = authority;
+  if (platform() === 'quest') return { authority: authority.name || authority.uuid, count: 1, hidden: [] };
   const hidden = [];
   for (const object of values.slice(1)) {
     object.visible = false;
@@ -106,51 +148,64 @@ function enforceTableAuthority() {
     hidden.push(object.name || object.uuid);
     state.hiddenTables.add(object.name || object.uuid);
   }
-  window.SVR_TABLE_AUTHORITY = authority;
   return { authority: authority.name || authority.uuid, count: values.length, hidden };
 }
 
 function tableBounds() {
   const object = window.SVR_TABLE_AUTHORITY || tableCandidates()[0];
   if (!object) return null;
-  object.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(object);
-  if (box.isEmpty()) return null;
-  const center = new THREE.Vector3(), size = new THREE.Vector3();
-  box.getCenter(center); box.getSize(size);
-  return { object, box, center, size, top: box.max.y };
+  try {
+    const box = new THREE.Box3().setFromObject(object, true);
+    if (box.isEmpty()) return null;
+    const center = new THREE.Vector3(), size = new THREE.Vector3();
+    box.getCenter(center); box.getSize(size);
+    return { object, box, center, size, top: box.max.y };
+  } catch {
+    const center = new THREE.Vector3().setFromMatrixPosition(object.matrixWorld || new THREE.Matrix4());
+    return { object, box: null, center, size: new THREE.Vector3(4.6, 1, 2.9), top: center.y + 1 };
+  }
+}
+
+function safeWorldPosition(object) {
+  try { return new THREE.Vector3().setFromMatrixPosition(object.matrixWorld); }
+  catch { return new THREE.Vector3(object.position?.x || 0, object.position?.y || 0, object.position?.z || 0); }
 }
 
 function enforceLogoAuthority() {
-  const r = root(), table = tableBounds();
-  if (!r || !table) return { count: 0, authority: null, hidden: [] };
+  const currentRoot = root();
+  if (!currentRoot) return { count: 0, authority: null, hidden: [] };
   const values = [];
-  r.traverse((object) => {
-    if (!object?.name || !/LOGO/i.test(object.name) || !object.visible) return;
-    const p = new THREE.Vector3();
-    object.getWorldPosition(p);
-    if (Math.hypot(p.x - table.center.x, p.z - table.center.z) <= Math.max(2.5, table.size.x * 0.8)) values.push({ object, p });
+  safeWalk(currentRoot, (object) => {
+    if (object?.name && /LOGO/i.test(object.name) && object.visible) values.push({ object, p: safeWorldPosition(object) });
   });
-  if (values.length <= 1) return { count: values.length, authority: values[0]?.object?.name || null, hidden: [] };
-  const preferred = values.sort((a, b) => {
-    const score = (x) => (/PHASE339|PHASE331|CENTER/i.test(x.object.name) ? 100 : 0) - x.p.distanceTo(table.center);
+  if (platform() === 'quest') {
+    const preferred = values.find(({ object }) => /PHASE341_CANONICAL_CENTER_LOGO|PHASE334_CENTER_LOGO|PHASE331_SVR_TABLE_CENTER_LOGO/i.test(object.name)) || values[0];
+    return { count: preferred ? 1 : 0, authority: preferred?.object?.name || null, hidden: [] };
+  }
+  const table = tableBounds();
+  if (!table) return { count: 0, authority: null, hidden: [] };
+  const near = values.filter(({ p }) => Math.hypot(p.x - table.center.x, p.z - table.center.z) <= Math.max(2.5, table.size.x * 0.8));
+  if (near.length <= 1) return { count: near.length, authority: near[0]?.object?.name || null, hidden: [] };
+  near.sort((a, b) => {
+    const score = (entry) => (/PHASE341|PHASE339|PHASE331|CENTER/i.test(entry.object.name) ? 100 : 0) - entry.p.distanceTo(table.center);
     return score(b) - score(a);
   });
-  const authority = preferred[0].object;
+  const authority = near[0].object;
   const hidden = [];
-  for (const { object } of preferred.slice(1)) {
+  for (const { object } of near.slice(1)) {
     object.visible = false;
     hidden.push(object.name || object.uuid);
     state.hiddenLogos.add(object.name || object.uuid);
   }
-  return { count: values.length, authority: authority.name || authority.uuid, hidden };
+  return { count: near.length, authority: authority.name || authority.uuid, hidden };
 }
 
 function hideLegacyObjects() {
-  const r = root();
-  if (!r) return 0;
+  if (platform() === 'quest') return 0;
+  const currentRoot = root();
+  if (!currentRoot) return 0;
   let hidden = 0;
-  r.traverse((object) => {
+  safeWalk(currentRoot, (object) => {
     if (!object?.name || !LEGACY_OBJECT.test(object.name)) return;
     if (object.visible) hidden += 1;
     object.visible = false;
@@ -160,9 +215,9 @@ function hideLegacyObjects() {
 }
 
 function enforceControls() {
-  const p = platform();
+  const currentPlatform = platform();
   const roots = [...document.querySelectorAll(CONTROL_SELECTORS)];
-  if (p !== 'android') {
+  if (currentPlatform !== 'android') {
     roots.forEach((element) => element.remove());
     return { roots: 0, move: 0, look: 0, pass: true };
   }
@@ -179,12 +234,12 @@ function enforceControls() {
 
 function hideCamera3Noise() {
   if (platform() !== 'camera3') return 0;
-  const r = root();
-  if (!r) return 0;
+  const currentRoot = root();
+  if (!currentRoot) return 0;
   const block = /(HUD|STATUS|BADGE|HITBOX|RAYCAST|FEEDBACK|TIMER|PANEL|MARKER|PORTAL|STOREFRONT|BUILDING|SKY|MOON|MARS|CONTROL|DEBUG)/i;
   const keep = /(TABLE|CARD|CHIP|POT|FELT|LOGO|PLAYER|BOT|ERIC|CLAUDIA|DEALER)/i;
   let hidden = 0;
-  r.traverse((object) => {
+  safeWalk(currentRoot, (object) => {
     if (!object?.name || !block.test(object.name) || keep.test(object.name)) return;
     if (object.visible) hidden += 1;
     object.visible = false;
@@ -200,7 +255,7 @@ export function applyRendererBudget(value = platform()) {
   if (!renderer) return false;
   const ratio = value === 'camera3' ? 1 : value === 'android' ? 1.15 : value === 'quest' ? 1.25 : 1.5;
   try { renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, ratio)); } catch {}
-  if (renderer.shadowMap && ['android','camera3'].includes(value)) renderer.shadowMap.enabled = false;
+  if (renderer.shadowMap && ['android','camera3','quest'].includes(value)) renderer.shadowMap.enabled = false;
   renderer.info.autoReset = true;
   return true;
 }
@@ -219,20 +274,26 @@ export function claimAuthority(key, owner, object = null, priority = 0) {
 }
 
 export function govern() {
-  const tables = enforceTableAuthority();
-  const logos = enforceLogoAuthority();
-  const controls = enforceControls();
-  const legacyHidden = hideLegacyObjects();
-  const camera3Hidden = hideCamera3Noise();
-  applyRendererBudget();
-  state.governedAt = new Date().toISOString();
-  return { tables, logos, controls, legacyHidden, camera3Hidden };
+  try {
+    const tables = enforceTableAuthority();
+    const logos = enforceLogoAuthority();
+    const controls = enforceControls();
+    const legacyHidden = hideLegacyObjects();
+    const camera3Hidden = hideCamera3Noise();
+    applyRendererBudget();
+    state.governedAt = new Date().toISOString();
+    state.lastError = null;
+    return { tables, logos, controls, legacyHidden, camera3Hidden };
+  } catch (error) {
+    state.lastError = String(error?.message || error);
+    return { tables: { authority: null, count: 0, hidden: [] }, logos: { authority: null, count: 0, hidden: [] }, controls: enforceControls(), legacyHidden: 0, camera3Hidden: 0, error: state.lastError };
+  }
 }
 
 export function audit() {
-  const s = scene(), renderer = window.__SVR_RENDERER__;
+  const currentScene = scene(), renderer = window.__SVR_RENDERER__;
   let objects = 0, visibleObjects = 0;
-  s?.traverse?.((object) => { objects += 1; if (object.visible) visibleObjects += 1; });
+  safeWalk(currentScene, (object) => { objects += 1; if (object.visible) visibleObjects += 1; });
   const governance = govern();
   const info = renderer?.info;
   const result = {
@@ -246,6 +307,8 @@ export function audit() {
     hiddenLegacyCount: state.hiddenLegacy.size,
     hiddenDuplicateTableCount: state.hiddenTables.size,
     hiddenDuplicateLogoCount: state.hiddenLogos.size,
+    traversalLimitHits: state.traversalLimitHits,
+    lastError: state.lastError,
     events: Object.fromEntries([...state.eventCounts.entries()].sort()),
     animationLoops: { assignments: state.animationLoopAssignments, clears: state.animationLoopClears },
     renderer: info ? {
@@ -259,7 +322,7 @@ export function audit() {
     } : null,
     checkedAt: new Date().toISOString()
   };
-  result.pass = governance.controls.pass && governance.tables.count <= 1 && governance.logos.count <= 1;
+  result.pass = governance.controls.pass && governance.tables.count <= 1 && governance.logos.count <= 1 && !state.lastError;
   window.SVR_PHASE340_AUTHORITY_STATE = result;
   return result;
 }
@@ -270,5 +333,5 @@ window.SVR_AUTHORITY_CLAIM = claimAuthority;
 window.SVR_PHASE340_GOVERN = govern;
 window.SVR_PHASE340_AUTHORITY_AUDIT = audit;
 window.SVR_PHASE340_APPLY_RENDERER_BUDGET = applyRendererBudget;
-[250, 700, 1400, 2600, 4800].forEach((ms) => setTimeout(govern, ms));
-setInterval(govern, 1800);
+[250, 700, 1400, 2600, 4800].forEach((ms) => setTimeout(() => govern(), ms));
+setInterval(() => govern(), 1800);
