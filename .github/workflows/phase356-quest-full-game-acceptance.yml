@@ -6,6 +6,8 @@ on:
       - 'game/index.html'
       - 'game/modules/phase340_platform_manifest.js'
       - 'game/modules/phase340_platform_core_loader.js'
+      - 'game/modules/phase356_quest_runtime_boot_lock.js'
+      - 'game/modules/phase356_quest_poker_boot_order_lock.js'
       - 'game/modules/phase356_quest_full_game_acceptance_smoothness_lock.js'
       - 'game/tools/phase356-quest-static-test.mjs'
       - 'game/tools/phase356-quest-browser-acceptance.cjs'
@@ -24,6 +26,8 @@ jobs:
           node-version: '20'
       - name: Static Quest contract and syntax
         run: |
+          node --check game/modules/phase356_quest_runtime_boot_lock.js
+          node --check game/modules/phase356_quest_poker_boot_order_lock.js
           node --check game/modules/phase356_quest_full_game_acceptance_smoothness_lock.js
           node --check game/tools/phase356-quest-browser-acceptance.cjs
           node game/tools/phase356-quest-static-test.mjs
