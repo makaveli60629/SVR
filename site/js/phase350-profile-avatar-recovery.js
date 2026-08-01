@@ -57,6 +57,20 @@ function palette(outfit = {}) {
   };
   return colors[outfit.palette] || colors.midnight;
 }
+function roundedRect(context, x, y, width, height, radius) {
+  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.lineTo(x + width - r, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + r);
+  context.lineTo(x + width, y + height - r);
+  context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  context.lineTo(x + r, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - r);
+  context.lineTo(x, y + r);
+  context.quadraticCurveTo(x, y, x + r, y);
+  context.closePath();
+}
 function drawFallback(outfit = {}, label = 'PLAYER') {
   if (!canvas) return;
   const width = Math.max(180, Math.round(canvas.clientWidth || 180));
@@ -78,8 +92,8 @@ function drawFallback(outfit = {}, label = 'PLAYER') {
   context.globalAlpha = 1;
   context.shadowColor = accent; context.shadowBlur = 22;
   context.fillStyle = '#c8b09c'; context.beginPath(); context.arc(width / 2, height * .29, Math.min(width, height) * .10, 0, Math.PI * 2); context.fill();
-  context.fillStyle = accent; context.beginPath(); context.roundRect(width * .31, height * .40, width * .38, height * .34, 24); context.fill();
-  context.fillStyle = '#111827'; context.beginPath(); context.roundRect(width * .34, height * .44, width * .32, height * .28, 19); context.fill();
+  context.fillStyle = accent; roundedRect(context, width * .31, height * .40, width * .38, height * .34, 24); context.fill();
+  context.fillStyle = '#111827'; roundedRect(context, width * .34, height * .44, width * .32, height * .28, 19); context.fill();
   context.strokeStyle = accent; context.lineWidth = 8; context.lineCap = 'round';
   context.beginPath(); context.moveTo(width * .35, height * .48); context.lineTo(width * .22, height * .68); context.moveTo(width * .65, height * .48); context.lineTo(width * .78, height * .68); context.moveTo(width * .43, height * .72); context.lineTo(width * .38, height * .92); context.moveTo(width * .57, height * .72); context.lineTo(width * .62, height * .92); context.stroke();
   context.shadowBlur = 0; context.fillStyle = '#fff'; context.textAlign = 'center'; context.font = '900 13px system-ui'; context.fillText(String(label || 'PLAYER').toUpperCase().slice(0, 22), width / 2, height - 14);
