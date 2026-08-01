@@ -143,7 +143,7 @@ function stabilize(object) {
     node.receiveShadow = false;
     node.frustumCulled = true;
     const materials = Array.isArray(node.material) ? node.material : [node.material];
-    const fixed = materials.map((material) => {
+    const fixed = Array.from(materials, (material) => {
       if (!material?.isMaterial) {
         return new THREE.MeshStandardMaterial({ color: 0x241b1d, roughness: 0.76, metalness: 0.04 });
       }
@@ -190,7 +190,7 @@ async function install() {
     stabilize(object);
     const normalized = normalize(object);
     const authorityRoot = new THREE.Group();
-    authorityRoot.name = 'PHASE356_QUEST_UPLOADED_TABLE_AUTHORITY_ROOT';
+    authorityRoot.name = 'PHASE356_QUEST_UPLOADED_ASSET_CONTAINER';
     authorityRoot.position.set(0, 0, TABLE_CENTER_Z);
     authorityRoot.add(object);
     removeCompetingTables(host);
