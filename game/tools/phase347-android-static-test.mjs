@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const read = (path) => fs.readFileSync(path, 'utf8');
 const runtime = read('game/modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js');
+const engine = read('game/modules/phase336_authoritative_engine.js');
 const handDriver = read('game/modules/phase355_android_full_hand_driver_compatibility_lock.js');
 const platform = read('game/modules/phase340_platform_manifest.js');
 const checker = read('app-update-checker.js');
@@ -26,9 +27,16 @@ requireText(runtime, "Array.from({ length: 5 }", 'five-community-slots');
 requireText(runtime, 'data-hole="0"', 'hole-slot-zero');
 requireText(runtime, 'data-hole="1"', 'hole-slot-one');
 requireText(runtime, "window.SVR_PHASE347_RUN_FULL_HAND_QA", 'full-hand-qa');
+requireText(engine, "window.SVR_POKER_QA_PASSIVE_BOTS === true", 'acceptance-passive-bot-engine-gate');
+requireText(engine, "return needed ? 'call' : 'check'", 'acceptance-passive-bot-policy');
+requireText(engine, "const delay = qa ? 35", 'acceptance-fast-bot-delay');
 requireText(handDriver, "window.SVR_PHASE344_RUN_FULL_HAND_QA = driveHand", 'phase344-driver-compatibility');
+requireText(handDriver, "window.SVR_POKER_QA_PASSIVE_BOTS = true", 'driver-enables-passive-bots');
+requireText(handDriver, "delete window.SVR_POKER_QA_PASSIVE_BOTS", 'driver-removes-passive-bot-flag');
+requireText(handDriver, "window.SVR_POKER_QA_PASSIVE_BOTS = previousPassiveMode", 'driver-restores-passive-bot-flag');
 requireText(handDriver, "totalStacks === 6000", 'hand-driver-chip-conservation');
 requireText(handDriver, "['preflop', 'flop', 'turn', 'river', 'showdown']", 'hand-driver-all-streets');
+requireText(handDriver, "activeRecord = makeRecord(result.attempts + 1)", 'retry-record-recreation');
 requireText(platform, "phase347_android_single_controller_seated_gameplay_apk_release_lock.js", 'platform-module');
 requireText(platform, "phase355_android_full_hand_driver_compatibility_lock.js", 'platform-hand-driver');
 requireText(platform, "if (value === 'android') return unique([...REGISTRY, ...ANDROID_FOUNDATION, ...ANDROID_POKER, ...ANDROID_FINAL]);", 'android-critical-runtime-assembly');
@@ -68,6 +76,7 @@ console.log(JSON.stringify({
   platformVersion,
   controller: 'single-visible-authority',
   horizontalInput: 'direct',
+  qaBots: 'deterministic-check-call-mode-enabled-only-during-acceptance-and-restored-afterward',
   runtimeOrderValidation: 'critical-gameplay-and-full-hand-driver-first-with-deferred-profile-presence-tail',
   cards: { hole: 2, community: 5, floating: 7 },
   apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, next: release.nextApkVersionName, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
