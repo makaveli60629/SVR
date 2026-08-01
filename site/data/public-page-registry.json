@@ -9,8 +9,8 @@
     { "path": "site/about.html", "role": "about", "required": true },
     { "path": "site/faq.html", "role": "faq", "required": true },
     { "path": "site/login.html", "role": "login", "required": true },
-    { "path": "site/profile.html", "role": "profile", "required": true },
-    { "path": "site/avatar.html", "role": "avatar-creator", "required": true },
+    { "path": "site/profile.html", "role": "profile-live-cam", "required": true },
+    { "path": "site/avatar.html", "role": "website-avatar-creator", "required": true },
     { "path": "site/store.html", "role": "store", "required": true },
     { "path": "site/cart.html", "role": "cart", "required": true },
     { "path": "site/donate.html", "role": "donation", "required": true },
@@ -23,7 +23,8 @@
     { "path": "game/index.html", "role": "quest-desktop-game", "required": true },
     { "path": "game/android.html", "role": "android-game", "required": true },
     { "path": "game/camera3.html", "role": "camera3", "required": true },
-    { "path": "game/avatar.html", "role": "avatar-redirect", "required": true }
+    { "path": "game/avatar.html", "role": "avatar-room-entry", "required": true },
+    { "path": "game/avatar-vr.html", "role": "webxr-avatar-dressing-room", "required": true }
   ],
   "optionalPages": [
     { "path": "site/sponsorship.html", "role": "sponsorship" },
