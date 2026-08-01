@@ -1,4 +1,4 @@
-const SVR_CACHE = 'svr-pwa-phase342-performance-manual-update';
+const SVR_CACHE = 'svr-pwa-phase356-android-site-ai-professionalism';
 const SVR_SHELL = [
   '/',
   '/index.html',
@@ -14,6 +14,7 @@ const SVR_SHELL = [
   '/downloads/',
   '/downloads/index.html',
   '/site/index.html',
+  '/site/profile.html',
   '/site/store.html',
   '/site/contact.html'
 ];
@@ -52,14 +53,20 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (url.pathname.startsWith('/game/') || url.pathname === '/matrix.js' || url.pathname === '/app-update-checker.js' || url.pathname.startsWith('/update/')) {
+  const alwaysFresh = url.pathname.startsWith('/game/')
+    || url.pathname === '/matrix.js'
+    || url.pathname === '/support-chat-bot.js'
+    || url.pathname === '/site/js/phase356-profile-legend-pedestal.js'
+    || url.pathname === '/app-update-checker.js'
+    || url.pathname.startsWith('/update/');
+  if (alwaysFresh) {
     event.respondWith(networkFirst(request));
     return;
   }
 
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
+      fetch(new Request(request, { cache: 'no-store' }))
         .then((response) => {
           const copy = response.clone();
           caches.open(SVR_CACHE).then((cache) => cache.put(request, copy)).catch(() => undefined);
