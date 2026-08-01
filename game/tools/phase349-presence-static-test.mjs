@@ -28,11 +28,12 @@ for (const token of [
   'phase349_multiplayer_presence_seat_reconnect_lock.js',
   'phase349_presence_gameplay_seat_bridge.js',
   'const SHARED_SOCIAL = [...ACCOUNT_ACTIVITY, ...INGAME_AVATAR, ...MULTIPLAYER_PRESENCE]',
-  'const QUEST_DEFERRED = [...SHARED_SOCIAL]',
+  'const QUEST_DEFERRED = [...LOBBY, ...SHARED_SOCIAL]',
   'const ANDROID_DEFERRED =',
   '...SHARED_SOCIAL',
   'const presenceIndex = normalizedDeferred.findIndex',
-  'presenceIndex <= avatarIndex',
+  'const seatBridgeIndex = normalizedDeferred.findIndex',
+  'presenceIndex <= avatarIndex || seatBridgeIndex <= presenceIndex',
   'phase356-quest-deferred-load-order'
 ]) requireText(platform, token, `platform-${token}`);
 
@@ -88,7 +89,7 @@ console.log(JSON.stringify({
   transport: 'local-simulation-until-presenceApiBase-configured',
   authority: { presence: true, seats: true, pokerState: false },
   androidLoadPolicy: 'deferred-until-table-playable',
-  questLoadPolicy: 'deferred-until-table-playable',
+  questLoadPolicy: 'deferred-after-poker-ready-lobby-scheduling',
   camera3Excluded: true,
   apk: { version: release.apkVersionName, code: release.apkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
