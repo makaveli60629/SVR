@@ -1,0 +1,48 @@
+{
+  "build": "PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK",
+  "description": "Canonical public pages that must exist and maintain valid local navigation. Historical and experimental HTML pages are audited separately but do not define the production navigation graph.",
+  "canonicalPages": [
+    { "path": "index.html", "role": "root-home", "required": true },
+    { "path": "404.html", "role": "root-not-found", "required": true },
+    { "path": "offline.html", "role": "offline", "required": true },
+    { "path": "site/index.html", "role": "site-home", "required": true },
+    { "path": "site/about.html", "role": "about", "required": true },
+    { "path": "site/faq.html", "role": "faq", "required": true },
+    { "path": "site/login.html", "role": "login", "required": true },
+    { "path": "site/profile.html", "role": "profile", "required": true },
+    { "path": "site/avatar.html", "role": "avatar-creator", "required": true },
+    { "path": "site/store.html", "role": "store", "required": true },
+    { "path": "site/cart.html", "role": "cart", "required": true },
+    { "path": "site/donate.html", "role": "donation", "required": true },
+    { "path": "site/impact.html", "role": "impact", "required": true },
+    { "path": "site/updates.html", "role": "updates", "required": true },
+    { "path": "site/terms.html", "role": "terms", "required": true },
+    { "path": "site/android/index.html", "role": "android", "required": true },
+    { "path": "site/downloads/index.html", "role": "downloads", "required": true },
+    { "path": "site/roadmap.html", "role": "roadmap", "required": true },
+    { "path": "game/index.html", "role": "quest-desktop-game", "required": true },
+    { "path": "game/android.html", "role": "android-game", "required": true },
+    { "path": "game/camera3.html", "role": "camera3", "required": true },
+    { "path": "game/avatar.html", "role": "avatar-redirect", "required": true }
+  ],
+  "optionalPages": [
+    { "path": "site/sponsorship.html", "role": "sponsorship" },
+    { "path": "site/membership.html", "role": "membership" },
+    { "path": "site/contact.html", "role": "contact" },
+    { "path": "site/schedule.html", "role": "schedule" },
+    { "path": "site/news.html", "role": "news" },
+    { "path": "site/app.html", "role": "application-information" },
+    { "path": "site/vibez.html", "role": "vibez" },
+    { "path": "site/vr-ui.html", "role": "vr-information" }
+  ],
+  "excludedPrefixes": [
+    "site/site/",
+    "site/archive/",
+    "site/archives/",
+    "site/backup/",
+    "site/backups/",
+    "site/legacy/",
+    "site/old/",
+    "node_modules/"
+  ]
+}

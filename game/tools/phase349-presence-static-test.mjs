@@ -24,19 +24,21 @@ requireText(runtime, "const REMOTE_LIMIT", 'remote-budget');
 requireText(seatBridge, "SVR_PHASE349_CLAIM_SEAT(0)", 'canonical-seat-zero-claim');
 requireText(seatBridge, "SVR_PHASE349_RELEASE_SEAT", 'gameplay-seat-release');
 
-requireText(platform, "export const VERSION = 'phase349'", 'platform-version');
 requireText(platform, "phase349_multiplayer_presence_seat_reconnect_lock.js", 'presence-module');
 requireText(platform, "phase349_presence_gameplay_seat_bridge.js", 'seat-bridge-module');
-requireText(platform, "phase349-android-load-order", 'android-load-order-check');
-const androidAssembly = "...ANDROID_FINAL, ...sharedTail";
-requireText(platform, androidAssembly, 'android-tail-assembly');
+requireText(platform, "const presenceIndex = normalized.findIndex", 'presence-load-order-index');
+requireText(platform, "const seatBridgeIndex = normalized.findIndex", 'seat-bridge-load-order-index');
+requireText(platform, "presenceIndex <= avatarIndex || seatBridgeIndex <= presenceIndex", 'presence-load-order-validator');
+requireText(platform, "const sharedTail = [...ACCOUNT_ACTIVITY, ...INGAME_AVATAR, ...MULTIPLAYER_PRESENCE]", 'shared-presence-tail');
+const platformVersion = Number(platform.match(/export const VERSION = 'phase(\d+)'/)?.[1] || 0);
+if (platformVersion < 349) errors.push('platform-version-regressed');
 const profileIndex = platform.indexOf("'modules/phase346_player_avatar_profile_bridge.js'");
 const avatarIndex = platform.indexOf("'modules/phase348_ingame_player_avatar_presence_performance_lock.js'");
 const presenceIndex = platform.indexOf("'modules/phase349_multiplayer_presence_seat_reconnect_lock.js'");
 const bridgeIndex = platform.indexOf("'modules/phase349_presence_gameplay_seat_bridge.js'");
 if (!(profileIndex >= 0 && avatarIndex > profileIndex && presenceIndex > avatarIndex && bridgeIndex > presenceIndex)) errors.push('presence-declaration-order');
-const cameraSection = platform.slice(platform.indexOf("if (platform === 'camera3')"));
-if (!cameraSection.includes('phase349_multiplayer_presence_seat_reconnect_lock.js') || !cameraSection.includes('phase349_presence_gameplay_seat_bridge.js')) errors.push('camera3-exclusion');
+const cameraValidation = platform.slice(platform.indexOf("if (platform === 'camera3')"));
+if (!cameraValidation.includes('phase349_multiplayer_presence_seat_reconnect_lock.js') || !cameraValidation.includes('phase349_presence_gameplay_seat_bridge.js')) errors.push('camera3-exclusion-validator');
 
 requireText(server, "app.post('/api/presence/join'", 'server-join');
 requireText(server, "app.post('/api/presence/heartbeat'", 'server-heartbeat');
@@ -54,8 +56,9 @@ requireText(schema, 'CHECK(SeatId BETWEEN 0 AND 5)', 'six-seat-limit');
 
 if (config.presenceApiBase !== '') errors.push('presence-api-prematurely-configured');
 if (config.allowLocalPresenceSimulation !== true) errors.push('simulation-disabled');
-if (manifest.phase !== 349 || manifest.build !== 'PHASE-349-MULTIPLAYER-PRESENCE-SEAT-RECONNECT-LOCK') errors.push('manifest-build');
-if (release.currentGameBuild !== 'PHASE-349-MULTIPLAYER-PRESENCE-SEAT-RECONNECT-LOCK') errors.push('release-build');
+if (Number(manifest.phase || 0) < 349) errors.push('manifest-phase-regressed');
+if (!String(manifest.build || '').startsWith('PHASE-')) errors.push('manifest-build-missing');
+if (release.currentGameBuild !== manifest.build) errors.push('release-manifest-build-mismatch');
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('apk-policy');
 
@@ -65,7 +68,9 @@ if (errors.length) {
 }
 console.log(JSON.stringify({
   pass: true,
-  build: manifest.build,
+  protectedBuild: 'PHASE-349-MULTIPLAYER-PRESENCE-SEAT-RECONNECT-LOCK',
+  currentBuild: manifest.build,
+  platformVersion,
   transport: 'local-simulation-until-presenceApiBase-configured',
   authority: { presence: true, seats: true, pokerState: false },
   camera3Excluded: true,

@@ -1,0 +1,48 @@
+name: Phase 350 Site Integrity Check
+
+on:
+  pull_request:
+    paths:
+      - 'site/**'
+      - 'game/modules/phase350_**'
+      - 'game/modules/phase340_platform_manifest.js'
+      - 'game/tools/phase350-integrity-static-test.mjs'
+      - 'game/index.html'
+      - 'game/android.html'
+      - 'game/camera3.html'
+      - 'game/manifest.json'
+      - 'game/android-release.json'
+      - '.github/workflows/phase350-site-integrity-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate JavaScript syntax
+        run: |
+          node --check site/js/phase350-profile-avatar-recovery.js
+          node --check game/modules/phase350_camera3_visibility_lighting_lock.js
+          node --check game/modules/phase350_android_controller_dom_deduplication_lock.js
+          node --check game/modules/phase340_platform_manifest.js
+          node --check game/tools/phase350-integrity-static-test.mjs
+          node --check site/tools/phase350-site-integrity-audit.mjs
+      - name: Validate Phase 350 contract
+        run: node game/tools/phase350-integrity-static-test.mjs
+      - name: Audit canonical pages and all public HTML
+        run: node site/tools/phase350-site-integrity-audit.mjs
+      - name: Upload site integrity report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase350-site-integrity-report
+          path: artifacts/phase350-site-integrity-report.json
+          if-no-files-found: error
+          retention-days: 30

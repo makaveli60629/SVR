@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="store-phase03.css" />
 </head>
-<body>
+<body data-build="PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK">
   <canvas id="binary-rain" aria-hidden="true"></canvas>
   <div class="site-shell">
     <nav class="site-nav">
@@ -30,19 +30,20 @@
     <a href="store.html">Store</a>
     <a href="donate.html">Donate</a>
     <a href="contact.html">Contact</a>
+    <a href="roadmap.html">Roadmap</a>
     <a href="../index.html">Launch</a>
   </div>
 </nav>
     <main class="site-card">
 
       <section class="store-banner" style="margin-top:0;"><span class="store-kicker">Sandbox Cart</span><h1 class="store-title">Cart Preview</h1><p class="store-lead">Review sample items added from any SVR store category. This cart is local-preview only and does not charge anyone.</p><div class="category-strip"><a href="store.html">All Stores</a><a class="active" href="cart.html">Cart</a><a href="stripe-sandbox.html">Stripe Sandbox</a></div></section>
-      <section class="store-section"><div class="cart-layout"><div class="stripe-panel"><span class="store-kicker">Order Preview</span><h2 class="section-title">Local cart items</h2><div data-cart-list></div><div class="cart-total"><span>Total</span><strong data-cart-total>$0.00</strong></div><div class="checkout-row"><a class="btn btn-primary" href="#" data-sandbox-checkout>Build Sandbox Payload</a><a class="btn btn-secondary" href="#" data-clear-cart>Clear Cart</a></div><p class="input-note" data-cart-status>No live sale. This only saves a preview payload locally.</p></div><aside class="cart-panel"><span class="store-kicker"><span class="store-dot"></span> Next wiring</span><h3 class="hub-title">Backend checkout route</h3><p class="hub-copy">When approved, the site should call a secure backend endpoint that creates Stripe Checkout Sessions. Secret keys must never be placed in public files.</p><p class="input-note"><code>/api/stripe/create-checkout-session</code></p><a class="btn btn-primary" href="stripe-sandbox.html">Open Stripe Sandbox</a></aside></div></section>
+      <section class="store-section"><div class="cart-layout"><div class="stripe-panel"><span class="store-kicker">Order Preview</span><h2 class="section-title">Local cart items</h2><div data-cart-list></div><div class="cart-total"><span>Total</span><strong data-cart-total>$0.00</strong></div><div class="checkout-row"><button class="btn btn-primary" type="button" data-sandbox-checkout>Build Sandbox Payload</button><button class="btn btn-secondary" type="button" data-clear-cart>Clear Cart</button></div><p class="input-note" data-cart-status>No live sale. This only saves a preview payload locally.</p></div><aside class="cart-panel"><span class="store-kicker"><span class="store-dot"></span> Next wiring</span><h3 class="hub-title">Backend checkout route</h3><p class="hub-copy">When approved, the site should call a secure backend endpoint that creates Stripe Checkout Sessions. Secret keys must never be placed in public files.</p><p class="input-note"><code>/api/stripe/create-checkout-session</code></p><a class="btn btn-primary" href="stripe-sandbox.html">Open Stripe Sandbox</a></aside></div></section>
 
-      <footer class="footer"><p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn btn-secondary" href="index.html">Back to Site</a><a class="btn btn-primary" href="../game/index.html">Preview Game</a></div></footer>
+      <footer class="footer"><p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn btn-secondary" href="index.html">Back to Site</a><a class="btn btn-primary" href="../game/index.html?v=phase350">Preview Game</a></div></footer>
     </main>
   </div>
-  <script src="../matrix.js"></script>
-  <script src="../site-public-hooks.js"></script>
+  <script src="../matrix.js?v=phase350"></script>
+  <script src="../site-public-hooks.js?v=phase350"></script>
   <script src="store-cart.js"></script>
 </body>
 </html>
