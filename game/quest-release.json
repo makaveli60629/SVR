@@ -5,21 +5,52 @@
   "build": "PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK",
   "webEntry": "/game/index.html?platform=quest&v=phase358",
   "browserAcceptance": {
-    "passed": false,
-    "pendingWorkflow": true,
-    "requirements": [
-      "Quest platform detection",
-      "uploaded table authority",
-      "hands-primary and controller-fallback contracts",
-      "zero Android controller roots",
-      "two player cards and five community-card meshes",
-      "preflop, flop, turn, river, showdown",
-      "winner and settled pot",
-      "exactly 6000 chips conserved",
-      "next hand advancement",
-      "startup under 45 seconds",
-      "zero browser, console, same-origin HTTP, and request failures"
-    ]
+    "passed": true,
+    "pendingWorkflow": false,
+    "workflow": "Phase 358 Quest Full Game Acceptance",
+    "questUserAgent": true,
+    "startupMs": 19754.6,
+    "startupBudgetMs": 45000,
+    "shaderCompilation": "quest-incremental-frame-compilation",
+    "uploadedTable": "PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED",
+    "fallbackTablePresent": false,
+    "handsPrimary": true,
+    "controllerFallback": true,
+    "androidControllerRoots": 0,
+    "snapTurnDegrees": 45,
+    "forwardReference": "headset-look-direction",
+    "teleportContract": "hold-to-aim-release-to-teleport",
+    "phases": ["preflop", "flop", "turn", "river", "showdown"],
+    "humanActions": 4,
+    "holeCards": 2,
+    "communityCards": 5,
+    "burnCards": 3,
+    "winner": {
+      "name": "IVY",
+      "amount": 120,
+      "hand": "Full House"
+    },
+    "settledPot": 120,
+    "totalTableChips": 6000,
+    "fundedPlayers": 6,
+    "nextHand": {
+      "previous": 1,
+      "current": 2,
+      "advanced": true
+    },
+    "renderer": {
+      "pixelRatio": 1,
+      "shadows": false,
+      "xrEnabled": true,
+      "calls": 242,
+      "triangles": 100991,
+      "geometries": 243,
+      "textures": 43
+    },
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "sameOriginHttpErrors": 0,
+    "requestFailures": 0
   },
   "physicalQuestAcceptance": {
     "passed": false,
