@@ -45,7 +45,22 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
       handTimeoutMs: 75000,
       startupBudgetMs: 45000
     }));
-    platform = await page.evaluate(() => window.SVR_PHASE340_AUDIT?.() || window.SVR_PHASE340_PLATFORM_STATE || null);
+    platform = await page.evaluate(() => {
+      const state = window.SVR_PHASE340_PLATFORM_STATE || null;
+      if (!state) return null;
+      return {
+        build: state.build,
+        platform: state.platform,
+        loaded: [...(state.loaded || [])],
+        failed: [...(state.failed || [])],
+        deferredLoaded: [...(state.deferredLoaded || [])],
+        deferredFailed: [...(state.deferredFailed || [])],
+        totalMs: state.totalMs,
+        deferredTotalMs: state.deferredTotalMs,
+        readyAt: state.readyAt,
+        deferredReadyAt: state.deferredReadyAt
+      };
+    });
   } finally {
     const report = {
       url,
@@ -64,6 +79,7 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
       && result?.platform === 'quest'
       && result?.hand?.pass === true
       && result?.nextHand?.advanced === true
+      && result?.table?.potDisplay
       && result?.input?.handsPrimary === true
       && result?.input?.controllerFallback === true
       && result?.input?.androidRoots === 0
