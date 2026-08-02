@@ -4,6 +4,15 @@ export const BUILD = 'PHASE-362-SETTLEMENT-ACCOUNTING-CLEAR-LOCK';
 
 const params = new URLSearchParams(location.search);
 const PHASE362_QA = params.has('phase362qa');
+const runtimePlatform = (() => {
+  const explicit = String(window.SVR_PLATFORM || params.get('platform') || '').toLowerCase();
+  if (explicit === 'android' || explicit === 'quest' || explicit === 'desktop') return explicit;
+  if (/\/android\.html$/i.test(location.pathname)) return 'android';
+  if (/Quest|Oculus|Meta Quest/i.test(navigator.userAgent || '')) return 'quest';
+  if (/Android/i.test(navigator.userAgent || '')) return 'android';
+  return 'desktop';
+})();
+const ANDROID_QA_FORCE_LEFT = PHASE362_QA && runtimePlatform === 'android';
 let lastClearedHand = -1;
 let clearedHands = 0;
 let lastCommitted = 0;
@@ -61,7 +70,7 @@ function clearSettledCommitments(reason = 'state-event') {
 }
 
 function installQaSeatGate() {
-  if (!PHASE362_QA) return;
+  if (!ANDROID_QA_FORCE_LEFT) return;
   const originalJoin = window.SVR_PHASE362_JOIN_TABLE;
   if (typeof originalJoin === 'function') {
     window.SVR_PHASE362_JOIN_TABLE = (...args) => {
@@ -91,6 +100,7 @@ function qa() {
   const result = {
     build: BUILD,
     installedAt,
+    runtimePlatform,
     phase: String(state.phase || 'idle'),
     handNo: Number(state.handNo || 0),
     settledPot: Number(state.settledPot || 0),
@@ -102,6 +112,7 @@ function qa() {
     clearedHands,
     lastCommitted,
     phase362Qa: PHASE362_QA,
+    androidQaForceLeft: ANDROID_QA_FORCE_LEFT,
     qaLeftReady: Boolean(window.SVR_PHASE362_QA_LEFT_READY),
     qaJoinStarted,
     checkedAt: new Date().toISOString()
@@ -126,6 +137,8 @@ function install() {
   window.SVR_PHASE362_SETTLEMENT_QA = qa;
   window.SVR_PHASE362_SETTLEMENT_STATE = {
     build: BUILD,
+    runtimePlatform,
+    androidQaForceLeft: ANDROID_QA_FORCE_LEFT,
     get installedAt() { return installedAt; },
     get lastClearedHand() { return lastClearedHand; },
     get clearedHands() { return clearedHands; },
