@@ -18,6 +18,7 @@ const state = {
   materialsReplaced: 0,
   compileRetries: 0,
   sparseCompileDeferrals: 0,
+  safeAsyncCompiles: 0,
   renderRetries: 0,
   sparseRenderDeferrals: 0,
   installedAt: null,
@@ -102,21 +103,14 @@ function safeCompile(scene, camera, targetScene) {
 }
 
 async function safeCompileAsync(scene, camera, targetScene) {
-  sanitizeSceneMaterials(scene);
-  try {
-    return await originalCompileAsync.call(this, scene, camera, targetScene);
-  } catch (error) {
-    if (!sparseMaterialError(error)) throw error;
-    state.compileRetries += 1;
-    sanitizeSceneMaterials(scene);
-    try {
-      return await originalCompileAsync.call(this, scene, camera, targetScene);
-    } catch (retryError) {
-      if (!sparseMaterialError(retryError)) throw retryError;
-      state.sparseCompileDeferrals += 1;
-      return this;
-    }
-  }
+  // Three.js r160 compileAsync() polls currentProgram.isReady() from a later
+  // timer callback. A sparse FBX material can leave currentProgram undefined,
+  // and that delayed throw bypasses the caller's Promise error handling. Quest
+  // therefore uses the guarded synchronous compile and returns a resolved
+  // async result instead of starting the unsafe readiness poll.
+  state.safeAsyncCompiles += 1;
+  safeCompile.call(this, scene, camera, targetScene);
+  return this;
 }
 
 function safeRender(scene, camera) {
@@ -130,8 +124,6 @@ function safeRender(scene, camera) {
       return originalRender.call(this, scene, camera);
     } catch (retryError) {
       if (!sparseMaterialError(retryError)) throw retryError;
-      // Render errors from a late sparse FBX material must not terminate the
-      // WebXR animation loop. Skip only this frame after one sanitation retry.
       state.sparseRenderDeferrals += 1;
       return this;
     }
@@ -168,8 +160,10 @@ function restore() {
   const scene = window.__SVR_SCENE__;
   sanitizeSceneMaterials(scene);
   if (typeof originalCompile === 'function') prototype.compile = safeCompile;
-  if (typeof originalCompileAsync === 'function') prototype.compileAsync = safeCompileAsync;
-  else delete prototype.compileAsync;
+  // Deliberately do not restore Three.js's original asynchronous readiness
+  // poll on Quest. The safe wrapper preserves the Promise API without the
+  // delayed currentProgram.isReady() crash.
+  prototype.compileAsync = safeCompileAsync;
   if (typeof originalRender === 'function') prototype.render = safeRender;
   state.restored = true;
   state.restoredAt = new Date().toISOString();
@@ -182,9 +176,12 @@ function qa() {
     ...state,
     incrementalDuringCriticalBoot: state.installed,
     originalsRestoredAfterReady: state.restored,
+    originalCompileAsyncCaptured: typeof originalCompileAsync === 'function',
+    originalCompileAsyncRestored: false,
     sparseMaterialGuard: typeof window.SVR_PHASE358_SANITIZE_SCENE_MATERIALS === 'function',
     sparseCompileDeferralAvailable: true,
     sparseRenderDeferralAvailable: true,
+    safeAsyncCompileAvailable: true,
     pass: !ACTIVE || state.installed
   };
 }
