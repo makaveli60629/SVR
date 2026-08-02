@@ -1,0 +1,72 @@
+{
+  "name": "SVR Poker Android + Quest Gameplay Release",
+  "phase": 359,
+  "build": "PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK",
+  "status": "joint-browser-acceptance-pending",
+  "routes": {
+    "android": "/game/android.html?channel=stable&v=phase359",
+    "quest": "/game/index.html?platform=quest&v=phase359"
+  },
+  "authorities": {
+    "poker": "Phase 336",
+    "tableCards": "Phase 341",
+    "androidControls": "Phase 347",
+    "androidPresentation": "Phase 357",
+    "questHands": "Phase 331",
+    "questRelease": "Phase 358",
+    "sharedContinuity": "Phase 359"
+  },
+  "gameplayOnlyCriticalPath": {
+    "android": true,
+    "quest": true,
+    "socialModulesBlockingGameplay": false,
+    "camera3ModulesLoaded": false
+  },
+  "table": {
+    "sourceAsset": "game/assets/table.fbx",
+    "questAuthority": "PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED",
+    "questFallbackAccepted": false,
+    "androidCanonicalPresentation": "PHASE341_CANONICAL_TABLE_PRESENTATION_ROOT"
+  },
+  "requiredResultPresentation": {
+    "winnerName": true,
+    "payoutAmount": true,
+    "winningHand": true,
+    "winnerHoleCards": true,
+    "communityBoard": true,
+    "settledPot": true,
+    "continuousNextHand": true,
+    "resultDisplayMilliseconds": 9000
+  },
+  "input": {
+    "androidSingleController": true,
+    "androidLeftRightCorrect": true,
+    "questMetaHandsPrimary": true,
+    "questControllerFallback": true,
+    "questSnapTurnDegrees": 45,
+    "questForwardReference": "headset-look-direction",
+    "questTeleport": "hold-to-aim-release-to-teleport"
+  },
+  "acceptance": {
+    "workflow": "Phase 359 Dual Platform Gameplay Continuity",
+    "pending": true,
+    "passed": false,
+    "androidFullHand": null,
+    "questFullHand": null
+  },
+  "productTruth": {
+    "localPlayMoneyVsFiveBots": true,
+    "serverAuthoritativeMultiplayer": false,
+    "realMoneyGambling": false,
+    "physicalAndroidDeviceTestPending": true,
+    "physicalQuestHeadsetTestPending": true
+  },
+  "androidApk": {
+    "versionName": "0.1.0-rc1",
+    "versionCode": 1,
+    "releaseReady": false,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true
+  }
+}
