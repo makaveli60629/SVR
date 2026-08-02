@@ -2,7 +2,7 @@
   "name": "SVR Poker Fresh Shuffle and Table Session Release",
   "phase": 360,
   "build": "PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK",
-  "status": "browser-acceptance-pending",
+  "status": "browser-acceptance-passed",
   "routes": {
     "android": "/game/android.html?channel=stable&v=phase360",
     "quest": "/game/index.html?platform=quest&v=phase360"
@@ -28,22 +28,86 @@
     "deliberateLeaveClearsRecoverySnapshot": true,
     "rejoinStartsFreshTable": true,
     "continuousResultDelayMilliseconds": 9000,
-    "practiceTableResetsWhenHumanOutOrFewerThanTwoFunded": true
+    "practiceTableResetsWhenHumanOutOrFewerThanTwoFunded": true,
+    "prematureNextHandRejected": true,
+    "nextHandAllowedAt": ["showdown", "idle"]
+  },
+  "chipConservation": {
+    "startingTableValue": 6000,
+    "acceptanceStackChipsAfterBlinds": 5970,
+    "acceptanceCommittedBlinds": 30,
+    "acceptanceTotalTableChips": 6000,
+    "formula": "player stacks plus committed chips"
   },
   "metaCardInteraction": {
     "pinchPickupContract": true,
     "controllerTriggerPickupContract": true,
     "throwTowardCenterFoldContract": true,
+    "tableKnockCheckCallNextContract": true,
+    "twoHandPushAllInContract": true,
     "physicalQuestHeadsetAcceptancePending": true
   },
   "acceptance": {
     "workflow": "Phase 360 Fresh Shuffle Leave Reset",
-    "pending": true,
-    "passed": false,
-    "secureShuffle": null,
-    "leaveJoinReset": null,
-    "androidFullHand": null,
-    "questFullHand": null
+    "pending": false,
+    "passed": true,
+    "secureShuffle": {
+      "viewport": "412x915",
+      "randomSource": "crypto.getRandomValues",
+      "fingerprintsDifferent": true,
+      "exactDeckRepeats": 0,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "requestFailures": 0
+    },
+    "leaveJoinReset": {
+      "leaveResetArmed": true,
+      "joinResets": 1,
+      "joinedHandNo": 1,
+      "freshDeckOnJoin": true,
+      "continuousResumed": true
+    },
+    "nextHandGuard": {
+      "prematureNextRejected": true,
+      "rejectedPrematureNextCount": 1
+    },
+    "androidFullHand": {
+      "passed": true,
+      "phases": ["preflop", "flop", "turn", "river", "showdown"],
+      "holeCards": 2,
+      "communityCards": 5,
+      "winnerRecorded": true,
+      "potSettled": true,
+      "totalStacksAfterSettlement": 6000,
+      "nextHandAdvanced": true,
+      "controllerRoots": 1,
+      "legacyControllerRoots": 0,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "requestFailures": 0
+    },
+    "questFullHand": {
+      "passed": true,
+      "browserStackAcceptance": true,
+      "physicalQuestSessionTested": false,
+      "handsPrimary": true,
+      "controllerFallback": true,
+      "snapTurnDegrees": 45,
+      "forwardReference": "headset-look-direction",
+      "teleportContract": "hold-to-aim-release-to-teleport",
+      "uploadedTableAuthority": true,
+      "fallbackTablePresent": false,
+      "pinchCardPickupContract": true,
+      "phases": ["preflop", "flop", "turn", "river", "showdown"],
+      "holeCards": 2,
+      "communityCards": 5,
+      "potSettled": true,
+      "totalStacksAfterSettlement": 6000,
+      "nextHandAdvanced": true,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "requestFailures": 0
+    }
   },
   "productTruth": {
     "localPlayMoneyVsFiveBots": true,
