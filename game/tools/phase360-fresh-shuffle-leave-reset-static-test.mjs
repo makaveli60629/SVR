@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 const read = (file) => fs.readFileSync(file, 'utf8');
 const runtime = read('game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
 const guard = read('game/modules/phase360_table_conservation_next_guard_lock.js');
+const phase361 = read('game/modules/phase361_quest_lobby_play_seat_watch_npc_lock.js');
 const android = read('game/android.html');
 const quest = read('game/index.html');
 const gesture = read('game/modules/phase334_table_layout_gesture_poker_lock.js');
@@ -50,17 +51,32 @@ assert.match(gesture, /function releaseCard/);
 assert.match(gesture, /pointer\.down/);
 assert.match(gesture, /window\.SVR_POKER_ACTION\?\.\("fold"\)/);
 
-for (const [name, html] of [['android', android], ['quest', quest]]) {
-  assert.match(html, /data-release="PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK"/);
-  assert.match(html, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase360/);
-  assert.match(html, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase360/);
-  assert.match(html, /phase360_table_conservation_next_guard_lock\.js\?v=phase360/);
-  const phase359 = html.indexOf('phase359_dual_platform_gameplay_continuity_lock.js');
-  const phase360 = html.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
-  const guardIndex = html.indexOf('phase360_table_conservation_next_guard_lock.js');
-  assert.ok(phase359 < phase360, `${name} Phase 360 must load after Phase 359`);
-  assert.ok(phase360 < guardIndex, `${name} conservation guard must load after Phase 360 core`);
-}
+assert.match(android, /data-release="PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK"/);
+assert.match(android, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase360/);
+assert.match(android, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase360/);
+assert.match(android, /phase360_table_conservation_next_guard_lock\.js\?v=phase360/);
+const android359 = android.indexOf('phase359_dual_platform_gameplay_continuity_lock.js');
+const android360 = android.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
+const androidGuard = android.indexOf('phase360_table_conservation_next_guard_lock.js');
+assert.ok(android359 < android360, 'Android Phase 360 must load after Phase 359');
+assert.ok(android360 < androidGuard, 'Android conservation guard must load after Phase 360 core');
+
+assert.match(quest, /data-release="PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK"/);
+assert.match(quest, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase361/);
+assert.match(quest, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase361/);
+assert.match(quest, /phase360_table_conservation_next_guard_lock\.js\?v=phase361/);
+assert.match(quest, /phase361_quest_lobby_play_seat_watch_npc_lock\.js\?v=phase361/);
+const quest359 = quest.indexOf('phase359_dual_platform_gameplay_continuity_lock.js');
+const quest360 = quest.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
+const questGuard = quest.indexOf('phase360_table_conservation_next_guard_lock.js');
+const quest361 = quest.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js');
+assert.ok(quest359 < quest360, 'Quest Phase 360 must load after Phase 359');
+assert.ok(quest360 < questGuard, 'Quest conservation guard must load after Phase 360 core');
+assert.ok(questGuard < quest361, 'Quest Phase 361 must load after Phase 360 conservation guard');
+
+assert.match(phase361, /SVR_PHASE360_JOIN_TABLE/);
+assert.match(phase361, /SVR_PHASE360_LEAVE_TABLE/);
+assert.match(phase361, /SVR_PHASE359_TOGGLE_CONTINUOUS/);
 
 assert.equal(manifest.phase, 360);
 assert.equal(manifest.build, 'PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK');
@@ -76,10 +92,11 @@ console.log(JSON.stringify({
   pass: true,
   build: manifest.build,
   random: 'crypto.getRandomValues with synchronous engine-call wrapper',
-  leave: 'deliberate leave clears recovery snapshot and arms fresh join',
+  leave: 'deliberate leave clears recovery snapshot and Phase 361 returns Quest to lobby spawn',
   conservation: 'player stacks plus committed chips must equal 6000',
   nextHand: 'rejected until showdown or idle',
-  loop: 'Phase 359 nine-second continuation protected; Phase 360 resets practice table when fewer than two players or human is out',
+  loop: 'Phase 359 nine-second continuation and Phase 360 secure practice reset protected',
+  questSuccessor: 'Phase 361 explicit PLAY GAME and LEAVE TABLE session authority',
   metaCards: 'pinch and trigger pickup source contract present; physical headset acceptance pending',
   apk: `${manifest.apk_version_name} (${manifest.apk_version_code})`
 }, null, 2));

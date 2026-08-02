@@ -21,7 +21,10 @@ const webManifest = JSON.parse(read('game/manifest.json'));
 const backendPackage = JSON.parse(read('backend/phase345/package.json'));
 const unityBlueprint = JSON.parse(read('docs/PHASE-356-PLATFORM-UNITY-BLUEPRINT.json'));
 
-requireText(manifest, "VERSION = 'phase356'", 'platform-version');
+// The shared manifest may advance for Quest-only successors. Preserve the
+// Phase 356 Android runtime contract rather than freezing the global version.
+requireText(manifest, "VERSION = 'phase361'", 'platform-successor-version');
+requireText(manifest, "BUILD = 'PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK'", 'platform-successor-build');
 requireText(manifest, 'phase356_android_real_device_freeze_recovery_lock.js', 'phase356-runtime');
 requireText(manifest, 'const ANDROID_DEFERRED = []', 'android-deferred-disabled');
 forbidText(manifest.split('const ANDROID_FOUNDATION = [')[1].split('];')[0], 'phase355_android_runtime_smoothness_hardening_lock.js', 'retired-runtime');
@@ -51,7 +54,7 @@ if (release.realDeviceValidation?.pending !== true || release.realDeviceValidati
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) throw new Error('APK update policy changed');
 if (release.apkVersionName !== '0.1.0-rc1' || release.apkVersionCode !== 1) throw new Error('APK version lock changed');
 if (Number(webManifest.phase || 0) < 356 || webManifest.apk_version_code !== 1) throw new Error('Web manifest phase/APK regression');
-if (!String(webManifest.build || '').startsWith('PHASE-360-')) throw new Error('Phase 360 web successor build missing');
+if (!String(webManifest.build || '').startsWith('PHASE-360-')) throw new Error('Phase 360 Android/web successor build missing');
 if (release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') throw new Error('Protected Android Phase 357 authority changed');
 if (!android.includes(webManifest.build)) throw new Error('Android page is missing Phase 360 successor release marker');
 
@@ -85,6 +88,7 @@ if (!unityBlueprint.sharedAuthorities.includes('poker-rules')) throw new Error('
 console.log(JSON.stringify({
   pass: true,
   protectedPhase: 356,
+  sharedManifestSuccessor: 361,
   currentPhase: webManifest.phase,
   successorWebBuild: webManifest.build,
   protectedAndroidAuthority: release.currentGameBuild,
