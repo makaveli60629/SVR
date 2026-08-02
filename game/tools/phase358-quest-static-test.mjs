@@ -4,6 +4,9 @@ const read = (path) => fs.readFileSync(path, 'utf8');
 const requireText = (source, text, label, errors) => {
   if (!source.includes(text)) errors.push(`${label}: missing ${text}`);
 };
+const requirePattern = (source, pattern, label, errors) => {
+  if (!pattern.test(source)) errors.push(`${label}: missing ${pattern}`);
+};
 const forbidText = (source, text, label, errors) => {
   if (source.includes(text)) errors.push(`${label}: forbidden ${text}`);
 };
@@ -25,8 +28,8 @@ const questRelease = JSON.parse(read('game/quest-release.json'));
 const androidRelease = JSON.parse(read('game/android-release.json'));
 const webManifest = JSON.parse(read('game/manifest.json'));
 
-requireText(manifest, "BUILD = 'PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK'", 'platform successor build', errors);
-requireText(manifest, "VERSION = 'phase361'", 'platform successor version', errors);
+requirePattern(manifest, /BUILD = 'PHASE-(?:361|36[2-9]|3[7-9]\d)-/, 'platform successor build', errors);
+requirePattern(manifest, /VERSION = 'phase(?:361|36[2-9]|3[7-9]\d)'/, 'platform successor version', errors);
 requireText(manifest, "params.get('platform') === 'quest'", 'explicit Quest route', errors);
 for (const module of [
   'phase358_quest_incremental_shader_compile_lock.js',
@@ -64,15 +67,17 @@ requireText(loader, "window.addEventListener('svr:phase358-acceptance'", 'Accept
 requireText(loader, 'phase358: window.SVR_PHASE358_QA?.() || null', 'Phase 358 audit', errors);
 
 requireText(index, 'PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK', 'Protected Quest base build', errors);
-requireText(index, 'data-release="PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK"', 'Quest Phase 361 successor release', errors);
-requireText(index, 'phase340_platform_core_loader.js?v=phase361', 'Quest page cache version', errors);
-requireText(index, '?channel=stable&v=phase360', 'Android route preservation', errors);
-requireText(index, 'phase359_dual_platform_gameplay_continuity_lock.js?v=phase361', 'Quest continuity successor', errors);
-requireText(index, 'phase360_fresh_shuffle_leave_reset_continuous_table_lock.js?v=phase361', 'Quest shuffle successor', errors);
-requireText(index, 'phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase361', 'Quest lobby-seat successor', errors);
+requirePattern(index, /data-release="PHASE-(?:361|36[2-9]|3[7-9]\d)-/, 'Quest successor release', errors);
+requirePattern(index, /phase340_platform_core_loader\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/, 'Quest page cache version', errors);
+requirePattern(index, /\?channel=stable&v=phase(?:360|36[1-9]|3[7-9]\d)/, 'Android route preservation', errors);
+requirePattern(index, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/, 'Quest continuity successor', errors);
+requirePattern(index, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/, 'Quest shuffle successor', errors);
+requirePattern(index, /phase361_quest_lobby_play_seat_watch_npc_lock\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/, 'Quest lobby-seat successor', errors);
 if (index.indexOf('await bootPlatform()') > index.indexOf('phase359_dual_platform_gameplay_continuity_lock.js')) errors.push('Phase 359 must load after Quest platform boot');
 if (index.indexOf('phase359_dual_platform_gameplay_continuity_lock.js') > index.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js')) errors.push('Phase 360 must load after Phase 359');
 if (index.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js') > index.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js')) errors.push('Phase 361 must load after Phase 360');
+const phase362Index = index.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
+if (phase362Index >= 0 && phase362Index < index.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js')) errors.push('Successor table policy must load after Phase 361');
 
 requireText(continuity, 'PHASE359_QUEST_WINNER_CARDS_AMOUNT_PANEL', 'Quest winner board successor', errors);
 requireText(continuity, 'NEXT HAND IN', 'Quest continuous-hand successor', errors);
@@ -117,19 +122,19 @@ requireText(acceptance, 'resetTable', 'Authoritative table reset', errors);
 requireText(acceptance, 'startHand', 'Authoritative next hand', errors);
 requireText(acceptance, 'turnKey !== lastSubmittedTurnKey', 'One action per turn transition', errors);
 requireText(acceptance, "['preflop', 'flop', 'turn', 'river', 'showdown']", 'Full hand streets', errors);
-requireText(acceptance, 'totalStacks === 6000', 'Chip conservation', errors);
+requireText(acceptance, 'totalStacks === 6000', 'Protected Phase 358 chip conservation', errors);
 requireText(acceptance, 'physicalQuestSessionTested', 'Physical Quest truth', errors);
 forbidText(acceptance, 'window.SVR_POKER_ACTION(action)', 'Wrapped action acceptance bug', errors);
 
-if (questRelease.phase !== 361 || questRelease.build !== 'PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK') errors.push('Quest successor release mismatch');
+if (Number(questRelease.phase) < 361 || !/^PHASE-(?:361|36[2-9]|3[7-9]\d)-/.test(String(questRelease.build || ''))) errors.push('Quest successor release mismatch');
 if (questRelease.browserAcceptance?.baseGameplayCertification !== 'PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK') errors.push('Protected Phase 358 certification missing');
-if (!String(questRelease.webEntry || '').includes('platform=quest') || !String(questRelease.webEntry || '').includes('v=phase361')) errors.push('Quest successor route mismatch');
+if (!String(questRelease.webEntry || '').includes('platform=quest') || !/v=phase(?:361|36[2-9]|3[7-9]\d)/.test(String(questRelease.webEntry || ''))) errors.push('Quest successor route mismatch');
 if (questRelease.physicalQuestAcceptance?.pending !== true || questRelease.physicalQuestAcceptance?.requiresHeadset !== true) errors.push('Physical Quest acceptance truth missing');
 if (questRelease.productTruth?.serverAuthoritativePoker !== false) errors.push('Server-authoritative poker overclaim');
 if (questRelease.androidApkPolicy?.versionName !== '0.1.0-rc1' || questRelease.androidApkPolicy?.versionCode !== 1) errors.push('Quest record changed APK lock');
 if (questRelease.androidApkPolicy?.forceUpdate !== false || questRelease.androidApkPolicy?.showUpdatePrompt !== false || questRelease.androidApkPolicy?.manualUpdateOnly !== true) errors.push('Quest record changed APK policy');
 if (androidRelease.apkVersionName !== '0.1.0-rc1' || androidRelease.apkVersionCode !== 1 || androidRelease.manualUpdateOnly !== true) errors.push('Android release policy regressed');
-if (webManifest.phase !== 360 || webManifest.build !== 'PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK') errors.push('Android/web successor release mismatch');
+if (Number(webManifest.phase) < 360 || !/^PHASE-(?:360|36[1-9]|3[7-9]\d)-/.test(String(webManifest.build || ''))) errors.push('Android/web successor release mismatch');
 if (webManifest.apk_version_name !== '0.1.0-rc1' || webManifest.apk_version_code !== 1 || webManifest.manual_update_only !== true) errors.push('Web manifest APK policy regressed');
 
 if (errors.length) {
@@ -145,13 +150,14 @@ console.log(JSON.stringify({
   sessionAuthority: 'standing lobby spawn, PLAY GAME south/front seat, locked seated movement, LEAVE TABLE, watch and NPC alignment',
   acceptance: {
     localPlayMoneyVsFiveBots: true,
-    fullHand: true,
-    chipConservation: 6000,
+    protectedFullHand: true,
+    protectedChipConservation: 6000,
+    successorPolicyBankroll: questRelease.tablePolicy?.tableBankroll || null,
     nextHand: true,
     physicalHeadsetPending: true
   },
   androidProtected: {
-    phase: 360,
+    phase: webManifest.phase,
     apkVersionName: androidRelease.apkVersionName,
     apkVersionCode: androidRelease.apkVersionCode,
     manualUpdateOnly: androidRelease.manualUpdateOnly
