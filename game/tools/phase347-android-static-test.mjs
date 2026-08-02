@@ -35,7 +35,7 @@ requireText(handDriver, "window.SVR_PHASE344_RUN_FULL_HAND_QA = driveHand", 'pha
 requireText(handDriver, "window.SVR_POKER_QA_PASSIVE_BOTS = true", 'driver-enables-passive-bots');
 requireText(handDriver, "delete window.SVR_POKER_QA_PASSIVE_BOTS", 'driver-removes-passive-bot-flag');
 requireText(handDriver, "window.SVR_POKER_QA_PASSIVE_BOTS = previousPassiveMode", 'driver-restores-passive-bot-flag');
-requireText(handDriver, "totalStacks === 6000", 'hand-driver-chip-conservation');
+requireText(handDriver, "totalStacks === 6000", 'protected-hand-driver-chip-conservation');
 requireText(handDriver, "['preflop', 'flop', 'turn', 'river', 'showdown']", 'hand-driver-all-streets');
 requireText(handDriver, "activeRecord = makeRecord(result.attempts + 1)", 'retry-record-recreation');
 requireText(platform, "phase356_android_real_device_freeze_recovery_lock.js", 'phase356-recovery-module');
@@ -66,8 +66,9 @@ if (platformVersion < 347) errors.push('platform-version-regressed');
 if (Number(manifest.phase || 0) < 347) errors.push('manifest-phase-regressed');
 if (!String(manifest.build || '').startsWith('PHASE-')) errors.push('manifest-build-missing');
 if (manifest.force_update !== false || manifest.show_update_prompt !== false || manifest.manual_update_only !== true) errors.push('manifest-update-policy');
-if (release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('protected-android-authority-changed');
-if (!String(manifest.build || '').startsWith('PHASE-360-')) errors.push('phase360-successor-build-missing');
+const protectedAuthority = release.protectedAndroidAuthority || release.currentGameBuild;
+if (protectedAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('protected-android-authority-changed');
+if (Number(manifest.phase || 0) < 360 || !/^PHASE-(?:360|36[1-9]|3[7-9]\d)-/.test(String(manifest.build || ''))) errors.push('phase360-or-successor-build-missing');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('release-update-policy');
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.apkVersionCode !== 1 || release.nextApkVersionCode !== 2) errors.push('apk-version-gate');
@@ -80,7 +81,7 @@ if (errors.length) {
 console.log(JSON.stringify({
   pass: true,
   protectedBuild: 'PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK',
-  protectedAndroidAuthority: release.currentGameBuild,
+  protectedAndroidAuthority: protectedAuthority,
   successorWebBuild: manifest.build,
   platformVersion,
   controller: 'single-visible-authority',
