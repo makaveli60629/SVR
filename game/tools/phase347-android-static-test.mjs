@@ -66,8 +66,8 @@ if (platformVersion < 347) errors.push('platform-version-regressed');
 if (Number(manifest.phase || 0) < 347) errors.push('manifest-phase-regressed');
 if (!String(manifest.build || '').startsWith('PHASE-')) errors.push('manifest-build-missing');
 if (manifest.force_update !== false || manifest.show_update_prompt !== false || manifest.manual_update_only !== true) errors.push('manifest-update-policy');
-if (!String(release.currentGameBuild || '').startsWith('PHASE-')) errors.push('release-build-missing');
-if (release.currentGameBuild !== manifest.build) errors.push('release-manifest-build-mismatch');
+if (release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('protected-android-authority-changed');
+if (!String(manifest.build || '').startsWith('PHASE-360-')) errors.push('phase360-successor-build-missing');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('release-update-policy');
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.apkVersionCode !== 1 || release.nextApkVersionCode !== 2) errors.push('apk-version-gate');
@@ -80,7 +80,8 @@ if (errors.length) {
 console.log(JSON.stringify({
   pass: true,
   protectedBuild: 'PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK',
-  currentBuild: release.currentGameBuild,
+  protectedAndroidAuthority: release.currentGameBuild,
+  successorWebBuild: manifest.build,
   platformVersion,
   controller: 'single-visible-authority',
   horizontalInput: 'direct',
