@@ -15,6 +15,7 @@
   "manualUpdateOnly": true,
   "previewEntry": "/game/camera3.html?v=phase350",
   "currentGameBuild": "PHASE-362-CONTINUOUS-10000-TURN-CLOCK-REJOIN-RESET-LOCK",
+  "protectedAndroidAuthority": "PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK",
   "tablePolicy": {
     "startingStackPerPlayer": 10000,
     "players": 6,
@@ -27,25 +28,33 @@
     "humanBustBehavior": "The remaining funded players continue until a champion exists; the table does not reset merely because the human stack reaches zero."
   },
   "browserAcceptance": {
+    "passed": true,
     "priorCompleteGamePassed": true,
+    "workflow": "Phase 354 Android Full Game Acceptance",
     "priorWorkflow": "Phase 354 Android Full Game Acceptance",
     "viewport": "412x915",
     "androidUserAgent": true,
+    "attempts": 1,
     "phases": ["preflop", "flop", "turn", "river", "showdown"],
     "holeCards": 2,
     "communityCards": 5,
     "burnCards": 3,
     "winnerRecorded": true,
     "settledPotRecorded": true,
+    "totalTableChips": 6000,
+    "nextHand": {"previous": 1, "current": 2, "advanced": true},
     "nextHandAdvanced": true,
     "singleControllerPassed": true,
     "legacyControllerRoots": 0,
+    "externalVirtualSticks": 0,
     "tableLogoPassed": true,
     "raisedPotDisplayPassed": true,
-    "phase362PolicyAcceptancePending": true
+    "phase362PolicyAcceptancePending": true,
+    "phase362TableBankroll": 60000
   },
   "realDeviceValidation": {
     "phase": 362,
+    "protectedAuthorityPhase": 357,
     "passed": false,
     "pending": true,
     "ownerPlaytestRequired": true,
@@ -59,8 +68,10 @@
   "notes": [
     "Phase 362 changes the remotely loaded Android web runtime and does not require reinstalling APK 0.1.0-rc1.",
     "Phase 347 remains the only Android MOVE, LOOK, and poker-button controller.",
+    "Phase 357 seating and showdown presentation remains protected authority.",
     "Phase 336 remains the poker rules and settlement authority.",
     "Phase 362 adds tournament policy, a cross-platform turn clock, timeout folds, champion reset, and deliberate leave/rejoin reset.",
+    "Historical Phase 354 browser evidence remains recorded separately from the Phase 362 60,000-chip policy acceptance.",
     "APK version name 0.1.0-rc1, version code 1, manual-update-only, forceUpdate false, and showUpdatePrompt false remain locked."
   ]
 }
