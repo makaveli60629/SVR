@@ -8,6 +8,8 @@ const assert = (condition, message) => {
 const html = read('game/android.html');
 const core = read('game/modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
 const table = read('game/modules/phase363_android_canonical_table_asset_lock.js');
+const raiseCapture = read('game/modules/phase363_android_raise_ui_capture_lock.js');
+const streetRaise = read('game/modules/phase363_android_street_raise_action_lock.js');
 const join = read('game/modules/phase363_android_join_control_capture_lock.js');
 const consistency = read('game/modules/phase363_android_settlement_lobby_consistency_lock.js');
 const manifest = JSON.parse(read('game/manifest.json'));
@@ -18,16 +20,27 @@ const dressingRoom = read('game/avatar-vr.html');
 assert(html.includes('v=phase363'), 'Android route is not Phase 363');
 assert(html.includes('SVR_REQUIRE_TABLE_JOIN=true'), 'Android does not require JOIN before cards');
 assert(html.includes('SVR_TABLE_STARTING_STACK=15000'), 'Android starting stack flag is not 15,000');
-assert(html.includes('phase363_android_canonical_table_asset_lock.js'), 'Canonical table authority is not loaded');
-assert(html.includes('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js'), 'Integrated Android core is not loaded');
-assert(html.includes('phase363_android_join_control_capture_lock.js'), 'Final JOIN capture authority is not loaded');
-assert(html.includes('phase363_android_settlement_lobby_consistency_lock.js'), 'Settlement/lobby consistency authority is not loaded');
+for (const module of [
+  'phase363_android_canonical_table_asset_lock.js',
+  'phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js',
+  'phase363_android_raise_ui_capture_lock.js',
+  'phase363_android_street_raise_action_lock.js',
+  'phase363_android_join_control_capture_lock.js',
+  'phase363_android_settlement_lobby_consistency_lock.js'
+]) assert(html.includes(module), `${module} is not loaded`);
 assert(!html.includes('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js'), 'Legacy 10,000-chip module still loads on Android');
 
 const coreIndex = html.indexOf('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
+const raiseCaptureIndex = html.indexOf('phase363_android_raise_ui_capture_lock.js');
+const streetRaiseIndex = html.indexOf('phase363_android_street_raise_action_lock.js');
 const joinIndex = html.indexOf('phase363_android_join_control_capture_lock.js');
 const consistencyIndex = html.indexOf('phase363_android_settlement_lobby_consistency_lock.js');
-assert(coreIndex >= 0 && joinIndex > coreIndex && consistencyIndex > joinIndex, 'Phase 363 final Android authority order is incorrect');
+assert(coreIndex >= 0
+  && raiseCaptureIndex > coreIndex
+  && streetRaiseIndex > raiseCaptureIndex
+  && joinIndex > streetRaiseIndex
+  && consistencyIndex > joinIndex,
+'Phase 363 final Android authority order is incorrect');
 
 assert(core.includes('const STARTING_STACK = 15000'), 'Integrated core starting stack is not 15,000');
 assert(core.includes('const TABLE_BANKROLL = STARTING_STACK * players.length'), 'Integrated core does not calculate table bankroll');
@@ -52,10 +65,26 @@ assert(table.includes('../assets/table.fbx'), 'Verified FBX fallback is missing'
 assert(!table.includes('../assets/table.obj'), 'Unverified OBJ path would generate a failed request');
 assert(table.includes('PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED'), 'Uploaded table authority name is missing');
 
-assert(join.includes("window.addEventListener('pointerdown'"), 'JOIN capture listener is missing');
+assert(raiseCapture.includes("key === runtime.lastKey"), 'Raise UI duplicate lock is not action-specific');
+assert(raiseCapture.includes("window.SVR_PHASE363_RAISE_TO?.(target)"), 'Raise confirm does not reach the Phase 363 raise authority');
+assert(raiseCapture.includes('event.stopImmediatePropagation()'), 'Raise capture does not block competing HUD handlers');
+
+assert(streetRaise.includes('function raiseTo'), 'Reliable raise authority is missing');
+assert(streetRaise.includes("const type = before.currentBet > 0 ? 'raise' : 'bet'"), 'Raise authority does not support both bet and raise');
+assert(streetRaise.includes('before.maximum > before.currentBet'), 'Raise authority does not protect stack limits');
+assert(streetRaise.includes("preflop: { community: 0, burn: 0 }"), 'Preflop street contract is missing');
+assert(streetRaise.includes("flop: { community: 3, burn: 1 }"), 'Flop burn-card contract is missing');
+assert(streetRaise.includes("turn: { community: 4, burn: 2 }"), 'Turn burn-card contract is missing');
+assert(streetRaise.includes("river: { community: 5, burn: 3 }"), 'River burn-card contract is missing');
+assert(streetRaise.includes("expectedOrder = ['preflop', 'flop', 'turn', 'river', 'showdown']"), 'Texas Hold’em street order contract is missing');
+assert(streetRaise.includes('window.SVR_PHASE363_STREET_RAISE_QA'), 'Street/raise runtime QA is missing');
+
+assert(join.includes("window.addEventListener('pointerdown'"), 'JOIN pointer capture is missing');
+assert(join.includes("window.addEventListener('click'"), 'JOIN click fallback is missing');
 assert(join.includes('event.stopImmediatePropagation()'), 'JOIN capture does not block duplicate legacy handlers');
 assert(join.includes('visible.length === 1'), 'JOIN gate does not require one visible control');
 assert(join.includes("'LEAVE TABLE' : 'JOIN TABLE'"), 'JOIN/LEAVE label authority is missing');
+assert(join.includes('duplicateActivationsBlocked'), 'JOIN duplicate-tap lock is missing');
 
 assert(consistency.includes('effectiveTableChips'), 'Settled chip accounting is missing');
 assert(consistency.includes('settledHand ? 0 : committedChips'), 'Settled contributions are still double-counted');
@@ -88,6 +117,9 @@ console.log(JSON.stringify({
   startingStack: manifest.starting_stack,
   tableBankroll: manifest.table_bankroll,
   joinRequired: manifest.join_required_before_deal,
+  reliableRaise: true,
+  holdemStreetOrder: ['preflop', 'flop', 'turn', 'river', 'showdown'],
+  burnCards: [1, 2, 3],
   settledChipAccounting: true,
   lobbyEngineCardsCleared: true,
   audioFallback: manifest.web_audio_synth_fallback,
