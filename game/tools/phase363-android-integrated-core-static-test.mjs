@@ -47,7 +47,7 @@ assert(table.includes('PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED'), 'Upload
 
 assert(join.includes("window.addEventListener('pointerdown'"), 'JOIN capture listener is missing');
 assert(join.includes('event.stopImmediatePropagation()'), 'JOIN capture does not block duplicate legacy handlers');
-assert(join.includes('visibleJoinControls === 1'), 'JOIN gate does not require one control');
+assert(join.includes('visible.length === 1'), 'JOIN gate does not require one visible control');
 
 assert(manifest.phase === 363, 'Manifest phase is not 363');
 assert(manifest.starting_stack === 15000, 'Manifest starting stack is not 15,000');
