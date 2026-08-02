@@ -2,11 +2,15 @@ import { state, players } from './phase336_authoritative_engine.js';
 
 export const BUILD = 'PHASE-362-SETTLEMENT-ACCOUNTING-CLEAR-LOCK';
 
+const params = new URLSearchParams(location.search);
+const PHASE362_QA = params.has('phase362qa');
 let lastClearedHand = -1;
 let clearedHands = 0;
 let lastCommitted = 0;
 let installedAt = null;
 let interval = 0;
+let qaSeatInterval = 0;
+let qaJoinStarted = false;
 
 function settledShowdown() {
   return String(state.phase || '').toLowerCase() === 'showdown'
@@ -56,6 +60,29 @@ function clearSettledCommitments(reason = 'state-event') {
   return true;
 }
 
+function installQaSeatGate() {
+  if (!PHASE362_QA) return;
+  const originalJoin = window.SVR_PHASE362_JOIN_TABLE;
+  if (typeof originalJoin === 'function') {
+    window.SVR_PHASE362_JOIN_TABLE = (...args) => {
+      qaJoinStarted = true;
+      if (qaSeatInterval) {
+        clearInterval(qaSeatInterval);
+        qaSeatInterval = 0;
+      }
+      return originalJoin(...args);
+    };
+  }
+  const pinLeft = () => {
+    if (qaJoinStarted) return;
+    if (window.SVR_PHASE347_STATE) window.SVR_PHASE347_STATE.seated = false;
+    window.SVR_PHASE362_LEAVE_TABLE?.();
+    window.SVR_PHASE362_QA_LEFT_READY = true;
+  };
+  pinLeft();
+  qaSeatInterval = window.setInterval(pinLeft, 25);
+}
+
 function qa() {
   const stacks = players.reduce((sum, player) => sum + Number(player.stack || 0), 0);
   const committed = players.reduce((sum, player) => sum + Number(player.contributed || 0), 0);
@@ -74,6 +101,9 @@ function qa() {
     lastClearedHand,
     clearedHands,
     lastCommitted,
+    phase362Qa: PHASE362_QA,
+    qaLeftReady: Boolean(window.SVR_PHASE362_QA_LEFT_READY),
+    qaJoinStarted,
     checkedAt: new Date().toISOString()
   };
   result.pass = Boolean(installedAt)
@@ -90,6 +120,7 @@ function install() {
   interval = window.setInterval(() => clearSettledCommitments('watchdog'), 120);
   window.addEventListener('beforeunload', () => {
     if (interval) clearInterval(interval);
+    if (qaSeatInterval) clearInterval(qaSeatInterval);
   }, { once: true });
   window.SVR_PHASE362_CLEAR_SETTLED_COMMITMENTS = clearSettledCommitments;
   window.SVR_PHASE362_SETTLEMENT_QA = qa;
@@ -98,9 +129,11 @@ function install() {
     get installedAt() { return installedAt; },
     get lastClearedHand() { return lastClearedHand; },
     get clearedHands() { return clearedHands; },
-    get lastCommitted() { return lastCommitted; }
+    get lastCommitted() { return lastCommitted; },
+    get qaJoinStarted() { return qaJoinStarted; }
   };
   clearSettledCommitments('install');
+  installQaSeatGate();
 }
 
 install();
