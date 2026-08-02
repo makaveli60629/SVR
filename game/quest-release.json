@@ -5,8 +5,10 @@
   "build": "PHASE-362-CONTINUOUS-10000-TURN-CLOCK-REJOIN-RESET-LOCK",
   "webEntry": "/game/index.html?platform=quest&v=phase362",
   "browserAcceptance": {
+    "passed": true,
     "priorCompleteGamePassed": true,
     "baseGameplayCertification": "PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK",
+    "startupMs": 19754.6,
     "startupBudgetMs": 45000,
     "uploadedTable": "PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED",
     "fallbackTablePresent": false,
@@ -16,9 +18,24 @@
     "snapTurnDegrees": 45,
     "forwardReference": "headset-look-direction",
     "teleportContract": "hold-to-aim-release-to-teleport",
-    "completeHand": true,
+    "phases": ["preflop", "flop", "turn", "river", "showdown"],
+    "humanActions": 4,
+    "holeCards": 2,
+    "communityCards": 5,
+    "burnCards": 3,
+    "winner": {"name": "IVY", "amount": 120, "hand": "Full House"},
+    "settledPot": 120,
+    "totalTableChips": 6000,
+    "fundedPlayers": 6,
+    "nextHand": {"previous": 1, "current": 2, "advanced": true},
     "nextHandAdvanced": true,
-    "phase362PolicyAcceptancePending": true
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "sameOriginHttpErrors": 0,
+    "requestFailures": 0,
+    "completeHand": true,
+    "phase362PolicyAcceptancePending": true,
+    "phase362TableBankroll": 60000
   },
   "sessionContract": {
     "startsStandingInLobby": true,
@@ -34,10 +51,23 @@
     "controllerSelectSupported": true,
     "handPinchSupported": true,
     "freshTableOnRejoin": true,
-    "legacyForcedSeatModulesRemoved": [
-      "p86_seated_lock.js",
-      "p87_scorpion_seat_authority.js"
-    ]
+    "legacyForcedSeatModulesRemoved": ["p86_seated_lock.js", "p87_scorpion_seat_authority.js"]
+  },
+  "phase361SessionContract": {
+    "startsStandingInLobby": true,
+    "walkToTableBeforeSitting": true,
+    "playGameButton": true,
+    "southFrontSeat": true,
+    "movementLockedWhileSeated": true,
+    "teleportLockedWhileSeated": true,
+    "headLookPreservedWhileSeated": true,
+    "leaveTableButtonRequired": true,
+    "leaveReturnsToLobbySpawn": true,
+    "watchVisibleInLobbyAndSeat": true,
+    "controllerSelectSupported": true,
+    "handPinchSupported": true,
+    "freshTableOnRejoin": true,
+    "legacyForcedSeatModulesRemoved": ["p86_seated_lock.js", "p87_scorpion_seat_authority.js"]
   },
   "tablePolicy": {
     "startingStackPerPlayer": 10000,
