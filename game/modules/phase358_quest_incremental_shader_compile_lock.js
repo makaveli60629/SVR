@@ -18,6 +18,8 @@ const state = {
   materialsReplaced: 0,
   compileRetries: 0,
   sparseCompileDeferrals: 0,
+  renderRetries: 0,
+  sparseRenderDeferrals: 0,
   installedAt: null,
   restoredAt: null
 };
@@ -25,6 +27,7 @@ const state = {
 const prototype = THREE.WebGLRenderer?.prototype;
 let originalCompile = null;
 let originalCompileAsync = null;
+let originalRender = null;
 
 function fallbackMaterial() {
   return new THREE.MeshStandardMaterial({
@@ -92,9 +95,6 @@ function safeCompile(scene, camera, targetScene) {
       return originalCompile.call(this, scene, camera, targetScene);
     } catch (retryError) {
       if (!sparseMaterialError(retryError)) throw retryError;
-      // compile() is an optimization. If a malformed late-loaded FBX material
-      // still reaches Three.js after sanitation, defer that shader to the
-      // normal render pass instead of crashing the Quest page.
       state.sparseCompileDeferrals += 1;
       return this;
     }
@@ -119,12 +119,32 @@ async function safeCompileAsync(scene, camera, targetScene) {
   }
 }
 
+function safeRender(scene, camera) {
+  try {
+    return originalRender.call(this, scene, camera);
+  } catch (error) {
+    if (!sparseMaterialError(error)) throw error;
+    state.renderRetries += 1;
+    sanitizeSceneMaterials(scene);
+    try {
+      return originalRender.call(this, scene, camera);
+    } catch (retryError) {
+      if (!sparseMaterialError(retryError)) throw retryError;
+      // Render errors from a late sparse FBX material must not terminate the
+      // WebXR animation loop. Skip only this frame after one sanitation retry.
+      state.sparseRenderDeferrals += 1;
+      return this;
+    }
+  }
+}
+
 function install() {
   if (!ACTIVE || !prototype || state.installed) return state;
   state.installed = true;
   state.installedAt = new Date().toISOString();
   originalCompile = prototype.compile;
   originalCompileAsync = prototype.compileAsync;
+  originalRender = prototype.render;
 
   prototype.compile = function phase358QuestDeferredCompile() {
     state.compileCallsDeferred += 1;
@@ -135,6 +155,8 @@ function install() {
     state.compileAsyncCallsDeferred += 1;
     return this;
   };
+
+  if (typeof originalRender === 'function') prototype.render = safeRender;
 
   window.SVR_PHASE358_SANITIZE_SCENE_MATERIALS = sanitizeSceneMaterials;
   window.SVR_PHASE358_QUEST_SHADER_STATE = state;
@@ -148,6 +170,7 @@ function restore() {
   if (typeof originalCompile === 'function') prototype.compile = safeCompile;
   if (typeof originalCompileAsync === 'function') prototype.compileAsync = safeCompileAsync;
   else delete prototype.compileAsync;
+  if (typeof originalRender === 'function') prototype.render = safeRender;
   state.restored = true;
   state.restoredAt = new Date().toISOString();
   window.SVR_PHASE358_QUEST_SHADER_STATE = state;
@@ -161,6 +184,7 @@ function qa() {
     originalsRestoredAfterReady: state.restored,
     sparseMaterialGuard: typeof window.SVR_PHASE358_SANITIZE_SCENE_MATERIALS === 'function',
     sparseCompileDeferralAvailable: true,
+    sparseRenderDeferralAvailable: true,
     pass: !ACTIVE || state.installed
   };
 }
