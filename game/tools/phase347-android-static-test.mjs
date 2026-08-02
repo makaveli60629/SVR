@@ -35,7 +35,8 @@ requireText(handDriver, "window.SVR_PHASE344_RUN_FULL_HAND_QA = driveHand", 'pha
 requireText(handDriver, "window.SVR_POKER_QA_PASSIVE_BOTS = true", 'driver-enables-passive-bots');
 requireText(handDriver, "delete window.SVR_POKER_QA_PASSIVE_BOTS", 'driver-removes-passive-bot-flag');
 requireText(handDriver, "window.SVR_POKER_QA_PASSIVE_BOTS = previousPassiveMode", 'driver-restores-passive-bot-flag');
-requireText(handDriver, "totalStacks === 6000", 'protected-hand-driver-chip-conservation');
+requireText(handDriver, "window.SVR_PHASE362_CONSTANTS?.TABLE_BANKROLL", 'table-policy-aware-chip-conservation');
+requireText(handDriver, "totalStacks === tableBankroll", 'dynamic-hand-driver-chip-conservation');
 requireText(handDriver, "['preflop', 'flop', 'turn', 'river', 'showdown']", 'hand-driver-all-streets');
 requireText(handDriver, "activeRecord = makeRecord(result.attempts + 1)", 'retry-record-recreation');
 requireText(platform, "phase356_android_real_device_freeze_recovery_lock.js", 'phase356-recovery-module');
