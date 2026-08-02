@@ -1,54 +1,55 @@
 {
   "name": "SVR Poker Android",
   "channel": "stable",
-  "status": "table-status-showdown-ante-refinement-awaiting-owner-playtest",
+  "status": "phase362-continuous-tournament-awaiting-owner-device-playtest",
   "packageName": "com.svrpoker.app",
   "apkVersionName": "0.1.0-rc1",
   "apkVersionCode": 1,
   "apkUrl": "",
   "apkSha256": "",
   "releaseReady": false,
-  "webEntry": "/game/android.html?channel=stable&v=phase357",
+  "webEntry": "/game/android.html?channel=stable&v=phase362",
   "downloadsUrl": "/downloads/",
   "forceUpdate": false,
   "showUpdatePrompt": false,
   "manualUpdateOnly": true,
   "previewEntry": "/game/camera3.html?v=phase350",
-  "currentGameBuild": "PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK",
+  "currentGameBuild": "PHASE-362-CONTINUOUS-10000-TURN-CLOCK-REJOIN-RESET-LOCK",
+  "tablePolicy": {
+    "startingStackPerPlayer": 10000,
+    "players": 6,
+    "tableBankroll": 60000,
+    "turnSeconds": 15,
+    "autoFoldOnTimeout": true,
+    "continuousUntilOneFundedPlayer": true,
+    "championReset": "All six seats restart at 10,000 on the next hand after one funded player remains.",
+    "leaveRejoinReset": "A deliberate table leave followed by rejoin starts a fresh six-player table at 10,000 each.",
+    "humanBustBehavior": "The remaining funded players continue until a champion exists; the table does not reset merely because the human stack reaches zero."
+  },
   "browserAcceptance": {
-    "passed": true,
-    "workflow": "Phase 354 Android Full Game Acceptance",
+    "priorCompleteGamePassed": true,
+    "priorWorkflow": "Phase 354 Android Full Game Acceptance",
     "viewport": "412x915",
     "androidUserAgent": true,
-    "attempts": 1,
     "phases": ["preflop", "flop", "turn", "river", "showdown"],
     "holeCards": 2,
     "communityCards": 5,
     "burnCards": 3,
     "winnerRecorded": true,
     "settledPotRecorded": true,
-    "totalTableChips": 6000,
     "nextHandAdvanced": true,
     "singleControllerPassed": true,
     "legacyControllerRoots": 0,
-    "externalVirtualSticks": 0,
     "tableLogoPassed": true,
-    "raisedPotDisplayPassed": true
+    "raisedPotDisplayPassed": true,
+    "phase362PolicyAcceptancePending": true
   },
   "realDeviceValidation": {
-    "phase": 357,
+    "phase": 362,
     "passed": false,
     "pending": true,
     "ownerPlaytestRequired": true,
-    "target": "Verify SIT moves the camera to the table edge, turn and bet indicators remain readable, showdown identifies the winner and winning cards, and ANTE UP starts the next hand.",
-    "changes": [
-      "Corrects the actual Android camera world position after SIT and RECENTER",
-      "Shows the active player, current bet, amount to call, and last action",
-      "Shows all six players' current hand bets and most recent actions",
-      "Shows winner, settled pot, winning hand name, winner hole cards, and board",
-      "Shows an immediate ANTE UP / NEXT HAND prompt after showdown",
-      "Preserves the Phase 356 freeze recovery and Phase 347 single controller"
-    ]
+    "target": "Verify the Android table starts at 10,000 per seat, the visible 15-second clock follows every active player, timeout folds occur, continuous hands do not freeze, and leave/rejoin restores a fresh 10,000-chip table."
   },
   "nextApkVersionName": "0.1.0-rc2",
   "nextApkVersionCode": 2,
@@ -56,12 +57,10 @@
   "updateMessage": "An optional SVR Poker Android update is available.",
   "updateMenuPolicy": "Hidden unless releaseReady is true, apkUrl is non-empty, and apkVersionCode is newer than the installed code.",
   "notes": [
-    "Phase 357 changes the remotely loaded Android web runtime and does not require reinstalling APK 0.1.0-rc1.",
-    "The owner reported that SIT did not move the view close enough and that turn, bet, winner, winning-hand, and next-hand information was missing.",
-    "Phase 357 measures the camera in world space and moves the rig by the exact camera-to-seat delta.",
-    "The authoritative Phase 336 state remains the source for turns, bets, pots, winners, cards, and hand labels.",
-    "The showdown prompt uses the phrase ANTE UP while accurately stating that the next hand is a $10 / $20 blind hand.",
-    "APK version name 0.1.0-rc1, version code 1, manual-update-only, forceUpdate false, and showUpdatePrompt false remain locked.",
-    "No native Android wrapper source, signing identity, or installable RC2 APK is currently present in the repository."
+    "Phase 362 changes the remotely loaded Android web runtime and does not require reinstalling APK 0.1.0-rc1.",
+    "Phase 347 remains the only Android MOVE, LOOK, and poker-button controller.",
+    "Phase 336 remains the poker rules and settlement authority.",
+    "Phase 362 adds tournament policy, a cross-platform turn clock, timeout folds, champion reset, and deliberate leave/rejoin reset.",
+    "APK version name 0.1.0-rc1, version code 1, manual-update-only, forceUpdate false, and showUpdatePrompt false remain locked."
   ]
 }
