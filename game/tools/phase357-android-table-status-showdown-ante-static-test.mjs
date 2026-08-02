@@ -6,6 +6,7 @@ const directCamera = read('game/modules/phase357_android_direct_camera_seat_fix.
 const continuity = read('game/modules/phase359_dual_platform_gameplay_continuity_lock.js');
 const shuffle = read('game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
 const phase363 = read('game/modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
+const consistency = read('game/modules/phase363_android_settlement_lobby_consistency_lock.js');
 const android = read('game/android.html');
 const manifest = JSON.parse(read('game/manifest.json'));
 const release = JSON.parse(read('game/android-release.json'));
@@ -47,9 +48,6 @@ requireText(directCamera, "'seat-transition' : 'seated-watchdog'", 'seat-transit
 requireText(directCamera, 'window.SVR_PHASE357_DIRECT_CAMERA_CORRECT', 'direct-camera-api');
 requireText(directCamera, 'window.SVR_PHASE357_DIRECT_CAMERA_QA', 'direct-camera-qa');
 
-// Preserve the historical continuity modules for Quest/desktop and regression
-// coverage, but Phase 363 deliberately excludes them from Android boot because
-// they can restart a hand before the player presses JOIN TABLE.
 requireText(continuity, 'PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK', 'phase359-continuity-build');
 requireText(shuffle, 'PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK', 'phase360-shuffle-build');
 requireText(phase363, 'PHASE-363-ANDROID-INTEGRATED-LOBBY-AUDIO-GYRO-BANKROLL-LOCK', 'phase363-build');
@@ -57,6 +55,9 @@ requireText(phase363, 'const STARTING_STACK = 15000', 'phase363-starting-stack')
 requireText(phase363, 'function prepareLobby', 'phase363-lobby-state');
 requireText(phase363, 'function joinTable', 'phase363-join-state');
 requireText(phase363, 'function leaveTable', 'phase363-leave-state');
+requireText(consistency, 'PHASE-363-ANDROID-SETTLEMENT-LOBBY-CONSISTENCY-LOCK', 'phase363-consistency-build');
+requireText(consistency, 'effectiveTableChips', 'settled-chip-accounting');
+requireText(consistency, 'enforceLobbyCardClear', 'lobby-card-clear');
 
 const bootIndex = android.indexOf("await bootPlatform({forcedPlatform:'android'})");
 const tableIndex = android.indexOf('phase363_android_canonical_table_asset_lock.js');
@@ -64,11 +65,13 @@ const phase357Index = android.indexOf('phase357_android_table_status_showdown_an
 const directCameraIndex = android.indexOf('phase357_android_direct_camera_seat_fix.js');
 const phase363Index = android.indexOf('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
 const joinCaptureIndex = android.indexOf('phase363_android_join_control_capture_lock.js');
+const consistencyIndex = android.indexOf('phase363_android_settlement_lobby_consistency_lock.js');
 if (bootIndex < 0 || tableIndex <= bootIndex) errors.push('verified-table-must-load-after-platform-boot');
 if (phase357Index <= tableIndex) errors.push('phase357-must-load-after-verified-table');
 if (directCameraIndex <= phase357Index) errors.push('direct-camera-fix-must-load-after-phase357');
 if (phase363Index <= directCameraIndex) errors.push('phase363-must-load-after-direct-camera-fix');
-if (joinCaptureIndex <= phase363Index) errors.push('join-capture-must-load-last');
+if (joinCaptureIndex <= phase363Index) errors.push('join-capture-must-load-after-core');
+if (consistencyIndex <= joinCaptureIndex) errors.push('consistency-must-load-last');
 if (android.includes('phase359_dual_platform_gameplay_continuity_lock.js')) errors.push('phase359-must-not-auto-run-before-join');
 if (android.includes('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js')) errors.push('phase360-must-not-auto-run-before-join');
 requireText(android, 'data-build="PHASE-363-ANDROID-INTEGRATED-LOBBY-AUDIO-GYRO-BANKROLL-LOCK"', 'android-page-build');
@@ -100,6 +103,7 @@ console.log(JSON.stringify({
   successorRelease: manifest.build,
   closeSeat: 'direct-non-xr-camera-to-south-table-edge-with-xr-rig-preserved',
   androidContinuation: 'phase363-join-gated-fresh-15000-chip-table',
+  settlement: 'effective settled stacks prevent contribution double-counting',
   historicalContinuityProtected: ['phase359', 'phase360'],
   apk: {
     versionName: release.apkVersionName,
