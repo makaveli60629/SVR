@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
@@ -9,11 +8,8 @@ const ACTIVE = (window.SVR_PLATFORM || '').toLowerCase() === 'android'
   || /\/game\/android\.html$/i.test(location.pathname)
   || (/Android/i.test(navigator.userAgent || '') && !/Quest|Oculus|Meta Quest/i.test(navigator.userAgent || ''));
 const CANDIDATES = [
-  { url: new URL('../assets/table.obj', import.meta.url).href, format: 'obj' },
-  { url: new URL('../assets/table.glb', import.meta.url).href, format: 'glb' },
-  { url: new URL('../assets/table.fbx', import.meta.url).href, format: 'fbx' },
-  { url: new URL('../assets/models/table.glb', import.meta.url).href, format: 'glb' },
-  { url: new URL('../assets/models/table.fbx', import.meta.url).href, format: 'fbx' }
+  { url: new URL('../assets/models/table.glb', import.meta.url).href, format: 'glb', verified: true },
+  { url: new URL('../assets/table.fbx', import.meta.url).href, format: 'fbx', verified: true }
 ];
 const TARGET_LENGTH = 4.28;
 const TARGET_DEPTH = 2.18;
@@ -140,16 +136,13 @@ function removeCompetingTables(root) {
   safeWalk(root, (object) => {
     const name = String(object?.name || '');
     if (!name) return;
-    if (/PHASE326_ANDROID_TABLE_FALLBACK|PHASE155_ENHANCED_REAL_TABLE_FALLBACK|PHASE200_INTENDED_LOBBY_POKER_TABLE_LOCKED|PHASE159_FBX_TABLE_FLAT_SCALE_FIX_ROOT|PHASE158_ACTUAL_FBX_TABLE_SCALE_ROOT|PHASE157_ACTUAL_FBX_TABLE_ROOT|PHASE358_QUEST_TABLE_FALLBACK|PHASE363_ANDROID_CANONICAL_TABLE_CONTAINER/.test(name)) {
-      remove.push(object);
-    }
+    if (/PHASE326_ANDROID_TABLE_FALLBACK|PHASE155_ENHANCED_REAL_TABLE_FALLBACK|PHASE200_INTENDED_LOBBY_POKER_TABLE_LOCKED|PHASE159_FBX_TABLE_FLAT_SCALE_FIX_ROOT|PHASE158_ACTUAL_FBX_TABLE_SCALE_ROOT|PHASE157_ACTUAL_FBX_TABLE_ROOT|PHASE358_QUEST_TABLE_FALLBACK|PHASE363_ANDROID_CANONICAL_TABLE_CONTAINER/.test(name)) remove.push(object);
   });
   for (const object of remove) object.removeFromParent?.();
   runtime.removedCompetingTables += remove.length;
 }
 
 async function loadCandidate(candidate) {
-  if (candidate.format === 'obj') return new OBJLoader().loadAsync(candidate.url);
   if (candidate.format === 'fbx') return new FBXLoader().loadAsync(candidate.url);
   const loaded = await new GLTFLoader().loadAsync(candidate.url);
   return loaded.scene || loaded.scenes?.[0] || null;
