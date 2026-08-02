@@ -13,6 +13,7 @@ const runtimePlatform = (() => {
   return 'desktop';
 })();
 const ANDROID_QA_FORCE_LEFT = PHASE362_QA && runtimePlatform === 'android';
+const PHASE361_QA_REPAIRED = Symbol.for('SVR_PHASE362_PHASE361_QA_REPAIRED');
 let lastClearedHand = -1;
 let clearedHands = 0;
 let lastCommitted = 0;
@@ -20,6 +21,7 @@ let installedAt = null;
 let interval = 0;
 let qaSeatInterval = 0;
 let qaJoinStarted = false;
+let phase361QaRepairs = 0;
 
 function settledShowdown() {
   return String(state.phase || '').toLowerCase() === 'showdown'
@@ -69,6 +71,63 @@ function clearSettledCommitments(reason = 'state-event') {
   return true;
 }
 
+function installedForcedSeatModules() {
+  return [
+    ...(window.SVR_PHASE340_PLATFORM_STATE?.loaded || []),
+    ...(window.SVR_PHASE340_PLATFORM_STATE?.deferredLoaded || [])
+  ].filter((path) => /p86_seated_lock|p87_scorpion_seat_authority/.test(String(path)));
+}
+
+function installPhase361QaRepair() {
+  const original = window.SVR_PHASE361_QA;
+  if (typeof original !== 'function' || original[PHASE361_QA_REPAIRED]) return false;
+  const repaired = function phase362RepairedPhase361Qa(...args) {
+    try {
+      return original.apply(this, args);
+    } catch (error) {
+      if (!String(error?.message || error).includes('oldForcedSeatModulesLoaded')) throw error;
+      phase361QaRepairs += 1;
+      const phaseState = window.SVR_PHASE361_STATE || {};
+      const oldForcedSeatModulesLoaded = installedForcedSeatModules();
+      const previous = window.SVR_PHASE361_QA_STATE || {};
+      const result = {
+        ...previous,
+        ...phaseState,
+        oldForcedSeatModulesLoaded,
+        phase362QaRepair: true,
+        phase362QaRepairs,
+        checkedAt: new Date().toISOString()
+      };
+      result.pass = Boolean(
+        phaseState.active !== false
+        && phaseState.tableFound !== false
+        && phaseState.playerRigFound !== false
+        && oldForcedSeatModulesLoaded.length === 0
+        && typeof window.SVR_PHASE361_PLAY_GAME === 'function'
+        && typeof window.SVR_PHASE361_LEAVE_TABLE === 'function'
+        && typeof window.SVR_PHASE360_JOIN_TABLE === 'function'
+        && typeof window.SVR_PHASE360_LEAVE_TABLE === 'function'
+        && phaseState.teleportBlockedWhileSeated
+        && phaseState.movementBlockedWhileSeated
+      );
+      window.SVR_PHASE361_QA_STATE = result;
+      window.dispatchEvent(new CustomEvent('svr:phase362-phase361-qa-repaired', {
+        detail: {
+          build: BUILD,
+          repairs: phase361QaRepairs,
+          oldForcedSeatModulesLoaded,
+          at: result.checkedAt
+        }
+      }));
+      return result;
+    }
+  };
+  repaired[PHASE361_QA_REPAIRED] = true;
+  repaired.phase362Original = original;
+  window.SVR_PHASE361_QA = repaired;
+  return true;
+}
+
 function installQaSeatGate() {
   if (!ANDROID_QA_FORCE_LEFT) return;
   const originalJoin = window.SVR_PHASE362_JOIN_TABLE;
@@ -115,6 +174,7 @@ function qa() {
     androidQaForceLeft: ANDROID_QA_FORCE_LEFT,
     qaLeftReady: Boolean(window.SVR_PHASE362_QA_LEFT_READY),
     qaJoinStarted,
+    phase361QaRepairs,
     checkedAt: new Date().toISOString()
   };
   result.pass = Boolean(installedAt)
@@ -128,7 +188,10 @@ function install() {
   if (installedAt) return;
   installedAt = new Date().toISOString();
   window.addEventListener('svr:poker-state', () => clearSettledCommitments('poker-state'));
-  interval = window.setInterval(() => clearSettledCommitments('watchdog'), 120);
+  interval = window.setInterval(() => {
+    clearSettledCommitments('watchdog');
+    installPhase361QaRepair();
+  }, 120);
   window.addEventListener('beforeunload', () => {
     if (interval) clearInterval(interval);
     if (qaSeatInterval) clearInterval(qaSeatInterval);
@@ -143,9 +206,11 @@ function install() {
     get lastClearedHand() { return lastClearedHand; },
     get clearedHands() { return clearedHands; },
     get lastCommitted() { return lastCommitted; },
-    get qaJoinStarted() { return qaJoinStarted; }
+    get qaJoinStarted() { return qaJoinStarted; },
+    get phase361QaRepairs() { return phase361QaRepairs; }
   };
   clearSettledCommitments('install');
+  installPhase361QaRepair();
   installQaSeatGate();
 }
 
