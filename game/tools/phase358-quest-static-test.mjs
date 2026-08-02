@@ -12,6 +12,7 @@ const errors = [];
 const manifest = read('game/modules/phase340_platform_manifest.js');
 const loader = read('game/modules/phase340_platform_core_loader.js');
 const index = read('game/index.html');
+const continuity = read('game/modules/phase359_dual_platform_gameplay_continuity_lock.js');
 const shader = read('game/modules/phase358_quest_incremental_shader_compile_lock.js');
 const boot = read('game/modules/phase358_quest_runtime_boot_lock.js');
 const table = read('game/modules/phase358_quest_uploaded_table_authority_lock.js');
@@ -57,8 +58,16 @@ requireText(loader, "window.addEventListener('svr:phase358-acceptance'", 'Accept
 requireText(loader, 'phase358: window.SVR_PHASE358_QA?.() || null', 'Phase 358 audit', errors);
 
 requireText(index, 'PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK', 'Quest page build', errors);
-requireText(index, 'phase340_platform_core_loader.js?v=phase358', 'Quest page cache version', errors);
-requireText(index, "?channel=stable&v=phase357", 'Android route preservation', errors);
+requireText(index, 'data-release="PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK"', 'Quest successor release', errors);
+requireText(index, 'phase340_platform_core_loader.js?v=phase359', 'Quest page cache version', errors);
+requireText(index, '?channel=stable&v=phase359', 'Android route preservation', errors);
+requireText(index, 'phase359_dual_platform_gameplay_continuity_lock.js?v=phase359', 'Quest continuity successor', errors);
+if (index.indexOf('await bootPlatform()') > index.indexOf('phase359_dual_platform_gameplay_continuity_lock.js')) errors.push('Phase 359 must load after Quest platform boot');
+
+requireText(continuity, 'PHASE359_QUEST_WINNER_CARDS_AMOUNT_PANEL', 'Quest winner board successor', errors);
+requireText(continuity, 'NEXT HAND IN', 'Quest continuous-hand successor', errors);
+requireText(continuity, 'getHand', 'Meta hand audit preserved', errors);
+requireText(continuity, 'getController', 'Controller fallback audit preserved', errors);
 
 requireText(shader, 'WebGLRenderer?.prototype', 'Shader prototype authority', errors);
 requireText(shader, 'phase358QuestDeferredCompileAsync', 'Shader async deferral', errors);
@@ -70,7 +79,7 @@ requireText(boot, 'renderer.setPixelRatio(Math.min', 'Quest pixel budget', error
 requireText(boot, 'renderer.xr.enabled = true', 'Quest WebXR enabled', errors);
 requireText(boot, 'removeAndroidControls', 'Android control removal', errors);
 
-requireText(table, "../assets/table.fbx", 'Uploaded table asset', errors);
+requireText(table, '../assets/table.fbx', 'Uploaded table asset', errors);
 requireText(table, 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED', 'Uploaded table name', errors);
 requireText(table, 'PHASE358_QUEST_UPLOADED_ASSET_CONTAINER', 'Uploaded table container', errors);
 requireText(table, 'removeCompetingTables', 'Competing table removal', errors);
@@ -89,7 +98,6 @@ requireText(acceptance, 'turnKey !== lastSubmittedTurnKey', 'One action per turn
 requireText(acceptance, "['preflop', 'flop', 'turn', 'river', 'showdown']", 'Full hand streets', errors);
 requireText(acceptance, 'totalStacks === 6000', 'Chip conservation', errors);
 requireText(acceptance, 'physicalQuestSessionTested', 'Physical Quest truth', errors);
-requireText(acceptance, 'server', 'noop', []);
 forbidText(acceptance, 'window.SVR_POKER_ACTION(action)', 'Wrapped action acceptance bug', errors);
 
 if (questRelease.phase !== 358 || questRelease.build !== 'PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK') errors.push('Quest release build mismatch');
@@ -109,6 +117,7 @@ if (errors.length) {
 console.log(JSON.stringify({
   pass: true,
   build: questRelease.build,
+  successorRelease: 'PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK',
   criticalBoot: 'shader deferral, runtime, main, uploaded table, poker presentation, hands and gestures, settlement, acceptance',
   deferred: 'lobby polish, account activity, avatar, and presence after table ready',
   acceptance: {

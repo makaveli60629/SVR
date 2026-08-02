@@ -31,7 +31,7 @@ const { chromium } = require('playwright');
     if (request.url().startsWith(base)) requestFailures.push({ url: request.url(), error: request.failure()?.errorText || 'failed' });
   });
 
-  const url = `${base}/game/android.html?channel=stable&manual=1&v=phase357`;
+  const url = `${base}/game/android.html?channel=stable&manual=1&v=phase359`;
   let report = null;
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
@@ -63,30 +63,43 @@ const { chromium } = require('playwright');
       winners: document.getElementById('svr357WinnerDetails')?.textContent || '',
       board: document.getElementById('svr357Board')?.textContent || '',
       anteVisible: Boolean(document.getElementById('svr357Ante')?.offsetParent),
+      phase359PanelVisible: Boolean(document.getElementById('svr359AndroidResult')?.offsetParent),
       turnPanel: document.getElementById('svr357TurnPanel')?.textContent || '',
       betIndicators: document.querySelectorAll('.svr357Bet').length,
       state: window.SVR_PHASE357_STATE || null
     }));
 
-    await page.locator('#svr357Ante').click();
+    const continuationAuthority = await page.evaluate(() => {
+      if (typeof window.SVR_PHASE359_NEXT_HAND === 'function') {
+        return { authority: 'phase359', accepted: window.SVR_PHASE359_NEXT_HAND() !== false };
+      }
+      if (typeof window.SVR_PHASE357_ANTE_UP === 'function') {
+        return { authority: 'phase357-api', accepted: window.SVR_PHASE357_ANTE_UP() !== false };
+      }
+      document.getElementById('svr357Ante')?.click();
+      return { authority: 'phase357-button', accepted: true };
+    });
+
     await page.waitForFunction((previous) => (
       Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0) > previous
       && window.SVR_PHASE336_POKER_STATE?.phase === 'preflop'
     ), showdown.handNo, { timeout: 10000 });
 
-    const continuation = await page.evaluate((previous) => ({
+    const continuation = await page.evaluate(({ previous, authority }) => ({
       previous,
       current: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0),
       phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
       advanced: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0) > previous,
+      authority,
       qa: window.SVR_PHASE357_QA?.() || null
-    }), showdown.handNo);
+    }), { previous: showdown.handNo, authority: continuationAuthority.authority });
 
     report = {
       url,
       seated,
       hand,
       showdown,
+      continuationAuthority,
       continuation,
       pageErrors,
       consoleErrors,
@@ -110,6 +123,8 @@ const { chromium } = require('playwright');
     && /BOARD:/i.test(report?.showdown?.board || '')
     && report?.showdown?.anteVisible === true
     && report?.showdown?.betIndicators === 6
+    && report?.continuationAuthority?.accepted === true
+    && ['phase359', 'phase357-api', 'phase357-button'].includes(report?.continuationAuthority?.authority)
     && report?.continuation?.advanced === true
     && report?.continuation?.phase === 'preflop'
     && pageErrors.length === 0

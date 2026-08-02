@@ -1,4 +1,4 @@
-const SVR_CACHE = 'svr-pwa-phase357-android-table-status-showdown-ante';
+const SVR_CACHE = 'svr-pwa-phase359-dual-platform-gameplay-continuity';
 const SVR_SHELL = [
   '/',
   '/index.html',
