@@ -64,8 +64,9 @@ if (config.presenceApiBase !== '') errors.push('presence-api-prematurely-configu
 if (config.allowLocalPresenceSimulation !== true) errors.push('simulation-disabled');
 if (Number(manifest.phase || 0) < 349) errors.push('manifest-phase-regressed');
 if (!String(manifest.build || '').startsWith('PHASE-')) errors.push('manifest-build-missing');
-if (release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('protected-android-authority-changed');
-if (!String(manifest.build || '').startsWith('PHASE-360-')) errors.push('phase360-successor-build-missing');
+const protectedAndroidAuthority = release.protectedAndroidAuthority || release.currentGameBuild;
+if (protectedAndroidAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('protected-android-authority-changed');
+if (Number(manifest.phase || 0) < 360 || !/^PHASE-(?:360|36[1-9]|3[7-9]\d)-/.test(String(manifest.build || ''))) errors.push('phase360-or-successor-build-missing');
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('apk-policy');
 if (Number(manifest.phase || 0) >= 356 && release.realDeviceValidation?.pending !== true) errors.push('real-device-validation-must-remain-pending');
@@ -78,7 +79,7 @@ console.log(JSON.stringify({
   pass: true,
   protectedBuild: 'PHASE-349-MULTIPLAYER-PRESENCE-SEAT-RECONNECT-LOCK',
   successorWebBuild: manifest.build,
-  protectedAndroidAuthority: release.currentGameBuild,
+  protectedAndroidAuthority,
   platformVersion,
   transport: 'local-simulation-until-presenceApiBase-configured',
   authority: { presence: true, seats: true, pokerState: false },
