@@ -9,6 +9,7 @@ const html = read('game/android.html');
 const core = read('game/modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
 const table = read('game/modules/phase363_android_canonical_table_asset_lock.js');
 const join = read('game/modules/phase363_android_join_control_capture_lock.js');
+const consistency = read('game/modules/phase363_android_settlement_lobby_consistency_lock.js');
 const manifest = JSON.parse(read('game/manifest.json'));
 const release = JSON.parse(read('game/android-release.json'));
 const profile = read('site/profile.html');
@@ -20,7 +21,13 @@ assert(html.includes('SVR_TABLE_STARTING_STACK=15000'), 'Android starting stack 
 assert(html.includes('phase363_android_canonical_table_asset_lock.js'), 'Canonical table authority is not loaded');
 assert(html.includes('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js'), 'Integrated Android core is not loaded');
 assert(html.includes('phase363_android_join_control_capture_lock.js'), 'Final JOIN capture authority is not loaded');
-assert(!html.includes("phase362_continuous_10000_turn_clock_rejoin_reset_lock.js"), 'Legacy 10,000-chip module still loads on Android');
+assert(html.includes('phase363_android_settlement_lobby_consistency_lock.js'), 'Settlement/lobby consistency authority is not loaded');
+assert(!html.includes('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js'), 'Legacy 10,000-chip module still loads on Android');
+
+const coreIndex = html.indexOf('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
+const joinIndex = html.indexOf('phase363_android_join_control_capture_lock.js');
+const consistencyIndex = html.indexOf('phase363_android_settlement_lobby_consistency_lock.js');
+assert(coreIndex >= 0 && joinIndex > coreIndex && consistencyIndex > joinIndex, 'Phase 363 final Android authority order is incorrect');
 
 assert(core.includes('const STARTING_STACK = 15000'), 'Integrated core starting stack is not 15,000');
 assert(core.includes('const TABLE_BANKROLL = STARTING_STACK * players.length'), 'Integrated core does not calculate table bankroll');
@@ -40,14 +47,21 @@ assert(core.includes('seatParallax'), 'Seated lateral parallax is missing');
 assert(core.includes('BANKROLL 15,000'), 'Visible bankroll HUD is missing');
 assert(core.includes('JOIN TABLE TO RECEIVE CARDS'), 'Lobby no-card instruction is missing');
 
-assert(table.includes("../assets/models/table.glb"), 'Verified GLB table is not first candidate');
-assert(table.includes("../assets/table.fbx"), 'Verified FBX fallback is missing');
-assert(!table.includes("../assets/table.obj"), 'Unverified OBJ path would generate a failed request');
+assert(table.includes('../assets/models/table.glb'), 'Verified GLB table is not first candidate');
+assert(table.includes('../assets/table.fbx'), 'Verified FBX fallback is missing');
+assert(!table.includes('../assets/table.obj'), 'Unverified OBJ path would generate a failed request');
 assert(table.includes('PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED'), 'Uploaded table authority name is missing');
 
 assert(join.includes("window.addEventListener('pointerdown'"), 'JOIN capture listener is missing');
 assert(join.includes('event.stopImmediatePropagation()'), 'JOIN capture does not block duplicate legacy handlers');
 assert(join.includes('visible.length === 1'), 'JOIN gate does not require one visible control');
+assert(join.includes("'LEAVE TABLE' : 'JOIN TABLE'"), 'JOIN/LEAVE label authority is missing');
+
+assert(consistency.includes('effectiveTableChips'), 'Settled chip accounting is missing');
+assert(consistency.includes('settledHand ? 0 : committedChips'), 'Settled contributions are still double-counted');
+assert(consistency.includes('enforceLobbyCardClear'), 'Lobby engine-card cleanup is missing');
+assert(consistency.includes('installAuditWrapper'), 'Lobby poker audit wrapper is missing');
+assert(consistency.includes('engineHandsCleared'), 'Engine hand-clear QA is missing');
 
 assert(manifest.phase === 363, 'Manifest phase is not 363');
 assert(manifest.starting_stack === 15000, 'Manifest starting stack is not 15,000');
@@ -74,6 +88,8 @@ console.log(JSON.stringify({
   startingStack: manifest.starting_stack,
   tableBankroll: manifest.table_bankroll,
   joinRequired: manifest.join_required_before_deal,
+  settledChipAccounting: true,
+  lobbyEngineCardsCleared: true,
   audioFallback: manifest.web_audio_synth_fallback,
   gyroTouchHybrid: manifest.gyro_touch_hybrid,
   profileShowroomProtected: true,
