@@ -2,7 +2,7 @@
   "name": "SVR Poker Android + Quest Gameplay Release",
   "phase": 359,
   "build": "PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK",
-  "status": "joint-browser-acceptance-pending",
+  "status": "joint-browser-acceptance-passed",
   "routes": {
     "android": "/game/android.html?channel=stable&v=phase359",
     "quest": "/game/index.html?platform=quest&v=phase359"
@@ -24,9 +24,11 @@
   },
   "table": {
     "sourceAsset": "game/assets/table.fbx",
+    "sourceAssetBytes": 596272,
     "questAuthority": "PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED",
     "questFallbackAccepted": false,
-    "androidCanonicalPresentation": "PHASE341_CANONICAL_TABLE_PRESENTATION_ROOT"
+    "androidCanonicalPresentation": "PHASE341_CANONICAL_TABLE_PRESENTATION_ROOT",
+    "objAssetPresent": false
   },
   "requiredResultPresentation": {
     "winnerName": true,
@@ -49,10 +51,55 @@
   },
   "acceptance": {
     "workflow": "Phase 359 Dual Platform Gameplay Continuity",
-    "pending": true,
-    "passed": false,
-    "androidFullHand": null,
-    "questFullHand": null
+    "runId": 30759186378,
+    "pending": false,
+    "passed": true,
+    "androidFullHand": {
+      "passed": true,
+      "viewport": "412x915",
+      "phases": ["preflop", "flop", "turn", "river", "showdown"],
+      "holeCards": 2,
+      "communityCards": 5,
+      "settledPot": 120,
+      "winners": [
+        { "name": "YOU", "amount": 40, "hand": "Straight", "cards": ["4♣", "J♣"] },
+        { "name": "ROOK", "amount": 40, "hand": "Straight", "cards": ["4♦", "K♦"] },
+        { "name": "ACE", "amount": 40, "hand": "Straight", "cards": ["5♣", "4♥"] }
+      ],
+      "board": ["3♥", "6♣", "7♦", "2♣", "5♦"],
+      "totalTableChips": 6000,
+      "fundedPlayers": 6,
+      "controllerRoots": 1,
+      "legacyControllerRoots": 0,
+      "leftMapsLeft": true,
+      "rightMapsRight": true,
+      "nextHand": { "previous": 1, "current": 2, "advanced": true },
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "sameOriginHttpErrors": 0,
+      "requestFailures": 0
+    },
+    "questFullHand": {
+      "passed": true,
+      "questUserAgent": true,
+      "startupMs": 19572.8,
+      "phases": ["preflop", "flop", "turn", "river", "showdown"],
+      "holeCards": 2,
+      "communityCards": 5,
+      "winner": { "name": "VEGA", "amount": 120, "hand": "Trips" },
+      "settledPot": 120,
+      "totalTableChips": 6000,
+      "fundedPlayers": 6,
+      "uploadedTableAuthority": true,
+      "fallbackTablePresent": false,
+      "metaHandsPrimary": true,
+      "controllerFallback": true,
+      "nextHand": { "previous": 1, "current": 2, "advanced": true },
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "sameOriginHttpErrors": 0,
+      "requestFailures": 0
+    }
   },
   "productTruth": {
     "localPlayMoneyVsFiveBots": true,
