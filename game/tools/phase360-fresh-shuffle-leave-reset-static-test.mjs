@@ -5,11 +5,13 @@ const read = (file) => fs.readFileSync(file, 'utf8');
 const runtime = read('game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
 const guard = read('game/modules/phase360_table_conservation_next_guard_lock.js');
 const phase361 = read('game/modules/phase361_quest_lobby_play_seat_watch_npc_lock.js');
+const phase363 = read('game/modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
 const android = read('game/android.html');
 const quest = read('game/index.html');
 const gesture = read('game/modules/phase334_table_layout_gesture_poker_lock.js');
 const engine = read('game/modules/phase336_authoritative_engine.js');
 const manifest = JSON.parse(read('game/manifest.json'));
+const release = JSON.parse(read('game/android-release.json'));
 
 assert.match(runtime, /PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK/);
 assert.match(runtime, /crypto\.getRandomValues/);
@@ -54,17 +56,27 @@ assert.match(gesture, /function releaseCard/);
 assert.match(gesture, /pointer\.down/);
 assert.match(gesture, /window\.SVR_POKER_ACTION\?\.\("fold"\)/);
 
-assert.match(android, /data-release="PHASE-(?:360|36[1-9]|3[7-9]\d)-/);
-assert.match(android, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase(?:360|36[1-9]|3[7-9]\d)/);
-assert.match(android, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase(?:360|36[1-9]|3[7-9]\d)/);
-assert.match(android, /phase360_table_conservation_next_guard_lock\.js\?v=phase(?:360|36[1-9]|3[7-9]\d)/);
-const android359 = android.indexOf('phase359_dual_platform_gameplay_continuity_lock.js');
-const android360 = android.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
-const androidGuard = android.indexOf('phase360_table_conservation_next_guard_lock.js');
-const androidSuccessor = android.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
-assert.ok(android359 < android360, 'Android Phase 360 must load after Phase 359');
-assert.ok(android360 < androidGuard, 'Android conservation guard must load after Phase 360 core');
-assert.ok(androidSuccessor < 0 || androidGuard < androidSuccessor, 'Android successor policy must load after conservation guard');
+// Android no longer auto-loads Phase 359/360 because it must not start or
+// resume a hand before the player presses JOIN TABLE. Phase 363 provides the
+// fresh 15,000-chip Android session. Phase 360 remains active and protected on
+// Quest/desktop.
+assert.match(android, /data-release="PHASE-363-ANDROID-CANONICAL-TABLE-JOIN-BANKROLL-AUDIO-LOCK"/);
+assert.match(android, /phase363_android_canonical_table_asset_lock\.js\?v=phase363/);
+assert.match(android, /phase363_android_integrated_lobby_audio_gyro_bankroll_lock\.js\?v=phase363/);
+assert.match(android, /phase363_android_join_control_capture_lock\.js\?v=phase363/);
+assert.doesNotMatch(android, /phase359_dual_platform_gameplay_continuity_lock\.js/);
+assert.doesNotMatch(android, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js/);
+assert.doesNotMatch(android, /phase360_table_conservation_next_guard_lock\.js/);
+assert.match(phase363, /const STARTING_STACK = 15000/);
+assert.match(phase363, /const TABLE_BANKROLL = STARTING_STACK \* players\.length/);
+assert.match(phase363, /clearSavedHand/);
+assert.match(phase363, /resetTable\(STARTING_STACK\)/);
+assert.match(phase363, /function prepareLobby/);
+assert.match(phase363, /function joinTable/);
+assert.match(phase363, /function leaveTable/);
+assert.equal(release.tablePolicy.startingStackPerPlayer, 15000);
+assert.equal(release.tablePolicy.tableBankroll, 90000);
+assert.equal(release.tablePolicy.freshTableOnLeaveRejoin, true);
 
 assert.match(quest, /data-release="PHASE-(?:361|36[2-9]|3[7-9]\d)-/);
 assert.match(quest, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/);
@@ -85,9 +97,12 @@ assert.match(phase361, /SVR_PHASE360_JOIN_TABLE/);
 assert.match(phase361, /SVR_PHASE360_LEAVE_TABLE/);
 assert.match(phase361, /SVR_PHASE359_TOGGLE_CONTINUOUS/);
 
-assert.ok(Number(manifest.phase) >= 360);
-assert.match(String(manifest.build), /^PHASE-(?:360|36[1-9]|3[7-9]\d)-/);
-assert.match(String(manifest.start_url), /v=phase(?:360|36[1-9]|3[7-9]\d)/);
+assert.ok(Number(manifest.phase) >= 363);
+assert.match(String(manifest.build), /^PHASE-363-/);
+assert.match(String(manifest.start_url), /v=phase363/);
+assert.equal(manifest.starting_stack, 15000);
+assert.equal(manifest.table_bankroll, 90000);
+assert.equal(manifest.join_required_before_deal, true);
 assert.equal(manifest.apk_version_name, '0.1.0-rc1');
 assert.equal(manifest.apk_version_code, 1);
 assert.equal(manifest.release_ready, false);
@@ -98,12 +113,11 @@ assert.equal(manifest.manual_update_only, true);
 console.log(JSON.stringify({
   pass: true,
   build: manifest.build,
-  random: 'crypto.getRandomValues with synchronous engine-call wrapper',
-  leave: 'deliberate leave clears recovery snapshot and Phase 361 returns Quest to lobby spawn',
-  conservation: 'Phase 360 preserves stack plus committed accounting; active policy selects 6000 legacy or successor bankroll',
-  nextHand: 'rejected until showdown or idle',
-  loop: 'Phase 359 continuation, Phase 360 secure session, and successor tournament policy protected',
-  questSuccessor: 'Phase 361 explicit PLAY GAME and LEAVE TABLE session authority',
+  random: 'phase360 crypto shuffle preserved for Quest and desktop',
+  androidLeave: 'phase363 deliberate leave clears cards and restores fresh 15,000-chip JOIN state',
+  androidConservation: 'phase363 requires 90,000 total test chips',
+  questConservation: 'phase360 stack plus committed accounting preserved',
+  nextHand: 'Phase 336 and protected platform policies remain authoritative',
   metaCards: 'pinch and trigger pickup source contract present; physical headset acceptance pending',
   apk: `${manifest.apk_version_name} (${manifest.apk_version_code})`
 }, null, 2));
