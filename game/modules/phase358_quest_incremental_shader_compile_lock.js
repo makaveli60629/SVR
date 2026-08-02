@@ -17,6 +17,7 @@ const state = {
   materialsInspected: 0,
   materialsReplaced: 0,
   compileRetries: 0,
+  sparseCompileDeferrals: 0,
   installedAt: null,
   restoredAt: null
 };
@@ -87,7 +88,16 @@ function safeCompile(scene, camera, targetScene) {
     if (!sparseMaterialError(error)) throw error;
     state.compileRetries += 1;
     sanitizeSceneMaterials(scene);
-    return originalCompile.call(this, scene, camera, targetScene);
+    try {
+      return originalCompile.call(this, scene, camera, targetScene);
+    } catch (retryError) {
+      if (!sparseMaterialError(retryError)) throw retryError;
+      // compile() is an optimization. If a malformed late-loaded FBX material
+      // still reaches Three.js after sanitation, defer that shader to the
+      // normal render pass instead of crashing the Quest page.
+      state.sparseCompileDeferrals += 1;
+      return this;
+    }
   }
 }
 
@@ -99,7 +109,13 @@ async function safeCompileAsync(scene, camera, targetScene) {
     if (!sparseMaterialError(error)) throw error;
     state.compileRetries += 1;
     sanitizeSceneMaterials(scene);
-    return originalCompileAsync.call(this, scene, camera, targetScene);
+    try {
+      return await originalCompileAsync.call(this, scene, camera, targetScene);
+    } catch (retryError) {
+      if (!sparseMaterialError(retryError)) throw retryError;
+      state.sparseCompileDeferrals += 1;
+      return this;
+    }
   }
 }
 
@@ -144,6 +160,7 @@ function qa() {
     incrementalDuringCriticalBoot: state.installed,
     originalsRestoredAfterReady: state.restored,
     sparseMaterialGuard: typeof window.SVR_PHASE358_SANITIZE_SCENE_MATERIALS === 'function',
+    sparseCompileDeferralAvailable: true,
     pass: !ACTIVE || state.installed
   };
 }
