@@ -37,7 +37,6 @@ assert(runtime.includes('controller-select'), 'Controller selection path missing
 assert(runtime.includes('hand-pinch'), 'Hand pinch selection path missing');
 assert(runtime.includes('svrPhase361FacesTable'), 'NPC face-table marker missing');
 assert(runtime.includes('svrPhase361Textured'), 'NPC texture marker missing');
-assert(runtime.includes('crypto') === false || true, 'Runtime parse guard');
 
 assert(!questModules.some((item) => item.endsWith('p86_seated_lock.js')), 'Legacy p86 forced-seat module still loads on Quest');
 assert(!questModules.some((item) => item.endsWith('p87_scorpion_seat_authority.js')), 'Legacy p87 forced-seat module still loads on Quest');
@@ -46,19 +45,22 @@ assert(validation.pass, `Quest manifest validation failed: ${JSON.stringify(vali
 const phase359Index = index.indexOf('phase359_dual_platform_gameplay_continuity_lock.js');
 const phase360Index = index.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
 const phase361Index = index.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js');
+const phase362Index = index.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
 assert(phase359Index >= 0 && phase360Index > phase359Index && phase361Index > phase360Index, 'Phase 361 must load after Phase 359 and Phase 360');
-assert(index.includes('data-release="PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK"'), 'Quest release marker missing from index');
-assert(index.includes('manifest.json?v=phase361'), 'Quest cache version missing');
+assert(phase362Index < 0 || phase362Index > phase361Index, 'Any successor table-policy module must load after Phase 361');
+assert(/data-release="PHASE-(?:361|36[2-9]|3[7-9]\d)-/i.test(index), 'Phase 361 or successor Quest release marker missing from index');
+assert(/manifest\.json\?v=phase(?:361|36[2-9]|3[7-9]\d)/i.test(index), 'Phase 361 or successor Quest cache version missing');
 
-assert(release.phase === 361, 'Quest release phase must be 361');
-assert(release.phase361SessionContract?.startsStandingInLobby === true, 'Lobby-start contract missing');
-assert(release.phase361SessionContract?.playGameButton === true, 'PLAY GAME release contract missing');
-assert(release.phase361SessionContract?.southFrontSeat === true, 'South/front seat contract missing');
-assert(release.phase361SessionContract?.movementLockedWhileSeated === true, 'Seated movement lock contract missing');
-assert(release.phase361SessionContract?.teleportLockedWhileSeated === true, 'Seated teleport lock contract missing');
-assert(release.phase361SessionContract?.headLookPreservedWhileSeated === true, 'Seated head-look contract missing');
-assert(release.phase361SessionContract?.leaveTableButtonRequired === true, 'Leave-table contract missing');
-assert(release.phase361SessionContract?.watchVisibleInLobbyAndSeat === true, 'Watch visibility contract missing');
+const sessionContract = release.phase361SessionContract || release.sessionContract;
+assert(Number(release.phase) >= 361, 'Quest release phase must remain Phase 361 or later');
+assert(sessionContract?.startsStandingInLobby === true, 'Lobby-start contract missing');
+assert(sessionContract?.playGameButton === true, 'PLAY GAME release contract missing');
+assert(sessionContract?.southFrontSeat === true, 'South/front seat contract missing');
+assert(sessionContract?.movementLockedWhileSeated === true, 'Seated movement lock contract missing');
+assert(sessionContract?.teleportLockedWhileSeated === true, 'Seated teleport lock contract missing');
+assert(sessionContract?.headLookPreservedWhileSeated === true, 'Seated head-look contract missing');
+assert(sessionContract?.leaveTableButtonRequired === true, 'Leave-table contract missing');
+assert(sessionContract?.watchVisibleInLobbyAndSeat === true, 'Watch visibility contract missing');
 assert(release.physicalQuestAcceptance?.pending === true, 'Physical Quest acceptance must remain pending');
 assert(release.androidApkPolicy?.versionName === '0.1.0-rc1', 'APK version changed');
 assert(release.androidApkPolicy?.versionCode === 1, 'APK version code changed');
@@ -69,8 +71,11 @@ assert(release.androidApkPolicy?.manualUpdateOnly === true, 'Manual-only APK pol
 console.log(JSON.stringify({
   pass: true,
   build: release.build,
+  phase: release.phase,
   questModuleCount: questModules.length,
   legacyForcedSeatModules: questModules.filter((item) => /p86_seated_lock|p87_scorpion_seat_authority/.test(item)),
-  loadOrder: ['phase359', 'phase360', 'phase361'],
+  loadOrder: phase362Index > phase361Index
+    ? ['phase359', 'phase360', 'phase361', 'successor-policy']
+    : ['phase359', 'phase360', 'phase361'],
   physicalQuestAcceptancePending: release.physicalQuestAcceptance.pending
 }, null, 2));
