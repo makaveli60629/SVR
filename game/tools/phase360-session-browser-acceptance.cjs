@@ -28,7 +28,7 @@ const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
   await page.waitForFunction(() => {
     try {
       const qa = window.SVR_PHASE360_QA?.();
-      return Boolean(qa?.nextHandWrapped && qa?.resetWrapped && qa?.deckFingerprint);
+      return Boolean(qa?.nextHandWrapped && qa?.resetWrapped && qa?.deckFingerprint && qa?.prematureNextProtected);
     } catch {
       return false;
     }
@@ -38,27 +38,40 @@ const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
   assert.equal(first.active, true);
   assert.equal(first.randomSource, 'crypto.getRandomValues');
   assert.equal(first.secureRandomAvailable, true);
-  assert.equal(first.totalStacks, 6000);
+  assert.equal(first.totalTableChips, 6000);
+  assert.equal(first.stackChips + first.committedChips, 6000);
   assert.equal(first.fundedPlayers, 6);
   assert.equal(first.exactDeckRepeats, 0);
+  assert.equal(first.pass, true);
   assert.ok(first.deckFingerprint);
 
   const firstFingerprint = first.deckFingerprint;
   const firstHandNo = first.handNo;
 
-  const nextAccepted = await page.evaluate(() => window.SVR_PHASE360_SECURE_NEXT_HAND());
-  assert.equal(nextAccepted, true);
-  await page.waitForFunction((previous) => window.SVR_PHASE360_QA?.().handNo > previous, firstHandNo, { timeout: 30000 });
+  const prematureNext = await page.evaluate(() => window.SVR_PHASE360_SECURE_NEXT_HAND());
+  assert.equal(prematureNext, false, 'NEXT HAND must be rejected while a hand is active');
+  const guarded = await page.evaluate(() => window.SVR_PHASE360_QA());
+  assert.equal(guarded.handNo, firstHandNo);
+  assert.equal(guarded.rejectedPrematureNext >= 1, true);
+  assert.equal(guarded.totalTableChips, 6000);
+
+  await page.evaluate(() => window.SVR_PHASE360_FRESH_HAND());
+  await page.waitForFunction((fingerprint) => {
+    const qa = window.SVR_PHASE360_QA?.();
+    return Boolean(qa?.deckFingerprint && qa.deckFingerprint !== fingerprint);
+  }, firstFingerprint, { timeout: 30000 });
   const second = await page.evaluate(() => window.SVR_PHASE360_QA());
-  assert.notEqual(second.deckFingerprint, firstFingerprint, 'a secure next hand must create a different complete deck order');
+  assert.notEqual(second.deckFingerprint, firstFingerprint, 'a fresh reset must create a different complete deck order');
   assert.equal(second.exactDeckRepeats, 0);
-  assert.equal(second.totalStacks, 6000);
+  assert.equal(second.totalTableChips, 6000);
+  assert.equal(second.pass, true);
 
   await page.evaluate(() => window.SVR_PHASE360_LEAVE_TABLE());
   await page.waitForFunction(() => window.SVR_PHASE360_QA?.().leaveResetArmed === true, null, { timeout: 10000 });
   const left = await page.evaluate(() => window.SVR_PHASE360_QA());
   assert.equal(left.leaveResetArmed, true);
   assert.equal(left.continuous, false);
+  assert.equal(left.totalTableChips, 6000);
 
   await page.evaluate(() => window.SVR_PHASE360_JOIN_TABLE());
   await page.waitForFunction(() => {
@@ -67,13 +80,14 @@ const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
   }, null, { timeout: 30000 });
   const joined = await page.evaluate(() => window.SVR_PHASE360_QA());
   assert.equal(joined.handNo, 1, 'deliberate leave then join must start a fresh table session');
-  assert.equal(joined.totalStacks, 6000);
+  assert.equal(joined.totalTableChips, 6000);
   assert.equal(joined.fundedPlayers, 6);
   assert.equal(joined.continuous, true);
   assert.notEqual(joined.deckFingerprint, second.deckFingerprint, 'rejoining must use a fresh deck');
   assert.equal(joined.exactDeckRepeats, 0);
   assert.equal(joined.androidLeaveWrapped, true);
   assert.equal(joined.androidSitWrapped, true);
+  assert.equal(joined.pass, true);
 
   assert.deepEqual(pageErrors, []);
   assert.deepEqual(consoleErrors, []);
@@ -87,10 +101,14 @@ const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
     secondHandNo: second.handNo,
     joinedHandNo: joined.handNo,
     fingerprintsDifferent: firstFingerprint !== second.deckFingerprint && second.deckFingerprint !== joined.deckFingerprint,
+    prematureNextRejected: prematureNext === false,
+    rejectedPrematureNext: joined.rejectedPrematureNext,
     leaveResetArmed: left.leaveResetArmed,
     joinResets: joined.counters.joinResets,
     exactDeckRepeats: joined.exactDeckRepeats,
-    totalStacks: joined.totalStacks,
+    totalTableChips: joined.totalTableChips,
+    stackChips: joined.stackChips,
+    committedChips: joined.committedChips,
     pageErrors: pageErrors.length,
     consoleErrors: consoleErrors.length,
     requestFailures: requestFailures.length
