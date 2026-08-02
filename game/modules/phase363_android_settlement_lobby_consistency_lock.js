@@ -13,10 +13,15 @@ const runtime = {
   lobbyCardRepairs: 0,
   qaWraps: 0,
   auditWraps: 0,
+  synchronousJoinReads: 0,
   installedAt: null
 };
 
 function joined() {
+  if (typeof window.SVR_PHASE363_JOINED_IMMEDIATE === 'boolean') {
+    runtime.synchronousJoinReads += 1;
+    return window.SVR_PHASE363_JOINED_IMMEDIATE;
+  }
   return Boolean(window.SVR_PHASE363_STATE?.joined);
 }
 
@@ -180,6 +185,7 @@ function qa() {
   return {
     ...runtime,
     joined: joined(),
+    joinedImmediate: window.SVR_PHASE363_JOINED_IMMEDIATE,
     ...chips,
     ...cards,
     pass: chips.effectiveTableChips === EXPECTED && (joined() || cards.lobbyCardsCleared),
