@@ -13,6 +13,7 @@ const manifest = read('game/modules/phase340_platform_manifest.js');
 const loader = read('game/modules/phase340_platform_core_loader.js');
 const index = read('game/index.html');
 const continuity = read('game/modules/phase359_dual_platform_gameplay_continuity_lock.js');
+const shuffle = read('game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
 const shader = read('game/modules/phase358_quest_incremental_shader_compile_lock.js');
 const boot = read('game/modules/phase358_quest_runtime_boot_lock.js');
 const table = read('game/modules/phase358_quest_uploaded_table_authority_lock.js');
@@ -58,16 +59,21 @@ requireText(loader, "window.addEventListener('svr:phase358-acceptance'", 'Accept
 requireText(loader, 'phase358: window.SVR_PHASE358_QA?.() || null', 'Phase 358 audit', errors);
 
 requireText(index, 'PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK', 'Quest page build', errors);
-requireText(index, 'data-release="PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK"', 'Quest successor release', errors);
-requireText(index, 'phase340_platform_core_loader.js?v=phase359', 'Quest page cache version', errors);
-requireText(index, '?channel=stable&v=phase359', 'Android route preservation', errors);
-requireText(index, 'phase359_dual_platform_gameplay_continuity_lock.js?v=phase359', 'Quest continuity successor', errors);
+requireText(index, 'data-release="PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK"', 'Quest successor release', errors);
+requireText(index, 'phase340_platform_core_loader.js?v=phase360', 'Quest page cache version', errors);
+requireText(index, '?channel=stable&v=phase360', 'Android route preservation', errors);
+requireText(index, 'phase359_dual_platform_gameplay_continuity_lock.js?v=phase360', 'Quest continuity successor', errors);
+requireText(index, 'phase360_fresh_shuffle_leave_reset_continuous_table_lock.js?v=phase360', 'Quest shuffle successor', errors);
 if (index.indexOf('await bootPlatform()') > index.indexOf('phase359_dual_platform_gameplay_continuity_lock.js')) errors.push('Phase 359 must load after Quest platform boot');
+if (index.indexOf('phase359_dual_platform_gameplay_continuity_lock.js') > index.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js')) errors.push('Phase 360 must load after Phase 359');
 
 requireText(continuity, 'PHASE359_QUEST_WINNER_CARDS_AMOUNT_PANEL', 'Quest winner board successor', errors);
 requireText(continuity, 'NEXT HAND IN', 'Quest continuous-hand successor', errors);
 requireText(continuity, 'getHand', 'Meta hand audit preserved', errors);
 requireText(continuity, 'getController', 'Controller fallback audit preserved', errors);
+requireText(shuffle, 'crypto.getRandomValues', 'Secure Quest shuffle', errors);
+requireText(shuffle, 'SVR_PHASE360_META_CARD_GRAB_QA', 'Meta card grab audit', errors);
+requireText(shuffle, 'physicalHeadsetAcceptancePending: true', 'Physical headset truth', errors);
 
 requireText(shader, 'WebGLRenderer?.prototype', 'Shader prototype authority', errors);
 requireText(shader, 'phase358QuestDeferredCompileAsync', 'Shader async deferral', errors);
@@ -107,6 +113,7 @@ if (questRelease.productTruth?.serverAuthoritativePoker !== false) errors.push('
 if (questRelease.androidApkPolicy?.versionName !== '0.1.0-rc1' || questRelease.androidApkPolicy?.versionCode !== 1) errors.push('Quest record changed APK lock');
 if (questRelease.androidApkPolicy?.forceUpdate !== false || questRelease.androidApkPolicy?.showUpdatePrompt !== false || questRelease.androidApkPolicy?.manualUpdateOnly !== true) errors.push('Quest record changed APK policy');
 if (androidRelease.apkVersionName !== '0.1.0-rc1' || androidRelease.apkVersionCode !== 1 || androidRelease.manualUpdateOnly !== true) errors.push('Android release policy regressed');
+if (webManifest.phase !== 360 || webManifest.build !== 'PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK') errors.push('Web successor release mismatch');
 if (webManifest.apk_version_name !== '0.1.0-rc1' || webManifest.apk_version_code !== 1 || webManifest.manual_update_only !== true) errors.push('Web manifest APK policy regressed');
 
 if (errors.length) {
@@ -116,10 +123,10 @@ if (errors.length) {
 
 console.log(JSON.stringify({
   pass: true,
-  build: questRelease.build,
-  successorRelease: 'PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK',
+  protectedBuild: questRelease.build,
+  successorRelease: webManifest.build,
   criticalBoot: 'shader deferral, runtime, main, uploaded table, poker presentation, hands and gestures, settlement, acceptance',
-  deferred: 'lobby polish, account activity, avatar, and presence after table ready',
+  continuation: 'phase359 countdown plus phase360 secure fresh-session reset',
   acceptance: {
     localPlayMoneyVsFiveBots: true,
     fullHand: true,
@@ -128,7 +135,7 @@ console.log(JSON.stringify({
     physicalHeadsetPending: true
   },
   androidProtected: {
-    phase: webManifest.phase,
+    phase: 357,
     apkVersionName: androidRelease.apkVersionName,
     apkVersionCode: androidRelease.apkVersionCode,
     manualUpdateOnly: androidRelease.manualUpdateOnly

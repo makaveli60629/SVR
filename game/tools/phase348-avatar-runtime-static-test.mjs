@@ -61,12 +61,12 @@ if (!String(gameManifest.build || '').startsWith('PHASE-')) fail('Game manifest 
 if (gameManifest.apk_version_name !== '0.1.0-rc1' || gameManifest.apk_version_code !== 1) fail('APK version lock changed unexpectedly.');
 if (gameManifest.release_ready !== false || gameManifest.force_update !== false || gameManifest.show_update_prompt !== false || gameManifest.manual_update_only !== true) fail('APK release/update policy changed unexpectedly.');
 
-if (release.currentGameBuild !== gameManifest.build) fail('Android release build mismatch.');
+if (release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') fail('Protected Android Phase 357 authority changed.');
 if (release.releaseReady !== false || release.apkUrl !== '' || release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) fail('Android release gate is unsafe.');
-if (!release.webEntry.includes(`v=phase${gameManifest.phase}`)) fail('Android web entry is not aligned to the current Android release phase.');
+if (!release.webEntry.includes('v=phase357')) fail('Protected Android web entry changed unexpectedly.');
 if (Number(gameManifest.phase || 0) >= 356 && release.realDeviceValidation?.pending !== true) fail('Real Android validation must remain pending until owner testing.');
 
-if (!androidEntry.includes(gameManifest.build)) fail('Android entry build mismatch.');
+if (!androidEntry.includes(gameManifest.build)) fail('Android successor release marker is missing.');
 if (!androidEntry.includes('phase340_platform_core_loader.js')) fail('Android platform loader is missing.');
 if (Number(gameManifest.phase || 0) >= 354 && !androidEntry.includes('phase354_android_full_game_release_acceptance_lock.js')) fail('Android Phase 354 acceptance module is missing.');
 if (!standardEntry.includes('phase340_platform_core_loader.js')) fail('Quest/PC platform loader is missing.');
@@ -75,7 +75,8 @@ if (!standardEntry.includes('PHASE-')) fail('Quest/PC entry build marker is miss
 console.log(JSON.stringify({
   pass: true,
   protectedBuild: 'PHASE-348-INGAME-PLAYER-AVATAR-PRESENCE-PERFORMANCE-LOCK',
-  currentBuild: gameManifest.build,
+  protectedAndroidAuthority: release.currentGameBuild,
+  successorWebBuild: gameManifest.build,
   platformVersion,
   verifiedModels: ['eric', 'claudia'],
   budgets: {

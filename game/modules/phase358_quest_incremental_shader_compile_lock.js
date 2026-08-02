@@ -14,6 +14,9 @@ const state = {
   restored: false,
   compileCallsDeferred: 0,
   compileAsyncCallsDeferred: 0,
+  materialsInspected: 0,
+  materialsReplaced: 0,
+  compileRetries: 0,
   installedAt: null,
   restoredAt: null
 };
@@ -21,6 +24,84 @@ const state = {
 const prototype = THREE.WebGLRenderer?.prototype;
 let originalCompile = null;
 let originalCompileAsync = null;
+
+function fallbackMaterial() {
+  return new THREE.MeshStandardMaterial({
+    color: 0x241b1d,
+    roughness: 0.78,
+    metalness: 0.03,
+    side: THREE.DoubleSide
+  });
+}
+
+function safeWalk(root, visitor, limit = 18000) {
+  if (!root) return 0;
+  const stack = [root];
+  const seen = new Set();
+  let count = 0;
+  while (stack.length && count < limit) {
+    const object = stack.pop();
+    if (!object || seen.has(object)) continue;
+    seen.add(object);
+    count += 1;
+    try { visitor(object); } catch {}
+    const children = Array.isArray(object.children) ? object.children : [];
+    for (let index = children.length - 1; index >= 0; index -= 1) {
+      const child = children[index];
+      if (child && child !== object && !seen.has(child)) stack.push(child);
+    }
+  }
+  return count;
+}
+
+function sanitizeSceneMaterials(scene) {
+  safeWalk(scene, (object) => {
+    if (!object?.isMesh) return;
+    const original = object.material;
+    const source = Array.isArray(original) ? original : [original];
+    state.materialsInspected += source.length;
+    const fixed = source.map((material) => {
+      if (material?.isMaterial) return material;
+      state.materialsReplaced += 1;
+      return fallbackMaterial();
+    });
+    if (!fixed.length) {
+      fixed.push(fallbackMaterial());
+      state.materialsReplaced += 1;
+    }
+    object.material = Array.isArray(original) ? fixed : fixed[0];
+  });
+  return scene;
+}
+
+function sparseMaterialError(error) {
+  const message = String(error?.stack || error?.message || error || '');
+  return /isReady|checkMaterialsReady|undefined.*material|material.*undefined/i.test(message);
+}
+
+function safeCompile(scene, camera, targetScene) {
+  sanitizeSceneMaterials(scene);
+  try {
+    return originalCompile.call(this, scene, camera, targetScene);
+  } catch (error) {
+    if (!sparseMaterialError(error)) throw error;
+    state.compileRetries += 1;
+    sanitizeSceneMaterials(scene);
+    return originalCompile.call(this, scene, camera, targetScene);
+  }
+}
+
+async function safeCompileAsync(scene, camera, targetScene) {
+  sanitizeSceneMaterials(scene);
+  try {
+    return await originalCompileAsync.call(this, scene, camera, targetScene);
+  } catch (error) {
+    if (!sparseMaterialError(error)) throw error;
+    state.compileRetries += 1;
+    sanitizeSceneMaterials(scene);
+    return originalCompileAsync.call(this, scene, camera, targetScene);
+  }
+}
 
 function install() {
   if (!ACTIVE || !prototype || state.installed) return state;
@@ -39,14 +120,17 @@ function install() {
     return this;
   };
 
+  window.SVR_PHASE358_SANITIZE_SCENE_MATERIALS = sanitizeSceneMaterials;
   window.SVR_PHASE358_QUEST_SHADER_STATE = state;
   return state;
 }
 
 function restore() {
   if (!state.installed || state.restored || !prototype) return state;
-  if (typeof originalCompile === 'function') prototype.compile = originalCompile;
-  if (typeof originalCompileAsync === 'function') prototype.compileAsync = originalCompileAsync;
+  const scene = window.__SVR_SCENE__;
+  sanitizeSceneMaterials(scene);
+  if (typeof originalCompile === 'function') prototype.compile = safeCompile;
+  if (typeof originalCompileAsync === 'function') prototype.compileAsync = safeCompileAsync;
   else delete prototype.compileAsync;
   state.restored = true;
   state.restoredAt = new Date().toISOString();
@@ -59,6 +143,7 @@ function qa() {
     ...state,
     incrementalDuringCriticalBoot: state.installed,
     originalsRestoredAfterReady: state.restored,
+    sparseMaterialGuard: typeof window.SVR_PHASE358_SANITIZE_SCENE_MATERIALS === 'function',
     pass: !ACTIVE || state.installed
   };
 }

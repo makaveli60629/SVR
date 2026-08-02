@@ -4,6 +4,7 @@ const read = (path) => fs.readFileSync(path, 'utf8');
 const runtime = read('game/modules/phase357_android_table_status_showdown_ante_lock.js');
 const directCamera = read('game/modules/phase357_android_direct_camera_seat_fix.js');
 const continuity = read('game/modules/phase359_dual_platform_gameplay_continuity_lock.js');
+const shuffle = read('game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
 const android = read('game/android.html');
 const manifest = JSON.parse(read('game/manifest.json'));
 const release = JSON.parse(read('game/android-release.json'));
@@ -45,23 +46,29 @@ requireText(directCamera, 'window.SVR_PHASE357_DIRECT_CAMERA_QA', 'direct-camera
 requireText(continuity, 'PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK', 'phase359-continuity-build');
 requireText(continuity, 'Continuous play: next hand in', 'phase359-android-countdown');
 requireText(continuity, 'window.SVR_PHASE359_NEXT_HAND', 'phase359-next-hand-api');
+requireText(shuffle, 'PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK', 'phase360-shuffle-build');
+requireText(shuffle, 'crypto.getRandomValues', 'phase360-secure-random');
+requireText(shuffle, 'function armFreshJoin', 'phase360-leave-reset');
+requireText(shuffle, 'function joinFreshTable', 'phase360-join-reset');
 
 const bootIndex = android.indexOf("await bootPlatform({forcedPlatform:'android'})");
 const phase357Index = android.indexOf('phase357_android_table_status_showdown_ante_lock.js');
 const directCameraIndex = android.indexOf('phase357_android_direct_camera_seat_fix.js');
 const phase359Index = android.indexOf('phase359_dual_platform_gameplay_continuity_lock.js');
+const phase360Index = android.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
 if (bootIndex < 0 || phase357Index <= bootIndex) errors.push('phase357-must-load-after-platform-boot');
 if (directCameraIndex <= phase357Index) errors.push('direct-camera-fix-must-load-after-phase357');
 if (phase359Index <= directCameraIndex) errors.push('phase359-must-load-after-direct-camera-fix');
+if (phase360Index <= phase359Index) errors.push('phase360-must-load-after-phase359');
 requireText(android, 'data-build="PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK"', 'android-page-build');
-requireText(android, 'data-release="PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK"', 'android-release-label');
-requireText(android, 'manifest.json?v=phase359', 'android-manifest-cache-version');
+requireText(android, 'data-release="PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK"', 'android-release-label');
+requireText(android, 'manifest.json?v=phase360', 'android-manifest-cache-version');
 
-if (manifest.phase !== 357) errors.push('manifest-phase');
-if (manifest.build !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('manifest-build');
-if (!String(manifest.start_url || '').includes('v=phase357')) errors.push('manifest-start-url');
-if (release.currentGameBuild !== manifest.build) errors.push('release-manifest-build-mismatch');
-if (!String(release.webEntry || '').includes('v=phase357')) errors.push('release-web-entry');
+if (manifest.phase !== 360) errors.push('manifest-phase');
+if (manifest.build !== 'PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK') errors.push('manifest-build');
+if (!String(manifest.start_url || '').includes('v=phase360')) errors.push('manifest-start-url');
+if (release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('phase357-authority-record-regressed');
+if (!String(release.webEntry || '').includes('v=phase357')) errors.push('phase357-authority-route-regressed');
 if (release.realDeviceValidation?.phase !== 357 || release.realDeviceValidation?.pending !== true) errors.push('owner-playtest-pending');
 
 if (manifest.apk_version_name !== '0.1.0-rc1' || manifest.apk_version_code !== 1) errors.push('manifest-apk-version');
@@ -77,12 +84,10 @@ if (errors.length) {
 
 console.log(JSON.stringify({
   pass: true,
-  build: manifest.build,
-  successorRelease: 'PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK',
+  protectedAuthority: release.currentGameBuild,
+  successorRelease: manifest.build,
   closeSeat: 'direct-non-xr-camera-to-south-table-edge-with-xr-rig-preserved',
-  turnDisplay: ['active player', 'current bet', 'amount to call', 'last action', 'six player bet strip'],
-  showdown: ['winner', 'amount won', 'hand name', 'winner hole cards', 'community board'],
-  continuation: 'phase357 ante-up plus phase359 protected continuous next hand',
+  continuation: 'phase359 countdown plus phase360 secure fresh-session reset',
   apk: {
     versionName: release.apkVersionName,
     versionCode: release.apkVersionCode,
