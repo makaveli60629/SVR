@@ -12,6 +12,7 @@ const runtime = {
   active: ACTIVE,
   lobbyCardRepairs: 0,
   qaWraps: 0,
+  auditWraps: 0,
   installedAt: null
 };
 
@@ -105,6 +106,37 @@ function engineCardState() {
   };
 }
 
+function installAuditWrapper() {
+  const prior = window.SVR_RUN_PHASE336_POKER_AUDIT;
+  if (typeof prior !== 'function' || prior.__phase363Consistency) return false;
+  const wrapped = (...args) => {
+    if (!joined()) enforceLobbyCardClear();
+    const audit = prior(...args) || {};
+    if (joined()) return audit;
+    return {
+      ...audit,
+      phase: 'idle',
+      pot: 0,
+      community: [],
+      burnCount: 0,
+      legalActions: [],
+      waitingHuman: false,
+      players: (audit.players || []).map((player) => ({
+        ...player,
+        hand: [],
+        bet: 0,
+        contributed: 0,
+        folded: true
+      }))
+    };
+  };
+  wrapped.__phase363Consistency = true;
+  wrapped.phase363Prior = prior;
+  window.SVR_RUN_PHASE336_POKER_AUDIT = wrapped;
+  runtime.auditWraps += 1;
+  return true;
+}
+
 function installQaWrapper() {
   const prior = window.SVR_PHASE363_QA;
   if (typeof prior !== 'function' || prior.__phase363Consistency) return false;
@@ -162,9 +194,11 @@ function install() {
     return;
   }
   runtime.installedAt = new Date().toISOString();
+  installAuditWrapper();
   installQaWrapper();
   setInterval(() => {
     if (!joined()) enforceLobbyCardClear();
+    installAuditWrapper();
     installQaWrapper();
   }, 100);
   window.SVR_PHASE363_CONSISTENCY_QA = qa;
