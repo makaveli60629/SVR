@@ -10,6 +10,12 @@ let running = false;
 let lastResult = null;
 const history = [];
 
+function activePolicy() {
+  const startingStack = Number(window.SVR_PHASE362_CONSTANTS?.STARTING_STACK || 1000);
+  const tableBankroll = Number(window.SVR_PHASE362_CONSTANTS?.TABLE_BANKROLL || startingStack * players.length);
+  return { startingStack, tableBankroll };
+}
+
 function makeRecord(attempt) {
   return {
     build: BUILD,
@@ -50,6 +56,7 @@ function snapshot(record) {
 }
 
 function settlementPass() {
+  const { startingStack, tableBankroll } = activePolicy();
   const totalStacks = players.reduce((sum, player) => sum + Number(player.stack || 0), 0);
   const fundedPlayers = players.filter((player) => Number(player.stack || 0) > 0).length;
   return {
@@ -59,11 +66,13 @@ function settlementPass() {
       label: winner.label
     })),
     settledPot: Number(state.settledPot || 0),
+    startingStack,
+    expectedTableBankroll: tableBankroll,
     totalStacks,
     fundedPlayers,
     pass: (state.winners || []).length > 0
       && Number(state.settledPot || 0) > 0
-      && totalStacks === 6000
+      && totalStacks === tableBankroll
       && fundedPlayers >= 2
   };
 }
@@ -83,6 +92,8 @@ function finalizeRecord(record) {
   record.finishedAt = new Date().toISOString();
   record.winners = settlement.winners;
   record.settledPot = settlement.settledPot;
+  record.startingStack = settlement.startingStack;
+  record.expectedTableBankroll = settlement.expectedTableBankroll;
   record.totalStacks = settlement.totalStacks;
   record.fundedPlayers = settlement.fundedPlayers;
   record.pass = ['preflop', 'flop', 'turn', 'river', 'showdown']
@@ -120,6 +131,7 @@ async function driveHand(options = {}) {
     timeoutMs,
     maxHands,
     deterministicBots: true,
+    policy: activePolicy(),
     record: null,
     audit: null,
     error: null,
@@ -136,7 +148,7 @@ async function driveHand(options = {}) {
     window.addEventListener('svr:poker-state', stateListener);
 
     activeRecord = makeRecord(1);
-    window.SVR_RESET_POKER_TABLE(1000);
+    window.SVR_RESET_POKER_TABLE(activePolicy().startingStack);
     activeRecord.handNo = Number(state.handNo || 0);
     snapshot(activeRecord);
 
@@ -164,7 +176,7 @@ async function driveHand(options = {}) {
         if (result.attempts < maxHands) {
           handledSequence = -1;
           activeRecord = makeRecord(result.attempts + 1);
-          window.SVR_RESET_POKER_TABLE(1000);
+          window.SVR_RESET_POKER_TABLE(activePolicy().startingStack);
           activeRecord.handNo = Number(state.handNo || 0);
           snapshot(activeRecord);
         }
@@ -211,6 +223,7 @@ function qa() {
     phase344Alias: typeof window.SVR_PHASE344_RUN_FULL_HAND_QA === 'function',
     pokerAction: typeof window.SVR_POKER_ACTION,
     resetPoker: typeof window.SVR_RESET_POKER_TABLE,
+    activePolicy: activePolicy(),
     passiveModeLeaked: window.SVR_POKER_QA_PASSIVE_BOTS === true,
     lastResult,
     history: history.slice(0, 3),
