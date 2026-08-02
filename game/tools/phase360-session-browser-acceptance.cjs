@@ -30,8 +30,9 @@ async function verifyQuestPhase360(browser) {
   const errors = diagnostics(page);
 
   // Do not add preview=1 here. The preview flag deliberately redirects to
-  // Camera 3; this test must execute the real Quest lobby and table modules.
-  await page.goto(`${base}/game/index.html?platform=quest&v=phase363&phase360qa=1`, {
+  // Camera 3. acceptance=1 with v=phase360 uses the route's existing legacy
+  // acceptance branch to measure Phase 360 without the Phase 362 successor.
+  await page.goto(`${base}/game/index.html?platform=quest&acceptance=1&v=phase360&phase360qa=1`, {
     waitUntil: 'domcontentloaded',
     timeout: 120000
   });
@@ -104,7 +105,7 @@ async function verifyQuestPhase360(browser) {
 
   return {
     platform: 'quest',
-    route: '/game/index.html?platform=quest',
+    route: '/game/index.html?platform=quest&acceptance=1&v=phase360',
     phase360Active: true,
     randomSource: joined.randomSource,
     firstHandNo,
