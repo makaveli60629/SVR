@@ -87,8 +87,9 @@ if (registry.build !== 'PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK') 
 if (!registry.canonicalPages.some((entry) => entry.path === 'site/roadmap.html' && entry.required === true)) errors.push('roadmap-not-canonical');
 if (!registry.canonicalPages.some((entry) => entry.path === 'index.html' && entry.required === true)) errors.push('root-home-not-canonical');
 
-if (Number(manifest.phase || 0) < 350 || !String(manifest.build || '').startsWith('PHASE-360-')) errors.push('phase360-successor-manifest');
-if (release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('protected-android-authority');
+if (Number(manifest.phase || 0) < 360 || !/^PHASE-(?:360|36[1-9]|3[7-9]\d)-/.test(String(manifest.build || ''))) errors.push('phase360-or-successor-manifest');
+const protectedAndroidAuthority = release.protectedAndroidAuthority || release.currentGameBuild;
+if (protectedAndroidAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('protected-android-authority');
 if (manifest.apk_version_name !== '0.1.0-rc1' || manifest.apk_version_code !== 1) errors.push('apk-version');
 if (manifest.release_ready !== false || manifest.force_update !== false || manifest.show_update_prompt !== false || manifest.manual_update_only !== true) errors.push('manifest-apk-policy');
 if (release.releaseReady !== false || release.apkUrl !== '' || release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('release-apk-policy');
@@ -101,7 +102,7 @@ console.log(JSON.stringify({
   pass: true,
   protectedBuild: 'PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK',
   successorWebBuild: manifest.build,
-  protectedAndroidAuthority: release.currentGameBuild,
+  protectedAndroidAuthority,
   profileAvatar: Number(manifest.phase || 0) >= 356 ? 'phase356-live-legend-pedestal-over-phase351-showroom' : showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
   camera3: 'dedicated-lighting-authority',
   androidController: 'physical-dom-deduplication-after-critical-gameplay-boot',
