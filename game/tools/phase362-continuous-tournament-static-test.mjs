@@ -4,6 +4,7 @@ import fs from 'node:fs';
 const read = (path) => fs.readFileSync(path, 'utf8');
 const runtime = read('game/modules/phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
 const settlement = read('game/modules/phase362_settlement_accounting_clear_lock.js');
+const desktopSafety = read('game/modules/phase362_desktop_renderer_preboot_safety_lock.js');
 const questEntry = read('game/index.html');
 const androidEntry = read('game/android.html');
 const manifest = JSON.parse(read('game/manifest.json'));
@@ -33,6 +34,19 @@ assert.match(settlement, /state\.settledPot/);
 assert.match(settlement, /state\.winners/);
 assert.match(settlement, /SVR_PHASE362_SETTLEMENT_QA/);
 assert.match(settlement, /svr:phase362-settlement-accounting-cleared/);
+
+assert.match(desktopSafety, /PHASE-362-DESKTOP-RENDERER-PREBOOT-SAFETY-LOCK/);
+assert.match(desktopSafety, /Object\.defineProperty\(window, '__SVR_RENDERER__'/);
+assert.match(desktopSafety, /safeCompileAsync/);
+assert.match(desktopSafety, /safeCompile\(scene, camera, targetScene\)/);
+assert.match(desktopSafety, /renderer\.compileAsync = safeCompileAsync/);
+assert.match(desktopSafety, /SVR_PHASE362_DESKTOP_RENDERER_QA/);
+assert.match(questEntry, /phase362_desktop_renderer_preboot_safety_lock\.js\?v=phase362/);
+assert.ok(
+  questEntry.indexOf('phase362_desktop_renderer_preboot_safety_lock.js')
+    < questEntry.indexOf('phase340_platform_core_loader.js'),
+  'Desktop renderer safety must load before platform boot'
+);
 
 assert.match(questEntry, /phase362_continuous_10000_turn_clock_rejoin_reset_lock\.js\?v=phase362/);
 assert.match(questEntry, /phase362_settlement_accounting_clear_lock\.js\?v=phase362/);
@@ -91,6 +105,7 @@ console.log(JSON.stringify({
   tableBankroll: manifest.table_bankroll,
   turnSeconds: manifest.turn_seconds,
   settlementAccounting: 'completed bets and contributions cleared after recorded payout',
+  desktopRendererSafety: 'preboot assignment guard replaces unsafe async shader readiness polling',
   questPlayAndLeavePreserved: true,
   apkPolicyPreserved: true
 }, null, 2));
