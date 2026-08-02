@@ -1,0 +1,79 @@
+name: Phase 362 Continuous Tournament Turn Clock
+
+on:
+  pull_request:
+    paths:
+      - 'game/index.html'
+      - 'game/android.html'
+      - 'game/manifest.json'
+      - 'game/android-release.json'
+      - 'game/quest-release.json'
+      - 'game/modules/phase362_continuous_10000_turn_clock_rejoin_reset_lock.js'
+      - 'game/modules/phase361_quest_lobby_play_seat_watch_npc_lock.js'
+      - 'game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js'
+      - 'game/modules/phase360_table_conservation_next_guard_lock.js'
+      - 'game/modules/phase359_dual_platform_gameplay_continuity_lock.js'
+      - 'game/modules/phase336_authoritative_engine.js'
+      - 'game/tools/phase362-continuous-tournament-static-test.mjs'
+      - 'game/tools/phase362-continuous-tournament-browser-acceptance.cjs'
+      - 'docs/phase362_continuous_10000_turn_clock_rejoin_reset_lock.md'
+      - '.github/workflows/phase362-continuous-tournament-turn-clock.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  continuous-tournament:
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate Phase 362 and protected contracts
+        run: |
+          node --check game/modules/phase362_continuous_10000_turn_clock_rejoin_reset_lock.js
+          node --check game/tools/phase362-continuous-tournament-browser-acceptance.cjs
+          node game/tools/phase362-continuous-tournament-static-test.mjs
+          node game/tools/phase361-quest-lobby-seat-static-test.mjs
+          node game/tools/phase358-quest-static-test.mjs
+          node game/tools/phase357-android-table-status-showdown-ante-static-test.mjs
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Start local SVR site
+        run: |
+          python3 -m http.server 4173 > /tmp/svr-phase362-http.log 2>&1 &
+          echo $! > /tmp/svr-phase362-http.pid
+          sleep 2
+
+      - name: Verify Android Quest and desktop tournament policy
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase362-continuous-tournament-browser-acceptance.cjs
+
+      - name: Re-run Android complete-hand acceptance
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase357-android-browser-acceptance.cjs
+
+      - name: Re-run Quest complete-hand acceptance
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase358-quest-browser-acceptance.cjs
+
+      - name: Upload HTTP log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase362-http-log
+          path: /tmp/svr-phase362-http.log
