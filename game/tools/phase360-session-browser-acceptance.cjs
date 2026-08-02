@@ -29,7 +29,9 @@ async function verifyQuestPhase360(browser) {
   const page = await context.newPage();
   const errors = diagnostics(page);
 
-  await page.goto(`${base}/game/index.html?platform=quest&preview=1&v=phase363&phase360qa=1`, {
+  // Do not add preview=1 here. The preview flag deliberately redirects to
+  // Camera 3; this test must execute the real Quest lobby and table modules.
+  await page.goto(`${base}/game/index.html?platform=quest&v=phase363&phase360qa=1`, {
     waitUntil: 'domcontentloaded',
     timeout: 120000
   });
@@ -102,6 +104,7 @@ async function verifyQuestPhase360(browser) {
 
   return {
     platform: 'quest',
+    route: '/game/index.html?platform=quest',
     phase360Active: true,
     randomSource: joined.randomSource,
     firstHandNo,
