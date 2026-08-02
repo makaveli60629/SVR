@@ -21,10 +21,11 @@ const webManifest = JSON.parse(read('game/manifest.json'));
 const backendPackage = JSON.parse(read('backend/phase345/package.json'));
 const unityBlueprint = JSON.parse(read('docs/PHASE-356-PLATFORM-UNITY-BLUEPRINT.json'));
 
-// The shared manifest may advance for Quest-only successors. Preserve the
-// Phase 356 Android runtime contract rather than freezing the global version.
-requireText(manifest, "VERSION = 'phase361'", 'platform-successor-version');
-requireText(manifest, "BUILD = 'PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK'", 'platform-successor-build');
+// The shared manifest may advance for Quest/table-policy successors. Preserve
+// the Phase 356 Android runtime contract rather than freezing the global version.
+const platformVersion = Number(manifest.match(/export const VERSION = 'phase(\d+)'/)?.[1] || 0);
+if (platformVersion < 361) throw new Error('Shared platform version regressed below Phase 361');
+if (!/^PHASE-(?:361|36[2-9]|3[7-9]\d)-/.test(manifest.match(/export const BUILD = '([^']+)'/)?.[1] || '')) throw new Error('Shared platform successor build missing');
 requireText(manifest, 'phase356_android_real_device_freeze_recovery_lock.js', 'phase356-runtime');
 requireText(manifest, 'const ANDROID_DEFERRED = []', 'android-deferred-disabled');
 forbidText(manifest.split('const ANDROID_FOUNDATION = [')[1].split('];')[0], 'phase355_android_runtime_smoothness_hardening_lock.js', 'retired-runtime');
@@ -54,9 +55,10 @@ if (release.realDeviceValidation?.pending !== true || release.realDeviceValidati
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) throw new Error('APK update policy changed');
 if (release.apkVersionName !== '0.1.0-rc1' || release.apkVersionCode !== 1) throw new Error('APK version lock changed');
 if (Number(webManifest.phase || 0) < 356 || webManifest.apk_version_code !== 1) throw new Error('Web manifest phase/APK regression');
-if (!String(webManifest.build || '').startsWith('PHASE-360-')) throw new Error('Phase 360 Android/web successor build missing');
-if (release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') throw new Error('Protected Android Phase 357 authority changed');
-if (!android.includes(webManifest.build)) throw new Error('Android page is missing Phase 360 successor release marker');
+if (Number(webManifest.phase || 0) < 360 || !/^PHASE-(?:360|36[1-9]|3[7-9]\d)-/.test(String(webManifest.build || ''))) throw new Error('Phase 360 or successor Android/web build missing');
+const protectedAndroidAuthority = release.protectedAndroidAuthority || release.currentGameBuild;
+if (protectedAndroidAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') throw new Error('Protected Android Phase 357 authority changed');
+if (!android.includes(webManifest.build)) throw new Error('Android page is missing successor release marker');
 
 requireText(matrix, 'phraseIntervalSeconds = reducedMotion ? 18 : coarsePointer ? 12 : 9', 'secret-phrase-slowdown');
 requireText(matrix, 'phraseStaggerSeconds', 'secret-letter-stagger');
@@ -88,10 +90,10 @@ if (!unityBlueprint.sharedAuthorities.includes('poker-rules')) throw new Error('
 console.log(JSON.stringify({
   pass: true,
   protectedPhase: 356,
-  sharedManifestSuccessor: 361,
+  sharedManifestSuccessor: platformVersion,
   currentPhase: webManifest.phase,
   successorWebBuild: webManifest.build,
-  protectedAndroidAuthority: release.currentGameBuild,
+  protectedAndroidAuthority,
   android: {
     deferredModules: 0,
     shaderPrecompile: 'disabled-on-android',
