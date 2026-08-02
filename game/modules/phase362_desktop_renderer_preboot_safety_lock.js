@@ -13,17 +13,22 @@ const PLATFORM = (() => {
 })();
 const ACTIVE = PLATFORM === 'desktop';
 const PATCH = Symbol.for('SVR_PHASE362_DESKTOP_RENDERER_PATCH');
+const MIXER_PATCH = Symbol.for('SVR_PHASE362_DESKTOP_ANIMATION_MIXER_PATCH');
 
 const state = {
   build: BUILD,
   active: ACTIVE,
   trapInstalled: false,
   rendererPatched: false,
+  animationMixerPatched: false,
   safeAsyncCompiles: 0,
   compileRetries: 0,
   renderRetries: 0,
   framesDeferred: 0,
   materialsReplaced: 0,
+  animationUpdateErrors: 0,
+  animationMixersDisabled: 0,
+  lastAnimationError: null,
   installedAt: null
 };
 
@@ -71,8 +76,58 @@ function sanitizeScene(scene) {
 }
 
 function sparseMaterialError(error) {
-  return /isReady|checkMaterialsReady|undefined.*material|material.*undefined/i
+  return /isReady|checkMaterialsReady|undefined.*material|material.*undefined|Cannot read properties of null \(reading ['"]mesh['"]\)/i
     .test(String(error?.stack || error?.message || error || ''));
+}
+
+function animationBindingError(error) {
+  return /Cannot read properties of null \(reading ['"]mesh['"]\)|PropertyBinding|AnimationMixer|findNode|No target node found/i
+    .test(String(error?.stack || error?.message || error || ''));
+}
+
+function patchAnimationMixer() {
+  if (!ACTIVE || !THREE.AnimationMixer?.prototype) return;
+  const prototype = THREE.AnimationMixer.prototype;
+  if (prototype[MIXER_PATCH]) {
+    state.animationMixerPatched = true;
+    return;
+  }
+  const originalUpdate = prototype.update;
+  if (typeof originalUpdate !== 'function') return;
+
+  Object.defineProperty(prototype, MIXER_PATCH, {
+    configurable: false,
+    enumerable: false,
+    value: { originalUpdate }
+  });
+
+  prototype.update = function safePhase362AnimationUpdate(deltaTime) {
+    try {
+      return originalUpdate.call(this, deltaTime);
+    } catch (error) {
+      if (!animationBindingError(error)) throw error;
+      state.animationUpdateErrors += 1;
+      state.lastAnimationError = String(error?.stack || error?.message || error);
+      try { this.stopAllAction?.(); } catch {}
+      try {
+        if (Array.isArray(this._actions)) {
+          for (const action of this._actions) {
+            if (!action) continue;
+            action.enabled = false;
+            action.paused = true;
+          }
+        }
+      } catch {}
+      try { this.timeScale = 0; } catch {}
+      if (!this.__svrPhase362AnimationDisabled) {
+        this.__svrPhase362AnimationDisabled = true;
+        state.animationMixersDisabled += 1;
+      }
+      window.SVR_PHASE362_DESKTOP_RENDERER_STATE = state;
+      return this;
+    }
+  };
+  state.animationMixerPatched = true;
 }
 
 function patchRenderer(renderer) {
@@ -161,13 +216,18 @@ function qa() {
   return {
     ...state,
     rendererPublished: Boolean(window.__SVR_RENDERER__),
-    pass: !ACTIVE || (state.trapInstalled && (!window.__SVR_RENDERER__ || state.rendererPatched)),
+    pass: !ACTIVE || (
+      state.trapInstalled
+      && state.animationMixerPatched
+      && (!window.__SVR_RENDERER__ || state.rendererPatched)
+    ),
     checkedAt: new Date().toISOString()
   };
 }
 
 if (ACTIVE) {
   state.installedAt = new Date().toISOString();
+  patchAnimationMixer();
   installTrap();
 }
 window.SVR_PHASE362_DESKTOP_RENDERER_QA = qa;
