@@ -14,13 +14,40 @@ const state = {
   duplicateActivationsBlocked: 0,
   duplicateControlsHidden: 0,
   labelRepairs: 0,
+  synchronousStateTransitions: 0,
   lastAction: null,
   lastActivationAt: 0,
   installedAt: null
 };
 
+let originalJoin = null;
+let originalLeave = null;
+let originalToggle = null;
+
+function joinedNow() {
+  if (typeof window.SVR_PHASE363_JOINED_IMMEDIATE === 'boolean') {
+    return window.SVR_PHASE363_JOINED_IMMEDIATE;
+  }
+  return Boolean(window.SVR_PHASE363_STATE?.joined);
+}
+
+function setJoinedImmediate(joined, reason = 'state') {
+  window.SVR_PHASE363_JOINED_IMMEDIATE = Boolean(joined);
+  window.SVR_PHASE363_GAME_STATE_IMMEDIATE = joined ? 'SEATED' : 'LOBBY';
+  state.synchronousStateTransitions += 1;
+  window.dispatchEvent(new CustomEvent('svr:phase363-immediate-join-state', {
+    detail: {
+      build: BUILD,
+      joined: Boolean(joined),
+      gameState: joined ? 'SEATED' : 'LOBBY',
+      reason,
+      at: Date.now()
+    }
+  }));
+}
+
 function desiredLabel() {
-  return window.SVR_PHASE363_STATE?.joined ? 'LEAVE TABLE' : 'JOIN TABLE';
+  return joinedNow() ? 'LEAVE TABLE' : 'JOIN TABLE';
 }
 
 function hideDuplicates() {
@@ -49,6 +76,42 @@ function hideDuplicates() {
   }
 }
 
+function wrapStateApis() {
+  if (originalJoin || typeof window.SVR_PHASE363_JOIN_TABLE !== 'function') return false;
+  originalJoin = window.SVR_PHASE363_JOIN_TABLE;
+  originalLeave = window.SVR_PHASE363_LEAVE_TABLE;
+  originalToggle = window.SVR_PHASE363_TOGGLE_JOIN;
+
+  window.SVR_PHASE363_JOIN_TABLE = (...args) => {
+    if (joinedNow()) return true;
+    setJoinedImmediate(true, String(args[0] || 'join-api'));
+    let result = false;
+    try {
+      result = originalJoin(...args);
+    } catch (error) {
+      setJoinedImmediate(false, 'join-error');
+      throw error;
+    }
+    if (result === false) setJoinedImmediate(false, 'join-rejected');
+    queueMicrotask(hideDuplicates);
+    return result;
+  };
+
+  window.SVR_PHASE363_LEAVE_TABLE = (...args) => {
+    setJoinedImmediate(false, String(args[0] || 'leave-api'));
+    const result = originalLeave?.(...args);
+    queueMicrotask(hideDuplicates);
+    return result;
+  };
+
+  window.SVR_PHASE363_TOGGLE_JOIN = (...args) => (
+    joinedNow()
+      ? window.SVR_PHASE363_LEAVE_TABLE(...args)
+      : window.SVR_PHASE363_JOIN_TABLE(...args)
+  );
+  return true;
+}
+
 function activate(event, source) {
   const button = event.target?.closest?.('#svr347Actions [data-ui="seat"]');
   if (!button) return false;
@@ -65,11 +128,10 @@ function activate(event, source) {
   if (source === 'pointerdown') state.pointerActivations += 1;
   else state.clickFallbackActivations += 1;
 
-  const joined = Boolean(window.SVR_PHASE363_STATE?.joined);
+  const joined = joinedNow();
   state.lastAction = joined ? 'leave' : 'join';
   const handler = joined ? window.SVR_PHASE363_LEAVE_TABLE : window.SVR_PHASE363_JOIN_TABLE;
-  if (typeof handler === 'function') handler(`join-control-${source}`);
-  else window.SVR_PHASE363_TOGGLE_JOIN?.();
+  handler?.(`join-control-${source}`);
   queueMicrotask(hideDuplicates);
   setTimeout(hideDuplicates, 0);
   setTimeout(hideDuplicates, 100);
@@ -84,11 +146,16 @@ function install() {
   }
   state.installed = true;
   state.installedAt = new Date().toISOString();
+  setJoinedImmediate(Boolean(window.SVR_PHASE363_STATE?.joined), 'capture-install');
+  wrapStateApis();
   window.addEventListener('pointerdown', (event) => activate(event, 'pointerdown'), true);
   window.addEventListener('click', (event) => activate(event, 'click'), true);
   const observer = new MutationObserver(hideDuplicates);
   observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-  setInterval(hideDuplicates, 120);
+  setInterval(() => {
+    wrapStateApis();
+    hideDuplicates();
+  }, 120);
   hideDuplicates();
   window.SVR_PHASE363_JOIN_CONTROL_STATE = state;
   window.SVR_PHASE363_JOIN_CONTROL_QA = () => {
@@ -102,6 +169,7 @@ function install() {
     const label = String(authority?.textContent || '').trim();
     return {
       ...state,
+      joinedImmediate: joinedNow(),
       authorityPresent: Boolean(authority),
       visibleJoinControls: visible.length,
       labels: visible.map((button) => String(button.textContent || '').trim()),
