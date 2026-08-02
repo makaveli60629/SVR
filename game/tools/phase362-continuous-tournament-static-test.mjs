@@ -3,6 +3,7 @@ import fs from 'node:fs';
 
 const read = (path) => fs.readFileSync(path, 'utf8');
 const runtime = read('game/modules/phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
+const settlement = read('game/modules/phase362_settlement_accounting_clear_lock.js');
 const questEntry = read('game/index.html');
 const androidEntry = read('game/android.html');
 const manifest = JSON.parse(read('game/manifest.json'));
@@ -24,10 +25,31 @@ assert.match(runtime, /PHASE362_QUEST_TURN_CLOCK/);
 assert.match(runtime, /svr362TurnClock/);
 assert.match(runtime, /crypto\?\.getRandomValues|crypto\.getRandomValues/);
 
+assert.match(settlement, /PHASE-362-SETTLEMENT-ACCOUNTING-CLEAR-LOCK/);
+assert.match(settlement, /settledShowdown/);
+assert.match(settlement, /player\.contributed = 0/);
+assert.match(settlement, /player\.bet = 0/);
+assert.match(settlement, /state\.settledPot/);
+assert.match(settlement, /state\.winners/);
+assert.match(settlement, /SVR_PHASE362_SETTLEMENT_QA/);
+assert.match(settlement, /svr:phase362-settlement-accounting-cleared/);
+
 assert.match(questEntry, /phase362_continuous_10000_turn_clock_rejoin_reset_lock\.js\?v=phase362/);
+assert.match(questEntry, /phase362_settlement_accounting_clear_lock\.js\?v=phase362/);
+assert.ok(
+  questEntry.indexOf('phase362_settlement_accounting_clear_lock.js')
+    > questEntry.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js'),
+  'Quest settlement correction must load after Phase 362 policy'
+);
 assert.match(questEntry, /SVR_PHASE362_LEAVE_TABLE/);
 assert.match(questEntry, /SVR_PHASE361_STATE\?\.seated/);
 assert.match(androidEntry, /phase362_continuous_10000_turn_clock_rejoin_reset_lock\.js\?v=phase362/);
+assert.match(androidEntry, /phase362_settlement_accounting_clear_lock\.js\?v=phase362/);
+assert.ok(
+  androidEntry.indexOf('phase362_settlement_accounting_clear_lock.js')
+    > androidEntry.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js'),
+  'Android settlement correction must load after Phase 362 policy'
+);
 assert.match(androidEntry, /SVR_PHASE362_LEAVE_TABLE/);
 assert.match(androidEntry, /SVR_PHASE347_STATE\?\.seated/);
 
@@ -68,6 +90,7 @@ console.log(JSON.stringify({
   startingStack: manifest.starting_stack,
   tableBankroll: manifest.table_bankroll,
   turnSeconds: manifest.turn_seconds,
+  settlementAccounting: 'completed bets and contributions cleared after recorded payout',
   questPlayAndLeavePreserved: true,
   apkPolicyPreserved: true
 }, null, 2));
