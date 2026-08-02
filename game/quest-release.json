@@ -1,17 +1,14 @@
 {
   "name": "SVR Poker Quest WebXR",
   "channel": "stable-web",
-  "phase": 358,
-  "build": "PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK",
-  "webEntry": "/game/index.html?platform=quest&v=phase358",
+  "phase": 361,
+  "build": "PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK",
+  "webEntry": "/game/index.html?platform=quest&v=phase361",
   "browserAcceptance": {
     "passed": true,
-    "pendingWorkflow": false,
-    "workflow": "Phase 358 Quest Full Game Acceptance",
-    "questUserAgent": true,
+    "baseGameplayCertification": "PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK",
     "startupMs": 19754.6,
     "startupBudgetMs": 45000,
-    "shaderCompilation": "quest-incremental-frame-compilation",
     "uploadedTable": "PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED",
     "fallbackTablePresent": false,
     "handsPrimary": true,
@@ -21,49 +18,57 @@
     "forwardReference": "headset-look-direction",
     "teleportContract": "hold-to-aim-release-to-teleport",
     "phases": ["preflop", "flop", "turn", "river", "showdown"],
-    "humanActions": 4,
     "holeCards": 2,
     "communityCards": 5,
     "burnCards": 3,
-    "winner": {
-      "name": "IVY",
-      "amount": 120,
-      "hand": "Full House"
-    },
-    "settledPot": 120,
     "totalTableChips": 6000,
-    "fundedPlayers": 6,
-    "nextHand": {
-      "previous": 1,
-      "current": 2,
-      "advanced": true
-    },
-    "renderer": {
-      "pixelRatio": 1,
-      "shadows": false,
-      "xrEnabled": true,
-      "calls": 242,
-      "triangles": 100991,
-      "geometries": 243,
-      "textures": 43
-    },
+    "nextHandAdvanced": true,
     "pageErrors": 0,
     "consoleErrors": 0,
     "sameOriginHttpErrors": 0,
     "requestFailures": 0
+  },
+  "phase361SessionContract": {
+    "startsStandingInLobby": true,
+    "walkToTableBeforeSitting": true,
+    "playGameButton": true,
+    "southFrontSeat": true,
+    "movementLockedWhileSeated": true,
+    "teleportLockedWhileSeated": true,
+    "headLookPreservedWhileSeated": true,
+    "leaveTableButtonRequired": true,
+    "leaveReturnsToLobbySpawn": true,
+    "watchVisibleInLobbyAndSeat": true,
+    "controllerSelectSupported": true,
+    "handPinchSupported": true,
+    "freshTableOnRejoin": true,
+    "legacyForcedSeatModulesRemoved": [
+      "p86_seated_lock.js",
+      "p87_scorpion_seat_authority.js"
+    ]
+  },
+  "npcPresentation": {
+    "ericTextureFallback": "procedural purple SVR fabric when the FBX mesh has no texture",
+    "botTextureFallback": "procedural cyan SVR fabric when a bot mesh has no texture",
+    "faceTableAlignment": true,
+    "preserveExistingModelTextures": true,
+    "deferredNpcMonitoring": true
   },
   "physicalQuestAcceptance": {
     "passed": false,
     "pending": true,
     "requiresHeadset": true,
     "checklist": [
-      "real hand joints",
-      "controller sticks",
-      "headset-look forward movement",
-      "45-degree snap turn",
-      "hold-to-aim and release-to-teleport",
-      "room-scale tracking",
-      "seated comfort and reach"
+      "spawn begins behind the table rather than over the cards",
+      "normal lobby walking and teleport work before PLAY GAME",
+      "PLAY GAME seats the player at the south/front chair",
+      "head look remains free while seated",
+      "walking and teleport cannot move the player away while seated",
+      "LEAVE TABLE returns the player to the lobby spawn",
+      "watch remains visible with PLAY or LEAVE state",
+      "Eric is textured and all visible NPCs face the felt",
+      "hole-card pickup, pinch, controller trigger, release, and throw thresholds",
+      "seated reach and comfort"
     ]
   },
   "productTruth": {
@@ -84,7 +89,9 @@
     "Phase 336 poker rules and settlement",
     "Phase 341 table and card coordinates",
     "Phase 347 Android single controller",
-    "Phase 356 Android freeze recovery",
-    "Phase 357 Android seating and showdown presentation"
+    "Phase 357 Android seating and showdown presentation",
+    "Phase 358 Quest uploaded table and full-hand certification",
+    "Phase 359 continuous winner presentation",
+    "Phase 360 fresh shuffle and deliberate leave reset"
   ]
 }
