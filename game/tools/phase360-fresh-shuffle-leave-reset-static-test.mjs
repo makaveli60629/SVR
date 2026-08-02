@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 const read = (file) => fs.readFileSync(file, 'utf8');
 const runtime = read('game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
+const guard = read('game/modules/phase360_table_conservation_next_guard_lock.js');
 const android = read('game/android.html');
 const quest = read('game/index.html');
 const gesture = read('game/modules/phase334_table_layout_gesture_poker_lock.js');
@@ -29,6 +30,16 @@ assert.match(runtime, /SVR_PHASE360_META_CARD_GRAB_QA/);
 assert.match(runtime, /physicalHeadsetAcceptancePending: true/);
 assert.match(runtime, /exactDeckRepeats === 0/);
 
+assert.match(guard, /PHASE-360-TABLE-CONSERVATION-NEXT-GUARD-LOCK/);
+assert.match(guard, /stackChips/);
+assert.match(guard, /committedChips/);
+assert.match(guard, /totalTableChips/);
+assert.match(guard, /\['showdown', 'idle'\]/);
+assert.match(guard, /rejectedPrematureNext/);
+assert.match(guard, /prematureNextProtected: true/);
+assert.match(guard, /SVR_PHASE360_CHIP_TOTALS/);
+assert.match(guard, /SVR_PHASE360_NEXT_ALLOWED/);
+
 assert.match(engine, /function shuffledDeck\(\)/);
 assert.match(engine, /localStorage\.setItem\(SAVE/);
 assert.match(engine, /Date\.now\(\) - snapshot\.savedAt > 1800000/);
@@ -43,11 +54,12 @@ for (const [name, html] of [['android', android], ['quest', quest]]) {
   assert.match(html, /data-release="PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK"/);
   assert.match(html, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase360/);
   assert.match(html, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase360/);
-  assert.ok(
-    html.indexOf('phase359_dual_platform_gameplay_continuity_lock.js')
-      < html.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js'),
-    `${name} Phase 360 must load after Phase 359`
-  );
+  assert.match(html, /phase360_table_conservation_next_guard_lock\.js\?v=phase360/);
+  const phase359 = html.indexOf('phase359_dual_platform_gameplay_continuity_lock.js');
+  const phase360 = html.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
+  const guardIndex = html.indexOf('phase360_table_conservation_next_guard_lock.js');
+  assert.ok(phase359 < phase360, `${name} Phase 360 must load after Phase 359`);
+  assert.ok(phase360 < guardIndex, `${name} conservation guard must load after Phase 360 core`);
 }
 
 assert.equal(manifest.phase, 360);
@@ -65,6 +77,8 @@ console.log(JSON.stringify({
   build: manifest.build,
   random: 'crypto.getRandomValues with synchronous engine-call wrapper',
   leave: 'deliberate leave clears recovery snapshot and arms fresh join',
+  conservation: 'player stacks plus committed chips must equal 6000',
+  nextHand: 'rejected until showdown or idle',
   loop: 'Phase 359 nine-second continuation protected; Phase 360 resets practice table when fewer than two players or human is out',
   metaCards: 'pinch and trigger pickup source contract present; physical headset acceptance pending',
   apk: `${manifest.apk_version_name} (${manifest.apk_version_code})`
