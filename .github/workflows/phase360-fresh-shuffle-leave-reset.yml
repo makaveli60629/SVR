@@ -7,6 +7,7 @@ on:
       - 'game/android.html'
       - 'game/manifest.json'
       - 'game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js'
+      - 'game/modules/phase360_table_conservation_next_guard_lock.js'
       - 'game/modules/phase359_dual_platform_gameplay_continuity_lock.js'
       - 'game/modules/phase334_table_layout_gesture_poker_lock.js'
       - 'game/modules/phase336_authoritative_engine.js'
@@ -31,6 +32,7 @@ jobs:
       - name: Validate Phase 360 and protected release contracts
         run: |
           node --check game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js
+          node --check game/modules/phase360_table_conservation_next_guard_lock.js
           node --check game/tools/phase360-session-browser-acceptance.cjs
           node game/tools/phase360-fresh-shuffle-leave-reset-static-test.mjs
           node game/tools/phase359-dual-platform-static-test.mjs
