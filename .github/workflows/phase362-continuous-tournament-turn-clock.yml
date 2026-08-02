@@ -10,6 +10,7 @@ on:
       - 'game/quest-release.json'
       - 'game/modules/phase362_continuous_10000_turn_clock_rejoin_reset_lock.js'
       - 'game/modules/phase362_settlement_accounting_clear_lock.js'
+      - 'game/modules/phase362_desktop_renderer_preboot_safety_lock.js'
       - 'game/modules/phase361_quest_lobby_play_seat_watch_npc_lock.js'
       - 'game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js'
       - 'game/modules/phase360_table_conservation_next_guard_lock.js'
@@ -41,6 +42,7 @@ jobs:
         run: |
           node --check game/modules/phase362_continuous_10000_turn_clock_rejoin_reset_lock.js
           node --check game/modules/phase362_settlement_accounting_clear_lock.js
+          node --check game/modules/phase362_desktop_renderer_preboot_safety_lock.js
           node --check game/tools/phase362-continuous-tournament-browser-acceptance.cjs
           node game/tools/phase362-continuous-tournament-static-test.mjs
           node game/tools/phase361-quest-lobby-seat-static-test.mjs
