@@ -10,9 +10,14 @@ const state = {
   installed: false,
   capturedPresses: 0,
   duplicateControlsHidden: 0,
+  labelRepairs: 0,
   lastAction: null,
   installedAt: null
 };
+
+function desiredLabel() {
+  return window.SVR_PHASE363_STATE?.joined ? 'LEAVE TABLE' : 'JOIN TABLE';
+}
 
 function hideDuplicates() {
   const authority = document.querySelector('#svr347Actions [data-ui="seat"]');
@@ -20,7 +25,7 @@ function hideDuplicates() {
   for (const button of document.querySelectorAll('button')) {
     if (button === authority || button.closest('#runtimeRecovery') || button.id === 'startRuntimeBtn') continue;
     const text = String(button.textContent || '').trim().toUpperCase();
-    if (!['SIT', 'SEAT', 'SIT DOWN', 'SIT AT TABLE', 'PLAY GAME', 'JOIN TABLE', 'LEAVE TABLE'].includes(text)) continue;
+    if (!['SIT', 'SEAT', 'SIT DOWN', 'SIT AT TABLE', 'PLAY GAME', 'JOIN TABLE', 'LEAVE', 'LEAVE TABLE'].includes(text)) continue;
     button.hidden = true;
     button.setAttribute('aria-hidden', 'true');
     try { button.inert = true; } catch {}
@@ -28,8 +33,14 @@ function hideDuplicates() {
   }
   state.duplicateControlsHidden = Math.max(state.duplicateControlsHidden, hidden);
   if (authority) {
+    const label = desiredLabel();
+    if (String(authority.textContent || '').trim() !== label) {
+      authority.textContent = label;
+      state.labelRepairs += 1;
+    }
     authority.hidden = false;
     authority.removeAttribute('aria-hidden');
+    authority.setAttribute('aria-label', label === 'JOIN TABLE' ? 'Join poker table' : 'Leave poker table');
     try { authority.inert = false; } catch {}
   }
 }
@@ -51,26 +62,30 @@ function install() {
     const joined = Boolean(window.SVR_PHASE363_STATE?.joined);
     state.lastAction = joined ? 'leave' : 'join';
     window.SVR_PHASE363_TOGGLE_JOIN();
-    hideDuplicates();
+    queueMicrotask(hideDuplicates);
   }, true);
   const observer = new MutationObserver(hideDuplicates);
-  observer.observe(document.body, { childList: true, subtree: true });
-  setInterval(hideDuplicates, 400);
+  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  setInterval(hideDuplicates, 120);
   hideDuplicates();
   window.SVR_PHASE363_JOIN_CONTROL_STATE = state;
   window.SVR_PHASE363_JOIN_CONTROL_QA = () => {
+    hideDuplicates();
     const authority = document.querySelector('#svr347Actions [data-ui="seat"]');
     const visible = [...document.querySelectorAll('button')].filter((button) => {
       if (button.hidden) return false;
       const text = String(button.textContent || '').trim().toUpperCase();
-      return ['JOIN TABLE', 'LEAVE TABLE', 'SIT', 'SEAT', 'PLAY GAME'].includes(text);
+      return ['JOIN TABLE', 'LEAVE TABLE', 'SIT', 'SEAT', 'PLAY GAME', 'LEAVE'].includes(text);
     });
+    const label = String(authority?.textContent || '').trim();
     return {
       ...state,
       authorityPresent: Boolean(authority),
       visibleJoinControls: visible.length,
       labels: visible.map((button) => String(button.textContent || '').trim()),
-      pass: Boolean(authority && visible.length === 1),
+      expectedLabel: desiredLabel(),
+      labelCorrect: label === desiredLabel(),
+      pass: Boolean(authority && visible.length === 1 && label === desiredLabel()),
       checkedAt: new Date().toISOString()
     };
   };
