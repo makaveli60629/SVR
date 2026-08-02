@@ -15,7 +15,8 @@
   "manualUpdateOnly": true,
   "previewEntry": "/game/camera3.html?v=phase350",
   "currentGameBuild": "PHASE-363-ANDROID-CANONICAL-TABLE-JOIN-BANKROLL-AUDIO-LOCK",
-  "protectedAndroidAuthority": "PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK",
+  "protectedAndroidAuthority": "PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK",
+  "controllerAuthority": "PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK",
   "tablePolicy": {
     "startingStackPerPlayer": 15000,
     "players": 6,
@@ -91,6 +92,7 @@
     "Phase 363 changes the remotely loaded Android web runtime and does not require reinstalling APK 0.1.0-rc1.",
     "Phase 336 remains the poker rules and payout authority.",
     "Phase 347 remains the only Android MOVE, LOOK, and poker-button controller.",
+    "Phase 357 remains the protected Android table/status/seating presentation authority.",
     "Phase 363 adds the final Android lobby/seated state, 15,000-chip test bankroll, one JOIN/LEAVE control, audio, haptics, gyro/touch view, responsive FOV, and verified table asset authority.",
     "No OBJ table is checked into the repository; the verified GLB is preferred and the verified FBX remains fallback.",
     "APK version name 0.1.0-rc1, version code 1, manual-update-only, forceUpdate false, and showUpdatePrompt false remain locked."
