@@ -1,5 +1,5 @@
-export const BUILD = 'PHASE-356-ANDROID-REAL-DEVICE-FREEZE-RECOVERY-LOCK';
-export const VERSION = 'phase356';
+export const BUILD = 'PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK';
+export const VERSION = 'phase361';
 
 const REGISTRY = [
   'modules/phase340_runtime_authority_registry.js'
@@ -77,9 +77,11 @@ const QUEST_POKER_BOOT = [
   'modules/phase358_quest_poker_boot_order_lock.js'
 ];
 
+// Phase 361 deliberately removes p86_seated_lock and
+// p87_scorpion_seat_authority. Those legacy modules continuously forced the
+// Quest camera over the card area and disabled movement, teleport, and watch
+// state before the player chose to play.
 const QUEST_INPUT = [
-  'modules/p86_seated_lock.js',
-  'modules/p87_scorpion_seat_authority.js',
   'phase281_visible_hands_sky_cleanup_lock.js',
   'modules/phase323_table_resting_point_alignment_lock.js',
   'modules/phase331_quest_meta_hands_table_interaction_lock.js',
@@ -127,9 +129,6 @@ const ANDROID_FINAL = [
   'modules/phase350_android_controller_dom_deduplication_lock.js'
 ];
 
-// Real-device lock: do not start FBX avatars, lobby decoration, account, or
-// network presence after the table becomes playable. Phase 356 supplies five
-// lightweight table avatars without background model/network work.
 const ANDROID_DEFERRED = [];
 
 const CAMERA3 = [
@@ -243,6 +242,8 @@ export function validateManifest(platform = detectPlatform()) {
 
   if (value === 'quest') {
     const retiredQuest = [
+      'modules/p86_seated_lock.js',
+      'modules/p87_scorpion_seat_authority.js',
       'phase156_table2_stool_texture_lock.js',
       'phase161_geometry_table_fbx_floor_lock.js',
       'phase164_fbx_table_final_alignment_seat_anchor_lock.js',
