@@ -95,7 +95,7 @@ function installPhase361QaRepair() {
         ...phaseState,
         oldForcedSeatModulesLoaded,
         phase362QaRepair: true,
-        phase362QaRepairs,
+        phase362QaRepairs: phase361QaRepairs,
         checkedAt: new Date().toISOString()
       };
       result.pass = Boolean(
