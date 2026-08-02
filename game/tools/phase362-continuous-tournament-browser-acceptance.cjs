@@ -15,21 +15,26 @@ function attachDiagnostics(page) {
   return report;
 }
 
-async function waitForPhase362(page, timeout = 180000) {
-  await page.waitForFunction(() => {
+async function waitForPhase362(page, timeout = 180000, requireAndroidLeft = false) {
+  await page.waitForFunction((needsAndroidLeft) => {
     try {
-      return typeof window.SVR_PHASE362_QA === 'function'
+      const policyReady = typeof window.SVR_PHASE362_QA === 'function'
         && Boolean(window.SVR_PHASE362_STATE)
         && Boolean(window.SVR_PHASE362_CONSTANTS);
+      const settlementReady = typeof window.SVR_PHASE362_SETTLEMENT_QA === 'function'
+        && Boolean(window.SVR_PHASE362_SETTLEMENT_STATE);
+      const leftReady = !needsAndroidLeft || window.SVR_PHASE362_QA_LEFT_READY === true;
+      return policyReady && settlementReady && leftReady;
     } catch {
       return false;
     }
-  }, null, { timeout });
+  }, requireAndroidLeft, { timeout });
 }
 
 async function policySnapshot(page) {
   return page.evaluate(() => ({
     qa: window.SVR_PHASE362_QA(),
+    settlement: window.SVR_PHASE362_SETTLEMENT_QA?.() || null,
     engine: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null,
     phase361: window.SVR_PHASE361_QA?.() || null,
     phase347: window.SVR_PHASE347_STATE || null
@@ -53,9 +58,12 @@ async function testAndroid(browser) {
     waitUntil: 'domcontentloaded',
     timeout: 120000
   });
-  await waitForPhase362(page);
+  await waitForPhase362(page, 180000, true);
 
   let snapshot = await policySnapshot(page);
+  assert.equal(snapshot.settlement.runtimePlatform, 'android');
+  assert.equal(snapshot.settlement.androidQaForceLeft, true);
+  assert.equal(snapshot.settlement.qaLeftReady, true);
   assert.equal(snapshot.qa.startingStack, 10000);
   assert.equal(snapshot.qa.tableBankroll, 60000);
   assert.equal(snapshot.qa.turnSeconds, 15);
@@ -177,6 +185,8 @@ async function testQuest(browser) {
   await page.waitForFunction(() => window.SVR_PHASE361_STATE?.mode === 'lobby', null, { timeout: 30000 });
 
   let snapshot = await policySnapshot(page);
+  assert.equal(snapshot.settlement.runtimePlatform, 'quest');
+  assert.equal(snapshot.settlement.androidQaForceLeft, false);
   assert.equal(snapshot.qa.awayFromTable, true);
   assert.equal(snapshot.phase361.mode, 'lobby');
   assert.equal(snapshot.phase361.seated, false);
@@ -248,6 +258,8 @@ async function testDesktop(browser) {
   await waitForPhase362(page, 180000);
   await page.waitForFunction(() => window.SVR_PHASE362_QA?.().pass === true, null, { timeout: 30000 });
   const snapshot = await policySnapshot(page);
+  assert.equal(snapshot.settlement.runtimePlatform, 'desktop');
+  assert.equal(snapshot.settlement.androidQaForceLeft, false);
   assert.equal(snapshot.qa.platform, 'desktop');
   assert.equal(snapshot.qa.totalTableChips, 60000);
   assert.equal(snapshot.qa.turnSeconds, 15);
