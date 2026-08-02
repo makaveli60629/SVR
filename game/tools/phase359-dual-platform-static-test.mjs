@@ -42,22 +42,26 @@ assert.match(phase361, /SVR_PHASE360_JOIN_TABLE/);
 assert.match(phase361, /SVR_PHASE360_LEAVE_TABLE/);
 
 assert.match(indexText, /data-build="PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK"/);
-assert.match(indexText, /data-release="PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK"/);
-assert.match(indexText, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase361/);
-assert.match(indexText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase361/);
-assert.match(indexText, /phase361_quest_lobby_play_seat_watch_npc_lock\.js\?v=phase361/);
+assert.match(indexText, /data-release="PHASE-(?:361|36[2-9]|3[7-9]\d)-/);
+assert.match(indexText, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/);
+assert.match(indexText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/);
+assert.match(indexText, /phase361_quest_lobby_play_seat_watch_npc_lock\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/);
 assert.ok(indexText.indexOf('await bootPlatform()') < indexText.indexOf('phase359_dual_platform_gameplay_continuity_lock.js'));
 assert.ok(indexText.indexOf('phase359_dual_platform_gameplay_continuity_lock.js') < indexText.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js'));
 assert.ok(indexText.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js') < indexText.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js'));
+const questSuccessorIndex = indexText.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
+assert.ok(questSuccessorIndex < 0 || questSuccessorIndex > indexText.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js'));
 
 assert.match(androidText, /data-build="PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK"/);
-assert.match(androidText, /data-release="PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK"/);
-assert.match(androidText, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase360/);
-assert.match(androidText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase360/);
+assert.match(androidText, /data-release="PHASE-(?:360|36[1-9]|3[7-9]\d)-/);
+assert.match(androidText, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase(?:360|36[1-9]|3[7-9]\d)/);
+assert.match(androidText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase(?:360|36[1-9]|3[7-9]\d)/);
 assert.ok(androidText.indexOf('phase357_android_table_status_showdown_ante_lock.js') < androidText.indexOf('phase359_dual_platform_gameplay_continuity_lock.js'));
 assert.ok(androidText.indexOf('phase359_dual_platform_gameplay_continuity_lock.js') < androidText.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js'));
+const androidSuccessorIndex = androidText.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
+assert.ok(androidSuccessorIndex < 0 || androidSuccessorIndex > androidText.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js'));
 
-assert.equal(questRelease.phase, 361);
+assert.ok(Number(questRelease.phase) >= 361);
 assert.equal(questRelease.browserAcceptance.passed, true);
 assert.equal(questRelease.browserAcceptance.baseGameplayCertification, 'PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK');
 assert.equal(questRelease.browserAcceptance.uploadedTable, 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED');
@@ -67,8 +71,9 @@ assert.equal(questRelease.browserAcceptance.controllerFallback, true);
 assert.equal(questRelease.browserAcceptance.holeCards, 2);
 assert.equal(questRelease.browserAcceptance.communityCards, 5);
 assert.equal(questRelease.browserAcceptance.nextHand.advanced, true);
-assert.equal(questRelease.phase361SessionContract.startsStandingInLobby, true);
-assert.equal(questRelease.phase361SessionContract.leaveTableButtonRequired, true);
+const questSession = questRelease.phase361SessionContract || questRelease.sessionContract;
+assert.equal(questSession.startsStandingInLobby, true);
+assert.equal(questSession.leaveTableButtonRequired, true);
 
 assert.equal(androidRelease.browserAcceptance.passed, true);
 assert.equal(androidRelease.browserAcceptance.holeCards, 2);
@@ -79,9 +84,9 @@ assert.equal(androidRelease.browserAcceptance.nextHandAdvanced, true);
 assert.equal(androidRelease.browserAcceptance.singleControllerPassed, true);
 assert.equal(androidRelease.browserAcceptance.legacyControllerRoots, 0);
 
-assert.equal(manifest.phase, 360);
-assert.equal(manifest.build, 'PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK');
-assert.match(manifest.start_url, /v=phase360/);
+assert.ok(Number(manifest.phase) >= 360);
+assert.match(String(manifest.build), /^PHASE-(?:360|36[1-9]|3[7-9]\d)-/);
+assert.match(String(manifest.start_url), /v=phase(?:360|36[1-9]|3[7-9]\d)/);
 assert.equal(manifest.apk_version_name, '0.1.0-rc1');
 assert.equal(manifest.apk_version_code, 1);
 assert.equal(manifest.release_ready, false);
@@ -95,12 +100,13 @@ assert.ok(fs.statSync(tablePath).size > 1024, 'uploaded table FBX must be non-em
 
 console.log(JSON.stringify({
   build: manifest.build,
-  android: 'phase357 protected with phase360 Android successor',
-  quest: 'phase358 gameplay protected with phase361 lobby/seat successor',
+  android: 'phase357 authority protected with successor table policy',
+  quest: 'phase358 gameplay and phase361 lobby/seat protected with successor table policy',
   continuity: 'phase359 protected',
   shuffle: 'phase360 secure-session protected',
   uploadedTableFbx: fs.statSync(tablePath).size,
   continuousDelayMs: 9000,
+  successorTableBankroll: manifest.table_bankroll || null,
   apk: `${manifest.apk_version_name} (${manifest.apk_version_code})`,
   pass: true
 }, null, 2));
