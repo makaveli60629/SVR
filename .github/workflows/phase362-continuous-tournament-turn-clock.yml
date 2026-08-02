@@ -8,6 +8,7 @@ on:
       - 'game/android-release.json'
       - 'game/modules/phase363_android_canonical_table_asset_lock.js'
       - 'game/modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js'
+      - 'game/modules/phase363_android_secure_shuffle_lock.js'
       - 'game/modules/phase363_android_raise_ui_capture_lock.js'
       - 'game/modules/phase363_android_street_raise_action_lock.js'
       - 'game/modules/phase363_android_join_control_capture_lock.js'
@@ -40,6 +41,7 @@ jobs:
         run: |
           node --check game/modules/phase363_android_canonical_table_asset_lock.js
           node --check game/modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js
+          node --check game/modules/phase363_android_secure_shuffle_lock.js
           node --check game/modules/phase363_android_raise_ui_capture_lock.js
           node --check game/modules/phase363_android_street_raise_action_lock.js
           node --check game/modules/phase363_android_join_control_capture_lock.js
@@ -60,7 +62,7 @@ jobs:
           echo $! > /tmp/svr-phase363-http.pid
           sleep 2
 
-      - name: Verify JOIN, RAISE, burns, betting streets, payout, LEAVE and rejoin
+      - name: Verify JOIN, secure shuffle, RAISE, burns, betting streets, payout, LEAVE and rejoin
         env:
           SVR_TEST_BASE: http://127.0.0.1:4173
         run: node game/tools/phase363-android-integrated-core-browser-acceptance.cjs
