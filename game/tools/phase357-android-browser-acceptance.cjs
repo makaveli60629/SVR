@@ -147,6 +147,10 @@ async function tap(locator) {
       hand,
       showdown,
       compatibilityAuthority: 'phase363-leave-join',
+      compatibilityBankrolls: {
+        isolatedLegacyDriver: Number(hand?.record?.expectedTableBankroll || 0),
+        phase363FreshTable: Number(freshRejoin?.consistency?.expectedTableChips || 0)
+      },
       lobbyAfterLeave,
       freshRejoin,
       pageErrors,
@@ -163,6 +167,8 @@ async function tap(locator) {
   const lobbyHandsCleared = (report?.lobbyAfterLeave?.audit?.players || [])
     .every((player) => Array.isArray(player.hand) && player.hand.length === 0);
   const freshHuman = report?.freshRejoin?.audit?.players?.[0] || null;
+  const legacyExpected = Number(report?.hand?.record?.expectedTableBankroll || 0);
+  const legacySettled = Number(report?.hand?.record?.totalStacks || -1);
   const pass = report?.lobbyBefore?.joined === false
     && report?.lobbyBefore?.joinQa?.pass === true
     && report?.lobbyBefore?.seatText === 'JOIN TABLE'
@@ -170,13 +176,15 @@ async function tap(locator) {
     && report?.seated?.seated === true
     && Number(report?.seated?.cameraDistance || Infinity) <= Number(report?.seated?.maximumCloseSeatDistance || 0) + 0.08
     && report?.hand?.pass === true
+    && legacyExpected === 6000
+    && legacySettled === legacyExpected
+    && Number(report?.hand?.record?.settledPot || 0) > 0
     && report?.showdown?.phase === 'showdown'
     && /WIN|WINS/i.test(report?.showdown?.title || '')
     && /POT SETTLED:/i.test(report?.showdown?.pot || '')
     && /WINNING CARDS:/i.test(report?.showdown?.winners || '')
     && /BOARD:/i.test(report?.showdown?.board || '')
     && report?.showdown?.betIndicators === 6
-    && report?.showdown?.phase363?.conservationValid === true
     && report?.compatibilityAuthority === 'phase363-leave-join'
     && report?.lobbyAfterLeave?.joined === false
     && report?.lobbyAfterLeave?.gameState === 'LOBBY'
@@ -194,6 +202,7 @@ async function tap(locator) {
     && Array.isArray(freshHuman?.hand)
     && freshHuman.hand.length === 2
     && Number(report?.freshRejoin?.consistency?.effectiveTableChips || 0) === 90000
+    && Number(report?.freshRejoin?.consistency?.expectedTableChips || 0) === 90000
     && report?.freshRejoin?.phase357?.seated === true
     && pageErrors.length === 0
     && consoleErrors.length === 0
