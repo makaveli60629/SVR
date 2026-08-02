@@ -18,10 +18,23 @@
     "forwardReference": "headset-look-direction",
     "teleportContract": "hold-to-aim-release-to-teleport",
     "phases": ["preflop", "flop", "turn", "river", "showdown"],
+    "humanActions": 4,
     "holeCards": 2,
     "communityCards": 5,
     "burnCards": 3,
+    "winner": {
+      "name": "IVY",
+      "amount": 120,
+      "hand": "Full House"
+    },
+    "settledPot": 120,
     "totalTableChips": 6000,
+    "fundedPlayers": 6,
+    "nextHand": {
+      "previous": 1,
+      "current": 2,
+      "advanced": true
+    },
     "nextHandAdvanced": true,
     "pageErrors": 0,
     "consoleErrors": 0,
