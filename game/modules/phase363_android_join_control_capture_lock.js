@@ -9,9 +9,13 @@ const state = {
   active: ACTIVE,
   installed: false,
   capturedPresses: 0,
+  pointerActivations: 0,
+  clickFallbackActivations: 0,
+  duplicateActivationsBlocked: 0,
   duplicateControlsHidden: 0,
   labelRepairs: 0,
   lastAction: null,
+  lastActivationAt: 0,
   installedAt: null
 };
 
@@ -45,6 +49,33 @@ function hideDuplicates() {
   }
 }
 
+function activate(event, source) {
+  const button = event.target?.closest?.('#svr347Actions [data-ui="seat"]');
+  if (!button) return false;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  const now = performance.now();
+  if (now - state.lastActivationAt < 650) {
+    state.duplicateActivationsBlocked += 1;
+    return true;
+  }
+  state.lastActivationAt = now;
+  state.capturedPresses += 1;
+  if (source === 'pointerdown') state.pointerActivations += 1;
+  else state.clickFallbackActivations += 1;
+
+  const joined = Boolean(window.SVR_PHASE363_STATE?.joined);
+  state.lastAction = joined ? 'leave' : 'join';
+  const handler = joined ? window.SVR_PHASE363_LEAVE_TABLE : window.SVR_PHASE363_JOIN_TABLE;
+  if (typeof handler === 'function') handler(`join-control-${source}`);
+  else window.SVR_PHASE363_TOGGLE_JOIN?.();
+  queueMicrotask(hideDuplicates);
+  setTimeout(hideDuplicates, 0);
+  setTimeout(hideDuplicates, 100);
+  return true;
+}
+
 function install() {
   if (!ACTIVE || state.installed) return;
   if (typeof window.SVR_PHASE363_TOGGLE_JOIN !== 'function') {
@@ -53,17 +84,8 @@ function install() {
   }
   state.installed = true;
   state.installedAt = new Date().toISOString();
-  window.addEventListener('pointerdown', (event) => {
-    const button = event.target?.closest?.('#svr347Actions [data-ui="seat"]');
-    if (!button) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    state.capturedPresses += 1;
-    const joined = Boolean(window.SVR_PHASE363_STATE?.joined);
-    state.lastAction = joined ? 'leave' : 'join';
-    window.SVR_PHASE363_TOGGLE_JOIN();
-    queueMicrotask(hideDuplicates);
-  }, true);
+  window.addEventListener('pointerdown', (event) => activate(event, 'pointerdown'), true);
+  window.addEventListener('click', (event) => activate(event, 'click'), true);
   const observer = new MutationObserver(hideDuplicates);
   observer.observe(document.body, { childList: true, subtree: true, characterData: true });
   setInterval(hideDuplicates, 120);
