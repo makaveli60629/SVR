@@ -51,8 +51,9 @@ if (release.realDeviceValidation?.pending !== true || release.realDeviceValidati
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) throw new Error('APK update policy changed');
 if (release.apkVersionName !== '0.1.0-rc1' || release.apkVersionCode !== 1) throw new Error('APK version lock changed');
 if (Number(webManifest.phase || 0) < 356 || webManifest.apk_version_code !== 1) throw new Error('Web manifest phase/APK regression');
-if (!String(webManifest.build || '').startsWith('PHASE-')) throw new Error('Web manifest build missing');
-if (release.currentGameBuild !== webManifest.build) throw new Error('Release and web manifest build mismatch');
+if (!String(webManifest.build || '').startsWith('PHASE-360-')) throw new Error('Phase 360 web successor build missing');
+if (release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') throw new Error('Protected Android Phase 357 authority changed');
+if (!android.includes(webManifest.build)) throw new Error('Android page is missing Phase 360 successor release marker');
 
 requireText(matrix, 'phraseIntervalSeconds = reducedMotion ? 18 : coarsePointer ? 12 : 9', 'secret-phrase-slowdown');
 requireText(matrix, 'phraseStaggerSeconds', 'secret-letter-stagger');
@@ -85,7 +86,8 @@ console.log(JSON.stringify({
   pass: true,
   protectedPhase: 356,
   currentPhase: webManifest.phase,
-  currentBuild: webManifest.build,
+  successorWebBuild: webManifest.build,
+  protectedAndroidAuthority: release.currentGameBuild,
   android: {
     deferredModules: 0,
     shaderPrecompile: 'disabled-on-android',
