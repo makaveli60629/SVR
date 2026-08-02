@@ -20,6 +20,7 @@ const start=async()=>{if(started)return;started=true;try{
   await import('./modules/phase359_dual_platform_gameplay_continuity_lock.js?v=phase363');
   await import('./modules/phase360_table_conservation_next_guard_lock.js?v=phase363');
   await import('./modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js?v=phase363');
+  await import('./modules/phase363_android_join_control_capture_lock.js?v=phase363');
   window.SVR_PHASE363_LEAVE_TABLE?.('boot-lobby');
 }catch(error){console.error(error);report('The Android table stopped during startup. Reload the table to try the protected low-memory path.');}};
 document.getElementById('startRuntimeBtn')?.addEventListener('click',start);
