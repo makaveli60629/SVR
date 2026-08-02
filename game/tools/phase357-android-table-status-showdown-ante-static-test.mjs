@@ -6,6 +6,8 @@ const directCamera = read('game/modules/phase357_android_direct_camera_seat_fix.
 const continuity = read('game/modules/phase359_dual_platform_gameplay_continuity_lock.js');
 const shuffle = read('game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
 const phase363 = read('game/modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
+const raiseCapture = read('game/modules/phase363_android_raise_ui_capture_lock.js');
+const streetRaise = read('game/modules/phase363_android_street_raise_action_lock.js');
 const consistency = read('game/modules/phase363_android_settlement_lobby_consistency_lock.js');
 const android = read('game/android.html');
 const manifest = JSON.parse(read('game/manifest.json'));
@@ -55,6 +57,11 @@ requireText(phase363, 'const STARTING_STACK = 15000', 'phase363-starting-stack')
 requireText(phase363, 'function prepareLobby', 'phase363-lobby-state');
 requireText(phase363, 'function joinTable', 'phase363-join-state');
 requireText(phase363, 'function leaveTable', 'phase363-leave-state');
+requireText(raiseCapture, 'PHASE-363-ANDROID-RAISE-UI-CAPTURE-LOCK', 'phase363-raise-capture-build');
+requireText(raiseCapture, 'event.stopImmediatePropagation()', 'phase363-raise-capture');
+requireText(streetRaise, 'PHASE-363-ANDROID-STREET-RAISE-ACTION-LOCK', 'phase363-street-raise-build');
+requireText(streetRaise, "expectedOrder = ['preflop', 'flop', 'turn', 'river', 'showdown']", 'phase363-street-order');
+requireText(streetRaise, "river: { community: 5, burn: 3 }", 'phase363-burn-order');
 requireText(consistency, 'PHASE-363-ANDROID-SETTLEMENT-LOBBY-CONSISTENCY-LOCK', 'phase363-consistency-build');
 requireText(consistency, 'effectiveTableChips', 'settled-chip-accounting');
 requireText(consistency, 'enforceLobbyCardClear', 'lobby-card-clear');
@@ -64,13 +71,17 @@ const tableIndex = android.indexOf('phase363_android_canonical_table_asset_lock.
 const phase357Index = android.indexOf('phase357_android_table_status_showdown_ante_lock.js');
 const directCameraIndex = android.indexOf('phase357_android_direct_camera_seat_fix.js');
 const phase363Index = android.indexOf('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
+const raiseCaptureIndex = android.indexOf('phase363_android_raise_ui_capture_lock.js');
+const streetRaiseIndex = android.indexOf('phase363_android_street_raise_action_lock.js');
 const joinCaptureIndex = android.indexOf('phase363_android_join_control_capture_lock.js');
 const consistencyIndex = android.indexOf('phase363_android_settlement_lobby_consistency_lock.js');
 if (bootIndex < 0 || tableIndex <= bootIndex) errors.push('verified-table-must-load-after-platform-boot');
 if (phase357Index <= tableIndex) errors.push('phase357-must-load-after-verified-table');
 if (directCameraIndex <= phase357Index) errors.push('direct-camera-fix-must-load-after-phase357');
 if (phase363Index <= directCameraIndex) errors.push('phase363-must-load-after-direct-camera-fix');
-if (joinCaptureIndex <= phase363Index) errors.push('join-capture-must-load-after-core');
+if (raiseCaptureIndex <= phase363Index) errors.push('raise-capture-must-load-after-core');
+if (streetRaiseIndex <= raiseCaptureIndex) errors.push('street-raise-must-load-after-raise-capture');
+if (joinCaptureIndex <= streetRaiseIndex) errors.push('join-capture-must-load-after-street-raise');
 if (consistencyIndex <= joinCaptureIndex) errors.push('consistency-must-load-last');
 if (android.includes('phase359_dual_platform_gameplay_continuity_lock.js')) errors.push('phase359-must-not-auto-run-before-join');
 if (android.includes('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js')) errors.push('phase360-must-not-auto-run-before-join');
@@ -103,6 +114,8 @@ console.log(JSON.stringify({
   successorRelease: manifest.build,
   closeSeat: 'direct-non-xr-camera-to-south-table-edge-with-xr-rig-preserved',
   androidContinuation: 'phase363-join-gated-fresh-15000-chip-table',
+  raise: 'capture-protected bet and raise-to authority',
+  streets: 'preflop-flop-turn-river-showdown with three burns',
   settlement: 'effective settled stacks prevent contribution double-counting',
   historicalContinuityProtected: ['phase359', 'phase360'],
   apk: {
