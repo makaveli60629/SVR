@@ -1,0 +1,63 @@
+{
+  "name": "SVR Poker Fresh Shuffle and Table Session Release",
+  "phase": 360,
+  "build": "PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK",
+  "status": "browser-acceptance-pending",
+  "routes": {
+    "android": "/game/android.html?channel=stable&v=phase360",
+    "quest": "/game/index.html?platform=quest&v=phase360"
+  },
+  "protectedAuthorities": {
+    "poker": "Phase 336",
+    "questHandsAndCardPickup": "Phase 334",
+    "androidControls": "Phase 347",
+    "androidPresentation": "Phase 357",
+    "questRelease": "Phase 358",
+    "continuousHands": "Phase 359"
+  },
+  "freshShuffle": {
+    "source": "crypto.getRandomValues when available, Math.random fallback only",
+    "engineIntegration": "synchronous random wrapper around Phase 336 start/reset calls",
+    "deckFingerprintAudit": true,
+    "exactDeckRepeatAllowedByReleaseGate": false,
+    "sameHoleCardsCanStillOccurNaturally": true
+  },
+  "tableSession": {
+    "accidentalSameTabReloadRecovery": true,
+    "newBrowserSessionStartsFresh": true,
+    "deliberateLeaveClearsRecoverySnapshot": true,
+    "rejoinStartsFreshTable": true,
+    "continuousResultDelayMilliseconds": 9000,
+    "practiceTableResetsWhenHumanOutOrFewerThanTwoFunded": true
+  },
+  "metaCardInteraction": {
+    "pinchPickupContract": true,
+    "controllerTriggerPickupContract": true,
+    "throwTowardCenterFoldContract": true,
+    "physicalQuestHeadsetAcceptancePending": true
+  },
+  "acceptance": {
+    "workflow": "Phase 360 Fresh Shuffle Leave Reset",
+    "pending": true,
+    "passed": false,
+    "secureShuffle": null,
+    "leaveJoinReset": null,
+    "androidFullHand": null,
+    "questFullHand": null
+  },
+  "productTruth": {
+    "localPlayMoneyVsFiveBots": true,
+    "serverAuthoritativeMultiplayer": false,
+    "realMoneyGambling": false,
+    "physicalAndroidDeviceTestPending": true,
+    "physicalQuestHeadsetTestPending": true
+  },
+  "androidApk": {
+    "versionName": "0.1.0-rc1",
+    "versionCode": 1,
+    "releaseReady": false,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true
+  }
+}
