@@ -13,6 +13,9 @@ const errors = [];
 function requireText(source, needle, label) {
   if (!source.includes(needle)) errors.push(label);
 }
+function requirePattern(source, pattern, label) {
+  if (!pattern.test(source)) errors.push(label);
+}
 
 requireText(runtime, 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK', 'build-label');
 requireText(runtime, 'function desiredSeatCamera', 'close-seat-target');
@@ -56,20 +59,23 @@ const phase357Index = android.indexOf('phase357_android_table_status_showdown_an
 const directCameraIndex = android.indexOf('phase357_android_direct_camera_seat_fix.js');
 const phase359Index = android.indexOf('phase359_dual_platform_gameplay_continuity_lock.js');
 const phase360Index = android.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
+const successorIndex = android.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
 if (bootIndex < 0 || phase357Index <= bootIndex) errors.push('phase357-must-load-after-platform-boot');
 if (directCameraIndex <= phase357Index) errors.push('direct-camera-fix-must-load-after-phase357');
 if (phase359Index <= directCameraIndex) errors.push('phase359-must-load-after-direct-camera-fix');
 if (phase360Index <= phase359Index) errors.push('phase360-must-load-after-phase359');
+if (successorIndex >= 0 && successorIndex <= phase360Index) errors.push('successor-policy-must-load-after-phase360');
 requireText(android, 'data-build="PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK"', 'android-page-build');
-requireText(android, 'data-release="PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK"', 'android-release-label');
-requireText(android, 'manifest.json?v=phase360', 'android-manifest-cache-version');
+requirePattern(android, /data-release="PHASE-(?:360|36[1-9]|3[7-9]\d)-/, 'android-release-label');
+requirePattern(android, /manifest\.json\?v=phase(?:360|36[1-9]|3[7-9]\d)/, 'android-manifest-cache-version');
 
-if (manifest.phase !== 360) errors.push('manifest-phase');
-if (manifest.build !== 'PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK') errors.push('manifest-build');
-if (!String(manifest.start_url || '').includes('v=phase360')) errors.push('manifest-start-url');
-if (release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('phase357-authority-record-regressed');
-if (!String(release.webEntry || '').includes('v=phase357')) errors.push('phase357-authority-route-regressed');
-if (release.realDeviceValidation?.phase !== 357 || release.realDeviceValidation?.pending !== true) errors.push('owner-playtest-pending');
+if (Number(manifest.phase) < 360) errors.push('manifest-phase');
+if (!/^PHASE-(?:360|36[1-9]|3[7-9]\d)-/.test(String(manifest.build || ''))) errors.push('manifest-build');
+if (!/v=phase(?:360|36[1-9]|3[7-9]\d)/.test(String(manifest.start_url || ''))) errors.push('manifest-start-url');
+if (release.protectedAndroidAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK'
+  && release.currentGameBuild !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('phase357-authority-record-regressed');
+if (!/v=phase(?:357|35[8-9]|36\d|3[7-9]\d)/.test(String(release.webEntry || ''))) errors.push('phase357-authority-route-regressed');
+if (Number(release.realDeviceValidation?.phase) < 357 || release.realDeviceValidation?.pending !== true) errors.push('owner-playtest-pending');
 
 if (manifest.apk_version_name !== '0.1.0-rc1' || manifest.apk_version_code !== 1) errors.push('manifest-apk-version');
 if (manifest.force_update !== false || manifest.show_update_prompt !== false || manifest.manual_update_only !== true) errors.push('manifest-apk-policy');
@@ -84,10 +90,10 @@ if (errors.length) {
 
 console.log(JSON.stringify({
   pass: true,
-  protectedAuthority: release.currentGameBuild,
+  protectedAuthority: release.protectedAndroidAuthority || 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK',
   successorRelease: manifest.build,
   closeSeat: 'direct-non-xr-camera-to-south-table-edge-with-xr-rig-preserved',
-  continuation: 'phase359 countdown plus phase360 secure fresh-session reset',
+  continuation: 'phase359 countdown, phase360 secure session, and successor tournament policy',
   apk: {
     versionName: release.apkVersionName,
     versionCode: release.apkVersionCode,
