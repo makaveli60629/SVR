@@ -53,7 +53,13 @@ assert.match(engine, /localStorage\.setItem\(SAVE/);
 assert.match(engine, /Date\.now\(\) - snapshot\.savedAt > 1800000/);
 for (const pattern of [/function nearestHumanCard/, /function grabCard/, /function releaseCard/, /pointer\.down/, /window\.SVR_POKER_ACTION\?\.\("fold"\)/]) assert.match(gesture, pattern);
 
-// Android remains JOIN-gated and does not auto-run the Quest/desktop session modules.
+const importIndex = (source, moduleName) => {
+  const escaped = moduleName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const expression = new RegExp(`(?:await\\s+)?import\\(['\"]\\./modules/${escaped}\\.js\\?v=phase\\d+['\"]\\)`);
+  const match = expression.exec(source);
+  return match ? match.index : -1;
+};
+
 assert.match(android, /data-release="PHASE-(?:363|3[6-9]\d)-/);
 for (const module of [
   'phase363_android_canonical_table_asset_lock.js',
@@ -84,14 +90,15 @@ for (const module of [
   'phase361_quest_lobby_play_seat_watch_npc_lock.js'
 ]) assert.match(quest, new RegExp(`${module.replaceAll('.', '\\.')}\\?v=phase(?:361|3[6-9]\\d)`));
 const questOrder = [
-  'phase359_dual_platform_gameplay_continuity_lock.js',
-  'phase360_fresh_shuffle_leave_reset_continuous_table_lock.js',
-  'phase360_table_conservation_next_guard_lock.js',
-  'phase361_quest_lobby_play_seat_watch_npc_lock.js'
-].map((token) => quest.indexOf(token));
+  'phase359_dual_platform_gameplay_continuity_lock',
+  'phase360_fresh_shuffle_leave_reset_continuous_table_lock',
+  'phase360_table_conservation_next_guard_lock',
+  'phase361_quest_lobby_play_seat_watch_npc_lock'
+].map((moduleName) => importIndex(quest, moduleName));
 assert.ok(questOrder.every((index) => index >= 0) && questOrder.every((index, i) => i === 0 || index > questOrder[i - 1]), 'Quest Phase 359-361 load order invalid');
-const questSuccessor = quest.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
+const questSuccessor = importIndex(quest, 'phase362_continuous_10000_turn_clock_rejoin_reset_lock');
 assert.ok(questSuccessor < 0 || questOrder.at(-1) < questSuccessor, 'Quest successor policy must load after Phase 361');
+assert.match(quest, /PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK/);
 
 for (const pattern of [/SVR_PHASE360_JOIN_TABLE/, /SVR_PHASE360_LEAVE_TABLE/, /SVR_PHASE359_TOGGLE_CONTINUOUS/]) assert.match(phase361, pattern);
 
@@ -111,6 +118,7 @@ assert.equal(manifest.manual_update_only, true);
 console.log(JSON.stringify({
   pass: true,
   build: manifest.build,
+  successorBuild: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
   random: 'phase360 crypto shuffle preserved for Quest and desktop',
   androidLeave: 'phase363 deliberate leave clears cards and restores fresh 15,000-chip JOIN state',
   androidConservation: 'phase363 requires 90,000 total test chips',
