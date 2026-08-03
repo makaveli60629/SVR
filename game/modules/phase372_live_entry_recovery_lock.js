@@ -15,6 +15,7 @@ const state = {
   joined: false,
   attempts: 0,
   leaveRestoresEntry: true,
+  questSingleSpawnAuthority: true,
   lastError: null,
   checkedAt: null
 };
@@ -167,11 +168,14 @@ async function runQuestLobby() {
   startRuntime();
   setStatus('Loading the Quest lobby and verified table…');
   await waitForTable();
-  window.SVR_PHASE364_LOBBY_SPAWN?.();
-  window.SVR_PHASE361_LOBBY_SPAWN?.();
+  const spawn = platform === 'quest'
+    ? await waitForFunction(['SVR_PHASE373_STABLE_LOBBY'], 30000)
+    : await waitForFunction(['SVR_PHASE364_LOBBY_SPAWN'], 12000);
+  const result = await spawn('phase372-visible-entry');
+  if (result === false) throw new Error('QUEST_LOBBY_SPAWN_REJECTED');
   document.body.classList.add('boot-released');
   root.hidden = true;
-  publish('quest-lobby-ready');
+  publish(platform === 'quest' ? 'quest-phase373-lobby-ready' : 'desktop-lobby-ready');
   return true;
 }
 
