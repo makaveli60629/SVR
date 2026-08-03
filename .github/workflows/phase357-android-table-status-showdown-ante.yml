@@ -8,6 +8,7 @@ on:
       - 'game/android-release.json'
       - 'game/modules/phase357_android_table_status_showdown_ante_lock.js'
       - 'game/modules/phase357_android_direct_camera_seat_fix.js'
+      - 'game/modules/phase369_android_join_table_freeze_recovery_lock.js'
       - 'game/tools/phase357-android-table-status-showdown-ante-static-test.mjs'
       - 'game/tools/phase357-android-browser-acceptance.cjs'
       - 'game/tools/phase347-android-static-test.mjs'
@@ -27,9 +28,11 @@ jobs:
         run: |
           node --check game/modules/phase357_android_table_status_showdown_ante_lock.js
           node --check game/modules/phase357_android_direct_camera_seat_fix.js
+          node --check game/modules/phase369_android_join_table_freeze_recovery_lock.js
           node --check game/tools/phase357-android-browser-acceptance.cjs
           node game/tools/phase357-android-table-status-showdown-ante-static-test.mjs
           node game/tools/phase347-android-static-test.mjs
+          node game/tools/phase369-android-recovery-static-test.mjs
       - name: Install Playwright Chromium
         run: |
           npm install --no-save playwright@1.49.1
