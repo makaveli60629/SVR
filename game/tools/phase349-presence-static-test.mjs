@@ -33,7 +33,7 @@ for (const [token, label] of [
   ['...INGAME_AVATAR', 'shared-avatar-tail'],
   ['...MULTIPLAYER_PRESENCE', 'shared-presence-modules'],
   ['const ANDROID_DEFERRED = []', 'android-background-presence-disabled'],
-  ['phase365-android-background-deferred-work', 'android-zero-background-validator'],
+  ['phase366-android-background-deferred-work', 'android-zero-background-validator'],
   ['phase356_android_real_device_freeze_recovery_lock.js', 'android-recovery-module']
 ]) requireText(platform, token, label);
 requireText(androidRuntime, 'PHASE356_ANDROID_LIGHTWEIGHT_TABLE_AVATARS', 'android-local-lightweight-opponents');
