@@ -4,6 +4,7 @@ const read = (file) => fs.readFileSync(file, 'utf8');
 const profileRecovery = read('site/js/phase350-profile-avatar-recovery.js');
 const profilePage = read('site/profile.html');
 const profileShowroom = fs.existsSync('site/js/phase351-profile-showroom.js') ? read('site/js/phase351-profile-showroom.js') : '';
+const profileLiveCamera = fs.existsSync('site/js/phase366-profile-live-camera-lock.js') ? read('site/js/phase366-profile-live-camera-lock.js') : '';
 const phase356Legend = fs.existsSync('site/js/phase356-profile-legend-pedestal.js') ? read('site/js/phase356-profile-legend-pedestal.js') : '';
 const camera3 = read('game/modules/phase350_camera3_visibility_lighting_lock.js');
 const androidDedupe = read('game/modules/phase350_android_controller_dom_deduplication_lock.js');
@@ -25,7 +26,8 @@ for (const [token, label] of [
   ['SVR_PHASE350_PROFILE_AVATAR_QA', 'profile-avatar-qa']
 ]) need(profileRecovery, token, label);
 const originalRecoveryLoaded = profilePage.includes('phase350-profile-avatar-recovery.js?v=phase350');
-const showroomLoaded = profilePage.includes('phase351-profile-showroom.js?v=phase351');
+const showroomLoaded = /phase351-profile-showroom\.js\?v=phase(?:351|366)/.test(profilePage);
+const liveCameraLoaded = profilePage.includes('phase366-profile-live-camera-lock.js?v=phase366');
 if (!originalRecoveryLoaded && !showroomLoaded) errors.push('profile-recovery-successor-missing');
 if (showroomLoaded) {
   for (const [token, label] of [
@@ -37,6 +39,11 @@ if (showroomLoaded) {
   ]) need(profileShowroom, token, label);
   need(profilePage, 'id="showroomRetry"', 'profile-visible-retry-button');
 } else need(profilePage, 'id="avatarRetry"', 'profile-visible-retry-button');
+if (liveCameraLoaded) {
+  need(profileLiveCamera, 'SVR_PHASE351_PROFILE_SHOWROOM_RETRY', 'phase366-showroom-recovery-bridge');
+  need(profileLiveCamera, 'SVR_PHASE366_PROFILE_CAMERA_QA', 'phase366-profile-camera-qa');
+  need(profilePage, 'phase366-profile-live-camera.css?v=phase366', 'phase366-profile-camera-css');
+}
 if (profilePage.includes('phase346-profile-avatar-preview.js')) errors.push('old-profile-preview-still-loaded');
 if (Number(manifest.phase || 0) >= 356) {
   need(matrix, 'phase356-profile-legend-pedestal.js', 'phase356-profile-legend-injection');
@@ -53,9 +60,9 @@ if (platformVersion < 350) errors.push('platform-version-regressed');
 for (const [token, label] of [
   ['phase350_android_controller_dom_deduplication_lock.js', 'android-dedupe-manifest'],
   ['phase350_camera3_visibility_lighting_lock.js', 'camera3-lighting-manifest'],
-  ['phase365-android-seated-ux-not-last', 'android-successor-final-validator'],
+  ['phase366-android-device-acceptance-not-last', 'android-successor-final-validator'],
   ['phase350-camera3-light-not-last', 'camera3-lighting-final-validator'],
-  ['phase365-android-critical-load-order', 'android-load-order-label'],
+  ['phase366-android-critical-load-order', 'android-load-order-label'],
   ['phase350-camera3-load-order', 'camera3-load-order-label'],
   ['deferredManifestFor', 'android-deferred-export'],
   ['const ANDROID_DEFERRED = []', 'phase356-zero-background-work']
@@ -64,7 +71,8 @@ for (const [token, label] of [
 const androidFinal = platform.split('const ANDROID_FINAL = [')[1]?.split('];')[0] || '';
 const dedupeIndex = androidFinal.indexOf('phase350_android_controller_dom_deduplication_lock.js');
 const phase365Index = androidFinal.indexOf('phase365_android_seated_ux_branding_gyro_alignment_lock.js');
-if (dedupeIndex < 0 || phase365Index <= dedupeIndex) errors.push('android-dedupe-successor-order');
+const phase366Index = androidFinal.indexOf('phase366_android_physical_device_viewport_acceptance_lock.js');
+if (dedupeIndex < 0 || phase365Index <= dedupeIndex || phase366Index <= phase365Index) errors.push('android-dedupe-successor-order');
 const camera3Array = platform.split('const CAMERA3 = [')[1]?.split('];')[0] || '';
 if (!camera3Array.trim().endsWith("'modules/phase350_camera3_visibility_lighting_lock.js'")) errors.push('camera3-lighting-not-final-in-array');
 
@@ -97,9 +105,9 @@ console.log(JSON.stringify({
   protectedBuild: 'PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK',
   successorWebBuild: manifest.build,
   protectedAndroidAuthority,
-  profileAvatar: Number(manifest.phase || 0) >= 356 ? 'phase356-live-legend-pedestal-over-phase351-showroom' : showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
+  profileAvatar: liveCameraLoaded ? 'phase366-live-camera-over-phase351-showroom' : Number(manifest.phase || 0) >= 356 ? 'phase356-live-legend-pedestal-over-phase351-showroom' : showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
   camera3: 'dedicated-lighting-final-authority',
-  androidController: 'phase350-physical-dom-deduplication-before-phase365-controller-repair',
+  androidController: 'phase350-physical-dom-deduplication-before-phase365-and-phase366-successors',
   roadmap: 'ordered-major-milestones',
   apkLocked: true
 }, null, 2));
