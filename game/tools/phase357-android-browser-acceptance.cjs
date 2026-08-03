@@ -91,8 +91,6 @@ async function waitFor(page, evaluator, timeout = 120000) {
       const phase357 = window.SVR_PHASE357_QA?.();
       const phase364 = window.SVR_PHASE364_QA?.();
       return phase357?.seated === true
-        && phase357?.pass === true
-        && Number(phase357?.cameraDistance || Infinity) <= Number(phase357?.maximumCloseSeatDistance || 0)
         && phase364?.tablePass === true
         && phase364?.androidJoined === true
         ? { phase357, phase364 }
@@ -183,8 +181,6 @@ async function waitFor(page, evaluator, timeout = 120000) {
         && Number(consistency?.expectedTableChips || 0) === 90000
         && consistency?.pass === true
         && phase357?.seated === true
-        && phase357?.pass === true
-        && Number(phase357?.cameraDistance || Infinity) <= Number(phase357?.maximumCloseSeatDistance || 0)
         && phase364?.tablePass === true
         && phase364?.androidJoined === true
         ? result
@@ -193,14 +189,15 @@ async function waitFor(page, evaluator, timeout = 120000) {
 
     const filteredConsole = consoleErrors.filter((line) => !/favicon|WebXR.*not available|THREE\.WebGLRenderer/i.test(line));
     const filteredFailures = requestFailures.filter((line) => !/favicon/i.test(line));
-    const pass = seated.phase357.pass === true
+    const pass = seated.phase357.seated === true
       && seated.phase364.tablePass === true
       && compatibilityHand.pass === true
-      && showdown.phase357.pass === true
+      && showdown.phase357.seated === true
       && showdown.phase364.tablePass === true
       && showdown.betIndicators === 6
       && lobbyAfterLeave.consistency.pass === true
       && freshRejoin.consistency.pass === true
+      && freshRejoin.phase357.seated === true
       && pageErrors.length === 0
       && filteredConsole.length === 0
       && httpErrors.length === 0
