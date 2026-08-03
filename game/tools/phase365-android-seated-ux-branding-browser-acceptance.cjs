@@ -22,6 +22,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
 
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
   await page.waitForFunction(() => typeof window.SVR_PHASE365_QA === 'function', null, { timeout: 120000 });
+  await page.waitForFunction(() => typeof window.SVR_PHASE363_JOIN_TABLE === 'function', null, { timeout: 120000 });
   await page.waitForSelector('#svr347Move', { timeout: 120000 });
   await page.waitForSelector('#svr347Look', { timeout: 120000 });
   await page.waitForFunction(() => Boolean(window.__SVR_CAMERA__ && window.SVR_TABLE_AUTHORITY), null, { timeout: 120000 });
@@ -49,8 +50,12 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
     lobbyAfter.camera[2] - lobbyBefore.camera[2]
   );
 
-  await page.evaluate(() => window.SVR_PHASE363_JOIN_TABLE?.('phase365-browser-acceptance'));
-  await page.waitForFunction(() => document.body.classList.contains('svr365-seated'), null, { timeout: 30000 });
+  await page.evaluate(() => window.SVR_PHASE363_JOIN_TABLE('phase365-browser-acceptance'));
+  await page.waitForFunction(() => (
+    window.SVR_PHASE363_JOINED_IMMEDIATE === true
+    && window.SVR_PHASE363_STATE?.joined === true
+    && document.body.classList.contains('svr365-seated')
+  ), null, { timeout: 30000 });
   await page.waitForTimeout(1200);
 
   await page.evaluate(() => {
@@ -79,6 +84,8 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
     const pot = scene?.getObjectByName?.('PHASE365_ANDROID_CLEAN_POT_DISPLAY');
     return {
       qa: window.SVR_PHASE365_QA?.(),
+      phase363State: window.SVR_PHASE363_STATE || null,
+      joinedImmediate: window.SVR_PHASE363_JOINED_IMMEDIATE,
       table: window.SVR_PHASE365_TABLE_ALIGNMENT,
       moveDisplay: getComputedStyle(document.querySelector('#svr347Move')).display,
       lookDisplay: getComputedStyle(document.querySelector('#svr347Look')).display,
@@ -101,7 +108,10 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
   const replacementBrand = await page.locator('#svr365BrandSlot').innerText();
 
   await page.evaluate(() => window.SVR_PHASE363_LEAVE_TABLE?.('phase365-browser-acceptance'));
-  await page.waitForFunction(() => !document.body.classList.contains('svr365-seated'), null, { timeout: 30000 });
+  await page.waitForFunction(() => (
+    window.SVR_PHASE363_JOINED_IMMEDIATE === false
+    && !document.body.classList.contains('svr365-seated')
+  ), null, { timeout: 30000 });
   await page.waitForTimeout(350);
   const lobbyReturn = await page.evaluate(() => ({
     moveDisplay: getComputedStyle(document.querySelector('#svr347Move')).display,
@@ -125,9 +135,10 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
     [lobbyBefore.moveCount === 1 && lobbyBefore.lookCount === 1, 'single-move-look'],
     [lobbyBefore.moveDisplay !== 'none' && lobbyBefore.lookDisplay !== 'none', 'lobby-sticks-visible'],
     [movementDistance > 0.015, 'lobby-stick-moves-camera'],
+    [seated.phase363State?.joined === true && seated.joinedImmediate === true, 'join-state-persists'],
     [seated.moveDisplay === 'none' && seated.lookDisplay === 'none', 'seated-sticks-hidden'],
     [seated.navVisible === 0, 'seated-navigation-hidden'],
-    [Math.abs(Number(seated.table?.referenceLineY || 99)) < 0.01, 'table-reference-line-floor'],
+    [Math.abs(Number(seated.table?.referenceLineY ?? 99)) < 0.01, 'table-reference-line-floor'],
     [seated.pot?.name === 'PHASE365_ANDROID_CLEAN_POT_DISPLAY', 'clean-pot-authority'],
     [Number(seated.pot?.opacity || 0) > 0 && seated.pot?.depthWrite === false, 'transparent-pot-material'],
     [seated.nameTags === 5, 'five-avatar-name-tags'],
