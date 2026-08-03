@@ -8,6 +8,7 @@ on:
       - 'game/android-release.json'
       - 'game/modules/phase368_android_join_card_gyro_ux_lock.js'
       - 'game/modules/phase368_android_spectator_tournament_voice_lock.js'
+      - 'game/modules/phase368_android_join_release_race_guard.js'
       - 'game/tools/phase368-android-tournament-avatar-card-ux-static-test.mjs'
       - 'game/tools/phase368-android-pointer-browser-acceptance.cjs'
       - 'site/js/phase368-profile-avatar-texture-fit-lock.js'
@@ -44,6 +45,7 @@ jobs:
         run: |
           node --check game/modules/phase368_android_join_card_gyro_ux_lock.js
           node --check game/modules/phase368_android_spectator_tournament_voice_lock.js
+          node --check game/modules/phase368_android_join_release_race_guard.js
           node --check game/tools/phase368-android-pointer-browser-acceptance.cjs
           node --check site/js/phase368-profile-avatar-texture-fit-lock.js
           node --check site/js/phase345-demo-activity-persistence.js
