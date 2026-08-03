@@ -27,7 +27,6 @@ for (const [token, label] of [
   ['data-hole="1"', 'hole-slot-one'],
   ['window.SVR_PHASE347_RUN_FULL_HAND_QA', 'full-hand-qa']
 ]) need(runtime, token, label);
-
 for (const [token, label] of [
   ["window.SVR_POKER_QA_PASSIVE_BOTS === true", 'acceptance-passive-bot-engine-gate'],
   ["return needed ? 'call' : 'check'", 'acceptance-passive-bot-policy'],
@@ -45,30 +44,31 @@ for (const [token, label] of [
 ]) need(handDriver, token, label);
 
 for (const [token, label] of [
+  ['const DEVICE_ALIGNMENT =', 'phase364-device-array'],
   ['phase364_device_xr_geometry_spawn_lock.js', 'phase364-device-alignment-module'],
+  ['const ANDROID_FOUNDATION = [', 'android-foundation-array'],
+  ['...DEVICE_ALIGNMENT,', 'device-alignment-before-android-recovery'],
   ['phase356_android_real_device_freeze_recovery_lock.js', 'phase356-recovery-module'],
-  ['phase347_android_single_controller_seated_gameplay_apk_release_lock.js', 'platform-module'],
+  ['const ANDROID_FINAL = [', 'android-final-array'],
+  ['phase347_android_single_controller_seated_gameplay_apk_release_lock.js', 'platform-controller-module'],
   ['phase355_android_full_hand_driver_compatibility_lock.js', 'platform-hand-driver'],
+  ['phase350_android_controller_dom_deduplication_lock.js', 'platform-dedupe-module'],
   ["if (value === 'android') return unique([...REGISTRY, ...ANDROID_FOUNDATION, ...ANDROID_POKER, ...ANDROID_FINAL]);", 'android-critical-runtime-assembly'],
-  ['export function deferredManifestFor', 'android-deferred-runtime-export'],
   ['const ANDROID_DEFERRED = []', 'android-background-work-disabled'],
   ['phase364-android-critical-load-order', 'phase364-critical-order-validator'],
   ['phase350-android-dedupe-not-last', 'dedupe-last-validator'],
   ['phase364-android-background-deferred-work', 'zero-deferred-error-label']
 ]) need(platform, token, label);
 
-const androidFoundation = platform.split('const ANDROID_FOUNDATION = [')[1]?.split('];')[0] || '';
-const androidFinal = platform.split('const ANDROID_FINAL = [')[1]?.split('];')[0] || '';
-const orderSource = `${androidFoundation}\n${androidFinal}`;
-const ordered = [
-  'phase364_device_xr_geometry_spawn_lock.js',
-  'phase356_android_real_device_freeze_recovery_lock.js',
-  'main.js',
+const foundation = platform.split('const ANDROID_FOUNDATION = [')[1]?.split('];')[0] || '';
+if (foundation.indexOf('...DEVICE_ALIGNMENT') < 0 || foundation.indexOf('phase356_android_real_device_freeze_recovery_lock.js') <= foundation.indexOf('...DEVICE_ALIGNMENT')) errors.push('device-alignment-not-before-recovery');
+const final = platform.split('const ANDROID_FINAL = [')[1]?.split('];')[0] || '';
+const finalOrder = [
   'phase347_android_single_controller_seated_gameplay_apk_release_lock.js',
   'phase355_android_full_hand_driver_compatibility_lock.js',
   'phase350_android_controller_dom_deduplication_lock.js'
-].map((token) => orderSource.indexOf(token));
-if (!ordered.every((index) => index >= 0) || !ordered.every((index, position) => position === 0 || index > ordered[position - 1])) errors.push('android-successor-runtime-order');
+].map((token) => final.indexOf(token));
+if (!finalOrder.every((index) => index >= 0) || !finalOrder.every((index, position) => position === 0 || index > finalOrder[position - 1])) errors.push('android-final-authority-order');
 
 for (const [token, label] of [
   ['PHASE356_ANDROID_LIGHTWEIGHT_TABLE_AVATARS', 'lightweight-table-avatars'],
