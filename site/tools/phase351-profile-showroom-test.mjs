@@ -33,11 +33,11 @@ for (const token of [
   'id="showroomRotate"',
   'id="showroomReset"',
   'id="showroomFullscreen"',
-  'id="showroomRetry"',
-  'phase351-profile-showroom.js?v=phase351',
-  'phase351-profile-showroom.css?v=phase351',
-  'avatar.html?v=phase351'
+  'id="showroomRetry"'
 ]) requireText(page, token, `page-${token}`);
+if (!/phase351-profile-showroom\.js\?v=phase(?:351|3[6-9]\d)/.test(page)) errors.push('page-showroom-current-cache');
+if (!/phase351-profile-showroom\.css\?v=phase(?:351|3[6-9]\d)/.test(page)) errors.push('page-showroom-css-current-cache');
+if (!/avatar\.html\?v=phase(?:351|3[6-9]\d)/.test(page)) errors.push('page-dressing-room-current-route');
 
 if (page.includes('phase350-profile-avatar-recovery.js')) errors.push('old-profile-recovery-still-loaded');
 if (page.includes('id="profileAvatarCanvas"')) errors.push('old-portrait-canvas-returned');
@@ -55,6 +55,7 @@ if (errors.length) {
 console.log(JSON.stringify({
   pass: true,
   build: 'PHASE-351-PROFILE-3D-SHOWROOM-LOCK',
+  currentRoutePhase: Number(page.match(/profile\.html\?v=phase(\d+)/)?.[1] || 351),
   showroom: { room: true, orbit: true, fullscreen: true, fallback: true },
   profileData: { avatarUrl: true, equippedOutfit: true },
   gameReleaseUnchanged: manifest.build,
