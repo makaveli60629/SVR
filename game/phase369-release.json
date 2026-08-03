@@ -1,13 +1,14 @@
 {
-  "schema": 2,
-  "build": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
+  "schema": 3,
+  "build": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+  "androidBuild": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
   "androidRecoveryBuild": "PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK",
   "joinReadinessBuild": "PHASE-369-ANDROID-JOIN-READINESS-TRANSACTION-LOCK",
   "joinIntentBuild": "PHASE-369-ANDROID-JOIN-INTENT-BRIDGE-LOCK",
   "dealerBuild": "PHASE-368-CARD-DEALER-ANIMATION-LOCK",
   "status": "production-deploy-enabled-pending-owner-physical-device-acceptance",
   "entry": "/game/android.html?channel=stable&v=phase372",
-  "questEntry": "/game/index.html?platform=quest&v=phase372",
+  "questEntry": "/game/index.html?platform=quest&v=phase373",
   "certifiedBase": "PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK",
   "protectedAuthorities": {
     "poker": "PHASE-336",
@@ -19,7 +20,8 @@
     "physicalDeviceViewportTouch": "PHASE-367",
     "dealerMotion": "PHASE-368",
     "androidJoinRecovery": "PHASE-369",
-    "liveEntryRecovery": "PHASE-372"
+    "liveEntryRecovery": "PHASE-372",
+    "questSeatedTeleportTableSpawnNpcRecovery": "PHASE-373"
   },
   "androidFlow": {
     "visibleEntryBeforeHeavyBoot": true,
@@ -43,10 +45,24 @@
   },
   "questFlow": {
     "visibleLobbyStartBeforeHeavyBoot": true,
+    "singleStableLobbySpawnAuthority": true,
+    "stableLobbyGapMeters": 0.9,
+    "stableSeatGapMeters": 0.62,
     "standingLobbySpawn": true,
     "verifiedTableRequired": true,
+    "realGlbTableFallback": "game/assets/models/table.glb",
+    "tableMeshesForcedVisible": true,
+    "tableMaterialsForcedOpaqueVisible": true,
     "playGameSeatAuthorityPreserved": true,
     "watchAuthorityPreserved": true,
+    "seatedMovementBlocked": true,
+    "seatedTeleportFlagsBlocked": true,
+    "seatedGripTeleportListenersSuspended": true,
+    "seatedRigMovesRejected": true,
+    "teleportRayAndMarkerHiddenWhileSeated": true,
+    "npcRootsVisible": true,
+    "npcTexturesRecovered": true,
+    "npcUprightGroundedFacingTable": true,
     "dealerDeferredUntilRuntimeStable": true,
     "loadingOverlayReleasedOnSuccessOrRecovery": true
   },
@@ -56,7 +72,10 @@
     "customDomain": "svrpoker.com",
     "automaticOnMainPush": true,
     "singleDeploymentWorkflow": true,
-    "postDeployHealthCheck": "/deploy-health.json"
+    "postDeployHealthCheck": "/deploy-health.json",
+    "activeBuild": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+    "androidRoute": "/game/android.html?channel=stable&v=phase372",
+    "questRoute": "/game/index.html?platform=quest&v=phase373"
   },
   "accounts": {
     "provider": "aws",
@@ -86,6 +105,11 @@
     "ownerPhysicalDevicePlaytestRequired": true
   },
   "qaHooks": [
+    "window.SVR_PHASE373_QA()",
+    "window.SVR_PHASE373_STABLE_LOBBY()",
+    "window.SVR_PHASE373_STABLE_SEAT()",
+    "window.SVR_PHASE373_REPAIR_TABLE()",
+    "window.SVR_PHASE373_REPAIR_NPCS()",
     "window.SVR_PHASE372_QA()",
     "window.SVR_PHASE372_PRIMARY_ACTION()",
     "window.SVR_PHASE369_ANDROID_QA()",
