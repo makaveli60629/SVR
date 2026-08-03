@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>SVR Poker — Android</title><meta name="theme-color" content="#0b0d12"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><link rel="manifest" href="./manifest.json?v=phase365"><style>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>SVR Poker — Android</title><meta name="theme-color" content="#0b0d12"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><link rel="manifest" href="./manifest.json?v=phase366"><style>
 html,body,#app{height:100%;margin:0;background:#080a0f;color:#f5f0e6;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}canvas{display:block;width:100%;height:100%}
 #safeStage{position:fixed;inset:0;z-index:999999;display:grid;place-items:center;background:radial-gradient(circle at 50% 38%,#1a202b,#080a0f 72%)}.card{margin:20px;padding:24px;border:1px solid rgba(166,218,219,.70);border-radius:20px;background:rgba(13,16,23,.90);text-align:center;max-width:420px;box-shadow:0 18px 58px rgba(0,0,0,.48)}button{padding:11px 16px;border:1px solid rgba(232,205,151,.72);border-radius:12px;background:#252832;color:#fff;font-weight:900}.boot-released #safeStage{display:none!important}
 #runtimeRecovery{position:fixed;z-index:1000000;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));padding:12px;border:1px solid rgba(232,205,151,.68);border-radius:16px;background:rgba(14,17,24,.95);box-shadow:0 18px 60px rgba(0,0,0,.64);text-align:center}#runtimeRecovery[hidden]{display:none}#runtimeRecovery p{margin:0 0 9px;line-height:1.3}#runtimeRecovery .actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
 </style><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script></head>
-<body data-build="PHASE-365-ANDROID-SEATED-UX-BRANDING-GYRO-ALIGNMENT-LOCK" data-release="PHASE-365-ANDROID-SEATED-UX-BRANDING-GYRO-ALIGNMENT-LOCK" data-acceptance="PHASE-363-ANDROID-CANONICAL-TABLE-JOIN-BANKROLL-AUDIO-LOCK" data-platform="android"><!-- protected certifications: PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK / PHASE-363-ANDROID-INTEGRATED-CORE --><div id="app"></div><div id="safeStage"><div class="card"><h1>SVR POKER</h1><p id="safeStatus">Preparing the verified table, single Android controller, clean seated HUD, gyro look, avatars and tournament branding…</p><button id="startRuntimeBtn">Enter Game</button></div></div><aside id="runtimeRecovery" hidden><p id="runtimeRecoveryText">Android performance recovery is available.</p><div class="actions"><button id="runtimeLowPowerButton" type="button">Continue Low Power</button><button id="runtimeReloadButton" type="button">Reload Table</button></div></aside><script type="module">
+<body data-build="PHASE-366-ANDROID-DEVICE-CALIBRATION-AVATAR-LIVE-CAMERA-LOCK" data-release="PHASE-366-ANDROID-DEVICE-CALIBRATION-AVATAR-LIVE-CAMERA-LOCK" data-acceptance="PHASE-365-ANDROID-SEATED-UX-BRANDING-GYRO-ALIGNMENT-LOCK" data-platform="android"><!-- protected certifications: PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK / PHASE-363-ANDROID-INTEGRATED-CORE / PHASE-365-ANDROID-SEATED-UX-BRANDING-GYRO-ALIGNMENT-LOCK --><div id="app"></div><div id="safeStage"><div class="card"><h1>SVR POKER</h1><p id="safeStatus">Preparing the verified table, single Android controller, clean seated HUD, avatar seats and device calibration…</p><button id="startRuntimeBtn">Enter Game</button></div></div><aside id="runtimeRecovery" hidden><p id="runtimeRecoveryText">Android performance recovery is available.</p><div class="actions"><button id="runtimeLowPowerButton" type="button">Continue Low Power</button><button id="runtimeReloadButton" type="button">Reload Table</button></div></aside><script type="module">
 window.SVR_REQUIRE_TABLE_JOIN=true;
 window.SVR_TABLE_STARTING_STACK=15000;
 window.SVR_ANDROID_BRAND_SLOT={id:'svr',name:'SVR POKER',logoUrl:'assets/ui/logo.png',fallbackLogoUrl:'logo.png'};
@@ -15,32 +15,35 @@ window.addEventListener('svr:phase363-immediate-join-state',(event)=>{
   document.body.classList.toggle('svr363-seated',joined);
   document.body.classList.toggle('svr363-lobby',!joined);
   document.body.classList.toggle('svr365-seated',joined);
-  queueMicrotask(()=>window.SVR_PHASE365_SYNC?.());
+  document.body.classList.toggle('svr366-seated',joined);
+  queueMicrotask(()=>{window.SVR_PHASE365_SYNC?.();window.SVR_PHASE366_APPLY?.();});
 });
-import'./modules/phase364_device_xr_geometry_spawn_lock.js?v=phase365';
-import{bootPlatform}from'./modules/phase340_platform_core_loader.js?v=phase365';
+import'./modules/phase364_device_xr_geometry_spawn_lock.js?v=phase366';
+import{bootPlatform}from'./modules/phase340_platform_core_loader.js?v=phase366';
 let started=false;
 const report=(message)=>{const status=document.getElementById('safeStatus');if(status)status.textContent=message;const panel=document.getElementById('runtimeRecovery');const text=document.getElementById('runtimeRecoveryText');if(text)text.textContent=message;if(panel)panel.hidden=false;};
 const start=async()=>{if(started)return;started=true;try{
-  import('./modules/phase354_android_full_game_release_acceptance_lock.js?v=phase365').catch(console.error);
+  import('./modules/phase354_android_full_game_release_acceptance_lock.js?v=phase366').catch(console.error);
   await bootPlatform({forcedPlatform:'android'});
-  await import('./modules/phase364_poker_audit_committed_alias.js?v=phase365');
-  await import('./modules/phase363_android_canonical_table_asset_lock.js?v=phase365');
+  await import('./modules/phase364_poker_audit_committed_alias.js?v=phase366');
+  await import('./modules/phase363_android_canonical_table_asset_lock.js?v=phase366');
   window.SVR_PHASE364_ALIGN_TABLE?.();
-  await import('./modules/phase357_android_table_status_showdown_ante_lock.js?v=phase365');
-  await import('./modules/phase357_android_direct_camera_seat_fix.js?v=phase365');
-  await import('./modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js?v=phase365');
-  await import('./modules/phase363_android_secure_shuffle_lock.js?v=phase365');
-  await import('./modules/phase363_android_raise_ui_capture_lock.js?v=phase365');
-  await import('./modules/phase363_android_street_raise_action_lock.js?v=phase365');
-  await import('./modules/phase363_android_join_control_capture_lock.js?v=phase365');
-  await import('./modules/phase363_android_settlement_lobby_consistency_lock.js?v=phase365');
-  await import('./modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js?v=phase365');
-  await import('./modules/phase365_android_card_brand_refresh_lock.js?v=phase365');
-  await import('./modules/phase365_phase364_reference_line_compat_lock.js?v=phase365');
+  await import('./modules/phase357_android_table_status_showdown_ante_lock.js?v=phase366');
+  await import('./modules/phase357_android_direct_camera_seat_fix.js?v=phase366');
+  await import('./modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js?v=phase366');
+  await import('./modules/phase363_android_secure_shuffle_lock.js?v=phase366');
+  await import('./modules/phase363_android_raise_ui_capture_lock.js?v=phase366');
+  await import('./modules/phase363_android_street_raise_action_lock.js?v=phase366');
+  await import('./modules/phase363_android_join_control_capture_lock.js?v=phase366');
+  await import('./modules/phase363_android_settlement_lobby_consistency_lock.js?v=phase366');
+  await import('./modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js?v=phase366');
+  await import('./modules/phase365_android_card_brand_refresh_lock.js?v=phase366');
+  await import('./modules/phase365_phase364_reference_line_compat_lock.js?v=phase366');
+  await import('./modules/phase366_android_device_calibration_avatar_showroom_continuity_lock.js?v=phase366');
   window.SVR_PHASE363_LEAVE_TABLE?.('boot-lobby');
   window.SVR_PHASE365_SYNC?.();
   window.SVR_PHASE365_REFRESH_CARD_BRAND?.();
+  window.SVR_PHASE366_APPLY?.();
 }catch(error){console.error(error);report('The Android table stopped during startup. Reload the table to try the protected low-memory path.');}};
 document.getElementById('startRuntimeBtn')?.addEventListener('click',start);
 document.getElementById('runtimeReloadButton')?.addEventListener('click',()=>location.reload());
