@@ -9,6 +9,14 @@ window.SVR_REQUIRE_TABLE_JOIN=true;
 window.SVR_TABLE_STARTING_STACK=15000;
 window.SVR_ANDROID_BRAND_SLOT={id:'svr',name:'SVR POKER',logoUrl:'assets/ui/logo.png',fallbackLogoUrl:'logo.png'};
 window.SVR_ANDROID_UPDATE_POLICY={apkVersionName:'0.1.0-rc1',apkVersionCode:1,forceUpdate:false,showUpdatePrompt:false,manualUpdateOnly:true};
+window.addEventListener('svr:phase363-immediate-join-state',(event)=>{
+  const joined=Boolean(event.detail?.joined);
+  window.SVR_PHASE363_STATE={...(window.SVR_PHASE363_STATE||{}),joined,gameState:joined?'SEATED':'LOBBY'};
+  document.body.classList.toggle('svr363-seated',joined);
+  document.body.classList.toggle('svr363-lobby',!joined);
+  document.body.classList.toggle('svr365-seated',joined);
+  queueMicrotask(()=>window.SVR_PHASE365_SYNC?.());
+});
 import'./modules/phase364_device_xr_geometry_spawn_lock.js?v=phase365';
 import{bootPlatform}from'./modules/phase340_platform_core_loader.js?v=phase365';
 let started=false;
