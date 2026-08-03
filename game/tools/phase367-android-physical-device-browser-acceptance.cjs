@@ -3,7 +3,7 @@
 const { chromium } = require('playwright');
 
 const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
-const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phase367`;
+const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phase367`;
 
 async function dragPointer(page, selector, dx = 12, dy = 0) {
   const locator = page.locator(selector);
@@ -74,16 +74,35 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   await page.waitForFunction(() => typeof window.SVR_PHASE367_DEVICE_QA === 'function', null, { timeout: 120000 });
   await page.waitForFunction(() => typeof window.SVR_PHASE365_QA === 'function', null, { timeout: 120000 });
   await page.waitForFunction(() => typeof window.SVR_PHASE363_JOIN_TABLE === 'function', null, { timeout: 120000 });
+  await page.waitForFunction(() => typeof window.SVR_PHASE372_SYNC_ANDROID_ENTRY === 'function', null, { timeout: 120000 });
   await page.waitForSelector('#svr347Root', { timeout: 120000 });
   await page.waitForSelector('#svr347Move', { timeout: 30000 });
   await page.waitForSelector('#svr347Look', { timeout: 30000 });
   await page.waitForSelector('#svr347Actions', { timeout: 30000 });
   await page.waitForFunction(() => window.SVR_PHASE367_DEVICE_QA?.().pass === true, null, { timeout: 30000 });
   await waitForPhase365Ready(page);
+  await page.evaluate(() => window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase367-browser-preflight'));
+  await page.waitForFunction(() => {
+    const button = document.getElementById('svr372Primary');
+    const phase372 = window.SVR_PHASE372_QA?.();
+    const join = window.SVR_PHASE363_JOIN_CONTROL_QA?.();
+    return Boolean(button?.offsetParent)
+      && button.disabled === false
+      && /JOIN TABLE/i.test(button.textContent || '')
+      && phase372?.primaryVisible === true
+      && phase372?.pass === true
+      && join?.authorityId === 'svr372Primary'
+      && join?.visibleJoinControls === 1
+      && join?.pass === true;
+  }, null, { timeout: 30000 });
 
   const baseline = await page.evaluate(() => ({
     device: window.SVR_PHASE367_DEVICE_QA(),
     phase365: window.SVR_PHASE365_QA(),
+    phase372: window.SVR_PHASE372_QA?.() || null,
+    join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
+    phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
+    legacySeatHidden: Boolean(document.querySelector('#svr347Actions [data-ui="seat"]')?.hidden),
     css: {
       width: getComputedStyle(document.documentElement).getPropertyValue('--svr367-vw').trim(),
       height: getComputedStyle(document.documentElement).getPropertyValue('--svr367-vh').trim(),
@@ -94,6 +113,14 @@ async function waitForPhase365Ready(page, timeout = 45000) {
       height: window.visualViewport?.height || innerHeight
     }
   }));
+
+  await page.evaluate(() => {
+    const entry = document.getElementById('svr372Entry');
+    if (!entry) return;
+    entry.dataset.phase367ControllerIsolation = '1';
+    entry.style.display = 'none';
+  });
+  await page.waitForTimeout(120);
 
   await dragPointer(page, '#svr347Move', 14, 0);
   await dragPointer(page, '#svr347Look', -12, 0);
@@ -106,6 +133,13 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   }, null, { timeout: 10000 });
 
   const touchMetrics = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
+  await page.evaluate(() => {
+    const entry = document.getElementById('svr372Entry');
+    if (!entry) return;
+    entry.style.removeProperty('display');
+    delete entry.dataset.phase367ControllerIsolation;
+    window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase367-controller-isolation-complete');
+  });
 
   await page.setViewportSize({ width: 412, height: 915 });
   await page.evaluate(() => {
@@ -162,13 +196,18 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     const navigation = [...document.querySelectorAll('button,a')]
       .filter((element) => /^(LOBBY|CENTER|CENTER VIEW)$/i.test((element.textContent || '').trim()))
       .filter(visible);
+    const legacySeat = document.querySelector('#svr347Actions [data-ui="seat"]');
     return {
       device: window.SVR_PHASE367_DEVICE_QA(),
       phase365: window.SVR_PHASE365_QA(),
+      phase372: window.SVR_PHASE372_QA?.() || null,
+      join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
       displays: {
         move: getComputedStyle(document.querySelector('#svr347Move')).display,
         look: getComputedStyle(document.querySelector('#svr347Look')).display
       },
+      legacyLeaveVisible: Boolean(legacySeat?.offsetParent) && (legacySeat?.textContent || '').trim() === 'LEAVE TABLE',
+      phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
       visibleNavigation: navigation.length,
       rootCount: document.querySelectorAll('#svr347Root').length,
       moveCount: document.querySelectorAll('#svr347Move').length,
@@ -180,11 +219,17 @@ async function waitForPhase365Ready(page, timeout = 45000) {
 
   await page.evaluate(() => window.SVR_PHASE363_LEAVE_TABLE?.('phase367-browser-acceptance'));
   await page.waitForFunction(() => window.SVR_PHASE363_STATE?.joined === false, null, { timeout: 30000 });
+  await page.evaluate(() => window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase367-browser-after-leave'));
+  await page.waitForFunction(() => Boolean(document.getElementById('svr372Primary')?.offsetParent), null, { timeout: 15000 });
   await waitForPhase365Ready(page);
   await page.waitForTimeout(250);
   const lobbyReturn = await page.evaluate(() => ({
     device: window.SVR_PHASE367_DEVICE_QA(),
     phase365: window.SVR_PHASE365_QA(),
+    phase372: window.SVR_PHASE372_QA?.() || null,
+    join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
+    phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
+    legacySeatHidden: Boolean(document.querySelector('#svr347Actions [data-ui="seat"]')?.hidden),
     moveDisplay: getComputedStyle(document.querySelector('#svr347Move')).display,
     lookDisplay: getComputedStyle(document.querySelector('#svr347Look')).display
   }));
@@ -194,6 +239,9 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   const checks = [
     [baseline.device?.pass === true, 'baseline-device-qa'],
     [baseline.phase365?.pass === true, 'baseline-phase365-qa'],
+    [baseline.phase372?.pass === true && baseline.phase372?.primaryVisible === true && baseline.phase372?.primaryText === 'JOIN TABLE', 'phase372-visible-join'],
+    [baseline.join?.pass === true && baseline.join?.authorityId === 'svr372Primary' && baseline.join?.visibleJoinControls === 1, 'one-lobby-join-authority'],
+    [baseline.phase372EntryVisible === true && baseline.legacySeatHidden === true, 'legacy-sit-hidden-under-entry'],
     [baseline.device?.controllerRoots === 1 && baseline.device?.moveControls === 1 && baseline.device?.lookControls === 1 && baseline.device?.actionPanels === 1, 'single-existing-controller'],
     [Number(baseline.device?.moveTouches || 0) === 0 && Number(baseline.device?.lookTouches || 0) === 0 && Number(baseline.device?.actionTouches || 0) === 0, 'touch-baseline-clean'],
     [Number(touchMetrics?.moveTouches || 0) >= 1 && Number(touchMetrics?.lookTouches || 0) >= 1 && Number(touchMetrics?.actionTouches || 0) >= 1, 'physical-touch-metrics'],
@@ -203,11 +251,15 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     [seated.device?.safeAreaReady === true, 'safe-area-ready'],
     [seated.rootCount === 1 && seated.moveCount === 1 && seated.lookCount === 1 && seated.actionPanelCount === 1, 'single-controller-after-join'],
     [seated.displays.move === 'none' && seated.displays.look === 'none', 'sticks-hidden-seated'],
+    [seated.legacyLeaveVisible === true && seated.phase372EntryVisible === false, 'one-seated-leave-authority'],
     [seated.visibleNavigation === 0 && Number(seated.device?.visibleNavigationWhileSeated || 0) === 0, 'navigation-hidden-seated'],
     [stabilizationDelta <= 2, 'stabilization-rate-limited'],
     [Number(seated.device?.stabilizationSkipped || 0) >= 1, 'stabilization-burst-skipped'],
     [seated.phase365?.pass === true, 'phase365-still-green-seated'],
     [lobbyReturn.phase365?.pass === true, 'phase365-green-after-leave'],
+    [lobbyReturn.phase372?.pass === true && lobbyReturn.phase372?.primaryVisible === true && lobbyReturn.phase372?.primaryText === 'JOIN TABLE', 'phase372-join-restored-after-leave'],
+    [lobbyReturn.join?.pass === true && lobbyReturn.join?.authorityId === 'svr372Primary' && lobbyReturn.join?.visibleJoinControls === 1, 'one-lobby-authority-after-leave'],
+    [lobbyReturn.phase372EntryVisible === true && lobbyReturn.legacySeatHidden === true, 'legacy-sit-hidden-after-leave'],
     [lobbyReturn.moveDisplay !== 'none' && lobbyReturn.lookDisplay !== 'none', 'controls-return-lobby'],
     [pageErrors.length === 0, 'no-page-errors'],
     [consoleErrors.length === 0, 'no-console-errors'],
@@ -216,6 +268,7 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   const failures = checks.filter(([pass]) => !pass).map(([, label]) => label);
   const result = {
     build: 'PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK',
+    successor: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
     baseline,
     touchMetrics,
     portrait,
