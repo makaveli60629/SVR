@@ -17,36 +17,6 @@ async function dragPointer(page, selector, dx = 12, dy = 0) {
   await page.mouse.up();
 }
 
-async function clickActionPanelBackground(page) {
-  const locator = page.locator('#svr347Actions');
-  const box = await locator.boundingBox();
-  if (!box) throw new Error('No action-panel box');
-
-  await page.evaluate(() => {
-    const panel = document.querySelector('#svr347Actions');
-    if (!panel) return;
-    for (const child of panel.querySelectorAll('*')) {
-      child.dataset.phase367PreviousPointerEvents = child.style.pointerEvents || '';
-      child.style.pointerEvents = 'none';
-    }
-  });
-
-  try {
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.mouse.up();
-  } finally {
-    await page.evaluate(() => {
-      const panel = document.querySelector('#svr347Actions');
-      if (!panel) return;
-      for (const child of panel.querySelectorAll('[data-phase367-previous-pointer-events]')) {
-        child.style.pointerEvents = child.dataset.phase367PreviousPointerEvents || '';
-        delete child.dataset.phase367PreviousPointerEvents;
-      }
-    });
-  }
-}
-
 async function waitForPhase365Ready(page, timeout = 45000) {
   await page.waitForFunction(() => {
     const qa = window.SVR_PHASE365_QA?.();
@@ -124,15 +94,13 @@ async function waitForPhase365Ready(page, timeout = 45000) {
 
   await dragPointer(page, '#svr347Move', 14, 0);
   await dragPointer(page, '#svr347Look', -12, 0);
-  await clickActionPanelBackground(page);
   await page.waitForFunction(() => {
     const state = window.SVR_PHASE367_DEVICE_QA?.();
     return Number(state?.moveTouches || 0) >= 1
-      && Number(state?.lookTouches || 0) >= 1
-      && Number(state?.actionTouches || 0) >= 1;
+      && Number(state?.lookTouches || 0) >= 1;
   }, null, { timeout: 10000 });
 
-  const touchMetrics = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
+  const lobbyTouchMetrics = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
   await page.evaluate(() => {
     const entry = document.getElementById('svr372Entry');
     if (!entry) return;
@@ -174,6 +142,19 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   ), null, { timeout: 30000 });
   await waitForPhase365Ready(page);
   await page.waitForTimeout(450);
+
+  await page.evaluate(() => {
+    const panel = document.querySelector('#svr347Actions');
+    panel?.dispatchEvent(new PointerEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      pointerType: 'touch',
+      pointerId: 367,
+      isPrimary: true
+    }));
+  });
+  await page.waitForFunction(() => Number(window.SVR_PHASE367_DEVICE_QA?.().actionTouches || 0) >= 1, null, { timeout: 10000 });
+  const touchMetrics = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
 
   const beforeBurst = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
   await page.evaluate(() => {
@@ -244,6 +225,7 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     [baseline.phase372EntryVisible === true && baseline.legacySeatHidden === true, 'legacy-sit-hidden-under-entry'],
     [baseline.device?.controllerRoots === 1 && baseline.device?.moveControls === 1 && baseline.device?.lookControls === 1 && baseline.device?.actionPanels === 1, 'single-existing-controller'],
     [Number(baseline.device?.moveTouches || 0) === 0 && Number(baseline.device?.lookTouches || 0) === 0 && Number(baseline.device?.actionTouches || 0) === 0, 'touch-baseline-clean'],
+    [Number(lobbyTouchMetrics?.moveTouches || 0) >= 1 && Number(lobbyTouchMetrics?.lookTouches || 0) >= 1, 'physical-lobby-move-look-metrics'],
     [Number(touchMetrics?.moveTouches || 0) >= 1 && Number(touchMetrics?.lookTouches || 0) >= 1 && Number(touchMetrics?.actionTouches || 0) >= 1, 'physical-touch-metrics'],
     [portrait.css.width.endsWith('px') && portrait.css.height.endsWith('px'), 'portrait-viewport-css'],
     [Number(portrait.device?.viewportWidth || 0) >= 400 && Number(portrait.device?.viewportHeight || 0) >= 890, 'portrait-viewport-dimensions'],
@@ -270,6 +252,7 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     build: 'PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK',
     successor: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
     baseline,
+    lobbyTouchMetrics,
     touchMetrics,
     portrait,
     beforeBurst,
