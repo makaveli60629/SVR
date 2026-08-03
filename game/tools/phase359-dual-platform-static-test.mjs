@@ -40,16 +40,28 @@ for (const pattern of [
 ]) assert.match(shuffle, pattern);
 for (const pattern of [/PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK/, /PLAY GAME/, /LEAVE TABLE/, /SVR_PHASE360_JOIN_TABLE/, /SVR_PHASE360_LEAVE_TABLE/]) assert.match(phase361, pattern);
 
+const importIndex = (source, moduleName) => {
+  const escaped = moduleName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const expression = new RegExp(`(?:await\\s+)?import\\(['\"]\\./modules/${escaped}\\.js\\?v=phase\\d+['\"]\\)`);
+  const match = expression.exec(source);
+  return match ? match.index : -1;
+};
+
 assert.match(indexText, /data-build="PHASE-(?:358|3[6-9]\d)-/);
 assert.match(indexText, /data-release="PHASE-(?:361|3[6-9]\d)-/);
 assert.match(indexText, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase(?:361|3[6-9]\d)/);
 assert.match(indexText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase(?:361|3[6-9]\d)/);
 assert.match(indexText, /phase361_quest_lobby_play_seat_watch_npc_lock\.js\?v=phase(?:361|3[6-9]\d)/);
-assert.ok(indexText.indexOf('await bootPlatform()') < indexText.indexOf('phase359_dual_platform_gameplay_continuity_lock.js'));
-assert.ok(indexText.indexOf('phase359_dual_platform_gameplay_continuity_lock.js') < indexText.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js'));
-assert.ok(indexText.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js') < indexText.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js'));
-const questSuccessorIndex = indexText.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
-assert.ok(questSuccessorIndex < 0 || questSuccessorIndex > indexText.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js'));
+const questBootIndex = indexText.indexOf('await bootPlatform()');
+const phase359Index = importIndex(indexText, 'phase359_dual_platform_gameplay_continuity_lock');
+const phase360Index = importIndex(indexText, 'phase360_fresh_shuffle_leave_reset_continuous_table_lock');
+const phase361Index = importIndex(indexText, 'phase361_quest_lobby_play_seat_watch_npc_lock');
+const questSuccessorIndex = importIndex(indexText, 'phase362_continuous_10000_turn_clock_rejoin_reset_lock');
+assert.ok(questBootIndex >= 0 && phase359Index > questBootIndex, 'Phase 359 must load after Quest platform boot');
+assert.ok(phase360Index > phase359Index, 'Phase 360 must load after Phase 359');
+assert.ok(phase361Index > phase360Index, 'Phase 361 must load after Phase 360');
+assert.ok(questSuccessorIndex < 0 || questSuccessorIndex > phase361Index, 'Quest successor policy must load after Phase 361');
+assert.match(indexText, /PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK/);
 
 assert.match(androidText, /data-build="PHASE-(?:363|3[6-9]\d)-/);
 assert.match(androidText, /data-release="PHASE-(?:363|3[6-9]\d)-/);
@@ -83,8 +95,6 @@ const questSession = questRelease.phase361SessionContract || questRelease.sessio
 assert.equal(questSession.startsStandingInLobby, true);
 assert.equal(questSession.leaveTableButtonRequired, true);
 
-// Later Android presentation phases may replace the top-level acceptance object.
-// Preserve the actual gameplay certifications and current table policy instead.
 assert.equal(androidRelease.protectedAuthorities?.fullGameAcceptance, 'PHASE-354');
 assert.equal(androidRelease.protectedAuthorities?.androidTableStatus, 'PHASE-357');
 assert.equal(androidRelease.protectedAuthorities?.androidIntegratedFlow, 'PHASE-363');
@@ -125,6 +135,7 @@ assert.ok(fs.statSync(tableGlbPath).size > 1024, 'uploaded table GLB must be non
 
 console.log(JSON.stringify({
   build: manifest.build,
+  successorBuild: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
   android: 'phase347 controller, phase357 seating, phase363 JOIN-gated 15,000-chip policy and phase365 presentation protected',
   androidBrowserAcceptance: currentAcceptance?.passed === true ? 'passed' : 'pending',
   androidPhysicalDeviceValidation: 'pending-owner-playtest',
