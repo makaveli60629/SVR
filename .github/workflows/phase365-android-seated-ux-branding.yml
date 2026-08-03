@@ -47,8 +47,8 @@ jobs:
           node game/tools/phase363-android-integrated-core-static-test.mjs
           node game/tools/phase357-android-table-status-showdown-ante-static-test.mjs
           node game/tools/phase347-android-static-test.mjs
-          node game/tools/phase351-profile-showroom-static-test.mjs
-          node game/tools/phase353-vr-avatar-static-test.mjs
+          node site/tools/phase351-profile-showroom-test.mjs
+          node game/tools/phase353-avatar-vr-static-test.mjs
 
       - name: Install Playwright Chromium
         run: |
