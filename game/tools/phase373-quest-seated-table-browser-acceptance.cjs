@@ -43,28 +43,38 @@ async function waitFor(page, evaluator, timeout = 120000) {
 
   try {
     await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await page.waitForFunction(() => typeof window.SVR_PHASE373_FINALIZER_QA === 'function', null, { timeout: 120000 });
+
     const lobby = await waitFor(page, () => {
+      window.SVR_PHASE373_FINALIZE_TABLE?.('browser-lobby-preflight');
       const phase373 = window.SVR_PHASE373_QA?.();
       const phase361 = window.SVR_PHASE361_QA?.();
       const preflight = window.SVR_PHASE373_RIG_PREFLIGHT_QA?.();
       const postflight = window.SVR_PHASE373_POSTFLIGHT_QA?.();
+      const finalizer = window.SVR_PHASE373_FINALIZER_QA?.();
       if (!phase373?.pass || !phase373?.tablePass || phase373?.stableAnchor?.mode !== 'lobby') return null;
-      if (!phase361?.pass || !preflight?.pass || !postflight?.pass) return null;
+      if (!phase361?.pass || !preflight?.pass || !postflight?.pass || !finalizer?.pass) return null;
       if (preflight.selectedOwnsTable || !preflight.selectedStillSafe) return null;
-      return { phase373, phase361, preflight, postflight };
+      if (Math.abs(Number(phase373.tableBounds?.minY || 0)) > 0.02) return null;
+      if (Math.abs(Number(finalizer.tableMinY || 0)) > 0.02) return null;
+      return { phase373, phase361, preflight, postflight, finalizer };
     });
 
     const joined = await page.evaluate(() => window.SVR_PHASE361_PLAY_GAME?.());
     if (joined === false) throw new Error('Phase 361 PLAY GAME rejected the Phase 373 seat test.');
 
     const seatedBeforeMove = await waitFor(page, () => {
-      window.SVR_PHASE373_STABLE_SEAT?.();
+      window.SVR_PHASE373_STABLE_SEAT?.('browser-seat-preflight');
+      window.SVR_PHASE373_FINALIZE_TABLE?.('browser-seat-table-preflight');
+      window.SVR_PHASE373_FINALIZE_SEAT?.();
       const qa = window.SVR_PHASE373_QA?.();
       const preflight = window.SVR_PHASE373_RIG_PREFLIGHT_QA?.();
       const postflight = window.SVR_PHASE373_POSTFLIGHT_QA?.();
+      const finalizer = window.SVR_PHASE373_FINALIZER_QA?.();
       if (!window.SVR_PHASE361_STATE?.seated || !qa?.pass || qa?.stableAnchor?.mode !== 'seated' || !qa?.teleportFlagsLocked) return null;
-      if (!preflight?.pass || !postflight?.pass || !Object.values(qa.teleportFlags || {}).every((value) => value === false)) return null;
-      return { qa, preflight, postflight };
+      if (!preflight?.pass || !postflight?.pass || !finalizer?.pass || !Object.values(qa.teleportFlags || {}).every((value) => value === false)) return null;
+      if (Math.abs(Number(qa.tableBounds?.minY || 0)) > 0.02 || Number(finalizer.seatDrift || 0) > 0.08) return null;
+      return { qa, preflight, postflight, finalizer };
     }, 30000);
 
     const prohibitedMove = await page.evaluate(() => {
@@ -80,11 +90,16 @@ async function waitFor(page, evaluator, timeout = 120000) {
     });
     await page.waitForTimeout(1100);
 
-    const seatedAfterMove = await page.evaluate(() => ({
-      phase373: window.SVR_PHASE373_QA?.(),
-      preflight: window.SVR_PHASE373_RIG_PREFLIGHT_QA?.(),
-      postflight: window.SVR_PHASE373_POSTFLIGHT_QA?.()
-    }));
+    const seatedAfterMove = await page.evaluate(() => {
+      window.SVR_PHASE373_FINALIZE_TABLE?.('browser-after-prohibited-move');
+      window.SVR_PHASE373_FINALIZE_SEAT?.();
+      return {
+        phase373: window.SVR_PHASE373_QA?.(),
+        preflight: window.SVR_PHASE373_RIG_PREFLIGHT_QA?.(),
+        postflight: window.SVR_PHASE373_POSTFLIGHT_QA?.(),
+        finalizer: window.SVR_PHASE373_FINALIZER_QA?.()
+      };
+    });
     const anchorDistance = Math.hypot(
       Number(seatedAfterMove.phase373?.currentHead?.x || 0) - Number(seatedAfterMove.phase373?.stableAnchor?.x || 0),
       Number(seatedAfterMove.phase373?.currentHead?.z || 0) - Number(seatedAfterMove.phase373?.stableAnchor?.z || 0)
@@ -99,14 +114,18 @@ async function waitFor(page, evaluator, timeout = 120000) {
 
     await page.evaluate(() => window.SVR_PHASE361_LEAVE_TABLE?.());
     const lobbyAfterLeave = await waitFor(page, () => {
+      window.SVR_PHASE373_FINALIZE_TABLE?.('browser-after-leave');
       const phase373 = window.SVR_PHASE373_QA?.();
       const postflight = window.SVR_PHASE373_POSTFLIGHT_QA?.();
+      const finalizer = window.SVR_PHASE373_FINALIZER_QA?.();
       return window.SVR_PHASE361_STATE?.seated === false
         && phase373?.stableAnchor?.mode === 'lobby'
         && phase373?.teleportFlagsLocked === false
         && postflight?.pass === true
         && postflight?.standingRestored === true
-        ? { phase373, postflight }
+        && finalizer?.pass === true
+        && Math.abs(Number(phase373?.tableBounds?.minY || 0)) <= 0.02
+        ? { phase373, postflight, finalizer }
         : null;
     }, 30000);
 
@@ -123,21 +142,28 @@ async function waitFor(page, evaluator, timeout = 120000) {
 
     const pass = lobby.phase373.tablePass === true
       && lobby.phase373.tableVisibleMeshes > 0
-      && Math.abs(Number(lobby.phase373.tableBounds?.minY || 0)) <= 0.04
+      && Math.abs(Number(lobby.phase373.tableBounds?.minY || 0)) <= 0.02
+      && lobby.finalizer.pass === true
+      && lobby.finalizer.publicLobbyWrapped === true
+      && lobby.finalizer.publicSeatWrapped === true
       && lobby.preflight.selectedOwnsTable === false
       && seatedBeforeMove.qa.teleportFlagsLocked === true
+      && seatedBeforeMove.finalizer.pass === true
       && Object.values(seatedBeforeMove.qa.teleportFlags || {}).every((value) => value === false)
       && seatedAfterMove.phase373.blockedRigMoves > Number(prohibitedMove.before?.blockedRigMoves || 0)
       && prohibitedHeadDrift <= 0.18
       && anchorDistance <= 0.24
       && tableVerticalDrift <= 0.04
-      && Math.abs(Number(seatedAfterMove.phase373.tableBounds?.minY || 0)) <= 0.04
+      && Math.abs(Number(seatedAfterMove.phase373.tableBounds?.minY || 0)) <= 0.02
+      && seatedAfterMove.finalizer.pass === true
+      && Number(seatedAfterMove.finalizer.seatDrift || 0) <= 0.08
       && seatedAfterMove.phase373.tablePass === true
       && seatedAfterMove.preflight?.selectedOwnsTable === false
       && npcPass
       && lobbyAfterLeave.phase373.stableAnchor?.mode === 'lobby'
       && lobbyAfterLeave.phase373.teleportFlagsLocked === false
       && lobbyAfterLeave.postflight.standingRestored === true
+      && lobbyAfterLeave.finalizer.pass === true
       && pageErrors.length === 0
       && filteredConsole.length === 0
       && httpErrors.length === 0
@@ -146,6 +172,7 @@ async function waitFor(page, evaluator, timeout = 120000) {
     const report = {
       pass,
       build: 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK',
+      finalizerBuild: 'PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK',
       url: URL,
       lobby,
       seatedBeforeMove,
