@@ -14,6 +14,7 @@ const state = {
   tableReady: false,
   joined: false,
   attempts: 0,
+  entrySyncs: 0,
   leaveRestoresEntry: true,
   questSingleSpawnAuthority: true,
   lastError: null,
@@ -24,6 +25,7 @@ let root = null;
 let statusNode = null;
 let primaryButton = null;
 let activePromise = null;
+let entrySyncTimer = 0;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const joinedNow = () => Boolean(window.SVR_PHASE363_JOINED_IMMEDIATE ?? window.SVR_PHASE363_STATE?.joined ?? window.SVR_PHASE361_STATE?.seated);
@@ -74,6 +76,25 @@ function resetPrimaryForLobby(reason = 'lobby') {
   root.hidden = false;
   setStatus(state.tableReady ? 'Table ready. Press JOIN TABLE to play.' : 'Preparing the verified table…');
   publish(reason);
+}
+
+function syncAndroidEntry(reason = 'android-entry-sync') {
+  if (platform !== 'android' || !root || !primaryButton) return false;
+  const runtimeReady = Boolean(
+    window.SVR_PHASE363_STATE?.installedAt
+    || typeof window.SVR_PHASE363_JOIN_TABLE === 'function'
+    || typeof window.SVR_PHASE369_JOIN_TABLE === 'function'
+  );
+  if (!runtimeReady) return false;
+  if (joinedNow()) {
+    root.hidden = true;
+    publish(`${reason}:joined`);
+    return true;
+  }
+  if (activePromise || primaryButton.disabled) return false;
+  state.entrySyncs += 1;
+  resetPrimaryForLobby(`${reason}:lobby`);
+  return true;
 }
 
 function ensureUi() {
@@ -193,7 +214,10 @@ async function primaryAction() {
       publish('error');
       return false;
     })
-    .finally(() => { activePromise = null; });
+    .finally(() => {
+      activePromise = null;
+      if (platform === 'android') window.setTimeout(() => syncAndroidEntry('join-finally'), 120);
+    });
   return activePromise;
 }
 
@@ -202,6 +226,7 @@ function install() {
   state.installed = true;
   ensureUi();
   window.SVR_PHASE372_PRIMARY_ACTION = primaryAction;
+  window.SVR_PHASE372_SYNC_ANDROID_ENTRY = syncAndroidEntry;
   window.SVR_PHASE372_QA = () => ({
     ...publish('qa'),
     entryCount: document.querySelectorAll('#svr372Entry').length,
@@ -221,7 +246,18 @@ function install() {
       publish(event.detail?.reason || 'join-state');
     }
   });
+  window.addEventListener('svr:phase372-core-ready', () => syncAndroidEntry('core-ready'));
+  window.addEventListener('pageshow', () => syncAndroidEntry('pageshow'));
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) syncAndroidEntry('visibility');
+  });
   window.addEventListener('svr:phase368-card-dealer-ready', () => publish('dealer-ready'));
+  if (platform === 'android') {
+    window.setTimeout(() => syncAndroidEntry('initial-500'), 500);
+    window.setTimeout(() => syncAndroidEntry('initial-1500'), 1500);
+    entrySyncTimer = window.setInterval(() => syncAndroidEntry('interval'), 650);
+    window.addEventListener('beforeunload', () => clearInterval(entrySyncTimer), { once: true });
+  }
   publish('installed');
 }
 
