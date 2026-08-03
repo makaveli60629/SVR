@@ -18,6 +18,7 @@ on:
       - 'game/modules/phase373_quest_rig_preflight_lock.js'
       - 'game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js'
       - 'game/modules/phase373_quest_npc_teleport_postflight_lock.js'
+      - 'game/modules/phase373_quest_table_seat_finalizer_lock.js'
       - 'game/tools/phase364-device-xr-geometry-static-test.mjs'
       - 'game/tools/phase364-device-xr-geometry-browser-acceptance.cjs'
       - 'game/tools/phase369-android-recovery-static-test.mjs'
@@ -60,6 +61,7 @@ jobs:
           node --check game/modules/phase373_quest_rig_preflight_lock.js
           node --check game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js
           node --check game/modules/phase373_quest_npc_teleport_postflight_lock.js
+          node --check game/modules/phase373_quest_table_seat_finalizer_lock.js
           node --check game/tools/phase364-device-xr-geometry-browser-acceptance.cjs
           node --check game/tools/phase373-quest-seated-table-browser-acceptance.cjs
           node --check game/tools/phase372-production-recovery-static-test.mjs
