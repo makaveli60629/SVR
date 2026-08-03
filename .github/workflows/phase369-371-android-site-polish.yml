@@ -1,4 +1,4 @@
-name: Phase 369-372 Android Site Production Recovery
+name: Phase 369-373 Android Quest Site Production Recovery
 
 on:
   pull_request:
@@ -11,11 +11,13 @@ on:
       - 'game/modules/phase369_android_join_readiness_transaction_lock.js'
       - 'game/modules/phase369_android_join_intent_bridge_lock.js'
       - 'game/modules/phase372_live_entry_recovery_lock.js'
+      - 'game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js'
       - 'game/phase369-release.json'
       - 'game/tools/phase350-integrity-static-test.mjs'
       - 'game/tools/phase356-android-real-device-static-test.mjs'
       - 'game/tools/phase369-android-recovery-static-test.mjs'
       - 'game/tools/phase372-production-recovery-static-test.mjs'
+      - 'game/tools/phase373-quest-seated-table-static-test.mjs'
       - 'site/js/phase345-player-account-client.js'
       - 'site/js/phase346-avatar-viewer.js'
       - 'site/js/phase370-account-profile-mobile-polish.js'
@@ -28,6 +30,7 @@ on:
       - 'docs/SVR_PHASE_369_371_ANDROID_SITE_CONTINUATION_MANIFEST.md'
       - 'docs/SVR_PHASE_369_371_MANIFEST.json'
       - 'docs/SVR_PHASE_372_PRODUCTION_RECOVERY_MANIFEST.md'
+      - 'docs/SVR_PHASE_373_QUEST_RECOVERY_MANIFEST.md'
       - '.github/workflows/deploy.yml'
       - '.github/workflows/phase369-371-android-site-polish.yml'
   workflow_dispatch:
@@ -52,6 +55,7 @@ jobs:
           node --check game/modules/phase369_android_join_readiness_transaction_lock.js
           node --check game/modules/phase369_android_join_intent_bridge_lock.js
           node --check game/modules/phase372_live_entry_recovery_lock.js
+          node --check game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js
           node --check site/js/phase345-player-account-client.js
           node --check site/js/phase346-avatar-viewer.js
           node --check site/js/phase370-account-profile-mobile-polish.js
@@ -59,6 +63,7 @@ jobs:
           node --check game/tools/phase350-integrity-static-test.mjs
           node --check game/tools/phase356-android-real-device-static-test.mjs
           node --check game/tools/phase372-production-recovery-static-test.mjs
+          node --check game/tools/phase373-quest-seated-table-static-test.mjs
           python3 -m json.tool game/phase369-release.json >/dev/null
           python3 -m json.tool docs/SVR_PHASE_369_371_MANIFEST.json >/dev/null
           python3 -m json.tool site/config/player-api.json >/dev/null
@@ -67,6 +72,7 @@ jobs:
           node game/tools/phase368-card-dealer-static-test.mjs
           node game/tools/phase369-android-recovery-static-test.mjs
           node game/tools/phase372-production-recovery-static-test.mjs
+          node game/tools/phase373-quest-seated-table-static-test.mjs
           node site/tools/phase370-371-site-polish-static-test.mjs
           node game/tools/phase350-integrity-static-test.mjs
           node game/tools/phase356-android-real-device-static-test.mjs
