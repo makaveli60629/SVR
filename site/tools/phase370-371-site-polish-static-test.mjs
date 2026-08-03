@@ -80,19 +80,21 @@ if (config.identity !== 'cognito') errors.push('config:identity');
 if (config.database !== 'dynamodb') errors.push('config:database');
 if (config.apiBase !== '') errors.push('config:api-endpoint-must-remain-empty-until-approved');
 
-if (manifest.activePhase !== 372) errors.push('manifest:active-phase');
-if (manifest.phases?.length !== 5) errors.push('manifest:phase-count');
+if (manifest.activePhase !== 373) errors.push('manifest:active-phase');
+if (manifest.phases?.length !== 6) errors.push('manifest:phase-count');
 if (manifest.phases?.find((phase) => phase.phase === 370)?.cashAppCredentialsCollected !== false) errors.push('manifest:cashapp-truth');
+if (manifest.phases?.find((phase) => phase.phase === 373)?.seatedTeleportDisabled !== true) errors.push('manifest:phase373-quest-lock');
 if (manifest.accounts?.provider !== 'aws' || manifest.accounts?.identity !== 'cognito' || manifest.accounts?.database !== 'dynamodb') errors.push('manifest:aws-authority');
 if (manifest.accounts?.azureRetired !== true) errors.push('manifest:azure-retired');
 if (manifest.truth?.physicalAndroidPlaytestRequired !== true || manifest.truth?.physicalQuestPlaytestRequired !== true) errors.push('manifest:device-test-truth');
 
 const result = {
-  build: 'PHASE-370/371-PROTECTED-BY-PHASE-372-AWS',
+  build: 'PHASE-370/371-PROTECTED-BY-PHASE-373-AWS',
   accountNavigation: 'distinct-login-and-register-desktop-and-mobile',
   accountProvider: config.provider,
   identity: config.identity,
   database: config.database,
+  activePhase: manifest.activePhase,
   errors,
   pass: errors.length === 0
 };
