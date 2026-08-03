@@ -1,80 +1,65 @@
-# Phase 356 Auto Deploy Marker
+# Phase 366 Auto Deploy Marker
 
 ## Build
-`PHASE-356-ANDROID-REAL-DEVICE-FREEZE-RECOVERY-LOCK`
+`PHASE-366-ANDROID-DEVICE-CALIBRATION-AVATAR-LIVE-CAMERA-LOCK`
 
 ## Deploy targets
 - Static website/game trigger: push to `main`
 - Static workflow: `.github/workflows/deploy.yml`
-- Phase 356 validation workflow: `.github/workflows/phase356-android-site-ai-check.yml`
-- Android full-hand validation: `.github/workflows/phase354-android-full-game-acceptance.yml`
+- Phase 366 validation workflow: `.github/workflows/phase366-device-calibration-avatar-camera.yml`
+- Complete Android Hold'em regression: Phase 363 browser acceptance
+- Phase 365 seated UX/branding regression remains required
 
 ## Static runtime payload
 - `game/android.html`
 - `game/android-release.json`
 - `game/manifest.json`
 - `game/modules/phase340_platform_manifest.js`
-- `game/modules/phase340_platform_core_loader.js`
-- `game/modules/phase356_android_real_device_freeze_recovery_lock.js`
-- `matrix.js`
-- `support-chat-bot.js`
-- `site/js/phase356-profile-legend-pedestal.js`
-- `sw.js`
-- Phase 356 tests, platform blueprint, and handoff manifest
+- `game/modules/phase366_android_device_calibration_avatar_showroom_continuity_lock.js`
+- `site/profile.html`
+- `site/js/phase366-profile-live-camera-continuity.js`
+- `game/avatar-vr.html`
+- Phase 366 tests and handoff records
 
-## Android real-device freeze locks
-- Phase 347 remains the only Android MOVE, LOOK, seated movement, and poker-action controller.
-- Android shader `compileAsync` prewarming is disabled.
-- Android deferred lobby, account, FBX-avatar, and presence modules are disabled during table play.
-- Scene inspection is bounded to one startup pass capped at 240 nodes.
-- Standard Android pixel ratio is capped at 1.0; recovery mode uses 0.78.
-- Shadows remain disabled.
-- Five lightweight table opponents replace background FBX avatar loading.
-- Frame-gap and WebGL context-loss recovery are active.
-- `Continue Low Power` and `Reload Table` controls are visible when recovery is required.
-- Phase 336 poker rules, settlement, legal actions, cards, and NEXT HAND remain authoritative.
+## Android device-calibration locks
+- Phase 365 remains the default/reset baseline.
+- Calibration is available only from one small lobby button.
+- The calibration button and panel are hidden after JOIN TABLE.
+- Settings are stored only on the current device under `svr.phase366.androidCalibration.v1`.
+- Calibration can adjust table height, seat distance/height, HUD scale, pot opacity/size, gyro sensitivity, and opponent seat offsets.
+- Calibration does not edit cards, poker state, bankroll, profile identity, or backend records.
+- Reset restores all Phase 365 defaults.
+- Phase 347 remains the only Android MOVE, LOOK and poker-action controller.
 
-## Website presentation locks
-- Matrix secret phrase bursts are delayed and staggered.
-- Desktop phrase interval: 9 seconds.
-- Touch/mobile phrase interval: 12 seconds.
-- Reduced-motion phrase interval: 18 seconds.
-- Profile showroom displays the local Eric FBX as a rotating `SVR LEGEND` on a professional pedestal.
-- A procedural lightweight legend remains available if the FBX cannot load.
-
-## AI support locks
-- The website uses a full-height, scrollable, platform-aware support panel.
-- Frontend route: `POST /api/ai/support`.
-- Offline SVR knowledge remains available when the GPT backend is unavailable.
-- Browser code contains no OpenAI secret.
-- Production GPT requires `OPENAI_API_KEY` on the separately deployed Node backend.
-- Static deployment does not deploy or configure the Node backend.
-
-## Platform and Unity blueprint
-- Android, Quest, desktop, Camera 3, website, profile, controls, poker authority, and recovery contracts are recorded in `docs/PHASE-356-PLATFORM-UNITY-BLUEPRINT.json`.
-- Unity should consume the shared authorities and profile fields rather than duplicate page-specific logic.
+## Avatar live-camera continuity
+- Phase 351 remains the profile 3D showroom renderer and visible fallback authority.
+- Phase 346 remains the website wardrobe authority.
+- Phase 353 remains the VR dressing room and moving-pedestal authority.
+- Phase 366 synchronizes the same saved profile record across all three routes.
+- The profile camera refreshes after profile/account changes, avatar saves, storage changes, and page visibility restoration.
+- No duplicate avatar record, scene, camera, or pedestal authority is introduced.
 
 ## Runtime QA
 ```js
-window.SVR_PHASE356_QA()
-window.SVR_PHASE356_ENTER_LOW_POWER('manual-test')
-window.SVR_PHASE347_QA?.()
-window.SVR_PHASE356_PROFILE_LEGEND_QA?.()
-window.SVR_PHASE340_AUDIT?.()
+window.SVR_PHASE366_QA()
+window.SVR_PHASE366_OPEN_CALIBRATION()
+window.SVR_PHASE366_SET_CALIBRATION({ seatDistanceOffset: -0.04, hudScale: 0.92 })
+window.SVR_PHASE366_RESET()
+window.SVR_PHASE366_PROFILE_CAMERA_QA()
+window.SVR_PHASE366_PROFILE_CAMERA_REFRESH()
 ```
 
 ## Validation status
-- Phase 345 Account API Check: passed
-- Phase 346 Avatar Check: passed
-- Phase 347 Android Check: passed
-- Phase 348 Avatar Runtime Check: passed
-- Phase 349 Presence Check: passed
-- Phase 350 Site Integrity Check: passed
-- Phase 351 Profile Showroom Check: passed
-- Phase 353 VR Avatar Check: passed
-- Phase 354 Android Full Game Acceptance: passed
-- Phase 356 Android Site AI Check: passed
-- Real owner-device Android acceptance: pending
+- Phase 345 Account API Check: protected
+- Phase 346 Avatar Check: protected
+- Phase 347 Android Check: protected
+- Phase 351 Profile Showroom Check: protected
+- Phase 353 VR Avatar Check: protected
+- Phase 363 Android complete Hold'em: required
+- Phase 364 Device XR Geometry Check: protected
+- Phase 365 Android Seated UX Branding Check: required
+- Phase 366 Device Calibration Avatar Camera Check: pending PR validation
+- Physical owner-device calibration/comfort acceptance: pending
 
 ## APK release gate
 - Current APK: `0.1.0-rc1`, code `1`
@@ -86,4 +71,4 @@ window.SVR_PHASE340_AUDIT?.()
 - Forced update: false
 - Automatic update prompt: false
 - Manual update only: true
-- Phase 356 updates the remote stable web runtime used by the installed RC1 wrapper; it does not claim a newly signed APK.
+- Phase 366 updates the remote stable web runtime used by the installed RC1 wrapper; it does not claim a newly signed APK.
