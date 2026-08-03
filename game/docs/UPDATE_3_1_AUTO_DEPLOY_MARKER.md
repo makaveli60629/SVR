@@ -47,21 +47,58 @@ window.SVR_PHASE367_DEVICE_STABILIZE()
 window.SVR_PHASE367_DEVICE_STATE
 ```
 
+## Certified browser results
+- Landscape viewport: `915 × 412`
+- Portrait viewport: `412 × 915`
+- Controller roots: `1`
+- MOVE controls: `1`
+- LOOK controls: `1`
+- Action panels: `1`
+- Real pointer events recorded: `3`
+- MOVE touches: `1`
+- LOOK touches: `1`
+- Action touches: `1`
+- Visible seated navigation controls: `0`
+- Stabilization burst requests: `10`
+- Stabilization applications during burst: `1`
+- Coalesced/rate-limited requests skipped: `8`
+- Phase 365 table minimum Y: `-0.065`
+- Phase 365 table reference line Y: `0`
+- Phase 365 table top Y: `0.735`
+- Pot opacity: `0.88`
+- Pot frame: none
+- Aligned opponent avatars: `5`
+- Avatar name tags: `5`
+- Branded card backs: `13`
+- Full Hold’em: passed
+- Fresh shuffle and leave/reset: passed
+- Table chips conserved: `90,000`
+- Page errors: `0`
+- Console errors: `0`
+- Failed requests: `0`
+
 ## Validation status
-- Phase 345 Account API Check: protected
-- Phase 346 Avatar Check: protected
-- Phase 347 Android Check: protected
-- Phase 349 Presence Check: protected
-- Phase 350 Site Integrity Check: protected
-- Phase 351 Profile Showroom Check: protected
-- Phase 353 VR Avatar Check: protected
-- Phase 354 Android Full Game Acceptance: protected
-- Phase 363 Android complete Hold’em: required
-- Phase 364 Device XR Geometry Check: protected
-- Phase 365 Android Seated UX Branding Check: required
-- Phase 366 Profile Live Camera Check: required
-- Phase 367 Android Physical Device Check: pending PR validation
-- Physical owner-device Android acceptance: pending
+- Phase 345 Account API Check: passed
+- Phase 346 Avatar Check: passed
+- Phase 347 Android Check: passed
+- Phase 348 Avatar Runtime Check: passed
+- Phase 349 Presence Check: passed
+- Phase 350 Site Integrity Check: passed
+- Phase 351 Profile Showroom Check: passed
+- Phase 353 VR Avatar Check: passed
+- Phase 354 Android Full Game Acceptance: passed
+- Phase 356 Android Site AI Check: passed
+- Phase 357 Android Table Status Check: passed
+- Phase 358 Quest Full Game Acceptance: passed
+- Phase 359 Dual Platform Continuity: passed
+- Phase 360 Fresh Shuffle Leave Reset: passed
+- Phase 361 Quest Lobby Check: passed
+- Phase 363 Android complete Hold’em: passed
+- Phase 364 Device XR Geometry Check: passed
+- Phase 365 Android Seated UX Branding Check: passed
+- Phase 366 Profile Live Camera Check: passed
+- Phase 367 Android Physical Device Check: passed
+- Physical owner-device Android comfort acceptance: pending
 
 ## APK release gate
 - Current APK: `0.1.0-rc1`, code `1`
