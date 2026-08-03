@@ -1,0 +1,83 @@
+name: Phase 364 Device XR Geometry Spawn
+
+on:
+  pull_request:
+    paths:
+      - 'game/index.html'
+      - 'game/android.html'
+      - 'game/manifest.json'
+      - 'game/device-release.json'
+      - 'game/modules/core_scene.js'
+      - 'game/modules/phase340_platform_manifest.js'
+      - 'game/modules/phase364_device_xr_geometry_spawn_lock.js'
+      - 'game/tools/phase364-device-xr-geometry-static-test.mjs'
+      - 'game/tools/phase364-device-xr-geometry-browser-acceptance.cjs'
+      - 'docs/phase364_device_xr_geometry_spawn_lock.md'
+      - '.github/workflows/phase364-device-xr-geometry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  device-xr-geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 38
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate Phase 364 contracts
+        run: |
+          node --check game/modules/core_scene.js
+          node --check game/modules/phase340_platform_manifest.js
+          node --check game/modules/phase364_device_xr_geometry_spawn_lock.js
+          node --check game/tools/phase364-device-xr-geometry-browser-acceptance.cjs
+          node game/tools/phase364-device-xr-geometry-static-test.mjs
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/device-release.json >/dev/null
+
+      - name: Run protected static regressions
+        run: |
+          node game/tools/phase358-quest-static-test.mjs
+          node game/tools/phase361-quest-lobby-seat-static-test.mjs
+          node game/tools/phase363-android-integrated-core-static-test.mjs
+          node game/tools/phase347-android-static-test.mjs
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Start local SVR site
+        run: |
+          python3 -m http.server 4173 > /tmp/svr-phase364-http.log 2>&1 &
+          echo $! > /tmp/svr-phase364-http.pid
+          sleep 2
+
+      - name: Verify Quest and Android geometry, spawn and seating
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase364-device-xr-geometry-browser-acceptance.cjs
+
+      - name: Re-run Android complete game
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase363-android-integrated-core-browser-acceptance.cjs
+
+      - name: Re-run Quest complete game
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase358-quest-browser-acceptance.cjs
+
+      - name: Upload HTTP log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase364-http-log
+          path: /tmp/svr-phase364-http.log
