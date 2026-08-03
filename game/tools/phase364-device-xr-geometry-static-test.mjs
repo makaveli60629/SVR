@@ -3,6 +3,7 @@ import fs from 'node:fs';
 const read = (path) => fs.readFileSync(path, 'utf8');
 const phase = read('game/modules/phase364_device_xr_geometry_spawn_lock.js');
 const quarantine = read('game/modules/phase364_quest_eric_quarantine_watch.js');
+const recovery = read('game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js');
 const core = read('game/modules/core_scene.js');
 const manifest = read('game/modules/phase340_platform_manifest.js');
 const quest = read('game/index.html');
@@ -41,6 +42,13 @@ requireText(quarantine, 'SVR_PHASE364_SANITIZE_NPCS');
 requireText(quarantine, 'window.setInterval(sweep, 260)');
 requireText(quarantine, 'SVR_PHASE364_ERIC_QUARANTINE_SWEEP');
 
+requireText(recovery, 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK');
+requireText(recovery, 'window.SVR_PHASE364_SANITIZE_NPCS = repairNpcs');
+requireText(recovery, 'svrPhase364Quarantined: false');
+requireText(recovery, 'textureNpc(root)');
+requireText(recovery, 'chooseUprightRotation(root)');
+requireText(recovery, 'groundNpc(root)');
+
 requireText(core, 'renderer.xr.setReferenceSpaceType("local-floor")');
 requireText(core, 'optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"]');
 forbidText(core, 'requiredFeatures:', 'required XR floor feature');
@@ -54,17 +62,22 @@ const questPhaseMatch = quest.match(/phase364_device_xr_geometry_spawn_lock\.js\
 const questBootMatch = quest.match(/phase340_platform_core_loader\.js\?v=(phase\d+)/);
 const phase361Match = quest.match(/phase361_quest_lobby_play_seat_watch_npc_lock\.js\?v=(phase\d+)/);
 const quarantineMatch = quest.match(/phase364_quest_eric_quarantine_watch\.js\?v=(phase\d+)/);
-if (!questPhaseMatch || !questBootMatch || !phase361Match || !quarantineMatch) throw new Error('Quest protected geometry, platform, lobby, or quarantine module missing');
+const recoveryMatch = quest.match(/phase373_quest_seated_teleport_table_spawn_npc_lock\.js\?v=(phase\d+)/);
+if (!questPhaseMatch || !questBootMatch || !phase361Match || !quarantineMatch || !recoveryMatch) throw new Error('Quest protected geometry, platform, lobby, quarantine, or Phase 373 recovery module missing');
 const questPhaseIndex = quest.indexOf(questPhaseMatch[0]);
 const questBootIndex = quest.indexOf(questBootMatch[0]);
 const phase361Index = quest.indexOf(phase361Match[0]);
 const quarantineIndex = quest.indexOf(quarantineMatch[0]);
+const recoveryIndex = quest.indexOf(recoveryMatch[0]);
 if (questPhaseIndex < 0 || questBootIndex <= questPhaseIndex) throw new Error('Quest Phase 364 must load before platform boot');
-if (phase361Index < 0 || quarantineIndex <= phase361Index) throw new Error('Eric quarantine watcher must load after Phase 361 NPC creation');
+if (phase361Index < 0 || quarantineIndex <= phase361Index || recoveryIndex <= quarantineIndex) throw new Error('Phase 373 recovery must load after the Phase 361 NPC and historical quarantine modules');
 requireText(quest, 'PHASE-364-QUEST-XR-ENTRY-TABLE-FLOOR-SPAWN-LOCK');
 requireText(quest, 'SVR_PHASE364_LOBBY_SPAWN');
-requireText(quest, 'SVR_PHASE364_ERIC_QUARANTINE_SWEEP');
-requireText(quest, 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK', 'phase372-successor');
+requireText(quest, 'SVR_PHASE373_REPAIR_NPCS');
+requireText(quest, 'SVR_PHASE373_STABLE_LOBBY');
+requireText(quest, 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK', 'phase372-entry-successor');
+requireText(quest, 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK', 'phase373-active-successor');
+forbidText(quest, 'window.SVR_PHASE364_ERIC_QUARANTINE_SWEEP?.();', 'page-level-Eric-hide-call');
 
 const androidPhaseMatch = android.match(/phase364_device_xr_geometry_spawn_lock\.js\?v=(phase\d+)/);
 const androidBootMatch = android.match(/phase340_platform_core_loader\.js\?v=(phase\d+)/);
@@ -83,12 +96,13 @@ if (appManifest.table_dimensions_meters?.length !== 2.74 || appManifest.table_di
 
 console.log(JSON.stringify({
   pass: true,
-  build: 'PHASE-364-PROTECTED-BY-PHASE-372',
+  build: 'PHASE-364-PROTECTED-BY-PHASE-373',
   currentPlatformPhase: appManifest.phase,
   tableMeters: [2.74, 0.80, 1.46],
   questSpawn: '0.90m outside south/front rail facing felt',
-  xrEntry: 'single stable placement plus inside-table safety recovery',
+  xrEntry: 'single one-time lobby placement plus seated position safety recovery',
   xrLocalFloorRequired: false,
-  lateEricQuarantine: true,
+  historicalEricQuarantineModuleRetained: true,
+  phase373EricRepairOverridesQuarantine: true,
   apk: `${appManifest.apk_version_name}/${appManifest.apk_version_code}`
 }, null, 2));
