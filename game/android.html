@@ -43,6 +43,7 @@ const start=async()=>{if(started)return;started=true;try{
   await import('./modules/phase367_android_physical_device_viewport_touch_acceptance_lock.js?v=phase367');
   await import('./modules/phase368_android_join_card_gyro_ux_lock.js?v=phase368');
   await import('./modules/phase368_android_spectator_tournament_voice_lock.js?v=phase368');
+  await import('./modules/phase368_android_join_release_race_guard.js?v=phase368');
   window.SVR_PHASE363_LEAVE_TABLE?.('boot-lobby');
   window.SVR_PHASE365_SYNC?.();
   window.SVR_PHASE365_REFRESH_CARD_BRAND?.();
