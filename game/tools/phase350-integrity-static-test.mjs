@@ -7,6 +7,8 @@ const profileShowroom = fs.existsSync('site/js/phase351-profile-showroom.js') ? 
 const phase366Account = fs.existsSync('site/js/phase366-player-account-resilience.js') ? read('site/js/phase366-player-account-resilience.js') : '';
 const phase366Camera = fs.existsSync('site/js/phase366-profile-live-camera-watchdog.js') ? read('site/js/phase366-profile-live-camera-watchdog.js') : '';
 const phase356Legend = fs.existsSync('site/js/phase356-profile-legend-pedestal.js') ? read('site/js/phase356-profile-legend-pedestal.js') : '';
+const phase370Profile = fs.existsSync('site/js/phase370-account-profile-mobile-polish.js') ? read('site/js/phase370-account-profile-mobile-polish.js') : '';
+const phase370Css = fs.existsSync('site/css/phase370-account-profile-mobile-clean.css') ? read('site/css/phase370-account-profile-mobile-clean.css') : '';
 const camera3 = read('game/modules/phase350_camera3_visibility_lighting_lock.js');
 const androidDedupe = read('game/modules/phase350_android_controller_dom_deduplication_lock.js');
 const platform = read('game/modules/phase340_platform_manifest.js');
@@ -46,10 +48,19 @@ if (showroomLoaded || phase366Loaded) {
 } else need(profilePage, 'id="avatarRetry"', 'profile-visible-retry-button');
 if (profilePage.includes('phase346-profile-avatar-preview.js')) errors.push('old-profile-preview-still-loaded');
 if (Number(manifest.phase || 0) >= 356) {
-  need(matrix, 'phase356-profile-legend-pedestal.js', 'phase356-profile-legend-injection');
-  need(phase356Legend, 'PHASE356_LEGEND_PEDESTAL', 'phase356-profile-legend-pedestal');
-  need(phase356Legend, '/game/assets/models/eric/eric.fbx', 'phase356-profile-verified-model');
-  need(phase356Legend, 'proceduralLegend', 'phase356-profile-fallback');
+  const legacyLegendInjected = matrix.includes('phase356-profile-legend-pedestal.js');
+  const cleanProfileSuccessor = matrix.includes('profileLegendModule: false')
+    && matrix.includes('phase370-account-profile-mobile-polish.js')
+    && phase370Profile.includes('SVR LEGEND / ERIC')
+    && phase370Profile.includes('profileShowroomCanvas')
+    && phase370Css.includes('.showroom-status-card,.showroom-hint{display:none!important}');
+  if (legacyLegendInjected) {
+    need(phase356Legend, 'PHASE356_LEGEND_PEDESTAL', 'phase356-profile-legend-pedestal');
+    need(phase356Legend, '/game/assets/models/eric/eric.fbx', 'phase356-profile-verified-model');
+    need(phase356Legend, 'proceduralLegend', 'phase356-profile-fallback');
+  } else if (!cleanProfileSuccessor) {
+    errors.push('phase356-profile-legend-or-phase370-clean-successor');
+  }
 }
 
 for (const token of ['PHASE350_CAMERA3_LIGHTING_ROOT', 'new THREE.HemisphereLight', 'new THREE.AmbientLight', 'new THREE.DirectionalLight', 'new THREE.PointLight', 'toneMappingExposure = 1.22', 'shadowMap.enabled = false', 'SVR_PHASE350_CAMERA3_QA']) need(camera3, token, `camera3-${token}`);
@@ -105,7 +116,7 @@ console.log(JSON.stringify({
   protectedBuild: 'PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK',
   successorWebBuild: manifest.build,
   protectedAndroidAuthority,
-  profileAvatar: phase366Loaded ? 'phase366-live-camera-over-phase351-showroom' : Number(manifest.phase || 0) >= 356 ? 'phase356-live-legend-pedestal-over-phase351-showroom' : showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
+  profileAvatar: phase370Profile ? 'phase370-clean-textured-avatar-over-phase366-live-camera' : phase366Loaded ? 'phase366-live-camera-over-phase351-showroom' : Number(manifest.phase || 0) >= 356 ? 'phase356-live-legend-pedestal-over-phase351-showroom' : showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
   camera3: 'dedicated-lighting-final-authority',
   androidController: 'phase350-deduplication-before-phase365-repair-and-phase367-viewport-layer',
   roadmap: 'ordered-major-milestones',
