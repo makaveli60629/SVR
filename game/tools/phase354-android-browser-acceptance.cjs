@@ -8,6 +8,16 @@ async function tap(locator) {
   }
 }
 
+async function joinAndroidTable(page) {
+  const phase369Entry = page.locator('#svr369Join');
+  if (await phase369Entry.count() && await phase369Entry.isVisible().catch(() => false)) {
+    await tap(phase369Entry);
+    return 'phase369-visible-entry';
+  }
+  await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+  return 'phase347-authoritative-seat';
+}
+
 (async () => {
   const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
   const baseOrigin = new URL(base).origin;
@@ -73,7 +83,7 @@ async function tap(locator) {
     });
   });
 
-  const url = `${base}/game/android.html?channel=stable&v=phase363&phase354compat=1`;
+  const url = `${base}/game/android.html?channel=stable&v=phase369&phase354compat=1`;
   let report = null;
   let fatal = null;
 
@@ -90,6 +100,7 @@ async function tap(locator) {
       && window.SVR_PHASE363_STATE?.installedAt
       && window.SVR_PHASE363_STATE?.gameState === 'LOBBY'
       && window.SVR_PHASE363_JOINED_IMMEDIATE === false
+      && Boolean(document.getElementById('svr369Join')?.offsetParent)
     ), null, { timeout: 120000 });
     await page.waitForTimeout(1000);
 
@@ -103,6 +114,7 @@ async function tap(locator) {
       controller: window.SVR_PHASE350_ANDROID_CONTROLLER_QA?.() || null,
       phase354: window.SVR_PHASE354_QA?.() || null,
       seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || null,
+      phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent),
       holeVisible: (() => {
         const element = document.getElementById('svr347Hole');
         return element ? getComputedStyle(element).display !== 'none' : false;
@@ -113,7 +125,7 @@ async function tap(locator) {
       })()
     }));
 
-    await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+    const firstJoinSurface = await joinAndroidTable(page);
     await page.waitForFunction(() => (
       window.SVR_PHASE363_STATE?.joined === true
       && window.SVR_PHASE363_JOINED_IMMEDIATE === true
@@ -163,6 +175,7 @@ async function tap(locator) {
       && window.SVR_PHASE363_JOINED_IMMEDIATE === false
       && window.SVR_PHASE336_POKER_STATE?.phase === 'idle'
       && window.SVR_PHASE363_CONSISTENCY_QA?.()?.lobbyCardsCleared === true
+      && Boolean(document.getElementById('svr369Join')?.offsetParent)
     ), null, { timeout: 15000 });
     await page.waitForTimeout(700);
 
@@ -174,10 +187,11 @@ async function tap(locator) {
       join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
       consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
       seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || null,
+      phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent),
       audit: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null
     }));
 
-    await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+    const rejoinSurface = await joinAndroidTable(page);
     await page.waitForFunction(() => (
       window.SVR_PHASE363_STATE?.joined === true
       && window.SVR_PHASE363_JOINED_IMMEDIATE === true
@@ -203,8 +217,10 @@ async function tap(locator) {
 
     report = {
       build: 'PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK',
-      successor: 'PHASE-363-ANDROID-CANONICAL-TABLE-JOIN-BANKROLL-AUDIO-LOCK',
+      successor: 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK',
       url,
+      firstJoinSurface,
+      rejoinSurface,
       lobby,
       seated,
       hand,
@@ -259,9 +275,11 @@ async function tap(locator) {
       && report?.showdown?.community === 5
       && report?.showdown?.burn === 3
       && (report?.showdown?.winners || []).length > 0,
-    deliberateJoinPassed: report?.lobby?.joined === false
+    deliberateJoinPassed: report?.firstJoinSurface === 'phase369-visible-entry'
+      && report?.lobby?.joined === false
       && report?.lobby?.join?.pass === true
       && report?.lobby?.seatText === 'JOIN TABLE'
+      && report?.lobby?.phase369EntryVisible === true
       && report?.seated?.join?.pass === true
       && report?.seated?.seatText === 'LEAVE TABLE'
       && report?.seated?.poker?.players?.[0]?.hand?.length === 2,
@@ -272,8 +290,10 @@ async function tap(locator) {
       && report?.left?.seatText === 'JOIN TABLE'
       && report?.left?.join?.pass === true
       && report?.left?.consistency?.lobbyCardsCleared === true
+      && report?.left?.phase369EntryVisible === true
       && lobbyHandsClear,
-    freshReleaseRejoinPassed: report?.rejoined?.joined === true
+    freshReleaseRejoinPassed: report?.rejoinSurface === 'phase369-visible-entry'
+      && report?.rejoined?.joined === true
       && report?.rejoined?.joinedImmediate === true
       && report?.rejoined?.gameState === 'SEATED'
       && report?.rejoined?.handNo === 1
