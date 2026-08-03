@@ -54,11 +54,12 @@ for (const [token, label] of [
   ['phase355_android_full_hand_driver_compatibility_lock.js', 'platform-hand-driver'],
   ['phase350_android_controller_dom_deduplication_lock.js', 'platform-dedupe-module'],
   ['phase365_android_seated_ux_branding_gyro_alignment_lock.js', 'platform-phase365-repair-module'],
+  ['phase367_android_physical_device_viewport_acceptance_lock.js', 'platform-phase367-device-module'],
   ["if (value === 'android') return unique([...REGISTRY, ...ANDROID_FOUNDATION, ...ANDROID_POKER, ...ANDROID_FINAL]);", 'android-critical-runtime-assembly'],
   ['const ANDROID_DEFERRED = []', 'android-background-work-disabled'],
-  ['phase365-android-critical-load-order', 'phase365-critical-order-validator'],
-  ['phase365-android-seated-ux-not-last', 'phase365-last-validator'],
-  ['phase365-android-background-deferred-work', 'zero-deferred-error-label']
+  ['phase367-android-critical-load-order', 'phase367-critical-order-validator'],
+  ['phase367-android-device-acceptance-not-last', 'phase367-last-validator'],
+  ['phase367-android-background-deferred-work', 'zero-deferred-error-label']
 ]) need(platform, token, label);
 
 const foundation = platform.split('const ANDROID_FOUNDATION = [')[1]?.split('];')[0] || '';
@@ -68,7 +69,8 @@ const finalOrder = [
   'phase347_android_single_controller_seated_gameplay_apk_release_lock.js',
   'phase355_android_full_hand_driver_compatibility_lock.js',
   'phase350_android_controller_dom_deduplication_lock.js',
-  'phase365_android_seated_ux_branding_gyro_alignment_lock.js'
+  'phase365_android_seated_ux_branding_gyro_alignment_lock.js',
+  'phase367_android_physical_device_viewport_acceptance_lock.js'
 ].map((token) => final.indexOf(token));
 if (!finalOrder.every((index) => index >= 0) || !finalOrder.every((index, position) => position === 0 || index > finalOrder[position - 1])) errors.push('android-final-authority-order');
 
@@ -102,7 +104,7 @@ console.log(JSON.stringify({
   protectedBuild: 'PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK',
   successorWebBuild: manifest.build,
   platformVersion,
-  controller: 'single-visible-phase347-authority-repaired-by-phase365',
+  controller: 'single-visible-phase347-authority-repaired-by-phase365-and-calibrated-by-phase367',
   horizontalInput: 'direct',
   deviceAlignmentBeforeRecovery: true,
   zeroDeferredWork: true,
