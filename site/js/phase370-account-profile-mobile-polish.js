@@ -4,6 +4,7 @@
     build: BUILD,
     menuInstalled: false,
     accountLinksInstalled: false,
+    menuRefreshes: 0,
     profileNoiseRemoved: 0,
     portraitReady: false,
     mobile: matchMedia('(max-width:900px),(pointer:coarse)').matches,
@@ -78,12 +79,25 @@
     })).filter((entry) => entry.text);
   }
 
+  function menuSignature(links) {
+    return JSON.stringify(links.map((entry) => [entry.href, entry.text, entry.current]));
+  }
+
+  function menuHtml(links) {
+    return links.map((entry) => `<a href="${entry.href}"${entry.current ? ' aria-current="page"' : ''}>${entry.text}</a>`).join('');
+  }
+
   function rebuildMenuPanel() {
     const nav = document.querySelector('.nav,.avatar-nav,.market-nav');
     const panel = document.getElementById('svr370MenuPanel');
-    if (!nav || !panel) return;
+    if (!nav || !panel) return false;
     const links = linksFromNav(nav);
-    panel.innerHTML = links.map((entry) => `<a href="${entry.href}"${entry.current ? ' aria-current="page"' : ''}>${entry.text}</a>`).join('');
+    const signature = menuSignature(links);
+    if (panel.dataset.svr370Signature === signature) return false;
+    panel.dataset.svr370Signature = signature;
+    panel.innerHTML = menuHtml(links);
+    state.menuRefreshes += 1;
+    return true;
   }
 
   function installMenu() {
@@ -107,7 +121,8 @@
     const panel = document.createElement('div');
     panel.id = 'svr370MenuPanel';
     panel.className = 'svr370-menu-panel';
-    panel.innerHTML = links.map((entry) => `<a href="${entry.href}"${entry.current ? ' aria-current="page"' : ''}>${entry.text}</a>`).join('');
+    panel.dataset.svr370Signature = menuSignature(links);
+    panel.innerHTML = menuHtml(links);
     nav.appendChild(button);
     document.body.appendChild(panel);
     button.addEventListener('click', () => {
@@ -203,6 +218,7 @@
       desktopRegisterLinks: desktopLinks.filter((text) => text === 'Register').length,
       menuLoginLinks: menuLinks.filter((text) => text === 'Login').length,
       menuRegisterLinks: menuLinks.filter((text) => text === 'Register').length,
+      menuSignatureReady: Boolean(document.getElementById('svr370MenuPanel')?.dataset.svr370Signature),
       noisyLegendNodes: document.querySelectorAll('[id*="legend" i],[class*="legend-pedestal" i],[data-phase356-profile-legend]').length,
       pass: Boolean(
         state.menuInstalled
@@ -212,6 +228,7 @@
         && desktopLinks.includes('Register')
         && menuLinks.includes('Login')
         && menuLinks.includes('Register')
+        && document.getElementById('svr370MenuPanel')?.dataset.svr370Signature
       ),
       checkedAt: state.checkedAt
     };
@@ -227,10 +244,8 @@
     enforceAvatarConcept();
     installRegistrationSupportNotice();
     const observer = new MutationObserver(() => {
-      const before = state.accountLinksInstalled;
       installAccountLinks();
       installMenu();
-      if (!before && state.accountLinksInstalled) rebuildMenuPanel();
       removeProfileNoise();
       installPortrait();
       enforceAvatarConcept();
