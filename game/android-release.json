@@ -1,7 +1,7 @@
 {
   "name": "SVR Poker Android",
   "channel": "stable",
-  "status": "phase365-android-seated-ux-branding-gyro-alignment-awaiting-acceptance",
+  "status": "phase365-android-seated-ux-branding-gyro-alignment-browser-acceptance-passed",
   "packageName": "com.svrpoker.app",
   "apkVersionName": "0.1.0-rc1",
   "apkVersionCode": 1,
@@ -91,7 +91,38 @@
     "seatedUxBranding": "PHASE-365"
   },
   "phase365Acceptance": {
-    "pending": true,
+    "passed": true,
+    "pending": false,
+    "browserAcceptancePassed": true,
+    "controllerRoots": 1,
+    "moveControls": 1,
+    "lookControls": 1,
+    "moveDistanceMeters": 0.3885,
+    "sticksHiddenAfterJoin": true,
+    "navigationVisibleAfterJoin": 0,
+    "tableMinimumY": -0.065,
+    "tableReferenceLineY": 0,
+    "tableTopY": 0.735,
+    "potDisplay": {
+      "authority": "PHASE365_ANDROID_CLEAN_POT_DISPLAY",
+      "opacity": 0.88,
+      "scale": [0.62, 0.18, 1],
+      "depthWrite": false,
+      "framed": false
+    },
+    "avatarNameTags": 5,
+    "alignedOpponentAvatars": 5,
+    "brandedCardBacks": 13,
+    "gyroEventsConsumed": 1,
+    "brandReplacementPassed": true,
+    "legalRaisePassed": true,
+    "fullHoldemPassed": true,
+    "freshRejoinTableChips": 90000,
+    "consoleErrors": 0,
+    "failedRequests": 0,
+    "profileShowroomProtected": true,
+    "vrDressingRoomProtected": true,
+    "questEnterVrButtons": 1,
     "required": [
       "Table reference line is aligned to floor Y=0",
       "MOVE and LOOK controls operate in lobby mode",
@@ -116,7 +147,7 @@
     "passed": false,
     "pending": true,
     "ownerPlaytestRequired": true,
-    "target": "Verify lobby sticks, JOIN hiding, phone gyro look, stable seated view, clean pot display, avatar/name visibility, table floor line and SVR branding on the owner Android device."
+    "target": "Verify lobby sticks, JOIN hiding, phone gyro comfort, stable seated view, clean pot display, avatar/name visibility, table floor line and SVR branding on the owner Android device."
   },
   "nextApkVersionName": "0.1.0-rc2",
   "nextApkVersionCode": 2,
@@ -124,6 +155,8 @@
   "updateMessage": "An optional SVR Poker Android update is available.",
   "updateMenuPolicy": "Hidden unless releaseReady is true, apkUrl is non-empty, and apkVersionCode is newer than the installed code.",
   "notes": [
+    "Phase 365 browser and complete-game acceptance passed on an Android-sized Chromium session.",
+    "Physical phone gyro comfort and final visual alignment remain pending owner device confirmation.",
     "Phase 365 changes the remotely loaded Android web runtime and does not require reinstalling APK 0.1.0-rc1.",
     "Phase 336 remains the poker rules and payout authority.",
     "Phase 347 remains the only visible Android MOVE, LOOK and poker-button controller.",
