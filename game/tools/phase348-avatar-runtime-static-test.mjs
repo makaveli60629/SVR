@@ -43,7 +43,7 @@ const camera3Block = platform.slice(platform.indexOf('const CAMERA3 ='), platfor
 if (camera3Block.includes('phase348_ingame_player_avatar_presence_performance_lock.js')) fail('Camera 3 must not load Phase 348.');
 if (!platform.includes('const ANDROID_DEFERRED = []')) fail('Android must disable background FBX avatar loading.');
 if (!platform.includes('phase356_android_real_device_freeze_recovery_lock.js')) fail('Android Phase 356 recovery runtime is missing.');
-if (!/phase(?:364|365)-android-background-deferred-work/.test(platform)) fail('Android zero-background-work validation is missing.');
+if (!/phase(?:364|365|367)-android-background-deferred-work/.test(platform)) fail('Android zero-background-work validation is missing.');
 for (const token of ['PHASE356_ANDROID_LIGHTWEIGHT_TABLE_AVATARS', 'PHASE356_BOT_AVATAR_', 'renderer.setPixelRatio(target)', 'inspected < 240']) {
   if (!androidRuntime.includes(token)) fail(`Android lightweight avatar token missing: ${token}`);
 }
