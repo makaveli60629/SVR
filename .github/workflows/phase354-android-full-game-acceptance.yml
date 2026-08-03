@@ -44,10 +44,14 @@ jobs:
       - name: Run Android full-game acceptance
         env:
           SVR_TEST_BASE: http://127.0.0.1:4173
-        run: node game/tools/phase354-android-browser-acceptance.cjs
-      - name: Upload HTTP log on failure
+        run: |
+          set -o pipefail
+          node game/tools/phase354-android-browser-acceptance.cjs 2>&1 | tee /tmp/phase354-acceptance-result.json
+      - name: Upload acceptance diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: phase354-http-log
-          path: /tmp/svr-http.log
+          name: phase354-acceptance-diagnostics
+          path: |
+            /tmp/svr-http.log
+            /tmp/phase354-acceptance-result.json
