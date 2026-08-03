@@ -45,18 +45,26 @@ async function runDevice(browser, name, userAgent, path, viewport) {
       const button = document.querySelector('#svr364EnterVr');
       if (!button || typeof window.SVR_PHASE361_PLAY_GAME !== 'function') return null;
       window.SVR_PHASE364_LOBBY_SPAWN?.();
+      const currentQa = window.SVR_PHASE364_QA?.() || null;
       return {
         customVrButtons: document.querySelectorAll('#svr364EnterVr').length,
         oldVrButtons: document.querySelectorAll('.svr-vr-button,#VRButton').length,
         xrSupported: window.SVR_PHASE364_STATE?.xrSupported,
         lobby: window.SVR_PHASE364_STATE?.lobbySpawn,
         seat: window.SVR_PHASE364_STATE?.seatAnchor,
+        spawnMode: window.SVR_PHASE364_STATE?.spawnMode,
+        tableReadyFacing: currentQa?.tableReadyFacing,
+        spawnGap: currentQa?.spawnGap,
+        seatGap: currentQa?.seatGap,
         phase361: window.SVR_PHASE361_QA?.() || null
       };
     });
     if (interaction.customVrButtons !== 1 || interaction.oldVrButtons !== 0) throw new Error(`quest: VR button authority invalid ${JSON.stringify(interaction)}`);
     if (!interaction.lobby || !interaction.seat) throw new Error('quest: anchors unavailable');
-    if (interaction.lobby.z - interaction.seat.z < 2.4) throw new Error(`quest: lobby spawn too close ${JSON.stringify(interaction)}`);
+    const standingToSeatDelta = interaction.lobby.z - interaction.seat.z;
+    if (standingToSeatDelta < 0.25 || standingToSeatDelta > 0.80) throw new Error(`quest: table-ready standing spawn not beside seat ${JSON.stringify(interaction)}`);
+    if (interaction.spawnMode !== 'table-ready-standing' || !interaction.tableReadyFacing) throw new Error(`quest: spawn is not table-ready/facing ${JSON.stringify(interaction)}`);
+    if (interaction.spawnGap < 0.72 || interaction.spawnGap > 1.08) throw new Error(`quest: standing rail gap invalid ${JSON.stringify(interaction)}`);
 
     const seated = await page.evaluate(async () => {
       window.SVR_PHASE361_PLAY_GAME?.();
