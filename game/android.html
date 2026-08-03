@@ -37,6 +37,7 @@ const start=async()=>{if(started)return;started=true;try{
   await import('./modules/phase363_android_settlement_lobby_consistency_lock.js?v=phase365');
   await import('./modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js?v=phase365');
   await import('./modules/phase365_android_card_brand_refresh_lock.js?v=phase365');
+  await import('./modules/phase365_phase364_reference_line_compat_lock.js?v=phase365');
   window.SVR_PHASE363_LEAVE_TABLE?.('boot-lobby');
   window.SVR_PHASE365_SYNC?.();
   window.SVR_PHASE365_REFRESH_CARD_BRAND?.();
