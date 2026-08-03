@@ -2,8 +2,10 @@ import fs from 'node:fs';
 
 const read = (path) => fs.readFileSync(path, 'utf8');
 const runtime = read('site/js/phase351-profile-showroom.js');
+const camera = read('site/js/phase366-profile-live-camera-lock.js');
 const page = read('site/profile.html');
 const css = read('site/css/phase351-profile-showroom.css');
+const cameraCss = read('site/css/phase366-profile-live-camera.css');
 const viewer = read('site/js/phase346-avatar-viewer.js');
 const catalog = JSON.parse(read('site/data/avatar-catalog.json'));
 const manifest = JSON.parse(read('game/manifest.json'));
@@ -12,19 +14,19 @@ const errors = [];
 const requireText = (source, text, label) => { if (!source.includes(text)) errors.push(label); };
 
 for (const token of [
-  "PHASE-351-PROFILE-3D-SHOWROOM-LOCK",
-  "PHASE351_PROFILE_3D_SHOWROOM_ROOT",
-  "PHASE351_SHOWROOM_WALL_LOGO",
-  "drawFallback",
-  "ResizeObserverFallback",
-  "AVATAR_MODEL",
-  "new THREE.SpotLight",
-  "new THREE.PointLight",
-  "viewer.loadModel",
-  "viewer.applyOutfit",
-  "SVR_PHASE351_PROFILE_SHOWROOM_QA",
-  "SVR_PHASE351_PROFILE_SHOWROOM_RETRY",
-  "SVR_PHASE350_PROFILE_AVATAR_QA"
+  'PHASE-351-PROFILE-3D-SHOWROOM-LOCK',
+  'PHASE351_PROFILE_3D_SHOWROOM_ROOT',
+  'PHASE351_SHOWROOM_WALL_LOGO',
+  'drawFallback',
+  'ResizeObserverFallback',
+  'AVATAR_MODEL',
+  'new THREE.SpotLight',
+  'new THREE.PointLight',
+  'viewer.loadModel',
+  'viewer.applyOutfit',
+  'SVR_PHASE351_PROFILE_SHOWROOM_QA',
+  'SVR_PHASE351_PROFILE_SHOWROOM_RETRY',
+  'SVR_PHASE350_PROFILE_AVATAR_QA'
 ]) requireText(runtime, token, `runtime-${token}`);
 
 for (const token of [
@@ -34,17 +36,32 @@ for (const token of [
   'id="showroomReset"',
   'id="showroomFullscreen"',
   'id="showroomRetry"',
-  'phase351-profile-showroom.js?v=phase351',
-  'phase351-profile-showroom.css?v=phase351',
-  'avatar.html?v=phase351'
+  'phase351-profile-showroom.js?v=phase366',
+  'phase366-profile-live-camera-lock.js?v=phase366',
+  'phase351-profile-showroom.css?v=phase366',
+  'phase366-profile-live-camera.css?v=phase366',
+  'avatar.html?v=phase366',
+  'avatar-vr.html?v=phase353'
 ]) requireText(page, token, `page-${token}`);
+
+for (const token of [
+  'PHASE-366-ANDROID-PHYSICAL-DEVICE-PROFILE-LIVE-CAMERA-LOCK',
+  "new Set(['full', 'portrait', 'outfit', 'orbit'])",
+  'SVR_PHASE366_PROFILE_CAMERA_QA',
+  'SVR_PHASE366_PROFILE_CAMERA_SET',
+  'SVR_PHASE351_PROFILE_SHOWROOM_RETRY',
+  'VR Dressing Room'
+]) requireText(camera, token, `camera-${token}`);
 
 if (page.includes('phase350-profile-avatar-recovery.js')) errors.push('old-profile-recovery-still-loaded');
 if (page.includes('id="profileAvatarCanvas"')) errors.push('old-portrait-canvas-returned');
 for (const token of ['min-height:560px', ':fullscreen', '.showroom-controls', '@media(max-width:520px)']) requireText(css, token, `css-${token}`);
+for (const token of ['svr366-live-camera-toolbar', 'svr366-camera-portrait', 'svr366-camera-outfit', 'svr366-live-orbit']) requireText(cameraCss, token, `camera-css-${token}`);
 for (const token of ['export class SVRAvatarViewer', 'OrbitControls', 'FBXLoader', 'GLTFLoader']) requireText(viewer, token, `viewer-${token}`);
 if (!Array.isArray(catalog.avatarModels) || catalog.avatarModels.length < 2) errors.push('avatar-model-catalog');
 if (!catalog.defaultOutfit?.modelId) errors.push('default-outfit-model');
+if (!manifest.profile_live_camera || manifest.phase < 366) errors.push('phase366-profile-camera-manifest');
+if (!release.avatarProfileProtection?.liveProfileCameraProtected) errors.push('phase366-profile-camera-release');
 if (manifest.release_ready !== false || manifest.force_update !== false || manifest.show_update_prompt !== false || manifest.manual_update_only !== true) errors.push('manifest-apk-policy');
 if (release.releaseReady !== false || release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('release-apk-policy');
 
@@ -54,9 +71,10 @@ if (errors.length) {
 }
 console.log(JSON.stringify({
   pass: true,
-  build: 'PHASE-351-PROFILE-3D-SHOWROOM-LOCK',
+  protectedBuild: 'PHASE-351-PROFILE-3D-SHOWROOM-LOCK',
+  successorBuild: manifest.build,
   showroom: { room: true, orbit: true, fullscreen: true, fallback: true },
+  liveCamera: { full: true, portrait: true, outfit: true, orbit: true, vrRoomLink: true },
   profileData: { avatarUrl: true, equippedOutfit: true },
-  gameReleaseUnchanged: manifest.build,
   apkLocked: true
 }, null, 2));
