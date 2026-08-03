@@ -11,6 +11,7 @@ const forbid = (source, token, label = token) => { if (source.includes(token)) e
 const android = read('game/android.html');
 const quest = read('game/index.html');
 const recovery = read('game/modules/phase372_live_entry_recovery_lock.js');
+const questRecovery = read('game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js');
 const deploy = read('.github/workflows/deploy.yml');
 const accountConfig = JSON.parse(read('site/config/player-api.json'));
 const aws = read('infrastructure/aws/phase372-player-account-foundation.yml');
@@ -21,10 +22,12 @@ need(android, 'phase369_android_join_table_freeze_recovery_lock.js?v=phase372', 
 need(android, 'phase368_card_dealer_animation_lock.js?v=phase372', 'android-deferred-dealer');
 need(android, "document.body.classList.add('boot-released')", 'android-loading-screen-release');
 
-need(quest, 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK', 'quest-phase372-build');
-need(quest, "import'./modules/phase372_live_entry_recovery_lock.js?v=phase372'", 'quest-early-recovery-import');
+need(quest, 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK', 'quest-phase373-build');
+need(quest, "import'./modules/phase372_live_entry_recovery_lock.js?v=phase373'", 'quest-visible-entry-recovery');
 need(quest, 'phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase364', 'quest-lobby-authority');
-need(quest, 'phase368_card_dealer_animation_lock.js?v=phase372', 'quest-deferred-dealer');
+need(quest, 'phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase373', 'quest-phase373-recovery');
+need(quest, 'phase368_card_dealer_animation_lock.js?v=phase373', 'quest-deferred-dealer');
+need(quest, 'window.SVR_PHASE373_STABLE_LOBBY?.()', 'quest-one-stable-spawn');
 need(quest, "document.body.classList.add('boot-released')", 'quest-loading-screen-release');
 
 need(recovery, "export const BUILD = 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK'", 'recovery-build');
@@ -35,6 +38,14 @@ need(recovery, "['SVR_PHASE369_JOIN_TABLE', 'SVR_PHASE363_JOIN_TABLE']", 'author
 need(recovery, 'table.visible = true', 'table-visible');
 need(recovery, 'window.SVR_PHASE372_QA', 'phase372-qa');
 forbid(recovery, 'new THREE.WebGLRenderer', 'no-second-renderer');
+
+need(questRecovery, "new URL('../assets/models/table.glb', import.meta.url).href", 'quest-real-glb-fallback');
+need(questRecovery, 'state.blockedRigMoves += 1', 'quest-seated-teleport-block');
+need(questRecovery, "['squeezestart', 'squeezeend']", 'quest-grip-teleport-listener-block');
+need(questRecovery, 'chooseUprightRotation', 'quest-npc-upright');
+need(questRecovery, 'textureNpc(root)', 'quest-npc-texture');
+need(questRecovery, 'window.SVR_PHASE373_QA = qa', 'phase373-qa');
+forbid(questRecovery, 'new THREE.WebGLRenderer', 'quest-no-second-renderer');
 
 if (accountConfig.provider !== 'aws') errors.push('account-provider:not-aws');
 if (accountConfig.database !== 'dynamodb') errors.push('account-database:not-dynamodb');
@@ -51,6 +62,9 @@ need(deploy, 'git push --force origin gh-pages', 'deploy-gh-pages-publish');
 need(deploy, 'test -f build/game/assets/models/table.glb', 'deploy-table-glb');
 need(deploy, 'test -f build/game/assets/table.fbx', 'deploy-table-fbx');
 need(deploy, 'test -f build/game/modules/phase372_live_entry_recovery_lock.js', 'deploy-phase372-module');
+need(deploy, 'test -f build/game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js', 'deploy-phase373-module');
+need(deploy, '"questRoute": "/game/index.html?platform=quest&v=phase373"', 'deploy-phase373-quest-route');
+need(deploy, '"androidRoute": "/game/android.html?channel=stable&v=phase372"', 'deploy-phase372-android-route');
 need(deploy, 'databaseProvider', 'deploy-health-aws');
 forbid(deploy, 'actions/deploy-pages', 'no-competing-pages-action');
 
@@ -60,12 +74,15 @@ if (!exists('game/assets/models/table.glb')) errors.push('asset-missing:table.gl
 if (!exists('game/assets/table.fbx')) errors.push('asset-missing:table.fbx');
 
 const result = {
-  build: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
+  build: 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK',
+  androidBuild: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
   provider: accountConfig.provider,
   database: accountConfig.database,
   identity: accountConfig.identity,
   androidVisibleEntry: recovery.includes('JOIN TABLE'),
   questVisibleEntry: recovery.includes('START VR LOBBY'),
+  questSeatedTeleportLock: questRecovery.includes('blockedRigMoves'),
+  questRealTableFallback: questRecovery.includes('table.glb'),
   errors,
   pass: errors.length === 0
 };
