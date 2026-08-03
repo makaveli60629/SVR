@@ -53,11 +53,12 @@ for (const [token, label] of [
   ['phase347_android_single_controller_seated_gameplay_apk_release_lock.js', 'platform-controller-module'],
   ['phase355_android_full_hand_driver_compatibility_lock.js', 'platform-hand-driver'],
   ['phase350_android_controller_dom_deduplication_lock.js', 'platform-dedupe-module'],
+  ['phase365_android_seated_ux_branding_gyro_alignment_lock.js', 'platform-phase365-repair-module'],
   ["if (value === 'android') return unique([...REGISTRY, ...ANDROID_FOUNDATION, ...ANDROID_POKER, ...ANDROID_FINAL]);", 'android-critical-runtime-assembly'],
   ['const ANDROID_DEFERRED = []', 'android-background-work-disabled'],
-  ['phase364-android-critical-load-order', 'phase364-critical-order-validator'],
-  ['phase350-android-dedupe-not-last', 'dedupe-last-validator'],
-  ['phase364-android-background-deferred-work', 'zero-deferred-error-label']
+  ['phase365-android-critical-load-order', 'phase365-critical-order-validator'],
+  ['phase365-android-seated-ux-not-last', 'phase365-last-validator'],
+  ['phase365-android-background-deferred-work', 'zero-deferred-error-label']
 ]) need(platform, token, label);
 
 const foundation = platform.split('const ANDROID_FOUNDATION = [')[1]?.split('];')[0] || '';
@@ -66,7 +67,8 @@ const final = platform.split('const ANDROID_FINAL = [')[1]?.split('];')[0] || ''
 const finalOrder = [
   'phase347_android_single_controller_seated_gameplay_apk_release_lock.js',
   'phase355_android_full_hand_driver_compatibility_lock.js',
-  'phase350_android_controller_dom_deduplication_lock.js'
+  'phase350_android_controller_dom_deduplication_lock.js',
+  'phase365_android_seated_ux_branding_gyro_alignment_lock.js'
 ].map((token) => final.indexOf(token));
 if (!finalOrder.every((index) => index >= 0) || !finalOrder.every((index, position) => position === 0 || index > finalOrder[position - 1])) errors.push('android-final-authority-order');
 
@@ -84,8 +86,8 @@ const platformVersion = Number(platform.match(/export const VERSION = 'phase(\d+
 if (platformVersion < 347 || Number(manifest.phase || 0) < 347) errors.push('platform-or-manifest-version-regressed');
 if (!String(manifest.build || '').startsWith('PHASE-')) errors.push('manifest-build-missing');
 if (manifest.force_update !== false || manifest.show_update_prompt !== false || manifest.manual_update_only !== true) errors.push('manifest-update-policy');
-const protectedAuthority = release.protectedAndroidAuthority || release.currentGameBuild;
-if (protectedAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('protected-android-authority-changed');
+if (release.protectedAuthorities?.androidController !== 'PHASE-347') errors.push('protected-android-controller-changed');
+if (release.controllerAuthority !== 'PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK') errors.push('controller-authority-record-changed');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('release-update-policy');
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.apkVersionCode !== 1 || release.nextApkVersionCode !== 2) errors.push('apk-version-gate');
@@ -100,7 +102,7 @@ console.log(JSON.stringify({
   protectedBuild: 'PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK',
   successorWebBuild: manifest.build,
   platformVersion,
-  controller: 'single-visible-authority',
+  controller: 'single-visible-phase347-authority-repaired-by-phase365',
   horizontalInput: 'direct',
   deviceAlignmentBeforeRecovery: true,
   zeroDeferredWork: true,

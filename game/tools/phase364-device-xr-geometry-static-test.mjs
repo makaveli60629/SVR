@@ -45,10 +45,10 @@ requireText(core, 'renderer.xr.setReferenceSpaceType("local-floor")');
 requireText(core, 'optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"]');
 forbidText(core, 'requiredFeatures:', 'required XR floor feature');
 
-requireText(manifest, "VERSION = 'phase364'");
 requireText(manifest, "phase364_device_xr_geometry_spawn_lock.js");
 requireText(manifest, "phase364-quest-critical-load-order");
-requireText(manifest, "phase364-android-critical-load-order");
+if (!/export const VERSION = 'phase3(?:6[4-9]|[7-9][0-9])'/.test(manifest)) throw new Error('Platform version regressed below Phase 364');
+if (!/phase(?:364|365)-android-critical-load-order/.test(manifest)) throw new Error('Missing protected Android geometry load-order validator');
 
 const questPhaseIndex = quest.indexOf("phase364_device_xr_geometry_spawn_lock.js?v=phase364");
 const questBootIndex = quest.indexOf("phase340_platform_core_loader.js?v=phase364");
@@ -60,20 +60,25 @@ requireText(quest, 'PHASE-364-QUEST-XR-ENTRY-TABLE-FLOOR-SPAWN-LOCK');
 requireText(quest, 'SVR_PHASE364_LOBBY_SPAWN');
 requireText(quest, 'SVR_PHASE364_ERIC_QUARANTINE_SWEEP');
 
-const androidPhaseIndex = android.indexOf("phase364_device_xr_geometry_spawn_lock.js?v=phase364");
-const androidBootIndex = android.indexOf("phase340_platform_core_loader.js?v=phase364");
-if (androidPhaseIndex < 0 || androidBootIndex <= androidPhaseIndex) throw new Error('Android Phase 364 must load before platform boot');
+const androidPhaseMatch = android.match(/phase364_device_xr_geometry_spawn_lock\.js\?v=(phase\d+)/);
+const androidBootMatch = android.match(/phase340_platform_core_loader\.js\?v=(phase\d+)/);
+if (!androidPhaseMatch || !androidBootMatch) throw new Error('Android Phase 364 geometry or platform loader missing');
+const androidPhaseIndex = android.indexOf(androidPhaseMatch[0]);
+const androidBootIndex = android.indexOf(androidBootMatch[0]);
+if (androidBootIndex <= androidPhaseIndex) throw new Error('Android Phase 364 must load before platform boot');
 requireText(android, 'SVR_PHASE364_ALIGN_TABLE');
-requireText(android, 'PHASE-364-ANDROID-TABLE-FLOOR-SEAT-ALIGNMENT-LOCK');
 requireText(android, 'PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK');
+if (!/PHASE-36[4-9]-ANDROID|PHASE-365-ANDROID/.test(android)) throw new Error('Android release label regressed below Phase 364');
 
 if (appManifest.apk_version_name !== '0.1.0-rc1' || appManifest.apk_version_code !== 1) throw new Error('APK lock changed');
 if (appManifest.force_update || appManifest.show_update_prompt || !appManifest.manual_update_only) throw new Error('APK prompt policy changed');
-if (appManifest.phase !== 364) throw new Error('Manifest phase is not 364');
+if (Number(appManifest.phase || 0) < 364) throw new Error('Manifest phase regressed below 364');
+if (appManifest.table_dimensions_meters?.length !== 2.74 || appManifest.table_dimensions_meters?.height !== 0.80 || appManifest.table_dimensions_meters?.depth !== 1.46) throw new Error('Phase 364 table dimensions changed');
 
 console.log(JSON.stringify({
   pass: true,
   build: 'PHASE-364-DEVICE-XR-GEOMETRY-SPAWN-LOCK',
+  currentPlatformPhase: appManifest.phase,
   tableMeters: [2.74, 0.80, 1.46],
   questSpawn: '0.90m outside south/front rail facing felt',
   xrEntry: 'single stable placement plus inside-table safety recovery',

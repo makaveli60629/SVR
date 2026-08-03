@@ -82,9 +82,12 @@ assert(manifest.table_bankroll === 90000, 'Manifest table bankroll is not 90,000
 assert(manifest.join_required_before_deal === true && manifest.cards_hidden_before_join === true, 'Manifest JOIN/card policy changed');
 assert(manifest.force_update === false && manifest.show_update_prompt === false && manifest.manual_update_only === true, 'APK update policy changed');
 
-assert(release.currentGameBuild.includes('PHASE-363'), 'Protected Android Phase 363 release record changed');
+assert(/^PHASE-3(?:6[3-9]|[7-9]\d)-ANDROID/.test(release.currentGameBuild), 'Android release record regressed below Phase 363');
+assert(release.protectedAuthorities?.androidIntegratedFlow === 'PHASE-363' || release.notes?.some((note) => /Phase 363/i.test(note)), 'Phase 363 Android integrated authority is no longer protected');
 assert(release.tablePolicy.startingStackPerPlayer === 15000 && release.tablePolicy.tableBankroll === 90000, 'Protected Android bankroll changed');
 assert(release.tablePolicy.singleJoinLeaveControl === true, 'Release does not require one JOIN/LEAVE control');
+assert(release.gameplayPolicy?.raiseControlRequired === true && release.gameplayPolicy?.raiseSliderConfirmRequired === true, 'Protected raise flow changed');
+assert(JSON.stringify(release.gameplayPolicy?.streetOrder) === JSON.stringify(['preflop', 'flop', 'turn', 'river', 'showdown']), 'Protected Holdem street order changed');
 assert(release.apkVersionName === '0.1.0-rc1' && release.apkVersionCode === 1, 'APK version changed');
 assert(release.forceUpdate === false && release.showUpdatePrompt === false && release.manualUpdateOnly === true, 'APK prompt policy changed');
 

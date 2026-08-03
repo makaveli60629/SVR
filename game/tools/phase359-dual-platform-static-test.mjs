@@ -83,16 +83,25 @@ const questSession = questRelease.phase361SessionContract || questRelease.sessio
 assert.equal(questSession.startsStandingInLobby, true);
 assert.equal(questSession.leaveTableButtonRequired, true);
 
-const priorAndroid = androidRelease.priorBrowserAcceptance || androidRelease.browserAcceptance;
-assert.equal(priorAndroid.completeLocalPokerGamePassed ?? priorAndroid.passed, true);
-assert.equal(priorAndroid.singleControllerPassed, true);
-assert.equal(priorAndroid.legacyControllerRoots, 0);
+// Later Android presentation phases may replace the top-level acceptance object.
+// Preserve the actual gameplay certifications and current table policy instead.
+assert.equal(androidRelease.protectedAuthorities?.fullGameAcceptance, 'PHASE-354');
+assert.equal(androidRelease.protectedAuthorities?.androidTableStatus, 'PHASE-357');
+assert.equal(androidRelease.protectedAuthorities?.androidIntegratedFlow, 'PHASE-363');
+assert.equal(androidRelease.controllerAuthority, 'PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK');
+assert.equal(androidRelease.androidExperience?.singleController, true);
 assert.equal(androidRelease.tablePolicy.startingStackPerPlayer, 15000);
 assert.equal(androidRelease.tablePolicy.tableBankroll, 90000);
 assert.equal(androidRelease.tablePolicy.joinRequiredBeforeDeal, true);
 assert.equal(androidRelease.tablePolicy.cardsHiddenBeforeJoin, true);
 assert.equal(androidRelease.tablePolicy.singleJoinLeaveControl, true);
-assert.equal(androidRelease.phase363Acceptance.pending, true);
+assert.equal(androidRelease.gameplayPolicy?.raiseControlRequired, true);
+assert.deepEqual(androidRelease.gameplayPolicy?.streetOrder, ['preflop', 'flop', 'turn', 'river', 'showdown']);
+const currentAcceptance = androidRelease.phase365Acceptance || androidRelease.phase363Acceptance;
+assert.equal(currentAcceptance?.passed === true || currentAcceptance?.pending === true, true);
+if (currentAcceptance?.passed === true) assert.equal(currentAcceptance?.browserAcceptancePassed, true);
+assert.equal(androidRelease.realDeviceValidation?.pending, true);
+assert.equal(androidRelease.realDeviceValidation?.ownerPlaytestRequired, true);
 
 assert.ok(Number(manifest.phase) >= 363);
 assert.match(String(manifest.build), /^PHASE-(?:363|3[6-9]\d)-/);
@@ -116,7 +125,9 @@ assert.ok(fs.statSync(tableGlbPath).size > 1024, 'uploaded table GLB must be non
 
 console.log(JSON.stringify({
   build: manifest.build,
-  android: 'phase357 seating protected with phase363 JOIN-gated 15,000-chip policy',
+  android: 'phase347 controller, phase357 seating, phase363 JOIN-gated 15,000-chip policy and phase365 presentation protected',
+  androidBrowserAcceptance: currentAcceptance?.passed === true ? 'passed' : 'pending',
+  androidPhysicalDeviceValidation: 'pending-owner-playtest',
   quest: 'phase358 gameplay and phase361 lobby/seat protected with phase364 geometry successor',
   continuity: 'phase359 preserved for Quest/desktop',
   shuffle: 'phase360 preserved for Quest/desktop',

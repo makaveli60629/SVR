@@ -56,8 +56,8 @@ if (release.forceUpdate !== false || release.showUpdatePrompt !== false || relea
 if (release.apkVersionName !== '0.1.0-rc1' || release.apkVersionCode !== 1) throw new Error('APK version lock changed');
 if (Number(webManifest.phase || 0) < 356 || webManifest.apk_version_code !== 1) throw new Error('Web manifest phase/APK regression');
 if (Number(webManifest.phase || 0) < 360 || !/^PHASE-(?:360|36[1-9]|3[7-9]\d)-/.test(String(webManifest.build || ''))) throw new Error('Phase 360 or successor Android/web build missing');
-const protectedAndroidAuthority = release.protectedAndroidAuthority || release.currentGameBuild;
-if (protectedAndroidAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') throw new Error('Protected Android Phase 357 authority changed');
+const protectedAndroidAuthority = release.protectedAuthorities?.androidTableStatus || release.protectedAndroidAuthority || release.currentGameBuild;
+if (protectedAndroidAuthority !== 'PHASE-357') throw new Error('Protected Android Phase 357 authority changed');
 if (!android.includes(webManifest.build)) throw new Error('Android page is missing successor release marker');
 
 requireText(matrix, 'phraseIntervalSeconds = reducedMotion ? 18 : coarsePointer ? 12 : 9', 'secret-phrase-slowdown');

@@ -33,7 +33,7 @@ for (const [token, label] of [
   ['...INGAME_AVATAR', 'shared-avatar-tail'],
   ['...MULTIPLAYER_PRESENCE', 'shared-presence-modules'],
   ['const ANDROID_DEFERRED = []', 'android-background-presence-disabled'],
-  ['phase364-android-background-deferred-work', 'android-zero-background-validator'],
+  ['phase365-android-background-deferred-work', 'android-zero-background-validator'],
   ['phase356_android_real_device_freeze_recovery_lock.js', 'android-recovery-module']
 ]) requireText(platform, token, label);
 requireText(androidRuntime, 'PHASE356_ANDROID_LIGHTWEIGHT_TABLE_AVATARS', 'android-local-lightweight-opponents');
@@ -71,8 +71,9 @@ if (config.presenceApiBase !== '') errors.push('presence-api-prematurely-configu
 if (config.allowLocalPresenceSimulation !== true) errors.push('simulation-disabled');
 if (Number(manifest.phase || 0) < 349) errors.push('manifest-phase-regressed');
 if (!String(manifest.build || '').startsWith('PHASE-')) errors.push('manifest-build-missing');
-const protectedAndroidAuthority = release.protectedAndroidAuthority || release.currentGameBuild;
-if (protectedAndroidAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('protected-android-authority-changed');
+const protectedAndroidAuthority = release.protectedAuthorities?.androidTableStatus || release.protectedAndroidAuthority || release.currentGameBuild;
+if (protectedAndroidAuthority !== 'PHASE-357') errors.push('protected-android-authority-changed');
+if (release.protectedAuthorities?.androidIntegratedFlow !== 'PHASE-363') errors.push('protected-android-integrated-flow-changed');
 if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('apk-policy');
 if (Number(manifest.phase || 0) >= 356 && release.realDeviceValidation?.pending !== true) errors.push('real-device-validation-must-remain-pending');

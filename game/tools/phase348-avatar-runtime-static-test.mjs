@@ -43,7 +43,7 @@ const camera3Block = platform.slice(platform.indexOf('const CAMERA3 ='), platfor
 if (camera3Block.includes('phase348_ingame_player_avatar_presence_performance_lock.js')) fail('Camera 3 must not load Phase 348.');
 if (!platform.includes('const ANDROID_DEFERRED = []')) fail('Android must disable background FBX avatar loading.');
 if (!platform.includes('phase356_android_real_device_freeze_recovery_lock.js')) fail('Android Phase 356 recovery runtime is missing.');
-if (!platform.includes('phase364-android-background-deferred-work')) fail('Android zero-background-work validation is missing.');
+if (!/phase(?:364|365)-android-background-deferred-work/.test(platform)) fail('Android zero-background-work validation is missing.');
 for (const token of ['PHASE356_ANDROID_LIGHTWEIGHT_TABLE_AVATARS', 'PHASE356_BOT_AVATAR_', 'renderer.setPixelRatio(target)', 'inspected < 240']) {
   if (!androidRuntime.includes(token)) fail(`Android lightweight avatar token missing: ${token}`);
 }
@@ -52,8 +52,8 @@ if (Number(gameManifest.phase || 0) < 348) fail('game/manifest.json phase regres
 if (!String(gameManifest.build || '').startsWith('PHASE-')) fail('Game manifest build is missing.');
 if (gameManifest.apk_version_name !== '0.1.0-rc1' || gameManifest.apk_version_code !== 1) fail('APK version lock changed unexpectedly.');
 if (gameManifest.release_ready !== false || gameManifest.force_update !== false || gameManifest.show_update_prompt !== false || gameManifest.manual_update_only !== true) fail('APK release/update policy changed unexpectedly.');
-const protectedAndroidAuthority = release.protectedAndroidAuthority || release.currentGameBuild;
-if (protectedAndroidAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') fail('Protected Android Phase 357 authority changed.');
+const protectedAndroidAuthority = release.protectedAuthorities?.androidTableStatus || release.protectedAndroidAuthority || release.currentGameBuild;
+if (protectedAndroidAuthority !== 'PHASE-357') fail('Protected Android Phase 357 authority changed.');
 if (release.releaseReady !== false || release.apkUrl !== '' || release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) fail('Android release gate is unsafe.');
 if (!/v=phase(?:357|35[8-9]|3[6-9]\d)/.test(String(release.webEntry || ''))) fail('Protected Android web entry changed unexpectedly.');
 if (Number(gameManifest.phase || 0) >= 356 && release.realDeviceValidation?.pending !== true) fail('Real Android validation must remain pending until owner testing.');
