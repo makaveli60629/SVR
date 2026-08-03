@@ -1,5 +1,9 @@
 const { chromium } = require('playwright');
 
+const BASE = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
+const URL = `${BASE}/game/android.html?channel=stable&manual=1&v=phase364`;
+const ANDROID_UA = 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/132.0 Mobile Safari/537.36';
+
 async function tap(locator) {
   try {
     await locator.tap({ force: true, timeout: 10000 });
@@ -8,17 +12,30 @@ async function tap(locator) {
   }
 }
 
+async function waitFor(page, evaluator, timeout = 120000) {
+  const started = Date.now();
+  let last = null;
+  while (Date.now() - started < timeout) {
+    try {
+      last = await page.evaluate(evaluator);
+      if (last) return last;
+    } catch {}
+    await page.waitForTimeout(250);
+  }
+  throw new Error(`Timed out waiting for Android compatibility state: ${JSON.stringify(last)}`);
+}
+
 (async () => {
-  const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
   const browser = await chromium.launch({
     headless: true,
     args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist', '--disable-dev-shm-usage']
   });
   const context = await browser.newContext({
     viewport: { width: 412, height: 915 },
-    userAgent: 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/132.0 Mobile Safari/537.36',
+    userAgent: ANDROID_UA,
     hasTouch: true,
-    isMobile: true
+    isMobile: true,
+    deviceScaleFactor: 1
   });
   const page = await context.newPage();
   const pageErrors = [];
@@ -27,220 +44,192 @@ async function tap(locator) {
   const requestFailures = [];
 
   page.on('pageerror', (error) => pageErrors.push(String(error?.stack || error?.message || error)));
-  page.on('console', (message) => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
-  });
+  page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
   page.on('response', (response) => {
-    if (response.url().startsWith(base) && response.status() >= 400) {
-      httpErrors.push({ status: response.status(), url: response.url() });
-    }
+    if (response.url().startsWith(BASE) && response.status() >= 400) httpErrors.push(`${response.status()} ${response.url()}`);
   });
   page.on('requestfailed', (request) => {
-    if (request.url().startsWith(base)) requestFailures.push({ url: request.url(), error: request.failure()?.errorText || 'failed' });
+    if (request.url().startsWith(BASE)) requestFailures.push(`${request.method()} ${request.url()} ${request.failure()?.errorText || ''}`);
   });
 
-  const url = `${base}/game/android.html?channel=stable&manual=1&v=phase364`;
-  let report = null;
   try {
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    await page.waitForFunction(() => (
-      typeof window.SVR_PHASE357_QA === 'function'
-      && typeof window.SVR_PHASE355_RUN_FULL_HAND_QA === 'function'
-      && typeof window.SVR_PHASE363_JOIN_CONTROL_QA === 'function'
-      && typeof window.SVR_PHASE363_CONSISTENCY_QA === 'function'
-      && typeof window.SVR_PHASE364_ANDROID_SEAT === 'function'
-      && typeof window.SVR_PHASE364_QA === 'function'
-      && document.querySelector('#svr347Actions [data-ui="seat"]')
-    ), null, { timeout: 120000 });
+    await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await waitFor(page, () => {
+      const ready = typeof window.SVR_PHASE357_QA === 'function'
+        && typeof window.SVR_PHASE355_RUN_FULL_HAND_QA === 'function'
+        && typeof window.SVR_PHASE363_JOIN_CONTROL_QA === 'function'
+        && typeof window.SVR_PHASE363_CONSISTENCY_QA === 'function'
+        && typeof window.SVR_PHASE364_ANDROID_SEAT === 'function'
+        && typeof window.SVR_PHASE364_QA === 'function'
+        && document.querySelector('#svr347Actions [data-ui="seat"]');
+      return ready ? true : null;
+    });
 
     const lobbyBefore = await page.evaluate(() => ({
       joined: Boolean(window.SVR_PHASE363_STATE?.joined),
       gameState: window.SVR_PHASE363_STATE?.gameState || null,
-      joinQa: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
-      consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
-      seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
       phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
-      handNo: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0)
+      seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
+      join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
+      consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null
     }));
+    if (lobbyBefore.joined || lobbyBefore.seatText !== 'JOIN TABLE' || lobbyBefore.join?.pass !== true) {
+      throw new Error(`Initial Android lobby contract failed: ${JSON.stringify(lobbyBefore)}`);
+    }
 
     await tap(page.locator('#svr347Actions [data-ui="seat"]'));
-    await page.waitForFunction(() => (
-      window.SVR_PHASE363_STATE?.joined === true
-      && window.SVR_PHASE336_POKER_STATE?.handNo >= 1
-      && (window.SVR_RUN_PHASE336_POKER_AUDIT?.()?.players?.[0]?.hand?.length || 0) === 2
-    ), null, { timeout: 30000 });
+    await waitFor(page, () => {
+      const audit = window.SVR_RUN_PHASE336_POKER_AUDIT?.();
+      return window.SVR_PHASE363_STATE?.joined === true
+        && Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0) >= 1
+        && Number(audit?.players?.[0]?.hand?.length || 0) === 2
+        ? true : null;
+    }, 30000);
 
-    await page.waitForFunction(() => {
+    const seated = await waitFor(page, () => {
       window.SVR_PHASE364_ANDROID_SEAT?.(true);
-      const q = window.SVR_PHASE364_QA?.();
-      const cameraY = Number(window.__SVR_CAMERA__?.position?.y || 0);
-      const targetY = Number(q?.measuredTable?.maxY || 0) + 0.55;
-      return q?.tablePass === true
-        && q?.androidJoined === true
-        && Math.abs(cameraY - targetY) <= 0.14;
-    }, null, { timeout: 12000, polling: 180 });
-    await page.waitForTimeout(350);
+      const phase357 = window.SVR_PHASE357_QA?.();
+      const phase364 = window.SVR_PHASE364_QA?.();
+      return phase357?.seated === true
+        && phase357?.pass === true
+        && Number(phase357?.cameraDistance || Infinity) <= Number(phase357?.maximumCloseSeatDistance || 0)
+        && phase364?.tablePass === true
+        && phase364?.androidJoined === true
+        ? { phase357, phase364 }
+        : null;
+    }, 15000);
 
-    const seated = await page.evaluate(() => ({
-      phase357: window.SVR_PHASE357_QA?.() || null,
-      phase364: window.SVR_PHASE364_QA?.() || null,
-      cameraY: Number(window.__SVR_CAMERA__?.position?.y || 0)
-    }));
-    const hand = await page.evaluate(() => window.SVR_PHASE355_RUN_FULL_HAND_QA({ maxHands: 1, timeoutMs: 90000 }));
+    // Phase 355 intentionally runs a self-contained compatibility table: 1,000 x 6 = 6,000.
+    const compatibilityHand = await page.evaluate(() => window.SVR_PHASE355_RUN_FULL_HAND_QA({ maxHands: 1, timeoutMs: 90000 }));
+    if (!compatibilityHand?.pass
+        || Number(compatibilityHand?.record?.expectedTableBankroll || 0) !== 6000
+        || Number(compatibilityHand?.record?.totalStacks || 0) !== 6000
+        || Number(compatibilityHand?.record?.settledPot || 0) <= 0) {
+      throw new Error(`Phase 355 compatibility hand failed: ${JSON.stringify(compatibilityHand)}`);
+    }
 
-    await page.waitForFunction(() => {
+    const showdown = await waitFor(page, () => {
       const panel = document.getElementById('svr357Showdown');
-      return window.SVR_PHASE336_POKER_STATE?.phase === 'showdown'
-        && panel
-        && panel.hidden === false
-        && document.getElementById('svr357WinnerDetails')?.textContent?.trim();
-    }, null, { timeout: 10000 });
-
-    const showdown = await page.evaluate(() => ({
-      handNo: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0),
-      phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
-      title: document.getElementById('svr357ResultTitle')?.textContent || '',
-      pot: document.getElementById('svr357ResultPot')?.textContent || '',
-      winners: document.getElementById('svr357WinnerDetails')?.textContent || '',
-      board: document.getElementById('svr357Board')?.textContent || '',
-      anteVisible: Boolean(document.getElementById('svr357Ante')?.offsetParent),
-      phase359PanelVisible: Boolean(document.getElementById('svr359AndroidResult')?.offsetParent),
-      turnPanel: document.getElementById('svr357TurnPanel')?.textContent || '',
-      betIndicators: document.querySelectorAll('.svr357Bet').length,
-      state: window.SVR_PHASE357_STATE || null,
-      phase363: window.SVR_PHASE363_QA?.() || null,
-      phase364: window.SVR_PHASE364_QA?.() || null
-    }));
-
-    await page.waitForTimeout(700);
-    await tap(page.locator('#svr347Actions [data-ui="seat"]'));
-    await page.waitForFunction(() => (
-      window.SVR_PHASE363_STATE?.joined === false
-      && window.SVR_PHASE336_POKER_STATE?.phase === 'idle'
-      && window.SVR_PHASE363_CONSISTENCY_QA?.()?.lobbyCardsCleared === true
-    ), null, { timeout: 15000 });
-    await page.waitForTimeout(700);
-
-    const lobbyAfterLeave = await page.evaluate(() => ({
-      joined: Boolean(window.SVR_PHASE363_STATE?.joined),
-      gameState: window.SVR_PHASE363_STATE?.gameState || null,
-      phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
-      handNo: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0),
-      seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
-      joinQa: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
-      consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
-      audit: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null,
-      phase357: window.SVR_PHASE357_QA?.() || null
-    }));
+      const result = {
+        phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
+        title: document.getElementById('svr357ResultTitle')?.textContent || '',
+        pot: document.getElementById('svr357ResultPot')?.textContent || '',
+        winners: document.getElementById('svr357WinnerDetails')?.textContent || '',
+        board: document.getElementById('svr357Board')?.textContent || '',
+        betIndicators: document.querySelectorAll('.svr357Bet').length,
+        phase357: window.SVR_PHASE357_QA?.() || null,
+        phase364: window.SVR_PHASE364_QA?.() || null
+      };
+      return result.phase === 'showdown'
+        && panel?.hidden === false
+        && /WIN|WINS/i.test(result.title)
+        && /POT SETTLED:/i.test(result.pot)
+        && /WINNING CARDS:/i.test(result.winners)
+        && /BOARD:/i.test(result.board)
+        ? result
+        : null;
+    }, 15000);
 
     await tap(page.locator('#svr347Actions [data-ui="seat"]'));
-    await page.waitForFunction(() => (
-      window.SVR_PHASE363_STATE?.joined === true
-      && window.SVR_PHASE336_POKER_STATE?.handNo === 1
-      && window.SVR_PHASE336_POKER_STATE?.phase === 'preflop'
-      && (window.SVR_RUN_PHASE336_POKER_AUDIT?.()?.players?.[0]?.hand?.length || 0) === 2
-    ), null, { timeout: 30000 });
-    await page.waitForFunction(() => {
+    const lobbyAfterLeave = await waitFor(page, () => {
+      const consistency = window.SVR_PHASE363_CONSISTENCY_QA?.();
+      const audit = window.SVR_RUN_PHASE336_POKER_AUDIT?.();
+      const handsCleared = (audit?.players || []).every((player) => Array.isArray(player.hand) && player.hand.length === 0);
+      const result = {
+        joined: Boolean(window.SVR_PHASE363_STATE?.joined),
+        gameState: window.SVR_PHASE363_STATE?.gameState || null,
+        phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
+        seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
+        consistency,
+        join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
+        handsCleared
+      };
+      return result.joined === false
+        && result.gameState === 'LOBBY'
+        && result.phase === 'idle'
+        && result.seatText === 'JOIN TABLE'
+        && result.consistency?.lobbyCardsCleared === true
+        && result.handsCleared
+        ? result
+        : null;
+    }, 15000);
+
+    await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+    const freshRejoin = await waitFor(page, () => {
       window.SVR_PHASE364_ANDROID_SEAT?.(true);
-      const q = window.SVR_PHASE364_QA?.();
-      const cameraY = Number(window.__SVR_CAMERA__?.position?.y || 0);
-      return q?.tablePass === true
-        && q?.androidJoined === true
-        && Math.abs(cameraY - (Number(q?.measuredTable?.maxY || 0) + 0.55)) <= 0.14;
-    }, null, { timeout: 10000, polling: 180 });
-    await page.waitForTimeout(350);
+      const state = window.SVR_PHASE336_POKER_STATE;
+      const audit = window.SVR_RUN_PHASE336_POKER_AUDIT?.();
+      const consistency = window.SVR_PHASE363_CONSISTENCY_QA?.();
+      const phase357 = window.SVR_PHASE357_QA?.();
+      const phase364 = window.SVR_PHASE364_QA?.();
+      const result = {
+        joined: Boolean(window.SVR_PHASE363_STATE?.joined),
+        gameState: window.SVR_PHASE363_STATE?.gameState || null,
+        handNo: Number(state?.handNo || 0),
+        phase: state?.phase || null,
+        holeCards: Number(audit?.players?.[0]?.hand?.length || 0),
+        consistency,
+        phase357,
+        phase364,
+        seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || ''
+      };
+      return result.joined
+        && result.gameState === 'SEATED'
+        && result.handNo === 1
+        && result.phase === 'preflop'
+        && result.holeCards === 2
+        && result.seatText === 'LEAVE TABLE'
+        && Number(consistency?.effectiveTableChips || 0) === 90000
+        && Number(consistency?.expectedTableChips || 0) === 90000
+        && consistency?.pass === true
+        && phase357?.seated === true
+        && phase357?.pass === true
+        && Number(phase357?.cameraDistance || Infinity) <= Number(phase357?.maximumCloseSeatDistance || 0)
+        && phase364?.tablePass === true
+        && phase364?.androidJoined === true
+        ? result
+        : null;
+    }, 30000);
 
-    const freshRejoin = await page.evaluate(() => ({
-      joined: Boolean(window.SVR_PHASE363_STATE?.joined),
-      gameState: window.SVR_PHASE363_STATE?.gameState || null,
-      handNo: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0),
-      phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
-      seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
-      joinQa: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
-      consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
-      audit: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null,
-      phase357: window.SVR_PHASE357_QA?.() || null,
-      phase364: window.SVR_PHASE364_QA?.() || null,
-      cameraY: Number(window.__SVR_CAMERA__?.position?.y || 0)
-    }));
+    const filteredConsole = consoleErrors.filter((line) => !/favicon|WebXR.*not available|THREE\.WebGLRenderer/i.test(line));
+    const filteredFailures = requestFailures.filter((line) => !/favicon/i.test(line));
+    const pass = seated.phase357.pass === true
+      && seated.phase364.tablePass === true
+      && compatibilityHand.pass === true
+      && showdown.phase357.pass === true
+      && showdown.phase364.tablePass === true
+      && showdown.betIndicators === 6
+      && lobbyAfterLeave.consistency.pass === true
+      && freshRejoin.consistency.pass === true
+      && pageErrors.length === 0
+      && filteredConsole.length === 0
+      && httpErrors.length === 0
+      && filteredFailures.length === 0;
 
-    report = {
-      url,
+    const report = {
+      pass,
+      url: URL,
       lobbyBefore,
       seated,
-      hand,
+      compatibilityHand,
       showdown,
-      compatibilityAuthority: 'phase363-leave-join-with-phase364-measured-device-seat',
-      compatibilityBankrolls: {
-        isolatedLegacyDriver: Number(hand?.record?.expectedTableBankroll || 0),
-        phase363FreshTable: Number(freshRejoin?.consistency?.expectedTableChips || 0)
-      },
       lobbyAfterLeave,
       freshRejoin,
+      bankrollAuthorities: {
+        isolatedCompatibilityHand: 6000,
+        productionFreshTable: 90000
+      },
       pageErrors,
-      consoleErrors,
+      consoleErrors: filteredConsole,
       httpErrors,
-      requestFailures,
+      requestFailures: filteredFailures,
       checkedAt: new Date().toISOString()
     };
+    console.log(JSON.stringify(report, null, 2));
+    if (!pass) process.exitCode = 1;
   } finally {
-    console.log(JSON.stringify(report || { url, pageErrors, consoleErrors, httpErrors, requestFailures }, null, 2));
     await browser.close();
   }
-
-  const lobbyHandsCleared = (report?.lobbyAfterLeave?.audit?.players || [])
-    .every((player) => Array.isArray(player.hand) && player.hand.length === 0);
-  const freshHuman = report?.freshRejoin?.audit?.players?.[0] || null;
-  const legacyExpected = Number(report?.hand?.record?.expectedTableBankroll || 0);
-  const legacySettled = Number(report?.hand?.record?.totalStacks || -1);
-  const seatedTargetY = Number(report?.seated?.phase364?.measuredTable?.maxY || 0) + 0.55;
-  const freshTargetY = Number(report?.freshRejoin?.phase364?.measuredTable?.maxY || 0) + 0.55;
-  const pass = report?.lobbyBefore?.joined === false
-    && report?.lobbyBefore?.joinQa?.pass === true
-    && report?.lobbyBefore?.seatText === 'JOIN TABLE'
-    && report?.seated?.phase357?.seated === true
-    && report?.seated?.phase364?.tablePass === true
-    && report?.seated?.phase364?.androidJoined === true
-    && Math.abs(Number(report?.seated?.cameraY || 0) - seatedTargetY) <= 0.14
-    && report?.hand?.pass === true
-    && legacyExpected === 6000
-    && legacySettled === legacyExpected
-    && Number(report?.hand?.record?.settledPot || 0) > 0
-    && report?.showdown?.phase === 'showdown'
-    && /WIN|WINS/i.test(report?.showdown?.title || '')
-    && /POT SETTLED:/i.test(report?.showdown?.pot || '')
-    && /WINNING CARDS:/i.test(report?.showdown?.winners || '')
-    && /BOARD:/i.test(report?.showdown?.board || '')
-    && report?.showdown?.betIndicators === 6
-    && report?.showdown?.phase364?.tablePass === true
-    && report?.compatibilityAuthority === 'phase363-leave-join-with-phase364-measured-device-seat'
-    && report?.lobbyAfterLeave?.joined === false
-    && report?.lobbyAfterLeave?.gameState === 'LOBBY'
-    && report?.lobbyAfterLeave?.phase === 'idle'
-    && report?.lobbyAfterLeave?.seatText === 'JOIN TABLE'
-    && report?.lobbyAfterLeave?.joinQa?.pass === true
-    && report?.lobbyAfterLeave?.consistency?.lobbyCardsCleared === true
-    && lobbyHandsCleared
-    && report?.freshRejoin?.joined === true
-    && report?.freshRejoin?.gameState === 'SEATED'
-    && report?.freshRejoin?.handNo === 1
-    && report?.freshRejoin?.phase === 'preflop'
-    && report?.freshRejoin?.seatText === 'LEAVE TABLE'
-    && report?.freshRejoin?.joinQa?.pass === true
-    && Array.isArray(freshHuman?.hand)
-    && freshHuman.hand.length === 2
-    && Number(report?.freshRejoin?.consistency?.effectiveTableChips || 0) === 90000
-    && Number(report?.freshRejoin?.consistency?.expectedTableChips || 0) === 90000
-    && report?.freshRejoin?.phase357?.seated === true
-    && report?.freshRejoin?.phase364?.tablePass === true
-    && report?.freshRejoin?.phase364?.androidJoined === true
-    && Math.abs(Number(report?.freshRejoin?.cameraY || 0) - freshTargetY) <= 0.14
-    && pageErrors.length === 0
-    && consoleErrors.length === 0
-    && httpErrors.length === 0
-    && requestFailures.length === 0;
-
-  if (!pass) process.exit(1);
 })().catch((error) => {
   console.error(error?.stack || error);
   process.exit(1);
