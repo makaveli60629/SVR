@@ -8,6 +8,7 @@ on:
       - 'game/android-release.json'
       - 'game/modules/phase340_platform_manifest.js'
       - 'game/modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js'
+      - 'game/modules/phase365_android_card_brand_refresh_lock.js'
       - 'game/tools/phase365-android-seated-ux-branding-static-test.mjs'
       - 'game/tools/phase365-android-seated-ux-branding-browser-acceptance.cjs'
       - 'site/profile.html'
@@ -35,6 +36,7 @@ jobs:
       - name: Validate Phase 365 contracts
         run: |
           node --check game/modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js
+          node --check game/modules/phase365_android_card_brand_refresh_lock.js
           node --check game/modules/phase340_platform_manifest.js
           node --check game/tools/phase365-android-seated-ux-branding-browser-acceptance.cjs
           node game/tools/phase365-android-seated-ux-branding-static-test.mjs
