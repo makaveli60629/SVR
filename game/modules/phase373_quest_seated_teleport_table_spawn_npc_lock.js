@@ -44,6 +44,8 @@ const state = {
   stableLobbyApplications: 0,
   stableSeatApplications: 0,
   positionCorrections: 0,
+  standingMovementAllowed: true,
+  teleportBaselineCaptured: false,
   teleportFlagsLocked: false,
   rigMethodsWrapped: 0,
   blockedRigMoves: 0,
@@ -74,7 +76,6 @@ let lastNpcSweepAt = 0;
 let stableAnchor = null;
 
 const tmp = new THREE.Vector3();
-const tmp2 = new THREE.Vector3();
 const tmpQ = new THREE.Quaternion();
 const tmpScale = new THREE.Vector3();
 const savedFlags = new Map();
@@ -123,8 +124,7 @@ function validTableBounds(value) {
 
 function candidateTable() {
   const root = worldRoot();
-  const direct = [window.SVR_TABLE_AUTHORITY, table];
-  for (const object of direct) {
+  for (const object of [window.SVR_TABLE_AUTHORITY, table]) {
     if (!object?.isObject3D) continue;
     try { if (validTableBounds(bounds(object))) return object; } catch {}
   }
@@ -138,10 +138,15 @@ function candidateTable() {
 
 function cloneVisibleMaterial(material, meshName = '') {
   if (!material?.isMaterial) return material;
-  if (material.userData?.svrPhase373Visible) return material;
+  if (material.userData?.svrPhase373Visible) {
+    material.opacity = 1;
+    material.colorWrite = true;
+    material.depthWrite = true;
+    material.needsUpdate = true;
+    return material;
+  }
   const clone = material.clone();
   clone.userData = { ...(clone.userData || {}), svrPhase373Visible: true };
-  clone.visible = true;
   clone.opacity = 1;
   clone.transparent = Boolean(clone.map?.image) && Boolean(material.transparent);
   clone.colorWrite = true;
@@ -150,9 +155,9 @@ function cloneVisibleMaterial(material, meshName = '') {
   clone.side = THREE.DoubleSide;
   if (clone.map) {
     clone.map.colorSpace = THREE.SRGBColorSpace;
-    if (clone.color?.setHex) clone.color.setHex(0xffffff);
-  } else if (clone.color?.setHex) {
-    clone.color.setHex(/felt|cloth|baize|surface|top/i.test(meshName) ? 0x130c1f : 0x171a20);
+    clone.color?.setHex?.(0xffffff);
+  } else {
+    clone.color?.setHex?.(/felt|cloth|baize|surface|top/i.test(meshName) ? 0x130c1f : 0x171a20);
   }
   if ('roughness' in clone) clone.roughness = /felt|cloth|baize|surface|top/i.test(meshName) ? 0.88 : 0.58;
   if ('metalness' in clone) clone.metalness = /leg|frame|metal/i.test(meshName) ? 0.28 : 0.06;
@@ -286,17 +291,24 @@ function currentPose() {
   return value || rig()?.position || { x: camera?.position?.x || 0, y: 0, z: camera?.position?.z || 0 };
 }
 
+function originalRigMethods(value = rig()) {
+  return value?.userData?.svrPhase373OriginalMethods || null;
+}
+
 function setRigPose(x, y, z, target = null) {
   const value = rig();
+  const originals = originalRigMethods(value);
   internalMove = true;
   let ok = false;
   try {
-    const original = value?.userData?.svrPhase373OriginalSetPlayerPose;
-    if (typeof original === 'function') {
-      original.call(value, x, y, z);
+    if (typeof originals?.setPlayerPose === 'function') {
+      originals.setPlayerPose.call(value, x, y, z);
       ok = true;
     } else if (typeof value?.setPlayerPose === 'function') {
       value.setPlayerPose(x, y, z);
+      ok = true;
+    } else if (typeof originals?.positionSet === 'function' && value?.position) {
+      originals.positionSet.call(value.position, x, y, z);
       ok = true;
     } else if (value?.position) {
       value.position.set(x, y, z);
@@ -368,12 +380,15 @@ function stableSeat(reason = 'manual') {
 
 function wrapRigMethods() {
   const value = rig();
-  if (!value || wrappedRigMethods.has(value)) return 0;
+  if (!value) return 0;
+  if (wrappedRigMethods.has(value)) return wrappedRigMethods.get(value).length;
+  const originals = {};
   const wrapped = [];
+  value.userData = { ...(value.userData || {}) };
   for (const name of RIG_MOVE_METHODS) {
     const original = value[name];
     if (typeof original !== 'function') continue;
-    if (name === 'setPlayerPose') value.userData = { ...(value.userData || {}), svrPhase373OriginalSetPlayerPose: original };
+    originals[name] = original;
     value[name] = function phase373RigMoveGuard(...args) {
       if (seated() && !internalMove) {
         state.blockedRigMoves += 1;
@@ -383,21 +398,40 @@ function wrapRigMethods() {
     };
     wrapped.push(name);
   }
+  if (value.position && typeof value.position.set === 'function') {
+    const positionSet = value.position.set;
+    originals.positionSet = positionSet;
+    value.position.set = function phase373PositionSetGuard(...args) {
+      if (seated() && !internalMove) {
+        state.blockedRigMoves += 1;
+        return this;
+      }
+      return positionSet.apply(this, args);
+    };
+    wrapped.push('position.set');
+  }
+  value.userData.svrPhase373OriginalMethods = originals;
   wrappedRigMethods.set(value, wrapped);
   state.rigMethodsWrapped = wrapped.length;
   return wrapped.length;
 }
 
-function lockTeleportFlags() {
-  for (const key of TELEPORT_FLAGS) {
-    if (!savedFlags.has(key)) savedFlags.set(key, window[key]);
-    window[key] = false;
+function captureTeleportBaseline() {
+  if (!state.teleportBaselineCaptured) {
+    for (const key of TELEPORT_FLAGS) savedFlags.set(key, window[key]);
+    state.teleportBaselineCaptured = true;
   }
   const floor = window.SVR_DEVICE_FLOOR_AUTHORITY;
-  if (floor?.userData) {
-    if (!savedTeleportSurface.has(floor)) savedTeleportSurface.set(floor, floor.userData.teleportSurface);
-    floor.userData.teleportSurface = false;
+  if (floor?.userData && !savedTeleportSurface.has(floor)) {
+    savedTeleportSurface.set(floor, floor.userData.teleportSurface);
   }
+}
+
+function lockTeleportFlags() {
+  captureTeleportBaseline();
+  for (const key of TELEPORT_FLAGS) window[key] = false;
+  const floor = window.SVR_DEVICE_FLOOR_AUTHORITY;
+  if (floor?.userData) floor.userData.teleportSurface = false;
   state.teleportFlagsLocked = true;
 }
 
@@ -407,7 +441,7 @@ function restoreTeleportFlags() {
     window[key] = typeof prior === 'boolean' ? prior : true;
   }
   for (const [floor, prior] of savedTeleportSurface) {
-    if (floor?.userData) floor.userData.teleportSurface = prior;
+    if (floor?.userData) floor.userData.teleportSurface = typeof prior === 'boolean' ? prior : true;
   }
   state.teleportFlagsLocked = false;
 }
@@ -474,11 +508,10 @@ function restoreSqueezeListeners() {
 }
 
 function enforceStablePosition() {
-  if (!stableAnchor) return;
+  if (stableAnchor?.mode !== 'seated') return;
   const current = headPosition(tmp);
   const distance = Math.hypot(current.x - stableAnchor.x, current.z - stableAnchor.z);
-  const threshold = stableAnchor.mode === 'seated' ? 0.14 : 0.34;
-  if (distance <= threshold) return;
+  if (distance <= 0.14) return;
   setRigPose(stableAnchor.x, stableAnchor.y || 0, stableAnchor.z, stableAnchor.target || null);
   state.positionCorrections += 1;
 }
@@ -546,15 +579,19 @@ function textureNpc(root) {
   let applied = 0;
   walk(root, (object) => {
     if (!object.isMesh || !object.material) return;
-    const meshLabel = `${object.name || ''} ${(Array.isArray(object.material) ? object.material : [object.material]).map((material) => material?.name || '').join(' ')}`.toLowerCase();
-    const skinLike = /(head|face|skin|hand|arm|neck)/.test(meshLabel);
     const materials = Array.isArray(object.material) ? object.material : [object.material];
+    const meshLabel = `${object.name || ''} ${materials.map((material) => material?.name || '').join(' ')}`.toLowerCase();
+    const skinLike = /(head|face|skin|hand|arm|neck)/.test(meshLabel);
     const next = materials.map((material) => {
       if (!material?.isMaterial) return material;
-      if (material.userData?.svrPhase373NpcTexture) return material;
+      if (material.userData?.svrPhase373NpcTexture) {
+        material.opacity = 1;
+        material.colorWrite = true;
+        material.needsUpdate = true;
+        return material;
+      }
       const clone = material.clone();
       clone.userData = { ...(clone.userData || {}), svrPhase373NpcTexture: true };
-      clone.visible = true;
       clone.opacity = 1;
       clone.colorWrite = true;
       clone.side = THREE.DoubleSide;
@@ -577,8 +614,8 @@ function textureNpc(root) {
     object.castShadow = false;
     object.receiveShadow = false;
   }, 3500);
-  root.userData = { ...(root.userData || {}), svrPhase373Textured: applied > 0 };
-  return applied > 0;
+  root.userData = { ...(root.userData || {}), svrPhase373Textured: applied > 0 || root.userData?.svrPhase373Textured };
+  return Boolean(root.userData.svrPhase373Textured);
 }
 
 function chooseUprightRotation(root) {
@@ -597,7 +634,7 @@ function chooseUprightRotation(root) {
     const value = bounds(root);
     const horizontal = Math.max(value.size.x, value.size.z, 0.001);
     const score = value.size.y / horizontal - Math.max(0, value.size.y - 2.8) * 4;
-    if (!best || score > best.score) best = { rotation: rotation.clone(), value, score };
+    if (!best || score > best.score) best = { rotation: rotation.clone(), score };
   }
   root.rotation.copy(best?.rotation || original);
   root.userData = { ...(root.userData || {}), svrPhase373Upright: true };
@@ -610,7 +647,7 @@ function groundNpc(root) {
     worldDelta(root, new THREE.Vector3(0, -value.box.min.y, 0));
     return true;
   }
-  return false;
+  return true;
 }
 
 function faceNpcToTable(root, tableInfo) {
@@ -718,7 +755,6 @@ function frame() {
     releaseSeatedLock();
     stableLobby('leave-table-stable');
   }
-  if (!isSeated && stableAnchor?.mode === 'lobby') enforceStablePosition();
   if (isSeated !== lastSeated) {
     if (isSeated) window.setTimeout(() => stableSeat('join-table-stable'), 180);
     lastSeated = isSeated;
@@ -747,6 +783,7 @@ async function install() {
     window.SVR_PHASE373_STATE = { ...state };
     return;
   }
+  captureTeleportBaseline();
   table = await ensureTable();
   if (!table) {
     state.lastError = state.lastError || 'QUEST_TABLE_NOT_READY';
