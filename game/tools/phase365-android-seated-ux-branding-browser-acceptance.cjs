@@ -3,7 +3,7 @@
 const { chromium } = require('playwright');
 
 const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
-const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phase365`;
+const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phase365`;
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
@@ -21,11 +21,22 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
   page.on('requestfailed', (request) => failedRequests.push(`${request.method()} ${request.url()} ${request.failure()?.errorText || ''}`));
 
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
+  await page.waitForFunction(() => typeof window.SVR_PHASE372_QA === 'function', null, { timeout: 120000 });
   await page.waitForFunction(() => typeof window.SVR_PHASE365_QA === 'function', null, { timeout: 120000 });
   await page.waitForFunction(() => typeof window.SVR_PHASE363_JOIN_TABLE === 'function', null, { timeout: 120000 });
   await page.waitForSelector('#svr347Move', { timeout: 120000 });
   await page.waitForSelector('#svr347Look', { timeout: 120000 });
   await page.waitForFunction(() => Boolean(window.__SVR_CAMERA__ && window.SVR_TABLE_AUTHORITY), null, { timeout: 120000 });
+
+  const entryBeforeTest = await page.evaluate(() => {
+    const qa = window.SVR_PHASE372_QA?.() || null;
+    const entry = document.getElementById('svr372Entry');
+    const visible = Boolean(document.getElementById('svr372Primary')?.offsetParent);
+    if (entry) entry.hidden = true;
+    return { qa, visible };
+  });
+  if (!entryBeforeTest.visible || entryBeforeTest.qa?.pass !== true) throw new Error('Phase 372 visible JOIN entry was not ready before controller isolation.');
+  await page.waitForTimeout(120);
 
   const lobbyBefore = await page.evaluate(() => ({
     camera: window.__SVR_CAMERA__.position.toArray(),
@@ -117,11 +128,14 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
   await page.waitForTimeout(350);
   const lobbyReturn = await page.evaluate(() => ({
     moveDisplay: getComputedStyle(document.querySelector('#svr347Move')).display,
-    lookDisplay: getComputedStyle(document.querySelector('#svr347Look')).display
+    lookDisplay: getComputedStyle(document.querySelector('#svr347Look')).display,
+    phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent)
   }));
 
   const result = {
     build: 'PHASE-365-ANDROID-SEATED-UX-BRANDING-GYRO-ALIGNMENT-LOCK',
+    successor: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
+    entryBeforeTest,
     lobbyBefore,
     movementDistance: +movementDistance.toFixed(4),
     seated,
@@ -133,6 +147,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
   };
 
   const checks = [
+    [entryBeforeTest.visible && entryBeforeTest.qa?.pass === true, 'phase372-entry-visible-before-test'],
     [lobbyBefore.rootCount === 1, 'single-controller-root'],
     [lobbyBefore.moveCount === 1 && lobbyBefore.lookCount === 1, 'single-move-look'],
     [lobbyBefore.moveDisplay !== 'none' && lobbyBefore.lookDisplay !== 'none', 'lobby-sticks-visible'],
@@ -150,6 +165,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
     [seated.gyroEvents >= 1, 'gyro-event-consumed'],
     [seated.qa?.pass === true, 'runtime-qa'],
     [lobbyReturn.moveDisplay !== 'none' && lobbyReturn.lookDisplay !== 'none', 'sticks-return-after-leave'],
+    [lobbyReturn.phase372EntryVisible === true, 'phase372-entry-restored-after-leave'],
     [errors.length === 0, 'no-page-console-errors'],
     [failedRequests.filter((entry) => entry.includes(base)).length === 0, 'no-local-request-failures']
   ];
