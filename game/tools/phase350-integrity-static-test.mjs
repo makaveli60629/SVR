@@ -4,6 +4,8 @@ const read = (file) => fs.readFileSync(file, 'utf8');
 const profileRecovery = read('site/js/phase350-profile-avatar-recovery.js');
 const profilePage = read('site/profile.html');
 const profileShowroom = fs.existsSync('site/js/phase351-profile-showroom.js') ? read('site/js/phase351-profile-showroom.js') : '';
+const phase366Account = fs.existsSync('site/js/phase366-player-account-resilience.js') ? read('site/js/phase366-player-account-resilience.js') : '';
+const phase366Camera = fs.existsSync('site/js/phase366-profile-live-camera-watchdog.js') ? read('site/js/phase366-profile-live-camera-watchdog.js') : '';
 const phase356Legend = fs.existsSync('site/js/phase356-profile-legend-pedestal.js') ? read('site/js/phase356-profile-legend-pedestal.js') : '';
 const camera3 = read('game/modules/phase350_camera3_visibility_lighting_lock.js');
 const androidDedupe = read('game/modules/phase350_android_controller_dom_deduplication_lock.js');
@@ -25,9 +27,10 @@ for (const [token, label] of [
   ['SVR_PHASE350_PROFILE_AVATAR_QA', 'profile-avatar-qa']
 ]) need(profileRecovery, token, label);
 const originalRecoveryLoaded = profilePage.includes('phase350-profile-avatar-recovery.js?v=phase350');
-const showroomLoaded = profilePage.includes('phase351-profile-showroom.js?v=phase351');
-if (!originalRecoveryLoaded && !showroomLoaded) errors.push('profile-recovery-successor-missing');
-if (showroomLoaded) {
+const showroomLoaded = /phase351-profile-showroom\.js\?v=phase(?:351|3[6-9]\d)/.test(profilePage);
+const phase366Loaded = profilePage.includes('data-live-avatar-camera="phase366"') && phase366Account.includes('ACCOUNT_BOOTSTRAP_TIMEOUT') && phase366Camera.includes('SVR_PHASE366_PROFILE_LIVE_CAMERA_RETRY');
+if (!originalRecoveryLoaded && !showroomLoaded && !phase366Loaded) errors.push('profile-recovery-successor-missing');
+if (showroomLoaded || phase366Loaded) {
   for (const [token, label] of [
     ['drawFallback', 'showroom-fallback-drawing'],
     ['AVATAR_MODEL', 'showroom-model-timeout'],
@@ -36,6 +39,10 @@ if (showroomLoaded) {
     ['SVR_PHASE350_PROFILE_AVATAR_QA', 'showroom-phase350-qa-alias']
   ]) need(profileShowroom, token, label);
   need(profilePage, 'id="showroomRetry"', 'profile-visible-retry-button');
+  if (phase366Loaded) {
+    need(phase366Camera, 'fallbackFinalized', 'phase366-resolved-fallback');
+    need(phase366Camera, 'FALLBACK AVATAR CAM', 'phase366-fallback-camera-label');
+  }
 } else need(profilePage, 'id="avatarRetry"', 'profile-visible-retry-button');
 if (profilePage.includes('phase346-profile-avatar-preview.js')) errors.push('old-profile-preview-still-loaded');
 if (Number(manifest.phase || 0) >= 356) {
@@ -97,7 +104,7 @@ console.log(JSON.stringify({
   protectedBuild: 'PHASE-350-PROFILE-CAMERA3-ANDROID-SITE-INTEGRITY-LOCK',
   successorWebBuild: manifest.build,
   protectedAndroidAuthority,
-  profileAvatar: Number(manifest.phase || 0) >= 356 ? 'phase356-live-legend-pedestal-over-phase351-showroom' : showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
+  profileAvatar: phase366Loaded ? 'phase366-live-camera-over-phase351-showroom' : Number(manifest.phase || 0) >= 356 ? 'phase356-live-legend-pedestal-over-phase351-showroom' : showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
   camera3: 'dedicated-lighting-final-authority',
   androidController: 'phase350-physical-dom-deduplication-before-phase365-controller-repair',
   roadmap: 'ordered-major-milestones',

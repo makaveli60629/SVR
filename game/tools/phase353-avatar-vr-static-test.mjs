@@ -19,9 +19,9 @@ for (const token of [
   'data-preset="3"',
   'Pause Pedestal',
   'Save Avatar',
-  '/site/profile.html?v=phase353',
   'phase353_vr_avatar_dressing_room_live_pedestal_lock.js'
 ]) requireText(html, token, `html:${token}`);
+if (!/\/site\/profile\.html\?v=phase(?:353|3[6-9]\d)/.test(html)) errors.push('html:profile-successor-route');
 
 for (const token of [
   "import { VRButton }",
@@ -39,7 +39,7 @@ for (const token of [
   'SVR_PHASE353_SAVE'
 ]) requireText(runtime, token, `runtime:${token}`);
 
-requireText(entry, './avatar-vr.html?v=phase353', 'entry-redirect');
+if (!/\.\/avatar-vr\.html\?v=phase(?:353|3[6-9]\d)/.test(entry)) errors.push('entry-redirect');
 if (catalog.avatarModels.length < 2) errors.push('verified-body-count');
 if (catalog.presets.length < 4) errors.push('starter-preset-count');
 for (const id of ['table-ready', 'scorpion-vip', 'founder', 'social-lounge']) {
@@ -57,6 +57,7 @@ if (errors.length) {
 console.log(JSON.stringify({
   pass: true,
   build: 'PHASE-353-VR-AVATAR-DRESSING-ROOM-LIVE-PEDESTAL-LOCK',
+  currentRoutePhase: Number(html.match(/v=phase(\d+)/)?.[1] || 353),
   verifiedBodies: catalog.avatarModels.map((item) => item.id),
   starterLooks: catalog.presets.slice(0, 4).map((item) => item.id),
   movingPedestal: true,
