@@ -175,8 +175,12 @@ function publish(reason = 'sync') {
 
 function requestStabilization(reason = 'manual') {
   runtime.stabilizationRequests += 1;
-  clearTimeout(stabilizeTimer);
+  if (stabilizeTimer) {
+    clearTimeout(stabilizeTimer);
+    runtime.stabilizationSkipped += 1;
+  }
   stabilizeTimer = window.setTimeout(() => {
+    stabilizeTimer = 0;
     if (!isSeated()) {
       runtime.stabilizationSkipped += 1;
       publish(`skip-unseated:${reason}`);
@@ -240,9 +244,11 @@ function applyViewport(reason = 'viewport') {
 }
 
 function syncSeatedState(reason = 'state') {
-  runtime.seated = isSeated();
+  const next = isSeated();
+  const changed = next !== runtime.seated;
+  runtime.seated = next;
   document.body.classList.toggle('svr367-seated', runtime.seated);
-  if (runtime.seated) {
+  if (runtime.seated && changed) {
     window.SVR_PHASE365_SYNC?.();
     requestStabilization(reason);
   }
