@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SVR Admin | App Analytics</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="../logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--cyan:#7ffcff;--gold:#ffd98a;--green:#8dffb4;--red:#ff769b;--panel:rgba(5,8,19,.88)}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 0,rgba(155,77,255,.25),transparent 30%),linear-gradient(180deg,#02030a,#08051a);color:#fff;font-family:Rajdhani,system-ui;padding:20px}
+.shell{width:min(1220px,100%);margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:13px}.brand img{width:62px;height:62px;object-fit:contain}.brand h1{margin:0;font:900 clamp(22px,4vw,38px) Orbitron}.brand p{margin:4px 0 0;color:#d8cff0}.badge{padding:8px 12px;border:1px solid rgba(127,252,255,.4);border-radius:999px;background:rgba(127,252,255,.08);color:var(--cyan);font-weight:900}
+.notice{padding:12px 14px;border:1px solid rgba(255,217,138,.28);border-radius:15px;background:rgba(255,217,138,.06);color:#fff0c7;margin-bottom:16px}
+.metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.metric,.panel{border:1px solid rgba(127,252,255,.18);border-radius:20px;background:var(--panel);box-shadow:0 18px 55px rgba(0,0,0,.38)}.metric{padding:17px}.metric span{color:#d8cff0;font-weight:800}.metric strong{display:block;margin-top:5px;font:900 26px Orbitron;color:#fff}
+.grid{display:grid;grid-template-columns:1.3fr .7fr;gap:14px;margin-top:14px}.panel{padding:18px}.panel h2{margin:0 0 12px;font:900 17px Orbitron}.chart-wrap{height:330px}.chart-wrap canvas{width:100%;height:100%}.controls{display:flex;gap:9px;flex-wrap:wrap}.controls button{border:1px solid rgba(127,252,255,.48);border-radius:999px;background:rgba(127,252,255,.1);color:#fff;padding:10px 14px;font-weight:900;cursor:pointer}.controls button.primary{background:linear-gradient(135deg,var(--green),var(--cyan));color:#03050a}
+.status{min-height:22px;margin-top:12px;color:var(--gold);font-weight:800}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:10px;border-bottom:1px solid rgba(255,255,255,.08)}th{color:var(--cyan);font-family:Orbitron;font-size:10px}.ok{color:var(--green)}.warn{color:var(--gold)}.bad{color:var(--red)}
+@media(max-width:980px){.metrics{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}@media(max-width:560px){body{padding:10px}.top{align-items:flex-start}.metrics{grid-template-columns:1fr}.brand img{width:48px;height:48px}.panel{padding:12px}table{font-size:12px}}
+</style>
+</head>
+<body data-build="PHASE-369-ADMIN-APP-ANALYTICS-FOUNDATION">
+<main class="shell">
+<header class="top"><div class="brand"><img src="../logo.png" alt="SVR Poker"><div><h1>App Analytics</h1><p>Install, activity, update and integrity research console</p></div></div><span class="badge" id="dataMode">LOCAL FALLBACK</span></header>
+<div class="notice">Private admin page. Production records require an authenticated admin token and the secure API. Raw IP addresses are not displayed; the backend should use a keyed hash and short-retention infrastructure logs.</div>
+<section class="metrics">
+<article class="metric"><span>Registered installs</span><strong id="totalInstalls">0</strong></article>
+<article class="metric"><span>Active 30 days</span><strong id="active30">0</strong></article>
+<article class="metric"><span>Download actions</span><strong id="downloads">0</strong></article>
+<article class="metric"><span>Update checks</span><strong id="updates">0</strong></article>
+<article class="metric"><span>Integrity alerts</span><strong id="integrityAlerts">0</strong></article>
+</section>
+<section class="grid">
+<article class="panel"><h2>30-Day Activity</h2><div class="chart-wrap"><canvas id="activityChart" aria-label="App activity graph"></canvas></div></article>
+<aside class="panel"><h2>Admin Controls</h2><div class="controls"><button class="primary" id="refresh" type="button">Refresh Metrics</button><button id="exportLocal" type="button">Export Local JSON</button></div><div class="status" id="status">Ready.</div><p>Set <code>sessionStorage.svr_admin_token</code> only through the future secure admin login. Never put admin tokens in source files or URLs.</p></aside>
+</section>
+<section class="panel" style="margin-top:14px"><h2>Recent Authorized Installations</h2><div style="overflow:auto"><table><thead><tr><th>Player</th><th>Installation</th><th>Version</th><th>Last Seen</th><th>Region</th><th>Integrity</th></tr></thead><tbody id="installRows"><tr><td colspan="6">No server records loaded.</td></tr></tbody></table></div></section>
+</main>
+<script src="js/phase369-admin-app-analytics.js?v=phase369"></script>
+</body>
+</html>
