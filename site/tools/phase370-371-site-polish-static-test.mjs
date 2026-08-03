@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const exists = (file) => fs.existsSync(path.join(root, file));
 const errors = [];
 const need = (source, token, label = token) => { if (!source.includes(token)) errors.push(`missing:${label}`); };
 const forbid = (source, token, label = token) => { if (source.includes(token)) errors.push(`forbidden:${label}`); };
@@ -14,10 +15,11 @@ const css = read('site/css/phase370-account-profile-mobile-clean.css');
 const login = read('site/login.html');
 const account = read('site/js/phase345-player-account-client.js');
 const backend = read('backend/phase345/src/server.js');
-const roles = read('backend/phase370/sql/002_phase370_admin_test_role_assignment.sql');
+const aws = read('infrastructure/aws/phase372-player-account-foundation.yml');
+const config = JSON.parse(read('site/config/player-api.json'));
 const manifest = JSON.parse(read('docs/SVR_PHASE_369_371_MANIFEST.json'));
 
-need(matrix, "PHASE-371-PUBLIC-APP-AI-MATRIX-POLISH-LOCK", 'matrix-build');
+need(matrix, 'PHASE-371-PUBLIC-APP-AI-MATRIX-POLISH-LOCK', 'matrix-build');
 need(matrix, 'slide-android-app', 'android-app-first-slide');
 need(matrix, 'Android Playtest Ready', 'android-banner-copy');
 need(matrix, "ai.innerHTML = '<span class=\"ai-dot\"></span><span>AI ACTIVE</span>'", 'ai-active-status');
@@ -56,6 +58,8 @@ need(css, '.showroom-status-card,.showroom-hint{display:none!important}', 'profi
 
 need(login, 'id="loginForm"', 'login-display');
 need(login, 'id="registerForm"', 'registration-display');
+need(login, 'Checking AWS player API', 'aws-login-presentation');
+need(login, 'Default avatar: Eric', 'eric-default-presentation');
 need(account, "request('/auth/register'", 'secure-register-client');
 need(account, "request('/auth/login'", 'secure-login-client');
 need(backend, "VALUES(@playerId,@displayName,@email,'player'", 'public-register-player-role');
@@ -63,21 +67,32 @@ forbid(login, 'cashappPassword', 'no-cashapp-password-field');
 forbid(login, 'cashAppPin', 'no-cashapp-pin-field');
 forbid(polish, 'name="cash', 'no-cashapp-form-field');
 
-need(roles, "SET Role = 'admin'", 'admin-role-assignment');
-need(roles, "SET Role = 'player'", 'test-player-role-assignment');
-need(roles, 'does not create or store passwords', 'role-script-password-safety');
-need(roles, 'REPLACE_WITH_ADMIN_EMAIL', 'admin-email-placeholder');
-need(roles, 'REPLACE_WITH_TEST_PLAYER_EMAIL', 'test-email-placeholder');
+need(aws, 'AWS::Cognito::UserPool', 'cognito-user-pool');
+need(aws, 'AWS::Cognito::UserPoolClient', 'cognito-web-client');
+need(aws, 'GroupName: admin', 'protected-admin-group');
+need(aws, 'AWS::DynamoDB::Table', 'dynamodb-tables');
+need(aws, 'DeletionProtectionEnabled: true', 'aws-deletion-protection');
+need(aws, 'PointInTimeRecoveryEnabled: true', 'aws-point-in-time-recovery');
+forbid(aws, 'GenerateSecret: true', 'no-public-client-secret');
+if (exists('backend/phase370/sql/002_phase370_admin_test_role_assignment.sql')) errors.push('obsolete-azure-role-script-present');
+if (config.provider !== 'aws') errors.push('config:provider');
+if (config.identity !== 'cognito') errors.push('config:identity');
+if (config.database !== 'dynamodb') errors.push('config:database');
+if (config.apiBase !== '') errors.push('config:api-endpoint-must-remain-empty-until-approved');
 
-if (manifest.phases?.length !== 4) errors.push('manifest:phase-count');
+if (manifest.activePhase !== 372) errors.push('manifest:active-phase');
+if (manifest.phases?.length !== 5) errors.push('manifest:phase-count');
 if (manifest.phases?.find((phase) => phase.phase === 370)?.cashAppCredentialsCollected !== false) errors.push('manifest:cashapp-truth');
-if (manifest.phases?.find((phase) => phase.phase === 370)?.adminCredentialsCreated !== false) errors.push('manifest:admin-credential-truth');
-if (manifest.truth?.physicalAndroidPlaytestRequired !== true) errors.push('manifest:device-test-truth');
+if (manifest.accounts?.provider !== 'aws' || manifest.accounts?.identity !== 'cognito' || manifest.accounts?.database !== 'dynamodb') errors.push('manifest:aws-authority');
+if (manifest.accounts?.azureRetired !== true) errors.push('manifest:azure-retired');
+if (manifest.truth?.physicalAndroidPlaytestRequired !== true || manifest.truth?.physicalQuestPlaytestRequired !== true) errors.push('manifest:device-test-truth');
 
 const result = {
-  build: 'PHASE-370-ACCOUNT-PROFILE-AVATAR-MOBILE-POLISH-LOCK / PHASE-371-PUBLIC-APP-AI-MATRIX-POLISH-LOCK',
+  build: 'PHASE-370/371-PROTECTED-BY-PHASE-372-AWS',
   accountNavigation: 'distinct-login-and-register-desktop-and-mobile',
-  menuSynchronization: 'signature-based-idempotent',
+  accountProvider: config.provider,
+  identity: config.identity,
+  database: config.database,
   errors,
   pass: errors.length === 0
 };
