@@ -33,6 +33,15 @@ need(viewer, 'PHASE370_DEFAULT_ERIC_FALLBACK', 'default-eric-fallback');
 need(viewer, 'this.autoRotate = Boolean(autoRotate)', 'avatar-auto-rotate');
 need(viewer, 'texturesPreserved', 'texture-audit');
 
+need(polish, 'function installAccountLinks()', 'account-navigation-installer');
+need(polish, "login.textContent = 'Login'", 'distinct-login-link');
+need(polish, "register.textContent = 'Register'", 'distinct-register-link');
+need(polish, "accountHref('login')", 'login-route');
+need(polish, "accountHref('register')", 'register-route');
+need(polish, 'rebuildMenuPanel()', 'mobile-menu-account-sync');
+need(polish, 'desktopLoginLinks', 'desktop-login-qa');
+need(polish, 'menuLoginLinks', 'mobile-login-qa');
+need(polish, 'state.accountLinksInstalled', 'account-links-pass-contract');
 need(polish, 'svr370-menu-button', 'mobile-menu');
 need(polish, 'SVR LEGEND / ERIC', 'legend-text-cleanup');
 need(polish, 'profileShowroomCanvas', 'profile-avatar-portrait');
@@ -63,6 +72,7 @@ if (manifest.truth?.physicalAndroidPlaytestRequired !== true) errors.push('manif
 
 const result = {
   build: 'PHASE-370-ACCOUNT-PROFILE-AVATAR-MOBILE-POLISH-LOCK / PHASE-371-PUBLIC-APP-AI-MATRIX-POLISH-LOCK',
+  accountNavigation: 'distinct-login-and-register-desktop-and-mobile',
   errors,
   pass: errors.length === 0
 };
