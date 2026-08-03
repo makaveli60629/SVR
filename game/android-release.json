@@ -1,7 +1,7 @@
 {
   "name": "SVR Poker Android",
   "channel": "stable",
-  "status": "phase367-android-physical-device-viewport-touch-awaiting-browser-acceptance",
+  "status": "phase367-android-physical-device-viewport-touch-browser-acceptance-passed",
   "packageName": "com.svrpoker.app",
   "apkVersionName": "0.1.0-rc1",
   "apkVersionCode": 1,
@@ -147,22 +147,59 @@
     "sameAvatarRecord": true
   },
   "phase367Acceptance": {
-    "passed": false,
-    "pending": true,
-    "browserAcceptancePassed": false,
-    "required": [
-      "visualViewport dimensions drive the Android stage",
-      "safe areas protect bankroll, cards, turn display, branding and action controls",
-      "orientation and viewport changes are debounced",
-      "seated stabilization is rate-limited to at least 900 ms",
-      "exactly one controller root, MOVE stick, LOOK stick and action panel remain",
-      "LOBBY and CENTER navigation stay hidden while seated",
-      "real pointer input is recorded on MOVE, LOOK and action controls",
-      "Phase 365 table, pot, avatar, branding and gyro acceptance remains green",
-      "Phase 366 profile live camera and both dressing rooms remain green",
-      "complete Hold'em still settles and conserves 90,000 chips",
-      "no browser errors or failed requests"
-    ]
+    "passed": true,
+    "pending": false,
+    "browserAcceptancePassed": true,
+    "viewport": {
+      "landscape": {"width": 915, "height": 412},
+      "portrait": {"width": 412, "height": 915},
+      "safeAreaReady": true,
+      "orientationAndResizeDebounced": true
+    },
+    "controller": {
+      "roots": 1,
+      "moveControls": 1,
+      "lookControls": 1,
+      "actionPanels": 1,
+      "createsNoNewControls": true,
+      "controlsReturnAfterLeave": true
+    },
+    "physicalPointerInput": {
+      "pointerEvents": 3,
+      "moveTouches": 1,
+      "lookTouches": 1,
+      "actionTouches": 1
+    },
+    "seated": {
+      "sticksHidden": true,
+      "visibleNavigationControls": 0,
+      "stabilizationMinimumIntervalMs": 900,
+      "burstRequests": 10,
+      "stabilizationAppliedDelta": 1,
+      "stabilizationSkipped": 8,
+      "bouncePreventionPassed": true
+    },
+    "tablePresentation": {
+      "tableMinimumY": -0.065,
+      "tableReferenceLineY": 0,
+      "tableTopY": 0.735,
+      "potOpacity": 0.88,
+      "potFramed": false,
+      "alignedOpponentAvatars": 5,
+      "avatarNameTags": 5,
+      "brandedCardBacks": 13
+    },
+    "gameplay": {
+      "phase365RegressionPassed": true,
+      "fullHoldemPassed": true,
+      "freshShuffleLeaveResetPassed": true,
+      "tableChipsConserved": 90000
+    },
+    "errors": {
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "failedRequests": 0
+    }
   },
   "realDeviceValidation": {
     "phase": 367,
@@ -177,6 +214,7 @@
   "updateMessage": "An optional SVR Poker Android update is available.",
   "updateMenuPolicy": "Hidden unless releaseReady is true, apkUrl is non-empty, and apkVersionCode is newer than the installed code.",
   "notes": [
+    "Phase 367 passed Android-sized browser acceptance for landscape/portrait viewport calibration, physical pointer input, safe areas, bounded seated stabilization, controller uniqueness, Phase 365 presentation, fresh shuffle/leave reset, and complete Hold'em.",
     "Phase 367 updates the remotely loaded Android web runtime and does not require reinstalling APK 0.1.0-rc1.",
     "Phase 365 remains the table, seated HUD, pot, gyro, avatar-seat and branding baseline.",
     "Phase 366 remains the profile live-camera and dressing-room reliability authority.",
