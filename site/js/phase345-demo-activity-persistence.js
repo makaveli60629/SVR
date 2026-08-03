@@ -99,7 +99,7 @@ window.SVR_PHASE345_DEMO_ACTIVITY = {
 };
 
 if (document.getElementById('profileShowroomCanvas')) {
-  queueMicrotask(() => import('./phase366-profile-live-camera-watchdog.js?v=phase368').catch((error) => {
+  queueMicrotask(() => import('./phase366-profile-live-camera-watchdog.js?v=phase366').catch((error) => {
     window.SVR_PHASE366_PROFILE_LIVE_CAMERA_ERROR = String(error?.message || error);
   }));
 }
