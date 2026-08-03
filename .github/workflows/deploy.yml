@@ -90,6 +90,7 @@ jobs:
           test -f build/game/index.html
           test -f build/game/android.html
           test -f build/game/modules/phase372_live_entry_recovery_lock.js
+          test -f build/game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js
           test -f build/game/modules/phase369_android_join_table_freeze_recovery_lock.js
           test -f build/game/modules/phase368_card_dealer_animation_lock.js
           test -f build/game/assets/models/table.glb
@@ -104,7 +105,8 @@ jobs:
           cat > build/deploy-health.json <<EOF
           {
             "status": "ok",
-            "build": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
+            "build": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+            "androidBuild": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
             "commit": "$GITHUB_SHA",
             "deployedAt": "$DEPLOYED_AT",
             "sourceBranch": "main",
@@ -113,7 +115,7 @@ jobs:
             "identityProvider": "cognito",
             "profileDatabase": "dynamodb",
             "androidRoute": "/game/android.html?channel=stable&v=phase372",
-            "questRoute": "/game/index.html?platform=quest&v=phase372",
+            "questRoute": "/game/index.html?platform=quest&v=phase373",
             "customDomain": "svrpoker.com"
           }
           EOF
