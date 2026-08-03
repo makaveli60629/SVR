@@ -5,6 +5,7 @@ import'./modules/phase364_device_xr_geometry_spawn_lock.js?v=phase373';
 import'./modules/phase362_desktop_renderer_preboot_safety_lock.js?v=phase373';
 import{bootPlatform}from'./modules/phase340_platform_core_loader.js?v=phase364';
 let started=false;
+const waitForApi=async(names,timeout=30000)=>{const start=performance.now();while(performance.now()-start<timeout){if(names.every(name=>typeof window[name]==='function'))return true;await new Promise(resolve=>setTimeout(resolve,100));}throw new Error(`PHASE373_API_TIMEOUT:${names.join(',')}`)};
 const loadDealerLater=()=>{const run=()=>import('./modules/phase368_card_dealer_animation_lock.js?v=phase373').then(()=>window.SVR_PHASE368_ALIGN_CARD_DEALER?.()).catch(console.error);if('requestIdleCallback'in window)requestIdleCallback(run,{timeout:7000});else setTimeout(run,2200);};
 const start=async()=>{if(started)return;started=true;try{
   await bootPlatform();
@@ -14,8 +15,11 @@ const start=async()=>{if(started)return;started=true;try{
   await import('./modules/phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase364');
   await import('./modules/phase364_quest_eric_quarantine_watch.js?v=phase364');
   await import('./modules/phase373_quest_rig_preflight_lock.js?v=phase373');
+  await waitForApi(['SVR_PHASE373_RIG_PREFLIGHT_QA']);
   await import('./modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase373');
+  await waitForApi(['SVR_PHASE373_QA','SVR_PHASE373_STABLE_LOBBY','SVR_PHASE373_STABLE_SEAT']);
   await import('./modules/phase373_quest_npc_teleport_postflight_lock.js?v=phase373');
+  await waitForApi(['SVR_PHASE373_POSTFLIGHT_QA','SVR_PHASE373_POSTFLIGHT_RESTORE_TELEPORT','SVR_PHASE373_POSTFLIGHT_REPAIR_NPCS']);
   await import('./modules/phase365_quest_vr_button_dedupe_lock.js?v=phase365');
   const p=new URLSearchParams(location.search),legacyAcceptance=p.get('acceptance')==='1'&&p.get('v')!=='phase364';
   if(!legacyAcceptance){
