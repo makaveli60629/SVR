@@ -10,14 +10,10 @@ const release = JSON.parse(read('game/android-release.json'));
 const androidEntry = read('game/android.html');
 const standardEntry = read('game/index.html');
 
-for (const path of [
-  'game/assets/models/eric/eric.fbx',
-  'game/assets/models/claudia/claudia.fbx'
-]) {
+for (const path of ['game/assets/models/eric/eric.fbx', 'game/assets/models/claudia/claudia.fbx']) {
   if (!fs.existsSync(path)) fail(`Missing verified avatar body: ${path}`);
 }
-
-const requiredRuntimeTokens = [
+for (const token of [
   'PHASE-348-INGAME-PLAYER-AVATAR-PRESENCE-PERFORMANCE-LOCK',
   'PHASE348_LOCAL_PLAYER_AVATAR_ROOT',
   'window.SVR_PLAYER_AVATAR_PROFILE',
@@ -30,13 +26,9 @@ const requiredRuntimeTokens = [
   "android: { updateHz: 24, animationHz: 18, maxEquipment: 6",
   "quest: { updateHz: 30, animationHz: 24, maxEquipment: 5",
   "desktop: { updateHz: 60, animationHz: 30, maxEquipment: 8"
-];
-for (const token of requiredRuntimeTokens) {
-  if (!runtime.includes(token)) fail(`Runtime token missing: ${token}`);
-}
-
+]) if (!runtime.includes(token)) fail(`Runtime token missing: ${token}`);
 if (!runtime.includes('const ACTIVE = !CAMERA3')) fail('Camera 3 exclusion is not explicit.');
-if (!runtime.includes("object.name === ROOT_NAME")) fail('Duplicate avatar root protection is missing.');
+if (!runtime.includes('object.name === ROOT_NAME')) fail('Duplicate avatar root protection is missing.');
 if (!runtime.includes('new FBXLoader()') || !runtime.includes('new GLTFLoader()')) fail('FBX/GLB loader support is incomplete.');
 if (!runtime.includes('THREE.FrontSide')) fail('First-person interior-head protection is missing.');
 
@@ -49,9 +41,9 @@ const platformVersion = Number(platform.match(/export const VERSION = 'phase(\d+
 if (platformVersion < 348) fail('Platform version regressed below Phase 348.');
 const camera3Block = platform.slice(platform.indexOf('const CAMERA3 ='), platform.indexOf('function unique'));
 if (camera3Block.includes('phase348_ingame_player_avatar_presence_performance_lock.js')) fail('Camera 3 must not load Phase 348.');
-if (!platform.includes('const ANDROID_DEFERRED = []')) fail('Android must disable background FBX avatar loading in Phase 356.');
+if (!platform.includes('const ANDROID_DEFERRED = []')) fail('Android must disable background FBX avatar loading.');
 if (!platform.includes('phase356_android_real_device_freeze_recovery_lock.js')) fail('Android Phase 356 recovery runtime is missing.');
-if (!platform.includes('phase356-android-background-deferred-work')) fail('Android zero-background-work validation is missing.');
+if (!platform.includes('phase364-android-background-deferred-work')) fail('Android zero-background-work validation is missing.');
 for (const token of ['PHASE356_ANDROID_LIGHTWEIGHT_TABLE_AVATARS', 'PHASE356_BOT_AVATAR_', 'renderer.setPixelRatio(target)', 'inspected < 240']) {
   if (!androidRuntime.includes(token)) fail(`Android lightweight avatar token missing: ${token}`);
 }
@@ -60,11 +52,10 @@ if (Number(gameManifest.phase || 0) < 348) fail('game/manifest.json phase regres
 if (!String(gameManifest.build || '').startsWith('PHASE-')) fail('Game manifest build is missing.');
 if (gameManifest.apk_version_name !== '0.1.0-rc1' || gameManifest.apk_version_code !== 1) fail('APK version lock changed unexpectedly.');
 if (gameManifest.release_ready !== false || gameManifest.force_update !== false || gameManifest.show_update_prompt !== false || gameManifest.manual_update_only !== true) fail('APK release/update policy changed unexpectedly.');
-
 const protectedAndroidAuthority = release.protectedAndroidAuthority || release.currentGameBuild;
 if (protectedAndroidAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') fail('Protected Android Phase 357 authority changed.');
 if (release.releaseReady !== false || release.apkUrl !== '' || release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) fail('Android release gate is unsafe.');
-if (!/v=phase(?:357|35[8-9]|36\d|3[7-9]\d)/.test(String(release.webEntry || ''))) fail('Protected Android web entry changed unexpectedly.');
+if (!/v=phase(?:357|35[8-9]|3[6-9]\d)/.test(String(release.webEntry || ''))) fail('Protected Android web entry changed unexpectedly.');
 if (Number(gameManifest.phase || 0) >= 356 && release.realDeviceValidation?.pending !== true) fail('Real Android validation must remain pending until owner testing.');
 
 if (!androidEntry.includes(gameManifest.build)) fail('Android successor release marker is missing.');
