@@ -35,6 +35,8 @@ Rules:
 - No first visible deal before JOIN TABLE.
 - One authoritative JOIN TABLE / LEAVE TABLE flow.
 - The visible Phase 369 button is the user-facing join surface.
+- The unbound button is pointer-guarded during its brief initialization window.
+- An early JOIN intent is captured before readiness binding and replayed exactly once after the bounded transaction is installed.
 - One tap starts a single-flight readiness transaction; repeated taps cannot create duplicate joins.
 - The transaction waits up to 18 seconds for the canonical table and up to 12 seconds for the authoritative join API.
 - The button displays `JOINING TABLE…` while readiness is pending.
@@ -52,6 +54,7 @@ Runtime QA:
 ```js
 window.SVR_PHASE369_ANDROID_QA()
 window.SVR_PHASE369_JOIN_READINESS_QA()
+window.SVR_PHASE369_JOIN_INTENT_QA()
 window.SVR_PHASE369_JOIN_TABLE()
 window.SVR_PHASE369_LOW_POWER('manual')
 window.SVR_PHASE367_DEVICE_QA()
@@ -62,13 +65,15 @@ window.SVR_PHASE368_CARD_DEALER_STATE
 
 - Existing secure account API remains the authority.
 - Login and registration use email/password through the backend and HTTP-only session cookies.
+- Desktop navigation has separate `Login` and `Register` actions.
+- Android/touch navigation has the same separate `Login` and `Register` actions inside one hamburger menu.
+- The hamburger menu uses signature-based synchronization and does not rebuild itself when links have not changed.
 - New public registrations remain `player` accounts.
 - Admin authority is never selectable from a public registration form.
 - A secure SQL role-assignment script is included for the owner admin account and separate test-player account after both accounts register.
 - Registration displays the optional development-support handle `$SVRhelp`.
 - Cash App payment is not required for registration.
 - The site never requests or stores a Cash App password, PIN, card number, or payment credential.
-- Mobile/touch pages receive one hamburger navigation menu.
 - Profile overlays are reduced so the avatar remains visible.
 - The old Founder Legend / SVR Legend profile injector is disabled.
 - Profile portrait captures the live avatar canvas when available.
@@ -119,6 +124,7 @@ game/modules/phase368_card_dealer_animation_lock.js
 game/modules/phase368_card_dealer_motion.js
 game/modules/phase369_android_join_table_freeze_recovery_lock.js
 game/modules/phase369_android_join_readiness_transaction_lock.js
+game/modules/phase369_android_join_intent_bridge_lock.js
 game/phase369-release.json
 game/tools/phase368-card-dealer-static-test.mjs
 game/tools/phase369-android-recovery-static-test.mjs
@@ -167,6 +173,7 @@ matrix.js
 Completed in code and static validation:
 
 - One Android entry/join flow.
+- Early JOIN intent capture and post-binding replay.
 - Bounded one-tap table/API readiness transaction.
 - Single-flight join protection.
 - Visible pending/retry status instead of silent failure.
@@ -177,10 +184,11 @@ Completed in code and static validation:
 - Continuous next-hand scheduling after showdown.
 - Low-power recovery path.
 - Secure account presentation.
+- Separate Login/Register desktop and mobile navigation.
+- Idempotent mobile-menu synchronization.
 - Admin/test role preparation.
 - Clean profile/avatar presentation.
 - Texture-preserving avatar viewer.
-- Mobile navigation.
 - Android app lead banner.
 - AI-active fallback status.
 - Thinner Matrix rain and staggered secret letters.
