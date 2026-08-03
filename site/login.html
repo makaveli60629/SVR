@@ -60,9 +60,8 @@
 </div>
 <script src="../matrix.js?v=phase369"></script>
 <script src="../site-public-hooks.js?v=phase369"></script>
-<script type="module" src="./js/phase369-registration-payout-profile.js?v=phase369"></script>
 <script type="module">
-import{account}from'./js/phase345-player-account-client.js?v=phase346';
+import{account}from'./js/phase369-registration-payout-profile.js?v=phase369';
 const status=document.getElementById('formStatus'),api=document.getElementById('apiState'),apiText=document.getElementById('apiStateText'),notice=document.getElementById('modeNotice');
 const params=new URLSearchParams(location.search),requested=params.get('next')||'',destination=/^\/(?:site\/(?:avatar|profile)\.html|game\/avatar\.html)(?:[?#].*)?$/.test(requested)?requested:'profile.html';
 const go=()=>location.href=destination;
