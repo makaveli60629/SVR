@@ -12,6 +12,19 @@ async function tap(locator) {
   }
 }
 
+async function joinAndroidTable(page) {
+  const phase369Entry = page.locator('#svr369Join');
+  if (await phase369Entry.count()) {
+    const visible = await phase369Entry.isVisible().catch(() => false);
+    if (visible) {
+      await tap(phase369Entry);
+      return 'phase369-visible-entry';
+    }
+  }
+  await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+  return 'phase347-authoritative-seat';
+}
+
 async function waitFor(page, evaluator, timeout = 120000) {
   const started = Date.now();
   let last = null;
@@ -65,6 +78,7 @@ async function waitForReadiness(page, timeout = 120000) {
           bodyRelease: document.body.dataset.release || null,
           safeStage: Boolean(document.getElementById('safeStage')),
           entryOverlay: Boolean(document.getElementById('svr369Entry')),
+          entryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent),
           checkedAt: new Date().toISOString()
         };
       });
@@ -114,13 +128,14 @@ async function waitForReadiness(page, timeout = 120000) {
       phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
       seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
       join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
-      consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null
+      consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
+      phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent)
     }));
     if (lobbyBefore.joined || lobbyBefore.seatText !== 'JOIN TABLE' || lobbyBefore.join?.pass !== true) {
       throw new Error(`Initial Android lobby contract failed: ${JSON.stringify({ readiness, lobbyBefore })}`);
     }
 
-    await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+    const firstJoinSurface = await joinAndroidTable(page);
     await waitFor(page, () => {
       const audit = window.SVR_RUN_PHASE336_POKER_AUDIT?.();
       return window.SVR_PHASE363_STATE?.joined === true
@@ -182,7 +197,8 @@ async function waitForReadiness(page, timeout = 120000) {
         seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
         consistency,
         join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
-        handsCleared
+        handsCleared,
+        phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent)
       };
       return result.joined === false
         && result.gameState === 'LOBBY'
@@ -190,11 +206,12 @@ async function waitForReadiness(page, timeout = 120000) {
         && result.seatText === 'JOIN TABLE'
         && result.consistency?.lobbyCardsCleared === true
         && result.handsCleared
+        && result.phase369EntryVisible
         ? result
         : null;
     }, 15000);
 
-    await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+    const rejoinSurface = await joinAndroidTable(page);
     const freshRejoin = await waitFor(page, () => {
       window.SVR_PHASE364_ANDROID_SEAT?.(true);
       const state = window.SVR_PHASE336_POKER_STATE;
@@ -232,6 +249,8 @@ async function waitForReadiness(page, timeout = 120000) {
     const filteredConsole = consoleErrors.filter((line) => !/favicon|WebXR.*not available|THREE\.WebGLRenderer/i.test(line));
     const filteredFailures = requestFailures.filter((line) => !/favicon/i.test(line));
     const pass = readiness.ready === true
+      && firstJoinSurface === 'phase369-visible-entry'
+      && rejoinSurface === 'phase369-visible-entry'
       && seated.phase357.seated === true
       && seated.phase364.tablePass === true
       && compatibilityHand.pass === true
@@ -250,6 +269,8 @@ async function waitForReadiness(page, timeout = 120000) {
       pass,
       url: URL,
       readiness,
+      firstJoinSurface,
+      rejoinSurface,
       lobbyBefore,
       seated,
       compatibilityHand,
