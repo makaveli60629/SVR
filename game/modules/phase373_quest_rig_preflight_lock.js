@@ -16,6 +16,7 @@ const state = {
   rejectedTableAncestors: [],
   unsafeMethodsGuarded: 0,
   fallbackCameraRig: false,
+  blockingInitialization: true,
   lastError: null,
   installedAt: null
 };
@@ -169,7 +170,11 @@ async function install() {
   window.dispatchEvent(new CustomEvent('svr:phase373-rig-preflight-ready', { detail: qa() }));
 }
 
-if (ACTIVE) install().catch((error) => {
-  state.lastError = String(error?.stack || error?.message || error);
-  window.SVR_PHASE373_RIG_PREFLIGHT_STATE = { ...state };
-});
+if (ACTIVE) {
+  try {
+    await install();
+  } catch (error) {
+    state.lastError = String(error?.stack || error?.message || error);
+    window.SVR_PHASE373_RIG_PREFLIGHT_STATE = { ...state };
+  }
+}
