@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "project": "SVR Poker",
+  "branch": "agent/card-dealer-fbx",
+  "phases": [
+    {
+      "phase": 368,
+      "build": "PHASE-368-CARD-DEALER-ANIMATION-LOCK",
+      "scope": "Uploaded Cards.fbx dealer motion and visible table dealer",
+      "physicalCardTransfer": false
+    },
+    {
+      "phase": 369,
+      "build": "PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK",
+      "scope": "Android logo entry, join-before-deal, table recovery, dealer defer, continuous play and low-power recovery",
+      "physicalDeviceAcceptance": "pending-owner-playtest"
+    },
+    {
+      "phase": 370,
+      "build": "PHASE-370-ACCOUNT-PROFILE-AVATAR-MOBILE-POLISH-LOCK",
+      "scope": "Secure login/registration presentation, admin/test role setup, profile cleanup, texture preservation and mobile navigation",
+      "adminCredentialsCreated": false,
+      "testCredentialsCreated": false,
+      "cashAppSupportHandle": "$SVRhelp",
+      "cashAppCredentialsCollected": false
+    },
+    {
+      "phase": 371,
+      "build": "PHASE-371-PUBLIC-APP-AI-MATRIX-POLISH-LOCK",
+      "scope": "Android app lead banner, AI-active fallback and thinner staggered Matrix rain"
+    }
+  ],
+  "androidEntry": "/game/android.html?channel=stable&v=phase369",
+  "siteEntries": {
+    "home": "/site/index.html?v=phase371",
+    "login": "/site/login.html?v=phase370",
+    "register": "/site/login.html?mode=register&v=phase370",
+    "profile": "/site/profile.html?v=phase370",
+    "avatar": "/site/avatar.html?v=phase370",
+    "public": "/?v=phase371"
+  },
+  "apk": {
+    "versionName": "0.1.0-rc1",
+    "versionCode": 1,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true
+  },
+  "truth": {
+    "localPlayMoneyHoldem": true,
+    "serverAuthoritativeMultiplayer": false,
+    "realMoneyGambling": false,
+    "physicalAndroidPlaytestRequired": true,
+    "actualAccountCredentialsMustBeEnteredByOwner": true,
+    "questIsNextFocusedTrack": true
+  },
+  "continuationDocument": "docs/SVR_PHASE_369_371_ANDROID_SITE_CONTINUATION_MANIFEST.md"
+}
