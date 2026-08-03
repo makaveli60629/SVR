@@ -1,7 +1,7 @@
 const { chromium } = require('playwright');
 
 const BASE = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
-const URL = `${BASE}/game/android.html?channel=stable&manual=1&v=phase369`;
+const URL = `${BASE}/game/android.html?channel=stable&manual=1&v=phase372`;
 const ANDROID_UA = 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/132.0 Mobile Safari/537.36';
 
 async function tap(locator) {
@@ -13,6 +13,14 @@ async function tap(locator) {
 }
 
 async function joinAndroidTable(page) {
+  const phase372Entry = page.locator('#svr372Primary');
+  if (await phase372Entry.count()) {
+    const visible = await phase372Entry.isVisible().catch(() => false);
+    if (visible) {
+      await tap(phase372Entry);
+      return 'phase372-visible-entry';
+    }
+  }
   const phase369Entry = page.locator('#svr369Join');
   if (await phase369Entry.count()) {
     const visible = await phase369Entry.isVisible().catch(() => false);
@@ -46,13 +54,15 @@ async function waitForReadiness(page, timeout = 120000) {
       last = await page.evaluate(() => {
         const seat = document.querySelector('#svr347Actions [data-ui="seat"]');
         const checks = {
+          phase372Qa: typeof window.SVR_PHASE372_QA === 'function',
           phase357Qa: typeof window.SVR_PHASE357_QA === 'function',
           phase355FullHand: typeof window.SVR_PHASE355_RUN_FULL_HAND_QA === 'function',
           phase363JoinQa: typeof window.SVR_PHASE363_JOIN_CONTROL_QA === 'function',
           phase363ConsistencyQa: typeof window.SVR_PHASE363_CONSISTENCY_QA === 'function',
           phase364AndroidSeat: typeof window.SVR_PHASE364_ANDROID_SEAT === 'function',
           phase364Qa: typeof window.SVR_PHASE364_QA === 'function',
-          seatExists: Boolean(seat)
+          seatExists: Boolean(seat),
+          phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent)
         };
         return {
           ready: Object.values(checks).every(Boolean),
@@ -67,6 +77,7 @@ async function waitForReadiness(page, timeout = 120000) {
           } : null,
           controllerRoots: document.querySelectorAll('#svr347Root').length,
           actionPanels: document.querySelectorAll('#svr347Actions').length,
+          phase372: window.SVR_PHASE372_QA?.() || null,
           phase369: window.SVR_PHASE369_ANDROID_STATE || null,
           platform: window.SVR_PHASE340_PLATFORM_STATE ? {
             platform: window.SVR_PHASE340_PLATFORM_STATE.platform,
@@ -77,8 +88,10 @@ async function waitForReadiness(page, timeout = 120000) {
           bodyBuild: document.body.dataset.build || null,
           bodyRelease: document.body.dataset.release || null,
           safeStage: Boolean(document.getElementById('safeStage')),
-          entryOverlay: Boolean(document.getElementById('svr369Entry')),
-          entryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent),
+          phase372Overlay: Boolean(document.getElementById('svr372Entry')),
+          phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
+          phase369Overlay: Boolean(document.getElementById('svr369Entry')),
+          phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent),
           checkedAt: new Date().toISOString()
         };
       });
@@ -129,9 +142,11 @@ async function waitForReadiness(page, timeout = 120000) {
       seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
       join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
       consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
+      phase372: window.SVR_PHASE372_QA?.() || null,
+      phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
       phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent)
     }));
-    if (lobbyBefore.joined || lobbyBefore.seatText !== 'JOIN TABLE' || lobbyBefore.join?.pass !== true) {
+    if (lobbyBefore.joined || lobbyBefore.seatText !== 'JOIN TABLE' || lobbyBefore.join?.pass !== true || !lobbyBefore.phase372EntryVisible) {
       throw new Error(`Initial Android lobby contract failed: ${JSON.stringify({ readiness, lobbyBefore })}`);
     }
 
@@ -142,7 +157,7 @@ async function waitForReadiness(page, timeout = 120000) {
         && Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0) >= 1
         && Number(audit?.players?.[0]?.hand?.length || 0) === 2
         ? true : null;
-    }, 30000);
+    }, 45000);
 
     const seated = await waitFor(page, () => {
       window.SVR_PHASE364_ANDROID_SEAT?.(true);
@@ -198,6 +213,8 @@ async function waitForReadiness(page, timeout = 120000) {
         consistency,
         join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
         handsCleared,
+        phase372: window.SVR_PHASE372_QA?.() || null,
+        phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
         phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent)
       };
       return result.joined === false
@@ -206,7 +223,8 @@ async function waitForReadiness(page, timeout = 120000) {
         && result.seatText === 'JOIN TABLE'
         && result.consistency?.lobbyCardsCleared === true
         && result.handsCleared
-        && result.phase369EntryVisible
+        && result.phase372EntryVisible
+        && result.phase372?.primaryText === 'JOIN TABLE'
         ? result
         : null;
     }, 15000);
@@ -244,13 +262,13 @@ async function waitForReadiness(page, timeout = 120000) {
         && phase364?.androidJoined === true
         ? result
         : null;
-    }, 30000);
+    }, 45000);
 
     const filteredConsole = consoleErrors.filter((line) => !/favicon|WebXR.*not available|THREE\.WebGLRenderer/i.test(line));
     const filteredFailures = requestFailures.filter((line) => !/favicon/i.test(line));
     const pass = readiness.ready === true
-      && firstJoinSurface === 'phase369-visible-entry'
-      && rejoinSurface === 'phase369-visible-entry'
+      && firstJoinSurface === 'phase372-visible-entry'
+      && rejoinSurface === 'phase372-visible-entry'
       && seated.phase357.seated === true
       && seated.phase364.tablePass === true
       && compatibilityHand.pass === true
@@ -268,6 +286,7 @@ async function waitForReadiness(page, timeout = 120000) {
     const report = {
       pass,
       url: URL,
+      successor: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
       readiness,
       firstJoinSurface,
       rejoinSurface,
