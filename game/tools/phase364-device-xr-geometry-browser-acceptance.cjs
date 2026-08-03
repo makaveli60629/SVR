@@ -29,11 +29,22 @@ async function runDevice(browser, name, userAgent, path, viewport) {
   page.on('requestfailed', (request) => failed.push(`${request.method()} ${request.url()} ${request.failure()?.errorText || ''}`));
   await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded', timeout: 120000 });
 
-  const qa = await waitFor(page, () => {
+  let qa = await waitFor(page, () => {
     if (typeof window.SVR_PHASE364_QA !== 'function') return null;
     const result = window.SVR_PHASE364_QA();
     return result?.tablePass ? result : null;
   });
+
+  if (name === 'android') {
+    const aligned = await waitFor(page, () => {
+      if (typeof window.SVR_PHASE365_QA !== 'function' || typeof window.SVR_PHASE364_QA !== 'function') return null;
+      const phase365 = window.SVR_PHASE365_QA();
+      const phase364 = window.SVR_PHASE364_QA();
+      if (!phase365?.pass || Number(phase365?.cardBacksBranded || 0) < 13 || !phase364?.tablePass) return null;
+      return { phase365, phase364 };
+    });
+    qa = aligned.phase364;
+  }
 
   if (!qa.tablePass) throw new Error(`${name}: table geometry failed ${JSON.stringify(qa)}`);
   const size = qa.measuredTable.size;
