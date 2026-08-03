@@ -13,7 +13,9 @@ const start=async()=>{if(started)return;started=true;try{
   await import('./modules/phase360_table_conservation_next_guard_lock.js?v=phase364');
   await import('./modules/phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase364');
   await import('./modules/phase364_quest_eric_quarantine_watch.js?v=phase364');
+  await import('./modules/phase373_quest_rig_preflight_lock.js?v=phase373');
   await import('./modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase373');
+  await import('./modules/phase373_quest_npc_teleport_postflight_lock.js?v=phase373');
   await import('./modules/phase365_quest_vr_button_dedupe_lock.js?v=phase365');
   const p=new URLSearchParams(location.search),legacyAcceptance=p.get('acceptance')==='1'&&p.get('v')!=='phase364';
   if(!legacyAcceptance){
@@ -29,7 +31,9 @@ const start=async()=>{if(started)return;started=true;try{
   window.SVR_PHASE365_QUEST_VR_BUTTON_SWEEP?.();
   window.SVR_PHASE373_REPAIR_TABLE?.();
   window.SVR_PHASE373_REPAIR_NPCS?.();
+  window.SVR_PHASE373_POSTFLIGHT_REPAIR_NPCS?.();
   window.SVR_PHASE373_STABLE_LOBBY?.();
+  window.SVR_PHASE373_POSTFLIGHT_RESTORE_TELEPORT?.('quest-core-ready');
   document.body.classList.add('boot-released');
   loadDealerLater();
   window.dispatchEvent(new CustomEvent('svr:phase373-core-ready'));
