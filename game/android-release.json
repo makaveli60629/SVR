@@ -85,6 +85,7 @@
     "profileShowroom": "PHASE-351",
     "vrDressingRoom": "PHASE-353",
     "fullGameAcceptance": "PHASE-354",
+    "androidTableStatus": "PHASE-357",
     "androidIntegratedFlow": "PHASE-363",
     "deviceGeometry": "PHASE-364",
     "seatedUxBranding": "PHASE-365"
@@ -126,7 +127,8 @@
     "Phase 365 changes the remotely loaded Android web runtime and does not require reinstalling APK 0.1.0-rc1.",
     "Phase 336 remains the poker rules and payout authority.",
     "Phase 347 remains the only visible Android MOVE, LOOK and poker-button controller.",
-    "Phase 365 repairs that controller in place and hides it after JOIN instead of creating another controller.",
+    "Phase 357 remains the protected table status, seating, showdown and ante presentation authority beneath Phase 365.",
+    "Phase 365 repairs the Phase 347 controller in place and hides it after JOIN instead of creating another controller.",
     "Phase 351 profile live camera and Phase 353 VR dressing room remain intact.",
     "No server-authoritative multiplayer or real-money gambling is claimed.",
     "APK version name 0.1.0-rc1, version code 1, manual-update-only, forceUpdate false and showUpdatePrompt false remain locked."
