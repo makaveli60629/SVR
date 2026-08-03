@@ -9,6 +9,7 @@ const forbid = (source, token, label = token) => { if (source.includes(token)) e
 
 const android = read('game/android.html');
 const runtime = read('game/modules/phase369_android_join_table_freeze_recovery_lock.js');
+const readiness = read('game/modules/phase369_android_join_readiness_transaction_lock.js');
 const dealer = read('game/modules/phase368_card_dealer_animation_lock.js');
 const release = JSON.parse(read('game/phase369-release.json'));
 
@@ -16,13 +17,15 @@ need(android, 'data-build="PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCE
 need(android, 'data-release="PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK"', 'phase369-release-marker');
 need(android, 'window.SVR_REQUIRE_TABLE_JOIN=true', 'join-required');
 need(android, "phase367_android_physical_device_viewport_touch_acceptance_lock.js?v=phase367", 'phase367-base-load');
-need(android, "phase369_android_join_table_freeze_recovery_lock.js?v=phase369", 'phase369-last-load');
+need(android, "phase369_android_join_table_freeze_recovery_lock.js?v=phase369", 'phase369-base-load');
+need(android, "phase369_android_join_readiness_transaction_lock.js?v=phase369", 'phase369-readiness-load');
 need(android, 'const loadDealerLater=', 'dealer-deferred');
 need(android, "requestIdleCallback(run,{timeout:5000})", 'idle-dealer-load');
 need(android, "logoUrl:'/logo.png'", 'android-logo');
 const phase367Index = android.indexOf('phase367_android_physical_device_viewport_touch_acceptance_lock.js');
 const phase369Index = android.indexOf('phase369_android_join_table_freeze_recovery_lock.js');
-if (!(phase367Index >= 0 && phase369Index > phase367Index)) errors.push('order:phase369-after-phase367');
+const readinessIndex = android.indexOf('phase369_android_join_readiness_transaction_lock.js');
+if (!(phase367Index >= 0 && phase369Index > phase367Index && readinessIndex > phase369Index)) errors.push('order:phase369-readiness-after-base');
 
 need(runtime, "export const BUILD = 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK'", 'runtime-build');
 need(runtime, '>JOIN TABLE<', 'single-entry-join-label');
@@ -37,6 +40,20 @@ need(runtime, 'gap > 1400', 'long-frame-watch');
 need(runtime, "applyLowPower('long-frame-gap')", 'automatic-low-power');
 need(runtime, 'window.SVR_PHASE369_ANDROID_QA', 'runtime-qa');
 forbid(runtime, 'new THREE.', 'no-new-renderer-or-table-authority');
+
+need(readiness, "PHASE-369-ANDROID-JOIN-READINESS-TRANSACTION-LOCK", 'readiness-build');
+need(readiness, 'async function waitForTable(timeoutMs = 18000)', 'bounded-table-wait');
+need(readiness, 'async function waitForJoinApi(timeoutMs = 12000)', 'bounded-api-wait');
+need(readiness, 'activePromise', 'single-flight-join');
+need(readiness, "JOINING TABLE…", 'visible-busy-state');
+need(readiness, "joinApi('phase369-readiness-transaction')", 'fallback-join');
+need(readiness, 'window.SVR_PHASE364_ANDROID_SEAT?.(true)', 'seat-after-readiness');
+need(readiness, 'window.SVR_RESET_POKER_TABLE?.(15000)', 'deal-after-readiness');
+need(readiness, "current.replaceWith(replacement)", 'old-listener-replaced');
+need(readiness, 'window.SVR_PHASE369_JOIN_TABLE = runJoin', 'join-api-upgraded');
+need(readiness, 'window.SVR_PHASE369_JOIN_READINESS_QA', 'readiness-qa');
+forbid(readiness, 'new THREE.', 'readiness-no-renderer');
+forbid(readiness, 'setInterval(', 'readiness-no-polling-interval');
 
 need(dealer, "dealer.position.set(info.center.x, 0, info.box.min.z - DEALER_GAP)", 'dealer-across-table');
 need(dealer, 'dealer.rotation.set(0, Math.PI, 0)', 'dealer-faces-table');
@@ -53,6 +70,7 @@ if (release.truth?.physicalAndroidAcceptancePassed !== false) errors.push('relea
 
 const result = {
   build: 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK',
+  readinessBuild: 'PHASE-369-ANDROID-JOIN-READINESS-TRANSACTION-LOCK',
   errors,
   pass: errors.length === 0
 };
