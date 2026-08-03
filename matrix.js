@@ -15,6 +15,73 @@
     });
   }
 
+  function installAndroidAppSlide() {
+    if (!/\/site\/index\.html$/i.test(location.pathname)) return;
+    const deck = document.querySelector('[data-svr-slide-deck]');
+    if (!deck || deck.querySelector('[data-slide-id="slide-android-app"]')) return;
+    if (!document.getElementById('svr371-app-slide-style')) {
+      const style = document.createElement('style');
+      style.id = 'svr371-app-slide-style';
+      style.textContent = `
+        .svr371-app-slide{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 38%,rgba(155,77,255,.46),rgba(4,7,17,.98) 67%)}
+        .svr371-app-slide::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(127,252,255,.12),transparent 38%,rgba(255,217,138,.1));pointer-events:none}
+        .svr371-app-banner{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.7fr);align-items:center;gap:18px;padding:clamp(20px,5vw,58px);color:#fff}
+        .svr371-app-copy{max-width:720px}.svr371-app-copy .eyebrow{color:#7ffcff;font:900 12px Orbitron,system-ui;letter-spacing:.12em}.svr371-app-copy h2{margin:8px 0;font:900 clamp(28px,5vw,58px) Orbitron,system-ui;line-height:1}.svr371-app-copy p{max-width:650px;margin:0 0 16px;color:#e6e5ed;font:700 clamp(15px,2vw,20px) Rajdhani,system-ui}.svr371-app-actions{display:flex;flex-wrap:wrap;gap:9px}
+        .svr371-app-logo{display:grid;place-items:center}.svr371-app-logo img{width:min(260px,34vw);height:min(260px,34vw);object-fit:contain;filter:drop-shadow(0 0 38px rgba(127,252,255,.34)) drop-shadow(0 0 50px rgba(155,77,255,.32))}.svr371-app-logo strong{margin-top:8px;color:#ffd98a;font:900 13px Orbitron,system-ui;letter-spacing:.08em;text-align:center}
+        @media(max-width:720px){.svr371-app-banner{grid-template-columns:1fr;text-align:center;padding:20px}.svr371-app-copy{display:grid;justify-items:center}.svr371-app-logo{grid-row:1}.svr371-app-logo img{width:112px;height:112px}.svr371-app-copy h2{font-size:28px}.svr371-app-copy p{font-size:15px}.svr371-app-actions{justify-content:center}}
+      `;
+      document.head.appendChild(style);
+    }
+    deck.querySelectorAll('.svr-slide.is-active').forEach((slide) => slide.classList.remove('is-active'));
+    const slide = document.createElement('article');
+    slide.className = 'svr-slide svr-art-slide svr371-app-slide is-active';
+    slide.dataset.slideId = 'slide-android-app';
+    slide.dataset.slideType = 'android-app';
+    slide.innerHTML = `
+      <div class="svr371-app-banner">
+        <div class="svr371-app-copy">
+          <span class="eyebrow">SVR POKER APP</span>
+          <h2>Android Playtest Ready</h2>
+          <p>Open the Android table, press JOIN TABLE, and play the current protected Hold’em test build. The full immersive experience continues on Quest VR.</p>
+          <div class="svr371-app-actions"><a class="btn primary" href="../game/android.html?channel=stable&v=phase369">Open Android Game</a><a class="btn secondary" href="../downloads/">App & Downloads</a></div>
+        </div>
+        <div class="svr371-app-logo"><img src="../logo.png" alt="SVR Poker app logo"><strong>ANDROID APP PLAYTEST</strong></div>
+      </div>`;
+    deck.prepend(slide);
+  }
+
+  function installPublicAiStatus() {
+    const publicRoot = !/\/site\//i.test(location.pathname) && (location.pathname === '/' || /\/index\.html$/i.test(location.pathname));
+    if (!publicRoot) return;
+    const badge = document.querySelector('.system-status-badge');
+    const admin = document.getElementById('admin-status') || document.querySelector('.admin-status');
+    if (!badge || !admin) return;
+    if (!document.getElementById('svr371-ai-status-style')) {
+      const style = document.createElement('style');
+      style.id = 'svr371-ai-status-style';
+      style.textContent = `.ai-status{display:none!important;align-items:center;gap:7px}.ai-status.is-active{display:inline-flex!important;color:#baffc9!important;border-color:rgba(73,255,121,.7)!important}.ai-status .ai-dot{width:9px;height:9px;border-radius:50%;background:#34ff72;box-shadow:0 0 12px rgba(52,255,114,.9)}`;
+      document.head.appendChild(style);
+    }
+    let ai = document.getElementById('ai-status');
+    if (!ai) {
+      ai = document.createElement('span');
+      ai.id = 'ai-status';
+      ai.className = 'status-item ai-status';
+      ai.innerHTML = '<span class="ai-dot"></span><span>AI ACTIVE</span>';
+      ai.setAttribute('aria-label', 'AI support active while admin is offline');
+      badge.appendChild(ai);
+    }
+    const adminOnline = admin.dataset.state === 'online' || admin.classList.contains('online');
+    ai.classList.toggle('is-active', !adminOnline);
+    ai.dataset.state = adminOnline ? 'standby' : 'active';
+    window.SVR_PUBLIC_AI_STATUS = {
+      build: BUILD,
+      active: !adminOnline,
+      reason: adminOnline ? 'admin-online' : 'admin-offline-support-fallback',
+      checkedAt: new Date().toISOString()
+    };
+  }
+
   function loadSitePolish() {
     if (!/^\/site\/(?:index|profile|avatar|login|register)\.html$/i.test(location.pathname)) return;
     if (!document.querySelector('link[data-svr-phase370]')) {
@@ -34,11 +101,15 @@
   }
 
   routeCamera3();
+  installAndroidAppSlide();
+  installPublicAiStatus();
   loadSitePolish();
   new MutationObserver(() => {
     routeCamera3();
+    installAndroidAppSlide();
+    installPublicAiStatus();
     loadSitePolish();
-  }).observe(document.documentElement, { subtree: true, childList: true });
+  }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'data-state'] });
 
   const canvas = document.getElementById('binary-rain');
   if (!canvas) return;
@@ -211,6 +282,8 @@
     phraseBursts: () => phraseBursts,
     profileLegendModule: false,
     phase370SitePolish: /^\/site\//i.test(location.pathname),
+    androidAppLeadSlide: /\/site\/index\.html$/i.test(location.pathname),
+    publicAiFallback: !/\/site\//i.test(location.pathname),
     camera3Route: CAMERA3,
     reducedMotion,
     lowPower,
