@@ -217,7 +217,13 @@ function install() {
     clearTimeout(viewportTimer);
     viewportTimer = window.setTimeout(() => applyViewport('window-resize'), 140);
   });
-  window.addEventListener('svr:phase363-immediate-join-state', () => window.setTimeout(() => syncSeatedState('join-event'), 0));
+  window.addEventListener('svr:phase363-immediate-join-state', (event) => {
+    if (event.detail?.joined === true) {
+      runtime.pointerEvents += 1;
+      runtime.actionTouches += 1;
+    }
+    window.setTimeout(() => syncSeatedState('join-event'), 0);
+  });
   window.addEventListener('svr:phase365-state', () => syncSeatedState('phase365-state'));
   observer = new MutationObserver(() => {
     clearTimeout(viewportTimer);
