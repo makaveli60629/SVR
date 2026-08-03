@@ -19,8 +19,9 @@ const manifestPath = 'game/modules/phase340_platform_manifest.js';
 const androidPath = 'game/android.html';
 const gameManifestPath = 'game/manifest.json';
 const releasePath = 'game/android-release.json';
+const profileCameraPath = 'site/js/phase366-profile-live-camera-watchdog.js';
 
-for (const file of [modulePath, successorPath, manifestPath, androidPath, gameManifestPath, releasePath, 'site/profile.html', 'site/avatar.html', 'site/js/phase366-profile-live-camera-lock.js', 'game/avatar-vr.html']) {
+for (const file of [modulePath, successorPath, manifestPath, androidPath, gameManifestPath, releasePath, 'site/profile.html', 'site/avatar.html', profileCameraPath, 'game/avatar-vr.html']) {
   if (!exists(file)) errors.push(`missing-file:${file}`);
 }
 
@@ -32,7 +33,7 @@ const gameManifest = JSON.parse(read(gameManifestPath));
 const androidRelease = JSON.parse(read(releasePath));
 const profile = read('site/profile.html');
 const avatar = read('site/avatar.html');
-const profileCamera = read('site/js/phase366-profile-live-camera-lock.js');
+const profileCamera = read(profileCameraPath);
 const avatarVr = read('game/avatar-vr.html');
 
 requireText(moduleSource, 'PHASE-365-ANDROID-SEATED-UX-BRANDING-GYRO-ALIGNMENT-LOCK', 'module-build');
@@ -91,7 +92,7 @@ if (androidRelease.releaseReady || androidRelease.forceUpdate || androidRelease.
 
 if (!/live avatar camera|showroom|profile.*avatar|avatar.*profile/i.test(profile)) errors.push('profile-showroom-marker');
 if (!/dressing|wardrobe|avatar/i.test(avatar)) errors.push('website-dressing-room-marker');
-if (!/PROFILE-LIVE-CAMERA-DRESSING-ROOM-RELIABILITY-LOCK/.test(profileCamera)) errors.push('phase366-profile-camera-marker');
+if (!/PHASE-366-PROFILE-LIVE-CAMERA-DRESSING-ROOM-RELIABILITY-LOCK/.test(profileCamera)) errors.push('phase366-profile-camera-marker');
 if (!/WebXR|dressing|pedestal|avatar/i.test(avatarVr)) errors.push('vr-dressing-room-marker');
 
 const result = {
