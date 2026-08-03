@@ -71,17 +71,20 @@ async function runDevice(browser, name, userAgent, path, viewport) {
       const scene = window.__SVR_SCENE__;
       let visible = 0;
       const seen = new Set();
-      const stack = scene ? [scene] : [];
+      const stack = scene ? [{ object: scene, inheritedVisible: scene.visible !== false }] : [];
       while (stack.length && seen.size < 18000) {
-        const object = stack.pop();
+        const { object, inheritedVisible } = stack.pop();
         if (!object || seen.has(object)) continue;
         seen.add(object);
-        if (/eric/i.test(String(object.name || '')) && object.visible !== false) visible += 1;
-        for (const child of object.children || []) if (child && !seen.has(child)) stack.push(child);
+        const effectiveVisible = inheritedVisible && object.visible !== false;
+        if (/eric/i.test(String(object.name || '')) && effectiveVisible) visible += 1;
+        for (const child of object.children || []) {
+          if (child && !seen.has(child)) stack.push({ object: child, inheritedVisible: effectiveVisible });
+        }
       }
       return visible;
     });
-    if (visibleEric !== 0) throw new Error(`quest: visible Eric roots remain ${visibleEric}`);
+    if (visibleEric !== 0) throw new Error(`quest: effectively visible Eric objects remain ${visibleEric}`);
   } else {
     interaction = await waitFor(page, () => {
       if (typeof window.SVR_PHASE363_JOIN_TABLE !== 'function') return null;
