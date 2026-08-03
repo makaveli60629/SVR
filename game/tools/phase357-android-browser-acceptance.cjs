@@ -53,6 +53,9 @@ async function waitForReadiness(page, timeout = 120000) {
     try {
       last = await page.evaluate(() => {
         const seat = document.querySelector('#svr347Actions [data-ui="seat"]');
+        const phase372Button = document.getElementById('svr372Primary');
+        const phase372 = window.SVR_PHASE372_QA?.() || null;
+        const join = window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null;
         const checks = {
           phase372Qa: typeof window.SVR_PHASE372_QA === 'function',
           phase357Qa: typeof window.SVR_PHASE357_QA === 'function',
@@ -62,7 +65,9 @@ async function waitForReadiness(page, timeout = 120000) {
           phase364AndroidSeat: typeof window.SVR_PHASE364_ANDROID_SEAT === 'function',
           phase364Qa: typeof window.SVR_PHASE364_QA === 'function',
           seatExists: Boolean(seat),
-          phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent)
+          phase372EntryVisible: Boolean(phase372Button?.offsetParent),
+          oneVisibleJoinAuthority: join?.pass === true && join?.authorityId === 'svr372Primary',
+          phase372Ready: phase372?.pass === true && phase372?.primaryVisible === true && phase372?.primaryText === 'JOIN TABLE'
         };
         return {
           ready: Object.values(checks).every(Boolean),
@@ -77,7 +82,8 @@ async function waitForReadiness(page, timeout = 120000) {
           } : null,
           controllerRoots: document.querySelectorAll('#svr347Root').length,
           actionPanels: document.querySelectorAll('#svr347Actions').length,
-          phase372: window.SVR_PHASE372_QA?.() || null,
+          phase372,
+          join,
           phase369: window.SVR_PHASE369_ANDROID_STATE || null,
           platform: window.SVR_PHASE340_PLATFORM_STATE ? {
             platform: window.SVR_PHASE340_PLATFORM_STATE.platform,
@@ -89,7 +95,7 @@ async function waitForReadiness(page, timeout = 120000) {
           bodyRelease: document.body.dataset.release || null,
           safeStage: Boolean(document.getElementById('safeStage')),
           phase372Overlay: Boolean(document.getElementById('svr372Entry')),
-          phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
+          phase372EntryVisible: Boolean(phase372Button?.offsetParent),
           phase369Overlay: Boolean(document.getElementById('svr369Entry')),
           phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent),
           checkedAt: new Date().toISOString()
@@ -139,14 +145,21 @@ async function waitForReadiness(page, timeout = 120000) {
       joined: Boolean(window.SVR_PHASE363_STATE?.joined),
       gameState: window.SVR_PHASE363_STATE?.gameState || null,
       phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
-      seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
+      legacySeatHidden: Boolean(document.querySelector('#svr347Actions [data-ui="seat"]')?.hidden),
       join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
       consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
       phase372: window.SVR_PHASE372_QA?.() || null,
       phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
       phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent)
     }));
-    if (lobbyBefore.joined || lobbyBefore.seatText !== 'JOIN TABLE' || lobbyBefore.join?.pass !== true || !lobbyBefore.phase372EntryVisible) {
+    if (lobbyBefore.joined
+        || lobbyBefore.gameState !== 'LOBBY'
+        || lobbyBefore.join?.pass !== true
+        || lobbyBefore.join?.authorityId !== 'svr372Primary'
+        || lobbyBefore.phase372?.primaryText !== 'JOIN TABLE'
+        || lobbyBefore.phase372?.primaryVisible !== true
+        || !lobbyBefore.phase372EntryVisible
+        || !lobbyBefore.legacySeatHidden) {
       throw new Error(`Initial Android lobby contract failed: ${JSON.stringify({ readiness, lobbyBefore })}`);
     }
 
@@ -205,25 +218,31 @@ async function waitForReadiness(page, timeout = 120000) {
       const consistency = window.SVR_PHASE363_CONSISTENCY_QA?.();
       const audit = window.SVR_RUN_PHASE336_POKER_AUDIT?.();
       const handsCleared = (audit?.players || []).every((player) => Array.isArray(player.hand) && player.hand.length === 0);
+      const phase372 = window.SVR_PHASE372_QA?.() || null;
+      const join = window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null;
+      const legacySeat = document.querySelector('#svr347Actions [data-ui="seat"]');
       const result = {
         joined: Boolean(window.SVR_PHASE363_STATE?.joined),
         gameState: window.SVR_PHASE363_STATE?.gameState || null,
         phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
-        seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
+        legacySeatHidden: Boolean(legacySeat?.hidden),
         consistency,
-        join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
+        join,
         handsCleared,
-        phase372: window.SVR_PHASE372_QA?.() || null,
+        phase372,
         phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
         phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent)
       };
       return result.joined === false
         && result.gameState === 'LOBBY'
         && result.phase === 'idle'
-        && result.seatText === 'JOIN TABLE'
+        && result.legacySeatHidden
+        && result.join?.authorityId === 'svr372Primary'
+        && result.join?.pass === true
         && result.consistency?.lobbyCardsCleared === true
         && result.handsCleared
         && result.phase372EntryVisible
+        && result.phase372?.primaryVisible === true
         && result.phase372?.primaryText === 'JOIN TABLE'
         ? result
         : null;
@@ -237,6 +256,7 @@ async function waitForReadiness(page, timeout = 120000) {
       const consistency = window.SVR_PHASE363_CONSISTENCY_QA?.();
       const phase357 = window.SVR_PHASE357_QA?.();
       const phase364 = window.SVR_PHASE364_QA?.();
+      const legacySeat = document.querySelector('#svr347Actions [data-ui="seat"]');
       const result = {
         joined: Boolean(window.SVR_PHASE363_STATE?.joined),
         gameState: window.SVR_PHASE363_STATE?.gameState || null,
@@ -246,14 +266,16 @@ async function waitForReadiness(page, timeout = 120000) {
         consistency,
         phase357,
         phase364,
-        seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || ''
+        legacySeatVisible: Boolean(legacySeat?.offsetParent),
+        legacySeatText: legacySeat?.textContent?.trim() || ''
       };
       return result.joined
         && result.gameState === 'SEATED'
         && result.handNo === 1
         && result.phase === 'preflop'
         && result.holeCards === 2
-        && result.seatText === 'LEAVE TABLE'
+        && result.legacySeatVisible
+        && result.legacySeatText === 'LEAVE TABLE'
         && Number(consistency?.effectiveTableChips || 0) === 90000
         && Number(consistency?.expectedTableChips || 0) === 90000
         && consistency?.pass === true
