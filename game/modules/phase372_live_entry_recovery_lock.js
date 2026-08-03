@@ -67,13 +67,24 @@ function setStatus(message, error = false) {
   statusNode.dataset.error = error ? '1' : '0';
 }
 
+function restorePrimaryButton(label = 'JOIN TABLE') {
+  if (!primaryButton) return;
+  primaryButton.hidden = false;
+  primaryButton.disabled = false;
+  primaryButton.removeAttribute('aria-hidden');
+  primaryButton.setAttribute('aria-label', 'Join poker table');
+  try { primaryButton.inert = false; } catch {}
+  primaryButton.textContent = label;
+}
+
 function resetPrimaryForLobby(reason = 'lobby') {
   if (!root || !primaryButton || platform !== 'android') return;
   activePromise = null;
   state.lastError = null;
-  primaryButton.disabled = false;
-  primaryButton.textContent = 'JOIN TABLE';
+  restorePrimaryButton('JOIN TABLE');
   root.hidden = false;
+  root.removeAttribute('aria-hidden');
+  try { root.inert = false; } catch {}
   setStatus(state.tableReady ? 'Table ready. Press JOIN TABLE to play.' : 'Preparing the verified table…');
   publish(reason);
 }
@@ -88,10 +99,11 @@ function syncAndroidEntry(reason = 'android-entry-sync') {
   if (!runtimeReady) return false;
   if (joinedNow()) {
     root.hidden = true;
+    root.setAttribute('aria-hidden', 'true');
     publish(`${reason}:joined`);
     return true;
   }
-  if (activePromise || primaryButton.disabled) return false;
+  if (activePromise) return false;
   state.entrySyncs += 1;
   resetPrimaryForLobby(`${reason}:lobby`);
   return true;
@@ -181,6 +193,7 @@ async function runAndroidJoin() {
   window.SVR_PHASE365_SYNC?.();
   window.SVR_PHASE367_DEVICE_CALIBRATE?.();
   root.hidden = true;
+  root.setAttribute('aria-hidden', 'true');
   publish('android-joined');
   return true;
 }
@@ -196,6 +209,7 @@ async function runQuestLobby() {
   if (result === false) throw new Error('QUEST_LOBBY_SPAWN_REJECTED');
   document.body.classList.add('boot-released');
   root.hidden = true;
+  root.setAttribute('aria-hidden', 'true');
   publish(platform === 'quest' ? 'quest-phase373-lobby-ready' : 'desktop-lobby-ready');
   return true;
 }
@@ -209,7 +223,10 @@ async function primaryAction() {
     .catch((error) => {
       state.lastError = String(error?.message || error);
       setStatus(`Recovery needed: ${state.lastError}`, true);
+      primaryButton.hidden = false;
       primaryButton.disabled = false;
+      primaryButton.removeAttribute('aria-hidden');
+      try { primaryButton.inert = false; } catch {}
       primaryButton.textContent = platform === 'android' ? 'RETRY JOIN TABLE' : 'RETRY VR LOBBY';
       publish('error');
       return false;
@@ -227,18 +244,22 @@ function install() {
   ensureUi();
   window.SVR_PHASE372_PRIMARY_ACTION = primaryAction;
   window.SVR_PHASE372_SYNC_ANDROID_ENTRY = syncAndroidEntry;
-  window.SVR_PHASE372_QA = () => ({
-    ...publish('qa'),
-    entryCount: document.querySelectorAll('#svr372Entry').length,
-    primaryVisible: Boolean(primaryButton && !root.hidden),
-    primaryText: primaryButton?.textContent?.trim() || null,
-    tableVisible: Boolean(locateTable()?.visible),
-    pass: document.querySelectorAll('#svr372Entry').length === 1 && !state.lastError
-  });
+  window.SVR_PHASE372_QA = () => {
+    const visible = Boolean(primaryButton && !root.hidden && !primaryButton.hidden && !primaryButton.disabled && !primaryButton.inert && primaryButton.offsetParent);
+    return {
+      ...publish('qa'),
+      entryCount: document.querySelectorAll('#svr372Entry').length,
+      primaryVisible: visible,
+      primaryText: primaryButton?.textContent?.trim() || null,
+      tableVisible: Boolean(locateTable()?.visible),
+      pass: document.querySelectorAll('#svr372Entry').length === 1 && !state.lastError
+    };
+  };
   window.addEventListener('svr:phase363-immediate-join-state', (event) => {
     const joined = Boolean(event.detail?.joined);
     if (joined) {
       root.hidden = true;
+      root.setAttribute('aria-hidden', 'true');
       publish(event.detail?.reason || 'android-joined-event');
     } else if (platform === 'android') {
       resetPrimaryForLobby(event.detail?.reason || 'android-lobby-event');
