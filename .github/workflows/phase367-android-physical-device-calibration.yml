@@ -1,0 +1,75 @@
+name: Phase 367 Android Physical Device Calibration Check
+
+on:
+  pull_request:
+    paths:
+      - 'game/android.html'
+      - 'game/manifest.json'
+      - 'game/android-release.json'
+      - 'game/modules/phase340_platform_manifest.js'
+      - 'game/modules/phase367_android_physical_device_viewport_acceptance_lock.js'
+      - 'game/tools/phase367-android-device-static-test.mjs'
+      - 'game/tools/phase367-android-device-browser-acceptance.cjs'
+      - '.github/workflows/phase367-android-physical-device-calibration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase367-android-device:
+    runs-on: ubuntu-latest
+    timeout-minutes: 48
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate Phase 367 and protected contracts
+        run: |
+          node --check game/modules/phase367_android_physical_device_viewport_acceptance_lock.js
+          node --check game/modules/phase340_platform_manifest.js
+          node --check game/tools/phase367-android-device-browser-acceptance.cjs
+          node game/tools/phase367-android-device-static-test.mjs
+          node game/tools/phase365-android-seated-ux-branding-static-test.mjs
+          node game/tools/phase347-android-static-test.mjs
+          node game/tools/phase364-device-xr-geometry-static-test.mjs
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Start local SVR site
+        run: |
+          python3 -m http.server 4173 > /tmp/svr-phase367-http.log 2>&1 &
+          echo $! > /tmp/svr-phase367-http.pid
+          sleep 2
+
+      - name: Verify physical viewport, safe-area and touch acceptance
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase367-android-device-browser-acceptance.cjs
+
+      - name: Re-run Phase 365 seated UX acceptance
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase365-android-seated-ux-branding-browser-acceptance.cjs
+
+      - name: Re-run complete Android Hold'em game
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase363-android-integrated-core-browser-acceptance.cjs
+
+      - name: Upload HTTP log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase367-http-log
+          path: /tmp/svr-phase367-http.log
