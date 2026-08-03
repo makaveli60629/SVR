@@ -92,8 +92,8 @@ assert(release.apkVersionName === '0.1.0-rc1' && release.apkVersionCode === 1, '
 assert(release.forceUpdate === false && release.showUpdatePrompt === false && release.manualUpdateOnly === true, 'APK prompt policy changed');
 
 assert(profile.includes('profileShowroomCanvas'), 'Profile live avatar camera was removed');
-assert(profile.includes('../game/avatar.html'), 'Profile no longer connects to the avatar route');
-assert(dressingRoom.includes('PHASE-353-VR-AVATAR-DRESSING-ROOM-LIVE-PEDESTAL-LOCK'), 'VR dressing room was removed');
+assert(profile.includes('avatar.html?v=') || profile.includes('../game/avatar-vr.html?v='), 'Profile no longer connects to an avatar dressing-room route');
+assert(dressingRoom.includes('PHASE-353-VR-AVATAR-DRESSING-ROOM-LIVE-PEDESTAL-LOCK'), 'VR dressing room authority was removed');
 assert(dressingRoom.includes('togglePedestal'), 'Moving avatar pedestal was removed');
 
 console.log(JSON.stringify({
