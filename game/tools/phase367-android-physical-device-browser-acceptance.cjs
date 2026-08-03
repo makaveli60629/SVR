@@ -5,15 +5,33 @@ const { chromium } = require('playwright');
 const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
 const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phase367`;
 
-async function tapTouch(page, selector) {
-  const locator = page.locator(selector);
-  const box = await locator.boundingBox();
-  if (!box) throw new Error(`No touch target box for ${selector}`);
-  await locator.tap({
-    force: true,
-    timeout: 10000,
-    position: { x: box.width / 2, y: box.height / 2 }
-  });
+async function touchGesture(page, selector, dx = 14, dy = 0, pointerId = 1) {
+  const result = await page.evaluate(({ selector, dx, dy, pointerId }) => {
+    const target = document.querySelector(selector);
+    if (!target) return { pass: false, reason: 'target-missing' };
+    const rect = target.getBoundingClientRect();
+    if (rect.width <= 1 || rect.height <= 1) return { pass: false, reason: 'target-no-layout', rect: rect.toJSON?.() || null };
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const common = {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      pointerType: 'touch',
+      pointerId,
+      isPrimary: true,
+      width: 12,
+      height: 12,
+      pressure: 0.7,
+      buttons: 1
+    };
+    target.dispatchEvent(new PointerEvent('pointerdown', { ...common, clientX: x, clientY: y }));
+    target.dispatchEvent(new PointerEvent('pointermove', { ...common, clientX: x + dx, clientY: y + dy }));
+    target.dispatchEvent(new PointerEvent('pointerup', { ...common, clientX: x + dx, clientY: y + dy, pressure: 0, buttons: 0 }));
+    return { pass: true, rect: rect.toJSON?.() || null };
+  }, { selector, dx, dy, pointerId });
+  if (!result?.pass) throw new Error(`Touch gesture failed for ${selector}: ${JSON.stringify(result)}`);
+  return result;
 }
 
 async function waitForPhase365Ready(page, timeout = 45000) {
@@ -90,12 +108,12 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     const entry = document.getElementById('svr372Entry');
     if (!entry) return;
     entry.dataset.phase367ControllerIsolation = '1';
-    entry.style.display = 'none';
+    entry.style.setProperty('display', 'none', 'important');
   });
   await page.waitForTimeout(120);
 
-  await tapTouch(page, '#svr347Move');
-  await tapTouch(page, '#svr347Look');
+  const moveGesture = await touchGesture(page, '#svr347Move', 18, 0, 3671);
+  const lookGesture = await touchGesture(page, '#svr347Look', -18, 0, 3672);
   await page.waitForFunction(() => {
     const state = window.SVR_PHASE367_DEVICE_QA?.();
     return Number(state?.moveTouches || 0) >= 1
@@ -150,9 +168,12 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     panel?.dispatchEvent(new PointerEvent('pointerdown', {
       bubbles: true,
       cancelable: true,
+      composed: true,
       pointerType: 'touch',
-      pointerId: 367,
-      isPrimary: true
+      pointerId: 3673,
+      isPrimary: true,
+      pressure: 0.7,
+      buttons: 1
     }));
   });
   await page.waitForFunction(() => Number(window.SVR_PHASE367_DEVICE_QA?.().actionTouches || 0) >= 1, null, { timeout: 10000 });
@@ -227,6 +248,7 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     [baseline.phase372EntryVisible === true && baseline.legacySeatHidden === true, 'legacy-sit-hidden-under-entry'],
     [baseline.device?.controllerRoots === 1 && baseline.device?.moveControls === 1 && baseline.device?.lookControls === 1 && baseline.device?.actionPanels === 1, 'single-existing-controller'],
     [Number(baseline.device?.moveTouches || 0) === 0 && Number(baseline.device?.lookTouches || 0) === 0 && Number(baseline.device?.actionTouches || 0) === 0, 'touch-baseline-clean'],
+    [moveGesture.pass === true && lookGesture.pass === true, 'directional-touch-gestures-dispatched'],
     [Number(lobbyTouchMetrics?.moveTouches || 0) >= 1 && Number(lobbyTouchMetrics?.lookTouches || 0) >= 1, 'physical-lobby-move-look-metrics'],
     [Number(touchMetrics?.moveTouches || 0) >= 1 && Number(touchMetrics?.lookTouches || 0) >= 1 && Number(touchMetrics?.actionTouches || 0) >= 1, 'physical-touch-metrics'],
     [portrait.css.width.endsWith('px') && portrait.css.height.endsWith('px'), 'portrait-viewport-css'],
@@ -254,6 +276,8 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     build: 'PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK',
     successor: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
     baseline,
+    moveGesture,
+    lookGesture,
     lobbyTouchMetrics,
     touchMetrics,
     portrait,
