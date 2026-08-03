@@ -60,9 +60,9 @@ if (platformVersion < 350) errors.push('platform-version-regressed');
 for (const [token, label] of [
   ['phase350_android_controller_dom_deduplication_lock.js', 'android-dedupe-manifest'],
   ['phase350_camera3_visibility_lighting_lock.js', 'camera3-lighting-manifest'],
-  ['phase365-android-seated-ux-not-last', 'android-successor-final-validator'],
+  ['phase367-android-device-acceptance-not-last', 'android-successor-final-validator'],
   ['phase350-camera3-light-not-last', 'camera3-lighting-final-validator'],
-  ['phase365-android-critical-load-order', 'android-load-order-label'],
+  ['phase367-android-critical-load-order', 'android-load-order-label'],
   ['phase350-camera3-load-order', 'camera3-load-order-label'],
   ['deferredManifestFor', 'android-deferred-export'],
   ['const ANDROID_DEFERRED = []', 'phase356-zero-background-work']
@@ -71,7 +71,8 @@ for (const [token, label] of [
 const androidFinal = platform.split('const ANDROID_FINAL = [')[1]?.split('];')[0] || '';
 const dedupeIndex = androidFinal.indexOf('phase350_android_controller_dom_deduplication_lock.js');
 const phase365Index = androidFinal.indexOf('phase365_android_seated_ux_branding_gyro_alignment_lock.js');
-if (dedupeIndex < 0 || phase365Index <= dedupeIndex) errors.push('android-dedupe-successor-order');
+const phase367Index = androidFinal.indexOf('phase367_android_physical_device_viewport_acceptance_lock.js');
+if (dedupeIndex < 0 || phase365Index <= dedupeIndex || phase367Index <= phase365Index) errors.push('android-dedupe-successor-order');
 const camera3Array = platform.split('const CAMERA3 = [')[1]?.split('];')[0] || '';
 if (!camera3Array.trim().endsWith("'modules/phase350_camera3_visibility_lighting_lock.js'")) errors.push('camera3-lighting-not-final-in-array');
 
@@ -106,7 +107,7 @@ console.log(JSON.stringify({
   protectedAndroidAuthority,
   profileAvatar: phase366Loaded ? 'phase366-live-camera-over-phase351-showroom' : Number(manifest.phase || 0) >= 356 ? 'phase356-live-legend-pedestal-over-phase351-showroom' : showroomLoaded ? 'phase351-showroom-successor' : 'phase350-recovery',
   camera3: 'dedicated-lighting-final-authority',
-  androidController: 'phase350-physical-dom-deduplication-before-phase365-controller-repair',
+  androidController: 'phase350-physical-dom-deduplication-before-phase365-and-phase367-successors',
   roadmap: 'ordered-major-milestones',
   apkLocked: true
 }, null, 2));
