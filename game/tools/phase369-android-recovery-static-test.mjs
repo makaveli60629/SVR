@@ -10,22 +10,28 @@ const forbid = (source, token, label = token) => { if (source.includes(token)) e
 const android = read('game/android.html');
 const runtime = read('game/modules/phase369_android_join_table_freeze_recovery_lock.js');
 const readiness = read('game/modules/phase369_android_join_readiness_transaction_lock.js');
+const intent = read('game/modules/phase369_android_join_intent_bridge_lock.js');
 const dealer = read('game/modules/phase368_card_dealer_animation_lock.js');
 const release = JSON.parse(read('game/phase369-release.json'));
 
 need(android, 'data-build="PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK"', 'phase367-certification-marker');
 need(android, 'data-release="PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK"', 'phase369-release-marker');
 need(android, 'window.SVR_REQUIRE_TABLE_JOIN=true', 'join-required');
+need(android, 'window.SVR_PHASE369_PENDING_JOIN=false', 'pending-join-initializer');
+need(android, 'event.stopImmediatePropagation();window.SVR_PHASE369_PENDING_JOIN=true', 'early-intent-capture');
+need(android, '#svr369Join:not([data-svr369-readiness-bound])', 'unbound-button-guard');
 need(android, "phase367_android_physical_device_viewport_touch_acceptance_lock.js?v=phase367", 'phase367-base-load');
 need(android, "phase369_android_join_table_freeze_recovery_lock.js?v=phase369", 'phase369-base-load');
 need(android, "phase369_android_join_readiness_transaction_lock.js?v=phase369", 'phase369-readiness-load');
+need(android, "phase369_android_join_intent_bridge_lock.js?v=phase369", 'phase369-intent-load');
 need(android, 'const loadDealerLater=', 'dealer-deferred');
 need(android, "requestIdleCallback(run,{timeout:5000})", 'idle-dealer-load');
 need(android, "logoUrl:'/logo.png'", 'android-logo');
 const phase367Index = android.indexOf('phase367_android_physical_device_viewport_touch_acceptance_lock.js');
 const phase369Index = android.indexOf('phase369_android_join_table_freeze_recovery_lock.js');
 const readinessIndex = android.indexOf('phase369_android_join_readiness_transaction_lock.js');
-if (!(phase367Index >= 0 && phase369Index > phase367Index && readinessIndex > phase369Index)) errors.push('order:phase369-readiness-after-base');
+const intentIndex = android.indexOf('phase369_android_join_intent_bridge_lock.js');
+if (!(phase367Index >= 0 && phase369Index > phase367Index && readinessIndex > phase369Index && intentIndex > readinessIndex)) errors.push('order:phase369-intent-after-readiness');
 
 need(runtime, "export const BUILD = 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK'", 'runtime-build');
 need(runtime, '>JOIN TABLE<', 'single-entry-join-label');
@@ -55,6 +61,15 @@ need(readiness, 'window.SVR_PHASE369_JOIN_READINESS_QA', 'readiness-qa');
 forbid(readiness, 'new THREE.', 'readiness-no-renderer');
 forbid(readiness, 'setInterval(', 'readiness-no-polling-interval');
 
+need(intent, "PHASE-369-ANDROID-JOIN-INTENT-BRIDGE-LOCK", 'intent-build');
+need(intent, 'window.SVR_PHASE369_PENDING_JOIN', 'intent-state');
+need(intent, 'replayPendingJoin', 'intent-replay');
+need(intent, 'queueMicrotask', 'install-replay');
+need(intent, 'window.SVR_PHASE369_JOIN_INTENT_QA', 'intent-qa');
+need(intent, 'document.querySelectorAll(\'#svr369Join[data-svr369-readiness-bound]\').length === 1', 'intent-bound-proof');
+forbid(intent, 'setInterval(', 'intent-no-polling');
+forbid(intent, 'new THREE.', 'intent-no-renderer');
+
 need(dealer, "dealer.position.set(info.center.x, 0, info.box.min.z - DEALER_GAP)", 'dealer-across-table');
 need(dealer, 'dealer.rotation.set(0, Math.PI, 0)', 'dealer-faces-table');
 need(dealer, 'optimizedFromUploadedFbx: true', 'uploaded-fbx-motion');
@@ -71,6 +86,7 @@ if (release.truth?.physicalAndroidAcceptancePassed !== false) errors.push('relea
 const result = {
   build: 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK',
   readinessBuild: 'PHASE-369-ANDROID-JOIN-READINESS-TRANSACTION-LOCK',
+  intentBuild: 'PHASE-369-ANDROID-JOIN-INTENT-BRIDGE-LOCK',
   errors,
   pass: errors.length === 0
 };
