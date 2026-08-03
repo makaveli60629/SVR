@@ -5,7 +5,8 @@
     'phase104-alignment-polish.css?v=alignment-polish',
     'store-alignment-fix.css?v=store-align-hero-fix',
     'site-android-readiness.css?v=android-store-banner-lock',
-    'vibez.css?v=vibez-four-ad-intro'
+    'vibez.css?v=vibez-four-ad-intro',
+    'phase369-apk-banner-telemetry.css?v=phase369'
   ];
 
   layers.forEach((href) => {
@@ -16,6 +17,15 @@
       document.head.appendChild(link);
     }
   });
+
+  function loadPhase369(){
+    if (document.querySelector('script[data-svr-phase369-apk-banner]')) return;
+    const script = document.createElement('script');
+    script.src = 'js/phase369-apk-banner-telemetry.js?v=phase369';
+    script.defer = true;
+    script.dataset.svrPhase369ApkBanner = '1';
+    document.head.appendChild(script);
+  }
 
   function wireVibezCampaign(){
     const navLinks = document.querySelector('.market-links');
@@ -193,6 +203,7 @@
 
   function boot(){
     document.documentElement.classList.toggle('is-android', /Android/i.test(navigator.userAgent || ''));
+    loadPhase369();
     wireVibezCampaign();
     wireBodyFloatingMenu();
     wireBannerSliders();
