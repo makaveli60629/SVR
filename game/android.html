@@ -42,6 +42,7 @@ const start=async()=>{if(started)return;started=true;try{
   await import('./modules/phase365_phase364_reference_line_compat_lock.js?v=phase367');
   await import('./modules/phase367_android_physical_device_viewport_touch_acceptance_lock.js?v=phase367');
   await import('./modules/phase369_android_join_table_freeze_recovery_lock.js?v=phase369');
+  await import('./modules/phase369_android_join_readiness_transaction_lock.js?v=phase369');
   window.SVR_PHASE363_LEAVE_TABLE?.('phase369-boot-lobby');
   window.SVR_PHASE365_SYNC?.();
   window.SVR_PHASE365_REFRESH_CARD_BRAND?.();
