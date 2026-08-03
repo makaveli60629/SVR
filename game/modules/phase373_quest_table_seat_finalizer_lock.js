@@ -17,6 +17,9 @@ const state = {
   tableGroundCorrections: 0,
   tableHorizontalCorrections: 0,
   seatedHorizontalCorrections: 0,
+  stableLobbyFinalizations: 0,
+  stableSeatFinalizations: 0,
+  coreReadyFinalizations: 0,
   largestSeatDrift: 0,
   currentSeatDrift: 0,
   tableMinY: null,
@@ -32,6 +35,8 @@ let camera = null;
 let renderer = null;
 let frameHandle = 0;
 let tableTimer = 0;
+let originalStableLobby = null;
+let originalStableSeat = null;
 const tmp = new THREE.Vector3();
 const tmpQ = new THREE.Quaternion();
 const tmpScale = new THREE.Vector3();
@@ -91,7 +96,6 @@ function groundAndCenterTable(reason = 'table-finalizer') {
   let value = bounds(authority);
   if (value.box.isEmpty()) return false;
   const dx = TABLE_CENTER_X - value.center.x;
-  const dy = -value.box.min.y;
   const dz = TABLE_CENTER_Z - value.center.z;
   if (Math.abs(dx) > 0.015 || Math.abs(dz) > 0.015) {
     worldDelta(authority, new THREE.Vector3(dx, 0, dz));
@@ -121,7 +125,16 @@ function groundAndCenterTable(reason = 'table-finalizer') {
   state.tableCenterX = +value.center.x.toFixed(4);
   state.tableCenterZ = +value.center.z.toFixed(4);
   state.lastTableReason = reason;
-  return Math.abs(value.box.min.y) <= 0.02;
+  window.SVR_PHASE373_FINALIZER_STATE = { ...state };
+  return Math.abs(value.box.min.y) <= 0.02
+    && Math.abs(value.center.x - TABLE_CENTER_X) <= 0.03
+    && Math.abs(value.center.z - TABLE_CENTER_Z) <= 0.03;
+}
+
+function scheduleTableFinalization(reason, delays = [0, 80, 220, 500, 1000]) {
+  for (const delay of delays) {
+    window.setTimeout(() => groundAndCenterTable(`${reason}:${delay}`), delay);
+  }
 }
 
 function desiredSeat() {
@@ -162,7 +175,38 @@ function correctSeatedDrift() {
   state.seatedHorizontalCorrections += 1;
   head.getWorldPosition(tmp);
   state.currentSeatDrift = +Math.hypot(target.x - tmp.x, target.z - tmp.z).toFixed(4);
+  window.SVR_PHASE373_FINALIZER_STATE = { ...state };
   return state.currentSeatDrift <= 0.03;
+}
+
+function scheduleSeatFinalization(reason) {
+  for (const delay of [0, 80, 200, 450, 900]) {
+    window.setTimeout(() => {
+      groundAndCenterTable(`${reason}:table:${delay}`);
+      correctSeatedDrift();
+    }, delay);
+  }
+}
+
+function wrapPublicPlacementApis() {
+  if (!originalStableLobby && typeof window.SVR_PHASE373_STABLE_LOBBY === 'function') {
+    originalStableLobby = window.SVR_PHASE373_STABLE_LOBBY;
+    window.SVR_PHASE373_STABLE_LOBBY = (...args) => {
+      const result = originalStableLobby(...args);
+      state.stableLobbyFinalizations += 1;
+      scheduleTableFinalization('stable-lobby');
+      return result;
+    };
+  }
+  if (!originalStableSeat && typeof window.SVR_PHASE373_STABLE_SEAT === 'function') {
+    originalStableSeat = window.SVR_PHASE373_STABLE_SEAT;
+    window.SVR_PHASE373_STABLE_SEAT = (...args) => {
+      const result = originalStableSeat(...args);
+      state.stableSeatFinalizations += 1;
+      scheduleSeatFinalization('stable-seat');
+      return result;
+    };
+  }
 }
 
 function qa() {
@@ -183,6 +227,8 @@ function qa() {
     tableCenterX: value ? +value.center.x.toFixed(4) : null,
     tableCenterZ: value ? +value.center.z.toFixed(4) : null,
     seatDrift: +seatDrift.toFixed(4),
+    publicLobbyWrapped: Boolean(originalStableLobby),
+    publicSeatWrapped: Boolean(originalStableSeat),
     pass: Boolean(
       ACTIVE
       && state.installed
@@ -192,6 +238,8 @@ function qa() {
       && Math.abs(value.center.x - TABLE_CENTER_X) <= 0.03
       && Math.abs(value.center.z - TABLE_CENTER_Z) <= 0.03
       && (!seated() || seatDrift <= DRIFT_TRIGGER)
+      && Boolean(originalStableLobby)
+      && Boolean(originalStableSeat)
       && !state.lastError
     ),
     checkedAt: new Date().toISOString()
@@ -214,7 +262,10 @@ async function install() {
     scene = window.__SVR_SCENE__ || scene;
     camera = window.__SVR_CAMERA__ || camera;
     renderer = window.__SVR_RENDERER__ || renderer;
-    if (scene && camera && renderer && rig()?.isObject3D && table()?.isObject3D && typeof window.SVR_PHASE373_QA === 'function') break;
+    if (scene && camera && renderer && rig()?.isObject3D && table()?.isObject3D
+      && typeof window.SVR_PHASE373_QA === 'function'
+      && typeof window.SVR_PHASE373_STABLE_LOBBY === 'function'
+      && typeof window.SVR_PHASE373_STABLE_SEAT === 'function') break;
     await wait(100);
   }
   if (!scene || !camera || !renderer || !rig()?.isObject3D || !table()?.isObject3D) {
@@ -227,14 +278,19 @@ async function install() {
   window.SVR_PHASE373_FINALIZE_TABLE = groundAndCenterTable;
   window.SVR_PHASE373_FINALIZE_SEAT = correctSeatedDrift;
   window.SVR_PHASE373_FINALIZER_QA = qa;
-  for (const delay of [0, 120, 360, 900, 1800]) {
-    window.setTimeout(() => groundAndCenterTable(`startup:${delay}`), delay);
-  }
-  window.addEventListener('svr:phase361-table-joined', () => {
-    for (const delay of [0, 120, 300, 700, 1200]) window.setTimeout(correctSeatedDrift, delay);
+  wrapPublicPlacementApis();
+  scheduleTableFinalization('startup', [0, 120, 360, 900, 1800]);
+  window.addEventListener('svr:phase373-core-ready', () => {
+    state.coreReadyFinalizations += 1;
+    scheduleTableFinalization('core-ready');
   });
-  window.addEventListener('svr:phase361-table-left', () => groundAndCenterTable('leave-table'));
-  tableTimer = window.setInterval(() => groundAndCenterTable('interval'), 1600);
+  window.addEventListener('svr:phase373-postflight-ready', () => scheduleTableFinalization('postflight-ready'));
+  window.addEventListener('svr:phase361-table-joined', () => scheduleSeatFinalization('phase361-table-joined'));
+  window.addEventListener('svr:phase361-table-left', () => scheduleTableFinalization('phase361-table-left'));
+  tableTimer = window.setInterval(() => {
+    wrapPublicPlacementApis();
+    groundAndCenterTable('interval');
+  }, 1000);
   frameHandle = requestAnimationFrame(frame);
   groundAndCenterTable('install');
   correctSeatedDrift();
