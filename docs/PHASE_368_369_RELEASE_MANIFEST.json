@@ -1,0 +1,61 @@
+{
+  "build": "PHASE-368-369-ANDROID-UX-APP-DISTRIBUTION-FOUNDATION",
+  "createdAt": "2026-08-03",
+  "protectedCertifiedBaseline": "PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK",
+  "android": {
+    "additiveAuthorities": [
+      "PHASE-368-ANDROID-JOIN-CARD-GYRO-UX-LOCK",
+      "PHASE-368-ANDROID-SPECTATOR-TOURNAMENT-VOICE-LOCK"
+    ],
+    "singleJoinLeaveControl": true,
+    "legacySitSeatControlsSuppressed": true,
+    "sticksVisibleInLobby": true,
+    "sticksHiddenWhileSeated": true,
+    "gyroSeatedLookPreserved": true,
+    "rankTenPresentation": "10",
+    "realisticCardCorners": true,
+    "spectatorBotCardsOutsideTableOnly": true,
+    "continuousLocalTournament": true,
+    "championCrown": true,
+    "startingStack": 15000,
+    "serverAuthoritativeMultiplayer": false
+  },
+  "profile": {
+    "preserveImportedTextureMaps": true,
+    "generatedSquareClothingDisabledOnProfile": true,
+    "bareAvatarDefault": true,
+    "phase366LiveCameraPreserved": true
+  },
+  "site": {
+    "publicMatrixLaunchPageTouched": false,
+    "interiorHomepageBannerFit": "contain",
+    "firstBanner": "Android App Release Center",
+    "manualUpdateCheck": true,
+    "downloadActivatesOnlyWhenSignedReleaseReady": true,
+    "adminAnalyticsRoute": "/site/admin-app-analytics.html"
+  },
+  "appDistribution": {
+    "installationId": "random-analytics-id-not-an-integrity-secret",
+    "playIntegrityContract": true,
+    "requestHashContract": true,
+    "rawIpInBrowser": false,
+    "longTermIpStorage": "keyed-hash-plus-coarse-region",
+    "awsProvisioned": false
+  },
+  "payouts": {
+    "preferences": ["none", "cash_app", "ach_pending"],
+    "bankAccountNumbersCollected": false,
+    "automatedPayoutsEnabled": false,
+    "prizeClaimsDefault": "pending_compliance",
+    "cashPrizeSystemLive": false
+  },
+  "apk": {
+    "versionName": "0.1.0-rc1",
+    "versionCode": 1,
+    "signedDownloadUrlPresent": false,
+    "releaseReady": false,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true
+  }
+}
