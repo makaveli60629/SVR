@@ -10,6 +10,8 @@ const state = {
   installed: false,
   joined: false,
   tableReady: false,
+  tableAligned: false,
+  tableScans: 0,
   dealerReady: false,
   controls: 0,
   duplicateControlsHidden: 0,
@@ -22,6 +24,7 @@ const state = {
   longFrameGaps: 0,
   lastFrameGapMs: 0,
   lastJoinAt: null,
+  lastLowPowerAt: 0,
   lastError: null,
   checkedAt: null
 };
@@ -33,12 +36,16 @@ const LEGACY_ROOTS = [
 
 let overlay = null;
 let brand = null;
+let tableRef = null;
+let tableAligned = false;
 let frameAt = performance.now();
 let nextHandTimer = 0;
 let repairTimer = 0;
+let observer = null;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const joinedNow = () => Boolean(window.SVR_PHASE363_JOINED_IMMEDIATE ?? window.SVR_PHASE363_STATE?.joined ?? state.joined);
+const authoritativeSeatButton = () => document.querySelector('#svr347Actions [data-ui="seat"]');
 
 function installStyles() {
   if (document.getElementById('svr369-style')) return;
@@ -101,7 +108,8 @@ function status(message, error = false) {
   }
 }
 
-function tableObject() {
+function locateTable() {
+  if (tableRef?.isObject3D) return tableRef;
   const scene = window.__SVR_SCENE__;
   const names = [
     'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED',
@@ -110,6 +118,7 @@ function tableObject() {
     'PHASE200_INTENDED_LOBBY_POKER_TABLE_LOCKED',
     'PHASE326_ANDROID_TABLE_FALLBACK'
   ];
+  state.tableScans += 1;
   let table = window.SVR_TABLE_AUTHORITY;
   if (!table?.isObject3D) {
     for (const name of names) {
@@ -117,22 +126,43 @@ function tableObject() {
       if (table?.isObject3D) break;
     }
   }
-  if (table?.isObject3D) {
-    table.visible = true;
-    window.SVR_TABLE_AUTHORITY = table;
-    state.tableReady = true;
+  if (table?.isObject3D) tableRef = table;
+  return tableRef;
+}
+
+function tableObject({ align = false } = {}) {
+  const table = locateTable();
+  if (!table?.isObject3D) {
+    state.tableReady = false;
+    return null;
+  }
+  table.visible = true;
+  window.SVR_TABLE_AUTHORITY = table;
+  state.tableReady = true;
+  if (align && !tableAligned) {
     window.SVR_PHASE364_ALIGN_TABLE?.();
     window.SVR_PHASE340_GOVERN?.();
-    return table;
+    tableAligned = true;
+    state.tableAligned = true;
   }
-  state.tableReady = false;
-  return null;
+  return table;
+}
+
+function protectSeatAuthority() {
+  const seat = authoritativeSeatButton();
+  if (!seat) return null;
+  seat.hidden = false;
+  seat.removeAttribute('aria-hidden');
+  try { seat.inert = false; } catch {}
+  return seat;
 }
 
 function hideDuplicates() {
+  const seatAuthority = protectSeatAuthority();
   let hidden = 0;
   document.querySelectorAll(LEGACY_ROOTS).forEach((element) => {
     if (element.closest?.('#svr347Root')) return;
+    if (element.hidden && element.getAttribute('aria-hidden') === 'true') return;
     element.hidden = true;
     element.setAttribute('aria-hidden', 'true');
     try { element.inert = true; } catch {}
@@ -140,17 +170,19 @@ function hideDuplicates() {
   });
   let seatHidden = 0;
   document.querySelectorAll('button').forEach((button) => {
+    if (button === seatAuthority || button.matches?.('#svr347Actions [data-ui="seat"]')) return;
     if (button.id === 'svr369Join' || button.closest('#runtimeRecovery')) return;
-    if (button.closest('#svr347Actions') && joinedNow()) return;
+    if (button.closest('#svr347Actions')) return;
     const text = String(button.textContent || '').trim().toUpperCase();
     if (!['SIT', 'SEAT', 'SIT DOWN', 'SIT AT TABLE', 'PLAY GAME'].includes(text)) return;
+    if (button.hidden && button.getAttribute('aria-hidden') === 'true') return;
     button.hidden = true;
     button.setAttribute('aria-hidden', 'true');
     try { button.inert = true; } catch {}
     seatHidden += 1;
   });
-  state.duplicateControlsHidden = Math.max(state.duplicateControlsHidden, hidden);
-  state.legacySeatButtonsHidden = Math.max(state.legacySeatButtonsHidden, seatHidden);
+  state.duplicateControlsHidden += hidden;
+  state.legacySeatButtonsHidden += seatHidden;
   state.controls = document.querySelectorAll('#svr347Root').length;
 }
 
@@ -160,6 +192,8 @@ function setJoined(joined, reason = 'state') {
   document.body.classList.toggle('svr369-seated', joined);
   ensureOverlay().hidden = joined;
   ensureBrand();
+  const seat = protectSeatAuthority();
+  if (seat) seat.textContent = joined ? 'LEAVE TABLE' : 'JOIN TABLE';
   if (!joined) {
     clearTimeout(nextHandTimer);
     status('Table ready. Press JOIN TABLE to begin.');
@@ -169,17 +203,22 @@ function setJoined(joined, reason = 'state') {
 }
 
 function applyLowPower(reason = 'manual') {
+  const now = performance.now();
+  if (reason === 'long-frame-gap' && now - state.lastLowPowerAt < 10000) return false;
   const renderer = window.__SVR_RENDERER__;
   try {
+    window.SVR_PHASE340_APPLY_RENDERER_BUDGET?.('android');
     renderer?.setPixelRatio?.(Math.min(0.95, window.devicePixelRatio || 1));
     if (renderer?.shadowMap) renderer.shadowMap.enabled = false;
-    window.SVR_PHASE340_APPLY_RENDERER_BUDGET?.('android');
     document.body.classList.add('svr369-low-power');
     state.lowPowerRecoveries += 1;
+    state.lastLowPowerAt = now;
     status('Low-power rendering enabled. Join the table when ready.');
     window.SVR_PHASE369_ANDROID_STATE = { ...state, lowPowerReason: reason };
+    return true;
   } catch (error) {
     state.lastError = String(error?.message || error);
+    return false;
   }
 }
 
@@ -187,7 +226,7 @@ async function joinTable() {
   if (joinedNow()) return;
   state.joinAttempts += 1;
   status('Joining table and preparing your first hand…');
-  const table = tableObject();
+  const table = tableObject({ align: true });
   if (!table) {
     status('The real table is still loading. Reload the table once.', true);
     return;
@@ -220,8 +259,7 @@ async function joinTable() {
 
 function onPokerState(event) {
   const detail = event?.detail || window.SVR_RUN_PHASE336_POKER_AUDIT?.() || {};
-  if (!joinedNow()) return;
-  if (detail.phase !== 'showdown') return;
+  if (!joinedNow() || detail.phase !== 'showdown') return;
   clearTimeout(nextHandTimer);
   nextHandTimer = window.setTimeout(() => {
     if (!joinedNow()) return;
@@ -257,18 +295,19 @@ async function install() {
 
   window.SVR_PHASE363_LEAVE_TABLE?.('phase369-clean-boot-lobby');
   setJoined(false, 'clean-boot');
-  tableObject();
+  tableObject({ align: true });
   hideDuplicates();
 
-  const observer = new MutationObserver(hideDuplicates);
-  observer.observe(document.body, { subtree: true, childList: true, characterData: true });
+  observer = new MutationObserver(() => hideDuplicates());
+  observer.observe(document.body, { subtree: true, childList: true });
   repairTimer = window.setInterval(() => {
-    tableObject();
-    hideDuplicates();
+    if (!state.tableReady) tableObject({ align: true });
+    else if (tableRef?.isObject3D) tableRef.visible = true;
+    protectSeatAuthority();
     state.dealerReady = Boolean(window.SVR_PHASE368_CARD_DEALER_STATE?.loaded);
     state.checkedAt = new Date().toISOString();
     window.SVR_PHASE369_ANDROID_STATE = { ...state };
-  }, 500);
+  }, 2500);
 
   window.addEventListener('svr:phase363-immediate-join-state', (event) => {
     setJoined(Boolean(event.detail?.joined), event.detail?.reason || 'phase363-event');
@@ -283,17 +322,22 @@ async function install() {
 
   window.SVR_PHASE369_JOIN_TABLE = joinTable;
   window.SVR_PHASE369_LOW_POWER = applyLowPower;
-  window.SVR_PHASE369_ANDROID_QA = () => ({
-    ...state,
-    joined: joinedNow(),
-    tableReady: Boolean(tableObject()),
-    dealerReady: Boolean(window.SVR_PHASE368_CARD_DEALER_STATE?.loaded),
-    controllerRoots: document.querySelectorAll('#svr347Root').length,
-    legacyControllersVisible: [...document.querySelectorAll(LEGACY_ROOTS)].filter((element) => !element.hidden && !element.closest?.('#svr347Root')).length,
-    entryVisible: !ensureOverlay().hidden,
-    pass: Boolean(tableObject() && document.querySelectorAll('#svr347Root').length <= 1 && state.lastError == null),
-    checkedAt: new Date().toISOString()
-  });
+  window.SVR_PHASE369_ANDROID_QA = () => {
+    const table = tableObject({ align: false });
+    return {
+      ...state,
+      joined: joinedNow(),
+      tableReady: Boolean(table),
+      tableAligned,
+      dealerReady: Boolean(window.SVR_PHASE368_CARD_DEALER_STATE?.loaded),
+      controllerRoots: document.querySelectorAll('#svr347Root').length,
+      authoritativeSeatButtons: document.querySelectorAll('#svr347Actions [data-ui="seat"]').length,
+      legacyControllersVisible: [...document.querySelectorAll(LEGACY_ROOTS)].filter((element) => !element.hidden && !element.closest?.('#svr347Root')).length,
+      entryVisible: !ensureOverlay().hidden,
+      pass: Boolean(table && tableAligned && document.querySelectorAll('#svr347Root').length <= 1 && document.querySelectorAll('#svr347Actions [data-ui="seat"]').length === 1 && state.lastError == null),
+      checkedAt: new Date().toISOString()
+    };
+  };
   window.SVR_PHASE369_ANDROID_STATE = { ...state };
 }
 
@@ -305,4 +349,5 @@ install().catch((error) => {
 window.addEventListener('beforeunload', () => {
   clearInterval(repairTimer);
   clearTimeout(nextHandTimer);
+  observer?.disconnect?.();
 }, { once: true });
