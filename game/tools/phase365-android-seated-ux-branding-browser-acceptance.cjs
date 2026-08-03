@@ -69,8 +69,9 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
   });
   await page.waitForTimeout(650);
 
-  await page.evaluate(() => window.SVR_PHASE365_SYNC?.());
-  await page.waitForTimeout(450);
+  await page.evaluate(() => window.SVR_PHASE365_REFRESH_CARD_BRAND?.());
+  await page.waitForFunction(() => window.SVR_PHASE365_CARD_BRAND_QA?.().pass === true, null, { timeout: 12000 });
+  await page.waitForTimeout(180);
 
   const seated = await page.evaluate(() => {
     const scene = window.__SVR_SCENE__;
@@ -92,6 +93,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
       navVisible,
       nameTags: tags,
       brandText: brand?.textContent?.trim() || '',
+      cardBrand: window.SVR_PHASE365_CARD_BRAND_QA?.() || null,
       pot: pot ? {
         name: pot.name,
         opacity: pot.material?.opacity,
@@ -143,6 +145,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase365&acceptance=phas
     [Number(seated.pot?.opacity || 0) > 0 && seated.pot?.depthWrite === false, 'transparent-pot-material'],
     [seated.nameTags === 5, 'five-avatar-name-tags'],
     [seated.brandText.includes('SVR POKER'), 'svr-brand-visible'],
+    [seated.cardBrand?.pass === true && seated.cardBrand?.brandedCards >= 3, 'card-backs-branded'],
     [replacementBrand.includes('QA TOURNAMENT'), 'brand-replaceable'],
     [seated.gyroEvents >= 1, 'gyro-event-consumed'],
     [seated.qa?.pass === true, 'runtime-qa'],
