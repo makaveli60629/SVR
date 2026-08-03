@@ -144,3 +144,5 @@ window.SVR_PHASE369_PAYOUT_PROFILE_QA = () => {
 };
 
 window.dispatchEvent(new CustomEvent('svr:phase369-payout-profile-ready', { detail: { build: BUILD } }));
+
+export { account };
