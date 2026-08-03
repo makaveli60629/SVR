@@ -9,6 +9,7 @@ on:
       - 'game/modules/phase340_platform_manifest.js'
       - 'game/modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js'
       - 'game/tools/phase365-android-seated-ux-branding-static-test.mjs'
+      - 'game/tools/phase365-android-seated-ux-branding-browser-acceptance.cjs'
       - 'site/profile.html'
       - 'site/avatar.html'
       - 'game/avatar-vr.html'
@@ -19,9 +20,9 @@ permissions:
   contents: read
 
 jobs:
-  phase365-static:
+  phase365-android-release:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 42
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,23 +30,50 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
 
-      - name: Validate Phase 365 module syntax
-        run: node --check game/modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js
-
-      - name: Validate platform manifest syntax
-        run: node --check game/modules/phase340_platform_manifest.js
-
-      - name: Run Phase 365 static acceptance
-        run: node game/tools/phase365-android-seated-ux-branding-static-test.mjs
-
-      - name: Validate release JSON
+      - name: Validate Phase 365 contracts
         run: |
-          node -e "JSON.parse(require('fs').readFileSync('game/manifest.json','utf8')); JSON.parse(require('fs').readFileSync('game/android-release.json','utf8'));"
+          node --check game/modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js
+          node --check game/modules/phase340_platform_manifest.js
+          node --check game/tools/phase365-android-seated-ux-branding-browser-acceptance.cjs
+          node game/tools/phase365-android-seated-ux-branding-static-test.mjs
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
 
-      - name: Preserve Phase 364 device geometry contract
-        run: node game/tools/phase364-device-xr-geometry-static-test.mjs
+      - name: Preserve protected static contracts
+        run: |
+          node game/tools/phase364-device-xr-geometry-static-test.mjs
+          node game/tools/phase363-android-integrated-core-static-test.mjs
+          node game/tools/phase357-android-table-status-showdown-ante-static-test.mjs
+          node game/tools/phase347-android-static-test.mjs
+          node game/tools/phase351-profile-showroom-static-test.mjs
+          node game/tools/phase353-vr-avatar-static-test.mjs
 
-      - name: Preserve Phase 363 Android integrated contract
-        run: node game/tools/phase363-android-integrated-core-static-test.mjs
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Start local SVR site
+        run: |
+          python3 -m http.server 4173 > /tmp/svr-phase365-http.log 2>&1 &
+          echo $! > /tmp/svr-phase365-http.pid
+          sleep 2
+
+      - name: Verify Android controller, JOIN cleanup, gyro, alignment, avatars and branding
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase365-android-seated-ux-branding-browser-acceptance.cjs
+
+      - name: Re-run complete Android Hold'em game
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase363-android-integrated-core-browser-acceptance.cjs
+
+      - name: Upload HTTP log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase365-http-log
+          path: /tmp/svr-phase365-http.log
