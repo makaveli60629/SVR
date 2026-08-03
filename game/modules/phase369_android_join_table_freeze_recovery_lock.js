@@ -36,7 +36,6 @@ let brand = null;
 let frameAt = performance.now();
 let nextHandTimer = 0;
 let repairTimer = 0;
-let joinedAt = 0;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const joinedNow = () => Boolean(window.SVR_PHASE363_JOINED_IMMEDIATE ?? window.SVR_PHASE363_STATE?.joined ?? state.joined);
@@ -196,7 +195,6 @@ async function joinTable() {
   try {
     const result = window.SVR_PHASE363_JOIN_TABLE?.('phase369-logo-entry');
     if (result === false) throw new Error('JOIN_REJECTED');
-    joinedAt = performance.now();
     setJoined(true, 'join-button');
     await wait(120);
     window.SVR_PHASE364_ANDROID_SEAT?.();
@@ -273,9 +271,7 @@ async function install() {
   }, 500);
 
   window.addEventListener('svr:phase363-immediate-join-state', (event) => {
-    const joined = Boolean(event.detail?.joined);
-    setJoined(joined, event.detail?.reason || 'phase363-event');
-    if (!joined && performance.now() - joinedAt > 900) window.SVR_PHASE363_LEAVE_TABLE?.('phase369-state-sync');
+    setJoined(Boolean(event.detail?.joined), event.detail?.reason || 'phase363-event');
   });
   window.addEventListener('svr:poker-state', onPokerState);
   window.addEventListener('svr:phase368-card-dealer-ready', () => {
