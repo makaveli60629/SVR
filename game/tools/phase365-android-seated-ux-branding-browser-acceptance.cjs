@@ -30,20 +30,26 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
   await page.waitForFunction(() => Boolean(window.__SVR_CAMERA__ && window.SVR_TABLE_AUTHORITY), null, { timeout: 120000 });
 
   const entrySyncResult = await page.evaluate(() => window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase365-browser-preflight'));
-  await page.waitForFunction(() => (
-    window.SVR_PHASE363_STATE?.joined === false
-    && Boolean(document.getElementById('svr372Primary')?.offsetParent)
-    && window.SVR_PHASE372_QA?.().pass === true
-  ), null, { timeout: 15000 });
+  await page.waitForFunction(() => {
+    const button = document.getElementById('svr372Primary');
+    return !Boolean(window.SVR_PHASE363_STATE?.joined)
+      && !Boolean(window.SVR_PHASE363_JOINED_IMMEDIATE)
+      && Boolean(button?.offsetParent)
+      && button.disabled === false
+      && /JOIN TABLE/i.test(button.textContent || '')
+      && window.SVR_PHASE372_QA?.().pass === true;
+  }, null, { timeout: 15000 });
 
   const entryBeforeTest = await page.evaluate(() => {
     const qa = window.SVR_PHASE372_QA?.() || null;
     const entry = document.getElementById('svr372Entry');
-    const visible = Boolean(document.getElementById('svr372Primary')?.offsetParent);
+    const button = document.getElementById('svr372Primary');
+    const visible = Boolean(button?.offsetParent);
+    const enabled = Boolean(button && !button.disabled && /JOIN TABLE/i.test(button.textContent || ''));
     if (entry) entry.hidden = true;
-    return { qa, visible };
+    return { qa, visible, enabled };
   });
-  if (!entryBeforeTest.visible || entryBeforeTest.qa?.pass !== true) throw new Error('Phase 372 visible JOIN entry was not ready after the authoritative synchronizer ran.');
+  if (!entryBeforeTest.visible || !entryBeforeTest.enabled || entryBeforeTest.qa?.pass !== true) throw new Error('Phase 372 visible JOIN entry was not ready after the authoritative synchronizer ran.');
   await page.waitForTimeout(120);
 
   const lobbyBefore = await page.evaluate(() => ({
@@ -160,7 +166,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
 
   const checks = [
     [entrySyncResult !== false, 'phase372-entry-sync-accepted'],
-    [entryBeforeTest.visible && entryBeforeTest.qa?.pass === true, 'phase372-entry-visible-before-test'],
+    [entryBeforeTest.visible && entryBeforeTest.enabled && entryBeforeTest.qa?.pass === true, 'phase372-entry-visible-before-test'],
     [lobbyBefore.rootCount === 1, 'single-controller-root'],
     [lobbyBefore.moveCount === 1 && lobbyBefore.lookCount === 1, 'single-move-look'],
     [lobbyBefore.moveDisplay !== 'none' && lobbyBefore.lookDisplay !== 'none', 'lobby-sticks-visible'],
