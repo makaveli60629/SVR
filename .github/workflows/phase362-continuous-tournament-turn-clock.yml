@@ -15,8 +15,10 @@ on:
       - 'game/modules/phase363_android_settlement_lobby_consistency_lock.js'
       - 'game/modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js'
       - 'game/modules/phase336_authoritative_engine.js'
+      - 'game/modules/phase364_device_xr_geometry_spawn_lock.js'
       - 'game/tools/phase363-android-integrated-core-static-test.mjs'
       - 'game/tools/phase363-android-integrated-core-browser-acceptance.cjs'
+      - 'game/tools/phase364-phase363-integrated-browser-acceptance.cjs'
       - 'docs/phase363_android_canonical_table_join_bankroll_audio_gyro_lock.md'
       - '.github/workflows/phase362-continuous-tournament-turn-clock.yml'
   workflow_dispatch:
@@ -46,7 +48,7 @@ jobs:
           node --check game/modules/phase363_android_street_raise_action_lock.js
           node --check game/modules/phase363_android_join_control_capture_lock.js
           node --check game/modules/phase363_android_settlement_lobby_consistency_lock.js
-          node --check game/tools/phase363-android-integrated-core-browser-acceptance.cjs
+          node --check game/tools/phase364-phase363-integrated-browser-acceptance.cjs
           node game/tools/phase363-android-integrated-core-static-test.mjs
           node game/tools/phase357-android-table-status-showdown-ante-static-test.mjs
           node game/tools/phase350-integrity-static-test.mjs
@@ -62,10 +64,10 @@ jobs:
           echo $! > /tmp/svr-phase363-http.pid
           sleep 2
 
-      - name: Verify JOIN, secure shuffle, RAISE, burns, betting streets, payout, LEAVE and rejoin
+      - name: Verify JOIN, legal RAISE, burns, streets, payout, LEAVE and fresh rejoin
         env:
           SVR_TEST_BASE: http://127.0.0.1:4173
-        run: node game/tools/phase363-android-integrated-core-browser-acceptance.cjs
+        run: node game/tools/phase364-phase363-integrated-browser-acceptance.cjs
 
       - name: Re-run certified Android complete-hand acceptance
         env:
