@@ -1,50 +1,35 @@
-name: Auto Deploy
+name: SVR Production Auto Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      confirm_deploy:
-        description: "Type YES to confirm deploy"
-        required: false
-        default: "YES"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: svr-production-deploy
+  cancel-in-progress: true
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages-deploy
-  cancel-in-progress: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 30
     steps:
-      - name: Free runner disk before checkout
+      - name: Free runner disk
         shell: bash
         run: |
           set +e
-          echo "Disk before cleanup:"
-          df -h
-          sudo rm -rf /usr/share/dotnet || true
-          sudo rm -rf /usr/local/lib/android || true
-          sudo rm -rf /opt/ghc || true
-          sudo rm -rf /opt/hostedtoolcache/CodeQL || true
-          sudo rm -rf /usr/local/share/boost || true
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost || true
           docker system prune -af || true
           sudo apt-get clean || true
-          echo "Disk after cleanup:"
           df -h
 
-      - name: Checkout public files only
+      - name: Checkout production paths
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
@@ -53,6 +38,7 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             index.html
+            404.html
             style.css
             launch.css
             launch-overrides.css
@@ -73,201 +59,92 @@ jobs:
             favicon.ico
             CNAME
             .nojekyll
-            deploy-health.json
-            phase100-deploy.json
-            site
             game
-            reiki
+            site
             android
             downloads
-            presentations
-            presentation
             update
-            docs/PHASE_100_FULL_DEMO_POLISH_MANIFEST.md
-            docs/PHASE_100_AWS_WEBEX_DEPLOYMENT_NOTES.md
-            docs/PHASE_100_QA_CHECKLIST.md
-            docs/PHASE_100_HANDOFF.md
-            docs/PHASE_101_LIVE_DEPLOY_QA_WEBXR_ROUTE_VERIFY.md
-            docs/PHASE_101A_BOOT_LOAD_SCREEN_RECOVERY_PATCH.md
 
-      - name: Prepare static Pages build
+      - name: Build production branch
         shell: bash
         run: |
           set -euo pipefail
-
           rm -rf build
           mkdir -p build
 
-          copy_file_if_exists() {
-            if [ -f "$1" ]; then
-              mkdir -p "build/$(dirname "$1")"
-              cp "$1" "build/$1"
-            fi
-          }
+          for file in index.html 404.html style.css launch.css launch-overrides.css matrix.js site-local-counter.js site-public-hooks.js support-chat-bot.js support-lead-routing.js pwa-app-install.js app-install.js app-update-checker.js manifest.webmanifest pwa-sw.js sw.js offline.html logo.png logo.webp favicon.ico CNAME .nojekyll; do
+            if [ -f "$file" ]; then cp -a "$file" build/; fi
+          done
 
-          copy_dir_if_exists() {
-            if [ -d "$1" ]; then
-              mkdir -p "build/$1"
-              cp -a "$1"/. "build/$1"/
-            fi
-          }
-
-          copy_file_if_exists index.html
-          copy_file_if_exists style.css
-          copy_file_if_exists launch.css
-          copy_file_if_exists launch-overrides.css
-          copy_file_if_exists matrix.js
-          copy_file_if_exists site-local-counter.js
-          copy_file_if_exists site-public-hooks.js
-          copy_file_if_exists support-chat-bot.js
-          copy_file_if_exists support-lead-routing.js
-          copy_file_if_exists pwa-app-install.js
-          copy_file_if_exists app-install.js
-          copy_file_if_exists app-update-checker.js
-          copy_file_if_exists manifest.webmanifest
-          copy_file_if_exists pwa-sw.js
-          copy_file_if_exists sw.js
-          copy_file_if_exists offline.html
-          copy_file_if_exists logo.png
-          copy_file_if_exists logo.webp
-          copy_file_if_exists favicon.ico
-          copy_file_if_exists CNAME
-          copy_file_if_exists .nojekyll
-
-          copy_dir_if_exists site
-          copy_dir_if_exists game
-          copy_dir_if_exists reiki
-          copy_dir_if_exists android
-          copy_dir_if_exists downloads
-          copy_dir_if_exists presentations
-          copy_dir_if_exists presentation
-          copy_dir_if_exists update
+          for dir in game site android downloads update; do
+            if [ -d "$dir" ]; then mkdir -p "build/$dir" && cp -a "$dir"/. "build/$dir"/; fi
+          done
 
           touch build/.nojekyll
+          find build -type d \( -name '_backups' -o -name 'backup-game-*' -o -name 'node_modules' -o -name '.git' \) -prune -exec rm -rf {} + || true
+          find build -type f \( -name '*.zip' -o -name '*.7z' -o -name '*.rar' -o -name '*.blend' -o -name '*.psd' -o -name '*.tmp' \) -delete || true
+          find build/game -type f -name '*.fbx' ! -path 'build/game/assets/table.fbx' -delete || true
 
-          mkdir -p build/reiki build/android build/downloads build/update
-          mkdir -p build/site/presentations/reiki build/site/android build/site/downloads build/game
-
-          if [ ! -f build/site/presentations/reiki/index.html ]; then
-            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Reiki Presentation</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Reiki Presentation</h1><p>Prepared for private review. Partner-specific materials remain awaiting approval.</p><p><a style="color:#ffd36a" href="/game/?scene=lobby&focus=reiki-storefront&svr30sky=1">Open VR Reiki Storefront Preview</a></p><p><a style="color:#7ffcff" href="/android/">Open Android Demo Page</a></p></body></html>' > build/site/presentations/reiki/index.html
-          fi
-
-          if [ ! -f build/site/android/index.html ]; then
-            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Android Demo</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Android Demo</h1><p>The Android APK demo is being finalized.</p><p><a style="color:#ffd36a" href="/reiki/">Open Reiki Presentation</a></p></body></html>' > build/site/android/index.html
-          fi
-
-          if [ ! -f build/site/downloads/index.html ]; then
-            printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><title>SVR Downloads</title></head><body style="background:#030008;color:white;font-family:Arial;padding:32px"><h1>SVR Downloads</h1><p>The app installer and Android package slot are routed through the downloads page.</p><p><a style="color:#ffd36a" href="/downloads/?install=1">Open Downloads</a></p></body></html>' > build/site/downloads/index.html
-          fi
-
-          if [ ! -f build/reiki/index.html ]; then
-            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/presentations/reiki/"><a href="/site/presentations/reiki/">Open Reiki Presentation</a>' > build/reiki/index.html
-          fi
-
-          if [ ! -f build/android/index.html ]; then
-            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/android/"><a href="/site/android/">Open Android Demo Page</a>' > build/android/index.html
-          fi
-
-          if [ ! -f build/downloads/index.html ]; then
-            printf '%s\n' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/site/downloads/"><a href="/site/downloads/">Open Downloads</a>' > build/downloads/index.html
-          fi
-
-          while IFS= read -r html_file; do
-            if grep -q 'support-chat-bot.js' "$html_file" && ! grep -q 'support-lead-routing.js' "$html_file"; then
-              perl -0pi -e 's#(<script[^>]+support-chat-bot\.js[^>]*></script>)#$1\n  <script src="/support-lead-routing.js?v=phase152-lead-routing"></script>#i' "$html_file" || true
-            fi
-          done < <(find build -name '*.html' -type f)
-
-          while IFS= read -r html_file; do
-            if ! grep -q 'app-update-checker.js' "$html_file"; then
-              perl -0pi -e 's#</body>#  <script src="/app-update-checker.js?v=phase154-update-manager"></script>\n</body>#i' "$html_file" || true
-            fi
-          done < <(find build -name '*.html' -type f)
-
-          while IFS= read -r html_file; do
-            if ! grep -q 'pwa-app-install.js' "$html_file"; then
-              perl -0pi -e 's#</body>#  <script src="/pwa-app-install.js?v=phase110sitebutton"></script>\n</body>#i' "$html_file" || true
-            fi
-            if ! grep -q 'manifest.webmanifest' "$html_file"; then
-              perl -0pi -e 's#</head>#  <link rel="manifest" href="/manifest.webmanifest" />\n  <meta name="theme-color" content="#9b4dff" />\n</head>#i' "$html_file" || true
-            fi
-          done < <(find build/site -name '*.html' -type f)
-
-          GAME_ZIP_STATUS="missing"
-          GAME_ZIP_BYTES="0"
-          if [ -f build/update/game.zip ]; then
-            GAME_ZIP_STATUS="present"
-            GAME_ZIP_BYTES="$(wc -c < build/update/game.zip | tr -d ' ')"
-            if [ "$GAME_ZIP_BYTES" -gt 26214400 ]; then
-              echo "::warning::update/game.zip is larger than 25 MB: ${GAME_ZIP_BYTES} bytes"
-            fi
-          else
-            echo "::warning::update/game.zip is missing from this deployment artifact"
-          fi
+          test -f build/index.html
+          test -f build/CNAME
+          test -f build/game/index.html
+          test -f build/game/android.html
+          test -f build/game/modules/phase372_live_entry_recovery_lock.js
+          test -f build/game/modules/phase369_android_join_table_freeze_recovery_lock.js
+          test -f build/game/modules/phase368_card_dealer_animation_lock.js
+          test -f build/game/assets/models/table.glb
+          test -f build/game/assets/table.fbx
+          test -f build/site/index.html
+          test -f build/site/login.html
+          test -f build/site/profile.html
+          test -f build/site/avatar.html
+          test -f build/site/config/player-api.json
 
           DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          printf '{\n  "status": "ok",\n  "build": "SVR-PHASE-154-APP-UPDATE-MANAGER-LOCK",\n  "commit": "%s",\n  "deployedAt": "%s",\n  "gameZipStatus": "%s",\n  "gameZipBytes": "%s",\n  "customDomain": "svrpoker.com"\n}\n' "$GITHUB_SHA" "$DEPLOYED_AT" "$GAME_ZIP_STATUS" "$GAME_ZIP_BYTES" > build/deploy-health.json
-          cat > build/update/app-version.json <<EOF
+          cat > build/deploy-health.json <<EOF
           {
-            "schema": 1,
-            "build": "SVR-PHASE-154-APP-UPDATE-MANAGER-LOCK",
-            "gameBuild": "PHASE-153-ANDROID-SAFE-MODE-POLISH-ROUTE-LOCK",
+            "status": "ok",
+            "build": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
             "commit": "$GITHUB_SHA",
             "deployedAt": "$DEPLOYED_AT",
-            "message": "A new SVR Poker site/game update is available.",
-            "required": false,
-            "gameUrl": "/game/index.html",
-            "androidSafeUrl": "/game/android.html",
-            "downloadsUrl": "/downloads/?install=1",
-            "packageName": "com.svrpoker.app",
-            "apkVersionCode": 0,
-            "apkVersionName": "pending-native-apk",
-            "apkUrl": "",
-            "apkSha256": ""
+            "sourceBranch": "main",
+            "publishBranch": "gh-pages",
+            "databaseProvider": "aws",
+            "identityProvider": "cognito",
+            "profileDatabase": "dynamodb",
+            "androidRoute": "/game/android.html?channel=stable&v=phase372",
+            "questRoute": "/game/index.html?platform=quest&v=phase372",
+            "customDomain": "svrpoker.com"
           }
           EOF
           cp build/deploy-health.json build/game/deploy-health.json
-          cp build/deploy-health.json build/phase100-deploy.json
-          cp build/deploy-health.json build/phase101b-deploy.json
-          cp build/deploy-health.json build/phase102-app-deploy.json
-          cp build/deploy-health.json build/phase104-site-app-deploy.json
-          cp build/deploy-health.json build/phase110-app-download-deploy.json
-          cp build/deploy-health.json build/phase152-ai-support-lead-routing-deploy.json
-          cp build/deploy-health.json build/phase154-app-update-manager-deploy.json
+          du -sh build
 
-          find build -maxdepth 3 -type f | sort > /tmp/svr-build-files.txt
-          sed -n '1,280p' /tmp/svr-build-files.txt | sed 's#^# - #'
-          df -h
+      - name: Publish exact build to gh-pages
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd build
+          git init -b gh-pages
+          git config user.name "SVR Auto Deploy"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Deploy ${GITHUB_SHA}"
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin gh-pages
 
-      - name: Validate routes before upload
+      - name: Verify custom-domain deployment
         shell: bash
         run: |
           set -euo pipefail
-          test -f build/index.html
-          test -f build/CNAME
-          test -f build/manifest.webmanifest
-          test -f build/pwa-sw.js
-          test -f build/sw.js
-          test -f build/app-install.js
-          test -f build/pwa-app-install.js
-          test -f build/app-update-checker.js
-          test -f build/support-chat-bot.js
-          test -f build/support-lead-routing.js
-          test -f build/update/app-version.json
-          test -f build/offline.html
-          test -f build/site/app.html
-          test -f build/reiki/index.html
-          test -f build/android/index.html
-          test -f build/downloads/index.html
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: build
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          for attempt in $(seq 1 24); do
+            response="$(curl -fsS --max-time 15 "https://svrpoker.com/deploy-health.json?commit=${GITHUB_SHA}&attempt=${attempt}" || true)"
+            if echo "$response" | grep -q "$GITHUB_SHA"; then
+              echo "Verified svrpoker.com at ${GITHUB_SHA}"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::warning::The gh-pages branch was published, but the custom-domain cache did not expose the new commit within four minutes."
