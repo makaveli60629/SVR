@@ -9,6 +9,7 @@ on:
       - 'game/modules/phase368_android_join_card_gyro_ux_lock.js'
       - 'game/modules/phase368_android_spectator_tournament_voice_lock.js'
       - 'game/tools/phase368-android-tournament-avatar-card-ux-static-test.mjs'
+      - 'game/tools/phase368-android-pointer-browser-acceptance.cjs'
       - 'site/js/phase368-profile-avatar-texture-fit-lock.js'
       - 'site/js/phase345-demo-activity-persistence.js'
       - 'site/js/market-ads.js'
@@ -31,7 +32,7 @@ permissions:
 jobs:
   release-contracts:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 32
     steps:
       - uses: actions/checkout@v4
 
@@ -43,6 +44,7 @@ jobs:
         run: |
           node --check game/modules/phase368_android_join_card_gyro_ux_lock.js
           node --check game/modules/phase368_android_spectator_tournament_voice_lock.js
+          node --check game/tools/phase368-android-pointer-browser-acceptance.cjs
           node --check site/js/phase368-profile-avatar-texture-fit-lock.js
           node --check site/js/phase345-demo-activity-persistence.js
           node --check site/js/market-ads.js
@@ -74,3 +76,26 @@ jobs:
           grep -q "last_ip_hash" backend/sql/004_app_install_telemetry_payout_profile.sql
           grep -q "DeletionProtectionEnabled: true" infrastructure/aws/phase369-app-data-foundation.yml
           grep -q "releaseReady && current.apkUrl" site/js/phase369-apk-banner-telemetry.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Start local SVR site
+        run: |
+          python3 -m http.server 4173 > /tmp/svr-phase368-http.log 2>&1 &
+          echo $! > /tmp/svr-phase368-http.pid
+          sleep 2
+
+      - name: Verify Phase 368 physical Android pointers
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase368-android-pointer-browser-acceptance.cjs
+
+      - name: Upload browser diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase368-browser-diagnostics
+          path: /tmp/svr-phase368-http.log
