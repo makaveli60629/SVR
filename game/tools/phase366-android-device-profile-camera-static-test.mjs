@@ -30,7 +30,7 @@ for (const token of [
   'visualViewport',
   '--svr366-vh',
   'safe-area-inset-bottom',
-  'orientationStabilization',
+  'requestStabilization',
   'SVR_PHASE365_STABILIZE_SEAT',
   'SVR_PHASE366_DEVICE_QA',
   'controllerRoots === 1',
