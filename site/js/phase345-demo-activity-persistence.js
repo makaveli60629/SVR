@@ -1,4 +1,4 @@
-import { account } from './phase345-player-account-client.js?v=phase345';
+import { account } from './phase366-player-account-resilience.js?v=phase366';
 
 const ACTIVITY_KEY = 'svr_phase345_demo_daily_activity_v1';
 const PROFILE_KEY = 'svr_phase345_demo_player_v1';
@@ -91,7 +91,13 @@ account.claimDailyReward = async function patchedClaim() {
 window.SVR_PHASE345_DEMO_ACTIVITY = {
   read: readActivity,
   reset: () => writeActivity({ activeSeconds: 0, heartbeatCount: 0 }),
-  build: 'PHASE-345-DEMO-ACTIVITY-PERSISTENCE-FIX'
+  build: 'PHASE-366-DEMO-ACTIVITY-ACCOUNT-RESILIENCE-LOCK'
 };
+
+if (document.getElementById('profileShowroomCanvas')) {
+  queueMicrotask(() => import('./phase366-profile-live-camera-watchdog.js?v=phase366').catch((error) => {
+    window.SVR_PHASE366_PROFILE_LIVE_CAMERA_ERROR = String(error?.message || error);
+  }));
+}
 
 export { account };
