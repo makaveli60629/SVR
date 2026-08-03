@@ -3,8 +3,6 @@ const { chromium } = require('playwright');
 const BASE = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
 const ANDROID_UA = 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/132.0 Mobile Safari/537.36';
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 async function waitFor(page, evaluator, timeout = 120000) {
   const started = Date.now();
   let last = null;
@@ -48,7 +46,6 @@ async function waitFor(page, evaluator, timeout = 120000) {
   });
 
   const url = `${BASE}/game/android.html?channel=stable&manual=1&v=phase364`;
-  let report = null;
 
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
@@ -57,7 +54,7 @@ async function waitFor(page, evaluator, timeout = 120000) {
       const ready = typeof window.SVR_PHASE363_JOIN_TABLE === 'function'
         && typeof window.SVR_PHASE363_LEAVE_TABLE === 'function'
         && typeof window.SVR_PHASE363_RAISE_TO === 'function'
-        && typeof window.SVR_PHASE363_RAISE_QA === 'function'
+        && typeof window.SVR_PHASE363_CONFIGURE_RAISE === 'function'
         && typeof window.SVR_PHASE363_STREET_RAISE_QA === 'function'
         && typeof window.SVR_PHASE363_CONSISTENCY_QA === 'function'
         && typeof window.SVR_PHASE363_JOIN_CONTROL_QA === 'function'
@@ -113,10 +110,10 @@ async function waitFor(page, evaluator, timeout = 120000) {
           }
           if (state.waitingHuman === true) {
             const legal = (window.SVR_POKER_LEGAL_ACTIONS?.() || []).map((action) => String(action).toLowerCase());
-            const raiseQa = window.SVR_PHASE363_RAISE_QA?.() || {};
             if (legal.includes('raise') || legal.includes('bet')) {
-              const minimum = Number(raiseQa.minimum || state.currentBet || 0);
-              const maximum = Number(raiseQa.maximum || 0);
+              const bounds = window.SVR_PHASE363_CONFIGURE_RAISE?.() || {};
+              const minimum = Number(bounds.minimum || state.currentBet || 0);
+              const maximum = Number(bounds.maximum || 0);
               const target = Math.min(maximum, Math.max(minimum, Number(state.currentBet || 0) + 40));
               const actorBefore = window.SVR_RUN_PHASE336_POKER_AUDIT?.()?.players?.[0] || {};
               const before = {
@@ -128,7 +125,7 @@ async function waitFor(page, evaluator, timeout = 120000) {
                 maximum,
                 target
               };
-              window.SVR_PHASE363_RAISE_TO(target);
+              const accepted = window.SVR_PHASE363_RAISE_TO(target);
               await wait(450);
               const next = window.SVR_PHASE336_POKER_STATE;
               const actorAfter = window.SVR_RUN_PHASE336_POKER_AUDIT?.()?.players?.[0] || {};
@@ -139,15 +136,17 @@ async function waitFor(page, evaluator, timeout = 120000) {
                 lastAction: actorAfter.lastAction || null
               };
               return {
-                pass: target > before.currentBet
+                pass: accepted !== false
+                  && target > before.currentBet
                   && after.committed > before.committed
                   && (after.currentBet >= target || /raise|bet/i.test(String(after.lastAction || ''))),
                 before,
-                after
+                after,
+                accepted
               };
             }
 
-            const key = `${state.handNo}:${state.phase}:${state.sequence}:${state.currentPlayer}:${state.currentBet}`;
+            const key = `${state.handNo}:${state.phase}:${state.actionSeq}:${state.current}:${state.currentBet}`;
             if (!submitted.has(key)) {
               submitted.add(key);
               if (legal.includes('check')) window.SVR_POKER_ACTION?.('check');
@@ -183,7 +182,7 @@ async function waitFor(page, evaluator, timeout = 120000) {
             handNo: Number(state?.handNo || 0),
             consistency: q,
             streetRaise: window.SVR_PHASE363_STREET_RAISE_QA?.() || null,
-            raiseQa: window.SVR_PHASE363_RAISE_QA?.() || null,
+            raiseUi: window.SVR_PHASE363_RAISE_UI_CAPTURE_QA?.() || null,
             phase364: window.SVR_PHASE364_QA?.() || null,
             audit: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null
           }
@@ -224,7 +223,9 @@ async function waitFor(page, evaluator, timeout = 120000) {
         : null;
     }, 30000);
 
-    report = {
+    const filteredConsole = consoleErrors.filter((line) => !/favicon|WebXR.*not available|THREE\.WebGLRenderer/i.test(line));
+    const filteredFailed = requestFailures.filter((line) => !/favicon/i.test(line));
+    const report = {
       url,
       lobbyBefore,
       seat,
@@ -235,13 +236,13 @@ async function waitFor(page, evaluator, timeout = 120000) {
       freshRejoin,
       pageErrors,
       consoleErrors,
+      filteredConsole,
       requestFailures,
+      filteredFailed,
       httpErrors,
       checkedAt: new Date().toISOString()
     };
 
-    const filteredConsole = consoleErrors.filter((line) => !/favicon|WebXR.*not available|THREE\.WebGLRenderer/i.test(line));
-    const filteredFailed = requestFailures.filter((line) => !/favicon/i.test(line));
     const pass = lobbyBefore.joined === false
       && lobbyBefore.cards === 0
       && lobbyBefore.join?.pass === true
@@ -252,7 +253,8 @@ async function waitFor(page, evaluator, timeout = 120000) {
       && Number(settled.consistency.effectiveTableChips || 0) === 90000
       && Number(settled.consistency.expectedTableChips || 0) === 90000
       && settled.streetRaise?.pass === true
-      && settled.streetRaise?.strictStreetOrder === true
+      && settled.streetRaise?.streetOrderPass === true
+      && settled.streetRaise?.burnSequencePass === true
       && settled.phase364?.tablePass === true
       && lobbyAfterLeave.cardsCleared === true
       && lobbyAfterLeave.join?.pass === true
@@ -265,7 +267,7 @@ async function waitFor(page, evaluator, timeout = 120000) {
       && filteredFailed.length === 0
       && httpErrors.length === 0;
 
-    console.log(JSON.stringify({ ...report, filteredConsole, filteredFailed, pass }, null, 2));
+    console.log(JSON.stringify({ ...report, pass }, null, 2));
     if (!pass) process.exitCode = 1;
   } finally {
     await browser.close();
