@@ -7,6 +7,7 @@ on:
       - 'game/modules/phase368_card_dealer_animation_lock.js'
       - 'game/modules/phase368_card_dealer_motion.js'
       - 'game/modules/phase369_android_join_table_freeze_recovery_lock.js'
+      - 'game/modules/phase369_android_join_readiness_transaction_lock.js'
       - 'game/phase369-release.json'
       - 'game/tools/phase350-integrity-static-test.mjs'
       - 'game/tools/phase356-android-real-device-static-test.mjs'
@@ -39,6 +40,7 @@ jobs:
           node --check game/modules/phase368_card_dealer_animation_lock.js
           node --check game/modules/phase368_card_dealer_motion.js
           node --check game/modules/phase369_android_join_table_freeze_recovery_lock.js
+          node --check game/modules/phase369_android_join_readiness_transaction_lock.js
           node --check site/js/phase346-avatar-viewer.js
           node --check site/js/phase370-account-profile-mobile-polish.js
           node --check matrix.js
