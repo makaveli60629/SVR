@@ -1,0 +1,164 @@
+/* PHASE-369-SITE-APK-BANNER-TELEMETRY-FOUNDATION-LOCK */
+.phase94-slider-section,
+.phase98-art-slider{
+  width:100%;
+  overflow:hidden;
+}
+.svr-slide-deck,
+.phase98-art-deck{
+  width:100%;
+  aspect-ratio:16/6;
+  min-height:260px;
+  max-height:480px;
+  overflow:hidden;
+  border-radius:26px;
+  background:
+    radial-gradient(circle at 18% 20%,rgba(155,77,255,.24),transparent 30%),
+    linear-gradient(180deg,#060916,#02040a);
+}
+.svr-slide,
+.svr-art-slide{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  border-radius:inherit;
+}
+.svr-art-slide>img,
+.svr-slide>img{
+  width:100%!important;
+  height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  background:linear-gradient(180deg,rgba(2,4,12,.92),rgba(3,6,18,.98));
+}
+.svr-slide-overlay{
+  inset:auto 18px 18px 18px!important;
+  max-width:calc(100% - 36px)!important;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:10px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:10px!important;
+  border-radius:18px!important;
+  background:linear-gradient(180deg,rgba(1,4,12,.36),rgba(1,4,12,.82))!important;
+  backdrop-filter:blur(12px);
+}
+.svr-slide-overlay .btn,
+.svr-slide-overlay button{
+  min-height:44px!important;
+  max-width:100%!important;
+  white-space:normal!important;
+  text-align:center!important;
+}
+.svr-apk-slide{
+  background:
+    radial-gradient(circle at 18% 20%,rgba(127,252,255,.18),transparent 25%),
+    radial-gradient(circle at 82% 18%,rgba(155,77,255,.32),transparent 30%),
+    linear-gradient(140deg,#02040b,#0c0820 56%,#031522);
+}
+.svr-apk-slide .svr-apk-art{
+  position:absolute;
+  inset:0;
+  display:grid;
+  grid-template-columns:minmax(150px,.72fr) minmax(280px,1.28fr);
+  align-items:center;
+  gap:clamp(18px,4vw,58px);
+  padding:clamp(28px,5vw,76px);
+  padding-bottom:110px;
+}
+.svr-apk-logo-wrap{
+  display:grid;
+  place-items:center;
+  min-width:0;
+}
+.svr-apk-logo-wrap img{
+  width:min(250px,78%);
+  height:auto;
+  max-height:220px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 28px rgba(127,252,255,.22)) drop-shadow(0 0 48px rgba(155,77,255,.24));
+}
+.svr-apk-copy{
+  min-width:0;
+  text-align:left;
+}
+.svr-apk-copy .svr-apk-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+  padding:7px 11px;
+  border:1px solid rgba(141,255,180,.4);
+  border-radius:999px;
+  background:rgba(141,255,180,.08);
+  color:#cffff0;
+  font:900 clamp(10px,1.2vw,13px) Orbitron,system-ui;
+  letter-spacing:.08em;
+}
+.svr-apk-copy h2{
+  margin:0;
+  font:900 clamp(28px,5vw,66px)/.98 Orbitron,system-ui;
+  letter-spacing:.04em;
+  color:#fff;
+  text-shadow:0 0 30px rgba(127,252,255,.24);
+}
+.svr-apk-copy p{
+  margin:13px 0 0;
+  max-width:700px;
+  color:#e2dcf4;
+  font:700 clamp(15px,2vw,22px)/1.3 Rajdhani,system-ui;
+}
+.svr-apk-copy .svr-apk-version{
+  display:block;
+  margin-top:10px;
+  color:#ffd98a;
+  font-weight:900;
+}
+.svr-apk-slide [data-apk-download][aria-disabled="true"]{
+  opacity:.62;
+  filter:saturate(.35);
+}
+.svr-apk-update-ready{
+  position:absolute;
+  right:18px;
+  top:18px;
+  z-index:4;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 11px;
+  border:1px solid rgba(141,255,180,.58);
+  border-radius:999px;
+  background:rgba(1,12,13,.78);
+  color:#baffd2;
+  font:900 11px Orbitron,system-ui;
+  letter-spacing:.06em;
+  box-shadow:0 0 25px rgba(141,255,180,.2);
+}
+.svr-apk-update-ready[hidden]{display:none!important}
+@media(max-width:860px){
+  .svr-slide-deck,.phase98-art-deck{aspect-ratio:16/8;min-height:300px}
+  .svr-apk-slide .svr-apk-art{
+    grid-template-columns:.65fr 1.35fr;
+    gap:16px;
+    padding:24px 22px 110px;
+  }
+  .svr-apk-logo-wrap img{width:min(175px,90%)}
+  .svr-apk-copy h2{font-size:clamp(28px,7vw,48px)}
+}
+@media(max-width:620px){
+  .svr-slide-deck,.phase98-art-deck{aspect-ratio:auto;min-height:440px;max-height:520px}
+  .svr-apk-slide .svr-apk-art{
+    grid-template-columns:1fr;
+    grid-template-rows:140px auto;
+    text-align:center;
+    padding:24px 16px 138px;
+  }
+  .svr-apk-copy{text-align:center}
+  .svr-apk-logo-wrap img{width:135px;max-height:130px}
+  .svr-slide-overlay{left:10px!important;right:10px!important;bottom:10px!important;max-width:calc(100% - 20px)!important}
+  .svr-slide-overlay .btn,.svr-slide-overlay button{flex:1 1 140px!important}
+}
