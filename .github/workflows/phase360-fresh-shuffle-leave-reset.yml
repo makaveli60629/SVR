@@ -9,6 +9,7 @@ on:
       - 'game/modules/phase358_quest_incremental_shader_compile_lock.js'
       - 'game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js'
       - 'game/modules/phase360_table_conservation_next_guard_lock.js'
+      - 'game/modules/phase363_android_secure_shuffle_lock.js'
       - 'game/modules/phase359_dual_platform_gameplay_continuity_lock.js'
       - 'game/modules/phase334_table_layout_gesture_poker_lock.js'
       - 'game/modules/phase336_authoritative_engine.js'
@@ -24,7 +25,7 @@ on:
 jobs:
   shuffle-session-full-game:
     runs-on: ubuntu-latest
-    timeout-minutes: 26
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,6 +36,7 @@ jobs:
           node --check game/modules/phase358_quest_incremental_shader_compile_lock.js
           node --check game/modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js
           node --check game/modules/phase360_table_conservation_next_guard_lock.js
+          node --check game/modules/phase363_android_secure_shuffle_lock.js
           node --check game/tools/phase360-session-browser-acceptance.cjs
           node game/tools/phase360-fresh-shuffle-leave-reset-static-test.mjs
           node game/tools/phase359-dual-platform-static-test.mjs
@@ -49,7 +51,7 @@ jobs:
           python3 -m http.server 4173 > /tmp/svr-phase360-http.log 2>&1 &
           echo $! > /tmp/svr-phase360-http.pid
           sleep 2
-      - name: Verify secure shuffle, leave reset, and rejoin
+      - name: Verify Quest Phase 360 and Android Phase 363 secure shuffle contracts
         env:
           SVR_TEST_BASE: http://127.0.0.1:4173
         run: node game/tools/phase360-session-browser-acceptance.cjs

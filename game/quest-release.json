@@ -1,11 +1,12 @@
 {
   "name": "SVR Poker Quest WebXR",
   "channel": "stable-web",
-  "phase": 361,
-  "build": "PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK",
-  "webEntry": "/game/index.html?platform=quest&v=phase361",
+  "phase": 362,
+  "build": "PHASE-362-CONTINUOUS-10000-TURN-CLOCK-REJOIN-RESET-LOCK",
+  "webEntry": "/game/index.html?platform=quest&v=phase362",
   "browserAcceptance": {
     "passed": true,
+    "priorCompleteGamePassed": true,
     "baseGameplayCertification": "PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK",
     "startupMs": 19754.6,
     "startupBudgetMs": 45000,
@@ -22,24 +23,35 @@
     "holeCards": 2,
     "communityCards": 5,
     "burnCards": 3,
-    "winner": {
-      "name": "IVY",
-      "amount": 120,
-      "hand": "Full House"
-    },
+    "winner": {"name": "IVY", "amount": 120, "hand": "Full House"},
     "settledPot": 120,
     "totalTableChips": 6000,
     "fundedPlayers": 6,
-    "nextHand": {
-      "previous": 1,
-      "current": 2,
-      "advanced": true
-    },
+    "nextHand": {"previous": 1, "current": 2, "advanced": true},
     "nextHandAdvanced": true,
     "pageErrors": 0,
     "consoleErrors": 0,
     "sameOriginHttpErrors": 0,
-    "requestFailures": 0
+    "requestFailures": 0,
+    "completeHand": true,
+    "phase362PolicyAcceptancePending": true,
+    "phase362TableBankroll": 60000
+  },
+  "sessionContract": {
+    "startsStandingInLobby": true,
+    "walkToTableBeforeSitting": true,
+    "playGameButton": true,
+    "southFrontSeat": true,
+    "movementLockedWhileSeated": true,
+    "teleportLockedWhileSeated": true,
+    "headLookPreservedWhileSeated": true,
+    "leaveTableButtonRequired": true,
+    "leaveReturnsToLobbySpawn": true,
+    "watchVisibleInLobbyAndSeat": true,
+    "controllerSelectSupported": true,
+    "handPinchSupported": true,
+    "freshTableOnRejoin": true,
+    "legacyForcedSeatModulesRemoved": ["p86_seated_lock.js", "p87_scorpion_seat_authority.js"]
   },
   "phase361SessionContract": {
     "startsStandingInLobby": true,
@@ -55,10 +67,18 @@
     "controllerSelectSupported": true,
     "handPinchSupported": true,
     "freshTableOnRejoin": true,
-    "legacyForcedSeatModulesRemoved": [
-      "p86_seated_lock.js",
-      "p87_scorpion_seat_authority.js"
-    ]
+    "legacyForcedSeatModulesRemoved": ["p86_seated_lock.js", "p87_scorpion_seat_authority.js"]
+  },
+  "tablePolicy": {
+    "startingStackPerPlayer": 10000,
+    "players": 6,
+    "tableBankroll": 60000,
+    "turnSeconds": 15,
+    "autoFoldOnTimeout": true,
+    "continuousUntilOneFundedPlayer": true,
+    "championReset": "All six seats restart at 10,000 on the next hand after one funded player remains.",
+    "leaveRejoinReset": "A deliberate LEAVE TABLE followed by PLAY GAME starts a fresh six-player table at 10,000 each.",
+    "humanBustBehavior": "The remaining funded players continue until a champion exists."
   },
   "npcPresentation": {
     "ericTextureFallback": "procedural purple SVR fabric when the FBX mesh has no texture",
@@ -79,6 +99,12 @@
       "walking and teleport cannot move the player away while seated",
       "LEAVE TABLE returns the player to the lobby spawn",
       "watch remains visible with PLAY or LEAVE state",
+      "turn clock is visible above the table and counts from 15",
+      "an expired human turn folds automatically",
+      "each seat begins at 10,000 chips",
+      "hands continue without freezing until one funded player remains",
+      "the champion reset restores six stacks of 10,000",
+      "leave and rejoin restores a fresh six-stack table",
       "Eric is textured and all visible NPCs face the felt",
       "hole-card pickup, pinch, controller trigger, release, and throw thresholds",
       "seated reach and comfort"
@@ -104,7 +130,9 @@
     "Phase 347 Android single controller",
     "Phase 357 Android seating and showdown presentation",
     "Phase 358 Quest uploaded table and full-hand certification",
-    "Phase 359 continuous winner presentation",
-    "Phase 360 fresh shuffle and deliberate leave reset"
+    "Phase 359 winner presentation",
+    "Phase 360 secure shuffle",
+    "Phase 361 Quest lobby approach and seating",
+    "Phase 362 continuous tournament and turn-clock policy"
   ]
 }

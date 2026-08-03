@@ -1,0 +1,80 @@
+name: Phase 363 Android Join Bankroll Audio Gyro
+
+on:
+  pull_request:
+    paths:
+      - 'game/android.html'
+      - 'game/manifest.json'
+      - 'game/android-release.json'
+      - 'game/modules/phase363_android_canonical_table_asset_lock.js'
+      - 'game/modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js'
+      - 'game/modules/phase363_android_secure_shuffle_lock.js'
+      - 'game/modules/phase363_android_raise_ui_capture_lock.js'
+      - 'game/modules/phase363_android_street_raise_action_lock.js'
+      - 'game/modules/phase363_android_join_control_capture_lock.js'
+      - 'game/modules/phase363_android_settlement_lobby_consistency_lock.js'
+      - 'game/modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js'
+      - 'game/modules/phase336_authoritative_engine.js'
+      - 'game/tools/phase363-android-integrated-core-static-test.mjs'
+      - 'game/tools/phase363-android-integrated-core-browser-acceptance.cjs'
+      - 'docs/phase363_android_canonical_table_join_bankroll_audio_gyro_lock.md'
+      - '.github/workflows/phase362-continuous-tournament-turn-clock.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android-integrated-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 36
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate Phase 363 and protected contracts
+        run: |
+          node --check game/modules/phase363_android_canonical_table_asset_lock.js
+          node --check game/modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js
+          node --check game/modules/phase363_android_secure_shuffle_lock.js
+          node --check game/modules/phase363_android_raise_ui_capture_lock.js
+          node --check game/modules/phase363_android_street_raise_action_lock.js
+          node --check game/modules/phase363_android_join_control_capture_lock.js
+          node --check game/modules/phase363_android_settlement_lobby_consistency_lock.js
+          node --check game/tools/phase363-android-integrated-core-browser-acceptance.cjs
+          node game/tools/phase363-android-integrated-core-static-test.mjs
+          node game/tools/phase357-android-table-status-showdown-ante-static-test.mjs
+          node game/tools/phase350-integrity-static-test.mjs
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Start local SVR site
+        run: |
+          python3 -m http.server 4173 > /tmp/svr-phase363-http.log 2>&1 &
+          echo $! > /tmp/svr-phase363-http.pid
+          sleep 2
+
+      - name: Verify JOIN, secure shuffle, RAISE, burns, betting streets, payout, LEAVE and rejoin
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase363-android-integrated-core-browser-acceptance.cjs
+
+      - name: Re-run certified Android complete-hand acceptance
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase357-android-browser-acceptance.cjs
+
+      - name: Upload HTTP log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase363-http-log
+          path: /tmp/svr-phase363-http.log

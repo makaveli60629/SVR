@@ -1,5 +1,13 @@
 const { chromium } = require('playwright');
 
+async function tap(locator) {
+  try {
+    await locator.tap({ force: true, timeout: 10000 });
+  } catch {
+    await locator.click({ force: true, timeout: 10000 });
+  }
+}
+
 (async () => {
   const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
   const browser = await chromium.launch({
@@ -31,18 +39,35 @@ const { chromium } = require('playwright');
     if (request.url().startsWith(base)) requestFailures.push({ url: request.url(), error: request.failure()?.errorText || 'failed' });
   });
 
-  const url = `${base}/game/android.html?channel=stable&manual=1&v=phase359`;
+  const url = `${base}/game/android.html?channel=stable&manual=1&v=phase363`;
   let report = null;
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
     await page.waitForFunction(() => (
       typeof window.SVR_PHASE357_QA === 'function'
       && typeof window.SVR_PHASE355_RUN_FULL_HAND_QA === 'function'
+      && typeof window.SVR_PHASE363_JOIN_CONTROL_QA === 'function'
+      && typeof window.SVR_PHASE363_CONSISTENCY_QA === 'function'
       && document.querySelector('#svr347Actions [data-ui="seat"]')
     ), null, { timeout: 120000 });
 
-    await page.locator('#svr347Actions [data-ui="seat"]').click();
-    await page.waitForTimeout(1300);
+    const lobbyBefore = await page.evaluate(() => ({
+      joined: Boolean(window.SVR_PHASE363_STATE?.joined),
+      gameState: window.SVR_PHASE363_STATE?.gameState || null,
+      joinQa: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
+      consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
+      seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
+      phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
+      handNo: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0)
+    }));
+
+    await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+    await page.waitForFunction(() => (
+      window.SVR_PHASE363_STATE?.joined === true
+      && window.SVR_PHASE336_POKER_STATE?.handNo >= 1
+      && (window.SVR_RUN_PHASE336_POKER_AUDIT?.()?.players?.[0]?.hand?.length || 0) === 2
+    ), null, { timeout: 30000 });
+    await page.waitForTimeout(900);
 
     const seated = await page.evaluate(() => window.SVR_PHASE357_QA());
     const hand = await page.evaluate(() => window.SVR_PHASE355_RUN_FULL_HAND_QA({ maxHands: 1, timeoutMs: 90000 }));
@@ -66,41 +91,68 @@ const { chromium } = require('playwright');
       phase359PanelVisible: Boolean(document.getElementById('svr359AndroidResult')?.offsetParent),
       turnPanel: document.getElementById('svr357TurnPanel')?.textContent || '',
       betIndicators: document.querySelectorAll('.svr357Bet').length,
-      state: window.SVR_PHASE357_STATE || null
+      state: window.SVR_PHASE357_STATE || null,
+      phase363: window.SVR_PHASE363_QA?.() || null
     }));
 
-    const continuationAuthority = await page.evaluate(() => {
-      if (typeof window.SVR_PHASE359_NEXT_HAND === 'function') {
-        return { authority: 'phase359', accepted: window.SVR_PHASE359_NEXT_HAND() !== false };
-      }
-      if (typeof window.SVR_PHASE357_ANTE_UP === 'function') {
-        return { authority: 'phase357-api', accepted: window.SVR_PHASE357_ANTE_UP() !== false };
-      }
-      document.getElementById('svr357Ante')?.click();
-      return { authority: 'phase357-button', accepted: true };
-    });
+    // Phase 363 intentionally retires Android auto-continuation. Compatibility
+    // now means Phase 357 still renders a complete showdown, then the one
+    // LEAVE/JOIN control returns to lobby and starts a fresh hand deliberately.
+    await page.waitForTimeout(700);
+    await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+    await page.waitForFunction(() => (
+      window.SVR_PHASE363_STATE?.joined === false
+      && window.SVR_PHASE336_POKER_STATE?.phase === 'idle'
+      && window.SVR_PHASE363_CONSISTENCY_QA?.()?.lobbyCardsCleared === true
+    ), null, { timeout: 15000 });
+    await page.waitForTimeout(700);
 
-    await page.waitForFunction((previous) => (
-      Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0) > previous
-      && window.SVR_PHASE336_POKER_STATE?.phase === 'preflop'
-    ), showdown.handNo, { timeout: 10000 });
-
-    const continuation = await page.evaluate(({ previous, authority }) => ({
-      previous,
-      current: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0),
+    const lobbyAfterLeave = await page.evaluate(() => ({
+      joined: Boolean(window.SVR_PHASE363_STATE?.joined),
+      gameState: window.SVR_PHASE363_STATE?.gameState || null,
       phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
-      advanced: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0) > previous,
-      authority,
-      qa: window.SVR_PHASE357_QA?.() || null
-    }), { previous: showdown.handNo, authority: continuationAuthority.authority });
+      handNo: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0),
+      seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
+      joinQa: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
+      consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
+      audit: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null,
+      phase357: window.SVR_PHASE357_QA?.() || null
+    }));
+
+    await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+    await page.waitForFunction(() => (
+      window.SVR_PHASE363_STATE?.joined === true
+      && window.SVR_PHASE336_POKER_STATE?.handNo === 1
+      && window.SVR_PHASE336_POKER_STATE?.phase === 'preflop'
+      && (window.SVR_RUN_PHASE336_POKER_AUDIT?.()?.players?.[0]?.hand?.length || 0) === 2
+    ), null, { timeout: 30000 });
+    await page.waitForTimeout(900);
+
+    const freshRejoin = await page.evaluate(() => ({
+      joined: Boolean(window.SVR_PHASE363_STATE?.joined),
+      gameState: window.SVR_PHASE363_STATE?.gameState || null,
+      handNo: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0),
+      phase: window.SVR_PHASE336_POKER_STATE?.phase || null,
+      seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || '',
+      joinQa: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
+      consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
+      audit: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null,
+      phase357: window.SVR_PHASE357_QA?.() || null
+    }));
 
     report = {
       url,
+      lobbyBefore,
       seated,
       hand,
       showdown,
-      continuationAuthority,
-      continuation,
+      compatibilityAuthority: 'phase363-leave-join',
+      compatibilityBankrolls: {
+        isolatedLegacyDriver: Number(hand?.record?.expectedTableBankroll || 0),
+        phase363FreshTable: Number(freshRejoin?.consistency?.expectedTableChips || 0)
+      },
+      lobbyAfterLeave,
+      freshRejoin,
       pageErrors,
       consoleErrors,
       httpErrors,
@@ -112,21 +164,46 @@ const { chromium } = require('playwright');
     await browser.close();
   }
 
-  const pass = report?.seated?.pass === true
+  const lobbyHandsCleared = (report?.lobbyAfterLeave?.audit?.players || [])
+    .every((player) => Array.isArray(player.hand) && player.hand.length === 0);
+  const freshHuman = report?.freshRejoin?.audit?.players?.[0] || null;
+  const legacyExpected = Number(report?.hand?.record?.expectedTableBankroll || 0);
+  const legacySettled = Number(report?.hand?.record?.totalStacks || -1);
+  const pass = report?.lobbyBefore?.joined === false
+    && report?.lobbyBefore?.joinQa?.pass === true
+    && report?.lobbyBefore?.seatText === 'JOIN TABLE'
+    && report?.seated?.pass === true
     && report?.seated?.seated === true
     && Number(report?.seated?.cameraDistance || Infinity) <= Number(report?.seated?.maximumCloseSeatDistance || 0) + 0.08
     && report?.hand?.pass === true
+    && legacyExpected === 6000
+    && legacySettled === legacyExpected
+    && Number(report?.hand?.record?.settledPot || 0) > 0
     && report?.showdown?.phase === 'showdown'
     && /WIN|WINS/i.test(report?.showdown?.title || '')
     && /POT SETTLED:/i.test(report?.showdown?.pot || '')
     && /WINNING CARDS:/i.test(report?.showdown?.winners || '')
     && /BOARD:/i.test(report?.showdown?.board || '')
-    && report?.showdown?.anteVisible === true
     && report?.showdown?.betIndicators === 6
-    && report?.continuationAuthority?.accepted === true
-    && ['phase359', 'phase357-api', 'phase357-button'].includes(report?.continuationAuthority?.authority)
-    && report?.continuation?.advanced === true
-    && report?.continuation?.phase === 'preflop'
+    && report?.compatibilityAuthority === 'phase363-leave-join'
+    && report?.lobbyAfterLeave?.joined === false
+    && report?.lobbyAfterLeave?.gameState === 'LOBBY'
+    && report?.lobbyAfterLeave?.phase === 'idle'
+    && report?.lobbyAfterLeave?.seatText === 'JOIN TABLE'
+    && report?.lobbyAfterLeave?.joinQa?.pass === true
+    && report?.lobbyAfterLeave?.consistency?.lobbyCardsCleared === true
+    && lobbyHandsCleared
+    && report?.freshRejoin?.joined === true
+    && report?.freshRejoin?.gameState === 'SEATED'
+    && report?.freshRejoin?.handNo === 1
+    && report?.freshRejoin?.phase === 'preflop'
+    && report?.freshRejoin?.seatText === 'LEAVE TABLE'
+    && report?.freshRejoin?.joinQa?.pass === true
+    && Array.isArray(freshHuman?.hand)
+    && freshHuman.hand.length === 2
+    && Number(report?.freshRejoin?.consistency?.effectiveTableChips || 0) === 90000
+    && Number(report?.freshRejoin?.consistency?.expectedTableChips || 0) === 90000
+    && report?.freshRejoin?.phase357?.seated === true
     && pageErrors.length === 0
     && consoleErrors.length === 0
     && httpErrors.length === 0

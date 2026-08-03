@@ -16,6 +16,11 @@ function chipTotals() {
   };
 }
 
+function expectedTableBankroll() {
+  const successor = Number(window.SVR_PHASE362_CONSTANTS?.TABLE_BANKROLL || 0);
+  return successor > 0 ? successor : 6000;
+}
+
 function nextAllowed() {
   return ['showdown', 'idle'].includes(String(state.phase || '').toLowerCase());
 }
@@ -53,7 +58,9 @@ function installQaGuard() {
   const guardedQa = function phase360ConservationQa() {
     const result = originalQa() || {};
     const totals = chipTotals();
+    const expectedTableChips = expectedTableBankroll();
     Object.assign(result, totals, {
+      expectedTableChips,
       rejectedPrematureNext,
       prematureNextProtected: true,
       nextAllowed: nextAllowed()
@@ -63,7 +70,7 @@ function installQaGuard() {
       && result.nextHandWrapped
       && result.resetWrapped
       && Number(result.fundedPlayers || 0) >= 2
-      && totals.totalTableChips === 6000
+      && totals.totalTableChips === expectedTableChips
       && Number(result.exactDeckRepeats || 0) === 0
       && (result.platform !== 'android' || (result.androidLeaveWrapped && result.androidSitWrapped))
       && (result.platform !== 'quest' || result.metaCardGrab?.phase334Loaded)
@@ -90,11 +97,13 @@ function install() {
   }, 500);
   window.addEventListener('beforeunload', () => clearInterval(timer), { once: true });
   window.SVR_PHASE360_CHIP_TOTALS = chipTotals;
+  window.SVR_PHASE360_EXPECTED_TABLE_BANKROLL = expectedTableBankroll;
   window.SVR_PHASE360_NEXT_ALLOWED = nextAllowed;
   window.SVR_PHASE360_CONSERVATION_GUARD = {
     build: BUILD,
     installedAt: new Date().toISOString(),
-    chipTotals
+    chipTotals,
+    expectedTableBankroll
   };
 }
 
