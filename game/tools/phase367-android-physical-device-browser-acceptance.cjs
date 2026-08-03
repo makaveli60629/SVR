@@ -5,6 +5,55 @@ const { chromium } = require('playwright');
 const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
 const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phase367`;
 
+async function dragPointer(page, selector, dx = 12, dy = 0) {
+  const locator = page.locator(selector);
+  const box = await locator.boundingBox();
+  if (!box) throw new Error(`No pointer target box for ${selector}`);
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + dx, y + dy, { steps: 3 });
+  await page.mouse.up();
+}
+
+async function clickActionPanelBackground(page) {
+  const locator = page.locator('#svr347Actions');
+  const box = await locator.boundingBox();
+  if (!box) throw new Error('No action-panel box');
+
+  await page.evaluate(() => {
+    const panel = document.querySelector('#svr347Actions');
+    if (!panel) return;
+    for (const child of panel.querySelectorAll('*')) {
+      child.dataset.phase367PreviousPointerEvents = child.style.pointerEvents || '';
+      child.style.pointerEvents = 'none';
+    }
+  });
+
+  try {
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.up();
+  } finally {
+    await page.evaluate(() => {
+      const panel = document.querySelector('#svr347Actions');
+      if (!panel) return;
+      for (const child of panel.querySelectorAll('[data-phase367-previous-pointer-events]')) {
+        child.style.pointerEvents = child.dataset.phase367PreviousPointerEvents || '';
+        delete child.dataset.phase367PreviousPointerEvents;
+      }
+    });
+  }
+}
+
+async function waitForPhase365Ready(page, timeout = 45000) {
+  await page.waitForFunction(() => {
+    const qa = window.SVR_PHASE365_QA?.();
+    return qa?.pass === true && Number(qa?.cardBacksBranded || 0) >= 13;
+  }, null, { timeout });
+}
+
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
@@ -30,6 +79,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phas
   await page.waitForSelector('#svr347Look', { timeout: 30000 });
   await page.waitForSelector('#svr347Actions', { timeout: 30000 });
   await page.waitForFunction(() => window.SVR_PHASE367_DEVICE_QA?.().pass === true, null, { timeout: 30000 });
+  await waitForPhase365Ready(page);
 
   const baseline = await page.evaluate(() => ({
     device: window.SVR_PHASE367_DEVICE_QA(),
@@ -45,30 +95,17 @@ const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phas
     }
   }));
 
-  await page.evaluate(() => {
-    const fire = (selector, pointerId) => {
-      const target = document.querySelector(selector);
-      if (!target) return;
-      target.dispatchEvent(new PointerEvent('pointerdown', {
-        pointerId,
-        pointerType: 'touch',
-        clientX: target.getBoundingClientRect().left + 12,
-        clientY: target.getBoundingClientRect().top + 12,
-        bubbles: true,
-        cancelable: true
-      }));
-      target.dispatchEvent(new PointerEvent('pointerup', {
-        pointerId,
-        pointerType: 'touch',
-        bubbles: true,
-        cancelable: true
-      }));
-    };
-    fire('#svr347Move', 71);
-    fire('#svr347Look', 72);
-    fire('#svr347Actions button:not([disabled])', 73);
-  });
-  await page.waitForTimeout(250);
+  await dragPointer(page, '#svr347Move', 14, 0);
+  await dragPointer(page, '#svr347Look', -12, 0);
+  await clickActionPanelBackground(page);
+  await page.waitForFunction(() => {
+    const state = window.SVR_PHASE367_DEVICE_QA?.();
+    return Number(state?.moveTouches || 0) >= 1
+      && Number(state?.lookTouches || 0) >= 1
+      && Number(state?.actionTouches || 0) >= 1;
+  }, null, { timeout: 10000 });
+
+  const touchMetrics = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
 
   await page.setViewportSize({ width: 412, height: 915 });
   await page.evaluate(() => {
@@ -93,6 +130,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phas
     window.visualViewport?.dispatchEvent(new Event('resize'));
   });
   await page.waitForTimeout(700);
+  await waitForPhase365Ready(page);
 
   await page.evaluate(() => window.SVR_PHASE363_JOIN_TABLE('phase367-browser-acceptance'));
   await page.waitForFunction(() => (
@@ -100,7 +138,8 @@ const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phas
     && document.body.classList.contains('svr365-seated')
     && document.body.classList.contains('svr367-seated')
   ), null, { timeout: 30000 });
-  await page.waitForTimeout(1100);
+  await waitForPhase365Ready(page);
+  await page.waitForTimeout(450);
 
   const beforeBurst = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
   await page.evaluate(() => {
@@ -111,6 +150,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phas
     }
   });
   await page.waitForTimeout(1350);
+  await waitForPhase365Ready(page);
 
   const seated = await page.evaluate(() => {
     const visible = (element) => {
@@ -140,9 +180,11 @@ const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phas
 
   await page.evaluate(() => window.SVR_PHASE363_LEAVE_TABLE?.('phase367-browser-acceptance'));
   await page.waitForFunction(() => window.SVR_PHASE363_STATE?.joined === false, null, { timeout: 30000 });
-  await page.waitForTimeout(350);
+  await waitForPhase365Ready(page);
+  await page.waitForTimeout(250);
   const lobbyReturn = await page.evaluate(() => ({
     device: window.SVR_PHASE367_DEVICE_QA(),
+    phase365: window.SVR_PHASE365_QA(),
     moveDisplay: getComputedStyle(document.querySelector('#svr347Move')).display,
     lookDisplay: getComputedStyle(document.querySelector('#svr347Look')).display
   }));
@@ -153,8 +195,8 @@ const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phas
     [baseline.device?.pass === true, 'baseline-device-qa'],
     [baseline.phase365?.pass === true, 'baseline-phase365-qa'],
     [baseline.device?.controllerRoots === 1 && baseline.device?.moveControls === 1 && baseline.device?.lookControls === 1 && baseline.device?.actionPanels === 1, 'single-existing-controller'],
-    [Number(baseline.device?.moveTouches || 0) === 0, 'touch-baseline-clean'],
-    [Number(portrait.device?.moveTouches || 0) >= 1 && Number(portrait.device?.lookTouches || 0) >= 1 && Number(portrait.device?.actionTouches || 0) >= 1, 'physical-touch-metrics'],
+    [Number(baseline.device?.moveTouches || 0) === 0 && Number(baseline.device?.lookTouches || 0) === 0 && Number(baseline.device?.actionTouches || 0) === 0, 'touch-baseline-clean'],
+    [Number(touchMetrics?.moveTouches || 0) >= 1 && Number(touchMetrics?.lookTouches || 0) >= 1 && Number(touchMetrics?.actionTouches || 0) >= 1, 'physical-touch-metrics'],
     [portrait.css.width.endsWith('px') && portrait.css.height.endsWith('px'), 'portrait-viewport-css'],
     [Number(portrait.device?.viewportWidth || 0) >= 400 && Number(portrait.device?.viewportHeight || 0) >= 890, 'portrait-viewport-dimensions'],
     [Number(seated.device?.viewportWidth || 0) >= 890 && Number(seated.device?.viewportHeight || 0) >= 400, 'landscape-viewport-dimensions'],
@@ -165,6 +207,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phas
     [stabilizationDelta <= 2, 'stabilization-rate-limited'],
     [Number(seated.device?.stabilizationSkipped || 0) >= 1, 'stabilization-burst-skipped'],
     [seated.phase365?.pass === true, 'phase365-still-green-seated'],
+    [lobbyReturn.phase365?.pass === true, 'phase365-green-after-leave'],
     [lobbyReturn.moveDisplay !== 'none' && lobbyReturn.lookDisplay !== 'none', 'controls-return-lobby'],
     [pageErrors.length === 0, 'no-page-errors'],
     [consoleErrors.length === 0, 'no-console-errors'],
@@ -174,6 +217,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phas
   const result = {
     build: 'PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK',
     baseline,
+    touchMetrics,
     portrait,
     beforeBurst,
     seated,
