@@ -39,7 +39,7 @@ async function tap(locator) {
     if (request.url().startsWith(base)) requestFailures.push({ url: request.url(), error: request.failure()?.errorText || 'failed' });
   });
 
-  const url = `${base}/game/android.html?channel=stable&manual=1&v=phase363`;
+  const url = `${base}/game/android.html?channel=stable&manual=1&v=phase364`;
   let report = null;
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
@@ -48,6 +48,7 @@ async function tap(locator) {
       && typeof window.SVR_PHASE355_RUN_FULL_HAND_QA === 'function'
       && typeof window.SVR_PHASE363_JOIN_CONTROL_QA === 'function'
       && typeof window.SVR_PHASE363_CONSISTENCY_QA === 'function'
+      && typeof window.SVR_PHASE364_ANDROID_SEAT === 'function'
       && document.querySelector('#svr347Actions [data-ui="seat"]')
     ), null, { timeout: 120000 });
 
@@ -67,7 +68,16 @@ async function tap(locator) {
       && window.SVR_PHASE336_POKER_STATE?.handNo >= 1
       && (window.SVR_RUN_PHASE336_POKER_AUDIT?.()?.players?.[0]?.hand?.length || 0) === 2
     ), null, { timeout: 30000 });
-    await page.waitForTimeout(900);
+
+    // Phase 364 owns the final table height and camera eye line. Wait for that
+    // device correction instead of sampling Phase 357 during the join transition.
+    await page.waitForFunction(() => {
+      window.SVR_PHASE364_ANDROID_SEAT?.(true);
+      const q = window.SVR_PHASE357_QA?.();
+      return q?.seated === true
+        && Number(q.cameraDistance || Infinity) <= Number(q.maximumCloseSeatDistance || 0) + 0.08;
+    }, null, { timeout: 12000, polling: 180 });
+    await page.waitForTimeout(350);
 
     const seated = await page.evaluate(() => window.SVR_PHASE357_QA());
     const hand = await page.evaluate(() => window.SVR_PHASE355_RUN_FULL_HAND_QA({ maxHands: 1, timeoutMs: 90000 }));
@@ -92,12 +102,10 @@ async function tap(locator) {
       turnPanel: document.getElementById('svr357TurnPanel')?.textContent || '',
       betIndicators: document.querySelectorAll('.svr357Bet').length,
       state: window.SVR_PHASE357_STATE || null,
-      phase363: window.SVR_PHASE363_QA?.() || null
+      phase363: window.SVR_PHASE363_QA?.() || null,
+      phase364: window.SVR_PHASE364_QA?.() || null
     }));
 
-    // Phase 363 intentionally retires Android auto-continuation. Compatibility
-    // now means Phase 357 still renders a complete showdown, then the one
-    // LEAVE/JOIN control returns to lobby and starts a fresh hand deliberately.
     await page.waitForTimeout(700);
     await tap(page.locator('#svr347Actions [data-ui="seat"]'));
     await page.waitForFunction(() => (
@@ -126,7 +134,11 @@ async function tap(locator) {
       && window.SVR_PHASE336_POKER_STATE?.phase === 'preflop'
       && (window.SVR_RUN_PHASE336_POKER_AUDIT?.()?.players?.[0]?.hand?.length || 0) === 2
     ), null, { timeout: 30000 });
-    await page.waitForTimeout(900);
+    await page.waitForFunction(() => {
+      window.SVR_PHASE364_ANDROID_SEAT?.(true);
+      return window.SVR_PHASE357_QA?.()?.seated === true;
+    }, null, { timeout: 10000, polling: 180 });
+    await page.waitForTimeout(350);
 
     const freshRejoin = await page.evaluate(() => ({
       joined: Boolean(window.SVR_PHASE363_STATE?.joined),
@@ -137,7 +149,8 @@ async function tap(locator) {
       joinQa: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
       consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
       audit: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null,
-      phase357: window.SVR_PHASE357_QA?.() || null
+      phase357: window.SVR_PHASE357_QA?.() || null,
+      phase364: window.SVR_PHASE364_QA?.() || null
     }));
 
     report = {
@@ -146,7 +159,7 @@ async function tap(locator) {
       seated,
       hand,
       showdown,
-      compatibilityAuthority: 'phase363-leave-join',
+      compatibilityAuthority: 'phase363-leave-join-with-phase364-device-seat',
       compatibilityBankrolls: {
         isolatedLegacyDriver: Number(hand?.record?.expectedTableBankroll || 0),
         phase363FreshTable: Number(freshRejoin?.consistency?.expectedTableChips || 0)
@@ -185,7 +198,8 @@ async function tap(locator) {
     && /WINNING CARDS:/i.test(report?.showdown?.winners || '')
     && /BOARD:/i.test(report?.showdown?.board || '')
     && report?.showdown?.betIndicators === 6
-    && report?.compatibilityAuthority === 'phase363-leave-join'
+    && report?.showdown?.phase364?.tablePass === true
+    && report?.compatibilityAuthority === 'phase363-leave-join-with-phase364-device-seat'
     && report?.lobbyAfterLeave?.joined === false
     && report?.lobbyAfterLeave?.gameState === 'LOBBY'
     && report?.lobbyAfterLeave?.phase === 'idle'
@@ -204,6 +218,7 @@ async function tap(locator) {
     && Number(report?.freshRejoin?.consistency?.effectiveTableChips || 0) === 90000
     && Number(report?.freshRejoin?.consistency?.expectedTableChips || 0) === 90000
     && report?.freshRejoin?.phase357?.seated === true
+    && report?.freshRejoin?.phase364?.tablePass === true
     && pageErrors.length === 0
     && consoleErrors.length === 0
     && httpErrors.length === 0
