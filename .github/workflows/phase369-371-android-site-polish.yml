@@ -8,6 +8,7 @@ on:
       - 'game/modules/phase368_card_dealer_motion.js'
       - 'game/modules/phase369_android_join_table_freeze_recovery_lock.js'
       - 'game/phase369-release.json'
+      - 'game/tools/phase350-integrity-static-test.mjs'
       - 'game/tools/phase369-android-recovery-static-test.mjs'
       - 'site/js/phase346-avatar-viewer.js'
       - 'site/js/phase370-account-profile-mobile-polish.js'
@@ -40,6 +41,7 @@ jobs:
           node --check site/js/phase346-avatar-viewer.js
           node --check site/js/phase370-account-profile-mobile-polish.js
           node --check matrix.js
+          node --check game/tools/phase350-integrity-static-test.mjs
           python3 -m json.tool game/phase369-release.json >/dev/null
           python3 -m json.tool docs/SVR_PHASE_369_371_MANIFEST.json >/dev/null
       - name: Validate new phases
@@ -47,6 +49,7 @@ jobs:
           node game/tools/phase368-card-dealer-static-test.mjs
           node game/tools/phase369-android-recovery-static-test.mjs
           node site/tools/phase370-371-site-polish-static-test.mjs
+          node game/tools/phase350-integrity-static-test.mjs
       - name: Preserve certified Android and XR contracts
         run: |
           node game/tools/phase364-device-xr-geometry-static-test.mjs
