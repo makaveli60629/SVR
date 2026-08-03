@@ -36,10 +36,10 @@ const start=async()=>{if(started)return;started=true;try{
   }
   window.SVR_PHASE365_QUEST_VR_BUTTON_SWEEP?.();
   window.SVR_PHASE373_REPAIR_TABLE?.();
-  window.SVR_PHASE373_FINALIZE_TABLE?.('quest-core-ready');
   window.SVR_PHASE373_REPAIR_NPCS?.();
   window.SVR_PHASE373_POSTFLIGHT_REPAIR_NPCS?.();
-  window.SVR_PHASE373_STABLE_LOBBY?.();
+  window.SVR_PHASE373_STABLE_LOBBY?.('quest-core-ready');
+  window.SVR_PHASE373_FINALIZE_TABLE?.('quest-core-ready-after-lobby');
   window.SVR_PHASE373_POSTFLIGHT_RESTORE_TELEPORT?.('quest-core-ready');
   document.body.classList.add('boot-released');
   loadDealerLater();
