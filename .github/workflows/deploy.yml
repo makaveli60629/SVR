@@ -90,7 +90,9 @@ jobs:
           test -f build/game/index.html
           test -f build/game/android.html
           test -f build/game/modules/phase372_live_entry_recovery_lock.js
+          test -f build/game/modules/phase373_quest_rig_preflight_lock.js
           test -f build/game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js
+          test -f build/game/modules/phase373_quest_npc_teleport_postflight_lock.js
           test -f build/game/modules/phase369_android_join_table_freeze_recovery_lock.js
           test -f build/game/modules/phase368_card_dealer_animation_lock.js
           test -f build/game/assets/models/table.glb
