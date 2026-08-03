@@ -1,8 +1,8 @@
 {
-  "schema": 2,
+  "schema": 3,
   "project": "SVR Poker",
   "branch": "agent/phase372-production-recovery-aws-autodeploy",
-  "activePhase": 372,
+  "activePhase": 373,
   "phases": [
     {
       "phase": 368,
@@ -37,17 +37,28 @@
       "sourceBranch": "main",
       "publishBranch": "gh-pages",
       "customDomain": "svrpoker.com"
+    },
+    {
+      "phase": 373,
+      "build": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+      "scope": "Quest seated teleport hard block, real GLB table visibility fallback, one exact spawn authority, and upright textured NPC recovery",
+      "singleStableQuestSpawn": true,
+      "lobbyGapMeters": 0.9,
+      "seatGapMeters": 0.62,
+      "seatedTeleportDisabled": true,
+      "realTableGlbFallback": "game/assets/models/table.glb",
+      "npcUprightTexturedGrounded": true
     }
   ],
   "routes": {
     "android": "/game/android.html?channel=stable&v=phase372",
-    "quest": "/game/index.html?platform=quest&v=phase372",
+    "quest": "/game/index.html?platform=quest&v=phase373",
     "siteHome": "/site/index.html?v=phase372",
     "login": "/site/login.html?v=phase372",
     "register": "/site/login.html?mode=register&v=phase372",
     "profile": "/site/profile.html?v=phase372",
     "avatar": "/site/avatar.html?v=phase372",
-    "public": "/?v=phase372",
+    "public": "/?v=phase373",
     "deployHealth": "/deploy-health.json"
   },
   "accounts": {
@@ -65,10 +76,13 @@
     "automaticOnMainPush": true,
     "directGhPagesPublish": true,
     "duplicatePagesWorkflowRemoved": true,
+    "activeBuild": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+    "androidBuild": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
     "requiredAssets": [
       "game/assets/models/table.glb",
       "game/assets/table.fbx",
       "game/modules/phase372_live_entry_recovery_lock.js",
+      "game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js",
       "game/modules/phase368_card_dealer_animation_lock.js"
     ]
   },
@@ -88,5 +102,5 @@
     "awsResourcesRequireAuthorizedAwsDeployment": true,
     "actualAccountCredentialsMustBeEnteredByOwner": true
   },
-  "continuationDocument": "docs/SVR_PHASE_372_PRODUCTION_RECOVERY_MANIFEST.md"
+  "continuationDocument": "docs/SVR_PHASE_373_QUEST_RECOVERY_MANIFEST.md"
 }
