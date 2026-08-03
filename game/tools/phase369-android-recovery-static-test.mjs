@@ -84,7 +84,8 @@ need(dealer, "dealer.position.set(info.center.x, 0, info.box.min.z - DEALER_GAP)
 need(dealer, 'dealer.rotation.set(0, Math.PI, 0)', 'dealer-faces-table');
 need(dealer, 'optimizedFromUploadedFbx: true', 'uploaded-fbx-motion');
 
-if (release.build !== 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK') errors.push('release:phase372-build');
+if (release.build !== 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK') errors.push('release:phase373-active-build');
+if (release.androidBuild !== 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK') errors.push('release:phase372-android-build');
 if (release.androidRecoveryBuild !== 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK') errors.push('release:phase369-protection');
 if (release.certifiedBase !== 'PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK') errors.push('release:base');
 if (!release.androidFlow?.joinRequiredBeforeDeal) errors.push('release:join-before-deal');
@@ -95,7 +96,8 @@ if (release.apkPolicy?.forceUpdate || release.apkPolicy?.showUpdatePrompt || !re
 if (release.truth?.physicalAndroidAcceptancePassed !== false) errors.push('release:physical-acceptance-truth');
 
 const result = {
-  build: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
+  build: 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK',
+  androidBuild: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
   protectedRecoveryBuild: 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK',
   errors,
   pass: errors.length === 0
