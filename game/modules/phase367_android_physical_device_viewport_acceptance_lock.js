@@ -42,10 +42,12 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
 function isSeated() {
   return Boolean(
-    window.SVR_PHASE363_STATE?.joined
+    window.SVR_PHASE363_JOINED_IMMEDIATE === true
+    || window.SVR_PHASE363_STATE?.joined
     || window.SVR_PHASE347_STATE?.seated
     || document.body.classList.contains('svr363-seated')
     || document.body.classList.contains('svr365-seated')
+    || document.body.classList.contains('svr367-seated')
   );
 }
 
