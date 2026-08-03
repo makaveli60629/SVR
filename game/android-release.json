@@ -1,21 +1,21 @@
 {
   "name": "SVR Poker Android",
   "channel": "stable",
-  "status": "phase365-android-seated-ux-branding-gyro-alignment-browser-acceptance-passed",
+  "status": "phase366-device-calibration-avatar-live-camera-awaiting-browser-acceptance",
   "packageName": "com.svrpoker.app",
   "apkVersionName": "0.1.0-rc1",
   "apkVersionCode": 1,
   "apkUrl": "",
   "apkSha256": "",
   "releaseReady": false,
-  "webEntry": "/game/android.html?channel=stable&v=phase365",
+  "webEntry": "/game/android.html?channel=stable&v=phase366",
   "downloadsUrl": "/downloads/",
   "forceUpdate": false,
   "showUpdatePrompt": false,
   "manualUpdateOnly": true,
   "previewEntry": "/game/camera3.html?v=phase350",
-  "currentGameBuild": "PHASE-365-ANDROID-SEATED-UX-BRANDING-GYRO-ALIGNMENT-LOCK",
-  "protectedAndroidAuthority": "PHASE-365-ANDROID-SEATED-UX-BRANDING-GYRO-ALIGNMENT-LOCK",
+  "currentGameBuild": "PHASE-366-ANDROID-DEVICE-CALIBRATION-AVATAR-LIVE-CAMERA-LOCK",
+  "protectedAndroidAuthority": "PHASE-366-ANDROID-DEVICE-CALIBRATION-AVATAR-LIVE-CAMERA-LOCK",
   "controllerAuthority": "PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK",
   "tablePolicy": {
     "startingStackPerPlayer": 15000,
@@ -68,15 +68,36 @@
     "haptics": true,
     "audioMode": "Web Audio synthesized poker effects with no missing-file dependency"
   },
+  "deviceCalibration": {
+    "enabled": true,
+    "scope": "local-device-only",
+    "storageKey": "svr.phase366.androidCalibration.v1",
+    "resetBaseline": "PHASE-365-ANDROID-SEATED-UX-BRANDING-GYRO-ALIGNMENT-LOCK",
+    "hiddenWhileSeated": true,
+    "doesNotModifyPokerState": true,
+    "fields": [
+      "tableYOffset",
+      "seatDistanceOffset",
+      "seatHeightOffset",
+      "hudScale",
+      "potOpacity",
+      "potScale",
+      "gyroSensitivity",
+      "avatarRadialOffset",
+      "avatarHeightOffset"
+    ]
+  },
   "avatarProfileProtection": {
-    "profileShowroom": "/site/profile.html?v=phase351",
-    "websiteDressingRoom": "/site/avatar.html?v=phase346",
-    "vrDressingRoom": "/game/avatar-vr.html?v=phase353",
+    "profileShowroom": "/site/profile.html?v=phase366",
+    "websiteDressingRoom": "/site/avatar.html?v=phase366",
+    "vrDressingRoom": "/game/avatar-vr.html?v=phase366",
     "movingPedestalProtected": true,
     "liveProfileCameraProtected": true,
+    "liveProfileCameraContinuity": true,
     "localProfileBridgeProtected": true,
+    "sharedAvatarProfileRecord": true,
     "cloudBankrollAuthority": false,
-    "note": "The Phase 351 profile showroom and Phase 353 VR dressing room remain the avatar presentation authorities. Phase 365 does not duplicate them."
+    "note": "Phase 366 synchronizes the Phase 351 profile live camera with the Phase 346 website dressing room and Phase 353 VR dressing room. It does not duplicate avatar records."
   },
   "protectedAuthorities": {
     "pokerRulesAndSettlement": "PHASE-336",
@@ -88,7 +109,8 @@
     "androidTableStatus": "PHASE-357",
     "androidIntegratedFlow": "PHASE-363",
     "deviceGeometry": "PHASE-364",
-    "seatedUxBranding": "PHASE-365"
+    "seatedUxBranding": "PHASE-365",
+    "deviceCalibrationAvatarContinuity": "PHASE-366"
   },
   "phase365Acceptance": {
     "passed": true,
@@ -122,32 +144,31 @@
     "failedRequests": 0,
     "profileShowroomProtected": true,
     "vrDressingRoomProtected": true,
-    "questEnterVrButtons": 1,
+    "questEnterVrButtons": 1
+  },
+  "phase366Acceptance": {
+    "passed": false,
+    "pending": true,
+    "browserAcceptancePassed": false,
     "required": [
-      "Table reference line is aligned to floor Y=0",
-      "MOVE and LOOK controls operate in lobby mode",
-      "Left input moves left and right input moves right",
-      "Exactly one MOVE and one LOOK control exist",
-      "JOIN TABLE hides MOVE, LOOK, LOBBY and CENTER controls",
-      "Gyroscope or touch drag looks around the seated table",
-      "Seated camera remains stable without bounce",
-      "Pot display is transparent, unframed and does not block avatars",
-      "Five opponent avatars align with canonical seats",
-      "Every opponent has a visible name and stack tag",
-      "SVR logo appears in the Android HUD",
-      "SVR brand appears on card backs",
-      "Tournament branding can be replaced through one runtime brand slot",
-      "Full hand still reaches settlement while conserving 90,000 chips",
-      "Profile 3D showroom and VR dressing room routes remain intact",
-      "No browser errors or failed asset requests"
+      "Exactly one hidden-in-game calibration button and one calibration panel exist",
+      "Default calibration reproduces the Phase 365 baseline",
+      "Table, seat, HUD, pot, gyro and avatar calibration values persist locally",
+      "Calibration does not modify cards, poker state, bankroll or APK policy",
+      "JOIN TABLE hides the calibration button with the movement controls",
+      "Reset restores the Phase 365 default values",
+      "Profile live camera refreshes when the shared avatar profile changes",
+      "Website and VR dressing room routes use the same avatar profile record",
+      "Full Hold'em regression still conserves 90,000 chips",
+      "No browser errors or failed requests"
     ]
   },
   "realDeviceValidation": {
-    "phase": 365,
+    "phase": 366,
     "passed": false,
     "pending": true,
     "ownerPlaytestRequired": true,
-    "target": "Verify lobby sticks, JOIN hiding, phone gyro comfort, stable seated view, clean pot display, avatar/name visibility, table floor line and SVR branding on the owner Android device."
+    "target": "Use the hidden calibration drawer only if the owner phone needs table-height, seat-distance, HUD, pot, gyro or avatar-chair fine tuning. Verify the profile live camera refreshes after saving an outfit."
   },
   "nextApkVersionName": "0.1.0-rc2",
   "nextApkVersionCode": 2,
@@ -155,14 +176,12 @@
   "updateMessage": "An optional SVR Poker Android update is available.",
   "updateMenuPolicy": "Hidden unless releaseReady is true, apkUrl is non-empty, and apkVersionCode is newer than the installed code.",
   "notes": [
-    "Phase 365 browser and complete-game acceptance passed on an Android-sized Chromium session.",
-    "Physical phone gyro comfort and final visual alignment remain pending owner device confirmation.",
-    "Phase 365 changes the remotely loaded Android web runtime and does not require reinstalling APK 0.1.0-rc1.",
+    "Phase 366 is a remotely loaded web-runtime phase and does not require reinstalling APK 0.1.0-rc1.",
+    "Phase 365 remains the reset baseline for table alignment, seated HUD, pot presentation, avatars and gyro behavior.",
+    "Calibration values are stored only on the current device and never alter the authoritative poker or profile records.",
+    "Phase 351 profile live camera, Phase 346 website dressing room and Phase 353 VR dressing room use the same saved avatar profile.",
     "Phase 336 remains the poker rules and payout authority.",
     "Phase 347 remains the only visible Android MOVE, LOOK and poker-button controller.",
-    "Phase 357 remains the protected table status, seating, showdown and ante presentation authority beneath Phase 365.",
-    "Phase 365 repairs the Phase 347 controller in place and hides it after JOIN instead of creating another controller.",
-    "Phase 351 profile live camera and Phase 353 VR dressing room remain intact.",
     "No server-authoritative multiplayer or real-money gambling is claimed.",
     "APK version name 0.1.0-rc1, version code 1, manual-update-only, forceUpdate false and showUpdatePrompt false remain locked."
   ]
