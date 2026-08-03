@@ -20,6 +20,7 @@ export function createCore({ containerId = "app" } = {}){
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 0.9));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.xr.enabled = true;
+  renderer.xr.setReferenceSpaceType("local-floor");
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -27,12 +28,26 @@ export function createCore({ containerId = "app" } = {}){
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   document.getElementById(containerId).appendChild(renderer.domElement);
+
+  // Compatibility fallback only. Phase 364 replaces this with one monitored
+  // Quest button after runtime initialization. local-floor is optional so a
+  // recovering guardian/floor permission cannot reject the entire session.
   const vrButton = VRButton.createButton(renderer, {
-    requiredFeatures: ["local-floor"],
-    optionalFeatures: ["bounded-floor", "hand-tracking"]
+    optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"]
   });
-  vrButton.classList.add("svr-vr-button");
+  vrButton.classList.add("svr-vr-button", "svr-vr-button-fallback");
+  vrButton.dataset.svrXrFallback = "true";
   document.body.appendChild(vrButton);
+
+  window.SVR_XR_CORE_STATE = {
+    build: "PHASE-364-DEVICE-XR-GEOMETRY-SPAWN-LOCK",
+    referenceSpaceType: "local-floor",
+    localFloorRequired: false,
+    localFloorOptional: true,
+    boundedFloorOptional: true,
+    handTrackingOptional: true,
+    checkedAt: new Date().toISOString()
+  };
 
   window.addEventListener("resize", ()=>{
     camera.aspect = window.innerWidth / window.innerHeight;
