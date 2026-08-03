@@ -1,4 +1,4 @@
-name: Phase 364-372 Device XR Production Recovery
+name: Phase 364-373 Device XR Production Recovery
 
 on:
   pull_request:
@@ -15,12 +15,16 @@ on:
       - 'game/modules/phase369_android_join_readiness_transaction_lock.js'
       - 'game/modules/phase369_android_join_intent_bridge_lock.js'
       - 'game/modules/phase372_live_entry_recovery_lock.js'
+      - 'game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js'
       - 'game/tools/phase364-device-xr-geometry-static-test.mjs'
       - 'game/tools/phase364-device-xr-geometry-browser-acceptance.cjs'
       - 'game/tools/phase369-android-recovery-static-test.mjs'
       - 'game/tools/phase372-production-recovery-static-test.mjs'
+      - 'game/tools/phase373-quest-seated-table-static-test.mjs'
+      - 'game/tools/phase373-quest-seated-table-browser-acceptance.cjs'
       - 'docs/phase364_device_xr_geometry_spawn_lock.md'
       - 'docs/SVR_PHASE_372_PRODUCTION_RECOVERY_MANIFEST.md'
+      - 'docs/SVR_PHASE_373_QUEST_RECOVERY_MANIFEST.md'
       - '.github/workflows/deploy.yml'
       - '.github/workflows/phase364-device-xr-geometry.yml'
   workflow_dispatch:
@@ -31,7 +35,7 @@ permissions:
 jobs:
   device-xr-geometry:
     runs-on: ubuntu-latest
-    timeout-minutes: 42
+    timeout-minutes: 48
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,7 +45,7 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Validate Phase 364-372 contracts
+      - name: Validate Phase 364-373 contracts
         run: |
           node --check game/modules/core_scene.js
           node --check game/modules/phase340_platform_manifest.js
@@ -51,11 +55,15 @@ jobs:
           node --check game/modules/phase369_android_join_readiness_transaction_lock.js
           node --check game/modules/phase369_android_join_intent_bridge_lock.js
           node --check game/modules/phase372_live_entry_recovery_lock.js
+          node --check game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js
           node --check game/tools/phase364-device-xr-geometry-browser-acceptance.cjs
+          node --check game/tools/phase373-quest-seated-table-browser-acceptance.cjs
           node --check game/tools/phase372-production-recovery-static-test.mjs
+          node --check game/tools/phase373-quest-seated-table-static-test.mjs
           node game/tools/phase364-device-xr-geometry-static-test.mjs
           node game/tools/phase369-android-recovery-static-test.mjs
           node game/tools/phase372-production-recovery-static-test.mjs
+          node game/tools/phase373-quest-seated-table-static-test.mjs
           python3 -m json.tool game/manifest.json >/dev/null
           python3 -m json.tool game/device-release.json >/dev/null
 
@@ -73,14 +81,19 @@ jobs:
 
       - name: Start local SVR site
         run: |
-          python3 -m http.server 4173 > /tmp/svr-phase372-http.log 2>&1 &
-          echo $! > /tmp/svr-phase372-http.pid
+          python3 -m http.server 4173 > /tmp/svr-phase373-http.log 2>&1 &
+          echo $! > /tmp/svr-phase373-http.pid
           sleep 2
 
       - name: Verify Quest and Android geometry, spawn and seating
         env:
           SVR_TEST_BASE: http://127.0.0.1:4173
         run: node game/tools/phase364-device-xr-geometry-browser-acceptance.cjs
+
+      - name: Verify Phase 373 table visibility, stable spawn and seated teleport block
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase373-quest-seated-table-browser-acceptance.cjs
 
       - name: Re-run Android complete game
         env:
@@ -96,5 +109,5 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: phase372-http-log
-          path: /tmp/svr-phase372-http.log
+          name: phase373-http-log
+          path: /tmp/svr-phase373-http.log
