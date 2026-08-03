@@ -1,0 +1,186 @@
+openapi: 3.1.0
+info:
+  title: SVR App Install, Telemetry and Payout Profile API
+  version: 0.1.0-phase369
+  description: >
+    Backend contract only. Production deployment, secrets, signing keys, Play Integrity
+    verification, payment-provider approval and legal compliance remain required.
+servers:
+  - url: https://api.svrpoker.com
+paths:
+  /api/v1/app/installations/register:
+    post:
+      summary: Register or refresh one app installation
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstallationRegistration'
+      responses:
+        '200':
+          description: Installation record accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  installationId: { type: string, format: uuid }
+                  serverNonce: { type: string }
+                  integrityRequired: { type: boolean }
+  /api/v1/app/heartbeat:
+    post:
+      summary: Record an active app heartbeat
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [installationId, appVersionCode, occurredAt]
+              properties:
+                installationId: { type: string, format: uuid }
+                appVersionCode: { type: integer }
+                occurredAt: { type: string, format: date-time }
+                integrityToken: { type: string, description: Google Play Integrity token when available }
+                requestHash: { type: string, description: SHA-256 digest binding the heartbeat payload to the integrity verdict }
+      responses:
+        '202': { description: Heartbeat accepted }
+  /api/v1/telemetry/events:
+    post:
+      summary: Record a privacy-disclosed app or website event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelemetryEvent'
+      responses:
+        '202': { description: Event queued }
+  /api/v1/admin/app-metrics:
+    get:
+      summary: Return aggregate install and activity metrics
+      security:
+        - adminBearer: []
+      parameters:
+        - in: query
+          name: days
+          schema: { type: integer, minimum: 1, maximum: 365, default: 30 }
+      responses:
+        '200':
+          description: Aggregated metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppMetrics'
+  /api/v1/admin/installations:
+    get:
+      summary: Search authorized installation records
+      description: >
+        Raw IP addresses are not returned. The server may expose a truncated or keyed hash,
+        coarse country/region, integrity status, username, app version and last activity.
+      security:
+        - adminBearer: []
+      responses:
+        '200': { description: Installation records }
+  /api/v1/player/payout-profile:
+    put:
+      summary: Save a payout preference without enabling a payout
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayoutProfile'
+      responses:
+        '200':
+          description: Payout preference saved
+  /api/v1/admin/prize-claims/{claimId}/approve:
+    post:
+      summary: Approve a prize claim after compliance review
+      description: >
+        Must remain disabled until tournament rules, eligibility, identity, tax, jurisdiction,
+        payment-provider and anti-gambling reviews pass.
+      security:
+        - adminBearer: []
+      parameters:
+        - in: path
+          name: claimId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '409': { description: Compliance or provider gate not satisfied }
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: svr_session
+    adminBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    InstallationRegistration:
+      type: object
+      required: [installationId, packageName, appVersionName, appVersionCode, platform]
+      properties:
+        installationId: { type: string, format: uuid }
+        playerId: { type: string, nullable: true }
+        packageName: { type: string }
+        appVersionName: { type: string }
+        appVersionCode: { type: integer }
+        platform: { type: string, enum: [android-apk, android-web, quest, desktop, website] }
+        signingCertificateSha256: { type: string, nullable: true }
+        integrityToken: { type: string, nullable: true }
+        requestHash: { type: string, nullable: true }
+        deviceClass: { type: string, nullable: true }
+    TelemetryEvent:
+      type: object
+      required: [eventId, installationId, name, createdAt]
+      properties:
+        eventId: { type: string }
+        installationId: { type: string }
+        playerId: { type: string, nullable: true }
+        name: { type: string, maxLength: 80 }
+        page: { type: string, maxLength: 240 }
+        createdAt: { type: string, format: date-time }
+        detail: { type: object, additionalProperties: true }
+    PayoutProfile:
+      type: object
+      required: [method, complianceConsent]
+      properties:
+        method:
+          type: string
+          enum: [none, cash_app, ach_pending]
+        cashAppTag:
+          type: string
+          pattern: '^\$[A-Za-z][A-Za-z0-9_]{1,19}$'
+        complianceConsent: { type: boolean }
+        automatedPayoutsEnabled:
+          type: boolean
+          const: false
+    AppMetrics:
+      type: object
+      properties:
+        totalRegisteredInstallations: { type: integer }
+        activeInstallations30d: { type: integer }
+        downloads: { type: integer }
+        updates: { type: integer }
+        dailyActivePlayers: { type: integer }
+        integrityFailures: { type: integer }
+        series:
+          type: array
+          items:
+            type: object
+            properties:
+              date: { type: string, format: date }
+              installs: { type: integer }
+              active: { type: integer }
+              downloads: { type: integer }
