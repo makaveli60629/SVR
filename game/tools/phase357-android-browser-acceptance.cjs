@@ -1,7 +1,7 @@
 const { chromium } = require('playwright');
 
 const BASE = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
-const URL = `${BASE}/game/android.html?channel=stable&manual=1&v=phase364`;
+const URL = `${BASE}/game/android.html?channel=stable&manual=1&v=phase369`;
 const ANDROID_UA = 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/132.0 Mobile Safari/537.36';
 
 async function tap(locator) {
@@ -23,6 +23,58 @@ async function waitFor(page, evaluator, timeout = 120000) {
     await page.waitForTimeout(250);
   }
   throw new Error(`Timed out waiting for Android compatibility state: ${JSON.stringify(last)}`);
+}
+
+async function waitForReadiness(page, timeout = 120000) {
+  const started = Date.now();
+  let last = null;
+  while (Date.now() - started < timeout) {
+    try {
+      last = await page.evaluate(() => {
+        const seat = document.querySelector('#svr347Actions [data-ui="seat"]');
+        const checks = {
+          phase357Qa: typeof window.SVR_PHASE357_QA === 'function',
+          phase355FullHand: typeof window.SVR_PHASE355_RUN_FULL_HAND_QA === 'function',
+          phase363JoinQa: typeof window.SVR_PHASE363_JOIN_CONTROL_QA === 'function',
+          phase363ConsistencyQa: typeof window.SVR_PHASE363_CONSISTENCY_QA === 'function',
+          phase364AndroidSeat: typeof window.SVR_PHASE364_ANDROID_SEAT === 'function',
+          phase364Qa: typeof window.SVR_PHASE364_QA === 'function',
+          seatExists: Boolean(seat)
+        };
+        return {
+          ready: Object.values(checks).every(Boolean),
+          checks,
+          seat: seat ? {
+            text: seat.textContent?.trim() || '',
+            hidden: Boolean(seat.hidden),
+            inert: Boolean(seat.inert),
+            ariaHidden: seat.getAttribute('aria-hidden'),
+            display: getComputedStyle(seat).display,
+            visibility: getComputedStyle(seat).visibility
+          } : null,
+          controllerRoots: document.querySelectorAll('#svr347Root').length,
+          actionPanels: document.querySelectorAll('#svr347Actions').length,
+          phase369: window.SVR_PHASE369_ANDROID_STATE || null,
+          platform: window.SVR_PHASE340_PLATFORM_STATE ? {
+            platform: window.SVR_PHASE340_PLATFORM_STATE.platform,
+            loaded: window.SVR_PHASE340_PLATFORM_STATE.loaded?.length || 0,
+            failed: window.SVR_PHASE340_PLATFORM_STATE.failed || [],
+            readyAt: window.SVR_PHASE340_PLATFORM_STATE.readyAt || null
+          } : null,
+          bodyBuild: document.body.dataset.build || null,
+          bodyRelease: document.body.dataset.release || null,
+          safeStage: Boolean(document.getElementById('safeStage')),
+          entryOverlay: Boolean(document.getElementById('svr369Entry')),
+          checkedAt: new Date().toISOString()
+        };
+      });
+      if (last?.ready) return last;
+    } catch (error) {
+      last = { evaluationError: String(error?.message || error) };
+    }
+    await page.waitForTimeout(250);
+  }
+  throw new Error(`Timed out waiting for Android readiness: ${JSON.stringify(last)}`);
 }
 
 (async () => {
@@ -54,16 +106,7 @@ async function waitFor(page, evaluator, timeout = 120000) {
 
   try {
     await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    await waitFor(page, () => {
-      const ready = typeof window.SVR_PHASE357_QA === 'function'
-        && typeof window.SVR_PHASE355_RUN_FULL_HAND_QA === 'function'
-        && typeof window.SVR_PHASE363_JOIN_CONTROL_QA === 'function'
-        && typeof window.SVR_PHASE363_CONSISTENCY_QA === 'function'
-        && typeof window.SVR_PHASE364_ANDROID_SEAT === 'function'
-        && typeof window.SVR_PHASE364_QA === 'function'
-        && document.querySelector('#svr347Actions [data-ui="seat"]');
-      return ready ? true : null;
-    });
+    const readiness = await waitForReadiness(page);
 
     const lobbyBefore = await page.evaluate(() => ({
       joined: Boolean(window.SVR_PHASE363_STATE?.joined),
@@ -74,7 +117,7 @@ async function waitFor(page, evaluator, timeout = 120000) {
       consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null
     }));
     if (lobbyBefore.joined || lobbyBefore.seatText !== 'JOIN TABLE' || lobbyBefore.join?.pass !== true) {
-      throw new Error(`Initial Android lobby contract failed: ${JSON.stringify(lobbyBefore)}`);
+      throw new Error(`Initial Android lobby contract failed: ${JSON.stringify({ readiness, lobbyBefore })}`);
     }
 
     await tap(page.locator('#svr347Actions [data-ui="seat"]'));
@@ -97,7 +140,6 @@ async function waitFor(page, evaluator, timeout = 120000) {
         : null;
     }, 15000);
 
-    // Phase 355 intentionally runs a self-contained compatibility table: 1,000 x 6 = 6,000.
     const compatibilityHand = await page.evaluate(() => window.SVR_PHASE355_RUN_FULL_HAND_QA({ maxHands: 1, timeoutMs: 90000 }));
     if (!compatibilityHand?.pass
         || Number(compatibilityHand?.record?.expectedTableBankroll || 0) !== 6000
@@ -189,7 +231,8 @@ async function waitFor(page, evaluator, timeout = 120000) {
 
     const filteredConsole = consoleErrors.filter((line) => !/favicon|WebXR.*not available|THREE\.WebGLRenderer/i.test(line));
     const filteredFailures = requestFailures.filter((line) => !/favicon/i.test(line));
-    const pass = seated.phase357.seated === true
+    const pass = readiness.ready === true
+      && seated.phase357.seated === true
       && seated.phase364.tablePass === true
       && compatibilityHand.pass === true
       && showdown.phase357.seated === true
@@ -206,6 +249,7 @@ async function waitFor(page, evaluator, timeout = 120000) {
     const report = {
       pass,
       url: URL,
+      readiness,
       lobbyBefore,
       seated,
       compatibilityHand,
