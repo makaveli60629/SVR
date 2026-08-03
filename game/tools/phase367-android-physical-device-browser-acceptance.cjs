@@ -5,16 +5,15 @@ const { chromium } = require('playwright');
 const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
 const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phase367`;
 
-async function dragPointer(page, selector, dx = 12, dy = 0) {
+async function tapTouch(page, selector) {
   const locator = page.locator(selector);
   const box = await locator.boundingBox();
-  if (!box) throw new Error(`No pointer target box for ${selector}`);
-  const x = box.x + box.width / 2;
-  const y = box.y + box.height / 2;
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  await page.mouse.move(x + dx, y + dy, { steps: 3 });
-  await page.mouse.up();
+  if (!box) throw new Error(`No touch target box for ${selector}`);
+  await locator.tap({
+    force: true,
+    timeout: 10000,
+    position: { x: box.width / 2, y: box.height / 2 }
+  });
 }
 
 async function waitForPhase365Ready(page, timeout = 45000) {
@@ -28,7 +27,10 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 915, height: 412 },
-    userAgent: 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36'
+    userAgent: 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36',
+    hasTouch: true,
+    isMobile: true,
+    deviceScaleFactor: 1
   });
   const page = await context.newPage();
   const pageErrors = [];
@@ -92,8 +94,8 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   });
   await page.waitForTimeout(120);
 
-  await dragPointer(page, '#svr347Move', 14, 0);
-  await dragPointer(page, '#svr347Look', -12, 0);
+  await tapTouch(page, '#svr347Move');
+  await tapTouch(page, '#svr347Look');
   await page.waitForFunction(() => {
     const state = window.SVR_PHASE367_DEVICE_QA?.();
     return Number(state?.moveTouches || 0) >= 1
