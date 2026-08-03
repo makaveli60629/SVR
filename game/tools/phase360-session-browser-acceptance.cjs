@@ -21,6 +21,16 @@ async function tap(locator) {
   catch { await locator.click({ force: true, timeout: 10000 }); }
 }
 
+async function joinAndroidTable(page) {
+  const phase369Entry = page.locator('#svr369Join');
+  if (await phase369Entry.count() && await phase369Entry.isVisible().catch(() => false)) {
+    await tap(phase369Entry);
+    return 'phase369-visible-entry';
+  }
+  await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+  return 'phase347-authoritative-seat';
+}
+
 async function verifyQuestPhase360(browser) {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 720 },
@@ -133,7 +143,7 @@ async function verifyAndroidPhase363(browser) {
   const page = await context.newPage();
   const errors = diagnostics(page);
 
-  await page.goto(`${base}/game/android.html?channel=stable&v=phase363&phase360compat=1`, {
+  await page.goto(`${base}/game/android.html?channel=stable&v=phase369&phase360compat=1`, {
     waitUntil: 'domcontentloaded',
     timeout: 120000
   });
@@ -155,6 +165,7 @@ async function verifyAndroidPhase363(browser) {
     gameState: window.SVR_PHASE363_STATE?.gameState,
     phase: window.SVR_PHASE336_POKER_STATE?.phase,
     seatText: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || null,
+    phase369EntryVisible: Boolean(document.getElementById('svr369Join')?.offsetParent),
     audit: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null
   }));
   assert.equal(lobby.phase360Type, 'undefined', 'Android must not load the retired Phase 360 auto-session controller');
@@ -165,10 +176,11 @@ async function verifyAndroidPhase363(browser) {
   assert.equal(lobby.gameState, 'LOBBY');
   assert.equal(lobby.phase, 'idle');
   assert.equal(lobby.seatText, 'JOIN TABLE');
+  assert.equal(lobby.phase369EntryVisible, true);
   assert.equal(lobby.consistency.effectiveTableChips, 90000);
   assert.equal((lobby.audit.players || []).every((player) => player.hand.length === 0), true);
 
-  await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+  const firstJoinSurface = await joinAndroidTable(page);
   await page.waitForFunction(() => {
     const qa = window.SVR_PHASE363_SECURE_SHUFFLE_QA?.();
     return Boolean(
@@ -185,6 +197,7 @@ async function verifyAndroidPhase363(browser) {
     join: window.SVR_PHASE363_JOIN_CONTROL_QA(),
     audit: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null
   }));
+  assert.equal(firstJoinSurface, 'phase369-visible-entry');
   assert.equal(first.secure.pass, true);
   assert.equal(first.secure.exactDeckRepeats, 0);
   assert.equal(first.secure.effectiveTableChips, 90000);
@@ -199,6 +212,7 @@ async function verifyAndroidPhase363(browser) {
     window.SVR_PHASE363_STATE?.joined === false
     && window.SVR_PHASE336_POKER_STATE?.phase === 'idle'
     && window.SVR_PHASE363_CONSISTENCY_QA?.()?.lobbyCardsCleared === true
+    && Boolean(document.getElementById('svr369Join')?.offsetParent)
   ), null, { timeout: 15000 });
   const left = await page.evaluate(() => ({
     joined: Boolean(window.SVR_PHASE363_STATE?.joined),
@@ -214,7 +228,7 @@ async function verifyAndroidPhase363(browser) {
   assert.equal((left.audit.players || []).every((player) => player.hand.length === 0), true);
 
   await page.waitForTimeout(700);
-  await tap(page.locator('#svr347Actions [data-ui="seat"]'));
+  const rejoinSurface = await joinAndroidTable(page);
   await page.waitForFunction((previous) => {
     const qa = window.SVR_PHASE363_SECURE_SHUFFLE_QA?.();
     return Boolean(
@@ -232,6 +246,7 @@ async function verifyAndroidPhase363(browser) {
     handNo: Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0),
     phase: window.SVR_PHASE336_POKER_STATE?.phase
   }));
+  assert.equal(rejoinSurface, 'phase369-visible-entry');
   assert.equal(rejoined.secure.pass, true);
   assert.equal(rejoined.secure.randomSource, 'crypto.getRandomValues');
   assert.notEqual(rejoined.secure.deckFingerprint, firstFingerprint);
@@ -255,6 +270,8 @@ async function verifyAndroidPhase363(browser) {
     phase360AutoSessionLoaded: false,
     phase363SecureShuffle: true,
     randomSource: rejoined.secure.randomSource,
+    firstJoinSurface,
+    rejoinSurface,
     firstFingerprint,
     secondFingerprint: rejoined.secure.deckFingerprint,
     fingerprintsDifferent: firstFingerprint !== rejoined.secure.deckFingerprint,
@@ -276,7 +293,7 @@ async function verifyAndroidPhase363(browser) {
     const android = await verifyAndroidPhase363(browser);
     console.log(JSON.stringify({
       pass: true,
-      contract: 'Phase 360 secure session on Quest; Phase 363 secure deliberate JOIN on Android',
+      contract: 'Phase 360 secure session on Quest; Phase 363 secure deliberate JOIN on Android through Phase 369 visible entry',
       quest,
       android
     }, null, 2));
