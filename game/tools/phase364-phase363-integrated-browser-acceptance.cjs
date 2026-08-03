@@ -9,8 +9,11 @@ async function waitFor(page, evaluator, timeout = 120000) {
   while (Date.now() - started < timeout) {
     try {
       last = await page.evaluate(evaluator);
-      if (last) return last;
-    } catch {}
+      const pendingDiagnostic = last && typeof last === 'object' && last.ready === false;
+      if (last && !pendingDiagnostic) return last;
+    } catch (error) {
+      last = { ready: false, evaluatorError: String(error?.message || error) };
+    }
     await page.waitForTimeout(250);
   }
   throw new Error(`Timed out waiting for Android runtime: ${JSON.stringify(last)}`);
@@ -43,20 +46,47 @@ async function waitFor(page, evaluator, timeout = 120000) {
     if (response.url().startsWith(BASE) && response.status() >= 400) httpErrors.push(`${response.status()} ${response.url()}`);
   });
 
-  const url = `${BASE}/game/android.html?channel=stable&manual=1&v=phase364`;
+  const url = `${BASE}/game/android.html?channel=stable&manual=1&v=phase365`;
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    await waitFor(page, () => {
-      const ready = typeof window.SVR_PHASE363_JOIN_TABLE === 'function'
-        && typeof window.SVR_PHASE363_LEAVE_TABLE === 'function'
-        && typeof window.SVR_PHASE363_RAISE_TO === 'function'
-        && typeof window.SVR_PHASE363_CONFIGURE_RAISE === 'function'
-        && typeof window.SVR_PHASE363_CONSISTENCY_QA === 'function'
-        && typeof window.SVR_PHASE355_RUN_FULL_HAND_QA === 'function'
-        && typeof window.SVR_PHASE364_ANDROID_SEAT === 'function'
-        && typeof window.SVR_PHASE364_QA === 'function';
-      return ready ? true : null;
+
+    const boot = await waitFor(page, () => {
+      const functions = {
+        phase365: typeof window.SVR_PHASE365_QA,
+        join: typeof window.SVR_PHASE363_JOIN_TABLE,
+        leave: typeof window.SVR_PHASE363_LEAVE_TABLE,
+        seat: typeof window.SVR_PHASE364_ANDROID_SEAT,
+        geometryQa: typeof window.SVR_PHASE364_QA
+      };
+      const missing = Object.entries(functions).filter(([, type]) => type !== 'function').map(([name]) => name);
+      return {
+        ready: missing.length === 0,
+        missing,
+        functions,
+        bodyBuild: document.body?.dataset?.build || null,
+        platform: window.SVR_PLATFORM || null,
+        phase365State: window.SVR_PHASE365_STATE || null,
+        phase363State: window.SVR_PHASE363_STATE || null,
+        recovery: window.SVR_PHASE356_STATE || null
+      };
     });
+
+    const actionRuntime = await waitFor(page, () => {
+      const functions = {
+        raise: typeof window.SVR_PHASE363_RAISE_TO,
+        configureRaise: typeof window.SVR_PHASE363_CONFIGURE_RAISE,
+        consistencyQa: typeof window.SVR_PHASE363_CONSISTENCY_QA
+      };
+      const missing = Object.entries(functions).filter(([, type]) => type !== 'function').map(([name]) => name);
+      return {
+        ready: missing.length === 0,
+        missing,
+        functions,
+        platformReady: window.SVR_PLATFORM_READY || null,
+        phase365Qa: window.SVR_PHASE365_QA?.() || null,
+        phase363State: window.SVR_PHASE363_STATE || null
+      };
+    }, 45000);
 
     const lobbyBefore = await page.evaluate(() => ({
       joined: Boolean(window.SVR_PHASE363_STATE?.joined),
@@ -70,13 +100,19 @@ async function waitFor(page, evaluator, timeout = 120000) {
       throw new Error(`Android lobby contract failed: ${JSON.stringify(lobbyBefore)}`);
     }
 
-    await page.evaluate(() => window.SVR_PHASE363_JOIN_TABLE('phase364-integrated-acceptance'));
+    await page.evaluate(() => window.SVR_PHASE363_JOIN_TABLE('phase365-integrated-acceptance'));
     await waitFor(page, () => {
       const audit = window.SVR_RUN_PHASE336_POKER_AUDIT?.();
-      return window.SVR_PHASE363_STATE?.joined === true
+      const ready = window.SVR_PHASE363_STATE?.joined === true
         && Number(window.SVR_PHASE336_POKER_STATE?.handNo || 0) >= 1
-        && Number(audit?.players?.[0]?.hand?.length || 0) === 2
-        ? true : null;
+        && Number(audit?.players?.[0]?.hand?.length || 0) === 2;
+      return ready ? true : {
+        ready: false,
+        immediateJoined: window.SVR_PHASE363_JOINED_IMMEDIATE,
+        phase363State: window.SVR_PHASE363_STATE || null,
+        poker: window.SVR_PHASE336_POKER_STATE || null,
+        humanCards: Number(audit?.players?.[0]?.hand?.length || 0)
+      };
     }, 30000);
 
     const seat = await waitFor(page, () => {
@@ -84,9 +120,10 @@ async function waitFor(page, evaluator, timeout = 120000) {
       const q = window.SVR_PHASE364_QA?.();
       const cameraY = Number(window.__SVR_CAMERA__?.position?.y || 0);
       const targetY = Number(q?.measuredTable?.maxY || 0) + 0.55;
-      return q?.tablePass && q?.androidJoined && Math.abs(cameraY - targetY) <= 0.14
+      const ready = q?.tablePass && q?.androidJoined && Math.abs(cameraY - targetY) <= 0.14;
+      return ready
         ? { q, cameraY, targetY }
-        : null;
+        : { ready: false, q, cameraY, targetY, phase363State: window.SVR_PHASE363_STATE || null };
     }, 15000);
 
     const raise = await page.evaluate(async () => {
@@ -160,26 +197,44 @@ async function waitFor(page, evaluator, timeout = 120000) {
     });
     if (!raise?.pass) throw new Error(`Integrated legal raise failed: ${JSON.stringify(raise)}`);
 
+    await waitFor(page, () => {
+      const functions = {
+        fullHand: typeof window.SVR_PHASE355_RUN_FULL_HAND_QA,
+        pokerAction: typeof window.SVR_POKER_ACTION,
+        resetTable: typeof window.SVR_RESET_POKER_TABLE
+      };
+      const missing = Object.entries(functions).filter(([, type]) => type !== 'function').map(([name]) => name);
+      return { ready: missing.length === 0, missing, functions };
+    }, 30000);
+
     // This legacy driver intentionally runs a self-contained 6,000-chip compatibility hand.
     const fullHand = await page.evaluate(() => window.SVR_PHASE355_RUN_FULL_HAND_QA({ maxHands: 2, timeoutMs: 120000 }));
     if (!fullHand?.pass || Number(fullHand?.record?.totalStacks || 0) !== 6000) {
       throw new Error(`Isolated compatibility hand failed: ${JSON.stringify(fullHand)}`);
     }
 
-    await page.evaluate(() => window.SVR_PHASE363_LEAVE_TABLE('phase364-integrated-acceptance'));
+    await page.evaluate(() => window.SVR_PHASE363_LEAVE_TABLE('phase365-integrated-acceptance'));
     const lobbyAfterLeave = await waitFor(page, () => {
       const consistency = window.SVR_PHASE363_CONSISTENCY_QA?.();
       const audit = window.SVR_RUN_PHASE336_POKER_AUDIT?.();
       const cardsCleared = (audit?.players || []).every((player) => Array.isArray(player.hand) && player.hand.length === 0);
-      return window.SVR_PHASE363_STATE?.joined === false
+      const ready = window.SVR_PHASE363_STATE?.joined === false
         && window.SVR_PHASE336_POKER_STATE?.phase === 'idle'
         && consistency?.lobbyCardsCleared === true
-        && cardsCleared
+        && cardsCleared;
+      return ready
         ? { consistency, audit, cardsCleared, join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null }
-        : null;
+        : {
+            ready: false,
+            immediateJoined: window.SVR_PHASE363_JOINED_IMMEDIATE,
+            phase363State: window.SVR_PHASE363_STATE || null,
+            poker: window.SVR_PHASE336_POKER_STATE || null,
+            consistency,
+            cardsCleared
+          };
     }, 15000);
 
-    await page.evaluate(() => window.SVR_PHASE363_JOIN_TABLE('phase364-integrated-rejoin'));
+    await page.evaluate(() => window.SVR_PHASE363_JOIN_TABLE('phase365-integrated-rejoin'));
     const freshRejoin = await waitFor(page, () => {
       window.SVR_PHASE364_ANDROID_SEAT?.(true);
       const state = window.SVR_PHASE336_POKER_STATE;
@@ -188,7 +243,7 @@ async function waitFor(page, evaluator, timeout = 120000) {
       const q364 = window.SVR_PHASE364_QA?.();
       const cameraY = Number(window.__SVR_CAMERA__?.position?.y || 0);
       const targetY = Number(q364?.measuredTable?.maxY || 0) + 0.55;
-      return window.SVR_PHASE363_STATE?.joined === true
+      const ready = window.SVR_PHASE363_STATE?.joined === true
         && Number(state?.handNo || 0) === 1
         && state?.phase === 'preflop'
         && Number(audit?.players?.[0]?.hand?.length || 0) === 2
@@ -196,15 +251,28 @@ async function waitFor(page, evaluator, timeout = 120000) {
         && Number(consistency?.expectedTableChips || 0) === 90000
         && consistency?.pass === true
         && q364?.tablePass === true
-        && Math.abs(cameraY - targetY) <= 0.14
+        && Math.abs(cameraY - targetY) <= 0.14;
+      return ready
         ? { state: { handNo: state.handNo, phase: state.phase }, audit, consistency, phase364: q364, cameraY, targetY }
-        : null;
+        : {
+            ready: false,
+            immediateJoined: window.SVR_PHASE363_JOINED_IMMEDIATE,
+            phase363State: window.SVR_PHASE363_STATE || null,
+            state: state ? { handNo: state.handNo, phase: state.phase } : null,
+            humanCards: Number(audit?.players?.[0]?.hand?.length || 0),
+            consistency,
+            phase364: q364,
+            cameraY,
+            targetY
+          };
     }, 30000);
 
     const filteredConsole = consoleErrors.filter((line) => !/favicon|WebXR.*not available|THREE\.WebGLRenderer/i.test(line));
     const filteredFailed = requestFailures.filter((line) => !/favicon/i.test(line));
     const report = {
       url,
+      boot,
+      actionRuntime,
       lobbyBefore,
       seat,
       raise,
