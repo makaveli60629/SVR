@@ -12,6 +12,7 @@ const android = read('game/android.html');
 const quest = read('game/index.html');
 const recovery = read('game/modules/phase372_live_entry_recovery_lock.js');
 const questRecovery = read('game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js');
+const questFinalizer = read('game/modules/phase373_quest_table_seat_finalizer_lock.js');
 const deploy = read('.github/workflows/deploy.yml');
 const accountConfig = JSON.parse(read('site/config/player-api.json'));
 const aws = read('infrastructure/aws/phase372-player-account-foundation.yml');
@@ -26,8 +27,13 @@ need(quest, 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK', 'quest-phase
 need(quest, "import'./modules/phase372_live_entry_recovery_lock.js?v=phase373'", 'quest-visible-entry-recovery');
 need(quest, 'phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase364', 'quest-lobby-authority');
 need(quest, 'phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase373', 'quest-phase373-recovery');
+need(quest, 'phase373_quest_table_seat_finalizer_lock.js?v=phase373', 'quest-finalizer-import');
 need(quest, 'phase368_card_dealer_animation_lock.js?v=phase373', 'quest-deferred-dealer');
-need(quest, 'window.SVR_PHASE373_STABLE_LOBBY?.()', 'quest-one-stable-spawn');
+need(quest, "window.SVR_PHASE373_STABLE_LOBBY?.('quest-core-ready')", 'quest-one-stable-spawn');
+need(quest, "window.SVR_PHASE373_FINALIZE_TABLE?.('quest-core-ready-after-lobby')", 'quest-table-finalized-after-lobby');
+const stableLobbyIndex = quest.indexOf("window.SVR_PHASE373_STABLE_LOBBY?.('quest-core-ready')");
+const finalizerIndex = quest.indexOf("window.SVR_PHASE373_FINALIZE_TABLE?.('quest-core-ready-after-lobby')");
+if (!(stableLobbyIndex >= 0 && finalizerIndex > stableLobbyIndex)) errors.push('order:quest-stable-lobby-before-table-finalizer');
 need(quest, "document.body.classList.add('boot-released')", 'quest-loading-screen-release');
 
 need(recovery, "export const BUILD = 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK'", 'recovery-build');
@@ -47,6 +53,12 @@ need(questRecovery, 'textureNpc(root)', 'quest-npc-texture');
 need(questRecovery, 'window.SVR_PHASE373_QA = qa', 'phase373-qa');
 forbid(questRecovery, 'new THREE.WebGLRenderer', 'quest-no-second-renderer');
 
+need(questFinalizer, "export const BUILD = 'PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK'", 'quest-finalizer-build');
+need(questFinalizer, 'wrapPublicPlacementApis()', 'quest-finalizer-wraps-public-placement');
+need(questFinalizer, 'scheduleTableFinalization', 'quest-finalizer-scheduled-grounding');
+need(questFinalizer, 'window.SVR_PHASE373_FINALIZER_QA = qa', 'quest-finalizer-qa');
+forbid(questFinalizer, 'new THREE.WebGLRenderer', 'quest-finalizer-no-renderer');
+
 if (accountConfig.provider !== 'aws') errors.push('account-provider:not-aws');
 if (accountConfig.database !== 'dynamodb') errors.push('account-database:not-dynamodb');
 if (accountConfig.identity !== 'cognito') errors.push('account-identity:not-cognito');
@@ -63,6 +75,7 @@ need(deploy, 'test -f build/game/assets/models/table.glb', 'deploy-table-glb');
 need(deploy, 'test -f build/game/assets/table.fbx', 'deploy-table-fbx');
 need(deploy, 'test -f build/game/modules/phase372_live_entry_recovery_lock.js', 'deploy-phase372-module');
 need(deploy, 'test -f build/game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js', 'deploy-phase373-module');
+need(deploy, 'test -f build/game/modules/phase373_quest_table_seat_finalizer_lock.js', 'deploy-phase373-finalizer-module');
 need(deploy, '"questRoute": "/game/index.html?platform=quest&v=phase373"', 'deploy-phase373-quest-route');
 need(deploy, '"androidRoute": "/game/android.html?channel=stable&v=phase372"', 'deploy-phase372-android-route');
 need(deploy, 'databaseProvider', 'deploy-health-aws');
@@ -83,6 +96,7 @@ const result = {
   questVisibleEntry: recovery.includes('START VR LOBBY'),
   questSeatedTeleportLock: questRecovery.includes('blockedRigMoves'),
   questRealTableFallback: questRecovery.includes('table.glb'),
+  questTableFinalizer: questFinalizer.includes('PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK'),
   errors,
   pass: errors.length === 0
 };
