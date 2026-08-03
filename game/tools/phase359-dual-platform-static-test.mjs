@@ -14,55 +14,52 @@ const androidRelease = JSON.parse(read('game/android-release.json'));
 const questRelease = JSON.parse(read('game/quest-release.json'));
 const manifest = JSON.parse(read('game/manifest.json'));
 
-assert.match(continuity, /PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK/);
-assert.match(continuity, /phase336_authoritative_engine\.js/);
-assert.match(continuity, /CONTINUOUS_DELAY_MS\s*=\s*9000/);
-assert.match(continuity, /PHASE359_QUEST_WINNER_CARDS_AMOUNT_PANEL/);
-assert.match(continuity, /NEXT HAND IN/);
-assert.match(continuity, /SVR_PHASE359_NEXT_HAND/);
-assert.match(continuity, /SVR_PHASE359_TOGGLE_CONTINUOUS/);
-assert.match(continuity, /left-input-moves-left-right-input-moves-right/);
-assert.match(continuity, /headset-look-direction/);
-assert.match(continuity, /hold-to-aim-release-to-teleport/);
+for (const pattern of [
+  /PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK/,
+  /phase336_authoritative_engine\.js/,
+  /CONTINUOUS_DELAY_MS\s*=\s*9000/,
+  /PHASE359_QUEST_WINNER_CARDS_AMOUNT_PANEL/,
+  /NEXT HAND IN/,
+  /SVR_PHASE359_NEXT_HAND/,
+  /SVR_PHASE359_TOGGLE_CONTINUOUS/,
+  /left-input-moves-left-right-input-moves-right/,
+  /headset-look-direction/,
+  /hold-to-aim-release-to-teleport/
+]) assert.match(continuity, pattern);
+for (const pattern of [
+  /PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK/,
+  /crypto\.getRandomValues/,
+  /SVR_PHASE336_POKER_SNAPSHOT_V1/,
+  /SVR_PHASE360_FRESH_ON_JOIN_V1/,
+  /function secureNext/,
+  /function armFreshJoin/,
+  /function joinFreshTable/,
+  /practice-table-reset/,
+  /SVR_PHASE360_META_CARD_GRAB_QA/,
+  /physicalHeadsetAcceptancePending: true/
+]) assert.match(shuffle, pattern);
+for (const pattern of [/PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK/, /PLAY GAME/, /LEAVE TABLE/, /SVR_PHASE360_JOIN_TABLE/, /SVR_PHASE360_LEAVE_TABLE/]) assert.match(phase361, pattern);
 
-assert.match(shuffle, /PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK/);
-assert.match(shuffle, /crypto\.getRandomValues/);
-assert.match(shuffle, /SVR_PHASE336_POKER_SNAPSHOT_V1/);
-assert.match(shuffle, /SVR_PHASE360_FRESH_ON_JOIN_V1/);
-assert.match(shuffle, /function secureNext/);
-assert.match(shuffle, /function armFreshJoin/);
-assert.match(shuffle, /function joinFreshTable/);
-assert.match(shuffle, /practice-table-reset/);
-assert.match(shuffle, /SVR_PHASE360_META_CARD_GRAB_QA/);
-assert.match(shuffle, /physicalHeadsetAcceptancePending: true/);
-
-assert.match(phase361, /PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK/);
-assert.match(phase361, /PLAY GAME/);
-assert.match(phase361, /LEAVE TABLE/);
-assert.match(phase361, /SVR_PHASE360_JOIN_TABLE/);
-assert.match(phase361, /SVR_PHASE360_LEAVE_TABLE/);
-
-assert.match(indexText, /data-build="PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK"/);
-assert.match(indexText, /data-release="PHASE-(?:361|36[2-9]|3[7-9]\d)-/);
-assert.match(indexText, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/);
-assert.match(indexText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/);
-assert.match(indexText, /phase361_quest_lobby_play_seat_watch_npc_lock\.js\?v=phase(?:361|36[2-9]|3[7-9]\d)/);
+assert.match(indexText, /data-build="PHASE-(?:358|3[6-9]\d)-/);
+assert.match(indexText, /data-release="PHASE-(?:361|3[6-9]\d)-/);
+assert.match(indexText, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase(?:361|3[6-9]\d)/);
+assert.match(indexText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase(?:361|3[6-9]\d)/);
+assert.match(indexText, /phase361_quest_lobby_play_seat_watch_npc_lock\.js\?v=phase(?:361|3[6-9]\d)/);
 assert.ok(indexText.indexOf('await bootPlatform()') < indexText.indexOf('phase359_dual_platform_gameplay_continuity_lock.js'));
 assert.ok(indexText.indexOf('phase359_dual_platform_gameplay_continuity_lock.js') < indexText.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js'));
 assert.ok(indexText.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js') < indexText.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js'));
 const questSuccessorIndex = indexText.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
 assert.ok(questSuccessorIndex < 0 || questSuccessorIndex > indexText.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js'));
 
-// Phase 359 and Phase 360 remain protected for Quest/desktop. Phase 363
-// intentionally excludes them from Android boot because Android must remain in
-// the lobby until JOIN TABLE is pressed.
-assert.match(androidText, /data-build="PHASE-363-ANDROID-INTEGRATED-LOBBY-AUDIO-GYRO-BANKROLL-LOCK"/);
-assert.match(androidText, /data-release="PHASE-363-ANDROID-CANONICAL-TABLE-JOIN-BANKROLL-AUDIO-LOCK"/);
-assert.match(androidText, /phase363_android_canonical_table_asset_lock\.js\?v=phase363/);
-assert.match(androidText, /phase357_android_table_status_showdown_ante_lock\.js\?v=phase363/);
-assert.match(androidText, /phase357_android_direct_camera_seat_fix\.js\?v=phase363/);
-assert.match(androidText, /phase363_android_integrated_lobby_audio_gyro_bankroll_lock\.js\?v=phase363/);
-assert.match(androidText, /phase363_android_join_control_capture_lock\.js\?v=phase363/);
+assert.match(androidText, /data-build="PHASE-(?:363|3[6-9]\d)-/);
+assert.match(androidText, /data-release="PHASE-(?:363|3[6-9]\d)-/);
+for (const module of [
+  'phase363_android_canonical_table_asset_lock.js',
+  'phase357_android_table_status_showdown_ante_lock.js',
+  'phase357_android_direct_camera_seat_fix.js',
+  'phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js',
+  'phase363_android_join_control_capture_lock.js'
+]) assert.match(androidText, new RegExp(`${module.replaceAll('.', '\\.')}\\?v=phase(?:363|3[6-9]\\d)`));
 assert.doesNotMatch(androidText, /phase359_dual_platform_gameplay_continuity_lock\.js/);
 assert.doesNotMatch(androidText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js/);
 assert.doesNotMatch(androidText, /phase362_continuous_10000_turn_clock_rejoin_reset_lock\.js/);
@@ -70,10 +67,7 @@ assert.ok(androidText.indexOf("await bootPlatform({forcedPlatform:'android'})") 
 assert.ok(androidText.indexOf('phase363_android_canonical_table_asset_lock.js') < androidText.indexOf('phase357_android_table_status_showdown_ante_lock.js'));
 assert.ok(androidText.indexOf('phase357_android_direct_camera_seat_fix.js') < androidText.indexOf('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js'));
 assert.ok(androidText.indexOf('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js') < androidText.indexOf('phase363_android_join_control_capture_lock.js'));
-assert.match(phase363, /const STARTING_STACK = 15000/);
-assert.match(phase363, /function prepareLobby/);
-assert.match(phase363, /function joinTable/);
-assert.match(phase363, /function leaveTable/);
+for (const pattern of [/const STARTING_STACK = 15000/, /function prepareLobby/, /function joinTable/, /function leaveTable/]) assert.match(phase363, pattern);
 
 assert.ok(Number(questRelease.phase) >= 361);
 assert.equal(questRelease.browserAcceptance.passed, true);
@@ -101,8 +95,8 @@ assert.equal(androidRelease.tablePolicy.singleJoinLeaveControl, true);
 assert.equal(androidRelease.phase363Acceptance.pending, true);
 
 assert.ok(Number(manifest.phase) >= 363);
-assert.match(String(manifest.build), /^PHASE-363-/);
-assert.match(String(manifest.start_url), /v=phase363/);
+assert.match(String(manifest.build), /^PHASE-(?:363|3[6-9]\d)-/);
+assert.match(String(manifest.start_url), /v=phase(?:363|3[6-9]\d)/);
 assert.equal(manifest.starting_stack, 15000);
 assert.equal(manifest.table_bankroll, 90000);
 assert.equal(manifest.join_required_before_deal, true);
@@ -123,7 +117,7 @@ assert.ok(fs.statSync(tableGlbPath).size > 1024, 'uploaded table GLB must be non
 console.log(JSON.stringify({
   build: manifest.build,
   android: 'phase357 seating protected with phase363 JOIN-gated 15,000-chip policy',
-  quest: 'phase358 gameplay and phase361 lobby/seat protected',
+  quest: 'phase358 gameplay and phase361 lobby/seat protected with phase364 geometry successor',
   continuity: 'phase359 preserved for Quest/desktop',
   shuffle: 'phase360 preserved for Quest/desktop',
   uploadedTableFbx: fs.statSync(tablePath).size,

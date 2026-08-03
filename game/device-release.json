@@ -1,0 +1,48 @@
+{
+  "name": "SVR Poker Device Runtime",
+  "phase": 364,
+  "build": "PHASE-364-DEVICE-XR-GEOMETRY-SPAWN-LOCK",
+  "questEntry": "/game/index.html?platform=quest&v=phase364",
+  "androidEntry": "/game/android.html?channel=stable&v=phase364",
+  "geometryAuthority": {
+    "tableLengthMeters": 2.74,
+    "tableHeightMeters": 0.80,
+    "tableDepthMeters": 1.46,
+    "floorY": 0,
+    "questLobbyClearanceMeters": 3.15,
+    "questSeatClearanceMeters": 0.48,
+    "questSeatedEyeAboveTableMeters": 0.56,
+    "androidSeatedEyeAboveTableMeters": 0.55
+  },
+  "quest": {
+    "singleEnterVrAuthority": true,
+    "localFloorRequired": false,
+    "localFloorOptional": true,
+    "standingLobbySpawn": true,
+    "playGameSeatCalibration": true,
+    "brokenEricQuarantined": true,
+    "physicalHeadsetAcceptancePassed": false,
+    "physicalHeadsetAcceptancePending": true,
+    "ownerReportedPriorFailure": "Enter VR blinked and exited; camera appeared at table center; PLAY GAME was unusable; Eric was sideways/untextured/floating."
+  },
+  "android": {
+    "phase363GameplayProtected": true,
+    "tableFloorAlignmentCorrected": true,
+    "seatEyeHeightMeasuredFromTableTop": true,
+    "startingStackPerSeat": 15000,
+    "tableBankroll": 90000
+  },
+  "productTruth": {
+    "localPlayMoneyVsFiveBots": true,
+    "serverAuthoritativePoker": false,
+    "physicalQuestRetestRequired": true
+  },
+  "apkPolicy": {
+    "versionName": "0.1.0-rc1",
+    "versionCode": 1,
+    "releaseReady": false,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true
+  }
+}

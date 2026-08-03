@@ -13,88 +13,72 @@ const android = read('game/android.html');
 const manifest = JSON.parse(read('game/manifest.json'));
 const release = JSON.parse(read('game/android-release.json'));
 const errors = [];
+const need = (source, token, label = token) => { if (!source.includes(token)) errors.push(label); };
+const match = (source, pattern, label) => { if (!pattern.test(source)) errors.push(label); };
 
-function requireText(source, needle, label) {
-  if (!source.includes(needle)) errors.push(label);
-}
-function requirePattern(source, pattern, label) {
-  if (!pattern.test(source)) errors.push(label);
-}
+for (const [token, label] of [
+  ['PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK', 'build-label'],
+  ['function desiredSeatCamera', 'close-seat-target'],
+  ['metrics.depth * 0.5 + edgeOffset', 'table-edge-distance'],
+  ['function moveRigByWorldDelta', 'xr-camera-world-delta-correction'],
+  ["button.dataset?.ui === 'seat'", 'sit-button-intercept'],
+  ["button.id === 'svr347Recenter'", 'recenter-button-intercept'],
+  ['svr357TurnPanel', 'turn-panel'], ['svr357Bets', 'six-player-bet-strip'],
+  ['TO CALL', 'amount-to-call-indicator'], ['actor?.lastAction', 'last-action-indicator'],
+  ['svr357Showdown', 'showdown-panel'], ['WINNING CARDS:', 'winning-cards-display'],
+  ['winner.label', 'winning-hand-name'], ['BOARD:', 'community-board-display'],
+  ['ANTE UP • NEXT HAND', 'ante-up-prompt'], ['window.SVR_POKER_NEXT_HAND?.()', 'authoritative-next-hand'],
+  ['playerBetIndicators === 6', 'six-player-qa'], ['window.SVR_PHASE357_QA', 'runtime-qa'],
+  ['window.SVR_PHASE357_RECENTER', 'recenter-api'], ['window.SVR_PHASE357_ANTE_UP', 'ante-api']
+]) need(runtime, token, label);
 
-requireText(runtime, 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK', 'build-label');
-requireText(runtime, 'function desiredSeatCamera', 'close-seat-target');
-requireText(runtime, 'metrics.depth * 0.5 + edgeOffset', 'table-edge-distance');
-requireText(runtime, 'function moveRigByWorldDelta', 'xr-camera-world-delta-correction');
-requireText(runtime, "button.dataset?.ui === 'seat'", 'sit-button-intercept');
-requireText(runtime, "button.id === 'svr347Recenter'", 'recenter-button-intercept');
-requireText(runtime, 'svr357TurnPanel', 'turn-panel');
-requireText(runtime, 'svr357Bets', 'six-player-bet-strip');
-requireText(runtime, 'TO CALL', 'amount-to-call-indicator');
-requireText(runtime, 'actor?.lastAction', 'last-action-indicator');
-requireText(runtime, 'svr357Showdown', 'showdown-panel');
-requireText(runtime, 'WINNING CARDS:', 'winning-cards-display');
-requireText(runtime, 'winner.label', 'winning-hand-name');
-requireText(runtime, 'BOARD:', 'community-board-display');
-requireText(runtime, 'ANTE UP • NEXT HAND', 'ante-up-prompt');
-requireText(runtime, 'window.SVR_POKER_NEXT_HAND?.()', 'authoritative-next-hand');
-requireText(runtime, 'playerBetIndicators === 6', 'six-player-qa');
-requireText(runtime, 'window.SVR_PHASE357_QA', 'runtime-qa');
-requireText(runtime, 'window.SVR_PHASE357_RECENTER', 'recenter-api');
-requireText(runtime, 'window.SVR_PHASE357_ANTE_UP', 'ante-api');
+for (const [token, label] of [
+  ['PHASE-357-ANDROID-DIRECT-CAMERA-SEAT-FIX', 'direct-camera-build'],
+  ['renderer()?.xr?.isPresenting', 'xr-exclusion'], ['camera.position.x = local.x', 'direct-camera-x'],
+  ['camera.position.z = local.z', 'direct-camera-z'], ["'seat-transition' : 'seated-watchdog'", 'seat-transition-correction'],
+  ['window.SVR_PHASE357_DIRECT_CAMERA_CORRECT', 'direct-camera-api'], ['window.SVR_PHASE357_DIRECT_CAMERA_QA', 'direct-camera-qa']
+]) need(directCamera, token, label);
 
-requireText(directCamera, 'PHASE-357-ANDROID-DIRECT-CAMERA-SEAT-FIX', 'direct-camera-build');
-requireText(directCamera, 'renderer()?.xr?.isPresenting', 'xr-exclusion');
-requireText(directCamera, 'camera.position.x = local.x', 'direct-camera-x');
-requireText(directCamera, 'camera.position.z = local.z', 'direct-camera-z');
-requireText(directCamera, "'seat-transition' : 'seated-watchdog'", 'seat-transition-correction');
-requireText(directCamera, 'window.SVR_PHASE357_DIRECT_CAMERA_CORRECT', 'direct-camera-api');
-requireText(directCamera, 'window.SVR_PHASE357_DIRECT_CAMERA_QA', 'direct-camera-qa');
+need(continuity, 'PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK', 'phase359-continuity-build');
+need(shuffle, 'PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK', 'phase360-shuffle-build');
+for (const [token, label] of [
+  ['PHASE-363-ANDROID-INTEGRATED-LOBBY-AUDIO-GYRO-BANKROLL-LOCK', 'phase363-build'],
+  ['const STARTING_STACK = 15000', 'phase363-starting-stack'], ['function prepareLobby', 'phase363-lobby-state'],
+  ['function joinTable', 'phase363-join-state'], ['function leaveTable', 'phase363-leave-state']
+]) need(phase363, token, label);
+need(raiseCapture, 'PHASE-363-ANDROID-RAISE-UI-CAPTURE-LOCK', 'phase363-raise-capture-build');
+need(raiseCapture, 'event.stopImmediatePropagation()', 'phase363-raise-capture');
+need(streetRaise, 'PHASE-363-ANDROID-STREET-RAISE-ACTION-LOCK', 'phase363-street-raise-build');
+need(streetRaise, "expectedOrder = ['preflop', 'flop', 'turn', 'river', 'showdown']", 'phase363-street-order');
+need(streetRaise, "river: { community: 5, burn: 3 }", 'phase363-burn-order');
+need(consistency, 'PHASE-363-ANDROID-SETTLEMENT-LOBBY-CONSISTENCY-LOCK', 'phase363-consistency-build');
+need(consistency, 'effectiveTableChips', 'settled-chip-accounting');
+need(consistency, 'enforceLobbyCardClear', 'lobby-card-clear');
 
-requireText(continuity, 'PHASE-359-DUAL-PLATFORM-GAMEPLAY-CONTINUITY-LOCK', 'phase359-continuity-build');
-requireText(shuffle, 'PHASE-360-FRESH-SHUFFLE-LEAVE-RESET-CONTINUOUS-TABLE-LOCK', 'phase360-shuffle-build');
-requireText(phase363, 'PHASE-363-ANDROID-INTEGRATED-LOBBY-AUDIO-GYRO-BANKROLL-LOCK', 'phase363-build');
-requireText(phase363, 'const STARTING_STACK = 15000', 'phase363-starting-stack');
-requireText(phase363, 'function prepareLobby', 'phase363-lobby-state');
-requireText(phase363, 'function joinTable', 'phase363-join-state');
-requireText(phase363, 'function leaveTable', 'phase363-leave-state');
-requireText(raiseCapture, 'PHASE-363-ANDROID-RAISE-UI-CAPTURE-LOCK', 'phase363-raise-capture-build');
-requireText(raiseCapture, 'event.stopImmediatePropagation()', 'phase363-raise-capture');
-requireText(streetRaise, 'PHASE-363-ANDROID-STREET-RAISE-ACTION-LOCK', 'phase363-street-raise-build');
-requireText(streetRaise, "expectedOrder = ['preflop', 'flop', 'turn', 'river', 'showdown']", 'phase363-street-order');
-requireText(streetRaise, "river: { community: 5, burn: 3 }", 'phase363-burn-order');
-requireText(consistency, 'PHASE-363-ANDROID-SETTLEMENT-LOBBY-CONSISTENCY-LOCK', 'phase363-consistency-build');
-requireText(consistency, 'effectiveTableChips', 'settled-chip-accounting');
-requireText(consistency, 'enforceLobbyCardClear', 'lobby-card-clear');
-
-const bootIndex = android.indexOf("await bootPlatform({forcedPlatform:'android'})");
-const tableIndex = android.indexOf('phase363_android_canonical_table_asset_lock.js');
-const phase357Index = android.indexOf('phase357_android_table_status_showdown_ante_lock.js');
-const directCameraIndex = android.indexOf('phase357_android_direct_camera_seat_fix.js');
-const phase363Index = android.indexOf('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
-const raiseCaptureIndex = android.indexOf('phase363_android_raise_ui_capture_lock.js');
-const streetRaiseIndex = android.indexOf('phase363_android_street_raise_action_lock.js');
-const joinCaptureIndex = android.indexOf('phase363_android_join_control_capture_lock.js');
-const consistencyIndex = android.indexOf('phase363_android_settlement_lobby_consistency_lock.js');
-if (bootIndex < 0 || tableIndex <= bootIndex) errors.push('verified-table-must-load-after-platform-boot');
-if (phase357Index <= tableIndex) errors.push('phase357-must-load-after-verified-table');
-if (directCameraIndex <= phase357Index) errors.push('direct-camera-fix-must-load-after-phase357');
-if (phase363Index <= directCameraIndex) errors.push('phase363-must-load-after-direct-camera-fix');
-if (raiseCaptureIndex <= phase363Index) errors.push('raise-capture-must-load-after-core');
-if (streetRaiseIndex <= raiseCaptureIndex) errors.push('street-raise-must-load-after-raise-capture');
-if (joinCaptureIndex <= streetRaiseIndex) errors.push('join-capture-must-load-after-street-raise');
-if (consistencyIndex <= joinCaptureIndex) errors.push('consistency-must-load-last');
+const sequence = [
+  "await bootPlatform({forcedPlatform:'android'})",
+  'phase363_android_canonical_table_asset_lock.js',
+  'phase357_android_table_status_showdown_ante_lock.js',
+  'phase357_android_direct_camera_seat_fix.js',
+  'phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js',
+  'phase363_android_raise_ui_capture_lock.js',
+  'phase363_android_street_raise_action_lock.js',
+  'phase363_android_join_control_capture_lock.js',
+  'phase363_android_settlement_lobby_consistency_lock.js'
+].map((token) => android.indexOf(token));
+if (!sequence.every((index) => index >= 0) || !sequence.every((index, i) => i === 0 || index > sequence[i - 1])) errors.push('android-runtime-order');
 if (android.includes('phase359_dual_platform_gameplay_continuity_lock.js')) errors.push('phase359-must-not-auto-run-before-join');
 if (android.includes('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js')) errors.push('phase360-must-not-auto-run-before-join');
-requireText(android, 'data-build="PHASE-363-ANDROID-INTEGRATED-LOBBY-AUDIO-GYRO-BANKROLL-LOCK"', 'android-page-build');
-requireText(android, 'data-acceptance="PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK"', 'android-acceptance-record');
-requirePattern(android, /data-release="PHASE-363-/, 'android-release-label');
-requirePattern(android, /manifest\.json\?v=phase363/, 'android-manifest-cache-version');
+match(android, /data-build="PHASE-(?:363|3[6-9]\d)-/, 'android-page-build');
+match(android, /data-acceptance="PHASE-(?:354|357|363|3[6-9]\d)-/, 'android-acceptance-record');
+match(android, /data-release="PHASE-(?:363|3[6-9]\d)-/, 'android-release-label');
+match(android, /manifest\.json\?v=phase(?:363|3[6-9]\d)/, 'android-manifest-cache-version');
 
 if (Number(manifest.phase) < 363) errors.push('manifest-phase');
-if (!/^PHASE-363-/.test(String(manifest.build || ''))) errors.push('manifest-build');
-if (!/v=phase363/.test(String(manifest.start_url || ''))) errors.push('manifest-start-url');
+if (!/^PHASE-(?:363|3[6-9]\d)-/.test(String(manifest.build || ''))) errors.push('manifest-build');
+if (!/v=phase(?:363|3[6-9]\d)/.test(String(manifest.start_url || ''))) errors.push('manifest-start-url');
 if (release.protectedAndroidAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('phase357-authority-record-regressed');
-if (!/v=phase363/.test(String(release.webEntry || ''))) errors.push('phase363-route-missing');
+if (!/v=phase363/.test(String(release.webEntry || ''))) errors.push('protected-phase363-route-missing');
 if (Number(release.realDeviceValidation?.phase) < 363 || release.realDeviceValidation?.pending !== true) errors.push('owner-playtest-pending');
 
 if (manifest.apk_version_name !== '0.1.0-rc1' || manifest.apk_version_code !== 1) errors.push('manifest-apk-version');
@@ -107,7 +91,6 @@ if (errors.length) {
   console.error(JSON.stringify({ pass: false, errors }, null, 2));
   process.exit(1);
 }
-
 console.log(JSON.stringify({
   pass: true,
   protectedAuthority: release.protectedAndroidAuthority,
@@ -117,10 +100,6 @@ console.log(JSON.stringify({
   raise: 'capture-protected bet and raise-to authority',
   streets: 'preflop-flop-turn-river-showdown with three burns',
   settlement: 'effective settled stacks prevent contribution double-counting',
-  historicalContinuityProtected: ['phase359', 'phase360'],
-  apk: {
-    versionName: release.apkVersionName,
-    versionCode: release.apkVersionCode,
-    manualUpdateOnly: release.manualUpdateOnly
-  }
+  geometrySuccessor: 'phase364-table-floor-and-seat-height',
+  apk: { versionName: release.apkVersionName, versionCode: release.apkVersionCode, manualUpdateOnly: release.manualUpdateOnly }
 }, null, 2));
