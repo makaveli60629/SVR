@@ -10,6 +10,8 @@ window.SVR_REQUIRE_TABLE_JOIN=true;
 window.SVR_TABLE_STARTING_STACK=15000;
 window.SVR_ANDROID_BRAND_SLOT={id:'svr',name:'SVR POKER',logoUrl:'/logo.png',fallbackLogoUrl:'/logo.webp'};
 window.SVR_ANDROID_UPDATE_POLICY={apkVersionName:'0.1.0-rc1',apkVersionCode:1,forceUpdate:false,showUpdatePrompt:false,manualUpdateOnly:true};
+window.SVR_PHASE369_PENDING_JOIN=false;
+document.addEventListener('click',(event)=>{const button=event.target?.closest?.('#svr369Join');if(!button||button.dataset.svr369ReadinessBound)return;event.preventDefault();event.stopImmediatePropagation();window.SVR_PHASE369_PENDING_JOIN=true;},true);
 window.addEventListener('svr:phase363-immediate-join-state',(event)=>{
   const joined=Boolean(event.detail?.joined);
   window.SVR_PHASE363_STATE={...(window.SVR_PHASE363_STATE||{}),joined,gameState:joined?'SEATED':'LOBBY'};
@@ -44,6 +46,7 @@ const start=async()=>{if(started)return;started=true;try{
   await import('./modules/phase367_android_physical_device_viewport_touch_acceptance_lock.js?v=phase367');
   await import('./modules/phase369_android_join_table_freeze_recovery_lock.js?v=phase369');
   await import('./modules/phase369_android_join_readiness_transaction_lock.js?v=phase369');
+  await import('./modules/phase369_android_join_intent_bridge_lock.js?v=phase369');
   window.SVR_PHASE363_LEAVE_TABLE?.('phase369-boot-lobby');
   window.SVR_PHASE365_SYNC?.();
   window.SVR_PHASE365_REFRESH_CARD_BRAND?.();
