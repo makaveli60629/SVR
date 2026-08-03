@@ -48,7 +48,7 @@ forbidText(core, 'requiredFeatures:', 'required XR floor feature');
 requireText(manifest, "phase364_device_xr_geometry_spawn_lock.js");
 requireText(manifest, "phase364-quest-critical-load-order");
 if (!/export const VERSION = 'phase3(?:6[4-9]|[7-9][0-9])'/.test(manifest)) throw new Error('Platform version regressed below Phase 364');
-if (!/phase(?:364|365)-android-critical-load-order/.test(manifest)) throw new Error('Missing protected Android geometry load-order validator');
+if (!/phase(?:364|365|366)-android-critical-load-order/.test(manifest)) throw new Error('Missing protected Android geometry load-order validator');
 
 const questPhaseIndex = quest.indexOf("phase364_device_xr_geometry_spawn_lock.js?v=phase364");
 const questBootIndex = quest.indexOf("phase340_platform_core_loader.js?v=phase364");
@@ -68,7 +68,7 @@ const androidBootIndex = android.indexOf(androidBootMatch[0]);
 if (androidBootIndex <= androidPhaseIndex) throw new Error('Android Phase 364 must load before platform boot');
 requireText(android, 'SVR_PHASE364_ALIGN_TABLE');
 requireText(android, 'PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK');
-if (!/PHASE-36[4-9]-ANDROID|PHASE-365-ANDROID/.test(android)) throw new Error('Android release label regressed below Phase 364');
+if (!/PHASE-36[4-9]-ANDROID/.test(android)) throw new Error('Android release label regressed below Phase 364');
 
 if (appManifest.apk_version_name !== '0.1.0-rc1' || appManifest.apk_version_code !== 1) throw new Error('APK lock changed');
 if (appManifest.force_update || appManifest.show_update_prompt || !appManifest.manual_update_only) throw new Error('APK prompt policy changed');
