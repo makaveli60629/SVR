@@ -19,6 +19,11 @@ const forbidText = (source, token, label = token) => {
 requireText(phase, "length: 2.74");
 requireText(phase, "depth: 1.46");
 requireText(phase, "height: 0.80");
+requireText(phase, "TABLE_READY_GAP = 0.90");
+requireText(phase, "spawnMode: 'table-ready-standing'");
+requireText(phase, "scheduleStableSpawn('xr-session-start')");
+requireText(phase, "headInsideTable");
+requireText(phase, "bounceCorrectionsBlocked");
 requireText(phase, "trapAuthority()");
 requireText(phase, "optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking']");
 requireText(phase, "window.SVR_PHASE364_ENTER_VR");
@@ -26,7 +31,9 @@ requireText(phase, "window.SVR_PHASE364_LOBBY_SPAWN");
 requireText(phase, "window.SVR_PHASE364_SEAT");
 requireText(phase, "window.SVR_PHASE364_ANDROID_SEAT");
 requireText(phase, "Dealer Eric remains hidden");
-requireText(phase, "value.rotation.y = Math.atan2(-dx, -dz)");
+requireText(phase, "root.rotation.y = Math.atan2(-dx, -dz)");
+forbidText(phase, 'frontZ + 3.15', 'distant Quest lobby spawn');
+forbidText(phase, "setTimeout(() => lobbySpawn(true), 180); setTimeout(() => lobbySpawn(true), 850)", 'double forced XR recenter');
 forbidText(phase, 'function installControllerRecovery', 'duplicate Phase 364 controller select authority');
 
 requireText(quarantine, 'PHASE-364-QUEST-ERIC-QUARANTINE-WATCH');
@@ -68,6 +75,8 @@ console.log(JSON.stringify({
   pass: true,
   build: 'PHASE-364-DEVICE-XR-GEOMETRY-SPAWN-LOCK',
   tableMeters: [2.74, 0.80, 1.46],
+  questSpawn: '0.90m outside south/front rail facing felt',
+  xrEntry: 'single stable placement plus inside-table safety recovery',
   xrLocalFloorRequired: false,
   lateEricQuarantine: true,
   apk: `${appManifest.apk_version_name}/${appManifest.apk_version_code}`
