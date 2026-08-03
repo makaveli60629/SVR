@@ -3,6 +3,7 @@ const read=p=>fs.readFileSync(p,'utf8');
 const join=read('game/modules/phase368_android_join_card_gyro_ux_lock.js');
 const tournament=read('game/modules/phase368_android_spectator_tournament_voice_lock.js');
 const raceGuard=read('game/modules/phase368_android_join_release_race_guard.js');
+const legacyCompat=read('game/modules/phase368_android_legacy_acceptance_compat_lock.js');
 const android=read('game/android.html');
 const manifest=JSON.parse(read('game/manifest.json'));
 const release=JSON.parse(read('game/android-release.json'));
@@ -12,10 +13,13 @@ const checks={
   joinBuild:join.includes('PHASE-368-ANDROID-JOIN-CARD-GYRO-UX-LOCK'),
   tournamentBuild:tournament.includes('PHASE-368-ANDROID-SPECTATOR-TOURNAMENT-VOICE-LOCK'),
   raceGuardBuild:raceGuard.includes('PHASE-368-ANDROID-JOIN-RELEASE-RACE-GUARD'),
+  legacyCompatBuild:legacyCompat.includes('PHASE-368-ANDROID-LEGACY-ACCEPTANCE-COMPAT-LOCK'),
   androidLoadsAfter367:android.indexOf('phase368_android_join_card_gyro_ux_lock.js?v=phase368')>android.indexOf('phase367_android_physical_device_viewport_touch_acceptance_lock.js?v=phase367'),
   tournamentLoadsAfterJoin:android.indexOf('phase368_android_spectator_tournament_voice_lock.js?v=phase368')>android.indexOf('phase368_android_join_card_gyro_ux_lock.js?v=phase368'),
-  raceGuardLoadsLast:android.indexOf('phase368_android_join_release_race_guard.js?v=phase368')>android.indexOf('phase368_android_spectator_tournament_voice_lock.js?v=phase368'),
+  raceGuardLoadsAfterTournament:android.indexOf('phase368_android_join_release_race_guard.js?v=phase368')>android.indexOf('phase368_android_spectator_tournament_voice_lock.js?v=phase368'),
+  legacyCompatLoadsLast:android.indexOf('phase368_android_legacy_acceptance_compat_lock.js?v=phase368')>android.indexOf('phase368_android_join_release_race_guard.js?v=phase368'),
   legacyTargetListenersQuarantined:raceGuard.includes('cloneNode(true)')&&raceGuard.includes("phase363Bound = '1'")&&raceGuard.includes('seat.replaceWith(replacement)'),
+  legacyCompatibilityJoined:legacyCompat.includes('setJoined')&&legacyCompat.includes('SVR_PHASE368_COMPATIBILITY_ACTIVE')&&legacyCompat.includes('SVR_RESET_POKER_TABLE?.(1000)'),
   singleJoinControl:join.includes('singleJoinControl')&&join.includes("'SIT AT TABLE'")&&join.includes("'JOIN TABLE'"),
   sticksHidden:join.includes('svr368-seated #svr347Move')&&join.includes('svr368-seated #svr347Look'),
   gyroPreserved:manifest.gyro_touch_hybrid===true&&manifest.android_gyro_head_look===true,
