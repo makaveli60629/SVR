@@ -1,6 +1,6 @@
 (() => {
-  const BUILD = 'PHASE-356-MATRIX-SECRET-PHRASE-PACING-LOCK';
-  const CAMERA3 = '/game/camera3.html?v=phase356';
+  const BUILD = 'PHASE-371-PUBLIC-APP-AI-MATRIX-POLISH-LOCK';
+  const CAMERA3 = '/game/camera3.html?v=phase371';
 
   function routeCamera3() {
     document.querySelectorAll('iframe[src*="cam=director"],iframe[src*="autocam=1"]').forEach((frame) => {
@@ -15,16 +15,30 @@
     });
   }
 
-  routeCamera3();
-  new MutationObserver(routeCamera3).observe(document.documentElement, { subtree: true, childList: true });
-
-  if (/\/site\/profile\.html$/i.test(location.pathname) && !document.querySelector('script[data-phase356-profile-legend]')) {
-    const module = document.createElement('script');
-    module.type = 'module';
-    module.src = '/site/js/phase356-profile-legend-pedestal.js?v=phase356';
-    module.dataset.phase356ProfileLegend = '1';
-    document.head.appendChild(module);
+  function loadSitePolish() {
+    if (!/^\/site\/(?:index|profile|avatar|login|register)\.html$/i.test(location.pathname)) return;
+    if (!document.querySelector('link[data-svr-phase370]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/site/css/phase370-account-profile-mobile-clean.css?v=phase371';
+      link.dataset.svrPhase370 = '1';
+      document.head.appendChild(link);
+    }
+    if (!document.querySelector('script[data-svr-phase370]')) {
+      const script = document.createElement('script');
+      script.src = '/site/js/phase370-account-profile-mobile-polish.js?v=phase371';
+      script.defer = true;
+      script.dataset.svrPhase370 = '1';
+      document.head.appendChild(script);
+    }
   }
+
+  routeCamera3();
+  loadSitePolish();
+  new MutationObserver(() => {
+    routeCamera3();
+    loadSitePolish();
+  }).observe(document.documentElement, { subtree: true, childList: true });
 
   const canvas = document.getElementById('binary-rain');
   if (!canvas) return;
@@ -37,14 +51,14 @@
   const lowPower = coarsePointer || Number(navigator.deviceMemory || 4) <= 3;
   const glyphs = ['0', '1'];
   const phrases = ['I LOVE SHY', 'I LOVE SCARLETT'];
-  const targetFrameMs = reducedMotion ? 80 : lowPower ? 42 : 24;
-  const phraseIntervalSeconds = reducedMotion ? 18 : coarsePointer ? 12 : 9;
-  const phraseStaggerSeconds = coarsePointer ? 0.34 : 0.28;
+  const targetFrameMs = reducedMotion ? 90 : lowPower ? 48 : 28;
+  const phraseIntervalSeconds = reducedMotion ? 25 : coarsePointer ? 19 : 16;
+  const phraseStaggerSeconds = coarsePointer ? 1.05 : 0.88;
 
   let width = 1;
   let height = 1;
   let dpr = 1;
-  let fontSize = 12;
+  let fontSize = 14;
   let columns = [];
   let drops = [];
   let highlights = [];
@@ -58,25 +72,26 @@
   const randomGlyph = () => glyphs[Math.random() < 0.5 ? 0 : 1];
   const createDrop = () => ({
     row: -Math.random() * Math.max(12, height / fontSize),
-    speed: (lowPower ? 7 : 10) + Math.random() * (lowPower ? 8 : 13),
-    length: (lowPower ? 8 : 12) + Math.floor(Math.random() * (lowPower ? 8 : 13)),
+    speed: (lowPower ? 5.5 : 7.5) + Math.random() * (lowPower ? 5.5 : 8),
+    length: (lowPower ? 6 : 8) + Math.floor(Math.random() * (lowPower ? 6 : 8)),
     seed: Math.random() * Math.PI * 2
   });
 
   function resize() {
-    dpr = Math.min(lowPower ? 1 : 1.35, Math.max(1, window.devicePixelRatio || 1));
+    dpr = Math.min(lowPower ? 1 : 1.25, Math.max(1, window.devicePixelRatio || 1));
     width = Math.max(1, window.innerWidth);
     height = Math.max(1, window.innerHeight);
-    fontSize = Math.max(lowPower ? 13 : 11, Math.min(15, Math.round(width / (lowPower ? 74 : 100))));
+    fontSize = Math.max(lowPower ? 14 : 13, Math.min(17, Math.round(width / (lowPower ? 66 : 82))));
     canvas.width = Math.floor(width * dpr);
     canvas.height = Math.floor(height * dpr);
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.textBaseline = 'top';
-    ctx.font = `700 ${fontSize}px Orbitron, ui-monospace, monospace`;
-    const count = Math.ceil(width / fontSize) + 3;
-    columns = Array.from({ length: count }, (_, index) => index * fontSize - fontSize);
+    ctx.font = `500 ${fontSize}px Orbitron, ui-monospace, monospace`;
+    const spacing = fontSize * 1.28;
+    const count = Math.ceil(width / spacing) + 3;
+    columns = Array.from({ length: count }, (_, index) => index * spacing - spacing);
     drops = Array.from({ length: count }, createDrop);
     highlights = [];
     ctx.clearRect(0, 0, width, height);
@@ -93,14 +108,14 @@
       const swap = Math.floor(Math.random() * (index + 1));
       [available[index], available[swap]] = [available[swap], available[index]];
     }
-    chars.slice(0, Math.min(chars.length, Math.max(5, Math.floor(columns.length * 0.42)))).forEach((char, index) => {
+    chars.slice(0, Math.min(chars.length, available.length)).forEach((char, index) => {
       highlights.push({
         char,
-        column: available[index % available.length],
-        row: -4 - Math.random() * 7,
-        speed: (coarsePointer ? 8 : 10) + Math.random() * 4,
+        column: available[index],
+        row: -4 - Math.random() * 9,
+        speed: (coarsePointer ? 6.5 : 8) + Math.random() * 2.5,
         alpha: 0,
-        delay: index * phraseStaggerSeconds,
+        delay: index * phraseStaggerSeconds + Math.random() * 0.25,
         age: 0,
         pulse: Math.random() * Math.PI * 2
       });
@@ -114,14 +129,14 @@
     for (let trail = 0; trail < drop.length; trail += 1) {
       const y = (headRow - trail) * fontSize;
       if (y < -fontSize || y > height + fontSize) continue;
-      const alpha = trail === 0 ? 0.68 : Math.max(0.015, 0.25 * (1 - trail / drop.length));
-      const pulse = 0.55 + 0.45 * Math.sin(timestamp * 0.0012 + drop.seed + y * 0.012);
-      const red = 132 + Math.floor(32 * pulse);
-      const green = 48 + Math.floor(28 * pulse);
-      ctx.fillStyle = `rgba(${red},${green},240,${alpha})`;
+      const alpha = trail === 0 ? 0.46 : Math.max(0.01, 0.16 * (1 - trail / drop.length));
+      const pulse = 0.55 + 0.45 * Math.sin(timestamp * 0.001 + drop.seed + y * 0.01);
+      const red = 126 + Math.floor(26 * pulse);
+      const green = 44 + Math.floor(22 * pulse);
+      ctx.fillStyle = `rgba(${red},${green},226,${alpha})`;
       if (trail === 0 && !lowPower) {
-        ctx.shadowColor = 'rgba(190,105,255,.34)';
-        ctx.shadowBlur = 5;
+        ctx.shadowColor = 'rgba(190,105,255,.22)';
+        ctx.shadowBlur = 3;
       }
       ctx.fillText(randomGlyph(), x, y);
       ctx.shadowBlur = 0;
@@ -135,14 +150,14 @@
       item.row += item.speed * delta;
       const y = item.row * fontSize;
       const visibleAge = item.age - item.delay;
-      const fadeIn = Math.min(1, visibleAge / 0.45);
-      const fadeOut = Math.max(0, 1 - Math.max(0, y - height * 0.62) / Math.max(1, height * 0.38));
-      item.alpha = Math.min(0.9, fadeIn * fadeOut);
-      const pulse = 0.65 + 0.35 * Math.sin(timestamp * 0.003 + item.pulse);
-      ctx.fillStyle = `rgba(255,${160 + Math.floor(45 * pulse)},244,${item.alpha})`;
+      const fadeIn = Math.min(1, visibleAge / 0.62);
+      const fadeOut = Math.max(0, 1 - Math.max(0, y - height * 0.64) / Math.max(1, height * 0.36));
+      item.alpha = Math.min(0.78, fadeIn * fadeOut);
+      const pulse = 0.65 + 0.35 * Math.sin(timestamp * 0.0024 + item.pulse);
+      ctx.fillStyle = `rgba(255,${150 + Math.floor(36 * pulse)},238,${item.alpha})`;
       if (!lowPower) {
-        ctx.shadowColor = `rgba(100,225,255,${0.18 + pulse * 0.2})`;
-        ctx.shadowBlur = 8;
+        ctx.shadowColor = `rgba(100,225,255,${0.12 + pulse * 0.14})`;
+        ctx.shadowBlur = 5;
       }
       ctx.fillText(item.char, columns[item.column] || 0, y);
       ctx.shadowBlur = 0;
@@ -157,7 +172,7 @@
     lastAdvance = timestamp;
     lastFrame = timestamp;
     phraseClock += delta;
-    ctx.fillStyle = reducedMotion ? 'rgba(0,0,0,.38)' : lowPower ? 'rgba(0,0,0,.29)' : 'rgba(0,0,0,.24)';
+    ctx.fillStyle = reducedMotion ? 'rgba(0,0,0,.43)' : lowPower ? 'rgba(0,0,0,.34)' : 'rgba(0,0,0,.30)';
     ctx.fillRect(0, 0, width, height);
     for (let index = 0; index < drops.length; index += 1) {
       const drop = drops[index];
@@ -174,7 +189,7 @@
 
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(resize, 140);
+    resizeTimer = setTimeout(resize, 160);
   }, { passive: true });
   document.addEventListener('visibilitychange', () => {
     paused = document.hidden;
@@ -189,10 +204,13 @@
   window.SVR_MATRIX_RAIN_STATE = {
     build: BUILD,
     active: true,
+    thinnerRain: true,
+    phraseLettersIndividuallyStaggered: true,
     phraseIntervalSeconds,
     phraseStaggerSeconds,
     phraseBursts: () => phraseBursts,
-    profileLegendModule: /\/site\/profile\.html$/i.test(location.pathname),
+    profileLegendModule: false,
+    phase370SitePolish: /^\/site\//i.test(location.pathname),
     camera3Route: CAMERA3,
     reducedMotion,
     lowPower,
