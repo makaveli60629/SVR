@@ -1,10 +1,13 @@
 {
-  "schema": 1,
-  "build": "PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK",
+  "schema": 2,
+  "build": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
+  "androidRecoveryBuild": "PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK",
   "joinReadinessBuild": "PHASE-369-ANDROID-JOIN-READINESS-TRANSACTION-LOCK",
   "joinIntentBuild": "PHASE-369-ANDROID-JOIN-INTENT-BRIDGE-LOCK",
-  "status": "code-complete-pending-owner-physical-device-acceptance",
-  "entry": "/game/android.html?channel=stable&v=phase369",
+  "dealerBuild": "PHASE-368-CARD-DEALER-ANIMATION-LOCK",
+  "status": "production-deploy-enabled-pending-owner-physical-device-acceptance",
+  "entry": "/game/android.html?channel=stable&v=phase372",
+  "questEntry": "/game/index.html?platform=quest&v=phase372",
   "certifiedBase": "PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK",
   "protectedAuthorities": {
     "poker": "PHASE-336",
@@ -14,34 +17,54 @@
     "deviceGeometry": "PHASE-364",
     "seatedUxBranding": "PHASE-365",
     "physicalDeviceViewportTouch": "PHASE-367",
-    "dealerMotion": "PHASE-368"
+    "dealerMotion": "PHASE-368",
+    "androidJoinRecovery": "PHASE-369",
+    "liveEntryRecovery": "PHASE-372"
   },
   "androidFlow": {
+    "visibleEntryBeforeHeavyBoot": true,
     "logoEntry": true,
     "joinRequiredBeforeDeal": true,
     "singleJoinLeaveAuthority": true,
     "visibleJoinButton": true,
-    "unboundJoinPointerGuard": true,
     "earlyJoinIntentCaptured": true,
-    "earlyJoinIntentReplayedAfterBinding": true,
     "oneTapBoundedReadinessTransaction": true,
-    "maximumTableWaitMs": 18000,
+    "maximumPhase372TableWaitMs": 45000,
+    "maximumPhase369TableWaitMs": 18000,
     "maximumJoinApiWaitMs": 12000,
-    "singleFlightJoin": true,
-    "visibleJoiningState": true,
-    "automaticRetryThroughAuthoritativeJoinApi": true,
     "legacySitSeatControlsSuppressed": true,
     "cardsHiddenBeforeJoin": true,
     "fresh15000ChipTableAfterJoin": true,
     "automaticNextHandAfterShowdown": true,
-    "authoritativeTableRequired": true,
     "authoritativeTableForcedVisible": true,
-    "tableAlignmentBounded": true,
     "dealerDeferredUntilRuntimeStable": true,
-    "dealerAlignedAfterJoin": true,
     "lowPowerRecoveryButton": true,
-    "longFrameGapRecovery": true,
-    "inGameLogo": true
+    "loadingOverlayReleasedOnSuccessOrRecovery": true
+  },
+  "questFlow": {
+    "visibleLobbyStartBeforeHeavyBoot": true,
+    "standingLobbySpawn": true,
+    "verifiedTableRequired": true,
+    "playGameSeatAuthorityPreserved": true,
+    "watchAuthorityPreserved": true,
+    "dealerDeferredUntilRuntimeStable": true,
+    "loadingOverlayReleasedOnSuccessOrRecovery": true
+  },
+  "deployment": {
+    "sourceBranch": "main",
+    "publishBranch": "gh-pages",
+    "customDomain": "svrpoker.com",
+    "automaticOnMainPush": true,
+    "singleDeploymentWorkflow": true,
+    "postDeployHealthCheck": "/deploy-health.json"
+  },
+  "accounts": {
+    "provider": "aws",
+    "identity": "cognito",
+    "profileDatabase": "dynamodb",
+    "apiGatewayEndpointConfigured": false,
+    "demoFallbackEnabled": true,
+    "azureSupported": false
   },
   "apkPolicy": {
     "apkVersionName": "0.1.0-rc1",
@@ -57,16 +80,19 @@
     "realMoneyGambling": false,
     "dealerUsesUploadedFbxMotion": true,
     "dealerPhysicallyTransfersCardObjects": false,
+    "awsInfrastructureProvisionedByThisCodeCommit": false,
     "physicalAndroidAcceptancePassed": false,
+    "physicalQuestAcceptancePassed": false,
     "ownerPhysicalDevicePlaytestRequired": true
   },
   "qaHooks": [
+    "window.SVR_PHASE372_QA()",
+    "window.SVR_PHASE372_PRIMARY_ACTION()",
     "window.SVR_PHASE369_ANDROID_QA()",
     "window.SVR_PHASE369_JOIN_READINESS_QA()",
     "window.SVR_PHASE369_JOIN_INTENT_QA()",
-    "window.SVR_PHASE369_JOIN_TABLE()",
-    "window.SVR_PHASE369_LOW_POWER('manual')",
     "window.SVR_PHASE368_CARD_DEALER_STATE",
-    "window.SVR_PHASE367_DEVICE_QA()"
+    "window.SVR_PHASE367_DEVICE_QA()",
+    "window.SVR_PHASE361_QA()"
   ]
 }
