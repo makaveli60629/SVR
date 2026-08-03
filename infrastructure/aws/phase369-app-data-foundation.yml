@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SVR Phase 369 app-install telemetry and payout-profile data foundation. No API, secrets or payout automation.
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+    AllowedPattern: '[a-z0-9-]+'
+Resources:
+  AppInstallationsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub svr-${EnvironmentName}-app-installations
+      BillingMode: PAY_PER_REQUEST
+      DeletionProtectionEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      AttributeDefinitions:
+        - AttributeName: installationId
+          AttributeType: S
+        - AttributeName: playerId
+          AttributeType: S
+        - AttributeName: lastSeenAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: installationId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: player-last-seen
+          KeySchema:
+            - AttributeName: playerId
+              KeyType: HASH
+            - AttributeName: lastSeenAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  AppTelemetryEventsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub svr-${EnvironmentName}-app-telemetry-events
+      BillingMode: PAY_PER_REQUEST
+      DeletionProtectionEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+      AttributeDefinitions:
+        - AttributeName: installationId
+          AttributeType: S
+        - AttributeName: occurredAtEventId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: installationId
+          KeyType: HASH
+        - AttributeName: occurredAtEventId
+          KeyType: RANGE
+
+  PlayerPayoutProfilesTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub svr-${EnvironmentName}-player-payout-profiles
+      BillingMode: PAY_PER_REQUEST
+      DeletionProtectionEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      AttributeDefinitions:
+        - AttributeName: playerId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: playerId
+          KeyType: HASH
+
+  TournamentPrizeClaimsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub svr-${EnvironmentName}-tournament-prize-claims
+      BillingMode: PAY_PER_REQUEST
+      DeletionProtectionEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      AttributeDefinitions:
+        - AttributeName: claimId
+          AttributeType: S
+        - AttributeName: playerId
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: claimId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: player-created-at
+          KeySchema:
+            - AttributeName: playerId
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+Outputs:
+  AppInstallationsTableName:
+    Value: !Ref AppInstallationsTable
+  AppTelemetryEventsTableName:
+    Value: !Ref AppTelemetryEventsTable
+  PlayerPayoutProfilesTableName:
+    Value: !Ref PlayerPayoutProfilesTable
+  TournamentPrizeClaimsTableName:
+    Value: !Ref TournamentPrizeClaimsTable
