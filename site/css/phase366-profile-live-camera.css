@@ -1,0 +1,18 @@
+#profileShowroom{--svr366-camera-scale:1;--svr366-camera-y:0%;--svr366-camera-x:0%;min-height:clamp(520px,72vh,780px)}
+#profileShowroomCanvas{transform:translate3d(var(--svr366-camera-x),var(--svr366-camera-y),0) scale(var(--svr366-camera-scale));transform-origin:50% 56%;transition:transform .55s cubic-bezier(.2,.75,.2,1),filter .35s ease;will-change:transform}
+#profileShowroom.svr366-camera-portrait{--svr366-camera-scale:1.42;--svr366-camera-y:14%}
+#profileShowroom.svr366-camera-outfit{--svr366-camera-scale:1.18;--svr366-camera-y:4%}
+#profileShowroom.svr366-camera-full{--svr366-camera-scale:1;--svr366-camera-y:0%}
+#profileShowroom.svr366-live-orbit #profileShowroomCanvas{filter:saturate(1.04) contrast(1.02)}
+.svr366-live-camera-badge{position:absolute;z-index:7;left:18px;top:18px;display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid rgba(127,252,255,.42);border-radius:999px;background:rgba(1,5,14,.62);backdrop-filter:blur(10px);color:#eaffff;font:800 12px/1 Rajdhani,system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase;pointer-events:none}
+.svr366-live-camera-badge::before{content:"";width:9px;height:9px;border-radius:50%;background:#7ffcff;box-shadow:0 0 16px #7ffcff;animation:svr366-live-pulse 1.8s ease-in-out infinite}
+.svr366-live-camera-badge[data-state="fallback"]::before{background:#ffd98a;box-shadow:0 0 16px #ffd98a}
+.svr366-live-camera-toolbar{position:absolute;z-index:8;left:50%;bottom:74px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:7px;max-width:calc(100% - 24px);padding:7px;border:1px solid rgba(127,252,255,.24);border-radius:16px;background:rgba(1,5,14,.68);backdrop-filter:blur(11px);box-shadow:0 14px 40px rgba(0,0,0,.32);overflow-x:auto;scrollbar-width:none}
+.svr366-live-camera-toolbar::-webkit-scrollbar{display:none}
+.svr366-live-camera-toolbar button,.svr366-live-camera-toolbar a{flex:0 0 auto;min-height:38px;padding:8px 11px;border:1px solid rgba(255,255,255,.18);border-radius:11px;background:rgba(15,20,34,.76);color:#fff;font:800 12px/1 Rajdhani,system-ui,sans-serif;letter-spacing:.04em;text-decoration:none;cursor:pointer}
+.svr366-live-camera-toolbar button[aria-pressed="true"]{border-color:rgba(127,252,255,.82);background:rgba(19,86,102,.72);box-shadow:0 0 18px rgba(127,252,255,.18)}
+.svr366-live-camera-toolbar a{border-color:rgba(255,217,138,.48);color:#ffe7b2}
+.svr366-camera-status{position:absolute;z-index:7;right:18px;top:18px;max-width:min(45vw,330px);padding:8px 11px;border-radius:12px;background:rgba(1,5,14,.58);color:#dffcff;font:700 11px/1.2 Rajdhani,system-ui,sans-serif;text-align:right;pointer-events:none}
+@keyframes svr366-live-pulse{0%,100%{opacity:.55;transform:scale(.85)}50%{opacity:1;transform:scale(1.08)}}
+@media(max-width:720px){#profileShowroom{min-height:620px}.svr366-live-camera-badge{left:10px;top:10px}.svr366-camera-status{right:10px;top:10px;max-width:54vw}.svr366-live-camera-toolbar{bottom:84px;justify-content:flex-start}.showroom-bottom{padding-bottom:76px!important}}
+@media(max-height:520px) and (orientation:landscape){#profileShowroom{min-height:460px}.svr366-live-camera-toolbar{bottom:54px}.showroom-hint{display:none}.showroom-bottom{padding-bottom:58px!important}}
