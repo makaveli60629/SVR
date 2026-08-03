@@ -14,6 +14,7 @@ const state = {
   tableReady: false,
   joined: false,
   attempts: 0,
+  leaveRestoresEntry: true,
   lastError: null,
   checkedAt: null
 };
@@ -61,6 +62,17 @@ function setStatus(message, error = false) {
   if (!statusNode) return;
   statusNode.textContent = message;
   statusNode.dataset.error = error ? '1' : '0';
+}
+
+function resetPrimaryForLobby(reason = 'lobby') {
+  if (!root || !primaryButton || platform !== 'android') return;
+  activePromise = null;
+  state.lastError = null;
+  primaryButton.disabled = false;
+  primaryButton.textContent = 'JOIN TABLE';
+  root.hidden = false;
+  setStatus(state.tableReady ? 'Table ready. Press JOIN TABLE to play.' : 'Preparing the verified table…');
+  publish(reason);
 }
 
 function ensureUi() {
@@ -190,12 +202,20 @@ function install() {
     ...publish('qa'),
     entryCount: document.querySelectorAll('#svr372Entry').length,
     primaryVisible: Boolean(primaryButton && !root.hidden),
+    primaryText: primaryButton?.textContent?.trim() || null,
     tableVisible: Boolean(locateTable()?.visible),
     pass: document.querySelectorAll('#svr372Entry').length === 1 && !state.lastError
   });
   window.addEventListener('svr:phase363-immediate-join-state', (event) => {
-    if (event.detail?.joined) root.hidden = true;
-    publish(event.detail?.reason || 'join-state');
+    const joined = Boolean(event.detail?.joined);
+    if (joined) {
+      root.hidden = true;
+      publish(event.detail?.reason || 'android-joined-event');
+    } else if (platform === 'android') {
+      resetPrimaryForLobby(event.detail?.reason || 'android-lobby-event');
+    } else {
+      publish(event.detail?.reason || 'join-state');
+    }
   });
   window.addEventListener('svr:phase368-card-dealer-ready', () => publish('dealer-ready'));
   publish('installed');
