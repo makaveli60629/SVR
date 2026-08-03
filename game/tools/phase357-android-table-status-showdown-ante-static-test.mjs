@@ -77,8 +77,8 @@ match(android, /manifest\.json\?v=phase(?:363|3[6-9]\d)/, 'android-manifest-cach
 if (Number(manifest.phase) < 363) errors.push('manifest-phase');
 if (!/^PHASE-(?:363|3[6-9]\d)-/.test(String(manifest.build || ''))) errors.push('manifest-build');
 if (!/v=phase(?:363|3[6-9]\d)/.test(String(manifest.start_url || ''))) errors.push('manifest-start-url');
-if (release.protectedAndroidAuthority !== 'PHASE-357-ANDROID-TABLE-STATUS-SHOWDOWN-ANTE-LOCK') errors.push('phase357-authority-record-regressed');
-if (!/v=phase363/.test(String(release.webEntry || ''))) errors.push('protected-phase363-route-missing');
+if (release.protectedAuthorities?.androidTableStatus !== 'PHASE-357') errors.push('phase357-authority-record-regressed');
+if (!/v=phase(?:363|3[6-9]\d)/.test(String(release.webEntry || ''))) errors.push('protected-phase363-route-missing');
 if (Number(release.realDeviceValidation?.phase) < 363 || release.realDeviceValidation?.pending !== true) errors.push('owner-playtest-pending');
 
 if (manifest.apk_version_name !== '0.1.0-rc1' || manifest.apk_version_code !== 1) errors.push('manifest-apk-version');
@@ -93,7 +93,7 @@ if (errors.length) {
 }
 console.log(JSON.stringify({
   pass: true,
-  protectedAuthority: release.protectedAndroidAuthority,
+  protectedAuthority: release.protectedAuthorities.androidTableStatus,
   successorRelease: manifest.build,
   closeSeat: 'direct-non-xr-camera-to-south-table-edge-with-xr-rig-preserved',
   androidContinuation: 'phase363-join-gated-fresh-15000-chip-table',
