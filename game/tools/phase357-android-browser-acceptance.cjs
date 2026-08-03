@@ -49,6 +49,7 @@ async function tap(locator) {
       && typeof window.SVR_PHASE363_JOIN_CONTROL_QA === 'function'
       && typeof window.SVR_PHASE363_CONSISTENCY_QA === 'function'
       && typeof window.SVR_PHASE364_ANDROID_SEAT === 'function'
+      && typeof window.SVR_PHASE364_QA === 'function'
       && document.querySelector('#svr347Actions [data-ui="seat"]')
     ), null, { timeout: 120000 });
 
@@ -69,17 +70,22 @@ async function tap(locator) {
       && (window.SVR_RUN_PHASE336_POKER_AUDIT?.()?.players?.[0]?.hand?.length || 0) === 2
     ), null, { timeout: 30000 });
 
-    // Phase 364 owns the final table height and camera eye line. Wait for that
-    // device correction instead of sampling Phase 357 during the join transition.
     await page.waitForFunction(() => {
       window.SVR_PHASE364_ANDROID_SEAT?.(true);
-      const q = window.SVR_PHASE357_QA?.();
-      return q?.seated === true
-        && Number(q.cameraDistance || Infinity) <= Number(q.maximumCloseSeatDistance || 0) + 0.08;
+      const q = window.SVR_PHASE364_QA?.();
+      const cameraY = Number(window.__SVR_CAMERA__?.position?.y || 0);
+      const targetY = Number(q?.measuredTable?.maxY || 0) + 0.55;
+      return q?.tablePass === true
+        && q?.androidJoined === true
+        && Math.abs(cameraY - targetY) <= 0.14;
     }, null, { timeout: 12000, polling: 180 });
     await page.waitForTimeout(350);
 
-    const seated = await page.evaluate(() => window.SVR_PHASE357_QA());
+    const seated = await page.evaluate(() => ({
+      phase357: window.SVR_PHASE357_QA?.() || null,
+      phase364: window.SVR_PHASE364_QA?.() || null,
+      cameraY: Number(window.__SVR_CAMERA__?.position?.y || 0)
+    }));
     const hand = await page.evaluate(() => window.SVR_PHASE355_RUN_FULL_HAND_QA({ maxHands: 1, timeoutMs: 90000 }));
 
     await page.waitForFunction(() => {
@@ -136,7 +142,11 @@ async function tap(locator) {
     ), null, { timeout: 30000 });
     await page.waitForFunction(() => {
       window.SVR_PHASE364_ANDROID_SEAT?.(true);
-      return window.SVR_PHASE357_QA?.()?.seated === true;
+      const q = window.SVR_PHASE364_QA?.();
+      const cameraY = Number(window.__SVR_CAMERA__?.position?.y || 0);
+      return q?.tablePass === true
+        && q?.androidJoined === true
+        && Math.abs(cameraY - (Number(q?.measuredTable?.maxY || 0) + 0.55)) <= 0.14;
     }, null, { timeout: 10000, polling: 180 });
     await page.waitForTimeout(350);
 
@@ -150,7 +160,8 @@ async function tap(locator) {
       consistency: window.SVR_PHASE363_CONSISTENCY_QA?.() || null,
       audit: window.SVR_RUN_PHASE336_POKER_AUDIT?.() || null,
       phase357: window.SVR_PHASE357_QA?.() || null,
-      phase364: window.SVR_PHASE364_QA?.() || null
+      phase364: window.SVR_PHASE364_QA?.() || null,
+      cameraY: Number(window.__SVR_CAMERA__?.position?.y || 0)
     }));
 
     report = {
@@ -159,7 +170,7 @@ async function tap(locator) {
       seated,
       hand,
       showdown,
-      compatibilityAuthority: 'phase363-leave-join-with-phase364-device-seat',
+      compatibilityAuthority: 'phase363-leave-join-with-phase364-measured-device-seat',
       compatibilityBankrolls: {
         isolatedLegacyDriver: Number(hand?.record?.expectedTableBankroll || 0),
         phase363FreshTable: Number(freshRejoin?.consistency?.expectedTableChips || 0)
@@ -182,12 +193,15 @@ async function tap(locator) {
   const freshHuman = report?.freshRejoin?.audit?.players?.[0] || null;
   const legacyExpected = Number(report?.hand?.record?.expectedTableBankroll || 0);
   const legacySettled = Number(report?.hand?.record?.totalStacks || -1);
+  const seatedTargetY = Number(report?.seated?.phase364?.measuredTable?.maxY || 0) + 0.55;
+  const freshTargetY = Number(report?.freshRejoin?.phase364?.measuredTable?.maxY || 0) + 0.55;
   const pass = report?.lobbyBefore?.joined === false
     && report?.lobbyBefore?.joinQa?.pass === true
     && report?.lobbyBefore?.seatText === 'JOIN TABLE'
-    && report?.seated?.pass === true
-    && report?.seated?.seated === true
-    && Number(report?.seated?.cameraDistance || Infinity) <= Number(report?.seated?.maximumCloseSeatDistance || 0) + 0.08
+    && report?.seated?.phase357?.seated === true
+    && report?.seated?.phase364?.tablePass === true
+    && report?.seated?.phase364?.androidJoined === true
+    && Math.abs(Number(report?.seated?.cameraY || 0) - seatedTargetY) <= 0.14
     && report?.hand?.pass === true
     && legacyExpected === 6000
     && legacySettled === legacyExpected
@@ -199,7 +213,7 @@ async function tap(locator) {
     && /BOARD:/i.test(report?.showdown?.board || '')
     && report?.showdown?.betIndicators === 6
     && report?.showdown?.phase364?.tablePass === true
-    && report?.compatibilityAuthority === 'phase363-leave-join-with-phase364-device-seat'
+    && report?.compatibilityAuthority === 'phase363-leave-join-with-phase364-measured-device-seat'
     && report?.lobbyAfterLeave?.joined === false
     && report?.lobbyAfterLeave?.gameState === 'LOBBY'
     && report?.lobbyAfterLeave?.phase === 'idle'
@@ -219,6 +233,8 @@ async function tap(locator) {
     && Number(report?.freshRejoin?.consistency?.expectedTableChips || 0) === 90000
     && report?.freshRejoin?.phase357?.seated === true
     && report?.freshRejoin?.phase364?.tablePass === true
+    && report?.freshRejoin?.phase364?.androidJoined === true
+    && Math.abs(Number(report?.freshRejoin?.cameraY || 0) - freshTargetY) <= 0.14
     && pageErrors.length === 0
     && consoleErrors.length === 0
     && httpErrors.length === 0
