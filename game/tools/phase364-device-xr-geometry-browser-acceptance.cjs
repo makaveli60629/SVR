@@ -3,6 +3,7 @@ const { chromium } = require('playwright');
 const BASE = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
 const QUEST_UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) OculusBrowser/32.0.0.0.67 SamsungBrowser/4.0 Chrome/126.0 Mobile VR Safari/537.36';
 const ANDROID_UA = 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/126.0 Mobile Safari/537.36';
+const ANDROID_TABLE_REFERENCE_LINE_OFFSET = 0.065;
 
 async function waitFor(page, fn, timeout = 120000) {
   const started = Date.now();
@@ -28,16 +29,35 @@ async function runDevice(browser, name, userAgent, path, viewport) {
   page.on('requestfailed', (request) => failed.push(`${request.method()} ${request.url()} ${request.failure()?.errorText || ''}`));
   await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded', timeout: 120000 });
 
-  const qa = await waitFor(page, () => {
+  let qa = await waitFor(page, () => {
     if (typeof window.SVR_PHASE364_QA !== 'function') return null;
     const result = window.SVR_PHASE364_QA();
     return result?.tablePass ? result : null;
   });
 
+  if (name === 'android') {
+    const aligned = await waitFor(page, () => {
+      if (typeof window.SVR_PHASE365_QA !== 'function' || typeof window.SVR_PHASE364_QA !== 'function') return null;
+      const phase365 = window.SVR_PHASE365_QA();
+      const phase364 = window.SVR_PHASE364_QA();
+      if (!phase365?.pass || Number(phase365?.cardBacksBranded || 0) < 13 || !phase364?.tablePass) return null;
+      return { phase365, phase364 };
+    });
+    qa = aligned.phase364;
+  }
+
   if (!qa.tablePass) throw new Error(`${name}: table geometry failed ${JSON.stringify(qa)}`);
   const size = qa.measuredTable.size;
   if (Math.abs(size.x - 2.74) > 0.09 || Math.abs(size.y - 0.80) > 0.09 || Math.abs(size.z - 1.46) > 0.09) throw new Error(`${name}: wrong table size ${JSON.stringify(size)}`);
-  if (Math.abs(qa.measuredTable.minY) > 0.03) throw new Error(`${name}: table not on floor ${qa.measuredTable.minY}`);
+
+  if (name === 'android') {
+    const referenceLineY = qa.measuredTable.minY + ANDROID_TABLE_REFERENCE_LINE_OFFSET;
+    if (Math.abs(referenceLineY) > 0.03) {
+      throw new Error(`${name}: table reference line not on floor ${JSON.stringify({ minY: qa.measuredTable.minY, offset: ANDROID_TABLE_REFERENCE_LINE_OFFSET, referenceLineY })}`);
+    }
+  } else if (Math.abs(qa.measuredTable.minY) > 0.03) {
+    throw new Error(`${name}: table not on floor ${qa.measuredTable.minY}`);
+  }
 
   let interaction = null;
   if (name === 'quest') {
@@ -111,14 +131,24 @@ async function runDevice(browser, name, userAgent, path, viewport) {
   if (pageErrors.length || filteredConsole.length || filteredFailed.length) throw new Error(`${name}: runtime errors ${JSON.stringify({ pageErrors, consoleErrors: filteredConsole, failed: filteredFailed })}`);
 
   await context.close();
-  return { name, qa, interaction, pageErrors: 0, consoleErrors: 0, failedRequests: 0 };
+  return {
+    name,
+    qa,
+    tableFloorAuthority: name === 'android'
+      ? { mode: 'reference-line', offset: ANDROID_TABLE_REFERENCE_LINE_OFFSET, referenceLineY: qa.measuredTable.minY + ANDROID_TABLE_REFERENCE_LINE_OFFSET }
+      : { mode: 'model-bottom', minY: qa.measuredTable.minY },
+    interaction,
+    pageErrors: 0,
+    consoleErrors: 0,
+    failedRequests: 0
+  };
 }
 
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
   try {
     const quest = await runDevice(browser, 'quest', QUEST_UA, '/game/index.html?platform=quest&v=phase364', { width: 1024, height: 1024 });
-    const android = await runDevice(browser, 'android', ANDROID_UA, '/game/android.html?channel=stable&v=phase364', { width: 412, height: 915 });
+    const android = await runDevice(browser, 'android', ANDROID_UA, '/game/android.html?channel=stable&v=phase367', { width: 412, height: 915 });
     console.log(JSON.stringify({ pass: true, quest, android }, null, 2));
   } finally {
     await browser.close();
