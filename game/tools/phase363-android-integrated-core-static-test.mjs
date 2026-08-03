@@ -92,7 +92,8 @@ assert(release.apkVersionName === '0.1.0-rc1' && release.apkVersionCode === 1, '
 assert(release.forceUpdate === false && release.showUpdatePrompt === false && release.manualUpdateOnly === true, 'APK prompt policy changed');
 
 assert(profile.includes('profileShowroomCanvas'), 'Profile live avatar camera was removed');
-assert(profile.includes('../game/avatar.html'), 'Profile no longer connects to the avatar route');
+assert(profile.includes('avatar.html?v=phase366'), 'Profile no longer connects to the website dressing room');
+assert(profile.includes('avatar-vr.html?v=phase353'), 'Profile no longer connects to the VR dressing room');
 assert(dressingRoom.includes('PHASE-353-VR-AVATAR-DRESSING-ROOM-LIVE-PEDESTAL-LOCK'), 'VR dressing room was removed');
 assert(dressingRoom.includes('togglePedestal'), 'Moving avatar pedestal was removed');
 
