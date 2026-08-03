@@ -36,8 +36,10 @@ const start=async()=>{if(started)return;started=true;try{
   await import('./modules/phase363_android_join_control_capture_lock.js?v=phase365');
   await import('./modules/phase363_android_settlement_lobby_consistency_lock.js?v=phase365');
   await import('./modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js?v=phase365');
+  await import('./modules/phase365_android_card_brand_refresh_lock.js?v=phase365');
   window.SVR_PHASE363_LEAVE_TABLE?.('boot-lobby');
   window.SVR_PHASE365_SYNC?.();
+  window.SVR_PHASE365_REFRESH_CARD_BRAND?.();
 }catch(error){console.error(error);report('The Android table stopped during startup. Reload the table to try the protected low-memory path.');}};
 document.getElementById('startRuntimeBtn')?.addEventListener('click',start);
 document.getElementById('runtimeReloadButton')?.addEventListener('click',()=>location.reload());
