@@ -48,7 +48,7 @@ forbidText(core, 'requiredFeatures:', 'required XR floor feature');
 requireText(manifest, "phase364_device_xr_geometry_spawn_lock.js");
 requireText(manifest, "phase364-quest-critical-load-order");
 if (!/export const VERSION = 'phase3(?:6[4-9]|[7-9][0-9])'/.test(manifest)) throw new Error('Platform version regressed below Phase 364');
-if (!/phase(?:364|365)-android-critical-load-order/.test(manifest)) throw new Error('Missing protected Android geometry load-order validator');
+if (!/phase(?:364|365|367)-android-critical-load-order/.test(manifest)) throw new Error('Missing protected Android geometry load-order validator');
 
 const questPhaseIndex = quest.indexOf("phase364_device_xr_geometry_spawn_lock.js?v=phase364");
 const questBootIndex = quest.indexOf("phase340_platform_core_loader.js?v=phase364");
