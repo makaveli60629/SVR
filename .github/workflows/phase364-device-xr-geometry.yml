@@ -10,6 +10,7 @@ on:
       - 'game/modules/core_scene.js'
       - 'game/modules/phase340_platform_manifest.js'
       - 'game/modules/phase364_device_xr_geometry_spawn_lock.js'
+      - 'game/modules/phase364_quest_eric_quarantine_watch.js'
       - 'game/tools/phase364-device-xr-geometry-static-test.mjs'
       - 'game/tools/phase364-device-xr-geometry-browser-acceptance.cjs'
       - 'docs/phase364_device_xr_geometry_spawn_lock.md'
@@ -37,6 +38,7 @@ jobs:
           node --check game/modules/core_scene.js
           node --check game/modules/phase340_platform_manifest.js
           node --check game/modules/phase364_device_xr_geometry_spawn_lock.js
+          node --check game/modules/phase364_quest_eric_quarantine_watch.js
           node --check game/tools/phase364-device-xr-geometry-browser-acceptance.cjs
           node game/tools/phase364-device-xr-geometry-static-test.mjs
           python3 -m json.tool game/manifest.json >/dev/null
