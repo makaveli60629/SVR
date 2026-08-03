@@ -3,11 +3,71 @@
   const state = {
     build: BUILD,
     menuInstalled: false,
+    accountLinksInstalled: false,
     profileNoiseRemoved: 0,
     portraitReady: false,
     mobile: matchMedia('(max-width:900px),(pointer:coarse)').matches,
     checkedAt: null
   };
+
+  function accountHref(mode = 'login') {
+    const prefix = /\/site\//i.test(location.pathname) ? '' : '/site/';
+    return mode === 'register' ? `${prefix}login.html?mode=register` : `${prefix}login.html`;
+  }
+
+  function installAccountLinks() {
+    const host = document.querySelector('.links,.avatar-links,.market-links');
+    if (!host) return false;
+    const anchors = [...host.querySelectorAll('a')];
+    const hasLogin = anchors.some((link) => {
+      const href = String(link.getAttribute('href') || '').toLowerCase();
+      return /(?:^|\/)login\.html(?:$|\?)/.test(href) && !/[?&]mode=register/.test(href);
+    });
+    const hasRegister = anchors.some((link) => {
+      const href = String(link.getAttribute('href') || '').toLowerCase();
+      const text = String(link.textContent || '').trim().toLowerCase();
+      return /(?:^|\/)register\.html(?:$|\?)/.test(href)
+        || /(?:^|\/)login\.html\?[^#]*mode=register/.test(href)
+        || text === 'register';
+    });
+
+    const profileLink = anchors.find((link) => /(?:^|\/)profile\.html(?:$|[?#])/.test(String(link.getAttribute('href') || '').toLowerCase()));
+    const registerLink = anchors.find((link) => {
+      const href = String(link.getAttribute('href') || '').toLowerCase();
+      const text = String(link.textContent || '').trim().toLowerCase();
+      return /(?:^|\/)register\.html(?:$|\?)/.test(href)
+        || /(?:^|\/)login\.html\?[^#]*mode=register/.test(href)
+        || text === 'register';
+    });
+
+    if (!hasLogin) {
+      const login = document.createElement('a');
+      login.href = accountHref('login');
+      login.textContent = 'Login';
+      login.dataset.svr370AccountLink = 'login';
+      if (/\/site\/login\.html$/i.test(location.pathname) && !new URLSearchParams(location.search).has('mode')) {
+        login.setAttribute('aria-current', 'page');
+      }
+      host.insertBefore(login, registerLink || profileLink || host.firstChild);
+    }
+
+    if (!hasRegister) {
+      const register = document.createElement('a');
+      register.href = accountHref('register');
+      register.textContent = 'Register';
+      register.dataset.svr370AccountLink = 'register';
+      if (/\/site\/login\.html$/i.test(location.pathname) && new URLSearchParams(location.search).get('mode') === 'register') {
+        register.setAttribute('aria-current', 'page');
+      }
+      const refreshedProfile = [...host.querySelectorAll('a')].find((link) => /(?:^|\/)profile\.html(?:$|[?#])/.test(String(link.getAttribute('href') || '').toLowerCase()));
+      host.insertBefore(register, refreshedProfile || null);
+    }
+
+    const finalLinks = [...host.querySelectorAll('a')];
+    state.accountLinksInstalled = finalLinks.some((link) => String(link.textContent || '').trim() === 'Login')
+      && finalLinks.some((link) => String(link.textContent || '').trim() === 'Register');
+    return state.accountLinksInstalled;
+  }
 
   function linksFromNav(nav) {
     const sources = nav?.querySelectorAll?.('.links a,.avatar-links a,.market-links a') || [];
@@ -18,10 +78,23 @@
     })).filter((entry) => entry.text);
   }
 
+  function rebuildMenuPanel() {
+    const nav = document.querySelector('.nav,.avatar-nav,.market-nav');
+    const panel = document.getElementById('svr370MenuPanel');
+    if (!nav || !panel) return;
+    const links = linksFromNav(nav);
+    panel.innerHTML = links.map((entry) => `<a href="${entry.href}"${entry.current ? ' aria-current="page"' : ''}>${entry.text}</a>`).join('');
+  }
+
   function installMenu() {
-    if (document.getElementById('svr370MenuButton')) return;
     const nav = document.querySelector('.nav,.avatar-nav,.market-nav');
     if (!nav) return;
+    const existingButton = document.getElementById('svr370MenuButton');
+    if (existingButton) {
+      rebuildMenuPanel();
+      state.menuInstalled = true;
+      return;
+    }
     const links = linksFromNav(nav);
     if (!links.length) return;
     const button = document.createElement('button');
@@ -120,12 +193,26 @@
 
   function audit() {
     state.checkedAt = new Date().toISOString();
+    const menuLinks = [...document.querySelectorAll('#svr370MenuPanel a')].map((link) => String(link.textContent || '').trim());
+    const desktopLinks = [...document.querySelectorAll('.links a,.avatar-links a,.market-links a')].map((link) => String(link.textContent || '').trim());
     const result = {
       ...state,
       menuButtons: document.querySelectorAll('#svr370MenuButton').length,
       menuPanels: document.querySelectorAll('#svr370MenuPanel').length,
+      desktopLoginLinks: desktopLinks.filter((text) => text === 'Login').length,
+      desktopRegisterLinks: desktopLinks.filter((text) => text === 'Register').length,
+      menuLoginLinks: menuLinks.filter((text) => text === 'Login').length,
+      menuRegisterLinks: menuLinks.filter((text) => text === 'Register').length,
       noisyLegendNodes: document.querySelectorAll('[id*="legend" i],[class*="legend-pedestal" i],[data-phase356-profile-legend]').length,
-      pass: state.menuInstalled && document.querySelectorAll('#svr370MenuButton').length === 1,
+      pass: Boolean(
+        state.menuInstalled
+        && state.accountLinksInstalled
+        && document.querySelectorAll('#svr370MenuButton').length === 1
+        && desktopLinks.includes('Login')
+        && desktopLinks.includes('Register')
+        && menuLinks.includes('Login')
+        && menuLinks.includes('Register')
+      ),
       checkedAt: state.checkedAt
     };
     window.SVR_PHASE370_SITE_QA_STATE = result;
@@ -133,13 +220,17 @@
   }
 
   function install() {
+    installAccountLinks();
     installMenu();
     removeProfileNoise();
     installPortrait();
     enforceAvatarConcept();
     installRegistrationSupportNotice();
     const observer = new MutationObserver(() => {
+      const before = state.accountLinksInstalled;
+      installAccountLinks();
       installMenu();
+      if (!before && state.accountLinksInstalled) rebuildMenuPanel();
       removeProfileNoise();
       installPortrait();
       enforceAvatarConcept();
