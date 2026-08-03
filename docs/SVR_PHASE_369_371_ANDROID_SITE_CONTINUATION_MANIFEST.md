@@ -27,16 +27,22 @@ Entry:
 Flow:
 
 ```text
-SVR logo entry → JOIN TABLE → seated table → first deal → actions → showdown → next hand
+SVR logo entry → one JOIN TABLE tap → bounded readiness wait → seated table → first deal → actions → showdown → next hand
 ```
 
 Rules:
 
 - No first visible deal before JOIN TABLE.
 - One authoritative JOIN TABLE / LEAVE TABLE flow.
+- The visible Phase 369 button is the user-facing join surface.
+- One tap starts a single-flight readiness transaction; repeated taps cannot create duplicate joins.
+- The transaction waits up to 18 seconds for the canonical table and up to 12 seconds for the authoritative join API.
+- The button displays `JOINING TABLE…` while readiness is pending.
+- If the base Phase 369 join returns before the joined state is confirmed, the transaction retries through the existing Phase 363 join authority.
 - Old SIT, SEAT, PLAY GAME, and duplicate controller surfaces are suppressed.
 - The canonical Phase 367 table pipeline remains the authority.
-- The table is forced visible and realigned before joining.
+- The table is forced visible and aligned through the existing Phase 364 authority.
+- Table lookup and alignment are bounded; the runtime does not perform full-scene alignment every frame or every half-second.
 - The dealer is deferred until the core table and Android runtime are stable.
 - Long frame gaps trigger lower renderer demand instead of stacking another renderer.
 - APK remains `0.1.0-rc1`, version code `1`, manual-update-only.
@@ -45,6 +51,7 @@ Runtime QA:
 
 ```js
 window.SVR_PHASE369_ANDROID_QA()
+window.SVR_PHASE369_JOIN_READINESS_QA()
 window.SVR_PHASE369_JOIN_TABLE()
 window.SVR_PHASE369_LOW_POWER('manual')
 window.SVR_PHASE367_DEVICE_QA()
@@ -111,6 +118,7 @@ window.SVR_PHASE370_SITE_QA()
 game/modules/phase368_card_dealer_animation_lock.js
 game/modules/phase368_card_dealer_motion.js
 game/modules/phase369_android_join_table_freeze_recovery_lock.js
+game/modules/phase369_android_join_readiness_transaction_lock.js
 game/phase369-release.json
 game/tools/phase368-card-dealer-static-test.mjs
 game/tools/phase369-android-recovery-static-test.mjs
@@ -131,6 +139,12 @@ docs/SVR_PHASE_369_371_MANIFEST.json
 game/index.html
 game/android.html
 game/camera3.html
+game/tools/phase350-integrity-static-test.mjs
+game/tools/phase356-android-real-device-static-test.mjs
+game/tools/phase354-android-browser-acceptance.cjs
+game/tools/phase357-android-browser-acceptance.cjs
+game/tools/phase360-session-browser-acceptance.cjs
+.github/workflows/phase357-android-table-status-showdown-ante.yml
 site/js/phase346-avatar-viewer.js
 matrix.js
 ```
@@ -153,7 +167,11 @@ matrix.js
 Completed in code and static validation:
 
 - One Android entry/join flow.
+- Bounded one-tap table/API readiness transaction.
+- Single-flight join protection.
+- Visible pending/retry status instead of silent failure.
 - Table recovery and visibility enforcement.
+- Bounded table lookup/alignment instead of repeated full-scene work.
 - Dealer deferred from critical boot.
 - Logo entry and in-game logo.
 - Continuous next-hand scheduling after showdown.
@@ -166,6 +184,7 @@ Completed in code and static validation:
 - Android app lead banner.
 - AI-active fallback status.
 - Thinner Matrix rain and staggered secret letters.
+- Legacy Android browser gates updated to operate the visible Phase 369 JOIN surface rather than a hidden predecessor control.
 
 Still dependent on external configuration or owner action:
 
