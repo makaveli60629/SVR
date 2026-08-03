@@ -12,7 +12,13 @@
     {
       "phase": 369,
       "build": "PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK",
-      "scope": "Android logo entry, join-before-deal, table recovery, dealer defer, continuous play and low-power recovery",
+      "joinReadinessBuild": "PHASE-369-ANDROID-JOIN-READINESS-TRANSACTION-LOCK",
+      "scope": "Android logo entry, one-tap bounded join readiness, join-before-deal, table recovery, dealer defer, continuous play and low-power recovery",
+      "oneTapJoin": true,
+      "singleFlightJoin": true,
+      "maximumTableWaitMs": 18000,
+      "maximumJoinApiWaitMs": 12000,
+      "silentJoinFailureAllowed": false,
       "physicalDeviceAcceptance": "pending-owner-playtest"
     },
     {
