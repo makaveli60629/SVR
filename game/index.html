@@ -20,6 +20,8 @@ const start=async()=>{if(started)return;started=true;try{
   await waitForApi(['SVR_PHASE373_QA','SVR_PHASE373_STABLE_LOBBY','SVR_PHASE373_STABLE_SEAT']);
   await import('./modules/phase373_quest_npc_teleport_postflight_lock.js?v=phase373');
   await waitForApi(['SVR_PHASE373_POSTFLIGHT_QA','SVR_PHASE373_POSTFLIGHT_RESTORE_TELEPORT','SVR_PHASE373_POSTFLIGHT_REPAIR_NPCS']);
+  await import('./modules/phase373_quest_table_seat_finalizer_lock.js?v=phase373');
+  await waitForApi(['SVR_PHASE373_FINALIZER_QA','SVR_PHASE373_FINALIZE_TABLE','SVR_PHASE373_FINALIZE_SEAT']);
   await import('./modules/phase365_quest_vr_button_dedupe_lock.js?v=phase365');
   const p=new URLSearchParams(location.search),legacyAcceptance=p.get('acceptance')==='1'&&p.get('v')!=='phase364';
   if(!legacyAcceptance){
@@ -34,6 +36,7 @@ const start=async()=>{if(started)return;started=true;try{
   }
   window.SVR_PHASE365_QUEST_VR_BUTTON_SWEEP?.();
   window.SVR_PHASE373_REPAIR_TABLE?.();
+  window.SVR_PHASE373_FINALIZE_TABLE?.('quest-core-ready');
   window.SVR_PHASE373_REPAIR_NPCS?.();
   window.SVR_PHASE373_POSTFLIGHT_REPAIR_NPCS?.();
   window.SVR_PHASE373_STABLE_LOBBY?.();
