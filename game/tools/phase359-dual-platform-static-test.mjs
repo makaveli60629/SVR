@@ -98,8 +98,10 @@ assert.equal(androidRelease.tablePolicy.singleJoinLeaveControl, true);
 assert.equal(androidRelease.gameplayPolicy?.raiseControlRequired, true);
 assert.deepEqual(androidRelease.gameplayPolicy?.streetOrder, ['preflop', 'flop', 'turn', 'river', 'showdown']);
 const currentAcceptance = androidRelease.phase365Acceptance || androidRelease.phase363Acceptance;
-assert.equal(currentAcceptance?.pending, true);
+assert.equal(currentAcceptance?.passed === true || currentAcceptance?.pending === true, true);
+if (currentAcceptance?.passed === true) assert.equal(currentAcceptance?.browserAcceptancePassed, true);
 assert.equal(androidRelease.realDeviceValidation?.pending, true);
+assert.equal(androidRelease.realDeviceValidation?.ownerPlaytestRequired, true);
 
 assert.ok(Number(manifest.phase) >= 363);
 assert.match(String(manifest.build), /^PHASE-(?:363|3[6-9]\d)-/);
@@ -124,6 +126,8 @@ assert.ok(fs.statSync(tableGlbPath).size > 1024, 'uploaded table GLB must be non
 console.log(JSON.stringify({
   build: manifest.build,
   android: 'phase347 controller, phase357 seating, phase363 JOIN-gated 15,000-chip policy and phase365 presentation protected',
+  androidBrowserAcceptance: currentAcceptance?.passed === true ? 'passed' : 'pending',
+  androidPhysicalDeviceValidation: 'pending-owner-playtest',
   quest: 'phase358 gameplay and phase361 lobby/seat protected with phase364 geometry successor',
   continuity: 'phase359 preserved for Quest/desktop',
   shuffle: 'phase360 preserved for Quest/desktop',
