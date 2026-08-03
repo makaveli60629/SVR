@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const read = (path) => fs.readFileSync(path, 'utf8');
 const phase = read('game/modules/phase364_device_xr_geometry_spawn_lock.js');
+const quarantine = read('game/modules/phase364_quest_eric_quarantine_watch.js');
 const core = read('game/modules/core_scene.js');
 const manifest = read('game/modules/phase340_platform_manifest.js');
 const quest = read('game/index.html');
@@ -28,6 +29,11 @@ requireText(phase, "Dealer Eric remains hidden");
 requireText(phase, "value.rotation.y = Math.atan2(-dx, -dz)");
 forbidText(phase, 'function installControllerRecovery', 'duplicate Phase 364 controller select authority');
 
+requireText(quarantine, 'PHASE-364-QUEST-ERIC-QUARANTINE-WATCH');
+requireText(quarantine, 'SVR_PHASE364_SANITIZE_NPCS');
+requireText(quarantine, 'window.setInterval(sweep, 260)');
+requireText(quarantine, 'SVR_PHASE364_ERIC_QUARANTINE_SWEEP');
+
 requireText(core, 'renderer.xr.setReferenceSpaceType("local-floor")');
 requireText(core, 'optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"]');
 forbidText(core, 'requiredFeatures:', 'required XR floor feature');
@@ -39,15 +45,20 @@ requireText(manifest, "phase364-android-critical-load-order");
 
 const questPhaseIndex = quest.indexOf("phase364_device_xr_geometry_spawn_lock.js?v=phase364");
 const questBootIndex = quest.indexOf("phase340_platform_core_loader.js?v=phase364");
+const phase361Index = quest.indexOf("phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase364");
+const quarantineIndex = quest.indexOf("phase364_quest_eric_quarantine_watch.js?v=phase364");
 if (questPhaseIndex < 0 || questBootIndex <= questPhaseIndex) throw new Error('Quest Phase 364 must load before platform boot');
+if (phase361Index < 0 || quarantineIndex <= phase361Index) throw new Error('Eric quarantine watcher must load after Phase 361 NPC creation');
 requireText(quest, 'PHASE-364-QUEST-XR-ENTRY-TABLE-FLOOR-SPAWN-LOCK');
 requireText(quest, 'SVR_PHASE364_LOBBY_SPAWN');
+requireText(quest, 'SVR_PHASE364_ERIC_QUARANTINE_SWEEP');
 
 const androidPhaseIndex = android.indexOf("phase364_device_xr_geometry_spawn_lock.js?v=phase364");
 const androidBootIndex = android.indexOf("phase340_platform_core_loader.js?v=phase364");
 if (androidPhaseIndex < 0 || androidBootIndex <= androidPhaseIndex) throw new Error('Android Phase 364 must load before platform boot');
 requireText(android, 'SVR_PHASE364_ALIGN_TABLE');
 requireText(android, 'PHASE-364-ANDROID-TABLE-FLOOR-SEAT-ALIGNMENT-LOCK');
+requireText(android, 'PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK');
 
 if (appManifest.apk_version_name !== '0.1.0-rc1' || appManifest.apk_version_code !== 1) throw new Error('APK lock changed');
 if (appManifest.force_update || appManifest.show_update_prompt || !appManifest.manual_update_only) throw new Error('APK prompt policy changed');
@@ -58,5 +69,6 @@ console.log(JSON.stringify({
   build: 'PHASE-364-DEVICE-XR-GEOMETRY-SPAWN-LOCK',
   tableMeters: [2.74, 0.80, 1.46],
   xrLocalFloorRequired: false,
+  lateEricQuarantine: true,
   apk: `${appManifest.apk_version_name}/${appManifest.apk_version_code}`
 }, null, 2));
