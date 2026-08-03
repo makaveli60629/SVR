@@ -1,2 +1,80 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SVR Poker | Player Login</title><meta name="description" content="Sign in to an SVR Poker player profile or continue in clearly labeled local demo mode."><link rel="icon" href="../logo.png" type="image/png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="site-phase09.css"><style>.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.account-form{display:grid;gap:12px}.account-form label{display:grid;gap:6px;color:#d9cdec;font-weight:800}.account-form input{width:100%;box-sizing:border-box;border:1px solid rgba(105,232,255,.3);border-radius:13px;background:rgba(0,0,0,.38);color:#fff;padding:12px;font:700 16px Rajdhani,system-ui}.account-form button{width:100%}.api-state{display:flex;gap:9px;align-items:center;margin:12px 0;padding:10px 12px;border:1px solid rgba(105,232,255,.22);border-radius:14px;background:rgba(105,232,255,.06)}.api-dot{width:10px;height:10px;border-radius:50%;background:#ff5b8c}.api-state.online .api-dot{background:#8dffb4}.api-state.demo .api-dot{background:#ffd98a}.notice{padding:12px;border:1px solid rgba(255,217,138,.35);border-radius:14px;background:rgba(255,217,138,.07);color:#fff3ca}.form-status{min-height:20px;color:#ffd98a;font-weight:800}.form-status.error{color:#ff91b4}.form-status.ok{color:#8dffb4}@media(max-width:760px){.account-grid{grid-template-columns:1fr}}</style></head><body class="svr9"><canvas id="binary-rain" aria-hidden="true"></canvas><div class="page"><nav class="nav"><a class="brand" href="index.html"><img src="assets/brand/logo.png" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Player Accounts</span></div></a><div class="links"><a href="index.html">Home</a><a href="login.html">Login</a><a href="profile.html">Profile</a><a href="avatar.html?v=phase346">Avatar</a><a href="../game/android.html?channel=stable&v=phase346">Android Game</a><a href="../game/index.html?v=phase346">VR / PC</a></div></nav><main class="shell"><section class="section hero"><div><span class="tag">Phase 346 Account + Avatar</span><h1>Player Login</h1><p class="lead">One identity for the website, Android game, Quest, PC, rewards, avatars, and future multiplayer.</p><div id="apiState" class="api-state"><span class="api-dot"></span><strong id="apiStateText">Checking secure account API…</strong></div><p class="copy">Passwords and database credentials are never stored in this page. Production sign-in uses the secure backend and an HTTP-only session cookie.</p><div class="notice" id="modeNotice">Local demo mode remains available for interface testing. Demo profiles and outfits stay on this device and do not populate the production database.</div></div><aside class="card"><div class="account-grid"><form id="loginForm" class="account-form"><h3>Sign In</h3><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Password<input name="password" type="password" autocomplete="current-password" minlength="10" required></label><button class="btn primary" type="submit">Sign In</button></form><form id="registerForm" class="account-form"><h3>Create Player</h3><label>Display Name<input name="displayName" maxlength="40" required></label><label>Email<input name="email" type="email" autocomplete="email" required></label><label>Password<input name="password" type="password" autocomplete="new-password" minlength="10" required></label><button class="btn secondary" type="submit">Create Account</button></form></div><hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:18px 0"><form id="demoForm" class="account-form"><label>Demo Display Name<input name="displayName" value="Demo Player" maxlength="40"></label><button class="btn ghost" type="submit">Continue as Local Demo Player</button></form><div id="formStatus" class="form-status" role="status"></div></aside></section><footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="index.html">Home</a><a class="btn primary" href="profile.html">Profile</a><a class="btn secondary" href="avatar.html?v=phase346">Avatar</a></div></footer></main></div><script src="../matrix.js?v=phase346"></script><script src="../site-public-hooks.js"></script><script type="module">import{account}from'./js/phase345-player-account-client.js?v=phase346';const status=document.getElementById('formStatus'),api=document.getElementById('apiState'),apiText=document.getElementById('apiStateText'),notice=document.getElementById('modeNotice');const params=new URLSearchParams(location.search),requested=params.get('next')||'',destination=/^\/(?:site\/(?:avatar|profile)\.html|game\/avatar\.html)(?:[?#].*)?$/.test(requested)?requested:'profile.html';const go=()=>location.href=destination;const show=(text,type='')=>{status.textContent=text;status.className=`form-status ${type}`};await account.bootstrap();const state=account.snapshot();if(state.apiHealthy){api.classList.add('online');apiText.textContent='Secure player API online';notice.textContent='Production login is ready. Local demo mode remains separate and clearly labeled.'}else{api.classList.add('demo');apiText.textContent=state.apiConfigured?'Player API unavailable — demo mode available':'Player API not configured — demo mode available'}if(state.profile)go();document.getElementById('loginForm').onsubmit=async e=>{e.preventDefault();show('Signing in…');try{const data=Object.fromEntries(new FormData(e.currentTarget));await account.login(data);go()}catch(err){show(err.message==='PLAYER_API_NOT_CONFIGURED'?'Secure backend is not configured yet. Use Demo Player for local testing.':err.message,'error')}};document.getElementById('registerForm').onsubmit=async e=>{e.preventDefault();show('Creating player…');try{const data=Object.fromEntries(new FormData(e.currentTarget));await account.register(data);go()}catch(err){show(err.message==='PLAYER_API_NOT_CONFIGURED'?'Secure backend is not configured yet. Use Demo Player for local testing.':err.message,'error')}};document.getElementById('demoForm').onsubmit=e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.currentTarget));account.continueDemo(data.displayName);go()};</script></body></html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SVR Poker | Player Login</title>
+<meta name="description" content="Sign in to an SVR Poker player profile or continue in clearly labeled local demo mode.">
+<link rel="icon" href="../logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site-phase09.css">
+<style>
+.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.account-form{display:grid;gap:12px}.account-form label{display:grid;gap:6px;color:#d9cdec;font-weight:800}.account-form input{width:100%;box-sizing:border-box;border:1px solid rgba(105,232,255,.3);border-radius:13px;background:rgba(0,0,0,.38);color:#fff;padding:12px;font:700 16px Rajdhani,system-ui}.account-form button{width:100%}.api-state{display:flex;gap:9px;align-items:center;margin:12px 0;padding:10px 12px;border:1px solid rgba(105,232,255,.22);border-radius:14px;background:rgba(105,232,255,.06)}.api-dot{width:10px;height:10px;border-radius:50%;background:#ff5b8c}.api-state.online .api-dot{background:#8dffb4}.api-state.demo .api-dot{background:#ffd98a}.notice{padding:12px;border:1px solid rgba(255,217,138,.35);border-radius:14px;background:rgba(255,217,138,.07);color:#fff3ca}.form-status{min-height:20px;color:#ffd98a;font-weight:800}.form-status.error{color:#ff91b4}.form-status.ok{color:#8dffb4}@media(max-width:760px){.account-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="svr9" data-build="PHASE-369-REGISTRATION-PAYOUT-PROFILE-COMPLIANCE-LOCK">
+<canvas id="binary-rain" aria-hidden="true"></canvas>
+<div class="page">
+<nav class="nav">
+  <a class="brand" href="index.html"><img src="assets/brand/logo.png" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Player Accounts</span></div></a>
+  <div class="links"><a href="index.html">Home</a><a href="login.html">Login</a><a href="profile.html">Profile</a><a href="avatar.html?v=phase368">Avatar</a><a href="../game/android.html?channel=stable&v=phase368">Android Game</a><a href="../game/index.html?v=phase368">VR / PC</a></div>
+</nav>
+<main class="shell">
+<section class="section hero">
+<div>
+  <span class="tag">Phase 369 Account + Payout Profile</span>
+  <h1>Player Login</h1>
+  <p class="lead">One identity for the website, Android game, Quest, PC, rewards, avatars, and future multiplayer.</p>
+  <div id="apiState" class="api-state"><span class="api-dot"></span><strong id="apiStateText">Checking secure account API…</strong></div>
+  <p class="copy">Passwords and database credentials are never stored in this page. Production sign-in uses the secure backend and an HTTP-only session cookie.</p>
+  <div class="notice" id="modeNotice">Local demo mode remains available for interface testing. Demo profiles and outfits stay on this device and do not populate the production database.</div>
+</div>
+<aside class="card">
+  <div class="account-grid">
+    <form id="loginForm" class="account-form">
+      <h3>Sign In</h3>
+      <label>Email<input name="email" type="email" autocomplete="email" required></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" minlength="10" required></label>
+      <button class="btn primary" type="submit">Sign In</button>
+    </form>
+    <form id="registerForm" class="account-form">
+      <h3>Create Player</h3>
+      <label>Display Name<input name="displayName" maxlength="40" required></label>
+      <label>Email<input name="email" type="email" autocomplete="email" required></label>
+      <label>Password<input name="password" type="password" autocomplete="new-password" minlength="10" required></label>
+      <button class="btn secondary" type="submit">Create Account</button>
+    </form>
+  </div>
+  <hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:18px 0">
+  <form id="demoForm" class="account-form">
+    <label>Demo Display Name<input name="displayName" value="Demo Player" maxlength="40"></label>
+    <button class="btn ghost" type="submit">Continue as Local Demo Player</button>
+  </form>
+  <div id="formStatus" class="form-status" role="status"></div>
+</aside>
+</section>
+<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="index.html">Home</a><a class="btn primary" href="profile.html">Profile</a><a class="btn secondary" href="avatar.html?v=phase368">Avatar</a></div></footer>
+</main>
+</div>
+<script src="../matrix.js?v=phase369"></script>
+<script src="../site-public-hooks.js?v=phase369"></script>
+<script type="module" src="./js/phase369-registration-payout-profile.js?v=phase369"></script>
+<script type="module">
+import{account}from'./js/phase345-player-account-client.js?v=phase346';
+const status=document.getElementById('formStatus'),api=document.getElementById('apiState'),apiText=document.getElementById('apiStateText'),notice=document.getElementById('modeNotice');
+const params=new URLSearchParams(location.search),requested=params.get('next')||'',destination=/^\/(?:site\/(?:avatar|profile)\.html|game\/avatar\.html)(?:[?#].*)?$/.test(requested)?requested:'profile.html';
+const go=()=>location.href=destination;
+const show=(text,type='')=>{status.textContent=text;status.className=`form-status ${type}`};
+await account.bootstrap();
+const state=account.snapshot();
+if(state.apiHealthy){api.classList.add('online');apiText.textContent='Secure player API online';notice.textContent='Production login is ready. Local demo mode remains separate and clearly labeled.'}
+else{api.classList.add('demo');apiText.textContent=state.apiConfigured?'Player API unavailable — demo mode available':'Player API not configured — demo mode available'}
+if(state.profile)go();
+document.getElementById('loginForm').onsubmit=async e=>{e.preventDefault();show('Signing in…');try{const data=Object.fromEntries(new FormData(e.currentTarget));await account.login(data);go()}catch(err){show(err.message==='PLAYER_API_NOT_CONFIGURED'?'Secure backend is not configured yet. Use Demo Player for local testing.':err.message,'error')}};
+document.getElementById('registerForm').onsubmit=async e=>{e.preventDefault();show('Creating player…');try{const data=Object.fromEntries(new FormData(e.currentTarget));await account.register(data);go()}catch(err){const message=err.message==='INVALID_CASH_APP_TAG'?'Enter a valid Cash App tag, such as $SVRplayer.':err.message==='PLAYER_API_NOT_CONFIGURED'?'Secure backend is not configured yet. Use Demo Player for local testing.':err.message;show(message,'error')}};
+document.getElementById('demoForm').onsubmit=e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.currentTarget));account.continueDemo(data.displayName);go()};
+</script>
+</body>
+</html>
