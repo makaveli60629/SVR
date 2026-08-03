@@ -38,6 +38,10 @@ need(polish, "login.textContent = 'Login'", 'distinct-login-link');
 need(polish, "register.textContent = 'Register'", 'distinct-register-link');
 need(polish, "accountHref('login')", 'login-route');
 need(polish, "accountHref('register')", 'register-route');
+need(polish, 'function menuSignature(links)', 'menu-signature');
+need(polish, 'panel.dataset.svr370Signature === signature', 'idempotent-menu-refresh');
+need(polish, 'panel.dataset.svr370Signature = signature', 'menu-signature-store');
+need(polish, 'menuSignatureReady', 'menu-signature-qa');
 need(polish, 'rebuildMenuPanel()', 'mobile-menu-account-sync');
 need(polish, 'desktopLoginLinks', 'desktop-login-qa');
 need(polish, 'menuLoginLinks', 'mobile-login-qa');
@@ -73,6 +77,7 @@ if (manifest.truth?.physicalAndroidPlaytestRequired !== true) errors.push('manif
 const result = {
   build: 'PHASE-370-ACCOUNT-PROFILE-AVATAR-MOBILE-POLISH-LOCK / PHASE-371-PUBLIC-APP-AI-MATRIX-POLISH-LOCK',
   accountNavigation: 'distinct-login-and-register-desktop-and-mobile',
+  menuSynchronization: 'signature-based-idempotent',
   errors,
   pass: errors.length === 0
 };
