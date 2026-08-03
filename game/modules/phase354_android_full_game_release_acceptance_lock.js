@@ -1,17 +1,18 @@
-import * as THREE from 'three';
 import { state, players } from './phase336_authoritative_engine.js';
 
 const BUILD = 'PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK';
 const ACTIVE = (window.SVR_PLATFORM || '').toLowerCase() === 'android'
   || /\/game\/android\.html$/i.test(location.pathname)
   || (/Android/i.test(navigator.userAgent || '') && !/Quest|Oculus|Meta Quest/i.test(navigator.userAgent || ''));
-const POT_NAME = 'PHASE354_ANDROID_RAISED_TRANSLUCENT_POT_DISPLAY';
+const CURRENT_POT_NAMES = [
+  'PHASE365_ANDROID_CLEAN_POT_DISPLAY',
+  'PHASE347_ANDROID_RAISED_TRANSLUCENT_POT_DISPLAY',
+  'PHASE347_ANDROID_POT_DISPLAY',
+  'PHASE347_ANDROID_OVERLAY_ROOT'
+];
 let running = false;
 let lastResult = null;
 let repairs = 0;
-let potSprite = null;
-let potCanvas = null;
-let potContext = null;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const visible = (element) => {
   if (!element) return false;
@@ -38,77 +39,25 @@ function progress(stage, detail = {}) {
   };
 }
 
-function roundedRect(context, x, y, width, height, radius) {
-  const r = Math.min(radius, width / 2, height / 2);
-  context.beginPath();
-  context.moveTo(x + r, y);
-  context.lineTo(x + width - r, y);
-  context.quadraticCurveTo(x + width, y, x + width, y + r);
-  context.lineTo(x + width, y + height - r);
-  context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-  context.lineTo(x + r, y + height);
-  context.quadraticCurveTo(x, y + height, x, y + height - r);
-  context.lineTo(x, y + r);
-  context.quadraticCurveTo(x, y, x + r, y);
-  context.closePath();
-}
-
-function paintPot() {
-  if (!potContext || !potCanvas) return;
-  const amount = Number(state.pot || state.settledPot || 0);
-  potContext.clearRect(0, 0, potCanvas.width, potCanvas.height);
-  potContext.fillStyle = 'rgba(2,8,18,.68)';
-  roundedRect(potContext, 8, 8, potCanvas.width - 16, potCanvas.height - 16, 34);
-  potContext.fill();
-  potContext.strokeStyle = 'rgba(255,217,138,.88)';
-  potContext.lineWidth = 5;
-  potContext.stroke();
-  potContext.textAlign = 'center';
-  potContext.textBaseline = 'middle';
-  potContext.fillStyle = '#dffcff';
-  potContext.font = '900 34px system-ui';
-  potContext.fillText('POT', potCanvas.width / 2, 56);
-  potContext.fillStyle = '#ffd98a';
-  potContext.font = '950 58px system-ui';
-  potContext.fillText(`$${amount.toLocaleString()}`, potCanvas.width / 2, 120);
-  if (potSprite?.material?.map) potSprite.material.map.needsUpdate = true;
-}
-
-function ensurePotDisplay() {
-  const scene = window.__SVR_SCENE__;
-  const layout = window.SVR_PHASE341_TABLE_LAYOUT;
-  if (!scene || !layout) return null;
-  const existing = scene.getObjectByName?.(POT_NAME);
-  if (existing) {
-    potSprite = existing;
-    paintPot();
-    return existing;
-  }
-  potCanvas = document.createElement('canvas');
-  potCanvas.width = 512;
-  potCanvas.height = 176;
-  potContext = potCanvas.getContext('2d');
-  const texture = new THREE.CanvasTexture(potCanvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  const material = new THREE.SpriteMaterial({
-    map: texture,
-    transparent: true,
-    depthTest: false,
-    depthWrite: false,
-    toneMapped: false
-  });
-  potSprite = new THREE.Sprite(material);
-  potSprite.name = POT_NAME;
-  potSprite.renderOrder = 9354;
-  potSprite.scale.set(1.38, .47, 1);
-  potSprite.position.set(
-    Number(layout.center?.x || 0),
-    Number(layout.top || 1) + .58,
-    Number(layout.center?.z || 0) - Number(layout.size?.z || 1.5) * .08
+function expectedTableBankroll() {
+  const configured = Number(
+    window.SVR_PHASE362_CONSTANTS?.TABLE_BANKROLL
+    || window.SVR_PHASE363_CONSTANTS?.TABLE_BANKROLL
+    || 0
   );
-  scene.add(potSprite);
-  paintPot();
-  return potSprite;
+  if (configured > 0) return configured;
+  const startingStack = Number(window.SVR_TABLE_STARTING_STACK || 1000);
+  return startingStack * Math.max(1, players.length || 6);
+}
+
+function scenePot() {
+  const scene = window.__SVR_SCENE__;
+  if (!scene?.getObjectByName) return null;
+  for (const name of CURRENT_POT_NAMES) {
+    const object = scene.getObjectByName(name);
+    if (object) return object;
+  }
+  return null;
 }
 
 function syncCards() {
@@ -131,8 +80,6 @@ function syncCards() {
     slot.classList.toggle('empty', !card);
     slot.classList.toggle('red', /[♥♦]/.test(text));
   });
-  ensurePotDisplay();
-  paintPot();
 }
 
 function controllerAudit() {
@@ -179,17 +126,16 @@ function cardAudit() {
 }
 
 function tableAudit() {
-  ensurePotDisplay();
   const scene = window.__SVR_SCENE__;
-  const logo = scene?.getObjectByName?.('PHASE347_ANDROID_TABLE_LOGO_ROOT')
+  const logo = scene?.getObjectByName?.('PHASE365_ANDROID_TABLE_LOGO_ROOT')
+    || scene?.getObjectByName?.('PHASE347_ANDROID_TABLE_LOGO_ROOT')
     || scene?.getObjectByName?.('PHASE341_CANONICAL_CENTER_LOGO_ROOT');
-  const pot = scene?.getObjectByName?.(POT_NAME)
-    || scene?.getObjectByName?.('PHASE347_ANDROID_POT_DISPLAY')
-    || scene?.getObjectByName?.('PHASE347_ANDROID_OVERLAY_ROOT');
+  const pot = scenePot();
   return {
     logo: Boolean(logo),
     potDisplay: Boolean(pot),
     potDisplayName: pot?.name || null,
+    potFramed: pot?.name === 'PHASE354_ANDROID_RAISED_TRANSLUCENT_POT_DISPLAY',
     table: Boolean(window.SVR_TABLE_AUTHORITY || window.SVR_PHASE341_TABLE_LAYOUT)
   };
 }
@@ -198,7 +144,6 @@ async function waitForRuntime(timeoutMs = 120000) {
   const started = performance.now();
   while (performance.now() - started < timeoutMs) {
     window.SVR_PHASE350_ANDROID_CONTROLLER_SWEEP?.();
-    ensurePotDisplay();
     const ready = typeof window.SVR_PHASE344_RUN_FULL_HAND_QA === 'function'
       && typeof window.SVR_POKER_ACTION === 'function'
       && typeof window.SVR_RESET_POKER_TABLE === 'function'
@@ -214,8 +159,15 @@ async function waitForRuntime(timeoutMs = 120000) {
   return false;
 }
 
-function scenePot() {
-  return window.__SVR_SCENE__?.getObjectByName?.(POT_NAME) || null;
+async function joinCurrentTable() {
+  if (typeof window.SVR_PHASE363_JOIN_TABLE === 'function') {
+    const result = window.SVR_PHASE363_JOIN_TABLE('phase354-acceptance');
+    await wait(750);
+    return result !== false;
+  }
+  const result = window.SVR_PHASE347_SIT?.() ?? window.SVR_PHASE343_SIT?.();
+  await wait(950);
+  return result !== false;
 }
 
 async function runAcceptance(options = {}) {
@@ -225,12 +177,14 @@ async function runAcceptance(options = {}) {
   const runtimeTimeoutMs = Math.max(30000, Math.min(150000, Number(options.runtimeTimeoutMs || 120000)));
   const handTimeoutMs = Math.max(30000, Math.min(90000, Number(options.handTimeoutMs || 90000)));
   const maxHands = Math.max(1, Math.min(5, Number(options.maxHands || 5)));
+  const tableBankroll = expectedTableBankroll();
   const report = {
     build: BUILD,
     startedAt: new Date().toISOString(),
     runtimeTimeoutMs,
     handTimeoutMs,
     maxHands,
+    expectedTableBankroll: tableBankroll,
     runtimeReady: false,
     handDriver: null,
     controllerBefore: null,
@@ -249,11 +203,9 @@ async function runAcceptance(options = {}) {
     if (!report.runtimeReady) throw new Error(`ANDROID_RUNTIME_TIMEOUT:${JSON.stringify(window.SVR_PHASE354_PROGRESS || {})}`);
     progress('runtime-ready');
     report.controllerBefore = controllerAudit();
-    const seated = window.SVR_PHASE347_SIT?.() ?? window.SVR_PHASE343_SIT?.();
-    await wait(950);
     report.seat = {
-      commandAccepted: seated !== false,
-      state: window.SVR_PHASE347_STATE || window.SVR_PHASE343_STATE || null,
+      commandAccepted: await joinCurrentTable(),
+      state: window.SVR_PHASE363_STATE || window.SVR_PHASE347_STATE || window.SVR_PHASE343_STATE || null,
       button: document.querySelector('#svr347Actions [data-ui="seat"]')?.textContent?.trim() || null
     };
     progress('running-hand-driver');
@@ -271,6 +223,7 @@ async function runAcceptance(options = {}) {
       winners: state.winners?.map((winner) => ({ name: winner.name, amount: winner.amount, label: winner.label })) || [],
       settledPot: Number(state.settledPot || 0),
       totalStacks: players.reduce((sum, player) => sum + Number(player.stack || 0), 0),
+      expectedTableBankroll: tableBankroll,
       phases: report.handDriver?.record?.phases || [],
       recordPass: report.handDriver?.record?.pass === true
     };
@@ -289,11 +242,12 @@ async function runAcceptance(options = {}) {
       && report.handDriver?.pass === true
       && report.controllerBefore.pass && report.controllerAfter.pass
       && report.cards.pass && report.table.table && report.table.logo && report.table.potDisplay
+      && report.table.potFramed === false
       && report.seat.commandAccepted && report.nextHand?.advanced
       && report.settlement.community === 5
       && report.settlement.winners.length > 0
       && report.settlement.settledPot > 0
-      && report.settlement.totalStacks === 6000
+      && report.settlement.totalStacks === tableBankroll
       && report.updatePolicy.forceUpdate === false
       && report.updatePolicy.showUpdatePrompt === false
       && report.updatePolicy.manualUpdateOnly === true;
@@ -324,7 +278,7 @@ function qa() {
     checkedAt: new Date().toISOString()
   };
   result.pass = result.controller.pass && result.cards.pass && result.table.table
-    && result.table.logo && result.table.potDisplay
+    && result.table.logo && result.table.potDisplay && result.table.potFramed === false
     && result.updatePolicy.forceUpdate === false && result.updatePolicy.showUpdatePrompt === false;
   window.SVR_PHASE354_QA_STATE = result;
   return result;
