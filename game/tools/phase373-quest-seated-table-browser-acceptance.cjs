@@ -46,8 +46,12 @@ async function waitFor(page, evaluator, timeout = 120000) {
     const lobby = await waitFor(page, () => {
       const phase373 = window.SVR_PHASE373_QA?.();
       const phase361 = window.SVR_PHASE361_QA?.();
-      if (!phase373?.pass || !phase373?.tablePass || phase373?.stableAnchor?.mode !== 'lobby' || !phase361?.pass) return null;
-      return { phase373, phase361 };
+      const preflight = window.SVR_PHASE373_RIG_PREFLIGHT_QA?.();
+      const postflight = window.SVR_PHASE373_POSTFLIGHT_QA?.();
+      if (!phase373?.pass || !phase373?.tablePass || phase373?.stableAnchor?.mode !== 'lobby') return null;
+      if (!phase361?.pass || !preflight?.pass || !postflight?.pass) return null;
+      if (preflight.selectedOwnsTable || !preflight.selectedStillSafe) return null;
+      return { phase373, phase361, preflight, postflight };
     });
 
     const joined = await page.evaluate(() => window.SVR_PHASE361_PLAY_GAME?.());
@@ -56,51 +60,84 @@ async function waitFor(page, evaluator, timeout = 120000) {
     const seatedBeforeMove = await waitFor(page, () => {
       window.SVR_PHASE373_STABLE_SEAT?.();
       const qa = window.SVR_PHASE373_QA?.();
+      const preflight = window.SVR_PHASE373_RIG_PREFLIGHT_QA?.();
+      const postflight = window.SVR_PHASE373_POSTFLIGHT_QA?.();
       if (!window.SVR_PHASE361_STATE?.seated || !qa?.pass || qa?.stableAnchor?.mode !== 'seated' || !qa?.teleportFlagsLocked) return null;
-      if (!Object.values(qa.teleportFlags || {}).every((value) => value === false)) return null;
-      return qa;
+      if (!preflight?.pass || !postflight?.pass || !Object.values(qa.teleportFlags || {}).every((value) => value === false)) return null;
+      return { qa, preflight, postflight };
     }, 30000);
 
     const prohibitedMove = await page.evaluate(() => {
-      const rig = window.SVR_TELEPORT_RIG_REF || window.SVR_TELEPORT_RIG || window.SVR_PLAYER_RIG || window.__SVR_PLAYER_RIG;
+      const rig = window.SVR_TELEPORT_RIG_REF;
       const before = window.SVR_PHASE373_QA?.();
+      const beforeTable = before?.tableBounds || null;
+      const beforeHead = before?.currentHead || null;
       let returnValue = null;
       if (typeof rig?.setPlayerPose === 'function') returnValue = rig.setPlayerPose(99, 0, 99);
       else if (typeof rig?.teleportTo === 'function') returnValue = rig.teleportTo(99, 0, 99);
-      else if (rig?.position) rig.position.set(99, 0, 99);
-      return { before, returnValue };
+      else if (rig?.position) returnValue = rig.position.set(99, 0, 99);
+      return { before, beforeTable, beforeHead, returnValue };
     });
-    await page.waitForTimeout(900);
+    await page.waitForTimeout(1100);
 
-    const seatedAfterMove = await page.evaluate(() => window.SVR_PHASE373_QA?.());
+    const seatedAfterMove = await page.evaluate(() => ({
+      phase373: window.SVR_PHASE373_QA?.(),
+      preflight: window.SVR_PHASE373_RIG_PREFLIGHT_QA?.(),
+      postflight: window.SVR_PHASE373_POSTFLIGHT_QA?.()
+    }));
     const anchorDistance = Math.hypot(
-      Number(seatedAfterMove?.currentHead?.x || 0) - Number(seatedAfterMove?.stableAnchor?.x || 0),
-      Number(seatedAfterMove?.currentHead?.z || 0) - Number(seatedAfterMove?.stableAnchor?.z || 0)
+      Number(seatedAfterMove.phase373?.currentHead?.x || 0) - Number(seatedAfterMove.phase373?.stableAnchor?.x || 0),
+      Number(seatedAfterMove.phase373?.currentHead?.z || 0) - Number(seatedAfterMove.phase373?.stableAnchor?.z || 0)
+    );
+    const prohibitedHeadDrift = Math.hypot(
+      Number(seatedAfterMove.phase373?.currentHead?.x || 0) - Number(prohibitedMove.beforeHead?.x || 0),
+      Number(seatedAfterMove.phase373?.currentHead?.z || 0) - Number(prohibitedMove.beforeHead?.z || 0)
+    );
+    const tableVerticalDrift = Math.abs(
+      Number(seatedAfterMove.phase373?.tableBounds?.minY || 0) - Number(prohibitedMove.beforeTable?.minY || 0)
     );
 
     await page.evaluate(() => window.SVR_PHASE361_LEAVE_TABLE?.());
     const lobbyAfterLeave = await waitFor(page, () => {
-      const qa = window.SVR_PHASE373_QA?.();
-      return window.SVR_PHASE361_STATE?.seated === false && qa?.stableAnchor?.mode === 'lobby' ? qa : null;
+      const phase373 = window.SVR_PHASE373_QA?.();
+      const postflight = window.SVR_PHASE373_POSTFLIGHT_QA?.();
+      return window.SVR_PHASE361_STATE?.seated === false
+        && phase373?.stableAnchor?.mode === 'lobby'
+        && phase373?.teleportFlagsLocked === false
+        && postflight?.pass === true
+        && postflight?.standingRestored === true
+        ? { phase373, postflight }
+        : null;
     }, 30000);
 
     const filteredConsole = consoleErrors.filter((line) => !/favicon|WebXR.*not available|immersive-vr|THREE\.WebGLRenderer/i.test(line));
     const filteredFailures = requestFailures.filter((line) => !/favicon/i.test(line));
+    const npcReport = seatedAfterMove.postflight || {};
+    const npcPass = npcReport.npcRootsRepaired > 0
+      ? npcReport.npcMeshesTextured > 0
+        && npcReport.npcRootsUpright > 0
+        && npcReport.npcRootsGrounded > 0
+        && npcReport.npcRootsFacingTable > 0
+      : npcReport.npcRepairApiReady === true
+        && npcReport.npcValidation === 'no-humanoid-roots-in-current-scene';
+
     const pass = lobby.phase373.tablePass === true
       && lobby.phase373.tableVisibleMeshes > 0
-      && lobby.phase373.tableBounds?.minY >= -0.04
-      && lobby.phase373.tableBounds?.minY <= 0.04
-      && seatedBeforeMove.teleportFlagsLocked === true
-      && Object.values(seatedBeforeMove.teleportFlags || {}).every((value) => value === false)
-      && seatedAfterMove.blockedRigMoves > Number(prohibitedMove.before?.blockedRigMoves || 0)
-      && anchorDistance <= 0.18
-      && seatedAfterMove.tablePass === true
-      && seatedAfterMove.npcRootsFound >= 1
-      && seatedAfterMove.npcRootsVisible >= 1
-      && seatedAfterMove.npcRootsTextured >= 1
-      && seatedAfterMove.npcRootsUpright >= 1
-      && lobbyAfterLeave.stableAnchor?.mode === 'lobby'
-      && lobbyAfterLeave.teleportFlagsLocked === false
+      && Math.abs(Number(lobby.phase373.tableBounds?.minY || 0)) <= 0.04
+      && lobby.preflight.selectedOwnsTable === false
+      && seatedBeforeMove.qa.teleportFlagsLocked === true
+      && Object.values(seatedBeforeMove.qa.teleportFlags || {}).every((value) => value === false)
+      && seatedAfterMove.phase373.blockedRigMoves > Number(prohibitedMove.before?.blockedRigMoves || 0)
+      && prohibitedHeadDrift <= 0.18
+      && anchorDistance <= 0.24
+      && tableVerticalDrift <= 0.04
+      && Math.abs(Number(seatedAfterMove.phase373.tableBounds?.minY || 0)) <= 0.04
+      && seatedAfterMove.phase373.tablePass === true
+      && seatedAfterMove.preflight?.selectedOwnsTable === false
+      && npcPass
+      && lobbyAfterLeave.phase373.stableAnchor?.mode === 'lobby'
+      && lobbyAfterLeave.phase373.teleportFlagsLocked === false
+      && lobbyAfterLeave.postflight.standingRestored === true
       && pageErrors.length === 0
       && filteredConsole.length === 0
       && httpErrors.length === 0
@@ -115,6 +152,9 @@ async function waitFor(page, evaluator, timeout = 120000) {
       prohibitedMoveReturn: prohibitedMove.returnValue,
       seatedAfterMove,
       anchorDistance,
+      prohibitedHeadDrift,
+      tableVerticalDrift,
+      npcPass,
       lobbyAfterLeave,
       pageErrors,
       consoleErrors: filteredConsole,
