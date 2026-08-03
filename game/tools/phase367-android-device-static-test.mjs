@@ -80,7 +80,7 @@ if (!release.androidExperience?.visualViewportCalibration || !release.androidExp
 if (release.releaseReady || release.apkUrl !== '' || release.forceUpdate || release.showUpdatePrompt || !release.manualUpdateOnly) errors.push('release-apk-policy');
 if (release.realDeviceValidation?.pending !== true) errors.push('physical-device-validation-not-pending');
 
-if (!profile.includes('SVR_PHASE366_PROFILE_LIVE_CAMERA_QA') && !profile.includes('phase366-profile-live-camera')) errors.push('profile-live-camera-not-protected');
+if (!profile.includes('data-live-avatar-camera="phase366"') || !profile.includes('avatar-vr.html?v=phase366') || !profile.includes('avatar.html?v=phase366')) errors.push('profile-live-camera-not-protected');
 if (!vrRoom.includes('PHASE-353-VR-AVATAR-DRESSING-ROOM-LIVE-PEDESTAL-LOCK')) errors.push('vr-room-not-protected');
 
 const result = {
