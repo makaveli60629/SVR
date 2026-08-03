@@ -1,0 +1,76 @@
+name: Phase 368-369 Android, APK Banner and App Data Foundation
+
+on:
+  pull_request:
+    paths:
+      - 'game/android.html'
+      - 'game/manifest.json'
+      - 'game/android-release.json'
+      - 'game/modules/phase368_android_join_card_gyro_ux_lock.js'
+      - 'game/modules/phase368_android_spectator_tournament_voice_lock.js'
+      - 'game/tools/phase368-android-tournament-avatar-card-ux-static-test.mjs'
+      - 'site/js/phase368-profile-avatar-texture-fit-lock.js'
+      - 'site/js/phase345-demo-activity-persistence.js'
+      - 'site/js/market-ads.js'
+      - 'site/js/phase369-apk-banner-telemetry.js'
+      - 'site/phase369-apk-banner-telemetry.css'
+      - 'site/login.html'
+      - 'site/js/phase369-registration-payout-profile.js'
+      - 'site/admin-app-analytics.html'
+      - 'site/js/phase369-admin-app-analytics.js'
+      - 'backend/contracts/phase369-openapi.yaml'
+      - 'backend/sql/004_app_install_telemetry_payout_profile.sql'
+      - 'infrastructure/aws/phase369-app-data-foundation.yml'
+      - 'game/tools/phase369-site-apk-telemetry-payout-static-test.mjs'
+      - '.github/workflows/phase368-369-release-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Syntax checks
+        run: |
+          node --check game/modules/phase368_android_join_card_gyro_ux_lock.js
+          node --check game/modules/phase368_android_spectator_tournament_voice_lock.js
+          node --check site/js/phase368-profile-avatar-texture-fit-lock.js
+          node --check site/js/phase345-demo-activity-persistence.js
+          node --check site/js/market-ads.js
+          node --check site/js/phase369-apk-banner-telemetry.js
+          node --check site/js/phase369-registration-payout-profile.js
+          node --check site/js/phase369-admin-app-analytics.js
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+
+      - name: Phase 368 and 369 static gates
+        run: |
+          node game/tools/phase368-android-tournament-avatar-card-ux-static-test.mjs
+          node game/tools/phase369-site-apk-telemetry-payout-static-test.mjs
+
+      - name: Protected regression gates
+        run: |
+          node game/tools/phase367-android-physical-device-static-test.mjs
+          node game/tools/phase365-android-seated-ux-branding-static-test.mjs
+          node game/tools/phase363-android-integrated-core-static-test.mjs
+          node game/tools/phase347-android-static-test.mjs
+          node site/tools/phase351-profile-showroom-test.mjs
+          node site/tools/phase366-profile-live-camera-test.mjs
+          node game/tools/phase353-avatar-vr-static-test.mjs
+
+      - name: Security contract assertions
+        run: |
+          grep -q "automatedPayoutsEnabled.*false" site/js/phase369-registration-payout-profile.js
+          grep -q "pending_compliance" backend/sql/004_app_install_telemetry_payout_profile.sql
+          grep -q "last_ip_hash" backend/sql/004_app_install_telemetry_payout_profile.sql
+          grep -q "DeletionProtectionEnabled: true" infrastructure/aws/phase369-app-data-foundation.yml
+          grep -q "releaseReady && current.apkUrl" site/js/phase369-apk-banner-telemetry.js
