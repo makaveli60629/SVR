@@ -11,7 +11,9 @@ on:
       - 'game/modules/phase369_android_join_readiness_transaction_lock.js'
       - 'game/modules/phase369_android_join_intent_bridge_lock.js'
       - 'game/modules/phase372_live_entry_recovery_lock.js'
+      - 'game/modules/phase373_quest_rig_preflight_lock.js'
       - 'game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js'
+      - 'game/modules/phase373_quest_npc_teleport_postflight_lock.js'
       - 'game/phase369-release.json'
       - 'game/tools/phase350-integrity-static-test.mjs'
       - 'game/tools/phase356-android-real-device-static-test.mjs'
@@ -55,7 +57,9 @@ jobs:
           node --check game/modules/phase369_android_join_readiness_transaction_lock.js
           node --check game/modules/phase369_android_join_intent_bridge_lock.js
           node --check game/modules/phase372_live_entry_recovery_lock.js
+          node --check game/modules/phase373_quest_rig_preflight_lock.js
           node --check game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js
+          node --check game/modules/phase373_quest_npc_teleport_postflight_lock.js
           node --check site/js/phase345-player-account-client.js
           node --check site/js/phase346-avatar-viewer.js
           node --check site/js/phase370-account-profile-mobile-polish.js
