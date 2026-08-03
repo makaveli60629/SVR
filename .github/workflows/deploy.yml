@@ -93,6 +93,7 @@ jobs:
           test -f build/game/modules/phase373_quest_rig_preflight_lock.js
           test -f build/game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js
           test -f build/game/modules/phase373_quest_npc_teleport_postflight_lock.js
+          test -f build/game/modules/phase373_quest_table_seat_finalizer_lock.js
           test -f build/game/modules/phase369_android_join_table_freeze_recovery_lock.js
           test -f build/game/modules/phase368_card_dealer_animation_lock.js
           test -f build/game/assets/models/table.glb
@@ -108,6 +109,7 @@ jobs:
           {
             "status": "ok",
             "build": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+            "questFinalizer": "PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK",
             "androidBuild": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
             "commit": "$GITHUB_SHA",
             "deployedAt": "$DEPLOYED_AT",
