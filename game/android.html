@@ -15,6 +15,7 @@ const report=(message)=>{const status=document.getElementById('safeStatus');if(s
 const start=async()=>{if(started)return;started=true;try{
   import('./modules/phase354_android_full_game_release_acceptance_lock.js?v=phase364').catch(console.error);
   await bootPlatform({forcedPlatform:'android'});
+  await import('./modules/phase364_poker_audit_committed_alias.js?v=phase364');
   await import('./modules/phase363_android_canonical_table_asset_lock.js?v=phase364');
   window.SVR_PHASE364_ALIGN_TABLE?.();
   await import('./modules/phase357_android_table_status_showdown_ante_lock.js?v=phase364');
