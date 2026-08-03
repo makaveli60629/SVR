@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Static syntax checks
         run: |
           node --check game/modules/phase354_android_full_game_release_acceptance_lock.js
@@ -29,7 +29,8 @@ jobs:
           grep -q 'PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK' game/android.html
           grep -q 'phase354_android_full_game_release_acceptance_lock.js' game/android.html
           grep -q 'SVR_PHASE354_RUN_ANDROID_FULL_GAME_ACCEPTANCE' game/modules/phase354_android_full_game_release_acceptance_lock.js
-          grep -q 'totalStacks === 6000' game/modules/phase354_android_full_game_release_acceptance_lock.js
+          grep -q 'totalStacks === tableBankroll' game/modules/phase354_android_full_game_release_acceptance_lock.js
+          grep -q 'potFramed === false' game/modules/phase354_android_full_game_release_acceptance_lock.js
           grep -q 'nextHand?.advanced' game/modules/phase354_android_full_game_release_acceptance_lock.js
       - name: Install Playwright Chromium
         run: |
