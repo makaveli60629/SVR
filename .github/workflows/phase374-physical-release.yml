@@ -77,7 +77,7 @@ jobs:
       - name: Security and release assertions
         run: |
           ! grep -RniE 'AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|clientSecret|databasePassword' index.html game site update app-install.js app-update-checker.js
-          ! grep -RniE 'Password123|TestPassword|temporary-password[[:space:]]+["'\''][^$]' .github infrastructure site game
+          ! grep -RniE 'Password123|TestPassword|CHANGE_ME|temporary-password[[:space:]]+[A-Za-z0-9]' .github infrastructure site game
           grep -q '"provider": "aws"' site/config/player-api.json
           grep -q '"identity": "cognito"' site/config/player-api.json
           grep -q '"database": "dynamodb"' site/config/player-api.json
