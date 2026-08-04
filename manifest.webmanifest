@@ -1,9 +1,9 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "Launch SVR Poker Android, Quest/VR, downloads, updates, store, and support.",
-  "id": "/?source=pwa-phase377",
-  "start_url": "/?source=pwa-phase377",
+  "description": "SVR Poker Android stable table, APK status, Quest/VR, store, and support.",
+  "id": "/?source=pwa-phase378-emergency",
+  "start_url": "/?source=pwa-phase378-emergency",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -18,9 +18,9 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {"name": "Play Android", "short_name": "Android", "description": "Open the Phase 377 stable Android poker table.", "url": "/game/android-play.html?channel=stable&v=phase377", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Update App", "short_name": "Update", "description": "Open the Android update and cache reset center.", "url": "/downloads/#update", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Download APK", "short_name": "APK", "description": "Check the current signed APK download status.", "url": "/downloads/#apk", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Play Android", "short_name": "Android", "description": "Open the Phase 378 standalone JOIN NOW table.", "url": "/game/android-stable.html?v=phase378", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "APK Download and Status", "short_name": "APK RC2", "description": "Open the verified Android APK release center.", "url": "/downloads/", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Update Game", "short_name": "Update", "description": "Clear old SVR caches and open the current Android table.", "url": "/downloads/#update", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Launch VR Room", "short_name": "VR Room", "description": "Open the SVR Poker Quest/VR room.", "url": "/game/index.html?platform=quest&v=phase373", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }
