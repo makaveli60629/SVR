@@ -1,0 +1,19 @@
+{
+  "build": "PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK",
+  "phase": 374,
+  "status": "current-web-runtime",
+  "androidSafeUrl": "/game/android.html?channel=stable&v=phase374",
+  "questUrl": "/game/index.html?platform=quest&v=phase374",
+  "launcherUrl": "/index.html?v=phase374",
+  "downloadsUrl": "/downloads/",
+  "packageName": "com.svrpoker.app",
+  "apkVersionName": "0.1.0-rc1",
+  "apkVersionCode": 1,
+  "apkUrl": "",
+  "apkSha256": "",
+  "releaseReady": false,
+  "forceUpdate": false,
+  "showUpdatePrompt": false,
+  "manualUpdateOnly": true,
+  "message": "The current SVR Poker game is delivered through the Phase 374 web runtime. No forced APK reinstall is required."
+}
