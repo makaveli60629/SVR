@@ -184,9 +184,18 @@ async function testQuest(browser) {
       const rig = window.SVR_TELEPORT_RIG_REF;
       const before = window.SVR_PHASE373_QA?.().blockedRigMoves || 0;
       let result = null;
-      if (typeof rig?.setPlayerPose === 'function') result = rig.setPlayerPose(99, 0, 99);
-      else if (typeof rig?.teleportTo === 'function') result = rig.teleportTo(99, 0, 99);
-      return { before, result };
+      let method = 'none';
+      if (typeof rig?.setPlayerPose === 'function') {
+        method = 'setPlayerPose';
+        result = rig.setPlayerPose(99, 0, 99);
+      } else if (typeof rig?.teleportTo === 'function') {
+        method = 'teleportTo';
+        result = rig.teleportTo(99, 0, 99);
+      } else if (typeof rig?.position?.set === 'function') {
+        method = 'position.set';
+        result = rig.position.set(99, 0, 99);
+      }
+      return { before, result: result === false ? false : null, method };
     });
     await page.waitForTimeout(500);
     const after = await page.evaluate(() => window.SVR_PHASE373_QA?.().blockedRigMoves || 0);
@@ -201,7 +210,7 @@ async function testQuest(browser) {
 
     const filteredConsole = errors.consoleErrors.filter((line) => !/favicon|WebXR.*not available|immersive-vr|THREE\.WebGLRenderer/i.test(line));
     return {
-      pass: lobby.badge && seated.locked && after > prohibited.before && standing.standingRestored && errors.pageErrors.length === 0 && filteredConsole.length === 0 && errors.httpErrors.length === 0 && errors.requestFailures.length === 0,
+      pass: lobby.badge && seated.locked && prohibited.method !== 'none' && after > prohibited.before && standing.standingRestored && errors.pageErrors.length === 0 && filteredConsole.length === 0 && errors.httpErrors.length === 0 && errors.requestFailures.length === 0,
       lobby,
       seated,
       prohibited,
