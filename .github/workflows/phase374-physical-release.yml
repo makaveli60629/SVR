@@ -1,0 +1,119 @@
+name: Phase 374 Physical Release Validation
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'manifest.webmanifest'
+      - 'app-install.js'
+      - 'app-update-checker.js'
+      - 'sw.js'
+      - 'pwa-sw.js'
+      - 'update/app-version.json'
+      - 'game/index.html'
+      - 'game/android.html'
+      - 'game/manifest.json'
+      - 'game/phase374-release.json'
+      - 'game/modules/phase372_live_entry_recovery_lock.js'
+      - 'game/modules/phase374_physical_release_truth_lock.js'
+      - 'game/modules/phase374_original_table_authority_lock.js'
+      - 'game/modules/phase374_android_tournament_card_ui_lock.js'
+      - 'game/tools/phase374-physical-release-static-test.mjs'
+      - 'game/tools/phase374-physical-release-browser-acceptance.cjs'
+      - 'site/login.html'
+      - 'site/config/phase374-test-player.json'
+      - 'site/js/phase374-test-player-avatar.js'
+      - 'infrastructure/aws/phase374-test-player.trigger'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/phase374-provision-test-player.yml'
+      - '.github/workflows/phase374-physical-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase374-physical-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 48
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate Phase 374 syntax and manifests
+        run: |
+          node --check app-install.js
+          node --check app-update-checker.js
+          node --check sw.js
+          node --check game/modules/phase372_live_entry_recovery_lock.js
+          node --check game/modules/phase374_physical_release_truth_lock.js
+          node --check game/modules/phase374_original_table_authority_lock.js
+          node --check game/modules/phase374_android_tournament_card_ui_lock.js
+          node --check site/js/phase374-test-player-avatar.js
+          node --check game/tools/phase374-physical-release-browser-acceptance.cjs
+          node --check game/tools/phase374-physical-release-static-test.mjs
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/phase374-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          python3 -m json.tool site/config/phase374-test-player.json >/dev/null
+
+      - name: Validate Phase 374 and protected contracts
+        run: |
+          node game/tools/phase374-physical-release-static-test.mjs
+          node game/tools/phase364-device-xr-geometry-static-test.mjs
+          node game/tools/phase367-android-physical-device-static-test.mjs
+          node game/tools/phase369-android-recovery-static-test.mjs
+          node game/tools/phase372-production-recovery-static-test.mjs
+          node game/tools/phase373-quest-seated-table-static-test.mjs
+          node game/tools/phase368-card-dealer-static-test.mjs
+          node site/tools/phase370-371-site-polish-static-test.mjs
+
+      - name: Security and release assertions
+        run: |
+          ! grep -RniE 'AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|clientSecret|databasePassword' index.html game site update app-install.js app-update-checker.js
+          ! grep -RniE 'Password123|TestPassword|temporary-password[[:space:]]+["'\''][^$]' .github infrastructure site game
+          grep -q '"provider": "aws"' site/config/player-api.json
+          grep -q '"identity": "cognito"' site/config/player-api.json
+          grep -q '"database": "dynamodb"' site/config/player-api.json
+          test -f game/assets/models/table.glb
+          test -f game/assets/table.fbx
+          test -f game/assets/models/eric/eric.fbx
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Start local SVR site
+        run: |
+          python3 -m http.server 4173 > /tmp/svr-phase374-http.log 2>&1 &
+          echo $! > /tmp/svr-phase374-http.pid
+          sleep 2
+
+      - name: Run Phase 374 Android and Quest acceptance
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase374-physical-release-browser-acceptance.cjs
+
+      - name: Re-run dedicated Android complete game
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase363-android-integrated-core-browser-acceptance.cjs
+
+      - name: Re-run dedicated Quest complete game
+        env:
+          SVR_TEST_BASE: http://127.0.0.1:4173
+        run: node game/tools/phase358-quest-browser-acceptance.cjs
+
+      - name: Upload HTTP log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase374-http-log
+          path: /tmp/svr-phase374-http.log
