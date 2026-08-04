@@ -10,6 +10,7 @@ const waitForApi=async(names,timeout=30000)=>{const start=performance.now();whil
 const loadDealerLater=()=>{const run=()=>import('./modules/phase368_card_dealer_animation_lock.js?v=phase374').then(()=>window.SVR_PHASE368_ALIGN_CARD_DEALER?.()).catch(console.error);if('requestIdleCallback'in window)requestIdleCallback(run,{timeout:7000});else setTimeout(run,2200);};
 const start=async()=>{if(started)return;started=true;try{
   await bootPlatform();
+  await import('./modules/phase374_phase358_original_table_compat_lock.js?v=phase374');
   await import('./modules/phase359_dual_platform_gameplay_continuity_lock.js?v=phase374');
   await import('./modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js?v=phase374');
   await import('./modules/phase360_table_conservation_next_guard_lock.js?v=phase374');
