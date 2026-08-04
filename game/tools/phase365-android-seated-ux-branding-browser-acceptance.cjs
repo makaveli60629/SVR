@@ -9,7 +9,10 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 915, height: 412 },
-    userAgent: 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36'
+    userAgent: 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36',
+    hasTouch: true,
+    isMobile: true,
+    deviceScaleFactor: 1
   });
   const page = await context.newPage();
   const errors = [];
@@ -46,7 +49,10 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
     const button = document.getElementById('svr372Primary');
     const visible = Boolean(button?.offsetParent);
     const enabled = Boolean(button && !button.disabled && /JOIN TABLE/i.test(button.textContent || ''));
-    if (entry) entry.hidden = true;
+    if (entry) {
+      entry.dataset.phase365ControllerIsolation = '1';
+      entry.style.setProperty('display', 'none', 'important');
+    }
     return { qa, visible, enabled };
   });
   if (!entryBeforeTest.visible || !entryBeforeTest.enabled || entryBeforeTest.qa?.pass !== true) throw new Error('Phase 372 visible JOIN entry was not ready after the authoritative synchronizer ran.');
@@ -61,19 +67,60 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
     lookCount: document.querySelectorAll('#svr347Look').length
   }));
 
-  const moveBox = await page.locator('#svr347Move').boundingBox();
-  if (!moveBox) throw new Error('MOVE stick has no layout box');
-  await page.mouse.move(moveBox.x + moveBox.width / 2, moveBox.y + moveBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(moveBox.x + moveBox.width / 2 - moveBox.width * 0.28, moveBox.y + moveBox.height / 2, { steps: 4 });
-  await page.waitForTimeout(520);
-  await page.mouse.up();
+  const movementGesture = await page.evaluate(() => {
+    const target = document.querySelector('#svr347Move');
+    if (!target) return { pass: false, reason: 'move-target-missing' };
+    const rect = target.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const common = {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      pointerType: 'touch',
+      pointerId: 3651,
+      isPrimary: true,
+      width: 12,
+      height: 12,
+      pressure: 0.7,
+      buttons: 1
+    };
+    target.dispatchEvent(new PointerEvent('pointerdown', { ...common, clientX: x, clientY: y }));
+    target.dispatchEvent(new PointerEvent('pointermove', { ...common, clientX: x - rect.width * 0.30, clientY: y }));
+    return { pass: true, x, y, width: rect.width, height: rect.height };
+  });
+  if (!movementGesture.pass) throw new Error(`Android MOVE gesture could not start: ${JSON.stringify(movementGesture)}`);
+  await page.waitForTimeout(720);
+  await page.evaluate(() => {
+    const target = document.querySelector('#svr347Move');
+    if (!target) return;
+    const rect = target.getBoundingClientRect();
+    target.dispatchEvent(new PointerEvent('pointerup', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      pointerType: 'touch',
+      pointerId: 3651,
+      isPrimary: true,
+      clientX: rect.left + rect.width * 0.20,
+      clientY: rect.top + rect.height / 2,
+      pressure: 0,
+      buttons: 0
+    }));
+  });
 
   const lobbyAfter = await page.evaluate(() => ({ camera: window.__SVR_CAMERA__.position.toArray() }));
   const movementDistance = Math.hypot(
     lobbyAfter.camera[0] - lobbyBefore.camera[0],
     lobbyAfter.camera[2] - lobbyBefore.camera[2]
   );
+
+  await page.evaluate(() => {
+    const entry = document.getElementById('svr372Entry');
+    if (!entry) return;
+    entry.style.removeProperty('display');
+    delete entry.dataset.phase365ControllerIsolation;
+  });
 
   await page.evaluate(() => window.SVR_PHASE363_JOIN_TABLE('phase365-browser-acceptance'));
   await page.waitForFunction(() => (
@@ -154,6 +201,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
     successor: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
     entrySyncResult,
     entryBeforeTest,
+    movementGesture,
     lobbyBefore,
     movementDistance: +movementDistance.toFixed(4),
     seated,
@@ -167,6 +215,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
   const checks = [
     [entrySyncResult !== false, 'phase372-entry-sync-accepted'],
     [entryBeforeTest.visible && entryBeforeTest.enabled && entryBeforeTest.qa?.pass === true, 'phase372-entry-visible-before-test'],
+    [movementGesture.pass === true, 'touch-movement-gesture-dispatched'],
     [lobbyBefore.rootCount === 1, 'single-controller-root'],
     [lobbyBefore.moveCount === 1 && lobbyBefore.lookCount === 1, 'single-move-look'],
     [lobbyBefore.moveDisplay !== 'none' && lobbyBefore.lookDisplay !== 'none', 'lobby-sticks-visible'],
