@@ -8,7 +8,7 @@ const QUEST_URL = `${BASE}/game/index.html?platform=quest&v=phase374&acceptance=
 const ANDROID_UA = 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36';
 const QUEST_UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 OculusBrowser/37.0 MetaQuestBrowser/37.0 Quest 3 Safari/537.36';
 
-async function waitFor(page, evaluator, timeout = 120000) {
+async function waitFor(page, evaluator, timeout = 120000, diagnosticKey = '') {
   const started = Date.now();
   let last = null;
   while (Date.now() - started < timeout) {
@@ -18,7 +18,11 @@ async function waitFor(page, evaluator, timeout = 120000) {
     } catch {}
     await page.waitForTimeout(250);
   }
-  throw new Error(`Timed out: ${JSON.stringify(last)}`);
+  let diagnostic = null;
+  if (diagnosticKey) {
+    diagnostic = await page.evaluate((key) => window[key] || null, diagnosticKey).catch(() => null);
+  }
+  throw new Error(`Timed out: ${JSON.stringify({ last, diagnostic })}`);
 }
 
 function watch(page, base) {
@@ -37,14 +41,29 @@ async function testAndroid(browser) {
   try {
     await page.goto(ANDROID_URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
     const lobby = await waitFor(page, () => {
-      const table = window.SVR_PHASE374_ORIGINAL_TABLE_QA?.();
-      const ui = window.SVR_PHASE374_ANDROID_UI_QA?.();
-      const phase372 = window.SVR_PHASE372_QA?.();
-      if (window.SVR_PHASE372_CORE_READY !== true || !table?.pass || !ui?.pass || !phase372?.pass) return null;
+      const table = window.SVR_PHASE374_ORIGINAL_TABLE_QA?.() || null;
+      const ui = window.SVR_PHASE374_ANDROID_UI_QA?.() || null;
+      const phase372 = window.SVR_PHASE372_QA?.() || null;
       const join = document.getElementById('svr372Primary');
-      if (!join?.offsetParent || join.disabled || !/JOIN TABLE/i.test(join.textContent || '')) return null;
-      return { table, ui, phase372, badge: Boolean(document.getElementById('svr374Badge')), logo: Boolean(document.getElementById('svr374TournamentLogo')) };
-    });
+      const diagnostic = {
+        coreReady: window.SVR_PHASE372_CORE_READY,
+        table,
+        tableState: window.SVR_PHASE374_TABLE_STATE || null,
+        ui,
+        phase372,
+        joinExists: Boolean(join),
+        joinVisible: Boolean(join?.offsetParent),
+        joinDisabled: Boolean(join?.disabled),
+        joinText: join?.textContent || null,
+        badge: Boolean(document.getElementById('svr374Badge')),
+        logo: Boolean(document.getElementById('svr374TournamentLogo')),
+        phase363: window.SVR_PHASE363_STATE || null
+      };
+      window.__SVR_PHASE374_ANDROID_LOBBY_DIAGNOSTIC = diagnostic;
+      if (diagnostic.coreReady !== true || !table?.pass || !ui?.pass || !phase372?.pass) return null;
+      if (!diagnostic.joinVisible || diagnostic.joinDisabled || !/JOIN TABLE/i.test(diagnostic.joinText || '')) return null;
+      return { table, ui, phase372, badge: diagnostic.badge, logo: diagnostic.logo };
+    }, 120000, '__SVR_PHASE374_ANDROID_LOBBY_DIAGNOSTIC');
 
     const card = await page.evaluate(async () => {
       const root = document.getElementById('svr347Community') || document.body;
@@ -68,21 +87,39 @@ async function testAndroid(browser) {
     if (joined === false) throw new Error('Phase 374 Android JOIN rejected.');
     const seated = await waitFor(page, () => {
       const isJoined = Boolean(window.SVR_PHASE363_JOINED_IMMEDIATE || window.SVR_PHASE363_STATE?.joined);
-      if (!isJoined) return null;
       const move = document.getElementById('svr347Move');
       const look = document.getElementById('svr347Look');
       const hidden = [move, look].every((control) => !control || getComputedStyle(control).display === 'none');
-      const ui = window.SVR_PHASE374_ANDROID_UI_QA?.();
-      const table = window.SVR_PHASE374_ORIGINAL_TABLE_QA?.();
-      return hidden && ui?.pass && table?.pass ? { hidden, ui, table } : null;
-    }, 45000);
+      const ui = window.SVR_PHASE374_ANDROID_UI_QA?.() || null;
+      const table = window.SVR_PHASE374_ORIGINAL_TABLE_QA?.() || null;
+      const diagnostic = {
+        isJoined,
+        phase363: window.SVR_PHASE363_STATE || null,
+        joinedImmediate: window.SVR_PHASE363_JOINED_IMMEDIATE,
+        hidden,
+        moveDisplay: move ? getComputedStyle(move).display : null,
+        lookDisplay: look ? getComputedStyle(look).display : null,
+        ui,
+        table,
+        tableState: window.SVR_PHASE374_TABLE_STATE || null
+      };
+      window.__SVR_PHASE374_ANDROID_SEATED_DIAGNOSTIC = diagnostic;
+      return isJoined && hidden && ui?.pass && table?.pass ? { hidden, ui, table } : null;
+    }, 45000, '__SVR_PHASE374_ANDROID_SEATED_DIAGNOSTIC');
 
     await page.evaluate(() => window.SVR_PHASE363_LEAVE_TABLE?.('phase374-browser'));
     const returned = await waitFor(page, () => {
       window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase374-browser-return');
       const join = document.getElementById('svr372Primary');
-      return !Boolean(window.SVR_PHASE363_STATE?.joined) && Boolean(join?.offsetParent) && !join.disabled ? true : null;
-    }, 30000);
+      const diagnostic = {
+        joined: Boolean(window.SVR_PHASE363_STATE?.joined),
+        joinVisible: Boolean(join?.offsetParent),
+        joinDisabled: Boolean(join?.disabled),
+        joinText: join?.textContent || null
+      };
+      window.__SVR_PHASE374_ANDROID_RETURN_DIAGNOSTIC = diagnostic;
+      return !diagnostic.joined && diagnostic.joinVisible && !diagnostic.joinDisabled ? true : null;
+    }, 30000, '__SVR_PHASE374_ANDROID_RETURN_DIAGNOSTIC');
 
     const filteredConsole = errors.consoleErrors.filter((line) => !/favicon|WebGL|setPointerCapture|THREE\.WebGLRenderer/i.test(line));
     return {
@@ -105,25 +142,43 @@ async function testQuest(browser) {
   try {
     await page.goto(QUEST_URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
     const lobby = await waitFor(page, () => {
-      const table = window.SVR_PHASE374_ORIGINAL_TABLE_QA?.();
-      const phase373 = window.SVR_PHASE373_QA?.();
-      const finalizer = window.SVR_PHASE373_FINALIZER_QA?.();
+      const table = window.SVR_PHASE374_ORIGINAL_TABLE_QA?.() || null;
+      const phase373 = window.SVR_PHASE373_QA?.() || null;
+      const finalizer = window.SVR_PHASE373_FINALIZER_QA?.() || null;
+      const diagnostic = {
+        table,
+        tableState: window.SVR_PHASE374_TABLE_STATE || null,
+        phase373,
+        finalizer,
+        phase361: window.SVR_PHASE361_STATE || null,
+        badge: Boolean(document.getElementById('svr374Badge'))
+      };
+      window.__SVR_PHASE374_QUEST_LOBBY_DIAGNOSTIC = diagnostic;
       if (!table?.pass || !phase373?.pass || !finalizer?.pass) return null;
       if (table.currentAuthority !== 'PHASE374_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY') return null;
-      return { table, phase373, finalizer, badge: Boolean(document.getElementById('svr374Badge')) };
-    });
+      return { table, phase373, finalizer, badge: diagnostic.badge };
+    }, 120000, '__SVR_PHASE374_QUEST_LOBBY_DIAGNOSTIC');
 
     const joinResult = await page.evaluate(() => window.SVR_PHASE361_PLAY_GAME?.());
     if (joinResult === false) throw new Error('Quest PLAY GAME rejected Phase 374 seat.');
     const seated = await waitFor(page, () => {
       window.SVR_PHASE373_STABLE_SEAT?.('phase374-browser');
       window.SVR_PHASE373_FINALIZE_SEAT?.('phase374-browser');
-      const qa = window.SVR_PHASE373_QA?.();
-      const table = window.SVR_PHASE374_ORIGINAL_TABLE_QA?.();
+      const qa = window.SVR_PHASE373_QA?.() || null;
+      const table = window.SVR_PHASE374_ORIGINAL_TABLE_QA?.() || null;
       const flags = qa?.teleportFlags || {};
       const locked = Object.keys(flags).length >= 4 && Object.values(flags).every((value) => value === false);
-      return window.SVR_PHASE361_STATE?.seated && qa?.teleportFlagsLocked && locked && table?.pass ? { qa, table, locked } : null;
-    }, 45000);
+      const diagnostic = {
+        seated: window.SVR_PHASE361_STATE?.seated,
+        qa,
+        table,
+        tableState: window.SVR_PHASE374_TABLE_STATE || null,
+        flags,
+        locked
+      };
+      window.__SVR_PHASE374_QUEST_SEATED_DIAGNOSTIC = diagnostic;
+      return diagnostic.seated && qa?.teleportFlagsLocked && locked && table?.pass ? { qa, table, locked } : null;
+    }, 45000, '__SVR_PHASE374_QUEST_SEATED_DIAGNOSTIC');
 
     const prohibited = await page.evaluate(() => {
       const rig = window.SVR_TELEPORT_RIG_REF;
@@ -138,9 +193,11 @@ async function testQuest(browser) {
 
     await page.evaluate(() => window.SVR_PHASE361_LEAVE_TABLE?.());
     const standing = await waitFor(page, () => {
-      const post = window.SVR_PHASE373_POSTFLIGHT_QA?.();
-      return window.SVR_PHASE361_STATE?.seated === false && post?.pass && post?.standingRestored ? post : null;
-    }, 30000);
+      const post = window.SVR_PHASE373_POSTFLIGHT_QA?.() || null;
+      const diagnostic = { seated: window.SVR_PHASE361_STATE?.seated, post };
+      window.__SVR_PHASE374_QUEST_STANDING_DIAGNOSTIC = diagnostic;
+      return diagnostic.seated === false && post?.pass && post?.standingRestored ? post : null;
+    }, 30000, '__SVR_PHASE374_QUEST_STANDING_DIAGNOSTIC');
 
     const filteredConsole = errors.consoleErrors.filter((line) => !/favicon|WebXR.*not available|immersive-vr|THREE\.WebGLRenderer/i.test(line));
     return {
