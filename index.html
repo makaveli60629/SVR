@@ -1,95 +1,108 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SVR Poker | Public Launch Page</title>
-  <meta name="description" content="SVR Poker public launch page." />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <meta name="theme-color" content="#9b4dff" />
-  <link rel="icon" href="./logo.png" type="image/png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./launch.css?v=phase104-public-no-app-button" />
-  <link rel="stylesheet" href="./launch-overrides.css?v=phase104-public-no-app-button" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#090510">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>SVR Poker — Phase 374 Live</title>
+  <meta name="description" content="Current SVR Poker Android, Quest/Oculus, website, and live deployment launcher.">
+  <link rel="icon" href="/logo.png" type="image/png">
+  <link rel="manifest" href="/manifest.webmanifest?v=phase374">
+  <style>
+    :root{color-scheme:dark;--cyan:#7ffcff;--purple:#aa64ff;--green:#56ff9a;--gold:#ffd98a;--ink:#05030a;--panel:rgba(9,8,20,.88)}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#030107;color:#fff;font-family:Inter,system-ui,Arial,sans-serif}body{overflow-x:hidden}
+    #rain{position:fixed;inset:0;width:100%;height:100%;opacity:.26;pointer-events:none}
+    .page{position:relative;z-index:1;width:min(1120px,calc(100% - 28px));margin:auto;padding:24px 0 40px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:12px}.brand img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 0 22px rgba(170,100,255,.5))}.brand strong{display:block;font-size:clamp(20px,4vw,34px);letter-spacing:.08em}.brand span{color:#c8bdde;font-size:13px}.phase{border:1px solid rgba(86,255,154,.65);border-radius:999px;padding:9px 12px;color:var(--green);background:rgba(2,15,11,.72);font-weight:900;font-size:11px;letter-spacing:.08em}
+    .hero{border:1px solid rgba(127,252,255,.32);border-radius:28px;padding:clamp(22px,5vw,48px);background:radial-gradient(circle at 18% 0%,rgba(170,100,255,.22),transparent 38%),linear-gradient(160deg,rgba(10,8,26,.96),rgba(3,4,10,.94));box-shadow:0 30px 100px rgba(0,0,0,.62)}
+    .eyebrow{color:var(--cyan);font-weight:900;letter-spacing:.13em;font-size:12px}.hero h1{font-size:clamp(34px,8vw,72px);line-height:.98;margin:12px 0 16px;max-width:850px}.hero p{max-width:760px;color:#ddd7eb;font-size:clamp(16px,2.2vw,20px);line-height:1.45}
+    .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:24px}.btn{display:flex;align-items:center;justify-content:center;min-height:58px;border-radius:16px;border:1px solid rgba(255,255,255,.15);text-decoration:none;color:#fff;font-weight:950;letter-spacing:.04em;text-align:center;padding:12px;background:rgba(255,255,255,.07)}.btn.primary{border:0;color:#02050a;background:linear-gradient(135deg,var(--green),var(--cyan))}.btn.quest{border-color:rgba(170,100,255,.65);background:linear-gradient(135deg,rgba(170,100,255,.28),rgba(127,252,255,.12))}.btn:hover,.btn:focus{transform:translateY(-1px);box-shadow:0 12px 34px rgba(0,0,0,.36)}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}.card{border:1px solid rgba(255,255,255,.11);border-radius:18px;background:var(--panel);padding:16px}.card b{display:block;color:var(--gold);font-size:12px;letter-spacing:.08em;margin-bottom:7px}.card span{color:#d5cfdf;font-size:14px;line-height:1.4}.status{display:flex;align-items:center;gap:8px;margin-top:10px;color:#dfffe9;font-size:13px}.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 16px rgba(86,255,154,.8)}
+    .deploy{margin-top:18px;border:1px solid rgba(86,255,154,.25);border-radius:18px;background:rgba(3,12,9,.78);padding:14px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.deploy code{color:#9dffbd;font-size:12px;word-break:break-all}.deploy button{border:1px solid rgba(255,217,138,.55);border-radius:999px;background:transparent;color:var(--gold);padding:10px 14px;font-weight:900;cursor:pointer}
+    footer{text-align:center;color:#9e96ad;font-size:12px;padding-top:28px}
+    @media(max-width:760px){.top{align-items:flex-start}.phase{max-width:150px;text-align:center}.actions,.grid{grid-template-columns:1fr}.hero{border-radius:22px}.btn{min-height:54px}}
+  </style>
 </head>
-<body class="launch-body" data-build="PHASE-104-PUBLIC-NO-APP-BUTTON-LOCK">
-  <canvas id="binary-rain" aria-hidden="true"></canvas>
+<body data-build="PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK">
+  <canvas id="rain" aria-hidden="true"></canvas>
+  <main class="page">
+    <header class="top">
+      <div class="brand"><img src="/logo.png" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Scarlett Holding LLC • Team Nova</span></div></div>
+      <div class="phase">PHASE 374 • LIVE DEVICE RELEASE</div>
+    </header>
 
-  <main class="launch-page">
-    <div class="system-status-badge" aria-label="SVR system status">
-      <span class="status-item admin-status offline" id="admin-status" data-state="offline"><span data-admin-label>ADMIN OFFLINE</span></span>
-      <span class="status-item server-status online" id="server-status" data-state="online">SERVER ONLINE</span>
-      <span class="status-item database-status online" id="database-status" data-state="online">DATABASE ONLINE</span>
-    </div>
-    <img class="launch-logo" src="./logo.png" alt="SVR Poker logo" />
+    <section class="hero">
+      <div class="eyebrow">CURRENT PHYSICAL TEST BUILD</div>
+      <h1>Open the version that is actually deployed.</h1>
+      <p>This launcher replaces the old Phase 102/104 links. Android and Quest now open the current physical-release routes directly, with an on-screen Phase 374 verifier and a cache-reset control inside the game.</p>
+      <div class="actions">
+        <a id="deviceLaunch" class="btn primary" href="/game/android.html?channel=stable&amp;v=phase374&amp;source=public-launch">PLAY ON ANDROID</a>
+        <a class="btn quest" href="/game/index.html?platform=quest&amp;v=phase374&amp;source=public-launch">ENTER QUEST / OCULUS</a>
+        <a class="btn" href="/game/camera3.html?preview=1&amp;cam=director&amp;autocam=1&amp;embed=1&amp;v=phase374">OPEN DIRECTOR PREVIEW</a>
+        <a class="btn" href="/site/index.html?v=phase374">OPEN SVR WEBSITE</a>
+      </div>
+    </section>
 
-    <div class="launch-copy">
-      <div class="eyebrow">Public Launch Page</div>
-      <h1 class="title-lockup brand-inline">
-        <span class="poker-word poker-full">SVR Poker</span>
-      </h1>
-      <p class="launch-note">This is a public page.</p>
-      <p class="launch-note">Site under construction.</p>
-      <p class="launch-note">Contact: <a href="mailto:admin@svrpoker.com">admin@svrpoker.com</a></p>
-      <p class="launch-note launch-age">18 years and older only for this project.</p>
-    </div>
+    <section class="grid" aria-label="Release status">
+      <article class="card"><b>ANDROID</b><span>One JOIN TABLE authority, current table runtime, touch controls, cache recovery, and visible Phase 374 badge.</span><div class="status"><i class="dot"></i>Current web route</div></article>
+      <article class="card"><b>QUEST / OCULUS</b><span>Stable lobby spawn, grounded table, seated teleport block, NPC repair, and table/seat finalizer.</span><div class="status"><i class="dot"></i>Current WebXR route</div></article>
+      <article class="card"><b>ACCOUNT FOUNDATION</b><span>AWS Cognito identity and DynamoDB profile/session infrastructure remain the protected backend direction.</span><div class="status"><i class="dot"></i>AWS configuration retained</div></article>
+      <article class="card"><b>PRODUCT TRUTH</b><span>Current poker is local play-money Hold'em against five bots. Server-authoritative multiplayer is not claimed.</span><div class="status"><i class="dot"></i>Acceptance scope clear</div></article>
+    </section>
 
-    <div class="action-row" id="control-dock-container" aria-label="SVR control dock">
-      <a class="btn btn-primary" href="./site/index.html?v=phase104-site-menu-app">Preview Site</a>
-      <a class="btn btn-secondary" href="./game/index.html?v=phase102-current-stack">Launch VR Room</a>
-      <a class="btn btn-ghost" href="./site/index.html#message">Leave Message</a>
-    </div>
+    <section class="deploy">
+      <div><strong>Production deployment:</strong> <code id="deployStatus">checking /deploy-health.json…</code></div>
+      <button id="clearCache" type="button">CLEAR OLD DEVICE CACHE</button>
+    </section>
 
-    <footer class="launch-footer">
-      <p>© 2026 SVR Poker. All rights reserved.</p>
-      <p>Scarlett Holding LLC • Team Nova • R.Chadee</p>
-    </footer>
+    <footer>© 2026 SVR Poker • 18+ project • Current release authority: Phase 374</footer>
   </main>
 
-  <script src="./matrix.js?v=phase104-public-no-app-button"></script>
-  <script src="./site-local-counter.js?v=phase104-public-no-app-button"></script>
-  <script src="./site-public-hooks.js?v=phase104-public-no-app-button"></script>
-  <script src="./support-chat-bot.js?v=support-chat-phase104-public-no-app-button"></script>
+  <script src="/app-install.js?v=phase374"></script>
+  <script src="/app-update-checker.js?v=phase374"></script>
   <script>
     (() => {
-      if (document.getElementById('svr-inline-support-chat')) return;
-      const style = document.createElement('style');
-      style.id = 'svr-inline-support-chat-style';
-      style.textContent = `
-        #svr-inline-support-chat{position:fixed;right:18px;bottom:18px;z-index:2147483647;font-family:Rajdhani,system-ui,Arial;color:white}
-        #svr-inline-support-chat button{font:900 13px Orbitron,system-ui,Arial;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
-        .svr-inline-chat-launch{border:1px solid rgba(127,252,255,.8);border-radius:999px;background:linear-gradient(135deg,#7ffcff,#9b4dff);color:#03040b;padding:13px 16px;box-shadow:0 20px 70px rgba(0,0,0,.7),0 0 24px rgba(127,252,255,.35)}
-        .svr-inline-chat-panel{display:none;position:absolute;right:0;bottom:58px;width:min(360px,calc(100vw - 28px));border:1px solid rgba(127,252,255,.55);border-radius:20px;background:rgba(3,5,14,.98);box-shadow:0 30px 90px rgba(0,0,0,.85);overflow:hidden}
-        .svr-inline-chat-panel.open{display:block}.svr-inline-chat-head{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.1);color:#bffcff;font-weight:900}.svr-inline-chat-body{padding:12px}.svr-inline-chat-msg{padding:10px 12px;border-radius:14px;background:rgba(127,252,255,.1);border:1px solid rgba(127,252,255,.2);margin-bottom:10px;line-height:1.25}.svr-inline-chat-form{display:grid;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.1)}.svr-inline-chat-form input,.svr-inline-chat-form textarea{box-sizing:border-box;width:100%;border:1px solid rgba(127,252,255,.3);border-radius:12px;background:rgba(0,0,0,.35);color:white;padding:10px;font:700 14px Rajdhani,system-ui,Arial}.svr-inline-chat-form textarea{min-height:72px;resize:vertical}.svr-inline-chat-send{border:1px solid rgba(255,217,138,.7);border-radius:13px;background:#ffd98a;color:#06060a;padding:10px}.svr-inline-chat-status{font-size:12px;color:#ffd98a;text-align:center;min-height:16px}
-      `;
-      document.head.appendChild(style);
-      const wrap = document.createElement('div');
-      wrap.id = 'svr-inline-support-chat';
-      wrap.innerHTML = `<button class="svr-inline-chat-launch" type="button">● Support</button><section class="svr-inline-chat-panel" aria-label="SVR support chat"><div class="svr-inline-chat-head"><strong>SVR Support Chat</strong><button type="button" aria-label="Close" style="border:0;background:rgba(255,255,255,.08);color:white;border-radius:999px;width:30px;height:30px">×</button></div><div class="svr-inline-chat-body"><div class="svr-inline-chat-msg">Welcome to SVR support. Send game, store, sponsorship, or admin questions here.</div></div><form class="svr-inline-chat-form"><input name="name" placeholder="Name optional"><input name="email" placeholder="Email optional"><textarea name="message" placeholder="Type your message"></textarea><button class="svr-inline-chat-send" type="submit">Send Message</button><div class="svr-inline-chat-status"></div></form></section>`;
-      document.body.appendChild(wrap);
-      const panel = wrap.querySelector('.svr-inline-chat-panel');
-      wrap.querySelector('.svr-inline-chat-launch').onclick = () => panel.classList.toggle('open');
-      wrap.querySelector('[aria-label="Close"]').onclick = () => panel.classList.remove('open');
-      wrap.querySelector('form').onsubmit = async (e) => {
-        e.preventDefault();
-        const status = wrap.querySelector('.svr-inline-chat-status');
-        const data = Object.fromEntries(new FormData(e.currentTarget).entries());
-        const msg = String(data.message || '').trim();
-        if (!msg) { status.textContent = 'Please type a message.'; return; }
-        const entry = { name: data.name || '', email: data.email || '', subject: 'SVR support chat', message: msg, source: location.pathname, createdAt: new Date().toISOString() };
+      const ua = navigator.userAgent || '';
+      const launch = document.getElementById('deviceLaunch');
+      if (/Quest|Oculus|Meta Quest/i.test(ua)) {
+        launch.href = '/game/index.html?platform=quest&v=phase374&source=detected-device';
+        launch.textContent = 'ENTER QUEST / OCULUS';
+      } else if (!/Android/i.test(ua)) {
+        launch.href = '/game/camera3.html?preview=1&cam=director&autocam=1&embed=1&v=phase374';
+        launch.textContent = 'OPEN LIVE PREVIEW';
+      }
+
+      const deploy = document.getElementById('deployStatus');
+      fetch('/deploy-health.json?t=' + Date.now(), { cache: 'no-store' })
+        .then((response) => response.ok ? response.json() : Promise.reject(new Error('HTTP ' + response.status)))
+        .then((data) => { deploy.textContent = `${data.build || 'build'} • ${(data.commit || '').slice(0,12) || 'commit pending'} • ${data.deployedAt || 'time pending'}`; })
+        .catch((error) => { deploy.textContent = 'deployment check unavailable: ' + error.message; });
+
+      document.getElementById('clearCache').addEventListener('click', async () => {
         try {
-          const list = JSON.parse(localStorage.getItem('svr_support_chat_messages') || '[]');
-          list.push({ ...entry, sent: false, localFallback: true });
-          localStorage.setItem('svr_support_chat_messages', JSON.stringify(list.slice(-80)));
+          if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(registrations.map((registration) => registration.unregister()));
+          }
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((key) => caches.delete(key)));
+          }
         } catch {}
-        status.textContent = 'Message saved. SVR support will review when backend is connected.';
-        e.currentTarget.reset();
-      };
-      window.SVR_INLINE_SUPPORT_CHAT = { active: true, build: 'INLINE-SUPPORT-CHAT-FALLBACK-01', checkedAt: new Date().toISOString() };
+        location.replace('/index.html?v=phase374&fresh=' + Date.now());
+      });
+
+      const canvas = document.getElementById('rain');
+      const ctx = canvas.getContext('2d');
+      let columns = [];
+      function size(){canvas.width=innerWidth;canvas.height=innerHeight;columns=Array(Math.ceil(innerWidth/24)).fill(0).map(()=>Math.random()*-40)}
+      function draw(){ctx.fillStyle='rgba(3,1,7,.12)';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.font='14px monospace';columns.forEach((y,i)=>{ctx.fillStyle=i%5===0?'#7ffcff':'#9b4dff';ctx.fillText(Math.random()>.5?'1':'0',i*24,y*22);columns[i]=y*22>canvas.height&&Math.random()>.985?0:y+0.22});requestAnimationFrame(draw)}
+      addEventListener('resize',size,{passive:true});size();draw();
+
+      if ('serviceWorker' in navigator) addEventListener('load',()=>navigator.serviceWorker.register('/pwa-sw.js?v=phase374',{scope:'/'}).catch(()=>undefined));
     })();
   </script>
 </body>
