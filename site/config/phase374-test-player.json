@@ -1,0 +1,24 @@
+{
+  "build": "PHASE-374-TEST-PLAYER-AVATAR-LOCK",
+  "playerId": "phase374-local-test-player",
+  "displayName": "SVR Test Player",
+  "email": "test-player@svrpoker.com",
+  "role": "player",
+  "playMoney": 50000,
+  "dailyStreak": 0,
+  "avatarUrl": "/logo.png",
+  "avatarModelUrl": "/game/assets/models/eric/eric.fbx",
+  "avatarName": "Eric",
+  "avatarHeightMeters": 1.72,
+  "equippedOutfit": {
+    "palette": "svr-purple-cyan",
+    "top": "svr-jacket",
+    "headwear": "none",
+    "accessory": "none"
+  },
+  "inventory": [],
+  "demoMode": true,
+  "testAccount": true,
+  "cloudAccount": false,
+  "notes": "Local physical-device QA profile. It does not create an AWS Cognito identity."
+}
