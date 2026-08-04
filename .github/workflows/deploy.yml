@@ -90,36 +90,70 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Build signed SVR Android RC2 test APK
+      - name: Build APK without blocking the web game deployment
         shell: bash
         run: |
-          set -euo pipefail
-          mkdir -p native/android/app/src/main/res/drawable
+          set -uo pipefail
+          mkdir -p native/android/app/src/main/res/drawable downloads site/downloads
           cp logo.png native/android/app/src/main/res/drawable/svr_logo.png
-          gradle -p native/android :app:assembleDebug --no-daemon --stacktrace
-          APK_SOURCE="native/android/app/build/outputs/apk/debug/app-debug.apk"
-          test -s "$APK_SOURCE"
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK_SOURCE"
-          mkdir -p downloads site/downloads
-          cp "$APK_SOURCE" downloads/svr-poker-android-rc2.apk
-          cp "$APK_SOURCE" site/downloads/svr-poker-android-rc2.apk
-          APK_SHA="$(sha256sum "$APK_SOURCE" | awk '{print $1}')"
-          printf '%s  %s\n' "$APK_SHA" "svr-poker-android-rc2.apk" > downloads/svr-poker-android-rc2.apk.sha256
-          cp downloads/svr-poker-android-rc2.apk.sha256 site/downloads/svr-poker-android-rc2.apk.sha256
-          jq --arg sha "$APK_SHA" '.apkSha256=$sha' game/android-release.json > game/android-release.json.tmp
-          mv game/android-release.json.tmp game/android-release.json
-          jq --arg sha "$APK_SHA" '.apkSha256=$sha' update/app-version.json > update/app-version.json.tmp
-          mv update/app-version.json.tmp update/app-version.json
-          echo "APK_SHA=$APK_SHA" >> "$GITHUB_ENV"
-          echo "Built APK SHA-256: $APK_SHA"
 
-      - name: Verify Phase 378 native APK and stable Android gate
+          set +e
+          gradle -p native/android :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee apk-build.log
+          GRADLE_EXIT=${PIPESTATUS[0]}
+          set -e
+
+          APK_SOURCE="native/android/app/build/outputs/apk/debug/app-debug.apk"
+          APK_READY=false
+          APK_SHA=""
+          APK_PUBLIC_URL=""
+          APK_BUILD_STATUS="failed"
+
+          if [ "$GRADLE_EXIT" -eq 0 ] && [ -s "$APK_SOURCE" ]; then
+            if "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK_SOURCE"; then
+              cp "$APK_SOURCE" downloads/svr-poker-android-rc2.apk
+              cp "$APK_SOURCE" site/downloads/svr-poker-android-rc2.apk
+              APK_SHA="$(sha256sum "$APK_SOURCE" | awk '{print $1}')"
+              printf '%s  %s\n' "$APK_SHA" "svr-poker-android-rc2.apk" > downloads/svr-poker-android-rc2.apk.sha256
+              cp downloads/svr-poker-android-rc2.apk.sha256 site/downloads/svr-poker-android-rc2.apk.sha256
+              APK_READY=true
+              APK_PUBLIC_URL="/downloads/svr-poker-android-rc2.apk"
+              APK_BUILD_STATUS="ready"
+            fi
+          fi
+
+          if [ "$APK_READY" = true ]; then
+            jq --arg sha "$APK_SHA" --arg url "$APK_PUBLIC_URL" '.apkSha256=$sha | .apkUrl=$url | .releaseReady=true | .nativeBuildStatus="generated-by-production-workflow"' game/android-release.json > game/android-release.json.tmp
+            mv game/android-release.json.tmp game/android-release.json
+            jq --arg sha "$APK_SHA" --arg url "$APK_PUBLIC_URL" '.apkSha256=$sha | .apkUrl=$url | .releaseReady=true' update/app-version.json > update/app-version.json.tmp
+            mv update/app-version.json.tmp update/app-version.json
+          else
+            echo "::warning::APK build did not complete. Publishing the Phase 378 browser game and download status page anyway."
+            cp apk-build.log downloads/apk-build-status.txt || true
+            cp apk-build.log site/downloads/apk-build-status.txt || true
+            jq '.apkSha256="" | .apkUrl="" | .releaseReady=false | .nativeBuildStatus="build-pending" | .updateMessage="Phase 378 browser game is live. APK RC2 build is pending."' game/android-release.json > game/android-release.json.tmp
+            mv game/android-release.json.tmp game/android-release.json
+            jq '.apkSha256="" | .apkUrl="" | .releaseReady=false | .note="Phase 378 browser game is live. APK RC2 build is pending."' update/app-version.json > update/app-version.json.tmp
+            mv update/app-version.json.tmp update/app-version.json
+          fi
+
+          echo "APK_READY=$APK_READY" >> "$GITHUB_ENV"
+          echo "APK_SHA=$APK_SHA" >> "$GITHUB_ENV"
+          echo "APK_PUBLIC_URL=$APK_PUBLIC_URL" >> "$GITHUB_ENV"
+          echo "APK_BUILD_STATUS=$APK_BUILD_STATUS" >> "$GITHUB_ENV"
+
+      - name: Verify Phase 378 browser game and optional APK
         shell: bash
         run: |
           set -euo pipefail
           node game/tools/phase378-native-apk-stable-static-test.mjs
-          test -s downloads/svr-poker-android-rc2.apk
-          test -s site/downloads/svr-poker-android-rc2.apk
+          test -f game/android-stable.html
+          grep -q "JOIN NOW" game/android-stable.html
+          if [ "$APK_READY" = true ]; then
+            test -s downloads/svr-poker-android-rc2.apk
+            test -s site/downloads/svr-poker-android-rc2.apk
+          else
+            echo "APK not ready; web deployment remains authorized."
+          fi
 
       - name: Build production branch
         shell: bash
@@ -147,22 +181,25 @@ jobs:
           test -f build/game/android.html
           test -f build/game/android-play.html
           test -f build/game/android-stable.html
+          grep -q "JOIN NOW" build/game/android-stable.html
           test -f build/game/assets/models/table.glb
           test -f build/game/assets/table.fbx
           test -f build/downloads/index.html
-          test -s build/downloads/svr-poker-android-rc2.apk
-          test -s build/site/downloads/svr-poker-android-rc2.apk
           test -f build/site/index.html
           test -f build/site/login.html
           test -f build/site/profile.html
           test -f build/site/avatar.html
           test -f build/site/config/player-api.json
+          if [ "$APK_READY" = true ]; then
+            test -s build/downloads/svr-poker-android-rc2.apk
+            test -s build/site/downloads/svr-poker-android-rc2.apk
+          fi
 
           DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           cat > build/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-378-NATIVE-APK-STABLE-ANDROID-AUTODEPLOY-LOCK",
+            "build": "PHASE-378-WEB-FIRST-NATIVE-APK-AUTODEPLOY-LOCK",
             "androidBuild": "PHASE-378-ANDROID-STANDALONE-STABLE-TABLE-LOCK",
             "publicReleaseBuild": "PHASE-378-PUBLIC-APK-RC2-NOTIFICATION-LOCK",
             "profileBuild": "PHASE-374-PROFILE-MOBILE-AVATAR-MENU-RECOVERY-LOCK",
@@ -174,11 +211,12 @@ jobs:
             "androidRoute": "/game/android-stable.html?v=phase378",
             "legacyAndroidRedirect": "/game/android.html?v=phase378",
             "downloadsRoute": "/downloads/",
-            "apkUrl": "/downloads/svr-poker-android-rc2.apk",
+            "apkUrl": "$APK_PUBLIC_URL",
             "apkVersionName": "0.1.0-rc2",
             "apkVersionCode": 2,
             "apkSha256": "$APK_SHA",
-            "signedApkAttached": true,
+            "signedApkAttached": $APK_READY,
+            "apkBuildStatus": "$APK_BUILD_STATUS",
             "signingChannel": "android-debug-test-key",
             "nativeApkRebuild": true,
             "offlineStableTableBundled": true,
@@ -204,19 +242,26 @@ jobs:
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
 
-      - name: Verify custom-domain APK and stable game deployment
+      - name: Verify custom-domain browser game and optional APK
         shell: bash
         run: |
           set -euo pipefail
           for attempt in $(seq 1 30); do
             health="$(curl -fsS --max-time 15 "https://svrpoker.com/deploy-health.json?commit=${GITHUB_SHA}&attempt=${attempt}" || true)"
             game="$(curl -fsS --max-time 15 "https://svrpoker.com/game/android-stable.html?v=phase378&attempt=${attempt}" || true)"
-            apk_code="$(curl -L -sS -o /dev/null -w '%{http_code}' --max-time 20 "https://svrpoker.com/downloads/svr-poker-android-rc2.apk?attempt=${attempt}" || true)"
-            if echo "$health" | grep -q "$GITHUB_SHA" && echo "$game" | grep -q "JOIN NOW" && [ "$apk_code" = "200" ]; then
-              echo "Verified Phase 378 website, Android table, and APK download."
-              exit 0
+            if echo "$health" | grep -q "$GITHUB_SHA" && echo "$game" | grep -q "JOIN NOW"; then
+              if [ "$APK_READY" = true ]; then
+                apk_code="$(curl -L -sS -o /dev/null -w '%{http_code}' --max-time 20 "https://svrpoker.com/downloads/svr-poker-android-rc2.apk?attempt=${attempt}" || true)"
+                if [ "$apk_code" = "200" ]; then
+                  echo "Verified Phase 378 website, Android table, and APK download."
+                  exit 0
+                fi
+              else
+                echo "Verified Phase 378 website and Android table. APK build remains pending."
+                exit 0
+              fi
             fi
             sleep 10
           done
-          echo "::error::Custom domain did not expose the Phase 378 APK and Android table within five minutes."
+          echo "::error::Custom domain did not expose the Phase 378 Android table within five minutes."
           exit 1
