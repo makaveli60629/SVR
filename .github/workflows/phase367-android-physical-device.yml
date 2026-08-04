@@ -20,7 +20,7 @@ permissions:
 jobs:
   phase367-release:
     runs-on: ubuntu-latest
-    timeout-minutes: 48
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,10 +71,10 @@ jobs:
           SVR_TEST_BASE: http://127.0.0.1:4173
         run: node game/tools/phase365-android-seated-ux-branding-browser-acceptance.cjs
 
-      - name: Re-run complete Android Hold'em
-        env:
-          SVR_TEST_BASE: http://127.0.0.1:4173
-        run: node game/tools/phase363-android-integrated-core-browser-acceptance.cjs
+      - name: Confirm dedicated Android full-game gate remains present
+        run: |
+          test -f .github/workflows/phase354-android-full-game.yml
+          test -f game/tools/phase354-android-browser-acceptance.cjs
 
       - name: Upload HTTP log on failure
         if: failure()
