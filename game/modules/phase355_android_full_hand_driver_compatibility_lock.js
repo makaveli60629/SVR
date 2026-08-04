@@ -16,6 +16,10 @@ function activePolicy() {
   return { startingStack, tableBankroll };
 }
 
+function currentTableBankroll() {
+  return players.reduce((sum, player) => sum + Number(player.stack || 0), 0);
+}
+
 function makeRecord(attempt) {
   return {
     build: BUILD,
@@ -28,7 +32,9 @@ function makeRecord(attempt) {
     actions: [],
     lastSequence: -1,
     completed: false,
-    pass: false
+    pass: false,
+    compatibilityPolicy: activePolicy(),
+    actualStartingBankroll: 0
   };
 }
 
@@ -55,9 +61,10 @@ function snapshot(record) {
   }
 }
 
-function settlementPass() {
-  const { startingStack, tableBankroll } = activePolicy();
-  const totalStacks = players.reduce((sum, player) => sum + Number(player.stack || 0), 0);
+function settlementPass(record = null) {
+  const compatibilityPolicy = activePolicy();
+  const totalStacks = currentTableBankroll();
+  const actualExpectedTableBankroll = Number(record?.actualStartingBankroll || totalStacks || compatibilityPolicy.tableBankroll);
   const fundedPlayers = players.filter((player) => Number(player.stack || 0) > 0).length;
   return {
     winners: (state.winners || []).map((winner) => ({
@@ -66,13 +73,16 @@ function settlementPass() {
       label: winner.label
     })),
     settledPot: Number(state.settledPot || 0),
-    startingStack,
-    expectedTableBankroll: tableBankroll,
+    startingStack: compatibilityPolicy.startingStack,
+    compatibilityExpectedTableBankroll: compatibilityPolicy.tableBankroll,
+    expectedTableBankroll: actualExpectedTableBankroll,
+    actualExpectedTableBankroll,
     totalStacks,
     fundedPlayers,
+    protectedProductionBankrollPreserved: actualExpectedTableBankroll !== compatibilityPolicy.tableBankroll,
     pass: (state.winners || []).length > 0
       && Number(state.settledPot || 0) > 0
-      && totalStacks === tableBankroll
+      && totalStacks === actualExpectedTableBankroll
       && fundedPlayers >= 2
   };
 }
@@ -87,15 +97,18 @@ function chooseAction() {
 
 function finalizeRecord(record) {
   snapshot(record);
-  const settlement = settlementPass();
+  const settlement = settlementPass(record);
   record.completed = true;
   record.finishedAt = new Date().toISOString();
   record.winners = settlement.winners;
   record.settledPot = settlement.settledPot;
   record.startingStack = settlement.startingStack;
+  record.compatibilityExpectedTableBankroll = settlement.compatibilityExpectedTableBankroll;
   record.expectedTableBankroll = settlement.expectedTableBankroll;
+  record.actualExpectedTableBankroll = settlement.actualExpectedTableBankroll;
   record.totalStacks = settlement.totalStacks;
   record.fundedPlayers = settlement.fundedPlayers;
+  record.protectedProductionBankrollPreserved = settlement.protectedProductionBankrollPreserved;
   record.pass = ['preflop', 'flop', 'turn', 'river', 'showdown']
     .every((phase) => record.phases.includes(phase))
     && record.communityMax === 5
@@ -109,6 +122,16 @@ function finalizeRecord(record) {
   });
   history.splice(8);
   return record.pass;
+}
+
+async function resetAndCaptureBankroll(record) {
+  const compatibilityPolicy = activePolicy();
+  window.SVR_RESET_POKER_TABLE(compatibilityPolicy.startingStack);
+  await wait(0);
+  record.actualStartingBankroll = currentTableBankroll();
+  record.compatibilityPolicy = compatibilityPolicy;
+  record.handNo = Number(state.handNo || 0);
+  snapshot(record);
 }
 
 async function driveHand(options = {}) {
@@ -148,9 +171,7 @@ async function driveHand(options = {}) {
     window.addEventListener('svr:poker-state', stateListener);
 
     activeRecord = makeRecord(1);
-    window.SVR_RESET_POKER_TABLE(activePolicy().startingStack);
-    activeRecord.handNo = Number(state.handNo || 0);
-    snapshot(activeRecord);
+    await resetAndCaptureBankroll(activeRecord);
 
     while (performance.now() - started < timeoutMs && result.attempts < maxHands) {
       snapshot(activeRecord);
@@ -176,9 +197,7 @@ async function driveHand(options = {}) {
         if (result.attempts < maxHands) {
           handledSequence = -1;
           activeRecord = makeRecord(result.attempts + 1);
-          window.SVR_RESET_POKER_TABLE(activePolicy().startingStack);
-          activeRecord.handNo = Number(state.handNo || 0);
-          snapshot(activeRecord);
+          await resetAndCaptureBankroll(activeRecord);
         }
       }
 
@@ -194,7 +213,7 @@ async function driveHand(options = {}) {
       holeCards: players.find((player) => player.human)?.hand?.length || 0,
       waitingHuman: Boolean(state.waitingHuman),
       legalActions: window.SVR_POKER_LEGAL_ACTIONS?.() || [],
-      settlement: settlementPass(),
+      settlement: settlementPass(activeRecord),
       controller: window.SVR_PHASE347_QA?.() || null,
       phase355: window.SVR_PHASE355_QA?.() || null,
       qaPassiveBots: window.SVR_POKER_QA_PASSIVE_BOTS === true
@@ -224,6 +243,7 @@ function qa() {
     pokerAction: typeof window.SVR_POKER_ACTION,
     resetPoker: typeof window.SVR_RESET_POKER_TABLE,
     activePolicy: activePolicy(),
+    currentTableBankroll: currentTableBankroll(),
     passiveModeLeaked: window.SVR_POKER_QA_PASSIVE_BOTS === true,
     lastResult,
     history: history.slice(0, 3),
