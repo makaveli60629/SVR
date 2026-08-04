@@ -183,16 +183,25 @@ function syncSeatUi(reason = 'sync') {
 
 function qa() {
   const cards = [...document.querySelectorAll('.svr347-card:not(.empty)')];
-  const enhanced = cards.filter((card) => card.querySelector('.svr374-card-face')).length;
+  const readableCards = cards.filter((card) => Boolean(parseCard(card)));
+  const enhancedCards = readableCards.filter((card) => card.querySelector('.svr374-card-face'));
+  const cardBacks = cards.filter((card) => !parseCard(card));
   const result = {
     ...state,
     logoExists: Boolean(document.getElementById('svr374TournamentLogo')),
     nonEmptyCards: cards.length,
-    enhancedCards: enhanced,
+    readableFaceCards: readableCards.length,
+    enhancedCards: enhancedCards.length,
+    cardBacksPreserved: cardBacks.length,
     sticksCurrentlyHidden: seated()
       ? [document.getElementById('svr347Move'), document.getElementById('svr347Look')].every((control) => !control || getComputedStyle(control).display === 'none')
       : true,
-    pass: Boolean(ACTIVE && state.installed && document.getElementById('svr374TournamentLogo') && (!cards.length || enhanced === cards.length)),
+    pass: Boolean(
+      ACTIVE
+      && state.installed
+      && document.getElementById('svr374TournamentLogo')
+      && enhancedCards.length === readableCards.length
+    ),
     checkedAt: new Date().toISOString()
   };
   window.SVR_PHASE374_ANDROID_UI_STATE = result;
