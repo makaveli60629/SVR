@@ -7,6 +7,7 @@ const TARGET_LENGTH = 4.28;
 const TARGET_DEPTH = 2.18;
 const TABLE_BOTTOM_Y = 0.02;
 const TABLE_CENTER_Z = 0.75;
+const PHASE374_AUTHORITY = 'PHASE374_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY';
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const state = {
@@ -14,6 +15,8 @@ const state = {
   assetUrl: ASSET_URL,
   loaded: false,
   authority: null,
+  successorAuthority: false,
+  successorBuild: null,
   fallbackRemoved: false,
   orientation: null,
   size: null,
@@ -173,15 +176,46 @@ function removeCompetingTables(host) {
   state.fallbackRemoved = remove.some((object) => object.name === 'PHASE358_QUEST_TABLE_FALLBACK');
 }
 
+function currentPhase374Authority() {
+  const authority = window.SVR_TABLE_AUTHORITY;
+  if (!authority?.isObject3D || authority.name !== PHASE374_AUTHORITY) return null;
+  const qa = window.SVR_PHASE374_ORIGINAL_TABLE_QA?.();
+  if (qa && qa.pass === false) return null;
+  return authority;
+}
+
+function adoptPhase374Authority(authority) {
+  const measured = bounds(authority);
+  state.loaded = true;
+  state.authority = authority.name;
+  state.successorAuthority = true;
+  state.successorBuild = 'PHASE-374-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK';
+  state.orientation = 'phase374-original-glb';
+  state.size = {
+    x: +measured.size.x.toFixed(3),
+    y: +measured.size.y.toFixed(3),
+    z: +measured.size.z.toFixed(3)
+  };
+  state.scale = Number(authority.scale?.x || 1);
+  state.error = null;
+  window.SVR_PHASE358_UPLOADED_TABLE_ROOT = authority;
+  return authority;
+}
+
 async function install() {
   const started = performance.now();
   try {
     const scene = await waitForScene();
     if (!scene) throw new Error('PHASE358_QUEST_SCENE_NOT_READY');
+    const successor = currentPhase374Authority();
+    if (successor) return adoptPhase374Authority(successor);
+
     const host = safeFind(scene, 'PHASE200_ORDERED_GRAND_LOBBY_ROOT') || scene;
     const existing = safeFind(host, 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED');
     if (existing) {
       window.SVR_TABLE_AUTHORITY = existing;
+      const trappedSuccessor = currentPhase374Authority();
+      if (trappedSuccessor) return adoptPhase374Authority(trappedSuccessor);
       state.loaded = true;
       state.authority = existing.name;
       return existing;
@@ -197,6 +231,11 @@ async function install() {
     removeCompetingTables(host);
     host.add(authorityRoot);
     window.SVR_TABLE_AUTHORITY = object;
+    const trappedSuccessor = currentPhase374Authority();
+    if (trappedSuccessor) {
+      authorityRoot.removeFromParent?.();
+      return adoptPhase374Authority(trappedSuccessor);
+    }
     window.SVR_PHASE358_UPLOADED_TABLE_ROOT = authorityRoot;
     state.loaded = true;
     state.authority = object.name;
@@ -217,13 +256,17 @@ async function install() {
 
 window.SVR_PHASE358_UPLOADED_TABLE_QA = () => {
   const scene = window.__SVR_SCENE__;
-  const authority = safeFind(scene, 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED');
+  const legacyAuthority = safeFind(scene, 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED');
+  const successorAuthority = currentPhase374Authority();
+  const acceptedAuthority = successorAuthority || legacyAuthority;
   return {
     ...state,
     currentAuthority: window.SVR_TABLE_AUTHORITY?.name || null,
-    uploadedTablePresent: Boolean(authority),
+    uploadedTablePresent: Boolean(acceptedAuthority),
+    legacyUploadedTablePresent: Boolean(legacyAuthority),
+    phase374OriginalTablePresent: Boolean(successorAuthority),
     fallbackPresent: Boolean(safeFind(scene, 'PHASE358_QUEST_TABLE_FALLBACK')),
-    pass: Boolean(state.loaded && authority && window.SVR_TABLE_AUTHORITY === authority && !state.error),
+    pass: Boolean(state.loaded && acceptedAuthority && window.SVR_TABLE_AUTHORITY === acceptedAuthority && !state.error),
     checkedAt: new Date().toISOString()
   };
 };
