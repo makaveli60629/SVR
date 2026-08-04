@@ -1,4 +1,4 @@
-const SVR_PWA_CACHE = 'svr-poker-pwa-phase155-lobby-barrier-v1';
+const SVR_PWA_CACHE = 'svr-poker-pwa-phase375-android-playable-v1';
 const SVR_CORE_ASSETS = [
   '/manifest.webmanifest',
   '/offline.html',
@@ -13,16 +13,14 @@ const SVR_CORE_ASSETS = [
   '/logo.png',
   '/logo.webp',
   '/site/index.html',
-  '/site/app.html',
+  '/site/profile.html?v=phase374',
+  '/site/avatar.html?v=phase374',
   '/site/store.html',
   '/site/contact.html',
   '/downloads/index.html',
-  '/game/index.html',
-  '/game/android.html',
-  '/game/phase145_android_black_screen_recovery_lock.js',
-  '/game/phase150_android_tap_move_no_black_fallback.js',
-  '/game/phase153_android_safe_mode_polish_lock.js',
-  '/game/phase155_lobby_barrier_balcony_table_lock.js'
+  '/game/index.html?platform=quest&v=phase373',
+  '/game/android.html?channel=stable&v=phase375',
+  '/game/modules/phase375_android_playable_authority_lock.js?v=phase375'
 ];
 
 self.addEventListener('install', (event) => {
@@ -48,11 +46,11 @@ self.addEventListener('message', (event) => {
 async function networkFirst(request) {
   const cache = await caches.open(SVR_PWA_CACHE);
   try {
-    const response = await fetch(request, { cache: 'no-store' });
+    const response = await fetch(new Request(request, { cache: 'no-store' }));
     if (response && response.ok) cache.put(request, response.clone()).catch(() => undefined);
     return response;
   } catch (error) {
-    const cached = await cache.match(request);
+    const cached = await cache.match(request, { ignoreSearch: false });
     if (cached) return cached;
     if (request.mode === 'navigate') return cache.match('/offline.html');
     throw error;
@@ -76,7 +74,12 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (request.mode === 'navigate' || url.pathname.startsWith('/game/') || url.pathname.startsWith('/update/') || /app-install\.js|pwa-app-install\.js|app-update-checker\.js|manifest\.webmanifest|deploy-health\.json/i.test(url.pathname)) {
+  if (request.mode === 'navigate'
+    || url.pathname.startsWith('/game/')
+    || url.pathname.startsWith('/update/')
+    || url.pathname === '/site/profile.html'
+    || url.pathname.startsWith('/site/js/phase')
+    || /app-install\.js|pwa-app-install\.js|app-update-checker\.js|manifest\.webmanifest|deploy-health\.json/i.test(url.pathname)) {
     event.respondWith(networkFirst(request));
     return;
   }
