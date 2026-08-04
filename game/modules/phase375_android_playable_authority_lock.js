@@ -53,6 +53,8 @@ function lowPower(reason='automatic'){
 }
 function park(reason='lobby'){
   if(joined())return false;try{localStorage.removeItem(SAVE);}catch{}
+  const alreadyParked=state.phase==='idle'&&state.handNo===0&&state.community?.length===0&&players.every(p=>p.hand?.length===0&&p.bet===0&&p.contributed===0);
+  if(alreadyParked){publish(`park-idle:${reason}`);return true;}
   Object.assign(state,{handNo:0,dealer:-1,phase:'idle',deck:[],burn:[],community:[],pot:0,pots:[],currentBet:0,minRaise:Number(state.bigBlind||20),lastAggressor:null,current:0,waitingHuman:false,winner:null,winners:[],actionLog:[],settledPot:0,lastAction:'Press JOIN NOW'});
   for(const p of players)Object.assign(p,{stack:15000,folded:false,allIn:false,bet:0,contributed:0,acted:false,raiseClosed:false,hand:[],lastAction:'Waiting to join'});
   window.dispatchEvent(new CustomEvent('svr:poker-state',{detail:audit()}));publish(`park:${reason}`);return true;
