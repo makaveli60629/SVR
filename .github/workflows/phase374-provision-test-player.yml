@@ -1,0 +1,125 @@
+name: Phase 374 Provision AWS Test Player
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infrastructure/aws/phase374-test-player.trigger'
+      - '.github/workflows/phase374-provision-test-player.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  provision-test-player:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check protected AWS configuration
+        id: check
+        shell: bash
+        env:
+          AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          COGNITO_USER_POOL_ID: ${{ secrets.SVR_COGNITO_USER_POOL_ID }}
+          TEST_PASSWORD: ${{ secrets.SVR_TEST_ACCOUNT_PASSWORD }}
+        run: |
+          missing=()
+          [ -n "$AWS_ROLE_TO_ASSUME" ] || missing+=(AWS_ROLE_TO_ASSUME)
+          [ -n "$AWS_REGION" ] || missing+=(AWS_REGION)
+          [ -n "$COGNITO_USER_POOL_ID" ] || missing+=(SVR_COGNITO_USER_POOL_ID)
+          [ -n "$TEST_PASSWORD" ] || missing+=(SVR_TEST_ACCOUNT_PASSWORD)
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "### AWS test player not provisioned" >> "$GITHUB_STEP_SUMMARY"
+            echo "Missing protected repository secrets: ${missing[*]}" >> "$GITHUB_STEP_SUMMARY"
+            echo "The Phase 374 local test player remains available without credentials." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Configure AWS credentials
+        if: steps.check.outputs.ready == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Create or reset Cognito test player
+        if: steps.check.outputs.ready == 'true'
+        id: cognito
+        shell: bash
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          USER_POOL_ID: ${{ secrets.SVR_COGNITO_USER_POOL_ID }}
+          TEST_PASSWORD: ${{ secrets.SVR_TEST_ACCOUNT_PASSWORD }}
+          TEST_EMAIL: ${{ secrets.SVR_TEST_ACCOUNT_EMAIL }}
+        run: |
+          set -euo pipefail
+          email="${TEST_EMAIL:-test-player@svrpoker.com}"
+          if aws cognito-idp admin-get-user --user-pool-id "$USER_POOL_ID" --username "$email" >/tmp/svr-user.json 2>/dev/null; then
+            echo "Existing Cognito test player found; resetting profile attributes and password."
+          else
+            aws cognito-idp admin-create-user \
+              --user-pool-id "$USER_POOL_ID" \
+              --username "$email" \
+              --message-action SUPPRESS \
+              --temporary-password "$TEST_PASSWORD" \
+              --user-attributes \
+                Name=email,Value="$email" \
+                Name=email_verified,Value=true \
+                Name=preferred_username,Value="SVR Test Player" >/tmp/svr-user.json
+          fi
+          aws cognito-idp admin-update-user-attributes \
+            --user-pool-id "$USER_POOL_ID" \
+            --username "$email" \
+            --user-attributes \
+              Name=email,Value="$email" \
+              Name=email_verified,Value=true \
+              Name=preferred_username,Value="SVR Test Player"
+          aws cognito-idp admin-set-user-password \
+            --user-pool-id "$USER_POOL_ID" \
+            --username "$email" \
+            --password "$TEST_PASSWORD" \
+            --permanent
+          sub="$(aws cognito-idp admin-get-user --user-pool-id "$USER_POOL_ID" --username "$email" --query "UserAttributes[?Name=='sub'].Value | [0]" --output text)"
+          echo "email=$email" >> "$GITHUB_OUTPUT"
+          echo "sub=$sub" >> "$GITHUB_OUTPUT"
+          echo "Cognito test player ready: $email" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Write DynamoDB test profile
+        if: steps.check.outputs.ready == 'true' && secrets.SVR_PLAYER_PROFILES_TABLE != ''
+        shell: bash
+        env:
+          TABLE_NAME: ${{ secrets.SVR_PLAYER_PROFILES_TABLE }}
+          PLAYER_ID: ${{ steps.cognito.outputs.sub }}
+          TEST_EMAIL: ${{ steps.cognito.outputs.email }}
+        run: |
+          set -euo pipefail
+          now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          aws dynamodb put-item \
+            --table-name "$TABLE_NAME" \
+            --item "{
+              \"playerId\":{\"S\":\"$PLAYER_ID\"},
+              \"normalizedEmail\":{\"S\":\"$TEST_EMAIL\"},
+              \"displayName\":{\"S\":\"SVR Test Player\"},
+              \"role\":{\"S\":\"player\"},
+              \"playMoney\":{\"N\":\"50000\"},
+              \"avatarUrl\":{\"S\":\"/game/assets/models/eric/eric.fbx\"},
+              \"avatarName\":{\"S\":\"Eric\"},
+              \"testAccount\":{\"BOOL\":true},
+              \"updatedAt\":{\"S\":\"$now\"}
+            }"
+          echo "DynamoDB profile written to $TABLE_NAME" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Provisioning summary
+        if: steps.check.outputs.ready == 'true'
+        shell: bash
+        run: |
+          echo "### Phase 374 AWS test player ready" >> "$GITHUB_STEP_SUMMARY"
+          echo "Role: player" >> "$GITHUB_STEP_SUMMARY"
+          echo "Avatar: Eric" >> "$GITHUB_STEP_SUMMARY"
+          echo "Starting profile balance: 50,000 play-money chips" >> "$GITHUB_STEP_SUMMARY"
+          echo "No password was printed or committed." >> "$GITHUB_STEP_SUMMARY"
