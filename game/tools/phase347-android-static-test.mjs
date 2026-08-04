@@ -38,7 +38,9 @@ for (const [token, label] of [
   ['delete window.SVR_POKER_QA_PASSIVE_BOTS', 'driver-removes-passive-bot-flag'],
   ['window.SVR_POKER_QA_PASSIVE_BOTS = previousPassiveMode', 'driver-restores-passive-bot-flag'],
   ['window.SVR_PHASE362_CONSTANTS?.TABLE_BANKROLL', 'table-policy-aware-chip-conservation'],
-  ['totalStacks === tableBankroll', 'dynamic-hand-driver-chip-conservation'],
+  ['compatibilityExpectedTableBankroll', 'historical-policy-bankroll-recorded'],
+  ['actualExpectedTableBankroll', 'actual-production-bankroll-recorded'],
+  ['totalStacks === actualExpectedTableBankroll', 'dynamic-hand-driver-chip-conservation'],
   ["['preflop', 'flop', 'turn', 'river', 'showdown']", 'hand-driver-all-streets'],
   ['activeRecord = makeRecord(result.attempts + 1)', 'retry-record-recreation']
 ]) need(handDriver, token, label);
@@ -108,5 +110,6 @@ console.log(JSON.stringify({
   horizontalInput: 'direct',
   deviceAlignmentBeforeRecovery: true,
   zeroDeferredWork: true,
+  bankrollValidation: 'historical-policy-plus-actual-production-conservation',
   apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
