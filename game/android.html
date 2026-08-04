@@ -13,6 +13,7 @@ window.SVR_TABLE_STARTING_STACK=15000;
 window.SVR_ANDROID_BRAND_SLOT={id:'svr',name:'SVR POKER',logoUrl:'/logo.png',fallbackLogoUrl:'/logo.webp'};
 window.SVR_ANDROID_UPDATE_POLICY={apkVersionName:'0.1.0-rc1',apkVersionCode:1,forceUpdate:false,showUpdatePrompt:false,manualUpdateOnly:true};
 window.SVR_PHASE369_PENDING_JOIN=false;
+window.SVR_PHASE372_CORE_READY=false;
 document.addEventListener('click',(event)=>{const button=event.target?.closest?.('#svr369Join');if(!button||button.dataset.svr369ReadinessBound)return;event.preventDefault();event.stopImmediatePropagation();window.SVR_PHASE369_PENDING_JOIN=true;},true);
 window.addEventListener('svr:phase363-immediate-join-state',(event)=>{
   const joined=Boolean(event.detail?.joined);
@@ -49,14 +50,16 @@ const start=async()=>{if(started)return;started=true;try{
   await import('./modules/phase369_android_join_table_freeze_recovery_lock.js?v=phase372');
   await import('./modules/phase369_android_join_readiness_transaction_lock.js?v=phase372');
   await import('./modules/phase369_android_join_intent_bridge_lock.js?v=phase372');
-  window.SVR_PHASE363_LEAVE_TABLE?.('phase372-boot-lobby');
+  const joinedDuringBoot=Boolean(window.SVR_PHASE363_JOINED_IMMEDIATE||window.SVR_PHASE363_STATE?.joined);
+  if(!joinedDuringBoot)window.SVR_PHASE363_LEAVE_TABLE?.('phase372-boot-lobby');
   window.SVR_PHASE365_SYNC?.();
   window.SVR_PHASE365_REFRESH_CARD_BRAND?.();
   window.SVR_PHASE367_DEVICE_CALIBRATE?.();
+  window.SVR_PHASE372_CORE_READY=true;
   document.body.classList.add('boot-released');
   loadDealerLater();
-  window.dispatchEvent(new CustomEvent('svr:phase372-core-ready'));
-}catch(error){console.error(error);document.body.classList.add('boot-released');report('The Android core stopped during startup. Use the Phase 372 retry or low-power controls.');}};
+  window.dispatchEvent(new CustomEvent('svr:phase372-core-ready',{detail:{joinedDuringBoot,at:Date.now()}}));
+}catch(error){console.error(error);window.SVR_PHASE372_CORE_READY=false;document.body.classList.add('boot-released');report('The Android core stopped during startup. Use the Phase 372 retry or low-power controls.');}};
 document.getElementById('startRuntimeBtn')?.addEventListener('click',start);
 document.getElementById('runtimeLowPowerButton')?.addEventListener('click',()=>window.SVR_PHASE369_LOW_POWER?.('recovery-panel'));
 document.getElementById('runtimeReloadButton')?.addEventListener('click',()=>location.reload());
