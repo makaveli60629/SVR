@@ -1,4 +1,4 @@
-const SVR_CACHE = 'svr-pwa-phase375-android-playable';
+const SVR_CACHE = 'svr-pwa-phase376-immediate-join';
 const SVR_SHELL = [
   '/',
   '/index.html',
@@ -17,7 +17,8 @@ const SVR_SHELL = [
   '/site/profile.html?v=phase374',
   '/site/store.html',
   '/site/contact.html',
-  '/game/android.html?channel=stable&v=phase375'
+  '/game/android.html?channel=stable&v=phase376',
+  '/game/modules/phase376_android_safe_play_fallback.js?v=phase376'
 ];
 
 self.addEventListener('install', (event) => {
