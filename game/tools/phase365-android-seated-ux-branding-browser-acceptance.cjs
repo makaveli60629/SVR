@@ -168,6 +168,8 @@ const url = `${base}/game/android.html?channel=stable&v=phase374&acceptance=phas
       .filter((element) => getComputedStyle(element).display !== 'none').length;
     const brand = document.querySelector('#svr365BrandSlot');
     const tournamentLogo = document.querySelector('#svr374TournamentLogo');
+    const tournamentStyle = tournamentLogo ? getComputedStyle(tournamentLogo) : null;
+    const tournamentRect = tournamentLogo?.getBoundingClientRect?.() || null;
     const pot = scene?.getObjectByName?.('PHASE365_ANDROID_CLEAN_POT_DISPLAY');
     return {
       qa: window.SVR_PHASE365_QA?.(),
@@ -181,7 +183,14 @@ const url = `${base}/game/android.html?channel=stable&v=phase374&acceptance=phas
       navVisible,
       nameTags: tags,
       brandText: brand?.textContent?.trim() || '',
-      tournamentLogoVisible: Boolean(tournamentLogo?.offsetParent),
+      tournamentLogoVisible: Boolean(
+        tournamentLogo
+        && tournamentStyle?.display !== 'none'
+        && tournamentStyle?.visibility !== 'hidden'
+        && Number(tournamentStyle?.opacity || 1) > 0
+        && Number(tournamentRect?.width || 0) > 0
+        && Number(tournamentRect?.height || 0) > 0
+      ),
       cardBrand: window.SVR_PHASE365_CARD_BRAND_QA?.() || null,
       pot: pot ? {
         name: pot.name,
