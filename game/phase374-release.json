@@ -1,0 +1,63 @@
+{
+  "name": "SVR Poker Physical Release",
+  "phase": 374,
+  "build": "PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK",
+  "status": "physical-device-release-candidate",
+  "androidEntry": "/game/android.html?channel=stable&v=phase374",
+  "questEntry": "/game/index.html?platform=quest&v=phase374",
+  "directorPreview": "/game/camera3.html?preview=1&cam=director&autocam=1&embed=1&v=phase374",
+  "siteEntry": "/site/index.html?v=phase374",
+  "deployHealth": "/deploy-health.json",
+  "releaseLayer": {
+    "visibleBuildBadge": true,
+    "inGameVerifier": true,
+    "cacheReset": true,
+    "deploymentCommitVisible": true,
+    "singlePublicLauncher": true,
+    "stalePhase102LinksRemoved": true,
+    "stalePhase104LauncherRemoved": true,
+    "stalePhase155ServiceWorkerAuthorityRemoved": true
+  },
+  "android": {
+    "protectedGameplay": "PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK",
+    "entryRecovery": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
+    "singleJoinControl": true,
+    "startingStackPerSeat": 15000,
+    "tableBankroll": 90000,
+    "cardsHiddenBeforeJoin": true,
+    "leaveRestoresJoin": true,
+    "physicalOwnerRetestRequired": true
+  },
+  "quest": {
+    "protectedGameplay": "PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK",
+    "recovery": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+    "tableFinalizer": "PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK",
+    "stableLobbySpawn": true,
+    "seatedTeleportBlocked": true,
+    "tableForcedVisible": true,
+    "npcRepair": true,
+    "physicalOwnerRetestRequired": true
+  },
+  "accountFoundation": {
+    "provider": "aws",
+    "identity": "cognito",
+    "profilesAndSessions": "dynamodb",
+    "publicRegistrationRole": "player",
+    "adminAssignment": "protected-cognito-group"
+  },
+  "apkPolicy": {
+    "versionName": "0.1.0-rc1",
+    "versionCode": 1,
+    "releaseReady": false,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true,
+    "webEntry": "/game/android.html?channel=stable&v=phase374"
+  },
+  "productTruth": {
+    "localPlayMoneyVsFiveBots": true,
+    "serverAuthoritativeMultiplayer": false,
+    "dealerPhysicallyTransfersCardMeshes": false,
+    "physicalDeviceAcceptancePending": true
+  }
+}
