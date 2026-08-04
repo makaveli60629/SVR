@@ -3,6 +3,7 @@ export const BUILD = 'PHASE-374-TEST-PLAYER-AVATAR-LOCK';
 const PROFILE_URL = '/site/config/phase374-test-player.json';
 const DEMO_KEY = 'svr_phase345_demo_player_v1';
 const TEST_KEY = 'svr_phase374_test_player_v1';
+const ERIC_MODEL = '/game/assets/models/eric/eric.fbx';
 
 async function loadTemplate() {
   const response = await fetch(`${PROFILE_URL}?t=${Date.now()}`, { cache: 'no-store' });
@@ -24,6 +25,7 @@ function writeProfile(profile) {
 export async function createPhase374TestPlayer(overrides = {}) {
   const template = await loadTemplate();
   const now = new Date().toISOString();
+  const modelUrl = String(overrides.avatarModelUrl || overrides.avatarUrl || template.avatarModelUrl || template.avatarUrl || ERIC_MODEL);
   const profile = {
     ...template,
     ...overrides,
@@ -32,8 +34,9 @@ export async function createPhase374TestPlayer(overrides = {}) {
     email: String(overrides.email || template.email || 'test-player@svrpoker.com'),
     role: 'player',
     playMoney: Number(overrides.playMoney || template.playMoney || 50000),
-    avatarUrl: String(overrides.avatarUrl || template.avatarUrl || '/logo.png'),
-    avatarModelUrl: String(overrides.avatarModelUrl || template.avatarModelUrl || '/game/assets/models/eric/eric.fbx'),
+    avatarUrl: modelUrl,
+    avatarModelUrl: modelUrl,
+    avatarPortraitUrl: String(overrides.avatarPortraitUrl || template.avatarPortraitUrl || '/logo.png'),
     avatarName: String(overrides.avatarName || template.avatarName || 'Eric'),
     equippedOutfit: { ...(template.equippedOutfit || {}), ...(overrides.equippedOutfit || {}) },
     demoMode: true,
