@@ -1,28 +1,22 @@
-const SVR_CACHE = 'svr-pwa-phase359-dual-platform-gameplay-continuity';
+const SVR_CACHE = 'svr-poker-phase374-physical-release-truth-v1';
 const SVR_SHELL = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/app-install.js',
-  '/launch.css',
-  '/launch-overrides.css',
-  '/matrix.js',
-  '/site-public-hooks.js',
-  '/support-chat-bot.js',
+  '/index.html?v=phase374',
+  '/manifest.webmanifest?v=phase374',
   '/logo.png',
   '/logo.webp',
-  '/downloads/',
-  '/downloads/index.html',
-  '/site/index.html',
-  '/site/profile.html',
-  '/site/store.html',
-  '/site/contact.html'
+  '/offline.html',
+  '/game/android.html?channel=stable&v=phase374',
+  '/game/index.html?platform=quest&v=phase374',
+  '/game/phase374-release.json',
+  '/game/modules/phase372_live_entry_recovery_lock.js?v=phase374',
+  '/game/modules/phase374_physical_release_truth_lock.js?v=phase374',
+  '/site/index.html?v=phase374'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(SVR_CACHE)
-      .then((cache) => cache.addAll(SVR_SHELL.map((path) => new Request(path, { cache: 'reload' }))).catch(() => undefined))
+      .then((cache) => Promise.allSettled(SVR_SHELL.map((url) => cache.add(new Request(url, { cache: 'reload' })))))
       .then(() => self.skipWaiting())
   );
 });
@@ -35,16 +29,41 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-function networkFirst(request) {
-  return fetch(new Request(request, { cache: 'no-store' }))
+self.addEventListener('message', (event) => {
+  if (event?.data?.type === 'SKIP_WAITING') self.skipWaiting();
+  if (event?.data?.type === 'CLEAR_SVR_CACHES') {
+    event.waitUntil(caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))));
+  }
+});
+
+async function networkFirst(request) {
+  const cache = await caches.open(SVR_CACHE);
+  try {
+    const response = await fetch(new Request(request, { cache: 'no-store' }));
+    if (response?.ok) eventSafePut(cache, request, response.clone());
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request, { ignoreSearch: false }) || await caches.match(request, { ignoreSearch: true });
+    if (cached) return cached;
+    if (request.mode === 'navigate') return caches.match('/offline.html');
+    throw error;
+  }
+}
+
+function eventSafePut(cache, request, response) {
+  cache.put(request, response).catch(() => undefined);
+}
+
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(SVR_CACHE);
+  const cached = await cache.match(request, { ignoreSearch: true });
+  const network = fetch(request)
     .then((response) => {
-      if (response && response.ok) {
-        const copy = response.clone();
-        caches.open(SVR_CACHE).then((cache) => cache.put(request, copy)).catch(() => undefined);
-      }
+      if (response?.ok) eventSafePut(cache, request, response.clone());
       return response;
     })
-    .catch(() => caches.match(request));
+    .catch(() => cached);
+  return cached || network;
 }
 
 self.addEventListener('fetch', (event) => {
@@ -53,40 +72,22 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  const alwaysFresh = url.pathname.startsWith('/game/')
-    || url.pathname === '/matrix.js'
-    || url.pathname === '/support-chat-bot.js'
-    || url.pathname === '/site/js/phase356-profile-legend-pedestal.js'
-    || url.pathname === '/app-update-checker.js'
-    || url.pathname.startsWith('/update/');
-  if (alwaysFresh) {
+  const currentReleasePath = request.mode === 'navigate'
+    || url.pathname === '/'
+    || /\.(?:html|js|mjs|json|webmanifest)$/i.test(url.pathname)
+    || url.pathname.startsWith('/game/')
+    || url.pathname.startsWith('/update/')
+    || url.pathname === '/deploy-health.json';
+
+  if (currentReleasePath) {
     event.respondWith(networkFirst(request));
     return;
   }
 
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(new Request(request, { cache: 'no-store' }))
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(SVR_CACHE).then((cache) => cache.put(request, copy)).catch(() => undefined);
-          return response;
-        })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
-    );
+  if (/\.(?:css|png|webp|svg|ico|jpg|jpeg|glb|fbx|mp3|wav)$/i.test(url.pathname)) {
+    event.respondWith(staleWhileRevalidate(request));
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      const network = fetch(request).then((response) => {
-        if (response && response.ok) {
-          const copy = response.clone();
-          caches.open(SVR_CACHE).then((cache) => cache.put(request, copy)).catch(() => undefined);
-        }
-        return response;
-      }).catch(() => cached);
-      return cached || network;
-    })
-  );
+  event.respondWith(networkFirst(request));
 });
