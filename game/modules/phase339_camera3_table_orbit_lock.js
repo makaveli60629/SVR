@@ -1,0 +1,11 @@
+import * as THREE from 'three';
+const BUILD='PHASE-339-CAMERA3-LIGHTWEIGHT-TABLE-ORBIT-LOCK';
+let angle=0,last=performance.now(),installed=false;
+const scene=()=>window.__SVR_SCENE__||null,camera=()=>window.__SVR_CAMERA__||null,renderer=()=>window.__SVR_RENDERER__||null;
+function root(){const s=scene();return s?.getObjectByName?.('PHASE200_ORDERED_GRAND_LOBBY_ROOT')||s}
+function table(){const r=root();return r?.getObjectByName?.('PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED')||r?.getObjectByName?.('PHASE159_FBX_TABLE_FLAT_SCALE_FIX_ROOT')||r?.getObjectByName?.('PHASE200_INTENDED_LOBBY_POKER_TABLE_LOCKED')||r?.getObjectByName?.('PHASE326_ANDROID_TABLE_FALLBACK')}
+function info(){const t=table();if(!t)return null;t.visible=true;t.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(t),s=new THREE.Vector3(),c=new THREE.Vector3();b.getSize(s);b.getCenter(c);return{t,b,s,c,top:b.max.y}}
+function sanitize(){document.querySelectorAll('body>*:not(#app):not(canvas)').forEach(e=>e.style.display='none');const r=root();if(!r)return;const keep=/(TABLE|CARD|CHIP|POT|FELT|LOGO|DEALER|BOT|PLAYER|ERIC|PHASE337|PHASE338|PHASE336)/i;r.traverse(o=>{const n=String(o.name||'');if(/HUD|STATUS|BADGE|PANEL|CONTROL|RAY|MARKER|DEBUG|PORTAL|STORE|BUILDING|SKY|MOON|MARS|LOBBY/i.test(n)&&!keep.test(n))o.visible=false})}
+function frame(now){const i=info(),c=camera(),r=renderer();if(i&&c&&r){const dt=Math.min(.05,(now-last)/1000);last=now;angle+=dt*.16;const radius=Math.max(3.4,i.s.x*.78),height=i.top+Math.max(2.6,i.s.z*1.15);c.position.set(i.c.x+Math.cos(angle)*radius,height,i.c.z+Math.sin(angle)*radius);c.lookAt(i.c.x,i.top+.08,i.c.z);r.setPixelRatio(Math.min(1.25,window.devicePixelRatio||1));r.shadowMap.enabled=false}requestAnimationFrame(frame)}
+function boot(){if(installed)return;installed=true;document.body.classList.add('svr-camera3-light');sanitize();[200,700,1600,3200].forEach(ms=>setTimeout(sanitize,ms));requestAnimationFrame(frame);window.SVR_PHASE339_CAMERA3_QA=()=>{const i=info();return{build:BUILD,active:true,table:!!i,camera:!!camera(),renderer:!!renderer(),drawCalls:renderer()?.info?.render?.calls??null,triangles:renderer()?.info?.render?.triangles??null,checkedAt:new Date().toISOString()}}}
+boot();

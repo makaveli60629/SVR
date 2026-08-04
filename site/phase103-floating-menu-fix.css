@@ -1,0 +1,53 @@
+/* Phase 103 customer-facing polish: floating menu must sit above banner layer. */
+.svr-polished-site .market-nav,
+.svr-polished-site .svr-touch-nav,
+.svr-polished-site .svr-nav-toggle{
+  z-index:2147483647!important;
+}
+.svr-polished-site .svr-nav-toggle{
+  position:fixed!important;
+  top:12px!important;
+  right:12px!important;
+  isolation:isolate!important;
+  pointer-events:auto!important;
+}
+.svr-polished-site .svr-touch-nav .market-links{
+  position:fixed!important;
+  top:58px!important;
+  right:10px!important;
+  left:auto!important;
+  width:min(320px,calc(100vw - 20px))!important;
+  z-index:2147483646!important;
+  isolation:isolate!important;
+  pointer-events:auto!important;
+  padding:10px!important;
+  border-radius:20px!important;
+  background:rgba(5,5,14,.97)!important;
+  border:1px solid rgba(105,232,255,.34)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.70)!important;
+  backdrop-filter:blur(18px)!important;
+}
+.svr-polished-site .svr-touch-nav .market-links.is-collapsed{display:none!important;opacity:0!important;visibility:hidden!important}
+.svr-polished-site .svr-touch-nav .market-links.is-open{display:grid!important;opacity:1!important;visibility:visible!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+.svr-polished-site .svr-touch-nav .market-links a,
+.svr-polished-site .svr-touch-nav .status-pill{
+  position:relative!important;
+  z-index:2147483647!important;
+  background:rgba(255,255,255,.06)!important;
+}
+.svr-polished-site .market-shell,
+.svr-polished-site .phase98-art-slider,
+.svr-polished-site .phase98-art-deck,
+.svr-polished-site .phase96-feature-deck,
+.svr-polished-site .svr-slide,
+.svr-polished-site .svr-slide-overlay{
+  z-index:1!important;
+}
+.svr-polished-site .phase98-art-slider,
+.svr-polished-site .phase98-art-deck{position:relative!important}
+.svr-polished-site .svr-slide-overlay{z-index:2!important}
+.svr-polished-site .svr-slide-controls button{width:16px!important;height:16px!important;min-width:16px!important;font-size:.68rem!important;box-shadow:none!important}
+.svr-polished-site .svr-slide-dots button{width:4px!important;height:4px!important;min-width:4px!important}
+@media(max-width:420px){
+  .svr-polished-site .svr-touch-nav .market-links{width:min(292px,calc(100vw - 18px))!important;top:56px!important;right:9px!important}
+}

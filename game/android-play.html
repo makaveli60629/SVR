@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>SVR Poker — Android Play</title>
+<meta name="theme-color" content="#080a0f">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="manifest" href="./manifest.json?v=phase377">
+<style>
+:root{--cyan:#7ffcff;--gold:#ffd98a;--purple:#a45cff;--ink:#030711}*{box-sizing:border-box}html,body,#app{height:100%;margin:0;background:#080a0f;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}canvas{display:block;width:100%;height:100%}#svr377Gate{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 50% 30%,rgba(55,25,86,.96),rgba(3,6,13,.99) 70%)}#svr377Gate[hidden]{display:none!important}.card{width:min(500px,95vw);padding:22px;border:1px solid rgba(127,252,255,.82);border-radius:24px;background:rgba(3,7,17,.97);box-shadow:0 24px 90px #000;text-align:center}.card img{width:82px;height:82px;object-fit:contain}.card h1{margin:7px 0 2px;letter-spacing:.09em}.card p{margin:7px 0 15px;color:#d9fbff;line-height:1.35}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.actions button,.actions a{display:flex;align-items:center;justify-content:center;min-height:50px;border:1px solid var(--gold);border-radius:14px;background:#111827;color:#fff;text-decoration:none;font-weight:950}.actions .primary{grid-column:1/-1;border:0;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#02040a;font-size:19px}.actions .room{border-color:var(--cyan);background:#064c58}.progress{min-height:23px;margin-top:12px;color:var(--gold);font-weight:850}.note{font-size:12px;color:#b9c8d9!important}#runtimeRecovery{position:fixed;z-index:2147483647;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));padding:12px;border:1px solid #ff9fbd;border-radius:16px;background:rgba(14,17,24,.98);text-align:center}#runtimeRecovery[hidden]{display:none!important}#runtimeRecovery button{min-height:44px;margin:4px;padding:8px 14px;border:1px solid var(--gold);border-radius:12px;background:#252832;color:#fff;font-weight:900}#svr377Leave{position:fixed;z-index:2147483600;top:max(8px,env(safe-area-inset-top));left:10px;min-height:42px;padding:0 14px;border:1px solid var(--gold);border-radius:999px;background:rgba(2,7,15,.9);color:#fff;font-weight:950}#svr377Leave[hidden]{display:none!important}body.svr377-playing #svr343Hud,body.svr377-playing #svr326Root,body.svr377-playing #svr369Entry,body.svr377-playing #svr372Entry,body.svr377-playing #svr375Entry,body.svr377-playing #svr376Gate{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}body.svr377-playing #svr347Actions [data-ui="seat"]{display:none!important}@media(orientation:landscape){.card{width:min(540px,72vw);padding:16px}.card img{width:60px;height:60px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script>
+window.SVR_PHASE377_CACHE_READY=(async()=>{try{const epoch='phase377-canonical-entry';if(localStorage.getItem('svr_android_cache_epoch')===epoch)return true;if('serviceWorker'in navigator){const registrations=await navigator.serviceWorker.getRegistrations();await Promise.all(registrations.map(r=>r.unregister().catch(()=>false)));}if('caches'in window){const keys=await caches.keys();await Promise.all(keys.filter(k=>/svr|poker/i.test(k)).map(k=>caches.delete(k)));}localStorage.setItem('svr_android_cache_epoch',epoch);return true;}catch{return false;}})();
+</script>
+</head>
+<body data-build="PHASE-377-ANDROID-CANONICAL-ENTRY-SAFE-FIRST-LOCK" data-release="PHASE-377-ANDROID-CANONICAL-ENTRY-SAFE-FIRST-LOCK" data-platform="android">
+<div id="app"></div>
+<section id="svr377Gate" aria-label="SVR Poker Android entry">
+  <div class="card">
+    <img src="/logo.png" alt="SVR Poker logo">
+    <h1>SVR POKER</h1>
+    <p><strong>JOIN NOW</strong> opens the lightweight playable table immediately. No cards are dealt before you join.</p>
+    <div class="actions">
+      <button id="svr377Join" class="primary" type="button">JOIN NOW</button>
+      <button id="svr377Room" class="room" type="button">TRY 3D ROOM</button>
+      <button id="svr377Refresh" type="button">UPDATE GAME</button>
+      <a href="/downloads/#apk">DOWNLOAD APK</a>
+    </div>
+    <div id="svr377Progress" class="progress">Ready. Press JOIN NOW.</div>
+    <p class="note">The safe table is the Android stability route. The 3D lobby remains available as an optional device test.</p>
+  </div>
+</section>
+<button id="svr377Leave" type="button" hidden>LEAVE TABLE</button>
+<aside id="runtimeRecovery" hidden><p id="runtimeRecoveryText">The 3D room stopped during startup.</p><button id="runtimeSafeButton" type="button">PLAY STABLE TABLE</button><button id="runtimeReloadButton" type="button">RELOAD</button></aside>
+<script type="module">
+window.SVR_PLATFORM='android';
+window.SVR_REQUIRE_TABLE_JOIN=true;
+window.SVR_TABLE_STARTING_STACK=15000;
+window.SVR_ANDROID_LOW_POWER_MODE=true;
+window.SVR_ANDROID_UPDATE_POLICY={apkVersionName:'0.1.0-rc1',apkVersionCode:1,forceUpdate:false,showUpdatePrompt:false,manualUpdateOnly:true,webEntry:'/game/android-play.html?channel=stable&v=phase377',webRuntimeBuild:'PHASE-377-ANDROID-CANONICAL-ENTRY-SAFE-FIRST-LOCK'};
+const VERSION='phase377';
+const gate=document.getElementById('svr377Gate');
+const join=document.getElementById('svr377Join');
+const room=document.getElementById('svr377Room');
+const progress=document.getElementById('svr377Progress');
+const leave=document.getElementById('svr377Leave');
+let booting=false,joined=false;
+const wait=(ms)=>new Promise(resolve=>setTimeout(resolve,ms));
+function report(text,error=false){progress.textContent=text;if(error){document.getElementById('runtimeRecoveryText').textContent=text;document.getElementById('runtimeRecovery').hidden=false;}}
+async function load(path,label,critical=true,timeout=15000){if(label)report(label);const url=new URL(path,document.baseURI);url.searchParams.set('v',VERSION);try{return await Promise.race([import(url.href),new Promise((_,reject)=>setTimeout(()=>reject(new Error(`MODULE_TIMEOUT:${path}`)),timeout))]);}catch(error){window.SVR_PHASE377_BOOT_ERRORS=[...(window.SVR_PHASE377_BOOT_ERRORS||[]),{path,error:String(error?.message||error)}];if(critical)throw error;return null;}}
+function hideLegacy(){document.querySelectorAll('button').forEach(button=>{if(button===leave||button.closest('#runtimeRecovery')||button.closest('#svr377Gate'))return;const text=(button.textContent||'').trim().toUpperCase();if(['SIT','SEAT','SIT DOWN','SIT AT TABLE','PLAY GAME','JOIN TABLE','JOIN NOW','LOBBY','CENTER'].includes(text)){button.hidden=true;button.setAttribute('aria-hidden','true');try{button.inert=true;}catch{}}});}
+async function startStable(){if(joined)return;join.disabled=true;join.textContent='JOINING…';report('Opening the stable Android poker table…');try{await window.SVR_PHASE377_CACHE_READY;await load('./modules/phase377_android_safe_play_fallback.js','Loading cards and six-player table…',true,8000);window.SVR_PHASE377_START_SAFE_PLAY?.();joined=true;gate.hidden=true;document.getElementById('runtimeRecovery').hidden=true;window.SVR_PHASE377_STATE={build:'PHASE-377-ANDROID-CANONICAL-ENTRY-SAFE-FIRST-LOCK',joined:true,mode:'stable',checkedAt:new Date().toISOString()};}catch(error){report(`Stable table error: ${String(error?.message||error)}. Press UPDATE GAME.`,true);}finally{join.disabled=false;join.textContent='JOIN NOW';}}
+function rendererBudget(){try{const renderer=window.__SVR_RENDERER__;renderer?.setPixelRatio?.(Math.min(.72,window.devicePixelRatio||1));if(renderer?.shadowMap)renderer.shadowMap.enabled=false;}catch{}}
+async function start3d(){if(booting||joined)return;booting=true;room.disabled=true;room.textContent='LOADING 3D…';report('Loading the optional 3D room in low-power mode…');try{await window.SVR_PHASE377_CACHE_READY;await load('./phase101_boot_load_screen_recovery.js','Preparing protected rendering…',false,6500);await load('./phase101_partial_runtime_render_guard.js','Preparing frame protection…',false,6500);await load('./main.js','Loading the 3D lobby…',true,16000);rendererBudget();await load('./modules/phase363_android_canonical_table_asset_lock.js','Loading the verified table…',true,16000);await load('./modules/phase355_android_poker_boot_order_lock.js','Loading poker rules…',true,16000);await load('./modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js','Loading phone controls…',true,12000);await load('./modules/phase357_android_direct_camera_seat_fix.js','Aligning seat…',false,7000);rendererBudget();if(typeof window.SVR_PHASE347_SIT!=='function'||typeof window.SVR_RESET_POKER_TABLE!=='function')throw new Error('ANDROID_3D_PLAY_API_NOT_READY');if(window.SVR_PHASE347_SIT()===false)throw new Error('ANDROID_3D_SEAT_NOT_READY');await wait(140);window.SVR_RESET_POKER_TABLE(15000);window.SVR_PHASE357_DIRECT_CAMERA_CORRECT?.();joined=true;document.body.classList.add('svr377-playing','runtime-visible','ready','svr-platform-android');hideLegacy();gate.hidden=true;leave.hidden=false;document.getElementById('runtimeRecovery').hidden=true;window.SVR_PHASE377_STATE={build:'PHASE-377-ANDROID-CANONICAL-ENTRY-SAFE-FIRST-LOCK',joined:true,mode:'3d',checkedAt:new Date().toISOString()};}catch(error){console.error(error);report(`3D room stopped: ${String(error?.message||error)}. Opening the stable table…`,true);await startStable();}finally{booting=false;room.disabled=false;room.textContent='TRY 3D ROOM';}}
+async function updateGame(){progress.textContent='Clearing old app data and opening Phase 377…';try{if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.unregister().catch(()=>false)));}if('caches'in window){const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)));}localStorage.setItem('svr_android_cache_epoch','phase377-canonical-entry');}catch{}location.replace(`/game/android-play.html?channel=stable&v=phase377&updated=${Date.now()}`);}
+join.addEventListener('click',startStable);room.addEventListener('click',start3d);document.getElementById('svr377Refresh').addEventListener('click',updateGame);leave.addEventListener('click',()=>location.replace(`/game/android-play.html?channel=stable&v=phase377&leave=${Date.now()}`));document.getElementById('runtimeSafeButton').addEventListener('click',startStable);document.getElementById('runtimeReloadButton').addEventListener('click',updateGame);window.SVR_PHASE377_JOIN=startStable;window.SVR_PHASE377_START_3D=start3d;window.SVR_PHASE377_UPDATE=updateGame;window.SVR_PHASE377_QA=()=>({build:'PHASE-377-ANDROID-CANONICAL-ENTRY-SAFE-FIRST-LOCK',joinVisible:!join.hidden,gateVisible:!gate.hidden,joined,mode:document.getElementById('svr376SafeTable')?'stable':joined?'3d':'gate',errors:window.SVR_PHASE377_BOOT_ERRORS||[],checkedAt:new Date().toISOString()});
+</script>
+</body>
+</html>

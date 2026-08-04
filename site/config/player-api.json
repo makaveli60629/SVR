@@ -1,0 +1,14 @@
+{
+  "build": "PHASE-372-AWS-PLAYER-ACCOUNT-FOUNDATION-LOCK",
+  "provider": "aws",
+  "database": "dynamodb",
+  "identity": "cognito",
+  "awsRegion": "",
+  "apiBase": "",
+  "presenceApiBase": "",
+  "allowDemoFallback": true,
+  "allowLocalPresenceSimulation": true,
+  "dailyRewardChips": 5000,
+  "minimumActivitySeconds": 300,
+  "notes": "Set apiBase and presenceApiBase to approved HTTPS AWS API Gateway URLs after the Phase 372 Cognito and DynamoDB stack is deployed. Never place AWS keys, secrets, Cognito client secrets, passwords, Cash App credentials, or database credentials in this public file."
+}

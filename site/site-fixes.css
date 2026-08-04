@@ -1,0 +1,172 @@
+/* PHASE 67 — site pages + hero spacing polish */
+.phase67-site-shell {
+  padding-top: 10px;
+}
+
+.phase67-site-card {
+  padding-top: clamp(18px, 2vw, 26px);
+  overflow: hidden;
+}
+
+.phase67-hero {
+  min-height: clamp(480px, 72vh, 720px);
+  align-items: center;
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr) !important;
+}
+
+.phase67-hero-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: clamp(420px, 58vh, 620px);
+  padding-top: 0 !important;
+  min-width: 0;
+}
+
+.hero-brand-stack {
+  display: inline-grid;
+  gap: 2px;
+  justify-items: start;
+  margin: 0 0 12px;
+}
+
+.phase67-title {
+  margin: 0 !important;
+  line-height: 0.95;
+}
+
+.phase67-title .poker-word {
+  font-size: clamp(2.6rem, 5.7vw, 5.1rem);
+  letter-spacing: 0.13em;
+  line-height: 0.95;
+}
+
+.all-in-subtitle {
+  width: 100%;
+  text-align: center;
+  font-family: 'Orbitron', Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(0.86rem, 1.45vw, 1.2rem);
+  line-height: 1;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: #dffcff;
+  transform: skewX(-10deg);
+  text-shadow:
+    0 0 8px rgba(97, 227, 255, 0.38),
+    0 0 18px rgba(255, 88, 247, 0.18);
+  opacity: 0.94;
+  padding-left: 0.42em;
+}
+
+.phase67-actions {
+  justify-content: flex-start;
+}
+
+.phase67-preview-panel {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.phase67-preview-window,
+.preview-window-live {
+  width: 100%;
+  max-width: 100%;
+  height: clamp(260px, 32vw, 378px);
+  min-height: 0 !important;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 22px;
+  contain: paint;
+}
+
+.phase67-preview-window iframe,
+.preview-window-live iframe,
+.game-live-preview-frame {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  display: block !important;
+  background: #000 !important;
+}
+
+.preview-live-badge {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  z-index: 2;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(120,255,186,.42);
+  background: rgba(2,10,8,.72);
+  color: #eafff4;
+  font: 700 11px/1 Orbitron, Arial, sans-serif;
+  letter-spacing: .08em;
+  pointer-events: none;
+}
+
+.page-hero {
+  margin-top: 0 !important;
+}
+
+.page-kicker {
+  margin-bottom: 10px;
+}
+
+.page-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.page-list li {
+  margin: 0.35rem 0;
+}
+
+@media (max-width: 1120px) {
+  .phase67-hero {
+    grid-template-columns: 1fr !important;
+    min-height: 0;
+  }
+  .phase67-hero-copy {
+    min-height: 0;
+    text-align: center;
+    align-items: center;
+  }
+  .hero-brand-stack {
+    justify-items: center;
+  }
+  .phase67-actions {
+    justify-content: center;
+  }
+  .phase67-preview-panel {
+    width: 100%;
+  }
+  .phase67-preview-window,
+  .preview-window-live {
+    height: clamp(260px, 52vw, 420px);
+  }
+}
+
+@media (max-width: 760px) {
+  .phase67-site-shell {
+    padding-top: 8px;
+  }
+  .phase67-title .poker-word {
+    font-size: clamp(2.05rem, 11vw, 3.1rem);
+    letter-spacing: 0.08em;
+  }
+  .all-in-subtitle {
+    font-size: 0.82rem;
+    letter-spacing: 0.28em;
+    padding-left: 0.28em;
+  }
+  .phase67-preview-window,
+  .preview-window-live {
+    height: clamp(240px, 68vw, 360px);
+  }
+}

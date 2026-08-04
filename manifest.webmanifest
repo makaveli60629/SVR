@@ -1,0 +1,26 @@
+{
+  "name": "SVR Poker",
+  "short_name": "SVR Poker",
+  "description": "Launch SVR Poker Android, Quest/VR, downloads, updates, store, and support.",
+  "id": "/?source=pwa-phase377",
+  "start_url": "/?source=pwa-phase377",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "background_color": "#030008",
+  "theme_color": "#9b4dff",
+  "categories": ["games", "entertainment", "social"],
+  "lang": "en-US",
+  "icons": [
+    {"src": "/logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
+  ],
+  "shortcuts": [
+    {"name": "Play Android", "short_name": "Android", "description": "Open the Phase 377 stable Android poker table.", "url": "/game/android-play.html?channel=stable&v=phase377", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Update App", "short_name": "Update", "description": "Open the Android update and cache reset center.", "url": "/downloads/#update", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Download APK", "short_name": "APK", "description": "Check the current signed APK download status.", "url": "/downloads/#apk", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Launch VR Room", "short_name": "VR Room", "description": "Open the SVR Poker Quest/VR room.", "url": "/game/index.html?platform=quest&v=phase373", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
+  ]
+}

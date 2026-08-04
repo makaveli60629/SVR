@@ -1,0 +1,30 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+
+const read = (path) => fs.readFileSync(path, 'utf8');
+const html = read('game/android.html');
+const authority = read('game/modules/phase375_android_playable_authority_lock.js');
+const release = JSON.parse(read('game/android-release.json'));
+const update = JSON.parse(read('update/app-version.json'));
+
+assert.match(html, /PHASE-375-ANDROID-PLAYABLE-SINGLE-JOIN-AUTHORITY-LOCK/);
+assert.match(html, /phase375_android_playable_authority_lock\.js/);
+assert.match(html, /phase363_android_canonical_table_asset_lock\.js/);
+assert.match(html, /phase347_android_single_controller_seated_gameplay_apk_release_lock\.js/);
+assert.doesNotMatch(html, /phase343_android_gameplay_hud_seated_table_view_lock\.js/);
+assert.doesNotMatch(html, /phase369_android_join_table_freeze_recovery_lock\.js/);
+assert.doesNotMatch(html, /phase372_live_entry_recovery_lock\.js/);
+assert.match(authority, /JOIN NOW/);
+assert.match(authority, /function park/);
+assert.match(authority, /resetTable\(15000\)/);
+assert.match(authority, /SVR_PHASE347_SIT/);
+assert.match(authority, /PHASE375_ANDROID_EMERGENCY_TABLE/);
+assert.equal(release.currentGameBuild, 'PHASE-375-ANDROID-PLAYABLE-SINGLE-JOIN-AUTHORITY-LOCK');
+assert.equal(release.webEntry, '/game/android.html?channel=stable&v=phase375');
+assert.equal(release.apkVersionName, '0.1.0-rc1');
+assert.equal(release.apkVersionCode, 1);
+assert.equal(release.forceUpdate, false);
+assert.equal(update.gameBuild, 'PHASE-375-ANDROID-PLAYABLE-SINGLE-JOIN-AUTHORITY-LOCK');
+assert.equal(update.androidSafeUrl, '/game/android.html?channel=stable&v=phase375');
+assert.equal(update.nativeApkRebuild, false);
+console.log('Phase 375 Android playable static gate passed.');

@@ -1,0 +1,32 @@
+{
+  "currentUpdate": "3.1",
+  "currentPhase": "3.1-C",
+  "currentBuild": "UPDATE-3.1-C-MOON-PHASE-HARD-LOCK",
+  "track": "game-only",
+  "siteTouched": false,
+  "sourceOfTruth": {
+    "gameRuntime": "game/",
+    "entry": "game/index.html",
+    "boot": "game/phase176_boot.js",
+    "diag": "game/phase223_phase_diag_log.js",
+    "buildVersion": "game/docs/BUILD_VERSION.json",
+    "deployMarker": "update/version.json"
+  },
+  "rules": [
+    "Do not touch website files in this game track.",
+    "Do not replace the current lobby baseline.",
+    "Keep Android, desktop, Quest hands, and Quest controller fallback.",
+    "Every phase must update version files together.",
+    "Keep diagnostics available until lobby is stable."
+  ],
+  "completed": [
+    { "id": "3.1-A", "name": "Version Sync Lock" },
+    { "id": "3.1-B", "name": "Lobby Structure Completion" },
+    { "id": "3.1-C", "name": "Moon Phase Hard Lock" }
+  ],
+  "nextPhases": [
+    { "id": "3.1-D", "name": "Module Routing Audit" },
+    { "id": "3.1-E", "name": "Cross Platform Controls Audit" },
+    { "id": "3.1-F", "name": "Multiplayer Placeholder Test" }
+  ]
+}

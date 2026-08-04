@@ -1,0 +1,14 @@
+{
+  "build": "PHASE-322-FULL-LOBBY-VISUAL-FINISH-LOCK",
+  "scope": "game-only",
+  "androidProductionRoute": true,
+  "plannedLobbyPreserved": true,
+  "fullLobbyTouchBounds": true,
+  "previewModulesIsolated": true,
+  "finishedArchitecture": true,
+  "finishedStorefrontPresentation": true,
+  "lightweightCitySkyline": true,
+  "moonMarsVisible": true,
+  "siteTouched": false,
+  "updatedAt": "2026-07-12T16:30:00-05:00"
+}

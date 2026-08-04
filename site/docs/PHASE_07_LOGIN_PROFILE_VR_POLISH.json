@@ -1,0 +1,10 @@
+{
+  "phase": "SVR_SITE_PHASE07_LOGIN_PROFILE_VR_POLISH",
+  "scope": "site-only",
+  "protected": [
+    "root index.html",
+    "launch.css",
+    "matrix.js",
+    "/game"
+  ]
+}

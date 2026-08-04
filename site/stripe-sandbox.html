@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stripe Sandbox | SVR Poker</title>
+  <meta name="description" content="Stripe sandbox preview page with no live checkout enabled." />
+  <link rel="icon" href="../logo.webp" type="image/webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="store-phase03.css" />
+</head>
+<body>
+  <canvas id="binary-rain" aria-hidden="true"></canvas>
+  <div class="site-shell">
+    <nav class="site-nav">
+  <div class="nav-brand">
+    <img src="../logo.webp" alt="SVR Poker logo" />
+    <div><strong>SVR POKER</strong><span>All In</span></div>
+  </div>
+  <div class="nav-links">
+    <span class="admin-status online" data-state="online">● Admin Online</span>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="sponsorship.html">Sponsorship</a>
+    <a href="membership.html">Membership</a>
+    <a href="impact.html">Impact</a>
+    <a href="store.html">Store</a>
+    <a href="donate.html">Donate</a>
+    <a href="contact.html">Contact</a>
+    <a href="../index.html">Launch</a>
+  </div>
+</nav>
+    <main class="site-card">
+
+      <section class="store-banner" style="margin-top:0;"><span class="store-kicker">Stripe Sandbox</span><h1 class="store-title">Checkout Wiring Preview</h1><p class="store-lead">This page shows the future Stripe checkout shape while live sales stay disabled. Use it to verify product/category/cart logic before backend activation.</p><div class="category-strip"><a href="store.html">All Stores</a><a href="cart.html">Cart</a><a class="active" href="stripe-sandbox.html">Stripe Sandbox</a></div></section>
+      <section class="store-section"><div class="stripe-grid"><article class="stripe-panel"><span class="store-kicker"><span class="store-dot"></span> Disabled by default</span><h2 class="section-title">No live checkout</h2><p class="section-copy">The public site must call the backend. The backend creates Stripe Checkout using secret keys stored only on the server.</p><div class="cart-total"><span>Cart Items</span><strong data-cart-count>0</strong></div><div class="cart-total"><span>Total</span><strong data-cart-total>$0.00</strong></div><a class="btn btn-primary" href="#" data-sandbox-checkout>Generate Sandbox Payload</a><p class="input-note" data-cart-status>Sandbox ready. No sale can be created from this public page.</p></article><article class="stripe-panel"><span class="store-kicker">Payload Preview</span><pre class="payload-preview" data-checkout-payload>{
+  "mode": "stripe_sandbox_preview_only",
+  "checkoutEnabled": false,
+  "nextEndpoint": "/api/stripe/create-checkout-session"
+}</pre></article></div></section>
+
+      <footer class="footer"><p class="footer-note">© 2026 SVR Poker. All rights reserved. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn btn-secondary" href="index.html">Back to Site</a><a class="btn btn-primary" href="../game/index.html">Preview Game</a></div></footer>
+    </main>
+  </div>
+  <script src="../matrix.js"></script>
+  <script src="../site-public-hooks.js"></script>
+  <script src="store-cart.js"></script>
+</body>
+</html>

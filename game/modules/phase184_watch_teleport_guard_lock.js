@@ -1,0 +1,7 @@
+const LABEL='PHASE-184-WATCH-TELEPORT-GUARD-LOCK';
+let patched=false,last=null,lastReject=null;
+function hand(){return window.SVR_PHASE170_HAND_INPUT||{};}
+function pinching(){const h=hand();return !!(h.leftPinch||h.rightPinch);}
+function patch(){const rig=window.SVR_TELEPORT_RIG_REF||window.SVR_TELEPORT_RIG;if(!rig||patched||typeof rig.toggleMode!=='function')return false;const base=rig.toggleMode.bind(rig);rig.toggleMode=()=>{const h=hand();if(pinching()){lastReject={build:LABEL,reason:'pinch_toggle_blocked',hand:h.source||null,checkedAt:new Date().toISOString()};window.SVR_PHASE184_LAST_REJECT=lastReject;return rig.isEnabled?rig.isEnabled():false;}const result=base();last={build:LABEL,result,checkedAt:new Date().toISOString()};window.SVR_PHASE184_LAST_TOGGLE=last;return result;};patched=true;return true;}
+function audit(){patch();const watch=window.SVR_PHASE87_WATCH_POKER_CONTROLS_LOCK||null;const tele=window.SVR_PHASE170_TELEPORT_AIM_COMMIT_LOCK||null;const data={build:LABEL,active:true,gameOnly:true,siteTouched:false,rigPatched:patched,watchLoaded:!!watch,teleportLoaded:!!tele,teleportEnabled:!!tele?.enabled,pinchToggleBlocked:true,faceFistToggleStillAllowed:true,lastReject,lastToggle:last,checkedAt:new Date().toISOString()};window.SVR_PHASE184_WATCH_TELEPORT_GUARD_LOCK=data;window.SVR_RUN_PHASE184_WATCH_TELEPORT_AUDIT=()=>window.SVR_PHASE184_WATCH_TELEPORT_GUARD_LOCK;window.SVR_LOCKED_FINAL_BUILD=LABEL;window.SVR_LIVE_BUILD_POINTER=LABEL;return data;}
+[300,900,1800,3500,7000].forEach(ms=>setTimeout(audit,ms));setInterval(audit,3000);audit();
