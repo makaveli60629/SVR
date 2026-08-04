@@ -1,8 +1,10 @@
 const { chromium } = require('playwright');
 
 const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
-const url = `${base}/game/index.html?platform=quest&acceptance=1&manual=1&v=phase358`;
+const url = `${base}/game/index.html?platform=quest&acceptance=1&manual=1&v=phase374`;
 const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) OculusBrowser/35.0.0.0.0 Chrome/126.0.0.0 Mobile VR Safari/537.36 Quest 3';
+const ORIGINAL_TABLE = 'PHASE374_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY';
+const LEGACY_TABLE = 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED';
 
 (async () => {
   const browser = await chromium.launch({
@@ -37,9 +39,14 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
 
   let result = null;
   let platform = null;
+  let tableCompatibility = null;
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    await page.waitForFunction(() => typeof window.SVR_PHASE358_RUN_QUEST_FULL_GAME_ACCEPTANCE === 'function', null, { timeout: 160000 });
+    await page.waitForFunction(() => (
+      typeof window.SVR_PHASE358_RUN_QUEST_FULL_GAME_ACCEPTANCE === 'function'
+      && window.SVR_PHASE374_PHASE358_COMPAT_QA?.().pass === true
+      && window.SVR_PHASE374_ORIGINAL_TABLE_QA?.().pass === true
+    ), null, { timeout: 160000 });
     result = await page.evaluate(() => window.SVR_PHASE358_RUN_QUEST_FULL_GAME_ACCEPTANCE({
       runtimeTimeoutMs: 120000,
       handTimeoutMs: 75000,
@@ -62,12 +69,19 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
         prewarm: state.prewarm
       };
     });
+    tableCompatibility = await page.evaluate(() => ({
+      compat: window.SVR_PHASE374_PHASE358_COMPAT_QA?.() || null,
+      original: window.SVR_PHASE374_ORIGINAL_TABLE_QA?.() || null,
+      uploaded: window.SVR_PHASE358_UPLOADED_TABLE_QA?.() || null,
+      currentAuthority: window.SVR_TABLE_AUTHORITY?.name || null
+    }));
   } finally {
     const report = {
       url,
       questUserAgent: true,
       result,
       platform,
+      tableCompatibility,
       pageErrors,
       consoleErrors,
       httpErrors,
@@ -76,6 +90,9 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
     };
     console.log(JSON.stringify(report, null, 2));
     await browser.close();
+    const acceptedTable = [ORIGINAL_TABLE, LEGACY_TABLE].includes(result?.table?.table)
+      && result?.table?.uploadedTableAuthority === true
+      && result?.table?.fallbackPresent === false;
     const pass = result?.pass === true
       && result?.platform === 'quest'
       && result?.hand?.pass === true
@@ -88,10 +105,11 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
       && result?.hand?.holeCards === 2
       && result?.hand?.settlement?.totalStacks === 6000
       && result?.nextHand?.advanced === true
-      && result?.table?.table === 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED'
-      && result?.table?.uploadedTableAuthority === true
-      && result?.table?.fallbackPresent === false
+      && acceptedTable
       && Boolean(result?.table?.potDisplay)
+      && tableCompatibility?.compat?.pass === true
+      && tableCompatibility?.original?.pass === true
+      && tableCompatibility?.currentAuthority === ORIGINAL_TABLE
       && result?.input?.handsPrimary === true
       && result?.input?.controllerFallback === true
       && result?.input?.androidRoots === 0
