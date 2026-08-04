@@ -1,13 +1,13 @@
 {
   "schema": 1,
-  "build": "PHASE-374-ANDROID-JOIN-PROFILE-AUTODEPLOY-LOCK",
-  "gameBuild": "PHASE-374-ANDROID-JOIN-TABLE-APP-RECOVERY-LOCK",
+  "build": "PHASE-375-ANDROID-PLAYABLE-AUTODEPLOY-LOCK",
+  "gameBuild": "PHASE-375-ANDROID-PLAYABLE-SINGLE-JOIN-AUTHORITY-LOCK",
   "profileBuild": "PHASE-374-PROFILE-MOBILE-AVATAR-MENU-RECOVERY-LOCK",
-  "message": "SVR Poker Android web gameplay and profile presentation were updated.",
+  "message": "SVR Poker Android now uses the Phase 375 playable JOIN NOW runtime.",
   "required": false,
   "webRuntimeUpdated": true,
   "gameUrl": "/game/index.html?platform=quest&v=phase373",
-  "androidSafeUrl": "/game/android.html?channel=stable&v=phase374",
+  "androidSafeUrl": "/game/android.html?channel=stable&v=phase375",
   "profileUrl": "/site/profile.html?v=phase374",
   "downloadsUrl": "/downloads/",
   "packageName": "com.svrpoker.app",
@@ -20,5 +20,5 @@
   "showUpdatePrompt": false,
   "manualUpdateOnly": true,
   "nativeApkRebuild": false,
-  "note": "The installed APK continues to load the updated stable web runtime. No forced native APK reinstall is required for Phase 374."
+  "note": "The installed APK continues to load the updated stable web runtime. No forced native APK reinstall is required for Phase 375."
 }
