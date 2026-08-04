@@ -18,18 +18,18 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
-      - name: Free runner disk
+      - name: Free runner disk without deleting Android SDK
         shell: bash
         run: |
           set +e
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost || true
+          sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost || true
           docker system prune -af || true
           sudo apt-get clean || true
           df -h
 
-      - name: Checkout production paths
+      - name: Checkout production and native Android paths
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
@@ -64,13 +64,57 @@ jobs:
             android
             downloads
             update
+            native
 
-      - name: Verify Phase 377 public route and Android recovery gate
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Ensure Android SDK 35
         shell: bash
         run: |
           set -euo pipefail
-          node --check game/modules/phase377_android_safe_play_fallback.js
-          node game/tools/phase377-public-route-android-recovery-static-test.mjs
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Build signed SVR Android RC2 test APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p native/android/app/src/main/res/drawable
+          cp logo.png native/android/app/src/main/res/drawable/svr_logo.png
+          base64 -d native/android/app/svr-demo-debug.keystore.b64 > native/android/app/svr-demo-debug.keystore
+          gradle -p native/android :app:assembleRelease --no-daemon --stacktrace
+          APK_SOURCE="native/android/app/build/outputs/apk/release/app-release.apk"
+          test -s "$APK_SOURCE"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK_SOURCE"
+          mkdir -p downloads site/downloads
+          cp "$APK_SOURCE" downloads/svr-poker-android-rc2.apk
+          cp "$APK_SOURCE" site/downloads/svr-poker-android-rc2.apk
+          APK_SHA="$(sha256sum "$APK_SOURCE" | awk '{print $1}')"
+          printf '%s  %s\n' "$APK_SHA" "svr-poker-android-rc2.apk" > downloads/svr-poker-android-rc2.apk.sha256
+          cp downloads/svr-poker-android-rc2.apk.sha256 site/downloads/svr-poker-android-rc2.apk.sha256
+          jq --arg sha "$APK_SHA" '.apkSha256=$sha' game/android-release.json > game/android-release.json.tmp
+          mv game/android-release.json.tmp game/android-release.json
+          jq --arg sha "$APK_SHA" '.apkSha256=$sha' update/app-version.json > update/app-version.json.tmp
+          mv update/app-version.json.tmp update/app-version.json
+          echo "APK_SHA=$APK_SHA" >> "$GITHUB_ENV"
+          echo "Built APK SHA-256: $APK_SHA"
+
+      - name: Verify Phase 378 native APK and stable Android gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node game/tools/phase378-native-apk-stable-static-test.mjs
+          test -s downloads/svr-poker-android-rc2.apk
+          test -s site/downloads/svr-poker-android-rc2.apk
 
       - name: Build production branch
         shell: bash
@@ -97,13 +141,12 @@ jobs:
           test -f build/game/index.html
           test -f build/game/android.html
           test -f build/game/android-play.html
-          test -f build/game/modules/phase377_android_safe_play_fallback.js
-          test -f build/game/modules/phase376_android_safe_play_fallback.js
-          test -f build/game/modules/phase363_android_canonical_table_asset_lock.js
-          test -f build/game/modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js
+          test -f build/game/android-stable.html
           test -f build/game/assets/models/table.glb
           test -f build/game/assets/table.fbx
           test -f build/downloads/index.html
+          test -s build/downloads/svr-poker-android-rc2.apk
+          test -s build/site/downloads/svr-poker-android-rc2.apk
           test -f build/site/index.html
           test -f build/site/login.html
           test -f build/site/profile.html
@@ -114,29 +157,26 @@ jobs:
           cat > build/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-377-ANDROID-CANONICAL-ENTRY-AUTODEPLOY-LOCK",
-            "androidBuild": "PHASE-377-ANDROID-CANONICAL-ENTRY-SAFE-FIRST-LOCK",
-            "safeFallbackBuild": "PHASE-377-ANDROID-CANONICAL-SAFE-PLAY-FALLBACK",
-            "publicReleaseBuild": "PHASE-377-PUBLIC-ANDROID-ENTRY-APK-UPDATE-LOCK",
+            "build": "PHASE-378-NATIVE-APK-STABLE-ANDROID-AUTODEPLOY-LOCK",
+            "androidBuild": "PHASE-378-ANDROID-STANDALONE-STABLE-TABLE-LOCK",
+            "publicReleaseBuild": "PHASE-378-PUBLIC-APK-RC2-NOTIFICATION-LOCK",
             "profileBuild": "PHASE-374-PROFILE-MOBILE-AVATAR-MENU-RECOVERY-LOCK",
             "questBuild": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
-            "questFinalizer": "PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK",
             "commit": "$GITHUB_SHA",
             "deployedAt": "$DEPLOYED_AT",
             "sourceBranch": "main",
             "publishBranch": "gh-pages",
-            "databaseProvider": "aws",
-            "identityProvider": "cognito",
-            "profileDatabase": "dynamodb",
-            "androidRoute": "/game/android-play.html?channel=stable&v=phase377",
-            "legacyAndroidRedirect": "/game/android.html?channel=stable&v=phase377",
+            "androidRoute": "/game/android-stable.html?v=phase378",
+            "legacyAndroidRedirect": "/game/android.html?v=phase378",
             "downloadsRoute": "/downloads/",
-            "profileRoute": "/site/profile.html?v=phase374",
-            "questRoute": "/game/index.html?platform=quest&v=phase373",
-            "apkVersionName": "0.1.0-rc1",
-            "apkVersionCode": 1,
-            "signedApkAttached": false,
-            "nativeApkRebuild": false,
+            "apkUrl": "/downloads/svr-poker-android-rc2.apk",
+            "apkVersionName": "0.1.0-rc2",
+            "apkVersionCode": 2,
+            "apkSha256": "$APK_SHA",
+            "signedApkAttached": true,
+            "signingChannel": "stable-test-key",
+            "nativeApkRebuild": true,
+            "offlineStableTableBundled": true,
             "webRuntimeUpdated": true,
             "customDomain": "svrpoker.com"
           }
@@ -159,16 +199,19 @@ jobs:
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin gh-pages
 
-      - name: Verify custom-domain deployment
+      - name: Verify custom-domain APK and stable game deployment
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 24); do
-            response="$(curl -fsS --max-time 15 "https://svrpoker.com/deploy-health.json?commit=${GITHUB_SHA}&attempt=${attempt}" || true)"
-            if echo "$response" | grep -q "$GITHUB_SHA"; then
-              echo "Verified svrpoker.com at ${GITHUB_SHA}"
+          for attempt in $(seq 1 30); do
+            health="$(curl -fsS --max-time 15 "https://svrpoker.com/deploy-health.json?commit=${GITHUB_SHA}&attempt=${attempt}" || true)"
+            game="$(curl -fsS --max-time 15 "https://svrpoker.com/game/android-stable.html?v=phase378&attempt=${attempt}" || true)"
+            apk_code="$(curl -L -sS -o /dev/null -w '%{http_code}' --max-time 20 "https://svrpoker.com/downloads/svr-poker-android-rc2.apk?attempt=${attempt}" || true)"
+            if echo "$health" | grep -q "$GITHUB_SHA" && echo "$game" | grep -q "JOIN NOW" && [ "$apk_code" = "200" ]; then
+              echo "Verified Phase 378 website, Android table, and APK download."
               exit 0
             fi
             sleep 10
           done
-          echo "::warning::The gh-pages branch was published, but the custom-domain cache did not expose the new commit within four minutes."
+          echo "::error::Custom domain did not expose the Phase 378 APK and Android table within five minutes."
+          exit 1
