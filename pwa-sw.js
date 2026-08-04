@@ -1,4 +1,4 @@
-const SVR_PWA_CACHE = 'svr-poker-pwa-phase375-android-playable-v1';
+const SVR_PWA_CACHE = 'svr-poker-pwa-phase376-immediate-join-v1';
 const SVR_CORE_ASSETS = [
   '/manifest.webmanifest',
   '/offline.html',
@@ -19,8 +19,8 @@ const SVR_CORE_ASSETS = [
   '/site/contact.html',
   '/downloads/index.html',
   '/game/index.html?platform=quest&v=phase373',
-  '/game/android.html?channel=stable&v=phase375',
-  '/game/modules/phase375_android_playable_authority_lock.js?v=phase375'
+  '/game/android.html?channel=stable&v=phase376',
+  '/game/modules/phase376_android_safe_play_fallback.js?v=phase376'
 ];
 
 self.addEventListener('install', (event) => {

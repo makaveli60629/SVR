@@ -65,11 +65,12 @@ jobs:
             downloads
             update
 
-      - name: Verify Phase 375 Android playable gate
+      - name: Verify Phase 376 immediate Join and safe play gate
         shell: bash
         run: |
           set -euo pipefail
-          node game/tools/phase375-android-playable-static-test.mjs
+          node --check game/modules/phase376_android_safe_play_fallback.js
+          node game/tools/phase376-android-immediate-join-static-test.mjs
 
       - name: Build production branch
         shell: bash
@@ -95,7 +96,7 @@ jobs:
           test -f build/CNAME
           test -f build/game/index.html
           test -f build/game/android.html
-          test -f build/game/modules/phase375_android_playable_authority_lock.js
+          test -f build/game/modules/phase376_android_safe_play_fallback.js
           test -f build/game/modules/phase363_android_canonical_table_asset_lock.js
           test -f build/game/modules/phase347_android_single_controller_seated_gameplay_apk_release_lock.js
           test -f build/game/modules/phase357_android_direct_camera_seat_fix.js
@@ -111,8 +112,9 @@ jobs:
           cat > build/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-375-ANDROID-PLAYABLE-AUTODEPLOY-LOCK",
-            "androidBuild": "PHASE-375-ANDROID-PLAYABLE-SINGLE-JOIN-AUTHORITY-LOCK",
+            "build": "PHASE-376-ANDROID-IMMEDIATE-JOIN-AUTODEPLOY-LOCK",
+            "androidBuild": "PHASE-376-ANDROID-IMMEDIATE-JOIN-SAFE-PLAY-LOCK",
+            "safeFallbackBuild": "PHASE-376-ANDROID-SAFE-PLAY-FALLBACK",
             "profileBuild": "PHASE-374-PROFILE-MOBILE-AVATAR-MENU-RECOVERY-LOCK",
             "questBuild": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
             "questFinalizer": "PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK",
@@ -123,7 +125,7 @@ jobs:
             "databaseProvider": "aws",
             "identityProvider": "cognito",
             "profileDatabase": "dynamodb",
-            "androidRoute": "/game/android.html?channel=stable&v=phase375",
+            "androidRoute": "/game/android.html?channel=stable&v=phase376",
             "profileRoute": "/site/profile.html?v=phase374",
             "questRoute": "/game/index.html?platform=quest&v=phase373",
             "apkVersionName": "0.1.0-rc1",
