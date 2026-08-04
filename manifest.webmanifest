@@ -1,9 +1,9 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "Install the SVR Poker companion app to launch the VR poker room, store, support, downloads, and project updates from your device.",
+  "description": "Launch the current SVR Poker Android game, Quest/Oculus room, website, and physical release verifier.",
   "id": "/site/?source=pwa",
-  "start_url": "/site/?source=pwa",
+  "start_url": "/game/android.html?channel=stable&v=phase374&source=pwa",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -18,9 +18,9 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {"name": "Launch VR Room", "short_name": "VR Room", "description": "Open the SVR Poker WebXR game room.", "url": "/game/index.html?source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Open Site", "short_name": "Site", "description": "Open the SVR Poker site hub.", "url": "/site/?source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Downloads", "short_name": "Downloads", "description": "Open the SVR app download and install page.", "url": "/downloads/?source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Contact Support", "short_name": "Support", "description": "Open the SVR support and message page.", "url": "/site/contact.html?source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
+    {"name": "Play on Android", "short_name": "Android", "description": "Open the current Android physical test build.", "url": "/game/android.html?channel=stable&v=phase374&source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Enter Quest/Oculus", "short_name": "Quest", "description": "Open the current Quest/Oculus WebXR room.", "url": "/game/index.html?platform=quest&v=phase374&source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Open SVR Website", "short_name": "Website", "description": "Open the SVR Poker website hub.", "url": "/site/index.html?v=phase374&source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Physical Release Status", "short_name": "Status", "description": "Open the current deployment and device launcher.", "url": "/index.html?v=phase374&source=pwa-shortcut", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }
