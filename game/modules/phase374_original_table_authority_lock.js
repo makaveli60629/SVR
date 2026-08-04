@@ -33,6 +33,9 @@ const state = {
   installed: false,
   source: null,
   authority: null,
+  authorityTrapInstalled: false,
+  rejectedAuthorityWrites: 0,
+  lastRejectedAuthority: null,
   visibleMeshes: 0,
   removedCompetingTables: 0,
   exactOriginalDimensionsMeters: { ...TARGET },
@@ -48,8 +51,8 @@ const state = {
 let scene = null;
 let table = null;
 let installPromise = null;
-let observer = null;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const authorityGetter = () => table;
 
 function walk(root, visitor, limit = 22000) {
   if (!root) return 0;
@@ -128,6 +131,16 @@ function forceOriginalMaterials(object) {
   return meshes;
 }
 
+function removeRejectedTable(object) {
+  if (!object?.isObject3D || object === table) return false;
+  const name = String(object.name || 'unnamed-table');
+  object.visible = false;
+  if (COMPETING_NAMES.includes(name)) object.removeFromParent?.();
+  state.lastRejectedAuthority = name;
+  state.rejectedAuthorityWrites += 1;
+  return true;
+}
+
 function removeCompetingTables() {
   const remove = [];
   walk(worldRoot(), (object) => {
@@ -135,8 +148,46 @@ function removeCompetingTables() {
     const name = String(object.name || '');
     if (COMPETING_NAMES.includes(name)) remove.push(object);
   });
-  for (const object of remove) object.removeFromParent?.();
+  for (const object of remove) {
+    object.visible = false;
+    object.removeFromParent?.();
+  }
   state.removedCompetingTables += remove.length;
+}
+
+function installAuthorityTrap() {
+  if (!ACTIVE || !table?.isObject3D) return false;
+  try {
+    const descriptor = Object.getOwnPropertyDescriptor(window, 'SVR_TABLE_AUTHORITY');
+    if (descriptor?.get === authorityGetter) {
+      state.authorityTrapInstalled = true;
+      return true;
+    }
+    if (descriptor?.configurable === false) {
+      state.lastError = 'NON_CONFIGURABLE_TABLE_AUTHORITY';
+      return false;
+    }
+    Object.defineProperty(window, 'SVR_TABLE_AUTHORITY', {
+      configurable: true,
+      enumerable: true,
+      get: authorityGetter,
+      set(value) {
+        if (!value || value === table) return;
+        removeRejectedTable(value);
+        queueMicrotask(() => {
+          if (!table?.isObject3D) return;
+          table.visible = true;
+          forceOriginalMaterials(table);
+          removeCompetingTables();
+        });
+      }
+    });
+    state.authorityTrapInstalled = true;
+    return true;
+  } catch (error) {
+    state.lastError = String(error?.message || error);
+    return false;
+  }
 }
 
 function normalizeOriginal(object) {
@@ -193,10 +244,10 @@ async function loadOriginal() {
 function reassert(reason = 'manual') {
   if (!table?.isObject3D) return false;
   state.reassertions += 1;
+  installAuthorityTrap();
   table.visible = true;
   forceOriginalMaterials(table);
   removeCompetingTables();
-  window.SVR_TABLE_AUTHORITY = table;
   window.SVR_PHASE374_ORIGINAL_TABLE_ROOT = table;
   window.SVR_PHASE341_TABLE_LAYOUT = {
     ...(window.SVR_PHASE341_TABLE_LAYOUT || {}),
@@ -208,7 +259,7 @@ function reassert(reason = 'manual') {
     reason
   };
   state.checkedAt = new Date().toISOString();
-  state.pass = state.visibleMeshes > 0 && state.measured?.minY === 0;
+  state.pass = state.visibleMeshes > 0 && state.measured?.minY === 0 && window.SVR_TABLE_AUTHORITY === table;
   window.SVR_PHASE374_TABLE_STATE = { ...state };
   return true;
 }
@@ -231,12 +282,12 @@ async function install() {
     removeCompetingTables();
     worldRoot()?.add(object);
     table = object;
-    window.SVR_TABLE_AUTHORITY = object;
     state.authority = object.name;
+    installAuthorityTrap();
     state.installed = true;
     state.installedAt = new Date().toISOString();
     reassert('installed');
-    for (const delay of [300, 900, 1800, 3200]) setTimeout(() => reassert(`bounded-${delay}`), delay);
+    for (const delay of [300, 900, 1800, 3200, 6000]) setTimeout(() => reassert(`bounded-${delay}`), delay);
     window.dispatchEvent(new CustomEvent('svr:phase374-original-table-ready', { detail: qa() }));
     return object;
   })().catch((error) => {
@@ -256,7 +307,15 @@ function qa() {
     authorityIsOriginal: window.SVR_TABLE_AUTHORITY === table,
     visibleMeshes: table ? forceOriginalMaterials(table) : 0,
     boundsValid: valid(value),
-    pass: Boolean(state.installed && window.SVR_TABLE_AUTHORITY === table && state.visibleMeshes > 0 && !state.lastError),
+    pass: Boolean(
+      state.installed
+      && state.authorityTrapInstalled
+      && window.SVR_TABLE_AUTHORITY === table
+      && table?.parent
+      && state.visibleMeshes > 0
+      && valid(value)
+      && !state.lastError
+    ),
     checkedAt: new Date().toISOString()
   };
   window.SVR_PHASE374_TABLE_STATE = result;
