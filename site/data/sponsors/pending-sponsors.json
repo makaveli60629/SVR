@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "svr-sponsor-list-v1",
+  "updated": "2026-06-14T00:45:00Z",
+  "items": [
+    {
+      "sponsorId": "example-reiki-sponsor",
+      "sponsorName": "Example Reiki Sponsor",
+      "hub": "wellness",
+      "category": "wellness",
+      "approvalStatus": "pending",
+      "approved": false,
+      "website": "https://example.com",
+      "storeUrl": "https://example.com/store",
+      "contactPerson": "Demo Sponsor Contact",
+      "contactEmail": "sponsor@example.com",
+      "schedule": {
+        "timezone": "America/Chicago",
+        "startDate": "2026-07-01",
+        "endDate": "2026-08-01",
+        "days": ["Friday", "Saturday", "Sunday"],
+        "hours": ["18:00", "22:00"]
+      },
+      "description": "Demo pending sponsor. Admin can approve, deny, pause, expire, preview, or export JSON from the static dashboard."
+    },
+    {
+      "sponsorId": "pga-training-demo",
+      "sponsorName": "PGA Training Demo",
+      "hub": "pga",
+      "category": "golf",
+      "approvalStatus": "pending",
+      "approved": false,
+      "website": "https://example.com/pga",
+      "storeUrl": "https://example.com/pga/store",
+      "contactPerson": "Golf Contact",
+      "contactEmail": "golf@example.com",
+      "schedule": {
+        "timezone": "America/Chicago",
+        "startDate": "2026-07-15",
+        "endDate": "2026-09-15",
+        "days": ["Saturday", "Sunday"],
+        "hours": ["10:00", "16:00"]
+      },
+      "description": "Demo PGA hub sponsor awaiting approval."
+    }
+  ]
+}

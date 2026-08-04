@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SVR Update 2.0 — Site Stability Lock</title>
+  <meta name="description" content="SVR Poker Update 2.0 site status and stability lock.">
+  <style>
+    :root{color-scheme:dark;--bg:#050008;--panel:rgba(20,6,38,.72);--line:rgba(180,140,255,.35);--mint:#8cffdc;--text:#f4ecff;--muted:#d8c1ff}
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at top,#241044 0,#050008 46%,#020104 100%);color:var(--text);font-family:system-ui,Segoe UI,Arial,sans-serif;min-height:100vh}
+    main{max-width:980px;margin:auto;padding:42px 18px}
+    .card{border:1px solid var(--line);background:var(--panel);border-radius:22px;padding:22px;margin:16px 0;box-shadow:0 18px 60px rgba(0,0,0,.35)}
+    h1{font-size:clamp(34px,7vw,72px);line-height:.95;margin:0 0 14px;color:#fff;text-shadow:0 0 26px rgba(180,140,255,.65)}
+    h2{color:var(--muted);margin:0 0 10px}
+    .pill{display:inline-block;border:1px solid rgba(140,255,220,.4);border-radius:999px;padding:7px 12px;margin:5px 5px 5px 0;background:rgba(0,0,0,.35);color:#dff;font-weight:700;font-size:13px}
+    a{color:var(--mint);font-weight:700}
+    ul{line-height:1.7;margin:8px 0 0 20px;padding:0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+    code{background:rgba(0,0,0,.35);padding:2px 6px;border-radius:8px;color:#eafff7}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>SVR Update 2.0</h1>
+    <p class="pill">Site Stability Lock</p>
+    <p class="pill">Public Matrix Page Untouched</p>
+    <p class="pill">No Secrets Exposed</p>
+    <p class="pill">Game Link Ready</p>
+
+    <section class="card">
+      <h2>Purpose</h2>
+      <p>This page records the Update 2.0 site milestone while keeping the public launch page protected. It gives testers and admins a simple status location without changing the Matrix landing page.</p>
+    </section>
+
+    <section class="grid">
+      <section class="card">
+        <h2>Site lock</h2>
+        <ul>
+          <li>Root Matrix launch page remains protected.</li>
+          <li>Interior site receives this Update 2.0 status page.</li>
+          <li>Store, sponsorship, membership, impact, and contact pages remain separate.</li>
+          <li>No SQL, Stripe, admin, or API secrets are committed.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>Game status</h2>
+        <ul>
+          <li>Game Update 2.0 remains a separate direct-game patch.</li>
+          <li>The game should be tested at the cache-busted game URL.</li>
+          <li>Teleport, lobby view, and Quest controls remain the main QA focus.</li>
+        </ul>
+      </section>
+    </section>
+
+    <section class="card">
+      <h2>Next target</h2>
+      <p><code>PHASE-283-QUEST-WATCH-SEATED-TABLE-POLISH</code></p>
+      <p>Focus: watch orientation, seated table alignment, and final card/chip readability.</p>
+      <p><a href="./index.html">Return to site hub</a> · <a href="../game/index.html?v=svr-update-2-game-site-stability">Open game</a></p>
+    </section>
+  </main>
+</body>
+</html>

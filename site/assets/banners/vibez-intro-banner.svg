@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 520" role="img" aria-labelledby="title desc">
+  <title id="title">((( VIBEZ ))) early access banner</title>
+  <desc id="desc">Dark cinematic neon banner for the VIBEZ short-form video freedom of speech app campaign.</desc>
+  <defs>
+    <radialGradient id="core" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#ff3b21" stop-opacity="0.95"/>
+      <stop offset="28%" stop-color="#8b1bff" stop-opacity="0.42"/>
+      <stop offset="62%" stop-color="#120015" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#020108"/>
+    </radialGradient>
+    <linearGradient id="hot" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff9a3d"/>
+      <stop offset="42%" stop-color="#ff2418"/>
+      <stop offset="72%" stop-color="#b300ff"/>
+      <stop offset="100%" stop-color="#ff5ad6"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.9 0 0.35 0 0 0.05 0 0 1 0 0.45 0 0 0 1 0" result="color"/>
+      <feMerge><feMergeNode in="color"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="scan" width="12" height="12" patternUnits="userSpaceOnUse">
+      <rect width="12" height="12" fill="transparent"/>
+      <path d="M0 11H12" stroke="#ffffff" stroke-opacity="0.055" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="520" fill="#020108"/>
+  <rect width="1600" height="520" fill="url(#core)"/>
+  <rect width="1600" height="520" fill="url(#scan)"/>
+  <g opacity="0.58">
+    <path d="M80 80C260 10 390 30 520 120C660 218 813 220 960 122C1092 34 1293 22 1508 94" fill="none" stroke="#ff3b21" stroke-opacity="0.45" stroke-width="4"/>
+    <path d="M92 420C260 506 438 502 566 404C710 294 878 294 1028 406C1162 506 1358 496 1502 410" fill="none" stroke="#b300ff" stroke-opacity="0.42" stroke-width="4"/>
+  </g>
+  <g filter="url(#glow)" text-anchor="middle">
+    <text x="800" y="224" font-family="Orbitron, Audiowide, Rajdhani, Arial, sans-serif" font-size="96" font-weight="900" letter-spacing="10" fill="url(#hot)">((( VIBEZ )))</text>
+    <text x="800" y="292" font-family="Rajdhani, Arial, sans-serif" font-size="34" font-weight="800" letter-spacing="8" fill="#ffffff">CREATE • POST • REACT • BE SEEN</text>
+    <text x="800" y="350" font-family="Rajdhani, Arial, sans-serif" font-size="27" font-weight="700" letter-spacing="3" fill="#ffe3c2">SHORT-FORM VIDEO • FREE EXPRESSION • EARLY ACCESS</text>
+  </g>
+  <g opacity="0.82" fill="none" stroke-linecap="round">
+    <path d="M214 160C166 202 166 318 214 360" stroke="#ff4a20" stroke-width="8"/>
+    <path d="M158 122C82 188 82 332 158 398" stroke="#ff4a20" stroke-opacity="0.55" stroke-width="5"/>
+    <path d="M1386 160C1434 202 1434 318 1386 360" stroke="#ff4a20" stroke-width="8"/>
+    <path d="M1442 122C1518 188 1518 332 1442 398" stroke="#ff4a20" stroke-opacity="0.55" stroke-width="5"/>
+  </g>
+  <rect x="54" y="38" width="1492" height="444" rx="36" fill="none" stroke="#ff5a2d" stroke-opacity="0.28" stroke-width="2"/>
+</svg>

@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "build": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+  "questFinalizer": "PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK",
+  "androidBuild": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
+  "commit": "6647975a130c76d6d750a2cb475094b23ddbbc88",
+  "deployedAt": "2026-08-04T18:22:22Z",
+  "sourceBranch": "main",
+  "publishBranch": "gh-pages",
+  "databaseProvider": "aws",
+  "identityProvider": "cognito",
+  "profileDatabase": "dynamodb",
+  "androidRoute": "/game/android.html?channel=stable&v=phase372",
+  "questRoute": "/game/index.html?platform=quest&v=phase373",
+  "customDomain": "svrpoker.com"
+}

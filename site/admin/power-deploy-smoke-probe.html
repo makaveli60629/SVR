@@ -1,0 +1,7 @@
+<!doctype html><html><head><meta charset="utf-8"><title>SVR Power Deploy Smoke Probe</title>
+<style>body{background:#050508;color:#f0fbff;font-family:system-ui;padding:24px}pre{background:#0008;padding:12px;border-radius:10px}</style></head>
+<body><h1>SVR Power Deploy Smoke Probe</h1><p>PHASE-234-POWER-DEPLOY-SMOKE-PROBE-LOCK</p>
+<p>Checks live URLs after deployment: main.js, version.json, deploy-health, optional loader, bridge aliases.</p>
+<pre>cd C:\Users\ronal\SVR
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\SVR-AUTO-APPLY-AND-DEPLOY.ps1" -WaitForDeploy -SmokeProbe</pre>
+<p>After deploy, test /game/?v=phase234-smokeprobe and press F12.</p></body></html>

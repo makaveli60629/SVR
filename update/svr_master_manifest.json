@@ -1,0 +1,86 @@
+﻿{
+    "build":  "PHASE-279-POKER-SPAWN-VIEW-FINAL-CLEANUP",
+    "cacheTag":  "phase279-poker-spawn-view-final-cleanup",
+    "requiredModules":  [
+                            "game/main.js",
+                            "game/modules/teleport.js",
+                            "game/modules/hands.js",
+                            "game/modules/phase279_poker_spawn_view_final_cleanup.js"
+                        ],
+    "phase":  279,
+    "rule":  "Original lobby only. No duplicate lobby. Hand history/showdown HUD higher. Community cards bigger and higher. Spawn view clear. Floor stable.",
+    "updatedAt":  "2026-05-27T04:58:43Z",
+    "phase252_original_lobby_storehub_embed":  {
+                                                   "phase":  252,
+                                                   "lock":  "PHASE-252-ORIGINAL-LOBBY-STORE-HUB-EMBED-LOCK",
+                                                   "date":  "2026-05-28",
+                                                   "request":  "Restore original lobby and embed original store hub/private VR room modules into it. Do not replace the lobby with a placeholder.",
+                                                   "rules":  [
+                                                                 "Original lobby is source of truth",
+                                                                 "Store hub must be embedded into original lobby",
+                                                                 "Private VR room portals must remain",
+                                                                 "Quest right-controller movement follows camera forward",
+                                                                 "Fist locomotion enabled",
+                                                                 "Trigger-release teleport leap enabled",
+                                                                 "No Unity path",
+                                                                 "Live site and GitHub route only"
+                                                             ],
+                                                   "files":  [
+                                                                 "game/index.html",
+                                                                 "game/modules/svr_quest_locomotion_teleport.js",
+                                                                 "game/modules/svr_original_lobby_store_hub_embed.js"
+                                                             ]
+                                               },
+    "phase253_full_boot_fix_no_patch":  {
+                                            "phase":  253,
+                                            "lock":  "PHASE-253-FULL-BOOT-FIX-NO-PATCH",
+                                            "date":  "2026-05-28",
+                                            "rule":  "No patch overlay. Replace broken boot with full working WebXR lobby runtime.",
+                                            "fixed":  [
+                                                          "Booting screen lock",
+                                                          "Original lobby floor and walls visible",
+                                                          "Store hub visible",
+                                                          "Private VR room nav visible",
+                                                          "Moon and Mars visible",
+                                                          "Quest grip fist locomotion",
+                                                          "Trigger-release teleport leap",
+                                                          "Camera-forward movement"
+                                                      ],
+                                            "files":  [
+                                                          "game/index.html",
+                                                          "game/modules/svr_full_lobby_runtime.js"
+                                                      ]
+                                        },
+    "phase254_true_original_lobby_restore":  {
+                                                 "phase":  254,
+                                                 "lock":  "PHASE-254-TRUE-ORIGINAL-LOBBY-RESTORE",
+                                                 "date":  "2026-05-28",
+                                                 "source_backup":  "FullName",
+                                                 "rule":  "True original lobby is source of truth. Do not replace with generated placeholder lobby.",
+                                                 "restored":  [
+                                                                  "game/index.html from backup",
+                                                                  "matching original JS runtime files if found",
+                                                                  "phase254 manifest lock"
+                                                              ],
+                                                 "next":  [
+                                                              "embed store hub only after original lobby boots",
+                                                              "repair locomotion only against original runtime object names",
+                                                              "do not rebuild lobby geometry"
+                                                          ]
+                                             },
+    "phase255_auto_true_original_lobby_restore":  {
+                                                      "phase":  255,
+                                                      "lock":  "PHASE-255-AUTO-TRUE-ORIGINAL-LOBBY-RESTORE",
+                                                      "date":  "2026-05-28",
+                                                      "restored_from":  "C:\\Users\\ronal\\SVR\\_backups\\phase85_20260526_200815\\game_before_phase85\\index.html",
+                                                      "rule":  "Auto-find and restore true original lobby. Remove generated replacement lobby.",
+                                                      "next":  "After this boots, embed store hub and locomotion into actual runtime only."
+                                                  },
+    "phase256_remove_generated_lobby_restore":  {
+                                                    "phase":  256,
+                                                    "lock":  "PHASE-256-REMOVE-GENERATED-LOBBY-RESTORE",
+                                                    "date":  "2026-05-28",
+                                                    "restored_from":  "C:\\Users\\ronal\\SVR\\_backup_phase250_app_hub_stabilization_20260526-162943\\index.html",
+                                                    "rule":  "Remove Phase 253 generated lobby. Restore older original backup lobby only."
+                                                }
+}

@@ -1,0 +1,28 @@
+.profile-showroom{position:relative;min-height:560px;border:1px solid rgba(127,252,255,.28);border-radius:28px;overflow:hidden;background:#02040b;box-shadow:0 28px 90px rgba(0,0,0,.52),0 0 45px rgba(127,252,255,.08)}
+.profile-showroom canvas{display:block;width:100%;height:560px;touch-action:none;background:#02040b}
+.showroom-overlay{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:18px}
+.showroom-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.showroom-identity{max-width:min(620px,75%);padding:14px 16px;border:1px solid rgba(127,252,255,.38);border-radius:18px;background:rgba(1,4,12,.72);backdrop-filter:blur(12px);box-shadow:0 14px 45px rgba(0,0,0,.34)}
+.showroom-identity .tag{margin-bottom:7px}
+.showroom-identity h1{margin:0;font:900 clamp(23px,4vw,42px) Orbitron;color:#fff;text-shadow:0 0 24px rgba(127,252,255,.35)}
+.showroom-identity p{margin:7px 0 0;color:#dceeff;font-weight:800}
+.showroom-mode{padding:9px 12px;border:1px solid rgba(127,252,255,.54);border-radius:999px;background:rgba(0,0,0,.68);font:900 11px Orbitron;color:#7ffcff;white-space:nowrap}
+.showroom-mode.demo{border-color:#ffd98a;color:#ffd98a}
+.showroom-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:14px}
+.showroom-status-card{max-width:560px;padding:11px 13px;border:1px solid rgba(255,255,255,.16);border-radius:15px;background:rgba(0,0,0,.68);backdrop-filter:blur(10px);color:#dffeff;font-weight:800}
+.showroom-status-card strong{color:#ffd98a}
+.showroom-controls{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;pointer-events:auto}
+.showroom-controls .btn{min-height:42px}
+#showroomRetry[hidden]{display:none!important}
+.showroom-hint{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);padding:7px 11px;border-radius:999px;background:rgba(0,0,0,.54);color:#dffeff;font:800 11px Rajdhani;letter-spacing:.05em;opacity:.9;pointer-events:none}
+.profile-summary{display:grid;grid-template-columns:1.3fr .7fr;gap:18px;align-items:stretch}
+.profile-card{padding:22px;border:1px solid rgba(105,232,255,.18);border-radius:22px;background:rgba(5,7,18,.78)}
+.profile-card h2{margin-top:0}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.stat{padding:17px;border:1px solid rgba(105,232,255,.18);border-radius:18px;background:rgba(105,232,255,.055)}
+.stat span{display:block;color:#d9cdec;font-weight:800}.stat strong{display:block;margin-top:5px;font:900 20px Orbitron;color:#fff;overflow:hidden;text-overflow:ellipsis}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.account-form{display:grid;gap:11px}.account-form label{display:grid;gap:6px;color:#d9cdec;font-weight:800}.account-form input{width:100%;box-sizing:border-box;border:1px solid rgba(105,232,255,.3);border-radius:13px;background:rgba(0,0,0,.38);color:#fff;padding:12px;font:700 16px Rajdhani}.reward-meter{height:12px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.reward-meter span{display:block;height:100%;background:linear-gradient(90deg,#69e8ff,#ffd98a);width:0}.status{min-height:20px;color:#ffd98a;font-weight:800}.status.ok{color:#8dffb4}.status.error{color:#ff91b4}
+.profile-showroom:fullscreen{border-radius:0;min-height:100vh}.profile-showroom:fullscreen canvas{height:100vh}.profile-showroom:fullscreen .showroom-overlay{padding:24px}
+@media(max-width:980px){.stats{grid-template-columns:repeat(3,1fr)}.profile-summary{grid-template-columns:1fr}}
+@media(max-width:800px){.profile-showroom{min-height:500px}.profile-showroom canvas{height:500px}.showroom-overlay{padding:13px}.showroom-top,.showroom-bottom{gap:9px}.showroom-identity{max-width:100%}.showroom-mode{position:absolute;right:13px;top:13px}.showroom-bottom{flex-direction:column;align-items:stretch}.showroom-controls{justify-content:flex-start}.showroom-hint{bottom:116px}.stats{grid-template-columns:1fr 1fr}.profile-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.profile-showroom{min-height:510px;border-radius:20px}.profile-showroom canvas{height:510px}.showroom-identity{padding:12px;max-width:calc(100% - 72px)}.showroom-identity p{font-size:13px}.showroom-controls{display:grid;grid-template-columns:1fr 1fr;width:100%}.showroom-controls .btn{text-align:center;padding:9px}.showroom-status-card{font-size:12px}.showroom-hint{display:none}.stats{grid-template-columns:1fr}}

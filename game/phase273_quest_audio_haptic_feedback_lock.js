@@ -1,0 +1,7 @@
+const BUILD="PHASE-273-QUEST-AUDIO-HAPTIC-FEEDBACK-LOCK";
+let ctx=null,last=0;
+function beep(){try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.frequency.value=660;g.gain.value=.025;o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.055)}catch{}}
+function pulse(){try{navigator.vibrate?.(28)}catch{} }
+function feedback(source="select"){const now=performance.now();if(now-last<180)return false;last=now;beep();pulse();window.SVR_AUDIO_HAPTIC_STATE={build:BUILD,active:true,lastSource:source,vibrateAvailable:!!navigator.vibrate,audioAvailable:!!(window.AudioContext||window.webkitAudioContext),at:new Date().toISOString()};return true}
+function install(){const old=window.SVR_TABLE_SELECT_INPUT;window.SVR_SAFE_INTERACTION_FEEDBACK=feedback;window.SVR_TABLE_SELECT_INPUT=(source)=>{const ok=old?old(source):false;if(ok)feedback(source||"select");return ok};window.addEventListener("svr:pot-awarded",()=>feedback("award"));window.SVR_PHASE273_AUDIO_HAPTIC={build:BUILD,active:true,siteTouched:false,helper:"SVR_SAFE_INTERACTION_FEEDBACK",checkedAt:new Date().toISOString()};window.SVR_LOCKED_FINAL_BUILD=BUILD;const l=document.getElementById("svr-phase-label");if(l)l.textContent="PHASE 273 ACTIVE • AUDIO HAPTIC LOCK";const s=document.getElementById("status");if(s)s.textContent="Phase 273 audio haptic feedback ready"}
+setTimeout(install,1000);

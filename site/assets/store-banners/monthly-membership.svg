@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">SVR Monthly Membership Preview Banner</title>
+  <desc id="desc">Purple neon SVR Poker membership package banner with cards, chips, and logo text.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#16062d"/>
+      <stop offset="0.45" stop-color="#2b0f55"/>
+      <stop offset="1" stop-color="#05020e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="72%" cy="32%" r="55%">
+      <stop offset="0" stop-color="#6fe8ff" stop-opacity="0.9"/>
+      <stop offset="0.38" stop-color="#9b5cff" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+  <rect width="1200" height="520" rx="42" fill="url(#bg)"/>
+  <rect width="1200" height="520" rx="42" fill="url(#glow)" opacity="0.5"/>
+  <circle cx="990" cy="90" r="175" fill="#ff4fd8" opacity="0.17" filter="url(#blur)"/>
+  <circle cx="180" cy="420" r="150" fill="#6fe8ff" opacity="0.16" filter="url(#blur)"/>
+  <g opacity="0.2" fill="none" stroke="#6fe8ff" stroke-width="2">
+    <path d="M35 90H1165M35 170H1165M35 250H1165M35 330H1165M35 410H1165"/>
+    <path d="M120 35V485M260 35V485M400 35V485M540 35V485M680 35V485M820 35V485M960 35V485M1100 35V485"/>
+  </g>
+  <g transform="translate(770 112) rotate(-8)">
+    <rect x="0" y="0" width="150" height="210" rx="18" fill="#f8fbff"/>
+    <text x="24" y="56" font-family="Arial Black, Orbitron, sans-serif" font-size="46" fill="#1d0b3f">A</text>
+    <text x="30" y="118" font-family="Arial Black, Orbitron, sans-serif" font-size="58" fill="#1d0b3f">♠</text>
+    <text x="108" y="184" font-family="Arial Black, Orbitron, sans-serif" font-size="42" fill="#1d0b3f" transform="rotate(180 108 184)">A</text>
+  </g>
+  <g transform="translate(910 112) rotate(7)">
+    <rect x="0" y="0" width="150" height="210" rx="18" fill="#fff7fb"/>
+    <text x="24" y="56" font-family="Arial Black, Orbitron, sans-serif" font-size="46" fill="#e3236b">K</text>
+    <text x="29" y="118" font-family="Arial Black, Orbitron, sans-serif" font-size="58" fill="#e3236b">♥</text>
+    <text x="108" y="184" font-family="Arial Black, Orbitron, sans-serif" font-size="42" fill="#e3236b" transform="rotate(180 108 184)">K</text>
+  </g>
+  <g transform="translate(790 340)">
+    <ellipse cx="80" cy="58" rx="78" ry="28" fill="#101225" stroke="#6fe8ff" stroke-width="8"/>
+    <ellipse cx="80" cy="44" rx="78" ry="28" fill="#21104a" stroke="#6fe8ff" stroke-width="8"/>
+    <text x="80" y="58" text-anchor="middle" font-family="Arial Black, Orbitron, sans-serif" font-size="32" fill="#ffffff">500</text>
+  </g>
+  <g transform="translate(930 330)">
+    <ellipse cx="80" cy="58" rx="78" ry="28" fill="#2e071c" stroke="#ff4fd8" stroke-width="8"/>
+    <ellipse cx="80" cy="44" rx="78" ry="28" fill="#5b123b" stroke="#ff4fd8" stroke-width="8"/>
+    <text x="80" y="58" text-anchor="middle" font-family="Arial Black, Orbitron, sans-serif" font-size="32" fill="#ffffff">VIP</text>
+  </g>
+  <text x="74" y="96" font-family="Orbitron, Arial Black, sans-serif" font-size="34" letter-spacing="8" fill="#6fe8ff">SVR POKER</text>
+  <text x="74" y="178" font-family="Arial Black, Orbitron, sans-serif" font-size="74" fill="#ffffff">MONTHLY</text>
+  <text x="74" y="250" font-family="Arial Black, Orbitron, sans-serif" font-size="70" fill="#ff4fd8">MEMBERSHIP</text>
+  <text x="78" y="316" font-family="Rajdhani, Arial, sans-serif" font-size="34" fill="#d8ccff">Preview package for VIP access, cosmetic perks, and future member routes.</text>
+  <rect x="74" y="356" width="300" height="58" rx="29" fill="none" stroke="#6fe8ff" stroke-width="3"/>
+  <text x="224" y="395" text-anchor="middle" font-family="Orbitron, Arial, sans-serif" font-size="22" fill="#b9fbff">SANDBOX ONLY</text>
+</svg>

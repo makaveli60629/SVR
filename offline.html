@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SVR Poker | Offline</title>
+  <meta name="theme-color" content="#9b4dff" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/logo.png" type="image/png" />
+  <style>
+    :root{color-scheme:dark;--cyan:#7ffcff;--pink:#ff5be9;--purple:#9b4dff;--gold:#ffd98a}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 15% 12%,rgba(155,77,255,.26),transparent 34%),radial-gradient(circle at 86% 18%,rgba(127,252,255,.16),transparent 30%),#030008;color:#fff;font-family:Rajdhani,system-ui,Arial,sans-serif;padding:24px;text-align:center}
+    main{width:min(680px,100%);border:1px solid rgba(127,252,255,.28);border-radius:30px;background:rgba(5,5,16,.84);box-shadow:0 35px 100px rgba(0,0,0,.75);padding:32px}
+    img{width:min(220px,58vw);filter:drop-shadow(0 0 26px rgba(127,252,255,.22))}
+    h1{font-family:Orbitron,system-ui,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;margin:18px 0 10px;background:linear-gradient(180deg,#fff,var(--cyan),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+    p{color:#d9cdec;line-height:1.55;font-size:1.1rem}
+    .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+    a{display:inline-flex;align-items:center;justify-content:center;min-width:160px;border:1px solid rgba(127,252,255,.32);border-radius:999px;padding:12px 18px;color:#fff;text-decoration:none;font-weight:900;background:rgba(255,255,255,.06)}
+    a.primary{background:linear-gradient(135deg,rgba(255,91,233,.92),rgba(105,72,255,.92))}
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/logo.png" alt="SVR Poker logo" />
+    <h1>SVR App Offline</h1>
+    <p>The SVR Poker app shell is installed, but the live server is not reachable right now. Reconnect to continue into the VR room, store, support, and public site.</p>
+    <div class="actions">
+      <a class="primary" href="/">Try Home</a>
+      <a href="/game/index.html">Try Game</a>
+      <a href="/site/store.html">Open Store</a>
+    </div>
+  </main>
+</body>
+</html>
