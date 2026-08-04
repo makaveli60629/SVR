@@ -72,7 +72,7 @@ jobs:
 
       - name: Confirm dedicated Android full-game gate remains present
         run: |
-          test -f .github/workflows/phase354-android-full-game.yml
+          test -f .github/workflows/phase354-android-full-game-acceptance.yml
           test -f game/tools/phase354-android-browser-acceptance.cjs
 
       - name: Upload HTTP log on failure
