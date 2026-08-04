@@ -1,59 +1,192 @@
 (() => {
-  const BUILD = 'PHASE-144-PWA-INSTALL-DIAGNOSTIC-MANAGER';
+  const BUILD = 'PHASE-374-PHYSICAL-APP-LAUNCHER-LOCK';
   if (window.SVR_APP_DOWNLOAD_MANAGER_LOADED) return;
   window.SVR_APP_DOWNLOAD_MANAGER_LOADED = true;
 
-  const ROUTES = {downloads:'/downloads/',siteApp:'/site/app.html?install=1',siteHome:'/site/index.html?source=app-download',game:'/game/index.html?source=app-download',store:'/site/store.html?source=app-download',support:'/site/contact.html?source=app-download'};
-  const APK_CANDIDATES = ['/downloads/svr-poker.apk','/android/svr-poker.apk','/update/svr-poker.apk'];
-  let deferredPrompt = null, installReady = false, discoveredApk = null, swReady = false;
+  const ROUTES = {
+    launcher: '/index.html?v=phase374&source=app',
+    android: '/game/android.html?channel=stable&v=phase374&source=app',
+    quest: '/game/index.html?platform=quest&v=phase374&source=app',
+    preview: '/game/camera3.html?preview=1&cam=director&autocam=1&embed=1&v=phase374',
+    site: '/site/index.html?v=phase374&source=app',
+    downloads: '/downloads/'
+  };
+  const APK_CANDIDATES = ['/downloads/svr-poker.apk', '/android/svr-poker.apk', '/update/svr-poker.apk'];
+  let deferredPrompt = null;
+  let discoveredApk = null;
+  let serviceWorkerReady = false;
 
-  function appRoot(path='/'){return new URL(path,window.location.origin).toString();}
-  function platformName(){const ua=navigator.userAgent||'';if(/iPhone|iPad|iPod/i.test(ua))return'ios';if(/Android/i.test(ua))return'android';if(/Quest|Oculus/i.test(ua))return'quest';return'desktop';}
-  function isStandalone(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}
-  function installState(){if(isStandalone())return'installed';if(installReady)return'install-ready';if(swReady)return'manual-install-ready';return'checking';}
-  function setStatus(message){const el=document.getElementById('svrAppInstallStatus')||document.querySelector('[data-svr-download-status]');if(el)el.textContent=message;window.SVR_APP_DOWNLOAD_STATUS={build:BUILD,message,state:installState(),installReady,standalone:isStandalone(),serviceWorkerReady:swReady,platform:platformName(),apkPath:discoveredApk,checkedAt:new Date().toISOString()};}
+  const platform = () => {
+    const ua = navigator.userAgent || '';
+    if (/Quest|Oculus|Meta Quest/i.test(ua)) return 'quest';
+    if (/Android/i.test(ua)) return 'android';
+    if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+    return 'desktop';
+  };
+  const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 
-  function ensureHeadLinks(){
-    if(!document.querySelector('link[rel="manifest"]')){const manifest=document.createElement('link');manifest.rel='manifest';manifest.href=appRoot('/manifest.webmanifest?v=phase144-install');document.head.appendChild(manifest);}
-    if(!document.querySelector('meta[name="theme-color"]')){const theme=document.createElement('meta');theme.name='theme-color';theme.content='#9b4dff';document.head.appendChild(theme);}
-    if(!document.querySelector('meta[name="apple-mobile-web-app-capable"]')){const apple=document.createElement('meta');apple.name='apple-mobile-web-app-capable';apple.content='yes';document.head.appendChild(apple);}
-    if(!document.querySelector('meta[name="apple-mobile-web-app-title"]')){const title=document.createElement('meta');title.name='apple-mobile-web-app-title';title.content='SVR Poker';document.head.appendChild(title);}
-    if(!document.querySelector('link[rel="apple-touch-icon"]')){const icon=document.createElement('link');icon.rel='apple-touch-icon';icon.href=appRoot('/logo.png');document.head.appendChild(icon);}
-  }
-
-  async function registerServiceWorker(){
-    if(!('serviceWorker' in navigator)){swReady=false;return{ok:false,reason:'service-worker-unavailable'};}
-    if(!/^https:$/i.test(location.protocol)&&location.hostname!=='localhost'){swReady=false;return{ok:false,reason:'https-required'};}
-    for(const path of ['/pwa-sw.js','/sw.js']){
-      try{const registration=await navigator.serviceWorker.register(appRoot(path),{scope:'/'});swReady=true;window.SVR_PWA_SERVICE_WORKER={ok:true,script:path,scope:registration.scope,build:BUILD,checkedAt:new Date().toISOString()};return{ok:true,registration,path};}
-      catch(error){window.SVR_PWA_SERVICE_WORKER={ok:false,script:path,error:String(error&&error.message||error),build:BUILD,checkedAt:new Date().toISOString()};}
+  function ensureHead() {
+    if (!document.querySelector('link[rel="manifest"]')) {
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = '/manifest.webmanifest?v=phase374';
+      document.head.appendChild(link);
     }
-    swReady=false;return{ok:false,reason:'registration-failed'};
+    if (!document.querySelector('meta[name="theme-color"]')) {
+      const meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      meta.content = '#9b4dff';
+      document.head.appendChild(meta);
+    }
   }
 
-  function ensureInstallStyles(){
-    if(document.getElementById('svr-app-download-style'))return;
-    const style=document.createElement('style');style.id='svr-app-download-style';style.textContent=`[data-svr-install-app],[data-svr-app-install],[data-svr-download-app]{cursor:pointer}.svr-install-modal{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.78);backdrop-filter:blur(12px);font-family:Rajdhani,system-ui,Arial;color:#fff}.svr-install-card{width:min(650px,calc(100vw - 28px));border:1px solid rgba(141,255,180,.52);border-radius:26px;background:radial-gradient(circle at 18% 0%,rgba(141,255,180,.16),transparent 34%),rgba(4,5,16,.98);box-shadow:0 30px 110px rgba(0,0,0,.88),0 0 38px rgba(141,255,180,.14);padding:22px;text-align:left}.svr-install-card h2{margin:0 0 8px;font-family:Orbitron,system-ui,Arial;letter-spacing:.06em;color:#8dffb4;text-transform:uppercase;font-size:1.16rem}.svr-install-card p{margin:8px 0;color:#e7dcff;line-height:1.45}.svr-install-card ol{margin:12px 0 0;padding-left:20px;color:#fff}.svr-install-card li{margin:6px 0}.svr-install-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.svr-install-actions button,.svr-install-actions a{display:inline-flex;align-items:center;justify-content:center;min-width:140px;padding:11px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;text-decoration:none;font-weight:900;cursor:pointer}.svr-install-actions .primary{background:linear-gradient(135deg,#8dffb4,#7ffcff);color:#03040b}.svr-download-row{display:grid;gap:8px;margin-top:12px}.svr-download-pill{border:1px solid rgba(141,255,180,.24);border-radius:14px;background:rgba(141,255,180,.07);padding:9px 10px;color:#dfffe9;font-weight:800}.svr-download-pill.warn{border-color:rgba(255,217,138,.40);background:rgba(255,217,138,.08);color:#fff4cf}`;document.head.appendChild(style);
+  async function registerWorker() {
+    if (!('serviceWorker' in navigator) || (location.protocol !== 'https:' && location.hostname !== 'localhost')) return false;
+    try {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const registration of registrations) {
+        const script = registration.active?.scriptURL || registration.waiting?.scriptURL || registration.installing?.scriptURL || '';
+        if (script && !/pwa-sw\.js|sw\.js/.test(script)) await registration.unregister();
+      }
+      const registration = await navigator.serviceWorker.register('/pwa-sw.js?v=phase374', { scope: '/', updateViaCache: 'none' });
+      await registration.update().catch(() => undefined);
+      serviceWorkerReady = true;
+      window.SVR_PWA_SERVICE_WORKER = { ok: true, build: BUILD, script: '/pwa-sw.js?v=phase374', scope: registration.scope, checkedAt: new Date().toISOString() };
+      return true;
+    } catch (error) {
+      window.SVR_PWA_SERVICE_WORKER = { ok: false, build: BUILD, error: String(error?.message || error), checkedAt: new Date().toISOString() };
+      return false;
+    }
   }
 
-  function modalCopy(){const p=platformName();if(p==='ios')return{title:'Install SVR Poker on iPhone',body:'Apple requires Safari for Home Screen web app installs.',steps:['Open this page in Safari.','Tap Share.','Choose Add to Home Screen.','Tap Add.']};if(p==='quest')return{title:'SVR Quest / VR Launcher',body:'Use this route as the launcher, then open the VR room in a WebXR browser.',steps:['Tap Launch VR Room.','Use the WebXR browser.','Press Enter VR inside the game.','Use AI Support to report any issue.']};if(p==='android')return{title:'Install SVR Poker on Android Chrome',body:'Chrome may not always show the native prompt immediately. The fallback is Chrome menu installation.',steps:['Tap Install Site App.','If no native prompt opens, tap the Chrome three-dot menu.','Choose Install app or Add to Home screen.','Open SVR Poker from your app drawer or home screen.']};return{title:'Install SVR Poker',body:'Use the browser install prompt or install icon to save SVR Poker as an app.',steps:['Tap Install Site App.','Accept the browser install prompt if shown.','Use Open Downloads for all app launch options.']};}
-
-  function showInstallModal(message=''){
-    ensureInstallStyles();document.querySelector('.svr-install-modal')?.remove();const copy=modalCopy();const state=installState();
-    const stateLine=state==='installed'?'Installed app detected':state==='install-ready'?'Chrome native install prompt is ready':'Manual install route is ready; Chrome menu may be required';
-    const apkLine=discoveredApk?`<a class="primary" href="${discoveredApk}" download>Download Android APK</a>`:'<span class="svr-download-pill warn">Android APK slot: ready, file not published yet</span>';
-    const modal=document.createElement('div');modal.className='svr-install-modal';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.innerHTML=`<section class="svr-install-card"><h2>${copy.title}</h2><p>${message||copy.body}</p><ol>${copy.steps.map(step=>`<li>${step}</li>`).join('')}</ol><div class="svr-download-row"><span class="svr-download-pill">Install status: ${stateLine}</span><span class="svr-download-pill">Service worker: ${swReady?'ready':'checking / unavailable'}</span><span class="svr-download-pill">Site app starts at: /site/</span><span class="svr-download-pill">Game launcher: Android-stable route ready</span>${apkLine}</div><div class="svr-install-actions"><button class="primary" type="button" data-svr-run-install>Install Site App</button><a href="${ROUTES.downloads}">Open Downloads</a><a href="${ROUTES.game}">Launch VR Room</a><button type="button" data-close-install>Close</button></div></section>`;
-    modal.addEventListener('click',event=>{if(event.target===modal||event.target.closest('[data-close-install]'))modal.remove();if(event.target.closest('[data-svr-run-install]'))installApp(event,true);});document.body.appendChild(modal);
+  async function discoverApk() {
+    for (const path of APK_CANDIDATES) {
+      try {
+        const response = await fetch(`${path}?t=${Date.now()}`, { method: 'HEAD', cache: 'no-store' });
+        if (response.ok) { discoveredApk = path; break; }
+      } catch {}
+    }
+    window.SVR_ANDROID_APK_DISCOVERY = { build: BUILD, apkPath: discoveredApk, checkedAt: new Date().toISOString() };
   }
 
-  async function discoverApk(){for(const path of APK_CANDIDATES){try{const response=await fetch(path,{method:'HEAD',cache:'no-store'});if(response.ok){discoveredApk=path;break;}}catch{}}window.SVR_ANDROID_APK_DISCOVERY={build:BUILD,apkPath:discoveredApk,checkedAt:new Date().toISOString()};return discoveredApk;}
-  async function installApp(event,forcePrompt=false){if(event)event.preventDefault();if(isStandalone()){showInstallModal('SVR Poker already appears to be running as an installed app.');setStatus('Installed app detected.');return;}if(deferredPrompt){const promptEvent=deferredPrompt;deferredPrompt=null;promptEvent.prompt();const result=await promptEvent.userChoice.catch(()=>({outcome:'unknown'}));window.SVR_APP_INSTALL_RESULT={outcome:result.outcome,build:BUILD,checkedAt:new Date().toISOString()};refreshButtons();setStatus(result.outcome==='accepted'?'Install started.':'Install was dismissed. Use Chrome menu or Open Downloads.');return;}if(forcePrompt||location.pathname.startsWith('/downloads')||location.pathname.startsWith('/site/app')){showInstallModal();setStatus('Install diagnostic opened. Use Chrome menu if no native prompt appears.');return;}location.href=ROUTES.downloads+'?install=1&source=site';}
-  function refreshButtons(){const installed=isStandalone();document.querySelectorAll('[data-svr-install-app],[data-svr-app-install],[data-svr-download-app]').forEach(btn=>{if(installed)btn.textContent='App Installed';else if(installReady)btn.textContent='Install App';else if(btn.dataset.svrDownloadApp==='apk')btn.textContent='Android APK';else btn.textContent='Download App';btn.title=installed?'SVR Poker is already installed':'Open SVR download and install options';});}
-  function wireButtons(){document.querySelectorAll('[data-svr-install-app],[data-svr-app-install],[data-svr-download-app]').forEach(btn=>{if(btn.dataset.svrInstallWired==='1')return;btn.dataset.svrInstallWired='1';btn.addEventListener('click',installApp);});refreshButtons();}
-  function publicApi(){return{build:BUILD,active:true,modular:true,diagnostic:true,siteReady:true,gameReady:true,standalone:isStandalone(),state:installState(),platform:platformName(),serviceWorkerReady:swReady,apkPath:discoveredApk,open:(source='manual')=>{showInstallModal(`SVR download options opened from ${source}.`);setStatus('Download diagnostic opened.');},install:()=>installApp(null,true),routes:ROUTES,checkedAt:new Date().toISOString()};}
+  function ensureStyle() {
+    if (document.getElementById('svr374-install-style')) return;
+    const style = document.createElement('style');
+    style.id = 'svr374-install-style';
+    style.textContent = `
+      #svr374InstallModal{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.82);backdrop-filter:blur(12px);font-family:system-ui,Arial;color:#fff}
+      #svr374InstallModal[hidden]{display:none!important}.svr374-install-card{width:min(620px,94vw);border:1px solid rgba(86,255,154,.56);border-radius:24px;background:rgba(4,7,16,.98);padding:20px;box-shadow:0 28px 90px rgba(0,0,0,.82)}
+      .svr374-install-card h2{margin:0 0 8px;color:#56ff9a}.svr374-install-card p{color:#dfe8f8;line-height:1.45}.svr374-install-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:14px}.svr374-install-grid a,.svr374-install-grid button{display:flex;align-items:center;justify-content:center;min-height:46px;border:1px solid rgba(127,252,255,.5);border-radius:999px;background:#111827;color:#fff;text-decoration:none;font-weight:900;padding:10px;cursor:pointer}.svr374-install-grid .primary{border:0;background:linear-gradient(135deg,#56ff9a,#7ffcff);color:#02070a}.svr374-install-meta{border:1px solid rgba(255,255,255,.12);border-radius:14px;background:#02040a;padding:10px;color:#c9ffdc;font-size:12px;line-height:1.5}@media(max-width:560px){.svr374-install-grid{grid-template-columns:1fr}}
+    `;
+    document.head.appendChild(style);
+  }
 
-  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredPrompt=event;installReady=true;refreshButtons();setStatus('Chrome install prompt is ready. Press Install App.');});
-  window.addEventListener('appinstalled',()=>{deferredPrompt=null;installReady=false;window.SVR_APP_INSTALLED={ok:true,build:BUILD,installedAt:new Date().toISOString()};refreshButtons();setStatus('SVR Poker app installed.');});
-  async function boot(){ensureHeadLinks();ensureInstallStyles();await registerServiceWorker();await discoverApk();wireButtons();setTimeout(wireButtons,750);setTimeout(wireButtons,1800);setStatus(isStandalone()?'Installed app detected.':swReady?'Install route ready. Chrome may require menu install.':'Install route checking.');if(new URLSearchParams(location.search).has('install'))setTimeout(()=>showInstallModal(),400);window.SVR_APP_DOWNLOAD_MANAGER=publicApi();}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  function modal() {
+    ensureStyle();
+    let root = document.getElementById('svr374InstallModal');
+    if (!root) {
+      root = document.createElement('section');
+      root.id = 'svr374InstallModal';
+      document.body.appendChild(root);
+    }
+    const p = platform();
+    const installCopy = standalone()
+      ? 'Installed app mode is active.'
+      : deferredPrompt
+        ? 'The browser install prompt is ready.'
+        : 'Use the browser menu and choose Install app or Add to Home screen.';
+    root.innerHTML = `
+      <div class="svr374-install-card">
+        <h2>SVR POKER • PHASE 374</h2>
+        <p>${installCopy} The installed app now opens the current Android physical-release route instead of the former site-only launcher.</p>
+        <div class="svr374-install-meta">Platform: ${p}<br>Service worker: ${serviceWorkerReady ? 'Phase 374 ready' : 'checking'}<br>Android route: ${ROUTES.android}<br>Quest route: ${ROUTES.quest}<br>APK: ${discoveredApk || 'existing rc1 wrapper; no forced update'}</div>
+        <div class="svr374-install-grid">
+          <button class="primary" type="button" data-install>${standalone() ? 'APP INSTALLED' : 'INSTALL SITE APP'}</button>
+          <a href="${p === 'quest' ? ROUTES.quest : ROUTES.android}">${p === 'quest' ? 'ENTER QUEST' : 'PLAY ANDROID'}</a>
+          <a href="${ROUTES.launcher}">OPEN RELEASE LAUNCHER</a>
+          ${discoveredApk ? `<a href="${discoveredApk}" download>DOWNLOAD APK</a>` : `<a href="${ROUTES.downloads}">OPEN DOWNLOADS</a>`}
+          <button type="button" data-clear>CLEAR OLD CACHE</button>
+          <button type="button" data-close>CLOSE</button>
+        </div>
+      </div>`;
+    root.hidden = false;
+    root.querySelector('[data-close]').onclick = () => { root.hidden = true; };
+    root.querySelector('[data-install]').onclick = install;
+    root.querySelector('[data-clear]').onclick = clearOldCache;
+    return root;
+  }
+
+  async function install(event) {
+    event?.preventDefault?.();
+    if (standalone()) { modal(); return; }
+    if (deferredPrompt) {
+      const prompt = deferredPrompt;
+      deferredPrompt = null;
+      await prompt.prompt();
+      const result = await prompt.userChoice.catch(() => ({ outcome: 'unknown' }));
+      window.SVR_APP_INSTALL_RESULT = { build: BUILD, outcome: result.outcome, checkedAt: new Date().toISOString() };
+      return;
+    }
+    modal();
+  }
+
+  async function clearOldCache() {
+    try {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+      }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((key) => caches.delete(key)));
+      }
+    } catch {}
+    location.replace(`${ROUTES.launcher}&fresh=${Date.now()}`);
+  }
+
+  function wire() {
+    document.querySelectorAll('[data-svr-install-app],[data-svr-app-install],[data-svr-download-app]').forEach((button) => {
+      if (button.dataset.svr374Wired === '1') return;
+      button.dataset.svr374Wired = '1';
+      button.addEventListener('click', install);
+      button.textContent = standalone() ? 'App Installed' : 'Install App';
+    });
+  }
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    wire();
+  });
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    wire();
+  });
+
+  async function boot() {
+    ensureHead();
+    ensureStyle();
+    await registerWorker();
+    await discoverApk();
+    wire();
+    setTimeout(wire, 900);
+    window.SVR_APP_DOWNLOAD_MANAGER = {
+      build: BUILD,
+      active: true,
+      phase: 374,
+      platform: platform(),
+      standalone: standalone(),
+      serviceWorkerReady,
+      apkPath: discoveredApk,
+      routes: ROUTES,
+      open: modal,
+      install,
+      clearOldCache,
+      checkedAt: new Date().toISOString()
+    };
+    if (new URLSearchParams(location.search).has('install')) setTimeout(modal, 350);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
+  else boot();
 })();
