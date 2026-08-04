@@ -13,11 +13,15 @@ const viewer = read('site/js/phase346-avatar-viewer.js');
 const polish = read('site/js/phase370-account-profile-mobile-polish.js');
 const css = read('site/css/phase370-account-profile-mobile-clean.css');
 const login = read('site/login.html');
+const testPlayerClient = read('site/js/phase374-test-player-avatar.js');
+const testPlayer = JSON.parse(read('site/config/phase374-test-player.json'));
 const account = read('site/js/phase345-player-account-client.js');
 const backend = read('backend/phase345/src/server.js');
 const aws = read('infrastructure/aws/phase372-player-account-foundation.yml');
+const provision = read('.github/workflows/phase374-provision-test-player.yml');
 const config = JSON.parse(read('site/config/player-api.json'));
 const manifest = JSON.parse(read('docs/SVR_PHASE_369_371_MANIFEST.json'));
+const currentRelease = JSON.parse(read('game/phase374-release.json'));
 
 need(matrix, 'PHASE-371-PUBLIC-APP-AI-MATRIX-POLISH-LOCK', 'matrix-build');
 need(matrix, 'slide-android-app', 'android-app-first-slide');
@@ -59,13 +63,23 @@ need(css, '.showroom-status-card,.showroom-hint{display:none!important}', 'profi
 need(login, 'id="loginForm"', 'login-display');
 need(login, 'id="registerForm"', 'registration-display');
 need(login, 'Checking AWS player API', 'aws-login-presentation');
-need(login, 'Default avatar: Eric', 'eric-default-presentation');
+need(login, 'Updated default avatar: Eric', 'eric-default-presentation');
+need(login, 'CREATE / RESET TEST PLAYER', 'phase374-test-player-control');
+need(login, 'phase374-test-player-avatar.js?v=phase374', 'phase374-test-player-loader');
 need(account, "request('/auth/register'", 'secure-register-client');
 need(account, "request('/auth/login'", 'secure-login-client');
 need(backend, "VALUES(@playerId,@displayName,@email,'player'", 'public-register-player-role');
 forbid(login, 'cashappPassword', 'no-cashapp-password-field');
 forbid(login, 'cashAppPin', 'no-cashapp-pin-field');
 forbid(polish, 'name="cash', 'no-cashapp-form-field');
+
+need(testPlayerClient, 'PHASE-374-TEST-PLAYER-AVATAR-LOCK', 'test-player-client-build');
+need(testPlayerClient, "role: 'player'", 'test-player-role-lock');
+need(testPlayerClient, 'cloudAccount: false', 'test-player-cloud-truth');
+need(testPlayerClient, "const ERIC_MODEL = '/game/assets/models/eric/eric.fbx'", 'test-player-eric-model');
+if (testPlayer.role !== 'player' || !testPlayer.testAccount || testPlayer.cloudAccount) errors.push('test-player:role-or-truth');
+if (testPlayer.avatarUrl !== '/game/assets/models/eric/eric.fbx' || testPlayer.avatarName !== 'Eric') errors.push('test-player:eric-avatar');
+if (Number(testPlayer.playMoney) !== 50000) errors.push('test-player:balance');
 
 need(aws, 'AWS::Cognito::UserPool', 'cognito-user-pool');
 need(aws, 'AWS::Cognito::UserPoolClient', 'cognito-web-client');
@@ -74,27 +88,36 @@ need(aws, 'AWS::DynamoDB::Table', 'dynamodb-tables');
 need(aws, 'DeletionProtectionEnabled: true', 'aws-deletion-protection');
 need(aws, 'PointInTimeRecoveryEnabled: true', 'aws-point-in-time-recovery');
 forbid(aws, 'GenerateSecret: true', 'no-public-client-secret');
+need(provision, 'SVR_COGNITO_USER_POOL_ID', 'test-player-cognito-secret');
+need(provision, 'SVR_TEST_ACCOUNT_PASSWORD', 'test-player-password-secret');
+need(provision, 'admin-set-user-password', 'test-player-password-provision');
+forbid(provision, 'Password123', 'no-committed-test-password');
+
 if (exists('backend/phase370/sql/002_phase370_admin_test_role_assignment.sql')) errors.push('obsolete-azure-role-script-present');
 if (config.provider !== 'aws') errors.push('config:provider');
 if (config.identity !== 'cognito') errors.push('config:identity');
 if (config.database !== 'dynamodb') errors.push('config:database');
 if (config.apiBase !== '') errors.push('config:api-endpoint-must-remain-empty-until-approved');
 
-if (manifest.activePhase !== 373) errors.push('manifest:active-phase');
+if (manifest.activePhase !== 373) errors.push('manifest:protected-active-phase');
 if (manifest.phases?.length !== 6) errors.push('manifest:phase-count');
 if (manifest.phases?.find((phase) => phase.phase === 370)?.cashAppCredentialsCollected !== false) errors.push('manifest:cashapp-truth');
 if (manifest.phases?.find((phase) => phase.phase === 373)?.seatedTeleportDisabled !== true) errors.push('manifest:phase373-quest-lock');
 if (manifest.accounts?.provider !== 'aws' || manifest.accounts?.identity !== 'cognito' || manifest.accounts?.database !== 'dynamodb') errors.push('manifest:aws-authority');
 if (manifest.accounts?.azureRetired !== true) errors.push('manifest:azure-retired');
 if (manifest.truth?.physicalAndroidPlaytestRequired !== true || manifest.truth?.physicalQuestPlaytestRequired !== true) errors.push('manifest:device-test-truth');
+if (currentRelease.phase !== 374 || currentRelease.build !== 'PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK') errors.push('current-release:phase374');
 
 const result = {
-  build: 'PHASE-370/371-PROTECTED-BY-PHASE-373-AWS',
+  build: 'PHASE-370/371-PROTECTED-BY-PHASE-374-AWS',
   accountNavigation: 'distinct-login-and-register-desktop-and-mobile',
   accountProvider: config.provider,
   identity: config.identity,
   database: config.database,
-  activePhase: manifest.activePhase,
+  protectedPhase: manifest.activePhase,
+  activePhysicalRelease: currentRelease.phase,
+  testPlayer: testPlayer.displayName,
+  avatar: testPlayer.avatarName,
   errors,
   pass: errors.length === 0
 };
