@@ -72,17 +72,23 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          touch "$HOME/.android/repositories.cfg"
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+          test -x "$ANDROID_HOME/build-tools/35.0.0/apksigner"
+
       - name: Set up Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-
-      - name: Ensure Android SDK 35
-        shell: bash
-        run: |
-          set -euo pipefail
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Build signed SVR Android RC2 test APK
         shell: bash
@@ -90,11 +96,10 @@ jobs:
           set -euo pipefail
           mkdir -p native/android/app/src/main/res/drawable
           cp logo.png native/android/app/src/main/res/drawable/svr_logo.png
-          base64 -d native/android/app/svr-demo-debug.keystore.b64 > native/android/app/svr-demo-debug.keystore
-          gradle -p native/android :app:assembleRelease --no-daemon --stacktrace
-          APK_SOURCE="native/android/app/build/outputs/apk/release/app-release.apk"
+          gradle -p native/android :app:assembleDebug --no-daemon --stacktrace
+          APK_SOURCE="native/android/app/build/outputs/apk/debug/app-debug.apk"
           test -s "$APK_SOURCE"
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK_SOURCE"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK_SOURCE"
           mkdir -p downloads site/downloads
           cp "$APK_SOURCE" downloads/svr-poker-android-rc2.apk
           cp "$APK_SOURCE" site/downloads/svr-poker-android-rc2.apk
@@ -174,7 +179,7 @@ jobs:
             "apkVersionCode": 2,
             "apkSha256": "$APK_SHA",
             "signedApkAttached": true,
-            "signingChannel": "stable-test-key",
+            "signingChannel": "android-debug-test-key",
             "nativeApkRebuild": true,
             "offlineStableTableBundled": true,
             "webRuntimeUpdated": true,
