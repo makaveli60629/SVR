@@ -3,6 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
 export const BUILD = 'PHASE-374-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK';
+export const PROTECTED_ASSIGNMENT_MARKER = 'window.SVR_TABLE_AUTHORITY = table';
 
 const params = new URLSearchParams(location.search);
 const ua = navigator.userAgent || '';
