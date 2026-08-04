@@ -11,29 +11,37 @@ const forbid = (source, token, label = token) => { if (source.includes(token)) e
 const android = read('game/android.html');
 const quest = read('game/index.html');
 const recovery = read('game/modules/phase372_live_entry_recovery_lock.js');
+const physicalRelease = read('game/modules/phase374_physical_release_truth_lock.js');
+const originalTable = read('game/modules/phase374_original_table_authority_lock.js');
 const questRecovery = read('game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js');
 const questFinalizer = read('game/modules/phase373_quest_table_seat_finalizer_lock.js');
 const deploy = read('.github/workflows/deploy.yml');
+const currentRelease = JSON.parse(read('game/phase374-release.json'));
 const accountConfig = JSON.parse(read('site/config/player-api.json'));
 const aws = read('infrastructure/aws/phase372-player-account-foundation.yml');
 
-need(android, 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK', 'android-phase372-build');
-need(android, "import'./modules/phase372_live_entry_recovery_lock.js?v=phase372'", 'android-early-recovery-import');
-need(android, 'phase369_android_join_table_freeze_recovery_lock.js?v=phase372', 'android-phase369-recovery');
-need(android, 'phase368_card_dealer_animation_lock.js?v=phase372', 'android-deferred-dealer');
+need(android, 'PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK', 'android-phase374-build');
+need(android, 'data-android-authority="PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK"', 'android-phase372-authority');
+need(android, "import'./modules/phase372_live_entry_recovery_lock.js?v=phase374'", 'android-early-recovery-import');
+need(android, 'phase369_android_join_table_freeze_recovery_lock.js?v=phase374', 'android-phase369-recovery');
+need(android, 'phase368_card_dealer_animation_lock.js?v=phase374', 'android-deferred-dealer');
 need(android, "document.body.classList.add('boot-released')", 'android-loading-screen-release');
+need(android, "phase374_original_table_authority_lock.js?v=phase374", 'android-original-table');
 
-need(quest, 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK', 'quest-phase373-build');
-need(quest, "import'./modules/phase372_live_entry_recovery_lock.js?v=phase373'", 'quest-visible-entry-recovery');
-need(quest, 'phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase364', 'quest-lobby-authority');
-need(quest, 'phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase373', 'quest-phase373-recovery');
-need(quest, 'phase373_quest_table_seat_finalizer_lock.js?v=phase373', 'quest-finalizer-import');
-need(quest, 'phase368_card_dealer_animation_lock.js?v=phase373', 'quest-deferred-dealer');
-need(quest, "window.SVR_PHASE373_STABLE_LOBBY?.('quest-core-ready')", 'quest-one-stable-spawn');
-need(quest, "window.SVR_PHASE373_FINALIZE_TABLE?.('quest-core-ready-after-lobby')", 'quest-table-finalized-after-lobby');
-const stableLobbyIndex = quest.indexOf("window.SVR_PHASE373_STABLE_LOBBY?.('quest-core-ready')");
-const finalizerIndex = quest.indexOf("window.SVR_PHASE373_FINALIZE_TABLE?.('quest-core-ready-after-lobby')");
-if (!(stableLobbyIndex >= 0 && finalizerIndex > stableLobbyIndex)) errors.push('order:quest-stable-lobby-before-table-finalizer');
+need(quest, 'PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK', 'quest-phase374-build');
+need(quest, 'data-quest-authority="PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK"', 'quest-phase373-authority');
+need(quest, "import'./modules/phase372_live_entry_recovery_lock.js?v=phase374'", 'quest-visible-entry-recovery');
+need(quest, 'phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase374', 'quest-lobby-authority');
+need(quest, 'phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase374', 'quest-phase373-recovery');
+need(quest, 'phase373_quest_table_seat_finalizer_lock.js?v=phase374', 'quest-finalizer-import');
+need(quest, 'phase368_card_dealer_animation_lock.js?v=phase374', 'quest-deferred-dealer');
+need(quest, "window.SVR_PHASE373_STABLE_LOBBY?.('quest-phase374-core-ready')", 'quest-one-stable-spawn');
+need(quest, "window.SVR_PHASE374_ORIGINAL_TABLE_REASSERT?.('quest-after-stable-lobby')", 'quest-original-table-after-lobby');
+need(quest, "window.SVR_PHASE373_FINALIZE_TABLE?.('quest-phase374-after-lobby')", 'quest-table-finalized-after-lobby');
+const stableLobbyIndex = quest.indexOf("window.SVR_PHASE373_STABLE_LOBBY?.('quest-phase374-core-ready')");
+const originalTableIndex = quest.indexOf("window.SVR_PHASE374_ORIGINAL_TABLE_REASSERT?.('quest-after-stable-lobby')");
+const finalizerIndex = quest.indexOf("window.SVR_PHASE373_FINALIZE_TABLE?.('quest-phase374-after-lobby')");
+if (!(stableLobbyIndex >= 0 && originalTableIndex > stableLobbyIndex && finalizerIndex > originalTableIndex)) errors.push('order:quest-stable-lobby-original-table-finalizer');
 need(quest, "document.body.classList.add('boot-released')", 'quest-loading-screen-release');
 
 need(recovery, "export const BUILD = 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK'", 'recovery-build');
@@ -43,7 +51,16 @@ need(recovery, 'async function waitForTable(timeoutMs = 45000)', 'bounded-table-
 need(recovery, "['SVR_PHASE369_JOIN_TABLE', 'SVR_PHASE363_JOIN_TABLE']", 'authoritative-join-fallback');
 need(recovery, 'table.visible = true', 'table-visible');
 need(recovery, 'window.SVR_PHASE372_QA', 'phase372-qa');
+need(recovery, "import('./phase374_physical_release_truth_lock.js?v=phase374')", 'phase374-verifier-loader');
 forbid(recovery, 'new THREE.WebGLRenderer', 'no-second-renderer');
+
+need(physicalRelease, 'PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK', 'physical-release-build');
+need(physicalRelease, 'window.SVR_PHASE374_RECOVER', 'physical-release-recovery');
+need(physicalRelease, 'window.SVR_PHASE374_CLEAR_OLD_CACHE', 'physical-release-cache-reset');
+need(originalTable, 'PHASE-374-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK', 'original-table-build');
+need(originalTable, "new URL('../assets/models/table.glb', import.meta.url).href", 'original-table-glb');
+need(originalTable, "new URL('../assets/table.fbx', import.meta.url).href", 'original-table-fbx');
+need(originalTable, 'removeCompetingTables()', 'remove-generated-tables');
 
 need(questRecovery, "new URL('../assets/models/table.glb', import.meta.url).href", 'quest-real-glb-fallback');
 need(questRecovery, 'state.blockedRigMoves += 1', 'quest-seated-teleport-block');
@@ -73,11 +90,13 @@ need(deploy, 'branches: [main]', 'deploy-main-trigger');
 need(deploy, 'git push --force origin gh-pages', 'deploy-gh-pages-publish');
 need(deploy, 'test -f build/game/assets/models/table.glb', 'deploy-table-glb');
 need(deploy, 'test -f build/game/assets/table.fbx', 'deploy-table-fbx');
+need(deploy, 'test -f build/game/assets/models/eric/eric.fbx', 'deploy-eric-fbx');
 need(deploy, 'test -f build/game/modules/phase372_live_entry_recovery_lock.js', 'deploy-phase372-module');
 need(deploy, 'test -f build/game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js', 'deploy-phase373-module');
 need(deploy, 'test -f build/game/modules/phase373_quest_table_seat_finalizer_lock.js', 'deploy-phase373-finalizer-module');
-need(deploy, '"questRoute": "/game/index.html?platform=quest&v=phase373"', 'deploy-phase373-quest-route');
-need(deploy, '"androidRoute": "/game/android.html?channel=stable&v=phase372"', 'deploy-phase372-android-route');
+need(deploy, 'test -f build/game/modules/phase374_original_table_authority_lock.js', 'deploy-phase374-table-module');
+need(deploy, '"questRoute": "/game/index.html?platform=quest&v=phase374"', 'deploy-phase374-quest-route');
+need(deploy, '"androidRoute": "/game/android.html?channel=stable&v=phase374"', 'deploy-phase374-android-route');
 need(deploy, 'databaseProvider', 'deploy-health-aws');
 forbid(deploy, 'actions/deploy-pages', 'no-competing-pages-action');
 
@@ -85,17 +104,23 @@ if (exists('.github/workflows/pages.yml')) errors.push('conflicting-workflow:pag
 if (exists('backend/phase370/sql/002_phase370_admin_test_role_assignment.sql')) errors.push('obsolete-azure-role-script-present');
 if (!exists('game/assets/models/table.glb')) errors.push('asset-missing:table.glb');
 if (!exists('game/assets/table.fbx')) errors.push('asset-missing:table.fbx');
+if (!exists('game/assets/models/eric/eric.fbx')) errors.push('asset-missing:eric.fbx');
+
+if (currentRelease.phase !== 374 || currentRelease.build !== 'PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK') errors.push('current-release:not-phase374');
+if (currentRelease.androidEntry !== '/game/android.html?channel=stable&v=phase374') errors.push('current-release:android-route');
+if (currentRelease.questEntry !== '/game/index.html?platform=quest&v=phase374') errors.push('current-release:quest-route');
 
 const result = {
-  build: 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK',
+  build: currentRelease.build,
   androidBuild: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
+  questBuild: 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK',
   provider: accountConfig.provider,
   database: accountConfig.database,
   identity: accountConfig.identity,
   androidVisibleEntry: recovery.includes('JOIN TABLE'),
   questVisibleEntry: recovery.includes('START VR LOBBY'),
   questSeatedTeleportLock: questRecovery.includes('blockedRigMoves'),
-  questRealTableFallback: questRecovery.includes('table.glb'),
+  originalTableAuthority: originalTable.includes('PHASE-374-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK'),
   questTableFinalizer: questFinalizer.includes('PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK'),
   errors,
   pass: errors.length === 0
