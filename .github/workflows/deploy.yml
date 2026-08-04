@@ -65,6 +65,29 @@ jobs:
             downloads
             update
 
+      - name: Validate Phase 374 release inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check app-install.js
+          node --check app-update-checker.js
+          node --check sw.js
+          node --check game/modules/phase372_live_entry_recovery_lock.js
+          node --check game/modules/phase374_physical_release_truth_lock.js
+          node --check game/modules/phase374_original_table_authority_lock.js
+          node --check game/modules/phase374_android_tournament_card_ui_lock.js
+          node --check site/js/phase374-test-player-avatar.js
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool game/phase374-release.json >/dev/null
+          python3 -m json.tool site/config/phase374-test-player.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          grep -q 'PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK' index.html
+          grep -q 'phase374_original_table_authority_lock.js' game/android.html
+          grep -q 'phase374_original_table_authority_lock.js' game/index.html
+          grep -q 'phase374_android_tournament_card_ui_lock.js' game/android.html
+          grep -q 'svr-poker-phase374-physical-release-truth-v1' sw.js
+          grep -q 'test-player@svrpoker.com' site/config/phase374-test-player.json
+
       - name: Build production branch
         shell: bash
         run: |
@@ -83,13 +106,21 @@ jobs:
           touch build/.nojekyll
           find build -type d \( -name '_backups' -o -name 'backup-game-*' -o -name 'node_modules' -o -name '.git' \) -prune -exec rm -rf {} + || true
           find build -type f \( -name '*.zip' -o -name '*.7z' -o -name '*.rar' -o -name '*.blend' -o -name '*.psd' -o -name '*.tmp' \) -delete || true
-          find build/game -type f -name '*.fbx' ! -path 'build/game/assets/table.fbx' -delete || true
+          find build/game -type f -name '*.fbx' ! -path 'build/game/assets/table.fbx' ! -path 'build/game/assets/models/eric/eric.fbx' -delete || true
 
           test -f build/index.html
           test -f build/CNAME
+          test -f build/manifest.webmanifest
+          test -f build/sw.js
+          test -f build/pwa-sw.js
+          test -f build/update/app-version.json
           test -f build/game/index.html
           test -f build/game/android.html
+          test -f build/game/phase374-release.json
           test -f build/game/modules/phase372_live_entry_recovery_lock.js
+          test -f build/game/modules/phase374_physical_release_truth_lock.js
+          test -f build/game/modules/phase374_original_table_authority_lock.js
+          test -f build/game/modules/phase374_android_tournament_card_ui_lock.js
           test -f build/game/modules/phase373_quest_rig_preflight_lock.js
           test -f build/game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js
           test -f build/game/modules/phase373_quest_npc_teleport_postflight_lock.js
@@ -98,19 +129,27 @@ jobs:
           test -f build/game/modules/phase368_card_dealer_animation_lock.js
           test -f build/game/assets/models/table.glb
           test -f build/game/assets/table.fbx
+          test -f build/game/assets/models/eric/eric.fbx
           test -f build/site/index.html
           test -f build/site/login.html
           test -f build/site/profile.html
           test -f build/site/avatar.html
           test -f build/site/config/player-api.json
+          test -f build/site/config/phase374-test-player.json
+          test -f build/site/js/phase374-test-player-avatar.js
 
           DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           cat > build/deploy-health.json <<EOF
           {
             "status": "ok",
-            "build": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
-            "questFinalizer": "PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK",
+            "build": "PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK",
+            "physicalRelease": "PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK",
+            "originalTableAuthority": "PHASE-374-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK",
+            "androidTournamentUi": "PHASE-374-ANDROID-TOURNAMENT-CARD-UI-LOCK",
+            "testPlayerAvatar": "PHASE-374-TEST-PLAYER-AVATAR-LOCK",
             "androidBuild": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
+            "questBuild": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+            "questFinalizer": "PHASE-373-QUEST-TABLE-SEAT-FINALIZER-LOCK",
             "commit": "$GITHUB_SHA",
             "deployedAt": "$DEPLOYED_AT",
             "sourceBranch": "main",
@@ -118,8 +157,10 @@ jobs:
             "databaseProvider": "aws",
             "identityProvider": "cognito",
             "profileDatabase": "dynamodb",
-            "androidRoute": "/game/android.html?channel=stable&v=phase372",
-            "questRoute": "/game/index.html?platform=quest&v=phase373",
+            "launcherRoute": "/index.html?v=phase374",
+            "androidRoute": "/game/android.html?channel=stable&v=phase374",
+            "questRoute": "/game/index.html?platform=quest&v=phase374",
+            "testAccountRoute": "/site/login.html?v=phase374",
             "customDomain": "svrpoker.com"
           }
           EOF
@@ -147,10 +188,10 @@ jobs:
           set -euo pipefail
           for attempt in $(seq 1 24); do
             response="$(curl -fsS --max-time 15 "https://svrpoker.com/deploy-health.json?commit=${GITHUB_SHA}&attempt=${attempt}" || true)"
-            if echo "$response" | grep -q "$GITHUB_SHA"; then
-              echo "Verified svrpoker.com at ${GITHUB_SHA}"
+            if echo "$response" | grep -q "$GITHUB_SHA" && echo "$response" | grep -q 'PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK'; then
+              echo "Verified svrpoker.com Phase 374 at ${GITHUB_SHA}"
               exit 0
             fi
             sleep 10
           done
-          echo "::warning::The gh-pages branch was published, but the custom-domain cache did not expose the new commit within four minutes."
+          echo "::warning::gh-pages was published, but the custom-domain cache did not expose Phase 374 within four minutes."
