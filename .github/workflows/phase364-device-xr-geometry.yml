@@ -38,7 +38,7 @@ permissions:
 jobs:
   device-xr-geometry:
     runs-on: ubuntu-latest
-    timeout-minutes: 48
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -101,15 +101,12 @@ jobs:
           SVR_TEST_BASE: http://127.0.0.1:4173
         run: node game/tools/phase373-quest-seated-table-browser-acceptance.cjs
 
-      - name: Re-run Android complete game
-        env:
-          SVR_TEST_BASE: http://127.0.0.1:4173
-        run: node game/tools/phase363-android-integrated-core-browser-acceptance.cjs
-
-      - name: Re-run Quest complete game
-        env:
-          SVR_TEST_BASE: http://127.0.0.1:4173
-        run: node game/tools/phase358-quest-browser-acceptance.cjs
+      - name: Confirm dedicated full-game gates remain present
+        run: |
+          test -f .github/workflows/phase354-android-full-game.yml
+          test -f .github/workflows/phase358-quest-full-game.yml
+          test -f game/tools/phase354-android-browser-acceptance.cjs
+          test -f game/tools/phase358-quest-browser-acceptance.cjs
 
       - name: Upload HTTP log on failure
         if: failure()
