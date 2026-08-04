@@ -1,62 +1,65 @@
 {
   "name": "SVR Poker Android",
   "channel": "stable",
-  "status": "phase376-immediate-join-safe-play-ready",
+  "status": "phase377-canonical-safe-first-entry-ready",
   "packageName": "com.svrpoker.app",
   "apkVersionName": "0.1.0-rc1",
   "apkVersionCode": 1,
   "apkUrl": "",
   "apkSha256": "",
   "releaseReady": false,
-  "webEntry": "/game/android.html?channel=stable&v=phase376",
+  "webEntry": "/game/android-play.html?channel=stable&v=phase377",
+  "legacyWebEntry": "/game/android.html?channel=stable&v=phase377",
   "downloadsUrl": "/downloads/",
   "forceUpdate": false,
   "showUpdatePrompt": false,
   "manualUpdateOnly": true,
   "previewEntry": "/game/camera3.html?v=phase350",
   "profileEntry": "/site/profile.html?v=phase374",
-  "currentGameBuild": "PHASE-376-ANDROID-IMMEDIATE-JOIN-SAFE-PLAY-LOCK",
-  "primary3dController": "PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK",
-  "primary3dTable": "PHASE-363-ANDROID-CANONICAL-TABLE-ASSET-LOCK",
-  "safeFallback": "PHASE-376-ANDROID-SAFE-PLAY-FALLBACK",
+  "currentGameBuild": "PHASE-377-ANDROID-CANONICAL-ENTRY-SAFE-FIRST-LOCK",
+  "safeFallback": "PHASE-377-ANDROID-CANONICAL-SAFE-PLAY-FALLBACK",
+  "publicControls": {
+    "downloadApkVisible": true,
+    "updateAppVisible": true,
+    "playAndroidVisible": true,
+    "directApkAvailable": false
+  },
   "tablePolicy": {
     "startingStackPerPlayer": 15000,
     "players": 6,
-    "joinVisibleBefore3dBoot": true,
-    "noAutomatic3dBoot": true,
+    "joinVisibleBeforeAnyGameModule": true,
+    "primaryJoinOpensStableTable": true,
+    "optional3dRoom": true,
     "joinRequiredBeforeDeal": true,
     "cardsHiddenBeforeJoin": true,
-    "singleJoinControl": "JOIN NOW",
-    "legacySitSeatControlsRemoved": true,
-    "safePlayableFallbackAvailable": true
+    "legacySitSeatControlsExcludedFromEntry": true
   },
-  "performancePolicy": {
-    "lowPowerSetBefore3dLoad": true,
-    "optionalModulesDeferredUntilAfterJoin": true,
-    "automaticSafeFallbackOnCriticalFailure": true,
-    "serviceWorkerCacheEpoch": "phase376",
-    "nativeReinstallRequired": false
+  "routingPolicy": {
+    "publicPageUsesCanonicalAndroidPath": true,
+    "gameIndexDiscardsOldAndroidQuery": true,
+    "legacyAndroidHtmlRedirects": true,
+    "serviceWorkerCacheEpoch": "phase377-canonical-entry"
   },
   "acceptance": {
-    "staticGate": "game/tools/phase376-android-immediate-join-static-test.mjs",
+    "staticGate": "game/tools/phase377-public-route-android-recovery-static-test.mjs",
     "physicalDeviceOwnerPlaytestPending": true,
     "requiredChecks": [
-      "JOIN NOW is visible immediately before any 3D module loads",
-      "SAFE TABLE is visible immediately",
-      "3D modules do not auto-start on page load",
-      "JOIN NOW starts the lean 3D boot and seats the player",
-      "critical 3D failure opens the safe playable table",
-      "no legacy SIT or SEAT button appears"
+      "Public Play Android opens android-play.html phase377",
+      "JOIN NOW is visible before modules",
+      "No cards appear before JOIN NOW",
+      "JOIN NOW opens the stable six-player table",
+      "Old SIT/SEAT route cannot be reached through the public page",
+      "Download APK and Update App remain visible"
     ]
   },
-  "nativeBuildStatus": "existing-apk-continues-to-load-stable-web-runtime",
+  "nativeBuildStatus": "signed-apk-binary-not-attached",
+  "nativeApkRebuild": false,
   "nextApkVersionName": "0.1.0-rc2",
   "nextApkVersionCode": 2,
-  "updateMessage": "SVR Poker Android now shows JOIN NOW immediately and includes a guaranteed lightweight SAFE TABLE fallback.",
+  "updateMessage": "Phase 377 replaces stale Android launch queries with a new canonical entry and restores public APK and Update App controls.",
   "notes": [
-    "Phase 376 removes the automatic heavy startup that previously ran before JOIN NOW could appear.",
-    "The 3D room now starts only after the player presses JOIN NOW.",
-    "The SAFE TABLE fallback remains playable even if the full 3D room cannot finish on the device.",
-    "The native APK remains 0.1.0-rc1 code 1."
+    "The public APK button is visible again.",
+    "No direct APK download is claimed because apkUrl and apkSha256 are empty.",
+    "The web game update is available through Update App and the canonical Android route."
   ]
 }
