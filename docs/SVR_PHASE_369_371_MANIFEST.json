@@ -1,0 +1,106 @@
+{
+  "schema": 3,
+  "project": "SVR Poker",
+  "branch": "agent/phase372-production-recovery-aws-autodeploy",
+  "activePhase": 373,
+  "phases": [
+    {
+      "phase": 368,
+      "build": "PHASE-368-CARD-DEALER-ANIMATION-LOCK",
+      "scope": "Uploaded Cards.fbx dealer motion and visible table dealer",
+      "physicalCardTransfer": false
+    },
+    {
+      "phase": 369,
+      "build": "PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK",
+      "scope": "Android bounded join readiness, join-before-deal, table recovery, dealer defer, continuous play and low-power recovery"
+    },
+    {
+      "phase": 370,
+      "build": "PHASE-370-ACCOUNT-PROFILE-AVATAR-MOBILE-POLISH-LOCK",
+      "scope": "Login/registration presentation, clean textured avatar profile, Eric default avatar and idempotent mobile navigation",
+      "cashAppSupportHandle": "$SVRhelp",
+      "cashAppCredentialsCollected": false
+    },
+    {
+      "phase": 371,
+      "build": "PHASE-371-PUBLIC-APP-AI-MATRIX-POLISH-LOCK",
+      "scope": "Android app lead banner, AI-active fallback and thinner staggered Matrix rain"
+    },
+    {
+      "phase": 372,
+      "build": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
+      "scope": "Visible Android and Quest recovery entry before heavy boot, stale gh-pages repair, AWS account foundation and automatic production publishing",
+      "androidVisibleEntry": true,
+      "questVisibleEntry": true,
+      "singleDeploymentAuthority": true,
+      "sourceBranch": "main",
+      "publishBranch": "gh-pages",
+      "customDomain": "svrpoker.com"
+    },
+    {
+      "phase": 373,
+      "build": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+      "scope": "Quest seated teleport hard block, real GLB table visibility fallback, one exact spawn authority, and upright textured NPC recovery",
+      "singleStableQuestSpawn": true,
+      "lobbyGapMeters": 0.9,
+      "seatGapMeters": 0.62,
+      "seatedTeleportDisabled": true,
+      "realTableGlbFallback": "game/assets/models/table.glb",
+      "npcUprightTexturedGrounded": true
+    }
+  ],
+  "routes": {
+    "android": "/game/android.html?channel=stable&v=phase372",
+    "quest": "/game/index.html?platform=quest&v=phase373",
+    "siteHome": "/site/index.html?v=phase372",
+    "login": "/site/login.html?v=phase372",
+    "register": "/site/login.html?mode=register&v=phase372",
+    "profile": "/site/profile.html?v=phase372",
+    "avatar": "/site/avatar.html?v=phase372",
+    "public": "/?v=phase373",
+    "deployHealth": "/deploy-health.json"
+  },
+  "accounts": {
+    "provider": "aws",
+    "identity": "cognito",
+    "database": "dynamodb",
+    "infrastructureTemplate": "infrastructure/aws/phase372-player-account-foundation.yml",
+    "apiGatewayConfigured": false,
+    "demoFallback": true,
+    "azureRetired": true,
+    "adminAssignment": "Use the protected Cognito admin group after the real account registers; never expose an admin selector publicly."
+  },
+  "deployment": {
+    "workflow": ".github/workflows/deploy.yml",
+    "automaticOnMainPush": true,
+    "directGhPagesPublish": true,
+    "duplicatePagesWorkflowRemoved": true,
+    "activeBuild": "PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK",
+    "androidBuild": "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK",
+    "requiredAssets": [
+      "game/assets/models/table.glb",
+      "game/assets/table.fbx",
+      "game/modules/phase372_live_entry_recovery_lock.js",
+      "game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js",
+      "game/modules/phase368_card_dealer_animation_lock.js"
+    ]
+  },
+  "apk": {
+    "versionName": "0.1.0-rc1",
+    "versionCode": 1,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "manualUpdateOnly": true
+  },
+  "truth": {
+    "localPlayMoneyHoldem": true,
+    "serverAuthoritativeMultiplayer": false,
+    "realMoneyGambling": false,
+    "physicalAndroidPlaytestRequired": true,
+    "physicalQuestPlaytestRequired": true,
+    "awsResourcesRequireAuthorizedAwsDeployment": true,
+    "actualAccountCredentialsMustBeEnteredByOwner": true
+  },
+  "continuationDocument": "docs/SVR_PHASE_373_QUEST_RECOVERY_MANIFEST.md"
+}

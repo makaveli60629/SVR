@@ -42,14 +42,20 @@ assert(!questModules.some((item) => item.endsWith('p86_seated_lock.js')), 'Legac
 assert(!questModules.some((item) => item.endsWith('p87_scorpion_seat_authority.js')), 'Legacy p87 forced-seat module still loads on Quest');
 assert(validation.pass, `Quest manifest validation failed: ${JSON.stringify(validation.forbidden)}`);
 
-const phase359Index = index.indexOf('phase359_dual_platform_gameplay_continuity_lock.js');
-const phase360Index = index.indexOf('phase360_fresh_shuffle_leave_reset_continuous_table_lock.js');
-const phase361Index = index.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js');
-const phase362Index = index.indexOf('phase362_continuous_10000_turn_clock_rejoin_reset_lock.js');
+const importIndex = (moduleName) => {
+  const expression = new RegExp(`(?:await\\s+)?import\\(['\"]\\./modules/${moduleName}\\.js\\?v=phase\\d+['\"]\\)`);
+  const match = expression.exec(index);
+  return match ? match.index : -1;
+};
+const phase359Index = importIndex('phase359_dual_platform_gameplay_continuity_lock');
+const phase360Index = importIndex('phase360_fresh_shuffle_leave_reset_continuous_table_lock');
+const phase361Index = importIndex('phase361_quest_lobby_play_seat_watch_npc_lock');
+const phase362Index = importIndex('phase362_continuous_10000_turn_clock_rejoin_reset_lock');
 assert(phase359Index >= 0 && phase360Index > phase359Index && phase361Index > phase360Index, 'Phase 361 must load after Phase 359 and Phase 360');
 assert(phase362Index < 0 || phase362Index > phase361Index, 'Any successor table-policy module must load after Phase 361');
 assert(/data-release="PHASE-(?:361|36[2-9]|3[7-9]\d)-/i.test(index), 'Phase 361 or successor Quest release marker missing from index');
 assert(/manifest\.json\?v=phase(?:361|36[2-9]|3[7-9]\d)/i.test(index), 'Phase 361 or successor Quest cache version missing');
+assert(index.includes('PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK'), 'Phase 372 successor marker missing');
 
 const sessionContract = release.phase361SessionContract || release.sessionContract;
 assert(Number(release.phase) >= 361, 'Quest release phase must remain Phase 361 or later');
@@ -71,6 +77,7 @@ assert(release.androidApkPolicy?.manualUpdateOnly === true, 'Manual-only APK pol
 console.log(JSON.stringify({
   pass: true,
   build: release.build,
+  successorBuild: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
   phase: release.phase,
   questModuleCount: questModules.length,
   legacyForcedSeatModules: questModules.filter((item) => /p86_seated_lock|p87_scorpion_seat_authority/.test(item)),

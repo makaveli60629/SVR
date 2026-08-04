@@ -1,0 +1,147 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SVR Poker Phase 372 AWS player account foundation using Cognito and DynamoDB.
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: prod
+    AllowedPattern: '[a-z0-9-]+'
+Resources:
+  PlayerUserPool:
+    Type: AWS::Cognito::UserPool
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      UserPoolName: !Sub svr-${EnvironmentName}-players
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      MfaConfiguration: OPTIONAL
+      EnabledMfas:
+        - SOFTWARE_TOKEN_MFA
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 10
+          RequireLowercase: true
+          RequireUppercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          TemporaryPasswordValidityDays: 3
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      UserAttributeUpdateSettings:
+        AttributesRequireVerificationBeforeUpdate:
+          - email
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: preferred_username
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+
+  PlayerWebClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub svr-${EnvironmentName}-web
+      UserPoolId: !Ref PlayerUserPool
+      GenerateSecret: false
+      PreventUserExistenceErrors: ENABLED
+      EnableTokenRevocation: true
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+
+  AdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: admin
+      Description: SVR Poker owner and approved administrators only.
+      Precedence: 0
+      UserPoolId: !Ref PlayerUserPool
+
+  PlayerProfilesTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub svr-${EnvironmentName}-player-profiles
+      BillingMode: PAY_PER_REQUEST
+      DeletionProtectionEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      AttributeDefinitions:
+        - AttributeName: playerId
+          AttributeType: S
+        - AttributeName: normalizedEmail
+          AttributeType: S
+      KeySchema:
+        - AttributeName: playerId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: normalized-email
+          KeySchema:
+            - AttributeName: normalizedEmail
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  PlayerSessionsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub svr-${EnvironmentName}-player-sessions
+      BillingMode: PAY_PER_REQUEST
+      DeletionProtectionEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+      AttributeDefinitions:
+        - AttributeName: sessionId
+          AttributeType: S
+        - AttributeName: playerId
+          AttributeType: S
+        - AttributeName: startedAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: sessionId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: player-started-at
+          KeySchema:
+            - AttributeName: playerId
+              KeyType: HASH
+            - AttributeName: startedAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+Outputs:
+  UserPoolId:
+    Value: !Ref PlayerUserPool
+  WebClientId:
+    Value: !Ref PlayerWebClient
+  PlayerProfilesTableName:
+    Value: !Ref PlayerProfilesTable
+  PlayerSessionsTableName:
+    Value: !Ref PlayerSessionsTable
+  AdminGroupName:
+    Value: !Ref AdminGroup

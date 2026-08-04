@@ -3,48 +3,35 @@
 const { chromium } = require('playwright');
 
 const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
-const url = `${base}/game/android.html?channel=stable&v=phase367&acceptance=phase367`;
+const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phase367`;
 
-async function dragPointer(page, selector, dx = 12, dy = 0) {
-  const locator = page.locator(selector);
-  const box = await locator.boundingBox();
-  if (!box) throw new Error(`No pointer target box for ${selector}`);
-  const x = box.x + box.width / 2;
-  const y = box.y + box.height / 2;
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  await page.mouse.move(x + dx, y + dy, { steps: 3 });
-  await page.mouse.up();
-}
-
-async function clickActionPanelBackground(page) {
-  const locator = page.locator('#svr347Actions');
-  const box = await locator.boundingBox();
-  if (!box) throw new Error('No action-panel box');
-
-  await page.evaluate(() => {
-    const panel = document.querySelector('#svr347Actions');
-    if (!panel) return;
-    for (const child of panel.querySelectorAll('*')) {
-      child.dataset.phase367PreviousPointerEvents = child.style.pointerEvents || '';
-      child.style.pointerEvents = 'none';
-    }
-  });
-
-  try {
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.mouse.up();
-  } finally {
-    await page.evaluate(() => {
-      const panel = document.querySelector('#svr347Actions');
-      if (!panel) return;
-      for (const child of panel.querySelectorAll('[data-phase367-previous-pointer-events]')) {
-        child.style.pointerEvents = child.dataset.phase367PreviousPointerEvents || '';
-        delete child.dataset.phase367PreviousPointerEvents;
-      }
-    });
-  }
+async function touchGesture(page, selector, dx = 14, dy = 0, pointerId = 1) {
+  const result = await page.evaluate(({ selector, dx, dy, pointerId }) => {
+    const target = document.querySelector(selector);
+    if (!target) return { pass: false, reason: 'target-missing' };
+    const rect = target.getBoundingClientRect();
+    if (rect.width <= 1 || rect.height <= 1) return { pass: false, reason: 'target-no-layout', rect: rect.toJSON?.() || null };
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const common = {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      pointerType: 'touch',
+      pointerId,
+      isPrimary: true,
+      width: 12,
+      height: 12,
+      pressure: 0.7,
+      buttons: 1
+    };
+    target.dispatchEvent(new PointerEvent('pointerdown', { ...common, clientX: x, clientY: y }));
+    target.dispatchEvent(new PointerEvent('pointermove', { ...common, clientX: x + dx, clientY: y + dy }));
+    target.dispatchEvent(new PointerEvent('pointerup', { ...common, clientX: x + dx, clientY: y + dy, pressure: 0, buttons: 0 }));
+    return { pass: true, rect: rect.toJSON?.() || null };
+  }, { selector, dx, dy, pointerId });
+  if (!result?.pass) throw new Error(`Touch gesture failed for ${selector}: ${JSON.stringify(result)}`);
+  return result;
 }
 
 async function waitForPhase365Ready(page, timeout = 45000) {
@@ -58,7 +45,10 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 915, height: 412 },
-    userAgent: 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36'
+    userAgent: 'Mozilla/5.0 (Linux; Android 16; SM-A166U) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36',
+    hasTouch: true,
+    isMobile: true,
+    deviceScaleFactor: 1
   });
   const page = await context.newPage();
   const pageErrors = [];
@@ -74,16 +64,35 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   await page.waitForFunction(() => typeof window.SVR_PHASE367_DEVICE_QA === 'function', null, { timeout: 120000 });
   await page.waitForFunction(() => typeof window.SVR_PHASE365_QA === 'function', null, { timeout: 120000 });
   await page.waitForFunction(() => typeof window.SVR_PHASE363_JOIN_TABLE === 'function', null, { timeout: 120000 });
+  await page.waitForFunction(() => typeof window.SVR_PHASE372_SYNC_ANDROID_ENTRY === 'function', null, { timeout: 120000 });
   await page.waitForSelector('#svr347Root', { timeout: 120000 });
   await page.waitForSelector('#svr347Move', { timeout: 30000 });
   await page.waitForSelector('#svr347Look', { timeout: 30000 });
   await page.waitForSelector('#svr347Actions', { timeout: 30000 });
   await page.waitForFunction(() => window.SVR_PHASE367_DEVICE_QA?.().pass === true, null, { timeout: 30000 });
   await waitForPhase365Ready(page);
+  await page.evaluate(() => window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase367-browser-preflight'));
+  await page.waitForFunction(() => {
+    const button = document.getElementById('svr372Primary');
+    const phase372 = window.SVR_PHASE372_QA?.();
+    const join = window.SVR_PHASE363_JOIN_CONTROL_QA?.();
+    return Boolean(button?.offsetParent)
+      && button.disabled === false
+      && /JOIN TABLE/i.test(button.textContent || '')
+      && phase372?.primaryVisible === true
+      && phase372?.pass === true
+      && join?.authorityId === 'svr372Primary'
+      && join?.visibleJoinControls === 1
+      && join?.pass === true;
+  }, null, { timeout: 30000 });
 
   const baseline = await page.evaluate(() => ({
     device: window.SVR_PHASE367_DEVICE_QA(),
     phase365: window.SVR_PHASE365_QA(),
+    phase372: window.SVR_PHASE372_QA?.() || null,
+    join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
+    phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
+    legacySeatHidden: Boolean(document.querySelector('#svr347Actions [data-ui="seat"]')?.hidden),
     css: {
       width: getComputedStyle(document.documentElement).getPropertyValue('--svr367-vw').trim(),
       height: getComputedStyle(document.documentElement).getPropertyValue('--svr367-vh').trim(),
@@ -95,17 +104,30 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     }
   }));
 
-  await dragPointer(page, '#svr347Move', 14, 0);
-  await dragPointer(page, '#svr347Look', -12, 0);
-  await clickActionPanelBackground(page);
+  await page.evaluate(() => {
+    const entry = document.getElementById('svr372Entry');
+    if (!entry) return;
+    entry.dataset.phase367ControllerIsolation = '1';
+    entry.style.setProperty('display', 'none', 'important');
+  });
+  await page.waitForTimeout(120);
+
+  const moveGesture = await touchGesture(page, '#svr347Move', 18, 0, 3671);
+  const lookGesture = await touchGesture(page, '#svr347Look', -18, 0, 3672);
   await page.waitForFunction(() => {
     const state = window.SVR_PHASE367_DEVICE_QA?.();
     return Number(state?.moveTouches || 0) >= 1
-      && Number(state?.lookTouches || 0) >= 1
-      && Number(state?.actionTouches || 0) >= 1;
+      && Number(state?.lookTouches || 0) >= 1;
   }, null, { timeout: 10000 });
 
-  const touchMetrics = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
+  const lobbyTouchMetrics = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
+  await page.evaluate(() => {
+    const entry = document.getElementById('svr372Entry');
+    if (!entry) return;
+    entry.style.removeProperty('display');
+    delete entry.dataset.phase367ControllerIsolation;
+    window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase367-controller-isolation-complete');
+  });
 
   await page.setViewportSize({ width: 412, height: 915 });
   await page.evaluate(() => {
@@ -141,6 +163,22 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   await waitForPhase365Ready(page);
   await page.waitForTimeout(450);
 
+  await page.evaluate(() => {
+    const panel = document.querySelector('#svr347Actions');
+    panel?.dispatchEvent(new PointerEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      pointerType: 'touch',
+      pointerId: 3673,
+      isPrimary: true,
+      pressure: 0.7,
+      buttons: 1
+    }));
+  });
+  await page.waitForFunction(() => Number(window.SVR_PHASE367_DEVICE_QA?.().actionTouches || 0) >= 1, null, { timeout: 10000 });
+  const touchMetrics = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
+
   const beforeBurst = await page.evaluate(() => window.SVR_PHASE367_DEVICE_QA());
   await page.evaluate(() => {
     for (let index = 0; index < 8; index += 1) {
@@ -162,13 +200,18 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     const navigation = [...document.querySelectorAll('button,a')]
       .filter((element) => /^(LOBBY|CENTER|CENTER VIEW)$/i.test((element.textContent || '').trim()))
       .filter(visible);
+    const legacySeat = document.querySelector('#svr347Actions [data-ui="seat"]');
     return {
       device: window.SVR_PHASE367_DEVICE_QA(),
       phase365: window.SVR_PHASE365_QA(),
+      phase372: window.SVR_PHASE372_QA?.() || null,
+      join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
       displays: {
         move: getComputedStyle(document.querySelector('#svr347Move')).display,
         look: getComputedStyle(document.querySelector('#svr347Look')).display
       },
+      legacyLeaveVisible: Boolean(legacySeat?.offsetParent) && (legacySeat?.textContent || '').trim() === 'LEAVE TABLE',
+      phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
       visibleNavigation: navigation.length,
       rootCount: document.querySelectorAll('#svr347Root').length,
       moveCount: document.querySelectorAll('#svr347Move').length,
@@ -180,11 +223,17 @@ async function waitForPhase365Ready(page, timeout = 45000) {
 
   await page.evaluate(() => window.SVR_PHASE363_LEAVE_TABLE?.('phase367-browser-acceptance'));
   await page.waitForFunction(() => window.SVR_PHASE363_STATE?.joined === false, null, { timeout: 30000 });
+  await page.evaluate(() => window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase367-browser-after-leave'));
+  await page.waitForFunction(() => Boolean(document.getElementById('svr372Primary')?.offsetParent), null, { timeout: 15000 });
   await waitForPhase365Ready(page);
   await page.waitForTimeout(250);
   const lobbyReturn = await page.evaluate(() => ({
     device: window.SVR_PHASE367_DEVICE_QA(),
     phase365: window.SVR_PHASE365_QA(),
+    phase372: window.SVR_PHASE372_QA?.() || null,
+    join: window.SVR_PHASE363_JOIN_CONTROL_QA?.() || null,
+    phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
+    legacySeatHidden: Boolean(document.querySelector('#svr347Actions [data-ui="seat"]')?.hidden),
     moveDisplay: getComputedStyle(document.querySelector('#svr347Move')).display,
     lookDisplay: getComputedStyle(document.querySelector('#svr347Look')).display
   }));
@@ -194,8 +243,13 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   const checks = [
     [baseline.device?.pass === true, 'baseline-device-qa'],
     [baseline.phase365?.pass === true, 'baseline-phase365-qa'],
+    [baseline.phase372?.pass === true && baseline.phase372?.primaryVisible === true && baseline.phase372?.primaryText === 'JOIN TABLE', 'phase372-visible-join'],
+    [baseline.join?.pass === true && baseline.join?.authorityId === 'svr372Primary' && baseline.join?.visibleJoinControls === 1, 'one-lobby-join-authority'],
+    [baseline.phase372EntryVisible === true && baseline.legacySeatHidden === true, 'legacy-sit-hidden-under-entry'],
     [baseline.device?.controllerRoots === 1 && baseline.device?.moveControls === 1 && baseline.device?.lookControls === 1 && baseline.device?.actionPanels === 1, 'single-existing-controller'],
     [Number(baseline.device?.moveTouches || 0) === 0 && Number(baseline.device?.lookTouches || 0) === 0 && Number(baseline.device?.actionTouches || 0) === 0, 'touch-baseline-clean'],
+    [moveGesture.pass === true && lookGesture.pass === true, 'directional-touch-gestures-dispatched'],
+    [Number(lobbyTouchMetrics?.moveTouches || 0) >= 1 && Number(lobbyTouchMetrics?.lookTouches || 0) >= 1, 'physical-lobby-move-look-metrics'],
     [Number(touchMetrics?.moveTouches || 0) >= 1 && Number(touchMetrics?.lookTouches || 0) >= 1 && Number(touchMetrics?.actionTouches || 0) >= 1, 'physical-touch-metrics'],
     [portrait.css.width.endsWith('px') && portrait.css.height.endsWith('px'), 'portrait-viewport-css'],
     [Number(portrait.device?.viewportWidth || 0) >= 400 && Number(portrait.device?.viewportHeight || 0) >= 890, 'portrait-viewport-dimensions'],
@@ -203,11 +257,15 @@ async function waitForPhase365Ready(page, timeout = 45000) {
     [seated.device?.safeAreaReady === true, 'safe-area-ready'],
     [seated.rootCount === 1 && seated.moveCount === 1 && seated.lookCount === 1 && seated.actionPanelCount === 1, 'single-controller-after-join'],
     [seated.displays.move === 'none' && seated.displays.look === 'none', 'sticks-hidden-seated'],
+    [seated.legacyLeaveVisible === true && seated.phase372EntryVisible === false, 'one-seated-leave-authority'],
     [seated.visibleNavigation === 0 && Number(seated.device?.visibleNavigationWhileSeated || 0) === 0, 'navigation-hidden-seated'],
     [stabilizationDelta <= 2, 'stabilization-rate-limited'],
     [Number(seated.device?.stabilizationSkipped || 0) >= 1, 'stabilization-burst-skipped'],
-    [seated.phase365?.pass === true, 'phase365-still-green-seated'],
+    [touchMetrics.phase365?.pass === true, 'phase365-green-during-seated-touch'],
     [lobbyReturn.phase365?.pass === true, 'phase365-green-after-leave'],
+    [lobbyReturn.phase372?.pass === true && lobbyReturn.phase372EntryVisible === true && lobbyReturn.join?.authorityId === 'svr372Primary', 'phase372-join-restored-after-leave'],
+    [lobbyReturn.join?.pass === true && lobbyReturn.join?.authorityId === 'svr372Primary' && lobbyReturn.join?.visibleJoinControls === 1, 'one-lobby-authority-after-leave'],
+    [lobbyReturn.phase372EntryVisible === true && lobbyReturn.legacySeatHidden === true, 'legacy-sit-hidden-after-leave'],
     [lobbyReturn.moveDisplay !== 'none' && lobbyReturn.lookDisplay !== 'none', 'controls-return-lobby'],
     [pageErrors.length === 0, 'no-page-errors'],
     [consoleErrors.length === 0, 'no-console-errors'],
@@ -216,7 +274,11 @@ async function waitForPhase365Ready(page, timeout = 45000) {
   const failures = checks.filter(([pass]) => !pass).map(([, label]) => label);
   const result = {
     build: 'PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK',
+    successor: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
     baseline,
+    moveGesture,
+    lookGesture,
+    lobbyTouchMetrics,
     touchMetrics,
     portrait,
     beforeBurst,
