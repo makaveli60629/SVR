@@ -1,4 +1,4 @@
-const SVR_CACHE = 'svr-pwa-phase359-dual-platform-gameplay-continuity';
+const SVR_CACHE = 'svr-pwa-phase375-android-playable';
 const SVR_SHELL = [
   '/',
   '/index.html',
@@ -14,9 +14,10 @@ const SVR_SHELL = [
   '/downloads/',
   '/downloads/index.html',
   '/site/index.html',
-  '/site/profile.html',
+  '/site/profile.html?v=phase374',
   '/site/store.html',
-  '/site/contact.html'
+  '/site/contact.html',
+  '/game/android.html?channel=stable&v=phase375'
 ];
 
 self.addEventListener('install', (event) => {
@@ -53,27 +54,16 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  const alwaysFresh = url.pathname.startsWith('/game/')
+  const alwaysFresh = request.mode === 'navigate'
+    || url.pathname.startsWith('/game/')
+    || url.pathname.startsWith('/update/')
     || url.pathname === '/matrix.js'
     || url.pathname === '/support-chat-bot.js'
-    || url.pathname === '/site/js/phase356-profile-legend-pedestal.js'
-    || url.pathname === '/app-update-checker.js'
-    || url.pathname.startsWith('/update/');
+    || url.pathname === '/site/profile.html'
+    || url.pathname.startsWith('/site/js/phase')
+    || url.pathname === '/app-update-checker.js';
   if (alwaysFresh) {
     event.respondWith(networkFirst(request));
-    return;
-  }
-
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(new Request(request, { cache: 'no-store' }))
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(SVR_CACHE).then((cache) => cache.put(request, copy)).catch(() => undefined);
-          return response;
-        })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
-    );
     return;
   }
 
