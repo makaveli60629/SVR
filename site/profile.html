@@ -2,52 +2,64 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SVR Poker | Player Profile Live Avatar Camera</title>
-<meta name="description" content="SVR Poker player profile with a live in-game-style 3D avatar camera, VR dressing room, play-money balance, daily activity reward, outfit record, and game access.">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SVR Poker | Player Profile</title>
+<meta name="description" content="SVR Poker player profile with a live avatar camera, dressing rooms, play-money balance, rewards, and direct Android and VR game access.">
 <link rel="icon" href="../logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site-phase09.css">
-<link rel="stylesheet" href="css/phase351-profile-showroom.css?v=phase366">
+<link rel="stylesheet" href="site-phase09.css?v=phase374">
+<link rel="stylesheet" href="css/phase351-profile-showroom.css?v=phase374">
+<link rel="stylesheet" href="css/phase374-profile-mobile-recovery.css?v=phase374">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body class="svr9" data-build="PHASE-366-PROFILE-LIVE-CAMERA-DRESSING-ROOM-RELIABILITY-LOCK" data-profile-showroom="phase351" data-live-avatar-camera="phase366">
+<body class="svr9" data-build="PHASE-374-PROFILE-MOBILE-AVATAR-MENU-RECOVERY-LOCK" data-profile-showroom="phase374" data-live-avatar-camera="phase374">
 <canvas id="binary-rain" aria-hidden="true"></canvas>
 <div class="page">
-<nav class="nav">
+<nav class="nav" aria-label="Player profile navigation">
   <a class="brand" href="index.html"><img src="assets/brand/logo.png" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Player Profile</span></div></a>
-  <div class="links"><a href="index.html">Home</a><a href="avatar.html?v=phase366">Dressing Room</a><a href="profile.html?v=phase366" aria-current="page">Profile</a><a href="../game/avatar-vr.html?v=phase366">VR Dressing Room</a><a href="../game/android.html?channel=stable&v=phase365">Android Game</a><a href="../game/index.html?v=phase365">VR / PC</a><a href="store.html">Store</a><a href="roadmap.html?v=phase366">Roadmap</a></div>
+  <div class="links" aria-label="Profile sections">
+    <a href="index.html">Home</a>
+    <a href="avatar.html?v=phase374">Dressing Room</a>
+    <a href="profile.html?v=phase374" aria-current="page">Profile</a>
+    <a href="../game/avatar-vr.html?v=phase374">VR Dressing Room</a>
+    <a href="../game/android.html?channel=stable&v=phase374">Android Game</a>
+    <a href="../game/index.html?platform=quest&v=phase373">Quest / PC</a>
+    <a href="store.html">Store</a>
+    <a href="roadmap.html?v=phase374">Roadmap</a>
+  </div>
 </nav>
+
 <main class="shell">
 <section class="section">
-  <div id="profileShowroom" class="profile-showroom is-fallback" aria-label="Live 3D player showroom">
-    <canvas id="profileShowroomCanvas" aria-label="Interactive live 3D player avatar camera"></canvas>
+  <div id="profileShowroom" class="profile-showroom is-fallback" aria-label="Live player avatar showroom">
+    <canvas id="profileShowroomCanvas" aria-label="Interactive player avatar camera"></canvas>
     <div class="showroom-overlay">
       <div class="showroom-top">
         <div class="showroom-identity">
-          <span class="tag">SVR Profile Live Camera</span>
+          <span class="tag">SVR Profile Camera</span>
           <h1 id="showroomAvatarName">Loading Player…</h1>
           <p id="showroomOutfit">Preparing saved avatar and outfit…</p>
         </div>
         <span id="modePill" class="showroom-mode">LOADING</span>
       </div>
       <div class="showroom-bottom">
-        <div class="showroom-status-card"><strong>CAMERA:</strong> <span id="showroomStatus">Fallback room ready. Opening live 3D avatar camera…</span></div>
+        <div class="showroom-status-card"><strong>CAMERA:</strong> <span id="showroomStatus">Opening your avatar camera…</span></div>
         <div class="showroom-controls">
           <button id="showroomRotate" class="btn ghost" type="button">Pause Rotation</button>
           <button id="showroomReset" class="btn ghost" type="button">Reset View</button>
           <button id="showroomFullscreen" class="btn secondary" type="button">Full Screen</button>
-          <button id="showroomRetry" class="btn secondary" type="button" hidden>Retry 3D</button>
-          <a class="btn primary" href="avatar.html?v=phase366">Dress Avatar</a>
-          <a class="btn ghost" href="../game/avatar-vr.html?v=phase366">Open VR Dressing Room</a>
+          <button id="showroomRetry" class="btn secondary" type="button" hidden>Retry Full 3D</button>
+          <a class="btn primary" href="avatar.html?v=phase374">Dress Avatar</a>
+          <a class="btn ghost" href="../game/avatar-vr.html?v=phase374">Open VR Dressing Room</a>
         </div>
       </div>
     </div>
-    <div class="showroom-hint">Drag to rotate • Scroll or pinch to zoom • The same saved outfit appears in the profile, VR room, Android, Quest, and PC</div>
+    <div class="showroom-hint">Drag to rotate • Scroll or pinch to zoom</div>
   </div>
 </section>
+
 <section class="section">
   <div class="stats">
     <article class="stat"><span>Play Money</span><strong id="playMoney">$0</strong></article>
@@ -57,6 +69,7 @@
     <article class="stat"><span>Avatar / Outfit</span><strong id="outfitLabel">Loading</strong></article>
   </div>
 </section>
+
 <section class="section profile-summary">
   <article class="profile-card">
     <span class="tag">Profile Identity</span>
@@ -68,21 +81,22 @@
   <article class="profile-card">
     <span class="tag">Avatar Rooms</span>
     <h2>One Avatar, Every Platform</h2>
-    <p>The website dressing room, live profile camera, VR dressing room, Android, Quest, and PC all use the same selected body and equipped outfit record.</p>
-    <div class="inline-actions"><a class="btn primary" href="avatar.html?v=phase366">Website Dressing Room</a><a class="btn secondary" href="../game/avatar-vr.html?v=phase366">VR Dressing Room</a></div>
+    <p>The website profile, dressing rooms, Android, Quest, and PC use the same selected body and equipped outfit record.</p>
+    <div class="inline-actions"><a class="btn primary" href="avatar.html?v=phase374">Website Dressing Room</a><a class="btn secondary" href="../game/avatar-vr.html?v=phase374">VR Dressing Room</a></div>
   </article>
   <article class="profile-card">
     <span class="tag">Game Access</span>
     <h2>Enter SVR Poker</h2>
-    <p>Launch the current Phase 365 Android gameplay lock or the Quest/PC route.</p>
-    <div class="inline-actions"><a class="btn primary" href="../game/android.html?channel=stable&v=phase365">Android</a><a class="btn secondary" href="../game/index.html?v=phase365">Quest / PC</a></div>
+    <p>Launch the stable Android table or the protected Quest/PC lobby.</p>
+    <div class="inline-actions"><a class="btn primary" href="../game/android.html?channel=stable&v=phase374">Android</a><a class="btn secondary" href="../game/index.html?platform=quest&v=phase373">Quest / PC</a></div>
   </article>
 </section>
+
 <section class="section">
   <div class="profile-grid">
     <article class="card">
       <span class="tag">Daily Activity</span><h2>5,000-Chip Reward</h2>
-      <p>Play the demo for the required active time. Production eligibility is verified by the secure backend and can be claimed once per UTC day.</p>
+      <p>Play the demo for the required active time. Production eligibility can be claimed once per UTC day.</p>
       <div class="reward-meter"><span id="rewardProgress"></span></div>
       <p id="rewardDetails">Checking activity…</p>
       <button id="claimReward" class="btn primary" type="button">Claim Daily Reward</button>
@@ -95,7 +109,7 @@
         <label>Advanced Avatar Model URL<input id="avatarUrl" name="avatarUrl" type="url" placeholder="https://svrpoker.com/game/assets/models/eric/eric.fbx"></label>
         <button class="btn secondary" type="submit">Save Profile</button>
       </form>
-      <p>Use either Dressing Room for normal body and equipment changes. The advanced URL remains available for future approved FBX, GLB, or VRM-derived assets.</p>
+      <p>Use either Dressing Room for normal body and equipment changes. The advanced URL remains available for future approved FBX, GLB, or VRM assets.</p>
       <div id="profileStatus" class="status" role="status"></div>
     </article>
   </div>
@@ -103,23 +117,23 @@
 <footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p></footer>
 </main>
 </div>
-<script src="../matrix.js?v=phase366"></script>
-<script src="../site-public-hooks.js?v=phase366"></script>
+<script src="../matrix.js?v=phase374"></script>
+<script src="../site-public-hooks.js?v=phase374"></script>
 <script type="module">
-import { account } from './js/phase345-demo-activity-persistence.js?v=phase366';
-import './js/phase351-profile-showroom.js?v=phase366';
+import { account } from './js/phase345-demo-activity-persistence.js?v=phase374';
+import './js/phase351-profile-showroom.js?v=phase374';
 const money = (value) => `$${Number(value || 0).toLocaleString()}`;
 const time = (value) => `${Math.floor(Number(value || 0) / 60)}:${String(Math.floor(Number(value || 0) % 60)).padStart(2, '0')}`;
 const show = (id, text, type = '') => { const element = document.getElementById(id); if (!element) return; element.textContent = text; element.className = `status ${type}`; };
 async function render() {
   await account.bootstrap();
   const state = account.snapshot();
-  if (!state.profile) { location.replace('login.html?return=profile.html%3Fv%3Dphase366'); return; }
+  if (!state.profile) { location.replace('login.html?return=profile.html%3Fv%3Dphase374'); return; }
   const profile = state.profile;
   document.getElementById('displayName').textContent = profile.displayName || 'Player';
   document.getElementById('showroomAvatarName').textContent = profile.displayName || 'Player';
   document.getElementById('emailLine').textContent = profile.email || 'Local demo profile';
-  document.getElementById('modePill').textContent = state.mode === 'api' ? 'DATABASE ACCOUNT' : 'LOCAL DEMO';
+  document.getElementById('modePill').textContent = state.mode === 'api' ? 'DATABASE ACCOUNT' : 'DEMO PLAYER';
   document.getElementById('modePill').classList.toggle('demo', state.mode !== 'api');
   document.getElementById('playMoney').textContent = money(profile.playMoney);
   document.getElementById('dailyStreak').textContent = Number(profile.dailyStreak || 0);
@@ -130,8 +144,8 @@ async function render() {
   document.getElementById('outfitLabel').textContent = outfitText;
   document.getElementById('showroomOutfit').textContent = outfitText.replaceAll(' / ', ' • ');
   document.getElementById('accountExplanation').textContent = state.mode === 'api'
-    ? 'This profile, avatar record, equipped outfit, and showroom identity are backed by the secure account API and database.'
-    : 'This profile and outfit are stored only on this device. The showroom is a local demo until the production account API is deployed.';
+    ? 'This profile, avatar record, equipped outfit, and showroom identity are backed by the secure account API.'
+    : 'This profile and outfit are stored on this device until the production account API is connected.';
   await renderReward();
 }
 async function renderReward() {
@@ -148,17 +162,18 @@ async function renderReward() {
   } catch (error) { show('rewardStatus', error.message, 'error'); }
 }
 document.getElementById('claimReward').onclick = async () => { show('rewardStatus', 'Claiming…'); try { const result = await account.claimDailyReward(); show('rewardStatus', `${money(result.rewardChips)} added.`, 'ok'); await render(); } catch (error) { show('rewardStatus', error.message === 'MORE_ACTIVITY_REQUIRED' ? 'More active gameplay is required.' : error.message, 'error'); } };
-document.getElementById('profileForm').onsubmit = async (event) => { event.preventDefault(); show('profileStatus', 'Saving…'); try { const data = Object.fromEntries(new FormData(event.currentTarget)); await account.updateProfile(data); show('profileStatus', 'Profile saved.', 'ok'); await render(); await window.SVR_PHASE366_PROFILE_LIVE_CAMERA_RETRY?.(); } catch (error) { show('profileStatus', error.message, 'error'); } };
-document.getElementById('refreshProfile').onclick = async () => { await account.refreshProfile(); await render(); await window.SVR_PHASE366_PROFILE_LIVE_CAMERA_RETRY?.(); };
+document.getElementById('profileForm').onsubmit = async (event) => { event.preventDefault(); show('profileStatus', 'Saving…'); try { const data = Object.fromEntries(new FormData(event.currentTarget)); await account.updateProfile(data); show('profileStatus', 'Profile saved.', 'ok'); await render(); await window.SVR_PHASE351_PROFILE_SHOWROOM_RETRY?.(); } catch (error) { show('profileStatus', error.message, 'error'); } };
+document.getElementById('refreshProfile').onclick = async () => { await account.refreshProfile(); await render(); await window.SVR_PHASE351_PROFILE_SHOWROOM_RETRY?.(); };
 document.getElementById('logout').onclick = async () => { await account.logout(); location.href = 'login.html'; };
 window.addEventListener('svr:account-session', renderReward);
 window.addEventListener('svr:account-change', render);
 render().catch((error) => {
   document.getElementById('displayName').textContent = 'Profile recovery available';
   document.getElementById('emailLine').textContent = String(error?.message || error);
-  document.getElementById('accountExplanation').textContent = 'The account request did not finish. The local recovery layer is active; refresh or use Retry 3D.';
+  document.getElementById('accountExplanation').textContent = 'The account request did not finish. Refresh or use Retry Full 3D.';
   document.getElementById('showroomRetry').hidden = false;
 });
 </script>
+<script src="js/phase374-profile-mobile-recovery.js?v=phase374"></script>
 </body>
 </html>
