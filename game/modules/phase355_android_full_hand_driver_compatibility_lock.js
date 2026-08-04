@@ -16,6 +16,12 @@ function activePolicy() {
   return { startingStack, tableBankroll };
 }
 
+function productionPolicy() {
+  const compatibility = activePolicy();
+  const startingStack = Number(window.SVR_TABLE_STARTING_STACK || compatibility.startingStack);
+  return { startingStack, tableBankroll: startingStack * players.length };
+}
+
 function currentTableBankroll() {
   return players.reduce((sum, player) => sum + Number(player.stack || 0), 0);
 }
@@ -34,6 +40,7 @@ function makeRecord(attempt) {
     completed: false,
     pass: false,
     compatibilityPolicy: activePolicy(),
+    productionPolicy: productionPolicy(),
     actualStartingBankroll: 0
   };
 }
@@ -44,36 +51,26 @@ function snapshot(record) {
   const phase = String(state.phase || 'idle').toLowerCase();
   if (phase && !record.phases.includes(phase)) record.phases.push(phase);
   record.communityMax = Math.max(record.communityMax, state.community?.length || 0);
-  record.holeCards = Math.max(
-    record.holeCards,
-    players.find((player) => player.human)?.hand?.length || 0
-  );
+  record.holeCards = Math.max(record.holeCards, players.find((player) => player.human)?.hand?.length || 0);
   const sequence = Number(state.actionSeq || 0);
   if (sequence !== record.lastSequence) {
     record.lastSequence = sequence;
-    record.actions.push({
-      sequence,
-      phase,
-      message: state.lastAction || '',
-      at: new Date().toISOString()
-    });
+    record.actions.push({ sequence, phase, message: state.lastAction || '', at: new Date().toISOString() });
     record.actions = record.actions.slice(-48);
   }
 }
 
 function settlementPass(record = null) {
   const compatibilityPolicy = activePolicy();
+  const protectedPolicy = productionPolicy();
   const totalStacks = currentTableBankroll();
-  const actualExpectedTableBankroll = Number(record?.actualStartingBankroll || totalStacks || compatibilityPolicy.tableBankroll);
+  const actualExpectedTableBankroll = Number(record?.actualStartingBankroll || record?.productionPolicy?.tableBankroll || protectedPolicy.tableBankroll);
   const fundedPlayers = players.filter((player) => Number(player.stack || 0) > 0).length;
   return {
-    winners: (state.winners || []).map((winner) => ({
-      name: winner.name,
-      amount: winner.amount,
-      label: winner.label
-    })),
+    winners: (state.winners || []).map((winner) => ({ name: winner.name, amount: winner.amount, label: winner.label })),
     settledPot: Number(state.settledPot || 0),
     startingStack: compatibilityPolicy.startingStack,
+    productionStartingStack: protectedPolicy.startingStack,
     compatibilityExpectedTableBankroll: compatibilityPolicy.tableBankroll,
     expectedTableBankroll: actualExpectedTableBankroll,
     actualExpectedTableBankroll,
@@ -103,33 +100,30 @@ function finalizeRecord(record) {
   record.winners = settlement.winners;
   record.settledPot = settlement.settledPot;
   record.startingStack = settlement.startingStack;
+  record.productionStartingStack = settlement.productionStartingStack;
   record.compatibilityExpectedTableBankroll = settlement.compatibilityExpectedTableBankroll;
   record.expectedTableBankroll = settlement.expectedTableBankroll;
   record.actualExpectedTableBankroll = settlement.actualExpectedTableBankroll;
   record.totalStacks = settlement.totalStacks;
   record.fundedPlayers = settlement.fundedPlayers;
   record.protectedProductionBankrollPreserved = settlement.protectedProductionBankrollPreserved;
-  record.pass = ['preflop', 'flop', 'turn', 'river', 'showdown']
-    .every((phase) => record.phases.includes(phase))
+  record.pass = ['preflop', 'flop', 'turn', 'river', 'showdown'].every((phase) => record.phases.includes(phase))
     && record.communityMax === 5
     && record.holeCards === 2
     && settlement.pass;
-  history.unshift({
-    ...record,
-    phases: record.phases.slice(),
-    actions: record.actions.slice(),
-    winners: record.winners.slice()
-  });
+  history.unshift({ ...record, phases: record.phases.slice(), actions: record.actions.slice(), winners: record.winners.slice() });
   history.splice(8);
   return record.pass;
 }
 
 async function resetAndCaptureBankroll(record) {
   const compatibilityPolicy = activePolicy();
-  window.SVR_RESET_POKER_TABLE(compatibilityPolicy.startingStack);
-  await wait(0);
-  record.actualStartingBankroll = currentTableBankroll();
+  const protectedPolicy = productionPolicy();
+  window.SVR_RESET_POKER_TABLE(protectedPolicy.startingStack);
+  record.actualStartingBankroll = protectedPolicy.tableBankroll;
   record.compatibilityPolicy = compatibilityPolicy;
+  record.productionPolicy = protectedPolicy;
+  await wait(0);
   record.handNo = Number(state.handNo || 0);
   snapshot(record);
 }
@@ -155,6 +149,7 @@ async function driveHand(options = {}) {
     maxHands,
     deterministicBots: true,
     policy: activePolicy(),
+    productionPolicy: productionPolicy(),
     record: null,
     audit: null,
     error: null,
@@ -162,20 +157,14 @@ async function driveHand(options = {}) {
   };
 
   try {
-    if (typeof window.SVR_POKER_ACTION !== 'function'
-      || typeof window.SVR_RESET_POKER_TABLE !== 'function') {
-      throw new Error('POKER_ENGINE_NOT_READY');
-    }
-
+    if (typeof window.SVR_POKER_ACTION !== 'function' || typeof window.SVR_RESET_POKER_TABLE !== 'function') throw new Error('POKER_ENGINE_NOT_READY');
     window.SVR_POKER_QA_PASSIVE_BOTS = true;
     window.addEventListener('svr:poker-state', stateListener);
-
     activeRecord = makeRecord(1);
     await resetAndCaptureBankroll(activeRecord);
 
     while (performance.now() - started < timeoutMs && result.attempts < maxHands) {
       snapshot(activeRecord);
-
       if (state.waitingHuman && Number(state.actionSeq || 0) !== handledSequence) {
         const selected = chooseAction();
         if (selected) {
@@ -183,7 +172,6 @@ async function driveHand(options = {}) {
           window.SVR_POKER_ACTION(selected);
         }
       }
-
       if (String(state.phase || '').toLowerCase() === 'showdown') {
         await wait(90);
         result.attempts += 1;
@@ -193,14 +181,12 @@ async function driveHand(options = {}) {
           result.record = activeRecord;
           break;
         }
-
         if (result.attempts < maxHands) {
           handledSequence = -1;
           activeRecord = makeRecord(result.attempts + 1);
           await resetAndCaptureBankroll(activeRecord);
         }
       }
-
       await wait(45);
     }
 
@@ -230,7 +216,6 @@ async function driveHand(options = {}) {
     lastResult = result;
     window.SVR_PHASE355_FULL_HAND_RESULT = result;
   }
-
   return result;
 }
 
@@ -243,18 +228,14 @@ function qa() {
     pokerAction: typeof window.SVR_POKER_ACTION,
     resetPoker: typeof window.SVR_RESET_POKER_TABLE,
     activePolicy: activePolicy(),
+    productionPolicy: productionPolicy(),
     currentTableBankroll: currentTableBankroll(),
     passiveModeLeaked: window.SVR_POKER_QA_PASSIVE_BOTS === true,
     lastResult,
     history: history.slice(0, 3),
     checkedAt: new Date().toISOString()
   };
-  result.pass = result.active
-    && result.installed
-    && result.phase344Alias
-    && result.pokerAction === 'function'
-    && result.resetPoker === 'function'
-    && !result.passiveModeLeaked;
+  result.pass = result.active && result.installed && result.phase344Alias && result.pokerAction === 'function' && result.resetPoker === 'function' && !result.passiveModeLeaked;
   window.SVR_PHASE355_HAND_DRIVER_QA_STATE = result;
   return result;
 }
