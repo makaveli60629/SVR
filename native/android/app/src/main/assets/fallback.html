@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>SVR Poker — Android Stable Table</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="theme-color" content="#070a11">
+<style>
+:root{--cyan:#7ffcff;--gold:#ffd98a;--purple:#9b4dff;--green:#8dffb4;--red:#ff6f91}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#02040a;color:#fff;font-family:system-ui,Arial,sans-serif}body{min-height:100vh;background:radial-gradient(circle at 50% 22%,#16383b 0,#07111c 42%,#02040a 100%);padding:max(10px,env(safe-area-inset-top)) 10px max(14px,env(safe-area-inset-bottom));overflow:auto}.hidden{display:none!important}.gate{min-height:calc(100vh - 24px);display:grid;place-items:center}.gate-card{width:min(520px,96vw);padding:24px;border:1px solid var(--cyan);border-radius:24px;background:rgba(3,8,18,.96);box-shadow:0 24px 90px #000;text-align:center}.gate-card h1{margin:8px 0 5px;letter-spacing:.08em}.gate-card p{color:#d9fbff;line-height:1.45}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px}.btn{min-height:50px;border:1px solid var(--gold);border-radius:14px;background:#111827;color:#fff;font-weight:950;text-decoration:none;display:flex;align-items:center;justify-content:center;padding:10px}.primary{grid-column:1/-1;border:0;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#02040a;font-size:19px}.update{border-color:var(--green);background:#0b392f}.apk{border-color:var(--gold);background:#30250d}.shell{width:min(980px,100%);margin:auto}.top{display:flex;gap:8px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5;padding:8px;border:1px solid #ffffff18;border-radius:16px;background:rgba(2,7,15,.92);backdrop-filter:blur(12px)}.pill{padding:8px 11px;border:1px solid var(--cyan);border-radius:999px;background:#020812;font-weight:900;font-size:13px}.status{text-align:center;color:var(--gold);font-weight:950;letter-spacing:.04em;margin:10px 0}.bots{display:grid;grid-template-columns:repeat(5,minmax(105px,1fr));gap:7px}.bot{padding:8px;border:1px solid #577a8f;border-radius:12px;background:#020812c9;text-align:center}.bot strong,.bot span{display:block}.bot span{font-size:12px;color:#cdefff}.cards{display:flex;justify-content:center;gap:7px;min-height:70px;flex-wrap:wrap}.card{display:inline-grid;place-items:center;width:48px;height:67px;border:2px solid #151515;border-radius:8px;background:#faf5e9;color:#111;font:950 21px Georgia,serif;box-shadow:0 5px 14px #0008}.card.red{color:#b00028}.card.back{background:linear-gradient(145deg,#2b1d68,#07162d);color:#d9fbff;border-color:var(--cyan);font:900 10px system-ui}.label{text-align:center;margin:10px 0 4px;color:#d9fbff;letter-spacing:.08em;font-size:13px}.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:760px;margin:14px auto}.actions button{min-height:52px;border:1px solid var(--gold);border-radius:14px;background:#111827;color:#fff;font-weight:950}.actions button.call{border-color:var(--cyan);background:#064c58}.actions button:disabled{opacity:.35}.footer{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.footer button,.footer a{min-height:44px;padding:8px 13px;border:1px solid var(--cyan);border-radius:12px;background:#080d19;color:#fff;text-decoration:none;font-weight:900;display:flex;align-items:center}.notice{margin:12px auto;max-width:760px;padding:10px;border-left:3px solid var(--green);background:#8dffb412;color:#e9fff1}.winner{color:var(--green)}@media(max-width:760px){.bots{grid-template-columns:repeat(2,1fr)}.actions{grid-template-columns:repeat(2,1fr)}.card{width:43px;height:61px;font-size:19px}.buttons{grid-template-columns:1fr}.primary{grid-column:auto}}
+</style>
+</head>
+<body data-build="PHASE-378-APK-OFFLINE-STABLE-TABLE">
+<section id="gate" class="gate"><div class="gate-card"><div style="font:950 28px system-ui;color:#7ffcff">SVR</div><h1>SVR POKER</h1><p><strong>JOIN NOW</strong> opens the offline stable poker table included inside this APK. No cards are dealt before you join.</p><div class="buttons"><button id="join" class="btn primary" type="button">JOIN NOW</button><button id="update" class="btn update" type="button">RESET TABLE</button><a class="btn apk" href="https://svrpoker.com/downloads/svr-poker-android-rc2.apk?phase=378">DOWNLOAD APK RC2</a><a class="btn" href="https://svrpoker.com/game/index.html?platform=android3d&amp;v=phase378">TRY ONLINE 3D ROOM</a></div><p id="gateStatus">Offline stable table ready.</p></div></section>
+<main id="table" class="shell hidden">
+<div class="top"><span class="pill" id="stack">STACK $15,000</span><span class="pill" id="pot">POT $0</span></div>
+<h2 class="status" id="status">YOUR TURN</h2>
+<div id="bots" class="bots"></div>
+<h3 class="label">COMMUNITY</h3><div id="community" class="cards"></div>
+<h3 class="label">YOUR CARDS</h3><div id="hole" class="cards"></div>
+<div class="actions"><button data-action="fold">FOLD</button><button data-action="call" class="call">CHECK / CALL</button><button data-action="raise">RAISE $100</button><button data-action="allin">ALL IN</button></div>
+<div class="footer"><button id="next" class="hidden">NEXT HAND</button><button id="leave">LEAVE TABLE</button><a href="https://svrpoker.com/game/index.html?platform=android3d&amp;v=phase378">TRY ONLINE 3D ROOM</a></div>
+<p class="notice">This offline table is the APK recovery route. It is local play-money poker against five bots.</p>
+</main>
+<script>
+(()=>{
+const SUITS=['S','H','D','C'],RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const state={joined:false,handNo:0,street:0,pot:0,deck:[],community:[],players:[],finished:false};
+const names=['YOU','Claudia','Eric','Maya','Darius','Nova'];
+const $=s=>document.querySelector(s),all=s=>[...document.querySelectorAll(s)];
+function deck(){return SUITS.flatMap(s=>RANKS.map((r,i)=>({r,s,v:i+2})));}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function symbol(c){return c?`${c.r}${{S:'♠',H:'♥',D:'♦',C:'♣'}[c.s]}`:'•';}
+function markup(c,hide=false){const shown=hide?null:c;return `<span class="card${shown&&(shown.s==='H'||shown.s==='D')?' red':''}${shown?'':' back'}">${shown?symbol(shown):'SVR'}</span>`;}
+function pay(p,n){const x=Math.min(p.stack,Math.max(0,Math.floor(n)));p.stack-=x;state.pot+=x;return x;}
+function persist(){try{localStorage.setItem('svr_phase378_stack',String(state.players[0]?.stack||15000));}catch{}}
+function start(){const saved=Math.max(1000,Number(localStorage.getItem('svr_phase378_stack')||15000));state.handNo++;state.street=0;state.pot=0;state.community=[];state.deck=shuffle(deck());state.finished=false;state.players=names.map((name,i)=>({name,stack:i?15000:saved,folded:false,hand:[state.deck.pop(),state.deck.pop()]}));state.players.forEach(p=>pay(p,20));setStatus('YOUR TURN — PREFLOP');render();}
+function setStatus(text,winner=false){const e=$('#status');e.textContent=text;e.classList.toggle('winner',winner);}
+function botsAct(){state.players.slice(1).forEach(p=>{if(p.folded||p.stack<=0)return;const r=Math.random();if(r<.12&&state.street<3)p.folded=true;else pay(p,r>.82?60:20);});}
+function reveal(){if(state.street===1)state.community.push(state.deck.pop(),state.deck.pop(),state.deck.pop());else if(state.street===2||state.street===3)state.community.push(state.deck.pop());}
+function settle(forcedUserFold=false){while(state.community.length<5)state.community.push(state.deck.pop());const live=state.players.filter(p=>!p.folded);const winner=forcedUserFold?live[Math.floor(Math.random()*live.length)]||state.players[1]:live[Math.floor(Math.random()*live.length)];const won=state.pot;winner.stack+=won;state.pot=0;state.finished=true;persist();setStatus(`${winner.name} WINS $${won.toLocaleString()}`,true);render();}
+function act(type){if(state.finished)return;const user=state.players[0];if(type==='fold'){user.folded=true;botsAct();settle(true);return;}if(type==='call')pay(user,20);if(type==='raise')pay(user,100);if(type==='allin')pay(user,user.stack);botsAct();state.street++;reveal();if(state.street>=4||user.stack===0)settle(false);else{setStatus(state.street===1?'FLOP — YOUR TURN':state.street===2?'TURN — YOUR TURN':'RIVER — YOUR TURN');render();}}
+function render(){const u=state.players[0];$('#stack').textContent=`STACK $${u.stack.toLocaleString()}`;$('#pot').textContent=`POT $${state.pot.toLocaleString()}`;$('#community').innerHTML=Array.from({length:5},(_,i)=>markup(state.community[i])).join('');$('#hole').innerHTML=u.hand.map(c=>markup(c)).join('');$('#bots').innerHTML=state.players.slice(1).map(p=>`<div class="bot"><strong>${p.name}</strong><span>${p.folded?'FOLDED':`$${p.stack.toLocaleString()}`}</span><div>${markup(p.hand[0],!state.finished)}${markup(p.hand[1],!state.finished)}</div></div>`).join('');all('[data-action]').forEach(b=>b.disabled=state.finished);$('#next').classList.toggle('hidden',!state.finished);}
+$('#join').onclick=()=>{state.joined=true;$('#gate').classList.add('hidden');$('#table').classList.remove('hidden');start();};$('#update').onclick=()=>location.reload();$('#leave').onclick=()=>location.reload();$('#next').onclick=start;document.addEventListener('click',e=>{const a=e.target?.dataset?.action;if(a)act(a);});
+})();
+</script>
+</body></html>
