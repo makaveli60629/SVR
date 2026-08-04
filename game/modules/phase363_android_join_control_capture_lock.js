@@ -1,4 +1,4 @@
-export const BUILD = 'PHASE-363-ANDROID-JOIN-CONTROL-CAPTURE-LOCK';
+export const BUILD = 'PHASE-374-ANDROID-JOIN-NOW-CONTROL-CAPTURE-LOCK';
 
 const ACTIVE = (window.SVR_PLATFORM || '').toLowerCase() === 'android'
   || /\/game\/android\.html$/i.test(location.pathname)
@@ -15,7 +15,7 @@ const state = {
   duplicateControlsHidden: 0,
   labelRepairs: 0,
   synchronousStateTransitions: 0,
-  phase372LobbyAuthority: true,
+  phase374LobbyAuthority: true,
   lastAction: null,
   lastActivationAt: 0,
   installedAt: null
@@ -26,9 +26,7 @@ let originalLeave = null;
 let originalToggle = null;
 
 function joinedNow() {
-  if (typeof window.SVR_PHASE363_JOINED_IMMEDIATE === 'boolean') {
-    return window.SVR_PHASE363_JOINED_IMMEDIATE;
-  }
+  if (typeof window.SVR_PHASE363_JOINED_IMMEDIATE === 'boolean') return window.SVR_PHASE363_JOINED_IMMEDIATE;
   return Boolean(window.SVR_PHASE363_STATE?.joined);
 }
 
@@ -48,7 +46,7 @@ function setJoinedImmediate(joined, reason = 'state') {
 }
 
 function desiredLabel() {
-  return joinedNow() ? 'LEAVE TABLE' : 'JOIN TABLE';
+  return joinedNow() ? 'LEAVE TABLE' : 'JOIN NOW';
 }
 
 function phase372Button() {
@@ -60,7 +58,7 @@ function restoreButton(button, label) {
   button.hidden = false;
   button.disabled = false;
   button.removeAttribute('aria-hidden');
-  button.setAttribute('aria-label', label === 'JOIN TABLE' ? 'Join poker table' : 'Leave poker table');
+  button.setAttribute('aria-label', label === 'JOIN NOW' ? 'Join poker table now' : 'Leave poker table');
   try { button.inert = false; } catch {}
   if (String(button.textContent || '').trim() !== label) {
     button.textContent = label;
@@ -85,13 +83,13 @@ function hideDuplicates() {
   for (const button of document.querySelectorAll('button')) {
     if (button === activeAuthority || button.closest('#runtimeRecovery') || button.id === 'startRuntimeBtn') continue;
     const text = String(button.textContent || '').trim().toUpperCase();
-    if (!['SIT', 'SEAT', 'SIT DOWN', 'SIT AT TABLE', 'PLAY GAME', 'JOIN TABLE', 'LEAVE', 'LEAVE TABLE'].includes(text)) continue;
+    if (!['SIT', 'SEAT', 'SIT DOWN', 'SIT AT TABLE', 'PLAY GAME', 'JOIN TABLE', 'JOIN NOW', 'LEAVE', 'LEAVE TABLE'].includes(text)) continue;
     quarantineButton(button);
     hidden += 1;
   }
 
   if (!joined && modernAuthority) {
-    restoreButton(modernAuthority, 'JOIN TABLE');
+    restoreButton(modernAuthority, 'JOIN NOW');
     quarantineButton(legacyAuthority);
   } else if (joined && legacyAuthority) {
     restoreButton(legacyAuthority, 'LEAVE TABLE');
@@ -128,7 +126,7 @@ function wrapStateApis() {
     setJoinedImmediate(false, String(args[0] || 'leave-api'));
     const result = originalLeave?.(...args);
     queueMicrotask(hideDuplicates);
-    window.setTimeout(() => window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase363-leave'), 0);
+    window.setTimeout(() => window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase374-leave'), 0);
     return result;
   };
 
@@ -194,7 +192,7 @@ function install() {
     const visible = [...document.querySelectorAll('button')].filter((button) => {
       if (button.hidden || !button.offsetParent) return false;
       const text = String(button.textContent || '').trim().toUpperCase();
-      return ['JOIN TABLE', 'LEAVE TABLE', 'SIT', 'SEAT', 'PLAY GAME', 'LEAVE'].includes(text);
+      return ['JOIN NOW', 'JOIN TABLE', 'LEAVE TABLE', 'SIT', 'SEAT', 'PLAY GAME', 'LEAVE'].includes(text);
     });
     const label = String(activeAuthority?.textContent || '').trim();
     return {
