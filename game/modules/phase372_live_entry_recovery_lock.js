@@ -284,3 +284,7 @@ function install() {
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install, { once: true });
 else install();
+
+import('./phase374_physical_release_truth_lock.js?v=phase374').catch((error) => {
+  console.error('[SVR Phase 374] physical release verifier failed to load', error);
+});
