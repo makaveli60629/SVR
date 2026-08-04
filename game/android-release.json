@@ -1,78 +1,62 @@
 {
   "name": "SVR Poker Android",
   "channel": "stable",
-  "status": "phase375-android-playable-single-join-authority-deployed",
+  "status": "phase376-immediate-join-safe-play-ready",
   "packageName": "com.svrpoker.app",
   "apkVersionName": "0.1.0-rc1",
   "apkVersionCode": 1,
   "apkUrl": "",
   "apkSha256": "",
   "releaseReady": false,
-  "webEntry": "/game/android.html?channel=stable&v=phase375",
+  "webEntry": "/game/android.html?channel=stable&v=phase376",
   "downloadsUrl": "/downloads/",
   "forceUpdate": false,
   "showUpdatePrompt": false,
   "manualUpdateOnly": true,
   "previewEntry": "/game/camera3.html?v=phase350",
   "profileEntry": "/site/profile.html?v=phase374",
-  "currentGameBuild": "PHASE-375-ANDROID-PLAYABLE-SINGLE-JOIN-AUTHORITY-LOCK",
-  "controllerAuthority": "PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK",
-  "tableAuthority": "PHASE-363-ANDROID-CANONICAL-TABLE-ASSET-LOCK",
-  "cameraAuthority": "PHASE-357-ANDROID-DIRECT-CAMERA-SEAT-FIX",
+  "currentGameBuild": "PHASE-376-ANDROID-IMMEDIATE-JOIN-SAFE-PLAY-LOCK",
+  "primary3dController": "PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK",
+  "primary3dTable": "PHASE-363-ANDROID-CANONICAL-TABLE-ASSET-LOCK",
+  "safeFallback": "PHASE-376-ANDROID-SAFE-PLAY-FALLBACK",
   "tablePolicy": {
     "startingStackPerPlayer": 15000,
     "players": 6,
-    "tableBankroll": 90000,
+    "joinVisibleBefore3dBoot": true,
+    "noAutomatic3dBoot": true,
     "joinRequiredBeforeDeal": true,
     "cardsHiddenBeforeJoin": true,
     "singleJoinControl": "JOIN NOW",
     "legacySitSeatControlsRemoved": true,
-    "leaveControlAfterJoin": true,
-    "freshTableOnLeaveRejoin": true
+    "safePlayableFallbackAvailable": true
   },
-  "gameplayPolicy": {
-    "noAutomaticDealWhileLobby": true,
-    "firstDealAfterJoinOnly": true,
-    "leaveStopsFutureDeals": true,
-    "fullHoldemStreetOrder": ["preflop", "flop", "turn", "river", "showdown"],
-    "actions": ["fold", "check", "call", "raise", "allin", "leave"]
-  },
-  "androidExperience": {
-    "curatedBootPath": true,
-    "legacyPhase343HudRemoved": true,
-    "legacyPhase344InputRemoved": true,
-    "singleController": true,
-    "canonicalTablePriority": [
-      "/game/assets/models/table.glb",
-      "/game/assets/table.fbx"
-    ],
-    "emergencyTableFallback": true,
-    "directSeatCameraCorrection": true,
-    "startupLowPowerBudget": true,
-    "staleServiceWorkerCacheClearedOncePerPhase": true,
-    "webRuntimeUpdatedWithoutNativeReinstall": true
+  "performancePolicy": {
+    "lowPowerSetBefore3dLoad": true,
+    "optionalModulesDeferredUntilAfterJoin": true,
+    "automaticSafeFallbackOnCriticalFailure": true,
+    "serviceWorkerCacheEpoch": "phase376",
+    "nativeReinstallRequired": false
   },
   "acceptance": {
-    "staticGate": "game/tools/phase375-android-playable-static-test.mjs",
-    "browserStructurePassed": true,
+    "staticGate": "game/tools/phase376-android-immediate-join-static-test.mjs",
     "physicalDeviceOwnerPlaytestPending": true,
     "requiredChecks": [
-      "JOIN NOW is the only pre-play table control",
-      "no cards appear before JOIN NOW",
-      "verified table is visible before joining",
-      "JOIN NOW seats player and starts the first hand",
-      "phone controls remain responsive after seating",
-      "LEAVE TABLE returns to a clean no-card lobby"
+      "JOIN NOW is visible immediately before any 3D module loads",
+      "SAFE TABLE is visible immediately",
+      "3D modules do not auto-start on page load",
+      "JOIN NOW starts the lean 3D boot and seats the player",
+      "critical 3D failure opens the safe playable table",
+      "no legacy SIT or SEAT button appears"
     ]
   },
   "nativeBuildStatus": "existing-apk-continues-to-load-stable-web-runtime",
   "nextApkVersionName": "0.1.0-rc2",
   "nextApkVersionCode": 2,
-  "updateMessage": "SVR Poker Android gameplay was upgraded to the Phase 375 playable runtime.",
+  "updateMessage": "SVR Poker Android now shows JOIN NOW immediately and includes a guaranteed lightweight SAFE TABLE fallback.",
   "notes": [
-    "Phase 375 replaces the conflicting Android boot stack with a curated module sequence.",
-    "The Phase 343 SIT HUD and Phase 344 legacy input layer are not loaded on the stable Android route.",
-    "The poker engine is parked in an idle no-card state until JOIN NOW succeeds.",
-    "The native APK version remains 0.1.0-rc1 code 1 and does not require a forced reinstall."
+    "Phase 376 removes the automatic heavy startup that previously ran before JOIN NOW could appear.",
+    "The 3D room now starts only after the player presses JOIN NOW.",
+    "The SAFE TABLE fallback remains playable even if the full 3D room cannot finish on the device.",
+    "The native APK remains 0.1.0-rc1 code 1."
   ]
 }
