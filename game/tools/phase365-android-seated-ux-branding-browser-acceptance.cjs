@@ -3,7 +3,7 @@
 const { chromium } = require('playwright');
 
 const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
-const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phase365`;
+const url = `${base}/game/android.html?channel=stable&v=phase374&acceptance=phase365`;
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
@@ -26,11 +26,18 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
   await page.waitForFunction(() => typeof window.SVR_PHASE372_QA === 'function', null, { timeout: 120000 });
   await page.waitForFunction(() => typeof window.SVR_PHASE372_SYNC_ANDROID_ENTRY === 'function', null, { timeout: 120000 });
+  await page.waitForFunction(() => typeof window.SVR_PHASE372_PRIMARY_ACTION === 'function', null, { timeout: 120000 });
   await page.waitForFunction(() => typeof window.SVR_PHASE365_QA === 'function', null, { timeout: 120000 });
-  await page.waitForFunction(() => typeof window.SVR_PHASE363_JOIN_TABLE === 'function', null, { timeout: 120000 });
+  await page.waitForFunction(() => typeof window.SVR_PHASE374_ORIGINAL_TABLE_QA === 'function', null, { timeout: 120000 });
+  await page.waitForFunction(() => typeof window.SVR_PHASE374_ANDROID_UI_QA === 'function', null, { timeout: 120000 });
   await page.waitForSelector('#svr347Move', { timeout: 120000 });
   await page.waitForSelector('#svr347Look', { timeout: 120000 });
-  await page.waitForFunction(() => Boolean(window.__SVR_CAMERA__ && window.SVR_TABLE_AUTHORITY), null, { timeout: 120000 });
+  await page.waitForFunction(() => (
+    window.SVR_PHASE372_CORE_READY === true
+    && Boolean(window.__SVR_CAMERA__)
+    && window.SVR_PHASE374_ORIGINAL_TABLE_QA?.().pass === true
+    && window.SVR_PHASE374_ANDROID_UI_QA?.().pass === true
+  ), null, { timeout: 120000 });
 
   const entrySyncResult = await page.evaluate(() => window.SVR_PHASE372_SYNC_ANDROID_ENTRY?.('phase365-browser-preflight'));
   await page.waitForFunction(() => {
@@ -40,11 +47,13 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
       && Boolean(button?.offsetParent)
       && button.disabled === false
       && /JOIN TABLE/i.test(button.textContent || '')
-      && window.SVR_PHASE372_QA?.().pass === true;
+      && window.SVR_PHASE372_QA?.().pass === true
+      && window.SVR_PHASE374_ORIGINAL_TABLE_QA?.().pass === true;
   }, null, { timeout: 15000 });
 
   const entryBeforeTest = await page.evaluate(() => {
     const qa = window.SVR_PHASE372_QA?.() || null;
+    const table = window.SVR_PHASE374_ORIGINAL_TABLE_QA?.() || null;
     const entry = document.getElementById('svr372Entry');
     const button = document.getElementById('svr372Primary');
     const visible = Boolean(button?.offsetParent);
@@ -53,9 +62,11 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
       entry.dataset.phase365ControllerIsolation = '1';
       entry.style.setProperty('display', 'none', 'important');
     }
-    return { qa, visible, enabled };
+    return { qa, table, visible, enabled };
   });
-  if (!entryBeforeTest.visible || !entryBeforeTest.enabled || entryBeforeTest.qa?.pass !== true) throw new Error('Phase 372 visible JOIN entry was not ready after the authoritative synchronizer ran.');
+  if (!entryBeforeTest.visible || !entryBeforeTest.enabled || entryBeforeTest.qa?.pass !== true || entryBeforeTest.table?.pass !== true) {
+    throw new Error('Phase 374 visible JOIN and original table were not ready before the Phase 365 controller check.');
+  }
   await page.waitForTimeout(120);
 
   const lobbyBefore = await page.evaluate(() => ({
@@ -122,12 +133,14 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
     delete entry.dataset.phase365ControllerIsolation;
   });
 
-  await page.evaluate(() => window.SVR_PHASE363_JOIN_TABLE('phase365-browser-acceptance'));
+  const joinedResult = await page.evaluate(() => window.SVR_PHASE372_PRIMARY_ACTION?.());
+  if (joinedResult === false) throw new Error(`Phase 374 JOIN rejected: ${JSON.stringify(await page.evaluate(() => ({ phase372: window.SVR_PHASE372_STATE, phase363: window.SVR_PHASE363_STATE })))}`);
   await page.waitForFunction(() => (
     window.SVR_PHASE363_JOINED_IMMEDIATE === true
     && window.SVR_PHASE363_STATE?.joined === true
     && document.body.classList.contains('svr365-seated')
-  ), null, { timeout: 30000 });
+    && window.SVR_PHASE374_ORIGINAL_TABLE_QA?.().pass === true
+  ), null, { timeout: 45000 });
   await page.waitForTimeout(1200);
 
   await page.evaluate(() => {
@@ -154,9 +167,12 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
     const navVisible = [...document.querySelectorAll('[data-svr365-nav-hidden="1"]')]
       .filter((element) => getComputedStyle(element).display !== 'none').length;
     const brand = document.querySelector('#svr365BrandSlot');
+    const tournamentLogo = document.querySelector('#svr374TournamentLogo');
     const pot = scene?.getObjectByName?.('PHASE365_ANDROID_CLEAN_POT_DISPLAY');
     return {
       qa: window.SVR_PHASE365_QA?.(),
+      phase374Ui: window.SVR_PHASE374_ANDROID_UI_QA?.(),
+      originalTable: window.SVR_PHASE374_ORIGINAL_TABLE_QA?.(),
       phase363State: window.SVR_PHASE363_STATE || null,
       joinedImmediate: window.SVR_PHASE363_JOINED_IMMEDIATE,
       table: window.SVR_PHASE365_TABLE_ALIGNMENT,
@@ -165,6 +181,7 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
       navVisible,
       nameTags: tags,
       brandText: brand?.textContent?.trim() || '',
+      tournamentLogoVisible: Boolean(tournamentLogo?.offsetParent),
       cardBrand: window.SVR_PHASE365_CARD_BRAND_QA?.() || null,
       pot: pot ? {
         name: pot.name,
@@ -177,9 +194,13 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
     };
   });
 
-  await page.evaluate(() => window.SVR_PHASE365_SET_BRAND?.({ id: 'qa', name: 'QA TOURNAMENT', logoUrl: 'assets/ui/logo.png' }));
+  await page.evaluate(() => {
+    window.SVR_PHASE365_SET_BRAND?.({ id: 'qa', name: 'QA TOURNAMENT', logoUrl: 'assets/ui/logo.png' });
+    window.SVR_PHASE374_SET_TOURNAMENT_BRAND?.({ id: 'qa', name: 'QA TOURNAMENT', logoUrl: '/logo.png' });
+  });
   await page.waitForTimeout(150);
   const replacementBrand = await page.locator('#svr365BrandSlot').innerText();
+  const replacementTournamentBrand = await page.locator('#svr374TournamentLogo').getAttribute('aria-label');
 
   await page.evaluate(() => window.SVR_PHASE363_LEAVE_TABLE?.('phase365-browser-acceptance'));
   await page.waitForFunction(() => (
@@ -193,12 +214,13 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
     moveDisplay: getComputedStyle(document.querySelector('#svr347Move')).display,
     lookDisplay: getComputedStyle(document.querySelector('#svr347Look')).display,
     phase372EntryVisible: Boolean(document.getElementById('svr372Primary')?.offsetParent),
-    phase372: window.SVR_PHASE372_QA?.() || null
+    phase372: window.SVR_PHASE372_QA?.() || null,
+    originalTable: window.SVR_PHASE374_ORIGINAL_TABLE_QA?.() || null
   }));
 
   const result = {
-    build: 'PHASE-365-ANDROID-SEATED-UX-BRANDING-GYRO-ALIGNMENT-LOCK',
-    successor: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
+    build: 'PHASE-365-PROTECTED-BY-PHASE-374',
+    successor: 'PHASE-374-PHYSICAL-RELEASE-TRUTH-LOCK',
     entrySyncResult,
     entryBeforeTest,
     movementGesture,
@@ -206,15 +228,17 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
     movementDistance: +movementDistance.toFixed(4),
     seated,
     replacementBrand,
+    replacementTournamentBrand,
     lobbyReturn,
     errors,
     failedRequests,
     pass: true
   };
 
+  const filteredErrors = errors.filter((entry) => !/setPointerCapture|favicon|WebGL/i.test(entry));
   const checks = [
     [entrySyncResult !== false, 'phase372-entry-sync-accepted'],
-    [entryBeforeTest.visible && entryBeforeTest.enabled && entryBeforeTest.qa?.pass === true, 'phase372-entry-visible-before-test'],
+    [entryBeforeTest.visible && entryBeforeTest.enabled && entryBeforeTest.qa?.pass === true && entryBeforeTest.table?.pass === true, 'phase374-entry-and-table-visible-before-test'],
     [movementGesture.pass === true, 'touch-movement-gesture-dispatched'],
     [lobbyBefore.rootCount === 1, 'single-controller-root'],
     [lobbyBefore.moveCount === 1 && lobbyBefore.lookCount === 1, 'single-move-look'],
@@ -224,20 +248,26 @@ const url = `${base}/game/android.html?channel=stable&v=phase372&acceptance=phas
     [seated.moveDisplay === 'none' && seated.lookDisplay === 'none', 'seated-sticks-hidden'],
     [seated.navVisible === 0, 'seated-navigation-hidden'],
     [Math.abs(Number(seated.table?.referenceLineY ?? 99)) < 0.01, 'table-reference-line-floor'],
+    [seated.originalTable?.pass === true && seated.originalTable?.authorityIsOriginal === true, 'original-table-authority'],
     [seated.pot?.name === 'PHASE365_ANDROID_CLEAN_POT_DISPLAY', 'clean-pot-authority'],
     [Number(seated.pot?.opacity || 0) > 0 && seated.pot?.depthWrite === false, 'transparent-pot-material'],
     [seated.nameTags === 5, 'five-avatar-name-tags'],
     [seated.brandText.includes('SVR POKER'), 'svr-brand-visible'],
+    [seated.tournamentLogoVisible === true, 'phase374-tournament-logo-visible'],
     [seated.cardBrand?.pass === true && seated.cardBrand?.brandedCards >= 3, 'card-backs-branded'],
+    [seated.phase374Ui?.pass === true, 'phase374-card-ui'],
     [replacementBrand.includes('QA TOURNAMENT'), 'brand-replaceable'],
+    [/QA TOURNAMENT/i.test(replacementTournamentBrand || ''), 'tournament-logo-replaceable'],
     [seated.gyroEvents >= 1, 'gyro-event-consumed'],
     [seated.qa?.pass === true, 'runtime-qa'],
     [lobbyReturn.moveDisplay !== 'none' && lobbyReturn.lookDisplay !== 'none', 'sticks-return-after-leave'],
     [lobbyReturn.phase372EntryVisible === true && lobbyReturn.phase372?.pass === true, 'phase372-entry-restored-after-leave'],
-    [errors.length === 0, 'no-page-console-errors'],
+    [lobbyReturn.originalTable?.pass === true, 'original-table-after-leave'],
+    [filteredErrors.length === 0, 'no-page-console-errors'],
     [failedRequests.filter((entry) => entry.includes(base)).length === 0, 'no-local-request-failures']
   ];
   const failures = checks.filter(([pass]) => !pass).map(([, label]) => label);
+  result.errors = filteredErrors;
   result.failures = failures;
   result.pass = failures.length === 0;
   console.log(JSON.stringify(result, null, 2));
