@@ -76,6 +76,9 @@ async function waitFor(page, evaluator, timeout = 60000) {
     await page.click('#join');
     const seated = await waitFor(page, () => {
       const qa = window.SVR_PHASE380_ANDROID_QA?.();
+      const slot = document.getElementById('brandSlot');
+      const style = slot ? getComputedStyle(slot) : null;
+      const rect = slot?.getBoundingClientRect?.();
       const result = {
         qa,
         tableVisible: !document.getElementById('table')?.classList.contains('hide'),
@@ -85,7 +88,7 @@ async function waitFor(page, evaluator, timeout = 60000) {
         bots: document.querySelectorAll('#bots .bot').length,
         actions: document.querySelectorAll('.actions button').length,
         movementControls: document.querySelectorAll('.virtual-stick,[data-svr-android-controller],#svr347Move,#svr347Look').length,
-        brandVisible: Boolean(document.getElementById('brandSlot')?.offsetParent),
+        brandVisible: Boolean(slot && style?.display !== 'none' && style?.visibility !== 'hidden' && Number(style?.opacity || 1) > 0 && rect?.width > 0 && rect?.height > 0),
         status: document.getElementById('status')?.textContent || ''
       };
       return result.qa?.joined === true
@@ -108,8 +111,10 @@ async function waitFor(page, evaluator, timeout = 60000) {
     const brand = await page.evaluate(() => window.SVR_PHASE380_SET_BRAND?.({ id: 'qa-tournament', name: 'QA TOURNAMENT', logoUrl: '/logo.png' }));
     const branding = await waitFor(page, () => {
       const slot = document.getElementById('brandSlot');
+      const style = slot ? getComputedStyle(slot) : null;
+      const rect = slot?.getBoundingClientRect?.();
       const result = {
-        visible: Boolean(slot?.offsetParent),
+        visible: Boolean(slot && style?.display !== 'none' && style?.visibility !== 'hidden' && Number(style?.opacity || 1) > 0 && rect?.width > 0 && rect?.height > 0),
         name: document.getElementById('brandName')?.textContent || '',
         logo: document.getElementById('brandLogo')?.getAttribute('src') || ''
       };
