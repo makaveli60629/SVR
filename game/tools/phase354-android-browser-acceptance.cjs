@@ -177,7 +177,6 @@ async function waitFor(page, evaluator, timeout = 60000) {
       && showdown.community === 5
       && showdown.qa?.burnCards === 3
       && nextHand.dealer !== dealerBefore
-      && document.querySelectorAll?.length !== -1
       && pageErrors.length === 0
       && filteredConsole.length === 0
       && httpErrors.length === 0
