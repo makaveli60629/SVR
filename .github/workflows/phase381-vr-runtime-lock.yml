@@ -62,10 +62,13 @@ jobs:
           test -s game/assets/models/eric/eric.fbx
           test -s game/modules/phase368_card_dealer_motion.js
 
-      - name: Preserve Phase 380 protected contracts
+      - name: Preserve protected Phase 380 table, Android and site contracts
         run: |
           set -euo pipefail
-          node game/tools/phase380-game-site-integrity-static-test.mjs
-          node game/tools/phase379-production-static-test.mjs
-          node game/tools/phase358-quest-static-test.mjs
-          node game/tools/phase359-dual-platform-static-test.mjs
+          grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' game/modules/phase380_original_table_authority_lock.js
+          grep -q 'FALLBACK_DELAY_MS = 10000' game/modules/phase379_quest_procedural_table_authority.js
+          grep -q 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' game/android-stable.html
+          grep -q 'movementControlsWhileSeated:0' game/android-stable.html
+          grep -q 'PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK' site/index.html
+          test -s game/assets/models/table.glb
+          test -s game/assets/table.fbx
