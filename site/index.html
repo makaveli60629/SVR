@@ -1,44 +1,74 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>SVR Poker | Play, Update & Download</title>
-<meta name="description" content="SVR Poker public Android, APK, Quest and player portal.">
-<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<meta name="theme-color" content="#9b4dff">
-<link rel="icon" href="/logo.png" type="image/png">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>SVR Poker | Premium Social VR Poker</title>
+<meta name="description" content="SVR Poker homepage with live lobby preview, player profiles, tournaments, store, sponsorship, membership, support and Android/Quest access."/>
+<link rel="icon" href="../logo.webp?v=phase381" type="image/webp"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site-market.css?v=phase381"/>
+<link rel="stylesheet" href="phase93-visual.css?v=phase381"/>
+<link rel="stylesheet" href="phase94-device-slider.css?v=phase381"/>
+<link rel="stylesheet" href="final-polish.css?v=phase381"/>
 <style>
-:root{--cyan:#7ffcff;--purple:#9b4dff;--gold:#ffd98a;--green:#8dffb4;--ink:#02040a}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#02030a;color:#fff;font-family:system-ui,Arial,sans-serif}body{padding:18px;background:radial-gradient(circle at 50% 0,rgba(155,77,255,.34),transparent 38%),radial-gradient(circle at 15% 35%,rgba(127,252,255,.13),transparent 30%),linear-gradient(180deg,#06020d,#03101a 58%,#000)}main{width:min(1040px,100%);margin:auto}.top{display:flex;align-items:center;gap:15px;padding:18px;border:1px solid #7ffcff55;border-radius:24px;background:#050915e8;box-shadow:0 25px 80px #000}.top img{width:88px;height:88px;object-fit:contain}.top h1{margin:0;font-size:clamp(30px,7vw,62px);letter-spacing:.12em}.top p{margin:5px 0;color:#d9fbff}.badge{display:inline-block;padding:6px 10px;border:1px solid var(--green);border-radius:999px;color:var(--green);font-weight:950;letter-spacing:.08em}.release{margin:15px 0;padding:18px;border:1px solid var(--gold);border-radius:20px;background:#171105d9}.release strong{color:var(--gold)}.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:15px 0}.btn{display:flex;align-items:center;justify-content:center;min-height:58px;padding:12px;border:1px solid #ffffff30;border-radius:15px;background:#111827;color:#fff;text-decoration:none;font-weight:950;text-align:center}.btn.play{grid-column:1/-1;border:0;background:linear-gradient(135deg,var(--cyan),var(--purple));color:var(--ink);font-size:21px}.btn.apk{border:0;background:linear-gradient(135deg,var(--green),var(--cyan));color:var(--ink)}.btn.update{border-color:var(--gold);background:#30250d}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card{padding:17px;border:1px solid #ffffff20;border-radius:19px;background:#070b16d9}.card h2{margin:0 0 7px;color:#dffcff}.card p{color:#cad7e7;line-height:1.5}.card a{color:var(--cyan)}.status{margin-top:12px;padding:12px;border-left:4px solid var(--green);border-radius:10px;background:#8dffb410;line-height:1.5}.footer{text-align:center;padding:25px 0 95px;color:#c9c0df}.notice{position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:2147483647;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;padding:10px;border:1px solid var(--green);border-radius:16px;background:#001016f5;box-shadow:0 20px 70px #000}.notice strong{color:var(--green)}.notice a{padding:9px 13px;border-radius:999px;background:var(--green);color:var(--ink);text-decoration:none;font-weight:950}.notice a:last-child{background:var(--cyan)}@media(max-width:760px){.top{align-items:flex-start}.top img{width:70px;height:70px}.actions,.grid{grid-template-columns:1fr}.btn.play{grid-column:auto}.notice{font-size:12px}.notice a{flex:1;text-align:center}}
+:root{--cyan:#7ffcff;--green:#8dffb4;--gold:#ffd98a;--purple:#9b4dff}
+.svr381-status-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-left:auto}.svr381-status{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid rgba(255,255,255,.17);border-radius:999px;background:rgba(3,6,14,.86);font:800 9px Orbitron,system-ui;letter-spacing:.05em;text-transform:uppercase}.svr381-status:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}.svr381-status.online:before{background:var(--green);box-shadow:0 0 13px var(--green)}.svr381-status.offline:before{background:#ff7d8b;box-shadow:0 0 13px #ff7d8b}.svr381-status.standby:before{background:var(--gold);box-shadow:0 0 13px var(--gold)}
+.svr381-ai-button{border:1px solid var(--green);border-radius:999px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#03100b;padding:7px 10px;font:900 9px Orbitron,system-ui;letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+.svr381-app-card{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;margin:18px 0;padding:18px;border:1px solid rgba(141,255,180,.55);border-radius:22px;background:linear-gradient(135deg,rgba(141,255,180,.09),rgba(155,77,255,.12));box-shadow:0 22px 70px rgba(0,0,0,.45)}.svr381-app-card img{width:72px;height:72px;object-fit:contain}.svr381-app-actions{display:flex;gap:8px;flex-wrap:wrap}.svr381-app-actions a{white-space:nowrap}
+.svr381-home-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.svr381-home-grid .card{min-height:175px}.svr381-message{display:grid;grid-template-columns:1fr 1fr;gap:14px}.svr381-message form{display:grid;gap:10px}.svr381-message input,.svr381-message textarea{width:100%;border:1px solid rgba(127,252,255,.3);border-radius:12px;background:rgba(0,0,0,.34);color:white;padding:11px;font:700 15px Rajdhani,system-ui}.svr381-message textarea{min-height:110px;resize:vertical}
+@media(max-width:1080px){.market-nav{align-items:flex-start;flex-wrap:wrap}.svr381-status-row{width:100%;margin-left:0}.svr381-home-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.svr381-app-card{grid-template-columns:1fr;text-align:center}.svr381-app-card img{margin:auto}.svr381-app-actions{justify-content:center}.svr381-home-grid,.svr381-message{grid-template-columns:1fr}.svr381-status{font-size:8px}.market-links{display:flex;overflow-x:auto;max-width:100%;padding-bottom:7px}}
 </style>
 </head>
-<body data-build="PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK">
-<main>
-<header class="top"><img src="/logo.png" alt="SVR Poker logo"><div><span class="badge">ANDROID + QUEST LIVE</span><h1>SVR POKER</h1><p>Android stable play, APK installation, Quest/VR launch, profile and support.</p></div></header>
-<section class="release"><strong>STABLE PLAY ROUTES</strong><p>Android opens the lightweight <b>JOIN NOW</b> table before any cards are dealt. Quest loads the original uploaded poker table first and creates an emergency table only when both uploaded table formats fail.</p></section>
-<nav class="actions" aria-label="Primary SVR controls">
-<a class="btn play" href="/game/android-stable.html?v=phase380&t=public">PLAY ANDROID — JOIN NOW</a>
-<a class="btn apk" id="apkButton" href="/downloads/svr-poker-android-rc2.apk">DOWNLOAD APK RC2</a>
-<a class="btn update" href="/downloads/?v=phase380#update">UPDATE / INSTALL HELP</a>
-<a class="btn" href="/game/index.html?platform=quest&v=phase380">LAUNCH QUEST / VR</a>
-<a class="btn" href="/site/profile.html?v=phase380">PLAYER PROFILE</a>
-<a class="btn" href="/site/store.html">SVR STORE</a>
-<a class="btn" href="/site/tournaments.html">TOURNAMENTS</a>
-<a class="btn" href="/site/contact.html">CONTACT / SUPPORT</a>
+<body class="svr-market" data-build="PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK" data-release="PHASE-381-FULL-WEBSITE-HOMEPAGE-RESTORATION-LOCK">
+<canvas id="binary-rain" aria-hidden="true"></canvas>
+<div class="market-page">
+<nav class="market-nav">
+<a class="market-brand" href="index.html?v=phase381"><img src="../logo.webp?v=phase381" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Premium Social VR</span></div></a>
+<div class="market-links"><a href="index.html?v=phase381">Home</a><a href="login.html?v=phase381">Login</a><a href="login.html?mode=register&v=phase381">Register</a><a href="profile.html?v=phase381">Profile</a><a href="store.html">Store</a><a href="tournaments.html">Tournaments</a><a href="about.html">About</a><a href="sponsorship.html">Sponsors</a><a href="advertising.html">Advertising</a><a href="billboards.html">Billboards</a><a href="membership.html">Membership</a><a href="impact.html">Impact</a><a href="roadmap.html">Roadmap</a><a href="contact.html">Contact</a></div>
+<div class="svr381-status-row" aria-label="SVR status indicators"><span class="svr381-status standby" data-svr-status="server">Server Checking</span><span class="svr381-status standby" data-svr-status="database">Database Checking</span><span class="svr381-status standby admin-status" data-svr-status="admin">Admin Checking</span><span class="svr381-status online" data-svr-status="ai">AI Support Online</span><button class="svr381-ai-button" data-svr-ask-ai type="button">Ask AI Support</button></div>
 </nav>
-<section class="grid">
-<article class="card"><h2>Android Stable Table</h2><p>JOIN NOW appears before the table. Cards use full <b>10</b> ranks, two readable corners, a large center suit, deterministic Hold’em evaluation, burn cards and a replaceable tournament logo.</p><a href="/game/android-stable.html?v=phase380">Open stable table</a></article>
-<article class="card"><h2>APK RC2</h2><p>The verified APK is available from the same SVR Poker domain. Uninstall an older test package before installing RC2.</p><a href="/downloads/svr-poker-android-rc2.apk">Download APK RC2</a></article>
-<article class="card"><h2>Quest Original Table</h2><p>The Quest route now prioritizes the uploaded GLB/FBX poker table. The procedural table is delayed, removable and emergency-only.</p><a href="/game/index.html?platform=quest&v=phase380">Open Quest route</a></article>
+
+<main class="market-shell">
+<section class="svr381-app-card" aria-label="SVR Android app release">
+<img src="../logo.png" alt="SVR Poker Android app">
+<div><span class="tag">Android App</span><h2>SVR Poker Android RC2</h2><p>The app download is one feature of the SVR website—not the entire website. Enter the full VR-style Android lobby, use the lightweight recovery table, or install the current APK.</p></div>
+<div class="svr381-app-actions"><a class="btn primary" href="../game/android-lobby.html?v=phase381">Open Android Lobby</a><a class="btn secondary" href="../downloads/svr-poker-android-rc2.apk" download>Download APK</a><a class="btn ghost" href="../downloads/?v=phase381">Install Help</a></div>
 </section>
-<div class="status" id="releaseStatus"><strong>Checking APK release status…</strong></div>
-<footer class="footer">© 2026 SVR Poker • Scarlett Holding LLC • Team Nova • R.Chadee</footer>
-</main>
-<aside class="notice"><strong>SVR ANDROID RC2</strong><a href="/downloads/svr-poker-android-rc2.apk">APK DOWNLOAD</a><a href="/game/android-stable.html?v=phase380">PLAY NOW</a></aside>
-<script>
-(async()=>{const box=document.getElementById('releaseStatus'),button=document.getElementById('apkButton');try{const response=await fetch('/game/android-release.json?t='+Date.now(),{cache:'no-store'});const manifest=await response.json();if(manifest.releaseReady&&manifest.apkUrl){button.href=manifest.apkUrl;button.setAttribute('download','');box.innerHTML='<strong style="color:#8dffb4">APK '+manifest.apkVersionName+' is published.</strong> Version code '+manifest.apkVersionCode+'.';}else{box.innerHTML='<strong style="color:#ffd98a">Android browser game is live.</strong> Open the release page for APK status.';}}catch{box.textContent='Android browser game and the same-domain APK download are available.';}})();
-</script>
-</body>
-</html>
+
+<section class="section phase94-slider-section phase98-art-slider" aria-label="SVR visual banner slider">
+<div class="svr-slide-deck phase96-feature-deck phase98-art-deck" data-svr-slide-deck data-autoplay-ms="4200">
+<article class="svr-slide svr-art-slide is-active" data-slide-id="slide-00"><img src="assets/banners/00-svr-welcome-main.svg" alt="Welcome to SVR Poker"><div class="svr-slide-overlay"><a class="btn primary" href="about.html">Explore SVR</a><a class="btn secondary" href="../game/index.html?platform=quest&v=phase381">Launch VR Lobby</a></div></article>
+<article class="svr-slide svr-art-slide" data-slide-id="slide-01"><img src="assets/banners/01-scorpion-vr-exclusive.webp" alt="Scorpion VR exclusive"><div class="svr-slide-overlay"><a class="btn primary" href="login.html?mode=register&v=phase381">Register Now</a><a class="btn secondary" href="tournaments.html">Tournaments</a></div></article>
+<article class="svr-slide svr-art-slide" data-slide-id="slide-02"><img src="assets/banners/02-svr-store-preview.webp" alt="SVR Store"><div class="svr-slide-overlay"><a class="btn primary" href="store.html">Open Store</a><a class="btn secondary" href="membership.html">Membership</a></div></article>
+<article class="svr-slide svr-art-slide" data-slide-id="slide-04"><img src="assets/banners/04-pga-golf-hub.webp" alt="PGA Golf Hub"><div class="svr-slide-overlay"><a class="btn primary" href="store-pga.html">PGA Hub</a><a class="btn secondary" href="sponsorship.html">Sponsor SVR</a></div></article>
+<article class="svr-slide svr-art-slide" data-slide-id="slide-05"><img src="assets/banners/05-smoker-lounge.webp" alt="SVR Lounge"><div class="svr-slide-overlay"><a class="btn primary" href="store-smoker.html">Open Lounge</a><a class="btn secondary" href="contact.html">Request Access</a></div></article>
+<article class="svr-slide svr-art-slide" data-slide-id="slide-06"><img src="assets/banners/06-scorpion-poker-room.webp" alt="Scorpion Poker Room"><div class="svr-slide-overlay"><a class="btn primary" href="../game/scorpion.html">Preview Room</a><a class="btn secondary" href="tournaments.html">Events</a></div></article>
+</div>
+<div class="svr-slide-controls phase98-art-controls"><button type="button" data-slide-prev aria-label="Previous slide">‹</button><div class="svr-slide-dots" data-slide-dots aria-label="Slide selector"></div><button type="button" data-slide-next aria-label="Next slide">›</button></div>
+</section>
+
+<section class="hero live-hero" id="live-game">
+<div class="live-copy"><span class="kicker">Live Lobby View</span><h1>SVR Live</h1><p class="lead">A director-camera view of the SVR Poker lobby for players, sponsors, testers and visitors.</p><p class="copy">Explore the full website, create a profile, open the store, review tournaments and sponsorship options, install the Android app, or enter the Quest lobby.</p><div class="actions"><a class="btn primary" href="login.html?mode=register&v=phase381">Register</a><a class="btn secondary" href="profile.html?v=phase381">Player Profile</a><a class="btn ghost" href="store.html">Store</a><a class="btn ghost" href="tournaments.html">Tournaments</a><button class="btn ghost" type="button" data-svr-ask-ai>Ask AI Support</button></div><div class="trust-strip"><span>Live Lobby Preview</span><span>Player Profiles</span><span>Android + Quest</span><span>Store + Sponsors</span></div></div>
+<aside class="hero-card live-game-card" aria-label="SVR Poker live game preview"><div class="live-frame-head"><span class="live-dot"></span><span>LIVE LOBBY VIEW</span><a href="../game/camera3.html?v=phase381" target="_blank" rel="noopener">Open</a></div><div class="preview live-preview-frame"><div class="preview-fallback" id="previewFallback"><strong>Loading SVR lobby preview…</strong><span>The full lobby remains available through Android and Quest.</span></div><iframe id="svrLiveGameFrame" src="../game/camera3.html?v=phase381" title="SVR Poker live director camera preview" loading="eager" allow="fullscreen; xr-spatial-tracking; autoplay"></iframe></div><div class="live-frame-actions"><a class="btn primary" href="../game/android-lobby.html?v=phase381">Android Lobby</a><a class="btn secondary" href="../game/index.html?platform=quest&v=phase381">Quest Lobby</a></div></aside>
+</section>
+
+<section class="section"><div class="head"><div><span class="tag">SVR Website</span><h2>The Complete SVR Experience</h2><p>The homepage is restored as the central path for the game, community, store, sponsorship, events and player services.</p></div></div><div class="svr381-home-grid"><article class="card"><h3>Player Accounts</h3><p>Login, registration, profile, avatar showroom, dressing rooms and daily play-money activity.</p><a href="profile.html?v=phase381">Open Profile</a></article><article class="card"><h3>Game Lobbies</h3><p>Use the VR-style Android lobby, Quest WebXR lobby, Camera 3 preview and private room portals.</p><a href="../game/android-lobby.html?v=phase381">Enter Android Lobby</a></article><article class="card"><h3>Store & Membership</h3><p>Browse SVR store concepts, player membership paths and future avatar/game offerings.</p><a href="store.html">Open Store</a></article><article class="card"><h3>Tournaments</h3><p>Review event concepts, tournament presentation and future sponsor-branded tables.</p><a href="tournaments.html">View Tournaments</a></article><article class="card"><h3>Sponsorship</h3><p>Explore lobby displays, branded rooms, tournament logo placements and public-site advertising.</p><a href="sponsorship.html">Sponsor SVR</a></article><article class="card"><h3>Advertising</h3><p>Review approved billboard, banner and digital placement concepts across the website and lobby.</p><a href="advertising.html">Advertising Options</a></article><article class="card"><h3>Community Impact</h3><p>Follow SVR community programs, stories and the planned charitable-impact presentation.</p><a href="impact.html">Open Impact</a></article><article class="card"><h3>Support</h3><p>AI support is available whenever the admin is offline. Contact pages and saved-message fallback remain available.</p><button class="btn primary" type="button" data-svr-ask-ai>Ask AI Support</button></article></div></section>
+
+<section class="section" id="message"><div class="head"><div><span class="tag">Contact SVR</span><h2>Leave a Message</h2><p>Use AI support for immediate SVR questions or leave a message for later admin review.</p></div></div><div class="svr381-message"><article class="card"><h3>AI Support</h3><p>Ask about Android, Quest, poker gameplay, profiles, tournaments, sponsorship, store navigation or technical recovery.</p><button class="btn primary" type="button" data-svr-ask-ai>Ask AI Support</button></article><form class="card" id="visitor-message-form"><input name="name" placeholder="Name optional"><input name="email" type="email" placeholder="Email optional"><textarea name="message" required placeholder="Type your message"></textarea><button class="btn secondary" type="submit">Save Message</button><div id="visitor-message-status" aria-live="polite"></div></form></div></section>
+
+<footer class="footer"><p class="footer-note">© 2026 SVR Poker. Scarlett Holding LLC • Team Nova • R.Chadee</p><div class="inline-actions"><a class="btn secondary" href="../index.html?v=phase381">Public Launch</a><a class="btn primary" href="login.html?mode=register&v=phase381">Register</a><a class="btn secondary" href="tournaments.html">Tournaments</a><a class="btn secondary" href="store.html">Store</a><a class="btn secondary" href="contact.html">Contact</a><a class="btn secondary" href="../downloads/svr-poker-android-rc2.apk" download>Download App</a></div></footer>
+</main></div>
+<script src="../matrix.js?v=phase381"></script>
+<script src="../site-local-counter.js?v=phase381"></script>
+<script src="../site-public-hooks.js?v=phase381"></script>
+<script src="../support-chat-bot.js?v=phase381"></script>
+<script src="js/market-ads.js?v=phase381"></script>
+<script>(function(){const frame=document.getElementById('svrLiveGameFrame');const fallback=document.getElementById('previewFallback');if(!frame||!fallback)return;let loaded=false;frame.addEventListener('load',()=>{loaded=true;fallback.classList.add('is-hidden')});setTimeout(()=>{if(!loaded){fallback.innerHTML='<strong>Preview is still loading.</strong><span>Use Android Lobby or Quest Lobby to open the full scene.</span>';fallback.classList.add('is-warning')}},7000)})();</script>
+</body></html>
