@@ -40,19 +40,21 @@ for (const route of ['game/index.html', 'game/camera3.html']) {
 }
 
 const androidEntry = read('game/android.html');
+const androidLobby = read('game/android-lobby.html');
 const androidStable = read('game/android-stable.html');
-expect(
-  androidEntry.includes('android-stable.html?v=phase379') || androidEntry.includes('android-stable.html?v=phase380'),
-  'game/android.html does not redirect to a supported stable Android table'
-);
+expect(androidEntry.includes('android-lobby.html?v=phase381'), 'game/android.html does not redirect to the Phase 381 Android lobby');
+expect(androidLobby.includes('PHASE-381-ANDROID-VR-LOBBY-SOUND-TABLE-LOCK'), 'Phase 381 Android lobby build is missing');
+expect(androidLobby.includes('phase368_card_dealer_animation_lock.js?v=phase381'), 'Phase 381 Android 3D lobby does not load the card dealer');
+expect(androidLobby.includes('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js?v=phase381'), 'Android lobby poker state is missing');
 expect(
   androidStable.includes('PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK')
     || androidStable.includes('PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK'),
-  'supported Android stable build is missing'
+  'supported Android low-power build is missing'
 );
+expect(androidStable.includes('PHASE-381-ANDROID-SOUND-COMPACT-LOGO-CARDS-LOCK'), 'Phase 381 low-power presentation successor is missing');
 expect(androidStable.includes('JOIN NOW'), 'Android JOIN NOW is missing');
 expect(androidStable.includes('No cards, poker actions, or movement controls appear before joining.') || androidStable.includes('No cards are dealt before you join.'), 'Android pre-join protection is missing');
-expect(!androidStable.includes('phase368_card_dealer_animation_lock.js'), 'lightweight Android table must not load the heavy 3D dealer');
+expect(!androidStable.includes('phase368_card_dealer_animation_lock.js'), 'low-power Android table must not load the heavy 3D dealer');
 
 if (failures.length) {
   console.error(JSON.stringify({ pass: false, failures }, null, 2));
@@ -61,10 +63,10 @@ if (failures.length) {
 console.log(JSON.stringify({
   pass: true,
   build: 'PHASE-368-CARD-DEALER-ANIMATION-LOCK',
-  successor: 'PHASE-380-GAME-SITE-INTEGRITY-LOCK',
+  successor: 'PHASE-381-SITE-LOBBY-RESTORATION-LOCK',
   source: motion.source,
   optimizedBytes: Buffer.byteLength(motion.rotationBase64 + motion.translationBase64, 'utf8'),
   frames: motion.frames,
   bones: motion.bones.length,
-  routes: ['desktop/quest 3D dealer', 'camera3 3D dealer', 'android Phase 380 lightweight table']
+  routes: ['desktop/quest 3D dealer', 'camera3 3D dealer', 'android Phase 381 3D lobby dealer', 'android Phase 380 low-power table without heavy dealer']
 }, null, 2));
