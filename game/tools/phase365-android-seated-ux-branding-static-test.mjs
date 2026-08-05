@@ -59,12 +59,12 @@ requireText(successorSource, 'window.visualViewport', 'visual-viewport');
 requireText(successorSource, 'window.SVR_PHASE365_STABILIZE_SEAT?.()', 'phase365-seat-authority-reused');
 requireText(platformManifest, "export const VERSION = 'phase367'", 'optional-3d-platform-version');
 requireText(platformManifest, "'modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js',\n  'modules/phase367_android_physical_device_viewport_touch_acceptance_lock.js'", 'phase365-before-phase367');
+requireText(platformManifest, 'phase367_android_physical_device_viewport_touch_acceptance_lock.js', 'phase367-loaded-by-platform');
 
 requireText(androidRedirect, 'android-lobby.html?v=phase381', 'android-phase381-redirect');
 requireText(androidLobby, 'PHASE-381-ANDROID-VR-LOBBY-SOUND-TABLE-LOCK', 'android-lobby-build');
 requireText(androidLobby, 'phase365_android_seated_ux_branding_gyro_alignment_lock.js?v=phase381', 'phase365-loaded-in-lobby');
 requireText(androidLobby, 'phase365_android_card_brand_refresh_lock.js?v=phase381', 'phase365-brand-refresh-loaded');
-requireText(androidLobby, 'phase367_android_physical_device_viewport_touch_acceptance_lock.js', 'phase367-loaded-by-platform');
 requireText(androidLobby, 'SVR_ANDROID_BRAND_SLOT', 'android-lobby-brand-slot');
 requireText(androidLobby, "SVR_PHASE363_LEAVE_TABLE?.('phase381-lobby-start')", 'android-lobby-before-seat');
 requireText(androidLobby, 'unlockSound()', 'android-lobby-audio-unlock');
