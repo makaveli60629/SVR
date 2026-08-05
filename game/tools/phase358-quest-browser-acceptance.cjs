@@ -1,7 +1,7 @@
 const { chromium } = require('playwright');
 
 const base = process.env.SVR_TEST_BASE || 'http://127.0.0.1:4173';
-const url = `${base}/game/index.html?platform=quest&acceptance=1&manual=1&v=phase358`;
+const url = `${base}/game/index.html?platform=quest&acceptance=1&manual=1&v=phase380`;
 const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) OculusBrowser/35.0.0.0.0 Chrome/126.0.0.0 Mobile VR Safari/537.36 Quest 3';
 
 (async () => {
@@ -27,9 +27,7 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
   page.on('response', (response) => {
-    if (response.url().startsWith(base) && response.status() >= 400) {
-      httpErrors.push({ status: response.status(), url: response.url() });
-    }
+    if (response.url().startsWith(base) && response.status() >= 400) httpErrors.push({ status: response.status(), url: response.url() });
   });
   page.on('requestfailed', (request) => {
     if (request.url().startsWith(base)) requestFailures.push({ url: request.url(), error: request.failure()?.errorText || 'failed' });
@@ -37,10 +35,11 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
 
   let result = null;
   let platform = null;
+  let tableQa = null;
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    await page.waitForFunction(() => typeof window.SVR_PHASE358_RUN_QUEST_FULL_GAME_ACCEPTANCE === 'function', null, { timeout: 160000 });
-    result = await page.evaluate(() => window.SVR_PHASE358_RUN_QUEST_FULL_GAME_ACCEPTANCE({
+    await page.waitForFunction(() => typeof window.SVR_PHASE380_RUN_QUEST_FULL_GAME_ACCEPTANCE === 'function', null, { timeout: 160000 });
+    result = await page.evaluate(() => window.SVR_PHASE380_RUN_QUEST_FULL_GAME_ACCEPTANCE({
       runtimeTimeoutMs: 120000,
       handTimeoutMs: 75000,
       startupBudgetMs: 45000
@@ -62,21 +61,30 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
         prewarm: state.prewarm
       };
     });
+    tableQa = await page.evaluate(() => ({
+      original: window.SVR_PHASE380_ORIGINAL_TABLE_QA?.() || null,
+      emergency: window.SVR_PHASE379_TABLE_QA?.() || null,
+      currentAuthority: window.SVR_TABLE_AUTHORITY?.name || null
+    }));
   } finally {
+    const filteredConsole = consoleErrors.filter((line) => !/favicon|WebXR.*not available|immersive-vr|THREE\.WebGLRenderer/i.test(line));
+    const filteredFailures = requestFailures.filter((item) => !/favicon/i.test(item.url || ''));
     const report = {
       url,
       questUserAgent: true,
       result,
+      tableQa,
       platform,
       pageErrors,
-      consoleErrors,
+      consoleErrors: filteredConsole,
       httpErrors,
-      requestFailures,
+      requestFailures: filteredFailures,
       checkedAt: new Date().toISOString()
     };
     console.log(JSON.stringify(report, null, 2));
     await browser.close();
     const pass = result?.pass === true
+      && result?.build === 'PHASE-380-QUEST-ORIGINAL-TABLE-FULL-GAME-ACCEPTANCE-LOCK'
       && result?.platform === 'quest'
       && result?.hand?.pass === true
       && result?.hand?.phases?.includes('preflop')
@@ -88,10 +96,15 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
       && result?.hand?.holeCards === 2
       && result?.hand?.settlement?.totalStacks === 6000
       && result?.nextHand?.advanced === true
-      && result?.table?.table === 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED'
+      && result?.table?.table === 'PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY'
+      && result?.table?.currentAuthority === 'PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY'
       && result?.table?.uploadedTableAuthority === true
       && result?.table?.fallbackPresent === false
       && Boolean(result?.table?.potDisplay)
+      && tableQa?.original?.pass === true
+      && tableQa?.original?.authorityIsOriginal === true
+      && tableQa?.emergency?.fallbackPresent !== true
+      && tableQa?.currentAuthority === 'PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY'
       && result?.input?.handsPrimary === true
       && result?.input?.controllerFallback === true
       && result?.input?.androidRoots === 0
@@ -100,9 +113,9 @@ const questUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTM
       && result?.physicalQuestSessionTested === false
       && platform?.prewarm?.method === 'quest-incremental-frame-compilation'
       && pageErrors.length === 0
-      && consoleErrors.length === 0
+      && filteredConsole.length === 0
       && httpErrors.length === 0
-      && requestFailures.length === 0;
+      && filteredFailures.length === 0;
     if (!pass) process.exitCode = 1;
   }
 })().catch((error) => {

@@ -1,4 +1,4 @@
-const SVR_CACHE='svr-poker-phase379-network-authority-v1';
+const SVR_CACHE='svr-poker-phase380-network-authority-v1';
 const CORE=['/offline.html','/logo.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(SVR_CACHE).then(cache=>cache.addAll(CORE.map(url=>new Request(url,{cache:'reload'}))).catch(()=>undefined)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==SVR_CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));

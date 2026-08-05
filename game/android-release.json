@@ -1,7 +1,7 @@
 {
   "name": "SVR Poker Android",
   "channel": "stable-test",
-  "status": "phase379-apk-rc2-same-domain-ready",
+  "status": "phase380-apk-rc2-same-domain-ready",
   "packageName": "com.svrpoker.app",
   "apkVersionName": "0.1.0-rc2",
   "apkVersionCode": 2,
@@ -9,16 +9,16 @@
   "apkSha256": "f264a3cb9d4eaf1fd7d66604f575f7abb176c6012015bae06e5d7dd734ca328c",
   "releasePage": "https://github.com/makaveli60629/SVR/releases/tag/android-rc2",
   "releaseReady": true,
-  "webEntry": "/game/android-stable.html?v=phase379",
-  "legacyWebEntry": "/game/android.html?v=phase379",
-  "downloadsUrl": "/downloads/?v=phase379",
+  "webEntry": "/game/android-stable.html?v=phase380",
+  "legacyWebEntry": "/game/android.html?v=phase380",
+  "downloadsUrl": "/downloads/?v=phase380",
   "forceUpdate": false,
-  "showUpdatePrompt": true,
+  "showUpdatePrompt": false,
   "manualUpdateOnly": true,
-  "previewEntry": "/game/index.html?platform=quest&v=phase379",
-  "profileEntry": "/site/profile.html?v=phase379",
-  "currentGameBuild": "PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK",
-  "questBuild": "PHASE-379-QUEST-TABLE-ANDROID-ROUTE-RECOVERY-LOCK",
+  "previewEntry": "/game/index.html?platform=quest&v=phase380",
+  "profileEntry": "/site/profile.html?v=phase380",
+  "currentGameBuild": "PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK",
+  "questBuild": "PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK",
   "publicControls": {
     "downloadApkVisible": true,
     "updateAppVisible": true,
@@ -33,15 +33,20 @@
     "joinRequiredBeforeDeal": true,
     "cardsHiddenBeforeJoin": true,
     "legacySitSeatControlsExcluded": true,
-    "threeJsRequired": false
+    "threeJsRequired": false,
+    "deterministicHandEvaluator": true,
+    "burnCards": true,
+    "rankTenRenderedAs": "10",
+    "replaceableTournamentBrandSlot": true
   },
   "nativeBuildStatus": "same-domain-apk-verified",
-  "nativeApkRebuild": true,
+  "nativeApkRebuild": false,
   "offlineStableTableBundled": true,
-  "updateMessage": "Android RC2 is published as a direct SVR Poker download.",
+  "updateMessage": "Android RC2 is published. Browser gameplay updates remain manual and do not force an APK reinstall.",
   "notes": [
-    "The browser game is available independently of the APK build.",
-    "The public APK control opens the GitHub release page while the binary is pending.",
-    "Uninstall the older test APK before installing RC2."
+    "The browser game is available independently of the APK.",
+    "The verified APK is published at the same-domain download URL.",
+    "Uninstall an older test APK before installing RC2.",
+    "No forced or recurring update prompt is enabled."
   ]
 }

@@ -1,6 +1,7 @@
 (() => {
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages';
+  const CURRENT_PHASE = 'phase380';
 
   function getAdminState() {
     const qs = new URLSearchParams(window.location.search);
@@ -22,6 +23,30 @@
     });
   }
 
+  function normalizeGameLinks() {
+    document.querySelectorAll('a[href]').forEach((anchor) => {
+      let url;
+      try { url = new URL(anchor.getAttribute('href'), window.location.href); } catch { return; }
+      if (url.origin !== window.location.origin) return;
+      if (/\/game\/(?:android|android-play)\.html$/i.test(url.pathname)) {
+        url.pathname = '/game/android-stable.html';
+        url.searchParams.delete('channel');
+        url.searchParams.set('v', CURRENT_PHASE);
+        anchor.href = url.pathname + '?' + url.searchParams.toString();
+        return;
+      }
+      if (/\/game\/android-stable\.html$/i.test(url.pathname)) {
+        url.searchParams.set('v', CURRENT_PHASE);
+        anchor.href = url.pathname + '?' + url.searchParams.toString();
+        return;
+      }
+      if (/\/game\/index\.html$/i.test(url.pathname)) {
+        url.searchParams.set('v', CURRENT_PHASE);
+        anchor.href = url.pathname + '?' + url.searchParams.toString();
+      }
+    });
+  }
+
   function wireMessageForm() {
     const form = document.getElementById('visitor-message-form');
     if (!form) return;
@@ -34,7 +59,7 @@
         email: (data.email || '').trim(),
         message: (data.message || '').trim(),
         createdAt: new Date().toISOString(),
-        source: 'svrpoker-public-site-restore'
+        source: 'svrpoker-public-site'
       };
       if (!entry.message) {
         if (status) status.textContent = 'Please enter a message before saving.';
@@ -44,10 +69,11 @@
       current.push(entry);
       localStorage.setItem(MESSAGE_KEY, JSON.stringify(current.slice(-100)));
       form.reset();
-      if (status) status.textContent = 'Message saved locally. Backend API/Azure SQL can be wired next.';
+      if (status) status.textContent = 'Message saved locally. Secure API delivery is not enabled on this static page yet.';
     });
   }
 
   paintAdminState();
+  normalizeGameLinks();
   wireMessageForm();
 })();

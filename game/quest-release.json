@@ -1,16 +1,21 @@
 {
   "name": "SVR Poker Quest WebXR",
   "channel": "stable-web",
-  "phase": 362,
-  "build": "PHASE-362-CONTINUOUS-10000-TURN-CLOCK-REJOIN-RESET-LOCK",
-  "webEntry": "/game/index.html?platform=quest&v=phase362",
+  "phase": 380,
+  "build": "PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK",
+  "webEntry": "/game/index.html?platform=quest&v=phase380",
   "browserAcceptance": {
     "passed": true,
     "priorCompleteGamePassed": true,
     "baseGameplayCertification": "PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK",
     "startupMs": 19754.6,
     "startupBudgetMs": 45000,
-    "uploadedTable": "PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED",
+    "uploadedTable": "PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY",
+    "uploadedTablePrimaryAsset": "game/assets/models/table.glb",
+    "uploadedTableFallbackAsset": "game/assets/table.fbx",
+    "proceduralFallbackEmergencyOnly": true,
+    "proceduralFallbackDelayMs": 10000,
+    "proceduralFallbackRemovedWhenOriginalAppears": true,
     "fallbackTablePresent": false,
     "handsPrimary": true,
     "controllerFallback": true,
@@ -18,6 +23,7 @@
     "snapTurnDegrees": 45,
     "forwardReference": "headset-look-direction",
     "teleportContract": "hold-to-aim-release-to-teleport",
+    "teleportLockedWhileSeated": true,
     "phases": ["preflop", "flop", "turn", "river", "showdown"],
     "humanActions": 4,
     "holeCards": 2,
@@ -34,7 +40,7 @@
     "sameOriginHttpErrors": 0,
     "requestFailures": 0,
     "completeHand": true,
-    "phase362PolicyAcceptancePending": true,
+    "phase380PhysicalAcceptancePending": true,
     "phase362TableBankroll": 60000
   },
   "sessionContract": {
@@ -70,6 +76,10 @@
     "legacyForcedSeatModulesRemoved": ["p86_seated_lock.js", "p87_scorpion_seat_authority.js"]
   },
   "tablePolicy": {
+    "originalUploadedTableRequired": true,
+    "originalUploadedTablePrimary": "game/assets/models/table.glb",
+    "originalUploadedTableFallback": "game/assets/table.fbx",
+    "proceduralTableEmergencyOnly": true,
     "startingStackPerPlayer": 10000,
     "players": 6,
     "tableBankroll": 60000,
@@ -92,12 +102,15 @@
     "pending": true,
     "requiresHeadset": true,
     "checklist": [
+      "original uploaded GLB table is visible instead of the emergency table",
       "spawn begins behind the table rather than over the cards",
       "normal lobby walking and teleport work before PLAY GAME",
       "PLAY GAME seats the player at the south/front chair",
       "head look remains free while seated",
       "walking and teleport cannot move the player away while seated",
+      "grip, trigger and pinch cannot teleport while seated",
       "LEAVE TABLE returns the player to the lobby spawn",
+      "standing teleport returns after leaving",
       "watch remains visible with PLAY or LEAVE state",
       "turn clock is visible above the table and counts from 15",
       "an expired human turn folds automatically",
@@ -117,9 +130,9 @@
     "productionMultiplayerCards": false
   },
   "androidApkPolicy": {
-    "versionName": "0.1.0-rc1",
-    "versionCode": 1,
-    "releaseReady": false,
+    "versionName": "0.1.0-rc2",
+    "versionCode": 2,
+    "releaseReady": true,
     "forceUpdate": false,
     "showUpdatePrompt": false,
     "manualUpdateOnly": true
@@ -127,12 +140,14 @@
   "protectedAuthorities": [
     "Phase 336 poker rules and settlement",
     "Phase 341 table and card coordinates",
-    "Phase 347 Android single controller",
-    "Phase 357 Android seating and showdown presentation",
-    "Phase 358 Quest uploaded table and full-hand certification",
+    "Phase 347 optional Android 3D controller",
+    "Phase 357 optional Android seating and showdown presentation",
+    "Phase 358 Quest full-hand certification",
     "Phase 359 winner presentation",
     "Phase 360 secure shuffle",
     "Phase 361 Quest lobby approach and seating",
-    "Phase 362 continuous tournament and turn-clock policy"
+    "Phase 362 continuous tournament and turn-clock policy",
+    "Phase 373 seated teleport and stable spawn",
+    "Phase 380 original uploaded table authority"
   ]
 }

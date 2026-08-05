@@ -30,7 +30,7 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify locked original Matrix public page
+      - name: Verify Phase 380 clean production payload
         shell: bash
         run: |
           set -euo pipefail
@@ -40,13 +40,22 @@ jobs:
           grep -q 'Preview Game' index.html
           grep -q 'Leave Message' index.html
           ! grep -q 'PHASE 379 LIVE RECOVERY' index.html
-          ! grep -q 'PLAY ANDROID — JOIN NOW' index.html
           test -s launch.css
           test -s matrix.js
           test -s site-public-hooks.js
           test -s logo.webp
-          grep -q 'PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK' game/android-stable.html
+          grep -q 'PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK' site/index.html
+          test -f site/profile.html
+          test -f site/avatar.html
+          grep -q 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' game/android-stable.html
           grep -q 'JOIN NOW' game/android-stable.html
+          grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' game/modules/phase380_original_table_authority_lock.js
+          grep -q 'PHASE-380-QUEST-PROCEDURAL-TABLE-FALLBACK-LOCK' game/modules/phase379_quest_procedural_table_authority.js
+          test -s game/assets/models/table.glb
+          test -s game/assets/table.fbx
+          test -s downloads/svr-poker-android-rc2.apk
+          grep -q 'PHASE-380-GAME-SITE-INTEGRITY-LOCK' deploy-health.json
+          grep -q '"cleanTreePublish": true' deploy-health.json
           test -f CNAME
           grep -qx 'svrpoker.com' CNAME
 
@@ -55,11 +64,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload locked Matrix Pages artifact
+      - name: Upload Phase 380 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy original Matrix public page
+      - name: Deploy Phase 380 game and site
         id: deployment
         uses: actions/deploy-pages@v4

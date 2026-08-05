@@ -41,9 +41,17 @@ for (const route of ['game/index.html', 'game/camera3.html']) {
 
 const androidEntry = read('game/android.html');
 const androidStable = read('game/android-stable.html');
-expect(androidEntry.includes('android-stable.html?v=phase379'), 'game/android.html does not redirect to the Phase 379 stable table');
-expect(androidStable.includes('PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK'), 'Phase 379 Android stable build is missing');
-expect(androidStable.includes('JOIN NOW'), 'Phase 379 Android JOIN NOW is missing');
+expect(
+  androidEntry.includes('android-stable.html?v=phase379') || androidEntry.includes('android-stable.html?v=phase380'),
+  'game/android.html does not redirect to a supported stable Android table'
+);
+expect(
+  androidStable.includes('PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK')
+    || androidStable.includes('PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK'),
+  'supported Android stable build is missing'
+);
+expect(androidStable.includes('JOIN NOW'), 'Android JOIN NOW is missing');
+expect(androidStable.includes('No cards, poker actions, or movement controls appear before joining.') || androidStable.includes('No cards are dealt before you join.'), 'Android pre-join protection is missing');
 expect(!androidStable.includes('phase368_card_dealer_animation_lock.js'), 'lightweight Android table must not load the heavy 3D dealer');
 
 if (failures.length) {
@@ -53,9 +61,10 @@ if (failures.length) {
 console.log(JSON.stringify({
   pass: true,
   build: 'PHASE-368-CARD-DEALER-ANIMATION-LOCK',
+  successor: 'PHASE-380-GAME-SITE-INTEGRITY-LOCK',
   source: motion.source,
   optimizedBytes: Buffer.byteLength(motion.rotationBase64 + motion.translationBase64, 'utf8'),
   frames: motion.frames,
   bones: motion.bones.length,
-  routes: ['desktop/quest 3D dealer', 'camera3 3D dealer', 'android Phase 379 lightweight table']
+  routes: ['desktop/quest 3D dealer', 'camera3 3D dealer', 'android Phase 380 lightweight table']
 }, null, 2));

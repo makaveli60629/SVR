@@ -9,7 +9,10 @@ const shuffle = read('game/modules/phase360_fresh_shuffle_leave_reset_continuous
 const phase361 = read('game/modules/phase361_quest_lobby_play_seat_watch_npc_lock.js');
 const phase363 = read('game/modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js');
 const indexText = read('game/index.html');
-const androidText = read('game/android.html');
+const androidRedirect = read('game/android.html');
+const androidStable = read('game/android-stable.html');
+const originalTable = read('game/modules/phase380_original_table_authority_lock.js');
+const fallbackTable = read('game/modules/phase379_quest_procedural_table_authority.js');
 const androidRelease = JSON.parse(read('game/android-release.json'));
 const questRelease = JSON.parse(read('game/quest-release.json'));
 const manifest = JSON.parse(read('game/manifest.json'));
@@ -39,6 +42,7 @@ for (const pattern of [
   /physicalHeadsetAcceptancePending: true/
 ]) assert.match(shuffle, pattern);
 for (const pattern of [/PHASE-361-QUEST-LOBBY-PLAY-SEAT-WATCH-NPC-LOCK/, /PLAY GAME/, /LEAVE TABLE/, /SVR_PHASE360_JOIN_TABLE/, /SVR_PHASE360_LEAVE_TABLE/]) assert.match(phase361, pattern);
+for (const pattern of [/PHASE-363-ANDROID-INTEGRATED-LOBBY-AUDIO-GYRO-BANKROLL-LOCK/, /const STARTING_STACK = 15000/, /function prepareLobby/, /function joinTable/, /function leaveTable/]) assert.match(phase363, pattern);
 
 const importIndex = (source, moduleName) => {
   const escaped = moduleName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -47,11 +51,13 @@ const importIndex = (source, moduleName) => {
   return match ? match.index : -1;
 };
 
-assert.match(indexText, /data-build="PHASE-(?:358|3[6-9]\d)-/);
-assert.match(indexText, /data-release="PHASE-(?:361|3[6-9]\d)-/);
-assert.match(indexText, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase(?:361|3[6-9]\d)/);
-assert.match(indexText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase(?:361|3[6-9]\d)/);
-assert.match(indexText, /phase361_quest_lobby_play_seat_watch_npc_lock\.js\?v=phase(?:361|3[6-9]\d)/);
+assert.match(indexText, /data-build="PHASE-380-GAME-SITE-INTEGRITY-LOCK"/);
+assert.match(indexText, /data-release="PHASE-380-GAME-SITE-INTEGRITY-LOCK"/);
+assert.match(indexText, /phase380_original_table_authority_lock\.js\?v=phase380/);
+assert.match(indexText, /phase379_quest_procedural_table_authority\.js\?v=phase380/);
+assert.match(indexText, /phase359_dual_platform_gameplay_continuity_lock\.js\?v=phase380/);
+assert.match(indexText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js\?v=phase380/);
+assert.match(indexText, /phase361_quest_lobby_play_seat_watch_npc_lock\.js\?v=phase380/);
 const questBootIndex = indexText.indexOf('await bootPlatform()');
 const phase359Index = importIndex(indexText, 'phase359_dual_platform_gameplay_continuity_lock');
 const phase360Index = importIndex(indexText, 'phase360_fresh_shuffle_leave_reset_continuous_table_lock');
@@ -61,67 +67,66 @@ assert.ok(questBootIndex >= 0 && phase359Index > questBootIndex, 'Phase 359 must
 assert.ok(phase360Index > phase359Index, 'Phase 360 must load after Phase 359');
 assert.ok(phase361Index > phase360Index, 'Phase 361 must load after Phase 360');
 assert.ok(questSuccessorIndex < 0 || questSuccessorIndex > phase361Index, 'Quest successor policy must load after Phase 361');
-assert.match(indexText, /PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK/);
+assert.match(originalTable, /PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK/);
+assert.match(originalTable, /assets\/models\/table\.glb/);
+assert.match(originalTable, /assets\/table\.fbx/);
+assert.match(fallbackTable, /FALLBACK_DELAY_MS = 10000/);
+assert.match(fallbackTable, /removeFallback\('original-table-adopted'\)/);
 
-assert.match(androidText, /data-build="PHASE-(?:363|3[6-9]\d)-/);
-assert.match(androidText, /data-release="PHASE-(?:363|3[6-9]\d)-/);
-for (const module of [
-  'phase363_android_canonical_table_asset_lock.js',
-  'phase357_android_table_status_showdown_ante_lock.js',
-  'phase357_android_direct_camera_seat_fix.js',
-  'phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js',
-  'phase363_android_join_control_capture_lock.js'
-]) assert.match(androidText, new RegExp(`${module.replaceAll('.', '\\.')}\\?v=phase(?:363|3[6-9]\\d)`));
-assert.doesNotMatch(androidText, /phase359_dual_platform_gameplay_continuity_lock\.js/);
-assert.doesNotMatch(androidText, /phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js/);
-assert.doesNotMatch(androidText, /phase362_continuous_10000_turn_clock_rejoin_reset_lock\.js/);
-assert.ok(androidText.indexOf("await bootPlatform({forcedPlatform:'android'})") < androidText.indexOf('phase363_android_canonical_table_asset_lock.js'));
-assert.ok(androidText.indexOf('phase363_android_canonical_table_asset_lock.js') < androidText.indexOf('phase357_android_table_status_showdown_ante_lock.js'));
-assert.ok(androidText.indexOf('phase357_android_direct_camera_seat_fix.js') < androidText.indexOf('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js'));
-assert.ok(androidText.indexOf('phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js') < androidText.indexOf('phase363_android_join_control_capture_lock.js'));
-for (const pattern of [/const STARTING_STACK = 15000/, /function prepareLobby/, /function joinTable/, /function leaveTable/]) assert.match(phase363, pattern);
+// Phase 380 Android is a deliberately standalone low-power table. The older
+// Phase 357/363 3D modules remain protected above but are not auto-loaded here.
+assert.match(androidRedirect, /android-stable\.html\?v=phase380/);
+assert.match(androidStable, /PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK/);
+assert.match(androidStable, /JOIN NOW/);
+assert.match(androidStable, /function scoreFive\(cards\)/);
+assert.match(androidStable, /function bestHand\(cards\)/);
+assert.match(androidStable, /function burn\(\)/);
+assert.match(androidStable, /RANKS=\['2','3','4','5','6','7','8','9','10','J','Q','K','A'\]/);
+assert.match(androidStable, /movementControlsWhileSeated:0/);
+assert.doesNotMatch(androidStable, /three\.module|type="module"|phase359_dual_platform_gameplay_continuity_lock\.js|phase360_fresh_shuffle_leave_reset_continuous_table_lock\.js/);
 
-assert.ok(Number(questRelease.phase) >= 361);
-assert.equal(questRelease.browserAcceptance.passed, true);
+assert.equal(questRelease.phase, 380);
+assert.equal(questRelease.build, 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK');
 assert.equal(questRelease.browserAcceptance.baseGameplayCertification, 'PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK');
-assert.equal(questRelease.browserAcceptance.uploadedTable, 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED');
+assert.equal(questRelease.browserAcceptance.uploadedTable, 'PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY');
+assert.equal(questRelease.browserAcceptance.proceduralFallbackEmergencyOnly, true);
 assert.equal(questRelease.browserAcceptance.fallbackTablePresent, false);
 assert.equal(questRelease.browserAcceptance.handsPrimary, true);
 assert.equal(questRelease.browserAcceptance.controllerFallback, true);
 assert.equal(questRelease.browserAcceptance.holeCards, 2);
 assert.equal(questRelease.browserAcceptance.communityCards, 5);
+assert.equal(questRelease.browserAcceptance.burnCards, 3);
 assert.equal(questRelease.browserAcceptance.nextHand.advanced, true);
-const questSession = questRelease.phase361SessionContract || questRelease.sessionContract;
-assert.equal(questSession.startsStandingInLobby, true);
-assert.equal(questSession.leaveTableButtonRequired, true);
+assert.equal(questRelease.physicalQuestAcceptance.pending, true);
+assert.equal(questRelease.physicalQuestAcceptance.requiresHeadset, true);
+assert.equal(questRelease.productTruth.serverAuthoritativePoker, false);
+assert.equal(questRelease.sessionContract.teleportLockedWhileSeated, true);
 
-assert.equal(androidRelease.protectedAuthorities?.fullGameAcceptance, 'PHASE-354');
-assert.equal(androidRelease.protectedAuthorities?.androidTableStatus, 'PHASE-357');
-assert.equal(androidRelease.protectedAuthorities?.androidIntegratedFlow, 'PHASE-363');
-assert.equal(androidRelease.controllerAuthority, 'PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK');
-assert.equal(androidRelease.androidExperience?.singleController, true);
+assert.equal(androidRelease.currentGameBuild, 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK');
 assert.equal(androidRelease.tablePolicy.startingStackPerPlayer, 15000);
-assert.equal(androidRelease.tablePolicy.tableBankroll, 90000);
+assert.equal(androidRelease.tablePolicy.players, 6);
 assert.equal(androidRelease.tablePolicy.joinRequiredBeforeDeal, true);
 assert.equal(androidRelease.tablePolicy.cardsHiddenBeforeJoin, true);
-assert.equal(androidRelease.tablePolicy.singleJoinLeaveControl, true);
-assert.equal(androidRelease.gameplayPolicy?.raiseControlRequired, true);
-assert.deepEqual(androidRelease.gameplayPolicy?.streetOrder, ['preflop', 'flop', 'turn', 'river', 'showdown']);
-const currentAcceptance = androidRelease.phase365Acceptance || androidRelease.phase363Acceptance;
-assert.equal(currentAcceptance?.passed === true || currentAcceptance?.pending === true, true);
-if (currentAcceptance?.passed === true) assert.equal(currentAcceptance?.browserAcceptancePassed, true);
-assert.equal(androidRelease.realDeviceValidation?.pending, true);
-assert.equal(androidRelease.realDeviceValidation?.ownerPlaytestRequired, true);
+assert.equal(androidRelease.tablePolicy.deterministicHandEvaluator, true);
+assert.equal(androidRelease.tablePolicy.burnCards, true);
+assert.equal(androidRelease.tablePolicy.replaceableTournamentBrandSlot, true);
+assert.equal(androidRelease.forceUpdate, false);
+assert.equal(androidRelease.showUpdatePrompt, false);
+assert.equal(androidRelease.manualUpdateOnly, true);
+assert.equal(androidRelease.apkVersionName, '0.1.0-rc2');
+assert.equal(androidRelease.apkVersionCode, 2);
 
-assert.ok(Number(manifest.phase) >= 363);
-assert.match(String(manifest.build), /^PHASE-(?:363|3[6-9]\d)-/);
-assert.match(String(manifest.start_url), /v=phase(?:363|3[6-9]\d)/);
-assert.equal(manifest.starting_stack, 15000);
-assert.equal(manifest.table_bankroll, 90000);
-assert.equal(manifest.join_required_before_deal, true);
-assert.equal(manifest.apk_version_name, '0.1.0-rc1');
-assert.equal(manifest.apk_version_code, 1);
-assert.equal(manifest.release_ready, false);
+assert.equal(manifest.phase, 380);
+assert.equal(manifest.build, 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK');
+assert.equal(manifest.start_url, './android-stable.html?v=phase380');
+assert.equal(manifest.android_starting_stack, 15000);
+assert.equal(manifest.android_players, 6);
+assert.equal(manifest.android_join_required_before_deal, true);
+assert.equal(manifest.android_deterministic_hand_evaluator, true);
+assert.equal(manifest.android_burn_cards, true);
+assert.equal(manifest.apk_version_name, '0.1.0-rc2');
+assert.equal(manifest.apk_version_code, 2);
+assert.equal(manifest.release_ready, true);
 assert.equal(manifest.force_update, false);
 assert.equal(manifest.show_update_prompt, false);
 assert.equal(manifest.manual_update_only, true);
@@ -134,17 +139,14 @@ assert.ok(fs.statSync(tablePath).size > 1024, 'uploaded table FBX must be non-em
 assert.ok(fs.statSync(tableGlbPath).size > 1024, 'uploaded table GLB must be non-empty');
 
 console.log(JSON.stringify({
-  build: manifest.build,
-  successorBuild: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
-  android: 'phase347 controller, phase357 seating, phase363 JOIN-gated 15,000-chip policy and phase365 presentation protected',
-  androidBrowserAcceptance: currentAcceptance?.passed === true ? 'passed' : 'pending',
-  androidPhysicalDeviceValidation: 'pending-owner-playtest',
-  quest: 'phase358 gameplay and phase361 lobby/seat protected with phase364 geometry successor',
-  continuity: 'phase359 preserved for Quest/desktop',
-  shuffle: 'phase360 preserved for Quest/desktop',
+  build: 'PHASE-380-GAME-SITE-INTEGRITY-LOCK',
+  android: 'standalone JOIN-gated deterministic Holdem with Phase 357/363 optional 3D modules preserved',
+  quest: 'Phase 358 gameplay, Phase 361 lobby/seat, Phase 373 seated teleport, Phase 380 uploaded table authority',
+  continuity: 'Phase 359 preserved for Quest/desktop',
+  shuffle: 'Phase 360 preserved for Quest/desktop',
   uploadedTableFbx: fs.statSync(tablePath).size,
   uploadedTableGlb: fs.statSync(tableGlbPath).size,
-  successorTableBankroll: manifest.table_bankroll,
   apk: `${manifest.apk_version_name} (${manifest.apk_version_code})`,
+  physicalQuestAcceptance: 'pending-headset',
   pass: true
 }, null, 2));

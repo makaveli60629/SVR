@@ -14,31 +14,31 @@
 :root{--cyan:#7ffcff;--purple:#9b4dff;--gold:#ffd98a;--green:#8dffb4;--ink:#02040a}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#02030a;color:#fff;font-family:system-ui,Arial,sans-serif}body{padding:18px;background:radial-gradient(circle at 50% 0,rgba(155,77,255,.34),transparent 38%),radial-gradient(circle at 15% 35%,rgba(127,252,255,.13),transparent 30%),linear-gradient(180deg,#06020d,#03101a 58%,#000)}main{width:min(1040px,100%);margin:auto}.top{display:flex;align-items:center;gap:15px;padding:18px;border:1px solid #7ffcff55;border-radius:24px;background:#050915e8;box-shadow:0 25px 80px #000}.top img{width:88px;height:88px;object-fit:contain}.top h1{margin:0;font-size:clamp(30px,7vw,62px);letter-spacing:.12em}.top p{margin:5px 0;color:#d9fbff}.badge{display:inline-block;padding:6px 10px;border:1px solid var(--green);border-radius:999px;color:var(--green);font-weight:950;letter-spacing:.08em}.release{margin:15px 0;padding:18px;border:1px solid var(--gold);border-radius:20px;background:#171105d9}.release strong{color:var(--gold)}.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:15px 0}.btn{display:flex;align-items:center;justify-content:center;min-height:58px;padding:12px;border:1px solid #ffffff30;border-radius:15px;background:#111827;color:#fff;text-decoration:none;font-weight:950;text-align:center}.btn.play{grid-column:1/-1;border:0;background:linear-gradient(135deg,var(--cyan),var(--purple));color:var(--ink);font-size:21px}.btn.apk{border:0;background:linear-gradient(135deg,var(--green),var(--cyan));color:var(--ink)}.btn.update{border-color:var(--gold);background:#30250d}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card{padding:17px;border:1px solid #ffffff20;border-radius:19px;background:#070b16d9}.card h2{margin:0 0 7px;color:#dffcff}.card p{color:#cad7e7;line-height:1.5}.card a{color:var(--cyan)}.status{margin-top:12px;padding:12px;border-left:4px solid var(--green);border-radius:10px;background:#8dffb410;line-height:1.5}.footer{text-align:center;padding:25px 0 95px;color:#c9c0df}.notice{position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:2147483647;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;padding:10px;border:1px solid var(--green);border-radius:16px;background:#001016f5;box-shadow:0 20px 70px #000}.notice strong{color:var(--green)}.notice a{padding:9px 13px;border-radius:999px;background:var(--green);color:var(--ink);text-decoration:none;font-weight:950}.notice a:last-child{background:var(--cyan)}@media(max-width:760px){.top{align-items:flex-start}.top img{width:70px;height:70px}.actions,.grid{grid-template-columns:1fr}.btn.play{grid-column:auto}.notice{font-size:12px}.notice a{flex:1;text-align:center}}
 </style>
 </head>
-<body data-build="PHASE-379-PUBLIC-SITE-ANDROID-APK-QUEST-RECOVERY-LOCK">
+<body data-build="PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK">
 <main>
-<header class="top"><img src="/logo.png" alt="SVR Poker logo"><div><span class="badge">PHASE 379 LIVE RECOVERY</span><h1>SVR POKER</h1><p>Android stable play, APK installation, Quest/VR launch, profile and support.</p></div></header>
-<section class="release"><strong>IMPORTANT ANDROID UPDATE</strong><p>The old frozen SIT/SEAT screen is retired. The primary Android route now opens a lightweight table with a visible <b>JOIN NOW</b> button before any cards are dealt.</p></section>
+<header class="top"><img src="/logo.png" alt="SVR Poker logo"><div><span class="badge">ANDROID + QUEST LIVE</span><h1>SVR POKER</h1><p>Android stable play, APK installation, Quest/VR launch, profile and support.</p></div></header>
+<section class="release"><strong>STABLE PLAY ROUTES</strong><p>Android opens the lightweight <b>JOIN NOW</b> table before any cards are dealt. Quest loads the original uploaded poker table first and creates an emergency table only when both uploaded table formats fail.</p></section>
 <nav class="actions" aria-label="Primary SVR controls">
-<a class="btn play" href="/game/android-stable.html?v=phase379&t=public">PLAY ANDROID — JOIN NOW</a>
-<a class="btn apk" id="apkButton" href="https://github.com/makaveli60629/SVR/releases/tag/android-rc2">DOWNLOAD APK RC2</a>
-<a class="btn update" href="/downloads/?v=phase379#update">UPDATE / INSTALL HELP</a>
-<a class="btn" href="/game/index.html?platform=quest&v=phase379">LAUNCH QUEST / VR</a>
-<a class="btn" href="/site/profile.html?v=phase379">PLAYER PROFILE</a>
+<a class="btn play" href="/game/android-stable.html?v=phase380&t=public">PLAY ANDROID — JOIN NOW</a>
+<a class="btn apk" id="apkButton" href="/downloads/svr-poker-android-rc2.apk">DOWNLOAD APK RC2</a>
+<a class="btn update" href="/downloads/?v=phase380#update">UPDATE / INSTALL HELP</a>
+<a class="btn" href="/game/index.html?platform=quest&v=phase380">LAUNCH QUEST / VR</a>
+<a class="btn" href="/site/profile.html?v=phase380">PLAYER PROFILE</a>
 <a class="btn" href="/site/store.html">SVR STORE</a>
 <a class="btn" href="/site/tournaments.html">TOURNAMENTS</a>
 <a class="btn" href="/site/contact.html">CONTACT / SUPPORT</a>
 </nav>
 <section class="grid">
-<article class="card"><h2>Android Stable Table</h2><p>No Three.js lobby is loaded before joining. Press JOIN NOW, receive cards only after joining, and play locally against five bots.</p><a href="/game/android-stable.html?v=phase379">Open stable table</a></article>
-<article class="card"><h2>APK RC2</h2><p>The APK is built by GitHub Actions and published as a GitHub Release asset. Uninstall the previous test APK before installing RC2.</p><a href="https://github.com/makaveli60629/SVR/releases/tag/android-rc2">Open APK release</a></article>
-<article class="card"><h2>Quest Table Recovery</h2><p>The Quest route now includes a procedural emergency table authority. If the uploaded table asset fails, a visible poker table is created in front of the player.</p><a href="/game/index.html?platform=quest&v=phase379">Open Quest route</a></article>
+<article class="card"><h2>Android Stable Table</h2><p>JOIN NOW appears before the table. Cards use full <b>10</b> ranks, two readable corners, a large center suit, deterministic Hold’em evaluation, burn cards and a replaceable tournament logo.</p><a href="/game/android-stable.html?v=phase380">Open stable table</a></article>
+<article class="card"><h2>APK RC2</h2><p>The verified APK is available from the same SVR Poker domain. Uninstall an older test package before installing RC2.</p><a href="/downloads/svr-poker-android-rc2.apk">Download APK RC2</a></article>
+<article class="card"><h2>Quest Original Table</h2><p>The Quest route now prioritizes the uploaded GLB/FBX poker table. The procedural table is delayed, removable and emergency-only.</p><a href="/game/index.html?platform=quest&v=phase380">Open Quest route</a></article>
 </section>
 <div class="status" id="releaseStatus"><strong>Checking APK release status…</strong></div>
 <footer class="footer">© 2026 SVR Poker • Scarlett Holding LLC • Team Nova • R.Chadee</footer>
 </main>
-<aside class="notice"><strong>ANDROID PHASE 379</strong><a href="https://github.com/makaveli60629/SVR/releases/tag/android-rc2">APK DOWNLOAD</a><a href="/game/android-stable.html?v=phase379">PLAY NOW</a></aside>
+<aside class="notice"><strong>SVR ANDROID RC2</strong><a href="/downloads/svr-poker-android-rc2.apk">APK DOWNLOAD</a><a href="/game/android-stable.html?v=phase380">PLAY NOW</a></aside>
 <script>
-(async()=>{const box=document.getElementById('releaseStatus'),button=document.getElementById('apkButton');try{const r=await fetch('/game/android-release.json?t='+Date.now(),{cache:'no-store'});const m=await r.json();if(m.releaseReady&&m.apkUrl){button.href=m.apkUrl;button.setAttribute('download','');box.innerHTML='<strong style="color:#8dffb4">APK '+m.apkVersionName+' is published.</strong> Version code '+m.apkVersionCode+'.';}else{box.innerHTML='<strong style="color:#ffd98a">Android browser game is live.</strong> APK RC2 is building or awaiting release verification; the APK button opens the release page.';}}catch{box.textContent='Android browser game is available. Open the APK release page for package status.';}})();
+(async()=>{const box=document.getElementById('releaseStatus'),button=document.getElementById('apkButton');try{const response=await fetch('/game/android-release.json?t='+Date.now(),{cache:'no-store'});const manifest=await response.json();if(manifest.releaseReady&&manifest.apkUrl){button.href=manifest.apkUrl;button.setAttribute('download','');box.innerHTML='<strong style="color:#8dffb4">APK '+manifest.apkVersionName+' is published.</strong> Version code '+manifest.apkVersionCode+'.';}else{box.innerHTML='<strong style="color:#ffd98a">Android browser game is live.</strong> Open the release page for APK status.';}}catch{box.textContent='Android browser game and the same-domain APK download are available.';}})();
 </script>
 </body>
 </html>
