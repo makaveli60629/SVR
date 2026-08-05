@@ -2,8 +2,8 @@
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages';
   const CACHE_EPOCH_KEY = 'svr_public_cache_epoch';
-  const CACHE_EPOCH = 'phase382-live-route-recovery';
-  const CURRENT_PHASE = 'phase382';
+  const CACHE_EPOCH = 'phase383-full-site-homepage-restore';
+  const CURRENT_PHASE = 'phase383';
 
   async function refreshRuntimeCaches() {
     try {
@@ -23,7 +23,7 @@
         await navigator.serviceWorker.register(`/sw.js?v=${CURRENT_PHASE}`, { scope: '/' });
       }
     } catch (error) {
-      console.warn('SVR Phase 382 cache recovery could not complete.', error);
+      console.warn('SVR Phase 383 cache recovery could not complete.', error);
     }
   }
 
@@ -51,8 +51,8 @@
     if (document.getElementById('svr-phase-live-badge')) return;
     const badge = document.createElement('div');
     badge.id = 'svr-phase-live-badge';
-    badge.textContent = '● PHASE 382 LIVE';
-    badge.setAttribute('aria-label', 'SVR Poker Phase 382 live deployment');
+    badge.textContent = '● PHASE 383 SITE RESTORED';
+    badge.setAttribute('aria-label', 'SVR Poker Phase 383 full website restored');
     Object.assign(badge.style, {
       position: 'fixed',
       top: '12px',
@@ -98,10 +98,10 @@
         anchor.href = url.pathname + '?' + url.searchParams.toString();
         return;
       }
-      if (/\/site\/(?:index|profile|avatar)\.html$/i.test(url.pathname)) {
+      if (/\/site\/[^/]+\.html$/i.test(url.pathname)) {
         url.searchParams.set('v', CURRENT_PHASE);
         url.searchParams.set('deploy', CURRENT_PHASE);
-        anchor.href = url.pathname + '?' + url.searchParams.toString();
+        anchor.href = url.pathname + '?' + url.searchParams.toString() + url.hash;
       }
     });
   }
