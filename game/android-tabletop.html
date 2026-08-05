@@ -41,6 +41,10 @@ function inject(){
       state.moduleInjected=true;
     }
     doc.body.dataset.presentationBuild=BUILD;
+    const buildLabel=doc.querySelector('.build');
+    if(buildLabel)buildLabel.textContent='PHASE 385 ANDROID TABLETOP';
+    const gateStatus=doc.querySelector('#gateStatus');
+    if(gateStatus)gateStatus.textContent='Original table, larger cards, compact seats, pot chips, and gyro view ready.';
     document.body.classList.add('ready');
     state.checkedAt=new Date().toISOString();
   }catch(error){
@@ -56,7 +60,12 @@ window.addEventListener('deviceorientation',event=>{
   }catch{}
 },{passive:true});
 setTimeout(inject,900);
-window.SVR_PHASE385_ANDROID_WRAPPER_QA=()=>({...state,frameUrl:frame.contentWindow?.location?.href||frame.src,childQa:frame.contentWindow?.SVR_PHASE385_ANDROID_TABLETOP_QA?.()||null,checkedAt:new Date().toISOString()});
+window.SVR_PHASE385_ANDROID_WRAPPER_QA=()=>{
+  let frameUrl=frame.src;
+  let childQa=null;
+  try{frameUrl=frame.contentWindow?.location?.href||frame.src;childQa=frame.contentWindow?.SVR_PHASE385_ANDROID_TABLETOP_QA?.()||null}catch{}
+  return{...state,frameUrl,childQa,checkedAt:new Date().toISOString()};
+};
 })();
 </script>
 </body>
