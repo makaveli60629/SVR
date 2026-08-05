@@ -97,6 +97,7 @@ function materialKind(label = '', yRatio = 0.5) {
 }
 function textureEric(root) {
   if (!root?.isObject3D) return 0;
+  if (root.userData?.svrPhase384Textured) return state.ericTexturedMaterials;
   const whole = bounds(root);
   let changed = 0;
   walk(root, (object) => {
@@ -207,6 +208,7 @@ function polishTable() {
   if (!table?.isObject3D) return false;
   const info = bounds(table);
   if (info.box.isEmpty()) return false;
+  if (state.tablePolished && felt && logo && table.userData?.svrPhase384TablePolished) return true;
   walk(table, (object) => {
     if (!object.isMesh || !object.material) return;
     const list = Array.isArray(object.material) ? object.material : [object.material];
@@ -253,6 +255,7 @@ function polishTable() {
     scene.add(logo);
     state.logoInstalled = true;
   }
+  table.userData = { ...(table.userData || {}), svrPhase384TablePolished: true };
   state.tablePolished = true;
   return true;
 }
