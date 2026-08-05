@@ -59,12 +59,13 @@ jobs:
       - name: Run protected successor contracts
         run: |
           set -euo pipefail
-          node game/tools/phase354-android-full-game-static-test.mjs 2>/dev/null || true
           node game/tools/phase357-android-table-status-showdown-ante-static-test.mjs
           node game/tools/phase358-quest-static-test.mjs
           node game/tools/phase359-dual-platform-static-test.mjs
+          node game/tools/phase364-device-xr-geometry-static-test.mjs
           node game/tools/phase365-android-seated-ux-branding-static-test.mjs
-          node game/tools/phase366-profile-live-camera-test.mjs
+          node site/tools/phase351-profile-showroom-test.mjs
+          node site/tools/phase366-profile-live-camera-test.mjs
           node game/tools/phase368-card-dealer-static-test.mjs
           node game/tools/phase379-production-static-test.mjs
 
