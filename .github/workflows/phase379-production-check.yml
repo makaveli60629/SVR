@@ -19,25 +19,29 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Checkout Phase 379 source
+      - name: Checkout Phase 381 production source
         uses: actions/checkout@v6
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             index.html
+            site-public-hooks.js
             site/index.html
             downloads/index.html
             game/index.html
             game/android.html
             game/android-play.html
+            game/android-lobby.html
             game/android-stable.html
             game/android-release.json
             game/modules/phase379_quest_procedural_table_authority.js
+            game/modules/phase380_original_table_authority_lock.js
+            game/modules/phase381_table_lobby_watchdog_lock.js
             game/tools/phase379-production-static-test.mjs
             update/app-version.json
             manifest.webmanifest
             pwa-sw.js
             sw.js
 
-      - name: Run Phase 379 production acceptance
+      - name: Run Phase 379 production acceptance with Phase 381 successor
         run: node game/tools/phase379-production-static-test.mjs
