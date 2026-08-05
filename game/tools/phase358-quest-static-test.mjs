@@ -59,7 +59,6 @@ need(loader, "release('phase358-quest-critical-ready')", 'Quest release reason')
 need(loader, "window.addEventListener('svr:phase358-acceptance'", 'Acceptance-gated deferred load');
 
 need(index, 'PHASE-380-GAME-SITE-INTEGRITY-LOCK', 'Phase 380 Quest entry');
-need(index, 'phase358_quest_full_game_acceptance_smoothness_lock.js', 'Protected Quest acceptance module');
 need(index, 'phase380_original_table_authority_lock.js?v=phase380', 'Original table authority');
 need(index, 'phase379_quest_procedural_table_authority.js?v=phase380', 'Emergency table fallback');
 need(index, 'phase359_dual_platform_gameplay_continuity_lock.js?v=phase380', 'Quest continuity successor');
@@ -106,6 +105,7 @@ if (errors.length) {
 console.log(JSON.stringify({
   pass: true,
   protectedQuestGameplay: 'PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK',
+  acceptanceLoadedBy: 'phase340_platform_manifest QUEST_ACCEPTANCE',
   successorBuild: 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK',
   originalTable: questRelease.browserAcceptance.uploadedTable,
   emergencyFallbackOnly: true,
