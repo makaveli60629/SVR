@@ -1,0 +1,71 @@
+name: Phase 381 VR Runtime Lock
+
+on:
+  pull_request:
+    paths:
+      - 'game/index.html'
+      - 'game/manifest.json'
+      - 'game/modules/phase381_*.js'
+      - 'update/app-version.json'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/pages-live-publish.yml'
+      - '.github/workflows/phase381-vr-runtime-lock.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'game/index.html'
+      - 'game/manifest.json'
+      - 'game/modules/phase381_*.js'
+      - 'update/app-version.json'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/pages-live-publish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase381-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate Phase 381 JavaScript and JSON
+        run: |
+          set -euo pipefail
+          node --check game/modules/phase381_asset_load_cache_guard.js
+          node --check game/modules/phase381_vr_runtime_lock.js
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+
+      - name: Validate Phase 381 runtime contracts
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' game/index.html
+          grep -q 'phase381_asset_load_cache_guard' game/index.html
+          grep -q 'phase381_vr_runtime_lock' game/index.html
+          ! grep -q 'phase364_quest_eric_quarantine_watch' game/index.html
+          grep -q 'SVR_PHASE381_SEAT_LOCK' game/modules/phase381_vr_runtime_lock.js
+          grep -q 'SVR_PHASE381_SEAT_UNLOCK' game/modules/phase381_vr_runtime_lock.js
+          grep -q 'SVR_PHASE381_OVERLAY_SWEEP' game/modules/phase381_vr_runtime_lock.js
+          grep -q 'assets/models/eric/eric.fbx' game/modules/phase381_vr_runtime_lock.js
+          grep -q 'phase368_card_dealer_motion' game/modules/phase381_vr_runtime_lock.js
+          grep -q 'SVR_PHASE381_AUDIO_TOGGLE' game/modules/phase381_vr_runtime_lock.js
+          grep -q 'SVR_AUDIO_TOGGLE' game/modules/phase381_vr_runtime_lock.js
+          test -s game/assets/models/eric/eric.fbx
+          test -s game/modules/phase368_card_dealer_motion.js
+
+      - name: Preserve Phase 380 protected contracts
+        run: |
+          set -euo pipefail
+          node game/tools/phase380-game-site-integrity-static-test.mjs
+          node game/tools/phase379-production-static-test.mjs
+          node game/tools/phase358-quest-static-test.mjs
+          node game/tools/phase359-dual-platform-static-test.mjs
