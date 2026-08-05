@@ -20,6 +20,7 @@ assert.match(root, /SVR Poker \| Public Launch Page/);
 assert.match(root, /id="binary-rain"/);
 assert.match(root, /Preview Site/);
 assert.match(root, /Preview Game/);
+assert.match(root, /PHASE-(?:382-LIVE-ROUTE-CACHE-RECOVERY|380-GAME-SITE-INTEGRITY)-LOCK/);
 assert.match(site, /PHASE-(?:379-PUBLIC-SITE-ANDROID-APK-QUEST-RECOVERY|380-PUBLIC-GAME-SITE-INTEGRITY)-LOCK/);
 assert.match(site, /DOWNLOAD APK RC2/);
 assert.match(android, /PHASE-(?:379-ANDROID-STANDALONE-JOIN-NOW|380-ANDROID-PLAYABLE-POKER-PRESENTATION)-LOCK/);
@@ -44,28 +45,30 @@ assert.equal(release.forceUpdate, false);
 assert.equal(release.showUpdatePrompt, false);
 assert.equal(release.manualUpdateOnly, true);
 assert.equal(update.androidSafeUrl, '/game/android-stable.html?v=phase380');
-assert.equal(update.gameUrl, '/game/index.html?platform=quest&v=phase380');
+assert.match(update.gameUrl, /^\/game\/index\.html\?platform=quest&v=phase(?:380|382)$/);
 assert.equal(update.forceUpdate, false);
 assert.equal(update.showUpdatePrompt, false);
-assert.equal(manifest.start_url, '/?source=pwa-phase380');
-assert.match(pwa, /phase380-clean-routes/);
-assert.match(sw, /phase380-network-authority/);
+assert.match(manifest.start_url, /^\/\?source=pwa-phase(?:380|382)(?:&v=phase382)?$/);
+assert.match(pwa, /phase(?:380-clean-routes|382-live-route-recovery)/);
+assert.match(sw, /phase(?:380-network-authority|382-live-route-recovery)/);
 
 console.log(JSON.stringify({
   pass: true,
   build: 'PHASE-379-PRODUCTION-ACCEPTANCE-LOCK',
-  successor: 'PHASE-380-GAME-SITE-INTEGRITY-LOCK',
+  successor: update.build || 'PHASE-380-GAME-SITE-INTEGRITY-LOCK',
   android: {
     joinStatic: true,
     cardsBeforeJoin: false,
     heavy3dExcluded: true,
-    deterministicEvaluator: true
+    deterministicEvaluator: true,
+    stableRouteLocked: true
   },
   quest: {
     originalUploadedTableFirst: true,
-    proceduralTableEmergencyOnly: true
+    proceduralTableEmergencyOnly: true,
+    runtimeRoute: update.gameUrl
   },
-  pwa: { phase380NetworkAuthority: true },
+  pwa: { currentStartUrl: manifest.start_url, cacheRecoveryAccepted: true },
   apk: { version: release.apkVersionName, code: release.apkVersionCode, ready: release.releaseReady, manualUpdateOnly: true },
   checkedAt: new Date().toISOString()
 }, null, 2));
