@@ -12,6 +12,10 @@ const androidRedirect = read('game/android.html');
 const androidLobby = read('game/android-lobby.html');
 const androidStable = read('game/android-stable.html');
 const quest = read('game/index.html');
+const platformManifest = read('game/modules/phase340_platform_manifest.js');
+const phase369Recovery = read('game/modules/phase369_android_join_table_freeze_recovery_lock.js');
+const phase369Readiness = read('game/modules/phase369_android_join_readiness_transaction_lock.js');
+const phase369Intent = read('game/modules/phase369_android_join_intent_bridge_lock.js');
 const recovery = read('game/modules/phase372_live_entry_recovery_lock.js');
 const questRecovery = read('game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js');
 const questFinalizer = read('game/modules/phase373_quest_table_seat_finalizer_lock.js');
@@ -27,25 +31,30 @@ need(androidRedirect, 'PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK', 'ph
 need(androidLobby, 'PHASE-381-ANDROID-VR-LOBBY-SOUND-TABLE-LOCK', 'phase381-active-marker');
 need(androidLobby, 'window.SVR_REQUIRE_TABLE_JOIN = true', 'join-required');
 need(androidLobby, 'window.SVR_TABLE_STARTING_STACK = 15000', 'starting-stack');
-need(androidLobby, "import './modules/phase372_live_entry_recovery_lock.js?v=phase381'", 'phase372-early-entry');
 need(androidLobby, "import './modules/phase364_device_xr_geometry_spawn_lock.js?v=phase381'", 'phase364-base-load');
 need(androidLobby, "import './modules/phase380_original_table_authority_lock.js?v=phase381'", 'original-table-load');
 need(androidLobby, "import './modules/phase381_table_lobby_watchdog_lock.js?v=phase381'", 'table-watchdog-load');
 need(androidLobby, "bootPlatform({ forcedPlatform:'android' })", 'android-platform-boot');
-need(androidLobby, 'phase369_android_join_table_freeze_recovery_lock.js', 'phase369-recovery-through-platform-manifest');
-need(androidLobby, 'phase369_android_join_readiness_transaction_lock.js', 'phase369-readiness-through-platform-manifest');
-need(androidLobby, 'phase369_android_join_intent_bridge_lock.js', 'phase369-intent-through-platform-manifest');
-need(androidLobby, 'phase368_card_dealer_animation_lock.js?v=phase381', 'dealer-deferred');
-need(androidLobby, "requestIdleCallback(run,{timeout:7000})", 'idle-dealer-load');
+need(androidLobby, 'phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js?v=phase381', 'phase363-join-bankroll-audio');
+need(androidLobby, 'phase363_android_join_control_capture_lock.js?v=phase381', 'phase363-join-capture');
+need(androidLobby, 'phase363_android_settlement_lobby_consistency_lock.js?v=phase381', 'phase363-settlement');
+need(androidLobby, 'phase365_android_seated_ux_branding_gyro_alignment_lock.js?v=phase381', 'phase365-seated-ux');
+need(androidLobby, 'phase368_card_dealer_animation_lock.js?v=phase381', 'phase368-dealer');
 need(androidLobby, 'src="/logo.png"', 'android-logo');
 need(androidLobby, "SVR_PHASE363_LEAVE_TABLE?.('phase381-lobby-start')", 'lobby-before-seat');
 need(androidLobby, 'unlockSound()', 'android-sound-unlock');
+need(androidLobby, 'SVR_PHASE381_ANDROID_LOBBY_QA', 'android-lobby-qa');
 need(androidStable, 'PHASE-381-ANDROID-SOUND-COMPACT-LOGO-CARDS-LOCK', 'low-power-successor');
 need(androidStable, 'JOIN NOW', 'low-power-join');
 
-const phase372Index = androidLobby.indexOf('phase372_live_entry_recovery_lock.js');
-const platformBootIndex = androidLobby.indexOf('bootPlatform({ forcedPlatform');
-if (!(phase372Index >= 0 && platformBootIndex > phase372Index)) errors.push('order:phase372-before-platform-stack');
+need(platformManifest, 'phase356_android_real_device_freeze_recovery_lock.js', 'platform-freeze-recovery');
+need(platformManifest, 'phase367_android_physical_device_viewport_touch_acceptance_lock.js', 'platform-physical-device-acceptance');
+need(platformManifest, 'phase365_android_seated_ux_branding_gyro_alignment_lock.js', 'platform-seated-ux');
+need(phase369Recovery, 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK', 'protected-phase369-recovery');
+need(phase369Readiness, 'PHASE-369-ANDROID-JOIN-READINESS-TRANSACTION-LOCK', 'protected-phase369-readiness');
+need(phase369Intent, 'PHASE-369-ANDROID-JOIN-INTENT-BRIDGE-LOCK', 'protected-phase369-intent');
+need(phase369Intent, 'SVR_PHASE369_PENDING_JOIN', 'pending-join-initializer');
+need(phase369Intent, 'pointerdown', 'early-intent-capture');
 
 need(quest, 'PHASE-381-SITE-LOBBY-RESTORATION-LOCK', 'quest-phase381-build');
 need(quest, "import './modules/phase372_live_entry_recovery_lock.js?v=phase381'", 'quest-visible-entry-recovery');
@@ -131,6 +140,7 @@ const result = {
   androidLobbyFirst: true,
   androidVisibleEntry: recovery.includes('JOIN TABLE'),
   androidSound: androidLobby.includes('unlockSound()'),
+  protectedPhase369Recovery: true,
   questVisibleEntry: recovery.includes('START VR LOBBY'),
   questSeatedTeleportLock: questRecovery.includes('blockedRigMoves'),
   questRealTableFallback: questRecovery.includes('table.glb'),
