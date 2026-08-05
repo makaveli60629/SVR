@@ -13,6 +13,7 @@ const avatarLock = read('site/js/phase384-avatar-site-lock.js');
 const catalog = json('site/data/avatar-catalog.json');
 const game = read('game/index.html');
 const quest = read('game/modules/phase384_quest_quickplay_polish.js');
+const world = read('game/modules/phase384_quest_lobby_world_polish.js');
 const phase381 = read('game/modules/phase381_vr_runtime_lock.js');
 const android = read('game/android-stable.html');
 const manifest = json('game/manifest.json');
@@ -33,17 +34,33 @@ assert.equal(catalog.defaultOutfit.top, 'none');
 assert.equal(catalog.defaultOutfit.shoes, 'none');
 assert.equal(catalog.defaultOutfit.accessory, 'none');
 
-assert.match(game, /PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK/);
+assert.match(game, /PHASE-384-QUEST-LOBBY-WORLD-INTERACTION-POLISH-LOCK/);
 assert.match(game, /phase381_vr_runtime_lock/);
 assert.match(game, /phase384_quest_quickplay_polish/);
+assert.match(game, /phase384_quest_lobby_world_polish/);
 assert.match(phase381, /SVR_PHASE381_PLAY_ERIC/);
 assert.match(phase381, /phase368_card_dealer_motion/);
 assert.match(quest, /questSingleEric|duplicateEricsHidden|dedupeDealer/);
 assert.match(quest, /svrPhase384ExternalSkeletonHidden/);
-assert.match(quest, /PHASE384_PROFESSIONAL_SVR_FELT/);
-assert.match(quest, /PHASE384_SVR_TABLE_LOGO/);
-assert.match(quest, /SVR_PHASE373_STABLE_SEAT/);
-assert.match(quest, /SVR_PHASE381_PLAY_ERIC/);
+assert.match(quest, /legacyOversizedFeltDisabled/);
+assert.match(quest, /legacyBackwardDealerRotationDisabled/);
+assert.match(world, /PHASE384_FITTED_INSET_SVR_FELT/);
+assert.match(world, /PHASE384_FITTED_SVR_TABLE_LOGO/);
+assert.match(world, /PHASE384_LEFT_FOREARM_WATCH_ROOT/);
+assert.match(world, /PHASE384_PHYSICAL_CARD_CHIP_KIT/);
+assert.match(world, /SVR_PHASE361_PLAY_GAME/);
+assert.match(world, /SVR_PHASE384_ALL_TELEPORT_LOCKED/);
+assert.match(world, /PHASE384_FOURTH_LOBBY_WALL/);
+assert.match(world, /PHASE384_TEXTURED_GLOWING_MOON/);
+assert.match(world, /PHASE384_TEXTURED_MARS/);
+assert.match(world, /ESPRESSO/);
+assert.match(world, /ALL-IN/);
+assert.match(world, /SVR POKER/);
+assert.match(world, /open\.spotify\.com/);
+assert.match(world, /actionPanelHiddenWhileSeated/);
+assert.match(world, /backgroundDimmed/);
+assert.match(world, /physicalCards/);
+assert.match(world, /physicalChips/);
 
 assert.match(android, /PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK/);
 assert.match(android, /PHASE-384-ANDROID-ONE-PAGE-3D-CHIP-WINNER-LOCK/);
@@ -86,7 +103,19 @@ console.log(JSON.stringify({
   build: app.build,
   siteBuild: app.siteBuild,
   profile: { defaultEric: true, generatedBoxClothingDisabled: true },
-  quest: { oneEricDealer: true, externalSkeletonHidden: true, dealerMotion: true, feltAndLogo: true, quickPlaySeat: true },
+  quest: {
+    oneEricDealer: true,
+    externalSkeletonHidden: true,
+    dealerMotion: true,
+    fittedFeltAndLogo: true,
+    autoSeatAndTeleportLock: true,
+    wristWatch: true,
+    physicalCardsAndChips: true,
+    lobbyFocusLighting: true,
+    fourthWallAndSkyline: true,
+    moonMarsAndAds: true,
+    ambientAndGameAudio: true
+  },
   android: { onePageFit: true, logoCardBack: true, centeredSuit: true, chipAnimation: true, winnerFlashSound: true, threeDimensionalPresentation: true },
   apk: { version: app.apkVersionName, code: app.apkVersionCode, forceUpdate: app.forceUpdate }
 }, null, 2));
