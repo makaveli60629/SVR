@@ -15,8 +15,8 @@
   "packageName": "com.svrpoker.app",
   "apkVersionCode": 2,
   "apkVersionName": "0.1.0-rc2",
-  "apkUrl": "https://github.com/makaveli60629/SVR/releases/download/android-rc2/svr-poker-android-rc2.apk",
-  "apkSha256": "f5e06f562ffc26dce59de79afc8b2c29735e5bc137e2c35509be69813105f337",
+  "apkUrl": "https://svrpoker.com/downloads/svr-poker-android-rc2.apk",
+  "apkSha256": "f264a3cb9d4eaf1fd7d66604f575f7abb176c6012015bae06e5d7dd734ca328c",
   "releaseReady": true,
   "forceUpdate": false,
   "showUpdatePrompt": true,
@@ -25,5 +25,5 @@
   "publicDownloadControl": true,
   "publicUpdateControl": true,
   "offlineStableTableBundled": true,
-  "note": "Android RC2 is published as a verified GitHub Release asset."
+  "note": "Android RC2 is published at the SVR Poker same-domain download path."
 }

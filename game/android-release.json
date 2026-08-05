@@ -1,12 +1,12 @@
 {
   "name": "SVR Poker Android",
   "channel": "stable-test",
-  "status": "phase379-apk-rc2-release-ready",
+  "status": "phase379-apk-rc2-same-domain-ready",
   "packageName": "com.svrpoker.app",
   "apkVersionName": "0.1.0-rc2",
   "apkVersionCode": 2,
-  "apkUrl": "https://github.com/makaveli60629/SVR/releases/download/android-rc2/svr-poker-android-rc2.apk",
-  "apkSha256": "f5e06f562ffc26dce59de79afc8b2c29735e5bc137e2c35509be69813105f337",
+  "apkUrl": "https://svrpoker.com/downloads/svr-poker-android-rc2.apk",
+  "apkSha256": "f264a3cb9d4eaf1fd7d66604f575f7abb176c6012015bae06e5d7dd734ca328c",
   "releasePage": "https://github.com/makaveli60629/SVR/releases/tag/android-rc2",
   "releaseReady": true,
   "webEntry": "/game/android-stable.html?v=phase379",
@@ -35,10 +35,10 @@
     "legacySitSeatControlsExcluded": true,
     "threeJsRequired": false
   },
-  "nativeBuildStatus": "github-release-verified",
+  "nativeBuildStatus": "same-domain-apk-verified",
   "nativeApkRebuild": true,
   "offlineStableTableBundled": true,
-  "updateMessage": "Android RC2 is published with the Phase 379 JOIN NOW table.",
+  "updateMessage": "Android RC2 is published as a direct SVR Poker download.",
   "notes": [
     "The browser game is available independently of the APK build.",
     "The public APK control opens the GitHub release page while the binary is pending.",
