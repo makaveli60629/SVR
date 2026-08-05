@@ -15,34 +15,27 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 25
     steps:
-      - name: Checkout production source
+      - name: Checkout authoritative production source
         uses: actions/checkout@v5
         with:
           path: source
           fetch-depth: 1
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            index.html
-            launch.css
-            matrix.js
-            site-public-hooks.js
-            logo.webp
-            logo.png
-            CNAME
-            .nojekyll
-            game/index.html
-            game/android.html
-            game/android-play.html
-            game/android-stable.html
-            game/android-release.json
-            game/modules/phase379_quest_procedural_table_authority.js
-            site/index.html
-            downloads/index.html
-            downloads/svr-poker-android-rc2.apk
-            downloads/svr-poker-android-rc2.apk.sha256
-            update/app-version.json
+            /index.html
+            /launch.css
+            /matrix.js
+            /site-public-hooks.js
+            /logo.webp
+            /logo.png
+            /CNAME
+            /.nojekyll
+            /game/
+            /site/
+            /downloads/
+            /update/app-version.json
 
       - name: Checkout current production branch
         uses: actions/checkout@v5
@@ -51,7 +44,7 @@ jobs:
           path: publish
           fetch-depth: 1
 
-      - name: Validate locked public page and game contracts
+      - name: Validate Phase 380 source contracts
         shell: bash
         run: |
           set -euo pipefail
@@ -59,55 +52,64 @@ jobs:
           grep -q 'id="binary-rain"' source/index.html
           grep -q 'Preview Site' source/index.html
           grep -q 'Preview Game' source/index.html
-          grep -q 'PHASE-379-PUBLIC-SITE-ANDROID-APK-QUEST-RECOVERY-LOCK' source/site/index.html
-          grep -q 'PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK' source/game/android-stable.html
+          grep -q 'PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK' source/site/index.html
+          grep -q 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' source/game/android-stable.html
           grep -q 'JOIN NOW' source/game/android-stable.html
-          grep -q 'PHASE-379-QUEST-PROCEDURAL-TABLE-AUTHORITY-LOCK' source/game/modules/phase379_quest_procedural_table_authority.js
-          grep -q 'phase379_quest_procedural_table_authority' source/game/index.html
+          grep -q 'deterministicHandEvaluator:true' source/game/android-stable.html
+          grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' source/game/modules/phase380_original_table_authority_lock.js
+          grep -q 'phase380_original_table_authority_lock' source/game/index.html
+          grep -q 'PHASE-380-QUEST-PROCEDURAL-TABLE-FALLBACK-LOCK' source/game/modules/phase379_quest_procedural_table_authority.js
+          test -s source/game/assets/models/table.glb
+          test -s source/game/assets/table.fbx
           test -s source/downloads/svr-poker-android-rc2.apk
           test -s source/downloads/svr-poker-android-rc2.apk.sha256
           python3 -m json.tool source/game/android-release.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
+          node --check source/game/modules/phase380_original_table_authority_lock.js
+          node --check source/game/modules/phase379_quest_procedural_table_authority.js
 
-      - name: Sync authoritative public files
+      - name: Rebuild clean production tree
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p publish/game/modules publish/site publish/downloads publish/update
+          find publish -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp source/index.html publish/index.html
           cp source/launch.css publish/launch.css
           cp source/matrix.js publish/matrix.js
           cp source/site-public-hooks.js publish/site-public-hooks.js
-          cp source/site/index.html publish/site/index.html
-          cp source/downloads/index.html publish/downloads/index.html
-          cp source/downloads/svr-poker-android-rc2.apk publish/downloads/svr-poker-android-rc2.apk
-          cp source/downloads/svr-poker-android-rc2.apk.sha256 publish/downloads/svr-poker-android-rc2.apk.sha256
-          cp source/game/index.html publish/game/index.html
-          cp source/game/android.html publish/game/android.html
-          cp source/game/android-play.html publish/game/android-play.html
-          cp source/game/android-stable.html publish/game/android-stable.html
-          cp source/game/android-release.json publish/game/android-release.json
-          cp source/game/modules/phase379_quest_procedural_table_authority.js publish/game/modules/phase379_quest_procedural_table_authority.js
-          cp source/update/app-version.json publish/update/app-version.json
-          if [ -f source/CNAME ]; then cp source/CNAME publish/CNAME; fi
-          if [ -f source/.nojekyll ]; then cp source/.nojekyll publish/.nojekyll; else touch publish/.nojekyll; fi
           if [ -f source/logo.png ]; then cp source/logo.png publish/logo.png; fi
           if [ -f source/logo.webp ]; then cp source/logo.webp publish/logo.webp; fi
+          if [ -f source/CNAME ]; then cp source/CNAME publish/CNAME; fi
+          if [ -f source/.nojekyll ]; then cp source/.nojekyll publish/.nojekyll; else touch publish/.nojekyll; fi
+          cp -a source/game publish/game
+          cp -a source/site publish/site
+          cp -a source/downloads publish/downloads
+          mkdir -p publish/update
+          cp source/update/app-version.json publish/update/app-version.json
+          rm -rf publish/game/tools publish/game/docs publish/site/tools publish/site/docs
+          find publish -type f \( -name '*.zip' -o -name '*.ps1' -o -name '.env' -o -name '.env.*' \) -delete
+          chmod -R u+rwX,go+rX publish
+
+      - name: Stamp deployment health
+        shell: bash
+        run: |
+          set -euo pipefail
           DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           APK_SHA="$(cut -d' ' -f1 source/downloads/svr-poker-android-rc2.apk.sha256)"
           cat > publish/deploy-health.json <<EOF
           {
             "status": "ok",
-            "build": "SVR-OFFICIAL-MATRIX-PUBLIC-APK-DIRECT-DEPLOY-LOCK",
-            "androidBuild": "PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK",
-            "questBuild": "PHASE-379-QUEST-TABLE-ANDROID-ROUTE-RECOVERY-LOCK",
+            "build": "PHASE-380-GAME-SITE-INTEGRITY-LOCK",
+            "androidBuild": "PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK",
+            "questBuild": "PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK",
             "publicBuild": "SVR-OFFICIAL-MATRIX-PUBLIC-LOCK",
+            "siteBuild": "PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "${DEPLOYED_AT}",
             "sourceBranch": "main",
             "publishBranch": "gh-pages",
-            "androidRoute": "/game/android-stable.html?v=phase379",
-            "questRoute": "/game/index.html?platform=quest&v=phase379",
+            "androidRoute": "/game/android-stable.html?v=phase380",
+            "questRoute": "/game/index.html?platform=quest&v=phase380",
             "downloadsRoute": "/downloads/",
             "apkUrl": "/downloads/svr-poker-android-rc2.apk",
             "apkSha256": "${APK_SHA}",
@@ -116,23 +118,44 @@ jobs:
             "apkBuildStatus": "same-domain-ready",
             "joinNowStatic": true,
             "cardsBeforeJoin": false,
-            "questProceduralTableFallback": true,
+            "androidDeterministicEvaluator": true,
+            "questOriginalTableFirst": true,
+            "questProceduralTableEmergencyOnly": true,
+            "cleanTreePublish": true,
             "customDomain": "svrpoker.com"
           }
           EOF
           cp publish/deploy-health.json publish/game/deploy-health.json
 
-      - name: Publish to gh-pages
+      - name: Validate clean production tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f publish/index.html
+          test -f publish/site/index.html
+          test -f publish/site/profile.html
+          test -f publish/site/avatar.html
+          test -f publish/game/index.html
+          test -f publish/game/android-stable.html
+          test -f publish/game/modules/phase380_original_table_authority_lock.js
+          test -s publish/game/assets/models/table.glb
+          test -s publish/game/assets/table.fbx
+          test -s publish/downloads/svr-poker-android-rc2.apk
+          test -f publish/deploy-health.json
+          ! find publish -type f \( -name '.env' -o -name '.env.*' \) | grep -q .
+          ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' publish | grep -q .
+
+      - name: Publish clean tree to gh-pages
         shell: bash
         working-directory: publish
         run: |
           set -euo pipefail
           git config user.name 'SVR Auto Deploy'
           git config user.email 'actions@users.noreply.github.com'
-          git add index.html launch.css matrix.js site-public-hooks.js logo.webp logo.png site/index.html downloads/index.html downloads/svr-poker-android-rc2.apk downloads/svr-poker-android-rc2.apk.sha256 game/index.html game/android.html game/android-play.html game/android-stable.html game/android-release.json game/modules/phase379_quest_procedural_table_authority.js update/app-version.json deploy-health.json game/deploy-health.json CNAME .nojekyll
+          git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches the locked public page and APK download.'
+            echo 'Production already matches the Phase 380 clean tree.'
           else
-            git commit -m "Deploy locked Matrix page and same-domain APK ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 380 clean game and site tree ${GITHUB_SHA}"
             git push origin gh-pages
           fi
