@@ -11,7 +11,7 @@
   "visibleBuildProof": true,
   "gameUrl": "/game/index.html?platform=quest&v=phase382",
   "questRuntimeUrl": "/game/index.html?platform=quest&v=phase382",
-  "androidSafeUrl": "/game/android-stable.html?v=phase380&deploy=phase382",
+  "androidSafeUrl": "/game/android-stable.html?v=phase380",
   "profileUrl": "/site/profile.html?v=phase382",
   "downloadsUrl": "/downloads/?v=phase382",
   "releasePage": "https://github.com/makaveli60629/SVR/releases/tag/android-rc2",
