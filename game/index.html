@@ -8,17 +8,17 @@
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="manifest" href="./manifest.json?v=phase381">
+<link rel="manifest" href="./manifest.json?v=phase384">
 <style>html,body,#app{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}canvas{display:block;width:100%;height:100%}#safeStage{position:fixed;inset:0;z-index:999999;display:grid;place-items:center;background:#000}.card{max-width:560px;margin:20px;padding:24px;border:1px solid #7ffcff;border-radius:20px;background:rgba(0,0,0,.88);text-align:center;box-shadow:0 0 40px rgba(127,252,255,.16)}button{padding:11px 16px;border:1px solid #ffd98a;border-radius:12px;background:#0a101a;color:#fff;font-weight:900}.boot-released #safeStage{display:none!important}</style>
-<script>(function(){const p=new URLSearchParams(location.search),ua=navigator.userAgent||'',path=location.pathname;const preview=self!==top||p.has('preview')||p.has('live')||p.get('cam')==='director';if(preview&&!/camera3\.html$/i.test(path)){location.replace(`./camera3.html${location.search||'?v=phase381'}`);return}if(/Android/i.test(ua)&&!/Quest|Oculus|Meta Quest/i.test(ua)&&!p.has('desktop')&&!p.has('standard')){location.replace(`/game/android-stable.html?v=phase380&from=game-index&t=${Date.now()}`);return}})();</script>
+<script>(function(){const p=new URLSearchParams(location.search),ua=navigator.userAgent||'',path=location.pathname;const preview=self!==top||p.has('preview')||p.has('live')||p.get('cam')==='director';if(preview&&!/camera3\.html$/i.test(path)){location.replace(`./camera3.html${location.search||'?v=phase384'}`);return}if(/Android/i.test(ua)&&!/Quest|Oculus|Meta Quest/i.test(ua)&&!p.has('desktop')&&!p.has('standard')){location.replace(`/game/android-stable.html?v=phase380&deploy=phase384&from=game-index&t=${Date.now()}`);return}})();</script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-380-GAME-SITE-INTEGRITY-LOCK" data-release="PHASE-380-GAME-SITE-INTEGRITY-LOCK" data-runtime-build="PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK" data-acceptance="PHASE-381-QUEST-FULL-GAME-RUNTIME-ACCEPTANCE-LOCK">
+<body data-build="PHASE-380-GAME-SITE-INTEGRITY-LOCK" data-release="PHASE-380-GAME-SITE-INTEGRITY-LOCK" data-runtime-build="PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK" data-predecessor-runtime="PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK" data-acceptance="PHASE-381-QUEST-FULL-GAME-RUNTIME-ACCEPTANCE-LOCK">
 <div id="app"></div>
-<div id="safeStage"><div class="card"><img src="/logo.png" alt="SVR Poker logo" style="width:82px;height:82px;object-fit:contain"><h1>SVR POKER</h1><p id="safeStatus">Preparing the original poker table, approved Eric dealer rig, seated control lock, and stable Quest lobby.</p><button id="startRuntimeBtn">START / RETRY GAME</button></div></div>
+<div id="safeStage"><div class="card"><img src="/logo.png" alt="SVR Poker logo" style="width:82px;height:82px;object-fit:contain"><h1>SVR POKER</h1><p id="safeStatus">Preparing the original poker table, one textured Eric dealer, dealer animation, polished SVR felt, and stable Quest quick play.</p><button id="startRuntimeBtn">START / RETRY GAME</button></div></div>
 <pre id="log" hidden></pre><pre id="err" hidden></pre>
 <script type="module">
-import './modules/phase381_asset_load_cache_guard.js?v=phase381';
+import './modules/phase381_asset_load_cache_guard.js?v=phase384';
 import './modules/phase372_live_entry_recovery_lock.js?v=phase380';
 import './modules/phase364_device_xr_geometry_spawn_lock.js?v=phase380';
 import './modules/phase362_desktop_renderer_preboot_safety_lock.js?v=phase380';
@@ -26,12 +26,13 @@ import './modules/phase380_original_table_authority_lock.js?v=phase380';
 import './modules/phase379_quest_procedural_table_authority.js?v=phase380';
 import {bootPlatform} from './modules/phase340_platform_core_loader.js?v=phase380';
 const PHASE381_SUCCESSOR_OF='PHASE-380-GAME-SITE-INTEGRITY-LOCK';
-// Phase 381 replaces phase368_card_dealer_animation_lock.js in the active Quest entry with the approved Eric mesh retarget.
+const PHASE384_SUCCESSOR_OF='PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK';
+// Phase 384 preserves the Phase 381 dealer rig and adds material, deduplication, table felt/logo and quick-play seating polish.
 let started=false;
-const waitForApi=async(names,timeout=30000)=>{const start=performance.now();while(performance.now()-start<timeout){if(names.every(name=>typeof window[name]==='function'))return true;await new Promise(resolve=>setTimeout(resolve,100));}throw new Error(`PHASE381_API_TIMEOUT:${names.join(',')}`)};
-const loadPhase381Later=()=>{const run=()=>import('./modules/phase381_vr_runtime_lock.js?v=phase381').then(()=>window.SVR_PHASE381_ALIGN_ERIC?.()).catch(console.error);if('requestIdleCallback'in window)requestIdleCallback(run,{timeout:7000});else setTimeout(run,2200);};
+const waitForApi=async(names,timeout=30000)=>{const start=performance.now();while(performance.now()-start<timeout){if(names.every(name=>typeof window[name]==='function'))return true;await new Promise(resolve=>setTimeout(resolve,100));}throw new Error(`PHASE384_API_TIMEOUT:${names.join(',')}`)};
+const loadPhase384Later=()=>{const run=async()=>{try{await import('./modules/phase381_vr_runtime_lock.js?v=phase384');window.SVR_PHASE381_ALIGN_ERIC?.();await import('./modules/phase384_quest_quickplay_polish.js?v=phase384');window.SVR_PHASE384_QUEST_SWEEP?.();window.dispatchEvent(new CustomEvent('svr:phase384-core-ready'));}catch(error){console.error(error)}};if('requestIdleCallback'in window)requestIdleCallback(run,{timeout:6500});else setTimeout(run,1800);};
 async function start(){if(started)return;started=true;const status=document.getElementById('safeStatus');try{
-  status.textContent='Loading the SVR Poker lobby, table, and seated gameplay controls…';
+  status.textContent='Loading the SVR Poker lobby, original table, Eric dealer, and seated gameplay controls…';
   await bootPlatform();
   await import('./modules/phase380_quest_full_game_acceptance_lock.js?v=phase380');
   window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('immediately-after-platform-boot');
@@ -59,14 +60,14 @@ async function start(){if(started)return;started=true;const status=document.getE
   window.SVR_PHASE373_REPAIR_TABLE?.();
   window.SVR_PHASE373_REPAIR_NPCS?.();
   window.SVR_PHASE373_POSTFLIGHT_REPAIR_NPCS?.();
-  window.SVR_PHASE373_STABLE_LOBBY?.('phase381-core-ready');
-  window.SVR_PHASE373_FINALIZE_TABLE?.('phase381-core-ready');
-  window.SVR_PHASE373_POSTFLIGHT_RESTORE_TELEPORT?.('phase381-core-ready');
-  window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase381-core-ready');
-  window.SVR_PHASE379_FORCE_TABLE?.('phase381-core-ready');
+  window.SVR_PHASE373_STABLE_LOBBY?.('phase384-core-ready');
+  window.SVR_PHASE373_FINALIZE_TABLE?.('phase384-core-ready');
+  window.SVR_PHASE373_POSTFLIGHT_RESTORE_TELEPORT?.('phase384-core-ready');
+  window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase384-core-ready');
+  window.SVR_PHASE379_FORCE_TABLE?.('phase384-core-ready');
   window.SVR_PHASE381_OVERLAY_SWEEP?.();
   document.body.classList.add('boot-released');
-  loadPhase381Later();
+  loadPhase384Later();
   window.dispatchEvent(new CustomEvent('svr:phase379-core-ready'));
   window.dispatchEvent(new CustomEvent('svr:phase380-core-ready'));
   window.dispatchEvent(new CustomEvent('svr:phase381-core-ready'));
@@ -75,12 +76,13 @@ async function start(){if(started)return;started=true;const status=document.getE
   status.textContent='Recovery mode: retrying the original table and seated runtime. Tap START / RETRY GAME again if needed.';
   window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('boot-error');
   window.SVR_PHASE379_FORCE_TABLE?.('boot-error');
-  setTimeout(()=>{window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('boot-error-delayed');window.SVR_PHASE379_FORCE_TABLE?.('boot-error-delayed');document.body.classList.add('boot-released');},1200);
+  setTimeout(()=>{window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('boot-error-delayed');window.SVR_PHASE379_FORCE_TABLE?.('boot-error-delayed');document.body.classList.add('boot-released');loadPhase384Later();},1200);
   started=false;
 }}
 document.getElementById('startRuntimeBtn')?.addEventListener('click',start);
 setTimeout(start,500);
-window.SVR_PHASE381_BOOT_QA=()=>({build:'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK',started,assetCache:window.SVR_PHASE381_ASSET_CACHE_QA?.()||null,originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.()||null,fallbackTable:window.SVR_PHASE379_TABLE_QA?.()||null,runtime381:window.SVR_PHASE381_QA?.()||null,acceptance:window.SVR_PHASE380_QUEST_ACCEPTANCE_QA?.()||null,checkedAt:new Date().toISOString()});
+window.SVR_PHASE381_BOOT_QA=()=>({build:'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK',successor:'PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK',started,assetCache:window.SVR_PHASE381_ASSET_CACHE_QA?.()||null,originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.()||null,fallbackTable:window.SVR_PHASE379_TABLE_QA?.()||null,runtime381:window.SVR_PHASE381_QA?.()||null,runtime384:window.SVR_PHASE384_QUEST_QA?.()||null,acceptance:window.SVR_PHASE380_QUEST_ACCEPTANCE_QA?.()||null,checkedAt:new Date().toISOString()});
+window.SVR_PHASE384_BOOT_QA=window.SVR_PHASE381_BOOT_QA;
 window.SVR_PHASE380_BOOT_QA=window.SVR_PHASE381_BOOT_QA;
 </script>
 </body>
