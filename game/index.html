@@ -13,42 +13,44 @@
 <script>(function(){const p=new URLSearchParams(location.search),ua=navigator.userAgent||'',path=location.pathname;const preview=self!==top||p.has('preview')||p.has('live')||p.get('cam')==='director';if(preview&&!/camera3\.html$/i.test(path)){location.replace(`./camera3.html${location.search||'?v=phase381'}`);return}if(/Android/i.test(ua)&&!/Quest|Oculus|Meta Quest/i.test(ua)&&!p.has('desktop')&&!p.has('standard')){location.replace(`/game/android-stable.html?v=phase380&from=game-index&t=${Date.now()}`);return}})();</script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK" data-release="PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK" data-acceptance="PHASE-381-QUEST-FULL-GAME-RUNTIME-ACCEPTANCE-LOCK">
+<body data-build="PHASE-380-GAME-SITE-INTEGRITY-LOCK" data-release="PHASE-380-GAME-SITE-INTEGRITY-LOCK" data-runtime-build="PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK" data-acceptance="PHASE-381-QUEST-FULL-GAME-RUNTIME-ACCEPTANCE-LOCK">
 <div id="app"></div>
 <div id="safeStage"><div class="card"><img src="/logo.png" alt="SVR Poker logo" style="width:82px;height:82px;object-fit:contain"><h1>SVR POKER</h1><p id="safeStatus">Preparing the original poker table, approved Eric dealer rig, seated control lock, and stable Quest lobby.</p><button id="startRuntimeBtn">START / RETRY GAME</button></div></div>
 <pre id="log" hidden></pre><pre id="err" hidden></pre>
 <script type="module">
 import './modules/phase381_asset_load_cache_guard.js?v=phase381';
-import './modules/phase372_live_entry_recovery_lock.js?v=phase381';
-import './modules/phase364_device_xr_geometry_spawn_lock.js?v=phase381';
-import './modules/phase362_desktop_renderer_preboot_safety_lock.js?v=phase381';
-import './modules/phase380_original_table_authority_lock.js?v=phase381';
-import './modules/phase379_quest_procedural_table_authority.js?v=phase381';
-import {bootPlatform} from './modules/phase340_platform_core_loader.js?v=phase381';
+import './modules/phase372_live_entry_recovery_lock.js?v=phase380';
+import './modules/phase364_device_xr_geometry_spawn_lock.js?v=phase380';
+import './modules/phase362_desktop_renderer_preboot_safety_lock.js?v=phase380';
+import './modules/phase380_original_table_authority_lock.js?v=phase380';
+import './modules/phase379_quest_procedural_table_authority.js?v=phase380';
+import {bootPlatform} from './modules/phase340_platform_core_loader.js?v=phase380';
+const PHASE381_SUCCESSOR_OF='PHASE-380-GAME-SITE-INTEGRITY-LOCK';
+// Phase 381 replaces phase368_card_dealer_animation_lock.js in the active Quest entry with the approved Eric mesh retarget.
 let started=false;
 const waitForApi=async(names,timeout=30000)=>{const start=performance.now();while(performance.now()-start<timeout){if(names.every(name=>typeof window[name]==='function'))return true;await new Promise(resolve=>setTimeout(resolve,100));}throw new Error(`PHASE381_API_TIMEOUT:${names.join(',')}`)};
 const loadPhase381Later=()=>{const run=()=>import('./modules/phase381_vr_runtime_lock.js?v=phase381').then(()=>window.SVR_PHASE381_ALIGN_ERIC?.()).catch(console.error);if('requestIdleCallback'in window)requestIdleCallback(run,{timeout:7000});else setTimeout(run,2200);};
 async function start(){if(started)return;started=true;const status=document.getElementById('safeStatus');try{
   status.textContent='Loading the SVR Poker lobby, table, and seated gameplay controls…';
   await bootPlatform();
-  await import('./modules/phase380_quest_full_game_acceptance_lock.js?v=phase381');
+  await import('./modules/phase380_quest_full_game_acceptance_lock.js?v=phase380');
   window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('immediately-after-platform-boot');
   window.SVR_PHASE379_FORCE_TABLE?.('immediately-after-platform-boot');
-  await import('./modules/phase359_dual_platform_gameplay_continuity_lock.js?v=phase381');
-  await import('./modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js?v=phase381');
-  await import('./modules/phase360_table_conservation_next_guard_lock.js?v=phase381');
-  await import('./modules/phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase381');
-  await import('./modules/phase373_quest_rig_preflight_lock.js?v=phase381');
+  await import('./modules/phase359_dual_platform_gameplay_continuity_lock.js?v=phase380');
+  await import('./modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js?v=phase380');
+  await import('./modules/phase360_table_conservation_next_guard_lock.js?v=phase380');
+  await import('./modules/phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase380');
+  await import('./modules/phase373_quest_rig_preflight_lock.js?v=phase380');
   await waitForApi(['SVR_PHASE373_RIG_PREFLIGHT_QA']);
-  await import('./modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase381');
+  await import('./modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase380');
   await waitForApi(['SVR_PHASE373_QA','SVR_PHASE373_STABLE_LOBBY','SVR_PHASE373_STABLE_SEAT']);
-  await import('./modules/phase373_quest_npc_teleport_postflight_lock.js?v=phase381');
-  await import('./modules/phase373_quest_table_seat_finalizer_lock.js?v=phase381');
-  await import('./modules/phase365_quest_vr_button_dedupe_lock.js?v=phase381');
+  await import('./modules/phase373_quest_npc_teleport_postflight_lock.js?v=phase380');
+  await import('./modules/phase373_quest_table_seat_finalizer_lock.js?v=phase380');
+  await import('./modules/phase365_quest_vr_button_dedupe_lock.js?v=phase380');
   const p=new URLSearchParams(location.search),legacyAcceptance=p.get('acceptance')==='1'&&p.get('v')!=='phase364';
   if(!legacyAcceptance){
-    await import('./modules/phase362_continuous_10000_turn_clock_rejoin_reset_lock.js?v=phase381');
-    await import('./modules/phase362_settlement_accounting_clear_lock.js?v=phase381');
+    await import('./modules/phase362_continuous_10000_turn_clock_rejoin_reset_lock.js?v=phase380');
+    await import('./modules/phase362_settlement_accounting_clear_lock.js?v=phase380');
     const isQuest=p.get('platform')==='quest'||/Quest|Oculus|Meta Quest/i.test(navigator.userAgent||'');
     if(isQuest&&!window.SVR_PHASE361_STATE?.seated)window.SVR_PHASE362_LEAVE_TABLE?.();
   }
