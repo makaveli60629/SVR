@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>SVR Poker — Android VR Lobby</title>
+<meta name="theme-color" content="#090611">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="manifest" href="./manifest.json?v=phase381">
+<style>
+html,body,#app{height:100%;margin:0;background:#05030a;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}canvas{display:block;width:100%;height:100%}
+#lobbyGate{position:fixed;inset:0;z-index:999999;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 50% 30%,#241247,#080711 52%,#020205);transition:opacity .25s ease}.lobby-ready #lobbyGate{opacity:0;pointer-events:none}.gate-card{width:min(520px,94vw);padding:25px;border:1px solid rgba(127,252,255,.65);border-radius:24px;background:rgba(5,8,19,.94);text-align:center;box-shadow:0 28px 100px #000,0 0 44px rgba(155,77,255,.18)}.gate-card img{width:86px;height:86px;object-fit:contain}.gate-card h1{margin:9px 0 5px;font-size:clamp(27px,8vw,48px);letter-spacing:.09em}.gate-card p{line-height:1.4;color:#d9fbff}.gate-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}.gate-actions button,.gate-actions a{min-height:50px;display:flex;align-items:center;justify-content:center;padding:10px;border:1px solid #ffd98a;border-radius:14px;background:#111827;color:#fff;text-decoration:none;font-weight:950}.gate-actions .primary{grid-column:1/-1;border:0;background:linear-gradient(135deg,#7ffcff,#9b4dff);color:#03040b;font-size:18px}.gate-build{color:#8dffb4;font-weight:950;letter-spacing:.06em}
+#runtimeRecovery{position:fixed;z-index:1000000;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));padding:11px;border:1px solid rgba(255,217,138,.66);border-radius:16px;background:rgba(5,8,19,.96);text-align:center;box-shadow:0 20px 70px #000}#runtimeRecovery[hidden]{display:none}#runtimeRecovery p{margin:0 0 8px}.recovery-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.recovery-actions button,.recovery-actions a{min-height:42px;padding:8px 12px;border:1px solid #7ffcff;border-radius:12px;background:#111827;color:white;text-decoration:none;font-weight:900}
+#lobbyBuild{position:fixed;left:10px;top:max(10px,env(safe-area-inset-top));z-index:80;padding:6px 9px;border:1px solid rgba(141,255,180,.38);border-radius:999px;background:rgba(0,8,12,.72);color:#8dffb4;font-size:9px;font-weight:950;letter-spacing:.06em;pointer-events:none}
+@media(max-width:600px){.gate-actions{grid-template-columns:1fr}.gate-actions .primary{grid-column:auto}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body data-build="PHASE-381-ANDROID-VR-LOBBY-SOUND-TABLE-LOCK" data-platform="android" data-release="PHASE-381-SITE-LOBBY-RESTORATION-LOCK" data-acceptance="PHASE-363-ANDROID-CANONICAL-TABLE-JOIN-BANKROLL-AUDIO-LOCK">
+<div id="app"></div>
+<div id="lobbyBuild">PHASE 381 • ANDROID VR LOBBY</div>
+<section id="lobbyGate"><div class="gate-card"><img src="/logo.png" alt="SVR Poker"><div class="gate-build">ANDROID 3D LOBBY</div><h1>SVR POKER</h1><p id="gateStatus">Enter the full VR-style lobby, walk to the original poker table, then use JOIN TABLE. Sound activates from this button.</p><div class="gate-actions"><button id="enterLobby" class="primary" type="button">ENTER VR LOBBY</button><a href="/game/android-stable.html?v=phase381">LOW-POWER TABLE</a><a href="/site/index.html?v=phase381">WEBSITE HOME</a><a href="/downloads/svr-poker-android-rc2.apk" download>DOWNLOAD APK</a><button id="clearCache" type="button">CLEAR OLD CACHE</button></div></div></section>
+<aside id="runtimeRecovery" hidden><p id="runtimeRecoveryText">Android recovery is available.</p><div class="recovery-actions"><a href="/game/android-stable.html?v=phase381">OPEN LOW-POWER TABLE</a><button id="retryLobby" type="button">RETRY LOBBY</button><button id="reloadLobby" type="button">RELOAD</button></div></aside>
+<script type="module">
+window.SVR_REQUIRE_TABLE_JOIN = true;
+window.SVR_TABLE_STARTING_STACK = 15000;
+window.SVR_ANDROID_BRAND_SLOT = { id:'svr', name:'SVR POKER', logoUrl:'/logo.png', fallbackLogoUrl:'assets/ui/logo.png' };
+window.SVR_ANDROID_UPDATE_POLICY = { apkVersionName:'0.1.0-rc2', apkVersionCode:2, forceUpdate:false, showUpdatePrompt:false, manualUpdateOnly:true };
+window.SVR_PHASE381_ANDROID_LOBBY = true;
+
+import './modules/phase364_device_xr_geometry_spawn_lock.js?v=phase381';
+import './modules/phase380_original_table_authority_lock.js?v=phase381';
+import './modules/phase381_table_lobby_watchdog_lock.js?v=phase381';
+import { bootPlatform } from './modules/phase340_platform_core_loader.js?v=phase381';
+
+let started = false;
+let audio = null;
+const gateStatus = document.getElementById('gateStatus');
+const recovery = document.getElementById('runtimeRecovery');
+const recoveryText = document.getElementById('runtimeRecoveryText');
+
+function unlockSound() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return null;
+    audio ||= new AudioContext();
+    audio.resume?.();
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(330, audio.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(660, audio.currentTime + .13);
+    gain.gain.setValueAtTime(.0001, audio.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.045, audio.currentTime + .02);
+    gain.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + .18);
+    oscillator.connect(gain).connect(audio.destination);
+    oscillator.start();
+    oscillator.stop(audio.currentTime + .2);
+    window.SVR_PHASE381_AUDIO_CONTEXT = audio;
+    return audio;
+  } catch { return null; }
+}
+
+function showRecovery(message) {
+  if (recoveryText) recoveryText.textContent = message;
+  recovery.hidden = false;
+}
+
+async function waitForOriginalTable(timeout = 30000) {
+  const begin = performance.now();
+  while (performance.now() - begin < timeout) {
+    window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('android-lobby-wait');
+    window.SVR_PHASE381_TABLE_WATCHDOG_TICK?.('android-lobby-wait');
+    const qa = window.SVR_PHASE380_ORIGINAL_TABLE_QA?.();
+    if (qa?.pass) return qa;
+    await new Promise(resolve => setTimeout(resolve, 160));
+  }
+  return window.SVR_PHASE380_ORIGINAL_TABLE_QA?.() || null;
+}
+
+async function startLobby() {
+  if (started) return;
+  started = true;
+  unlockSound();
+  gateStatus.textContent = 'Loading the full lobby, original table, player controls and poker systems…';
+  try {
+    await bootPlatform({ forcedPlatform:'android' });
+    await import('./modules/phase364_poker_audit_committed_alias.js?v=phase381');
+    await import('./modules/phase363_android_canonical_table_asset_lock.js?v=phase381');
+    await import('./modules/phase357_android_table_status_showdown_ante_lock.js?v=phase381');
+    await import('./modules/phase357_android_direct_camera_seat_fix.js?v=phase381');
+    await import('./modules/phase363_android_integrated_lobby_audio_gyro_bankroll_lock.js?v=phase381');
+    await import('./modules/phase363_android_secure_shuffle_lock.js?v=phase381');
+    await import('./modules/phase363_android_raise_ui_capture_lock.js?v=phase381');
+    await import('./modules/phase363_android_street_raise_action_lock.js?v=phase381');
+    await import('./modules/phase363_android_join_control_capture_lock.js?v=phase381');
+    await import('./modules/phase363_android_settlement_lobby_consistency_lock.js?v=phase381');
+    await import('./modules/phase365_android_seated_ux_branding_gyro_alignment_lock.js?v=phase381');
+    await import('./modules/phase365_android_card_brand_refresh_lock.js?v=phase381');
+    await import('./modules/phase365_phase364_reference_line_compat_lock.js?v=phase381');
+    await import('./modules/phase368_card_dealer_animation_lock.js?v=phase381').catch(() => null);
+    window.SVR_PHASE364_ALIGN_TABLE?.();
+    window.SVR_PHASE363_LEAVE_TABLE?.('phase381-lobby-start');
+    window.SVR_PHASE365_SYNC?.();
+    window.SVR_PHASE365_REFRESH_CARD_BRAND?.();
+    const tableQa = await waitForOriginalTable();
+    window.SVR_PHASE381_TABLE_WATCHDOG_TICK?.('android-lobby-ready');
+    document.body.classList.add('lobby-ready');
+    window.dispatchEvent(new CustomEvent('svr:phase381-lobby-ready', { detail:{ table:tableQa } }));
+    gateStatus.textContent = tableQa?.pass ? 'Lobby ready. Walk to the table and JOIN TABLE.' : 'Lobby ready. Table recovery remains active.';
+    if (!tableQa?.pass) showRecovery('The lobby loaded, but the original table is still recovering. The watchdog will keep trying, or use the low-power table.');
+  } catch (error) {
+    console.error(error);
+    started = false;
+    gateStatus.textContent = 'The full lobby stopped during startup. Retry or open the low-power table.';
+    showRecovery('The 3D lobby stopped during startup. Retry the lobby or use the low-power table without losing the website or APK access.');
+  }
+}
+
+document.getElementById('enterLobby')?.addEventListener('click', startLobby);
+document.getElementById('retryLobby')?.addEventListener('click', () => { recovery.hidden = true; startLobby(); });
+document.getElementById('reloadLobby')?.addEventListener('click', () => location.replace(`/game/android-lobby.html?v=phase381&t=${Date.now()}`));
+document.getElementById('clearCache')?.addEventListener('click', async () => {
+  try {
+    for (const registration of await navigator.serviceWorker?.getRegistrations?.() || []) await registration.unregister();
+    for (const key of await caches.keys()) await caches.delete(key);
+  } catch {}
+  location.replace(`/game/android-lobby.html?v=phase381&clean=${Date.now()}`);
+});
+window.addEventListener('unhandledrejection', event => { console.error(event.reason); showRecovery('A lobby module stopped responding. Retry or use the low-power table.'); });
+window.SVR_PHASE381_ANDROID_LOBBY_QA = () => ({
+  build:'PHASE-381-ANDROID-VR-LOBBY-SOUND-TABLE-LOCK',
+  started,
+  lobbyReady:document.body.classList.contains('lobby-ready'),
+  audioUnlocked:Boolean(audio && audio.state !== 'suspended'),
+  originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.() || null,
+  tableWatchdog:window.SVR_PHASE381_TABLE_WATCHDOG_QA?.() || null,
+  joined:Boolean(window.SVR_PHASE363_STATE?.joined),
+  gameState:window.SVR_PHASE363_STATE?.gameState || 'LOBBY',
+  checkedAt:new Date().toISOString()
+});
+</script>
+</body>
+</html>
