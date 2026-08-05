@@ -100,4 +100,8 @@ if (document.getElementById('profileShowroomCanvas')) {
   }));
 }
 
+queueMicrotask(() => import('./phase384-avatar-site-lock.js?v=phase384').catch((error) => {
+  window.SVR_PHASE384_AVATAR_SITE_ERROR = String(error?.message || error);
+}));
+
 export { account };
