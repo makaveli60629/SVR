@@ -20,9 +20,14 @@ assert.match(root, /SVR Poker \| Public Launch Page/);
 assert.match(root, /id="binary-rain"/);
 assert.match(root, /Preview Site/);
 assert.match(root, /Preview Game/);
-assert.match(root, /PHASE-(?:382-LIVE-ROUTE-CACHE-RECOVERY|380-GAME-SITE-INTEGRITY)-LOCK/);
-assert.match(site, /PHASE-(?:379-PUBLIC-SITE-ANDROID-APK-QUEST-RECOVERY|380-PUBLIC-GAME-SITE-INTEGRITY)-LOCK/);
-assert.match(site, /DOWNLOAD APK RC2/);
+assert.match(root, /PHASE-(?:383-FULL-SITE-HOMEPAGE-RESTORE|382-LIVE-ROUTE-CACHE-RECOVERY|380-GAME-SITE-INTEGRITY)-LOCK/);
+assert.match(site, /PHASE-(?:383-FULL-SITE-HOMEPAGE-RESTORE|379-PUBLIC-SITE-ANDROID-APK-QUEST-RECOVERY|380-PUBLIC-GAME-SITE-INTEGRITY)-LOCK/);
+assert.match(site, /Download APK RC2/i);
+assert.match(site, /SVR Store/);
+assert.match(site, /Tournaments/);
+assert.match(site, /Membership/);
+assert.match(site, /Sponsorship/);
+assert.match(site, /Community Impact/);
 assert.match(android, /PHASE-(?:379-ANDROID-STANDALONE-JOIN-NOW|380-ANDROID-PLAYABLE-POKER-PRESENTATION)-LOCK/);
 assert.match(android, /id="join"[^>]*>[\s\S]*JOIN NOW/);
 assert.match(android, /No cards(?:, poker actions, or movement controls appear| are dealt) before (?:joining|you join)/);
@@ -49,13 +54,14 @@ assert.match(update.gameUrl, /^\/game\/index\.html\?platform=quest&v=phase(?:380
 assert.equal(update.forceUpdate, false);
 assert.equal(update.showUpdatePrompt, false);
 assert.match(manifest.start_url, /^\/\?source=pwa-phase(?:380|382)(?:&v=phase382)?$/);
-assert.match(pwa, /phase(?:380-clean-routes|382-live-route-recovery)/);
-assert.match(sw, /phase(?:380-network-authority|382-live-route-recovery)/);
+assert.match(pwa, /phase(?:380-clean-routes|382-live-route-recovery|383-full-site-homepage-restore)/);
+assert.match(sw, /phase(?:380-network-authority|382-live-route-recovery|383-full-site-homepage-restore)/);
 
 console.log(JSON.stringify({
   pass: true,
   build: 'PHASE-379-PRODUCTION-ACCEPTANCE-LOCK',
-  successor: update.build || 'PHASE-380-GAME-SITE-INTEGRITY-LOCK',
+  successor: 'PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK',
+  fullWebsiteRestored: true,
   android: {
     joinStatic: true,
     cardsBeforeJoin: false,
