@@ -18,6 +18,7 @@
 <div id="safeStage"><div class="card"><img src="/logo.png" alt="SVR Poker logo" style="width:82px;height:82px;object-fit:contain"><h1>SVR POKER</h1><p id="safeStatus">Preparing the original poker table, approved Eric dealer rig, seated control lock, and stable Quest lobby.</p><button id="startRuntimeBtn">START / RETRY GAME</button></div></div>
 <pre id="log" hidden></pre><pre id="err" hidden></pre>
 <script type="module">
+import './modules/phase381_asset_load_cache_guard.js?v=phase381';
 import './modules/phase372_live_entry_recovery_lock.js?v=phase381';
 import './modules/phase364_device_xr_geometry_spawn_lock.js?v=phase381';
 import './modules/phase362_desktop_renderer_preboot_safety_lock.js?v=phase381';
@@ -77,7 +78,7 @@ async function start(){if(started)return;started=true;const status=document.getE
 }}
 document.getElementById('startRuntimeBtn')?.addEventListener('click',start);
 setTimeout(start,500);
-window.SVR_PHASE381_BOOT_QA=()=>({build:'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK',started,originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.()||null,fallbackTable:window.SVR_PHASE379_TABLE_QA?.()||null,runtime381:window.SVR_PHASE381_QA?.()||null,acceptance:window.SVR_PHASE380_QUEST_ACCEPTANCE_QA?.()||null,checkedAt:new Date().toISOString()});
+window.SVR_PHASE381_BOOT_QA=()=>({build:'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK',started,assetCache:window.SVR_PHASE381_ASSET_CACHE_QA?.()||null,originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.()||null,fallbackTable:window.SVR_PHASE379_TABLE_QA?.()||null,runtime381:window.SVR_PHASE381_QA?.()||null,acceptance:window.SVR_PHASE380_QUEST_ACCEPTANCE_QA?.()||null,checkedAt:new Date().toISOString()});
 window.SVR_PHASE380_BOOT_QA=window.SVR_PHASE381_BOOT_QA;
 </script>
 </body>
