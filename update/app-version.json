@@ -1,17 +1,19 @@
 {
   "schema": 1,
-  "build": "PHASE-380-GAME-SITE-INTEGRITY-LOCK",
+  "build": "PHASE-382-LIVE-ROUTE-CACHE-RECOVERY-LOCK",
   "gameBuild": "PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK",
   "questBuild": "PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK",
   "profileBuild": "PHASE-374-PROFILE-MOBILE-AVATAR-MENU-RECOVERY-LOCK",
-  "message": "Phase 381 preserves the Phase 380 clean site/game and Android app contracts while updating the Quest/desktop web runtime with the approved Eric dealer rig, universal seated control lock, headset overlay cleanup, and lightweight poker sound effects.",
+  "message": "Phase 382 forces the public domain, PWA, service workers and launch links onto the current Phase 381 Quest runtime and Phase 380 Android stable build. It clears stale cached routes and adds visible live-build confirmation.",
   "required": false,
   "webRuntimeUpdated": true,
-  "gameUrl": "/game/index.html?platform=quest&v=phase380",
-  "questRuntimeUrl": "/game/index.html?platform=quest&v=phase381",
+  "cacheRecovery": true,
+  "visibleBuildProof": true,
+  "gameUrl": "/game/index.html?platform=quest&v=phase382",
+  "questRuntimeUrl": "/game/index.html?platform=quest&v=phase382",
   "androidSafeUrl": "/game/android-stable.html?v=phase380",
-  "profileUrl": "/site/profile.html?v=phase381",
-  "downloadsUrl": "/downloads/?v=phase381",
+  "profileUrl": "/site/profile.html?v=phase382",
+  "downloadsUrl": "/downloads/?v=phase382",
   "releasePage": "https://github.com/makaveli60629/SVR/releases/tag/android-rc2",
   "packageName": "com.svrpoker.app",
   "apkVersionCode": 2,
@@ -26,5 +28,5 @@
   "publicDownloadControl": true,
   "publicUpdateControl": true,
   "offlineStableTableBundled": true,
-  "note": "Quest/desktop web runtime updated to Phase 381. Android stable and APK remain on the locked Phase 380/RC2 channel without a forced update."
+  "note": "Phase 382 is a public deployment and cache-recovery phase. Quest gameplay remains Phase 381; Android stable and APK remain locked on Phase 380/RC2 without a forced app update."
 }

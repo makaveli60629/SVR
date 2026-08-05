@@ -48,14 +48,17 @@ jobs:
           path: publish
           fetch-depth: 1
 
-      - name: Validate Phase 381 source contracts
+      - name: Validate Phase 382 source contracts
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'SVR Poker | Public Launch Page' source/index.html
           grep -q 'id="binary-rain"' source/index.html
+          grep -q 'PHASE-382-LIVE-ROUTE-CACHE-RECOVERY-LOCK' source/index.html
+          grep -q 'site-public-hooks.js?v=phase382' source/index.html
           grep -q 'Preview Site' source/index.html
           grep -q 'Preview Game' source/index.html
+          grep -q 'phase382-live-route-recovery' source/site-public-hooks.js
           grep -q 'PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK' source/site/index.html
           grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' source/game/index.html
           grep -q 'phase381_asset_load_cache_guard' source/game/index.html
@@ -66,9 +69,9 @@ jobs:
           grep -q 'deterministicHandEvaluator:true' source/game/android-stable.html
           grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' source/game/modules/phase380_original_table_authority_lock.js
           grep -q 'PHASE-380-QUEST-PROCEDURAL-TABLE-FALLBACK-LOCK' source/game/modules/phase379_quest_procedural_table_authority.js
-          grep -q 'pwa-phase380' source/manifest.webmanifest
-          grep -q 'phase380-clean-routes' source/pwa-sw.js
-          grep -q 'phase380-network-authority' source/sw.js
+          grep -q 'pwa-phase382' source/manifest.webmanifest
+          grep -q 'phase382-live-route-recovery' source/pwa-sw.js
+          grep -q 'phase382-live-route-recovery' source/sw.js
           test -s source/offline.html
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/table.fbx
@@ -79,6 +82,7 @@ jobs:
           python3 -m json.tool source/game/manifest.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
           python3 -m json.tool source/manifest.webmanifest >/dev/null
+          node --check source/site-public-hooks.js
           node --check source/game/modules/phase381_asset_load_cache_guard.js
           node --check source/game/modules/phase381_vr_runtime_lock.js
           node --check source/game/modules/phase380_original_table_authority_lock.js
@@ -121,19 +125,20 @@ jobs:
           cat > publish/deploy-health.json <<EOF2
           {
             "status": "ok",
-            "build": "PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK",
+            "build": "PHASE-382-LIVE-ROUTE-CACHE-RECOVERY-LOCK",
             "androidBuild": "PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK",
             "questBuild": "PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK",
-            "publicBuild": "SVR-OFFICIAL-MATRIX-PUBLIC-LOCK",
-            "siteBuild": "PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK",
-            "pwaBuild": "PHASE-380-PWA-NETWORK-AUTHORITY-LOCK",
+            "publicBuild": "PHASE-382-LIVE-ROUTE-CACHE-RECOVERY-LOCK",
+            "siteBuild": "PHASE-382-PUBLIC-LIVE-ROUTE-RECOVERY",
+            "pwaBuild": "PHASE-382-PWA-CACHE-ROLLOVER",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "${DEPLOYED_AT}",
             "sourceBranch": "main",
             "publishBranch": "gh-pages",
-            "androidRoute": "/game/android-stable.html?v=phase380",
-            "questRoute": "/game/index.html?platform=quest&v=phase381",
-            "downloadsRoute": "/downloads/",
+            "androidRoute": "/game/android-stable.html?v=phase380&deploy=phase382",
+            "questRoute": "/game/index.html?platform=quest&v=phase382",
+            "siteRoute": "/site/index.html?v=phase382",
+            "downloadsRoute": "/downloads/?v=phase382",
             "apkUrl": "/downloads/svr-poker-android-rc2.apk",
             "apkSha256": "${APK_SHA}",
             "apkVersionName": "0.1.0-rc2",
@@ -148,6 +153,9 @@ jobs:
             "questSeatedMovementAndTeleportLocked": true,
             "questHeadOverlayCleanup": true,
             "questProceduralAudioFallback": true,
+            "cacheRecovery": true,
+            "visibleBuildProof": true,
+            "pagesPushTrigger": true,
             "cleanTreePublish": true,
             "customDomain": "svrpoker.com"
           }
@@ -176,6 +184,7 @@ jobs:
           test -f publish/sw.js
           test -f publish/offline.html
           test -f publish/deploy-health.json
+          grep -q 'PHASE-382-LIVE-ROUTE-CACHE-RECOVERY-LOCK' publish/deploy-health.json
           ! find publish -type f \( -name '.env' -o -name '.env.*' \) | grep -q .
           ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' publish | grep -q .
 
@@ -188,8 +197,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches the Phase 381 clean tree.'
+            echo 'Production already matches the Phase 382 live-route recovery tree.'
           else
-            git commit -m "Deploy Phase 381 VR runtime lock ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 382 live-route recovery ${GITHUB_SHA}"
             git push origin gh-pages
           fi

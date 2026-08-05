@@ -2,6 +2,8 @@ name: SVR Pages Live Publish
 
 on:
   workflow_dispatch:
+  push:
+    branches: [gh-pages]
   workflow_run:
     workflows: ['SVR Production Auto Deploy']
     types: [completed]
@@ -17,7 +19,7 @@ concurrency:
 
 jobs:
   deploy-pages:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -30,12 +32,14 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 381 clean production payload
+      - name: Verify Phase 382 live production payload
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'SVR Poker | Public Launch Page' index.html
           grep -q 'id="binary-rain"' index.html
+          grep -q 'PHASE-382-LIVE-ROUTE-CACHE-RECOVERY-LOCK' index.html
+          grep -q 'site-public-hooks.js?v=phase382' index.html
           grep -q 'Preview Site' index.html
           grep -q 'Preview Game' index.html
           grep -q 'Leave Message' index.html
@@ -55,13 +59,17 @@ jobs:
           grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' game/modules/phase380_original_table_authority_lock.js
           grep -q 'PHASE-380-QUEST-PROCEDURAL-TABLE-FALLBACK-LOCK' game/modules/phase379_quest_procedural_table_authority.js
           grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' game/modules/phase381_vr_runtime_lock.js
+          grep -q 'phase382-live-route-recovery' sw.js
+          grep -q 'phase382-live-route-recovery' pwa-sw.js
+          grep -q 'pwa-phase382' manifest.webmanifest
           test -s game/assets/models/eric/eric.fbx
           test -s game/assets/models/table.glb
           test -s game/assets/table.fbx
           test -s downloads/svr-poker-android-rc2.apk
-          grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' deploy-health.json
-          grep -q '"questEricMeshRiggedToDealerMotion": true' deploy-health.json
-          grep -q '"questSeatedMovementAndTeleportLocked": true' deploy-health.json
+          grep -q 'PHASE-382-LIVE-ROUTE-CACHE-RECOVERY-LOCK' deploy-health.json
+          grep -q '"questBuild": "PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK"' deploy-health.json
+          grep -q '"cacheRecovery": true' deploy-health.json
+          grep -q '"pagesPushTrigger": true' deploy-health.json
           grep -q '"cleanTreePublish": true' deploy-health.json
           test -f CNAME
           grep -qx 'svrpoker.com' CNAME
@@ -71,11 +79,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 381 Pages artifact
+      - name: Upload Phase 382 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 381 game and site
+      - name: Deploy Phase 382 game and site
         id: deployment
         uses: actions/deploy-pages@v4
