@@ -147,7 +147,7 @@ function rebuildPot(amount) {
   const spacing = 0.19;
   for (let stack = 0; stack < stackCount; stack += 1) {
     const x = (stack - (stackCount - 1) / 2) * spacing;
-    const z = 0.13 + ((stack % 2) * 0.09);
+    const z = -0.38 + ((stack % 2) * 0.09);
     for (let i = 0; i < chipsPerStack; i += 1) {
       const chip = new THREE.Mesh(chipGeometry, chipMaterials[(stack + i) % chipMaterials.length]);
       chip.position.set(x, tableTopY + 0.018 + i * 0.024, z);
@@ -199,8 +199,9 @@ function onOrientation(event) {
 
 async function enableGyro() {
   try {
-    if (typeof DeviceOrientationEvent?.requestPermission === 'function') {
-      const result = await DeviceOrientationEvent.requestPermission();
+    const OrientationEvent = window.DeviceOrientationEvent;
+    if (typeof OrientationEvent?.requestPermission === 'function') {
+      const result = await OrientationEvent.requestPermission();
       if (result !== 'granted') throw new Error('GYRO_PERMISSION_DENIED');
     }
     window.addEventListener('deviceorientation', onOrientation, { passive: true });
