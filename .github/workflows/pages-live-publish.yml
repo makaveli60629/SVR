@@ -32,18 +32,16 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 383 restored full-site payload
+      - name: Verify Phase 384 production payload
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'SVR Poker | Public Launch Page' index.html
-          grep -q 'id="binary-rain"' index.html
-          grep -q 'PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK' index.html
-          grep -q 'site-public-hooks.js?v=phase383' index.html
-          grep -q 'site/index.html?v=phase383' index.html
+          grep -q 'PHASE-384-ERIC-QUEST-ANDROID-POLISH-LOCK' index.html
+          grep -q 'site-public-hooks.js?v=phase384' index.html
+          grep -q 'site/index.html?v=phase384' index.html
           grep -q 'Preview Site' index.html
           grep -q 'Preview Game' index.html
-          grep -q 'Leave Message' index.html
           test -s launch.css
           test -s matrix.js
           test -s site-public-hooks.js
@@ -52,45 +50,39 @@ jobs:
           grep -q 'Explore SVR Poker' site/index.html
           grep -q 'SVR Store' site/index.html
           grep -q 'Tournaments' site/index.html
-          grep -q 'Membership' site/index.html
-          grep -q 'Sponsorship' site/index.html
-          grep -q 'Community Impact' site/index.html
           grep -q 'SVR AI Concierge' site/index.html
-          grep -q 'phase383-home-restore.css' site/index.html
-          grep -q 'phase383-home-restore.js' site/index.html
           test -s site/phase383-home-restore.css
           test -s site/phase383-home-restore.js
           test -f site/profile.html
           test -f site/avatar.html
-          test -f site/store.html
-          test -f site/tournaments.html
-          test -f site/membership.html
-          test -f site/sponsorship.html
-          test -f site/impact.html
-          test -f site/contact.html
-          grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' game/index.html
-          grep -q 'phase381_asset_load_cache_guard' game/index.html
+          test -s site/js/phase384-avatar-site-lock.js
+          grep -q 'PHASE-384-ERIC-DEFAULT-AVATAR-SITE-LOCK' site/js/phase384-avatar-site-lock.js
+          grep -q 'PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK' game/index.html
           grep -q 'phase381_vr_runtime_lock' game/index.html
-          ! grep -q 'phase364_quest_eric_quarantine_watch' game/index.html
+          grep -q 'phase384_quest_quickplay_polish' game/index.html
+          grep -q 'PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK' game/modules/phase384_quest_quickplay_polish.js
+          grep -q 'PHASE384_SVR_TABLE_LOGO' game/modules/phase384_quest_quickplay_polish.js
           grep -q 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' game/android-stable.html
-          grep -q 'JOIN NOW' game/android-stable.html
-          grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' game/modules/phase380_original_table_authority_lock.js
-          grep -q 'PHASE-380-QUEST-PROCEDURAL-TABLE-FALLBACK-LOCK' game/modules/phase379_quest_procedural_table_authority.js
-          grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' game/modules/phase381_vr_runtime_lock.js
-          grep -q 'phase383-full-site-homepage-restore' sw.js
-          grep -q 'phase383-full-site-homepage-restore' pwa-sw.js
-          grep -q 'pwa-phase382' manifest.webmanifest
+          grep -q 'PHASE-384-ANDROID-ONE-PAGE-3D-CHIP-WINNER-LOCK' game/android-stable.html
+          grep -q 'onePageFit:true' game/android-stable.html
+          grep -q 'cardBackLogo:true' game/android-stable.html
+          grep -q 'singleCenteredSuit:true' game/android-stable.html
+          grep -q 'chipAnimation:true' game/android-stable.html
+          grep -q 'winnerFlashAndSound:true' game/android-stable.html
+          grep -q 'phase384-eric-quest-android-polish' sw.js
+          grep -q 'phase384-eric-quest-android-polish' pwa-sw.js
+          grep -q 'pwa-phase384' manifest.webmanifest
           test -s game/assets/models/eric/eric.fbx
           test -s game/assets/models/table.glb
           test -s game/assets/table.fbx
           test -s downloads/svr-poker-android-rc2.apk
-          grep -q 'PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK' deploy-health.json
+          grep -q 'PHASE-384-ERIC-QUEST-ANDROID-POLISH-LOCK' deploy-health.json
+          grep -q '"androidOnePageFit": true' deploy-health.json
+          grep -q '"questSingleEricDealer": true' deploy-health.json
+          grep -q '"questSvrLogoOnTable": true' deploy-health.json
+          grep -q '"profileDefaultTexturedEric": true' deploy-health.json
           grep -q '"fullWebsiteRestored": true' deploy-health.json
-          grep -q '"homepageNavigationRestored": true' deploy-health.json
-          grep -q '"homepageStatusAiDressingRoomPreserved": true' deploy-health.json
-          grep -q '"questBuild": "PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK"' deploy-health.json
           grep -q '"cacheRecovery": true' deploy-health.json
-          grep -q '"pagesPushTrigger": true' deploy-health.json
           grep -q '"cleanTreePublish": true' deploy-health.json
           test -f CNAME
           grep -qx 'svrpoker.com' CNAME
@@ -100,11 +92,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 383 Pages artifact
+      - name: Upload Phase 384 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 383 restored full website
+      - name: Deploy Phase 384 game polish
         id: deployment
         uses: actions/deploy-pages@v4
