@@ -1,0 +1,57 @@
+name: SVR Pages Live Publish
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['SVR Production Auto Deploy']
+    types: [completed]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: svr-pages-live
+  cancel-in-progress: true
+
+jobs:
+  deploy-pages:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout authoritative gh-pages branch
+        uses: actions/checkout@v5
+        with:
+          ref: gh-pages
+          fetch-depth: 1
+
+      - name: Verify Phase 379 deployment payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-379-PUBLIC-ROOT-RECOVERY-LOCK' index.html
+          grep -q 'PHASE-379-PUBLIC-SITE-ANDROID-APK-QUEST-RECOVERY-LOCK' site/index.html
+          grep -q 'PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK' game/android-stable.html
+          grep -q 'JOIN NOW' game/android-stable.html
+          grep -q 'PHASE-379-QUEST-PROCEDURAL-TABLE-AUTHORITY-LOCK' game/modules/phase379_quest_procedural_table_authority.js
+          test -f CNAME
+          grep -qx 'svrpoker.com' CNAME
+
+      - name: Configure GitHub Pages for Actions
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload production Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+
+      - name: Deploy custom-domain site
+        id: deployment
+        uses: actions/deploy-pages@v4
