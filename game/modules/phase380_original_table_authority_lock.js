@@ -7,7 +7,9 @@ export const BUILD = 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK';
 const params = new URLSearchParams(location.search);
 const ua = navigator.userAgent || '';
 const ACTIVE = params.get('platform') === 'quest'
+  || params.get('platform') === 'android'
   || /Quest|Oculus|Meta Quest/i.test(ua)
+  || (/Android/i.test(ua) && /android-lobby\.html$/i.test(location.pathname))
   || params.has('desktop')
   || params.has('standard');
 const TARGET = Object.freeze({ length: 2.734, depth: 1.46, centerX: 0, centerZ: 0.75 });
@@ -212,6 +214,7 @@ function reassert(reason = 'manual') {
   if (!table?.isObject3D) return false;
   state.reassertions += 1;
   installAuthorityTrap();
+  if (!table.parent && worldRoot()?.isObject3D) worldRoot().add(table);
   table.visible = true;
   forceVisible(table);
   removeCompetitors();
@@ -283,5 +286,6 @@ window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT = reassert;
 window.SVR_PHASE380_ORIGINAL_TABLE_QA = qa;
 window.addEventListener('svr:phase373-core-ready', () => reassert('quest-core-ready'));
 window.addEventListener('svr:phase379-core-ready', () => reassert('phase379-core-ready'));
+window.addEventListener('svr:phase381-lobby-ready', () => reassert('phase381-lobby-ready'));
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => install(), { once: true });
 else install();
