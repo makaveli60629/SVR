@@ -12,18 +12,13 @@ async function waitFor(page, evaluator, timeout = 60000) {
     try {
       last = await page.evaluate(evaluator);
       if (last?.ready === true) return last;
-    } catch {}
+    } catch (error) {
+      last = { ready: false, evaluatorError: String(error?.message || error) };
+    }
     await page.waitForTimeout(120);
   }
   throw new Error(`Timed out waiting for Android Phase 380 state: ${JSON.stringify(last)}`);
 }
-
-const visible = (element) => {
-  if (!element) return false;
-  const style = getComputedStyle(element);
-  const rect = element.getBoundingClientRect();
-  return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity || 1) > 0 && rect.width > 0 && rect.height > 0;
-};
 
 (async () => {
   const browser = await chromium.launch({
@@ -49,20 +44,33 @@ const visible = (element) => {
 
   try {
     await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await page.evaluate(() => {
+      window.__SVR_TEST_VISIBLE = (element) => {
+        if (!element) return false;
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return style.display !== 'none'
+          && style.visibility !== 'hidden'
+          && Number(style.opacity || 1) > 0
+          && rect.width > 0
+          && rect.height > 0;
+      };
+    });
 
     const lobby = await waitFor(page, () => {
+      const isVisible = window.__SVR_TEST_VISIBLE;
       const qa = window.SVR_PHASE380_ANDROID_QA?.();
       const gate = document.getElementById('gate');
       const table = document.getElementById('table');
       const result = {
         qa,
         joinText: document.getElementById('join')?.textContent?.trim() || '',
-        joinVisible: visible(document.getElementById('join')),
+        joinVisible: isVisible(document.getElementById('join')),
         tableHidden: Boolean(table?.classList.contains('hide')),
         cards: document.querySelectorAll('#community .card,#hole .card').length,
-        actionsVisible: [...document.querySelectorAll('.actions button')].some(visible),
+        actionsVisible: [...document.querySelectorAll('.actions button')].some((button) => isVisible(button)),
         movementControls: document.querySelectorAll('.virtual-stick,[data-svr-android-controller],#svr347Move,#svr347Look').length,
-        gateVisible: visible(gate)
+        gateVisible: isVisible(gate)
       };
       result.ready = result.qa?.build === 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK'
         && result.qa?.cardsBeforeJoin === 0
@@ -85,17 +93,18 @@ const visible = (element) => {
     await page.click('#join');
 
     const seated = await waitFor(page, () => {
+      const isVisible = window.__SVR_TEST_VISIBLE;
       const qa = window.SVR_PHASE380_ANDROID_QA?.();
       const result = {
         qa,
-        tableVisible: visible(document.getElementById('table')),
+        tableVisible: isVisible(document.getElementById('table')),
         gateHidden: document.getElementById('gate')?.classList.contains('hide'),
         playerCards: document.querySelectorAll('#hole .card').length,
         communitySlots: document.querySelectorAll('#community .card').length,
         bots: document.querySelectorAll('#bots .bot').length,
         actions: document.querySelectorAll('.actions button').length,
         movementControls: document.querySelectorAll('.virtual-stick,[data-svr-android-controller],#svr347Move,#svr347Look').length,
-        brandVisible: visible(document.getElementById('brandSlot')),
+        brandVisible: isVisible(document.getElementById('brandSlot')),
         status: document.getElementById('status')?.textContent || '',
         dealer: document.getElementById('dealer')?.textContent || ''
       };
@@ -118,8 +127,9 @@ const visible = (element) => {
 
     const brand = await page.evaluate(() => window.SVR_PHASE380_SET_BRAND?.({ id: 'qa-tournament', name: 'QA TOURNAMENT', logoUrl: '/logo.png' }));
     const branding = await waitFor(page, () => {
+      const isVisible = window.__SVR_TEST_VISIBLE;
       const result = {
-        visible: visible(document.getElementById('brandSlot')),
+        visible: isVisible(document.getElementById('brandSlot')),
         name: document.getElementById('brandName')?.textContent || '',
         logo: document.getElementById('brandLogo')?.getAttribute('src') || ''
       };
@@ -136,13 +146,14 @@ const visible = (element) => {
     }
 
     const showdown = await waitFor(page, () => {
+      const isVisible = window.__SVR_TEST_VISIBLE;
       const qa = window.SVR_PHASE380_ANDROID_QA?.();
       const result = {
         qa,
         status: document.getElementById('status')?.textContent || '',
         community: document.querySelectorAll('#community .card:not(.back)').length,
         hole: document.querySelectorAll('#hole .card:not(.back)').length,
-        nextVisible: visible(document.getElementById('next')),
+        nextVisible: isVisible(document.getElementById('next')),
         actionDisabled: [...document.querySelectorAll('.actions button')].every((button) => button.disabled),
         pot: document.getElementById('pot')?.textContent || '',
         stack: document.getElementById('stack')?.textContent || '',
