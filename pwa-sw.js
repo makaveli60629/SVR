@@ -1,5 +1,5 @@
-const SVR_PWA_CACHE='svr-poker-pwa-phase379-fresh-routes-v1';
-const CORE=['/offline.html','/logo.png','/manifest.webmanifest?v=phase379'];
+const SVR_PWA_CACHE='svr-poker-pwa-phase380-clean-routes-v1';
+const CORE=['/offline.html','/logo.png','/manifest.webmanifest?v=phase380'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(SVR_PWA_CACHE).then(cache=>cache.addAll(CORE.map(url=>new Request(url,{cache:'reload'}))).catch(()=>undefined)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==SVR_PWA_CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('message',event=>{if(event?.data?.type==='SKIP_WAITING')self.skipWaiting();});
