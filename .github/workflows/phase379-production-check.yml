@@ -1,0 +1,43 @@
+name: Phase 379 Production Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase379-production-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout Phase 379 source
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            index.html
+            site/index.html
+            downloads/index.html
+            game/index.html
+            game/android.html
+            game/android-play.html
+            game/android-stable.html
+            game/android-release.json
+            game/modules/phase379_quest_procedural_table_authority.js
+            game/tools/phase379-production-static-test.mjs
+            update/app-version.json
+            manifest.webmanifest
+            pwa-sw.js
+            sw.js
+
+      - name: Run Phase 379 production acceptance
+        run: node game/tools/phase379-production-static-test.mjs
