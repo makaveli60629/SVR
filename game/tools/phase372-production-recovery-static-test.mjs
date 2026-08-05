@@ -54,7 +54,8 @@ need(phase369Recovery, 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK', 'pro
 need(phase369Readiness, 'PHASE-369-ANDROID-JOIN-READINESS-TRANSACTION-LOCK', 'protected-phase369-readiness');
 need(phase369Intent, 'PHASE-369-ANDROID-JOIN-INTENT-BRIDGE-LOCK', 'protected-phase369-intent');
 need(phase369Intent, 'SVR_PHASE369_PENDING_JOIN', 'pending-join-initializer');
-need(phase369Intent, 'pointerdown', 'early-intent-capture');
+need(phase369Intent, "document.addEventListener('click', legacyListener, true)", 'early-capture-listener');
+need(phase369Intent, 'event.stopImmediatePropagation()', 'unbound-button-guard');
 
 need(quest, 'PHASE-381-SITE-LOBBY-RESTORATION-LOCK', 'quest-phase381-build');
 need(quest, "import './modules/phase372_live_entry_recovery_lock.js?v=phase381'", 'quest-visible-entry-recovery');
