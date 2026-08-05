@@ -30,31 +30,49 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 380 clean production payload
+      - name: Verify Phase 381 restored website and lobby payload
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'SVR Poker | Public Launch Page' index.html
           grep -q 'id="binary-rain"' index.html
           grep -q 'Preview Site' index.html
-          grep -q 'Preview Game' index.html
+          grep -q 'Launch VR Room' index.html
           grep -q 'Leave Message' index.html
-          ! grep -q 'PHASE 379 LIVE RECOVERY' index.html
+          grep -q 'PHASE-381-PUBLIC-STATUS-AI-RESTORATION-LOCK' index.html
+          grep -q 'data-svr-status="server"' index.html
+          grep -q 'data-svr-status="database"' index.html
+          grep -q 'data-svr-ask-ai' index.html
           test -s launch.css
           test -s matrix.js
           test -s site-public-hooks.js
+          test -s site-local-counter.js
+          test -s support-chat-bot.js
           test -s logo.webp
-          grep -q 'PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK' site/index.html
+          grep -q 'PHASE-381-FULL-WEBSITE-HOMEPAGE-RESTORATION-LOCK' site/index.html
+          grep -q 'SVR Website' site/index.html
+          grep -q 'Open Android Lobby' site/index.html
+          grep -q 'Download APK' site/index.html
           test -f site/profile.html
           test -f site/avatar.html
+          test -f site/store.html
+          test -f site/tournaments.html
+          grep -q 'PHASE-381-ANDROID-VR-LOBBY-SOUND-TABLE-LOCK' game/android-lobby.html
+          grep -q 'ENTER VR LOBBY' game/android-lobby.html
           grep -q 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' game/android-stable.html
-          grep -q 'JOIN NOW' game/android-stable.html
+          grep -q 'PHASE-381-ANDROID-SOUND-COMPACT-LOGO-CARDS-LOCK' game/android-stable.html
+          grep -q 'SVR card back' game/android-stable.html
           grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' game/modules/phase380_original_table_authority_lock.js
+          grep -q 'PHASE-381-ANDROID-QUEST-LOBBY-TABLE-WATCHDOG-LOCK' game/modules/phase381_table_lobby_watchdog_lock.js
           grep -q 'PHASE-380-QUEST-PROCEDURAL-TABLE-FALLBACK-LOCK' game/modules/phase379_quest_procedural_table_authority.js
           test -s game/assets/models/table.glb
           test -s game/assets/table.fbx
           test -s downloads/svr-poker-android-rc2.apk
-          grep -q 'PHASE-380-GAME-SITE-INTEGRITY-LOCK' deploy-health.json
+          grep -q 'PHASE-381-SITE-LOBBY-RESTORATION-LOCK' deploy-health.json
+          grep -q '"fullWebsiteHomepage": true' deploy-health.json
+          grep -q '"publicStatusLights": true' deploy-health.json
+          grep -q '"androidLobbyFirst": true' deploy-health.json
+          grep -q '"questTableWatchdog": true' deploy-health.json
           grep -q '"cleanTreePublish": true' deploy-health.json
           test -f CNAME
           grep -qx 'svrpoker.com' CNAME
@@ -64,11 +82,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 380 Pages artifact
+      - name: Upload Phase 381 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 380 game and site
+      - name: Deploy Phase 381 restored website and game lobbies
         id: deployment
         uses: actions/deploy-pages@v4
