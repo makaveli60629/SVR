@@ -2,15 +2,16 @@
   "schema": 1,
   "build": "PHASE-380-GAME-SITE-INTEGRITY-LOCK",
   "gameBuild": "PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK",
-  "questBuild": "PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK",
+  "questBuild": "PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK",
   "profileBuild": "PHASE-374-PROFILE-MOBILE-AVATAR-MENU-RECOVERY-LOCK",
-  "message": "Phase 380 restores the uploaded Quest table as the primary authority, keeps the emergency table removable, corrects Android Hold'em evaluation and card presentation, and publishes a clean game/site tree.",
+  "message": "Phase 381 preserves the Phase 380 clean site/game and Android app contracts while updating the Quest/desktop web runtime with the approved Eric dealer rig, universal seated control lock, headset overlay cleanup, and lightweight poker sound effects.",
   "required": false,
   "webRuntimeUpdated": true,
   "gameUrl": "/game/index.html?platform=quest&v=phase380",
+  "questRuntimeUrl": "/game/index.html?platform=quest&v=phase381",
   "androidSafeUrl": "/game/android-stable.html?v=phase380",
-  "profileUrl": "/site/profile.html?v=phase380",
-  "downloadsUrl": "/downloads/?v=phase380",
+  "profileUrl": "/site/profile.html?v=phase381",
+  "downloadsUrl": "/downloads/?v=phase381",
   "releasePage": "https://github.com/makaveli60629/SVR/releases/tag/android-rc2",
   "packageName": "com.svrpoker.app",
   "apkVersionCode": 2,
@@ -25,5 +26,5 @@
   "publicDownloadControl": true,
   "publicUpdateControl": true,
   "offlineStableTableBundled": true,
-  "note": "Android RC2 is published at the SVR Poker same-domain download path. Browser updates remain manual."
+  "note": "Quest/desktop web runtime updated to Phase 381. Android stable and APK remain on the locked Phase 380/RC2 channel without a forced update."
 }
