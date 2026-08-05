@@ -78,7 +78,7 @@ for (const token of [
   "expectedOrder = ['preflop', 'flop', 'turn', 'river', 'showdown']",
   'window.SVR_PHASE363_STREET_RAISE_QA'
 ]) assert(streetRaise.includes(token), `Street/raise contract missing ${token}`);
-for (const token of ["window.addEventListener('pointerdown'", "window.addEventListener('click'", 'event.stopImmediatePropagation()', 'visible.length === 1', "'LEAVE TABLE' : 'JOIN TABLE'", 'duplicateActivationsBlocked']) assert(join.includes(token), `JOIN contract missing ${token}`);
+for (const token of ["window.addEventListener('pointerdown'", "window.addEventListener('click'", 'event.stopImmediatePropagation()', 'visible.length === 1', "return joinedNow() ? 'LEAVE TABLE' : 'JOIN NOW'", 'duplicateActivationsBlocked']) assert(join.includes(token), `JOIN contract missing ${token}`);
 for (const token of ['effectiveTableChips', 'settledHand ? 0 : committedChips', 'enforceLobbyCardClear', 'installAuditWrapper', 'engineHandsCleared']) assert(consistency.includes(token), `Settlement/lobby contract missing ${token}`);
 
 assert(manifest.phase === 381, 'Manifest is not Phase 381');
@@ -115,6 +115,7 @@ console.log(JSON.stringify({
   players: 6,
   reliableRaise: true,
   holdemStreetOrder: ['preflop', 'flop', 'turn', 'river', 'showdown'],
+  joinLabel: 'JOIN NOW',
   lobbyBeforeSeat: true,
   sound: true,
   avatarShowroomsProtected: true,
