@@ -25,6 +25,7 @@ const profileHasVrRoom = (
   profile.includes('../game/avatar-vr.html?v=phase366')
   || profile.includes('../game/avatar-vr.html?v=phase374')
   || profile.includes('../game/avatar-vr.html?v=phase380')
+  || profile.includes('../game/avatar-vr.html?v=phase381')
 );
 const supportedApk = (
   (androidRelease.apkVersionName === '0.1.0-rc1' && androidRelease.apkVersionCode === 1)
@@ -43,7 +44,7 @@ const checks = {
   profileFreshCache: profileUsesSupportedCache,
   liveCameraUi: profileHasLiveCameraUi,
   vrDressingRoomLink: profileHasVrRoom,
-  currentGameRouteNormalizer: hooks.includes("const CURRENT_PHASE = 'phase380'") && hooks.includes("url.pathname = '/game/android-stable.html'"),
+  currentGameRouteNormalizer: hooks.includes("const CURRENT_PHASE = 'phase381'") && hooks.includes("url.pathname = '/game/android-lobby.html'"),
   vrRoomFreshCache: vrRoom.includes('phase353_vr_avatar_dressing_room_live_pedestal_lock.js?v=phase366') && vrRoom.includes('/site/profile.html?v=phase366'),
   webxrRoomPreserved: vrRuntime.includes('VRButton') && vrRuntime.includes('PHASE353_MOVING_PEDESTAL_ROOT') && vrRuntime.includes('renderer.xr.enabled = true'),
   apkLocked: supportedApk
@@ -52,7 +53,7 @@ const checks = {
 const failed = Object.entries(checks).filter(([, value]) => !value).map(([key]) => key);
 console.log(JSON.stringify({
   build: 'PHASE-366-PROFILE-LIVE-CAMERA-DRESSING-ROOM-RELIABILITY-LOCK',
-  successor: 'PHASE-380-GAME-SITE-INTEGRITY-LOCK',
+  successor: 'PHASE-381-SITE-LOBBY-RESTORATION-LOCK',
   checks,
   failed,
   pass: failed.length === 0
