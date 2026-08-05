@@ -1,0 +1,71 @@
+name: Phase 380 Game Site Integrity
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'site-public-hooks.js'
+      - 'site/**'
+      - 'game/**'
+      - 'update/app-version.json'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/pages-live-publish.yml'
+      - '.github/workflows/phase380-game-site-integrity.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'site-public-hooks.js'
+      - 'site/**'
+      - 'game/**'
+      - 'update/app-version.json'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/pages-live-publish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase380-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate JavaScript and JSON
+        run: |
+          set -euo pipefail
+          node --check game/modules/phase380_original_table_authority_lock.js
+          node --check game/modules/phase379_quest_procedural_table_authority.js
+          node --check site-public-hooks.js
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+
+      - name: Run Phase 380 static audit
+        run: node game/tools/phase380-game-site-integrity-static-test.mjs
+
+      - name: Verify required production assets
+        run: |
+          set -euo pipefail
+          test -s game/assets/models/table.glb
+          test -s game/assets/table.fbx
+          test -s downloads/svr-poker-android-rc2.apk
+          test -s downloads/svr-poker-android-rc2.apk.sha256
+          test -f site/profile.html
+          test -f site/avatar.html
+          test -f site/store.html
+          test -f site/contact.html
+          test -f site/tournaments.html
+
+      - name: Security scan public runtime
+        run: |
+          set -euo pipefail
+          ! find game site downloads -type f \( -name '.env' -o -name '.env.*' \) | grep -q .
+          ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' index.html site-public-hooks.js game site | grep -q .
