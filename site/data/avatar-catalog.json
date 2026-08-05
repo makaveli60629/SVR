@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK",
-  "version": 2,
+  "build": "PHASE-384-ERIC-DEFAULT-AVATAR-SITE-LOCK",
+  "version": 3,
   "avatarModels": [
     {
       "id": "eric",
@@ -9,7 +9,7 @@
       "format": "fbx",
       "default": true,
       "targetHeightMeters": 1.78,
-      "role": "starter-player-body"
+      "role": "default-player-and-dealer-body"
     },
     {
       "id": "claudia",
@@ -18,7 +18,7 @@
       "format": "fbx",
       "default": false,
       "targetHeightMeters": 1.70,
-      "role": "starter-player-body"
+      "role": "future-player-body"
     }
   ],
   "palettes": [
@@ -30,39 +30,37 @@
   ],
   "categories": {
     "headwear": [
-      { "id": "none", "label": "No Hat", "generator": "none", "ownedByDefault": true },
-      { "id": "cap", "label": "SVR Cap", "generator": "cap", "ownedByDefault": true },
-      { "id": "beanie", "label": "Night Beanie", "generator": "beanie", "ownedByDefault": true },
-      { "id": "crown", "label": "Founder Crown", "generator": "crown", "ownedByDefault": true }
+      { "id": "none", "label": "Clean Base Head", "generator": "none", "ownedByDefault": true },
+      { "id": "cap", "label": "SVR Cap (future fitted geometry)", "generator": "cap", "ownedByDefault": true, "previewDisabled": true },
+      { "id": "beanie", "label": "Night Beanie (future fitted geometry)", "generator": "beanie", "ownedByDefault": true, "previewDisabled": true },
+      { "id": "crown", "label": "Founder Crown (future fitted geometry)", "generator": "crown", "ownedByDefault": true, "previewDisabled": true }
     ],
     "eyewear": [
       { "id": "none", "label": "No Glasses", "generator": "none", "ownedByDefault": true },
-      { "id": "neon", "label": "Neon Frames", "generator": "glasses-round", "ownedByDefault": true },
-      { "id": "visor", "label": "VR Visor", "generator": "visor", "ownedByDefault": true }
+      { "id": "neon", "label": "Neon Frames (future fitted geometry)", "generator": "glasses-round", "ownedByDefault": true, "previewDisabled": true },
+      { "id": "visor", "label": "VR Visor (future fitted geometry)", "generator": "visor", "ownedByDefault": true, "previewDisabled": true }
     ],
     "top": [
-      { "id": "none", "label": "Base Outfit", "generator": "none", "ownedByDefault": true },
-      { "id": "jacket", "label": "Casino Jacket", "generator": "jacket", "ownedByDefault": true },
-      { "id": "vest", "label": "Dealer Vest", "generator": "vest", "ownedByDefault": true },
-      { "id": "hoodie", "label": "SVR Hoodie", "generator": "hoodie", "ownedByDefault": true }
+      { "id": "none", "label": "Eric Base Outfit", "generator": "none", "ownedByDefault": true },
+      { "id": "jacket", "label": "Casino Jacket (fitting disabled)", "generator": "jacket", "ownedByDefault": true, "previewDisabled": true },
+      { "id": "vest", "label": "Dealer Vest (fitting disabled)", "generator": "vest", "ownedByDefault": true, "previewDisabled": true },
+      { "id": "hoodie", "label": "SVR Hoodie (fitting disabled)", "generator": "hoodie", "ownedByDefault": true, "previewDisabled": true }
     ],
     "shoes": [
-      { "id": "none", "label": "Base Shoes", "generator": "none", "ownedByDefault": true },
-      { "id": "sneakers", "label": "Neon Sneakers", "generator": "sneakers", "ownedByDefault": true },
-      { "id": "boots", "label": "Black Boots", "generator": "boots", "ownedByDefault": true }
+      { "id": "none", "label": "Eric Base Shoes", "generator": "none", "ownedByDefault": true },
+      { "id": "sneakers", "label": "Neon Sneakers (future fitted geometry)", "generator": "sneakers", "ownedByDefault": true, "previewDisabled": true },
+      { "id": "boots", "label": "Black Boots (future fitted geometry)", "generator": "boots", "ownedByDefault": true, "previewDisabled": true }
     ],
     "accessory": [
       { "id": "none", "label": "No Accessory", "generator": "none", "ownedByDefault": true },
-      { "id": "chain", "label": "Gold Chain", "generator": "chain", "ownedByDefault": true },
-      { "id": "watch", "label": "SVR Watch", "generator": "watch", "ownedByDefault": true },
-      { "id": "badge", "label": "Founder Badge", "generator": "badge", "ownedByDefault": true }
+      { "id": "chain", "label": "Gold Chain (future fitted geometry)", "generator": "chain", "ownedByDefault": true, "previewDisabled": true },
+      { "id": "watch", "label": "SVR Watch (future fitted geometry)", "generator": "watch", "ownedByDefault": true, "previewDisabled": true },
+      { "id": "badge", "label": "Founder Badge (future fitted geometry)", "generator": "badge", "ownedByDefault": true, "previewDisabled": true }
     ]
   },
   "presets": [
-    { "id": "table-ready", "label": "Table Ready", "outfit": { "modelId": "eric", "palette": "midnight", "headwear": "cap", "eyewear": "none", "top": "jacket", "shoes": "sneakers", "accessory": "watch" } },
-    { "id": "scorpion-vip", "label": "Scorpion VIP", "outfit": { "modelId": "claudia", "palette": "scorpion", "headwear": "none", "eyewear": "visor", "top": "vest", "shoes": "boots", "accessory": "chain" } },
-    { "id": "founder", "label": "Founder", "outfit": { "modelId": "eric", "palette": "gold", "headwear": "crown", "eyewear": "neon", "top": "jacket", "shoes": "boots", "accessory": "badge" } },
-    { "id": "social-lounge", "label": "Social Lounge", "outfit": { "modelId": "claudia", "palette": "royal", "headwear": "beanie", "eyewear": "neon", "top": "hoodie", "shoes": "sneakers", "accessory": "watch" } }
+    { "id": "table-ready", "label": "Eric Table Ready", "outfit": { "modelId": "eric", "palette": "midnight", "headwear": "none", "eyewear": "none", "top": "none", "shoes": "none", "accessory": "none" } },
+    { "id": "clean-eric", "label": "Clean Eric", "outfit": { "modelId": "eric", "palette": "midnight", "headwear": "none", "eyewear": "none", "top": "none", "shoes": "none", "accessory": "none" } }
   ],
   "defaultOutfit": {
     "schemaVersion": 1,
@@ -70,8 +68,8 @@
     "palette": "midnight",
     "headwear": "none",
     "eyewear": "none",
-    "top": "jacket",
-    "shoes": "sneakers",
-    "accessory": "watch"
+    "top": "none",
+    "shoes": "none",
+    "accessory": "none"
   }
 }

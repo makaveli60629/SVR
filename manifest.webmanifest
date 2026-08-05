@@ -1,9 +1,9 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "SVR Poker Phase 382 live-route recovery with Android Phase 380, APK RC2 and Quest Phase 381 runtime.",
-  "id": "/?source=pwa-phase382",
-  "start_url": "/?source=pwa-phase382&v=phase382",
+  "description": "SVR Poker Phase 384 with the restored full site, one-page Android poker, textured Eric profile/dealer, polished Quest table and APK RC2.",
+  "id": "/?source=pwa-phase384",
+  "start_url": "/?source=pwa-phase384&v=phase384",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -18,9 +18,10 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {"name": "Play Android — Join Now", "short_name": "Android", "description": "Open the locked Phase 380 standalone JOIN NOW table.", "url": "/game/android-stable.html?v=phase380", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Open the APK download and verified release status page.", "url": "/downloads/?v=phase382", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Public Player Site", "short_name": "Player Site", "description": "Open the current SVR Poker public player portal.", "url": "/site/index.html?v=phase382", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Launch Quest / VR", "short_name": "Quest VR", "description": "Open the Phase 381 Quest runtime through the Phase 382 live route.", "url": "/game/index.html?platform=quest&v=phase382", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
+    {"name": "Play Android — Join Now", "short_name": "Android", "description": "Open the Phase 380 authority table with the Phase 384 one-page 3D-style presentation.", "url": "/game/android-stable.html?v=phase380&deploy=phase384", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Open the APK download and verified release status page.", "url": "/downloads/?v=phase384", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Public Player Site", "short_name": "Player Site", "description": "Open the restored SVR Poker public website.", "url": "/site/index.html?v=phase384", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Eric Dressing Room", "short_name": "Eric", "description": "Open the clean textured Eric avatar dressing room.", "url": "/site/avatar.html?v=phase384", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Launch Quest / VR", "short_name": "Quest VR", "description": "Open the Phase 384 polished Quest quick-play runtime.", "url": "/game/index.html?platform=quest&v=phase384", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }

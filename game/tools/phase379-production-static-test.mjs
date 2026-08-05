@@ -20,7 +20,7 @@ assert.match(root, /SVR Poker \| Public Launch Page/);
 assert.match(root, /id="binary-rain"/);
 assert.match(root, /Preview Site/);
 assert.match(root, /Preview Game/);
-assert.match(root, /PHASE-(?:383-FULL-SITE-HOMEPAGE-RESTORE|382-LIVE-ROUTE-CACHE-RECOVERY|380-GAME-SITE-INTEGRITY)-LOCK/);
+assert.match(root, /PHASE-(?:384-ERIC-QUEST-ANDROID-POLISH|383-FULL-SITE-HOMEPAGE-RESTORE|382-LIVE-ROUTE-CACHE-RECOVERY|380-GAME-SITE-INTEGRITY)-LOCK/);
 assert.match(site, /PHASE-(?:383-FULL-SITE-HOMEPAGE-RESTORE|379-PUBLIC-SITE-ANDROID-APK-QUEST-RECOVERY|380-PUBLIC-GAME-SITE-INTEGRITY)-LOCK/);
 assert.match(site, /Download APK RC2/i);
 assert.match(site, /SVR Store/);
@@ -50,24 +50,25 @@ assert.equal(release.forceUpdate, false);
 assert.equal(release.showUpdatePrompt, false);
 assert.equal(release.manualUpdateOnly, true);
 assert.equal(update.androidSafeUrl, '/game/android-stable.html?v=phase380');
-assert.match(update.gameUrl, /^\/game\/index\.html\?platform=quest&v=phase(?:380|382)$/);
+assert.match(update.gameUrl, /^\/game\/index\.html\?platform=quest&v=phase(?:380|382|384)$/);
 assert.equal(update.forceUpdate, false);
 assert.equal(update.showUpdatePrompt, false);
-assert.match(manifest.start_url, /^\/\?source=pwa-phase(?:380|382)(?:&v=phase382)?$/);
-assert.match(pwa, /phase(?:380-clean-routes|382-live-route-recovery|383-full-site-homepage-restore)/);
-assert.match(sw, /phase(?:380-network-authority|382-live-route-recovery|383-full-site-homepage-restore)/);
+assert.match(manifest.start_url, /^\/\?source=pwa-phase(?:380|382|384)(?:&v=phase(?:382|384))?$/);
+assert.match(pwa, /phase(?:380-clean-routes|382-live-route-recovery|383-full-site-homepage-restore|384-eric-quest-android-polish)/);
+assert.match(sw, /phase(?:380-network-authority|382-live-route-recovery|383-full-site-homepage-restore|384-eric-quest-android-polish)/);
 
 console.log(JSON.stringify({
   pass: true,
   build: 'PHASE-379-PRODUCTION-ACCEPTANCE-LOCK',
-  successor: 'PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK',
+  successor: update.build || 'PHASE-384-ERIC-QUEST-ANDROID-POLISH-LOCK',
   fullWebsiteRestored: true,
   android: {
     joinStatic: true,
     cardsBeforeJoin: false,
     heavy3dExcluded: true,
     deterministicEvaluator: true,
-    stableRouteLocked: true
+    stableRouteLocked: true,
+    successorPresentation: update.androidSuccessorBuild || null
   },
   quest: {
     originalUploadedTableFirst: true,
