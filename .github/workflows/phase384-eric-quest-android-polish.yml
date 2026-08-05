@@ -54,6 +54,7 @@ jobs:
           node --check site/js/phase384-avatar-site-lock.js
           node --check game/modules/phase381_vr_runtime_lock.js
           node --check game/modules/phase384_quest_quickplay_polish.js
+          node --check game/modules/phase384_quest_lobby_world_polish.js
           node --check game/tools/phase384-eric-quest-android-static-test.mjs
           node --check sw.js
           node --check pwa-sw.js
@@ -76,6 +77,11 @@ jobs:
           grep -q 'PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK' site/index.html
           grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' game/modules/phase380_original_table_authority_lock.js
           grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' game/modules/phase381_vr_runtime_lock.js
+          grep -q 'PHASE-384-QUEST-LOBBY-WORLD-INTERACTION-POLISH-LOCK' game/modules/phase384_quest_lobby_world_polish.js
+          grep -q 'PHASE384_LEFT_FOREARM_WATCH_ROOT' game/modules/phase384_quest_lobby_world_polish.js
+          grep -q 'PHASE384_PHYSICAL_CARD_CHIP_KIT' game/modules/phase384_quest_lobby_world_polish.js
+          grep -q 'PHASE384_FOURTH_LOBBY_WALL' game/modules/phase384_quest_lobby_world_polish.js
+          grep -q 'PHASE384_TEXTURED_GLOWING_MOON' game/modules/phase384_quest_lobby_world_polish.js
           grep -q 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' game/android-stable.html
           ! grep -Eqi 'Trueitive|Shyona Royston' site/index.html
 
