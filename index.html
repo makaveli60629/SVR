@@ -3,19 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
   <title>SVR Poker | Public Launch Page</title>
-  <meta name="description" content="SVR Poker public launch page, game previews, and Android APK download." />
+  <meta name="description" content="SVR Poker public launch page." />
   <link rel="icon" href="./logo.webp" type="image/webp" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./launch.css?v=matrix-apk-restore-20260804" />
-  <link rel="stylesheet" href="./apk-quick-pop.css?v=matrix-apk-restore-20260804" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Audiowide&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./launch.css" />
 </head>
-<body class="launch-body" data-build="SVR-MATRIX-PUBLIC-APK-DIRECT-RESTORE-LOCK">
+<body class="launch-body">
   <canvas id="binary-rain" aria-hidden="true"></canvas>
 
   <main class="launch-page">
@@ -44,29 +40,7 @@
     </footer>
   </main>
 
-  <aside class="apk-quick-pop" id="apk-quick-pop" aria-label="SVR Poker Android APK download">
-    <button class="apk-quick-close" id="apk-quick-close" type="button" aria-label="Close APK download popup">×</button>
-    <span class="apk-quick-kicker">ANDROID APP</span>
-    <strong>SVR Poker APK RC2</strong>
-    <a class="apk-quick-download" href="https://github.com/makaveli60629/SVR/releases/download/android-rc2/svr-poker-android-rc2.apk" download>Download APK</a>
-    <a class="apk-quick-play" href="./game/android-stable.html?v=phase379">Play in Browser</a>
-  </aside>
-
-  <script src="./matrix.js?v=matrix-apk-restore-20260804"></script>
-  <script src="./site-public-hooks.js?v=matrix-apk-restore-20260804"></script>
-  <script>
-    (() => {
-      const popup = document.getElementById('apk-quick-pop');
-      const close = document.getElementById('apk-quick-close');
-      if (!popup || !close) return;
-      try {
-        if (sessionStorage.getItem('svr_apk_quick_pop_closed') === '1') popup.hidden = true;
-      } catch (_) {}
-      close.addEventListener('click', () => {
-        popup.hidden = true;
-        try { sessionStorage.setItem('svr_apk_quick_pop_closed', '1'); } catch (_) {}
-      });
-    })();
-  </script>
+  <script src="./matrix.js"></script>
+  <script src="./site-public-hooks.js"></script>
 </body>
 </html>
