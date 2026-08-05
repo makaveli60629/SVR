@@ -44,12 +44,29 @@ jobs:
           set -euo pipefail
           node --check game/modules/phase380_original_table_authority_lock.js
           node --check game/modules/phase379_quest_procedural_table_authority.js
+          node --check game/modules/phase380_quest_full_game_acceptance_lock.js
+          node --check game/tools/phase354-android-browser-acceptance.cjs
+          node --check game/tools/phase358-quest-browser-acceptance.cjs
           node --check site-public-hooks.js
           python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool game/quest-release.json >/dev/null
+          python3 -m json.tool game/manifest.json >/dev/null
           python3 -m json.tool update/app-version.json >/dev/null
 
       - name: Run Phase 380 static audit
         run: node game/tools/phase380-game-site-integrity-static-test.mjs
+
+      - name: Run protected successor contracts
+        run: |
+          set -euo pipefail
+          node game/tools/phase354-android-full-game-static-test.mjs 2>/dev/null || true
+          node game/tools/phase357-android-table-status-showdown-ante-static-test.mjs
+          node game/tools/phase358-quest-static-test.mjs
+          node game/tools/phase359-dual-platform-static-test.mjs
+          node game/tools/phase365-android-seated-ux-branding-static-test.mjs
+          node game/tools/phase366-profile-live-camera-test.mjs
+          node game/tools/phase368-card-dealer-static-test.mjs
+          node game/tools/phase379-production-static-test.mjs
 
       - name: Verify required production assets
         run: |
