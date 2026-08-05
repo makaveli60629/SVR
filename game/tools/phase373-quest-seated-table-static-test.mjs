@@ -13,25 +13,35 @@ const preflight = read('game/modules/phase373_quest_rig_preflight_lock.js');
 const runtime = read('game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js');
 const postflight = read('game/modules/phase373_quest_npc_teleport_postflight_lock.js');
 const finalizer = read('game/modules/phase373_quest_table_seat_finalizer_lock.js');
+const originalTable = read('game/modules/phase380_original_table_authority_lock.js');
+const tableWatchdog = read('game/modules/phase381_table_lobby_watchdog_lock.js');
 const deploy = read('.github/workflows/deploy.yml');
+const accountConfig = JSON.parse(read('site/config/player-api.json'));
 
-need(quest, 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK', 'quest-active-build');
-need(quest, "phase373_quest_rig_preflight_lock.js?v=phase373", 'quest-preflight-import');
-need(quest, "phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase373", 'quest-phase373-import');
-need(quest, "phase373_quest_npc_teleport_postflight_lock.js?v=phase373", 'quest-postflight-import');
-need(quest, "phase373_quest_table_seat_finalizer_lock.js?v=phase373", 'quest-finalizer-import');
+need(quest, 'data-build="PHASE-380-GAME-SITE-INTEGRITY-LOCK"', 'protected-quest-build');
+need(quest, 'data-release="PHASE-381-SITE-LOBBY-RESTORATION-LOCK"', 'quest-active-successor');
+need(quest, "phase373_quest_rig_preflight_lock.js?v=phase381", 'quest-preflight-import');
+need(quest, "phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase381", 'quest-phase373-import');
+need(quest, "phase373_quest_npc_teleport_postflight_lock.js?v=phase381", 'quest-postflight-import');
+need(quest, "phase373_quest_table_seat_finalizer_lock.js?v=phase381", 'quest-finalizer-import');
+need(quest, "phase380_original_table_authority_lock.js?v=phase381", 'original-table-import');
+need(quest, "phase381_table_lobby_watchdog_lock.js?v=phase381", 'table-watchdog-import');
 need(quest, 'window.SVR_PHASE364_LOBBY_SPAWN=window.SVR_PHASE373_STABLE_LOBBY', 'single-phase364-spawn');
 need(quest, 'window.SVR_PHASE361_LOBBY_SPAWN=window.SVR_PHASE373_STABLE_LOBBY', 'single-phase361-spawn');
 need(quest, 'window.SVR_PHASE373_REPAIR_TABLE?.()', 'table-repair-before-release');
 need(quest, 'window.SVR_PHASE373_REPAIR_NPCS?.()', 'npc-repair-before-release');
 need(quest, 'window.SVR_PHASE373_POSTFLIGHT_REPAIR_NPCS?.()', 'postflight-npc-repair-before-release');
-need(quest, "window.SVR_PHASE373_STABLE_LOBBY?.('quest-core-ready')", 'stable-lobby-before-release');
-need(quest, "window.SVR_PHASE373_FINALIZE_TABLE?.('quest-core-ready-after-lobby')", 'table-finalizer-before-release');
-need(quest, "window.SVR_PHASE373_POSTFLIGHT_RESTORE_TELEPORT?.('quest-core-ready')", 'standing-teleport-before-release');
-const stableLobbyCall = quest.indexOf("window.SVR_PHASE373_STABLE_LOBBY?.('quest-core-ready')");
-const finalizerCall = quest.indexOf("window.SVR_PHASE373_FINALIZE_TABLE?.('quest-core-ready-after-lobby')");
+need(quest, "window.SVR_PHASE373_STABLE_LOBBY?.('phase381-core-ready')", 'stable-lobby-before-release');
+need(quest, "window.SVR_PHASE373_FINALIZE_TABLE?.('phase381-core-ready')", 'table-finalizer-before-release');
+need(quest, "window.SVR_PHASE373_POSTFLIGHT_RESTORE_TELEPORT?.('phase381-core-ready')", 'standing-teleport-before-release');
+need(quest, "window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase381-core-ready')", 'original-table-reassert-before-release');
+need(quest, "window.SVR_PHASE381_TABLE_WATCHDOG_TICK?.('phase381-core-ready')", 'table-watchdog-before-release');
+const stableLobbyCall = quest.indexOf("window.SVR_PHASE373_STABLE_LOBBY?.('phase381-core-ready')");
+const finalizerCall = quest.indexOf("window.SVR_PHASE373_FINALIZE_TABLE?.('phase381-core-ready')");
+const originalCall = quest.indexOf("window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase381-core-ready')");
+const watchdogCall = quest.indexOf("window.SVR_PHASE381_TABLE_WATCHDOG_TICK?.('phase381-core-ready')");
 const releaseCall = quest.indexOf("document.body.classList.add('boot-released')");
-if (!(stableLobbyCall >= 0 && finalizerCall > stableLobbyCall && releaseCall > finalizerCall)) errors.push('order:stable-lobby-finalizer-release');
+if (!(stableLobbyCall >= 0 && finalizerCall > stableLobbyCall && originalCall > finalizerCall && watchdogCall > originalCall && releaseCall > watchdogCall)) errors.push('order:stable-lobby-finalizer-original-watchdog-release');
 const p361 = quest.indexOf('phase361_quest_lobby_play_seat_watch_npc_lock.js');
 const p364q = quest.indexOf('phase364_quest_eric_quarantine_watch.js');
 const pre = quest.indexOf('phase373_quest_rig_preflight_lock.js');
@@ -99,25 +109,36 @@ need(finalizer, 'scheduleSeatFinalization', 'finalizer-schedules-seat-stability'
 need(finalizer, 'window.SVR_PHASE373_FINALIZER_QA = qa', 'finalizer-qa');
 forbid(finalizer, 'new THREE.WebGLRenderer', 'finalizer-no-renderer');
 
-need(deploy, 'test -f build/game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js', 'deploy-phase373-module');
-need(deploy, 'test -f build/game/modules/phase373_quest_table_seat_finalizer_lock.js', 'deploy-phase373-finalizer');
-need(deploy, '"questRoute": "/game/index.html?platform=quest&v=phase373"', 'deploy-phase373-route');
-need(deploy, '"androidRoute": "/game/android.html?channel=stable&v=phase372"', 'android-route-preserved');
-need(deploy, '"databaseProvider": "aws"', 'aws-preserved');
+need(originalTable, 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK', 'original-table-build');
+need(originalTable, 'if (!table.parent && worldRoot()?.isObject3D) worldRoot().add(table)', 'original-table-reattach');
+need(tableWatchdog, 'PHASE-381-ANDROID-QUEST-LOBBY-TABLE-WATCHDOG-LOCK', 'watchdog-build');
+need(tableWatchdog, "setInterval(() => tick('interval'), 1800)", 'watchdog-continuous');
+need(tableWatchdog, 'SVR_PHASE381_TABLE_WATCHDOG_QA', 'watchdog-qa');
+
+need(deploy, 'test -s source/game/assets/models/table.glb', 'deploy-table-glb');
+need(deploy, 'test -s source/game/assets/table.fbx', 'deploy-table-fbx');
+need(deploy, 'test -f publish/game/modules/phase381_table_lobby_watchdog_lock.js', 'deploy-watchdog-module');
+need(deploy, '"questRoute": "/game/index.html?platform=quest&v=phase381"', 'deploy-phase381-route');
+need(deploy, '"androidRoute": "/game/android-lobby.html?v=phase381"', 'android-route-preserved');
+need(deploy, '"questTableWatchdog": true', 'deploy-watchdog-proof');
+if (accountConfig.provider !== 'aws' || accountConfig.database !== 'dynamodb' || accountConfig.identity !== 'cognito') errors.push('aws-account-foundation-regressed');
 
 const result = {
-  build: 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK',
+  build: 'PHASE-373-QUEST-RECOVERY-PROTECTED-BY-PHASE-381',
+  successor: 'PHASE-381-SITE-LOBBY-RESTORATION-LOCK',
   exactLobbyGapMeters: 0.90,
   exactSeatGapMeters: 0.62,
   safeRigCannotOwnTable: true,
   standingMovementAllowed: true,
   visibleEntryUsesOneSpawn: true,
   realTableGlbFallback: true,
+  originalUploadedTableFirst: true,
+  continuousTableWatchdog: true,
   seatedTeleportHardBlocked: true,
   delayedTeleportRestoredAfterLeave: true,
   namedAndUnnamedNpcRepair: true,
   tableAndSeatFinalizer: true,
-  androidBuildPreserved: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
+  awsPreserved: true,
   errors,
   pass: errors.length === 0
 };
