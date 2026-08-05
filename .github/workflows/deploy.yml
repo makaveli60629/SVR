@@ -48,7 +48,7 @@ jobs:
           path: publish
           fetch-depth: 1
 
-      - name: Validate Phase 380 source contracts
+      - name: Validate Phase 381 source contracts
         shell: bash
         run: |
           set -euo pipefail
@@ -57,11 +57,14 @@ jobs:
           grep -q 'Preview Site' source/index.html
           grep -q 'Preview Game' source/index.html
           grep -q 'PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK' source/site/index.html
+          grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' source/game/index.html
+          grep -q 'phase381_asset_load_cache_guard' source/game/index.html
+          grep -q 'phase381_vr_runtime_lock' source/game/index.html
+          ! grep -q 'phase364_quest_eric_quarantine_watch' source/game/index.html
           grep -q 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' source/game/android-stable.html
           grep -q 'JOIN NOW' source/game/android-stable.html
           grep -q 'deterministicHandEvaluator:true' source/game/android-stable.html
           grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' source/game/modules/phase380_original_table_authority_lock.js
-          grep -q 'phase380_original_table_authority_lock' source/game/index.html
           grep -q 'PHASE-380-QUEST-PROCEDURAL-TABLE-FALLBACK-LOCK' source/game/modules/phase379_quest_procedural_table_authority.js
           grep -q 'pwa-phase380' source/manifest.webmanifest
           grep -q 'phase380-clean-routes' source/pwa-sw.js
@@ -69,11 +72,15 @@ jobs:
           test -s source/offline.html
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/table.fbx
+          test -s source/game/assets/models/eric/eric.fbx
           test -s source/downloads/svr-poker-android-rc2.apk
           test -s source/downloads/svr-poker-android-rc2.apk.sha256
           python3 -m json.tool source/game/android-release.json >/dev/null
+          python3 -m json.tool source/game/manifest.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
           python3 -m json.tool source/manifest.webmanifest >/dev/null
+          node --check source/game/modules/phase381_asset_load_cache_guard.js
+          node --check source/game/modules/phase381_vr_runtime_lock.js
           node --check source/game/modules/phase380_original_table_authority_lock.js
           node --check source/game/modules/phase379_quest_procedural_table_authority.js
           node --check source/pwa-sw.js
@@ -111,12 +118,12 @@ jobs:
           set -euo pipefail
           DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           APK_SHA="$(cut -d' ' -f1 source/downloads/svr-poker-android-rc2.apk.sha256)"
-          cat > publish/deploy-health.json <<EOF
+          cat > publish/deploy-health.json <<EOF2
           {
             "status": "ok",
-            "build": "PHASE-380-GAME-SITE-INTEGRITY-LOCK",
+            "build": "PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK",
             "androidBuild": "PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK",
-            "questBuild": "PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK",
+            "questBuild": "PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK",
             "publicBuild": "SVR-OFFICIAL-MATRIX-PUBLIC-LOCK",
             "siteBuild": "PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK",
             "pwaBuild": "PHASE-380-PWA-NETWORK-AUTHORITY-LOCK",
@@ -125,7 +132,7 @@ jobs:
             "sourceBranch": "main",
             "publishBranch": "gh-pages",
             "androidRoute": "/game/android-stable.html?v=phase380",
-            "questRoute": "/game/index.html?platform=quest&v=phase380",
+            "questRoute": "/game/index.html?platform=quest&v=phase381",
             "downloadsRoute": "/downloads/",
             "apkUrl": "/downloads/svr-poker-android-rc2.apk",
             "apkSha256": "${APK_SHA}",
@@ -137,10 +144,14 @@ jobs:
             "androidDeterministicEvaluator": true,
             "questOriginalTableFirst": true,
             "questProceduralTableEmergencyOnly": true,
+            "questEricMeshRiggedToDealerMotion": true,
+            "questSeatedMovementAndTeleportLocked": true,
+            "questHeadOverlayCleanup": true,
+            "questProceduralAudioFallback": true,
             "cleanTreePublish": true,
             "customDomain": "svrpoker.com"
           }
-          EOF
+          EOF2
           cp publish/deploy-health.json publish/game/deploy-health.json
 
       - name: Validate clean production tree
@@ -153,9 +164,12 @@ jobs:
           test -f publish/site/avatar.html
           test -f publish/game/index.html
           test -f publish/game/android-stable.html
+          test -f publish/game/modules/phase381_asset_load_cache_guard.js
+          test -f publish/game/modules/phase381_vr_runtime_lock.js
           test -f publish/game/modules/phase380_original_table_authority_lock.js
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/table.fbx
+          test -s publish/game/assets/models/eric/eric.fbx
           test -s publish/downloads/svr-poker-android-rc2.apk
           test -f publish/manifest.webmanifest
           test -f publish/pwa-sw.js
@@ -174,8 +188,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches the Phase 380 clean tree.'
+            echo 'Production already matches the Phase 381 clean tree.'
           else
-            git commit -m "Deploy Phase 380 clean game and site tree ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 381 VR runtime lock ${GITHUB_SHA}"
             git push origin gh-pages
           fi

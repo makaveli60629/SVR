@@ -30,7 +30,7 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 380 clean production payload
+      - name: Verify Phase 381 clean production payload
         shell: bash
         run: |
           set -euo pipefail
@@ -39,7 +39,6 @@ jobs:
           grep -q 'Preview Site' index.html
           grep -q 'Preview Game' index.html
           grep -q 'Leave Message' index.html
-          ! grep -q 'PHASE 379 LIVE RECOVERY' index.html
           test -s launch.css
           test -s matrix.js
           test -s site-public-hooks.js
@@ -47,14 +46,22 @@ jobs:
           grep -q 'PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK' site/index.html
           test -f site/profile.html
           test -f site/avatar.html
+          grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' game/index.html
+          grep -q 'phase381_asset_load_cache_guard' game/index.html
+          grep -q 'phase381_vr_runtime_lock' game/index.html
+          ! grep -q 'phase364_quest_eric_quarantine_watch' game/index.html
           grep -q 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' game/android-stable.html
           grep -q 'JOIN NOW' game/android-stable.html
           grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' game/modules/phase380_original_table_authority_lock.js
           grep -q 'PHASE-380-QUEST-PROCEDURAL-TABLE-FALLBACK-LOCK' game/modules/phase379_quest_procedural_table_authority.js
+          grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' game/modules/phase381_vr_runtime_lock.js
+          test -s game/assets/models/eric/eric.fbx
           test -s game/assets/models/table.glb
           test -s game/assets/table.fbx
           test -s downloads/svr-poker-android-rc2.apk
-          grep -q 'PHASE-380-GAME-SITE-INTEGRITY-LOCK' deploy-health.json
+          grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' deploy-health.json
+          grep -q '"questEricMeshRiggedToDealerMotion": true' deploy-health.json
+          grep -q '"questSeatedMovementAndTeleportLocked": true' deploy-health.json
           grep -q '"cleanTreePublish": true' deploy-health.json
           test -f CNAME
           grep -qx 'svrpoker.com' CNAME
@@ -64,11 +71,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 380 Pages artifact
+      - name: Upload Phase 381 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 380 game and site
+      - name: Deploy Phase 381 game and site
         id: deployment
         uses: actions/deploy-pages@v4

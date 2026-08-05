@@ -7,35 +7,32 @@ const errors = [];
 const need = (source, token, label = token) => { if (!source.includes(token)) errors.push(`missing:${label}`); };
 const forbid = (source, token, label = token) => { if (source.includes(token)) errors.push(`forbidden:${label}`); };
 
-const android = read('game/android.html');
+const androidRedirect = read('game/android.html');
+const androidStable = read('game/android-stable.html');
 const runtime = read('game/modules/phase369_android_join_table_freeze_recovery_lock.js');
 const readiness = read('game/modules/phase369_android_join_readiness_transaction_lock.js');
 const intent = read('game/modules/phase369_android_join_intent_bridge_lock.js');
 const successor = read('game/modules/phase372_live_entry_recovery_lock.js');
 const dealer = read('game/modules/phase368_card_dealer_animation_lock.js');
+const phase381 = read('game/modules/phase381_vr_runtime_lock.js');
 const release = JSON.parse(read('game/phase369-release.json'));
+const appManifest = JSON.parse(read('game/manifest.json'));
 
-need(android, 'data-build="PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK"', 'phase372-active-marker');
-need(android, 'data-build="PHASE-367-ANDROID-PHYSICAL-DEVICE-VIEWPORT-TOUCH-ACCEPTANCE-LOCK"', 'phase367-certification-marker');
-need(android, 'data-release="PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK"', 'phase369-certification-marker');
-need(android, 'window.SVR_REQUIRE_TABLE_JOIN=true', 'join-required');
-need(android, 'window.SVR_PHASE369_PENDING_JOIN=false', 'pending-join-initializer');
-need(android, 'event.stopImmediatePropagation();window.SVR_PHASE369_PENDING_JOIN=true', 'early-intent-capture');
-need(android, '#svr369Join:not([data-svr369-readiness-bound])', 'unbound-button-guard');
-need(android, "phase372_live_entry_recovery_lock.js?v=phase372", 'phase372-early-entry');
-need(android, "phase367_android_physical_device_viewport_touch_acceptance_lock.js?v=phase367", 'phase367-base-load');
-need(android, "phase369_android_join_table_freeze_recovery_lock.js?v=phase372", 'phase369-base-load');
-need(android, "phase369_android_join_readiness_transaction_lock.js?v=phase372", 'phase369-readiness-load');
-need(android, "phase369_android_join_intent_bridge_lock.js?v=phase372", 'phase369-intent-load');
-need(android, 'const loadDealerLater=', 'dealer-deferred');
-need(android, "requestIdleCallback(run,{timeout:6000})", 'idle-dealer-load');
-need(android, "logoUrl:'/logo.png'", 'android-logo');
-const phase372Index = android.indexOf('phase372_live_entry_recovery_lock.js');
-const phase367Index = android.indexOf('phase367_android_physical_device_viewport_touch_acceptance_lock.js');
-const phase369Index = android.indexOf('phase369_android_join_table_freeze_recovery_lock.js');
-const readinessIndex = android.indexOf('phase369_android_join_readiness_transaction_lock.js');
-const intentIndex = android.indexOf('phase369_android_join_intent_bridge_lock.js');
-if (!(phase372Index >= 0 && phase367Index > phase372Index && phase369Index > phase367Index && readinessIndex > phase369Index && intentIndex > readinessIndex)) errors.push('order:phase372-before-protected-phase369-stack');
+// Current Android authority is the Phase 380 standalone table. Historical
+// Phase 367/369/372 modules remain in source as optional 3D rollback coverage;
+// they are no longer required in the active lightweight Android entry.
+need(androidRedirect, 'PHASE-354-ANDROID-FULL-GAME-RELEASE-ACCEPTANCE-LOCK', 'protected-full-game-certification');
+need(androidRedirect, 'android-stable.html?v=phase380', 'phase380-stable-redirect');
+need(androidStable, 'data-build="PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK"', 'phase380-active-marker');
+need(androidStable, 'JOIN NOW', 'join-visible');
+need(androidStable, 'joined:false', 'join-state-initializer');
+need(androidStable, 'movementControlsWhileSeated:0', 'seated-controls-hidden');
+need(androidStable, 'function scoreFive(cards)', 'deterministic-evaluator');
+need(androidStable, 'function burnCard()', 'burn-cards');
+need(androidStable, 'cardsHiddenBeforeJoin:true', 'cards-hidden-before-join');
+need(androidStable, "logoUrl:'/logo.png'", 'android-logo');
+forbid(androidStable, 'phase369_android_join_table_freeze_recovery_lock.js', 'heavy-phase369-module-on-standalone-android');
+forbid(androidStable, 'phase368_card_dealer_animation_lock.js', 'heavy-dealer-on-standalone-android');
 
 need(runtime, "export const BUILD = 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK'", 'runtime-build');
 need(runtime, '>JOIN TABLE<', 'phase369-entry-join-label');
@@ -73,16 +70,19 @@ need(intent, 'window.SVR_PHASE369_JOIN_INTENT_QA', 'intent-qa');
 forbid(intent, 'setInterval(', 'intent-no-polling');
 forbid(intent, 'new THREE.', 'intent-no-renderer');
 
-need(successor, "PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK", 'successor-build');
+need(successor, 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK', 'successor-build');
 need(successor, "'JOIN TABLE'", 'successor-visible-join');
 need(successor, "['SVR_PHASE369_JOIN_TABLE', 'SVR_PHASE363_JOIN_TABLE']", 'successor-reuses-join-authority');
 need(successor, 'table.visible = true', 'successor-table-visible');
 need(successor, 'window.SVR_PHASE372_QA', 'successor-qa');
 forbid(successor, 'new THREE.WebGLRenderer', 'successor-no-renderer');
 
-need(dealer, "dealer.position.set(info.center.x, 0, info.box.min.z - DEALER_GAP)", 'dealer-across-table');
-need(dealer, 'dealer.rotation.set(0, Math.PI, 0)', 'dealer-faces-table');
+need(dealer, "dealer.position.set(info.center.x, 0, info.box.min.z - DEALER_GAP)", 'protected-dealer-across-table');
+need(dealer, 'dealer.rotation.set(0, Math.PI, 0)', 'protected-dealer-faces-table');
 need(dealer, 'optimizedFromUploadedFbx: true', 'uploaded-fbx-motion');
+need(phase381, 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK', 'phase381-dealer-successor');
+need(phase381, 'assets/models/eric/eric.fbx', 'approved-eric-asset');
+need(phase381, 'phase368_card_dealer_motion.js', 'protected-motion-reuse');
 
 if (release.build !== 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK') errors.push('release:phase373-active-build');
 if (release.androidBuild !== 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK') errors.push('release:phase372-android-build');
@@ -94,11 +94,15 @@ if (!release.androidFlow?.dealerDeferredUntilRuntimeStable) errors.push('release
 if (!release.androidFlow?.automaticNextHandAfterShowdown) errors.push('release:continuous-play');
 if (release.apkPolicy?.forceUpdate || release.apkPolicy?.showUpdatePrompt || !release.apkPolicy?.manualUpdateOnly) errors.push('release:apk-policy');
 if (release.truth?.physicalAndroidAcceptancePassed !== false) errors.push('release:physical-acceptance-truth');
+if (appManifest.build !== 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' || appManifest.phase !== 380) errors.push('manifest:phase380-android-authority');
+if (appManifest.quest_runtime_build !== 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK') errors.push('manifest:phase381-quest-successor');
 
 const result = {
-  build: 'PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK',
-  androidBuild: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
+  build: 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK',
+  questSuccessor: 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK',
   protectedRecoveryBuild: 'PHASE-369-ANDROID-JOIN-TABLE-FREEZE-RECOVERY-LOCK',
+  protectedSuccessorBuild: 'PHASE-372-LIVE-ENTRY-RECOVERY-AWS-AUTODEPLOY-LOCK',
+  architecture: 'Phase 380 standalone Android authority with protected optional 3D recovery modules and Phase 381 Quest runtime',
   errors,
   pass: errors.length === 0
 };

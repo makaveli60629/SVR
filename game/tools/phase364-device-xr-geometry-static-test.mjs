@@ -4,6 +4,7 @@ const read = (path) => fs.readFileSync(path, 'utf8');
 const phase = read('game/modules/phase364_device_xr_geometry_spawn_lock.js');
 const quarantine = read('game/modules/phase364_quest_eric_quarantine_watch.js');
 const recovery = read('game/modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js');
+const phase381 = read('game/modules/phase381_vr_runtime_lock.js');
 const originalTable = read('game/modules/phase380_original_table_authority_lock.js');
 const core = read('game/modules/core_scene.js');
 const manifest = read('game/modules/phase340_platform_manifest.js');
@@ -30,8 +31,12 @@ forbidText(phase, 'frontZ + 3.15', 'distant Quest lobby spawn');
 forbidText(phase, 'setTimeout(() => lobbySpawn(true), 180); setTimeout(() => lobbySpawn(true), 850)', 'double forced XR recenter');
 forbidText(phase, 'function installControllerRecovery', 'duplicate Phase 364 controller select authority');
 
+// The historical quarantine remains in source for rollback/reference but Phase 381
+// deliberately removes it from the active entry and replaces it with an approved
+// Eric rig plus universal seated/overlay safety.
 for (const token of ['PHASE-364-QUEST-ERIC-QUARANTINE-WATCH', 'SVR_PHASE364_SANITIZE_NPCS', 'window.setInterval(sweep, 260)', 'SVR_PHASE364_ERIC_QUARANTINE_SWEEP']) requireText(quarantine, token);
 for (const token of ['PHASE-373-QUEST-SEATED-TELEPORT-TABLE-SPAWN-NPC-LOCK', 'window.SVR_PHASE364_SANITIZE_NPCS = repairNpcs', 'svrPhase364Quarantined: false', 'textureNpc(root)', 'chooseUprightRotation(root)', 'groundNpc(root)']) requireText(recovery, token);
+for (const token of ['PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK', 'SVR_PHASE381_SEAT_LOCK', 'SVR_PHASE381_SEAT_UNLOCK', 'SVR_PHASE381_OVERLAY_SWEEP', 'assets/models/eric/eric.fbx', 'hideOldSkeletons']) requireText(phase381, token);
 for (const token of ['PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK', 'length: 2.734', 'depth: 1.46', 'PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY']) requireText(originalTable, token);
 
 requireText(core, 'renderer.xr.setReferenceSpaceType("local-floor")');
@@ -48,12 +53,16 @@ const questPhaseIndex = importPosition(quest, 'phase364_device_xr_geometry_spawn
 const questBootIndex = importPosition(quest, 'phase340_platform_core_loader.js?v=phase380');
 const originalIndex = importPosition(quest, 'phase380_original_table_authority_lock.js?v=phase380');
 const phase361Index = importPosition(quest, 'phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase380');
-const quarantineIndex = importPosition(quest, 'phase364_quest_eric_quarantine_watch.js?v=phase380');
 const recoveryIndex = importPosition(quest, 'phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase380');
+const phase381ModuleIndex = importPosition(quest, 'phase381_vr_runtime_lock.js?v=phase381');
+const phase381ActivationIndex = importPosition(quest, 'loadPhase381Later();');
 if (questPhaseIndex < 0 || questBootIndex <= questPhaseIndex) throw new Error('Quest Phase 364 must load before platform boot');
 if (originalIndex < 0 || originalIndex > questBootIndex) throw new Error('Original uploaded table authority must load before platform boot');
-if (phase361Index < 0 || quarantineIndex <= phase361Index || recoveryIndex <= quarantineIndex) throw new Error('Phase 373 recovery must load after Phase 361 and historical quarantine modules');
+if (phase361Index < 0 || recoveryIndex <= phase361Index) throw new Error('Phase 373 recovery must load after Phase 361');
+if (phase381ModuleIndex < 0 || phase381ActivationIndex <= recoveryIndex) throw new Error('Phase 381 approved successor must activate after Phase 373 recovery');
+forbidText(quest, "import './modules/phase364_quest_eric_quarantine_watch.js", 'active historical Eric quarantine import');
 requireText(quest, 'PHASE-380-GAME-SITE-INTEGRITY-LOCK');
+requireText(quest, 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK');
 requireText(quest, 'SVR_PHASE364_LOBBY_SPAWN');
 requireText(quest, 'SVR_PHASE373_REPAIR_NPCS');
 requireText(quest, 'SVR_PHASE373_STABLE_LOBBY');
@@ -75,18 +84,22 @@ if (appManifest.force_update || appManifest.show_update_prompt || !appManifest.m
 if (Number(appManifest.phase || 0) !== 380) throw new Error('Manifest phase is not Phase 380');
 if (appManifest.table_reference_line_offset_meters !== 0.065) throw new Error('Protected table reference line changed');
 if (!appManifest.android_sticks_hidden_while_seated || appManifest.android_movement_controls_while_seated !== 0) throw new Error('Standalone seated movement lock changed');
+if (appManifest.quest_runtime_build !== 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK') throw new Error('Phase 381 Quest runtime record missing');
+if (!appManifest.quest_seated_movement_locked || !appManifest.quest_seated_teleport_locked || !appManifest.quest_overlay_cleanup) throw new Error('Phase 381 Quest safety policy missing');
 
 console.log(JSON.stringify({
   pass: true,
-  build: 'PHASE-364-PROTECTED-BY-PHASE-380',
+  protectedBuild: 'PHASE-364-PROTECTED-BY-PHASE-380',
+  successor: 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK',
   currentPlatformPhase: appManifest.phase,
   tableMeters: [2.74, 0.80, 1.46],
   questSpawn: '0.90m outside south/front rail facing felt',
   xrEntry: 'single one-time lobby placement plus seated position safety recovery',
   xrLocalFloorRequired: false,
   originalTableAuthority: 'PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY',
-  historicalEricQuarantineModuleRetained: true,
-  phase373EricRepairOverridesQuarantine: true,
+  historicalEricQuarantineModuleRetainedAsInactiveRollback: true,
+  phase381ApprovedEricReplacesQuarantine: true,
+  phase381UniversalSeatedLock: true,
   android: 'Phase 380 standalone seated table; Phase 364 3D APIs retained as optional regression surface',
   apk: `${appManifest.apk_version_name}/${appManifest.apk_version_code}`
 }, null, 2));
