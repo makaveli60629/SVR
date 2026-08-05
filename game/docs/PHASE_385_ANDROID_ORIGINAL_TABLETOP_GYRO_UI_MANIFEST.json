@@ -44,12 +44,15 @@
     "cssFallbackTable": true
   },
   "files": [
+    "game/index.html",
     "game/android.html",
     "game/android-tabletop.html",
     "game/manifest.json",
     "game/styles/phase385_android_tabletop.css",
     "game/modules/phase385_android_tabletop_3d.js",
     "game/docs/PHASE_385_ANDROID_ORIGINAL_TABLETOP_GYRO_UI_LOCK.md",
-    "game/docs/PHASE_385_ANDROID_ORIGINAL_TABLETOP_GYRO_UI_MANIFEST.json"
+    "game/docs/PHASE_385_ANDROID_ORIGINAL_TABLETOP_GYRO_UI_MANIFEST.json",
+    "pwa-sw.js",
+    "sw.js"
   ]
 }
