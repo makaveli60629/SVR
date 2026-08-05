@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - name: Checkout Phase 379 production source
+      - name: Checkout production source
         uses: actions/checkout@v5
         with:
           path: source
@@ -25,9 +25,13 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             index.html
+            launch.css
+            matrix.js
+            site-public-hooks.js
+            logo.webp
+            logo.png
             CNAME
             .nojekyll
-            logo.png
             game/index.html
             game/android.html
             game/android-play.html
@@ -36,6 +40,8 @@ jobs:
             game/modules/phase379_quest_procedural_table_authority.js
             site/index.html
             downloads/index.html
+            downloads/svr-poker-android-rc2.apk
+            downloads/svr-poker-android-rc2.apk.sha256
             update/app-version.json
 
       - name: Checkout current production branch
@@ -45,16 +51,21 @@ jobs:
           path: publish
           fetch-depth: 1
 
-      - name: Validate Phase 379 source contract
+      - name: Validate locked public page and game contracts
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-379-PUBLIC-ROOT-RECOVERY-LOCK' source/index.html
+          grep -q 'SVR Poker | Public Launch Page' source/index.html
+          grep -q 'id="binary-rain"' source/index.html
+          grep -q 'Preview Site' source/index.html
+          grep -q 'Preview Game' source/index.html
           grep -q 'PHASE-379-PUBLIC-SITE-ANDROID-APK-QUEST-RECOVERY-LOCK' source/site/index.html
           grep -q 'PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK' source/game/android-stable.html
           grep -q 'JOIN NOW' source/game/android-stable.html
           grep -q 'PHASE-379-QUEST-PROCEDURAL-TABLE-AUTHORITY-LOCK' source/game/modules/phase379_quest_procedural_table_authority.js
           grep -q 'phase379_quest_procedural_table_authority' source/game/index.html
+          test -s source/downloads/svr-poker-android-rc2.apk
+          test -s source/downloads/svr-poker-android-rc2.apk.sha256
           python3 -m json.tool source/game/android-release.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
 
@@ -64,8 +75,13 @@ jobs:
           set -euo pipefail
           mkdir -p publish/game/modules publish/site publish/downloads publish/update
           cp source/index.html publish/index.html
+          cp source/launch.css publish/launch.css
+          cp source/matrix.js publish/matrix.js
+          cp source/site-public-hooks.js publish/site-public-hooks.js
           cp source/site/index.html publish/site/index.html
           cp source/downloads/index.html publish/downloads/index.html
+          cp source/downloads/svr-poker-android-rc2.apk publish/downloads/svr-poker-android-rc2.apk
+          cp source/downloads/svr-poker-android-rc2.apk.sha256 publish/downloads/svr-poker-android-rc2.apk.sha256
           cp source/game/index.html publish/game/index.html
           cp source/game/android.html publish/game/android.html
           cp source/game/android-play.html publish/game/android-play.html
@@ -76,24 +92,28 @@ jobs:
           if [ -f source/CNAME ]; then cp source/CNAME publish/CNAME; fi
           if [ -f source/.nojekyll ]; then cp source/.nojekyll publish/.nojekyll; else touch publish/.nojekyll; fi
           if [ -f source/logo.png ]; then cp source/logo.png publish/logo.png; fi
+          if [ -f source/logo.webp ]; then cp source/logo.webp publish/logo.webp; fi
           DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          APK_SHA="$(cut -d' ' -f1 source/downloads/svr-poker-android-rc2.apk.sha256)"
           cat > publish/deploy-health.json <<EOF
           {
             "status": "ok",
-            "build": "PHASE-379-FOCUSED-PRODUCTION-AUTODEPLOY-LOCK",
+            "build": "SVR-OFFICIAL-MATRIX-PUBLIC-APK-DIRECT-DEPLOY-LOCK",
             "androidBuild": "PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK",
             "questBuild": "PHASE-379-QUEST-TABLE-ANDROID-ROUTE-RECOVERY-LOCK",
-            "publicBuild": "PHASE-379-PUBLIC-SITE-ANDROID-APK-QUEST-RECOVERY-LOCK",
+            "publicBuild": "SVR-OFFICIAL-MATRIX-PUBLIC-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "${DEPLOYED_AT}",
             "sourceBranch": "main",
             "publishBranch": "gh-pages",
             "androidRoute": "/game/android-stable.html?v=phase379",
             "questRoute": "/game/index.html?platform=quest&v=phase379",
-            "downloadsRoute": "/downloads/?v=phase379",
+            "downloadsRoute": "/downloads/",
+            "apkUrl": "/downloads/svr-poker-android-rc2.apk",
+            "apkSha256": "${APK_SHA}",
             "apkVersionName": "0.1.0-rc2",
             "apkVersionCode": 2,
-            "apkBuildStatus": "release-workflow-pending",
+            "apkBuildStatus": "same-domain-ready",
             "joinNowStatic": true,
             "cardsBeforeJoin": false,
             "questProceduralTableFallback": true,
@@ -109,10 +129,10 @@ jobs:
           set -euo pipefail
           git config user.name 'SVR Auto Deploy'
           git config user.email 'actions@users.noreply.github.com'
-          git add index.html site/index.html downloads/index.html game/index.html game/android.html game/android-play.html game/android-stable.html game/android-release.json game/modules/phase379_quest_procedural_table_authority.js update/app-version.json deploy-health.json game/deploy-health.json CNAME .nojekyll logo.png
+          git add index.html launch.css matrix.js site-public-hooks.js logo.webp logo.png site/index.html downloads/index.html downloads/svr-poker-android-rc2.apk downloads/svr-poker-android-rc2.apk.sha256 game/index.html game/android.html game/android-play.html game/android-stable.html game/android-release.json game/modules/phase379_quest_procedural_table_authority.js update/app-version.json deploy-health.json game/deploy-health.json CNAME .nojekyll
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 379.'
+            echo 'Production already matches the locked public page and APK download.'
           else
-            git commit -m "Deploy Phase 379 ${GITHUB_SHA}"
+            git commit -m "Deploy locked Matrix page and same-domain APK ${GITHUB_SHA}"
             git push origin gh-pages
           fi
