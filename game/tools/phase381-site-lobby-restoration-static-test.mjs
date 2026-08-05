@@ -83,7 +83,7 @@ requireText(quest, 'SVR_PHASE381_TABLE_WATCHDOG_TICK', 'Quest watchdog use');
 requireText(originalTable, "params.get('platform') === 'android'", 'original table Android activation');
 requireText(originalTable, 'if (!table.parent && worldRoot()?.isObject3D) worldRoot().add(table)', 'original table reattach');
 requireText(watchdog, 'PHASE-381-ANDROID-QUEST-LOBBY-TABLE-WATCHDOG-LOCK', 'watchdog build');
-requireText(watchdog, 'setInterval(() => tick(\'interval\'), 1800)', 'continuous table recovery');
+requireText(watchdog, "setInterval(() => tick('interval'), 1800)", 'continuous table recovery');
 requireText(watchdog, 'PHASE379_PROCEDURAL_TABLE_AUTHORITY', 'fallback cleanup');
 requireText(watchdog, 'SVR_PHASE381_TABLE_WATCHDOG_QA', 'watchdog QA');
 
