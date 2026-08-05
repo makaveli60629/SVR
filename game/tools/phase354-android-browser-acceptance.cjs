@@ -73,6 +73,12 @@ async function waitFor(page, evaluator, timeout = 60000) {
         ? result : null;
     });
 
+    await page.evaluate(() => {
+      const nativeRandom = Math.random;
+      Math.random = () => 0.99;
+      window.SVR_PHASE380_QA_RANDOM_LOCKED = true;
+      window.SVR_PHASE380_QA_RESTORE_RANDOM = () => { Math.random = nativeRandom; };
+    });
     await page.click('#join');
     const seated = await waitFor(page, () => {
       const qa = window.SVR_PHASE380_ANDROID_QA?.();
