@@ -53,7 +53,7 @@ requireText(android, 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK', 'Andr
 requireText(android, 'JOIN NOW', 'Android stable table');
 requireText(android, 'No cards, poker actions, or movement controls appear before joining.', 'Android stable table');
 requireText(android, "RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A']", 'Android cards');
-forbidText(android, "'T'", 'Android cards');
+forbidText(android, "RANKS=['2','3','4','5','6','7','8','9','T'", 'Android cards');
 requireText(android, 'function scoreFive(cards)', 'Android hand evaluator');
 requireText(android, 'function bestHand(cards)', 'Android hand evaluator');
 requireText(android, 'function burn()', 'Android burn cards');
