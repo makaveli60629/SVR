@@ -13,6 +13,7 @@ const shader = read('game/modules/phase358_quest_incremental_shader_compile_lock
 const boot = read('game/modules/phase358_quest_runtime_boot_lock.js');
 const legacyTable = read('game/modules/phase358_quest_uploaded_table_authority_lock.js');
 const originalTable = read('game/modules/phase380_original_table_authority_lock.js');
+const tableWatchdog = read('game/modules/phase381_table_lobby_watchdog_lock.js');
 const emergencyTable = read('game/modules/phase379_quest_procedural_table_authority.js');
 const pokerBoot = read('game/modules/phase358_quest_poker_boot_order_lock.js');
 const pot = read('game/modules/phase358_quest_pot_display_authority_lock.js');
@@ -58,19 +59,25 @@ need(loader, "method: 'quest-incremental-frame-compilation'", 'Quest compile pol
 need(loader, "release('phase358-quest-critical-ready')", 'Quest release reason');
 need(loader, "window.addEventListener('svr:phase358-acceptance'", 'Acceptance-gated deferred load');
 
-need(index, 'PHASE-380-GAME-SITE-INTEGRITY-LOCK', 'Phase 380 Quest entry');
-need(index, 'phase380_original_table_authority_lock.js?v=phase380', 'Original table authority');
-need(index, 'phase379_quest_procedural_table_authority.js?v=phase380', 'Emergency table fallback');
-need(index, 'phase359_dual_platform_gameplay_continuity_lock.js?v=phase380', 'Quest continuity successor');
-need(index, 'phase360_fresh_shuffle_leave_reset_continuous_table_lock.js?v=phase380', 'Quest shuffle successor');
-need(index, 'phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase380', 'Quest lobby-seat successor');
-if (index.indexOf('phase380_original_table_authority_lock.js') > index.indexOf('phase379_quest_procedural_table_authority.js')) errors.push('Original table must load before emergency fallback');
+need(index, 'PHASE-380-GAME-SITE-INTEGRITY-LOCK', 'Phase 380 protected Quest entry');
+need(index, 'PHASE-381-SITE-LOBBY-RESTORATION-LOCK', 'Phase 381 Quest successor');
+need(index, 'phase380_original_table_authority_lock.js?v=phase381', 'Original table authority');
+need(index, 'phase381_table_lobby_watchdog_lock.js?v=phase381', 'Continuous table watchdog');
+need(index, 'phase379_quest_procedural_table_authority.js?v=phase381', 'Emergency table fallback');
+need(index, 'phase359_dual_platform_gameplay_continuity_lock.js?v=phase381', 'Quest continuity successor');
+need(index, 'phase360_fresh_shuffle_leave_reset_continuous_table_lock.js?v=phase381', 'Quest shuffle successor');
+need(index, 'phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase381', 'Quest lobby-seat successor');
+const originalIndex = index.indexOf('phase380_original_table_authority_lock.js');
+const watchdogIndex = index.indexOf('phase381_table_lobby_watchdog_lock.js');
+const emergencyIndex = index.indexOf('phase379_quest_procedural_table_authority.js');
+if (originalIndex < 0 || watchdogIndex < originalIndex || emergencyIndex < watchdogIndex) errors.push('Original table and watchdog must load before emergency fallback');
 
 for (const token of ['PLAY GAME', 'LEAVE TABLE', 'applyLobbySpawn', 'applySeatAnchor', 'PHASE361_QUEST_FALLBACK_FOREARM_WATCH', 'SVR_PHASE360_JOIN_TABLE', 'SVR_PHASE360_LEAVE_TABLE']) need(phase361, token, 'Phase 361 session contract');
 for (const token of ['WebGLRenderer?.prototype', 'phase358QuestDeferredCompileAsync', "window.addEventListener('svr:platform-ready'"]) need(shader, token, 'Quest shader contract');
 for (const token of ['PHASE358_QUEST_TABLE_FALLBACK', 'PHASE358_QUEST_RAISED_TRANSLUCENT_POT_DISPLAY', 'renderer.setPixelRatio(Math.min', 'renderer.xr.enabled = true', 'removeAndroidControls']) need(boot, token, 'Quest boot contract');
 for (const token of ['../assets/table.fbx', 'PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED', 'PHASE358_QUEST_UPLOADED_ASSET_CONTAINER', 'removeCompetingTables']) need(legacyTable, token, 'Legacy uploaded table regression contract');
-for (const token of ['PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK', '../assets/models/table.glb', '../assets/table.fbx', 'PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY', "Object.defineProperty(window, 'SVR_TABLE_AUTHORITY'"]) need(originalTable, token, 'Phase 380 original table contract');
+for (const token of ['PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK', '../assets/models/table.glb', '../assets/table.fbx', 'PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY', "Object.defineProperty(window, 'SVR_TABLE_AUTHORITY'", 'if (!table.parent && worldRoot()?.isObject3D) worldRoot().add(table)']) need(originalTable, token, 'Phase 380 original table contract');
+for (const token of ['PHASE-381-ANDROID-QUEST-LOBBY-TABLE-WATCHDOG-LOCK', 'SVR_PHASE381_TABLE_WATCHDOG_TICK', 'SVR_PHASE381_TABLE_WATCHDOG_QA', "setInterval(() => tick('interval'), 1800)"]) need(tableWatchdog, token, 'Phase 381 table watchdog contract');
 for (const token of ['PHASE-380-QUEST-PROCEDURAL-TABLE-FALLBACK-LOCK', 'FALLBACK_DELAY_MS = 10000', 'preferredOriginal()', "removeFallback('original-table-adopted')"]) need(emergencyTable, token, 'Emergency fallback contract');
 if (!fs.existsSync('game/assets/table.fbx') || fs.statSync('game/assets/table.fbx').size < 1024) errors.push('Uploaded table FBX missing or empty');
 if (!fs.existsSync('game/assets/models/table.glb') || fs.statSync('game/assets/models/table.glb').size < 1024) errors.push('Uploaded table GLB missing or empty');
@@ -106,8 +113,9 @@ console.log(JSON.stringify({
   pass: true,
   protectedQuestGameplay: 'PHASE-358-QUEST-FULL-GAME-ACCEPTANCE-SMOOTHNESS-LOCK',
   acceptanceLoadedBy: 'phase340_platform_manifest QUEST_ACCEPTANCE',
-  successorBuild: 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK',
+  successorBuild: 'PHASE-381-SITE-LOBBY-RESTORATION-LOCK',
   originalTable: questRelease.browserAcceptance.uploadedTable,
+  continuousTableWatchdog: true,
   emergencyFallbackOnly: true,
   seatedTeleportLocked: true,
   physicalHeadsetPending: true,
