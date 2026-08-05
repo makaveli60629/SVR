@@ -30,6 +30,10 @@ jobs:
             /site-public-hooks.js
             /logo.webp
             /logo.png
+            /manifest.webmanifest
+            /pwa-sw.js
+            /sw.js
+            /offline.html
             /CNAME
             /.nojekyll
             /game/
@@ -59,14 +63,21 @@ jobs:
           grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' source/game/modules/phase380_original_table_authority_lock.js
           grep -q 'phase380_original_table_authority_lock' source/game/index.html
           grep -q 'PHASE-380-QUEST-PROCEDURAL-TABLE-FALLBACK-LOCK' source/game/modules/phase379_quest_procedural_table_authority.js
+          grep -q 'pwa-phase380' source/manifest.webmanifest
+          grep -q 'phase380-clean-routes' source/pwa-sw.js
+          grep -q 'phase380-network-authority' source/sw.js
+          test -s source/offline.html
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/table.fbx
           test -s source/downloads/svr-poker-android-rc2.apk
           test -s source/downloads/svr-poker-android-rc2.apk.sha256
           python3 -m json.tool source/game/android-release.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
+          python3 -m json.tool source/manifest.webmanifest >/dev/null
           node --check source/game/modules/phase380_original_table_authority_lock.js
           node --check source/game/modules/phase379_quest_procedural_table_authority.js
+          node --check source/pwa-sw.js
+          node --check source/sw.js
 
       - name: Rebuild clean production tree
         shell: bash
@@ -77,6 +88,10 @@ jobs:
           cp source/launch.css publish/launch.css
           cp source/matrix.js publish/matrix.js
           cp source/site-public-hooks.js publish/site-public-hooks.js
+          cp source/manifest.webmanifest publish/manifest.webmanifest
+          cp source/pwa-sw.js publish/pwa-sw.js
+          cp source/sw.js publish/sw.js
+          cp source/offline.html publish/offline.html
           if [ -f source/logo.png ]; then cp source/logo.png publish/logo.png; fi
           if [ -f source/logo.webp ]; then cp source/logo.webp publish/logo.webp; fi
           if [ -f source/CNAME ]; then cp source/CNAME publish/CNAME; fi
@@ -104,6 +119,7 @@ jobs:
             "questBuild": "PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK",
             "publicBuild": "SVR-OFFICIAL-MATRIX-PUBLIC-LOCK",
             "siteBuild": "PHASE-380-PUBLIC-GAME-SITE-INTEGRITY-LOCK",
+            "pwaBuild": "PHASE-380-PWA-NETWORK-AUTHORITY-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "${DEPLOYED_AT}",
             "sourceBranch": "main",
@@ -141,6 +157,10 @@ jobs:
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/table.fbx
           test -s publish/downloads/svr-poker-android-rc2.apk
+          test -f publish/manifest.webmanifest
+          test -f publish/pwa-sw.js
+          test -f publish/sw.js
+          test -f publish/offline.html
           test -f publish/deploy-health.json
           ! find publish -type f \( -name '.env' -o -name '.env.*' \) | grep -q .
           ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' publish | grep -q .
