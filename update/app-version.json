@@ -1,15 +1,17 @@
 {
   "schema": 1,
-  "build": "PHASE-378-EMERGENCY-MANUAL-WEB-PUBLISH-LOCK",
-  "gameBuild": "PHASE-378-ANDROID-STANDALONE-STABLE-TABLE-LOCK",
+  "build": "PHASE-379-WEB-QUEST-APK-RECOVERY-LOCK",
+  "gameBuild": "PHASE-379-ANDROID-STANDALONE-JOIN-NOW-LOCK",
+  "questBuild": "PHASE-379-QUEST-TABLE-ANDROID-ROUTE-RECOVERY-LOCK",
   "profileBuild": "PHASE-374-PROFILE-MOBILE-AVATAR-MENU-RECOVERY-LOCK",
-  "message": "Phase 378 standalone Android browser play is live. APK RC2 is pending package verification.",
+  "message": "Phase 379 publishes the static Android JOIN NOW table and Quest procedural table recovery. APK RC2 remains pending until the GitHub Release asset is verified.",
   "required": false,
   "webRuntimeUpdated": true,
-  "gameUrl": "/game/index.html?platform=quest&v=phase373",
-  "androidSafeUrl": "/game/android-stable.html?v=phase378",
-  "profileUrl": "/site/profile.html?v=phase374",
-  "downloadsUrl": "/downloads/",
+  "gameUrl": "/game/index.html?platform=quest&v=phase379",
+  "androidSafeUrl": "/game/android-stable.html?v=phase379",
+  "profileUrl": "/site/profile.html?v=phase379",
+  "downloadsUrl": "/downloads/?v=phase379",
+  "releasePage": "https://github.com/makaveli60629/SVR/releases/tag/android-rc2",
   "packageName": "com.svrpoker.app",
   "apkVersionCode": 2,
   "apkVersionName": "0.1.0-rc2",
@@ -23,5 +25,5 @@
   "publicDownloadControl": true,
   "publicUpdateControl": true,
   "offlineStableTableBundled": true,
-  "note": "Use the Phase 378 browser table now. The APK button will activate after the generated RC2 package is verified."
+  "note": "The browser game is ready independently. The APK button opens the GitHub Release page until the verified APK asset is published."
 }
