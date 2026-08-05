@@ -54,10 +54,12 @@ const questBootIndex = importPosition(quest, 'phase340_platform_core_loader.js?v
 const originalIndex = importPosition(quest, 'phase380_original_table_authority_lock.js?v=phase380');
 const phase361Index = importPosition(quest, 'phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase380');
 const recoveryIndex = importPosition(quest, 'phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase380');
-const phase381Index = importPosition(quest, 'phase381_vr_runtime_lock.js?v=phase381');
+const phase381ModuleIndex = importPosition(quest, 'phase381_vr_runtime_lock.js?v=phase381');
+const phase381ActivationIndex = importPosition(quest, 'loadPhase381Later();');
 if (questPhaseIndex < 0 || questBootIndex <= questPhaseIndex) throw new Error('Quest Phase 364 must load before platform boot');
 if (originalIndex < 0 || originalIndex > questBootIndex) throw new Error('Original uploaded table authority must load before platform boot');
-if (phase361Index < 0 || recoveryIndex <= phase361Index || phase381Index <= recoveryIndex) throw new Error('Phase 373 recovery and Phase 381 approved successor must load after Phase 361');
+if (phase361Index < 0 || recoveryIndex <= phase361Index) throw new Error('Phase 373 recovery must load after Phase 361');
+if (phase381ModuleIndex < 0 || phase381ActivationIndex <= recoveryIndex) throw new Error('Phase 381 approved successor must activate after Phase 373 recovery');
 forbidText(quest, "import './modules/phase364_quest_eric_quarantine_watch.js", 'active historical Eric quarantine import');
 requireText(quest, 'PHASE-380-GAME-SITE-INTEGRITY-LOCK');
 requireText(quest, 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK');
