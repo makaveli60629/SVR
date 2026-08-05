@@ -1,0 +1,88 @@
+name: Phase 381 Site Lobby Restoration
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'site-public-hooks.js'
+      - 'support-chat-bot.js'
+      - 'site/**'
+      - 'game/**'
+      - 'manifest.webmanifest'
+      - 'pwa-sw.js'
+      - 'sw.js'
+      - 'update/app-version.json'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/pages-live-publish.yml'
+      - '.github/workflows/phase381-site-lobby-restoration.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'site-public-hooks.js'
+      - 'support-chat-bot.js'
+      - 'site/**'
+      - 'game/**'
+      - 'manifest.webmanifest'
+      - 'pwa-sw.js'
+      - 'sw.js'
+      - 'update/app-version.json'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/pages-live-publish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase381-restoration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate Phase 381 JavaScript and JSON
+        run: |
+          set -euo pipefail
+          node --check site-public-hooks.js
+          node --check support-chat-bot.js
+          node --check pwa-sw.js
+          node --check sw.js
+          node --check game/modules/phase380_original_table_authority_lock.js
+          node --check game/modules/phase381_table_lobby_watchdog_lock.js
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool site/config/player-api.json >/dev/null
+
+      - name: Run Phase 381 restoration contract
+        run: node game/tools/phase381-site-lobby-restoration-static-test.mjs
+
+      - name: Verify restored website assets and game models
+        run: |
+          set -euo pipefail
+          test -s site/site-market.css
+          test -s site/phase93-visual.css
+          test -s site/phase94-device-slider.css
+          test -s site/final-polish.css
+          test -s site/assets/banners/00-svr-welcome-main.svg
+          test -s site/assets/banners/01-scorpion-vr-exclusive.webp
+          test -s site/assets/banners/02-svr-store-preview.webp
+          test -s support-chat-bot.js
+          test -s site-local-counter.js
+          test -s game/assets/models/table.glb
+          test -s game/assets/table.fbx
+          test -s downloads/svr-poker-android-rc2.apk
+
+      - name: Security scan public restoration
+        run: |
+          set -euo pipefail
+          ! find game site downloads -type f \( -name '.env' -o -name '.env.*' \) | grep -q .
+          ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' index.html site-public-hooks.js support-chat-bot.js game site | grep -q .
