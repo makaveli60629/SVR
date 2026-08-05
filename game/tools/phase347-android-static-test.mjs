@@ -6,6 +6,8 @@ const recovery = read('game/modules/phase356_android_real_device_freeze_recovery
 const engine = read('game/modules/phase336_authoritative_engine.js');
 const handDriver = read('game/modules/phase355_android_full_hand_driver_compatibility_lock.js');
 const platform = read('game/modules/phase340_platform_manifest.js');
+const androidLobby = read('game/android-lobby.html');
+const lowPower = read('game/android-stable.html');
 const checker = read('app-update-checker.js');
 const androidPage = read('site/android/index.html');
 const downloadsPage = read('site/downloads/index.html');
@@ -85,17 +87,25 @@ for (const [token, label] of [
 need(checker, 'current.releaseReady && current.apkUrl && current.apkVersionCode > installed', 'conditional-apk-menu');
 need(androidPage, 'm.releaseReady===true&&m.apkUrl', 'android-page-conditional-download');
 need(downloadsPage, 'm.releaseReady===true&&m.apkUrl', 'downloads-page-conditional-download');
+need(androidLobby, 'PHASE-381-ANDROID-VR-LOBBY-SOUND-TABLE-LOCK', 'phase381-lobby-build');
+need(androidLobby, 'bootPlatform({ forcedPlatform:\'android\' })', 'phase381-platform-boot');
+need(androidLobby, "SVR_PHASE363_LEAVE_TABLE?.('phase381-lobby-start')", 'lobby-before-seat');
+need(lowPower, 'PHASE-381-ANDROID-SOUND-COMPACT-LOGO-CARDS-LOCK', 'low-power-successor');
+need(lowPower, 'movementControlsWhileSeated:0', 'low-power-seated-controls-zero');
 
 const platformVersion = Number(platform.match(/export const VERSION = 'phase(\d+)'/)?.[1] || 0);
 if (platformVersion < 347 || Number(manifest.phase || 0) < 347) errors.push('platform-or-manifest-version-regressed');
-if (!String(manifest.build || '').startsWith('PHASE-')) errors.push('manifest-build-missing');
+if (manifest.phase !== 381 || manifest.build !== 'PHASE-381-ANDROID-VR-LOBBY-SOUND-TABLE-LOCK') errors.push('manifest-phase381-build');
+if (manifest.android_canonical_entry !== './android-lobby.html?v=phase381') errors.push('manifest-canonical-lobby');
+if (manifest.android_sticks_hidden_while_seated !== true || manifest.android_movement_controls_while_seated !== 0) errors.push('manifest-seated-controls');
 if (manifest.force_update !== false || manifest.show_update_prompt !== false || manifest.manual_update_only !== true) errors.push('manifest-update-policy');
-if (release.protectedAuthorities?.androidController !== 'PHASE-347') errors.push('protected-android-controller-changed');
-if (release.controllerAuthority !== 'PHASE-347-ANDROID-SINGLE-CONTROLLER-SEATED-GAMEPLAY-APK-RELEASE-LOCK') errors.push('controller-authority-record-changed');
+if (release.currentGameBuild !== 'PHASE-381-ANDROID-VR-LOBBY-SOUND-TABLE-LOCK') errors.push('release-phase381-build');
+if (release.lowPowerGameBuild !== 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK') errors.push('release-low-power-build');
+if (release.webEntry !== '/game/android-lobby.html?v=phase381') errors.push('release-canonical-lobby');
 if (release.forceUpdate !== false || release.showUpdatePrompt !== false || release.manualUpdateOnly !== true) errors.push('release-update-policy');
-if (release.releaseReady !== false || release.apkUrl !== '') errors.push('unverified-apk-exposed');
-if (release.apkVersionCode !== 1 || release.nextApkVersionCode !== 2) errors.push('apk-version-gate');
-if (Number(manifest.phase || 0) >= 356 && release.realDeviceValidation?.pending !== true) errors.push('real-device-validation-must-remain-pending');
+if (release.releaseReady !== true || !release.apkUrl) errors.push('verified-apk-not-exposed');
+if (release.apkVersionName !== '0.1.0-rc2' || release.apkVersionCode !== 2) errors.push('apk-version-gate');
+if (!release.tablePolicy?.lobbyBeforeSeating || !release.tablePolicy?.joinRequiredBeforeDeal) errors.push('release-lobby-join-policy');
 
 if (errors.length) {
   console.error(JSON.stringify({ pass: false, errors }, null, 2));
@@ -110,6 +120,7 @@ console.log(JSON.stringify({
   horizontalInput: 'direct',
   deviceAlignmentBeforeRecovery: true,
   zeroDeferredWork: true,
+  lobbyFirst: true,
   bankrollValidation: 'historical-policy-plus-actual-production-conservation',
-  apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, nextCode: release.nextApkVersionCode, releaseReady: release.releaseReady }
+  apk: { current: release.apkVersionName, currentCode: release.apkVersionCode, releaseReady: release.releaseReady }
 }, null, 2));
