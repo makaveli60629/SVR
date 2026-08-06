@@ -1,4 +1,4 @@
-name: Phase 389 Audit Check
+name: Phase 390 Table and Gameplay Audit Check
 
 on:
   pull_request:
@@ -16,24 +16,34 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
-      - name: Validate Phase 389 contracts
+      - name: Validate Phase 390 contracts
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK' index.html
-          grep -q 'PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK' game/index.html
+          grep -q 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK' index.html
+          grep -q 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK' game/index.html
+          grep -q 'phase390_quest_table_geometry_cards_spawn_authority' game/index.html
+          grep -q 'phase390_front_spawn_final_guard' game/index.html
           ! grep -q "^import './modules/phase388_front_south_seat_authority" game/index.html
-          grep -q 'phase389_runtime_health_visibility' game/index.html
-          grep -q 'PHASE-389-CAMERA3-LIVE-PREVIEW-ROUTE-LOCK' game/camera3-live.html
+          grep -q 'TARGET_RECESS_METERS = 0.165' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'PHASE390_RECESSED_BRANDED_PLAYING_SURFACE' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'phase388OverlayDetached' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'cardMeshesReady' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'ericUpDot' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'PHASE-390-FRONT-SPAWN-FINAL-GUARD-LOCK' game/modules/phase390_front_spawn_final_guard.js
+          grep -q 'fixedTableFront: true' game/modules/phase390_front_spawn_final_guard.js
+          grep -q 'PHASE-390-CAMERA3-FURNISHED-TABLE-CARDS-LOCK' game/camera3-live.html
           grep -q 'PHASE389_CAMERA3_PRODUCTION_LIGHTING' game/modules/phase389_camera3_live_preview.js
-          grep -q 'camera3-live.html?v=phase389' site/phase383-home-restore.js
-          grep -q 'PHASE-389-ANDROID-RESPONSIVE-TABLE-LAYOUT-LOCK' game/android-tabletop.html
-          grep -q 'PHASE-389-AVATAR-DRESSING-ROOM-VISIBLE-REFRESH-LOCK' site/avatar.html
-          grep -q 'PHASE-389-PROFILE-AVATAR-SHOWROOM-VISIBLE-REFRESH-LOCK' site/profile.html
-          grep -q 'phase389-full-audit-visible-fixes-v2' sw.js
-          grep -q 'phase389-full-audit-visible-fixes-v2' pwa-sw.js
-          grep -q '"phase": 389' game/manifest.json
-          grep -q '"camera3Url": "/game/camera3-live.html?v=phase389"' update/app-version.json
+          grep -q 'camera3-live.html?v=phase390' site/phase383-home-restore.js
+          grep -q 'PHASE-390-ANDROID-PLAYABLE-ROUTE-LOCK' game/android.html
+          grep -q 'PHASE-390-ANDROID-PLAYABLE-ROUTE-LOCK' game/android-tabletop.html
+          grep -q 'android-stable.html?v=phase390' game/android-tabletop.html
+          grep -q 'playableUiFound' game/android-tabletop.html
+          grep -q 'phase390-table-geometry-cards-spawn-v1' sw.js
+          grep -q 'phase390-table-geometry-cards-spawn-v1' pwa-sw.js
+          grep -q '"phase": 390' game/manifest.json
+          grep -q '"tablePlayingSurfaceRecessInches": 6.5' update/app-version.json
+          grep -q '"androidGameplayUrl": "/game/android-stable.html?v=phase390&direct=1"' update/app-version.json
           grep -q '"forceUpdate": false' update/app-version.json
           grep -q '"showUpdatePrompt": false' update/app-version.json
           test -s game/assets/models/table.glb
@@ -49,25 +59,26 @@ jobs:
           node --check game/modules/phase389_runtime_health_visibility.js
           node --check game/modules/phase389_camera3_live_preview.js
           node --check game/modules/phase389_android_responsive_layout.js
+          node --check game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          node --check game/modules/phase390_front_spawn_final_guard.js
           node --check sw.js
           node --check pwa-sw.js
-      - name: Verify protected release policy
+      - name: Verify protected release policy and secret scan
         shell: bash
         run: |
           set -euo pipefail
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
           grep -q '"apkVersionCode": 2' game/android-release.json
           grep -q '"nativeApkRebuild": false' game/android-release.json
-          PHASE389_FILES=(
+          PHASE390_FILES=(
             index.html site-public-hooks.js sw.js pwa-sw.js manifest.webmanifest update/app-version.json
-            game/index.html game/quest.html game/camera3-live.html game/android.html game/android-tabletop.html
-            game/manifest.json game/android-release.json
-            game/modules/phase389_runtime_health_visibility.js
-            game/modules/phase389_camera3_live_preview.js
-            game/modules/phase389_android_responsive_layout.js
-            game/styles/phase389_android_responsive_layout.css
+            game/index.html game/quest.html game/camera3-live.html game/camera3.html game/cam3.html game/preview.html
+            game/android.html game/android-tabletop.html game/manifest.json game/android-release.json
+            game/modules/phase389_runtime_health_visibility.js game/modules/phase389_camera3_live_preview.js
+            game/modules/phase389_android_responsive_layout.js game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+            game/modules/phase390_front_spawn_final_guard.js game/styles/phase389_android_responsive_layout.css
             site/avatar.html site/profile.html site/phase383-home-restore.js
             site/js/phase389-avatar-room.js site/js/phase389-profile-showroom.js
             site/css/phase389-avatar-profile-visible-refresh.css
           )
-          ! grep -Il -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' "${PHASE389_FILES[@]}" | grep -q .
+          ! grep -Il -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' "${PHASE390_FILES[@]}" | grep -q .
