@@ -8,121 +8,62 @@
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="manifest" href="./manifest.json?v=phase387">
+<link rel="manifest" href="./manifest.json?v=phase388">
 <style>html,body,#app{height:100%;margin:0;background:#000;color:#fff;overflow:hidden;font-family:system-ui,Arial,sans-serif;touch-action:none}canvas{display:block;width:100%;height:100%}#safeStage{position:fixed;inset:0;z-index:999999;display:grid;place-items:center;background:#000}.card{max-width:560px;margin:20px;padding:24px;border:1px solid #7ffcff;border-radius:20px;background:rgba(0,0,0,.88);text-align:center;box-shadow:0 0 40px rgba(127,252,255,.16)}button{padding:11px 16px;border:1px solid #ffd98a;border-radius:12px;background:#0a101a;color:#fff;font-weight:900}.boot-released #safeStage,.quest-direct #safeStage{display:none!important}</style>
-<script>(function(){const p=new URLSearchParams(location.search),ua=navigator.userAgent||'',path=location.pathname;const preview=self!==top||p.has('preview')||p.has('live')||p.get('cam')==='director';const quest=p.get('platform')==='quest'||/Quest|Oculus|Meta Quest/i.test(ua);if(p.get('direct')==='1')document.documentElement.classList.add('quest-direct');if(preview&&!/camera3\.html$/i.test(path)){location.replace(`./camera3.html${location.search||'?v=phase384'}`);return}if(quest&&!p.has('direct')&&!p.has('desktop')&&!p.has('standard')){location.replace(`/game/quest.html?v=phase387&t=${Date.now()}`);return}if(/Android/i.test(ua)&&!quest&&!p.has('desktop')&&!p.has('standard')){location.replace(`/game/android-tabletop.html?v=phase385&from=game-index&t=${Date.now()}`);return}})();</script>
+<script>(function(){const p=new URLSearchParams(location.search),ua=navigator.userAgent||'',path=location.pathname;const preview=self!==top||p.has('preview')||p.has('live')||p.get('cam')==='director';const quest=p.get('platform')==='quest'||/Quest|Oculus|Meta Quest/i.test(ua);if(p.get('direct')==='1')document.documentElement.classList.add('quest-direct');if(preview&&!/camera3\.html$/i.test(path)){location.replace(`./camera3.html${location.search||'?v=phase384'}`);return}if(quest&&!p.has('direct')&&!p.has('desktop')&&!p.has('standard')){location.replace(`/game/quest.html?v=phase388&t=${Date.now()}`);return}if(/Android/i.test(ua)&&!quest&&!p.has('desktop')&&!p.has('standard')){location.replace(`/game/android-tabletop.html?v=phase385&from=game-index&t=${Date.now()}`);return}})();</script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-380-GAME-SITE-INTEGRITY-LOCK" data-release="PHASE-380-GAME-SITE-INTEGRITY-LOCK" data-runtime-build="PHASE-387-QUEST-DIRECT-SEAT-RECOVERY-LOCK" data-predecessor-runtime="PHASE-386-QUEST-TABLE-ENVIRONMENT-AUTHORITY-LOCK" data-acceptance="PHASE-381-QUEST-FULL-GAME-RUNTIME-ACCEPTANCE-LOCK">
+<body data-build="PHASE-380-GAME-SITE-INTEGRITY-LOCK" data-release="PHASE-380-GAME-SITE-INTEGRITY-LOCK" data-runtime-build="PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK" data-predecessor-runtime="PHASE-387-QUEST-DIRECT-SEAT-RECOVERY-LOCK">
 <div id="app"></div>
-<div id="safeStage"><div class="card"><img src="/logo.png" alt="SVR Poker logo" style="width:82px;height:82px;object-fit:contain"><h1>SVR POKER</h1><p id="safeStatus">Loading the original table, direct seated position, professional lighting, and Eric dealer.</p><button id="startRuntimeBtn">RETRY GAME</button></div></div>
+<div id="safeStage"><div class="card"><img src="/logo.png" alt="SVR Poker logo" style="width:82px;height:82px;object-fit:contain"><h1>SVR POKER</h1><p id="safeStatus">Loading the close table seat, official logo felt, professional lighting, and upright Eric dealer.</p><button id="startRuntimeBtn">RETRY GAME</button></div></div>
 <pre id="log" hidden></pre><pre id="err" hidden></pre>
 <script type="module">
-import './modules/phase381_asset_load_cache_guard.js?v=phase387';
+import './modules/phase381_asset_load_cache_guard.js?v=phase388';
 import './modules/phase372_live_entry_recovery_lock.js?v=phase380';
 import './modules/phase364_device_xr_geometry_spawn_lock.js?v=phase380';
 import './modules/phase362_desktop_renderer_preboot_safety_lock.js?v=phase380';
-import './modules/phase380_original_table_authority_lock.js?v=phase387';
+import './modules/phase380_original_table_authority_lock.js?v=phase388';
 import './modules/phase379_quest_procedural_table_authority.js?v=phase380';
+import './modules/phase388_front_south_seat_authority.js?v=phase388';
+import './modules/phase388_table_material_visibility_guard.js?v=phase388';
 import {bootPlatform} from './modules/phase340_platform_core_loader.js?v=phase380';
-const PHASE381_SUCCESSOR_OF='PHASE-380-GAME-SITE-INTEGRITY-LOCK';
-const PHASE384_SUCCESSOR_OF='PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK';
-const PHASE386_SUCCESSOR_OF='PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK';
-const PHASE387_SUCCESSOR_OF='PHASE-386-QUEST-TABLE-ENVIRONMENT-AUTHORITY-LOCK';
+const PHASE388_SUCCESSOR_OF='PHASE-387-QUEST-DIRECT-SEAT-RECOVERY-LOCK';
 const routeParams=new URLSearchParams(location.search);
 const directQuest=routeParams.get('direct')==='1'||routeParams.get('autoseat')==='1'||routeParams.get('questfix')==='1';
 let started=false;
-let environmentPromise=null;
-const waitForApi=async(names,timeout=30000)=>{const start=performance.now();while(performance.now()-start<timeout){if(names.every(name=>typeof window[name]==='function'))return true;await new Promise(resolve=>setTimeout(resolve,100));}throw new Error(`PHASE387_API_TIMEOUT:${names.join(',')}`)};
-async function loadPhase387Environment(){
-  if(environmentPromise)return environmentPromise;
-  environmentPromise=(async()=>{
-    await import('./modules/phase381_vr_runtime_lock.js?v=phase387');
-    window.SVR_PHASE381_ALIGN_ERIC?.();
-    await import('./modules/phase384_quest_quickplay_polish.js?v=phase387');
-    window.SVR_PHASE384_QUEST_SWEEP?.();
-    window.dispatchEvent(new CustomEvent('svr:phase384-core-ready'));
-    await import('./modules/phase386_quest_table_environment_authority.js?v=phase387');
-    await import('./modules/phase386_planet_preservation_guard.js?v=phase387');
-    window.SVR_PHASE386_QUEST_SWEEP?.('phase387-environment-load');
-    window.SVR_PHASE386_PRESERVE_PLANETS?.();
-    window.dispatchEvent(new CustomEvent('svr:phase386-core-ready'));
-    await import('./modules/phase387_quest_direct_seat_recovery.js?v=phase387');
-    window.SVR_PHASE387_SWEEP?.('phase387-entry-load');
-    window.SVR_PHASE387_DIRECT_SEAT?.('phase387-entry-load');
-    window.SVR_PHASE387_ENSURE_ERIC?.();
-    window.dispatchEvent(new CustomEvent('svr:phase387-core-ready'));
-    return true;
-  })().catch(error=>{console.error(error);environmentPromise=null;throw error});
-  return environmentPromise;
-}
-function scheduleEnvironment(){
-  if(directQuest){void loadPhase387Environment();return;}
-  const run=()=>void loadPhase387Environment();
-  if('requestIdleCallback'in window)requestIdleCallback(run,{timeout:2600});else setTimeout(run,650);
-}
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function waitForPhase388(timeout=30000){const start=performance.now();while(performance.now()-start<timeout){if(window.SVR_PHASE388_STATE?.installed&&window.SVR_PHASE388_FRONT_SOUTH_STATE?.installed&&typeof window.SVR_PHASE388_DIRECT_SEAT==='function')return true;await wait(100)}throw new Error('PHASE388_AUTHORITY_TIMEOUT')}
 async function start(){if(started)return;started=true;const status=document.getElementById('safeStatus');try{
   if(directQuest){document.documentElement.classList.add('quest-direct');document.body.classList.add('boot-released');}
-  status.textContent='Loading the direct seated Quest table, lighting, Eric dealer, textured Moon, Earth, and Mars…';
+  status.textContent='Loading the close Quest table seat, official SVR logo, professional lighting, and upright Eric dealer…';
   await bootPlatform();
-  await import('./modules/phase380_quest_full_game_acceptance_lock.js?v=phase387');
-  window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('immediately-after-platform-boot');
-  window.SVR_PHASE379_FORCE_TABLE?.('immediately-after-platform-boot');
   await import('./modules/phase359_dual_platform_gameplay_continuity_lock.js?v=phase380');
   await import('./modules/phase360_fresh_shuffle_leave_reset_continuous_table_lock.js?v=phase380');
   await import('./modules/phase360_table_conservation_next_guard_lock.js?v=phase380');
-  await import('./modules/phase361_quest_lobby_play_seat_watch_npc_lock.js?v=phase387');
-  await import('./modules/phase373_quest_rig_preflight_lock.js?v=phase387');
-  await waitForApi(['SVR_PHASE373_RIG_PREFLIGHT_QA']);
-  await import('./modules/phase373_quest_seated_teleport_table_spawn_npc_lock.js?v=phase387');
-  await waitForApi(['SVR_PHASE373_QA','SVR_PHASE373_STABLE_LOBBY','SVR_PHASE373_STABLE_SEAT']);
-  await import('./modules/phase373_quest_npc_teleport_postflight_lock.js?v=phase387');
-  await import('./modules/phase373_quest_table_seat_finalizer_lock.js?v=phase387');
   await import('./modules/phase365_quest_vr_button_dedupe_lock.js?v=phase380');
-  const legacyAcceptance=routeParams.get('acceptance')==='1'&&routeParams.get('v')!=='phase364';
-  if(!legacyAcceptance){
-    await import('./modules/phase362_continuous_10000_turn_clock_rejoin_reset_lock.js?v=phase380');
-    await import('./modules/phase362_settlement_accounting_clear_lock.js?v=phase380');
-    if(!directQuest){
-      const isQuest=routeParams.get('platform')==='quest'||/Quest|Oculus|Meta Quest/i.test(navigator.userAgent||'');
-      if(isQuest&&!window.SVR_PHASE361_STATE?.seated)window.SVR_PHASE362_LEAVE_TABLE?.();
-    }
-  }
-  if(!directQuest&&window.SVR_PHASE373_STABLE_LOBBY){window.SVR_PHASE364_LOBBY_SPAWN=window.SVR_PHASE373_STABLE_LOBBY;window.SVR_PHASE361_LOBBY_SPAWN=window.SVR_PHASE373_STABLE_LOBBY;}
-  window.SVR_PHASE365_QUEST_VR_BUTTON_SWEEP?.();
-  window.SVR_PHASE373_REPAIR_TABLE?.();
-  window.SVR_PHASE373_REPAIR_NPCS?.();
-  window.SVR_PHASE373_POSTFLIGHT_REPAIR_NPCS?.();
-  if(directQuest){
-    window.SVR_PHASE361_PLAY_GAME?.();
-    window.SVR_PHASE373_STABLE_SEAT?.('phase387-direct-core-ready');
-  }else{
-    window.SVR_PHASE373_STABLE_LOBBY?.('phase387-lobby-core-ready');
-    window.SVR_PHASE373_POSTFLIGHT_RESTORE_TELEPORT?.('phase387-lobby-core-ready');
-  }
-  window.SVR_PHASE373_FINALIZE_TABLE?.('phase387-core-ready');
-  window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase387-core-ready');
-  window.SVR_PHASE379_FORCE_TABLE?.('phase387-core-ready');
+  window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase388-core-ready');
+  window.SVR_PHASE379_FORCE_TABLE?.('phase388-core-ready');
   document.body.classList.add('boot-released');
-  if(directQuest)await loadPhase387Environment();else scheduleEnvironment();
-  window.dispatchEvent(new CustomEvent('svr:phase379-core-ready'));
-  window.dispatchEvent(new CustomEvent('svr:phase380-core-ready'));
-  window.dispatchEvent(new CustomEvent('svr:phase381-core-ready'));
+  await import('./modules/phase388_quest_table_player_eric_authority.js?v=phase388');
+  await import('./modules/phase388_quest_view_dealer_guard.js?v=phase388');
+  await waitForPhase388();
+  window.SVR_PHASE388_TABLE_MATERIAL_SWEEP?.();
+  await window.SVR_PHASE388_SWEEP?.('phase388-exclusive-entry');
+  await window.SVR_PHASE388_ENSURE_ERIC?.();
+  window.SVR_PHASE388_VIEW_GUARD_SWEEP?.();
+  window.SVR_PHASE388_FRONT_SOUTH_SEAT?.('phase388-exclusive-entry',true);
+  window.dispatchEvent(new CustomEvent('svr:phase388-core-ready'));
 }catch(error){
   console.error(error);
-  status.textContent='Recovery mode is retrying the direct seated table and Eric dealer.';
-  window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase387-boot-error');
-  window.SVR_PHASE379_FORCE_TABLE?.('phase387-boot-error');
-  setTimeout(()=>{window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase387-boot-error-delayed');window.SVR_PHASE379_FORCE_TABLE?.('phase387-boot-error-delayed');document.body.classList.add('boot-released');void loadPhase387Environment();},900);
+  status.textContent='Recovery mode is retrying the close table seat, official logo, lighting, and upright Eric dealer.';
+  window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase388-boot-error');
+  window.SVR_PHASE379_FORCE_TABLE?.('phase388-boot-error');
+  setTimeout(async()=>{document.body.classList.add('boot-released');try{await import('./modules/phase388_quest_table_player_eric_authority.js?v=phase388');await import('./modules/phase388_quest_view_dealer_guard.js?v=phase388');window.SVR_PHASE388_TABLE_MATERIAL_SWEEP?.();await window.SVR_PHASE388_SWEEP?.('phase388-error-retry');window.SVR_PHASE388_FRONT_SOUTH_SEAT?.('phase388-error-retry',true)}catch(e){console.error(e)}},700);
   started=false;
 }}
 document.getElementById('startRuntimeBtn')?.addEventListener('click',start);
-setTimeout(start,directQuest?80:400);
-window.SVR_PHASE387_BOOT_QA=()=>({build:'PHASE-387-QUEST-DIRECT-SEAT-RECOVERY-LOCK',predecessor:'PHASE-386-QUEST-TABLE-ENVIRONMENT-AUTHORITY-LOCK',started,directQuest,assetCache:window.SVR_PHASE381_ASSET_CACHE_QA?.()||null,originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.()||null,fallbackTable:window.SVR_PHASE379_TABLE_QA?.()||null,runtime381:window.SVR_PHASE381_QA?.()||null,runtime384:window.SVR_PHASE384_QUEST_QA?.()||null,runtime386:window.SVR_PHASE386_QA?.()||null,runtime387:window.SVR_PHASE387_QA?.()||null,planets386:window.SVR_PHASE386_PLANET_QA?.()||null,acceptance:window.SVR_PHASE380_QUEST_ACCEPTANCE_QA?.()||null,checkedAt:new Date().toISOString()});
-window.SVR_PHASE386_BOOT_QA=window.SVR_PHASE387_BOOT_QA;
-window.SVR_PHASE384_BOOT_QA=window.SVR_PHASE387_BOOT_QA;
-window.SVR_PHASE381_BOOT_QA=window.SVR_PHASE387_BOOT_QA;
-window.SVR_PHASE380_BOOT_QA=window.SVR_PHASE387_BOOT_QA;
+setTimeout(start,directQuest?20:300);
+window.SVR_PHASE388_BOOT_QA=()=>({build:'PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK',predecessor:PHASE388_SUCCESSOR_OF,started,directQuest,platform:window.SVR_PHASE340_PLATFORM_STATE||null,originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.()||null,tableMaterials:window.SVR_PHASE388_TABLE_MATERIAL_QA?.()||null,runtime388:window.SVR_PHASE388_QA?.()||null,frontSouth:window.SVR_PHASE388_FRONT_SOUTH_QA?.()||null,viewGuard:window.SVR_PHASE388_VIEW_GUARD_QA?.()||null,checkedAt:new Date().toISOString()});
 </script>
 </body>
 </html>
