@@ -1,0 +1,97 @@
+{
+  "build": "PHASE-387-QUEST-DIRECT-SEAT-RECOVERY-LOCK",
+  "scope": "quest-oculus-direct-entry-seat-and-eric-recovery",
+  "branch": "agent/phase387-quest-direct-seat-recovery",
+  "rootCauses": [
+    "public Quest launch remained versioned to phase384",
+    "site-public-hooks cache epoch and link normalizer remained phase384",
+    "phase386 placement used a phase373-guarded rig transform",
+    "phase373 XR session-start handler could restore the far lobby position"
+  ],
+  "routes": {
+    "canonicalQuestEntry": "/game/quest.html?v=phase387",
+    "directQuestRuntime": "/game/index.html?platform=quest&v=phase387&direct=1&autoseat=1&questfix=1&clean=1",
+    "android": "/game/android.html?channel=stable&v=phase385",
+    "site": "/site/index.html?v=phase384"
+  },
+  "cacheRecovery": {
+    "uniqueQuestFilename": true,
+    "unregisterServiceWorkers": true,
+    "deleteBrowserCaches": true,
+    "cacheEpoch": "phase387-quest-direct-seat-recovery",
+    "timestampedRuntimeNavigation": true,
+    "phase387ServiceWorkerNetworkOnlyRoutes": true
+  },
+  "player": {
+    "autoStart": true,
+    "startScreenHidden": true,
+    "autoJoinTable": true,
+    "autoSeated": true,
+    "frontGapMeters": 0.48,
+    "eyeHeightCalibratedToTable": true,
+    "usesPhase373OriginalRigMethods": true,
+    "directPositionFallback": true,
+    "xrSessionReseatBursts": true,
+    "continuousAnchorCorrection": true,
+    "lobbySpawnApisBlockedInDirectMode": true
+  },
+  "movement": {
+    "locomotionDisabled": true,
+    "stickMovementDisabled": true,
+    "tableTravelDisabled": true,
+    "teleportDisabled": true,
+    "handTeleportDisabled": true,
+    "gripTeleportDisabled": true,
+    "watchTeleportDisabled": true,
+    "pointerRayDisabled": true,
+    "handRayDisabled": true,
+    "teleportVisualsHidden": true
+  },
+  "eric": {
+    "asset": "/game/assets/models/eric/eric.fbx",
+    "validApprovedRootRequiresMeshes": true,
+    "independentFallbackLoader": true,
+    "targetHeightMeters": 1.78,
+    "dealerSidePlacement": true,
+    "sourceMapsPreserved": true,
+    "fallbackTextureClasses": ["skin", "hair", "shirt", "suit", "pants", "shoes"],
+    "singleTextureApplication": true,
+    "duplicateRootsHidden": true,
+    "externalSkeletonHelpersHidden": true,
+    "alignmentThrottledForQuest": true,
+    "phase381DealerMotionPreserved": true
+  },
+  "environment": {
+    "originalTableAuthorityPreserved": true,
+    "phase386LightingPreserved": true,
+    "phase386TableMaterialsPreserved": true,
+    "svrFeltLogoPreserved": true,
+    "headsetOverlayCleanupPreserved": true,
+    "texturedMoonPreserved": true,
+    "earthPreserved": true,
+    "marsPreserved": true
+  },
+  "protected": {
+    "websiteContentBuild": "PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK",
+    "androidPresentationBuild": "PHASE-385-ANDROID-ORIGINAL-TABLETOP-GYRO-UI-LOCK",
+    "pokerEngineBuild": "PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK",
+    "apkVersionName": "0.1.0-rc2",
+    "apkVersionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false
+  },
+  "files": [
+    "game/quest.html",
+    "game/index.html",
+    "game/modules/phase387_quest_direct_seat_recovery.js",
+    "game/manifest.json",
+    "index.html",
+    "site-public-hooks.js",
+    "manifest.webmanifest",
+    "sw.js",
+    "pwa-sw.js",
+    ".github/workflows/deploy.yml",
+    "docs/PHASE_387_QUEST_DIRECT_SEAT_RECOVERY.md",
+    "docs/PHASE_387_QUEST_DIRECT_SEAT_RECOVERY_MANIFEST.json"
+  ]
+}
