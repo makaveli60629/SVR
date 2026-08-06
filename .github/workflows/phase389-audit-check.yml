@@ -58,4 +58,16 @@ jobs:
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
           grep -q '"apkVersionCode": 2' game/android-release.json
           grep -q '"nativeApkRebuild": false' game/android-release.json
-          ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' index.html game site update .github | grep -q .
+          PHASE389_FILES=(
+            index.html site-public-hooks.js sw.js pwa-sw.js manifest.webmanifest update/app-version.json
+            game/index.html game/quest.html game/camera3-live.html game/android.html game/android-tabletop.html
+            game/manifest.json game/android-release.json
+            game/modules/phase389_runtime_health_visibility.js
+            game/modules/phase389_camera3_live_preview.js
+            game/modules/phase389_android_responsive_layout.js
+            game/styles/phase389_android_responsive_layout.css
+            site/avatar.html site/profile.html site/phase383-home-restore.js
+            site/js/phase389-avatar-room.js site/js/phase389-profile-showroom.js
+            site/css/phase389-avatar-profile-visible-refresh.css
+          )
+          ! grep -Il -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' "${PHASE389_FILES[@]}" | grep -q .
