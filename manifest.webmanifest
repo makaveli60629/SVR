@@ -1,10 +1,10 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "SVR Poker Phase 390 with corrected recessed table geometry, restored cards, upright Eric, fixed-front Quest spawn, furnished Camera 3, and playable Android browser routes.",
-  "id": "/?source=pwa-phase390",
-  "predecessor_id": "pwa-phase389",
-  "start_url": "/?source=pwa-phase390&v=phase390",
+  "description": "SVR Poker Phase 391 with one original table authority, a recessed playing surface, restored cards, upright Eric, fixed-front Quest spawn, production Camera 3, and playable Android browser routes.",
+  "id": "/?source=pwa-phase391",
+  "predecessor_id": "pwa-phase390",
+  "start_url": "/?source=pwa-phase391&v=phase391",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -19,12 +19,12 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {"name": "Camera 3 Furnished Table Feed", "short_name": "CAM 3", "description": "Open the corrected recessed table, restored cards, Eric dealer, and production lighting.", "url": "/game/camera3-live.html?v=phase390", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Play Android Poker", "short_name": "Android", "description": "Open JOIN NOW, five bots, cards, pot chips, and poker actions in the Phase 390 responsive browser game.", "url": "/game/android.html?channel=stable&v=phase390", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Android Direct Gameplay", "short_name": "Direct Game", "description": "Open the direct playable Android fallback route.", "url": "/game/android-stable.html?v=phase390&direct=1", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Camera 3 Production Feed", "short_name": "CAM 3", "description": "Open the single original table, recessed felt, restored cards, upright Eric, and production lighting.", "url": "/game/camera3-live.html?v=phase391", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Play Android Poker", "short_name": "Android", "description": "Open JOIN NOW, five bots, cards, pot chips, poker actions, and responsive layouts.", "url": "/game/android.html?channel=stable&v=phase391", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Android Direct Gameplay", "short_name": "Direct Game", "description": "Open the direct playable Android fallback route.", "url": "/game/android-stable.html?v=phase391&direct=1", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Avatar Dressing Room", "short_name": "Avatar", "description": "Open the Phase 389 live avatar dressing room.", "url": "/site/avatar.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Player Profile Demo", "short_name": "Profile", "description": "Open the Phase 389 saved-avatar profile showroom.", "url": "/site/profile.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Launch Quest / VR", "short_name": "Quest VR", "description": "Clear stale caches and open the Phase 390 corrected table, cards, upright Eric, and fixed-front spawn.", "url": "/game/quest.html?v=phase390", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Open the current APK download and verified release status page.", "url": "/downloads/?v=phase390", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
+    {"name": "Launch Quest / VR", "short_name": "Quest VR", "description": "Clear stale caches and open the Phase 391 consolidated Quest poker runtime.", "url": "/game/quest.html?v=phase391", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Open the current APK download and verified release status page.", "url": "/downloads/?v=phase391", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }
