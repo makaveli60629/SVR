@@ -2,10 +2,11 @@
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages';
   const CACHE_EPOCH_KEY = 'svr_public_cache_epoch';
-  const CACHE_EPOCH = 'phase389-full-audit-visible-fixes';
-  const CURRENT_PHASE = 'phase389';
-  const SITE_PHASE = 'phase389';
-  const ANDROID_PHASE = 'phase389';
+  const CACHE_EPOCH = 'phase390-table-geometry-cards-spawn';
+  const CURRENT_PHASE = 'phase390';
+  const SITE_PHASE = 'phase390';
+  const AVATAR_PHASE = 'phase389';
+  const ANDROID_PHASE = 'phase390';
 
   async function refreshRuntimeCaches() {
     try {
@@ -23,7 +24,7 @@
       }
       if ('serviceWorker' in navigator) await navigator.serviceWorker.register(`/sw.js?v=${CURRENT_PHASE}`, { scope: '/' });
     } catch (error) {
-      console.warn('SVR Phase 389 cache recovery could not complete.', error);
+      console.warn('SVR Phase 390 cache recovery could not complete.', error);
     }
   }
 
@@ -51,8 +52,8 @@
     if (document.getElementById('svr-phase-live-badge')) return;
     const badge = document.createElement('div');
     badge.id = 'svr-phase-live-badge';
-    badge.textContent = '● PHASE 389 VISIBLE FIXES';
-    badge.setAttribute('aria-label', 'SVR Poker Phase 389 game, avatar, profile and Android visible fixes');
+    badge.textContent = '● PHASE 390 TABLE + GAMEPLAY FIXES';
+    badge.setAttribute('aria-label', 'SVR Poker Phase 390 table geometry, cards, Eric, spawn, Camera 3 and Android gameplay corrections');
     Object.assign(badge.style, {
       position: 'fixed', top: '12px', right: '12px', zIndex: '2147483647',
       padding: '7px 11px', border: '1px solid #8dffb4', borderRadius: '999px',
@@ -70,9 +71,19 @@
       try { url = new URL(anchor.getAttribute('href'), window.location.href); } catch { return; }
       if (url.origin !== window.location.origin) return;
       if (/\/game\/(?:android|android-play|android-stable|android-tabletop)\.html$/i.test(url.pathname)) {
-        url.pathname = '/game/android-tabletop.html';
+        url.pathname = '/game/android.html';
         url.search = '';
+        url.searchParams.set('channel', 'stable');
         url.searchParams.set('v', ANDROID_PHASE);
+        url.searchParams.set('source', 'public-link');
+        anchor.href = url.pathname + '?' + url.searchParams.toString();
+        return;
+      }
+      if (/\/game\/(?:camera3-live|camera3|cam3|preview)\.html$/i.test(url.pathname) || url.searchParams.get('cam') === 'director') {
+        url.pathname = '/game/camera3-live.html';
+        url.search = '';
+        url.searchParams.set('v', CURRENT_PHASE);
+        url.searchParams.set('autocam', '1');
         url.searchParams.set('source', 'public-link');
         anchor.href = url.pathname + '?' + url.searchParams.toString();
         return;
@@ -86,14 +97,14 @@
         return;
       }
       if (/\/site\/(?:avatar|profile)\.html$/i.test(url.pathname)) {
-        url.searchParams.set('v', CURRENT_PHASE);
+        url.searchParams.set('v', AVATAR_PHASE);
         url.searchParams.set('deploy', CURRENT_PHASE);
         anchor.href = url.pathname + '?' + url.searchParams.toString() + url.hash;
         return;
       }
       if (/\/site\/[^/]+\.html$/i.test(url.pathname)) {
         url.searchParams.set('v', SITE_PHASE);
-        url.searchParams.set('deploy', SITE_PHASE);
+        url.searchParams.set('deploy', CURRENT_PHASE);
         anchor.href = url.pathname + '?' + url.searchParams.toString() + url.hash;
       }
     });
