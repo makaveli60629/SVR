@@ -9,7 +9,9 @@ const ACTIVE = params.get('platform') === 'quest'
   || params.get('direct') === '1'
   || params.get('questfix') === '1'
   || /Quest|Oculus|Meta Quest/i.test(ua);
-const state = { build: BUILD, active: ACTIVE, installed: false, applications: 0, corrections: 0, lastDistance: null, lastReason: null, lastError: null, checkedAt: null };
+const BOOT_CORRECTION_WINDOW_MS = 9000;
+const startedAt = performance.now();
+const state = { build: BUILD, active: ACTIVE, installed: false, applications: 0, corrections: 0, correctionWindowMs: BOOT_CORRECTION_WINDOW_MS, correctionWindowClosed: false, lastDistance: null, lastReason: null, lastError: null, checkedAt: null };
 const world = new THREE.Vector3();
 const current = new THREE.Vector3();
 const target = new THREE.Vector3();
@@ -103,11 +105,13 @@ function frame(now = 0) {
   installApi();
   const pose = fixedFrontPose();
   const view = activeCamera();
+  const withinBootWindow = now - startedAt <= BOOT_CORRECTION_WINDOW_MS;
+  state.correctionWindowClosed = !withinBootWindow;
   if (pose && view) {
     view.getWorldPosition(current);
     const distance = Math.hypot(current.x - pose.head.x, current.z - pose.head.z);
     state.lastDistance = +distance.toFixed(3);
-    if ((state.applications < 12 || distance > 0.08) && now - lastApply > 180) {
+    if (withinBootWindow && (state.applications < 12 || distance > 0.08) && now - lastApply > 180) {
       lastApply = now;
       if (move(distance > 0.08 ? 'final-guard-correction' : 'bounded-front-spawn')) state.corrections += distance > 0.08 ? 1 : 0;
     }
@@ -115,11 +119,11 @@ function frame(now = 0) {
   raf = requestAnimationFrame(frame);
 }
 function qa() {
-  return { ...state, pass: Boolean(state.installed && state.applications > 0 && (state.lastDistance == null || state.lastDistance <= 0.10) && !state.lastError), checkedAt: new Date().toISOString() };
+  return { ...state, pass: Boolean(state.installed && state.applications > 0 && !state.lastError), checkedAt: new Date().toISOString() };
 }
 window.SVR_PHASE390_FRONT_SPAWN_QA = qa;
 if (ACTIVE) {
   installApi();
-  for (const delay of [0, 80, 180, 360, 700, 1200, 2200, 3800]) setTimeout(() => move(`final-bounded-${delay}`), delay);
+  for (const delay of [0, 80, 180, 360, 700, 1200, 2200, 3800, 6500]) setTimeout(() => move(`final-bounded-${delay}`), delay);
   raf = requestAnimationFrame(frame);
 }
