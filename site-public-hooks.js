@@ -2,8 +2,10 @@
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages';
   const CACHE_EPOCH_KEY = 'svr_public_cache_epoch';
-  const CACHE_EPOCH = 'phase384-eric-quest-android-polish';
-  const CURRENT_PHASE = 'phase384';
+  const CACHE_EPOCH = 'phase387-quest-direct-seat-recovery';
+  const CURRENT_PHASE = 'phase387';
+  const SITE_PHASE = 'phase384';
+  const ANDROID_PHASE = 'phase385';
 
   async function refreshRuntimeCaches() {
     try {
@@ -23,7 +25,7 @@
         await navigator.serviceWorker.register(`/sw.js?v=${CURRENT_PHASE}`, { scope: '/' });
       }
     } catch (error) {
-      console.warn('SVR Phase 384 cache recovery could not complete.', error);
+      console.warn('SVR Phase 387 cache recovery could not complete.', error);
     }
   }
 
@@ -51,8 +53,8 @@
     if (document.getElementById('svr-phase-live-badge')) return;
     const badge = document.createElement('div');
     badge.id = 'svr-phase-live-badge';
-    badge.textContent = '● PHASE 384 GAME POLISH';
-    badge.setAttribute('aria-label', 'SVR Poker Phase 384 Eric, Quest and Android polish');
+    badge.textContent = '● PHASE 387 QUEST RECOVERY';
+    badge.setAttribute('aria-label', 'SVR Poker Phase 387 direct Quest table seat recovery');
     Object.assign(badge.style, {
       position: 'fixed',
       top: '12px',
@@ -78,29 +80,29 @@
       if (url.origin !== window.location.origin) return;
 
       if (/\/game\/(?:android|android-play)\.html$/i.test(url.pathname)) {
-        url.pathname = '/game/android-stable.html';
+        url.pathname = '/game/android-tabletop.html';
         url.searchParams.delete('channel');
-        url.searchParams.set('v', 'phase380');
-        url.searchParams.set('deploy', CURRENT_PHASE);
+        url.searchParams.set('v', ANDROID_PHASE);
         anchor.href = url.pathname + '?' + url.searchParams.toString();
         return;
       }
       if (/\/game\/android-stable\.html$/i.test(url.pathname)) {
         url.searchParams.set('v', 'phase380');
-        url.searchParams.set('deploy', CURRENT_PHASE);
+        url.searchParams.set('deploy', ANDROID_PHASE);
         anchor.href = url.pathname + '?' + url.searchParams.toString();
         return;
       }
-      if (/\/game\/index\.html$/i.test(url.pathname)) {
-        url.searchParams.set('platform', url.searchParams.get('platform') || 'quest');
+      if (/\/game\/(?:index|quest)\.html$/i.test(url.pathname)) {
+        url.pathname = '/game/quest.html';
+        url.search = '';
         url.searchParams.set('v', CURRENT_PHASE);
-        url.searchParams.set('deploy', CURRENT_PHASE);
+        url.searchParams.set('source', 'public-link');
         anchor.href = url.pathname + '?' + url.searchParams.toString();
         return;
       }
       if (/\/site\/[^/]+\.html$/i.test(url.pathname)) {
-        url.searchParams.set('v', CURRENT_PHASE);
-        url.searchParams.set('deploy', CURRENT_PHASE);
+        url.searchParams.set('v', SITE_PHASE);
+        url.searchParams.set('deploy', SITE_PHASE);
         anchor.href = url.pathname + '?' + url.searchParams.toString() + url.hash;
       }
     });
