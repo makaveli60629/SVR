@@ -1,10 +1,10 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "SVR Poker Phase 389 with consolidated Quest runtime, live Camera 3 table feed, visible avatar and profile refresh, and responsive Android tabletop.",
-  "id": "/?source=pwa-phase389",
-  "predecessor_id": "pwa-phase388",
-  "start_url": "/?source=pwa-phase389&v=phase389",
+  "description": "SVR Poker Phase 390 with corrected recessed table geometry, restored cards, upright Eric, fixed-front Quest spawn, furnished Camera 3, and playable Android browser routes.",
+  "id": "/?source=pwa-phase390",
+  "predecessor_id": "pwa-phase389",
+  "start_url": "/?source=pwa-phase390&v=phase390",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -19,11 +19,12 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {"name": "Camera 3 Live Table Feed", "short_name": "CAM 3", "description": "Open the Phase 389 dedicated live table preview with production lighting.", "url": "/game/camera3-live.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Play Android — Responsive Table", "short_name": "Android", "description": "Open the Phase 389 responsive portrait and landscape tabletop.", "url": "/game/android.html?channel=stable&v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Camera 3 Furnished Table Feed", "short_name": "CAM 3", "description": "Open the corrected recessed table, restored cards, Eric dealer, and production lighting.", "url": "/game/camera3-live.html?v=phase390", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Play Android Poker", "short_name": "Android", "description": "Open JOIN NOW, five bots, cards, pot chips, and poker actions in the Phase 390 responsive browser game.", "url": "/game/android.html?channel=stable&v=phase390", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Android Direct Gameplay", "short_name": "Direct Game", "description": "Open the direct playable Android fallback route.", "url": "/game/android-stable.html?v=phase390&direct=1", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Avatar Dressing Room", "short_name": "Avatar", "description": "Open the Phase 389 live avatar dressing room.", "url": "/site/avatar.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Player Profile Demo", "short_name": "Profile", "description": "Open the Phase 389 saved-avatar profile showroom.", "url": "/site/profile.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Launch Quest / VR", "short_name": "Quest VR", "description": "Clear stale Oculus caches and open the Phase 389 single-authority table runtime.", "url": "/game/quest.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Open the current APK download and verified release status page.", "url": "/downloads/?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
+    {"name": "Launch Quest / VR", "short_name": "Quest VR", "description": "Clear stale caches and open the Phase 390 corrected table, cards, upright Eric, and fixed-front spawn.", "url": "/game/quest.html?v=phase390", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Open the current APK download and verified release status page.", "url": "/downloads/?v=phase390", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }
