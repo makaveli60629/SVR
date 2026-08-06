@@ -34,7 +34,7 @@ const directQuest=routeParams.get('direct')==='1'||routeParams.get('autoseat')==
 let started=false;
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function waitForAuthority(timeout=30000){const start=performance.now();while(performance.now()-start<timeout){if(window.SVR_PHASE388_STATE?.installed&&typeof window.SVR_PHASE388_DIRECT_SEAT==='function')return true;await wait(100)}throw new Error('PHASE390_AUTHORITY_TIMEOUT')}
-async function loadPhase390(){await import('./modules/phase390_quest_table_geometry_cards_spawn_authority.js?v=phase390');await import('./modules/phase390_front_spawn_final_guard.js?v=phase390')}
+async function loadPhase390(){await import('./modules/phase390_quest_table_geometry_cards_spawn_authority.js?v=phase390');await import('./modules/phase390_surface_cards_final_guard.js?v=phase390');await import('./modules/phase390_front_spawn_final_guard.js?v=phase390')}
 async function start(){if(started)return;started=true;const status=document.getElementById('safeStatus');try{
  if(directQuest){document.documentElement.classList.add('quest-direct');document.body.classList.add('boot-released')}
  status.textContent='Loading the original table, six-inch recessed playing surface, visible card layers, direct front seat, and upright Eric dealer…';
@@ -55,17 +55,18 @@ async function start(){if(started)return;started=true;const status=document.getE
  await window.SVR_PHASE388_ENSURE_ERIC?.();
  window.SVR_PHASE388_VIEW_GUARD_SWEEP?.();
  await window.SVR_PHASE390_SWEEP?.('phase390-consolidated-entry');
+ await window.SVR_PHASE390_SURFACE_CARDS_SWEEP?.('phase390-consolidated-entry');
  window.SVR_PHASE390_DIRECT_FRONT_SEAT?.('phase390-consolidated-entry');
  window.SVR_PHASE389_RUNTIME_SWEEP?.();
  window.dispatchEvent(new CustomEvent('svr:phase390-core-ready'));
 }catch(error){
  console.error(error);status.textContent='Recovery mode is restoring the recessed table surface, cards, Eric, and direct front seat.';
  window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase390-boot-error');window.SVR_PHASE379_FORCE_TABLE?.('phase390-boot-error');
- setTimeout(async()=>{document.body.classList.add('boot-released');try{await import('./modules/phase388_quest_table_player_eric_authority.js?v=phase390');await import('./modules/phase388_quest_view_dealer_guard.js?v=phase390');await loadPhase390();window.SVR_PHASE388_TABLE_MATERIAL_SWEEP?.();await window.SVR_PHASE388_SWEEP?.('phase390-error-retry');await window.SVR_PHASE390_SWEEP?.('phase390-error-retry');window.SVR_PHASE390_DIRECT_FRONT_SEAT?.('phase390-error-retry');window.SVR_PHASE389_RUNTIME_SWEEP?.()}catch(e){console.error(e)}},700);started=false;
+ setTimeout(async()=>{document.body.classList.add('boot-released');try{await import('./modules/phase388_quest_table_player_eric_authority.js?v=phase390');await import('./modules/phase388_quest_view_dealer_guard.js?v=phase390');await loadPhase390();window.SVR_PHASE388_TABLE_MATERIAL_SWEEP?.();await window.SVR_PHASE388_SWEEP?.('phase390-error-retry');await window.SVR_PHASE390_SWEEP?.('phase390-error-retry');await window.SVR_PHASE390_SURFACE_CARDS_SWEEP?.('phase390-error-retry');window.SVR_PHASE390_DIRECT_FRONT_SEAT?.('phase390-error-retry');window.SVR_PHASE389_RUNTIME_SWEEP?.()}catch(e){console.error(e)}},700);started=false;
 }}
 document.getElementById('startRuntimeBtn')?.addEventListener('click',start);
 setTimeout(start,directQuest?20:300);
-window.SVR_PHASE390_BOOT_QA=()=>({build:BUILD,predecessor:PREDECESSOR,started,directQuest,platform:window.SVR_PHASE340_PLATFORM_STATE||null,originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.()||null,tableMaterials:window.SVR_PHASE388_TABLE_MATERIAL_QA?.()||null,runtime388:window.SVR_PHASE388_QA?.()||null,runtime389:window.SVR_PHASE389_RUNTIME_QA?.()||null,runtime390:window.SVR_PHASE390_QA?.()||null,frontSpawn:window.SVR_PHASE390_FRONT_SPAWN_QA?.()||null,viewGuard:window.SVR_PHASE388_VIEW_GUARD_QA?.()||null,checkedAt:new Date().toISOString()});
+window.SVR_PHASE390_BOOT_QA=()=>({build:BUILD,predecessor:PREDECESSOR,started,directQuest,platform:window.SVR_PHASE340_PLATFORM_STATE||null,originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.()||null,tableMaterials:window.SVR_PHASE388_TABLE_MATERIAL_QA?.()||null,runtime388:window.SVR_PHASE388_QA?.()||null,runtime389:window.SVR_PHASE389_RUNTIME_QA?.()||null,runtime390:window.SVR_PHASE390_QA?.()||null,surfaceCards:window.SVR_PHASE390_SURFACE_CARDS_QA?.()||null,frontSpawn:window.SVR_PHASE390_FRONT_SPAWN_QA?.()||null,viewGuard:window.SVR_PHASE388_VIEW_GUARD_QA?.()||null,checkedAt:new Date().toISOString()});
 </script>
 </body>
 </html>
