@@ -7,13 +7,28 @@ const state = {
   sweeps: 0,
   authoritativeMoonVisible: false,
   oldMoonsHidden: 0,
+  planetGroupsRenamed: 0,
   earthPreserved: false,
   marsPreserved: false,
   checkedAt: null
 };
 
 let frameHandle = 0;
-let lastSweep = 0;
+
+function preserveGroup(value) {
+  if (!value?.group) return;
+  value.group.visible = true;
+  const currentName = String(value.group.name || '');
+  if (/moon/i.test(currentName)) {
+    value.group.userData = {
+      ...(value.group.userData || {}),
+      svrPhase386OriginalPlanetGroupName: value.group.userData?.svrPhase386OriginalPlanetGroupName || currentName,
+      svrPhase386EarthMarsPreserved: true
+    };
+    value.group.name = currentName.replace(/moon/ig, 'LUNAR-SLOT').replace(/\s+/g, ' ').trim();
+    state.planetGroupsRenamed += 1;
+  }
+}
 
 function preservePlanets() {
   const scene = window.__SVR_SCENE__;
@@ -32,7 +47,7 @@ function preservePlanets() {
   ].filter(Boolean);
   let hidden = 0;
   for (const value of planetStates) {
-    if (value.group) value.group.visible = true;
+    preserveGroup(value);
     if (value.earth) {
       value.earth.visible = true;
       state.earthPreserved = true;
@@ -52,11 +67,8 @@ function preservePlanets() {
   return true;
 }
 
-function tick(time = 0) {
-  if (time - lastSweep > 120) {
-    lastSweep = time;
-    preservePlanets();
-  }
+function tick() {
+  preservePlanets();
   frameHandle = requestAnimationFrame(tick);
 }
 
