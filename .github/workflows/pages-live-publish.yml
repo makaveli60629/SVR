@@ -32,20 +32,22 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 384 production payload
+      - name: Verify Phase 388 production payload
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'SVR Poker | Public Launch Page' index.html
-          grep -q 'PHASE-384-ERIC-QUEST-ANDROID-POLISH-LOCK' index.html
-          grep -q 'site-public-hooks.js?v=phase384' index.html
+          grep -q 'PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK' index.html
+          grep -q 'site-public-hooks.js?v=phase388' index.html
+          grep -q 'game/quest.html?v=phase388' index.html
           grep -q 'site/index.html?v=phase384' index.html
           grep -q 'Preview Site' index.html
           grep -q 'Preview Game' index.html
           test -s launch.css
           test -s matrix.js
           test -s site-public-hooks.js
-          test -s logo.webp
+          test -s logo.png
+          grep -q 'phase388-quest-table-player-eric' site-public-hooks.js
           grep -q 'PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK' site/index.html
           grep -q 'Explore SVR Poker' site/index.html
           grep -q 'SVR Store' site/index.html
@@ -55,33 +57,43 @@ jobs:
           test -s site/phase383-home-restore.js
           test -f site/profile.html
           test -f site/avatar.html
-          test -s site/js/phase384-avatar-site-lock.js
-          grep -q 'PHASE-384-ERIC-DEFAULT-AVATAR-SITE-LOCK' site/js/phase384-avatar-site-lock.js
-          grep -q 'PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK' game/index.html
-          grep -q 'phase381_vr_runtime_lock' game/index.html
-          grep -q 'phase384_quest_quickplay_polish' game/index.html
-          grep -q 'PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK' game/modules/phase384_quest_quickplay_polish.js
-          grep -q 'PHASE384_SVR_TABLE_LOGO' game/modules/phase384_quest_quickplay_polish.js
+          test -s site/js/phase388-eric-upright-material-lock.js
+          grep -q 'phase388-eric-upright-material-lock' site/js/phase346-avatar-room.js
+          grep -q 'PHASE-388-ERIC-UPRIGHT-MATERIAL-LOCK' site/js/phase388-eric-upright-material-lock.js
+          grep -q 'PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK' game/index.html
+          grep -q 'phase388_front_south_seat_authority' game/index.html
+          grep -q 'phase388_quest_table_player_eric_authority' game/index.html
+          grep -q 'phase388_quest_view_dealer_guard' game/index.html
+          ! grep -q "await import('./modules/phase381_vr_runtime_lock" game/index.html
+          ! grep -q "await import('./modules/phase384_quest_quickplay_polish" game/index.html
+          ! grep -q "await import('./modules/phase386_quest_table_environment_authority" game/index.html
+          ! grep -q "await import('./modules/phase387_quest_direct_seat_recovery" game/index.html
+          test -s game/quest.html
+          test -s game/modules/phase388_front_south_seat_authority.js
+          test -s game/modules/phase388_quest_table_player_eric_authority.js
+          test -s game/modules/phase388_quest_view_dealer_guard.js
+          grep -q 'GAP=.12' game/modules/phase388_front_south_seat_authority.js
+          grep -q 'PHASE388_OFFICIAL_SITE_LOGO_FELT' game/modules/phase388_quest_table_player_eric_authority.js
+          grep -q 'PHASE388_QUEST_PROFESSIONAL_LIGHTS' game/modules/phase388_quest_table_player_eric_authority.js
+          grep -q 'svrPhase388HeadOverlayRemoved' game/modules/phase388_quest_view_dealer_guard.js
           grep -q 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' game/android-stable.html
-          grep -q 'PHASE-384-ANDROID-ONE-PAGE-3D-CHIP-WINNER-LOCK' game/android-stable.html
-          grep -q 'onePageFit:true' game/android-stable.html
-          grep -q 'cardBackLogo:true' game/android-stable.html
-          grep -q 'singleCenteredSuit:true' game/android-stable.html
-          grep -q 'chipAnimation:true' game/android-stable.html
-          grep -q 'winnerFlashAndSound:true' game/android-stable.html
-          grep -q 'phase384-eric-quest-android-polish' sw.js
-          grep -q 'phase384-eric-quest-android-polish' pwa-sw.js
-          grep -q 'pwa-phase384' manifest.webmanifest
+          grep -q 'PHASE-385-ANDROID-ORIGINAL-TABLETOP-GYRO-UI-LOCK' game/android-tabletop.html
+          grep -q 'phase388-quest-table-player-eric' sw.js
+          grep -q 'phase388-quest-table-player-eric' pwa-sw.js
+          grep -q 'pwa-phase388' manifest.webmanifest
           test -s game/assets/models/eric/eric.fbx
           test -s game/assets/models/table.glb
           test -s game/assets/table.fbx
           test -s downloads/svr-poker-android-rc2.apk
-          grep -q 'PHASE-384-ERIC-QUEST-ANDROID-POLISH-LOCK' deploy-health.json
-          grep -q '"androidOnePageFit": true' deploy-health.json
-          grep -q '"questSingleEricDealer": true' deploy-health.json
-          grep -q '"questSvrLogoOnTable": true' deploy-health.json
-          grep -q '"profileDefaultTexturedEric": true' deploy-health.json
-          grep -q '"fullWebsiteRestored": true' deploy-health.json
+          grep -q 'PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK' deploy-health.json
+          grep -q '"questPlayerUsesTableLocalFrontAxis": true' deploy-health.json
+          grep -q '"questPlayerTableEdgeGapMeters": 0.12' deploy-health.json
+          grep -q '"questExclusiveEnvironmentAuthority": true' deploy-health.json
+          grep -q '"questEricBoneCheckedUpright": true' deploy-health.json
+          grep -q '"questEricGrounded": true' deploy-health.json
+          grep -q '"questEricGeneratedStripeTextureRemoved": true' deploy-health.json
+          grep -q '"questOfficialRootLogoOnFelt": true' deploy-health.json
+          grep -q '"questProfessionalLightingAuthority": true' deploy-health.json
           grep -q '"cacheRecovery": true' deploy-health.json
           grep -q '"cleanTreePublish": true' deploy-health.json
           test -f CNAME
@@ -92,11 +104,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 384 Pages artifact
+      - name: Upload Phase 388 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 384 game polish
+      - name: Deploy Phase 388 Quest authority
         id: deployment
         uses: actions/deploy-pages@v4
