@@ -1,0 +1,131 @@
+{
+  "build": "PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK",
+  "predecessor": "PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK",
+  "branch": "agent/phase389-full-audit-visible-fixes",
+  "scope": [
+    "repository-audit",
+    "quest-runtime-consolidation",
+    "camera3-live-preview",
+    "avatar-dressing-room",
+    "profile-avatar-demo",
+    "android-responsive-layout",
+    "cache-route-rollover",
+    "github-pages-deployment"
+  ],
+  "routes": {
+    "quest": "/game/quest.html?v=phase389",
+    "questRuntime": "/game/index.html?platform=quest&v=phase389&direct=1&autoseat=1&questfix=1&clean=1",
+    "camera3": "/game/camera3-live.html?v=phase389",
+    "android": "/game/android.html?channel=stable&v=phase389",
+    "androidTabletop": "/game/android-tabletop.html?v=phase389",
+    "dressingRoom": "/site/avatar.html?v=phase389",
+    "profile": "/site/profile.html?v=phase389"
+  },
+  "findings": [
+    {
+      "id": "STALE_VISIBLE_AVATAR_ENTRY",
+      "severity": "high",
+      "status": "fixed",
+      "cause": "Phase 388 route versioning still loaded Phase 346 dressing-room implementation."
+    },
+    {
+      "id": "STALE_PROFILE_SHOWROOM_ENTRY",
+      "severity": "high",
+      "status": "fixed",
+      "cause": "Profile demo remained on Phase 351/374 showroom and fallback code."
+    },
+    {
+      "id": "DUPLICATE_QUEST_SEAT_AUTHORITIES",
+      "severity": "critical",
+      "status": "fixed",
+      "cause": "Two continuous rig-position seat authorities were imported in the same runtime."
+    },
+    {
+      "id": "NO_FINAL_RUNTIME_VISIBILITY_GUARD",
+      "severity": "high",
+      "status": "fixed",
+      "cause": "No final consolidated check kept the renderer, table and Eric visible together."
+    },
+    {
+      "id": "CAMERA3_STALE_ROUTE_AND_TABLE_DISCOVERY",
+      "severity": "high",
+      "status": "fixed",
+      "cause": "Camera 3 used older routing, limited table names and lower lighting authority."
+    },
+    {
+      "id": "ANDROID_FIXED_VIEWPORT_LAYOUT",
+      "severity": "high",
+      "status": "fixed",
+      "cause": "Phase 385 layout lacked Visual Viewport and separate portrait/landscape action layouts."
+    },
+    {
+      "id": "MIXED_PHASE_CACHE_AND_METADATA",
+      "severity": "high",
+      "status": "fixed",
+      "cause": "Service workers, PWA metadata and release routes mixed Phase 380 through Phase 388."
+    },
+    {
+      "id": "PRODUCTION_GATES_PINNED_TO_PHASE388",
+      "severity": "critical",
+      "status": "fixed",
+      "cause": "Deploy and Pages workflows would reject corrected Phase 389 source."
+    }
+  ],
+  "quest": {
+    "singleSeatAuthority": true,
+    "duplicateFrontSouthImportDisabled": true,
+    "runtimeHealthVisibilityGuard": true,
+    "originalTablePreserved": true,
+    "ericAssetPreserved": true
+  },
+  "camera3": {
+    "dedicatedRoute": true,
+    "legacyRoutesRedirect": true,
+    "websiteIframeUpdated": true,
+    "tableRequired": true,
+    "recursiveVisibility": true,
+    "productionLights": 7,
+    "toneMapping": "ACESFilmic",
+    "exposure": 1.48,
+    "directorShots": 5
+  },
+  "android": {
+    "responsivePortrait": true,
+    "responsiveLandscape": true,
+    "visualViewportHeight": true,
+    "safeAreaInsets": true,
+    "landscapeActionRail": true,
+    "largerActionTargets": true,
+    "gyroscopePreserved": true
+  },
+  "avatar": {
+    "dressingRoomVisibleRefresh": true,
+    "profileSavedAvatarRefresh": true,
+    "cameraPresets": ["full", "upper", "face"],
+    "portraitCapture": true,
+    "savedOutfitShared": true
+  },
+  "deployment": {
+    "productionWorkflow": ".github/workflows/deploy.yml",
+    "pagesWorkflow": ".github/workflows/pages-live-publish.yml",
+    "auditWorkflow": ".github/workflows/phase389-audit-check.yml",
+    "cacheEpoch": "phase389-full-audit-visible-fixes-v2",
+    "cleanTreePublish": true,
+    "secretScan": true
+  },
+  "protected": {
+    "publicSiteBuild": "PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK",
+    "apkVersionName": "0.1.0-rc2",
+    "apkVersionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "nativeApkRebuild": false
+  },
+  "manualAcceptanceRequired": [
+    "physical Quest seat and table view",
+    "physical Android portrait and landscape layout",
+    "Camera 3 visual brightness and table framing",
+    "saved outfit round-trip from dressing room to profile",
+    "Eric animation retargeting or shuffle clip compatibility"
+  ]
+}
