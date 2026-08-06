@@ -48,7 +48,7 @@ jobs:
           path: publish
           fetch-depth: 1
 
-      - name: Validate Phase 384 source contracts
+      - name: Validate Phase 386 source contracts
         shell: bash
         run: |
           set -euo pipefail
@@ -67,30 +67,44 @@ jobs:
           grep -q 'PHASE-384-ERIC-DEFAULT-AVATAR-SITE-LOCK' source/site/js/phase384-avatar-site-lock.js
           grep -q "DEFAULT_AVATAR_URL" source/site/js/phase366-player-account-resilience.js
           grep -q '"top": "none"' source/site/data/avatar-catalog.json
-          grep -q 'PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK' source/game/index.html
+
+          grep -q 'PHASE-386-QUEST-TABLE-ENVIRONMENT-AUTHORITY-LOCK' source/game/index.html
           grep -q 'phase381_vr_runtime_lock' source/game/index.html
           grep -q 'phase384_quest_quickplay_polish' source/game/index.html
+          grep -q 'phase386_quest_table_environment_authority' source/game/index.html
           grep -q 'PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK' source/game/modules/phase384_quest_quickplay_polish.js
-          grep -q 'PHASE384_SVR_TABLE_LOGO' source/game/modules/phase384_quest_quickplay_polish.js
-          grep -q 'svrPhase384ExternalSkeletonHidden' source/game/modules/phase384_quest_quickplay_polish.js
+          grep -q 'PHASE-386-QUEST-TABLE-ENVIRONMENT-AUTHORITY-LOCK' source/game/modules/phase386_quest_table_environment_authority.js
+          grep -q 'PHASE386_SVR_TABLE_LOGO' source/game/modules/phase386_quest_table_environment_authority.js
+          grep -q 'PHASE386_PROFESSIONAL_TABLE_LIGHTING_RIG' source/game/modules/phase386_quest_table_environment_authority.js
+          grep -q 'PHASE386_AUTHORITATIVE_TEXTURED_MOON' source/game/modules/phase386_quest_table_environment_authority.js
+          grep -q 'svrPhase386HeadOverlayRemoved' source/game/modules/phase386_quest_table_environment_authority.js
+          grep -q 'PLAYER_FRONT_GAP = 0.68' source/game/modules/phase386_quest_table_environment_authority.js
+          grep -q 'forcedQuickSeatBlocks' source/game/modules/phase386_quest_table_environment_authority.js
+
           grep -q 'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK' source/game/android-stable.html
           grep -q 'PHASE-384-ANDROID-ONE-PAGE-3D-CHIP-WINNER-LOCK' source/game/android-stable.html
+          grep -q 'PHASE-385-ANDROID-ORIGINAL-TABLETOP-GYRO-UI-LOCK' source/game/android-tabletop.html
+          grep -q 'phase385_android_tabletop_3d' source/game/android-tabletop.html
+          test -s source/game/styles/phase385_android_tabletop.css
+          test -s source/game/modules/phase385_android_tabletop_3d.js
           grep -q 'onePageFit:true' source/game/android-stable.html
           grep -q 'singleCenteredSuit:true' source/game/android-stable.html
           grep -q 'chipAnimation:true' source/game/android-stable.html
           grep -q 'winnerFlashAndSound:true' source/game/android-stable.html
           grep -q '<img src="/logo.png" alt="SVR">' source/game/android-stable.html
           grep -q 'deterministicHandEvaluator:true' source/game/android-stable.html
+
           grep -q 'PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK' source/game/modules/phase380_original_table_authority_lock.js
           grep -q 'PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK' source/game/modules/phase381_vr_runtime_lock.js
           grep -q 'pwa-phase384' source/manifest.webmanifest
-          grep -q 'phase384-eric-quest-android-polish' source/pwa-sw.js
-          grep -q 'phase384-eric-quest-android-polish' source/sw.js
+          grep -q 'phase386-quest-table-environment' source/pwa-sw.js
+          grep -q 'phase386-quest-table-environment' source/sw.js
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/table.fbx
           test -s source/game/assets/models/eric/eric.fbx
           test -s source/downloads/svr-poker-android-rc2.apk
           test -s source/downloads/svr-poker-android-rc2.apk.sha256
+
           python3 -m json.tool source/game/android-release.json >/dev/null
           python3 -m json.tool source/game/manifest.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
@@ -102,6 +116,8 @@ jobs:
           node --check source/site/js/phase345-demo-activity-persistence.js
           node --check source/game/modules/phase381_vr_runtime_lock.js
           node --check source/game/modules/phase384_quest_quickplay_polish.js
+          node --check source/game/modules/phase385_android_tabletop_3d.js
+          node --check source/game/modules/phase386_quest_table_environment_authority.js
           node --check source/pwa-sw.js
           node --check source/sw.js
 
@@ -140,21 +156,22 @@ jobs:
           cat > publish/deploy-health.json <<EOF2
           {
             "status": "ok",
-            "build": "PHASE-384-ERIC-QUEST-ANDROID-POLISH-LOCK",
+            "build": "PHASE-386-QUEST-TABLE-ENVIRONMENT-AUTHORITY-LOCK",
             "androidBuild": "PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK",
-            "androidSuccessorBuild": "PHASE-384-ANDROID-ONE-PAGE-3D-CHIP-WINNER-LOCK",
-            "questBuild": "PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK",
-            "questPredecessorBuild": "PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK",
+            "androidSuccessorBuild": "PHASE-385-ANDROID-ORIGINAL-TABLETOP-GYRO-UI-LOCK",
+            "questBuild": "PHASE-386-QUEST-TABLE-ENVIRONMENT-AUTHORITY-LOCK",
+            "questPredecessorBuild": "PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK",
             "profileBuild": "PHASE-384-ERIC-DEFAULT-AVATAR-SITE-LOCK",
             "publicBuild": "PHASE-384-ERIC-QUEST-ANDROID-POLISH-LOCK",
             "siteBuild": "PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK",
-            "pwaBuild": "PHASE-384-CACHE-ROLLOVER",
+            "pwaBuild": "PHASE-386-CACHE-ROLLOVER",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "${DEPLOYED_AT}",
             "sourceBranch": "main",
             "publishBranch": "gh-pages",
-            "androidRoute": "/game/android-stable.html?v=phase380&deploy=phase384",
-            "questRoute": "/game/index.html?platform=quest&v=phase384",
+            "androidRoute": "/game/android.html?channel=stable&v=phase385",
+            "androidTabletopRoute": "/game/android-tabletop.html?v=phase385",
+            "questRoute": "/game/index.html?platform=quest&v=phase386",
             "siteRoute": "/site/index.html?v=phase384",
             "profileRoute": "/site/profile.html?v=phase384",
             "dressingRoomRoute": "/site/avatar.html?v=phase384",
@@ -169,23 +186,33 @@ jobs:
             "profileDefaultTexturedEric": true,
             "dressingRoomEricUpright": true,
             "dressingRoomGeneratedBoxClothingDisabled": true,
-            "androidOnePageFit": true,
-            "androidCardBackSvrLogo": true,
-            "androidSingleCenteredSuit": true,
-            "androidChipAnimation": true,
-            "androidWinnerFlashAndSound": true,
-            "androidThreeDimensionalPresentation": true,
+            "androidOriginalTablePrimary": true,
+            "androidGyroscopeTableView": true,
+            "androidCompactSeatPanels": true,
+            "androidLargeCards": true,
+            "androidVisiblePotChips": true,
+            "androidSvrLogoOnFelt": true,
             "androidDeterministicEvaluator": true,
             "questOriginalTableFirst": true,
+            "questTableSized": true,
+            "questProfessionalLighting": true,
             "questSingleEricDealer": true,
             "questExternalSkeletonHidden": true,
             "questEricDealerMotion": true,
             "questEricTexturedMaterials": true,
             "questProfessionalTableFelt": true,
             "questSvrLogoOnTable": true,
-            "questQuickPlayAutoSeat": true,
-            "questSeatedMovementAndTeleportLocked": true,
-            "questHeadOverlayCleanup": true,
+            "questPlayerAlwaysFront": true,
+            "questSameDistanceSittingStanding": true,
+            "questForcedQuickPlayAutoSeat": false,
+            "questManualSitPreserved": true,
+            "questFrontTableMovementLocked": true,
+            "questFrontTableTeleportLocked": true,
+            "questTeleportVisualsHidden": true,
+            "questNamedAndUnnamedHeadOverlayCleanup": true,
+            "questPostprocessingVignetteDisabled": true,
+            "questAuthoritativeTexturedMoon": true,
+            "questDuplicateMoonsHidden": true,
             "questProceduralAudioFallback": true,
             "cacheRecovery": true,
             "visibleBuildProof": true,
@@ -207,16 +234,23 @@ jobs:
           test -f publish/site/js/phase384-avatar-site-lock.js
           test -f publish/game/index.html
           test -f publish/game/android-stable.html
+          test -f publish/game/android-tabletop.html
+          test -f publish/game/styles/phase385_android_tabletop.css
           test -f publish/game/modules/phase381_vr_runtime_lock.js
           test -f publish/game/modules/phase384_quest_quickplay_polish.js
+          test -f publish/game/modules/phase385_android_tabletop_3d.js
+          test -f publish/game/modules/phase386_quest_table_environment_authority.js
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/table.fbx
           test -s publish/game/assets/models/eric/eric.fbx
           test -s publish/downloads/svr-poker-android-rc2.apk
           test -f publish/deploy-health.json
-          grep -q 'PHASE-384-ERIC-QUEST-ANDROID-POLISH-LOCK' publish/deploy-health.json
-          grep -q '"androidOnePageFit": true' publish/deploy-health.json
-          grep -q '"questSingleEricDealer": true' publish/deploy-health.json
+          grep -q 'PHASE-386-QUEST-TABLE-ENVIRONMENT-AUTHORITY-LOCK' publish/deploy-health.json
+          grep -q '"androidOriginalTablePrimary": true' publish/deploy-health.json
+          grep -q '"questProfessionalLighting": true' publish/deploy-health.json
+          grep -q '"questPlayerAlwaysFront": true' publish/deploy-health.json
+          grep -q '"questFrontTableTeleportLocked": true' publish/deploy-health.json
+          grep -q '"questAuthoritativeTexturedMoon": true' publish/deploy-health.json
           grep -q '"profileDefaultTexturedEric": true' publish/deploy-health.json
           ! find publish -type f \( -name '.env' -o -name '.env.*' \) | grep -q .
           ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' publish | grep -q .
@@ -230,8 +264,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches the Phase 384 game-polish tree.'
+            echo 'Production already matches the Phase 386 Quest environment tree.'
           else
-            git commit -m "Deploy Phase 384 Eric Quest Android polish ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 386 Quest table environment ${GITHUB_SHA}"
             git push origin gh-pages
           fi
