@@ -21,35 +21,69 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Validate single Quest authority stack
+      - name: Evaluate active platform manifests
         shell: bash
         run: |
           set -euo pipefail
-          MANIFEST=game/modules/phase340_platform_manifest.js
-          grep -q 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK' "$MANIFEST"
-          grep -q "VERSION = 'phase391'" "$MANIFEST"
-          grep -q 'singleOriginalTableAuthority' "$MANIFEST"
-          grep -q 'legacyQuestAcceptanceRemoved' "$MANIFEST"
-          grep -q 'directQuestDeferredWorkDisabled' "$MANIFEST"
-          ! grep -q "'modules/phase358_quest_uploaded_table_authority_lock.js'," "$MANIFEST"
-          ! grep -q "'modules/phase358_quest_runtime_boot_lock.js'," "$MANIFEST"
-          ! grep -q "'modules/phase358_quest_poker_boot_order_lock.js'," "$MANIFEST"
-          ! grep -q "'modules/phase358_quest_pot_display_authority_lock.js'," "$MANIFEST"
-          ! grep -q "'modules/phase358_quest_full_game_acceptance_smoothness_lock.js'," "$MANIFEST"
-          ! grep -q "'modules/phase379_quest_procedural_table_authority.js'," "$MANIFEST"
-          ! grep -q 'phase388_quest_table_player_eric_authority' game/index.html
-          ! grep -q 'phase388_front_south_seat_authority' game/index.html
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          Object.defineProperty(globalThis, 'location', {
+            configurable: true,
+            value: {
+              search: '?platform=quest&direct=1&autoseat=1&questfix=1',
+              pathname: '/game/index.html'
+            }
+          });
+          Object.defineProperty(globalThis, 'navigator', {
+            configurable: true,
+            value: { userAgent: 'Mozilla/5.0 Meta Quest' }
+          });
+          const manifest = await import(`./game/modules/phase340_platform_manifest.js?audit=${Date.now()}`);
+          assert.equal(manifest.BUILD, 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK');
+          assert.equal(manifest.VERSION, 'phase391');
+          const quest = manifest.manifestFor('quest');
+          const camera3 = manifest.manifestFor('camera3');
+          const android = manifest.manifestFor('android');
+          const retiredQuest = [
+            'modules/phase358_quest_uploaded_table_authority_lock.js',
+            'modules/phase358_quest_runtime_boot_lock.js',
+            'modules/phase358_quest_poker_boot_order_lock.js',
+            'modules/phase358_quest_pot_display_authority_lock.js',
+            'modules/phase358_quest_full_game_acceptance_smoothness_lock.js',
+            'modules/phase379_quest_procedural_table_authority.js',
+            'modules/phase388_front_south_seat_authority.js'
+          ];
+          for (const retired of retiredQuest) assert.equal(quest.includes(retired), false, `${retired} must not be active`);
+          assert.equal(manifest.deferredManifestFor('quest').length, 0, 'Direct Quest route must not load deferred lobby/social modules');
+          assert.equal(camera3.some((entry) => /phase339_camera3|phase350_camera3/.test(entry)), false);
+          assert.equal(android.filter((entry, index) => android.indexOf(entry) !== index).length, 0);
+          const questAudit = manifest.validateManifest('quest');
+          const cameraAudit = manifest.validateManifest('camera3');
+          const androidAudit = manifest.validateManifest('android');
+          assert.equal(questAudit.pass, true, JSON.stringify(questAudit));
+          assert.equal(cameraAudit.pass, true, JSON.stringify(cameraAudit));
+          assert.equal(androidAudit.pass, true, JSON.stringify(androidAudit));
+          assert.equal(questAudit.singleOriginalTableAuthority, true);
+          assert.equal(questAudit.legacyQuestAcceptanceRemoved, true);
+          assert.equal(questAudit.directQuestDeferredWorkDisabled, true);
+          assert.equal(cameraAudit.legacyCameraControllersRemoved, true);
+          console.log(JSON.stringify({ questAudit, cameraAudit, androidAudit }, null, 2));
+          NODE
+
+      - name: Validate Quest, table, cards, Eric, and spawn
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK' game/index.html
           grep -q 'phase380_original_table_authority_lock' game/index.html
           grep -q 'phase391_eric_dealer_authority' game/index.html
           grep -q 'phase390_quest_table_geometry_cards_spawn_authority' game/index.html
           grep -q 'phase390_surface_cards_final_guard' game/index.html
           grep -q 'phase390_front_spawn_final_guard' game/index.html
           grep -q 'phase391_production_runtime_audit' game/index.html
-
-      - name: Validate table, cards, Eric, and spawn contracts
-        shell: bash
-        run: |
-          set -euo pipefail
+          ! grep -q 'phase379_quest_procedural_table_authority' game/index.html
+          ! grep -q 'phase388_quest_table_player_eric_authority' game/index.html
+          ! grep -q 'phase388_front_south_seat_authority' game/index.html
           grep -q 'TARGET_RECESS_METERS = 0.165' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
           grep -q 'PHASE390_RECESSED_BRANDED_PLAYING_SURFACE' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
           grep -q 'PHASE341_CANONICAL_TABLE_PRESENTATION_ROOT' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
@@ -104,7 +138,7 @@ jobs:
           grep -q '"webEntry": "/game/android.html?channel=stable&v=phase391"' game/android-release.json
           grep -q '"coreGameplayEntry": "/game/android-stable.html?v=phase391&direct=1"' game/android-release.json
 
-      - name: Validate routes, caches, metadata, syntax, and protected APK
+      - name: Validate caches, metadata, syntax, assets, and APK policy
         shell: bash
         run: |
           set -euo pipefail
@@ -135,6 +169,8 @@ jobs:
           node --check game/modules/phase391_production_runtime_audit.js
           node --check sw.js
           node --check pwa-sw.js
+          test -s downloads/svr-poker-android-rc2.apk
+          test -s downloads/svr-poker-android-rc2.apk.sha256
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
           grep -q '"apkVersionCode": 2' game/android-release.json
           grep -q '"forceUpdate": false' game/android-release.json
