@@ -2,7 +2,8 @@
   "build": "PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK",
   "scope": [
     "quest-oculus-runtime",
-    "website-eric-dressing-room"
+    "website-eric-dressing-room",
+    "github-pages-production-gates"
   ],
   "predecessor": "PHASE-387-QUEST-DIRECT-SEAT-RECOVERY-LOCK",
   "routes": {
@@ -65,6 +66,9 @@
   "table": {
     "primaryAsset": "/game/assets/models/table.glb",
     "fallbackAsset": "/game/assets/table.fbx",
+    "materialVisibilityGuard": true,
+    "nearBlackMaterialCorrection": true,
+    "sourceImageMapsPreserved": true,
     "officialLogoAsset": "/logo.png",
     "officialLogoCentered": true,
     "felt": "purple-professional",
@@ -86,6 +90,12 @@
     "unnamedDarkPlanarCleanup": true,
     "handsControllersWatchCardsTableLogoDealerAndSkyProtected": true
   },
+  "deployment": {
+    "productionWorkflow": ".github/workflows/deploy.yml",
+    "pagesWorkflow": ".github/workflows/pages-live-publish.yml",
+    "obsoletePhase384PagesGateRemoved": true,
+    "bothPublishingStagesValidatePhase388": true
+  },
   "cache": {
     "epoch": "phase388-quest-table-player-eric",
     "staleServiceWorkersUnregistered": true,
@@ -93,6 +103,7 @@
   },
   "files": [
     "game/modules/phase388_front_south_seat_authority.js",
+    "game/modules/phase388_table_material_visibility_guard.js",
     "game/modules/phase388_quest_table_player_eric_authority.js",
     "game/modules/phase388_quest_view_dealer_guard.js",
     "site/js/phase388-eric-upright-material-lock.js",
@@ -106,6 +117,7 @@
     "sw.js",
     "pwa-sw.js",
     ".github/workflows/deploy.yml",
+    ".github/workflows/pages-live-publish.yml",
     "docs/PHASE_388_QUEST_TABLE_PLAYER_ERIC_AUTHORITY.md",
     "docs/PHASE_388_QUEST_TABLE_PLAYER_ERIC_AUTHORITY_MANIFEST.json"
   ],
