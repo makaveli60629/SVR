@@ -1,3 +1,4 @@
+import './phase388-eric-upright-material-lock.js?v=phase388';
 import { account } from './phase345-demo-activity-persistence.js?v=phase346';
 import { SVRAvatarViewer, BUILD } from './phase346-avatar-viewer.js?v=phase346';
 
