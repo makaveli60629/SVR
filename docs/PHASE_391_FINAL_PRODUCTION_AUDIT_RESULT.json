@@ -1,0 +1,92 @@
+{
+  "phase": 391,
+  "build": "PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK",
+  "auditDate": "2026-08-06",
+  "status": "final-production-audit-complete",
+  "findingsCorrected": {
+    "websiteSupportAssets": {
+      "supportChatBot": "/support-chat-bot.js",
+      "siteLocalCounter": "/site-local-counter.js",
+      "restoredToProduction": true,
+      "preservedByAutoDeploy": true,
+      "validatedBySourcePublishComparison": true
+    },
+    "deploymentGate": {
+      "activeManifestEvaluation": true,
+      "duplicateModuleDetection": true,
+      "questAuditRequired": true,
+      "camera3AuditRequired": true,
+      "androidAuditRequired": true,
+      "retiredQuestAuthoritiesRejected": true,
+      "legacyCameraControllersRejected": true
+    },
+    "repositoryHygiene": {
+      "removedRootArtifacts": ["Get-Content", "cd", "dir", "git", "type"],
+      "gitignoreProtectionAdded": true
+    },
+    "pullRequests": {
+      "obsoletePhase381PrClosed": true,
+      "alternateArchitecturePrClosed": true,
+      "openPullRequestsAfterAudit": 0
+    }
+  },
+  "quest": {
+    "route": "/game/quest.html?v=phase391",
+    "runtimeRoute": "/game/index.html?platform=quest&v=phase391&direct=1&autoseat=1&questfix=1&clean=1",
+    "singleOriginalTableAuthority": true,
+    "fallbackTableCreationDisabled": true,
+    "proceduralTableAuthorityRemoved": true,
+    "legacyPhase388CombinedAuthorityRemoved": true,
+    "legacyAlternateSeatAuthorityRemoved": true,
+    "playingSurfaceRecessMeters": 0.165,
+    "playingSurfaceRecessInches": 6.5,
+    "armrestPreserved": true,
+    "minimumPhysicalCardMeshes": 17,
+    "ericTargetHeightMeters": 1.78,
+    "ericAnatomicalUprightCorrection": true,
+    "boundedFrontSpawn": true,
+    "directRouteDeferredLobbyDisabled": true,
+    "directRouteDeferredSocialDisabled": true
+  },
+  "android": {
+    "route": "/game/android.html?channel=stable&v=phase391",
+    "tabletopRoute": "/game/android-tabletop.html?v=phase391",
+    "gameplayRoute": "/game/android-stable.html?v=phase391&direct=1",
+    "joinNow": true,
+    "players": 6,
+    "bots": 5,
+    "holeCards": true,
+    "communityCards": true,
+    "actions": ["fold", "check-call", "raise", "all-in", "next-hand"],
+    "portraitLayout": true,
+    "landscapeLayout": true,
+    "safeAreaSupport": true,
+    "gyroscopeSupport": true
+  },
+  "camera3": {
+    "route": "/game/camera3-live.html?v=phase391",
+    "originalTable": true,
+    "recessedSurface": true,
+    "cardsVisible": true,
+    "ericUpright": true,
+    "singleDirectorAuthority": true,
+    "productionLighting": true,
+    "legacyPhase339ControllerRemoved": true,
+    "legacyPhase350ControllerRemoved": true,
+    "duplicatePhase368DealerRemoved": true
+  },
+  "apkPolicy": {
+    "apkVersionName": "0.1.0-rc2",
+    "apkVersionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "nativeApkRebuild": false
+  },
+  "remainingAcceptance": [
+    "Quest stereoscopic Eric orientation",
+    "Quest physical table rail and recessed surface alignment",
+    "Quest complete-hand card visibility and controls",
+    "Android portrait and landscape physical-device control reachability",
+    "Camera 3 live website framing and lighting"
+  ]
+}
