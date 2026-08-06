@@ -24,6 +24,7 @@ const LOCK_FLAGS = [
 ];
 const TELEPORT_RX = /(teleport|landing|reticle|marker|arc|raycast|ray[_ -]?line)/i;
 const KEEP_RX = /(table|card|poker|logo|button|action|avatar|dealer|eric|moon|mars|earth|star|watch|controller|hand)/i;
+const APPROVED_ERIC_NAME = 'PHASE381_APPROVED_CARD_DEALER_RIG';
 
 const state = {
   build: BUILD,
@@ -63,9 +64,10 @@ let ericPromise = null;
 let timer = 0;
 let frameHandle = 0;
 let lastCorrection = 0;
-let patchedApis = false;
+let lastEricAlign = 0;
 let xrListenerInstalled = false;
 let anchor = null;
+const patchedApis = new Set();
 const textureCache = new Map();
 const tmp = new THREE.Vector3();
 const tmp2 = new THREE.Vector3();
@@ -101,6 +103,12 @@ function bounds(object) {
 
 function validBounds(value) {
   return Boolean(value && !value.box.isEmpty() && value.size.x > 0.05 && value.size.y > 0.05 && value.size.z > 0.05);
+}
+
+function meshCount(root) {
+  let count = 0;
+  walk(root, (object) => { if (object?.isMesh) count += 1; }, 9000);
+  return count;
 }
 
 function rig() {
@@ -150,16 +158,13 @@ function setRigPoseDirect(x, y, z, target = null) {
     } else if (typeof originals.positionSet === 'function' && value.position) {
       originals.positionSet.call(value.position, x, y, z);
       moved = true;
-    } else if (typeof value.setPlayerPose === 'function') {
-      const previousSeated = window.SVR_PHASE361_STATE?.seated;
-      if (window.SVR_PHASE361_STATE) window.SVR_PHASE361_STATE.seated = false;
-      try { value.setPlayerPose(x, y, z); moved = true; } finally {
-        if (window.SVR_PHASE361_STATE) window.SVR_PHASE361_STATE.seated = previousSeated;
-      }
     } else if (value.position) {
       value.position.x = x;
       value.position.y = y;
       value.position.z = z;
+      moved = true;
+    } else if (typeof value.setPlayerPose === 'function') {
+      value.setPlayerPose(x, y, z);
       moved = true;
     }
   } catch (error) {
@@ -179,19 +184,28 @@ function computeAnchor() {
   if (!table) return null;
   const info = bounds(table);
   if (!validBounds(info)) return null;
-  const target = new THREE.Vector3(info.center.x, info.box.max.y + 0.05, info.center.z - info.size.z * 0.08);
   return {
     x: info.center.x,
     z: info.box.max.z + FRONT_GAP,
-    target,
+    target: new THREE.Vector3(info.center.x, info.box.max.y + 0.05, info.center.z - info.size.z * 0.08),
     desiredEyeY: info.box.max.y + 0.53,
     tableTopY: info.box.max.y,
     tableCenter: info.center.clone()
   };
 }
 
+function alreadySeated() {
+  return Boolean(
+    window.SVR_PHASE361_STATE?.seated
+    || document.body.classList.contains('svr361-seated')
+    || document.body.dataset.svrSeated === 'true'
+  );
+}
+
 function forceSeatedState() {
-  try { window.SVR_PHASE361_PLAY_GAME?.(); } catch {}
+  if (!alreadySeated()) {
+    try { window.SVR_PHASE361_PLAY_GAME?.(); } catch {}
+  }
   if (window.SVR_PHASE361_STATE) {
     window.SVR_PHASE361_STATE.seated = true;
     window.SVR_PHASE361_STATE.mode = 'seated';
@@ -199,7 +213,9 @@ function forceSeatedState() {
   document.body.classList.add('svr361-seated', 'svr387-direct-seated');
   document.body.dataset.svrSeated = 'true';
   state.seated = true;
-  try { window.SVR_PHASE381_SEAT_LOCK?.('phase387-direct-seat'); } catch {}
+  if (!window.SVR_PHASE381_STATE?.seated) {
+    try { window.SVR_PHASE381_SEAT_LOCK?.('phase387-direct-seat'); } catch {}
+  }
 }
 
 function lockMovement() {
@@ -247,7 +263,7 @@ function placeAtTable(reason = 'manual') {
 }
 
 function correctAnchor(time = performance.now()) {
-  if (!anchor || time - lastCorrection < 120) return false;
+  if (!anchor || time - lastCorrection < 140) return false;
   lastCorrection = time;
   const value = rig();
   if (!value?.position) return false;
@@ -263,27 +279,20 @@ function correctAnchor(time = performance.now()) {
   return false;
 }
 
+function patchLobbyApi(name) {
+  if (patchedApis.has(name) || typeof window[name] !== 'function') return false;
+  window[name] = () => {
+    state.lobbyMovesBlocked += 1;
+    return placeAtTable(`blocked-${name}`);
+  };
+  patchedApis.add(name);
+  return true;
+}
+
 function patchLobbyApis() {
-  if (patchedApis) return;
-  if (typeof window.SVR_PHASE361_LOBBY_SPAWN === 'function') {
-    window.SVR_PHASE361_LOBBY_SPAWN = () => {
-      state.lobbyMovesBlocked += 1;
-      return placeAtTable('blocked-phase361-lobby-spawn');
-    };
-  }
-  if (typeof window.SVR_PHASE373_STABLE_LOBBY === 'function') {
-    window.SVR_PHASE373_STABLE_LOBBY = () => {
-      state.lobbyMovesBlocked += 1;
-      return placeAtTable('blocked-phase373-lobby-spawn');
-    };
-  }
-  if (typeof window.SVR_PHASE364_LOBBY_SPAWN === 'function') {
-    window.SVR_PHASE364_LOBBY_SPAWN = () => {
-      state.lobbyMovesBlocked += 1;
-      return placeAtTable('blocked-phase364-lobby-spawn');
-    };
-  }
-  patchedApis = true;
+  patchLobbyApi('SVR_PHASE361_LOBBY_SPAWN');
+  patchLobbyApi('SVR_PHASE373_STABLE_LOBBY');
+  patchLobbyApi('SVR_PHASE364_LOBBY_SPAWN');
 }
 
 function scheduleSeatBurst(reason) {
@@ -308,12 +317,8 @@ function patternTexture(kind) {
   canvas.width = canvas.height = 384;
   const ctx = canvas.getContext('2d');
   const colors = {
-    skin: ['#b7795d', '#754534'],
-    hair: ['#2a170f', '#080504'],
-    shirt: ['#eef3f7', '#aeb9c5'],
-    suit: ['#252c3a', '#070a11'],
-    pants: ['#151b26', '#05070b'],
-    shoes: ['#1a1718', '#020202']
+    skin: ['#b7795d', '#754534'], hair: ['#2a170f', '#080504'], shirt: ['#eef3f7', '#aeb9c5'],
+    suit: ['#252c3a', '#070a11'], pants: ['#151b26', '#05070b'], shoes: ['#1a1718', '#020202']
   }[kind] || ['#252c3a', '#070a11'];
   const gradient = ctx.createLinearGradient(0, 0, 384, 384);
   gradient.addColorStop(0, colors[0]);
@@ -353,6 +358,18 @@ function materialKind(label, yRatio) {
 }
 
 function textureEric(root) {
+  if (root.userData?.svrPhase387Textured) {
+    let meshes = 0;
+    walk(root, (object) => {
+      object.visible = true;
+      if (object.isMesh) {
+        meshes += 1;
+        object.frustumCulled = false;
+      }
+    }, 9000);
+    state.ericMeshes = meshes;
+    return meshes;
+  }
   const whole = bounds(root);
   if (!validBounds(whole)) return 0;
   let changed = 0;
@@ -379,26 +396,32 @@ function textureEric(root) {
       material.opacity = 1;
       material.depthTest = true;
       material.depthWrite = true;
-      if ('roughness' in material) material.roughness = kind === 'skin' ? 0.72 : kind === 'shoes' ? 0.3 : 0.56;
+      if ('roughness' in material) material.roughness = kind === 'skin' ? 0.72 : kind === 'shoes' ? 0.30 : 0.56;
       if ('metalness' in material) material.metalness = kind === 'shoes' ? 0.12 : 0.03;
       material.needsUpdate = true;
       changed += 1;
       return material;
     });
     object.material = Array.isArray(object.material) ? next : next[0];
-  });
+  }, 9000);
+  root.userData = { ...(root.userData || {}), svrPhase387Textured: true };
   state.ericMeshes = meshes;
   state.ericTexturedMaterials = Math.max(state.ericTexturedMaterials, changed);
   return meshes;
 }
 
 function findApprovedEric() {
-  let found = window.SVR_PHASE386_ERIC_AUTHORITY || null;
-  if (found?.isObject3D) return found;
+  let found = window.SVR_PHASE386_ERIC_AUTHORITY;
+  if (found?.isObject3D && meshCount(found) > 0) return found;
+  found = null;
   walk(scene, (object) => {
     if (found || !object?.isObject3D) return;
-    if (object.userData?.svrPhase381Approved || object.userData?.svrPhase386Approved || object.name === 'PHASE381_APPROVED_CARD_DEALER_RIG') found = object;
-  });
+    const approved = object.userData?.svrPhase381Approved
+      || object.userData?.svrPhase386Approved
+      || object.userData?.svrApprovedDealerRig
+      || object.name === APPROVED_ERIC_NAME;
+    if (approved && meshCount(object) > 0) found = object;
+  }, 18000);
   return found;
 }
 
@@ -420,7 +443,7 @@ function normalizeFallbackEric(object) {
   object.position.x -= value.center.x;
   object.position.z -= value.center.z;
   object.position.y -= value.box.min.y;
-  object.name = 'PHASE381_APPROVED_CARD_DEALER_RIG';
+  object.name = APPROVED_ERIC_NAME;
   object.userData = {
     ...(object.userData || {}),
     svrApprovedDealerRig: true,
@@ -474,34 +497,32 @@ function alignEric() {
 function hideEricDuplicates() {
   if (!scene || !eric) return 0;
   let hidden = 0;
+  let skeletons = 0;
   walk(scene, (object) => {
     if (!object?.isObject3D || object === eric || isInside(object, eric)) return;
-    const exactEricRoot = object.name === 'PHASE381_APPROVED_CARD_DEALER_RIG'
+    const approvedRoot = object.name === APPROVED_ERIC_NAME
       || object.userData?.svrPhase381Approved
       || object.userData?.svrApprovedDealerRig;
     const skeleton = object.isSkeletonHelper || /(external[_ -]?skeleton|debug[_ -]?skeleton|PHASE368_CARD_DEALER_ROOT)/i.test(String(object.name || ''));
-    if (exactEricRoot) {
+    if (approvedRoot) {
       object.visible = false;
       hidden += 1;
     } else if (skeleton) {
       object.visible = false;
-      state.skeletonHelpersHidden += 1;
+      skeletons += 1;
     }
-  });
+  }, 18000);
   state.duplicateEricsHidden = Math.max(state.duplicateEricsHidden, hidden);
+  state.skeletonHelpersHidden = Math.max(state.skeletonHelpersHidden, skeletons);
   return hidden;
 }
 
 async function ensureEric() {
   eric = findApprovedEric() || eric;
-  if (!eric) eric = await loadEricFallback();
+  if (!eric || meshCount(eric) <= 0) eric = await loadEricFallback();
   if (!eric) return false;
-  const meshCount = textureEric(eric);
-  if (meshCount <= 0 && !state.ericFallbackLoaded) {
-    eric = await loadEricFallback();
-    if (!eric) return false;
-    textureEric(eric);
-  }
+  const meshes = textureEric(eric);
+  if (meshes <= 0) return false;
   state.ericLoaded = true;
   window.SVR_PHASE386_ERIC_AUTHORITY = eric;
   window.SVR_PHASE387_ERIC_AUTHORITY = eric;
@@ -525,8 +546,10 @@ async function sweep(reason = 'interval') {
   state.sceneReady = Boolean(scene && camera && renderer && rig());
   hideBootUi();
   if (!state.sceneReady) return false;
-  window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.(`phase387-${reason}`);
-  window.SVR_PHASE386_QUEST_SWEEP?.(`phase387-${reason}`);
+  if (!state.tableReady) {
+    window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.(`phase387-${reason}`);
+    window.SVR_PHASE386_QUEST_SWEEP?.(`phase387-${reason}`);
+  }
   table = candidateTable() || table;
   state.tableReady = Boolean(table);
   patchLobbyApis();
@@ -542,7 +565,7 @@ async function sweep(reason = 'interval') {
   window.SVR_PHASE386_OVERLAY_SWEEP?.();
   state.overlaySweeps += 1;
   window.SVR_PHASE386_PRESERVE_PLANETS?.();
-  return Boolean(table && eric);
+  return Boolean(table && eric && state.ericVisible);
 }
 
 function frame(time = 0) {
@@ -552,7 +575,10 @@ function frame(time = 0) {
   correctAnchor(time);
   if (eric) {
     eric.visible = true;
-    alignEric();
+    if (time - lastEricAlign > 600) {
+      lastEricAlign = time;
+      alignEric();
+    }
   }
   frameHandle = requestAnimationFrame(frame);
 }
@@ -561,6 +587,7 @@ function qa() {
   const info = table?.isObject3D ? bounds(table) : null;
   const head = activeCamera();
   head?.getWorldPosition?.(tmp2);
+  const movementFlags = Object.fromEntries(LOCK_FLAGS.map((key) => [key, window[key]]));
   state.checkedAt = new Date().toISOString();
   return {
     ...state,
@@ -571,7 +598,7 @@ function qa() {
     } : null,
     anchor: anchor ? { x: Number(anchor.x.toFixed(3)), z: Number(anchor.z.toFixed(3)), eyeY: Number(anchor.desiredEyeY.toFixed(3)) } : null,
     head: { x: Number(tmp2.x.toFixed(3)), y: Number(tmp2.y.toFixed(3)), z: Number(tmp2.z.toFixed(3)) },
-    movementFlags: Object.fromEntries(LOCK_FLAGS.map((key) => [key, window[key]])),
+    movementFlags,
     pass: !ACTIVE || Boolean(
       state.sceneReady
       && state.tableReady
@@ -581,7 +608,7 @@ function qa() {
       && state.ericLoaded
       && state.ericVisible
       && state.ericMeshes > 0
-      && Object.values(Object.fromEntries(LOCK_FLAGS.map((key) => [key, window[key]]))).every((value) => value === false)
+      && Object.values(movementFlags).every((value) => value === false)
     )
   };
 }
@@ -593,7 +620,7 @@ function install() {
   hideBootUi();
   timer = window.setInterval(() => sweep('interval').catch((error) => {
     state.lastError = String(error?.message || error);
-  }), 360);
+  }), 720);
   frameHandle = requestAnimationFrame(frame);
   for (const delay of [0, 80, 220, 500, 900, 1600, 2800, 5000, 8000]) {
     window.setTimeout(() => sweep(`boot-${delay}`).catch((error) => {
