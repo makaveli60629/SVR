@@ -30,7 +30,6 @@ const QUEST_FOUNDATION = [
   ...REGISTRY,
   ...DEVICE_ALIGNMENT,
   'modules/phase358_quest_incremental_shader_compile_lock.js',
-  'modules/phase358_quest_runtime_boot_lock.js',
   ...BOOT,
   ...POKER_CORE
 ];
@@ -44,9 +43,7 @@ const QUEST_INTERACTION = [
 const QUEST_SETTLEMENT = [
   'modules/phase337_physical_pot_winner_settlement_lock.js',
   'modules/phase338_bankroll_chip_inventory_sync_lock.js',
-  'modules/phase342_adaptive_performance_asset_pipeline_lock.js',
-  'modules/phase358_quest_pot_display_authority_lock.js',
-  'modules/phase358_quest_full_game_acceptance_smoothness_lock.js'
+  'modules/phase342_adaptive_performance_asset_pipeline_lock.js'
 ];
 const QUEST_DEFERRED = [...LOBBY, ...SOCIAL];
 
@@ -111,7 +108,11 @@ export function manifestFor(platform = detectPlatform()) {
 }
 
 export function deferredManifestFor(platform = detectPlatform()) {
-  return String(platform || '').toLowerCase() === 'quest' ? unique(QUEST_DEFERRED) : [];
+  const value = String(platform || '').toLowerCase();
+  if (value !== 'quest') return [];
+  const params = new URLSearchParams(location.search);
+  const directTable = params.get('direct') === '1' || params.get('autoseat') === '1' || params.get('questfix') === '1';
+  return directTable ? [] : unique(QUEST_DEFERRED);
 }
 
 function ordered(items, names) {
@@ -131,6 +132,10 @@ export function validateManifest(platform = detectPlatform()) {
   const forbidden = [];
   const retiredAuthorities = [
     'modules/phase358_quest_uploaded_table_authority_lock.js',
+    'modules/phase358_quest_runtime_boot_lock.js',
+    'modules/phase358_quest_poker_boot_order_lock.js',
+    'modules/phase358_quest_pot_display_authority_lock.js',
+    'modules/phase358_quest_full_game_acceptance_smoothness_lock.js',
     'modules/phase379_quest_procedural_table_authority.js',
     'modules/phase339_camera3_table_orbit_lock.js',
     'modules/phase350_camera3_visibility_lighting_lock.js',
@@ -144,15 +149,18 @@ export function validateManifest(platform = detectPlatform()) {
     if (!ordered(normalized, [
       'phase364_device_xr_geometry_spawn_lock.js',
       'phase358_quest_incremental_shader_compile_lock.js',
-      'phase358_quest_runtime_boot_lock.js',
       'main.js',
       'p85_poker_truth_lock.js',
       'phase336_authoritative_poker_rules_pot_settlement_lock.js',
       'phase331_quest_meta_hands_table_interaction_lock.js',
       'phase334_table_layout_gesture_poker_lock.js',
-      'phase358_quest_full_game_acceptance_smoothness_lock.js'
+      'phase337_physical_pot_winner_settlement_lock.js',
+      'phase342_adaptive_performance_asset_pipeline_lock.js'
     ])) forbidden.push('phase391-quest-load-order');
-    if (!ordered(normalizedDeferred, [
+    const params = new URLSearchParams(location.search);
+    const directTable = params.get('direct') === '1' || params.get('autoseat') === '1' || params.get('questfix') === '1';
+    if (directTable && normalizedDeferred.length) forbidden.push('phase391-direct-quest-deferred-work');
+    if (!directTable && normalizedDeferred.length && !ordered(normalizedDeferred, [
       'phase346_player_avatar_profile_bridge.js',
       'phase348_ingame_player_avatar_presence_performance_lock.js',
       'phase349_multiplayer_presence_seat_reconnect_lock.js',
@@ -183,8 +191,10 @@ export function validateManifest(platform = detectPlatform()) {
     deferredModuleCount: deferred.length,
     duplicates,
     forbidden,
-    singleOriginalTableAuthority: !combined.some((item) => item.endsWith('phase358_quest_uploaded_table_authority_lock.js') || item.endsWith('phase379_quest_procedural_table_authority.js')),
+    singleOriginalTableAuthority: !combined.some((item) => item.endsWith('phase358_quest_uploaded_table_authority_lock.js') || item.endsWith('phase358_quest_runtime_boot_lock.js') || item.endsWith('phase379_quest_procedural_table_authority.js')),
+    legacyQuestAcceptanceRemoved: !combined.some((item) => item.endsWith('phase358_quest_full_game_acceptance_smoothness_lock.js') || item.endsWith('phase358_quest_pot_display_authority_lock.js')),
     legacyCameraControllersRemoved: !combined.some((item) => /phase339_camera3|phase350_camera3/.test(item)),
+    directQuestDeferredWorkDisabled: value !== 'quest' || !new URLSearchParams(location.search).has('direct') || normalizedDeferred.length === 0,
     pass: duplicates.length === 0 && forbidden.length === 0,
     modules,
     deferred
