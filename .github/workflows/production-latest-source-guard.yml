@@ -1,0 +1,46 @@
+name: SVR Production Latest-Source Guard
+
+on:
+  workflow_run:
+    workflows: ["SVR Production Auto Deploy"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: svr-production-latest-source-guard
+  cancel-in-progress: true
+
+jobs:
+  verify-latest-source:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Compare deployed source commit with current main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          LATEST_MAIN="$(gh api "repos/${GITHUB_REPOSITORY}/commits/main" --jq '.sha')"
+          HEALTH_CONTENT="$(gh api "repos/${GITHUB_REPOSITORY}/contents/deploy-health.json?ref=gh-pages" --jq '.content' 2>/dev/null || true)"
+          if [ -n "$HEALTH_CONTENT" ]; then
+            DEPLOYED_SOURCE="$(printf '%s' "$HEALTH_CONTENT" | tr -d '\n' | base64 --decode | jq -r '.commit // "missing"')"
+          else
+            DEPLOYED_SOURCE="missing"
+          fi
+
+          echo "Latest main:     $LATEST_MAIN"
+          echo "Deployed source: $DEPLOYED_SOURCE"
+
+          if [ "$DEPLOYED_SOURCE" = "$LATEST_MAIN" ]; then
+            echo 'Production already matches current main.'
+            exit 0
+          fi
+
+          echo 'A stale or incomplete production source was detected. Dispatching the latest main build.'
+          gh workflow run deploy.yml --ref main
