@@ -1,0 +1,45 @@
+{
+  "phase": 391,
+  "build": "PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK",
+  "type": "final-hardening-addendum",
+  "findings": [
+    {
+      "module": "game/modules/phase358_quest_runtime_boot_lock.js",
+      "risk": "Could create PHASE358_QUEST_TABLE_FALLBACK before the original Phase 380 table completed loading.",
+      "resolution": "Removed from active Quest manifest."
+    },
+    {
+      "module": "game/modules/phase358_quest_pot_display_authority_lock.js",
+      "risk": "Depended on the retired Phase 358 boot-created display.",
+      "resolution": "Removed from active Quest manifest; physical Phase 337/338 pot and chip settlement remains."
+    },
+    {
+      "module": "game/modules/phase358_quest_full_game_acceptance_smoothness_lock.js",
+      "risk": "Waited for retired SVR_PHASE358_UPLOADED_TABLE_QA and SVR_PHASE358_POKER_BOOT_QA APIs.",
+      "resolution": "Removed from active Quest manifest; Phase 391 runtime QA is authoritative."
+    }
+  ],
+  "retiredFromActiveQuestManifest": [
+    "modules/phase358_quest_uploaded_table_authority_lock.js",
+    "modules/phase358_quest_runtime_boot_lock.js",
+    "modules/phase358_quest_poker_boot_order_lock.js",
+    "modules/phase358_quest_pot_display_authority_lock.js",
+    "modules/phase358_quest_full_game_acceptance_smoothness_lock.js",
+    "modules/phase379_quest_procedural_table_authority.js",
+    "modules/phase388_quest_table_player_eric_authority.js",
+    "modules/phase388_front_south_seat_authority.js"
+  ],
+  "directQuest": {
+    "canonicalQuery": "platform=quest&v=phase391&direct=1&autoseat=1&questfix=1&clean=1",
+    "deferredLobbyModulesDisabled": true,
+    "deferredSocialModulesDisabled": true,
+    "reason": "Reduce headset boot workload and prevent background lobby/social runtime competition during direct table play."
+  },
+  "activeTablePolicy": {
+    "originalTableAuthority": "PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY",
+    "fallbackTableCreationDisabled": true,
+    "singleOriginalTableAuthority": true,
+    "productionQa": "SVR_PHASE391_PRODUCTION_QA"
+  },
+  "result": "The last known active fallback-table creation path and obsolete Quest acceptance waits are removed from the production route."
+}
