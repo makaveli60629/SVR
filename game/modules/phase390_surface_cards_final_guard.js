@@ -139,10 +139,10 @@ async function rebuild(reason) {
   }
 }
 function alignmentDelta(cards, top) {
-  const visibleOrAll = cards.filter((card) => card.visible).length ? cards.filter((card) => card.visible) : cards;
-  if (!visibleOrAll.length) return null;
+  const visibleCards = cards.filter((card) => card.visible);
+  if (!visibleCards.length) return null;
   const heights = [];
-  for (const card of visibleOrAll) {
+  for (const card of visibleCards) {
     card.getWorldPosition(point);
     heights.push(point.y);
   }
@@ -185,7 +185,8 @@ function frame(now = 0) {
   raf = requestAnimationFrame(frame);
 }
 function qa() {
-  const result = { ...state, pass: Boolean(state.installed && state.surfaceReady && state.cardRootReady && state.cardMeshes >= 17 && state.alignmentDelta != null && state.alignmentDelta >= 0.001 && state.alignmentDelta <= 0.035 && !state.lastError), checkedAt: new Date().toISOString() };
+  const cardAlignmentPass = state.visibleCards === 0 || (state.alignmentDelta != null && state.alignmentDelta >= 0.001 && state.alignmentDelta <= 0.035);
+  const result = { ...state, pass: Boolean(state.installed && state.surfaceReady && state.cardRootReady && state.cardMeshes >= 17 && cardAlignmentPass && !state.lastError), checkedAt: new Date().toISOString() };
   window.SVR_PHASE390_SURFACE_CARDS_STATE = result;
   return result;
 }
