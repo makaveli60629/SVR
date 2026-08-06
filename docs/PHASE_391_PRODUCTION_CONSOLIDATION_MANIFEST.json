@@ -1,0 +1,193 @@
+{
+  "phase": 391,
+  "build": "PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK",
+  "title": "SVR Poker Production Consolidation and Auto-Deploy",
+  "predecessors": [
+    "PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK",
+    "PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK"
+  ],
+  "scope": [
+    "quest",
+    "android-browser",
+    "camera3",
+    "table-geometry",
+    "cards",
+    "eric-dealer",
+    "routing",
+    "service-workers",
+    "metadata",
+    "deployment",
+    "runtime-audit"
+  ],
+  "auditFindings": [
+    {
+      "id": "stale-platform-manifest",
+      "severity": "release-blocking",
+      "finding": "The platform manifest still identified itself as Phase 367 and loaded historical table and Camera 3 authorities."
+    },
+    {
+      "id": "duplicate-quest-table-authorities",
+      "severity": "release-blocking",
+      "finding": "Quest could load Phase 358, Phase 379, and Phase 380 table authority paths."
+    },
+    {
+      "id": "phase388-monolithic-authority",
+      "severity": "release-blocking",
+      "finding": "The Phase 388 dealer module also controlled the seat, locomotion, felt overlay, lighting, and duplicate cleanup."
+    },
+    {
+      "id": "camera3-controller-and-dealer-duplicates",
+      "severity": "high",
+      "finding": "Camera 3 could load old Phase 339/350 controllers plus the newer director and the Phase 368 procedural dealer."
+    },
+    {
+      "id": "stale-service-worker-authorities",
+      "severity": "high",
+      "finding": "Service workers still preloaded the retired Phase 388 combined authority."
+    },
+    {
+      "id": "android-public-proof",
+      "severity": "high",
+      "finding": "Playable Android core existed but wrapper verification and direct fallback proof were insufficient."
+    }
+  ],
+  "fixes": {
+    "platformManifest": {
+      "build": "PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK",
+      "version": "phase391",
+      "singleOriginalTableAuthority": true,
+      "legacyUploadedTableAuthorityRemoved": true,
+      "proceduralTableAuthorityRemoved": true,
+      "legacyCameraControllersRemoved": true
+    },
+    "table": {
+      "primaryAsset": "game/assets/models/table.glb",
+      "fallbackAsset": "game/assets/table.fbx",
+      "authorityName": "PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY",
+      "playingSurfaceSourceMaterial": "polotno",
+      "playingSurfaceRecessMeters": 0.165,
+      "playingSurfaceRecessInches": 6.5,
+      "armrestPreserved": true,
+      "legacyTopFeltOverlaysRemoved": true
+    },
+    "cards": {
+      "presentationRoot": "PHASE341_CANONICAL_TABLE_PRESENTATION_ROOT",
+      "minimumCardMeshes": 17,
+      "rebuildWhenMissing": true,
+      "renderedAbovePlayingSurface": true
+    },
+    "eric": {
+      "authorityBuild": "PHASE-391-ERIC-UPRIGHT-DEALER-AUTHORITY-LOCK",
+      "asset": "game/assets/models/eric/eric.fbx",
+      "targetHeightMeters": 1.78,
+      "anatomicalHeadFeetOrientation": true,
+      "grounded": true,
+      "duplicateDealerRemoval": true,
+      "doesNotControlSeatFeltLighting": true
+    },
+    "quest": {
+      "fixedFrontSpawn": true,
+      "startupCorrectionWindowSeconds": 9,
+      "legacySeatControllerRemoved": true,
+      "handsAndControllerFallbackRetained": true
+    },
+    "camera3": {
+      "build": "PHASE-391-CAMERA3-PRODUCTION-CONSOLIDATION-LOCK",
+      "singleDirectorAuthority": true,
+      "proceduralDealerRemoved": true,
+      "productionLighting": true,
+      "directorShots": 5,
+      "cardsRequired": true,
+      "uprightEricRequired": true
+    },
+    "android": {
+      "build": "PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK",
+      "joinNow": true,
+      "players": 6,
+      "bots": 5,
+      "holeCards": true,
+      "communityCards": true,
+      "potChips": true,
+      "actions": ["fold", "check-call", "raise", "all-in", "next-hand"],
+      "portrait": true,
+      "landscape": true,
+      "safeArea": true,
+      "gyroscope": true,
+      "wrapperQa": "SVR_PHASE391_ANDROID_WRAPPER_QA",
+      "directFallback": true
+    },
+    "runtimeAudit": {
+      "build": "PHASE-391-PRODUCTION-RUNTIME-AUDIT-LOCK",
+      "duplicateTableCleanup": true,
+      "legacyFeltCleanup": true,
+      "rendererBudget": true,
+      "questPixelRatioCap": 1.35,
+      "camera3PixelRatioCap": 1.5
+    }
+  },
+  "routes": {
+    "quest": "/game/quest.html?v=phase391",
+    "questRuntime": "/game/index.html?platform=quest&v=phase391&direct=1&autoseat=1&questfix=1&clean=1",
+    "camera3": "/game/camera3-live.html?v=phase391",
+    "android": "/game/android.html?channel=stable&v=phase391",
+    "androidTabletop": "/game/android-tabletop.html?v=phase391",
+    "androidGameplay": "/game/android-stable.html?v=phase391&direct=1",
+    "avatar": "/site/avatar.html?v=phase389&deploy=phase391",
+    "profile": "/site/profile.html?v=phase389&deploy=phase391"
+  },
+  "retiredFromActiveRuntime": [
+    "game/modules/phase358_quest_uploaded_table_authority_lock.js",
+    "game/modules/phase379_quest_procedural_table_authority.js",
+    "game/modules/phase388_quest_table_player_eric_authority.js",
+    "game/modules/phase388_front_south_seat_authority.js",
+    "game/modules/phase339_camera3_table_orbit_lock.js",
+    "game/modules/phase350_camera3_visibility_lighting_lock.js",
+    "game/modules/phase368_card_dealer_animation_lock.js on Camera 3"
+  ],
+  "qa": {
+    "quest": "SVR_PHASE391_BOOT_QA",
+    "eric": "SVR_PHASE391_ERIC_QA",
+    "production": "SVR_PHASE391_PRODUCTION_QA",
+    "android": "SVR_PHASE391_ANDROID_WRAPPER_QA",
+    "camera3": "SVR_PHASE391_CAMERA3_ROUTE_QA"
+  },
+  "automatedValidation": [
+    "canonical route markers",
+    "retired import absence",
+    "single-table authority contract",
+    "Eric anatomical upright contract",
+    "6.5-inch recessed playing surface",
+    "Phase 341 card restoration",
+    "fixed-front Quest spawn",
+    "Camera 3 production path",
+    "Android playable DOM and actions",
+    "service-worker cache epoch",
+    "JSON validity",
+    "JavaScript syntax",
+    "asset existence",
+    "protected APK policy",
+    "secret-pattern scan",
+    "production deploy contract",
+    "Pages publish contract"
+  ],
+  "apkPolicy": {
+    "packageName": "com.svrpoker.app",
+    "versionName": "0.1.0-rc2",
+    "versionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "nativeApkRebuild": false
+  },
+  "manualAcceptanceRequired": [
+    "Quest stereoscopic visibility and comfort",
+    "Quest front spawn and facing",
+    "Eric upright and grounded in both eyes",
+    "one furnished table visible",
+    "hand rests above recessed felt",
+    "hole and community cards visible",
+    "complete Quest hand without freeze",
+    "Camera 3 framing and brightness",
+    "Android JOIN NOW in portrait and landscape",
+    "Android safe-area and viewport control reachability"
+  ]
+}

@@ -1,5 +1,28 @@
-/* PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK */
+/* PHASE-391-SITE-GAME-ROUTE-CONSOLIDATION-LOCK */
 (() => {
+  const CAMERA3_ROUTE = '../game/camera3-live.html?v=phase391&embed=1&autocam=1&source=site-live-preview';
+  const ANDROID_ROUTE = '../game/android.html?channel=stable&v=phase391&source=site-play-android';
+  const QUEST_ROUTE = '../game/quest.html?v=phase391&source=site-play-quest';
+  const routeLiveGames = () => {
+    document.querySelectorAll('iframe').forEach((iframe) => {
+      const src = String(iframe.getAttribute('src') || '');
+      if (/preview=1|cam=director|camera3(?:-live)?\.html|cam3\.html/i.test(src)) iframe.src = CAMERA3_ROUTE;
+    });
+    document.querySelectorAll('a[href]').forEach((anchor) => {
+      const href = String(anchor.getAttribute('href') || '');
+      if (/preview=1|cam=director|camera3(?:-live)?\.html|cam3\.html/i.test(href)) {
+        anchor.href = CAMERA3_ROUTE.replace('&embed=1', '');
+        return;
+      }
+      if (/\/game\/(?:android|android-play|android-stable|android-tabletop)\.html/i.test(href)) {
+        anchor.href = ANDROID_ROUTE;
+        return;
+      }
+      if (/\/game\/(?:index|quest)\.html/i.test(href)) anchor.href = QUEST_ROUTE;
+    });
+  };
+  routeLiveGames();
+
   const frame = document.getElementById('svrLiveGameFrame');
   const fallback = document.getElementById('previewFallback');
   if (frame && fallback) {
@@ -10,10 +33,10 @@
     });
     setTimeout(() => {
       if (!loaded) {
-        fallback.innerHTML = '<strong>Preview is still loading.</strong><span>Use Open Full Game while the 3D lobby finishes loading.</span>';
+        fallback.innerHTML = '<strong>Camera 3 is still loading.</strong><span>Open the dedicated live feed while the consolidated table, cards, Eric, and lighting finish loading.</span>';
         fallback.classList.add('is-warning');
       }
-    }, 7000);
+    }, 8000);
   }
 
   const setMeter = (id, text, width, ok = true) => {
@@ -28,7 +51,6 @@
 
   let deployHealth = null;
   let androidRelease = null;
-
   (async () => {
     const box = document.getElementById('releaseStatus');
     try {
@@ -42,38 +64,38 @@
       setMeter('game', String(deployHealth.questBuild || deployHealth.build || 'LIVE').replace('PHASE-', 'P'), 100, true);
       if (androidRelease.releaseReady && androidRelease.apkUrl) {
         setMeter('apk', 'RC2 READY', 100, true);
-        if (box) box.innerHTML = `<strong>Server, full website, Quest runtime and APK ${androidRelease.apkVersionName} are published.</strong> Android remains on the stable Phase 380 / RC2 channel.`;
+        if (box) box.innerHTML = `<strong>Server, full website, production Camera 3, consolidated Quest runtime, playable Android browser game, and APK ${androidRelease.apkVersionName} are published.</strong>`;
       } else {
         setMeter('apk', 'BROWSER LIVE', 72, true);
-        if (box) box.innerHTML = '<strong>Browser play is live.</strong> Open the APK Center for the current package status.';
+        if (box) box.innerHTML = '<strong>Playable Android browser game, Quest route, and Camera 3 are live.</strong> Open the APK Center for package status.';
       }
-    } catch (error) {
+    } catch {
       setMeter('server', 'RETRY', 35, false);
       setMeter('game', 'AVAILABLE', 72, true);
       setMeter('apk', 'AVAILABLE', 72, true);
-      if (box) box.textContent = 'The full website and game routes are available; live status data will retry on refresh.';
+      if (box) box.textContent = 'The website, playable Android route, Camera 3, and Quest game routes are available; live status data will retry on refresh.';
     }
   })();
 
   const answers = {
     status: () => deployHealth?.status === 'ok'
-      ? `Server is up. Site build: ${deployHealth.siteBuild || deployHealth.build}. Quest runtime: ${deployHealth.questBuild || 'Phase 381'}. Android remains Phase 380 RC2.`
-      : 'The website and game routes are available. Live status is still checking.',
-    android: () => 'Use Play Android — Join Now. The stable table waits for JOIN NOW before dealing cards.',
-    quest: () => 'Launch Quest / VR for the original uploaded table, Eric dealer runtime, seated movement lock, overlay cleanup and poker audio.',
-    profile: () => 'Open Player Profile for the dashboard, then use Dressing Room to preview Eric and the avatar system.',
+      ? `Server is up. Build: ${deployHealth.build}. Camera 3: ${deployHealth.camera3Build || 'Phase 391'}. Quest: ${deployHealth.questBuild || 'Phase 391'}. Android: ${deployHealth.androidBuild || 'Phase 391'}.`
+      : 'The website, production Camera 3, playable Android route, and Quest game are available. Live status is still checking.',
+    android: () => 'Use Play Android. Phase 391 opens JOIN NOW, five bots, hole cards, community cards, pot chips, poker actions, responsive portrait/landscape layouts, and a direct gameplay fallback.',
+    quest: () => 'Launch Quest / VR for one original table authority, the recessed playing surface, restored cards, upright Eric, and a fixed spawn directly in front of the table.',
+    profile: () => 'Open Player Profile for the saved-avatar demo, then use Dressing Room to change the outfit.',
     store: () => 'Open SVR Store to browse the store portal and future in-world item concepts.',
     events: () => 'Open Tournaments for the event schedule and competition path.',
     sponsor: () => 'Open Sponsorship, Advertising or Billboards to review partnership and presentation options.',
     support: () => 'Open Contact SVR for project, technical, membership, sponsor or support questions.',
-    default: () => 'I can help with system status, Android, Quest, APK installation, profiles, the dressing room, store, tournaments, membership, sponsors, news or support.'
+    default: () => 'I can help with Camera 3, system status, Android gameplay, Quest, APK installation, profiles, the dressing room, store, tournaments, membership, sponsors, news or support.'
   };
 
   const reply = (value) => {
     const raw = String(value || '').trim();
     if (!raw) return;
     const q = raw.toLowerCase();
-    const key = q.includes('status') || q.includes('server') ? 'status'
+    const key = q.includes('status') || q.includes('server') || q.includes('camera') ? 'status'
       : q.includes('quest') || q.includes('vr') ? 'quest'
       : q.includes('android') || q.includes('play') || q.includes('apk') ? 'android'
       : q.includes('profile') || q.includes('eric') || q.includes('dress') || q.includes('avatar') ? 'profile'
@@ -89,25 +111,29 @@
       log.scrollTop = log.scrollHeight;
     }
   };
-
   const input = document.getElementById('aiInput');
   const send = document.getElementById('aiSend');
   if (send && input) {
-    send.addEventListener('click', () => {
-      reply(input.value);
-      input.value = '';
-    });
-    input.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') send.click();
-    });
+    send.addEventListener('click', () => { reply(input.value); input.value = ''; });
+    input.addEventListener('keydown', (event) => { if (event.key === 'Enter') send.click(); });
   }
   document.querySelectorAll('[data-ai]').forEach((button) => button.addEventListener('click', () => reply(button.dataset.ai)));
 
-  window.SVR_PHASE383_FULL_SITE = {
-    build: 'PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK',
-    fullHomepage: true,
-    androidStablePreserved: true,
-    questRuntimePreserved: true,
+  window.SVR_PHASE391_FULL_SITE = {
+    build: 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK',
+    camera3Route: '/game/camera3-live.html?v=phase391',
+    androidRoute: '/game/android.html?channel=stable&v=phase391',
+    androidGameplayRoute: '/game/android-stable.html?v=phase391&direct=1',
+    questRoute: '/game/quest.html?v=phase391',
+    singleOriginalTableAuthority: true,
+    legacyCameraControllersRemoved: true,
+    legacyQuestSeatAuthorityRemoved: true,
+    androidPlayable: true,
+    questTableGeometryCorrected: true,
+    questCardsRestored: true,
+    questFrontSpawnLocked: true,
+    ericUprightCorrected: true,
+    avatarProfileVisibleRefresh: true,
     terminatedPartnerMaterialExcluded: true
   };
 })();
