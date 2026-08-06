@@ -3,69 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>SVR Poker Android Tabletop</title>
+<title>SVR Poker Android Playable Tabletop</title>
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<style>
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#02040a;color:#fff;font-family:system-ui,Arial}#androidTabletopFrame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#02040a}#phase385Loading{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#16393b,#07101a 46%,#02040a 82%);transition:.28s opacity}.card{width:min(420px,88vw);padding:22px;border:1px solid #7ffcff;border-radius:22px;background:#050a14ef;text-align:center;box-shadow:0 28px 90px #000}.card img{width:72px;height:72px;object-fit:contain}.card strong{display:block;color:#8dffb4;letter-spacing:.08em;margin-top:8px}.ready #phase385Loading{opacity:0;pointer-events:none}
-</style>
+<meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<style>html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#02040a;color:#fff;font-family:system-ui,Arial}#androidTabletopFrame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#02040a}#phase391Loading{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#16393b,#07101a 46%,#02040a 82%);transition:.28s opacity}.card{width:min(430px,88vw);padding:22px;border:1px solid #7ffcff;border-radius:22px;background:#050a14ef;text-align:center;box-shadow:0 28px 90px #000}.card img{width:72px;height:72px;object-fit:contain}.card strong{display:block;color:#8dffb4;letter-spacing:.08em;margin-top:8px}.card a{display:inline-flex;min-height:46px;margin-top:10px;padding:0 14px;align-items:center;justify-content:center;border:1px solid #ffd98a;border-radius:12px;color:#fff;text-decoration:none;font-weight:900}.ready #phase391Loading{opacity:0;pointer-events:none}.failed #phase391Loading{background:#12060b}</style>
 </head>
-<body data-build="PHASE-385-ANDROID-ORIGINAL-TABLETOP-GYRO-UI-LOCK">
-<div id="phase385Loading"><div class="card"><img src="/logo.png" alt="SVR Poker"><strong>PHASE 385 ANDROID TABLETOP</strong><p>Loading the original SVR table, compact seats, larger cards, visible pot chips, and gyroscope view.</p></div></div>
-<iframe id="androidTabletopFrame" title="SVR Poker Android game" allow="accelerometer; gyroscope; fullscreen" src="./android-stable.html?v=phase380&deploy=phase385&presentation=tabletop"></iframe>
+<body data-build="PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK" data-predecessor="PHASE-390-ANDROID-PLAYABLE-ROUTE-LOCK">
+<div id="phase391Loading"><div class="card"><img src="/logo.png" alt="SVR Poker"><strong>ANDROID PLAYABLE POKER</strong><p id="phase391Status">Loading JOIN NOW, five bots, cards, pot chips, poker actions, responsive layouts, and gyroscope view.</p><a href="./android-stable.html?v=phase391&direct=1">OPEN DIRECT GAME</a></div></div>
+<iframe id="androidTabletopFrame" title="SVR Poker Android playable game" allow="accelerometer; gyroscope; fullscreen" src="./android-stable.html?v=phase391&deploy=phase391&presentation=responsive-tabletop"></iframe>
 <script>
 (()=>{
-const BUILD='PHASE-385-ANDROID-ORIGINAL-TABLETOP-GYRO-UI-LOCK';
+const BUILD='PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK';
 const frame=document.getElementById('androidTabletopFrame');
-const state={build:BUILD,frameLoads:0,cssInjected:false,moduleInjected:false,orientationRelayed:false,lastError:null,checkedAt:null};
+const status=document.getElementById('phase391Status');
+const state={build:BUILD,frameLoads:0,baseCssInjected:false,responsiveCssInjected:false,tableModuleInjected:false,responsiveModuleInjected:false,joinButtonFound:false,tableFound:false,holeCardsRootFound:false,communityCardsRootFound:false,actionButtons:0,playableUiFound:false,orientationRelayed:false,recoveryShown:false,lastError:null,checkedAt:null};
+function addStyle(doc,id,href){if(doc.getElementById(id))return false;const link=doc.createElement('link');link.id=id;link.rel='stylesheet';link.href=href;doc.head.appendChild(link);return true}
+function addModule(doc,id,src){if(doc.getElementById(id))return false;const script=doc.createElement('script');script.id=id;script.type='module';script.src=src;doc.body.appendChild(script);return true}
+function inspect(doc){state.joinButtonFound=Boolean(doc.querySelector('#join'));state.tableFound=Boolean(doc.querySelector('#table'));state.holeCardsRootFound=Boolean(doc.querySelector('#hole'));state.communityCardsRootFound=Boolean(doc.querySelector('#community'));state.actionButtons=doc.querySelectorAll('.actions button[data-a]').length;state.playableUiFound=state.joinButtonFound&&state.tableFound&&state.holeCardsRootFound&&state.communityCardsRootFound&&state.actionButtons===4;return state.playableUiFound}
 function inject(){
-  try{
-    const doc=frame.contentDocument;
-    if(!doc?.head||!doc?.body)return;
-    state.frameLoads+=1;
-    if(!doc.getElementById('phase385AndroidTabletopCss')){
-      const link=doc.createElement('link');
-      link.id='phase385AndroidTabletopCss';
-      link.rel='stylesheet';
-      link.href='./styles/phase385_android_tabletop.css?v=phase385';
-      doc.head.appendChild(link);
-      state.cssInjected=true;
-    }
-    if(!doc.getElementById('phase385AndroidTabletopModule')){
-      const script=doc.createElement('script');
-      script.id='phase385AndroidTabletopModule';
-      script.type='module';
-      script.src='./modules/phase385_android_tabletop_3d.js?v=phase385';
-      doc.body.appendChild(script);
-      state.moduleInjected=true;
-    }
-    doc.body.dataset.presentationBuild=BUILD;
-    const buildLabel=doc.querySelector('.build');
-    if(buildLabel)buildLabel.textContent='PHASE 385 ANDROID TABLETOP';
-    const gateStatus=doc.querySelector('#gateStatus');
-    if(gateStatus)gateStatus.textContent='Original table, larger cards, compact seats, pot chips, and gyro view ready.';
-    document.body.classList.add('ready');
-    state.checkedAt=new Date().toISOString();
-  }catch(error){
-    state.lastError=String(error?.stack||error?.message||error);
-    state.checkedAt=new Date().toISOString();
-  }
+ try{
+  const doc=frame.contentDocument;if(!doc?.head||!doc?.body)return;
+  state.frameLoads++;
+  state.baseCssInjected=addStyle(doc,'phase385AndroidTabletopCss','./styles/phase385_android_tabletop.css?v=phase391')||state.baseCssInjected;
+  state.responsiveCssInjected=addStyle(doc,'phase391AndroidResponsiveCss','./styles/phase389_android_responsive_layout.css?v=phase391')||state.responsiveCssInjected;
+  state.tableModuleInjected=addModule(doc,'phase385AndroidTabletopModule','./modules/phase385_android_tabletop_3d.js?v=phase391')||state.tableModuleInjected;
+  state.responsiveModuleInjected=addModule(doc,'phase391AndroidResponsiveModule','./modules/phase389_android_responsive_layout.js?v=phase391')||state.responsiveModuleInjected;
+  doc.body.dataset.presentationBuild=BUILD;
+  const buildLabel=doc.querySelector('.build');if(buildLabel)buildLabel.textContent='PHASE 391 ANDROID PLAYABLE POKER';
+  const gateStatus=doc.querySelector('#gateStatus');if(gateStatus)gateStatus.textContent='JOIN NOW opens the complete local play-money table with five bots, cards, chips, actions, and responsive controls.';
+  if(inspect(doc)){document.body.classList.add('ready');document.body.classList.remove('failed');status.textContent='Android gameplay ready.'}
+  state.checkedAt=new Date().toISOString();
+ }catch(error){state.lastError=String(error?.stack||error?.message||error);state.checkedAt=new Date().toISOString()}
 }
-frame.addEventListener('load',()=>{setTimeout(inject,0);setTimeout(inject,250)});
-window.addEventListener('deviceorientation',event=>{
-  try{
-    frame.contentWindow?.dispatchEvent(new CustomEvent('svr:deviceorientation',{detail:{alpha:event.alpha,beta:event.beta,gamma:event.gamma,absolute:event.absolute}}));
-    state.orientationRelayed=true;
-  }catch{}
-},{passive:true});
-setTimeout(inject,900);
-window.SVR_PHASE385_ANDROID_WRAPPER_QA=()=>{
-  let frameUrl=frame.src;
-  let childQa=null;
-  try{frameUrl=frame.contentWindow?.location?.href||frame.src;childQa=frame.contentWindow?.SVR_PHASE385_ANDROID_TABLETOP_QA?.()||null}catch{}
-  return{...state,frameUrl,childQa,checkedAt:new Date().toISOString()};
-};
+frame.addEventListener('load',()=>{setTimeout(inject,0);setTimeout(inject,250);setTimeout(inject,900);setTimeout(inject,2200)});
+window.addEventListener('deviceorientation',event=>{try{frame.contentWindow?.dispatchEvent(new CustomEvent('svr:deviceorientation',{detail:{alpha:event.alpha,beta:event.beta,gamma:event.gamma,absolute:event.absolute}}));state.orientationRelayed=true}catch{}},{passive:true});
+window.addEventListener('orientationchange',()=>setTimeout(inject,200));
+window.visualViewport?.addEventListener('resize',()=>setTimeout(inject,80),{passive:true});
+setTimeout(inject,700);
+setTimeout(()=>{if(!state.playableUiFound){state.recoveryShown=true;document.body.classList.add('failed');status.textContent='The responsive wrapper did not confirm the game. Use Open Direct Game below.'}},6500);
+window.SVR_PHASE391_ANDROID_WRAPPER_QA=()=>{let frameUrl=frame.src,childQa=null;try{frameUrl=frame.contentWindow?.location?.href||frame.src;childQa=frame.contentWindow?.SVR_PHASE389_ANDROID_LAYOUT_QA?.()||null}catch{}return{...state,frameUrl,childQa,pass:Boolean(state.playableUiFound&&state.responsiveCssInjected&&state.responsiveModuleInjected&&state.actionButtons===4),checkedAt:new Date().toISOString()}};
 })();
 </script>
 </body>
