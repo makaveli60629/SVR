@@ -1,7 +1,7 @@
 {
   "name": "SVR Poker Android",
   "channel": "stable-test",
-  "status": "phase390-playable-web-rc2-apk-ready",
+  "status": "phase391-playable-web-production-rc2-apk-ready",
   "packageName": "com.svrpoker.app",
   "apkVersionName": "0.1.0-rc2",
   "apkVersionCode": 2,
@@ -9,18 +9,18 @@
   "apkSha256": "f264a3cb9d4eaf1fd7d66604f575f7abb176c6012015bae06e5d7dd734ca328c",
   "releasePage": "https://github.com/makaveli60629/SVR/releases/tag/android-rc2",
   "releaseReady": true,
-  "webEntry": "/game/android.html?channel=stable&v=phase390",
-  "tabletopEntry": "/game/android-tabletop.html?v=phase390",
-  "coreGameplayEntry": "/game/android-stable.html?v=phase390&direct=1",
-  "downloadsUrl": "/downloads/?v=phase390",
+  "webEntry": "/game/android.html?channel=stable&v=phase391",
+  "tabletopEntry": "/game/android-tabletop.html?v=phase391",
+  "coreGameplayEntry": "/game/android-stable.html?v=phase391&direct=1",
+  "downloadsUrl": "/downloads/?v=phase391",
   "forceUpdate": false,
   "showUpdatePrompt": false,
   "manualUpdateOnly": true,
-  "previewEntry": "/game/camera3-live.html?v=phase390",
+  "previewEntry": "/game/camera3-live.html?v=phase391",
   "profileEntry": "/site/profile.html?v=phase389",
   "dressingRoomEntry": "/site/avatar.html?v=phase389",
-  "currentGameBuild": "PHASE-390-ANDROID-PLAYABLE-ROUTE-LOCK",
-  "questBuild": "PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK",
+  "currentGameBuild": "PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK",
+  "questBuild": "PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK",
   "publicControls": {
     "downloadApkVisible": true,
     "updateAppVisible": true,
@@ -48,16 +48,18 @@
     "safeAreaInsets": true,
     "visualViewportHeight": true,
     "largeActionButtons": true,
-    "gyroscopeView": true
+    "gyroscopeView": true,
+    "wrapperQa": "SVR_PHASE391_ANDROID_WRAPPER_QA",
+    "directFallback": true
   },
   "nativeBuildStatus": "same-domain-apk-verified-no-rebuild",
   "nativeApkRebuild": false,
   "offlineStableTableBundled": true,
-  "updateMessage": "Android RC2 remains published. Phase 390 exposes the playable browser game and direct gameplay fallback without forcing an APK reinstall.",
+  "updateMessage": "Android RC2 remains published. Phase 391 consolidates the playable browser route and direct fallback without forcing an APK reinstall.",
   "notes": [
     "The playable browser game is available independently of the APK.",
     "The verified RC2 APK and version code remain unchanged.",
-    "Phase 390 exposes JOIN NOW, cards, bots, pot chips, and poker actions through the Android route.",
+    "Phase 391 exposes JOIN NOW, five bots, cards, pot chips, poker actions, responsive layouts, and gyroscope support.",
     "No forced or recurring update prompt is enabled."
   ]
 }
