@@ -11,6 +11,7 @@ const CORE=[
   '/game/modules/phase388_table_material_visibility_guard.js?v=phase390',
   '/game/modules/phase389_runtime_health_visibility.js?v=phase390',
   '/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js?v=phase390',
+  '/game/modules/phase390_surface_cards_final_guard.js?v=phase390',
   '/game/modules/phase390_front_spawn_final_guard.js?v=phase390',
   '/game/camera3-live.html?v=phase390','/game/modules/phase389_camera3_live_preview.js?v=phase390',
   '/game/android.html?channel=stable&v=phase390','/game/android-tabletop.html?v=phase390','/game/android-stable.html?v=phase390',
