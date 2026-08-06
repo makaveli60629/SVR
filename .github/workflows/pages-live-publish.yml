@@ -62,6 +62,7 @@ jobs:
           grep -q 'PHASE-388-ERIC-UPRIGHT-MATERIAL-LOCK' site/js/phase388-eric-upright-material-lock.js
           grep -q 'PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK' game/index.html
           grep -q 'phase388_front_south_seat_authority' game/index.html
+          grep -q 'phase388_table_material_visibility_guard' game/index.html
           grep -q 'phase388_quest_table_player_eric_authority' game/index.html
           grep -q 'phase388_quest_view_dealer_guard' game/index.html
           ! grep -q "await import('./modules/phase381_vr_runtime_lock" game/index.html
@@ -70,9 +71,11 @@ jobs:
           ! grep -q "await import('./modules/phase387_quest_direct_seat_recovery" game/index.html
           test -s game/quest.html
           test -s game/modules/phase388_front_south_seat_authority.js
+          test -s game/modules/phase388_table_material_visibility_guard.js
           test -s game/modules/phase388_quest_table_player_eric_authority.js
           test -s game/modules/phase388_quest_view_dealer_guard.js
           grep -q 'GAP=.12' game/modules/phase388_front_south_seat_authority.js
+          grep -q 'svrPhase388TableVisible' game/modules/phase388_table_material_visibility_guard.js
           grep -q 'PHASE388_OFFICIAL_SITE_LOGO_FELT' game/modules/phase388_quest_table_player_eric_authority.js
           grep -q 'PHASE388_QUEST_PROFESSIONAL_LIGHTS' game/modules/phase388_quest_table_player_eric_authority.js
           grep -q 'svrPhase388HeadOverlayRemoved' game/modules/phase388_quest_view_dealer_guard.js
@@ -94,6 +97,7 @@ jobs:
           grep -q '"questEricGeneratedStripeTextureRemoved": true' deploy-health.json
           grep -q '"questOfficialRootLogoOnFelt": true' deploy-health.json
           grep -q '"questProfessionalLightingAuthority": true' deploy-health.json
+          grep -q '"questTableMaterialVisibilityGuard": true' deploy-health.json
           grep -q '"cacheRecovery": true' deploy-health.json
           grep -q '"cleanTreePublish": true' deploy-health.json
           test -f CNAME
