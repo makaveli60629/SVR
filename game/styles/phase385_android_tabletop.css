@@ -1,0 +1,43 @@
+/* PHASE-385-ANDROID-ORIGINAL-TABLETOP-GYRO-UI-LOCK */
+:root{--phase385-seat-bg:rgba(2,8,18,.82);--phase385-seat-border:rgba(127,252,255,.58);--phase385-seat-active:#ffd98a;--phase385-felt:#061a13}
+.table-surface{display:block!important;position:relative!important;padding:0!important;transform:none!important;isolation:isolate;background:radial-gradient(ellipse at 50% 43%,#17402f 0,#08241a 52%,#020b08 100%)!important}
+.table-surface::before{z-index:1;inset:7px!important;border:1px solid rgba(255,217,138,.52)!important;box-shadow:inset 0 0 0 1px rgba(127,252,255,.16);pointer-events:none}
+#phase385TableStage{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;pointer-events:none;background:radial-gradient(ellipse at 50% 54%,rgba(12,63,43,.28),rgba(0,0,0,.38) 72%)}
+#phase385TableStage canvas{width:100%!important;height:100%!important;display:block;filter:saturate(1.06) contrast(1.04)}
+.table-surface.phase385-3d-ready{background:linear-gradient(180deg,#04110d,#020806)!important}
+.table-surface.phase385-3d-ready .table-watermark{opacity:0}
+.table-watermark{z-index:1;inset:34% 35%!important;opacity:.1!important}
+#phase385GyroBadge{position:absolute;z-index:9;top:8px;right:12px;padding:4px 7px;border:1px solid rgba(127,252,255,.55);border-radius:999px;background:rgba(2,8,18,.76);color:#dffcff;font-size:8px;font-weight:950;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(5px)}
+.dealer{position:absolute!important;z-index:8!important;top:2.2%;left:50%;transform:translateX(-50%);margin:0!important;padding:4px 10px!important;font-size:clamp(9px,2.8vw,12px)!important;box-shadow:0 5px 18px rgba(0,0,0,.55)}
+.bots{position:absolute!important;inset:0!important;z-index:7!important;display:block!important;pointer-events:none}
+.bot{position:absolute!important;width:clamp(94px,28vw,148px)!important;min-height:63px!important;height:auto!important;padding:5px 6px!important;border:1px solid var(--phase385-seat-border)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(4,13,23,.9),var(--phase385-seat-bg))!important;box-shadow:0 9px 22px rgba(0,0,0,.45),inset 0 0 14px rgba(127,252,255,.04);backdrop-filter:blur(6px);overflow:visible!important;transform-origin:center;pointer-events:none}
+.bot strong{font-size:clamp(10px,3vw,13px)!important;line-height:1.05;color:#fff;text-shadow:0 1px 3px #000}
+.bot .money{font-size:clamp(9px,2.7vw,12px)!important;line-height:1.05;color:#dceeff!important}
+.bot:nth-child(1){left:2.2%;top:8.5%}
+.bot:nth-child(2){left:50%;top:3.6%;transform:translateX(-50%)}
+.bot:nth-child(3){right:2.2%;top:8.5%}
+.bot:nth-child(4){left:2.2%;top:37%}
+.bot:nth-child(5){right:2.2%;top:37%}
+.bot.button{border-color:var(--phase385-seat-active)!important;box-shadow:0 0 0 1px rgba(255,217,138,.28),0 0 18px rgba(255,217,138,.42)!important}
+.bot.winner{z-index:10!important}
+.mini-cards{gap:4px!important;margin-top:4px!important}
+.mini-cards .card{width:clamp(27px,7.9vw,38px)!important;height:clamp(38px,11vw,54px)!important;border-radius:6px!important}
+.mini-cards .card .rank{left:3px!important;top:2px!important;font-size:clamp(9px,2.7vw,13px)!important}
+.mini-cards .card .suit{font-size:clamp(18px,5.4vw,27px)!important}
+.board-row{position:absolute!important;z-index:8!important;left:50%;bottom:2.4%;width:96%;transform:translateX(-50%);display:grid!important;grid-template-columns:44px minmax(0,1fr)!important;grid-template-areas:"cl community" "hl hole"!important;align-items:center!important;gap:5px 4px!important;padding:5px 6px 7px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:linear-gradient(180deg,rgba(1,11,8,.18),rgba(1,8,6,.68));box-shadow:0 10px 24px rgba(0,0,0,.38);backdrop-filter:blur(3px)}
+.board-row .community-label{grid-area:cl}.board-row #community{grid-area:community}.board-row .hole-label{grid-area:hl}.board-row #hole{grid-area:hole}
+.label{font-size:clamp(8px,2.4vw,10px)!important;color:#e3fbff!important}
+#community,#hole{justify-content:center!important;gap:clamp(3px,1vw,6px)!important;min-width:0}
+#community .card{width:clamp(39px,11vw,58px)!important;height:clamp(55px,15.4vw,82px)!important;border-radius:8px!important}
+#hole{width:max-content;min-width:112px;margin:auto;padding:3px 9px;border:1px solid rgba(127,252,255,.36);border-radius:12px;background:rgba(2,8,18,.72);box-shadow:0 0 18px rgba(127,252,255,.08)}
+#hole .card{width:clamp(48px,13.4vw,68px)!important;height:clamp(68px,18.8vw,96px)!important;border-radius:9px!important}
+#community .card .rank,#hole .card .rank{left:5px!important;top:4px!important;font-size:clamp(13px,3.8vw,19px)!important}
+#community .card .suit{font-size:clamp(25px,7.2vw,39px)!important}
+#hole .card .suit{font-size:clamp(30px,8.8vw,46px)!important}
+.card{box-shadow:0 5px 12px rgba(0,0,0,.72),0 0 0 1px rgba(255,255,255,.75) inset!important}
+.actions{position:relative;z-index:12}
+.pill#pot{transition:.2s transform,.2s box-shadow,.2s background}
+.pill#pot:not(:empty){box-shadow:0 0 14px rgba(255,217,138,.1)}
+@media(max-width:420px){.shell{padding-left:5px!important;padding-right:5px!important}.table-surface{border-width:5px!important;border-radius:28px!important}.bot{width:29vw!important;min-height:58px!important;padding:4px!important}.bot:nth-child(4),.bot:nth-child(5){top:36.5%}.board-row{width:97%;grid-template-columns:36px minmax(0,1fr)!important;padding-left:4px;padding-right:4px}#community .card{width:10.6vw!important;height:15vw!important}#hole .card{width:13.2vw!important;height:18.6vw!important}.mini-cards .card{width:7.6vw!important;height:10.7vw!important}}
+@media(max-height:760px){.card{width:auto;height:auto}.bot{min-height:52px!important}.bot:nth-child(4),.bot:nth-child(5){top:34.5%}.mini-cards .card{width:24px!important;height:34px!important}#community .card{width:36px!important;height:51px!important}#hole .card{width:43px!important;height:61px!important}.board-row{bottom:1.3%;padding-top:3px;padding-bottom:4px}}
+@media(min-width:700px){.bot{width:150px!important;min-height:78px!important}.mini-cards .card{width:38px!important;height:54px!important}#community .card{width:58px!important;height:82px!important}#hole .card{width:68px!important;height:96px!important}}

@@ -1,0 +1,58 @@
+{
+  "build": "PHASE-385-ANDROID-ORIGINAL-TABLETOP-GYRO-UI-LOCK",
+  "scope": "android-game-presentation-only",
+  "protected": {
+    "website": true,
+    "questRuntime": "PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK",
+    "androidGameplay": "PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK",
+    "androidPresentationPredecessor": "PHASE-384-ANDROID-ONE-PAGE-3D-CHIP-WINNER-LOCK",
+    "apkVersionName": "0.1.0-rc2",
+    "apkVersionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false
+  },
+  "entry": "/game/android.html?channel=stable&v=phase385",
+  "presentationWrapper": "/game/android-tabletop.html?v=phase385",
+  "gameplayFallback": "/game/android-stable.html?v=phase380&deploy=phase385",
+  "assets": {
+    "primaryTable": "/game/assets/models/table.glb",
+    "existingFallbackTable": "/game/assets/table.fbx",
+    "feltLogo": "/logo.png"
+  },
+  "features": {
+    "compactPlayerSeats": true,
+    "largeOpponentCards": true,
+    "largeCommunityCards": true,
+    "largePlayerCards": true,
+    "namesAndStacksAttachedToSeats": true,
+    "winnerSeatHighlight": true,
+    "originalTablePrimary": true,
+    "generatedDuplicateTable": false,
+    "gyroscopeView": true,
+    "touchLookFallback": true,
+    "visiblePotChipStacks": true,
+    "svrLogoOnFelt": true,
+    "existingChipFlightPreserved": true,
+    "existingPokerEnginePreserved": true
+  },
+  "performance": {
+    "pixelRatioCap": 1.45,
+    "antialias": false,
+    "dynamicShadows": false,
+    "sharedChipGeometry": true,
+    "smoothedGyroscope": true,
+    "cssFallbackTable": true
+  },
+  "files": [
+    "game/index.html",
+    "game/android.html",
+    "game/android-tabletop.html",
+    "game/manifest.json",
+    "game/styles/phase385_android_tabletop.css",
+    "game/modules/phase385_android_tabletop_3d.js",
+    "game/docs/PHASE_385_ANDROID_ORIGINAL_TABLETOP_GYRO_UI_LOCK.md",
+    "game/docs/PHASE_385_ANDROID_ORIGINAL_TABLETOP_GYRO_UI_MANIFEST.json",
+    "pwa-sw.js",
+    "sw.js"
+  ]
+}

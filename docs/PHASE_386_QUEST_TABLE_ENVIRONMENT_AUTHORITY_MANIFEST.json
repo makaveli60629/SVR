@@ -1,0 +1,115 @@
+{
+  "build": "PHASE-386-QUEST-TABLE-ENVIRONMENT-AUTHORITY-LOCK",
+  "scope": "quest-game-runtime-only",
+  "branch": "agent/android-original-tabletop-gyro-polish",
+  "predecessors": {
+    "quest": "PHASE-384-QUEST-ERIC-TABLE-QUICKPLAY-POLISH-LOCK",
+    "ericMotion": "PHASE-381-VR-SEAT-ERIC-AUDIO-OVERLAY-LOCK",
+    "table": "PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK",
+    "android": "PHASE-385-ANDROID-ORIGINAL-TABLETOP-GYRO-UI-LOCK",
+    "site": "PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK"
+  },
+  "routes": {
+    "quest": "/game/index.html?platform=quest&v=phase386",
+    "android": "/game/android-tabletop.html?v=phase385"
+  },
+  "assets": {
+    "primaryTable": "/game/assets/models/table.glb",
+    "fallbackTable": "/game/assets/table.fbx",
+    "eric": "/game/assets/models/eric/eric.fbx",
+    "feltLogo": "/logo.png",
+    "moonTexture": "phase386-generated-crater-canvas"
+  },
+  "table": {
+    "targetLengthMeters": 2.74,
+    "targetDepthMeters": 1.46,
+    "targetHeightMeters": 0.8,
+    "originalAssetPrimary": true,
+    "duplicateTablesHidden": true,
+    "professionalMaterialFallback": true,
+    "greenFeltOverlay": true,
+    "svrLogoOnFelt": true
+  },
+  "player": {
+    "alwaysFrontOfTable": true,
+    "frontGapMeters": 0.68,
+    "sameHorizontalDistanceSittingOrStanding": true,
+    "seatedVerticalCalibration": true,
+    "standingModePreserved": true,
+    "forcedPhase384QuickSeatBlocked": true,
+    "continuousFrontAnchorCorrection": true
+  },
+  "teleport": {
+    "disabledAtTable": true,
+    "handTeleportDisabled": true,
+    "gripTeleportDisabled": true,
+    "watchTeleportDisabled": true,
+    "pointerAndHandRayDisabled": true,
+    "teleportMethodsGuarded": true,
+    "raysArcsMarkersAndReticlesHidden": true
+  },
+  "lighting": {
+    "ambientFill": true,
+    "hemisphereLight": true,
+    "warmDirectionalKey": true,
+    "coolDirectionalFill": true,
+    "dealerSpot": true,
+    "playerSideFill": true,
+    "dynamicShadows": false,
+    "toneMapping": "ACESFilmic",
+    "exposure": 1.22
+  },
+  "eric": {
+    "singleAuthority": true,
+    "targetHeightMeters": 1.78,
+    "behindDealerSide": true,
+    "existingTextureMapsPreserved": true,
+    "fallbackMaterialClasses": ["skin", "hair", "shirt", "suit", "pants", "shoes"],
+    "externalSkeletonsHidden": true,
+    "dealerMotionPreserved": true
+  },
+  "headsetOverlay": {
+    "namedOverlayCleanup": true,
+    "unnamedDarkCameraQuadCleanup": true,
+    "vignetteDisabled": true,
+    "comfortMaskDisabled": true,
+    "visorDisabled": true,
+    "postprocessingDisabled": true,
+    "handsControllersWatchCardsAndPlanetsPreserved": true
+  },
+  "moon": {
+    "singleAuthority": true,
+    "radiusMeters": 2.35,
+    "craterTexture": true,
+    "bumpResponse": true,
+    "aboveLobbyView": true,
+    "slowRotation": true,
+    "olderDuplicateMoonsHidden": true
+  },
+  "planetPreservation": {
+    "guardBuild": "PHASE-386-PLANET-PRESERVATION-GUARD",
+    "earthPreserved": true,
+    "marsPreserved": true,
+    "existingPlanetGroupsRestored": true,
+    "onlyLegacyMoonObjectsHidden": true
+  },
+  "protected": {
+    "websiteRedesign": false,
+    "androidGameplayRewritten": false,
+    "apkVersionName": "0.1.0-rc2",
+    "apkVersionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false
+  },
+  "files": [
+    "game/modules/phase386_quest_table_environment_authority.js",
+    "game/modules/phase386_planet_preservation_guard.js",
+    "game/index.html",
+    "game/manifest.json",
+    "docs/PHASE_386_QUEST_TABLE_ENVIRONMENT_AUTHORITY_MANIFEST.md",
+    "docs/PHASE_386_QUEST_TABLE_ENVIRONMENT_AUTHORITY_MANIFEST.json",
+    "pwa-sw.js",
+    "sw.js",
+    ".github/workflows/deploy.yml"
+  ]
+}
