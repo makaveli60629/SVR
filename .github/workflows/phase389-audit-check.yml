@@ -1,0 +1,61 @@
+name: Phase 389 Audit Check
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [agent/phase389-full-audit-visible-fixes]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate Phase 389 contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK' index.html
+          grep -q 'PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK' game/index.html
+          ! grep -q "^import './modules/phase388_front_south_seat_authority" game/index.html
+          grep -q 'phase389_runtime_health_visibility' game/index.html
+          grep -q 'PHASE-389-CAMERA3-LIVE-PREVIEW-ROUTE-LOCK' game/camera3-live.html
+          grep -q 'PHASE389_CAMERA3_PRODUCTION_LIGHTING' game/modules/phase389_camera3_live_preview.js
+          grep -q 'camera3-live.html?v=phase389' site/phase383-home-restore.js
+          grep -q 'PHASE-389-ANDROID-RESPONSIVE-TABLE-LAYOUT-LOCK' game/android-tabletop.html
+          grep -q 'PHASE-389-AVATAR-DRESSING-ROOM-VISIBLE-REFRESH-LOCK' site/avatar.html
+          grep -q 'PHASE-389-PROFILE-AVATAR-SHOWROOM-VISIBLE-REFRESH-LOCK' site/profile.html
+          grep -q 'phase389-full-audit-visible-fixes-v2' sw.js
+          grep -q 'phase389-full-audit-visible-fixes-v2' pwa-sw.js
+          grep -q '"phase": 389' game/manifest.json
+          grep -q '"camera3Url": "/game/camera3-live.html?v=phase389"' update/app-version.json
+          grep -q '"forceUpdate": false' update/app-version.json
+          grep -q '"showUpdatePrompt": false' update/app-version.json
+          test -s game/assets/models/table.glb
+          test -s game/assets/models/eric/eric.fbx
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          node --check site-public-hooks.js
+          node --check site/phase383-home-restore.js
+          node --check site/js/phase389-avatar-room.js
+          node --check site/js/phase389-profile-showroom.js
+          node --check game/modules/phase389_runtime_health_visibility.js
+          node --check game/modules/phase389_camera3_live_preview.js
+          node --check game/modules/phase389_android_responsive_layout.js
+          node --check sw.js
+          node --check pwa-sw.js
+      - name: Verify protected release policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+          ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' index.html game site update .github | grep -q .
