@@ -1,22 +1,28 @@
-/* PHASE-390-CAMERA3-ANDROID-GAMEPLAY-LIVE-ROUTE-LOCK */
+/* PHASE-391-SITE-GAME-ROUTE-CONSOLIDATION-LOCK */
 (() => {
-  const CAMERA3_ROUTE = '../game/camera3-live.html?v=phase390&embed=1&autocam=1&source=site-live-preview';
-  const ANDROID_ROUTE = '../game/android.html?channel=stable&v=phase390&source=site-play-android';
+  const CAMERA3_ROUTE = '../game/camera3-live.html?v=phase391&embed=1&autocam=1&source=site-live-preview';
+  const ANDROID_ROUTE = '../game/android.html?channel=stable&v=phase391&source=site-play-android';
+  const QUEST_ROUTE = '../game/quest.html?v=phase391&source=site-play-quest';
   const routeLiveGames = () => {
     document.querySelectorAll('iframe').forEach((iframe) => {
       const src = String(iframe.getAttribute('src') || '');
-      if (/preview=1|cam=director|camera3\.html|cam3\.html/i.test(src)) iframe.src = CAMERA3_ROUTE;
+      if (/preview=1|cam=director|camera3(?:-live)?\.html|cam3\.html/i.test(src)) iframe.src = CAMERA3_ROUTE;
     });
     document.querySelectorAll('a[href]').forEach((anchor) => {
       const href = String(anchor.getAttribute('href') || '');
-      if (/preview=1|cam=director|camera3\.html|cam3\.html/i.test(href)) {
+      if (/preview=1|cam=director|camera3(?:-live)?\.html|cam3\.html/i.test(href)) {
         anchor.href = CAMERA3_ROUTE.replace('&embed=1', '');
         return;
       }
-      if (/\/game\/(?:android|android-play|android-stable|android-tabletop)\.html/i.test(href)) anchor.href = ANDROID_ROUTE;
+      if (/\/game\/(?:android|android-play|android-stable|android-tabletop)\.html/i.test(href)) {
+        anchor.href = ANDROID_ROUTE;
+        return;
+      }
+      if (/\/game\/(?:index|quest)\.html/i.test(href)) anchor.href = QUEST_ROUTE;
     });
   };
   routeLiveGames();
+
   const frame = document.getElementById('svrLiveGameFrame');
   const fallback = document.getElementById('previewFallback');
   if (frame && fallback) {
@@ -27,7 +33,7 @@
     });
     setTimeout(() => {
       if (!loaded) {
-        fallback.innerHTML = '<strong>Camera 3 is still loading.</strong><span>Open the dedicated live feed while the corrected table, cards, Eric, and lighting finish loading.</span>';
+        fallback.innerHTML = '<strong>Camera 3 is still loading.</strong><span>Open the dedicated live feed while the consolidated table, cards, Eric, and lighting finish loading.</span>';
         fallback.classList.add('is-warning');
       }
     }, 8000);
@@ -45,7 +51,6 @@
 
   let deployHealth = null;
   let androidRelease = null;
-
   (async () => {
     const box = document.getElementById('releaseStatus');
     try {
@@ -59,12 +64,12 @@
       setMeter('game', String(deployHealth.questBuild || deployHealth.build || 'LIVE').replace('PHASE-', 'P'), 100, true);
       if (androidRelease.releaseReady && androidRelease.apkUrl) {
         setMeter('apk', 'RC2 READY', 100, true);
-        if (box) box.innerHTML = `<strong>Server, full website, furnished Camera 3, corrected Quest runtime, playable Android browser game, and APK ${androidRelease.apkVersionName} are published.</strong>`;
+        if (box) box.innerHTML = `<strong>Server, full website, production Camera 3, consolidated Quest runtime, playable Android browser game, and APK ${androidRelease.apkVersionName} are published.</strong>`;
       } else {
         setMeter('apk', 'BROWSER LIVE', 72, true);
         if (box) box.innerHTML = '<strong>Playable Android browser game, Quest route, and Camera 3 are live.</strong> Open the APK Center for package status.';
       }
-    } catch (error) {
+    } catch {
       setMeter('server', 'RETRY', 35, false);
       setMeter('game', 'AVAILABLE', 72, true);
       setMeter('apk', 'AVAILABLE', 72, true);
@@ -74,11 +79,11 @@
 
   const answers = {
     status: () => deployHealth?.status === 'ok'
-      ? `Server is up. Build: ${deployHealth.build}. Camera 3: ${deployHealth.camera3Build || 'Phase 390'}. Quest: ${deployHealth.questBuild || 'Phase 390'}. Android: ${deployHealth.androidBuild || 'Phase 390'}.`
-      : 'The website, furnished Camera 3, playable Android route, and Quest game are available. Live status is still checking.',
-    android: () => 'Use Play Android. Phase 390 opens JOIN NOW, five bots, hole cards, community cards, pot chips, poker actions, portrait/landscape layout, and a direct gameplay fallback.',
-    quest: () => 'Launch Quest / VR for the original table with a 6.5-inch recessed playing surface, restored cards, upright Eric, and a fixed spawn directly in front of the table.',
-    profile: () => 'Open Player Profile for the live saved-avatar demo, then use Dressing Room to change the outfit.',
+      ? `Server is up. Build: ${deployHealth.build}. Camera 3: ${deployHealth.camera3Build || 'Phase 391'}. Quest: ${deployHealth.questBuild || 'Phase 391'}. Android: ${deployHealth.androidBuild || 'Phase 391'}.`
+      : 'The website, production Camera 3, playable Android route, and Quest game are available. Live status is still checking.',
+    android: () => 'Use Play Android. Phase 391 opens JOIN NOW, five bots, hole cards, community cards, pot chips, poker actions, responsive portrait/landscape layouts, and a direct gameplay fallback.',
+    quest: () => 'Launch Quest / VR for one original table authority, the recessed playing surface, restored cards, upright Eric, and a fixed spawn directly in front of the table.',
+    profile: () => 'Open Player Profile for the saved-avatar demo, then use Dressing Room to change the outfit.',
     store: () => 'Open SVR Store to browse the store portal and future in-world item concepts.',
     events: () => 'Open Tournaments for the event schedule and competition path.',
     sponsor: () => 'Open Sponsorship, Advertising or Billboards to review partnership and presentation options.',
@@ -106,7 +111,6 @@
       log.scrollTop = log.scrollHeight;
     }
   };
-
   const input = document.getElementById('aiInput');
   const send = document.getElementById('aiSend');
   if (send && input) {
@@ -115,12 +119,15 @@
   }
   document.querySelectorAll('[data-ai]').forEach((button) => button.addEventListener('click', () => reply(button.dataset.ai)));
 
-  window.SVR_PHASE390_FULL_SITE = {
-    build: 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK',
-    camera3Route: '/game/camera3-live.html?v=phase390',
-    androidRoute: '/game/android.html?channel=stable&v=phase390',
-    androidGameplayRoute: '/game/android-stable.html?v=phase390&direct=1',
-    fullHomepage: true,
+  window.SVR_PHASE391_FULL_SITE = {
+    build: 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK',
+    camera3Route: '/game/camera3-live.html?v=phase391',
+    androidRoute: '/game/android.html?channel=stable&v=phase391',
+    androidGameplayRoute: '/game/android-stable.html?v=phase391&direct=1',
+    questRoute: '/game/quest.html?v=phase391',
+    singleOriginalTableAuthority: true,
+    legacyCameraControllersRemoved: true,
+    legacyQuestSeatAuthorityRemoved: true,
     androidPlayable: true,
     questTableGeometryCorrected: true,
     questCardsRestored: true,
