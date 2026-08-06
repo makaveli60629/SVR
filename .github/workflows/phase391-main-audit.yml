@@ -1,0 +1,143 @@
+name: Phase 391 Main Runtime Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase391-main-runtime-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Validate single Quest authority stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          MANIFEST=game/modules/phase340_platform_manifest.js
+          grep -q 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK' "$MANIFEST"
+          grep -q "VERSION = 'phase391'" "$MANIFEST"
+          grep -q 'singleOriginalTableAuthority' "$MANIFEST"
+          grep -q 'legacyQuestAcceptanceRemoved' "$MANIFEST"
+          grep -q 'directQuestDeferredWorkDisabled' "$MANIFEST"
+          ! grep -q "'modules/phase358_quest_uploaded_table_authority_lock.js'," "$MANIFEST"
+          ! grep -q "'modules/phase358_quest_runtime_boot_lock.js'," "$MANIFEST"
+          ! grep -q "'modules/phase358_quest_poker_boot_order_lock.js'," "$MANIFEST"
+          ! grep -q "'modules/phase358_quest_pot_display_authority_lock.js'," "$MANIFEST"
+          ! grep -q "'modules/phase358_quest_full_game_acceptance_smoothness_lock.js'," "$MANIFEST"
+          ! grep -q "'modules/phase379_quest_procedural_table_authority.js'," "$MANIFEST"
+          ! grep -q 'phase388_quest_table_player_eric_authority' game/index.html
+          ! grep -q 'phase388_front_south_seat_authority' game/index.html
+          grep -q 'phase380_original_table_authority_lock' game/index.html
+          grep -q 'phase391_eric_dealer_authority' game/index.html
+          grep -q 'phase390_quest_table_geometry_cards_spawn_authority' game/index.html
+          grep -q 'phase390_surface_cards_final_guard' game/index.html
+          grep -q 'phase390_front_spawn_final_guard' game/index.html
+          grep -q 'phase391_production_runtime_audit' game/index.html
+
+      - name: Validate table, cards, Eric, and spawn contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'TARGET_RECESS_METERS = 0.165' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'PHASE390_RECESSED_BRANDED_PLAYING_SURFACE' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'PHASE341_CANONICAL_TABLE_PRESENTATION_ROOT' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'cardMeshesReady' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'PHASE-390-SURFACE-CARDS-FINAL-GUARD-LOCK' game/modules/phase390_surface_cards_final_guard.js
+          grep -q 'PHASE-390-FRONT-SPAWN-FINAL-GUARD-LOCK' game/modules/phase390_front_spawn_final_guard.js
+          grep -q 'BOOT_CORRECTION_WINDOW_MS = 9000' game/modules/phase390_front_spawn_final_guard.js
+          grep -q 'PHASE-391-ERIC-UPRIGHT-DEALER-AUTHORITY-LOCK' game/modules/phase391_eric_dealer_authority.js
+          grep -q 'anatomicalUpDot' game/modules/phase391_eric_dealer_authority.js
+          grep -q 'duplicateDealersRemoved' game/modules/phase391_eric_dealer_authority.js
+          grep -q 'PHASE-391-PRODUCTION-RUNTIME-AUDIT-LOCK' game/modules/phase391_production_runtime_audit.js
+          grep -q 'singleTableAuthority' game/modules/phase391_production_runtime_audit.js
+          grep -q 'duplicateTablesRemoved' game/modules/phase391_production_runtime_audit.js
+          test -s game/assets/models/table.glb
+          test -s game/assets/table.fbx
+          test -s game/assets/models/eric/eric.fbx
+
+      - name: Validate Camera 3 production route
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-391-CAMERA3-PRODUCTION-CONSOLIDATION-LOCK' game/camera3-live.html
+          grep -q 'phase380_original_table_authority_lock' game/camera3-live.html
+          grep -q 'phase341_canonical_table_geometry_card_motion_lock' game/camera3-live.html
+          grep -q 'phase391_eric_dealer_authority' game/camera3-live.html
+          grep -q 'phase390_quest_table_geometry_cards_spawn_authority' game/camera3-live.html
+          grep -q 'phase390_surface_cards_final_guard' game/camera3-live.html
+          grep -q 'phase389_camera3_live_preview' game/camera3-live.html
+          grep -q 'phase391_production_runtime_audit' game/camera3-live.html
+          ! grep -q 'phase339_camera3_table_orbit_lock' game/camera3-live.html
+          ! grep -q 'phase350_camera3_visibility_lighting_lock' game/camera3-live.html
+          ! grep -q 'phase368_card_dealer_animation_lock' game/camera3-live.html
+          grep -q 'PHASE389_CAMERA3_PRODUCTION_LIGHTING' game/modules/phase389_camera3_live_preview.js
+
+      - name: Validate playable Android routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK' game/android.html
+          grep -q 'PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK' game/android-tabletop.html
+          grep -q 'android-stable.html?v=phase391' game/android-tabletop.html
+          grep -q 'SVR_PHASE391_ANDROID_WRAPPER_QA' game/android-tabletop.html
+          grep -q 'id="join"' game/android-stable.html
+          grep -q 'id="table"' game/android-stable.html
+          grep -q 'id="community"' game/android-stable.html
+          grep -q 'id="hole"' game/android-stable.html
+          grep -q 'data-a="fold"' game/android-stable.html
+          grep -q 'data-a="call"' game/android-stable.html
+          grep -q 'data-a="raise"' game/android-stable.html
+          grep -q 'data-a="allin"' game/android-stable.html
+          grep -q "NAMES=\['YOU','Claudia','Eric','Maya','Darius','Nova'\]" game/android-stable.html
+          grep -q '"webEntry": "/game/android.html?channel=stable&v=phase391"' game/android-release.json
+          grep -q '"coreGameplayEntry": "/game/android-stable.html?v=phase391&direct=1"' game/android-release.json
+
+      - name: Validate routes, caches, metadata, syntax, and protected APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'phase391-production-consolidation-v1' sw.js
+          grep -q 'phase391-production-consolidation-v1' pwa-sw.js
+          ! grep -q 'phase388_quest_table_player_eric_authority' sw.js
+          ! grep -q 'phase388_quest_table_player_eric_authority' pwa-sw.js
+          grep -q 'pwa-phase391' manifest.webmanifest
+          grep -q '"phase": 391' game/manifest.json
+          grep -q 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK' docs/PHASE_391_PRODUCTION_CONSOLIDATION_MANIFEST.md
+          grep -q 'last known active fallback-table creation path' docs/PHASE_391_FINAL_HARDENING_ADDENDUM.md
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool docs/PHASE_391_PRODUCTION_CONSOLIDATION_MANIFEST.json >/dev/null
+          python3 -m json.tool docs/PHASE_391_FINAL_HARDENING_ADDENDUM.json >/dev/null
+          node --check site-public-hooks.js
+          node --check site/phase383-home-restore.js
+          node --check game/modules/phase340_platform_manifest.js
+          node --check game/modules/phase389_runtime_health_visibility.js
+          node --check game/modules/phase389_camera3_live_preview.js
+          node --check game/modules/phase389_android_responsive_layout.js
+          node --check game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          node --check game/modules/phase390_surface_cards_final_guard.js
+          node --check game/modules/phase390_front_spawn_final_guard.js
+          node --check game/modules/phase391_eric_dealer_authority.js
+          node --check game/modules/phase391_production_runtime_audit.js
+          node --check sw.js
+          node --check pwa-sw.js
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+          ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' index.html site-public-hooks.js sw.js pwa-sw.js manifest.webmanifest update game/index.html game/quest.html game/camera3-live.html game/android.html game/android-tabletop.html game/modules/phase39*.js site/phase383-home-restore.js docs/PHASE_391*.md docs/PHASE_391*.json | grep -q .
