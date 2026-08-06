@@ -25,6 +25,7 @@ import './modules/phase362_desktop_renderer_preboot_safety_lock.js?v=phase380';
 import './modules/phase380_original_table_authority_lock.js?v=phase388';
 import './modules/phase379_quest_procedural_table_authority.js?v=phase380';
 import './modules/phase388_front_south_seat_authority.js?v=phase388';
+import './modules/phase388_table_material_visibility_guard.js?v=phase388';
 import {bootPlatform} from './modules/phase340_platform_core_loader.js?v=phase380';
 const PHASE388_SUCCESSOR_OF='PHASE-387-QUEST-DIRECT-SEAT-RECOVERY-LOCK';
 const routeParams=new URLSearchParams(location.search);
@@ -46,6 +47,7 @@ async function start(){if(started)return;started=true;const status=document.getE
   await import('./modules/phase388_quest_table_player_eric_authority.js?v=phase388');
   await import('./modules/phase388_quest_view_dealer_guard.js?v=phase388');
   await waitForPhase388();
+  window.SVR_PHASE388_TABLE_MATERIAL_SWEEP?.();
   await window.SVR_PHASE388_SWEEP?.('phase388-exclusive-entry');
   await window.SVR_PHASE388_ENSURE_ERIC?.();
   window.SVR_PHASE388_VIEW_GUARD_SWEEP?.();
@@ -56,12 +58,12 @@ async function start(){if(started)return;started=true;const status=document.getE
   status.textContent='Recovery mode is retrying the close table seat, official logo, lighting, and upright Eric dealer.';
   window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase388-boot-error');
   window.SVR_PHASE379_FORCE_TABLE?.('phase388-boot-error');
-  setTimeout(async()=>{document.body.classList.add('boot-released');try{await import('./modules/phase388_quest_table_player_eric_authority.js?v=phase388');await import('./modules/phase388_quest_view_dealer_guard.js?v=phase388');await window.SVR_PHASE388_SWEEP?.('phase388-error-retry');window.SVR_PHASE388_FRONT_SOUTH_SEAT?.('phase388-error-retry',true)}catch(e){console.error(e)}},700);
+  setTimeout(async()=>{document.body.classList.add('boot-released');try{await import('./modules/phase388_quest_table_player_eric_authority.js?v=phase388');await import('./modules/phase388_quest_view_dealer_guard.js?v=phase388');window.SVR_PHASE388_TABLE_MATERIAL_SWEEP?.();await window.SVR_PHASE388_SWEEP?.('phase388-error-retry');window.SVR_PHASE388_FRONT_SOUTH_SEAT?.('phase388-error-retry',true)}catch(e){console.error(e)}},700);
   started=false;
 }}
 document.getElementById('startRuntimeBtn')?.addEventListener('click',start);
 setTimeout(start,directQuest?20:300);
-window.SVR_PHASE388_BOOT_QA=()=>({build:'PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK',predecessor:PHASE388_SUCCESSOR_OF,started,directQuest,platform:window.SVR_PHASE340_PLATFORM_STATE||null,originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.()||null,runtime388:window.SVR_PHASE388_QA?.()||null,frontSouth:window.SVR_PHASE388_FRONT_SOUTH_QA?.()||null,viewGuard:window.SVR_PHASE388_VIEW_GUARD_QA?.()||null,checkedAt:new Date().toISOString()});
+window.SVR_PHASE388_BOOT_QA=()=>({build:'PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK',predecessor:PHASE388_SUCCESSOR_OF,started,directQuest,platform:window.SVR_PHASE340_PLATFORM_STATE||null,originalTable:window.SVR_PHASE380_ORIGINAL_TABLE_QA?.()||null,tableMaterials:window.SVR_PHASE388_TABLE_MATERIAL_QA?.()||null,runtime388:window.SVR_PHASE388_QA?.()||null,frontSouth:window.SVR_PHASE388_FRONT_SOUTH_QA?.()||null,viewGuard:window.SVR_PHASE388_VIEW_GUARD_QA?.()||null,checkedAt:new Date().toISOString()});
 </script>
 </body>
 </html>
