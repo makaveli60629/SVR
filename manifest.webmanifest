@@ -1,7 +1,7 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "SVR Poker Phase 389 with consolidated Quest runtime, visible avatar and profile refresh, and responsive Android tabletop.",
+  "description": "SVR Poker Phase 389 with consolidated Quest runtime, live Camera 3 table feed, visible avatar and profile refresh, and responsive Android tabletop.",
   "id": "/?source=pwa-phase389",
   "predecessor_id": "pwa-phase388",
   "start_url": "/?source=pwa-phase389&v=phase389",
@@ -19,6 +19,7 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
+    {"name": "Camera 3 Live Table Feed", "short_name": "CAM 3", "description": "Open the Phase 389 dedicated live table preview with production lighting.", "url": "/game/camera3-live.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Play Android — Responsive Table", "short_name": "Android", "description": "Open the Phase 389 responsive portrait and landscape tabletop.", "url": "/game/android.html?channel=stable&v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Avatar Dressing Room", "short_name": "Avatar", "description": "Open the Phase 389 live avatar dressing room.", "url": "/site/avatar.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Player Profile Demo", "short_name": "Profile", "description": "Open the Phase 389 saved-avatar profile showroom.", "url": "/site/profile.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
