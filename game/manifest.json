@@ -1,26 +1,35 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "start_url": "./android.html?channel=stable&v=phase390",
+  "start_url": "./android.html?channel=stable&v=phase391",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#080a0f",
   "theme_color": "#9b4dff",
-  "build": "PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK",
-  "phase": 390,
-  "predecessor_build": "PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK",
+  "build": "PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK",
+  "phase": 391,
+  "predecessor_build": "PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK",
   "routes": {
-    "android": "./android.html?channel=stable&v=phase390",
-    "androidTabletop": "./android-tabletop.html?v=phase390",
-    "androidGameplay": "./android-stable.html?v=phase390&direct=1",
-    "quest": "./quest.html?v=phase390",
-    "questRuntime": "./index.html?platform=quest&v=phase390&direct=1&autoseat=1&questfix=1&clean=1",
-    "camera3Live": "./camera3-live.html?v=phase390",
-    "camera3Legacy": "./camera3.html?v=phase390",
+    "android": "./android.html?channel=stable&v=phase391",
+    "androidTabletop": "./android-tabletop.html?v=phase391",
+    "androidGameplay": "./android-stable.html?v=phase391&direct=1",
+    "quest": "./quest.html?v=phase391",
+    "questRuntime": "./index.html?platform=quest&v=phase391&direct=1&autoseat=1&questfix=1&clean=1",
+    "camera3Live": "./camera3-live.html?v=phase391",
+    "camera3Legacy": "./camera3.html?v=phase391",
     "profile": "/site/profile.html?v=phase389",
     "dressingRoom": "/site/avatar.html?v=phase389",
     "vrDressingRoom": "./avatar-vr.html?v=phase389"
+  },
+  "runtimeAuthority": {
+    "platformManifestBuild": "PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK",
+    "singleOriginalTableAuthority": true,
+    "legacyUploadedTableAuthorityRemoved": true,
+    "proceduralTableAuthorityRemoved": true,
+    "legacyCameraControllersRemoved": true,
+    "legacyQuestSeatControllerRemoved": true,
+    "productionDuplicateSweep": true
   },
   "quest": {
     "singleSeatAuthority": true,
@@ -31,6 +40,7 @@
     "originalTableFallbackAsset": "./assets/table.fbx",
     "runtimeHealthVisibilityGuard": true,
     "ericAsset": "./assets/models/eric/eric.fbx",
+    "ericAuthorityBuild": "PHASE-391-ERIC-UPRIGHT-DEALER-AUTHORITY-LOCK",
     "ericAuthoritativeInstance": true,
     "ericAnatomicalUprightCorrection": true,
     "playingSurfaceSourceMaterial": "polotno",
@@ -41,13 +51,15 @@
     "phase341CardRootRestored": true,
     "minimumCardMeshes": 17,
     "professionalLighting": true,
-    "cacheEpoch": "phase390-table-geometry-cards-spawn"
+    "cacheEpoch": "phase391-production-consolidation"
   },
   "camera3": {
-    "dedicatedRoute": "./camera3-live.html?v=phase390",
+    "build": "PHASE-391-CAMERA3-PRODUCTION-CONSOLIDATION-LOCK",
+    "dedicatedRoute": "./camera3-live.html?v=phase391",
     "correctedTableGeometry": true,
     "visibleCardsRequired": true,
-    "tableRequired": true,
+    "uprightEricRequired": true,
+    "singleTableAuthorityRequired": true,
     "tableVisibilityGuard": true,
     "productionLightingRoot": true,
     "minimumLightCount": 6,
@@ -58,6 +70,7 @@
     "websiteIframeUpdated": true
   },
   "android": {
+    "build": "PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK",
     "playableBrowserRoute": true,
     "directGameplayFallback": true,
     "joinNow": true,
@@ -72,7 +85,8 @@
     "touchLookFallback": true,
     "startingStack": 15000,
     "players": 6,
-    "deterministicHandEvaluator": true
+    "deterministicHandEvaluator": true,
+    "wrapperQa": "SVR_PHASE391_ANDROID_WRAPPER_QA"
   },
   "avatar": {
     "dressingRoomBuild": "PHASE-389-AVATAR-DRESSING-ROOM-VISIBLE-REFRESH-LOCK",
