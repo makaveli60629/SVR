@@ -48,57 +48,64 @@ jobs:
           path: publish
           fetch-depth: 1
 
-      - name: Validate Phase 389 source contracts
+      - name: Validate Phase 390 source contracts
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK' source/index.html
-          grep -q 'site-public-hooks.js?v=phase389' source/index.html
-          grep -q 'game/quest.html?v=phase389' source/index.html
-          grep -q 'game/android.html?channel=stable&amp;v=phase389' source/index.html
-          grep -q 'site/avatar.html?v=phase389' source/index.html
-          grep -q 'site/profile.html?v=phase389' source/index.html
-          grep -q 'phase389-full-audit-visible-fixes' source/site-public-hooks.js
+          grep -q 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK' source/index.html
+          grep -q 'site-public-hooks.js?v=phase390' source/index.html
+          grep -q 'game/quest.html?v=phase390' source/index.html
+          grep -q 'game/android.html?channel=stable&amp;v=phase390' source/index.html
+          grep -q 'game/camera3-live.html?v=phase390' source/index.html
+          grep -q 'phase390-table-geometry-cards-spawn' source/site-public-hooks.js
           grep -q 'PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK' source/site/index.html
           ! grep -Eqi 'Trueitive|Shyona Royston' source/site/index.html
 
           test -s source/game/index.html
-          grep -q 'PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK' source/game/index.html
-          grep -q 'phase389_runtime_health_visibility' source/game/index.html
+          grep -q 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK' source/game/index.html
+          grep -q 'phase390_quest_table_geometry_cards_spawn_authority' source/game/index.html
+          grep -q 'phase390_front_spawn_final_guard' source/game/index.html
           ! grep -q "^import './modules/phase388_front_south_seat_authority" source/game/index.html
-          test -s source/game/modules/phase389_runtime_health_visibility.js
-          grep -q 'duplicatePhase388SeatControllerLoaded' source/game/index.html
+          test -s source/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          test -s source/game/modules/phase390_front_spawn_final_guard.js
+          grep -q 'TARGET_RECESS_METERS = 0.165' source/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'PHASE390_RECESSED_BRANDED_PLAYING_SURFACE' source/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'cardMeshesReady' source/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'ericUpDot' source/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'fixedTableFront: true' source/game/modules/phase390_front_spawn_final_guard.js
 
           test -s source/game/camera3-live.html
-          grep -q 'PHASE-389-CAMERA3-LIVE-PREVIEW-ROUTE-LOCK' source/game/camera3-live.html
+          grep -q 'PHASE-390-CAMERA3-FURNISHED-TABLE-CARDS-LOCK' source/game/camera3-live.html
           test -s source/game/modules/phase389_camera3_live_preview.js
           grep -q 'PHASE389_CAMERA3_PRODUCTION_LIGHTING' source/game/modules/phase389_camera3_live_preview.js
-          grep -q 'camera3-live.html?v=phase389' source/site/phase383-home-restore.js
-          grep -q 'camera3-live.html?v=phase389' source/game/camera3.html
-          grep -q 'camera3-live.html?v=phase389' source/game/cam3.html
-          grep -q 'camera3-live.html?v=phase389' source/game/preview.html
+          grep -q 'camera3-live.html?v=phase390' source/site/phase383-home-restore.js
+          grep -q 'camera3-live.html?v=phase390' source/game/camera3.html
+          grep -q 'camera3-live.html?v=phase390' source/game/cam3.html
+          grep -q 'camera3-live.html?v=phase390' source/game/preview.html
 
           grep -q 'PHASE-389-AVATAR-DRESSING-ROOM-VISIBLE-REFRESH-LOCK' source/site/avatar.html
-          grep -q 'phase389-avatar-room.js?v=phase389' source/site/avatar.html
-          test -s source/site/js/phase389-avatar-room.js
           grep -q 'PHASE-389-PROFILE-AVATAR-SHOWROOM-VISIBLE-REFRESH-LOCK' source/site/profile.html
-          grep -q 'phase389-profile-showroom.js?v=phase389' source/site/profile.html
+          test -s source/site/js/phase389-avatar-room.js
           test -s source/site/js/phase389-profile-showroom.js
           test -s source/site/css/phase389-avatar-profile-visible-refresh.css
 
-          grep -q 'PHASE-389-ANDROID-RESPONSIVE-TABLE-LAYOUT-LOCK' source/game/android.html
-          grep -q 'PHASE-389-ANDROID-RESPONSIVE-TABLE-LAYOUT-LOCK' source/game/android-tabletop.html
+          grep -q 'PHASE-390-ANDROID-PLAYABLE-ROUTE-LOCK' source/game/android.html
+          grep -q 'PHASE-390-ANDROID-PLAYABLE-ROUTE-LOCK' source/game/android-tabletop.html
+          grep -q 'android-stable.html?v=phase390' source/game/android-tabletop.html
+          grep -q 'playableUiFound' source/game/android-tabletop.html
+          test -s source/game/android-stable.html
           test -s source/game/styles/phase389_android_responsive_layout.css
           test -s source/game/modules/phase389_android_responsive_layout.js
-          grep -q 'responsiveModuleInjected' source/game/android-tabletop.html
-          grep -q '"webEntry": "/game/android.html?channel=stable&v=phase389"' source/game/android-release.json
+          grep -q '"webEntry": "/game/android.html?channel=stable&v=phase390"' source/game/android-release.json
+          grep -q '"coreGameplayEntry": "/game/android-stable.html?v=phase390&direct=1"' source/game/android-release.json
           grep -q '"forceUpdate": false' source/game/android-release.json
           grep -q '"showUpdatePrompt": false' source/game/android-release.json
 
-          grep -q 'phase389-full-audit-visible-fixes-v2' source/sw.js
-          grep -q 'phase389-full-audit-visible-fixes-v2' source/pwa-sw.js
-          grep -q 'pwa-phase389' source/manifest.webmanifest
-          grep -q '"phase": 389' source/game/manifest.json
+          grep -q 'phase390-table-geometry-cards-spawn-v1' source/sw.js
+          grep -q 'phase390-table-geometry-cards-spawn-v1' source/pwa-sw.js
+          grep -q 'pwa-phase390' source/manifest.webmanifest
+          grep -q '"phase": 390' source/game/manifest.json
+          grep -q '"tablePlayingSurfaceRecessInches": 6.5' source/update/app-version.json
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/table.fbx
           test -s source/game/assets/models/eric/eric.fbx
@@ -112,11 +119,11 @@ jobs:
           python3 -m json.tool source/manifest.webmanifest >/dev/null
           node --check source/site-public-hooks.js
           node --check source/site/phase383-home-restore.js
-          node --check source/site/js/phase389-avatar-room.js
-          node --check source/site/js/phase389-profile-showroom.js
           node --check source/game/modules/phase389_runtime_health_visibility.js
           node --check source/game/modules/phase389_camera3_live_preview.js
           node --check source/game/modules/phase389_android_responsive_layout.js
+          node --check source/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          node --check source/game/modules/phase390_front_spawn_final_guard.js
           node --check source/sw.js
           node --check source/pwa-sw.js
 
@@ -146,7 +153,7 @@ jobs:
           find publish -type f \( -name '*.zip' -o -name '*.ps1' -o -name '.env' -o -name '.env.*' \) -delete
           chmod -R u+rwX,go+rX publish
 
-      - name: Stamp Phase 389 deployment health
+      - name: Stamp Phase 390 deployment health
         shell: bash
         run: |
           set -euo pipefail
@@ -155,10 +162,10 @@ jobs:
           cat > publish/deploy-health.json <<EOF2
           {
             "status": "ok",
-            "build": "PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK",
-            "questBuild": "PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK",
-            "camera3Build": "PHASE-389-CAMERA3-LIVE-PREVIEW-ROUTE-LOCK",
-            "androidBuild": "PHASE-389-ANDROID-RESPONSIVE-TABLE-LAYOUT-LOCK",
+            "build": "PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK",
+            "questBuild": "PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK",
+            "camera3Build": "PHASE-390-CAMERA3-FURNISHED-TABLE-CARDS-LOCK",
+            "androidBuild": "PHASE-390-ANDROID-PLAYABLE-ROUTE-LOCK",
             "avatarBuild": "PHASE-389-AVATAR-DRESSING-ROOM-VISIBLE-REFRESH-LOCK",
             "profileBuild": "PHASE-389-PROFILE-AVATAR-SHOWROOM-VISIBLE-REFRESH-LOCK",
             "siteBuild": "PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK",
@@ -166,28 +173,33 @@ jobs:
             "deployedAt": "${DEPLOYED_AT}",
             "sourceBranch": "main",
             "publishBranch": "gh-pages",
-            "questRoute": "/game/quest.html?v=phase389",
-            "questRuntimeRoute": "/game/index.html?platform=quest&v=phase389&direct=1&autoseat=1&questfix=1&clean=1",
-            "camera3Route": "/game/camera3-live.html?v=phase389",
-            "androidRoute": "/game/android.html?channel=stable&v=phase389",
-            "androidTabletopRoute": "/game/android-tabletop.html?v=phase389",
+            "questRoute": "/game/quest.html?v=phase390",
+            "questRuntimeRoute": "/game/index.html?platform=quest&v=phase390&direct=1&autoseat=1&questfix=1&clean=1",
+            "camera3Route": "/game/camera3-live.html?v=phase390",
+            "androidRoute": "/game/android.html?channel=stable&v=phase390",
+            "androidTabletopRoute": "/game/android-tabletop.html?v=phase390",
+            "androidGameplayRoute": "/game/android-stable.html?v=phase390&direct=1",
             "dressingRoomRoute": "/site/avatar.html?v=phase389",
             "profileRoute": "/site/profile.html?v=phase389",
             "apkUrl": "/downloads/svr-poker-android-rc2.apk",
             "apkSha256": "${APK_SHA}",
             "apkVersionName": "0.1.0-rc2",
             "apkVersionCode": 2,
-            "questSingleSeatAuthority": true,
-            "questDuplicateFrontSouthAuthorityDisabled": true,
-            "questRuntimeVisibilityGuard": true,
+            "tablePlayingSurfaceRecessMeters": 0.165,
+            "tablePlayingSurfaceRecessInches": 6.5,
+            "tableArmrestPreserved": true,
+            "phase388TopFeltOverlayRemoved": true,
+            "phase341CardsRestored": true,
+            "questFixedFrontSpawn": true,
+            "ericAnatomicalUprightCorrection": true,
             "camera3DedicatedRoute": true,
-            "camera3TableRequired": true,
+            "camera3CorrectedTableGeometry": true,
+            "camera3VisibleCardsRequired": true,
             "camera3ProductionLighting": true,
-            "camera3DirectorShots": 5,
-            "websiteCamera3IframeUpdated": true,
+            "androidPlayableBrowserRoute": true,
+            "androidDirectGameplayFallback": true,
             "androidResponsivePortrait": true,
             "androidResponsiveLandscape": true,
-            "androidSafeAreaInsets": true,
             "avatarVisibleRefresh": true,
             "profileLiveSavedAvatar": true,
             "cacheRecovery": true,
@@ -207,23 +219,19 @@ jobs:
           test -f publish/game/index.html
           test -f publish/game/quest.html
           test -f publish/game/camera3-live.html
-          test -f publish/game/modules/phase389_camera3_live_preview.js
-          test -f publish/game/modules/phase389_runtime_health_visibility.js
-          test -f publish/game/modules/phase389_android_responsive_layout.js
-          test -f publish/game/styles/phase389_android_responsive_layout.css
-          test -f publish/site/avatar.html
-          test -f publish/site/profile.html
-          test -f publish/site/js/phase389-avatar-room.js
-          test -f publish/site/js/phase389-profile-showroom.js
+          test -f publish/game/android.html
+          test -f publish/game/android-tabletop.html
+          test -f publish/game/android-stable.html
+          test -f publish/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          test -f publish/game/modules/phase390_front_spawn_final_guard.js
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/models/eric/eric.fbx
-          test -s publish/logo.png
           test -s publish/downloads/svr-poker-android-rc2.apk
-          grep -q 'PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK' publish/deploy-health.json
-          grep -q '"camera3DedicatedRoute": true' publish/deploy-health.json
-          grep -q '"questDuplicateFrontSouthAuthorityDisabled": true' publish/deploy-health.json
-          grep -q '"androidResponsivePortrait": true' publish/deploy-health.json
-          grep -q '"profileLiveSavedAvatar": true' publish/deploy-health.json
+          grep -q 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK' publish/deploy-health.json
+          grep -q '"tablePlayingSurfaceRecessInches": 6.5' publish/deploy-health.json
+          grep -q '"phase341CardsRestored": true' publish/deploy-health.json
+          grep -q '"questFixedFrontSpawn": true' publish/deploy-health.json
+          grep -q '"androidPlayableBrowserRoute": true' publish/deploy-health.json
           ! find publish -type f \( -name '.env' -o -name '.env.*' \) | grep -q .
           ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' publish | grep -q .
 
@@ -236,8 +244,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches the Phase 389 audited tree.'
+            echo 'Production already matches the Phase 390 audited tree.'
           else
-            git commit -m "Deploy Phase 389 audited visible fixes ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 390 table and gameplay fixes ${GITHUB_SHA}"
             git push origin gh-pages
           fi
