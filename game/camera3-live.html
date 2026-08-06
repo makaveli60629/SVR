@@ -21,12 +21,14 @@ import {bootPlatform} from './modules/phase340_platform_core_loader.js?v=phase39
   window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase390-camera3-live-route');
   await import('./modules/phase368_card_dealer_animation_lock.js?v=phase390');
   await import('./modules/phase390_quest_table_geometry_cards_spawn_authority.js?v=phase390');
+  await import('./modules/phase390_surface_cards_final_guard.js?v=phase390');
   await window.SVR_PHASE390_SWEEP?.('phase390-camera3-live-route');
+  await window.SVR_PHASE390_SURFACE_CARDS_SWEEP?.('phase390-camera3-live-route');
   await import('./modules/phase389_camera3_live_preview.js?v=phase390');
   document.body.classList.add('boot-released');
   window.SVR_PHASE389_CAMERA3_ENFORCE?.('phase390-route-ready');
-}catch(error){console.error(error);document.getElementById('safeStatus').textContent='Camera 3 recovery is restoring the furnished table, cards, and lighting.';document.body.classList.add('boot-released');try{await import('./modules/phase390_quest_table_geometry_cards_spawn_authority.js?v=phase390');await window.SVR_PHASE390_SWEEP?.('camera3-recovery');await import('./modules/phase389_camera3_live_preview.js?v=phase390')}catch(inner){console.error(inner)}}})();
-window.SVR_PHASE390_CAMERA3_ROUTE_QA=()=>({build:'PHASE-390-CAMERA3-FURNISHED-TABLE-CARDS-LOCK',route:location.pathname,platform:window.SVR_PHASE340_PLATFORM_STATE||null,table:window.SVR_PHASE390_QA?.()||null,camera:window.SVR_PHASE389_CAMERA3_QA?.()||null,checkedAt:new Date().toISOString()});
+}catch(error){console.error(error);document.getElementById('safeStatus').textContent='Camera 3 recovery is restoring the furnished table, cards, and lighting.';document.body.classList.add('boot-released');try{await import('./modules/phase390_quest_table_geometry_cards_spawn_authority.js?v=phase390');await import('./modules/phase390_surface_cards_final_guard.js?v=phase390');await window.SVR_PHASE390_SWEEP?.('camera3-recovery');await window.SVR_PHASE390_SURFACE_CARDS_SWEEP?.('camera3-recovery');await import('./modules/phase389_camera3_live_preview.js?v=phase390')}catch(inner){console.error(inner)}}})();
+window.SVR_PHASE390_CAMERA3_ROUTE_QA=()=>({build:'PHASE-390-CAMERA3-FURNISHED-TABLE-CARDS-LOCK',route:location.pathname,platform:window.SVR_PHASE340_PLATFORM_STATE||null,table:window.SVR_PHASE390_QA?.()||null,surfaceCards:window.SVR_PHASE390_SURFACE_CARDS_QA?.()||null,camera:window.SVR_PHASE389_CAMERA3_QA?.()||null,checkedAt:new Date().toISOString()});
 </script>
 </body>
 </html>
