@@ -46,7 +46,8 @@ jobs:
           grep -q 'PHASE-391-PRODUCTION-RUNTIME-AUDIT-LOCK' game/modules/phase391_production_runtime_audit.js
           grep -q 'duplicateTablesRemoved' game/modules/phase391_production_runtime_audit.js
           grep -q 'singleTableAuthority' game/modules/phase391_production_runtime_audit.js
-          ! grep -q 'PHASE(?:155|157|158|159|200|326|341|358' game/modules/phase391_production_runtime_audit.js
+          grep -q 'PHASE341_CANONICAL_TABLE_PRESENTATION_ROOT' game/modules/phase391_production_runtime_audit.js
+          ! grep -Eq 'PHASE\(\?:155\|157\|158\|159\|200\|326\|341\|358' game/modules/phase391_production_runtime_audit.js
 
           grep -q 'TARGET_RECESS_METERS = 0.165' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
           grep -q 'PHASE390_RECESSED_BRANDED_PLAYING_SURFACE' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
