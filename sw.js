@@ -1,8 +1,8 @@
 const PHASE388_PREDECESSOR='phase388-quest-table-player-eric';
-const SVR_CACHE='svr-poker-phase389-full-audit-visible-fixes-v1';
+const SVR_CACHE='svr-poker-phase389-full-audit-visible-fixes-v2';
 const CORE=[
   '/offline.html','/logo.png','/manifest.webmanifest?v=phase389','/site-public-hooks.js?v=phase389',
-  '/site/avatar.html?v=phase389','/site/profile.html?v=phase389',
+  '/site/avatar.html?v=phase389','/site/profile.html?v=phase389','/site/phase383-home-restore.js?v=phase389',
   '/site/css/phase389-avatar-profile-visible-refresh.css?v=phase389',
   '/site/js/phase389-avatar-room.js?v=phase389','/site/js/phase389-profile-showroom.js?v=phase389',
   '/game/quest.html?v=phase389','/game/index.html?platform=quest&v=phase389&direct=1&autoseat=1&questfix=1&clean=1',
@@ -10,6 +10,7 @@ const CORE=[
   '/game/modules/phase388_quest_view_dealer_guard.js?v=phase389',
   '/game/modules/phase388_table_material_visibility_guard.js?v=phase389',
   '/game/modules/phase389_runtime_health_visibility.js?v=phase389',
+  '/game/camera3-live.html?v=phase389','/game/modules/phase389_camera3_live_preview.js?v=phase389',
   '/game/android-tabletop.html?v=phase389','/game/styles/phase385_android_tabletop.css?v=phase389',
   '/game/styles/phase389_android_responsive_layout.css?v=phase389',
   '/game/modules/phase385_android_tabletop_3d.js?v=phase389','/game/modules/phase389_android_responsive_layout.js?v=phase389'
