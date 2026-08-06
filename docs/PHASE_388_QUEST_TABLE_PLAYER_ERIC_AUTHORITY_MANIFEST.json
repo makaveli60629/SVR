@@ -1,0 +1,120 @@
+{
+  "build": "PHASE-388-QUEST-TABLE-PLAYER-ERIC-AUTHORITY-LOCK",
+  "scope": [
+    "quest-oculus-runtime",
+    "website-eric-dressing-room"
+  ],
+  "predecessor": "PHASE-387-QUEST-DIRECT-SEAT-RECOVERY-LOCK",
+  "routes": {
+    "quest": "/game/quest.html?v=phase388",
+    "questRuntime": "/game/index.html?platform=quest&v=phase388&direct=1&autoseat=1&questfix=1&clean=1",
+    "dressingRoom": "/site/avatar.html?v=phase388",
+    "android": "/game/android.html?channel=stable&v=phase385"
+  },
+  "exclusiveQuestAuthority": {
+    "enabled": true,
+    "oldPhase381EnvironmentLoaded": false,
+    "oldPhase384EnvironmentLoaded": false,
+    "oldPhase386EnvironmentLoaded": false,
+    "oldPhase387SeatControllerLoaded": false
+  },
+  "player": {
+    "frontAxis": "table-local-positive-z-transformed-to-world",
+    "usesActiveHeadsetWorldPosition": true,
+    "tableEdgeGapMeters": 0.12,
+    "eyeHeightAboveTableMeters": 0.54,
+    "continuousAnchor": true,
+    "positionSetBlocked": true,
+    "positionCopyBlocked": true,
+    "setPlayerPoseBlocked": true,
+    "teleportLocked": true,
+    "locomotionLocked": true
+  },
+  "eric": {
+    "asset": "/game/assets/models/eric/eric.fbx",
+    "freshAuthoritativeInstance": true,
+    "targetHeightMeters": 1.78,
+    "boneCheckedOrientation": true,
+    "headAboveFeetValidation": true,
+    "groundedAfterFinalRotation": true,
+    "yawOnlyFacing": true,
+    "pitchDegrees": 0,
+    "rollDegrees": 0,
+    "sourceContainsEmbeddedImageTextures": false,
+    "sourceContainsFbxMaterialNodes": false,
+    "generatedStripeTextureRemoved": true,
+    "materialRegions": [
+      "hair",
+      "skin",
+      "white-shirt",
+      "dark-suit",
+      "dark-pants",
+      "dark-shoes"
+    ],
+    "duplicateRootsDetached": true,
+    "externalSkeletonsHidden": true
+  },
+  "dressingRoom": {
+    "phase388CorrectionLoaded": true,
+    "animationMixerStopped": true,
+    "boneCheckedUpright": true,
+    "grounded": true,
+    "vertexMaterialSet": true,
+    "autoRotateDisabledByCorrection": true
+  },
+  "table": {
+    "primaryAsset": "/game/assets/models/table.glb",
+    "fallbackAsset": "/game/assets/table.fbx",
+    "officialLogoAsset": "/logo.png",
+    "officialLogoCentered": true,
+    "felt": "purple-professional",
+    "legacyYellowSquareHidden": true,
+    "legacyPassLineLogoOverlaysHidden": true
+  },
+  "lighting": {
+    "ambient": true,
+    "hemisphere": true,
+    "warmDirectionalKey": true,
+    "coolDirectionalFill": true,
+    "dealerTableSpot": true,
+    "toneMapping": "ACESFilmic",
+    "exposure": 1.72,
+    "dynamicShadows": false
+  },
+  "headsetView": {
+    "namedOverlayCleanup": true,
+    "unnamedDarkPlanarCleanup": true,
+    "handsControllersWatchCardsTableLogoDealerAndSkyProtected": true
+  },
+  "cache": {
+    "epoch": "phase388-quest-table-player-eric",
+    "staleServiceWorkersUnregistered": true,
+    "staleCachesDeleted": true
+  },
+  "files": [
+    "game/modules/phase388_front_south_seat_authority.js",
+    "game/modules/phase388_quest_table_player_eric_authority.js",
+    "game/modules/phase388_quest_view_dealer_guard.js",
+    "site/js/phase388-eric-upright-material-lock.js",
+    "game/index.html",
+    "game/quest.html",
+    "game/manifest.json",
+    "site/js/phase346-avatar-room.js",
+    "index.html",
+    "site-public-hooks.js",
+    "manifest.webmanifest",
+    "sw.js",
+    "pwa-sw.js",
+    ".github/workflows/deploy.yml",
+    "docs/PHASE_388_QUEST_TABLE_PLAYER_ERIC_AUTHORITY.md",
+    "docs/PHASE_388_QUEST_TABLE_PLAYER_ERIC_AUTHORITY_MANIFEST.json"
+  ],
+  "protected": {
+    "androidPhase385": true,
+    "publicSitePhase383": true,
+    "apkVersionName": "0.1.0-rc2",
+    "apkVersionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false
+  }
+}
