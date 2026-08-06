@@ -77,17 +77,20 @@ Dynamic shadows remain disabled for Quest performance. Renderer output is set to
 - Disables known vignette, comfort-mask, visor, head-overlay, and postprocessing runtime flags.
 - Preserves hands, controllers, watch, cards, table UI, avatar objects, dealer objects, planets, and stars.
 
-### Moon
+### Moon, Earth, and Mars
 
 - Adds one authoritative textured Moon above and behind the lobby/table view.
 - Uses a generated high-resolution crater texture and bump response.
-- Radius is approximately `2.35 m` in the game scene.
-- Slowly rotates for visible surface movement.
+- Moon radius is approximately `2.35 m` in the game scene.
+- The Moon slowly rotates for visible surface movement.
 - Hides duplicate older Moon geometry while preserving Moon-related lights and labels.
+- A separate `PHASE-386-PLANET-PRESERVATION-GUARD` keeps the existing Earth and Mars objects and their parent showcase groups visible.
+- Only legacy Moon objects are hidden by the preservation guard; Earth and Mars are not replaced or removed.
 
-## Runtime file
+## Runtime files
 
-`game/modules/phase386_quest_table_environment_authority.js`
+- `game/modules/phase386_quest_table_environment_authority.js`
+- `game/modules/phase386_planet_preservation_guard.js`
 
 ## Quest test route
 
@@ -104,8 +107,9 @@ Dynamic shadows remain disabled for Quest performance. Renderer output is set to
 7. Eric is visible behind the dealer side, upright, correctly scaled, textured, and lit.
 8. No external skeleton is visible behind or through Eric.
 9. The Moon is larger, above the lobby view, textured, and slowly rotating.
-10. Turning the headset no longer causes stars or the scene to dim behind a black square/film.
-11. Existing cards, betting actions, dealer motion, audio, and gameplay remain functional.
+10. Earth and Mars remain visible and are not removed with the older Moon geometry.
+11. Turning the headset no longer causes stars or the scene to dim behind a black square/film.
+12. Existing cards, betting actions, dealer motion, audio, and gameplay remain functional.
 
 ## QA APIs
 
@@ -115,6 +119,8 @@ Dynamic shadows remain disabled for Quest performance. Renderer output is set to
 - `window.SVR_PHASE386_OVERLAY_SWEEP()`
 - `window.SVR_PHASE386_LIGHTING_SWEEP()`
 - `window.SVR_PHASE386_ALIGN_ERIC()`
+- `window.SVR_PHASE386_PRESERVE_PLANETS()`
+- `window.SVR_PHASE386_PLANET_QA()`
 
 ## Protected baselines
 
