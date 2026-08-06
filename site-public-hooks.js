@@ -2,11 +2,11 @@
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages';
   const CACHE_EPOCH_KEY = 'svr_public_cache_epoch';
-  const CACHE_EPOCH = 'phase390-table-geometry-cards-spawn';
-  const CURRENT_PHASE = 'phase390';
-  const SITE_PHASE = 'phase390';
+  const CACHE_EPOCH = 'phase391-production-consolidation';
+  const CURRENT_PHASE = 'phase391';
+  const SITE_PHASE = 'phase391';
   const AVATAR_PHASE = 'phase389';
-  const ANDROID_PHASE = 'phase390';
+  const ANDROID_PHASE = 'phase391';
 
   async function refreshRuntimeCaches() {
     try {
@@ -24,7 +24,7 @@
       }
       if ('serviceWorker' in navigator) await navigator.serviceWorker.register(`/sw.js?v=${CURRENT_PHASE}`, { scope: '/' });
     } catch (error) {
-      console.warn('SVR Phase 390 cache recovery could not complete.', error);
+      console.warn('SVR Phase 391 cache recovery could not complete.', error);
     }
   }
 
@@ -52,8 +52,8 @@
     if (document.getElementById('svr-phase-live-badge')) return;
     const badge = document.createElement('div');
     badge.id = 'svr-phase-live-badge';
-    badge.textContent = '● PHASE 390 TABLE + GAMEPLAY FIXES';
-    badge.setAttribute('aria-label', 'SVR Poker Phase 390 table geometry, cards, Eric, spawn, Camera 3 and Android gameplay corrections');
+    badge.textContent = '● PHASE 391 PRODUCTION CONSOLIDATION';
+    badge.setAttribute('aria-label', 'SVR Poker Phase 391 consolidated Quest, Camera 3 and Android gameplay release');
     Object.assign(badge.style, {
       position: 'fixed', top: '12px', right: '12px', zIndex: '2147483647',
       padding: '7px 11px', border: '1px solid #8dffb4', borderRadius: '999px',
