@@ -28,6 +28,8 @@ jobs:
             /launch.css
             /matrix.js
             /site-public-hooks.js
+            /site-local-counter.js
+            /support-chat-bot.js
             /logo.webp
             /logo.png
             /manifest.webmanifest
@@ -48,6 +50,62 @@ jobs:
           path: publish
           fetch-depth: 1
 
+      - name: Evaluate active Phase 391 platform manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp source/game/modules/phase340_platform_manifest.js /tmp/phase340_platform_manifest.mjs
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          Object.defineProperty(globalThis, 'location', {
+            configurable: true,
+            value: {
+              search: '?platform=quest&direct=1&autoseat=1&questfix=1&clean=1',
+              pathname: '/game/index.html'
+            }
+          });
+          Object.defineProperty(globalThis, 'navigator', {
+            configurable: true,
+            value: { userAgent: 'Mozilla/5.0 Meta Quest' }
+          });
+          const manifest = await import(`file:///tmp/phase340_platform_manifest.mjs?audit=${Date.now()}`);
+          assert.equal(manifest.BUILD, 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK');
+          assert.equal(manifest.VERSION, 'phase391');
+
+          const quest = manifest.manifestFor('quest');
+          const camera3 = manifest.manifestFor('camera3');
+          const android = manifest.manifestFor('android');
+          const retiredQuest = [
+            'modules/phase358_quest_uploaded_table_authority_lock.js',
+            'modules/phase358_quest_runtime_boot_lock.js',
+            'modules/phase358_quest_poker_boot_order_lock.js',
+            'modules/phase358_quest_pot_display_authority_lock.js',
+            'modules/phase358_quest_full_game_acceptance_smoothness_lock.js',
+            'modules/phase379_quest_procedural_table_authority.js',
+            'modules/phase388_front_south_seat_authority.js'
+          ];
+          for (const retired of retiredQuest) {
+            assert.equal(quest.includes(retired), false, `${retired} must not be active`);
+          }
+          assert.equal(manifest.deferredManifestFor('quest').length, 0, 'Direct Quest route must not load deferred lobby or social work');
+          assert.equal(camera3.some((entry) => /phase339_camera3|phase350_camera3/.test(entry)), false);
+          assert.equal(quest.filter((entry, index) => quest.indexOf(entry) !== index).length, 0);
+          assert.equal(camera3.filter((entry, index) => camera3.indexOf(entry) !== index).length, 0);
+          assert.equal(android.filter((entry, index) => android.indexOf(entry) !== index).length, 0);
+
+          const questAudit = manifest.validateManifest('quest');
+          const cameraAudit = manifest.validateManifest('camera3');
+          const androidAudit = manifest.validateManifest('android');
+          assert.equal(questAudit.pass, true, JSON.stringify(questAudit));
+          assert.equal(cameraAudit.pass, true, JSON.stringify(cameraAudit));
+          assert.equal(androidAudit.pass, true, JSON.stringify(androidAudit));
+          assert.equal(questAudit.singleOriginalTableAuthority, true);
+          assert.equal(questAudit.legacyQuestAcceptanceRemoved, true);
+          assert.equal(questAudit.directQuestDeferredWorkDisabled, true);
+          assert.equal(cameraAudit.legacyCameraControllersRemoved, true);
+          console.log(JSON.stringify({ questAudit, cameraAudit, androidAudit }, null, 2));
+          NODE
+
       - name: Validate Phase 391 production contracts
         shell: bash
         run: |
@@ -57,41 +115,45 @@ jobs:
           grep -q 'game/quest.html?v=phase391' source/index.html
           grep -q 'game/android.html?channel=stable&amp;v=phase391' source/index.html
           grep -q 'game/camera3-live.html?v=phase391' source/index.html
-          grep -q 'phase391-production-consolidation' source/site-public-hooks.js
           grep -q 'PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK' source/site/index.html
+          grep -q '../support-chat-bot.js' source/site/index.html
+          grep -q '../site-local-counter.js' source/site/index.html
           ! grep -Eqi 'Trueitive|Shyona Royston' source/site/index.html
 
           grep -q 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK' source/game/index.html
+          grep -q 'phase380_original_table_authority_lock' source/game/index.html
           grep -q 'phase391_eric_dealer_authority' source/game/index.html
           grep -q 'phase391_production_runtime_audit' source/game/index.html
           grep -q 'phase390_quest_table_geometry_cards_spawn_authority' source/game/index.html
           grep -q 'phase390_surface_cards_final_guard' source/game/index.html
           grep -q 'phase390_front_spawn_final_guard' source/game/index.html
-          ! grep -q "import './modules/phase379_quest_procedural_table_authority" source/game/index.html
-          ! grep -q "import('./modules/phase388_quest_table_player_eric_authority" source/game/index.html
-          ! grep -q "import './modules/phase388_quest_table_player_eric_authority" source/game/index.html
+          ! grep -q 'phase379_quest_procedural_table_authority' source/game/index.html
+          ! grep -q 'phase388_quest_table_player_eric_authority' source/game/index.html
+          ! grep -q 'phase388_front_south_seat_authority' source/game/index.html
 
-          grep -q 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK' source/game/modules/phase340_platform_manifest.js
-          grep -q "VERSION = 'phase391'" source/game/modules/phase340_platform_manifest.js
-          grep -q 'singleOriginalTableAuthority' source/game/modules/phase340_platform_manifest.js
-          grep -q 'PHASE-391-ERIC-UPRIGHT-DEALER-AUTHORITY-LOCK' source/game/modules/phase391_eric_dealer_authority.js
-          grep -q 'anatomicalUpDot' source/game/modules/phase391_eric_dealer_authority.js
-          grep -q 'PHASE-391-PRODUCTION-RUNTIME-AUDIT-LOCK' source/game/modules/phase391_production_runtime_audit.js
-          grep -q 'duplicateTablesRemoved' source/game/modules/phase391_production_runtime_audit.js
           grep -q 'TARGET_RECESS_METERS = 0.165' source/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
           grep -q 'PHASE390_RECESSED_BRANDED_PLAYING_SURFACE' source/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
           grep -q 'cardMeshesReady' source/game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
           grep -q 'BOOT_CORRECTION_WINDOW_MS = 9000' source/game/modules/phase390_front_spawn_final_guard.js
+          grep -q 'PHASE-391-ERIC-UPRIGHT-DEALER-AUTHORITY-LOCK' source/game/modules/phase391_eric_dealer_authority.js
+          grep -q 'anatomicalUpDot' source/game/modules/phase391_eric_dealer_authority.js
+          grep -q 'duplicateDealersRemoved' source/game/modules/phase391_eric_dealer_authority.js
+          grep -q 'PHASE-391-PRODUCTION-RUNTIME-AUDIT-LOCK' source/game/modules/phase391_production_runtime_audit.js
+          grep -q 'singleTableAuthority' source/game/modules/phase391_production_runtime_audit.js
+          grep -q 'duplicateTablesRemoved' source/game/modules/phase391_production_runtime_audit.js
 
           grep -q 'PHASE-391-CAMERA3-PRODUCTION-CONSOLIDATION-LOCK' source/game/camera3-live.html
+          grep -q 'phase380_original_table_authority_lock' source/game/camera3-live.html
+          grep -q 'phase341_canonical_table_geometry_card_motion_lock' source/game/camera3-live.html
           grep -q 'phase391_eric_dealer_authority' source/game/camera3-live.html
+          grep -q 'phase390_quest_table_geometry_cards_spawn_authority' source/game/camera3-live.html
+          grep -q 'phase390_surface_cards_final_guard' source/game/camera3-live.html
+          grep -q 'phase389_camera3_live_preview' source/game/camera3-live.html
           grep -q 'phase391_production_runtime_audit' source/game/camera3-live.html
+          ! grep -q 'phase339_camera3_table_orbit_lock' source/game/camera3-live.html
+          ! grep -q 'phase350_camera3_visibility_lighting_lock' source/game/camera3-live.html
           ! grep -q 'phase368_card_dealer_animation_lock' source/game/camera3-live.html
           grep -q 'PHASE389_CAMERA3_PRODUCTION_LIGHTING' source/game/modules/phase389_camera3_live_preview.js
-          grep -q 'camera3-live.html?v=phase391' source/site/phase383-home-restore.js
-          grep -q 'camera3-live.html?v=phase391' source/game/camera3.html
-          grep -q 'camera3-live.html?v=phase391' source/game/cam3.html
-          grep -q 'camera3-live.html?v=phase391' source/game/preview.html
 
           grep -q 'PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK' source/game/android.html
           grep -q 'PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK' source/game/android-tabletop.html
@@ -102,7 +164,10 @@ jobs:
           grep -q 'id="community"' source/game/android-stable.html
           grep -q 'id="hole"' source/game/android-stable.html
           grep -q 'data-a="fold"' source/game/android-stable.html
+          grep -q 'data-a="call"' source/game/android-stable.html
+          grep -q 'data-a="raise"' source/game/android-stable.html
           grep -q 'data-a="allin"' source/game/android-stable.html
+          grep -q "NAMES=\['YOU','Claudia','Eric','Maya','Darius','Nova'\]" source/game/android-stable.html
 
           grep -q 'phase391-production-consolidation-v1' source/sw.js
           grep -q 'phase391-production-consolidation-v1' source/pwa-sw.js
@@ -112,9 +177,9 @@ jobs:
           grep -q '"phase": 391' source/game/manifest.json
           grep -q '"singleOriginalTableAuthority": true' source/update/app-version.json
           grep -q '"androidGameplayUrl": "/game/android-stable.html?v=phase391&direct=1"' source/update/app-version.json
-          grep -q '"forceUpdate": false' source/update/app-version.json
-          grep -q '"showUpdatePrompt": false' source/update/app-version.json
 
+          test -s source/support-chat-bot.js
+          test -s source/site-local-counter.js
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/table.fbx
           test -s source/game/assets/models/eric/eric.fbx
@@ -127,6 +192,8 @@ jobs:
           python3 -m json.tool source/update/app-version.json >/dev/null
           python3 -m json.tool source/manifest.webmanifest >/dev/null
           node --check source/site-public-hooks.js
+          node --check source/site-local-counter.js
+          node --check source/support-chat-bot.js
           node --check source/site/phase383-home-restore.js
           node --check source/game/modules/phase340_platform_manifest.js
           node --check source/game/modules/phase389_runtime_health_visibility.js
@@ -146,8 +213,10 @@ jobs:
           set -euo pipefail
           grep -q '"apkVersionName": "0.1.0-rc2"' source/game/android-release.json
           grep -q '"apkVersionCode": 2' source/game/android-release.json
+          grep -q '"forceUpdate": false' source/game/android-release.json
+          grep -q '"showUpdatePrompt": false' source/game/android-release.json
           grep -q '"nativeApkRebuild": false' source/game/android-release.json
-          ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' source/index.html source/site-public-hooks.js source/sw.js source/pwa-sw.js source/manifest.webmanifest source/update source/game/index.html source/game/quest.html source/game/camera3-live.html source/game/android.html source/game/android-tabletop.html source/game/modules/phase39*.js source/site/phase383-home-restore.js | grep -q .
+          ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' source/index.html source/site-public-hooks.js source/site-local-counter.js source/support-chat-bot.js source/sw.js source/pwa-sw.js source/manifest.webmanifest source/update source/game/index.html source/game/quest.html source/game/camera3-live.html source/game/android.html source/game/android-tabletop.html source/game/modules/phase39*.js source/site/phase383-home-restore.js | grep -q .
 
       - name: Rebuild clean production tree
         shell: bash
@@ -158,6 +227,8 @@ jobs:
           cp source/launch.css publish/launch.css
           cp source/matrix.js publish/matrix.js
           cp source/site-public-hooks.js publish/site-public-hooks.js
+          cp source/site-local-counter.js publish/site-local-counter.js
+          cp source/support-chat-bot.js publish/support-chat-bot.js
           cp source/manifest.webmanifest publish/manifest.webmanifest
           cp source/pwa-sw.js publish/pwa-sw.js
           cp source/sw.js publish/sw.js
@@ -195,6 +266,7 @@ jobs:
             "deployedAt": "${DEPLOYED_AT}",
             "sourceBranch": "main",
             "publishBranch": "gh-pages",
+            "deploymentMethod": "phase391-active-manifest-validated-auto-deploy",
             "questRoute": "/game/quest.html?v=phase391",
             "questRuntimeRoute": "/game/index.html?platform=quest&v=phase391&direct=1&autoseat=1&questfix=1&clean=1",
             "camera3Route": "/game/camera3-live.html?v=phase391",
@@ -209,26 +281,46 @@ jobs:
             "apkVersionCode": 2,
             "singleOriginalTableAuthority": true,
             "legacyUploadedTableAuthorityRemoved": true,
+            "legacyQuestFallbackTableCreatorRemoved": true,
+            "legacyQuestPokerBootOrderRemoved": true,
+            "legacyQuestPotDisplayDependencyRemoved": true,
+            "legacyQuestAcceptanceWaitRemoved": true,
             "proceduralTableAuthorityRemoved": true,
             "legacyCameraControllersRemoved": true,
             "legacyQuestSeatControllerRemoved": true,
+            "directQuestDeferredLobbyDisabled": true,
+            "directQuestDeferredSocialDisabled": true,
             "productionDuplicateSweep": true,
             "tablePlayingSurfaceRecessMeters": 0.165,
             "tablePlayingSurfaceRecessInches": 6.5,
             "tableArmrestPreserved": true,
+            "phase388TopFeltOverlayRemoved": true,
             "phase341CardsRestored": true,
+            "minimumPhysicalCardMeshes": 17,
             "questFixedFrontSpawn": true,
+            "questSpawnCorrectionWindowSeconds": 9,
             "ericUprightDealerAuthority": true,
+            "ericTargetHeightMeters": 1.78,
+            "ericAnatomicalUprightCorrection": true,
             "camera3VisibleCardsRequired": true,
             "camera3ProductionLighting": true,
+            "camera3DirectorShots": 5,
             "androidPlayableBrowserRoute": true,
             "androidDirectGameplayFallback": true,
+            "androidJoinNow": true,
+            "androidPlayers": 6,
+            "androidBots": 5,
             "androidResponsivePortrait": true,
             "androidResponsiveLandscape": true,
+            "androidGyroscopeView": true,
+            "supportChatBotPublished": true,
+            "siteLocalCounterPublished": true,
             "cacheRecovery": true,
+            "cacheEpoch": "phase391-production-consolidation-v1",
             "cleanTreePublish": true,
             "forceUpdate": false,
             "showUpdatePrompt": false,
+            "nativeApkRebuild": false,
             "customDomain": "svrpoker.com"
           }
           EOF2
@@ -239,6 +331,8 @@ jobs:
         run: |
           set -euo pipefail
           test -f publish/index.html
+          test -f publish/support-chat-bot.js
+          test -f publish/site-local-counter.js
           test -f publish/game/index.html
           test -f publish/game/quest.html
           test -f publish/game/camera3-live.html
@@ -250,9 +344,18 @@ jobs:
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/models/eric/eric.fbx
           test -s publish/downloads/svr-poker-android-rc2.apk
+          cmp source/support-chat-bot.js publish/support-chat-bot.js
+          cmp source/site-local-counter.js publish/site-local-counter.js
+          cmp source/game/index.html publish/game/index.html
+          cmp source/game/camera3-live.html publish/game/camera3-live.html
+          cmp source/game/android-tabletop.html publish/game/android-tabletop.html
+          cmp source/game/modules/phase340_platform_manifest.js publish/game/modules/phase340_platform_manifest.js
           grep -q 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK' publish/deploy-health.json
           grep -q '"singleOriginalTableAuthority": true' publish/deploy-health.json
-          grep -q '"legacyQuestSeatControllerRemoved": true' publish/deploy-health.json
+          grep -q '"legacyQuestFallbackTableCreatorRemoved": true' publish/deploy-health.json
+          grep -q '"directQuestDeferredLobbyDisabled": true' publish/deploy-health.json
+          grep -q '"supportChatBotPublished": true' publish/deploy-health.json
+          grep -q '"siteLocalCounterPublished": true' publish/deploy-health.json
           grep -q '"androidPlayableBrowserRoute": true' publish/deploy-health.json
           ! find publish -type f \( -name '.env' -o -name '.env.*' \) | grep -q .
 
