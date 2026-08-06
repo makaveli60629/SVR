@@ -27,6 +27,7 @@ const state = {
   pokerActionsReady: false,
   camera3LightingReady: false,
   rendererPixelRatio: null,
+  sweepRunning: false,
   lastError: null,
   checkedAt: null
 };
@@ -34,6 +35,7 @@ let scene = null;
 let renderer = null;
 let table = null;
 let timer = 0;
+let sweepPromise = null;
 const TABLE_NAME_RX = /(PHASE(?:155|157|158|159|200|326|358|363|373|379|380).*TABLE|ACTUAL_UPLOADED_TABLE|PROCEDURAL_TABLE_AUTHORITY)/i;
 const FELT_OVERLAY_RX = /(PHASE388_OFFICIAL_SITE_LOGO_FELT|PHASE386_PROFESSIONAL_SVR_FELT|PHASE384_PROFESSIONAL_SVR_FELT|PHASE167_.*FELT)/i;
 
@@ -133,20 +135,29 @@ function refreshState() {
   window.SVR_PHASE391_PRODUCTION_STATE = { ...state };
   return state;
 }
-function sweep(reason = 'interval') {
+async function sweep(reason = 'interval') {
   if (!ACTIVE) return false;
-  try {
-    window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.(`phase391-${reason}`);
-    window.SVR_PHASE390_SWEEP?.(`phase391-${reason}`);
-    window.SVR_PHASE390_SURFACE_CARDS_SWEEP?.(`phase391-${reason}`);
-    window.SVR_PHASE391_ERIC_SWEEP?.(`phase391-${reason}`);
-    refreshState();
-    return true;
-  } catch (error) {
-    state.lastError = String(error?.stack || error?.message || error);
-    state.checkedAt = new Date().toISOString();
-    return false;
-  }
+  if (sweepPromise) return sweepPromise;
+  sweepPromise = (async () => {
+    state.sweepRunning = true;
+    try {
+      window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.(`phase391-${reason}`);
+      await window.SVR_PHASE390_SWEEP?.(`phase391-${reason}`);
+      await window.SVR_PHASE390_SURFACE_CARDS_SWEEP?.(`phase391-${reason}`);
+      await window.SVR_PHASE391_ERIC_SWEEP?.(`phase391-${reason}`);
+      refreshState();
+      state.lastError = null;
+      return true;
+    } catch (error) {
+      state.lastError = String(error?.stack || error?.message || error);
+      state.checkedAt = new Date().toISOString();
+      return false;
+    } finally {
+      state.sweepRunning = false;
+      sweepPromise = null;
+    }
+  })();
+  return sweepPromise;
 }
 function qa() {
   refreshState();
@@ -170,6 +181,6 @@ function qa() {
 window.SVR_PHASE391_PRODUCTION_SWEEP = sweep;
 window.SVR_PHASE391_PRODUCTION_QA = qa;
 if (ACTIVE) {
-  for (const delay of [0, 250, 700, 1400, 2800, 5000, 8000]) setTimeout(() => sweep(`bounded-${delay}`), delay);
-  timer = window.setInterval(() => sweep('interval'), 1800);
+  for (const delay of [0, 250, 700, 1400, 2800, 5000, 8000]) setTimeout(() => { void sweep(`bounded-${delay}`); }, delay);
+  timer = window.setInterval(() => { void sweep('interval'); }, 1800);
 }
