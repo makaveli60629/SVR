@@ -32,70 +32,79 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 390 production payload
+      - name: Verify Phase 391 production payload
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK' index.html
-          grep -q 'site-public-hooks.js?v=phase390' index.html
-          grep -q 'game/quest.html?v=phase390' index.html
-          grep -q 'game/android.html?channel=stable&amp;v=phase390' index.html
-          grep -q 'game/camera3-live.html?v=phase390' index.html
+          grep -q 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK' index.html
+          grep -q 'site-public-hooks.js?v=phase391' index.html
+          grep -q 'game/quest.html?v=phase391' index.html
+          grep -q 'game/android.html?channel=stable&amp;v=phase391' index.html
+          grep -q 'game/camera3-live.html?v=phase391' index.html
           test -s launch.css
           test -s matrix.js
           test -s site-public-hooks.js
           test -s logo.png
-          grep -q 'phase390-table-geometry-cards-spawn' site-public-hooks.js
+          grep -q 'phase391-production-consolidation' site-public-hooks.js
           grep -q 'PHASE-383-FULL-SITE-HOMEPAGE-RESTORE-LOCK' site/index.html
-          grep -q 'camera3-live.html?v=phase390' site/phase383-home-restore.js
-          grep -q 'android.html?channel=stable&v=phase390' site/phase383-home-restore.js
+          grep -q 'camera3-live.html?v=phase391' site/phase383-home-restore.js
+          grep -q 'android.html?channel=stable&v=phase391' site/phase383-home-restore.js
           test -s site/avatar.html
           test -s site/profile.html
           test -s site/js/phase389-avatar-room.js
           test -s site/js/phase389-profile-showroom.js
           test -s site/css/phase389-avatar-profile-visible-refresh.css
 
-          test -s game/index.html
-          test -s game/quest.html
-          grep -q 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK' game/index.html
+          grep -q 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK' game/index.html
+          grep -q 'phase391_eric_dealer_authority' game/index.html
+          grep -q 'phase391_production_runtime_audit' game/index.html
           grep -q 'phase390_quest_table_geometry_cards_spawn_authority' game/index.html
+          grep -q 'phase390_surface_cards_final_guard' game/index.html
           grep -q 'phase390_front_spawn_final_guard' game/index.html
-          ! grep -q "^import './modules/phase388_front_south_seat_authority" game/index.html
-          test -s game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
-          test -s game/modules/phase390_front_spawn_final_guard.js
+          ! grep -q 'phase379_quest_procedural_table_authority' game/index.html
+          ! grep -q 'phase388_quest_table_player_eric_authority' game/index.html
+          test -s game/modules/phase391_eric_dealer_authority.js
+          test -s game/modules/phase391_production_runtime_audit.js
+          grep -q 'PHASE-391-ERIC-UPRIGHT-DEALER-AUTHORITY-LOCK' game/modules/phase391_eric_dealer_authority.js
+          grep -q 'PHASE-391-PRODUCTION-RUNTIME-AUDIT-LOCK' game/modules/phase391_production_runtime_audit.js
           grep -q 'TARGET_RECESS_METERS = 0.165' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
-          grep -q 'cardMeshesReady' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
-          grep -q 'ericUpDot' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
-          grep -q 'fixedTableFront: true' game/modules/phase390_front_spawn_final_guard.js
+          grep -q 'BOOT_CORRECTION_WINDOW_MS = 9000' game/modules/phase390_front_spawn_final_guard.js
 
-          test -s game/camera3-live.html
-          test -s game/modules/phase389_camera3_live_preview.js
-          grep -q 'PHASE-390-CAMERA3-FURNISHED-TABLE-CARDS-LOCK' game/camera3-live.html
+          grep -q 'PHASE-391-CAMERA3-PRODUCTION-CONSOLIDATION-LOCK' game/camera3-live.html
+          grep -q 'phase391_eric_dealer_authority' game/camera3-live.html
+          grep -q 'phase391_production_runtime_audit' game/camera3-live.html
+          ! grep -q 'phase368_card_dealer_animation_lock' game/camera3-live.html
           grep -q 'PHASE389_CAMERA3_PRODUCTION_LIGHTING' game/modules/phase389_camera3_live_preview.js
-          grep -q 'camera3-live.html?v=phase390' game/camera3.html
-          grep -q 'camera3-live.html?v=phase390' game/cam3.html
-          grep -q 'camera3-live.html?v=phase390' game/preview.html
+          grep -q 'camera3-live.html?v=phase391' game/camera3.html
+          grep -q 'camera3-live.html?v=phase391' game/cam3.html
+          grep -q 'camera3-live.html?v=phase391' game/preview.html
 
-          grep -q 'PHASE-390-ANDROID-PLAYABLE-ROUTE-LOCK' game/android.html
-          grep -q 'PHASE-390-ANDROID-PLAYABLE-ROUTE-LOCK' game/android-tabletop.html
-          grep -q 'android-stable.html?v=phase390' game/android-tabletop.html
-          grep -q 'playableUiFound' game/android-tabletop.html
-          test -s game/android-stable.html
-          test -s game/styles/phase389_android_responsive_layout.css
-          test -s game/modules/phase389_android_responsive_layout.js
+          grep -q 'PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK' game/android.html
+          grep -q 'PHASE-391-ANDROID-PLAYABLE-PRODUCTION-LOCK' game/android-tabletop.html
+          grep -q 'android-stable.html?v=phase391' game/android-tabletop.html
+          grep -q 'SVR_PHASE391_ANDROID_WRAPPER_QA' game/android-tabletop.html
+          grep -q 'id="join"' game/android-stable.html
+          grep -q 'id="community"' game/android-stable.html
+          grep -q 'id="hole"' game/android-stable.html
+          grep -q 'data-a="fold"' game/android-stable.html
+          grep -q 'data-a="allin"' game/android-stable.html
 
-          grep -q 'phase390-table-geometry-cards-spawn-v1' sw.js
-          grep -q 'phase390-table-geometry-cards-spawn-v1' pwa-sw.js
-          grep -q 'pwa-phase390' manifest.webmanifest
+          grep -q 'phase391-production-consolidation-v1' sw.js
+          grep -q 'phase391-production-consolidation-v1' pwa-sw.js
+          ! grep -q 'phase388_quest_table_player_eric_authority' sw.js
+          ! grep -q 'phase388_quest_table_player_eric_authority' pwa-sw.js
+          grep -q 'pwa-phase391' manifest.webmanifest
           test -s game/assets/models/eric/eric.fbx
           test -s game/assets/models/table.glb
           test -s game/assets/table.fbx
           test -s downloads/svr-poker-android-rc2.apk
-          grep -q 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK' deploy-health.json
+          grep -q 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK' deploy-health.json
+          grep -q '"singleOriginalTableAuthority": true' deploy-health.json
+          grep -q '"legacyCameraControllersRemoved": true' deploy-health.json
+          grep -q '"legacyQuestSeatControllerRemoved": true' deploy-health.json
           grep -q '"tablePlayingSurfaceRecessInches": 6.5' deploy-health.json
           grep -q '"phase341CardsRestored": true' deploy-health.json
-          grep -q '"questFixedFrontSpawn": true' deploy-health.json
-          grep -q '"ericAnatomicalUprightCorrection": true' deploy-health.json
+          grep -q '"ericUprightDealerAuthority": true' deploy-health.json
           grep -q '"androidPlayableBrowserRoute": true' deploy-health.json
           test -f CNAME
           grep -qx 'svrpoker.com' CNAME
@@ -105,11 +114,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 390 Pages artifact
+      - name: Upload Phase 391 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 390 table and gameplay fixes
+      - name: Deploy Phase 391 production consolidation
         id: deployment
         uses: actions/deploy-pages@v4
