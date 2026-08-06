@@ -1,0 +1,102 @@
+{
+  "phase": 390,
+  "build": "PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK",
+  "predecessor": "PHASE-389-FULL-AUDIT-VISIBLE-FIXES-LOCK",
+  "status": "source-corrected-manual-device-acceptance-required",
+  "reportedFailures": [
+    "Eric sideways",
+    "Quest spawn beside table",
+    "felt overlay covering hand rests",
+    "card layers missing",
+    "Android gameplay not clearly reachable"
+  ],
+  "geometryAudit": {
+    "asset": "game/assets/models/table.glb",
+    "normalizedDimensionsMeters": {
+      "length": 2.734,
+      "height": 0.801,
+      "depth": 1.46
+    },
+    "railTopMeters": 0.80086,
+    "uploadedFeltTopMeters": 0.71906,
+    "uploadedReliefMeters": 0.0818,
+    "uploadedReliefInches": 3.22,
+    "sourceSurfaceMesh": "Object002_e392c7",
+    "sourceSurfaceMaterial": "polotno"
+  },
+  "rootCause": {
+    "overlayName": "PHASE388_OFFICIAL_SITE_LOGO_FELT",
+    "overlayHeightContract": "table.maxY + 0.028",
+    "overlayRenderOrder": 9388,
+    "cardRenderOrder": 9341,
+    "effect": "The rectangular overlay sat above the rail and rendered over Phase 341 cards."
+  },
+  "corrections": {
+    "playingSurface": {
+      "module": "game/modules/phase390_quest_table_geometry_cards_spawn_authority.js",
+      "authorityName": "PHASE390_RECESSED_BRANDED_PLAYING_SURFACE",
+      "sourceGeometryCloned": true,
+      "targetRecessMeters": 0.165,
+      "targetRecessInches": 6.5,
+      "handRestPreserved": true,
+      "legacyTopOverlaysDetached": true,
+      "armrestMaterialsPolishedSeparately": true
+    },
+    "cards": {
+      "root": "PHASE341_CANONICAL_TABLE_PRESENTATION_ROOT",
+      "minimumCardMeshes": 17,
+      "holeCards": 12,
+      "communityCards": 5,
+      "burnCardsRetained": true,
+      "rebuildWhenMissing": true
+    },
+    "eric": {
+      "asset": "game/assets/models/eric/eric.fbx",
+      "anatomicalHeadToFeetCorrection": true,
+      "targetHeightMeters": 1.78,
+      "grounded": true
+    },
+    "spawn": {
+      "module": "game/modules/phase390_front_spawn_final_guard.js",
+      "fixedTableFront": true,
+      "cameraRelativeSeatDisabled": true,
+      "facesPlayingSurfaceCenter": true,
+      "driftCorrection": true
+    },
+    "camera3": {
+      "route": "/game/camera3-live.html?v=phase390",
+      "correctedTableLoadedBeforeLighting": true,
+      "cardsRequired": true,
+      "legacyRoutesRedirect": true
+    },
+    "android": {
+      "publicRoute": "/game/android.html?channel=stable&v=phase390",
+      "tabletopRoute": "/game/android-tabletop.html?v=phase390",
+      "directGameplayFallback": "/game/android-stable.html?v=phase390&direct=1",
+      "joinNow": true,
+      "fiveBots": true,
+      "holeCards": true,
+      "communityCards": true,
+      "potChips": true,
+      "pokerActions": true,
+      "portraitLandscape": true,
+      "gyroscope": true
+    }
+  },
+  "apkPolicy": {
+    "apkVersionName": "0.1.0-rc2",
+    "apkVersionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "nativeApkRebuild": false
+  },
+  "manualAcceptance": [
+    "Quest front spawn and facing",
+    "Eric upright in stereoscopic view",
+    "hand-rest visibility",
+    "6.5-inch visual recess",
+    "hole and community card visibility",
+    "Camera 3 furnished-table framing",
+    "Android portrait and landscape gameplay"
+  ]
+}
