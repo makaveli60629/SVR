@@ -1,10 +1,10 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "SVR Poker with the restored full site, Phase 385 Android tabletop, and Phase 387 direct seated Quest recovery.",
-  "id": "/?source=pwa-phase387",
-  "predecessor_id": "pwa-phase384",
-  "start_url": "/?source=pwa-phase387&v=phase387",
+  "description": "SVR Poker with the restored full site, Phase 385 Android tabletop, and Phase 388 close-table Quest authority with upright Eric dealer.",
+  "id": "/?source=pwa-phase388",
+  "predecessor_id": "pwa-phase387",
+  "start_url": "/?source=pwa-phase388&v=phase388",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -22,7 +22,7 @@
     {"name": "Play Android — Join Now", "short_name": "Android", "description": "Open the Phase 385 original tabletop presentation.", "url": "/game/android.html?channel=stable&v=phase385", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Open the APK download and verified release status page.", "url": "/downloads/?v=phase384", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Public Player Site", "short_name": "Player Site", "description": "Open the restored SVR Poker public website.", "url": "/site/index.html?v=phase384", "icons": [{"src": "/logo.png", "sizes": "192x192", "type":"image/png"}]},
-    {"name": "Eric Dressing Room", "short_name": "Eric", "description": "Open the clean textured Eric avatar dressing room.", "url": "/site/avatar.html?v=phase384", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Launch Quest / VR", "short_name": "Quest VR", "description": "Clear stale Oculus caches and open the Phase 387 direct seated table runtime.", "url": "/game/quest.html?v=phase387", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
+    {"name": "Eric Dressing Room", "short_name": "Eric", "description": "Open upright Eric with the Phase 388 dealer material correction.", "url": "/site/avatar.html?v=phase388", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Launch Quest / VR", "short_name": "Quest VR", "description": "Clear stale Oculus caches and open the Phase 388 close-table runtime.", "url": "/game/quest.html?v=phase388", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }
