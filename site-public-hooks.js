@@ -2,8 +2,8 @@
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages';
   const CACHE_EPOCH_KEY = 'svr_public_cache_epoch';
-  const CACHE_EPOCH = 'phase387-quest-direct-seat-recovery';
-  const CURRENT_PHASE = 'phase387';
+  const CACHE_EPOCH = 'phase388-quest-table-player-eric';
+  const CURRENT_PHASE = 'phase388';
   const SITE_PHASE = 'phase384';
   const ANDROID_PHASE = 'phase385';
 
@@ -25,7 +25,7 @@
         await navigator.serviceWorker.register(`/sw.js?v=${CURRENT_PHASE}`, { scope: '/' });
       }
     } catch (error) {
-      console.warn('SVR Phase 387 cache recovery could not complete.', error);
+      console.warn('SVR Phase 388 cache recovery could not complete.', error);
     }
   }
 
@@ -53,20 +53,13 @@
     if (document.getElementById('svr-phase-live-badge')) return;
     const badge = document.createElement('div');
     badge.id = 'svr-phase-live-badge';
-    badge.textContent = '● PHASE 387 QUEST RECOVERY';
-    badge.setAttribute('aria-label', 'SVR Poker Phase 387 direct Quest table seat recovery');
+    badge.textContent = '● PHASE 388 QUEST TABLE FIX';
+    badge.setAttribute('aria-label', 'SVR Poker Phase 388 close Quest seat, official table logo, lighting and upright Eric dealer');
     Object.assign(badge.style, {
-      position: 'fixed',
-      top: '12px',
-      right: '12px',
-      zIndex: '2147483647',
-      padding: '7px 11px',
-      border: '1px solid #8dffb4',
-      borderRadius: '999px',
-      background: 'rgba(0,12,18,.92)',
-      color: '#8dffb4',
-      font: '800 11px/1.1 system-ui,Arial,sans-serif',
-      letterSpacing: '.08em',
+      position: 'fixed', top: '12px', right: '12px', zIndex: '2147483647',
+      padding: '7px 11px', border: '1px solid #8dffb4', borderRadius: '999px',
+      background: 'rgba(0,12,18,.92)', color: '#8dffb4',
+      font: '800 11px/1.1 system-ui,Arial,sans-serif', letterSpacing: '.08em',
       boxShadow: '0 0 24px rgba(141,255,180,.2)'
     });
     document.body.appendChild(badge);
@@ -100,6 +93,12 @@
         anchor.href = url.pathname + '?' + url.searchParams.toString();
         return;
       }
+      if (/\/site\/(?:avatar|profile)\.html$/i.test(url.pathname)) {
+        url.searchParams.set('v', CURRENT_PHASE);
+        url.searchParams.set('deploy', CURRENT_PHASE);
+        anchor.href = url.pathname + '?' + url.searchParams.toString() + url.hash;
+        return;
+      }
       if (/\/site\/[^/]+\.html$/i.test(url.pathname)) {
         url.searchParams.set('v', SITE_PHASE);
         url.searchParams.set('deploy', SITE_PHASE);
@@ -116,16 +115,11 @@
       event.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
       const entry = {
-        name: (data.name || '').trim(),
-        email: (data.email || '').trim(),
-        message: (data.message || '').trim(),
-        createdAt: new Date().toISOString(),
+        name: (data.name || '').trim(), email: (data.email || '').trim(),
+        message: (data.message || '').trim(), createdAt: new Date().toISOString(),
         source: 'svrpoker-public-site'
       };
-      if (!entry.message) {
-        if (status) status.textContent = 'Please enter a message before saving.';
-        return;
-      }
+      if (!entry.message) { if (status) status.textContent = 'Please enter a message before saving.'; return; }
       const current = JSON.parse(localStorage.getItem(MESSAGE_KEY) || '[]');
       current.push(entry);
       localStorage.setItem(MESSAGE_KEY, JSON.stringify(current.slice(-100)));
