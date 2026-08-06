@@ -67,6 +67,7 @@ jobs:
           ! grep -q "await import('./modules/phase387_quest_direct_seat_recovery" source/game/index.html
           test -s source/game/modules/phase388_front_south_seat_authority.js
           test -s source/game/modules/phase388_quest_table_player_eric_authority.js
+          test -s source/game/modules/phase388_table_material_visibility_guard.js
           test -s source/game/modules/phase388_quest_view_dealer_guard.js
           grep -q 'PHASE388_OFFICIAL_SITE_LOGO_FELT' source/game/modules/phase388_quest_table_player_eric_authority.js
           grep -q 'PHASE388_QUEST_PROFESSIONAL_LIGHTS' source/game/modules/phase388_quest_table_player_eric_authority.js
@@ -74,6 +75,7 @@ jobs:
           grep -q 'GAP=.12' source/game/modules/phase388_front_south_seat_authority.js
           grep -q 'transformDirection(table.matrixWorld)' source/game/modules/phase388_front_south_seat_authority.js
           grep -q 'svrPhase388HeadOverlayRemoved' source/game/modules/phase388_quest_view_dealer_guard.js
+          grep -q 'svrPhase388TableVisible' source/game/modules/phase388_table_material_visibility_guard.js
           grep -q 'phase388-eric-upright-material-lock' source/site/js/phase346-avatar-room.js
           test -s source/site/js/phase388-eric-upright-material-lock.js
           grep -q 'PHASE-388-ERIC-UPRIGHT-MATERIAL-LOCK' source/site/js/phase388-eric-upright-material-lock.js
@@ -99,6 +101,7 @@ jobs:
           node --check source/game/modules/phase388_front_south_seat_authority.js
           node --check source/game/modules/phase388_quest_table_player_eric_authority.js
           node --check source/game/modules/phase388_quest_view_dealer_guard.js
+          node --check source/game/modules/phase388_table_material_visibility_guard.js
           node --check source/pwa-sw.js
           node --check source/sw.js
 
@@ -174,6 +177,8 @@ jobs:
             "questOfficialRootLogoOnFelt": true,
             "questLegacyYellowLogoOverlayRemoved": true,
             "questProfessionalLightingAuthority": true,
+            "questTableMaterialVisibilityGuard": true,
+            "questNearBlackTableMaterialsCorrected": true,
             "questRendererExposure": 1.72,
             "questOriginalTablePreserved": true,
             "questMoonEarthMarsPreserved": true,
@@ -194,6 +199,7 @@ jobs:
           test -f publish/game/modules/phase388_front_south_seat_authority.js
           test -f publish/game/modules/phase388_quest_table_player_eric_authority.js
           test -f publish/game/modules/phase388_quest_view_dealer_guard.js
+          test -f publish/game/modules/phase388_table_material_visibility_guard.js
           test -f publish/site/js/phase388-eric-upright-material-lock.js
           test -f publish/site/avatar.html
           test -s publish/game/assets/models/table.glb
@@ -208,6 +214,7 @@ jobs:
           grep -q '"questEricBoneCheckedUpright": true' publish/deploy-health.json
           grep -q '"questOfficialRootLogoOnFelt": true' publish/deploy-health.json
           grep -q '"questProfessionalLightingAuthority": true' publish/deploy-health.json
+          grep -q '"questTableMaterialVisibilityGuard": true' publish/deploy-health.json
           ! find publish -type f \( -name '.env' -o -name '.env.*' \) | grep -q .
           ! grep -RIl --exclude='*.min.js' --exclude='*.map' -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' publish | grep -q .
 
