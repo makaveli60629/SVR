@@ -86,6 +86,13 @@
     "slowRotation": true,
     "olderDuplicateMoonsHidden": true
   },
+  "planetPreservation": {
+    "guardBuild": "PHASE-386-PLANET-PRESERVATION-GUARD",
+    "earthPreserved": true,
+    "marsPreserved": true,
+    "existingPlanetGroupsRestored": true,
+    "onlyLegacyMoonObjectsHidden": true
+  },
   "protected": {
     "websiteRedesign": false,
     "androidGameplayRewritten": false,
@@ -96,6 +103,7 @@
   },
   "files": [
     "game/modules/phase386_quest_table_environment_authority.js",
+    "game/modules/phase386_planet_preservation_guard.js",
     "game/index.html",
     "game/manifest.json",
     "docs/PHASE_386_QUEST_TABLE_ENVIRONMENT_AUTHORITY_MANIFEST.md",
