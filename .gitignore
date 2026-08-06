@@ -21,7 +21,17 @@ _local_untracked_archive/
 *.backup
 *.tmp
 *~
-tatus
+
+# Prevent accidental shell and PowerShell command-redirection artifacts at repo root
+/Get-Content
+/Set-Content
+/Out-File
+/cd
+/dir
+/git
+/type
+/status
+/tatus
 
 backend/node_modules/
 node_modules/
@@ -38,9 +48,6 @@ backend/.env
 android/keystores/
 _svr_local_backups/
 
-
 **/keystore.properties
 
-
 _svr_private_drafts_archive/
-
