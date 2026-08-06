@@ -23,6 +23,7 @@ jobs:
           grep -q 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK' index.html
           grep -q 'PHASE-390-QUEST-TABLE-GEOMETRY-CARDS-SPAWN-AUTHORITY-LOCK' game/index.html
           grep -q 'phase390_quest_table_geometry_cards_spawn_authority' game/index.html
+          grep -q 'phase390_surface_cards_final_guard' game/index.html
           grep -q 'phase390_front_spawn_final_guard' game/index.html
           ! grep -q "^import './modules/phase388_front_south_seat_authority" game/index.html
           grep -q 'TARGET_RECESS_METERS = 0.165' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
@@ -30,9 +31,14 @@ jobs:
           grep -q 'phase388OverlayDetached' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
           grep -q 'cardMeshesReady' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
           grep -q 'ericUpDot' game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          grep -q 'PHASE-390-SURFACE-CARDS-FINAL-GUARD-LOCK' game/modules/phase390_surface_cards_final_guard.js
+          grep -q 'card-height-realign' game/modules/phase390_surface_cards_final_guard.js
+          grep -q 'material.color?.setHex?.(0xffffff)' game/modules/phase390_surface_cards_final_guard.js
           grep -q 'PHASE-390-FRONT-SPAWN-FINAL-GUARD-LOCK' game/modules/phase390_front_spawn_final_guard.js
           grep -q 'fixedTableFront: true' game/modules/phase390_front_spawn_final_guard.js
+          grep -q 'BOOT_CORRECTION_WINDOW_MS = 9000' game/modules/phase390_front_spawn_final_guard.js
           grep -q 'PHASE-390-CAMERA3-FURNISHED-TABLE-CARDS-LOCK' game/camera3-live.html
+          grep -q 'phase390_surface_cards_final_guard' game/camera3-live.html
           grep -q 'PHASE389_CAMERA3_PRODUCTION_LIGHTING' game/modules/phase389_camera3_live_preview.js
           grep -q 'camera3-live.html?v=phase390' site/phase383-home-restore.js
           grep -q 'PHASE-390-ANDROID-PLAYABLE-ROUTE-LOCK' game/android.html
@@ -40,7 +46,9 @@ jobs:
           grep -q 'android-stable.html?v=phase390' game/android-tabletop.html
           grep -q 'playableUiFound' game/android-tabletop.html
           grep -q 'phase390-table-geometry-cards-spawn-v1' sw.js
+          grep -q 'phase390_surface_cards_final_guard' sw.js
           grep -q 'phase390-table-geometry-cards-spawn-v1' pwa-sw.js
+          grep -q 'phase390_surface_cards_final_guard' pwa-sw.js
           grep -q '"phase": 390' game/manifest.json
           grep -q '"tablePlayingSurfaceRecessInches": 6.5' update/app-version.json
           grep -q '"androidGameplayUrl": "/game/android-stable.html?v=phase390&direct=1"' update/app-version.json
@@ -52,6 +60,7 @@ jobs:
           python3 -m json.tool game/android-release.json >/dev/null
           python3 -m json.tool update/app-version.json >/dev/null
           python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool docs/PHASE_390_QUEST_TABLE_GEOMETRY_CARDS_SPAWN_MANIFEST.json >/dev/null
           node --check site-public-hooks.js
           node --check site/phase383-home-restore.js
           node --check site/js/phase389-avatar-room.js
@@ -60,6 +69,7 @@ jobs:
           node --check game/modules/phase389_camera3_live_preview.js
           node --check game/modules/phase389_android_responsive_layout.js
           node --check game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
+          node --check game/modules/phase390_surface_cards_final_guard.js
           node --check game/modules/phase390_front_spawn_final_guard.js
           node --check sw.js
           node --check pwa-sw.js
@@ -76,9 +86,12 @@ jobs:
             game/android.html game/android-tabletop.html game/manifest.json game/android-release.json
             game/modules/phase389_runtime_health_visibility.js game/modules/phase389_camera3_live_preview.js
             game/modules/phase389_android_responsive_layout.js game/modules/phase390_quest_table_geometry_cards_spawn_authority.js
-            game/modules/phase390_front_spawn_final_guard.js game/styles/phase389_android_responsive_layout.css
+            game/modules/phase390_surface_cards_final_guard.js game/modules/phase390_front_spawn_final_guard.js
+            game/styles/phase389_android_responsive_layout.css
             site/avatar.html site/profile.html site/phase383-home-restore.js
             site/js/phase389-avatar-room.js site/js/phase389-profile-showroom.js
             site/css/phase389-avatar-profile-visible-refresh.css
+            docs/PHASE_390_QUEST_TABLE_GEOMETRY_CARDS_SPAWN_MANIFEST.md
+            docs/PHASE_390_QUEST_TABLE_GEOMETRY_CARDS_SPAWN_MANIFEST.json
           )
           ! grep -Il -E 'AZURE_SQL_CONNECTION_STRING=|STRIPE_SECRET_KEY=|AWS_SECRET_ACCESS_KEY=|ADMIN_PASSWORD=' "${PHASE390_FILES[@]}" | grep -q .
