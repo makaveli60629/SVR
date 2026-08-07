@@ -1,10 +1,10 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "SVR Poker Phase 391 with one original table authority, a recessed playing surface, restored cards, upright Eric, fixed-front Quest spawn, production Camera 3, and playable Android browser routes.",
-  "id": "/?source=pwa-phase391",
-  "predecessor_id": "pwa-phase390",
-  "start_url": "/?source=pwa-phase391&v=phase391",
+  "description": "SVR Poker Phase 392 with a simplified public page, platform-aware launch, polished Android continuous play, upright avatar pedestal, and table-focused Camera 3 showcase.",
+  "id": "/?source=pwa-phase392",
+  "predecessor_id": "pwa-phase391",
+  "start_url": "/?source=pwa-phase392&v=phase392",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -19,12 +19,10 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {"name": "Camera 3 Production Feed", "short_name": "CAM 3", "description": "Open the single original table, recessed felt, restored cards, upright Eric, and production lighting.", "url": "/game/camera3-live.html?v=phase391", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Play Android Poker", "short_name": "Android", "description": "Open JOIN NOW, five bots, cards, pot chips, poker actions, and responsive layouts.", "url": "/game/android.html?channel=stable&v=phase391", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Android Direct Gameplay", "short_name": "Direct Game", "description": "Open the direct playable Android fallback route.", "url": "/game/android-stable.html?v=phase391&direct=1", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Avatar Dressing Room", "short_name": "Avatar", "description": "Open the Phase 389 live avatar dressing room.", "url": "/site/avatar.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Player Profile Demo", "short_name": "Profile", "description": "Open the Phase 389 saved-avatar profile showroom.", "url": "/site/profile.html?v=phase389", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Launch Quest / VR", "short_name": "Quest VR", "description": "Clear stale caches and open the Phase 391 consolidated Quest poker runtime.", "url": "/game/quest.html?v=phase391", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Open the current APK download and verified release status page.", "url": "/downloads/?v=phase391", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
+    {"name": "Live Table Showcase", "short_name": "Showcase", "description": "Open the table-focused Camera 3 advertising feed.", "url": "/game/camera3-showcase.html?v=phase392", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Play Android Poker", "short_name": "Android", "description": "Open continuous Android touch play with profiles, ranks, XP, burn cards, and sponsor zones.", "url": "/game/android.html?channel=stable&v=phase392", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Avatar Dressing Room", "short_name": "Avatar", "description": "Open the upright avatar pedestal and dressing room.", "url": "/site/avatar.html?v=phase392", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Launch Quest / VR", "short_name": "Quest VR", "description": "Open the dedicated Quest spatial version.", "url": "/game/quest.html?v=phase392", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Open the current APK download center.", "url": "/downloads/?v=phase392", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }

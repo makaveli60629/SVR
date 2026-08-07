@@ -1,0 +1,102 @@
+name: Phase 392 Platform and Gameplay Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase392-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate public site and platform routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-392-PUBLIC-ANDROID-SHOWCASE-POLISH-LOCK' index.html
+          test "$(grep -o 'class=\"btn ' index.html | wc -l)" -eq 3
+          grep -q 'platformGameButton' index.html
+          grep -q 'Play Android' index.html
+          grep -q 'Enter VR' index.html
+          grep -q 'PHASE-392-SITE-GAME-ROUTE-CONSOLIDATION-LOCK' site/phase383-home-restore.js
+          grep -q 'phase392-site-polish.js' site/phase383-home-restore.js
+          grep -q 'PHASE-392-SITE-PRESENTATION-POLISH-LOCK' site/phase392-site-polish.js
+          grep -q 'phase392-launch-slide' site/phase392-site-polish.js
+          grep -q 'vibez.html' site/phase392-site-polish.js
+          grep -q 'ASK SVR AI' site/phase392-site-polish.js
+          grep -q 'DOWNLOAD APK' site/phase392-site-polish.js
+          grep -q 'PHASE-392-MARKET-ADS-NO-DUPLICATE-NAV-LOCK' site/js/market-ads.js
+      - name: Validate Android continuous gameplay
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-392-ANDROID-CONTINUOUS-PLAY-RANKING-LOCK' game/android.html
+          grep -q 'PHASE-392-ANDROID-CONTINUOUS-PLAY-RANKING-LOCK' game/android-tabletop.html
+          grep -q 'PHASE-392-ANDROID-CONTINUOUS-PLAY-RANKING-LOCK' game/android-stable.html
+          grep -q 'id="leave"' game/android-stable.html
+          grep -q 'id="outOverlay"' game/android-stable.html
+          grep -q 'phase392_android_gameplay.css' game/android-stable.html
+          grep -q 'phase392_android_gameplay.js' game/android-stable.html
+          grep -q 'continuousPlay' game/modules/phase392_android_gameplay.js
+          grep -q 'function burn' game/modules/phase392_android_gameplay.js
+          grep -q "reveal(3,'FLOP')" game/modules/phase392_android_gameplay.js
+          grep -q "reveal(1,'TURN')" game/modules/phase392_android_gameplay.js
+          grep -q "reveal(1,'RIVER')" game/modules/phase392_android_gameplay.js
+          grep -q 'SVR_ANDROID_SPONSORS' game/modules/phase392_android_gameplay.js
+          grep -q 'awardXp' game/modules/phase392_android_gameplay.js
+          grep -q 'center-pot' game/styles/phase392_android_gameplay.css
+          grep -q 'SVR_PHASE392_ANDROID_QA' game/modules/phase392_android_gameplay.js
+          grep -q 'SVR_PHASE392_ANDROID_WRAPPER_QA' game/android-tabletop.html
+      - name: Validate Camera 3 and avatar
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-392-CAMERA3-TABLE-SHOWCASE-LOCK' game/camera3-showcase.html
+          grep -q 'phase392_camera3_table_showcase.js' game/camera3-showcase.html
+          grep -q 'PHASE-392-CAMERA3-TABLE-SHOWCASE-LOCK' game/modules/phase392_camera3_table_showcase.js
+          grep -Eq 'cardCount\(\)[[:space:]]*>=[[:space:]]*17' game/modules/phase392_camera3_table_showcase.js
+          grep -q 'PHASE-392-AVATAR-PEDESTAL-UPRIGHT-LOCK' site/avatar.html
+          ! grep -q 'matrix.js' site/avatar.html
+          grep -q 'phase392-avatar-pedestal-fix.js' site/avatar.html
+          grep -q 'anatomicalUpDot' site/js/phase392-avatar-pedestal-fix.js
+      - name: Validate metadata, syntax, and protected APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'phase392-public-android-showcase-polish-v1' sw.js
+          grep -q 'phase392-public-android-showcase-polish-v1' pwa-sw.js
+          grep -q 'pwa-phase392' manifest.webmanifest
+          grep -q '"phase": 392' game/manifest.json
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          node --check site-public-hooks.js
+          node --check site/phase383-home-restore.js
+          node --check site/phase392-site-polish.js
+          node --check site/js/market-ads.js
+          node --check site/js/phase392-avatar-pedestal-fix.js
+          node --check game/modules/phase392_camera3_table_showcase.js
+          node --check game/modules/phase392_android_gameplay.js
+          test -s game/styles/phase392_android_gameplay.css
+          node --check sw.js
+          node --check pwa-sw.js
+          test -s downloads/svr-poker-android-rc2.apk
+          test -s game/assets/models/table.glb
+          test -s game/assets/models/eric/eric.fbx

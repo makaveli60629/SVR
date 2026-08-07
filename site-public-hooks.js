@@ -2,11 +2,11 @@
   const ADMIN_KEY = 'svr_admin_presence';
   const MESSAGE_KEY = 'svr_public_messages';
   const CACHE_EPOCH_KEY = 'svr_public_cache_epoch';
-  const CACHE_EPOCH = 'phase391-production-consolidation';
-  const CURRENT_PHASE = 'phase391';
-  const SITE_PHASE = 'phase391';
-  const AVATAR_PHASE = 'phase389';
-  const ANDROID_PHASE = 'phase391';
+  const CACHE_EPOCH = 'phase392-public-android-showcase-polish';
+  const CURRENT_PHASE = 'phase392';
+  const SITE_PHASE = 'phase392';
+  const AVATAR_PHASE = 'phase392';
+  const ANDROID_PHASE = 'phase392';
 
   async function refreshRuntimeCaches() {
     try {
@@ -24,7 +24,7 @@
       }
       if ('serviceWorker' in navigator) await navigator.serviceWorker.register(`/sw.js?v=${CURRENT_PHASE}`, { scope: '/' });
     } catch (error) {
-      console.warn('SVR Phase 391 cache recovery could not complete.', error);
+      console.warn('SVR Phase 392 cache recovery could not complete.', error);
     }
   }
 
@@ -52,8 +52,8 @@
     if (document.getElementById('svr-phase-live-badge')) return;
     const badge = document.createElement('div');
     badge.id = 'svr-phase-live-badge';
-    badge.textContent = '● PHASE 391 PRODUCTION CONSOLIDATION';
-    badge.setAttribute('aria-label', 'SVR Poker Phase 391 consolidated Quest, Camera 3 and Android gameplay release');
+    badge.textContent = '● PHASE 392 PLATFORM POLISH';
+    badge.setAttribute('aria-label', 'SVR Poker Phase 392 Android, Camera 3, avatar, and website presentation release');
     Object.assign(badge.style, {
       position: 'fixed', top: '12px', right: '12px', zIndex: '2147483647',
       padding: '7px 11px', border: '1px solid #8dffb4', borderRadius: '999px',
@@ -79,8 +79,8 @@
         anchor.href = url.pathname + '?' + url.searchParams.toString();
         return;
       }
-      if (/\/game\/(?:camera3-live|camera3|cam3|preview)\.html$/i.test(url.pathname) || url.searchParams.get('cam') === 'director') {
-        url.pathname = '/game/camera3-live.html';
+      if (/\/game\/(?:camera3-showcase|camera3-live|camera3|cam3|preview)\.html$/i.test(url.pathname) || url.searchParams.get('cam') === 'director') {
+        url.pathname = '/game/camera3-showcase.html';
         url.search = '';
         url.searchParams.set('v', CURRENT_PHASE);
         url.searchParams.set('autocam', '1');
@@ -117,8 +117,17 @@
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
-      const entry = { name: (data.name || '').trim(), email: (data.email || '').trim(), message: (data.message || '').trim(), createdAt: new Date().toISOString(), source: 'svrpoker-public-site' };
-      if (!entry.message) { if (status) status.textContent = 'Please enter a message before saving.'; return; }
+      const entry = {
+        name: (data.name || '').trim(),
+        email: (data.email || '').trim(),
+        message: (data.message || '').trim(),
+        createdAt: new Date().toISOString(),
+        source: 'svrpoker-public-site'
+      };
+      if (!entry.message) {
+        if (status) status.textContent = 'Please enter a message before saving.';
+        return;
+      }
       const current = JSON.parse(localStorage.getItem(MESSAGE_KEY) || '[]');
       current.push(entry);
       localStorage.setItem(MESSAGE_KEY, JSON.stringify(current.slice(-100)));
