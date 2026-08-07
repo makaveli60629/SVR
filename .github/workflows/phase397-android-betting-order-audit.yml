@@ -1,0 +1,83 @@
+name: Phase 397 Android Betting Order Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase397-android-betting-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Validate Android betting source contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-397-ANDROID-BETTING-ORDER-CHECK-CALL-RAISE-LOCK' game/modules/phase393_android_gameplay.js
+          grep -q 'clockwiseOrderAfter' game/modules/phase393_android_gameplay.js
+          grep -q 'const small=(state.dealer+1)%6,big=(state.dealer+2)%6' game/modules/phase393_android_gameplay.js
+          grep -q 'const first=nextEligible(big)' game/modules/phase393_android_gameplay.js
+          grep -q 'const next=nextEligible(state.dealer)' game/modules/phase393_android_gameplay.js
+          grep -q 'legalFullRaise' game/modules/phase393_android_gameplay.js
+          grep -q 'minimum raise unavailable' game/modules/phase393_android_gameplay.js
+          grep -q 'SVR_PHASE397_ANDROID_BETTING_QA' game/modules/phase393_android_gameplay.js
+          grep -q 'PHASE-397-ANDROID-ACTION-BUTTON-GUARD-LOCK' game/modules/phase397_android_action_button_guard.js
+          grep -q 'CALL ${money(Math.min(need,user.stack))}' game/modules/phase397_android_action_button_guard.js
+          grep -q "call.textContent=.*:'CHECK'" game/modules/phase397_android_action_button_guard.js
+          grep -q 'max>=game.currentBet+MIN_RAISE' game/modules/phase397_android_action_button_guard.js
+          grep -q 'phase397_android_action_button_guard.js?v=phase397' game/android-stable.html
+          node --check game/modules/phase393_android_gameplay.js
+          node --check game/modules/phase397_android_action_button_guard.js
+
+      - name: Simulate six-seat Holdem action rotation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const seats=6;
+          const orderAfter=(anchor,eligible=new Set([0,1,2,3,4,5]))=>{
+            const out=[];
+            for(let step=1;step<=seats;step++){
+              const i=(anchor+step)%seats;
+              if(eligible.has(i))out.push(i);
+            }
+            return out;
+          };
+          for(let dealer=0;dealer<seats;dealer++){
+            const small=(dealer+1)%seats;
+            const big=(dealer+2)%seats;
+            const pre=orderAfter(big);
+            const post=orderAfter(dealer);
+            if(small!==(dealer+1)%seats)throw new Error(`bad SB for dealer ${dealer}`);
+            if(big!==(dealer+2)%seats)throw new Error(`bad BB for dealer ${dealer}`);
+            if(pre[0]!==((big+1)%seats))throw new Error(`bad preflop first actor for dealer ${dealer}`);
+            if(post[0]!==((dealer+1)%seats))throw new Error(`bad postflop first actor for dealer ${dealer}`);
+            if(new Set(pre).size!==seats||new Set(post).size!==seats)throw new Error(`duplicate action order for dealer ${dealer}`);
+          }
+          const eligible=new Set([0,2,4]);
+          const skipped=orderAfter(0,eligible);
+          if(JSON.stringify(skipped)!==JSON.stringify([2,4,0]))throw new Error(`fold/all-in skip order wrong: ${skipped}`);
+          const label=(currentBet,streetBet,stack)=>{
+            const need=Math.max(0,currentBet-streetBet);
+            return need?`CALL $${Math.min(need,stack)}`:'CHECK';
+          };
+          if(label(100,100,500)!=='CHECK')throw new Error('check label wrong');
+          if(label(500,100,1000)!=='CALL $400')throw new Error('call label wrong');
+          if(label(500,100,250)!=='CALL $250')throw new Error('short all-in call label wrong');
+          const canRaise=(currentBet,streetBet,stack)=>streetBet+stack>=currentBet+100;
+          if(!canRaise(500,100,1000))throw new Error('legal raise rejected');
+          if(canRaise(500,100,450))throw new Error('illegal full raise accepted');
+          console.log('All six dealer rotations, skip order, CHECK/CALL labels, and minimum-raise rules passed.');
+          NODE
