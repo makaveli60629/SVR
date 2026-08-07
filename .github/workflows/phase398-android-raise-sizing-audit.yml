@@ -1,0 +1,101 @@
+name: Phase 398 Android Raise Sizing Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase398-android-raise-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Validate Phase 398 source contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/modules/phase393_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-398-ANDROID-RAISE-CONTROL-GUARD-LOCK' game/modules/phase397_android_action_button_guard.js
+          grep -q 'lastFullRaiseSize' game/modules/phase393_android_gameplay.js
+          grep -q 'isFullRaise' game/modules/phase393_android_gameplay.js
+          grep -q 'callAmount' game/modules/phase393_android_gameplay.js
+          grep -q 'shortAllInDoesNotResetFullRaise' game/modules/phase393_android_gameplay.js
+          grep -q 'RAISE TO' game/modules/phase393_android_gameplay.js
+          grep -q 'step="50"' game/android-stable.html
+          grep -q 'phase393_android_gameplay.js?v=phase398' game/android-stable.html
+          grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable.html
+          grep -q 'android-tabletop.html?v=phase398' game/android.html
+          grep -q '"bettingBuild": "PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK"' game/android-release.json
+          grep -q '"dynamicMinimumRaiseFromLastFullRaise": true' game/android-release.json
+          grep -q '"exactCallDifference": true' game/android-release.json
+          node --check game/modules/phase398_android_raise_rules.js
+          node --check game/modules/phase393_android_gameplay.js
+          node --check game/modules/phase397_android_action_button_guard.js
+          python3 -m json.tool game/android-release.json >/dev/null
+
+      - name: Execute actual Phase 398 raise-rule module scenarios
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const source=fs.readFileSync('game/modules/phase398_android_raise_rules.js','utf8');
+          const rules=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+          const {callAmount,minimumRaiseTo,isFullRaise,roundToChip,potSizedRaiseTo,legalRaiseWindow}=rules;
+          const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
+
+          // $50/$100 opening blinds: minimum raise is TO $200, not "plus $200".
+          assert(minimumRaiseTo(100,100)===200,'100 blind should min-raise to 200');
+          assert(isFullRaise(100,200,100)===true,'100 -> 200 must be a full raise of 100');
+          assert(minimumRaiseTo(200,100)===300,'after 100-sized raise, next minimum is 300');
+
+          // A larger raise changes the next minimum by the size of that full raise.
+          assert(isFullRaise(100,300,100)===true,'100 -> 300 must be a full 200 raise');
+          assert(minimumRaiseTo(300,200)===500,'after raise size 200, next minimum must be 500');
+          assert(isFullRaise(300,450,200)===false,'300 -> 450 is only a 150 short raise');
+          assert(minimumRaiseTo(450,200)===650,'short raise must not reset the prior 200 full-raise size');
+
+          // Calls pay only what this seat still owes.
+          assert(callAmount(200,0,15000)===200,'uninvested seat should call 200, never 400');
+          assert(callAmount(200,50,15000)===150,'small blind should call only 150');
+          assert(callAmount(200,100,15000)===100,'big blind should call only 100');
+          assert(callAmount(500,300,15000)===200,'seat at 300 should call only 200 to reach 500');
+          assert(callAmount(500,300,125)===125,'short stack should make a 125 all-in call');
+
+          // Postflop opening bet and legal window.
+          assert(minimumRaiseTo(0,100)===100,'postflop minimum opening bet must be 100');
+          const legal=legalRaiseWindow({currentBet:300,lastFullRaiseSize:200,streetBet:100,stack:1000,raiseLocked:false});
+          assert(legal.min===500&&legal.max===1100&&legal.canRaise,'legal window should require raise-to 500');
+          const locked=legalRaiseWindow({currentBet:300,lastFullRaiseSize:200,streetBet:300,stack:1000,raiseLocked:true});
+          assert(locked.canRaise===false,'short all-in must be able to lock a previously acted player from reraising');
+
+          // $50 chip precision and pot-size helper sanity.
+          assert(roundToChip(349)===350,'349 should round to a 350 chip target');
+          assert(potSizedRaiseTo({pot:150,currentBet:100,streetBet:0,fraction:1})===350,'pot raise facing 100 into 150 pot should be raise-to 350');
+          console.log('Phase 398 exact-call and dynamic full-raise scenarios passed.');
+          NODE
+
+      - name: Preserve approved Android presentation and Quest isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK' game/android-stable.html
+          grep -q 'phase396_android_burn_dealer_polish.js?v=phase396' game/android-stable.html
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
