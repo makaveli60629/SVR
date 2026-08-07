@@ -1,6 +1,6 @@
 /* PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK */
 const BUILD='PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK';
-const state={build:BUILD,installed:false,dealerButtonReady:false,dealerIndex:null,dealerName:null,dealerMoves:0,burnAboveCommunity:false,communityCardsEnlarged:false,lastError:null,checkedAt:null};
+const state={build:BUILD,installed:false,dealerButtonReady:false,dealerIndex:null,dealerName:null,dealerMoves:0,activePlayer:null,activeName:null,burnAboveCommunity:false,communityCardsEnlarged:false,lastError:null,checkedAt:null};
 const $=selector=>document.querySelector(selector);
 let lastDealer=null;
 function ensureDealerUi(){
@@ -16,9 +16,10 @@ function placeDealer(){
   document.querySelectorAll('.player-box[data-dealer]').forEach(el=>delete el.dataset.dealer);if(dealer>0){const box=$(`[data-player="${dealer}"]`);if(box)box.dataset.dealer='true'}
   const tr=table.getBoundingClientRect(),r=target.getBoundingClientRect();let x=r.left-tr.left+r.width*.5,y=r.top-tr.top-10;
   if(dealer===0){x=r.left-tr.left+Math.min(r.width*.12,48);y=r.top-tr.top-9}else{const side=x<tr.width*.5?-1:1;x+=side*Math.min(24,r.width*.12);y+=Math.min(10,r.height*.10)}
-  x=Math.max(22,Math.min(tr.width-22,x));y=Math.max(25,Math.min(tr.height-34,y));button.style.left=`${x}px`;button.style.top=`${y}px`;button.dataset.dealerIndex=String(dealer);button.title=`Dealer: ${player?.name||`Seat ${dealer+1}`}`;readout.textContent=`DEALER • ${player?.name||`SEAT ${dealer+1}`}`;
+  x=Math.max(22,Math.min(tr.width-22,x));y=Math.max(25,Math.min(tr.height-34,y));button.style.left=`${x}px`;button.style.top=`${y}px`;button.dataset.dealerIndex=String(dealer);button.title=`Dealer: ${player?.name||`Seat ${dealer+1}`}`;
+  const active=Number.isFinite(Number(game.activePlayer))?Number(game.activePlayer):null,activePlayer=active===null?null:game.players?.[active];readout.textContent=`DEALER • ${player?.name||`SEAT ${dealer+1}`}  |  TURN • ${activePlayer?.name||'WAITING'}`;
   if(lastDealer!==dealer){lastDealer=dealer;state.dealerMoves++;button.animate?.([{transform:'translate(-50%,-50%) scale(.75)',opacity:.55},{transform:'translate(-50%,-50%) scale(1.18)',opacity:1},{transform:'translate(-50%,-50%) scale(1)',opacity:1}],{duration:420,easing:'ease-out'})}
-  state.dealerIndex=dealer;state.dealerName=player?.name||null;return true
+  state.dealerIndex=dealer;state.dealerName=player?.name||null;state.activePlayer=active;state.activeName=activePlayer?.name||null;return true
 }
 function inspectLayout(){
   const burn=$('#burnZone'),boardRow=$('.board-row'),community=$('#community .card');state.burnAboveCommunity=Boolean(burn&&boardRow&&burn.parentElement===$('.board-zone')&&burn.nextElementSibling===boardRow);
