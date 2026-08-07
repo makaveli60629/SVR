@@ -32,26 +32,32 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 396 production payload
+      - name: Verify Phase 399 production payload
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-396-SEATED-QUEST-ANDROID-DEALER-POLISH-LOCK' index.html
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
           grep -q 'phase396_quest_seated_clean_table_deal_lock.js?v=phase396' game/index.html
           test -s game/modules/phase396_quest_seated_clean_table_deal_lock.js
           grep -q 'SVR_PHASE396_TELEPORT_DISABLED=true' game/modules/phase396_quest_seated_clean_table_deal_lock.js
-          grep -q 'PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK' game/android-stable.html
+          grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' game/android-stable.html
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/android-stable.html
           grep -q 'phase396_android_burn_dealer_polish.css?v=phase396' game/android-stable.html
-          grep -q 'phase396_android_burn_dealer_polish.js?v=phase396' game/android-stable.html
-          test -s game/modules/phase396_android_burn_dealer_polish.js
-          test -s game/styles/phase396_android_burn_dealer_polish.css
-          grep -q 'PHASE-396-SEATED-QUEST-ANDROID-DEALER-POLISH-LOCK' deploy-health.json
+          grep -q 'phase399_android_learning_chips_sponsor.css?v=phase399' game/android-stable.html
+          grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' game/android-stable.html
+          grep -q 'phase399_android_matchmaking_voice.js?v=phase399' game/android-stable.html
+          test -s game/modules/phase399_android_learning_chips_sponsor.js
+          test -s game/modules/phase399_android_matchmaking_voice.js
+          test -s game/styles/phase399_android_learning_chips_sponsor.css
+          grep -q 'PHASE-399-ANDROID-LEARNING-CHIPS-SPONSOR-MULTIPLAYER-READY-LOCK' deploy-health.json
           grep -q '"questTeleportEnabled": false' deploy-health.json
           grep -q '"questHardSeatedFrontTable": true' deploy-health.json
-          grep -q '"questTabletopNonCardOverlaysHidden": true' deploy-health.json
-          grep -q '"androidBurnTrayAboveCommunityCards": true' deploy-health.json
-          grep -q '"androidMovingDealerButton": true' deploy-health.json
+          grep -q '"androidExactBestFiveEvaluator": true' deploy-health.json
+          grep -q '"androidTournamentTicketNonCash": true' deploy-health.json
+          grep -q '"androidReikiFeltBranding": true' deploy-health.json
+          grep -q '"androidProductionMatchServerConfigured": false' deploy-health.json
+          grep -q '"androidBotFallbackWhenNoMatch": true' deploy-health.json
+          grep -q '"androidLiveMultiplayer": false' deploy-health.json
           test -s downloads/svr-poker-android-rc2.apk
           test -f CNAME
           grep -qx 'svrpoker.com' CNAME
@@ -61,11 +67,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 396 Pages artifact
+      - name: Upload Phase 399 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 396
+      - name: Deploy Phase 399
         id: deployment
         uses: actions/deploy-pages@v4
