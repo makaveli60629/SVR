@@ -1,10 +1,10 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "SVR Poker Phase 399 with the protected seated Quest build and Android learning, chip, sponsor, tournament-ticket, and multiplayer-ready layers.",
-  "id": "/?source=pwa-phase399",
-  "predecessor_id": "pwa-phase396",
-  "start_url": "/?source=pwa-phase399&v=phase399",
+  "description": "SVR Poker Phase 400 adds iPhone and Safari touch play while preserving the approved Android and Quest builds.",
+  "id": "/?source=pwa-phase400",
+  "predecessor_id": "pwa-phase399",
+  "start_url": "/?source=pwa-phase400&v=phase400",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -19,7 +19,8 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {"name": "Play Android Poker", "short_name": "Android", "description": "Open the Phase 399 Android table with exact-hand teaching, chip racks, tournament tickets, Reiki branding, and bot fallback.", "url": "/game/android.html?channel=stable&v=phase399", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Play on iPhone / Safari", "short_name": "iPhone", "description": "Open the Phase 400 iPhone and Safari touch table.", "url": "/game/iphone.html?v=phase400", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Play Android Poker", "short_name": "Android", "description": "Open the protected Phase 399 Android table with exact-hand teaching, chip racks, tournament tickets, Reiki branding, and bot fallback.", "url": "/game/android.html?channel=stable&v=phase399", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Launch Quest VR", "short_name": "Quest VR", "description": "Open the protected Phase 396 seated Quest table with teleport disabled, clean felt, and visible dealing.", "url": "/game/quest.html?v=phase396", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Camera 3 Table Showcase", "short_name": "CAM 3", "description": "Open the table-focused production preview.", "url": "/game/camera3-showcase.html?v=phase392", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Download the current manual-update Android APK.", "url": "/downloads/?v=phase399", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
