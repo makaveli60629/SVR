@@ -32,28 +32,36 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 393 production payload
+      - name: Verify Phase 394 Android polish production payload
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'PHASE-393-DUAL-DEVICE-CALIBRATION-LOCK' index.html
           grep -q 'PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK' game/index.html
           grep -q 'phase393_quest_table_eric_seat_calibration.js' game/index.html
-          grep -q 'PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK' game/android-stable.html
+          grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' game/android-stable.html
           grep -q 'phase393_android_gameplay.js' game/android-stable.html
           grep -q 'phase393_android_table_layout.css' game/android-stable.html
+          grep -q 'phase394_android_table_polish.css' game/android-stable.html
+          grep -q 'phase394_android_table_polish.js' game/android-stable.html
+          grep -q 'id="burnSlot"' game/android-stable.html
+          grep -q 'id="featuredSponsor"' game/android-stable.html
           test -s game/modules/phase393_quest_table_surface.js
           test -s game/modules/phase393_quest_eric_seat.js
           test -s game/modules/phase393_quest_table_eric_seat_calibration.js
           test -s game/modules/phase393_android_common.js
           test -s game/modules/phase393_android_evaluator.js
           test -s game/modules/phase393_android_gameplay.js
+          test -s game/modules/phase394_android_table_polish.js
           test -s game/styles/phase393_android_table_layout.css
-          grep -q 'PHASE-393-DUAL-DEVICE-CALIBRATION-LOCK' deploy-health.json
+          test -s game/styles/phase394_android_table_polish.css
+          grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' deploy-health.json
           grep -q '"questTableTopMeters": 0.98' deploy-health.json
           grep -q '"questEricFloorAnchored": true' deploy-health.json
-          grep -q '"androidTurnClockSeconds": 15' deploy-health.json
-          grep -q '"androidCustomRaiseSlider": true' deploy-health.json
+          grep -q '"androidPotBelowLogo": true' deploy-health.json
+          grep -q '"androidLargerCommunityCards": true' deploy-health.json
+          grep -q '"androidDedicatedBurnTray": true' deploy-health.json
+          grep -q '"androidFeaturedSponsorDefault": "REIKI"' deploy-health.json
           test -s downloads/svr-poker-android-rc2.apk
           test -f CNAME
           grep -qx 'svrpoker.com' CNAME
@@ -63,11 +71,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 393 Pages artifact
+      - name: Upload Phase 394 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 393 production calibration
+      - name: Deploy Phase 394 Android table polish
         id: deployment
         uses: actions/deploy-pages@v4
