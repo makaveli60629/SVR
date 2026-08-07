@@ -60,18 +60,21 @@ jobs:
           grep -q '"movingDealerButton": true' game/manifest.json
           grep -q '"dealerNameReadout": true' game/manifest.json
 
-      - name: Validate protected gameplay, Phase 397 betting order, and APK policy
+      - name: Validate protected gameplay, Phase 398 betting rules, and APK policy
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'PHASE-397-ANDROID-BETTING-ORDER-CHECK-CALL-RAISE-LOCK' game/modules/phase393_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/modules/phase393_android_gameplay.js
           grep -q 'clockwiseOrderAfter' game/modules/phase393_android_gameplay.js
           grep -q 'const first=nextEligible(big)' game/modules/phase393_android_gameplay.js
           grep -q 'const next=nextEligible(state.dealer)' game/modules/phase393_android_gameplay.js
-          grep -q 'legalFullRaise' game/modules/phase393_android_gameplay.js
-          grep -q 'SVR_PHASE397_ANDROID_BETTING_QA' game/modules/phase393_android_gameplay.js
-          grep -q 'PHASE-397-ANDROID-ACTION-BUTTON-GUARD-LOCK' game/modules/phase397_android_action_button_guard.js
-          grep -q 'phase397_android_action_button_guard.js?v=phase397' game/android-stable.html
+          grep -q 'lastFullRaiseSize' game/modules/phase393_android_gameplay.js
+          grep -q 'shortAllInDoesNotResetFullRaise' game/modules/phase393_android_gameplay.js
+          grep -q 'SVR_PHASE398_ANDROID_BETTING_QA' game/modules/phase393_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-CONTROL-GUARD-LOCK' game/modules/phase397_android_action_button_guard.js
+          grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable.html
+          grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase393_android_gameplay.js
           grep -q 'TURN_SECONDS=15' game/modules/phase393_android_common.js
           grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' game/modules/phase394_android_table_polish.js
           grep -q 'id="raiseSlider"' game/android-stable.html
@@ -103,6 +106,7 @@ jobs:
           node --check game/modules/phase394_android_table_polish.js
           node --check game/modules/phase396_android_burn_dealer_polish.js
           node --check game/modules/phase397_android_action_button_guard.js
+          node --check game/modules/phase398_android_raise_rules.js
           grep -q 'svr-poker-phase396-seated-quest-android-dealer-v1' sw.js
           grep -q 'svr-poker-phase396-seated-quest-android-dealer-v1' pwa-sw.js
           test -s game/styles/phase396_android_burn_dealer_polish.css
