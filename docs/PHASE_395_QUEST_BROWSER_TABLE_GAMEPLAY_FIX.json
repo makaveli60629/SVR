@@ -1,0 +1,39 @@
+{
+  "phase": 395,
+  "build": "PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK",
+  "scope": "quest-browser-and-quest-runtime-only",
+  "questBrowser": {
+    "centered": true,
+    "css": "/launch-quest.css?v=phase395",
+    "route": "/game/quest.html?v=phase395"
+  },
+  "quest": {
+    "tableWidthMeters": 3.58,
+    "tableTopMeters": 1.03,
+    "tableBottomFallbackMeters": -0.015,
+    "baseLineAlignedToFloor": true,
+    "feltRecessMeters": 0.12,
+    "dealerGapMeters": 0.22,
+    "seatedRailGapMeters": 0.10,
+    "seatedEyeHeightMeters": 1.22,
+    "minimumPhysicalCardMeshes": 17,
+    "rebuildCardsAfterFinalCalibration": true,
+    "autoStartTestHandWhenIdle": true,
+    "lightingBoost": true,
+    "ericHardFloorGuard": true,
+    "qa": "SVR_PHASE395_QUEST_QA"
+  },
+  "android": {
+    "build": "PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK",
+    "lockedUnchanged": true,
+    "route": "/game/android.html?channel=stable&v=phase394"
+  },
+  "apk": {
+    "versionName": "0.1.0-rc2",
+    "versionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "nativeRebuild": false
+  },
+  "physicalQuestAcceptanceRequired": true
+}
