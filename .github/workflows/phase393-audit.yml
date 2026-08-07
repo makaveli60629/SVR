@@ -106,10 +106,12 @@ jobs:
           node --check game/modules/phase398_android_raise_rules.js
           node --check game/modules/phase399_android_learning_chips_sponsor.js
           node --check game/modules/phase399_android_matchmaking_voice.js
-          grep -q 'svr-poker-phase399-android-learning-chips-sponsor-v1' sw.js
-          grep -q 'svr-poker-phase399-android-learning-chips-sponsor-v1' pwa-sw.js
+          node --check game/modules/phase400_ios_safari_adapter.js
+          grep -q 'svr-poker-phase400-iphone-safari-web-game-v1' sw.js
+          grep -q 'svr-poker-phase400-iphone-safari-web-game-v1' pwa-sw.js
           test -s game/styles/phase396_android_burn_dealer_polish.css
           test -s game/styles/phase399_android_learning_chips_sponsor.css
+          test -s game/styles/phase400_ios_safari_compat.css
           test -s game/assets/models/table.glb
           test -s game/assets/models/eric/eric.fbx
           test -s downloads/svr-poker-android-rc2.apk
