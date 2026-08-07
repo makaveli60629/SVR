@@ -1,0 +1,33 @@
+{
+  "phase": 396,
+  "build": "PHASE-396-SEATED-QUEST-ANDROID-DEALER-POLISH-LOCK",
+  "quest": {
+    "build": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
+    "teleportEnabled": false,
+    "hardSeatedFrontTable": true,
+    "tabletopNonCardOverlaysHidden": true,
+    "minimumPhysicalCardMeshes": 17,
+    "autoStartTestHandWhenIdle": true,
+    "inheritsPhase395TableCalibration": true,
+    "inheritsPhase395EricGrounding": true,
+    "inheritsPhase395Lighting": true
+  },
+  "android": {
+    "build": "PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK",
+    "coreBuild": "PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK",
+    "phase394PolishPreserved": true,
+    "burnTrayAboveCommunityCards": true,
+    "largerCommunityCards": true,
+    "movingDealerButton": true,
+    "dealerNameReadout": true,
+    "turnClockSeconds": 15
+  },
+  "apk": {
+    "versionName": "0.1.0-rc2",
+    "versionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "nativeRebuild": false
+  },
+  "physicalAcceptanceRequired": true
+}
