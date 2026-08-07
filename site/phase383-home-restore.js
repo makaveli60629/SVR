@@ -1,139 +1,17 @@
-/* PHASE-391-SITE-GAME-ROUTE-CONSOLIDATION-LOCK */
+/* PHASE-392-SITE-GAME-ROUTE-CONSOLIDATION-LOCK */
 (() => {
-  const CAMERA3_ROUTE = '../game/camera3-live.html?v=phase391&embed=1&autocam=1&source=site-live-preview';
-  const ANDROID_ROUTE = '../game/android.html?channel=stable&v=phase391&source=site-play-android';
-  const QUEST_ROUTE = '../game/quest.html?v=phase391&source=site-play-quest';
-  const routeLiveGames = () => {
-    document.querySelectorAll('iframe').forEach((iframe) => {
-      const src = String(iframe.getAttribute('src') || '');
-      if (/preview=1|cam=director|camera3(?:-live)?\.html|cam3\.html/i.test(src)) iframe.src = CAMERA3_ROUTE;
-    });
-    document.querySelectorAll('a[href]').forEach((anchor) => {
-      const href = String(anchor.getAttribute('href') || '');
-      if (/preview=1|cam=director|camera3(?:-live)?\.html|cam3\.html/i.test(href)) {
-        anchor.href = CAMERA3_ROUTE.replace('&embed=1', '');
-        return;
-      }
-      if (/\/game\/(?:android|android-play|android-stable|android-tabletop)\.html/i.test(href)) {
-        anchor.href = ANDROID_ROUTE;
-        return;
-      }
-      if (/\/game\/(?:index|quest)\.html/i.test(href)) anchor.href = QUEST_ROUTE;
-    });
-  };
-  routeLiveGames();
-
-  const frame = document.getElementById('svrLiveGameFrame');
-  const fallback = document.getElementById('previewFallback');
-  if (frame && fallback) {
-    let loaded = false;
-    frame.addEventListener('load', () => {
-      loaded = true;
-      fallback.classList.add('is-hidden');
-    });
-    setTimeout(() => {
-      if (!loaded) {
-        fallback.innerHTML = '<strong>Camera 3 is still loading.</strong><span>Open the dedicated live feed while the consolidated table, cards, Eric, and lighting finish loading.</span>';
-        fallback.classList.add('is-warning');
-      }
-    }, 8000);
+  const BUILD = 'PHASE-392-SITE-GAME-ROUTE-CONSOLIDATION-LOCK';
+  const CAMERA3_ROUTE = '../game/camera3-showcase.html?v=phase392&embed=1&autocam=1&source=site-live-preview';
+  const ANDROID_ROUTE = '../game/android.html?channel=stable&v=phase392&source=site-play-android';
+  const QUEST_ROUTE = '../game/quest.html?v=phase392&source=site-play-quest';
+  function routeLiveGames() {
+    document.querySelectorAll('iframe').forEach((iframe) => { const src = String(iframe.getAttribute('src') || ''); if (/preview=1|cam=director|camera3(?:-live|-showcase)?\.html|cam3\.html/i.test(src)) iframe.src = CAMERA3_ROUTE; });
+    document.querySelectorAll('a[href]').forEach((anchor) => { const href = String(anchor.getAttribute('href') || ''); if (/preview=1|cam=director|camera3(?:-live|-showcase)?\.html|cam3\.html/i.test(href)) anchor.href = CAMERA3_ROUTE.replace('&embed=1', ''); else if (/\/game\/(?:android|android-play|android-stable|android-tabletop)\.html/i.test(href)) anchor.href = ANDROID_ROUTE; else if (/\/game\/(?:index|quest)\.html/i.test(href)) anchor.href = QUEST_ROUTE; });
   }
-
-  const setMeter = (id, text, width, ok = true) => {
-    const textEl = document.getElementById(`${id}Text`);
-    const bar = document.getElementById(`${id}Bar`);
-    if (textEl) {
-      textEl.textContent = text;
-      textEl.style.color = ok ? '#8dffb4' : '#ffd98a';
-    }
-    if (bar) bar.style.width = `${width}%`;
-  };
-
-  let deployHealth = null;
-  let androidRelease = null;
-  (async () => {
-    const box = document.getElementById('releaseStatus');
-    try {
-      const [healthResponse, releaseResponse] = await Promise.all([
-        fetch(`../deploy-health.json?t=${Date.now()}`, { cache: 'no-store' }),
-        fetch(`../game/android-release.json?t=${Date.now()}`, { cache: 'no-store' })
-      ]);
-      deployHealth = await healthResponse.json();
-      androidRelease = await releaseResponse.json();
-      setMeter('server', deployHealth.status === 'ok' ? 'UP' : 'CHECK', 100, deployHealth.status === 'ok');
-      setMeter('game', String(deployHealth.questBuild || deployHealth.build || 'LIVE').replace('PHASE-', 'P'), 100, true);
-      if (androidRelease.releaseReady && androidRelease.apkUrl) {
-        setMeter('apk', 'RC2 READY', 100, true);
-        if (box) box.innerHTML = `<strong>Server, full website, production Camera 3, consolidated Quest runtime, playable Android browser game, and APK ${androidRelease.apkVersionName} are published.</strong>`;
-      } else {
-        setMeter('apk', 'BROWSER LIVE', 72, true);
-        if (box) box.innerHTML = '<strong>Playable Android browser game, Quest route, and Camera 3 are live.</strong> Open the APK Center for package status.';
-      }
-    } catch {
-      setMeter('server', 'RETRY', 35, false);
-      setMeter('game', 'AVAILABLE', 72, true);
-      setMeter('apk', 'AVAILABLE', 72, true);
-      if (box) box.textContent = 'The website, playable Android route, Camera 3, and Quest game routes are available; live status data will retry on refresh.';
-    }
-  })();
-
-  const answers = {
-    status: () => deployHealth?.status === 'ok'
-      ? `Server is up. Build: ${deployHealth.build}. Camera 3: ${deployHealth.camera3Build || 'Phase 391'}. Quest: ${deployHealth.questBuild || 'Phase 391'}. Android: ${deployHealth.androidBuild || 'Phase 391'}.`
-      : 'The website, production Camera 3, playable Android route, and Quest game are available. Live status is still checking.',
-    android: () => 'Use Play Android. Phase 391 opens JOIN NOW, five bots, hole cards, community cards, pot chips, poker actions, responsive portrait/landscape layouts, and a direct gameplay fallback.',
-    quest: () => 'Launch Quest / VR for one original table authority, the recessed playing surface, restored cards, upright Eric, and a fixed spawn directly in front of the table.',
-    profile: () => 'Open Player Profile for the saved-avatar demo, then use Dressing Room to change the outfit.',
-    store: () => 'Open SVR Store to browse the store portal and future in-world item concepts.',
-    events: () => 'Open Tournaments for the event schedule and competition path.',
-    sponsor: () => 'Open Sponsorship, Advertising or Billboards to review partnership and presentation options.',
-    support: () => 'Open Contact SVR for project, technical, membership, sponsor or support questions.',
-    default: () => 'I can help with Camera 3, system status, Android gameplay, Quest, APK installation, profiles, the dressing room, store, tournaments, membership, sponsors, news or support.'
-  };
-
-  const reply = (value) => {
-    const raw = String(value || '').trim();
-    if (!raw) return;
-    const q = raw.toLowerCase();
-    const key = q.includes('status') || q.includes('server') || q.includes('camera') ? 'status'
-      : q.includes('quest') || q.includes('vr') ? 'quest'
-      : q.includes('android') || q.includes('play') || q.includes('apk') ? 'android'
-      : q.includes('profile') || q.includes('eric') || q.includes('dress') || q.includes('avatar') ? 'profile'
-      : q.includes('store') ? 'store'
-      : q.includes('tournament') || q.includes('event') ? 'events'
-      : q.includes('sponsor') || q.includes('advert') || q.includes('billboard') ? 'sponsor'
-      : q.includes('contact') || q.includes('support') || q.includes('help') ? 'support'
-      : 'default';
-    const safe = raw.replace(/[<>]/g, '');
-    const log = document.getElementById('aiLog');
-    if (log) {
-      log.innerHTML += `<br><br><b>You:</b> ${safe}<br><b>SVR AI:</b> ${answers[key]()}`;
-      log.scrollTop = log.scrollHeight;
-    }
-  };
-  const input = document.getElementById('aiInput');
-  const send = document.getElementById('aiSend');
-  if (send && input) {
-    send.addEventListener('click', () => { reply(input.value); input.value = ''; });
-    input.addEventListener('keydown', (event) => { if (event.key === 'Enter') send.click(); });
-  }
-  document.querySelectorAll('[data-ai]').forEach((button) => button.addEventListener('click', () => reply(button.dataset.ai)));
-
-  window.SVR_PHASE391_FULL_SITE = {
-    build: 'PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK',
-    camera3Route: '/game/camera3-live.html?v=phase391',
-    androidRoute: '/game/android.html?channel=stable&v=phase391',
-    androidGameplayRoute: '/game/android-stable.html?v=phase391&direct=1',
-    questRoute: '/game/quest.html?v=phase391',
-    singleOriginalTableAuthority: true,
-    legacyCameraControllersRemoved: true,
-    legacyQuestSeatAuthorityRemoved: true,
-    androidPlayable: true,
-    questTableGeometryCorrected: true,
-    questCardsRestored: true,
-    questFrontSpawnLocked: true,
-    ericUprightCorrected: true,
-    avatarProfileVisibleRefresh: true,
-    terminatedPartnerMaterialExcluded: true
-  };
+  function setMeter(id,text,width,ok=true){const textEl=document.getElementById(`${id}Text`),bar=document.getElementById(`${id}Bar`);if(textEl){textEl.textContent=text;textEl.style.color=ok?'#8dffb4':'#ffd98a'}if(bar)bar.style.width=`${width}%`}
+  async function status(){const box=document.getElementById('releaseStatus');try{const [h,r]=await Promise.all([fetch(`../deploy-health.json?t=${Date.now()}`,{cache:'no-store'}),fetch(`../game/android-release.json?t=${Date.now()}`,{cache:'no-store'})]);const health=await h.json(),release=await r.json();setMeter('server',health.status==='ok'?'UP':'CHECK',100,health.status==='ok');setMeter('game','PHASE 392',100,true);setMeter('apk',release.releaseReady?`${release.apkVersionName||'RC2'} READY`:'BROWSER LIVE',release.releaseReady?100:72,true);if(box)box.innerHTML='<strong>Android touch play, Quest VR, the table-focused Camera 3 showcase, avatar/profile demos, and APK RC2 are available.</strong>';window.SVR_PHASE392_DEPLOY_HEALTH=health;window.SVR_PHASE392_ANDROID_RELEASE=release}catch{setMeter('server','RETRY',35,false);setMeter('game','AVAILABLE',72,true);setMeter('apk','AVAILABLE',72,true);if(box)box.textContent='The site and game routes are available; live status will retry on refresh.'}}
+  function support(){const answers={status:'The public site, Android touch game, Quest VR game, Camera 3 showcase, profile, and avatar room are published.',android:'Android uses the touch version with continuous hands, burn-and-turn cards, winner effects, XP, ranks, profiles, and sponsor zones. It is not the VR version.',quest:'Quest uses the spatial VR version. Select Enter VR from a Quest headset.',camera:'Camera 3 is a table-focused advertising feed with the original table, cards, Eric, and showcase lighting.',apk:'The APK download stays in the menu and platform slide. New version codes display a NEW update badge.',default:'Ask about Android, Quest, Camera 3, APK updates, profiles, the avatar room, store, tournaments, or contact.'};const input=document.getElementById('aiInput'),send=document.getElementById('aiSend'),log=document.getElementById('aiLog');const reply=value=>{const raw=String(value||'').trim();if(!raw||!log)return;const q=raw.toLowerCase(),key=q.includes('status')||q.includes('server')?'status':q.includes('android')||q.includes('phone')?'android':q.includes('quest')||q.includes('vr')?'quest':q.includes('camera')||q.includes('preview')?'camera':q.includes('apk')||q.includes('update')?'apk':'default';log.innerHTML+=`<br><br><b>You:</b> ${raw.replace(/[<>]/g,'')}<br><b>SVR AI:</b> ${answers[key]}`;log.scrollTop=log.scrollHeight};send?.addEventListener('click',()=>{reply(input?.value);if(input)input.value=''});input?.addEventListener('keydown',event=>{if(event.key==='Enter')send?.click()});document.querySelectorAll('[data-ai]').forEach(button=>button.addEventListener('click',()=>reply(button.dataset.ai)))}
+  function loadPolish(){if(document.querySelector('script[data-phase392-site-polish]'))return;const script=document.createElement('script');script.src=`phase392-site-polish.js?v=phase392&t=${Date.now()}`;script.dataset.phase392SitePolish='true';document.body.appendChild(script)}
+  function boot(){routeLiveGames();status();support();loadPolish();window.SVR_PHASE392_FULL_SITE={build:BUILD,camera3Route:'/game/camera3-showcase.html?v=phase392',androidRoute:'/game/android.html?channel=stable&v=phase392',androidGameplayRoute:'/game/android-stable.html?v=phase392&direct=1',questRoute:'/game/quest.html?v=phase392',publicButtons:3,platformAwareLaunch:true,siteHeaderConsolidated:true,vibezSeparatedFromHero:true,avatarPedestalUpright:true}}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

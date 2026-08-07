@@ -3,75 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>SVR Poker Android Stable</title>
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<style>
-:root{--c:#7ffcff;--g:#ffd98a;--p:#9b4dff;--ok:#8dffb4;--felt:#071913;--danger:#ff6289;--vh:1vh}*{box-sizing:border-box}html,body{margin:0;width:100%;min-height:100%;background:#02040a;color:#fff;font-family:system-ui,Arial;overscroll-behavior:none}body{background:radial-gradient(circle at 50% 15%,#174548 0,#07101a 42%,#02040a 80%);overflow-x:hidden}.hide{display:none!important}.gate{min-height:100dvh;display:grid;place-items:center;padding:14px}.panel{width:min(520px,96vw);padding:22px;border:1px solid var(--c);border-radius:24px;background:#050a14f5;text-align:center;box-shadow:0 30px 90px #000}.panel img{width:82px;height:82px;object-fit:contain}.panel h1{letter-spacing:.08em;margin:.4rem 0}.build{color:var(--ok);font-weight:950;letter-spacing:.08em}.btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn,.actions button{min-height:48px;border:1px solid var(--g);border-radius:13px;background:#111827;color:#fff;font-weight:950;text-decoration:none;display:flex;align-items:center;justify-content:center;padding:9px}.primary{grid-column:1/-1;border:0;background:linear-gradient(135deg,var(--c),var(--p));color:#02040a;font-size:20px}
-body.joined{overflow:hidden}.shell{height:100dvh;width:min(760px,100%);margin:auto;padding:max(7px,env(safe-area-inset-top)) 8px max(7px,env(safe-area-inset-bottom));display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;gap:5px;position:relative;overflow:hidden}.hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px}.pill{padding:7px 9px;border:1px solid var(--c);border-radius:999px;background:#020812e8;font-weight:950;font-size:clamp(11px,3.2vw,16px);white-space:nowrap}.pill:last-child{text-align:right}.brand-slot{display:flex;align-items:center;justify-content:center;gap:5px;min-width:92px;padding:4px 7px;border:1px solid #7ffcff70;border-radius:13px;background:#020812e8}.brand-slot img{width:34px;height:34px;object-fit:contain}.brand-slot span{font-size:8px;font-weight:950;letter-spacing:.08em;color:#dffcff}.status{text-align:center;color:var(--g);font-size:clamp(14px,4.5vw,24px);line-height:1.05;min-height:22px;margin:0;padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.status.win{color:var(--ok);text-shadow:0 0 18px currentColor}.table-surface{position:relative;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:4px;padding:7px;border:7px solid #191421;border-radius:34px;background:radial-gradient(ellipse at 50% 44%,#18372a 0,#0a2118 48%,#03100c 100%);box-shadow:inset 0 0 0 2px #ffd98a66,inset 0 -25px 45px #0008,0 18px 45px #000;transform:perspective(1100px) rotateX(1.6deg);transform-origin:center bottom;overflow:hidden}.table-surface::before{content:"";position:absolute;inset:8px;border:1px solid #ffffff4a;border-radius:27px;pointer-events:none}.table-watermark{position:absolute;inset:33% 35%;background:url('/logo.png') center/contain no-repeat;opacity:.12;filter:saturate(1.3);pointer-events:none}.dealer{z-index:2;margin:0 auto;width:max-content;max-width:90%;padding:3px 9px;border:1px solid var(--g);border-radius:999px;background:#1f1707e8;color:var(--g);font-weight:950;font-size:11px;white-space:nowrap}.bots{z-index:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:4px;min-height:0}.bot{position:relative;min-width:0;padding:4px;border:1px solid #52758a;border-radius:10px;background:#020812df;text-align:center;font-size:10px;overflow:hidden;transition:.2s transform,.2s box-shadow,.2s border-color}.bot strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}.bot .money{color:#d8e7f0;white-space:nowrap}.bot.button{border-color:var(--g);box-shadow:0 0 12px #ffd98a44}.bot.folded{opacity:.45}.mini-cards{display:flex;justify-content:center;gap:3px;margin-top:2px}.cards{z-index:2;display:flex;justify-content:center;align-items:center;gap:4px;min-height:0}.board-row{z-index:2;display:grid;grid-template-columns:auto 1fr auto 1fr;align-items:center;gap:4px}.label{color:#d9fbff;font-size:8px;letter-spacing:.08em;font-weight:900;white-space:nowrap}.card{position:relative;display:grid;place-items:center;width:clamp(32px,9vw,46px);height:clamp(44px,12.5vw,64px);border-radius:7px;background:linear-gradient(160deg,#fffdf6,#e8e0d3);color:#10131b;border:1px solid #111;box-shadow:0 4px 10px #0009,0 0 0 1px #ffffff88 inset;overflow:hidden;transform:translateZ(0)}.card.red{color:#b00028}.card .rank{position:absolute;left:4px;top:3px;font:950 clamp(10px,3vw,14px) Georgia}.card .suit{font:950 clamp(20px,7vw,31px) Georgia;filter:drop-shadow(0 1px 0 #fff)}.card.back{background:radial-gradient(circle at 50% 45%,#36237d,#101b3d 65%,#050812);border:2px solid var(--c)}.card.back img{width:72%;height:72%;object-fit:contain;filter:drop-shadow(0 0 5px #9b4dff)}.card.slot{opacity:.34}.mini-cards .card{width:20px;height:29px;border-radius:5px}.mini-cards .card.back img{width:78%;height:78%}.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.actions button{min-height:42px;padding:6px;font-size:clamp(10px,2.8vw,13px);border-color:#ffffff35;background:linear-gradient(180deg,#151c2a,#080c14)}.actions button.valid{border-color:var(--ok);box-shadow:0 0 12px #8dffb438}.actions button:disabled{opacity:.35}.footer{display:flex;justify-content:center;gap:5px}.footer button,.footer a{min-height:32px;padding:5px 10px;border:1px solid var(--c);border-radius:10px;background:#080d19;color:#fff;text-decoration:none;font-size:10px;font-weight:900}.notice{display:none}.chip-layer{position:fixed;inset:0;z-index:100;pointer-events:none}.chip-flight{position:fixed;width:13px;height:13px;border-radius:50%;border:2px solid #ffeaa7;background:radial-gradient(circle,#ffec8f 0 30%,#e64b65 32% 58%,#fff 60% 70%,#15223f 72%);box-shadow:0 0 10px #ffd98a;animation:chipMove .56s cubic-bezier(.2,.8,.2,1) forwards}.winner-banner{position:fixed;left:50%;top:48%;z-index:120;transform:translate(-50%,-50%) scale(.8);max-width:90vw;padding:14px 18px;border:2px solid var(--ok);border-radius:17px;background:#03130ef2;color:#fff;text-align:center;font-weight:950;box-shadow:0 0 45px #8dffb477;opacity:0;pointer-events:none}.winner-banner.show{animation:winnerBanner 2.25s ease forwards}.bot.winner,#stack.winner{animation:winnerFlash .5s ease 6}.pot-pop{animation:potPulse .42s ease 3}@keyframes chipMove{to{left:var(--tx);top:var(--ty);transform:scale(.72) rotate(540deg);opacity:.2}}@keyframes winnerFlash{0%,100%{filter:none}50%{background:#8dffb4;color:#03100a;border-color:#fff;box-shadow:0 0 30px #8dffb4;transform:scale(1.04)}}@keyframes winnerBanner{0%{opacity:0;transform:translate(-50%,-50%) scale(.75)}15%,76%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.08)}}@keyframes potPulse{50%{background:#ffd98a;color:#1b1000;box-shadow:0 0 25px #ffd98a}}
-@media(max-width:520px){.shell{gap:4px;padding-left:5px;padding-right:5px}.table-surface{border-width:5px;border-radius:27px;padding:5px}.table-surface::before{inset:5px;border-radius:22px}.brand-slot span{display:none}.brand-slot{min-width:48px}.status{font-size:16px}.bot{padding:3px}.board-row{grid-template-columns:auto 1fr;grid-template-areas:"cl community" "hl hole"}.board-row .community-label{grid-area:cl}.board-row #community{grid-area:community}.board-row .hole-label{grid-area:hl}.board-row #hole{grid-area:hole}.actions{grid-template-columns:repeat(4,1fr)}}
-@media(max-height:760px){.shell{grid-template-rows:auto auto minmax(0,1fr) auto}.footer{display:none}.card{width:30px;height:42px}.mini-cards .card{width:17px;height:25px}.bot strong{font-size:9px}.bot{font-size:8px}.actions button{min-height:37px}.status{font-size:14px}.brand-slot img{width:28px;height:28px}.pill{padding:5px 7px;font-size:10px}}
-@media(min-width:800px){.shell{height:min(100dvh,920px);padding:14px}.card{width:52px;height:72px}.mini-cards .card{width:27px;height:39px}.bot{font-size:13px}.bot strong{font-size:14px}}
-</style>
+<title>SVR Poker Android</title>
+<link rel="stylesheet" href="./styles/phase392_android_gameplay.css?v=phase392">
 </head>
-<body data-build="PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK" data-runtime-build="PHASE-384-ANDROID-ONE-PAGE-3D-CHIP-WINNER-LOCK">
-<section id="gate" class="gate"><div class="panel"><img src="/logo.png" alt="SVR"><div class="build">PHASE 384 ANDROID POLISH</div><h1>SVR POKER</h1><p><strong>JOIN NOW</strong> opens the one-page Android quick-play table. No cards, poker actions, or movement controls appear before joining.</p><div class="btns"><button id="join" class="btn primary">JOIN NOW</button><button id="update" class="btn">UPDATE GAME</button><a class="btn" href="/downloads/svr-poker-android-rc2.apk">APK DOWNLOAD</a><a class="btn" href="/site/index.html?v=phase384">PUBLIC PAGE</a></div><p id="gateStatus">Stable table ready.</p></div></section>
+<body data-build="PHASE-392-ANDROID-CONTINUOUS-PLAY-RANKING-LOCK" data-platform="android">
+<section id="gate" class="gate">
+  <div class="gate-card">
+    <img src="/logo.png" alt="SVR Poker">
+    <div id="platformBadge" class="platform-badge">ANDROID TOUCH VERSION</div>
+    <h1>SVR POKER</h1>
+    <p class="gate-note" id="platformMessage">This is the Android touch version, not the VR version. Quest players should use Enter VR.</p>
+    <div class="gate-actions">
+      <button id="join" class="btn primary">JOIN NOW</button>
+      <button id="update" class="btn">CHECK UPDATE</button>
+      <a class="btn" href="/downloads/svr-poker-android-rc2.apk" download>DOWNLOAD APK</a>
+      <a class="btn" href="/game/quest.html?v=phase392">QUEST / ENTER VR</a>
+    </div>
+    <p id="gateStatus">Local play-money table ready. Continuous hands, burn-and-turn cards, XP, ranks, winner effects, and sponsor zones are active.</p>
+  </div>
+</section>
+
 <main id="table" class="shell hide">
-<div class="hud"><span id="stack" class="pill">STACK $15,000</span><div id="brandSlot" class="brand-slot"><img id="brandLogo" src="/logo.png" alt="SVR Poker"><span id="brandName">SVR POKER</span></div><span id="pot" class="pill">POT $0</span></div>
-<h2 id="status" class="status">YOUR TURN</h2>
-<section class="table-surface"><div class="table-watermark" aria-hidden="true"></div><div id="dealer" class="dealer">DEALER: —</div><div id="bots" class="bots"></div><div class="board-row"><span class="label community-label">BOARD</span><div id="community" class="cards"></div><span class="label hole-label">YOU</span><div id="hole" class="cards"></div></div></section>
-<div class="actions"><button data-a="fold">FOLD</button><button data-a="call">CHECK</button><button data-a="raise">RAISE $100</button><button data-a="allin">ALL IN</button></div>
-<div class="footer"><button id="next" class="hide">NEXT HAND</button><button id="leave">LEAVE</button><a href="/downloads/svr-poker-android-rc2.apk">APK RC2</a></div>
-<p class="notice">Local play-money Texas Hold’em against five bots. Burn cards, deterministic hand ranking, tied-pot splitting, and a rotating dealer button are active.</p>
+  <div class="topbar">
+    <div class="profile-pill"><div class="profile-avatar" id="userAvatar">YOU</div><div class="profile-text"><strong id="userName">YOU</strong><span id="rankText">ROOKIE I • 0 XP</span><div class="xp-track"><i id="xpFill"></i></div></div></div>
+    <div class="brand-pill"><img src="/logo.png" alt="SVR Poker"><span>ANDROID EDITION</span></div>
+    <div class="pot-pill"><strong id="stack">STACK $15,000</strong><span id="handCounter">HAND 0</span></div>
+  </div>
+  <h2 id="status" class="status">YOUR TURN</h2>
+  <section class="table-wrap">
+    <div class="table-surface">
+      <div class="table-logo" aria-hidden="true"></div>
+      <div class="center-pot" id="potTarget"><small>POT</small><span id="pot">$0</span></div>
+      <aside class="sponsor-zone left" id="sponsorLeft"><img src="/logo.png" alt=""><span>SVR POKER</span></aside>
+      <aside class="sponsor-zone right" id="sponsorRight"><img src="/logo.png" alt=""><span>SPONSOR OPEN</span></aside>
+      <div class="deck-zone"><div class="deck-card" id="deckCard"><img src="/logo.png" alt="SVR card back"></div><span class="burn-label" id="burnLabel">DECK READY</span></div>
+      <div id="players" class="players"></div>
+      <div class="board-zone"><span class="label board-label">BOARD</span><div id="community" class="cards"></div><span class="label hole-label">YOU</span><div id="hole" class="cards"></div></div>
+    </div>
+  </section>
+  <div class="actions">
+    <button data-a="fold">FOLD</button>
+    <button data-a="call">CHECK</button>
+    <button data-a="raise">RAISE $200</button>
+    <button data-a="allin">ALL IN</button>
+  </div>
+  <div class="footer">
+    <button id="next" class="hide">NEXT HAND</button>
+    <button id="leave">LEAVE TABLE</button>
+    <a href="/site/profile.html?v=phase392">PROFILE</a>
+    <a href="/downloads/svr-poker-android-rc2.apk" download>APK</a>
+  </div>
 </main>
-<div id="chipLayer" class="chip-layer"></div><div id="winnerBanner" class="winner-banner"></div>
-<script>
-(()=>{
-const SUITS=['S','H','D','C'],RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'],NAMES=['YOU','Claudia','Eric','Maya','Darius','Nova'];
-const $=s=>document.querySelector(s),all=s=>[...document.querySelectorAll(s)];
-const suitSymbol=s=>({S:'♠',H:'♥',D:'♦',C:'♣'}[s]);
-let dealer=-1,stacks=NAMES.map((_,i)=>i?15000:Math.max(1000,Number(localStorage.getItem('svr380stack')||15000)));
-let st={pot:0,street:0,deck:[],community:[],players:[],done:false,currentBet:0,burns:[],dealer:0};
-let brand={id:'svr',name:'SVR POKER',logoUrl:'/logo.png'},audioContext=null,chipQueue=[];
-function ensureAudio(){if(audioContext)return audioContext;const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;audioContext=new C();return audioContext}
-function tone(freq,duration=.09,type='sine',gain=.04,delay=0){const c=ensureAudio();if(!c)return;const o=c.createOscillator(),g=c.createGain(),now=c.currentTime+delay;o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(gain,now+.008);g.gain.exponentialRampToValueAtTime(.0001,now+duration);o.connect(g).connect(c.destination);o.start(now);o.stop(now+duration+.03)}
-function chipSound(){tone(820,.04,'square',.018);tone(1030,.035,'square',.014,.04)}
-function winnerSound(){tone(523,.13,'sine',.05);tone(659,.13,'sine',.05,.11);tone(784,.22,'sine',.055,.22)}
-function makeDeck(){return SUITS.flatMap(s=>RANKS.map((r,i)=>({r,s,v:i+2})))}
-function shuffle(cards){for(let i=cards.length-1;i;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]]}return cards}
-function card(c,hidden=false,slot=false){if(hidden)return '<span class="card back"><img src="/logo.png" alt="SVR"></span>';if(slot)return '<span class="card back slot"><img src="/logo.png" alt="SVR"></span>';const suit=suitSymbol(c.s),red=c.s==='H'||c.s==='D';return `<span class="card${red?' red':''}"><span class="rank">${c.r}</span><span class="suit">${suit}</span></span>`}
-function seatElement(index){return index===0?$('#stack'):$(`[data-seat="${index}"]`)}
-function centerOf(element){const r=element?.getBoundingClientRect?.();return r?{x:r.left+r.width/2,y:r.top+r.height/2}:{x:innerWidth/2,y:innerHeight/2}}
-function animateChips(fromIndex,amount=0,toElement=$('#pot')){const from=centerOf(seatElement(fromIndex)),to=centerOf(toElement);for(let i=0;i<3;i++){const chip=document.createElement('i');chip.className='chip-flight';chip.style.left=`${from.x-7+i*3}px`;chip.style.top=`${from.y-7+i*2}px`;chip.style.setProperty('--tx',`${to.x-7+(i-1)*5}px`);chip.style.setProperty('--ty',`${to.y-7+(i-1)*3}px`);chip.style.animationDelay=`${i*.045}s`;$('#chipLayer').appendChild(chip);setTimeout(()=>chip.remove(),850)}if(amount>0)chipSound()}
-function flushChipQueue(){const queue=chipQueue.splice(0);queue.forEach((entry,i)=>setTimeout(()=>animateChips(entry.index,entry.amount),i*90))}
-function pay(player,amount){const paid=Math.min(player.stack,Math.max(0,Math.floor(amount)));player.stack-=paid;player.bet+=paid;st.pot+=paid;if(paid>0)chipQueue.push({index:player.index,amount:paid});return paid}
-function combinations(cards){const out=[];for(let a=0;a<cards.length-4;a++)for(let b=a+1;b<cards.length-3;b++)for(let c=b+1;c<cards.length-2;c++)for(let d=c+1;d<cards.length-1;d++)for(let e=d+1;e<cards.length;e++)out.push([cards[a],cards[b],cards[c],cards[d],cards[e]]);return out}
-function scoreFive(cards){const values=cards.map(c=>c.v).sort((a,b)=>b-a),counts=new Map();for(const value of values)counts.set(value,(counts.get(value)||0)+1);const groups=[...counts.entries()].sort((a,b)=>b[1]-a[1]||b[0]-a[0]);const flush=cards.every(c=>c.s===cards[0].s);const unique=[...new Set(values)];if(unique.includes(14))unique.push(1);unique.sort((a,b)=>b-a);let straightHigh=0;for(let i=0;i<=unique.length-5;i++){if(unique[i]-unique[i+4]===4){straightHigh=unique[i];break}}let score,label;if(flush&&straightHigh){score=[8,straightHigh];label='Straight Flush'}else if(groups[0][1]===4){score=[7,groups[0][0],groups[1][0]];label='Four of a Kind'}else if(groups[0][1]===3&&groups[1]?.[1]===2){score=[6,groups[0][0],groups[1][0]];label='Full House'}else if(flush){score=[5,...values];label='Flush'}else if(straightHigh){score=[4,straightHigh];label='Straight'}else if(groups[0][1]===3){score=[3,groups[0][0],...groups.slice(1).map(g=>g[0]).sort((a,b)=>b-a)];label='Three of a Kind'}else if(groups[0][1]===2&&groups[1]?.[1]===2){const pairs=[groups[0][0],groups[1][0]].sort((a,b)=>b-a);score=[2,...pairs,groups.find(g=>g[1]===1)?.[0]||0];label='Two Pair'}else if(groups[0][1]===2){score=[1,groups[0][0],...groups.slice(1).map(g=>g[0]).sort((a,b)=>b-a)];label='Pair'}else{score=[0,...values];label='High Card'}return{score,label}}
-function compareScore(a,b){for(let i=0;i<Math.max(a.length,b.length);i++){const delta=(a[i]||0)-(b[i]||0);if(delta)return delta}return 0}
-function bestHand(cards){return combinations(cards).map(scoreFive).sort((a,b)=>compareScore(b.score,a.score))[0]}
-function dealOrder(){return Array.from({length:6},(_,i)=>(st.dealer+1+i)%6)}
-function burn(){if(st.deck.length)st.burns.push(st.deck.pop())}
-function revealNext(){if(st.street===0){burn();st.community.push(st.deck.pop(),st.deck.pop(),st.deck.pop());st.street=1}else if(st.street===1||st.street===2){burn();st.community.push(st.deck.pop());st.street+=1}else return false;st.players.forEach(p=>p.bet=0);st.currentBet=0;return true}
-function resetTableIfNeeded(){if(stacks[0]<100||stacks.filter(v=>v>=100).length<2)stacks=NAMES.map(()=>15000)}
-function start(){resetTableIfNeeded();dealer=(dealer+1)%6;chipQueue=[];st={pot:0,street:0,deck:shuffle(makeDeck()),community:[],players:NAMES.map((name,index)=>({name,index,stack:stacks[index],fold:false,hand:[],bet:0})),done:false,currentBet:0,burns:[],dealer};for(let round=0;round<2;round++)for(const seat of dealOrder())st.players[seat].hand.push(st.deck.pop());const sb=(dealer+1)%6,bb=(dealer+2)%6;pay(st.players[sb],25);pay(st.players[bb],50);st.currentBet=50;$('#status').classList.remove('win');$('#status').textContent='YOUR TURN — PREFLOP';all('.winner').forEach(e=>e.classList.remove('winner'));render()}
-function botStrength(player){const [a,b]=player.hand;let value=Math.max(a.v,b.v)/14;if(a.v===b.v)value+=.55;if(a.s===b.s)value+=.08;if(Math.abs(a.v-b.v)<=2)value+=.06;return Math.min(1,value)}
-function botsAct(){for(const p of st.players.slice(1)){if(p.fold||p.stack<=0)continue;const call=Math.max(0,st.currentBet-p.bet),strength=botStrength(p),pressure=call/Math.max(1,p.stack);if(call>0&&strength<.44&&pressure>.015&&Math.random()<.42){p.fold=true;continue}pay(p,call)}}
-function runBoard(){while(st.community.length<5){if(st.community.length===0){burn();st.community.push(st.deck.pop(),st.deck.pop(),st.deck.pop())}else{burn();st.community.push(st.deck.pop())}}}
-function showWinner(winners,won,label){const banner=$('#winnerBanner'),names=winners.map(p=>p.name).join(' / ');banner.innerHTML=`<strong>${names} WINS</strong><br>$${won.toLocaleString()} • ${label}`;banner.classList.remove('show');void banner.offsetWidth;banner.classList.add('show');$('#pot').classList.add('pot-pop');setTimeout(()=>$('#pot').classList.remove('pot-pop'),1400);winnerSound();winners.forEach((player,index)=>{const target=seatElement(player.index);setTimeout(()=>{target?.classList.add('winner');animateChips(0,0,target)},180+index*100)})}
-function settle(){const live=st.players.filter(p=>!p.fold);if(live.length>1)runBoard();let winners,label;if(live.length===1){winners=live;label='Last Player Standing'}else{const results=live.map(player=>({player,hand:bestHand([...player.hand,...st.community])}));results.sort((a,b)=>compareScore(b.hand.score,a.hand.score));const top=results[0].hand.score;winners=results.filter(r=>compareScore(r.hand.score,top)===0).map(r=>r.player);label=results[0].hand.label}const won=st.pot,share=Math.floor(won/winners.length),remainder=won-share*winners.length;winners.forEach((p,i)=>p.stack+=share+(i===0?remainder:0));st.pot=0;st.done=true;stacks=st.players.map(p=>p.stack);localStorage.setItem('svr380stack',String(stacks[0]));const names=winners.map(p=>p.name).join(' / ');$('#status').textContent=`${names} WINS $${won.toLocaleString()} — ${label}`;$('#status').classList.add('win');render();setTimeout(()=>showWinner(winners,won,label),180)}
-function act(action){if(st.done)return;const user=st.players[0];if(action==='fold'){user.fold=true;botsAct();settle();return}const call=Math.max(0,st.currentBet-user.bet);if(action==='raise'){pay(user,call+100);st.currentBet=Math.max(st.currentBet,user.bet)}else if(action==='allin'){pay(user,user.stack);st.currentBet=Math.max(st.currentBet,user.bet)}else pay(user,call);botsAct();if(st.players.filter(p=>!p.fold).length<=1){settle();return}if(st.street>=3){settle();return}revealNext();$('#status').textContent=['','FLOP — YOUR TURN','TURN — YOUR TURN','RIVER — YOUR TURN'][st.street];render()}
-function render(){const user=st.players[0],call=Math.max(0,st.currentBet-user.bet);$('#stack').textContent=`STACK $${user.stack.toLocaleString()}`;$('#pot').textContent=`POT $${st.pot.toLocaleString()}`;$('#dealer').textContent=`DEALER: ${NAMES[st.dealer]}`;$('#community').innerHTML=Array.from({length:5},(_,i)=>st.community[i]?card(st.community[i]):card(null,false,true)).join('');$('#hole').innerHTML=user.hand.map(c=>card(c)).join('');$('#bots').innerHTML=st.players.slice(1).map((p,i)=>`<div data-seat="${i+1}" class="bot${i+1===st.dealer?' button':''}${p.fold?' folded':''}"><strong>${p.name}${i+1===st.dealer?' • D':''}</strong><div class="money">${p.fold?'FOLDED':'$'+p.stack.toLocaleString()}</div><div class="mini-cards">${card(p.hand[0],!st.done)}${card(p.hand[1],!st.done)}</div></div>`).join('');const callButton=$('[data-a="call"]');callButton.textContent=call?`CALL $${call.toLocaleString()}`:'CHECK';all('[data-a]').forEach(button=>{button.disabled=st.done;button.classList.toggle('valid',!st.done)});$('#next').classList.toggle('hide',!st.done);requestAnimationFrame(flushChipQueue)}
-function setBrand(config={}){brand={...brand,...config};$('#brandLogo').src=brand.logoUrl||'/logo.png';$('#brandName').textContent=brand.name||'SVR POKER';return{...brand}}
-$('#join').onclick=()=>{ensureAudio()?.resume?.();document.body.classList.add('joined');$('#gate').classList.add('hide');$('#table').classList.remove('hide');start()};
-$('#update').onclick=async()=>{try{for(const registration of await navigator.serviceWorker?.getRegistrations?.()||[])await registration.unregister();for(const key of await caches.keys())await caches.delete(key)}catch{}location.replace('/game/android-stable.html?v=phase380&deploy=phase384&t='+Date.now())};
-$('#leave').onclick=()=>location.replace('/game/android-stable.html?v=phase380&deploy=phase384&left='+Date.now());
-$('#next').onclick=start;
-document.addEventListener('click',event=>{if(event.target.dataset.a)act(event.target.dataset.a)});
-window.SVR_PHASE380_SET_BRAND=setBrand;
-window.SVR_PHASE380_ANDROID_QA=()=>({build:'PHASE-380-ANDROID-PLAYABLE-POKER-PRESENTATION-LOCK',successor:'PHASE-384-ANDROID-ONE-PAGE-3D-CHIP-WINNER-LOCK',joinVisible:!$('#gate').classList.contains('hide'),joined:!$('#table').classList.contains('hide'),cardsBeforeJoin:$('#gate').classList.contains('hide')?2:0,players:st.players.length,rankUsesTen:RANKS.includes('10')&&!RANKS.includes('T'),burnCards:st.burns.length,deterministicHandEvaluator:true,brand:{...brand},onePageFit:true,cardBackLogo:true,singleCenteredSuit:true,chipAnimation:true,winnerFlashAndSound:true,threeDimensionalPresentation:true,movementControlsWhileSeated:0,checkedAt:new Date().toISOString()});
-window.SVR_PHASE384_ANDROID_QA=window.SVR_PHASE380_ANDROID_QA;
-})();
-</script>
+
+<div id="outOverlay" class="overlay hide"><div class="overlay-card"><h2>OUT OF PLAY CHIPS</h2><p>Your stack reached $0. Continuous play has stopped.</p><button id="restartChips" class="btn primary">RESTART WITH $15,000</button><button id="outLeave" class="btn">LEAVE TABLE</button></div></div>
+<div id="chipLayer" class="chip-layer"></div>
+<div id="fxLayer" class="fx-layer"></div>
+<div id="winnerBanner" class="winner-banner"></div>
+
+<script src="./modules/phase392_android_gameplay.js?v=phase392"></script>
 </body>
 </html>

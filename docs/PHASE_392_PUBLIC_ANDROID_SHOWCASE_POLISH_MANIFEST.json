@@ -1,0 +1,57 @@
+{
+  "phase": 392,
+  "build": "PHASE-392-PUBLIC-ANDROID-SHOWCASE-POLISH-LOCK",
+  "publicPage": {
+    "buttons": 3,
+    "platformAwareGameButton": true
+  },
+  "android": {
+    "build": "PHASE-392-ANDROID-CONTINUOUS-PLAY-RANKING-LOCK",
+    "continuousPlay": true,
+    "leaveButton": true,
+    "outOfChipsNotice": true,
+    "burnAndTurn": true,
+    "logoCardBacks": true,
+    "potCentered": true,
+    "winnerPotAnimation": true,
+    "xpAndRanks": true,
+    "profileIcons": true,
+    "sponsorZones": 2,
+    "gameplayModule": "/game/modules/phase392_android_gameplay.js",
+    "gameplayStyles": "/game/styles/phase392_android_gameplay.css"
+  },
+  "camera3": {
+    "build": "PHASE-392-CAMERA3-TABLE-SHOWCASE-LOCK",
+    "route": "/game/camera3-showcase.html?v=phase392",
+    "tableAdvertisingFocus": true,
+    "shots": 3
+  },
+  "avatar": {
+    "build": "PHASE-392-AVATAR-PEDESTAL-UPRIGHT-LOCK",
+    "matrixIntroRemoved": true,
+    "anatomicalUprightCorrection": true
+  },
+  "site": {
+    "build": "PHASE-392-SITE-PRESENTATION-POLISH-LOCK",
+    "singleHeader": true,
+    "duplicateFloatingMenuRemoved": true,
+    "logoFirstSlide": true,
+    "autoplay": true,
+    "swipe": true,
+    "vibezSeparated": true,
+    "floatingTools": true,
+    "apkUpdateBadge": true
+  },
+  "reiki": {
+    "assetsDetected": true,
+    "directQuestRouteActive": false,
+    "terminatedPartnerBrandingRestored": false
+  },
+  "apk": {
+    "versionName": "0.1.0-rc2",
+    "versionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "nativeRebuild": false
+  }
+}
