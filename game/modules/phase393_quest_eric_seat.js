@@ -34,7 +34,8 @@ function anchorEric(){
   const table=getTable();eric=findEric()||eric;if(!table||!eric)return false;normalizeScale();captureBones();const tableInfo=bounds(table);if(!valid(tableInfo))return false;
   if(!Number.isFinite(eric.userData?.svrPhase393StableFloorOffset)){eric.getWorldPosition(v[3]);const initial=bounds(eric);eric.userData={...(eric.userData||{}),svrPhase393StableFloorOffset:initial.box.min.y-v[3].y}}
   const forward=tableForward(table),halfDepth=Math.min(tableInfo.size.x,tableInfo.size.z)/2,position=tableInfo.center.clone().addScaledVector(forward,-(halfDepth+DEALER_GAP));position.y=-(Number(eric.userData.svrPhase393StableFloorOffset)||0);
-  setWorldPosition(eric,position);eric.lookAt(tableInfo.center.x,tableState.tableTop-.12,tableInfo.center.z);eric.visible=true;
+  if(!eric.userData?.svrPhase393BaseQuaternion)eric.userData={...(eric.userData||{}),svrPhase393BaseQuaternion:eric.quaternion.clone()};
+  setWorldPosition(eric,position);if(eric.userData.svrPhase393BaseQuaternion?.isQuaternion)eric.quaternion.copy(eric.userData.svrPhase393BaseQuaternion);eric.visible=true;
   if(bones.pelvis&&bones.pelvisP){bones.pelvis.position.copy(bones.pelvisP);if(bones.pelvisQ)bones.pelvis.quaternion.copy(bones.pelvisQ);state.rootMotionLocked=true}
   eric.updateWorldMatrix?.(true,true);const info=bounds(eric);state.ericFloorDrift=valid(info)?+Math.abs(info.box.min.y).toFixed(4):null;state.ericAnchored=valid(info)&&state.ericFloorDrift<=.045;return state.ericAnchored;
 }
