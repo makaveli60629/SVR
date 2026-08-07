@@ -1,4 +1,5 @@
 /* PHASE-401-ANDROID-SPONSOR-TOURNAMENT-STYLES-LOCK */
+.phase401-tournament-mode .shell{grid-template-rows:auto auto auto minmax(0,1fr) auto auto auto}
 .phase401-tournament-mode .table-surface{background:radial-gradient(ellipse at 50% 42%,rgba(96,40,123,.34),transparent 34%),radial-gradient(ellipse at 50% 46%,#245d49 0,#0b3b2a 48%,#041711 100%)}
 .phase401-tournament-mode .table-surface::after{content:"REIKI • FIRST 50 TOURNAMENT";position:absolute;left:50%;top:31%;transform:translate(-50%,-50%);z-index:3;width:min(60%,440px);text-align:center;font-size:clamp(9px,2.6vw,15px);font-weight:950;letter-spacing:.16em;color:rgba(232,209,255,.64);text-shadow:0 0 18px #9b4dff;pointer-events:none}
 .phase401-tournament-mode .featured-sponsor{border-color:#d8a7ff!important;box-shadow:0 0 20px #9b4dff55!important;background:linear-gradient(180deg,rgba(78,25,105,.86),rgba(12,19,31,.92))!important}
