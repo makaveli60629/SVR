@@ -1,10 +1,10 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "SVR Poker Phase 395 with Quest Browser centering and a corrected seated Quest table while preserving the approved Android Phase 394 table.",
-  "id": "/?source=pwa-phase395",
-  "predecessor_id": "pwa-phase394",
-  "start_url": "/?source=pwa-phase395&v=phase395",
+  "description": "SVR Poker Phase 396 with seated Quest poker, teleport disabled, a clean tabletop, visible dealing, and Android dealer rotation polish.",
+  "id": "/?source=pwa-phase396",
+  "predecessor_id": "pwa-phase395",
+  "start_url": "/?source=pwa-phase396&v=phase396",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -19,9 +19,9 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {"name": "Play Android Poker", "short_name": "Android", "description": "Open the approved Phase 394 Android perimeter table.", "url": "/game/android.html?channel=stable&v=phase394", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Launch Quest VR", "short_name": "Quest VR", "description": "Open the Phase 395 close seated Quest table with stable dealer, card-play recovery, and brighter lighting.", "url": "/game/quest.html?v=phase395", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Play Android Poker", "short_name": "Android", "description": "Open the Phase 396 Android table with larger board cards, burn tray, and moving dealer button.", "url": "/game/android.html?channel=stable&v=phase396", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Launch Quest VR", "short_name": "Quest VR", "description": "Open the Phase 396 seated Quest table with teleport disabled, clean felt, and visible dealing.", "url": "/game/quest.html?v=phase396", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Camera 3 Table Showcase", "short_name": "CAM 3", "description": "Open the table-focused production preview.", "url": "/game/camera3-showcase.html?v=phase392", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Download the current manual-update Android APK.", "url": "/downloads/?v=phase394", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
+    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Download the current manual-update Android APK.", "url": "/downloads/?v=phase396", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }
