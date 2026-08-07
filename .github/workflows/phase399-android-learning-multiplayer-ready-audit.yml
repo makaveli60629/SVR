@@ -69,7 +69,7 @@ jobs:
           grep -q 'TICKET_CHANCE=.08' game/modules/phase399_android_learning_chips_sponsor.js
           grep -q 'svr399TournamentTickets' game/modules/phase399_android_learning_chips_sponsor.js
           grep -q 'nonCash:true' game/modules/phase399_android_learning_chips_sponsor.js
-          grep -q 'each tied winner' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'tied winners each receive one' game/modules/phase399_android_learning_chips_sponsor.js
           grep -q 'reiki-demo-room' game/modules/phase399_android_learning_chips_sponsor.js
           grep -q '"androidTournamentTicketNonCash": true' update/app-version.json
           grep -q '"androidReikiFeltBranding": true' update/app-version.json
