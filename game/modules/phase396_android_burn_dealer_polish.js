@@ -9,6 +9,7 @@ function ensureDealerUi(){
   let readout=$('#dealerReadout');if(!readout){readout=document.createElement('div');readout.id='dealerReadout';readout.className='dealer-readout';readout.textContent='DEALER • WAITING';table.appendChild(readout)}
   state.dealerButtonReady=true;return true
 }
+function ensureBurnPlacement(){const board=$('.board-zone'),row=$('.board-row'),burn=$('#burnZone');if(!board||!row||!burn)return false;if(burn.parentElement!==board||burn.nextElementSibling!==row)board.insertBefore(burn,row);return true}
 function placeDealer(){
   const game=window.SVR_PHASE393_ANDROID_STATE,table=$('.table-surface'),button=$('#dealerButton'),readout=$('#dealerReadout');if(!game||!table||!button||!readout)return false;
   const dealer=Number(game.dealer);if(!Number.isFinite(dealer)||dealer<0)return false;const player=game.players?.[dealer];let target=dealer===0?$('#hole'):$(`[data-player="${dealer}"]`);if(!target)target=dealer===0?$('.hole-row'):null;if(!target)return false;
@@ -20,11 +21,11 @@ function placeDealer(){
   state.dealerIndex=dealer;state.dealerName=player?.name||null;return true
 }
 function inspectLayout(){
-  const burn=$('#burnZone'),community=$('#community .card');if(burn){const rect=burn.getBoundingClientRect(),board=$('#community')?.getBoundingClientRect();state.burnAboveCommunity=Boolean(board&&rect.bottom<=board.top+22&&rect.top<board.top)}
+  const burn=$('#burnZone'),boardRow=$('.board-row'),community=$('#community .card');state.burnAboveCommunity=Boolean(burn&&boardRow&&burn.parentElement===$('.board-zone')&&burn.nextElementSibling===boardRow);
   if(community)state.communityCardsEnlarged=community.getBoundingClientRect().width>=38;
 }
 function sync(){
-  try{ensureDealerUi();placeDealer();inspectLayout();state.installed=Boolean(state.dealerButtonReady&&state.burnAboveCommunity);state.checkedAt=new Date().toISOString();window.SVR_PHASE396_ANDROID_STATE={...state};return state.installed}catch(error){state.lastError=String(error?.message||error);return false}
+  try{ensureDealerUi();ensureBurnPlacement();placeDealer();inspectLayout();state.installed=Boolean(state.dealerButtonReady&&state.burnAboveCommunity);state.checkedAt=new Date().toISOString();window.SVR_PHASE396_ANDROID_STATE={...state};return state.installed}catch(error){state.lastError=String(error?.message||error);return false}
 }
 function qa(){sync();return{...state,dealerButton:Boolean($('#dealerButton')),dealerReadout:Boolean($('#dealerReadout')),burnZone:Boolean($('#burnZone')),communityCards:document.querySelectorAll('#community .card').length,pass:Boolean(state.installed&&state.dealerButtonReady&&state.burnAboveCommunity&&!state.lastError),checkedAt:new Date().toISOString()}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setInterval(sync,120),{once:true});else setInterval(sync,120);
