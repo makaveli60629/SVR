@@ -81,8 +81,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK' game/android-stable.html
+          grep -q 'PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK' game/modules/phase396_android_burn_dealer_polish.js
           grep -q 'phase396_android_burn_dealer_polish.js?v=phase396' game/android-stable.html
+          grep -q 'data-polish-build="PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK"' game/android-stable.html
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
           grep -q '"apkVersionCode": 2' game/android-release.json
