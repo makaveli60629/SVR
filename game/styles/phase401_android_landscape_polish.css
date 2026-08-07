@@ -3,13 +3,14 @@
   html,body{height:100%;min-height:100%;overflow:hidden}
   body{background:radial-gradient(circle at 50% 0,#123e44 0,#07101a 38%,#02040a 82%)}
   .shell{width:100vw;max-width:none;height:100dvh;margin:0;padding:max(2px,env(safe-area-inset-top)) max(4px,env(safe-area-inset-right)) max(2px,env(safe-area-inset-bottom)) max(4px,env(safe-area-inset-left));grid-template-rows:40px 28px minmax(0,1fr) 54px 38px 30px;gap:3px}
+  .phase401-tournament-mode .shell{grid-template-rows:40px 28px 25px minmax(0,1fr) 54px 38px 30px}
   .topbar{height:40px;grid-template-columns:minmax(150px,.9fr) minmax(120px,.55fr) minmax(190px,1fr);gap:4px}
   .profile-pill,.brand-pill,.stack-pill{height:40px;border-radius:12px;padding:3px 6px}
   .profile-pill{grid-template-columns:30px minmax(0,1fr);gap:5px}.profile-avatar{width:30px;height:30px;font-size:11px}.profile-text strong{font-size:10px}.profile-text span{font-size:7px}.xp-track{height:3px;margin-top:2px}
   .brand-pill{display:grid;grid-template-columns:38px 1fr;align-items:center;text-align:left}.brand-pill img{width:36px;height:28px}.brand-pill span{font-size:6px;line-height:1.1}.phase399-match-status{margin-top:0!important;font-size:6px!important}
   .stack-pill{display:flex;align-items:center;justify-content:flex-end;gap:9px;text-align:right}.stack-pill strong{font-size:11px}.stack-pill>span{font-size:8px}.phase399-chip-rack{display:none!important}
   .turn-strip{min-height:28px;height:28px;padding:1px 5px}.turn-strip strong{font-size:13px}.turn-clock{width:27px;height:27px;border-width:1px;font-size:10px}
-  .phase401-tournament-hud{min-height:25px;padding:2px 5px!important;border-radius:9px!important;font-size:6.5px!important}
+  .phase401-tournament-hud{min-height:25px;height:25px;padding:2px 5px!important;border-radius:9px!important;font-size:6.5px!important}
   .table-wrap{min-height:0;overflow:hidden}.table-surface{height:100%;border-width:5px;border-radius:27px;box-shadow:inset 0 0 0 1px #ffd98a55,inset 0 -20px 42px #0008,0 8px 22px #000}
   .table-surface::before{inset:5px;border-radius:21px}
   .players{inset:5px 8px 91px}
@@ -30,5 +31,5 @@
   .phase399-sheet{width:min(920px,96vw);max-height:88dvh;bottom:3px;padding:8px;border-radius:14px}.phase399-sheet-head{top:-8px;margin:-8px -8px 6px;padding:7px 8px 5px}.phase399-sheet-head h2{font-size:12px}.phase399-hand-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.phase399-hand-guide{padding:5px}.phase399-hand-guide strong{font-size:8px}.phase399-hand-guide span{font-size:6px}.phase399-result-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.phase399-ticket-notice{top:35px;width:min(560px,74vw);padding:7px}.phase399-ticket-chip{width:38px;height:38px}.phase399-ticket-notice p{font-size:8px}
 }
 @media (orientation:landscape) and (max-height:420px){
-  .shell{grid-template-rows:34px 23px minmax(0,1fr) 47px 34px 27px;gap:2px}.topbar,.profile-pill,.brand-pill,.stack-pill{height:34px}.profile-avatar{width:25px;height:25px}.brand-pill img{height:23px}.turn-strip{height:23px;min-height:23px}.turn-clock{width:22px;height:22px}.player-box{min-height:48px}.players{inset:4px 7px 76px}.featured-sponsor{transform:translateX(-50%) scale(.82)!important}.dealer-readout{display:none!important}.board-zone{width:66%!important}.community-cards .card{width:30px!important;height:42px!important}.hole-cards .card{width:31px!important;height:43px!important}.raise-panel{height:47px;grid-template-rows:19px 20px}.actions,.actions button{height:34px!important;min-height:34px!important}.footer,.footer button,.footer a{height:27px!important;min-height:25px!important}
+  .shell{grid-template-rows:34px 23px minmax(0,1fr) 47px 34px 27px;gap:2px}.phase401-tournament-mode .shell{grid-template-rows:34px 23px 21px minmax(0,1fr) 47px 34px 27px}.phase401-tournament-hud{height:21px;min-height:21px}.topbar,.profile-pill,.brand-pill,.stack-pill{height:34px}.profile-avatar{width:25px;height:25px}.brand-pill img{height:23px}.turn-strip{height:23px;min-height:23px}.turn-clock{width:22px;height:22px}.player-box{min-height:48px}.players{inset:4px 7px 76px}.featured-sponsor{transform:translateX(-50%) scale(.82)!important}.dealer-readout{display:none!important}.board-zone{width:66%!important}.community-cards .card{width:30px!important;height:42px!important}.hole-cards .card{width:31px!important;height:43px!important}.raise-panel{height:47px;grid-template-rows:19px 20px}.actions,.actions button{height:34px!important;min-height:34px!important}.footer,.footer button,.footer a{height:27px!important;min-height:25px!important}
 }
