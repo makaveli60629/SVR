@@ -2,11 +2,12 @@
   const ADMIN_KEY='svr_admin_presence';
   const MESSAGE_KEY='svr_public_messages';
   const CACHE_EPOCH_KEY='svr_public_cache_epoch';
-  const CACHE_EPOCH='phase396-seated-quest-android-dealer';
-  const CURRENT_PHASE='phase396';
+  const CACHE_EPOCH='phase401-android-sponsor-tournament-landscape';
+  const CURRENT_PHASE='phase401';
+  const QUEST_PHASE='phase396';
   const SITE_PHASE='phase392';
   const AVATAR_PHASE='phase392';
-  const ANDROID_PHASE='phase396';
+  const ANDROID_PHASE='phase401';
 
   async function refreshRuntimeCaches(){
     try{
@@ -17,17 +18,18 @@
         localStorage.setItem(CACHE_EPOCH_KEY,CACHE_EPOCH);
       }
       if('serviceWorker'in navigator)await navigator.serviceWorker.register(`/sw.js?v=${CURRENT_PHASE}`,{scope:'/'});
-    }catch(error){console.warn('SVR Phase 396 cache recovery could not complete.',error)}
+    }catch(error){console.warn('SVR Phase 401 cache recovery could not complete.',error)}
   }
   function getAdminState(){const qs=new URLSearchParams(location.search),override=qs.get('admin');if(override==='online'||override==='offline'){localStorage.setItem(ADMIN_KEY,override);return override}return localStorage.getItem(ADMIN_KEY)||'offline'}
   function paintAdminState(){const current=getAdminState();document.querySelectorAll('.admin-status').forEach(element=>{element.dataset.state=current;element.classList.toggle('online',current==='online');element.classList.toggle('offline',current!=='online');element.textContent=current==='online'?'● Admin Online':'● Admin Offline'})}
-  function paintPhaseBadge(){if(document.getElementById('svr-phase-live-badge'))return;const badge=document.createElement('div');badge.id='svr-phase-live-badge';badge.textContent='● PHASE 396 TABLE PLAY';badge.setAttribute('aria-label','SVR Poker Phase 396 seated Quest and Android dealer rotation polish');Object.assign(badge.style,{position:'fixed',top:'12px',right:'12px',zIndex:'2147483647',padding:'7px 11px',border:'1px solid #8dffb4',borderRadius:'999px',background:'rgba(0,12,18,.92)',color:'#8dffb4',font:'800 11px/1.1 system-ui,Arial,sans-serif',letterSpacing:'.08em',boxShadow:'0 0 24px rgba(141,255,180,.2)'});document.body.appendChild(badge);document.body.dataset.deployPhase=CURRENT_PHASE}
+  function paintPhaseBadge(){if(document.getElementById('svr-phase-live-badge'))return;const badge=document.createElement('div');badge.id='svr-phase-live-badge';badge.textContent='● PHASE 401 ANDROID TOURNAMENT';badge.setAttribute('aria-label','SVR Poker Phase 401 Android sponsor tournament and landscape handheld polish');Object.assign(badge.style,{position:'fixed',top:'12px',right:'12px',zIndex:'2147483647',padding:'7px 11px',border:'1px solid #8dffb4',borderRadius:'999px',background:'rgba(0,12,18,.92)',color:'#8dffb4',font:'800 11px/1.1 system-ui,Arial,sans-serif',letterSpacing:'.08em',boxShadow:'0 0 24px rgba(141,255,180,.2)'});document.body.appendChild(badge);document.body.dataset.deployPhase=CURRENT_PHASE}
   function normalizePublicLinks(){
     document.querySelectorAll('a[href]').forEach(anchor=>{
       let url;try{url=new URL(anchor.getAttribute('href'),location.href)}catch{return}if(url.origin!==location.origin)return;
       if(/\/game\/(?:android|android-play|android-stable|android-tabletop)\.html$/i.test(url.pathname)){url.pathname='/game/android.html';url.search='';url.searchParams.set('channel','stable');url.searchParams.set('v',ANDROID_PHASE);url.searchParams.set('source','public-link');anchor.href=url.pathname+'?'+url.searchParams.toString();return}
+      if(/\/game\/(?:tournaments|tournament-results)\.html$/i.test(url.pathname)){url.searchParams.set('v',ANDROID_PHASE);url.searchParams.set('source','public-link');anchor.href=url.pathname+'?'+url.searchParams.toString()+url.hash;return}
       if(/\/game\/(?:camera3-showcase|camera3-live|camera3|cam3|preview)\.html$/i.test(url.pathname)||url.searchParams.get('cam')==='director'){url.pathname='/game/camera3-showcase.html';url.search='';url.searchParams.set('v','phase392');url.searchParams.set('autocam','1');url.searchParams.set('source','public-link');anchor.href=url.pathname+'?'+url.searchParams.toString();return}
-      if(/\/game\/(?:index|quest)\.html$/i.test(url.pathname)){url.pathname='/game/quest.html';url.search='';url.searchParams.set('v',CURRENT_PHASE);url.searchParams.set('source','public-link');anchor.href=url.pathname+'?'+url.searchParams.toString();return}
+      if(/\/game\/(?:index|quest)\.html$/i.test(url.pathname)){url.pathname='/game/quest.html';url.search='';url.searchParams.set('v',QUEST_PHASE);url.searchParams.set('source','public-link');anchor.href=url.pathname+'?'+url.searchParams.toString();return}
       if(/\/site\/(?:avatar|profile)\.html$/i.test(url.pathname)){url.searchParams.set('v',AVATAR_PHASE);url.searchParams.set('deploy',CURRENT_PHASE);anchor.href=url.pathname+'?'+url.searchParams.toString()+url.hash;return}
       if(/\/site\/[^/]+\.html$/i.test(url.pathname)){url.searchParams.set('v',SITE_PHASE);url.searchParams.set('deploy',CURRENT_PHASE);anchor.href=url.pathname+'?'+url.searchParams.toString()+url.hash}
     })
