@@ -1,0 +1,46 @@
+{
+  "phase": 393,
+  "build": "PHASE-393-DUAL-DEVICE-CALIBRATION-LOCK",
+  "quest": {
+    "build": "PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK",
+    "tableWidthMeters": 3.35,
+    "tableTopMeters": 0.98,
+    "tableBottomMeters": -0.08,
+    "feltRecessMeters": 0.11,
+    "blackCoverDisabled": true,
+    "cardsRaisedAboveFelt": true,
+    "ericHeightMeters": 1.78,
+    "ericFloorAnchored": true,
+    "ericRootMotionLocked": true,
+    "ericDealingAnimation": true,
+    "playersNormalizedToEric": true,
+    "seatedRailGapMeters": 0.14,
+    "seatedEyeHeightMeters": 1.18,
+    "boundedSeatCorrectionSeconds": 15
+  },
+  "android": {
+    "build": "PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK",
+    "perimeterOpponentSeats": 5,
+    "centerPlayerCount": 0,
+    "largerOpponentCards": true,
+    "turnClockSeconds": 15,
+    "activeSeatBlink": true,
+    "actionLabels": true,
+    "timeoutFacingBet": "auto-fold",
+    "timeoutNoBet": "auto-check",
+    "customRaiseSlider": true,
+    "raisePresets": ["half-pot", "pot", "min", "max"],
+    "embeddedSponsorZones": 2,
+    "soundEffects": true,
+    "soundToggle": true,
+    "hapticFeedback": true
+  },
+  "apk": {
+    "versionName": "0.1.0-rc2",
+    "versionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "nativeRebuild": false
+  },
+  "physicalAcceptanceRequired": true
+}

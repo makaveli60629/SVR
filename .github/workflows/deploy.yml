@@ -28,32 +28,42 @@ jobs:
           ref: gh-pages
           path: publish
           fetch-depth: 1
-      - name: Validate Phase 392
+
+      - name: Verify latest main source
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-392-PUBLIC-ANDROID-SHOWCASE-POLISH-LOCK' source/index.html
-          test "$(grep -o 'class=\"btn ' source/index.html | wc -l)" -eq 3
-          grep -q 'PHASE-392-SITE-PRESENTATION-POLISH-LOCK' source/site/phase392-site-polish.js
-          grep -q 'PHASE-392-MARKET-ADS-NO-DUPLICATE-NAV-LOCK' source/site/js/market-ads.js
-          grep -q 'PHASE-392-ANDROID-CONTINUOUS-PLAY-RANKING-LOCK' source/game/android-stable.html
-          grep -q 'SVR_PHASE392_ANDROID_QA' source/game/modules/phase392_android_gameplay.js
-          grep -q 'PHASE-392-CAMERA3-TABLE-SHOWCASE-LOCK' source/game/camera3-showcase.html
-          grep -q 'PHASE-392-AVATAR-PEDESTAL-UPRIGHT-LOCK' source/site/avatar.html
+          git -C source fetch origin main --depth=1
+          test "$(git -C source rev-parse HEAD)" = "$(git -C source rev-parse origin/main)"
+
+      - name: Validate Phase 393
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-393-DUAL-DEVICE-CALIBRATION-LOCK' source/index.html
+          grep -q 'PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK' source/game/index.html
+          grep -q 'phase393_quest_table_eric_seat_calibration.js' source/game/index.html
+          grep -q 'PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK' source/game/android-stable.html
+          grep -q 'SVR_PHASE393_ANDROID_QA' source/game/modules/phase393_android_gameplay.js
+          grep -q 'SVR_PHASE393_QUEST_QA' source/game/modules/phase393_quest_table_eric_seat_calibration.js
+          grep -q 'TURN_SECONDS=15' source/game/modules/phase393_android_common.js
+          grep -q 'TARGET_TABLE_TOP=.98' source/game/modules/phase393_quest_table_surface.js
+          grep -q 'TARGET_TABLE_BOTTOM=-.08' source/game/modules/phase393_quest_table_surface.js
+          grep -q 'PHASE393_VISIBLE_RECESSED_INNER_FELT' source/game/modules/phase393_quest_table_surface.js
           node --check source/site-public-hooks.js
-          node --check source/site/phase383-home-restore.js
-          node --check source/site/phase392-site-polish.js
-          node --check source/site/js/market-ads.js
-          node --check source/site/js/phase392-avatar-pedestal-fix.js
-          node --check source/game/modules/phase392_camera3_table_showcase.js
-          node --check source/game/modules/phase392_android_gameplay.js
+          node --check source/game/modules/phase393_android_common.js
+          node --check source/game/modules/phase393_android_evaluator.js
+          node --check source/game/modules/phase393_android_gameplay.js
+          node --check source/game/modules/phase393_quest_table_surface.js
+          node --check source/game/modules/phase393_quest_eric_seat.js
+          node --check source/game/modules/phase393_quest_table_eric_seat_calibration.js
           node --check source/sw.js
           node --check source/pwa-sw.js
-          test -s source/game/styles/phase392_android_gameplay.css
           python3 -m json.tool source/manifest.webmanifest >/dev/null
           python3 -m json.tool source/game/manifest.json >/dev/null
           python3 -m json.tool source/game/android-release.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
+          test -s source/game/styles/phase393_android_table_layout.css
           test -s source/support-chat-bot.js
           test -s source/site-local-counter.js
           test -s source/downloads/svr-poker-android-rc2.apk
@@ -62,6 +72,7 @@ jobs:
           grep -q '"forceUpdate": false' source/game/android-release.json
           grep -q '"showUpdatePrompt": false' source/game/android-release.json
           grep -q '"nativeApkRebuild": false' source/game/android-release.json
+
       - name: Build clean production tree
         shell: bash
         run: |
@@ -77,42 +88,45 @@ jobs:
           cp source/update/app-version.json publish/update/app-version.json
           rm -rf publish/game/tools publish/game/docs publish/site/tools publish/site/docs
           find publish -type f \( -name '*.zip' -o -name '*.ps1' -o -name '.env' -o -name '.env.*' \) -delete
+
       - name: Stamp deployment health
         shell: bash
         run: |
           set -euo pipefail
-          cat > publish/deploy-health.json <<EOF
+          cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-392-PUBLIC-ANDROID-SHOWCASE-POLISH-LOCK",
-            "questBuild": "PHASE-391-PRODUCTION-CONSOLIDATION-AUTO-DEPLOY-LOCK",
+            "build": "PHASE-393-DUAL-DEVICE-CALIBRATION-LOCK",
+            "questBuild": "PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK",
+            "androidBuild": "PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK",
             "camera3Build": "PHASE-392-CAMERA3-TABLE-SHOWCASE-LOCK",
-            "androidBuild": "PHASE-392-ANDROID-CONTINUOUS-PLAY-RANKING-LOCK",
-            "avatarBuild": "PHASE-392-AVATAR-PEDESTAL-UPRIGHT-LOCK",
             "siteBuild": "PHASE-392-SITE-PRESENTATION-POLISH-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "sourceBranch": "main",
             "publishBranch": "gh-pages",
-            "questRoute": "/game/quest.html?v=phase392",
-            "camera3Route": "/game/camera3-showcase.html?v=phase392",
-            "androidRoute": "/game/android.html?channel=stable&v=phase392",
-            "androidGameplayRoute": "/game/android-stable.html?v=phase392&direct=1",
-            "publicButtons": 3,
-            "platformAwareLaunch": true,
-            "androidContinuousPlay": true,
-            "androidLeaveButton": true,
-            "androidOutOfChipsNotice": true,
-            "androidBurnAndTurn": true,
-            "androidXpAndRanks": true,
-            "androidSponsorZones": 2,
-            "avatarPedestalUpright": true,
-            "camera3TableShowcase": true,
-            "siteHeaderConsolidated": true,
-            "vibezSeparatedFromHero": true,
-            "duplicateFloatingMenuRemoved": true,
-            "supportChatBotPublished": true,
-            "siteLocalCounterPublished": true,
+            "questRoute": "/game/quest.html?v=phase393",
+            "questRuntimeRoute": "/game/index.html?platform=quest&v=phase393&direct=1&autoseat=1&questfix=1&clean=1",
+            "androidRoute": "/game/android.html?channel=stable&v=phase393",
+            "androidGameplayRoute": "/game/android-stable.html?v=phase393&direct=1",
+            "questTableWidthMeters": 3.35,
+            "questTableTopMeters": 0.98,
+            "questTableBottomMeters": -0.08,
+            "questFeltRecessMeters": 0.11,
+            "questBlackCoverDisabled": true,
+            "questCardsRaisedAboveFelt": true,
+            "questEricFloorAnchored": true,
+            "questEricRootMotionLocked": true,
+            "questEricDealingAnimation": true,
+            "questPlayersNormalized": true,
+            "questSeatedRailGapMeters": 0.14,
+            "questSeatedEyeHeightMeters": 1.18,
+            "androidPerimeterSeats": 5,
+            "androidCenterPlayerCount": 0,
+            "androidTurnClockSeconds": 15,
+            "androidCustomRaiseSlider": true,
+            "androidPokerSounds": true,
+            "androidEmbeddedSponsorZones": 2,
             "apkVersionName": "0.1.0-rc2",
             "apkVersionCode": 2,
             "forceUpdate": false,
@@ -120,26 +134,28 @@ jobs:
             "nativeApkRebuild": false,
             "customDomain": "svrpoker.com"
           }
-          EOF
+          EOF_HEALTH
           cp publish/deploy-health.json publish/game/deploy-health.json
+
       - name: Validate production tree
         shell: bash
         run: |
           set -euo pipefail
           test -s publish/index.html
-          test -s publish/site/phase392-site-polish.js
-          test -s publish/site/js/market-ads.js
-          test -s publish/site/js/phase392-avatar-pedestal-fix.js
-          test -s publish/game/camera3-showcase.html
-          test -s publish/game/modules/phase392_camera3_table_showcase.js
+          test -s publish/game/quest.html
+          test -s publish/game/index.html
+          test -s publish/game/modules/phase393_quest_table_surface.js
+          test -s publish/game/modules/phase393_quest_eric_seat.js
+          test -s publish/game/modules/phase393_quest_table_eric_seat_calibration.js
           test -s publish/game/android-stable.html
-          test -s publish/game/modules/phase392_android_gameplay.js
-          test -s publish/game/styles/phase392_android_gameplay.css
-          test -s publish/support-chat-bot.js
-          test -s publish/site-local-counter.js
-          grep -q 'PHASE-392-PUBLIC-ANDROID-SHOWCASE-POLISH-LOCK' publish/deploy-health.json
-          grep -q '"androidContinuousPlay": true' publish/deploy-health.json
-          grep -q '"duplicateFloatingMenuRemoved": true' publish/deploy-health.json
+          test -s publish/game/modules/phase393_android_common.js
+          test -s publish/game/modules/phase393_android_evaluator.js
+          test -s publish/game/modules/phase393_android_gameplay.js
+          test -s publish/game/styles/phase393_android_table_layout.css
+          grep -q 'PHASE-393-DUAL-DEVICE-CALIBRATION-LOCK' publish/deploy-health.json
+          grep -q '"questEricFloorAnchored": true' publish/deploy-health.json
+          grep -q '"androidTurnClockSeconds": 15' publish/deploy-health.json
+
       - name: Publish
         shell: bash
         working-directory: publish
@@ -149,8 +165,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 392.'
+            echo 'Production already matches Phase 393.'
           else
-            git commit -m "Deploy Phase 392 platform polish ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 393 dual-device calibration ${GITHUB_SHA}"
             git push origin gh-pages
           fi

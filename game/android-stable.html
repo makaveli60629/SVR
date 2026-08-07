@@ -6,63 +6,83 @@
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>SVR Poker Android</title>
-<link rel="stylesheet" href="./styles/phase392_android_gameplay.css?v=phase392">
+<title>SVR Poker Android Phase 393</title>
+<link rel="stylesheet" href="./styles/phase393_android_table_layout.css?v=phase393">
 </head>
-<body data-build="PHASE-392-ANDROID-CONTINUOUS-PLAY-RANKING-LOCK" data-platform="android">
+<body data-build="PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK" data-platform="android">
 <section id="gate" class="gate">
   <div class="gate-card">
     <img src="/logo.png" alt="SVR Poker">
-    <div id="platformBadge" class="platform-badge">ANDROID TOUCH VERSION</div>
+    <div class="platform-badge">ANDROID TOUCH VERSION</div>
     <h1>SVR POKER</h1>
-    <p class="gate-note" id="platformMessage">This is the Android touch version, not the VR version. Quest players should use Enter VR.</p>
+    <p>This is the Android touch game, not the Quest VR version.</p>
     <div class="gate-actions">
-      <button id="join" class="btn primary">JOIN NOW</button>
-      <button id="update" class="btn">CHECK UPDATE</button>
+      <button id="join" class="btn primary">JOIN TABLE</button>
+      <button id="soundGate" class="btn">SOUND ON</button>
       <a class="btn" href="/downloads/svr-poker-android-rc2.apk" download>DOWNLOAD APK</a>
-      <a class="btn" href="/game/quest.html?v=phase392">QUEST / ENTER VR</a>
+      <a class="btn" href="/game/quest.html?v=phase393">QUEST / ENTER VR</a>
     </div>
-    <p id="gateStatus">Local play-money table ready. Continuous hands, burn-and-turn cards, XP, ranks, winner effects, and sponsor zones are active.</p>
+    <p id="gateStatus">Perimeter seating, larger cards, 15-second turns, custom raises, table sounds, ranks, and sponsor panels are ready.</p>
   </div>
 </section>
 
 <main id="table" class="shell hide">
-  <div class="topbar">
-    <div class="profile-pill"><div class="profile-avatar" id="userAvatar">YOU</div><div class="profile-text"><strong id="userName">YOU</strong><span id="rankText">ROOKIE I • 0 XP</span><div class="xp-track"><i id="xpFill"></i></div></div></div>
-    <div class="brand-pill"><img src="/logo.png" alt="SVR Poker"><span>ANDROID EDITION</span></div>
-    <div class="pot-pill"><strong id="stack">STACK $15,000</strong><span id="handCounter">HAND 0</span></div>
-  </div>
-  <h2 id="status" class="status">YOUR TURN</h2>
+  <header class="topbar">
+    <div class="profile-pill">
+      <div class="profile-avatar" id="userAvatar">Y</div>
+      <div class="profile-text"><strong id="userName">YOU</strong><span id="rankText">ROOKIE I • 0 XP</span><div class="xp-track"><i id="xpFill"></i></div></div>
+    </div>
+    <div class="brand-pill"><img src="/logo.png" alt="SVR Poker"><span>ANDROID TABLE</span></div>
+    <div class="stack-pill"><strong id="stack">STACK $15,000</strong><span id="handCounter">HAND 0</span></div>
+  </header>
+
+  <section class="turn-strip" aria-live="polite">
+    <strong id="status">WAITING FOR HAND</strong>
+    <span id="turnClock" class="turn-clock">15</span>
+  </section>
+
   <section class="table-wrap">
     <div class="table-surface">
       <div class="table-logo" aria-hidden="true"></div>
       <div class="center-pot" id="potTarget"><small>POT</small><span id="pot">$0</span></div>
-      <aside class="sponsor-zone left" id="sponsorLeft"><img src="/logo.png" alt=""><span>SVR POKER</span></aside>
-      <aside class="sponsor-zone right" id="sponsorRight"><img src="/logo.png" alt=""><span>SPONSOR OPEN</span></aside>
-      <div class="deck-zone"><div class="deck-card" id="deckCard"><img src="/logo.png" alt="SVR card back"></div><span class="burn-label" id="burnLabel">DECK READY</span></div>
-      <div id="players" class="players"></div>
-      <div class="board-zone"><span class="label board-label">BOARD</span><div id="community" class="cards"></div><span class="label hole-label">YOU</span><div id="hole" class="cards"></div></div>
+      <div class="deck-zone"><div class="deck-card" id="deckCard"><img src="/logo.png" alt="SVR card back"></div><span id="burnLabel">DECK READY</span></div>
+      <div id="players" class="players" aria-label="Opponent seats"></div>
+      <aside class="sponsor-zone sponsor-left" id="sponsorLeft"><img src="/logo.png" alt="SVR Poker"><span>SVR POKER</span></aside>
+      <aside class="sponsor-zone sponsor-right" id="sponsorRight"><img src="/logo.png" alt="Sponsor"><span>SPONSOR OPEN</span></aside>
+      <div class="board-zone">
+        <div class="board-row"><span class="zone-label">BOARD</span><div id="community" class="cards community-cards"></div></div>
+        <div class="hole-row"><span class="zone-label">YOU</span><div id="hole" class="cards hole-cards"></div></div>
+      </div>
+      <div id="tableMessage" class="table-message">TABLE READY</div>
     </div>
   </section>
+
+  <section id="raisePanel" class="raise-panel" aria-label="Raise amount">
+    <div class="raise-head"><strong>CUSTOM RAISE</strong><span id="raiseAmount">$500</span></div>
+    <input id="raiseSlider" type="range" min="200" max="15000" value="500" step="100" aria-label="Raise amount">
+    <div class="raise-presets"><button data-bet="half">½ POT</button><button data-bet="pot">POT</button><button data-bet="min">MIN</button><button data-bet="max">MAX</button></div>
+  </section>
+
   <div class="actions">
     <button data-a="fold">FOLD</button>
     <button data-a="call">CHECK</button>
-    <button data-a="raise">RAISE $200</button>
+    <button data-a="raise">RAISE $500</button>
     <button data-a="allin">ALL IN</button>
   </div>
-  <div class="footer">
+
+  <footer class="footer">
     <button id="next" class="hide">NEXT HAND</button>
     <button id="leave">LEAVE TABLE</button>
-    <a href="/site/profile.html?v=phase392">PROFILE</a>
+    <button id="soundToggle">SOUND ON</button>
+    <a href="/site/profile.html?v=phase393">PROFILE</a>
     <a href="/downloads/svr-poker-android-rc2.apk" download>APK</a>
-  </div>
+  </footer>
 </main>
 
-<div id="outOverlay" class="overlay hide"><div class="overlay-card"><h2>OUT OF PLAY CHIPS</h2><p>Your stack reached $0. Continuous play has stopped.</p><button id="restartChips" class="btn primary">RESTART WITH $15,000</button><button id="outLeave" class="btn">LEAVE TABLE</button></div></div>
+<div id="outOverlay" class="overlay hide"><div class="overlay-card"><h2>OUT OF PLAY CHIPS</h2><p>Your stack reached $0. Continuous play stopped.</p><button id="restartChips" class="btn primary">RESTART WITH $15,000</button><button id="outLeave" class="btn">LEAVE TABLE</button></div></div>
 <div id="chipLayer" class="chip-layer"></div>
 <div id="fxLayer" class="fx-layer"></div>
 <div id="winnerBanner" class="winner-banner"></div>
-
-<script src="./modules/phase392_android_gameplay.js?v=phase392"></script>
+<script type="module" src="./modules/phase393_android_gameplay.js?v=phase393"></script>
 </body>
 </html>
