@@ -28,7 +28,7 @@ jobs:
           grep -q 'PHASE-393-DUAL-DEVICE-CALIBRATION-LOCK' index.html
           test "$(grep -o 'class=\"btn ' index.html | wc -l)" -eq 3
           grep -q 'game/quest.html?v=phase393' index.html
-          grep -q 'game/android.html?channel=stable&amp;v=phase393' index.html
+          grep -q 'game/android.html?channel=stable&v=phase393' index.html
           grep -q 'phase393-dual-device-calibration' site-public-hooks.js
           grep -q 'phase393-dual-device-calibration-v1' sw.js
           grep -q 'phase393-dual-device-calibration-v1' pwa-sw.js
@@ -59,6 +59,7 @@ jobs:
           grep -q 'SEATED_RAIL_GAP=.14' game/modules/phase393_quest_eric_seat.js
           grep -q 'SEATED_EYE_HEIGHT=1.18' game/modules/phase393_quest_eric_seat.js
           grep -q 'svrPhase393StableFloorOffset' game/modules/phase393_quest_eric_seat.js
+          grep -q 'svrPhase393BaseQuaternion' game/modules/phase393_quest_eric_seat.js
           grep -q 'PHASE393_ERIC_DEALING_CARD' game/modules/phase393_quest_eric_seat.js
           grep -q 'rootMotionLocked' game/modules/phase393_quest_eric_seat.js
           grep -q 'playersNormalized' game/modules/phase393_quest_eric_seat.js
