@@ -1,4 +1,4 @@
-name: Phase 394 Android Polish and Quest Regression Audit
+name: Phase 395 Quest Browser and Table Gameplay Audit
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: phase394-audit-${{ github.ref }}
+  group: phase395-quest-audit-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -21,23 +21,55 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Validate protected Quest calibration
+      - name: Validate Quest Browser public-page centering
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK' game/quest.html
-          grep -q 'PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK' game/index.html
-          grep -q 'phase393_quest_table_eric_seat_calibration.js' game/index.html
-          grep -q 'SVR_PHASE393_QUEST_SWEEP' game/index.html
-          grep -q 'SVR_PHASE393_QUEST_QA' game/modules/phase393_quest_table_eric_seat_calibration.js
-          grep -q 'TARGET_TABLE_WIDTH=3.35' game/modules/phase393_quest_table_surface.js
-          grep -q 'TARGET_TABLE_TOP=.98' game/modules/phase393_quest_table_surface.js
-          grep -q 'TARGET_TABLE_BOTTOM=-.08' game/modules/phase393_quest_table_surface.js
-          grep -q 'TARGET_ERIC_HEIGHT=1.78' game/modules/phase393_quest_eric_seat.js
-          grep -q 'svrPhase393StableFloorOffset' game/modules/phase393_quest_eric_seat.js
-          grep -q 'svrPhase393BaseQuaternion' game/modules/phase393_quest_eric_seat.js
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' index.html
+          grep -q 'quest-browser' index.html
+          grep -q 'launch-quest.css?v=phase395' index.html
+          grep -q 'game/quest.html?v=phase395' index.html
+          grep -q 'game/android.html?channel=stable&v=phase394' index.html
+          grep -q 'PHASE-395-QUEST-BROWSER-PUBLIC-PAGE-CENTER-LOCK' launch-quest.css
+          grep -q 'place-items:center' launch-quest.css
+          grep -q 'margin:0 auto' launch-quest.css
+          grep -q 'phase395-quest-browser-table-gameplay-fix' site-public-hooks.js
+          grep -q "ANDROID_PHASE='phase394'" site-public-hooks.js
 
-      - name: Validate Phase 394 Android presentation
+      - name: Validate Phase 395 Quest table, dealer, seat, cards, and lighting
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' game/quest.html
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' game/index.html
+          grep -q 'phase395_quest_browser_table_gameplay_fix.js?v=phase395' game/index.html
+          grep -q 'phase395_quest_eric_floor_guard.js?v=phase395' game/index.html
+          grep -q 'SVR_PHASE395_QUEST_SWEEP' game/index.html
+          grep -q 'SVR_PHASE395_QUEST_QA' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'TARGET_TABLE_WIDTH=3.58' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'TARGET_TABLE_TOP=1.03' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'TARGET_TABLE_BOTTOM=-0.015' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'TARGET_FELT_RECESS=0.12' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'DEALER_GAP=0.22' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SEATED_RAIL_GAP=0.10' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SEATED_EYE_HEIGHT=1.22' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'detectBaseLine' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SVR_PHASE341_REBUILD' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'cardMeshesReady' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SVR_POKER_NEXT_HAND' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'PHASE395_QUEST_TABLE_LIGHTING' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'HemisphereLight' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'PointLight' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SVR_PHASE395_ERIC_HARD_GUARD_QA' game/modules/phase395_quest_eric_floor_guard.js
+          grep -q 'supersededByPhase395' game/modules/phase393_quest_table_eric_seat_calibration.js
+          grep -q '"phase": 395' game/manifest.json
+          grep -q '"questBrowserCentered": true' update/app-version.json
+          grep -q '"questTableTargetWidthMeters": 3.58' update/app-version.json
+          grep -q '"questEricDealerGapMeters": 0.22' update/app-version.json
+          grep -q '"questSeatedRailGapMeters": 0.10' update/app-version.json
+          grep -q '"questLightingBoost": true' update/app-version.json
+
+      - name: Validate locked Android Phase 394 regression
         shell: bash
         run: |
           set -euo pipefail
@@ -48,47 +80,19 @@ jobs:
           grep -q 'phase394_android_table_polish.js' game/android-stable.html
           grep -q 'id="burnZone"' game/android-stable.html
           grep -q 'id="burnSlot"' game/android-stable.html
-          grep -q 'id="burnCard"' game/android-stable.html
           grep -q 'id="featuredSponsor"' game/android-stable.html
-          grep -q 'REIKI' game/android-stable.html
-          grep -q 'SVR_ANDROID_FEATURED_SPONSOR' game/modules/phase394_android_table_polish.js
           grep -q 'SVR_PHASE394_ANDROID_POLISH_QA' game/modules/phase394_android_table_polish.js
           grep -q 'SVR_PHASE394_ANDROID_WRAPPER_QA' game/android-tabletop.html
-          grep -q 'SVR_PHASE393_ANDROID_WRAPPER_QA' game/android-tabletop.html
-          grep -q 'burnTrayFlip' game/styles/phase394_android_table_polish.css
-          grep -q '.center-pot{top:59%' game/styles/phase394_android_table_polish.css
-          grep -q '.community-cards .card' game/styles/phase394_android_table_polish.css
-          grep -q '.featured-sponsor' game/styles/phase394_android_table_polish.css
-          grep -q '"phase": 394' game/manifest.json
-          grep -q '"potBelowLogo": true' game/android-release.json
-          grep -q '"logoCenterUnobstructed": true' game/android-release.json
-          grep -q '"largerCommunityCards": true' game/android-release.json
-          grep -q '"dedicatedBurnTray": true' game/android-release.json
-          grep -q '"animatedBurnTransfer": true' game/android-release.json
-          grep -q '"featuredSponsorAboveLogo": true' game/android-release.json
-          grep -q '"featuredSponsorDefault": "REIKI"' game/android-release.json
-          grep -q '"sponsorZones": 3' game/android-release.json
-
-      - name: Validate Phase 393 Android gameplay regression
-        shell: bash
-        run: |
-          set -euo pipefail
-          grep -q 'PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK' game/android-stable.html
-          grep -q 'phase393_android_table_layout.css' game/android-stable.html
-          grep -q 'phase393_android_gameplay.js' game/android-stable.html
-          grep -q 'id="raiseSlider"' game/android-stable.html
-          grep -q 'id="turnClock"' game/android-stable.html
-          grep -q 'id="soundToggle"' game/android-stable.html
-          grep -q 'TURN_SECONDS=15' game/modules/phase393_android_common.js
-          grep -q 'function beginTurn' game/modules/phase393_android_gameplay.js
-          grep -q 'function presetRaise' game/modules/phase393_android_gameplay.js
           grep -q 'SVR_PHASE393_ANDROID_QA' game/modules/phase393_android_gameplay.js
-          grep -q 'player-box\[data-seat="1"\]' game/styles/phase393_android_table_layout.css
-          grep -q 'player-box\[data-seat="5"\]' game/styles/phase393_android_table_layout.css
-          grep -q '"centerPlayerCount": 0' game/android-release.json
-          grep -q '"timeoutFacingBet": "auto-fold"' game/android-release.json
+          grep -q 'TURN_SECONDS=15' game/modules/phase393_android_common.js
+          grep -q 'id="raiseSlider"' game/android-stable.html
+          grep -q 'id="soundToggle"' game/android-stable.html
+          grep -q '"potBelowLogo": true' game/android-release.json
+          grep -q '"dedicatedBurnTray": true' game/android-release.json
+          grep -q '"featuredSponsorDefault": "REIKI"' game/android-release.json
+          grep -q '"lockedUnchangedForPhase395": true' game/manifest.json
 
-      - name: Validate syntax, JSON, files, and APK policy
+      - name: Validate syntax, JSON, files, cache, and APK policy
         shell: bash
         run: |
           set -euo pipefail
@@ -96,21 +100,24 @@ jobs:
           python3 -m json.tool game/manifest.json >/dev/null
           python3 -m json.tool game/android-release.json >/dev/null
           python3 -m json.tool update/app-version.json >/dev/null
+          python3 -m json.tool docs/PHASE_395_QUEST_BROWSER_TABLE_GAMEPLAY_FIX.json >/dev/null
           node --check site-public-hooks.js
           node --check sw.js
           node --check pwa-sw.js
+          node --check game/modules/phase395_quest_browser_table_gameplay_fix.js
+          node --check game/modules/phase395_quest_eric_floor_guard.js
+          node --check game/modules/phase393_quest_table_eric_seat_calibration.js
           node --check game/modules/phase393_android_common.js
           node --check game/modules/phase393_android_evaluator.js
           node --check game/modules/phase393_android_gameplay.js
           node --check game/modules/phase394_android_table_polish.js
-          node --check game/modules/phase393_quest_table_surface.js
-          node --check game/modules/phase393_quest_eric_seat.js
-          node --check game/modules/phase393_quest_table_eric_seat_calibration.js
-          test -s game/styles/phase393_android_table_layout.css
-          test -s game/styles/phase394_android_table_polish.css
+          grep -q 'svr-poker-phase395-quest-browser-table-gameplay-v1' sw.js
+          grep -q 'svr-poker-phase395-quest-browser-table-gameplay-v1' pwa-sw.js
+          test -s launch-quest.css
           test -s game/assets/models/table.glb
           test -s game/assets/models/eric/eric.fbx
           test -s downloads/svr-poker-android-rc2.apk
+          test -s docs/PHASE_395_QUEST_BROWSER_TABLE_GAMEPLAY_FIX.md
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
           grep -q '"apkVersionCode": 2' game/android-release.json
           grep -q '"forceUpdate": false' game/android-release.json
