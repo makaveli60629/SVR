@@ -1,0 +1,25 @@
+{
+  "phase": 394,
+  "build": "PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK",
+  "scope": "android-presentation-only",
+  "protectedAndroidCore": "PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK",
+  "protectedQuestBuild": "PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK",
+  "changes": {
+    "potBelowLogo": true,
+    "logoCenterUnobstructed": true,
+    "largerCommunityCards": true,
+    "dedicatedBurnTray": true,
+    "animatedBurnTransfer": true,
+    "burnCardBackProtected": true,
+    "featuredSponsorAboveLogo": true,
+    "featuredSponsorDefault": "REIKI",
+    "featuredSponsorConfig": "window.SVR_ANDROID_FEATURED_SPONSOR"
+  },
+  "apk": {
+    "versionName": "0.1.0-rc2",
+    "versionCode": 2,
+    "forceUpdate": false,
+    "showUpdatePrompt": false,
+    "nativeRebuild": false
+  }
+}
