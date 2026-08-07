@@ -2,7 +2,7 @@ const SVR_CACHE='svr-poker-phase395-quest-browser-table-gameplay-v1';
 const CORE=[
   '/offline.html','/logo.png','/manifest.webmanifest?v=phase395','/site-public-hooks.js?v=phase395','/launch-quest.css?v=phase395',
   '/game/quest.html?v=phase395','/game/index.html?platform=quest&v=phase395&direct=1&autoseat=1&questfix=1&clean=1',
-  '/game/modules/phase395_quest_browser_table_gameplay_fix.js?v=phase395','/game/modules/phase393_quest_table_eric_seat_calibration.js?v=phase395',
+  '/game/modules/phase395_quest_browser_table_gameplay_fix.js?v=phase395','/game/modules/phase395_quest_eric_floor_guard.js?v=phase395','/game/modules/phase393_quest_table_eric_seat_calibration.js?v=phase395',
   '/game/android.html?channel=stable&v=phase394','/game/android-tabletop.html?v=phase394','/game/android-stable.html?v=phase394',
   '/game/styles/phase393_android_table_layout.css?v=phase393','/game/styles/phase394_android_table_polish.css?v=phase394','/game/modules/phase393_android_common.js?v=phase393','/game/modules/phase393_android_evaluator.js?v=phase393','/game/modules/phase393_android_gameplay.js?v=phase393','/game/modules/phase394_android_table_polish.js?v=phase394',
   '/game/camera3-showcase.html?v=phase392','/site/avatar.html?v=phase392','/site/profile.html?v=phase392'
