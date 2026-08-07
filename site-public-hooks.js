@@ -2,11 +2,11 @@
   const ADMIN_KEY='svr_admin_presence';
   const MESSAGE_KEY='svr_public_messages';
   const CACHE_EPOCH_KEY='svr_public_cache_epoch';
-  const CACHE_EPOCH='phase395-quest-browser-table-gameplay-fix';
-  const CURRENT_PHASE='phase395';
+  const CACHE_EPOCH='phase396-seated-quest-android-dealer';
+  const CURRENT_PHASE='phase396';
   const SITE_PHASE='phase392';
   const AVATAR_PHASE='phase392';
-  const ANDROID_PHASE='phase394';
+  const ANDROID_PHASE='phase396';
 
   async function refreshRuntimeCaches(){
     try{
@@ -17,11 +17,11 @@
         localStorage.setItem(CACHE_EPOCH_KEY,CACHE_EPOCH);
       }
       if('serviceWorker'in navigator)await navigator.serviceWorker.register(`/sw.js?v=${CURRENT_PHASE}`,{scope:'/'});
-    }catch(error){console.warn('SVR Phase 395 cache recovery could not complete.',error)}
+    }catch(error){console.warn('SVR Phase 396 cache recovery could not complete.',error)}
   }
   function getAdminState(){const qs=new URLSearchParams(location.search),override=qs.get('admin');if(override==='online'||override==='offline'){localStorage.setItem(ADMIN_KEY,override);return override}return localStorage.getItem(ADMIN_KEY)||'offline'}
   function paintAdminState(){const current=getAdminState();document.querySelectorAll('.admin-status').forEach(element=>{element.dataset.state=current;element.classList.toggle('online',current==='online');element.classList.toggle('offline',current!=='online');element.textContent=current==='online'?'● Admin Online':'● Admin Offline'})}
-  function paintPhaseBadge(){if(document.getElementById('svr-phase-live-badge'))return;const badge=document.createElement('div');badge.id='svr-phase-live-badge';badge.textContent='● PHASE 395 QUEST TEST';badge.setAttribute('aria-label','SVR Poker Phase 395 Quest browser and seated gameplay test');Object.assign(badge.style,{position:'fixed',top:'12px',right:'12px',zIndex:'2147483647',padding:'7px 11px',border:'1px solid #8dffb4',borderRadius:'999px',background:'rgba(0,12,18,.92)',color:'#8dffb4',font:'800 11px/1.1 system-ui,Arial,sans-serif',letterSpacing:'.08em',boxShadow:'0 0 24px rgba(141,255,180,.2)'});document.body.appendChild(badge);document.body.dataset.deployPhase=CURRENT_PHASE}
+  function paintPhaseBadge(){if(document.getElementById('svr-phase-live-badge'))return;const badge=document.createElement('div');badge.id='svr-phase-live-badge';badge.textContent='● PHASE 396 TABLE PLAY';badge.setAttribute('aria-label','SVR Poker Phase 396 seated Quest and Android dealer rotation polish');Object.assign(badge.style,{position:'fixed',top:'12px',right:'12px',zIndex:'2147483647',padding:'7px 11px',border:'1px solid #8dffb4',borderRadius:'999px',background:'rgba(0,12,18,.92)',color:'#8dffb4',font:'800 11px/1.1 system-ui,Arial,sans-serif',letterSpacing:'.08em',boxShadow:'0 0 24px rgba(141,255,180,.2)'});document.body.appendChild(badge);document.body.dataset.deployPhase=CURRENT_PHASE}
   function normalizePublicLinks(){
     document.querySelectorAll('a[href]').forEach(anchor=>{
       let url;try{url=new URL(anchor.getAttribute('href'),location.href)}catch{return}if(url.origin!==location.origin)return;
