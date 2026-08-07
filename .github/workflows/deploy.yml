@@ -36,50 +36,65 @@ jobs:
           git -C source fetch origin main --depth=1
           test "$(git -C source rev-parse HEAD)" = "$(git -C source rev-parse origin/main)"
 
-      - name: Validate Phase 394 Android polish and protected Quest core
+      - name: Validate Phase 395 Quest and locked Android Phase 394
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-393-DUAL-DEVICE-CALIBRATION-LOCK' source/index.html
-          grep -q 'PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK' source/game/index.html
-          grep -q 'phase393_quest_table_eric_seat_calibration.js' source/game/index.html
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' source/index.html
+          grep -q 'launch-quest.css?v=phase395' source/index.html
+          grep -q 'game/quest.html?v=phase395' source/index.html
+          grep -q 'game/android.html?channel=stable&v=phase394' source/index.html
+          grep -q 'PHASE-395-QUEST-BROWSER-PUBLIC-PAGE-CENTER-LOCK' source/launch-quest.css
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' source/game/quest.html
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' source/game/index.html
+          grep -q 'phase395_quest_browser_table_gameplay_fix.js?v=phase395' source/game/index.html
+          grep -q 'phase395_quest_eric_floor_guard.js?v=phase395' source/game/index.html
+          grep -q 'TARGET_TABLE_WIDTH=3.58' source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'TARGET_TABLE_TOP=1.03' source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'TARGET_TABLE_BOTTOM=-0.015' source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'TARGET_FELT_RECESS=0.12' source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'DEALER_GAP=0.22' source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SEATED_RAIL_GAP=0.10' source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SEATED_EYE_HEIGHT=1.22' source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SVR_PHASE341_REBUILD' source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SVR_POKER_NEXT_HAND' source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'PHASE395_QUEST_TABLE_LIGHTING' source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SVR_PHASE395_ERIC_HARD_GUARD_QA' source/game/modules/phase395_quest_eric_floor_guard.js
+          grep -q 'supersededByPhase395' source/game/modules/phase393_quest_table_eric_seat_calibration.js
+          grep -q '"phase": 395' source/game/manifest.json
+          grep -q '"lockedUnchangedForPhase395": true' source/game/manifest.json
+
+          # Android Phase 394 is a protected production baseline for this Quest-only phase.
           grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' source/game/android.html
           grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' source/game/android-tabletop.html
           grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' source/game/android-stable.html
           grep -q 'phase394_android_table_polish.css' source/game/android-stable.html
           grep -q 'phase394_android_table_polish.js' source/game/android-stable.html
-          grep -q 'id="burnSlot"' source/game/android-stable.html
-          grep -q 'id="featuredSponsor"' source/game/android-stable.html
           grep -q 'SVR_PHASE394_ANDROID_POLISH_QA' source/game/modules/phase394_android_table_polish.js
-          grep -q 'SVR_PHASE394_ANDROID_WRAPPER_QA' source/game/android-tabletop.html
-          grep -q 'SVR_PHASE393_ANDROID_WRAPPER_QA' source/game/android-tabletop.html
           grep -q 'SVR_PHASE393_ANDROID_QA' source/game/modules/phase393_android_gameplay.js
-          grep -q 'SVR_PHASE393_QUEST_QA' source/game/modules/phase393_quest_table_eric_seat_calibration.js
           grep -q 'TURN_SECONDS=15' source/game/modules/phase393_android_common.js
-          grep -q 'TARGET_TABLE_TOP=.98' source/game/modules/phase393_quest_table_surface.js
-          grep -q 'TARGET_TABLE_BOTTOM=-.08' source/game/modules/phase393_quest_table_surface.js
-          grep -q 'PHASE393_VISIBLE_RECESSED_INNER_FELT' source/game/modules/phase393_quest_table_surface.js
-          grep -q '"phase": 394' source/game/manifest.json
           grep -q '"potBelowLogo": true' source/game/android-release.json
-          grep -q '"largerCommunityCards": true' source/game/android-release.json
           grep -q '"dedicatedBurnTray": true' source/game/android-release.json
           grep -q '"featuredSponsorDefault": "REIKI"' source/game/android-release.json
+
           node --check source/site-public-hooks.js
+          node --check source/sw.js
+          node --check source/pwa-sw.js
+          node --check source/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          node --check source/game/modules/phase395_quest_eric_floor_guard.js
+          node --check source/game/modules/phase393_quest_table_eric_seat_calibration.js
           node --check source/game/modules/phase393_android_common.js
           node --check source/game/modules/phase393_android_evaluator.js
           node --check source/game/modules/phase393_android_gameplay.js
           node --check source/game/modules/phase394_android_table_polish.js
-          node --check source/game/modules/phase393_quest_table_surface.js
-          node --check source/game/modules/phase393_quest_eric_seat.js
-          node --check source/game/modules/phase393_quest_table_eric_seat_calibration.js
-          node --check source/sw.js
-          node --check source/pwa-sw.js
           python3 -m json.tool source/manifest.webmanifest >/dev/null
           python3 -m json.tool source/game/manifest.json >/dev/null
           python3 -m json.tool source/game/android-release.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
-          test -s source/game/styles/phase393_android_table_layout.css
-          test -s source/game/styles/phase394_android_table_polish.css
+          python3 -m json.tool source/docs/PHASE_395_QUEST_BROWSER_TABLE_GAMEPLAY_FIX.json >/dev/null
+          test -s source/launch-quest.css
+          test -s source/game/assets/models/table.glb
+          test -s source/game/assets/models/eric/eric.fbx
           test -s source/support-chat-bot.js
           test -s source/site-local-counter.js
           test -s source/downloads/svr-poker-android-rc2.apk
@@ -94,7 +109,7 @@ jobs:
         run: |
           set -euo pipefail
           find publish -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-          for file in index.html launch.css matrix.js site-public-hooks.js site-local-counter.js support-chat-bot.js manifest.webmanifest pwa-sw.js sw.js offline.html logo.png logo.webp CNAME .nojekyll; do
+          for file in index.html launch.css launch-quest.css matrix.js site-public-hooks.js site-local-counter.js support-chat-bot.js manifest.webmanifest pwa-sw.js sw.js offline.html logo.png logo.webp CNAME .nojekyll; do
             [ -e "source/$file" ] && cp "source/$file" "publish/$file"
           done
           cp -a source/game publish/game
@@ -112,8 +127,8 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK",
-            "questBuild": "PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK",
+            "build": "PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK",
+            "questBuild": "PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK",
             "androidBuild": "PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK",
             "androidCoreBuild": "PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK",
             "camera3Build": "PHASE-392-CAMERA3-TABLE-SHOWCASE-LOCK",
@@ -122,22 +137,26 @@ jobs:
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "sourceBranch": "main",
             "publishBranch": "gh-pages",
-            "questRoute": "/game/quest.html?v=phase393",
-            "questRuntimeRoute": "/game/index.html?platform=quest&v=phase393&direct=1&autoseat=1&questfix=1&clean=1",
+            "questRoute": "/game/quest.html?v=phase395",
+            "questRuntimeRoute": "/game/index.html?platform=quest&v=phase395&direct=1&autoseat=1&questfix=1&clean=1",
             "androidRoute": "/game/android.html?channel=stable&v=phase394",
             "androidGameplayRoute": "/game/android-stable.html?v=phase394&direct=1",
-            "questTableWidthMeters": 3.35,
-            "questTableTopMeters": 0.98,
-            "questTableBottomMeters": -0.08,
-            "questFeltRecessMeters": 0.11,
-            "questBlackCoverDisabled": true,
-            "questCardsRaisedAboveFelt": true,
+            "questBrowserCentered": true,
+            "questTableWidthMeters": 3.58,
+            "questTableTopMeters": 1.03,
+            "questTableBottomFallbackMeters": -0.015,
+            "questBaseLineAlignedToFloor": true,
+            "questFeltRecessMeters": 0.12,
             "questEricFloorAnchored": true,
-            "questEricRootMotionLocked": true,
-            "questEricDealingAnimation": true,
-            "questPlayersNormalized": true,
-            "questSeatedRailGapMeters": 0.14,
-            "questSeatedEyeHeightMeters": 1.18,
+            "questEricHardFloorGuard": true,
+            "questEricDealerGapMeters": 0.22,
+            "questSeatedRailGapMeters": 0.10,
+            "questSeatedEyeHeightMeters": 1.22,
+            "questMinimumPhysicalCardMeshes": 17,
+            "questCardsRebuiltAfterFinalCalibration": true,
+            "questAutoStartTestHandWhenIdle": true,
+            "questLightingBoost": true,
+            "androidLockedUnchangedForPhase395": true,
             "androidPerimeterSeats": 5,
             "androidCenterPlayerCount": 0,
             "androidTurnClockSeconds": 15,
@@ -166,10 +185,11 @@ jobs:
         run: |
           set -euo pipefail
           test -s publish/index.html
+          test -s publish/launch-quest.css
           test -s publish/game/quest.html
           test -s publish/game/index.html
-          test -s publish/game/modules/phase393_quest_table_surface.js
-          test -s publish/game/modules/phase393_quest_eric_seat.js
+          test -s publish/game/modules/phase395_quest_browser_table_gameplay_fix.js
+          test -s publish/game/modules/phase395_quest_eric_floor_guard.js
           test -s publish/game/modules/phase393_quest_table_eric_seat_calibration.js
           test -s publish/game/android-stable.html
           test -s publish/game/modules/phase393_android_common.js
@@ -178,11 +198,12 @@ jobs:
           test -s publish/game/modules/phase394_android_table_polish.js
           test -s publish/game/styles/phase393_android_table_layout.css
           test -s publish/game/styles/phase394_android_table_polish.css
-          grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' publish/deploy-health.json
-          grep -q '"questEricFloorAnchored": true' publish/deploy-health.json
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' publish/deploy-health.json
+          grep -q '"questBrowserCentered": true' publish/deploy-health.json
+          grep -q '"questEricHardFloorGuard": true' publish/deploy-health.json
+          grep -q '"questMinimumPhysicalCardMeshes": 17' publish/deploy-health.json
+          grep -q '"androidLockedUnchangedForPhase395": true' publish/deploy-health.json
           grep -q '"androidPotBelowLogo": true' publish/deploy-health.json
-          grep -q '"androidLargerCommunityCards": true' publish/deploy-health.json
-          grep -q '"androidDedicatedBurnTray": true' publish/deploy-health.json
           grep -q '"androidFeaturedSponsorDefault": "REIKI"' publish/deploy-health.json
 
       - name: Publish
@@ -194,8 +215,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 394 Android polish.'
+            echo 'Production already matches Phase 395 Quest fixes.'
           else
-            git commit -m "Deploy Phase 394 Android table polish ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 395 Quest browser and gameplay fix ${GITHUB_SHA}"
             git push origin gh-pages
           fi
