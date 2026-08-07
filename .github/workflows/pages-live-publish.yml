@@ -32,35 +32,43 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 394 Android polish production payload
+      - name: Verify Phase 395 Quest production payload
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-393-DUAL-DEVICE-CALIBRATION-LOCK' index.html
-          grep -q 'PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK' game/index.html
-          grep -q 'phase393_quest_table_eric_seat_calibration.js' game/index.html
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' index.html
+          grep -q 'launch-quest.css?v=phase395' index.html
+          grep -q 'PHASE-395-QUEST-BROWSER-PUBLIC-PAGE-CENTER-LOCK' launch-quest.css
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' game/quest.html
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' game/index.html
+          grep -q 'phase395_quest_browser_table_gameplay_fix.js?v=phase395' game/index.html
+          grep -q 'phase395_quest_eric_floor_guard.js?v=phase395' game/index.html
+          test -s game/modules/phase395_quest_browser_table_gameplay_fix.js
+          test -s game/modules/phase395_quest_eric_floor_guard.js
+          grep -q 'TARGET_TABLE_WIDTH=3.58' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'DEALER_GAP=0.22' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SEATED_RAIL_GAP=0.10' game/modules/phase395_quest_browser_table_gameplay_fix.js
+          grep -q 'SVR_PHASE395_ERIC_HARD_GUARD_QA' game/modules/phase395_quest_eric_floor_guard.js
+
+          # Protected Android remains the approved Phase 394 table.
           grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' game/android-stable.html
-          grep -q 'phase393_android_gameplay.js' game/android-stable.html
-          grep -q 'phase393_android_table_layout.css' game/android-stable.html
           grep -q 'phase394_android_table_polish.css' game/android-stable.html
           grep -q 'phase394_android_table_polish.js' game/android-stable.html
-          grep -q 'id="burnSlot"' game/android-stable.html
-          grep -q 'id="featuredSponsor"' game/android-stable.html
-          test -s game/modules/phase393_quest_table_surface.js
-          test -s game/modules/phase393_quest_eric_seat.js
-          test -s game/modules/phase393_quest_table_eric_seat_calibration.js
-          test -s game/modules/phase393_android_common.js
-          test -s game/modules/phase393_android_evaluator.js
           test -s game/modules/phase393_android_gameplay.js
           test -s game/modules/phase394_android_table_polish.js
           test -s game/styles/phase393_android_table_layout.css
           test -s game/styles/phase394_android_table_polish.css
-          grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' deploy-health.json
-          grep -q '"questTableTopMeters": 0.98' deploy-health.json
-          grep -q '"questEricFloorAnchored": true' deploy-health.json
-          grep -q '"androidPotBelowLogo": true' deploy-health.json
-          grep -q '"androidLargerCommunityCards": true' deploy-health.json
-          grep -q '"androidDedicatedBurnTray": true' deploy-health.json
+
+          grep -q 'PHASE-395-QUEST-BROWSER-TABLE-GAMEPLAY-FIX-LOCK' deploy-health.json
+          grep -q '"questBrowserCentered": true' deploy-health.json
+          grep -q '"questTableWidthMeters": 3.58' deploy-health.json
+          grep -q '"questBaseLineAlignedToFloor": true' deploy-health.json
+          grep -q '"questEricHardFloorGuard": true' deploy-health.json
+          grep -q '"questEricDealerGapMeters": 0.22' deploy-health.json
+          grep -q '"questSeatedRailGapMeters": 0.10' deploy-health.json
+          grep -q '"questMinimumPhysicalCardMeshes": 17' deploy-health.json
+          grep -q '"questLightingBoost": true' deploy-health.json
+          grep -q '"androidLockedUnchangedForPhase395": true' deploy-health.json
           grep -q '"androidFeaturedSponsorDefault": "REIKI"' deploy-health.json
           test -s downloads/svr-poker-android-rc2.apk
           test -f CNAME
@@ -71,11 +79,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 394 Pages artifact
+      - name: Upload Phase 395 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 394 Android table polish
+      - name: Deploy Phase 395 Quest browser and gameplay fix
         id: deployment
         uses: actions/deploy-pages@v4
