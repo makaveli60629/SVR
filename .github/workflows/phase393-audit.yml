@@ -40,13 +40,10 @@ jobs:
           grep -q '"hardSeatedAtFrontTable": true' game/manifest.json
           grep -q '"tabletopNonCardOverlaysHidden": true' game/manifest.json
 
-      - name: Validate Phase 396 Android rotation polish
+      - name: Validate Phase 396 Android presentation remains preserved
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK' game/android.html
-          grep -q 'PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK' game/android-tabletop.html
-          grep -q 'PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK' game/android-stable.html
           grep -q 'phase396_android_burn_dealer_polish.css?v=phase396' game/android-stable.html
           grep -q 'phase396_android_burn_dealer_polish.js?v=phase396' game/android-stable.html
           grep -q 'burn-zone' game/styles/phase396_android_burn_dealer_polish.css
@@ -55,7 +52,7 @@ jobs:
           grep -q 'dealer-readout' game/styles/phase396_android_burn_dealer_polish.css
           grep -q 'SVR_PHASE396_ANDROID_QA' game/modules/phase396_android_burn_dealer_polish.js
           grep -q 'game.dealer' game/modules/phase396_android_burn_dealer_polish.js
-          grep -q 'SVR_PHASE396_ANDROID_WRAPPER_QA' game/android-tabletop.html
+          grep -q 'SVR_PHASE399_ANDROID_WRAPPER_QA' game/android-tabletop.html
           grep -q '"burnTrayAboveCommunityCards": true' game/manifest.json
           grep -q '"movingDealerButton": true' game/manifest.json
           grep -q '"dealerNameReadout": true' game/manifest.json
@@ -86,7 +83,7 @@ jobs:
           grep -q '"showUpdatePrompt": false' game/android-release.json
           grep -q '"nativeApkRebuild": false' game/android-release.json
 
-      - name: Validate syntax, JSON, files, and cache
+      - name: Validate syntax JSON files and current cache
         shell: bash
         run: |
           set -euo pipefail
@@ -107,9 +104,12 @@ jobs:
           node --check game/modules/phase396_android_burn_dealer_polish.js
           node --check game/modules/phase397_android_action_button_guard.js
           node --check game/modules/phase398_android_raise_rules.js
-          grep -q 'svr-poker-phase396-seated-quest-android-dealer-v1' sw.js
-          grep -q 'svr-poker-phase396-seated-quest-android-dealer-v1' pwa-sw.js
+          node --check game/modules/phase399_android_learning_chips_sponsor.js
+          node --check game/modules/phase399_android_matchmaking_voice.js
+          grep -q 'svr-poker-phase399-android-learning-chips-sponsor-v1' sw.js
+          grep -q 'svr-poker-phase399-android-learning-chips-sponsor-v1' pwa-sw.js
           test -s game/styles/phase396_android_burn_dealer_polish.css
+          test -s game/styles/phase399_android_learning_chips_sponsor.css
           test -s game/assets/models/table.glb
           test -s game/assets/models/eric/eric.fbx
           test -s downloads/svr-poker-android-rc2.apk

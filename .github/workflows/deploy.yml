@@ -36,37 +36,47 @@ jobs:
           git -C source fetch origin main --depth=1
           test "$(git -C source rev-parse HEAD)" = "$(git -C source rev-parse origin/main)"
 
-      - name: Validate Phase 396 payload
+      - name: Validate Phase 399 Android and protected Quest payload
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-396-SEATED-QUEST-ANDROID-DEALER-POLISH-LOCK' source/index.html
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' source/game/quest.html
           grep -q 'phase396_quest_seated_clean_table_deal_lock.js?v=phase396' source/game/index.html
           grep -q 'SVR_PHASE396_TELEPORT_DISABLED=true' source/game/modules/phase396_quest_seated_clean_table_deal_lock.js
-          grep -q 'PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK' source/game/android-stable.html
-          grep -q 'phase396_android_burn_dealer_polish.css?v=phase396' source/game/android-stable.html
-          grep -q 'phase396_android_burn_dealer_polish.js?v=phase396' source/game/android-stable.html
-          grep -q 'SVR_PHASE396_ANDROID_QA' source/game/modules/phase396_android_burn_dealer_polish.js
-          grep -q '"phase": 396' source/game/manifest.json
-          grep -q '"questTeleportEnabled": false' source/update/app-version.json
-          grep -q '"androidMovingDealerButton": true' source/update/app-version.json
+          grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' source/game/android-stable.html
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' source/game/android-stable.html
+          grep -q 'phase399_android_learning_chips_sponsor.css?v=phase399' source/game/android-stable.html
+          grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' source/game/android-stable.html
+          grep -q 'phase399_android_matchmaking_voice.js?v=phase399' source/game/android-stable.html
+          grep -q 'PHASE-399-ANDROID-BEST-FIVE-HAND-EVALUATOR-LOCK' source/game/modules/phase393_android_evaluator.js
+          grep -q 'PHASE-399-ANDROID-LEARNING-CHIPS-SPONSOR-LOCK' source/game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'PHASE-399-ANDROID-MATCHMAKING-VOICE-READY-LOCK' source/game/modules/phase399_android_matchmaking_voice.js
+          grep -q '"phase": 399' source/game/manifest.json
+          grep -q '"androidExactBestFiveEvaluator": true' source/update/app-version.json
+          grep -q '"androidTournamentTicketNonCash": true' source/update/app-version.json
+          grep -q '"androidProductionMatchServerConfigured": false' source/update/app-version.json
+          grep -q '"androidBotFallbackWhenNoMatch": true' source/update/app-version.json
+          grep -q '"androidLiveMultiplayer": false' source/update/app-version.json
           node --check source/site-public-hooks.js
           node --check source/sw.js
           node --check source/pwa-sw.js
           node --check source/game/modules/phase396_quest_seated_clean_table_deal_lock.js
-          node --check source/game/modules/phase396_android_burn_dealer_polish.js
+          node --check source/game/modules/phase393_android_evaluator.js
           node --check source/game/modules/phase393_android_gameplay.js
-          node --check source/game/modules/phase394_android_table_polish.js
+          node --check source/game/modules/phase397_android_action_button_guard.js
+          node --check source/game/modules/phase399_android_learning_chips_sponsor.js
+          node --check source/game/modules/phase399_android_matchmaking_voice.js
           python3 -m json.tool source/manifest.webmanifest >/dev/null
           python3 -m json.tool source/game/manifest.json >/dev/null
           python3 -m json.tool source/game/android-release.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
+          test -s source/game/styles/phase399_android_learning_chips_sponsor.css
           test -s source/game/styles/phase396_android_burn_dealer_polish.css
           test -s source/support-chat-bot.js
           test -s source/site-local-counter.js
           test -s source/downloads/svr-poker-android-rc2.apk
           grep -q '"apkVersionName": "0.1.0-rc2"' source/game/android-release.json
+          grep -q '"apkVersionCode": 2' source/game/android-release.json
           grep -q '"forceUpdate": false' source/game/android-release.json
           grep -q '"showUpdatePrompt": false' source/game/android-release.json
           grep -q '"nativeApkRebuild": false' source/game/android-release.json
@@ -94,17 +104,19 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-396-SEATED-QUEST-ANDROID-DEALER-POLISH-LOCK",
+            "build": "PHASE-399-ANDROID-LEARNING-CHIPS-SPONSOR-MULTIPLAYER-READY-LOCK",
             "questBuild": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
-            "androidBuild": "PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK",
+            "androidBuild": "PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK",
+            "androidBettingBuild": "PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK",
+            "androidMatchVoiceBuild": "PHASE-399-ANDROID-MATCHMAKING-VOICE-READY-LOCK",
             "androidCoreBuild": "PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK",
             "camera3Build": "PHASE-392-CAMERA3-TABLE-SHOWCASE-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "questRoute": "/game/quest.html?v=phase396",
             "questRuntimeRoute": "/game/index.html?platform=quest&v=phase396&direct=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1",
-            "androidRoute": "/game/android.html?channel=stable&v=phase396",
-            "androidGameplayRoute": "/game/android-stable.html?v=phase396&direct=1",
+            "androidRoute": "/game/android.html?channel=stable&v=phase399",
+            "androidGameplayRoute": "/game/android-stable.html?v=phase399&direct=1",
             "questBrowserCentered": true,
             "questTeleportEnabled": false,
             "questHardSeatedFrontTable": true,
@@ -119,13 +131,35 @@ jobs:
             "androidCenterPlayerCount": 0,
             "androidTurnClockSeconds": 15,
             "androidCustomRaiseSlider": true,
-            "androidPokerSounds": true,
+            "androidExactCallAmounts": true,
+            "androidDynamicMinimumRaise": true,
             "androidLargerCommunityCards": true,
             "androidBurnTrayAboveCommunityCards": true,
             "androidMovingDealerButton": true,
             "androidDealerNameReadout": true,
             "androidPotBelowLogo": true,
+            "androidExactBestFiveEvaluator": true,
+            "androidWinnerHandBreakdown": true,
+            "androidTieHandBreakdown": true,
+            "androidWinningCardHighlights": true,
+            "androidTexasHoldemHandGuide": true,
+            "androidSmartHandCoach": true,
+            "androidDecorativeChipRack": true,
+            "androidTournamentTicketPot": true,
+            "androidTournamentTicketNonCash": true,
+            "androidTournamentTicketRequiresAck": true,
+            "androidReikiFeltBranding": true,
+            "androidSponsorRoomRotationReady": true,
             "androidFeaturedSponsorDefault": "REIKI",
+            "androidMatchmakingClientReady": true,
+            "androidProductionMatchServerConfigured": false,
+            "androidBotFallbackWhenNoMatch": true,
+            "androidWebRtcVoiceReady": true,
+            "androidPushToTalk": true,
+            "androidNoiseSuppressionRequested": true,
+            "androidProximityVoiceControl": true,
+            "androidLiveMultiplayer": false,
+            "androidLiveVoice": false,
             "apkVersionName": "0.1.0-rc2",
             "apkVersionCode": 2,
             "forceUpdate": false,
@@ -145,13 +179,16 @@ jobs:
           test -s publish/game/index.html
           test -s publish/game/modules/phase396_quest_seated_clean_table_deal_lock.js
           test -s publish/game/android-stable.html
-          test -s publish/game/modules/phase396_android_burn_dealer_polish.js
-          test -s publish/game/styles/phase396_android_burn_dealer_polish.css
-          grep -q 'PHASE-396-SEATED-QUEST-ANDROID-DEALER-POLISH-LOCK' publish/deploy-health.json
+          test -s publish/game/modules/phase399_android_learning_chips_sponsor.js
+          test -s publish/game/modules/phase399_android_matchmaking_voice.js
+          test -s publish/game/styles/phase399_android_learning_chips_sponsor.css
+          grep -q 'PHASE-399-ANDROID-LEARNING-CHIPS-SPONSOR-MULTIPLAYER-READY-LOCK' publish/deploy-health.json
           grep -q '"questTeleportEnabled": false' publish/deploy-health.json
-          grep -q '"questHardSeatedFrontTable": true' publish/deploy-health.json
-          grep -q '"androidBurnTrayAboveCommunityCards": true' publish/deploy-health.json
-          grep -q '"androidMovingDealerButton": true' publish/deploy-health.json
+          grep -q '"androidExactBestFiveEvaluator": true' publish/deploy-health.json
+          grep -q '"androidTournamentTicketNonCash": true' publish/deploy-health.json
+          grep -q '"androidProductionMatchServerConfigured": false' publish/deploy-health.json
+          grep -q '"androidBotFallbackWhenNoMatch": true' publish/deploy-health.json
+          grep -q '"androidLiveMultiplayer": false' publish/deploy-health.json
 
       - name: Publish
         shell: bash
@@ -162,8 +199,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 396.'
+            echo 'Production already matches Phase 399.'
           else
-            git commit -m "Deploy Phase 396 seated Quest and Android dealer polish ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 399 Android learning chips sponsor and multiplayer readiness ${GITHUB_SHA}"
             git push origin gh-pages
           fi
