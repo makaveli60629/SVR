@@ -32,26 +32,37 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 400 production payload
+      - name: Verify Phase 401 production payload
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' index.html
-          grep -q 'iphone.html?v=phase400' index.html
-          test -s game/iphone.html
-          test -s game/iphone-tabletop.html
-          test -s game/modules/phase400_ios_safari_adapter.js
-          test -s game/styles/phase400_ios_safari_compat.css
-          grep -q 'phase400_ios_safari_adapter.js?v=phase400' game/android-stable.html
-          grep -q 'phase400_ios_safari_compat.css?v=phase400' game/android-stable.html
+          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-LANDSCAPE-LOCK' index.html
+          grep -q 'android.html?channel=stable&v=phase401' index.html
+          test -s game/android.html
+          test -s game/android-tabletop.html
+          test -s game/android-stable.html
+          test -s game/tournaments.html
+          test -s game/tournament-results.html
+          test -s game/modules/phase401_android_tournament_director.js
+          test -s game/modules/phase401_android_champion_crown.js
+          test -s game/styles/phase401_android_tournament.css
+          test -s game/styles/phase401_android_landscape_polish.css
+          test -s game/styles/phase401_tournament_portal.css
+          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-DIRECTOR-LOCK' game/modules/phase401_android_tournament_director.js
+          grep -q 'PHASE-401-ANDROID-24H-TOURNAMENT-CHAMPION-CROWN-LOCK' game/modules/phase401_android_champion_crown.js
+          grep -q 'PHASE-401-ANDROID-LANDSCAPE-HANDHELD-POLISH-LOCK' game/styles/phase401_android_landscape_polish.css
           grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' game/android-stable.html
           grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/android-stable.html
+          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone.html
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
-          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' deploy-health.json
+          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-LANDSCAPE-LOCK' deploy-health.json
+          grep -q '"androidTournamentRegistrationCap": 50' deploy-health.json
+          grep -q '"androidTournamentTestFieldSize": 10' deploy-health.json
+          grep -q '"androidTournamentPrizePlayChips": 100000' deploy-health.json
+          grep -q '"androidTournamentChampionCrownHours": 24' deploy-health.json
+          grep -q '"androidLandscapeHandheldPolish": true' deploy-health.json
+          grep -q '"androidTournamentSharedRegistrationBackendLive": false' deploy-health.json
           grep -q '"iosIphoneSafariAvailable": true' deploy-health.json
-          grep -q '"iosSafeAreaInsets": true' deploy-health.json
-          grep -q '"iosSafariAudioUnlock": true' deploy-health.json
-          grep -q '"androidExactBestFiveEvaluator": true' deploy-health.json
           grep -q '"questTeleportEnabled": false' deploy-health.json
           test -s downloads/svr-poker-android-rc2.apk
           test -f CNAME
@@ -62,11 +73,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 400 Pages artifact
+      - name: Upload Phase 401 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 400
+      - name: Deploy Phase 401
         id: deployment
         uses: actions/deploy-pages@v4

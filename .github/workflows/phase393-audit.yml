@@ -107,8 +107,8 @@ jobs:
           node --check game/modules/phase399_android_learning_chips_sponsor.js
           node --check game/modules/phase399_android_matchmaking_voice.js
           node --check game/modules/phase400_ios_safari_adapter.js
-          grep -q 'svr-poker-phase400-iphone-safari-web-game-v1' sw.js
-          grep -q 'svr-poker-phase400-iphone-safari-web-game-v1' pwa-sw.js
+          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' sw.js
+          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' pwa-sw.js
           test -s game/styles/phase396_android_burn_dealer_polish.css
           test -s game/styles/phase399_android_learning_chips_sponsor.css
           test -s game/styles/phase400_ios_safari_compat.css

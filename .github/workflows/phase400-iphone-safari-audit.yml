@@ -67,7 +67,7 @@ jobs:
           grep -q 'min-height:44px' game/styles/phase400_ios_safari_compat.css
           grep -q 'window.webkitAudioContext' game/modules/phase393_android_common.js
 
-      - name: Validate mobile table integration
+      - name: Validate shared mobile table integration without iOS regression
         shell: bash
         run: |
           set -euo pipefail
@@ -79,12 +79,14 @@ jobs:
           grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/android-stable.html
           grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' game/android-stable.html
           grep -q 'phase399_android_matchmaking_voice.js?v=phase399' game/android-stable.html
+          grep -q "q.get('platform')==='ios'" game/android-stable.html
+          grep -q "if(!isIOS)" game/android-stable.html
 
       - name: Validate metadata PWA and protected platforms
         shell: bash
         run: |
           set -euo pipefail
-          grep -q '"phase": 400' game/manifest.json
+          grep -q '"phase": 401' game/manifest.json
           grep -q '"iphoneSafariAvailable": true' game/manifest.json
           grep -q '"usesProtectedAndroidPokerEngine": true' game/manifest.json
           grep -q '"iosIphoneSafariAvailable": true' update/app-version.json
@@ -115,7 +117,7 @@ jobs:
           python3 -m json.tool game/manifest.json >/dev/null
           python3 -m json.tool game/android-release.json >/dev/null
           python3 -m json.tool update/app-version.json >/dev/null
-          grep -q 'svr-poker-phase400-iphone-safari-web-game-v1' sw.js
-          grep -q 'svr-poker-phase400-iphone-safari-web-game-v1' pwa-sw.js
+          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' sw.js
+          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' pwa-sw.js
           test -s game/styles/phase400_ios_safari_compat.css
           test -s downloads/svr-poker-android-rc2.apk

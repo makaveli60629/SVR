@@ -10,27 +10,29 @@
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>SVR Poker Mobile Phase 400</title>
+<title>SVR Poker Mobile Phase 401</title>
 <link rel="stylesheet" href="./styles/phase393_android_table_layout.css?v=phase393">
 <link rel="stylesheet" href="./styles/phase394_android_table_polish.css?v=phase394">
 <link rel="stylesheet" href="./styles/phase396_android_burn_dealer_polish.css?v=phase396">
 <link rel="stylesheet" href="./styles/phase399_android_learning_chips_sponsor.css?v=phase399">
 <link rel="stylesheet" href="./styles/phase400_ios_safari_compat.css?v=phase400">
+<script>(()=>{const q=new URLSearchParams(location.search),ua=navigator.userAgent||'',ipad=navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1,isIOS=q.get('platform')==='ios'||q.get('safari')==='1'||/iPhone|iPad|iPod/i.test(ua)||ipad;if(!isIOS){['./styles/phase401_android_tournament.css?v=phase401','./styles/phase401_android_landscape_polish.css?v=phase401'].forEach(href=>{const link=document.createElement('link');link.rel='stylesheet';link.href=href;document.head.appendChild(link)})}})()</script>
 </head>
-<body data-build="PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK" data-betting-build="PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK" data-experience-build="PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK" data-match-build="PHASE-399-ANDROID-MATCHMAKING-VOICE-READY-LOCK" data-ios-build="PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK" data-core-build="PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK" data-polish-build="PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK" data-platform="android">
+<body data-build="PHASE-401-ANDROID-SPONSOR-TOURNAMENT-LANDSCAPE-LOCK" data-betting-build="PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK" data-experience-build="PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK" data-match-build="PHASE-399-ANDROID-MATCHMAKING-VOICE-READY-LOCK" data-ios-build="PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK" data-tournament-build="PHASE-401-ANDROID-SPONSOR-TOURNAMENT-DIRECTOR-LOCK" data-crown-build="PHASE-401-ANDROID-24H-TOURNAMENT-CHAMPION-CROWN-LOCK" data-landscape-build="PHASE-401-ANDROID-LANDSCAPE-HANDHELD-POLISH-LOCK" data-core-build="PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK" data-polish-build="PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK" data-platform="android">
 <section id="gate" class="gate">
   <div class="gate-card">
     <img src="/logo.png" alt="SVR Poker">
     <div class="platform-badge">ANDROID TOUCH VERSION</div>
     <h1>SVR POKER</h1>
-    <p>This is the Android touch game, not the Quest VR version.</p>
+    <p>Android poker with Practice, Regular and Sponsor Tournament modes.</p>
     <div class="gate-actions">
       <button id="join" class="btn primary">JOIN TABLE</button>
       <button id="soundGate" class="btn">SOUND ON</button>
+      <a class="btn" href="/game/tournaments.html?v=phase401">TOURNAMENTS</a>
       <a class="btn" href="/downloads/svr-poker-android-rc2.apk" download>DOWNLOAD APK</a>
       <a class="btn" href="/game/quest.html?v=phase396">QUEST / ENTER VR</a>
     </div>
-    <p id="gateStatus">Phase 399 preserves Phase 398 betting and adds showdown teaching, hand guide, chip racks, tournament tickets, Reiki table branding, and multiplayer/voice readiness with bot fallback.</p>
+    <p id="gateStatus">Phase 401 preserves the approved betting and teaching systems while adding Android game modes, sponsor tournaments, results, a 24-hour champion crown and landscape handheld polish.</p>
   </div>
 </section>
 
@@ -91,6 +93,7 @@
     <button id="next" class="hide">NEXT HAND</button>
     <button id="leave">LEAVE TABLE</button>
     <button id="soundToggle">SOUND ON</button>
+    <a href="/game/tournaments.html?v=phase401">TOURNAMENTS</a>
     <a href="/site/profile.html?v=phase392">PROFILE</a>
     <a href="/downloads/svr-poker-android-rc2.apk" download>APK</a>
   </footer>
@@ -107,5 +110,6 @@
 <script type="module" src="./modules/phase399_android_learning_chips_sponsor.js?v=phase399"></script>
 <script type="module" src="./modules/phase399_android_matchmaking_voice.js?v=phase399"></script>
 <script type="module" src="./modules/phase400_ios_safari_adapter.js?v=phase400"></script>
+<script type="module">const q=new URLSearchParams(location.search),ua=navigator.userAgent||'',ipad=navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1,isIOS=q.get('platform')==='ios'||q.get('safari')==='1'||/iPhone|iPad|iPod/i.test(ua)||ipad;if(!isIOS){import('./modules/phase401_android_tournament_director.js?v=phase401');import('./modules/phase401_android_champion_crown.js?v=phase401')}</script>
 </body>
 </html>

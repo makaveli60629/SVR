@@ -1,0 +1,155 @@
+name: Phase 401 Android Sponsor Tournament and Landscape Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase401-android-tournament-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Validate Android mode hub and tournament pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-401-ANDROID-MODE-HUB-LOCK' game/android.html
+          grep -q '>PRACTICE<' game/android.html
+          grep -q '>REGULAR<' game/android.html
+          grep -q 'REIKI TOURNAMENT' game/android.html
+          grep -q 'android-tabletop.html?v=phase401&mode=practice' game/android.html
+          grep -q 'android-tabletop.html?v=phase401&mode=regular' game/android.html
+          grep -q 'tournaments.html?v=phase401' game/android.html
+          test -s game/tournaments.html
+          test -s game/tournament-results.html
+          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-PORTAL-LOCK' game/tournaments.html
+          grep -q 'REIKI FIRST 50' game/tournaments.html
+          grep -q 'REGISTRATION CAP' game/tournaments.html
+          grep -q 'CURRENT TEST FIELD' game/tournaments.html
+          grep -q '100,000' game/tournaments.html
+          grep -q 'POKER HANDS CARD' game/tournaments.html
+          grep -q 'Royal Flush' game/tournaments.html
+          grep -q 'High Card' game/tournaments.html
+          grep -q 'PHASE-401-ANDROID-TOURNAMENT-RESULTS-LOCK' game/tournament-results.html
+          grep -q '24-hour champion crown' game/tournament-results.html
+          grep -q 'svr401_reiki_first50_results' game/tournament-results.html
+
+      - name: Validate tournament director structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-DIRECTOR-LOCK' game/modules/phase401_android_tournament_director.js
+          grep -q "registrationCap:50" game/modules/phase401_android_tournament_director.js
+          grep -q "testFieldSize:10" game/modules/phase401_android_tournament_director.js
+          grep -q "visibleTableSeats:6" game/modules/phase401_android_tournament_director.js
+          grep -q "startingStack:10000" game/modules/phase401_android_tournament_director.js
+          grep -q "prizePlayChips:100000" game/modules/phase401_android_tournament_director.js
+          grep -q "roundsPerLevel:2" game/modules/phase401_android_tournament_director.js
+          grep -q "BOT_NAMES.slice(0,CONFIG.testFieldSize-1)" game/modules/phase401_android_tournament_director.js
+          grep -q "regularStackBefore" game/modules/phase401_android_tournament_director.js
+          grep -q "restoreRegular" game/modules/phase401_android_tournament_director.js
+          grep -q "simulateOffTable" game/modules/phase401_android_tournament_director.js
+          grep -q "resultsStorage:RESULTS" game/modules/phase401_android_tournament_director.js
+          grep -q "SVR_PHASE401_TOURNAMENT_QA" game/modules/phase401_android_tournament_director.js
+          node <<'NODE'
+          const fs=require('fs');
+          const s=fs.readFileSync('game/modules/phase401_android_tournament_director.js','utf8');
+          const levels=[...s.matchAll(/\{smallBlind:(\d+),bigBlind:(\d+),ante:(\d+)\}/g)].map(m=>m.slice(1).map(Number));
+          if(levels.length<8)throw new Error(`expected tournament level schedule, found ${levels.length}`);
+          if(JSON.stringify(levels[0])!==JSON.stringify([50,100,0]))throw new Error('level 1 must be 50/100 no ante');
+          if(JSON.stringify(levels[1])!==JSON.stringify([75,150,25]))throw new Error('level 2 must be 75/150 ante 25');
+          if(!s.includes('Math.floor(Math.max(0,t.round||0)/CONFIG.roundsPerLevel)'))throw new Error('levels must advance using roundsPerLevel');
+          console.log('Phase 401 tournament level schedule passed.');
+          NODE
+
+      - name: Validate 24 hour champion crown
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-401-ANDROID-24H-TOURNAMENT-CHAMPION-CROWN-LOCK' game/modules/phase401_android_champion_crown.js
+          grep -q 'DURATION_MS=24\*60\*60\*1000' game/modules/phase401_android_champion_crown.js
+          grep -q 'completedAt+DURATION_MS' game/modules/phase401_android_champion_crown.js
+          grep -q 'svr401_tournament_crown' game/modules/phase401_android_champion_crown.js
+          grep -q 'championCrownExpiresAt' game/modules/phase401_android_champion_crown.js
+          grep -q 'multiplayerMetadataReady:true' game/modules/phase401_android_champion_crown.js
+          grep -q 'REIKI CHAMPION' game/modules/phase401_android_champion_crown.js
+          grep -q 'phase401-champion-crown' game/styles/phase401_android_tournament.css
+          grep -q 'phase401-seat-crown' game/styles/phase401_android_tournament.css
+          grep -q '"androidTournamentChampionCrownHours": 24' update/app-version.json
+          grep -q '"championCrownHours": 24' game/manifest.json
+
+      - name: Validate landscape handheld redesign
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-401-ANDROID-LANDSCAPE-HANDHELD-POLISH-LOCK' game/styles/phase401_android_landscape_polish.css
+          grep -q '@media (orientation:landscape) and (max-height:620px)' game/styles/phase401_android_landscape_polish.css
+          grep -q 'grid-template-rows:40px 28px minmax(0,1fr) 54px 38px 30px' game/styles/phase401_android_landscape_polish.css
+          grep -q 'width:clamp(108px,19vw,158px)' game/styles/phase401_android_landscape_polish.css
+          grep -q 'board-zone{bottom:2px' game/styles/phase401_android_landscape_polish.css
+          grep -q 'actions{height:38px' game/styles/phase401_android_landscape_polish.css
+          grep -q 'phase401_android_landscape_polish.css?v=phase401' game/android-stable.html
+          grep -q "if(!isIOS)" game/android-stable.html
+          grep -q "q.get('platform')==='ios'" game/android-stable.html
+          grep -q '"androidLandscapeHandheldPolish": true' update/app-version.json
+          grep -q '"androidPortraitLayoutPreserved": true' update/app-version.json
+
+      - name: Validate protected teaching cards betting and platform isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' game/android-stable.html
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/android-stable.html
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone.html
+          grep -q 'Texas Hold' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'HANDS' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'SMART HAND COACH' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'phase401_android_tournament_director.js?v=phase401' game/android-stable.html
+          grep -q 'phase401_android_champion_crown.js?v=phase401' game/android-stable.html
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/modules/phase393_android_gameplay.js)"
+          test -z "$(git diff origin/main -- game/modules/phase398_android_raise_rules.js)"
+          test -z "$(git diff origin/main -- game/modules/phase399_android_learning_chips_sponsor.js)"
+          test -z "$(git diff origin/main -- game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
+
+      - name: Validate release metadata syntax cache and APK policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '"phase": 401' game/manifest.json
+          grep -q '"androidTournamentRegistrationCap": 50' update/app-version.json
+          grep -q '"androidTournamentTestFieldSize": 10' update/app-version.json
+          grep -q '"androidTournamentPrizePlayChips": 100000' update/app-version.json
+          grep -q '"androidTournamentRoundsPerLevel": 2' update/app-version.json
+          grep -q '"androidTournamentSharedRegistrationBackendLive": false' update/app-version.json
+          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' sw.js
+          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' pwa-sw.js
+          node --check game/modules/phase401_android_tournament_director.js
+          node --check game/modules/phase401_android_champion_crown.js
+          node --check site-public-hooks.js
+          node --check sw.js
+          node --check pwa-sw.js
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
