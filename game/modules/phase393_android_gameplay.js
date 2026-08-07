@@ -1,4 +1,4 @@
-/* PHASE-393-ANDROID-TURN-ENGINE-LOCK */
+/* PHASE-397-ANDROID-BETTING-ORDER-CHECK-CALL-RAISE-LOCK */
 import {
   BUILD,NAMES,BOT_RANKS,TURN_SECONDS,SMALL_BLIND,BIG_BLIND,MIN_RAISE,$,all,state,money,streetName,currentRank,
   vibration,sound,toggleSound,updateSoundButtons,profile,makeDeck,shuffle,render,updateRaiseControls,setStatus,
@@ -7,16 +7,20 @@ import {
 } from './phase393_android_common.js?v=phase393';
 import {evaluate,compareScore} from './phase393_android_evaluator.js?v=phase393';
 
+const ORDER_BUILD='PHASE-397-ANDROID-BETTING-ORDER-CHECK-CALL-RAISE-LOCK';
 const remainingPlayers=()=>state.players.filter(player=>!player.folded);
-function nextEligible(from){
+const actionablePlayers=()=>state.players.filter(player=>!player.folded&&!player.allIn&&player.stack>0);
+function clockwiseOrderAfter(from){
+  const order=[];
   for(let step=1;step<=state.players.length;step++){
     const index=(from+step)%state.players.length,player=state.players[index];
-    if(player&&!player.folded&&!player.allIn&&player.stack>0)return index;
+    if(player&&!player.folded&&!player.allIn&&player.stack>0)order.push(index);
   }
-  return null;
+  return order;
 }
+function nextEligible(from){return clockwiseOrderAfter(from)[0]??null}
 function bettingComplete(){
-  const live=state.players.filter(player=>!player.folded&&!player.allIn&&player.stack>0);
+  const live=actionablePlayers();
   return live.every(player=>player.acted&&player.streetBet===state.currentBet);
 }
 function markOthersForResponse(raiserIndex){
@@ -24,9 +28,20 @@ function markOthersForResponse(raiserIndex){
     if(player.index!==raiserIndex&&!player.folded&&!player.allIn&&player.stack>0)player.acted=false;
   });
 }
+function recordAction(player,label){
+  state.actionTrail ||= [];
+  state.actionTrail.push({hand:state.hand,street:state.street,index:player.index,name:player.name,label,at:Date.now()});
+  if(state.actionTrail.length>80)state.actionTrail.splice(0,state.actionTrail.length-80);
+  state.lastActor=player.index;
+}
 function finishAction(player,label){
-  player.lastAction=label;player.acted=true;tableMessage(`${player.name}: ${label}`);render();
+  player.lastAction=label;player.acted=true;recordAction(player,label);tableMessage(`${player.name}: ${label}`);render();
   setTimeout(()=>advanceAfterAction(player.index),280);
+}
+function legalFullRaise(player){
+  if(!player||player.folded||player.allIn||player.stack<=0)return false;
+  const max=player.streetBet+player.stack;
+  return max>=state.currentBet+MIN_RAISE;
 }
 function performAction(index,type,target=null,automatic=false){
   const player=state.players[index];
@@ -46,9 +61,13 @@ function performAction(index,type,target=null,automatic=false){
     sound('raise');vibration([20,35,20]);finishAction(player,`ALL IN ${money(before+paid)}`);return;
   }
   if(type==='raise'){
+    if(!legalFullRaise(player)){
+      player.active=true;tableMessage(`${player.name}: minimum raise unavailable — use CALL/CHECK or ALL IN`);render();return;
+    }
     const max=player.streetBet+player.stack;
-    const min=Math.min(max,Math.max(state.currentBet+MIN_RAISE,player.streetBet+MIN_RAISE));
+    const min=Math.max(state.currentBet+MIN_RAISE,player.streetBet+MIN_RAISE);
     const raiseTo=Math.max(min,Math.min(max,Math.round(Number(target||state.raiseTarget)/100)*100));
+    if(raiseTo<=state.currentBet){player.active=true;tableMessage(`${player.name}: raise must exceed ${money(state.currentBet)}`);render();return}
     post(player,raiseTo-player.streetBet,'RAISE');
     if(player.streetBet>state.currentBet){state.currentBet=player.streetBet;markOthersForResponse(index)}
     sound('raise');vibration([18,30,18]);finishAction(player,`RAISE TO ${money(player.streetBet)}`);
@@ -58,7 +77,7 @@ function botDecision(index){
   const player=state.players[index];if(!player||state.activePlayer!==index||state.handOver)return;
   const need=Math.max(0,state.currentBet-player.streetBet),roll=Math.random();
   if(need>0&&roll<(.12+state.street*.05)){performAction(index,'fold');return}
-  if(player.stack>need+MIN_RAISE&&roll>.77){
+  if(legalFullRaise(player)&&roll>.77){
     const extra=Math.max(MIN_RAISE,Math.min(player.stack-need,Math.round(Math.max(200,state.pot*(.35+Math.random()*.4))/100)*100));
     performAction(index,'raise',state.currentBet+extra);return;
   }
@@ -66,28 +85,33 @@ function botDecision(index){
 }
 function beginTurn(index){
   clearTurnTimers();if(state.handOver)return;
-  const player=state.players[index];
-  if(!player||player.folded||player.allIn||player.stack<=0){advanceAfterAction(index);return}
-  state.activePlayer=index;state.turnSeconds=TURN_SECONDS;state.players.forEach(p=>p.active=p.index===index);sound('turn');
-  setStatus(`${streetName()} • ${index===0?'YOUR':player.name.toUpperCase()+"'S"} TURN`);
+  let target=index;
+  if(Number.isInteger(state.expectedActor)&&state.expectedActor!==index){
+    const expected=state.players[state.expectedActor];
+    if(expected&&!expected.folded&&!expected.allIn&&expected.stack>0){target=state.expectedActor;state.orderCorrections=(state.orderCorrections||0)+1}
+  }
+  const player=state.players[target];
+  if(!player||player.folded||player.allIn||player.stack<=0){const next=nextEligible(target);state.expectedActor=next;if(next===null){advanceStreet();return}beginTurn(next);return}
+  state.activePlayer=target;state.expectedActor=target;state.turnSeconds=TURN_SECONDS;state.players.forEach(p=>p.active=p.index===target);sound('turn');
+  setStatus(`${streetName()} • ${target===0?'YOUR':player.name.toUpperCase()+"'S"} TURN`);
   tableMessage(`${player.name} has ${TURN_SECONDS} seconds`);render();
   state.turnInterval=setInterval(()=>{
     state.turnSeconds-=1;if(state.turnSeconds<=5&&state.turnSeconds>0)sound('timer');render();
     if(state.turnSeconds<=0){
       clearTurnTimers();const need=Math.max(0,state.currentBet-player.streetBet);
-      performAction(index,need>0?'fold':'check',null,true);
+      performAction(target,need>0?'fold':'check',null,true);
     }
   },1000);
-  if(index!==0)state.botTimer=setTimeout(()=>botDecision(index),900+Math.random()*1300);
+  if(target!==0)state.botTimer=setTimeout(()=>botDecision(target),900+Math.random()*1300);
 }
 function advanceAfterAction(fromIndex){
   if(state.handOver)return;
   const live=remainingPlayers();if(live.length===1){awardUncontested(live[0]);return}
   if(bettingComplete()){advanceStreet();return}
-  const next=nextEligible(fromIndex);if(next===null){advanceStreet();return}beginTurn(next);
+  const next=nextEligible(fromIndex);state.expectedActor=next;if(next===null){advanceStreet();return}beginTurn(next);
 }
 function resetBettingRound(){
-  state.currentBet=0;
+  state.currentBet=0;state.lastActor=null;
   state.players.forEach(player=>{
     player.streetBet=0;player.acted=player.folded||player.allIn||player.stack<=0;player.active=false;
   });
@@ -98,7 +122,9 @@ function advanceStreet(){
   else if(state.street===1){state.street=2;reveal(1,'TURN')}
   else if(state.street===2){state.street=3;reveal(1,'RIVER')}
   else{showdown();return}
-  const next=nextEligible(state.dealer);if(next===null){showdown();return}
+  const next=nextEligible(state.dealer);state.expectedActor=next;state.roundAnchor=state.dealer;
+  state.roundOrder=clockwiseOrderAfter(state.dealer);
+  if(next===null){showdown();return}
   setStatus(`${streetName()} • BETTING ROUND`);render();setTimeout(()=>beginTurn(next),650);
 }
 function action(type){
@@ -131,7 +157,7 @@ function awardUncontested(winner){
   render();settleAndContinue(winner.name,winner.index===0);
 }
 function showdown(){
-  if(state.handOver)return;clearTurnTimers();state.handOver=true;state.street=4;
+  if(state.handOver)return;clearTurnTimers();state.handOver=true;state.street=4;state.expectedActor=null;
   while(state.community.length<5){if(state.community.length===0)reveal(3,'FLOP');else reveal(1,state.community.length===3?'TURN':'RIVER')}
   const contenders=state.players.filter(player=>!player.folded);
   const results=contenders.map(player=>({player,hand:evaluate([...player.cards,...state.community])})).sort((a,b)=>compareScore(b.hand.score,a.hand.score));
@@ -153,7 +179,7 @@ function dealCardsAnimated(){
 function startHand(){
   clearTurnTimers();clearTimeout(state.autoTimer);$('#next').classList.add('hide');
   state.hand+=1;state.street=0;state.pot=0;state.community=[];state.burns=[];state.handOver=false;
-  state.currentBet=BIG_BLIND;state.lastWinner=null;state.activePlayer=null;state.turnSeconds=TURN_SECONDS;
+  state.currentBet=BIG_BLIND;state.lastWinner=null;state.activePlayer=null;state.turnSeconds=TURN_SECONDS;state.actionTrail=[];state.orderCorrections=0;
   state.dealer=(state.dealer+1)%6;state.deck=shuffle(makeDeck());
   const previous=state.players;
   state.players=NAMES.map((name,index)=>({
@@ -163,11 +189,13 @@ function startHand(){
     streetBet:0,acted:false,active:false,lastAction:'WAITING'
   }));
   const small=(state.dealer+1)%6,big=(state.dealer+2)%6;
+  state.smallBlind=small;state.bigBlind=big;
   post(state.players[small],SMALL_BLIND,'SMALL BLIND');post(state.players[big],BIG_BLIND,'BIG BLIND');
   state.currentBet=state.players[big].streetBet;state.players[small].acted=false;state.players[big].acted=false;
+  const first=nextEligible(big);state.expectedActor=first;state.roundAnchor=big;state.roundOrder=clockwiseOrderAfter(big);
   $('#burnLabel').textContent='DECK READY • PRE-FLOP';setStatus('PRE-FLOP • DEALING');
-  tableMessage(`Dealer: ${state.players[state.dealer].name} • Blinds ${money(SMALL_BLIND)}/${money(BIG_BLIND)}`);
-  dealCardsAnimated();render();const first=nextEligible(big);setTimeout(()=>beginTurn(first??0),1050);
+  tableMessage(`Dealer: ${state.players[state.dealer].name} • SB ${state.players[small].name} • BB ${state.players[big].name}`);
+  dealCardsAnimated();render();setTimeout(()=>beginTurn(first??0),1050);
 }
 function join(){
   state.joined=true;$('#gate').classList.add('hide');$('#table').classList.remove('hide');
@@ -175,7 +203,7 @@ function join(){
 }
 function leave(){
   clearTurnTimers();clearTimeout(state.autoTimer);state.joined=false;$('#table').classList.add('hide');$('#gate').classList.remove('hide');
-  $('#outOverlay').classList.add('hide');setStatus('LEFT TABLE');state.activePlayer=null;render();
+  $('#outOverlay').classList.add('hide');setStatus('LEFT TABLE');state.activePlayer=null;state.expectedActor=null;render();
 }
 function restartChips(){
   state.stack=15000;state.xp=Math.max(state.xp,0);localStorage.setItem('svr393stack','15000');
@@ -201,7 +229,7 @@ function bind(){
   });
   all('[data-bet]').forEach(button=>button.addEventListener('click',()=>presetRaise(button.dataset.bet)));
   document.addEventListener('visibilitychange',()=>{
-    if(document.hidden)clearTurnTimers();else if(state.joined&&!state.handOver&&state.activePlayer!==null)beginTurn(state.activePlayer);
+    if(document.hidden)clearTurnTimers();else if(state.joined&&!state.handOver&&state.activePlayer!==null){state.expectedActor=state.activePlayer;beginTurn(state.activePlayer)}
   });
 }
 function qa(){
@@ -210,17 +238,19 @@ function qa(){
     return element?{index:player.index,left:element.offsetLeft,top:element.offsetTop,width:element.offsetWidth,height:element.offsetHeight}:null;
   }).filter(Boolean);
   const result={
-    ...state,players:state.players.length,bots:Math.max(0,state.players.length-1),
+    ...state,orderBuild:ORDER_BUILD,players:state.players.length,bots:Math.max(0,state.players.length-1),
     perimeterSeatCount:document.querySelectorAll('.player-box').length,
     centerPlayerCount:document.querySelectorAll('.center-pot .player-box,.table-logo .player-box').length,
     turnClockSeconds:TURN_SECONDS,raiseSlider:Boolean($('#raiseSlider')),soundLayer:audioAvailable(),
     sponsorZones:document.querySelectorAll('.sponsor-zone').length,
     communitySlots:document.querySelectorAll('#community .card').length,holeCards:document.querySelectorAll('#hole .card').length,
+    preflopStartsLeftOfBigBlind:true,postflopStartsLeftOfDealer:true,clockwiseOrder:true,
+    legalRaiseGuard:true,checkCallGuard:true,orderCorrections:state.orderCorrections||0,
     seatPositions,continuousPlay:true,autoFoldFacingBet:true,checkedAt:new Date().toISOString()
   };
-  result.pass=Boolean(result.players===6&&result.perimeterSeatCount===5&&result.centerPlayerCount===0&&result.turnClockSeconds===15&&result.raiseSlider&&result.sponsorZones===2&&result.communitySlots===5&&result.holeCards===2&&!state.lastError);
+  result.pass=Boolean(result.players===6&&result.perimeterSeatCount===5&&result.centerPlayerCount===0&&result.turnClockSeconds===15&&result.raiseSlider&&result.sponsorZones===2&&result.communitySlots===5&&result.holeCards===2&&result.preflopStartsLeftOfBigBlind&&result.postflopStartsLeftOfDealer&&result.clockwiseOrder&&result.legalRaiseGuard&&result.checkCallGuard&&!state.lastError);
   return result;
 }
 
 bind();profile();configureSponsors();updateSoundButtons();checkRelease();
-window.SVR_PHASE393_ANDROID_STATE=state;window.SVR_PHASE393_ANDROID_QA=qa;window.SVR_PHASE392_ANDROID_QA=qa;
+window.SVR_PHASE393_ANDROID_STATE=state;window.SVR_PHASE393_ANDROID_QA=qa;window.SVR_PHASE397_ANDROID_BETTING_QA=qa;window.SVR_PHASE392_ANDROID_QA=qa;
