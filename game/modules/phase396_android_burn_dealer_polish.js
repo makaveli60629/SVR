@@ -20,7 +20,7 @@ function placeDealer(){
   state.dealerIndex=dealer;state.dealerName=player?.name||null;return true
 }
 function inspectLayout(){
-  const burn=$('#burnZone'),community=$('#community .card');if(burn){const style=getComputedStyle(burn),rect=burn.getBoundingClientRect(),board=$('#community')?.getBoundingClientRect();state.burnAboveCommunity=Boolean(board&&rect.bottom<=board.top+18&&style.top==='auto')}
+  const burn=$('#burnZone'),community=$('#community .card');if(burn){const rect=burn.getBoundingClientRect(),board=$('#community')?.getBoundingClientRect();state.burnAboveCommunity=Boolean(board&&rect.bottom<=board.top+22&&rect.top<board.top)}
   if(community)state.communityCardsEnlarged=community.getBoundingClientRect().width>=38;
 }
 function sync(){
