@@ -1,0 +1,120 @@
+name: Phase 393 Quest and Android Calibration Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase393-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Validate public routes and protected release policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-393-DUAL-DEVICE-CALIBRATION-LOCK' index.html
+          test "$(grep -o 'class=\"btn ' index.html | wc -l)" -eq 3
+          grep -q 'game/quest.html?v=phase393' index.html
+          grep -q 'game/android.html?channel=stable&v=phase393' index.html
+          grep -q 'phase393-dual-device-calibration' site-public-hooks.js
+          grep -q 'phase393-dual-device-calibration-v1' sw.js
+          grep -q 'phase393-dual-device-calibration-v1' pwa-sw.js
+          grep -q 'pwa-phase393' manifest.webmanifest
+          grep -q '"phase": 393' game/manifest.json
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+
+      - name: Validate Quest table, felt, seat, and Eric calibration
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK' game/quest.html
+          grep -q 'PHASE-393-QUEST-TABLE-ERIC-SEAT-CALIBRATION-LOCK' game/index.html
+          grep -q 'phase393_quest_table_eric_seat_calibration.js' game/index.html
+          grep -q 'SVR_PHASE393_QUEST_SWEEP' game/index.html
+          grep -q 'SVR_PHASE393_QUEST_QA' game/modules/phase393_quest_table_eric_seat_calibration.js
+          grep -q 'TARGET_TABLE_WIDTH=3.35' game/modules/phase393_quest_table_surface.js
+          grep -q 'TARGET_TABLE_TOP=.98' game/modules/phase393_quest_table_surface.js
+          grep -q 'TARGET_TABLE_BOTTOM=-.08' game/modules/phase393_quest_table_surface.js
+          grep -q 'TARGET_FELT_RECESS=.11' game/modules/phase393_quest_table_surface.js
+          grep -q 'PHASE393_VISIBLE_RECESSED_INNER_FELT' game/modules/phase393_quest_table_surface.js
+          grep -q 'svrPhase393BlackCoverDisabled' game/modules/phase393_quest_table_surface.js
+          grep -q 'TARGET_ERIC_HEIGHT=1.78' game/modules/phase393_quest_eric_seat.js
+          grep -q 'SEATED_RAIL_GAP=.14' game/modules/phase393_quest_eric_seat.js
+          grep -q 'SEATED_EYE_HEIGHT=1.18' game/modules/phase393_quest_eric_seat.js
+          grep -q 'svrPhase393StableFloorOffset' game/modules/phase393_quest_eric_seat.js
+          grep -q 'svrPhase393BaseQuaternion' game/modules/phase393_quest_eric_seat.js
+          grep -q 'PHASE393_ERIC_DEALING_CARD' game/modules/phase393_quest_eric_seat.js
+          grep -q 'rootMotionLocked' game/modules/phase393_quest_eric_seat.js
+          grep -q 'playersNormalized' game/modules/phase393_quest_eric_seat.js
+          grep -q 'requestSeat(16000)' game/modules/phase393_quest_table_eric_seat_calibration.js
+
+      - name: Validate Android perimeter table and turn system
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK' game/android.html
+          grep -q 'PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK' game/android-tabletop.html
+          grep -q 'PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK' game/android-stable.html
+          grep -q 'phase393_android_table_layout.css' game/android-stable.html
+          grep -q 'phase393_android_gameplay.js' game/android-stable.html
+          grep -q 'id="raiseSlider"' game/android-stable.html
+          grep -q 'id="turnClock"' game/android-stable.html
+          grep -q 'id="soundToggle"' game/android-stable.html
+          grep -q 'data-bet="half"' game/android-stable.html
+          grep -q 'data-bet="pot"' game/android-stable.html
+          grep -q 'TURN_SECONDS=15' game/modules/phase393_android_common.js
+          grep -q 'function beginTurn' game/modules/phase393_android_gameplay.js
+          grep -q 'function presetRaise' game/modules/phase393_android_gameplay.js
+          grep -q "name==='deal'" game/modules/phase393_android_common.js
+          grep -q "name==='chip'" game/modules/phase393_android_common.js
+          grep -q "name==='win'" game/modules/phase393_android_common.js
+          grep -q 'SVR_ANDROID_SPONSORS' game/modules/phase393_android_common.js
+          grep -q 'SVR_PHASE393_ANDROID_QA' game/modules/phase393_android_gameplay.js
+          grep -q 'SVR_PHASE393_ANDROID_WRAPPER_QA' game/android-tabletop.html
+          grep -q 'player-box\[data-seat="1"\]' game/styles/phase393_android_table_layout.css
+          grep -q 'player-box\[data-seat="5"\]' game/styles/phase393_android_table_layout.css
+          grep -q 'activeSeat' game/styles/phase393_android_table_layout.css
+          grep -q 'raise-panel' game/styles/phase393_android_table_layout.css
+          grep -q '"centerPlayerCount": 0' game/android-release.json
+          grep -q '"timeoutFacingBet": "auto-fold"' game/android-release.json
+
+      - name: Validate syntax, JSON, and required assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          node --check site-public-hooks.js
+          node --check sw.js
+          node --check pwa-sw.js
+          node --check game/modules/phase393_android_common.js
+          node --check game/modules/phase393_android_evaluator.js
+          node --check game/modules/phase393_android_gameplay.js
+          node --check game/modules/phase393_quest_table_surface.js
+          node --check game/modules/phase393_quest_eric_seat.js
+          node --check game/modules/phase393_quest_table_eric_seat_calibration.js
+          test -s game/styles/phase393_android_table_layout.css
+          test -s game/assets/models/table.glb
+          test -s game/assets/models/eric/eric.fbx
+          test -s downloads/svr-poker-android-rc2.apk
+          test -s docs/PHASE_393_DUAL_DEVICE_CALIBRATION_MANIFEST.md
+          test -s docs/PHASE_393_DUAL_DEVICE_CALIBRATION_MANIFEST.json
