@@ -6,12 +6,12 @@
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>SVR Poker Android Phase 396</title>
+<title>SVR Poker Android Phase 398</title>
 <link rel="stylesheet" href="./styles/phase393_android_table_layout.css?v=phase393">
 <link rel="stylesheet" href="./styles/phase394_android_table_polish.css?v=phase394">
 <link rel="stylesheet" href="./styles/phase396_android_burn_dealer_polish.css?v=phase396">
 </head>
-<body data-build="PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK" data-betting-build="PHASE-397-ANDROID-BETTING-ORDER-CHECK-CALL-RAISE-LOCK" data-core-build="PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK" data-polish-build="PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK" data-platform="android">
+<body data-build="PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK" data-betting-build="PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK" data-core-build="PHASE-393-ANDROID-PERIMETER-TURN-CLOCK-AUDIO-LOCK" data-polish-build="PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK" data-platform="android">
 <section id="gate" class="gate">
   <div class="gate-card">
     <img src="/logo.png" alt="SVR Poker">
@@ -24,7 +24,7 @@
       <a class="btn" href="/downloads/svr-poker-android-rc2.apk" download>DOWNLOAD APK</a>
       <a class="btn" href="/game/quest.html?v=phase396">QUEST / ENTER VR</a>
     </div>
-    <p id="gateStatus">Android table layout is preserved. Betting rotation now verifies Check, Call, Raise, Fold, blinds, and dealer-relative action order.</p>
+    <p id="gateStatus">Android layout is preserved. Phase 398 corrects exact calls, dynamic minimum raises, short all-ins, and clear RAISE TO amounts.</p>
   </div>
 </section>
 
@@ -69,15 +69,15 @@
   </section>
 
   <section id="raisePanel" class="raise-panel" aria-label="Raise amount">
-    <div class="raise-head"><strong>CUSTOM RAISE</strong><span id="raiseAmount">$500</span></div>
-    <input id="raiseSlider" type="range" min="200" max="15000" value="500" step="100" aria-label="Raise amount">
+    <div class="raise-head"><strong>CUSTOM RAISE</strong><span id="raiseAmount">TO $200</span></div>
+    <input id="raiseSlider" type="range" min="200" max="15000" value="200" step="50" aria-label="Raise-to amount">
     <div class="raise-presets"><button data-bet="half">½ POT</button><button data-bet="pot">POT</button><button data-bet="min">MIN</button><button data-bet="max">MAX</button></div>
   </section>
 
   <div class="actions">
     <button data-a="fold">FOLD</button>
     <button data-a="call">CHECK</button>
-    <button data-a="raise">RAISE $500</button>
+    <button data-a="raise">RAISE TO $200</button>
     <button data-a="allin">ALL IN</button>
   </div>
 
@@ -94,9 +94,9 @@
 <div id="chipLayer" class="chip-layer"></div>
 <div id="fxLayer" class="fx-layer"></div>
 <div id="winnerBanner" class="winner-banner"></div>
-<script type="module" src="./modules/phase393_android_gameplay.js?v=phase397"></script>
+<script type="module" src="./modules/phase393_android_gameplay.js?v=phase398"></script>
 <script type="module" src="./modules/phase394_android_table_polish.js?v=phase394"></script>
 <script type="module" src="./modules/phase396_android_burn_dealer_polish.js?v=phase396"></script>
-<script type="module" src="./modules/phase397_android_action_button_guard.js?v=phase397"></script>
+<script type="module" src="./modules/phase397_android_action_button_guard.js?v=phase398"></script>
 </body>
 </html>
