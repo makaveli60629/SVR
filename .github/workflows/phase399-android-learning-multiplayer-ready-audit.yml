@@ -1,0 +1,123 @@
+name: Phase 399 Android Learning and Multiplayer Ready Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase399-android-learning-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Validate Phase 399 Android presentation contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' game/android-stable.html
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/android-stable.html
+          grep -q 'phase399_android_learning_chips_sponsor.css?v=phase399' game/android-stable.html
+          grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' game/android-stable.html
+          grep -q 'phase399_android_matchmaking_voice.js?v=phase399' game/android-stable.html
+          grep -q 'v=phase399' game/android.html
+          grep -q 'v=phase399' game/android-tabletop.html
+          grep -q 'REIKI  •  FEATURED TABLE PARTNER' game/styles/phase399_android_learning_chips_sponsor.css
+          grep -q 'phase399-chip-stack' game/styles/phase399_android_learning_chips_sponsor.css
+          grep -q 'phase399-ticket-notice' game/styles/phase399_android_learning_chips_sponsor.css
+
+      - name: Validate exact best-five evaluator
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-399-ANDROID-BEST-FIVE-HAND-EVALUATOR-LOCK' game/modules/phase393_android_evaluator.js
+          node --input-type=module <<'NODE'
+          import {evaluate,compareScore,cardKey} from './game/modules/phase393_android_evaluator.js';
+          const c=(r,s,v)=>({r,s,v});
+          const royal=[c('A','S',14),c('K','S',13),c('Q','S',12),c('J','S',11),c('10','S',10),c('2','D',2),c('3','C',3)];
+          const r=evaluate(royal);
+          if(r.name!=='Royal Flush'||r.bestFive.length!==5)throw new Error(`royal failed ${JSON.stringify(r)}`);
+          if(!['AS','KS','QS','JS','10S'].every(k=>r.usedKeys.includes(k)))throw new Error(`royal best-five keys wrong ${r.usedKeys}`);
+          const full=[c('A','S',14),c('A','D',14),c('A','C',14),c('K','S',13),c('K','D',13),c('Q','S',12),c('2','C',2)];
+          const f=evaluate(full);
+          if(f.name!=='Full House'||f.bestFive.length!==5)throw new Error(`full house failed ${JSON.stringify(f)}`);
+          const boardRoyal=[c('2','D',2),c('3','C',3),c('A','H',14),c('K','H',13),c('Q','H',12),c('J','H',11),c('10','H',10)];
+          const boardRoyal2=[c('4','D',4),c('5','C',5),c('A','H',14),c('K','H',13),c('Q','H',12),c('J','H',11),c('10','H',10)];
+          const a=evaluate(boardRoyal),b=evaluate(boardRoyal2);
+          if(a.name!=='Royal Flush'||b.name!=='Royal Flush'||compareScore(a.score,b.score)!==0)throw new Error('board-only tie failed');
+          if(new Set(a.bestFive.map(cardKey)).size!==5)throw new Error('best-five duplicate cards');
+          console.log('Exact best-five evaluator scenarios passed.');
+          NODE
+
+      - name: Validate learning chip ticket and sponsor contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-399-ANDROID-LEARNING-CHIPS-SPONSOR-LOCK' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'Texas Hold' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'SMART HAND COACH' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'TICKET_CHANCE=.08' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'svr399TournamentTickets' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'nonCash:true' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'each tied winner' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'reiki-demo-room' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q '"androidTournamentTicketNonCash": true' update/app-version.json
+          grep -q '"androidReikiFeltBranding": true' update/app-version.json
+          grep -q '"androidExactBestFiveEvaluator": true' update/app-version.json
+
+      - name: Validate matchmaking bot fallback and voice readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-399-ANDROID-MATCHMAKING-VOICE-READY-LOCK' game/modules/phase399_android_matchmaking_voice.js
+          grep -q 'MATCH_TIMEOUT_MS=8000' game/modules/phase399_android_matchmaking_voice.js
+          grep -q 'Matchmaking endpoint must use wss://' game/modules/phase399_android_matchmaking_voice.js
+          grep -q 'NO MATCH SERVER' game/modules/phase399_android_matchmaking_voice.js
+          grep -q 'fallback-bots' game/modules/phase399_android_matchmaking_voice.js
+          grep -q 'RTCPeerConnection' game/modules/phase399_android_matchmaking_voice.js
+          grep -q 'noiseSuppression:true' game/modules/phase399_android_matchmaking_voice.js
+          grep -q 'echoCancellation:true' game/modules/phase399_android_matchmaking_voice.js
+          grep -q 'autoGainControl:true' game/modules/phase399_android_matchmaking_voice.js
+          grep -q 'proximityVolume' game/modules/phase399_android_matchmaking_voice.js
+          grep -q '"androidProductionMatchServerConfigured": false' update/app-version.json
+          grep -q '"androidBotFallbackWhenNoMatch": true' update/app-version.json
+          grep -q '"androidLiveMultiplayer": false' update/app-version.json
+          grep -q '"androidLiveVoice": false' update/app-version.json
+
+      - name: Validate protected betting Quest APK and syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/modules/phase393_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q '"teleportEnabled": false' game/manifest.json
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+          node --check game/modules/phase393_android_evaluator.js
+          node --check game/modules/phase393_android_gameplay.js
+          node --check game/modules/phase397_android_action_button_guard.js
+          node --check game/modules/phase398_android_raise_rules.js
+          node --check game/modules/phase399_android_learning_chips_sponsor.js
+          node --check game/modules/phase399_android_matchmaking_voice.js
+          node --check sw.js
+          node --check pwa-sw.js
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          grep -q 'svr-poker-phase399-android-learning-chips-sponsor-v1' sw.js
+          grep -q 'svr-poker-phase399-android-learning-chips-sponsor-v1' pwa-sw.js
