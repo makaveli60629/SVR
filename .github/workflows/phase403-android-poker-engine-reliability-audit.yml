@@ -62,7 +62,7 @@ jobs:
           console.log('10,000 permanent seat-cycle iterations passed:',order.map(i=>names[i]).join(' -> '));
           NODE
 
-      - name: Execute side-pot and split-pot scenarios
+      - name: Execute side-pot split-pot and uncalled-return scenarios
         shell: bash
         run: |
           set -euo pipefail
@@ -70,18 +70,20 @@ jobs:
           import {buildSidePots,splitPotAmount,sumPotAmounts} from './game/modules/phase403_android_pot_rules.js';
           const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
           let audit=buildSidePots([{index:0,amount:1000},{index:1,amount:500},{index:2,amount:200}],1700);
-          assert(JSON.stringify(audit.pots.map(p=>p.amount))===JSON.stringify([600,600,500]),`3-way side pots wrong ${JSON.stringify(audit.pots)}`);
+          assert(JSON.stringify(audit.pots.map(p=>p.amount))===JSON.stringify([600,600,500]),`3-way layers wrong ${JSON.stringify(audit.pots)}`);
+          assert(JSON.stringify(audit.pots.map(p=>p.type))===JSON.stringify(['pot','pot','refund']),`unmatched excess must be return ${JSON.stringify(audit.pots)}`);
+          assert(audit.pots[0].label==='MAIN POT'&&audit.pots[1].label==='SIDE POT 1'&&audit.pots[2].label==='UNCALLED RETURN','pot labels wrong');
           assert(sumPotAmounts(audit.pots)===1700,'3-way pot total must conserve all chips');
           audit=buildSidePots([{index:0,amount:1000,folded:false},{index:1,amount:1000,folded:true},{index:2,amount:500,folded:false}],2500);
           assert(audit.pots[0].amount===1500&&audit.pots[1].amount===1000,'folded contribution pot layers wrong');
-          assert(audit.pots[1].eligibleIndexes.length===1&&audit.pots[1].eligibleIndexes[0]===0,'folded player must not be eligible for side pot');
+          assert(audit.pots[1].eligibleIndexes.length===1&&audit.pots[1].eligibleIndexes[0]===0,'folded player must not be eligible for contested layer');
           audit=buildSidePots([{index:0,amount:500,folded:false},{index:1,amount:1000,folded:true}],1500);
           assert(audit.pots[1].type==='refund','unmatched folded top layer should become uncalled return');
           audit=buildSidePots([{index:0,amount:100},{index:1,amount:100},{index:2,amount:100},{index:3,amount:100},{index:4,amount:100},{index:5,amount:100}],650);
           assert(audit.delta===50&&sumPotAmounts(audit.pots)===650,'untracked forced-bet remainder must reconcile into pot');
           const split=splitPotAmount(301,[0,5],4,[0,5,1,2,3,4]);
           assert(split.payouts[0]===151&&split.payouts[5]===150,'odd chip must go to first winner left-to-right from dealer');
-          console.log('Explicit Phase 403 side-pot scenarios passed.');
+          console.log('Explicit Phase 403 side-pot and return scenarios passed.');
           NODE
 
       - name: Stress chip conservation over randomized all-ins
@@ -99,9 +101,9 @@ jobs:
             if(sumPotAmounts(audit.pots)!==total)throw new Error(`pot conservation failed at test ${test}`);
             let paid=0;
             for(const pot of audit.pots){
-              const candidates=(pot.type==='refund'?pot.participantIndexes:pot.eligibleIndexes);
+              const candidates=pot.type==='refund'?pot.participantIndexes:pot.eligibleIndexes;
               if(!candidates.length)continue;
-              const winners=candidates.filter(()=>Math.random()<.45);if(!winners.length)winners.push(candidates[0]);
+              const winners=pot.type==='refund'?[candidates[0]]:candidates.filter(()=>Math.random()<.45);if(!winners.length)winners.push(candidates[0]);
               const split=splitPotAmount(pot.amount,winners,order[test%order.length],order);
               const subtotal=Object.values(split.payouts).reduce((a,b)=>a+b,0);
               if(subtotal!==pot.amount)throw new Error(`split conservation failed at test ${test}`);
@@ -112,7 +114,7 @@ jobs:
           console.log('12,000 randomized pot and payout conservation scenarios passed.');
           NODE
 
-      - name: Validate clarity teaching bots and tournament HUD
+      - name: Validate clarity teaching bots tickets and tournament HUD
         shell: bash
         run: |
           set -euo pipefail
@@ -130,6 +132,12 @@ jobs:
           grep -q 'data-next' game/modules/phase403_android_table_clarity.js
           grep -q 'phase403-flow-rail' game/styles/phase403_android_table_clarity.css
           grep -q 'phase403-turn-arrow' game/styles/phase403_android_table_clarity.css
+          grep -q 'position:relative!important' game/styles/phase403_android_table_clarity.css
+          grep -q 'mainPotAwareTicket:true' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q "ticketSource=mainPotSet.size?'main-pot':'showdown-best'" game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'phase403PotAware:true' game/modules/phase401_android_tournament_director.js
+          grep -q 'userWonAnyPot' game/modules/phase401_android_tournament_director.js
+          grep -q 'handContribution=(player.handContribution||0)+pay' game/modules/phase401_android_tournament_director.js
 
       - name: Preserve protected rules platforms tournament and APK
         shell: bash
