@@ -1,4 +1,4 @@
-/* PHASE-399-ANDROID-LEARNING-CHIPS-SPONSOR-LOCK */
+/* PHASE-399-ANDROID-LEARNING-CHIPS-SPONSOR-LOCK | PHASE-403 main-pot ticket compatibility */
 import {evaluate,compareScore,cardKey,describePreflop} from './phase393_android_evaluator.js?v=phase399';
 
 const BUILD='PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK';
@@ -81,11 +81,16 @@ function showdownResults(g){
 }
 function awardTicketIfNeeded(g,results){
   if(state.ticketHand!==g.hand||state.ticketResolved||!results)return'';
-  state.ticketResolved=true;state.lastTicketWinners=results.winners.map(x=>x.player.name);
-  const userWon=results.winners.some(x=>x.player.index===0);
+  state.ticketResolved=true;
+  const mainPotSet=new Set(Array.isArray(g.lastMainPotWinners)?g.lastMainPotWinners:[]);
+  let ticketWinners=mainPotSet.size?results.contenders.filter(x=>mainPotSet.has(x.player.index)):results.winners;
+  if(!ticketWinners.length)ticketWinners=results.winners;
+  state.lastTicketWinners=ticketWinners.map(x=>x.player.name);
+  const userWon=ticketWinners.some(x=>x.player.index===0);
   if(userWon){state.tickets+=1;localStorage.setItem('svr399TournamentTickets',String(state.tickets));renderChipRack()}
-  window.SVR_PHASE399_TOURNAMENT_TICKET_STATE={hand:g.hand,winners:state.lastTicketWinners,userWon,tickets:state.tickets,nonCash:true,checkedAt:new Date().toISOString()};
-  return results.winners.length>1?' • TICKET POT TIED: EACH WINNER EARNS A TICKET':` • TOURNAMENT TICKET → ${results.winners[0]?.player?.name||'WINNER'}`;
+  const ticketSource=mainPotSet.size?'main-pot':'showdown-best';
+  window.SVR_PHASE399_TOURNAMENT_TICKET_STATE={hand:g.hand,winners:state.lastTicketWinners,winnerIndexes:ticketWinners.map(x=>x.player.index),userWon,tickets:state.tickets,nonCash:true,ticketSource,mainPotAware:mainPotSet.size>0,checkedAt:new Date().toISOString()};
+  return ticketWinners.length>1?' • MAIN POT TIED: EACH WINNER EARNS THE TICKET':` • TOURNAMENT TICKET → ${ticketWinners[0]?.player?.name||'WINNER'}`;
 }
 function showResult(g){
   const results=showdownResults(g);if(!results)return;
@@ -107,9 +112,9 @@ function maybeTicketHand(g){
   state.ticketHand=g.hand;
   const notice=$('#phase399TicketNotice');if(!notice)return;
   notice.querySelector('strong').textContent='TOURNAMENT TICKET POT INCOMING';
-  notice.querySelector('p').textContent='A promotional tournament-entry chip is entering this pot. Press OK to acknowledge it. Whoever wins this pot earns the ticket; tied winners each receive one.';
+  notice.querySelector('p').textContent='A promotional tournament-entry chip is entering the main pot. Press OK to acknowledge it. Whoever wins the main pot earns the ticket; tied main-pot winners each receive one.';
   const button=notice.querySelector('button');button.textContent='OK';button.onclick=()=>ackTicket();notice.classList.remove('hide');
-  window.SVR_PHASE399_TOURNAMENT_TICKET_STATE={hand:g.hand,pending:true,acknowledged:false,nonCash:true};
+  window.SVR_PHASE399_TOURNAMENT_TICKET_STATE={hand:g.hand,pending:true,acknowledged:false,nonCash:true,mainPotAware:true};
 }
 function ackTicket(){
   state.ticketAcknowledged=true;const notice=$('#phase399TicketNotice');notice?.classList.add('hide');animateTicketToPot();
@@ -168,7 +173,7 @@ function sync(){
     state.checkedAt=new Date().toISOString();window.SVR_PHASE399_ANDROID_EXPERIENCE_STATE={...state,pass:Boolean(state.installed&&!state.lastError),coachOn:state.coachOn,tickets:state.tickets,entries:state.entries};
   }catch(error){state.lastError=String(error?.message||error);window.SVR_PHASE399_ANDROID_EXPERIENCE_STATE={...state,pass:false}}
 }
-function qa(){sync();return{...state,exactBestFiveEvaluator:true,winnerBreakdown:Boolean($('#phase399ResultSheet')),handGuide:Boolean($('#phase399HandsSheet')),handCoach:Boolean($('#phase399Coach')),chipRack:Boolean($('#phase399ChipRack')),ticketNotice:Boolean($('#phase399TicketNotice')),reikiFeltBrand:$('.table-surface')?.dataset?.sponsorSkin==='reiki',nonCashTournamentTicket:true,pass:Boolean(state.installed&&!state.lastError),checkedAt:new Date().toISOString()}}
+function qa(){sync();return{...state,exactBestFiveEvaluator:true,winnerBreakdown:Boolean($('#phase399ResultSheet')),handGuide:Boolean($('#phase399HandsSheet')),handCoach:Boolean($('#phase399Coach')),chipRack:Boolean($('#phase399ChipRack')),ticketNotice:Boolean($('#phase399TicketNotice')),reikiFeltBrand:$('.table-surface')?.dataset?.sponsorSkin==='reiki',nonCashTournamentTicket:true,mainPotAwareTicket:true,pass:Boolean(state.installed&&!state.lastError),checkedAt:new Date().toISOString()}}
 window.SVR_PHASE399_SET_SPONSOR_ROOM=sponsorRoom;window.SVR_PHASE399_ANDROID_LEARNING_QA=qa;
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{ensureUi();sync()},{once:true});else{ensureUi();sync()}
 setInterval(sync,180);
