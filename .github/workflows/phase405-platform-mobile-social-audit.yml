@@ -82,7 +82,7 @@ jobs:
           grep -q 'Guest 1' game/modules/phase405_mobile_ui.js
           grep -q 'Guest 2' game/modules/phase405_mobile_ui.js
           grep -q 'OPEN • BOT STANDBY' game/modules/phase405_mobile_ui.js
-          grep -q 'querySelectorAll(.burn-zone' game/modules/phase405_mobile_ui.js
+          grep -Fq "querySelectorAll('.burn-zone')" game/modules/phase405_mobile_ui.js
           grep -q 'YOU WON THE TOURNAMENT' game/modules/phase405_mobile_ui.js
           grep -q 'Moving to the next tournament table' game/modules/phase405_mobile_ui.js
           node --check game/modules/phase405_mobile_ui.js
