@@ -36,48 +36,54 @@ jobs:
           git -C source fetch origin main --depth=1
           test "$(git -C source rev-parse HEAD)" = "$(git -C source rev-parse origin/main)"
 
-      - name: Validate Phase 401 Android tournament plus protected builds
+      - name: Validate Phase 403 Android poker reliability plus protected builds
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-LANDSCAPE-LOCK' source/index.html
-          grep -q 'android.html?channel=stable&v=phase401' source/index.html
-          grep -q 'PHASE-401-ANDROID-MODE-HUB-LOCK' source/game/android.html
-          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-LANDSCAPE-LOCK' source/game/android-stable.html
-          grep -q 'phase401_android_tournament_director.js?v=phase401' source/game/android-stable.html
-          grep -q 'phase401_android_champion_crown.js?v=phase401' source/game/android-stable.html
-          grep -q 'phase401_android_landscape_polish.css?v=phase401' source/game/android-stable.html
-          grep -q "if(!isIOS)" source/game/android-stable.html
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' source/index.html
+          grep -q 'android.html?channel=stable&v=phase403' source/index.html
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' source/game/android.html
+          grep -q 'android-stable-phase403.html?v=phase403' source/game/android.html
+          grep -q 'android-stable-phase403.html' source/game/android-tabletop.html
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' source/game/android-stable-phase403.html
+          grep -q 'phase403_android_gameplay.js?v=phase403' source/game/android-stable-phase403.html
+          grep -q 'phase403_android_table_clarity.js?v=phase403' source/game/android-stable-phase403.html
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' source/game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' source/game/modules/phase403_android_pot_rules.js
+          grep -q 'PHASE-403-ANDROID-TABLE-CLARITY-LOCK' source/game/modules/phase403_android_table_clarity.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' source/game/modules/phase403_android_gameplay.js
+          grep -q 'sidePotEngine:true' source/game/modules/phase403_android_gameplay.js
+          grep -q 'contributionAccounting:true' source/game/modules/phase403_android_gameplay.js
+          grep -q 'botPersonalityCount:Object.keys(BOT_PROFILES).length' source/game/modules/phase403_android_gameplay.js
+          grep -q 'phase403-flow-label">LEFT → RIGHT' source/game/modules/phase403_android_table_clarity.js
+          grep -q 'Hand Action History' source/game/modules/phase403_android_table_clarity.js
+          grep -q 'Pot-by-Pot Showdown' source/game/modules/phase403_android_table_clarity.js
           grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-PORTAL-LOCK' source/game/tournaments.html
-          grep -q 'PHASE-401-ANDROID-TOURNAMENT-RESULTS-LOCK' source/game/tournament-results.html
+          grep -q 'android-tabletop.html?v=phase403&mode=tournament' source/game/tournaments.html
           grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-DIRECTOR-LOCK' source/game/modules/phase401_android_tournament_director.js
-          grep -q 'registrationCap:50' source/game/modules/phase401_android_tournament_director.js
-          grep -q 'testFieldSize:10' source/game/modules/phase401_android_tournament_director.js
-          grep -q 'startingStack:10000' source/game/modules/phase401_android_tournament_director.js
-          grep -q 'prizePlayChips:100000' source/game/modules/phase401_android_tournament_director.js
-          grep -q 'roundsPerLevel:2' source/game/modules/phase401_android_tournament_director.js
           grep -q 'PHASE-401-ANDROID-24H-TOURNAMENT-CHAMPION-CROWN-LOCK' source/game/modules/phase401_android_champion_crown.js
-          grep -q 'DURATION_MS=24\*60\*60\*1000' source/game/modules/phase401_android_champion_crown.js
           grep -q 'PHASE-401-ANDROID-LANDSCAPE-HANDHELD-POLISH-LOCK' source/game/styles/phase401_android_landscape_polish.css
-          grep -q 'POKER HANDS CARD' source/game/tournaments.html
-          grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' source/game/android-stable.html
-          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' source/game/modules/phase393_android_gameplay.js
+          grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' source/game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' source/game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK' source/game/modules/phase402_android_gameplay.js
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' source/game/iphone.html
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' source/game/quest.html
-          grep -q '"phase": 401' source/game/manifest.json
+          grep -q '"phase": 403' source/game/manifest.json
+          grep -q '"androidSidePotEngine": true' source/update/app-version.json
+          grep -q '"androidDariusAdvancesToUser": true' source/update/app-version.json
           grep -q '"androidTournamentRegistrationCap": 50' source/update/app-version.json
-          grep -q '"androidTournamentTestFieldSize": 10' source/update/app-version.json
-          grep -q '"androidTournamentPrizePlayChips": 100000' source/update/app-version.json
           grep -q '"androidTournamentChampionCrownHours": 24' source/update/app-version.json
           grep -q '"androidTournamentSharedRegistrationBackendLive": false' source/update/app-version.json
           node --check source/site-public-hooks.js
           node --check source/sw.js
           node --check source/pwa-sw.js
+          node --check source/game/modules/phase403_android_pot_rules.js
+          node --check source/game/modules/phase403_android_gameplay.js
+          node --check source/game/modules/phase403_android_table_clarity.js
           node --check source/game/modules/phase401_android_tournament_director.js
           node --check source/game/modules/phase401_android_champion_crown.js
           node --check source/game/modules/phase400_ios_safari_adapter.js
           node --check source/game/modules/phase393_android_evaluator.js
-          node --check source/game/modules/phase393_android_gameplay.js
           node --check source/game/modules/phase397_android_action_button_guard.js
           node --check source/game/modules/phase399_android_learning_chips_sponsor.js
           node --check source/game/modules/phase399_android_matchmaking_voice.js
@@ -85,13 +91,10 @@ jobs:
           python3 -m json.tool source/game/manifest.json >/dev/null
           python3 -m json.tool source/game/android-release.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
+          test -s source/game/android-stable-phase403.html
           test -s source/game/tournaments.html
           test -s source/game/tournament-results.html
-          test -s source/game/styles/phase401_android_tournament.css
-          test -s source/game/styles/phase401_android_landscape_polish.css
-          test -s source/game/styles/phase401_tournament_portal.css
-          test -s source/game/modules/phase401_android_tournament_director.js
-          test -s source/game/modules/phase401_android_champion_crown.js
+          test -s source/game/styles/phase403_android_table_clarity.css
           test -s source/game/iphone.html
           test -s source/game/quest.html
           test -s source/downloads/svr-poker-android-rc2.apk
@@ -100,6 +103,20 @@ jobs:
           grep -q '"forceUpdate": false' source/game/android-release.json
           grep -q '"showUpdatePrompt": false' source/game/android-release.json
           grep -q '"nativeApkRebuild": false' source/game/android-release.json
+
+      - name: Execute production side-pot sanity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import {buildSidePots,sumPotAmounts,splitPotAmount} from './source/game/modules/phase403_android_pot_rules.js';
+          const audit=buildSidePots([{index:0,amount:1000},{index:1,amount:500},{index:2,amount:200}],1700);
+          if(JSON.stringify(audit.pots.map(p=>p.amount))!==JSON.stringify([600,600,500]))throw new Error('side-pot layers wrong');
+          if(sumPotAmounts(audit.pots)!==1700)throw new Error('pot conservation failed');
+          const split=splitPotAmount(301,[0,5],4,[0,5,1,2,3,4]);
+          if(split.payouts[0]!==151||split.payouts[5]!==150)throw new Error('odd-chip order failed');
+          console.log('Phase 403 production pot sanity passed.');
+          NODE
 
       - name: Build clean production tree
         shell: bash
@@ -124,9 +141,12 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-401-ANDROID-SPONSOR-TOURNAMENT-LANDSCAPE-LOCK",
+            "build": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
             "questBuild": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
-            "androidBuild": "PHASE-401-ANDROID-SPONSOR-TOURNAMENT-LANDSCAPE-LOCK",
+            "androidBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
+            "androidSeatOrderBuild": "PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK",
+            "androidPotRulesBuild": "PHASE-403-ANDROID-SIDE-POT-RULES-LOCK",
+            "androidClarityBuild": "PHASE-403-ANDROID-TABLE-CLARITY-LOCK",
             "androidBettingBuild": "PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK",
             "androidLearningBuild": "PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK",
             "androidMatchVoiceBuild": "PHASE-399-ANDROID-MATCHMAKING-VOICE-READY-LOCK",
@@ -138,13 +158,13 @@ jobs:
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "questRoute": "/game/quest.html?v=phase396",
-            "androidRoute": "/game/android.html?channel=stable&v=phase401",
-            "androidPracticeRoute": "/game/android-tabletop.html?v=phase401&mode=practice",
-            "androidRegularRoute": "/game/android-tabletop.html?v=phase401&mode=regular",
-            "androidTournamentLobbyRoute": "/game/tournaments.html?v=phase401",
-            "androidTournamentRoute": "/game/android-tabletop.html?v=phase401&mode=tournament&tournament=reiki-first-50",
-            "androidTournamentResultsRoute": "/game/tournament-results.html?v=phase401",
-            "androidGameplayRoute": "/game/android-stable.html?v=phase401&mode=regular&direct=1",
+            "androidRoute": "/game/android.html?channel=stable&v=phase403",
+            "androidPracticeRoute": "/game/android-tabletop.html?v=phase403&mode=practice",
+            "androidRegularRoute": "/game/android-tabletop.html?v=phase403&mode=regular",
+            "androidTournamentLobbyRoute": "/game/tournaments.html?v=phase403",
+            "androidTournamentRoute": "/game/android-tabletop.html?v=phase403&mode=tournament&tournament=reiki-first-50",
+            "androidTournamentResultsRoute": "/game/tournament-results.html?v=phase403",
+            "androidGameplayRoute": "/game/android-stable-phase403.html?v=phase403&mode=regular&direct=1",
             "iphoneRoute": "/game/iphone.html?v=phase400",
             "iphoneTabletopRoute": "/game/iphone-tabletop.html?v=phase400",
             "iphoneGameplayRoute": "/game/android-stable.html?v=phase400&platform=ios&safari=1&direct=1",
@@ -153,8 +173,18 @@ jobs:
             "androidPracticeAvailable": true,
             "androidRegularAvailable": true,
             "androidTournamentAvailable": true,
+            "androidVisualLeftToRightSeatOrder": [0,5,1,2,3,4],
+            "androidDariusAdvancesToUser": true,
             "androidExactCallAmounts": true,
             "androidDynamicMinimumRaise": true,
+            "androidPerPlayerContributionTracking": true,
+            "androidSidePotEngine": true,
+            "androidMultipleAllIns": true,
+            "androidSplitPots": true,
+            "androidUncalledReturnGuard": true,
+            "androidActionHistory": true,
+            "androidGraphicalHandExamples": true,
+            "androidDistinctBotPersonalities": 5,
             "androidExactBestFiveEvaluator": true,
             "androidTexasHoldemHandGuide": true,
             "androidSmartHandCoach": true,
@@ -172,6 +202,9 @@ jobs:
             "androidTournamentRoundsPerLevel": 2,
             "androidTournamentHandsCard": true,
             "androidTournamentResultsPage": true,
+            "androidTournamentPositionVisible": true,
+            "androidTournamentAverageStackVisible": true,
+            "androidTournamentNextLevelVisible": true,
             "androidTournamentRegularBankrollIsolated": true,
             "androidTournamentChampionCrownHours": 24,
             "androidTournamentChampionCrownPersistentExpiry": true,
@@ -207,22 +240,24 @@ jobs:
           test -s publish/index.html
           test -s publish/game/android.html
           test -s publish/game/android-tabletop.html
-          test -s publish/game/android-stable.html
+          test -s publish/game/android-stable-phase403.html
           test -s publish/game/tournaments.html
           test -s publish/game/tournament-results.html
-          test -s publish/game/modules/phase401_android_tournament_director.js
-          test -s publish/game/modules/phase401_android_champion_crown.js
-          test -s publish/game/styles/phase401_android_landscape_polish.css
+          test -s publish/game/modules/phase403_android_gameplay.js
+          test -s publish/game/modules/phase403_android_pot_rules.js
+          test -s publish/game/modules/phase403_android_table_clarity.js
+          test -s publish/game/styles/phase403_android_table_clarity.css
           test -s publish/game/iphone.html
           test -s publish/game/quest.html
-          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-LANDSCAPE-LOCK' publish/deploy-health.json
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' publish/deploy-health.json
+          grep -q '"androidDariusAdvancesToUser": true' publish/deploy-health.json
+          grep -q '"androidSidePotEngine": true' publish/deploy-health.json
+          grep -q '"androidMultipleAllIns": true' publish/deploy-health.json
+          grep -q '"androidActionHistory": true' publish/deploy-health.json
+          grep -q '"androidDistinctBotPersonalities": 5' publish/deploy-health.json
           grep -q '"androidTournamentRegistrationCap": 50' publish/deploy-health.json
-          grep -q '"androidTournamentTestFieldSize": 10' publish/deploy-health.json
-          grep -q '"androidTournamentPrizePlayChips": 100000' publish/deploy-health.json
           grep -q '"androidTournamentChampionCrownHours": 24' publish/deploy-health.json
-          grep -q '"androidLandscapeHandheldPolish": true' publish/deploy-health.json
           grep -q '"androidTournamentSharedRegistrationBackendLive": false' publish/deploy-health.json
-          grep -q '"androidExactBestFiveEvaluator": true' publish/deploy-health.json
           grep -q '"questTeleportEnabled": false' publish/deploy-health.json
           grep -q '"iosIphoneSafariAvailable": true' publish/deploy-health.json
 
@@ -235,8 +270,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 401.'
+            echo 'Production already matches Phase 403.'
           else
-            git commit -m "Deploy Phase 401 Android sponsor tournament and landscape ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 403 Android poker reliability ${GITHUB_SHA}"
             git push origin gh-pages
           fi
