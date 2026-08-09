@@ -1,0 +1,176 @@
+name: Phase 405 Platform Mobile Social Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase405-platform-mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+      - name: Protect public launch page structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- index.html)"
+          grep -q 'Public Launch Page' index.html
+          grep -q 'Preview Site' index.html
+          grep -q 'platformGameButton' index.html
+          grep -q 'Contact' index.html
+          grep -q 'PHASE 405 PLATFORM / MOBILE' site-public-hooks.js
+          grep -q 'GAMING TEST READY' site-public-hooks.js
+          grep -q "if(d.quest)" site-public-hooks.js
+          grep -q "button.textContent='Enter VR'" site-public-hooks.js
+      - name: Validate platform device alignment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s platform-device.js
+          grep -q 'PHASE-405-PLATFORM-DEVICE-ALIGNMENT-LOCK' platform-device.js
+          grep -q 'OculusBrowser' platform-device.js
+          grep -q 'svr-platform-quest' platform-device.js
+          grep -q 'visualViewport' platform-device.js
+          grep -q "isSessionSupported?.('immersive-vr')" platform-device.js
+          grep -q 'svr-platform-quest' launch-quest.css
+          grep -q 'calc(100vw - 24px)' game/android.html
+          grep -q 'overflow-wrap:anywhere' game/android.html
+          node --check platform-device.js
+      - name: Validate Phase 405 shared mobile shell
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/android-stable-phase405.html
+          test -s game/modules/phase405_mobile_ui.js
+          test -s game/modules/phase405_vox_voice.js
+          test -s game/styles/phase405_mobile_social_alignment.css
+          grep -q 'PHASE-405-PLATFORM-MOBILE-SOCIAL-LOCK' game/android-stable-phase405.html
+          grep -q 'phase403_android_gameplay.js?v=phase403' game/android-stable-phase405.html
+          grep -q 'phase404_android_mobile_safety.js?v=phase404' game/android-stable-phase405.html
+          grep -q 'phase400_ios_safari_adapter.js?v=phase400' game/android-stable-phase405.html
+          grep -q 'phase405_mobile_ui.js?v=phase405' game/android-stable-phase405.html
+          grep -q 'phase405_vox_voice.js?v=phase405' game/android-stable-phase405.html
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('game/android-stable-phase405.html').read_text()
+          if s.count('class="burn-zone"') != 1: raise SystemExit('Phase 405 stable shell must contain exactly one burn-zone')
+          if '>DECK<' not in s: raise SystemExit('deck must be clearly labeled DECK')
+          if s.index('phase404_android_mobile_safety.js?v=phase404') >= s.index('phase403_android_gameplay.js?v=phase403'): raise SystemExit('Phase 404 ALL IN guard must load before engine')
+          print('Single burn pile and protected script order passed.')
+          PY
+      - name: Validate hands profiles guests and win transitions
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'POKER HANDS' game/modules/phase405_mobile_ui.js
+          grep -q 'phase405ProfileSheet' game/modules/phase405_mobile_ui.js
+          grep -q 'data-close405' game/modules/phase405_mobile_ui.js
+          grep -q 'Guest 1' game/modules/phase405_mobile_ui.js
+          grep -q 'Guest 2' game/modules/phase405_mobile_ui.js
+          grep -q 'OPEN • BOT STANDBY' game/modules/phase405_mobile_ui.js
+          grep -q 'querySelectorAll(.burn-zone' game/modules/phase405_mobile_ui.js
+          grep -q 'YOU WON THE TOURNAMENT' game/modules/phase405_mobile_ui.js
+          grep -q 'Moving to the next tournament table' game/modules/phase405_mobile_ui.js
+          node --check game/modules/phase405_mobile_ui.js
+      - name: Validate VOX remains peer-safe
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-405-MOBILE-VOX-VOICE-LOCK' game/modules/phase405_vox_voice.js
+          grep -q 'PUSH TO TALK' game/modules/phase405_vox_voice.js
+          grep -q '>VOX<' game/modules/phase405_vox_voice.js
+          grep -q 'VOX sensitivity' game/modules/phase405_vox_voice.js
+          grep -q 'echoCancellation:true' game/modules/phase405_vox_voice.js
+          grep -q 'noiseSuppression:true' game/modules/phase405_vox_voice.js
+          grep -q 'NO LIVE PEER' game/modules/phase405_vox_voice.js
+          grep -q '"androidProductionMatchServerConfigured": false' update/app-version.json
+          grep -q '"androidLiveMultiplayer": false' update/app-version.json
+          grep -q '"androidLiveVoice": false' update/app-version.json
+          node --check game/modules/phase405_vox_voice.js
+      - name: Validate five-hour fake-money tournament schedule
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-405-FIVE-HOUR-TOURNAMENT-SCHEDULE-LOCK' game/modules/phase405_tournament_scheduler.js
+          grep -q 'SLOT_MS=5\*60\*60\*1000' game/modules/phase405_tournament_scheduler.js
+          grep -q "source:'bot-simulation'" game/modules/phase405_tournament_scheduler.js
+          grep -q 'playMoneyOnly:true' game/modules/phase405_tournament_scheduler.js
+          grep -q 'sharedBackend:false' game/modules/phase405_tournament_scheduler.js
+          grep -q 'phase405_tournament_archive' game/modules/phase405_tournament_scheduler.js
+          grep -q 'phase405_tournament_scheduler.js?v=phase405' game/tournaments.html
+          grep -q 'phase405_tournament_scheduler.js?v=phase405' game/tournament-results.html
+          node <<'NODE'
+          const SLOT=5*60*60*1000;
+          if(SLOT!==18000000)throw new Error('5-hour slot duration wrong');
+          const anchor=Date.UTC(2026,0,1);
+          for(let i=0;i<1000;i++){const a=anchor+i*SLOT,b=anchor+(i+1)*SLOT;if(b-a!==18000000)throw new Error('slot cadence drift')}
+          console.log('1,000 five-hour slots passed exact cadence test.');
+          NODE
+          node --check game/modules/phase405_tournament_scheduler.js
+      - name: Validate portrait upload and iPhone parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s site/js/phase405-profile-portrait.js
+          grep -q 'svr405_profile_portrait' site/js/phase405-profile-portrait.js
+          grep -q 'canvas.width=size' site/js/phase405-profile-portrait.js
+          grep -q 'accept="image/\*"' site/js/phase405-profile-portrait.js
+          grep -q 'android-stable-phase405.html' game/iphone-tabletop.html
+          grep -q 'SVR_PHASE405_IPHONE_WRAPPER_QA' game/iphone-tabletop.html
+          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/modules/phase400_ios_safari_adapter.js
+          node --check site/js/phase405-profile-portrait.js
+      - name: Preserve Phase 403 poker and Quest authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' game/modules/phase403_android_pot_rules.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase403_android_table_clarity.js game/modules/phase398_android_raise_rules.js)"
+          test -z "$(git diff origin/main -- game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
+          node --input-type=module <<'NODE'
+          import {buildSidePots,sumPotAmounts,splitPotAmount} from './game/modules/phase403_android_pot_rules.js';
+          const audit=buildSidePots([{index:0,amount:1000},{index:1,amount:500},{index:2,amount:200}],1700);
+          if(sumPotAmounts(audit.pots)!==1700)throw new Error('pot conservation changed');
+          const split=splitPotAmount(301,[0,5],4,[0,5,1,2,3,4]);
+          if(split.payouts[0]!==151||split.payouts[5]!==150)throw new Error('odd chip order changed');
+          NODE
+      - name: Validate metadata cache and APK policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '"phase": 405' game/manifest.json
+          grep -q '"scheduleEveryHours": 5' game/manifest.json
+          grep -q '"androidSingleBurnPile": true' update/app-version.json
+          grep -q 'svr-poker-phase405-platform-mobile-social-v1' sw.js
+          grep -q 'svr-poker-phase405-platform-mobile-social-v1' pwa-sw.js
+          grep -q 'svr-poker-phase404-android-mobile-safety-v1' sw.js
+          node --check site-public-hooks.js
+          node --check sw.js
+          node --check pwa-sw.js
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
