@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Validate protected Phase 402 order and active Phase 403 route
+      - name: Validate protected Phase 402 order and active Phase 404 route
         shell: bash
         run: |
           set -euo pipefail
@@ -29,15 +29,16 @@ jobs:
           test -s game/modules/phase402_android_gameplay.js
           test -s game/android-stable-phase403.html
           test -s game/modules/phase403_android_gameplay.js
+          test -s game/android-stable-phase404.html
           grep -q 'PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK' game/android.html
-          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/android.html
-          grep -q 'android-tabletop.html?v=phase403' game/android.html
-          grep -q 'android-stable-phase403.html?v=phase403' game/android.html
-          grep -q 'android-stable-phase403.html' game/android-tabletop.html
+          grep -q 'PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK' game/android.html
+          grep -q 'android-tabletop.html?v=phase404' game/android.html
+          grep -q 'android-stable-phase404.html?v=phase404' game/android.html
+          grep -q 'android-stable-phase404.html' game/android-tabletop.html
           grep -q 'SVR_PHASE402_ANDROID_SEAT_ORDER_QA' game/android-tabletop.html
           grep -q 'SVR_PHASE403_ANDROID_ENGINE_QA' game/android-tabletop.html
-          grep -q 'phase403_android_gameplay.js?v=phase403' game/android-stable-phase403.html
-          grep -q 'data-seat-order-build="PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK"' game/android-stable-phase403.html
+          grep -q 'phase403_android_gameplay.js?v=phase403' game/android-stable-phase404.html
+          grep -q 'data-seat-order-build="PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK"' game/android-stable-phase404.html
 
       - name: Validate physical leftward seat cycle
         shell: bash
@@ -94,7 +95,7 @@ jobs:
           set -euo pipefail
           grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
           grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase403_android_gameplay.js
-          grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' game/android-stable-phase403.html
+          grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' game/android-stable-phase404.html
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
           grep -q 'phase393_android_gameplay.js?v=phase398' game/android-stable.html
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone.html
