@@ -1,0 +1,161 @@
+name: Phase 403 Android Poker Engine Reliability Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase403-android-engine-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Validate Phase 403 route and modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/android-stable-phase403.html
+          test -s game/modules/phase403_android_gameplay.js
+          test -s game/modules/phase403_android_pot_rules.js
+          test -s game/modules/phase403_android_table_clarity.js
+          test -s game/styles/phase403_android_table_clarity.css
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/android.html
+          grep -q 'android-tabletop.html?v=phase403' game/android.html
+          grep -q 'android-stable-phase403.html?v=phase403' game/android.html
+          grep -q 'android-stable-phase403.html' game/android-tabletop.html
+          grep -q 'SVR_PHASE403_ANDROID_ENGINE_QA' game/android-tabletop.html
+          grep -q 'SVR_PHASE403_TABLE_CLARITY_QA' game/android-tabletop.html
+          grep -q 'phase403_android_gameplay.js?v=phase403' game/android-stable-phase403.html
+          grep -q 'phase403_android_table_clarity.js?v=phase403' game/android-stable-phase403.html
+          grep -q 'phase403_android_table_clarity.css?v=phase403' game/android-stable-phase403.html
+          grep -q 'phase403_android_pot_rules.js?v=phase403' game/modules/phase403_android_gameplay.js
+          node --check game/modules/phase403_android_pot_rules.js
+          node --check game/modules/phase403_android_gameplay.js
+          node --check game/modules/phase403_android_table_clarity.js
+
+      - name: Lock permanent visual left-to-right table flow
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'state.dealer=nextVisualSeat(state.dealer)' game/modules/phase403_android_gameplay.js
+          grep -q 'const small=nextVisualSeat(state.dealer),big=nextVisualSeat(small)' game/modules/phase403_android_gameplay.js
+          grep -q 'const first=nextEligible(big)' game/modules/phase403_android_gameplay.js
+          grep -q 'state.roundOrder=leftwardOrderAfter(state.dealer)' game/modules/phase403_android_gameplay.js
+          grep -q 'const order=visualSeatsAfter(state.dealer)' game/modules/phase403_android_gameplay.js
+          node <<'NODE'
+          const order=[0,5,1,2,3,4],names={0:'YOU',1:'Claudia',2:'Eric',3:'Maya',4:'Darius',5:'Nova'};
+          const next=seat=>order[(order.indexOf(seat)+1)%order.length];
+          const expected=[[0,5],[5,1],[1,2],[2,3],[3,4],[4,0]];
+          for(let loop=0;loop<10000;loop++)for(const [from,to] of expected)if(next(from)!==to)throw new Error(`${names[from]} did not advance to ${names[to]}`);
+          console.log('10,000 permanent seat-cycle iterations passed:',order.map(i=>names[i]).join(' -> '));
+          NODE
+
+      - name: Execute side-pot and split-pot scenarios
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import {buildSidePots,splitPotAmount,sumPotAmounts} from './game/modules/phase403_android_pot_rules.js';
+          const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
+          let audit=buildSidePots([{index:0,amount:1000},{index:1,amount:500},{index:2,amount:200}],1700);
+          assert(JSON.stringify(audit.pots.map(p=>p.amount))===JSON.stringify([600,600,500]),`3-way side pots wrong ${JSON.stringify(audit.pots)}`);
+          assert(sumPotAmounts(audit.pots)===1700,'3-way pot total must conserve all chips');
+          audit=buildSidePots([{index:0,amount:1000,folded:false},{index:1,amount:1000,folded:true},{index:2,amount:500,folded:false}],2500);
+          assert(audit.pots[0].amount===1500&&audit.pots[1].amount===1000,'folded contribution pot layers wrong');
+          assert(audit.pots[1].eligibleIndexes.length===1&&audit.pots[1].eligibleIndexes[0]===0,'folded player must not be eligible for side pot');
+          audit=buildSidePots([{index:0,amount:500,folded:false},{index:1,amount:1000,folded:true}],1500);
+          assert(audit.pots[1].type==='refund','unmatched folded top layer should become uncalled return');
+          audit=buildSidePots([{index:0,amount:100},{index:1,amount:100},{index:2,amount:100},{index:3,amount:100},{index:4,amount:100},{index:5,amount:100}],650);
+          assert(audit.delta===50&&sumPotAmounts(audit.pots)===650,'untracked forced-bet remainder must reconcile into pot');
+          const split=splitPotAmount(301,[0,5],4,[0,5,1,2,3,4]);
+          assert(split.payouts[0]===151&&split.payouts[5]===150,'odd chip must go to first winner left-to-right from dealer');
+          console.log('Explicit Phase 403 side-pot scenarios passed.');
+          NODE
+
+      - name: Stress chip conservation over randomized all-ins
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import {buildSidePots,splitPotAmount,sumPotAmounts} from './game/modules/phase403_android_pot_rules.js';
+          const order=[0,5,1,2,3,4];
+          for(let test=0;test<12000;test++){
+            const rows=Array.from({length:6},(_,index)=>({index,amount:Math.floor(Math.random()*201)*25,folded:Math.random()<.24}));
+            if(rows.every(r=>r.folded))rows[0].folded=false;
+            const tracked=rows.reduce((sum,r)=>sum+r.amount,0),extra=Math.random()<.1?Math.floor(Math.random()*5)*25:0,total=tracked+extra;
+            const audit=buildSidePots(rows,total);
+            if(sumPotAmounts(audit.pots)!==total)throw new Error(`pot conservation failed at test ${test}`);
+            let paid=0;
+            for(const pot of audit.pots){
+              const candidates=(pot.type==='refund'?pot.participantIndexes:pot.eligibleIndexes);
+              if(!candidates.length)continue;
+              const winners=candidates.filter(()=>Math.random()<.45);if(!winners.length)winners.push(candidates[0]);
+              const split=splitPotAmount(pot.amount,winners,order[test%order.length],order);
+              const subtotal=Object.values(split.payouts).reduce((a,b)=>a+b,0);
+              if(subtotal!==pot.amount)throw new Error(`split conservation failed at test ${test}`);
+              paid+=subtotal;
+            }
+            if(paid!==total)throw new Error(`total payouts ${paid} != pot ${total} at test ${test}`);
+          }
+          console.log('12,000 randomized pot and payout conservation scenarios passed.');
+          NODE
+
+      - name: Validate clarity teaching bots and tournament HUD
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "Claudia.*style:'TIGHT'" game/modules/phase403_android_gameplay.js
+          grep -q "Eric.*style:'BALANCED'" game/modules/phase403_android_gameplay.js
+          grep -q "Maya.*style:'AGGRESSIVE'" game/modules/phase403_android_gameplay.js
+          grep -q "Darius.*style:'LOOSE AGGRESSIVE'" game/modules/phase403_android_gameplay.js
+          grep -q "Nova.*style:'TRICKY'" game/modules/phase403_android_gameplay.js
+          grep -q 'phase403-flow-label">LEFT → RIGHT' game/modules/phase403_android_table_clarity.js
+          grep -q 'Hand Action History' game/modules/phase403_android_table_clarity.js
+          grep -q 'Pot-by-Pot Showdown' game/modules/phase403_android_table_clarity.js
+          grep -q 'GUIDE_EXAMPLES' game/modules/phase403_android_table_clarity.js
+          grep -q 'data-pos' game/modules/phase403_android_table_clarity.js
+          grep -q 'data-avg' game/modules/phase403_android_table_clarity.js
+          grep -q 'data-next' game/modules/phase403_android_table_clarity.js
+          grep -q 'phase403-flow-rail' game/styles/phase403_android_table_clarity.css
+          grep -q 'phase403-turn-arrow' game/styles/phase403_android_table_clarity.css
+
+      - name: Preserve protected rules platforms tournament and APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK' game/modules/phase402_android_gameplay.js
+          grep -q 'PHASE-399-ANDROID-LEARNING-CHIPS-SPONSOR-LOCK' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-DIRECTOR-LOCK' game/modules/phase401_android_tournament_director.js
+          grep -q 'PHASE-401-ANDROID-24H-TOURNAMENT-CHAMPION-CROWN-LOCK' game/modules/phase401_android_champion_crown.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone.html
+          grep -q 'phase393_android_gameplay.js?v=phase398' game/android-stable.html
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          grep -q '"phase": 403' game/manifest.json
+          grep -q '"androidSidePotEngine": true' update/app-version.json
+          grep -q '"androidDariusAdvancesToUser": true' update/app-version.json
+          grep -q '"androidTournamentSharedRegistrationBackendLive": false' update/app-version.json
+          grep -q '"androidLiveMultiplayer": false' update/app-version.json
+          grep -q 'svr-poker-phase403-android-engine-reliability-v1' sw.js
+          grep -q 'svr-poker-phase403-android-engine-reliability-v1' pwa-sw.js
