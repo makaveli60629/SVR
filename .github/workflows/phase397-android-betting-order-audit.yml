@@ -21,52 +21,59 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Validate Android betting source contracts
+      - name: Validate active Android betting source contracts
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-397-ANDROID-BETTING-ORDER-CHECK-CALL-RAISE-LOCK' game/modules/phase393_android_gameplay.js
-          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/modules/phase393_android_gameplay.js
-          grep -q 'clockwiseOrderAfter' game/modules/phase393_android_gameplay.js
-          grep -q 'const small=(state.dealer+1)%6,big=(state.dealer+2)%6' game/modules/phase393_android_gameplay.js
-          grep -q 'const first=nextEligible(big)' game/modules/phase393_android_gameplay.js
-          grep -q 'const next=nextEligible(state.dealer)' game/modules/phase393_android_gameplay.js
-          grep -q 'legalFullRaise' game/modules/phase393_android_gameplay.js
-          grep -q 'lastFullRaiseSize' game/modules/phase393_android_gameplay.js
-          grep -q 'SVR_PHASE398_ANDROID_BETTING_QA' game/modules/phase393_android_gameplay.js
+          grep -q 'PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK' game/modules/phase402_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/modules/phase402_android_gameplay.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase402_android_gameplay.js
+          grep -q 'leftwardOrderAfter' game/modules/phase402_android_gameplay.js
+          grep -q 'state.dealer=nextVisualSeat(state.dealer)' game/modules/phase402_android_gameplay.js
+          grep -q 'const small=nextVisualSeat(state.dealer),big=nextVisualSeat(small)' game/modules/phase402_android_gameplay.js
+          grep -q 'const first=nextEligible(big)' game/modules/phase402_android_gameplay.js
+          grep -q 'const next=nextEligible(state.dealer)' game/modules/phase402_android_gameplay.js
+          grep -q 'legalFullRaise' game/modules/phase402_android_gameplay.js
+          grep -q 'lastFullRaiseSize' game/modules/phase402_android_gameplay.js
+          grep -q 'SVR_PHASE398_ANDROID_BETTING_QA' game/modules/phase402_android_gameplay.js
+          grep -q 'SVR_PHASE402_ANDROID_SEAT_ORDER_QA' game/modules/phase402_android_gameplay.js
           grep -q 'PHASE-398-ANDROID-RAISE-CONTROL-GUARD-LOCK' game/modules/phase397_android_action_button_guard.js
           grep -q 'RAISE TO' game/modules/phase397_android_action_button_guard.js
-          grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable.html
-          grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase393_android_gameplay.js
-          node --check game/modules/phase393_android_gameplay.js
+          grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable-phase402.html
+          grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase402_android_gameplay.js
+          node --check game/modules/phase402_android_gameplay.js
           node --check game/modules/phase397_android_action_button_guard.js
           node --check game/modules/phase398_android_raise_rules.js
 
-      - name: Simulate six-seat Holdem action rotation
+      - name: Simulate physical six-seat Holdem action rotation
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
-          const seats=6;
-          const orderAfter=(anchor,eligible=new Set([0,1,2,3,4,5]))=>{
-            const out=[];
-            for(let step=1;step<=seats;step++){
-              const i=(anchor+step)%seats;
+          const visual=[0,5,1,2,3,4];
+          const names={0:'YOU',1:'Claudia',2:'Eric',3:'Maya',4:'Darius',5:'Nova'};
+          const orderAfter=(anchor,eligible=new Set(visual))=>{
+            const pos=visual.indexOf(anchor),out=[];
+            for(let step=1;step<=visual.length;step++){
+              const i=visual[(pos+step)%visual.length];
               if(eligible.has(i))out.push(i);
             }
             return out;
           };
-          for(let dealer=0;dealer<seats;dealer++){
-            const small=(dealer+1)%seats;
-            const big=(dealer+2)%seats;
-            const pre=orderAfter(big);
-            const post=orderAfter(dealer);
-            if(pre[0]!==((big+1)%seats))throw new Error(`bad preflop first actor for dealer ${dealer}`);
-            if(post[0]!==((dealer+1)%seats))throw new Error(`bad postflop first actor for dealer ${dealer}`);
-            if(new Set(pre).size!==seats||new Set(post).size!==seats)throw new Error(`duplicate action order for dealer ${dealer}`);
+          const next=s=>orderAfter(s)[0];
+          if(next(4)!==0)throw new Error('Darius must act to YOU next');
+          if(next(0)!==5)throw new Error('YOU must act to Nova next');
+          if(next(5)!==1)throw new Error('Nova must act to Claudia next');
+          if(next(1)!==2||next(2)!==3||next(3)!==4)throw new Error('upper-table physical order is wrong');
+          for(const dealer of visual){
+            const small=next(dealer),big=next(small),pre=orderAfter(big),post=orderAfter(dealer);
+            if(pre[0]!==next(big))throw new Error(`bad preflop first actor for dealer ${names[dealer]}`);
+            if(post[0]!==next(dealer))throw new Error(`bad postflop first actor for dealer ${names[dealer]}`);
+            if(new Set(pre).size!==visual.length||new Set(post).size!==visual.length)throw new Error(`duplicate action order for dealer ${names[dealer]}`);
           }
-          const eligible=new Set([0,2,4]);
-          const skipped=orderAfter(0,eligible);
-          if(JSON.stringify(skipped)!==JSON.stringify([2,4,0]))throw new Error(`fold/all-in skip order wrong: ${skipped}`);
-          console.log('Phase 397 clockwise action order remains correct.');
+          const withoutNova=orderAfter(4,new Set([0,1,2,3,4]));
+          if(withoutNova[0]!==0)throw new Error(`Darius skipped YOU when Nova unavailable: ${withoutNova}`);
+          const withoutUser=orderAfter(4,new Set([1,2,3,4,5]));
+          if(withoutUser[0]!==5)throw new Error(`fold/all-in skip order wrong when YOU unavailable: ${withoutUser}`);
+          console.log('Physical Android action order:',visual.map(i=>names[i]).join(' -> '));
           NODE

@@ -31,8 +31,8 @@ jobs:
           grep -q '>PRACTICE<' game/android.html
           grep -q '>REGULAR<' game/android.html
           grep -q 'REIKI TOURNAMENT' game/android.html
-          grep -q 'android-tabletop.html?v=phase401&mode=practice' game/android.html
-          grep -q 'android-tabletop.html?v=phase401&mode=regular' game/android.html
+          grep -q 'android-tabletop.html?v=phase402&mode=practice' game/android.html
+          grep -q 'android-tabletop.html?v=phase402&mode=regular' game/android.html
           grep -q 'tournaments.html?v=phase401' game/android.html
           test -s game/tournaments.html
           test -s game/tournament-results.html
