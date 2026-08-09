@@ -17,12 +17,14 @@ export function buildSidePots(contributions,totalPot=null){
     const amount=(cap-previous)*participants.length;
     if(amount>0){
       const eligible=participants.filter(row=>!row.folded).map(row=>row.index);
+      const uncalled=participants.length===1;
       pots.push({
         cap,
         amount,
         participantIndexes:participants.map(row=>row.index),
         eligibleIndexes:eligible,
-        type:eligible.length?'pot':'refund'
+        type:uncalled||!eligible.length?'refund':'pot',
+        reason:uncalled?'uncalled-excess':(!eligible.length?'no-eligible-contender':null)
       });
     }
     previous=cap;
@@ -33,12 +35,17 @@ export function buildSidePots(contributions,totalPot=null){
   if(delta>0){
     if(pots.length){pots[0].amount+=delta;pots[0].untrackedRemainder=(pots[0].untrackedRemainder||0)+delta}
     else{
-      const eligible=rows.filter(row=>!row.folded).map(row=>row.index);
-      pots.push({cap:0,amount:delta,participantIndexes:rows.map(row=>row.index),eligibleIndexes:eligible,type:eligible.length?'pot':'refund',untrackedRemainder:delta});
+      const eligible=rows.filter(row=>!row.folded).map(row=>row.index),participants=rows.map(row=>row.index);
+      pots.push({cap:0,amount:delta,participantIndexes:participants,eligibleIndexes:eligible,type:participants.length===1||!eligible.length?'refund':'pot',reason:participants.length===1?'uncalled-excess':null,untrackedRemainder:delta});
     }
   }
+  let contestedIndex=0,returnIndex=0;
+  const labeled=pots.map(pot=>{
+    if(pot.type==='refund')return{...pot,label:returnIndex++===0?'UNCALLED RETURN':`RETURN ${returnIndex}`};
+    const label=contestedIndex===0?'MAIN POT':`SIDE POT ${contestedIndex}`;contestedIndex++;return{...pot,label};
+  });
   return{
-    pots:pots.map((pot,index)=>({...pot,label:index===0?'MAIN POT':`SIDE POT ${index}`})),
+    pots:labeled,
     tracked,
     requested,
     delta,
