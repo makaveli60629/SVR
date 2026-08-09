@@ -1,10 +1,10 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "SVR Poker Phase 403 adds permanent Android left-to-right table flow, audited side pots, multiple-all-in reliability, smarter bots, action history, and stronger teaching while preserving iPhone/Safari and Quest.",
-  "id": "/?source=pwa-phase403",
-  "predecessor_id": "pwa-phase401",
-  "start_url": "/?source=pwa-phase403&v=phase403",
+  "description": "SVR Poker Phase 404 adds Android mobile decision safety, double-tap ALL IN protection, pot-odds information, screen-awake support and copyable playtest session reporting while preserving the Phase 403 poker engine, iPhone/Safari and Quest.",
+  "id": "/?source=pwa-phase404",
+  "predecessor_id": "pwa-phase403",
+  "start_url": "/?source=pwa-phase404&v=phase404",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -19,11 +19,11 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {"name": "Android Game Modes", "short_name": "Android", "description": "Choose Practice, Regular or Tournament with the Phase 403 reliable poker engine.", "url": "/game/android.html?channel=stable&v=phase403", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Reiki First 50 Tournament", "short_name": "Tournament", "description": "Open the Reiki First 50 sponsor tournament through Phase 403 Android gameplay.", "url": "/game/tournaments.html?v=phase403", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Android Game Modes", "short_name": "Android", "description": "Choose Practice, Regular or Tournament with Phase 404 mobile safety over the Phase 403 poker engine.", "url": "/game/android.html?channel=stable&v=phase404", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Reiki First 50 Tournament", "short_name": "Tournament", "description": "Open the Reiki First 50 sponsor tournament through Phase 404 Android gameplay.", "url": "/game/tournaments.html?v=phase404", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Play on iPhone / Safari", "short_name": "iPhone", "description": "Open the protected Phase 400 iPhone and Safari touch table.", "url": "/game/iphone.html?v=phase400", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Launch Quest VR", "short_name": "Quest VR", "description": "Open the protected Phase 396 seated Quest table with teleport disabled, clean felt, and visible dealing.", "url": "/game/quest.html?v=phase396", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Camera 3 Table Showcase", "short_name": "CAM 3", "description": "Open the table-focused production preview.", "url": "/game/camera3-showcase.html?v=phase392", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Download the current manual-update Android APK.", "url": "/downloads/?v=phase403", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
+    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Download the current manual-update Android APK.", "url": "/downloads/?v=phase404", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }

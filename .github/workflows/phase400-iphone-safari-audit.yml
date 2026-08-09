@@ -86,7 +86,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q '"phase": 403' game/manifest.json
+          grep -q '"phase": 404' game/manifest.json
           grep -q '"iphoneSafariAvailable": true' game/manifest.json
           grep -q '"usesProtectedAndroidPokerEngine": true' game/manifest.json
           grep -q '"iosIphoneSafariAvailable": true' update/app-version.json
