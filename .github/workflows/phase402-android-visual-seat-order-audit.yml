@@ -1,0 +1,101 @@
+name: Phase 402 Android Visual Seat Order Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase402-android-seat-order-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Validate Phase 402 Android route
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/android-stable-phase402.html
+          test -s game/modules/phase402_android_gameplay.js
+          grep -q 'PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK' game/android.html
+          grep -q 'android-tabletop.html?v=phase402' game/android.html
+          grep -q 'android-stable-phase402.html?v=phase402' game/android.html
+          grep -q 'android-stable-phase402.html' game/android-tabletop.html
+          grep -q 'SVR_PHASE402_ANDROID_SEAT_ORDER_QA' game/android-tabletop.html
+          grep -q 'phase402_android_gameplay.js?v=phase402' game/android-stable-phase402.html
+          grep -q 'data-seat-order-build="PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK"' game/android-stable-phase402.html
+
+      - name: Validate physical leftward seat cycle
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase402_android_gameplay.js
+          grep -q 'dariusGoesToUser:nextVisualSeat(4)===0' game/modules/phase402_android_gameplay.js
+          grep -q 'userGoesToNova:nextVisualSeat(0)===5' game/modules/phase402_android_gameplay.js
+          grep -q 'novaGoesToClaudia:nextVisualSeat(5)===1' game/modules/phase402_android_gameplay.js
+          node <<'NODE'
+          const order=[0,5,1,2,3,4];
+          const names={0:'YOU',1:'Claudia',2:'Eric',3:'Maya',4:'Darius',5:'Nova'};
+          const after=(seat)=>{const p=order.indexOf(seat);return order[(p+1)%order.length]};
+          const expected=[[4,0],[0,5],[5,1],[1,2],[2,3],[3,4]];
+          for(const [from,to] of expected){if(after(from)!==to)throw new Error(`${names[from]} should go to ${names[to]}, got ${names[after(from)]}`)}
+          const eligibleAfter=(seat,eligible)=>{const p=order.indexOf(seat);for(let s=1;s<=order.length;s++){const x=order[(p+s)%order.length];if(eligible.has(x))return x}return null};
+          if(eligibleAfter(4,new Set([0,1,2,3,4]))!==0)throw new Error('Darius must go to YOU when Nova is unavailable');
+          if(eligibleAfter(4,new Set([0,1,2,3,4,5]))!==0)throw new Error('Darius must go to YOU even when every seat is live');
+          if(eligibleAfter(0,new Set([0,1,2,3,4]))!==1)throw new Error('When Nova is folded, YOU must go to Claudia');
+          console.log('Phase 402 physical leftward seat cycle passed:',order.map(i=>names[i]).join(' -> '));
+          NODE
+
+      - name: Validate dealer blinds and street anchors use physical order
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'state.dealer=nextVisualSeat(state.dealer)' game/modules/phase402_android_gameplay.js
+          grep -q 'const small=nextVisualSeat(state.dealer),big=nextVisualSeat(small)' game/modules/phase402_android_gameplay.js
+          grep -q 'const first=nextEligible(big)' game/modules/phase402_android_gameplay.js
+          grep -q 'const next=nextEligible(state.dealer)' game/modules/phase402_android_gameplay.js
+          grep -q 'state.roundOrder=leftwardOrderAfter(state.dealer)' game/modules/phase402_android_gameplay.js
+          grep -q 'const order=visualSeatsAfter(state.dealer)' game/modules/phase402_android_gameplay.js
+          node <<'NODE'
+          const order=[0,5,1,2,3,4];
+          const next=s=>order[(order.indexOf(s)+1)%order.length];
+          for(const dealer of order){const sb=next(dealer),bb=next(sb),first=next(bb);if(new Set([dealer,sb,bb]).size!==3)throw new Error('dealer/SB/BB collision');if(first===bb)throw new Error('preflop did not move left of BB')}
+          console.log('Dealer, blind and preflop anchors passed all six physical seats.');
+          NODE
+
+      - name: Validate tournament uses same physical order
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'SEAT_ORDER_BUILD=.PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK.' game/modules/phase401_android_tournament_director.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase401_android_tournament_director.js
+          grep -q 'for(const i of visualSeatsAfter(from))' game/modules/phase401_android_tournament_director.js
+          grep -q 'dariusGoesToUser:visualSeatsAfter(4)\[0\]===0' game/modules/phase401_android_tournament_director.js
+          grep -q 'userGoesToNova:visualSeatsAfter(0)\[0\]===5' game/modules/phase401_android_tournament_director.js
+
+      - name: Preserve betting teaching Quest iPhone and APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase402_android_gameplay.js
+          grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' game/android-stable-phase402.html
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q 'phase393_android_gameplay.js?v=phase398' game/android-stable.html
+          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone.html
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+          node --check game/modules/phase402_android_gameplay.js
+          node --check game/modules/phase401_android_tournament_director.js
