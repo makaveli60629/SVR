@@ -1,10 +1,10 @@
-/* PHASE-395-QUEST-BROWSER-PUBLIC-PAGE-CENTER-LOCK */
-html.quest-browser,html.quest-browser body{width:100%;min-width:100%;min-height:100%;margin:0}
-html.quest-browser body.launch-body{display:grid;place-items:center;overflow:auto;overflow-x:hidden;padding:0;background:#000}
-html.quest-browser .launch-page{width:min(760px,calc(100vw - 32px));max-width:760px;min-height:100dvh;margin:0 auto;justify-self:center;align-self:center;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));transform:none}
-html.quest-browser .launch-logo{width:min(42vh,520px,68vw);max-height:39vh;margin-inline:auto}
-html.quest-browser .launch-copy,html.quest-browser .action-row,html.quest-browser .platform-note,html.quest-browser .launch-footer{margin-left:auto;margin-right:auto}
-html.quest-browser .action-row{width:min(650px,92%);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));justify-content:center}
-html.quest-browser .btn{min-width:0;width:100%;padding-left:14px;padding-right:14px}
-@media (orientation:landscape){html.quest-browser .launch-page{gap:6px;padding-top:10px;padding-bottom:10px}html.quest-browser .launch-logo{width:min(34vh,420px,48vw);max-height:31vh}html.quest-browser .platform-note{margin-top:7px}html.quest-browser .action-row{margin-top:5px}}
-@media (max-height:620px){html.quest-browser .launch-logo{width:min(29vh,360px,44vw);max-height:26vh}html.quest-browser .eyebrow{padding:5px 10px}html.quest-browser .launch-note{font-size:.86rem}html.quest-browser .action-row .btn{min-height:48px}html.quest-browser .platform-note{padding:7px 10px;font-size:12px}}
+/* PHASE-405-QUEST-BROWSER-PLATFORM-ALIGNMENT-LOCK | preserves Phase 395 center lock */
+html.quest-browser,html.quest-browser body,html.svr-platform-quest,html.svr-platform-quest body{width:100%;min-width:100%;min-height:100%;margin:0}
+html.quest-browser body.launch-body,html.svr-platform-quest body.launch-body{display:grid;place-items:center;overflow:auto;overflow-x:hidden;padding:0;background:#000}
+html.quest-browser .launch-page,html.svr-platform-quest .launch-page{width:min(760px,calc(100vw - 32px));max-width:760px;min-height:100dvh;margin:0 auto;justify-self:center;align-self:center;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));transform:none}
+html.quest-browser .launch-logo,html.svr-platform-quest .launch-logo{width:min(42vh,520px,68vw);max-height:39vh;margin-inline:auto}
+html.quest-browser .launch-copy,html.quest-browser .action-row,html.quest-browser .platform-note,html.quest-browser .launch-footer,html.svr-platform-quest .launch-copy,html.svr-platform-quest .action-row,html.svr-platform-quest .platform-note,html.svr-platform-quest .launch-footer{margin-left:auto;margin-right:auto}
+html.quest-browser .action-row,html.svr-platform-quest .action-row{width:min(650px,92%);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));justify-content:center}
+html.quest-browser .btn,html.svr-platform-quest .btn{min-width:0;width:100%;padding-left:14px;padding-right:14px}
+@media (orientation:landscape){html.quest-browser .launch-page,html.svr-platform-quest .launch-page{gap:6px;padding-top:10px;padding-bottom:10px}html.quest-browser .launch-logo,html.svr-platform-quest .launch-logo{width:min(34vh,420px,48vw);max-height:31vh}html.quest-browser .platform-note,html.svr-platform-quest .platform-note{margin-top:7px}html.quest-browser .action-row,html.svr-platform-quest .action-row{margin-top:5px}}
+@media (max-height:620px){html.quest-browser .launch-logo,html.svr-platform-quest .launch-logo{width:min(29vh,360px,44vw);max-height:26vh}html.quest-browser .eyebrow,html.svr-platform-quest .eyebrow{padding:5px 10px}html.quest-browser .launch-note,html.svr-platform-quest .launch-note{font-size:.86rem}html.quest-browser .action-row .btn,html.svr-platform-quest .action-row .btn{min-height:48px}html.quest-browser .platform-note,html.svr-platform-quest .platform-note{padding:7px 10px;font-size:12px}}

@@ -20,20 +20,18 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v5
-
-      - name: Validate public iPhone routing
+      - name: Validate protected public iPhone detection
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' index.html
           grep -q 'iPhone|iPad|iPod' index.html
           grep -q "navigator.platform==='MacIntel'" index.html
-          grep -q "button.textContent='Play on iPhone'" index.html
-          grep -q "./game/iphone.html?v=phase400" index.html
           grep -q 'apple-mobile-web-app-capable' index.html
           grep -q 'apple-touch-icon' index.html
-
-      - name: Validate iPhone Safari entry and wrapper
+          grep -q 'platformIosDetection' update/app-version.json
+          grep -q 'GAMING TEST READY' site-public-hooks.js
+      - name: Validate Phase 405 iPhone entry and wrapper preserve Phase 400
         shell: bash
         run: |
           set -euo pipefail
@@ -41,13 +39,15 @@ jobs:
           test -s game/iphone-tabletop.html
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone.html
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone-tabletop.html
+          grep -q 'PHASE-405-IPHONE-MOBILE-TEST-LOCK' game/iphone.html
           grep -q 'viewport-fit=cover' game/iphone.html
           grep -q 'apple-mobile-web-app-capable' game/iphone.html
           grep -q 'platform=ios&safari=1' game/iphone.html
           grep -q 'platform=ios&safari=1' game/iphone-tabletop.html
           grep -q 'allow="microphone; autoplay; fullscreen"' game/iphone-tabletop.html
+          grep -q 'SVR_PHASE405_IPHONE_WRAPPER_QA' game/iphone-tabletop.html
           grep -q 'SVR_PHASE400_IPHONE_WRAPPER_QA' game/iphone-tabletop.html
-
+          grep -q 'android-stable-phase405.html' game/iphone-tabletop.html
       - name: Validate Safari runtime and safe-area CSS
         shell: bash
         run: |
@@ -66,27 +66,24 @@ jobs:
           grep -q 'touch-action:manipulation' game/styles/phase400_ios_safari_compat.css
           grep -q 'min-height:44px' game/styles/phase400_ios_safari_compat.css
           grep -q 'window.webkitAudioContext' game/modules/phase393_android_common.js
-
       - name: Validate shared mobile table integration without iOS regression
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'phase400_ios_safari_compat.css?v=phase400' game/android-stable.html
           grep -q 'phase400_ios_safari_adapter.js?v=phase400' game/android-stable.html
-          grep -q 'apple-mobile-web-app-capable' game/android-stable.html
-          grep -q 'data-ios-build="PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK"' game/android-stable.html
-          grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' game/android-stable.html
-          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/android-stable.html
-          grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' game/android-stable.html
-          grep -q 'phase399_android_matchmaking_voice.js?v=phase399' game/android-stable.html
-          grep -q "q.get('platform')==='ios'" game/android-stable.html
-          grep -q "if(!isIOS)" game/android-stable.html
-
+          grep -q 'phase400_ios_safari_compat.css?v=phase400' game/android-stable-phase405.html
+          grep -q 'phase400_ios_safari_adapter.js?v=phase400' game/android-stable-phase405.html
+          grep -q 'apple-mobile-web-app-capable' game/android-stable-phase405.html
+          grep -q 'data-ios-build="PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK"' game/android-stable-phase405.html
+          grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' game/android-stable-phase405.html
+          grep -q 'phase399_android_matchmaking_voice.js?v=phase399' game/android-stable-phase405.html
+          grep -q 'phase403_android_gameplay.js?v=phase403' game/android-stable-phase405.html
       - name: Validate metadata PWA and protected platforms
         shell: bash
         run: |
           set -euo pipefail
-          grep -q '"phase": 404' game/manifest.json
+          grep -q '"phase": 405' game/manifest.json
           grep -q '"iphoneSafariAvailable": true' game/manifest.json
           grep -q '"usesProtectedAndroidPokerEngine": true' game/manifest.json
           grep -q '"iosIphoneSafariAvailable": true' update/app-version.json
@@ -94,14 +91,13 @@ jobs:
           grep -q '"iosSafariAudioUnlock": true' update/app-version.json
           grep -q '"iosMicrophonePermissionReady": true' update/app-version.json
           grep -q 'Play on iPhone / Safari' manifest.webmanifest
-          grep -q '/game/iphone.html?v=phase400' manifest.webmanifest
+          grep -q '/game/iphone.html?v=phase405' manifest.webmanifest
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
           grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/modules/phase393_android_gameplay.js
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
           grep -q '"apkVersionCode": 2' game/android-release.json
           grep -q '"forceUpdate": false' game/android-release.json
           grep -q '"nativeApkRebuild": false' game/android-release.json
-
       - name: Validate syntax JSON and current cache
         shell: bash
         run: |
@@ -111,6 +107,8 @@ jobs:
           node --check game/modules/phase393_android_gameplay.js
           node --check game/modules/phase399_android_learning_chips_sponsor.js
           node --check game/modules/phase399_android_matchmaking_voice.js
+          node --check game/modules/phase405_mobile_ui.js
+          node --check game/modules/phase405_vox_voice.js
           node --check sw.js
           node --check pwa-sw.js
           python3 -m json.tool manifest.webmanifest >/dev/null
@@ -118,6 +116,6 @@ jobs:
           python3 -m json.tool game/android-release.json >/dev/null
           python3 -m json.tool update/app-version.json >/dev/null
           grep -q 'svr-poker-phase403-android-engine-reliability-v1' sw.js
-          grep -q 'svr-poker-phase403-android-engine-reliability-v1' pwa-sw.js
+          grep -q 'svr-poker-phase405-platform-mobile-social-v1' sw.js
           test -s game/styles/phase400_ios_safari_compat.css
           test -s downloads/svr-poker-android-rc2.apk

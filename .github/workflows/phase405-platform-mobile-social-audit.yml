@@ -1,0 +1,166 @@
+name: Phase 405 Platform Mobile Social Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase405-platform-mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+      - name: Protect public launch page structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- index.html)"
+          grep -q 'Public Launch Page' index.html
+          grep -q 'Preview Site' index.html
+          grep -q 'platformGameButton' index.html
+          grep -q 'Contact' index.html
+          grep -q 'PHASE 405 PLATFORM / MOBILE' site-public-hooks.js
+          grep -q 'GAMING TEST READY' site-public-hooks.js
+          grep -q "button.textContent='Enter VR'" site-public-hooks.js
+      - name: Validate platform device alignment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('platform-device.js').read_text()
+          for token in ['PHASE-405-PLATFORM-DEVICE-ALIGNMENT-LOCK','OculusBrowser','svr-platform-quest','visualViewport','immersive-vr','SVR_PLATFORM_DEVICE_QA']:
+              if token not in s: raise SystemExit(f'missing platform contract: {token}')
+          a=Path('game/android.html').read_text()
+          for token in ['calc(100vw - 24px)','overflow-wrap:anywhere','PHASE-405-PLATFORM-MOBILE-SOCIAL-LOCK']:
+              if token not in a: raise SystemExit(f'missing Android alignment contract: {token}')
+          q=Path('launch-quest.css').read_text()
+          if 'svr-platform-quest' not in q: raise SystemExit('Quest Phase 405 alias missing')
+          PY
+          node --check platform-device.js
+      - name: Validate shared mobile shell and single burn pile
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('game/android-stable-phase405.html').read_text()
+          for token in ['PHASE-405-PLATFORM-MOBILE-SOCIAL-LOCK','phase403_android_gameplay.js?v=phase403','phase404_android_mobile_safety.js?v=phase404','phase400_ios_safari_adapter.js?v=phase400','phase405_mobile_ui.js?v=phase405','phase405_vox_voice.js?v=phase405','phase405_tournament_scheduler.js?v=phase405']:
+              if token not in s: raise SystemExit(f'missing mobile shell contract: {token}')
+          if s.count('class="burn-zone"')!=1: raise SystemExit('Phase 405 shell must contain exactly one burn-zone')
+          if '>DECK<' not in s: raise SystemExit('deck must be explicitly labeled DECK')
+          if s.index('phase404_android_mobile_safety.js?v=phase404')>=s.index('phase403_android_gameplay.js?v=phase403'): raise SystemExit('ALL IN guard must load before engine')
+          PY
+      - name: Validate hands profiles guests and transition graphics
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('game/modules/phase405_mobile_ui.js').read_text()
+          for token in ['POKER HANDS','phase405ProfileSheet','data-close405','Guest 1','Guest 2','OPEN • BOT STANDBY',"querySelectorAll('.burn-zone')",'YOU WON THE TOURNAMENT','Moving to the next tournament table']:
+              if token not in s: raise SystemExit(f'missing mobile UI contract: {token}')
+          PY
+          node --check game/modules/phase405_mobile_ui.js
+      - name: Validate VOX remains peer-safe
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('game/modules/phase405_vox_voice.js').read_text()
+          for token in ['PHASE-405-MOBILE-VOX-VOICE-LOCK','PUSH TO TALK','>VOX<','VOX sensitivity','echoCancellation:true','noiseSuppression:true','NO LIVE PEER']:
+              if token not in s: raise SystemExit(f'missing VOX contract: {token}')
+          meta=Path('update/app-version.json').read_text()
+          for token in ['"androidProductionMatchServerConfigured": false','"androidLiveMultiplayer": false','"androidLiveVoice": false']:
+              if token not in meta: raise SystemExit(f'missing multiplayer truth field: {token}')
+          PY
+          node --check game/modules/phase405_vox_voice.js
+      - name: Validate exact five-hour play-money scheduler
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('game/modules/phase405_tournament_scheduler.js').read_text()
+          required=['PHASE-405-FIVE-HOUR-TOURNAMENT-SCHEDULE-LOCK','SLOT_MS=5*60*60*1000',"source:'bot-simulation'",'playMoneyOnly:true','sharedBackend:false','svr405_tournament_archive']
+          for token in required:
+              if token not in s: raise SystemExit(f'missing scheduler contract: {token}')
+          for page in ['game/tournaments.html','game/tournament-results.html']:
+              if 'phase405_tournament_scheduler.js?v=phase405' not in Path(page).read_text(): raise SystemExit(f'scheduler missing from {page}')
+          SLOT=5*60*60*1000
+          if SLOT!=18_000_000: raise SystemExit('slot duration is not exactly five hours')
+          anchor=1767225600000
+          for i in range(1000):
+              if (anchor+(i+1)*SLOT)-(anchor+i*SLOT)!=18_000_000: raise SystemExit('slot cadence drift')
+          print('1,000 exact five-hour slots passed.')
+          PY
+          node --check game/modules/phase405_tournament_scheduler.js
+      - name: Validate portrait upload and iPhone parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('site/js/phase405-profile-portrait.js').read_text()
+          for token in ['svr405_profile_portrait','canvas.width=size','accept="image/*"','256']:
+              if token not in p: raise SystemExit(f'missing portrait contract: {token}')
+          i=Path('game/iphone-tabletop.html').read_text()
+          for token in ['android-stable-phase405.html','SVR_PHASE405_IPHONE_WRAPPER_QA','SVR_PHASE400_IPHONE_WRAPPER_QA']:
+              if token not in i: raise SystemExit(f'missing iPhone wrapper contract: {token}')
+          PY
+          grep -q 'PHASE-400-IOS-SAFARI-RUNTIME-ADAPTER-LOCK' game/modules/phase400_ios_safari_adapter.js
+          node --check site/js/phase405-profile-portrait.js
+      - name: Preserve Phase 403 poker and Quest authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' game/modules/phase403_android_pot_rules.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase403_android_table_clarity.js game/modules/phase398_android_raise_rules.js)"
+          test -z "$(git diff origin/main -- game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
+          node --input-type=module <<'NODE'
+          import {buildSidePots,sumPotAmounts,splitPotAmount} from './game/modules/phase403_android_pot_rules.js';
+          const audit=buildSidePots([{index:0,amount:1000},{index:1,amount:500},{index:2,amount:200}],1700);
+          if(sumPotAmounts(audit.pots)!==1700)throw new Error('pot conservation changed');
+          const split=splitPotAmount(301,[0,5],4,[0,5,1,2,3,4]);
+          if(split.payouts[0]!==151||split.payouts[5]!==150)throw new Error('odd chip order changed');
+          NODE
+      - name: Validate metadata cache and APK policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          grep -q '"phase": 405' game/manifest.json
+          grep -q '"scheduleEveryHours": 5' game/manifest.json
+          grep -q '"androidSingleBurnPile": true' update/app-version.json
+          grep -q 'svr-poker-phase405-platform-mobile-social-v1' sw.js
+          grep -q 'svr-poker-phase404-android-mobile-safety-v1' sw.js
+          node --check site-public-hooks.js
+          node --check sw.js
+          node --check pwa-sw.js
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
