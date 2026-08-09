@@ -1,13 +1,14 @@
 /* PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK */
 const BUILD='PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK';
 const ALL_IN_CONFIRM_MS=2600;
+const RUNOUT_STEP_MS=720;
 const STORAGE='svr404_android_session';
-const state={build:BUILD,installed:false,armedUntil:0,armTimer:0,wakeLock:null,wakeLockSupported:'wakeLock'in navigator,lastHand:0,lastCompletedHand:0,session:null,lastError:null,checkedAt:null};
+const state={build:BUILD,installed:false,armedUntil:0,armTimer:0,wakeLock:null,wakeLockSupported:'wakeLock'in navigator,lastHand:0,lastCompletedHand:0,session:null,runout:{active:false,scheduled:false,startBoard:0,timers:[]},lastError:null,checkedAt:null};
 const $=s=>document.querySelector(s);
 const game=()=>window.SVR_PHASE393_ANDROID_STATE;
 const money=n=>`$${Math.max(0,Math.round(Number(n||0))).toLocaleString()}`;
 const now=()=>Date.now();
-function blankSession(){return{build:BUILD,startedAt:new Date().toISOString(),handsStarted:0,handsCompleted:0,potsWon:0,mainPotsWon:0,sidePotsWon:0,showdowns:0,folds:0,allIns:0,biggestPot:0,totalPotWon:0,lastHand:null}}
+function blankSession(){return{build:BUILD,startedAt:new Date().toISOString(),handsStarted:0,handsCompleted:0,potsWon:0,mainPotsWon:0,sidePotsWon:0,showdowns:0,folds:0,allIns:0,allInRunouts:0,biggestPot:0,totalPotWon:0,lastHand:null}}
 function loadSession(){try{const saved=JSON.parse(sessionStorage.getItem(STORAGE)||'null');if(saved?.build===BUILD)return saved}catch{}return blankSession()}
 function saveSession(){if(!state.session)state.session=blankSession();sessionStorage.setItem(STORAGE,JSON.stringify(state.session));return state.session}
 function resetAllInArm(reason=''){
@@ -44,10 +45,42 @@ function ensureUi(){
   state.installed=true;return true;
 }
 function updateDecision(g){const strip=$('#phase404DecisionStrip'),hero=g?.players?.[0];if(!strip||!hero)return;const call=Math.max(0,Number(g.currentBet||0)-Number(hero.streetBet||0)),odds=potOdds(Math.min(call,hero.stack),g.pot),min=minimumRaiseTo(g,hero);strip.querySelector('[data-pot]').textContent=money(g.pot);strip.querySelector('[data-call]').textContent=call?money(Math.min(call,hero.stack)):'FREE';strip.querySelector('[data-odds]').textContent=call?`${odds.toFixed(1)}%`:'0%';strip.querySelector('[data-stack]').textContent=money(hero.stack);strip.querySelector('[data-min]').textContent=g.activePlayer===0&&!g.handOver?money(min):'-';strip.classList.toggle('your-turn',g.activePlayer===0&&!g.handOver);strip.classList.toggle('allin-armed',state.armedUntil>now())}
+function actionableCount(g){return(g.players||[]).filter(p=>!p.folded&&!p.allIn&&p.stack>0).length}
+function liveCount(g){return(g.players||[]).filter(p=>!p.folded).length}
+function clearRunoutTimers(){for(const timer of state.runout.timers||[])clearTimeout(timer);state.runout.timers=[]}
+function resetRunout(){clearRunoutTimers();state.runout.active=false;state.runout.scheduled=false;state.runout.startBoard=0;document.body.classList.remove('phase404-runout-pending');document.querySelectorAll('.phase404-runout-hidden').forEach(el=>el.classList.remove('phase404-runout-hidden'))}
+function prepareRunout(g){
+  if(state.runout.active||g.handOver||g.community.length>=5||liveCount(g)<2||actionableCount(g)!==0)return;
+  state.runout.active=true;state.runout.startBoard=Math.max(0,g.community.length);document.body.classList.add('phase404-runout-pending');
+  const status=$('#status'),msg=$('#tableMessage');if(status)status.textContent='ALL IN • RUNOUT';if(msg)msg.textContent='ALL IN • BOARD RUNNING OUT';
+}
+function restartWinnerPresentation(){
+  document.body.classList.remove('phase404-runout-pending');
+  const banner=$('#winnerBanner');if(banner?.innerHTML){banner.classList.remove('show');void banner.offsetWidth;banner.classList.add('show')}
+  const complex=game()?.lastPotBreakdown?.length>1;if(complex)window.SVR_PHASE403_TABLE_CLARITY_QA?.();
+}
+function scheduleRunoutPresentation(g){
+  if(!state.runout.active||state.runout.scheduled||!g.handOver||g.community.length<5)return;
+  state.runout.scheduled=true;state.session.allInRunouts=(state.session.allInRunouts||0)+1;saveSession();
+  const cards=[...document.querySelectorAll('#community .card')],start=Math.max(0,Math.min(5,state.runout.startBoard));
+  const groups=[];
+  if(start<=2){const flop=[];for(let i=start;i<3;i++)flop.push(i);if(flop.length)groups.push({label:'FLOP',indexes:flop})}
+  if(start<=3)groups.push({label:'TURN',indexes:[3]});
+  if(start<=4)groups.push({label:'RIVER',indexes:[4]});
+  const hiddenIndexes=[...new Set(groups.flatMap(group=>group.indexes))];hiddenIndexes.forEach(index=>cards[index]?.classList.add('phase404-runout-hidden'));
+  const status=$('#status'),msg=$('#tableMessage');if(status)status.textContent='ALL IN • RUNOUT';if(msg)msg.textContent='ALL IN • BOARD RUNNING OUT';
+  groups.forEach((group,step)=>{
+    const timer=setTimeout(()=>{
+      group.indexes.forEach(index=>{const card=cards[index];if(!card)return;card.classList.remove('phase404-runout-hidden');card.animate?.([{transform:'translateY(-14px) rotateY(90deg)',opacity:.15},{transform:'translateY(0) rotateY(0)',opacity:1}],{duration:360})});
+      if(msg)msg.textContent=`ALL IN • ${group.label}`;navigator.vibrate?.(18);
+    },260+step*RUNOUT_STEP_MS);state.runout.timers.push(timer);
+  });
+  const finish=setTimeout(()=>{restartWinnerPresentation();state.runout.active=false;state.runout.scheduled=false;state.runout.timers=[];if(status)status.textContent='SHOWDOWN COMPLETE'},Math.max(520,260+groups.length*RUNOUT_STEP_MS));state.runout.timers.push(finish);
+}
 function totalBreakdownPot(g){return(g?.lastPotBreakdown||[]).reduce((sum,p)=>sum+Math.max(0,Number(p.amount||0)),0)}
 function observeHand(g){
   if(!state.session)state.session=loadSession();
-  if(g.hand>0&&g.hand!==state.lastHand){state.lastHand=g.hand;state.session.handsStarted+=1;resetAllInArm('new-hand');saveSession()}
+  if(g.hand>0&&g.hand!==state.lastHand){state.lastHand=g.hand;state.session.handsStarted+=1;resetAllInArm('new-hand');resetRunout();saveSession()}
   if(g.handOver&&g.hand>0&&g.hand!==state.lastCompletedHand){
     state.lastCompletedHand=g.hand;state.session.handsCompleted+=1;
     const breakdown=g.lastPotBreakdown||[],pot=totalBreakdownPot(g),won=breakdown.filter(p=>p.type==='pot'&&(p.winnerIndexes||[]).includes(0));
@@ -61,11 +94,11 @@ function observeHand(g){
 async function requestWakeLock(){if(!state.wakeLockSupported||state.wakeLock)return;try{state.wakeLock=await navigator.wakeLock.request('screen');state.wakeLock.addEventListener?.('release',()=>{state.wakeLock=null})}catch(error){document.body.dataset.phase404WakeLockError=String(error?.name||'unavailable')}}
 function manageWakeLock(g){if(g?.joined&&!document.hidden)requestWakeLock();else if(state.wakeLock){state.wakeLock.release?.().catch?.(()=>{});state.wakeLock=null}}
 function sessionReport(){const g=game(),qa={engine:window.SVR_PHASE403_ANDROID_ENGINE_QA?.()||null,clarity:window.SVR_PHASE403_TABLE_CLARITY_QA?.()||null,betting:window.SVR_PHASE398_ANDROID_BETTING_QA?.()||null,tournament:window.SVR_PHASE401_TOURNAMENT_QA?.()||null};return{build:BUILD,createdAt:new Date().toISOString(),session:state.session||loadSession(),current:{hand:g?.hand||0,street:g?.street??null,joined:Boolean(g?.joined),mode:new URLSearchParams(location.search).get('mode')||'regular'},device:{userAgent:navigator.userAgent,viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio||1},orientation:screen.orientation?.type||null},qa}}
-function renderSession(){const host=$('#phase404SessionSheet .phase404-stats'),s=state.session||loadSession();if(!host)return;const mins=Math.max(0,Math.floor((Date.now()-Date.parse(s.startedAt))/60000));host.innerHTML=`<article><small>HANDS</small><b>${s.handsCompleted}/${s.handsStarted}</b></article><article><small>POTS WON</small><b>${s.potsWon}</b></article><article><small>MAIN / SIDE</small><b>${s.mainPotsWon} / ${s.sidePotsWon}</b></article><article><small>SHOWDOWNS</small><b>${s.showdowns}</b></article><article><small>BIGGEST POT</small><b>${money(s.biggestPot)}</b></article><article><small>PLAY TIME</small><b>${mins}m</b></article>`}
+function renderSession(){const host=$('#phase404SessionSheet .phase404-stats'),s=state.session||loadSession();if(!host)return;const mins=Math.max(0,Math.floor((Date.now()-Date.parse(s.startedAt))/60000));host.innerHTML=`<article><small>HANDS</small><b>${s.handsCompleted}/${s.handsStarted}</b></article><article><small>POTS WON</small><b>${s.potsWon}</b></article><article><small>MAIN / SIDE</small><b>${s.mainPotsWon} / ${s.sidePotsWon}</b></article><article><small>RUNOUTS</small><b>${s.allInRunouts||0}</b></article><article><small>BIGGEST POT</small><b>${money(s.biggestPot)}</b></article><article><small>PLAY TIME</small><b>${mins}m</b></article>`}
 function openSession(){renderSession();$('#phase404SessionSheet')?.classList.remove('hide')}
 async function copyReport(){const report=JSON.stringify(sessionReport(),null,2);try{await navigator.clipboard.writeText(report);const b=$('[data-copy-phase404]');if(b){const old=b.textContent;b.textContent='COPIED';setTimeout(()=>b.textContent=old,1300)}}catch{const sheet=$('#phase404SessionSheet');if(sheet){const box=document.createElement('textarea');box.className='phase404-report-box';box.value=report;sheet.appendChild(box);box.select()}}}
-function qa(){const g=game();return{build:BUILD,installed:state.installed,decisionStrip:Boolean($('#phase404DecisionStrip')),decisionStripInsideRaisePanel:Boolean($('#raisePanel > #phase404DecisionStrip')),allInDoubleTapGuard:true,allInConfirmMs:ALL_IN_CONFIRM_MS,sessionReport:Boolean($('#phase404SessionSheet')),copyTestReport:true,wakeLockSupported:state.wakeLockSupported,wakeLockHeld:Boolean(state.wakeLock),engineBuild:g?.engineBuild||null,phase403EnginePreserved:g?.engineBuild==='PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK',lastError:state.lastError,pass:Boolean(state.installed&&$('#raisePanel > #phase404DecisionStrip')&&$('#phase404SessionSheet')&&!state.lastError),checkedAt:new Date().toISOString()}}
-function poll(){try{if(!ensureUi())return;const g=game();if(!g)return;updateDecision(g);observeHand(g);manageWakeLock(g);state.checkedAt=new Date().toISOString()}catch(error){state.lastError=String(error?.message||error)}}
-state.session=loadSession();document.addEventListener('visibilitychange',()=>{if(document.hidden)resetAllInArm('hidden');manageWakeLock(game())});
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{ensureUi();setInterval(poll,120)},{once:true});else{ensureUi();setInterval(poll,120)}
+function qa(){const g=game();return{build:BUILD,installed:state.installed,decisionStrip:Boolean($('#phase404DecisionStrip')),decisionStripInsideRaisePanel:Boolean($('#raisePanel > #phase404DecisionStrip')),allInDoubleTapGuard:true,allInConfirmMs:ALL_IN_CONFIRM_MS,pacedAllInRunout:true,runoutStepMs:RUNOUT_STEP_MS,runoutActive:state.runout.active,sessionReport:Boolean($('#phase404SessionSheet')),copyTestReport:true,wakeLockSupported:state.wakeLockSupported,wakeLockHeld:Boolean(state.wakeLock),engineBuild:g?.engineBuild||null,phase403EnginePreserved:g?.engineBuild==='PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK',lastError:state.lastError,pass:Boolean(state.installed&&$('#raisePanel > #phase404DecisionStrip')&&$('#phase404SessionSheet')&&!state.lastError),checkedAt:new Date().toISOString()}}
+function poll(){try{if(!ensureUi())return;const g=game();if(!g)return;updateDecision(g);prepareRunout(g);observeHand(g);scheduleRunoutPresentation(g);manageWakeLock(g);if(state.runout.active){const status=$('#status');if(status)status.textContent='ALL IN • RUNOUT'}state.checkedAt=new Date().toISOString()}catch(error){state.lastError=String(error?.message||error)}}
+state.session=loadSession();document.addEventListener('visibilitychange',()=>{if(document.hidden){resetAllInArm('hidden');clearRunoutTimers()}manageWakeLock(game())});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{ensureUi();setInterval(poll,90)},{once:true});else{ensureUi();setInterval(poll,90)}
 window.SVR_PHASE404_MOBILE_SAFETY_QA=qa;window.SVR_PHASE404_SESSION_REPORT=sessionReport;window.SVR_PHASE404_RESET_SESSION=()=>{state.session=blankSession();saveSession();return state.session};
