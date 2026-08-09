@@ -20,7 +20,6 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
-
       - name: Validate Phase 398 source contracts
         shell: bash
         run: |
@@ -36,9 +35,10 @@ jobs:
           grep -q 'step="50"' game/android-stable.html
           grep -q 'phase393_android_gameplay.js?v=phase398' game/android-stable.html
           grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable.html
-          grep -q 'android-tabletop.html?v=phase404' game/android.html
+          grep -q 'android-tabletop.html?v=phase405' game/android.html
           grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase403_android_gameplay.js
           grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable-phase404.html
+          grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable-phase405.html
           grep -q '"bettingBuild": "PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK"' game/android-release.json
           grep -q '"dynamicMinimumRaiseFromLastFullRaise": true' game/android-release.json
           grep -q '"exactCallDifference": true' game/android-release.json
@@ -47,7 +47,6 @@ jobs:
           node --check game/modules/phase397_android_action_button_guard.js
           node --check game/modules/phase403_android_gameplay.js
           python3 -m json.tool game/android-release.json >/dev/null
-
       - name: Execute actual Phase 398 raise-rule module scenarios
         shell: bash
         run: |
@@ -79,13 +78,12 @@ jobs:
           assert(potSizedRaiseTo({pot:150,currentBet:100,streetBet:0,fraction:1})===350,'pot raise facing 100 into 150 pot should be raise-to 350');
           console.log('Phase 398 exact-call and dynamic full-raise scenarios passed.');
           NODE
-
       - name: Preserve approved Android presentation and Quest isolation
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK' game/modules/phase396_android_burn_dealer_polish.js
-          grep -q 'phase396_android_burn_dealer_polish.js?v=phase396' game/android-stable-phase404.html
+          grep -q 'phase396_android_burn_dealer_polish.js?v=phase396' game/android-stable-phase405.html
           grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' game/modules/phase394_android_table_polish.js
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
