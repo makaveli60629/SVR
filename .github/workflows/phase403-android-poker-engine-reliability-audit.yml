@@ -21,24 +21,25 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Validate Phase 403 route and modules
+      - name: Validate Phase 403 engine under current Android route
         shell: bash
         run: |
           set -euo pipefail
           test -s game/android-stable-phase403.html
+          test -s game/android-stable-phase404.html
           test -s game/modules/phase403_android_gameplay.js
           test -s game/modules/phase403_android_pot_rules.js
           test -s game/modules/phase403_android_table_clarity.js
           test -s game/styles/phase403_android_table_clarity.css
-          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/android.html
-          grep -q 'android-tabletop.html?v=phase403' game/android.html
-          grep -q 'android-stable-phase403.html?v=phase403' game/android.html
-          grep -q 'android-stable-phase403.html' game/android-tabletop.html
+          grep -q 'PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK' game/android.html
+          grep -q 'android-tabletop.html?v=phase404' game/android.html
+          grep -q 'android-stable-phase404.html?v=phase404' game/android.html
+          grep -q 'android-stable-phase404.html' game/android-tabletop.html
           grep -q 'SVR_PHASE403_ANDROID_ENGINE_QA' game/android-tabletop.html
           grep -q 'SVR_PHASE403_TABLE_CLARITY_QA' game/android-tabletop.html
-          grep -q 'phase403_android_gameplay.js?v=phase403' game/android-stable-phase403.html
-          grep -q 'phase403_android_table_clarity.js?v=phase403' game/android-stable-phase403.html
-          grep -q 'phase403_android_table_clarity.css?v=phase403' game/android-stable-phase403.html
+          grep -q 'phase403_android_gameplay.js?v=phase403' game/android-stable-phase404.html
+          grep -q 'phase403_android_table_clarity.js?v=phase403' game/android-stable-phase404.html
+          grep -q 'phase403_android_table_clarity.css?v=phase403' game/android-stable-phase404.html
           grep -q 'phase403_android_pot_rules.js?v=phase403' game/modules/phase403_android_gameplay.js
           node --check game/modules/phase403_android_pot_rules.js
           node --check game/modules/phase403_android_gameplay.js
@@ -160,10 +161,10 @@ jobs:
           python3 -m json.tool update/app-version.json >/dev/null
           python3 -m json.tool game/manifest.json >/dev/null
           python3 -m json.tool manifest.webmanifest >/dev/null
-          grep -q '"phase": 403' game/manifest.json
+          grep -q '"phase": 404' game/manifest.json
           grep -q '"androidSidePotEngine": true' update/app-version.json
           grep -q '"androidDariusAdvancesToUser": true' update/app-version.json
           grep -q '"androidTournamentSharedRegistrationBackendLive": false' update/app-version.json
           grep -q '"androidLiveMultiplayer": false' update/app-version.json
-          grep -q 'svr-poker-phase403-android-engine-reliability-v1' sw.js
-          grep -q 'svr-poker-phase403-android-engine-reliability-v1' pwa-sw.js
+          grep -q 'svr-poker-phase404-android-mobile-safety-v1' sw.js
+          grep -q 'svr-poker-phase404-android-mobile-safety-v1' pwa-sw.js
