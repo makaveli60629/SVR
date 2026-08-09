@@ -2,12 +2,12 @@
   const ADMIN_KEY='svr_admin_presence';
   const MESSAGE_KEY='svr_public_messages';
   const CACHE_EPOCH_KEY='svr_public_cache_epoch';
-  const CACHE_EPOCH='phase404-android-mobile-decision-safety';
-  const CURRENT_PHASE='phase404';
+  const CACHE_EPOCH='phase405-platform-mobile-social';
+  const CURRENT_PHASE='phase405';
   const QUEST_PHASE='phase396';
   const SITE_PHASE='phase392';
   const AVATAR_PHASE='phase392';
-  const ANDROID_PHASE='phase404';
+  const ANDROID_PHASE='phase405';
 
   async function refreshRuntimeCaches(){
     try{
@@ -18,15 +18,19 @@
         localStorage.setItem(CACHE_EPOCH_KEY,CACHE_EPOCH);
       }
       if('serviceWorker'in navigator)await navigator.serviceWorker.register(`/sw.js?v=${CURRENT_PHASE}`,{scope:'/'});
-    }catch(error){console.warn('SVR Phase 404 cache recovery could not complete.',error)}
+    }catch(error){console.warn('SVR Phase 405 cache recovery could not complete.',error)}
   }
   function getAdminState(){const qs=new URLSearchParams(location.search),override=qs.get('admin');if(override==='online'||override==='offline'){localStorage.setItem(ADMIN_KEY,override);return override}return localStorage.getItem(ADMIN_KEY)||'offline'}
   function paintAdminState(){const current=getAdminState();document.querySelectorAll('.admin-status').forEach(element=>{element.dataset.state=current;element.classList.toggle('online',current==='online');element.classList.toggle('offline',current!=='online');element.textContent=current==='online'?'● Admin Online':'● Admin Offline'})}
-  function paintPhaseBadge(){if(document.getElementById('svr-phase-live-badge'))return;const badge=document.createElement('div');badge.id='svr-phase-live-badge';badge.textContent='● PHASE 404 MOBILE SAFETY';badge.setAttribute('aria-label','SVR Poker Phase 404 Android mobile decision safety');Object.assign(badge.style,{position:'fixed',top:'12px',right:'12px',zIndex:'2147483647',padding:'7px 11px',border:'1px solid #8dffb4',borderRadius:'999px',background:'rgba(0,12,18,.92)',color:'#8dffb4',font:'800 11px/1.1 system-ui,Arial,sans-serif',letterSpacing:'.08em',boxShadow:'0 0 24px rgba(141,255,180,.2)'});document.body.appendChild(badge);document.body.dataset.deployPhase=CURRENT_PHASE}
+  function paintPhaseBadge(){if(document.getElementById('svr-phase-live-badge'))return;const badge=document.createElement('div');badge.id='svr-phase-live-badge';badge.textContent='● PHASE 405 PLATFORM / MOBILE';badge.setAttribute('aria-label','SVR Poker Phase 405 platform and mobile test');Object.assign(badge.style,{position:'fixed',top:'12px',right:'12px',zIndex:'2147483647',padding:'7px 11px',border:'1px solid #8dffb4',borderRadius:'999px',background:'rgba(0,12,18,.92)',color:'#8dffb4',font:'800 11px/1.1 system-ui,Arial,sans-serif',letterSpacing:'.08em',boxShadow:'0 0 24px rgba(141,255,180,.2)'});document.body.appendChild(badge);document.body.dataset.deployPhase=CURRENT_PHASE}
+  function ensurePlatformDetector(){if(window.SVR_PLATFORM_DEVICE||document.querySelector('script[data-svr-platform]'))return;const script=document.createElement('script');script.src='/platform-device.js?v=phase405';script.dataset.svrPlatform='1';document.head.appendChild(script)}
+  function fallbackDevice(){const ua=navigator.userAgent||'',ipad=navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1,quest=/Quest|Oculus|OculusBrowser|Meta Quest/i.test(ua),ios=/iPhone|iPad|iPod/i.test(ua)||ipad,android=/Android/i.test(ua)&&!quest;return{quest,ios,android,device:quest?'quest':ios?'ios':android?'android':'desktop',browser:/OculusBrowser/i.test(ua)?'oculus':/SamsungBrowser/i.test(ua)?'samsung':/Safari/i.test(ua)&&!/Chrome|CriOS/i.test(ua)?'safari':'other'}}
+  function launchDevice(){return window.SVR_PLATFORM_DEVICE||fallbackDevice()}
+  function applyPlatformLaunch(){const button=document.getElementById('platformGameButton'),notice=document.getElementById('platformNotice');if(!button||!notice)return;const d=launchDevice();if(!document.getElementById('phase405-device-label-style')){const style=document.createElement('style');style.id='phase405-device-label-style';style.textContent='#platformGameButton{flex-direction:column;gap:2px}#platformGameButton .svr-test-ready{display:block;font:800 9px/1.1 Rajdhani,system-ui;letter-spacing:.08em;opacity:.78}.svr-platform-quest .launch-page,.quest-browser .launch-page{max-width:min(760px,calc(100vw - 28px))}.svr-platform-quest .platform-note,.quest-browser .platform-note{max-width:min(630px,88vw)}';document.head.appendChild(style)}if(d.quest){button.textContent='Enter VR';button.href='./game/quest.html?v=phase396&source=launch-device';notice.innerHTML='<strong>Quest detected:</strong> Phase 396 seated VR test • centered browser fit • teleport disabled.'}else if(d.ios){button.innerHTML='Play iPhone<span class="svr-test-ready">GAMING TEST READY</span>';button.href='./game/iphone.html?v=phase400&deploy=phase405&source=launch-device';notice.innerHTML='<strong>iPhone / iPad detected:</strong> mobile poker test ready • safe-area controls • profile, hands and voice tools.'}else if(d.android){button.innerHTML='Play Android<span class="svr-test-ready">GAMING TEST READY</span>';button.href='./game/android.html?channel=stable&v=phase405&source=launch-device';notice.innerHTML='<strong>Android detected:</strong> Phase 405 mobile test • protected poker engine • platform alignment • profile, hands, tournament and voice tools.'}else{button.textContent='Preview Game';button.href='./game/camera3-showcase.html?v=phase392&source=launch-device';notice.innerHTML='<strong>Desktop preview:</strong> table showcase. Android, iPhone/iPad and Quest receive dedicated layouts automatically.'}}
   function normalizePublicLinks(){
     document.querySelectorAll('a[href]').forEach(anchor=>{
       let url;try{url=new URL(anchor.getAttribute('href'),location.href)}catch{return}if(url.origin!==location.origin)return;
-      if(/\/game\/(?:android|android-play|android-stable|android-stable-phase402|android-stable-phase403|android-stable-phase404|android-tabletop)\.html$/i.test(url.pathname)){url.pathname='/game/android.html';url.search='';url.searchParams.set('channel','stable');url.searchParams.set('v',ANDROID_PHASE);url.searchParams.set('source','public-link');anchor.href=url.pathname+'?'+url.searchParams.toString();return}
+      if(/\/game\/(?:android|android-play|android-stable|android-stable-phase402|android-stable-phase403|android-stable-phase404|android-stable-phase405|android-tabletop)\.html$/i.test(url.pathname)){url.pathname='/game/android.html';url.search='';url.searchParams.set('channel','stable');url.searchParams.set('v',ANDROID_PHASE);url.searchParams.set('source','public-link');anchor.href=url.pathname+'?'+url.searchParams.toString();return}
       if(/\/game\/(?:tournaments|tournament-results)\.html$/i.test(url.pathname)){url.searchParams.set('v',ANDROID_PHASE);url.searchParams.set('source','public-link');anchor.href=url.pathname+'?'+url.searchParams.toString()+url.hash;return}
       if(/\/game\/(?:camera3-showcase|camera3-live|camera3|cam3|preview)\.html$/i.test(url.pathname)||url.searchParams.get('cam')==='director'){url.pathname='/game/camera3-showcase.html';url.search='';url.searchParams.set('v','phase392');url.searchParams.set('autocam','1');url.searchParams.set('source','public-link');anchor.href=url.pathname+'?'+url.searchParams.toString();return}
       if(/\/game\/(?:index|quest)\.html$/i.test(url.pathname)){url.pathname='/game/quest.html';url.search='';url.searchParams.set('v',QUEST_PHASE);url.searchParams.set('source','public-link');anchor.href=url.pathname+'?'+url.searchParams.toString();return}
@@ -35,5 +39,7 @@
     })
   }
   function wireMessageForm(){const form=document.getElementById('visitor-message-form');if(!form)return;const status=document.getElementById('visitor-message-status');form.addEventListener('submit',event=>{event.preventDefault();const data=Object.fromEntries(new FormData(form).entries()),entry={name:(data.name||'').trim(),email:(data.email||'').trim(),message:(data.message||'').trim(),createdAt:new Date().toISOString(),source:'svrpoker-public-site'};if(!entry.message){if(status)status.textContent='Please enter a message before saving.';return}const current=JSON.parse(localStorage.getItem(MESSAGE_KEY)||'[]');current.push(entry);localStorage.setItem(MESSAGE_KEY,JSON.stringify(current.slice(-100)));form.reset();if(status)status.textContent='Message saved locally. Secure API delivery is not enabled on this static page yet.'})}
-  refreshRuntimeCaches();paintAdminState();paintPhaseBadge();normalizePublicLinks();wireMessageForm();
+  function profilePortrait(){if(!/\/site\/profile\.html$/i.test(location.pathname)||document.querySelector('script[data-phase405-portrait]'))return;const s=document.createElement('script');s.type='module';s.src='/site/js/phase405-profile-portrait.js?v=phase405';s.dataset.phase405Portrait='1';document.body.appendChild(s)}
+  refreshRuntimeCaches();ensurePlatformDetector();paintAdminState();paintPhaseBadge();normalizePublicLinks();wireMessageForm();profilePortrait();
+  window.addEventListener('svr:platform-device',applyPlatformLaunch);requestAnimationFrame(()=>setTimeout(applyPlatformLaunch,0));setTimeout(applyPlatformLaunch,350);setTimeout(normalizePublicLinks,400);
 })();
