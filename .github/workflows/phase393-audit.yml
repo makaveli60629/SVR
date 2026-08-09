@@ -44,15 +44,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'phase396_android_burn_dealer_polish.css?v=phase396' game/android-stable.html
-          grep -q 'phase396_android_burn_dealer_polish.js?v=phase396' game/android-stable.html
+          grep -q 'phase396_android_burn_dealer_polish.css?v=phase396' game/android-stable-phase403.html
+          grep -q 'phase396_android_burn_dealer_polish.js?v=phase396' game/android-stable-phase403.html
           grep -q 'burn-zone' game/styles/phase396_android_burn_dealer_polish.css
           grep -q 'community-cards .card' game/styles/phase396_android_burn_dealer_polish.css
           grep -q 'dealer-button' game/styles/phase396_android_burn_dealer_polish.css
           grep -q 'dealer-readout' game/styles/phase396_android_burn_dealer_polish.css
           grep -q 'SVR_PHASE396_ANDROID_QA' game/modules/phase396_android_burn_dealer_polish.js
           grep -q 'game.dealer' game/modules/phase396_android_burn_dealer_polish.js
-          grep -q 'SVR_PHASE399_ANDROID_WRAPPER_QA' game/android-tabletop.html
+          grep -q 'SVR_PHASE403_ANDROID_WRAPPER_QA' game/android-tabletop.html
           grep -q '"burnTrayAboveCommunityCards": true' game/manifest.json
           grep -q '"movingDealerButton": true' game/manifest.json
           grep -q '"dealerNameReadout": true' game/manifest.json
@@ -70,13 +70,13 @@ jobs:
           grep -q 'shortAllInDoesNotResetFullRaise' game/modules/phase393_android_gameplay.js
           grep -q 'SVR_PHASE398_ANDROID_BETTING_QA' game/modules/phase393_android_gameplay.js
           grep -q 'PHASE-398-ANDROID-RAISE-CONTROL-GUARD-LOCK' game/modules/phase397_android_action_button_guard.js
-          grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable.html
-          grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase393_android_gameplay.js
+          grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable-phase403.html
+          grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase403_android_gameplay.js
           grep -q 'TURN_SECONDS=15' game/modules/phase393_android_common.js
           grep -q 'PHASE-394-ANDROID-TABLE-PRESENTATION-POLISH-LOCK' game/modules/phase394_android_table_polish.js
-          grep -q 'id="raiseSlider"' game/android-stable.html
-          grep -q 'id="soundToggle"' game/android-stable.html
-          grep -q 'id="featuredSponsor"' game/android-stable.html
+          grep -q 'id="raiseSlider"' game/android-stable-phase403.html
+          grep -q 'id="soundToggle"' game/android-stable-phase403.html
+          grep -q 'id="featuredSponsor"' game/android-stable-phase403.html
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
           grep -q '"apkVersionCode": 2' game/android-release.json
           grep -q '"forceUpdate": false' game/android-release.json
@@ -107,11 +107,15 @@ jobs:
           node --check game/modules/phase399_android_learning_chips_sponsor.js
           node --check game/modules/phase399_android_matchmaking_voice.js
           node --check game/modules/phase400_ios_safari_adapter.js
-          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' sw.js
-          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' pwa-sw.js
+          node --check game/modules/phase403_android_pot_rules.js
+          node --check game/modules/phase403_android_gameplay.js
+          node --check game/modules/phase403_android_table_clarity.js
+          grep -q 'svr-poker-phase403-android-engine-reliability-v1' sw.js
+          grep -q 'svr-poker-phase403-android-engine-reliability-v1' pwa-sw.js
           test -s game/styles/phase396_android_burn_dealer_polish.css
           test -s game/styles/phase399_android_learning_chips_sponsor.css
           test -s game/styles/phase400_ios_safari_compat.css
+          test -s game/styles/phase403_android_table_clarity.css
           test -s game/assets/models/table.glb
           test -s game/assets/models/eric/eric.fbx
           test -s downloads/svr-poker-android-rc2.apk

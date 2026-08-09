@@ -32,35 +32,44 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Verify Phase 401 production payload
+      - name: Verify Phase 403 production payload
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-LANDSCAPE-LOCK' index.html
-          grep -q 'android.html?channel=stable&v=phase401' index.html
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' index.html
+          grep -q 'android.html?channel=stable&v=phase403' index.html
           test -s game/android.html
           test -s game/android-tabletop.html
-          test -s game/android-stable.html
+          test -s game/android-stable-phase403.html
           test -s game/tournaments.html
           test -s game/tournament-results.html
-          test -s game/modules/phase401_android_tournament_director.js
-          test -s game/modules/phase401_android_champion_crown.js
-          test -s game/styles/phase401_android_tournament.css
-          test -s game/styles/phase401_android_landscape_polish.css
-          test -s game/styles/phase401_tournament_portal.css
+          test -s game/modules/phase403_android_gameplay.js
+          test -s game/modules/phase403_android_pot_rules.js
+          test -s game/modules/phase403_android_table_clarity.js
+          test -s game/styles/phase403_android_table_clarity.css
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' game/modules/phase403_android_pot_rules.js
+          grep -q 'PHASE-403-ANDROID-TABLE-CLARITY-LOCK' game/modules/phase403_android_table_clarity.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'phase403_android_gameplay.js?v=phase403' game/android-stable-phase403.html
+          grep -q 'phase403_android_table_clarity.js?v=phase403' game/android-stable-phase403.html
           grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-DIRECTOR-LOCK' game/modules/phase401_android_tournament_director.js
           grep -q 'PHASE-401-ANDROID-24H-TOURNAMENT-CHAMPION-CROWN-LOCK' game/modules/phase401_android_champion_crown.js
           grep -q 'PHASE-401-ANDROID-LANDSCAPE-HANDHELD-POLISH-LOCK' game/styles/phase401_android_landscape_polish.css
-          grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' game/android-stable.html
-          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/android-stable.html
+          grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' game/modules/phase399_android_learning_chips_sponsor.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone.html
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
-          grep -q 'PHASE-401-ANDROID-SPONSOR-TOURNAMENT-LANDSCAPE-LOCK' deploy-health.json
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' deploy-health.json
+          grep -q '"androidDariusAdvancesToUser": true' deploy-health.json
+          grep -q '"androidSidePotEngine": true' deploy-health.json
+          grep -q '"androidMultipleAllIns": true' deploy-health.json
+          grep -q '"androidSplitPots": true' deploy-health.json
+          grep -q '"androidActionHistory": true' deploy-health.json
+          grep -q '"androidDistinctBotPersonalities": 5' deploy-health.json
           grep -q '"androidTournamentRegistrationCap": 50' deploy-health.json
-          grep -q '"androidTournamentTestFieldSize": 10' deploy-health.json
           grep -q '"androidTournamentPrizePlayChips": 100000' deploy-health.json
           grep -q '"androidTournamentChampionCrownHours": 24' deploy-health.json
-          grep -q '"androidLandscapeHandheldPolish": true' deploy-health.json
           grep -q '"androidTournamentSharedRegistrationBackendLive": false' deploy-health.json
           grep -q '"iosIphoneSafariAvailable": true' deploy-health.json
           grep -q '"questTeleportEnabled": false' deploy-health.json
@@ -73,11 +82,11 @@ jobs:
         with:
           enablement: true
 
-      - name: Upload Phase 401 Pages artifact
+      - name: Upload Phase 403 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
-      - name: Deploy Phase 401
+      - name: Deploy Phase 403
         id: deployment
         uses: actions/deploy-pages@v4

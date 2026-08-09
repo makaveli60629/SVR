@@ -86,7 +86,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q '"phase": 401' game/manifest.json
+          grep -q '"phase": 403' game/manifest.json
           grep -q '"iphoneSafariAvailable": true' game/manifest.json
           grep -q '"usesProtectedAndroidPokerEngine": true' game/manifest.json
           grep -q '"iosIphoneSafariAvailable": true' update/app-version.json
@@ -117,7 +117,7 @@ jobs:
           python3 -m json.tool game/manifest.json >/dev/null
           python3 -m json.tool game/android-release.json >/dev/null
           python3 -m json.tool update/app-version.json >/dev/null
-          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' sw.js
-          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' pwa-sw.js
+          grep -q 'svr-poker-phase403-android-engine-reliability-v1' sw.js
+          grep -q 'svr-poker-phase403-android-engine-reliability-v1' pwa-sw.js
           test -s game/styles/phase400_ios_safari_compat.css
           test -s downloads/svr-poker-android-rc2.apk

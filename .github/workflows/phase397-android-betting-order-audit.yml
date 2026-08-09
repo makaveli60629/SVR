@@ -25,23 +25,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK' game/modules/phase402_android_gameplay.js
-          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/modules/phase402_android_gameplay.js
-          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase402_android_gameplay.js
-          grep -q 'leftwardOrderAfter' game/modules/phase402_android_gameplay.js
-          grep -q 'state.dealer=nextVisualSeat(state.dealer)' game/modules/phase402_android_gameplay.js
-          grep -q 'const small=nextVisualSeat(state.dealer),big=nextVisualSeat(small)' game/modules/phase402_android_gameplay.js
-          grep -q 'const first=nextEligible(big)' game/modules/phase402_android_gameplay.js
-          grep -q 'const next=nextEligible(state.dealer)' game/modules/phase402_android_gameplay.js
-          grep -q 'legalFullRaise' game/modules/phase402_android_gameplay.js
-          grep -q 'lastFullRaiseSize' game/modules/phase402_android_gameplay.js
-          grep -q 'SVR_PHASE398_ANDROID_BETTING_QA' game/modules/phase402_android_gameplay.js
-          grep -q 'SVR_PHASE402_ANDROID_SEAT_ORDER_QA' game/modules/phase402_android_gameplay.js
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'leftwardOrderAfter' game/modules/phase403_android_gameplay.js
+          grep -q 'state.dealer=nextVisualSeat(state.dealer)' game/modules/phase403_android_gameplay.js
+          grep -q 'const small=nextVisualSeat(state.dealer),big=nextVisualSeat(small)' game/modules/phase403_android_gameplay.js
+          grep -q 'const first=nextEligible(big)' game/modules/phase403_android_gameplay.js
+          grep -q 'const next=nextEligible(state.dealer)' game/modules/phase403_android_gameplay.js
+          grep -q 'legalFullRaise' game/modules/phase403_android_gameplay.js
+          grep -q 'lastFullRaiseSize' game/modules/phase403_android_gameplay.js
+          grep -q 'SVR_PHASE398_ANDROID_BETTING_QA' game/modules/phase403_android_gameplay.js
+          grep -q 'SVR_PHASE402_ANDROID_SEAT_ORDER_QA' game/modules/phase403_android_gameplay.js
           grep -q 'PHASE-398-ANDROID-RAISE-CONTROL-GUARD-LOCK' game/modules/phase397_android_action_button_guard.js
           grep -q 'RAISE TO' game/modules/phase397_android_action_button_guard.js
-          grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable-phase402.html
-          grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase402_android_gameplay.js
-          node --check game/modules/phase402_android_gameplay.js
+          grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable-phase403.html
+          grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase403_android_gameplay.js
+          node --check game/modules/phase403_android_gameplay.js
           node --check game/modules/phase397_android_action_button_guard.js
           node --check game/modules/phase398_android_raise_rules.js
 
@@ -61,10 +62,12 @@ jobs:
             return out;
           };
           const next=s=>orderAfter(s)[0];
-          if(next(4)!==0)throw new Error('Darius must act to YOU next');
-          if(next(0)!==5)throw new Error('YOU must act to Nova next');
-          if(next(5)!==1)throw new Error('Nova must act to Claudia next');
-          if(next(1)!==2||next(2)!==3||next(3)!==4)throw new Error('upper-table physical order is wrong');
+          for(let pass=0;pass<10000;pass++){
+            if(next(4)!==0)throw new Error('Darius must act to YOU next');
+            if(next(0)!==5)throw new Error('YOU must act to Nova next');
+            if(next(5)!==1)throw new Error('Nova must act to Claudia next');
+            if(next(1)!==2||next(2)!==3||next(3)!==4)throw new Error('upper-table physical order is wrong');
+          }
           for(const dealer of visual){
             const small=next(dealer),big=next(small),pre=orderAfter(big),post=orderAfter(dealer);
             if(pre[0]!==next(big))throw new Error(`bad preflop first actor for dealer ${names[dealer]}`);
