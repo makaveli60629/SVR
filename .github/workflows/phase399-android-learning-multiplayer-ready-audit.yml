@@ -27,11 +27,11 @@ jobs:
           set -euo pipefail
           grep -q 'PHASE-399-ANDROID-LEARNING-WINNER-CHIPS-SPONSOR-LOCK' game/android-stable.html
           grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/android-stable.html
-          grep -q 'phase399_android_learning_chips_sponsor.css?v=phase399' game/android-stable.html
-          grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' game/android-stable.html
-          grep -q 'phase399_android_matchmaking_voice.js?v=phase399' game/android-stable.html
-          grep -q 'v=phase402' game/android.html
-          grep -q 'v=phase402' game/android-tabletop.html
+          grep -q 'phase399_android_learning_chips_sponsor.css?v=phase399' game/android-stable-phase403.html
+          grep -q 'phase399_android_learning_chips_sponsor.js?v=phase399' game/android-stable-phase403.html
+          grep -q 'phase399_android_matchmaking_voice.js?v=phase399' game/android-stable-phase403.html
+          grep -q 'v=phase403' game/android.html
+          grep -q 'v=phase403' game/android-tabletop.html
           grep -q 'REIKI  •  FEATURED TABLE PARTNER' game/styles/phase399_android_learning_chips_sponsor.css
           grep -q 'phase399-chip-stack' game/styles/phase399_android_learning_chips_sponsor.css
           grep -q 'phase399-ticket-notice' game/styles/phase399_android_learning_chips_sponsor.css
@@ -114,11 +114,12 @@ jobs:
           node --check game/modules/phase399_android_learning_chips_sponsor.js
           node --check game/modules/phase399_android_matchmaking_voice.js
           node --check game/modules/phase400_ios_safari_adapter.js
+          node --check game/modules/phase403_android_gameplay.js
           node --check sw.js
           node --check pwa-sw.js
           python3 -m json.tool game/manifest.json >/dev/null
           python3 -m json.tool game/android-release.json >/dev/null
           python3 -m json.tool update/app-version.json >/dev/null
           python3 -m json.tool manifest.webmanifest >/dev/null
-          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' sw.js
-          grep -q 'svr-poker-phase401-android-sponsor-tournament-landscape-v1' pwa-sw.js
+          grep -q 'svr-poker-phase403-android-engine-reliability-v1' sw.js
+          grep -q 'svr-poker-phase403-android-engine-reliability-v1' pwa-sw.js
