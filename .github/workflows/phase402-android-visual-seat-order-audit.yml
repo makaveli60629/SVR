@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
-      - name: Validate protected Phase 402 order under active Phase 405 route
+      - name: Validate protected Phase 402 order under active Phase 406 route
         shell: bash
         run: |
           set -euo pipefail
@@ -31,8 +31,8 @@ jobs:
           test -s game/android-stable-phase405.html
           test -s game/modules/phase403_android_gameplay.js
           grep -q 'PHASE-402-ANDROID-VISUAL-LEFT-SEAT-ORDER-LOCK' game/android-stable-phase405.html
-          grep -q 'PHASE-405-PLATFORM-MOBILE-SOCIAL-LOCK' game/android.html
-          grep -q 'android-tabletop.html?v=phase405' game/android.html
+          grep -q 'PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK' game/android.html
+          grep -q 'android-tabletop.html?v=phase406' game/android.html
           grep -q 'android-stable-phase405.html' game/android-tabletop.html
           grep -q 'SVR_PHASE402_ANDROID_SEAT_ORDER_QA' game/android-tabletop.html
           grep -q 'SVR_PHASE403_ANDROID_ENGINE_QA' game/android-tabletop.html
