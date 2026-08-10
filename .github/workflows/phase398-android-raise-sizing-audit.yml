@@ -35,7 +35,7 @@ jobs:
           grep -q 'step="50"' game/android-stable.html
           grep -q 'phase393_android_gameplay.js?v=phase398' game/android-stable.html
           grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable.html
-          grep -q 'android-tabletop.html?v=phase405' game/android.html
+          grep -q 'android-tabletop.html?v=phase406' game/android.html
           grep -q 'phase398_android_raise_rules.js?v=phase398' game/modules/phase403_android_gameplay.js
           grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable-phase404.html
           grep -q 'phase397_android_action_button_guard.js?v=phase398' game/android-stable-phase405.html
