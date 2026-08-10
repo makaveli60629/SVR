@@ -31,7 +31,7 @@ jobs:
         with:
           ref: gh-pages
           fetch-depth: 1
-      - name: Verify Phase 405 production payload
+      - name: Verify Phase 406 production payload
         shell: bash
         run: |
           set -euo pipefail
@@ -44,17 +44,24 @@ jobs:
           test -s game/modules/phase405_mobile_ui.js
           test -s game/modules/phase405_vox_voice.js
           test -s game/modules/phase405_tournament_scheduler.js
+          test -s game/modules/phase406_mobile_ultimate_gameplay.js
+          test -s game/modules/phase406_tournament_24h_board.js
+          test -s game/modules/phase406_quest_side_burn_chip_polish.js
+          test -s game/styles/phase406_mobile_casino_polish.css
           test -s site/js/phase405-profile-portrait.js
-          grep -q 'PHASE-405-PLATFORM-MOBILE-SOCIAL-LOCK' game/android.html
-          grep -q 'phase405_mobile_ui.js?v=phase405' game/android-stable-phase405.html
-          grep -q 'phase405_vox_voice.js?v=phase405' game/android-stable-phase405.html
+          grep -q 'PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK' game/android.html
+          grep -q 'phase406_mobile_ultimate_gameplay.js?v=phase406' game/android-stable-phase405.html
+          grep -q 'phase406_mobile_casino_polish.css?v=phase406' game/android-stable-phase405.html
+          grep -q 'phase406_tournament_24h_board.js?v=phase406' game/tournament-results.html
+          grep -q 'phase406_quest_side_burn_chip_polish.js?v=phase406' game/index.html
           grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
           grep -q 'PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK' game/modules/phase404_android_mobile_safety.js
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/modules/phase400_ios_safari_adapter.js
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
-          grep -q 'PHASE-405-PLATFORM-MOBILE-SOCIAL-LOCK' deploy-health.json
+          grep -q 'PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK' deploy-health.json
           grep -q '"androidSingleBurnPile": true' deploy-health.json
-          grep -q '"androidPokerHandsButton": true' deploy-health.json
+          grep -q '"androidBurnPileAtSideRail": true' deploy-health.json
+          grep -q '"androidHandHelperCards": 12' deploy-health.json
           grep -q '"androidTournamentEveryHours": 5' deploy-health.json
           grep -q '"androidProductionMatchServerConfigured": false' deploy-health.json
           grep -q '"nativeApkRebuild": false' deploy-health.json
@@ -65,10 +72,10 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Upload Phase 405 Pages artifact
+      - name: Upload Phase 406 Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
-      - name: Deploy Phase 405
+      - name: Deploy Phase 406
         id: deployment
         uses: actions/deploy-pages@v4
