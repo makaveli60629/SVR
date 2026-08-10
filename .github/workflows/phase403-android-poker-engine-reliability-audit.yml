@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v5
-      - name: Validate Phase 403 engine under current Phase 405 route
+      - name: Validate Phase 403 engine under current Phase 406 route
         shell: bash
         run: |
           set -euo pipefail
@@ -31,8 +31,8 @@ jobs:
           test -s game/modules/phase403_android_pot_rules.js
           test -s game/modules/phase403_android_table_clarity.js
           test -s game/styles/phase403_android_table_clarity.css
-          grep -q 'PHASE-405-PLATFORM-MOBILE-SOCIAL-LOCK' game/android.html
-          grep -q 'android-tabletop.html?v=phase405' game/android.html
+          grep -q 'PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK' game/android.html
+          grep -q 'android-tabletop.html?v=phase406' game/android.html
           grep -q 'android-stable-phase405.html' game/android-tabletop.html
           grep -q 'SVR_PHASE403_ANDROID_ENGINE_QA' game/android-tabletop.html
           grep -q 'SVR_PHASE403_TABLE_CLARITY_QA' game/android-tabletop.html
@@ -123,10 +123,11 @@ jobs:
           python3 -m json.tool update/app-version.json >/dev/null
           python3 -m json.tool game/manifest.json >/dev/null
           python3 -m json.tool manifest.webmanifest >/dev/null
-          grep -q '"phase": 405' game/manifest.json
+          grep -q '"phase": 406' game/manifest.json
           grep -q '"androidSidePotEngine": true' update/app-version.json
           grep -q '"androidDariusAdvancesToUser": true' update/app-version.json
           grep -q '"androidTournamentSharedRegistrationBackendLive": false' update/app-version.json
           grep -q '"androidLiveMultiplayer": false' update/app-version.json
           grep -q 'svr-poker-phase404-android-mobile-safety-v1' sw.js
           grep -q 'svr-poker-phase405-platform-mobile-social-v1' sw.js
+          grep -q 'svr-poker-phase406-mobile-ultimate-gameplay-v1' sw.js
