@@ -34,26 +34,30 @@ jobs:
           set -euo pipefail
           git -C source fetch origin main --depth=1
           test "$(git -C source rev-parse HEAD)" = "$(git -C source rev-parse origin/main)"
-      - name: Validate Phase 406 and protected poker engine
+      - name: Validate Phase 407 and protected poker engine
         shell: bash
         run: |
           set -euo pipefail
           test -s source/platform-device.js
+          test -s source/phase407-public-status.js
           test -s source/game/android-stable-phase405.html
+          test -s source/game/modules/phase407_mobile_bot_pacing_preload.js
+          test -s source/game/modules/phase407_mobile_fit_login.js
+          test -s source/game/styles/phase407_mobile_fit_login.css
           test -s source/game/modules/phase405_mobile_ui.js
           test -s source/game/modules/phase405_vox_voice.js
           test -s source/game/modules/phase405_tournament_scheduler.js
           test -s source/game/modules/phase406_mobile_ultimate_gameplay.js
           test -s source/game/modules/phase406_tournament_24h_board.js
           test -s source/game/modules/phase406_quest_side_burn_chip_polish.js
-          test -s source/game/styles/phase405_mobile_social_alignment.css
-          test -s source/game/styles/phase406_mobile_casino_polish.css
-          grep -q 'PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK' source/game/android.html
-          grep -q 'android-stable-phase405.html' source/game/android-tabletop.html
-          grep -q 'phase406_mobile_ultimate_gameplay.js?v=phase406' source/game/android-stable-phase405.html
-          grep -q 'phase406_mobile_casino_polish.css?v=phase406' source/game/android-stable-phase405.html
-          grep -q 'phase406_tournament_24h_board.js?v=phase406' source/game/tournaments.html
-          grep -q 'phase406_quest_side_burn_chip_polish.js?v=phase406' source/game/index.html
+          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' source/game/android.html
+          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' source/game/android-tabletop.html
+          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' source/game/android-stable-phase405.html
+          grep -q 'phase407_mobile_bot_pacing_preload.js?v=phase407' source/game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.css?v=phase407' source/game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.js?v=phase407' source/game/android-stable-phase405.html
+          grep -q 'phase345_player_account_activity_bridge.js?v=phase407' source/game/android-stable-phase405.html
+          grep -q 'phase407-public-status.js' source/site-public-hooks.js
           grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' source/game/modules/phase403_android_gameplay.js
           grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' source/game/modules/phase403_android_pot_rules.js
           grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' source/game/modules/phase403_android_gameplay.js
@@ -66,14 +70,15 @@ jobs:
           grep -q '"androidProductionMatchServerConfigured": false' source/update/app-version.json
           node --check source/platform-device.js
           node --check source/site-public-hooks.js
+          node --check source/phase407-public-status.js
           node --check source/sw.js
           node --check source/pwa-sw.js
+          node --check source/game/modules/phase407_mobile_bot_pacing_preload.js
+          node --check source/game/modules/phase407_mobile_fit_login.js
           node --check source/game/modules/phase405_mobile_ui.js
           node --check source/game/modules/phase405_vox_voice.js
           node --check source/game/modules/phase405_tournament_scheduler.js
           node --check source/game/modules/phase406_mobile_ultimate_gameplay.js
-          node --check source/game/modules/phase406_tournament_24h_board.js
-          node --check source/game/modules/phase406_quest_side_burn_chip_polish.js
           node --check source/game/modules/phase403_android_gameplay.js
           python3 -m json.tool source/manifest.webmanifest >/dev/null
           python3 -m json.tool source/game/manifest.json >/dev/null
@@ -85,6 +90,13 @@ jobs:
           grep -q '"forceUpdate": false' source/game/android-release.json
           grep -q '"showUpdatePrompt": false' source/game/android-release.json
           grep -q '"nativeApkRebuild": false' source/game/android-release.json
+      - name: Protect public page and Phase 403 poker source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C source fetch origin main~1 --depth=1 || true
+          grep -q 'SVR Poker | Public Launch Page' source/index.html
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' source/game/modules/phase403_android_gameplay.js
       - name: Execute protected Phase 403 pot sanity
         shell: bash
         run: |
@@ -98,12 +110,27 @@ jobs:
           if(split.payouts[0]!==151||split.payouts[5]!==150)throw new Error('odd-chip order failed');
           console.log('Protected Phase 403 production pot sanity passed.');
           NODE
+      - name: Validate Phase 407 mobile contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'MIN_THINK_MS=2200,MAX_THINK_MS=4000' source/game/modules/phase407_mobile_bot_pacing_preload.js
+          grep -q "afterend',keep" source/game/modules/phase407_mobile_fit_login.js
+          grep -q 'phase407-board-burn' source/game/styles/phase407_mobile_fit_login.css
+          grep -q 'phase407-user-turn' source/game/styles/phase407_mobile_fit_login.css
+          grep -q 'SIGN IN' source/game/modules/phase407_mobile_fit_login.js
+          grep -q 'Site Under Construction' source/phase407-public-status.js
+          grep -q 'SERVER' source/phase407-public-status.js
+          grep -q 'DATABASE' source/phase407-public-status.js
+          grep -q 'NO LIVE PEER' source/game/modules/phase405_vox_voice.js
+          grep -q 'YOU WON THE TOURNAMENT' source/game/modules/phase405_mobile_ui.js
+          grep -q 'Moving to the next tournament table' source/game/modules/phase405_mobile_ui.js
       - name: Build clean production tree
         shell: bash
         run: |
           set -euo pipefail
           find publish -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-          for file in index.html launch.css launch-quest.css matrix.js platform-device.js site-public-hooks.js site-local-counter.js support-chat-bot.js manifest.webmanifest pwa-sw.js sw.js offline.html logo.png logo.webp CNAME .nojekyll; do
+          for file in index.html launch.css launch-quest.css matrix.js platform-device.js site-public-hooks.js phase407-public-status.js site-local-counter.js support-chat-bot.js manifest.webmanifest pwa-sw.js sw.js offline.html logo.png logo.webp CNAME .nojekyll; do
             [ -e "source/$file" ] && cp "source/$file" "publish/$file"
           done
           cp -a source/game publish/game
@@ -120,54 +147,55 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK",
+            "build": "PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK",
             "platformBuild": "PHASE-405-PLATFORM-DEVICE-ALIGNMENT-LOCK",
             "questBuild": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
             "questPolishBuild": "PHASE-406-QUEST-SIDE-BURN-CHIP-POLISH-LOCK",
-            "androidBuild": "PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK",
+            "androidBuild": "PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK",
             "androidEngineBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
             "androidMobileSafetyBuild": "PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK",
-            "iosBuild": "PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK",
+            "iosBuild": "PHASE-407-IPHONE-MOBILE-FIT-PACING-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "questRoute": "/game/quest.html?v=phase396",
-            "androidRoute": "/game/android.html?channel=stable&v=phase406",
-            "androidPracticeRoute": "/game/android-tabletop.html?v=phase406&mode=practice",
-            "androidRegularRoute": "/game/android-tabletop.html?v=phase406&mode=regular",
-            "androidTournamentRoute": "/game/android-tabletop.html?v=phase406&mode=tournament&tournament=reiki-first-50",
-            "androidGameplayRoute": "/game/android-stable-phase405.html?v=phase406&mode=regular&direct=1",
-            "iphoneRoute": "/game/iphone.html?v=phase406",
-            "iphoneGameplayRoute": "/game/android-stable-phase405.html?v=phase406&platform=ios&safari=1&direct=1",
+            "androidRoute": "/game/android.html?channel=stable&v=phase407",
+            "androidPracticeRoute": "/game/android-tabletop.html?v=phase407&mode=practice",
+            "androidRegularRoute": "/game/android-tabletop.html?v=phase407&mode=regular",
+            "androidTournamentRoute": "/game/android-tabletop.html?v=phase407&mode=tournament&tournament=reiki-first-50",
+            "androidGameplayRoute": "/game/android-stable-phase405.html?v=phase407&mode=regular&direct=1",
+            "iphoneRoute": "/game/iphone.html?v=phase407",
+            "iphoneGameplayRoute": "/game/android-stable-phase405.html?v=phase407&platform=ios&safari=1&direct=1",
             "publicPageStructurePreserved": true,
             "publicGreenPhaseIndicatorVisible": true,
-            "publicMobileNotVrMessage": true,
+            "publicSiteUnderConstructionVisible": true,
+            "publicServerDatabaseIndicators": true,
+            "publicStatusIndicatorsTruthful": true,
             "platformQuestDetection": true,
             "platformAndroidDetection": true,
             "platformIosDetection": true,
             "platformVisualViewportAlignment": true,
             "questTeleportEnabled": false,
             "questHardSeatedFrontTable": true,
-            "questSideBurnPile": true,
-            "questChipPalettePolish": true,
             "androidVisualLeftToRightSeatOrder": [0,5,1,2,3,4],
             "androidDariusAdvancesToUser": true,
             "androidSidePotEngine": true,
             "androidMultipleAllIns": true,
             "androidSplitPots": true,
             "androidSingleBurnPile": true,
-            "androidBurnPileAtSideRail": true,
-            "androidCasinoChipDenominationLabels": true,
-            "androidHandHelperCards": 12,
-            "androidOfficialRankedHands": 10,
-            "androidTournamentLast24HoursBoard": true,
-            "androidPlayChipPayoutTiers": [100000,50000,25000],
-            "androidNoCashValue": true,
+            "androidBurnPileBesideBoard": true,
+            "androidBotThinkMinMs": 2200,
+            "androidBotThinkMaxMs": 4000,
+            "androidChipRackAligned": true,
+            "androidActionsRaisedForMobile": true,
+            "androidLandscapeFitPolished": true,
+            "androidTurnIndicatorEnhanced": true,
             "androidPokerHandsButton": true,
             "androidProfileFacePopup": true,
             "androidProfilePortraitUpload": true,
-            "androidGuestTwoSeatReady": true,
-            "androidQuickMicButton": true,
             "androidVoxControl": true,
+            "androidLoginReady": true,
+            "androidGuestFallbackDuringTest": true,
+            "androidLoginRequiredForProduction": true,
             "androidTournamentEveryHours": 5,
             "androidTournamentDailyLocalResults": true,
             "androidTournamentUnattendedBotSimulation": true,
@@ -175,11 +203,6 @@ jobs:
             "androidProductionMatchServerConfigured": false,
             "androidLiveMultiplayer": false,
             "androidLiveVoice": false,
-            "iosPokerHandsButton": true,
-            "iosProfileFacePopup": true,
-            "iosVoxControl": true,
-            "iosLiveMultiplayer": false,
-            "iosLiveVoice": false,
             "apkVersionName": "0.1.0-rc2",
             "apkVersionCode": 2,
             "forceUpdate": false,
@@ -193,16 +216,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -s publish/platform-device.js
+          test -s publish/phase407-public-status.js
           test -s publish/game/android-stable-phase405.html
-          test -s publish/game/modules/phase406_mobile_ultimate_gameplay.js
-          test -s publish/game/modules/phase406_tournament_24h_board.js
-          test -s publish/game/modules/phase406_quest_side_burn_chip_polish.js
-          test -s publish/site/js/phase405-profile-portrait.js
-          grep -q 'PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK' publish/deploy-health.json
+          test -s publish/game/modules/phase407_mobile_bot_pacing_preload.js
+          test -s publish/game/modules/phase407_mobile_fit_login.js
+          test -s publish/game/styles/phase407_mobile_fit_login.css
+          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' publish/deploy-health.json
           grep -q '"androidSingleBurnPile": true' publish/deploy-health.json
-          grep -q '"androidBurnPileAtSideRail": true' publish/deploy-health.json
-          grep -q '"androidTournamentEveryHours": 5' publish/deploy-health.json
+          grep -q '"androidBurnPileBesideBoard": true' publish/deploy-health.json
+          grep -q '"androidBotThinkMinMs": 2200' publish/deploy-health.json
+          grep -q '"publicSiteUnderConstructionVisible": true' publish/deploy-health.json
+          grep -q '"androidLoginReady": true' publish/deploy-health.json
           grep -q '"androidProductionMatchServerConfigured": false' publish/deploy-health.json
           grep -q '"nativeApkRebuild": false' publish/deploy-health.json
           test -f publish/CNAME
@@ -216,8 +240,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 406.'
+            echo 'Production already matches Phase 407.'
           else
-            git commit -m "Deploy Phase 406 mobile gameplay ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 407 mobile fit pacing ${GITHUB_SHA}"
             git push origin gh-pages
           fi
