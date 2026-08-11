@@ -36,15 +36,19 @@ jobs:
           grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
 
-      - name: Validate Phase 406 shared mobile table
+      - name: Validate Phase 406 shared mobile layer under Phase 407 override
         shell: bash
         run: |
           set -euo pipefail
           test -s game/modules/phase406_mobile_ultimate_gameplay.js
           test -s game/styles/phase406_mobile_casino_polish.css
-          grep -q 'PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK' game/android-stable-phase405.html
+          test -s game/modules/phase407_mobile_fit_login.js
+          test -s game/styles/phase407_mobile_fit_login.css
+          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android-stable-phase405.html
           grep -q 'phase406_mobile_casino_polish.css?v=phase406' game/android-stable-phase405.html
           grep -q 'phase406_mobile_ultimate_gameplay.js?v=phase406' game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.css?v=phase407' game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.js?v=phase407' game/android-stable-phase405.html
           python3 - <<'PY'
           from pathlib import Path
           s=Path('game/android-stable-phase405.html').read_text()
@@ -54,12 +58,17 @@ jobs:
               raise SystemExit('ALL IN capture guard must load before protected engine')
           if s.index('phase406_mobile_ultimate_gameplay.js?v=phase406') <= s.index('phase405_vox_voice.js?v=phase405'):
               raise SystemExit('Phase 406 enhancement must load after Phase 405 voice/social layer')
+          if s.index('phase407_mobile_fit_login.js?v=phase407') <= s.index('phase406_mobile_ultimate_gameplay.js?v=phase406'):
+              raise SystemExit('Phase 407 presentation override must load after Phase 406')
           PY
           grep -q 'phase406-side-burn' game/styles/phase406_mobile_casino_polish.css
           grep -q 'right:10px!important' game/styles/phase406_mobile_casino_polish.css
           grep -Fq "document.querySelectorAll('.burn-zone')" game/modules/phase406_mobile_ultimate_gameplay.js
           grep -q 'keep.parentElement!==table' game/modules/phase406_mobile_ultimate_gameplay.js
+          grep -Fq "label.insertAdjacentElement('afterend',keep)" game/modules/phase407_mobile_fit_login.js
+          grep -q 'phase407-board-burn' game/styles/phase407_mobile_fit_login.css
           node --check game/modules/phase406_mobile_ultimate_gameplay.js
+          node --check game/modules/phase407_mobile_fit_login.js
 
       - name: Validate hand helper chip and Reiki presentation
         shell: bash
@@ -76,6 +85,7 @@ jobs:
           grep -q "content:'\$1K'" game/styles/phase406_mobile_casino_polish.css
           grep -q 'REIKI • FEATURED' game/styles/phase406_mobile_casino_polish.css
           grep -q 'compactReikiSponsorPresentation' game/manifest.json
+          grep -q 'androidChipRackAligned' update/app-version.json
 
       - name: Validate rolling 24h tournaments and play-chip payouts
         shell: bash
@@ -126,17 +136,19 @@ jobs:
           for value in '1,0xf5f5f5' '5,0xc92d3d' '25,0x23854a' '100,0x15181e' '500,0x7837a8' '1000,0xd5a425'; do grep -q "$value" game/modules/phase406_quest_side_burn_chip_polish.js; done
           node --check game/modules/phase406_quest_side_burn_chip_polish.js
 
-      - name: Validate Phase 406 metadata cache and APK policy
+      - name: Validate Phase 406 preservation under Phase 407 metadata cache and APK policy
         shell: bash
         run: |
           set -euo pipefail
-          grep -q '"phase": 406' game/manifest.json
-          grep -q '"build": "PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK"' game/manifest.json
-          grep -q '"burnTrayAtSideRail": true' game/manifest.json
+          grep -q '"phase": 407' game/manifest.json
+          grep -q '"predecessor_build": "PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK"' game/manifest.json
+          grep -q '"burnTrayAtSideRail": false' game/manifest.json
+          grep -q '"burnPileBesideBoard": true' game/manifest.json
           grep -q '"handHelperCards": 12' game/manifest.json
           grep -q '"rollingResultHours": 24' game/manifest.json
           grep -q 'svr-poker-phase406-mobile-ultimate-gameplay-v1' sw.js
-          grep -q 'svr-poker-phase406-mobile-ultimate-gameplay-v1' pwa-sw.js
+          grep -q 'svr-poker-phase407-mobile-fit-pacing-status-login-v1' sw.js
+          grep -q 'svr-poker-phase407-mobile-fit-pacing-status-login-v1' pwa-sw.js
           node --check site-public-hooks.js
           node --check sw.js
           node --check pwa-sw.js
