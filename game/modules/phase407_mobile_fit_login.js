@@ -48,9 +48,9 @@ function thinkingPolish(){
 }
 function micPolish(){const b=$('#phase406QuickMic');if(b&&!/VOX/.test(b.textContent||''))b.textContent='MIC / VOX'}
 function ensurePhase409Layer(){
-  if(!document.querySelector('link[data-phase409-player-fit]')){const link=document.createElement('link');link.rel='stylesheet';link.href='/game/styles/phase409_mobile_player_box_fit.css?v=phase409';link.dataset.phase409PlayerFit='1';document.head.appendChild(link)}
-  if(!window.SVR_PHASE409_PLAYER_TURN_QA&&!document.querySelector('script[data-phase409-turn-guard]')){const script=document.createElement('script');script.type='module';script.src='/game/modules/phase409_mobile_player_turn_guard.js?v=phase409';script.dataset.phase409TurnGuard='1';document.body.appendChild(script)}
-  state.phase409Layer=Boolean(document.querySelector('link[data-phase409-player-fit]')&&document.querySelector('script[data-phase409-turn-guard]'));return state.phase409Layer
+  let link=document.querySelector('link[href*="phase409_mobile_player_box_fit.css"]');if(!link){link=document.createElement('link');link.rel='stylesheet';link.href='/game/styles/phase409_mobile_player_box_fit.css?v=phase409';link.dataset.phase409PlayerFit='1';document.head.appendChild(link)}
+  let script=document.querySelector('script[src*="phase409_mobile_player_turn_guard.js"]');if(!window.SVR_PHASE409_PLAYER_TURN_QA&&!script){script=document.createElement('script');script.type='module';script.src='/game/modules/phase409_mobile_player_turn_guard.js?v=phase409';script.dataset.phase409TurnGuard='1';document.body.appendChild(script)}
+  state.phase409Layer=Boolean(link&&(script||window.SVR_PHASE409_PLAYER_TURN_QA));return state.phase409Layer
 }
 function poll(){try{ensurePhase409Layer();ensureSingleBurn();ensureAccountUi();turnPolish();thinkingPolish();micPolish();state.installed=Boolean(state.oneBurn&&state.burnBesideBoard&&state.loginButton&&state.phase409Layer);state.lastError=null}catch(e){state.lastError=String(e?.message||e)}}
 window.addEventListener('svr:bot-thinking',e=>{state.lastThinkDelay=Number(e.detail?.delay||0)});
