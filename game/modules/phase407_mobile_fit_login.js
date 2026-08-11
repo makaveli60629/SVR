@@ -1,5 +1,6 @@
 /* PHASE-407-MOBILE-FIT-LOGIN-BURN-LOCK */
 const BUILD='PHASE-407-MOBILE-FIT-LOGIN-BURN-LOCK';
+window.SVR_PHASE407_BOARD_BURN=true;
 const state={build:BUILD,installed:false,burnBesideBoard:false,oneBurn:false,userTurn:false,loginButton:false,accountMode:'loading',signedIn:false,thinking:false,lastThinkDelay:0,lastError:null};
 const $=s=>document.querySelector(s);
 function accountSnapshot(){try{return window.SVR_PHASE345_ACCOUNT_QA?.()?.account||window.SVR_PLAYER_ACCOUNT?.snapshot?.()||null}catch{return null}}
