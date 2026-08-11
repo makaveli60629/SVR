@@ -39,33 +39,42 @@ jobs:
         run: |
           set -euo pipefail
           test -s game/modules/phase412_tournament_account_gate.js
+          test -s site/js/phase412-tournament-account-registration.js
           grep -q 'PHASE-412-TOURNAMENT-ACCOUNT-GATE-LOCK' game/modules/phase412_tournament_account_gate.js
+          grep -q 'PHASE-412-TOURNAMENT-TEST-ACCOUNT-REGISTRATION-LOCK' site/js/phase412-tournament-account-registration.js
           grep -q "isTournamentGame=String(qs.get('mode')||'').toLowerCase()==='tournament'" game/modules/phase412_tournament_account_gate.js
           grep -q 'guestOneTournamentEligible:false' game/modules/phase412_tournament_account_gate.js
+          grep -q 'genericDemoTournamentEligible:false' game/modules/phase412_tournament_account_gate.js
           grep -q 'practiceGuestAllowed:true' game/modules/phase412_tournament_account_gate.js
           grep -q 'productionRequirementWhenApiLive:true' game/modules/phase412_tournament_account_gate.js
-          grep -q 'localTestFallbackBeforeApiLive:true' game/modules/phase412_tournament_account_gate.js
+          grep -q 'explicitLocalTestAccountRequiredBeforeApiLive:true' game/modules/phase412_tournament_account_gate.js
+          grep -q 'svr_phase412_tournament_test_account_v1' game/modules/phase412_tournament_account_gate.js
+          grep -q 'svr_phase412_tournament_test_account_v1' site/js/phase412-tournament-account-registration.js
+          grep -q 'CREATE LOCAL TOURNAMENT TEST ACCOUNT' site/js/phase412-tournament-account-registration.js
           grep -q 'SIGN IN / CREATE ACCOUNT' game/modules/phase412_tournament_account_gate.js
           grep -q 'LOGIN / CREATE ACCOUNT TO ENTER' game/tournaments.html
           grep -q 'phase412_tournament_account_gate.js?v=phase412' game/tournaments.html
+          grep -q 'phase412-tournament-account-registration.js?v=phase412' site-public-hooks.js
           grep -q 'mode=tournament' game/android.html
           grep -q 'tournament=reiki-open-100' game/android.html
           node --check game/modules/phase412_tournament_account_gate.js
+          node --check site/js/phase412-tournament-account-registration.js
 
       - name: Execute account entitlement scenarios
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
-          function eligible({profile,mode,apiConfigured,apiHealthy}){
+          function eligible({profile,mode,apiConfigured,apiHealthy,testRegistration}){
             const production=Boolean(profile&&mode==='api'&&!profile.demoMode);
-            const local=Boolean(profile&&mode==='demo');
+            const local=Boolean(profile&&mode==='demo'&&testRegistration?.playerId&&testRegistration.playerId===profile.playerId);
             return apiConfigured&&apiHealthy?production:Boolean(production||local);
           }
-          if(eligible({profile:null,mode:'unconfigured',apiConfigured:false,apiHealthy:false})) throw new Error('Guest 1 must not enter tournament');
-          if(!eligible({profile:{demoMode:true},mode:'demo',apiConfigured:false,apiHealthy:false})) throw new Error('Named local test account must work before backend is live');
-          if(eligible({profile:{demoMode:true},mode:'demo',apiConfigured:true,apiHealthy:true})) throw new Error('Demo identity must not pass once production auth is live');
-          if(!eligible({profile:{demoMode:false},mode:'api',apiConfigured:true,apiHealthy:true})) throw new Error('Production account must pass');
+          if(eligible({profile:null,mode:'unconfigured',apiConfigured:false,apiHealthy:false,testRegistration:null})) throw new Error('Guest 1 must not enter tournament');
+          if(eligible({profile:{playerId:'demo-1',demoMode:true},mode:'demo',apiConfigured:false,apiHealthy:false,testRegistration:null})) throw new Error('Generic demo player must not enter tournament');
+          if(!eligible({profile:{playerId:'demo-1',demoMode:true},mode:'demo',apiConfigured:false,apiHealthy:false,testRegistration:{playerId:'demo-1'}})) throw new Error('Explicit local tournament test account must work before backend is live');
+          if(eligible({profile:{playerId:'demo-1',demoMode:true},mode:'demo',apiConfigured:true,apiHealthy:true,testRegistration:{playerId:'demo-1'}})) throw new Error('Local test identity must not pass once production auth is live');
+          if(!eligible({profile:{playerId:'prod-1',demoMode:false},mode:'api',apiConfigured:true,apiHealthy:true,testRegistration:null})) throw new Error('Production account must pass');
           console.log('Phase 412 tournament entitlement scenarios passed.');
           NODE
 
