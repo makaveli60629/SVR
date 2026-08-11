@@ -1,10 +1,10 @@
 {
   "name": "SVR Poker",
   "short_name": "SVR Poker",
-  "description": "SVR Poker Phase 406 keeps the protected poker engine while improving Android and iPhone/iPad presentation with a side burn pile, casino chip denominations, hand helper, profile/mic tools, rolling 24-hour play-money tournament results, and clearer phone-versus-VR device guidance.",
-  "id": "/?source=pwa-phase406",
-  "predecessor_id": "pwa-phase405",
-  "start_url": "/?source=pwa-phase406&v=phase406",
+  "description": "SVR Poker Phase 407 keeps the protected poker engine while improving Android and iPhone/iPad fit, slower bot decision pacing, a single burn pile beside BOARD, aligned casino chips and actions, VOX/profile tools, login readiness, and five-hour play-money tournament testing.",
+  "id": "/?source=pwa-phase407",
+  "predecessor_id": "pwa-phase406",
+  "start_url": "/?source=pwa-phase407&v=phase407",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -19,11 +19,11 @@
     {"src": "/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}
   ],
   "shortcuts": [
-    {"name": "Android Game Modes", "short_name": "Android", "description": "Practice, Regular and Tournament Phase 406 phone/tablet game.", "url": "/game/android.html?channel=stable&v=phase406", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Reiki Five-Hour Tournaments", "short_name": "Tournament", "description": "Open the five-hour play-money tournament test and rolling 24-hour local results.", "url": "/game/tournaments.html?v=phase406", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Play on iPhone / Safari", "short_name": "iPhone", "description": "Open the Phase 406 shared mobile table with Phase 400 Safari compatibility.", "url": "/game/iphone.html?v=phase406", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Android Game Modes", "short_name": "Android", "description": "Practice, Regular and Tournament Phase 407 phone/tablet game.", "url": "/game/android.html?channel=stable&v=phase407", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Reiki Five-Hour Tournaments", "short_name": "Tournament", "description": "Open the five-hour play-money tournament test and rolling 24-hour local results.", "url": "/game/tournaments.html?v=phase407", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Play on iPhone / Safari", "short_name": "iPhone", "description": "Open the Phase 407 shared mobile table with Phase 400 Safari compatibility.", "url": "/game/iphone.html?v=phase407", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Launch Quest VR", "short_name": "Quest VR", "description": "Open the protected Phase 396 seated Quest table with Phase 406 side-burn/chip presentation polish.", "url": "/game/quest.html?v=phase396", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
     {"name": "Camera 3 Table Showcase", "short_name": "CAM 3", "description": "Open the table-focused production preview.", "url": "/game/camera3-showcase.html?v=phase392", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Download the unchanged manual-update Android APK.", "url": "/downloads/?v=phase406", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
+    {"name": "APK RC2 Download", "short_name": "APK RC2", "description": "Download the unchanged manual-update Android APK.", "url": "/downloads/?v=phase407", "icons": [{"src": "/logo.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }
