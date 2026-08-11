@@ -40,7 +40,7 @@ jobs:
           grep -q '"hardSeatedAtFrontTable": true' game/manifest.json
           grep -q '"tabletopNonCardOverlaysHidden": true' game/manifest.json
 
-      - name: Validate Phase 396 Android dealer presentation and Phase 406 side-burn override
+      - name: Validate Phase 396 Android dealer presentation under Phase 407 board-burn override
         shell: bash
         run: |
           set -euo pipefail
@@ -54,8 +54,10 @@ jobs:
           grep -q 'game.dealer' game/modules/phase396_android_burn_dealer_polish.js
           grep -q 'SVR_PHASE403_ANDROID_WRAPPER_QA' game/android-tabletop.html
           grep -q '"burnTrayAboveCommunityCards": false' game/manifest.json
-          grep -q '"burnTrayAtSideRail": true' game/manifest.json
+          grep -q '"burnTrayAtSideRail": false' game/manifest.json
+          grep -q '"burnPileBesideBoard": true' game/manifest.json
           grep -q 'phase406_mobile_ultimate_gameplay.js?v=phase406' game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.js?v=phase407' game/android-stable-phase405.html
           grep -q '"movingDealerButton": true' game/manifest.json
           grep -q '"dealerNameReadout": true' game/manifest.json
 
@@ -113,9 +115,11 @@ jobs:
           node --check game/modules/phase403_android_pot_rules.js
           node --check game/modules/phase403_android_gameplay.js
           node --check game/modules/phase403_android_table_clarity.js
+          node --check game/modules/phase407_mobile_bot_pacing_preload.js
+          node --check game/modules/phase407_mobile_fit_login.js
           grep -q 'svr-poker-phase403-android-engine-reliability-v1' sw.js
-          grep -q 'svr-poker-phase403-android-engine-reliability-v1' pwa-sw.js
           grep -q 'svr-poker-phase406-mobile-ultimate-gameplay-v1' sw.js
+          grep -q 'svr-poker-phase407-mobile-fit-pacing-status-login-v1' sw.js
           test -s game/styles/phase396_android_burn_dealer_polish.css
           test -s game/styles/phase399_android_learning_chips_sponsor.css
           test -s game/styles/phase400_ios_safari_compat.css
