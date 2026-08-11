@@ -1,17 +1,19 @@
 /* PHASE-407-MOBILE-FIT-LOGIN-BURN-LOCK */
 const BUILD='PHASE-407-MOBILE-FIT-LOGIN-BURN-LOCK';
-window.SVR_PHASE407_BOARD_BURN=true;
 const state={build:BUILD,installed:false,burnBesideBoard:false,oneBurn:false,userTurn:false,loginButton:false,accountMode:'loading',signedIn:false,thinking:false,lastThinkDelay:0,lastError:null};
 const $=s=>document.querySelector(s);
 function accountSnapshot(){try{return window.SVR_PHASE345_ACCOUNT_QA?.()?.account||window.SVR_PLAYER_ACCOUNT?.snapshot?.()||null}catch{return null}}
 function ensureSingleBurn(){
-  const burns=[...document.querySelectorAll('.burn-zone')],keep=burns.find(x=>x.id==='burnZone')||burns[0];
+  const burns=[...document.querySelectorAll('.burn-zone')],keep=burns.find(x=>x.id==='burnZone')||burns[0],table=$('.table-surface'),label=$('.board-row .zone-label');
   burns.forEach(x=>{if(x!==keep)x.remove()});
-  const row=$('.board-row'),label=row?.querySelector('.zone-label');
-  if(keep&&row&&label&&keep.parentElement!==row)label.insertAdjacentElement('afterend',keep);
+  if(keep&&table&&keep.parentElement!==table)table.appendChild(keep);
   if(keep){keep.id='burnZone';keep.classList.add('phase407-board-burn');const strong=keep.querySelector('strong');if(strong)strong.textContent='BURN'}
+  if(keep&&table&&label){
+    const tr=table.getBoundingClientRect(),lr=label.getBoundingClientRect(),left=Math.max(6,lr.right-tr.left+5),top=Math.max(6,lr.top-tr.top+(lr.height/2)-14);
+    keep.style.setProperty('--svr407-burn-left',`${Math.round(left)}px`);keep.style.setProperty('--svr407-burn-top',`${Math.round(top)}px`);
+  }
   state.oneBurn=document.querySelectorAll('.burn-zone').length===1;
-  state.burnBesideBoard=Boolean(keep&&row&&keep.parentElement===row&&keep.previousElementSibling===label);
+  state.burnBesideBoard=Boolean(keep&&table&&label&&keep.parentElement===table&&keep.style.getPropertyValue('--svr407-burn-left'));
   return state.oneBurn&&state.burnBesideBoard;
 }
 function ensureAccountUi(){
@@ -34,11 +36,9 @@ function thinkingPolish(){
   const player=thinking?game.players?.[active]:null,el=$('#tableMessage');if(thinking&&player&&el&&!/thinking/i.test(el.textContent||''))el.dataset.phase407Thinking=`${player.name} thinking…`;
 }
 function micPolish(){const b=$('#phase406QuickMic');if(b&&!/VOX/.test(b.textContent||''))b.textContent='MIC / VOX'}
-function installObserver(){
-  const table=$('.table-surface');if(!table||table.dataset.phase407Observer)return;table.dataset.phase407Observer='1';
-  new MutationObserver(()=>ensureSingleBurn()).observe(table,{childList:true,subtree:true});
-}
-function poll(){try{ensureSingleBurn();ensureAccountUi();turnPolish();thinkingPolish();micPolish();installObserver();state.installed=Boolean(state.oneBurn&&state.burnBesideBoard&&state.loginButton);state.lastError=null}catch(e){state.lastError=String(e?.message||e)}}
+function poll(){try{ensureSingleBurn();ensureAccountUi();turnPolish();thinkingPolish();micPolish();state.installed=Boolean(state.oneBurn&&state.burnBesideBoard&&state.loginButton);state.lastError=null}catch(e){state.lastError=String(e?.message||e)}}
 window.addEventListener('svr:bot-thinking',e=>{state.lastThinkDelay=Number(e.detail?.delay||0)});
+window.addEventListener('resize',()=>setTimeout(ensureSingleBurn,60),{passive:true});
+window.visualViewport?.addEventListener('resize',()=>setTimeout(ensureSingleBurn,60),{passive:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{poll();setInterval(poll,260)},{once:true});else{poll();setInterval(poll,260)}
 window.SVR_PHASE407_MOBILE_QA=()=>({build:BUILD,...state,actionButtons:document.querySelectorAll('.actions button').length,chipStacks:document.querySelectorAll('.phase399-chip-stack').length,voiceReady:Boolean(window.SVR_PHASE405_VOX_QA),accountBridge:Boolean(window.SVR_PHASE345_ACCOUNT_QA),guestFallbackEnabled:!state.signedIn,loginRequiredForProduction:true,liveMultiplayer:Boolean(window.SVR_PHASE399_MATCH_STATE?.authoritativeGame&&window.SVR_PHASE399_MATCH_STATE?.matched),pass:Boolean(state.installed&&!state.lastError),checkedAt:new Date().toISOString()});
