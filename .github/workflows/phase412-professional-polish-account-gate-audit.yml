@@ -1,0 +1,114 @@
+name: Phase 412 Professional Polish Account Gate Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase412-professional-polish-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Protect public page and poker authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- index.html)"
+          test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase398_android_raise_rules.js)"
+          test -z "$(git diff origin/main -- game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+
+      - name: Validate tournament account gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/modules/phase412_tournament_account_gate.js
+          grep -q 'PHASE-412-TOURNAMENT-ACCOUNT-GATE-LOCK' game/modules/phase412_tournament_account_gate.js
+          grep -q "isTournamentGame=String(qs.get('mode')||'').toLowerCase()==='tournament'" game/modules/phase412_tournament_account_gate.js
+          grep -q 'guestOneTournamentEligible:false' game/modules/phase412_tournament_account_gate.js
+          grep -q 'practiceGuestAllowed:true' game/modules/phase412_tournament_account_gate.js
+          grep -q 'productionRequirementWhenApiLive:true' game/modules/phase412_tournament_account_gate.js
+          grep -q 'localTestFallbackBeforeApiLive:true' game/modules/phase412_tournament_account_gate.js
+          grep -q 'SIGN IN / CREATE ACCOUNT' game/modules/phase412_tournament_account_gate.js
+          grep -q 'LOGIN / CREATE ACCOUNT TO ENTER' game/tournaments.html
+          grep -q 'phase412_tournament_account_gate.js?v=phase412' game/tournaments.html
+          grep -q 'mode=tournament' game/android.html
+          grep -q 'tournament=reiki-open-100' game/android.html
+          node --check game/modules/phase412_tournament_account_gate.js
+
+      - name: Execute account entitlement scenarios
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          function eligible({profile,mode,apiConfigured,apiHealthy}){
+            const production=Boolean(profile&&mode==='api'&&!profile.demoMode);
+            const local=Boolean(profile&&mode==='demo');
+            return apiConfigured&&apiHealthy?production:Boolean(production||local);
+          }
+          if(eligible({profile:null,mode:'unconfigured',apiConfigured:false,apiHealthy:false})) throw new Error('Guest 1 must not enter tournament');
+          if(!eligible({profile:{demoMode:true},mode:'demo',apiConfigured:false,apiHealthy:false})) throw new Error('Named local test account must work before backend is live');
+          if(eligible({profile:{demoMode:true},mode:'demo',apiConfigured:true,apiHealthy:true})) throw new Error('Demo identity must not pass once production auth is live');
+          if(!eligible({profile:{demoMode:false},mode:'api',apiConfigured:true,apiHealthy:true})) throw new Error('Production account must pass');
+          console.log('Phase 412 tournament entitlement scenarios passed.');
+          NODE
+
+      - name: Validate professional interaction polish
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/styles/phase412_professional_polish.css
+          test -s game/modules/phase412_professional_polish.js
+          grep -q 'PHASE-412-MOBILE-PROFESSIONAL-POLISH-LOCK' game/modules/phase412_professional_polish.js
+          grep -q 'YOUR DECISION' game/modules/phase412_professional_polish.js
+          grep -q 'OPPONENT THINKING' game/modules/phase412_professional_polish.js
+          grep -q 'navigator.vibrate' game/modules/phase412_professional_polish.js
+          grep -q 'prefers-reduced-motion:reduce' game/styles/phase412_professional_polish.css
+          grep -q 'focus-visible' game/styles/phase412_professional_polish.css
+          grep -q 'phase412_tournament_account_gate.js' game/modules/phase407_mobile_fit_login.js
+          grep -q 'phase412_professional_polish.js' game/modules/phase407_mobile_fit_login.js
+          grep -q 'phase412_professional_polish.css' game/modules/phase407_mobile_fit_login.js
+          node --check game/modules/phase412_professional_polish.js
+          node --check game/modules/phase407_mobile_fit_login.js
+
+      - name: Validate Phase 412 route and cache sync
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'ANDROID • PHASE 412' game/android.html
+          grep -q "CURRENT_PHASE='phase412'" site-public-hooks.js
+          grep -q 'PHASE 412 PROFESSIONAL MOBILE / TOURNAMENT TEST' site-public-hooks.js
+          grep -q 'svr-poker-phase412-professional-polish-account-gate-v1' sw.js
+          grep -q 'svr-poker-phase412-professional-polish-account-gate-v1' pwa-sw.js
+          grep -q 'phase412_tournament_account_gate.js?v=phase412' sw.js
+          grep -q 'phase412_professional_polish.js?v=phase412' sw.js
+          node --check site-public-hooks.js
+          node --check sw.js
+          node --check pwa-sw.js
+
+      - name: Preserve APK policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool game/android-release.json >/dev/null
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
