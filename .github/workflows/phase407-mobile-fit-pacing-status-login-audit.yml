@@ -1,0 +1,139 @@
+name: Phase 407 Mobile Fit Pacing Status Login Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase407-mobile-fit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+      - name: Protect public page and poker engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- index.html)"
+          test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase403_android_table_clarity.js game/modules/phase398_android_raise_rules.js)"
+          test -z "$(git diff origin/main -- game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+      - name: Validate shared Android and iPhone Phase 407 shell
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/modules/phase407_mobile_bot_pacing_preload.js
+          test -s game/modules/phase407_mobile_fit_login.js
+          test -s game/styles/phase407_mobile_fit_login.css
+          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android-stable-phase405.html
+          grep -q 'phase407_mobile_bot_pacing_preload.js?v=phase407' game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.css?v=phase407' game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.js?v=phase407' game/android-stable-phase405.html
+          grep -q 'phase345_player_account_activity_bridge.js?v=phase407' game/android-stable-phase405.html
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('game/android-stable-phase405.html').read_text()
+          if s.count('class="burn-zone"') != 1: raise SystemExit('stable shell must contain exactly one base burn-zone')
+          if s.index('phase407_mobile_bot_pacing_preload.js?v=phase407') >= s.index('phase403_android_gameplay.js?v=phase403'): raise SystemExit('pacing preload must load before poker engine')
+          if s.index('phase407_mobile_fit_login.js?v=phase407') <= s.index('phase406_mobile_ultimate_gameplay.js?v=phase406'): raise SystemExit('Phase407 layout lock must load after Phase406 presentation')
+          PY
+          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android.html
+          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android-tabletop.html
+          grep -q 'PHASE-407-IPHONE-MOBILE-FIT-PACING-LOCK' game/iphone.html
+          grep -q 'PHASE-407-IPHONE-MOBILE-FIT-PACING-LOCK' game/iphone-tabletop.html
+      - name: Validate stable burn beside BOARD and mobile fit
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'getBoundingClientRect' game/modules/phase407_mobile_fit_login.js
+          grep -q -- '--svr407-burn-left' game/modules/phase407_mobile_fit_login.js
+          grep -q -- '--svr407-burn-top' game/modules/phase407_mobile_fit_login.js
+          grep -q 'state.burnBesideBoard' game/modules/phase407_mobile_fit_login.js
+          grep -q 'grid-template-columns:auto minmax(0,1fr)' game/styles/phase407_mobile_fit_login.css
+          grep -q 'table-surface>.burn-zone.phase407-board-burn' game/styles/phase407_mobile_fit_login.css
+          grep -q 'left:var(--svr407-burn-left' game/styles/phase407_mobile_fit_login.css
+          grep -q 'top:var(--svr407-burn-top' game/styles/phase407_mobile_fit_login.css
+          grep -q 'overflow:hidden!important' game/styles/phase407_mobile_fit_login.css
+          grep -q 'phase399-chip-rack' game/styles/phase407_mobile_fit_login.css
+          grep -q '.actions{position:relative!important;top:-5px' game/styles/phase407_mobile_fit_login.css
+          grep -q 'orientation:landscape' game/styles/phase407_mobile_fit_login.css
+          grep -q 'phase407-user-turn' game/styles/phase407_mobile_fit_login.css
+      - name: Validate paced bot decisions without engine rewrite
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'MIN_THINK_MS=2200,MAX_THINK_MS=4000' game/modules/phase407_mobile_bot_pacing_preload.js
+          grep -q 'botDecision' game/modules/phase407_mobile_bot_pacing_preload.js
+          grep -q 'state.botTimersAdjusted' game/modules/phase407_mobile_bot_pacing_preload.js
+          grep -q 'setTimeout(()=>botDecision(target),820+Math.random()\*980)' game/modules/phase403_android_gameplay.js
+          node --check game/modules/phase407_mobile_bot_pacing_preload.js
+          node --check game/modules/phase407_mobile_fit_login.js
+      - name: Validate VOX account readiness and guest truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'getUserMedia' game/modules/phase405_vox_voice.js
+          grep -q 'noiseSuppression:true' game/modules/phase405_vox_voice.js
+          grep -q 'echoCancellation:true' game/modules/phase405_vox_voice.js
+          grep -q 'NO LIVE PEER' game/modules/phase405_vox_voice.js
+          grep -q 'SVR_PHASE345_ACCOUNT_QA' game/modules/phase345_player_account_activity_bridge.js
+          grep -q '/site/login.html' game/modules/phase407_mobile_fit_login.js
+          grep -q 'SIGN IN • GUEST TEST' game/modules/phase407_mobile_fit_login.js
+          grep -q 'loginRequiredForProduction:true' game/modules/phase407_mobile_fit_login.js
+          grep -q '"apiBase": ""' site/config/player-api.json
+          grep -q '"allowDemoFallback": true' site/config/player-api.json
+      - name: Validate public under-construction and truthful health status
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s phase407-public-status.js
+          grep -q 'Site Under Construction' phase407-public-status.js
+          grep -q 'SERVER' phase407-public-status.js
+          grep -q 'DATABASE' phase407-public-status.js
+          grep -q '/api/health' phase407-public-status.js
+          grep -q 'No public API base configured yet' phase407-public-status.js
+          grep -q 'phase407-public-status.js' site-public-hooks.js
+          grep -q 'PHASE 407 MOBILE FIT / PACING' site-public-hooks.js
+          node --check phase407-public-status.js
+          node --check site-public-hooks.js
+      - name: Validate tournament transitions and five-hour cadence
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'YOU WON THE TOURNAMENT' game/modules/phase405_mobile_ui.js
+          grep -q 'Moving to the next tournament table' game/modules/phase405_mobile_ui.js
+          grep -q 'SLOT_MS=5\*60\*60\*1000' game/modules/phase405_tournament_scheduler.js
+          node <<'NODE'
+          const SLOT=5*60*60*1000;if(SLOT!==18000000)throw new Error('five-hour cadence changed');
+          for(let i=0;i<1000;i++)if((i+1)*SLOT-i*SLOT!==SLOT)throw new Error('slot cadence drift');
+          NODE
+      - name: Validate cache deploy and APK policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'svr-poker-phase407-mobile-fit-pacing-status-login-v1' sw.js
+          grep -q 'svr-poker-phase407-mobile-fit-pacing-status-login-v1' pwa-sw.js
+          grep -q 'PHASE407_CLEAR' sw.js
+          grep -q 'phase407_mobile_fit_login.js?v=phase407' sw.js
+          grep -q 'phase407-public-status.js?v=phase407' sw.js
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
