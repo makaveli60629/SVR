@@ -32,7 +32,7 @@ jobs:
           grep -q 'Preview Site' index.html
           grep -q 'platformGameButton' index.html
           grep -q 'Contact' index.html
-          grep -q 'PHASE 406 MOBILE GAMEPLAY' site-public-hooks.js
+          grep -q 'PHASE 407 MOBILE FIT / PACING' site-public-hooks.js
           grep -q 'TEST READY' site-public-hooks.js
           grep -q "button.textContent='Enter VR'" site-public-hooks.js
       - name: Validate Phase 405 platform detector survives current shell
@@ -45,20 +45,20 @@ jobs:
           for token in ['PHASE-405-PLATFORM-DEVICE-ALIGNMENT-LOCK','OculusBrowser','svr-platform-quest','visualViewport','immersive-vr','SVR_PLATFORM_DEVICE_QA']:
               if token not in s: raise SystemExit(f'missing platform contract: {token}')
           a=Path('game/android.html').read_text()
-          for token in ['calc(100vw - 24px)','overflow-wrap:anywhere','PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK']:
+          for token in ['calc(100vw - 24px)','overflow-wrap:anywhere','PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK']:
               if token not in a: raise SystemExit(f'missing Android alignment/current-shell contract: {token}')
           q=Path('launch-quest.css').read_text()
           if 'svr-platform-quest' not in q: raise SystemExit('Quest platform alias missing')
           PY
           node --check platform-device.js
-      - name: Validate Phase 405 social layer under current mobile shell
+      - name: Validate Phase 405 social layer under current Phase 407 mobile shell
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
           s=Path('game/android-stable-phase405.html').read_text()
-          for token in ['PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK','phase403_android_gameplay.js?v=phase403','phase404_android_mobile_safety.js?v=phase404','phase400_ios_safari_adapter.js?v=phase400','phase405_mobile_ui.js?v=phase405','phase405_vox_voice.js?v=phase405','phase405_tournament_scheduler.js?v=phase406','phase406_mobile_ultimate_gameplay.js?v=phase406']:
+          for token in ['PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK','phase403_android_gameplay.js?v=phase403','phase404_android_mobile_safety.js?v=phase404','phase400_ios_safari_adapter.js?v=phase400','phase405_mobile_ui.js?v=phase405','phase405_vox_voice.js?v=phase405','phase405_tournament_scheduler.js?v=phase407','phase406_mobile_ultimate_gameplay.js?v=phase406','phase407_mobile_fit_login.js?v=phase407']:
               if token not in s: raise SystemExit(f'missing mobile shell contract: {token}')
           if s.count('class="burn-zone"')!=1: raise SystemExit('current shell must contain exactly one burn-zone')
           if '>DECK<' not in s: raise SystemExit('deck must be explicitly labeled DECK')
@@ -119,7 +119,7 @@ jobs:
           for token in ['svr405_profile_portrait','canvas.width=size','accept="image/*"','256']:
               if token not in p: raise SystemExit(f'missing portrait contract: {token}')
           i=Path('game/iphone-tabletop.html').read_text()
-          for token in ['android-stable-phase405.html','SVR_PHASE405_IPHONE_WRAPPER_QA','SVR_PHASE400_IPHONE_WRAPPER_QA','SVR_PHASE406_IPHONE_WRAPPER_QA']:
+          for token in ['android-stable-phase405.html','SVR_PHASE407_IPHONE_WRAPPER_QA','SVR_PHASE405_IPHONE_WRAPPER_QA','SVR_PHASE400_IPHONE_WRAPPER_QA','SVR_PHASE406_IPHONE_WRAPPER_QA']:
               if token not in i: raise SystemExit(f'missing iPhone wrapper contract: {token}')
           PY
           grep -q 'PHASE-400-IOS-SAFARI-RUNTIME-ADAPTER-LOCK' game/modules/phase400_ios_safari_adapter.js
@@ -151,10 +151,11 @@ jobs:
           python3 -m json.tool game/manifest.json >/dev/null
           python3 -m json.tool game/android-release.json >/dev/null
           python3 -m json.tool update/app-version.json >/dev/null
-          grep -q '"phase": 406' game/manifest.json
+          grep -q '"phase": 407' game/manifest.json
           grep -q '"scheduleEveryHours": 5' game/manifest.json
           grep -q '"androidSingleBurnPile": true' update/app-version.json
           grep -q 'svr-poker-phase406-mobile-ultimate-gameplay-v1' sw.js
+          grep -q 'svr-poker-phase407-mobile-fit-pacing-status-login-v1' sw.js
           grep -q 'svr-poker-phase405-platform-mobile-social-v1' sw.js
           grep -q 'svr-poker-phase404-android-mobile-safety-v1' sw.js
           node --check site-public-hooks.js
