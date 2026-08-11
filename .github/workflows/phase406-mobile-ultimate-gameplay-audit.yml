@@ -65,8 +65,9 @@ jobs:
           grep -q 'right:10px!important' game/styles/phase406_mobile_casino_polish.css
           grep -Fq "document.querySelectorAll('.burn-zone')" game/modules/phase406_mobile_ultimate_gameplay.js
           grep -q 'keep.parentElement!==table' game/modules/phase406_mobile_ultimate_gameplay.js
-          grep -Fq "label.insertAdjacentElement('afterend',keep)" game/modules/phase407_mobile_fit_login.js
-          grep -q 'phase407-board-burn' game/styles/phase407_mobile_fit_login.css
+          grep -q 'getBoundingClientRect' game/modules/phase407_mobile_fit_login.js
+          grep -q -- '--svr407-burn-left' game/modules/phase407_mobile_fit_login.js
+          grep -q 'table-surface>.burn-zone.phase407-board-burn' game/styles/phase407_mobile_fit_login.css
           node --check game/modules/phase406_mobile_ultimate_gameplay.js
           node --check game/modules/phase407_mobile_fit_login.js
 
