@@ -8,7 +8,7 @@ const isTournamentPortal=/\/game\/tournaments\.html$/i.test(location.pathname);
 const isTournamentGame=String(qs.get('mode')||'').toLowerCase()==='tournament';
 const TOURNAMENT_TARGET='/game/android-tabletop.html?v=phase412&mode=tournament&tournament=reiki-open-100';
 const RETURN_TARGET=isTournamentPortal?'/game/tournaments.html?v=phase412':'/game/android.html?channel=stable&v=phase412&mode=tournament';
-const LOGIN_URL=`/site/login.html?mode=register&next=${encodeURIComponent(RETURN_TARGET)}&source=tournament-gate&v=phase412`;
+const LOGIN_URL=`/site/tournament-account.html?next=${encodeURIComponent(RETURN_TARGET)}&source=tournament-gate&v=phase412`;
 const state={build:BUILD,ready:false,required:Boolean(isTournamentPortal||isTournamentGame),eligible:false,mode:'loading',apiConfigured:false,apiHealthy:false,localTestAccount:false,productionAccount:false,blocked:false,lastError:null};
 
 function safeJson(value){try{return JSON.parse(value||'null')}catch{return null}}
