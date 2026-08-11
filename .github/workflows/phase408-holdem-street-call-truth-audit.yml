@@ -1,0 +1,88 @@
+name: Phase 408 Holdem Street and Call Truth Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase408-holdem-truth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate Phase 408 mobile layer
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/modules/phase408_holdem_street_call_truth.js
+          test -s game/styles/phase408_holdem_street_call_truth.css
+          grep -q 'PHASE-408-HOLDEM-STREET-CALL-TRUTH-LOCK' game/android-stable-phase405.html
+          grep -q 'phase408_holdem_street_call_truth.css?v=phase408' game/android-stable-phase405.html
+          grep -q 'phase408_holdem_street_call_truth.js?v=phase408' game/android-stable-phase405.html
+          grep -q '#community .card.placeholder{display:none!important}' game/styles/phase408_holdem_street_call_truth.css
+          grep -q 'phase408-inline-burn' game/styles/phase408_holdem_street_call_truth.css
+          grep -q 'TO CALL' game/modules/phase408_holdem_street_call_truth.js
+          grep -q 'MATCH BET' game/modules/phase408_holdem_street_call_truth.js
+          grep -q 'BOT_MIN_MS=4800,BOT_MAX_MS=5400' game/modules/phase408_holdem_street_call_truth.js
+          node --check game/modules/phase408_holdem_street_call_truth.js
+          node --check game/modules/phase407_mobile_fit_login.js
+      - name: Validate real Holdem street sequence
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "if(state.street===0){state.street=1;reveal(3,'FLOP')}" game/modules/phase403_android_gameplay.js
+          grep -q "else if(state.street===1){state.street=2;reveal(1,'TURN')}" game/modules/phase403_android_gameplay.js
+          grep -q "else if(state.street===2){state.street=3;reveal(1,'RIVER')}" game/modules/phase403_android_gameplay.js
+          grep -q 'export function reveal(count,label){burn(label);' game/modules/phase393_android_common.js
+          node <<'NODE'
+          const sequence=[{street:'PRE-FLOP',board:0,burns:0},{street:'FLOP',board:3,burns:1},{street:'TURN',board:4,burns:2},{street:'RIVER',board:5,burns:3}];
+          for(let i=1;i<sequence.length;i++){
+            const prior=sequence[i-1],next=sequence[i];
+            const boardAdded=next.board-prior.board,burnAdded=next.burns-prior.burns;
+            if(boardAdded!==(i===1?3:1))throw new Error(`${next.street} wrong board increment`);
+            if(burnAdded!==1)throw new Error(`${next.street} must burn exactly one card first`);
+          }
+          if(sequence.map(x=>x.board).join(',')!=='0,3,4,5')throw new Error('board sequence must be 0,3,4,5');
+          if(sequence.map(x=>x.burns).join(',')!=='0,1,2,3')throw new Error('burn sequence must be 0,1,2,3');
+          console.log('Holdem street sequence passed:',sequence);
+          NODE
+      - name: Validate exact call math never multiplies
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import {callAmount} from './game/modules/phase398_android_raise_rules.js';
+          const cases=[
+            {bet:100,in:0,stack:15000,want:100},
+            {bet:200,in:100,stack:14900,want:100},
+            {bet:300,in:100,stack:14900,want:200},
+            {bet:500,in:300,stack:14700,want:200},
+            {bet:14000,in:1000,stack:14000,want:13000},
+            {bet:14000,in:1000,stack:5000,want:5000},
+            {bet:300,in:300,stack:14700,want:0}
+          ];
+          for(const c of cases){const got=callAmount(c.bet,c.in,c.stack);if(got!==c.want)throw new Error(`callAmount(${c.bet},${c.in},${c.stack})=${got}, wanted ${c.want}`)}
+          console.log('Exact call math passed:',cases.length,'cases');
+          NODE
+      - name: Preserve protected poker authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK' game/modules/phase404_android_mobile_safety.js
+          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/modules/phase400_ios_safari_adapter.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json

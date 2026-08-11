@@ -1,4 +1,4 @@
-/* PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK */
+/* PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK | Phase 408 inline burn compatible */
 const BUILD='PHASE-396-ANDROID-BURN-DEALER-POLISH-LOCK';
 const state={build:BUILD,installed:false,dealerButtonReady:false,dealerIndex:null,dealerName:null,dealerMoves:0,activePlayer:null,activeName:null,burnAboveCommunity:false,communityCardsEnlarged:false,lastError:null,checkedAt:null};
 const $=selector=>document.querySelector(selector);
@@ -9,7 +9,11 @@ function ensureDealerUi(){
   let readout=$('#dealerReadout');if(!readout){readout=document.createElement('div');readout.id='dealerReadout';readout.className='dealer-readout';readout.textContent='DEALER • WAITING';table.appendChild(readout)}
   state.dealerButtonReady=true;return true
 }
-function ensureBurnPlacement(){const board=$('.board-zone'),row=$('.board-row'),burn=$('#burnZone');if(!board||!row||!burn)return false;if(burn.parentElement!==board||burn.nextElementSibling!==row)board.insertBefore(burn,row);return true}
+function ensureBurnPlacement(){
+  const board=$('.board-zone'),row=$('.board-row'),burn=$('#burnZone'),community=$('#community');if(!board||!row||!burn)return false;
+  if(window.SVR_PHASE408_HOLDEM_TRUTH&&community){if(burn.parentElement!==row||burn.nextElementSibling!==community)row.insertBefore(burn,community);burn.classList.add('phase408-inline-burn');return true}
+  if(burn.parentElement!==board||burn.nextElementSibling!==row)board.insertBefore(burn,row);return true
+}
 function placeDealer(){
   const game=window.SVR_PHASE393_ANDROID_STATE,table=$('.table-surface'),button=$('#dealerButton'),readout=$('#dealerReadout');if(!game||!table||!button||!readout)return false;
   const dealer=Number(game.dealer);if(!Number.isFinite(dealer)||dealer<0)return false;const player=game.players?.[dealer];let target=dealer===0?$('#hole'):$(`[data-player="${dealer}"]`);if(!target)target=dealer===0?$('.hole-row'):null;if(!target)return false;
@@ -22,12 +26,13 @@ function placeDealer(){
   state.dealerIndex=dealer;state.dealerName=player?.name||null;state.activePlayer=active;state.activeName=activePlayer?.name||null;return true
 }
 function inspectLayout(){
-  const burn=$('#burnZone'),boardRow=$('.board-row'),community=$('#community .card');state.burnAboveCommunity=Boolean(burn&&boardRow&&burn.parentElement===$('.board-zone')&&burn.nextElementSibling===boardRow);
-  if(community)state.communityCardsEnlarged=community.getBoundingClientRect().width>=38;
+  const burn=$('#burnZone'),boardRow=$('.board-row'),community=$('#community');
+  state.burnAboveCommunity=window.SVR_PHASE408_HOLDEM_TRUTH?Boolean(burn&&boardRow&&community&&burn.parentElement===boardRow&&burn.nextElementSibling===community):Boolean(burn&&boardRow&&burn.parentElement===$('.board-zone')&&burn.nextElementSibling===boardRow);
+  const communityCard=$('#community .card');if(communityCard)state.communityCardsEnlarged=communityCard.getBoundingClientRect().width>=38;
 }
 function sync(){
   try{ensureDealerUi();ensureBurnPlacement();placeDealer();inspectLayout();state.installed=Boolean(state.dealerButtonReady&&state.burnAboveCommunity);state.checkedAt=new Date().toISOString();window.SVR_PHASE396_ANDROID_STATE={...state};return state.installed}catch(error){state.lastError=String(error?.message||error);return false}
 }
-function qa(){sync();return{...state,dealerButton:Boolean($('#dealerButton')),dealerReadout:Boolean($('#dealerReadout')),burnZone:Boolean($('#burnZone')),communityCards:document.querySelectorAll('#community .card').length,pass:Boolean(state.installed&&state.dealerButtonReady&&state.burnAboveCommunity&&!state.lastError),checkedAt:new Date().toISOString()}}
+function qa(){sync();return{...state,dealerButton:Boolean($('#dealerButton')),dealerReadout:Boolean($('#dealerReadout')),burnZone:Boolean($('#burnZone')),communityCards:document.querySelectorAll('#community .card').length,phase408InlineBurnCompatible:true,pass:Boolean(state.installed&&state.dealerButtonReady&&state.burnAboveCommunity&&!state.lastError),checkedAt:new Date().toISOString()}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setInterval(sync,120),{once:true});else setInterval(sync,120);
 window.SVR_PHASE396_ANDROID_QA=qa;

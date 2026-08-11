@@ -1,4 +1,4 @@
-/* PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK */
+/* PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK | Phase 408 inline burn compatible */
 const BUILD='PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK';
 const ARCHIVE='svr405_tournament_archive',RESULTS='svr401_reiki_first50_results',PAYOUT_LEDGER='svr406_play_chip_payouts';
 const PAYOUTS=Object.freeze({1:100000,2:50000,3:25000});
@@ -14,9 +14,9 @@ function write(key,value){try{localStorage.setItem(key,JSON.stringify(value));re
 function toast(text){const el=$('#tableMessage');if(!el)return;const old=el.textContent;el.textContent=text;setTimeout(()=>{if(el.textContent===text)el.textContent=old},2400)}
 function relocateBurn(){
   const burns=[...document.querySelectorAll('.burn-zone')],table=$('.table-surface');if(!table||!burns.length)return false;
-  const keep=burns.find(x=>x.id==='burnZone')||burns[0];burns.forEach(x=>{if(x!==keep)x.remove()});
-  keep.id='burnZone';keep.classList.add('phase406-side-burn');if(keep.parentElement!==table)table.appendChild(keep);
-  state.burnMoved=document.querySelectorAll('.burn-zone').length===1&&keep.parentElement===table;return state.burnMoved;
+  const keep=burns.find(x=>x.id==='burnZone')||burns[0];burns.forEach(x=>{if(x!==keep)x.remove()});keep.id='burnZone';keep.classList.add('phase406-side-burn');
+  if(window.SVR_PHASE408_HOLDEM_TRUTH){const row=$('.board-row'),community=$('#community');if(row&&community){keep.classList.add('phase408-inline-burn');if(keep.parentElement!==row||keep.nextElementSibling!==community)row.insertBefore(keep,community);state.burnMoved=document.querySelectorAll('.burn-zone').length===1&&keep.parentElement===row&&keep.nextElementSibling===community;return state.burnMoved}}
+  if(keep.parentElement!==table)table.appendChild(keep);state.burnMoved=document.querySelectorAll('.burn-zone').length===1&&keep.parentElement===table;return state.burnMoved;
 }
 function enhanceHands(){
   const sheet=$('#phase405HandsSheet'),button=$('#phase405HandsButton');if(!sheet)return false;
@@ -67,4 +67,4 @@ function winPulse(){const g=game();if(!g?.handOver||g.hand===state.lastWinHand)r
 function poll(){try{relocateBurn();enhanceHands();enhanceProfiles();ensureBoard();ensureMic();deviceChip();winPulse();state.installed=Boolean(state.burnMoved&&state.handHelper&&state.board&&state.mic);state.lastError=null}catch(e){state.lastError=String(e?.message||e)}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{poll();setInterval(poll,450)},{once:true});else{poll();setInterval(poll,450)}
 window.SVR_PHASE406_OPEN_24H_BOARD=()=>{renderBoard();$('#phase406TournamentBoard')?.classList.remove('hide')};
-window.SVR_PHASE406_MOBILE_QA=()=>({build:BUILD,installed:state.installed,oneBurnPile:document.querySelectorAll('.burn-zone').length===1,burnParent:$('#burnZone')?.parentElement?.className||null,burnMoved:state.burnMoved,handHelperCards:document.querySelectorAll('#phase405HandsSheet .phase405-hand').length,handHelper:state.handHelper,board:state.board,last24Hours:rollingResults().length,payout:state.payout||maybeAwardPlayChips(),profileFaces:state.faces,profileEdit:Boolean($('.phase406-profile-edit')),quickMic:state.mic,voiceMode:localStorage.getItem('svr405_voice_mode')||'ptt',livePeer:Boolean(window.SVR_PHASE399_MATCH_STATE?.voiceConnected),playMoneyOnly:true,noCashValue:true,lastError:state.lastError,pass:Boolean(state.installed&&!state.lastError),checkedAt:new Date().toISOString()});
+window.SVR_PHASE406_MOBILE_QA=()=>({build:BUILD,installed:state.installed,oneBurnPile:document.querySelectorAll('.burn-zone').length===1,burnParent:$('#burnZone')?.parentElement?.className||null,burnMoved:state.burnMoved,phase408InlineBurnCompatible:true,handHelperCards:document.querySelectorAll('#phase405HandsSheet .phase405-hand').length,handHelper:state.handHelper,board:state.board,last24Hours:rollingResults().length,payout:state.payout||maybeAwardPlayChips(),profileFaces:state.faces,profileEdit:Boolean($('.phase406-profile-edit')),quickMic:state.mic,voiceMode:localStorage.getItem('svr405_voice_mode')||'ptt',livePeer:Boolean(window.SVR_PHASE399_MATCH_STATE?.voiceConnected),playMoneyOnly:true,noCashValue:true,lastError:state.lastError,pass:Boolean(state.installed&&!state.lastError),checkedAt:new Date().toISOString()});
