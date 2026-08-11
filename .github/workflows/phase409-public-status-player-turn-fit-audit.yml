@@ -1,0 +1,108 @@
+name: Phase 409 Public Status Player Turn Fit Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase409-public-turn-fit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Validate public construction and status placement
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' index.html
+          grep -q 'site-public-hooks.js?v=phase409' index.html
+          grep -q 'PHASE-409-PUBLIC-CONSTRUCTION-STATUS-LOCK' phase409-public-status.js
+          grep -q "construction.textContent='SITE UNDER CONSTRUCTION'" phase409-public-status.js
+          grep -q "copy.insertBefore(construction,eyebrow)" phase409-public-status.js
+          grep -q "eyebrow.insertAdjacentElement('afterend',health)" phase409-public-status.js
+          grep -q 'SERVER ONLINE' phase409-public-status.js
+          grep -q 'DATABASE ONLINE' phase409-public-status.js
+          grep -q 'AI ONLINE' phase409-public-status.js
+          grep -q "remoteHealthVerified:false" phase409-public-status.js
+          grep -q "current==='online'?'● Admin Online':'● Admin Offline'" site-public-hooks.js
+          grep -q 'PHASE 409 PUBLIC / PLAYER TURN' site-public-hooks.js
+          node --check site-public-hooks.js
+          node --check phase409-public-status.js
+
+      - name: Validate player turn guard scenarios
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-409-MOBILE-PLAYER-TURN-GUARD-LOCK' game/modules/phase409_mobile_player_turn_guard.js
+          grep -q 'DARIUS_TO_USER_ORDER' game/modules/phase409_mobile_player_turn_guard.js
+          grep -q 'EXPECTED_USER_ACTOR' game/modules/phase409_mobile_player_turn_guard.js
+          grep -q 'SVR_PHASE409_PLAYER_TURN_QA' game/modules/phase409_mobile_player_turn_guard.js
+          node --check game/modules/phase409_mobile_player_turn_guard.js
+          node <<'NODE'
+          const USER=0,DARIUS=4;
+          const needs=(g)=>{const u=g.players[USER];if(!u||g.handOver||u.folded||u.allIn||u.stack<=0)return false;const acted=g.trail.some(r=>r.hand===g.hand&&r.street===g.street&&r.index===USER);return !acted||u.streetBet<g.currentBet||u.acted===false};
+          const rescue=(g)=>{const last=g.trail.at(-1),same=last&&last.hand===g.hand&&last.street===g.street;return Boolean(same&&last.index===DARIUS&&needs(g)&&Number.isInteger(g.activePlayer)&&g.activePlayer>0&&g.activePlayer!==DARIUS)};
+          const base={hand:8,street:1,currentBet:0,handOver:false,activePlayer:5,players:Array.from({length:6},(_,index)=>({index,stack:1000,streetBet:0,acted:true,folded:false,allIn:false})),trail:[{hand:8,street:1,index:4}]};
+          base.players[0].acted=false;
+          if(!rescue(base))throw new Error('Darius -> pending user -> Nova must trigger rescue');
+          const acted=structuredClone(base);acted.players[0].acted=true;acted.trail=[{hand:8,street:1,index:0},{hand:8,street:1,index:4}];if(rescue(acted))throw new Error('Already-complete user must not get duplicate action');
+          const raised=structuredClone(acted);raised.currentBet=200;raised.players[0].streetBet=100;if(!rescue(raised))throw new Error('User owing chips after Darius must regain action');
+          const nextStreet=structuredClone(base);nextStreet.street=2;if(rescue(nextStreet))throw new Error('Valid street transition must not be pulled backward');
+          const folded=structuredClone(base);folded.players[0].folded=true;if(rescue(folded))throw new Error('Folded user must stay skipped');
+          console.log('Phase 409 Darius-to-user guard scenarios passed.');
+          NODE
+
+      - name: Validate compact mobile player boxes
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-409-MOBILE-PLAYER-BOX-FIT-LOCK' game/styles/phase409_mobile_player_box_fit.css
+          grep -q 'width:clamp(104px,24vw,150px)' game/styles/phase409_mobile_player_box_fit.css
+          grep -q '@media(max-width:620px)' game/styles/phase409_mobile_player_box_fit.css
+          grep -q '@media(orientation:landscape)' game/styles/phase409_mobile_player_box_fit.css
+          grep -q 'phase409_mobile_player_box_fit.css?v=phase409' game/android-stable-phase405.html
+          grep -q 'phase409_mobile_player_turn_guard.js?v=phase409' game/android-stable-phase405.html
+          grep -q 'ANDROID • PHASE 409' game/android.html
+          grep -q 'IPHONE • PHASE 409' game/iphone.html
+
+      - name: Preserve protected poker Quest and APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'dariusGoesToUser:nextVisualSeat(4)===0' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-408-HOLDEM-STREET-CALL-TRUTH-LOCK' game/modules/phase408_holdem_street_call_truth.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase398_android_raise_rules.js game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+
+      - name: Validate wrappers and syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android-tabletop.html
+          grep -q 'SVR_PHASE409_PLAYER_TURN_QA' game/android-tabletop.html
+          grep -q 'PHASE-409-IPHONE-PLAYER-TURN-FIT-LOCK' game/iphone-tabletop.html
+          grep -q 'SVR_PHASE409_PLAYER_TURN_QA' game/iphone-tabletop.html
+          node --check game/modules/phase407_mobile_fit_login.js
+          node --check game/modules/phase408_holdem_street_call_truth.js
+          python3 -m json.tool game/android-release.json >/dev/null
