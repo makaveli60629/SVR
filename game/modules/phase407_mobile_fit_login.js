@@ -1,6 +1,6 @@
-/* PHASE-407-MOBILE-FIT-LOGIN-BURN-LOCK | Phase 408 inline burn compatible | Phase 409 turn/fit layer */
+/* PHASE-407-MOBILE-FIT-LOGIN-BURN-LOCK | Phase 408 inline burn compatible | Phase 409 turn/fit layer | Phase 410 human input layer */
 const BUILD='PHASE-407-MOBILE-FIT-LOGIN-BURN-LOCK';
-const state={build:BUILD,installed:false,burnBesideBoard:false,oneBurn:false,userTurn:false,loginButton:false,accountMode:'loading',signedIn:false,thinking:false,lastThinkDelay:0,phase409Layer:false,lastError:null};
+const state={build:BUILD,installed:false,burnBesideBoard:false,oneBurn:false,userTurn:false,loginButton:false,accountMode:'loading',signedIn:false,thinking:false,lastThinkDelay:0,phase409Layer:false,phase410Layer:false,lastError:null};
 const $=s=>document.querySelector(s);
 function accountSnapshot(){try{return window.SVR_PHASE345_ACCOUNT_QA?.()?.account||window.SVR_PLAYER_ACCOUNT?.snapshot?.()||null}catch{return null}}
 function ensureSingleBurn(){
@@ -52,9 +52,14 @@ function ensurePhase409Layer(){
   let script=document.querySelector('script[src*="phase409_mobile_player_turn_guard.js"]');if(!window.SVR_PHASE409_PLAYER_TURN_QA&&!script){script=document.createElement('script');script.type='module';script.src='/game/modules/phase409_mobile_player_turn_guard.js?v=phase409';script.dataset.phase409TurnGuard='1';document.body.appendChild(script)}
   state.phase409Layer=Boolean(link&&(script||window.SVR_PHASE409_PLAYER_TURN_QA));return state.phase409Layer
 }
-function poll(){try{ensurePhase409Layer();ensureSingleBurn();ensureAccountUi();turnPolish();thinkingPolish();micPolish();state.installed=Boolean(state.oneBurn&&state.burnBesideBoard&&state.loginButton&&state.phase409Layer);state.lastError=null}catch(e){state.lastError=String(e?.message||e)}}
+function ensurePhase410Layer(){
+  let link=document.querySelector('link[href*="phase410_mobile_human_input_lock.css"]');if(!link){link=document.createElement('link');link.rel='stylesheet';link.href='/game/styles/phase410_mobile_human_input_lock.css?v=phase410';link.dataset.phase410HumanInput='1';document.head.appendChild(link)}
+  let script=document.querySelector('script[src*="phase410_mobile_human_input_lock.js"]');if(!window.SVR_PHASE410_MOBILE_INPUT_QA&&!script){script=document.createElement('script');script.type='module';script.src='/game/modules/phase410_mobile_human_input_lock.js?v=phase410';script.dataset.phase410HumanInput='1';document.body.appendChild(script)}
+  state.phase410Layer=Boolean(link&&(script||window.SVR_PHASE410_MOBILE_INPUT_QA));return state.phase410Layer
+}
+function poll(){try{ensurePhase409Layer();ensurePhase410Layer();ensureSingleBurn();ensureAccountUi();turnPolish();thinkingPolish();micPolish();state.installed=Boolean(state.oneBurn&&state.burnBesideBoard&&state.loginButton&&state.phase409Layer&&state.phase410Layer);state.lastError=null}catch(e){state.lastError=String(e?.message||e)}}
 window.addEventListener('svr:bot-thinking',e=>{state.lastThinkDelay=Number(e.detail?.delay||0)});
 window.addEventListener('resize',()=>setTimeout(ensureSingleBurn,60),{passive:true});
 window.visualViewport?.addEventListener('resize',()=>setTimeout(ensureSingleBurn,60),{passive:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{poll();setInterval(poll,260)},{once:true});else{poll();setInterval(poll,260)}
-window.SVR_PHASE407_MOBILE_QA=()=>({build:BUILD,...state,actionButtons:document.querySelectorAll('.actions button').length,chipStacks:document.querySelectorAll('.phase399-chip-stack').length,voiceReady:Boolean(window.SVR_PHASE405_VOX_QA),accountBridge:Boolean(window.SVR_PHASE345_ACCOUNT_QA),guestFallbackEnabled:!state.signedIn,loginRequiredForProduction:true,phase408InlineBurnCompatible:true,phase409TurnGuard:Boolean(window.SVR_PHASE409_PLAYER_TURN_QA),liveMultiplayer:Boolean(window.SVR_PHASE399_MATCH_STATE?.authoritativeGame&&window.SVR_PHASE399_MATCH_STATE?.matched),pass:Boolean(state.installed&&!state.lastError),checkedAt:new Date().toISOString()});
+window.SVR_PHASE407_MOBILE_QA=()=>({build:BUILD,...state,actionButtons:document.querySelectorAll('.actions button').length,chipStacks:document.querySelectorAll('.phase399-chip-stack').length,voiceReady:Boolean(window.SVR_PHASE405_VOX_QA),accountBridge:Boolean(window.SVR_PHASE345_ACCOUNT_QA),guestFallbackEnabled:!state.signedIn,loginRequiredForProduction:true,phase408InlineBurnCompatible:true,phase409TurnGuard:Boolean(window.SVR_PHASE409_PLAYER_TURN_QA),phase410HumanInput:Boolean(window.SVR_PHASE410_MOBILE_INPUT_QA),liveMultiplayer:Boolean(window.SVR_PHASE399_MATCH_STATE?.authoritativeGame&&window.SVR_PHASE399_MATCH_STATE?.matched),pass:Boolean(state.installed&&!state.lastError),checkedAt:new Date().toISOString()});

@@ -1,0 +1,83 @@
+name: Phase 410 Mobile Human Input Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase410-mobile-input-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Validate Phase 410 input source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/modules/phase410_mobile_human_input_lock.js
+          test -s game/styles/phase410_mobile_human_input_lock.css
+          grep -q 'PHASE-410-MOBILE-HUMAN-INPUT-LOCK' game/modules/phase410_mobile_human_input_lock.js
+          grep -q 'pointerdown' game/modules/phase410_mobile_human_input_lock.js
+          grep -q 'pointerup' game/modules/phase410_mobile_human_input_lock.js
+          grep -q 'schedulePointerFallback' game/modules/phase410_mobile_human_input_lock.js
+          grep -q "button.dataset.a==='allin'" game/modules/phase410_mobile_human_input_lock.js
+          grep -q 'svr:user-turn-restored' game/modules/phase410_mobile_human_input_lock.js
+          grep -q 'SVR_PHASE410_MOBILE_INPUT_QA' game/modules/phase410_mobile_human_input_lock.js
+          grep -q 'pointer-events:auto' game/styles/phase410_mobile_human_input_lock.css
+          grep -q 'touch-action:manipulation' game/styles/phase410_mobile_human_input_lock.css
+          node --check game/modules/phase410_mobile_human_input_lock.js
+
+      - name: Validate Phase 410 is loaded by active mobile shell
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'ensurePhase410Layer' game/modules/phase407_mobile_fit_login.js
+          grep -q 'phase410_mobile_human_input_lock.css?v=phase410' game/modules/phase407_mobile_fit_login.js
+          grep -q 'phase410_mobile_human_input_lock.js?v=phase410' game/modules/phase407_mobile_fit_login.js
+          grep -q 'phase410HumanInput' game/modules/phase407_mobile_fit_login.js
+          node --check game/modules/phase407_mobile_fit_login.js
+
+      - name: Simulate human-turn button unlock rules
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const canAct=g=>Boolean(g&&g.players?.[0]&&g.activePlayer===0&&!g.handOver&&!g.players[0].folded&&!g.players[0].allIn&&g.players[0].stack>0);
+          const base={activePlayer:0,handOver:false,players:[{stack:15000,folded:false,allIn:false}]};
+          if(!canAct(base))throw new Error('normal human turn must be actionable');
+          if(canAct({...base,activePlayer:4}))throw new Error('bot turn must not unlock human buttons');
+          if(canAct({...base,handOver:true}))throw new Error('finished hand must not unlock human buttons');
+          if(canAct({...base,players:[{stack:15000,folded:true,allIn:false}]}))throw new Error('folded user must stay locked');
+          if(canAct({...base,players:[{stack:15000,folded:false,allIn:true}]}))throw new Error('all-in user must stay locked');
+          console.log('Phase 410 human-turn unlock scenarios passed.');
+          NODE
+
+      - name: Preserve poker rules Quest and APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-409-MOBILE-PLAYER-TURN-GUARD-LOCK' game/modules/phase409_mobile_player_turn_guard.js
+          grep -q 'PHASE-408-HOLDEM-STREET-CALL-TRUTH-LOCK' game/modules/phase408_holdem_street_call_truth.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase398_android_raise_rules.js game/modules/phase409_mobile_player_turn_guard.js game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
