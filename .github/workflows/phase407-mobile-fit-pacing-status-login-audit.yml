@@ -55,14 +55,18 @@ jobs:
           grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android-tabletop.html
           grep -q 'PHASE-407-IPHONE-MOBILE-FIT-PACING-LOCK' game/iphone.html
           grep -q 'PHASE-407-IPHONE-MOBILE-FIT-PACING-LOCK' game/iphone-tabletop.html
-      - name: Validate burn beside BOARD and mobile fit
+      - name: Validate stable burn beside BOARD and mobile fit
         shell: bash
         run: |
           set -euo pipefail
-          grep -Fq "label.insertAdjacentElement('afterend',keep)" game/modules/phase407_mobile_fit_login.js
+          grep -q 'getBoundingClientRect' game/modules/phase407_mobile_fit_login.js
+          grep -q -- '--svr407-burn-left' game/modules/phase407_mobile_fit_login.js
+          grep -q -- '--svr407-burn-top' game/modules/phase407_mobile_fit_login.js
           grep -q 'state.burnBesideBoard' game/modules/phase407_mobile_fit_login.js
-          grep -q 'grid-template-columns:auto auto minmax(0,1fr)' game/styles/phase407_mobile_fit_login.css
-          grep -q 'board-row>.burn-zone.phase407-board-burn' game/styles/phase407_mobile_fit_login.css
+          grep -q 'grid-template-columns:auto minmax(0,1fr)' game/styles/phase407_mobile_fit_login.css
+          grep -q 'table-surface>.burn-zone.phase407-board-burn' game/styles/phase407_mobile_fit_login.css
+          grep -q 'left:var(--svr407-burn-left' game/styles/phase407_mobile_fit_login.css
+          grep -q 'top:var(--svr407-burn-top' game/styles/phase407_mobile_fit_login.css
           grep -q 'overflow:hidden!important' game/styles/phase407_mobile_fit_login.css
           grep -q 'phase399-chip-rack' game/styles/phase407_mobile_fit_login.css
           grep -q '.actions{position:relative!important;top:-5px' game/styles/phase407_mobile_fit_login.css
