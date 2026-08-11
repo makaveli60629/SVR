@@ -31,7 +31,7 @@ jobs:
           grep -q 'apple-touch-icon' index.html
           grep -q 'platformIosDetection' update/app-version.json
           grep -q 'IPHONE GAME • NOT VR • TEST READY' site-public-hooks.js
-      - name: Validate Phase 406 iPhone entry and wrapper preserve Phase 400
+      - name: Validate Phase 407 iPhone entry and wrapper preserve Phase 400
         shell: bash
         run: |
           set -euo pipefail
@@ -39,12 +39,13 @@ jobs:
           test -s game/iphone-tabletop.html
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone.html
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone-tabletop.html
-          grep -q 'PHASE-406-IPHONE-MOBILE-GAMEPLAY-LOCK' game/iphone.html
+          grep -q 'PHASE-407-IPHONE-MOBILE-FIT-PACING-LOCK' game/iphone.html
           grep -q 'viewport-fit=cover' game/iphone.html
           grep -q 'apple-mobile-web-app-capable' game/iphone.html
           grep -q 'platform=ios&safari=1' game/iphone.html
           grep -q 'platform=ios&safari=1' game/iphone-tabletop.html
           grep -q 'allow="microphone; autoplay; fullscreen"' game/iphone-tabletop.html
+          grep -q 'SVR_PHASE407_IPHONE_WRAPPER_QA' game/iphone-tabletop.html
           grep -q 'SVR_PHASE406_IPHONE_WRAPPER_QA' game/iphone-tabletop.html
           grep -q 'SVR_PHASE405_IPHONE_WRAPPER_QA' game/iphone-tabletop.html
           grep -q 'SVR_PHASE400_IPHONE_WRAPPER_QA' game/iphone-tabletop.html
@@ -81,11 +82,12 @@ jobs:
           grep -q 'phase399_android_matchmaking_voice.js?v=phase399' game/android-stable-phase405.html
           grep -q 'phase403_android_gameplay.js?v=phase403' game/android-stable-phase405.html
           grep -q 'phase406_mobile_ultimate_gameplay.js?v=phase406' game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.js?v=phase407' game/android-stable-phase405.html
       - name: Validate metadata PWA and protected platforms
         shell: bash
         run: |
           set -euo pipefail
-          grep -q '"phase": 406' game/manifest.json
+          grep -q '"phase": 407' game/manifest.json
           grep -q '"iphoneSafariAvailable": true' game/manifest.json
           grep -q '"usesProtectedAndroidPokerEngine": true' game/manifest.json
           grep -q '"iosIphoneSafariAvailable": true' update/app-version.json
@@ -93,7 +95,7 @@ jobs:
           grep -q '"iosSafariAudioUnlock": true' update/app-version.json
           grep -q '"iosMicrophonePermissionReady": true' update/app-version.json
           grep -q 'Play on iPhone / Safari' manifest.webmanifest
-          grep -q '/game/iphone.html?v=phase406' manifest.webmanifest
+          grep -q '/game/iphone.html?v=phase407' manifest.webmanifest
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
           grep -q 'PHASE-398-ANDROID-RAISE-SIZING-SMOOTHNESS-LOCK' game/modules/phase393_android_gameplay.js
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
@@ -112,6 +114,8 @@ jobs:
           node --check game/modules/phase405_mobile_ui.js
           node --check game/modules/phase405_vox_voice.js
           node --check game/modules/phase406_mobile_ultimate_gameplay.js
+          node --check game/modules/phase407_mobile_bot_pacing_preload.js
+          node --check game/modules/phase407_mobile_fit_login.js
           node --check sw.js
           node --check pwa-sw.js
           python3 -m json.tool manifest.webmanifest >/dev/null
@@ -121,5 +125,6 @@ jobs:
           grep -q 'svr-poker-phase403-android-engine-reliability-v1' sw.js
           grep -q 'svr-poker-phase405-platform-mobile-social-v1' sw.js
           grep -q 'svr-poker-phase406-mobile-ultimate-gameplay-v1' sw.js
+          grep -q 'svr-poker-phase407-mobile-fit-pacing-status-login-v1' sw.js
           test -s game/styles/phase400_ios_safari_compat.css
           test -s downloads/svr-poker-android-rc2.apk
