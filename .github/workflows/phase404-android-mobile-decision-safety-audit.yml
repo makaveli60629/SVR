@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 2
-      - name: Validate protected Phase 404 layer under current Phase 406 shell
+      - name: Validate protected Phase 404 layer under current Phase 407 shell
         shell: bash
         run: |
           set -euo pipefail
@@ -30,11 +30,12 @@ jobs:
           test -s game/android-stable-phase405.html
           test -s game/modules/phase404_android_mobile_safety.js
           test -s game/styles/phase404_android_mobile_safety.css
-          grep -q 'PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK' game/android.html
-          grep -q 'android-tabletop.html?v=phase406' game/android.html
+          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android.html
+          grep -q 'android-tabletop.html?v=phase407' game/android.html
           grep -q 'android-stable-phase405.html' game/android-tabletop.html
           grep -q 'SVR_PHASE404_MOBILE_SAFETY_QA' game/android-tabletop.html
           grep -q 'SVR_PHASE404_ANDROID_WRAPPER_QA' game/android-tabletop.html
+          grep -q 'SVR_PHASE407_MOBILE_WRAPPER_QA' game/android-tabletop.html
           grep -q 'phase404_android_mobile_safety.css?v=phase404' game/android-stable-phase405.html
           grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/android-stable-phase405.html
           python3 - <<'PY'
@@ -138,12 +139,13 @@ jobs:
           python3 -m json.tool game/manifest.json >/dev/null
           python3 -m json.tool game/android-release.json >/dev/null
           python3 -m json.tool update/app-version.json >/dev/null
-          grep -q '"phase": 406' game/manifest.json
+          grep -q '"phase": 407' game/manifest.json
           grep -q '"androidAllInDoubleTapGuard": true' update/app-version.json
           grep -q '"androidSessionPlaytestReport": true' update/app-version.json
           grep -q 'svr-poker-phase404-android-mobile-safety-v1' sw.js
           grep -q 'svr-poker-phase405-platform-mobile-social-v1' sw.js
           grep -q 'svr-poker-phase406-mobile-ultimate-gameplay-v1' sw.js
+          grep -q 'svr-poker-phase407-mobile-fit-pacing-status-login-v1' sw.js
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
           grep -q '"apkVersionCode": 2' game/android-release.json
           grep -q '"forceUpdate": false' game/android-release.json
