@@ -1,4 +1,4 @@
-/* PHASE-407-MOBILE-FIT-LOGIN-BURN-LOCK */
+/* PHASE-407-MOBILE-FIT-LOGIN-BURN-LOCK | Phase 408 inline burn compatible */
 const BUILD='PHASE-407-MOBILE-FIT-LOGIN-BURN-LOCK';
 const state={build:BUILD,installed:false,burnBesideBoard:false,oneBurn:false,userTurn:false,loginButton:false,accountMode:'loading',signedIn:false,thinking:false,lastThinkDelay:0,lastError:null};
 const $=s=>document.querySelector(s);
@@ -6,6 +6,17 @@ function accountSnapshot(){try{return window.SVR_PHASE345_ACCOUNT_QA?.()?.accoun
 function ensureSingleBurn(){
   const burns=[...document.querySelectorAll('.burn-zone')],keep=burns.find(x=>x.id==='burnZone')||burns[0],table=$('.table-surface'),label=$('.board-row .zone-label');
   burns.forEach(x=>{if(x!==keep)x.remove()});
+  if(window.SVR_PHASE408_HOLDEM_TRUTH&&keep&&label){
+    const row=label.closest('.board-row'),community=$('#community');
+    if(row&&community){
+      keep.id='burnZone';keep.classList.add('phase407-board-burn','phase408-inline-burn');
+      if(keep.parentElement!==row||keep.nextElementSibling!==community)row.insertBefore(keep,community);
+      const strong=keep.querySelector('strong');if(strong)strong.textContent='BURN';
+      state.oneBurn=document.querySelectorAll('.burn-zone').length===1;
+      state.burnBesideBoard=keep.parentElement===row&&keep.nextElementSibling===community;
+      return state.oneBurn&&state.burnBesideBoard;
+    }
+  }
   if(keep&&table&&keep.parentElement!==table)table.appendChild(keep);
   if(keep){keep.id='burnZone';keep.classList.add('phase407-board-burn');const strong=keep.querySelector('strong');if(strong)strong.textContent='BURN'}
   if(keep&&table&&label){
@@ -41,4 +52,4 @@ window.addEventListener('svr:bot-thinking',e=>{state.lastThinkDelay=Number(e.det
 window.addEventListener('resize',()=>setTimeout(ensureSingleBurn,60),{passive:true});
 window.visualViewport?.addEventListener('resize',()=>setTimeout(ensureSingleBurn,60),{passive:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{poll();setInterval(poll,260)},{once:true});else{poll();setInterval(poll,260)}
-window.SVR_PHASE407_MOBILE_QA=()=>({build:BUILD,...state,actionButtons:document.querySelectorAll('.actions button').length,chipStacks:document.querySelectorAll('.phase399-chip-stack').length,voiceReady:Boolean(window.SVR_PHASE405_VOX_QA),accountBridge:Boolean(window.SVR_PHASE345_ACCOUNT_QA),guestFallbackEnabled:!state.signedIn,loginRequiredForProduction:true,liveMultiplayer:Boolean(window.SVR_PHASE399_MATCH_STATE?.authoritativeGame&&window.SVR_PHASE399_MATCH_STATE?.matched),pass:Boolean(state.installed&&!state.lastError),checkedAt:new Date().toISOString()});
+window.SVR_PHASE407_MOBILE_QA=()=>({build:BUILD,...state,actionButtons:document.querySelectorAll('.actions button').length,chipStacks:document.querySelectorAll('.phase399-chip-stack').length,voiceReady:Boolean(window.SVR_PHASE405_VOX_QA),accountBridge:Boolean(window.SVR_PHASE345_ACCOUNT_QA),guestFallbackEnabled:!state.signedIn,loginRequiredForProduction:true,phase408InlineBurnCompatible:true,liveMultiplayer:Boolean(window.SVR_PHASE399_MATCH_STATE?.authoritativeGame&&window.SVR_PHASE399_MATCH_STATE?.matched),pass:Boolean(state.installed&&!state.lastError),checkedAt:new Date().toISOString()});
