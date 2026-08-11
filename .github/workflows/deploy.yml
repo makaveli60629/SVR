@@ -115,8 +115,11 @@ jobs:
         run: |
           set -euo pipefail
           grep -q 'MIN_THINK_MS=2200,MAX_THINK_MS=4000' source/game/modules/phase407_mobile_bot_pacing_preload.js
-          grep -q "afterend',keep" source/game/modules/phase407_mobile_fit_login.js
-          grep -q 'phase407-board-burn' source/game/styles/phase407_mobile_fit_login.css
+          grep -q 'getBoundingClientRect' source/game/modules/phase407_mobile_fit_login.js
+          grep -q -- '--svr407-burn-left' source/game/modules/phase407_mobile_fit_login.js
+          grep -q -- '--svr407-burn-top' source/game/modules/phase407_mobile_fit_login.js
+          grep -q 'table-surface>.burn-zone.phase407-board-burn' source/game/styles/phase407_mobile_fit_login.css
+          grep -q 'left:var(--svr407-burn-left' source/game/styles/phase407_mobile_fit_login.css
           grep -q 'phase407-user-turn' source/game/styles/phase407_mobile_fit_login.css
           grep -q 'SIGN IN' source/game/modules/phase407_mobile_fit_login.js
           grep -q 'Site Under Construction' source/phase407-public-status.js
