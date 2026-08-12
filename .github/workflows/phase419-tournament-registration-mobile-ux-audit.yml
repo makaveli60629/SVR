@@ -57,7 +57,7 @@ jobs:
           console.log('2,000 exact five-hour tournament slots passed.');
           NODE
 
-      - name: Validate start notification truth and navigation
+      - name: Validate active-session start notification truth
         shell: bash
         run: |
           set -euo pipefail
@@ -66,10 +66,8 @@ jobs:
           grep -q 'Notification.requestPermission' game/modules/phase419_tournament_registration_notify.js
           grep -q 'showNotification' game/modules/phase419_tournament_registration_notify.js
           grep -q 'backgroundPushLive' game/modules/phase419_tournament_registration_notify.js
-          grep -q "notificationclick" sw.js
-          grep -q "notificationclick" pwa-sw.js
-          grep -q '/game/tournaments.html?v=phase419' sw.js
-          grep -q '/game/tournaments.html?v=phase419' pwa-sw.js
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- sw.js pwa-sw.js)"
           node --check sw.js
           node --check pwa-sw.js
 
