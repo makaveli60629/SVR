@@ -1,0 +1,30 @@
+/* PHASE-417-ANDROID-VIEWPORT-MEDIA-FIT-LOCK
+   Presentation-only responsive media guard. Poker rules and Quest are untouched. */
+:root{--svr417-media-max-h:min(38dvh,320px);--svr417-hero-max-h:min(22dvh,160px)}
+html,body{max-width:100%;overflow-x:hidden}
+/* Never allow Android/mobile imagery to exceed the container or viewport. */
+.gate-card img,.card img,.shell img,.portal img,.phase405-sheet img,.overlay-card img{max-inline-size:100%;object-fit:contain}
+/* Hero / launch imagery scales with phone width and available screen height. */
+.gate-card>img,.card>img,.portal-head>img{width:clamp(54px,16vw,92px);height:auto;max-height:var(--svr417-hero-max-h);aspect-ratio:1/1;object-fit:contain}
+/* Table art remains inside its assigned surface instead of overflowing. */
+.brand-pill img,.featured-sponsor img,.sponsor-zone img,.burn-card img,.deck-card img{max-width:100%;max-height:100%;object-fit:contain}
+.featured-sponsor,.sponsor-zone,.burn-card,.deck-card,.brand-pill{min-width:0;overflow:hidden}
+/* User/profile portraits stay square and crop safely without stretching. */
+.profile-avatar,.phase405-profile-photo,.player-box .face{background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;overflow:hidden}
+.profile-avatar img,.phase405-profile-photo img,.player-box .face img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+/* Future inserted mobile content images get a sensible one-screen cap automatically. */
+.gate-card .content-media,.shell .content-media,.portal .content-media,.phase405-sheet .content-media,[data-svr-mobile-media]{display:block;width:auto;max-width:100%;height:auto;max-height:var(--svr417-media-max-h);margin-inline:auto;object-fit:contain}
+@media(max-width:620px){
+  :root{--svr417-media-max-h:min(34dvh,240px);--svr417-hero-max-h:min(17dvh,112px)}
+  .gate-card>img,.card>img,.portal-head>img{width:clamp(48px,15vw,78px)}
+  .featured-sponsor img,.sponsor-zone img{max-height:min(12dvh,74px)}
+}
+@media(max-width:390px){
+  :root{--svr417-media-max-h:min(30dvh,200px);--svr417-hero-max-h:min(14dvh,88px)}
+  .gate-card>img,.card>img,.portal-head>img{width:clamp(44px,14vw,66px)}
+}
+@media(orientation:landscape) and (max-height:620px){
+  :root{--svr417-media-max-h:min(48dvh,190px);--svr417-hero-max-h:min(19dvh,72px)}
+  .gate-card>img,.card>img,.portal-head>img{width:clamp(38px,7vw,58px);max-height:var(--svr417-hero-max-h)}
+  .featured-sponsor img,.sponsor-zone img{max-height:min(15dvh,62px)}
+}
