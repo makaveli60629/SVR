@@ -1,8 +1,12 @@
 {
-  "build": "PHASE-372-AWS-PLAYER-ACCOUNT-FOUNDATION-LOCK",
+  "build": "PHASE-418-PLAYER-ACCOUNT-API-READINESS-LOCK",
   "provider": "aws",
   "database": "dynamodb",
   "identity": "cognito",
+  "deploymentState": "cloud-endpoint-pending",
+  "accountApiEndpointConfigured": false,
+  "foundationTemplate": "/infrastructure/aws/phase372-player-account-foundation.yml",
+  "requiredNextInfrastructure": "API Gateway + Lambda player-account service matching the Phase 345 browser contract",
   "awsRegion": "",
   "apiBase": "",
   "presenceApiBase": "",
@@ -10,5 +14,5 @@
   "allowLocalPresenceSimulation": true,
   "dailyRewardChips": 5000,
   "minimumActivitySeconds": 300,
-  "notes": "Set apiBase and presenceApiBase to approved HTTPS AWS API Gateway URLs after the Phase 372 Cognito and DynamoDB stack is deployed. Never place AWS keys, secrets, Cognito client secrets, passwords, Cash App credentials, or database credentials in this public file."
+  "notes": "The public configuration is valid but the production AWS player-account endpoint has not been provisioned. The current AWS foundation defines Cognito and DynamoDB; API Gateway/Lambda still require an authorized AWS deployment and an approved region. Keep apiBase blank until deployment returns a real HTTPS URL. Never place AWS keys, secrets, Cognito client secrets, passwords, Cash App credentials, or database credentials in this public file."
 }

@@ -1,7 +1,7 @@
-/* PHASE-409-PUBLIC-CONSTRUCTION-STATUS-LOCK */
+/* PHASE-409-PUBLIC-CONSTRUCTION-STATUS-LOCK | PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK */
 (()=>{
-  const BUILD='PHASE-409-PUBLIC-CONSTRUCTION-STATUS-LOCK';
-  const state={build:BUILD,server:'online',database:'online',ai:'online',admin:'offline',displayMode:'configured-status-display',remoteHealthVerified:false,lastError:null,checkedAt:null};
+  const BUILD='PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK';
+  const state={build:BUILD,server:'online',database:'online',ai:'online',admin:'offline',thirdPill:'AI ONLINE',displayMode:'configured-status-display',remoteHealthVerified:false,lastError:null,checkedAt:null};
   const $=s=>document.querySelector(s);
   function style(){if($('#phase409-public-style'))return;const el=document.createElement('style');el.id='phase409-public-style';el.textContent=`
     #admin-status{font-size:9px!important;line-height:1!important;padding:5px 8px!important;min-height:auto!important;letter-spacing:.05em!important;border-radius:999px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;margin-inline:auto!important}
@@ -10,6 +10,8 @@
     .svr409-health span{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border:1px solid rgba(141,255,180,.48);border-radius:999px;background:rgba(2,17,14,.8);color:#dfffea;font:900 7px/1 system-ui;letter-spacing:.055em;white-space:nowrap}
     .svr409-health span::before{content:'●';color:#8dffb4;text-shadow:0 0 8px #8dffb4}
   `;document.head.appendChild(el)}
+  function adminOnline(){const publicState=window.SVR_PUBLIC_ADMIN_STATE;if(typeof publicState?.online==='boolean')return publicState.online;const admin=$('#admin-status');return admin?.dataset?.state==='online'||/admin online/i.test(admin?.textContent||'')}
+  function paintThirdPill(){const online=adminOnline(),pill=$('#svr409Ai');state.admin=online?'online':'offline';state.ai=online?'standby':'online';state.thirdPill=online?'ADMIN ONLINE':'AI ONLINE';if(pill){pill.textContent=state.thirdPill;pill.dataset.mode=online?'admin':'ai';pill.setAttribute('aria-label',online?'Administrator online':'AI online while administrator is offline')}return online}
   function ensure(){
     style();const copy=$('.launch-copy'),eyebrow=copy?.querySelector('.eyebrow');if(!copy||!eyebrow)return false;
     $('#svr407Construction')?.remove();$('#svr407Health')?.remove();
@@ -17,8 +19,9 @@
     if(construction.parentElement!==copy||construction.nextElementSibling!==eyebrow)copy.insertBefore(construction,eyebrow);
     let health=$('#svr409Health');if(!health){health=document.createElement('div');health.id='svr409Health';health.className='svr409-health';health.setAttribute('aria-label','SVR service status');health.innerHTML='<span id="svr409Server">SERVER ONLINE</span><span id="svr409Database">DATABASE ONLINE</span><span id="svr409Ai">AI ONLINE</span>'}
     if(health.parentElement!==copy||health.previousElementSibling!==eyebrow)eyebrow.insertAdjacentElement('afterend',health);
-    const admin=$('#admin-status');state.admin=admin?.dataset?.state||(/online/i.test(admin?.textContent||'')?'online':'offline');state.checkedAt=new Date().toISOString();window.SVR_PHASE409_PUBLIC_STATUS={...state,refresh};return true
+    paintThirdPill();state.checkedAt=new Date().toISOString();window.SVR_PHASE409_PUBLIC_STATUS={...state,refresh};window.SVR_PHASE418_PUBLIC_STATUS={...state,refresh};return true
   }
-  function refresh(){try{ensure();state.lastError=null}catch(error){state.lastError=String(error?.message||error)}state.checkedAt=new Date().toISOString();window.SVR_PHASE409_PUBLIC_STATUS={...state,refresh};return state}
-  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,30000)},{once:true}):(()=>{refresh();setInterval(refresh,30000)})();
+  function refresh(){try{ensure();paintThirdPill();state.lastError=null}catch(error){state.lastError=String(error?.message||error)}state.checkedAt=new Date().toISOString();window.SVR_PHASE409_PUBLIC_STATUS={...state,refresh};window.SVR_PHASE418_PUBLIC_STATUS={...state,refresh};return state}
+  window.addEventListener('svr:public-admin-state',refresh);window.addEventListener('svr-admin-presence-change',refresh);window.addEventListener('storage',refresh);
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,1500)},{once:true}):(()=>{refresh();setInterval(refresh,1500)})();
 })();
