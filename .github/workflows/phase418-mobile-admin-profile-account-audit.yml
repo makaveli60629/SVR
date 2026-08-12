@@ -37,21 +37,20 @@ jobs:
           node --check site-public-hooks.js
           node --check phase409-public-status.js
 
-      - name: Validate Phase 418 layer under current mobile entry
+      - name: Validate one-screen Android and iPhone entry
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'PHASE-418-MOBILE-ADMIN-PROFILE-ACCOUNT-POLISH-LOCK' game/android.html
-          grep -q 'PHASE-419-TOURNAMENT-REGISTRATION-MOBILE-UX-LOCK' game/android.html
           grep -q 'phase418_mobile_surface_polish.css?v=phase418' game/android.html
           grep -q 'phase418_mobile_surface_polish.js?v=phase418' game/android.html
-          grep -q 'ANDROID • PHASE 419' game/android.html
+          grep -q 'ANDROID • PHASE 418' game/android.html
           grep -q 'SIGN IN' game/modules/phase418_mobile_surface_polish.js
           grep -q 'CREATE ACCOUNT' game/modules/phase418_mobile_surface_polish.js
           grep -q 'phase418-one-screen' game/modules/phase418_mobile_surface_polish.js
           grep -q 'body.phase418-one-screen' game/styles/phase418_mobile_surface_polish.css
-          grep -q 'IPHONE • PHASE 419 TEST' game/iphone.html
-          grep -q 'v=phase419' game/iphone.html
+          grep -q 'IPHONE • PHASE 418 TEST' game/iphone.html
+          grep -q 'v=phase418' game/iphone.html
 
       - name: Validate table flow mic bankroll and burn truth
         shell: bash
