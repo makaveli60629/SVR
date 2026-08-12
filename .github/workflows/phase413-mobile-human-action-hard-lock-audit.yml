@@ -58,18 +58,20 @@ jobs:
           console.log('Phase 413 strict human decision scenarios passed.');
           NODE
 
-      - name: Validate active Android and iPhone shared route
+      - name: Validate protected chooser and active shared mobile route
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK' game/android.html
-          grep -q 'android-tabletop.html?v=phase413&mode=practice' game/android.html
-          grep -q 'android-tabletop.html?v=phase413&mode=regular' game/android.html
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/android.html)"
+          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android.html
           grep -q 'PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK' game/android-tabletop.html
           grep -q 'phase413Found' game/android-tabletop.html
           grep -q 'SVR_PHASE413_HUMAN_ACTION_QA' game/android-tabletop.html
+          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android-tabletop.html
           grep -q 'phase413_mobile_human_action_hard_lock.js?v=phase413' game/android-stable-phase405.html
           grep -q 'data-human-action-build="PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK"' game/android-stable-phase405.html
+          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android-stable-phase405.html
           grep -q 'phase407_mobile_fit_login.js?v=phase413' game/android-stable-phase405.html
 
       - name: Preserve protected ALL IN poker Quest and APK
