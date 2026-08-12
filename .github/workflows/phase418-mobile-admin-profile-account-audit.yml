@@ -1,0 +1,154 @@
+name: Phase 418 Mobile Admin Profile Account Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase418-mobile-admin-profile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Protect public launch structure and admin AI fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- index.html)"
+          grep -q "const ADMIN_PAYLOAD_KEY='svr_admin_presence_payload'" site-public-hooks.js
+          grep -q "const ADMIN_SESSION_KEY='SVR_ADMIN_SESSION'" site-public-hooks.js
+          grep -q "CURRENT_PHASE='phase418'" site-public-hooks.js
+          grep -q "ADMIN ONLINE':'AI ONLINE" phase409-public-status.js
+          grep -q 'PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK' phase409-public-status.js
+          node --check site-public-hooks.js
+          node --check phase409-public-status.js
+
+      - name: Validate one-screen Android and iPhone entry
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-418-MOBILE-ADMIN-PROFILE-ACCOUNT-POLISH-LOCK' game/android.html
+          grep -q 'phase418_mobile_surface_polish.css?v=phase418' game/android.html
+          grep -q 'phase418_mobile_surface_polish.js?v=phase418' game/android.html
+          grep -q 'ANDROID • PHASE 418' game/android.html
+          grep -q 'SIGN IN' game/modules/phase418_mobile_surface_polish.js
+          grep -q 'CREATE ACCOUNT' game/modules/phase418_mobile_surface_polish.js
+          grep -q 'phase418-one-screen' game/modules/phase418_mobile_surface_polish.js
+          grep -q 'body.phase418-one-screen' game/styles/phase418_mobile_surface_polish.css
+          grep -q 'IPHONE • PHASE 418 TEST' game/iphone.html
+          grep -q 'v=phase418' game/iphone.html
+
+      - name: Validate table flow mic bankroll and burn truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'phase418_mobile_surface_polish.css?v=phase418' game/android-stable-phase405.html
+          grep -q 'phase418_mobile_surface_polish.js?v=phase418' game/android-stable-phase405.html
+          grep -q 'phase403FlowRail' game/modules/phase418_mobile_surface_polish.js
+          grep -q 'phase404DecisionStrip' game/modules/phase418_mobile_surface_polish.js
+          grep -q 'insertAdjacentElement' game/modules/phase418_mobile_surface_polish.js
+          grep -q 'MIC / VOX' game/modules/phase418_mobile_surface_polish.js
+          grep -q 'STACK ' game/modules/phase418_mobile_surface_polish.js
+          grep -q 'pokerStateMutated:false' game/modules/phase418_mobile_surface_polish.js
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('game/android-stable-phase405.html').read_text()
+          if s.count('class="burn-zone"') != 1:
+              raise SystemExit('shared mobile shell must contain exactly one burn-zone')
+          if s.index('phase404_android_mobile_safety.js?v=phase404') >= s.index('phase403_android_gameplay.js?v=phase403'):
+              raise SystemExit('ALL IN capture guard must remain before the poker engine')
+          print('single burn pile and protected safety script order passed')
+          PY
+          node --check game/modules/phase418_mobile_surface_polish.js
+
+      - name: Validate wrapper direct-game recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-418-MOBILE-WRAPPER-DIRECT-RECOVERY-LOCK' game/android-tabletop.html
+          grep -q 'state.coreReady' game/android-tabletop.html
+          grep -q 'location.replace(direct.href)' game/android-tabletop.html
+          grep -q 'no manual Open Direct step required' game/android-tabletop.html
+          grep -q 'PHASE-418-IPHONE-WRAPPER-DIRECT-RECOVERY-LOCK' game/iphone-tabletop.html
+          grep -q 'location.replace(direct.href)' game/iphone-tabletop.html
+
+      - name: Validate profile immediate visibility and Eric authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'phase418-profile-mobile-fix.css?v=phase418' site/profile.html
+          grep -q 'phase418-profile-eric-authority.js?v=phase418' site/profile.html
+          grep -q 'PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK' site/profile.html
+          grep -q 'foot_l' site/js/phase418-profile-eric-authority.js
+          grep -q 'foot_r' site/js/phase418-profile-eric-authority.js
+          grep -q "stopAllAction" site/js/phase418-profile-eric-authority.js
+          grep -q 'materialsWithOriginalMaps' site/js/phase418-profile-eric-authority.js
+          grep -q 'headAboveFeet' site/js/phase418-profile-eric-authority.js
+          grep -q 'phase418-profile-priority' site/css/phase418-profile-mobile-fix.css
+          node --check site/js/phase418-profile-eric-authority.js
+
+      - name: Validate account routes and truthful API readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-418-PLAYER-ACCOUNT-ACCESS-POLISH-LOCK' site/login.html
+          grep -q 'Production player API deployment pending' site/login.html
+          grep -q 'phase418' site/register.html
+          python3 - <<'PY'
+          import json
+          p=json.load(open('site/config/player-api.json'))
+          assert p['build']=='PHASE-418-PLAYER-ACCOUNT-API-READINESS-LOCK'
+          assert p['deploymentState']=='cloud-endpoint-pending'
+          assert p['accountApiEndpointConfigured'] is False
+          assert p['apiBase']==''
+          assert p['presenceApiBase']==''
+          print('player API remains truthful and secret-free while cloud endpoint is pending')
+          PY
+          grep -q 'AWS::Cognito::UserPool' infrastructure/aws/phase372-player-account-foundation.yml
+          grep -q 'AWS::DynamoDB::Table' infrastructure/aws/phase372-player-account-foundation.yml
+          if grep -q 'AWS::ApiGateway' infrastructure/aws/phase372-player-account-foundation.yml; then
+            echo 'Phase 372 foundation unexpectedly changed API Gateway authority' >&2; exit 1
+          fi
+          grep -q 'Cloud deployment boundary' docs/PHASE_418_MOBILE_ADMIN_PROFILE_ACCOUNT_API_AUDIT.md
+
+      - name: Preserve poker Quest and APK authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' game/modules/phase403_android_pot_rules.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase398_android_raise_rules.js game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
+
+      - name: Syntax and JSON validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check game/modules/phase418_mobile_surface_polish.js
+          node --check site/js/phase418-profile-eric-authority.js
+          node --check site-public-hooks.js
+          node --check phase409-public-status.js
+          python3 -m json.tool site/config/player-api.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
