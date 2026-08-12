@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+  <meta name="theme-color" content="#050a13">
+  <title>SVR Poker Tournament Sign-Up • Phase 419</title>
+  <meta name="description" content="Sign up for the next SVR Poker play-money mobile tournament test and see the human test roster with registration times.">
+  <link rel="stylesheet" href="./styles/phase419_tournament_registration_notify.css?v=phase419">
+</head>
+<body data-build="PHASE-419-TOURNAMENT-REGISTRATION-NOTIFICATION-LOCK">
+  <main class="p419-shell">
+    <header class="p419-head">
+      <img src="/logo.png" alt="SVR Poker">
+      <div>
+        <div class="p419-kicker">PLAY-MONEY MOBILE TEST • PHASE 419</div>
+        <h1>Tournament Sign-Up</h1>
+        <p>Register for the next five-hour tournament test slot, see when human testers signed up, and enable a start alert on this device.</p>
+      </div>
+    </header>
+
+    <section class="p419-countdown" aria-label="Next tournament timing">
+      <article class="p419-stat"><small>STARTS IN</small><strong id="phase419Countdown">CALCULATING…</strong></article>
+      <article class="p419-stat"><small>LOCAL START TIME</small><strong id="phase419StartTime">CALCULATING…</strong></article>
+      <article class="p419-stat"><small>SLOT</small><strong id="phase419SlotId">—</strong></article>
+    </section>
+
+    <section class="p419-grid">
+      <article class="p419-card">
+        <h2>Sign Up</h2>
+        <p>This roster is for human testers only. Empty tournament seats can still be filled by bots in the current prototype.</p>
+        <form id="phase419Form" class="p419-form">
+          <label>Player name
+            <input id="phase419DisplayName" name="displayName" maxlength="40" autocomplete="nickname" placeholder="Guest 1" required>
+          </label>
+          <div class="p419-actions">
+            <button id="phase419Signup" class="p419-btn primary" type="submit">SIGN UP FOR NEXT TOURNAMENT</button>
+            <button id="phase419Notify" class="p419-btn notify" type="button">ENABLE START NOTIFICATION</button>
+          </div>
+        </form>
+        <div id="phase419Status" class="p419-status" role="status">Checking tournament registration mode…</div>
+        <div class="p419-note"><strong>Notification truth:</strong> the in-app banner and OS notification work while the browser/PWA remains active. A guaranteed notification after the app has been fully closed requires the production push backend, which is intentionally not claimed as live yet.</div>
+      </article>
+
+      <article class="p419-card">
+        <div class="p419-roster-head"><h2>Human Test Roster</h2><strong id="phase419RosterCount">0 / 100 SIGNED UP</strong></div>
+        <div id="phase419Roster" class="p419-roster"><div class="p419-empty">Loading roster…</div></div>
+        <div class="p419-note">Registration timestamps show when each tester entered this upcoming slot. Email addresses and private account details are never displayed in this public roster.</div>
+      </article>
+    </section>
+
+    <nav class="p419-bottom" aria-label="Tournament links">
+      <a class="p419-btn primary" href="./tournaments.html?v=phase419">TOURNAMENT LOBBY</a>
+      <a class="p419-btn" href="./tournament-results.html?v=phase419">RESULTS</a>
+      <a class="p419-btn" href="./android.html?channel=stable&v=phase419">ANDROID / IPHONE GAME</a>
+      <a class="p419-btn" href="/site/tournament-account.html?v=phase419">TOURNAMENT ACCOUNT</a>
+    </nav>
+  </main>
+  <div id="phase419StartBanner" class="p419-start-banner" role="status"><strong>TOURNAMENT STARTED</strong><span>Your play-money test slot is ready. Open the tournament lobby to enter.</span></div>
+  <script type="module" src="./modules/phase419_tournament_registration_notify.js?v=phase419"></script>
+</body>
+</html>

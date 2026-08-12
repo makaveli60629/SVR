@@ -1,0 +1,9 @@
+{
+  "build": "PHASE-419-TOURNAMENT-REGISTRATION-NOTIFICATION-LOCK",
+  "apiBase": "",
+  "sharedRegistrationBackendLive": false,
+  "backgroundPushLive": false,
+  "registrationCap": 100,
+  "scheduleEveryHours": 5,
+  "note": "Keep apiBase blank until a real HTTPS tournament registration endpoint is deployed and verified. Local registration remains available for device testing."
+}
