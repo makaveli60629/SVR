@@ -1,6 +1,6 @@
 /* PHASE-418-MOBILE-SURFACE-POLISH-LOCK */
 const BUILD='PHASE-418-MOBILE-SURFACE-POLISH-LOCK';
-const state={build:BUILD,flowDocked:false,quickMic:false,accountControls:false,stackBadges:0,lastError:null,checkedAt:null};
+const state={build:BUILD,flowDocked:false,quickMic:false,accountControls:false,chooserOneScreen:false,chooserAccounts:false,stackBadges:0,lastError:null,checkedAt:null};
 const $=s=>document.querySelector(s);
 const game=()=>window.SVR_PHASE393_ANDROID_STATE;
 const money=n=>`$${Math.max(0,Math.round(Number(n||0))).toLocaleString()}`;
@@ -37,6 +37,13 @@ function ensureQuickControls(){
   if(signedIn&&profile){const name=snap.profile.displayName||snap.profile.name||'PLAYER';profile.textContent=`PROFILE • ${String(name).toUpperCase().slice(0,18)}`}
   state.quickMic=Boolean(mic);state.accountControls=Boolean(profile&&login&&register);return state.quickMic&&state.accountControls;
 }
+function ensureChooser(){
+  const chooser=/\/game\/(?:android|iphone)\.html$/i.test(location.pathname),card=document.querySelector('body > .card, body > main.card');if(!chooser||!card)return false;
+  document.body.classList.add('phase418-one-screen');state.chooserOneScreen=true;
+  let row=$('#phase418ChooserAccounts');if(!row){row=document.createElement('div');row.id='phase418ChooserAccounts';row.className='phase418-account-row';row.innerHTML='<a href="/site/login.html?next=/game/android.html%3Fchannel%3Dstable%26v%3Dphase418">SIGN IN</a><a class="register" href="/site/register.html?next=/game/android.html%3Fchannel%3Dstable%26v%3Dphase418">CREATE ACCOUNT</a><a href="/site/tournament-account.html?v=phase418">TOURNAMENT ACCOUNT</a>';const links=card.querySelector('.links');(links||card).insertAdjacentElement('afterend',row)}
+  const tournament=card.querySelector('.mode.tournament a');if(tournament)tournament.title='Tournament entry requires a player identity; the tournament portal will route unsigned players to login/create account.';
+  state.chooserAccounts=Boolean(row);return true;
+}
 function ensurePlayerStacks(){
   const g=game();if(!g?.players?.length)return 0;let count=0;
   for(const player of g.players){
@@ -48,10 +55,10 @@ function ensurePlayerStacks(){
 }
 function ensureVoiceLabel(){const legacy=$('#phase405VoiceButton');if(legacy)legacy.textContent='MIC / VOX'}
 function poll(){
-  try{dockFlowRail();ensureQuickControls();ensureVoiceLabel();ensurePlayerStacks();state.lastError=null}catch(error){state.lastError=String(error?.message||error)}
+  try{ensureChooser();dockFlowRail();ensureQuickControls();ensureVoiceLabel();ensurePlayerStacks();state.lastError=null}catch(error){state.lastError=String(error?.message||error)}
   state.checkedAt=new Date().toISOString();
 }
-function qa(){poll();return{...state,flowParent:$('#phase403FlowRail')?.parentElement?.id||null,flowPrevious:$('#phase403FlowRail')?.previousElementSibling?.id||null,oneBurnPile:document.querySelectorAll('.burn-zone').length===1,voiceSheet:Boolean($('#phase405VoiceSheet')),existingVoiceClient:Boolean(window.SVR_PHASE405_VOX_QA),profileRoute:'/site/profile.html',loginRoute:'/site/login.html',registerRoute:'/site/register.html',pokerStateMutated:false,pass:Boolean(state.flowDocked&&state.quickMic&&state.accountControls&&state.stackBadges>=5&&!state.lastError),checkedAt:new Date().toISOString()}}
+function qa(){poll();const tablePage=Boolean($('#raisePanel'));return{...state,flowParent:$('#phase403FlowRail')?.parentElement?.id||null,flowPrevious:$('#phase403FlowRail')?.previousElementSibling?.id||null,oneBurnPile:document.querySelectorAll('.burn-zone').length===1,voiceSheet:Boolean($('#phase405VoiceSheet')),existingVoiceClient:Boolean(window.SVR_PHASE405_VOX_QA),profileRoute:'/site/profile.html',loginRoute:'/site/login.html',registerRoute:'/site/register.html',pokerStateMutated:false,pass:Boolean(!state.lastError&&(state.chooserOneScreen||!document.querySelector('body > .card, body > main.card'))&&(!tablePage||(state.flowDocked&&state.quickMic&&state.accountControls&&state.stackBadges>=5))),checkedAt:new Date().toISOString()}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{poll();setInterval(poll,180)},{once:true});else{poll();setInterval(poll,180)}
 window.addEventListener('svr:account-change',poll);
 window.SVR_PHASE418_MOBILE_SURFACE_QA=qa;
