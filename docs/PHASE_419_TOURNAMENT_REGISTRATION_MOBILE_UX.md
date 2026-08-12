@@ -70,11 +70,11 @@ Until a real HTTPS registration API is deployed, the roster uses a device-local 
 The Phase 419 page can request browser notification permission and can show:
 
 - an in-app tournament-start banner
-- an OS notification through the active service worker when supported
+- an OS notification through the existing active service worker when supported by the current browser/PWA session
 
-Both service workers include a `notificationclick` handler that focuses an existing SVR page or opens the tournament lobby.
+The protected Phase 407 service workers remain unchanged in this phase. Phase 419 therefore does not claim guaranteed notification navigation or background delivery after the application/browser has been fully closed.
 
-Guaranteed notification after the application/browser has been fully closed still requires a production push backend. Phase 419 does not claim that backend is live.
+Guaranteed closed-app background push requires a production push backend and a future approved service-worker/push integration phase.
 
 ## Admin database preparation
 
@@ -113,6 +113,7 @@ Unchanged:
 - Quest Phase 396
 - APK `0.1.0-rc2`, code `2`, manual-update only
 - exactly one mobile burn pile
+- Phase 407 service-worker baseline
 
 ## Multiplayer / voice truth
 
