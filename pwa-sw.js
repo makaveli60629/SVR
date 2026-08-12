@@ -1,4 +1,4 @@
-// Predecessor audit lineage markers only: svr-poker-phase403-android-engine-reliability-v1 | svr-poker-phase404-android-mobile-safety-v1 | svr-poker-phase405-platform-mobile-social-v1 | svr-poker-phase406-mobile-ultimate-gameplay-v1
+// Predecessor audit lineage markers only: svr-poker-phase403-android-engine-reliability-v1 | svr-poker-phase404-android-mobile-safety-v1 | svr-poker-phase405-platform-mobile-social-v1 | svr-poker-phase406-mobile-ultimate-gameplay-v1 | svr-poker-phase407-mobile-fit-pacing-status-login-v1
 const SVR_CACHE='svr-poker-phase419-tournament-registration-mobile-ux-v1';
 const CORE=[
   '/offline.html','/logo.png','/manifest.webmanifest?v=phase407','/site-public-hooks.js?v=phase407','/phase407-public-status.js?v=phase407','/platform-device.js?v=phase407','/launch-quest.css?v=phase406',
