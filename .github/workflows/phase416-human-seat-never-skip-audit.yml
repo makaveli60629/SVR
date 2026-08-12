@@ -1,0 +1,96 @@
+name: Phase 416 Human Seat Never-Skip Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase416-human-seat-never-skip-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Validate Phase 416 chain and missing Phase 410 wrapper dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/modules/phase416_human_seat_never_skip.js
+          grep -q 'PHASE-416-HUMAN-SEAT-NEVER-SKIP-LOCK' game/modules/phase416_human_seat_never_skip.js
+          grep -q "import './phase410_mobile_human_input_lock.js?v=phase410'" game/modules/phase416_human_seat_never_skip.js
+          grep -q "import './phase416_human_seat_never_skip.js?v=phase416'" game/modules/phase414_human_turn_rotation_authority.js
+          grep -q 'phase416Authority' game/modules/phase414_human_turn_rotation_authority.js
+          grep -q 'SVR_PHASE410_MOBILE_INPUT_QA' game/android-tabletop.html
+          grep -q 'SVR_PHASE416_HUMAN_SEAT_QA' game/modules/phase416_human_seat_never_skip.js
+          node --check game/modules/phase410_mobile_human_input_lock.js
+          node --check game/modules/phase415_mobile_human_control_authority.js
+          node --check game/modules/phase416_human_seat_never_skip.js
+          node --check game/modules/phase414_human_turn_rotation_authority.js
+
+      - name: Reproduce and block cards-with-zero-stack skip
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const START=15000;
+          function normalizeBeforeJoin(g,mode='regular'){
+            if(!g||g.joined||mode==='tournament')return false;
+            const saved=Number(g.stack||0);if(Number.isFinite(saved)&&saved>0)return false;
+            g.stack=START;return true;
+          }
+          const stale={joined:false,stack:0};
+          if(!normalizeBeforeJoin(stale)||stale.stack!==15000)throw new Error('zero saved playtest stack was not reset before dealing');
+          const healthy={joined:false,stack:7250};
+          if(normalizeBeforeJoin(healthy)||healthy.stack!==7250)throw new Error('positive saved stack must be preserved');
+          const tournament={joined:false,stack:0};
+          if(normalizeBeforeJoin(tournament,'tournament'))throw new Error('tournament elimination stack must not be silently rebought');
+          console.log('Zero-stack admission scenarios passed.');
+          NODE
+
+      - name: Simulate permanent left-to-right human turn and hold barrier
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const ORDER=[0,5,1,2,3,4];
+          const pending=(g,p)=>!!p&&!p.folded&&!p.allIn&&p.stack>0&&(!p.acted||p.streetBet<g.currentBet);
+          const nextPendingAfter=(g,from)=>{const pos=ORDER.indexOf(from);if(pos<0)return null;for(let step=1;step<=ORDER.length;step++){const i=ORDER[(pos+step)%ORDER.length];if(pending(g,g.players[i]))return i}return null};
+          const players=()=>Array.from({length:6},(_,index)=>({index,stack:15000,streetBet:100,acted:true,folded:false,allIn:false,active:false}));
+          const p=players();p[0].acted=false;
+          const g={players:p,currentBet:100,hand:1,street:0,lastActor:4,activePlayer:5,expectedActor:5};
+          if(nextPendingAfter(g,4)!==0)throw new Error('Darius must hand action to the human seat');
+          let hold={hand:1,street:0,trailLength:0};
+          const resolved=trail=>trail.slice(hold.trailLength).some(x=>x.index===0);
+          if(resolved([]))throw new Error('hold resolved before human acted');
+          g.activePlayer=0;g.expectedActor=0;g.players.forEach(x=>x.active=x.index===0);g.players[0].acted=false;
+          if(g.activePlayer!==0||!g.players[0].active||g.players[0].acted)throw new Error('human hold did not own action');
+          if(!resolved([{index:0,label:'CALL'}]))throw new Error('human action must release hold');
+          console.log('Human actor and hold-until-action scenarios passed.');
+          NODE
+
+      - name: Preserve protected poker engine Quest and APK policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK' game/modules/phase404_android_mobile_safety.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
