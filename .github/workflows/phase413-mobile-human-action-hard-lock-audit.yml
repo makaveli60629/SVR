@@ -1,0 +1,105 @@
+name: Phase 413 Mobile Human Action Hard Lock Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase413-mobile-human-action-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Validate strict mobile human action source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q 'PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK' game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q 'user.active===true' game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q 'user.acted===false' game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q "addEventListener('click',acceptClickCapture,true)" game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q "addEventListener('pointerup',scheduleReleaseFallback,true)" game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q "addEventListener('touchend',scheduleReleaseFallback" game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q "type==='allin'" game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q 'blockedStaleClicks' game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q 'blockedDuplicateClicks' game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q 'syntheticRescues' game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q 'SVR_PHASE413_HUMAN_ACTION_QA' game/modules/phase413_mobile_human_action_hard_lock.js
+          node --check game/modules/phase413_mobile_human_action_hard_lock.js
+
+      - name: Simulate strict player decision gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const canAct=g=>Boolean(g&&g.players?.[0]&&Number(g.activePlayer)===0&&!g.handOver&&!g.players[0].folded&&!g.players[0].allIn&&Number(g.players[0].stack||0)>0&&g.players[0].active===true&&g.players[0].acted===false);
+          const base={activePlayer:0,handOver:false,players:[{stack:15000,folded:false,allIn:false,active:true,acted:false}]};
+          if(!canAct(base))throw new Error('real open human decision must be actionable');
+          if(canAct({...base,activePlayer:4}))throw new Error('bot turn must not accept human action');
+          if(canAct({...base,players:[{...base.players[0],active:false}]}))throw new Error('post-action transition must not reopen buttons');
+          if(canAct({...base,players:[{...base.players[0],acted:true}]}))throw new Error('already-recorded action must not accept a duplicate tap');
+          if(canAct({...base,handOver:true}))throw new Error('completed hand must stay locked');
+          if(canAct({...base,players:[{...base.players[0],folded:true}]}))throw new Error('folded user must stay locked');
+          if(canAct({...base,players:[{...base.players[0],allIn:true}]}))throw new Error('all-in user must stay locked');
+          console.log('Phase 413 strict human decision scenarios passed.');
+          NODE
+
+      - name: Validate protected chooser and active shared mobile route
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/android.html)"
+          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android.html
+          grep -q 'PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK' game/android-tabletop.html
+          grep -q 'phase413Found' game/android-tabletop.html
+          grep -q 'SVR_PHASE413_HUMAN_ACTION_QA' game/android-tabletop.html
+          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android-tabletop.html
+          grep -q 'phase413_mobile_human_action_hard_lock.js?v=phase413' game/android-stable-phase405.html
+          grep -q 'data-human-action-build="PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK"' game/android-stable-phase405.html
+          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.js?v=phase413' game/android-stable-phase405.html
+
+      - name: Preserve protected ALL IN poker Quest and APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK' game/modules/phase404_android_mobile_safety.js
+          grep -q 'ALL_IN_CONFIRM_MS=2600' game/modules/phase404_android_mobile_safety.js
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' game/modules/phase403_android_pot_rules.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-409-MOBILE-PLAYER-TURN-GUARD-LOCK' game/modules/phase409_mobile_player_turn_guard.js
+          grep -q 'PHASE-410-MOBILE-HUMAN-INPUT-LOCK' game/modules/phase410_mobile_human_input_lock.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase398_android_raise_rules.js game/modules/phase404_android_mobile_safety.js game/modules/phase409_mobile_player_turn_guard.js game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+
+      - name: Validate syntax and JSON
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check game/modules/phase413_mobile_human_action_hard_lock.js
+          node --check game/modules/phase410_mobile_human_input_lock.js
+          node --check game/modules/phase409_mobile_player_turn_guard.js
+          node --check game/modules/phase407_mobile_fit_login.js
+          python3 -m json.tool game/android-release.json >/dev/null
