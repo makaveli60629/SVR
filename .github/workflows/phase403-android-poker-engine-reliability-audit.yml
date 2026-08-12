@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v5
-      - name: Validate Phase 403 engine under current Phase 407 route
+      - name: Validate Phase 403 engine under current Phase 418 route
         shell: bash
         run: |
           set -euo pipefail
@@ -31,12 +31,12 @@ jobs:
           test -s game/modules/phase403_android_pot_rules.js
           test -s game/modules/phase403_android_table_clarity.js
           test -s game/styles/phase403_android_table_clarity.css
-          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android.html
-          grep -q 'android-tabletop.html?v=phase407' game/android.html
+          grep -q 'PHASE-418-MOBILE-ADMIN-PROFILE-ACCOUNT-POLISH-LOCK' game/android.html
+          grep -q 'android-tabletop.html?v=phase418' game/android.html
           grep -q 'android-stable-phase405.html' game/android-tabletop.html
           grep -q 'SVR_PHASE403_ANDROID_ENGINE_QA' game/android-tabletop.html
-          grep -q 'SVR_PHASE403_TABLE_CLARITY_QA' game/android-tabletop.html
-          grep -q 'SVR_PHASE407_MOBILE_WRAPPER_QA' game/android-tabletop.html
+          grep -q 'SVR_PHASE403_TABLE_CLARITY_QA' game/modules/phase403_android_table_clarity.js
+          grep -q 'SVR_PHASE418_MOBILE_WRAPPER_QA' game/android-tabletop.html
           grep -q 'phase403_android_gameplay.js?v=phase403' game/android-stable-phase405.html
           grep -q 'phase403_android_table_clarity.js?v=phase403' game/android-stable-phase405.html
           grep -q 'phase403_android_table_clarity.css?v=phase403' game/android-stable-phase405.html
