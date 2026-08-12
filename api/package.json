@@ -5,7 +5,8 @@
   "description": "SVR Poker AWS PostgreSQL admin/status/message API",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "bootstrap:admin": "node phase419-admin-db-bootstrap.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

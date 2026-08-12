@@ -1,0 +1,160 @@
+name: Phase 419 Tournament Registration Mobile UX Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase419-tournament-registration-mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Validate tournament sign-up and five-hour timing
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/tournament-signup.html
+          test -s game/modules/phase419_tournament_registration_notify.js
+          test -s game/styles/phase419_tournament_registration_notify.css
+          test -s game/config/tournament-api.json
+          grep -q 'PHASE-419-TOURNAMENT-REGISTRATION-NOTIFICATION-LOCK' game/tournament-signup.html
+          grep -q 'SIGN UP FOR NEXT TOURNAMENT' game/tournament-signup.html
+          grep -q 'Human Test Roster' game/tournament-signup.html
+          grep -q 'registration times' game/tournament-signup.html
+          grep -q 'SLOT_MS=5\*60\*60\*1000' game/modules/phase419_tournament_registration_notify.js
+          grep -q 'registeredAt' game/modules/phase419_tournament_registration_notify.js
+          grep -q 'localRoster' game/modules/phase419_tournament_registration_notify.js
+          grep -q 'sharedRegistrationBackendLive' game/config/tournament-api.json
+          python3 - <<'PY'
+          import json
+          c=json.load(open('game/config/tournament-api.json'))
+          assert c['apiBase']==''
+          assert c['sharedRegistrationBackendLive'] is False
+          assert c['backgroundPushLive'] is False
+          assert c['registrationCap']==100
+          assert c['scheduleEveryHours']==5
+          print('Tournament config remains truthful: local fallback active, shared registration/push not falsely live.')
+          PY
+          node <<'NODE'
+          const SLOT=5*60*60*1000;
+          if(SLOT!==18000000) throw new Error('five-hour cadence is not exact');
+          const anchor=Date.UTC(2026,0,1);
+          for(let i=0;i<2000;i++) if((anchor+(i+1)*SLOT)-(anchor+i*SLOT)!==18000000) throw new Error('slot drift');
+          console.log('2,000 exact five-hour tournament slots passed.');
+          NODE
+
+      - name: Validate active-session start notification truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'ENABLE START NOTIFICATION' game/tournament-signup.html
+          grep -q 'fully closed requires the production push backend' game/tournament-signup.html
+          grep -q 'Notification.requestPermission' game/modules/phase419_tournament_registration_notify.js
+          grep -q 'showNotification' game/modules/phase419_tournament_registration_notify.js
+          grep -q 'backgroundPushLive' game/modules/phase419_tournament_registration_notify.js
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- sw.js pwa-sw.js)"
+          node --check sw.js
+          node --check pwa-sw.js
+
+      - name: Validate mobile table flow is outside opponent layer
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/modules/phase419_mobile_table_flow_polish.js
+          test -s game/styles/phase419_mobile_table_flow_polish.css
+          grep -q 'PHASE-419-MOBILE-TABLE-FLOW-POLISH-LOCK' game/modules/phase419_mobile_table_flow_polish.js
+          grep -q 'TABLE FLOW' game/modules/phase419_mobile_table_flow_polish.js
+          grep -q 'LEFT → RIGHT' game/modules/phase419_mobile_table_flow_polish.js
+          grep -q "!rail.closest('.table-wrap')" game/modules/phase419_mobile_table_flow_polish.js
+          grep -q "!rail.closest('.table-surface')" game/modules/phase419_mobile_table_flow_polish.js
+          grep -q "!rail.closest('.players')" game/modules/phase419_mobile_table_flow_polish.js
+          grep -q 'pokerStateMutated:false' game/modules/phase419_mobile_table_flow_polish.js
+          grep -q 'phase419_mobile_table_flow_polish.css?v=phase419' game/android-stable-phase405.html
+          grep -q 'phase419_mobile_table_flow_polish.js?v=phase419' game/android-stable-phase405.html
+          grep -q 'SIGN-UP / ROSTER' game/android-stable-phase405.html
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('game/android-stable-phase405.html').read_text()
+          if s.count('class="burn-zone"') != 1:
+              raise SystemExit('mobile shell must contain exactly one burn-zone')
+          if s.index('phase404_android_mobile_safety.js?v=phase404') >= s.index('phase403_android_gameplay.js?v=phase403'):
+              raise SystemExit('Phase 404 ALL IN capture guard must remain before Phase 403 engine')
+          print('one burn pile and protected ALL IN script order passed')
+          PY
+          node --check game/modules/phase419_mobile_table_flow_polish.js
+
+      - name: Validate tournament portal links the roster
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-419-TOURNAMENT-REGISTRATION-MOBILE-UX-LOCK' game/tournaments.html
+          grep -q 'SIGN UP / VIEW ROSTER' game/tournaments.html
+          grep -q 'phase419SignupCount' game/tournaments.html
+          grep -q 'phase419_tournament_registration_notify.js?v=phase419' game/tournaments.html
+          grep -q 'bots not represented as humans\|bot-filled seats are not presented as human sign-ups' game/tournaments.html
+
+      - name: Validate secure admin database bootstrap
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s api/phase419-admin-db-bootstrap.js
+          test -s api/sql/phase419_admin_tournament_registration.sql
+          grep -q 'PHASE-419-ADMIN-DATABASE-BOOTSTRAP-LOCK' api/phase419-admin-db-bootstrap.js
+          grep -q "ADMIN_USERNAME||'admin'" api/phase419-admin-db-bootstrap.js
+          grep -q 'ADMIN_INITIAL_PASSWORD' api/phase419-admin-db-bootstrap.js
+          grep -q 'PASSWORD.length<12' api/phase419-admin-db-bootstrap.js
+          grep -q 'must_change_password' api/phase419-admin-db-bootstrap.js
+          grep -q "crypt(\$4,gen_salt('bf',12))" api/phase419-admin-db-bootstrap.js
+          grep -q 'tournament_registrations' api/sql/phase419_admin_tournament_registration.sql
+          grep -q 'bootstrap:admin' api/package.json
+          if grep -Fq 'SVR Poker' api/phase419-admin-db-bootstrap.js api/sql/phase419_admin_tournament_registration.sql; then
+            echo 'Plain requested password phrase must never be committed into admin DB bootstrap files.' >&2; exit 1
+          fi
+          node --check api/phase419-admin-db-bootstrap.js
+          python3 -m json.tool api/package.json >/dev/null
+
+      - name: Preserve protected poker Quest and APK authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' game/modules/phase403_android_pot_rules.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-398-ANDROID-RAISE-SIZING-RULES-LOCK' game/modules/phase398_android_raise_rules.js
+          grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' game/modules/phase414_human_turn_rotation_authority.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase398_android_raise_rules.js game/modules/phase414_human_turn_rotation_authority.js game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js game/android-release.json)"
+
+      - name: Syntax and JSON validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check game/modules/phase419_tournament_registration_notify.js
+          node --check game/modules/phase419_mobile_table_flow_polish.js
+          node --check api/phase419-admin-db-bootstrap.js
+          node --check sw.js
+          node --check pwa-sw.js
+          python3 -m json.tool game/config/tournament-api.json >/dev/null
+          python3 -m json.tool api/package.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
