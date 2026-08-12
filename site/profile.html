@@ -3,20 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>SVR Poker | Player Profile Demo</title>
-<meta name="description" content="SVR Poker profile demo with live avatar preview, saved outfit, play-money balance, rewards, and game access.">
+<title>SVR Poker | Player Profile</title>
+<meta name="description" content="SVR Poker player profile with immediate avatar preview, bankroll, account controls, rewards, and mobile game access.">
 <link rel="icon" href="../logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/phase389-avatar-profile-visible-refresh.css?v=phase389">
+<link rel="stylesheet" href="css/phase418-profile-mobile-fix.css?v=phase418">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-389-PROFILE-AVATAR-SHOWROOM-VISIBLE-REFRESH-LOCK" data-predecessor="PHASE-374-PROFILE-MOBILE-AVATAR-MENU-RECOVERY-LOCK">
+<body data-build="PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK" data-predecessor="PHASE-389-PROFILE-AVATAR-SHOWROOM-VISIBLE-REFRESH-LOCK">
 <canvas id="binary-rain" aria-hidden="true"></canvas>
 <div class="phase389-page">
 <nav class="phase389-nav">
-  <a class="phase389-brand" href="index.html?v=phase389"><img src="../logo.png" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Player Profile Demo</span></div></a>
-  <div class="phase389-links"><a href="avatar.html?v=phase389">Dressing Room</a><a href="profile.html?v=phase389" aria-current="page">Profile</a><a href="../game/android.html?channel=stable&v=phase389">Android</a><a href="../game/quest.html?v=phase389">Quest</a><a href="store.html">Store</a></div>
+  <a class="phase389-brand" href="index.html?v=phase418"><img src="../logo.png" alt="SVR Poker logo"><div><strong>SVR POKER</strong><span>Player Profile</span></div></a>
+  <div class="phase389-links"><a href="avatar.html?v=phase418">Dressing Room</a><a href="profile.html?v=phase418" aria-current="page">Profile</a><a href="../game/android.html?channel=stable&v=phase418">Android</a><a href="../game/quest.html?v=phase396">Quest</a><a href="store.html?v=phase418">Store</a></div>
 </nav>
 <main class="phase389-shell">
 <section class="phase389-card">
@@ -30,13 +31,13 @@
       <button id="showroomFace" class="phase389-btn" type="button">Face</button>
       <button id="showroomFullscreen" class="phase389-btn gold" type="button">Full Screen</button>
       <button id="showroomRetry" class="phase389-btn" type="button" hidden>Retry 3D</button>
-      <a class="phase389-btn primary" href="avatar.html?v=phase389">Edit Avatar</a>
+      <a class="phase389-btn primary" href="avatar.html?v=phase418">Edit Avatar</a>
     </div>
   </div>
-  <div class="phase389-card-pad"><strong>Profile Camera:</strong> <span id="showroomStatus">Opening your avatar camera…</span></div>
+  <div class="phase389-card-pad"><strong>Profile Camera:</strong> <span id="showroomStatus">Opening your upright avatar camera…</span></div>
 </section>
 
-<section class="phase389-stats" style="margin-top:14px">
+<section class="phase389-stats" style="margin-top:8px">
   <article class="phase389-stat"><span>Play Money</span><strong id="playMoney">$0</strong></article>
   <article class="phase389-stat"><span>Daily Streak</span><strong id="dailyStreak">0</strong></article>
   <article class="phase389-stat"><span>Activity Today</span><strong id="activeTime">0:00</strong></article>
@@ -46,31 +47,32 @@
 
 <section class="phase389-profile-grid">
   <article class="phase389-info"><span class="phase389-eyebrow">PROFILE IDENTITY</span><h2 id="displayName">Loading…</h2><p id="emailLine">Checking account state…</p><p id="accountExplanation">Loading account mode…</p><div class="phase389-inline"><button id="refreshProfile" class="phase389-btn" type="button">Refresh</button><button id="logout" class="phase389-btn gold" type="button">Sign Out</button></div></article>
-  <article class="phase389-info"><span class="phase389-eyebrow">AVATAR SYNC</span><h2>One Saved Player</h2><p>The profile demo now loads the same saved body and outfit as the dressing room. Saving an outfit refreshes the showroom on the next profile view.</p><div class="phase389-inline"><a class="phase389-btn primary" href="avatar.html?v=phase389">Open Dressing Room</a><a class="phase389-btn" href="../game/avatar-vr.html?v=phase389">VR Room</a></div></article>
-  <article class="phase389-info"><span class="phase389-eyebrow">GAME ACCESS</span><h2>Enter SVR Poker</h2><p>Launch the responsive Android table or protected Quest lobby.</p><div class="phase389-inline"><a class="phase389-btn primary" href="../game/android.html?channel=stable&v=phase389">Android</a><a class="phase389-btn" href="../game/quest.html?v=phase389">Quest</a></div></article>
+  <article class="phase389-info"><span class="phase389-eyebrow">AVATAR SYNC</span><h2>One Saved Player</h2><p>The profile loads the same saved body and outfit as the dressing room. Phase 418 stops Eric’s imported animation from rotating/collapsing him and applies the proven upright material authority.</p><div class="phase389-inline"><a class="phase389-btn primary" href="avatar.html?v=phase418">Open Dressing Room</a><a class="phase389-btn" href="../game/avatar-vr.html?v=phase418">VR Room</a></div></article>
+  <article class="phase389-info"><span class="phase389-eyebrow">GAME ACCESS</span><h2>Enter SVR Poker</h2><p>Launch the mobile table or protected Quest lobby.</p><div class="phase389-inline"><a class="phase389-btn primary" href="../game/android.html?channel=stable&v=phase418">Android / iPhone Game</a><a class="phase389-btn" href="../game/quest.html?v=phase396">Quest</a></div></article>
 </section>
 
 <section class="phase389-profile-grid">
   <article class="phase389-info"><span class="phase389-eyebrow">DAILY ACTIVITY</span><h2>5,000-Chip Reward</h2><div class="phase389-progress"><span id="rewardProgress"></span></div><p id="rewardDetails">Checking activity…</p><button id="claimReward" class="phase389-btn primary" type="button">Claim Daily Reward</button><div id="rewardStatus" class="phase389-status" role="status"></div></article>
   <article class="phase389-info" style="grid-column:span 2"><span class="phase389-eyebrow">PROFILE RECORD</span><h2>Player Identity</h2><form id="profileForm" class="phase389-form"><label>Display Name<input id="profileName" name="displayName" maxlength="40" required></label><label>Advanced Avatar Model URL<input id="avatarUrl" name="avatarUrl" type="url" placeholder="https://svrpoker.com/game/assets/models/eric/eric.fbx"></label><button class="phase389-btn primary" type="submit">Save Profile</button></form><div id="profileStatus" class="phase389-status" role="status"></div></article>
 </section>
-<footer class="phase389-footer">PHASE-389-PROFILE-AVATAR-SHOWROOM-VISIBLE-REFRESH-LOCK</footer>
+<footer class="phase389-footer">PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK</footer>
 </main>
 </div>
-<script src="../matrix.js?v=phase389"></script>
-<script src="../site-public-hooks.js?v=phase389"></script>
-<script type="module" src="js/phase389-profile-showroom.js?v=phase389"></script>
+<script src="../matrix.js?v=phase418"></script>
+<script src="../site-public-hooks.js?v=phase418"></script>
+<script type="module" src="js/phase389-profile-showroom.js?v=phase418"></script>
+<script type="module" src="js/phase418-profile-eric-authority.js?v=phase418"></script>
 <script type="module">
-import { account } from './js/phase345-demo-activity-persistence.js?v=phase389';
+import { account } from './js/phase345-demo-activity-persistence.js?v=phase418';
 const money=(value)=>`$${Number(value||0).toLocaleString()}`;
 const time=(value)=>`${Math.floor(Number(value||0)/60)}:${String(Math.floor(Number(value||0)%60)).padStart(2,'0')}`;
 const show=(id,text,type='')=>{const element=document.getElementById(id);if(!element)return;element.textContent=text;element.className=`phase389-status ${type}`};
 async function renderReward(){try{const reward=await account.rewardStatus();const active=Number(reward.activeSeconds||0),required=Number(reward.requiredSeconds||300),percent=Math.min(100,Math.round(active/Math.max(1,required)*100));document.getElementById('activeTime').textContent=time(active);document.getElementById('rewardProgress').style.width=`${percent}%`;document.getElementById('rewardDetails').textContent=reward.claimed?'Today’s reward has been claimed.':`${time(active)} active • ${time(required)} required • ${money(reward.rewardChips)} reward`;document.getElementById('rewardState').textContent=reward.claimed?'CLAIMED':reward.eligible?'READY':'LOCKED';document.getElementById('claimReward').disabled=!reward.eligible}catch(error){show('rewardStatus',String(error?.message||error),'error')}}
-async function render(){await account.bootstrap();const state=account.snapshot();if(!state.profile){location.replace('login.html?return=profile.html%3Fv%3Dphase389');return}const profile=state.profile;document.getElementById('displayName').textContent=profile.displayName||'Player';document.getElementById('emailLine').textContent=profile.email||'Local demo profile';document.getElementById('playMoney').textContent=money(profile.playMoney);document.getElementById('dailyStreak').textContent=Number(profile.dailyStreak||0);document.getElementById('profileName').value=profile.displayName||'';document.getElementById('avatarUrl').value=profile.avatarUrl||new URL('/game/assets/models/eric/eric.fbx',location.origin).href;const outfit=profile.equippedOutfit||{};document.getElementById('outfitLabel').textContent=[outfit.modelId,outfit.palette,outfit.top].filter(Boolean).join(' / ')||'Eric / Default';document.getElementById('accountExplanation').textContent=state.mode==='api'?'Profile and outfit are backed by the secure account API.':'Profile and outfit are stored on this device until the production account API is connected.';await renderReward()}
+async function render(){await account.bootstrap();const state=account.snapshot();if(!state.profile){location.replace('login.html?return=profile.html%3Fv%3Dphase418');return}const profile=state.profile;document.getElementById('displayName').textContent=profile.displayName||'Player';document.getElementById('emailLine').textContent=profile.email||'Local test profile';document.getElementById('playMoney').textContent=money(profile.playMoney);document.getElementById('dailyStreak').textContent=Number(profile.dailyStreak||0);document.getElementById('profileName').value=profile.displayName||'';document.getElementById('avatarUrl').value=profile.avatarUrl||new URL('/game/assets/models/eric/eric.fbx',location.origin).href;const outfit=profile.equippedOutfit||{};document.getElementById('outfitLabel').textContent=[outfit.modelId,outfit.palette,outfit.top].filter(Boolean).join(' / ')||'Eric / Default';document.getElementById('accountExplanation').textContent=state.mode==='api'?'Profile and outfit are backed by the secure account API.':'Profile and outfit are stored on this device until the production AWS player-account API is deployed.';await renderReward()}
 document.getElementById('claimReward').onclick=async()=>{show('rewardStatus','Claiming…','info');try{const result=await account.claimDailyReward();show('rewardStatus',`${money(result.rewardChips)} added.`,'ok');await render()}catch(error){show('rewardStatus',String(error?.message||error),'error')}};
 document.getElementById('profileForm').onsubmit=async(event)=>{event.preventDefault();show('profileStatus','Saving…','info');try{await account.updateProfile(Object.fromEntries(new FormData(event.currentTarget)));show('profileStatus','Profile saved.','ok');await render();await window.SVR_PHASE389_PROFILE_RETRY?.()}catch(error){show('profileStatus',String(error?.message||error),'error')}};
 document.getElementById('refreshProfile').onclick=async()=>{await account.refreshProfile();await render();await window.SVR_PHASE389_PROFILE_RETRY?.()};
-document.getElementById('logout').onclick=async()=>{await account.logout();location.href='login.html'};
+document.getElementById('logout').onclick=async()=>{await account.logout();location.href='login.html?v=phase418'};
 window.addEventListener('svr:account-change',()=>void render());
 void render().catch((error)=>show('profileStatus',String(error?.message||error),'error'));
 </script>
