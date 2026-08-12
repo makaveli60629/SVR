@@ -30,36 +30,40 @@ jobs:
           test -s game/modules/phase414_human_turn_rotation_authority.js
           grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' game/modules/phase414_human_turn_rotation_authority.js
           grep -q 'VISUAL_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase414_human_turn_rotation_authority.js
-          grep -q 'precedingEligibleSeat' game/modules/phase414_human_turn_rotation_authority.js
+          grep -q 'nextEligibleAfter' game/modules/phase414_human_turn_rotation_authority.js
+          grep -q 'handoffGraceActive' game/modules/phase414_human_turn_rotation_authority.js
+          grep -q 'HANDOFF_GRACE_MS=450' game/modules/phase414_human_turn_rotation_authority.js
           grep -q 'userPending' game/modules/phase414_human_turn_rotation_authority.js
           grep -q 'user.acted=false' game/modules/phase414_human_turn_rotation_authority.js
           grep -q 'svr:user-turn-restored' game/modules/phase414_human_turn_rotation_authority.js
           grep -q 'SVR_PHASE414_HUMAN_TURN_QA' game/modules/phase414_human_turn_rotation_authority.js
           node --check game/modules/phase414_human_turn_rotation_authority.js
 
-      - name: Simulate human cannot be skipped in clockwise eligible order
+      - name: Simulate human cannot be skipped in actor cycle
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
           const ORDER=[0,5,1,2,3,4],USER=0;
           const eligible=p=>p&&!p.folded&&!p.allIn&&p.stack>0;
-          const predecessor=g=>{const pos=ORDER.indexOf(USER);for(let step=1;step<ORDER.length;step++){const i=ORDER[(pos-step+ORDER.length)%ORDER.length];if(eligible(g.players[i]))return i}return null};
+          const nextAfter=(g,from)=>{const pos=ORDER.indexOf(from);if(pos<0)return null;for(let step=1;step<=ORDER.length;step++){const i=ORDER[(pos+step)%ORDER.length];if(eligible(g.players[i]))return i}return null};
           const trail=g=>g.trail.filter(r=>r.hand===g.hand&&r.street===g.street);
           const userActed=g=>trail(g).some(r=>r.index===USER);
           const pending=g=>{const u=g.players[0];if(!eligible(u)||g.handOver)return false;const owes=Math.max(0,g.currentBet-u.streetBet);return !userActed(g)||owes>0||u.acted===false};
-          const due=g=>{if(!pending(g))return false;if(g.activePlayer===0||g.expectedActor===0)return true;const t=trail(g),last=t.at(-1);return Boolean(last&&last.index===predecessor(g))};
-          const base=()=>({hand:5,street:1,currentBet:0,handOver:false,activePlayer:5,expectedActor:5,players:Array.from({length:6},(_,index)=>({index,stack:1000,streetBet:0,acted:true,folded:false,allIn:false})),trail:[]});
-          let g=base();g.players[0].acted=false;g.trail=[{hand:5,street:1,index:4}];if(predecessor(g)!==4||!due(g))throw new Error('Darius -> user must be due');
-          g=base();g.players[0].acted=false;g.players[4].folded=true;g.trail=[{hand:5,street:1,index:3}];if(predecessor(g)!==3||!due(g))throw new Error('folded Darius: Maya -> user must be due');
-          g=base();g.players[0].acted=false;g.players[4].folded=true;g.players[3].allIn=true;g.trail=[{hand:5,street:1,index:2}];if(predecessor(g)!==2||!due(g))throw new Error('Darius unavailable + Maya all-in: Eric -> user must be due');
-          g=base();g.players[0].acted=true;g.players[0].streetBet=100;g.currentBet=300;g.trail=[{hand:5,street:1,index:0},{hand:5,street:1,index:4}];if(!pending(g)||!due(g))throw new Error('user must regain action after a raise even when acted flag is stale true');
+          const due=g=>{if(!pending(g))return false;if(g.activePlayer===0||g.expectedActor===0)return true;const t=trail(g),last=t.at(-1);if(last&&nextAfter(g,last.index)===0)return true;if(!last&&Number.isInteger(g.roundAnchor)&&nextAfter(g,g.roundAnchor)===0)return true;return false};
+          const base=()=>({hand:5,street:1,currentBet:0,handOver:false,activePlayer:5,expectedActor:5,roundAnchor:4,players:Array.from({length:6},(_,index)=>({index,stack:1000,streetBet:0,acted:true,folded:false,allIn:false})),trail:[]});
+          let g=base();g.players[0].acted=false;g.trail=[{hand:5,street:1,index:4}];if(nextAfter(g,4)!==0||!due(g))throw new Error('Darius -> user must be due');
+          g=base();g.players[0].acted=false;g.players[4].folded=true;g.trail=[{hand:5,street:1,index:3}];if(nextAfter(g,3)!==0||!due(g))throw new Error('folded Darius: Maya -> user must be due');
+          g=base();g.players[0].acted=false;g.players[4].folded=true;g.players[3].allIn=true;g.trail=[{hand:5,street:1,index:2}];if(nextAfter(g,2)!==0||!due(g))throw new Error('Darius unavailable + Maya all-in: Eric -> user must be due');
+          g=base();g.players[0].acted=false;g.players[4].allIn=true;g.trail=[{hand:5,street:1,index:4}];if(nextAfter(g,4)!==0||!due(g))throw new Error('Darius becoming all-in after acting must still hand action to user');
+          g=base();g.players[0].acted=true;g.players[0].streetBet=100;g.currentBet=300;g.trail=[{hand:5,street:1,index:0},{hand:5,street:1,index:4}];if(!pending(g)||!due(g))throw new Error('user must regain action after a raise even with stale acted=true');
           g=base();g.players[0].acted=true;g.trail=[{hand:5,street:1,index:0},{hand:5,street:1,index:4}];if(pending(g)||due(g))throw new Error('matched already-acted user must not receive duplicate action');
-          g=base();g.players[0].acted=false;g.trail=[{hand:5,street:1,index:5}];if(due(g))throw new Error('Nova -> Claudia is not yet the user turn');
-          g=base();g.players[0].acted=false;g.expectedActor=0;g.activePlayer=2;if(!due(g))throw new Error('expectedActor user must override a stray bot handoff');
+          g=base();g.players[0].acted=false;g.trail=[{hand:5,street:1,index:5}];if(nextAfter(g,5)!==1||due(g))throw new Error('Nova -> Claudia is not yet user turn');
+          g=base();g.players[0].acted=false;g.expectedActor=0;g.activePlayer=2;if(!due(g))throw new Error('expectedActor user must override stray bot handoff');
+          g=base();g.players[0].acted=false;g.activePlayer=null;g.expectedActor=null;g.trail=[];g.roundAnchor=4;if(!due(g))throw new Error('street anchor Darius must identify user as first eligible actor');
           g=base();g.players[0].folded=true;g.expectedActor=0;if(due(g))throw new Error('folded human must be skipped legally');
           g=base();g.players[0].allIn=true;g.expectedActor=0;if(due(g))throw new Error('all-in human must be skipped legally');
-          console.log('Phase 414 clockwise human-turn rotation scenarios passed.');
+          console.log('Phase 414 actor-cycle human-turn scenarios passed.');
           NODE
 
       - name: Validate shared Android iPhone and all mobile modes
@@ -78,6 +82,8 @@ jobs:
           grep -q 'phase414Found' game/iphone-tabletop.html
           grep -q 'android-stable-phase405.html?v=phase414' game/iphone-tabletop.html
           grep -q 'iphone-tabletop.html?v=phase414' game/iphone.html
+          grep -q 'android-tabletop.html?v=phase414&mode=tournament' game/modules/phase412_tournament_account_gate.js
+          grep -q 'phase414HumanTurnRoute:true' game/modules/phase412_tournament_account_gate.js
           grep -q 'PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK' game/modules/phase413_mobile_human_action_hard_lock.js
           grep -q 'PHASE-410-MOBILE-HUMAN-INPUT-LOCK' game/modules/phase410_mobile_human_input_lock.js
           grep -q 'PHASE-409-MOBILE-PLAYER-TURN-GUARD-LOCK' game/modules/phase409_mobile_player_turn_guard.js
