@@ -1,5 +1,6 @@
 /* PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK */
 import './phase415_mobile_human_control_authority.js?v=phase415';
+import './phase416_human_seat_never_skip.js?v=phase416';
 const BUILD='PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK';
 const USER=0,TURN_SECONDS=15,HANDOFF_GRACE_MS=450;
 const VISUAL_ORDER=Object.freeze([0,5,1,2,3,4]);
@@ -77,4 +78,4 @@ function guard(){
 }
 function poll(){try{guard()}catch(error){runtime.lastError=String(error?.message||error);runtime.checkedAt=new Date().toISOString()}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{poll();setInterval(poll,20)},{once:true});else{poll();setInterval(poll,20)}
-window.SVR_PHASE414_HUMAN_TURN_QA=()=>{const g=game(),user=g?.players?.[USER],last=lastStreetAction(g);return{...runtime,activePlayer:actor(g?.activePlayer),expectedActor:actor(g?.expectedActor),userActive:user?.active??null,userActed:user?.acted??null,userPending:userPending(g),userDue:userIsDue(g),lastActor:last?.index??null,nextEligibleAfterLast:last?nextEligibleAfter(g,last.index):null,visualOrder:[...VISUAL_ORDER],handoffGraceMs:HANDOFF_GRACE_MS,allMobileModes:true,android:true,iphone:true,practice:true,regular:true,tournament:true,phase415Authority:Boolean(window.SVR_PHASE415_HUMAN_CONTROL_QA),pass:Boolean(runtime.installed&&!runtime.lastError&&window.SVR_PHASE415_HUMAN_CONTROL_QA?.()?.pass),checkedAt:new Date().toISOString()}};
+window.SVR_PHASE414_HUMAN_TURN_QA=()=>{const g=game(),user=g?.players?.[USER],last=lastStreetAction(g);return{...runtime,activePlayer:actor(g?.activePlayer),expectedActor:actor(g?.expectedActor),userActive:user?.active??null,userActed:user?.acted??null,userPending:userPending(g),userDue:userIsDue(g),lastActor:last?.index??null,nextEligibleAfterLast:last?nextEligibleAfter(g,last.index):null,visualOrder:[...VISUAL_ORDER],handoffGraceMs:HANDOFF_GRACE_MS,allMobileModes:true,android:true,iphone:true,practice:true,regular:true,tournament:true,phase415Authority:Boolean(window.SVR_PHASE415_HUMAN_CONTROL_QA),phase416Authority:Boolean(window.SVR_PHASE416_HUMAN_SEAT_QA),pass:Boolean(runtime.installed&&!runtime.lastError&&window.SVR_PHASE415_HUMAN_CONTROL_QA?.()?.pass&&window.SVR_PHASE416_HUMAN_SEAT_QA?.()?.pass),checkedAt:new Date().toISOString()}};
