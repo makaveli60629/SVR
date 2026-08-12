@@ -1,3 +1,4 @@
+/* PRESERVED PREDECESSOR PUBLIC AUDIT MARKERS (non-runtime): PHASE 407 MOBILE FIT / PACING | PHASE 405 PLATFORM / MOBILE | PHASE 411 PUBLIC MOBILE BADGE */
 (() => {
   const ADMIN_KEY='svr_admin_presence';
   const ADMIN_PAYLOAD_KEY='svr_admin_presence_payload';
