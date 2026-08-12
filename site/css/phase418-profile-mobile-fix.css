@@ -1,0 +1,25 @@
+/* PHASE-418-PROFILE-MOBILE-VISIBILITY-LOCK */
+body.phase418-profile-polish #matrix-bg{position:fixed!important;inset:0!important;z-index:0!important;opacity:.28!important;pointer-events:none!important}
+body.phase418-profile-polish .phase389-page{position:relative!important;z-index:2!important;min-height:100dvh!important}
+body.phase418-profile-polish .phase389-nav{min-height:54px!important;padding:max(6px,env(safe-area-inset-top)) 10px 6px!important}
+body.phase418-profile-polish .phase389-shell{padding:8px!important}
+body.phase418-profile-polish .phase389-grid{gap:8px!important}
+body.phase418-profile-polish .phase389-view-head{padding:8px 10px!important}
+body.phase418-profile-polish .phase389-view-head strong{font-size:15px!important}
+body.phase418-profile-polish .phase389-stage{height:min(46dvh,430px)!important;min-height:290px!important;background:radial-gradient(circle at 50% 42%,rgba(127,252,255,.15),rgba(0,0,0,0) 58%)!important}
+body.phase418-profile-polish .phase389-sidebar{padding:10px!important;max-height:none!important}
+body.phase418-profile-polish .phase389-sidebar h1{font-size:clamp(20px,5vw,30px)!important;margin:2px 0 3px!important}
+body.phase418-profile-polish .phase389-sidebar>p{font-size:12px!important;line-height:1.25!important;margin:0 0 7px!important}
+body.phase418-profile-polish .phase389-presets{margin:6px 0!important}
+body.phase418-profile-polish .phase389-category{margin-top:7px!important}
+body.phase418-profile-polish .phase389-save{margin-top:8px!important;padding:9px!important}
+body.phase418-profile-polish .phase389-stats{gap:5px!important;margin-top:8px!important}
+body.phase418-profile-polish .phase389-stat{padding:8px!important}
+body.phase418-profile-polish .phase389-stat strong{font-size:14px!important}
+body.phase418-profile-polish .phase418-profile-priority{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border:1px solid rgba(141,255,180,.35);border-radius:14px;background:rgba(3,14,20,.92);padding:8px 10px;margin-bottom:8px}
+body.phase418-profile-polish .phase418-profile-priority strong{font:900 12px Orbitron;color:#8dffb4}
+body.phase418-profile-polish .phase418-profile-priority span{font-size:11px;color:#d7e9f0}
+body.phase418-profile-polish .phase418-profile-priority a{display:inline-flex;min-height:34px;align-items:center;padding:5px 9px;border:1px solid #ffd98a;border-radius:10px;color:#ffd98a;text-decoration:none;font-weight:900;font-size:10px}
+@media(max-width:1000px){body.phase418-profile-polish .phase389-grid{grid-template-columns:1fr!important}body.phase418-profile-polish .phase389-sidebar{order:-1!important}body.phase418-profile-polish .phase389-stage{height:min(42dvh,390px)!important;min-height:260px!important}}
+@media(max-width:640px){body.phase418-profile-polish .phase389-nav{position:relative!important}body.phase418-profile-polish .phase389-links{max-width:68%!important;gap:3px!important}body.phase418-profile-polish .phase389-links a{padding:5px 6px!important;font-size:9px!important}body.phase418-profile-polish .phase389-brand img{width:34px!important;height:34px!important}body.phase418-profile-polish .phase389-stage{height:min(38dvh,330px)!important;min-height:230px!important}body.phase418-profile-polish .phase389-camera-tools{padding:5px!important;gap:4px!important}body.phase418-profile-polish .phase389-camera-tools .phase389-btn,body.phase418-profile-polish .phase389-camera-tools .phase389-toggle{min-height:34px!important;font-size:9px!important;padding:5px!important}body.phase418-profile-polish .phase389-options{grid-template-columns:repeat(2,minmax(0,1fr))!important}body.phase418-profile-polish .avatar-option{padding:7px!important}body.phase418-profile-polish .phase389-profile-grid{margin-top:8px!important}}
+@media(max-height:700px) and (orientation:landscape){body.phase418-profile-polish .phase389-grid{grid-template-columns:minmax(0,1.3fr) minmax(270px,.7fr)!important}body.phase418-profile-polish .phase389-sidebar{order:initial!important;max-height:calc(100dvh - 62px)!important;overflow:auto!important}body.phase418-profile-polish .phase389-stage{height:calc(100dvh - 70px)!important;min-height:260px!important}}
