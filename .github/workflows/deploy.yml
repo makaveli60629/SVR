@@ -65,7 +65,7 @@ jobs:
           grep -q '"accountApiEndpointConfigured": false' source/site/config/player-api.json
           grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' source/game/modules/phase414_human_turn_rotation_authority.js
           grep -q 'PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK' source/game/modules/phase413_mobile_human_action_hard_lock.js
-          grep -q 'PHASE-410-MOBILE-HUMAN-INPUT-LOCK' source/game/modules/phase410_mobile_human_input.js
+          grep -q 'PHASE-410-MOBILE-HUMAN-INPUT-LOCK' source/game/modules/phase410_mobile_human_input_lock.js
           grep -q 'PHASE-409-MOBILE-PLAYER-TURN-GUARD-LOCK' source/game/modules/phase409_mobile_player_turn_guard.js
           grep -q 'DARIUS_TO_USER_ORDER' source/game/modules/phase409_mobile_player_turn_guard.js
           grep -q 'PHASE-408-HOLDEM-STREET-CALL-TRUTH-LOCK' source/game/modules/phase408_holdem_street_call_truth.js
@@ -86,6 +86,7 @@ jobs:
           node --check source/site/js/phase418-profile-eric-authority.js
           node --check source/game/modules/phase414_human_turn_rotation_authority.js
           node --check source/game/modules/phase413_mobile_human_action_hard_lock.js
+          node --check source/game/modules/phase410_mobile_human_input_lock.js
           node --check source/game/modules/phase409_mobile_player_turn_guard.js
           node --check source/game/modules/phase408_holdem_street_call_truth.js
           node --check source/game/modules/phase403_android_gameplay.js
