@@ -1,0 +1,68 @@
+name: Phase 417 Android Viewport Media Fit Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase417-android-media-fit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Validate responsive media guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/styles/phase417_android_viewport_media_fit.css
+          grep -q 'PHASE-417-ANDROID-VIEWPORT-MEDIA-FIT-LOCK' game/styles/phase417_android_viewport_media_fit.css
+          grep -q 'max-inline-size:100%' game/styles/phase417_android_viewport_media_fit.css
+          grep -q 'object-fit:contain' game/styles/phase417_android_viewport_media_fit.css
+          grep -q 'object-fit:cover' game/styles/phase417_android_viewport_media_fit.css
+          grep -q 'max-height:var(--svr417-media-max-h)' game/styles/phase417_android_viewport_media_fit.css
+          grep -q '@media(max-width:620px)' game/styles/phase417_android_viewport_media_fit.css
+          grep -q '@media(orientation:landscape) and (max-height:620px)' game/styles/phase417_android_viewport_media_fit.css
+
+      - name: Validate mobile-only loader and device alignment
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "MEDIA_FIT_BUILD='PHASE-417-ANDROID-VIEWPORT-MEDIA-FIT-LOCK'" platform-device.js
+          grep -q "if(!mobile||questUa||!location.pathname.startsWith('/game/'))return false" platform-device.js
+          grep -q 'phase417_android_viewport_media_fit.css?v=phase417' platform-device.js
+          grep -q 'mediaFitLoaded' platform-device.js
+          node --check platform-device.js
+
+      - name: Preserve Phase 414 poker and Quest locks
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' game/modules/phase414_human_turn_rotation_authority.js
+          grep -q 'PHASE-416-HUMAN-SEAT-NEVER-SKIP-LOCK' game/modules/phase416_human_seat_never_skip.js
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          git fetch origin main --depth=1
+          test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase414_human_turn_rotation_authority.js game/modules/phase415_mobile_human_control_authority.js game/modules/phase416_human_seat_never_skip.js game/quest.html)"
+
+      - name: Preserve APK policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
