@@ -9,18 +9,21 @@ import { getPool, sql } from './db.js';
 const app = express();
 const port = Number(process.env.PORT || 8080);
 const allowed = String(process.env.ALLOWED_ORIGIN || '').split(',').map(s=>s.trim()).filter(Boolean);
-app.use(cors({ origin: (origin, cb) => !origin || allowed.length === 0 || allowed.includes(origin) ? cb(null,true) : cb(new Error('CORS blocked')) }));
+const adminJwtSecret = String(process.env.ADMIN_JWT_SECRET || '').trim();
+if (!adminJwtSecret) throw new Error('ADMIN_JWT_SECRET is required; refusing insecure startup');
+if (!allowed.length) throw new Error('ALLOWED_ORIGIN is required; refusing open CORS startup');
+app.use(cors({ origin: (origin, cb) => !origin || allowed.includes(origin) ? cb(null,true) : cb(new Error('CORS blocked')) }));
 app.use(express.json({ limit: '1mb' }));
 
-function tokenFor(admin){ return jwt.sign({ sub: admin.Email, role: 'owner' }, process.env.ADMIN_JWT_SECRET || 'dev-secret', { expiresIn: '8h' }); }
+function tokenFor(admin){ return jwt.sign({ sub: admin.Email, role: 'owner' }, adminJwtSecret, { expiresIn: '8h' }); }
 function auth(req,res,next){
   const raw = req.headers.authorization || '';
   const token = raw.startsWith('Bearer ') ? raw.slice(7) : '';
-  try{ req.user = jwt.verify(token, process.env.ADMIN_JWT_SECRET || 'dev-secret'); next(); }catch(_){ res.status(401).json({ ok:false, error:'Unauthorized' }); }
+  try{ req.user = jwt.verify(token, adminJwtSecret); next(); }catch(_){ res.status(401).json({ ok:false, error:'Unauthorized' }); }
 }
 
 app.get('/api/health', async (_req,res)=>{
-  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-174-ENTERPRISE-AUTO-FINISH-LOCK' }); }
+  try { await getPool(); res.json({ status:'ok', database:'connected', build:'PHASE-422-LEGACY-ENTERPRISE-SECURITY-HARDENING-LOCK' }); }
   catch(err){ res.status(500).json({ status:'error', database:'failed', message:err.message }); }
 });
 
@@ -76,10 +79,10 @@ app.get('/api/store/products', async (_req,res)=>{
   res.json({ ok:true, checkoutEnabled: process.env.STORE_CHECKOUT_ENABLED === 'true', products: result.recordset });
 });
 
-app.post('/api/stripe/create-checkout-session', async (req,res)=>{
+app.post('/api/stripe/create-checkout-session', async (_req,res)=>{
   if (process.env.STORE_CHECKOUT_ENABLED !== 'true') return res.status(403).json({ ok:false, error:'Checkout disabled' });
   if (!process.env.STRIPE_SECRET_KEY) return res.status(500).json({ ok:false, error:'Stripe key missing' });
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  new Stripe(process.env.STRIPE_SECRET_KEY);
   res.status(501).json({ ok:false, error:'Stripe product mapping pending approval' });
 });
 
@@ -93,4 +96,4 @@ app.post('/api/game/hand-results', async (req,res)=>{
   }catch(err){ res.status(500).json({ ok:false, error:err.message }); }
 });
 
-app.listen(port, () => console.log(`SVR Enterprise API running on port ${port}`));
+app.listen(port, () => console.log(`SVR Enterprise API Phase 422 running on port ${port}`));
