@@ -1,6 +1,6 @@
 /* PHASE-419-MOBILE-TABLE-FLOW-POLISH-LOCK */
 const BUILD='PHASE-419-MOBILE-TABLE-FLOW-POLISH-LOCK';
-const state={build:BUILD,installed:false,railMoved:false,oldTableOverlapRemoved:false,lastError:null,checkedAt:null};
+const state={build:BUILD,installed:false,railMoved:false,oldTableOverlapRemoved:false,observerActive:false,lastError:null,checkedAt:null};
 const $=s=>document.querySelector(s);
 function install(){
   const rail=$('#phase403FlowRail'),raise=$('#raisePanel');
@@ -22,5 +22,9 @@ function install(){
 }
 function poll(){try{install();state.lastError=null}catch(error){state.lastError=String(error?.message||error);state.checkedAt=new Date().toISOString()}}
 function qa(){poll();const rail=$('#phase403FlowRail'),host=$('#phase419TableFlowHost');return{...state,hostParent:host?.parentElement?.id||host?.parentElement?.className||null,railParent:rail?.parentElement?.className||rail?.parentElement?.id||null,insideTable:Boolean(rail?.closest('.table-wrap,.table-surface,.players')),pokerStateMutated:false,pass:Boolean(state.installed&&!state.lastError&&state.railMoved&&state.oldTableOverlapRemoved),checkedAt:new Date().toISOString()}}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{poll();setInterval(poll,220)},{once:true});else{poll();setInterval(poll,220)}
+let settleTimer=0;
+function schedule(){clearTimeout(settleTimer);settleTimer=setTimeout(poll,50)}
+function boot(){poll();if('MutationObserver'in window){const observer=new MutationObserver(()=>{const rail=$('#phase403FlowRail'),host=$('#phase419TableFlowHost');if(!state.installed||!rail||!host||!rail.closest('#phase419TableFlowHost'))schedule()});observer.observe(document.body,{childList:true,subtree:true});state.observerActive=true}window.addEventListener('pageshow',schedule,{passive:true});setTimeout(poll,700);setTimeout(poll,2200)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 window.SVR_PHASE419_MOBILE_TABLE_FLOW_QA=qa;
+queueMicrotask(()=>import('./phase420_mobile_release_lock.js?v=phase420').catch(error=>{window.SVR_PHASE420_MOBILE_RELEASE_IMPORT_ERROR=String(error?.message||error)}));
