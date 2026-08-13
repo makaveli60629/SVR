@@ -35,15 +35,19 @@ jobs:
           grep -q 'PHASE-421-VR-TABLE-FINAL-POLISH-LOCK' game/modules/phase421_vr_table_final_polish.js
           grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
 
-      - name: Validate active backend fail-safe health behavior
+      - name: Validate active zero-dependency backend health behavior
         shell: bash
         run: |
           set -euo pipefail
           node --check backend/server.js
           grep -q 'PHASE-422-PRODUCTION-BACKEND-HEALTH-HARDENING-LOCK' backend/server.js
-          grep -q "app.disable('x-powered-by')" backend/server.js
-          grep -q "Cache-Control','no-store'" backend/server.js
-          grep -q "X-Content-Type-Options','nosniff'" backend/server.js
+          grep -q "require('http')" backend/server.js
+          grep -q "require('crypto')" backend/server.js
+          ! grep -q "require('express')" backend/server.js
+          ! grep -q "require('cors')" backend/server.js
+          ! grep -q "require('dotenv')" backend/server.js
+          grep -q "'Cache-Control':'no-store'" backend/server.js
+          grep -q "'X-Content-Type-Options':'nosniff'" backend/server.js
           grep -q 'ALLOWED_ORIGINS' backend/server.js
           grep -q 'databaseVerified:false' backend/server.js
           grep -q 'accountApiConfigured' backend/server.js
