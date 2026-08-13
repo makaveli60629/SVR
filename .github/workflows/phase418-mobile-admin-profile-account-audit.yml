@@ -41,16 +41,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-418-MOBILE-ADMIN-PROFILE-ACCOUNT-POLISH-LOCK' game/android.html
+          grep -Eq 'PHASE-(418-MOBILE-ADMIN-PROFILE-ACCOUNT-POLISH-LOCK|420-MOBILE-RELEASE-TRUTH-LOCK)' game/android.html
           grep -q 'phase418_mobile_surface_polish.css?v=phase418' game/android.html
           grep -q 'phase418_mobile_surface_polish.js?v=phase418' game/android.html
-          grep -q 'ANDROID • PHASE 418' game/android.html
+          grep -Eq 'ANDROID • PHASE (418|420)' game/android.html
           grep -q 'SIGN IN' game/modules/phase418_mobile_surface_polish.js
           grep -q 'CREATE ACCOUNT' game/modules/phase418_mobile_surface_polish.js
           grep -q 'phase418-one-screen' game/modules/phase418_mobile_surface_polish.js
           grep -q 'body.phase418-one-screen' game/styles/phase418_mobile_surface_polish.css
-          grep -q 'IPHONE • PHASE 418 TEST' game/iphone.html
-          grep -q 'v=phase418' game/iphone.html
+          grep -Eq 'IPHONE • PHASE (418 TEST|420)' game/iphone.html
+          grep -Eq 'v=phase(418|420)' game/iphone.html
 
       - name: Validate table flow mic bankroll and burn truth
         shell: bash
@@ -79,11 +79,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-418-MOBILE-WRAPPER-DIRECT-RECOVERY-LOCK' game/android-tabletop.html
+          grep -Eq 'PHASE-(418-MOBILE-WRAPPER-DIRECT-RECOVERY-LOCK|420-MOBILE-WRAPPER-RELEASE-LOCK)' game/android-tabletop.html
           grep -q 'state.coreReady' game/android-tabletop.html
           grep -q 'location.replace(direct.href)' game/android-tabletop.html
           grep -q 'no manual Open Direct step required' game/android-tabletop.html
-          grep -q 'PHASE-418-IPHONE-WRAPPER-DIRECT-RECOVERY-LOCK' game/iphone-tabletop.html
+          grep -Eq 'PHASE-(418-IPHONE-WRAPPER-DIRECT-RECOVERY-LOCK|420-IPHONE-WRAPPER-RELEASE-LOCK)' game/iphone-tabletop.html
           grep -q 'location.replace(direct.href)' game/iphone-tabletop.html
 
       - name: Validate profile immediate visibility and Eric authority

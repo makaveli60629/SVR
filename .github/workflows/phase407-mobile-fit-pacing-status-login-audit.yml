@@ -32,7 +32,7 @@ jobs:
           test -z "$(git diff origin/main -- game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
           grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
           grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
-      - name: Validate shared Android and iPhone Phase 407 shell
+      - name: Validate shared Android and iPhone Phase 407 authority under current routes
         shell: bash
         run: |
           set -euo pipefail
@@ -42,19 +42,22 @@ jobs:
           grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android-stable-phase405.html
           grep -q 'phase407_mobile_bot_pacing_preload.js?v=phase407' game/android-stable-phase405.html
           grep -q 'phase407_mobile_fit_login.css?v=phase407' game/android-stable-phase405.html
-          grep -q 'phase407_mobile_fit_login.js?v=phase407' game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.js?v=phase414' game/android-stable-phase405.html
           grep -q 'phase345_player_account_activity_bridge.js?v=phase407' game/android-stable-phase405.html
           python3 - <<'PY'
           from pathlib import Path
           s=Path('game/android-stable-phase405.html').read_text()
           if s.count('class="burn-zone"') != 1: raise SystemExit('stable shell must contain exactly one base burn-zone')
-          if s.index('phase407_mobile_bot_pacing_preload.js?v=phase407') >= s.index('phase403_android_gameplay.js?v=phase403'): raise SystemExit('pacing preload must load before poker engine')
-          if s.index('phase407_mobile_fit_login.js?v=phase407') <= s.index('phase406_mobile_ultimate_gameplay.js?v=phase406'): raise SystemExit('Phase407 layout lock must load after Phase406 presentation')
+          marker='<script type="module" src="./modules/phase407_mobile_bot_pacing_preload.js'
+          runtime=s[s.index(marker):]
+          if runtime.index('phase407_mobile_bot_pacing_preload.js?v=phase407') >= runtime.index('phase403_android_gameplay.js?v=phase403'): raise SystemExit('pacing preload must load before poker engine')
+          if runtime.index('phase407_mobile_fit_login.js?v=phase414') <= runtime.index('phase406_mobile_ultimate_gameplay.js?v=phase406'): raise SystemExit('Phase407 layout lock must load after Phase406 presentation')
+          print('Phase407 runtime order passed using active script block.')
           PY
-          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android.html
-          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android-tabletop.html
-          grep -q 'PHASE-407-IPHONE-MOBILE-FIT-PACING-LOCK' game/iphone.html
-          grep -q 'PHASE-407-IPHONE-MOBILE-FIT-PACING-LOCK' game/iphone-tabletop.html
+          grep -Eq 'PHASE-(407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK|420-MOBILE-RELEASE-TRUTH-LOCK)' game/android.html
+          grep -Eq 'PHASE-(407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK|420-MOBILE-WRAPPER-RELEASE-LOCK)' game/android-tabletop.html
+          grep -Eq 'PHASE-(407-IPHONE-MOBILE-FIT-PACING-LOCK|420-MOBILE-RELEASE-TRUTH-LOCK)' game/iphone.html
+          grep -Eq 'PHASE-(407-IPHONE-MOBILE-FIT-PACING-LOCK|420-IPHONE-WRAPPER-RELEASE-LOCK)' game/iphone-tabletop.html
       - name: Validate stable burn beside BOARD and mobile fit
         shell: bash
         run: |
@@ -82,7 +85,7 @@ jobs:
           grep -q 'setTimeout(()=>botDecision(target),820+Math.random()\*980)' game/modules/phase403_android_gameplay.js
           node --check game/modules/phase407_mobile_bot_pacing_preload.js
           node --check game/modules/phase407_mobile_fit_login.js
-      - name: Validate VOX account readiness and guest truth
+      - name: Validate VOX account readiness and truthful local fallback
         shell: bash
         run: |
           set -euo pipefail
@@ -92,10 +95,11 @@ jobs:
           grep -q 'NO LIVE PEER' game/modules/phase405_vox_voice.js
           grep -q 'SVR_PHASE345_ACCOUNT_QA' game/modules/phase345_player_account_activity_bridge.js
           grep -q '/site/login.html' game/modules/phase407_mobile_fit_login.js
-          grep -q 'SIGN IN • GUEST TEST' game/modules/phase407_mobile_fit_login.js
+          grep -q 'SIGN IN • LOCAL TEST' game/modules/phase407_mobile_fit_login.js
           grep -q 'loginRequiredForProduction:true' game/modules/phase407_mobile_fit_login.js
           grep -q '"apiBase": ""' site/config/player-api.json
           grep -q '"allowDemoFallback": true' site/config/player-api.json
+          grep -q '"deploymentState": "cloud-endpoint-pending"' site/config/player-api.json
       - name: Validate public under-construction and truthful health status
         shell: bash
         run: |

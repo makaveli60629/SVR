@@ -65,7 +65,7 @@ jobs:
           console.log('Phase 409 Darius-to-user guard scenarios passed.');
           NODE
 
-      - name: Validate compact mobile player boxes
+      - name: Validate compact mobile player boxes under current release
         shell: bash
         run: |
           set -euo pipefail
@@ -75,8 +75,8 @@ jobs:
           grep -q '@media(orientation:landscape)' game/styles/phase409_mobile_player_box_fit.css
           grep -q 'phase409_mobile_player_box_fit.css?v=phase409' game/android-stable-phase405.html
           grep -q 'phase409_mobile_player_turn_guard.js?v=phase409' game/android-stable-phase405.html
-          grep -q 'ANDROID • PHASE 409' game/android.html
-          grep -q 'IPHONE • PHASE 409' game/iphone.html
+          grep -q 'ANDROID • PHASE 420' game/android.html
+          grep -q 'IPHONE • PHASE 420' game/iphone.html
 
       - name: Preserve protected poker Quest and APK
         shell: bash
@@ -95,13 +95,13 @@ jobs:
           grep -q '"showUpdatePrompt": false' game/android-release.json
           grep -q '"nativeApkRebuild": false' game/android-release.json
 
-      - name: Validate wrappers and syntax
+      - name: Validate current wrappers retain Phase 409 guard and syntax
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android-tabletop.html
+          grep -q 'PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK' game/android-tabletop.html
           grep -q 'SVR_PHASE409_PLAYER_TURN_QA' game/android-tabletop.html
-          grep -q 'PHASE-409-IPHONE-PLAYER-TURN-FIT-LOCK' game/iphone-tabletop.html
+          grep -q 'PHASE-420-IPHONE-WRAPPER-RELEASE-LOCK' game/iphone-tabletop.html
           grep -q 'SVR_PHASE409_PLAYER_TURN_QA' game/iphone-tabletop.html
           node --check game/modules/phase407_mobile_fit_login.js
           node --check game/modules/phase408_holdem_street_call_truth.js

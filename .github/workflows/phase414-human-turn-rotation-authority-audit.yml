@@ -66,7 +66,7 @@ jobs:
           console.log('Phase 414 actor-cycle human-turn scenarios passed.');
           NODE
 
-      - name: Validate shared Android iPhone and all mobile modes
+      - name: Validate Phase 414 authority survives current mobile routes
         shell: bash
         run: |
           set -euo pipefail
@@ -76,12 +76,12 @@ jobs:
           grep -q 'phase414Found' game/android-tabletop.html
           grep -q "mode==='tournament'" game/android-tabletop.html
           grep -q "mode==='practice'" game/android-tabletop.html
-          grep -q 'android-tabletop.html?v=phase414&mode=practice' game/android.html
-          grep -q 'android-tabletop.html?v=phase414&mode=regular' game/android.html
+          grep -q 'android-tabletop.html?v=phase420&mode=practice' game/android.html
+          grep -q 'android-tabletop.html?v=phase420&mode=regular' game/android.html
           grep -q 'SVR_PHASE414_HUMAN_TURN_QA' game/iphone-tabletop.html
           grep -q 'phase414Found' game/iphone-tabletop.html
-          grep -q 'android-stable-phase405.html?v=phase414' game/iphone-tabletop.html
-          grep -q 'iphone-tabletop.html?v=phase414' game/iphone.html
+          grep -q 'android-stable-phase405.html?v=phase420' game/iphone-tabletop.html
+          grep -q 'iphone-tabletop.html?v=phase420' game/iphone.html
           grep -q 'android-tabletop.html?v=phase414&mode=tournament' game/modules/phase412_tournament_account_gate.js
           grep -q 'phase414HumanTurnRoute:true' game/modules/phase412_tournament_account_gate.js
           grep -q 'PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK' game/modules/phase413_mobile_human_action_hard_lock.js

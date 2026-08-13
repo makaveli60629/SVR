@@ -31,7 +31,7 @@ jobs:
           grep -q 'apple-touch-icon' index.html
           grep -q 'platformIosDetection' update/app-version.json
           grep -q 'IPHONE GAME • NOT VR • TEST READY' site-public-hooks.js
-      - name: Validate Phase 407 iPhone entry and wrapper preserve Phase 400
+      - name: Validate current iPhone entry and wrapper preserve Phase 400
         shell: bash
         run: |
           set -euo pipefail
@@ -39,7 +39,7 @@ jobs:
           test -s game/iphone-tabletop.html
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone.html
           grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/iphone-tabletop.html
-          grep -q 'PHASE-407-IPHONE-MOBILE-FIT-PACING-LOCK' game/iphone.html
+          grep -Eq 'PHASE-(407-IPHONE-MOBILE-FIT-PACING-LOCK|420-MOBILE-RELEASE-TRUTH-LOCK)' game/iphone.html
           grep -q 'viewport-fit=cover' game/iphone.html
           grep -q 'apple-mobile-web-app-capable' game/iphone.html
           grep -q 'platform=ios&safari=1' game/iphone.html
@@ -50,6 +50,7 @@ jobs:
           grep -q 'SVR_PHASE405_IPHONE_WRAPPER_QA' game/iphone-tabletop.html
           grep -q 'SVR_PHASE400_IPHONE_WRAPPER_QA' game/iphone-tabletop.html
           grep -q 'android-stable-phase405.html' game/iphone-tabletop.html
+          grep -q 'PHASE-420-IPHONE-WRAPPER-RELEASE-LOCK' game/iphone-tabletop.html
       - name: Validate Safari runtime and safe-area CSS
         shell: bash
         run: |

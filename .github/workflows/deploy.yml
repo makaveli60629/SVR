@@ -34,7 +34,7 @@ jobs:
           set -euo pipefail
           git -C source fetch origin main --depth=1
           test "$(git -C source rev-parse HEAD)" = "$(git -C source rev-parse origin/main)"
-      - name: Validate Phase 419 and protected authorities
+      - name: Validate Phase 420 mobile, Phase 421 VR table and protected authorities
         shell: bash
         run: |
           set -euo pipefail
@@ -42,7 +42,9 @@ jobs:
           test -s source/phase409-public-status.js
           test -s source/site-public-hooks.js
           test -s source/game/android.html
+          test -s source/game/iphone.html
           test -s source/game/android-tabletop.html
+          test -s source/game/iphone-tabletop.html
           test -s source/game/android-stable-phase405.html
           test -s source/game/modules/phase418_mobile_surface_polish.js
           test -s source/game/styles/phase418_mobile_surface_polish.css
@@ -50,6 +52,9 @@ jobs:
           test -s source/game/styles/phase419_mobile_table_flow_polish.css
           test -s source/game/modules/phase419_tournament_registration_notify.js
           test -s source/game/styles/phase419_tournament_registration_notify.css
+          test -s source/game/modules/phase420_mobile_release_lock.js
+          test -s source/game/modules/phase420_tournament_start_authority.js
+          test -s source/game/modules/phase421_vr_table_final_polish.js
           test -s source/game/tournament-signup.html
           test -s source/game/config/tournament-api.json
           test -s source/site/profile.html
@@ -62,8 +67,16 @@ jobs:
           grep -q 'PHASE-419-TOURNAMENT-REGISTRATION-NOTIFICATION-LOCK' source/game/tournament-signup.html
           grep -q 'phase419_mobile_table_flow_polish.js?v=phase419' source/game/android-stable-phase405.html
           grep -q 'phase419_tournament_registration_notify.js?v=phase419' source/game/tournaments.html
-          grep -q 'PHASE-418-MOBILE-ADMIN-PROFILE-ACCOUNT-POLISH-LOCK' source/game/android.html
-          grep -q 'PHASE-418-MOBILE-WRAPPER-DIRECT-RECOVERY-LOCK' source/game/android-tabletop.html
+          grep -q 'PHASE-420-MOBILE-RELEASE-TRUTH-LOCK' source/game/android.html
+          grep -q 'PHASE-420-MOBILE-RELEASE-TRUTH-LOCK' source/game/iphone.html
+          grep -q 'PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK' source/game/android-tabletop.html
+          grep -q 'PHASE-420-IPHONE-WRAPPER-RELEASE-LOCK' source/game/iphone-tabletop.html
+          grep -q 'PHASE-420-TOURNAMENT-START-AUTHORITY-LOCK' source/game/tournaments.html
+          grep -q 'phase420_tournament_start_authority.js?v=phase420' source/game/tournaments.html
+          grep -q 'phase420_mobile_release_lock.js?v=phase420' source/game/modules/phase419_mobile_table_flow_polish.js
+          grep -q 'PHASE-421-VR-TABLE-FINAL-POLISH-LOCK' source/game/modules/phase421_vr_table_final_polish.js
+          grep -q 'phase421_vr_table_final_polish.js?v=phase421' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'TARGET_RECESS_METERS=0.026' source/game/modules/phase421_vr_table_final_polish.js
           grep -q 'phase418_mobile_surface_polish.js?v=phase418' source/game/android-stable-phase405.html
           grep -q 'phase418_mobile_surface_polish.css?v=phase418' source/game/android-stable-phase405.html
           grep -q 'PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK' source/site/profile.html
@@ -88,13 +101,28 @@ jobs:
           grep -q 'scheduleEveryHours.*5' source/game/manifest.json
           grep -q '"androidSingleBurnPile": true' source/update/app-version.json
           grep -q '"androidProductionMatchServerConfigured": false' source/update/app-version.json
+          if grep -q 'setInterval(poll,220)' source/game/modules/phase419_mobile_table_flow_polish.js; then
+            echo 'Phase 419 table-flow continuous polling regression detected.' >&2
+            exit 1
+          fi
+          if grep -q 'setInterval(watchdog' source/game/modules/phase421_vr_table_final_polish.js; then
+            echo 'Phase 421 VR felt continuous watchdog regression detected.' >&2
+            exit 1
+          fi
           python3 - <<'PY'
-          import json
+          import json,re
           c=json.load(open('source/game/config/tournament-api.json'))
           assert c['apiBase']==''
           assert c['sharedRegistrationBackendLive'] is False
           assert c['backgroundPushLive'] is False
           assert c['scheduleEveryHours']==5
+          p=json.load(open('source/site/config/player-api.json'))
+          assert p['deploymentState']=='cloud-endpoint-pending'
+          assert p['accountApiEndpointConfigured'] is False
+          assert p['apiBase']==''
+          s=open('source/game/modules/phase421_vr_table_final_polish.js').read()
+          recess=float(re.search(r'TARGET_RECESS_METERS=([0-9.]+)',s).group(1))
+          assert 0.015 <= recess <= 0.04
           PY
           test "$(grep -o 'class="burn-zone"' source/game/android-stable-phase405.html | wc -l)" -eq 1
           node --check source/platform-device.js
@@ -103,6 +131,10 @@ jobs:
           node --check source/game/modules/phase418_mobile_surface_polish.js
           node --check source/game/modules/phase419_mobile_table_flow_polish.js
           node --check source/game/modules/phase419_tournament_registration_notify.js
+          node --check source/game/modules/phase420_mobile_release_lock.js
+          node --check source/game/modules/phase420_tournament_start_authority.js
+          node --check source/game/modules/phase421_vr_table_final_polish.js
+          node --check source/game/modules/phase406_quest_side_burn_chip_polish.js
           node --check source/site/js/phase418-profile-eric-authority.js
           node --check source/game/modules/phase414_human_turn_rotation_authority.js
           node --check source/game/modules/phase413_mobile_human_action_hard_lock.js
@@ -159,31 +191,33 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-419-TOURNAMENT-REGISTRATION-MOBILE-UX-LOCK",
-            "predecessorMobileBuild": "PHASE-418-MOBILE-ADMIN-PROFILE-ACCOUNT-POLISH-LOCK",
+            "build": "PHASE-420-MOBILE-RELEASE-PHASE-421-VR-TABLE-POLISH-LOCK",
+            "predecessorMobileBuild": "PHASE-419-TOURNAMENT-REGISTRATION-MOBILE-UX-LOCK",
             "publicStatusBuild": "PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK",
             "platformBuild": "PHASE-405-PLATFORM-DEVICE-ALIGNMENT-LOCK",
             "questBuild": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
-            "androidBuild": "PHASE-418-MOBILE-WRAPPER-DIRECT-RECOVERY-LOCK",
-            "androidSurfaceBuild": "PHASE-419-MOBILE-TABLE-FLOW-POLISH-LOCK",
+            "vrTableBuild": "PHASE-421-VR-TABLE-FINAL-POLISH-LOCK",
+            "androidBuild": "PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK",
+            "androidSurfaceBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
             "tournamentRegistrationBuild": "PHASE-419-TOURNAMENT-REGISTRATION-NOTIFICATION-LOCK",
+            "tournamentStartBuild": "PHASE-420-TOURNAMENT-START-AUTHORITY-LOCK",
             "androidHoldemBuild": "PHASE-408-HOLDEM-STREET-CALL-TRUTH-LOCK",
             "androidEngineBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
             "androidMobileSafetyBuild": "PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK",
-            "iosBuild": "PHASE-418-IPHONE-WRAPPER-DIRECT-RECOVERY-LOCK",
+            "iosBuild": "PHASE-420-IPHONE-WRAPPER-RELEASE-LOCK",
             "profileBuild": "PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK",
             "playerAccountBuild": "PHASE-418-PLAYER-ACCOUNT-API-READINESS-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "questRoute": "/game/quest.html?v=phase396",
-            "androidRoute": "/game/android.html?channel=stable&v=phase419",
-            "androidPracticeRoute": "/game/android-tabletop.html?v=phase419&mode=practice",
-            "androidRegularRoute": "/game/android-tabletop.html?v=phase419&mode=regular",
-            "androidTournamentRoute": "/game/android-tabletop.html?v=phase419&mode=tournament&tournament=reiki-first-50",
-            "androidGameplayRoute": "/game/android-stable-phase405.html?v=phase419&mode=regular&direct=1",
-            "tournamentSignupRoute": "/game/tournament-signup.html?v=phase419",
-            "iphoneRoute": "/game/iphone.html?v=phase419",
-            "iphoneGameplayRoute": "/game/android-stable-phase405.html?v=phase419&platform=ios&safari=1&direct=1",
+            "questRoute": "/game/quest.html?v=phase421",
+            "androidRoute": "/game/android.html?channel=stable&v=phase420",
+            "androidPracticeRoute": "/game/android-tabletop.html?v=phase420&mode=practice",
+            "androidRegularRoute": "/game/android-tabletop.html?v=phase420&mode=regular",
+            "androidTournamentRoute": "/game/tournaments.html?v=phase420",
+            "androidGameplayRoute": "/game/android-stable-phase405.html?v=phase420&mode=regular&direct=1",
+            "tournamentSignupRoute": "/game/tournament-signup.html?v=phase420",
+            "iphoneRoute": "/game/iphone.html?v=phase420",
+            "iphoneGameplayRoute": "/game/android-stable-phase405.html?v=phase420&platform=ios&safari=1&direct=1",
             "profileRoute": "/site/profile.html?v=phase418",
             "publicPageStructurePreserved": true,
             "publicAdminAiFallback": true,
@@ -194,6 +228,9 @@ jobs:
             "platformVisualViewportAlignment": true,
             "questTeleportEnabled": false,
             "questHardSeatedFrontTable": true,
+            "questFinalTableFeltShallowRecessMeters": 0.026,
+            "questFinalTableFeltMicroSurface": true,
+            "questFinalTableRailMaterialPolish": true,
             "androidVisualLeftToRightSeatOrder": [0,5,1,2,3,4],
             "androidDariusAdvancesToUser": true,
             "androidSidePotEngine": true,
@@ -206,9 +243,11 @@ jobs:
             "androidMicVoxQuickControl": true,
             "androidWrapperAutoDirectRecovery": true,
             "androidOneScreenChooser": true,
-            "androidLoginReady": true,
-            "androidRegistrationReady": true,
+            "androidLoginClientReady": true,
+            "androidProductionLoginBackendLive": false,
+            "androidRegistrationClientReady": true,
             "androidTournamentEveryHours": 5,
+            "androidTournamentCurrentSlotStartAuthority": true,
             "androidTournamentSignupPage": true,
             "androidTournamentHumanRosterTimestamps": true,
             "androidTournamentLocalRegistrationFallback": true,
@@ -240,13 +279,17 @@ jobs:
           set -euo pipefail
           test -s publish/phase409-public-status.js
           test -s publish/game/android-stable-phase405.html
+          test -s publish/game/modules/phase420_mobile_release_lock.js
+          test -s publish/game/modules/phase420_tournament_start_authority.js
+          test -s publish/game/modules/phase421_vr_table_final_polish.js
           test -s publish/game/modules/phase419_mobile_table_flow_polish.js
           test -s publish/game/modules/phase419_tournament_registration_notify.js
           test -s publish/game/tournament-signup.html
           test -s publish/site/profile.html
-          grep -q 'PHASE-419-TOURNAMENT-REGISTRATION-MOBILE-UX-LOCK' publish/deploy-health.json
-          grep -q '"androidFlowRailRemovedFromOpponentLayer": true' publish/deploy-health.json
-          grep -q '"androidTournamentSignupPage": true' publish/deploy-health.json
+          grep -q 'PHASE-420-MOBILE-RELEASE-PHASE-421-VR-TABLE-POLISH-LOCK' publish/deploy-health.json
+          grep -q '"vrTableBuild": "PHASE-421-VR-TABLE-FINAL-POLISH-LOCK"' publish/deploy-health.json
+          grep -q '"androidTournamentCurrentSlotStartAuthority": true' publish/deploy-health.json
+          grep -q '"androidProductionLoginBackendLive": false' publish/deploy-health.json
           grep -q '"androidTournamentSharedRegistrationBackendLive": false' publish/deploy-health.json
           grep -q '"androidTournamentBackgroundPushLive": false' publish/deploy-health.json
           grep -q '"androidSingleBurnPile": true' publish/deploy-health.json
@@ -265,8 +308,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 419.'
+            echo 'Production already matches Phase 420 / 421.'
           else
-            git commit -m "Deploy Phase 419 tournament registration mobile UX ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 420 mobile + Phase 421 VR table ${GITHUB_SHA}"
             git push origin gh-pages
           fi

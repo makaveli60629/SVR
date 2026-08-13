@@ -23,7 +23,7 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Protect public cache poker Quest and APK baselines under Phase 414 route
+      - name: Protect public cache poker Quest and APK baselines under current route
         shell: bash
         run: |
           set -euo pipefail
@@ -32,8 +32,8 @@ jobs:
           test -z "$(git diff origin/main -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase398_android_raise_rules.js)"
           test -z "$(git diff origin/main -- game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js)"
           grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' game/android.html
-          grep -q 'android-tabletop.html?v=phase414&mode=practice' game/android.html
-          grep -q 'android-tabletop.html?v=phase414&mode=regular' game/android.html
+          grep -q 'android-tabletop.html?v=phase420&mode=practice' game/android.html
+          grep -q 'android-tabletop.html?v=phase420&mode=regular' game/android.html
           grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
           python3 -m json.tool game/android-release.json >/dev/null
@@ -43,7 +43,7 @@ jobs:
           grep -q '"showUpdatePrompt": false' game/android-release.json
           grep -q '"nativeApkRebuild": false' game/android-release.json
 
-      - name: Validate tournament account gate and Phase 414 target
+      - name: Validate tournament account gate and preserved Phase 414 target
         shell: bash
         run: |
           set -euo pipefail

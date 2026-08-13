@@ -28,23 +28,24 @@ jobs:
           set -euo pipefail
           grep -q '>PRACTICE<' game/android.html
           grep -q '>REGULAR<' game/android.html
-          grep -q 'REIKI TOURNAMENT' game/android.html
-          grep -q 'android-tabletop.html?v=phase407&mode=practice' game/android.html
-          grep -q 'android-tabletop.html?v=phase407&mode=regular' game/android.html
-          grep -q 'tournaments.html?v=phase407' game/android.html
+          grep -q '>TOURNAMENTS<' game/android.html
+          grep -q 'android-tabletop.html?v=phase420&mode=practice' game/android.html
+          grep -q 'android-tabletop.html?v=phase420&mode=regular' game/android.html
+          grep -q 'tournaments.html?v=phase420' game/android.html
           test -s game/tournaments.html
           test -s game/tournament-results.html
-          grep -q 'PHASE-406-TOURNAMENT-24H-RESULTS-BOARD-LOCK' game/tournaments.html
-          grep -q 'phase405_tournament_scheduler.js?v=phase406' game/tournaments.html
-          grep -q 'REIKI FIRST 50' game/tournaments.html
-          grep -q 'REGISTRATION CAP' game/tournaments.html
-          grep -q 'CURRENT TEST FIELD' game/tournaments.html
+          test -s game/modules/phase406_tournament_24h_board.js
+          grep -q 'PHASE-420-TOURNAMENT-START-AUTHORITY-LOCK' game/tournaments.html
+          grep -q 'phase405_tournament_scheduler.js?v=phase411' game/tournaments.html
+          grep -q 'REIKI OPEN 100' game/tournaments.html
+          grep -q '100 PLAYER LOCAL TEST FIELD' game/tournaments.html
+          grep -q 'STARTING TOURNAMENT CHIPS' game/tournaments.html
           grep -q '100,000' game/tournaments.html
           grep -q 'POKER HANDS CARD' game/tournaments.html
           grep -q 'Royal Flush' game/tournaments.html
           grep -q 'High Card' game/tournaments.html
-          grep -q 'android-tabletop.html?v=phase406&mode=tournament' game/tournaments.html
-          grep -q 'PHASE-406-TOURNAMENT-24H-RESULTS-BOARD-LOCK' game/tournament-results.html
+          grep -q 'phase420_tournament_start_authority.js?v=phase420' game/tournaments.html
+          grep -q 'PHASE-406-TOURNAMENT-24H-RESULTS-BOARD-LOCK' game/modules/phase406_tournament_24h_board.js
           grep -q 'CHAMPION CROWN' game/tournament-results.html
           grep -q 'svr401_reiki_first50_results' game/tournament-results.html
       - name: Validate protected Phase 401 tournament director structure

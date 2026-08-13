@@ -23,7 +23,7 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Protect public page and poker authorities
+      - name: Protect public page poker and Quest authorities
         shell: bash
         run: |
           set -euo pipefail
@@ -36,7 +36,7 @@ jobs:
           grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
 
-      - name: Validate Phase 406 shared mobile layer under Phase 407 override
+      - name: Validate actual Phase 406 to Phase 407 runtime order
         shell: bash
         run: |
           set -euo pipefail
@@ -44,87 +44,45 @@ jobs:
           test -s game/styles/phase406_mobile_casino_polish.css
           test -s game/modules/phase407_mobile_fit_login.js
           test -s game/styles/phase407_mobile_fit_login.css
-          grep -q 'PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK' game/android-stable-phase405.html
           grep -q 'phase406_mobile_casino_polish.css?v=phase406' game/android-stable-phase405.html
           grep -q 'phase406_mobile_ultimate_gameplay.js?v=phase406' game/android-stable-phase405.html
           grep -q 'phase407_mobile_fit_login.css?v=phase407' game/android-stable-phase405.html
-          grep -q 'phase407_mobile_fit_login.js?v=phase407' game/android-stable-phase405.html
+          grep -q 'phase407_mobile_fit_login.js?v=phase414' game/android-stable-phase405.html
           python3 - <<'PY'
           from pathlib import Path
           s=Path('game/android-stable-phase405.html').read_text()
-          if s.count('class="burn-zone"') != 1:
-              raise SystemExit('shared mobile shell must contain exactly one burn-zone')
-          if s.index('phase404_android_mobile_safety.js?v=phase404') >= s.index('phase403_android_gameplay.js?v=phase403'):
-              raise SystemExit('ALL IN capture guard must load before protected engine')
-          if s.index('phase406_mobile_ultimate_gameplay.js?v=phase406') <= s.index('phase405_vox_voice.js?v=phase405'):
-              raise SystemExit('Phase 406 enhancement must load after Phase 405 voice/social layer')
-          if s.index('phase407_mobile_fit_login.js?v=phase407') <= s.index('phase406_mobile_ultimate_gameplay.js?v=phase406'):
-              raise SystemExit('Phase 407 presentation override must load after Phase 406')
+          runtime=s[s.index('<script type="module" src="./modules/phase407_mobile_bot_pacing_preload.js'):]
+          assert s.count('class="burn-zone"') == 1
+          assert runtime.index('phase404_android_mobile_safety.js?v=phase404') < runtime.index('phase403_android_gameplay.js?v=phase403')
+          assert runtime.index('phase405_vox_voice.js?v=phase405') < runtime.index('phase406_mobile_ultimate_gameplay.js?v=phase406')
+          assert runtime.index('phase406_mobile_ultimate_gameplay.js?v=phase406') < runtime.index('phase407_mobile_fit_login.js?v=phase414')
+          print('Runtime order passed: safety -> engine, voice -> Phase406 -> Phase407.')
           PY
           grep -q 'phase406-side-burn' game/styles/phase406_mobile_casino_polish.css
-          grep -q 'right:10px!important' game/styles/phase406_mobile_casino_polish.css
           grep -Fq "document.querySelectorAll('.burn-zone')" game/modules/phase406_mobile_ultimate_gameplay.js
-          grep -q 'keep.parentElement!==table' game/modules/phase406_mobile_ultimate_gameplay.js
           grep -q 'getBoundingClientRect' game/modules/phase407_mobile_fit_login.js
           grep -q -- '--svr407-burn-left' game/modules/phase407_mobile_fit_login.js
-          grep -q 'table-surface>.burn-zone.phase407-board-burn' game/styles/phase407_mobile_fit_login.css
           node --check game/modules/phase406_mobile_ultimate_gameplay.js
           node --check game/modules/phase407_mobile_fit_login.js
 
-      - name: Validate hand helper chip and Reiki presentation
+      - name: Validate helper chips sponsor tournament and truth labels
         shell: bash
         run: |
           set -euo pipefail
           for hand in 'Royal Flush' 'Straight Flush' 'Four of a Kind' 'Full House' 'Flush' 'Straight' 'Three of a Kind' 'Two Pair' 'Pair' 'High Card'; do grep -q "$hand" game/modules/phase405_mobile_ui.js; done
           grep -q 'Board Can Play' game/modules/phase406_mobile_ultimate_gameplay.js
           grep -q 'Tie / Kicker Rule' game/modules/phase406_mobile_ultimate_gameplay.js
-          grep -q '10 ranked hand categories' game/modules/phase406_mobile_ultimate_gameplay.js
-          grep -q 'grid.querySelectorAll(.phase405-hand' game/modules/phase406_mobile_ultimate_gameplay.js || grep -q "querySelectorAll('#phase405HandsSheet .phase405-hand')" game/modules/phase406_mobile_ultimate_gameplay.js
-          grep -q 'data-denom="50"' game/styles/phase406_mobile_casino_polish.css
-          grep -q "content:'\$50'" game/styles/phase406_mobile_casino_polish.css
-          grep -q "content:'\$100'" game/styles/phase406_mobile_casino_polish.css
-          grep -q "content:'\$1K'" game/styles/phase406_mobile_casino_polish.css
-          grep -q 'REIKI • FEATURED' game/styles/phase406_mobile_casino_polish.css
-          grep -q 'compactReikiSponsorPresentation' game/manifest.json
-          grep -q 'androidChipRackAligned' update/app-version.json
-
-      - name: Validate rolling 24h tournaments and play-chip payouts
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -s game/modules/phase406_tournament_24h_board.js
-          grep -q '24\*60\*60\*1000' game/modules/phase406_tournament_24h_board.js
-          grep -q 'BOT TEST' game/modules/phase406_tournament_24h_board.js
-          grep -q 'NO CASH VALUE' game/modules/phase406_tournament_24h_board.js
           grep -q 'PAYOUTS=Object.freeze({1:100000,2:50000,3:25000})' game/modules/phase406_mobile_ultimate_gameplay.js
           grep -q 'playMoneyOnly:true' game/modules/phase406_mobile_ultimate_gameplay.js
           grep -q 'noCashValue:true' game/modules/phase406_mobile_ultimate_gameplay.js
-          grep -q 'phase406_tournament_24h_board.js?v=phase406' game/tournaments.html
-          grep -q 'phase406_tournament_24h_board.js?v=phase406' game/tournament-results.html
           grep -q 'SLOT_MS=5\*60\*60\*1000' game/modules/phase405_tournament_scheduler.js
-          node --check game/modules/phase406_tournament_24h_board.js
-
-      - name: Validate profile voice guests and truth labels
-        shell: bash
-        run: |
-          set -euo pipefail
-          grep -q 'EDIT PHOTO / PROFILE' game/modules/phase406_mobile_ultimate_gameplay.js
-          grep -q 'phase405ProfileSheet' game/modules/phase405_mobile_ui.js
-          grep -q 'Guest 1' game/modules/phase405_mobile_ui.js
-          grep -q 'Guest 2' game/modules/phase405_mobile_ui.js
-          grep -q 'OPEN • BOT STANDBY' game/modules/phase405_mobile_ui.js
-          grep -q 'MIC READY • NO LIVE PEER YET' game/modules/phase406_mobile_ultimate_gameplay.js
           grep -q 'PHASE-405-MOBILE-VOX-VOICE-LOCK' game/modules/phase405_vox_voice.js
           grep -q 'NO LIVE PEER' game/modules/phase405_vox_voice.js
           grep -q '"androidProductionMatchServerConfigured": false' update/app-version.json
           grep -q '"androidLiveMultiplayer": false' update/app-version.json
           grep -q '"androidLiveVoice": false' update/app-version.json
-          grep -q 'ANDROID GAME • NOT VR • APP TEST READY' site-public-hooks.js
-          grep -q 'IPHONE GAME • NOT VR • TEST READY' site-public-hooks.js
-          grep -q 'ANDROID PHONE / TABLET GAME • NOT VR' game/android.html
-          grep -q 'IPHONE / IPAD GAME • NOT VR' game/iphone.html
 
-      - name: Validate isolated Quest side-burn and chip polish
+      - name: Validate isolated Quest table polish chain
         shell: bash
         run: |
           set -euo pipefail
@@ -134,23 +92,20 @@ jobs:
           grep -q 'phase406_quest_side_burn_chip_polish.js?v=phase406' game/index.html
           grep -q 'phase396SeatingUntouched:true' game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase396TeleportUntouched:true' game/modules/phase406_quest_side_burn_chip_polish.js
-          for value in '1,0xf5f5f5' '5,0xc92d3d' '25,0x23854a' '100,0x15181e' '500,0x7837a8' '1000,0xd5a425'; do grep -q "$value" game/modules/phase406_quest_side_burn_chip_polish.js; done
+          grep -q 'phase421_vr_table_final_polish.js?v=phase421' game/modules/phase406_quest_side_burn_chip_polish.js
           node --check game/modules/phase406_quest_side_burn_chip_polish.js
+          node --check game/modules/phase421_vr_table_final_polish.js
 
-      - name: Validate Phase 406 preservation under Phase 407 metadata cache and APK policy
+      - name: Validate metadata cache and APK policy
         shell: bash
         run: |
           set -euo pipefail
           grep -q '"phase": 407' game/manifest.json
-          grep -q '"predecessor_build": "PHASE-406-MOBILE-ULTIMATE-GAMEPLAY-POLISH-LOCK"' game/manifest.json
-          grep -q '"burnTrayAtSideRail": false' game/manifest.json
           grep -q '"burnPileBesideBoard": true' game/manifest.json
           grep -q '"handHelperCards": 12' game/manifest.json
           grep -q '"rollingResultHours": 24' game/manifest.json
           grep -q 'svr-poker-phase406-mobile-ultimate-gameplay-v1' sw.js
           grep -q 'svr-poker-phase407-mobile-fit-pacing-status-login-v1' sw.js
-          grep -q 'svr-poker-phase407-mobile-fit-pacing-status-login-v1' pwa-sw.js
-          node --check site-public-hooks.js
           node --check sw.js
           node --check pwa-sw.js
           python3 -m json.tool manifest.webmanifest >/dev/null

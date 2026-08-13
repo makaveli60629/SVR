@@ -58,19 +58,18 @@ jobs:
           console.log('Phase 413 strict human decision scenarios passed.');
           NODE
 
-      - name: Validate Phase 413 under active Phase 414 mobile route
+      - name: Validate Phase 413 survives current Phase 420 route
         shell: bash
         run: |
           set -euo pipefail
           git fetch origin main --depth=1
           test -z "$(git diff origin/main -- game/modules/phase413_mobile_human_action_hard_lock.js)"
-          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android.html
-          grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' game/android-tabletop.html
+          grep -q 'PHASE-420-MOBILE-RELEASE-TRUTH-LOCK' game/android.html
+          grep -q 'PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK' game/android-tabletop.html
           grep -q 'phase413Found' game/android-tabletop.html
           grep -q 'SVR_PHASE413_HUMAN_ACTION_QA' game/android-tabletop.html
           grep -q 'phase414Found' game/android-tabletop.html
           grep -q 'SVR_PHASE414_HUMAN_TURN_QA' game/android-tabletop.html
-          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android-tabletop.html
           grep -q 'phase413_mobile_human_action_hard_lock.js?v=phase413' game/android-stable-phase405.html
           grep -q 'data-human-action-build="PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK"' game/android-stable-phase405.html
           grep -q 'data-human-turn-build="PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK"' game/android-stable-phase405.html
