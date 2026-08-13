@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, phase422-production-backend-security-hardening]
   workflow_dispatch:
 
 permissions:
@@ -49,6 +49,7 @@ jobs:
           grep -q 'accountApiConfigured' backend/server.js
           grep -q 'tournamentApiConfigured' backend/server.js
           grep -q 'Math.min(100' backend/server.js
+          grep -q 'X-Request-ID' backend/server.js
           ! grep -q 'dev-secret' backend/server.js
 
       - name: Validate enterprise admin backend fails closed
