@@ -16,25 +16,26 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v5
-      - name: Validate badge and device routes
+      - name: Validate locked public badge and device routes
         shell: bash
         run: |
           set -euo pipefail
-          grep -q "CACHE_EPOCH='phase411-tournament-bot-action-readability'" site-public-hooks.js
-          grep -q "CURRENT_PHASE='phase411'" site-public-hooks.js
-          grep -q "ANDROID_PHASE='phase411'" site-public-hooks.js
-          grep -q 'PHASE 411 MOBILE / TOURNAMENT TEST' site-public-hooks.js
-          grep -q 'game/iphone.html?v=phase411' site-public-hooks.js
-          grep -q 'game/android.html?channel=stable&v=phase411' site-public-hooks.js
-          grep -q 'ANDROID GAME • NOT VR • APP TEST READY' site-public-hooks.js
+          grep -q "CACHE_EPOCH='phase418-mobile-admin-profile-account-polish'" site-public-hooks.js
+          grep -q "CURRENT_PHASE='phase418'" site-public-hooks.js
+          grep -q "ANDROID_PHASE='phase418'" site-public-hooks.js
+          grep -q 'PHASE 418 MOBILE / PROFILE TEST' site-public-hooks.js
+          grep -q 'game/iphone.html?v=phase418' site-public-hooks.js
+          grep -q 'game/android.html?channel=stable&v=phase418' site-public-hooks.js
+          grep -q 'ANDROID GAME • NOT VR • TEST READY' site-public-hooks.js
           grep -q 'game/quest.html?v=phase396' site-public-hooks.js
+          grep -q 'PHASE 411 PUBLIC MOBILE BADGE' site-public-hooks.js
           node --check site-public-hooks.js
       - name: Protect public markup Quest and APK
         shell: bash
         run: |
           set -euo pipefail
           git fetch origin main --depth=1
-          test -z "$(git diff origin/main -- index.html game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js game/android-release.json)"
+          test -z "$(git diff origin/main -- index.html site-public-hooks.js game/quest.html game/modules/phase396_quest_seated_clean_table_deal_lock.js game/android-release.json)"
           grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
           grep -q '"apkVersionCode": 2' game/android-release.json
           grep -q '"forceUpdate": false' game/android-release.json
