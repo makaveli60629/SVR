@@ -50,6 +50,8 @@ If either is missing, that enterprise entrypoint refuses startup instead of sile
 - cloud account/tournament configs remain truthfully disabled until deployment;
 - RC2 APK force-update policy remains unchanged.
 
+The dedicated branch audit run `31704532221` completed successfully on 2026-08-13.
+
 ## Secret-pattern sweep
 
 Repository searches performed during this phase found:
@@ -73,9 +75,13 @@ If a real credential is ever exposed:
 5. If a deployment fails, roll back application code while keeping the rotated credential; never restore a compromised secret.
 6. For Android signing, preserve the original signing identity securely. Do not generate a replacement keystore and call it an upgrade-compatible release.
 
-## Remaining external production blockers
+## Remaining production blockers
 
-These items cannot be truthfully completed from repository access alone.
+### Backend package manifest / lockfile drift
+
+`backend/package.json` and `backend/package-lock.json` do not describe the same root dependency set. The Phase 422 JavaScript itself passes `node --check`, but a deterministic clean `npm ci` should not be claimed until the manifest and lockfile are regenerated together from pinned production dependencies.
+
+A direct package-manifest write was attempted during this phase and rejected by the connected GitHub safety gate, so the mismatch is recorded here instead of being hidden. Before backend deployment, regenerate the lockfile, run `npm ci`, then run the Phase 422 backend audit again.
 
 ### Player account API
 
@@ -85,7 +91,7 @@ The browser contract and Cognito/DynamoDB foundation exist, but `site/config/pla
 - `accountApiEndpointConfigured: false`;
 - `apiBase: ""`.
 
-A verified API Gateway/Lambda deployment is required before setting this config live.
+A verified API Gateway/Lambda deployment is required before setting this config live. No AWS deployment connector or repository secret/role visibility was available in the connected toolset during this phase.
 
 ### Shared tournament backend / background push
 
@@ -109,12 +115,8 @@ The repository audit still does not contain a verified native Android wrapper + 
 
 Repository and CI validation cannot substitute for actual Android, iPhone Safari, and Quest headset acceptance. Phase 421 table source is deployed, but final headset appearance must be visually inspected on Quest.
 
-## Phase 422 acceptance boundary
+## Promotion status
 
-Phase 422 may be merged when:
+The Phase 422 hardening branch is green under its dedicated audit. Normal pull-request creation was attempted multiple times and rejected by the connected GitHub safety classifier, so the branch has **not** been force-promoted to `main`. No direct-ref or review-bypass promotion was used.
 
-- its security workflow is green;
-- all predecessor Phase 420/421 poker/mobile/Quest regression workflows stay green;
-- no public-site or protected poker changes appear in the diff;
-- production deploy remains green;
-- published deploy health stays truthful about cloud services that are still not live.
+That means current production remains the already-green Phase 420 mobile / Phase 421 VR-table release until the Phase 422 branch can be promoted through an approved GitHub path.
