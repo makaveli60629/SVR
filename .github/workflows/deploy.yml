@@ -34,7 +34,7 @@ jobs:
           set -euo pipefail
           git -C source fetch origin main --depth=1
           test "$(git -C source rev-parse HEAD)" = "$(git -C source rev-parse origin/main)"
-      - name: Validate Phase 420 mobile, Phase 421 VR table and protected authorities
+      - name: Validate Phase 420 mobile, Phase 422 Quest table and protected authorities
         shell: bash
         run: |
           set -euo pipefail
@@ -55,6 +55,9 @@ jobs:
           test -s source/game/modules/phase420_mobile_release_lock.js
           test -s source/game/modules/phase420_tournament_start_authority.js
           test -s source/game/modules/phase421_vr_table_final_polish.js
+          test -s source/game/modules/phase422_quest_table_geometry_theme_lock.js
+          test -s source/game/modules/phase422_quest_seated_inspection_lock.js
+          test -s source/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
           test -s source/game/tournament-signup.html
           test -s source/game/config/tournament-api.json
           test -s source/site/profile.html
@@ -75,8 +78,23 @@ jobs:
           grep -q 'phase420_tournament_start_authority.js?v=phase420' source/game/tournaments.html
           grep -q 'phase420_mobile_release_lock.js?v=phase420' source/game/modules/phase419_mobile_table_flow_polish.js
           grep -q 'PHASE-421-VR-TABLE-FINAL-POLISH-LOCK' source/game/modules/phase421_vr_table_final_polish.js
-          grep -q 'phase421_vr_table_final_polish.js?v=phase421' source/game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -q 'TARGET_RECESS_METERS=0.026' source/game/modules/phase421_vr_table_final_polish.js
+          grep -Fq 'phase421_vr_table_final_polish.js?v=phase422' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'supersededByPhase422' source/game/modules/phase421_vr_table_final_polish.js
+          grep -q 'PHASE-422-QUEST-TABLE-GEOMETRY-THEME-LOCK' source/game/modules/phase422_quest_table_geometry_theme_lock.js
+          grep -q 'FELT_RECESS_METERS=.0254' source/game/modules/phase422_quest_table_geometry_theme_lock.js
+          grep -q 'PHASE422_TRUE_INNER_PLAYING_SURFACE' source/game/modules/phase422_quest_table_geometry_theme_lock.js
+          grep -q 'PASS / BET LINE' source/game/modules/phase422_quest_table_geometry_theme_lock.js
+          grep -q 'curvedLeatherRailPreserved:true' source/game/modules/phase422_quest_table_geometry_theme_lock.js
+          grep -q 'SEATED_RAIL_GAP=.045' source/game/modules/phase422_quest_seated_inspection_lock.js
+          grep -q 'SEATED_EYE_HEIGHT=1.18' source/game/modules/phase422_quest_seated_inspection_lock.js
+          grep -q 'SVR_HAND_TELEPORT_ENABLED' source/game/modules/phase422_quest_seated_inspection_lock.js
+          grep -q 'SVR_GRIP_TELEPORT_ENABLED' source/game/modules/phase422_quest_seated_inspection_lock.js
+          grep -q 'phase334Held' source/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
+          grep -q 'phase422_quest_table_geometry_theme_lock.js?v=phase422' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase422_quest_seated_inspection_lock.js?v=phase422' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase422_quest_table_prop_alignment_flex_lock.js?v=phase422' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422' source/game/index.html
+          grep -q 'data-quest-polish-build="PHASE-422-QUEST-TABLE-INSPECTION-LOCK"' source/game/index.html
           grep -q 'phase418_mobile_surface_polish.js?v=phase418' source/game/android-stable-phase405.html
           grep -q 'phase418_mobile_surface_polish.css?v=phase418' source/game/android-stable-phase405.html
           grep -q 'PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK' source/site/profile.html
@@ -120,9 +138,9 @@ jobs:
           assert p['deploymentState']=='cloud-endpoint-pending'
           assert p['accountApiEndpointConfigured'] is False
           assert p['apiBase']==''
-          s=open('source/game/modules/phase421_vr_table_final_polish.js').read()
-          recess=float(re.search(r'TARGET_RECESS_METERS=([0-9.]+)',s).group(1))
-          assert 0.015 <= recess <= 0.04
+          s=open('source/game/modules/phase422_quest_table_geometry_theme_lock.js').read()
+          recess=float(re.search(r'FELT_RECESS_METERS=([0-9.]+)',s).group(1))
+          assert abs(recess-0.0254) < 1e-9
           PY
           test "$(grep -o 'class="burn-zone"' source/game/android-stable-phase405.html | wc -l)" -eq 1
           node --check source/platform-device.js
@@ -134,6 +152,9 @@ jobs:
           node --check source/game/modules/phase420_mobile_release_lock.js
           node --check source/game/modules/phase420_tournament_start_authority.js
           node --check source/game/modules/phase421_vr_table_final_polish.js
+          node --check source/game/modules/phase422_quest_table_geometry_theme_lock.js
+          node --check source/game/modules/phase422_quest_seated_inspection_lock.js
+          node --check source/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
           node --check source/game/modules/phase406_quest_side_burn_chip_polish.js
           node --check source/site/js/phase418-profile-eric-authority.js
           node --check source/game/modules/phase414_human_turn_rotation_authority.js
@@ -191,12 +212,14 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-420-MOBILE-RELEASE-PHASE-421-VR-TABLE-POLISH-LOCK",
+            "build": "PHASE-420-MOBILE-RELEASE-PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
             "predecessorMobileBuild": "PHASE-419-TOURNAMENT-REGISTRATION-MOBILE-UX-LOCK",
             "publicStatusBuild": "PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK",
             "platformBuild": "PHASE-405-PLATFORM-DEVICE-ALIGNMENT-LOCK",
             "questBuild": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
-            "vrTableBuild": "PHASE-421-VR-TABLE-FINAL-POLISH-LOCK",
+            "vrTableBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
+            "vrTableGeometryBuild": "PHASE-422-QUEST-TABLE-GEOMETRY-THEME-LOCK",
+            "vrTablePredecessorBuild": "PHASE-421-VR-TABLE-FINAL-POLISH-LOCK",
             "androidBuild": "PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK",
             "androidSurfaceBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
             "tournamentRegistrationBuild": "PHASE-419-TOURNAMENT-REGISTRATION-NOTIFICATION-LOCK",
@@ -209,7 +232,7 @@ jobs:
             "playerAccountBuild": "PHASE-418-PLAYER-ACCOUNT-API-READINESS-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "questRoute": "/game/quest.html?v=phase421",
+            "questRoute": "/game/quest.html?v=phase422",
             "androidRoute": "/game/android.html?channel=stable&v=phase420",
             "androidPracticeRoute": "/game/android-tabletop.html?v=phase420&mode=practice",
             "androidRegularRoute": "/game/android-tabletop.html?v=phase420&mode=regular",
@@ -227,10 +250,17 @@ jobs:
             "platformIosDetection": true,
             "platformVisualViewportAlignment": true,
             "questTeleportEnabled": false,
+            "questHandTeleportEnabled": false,
+            "questGripTeleportEnabled": false,
             "questHardSeatedFrontTable": true,
-            "questFinalTableFeltShallowRecessMeters": 0.026,
-            "questFinalTableFeltMicroSurface": true,
-            "questFinalTableRailMaterialPolish": true,
+            "questInspectionSeatRailGapMeters": 0.045,
+            "questInspectionEyeHeightMeters": 1.18,
+            "questFinalTableFeltShallowRecessMeters": 0.0254,
+            "questFinalTableTrueInnerSurface": true,
+            "questFinalTableCurvedLeatherRailPreserved": true,
+            "questFinalTablePassBetLineAligned": true,
+            "questFinalTableFuturisticLighting": true,
+            "questHeldCardFlex": true,
             "androidVisualLeftToRightSeatOrder": [0,5,1,2,3,4],
             "androidDariusAdvancesToUser": true,
             "androidSidePotEngine": true,
@@ -282,12 +312,19 @@ jobs:
           test -s publish/game/modules/phase420_mobile_release_lock.js
           test -s publish/game/modules/phase420_tournament_start_authority.js
           test -s publish/game/modules/phase421_vr_table_final_polish.js
+          test -s publish/game/modules/phase422_quest_table_geometry_theme_lock.js
+          test -s publish/game/modules/phase422_quest_seated_inspection_lock.js
+          test -s publish/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
           test -s publish/game/modules/phase419_mobile_table_flow_polish.js
           test -s publish/game/modules/phase419_tournament_registration_notify.js
           test -s publish/game/tournament-signup.html
           test -s publish/site/profile.html
-          grep -q 'PHASE-420-MOBILE-RELEASE-PHASE-421-VR-TABLE-POLISH-LOCK' publish/deploy-health.json
-          grep -q '"vrTableBuild": "PHASE-421-VR-TABLE-FINAL-POLISH-LOCK"' publish/deploy-health.json
+          grep -q 'PHASE-420-MOBILE-RELEASE-PHASE-422-QUEST-TABLE-INSPECTION-LOCK' publish/deploy-health.json
+          grep -q '"vrTableBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK"' publish/deploy-health.json
+          grep -q '"questFinalTableFeltShallowRecessMeters": 0.0254' publish/deploy-health.json
+          grep -q '"questInspectionSeatRailGapMeters": 0.045' publish/deploy-health.json
+          grep -q '"questHandTeleportEnabled": false' publish/deploy-health.json
+          grep -q '"questFinalTableTrueInnerSurface": true' publish/deploy-health.json
           grep -q '"androidTournamentCurrentSlotStartAuthority": true' publish/deploy-health.json
           grep -q '"androidProductionLoginBackendLive": false' publish/deploy-health.json
           grep -q '"androidTournamentSharedRegistrationBackendLive": false' publish/deploy-health.json
@@ -308,8 +345,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 420 / 421.'
+            echo 'Production already matches Phase 420 / 422.'
           else
-            git commit -m "Deploy Phase 420 mobile + Phase 421 VR table ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 420 mobile + Phase 422 Quest table ${GITHUB_SHA}"
             git push origin gh-pages
           fi
