@@ -89,12 +89,16 @@ jobs:
           test -s game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'PHASE-406-QUEST-SIDE-BURN-CHIP-POLISH-LOCK' game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'PHASE334_BURN_AND_TURN_PILE' game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -q 'phase406_quest_side_burn_chip_polish.js?v=phase406' game/index.html
+          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422' game/index.html
           grep -q 'phase396SeatingUntouched:true' game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase396TeleportUntouched:true' game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -q 'phase421_vr_table_final_polish.js?v=phase421' game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -Fq 'phase421_vr_table_final_polish.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase422_quest_table_geometry_theme_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
           node --check game/modules/phase406_quest_side_burn_chip_polish.js
           node --check game/modules/phase421_vr_table_final_polish.js
+          node --check game/modules/phase422_quest_table_geometry_theme_lock.js
+          node --check game/modules/phase422_quest_seated_inspection_lock.js
+          node --check game/modules/phase422_quest_table_prop_alignment_flex_lock.js
 
       - name: Validate metadata cache and APK policy
         shell: bash
