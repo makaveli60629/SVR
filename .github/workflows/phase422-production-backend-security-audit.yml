@@ -68,6 +68,23 @@ jobs:
           ! grep -q "ADMIN_JWT_SECRET ||" backend/backend/src/server.js
           ! grep -q 'dev-secret' backend/backend/src/server.js
 
+      - name: Validate Phase 423 account and tournament contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check site/js/phase345-player-account-client.js
+          node --check game/modules/phase419_tournament_registration_notify.js
+          node --check game/modules/phase420_tournament_start_authority.js
+          node --check infrastructure/aws/phase423-player-tournament-api/src/handler.mjs
+          grep -q 'PHASE-423-PLAYER-ACCOUNT-CONFIRMATION-LOCK' site/js/phase345-player-account-client.js
+          grep -q '/auth/confirm' site/js/phase345-player-account-client.js
+          grep -q 'HttpOnly' infrastructure/aws/phase423-player-tournament-api/src/handler.mjs
+          grep -q 'PHASE-423-TOURNAMENT-AUTHENTICATED-REGISTRATION-LOCK' game/modules/phase419_tournament_registration_notify.js
+          grep -q "credentials:'include'" game/modules/phase419_tournament_registration_notify.js
+          grep -q 'PHASE-423-TOURNAMENT-CURRENT-SLOT-REGISTRATION-GATE-LOCK' game/modules/phase420_tournament_start_authority.js
+          grep -q 'currentRegistrationRequired:true' game/modules/phase420_tournament_start_authority.js
+          grep -q 'SLOT_MS=5\*60\*60\*1000' game/modules/phase420_tournament_start_authority.js
+
       - name: Validate secret and signing hygiene
         shell: bash
         run: |
