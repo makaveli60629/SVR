@@ -24,5 +24,6 @@ window.SVR_PHASE421_VR_TABLE_SWEEP=sweep;
 window.SVR_PHASE421_VR_TABLE_QA=()=>({build:BUILD,...state,targetRecessMeters:TARGET_RECESS_METERS,recessTolerance:RECESS_TOLERANCE,recessWithinTolerance:Number.isFinite(state.feltRecessMeters)&&Math.abs(state.feltRecessMeters-TARGET_RECESS_METERS)<=RECESS_TOLERANCE,stableSuccessorSurface:Boolean(polishedFelt?.parent),deepPhase390SurfaceColorSuppressed:Boolean(sourceFelt(table())?.userData?.svrPhase421DeepSourceSuppressed),tableOnlyPolish:true,lobbyGeometryUntouched:true,locomotionUntouched:true,pass:Boolean(state.installed&&state.tableFound&&state.sourceFeltFound&&state.polishedFeltReady&&Math.abs(state.feltRecessMeters-TARGET_RECESS_METERS)<=RECESS_TOLERANCE&&!state.lastError),checkedAt:new Date().toISOString()});
 window.addEventListener('svr:phase396-core-ready',()=>setTimeout(()=>sweep('phase396-core-ready'),280),{once:true});
 window.addEventListener('svr:hand-start',()=>setTimeout(()=>{watchdog();sweep('hand-start')},80));
+window.addEventListener('svr:poker-state',()=>setTimeout(watchdog,40));
 setTimeout(()=>sweep('phase421-delayed'),3200);
-setInterval(watchdog,800);
+[800,2200,5200].forEach(delay=>setTimeout(watchdog,delay));
