@@ -13,13 +13,13 @@ Phase 422 follows the Phase 420 mobile release and Phase 421 VR table polish. It
 `backend/server.js` now:
 
 - reports `PHASE-422-PRODUCTION-BACKEND-HEALTH-HARDENING-LOCK`;
-- disables the Express `X-Powered-By` disclosure;
+- runs on Node built-in `http`, `crypto`, and `url` modules only, so the active health runtime no longer depends on Express/CORS/dotenv installation state;
 - uses an explicit production origin allowlist instead of wildcard CORS;
 - returns `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`, and `X-Frame-Options: DENY`;
 - caps JSON request bodies at 256 KB;
 - caps the in-memory marker-health buffer at 500 rows and read responses at 100 rows;
 - emits a request ID on health/marker responses and logs health/error events without printing request bodies or secrets;
-- returns safe 404/500 wording;
+- returns safe 400/403/404/413/500 wording;
 - distinguishes configured services from verified services instead of claiming that a database/account/tournament service is online when it has not been checked;
 - handles SIGTERM/SIGINT shutdown.
 
@@ -43,14 +43,14 @@ If either is missing, that enterprise entrypoint refuses startup instead of sile
 `.github/workflows/phase422-production-backend-security-audit.yml` verifies:
 
 - current Phase 420/421 game authorities are untouched;
-- active backend syntax and hardening markers;
+- active backend syntax and zero-third-party-runtime markers;
 - enterprise JWT/CORS fail-closed behavior;
 - `.env`, keystore, and signing-file ignore rules;
 - no obvious committed AWS access-key prefix;
 - cloud account/tournament configs remain truthfully disabled until deployment;
 - RC2 APK force-update policy remains unchanged.
 
-The dedicated branch audit run `31704532221` completed successfully on 2026-08-13.
+The dedicated Phase 422 branch workflow is configured to run on every hardening-branch push as well as PR/main.
 
 ## Secret-pattern sweep
 
@@ -77,11 +77,11 @@ If a real credential is ever exposed:
 
 ## Remaining production blockers
 
-### Backend package manifest / lockfile drift
+### Backend package manifest / lockfile housekeeping
 
-`backend/package.json` and `backend/package-lock.json` do not describe the same root dependency set. The Phase 422 JavaScript itself passes `node --check`, but a deterministic clean `npm ci` should not be claimed until the manifest and lockfile are regenerated together from pinned production dependencies.
+`backend/package.json` and `backend/package-lock.json` still describe different historical dependency sets. The Phase 422 **active health runtime no longer imports any of those packages**, so `node backend/server.js` is no longer blocked by that drift. The package files should still be regenerated together before using `npm ci` as a backend deployment step, and production dependency versions should be pinned rather than `latest`.
 
-A direct package-manifest write was attempted during this phase and rejected by the connected GitHub safety gate, so the mismatch is recorded here instead of being hidden. Before backend deployment, regenerate the lockfile, run `npm ci`, then run the Phase 422 backend audit again.
+A direct package-manifest write was attempted during this phase and rejected by the connected GitHub safety gate; no review bypass was used.
 
 ### Player account API
 
@@ -115,8 +115,14 @@ The repository audit still does not contain a verified native Android wrapper + 
 
 Repository and CI validation cannot substitute for actual Android, iPhone Safari, and Quest headset acceptance. Phase 421 table source is deployed, but final headset appearance must be visually inspected on Quest.
 
+## Staging contract
+
+`infrastructure/aws/PHASE_422_STAGING_DEPLOYMENT.md` defines the staging resource isolation, deployment order, CloudWatch/health gates, public-site protection, and rollback path. It reuses the parameterized Phase 372 player-account foundation with `EnvironmentName=staging`.
+
+An actual staging endpoint cannot be claimed until AWS deployment credentials/role access is available and the stack is deployed and health-tested.
+
 ## Promotion status
 
-The Phase 422 hardening branch is green under its dedicated audit. Normal pull-request creation was attempted multiple times and rejected by the connected GitHub safety classifier, so the branch has **not** been force-promoted to `main`. No direct-ref or review-bypass promotion was used.
+The Phase 422 hardening branch has passed its dedicated audit on prior commits and is configured to re-run on every branch push. Normal pull-request creation was attempted multiple times and rejected by the connected GitHub safety classifier, so the branch has **not** been force-promoted to `main`. No direct-ref or review-bypass promotion was used.
 
 That means current production remains the already-green Phase 420 mobile / Phase 421 VR-table release until the Phase 422 branch can be promoted through an approved GitHub path.
