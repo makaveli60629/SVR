@@ -34,6 +34,7 @@ jobs:
           grep -q 'tournaments.html?v=phase420' game/android.html
           test -s game/tournaments.html
           test -s game/tournament-results.html
+          test -s game/modules/phase406_tournament_24h_board.js
           grep -q 'PHASE-420-TOURNAMENT-START-AUTHORITY-LOCK' game/tournaments.html
           grep -q 'phase405_tournament_scheduler.js?v=phase411' game/tournaments.html
           grep -q 'REIKI OPEN 100' game/tournaments.html
@@ -44,7 +45,7 @@ jobs:
           grep -q 'Royal Flush' game/tournaments.html
           grep -q 'High Card' game/tournaments.html
           grep -q 'phase420_tournament_start_authority.js?v=phase420' game/tournaments.html
-          grep -q 'PHASE-406-TOURNAMENT-24H-RESULTS-BOARD-LOCK' game/tournament-results.html
+          grep -q 'PHASE-406-TOURNAMENT-24H-RESULTS-BOARD-LOCK' game/modules/phase406_tournament_24h_board.js
           grep -q 'CHAMPION CROWN' game/tournament-results.html
           grep -q 'svr401_reiki_first50_results' game/tournament-results.html
       - name: Validate protected Phase 401 tournament director structure
