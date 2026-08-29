@@ -30,11 +30,12 @@ jobs:
           grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' index.html
           grep -q 'site-public-hooks.js?v=phase409' index.html
           grep -q 'PHASE-409-PUBLIC-CONSTRUCTION-STATUS-LOCK' phase409-public-status.js
+          grep -q 'PHASE-422-FULL-STACK-AUDIT-STATUS-HOTFIX' phase409-public-status.js
           grep -q "construction.textContent='SITE UNDER CONSTRUCTION'" phase409-public-status.js
           grep -q "copy.insertBefore(construction,eyebrow)" phase409-public-status.js
           grep -q "eyebrow.insertAdjacentElement('afterend',health)" phase409-public-status.js
-          grep -q 'SERVER ONLINE' phase409-public-status.js
-          grep -q 'DATABASE ONLINE' phase409-public-status.js
+          grep -q 'STATIC SITE ONLINE' phase409-public-status.js
+          grep -q 'DATABASE ENDPOINT PENDING' phase409-public-status.js
           grep -q 'AI ONLINE' phase409-public-status.js
           grep -q "remoteHealthVerified:false" phase409-public-status.js
           grep -q "current==='online'?'● Admin Online':'● Admin Offline'" site-public-hooks.js

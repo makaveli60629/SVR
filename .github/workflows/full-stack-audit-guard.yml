@@ -1,0 +1,150 @@
+name: SVR Full Stack Audit Guard
+
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: svr-full-stack-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Reject tracked secrets and dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          bad_env="$(git ls-files | grep -E '(^|/)\.env($|\.local$|\.production$|\.development$|\.test$)' || true)"
+          if [ -n "$bad_env" ]; then
+            echo "Tracked environment/secret files are not allowed:"
+            printf '%s\n' "$bad_env"
+            exit 1
+          fi
+          bad_modules="$(git ls-files | grep -E '(^|/)node_modules/' || true)"
+          if [ -n "$bad_modules" ]; then
+            echo "Tracked node_modules files are not allowed:"
+            printf '%s\n' "$bad_modules" | head -100
+            exit 1
+          fi
+
+      - name: Validate API configuration contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          player_path = Path('site/config/player-api.json')
+          tournament_path = Path('game/config/tournament-api.json')
+          player = json.loads(player_path.read_text(encoding='utf-8'))
+          tournament = json.loads(tournament_path.read_text(encoding='utf-8'))
+
+          player_base = str(player.get('apiBase') or '').strip()
+          player_flag = bool(player.get('accountApiEndpointConfigured'))
+          if bool(player_base) != player_flag:
+              raise SystemExit('player-api.json mismatch: apiBase and accountApiEndpointConfigured disagree')
+
+          tournament_base = str(tournament.get('apiBase') or '').strip()
+          tournament_flag = bool(tournament.get('endpointConfigured'))
+          if bool(tournament_base) != tournament_flag:
+              raise SystemExit('tournament-api.json mismatch: apiBase and endpointConfigured disagree')
+
+          if player.get('provider') == 'aws':
+              if player.get('identity') != 'cognito' or player.get('database') != 'dynamodb':
+                  raise SystemExit('AWS player contract must identify Cognito + DynamoDB')
+
+          print('Player account remote endpoint:', 'configured' if player_flag else 'local fallback')
+          print('Tournament authority endpoint:', 'configured' if tournament_flag else 'local fallback')
+          PY
+
+      - name: Verify reachable game module graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          root = Path('game/main.js').resolve()
+          repo = Path('.').resolve()
+          queue = [root]
+          seen = set()
+          import_re = re.compile(r'(?:import|export)\s+(?:[^;]*?\s+from\s+)?["\']([^"\']+)["\']|import\(\s*["\']([^"\']+)["\']\s*\)')
+
+          while queue:
+              path = queue.pop()
+              if path in seen:
+                  continue
+              if not path.is_file():
+                  raise SystemExit(f'Missing reachable game module: {path.relative_to(repo) if path.is_relative_to(repo) else path}')
+              seen.add(path)
+              text = path.read_text(encoding='utf-8-sig')
+              for match in import_re.finditer(text):
+                  spec = (match.group(1) or match.group(2) or '').split('?', 1)[0].split('#', 1)[0]
+                  if not spec.startswith('.'):
+                      continue
+                  target = (path.parent / spec).resolve()
+                  if target.suffix == '':
+                      target = target.with_suffix('.js')
+                  if repo not in target.parents and target != repo:
+                      raise SystemExit(f'Import escapes repository: {path} -> {spec}')
+                  queue.append(target)
+
+          print(f'Validated {len(seen)} reachable JavaScript modules from game/main.js')
+          for path in sorted(seen):
+              print(path.relative_to(repo))
+          PY
+
+      - name: Syntax-check reachable browser JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check game/main.js
+          node --check game/modules/core_scene.js
+          node --check game/modules/desktop_controls.js
+          node --check game/modules/hands_phase228.js
+          node --check game/modules/movement_phase228.js
+          node --check game/modules/phase195_clean_lobby_world.js
+          node --check game/modules/phase201_hub_content_restore.js
+          node --check game/modules/phase202_storefront_shells.js
+          node --check game/modules/phase262_geometry_sky_alignment_lock.js
+          node --check game/modules/asset_base.js
+          node --check game/modules/watch.js
+          node --check game/modules/performance_phase148.js
+          node --check game/modules/android_smart_controls.js
+          node --check game/phase149_lobby_fit_alignment_lock.js
+
+      - name: Verify Phase 422 authority files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/modules/phase422_quest_table_geometry_theme_lock.js
+          test -s game/modules/phase422_quest_seated_inspection_lock.js
+          test -s game/modules/phase422_quest_table_prop_alignment_flex_lock.js
+          test -s .github/workflows/deploy.yml
+          test -s .github/workflows/pages-live-publish.yml
+          ! grep -q 'actions/deploy-pages@' .github/workflows/pages-live-publish.yml
+          grep -q 'SVR Production Auto Deploy' .github/workflows/pages-live-publish.yml
+
+      - name: Validate backend hygiene and authority documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s backend/README.md
+          test ! -e backend/.env
+          test ! -d backend/node_modules
+          grep -q 'apiBase' backend/README.md
+          grep -q 'local browser fallback' backend/README.md

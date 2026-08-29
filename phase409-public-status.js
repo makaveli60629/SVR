@@ -1,14 +1,16 @@
-/* PHASE-409-PUBLIC-CONSTRUCTION-STATUS-LOCK | PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK */
+/* PHASE-409-PUBLIC-CONSTRUCTION-STATUS-LOCK | PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK | PHASE-422-FULL-STACK-AUDIT-STATUS-HOTFIX */
 (()=>{
   const BUILD='PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK';
-  const state={build:BUILD,server:'online',database:'online',ai:'online',admin:'offline',thirdPill:'AI ONLINE',displayMode:'configured-status-display',remoteHealthVerified:false,lastError:null,checkedAt:null};
+  const state={build:BUILD,server:'static-online',database:'unverified',ai:'online',admin:'offline',thirdPill:'AI ONLINE',displayMode:'verified-static-unverified-remote-display',remoteHealthVerified:false,lastError:null,checkedAt:null};
   const $=s=>document.querySelector(s);
   function style(){if($('#phase409-public-style'))return;const el=document.createElement('style');el.id='phase409-public-style';el.textContent=`
     #admin-status{font-size:9px!important;line-height:1!important;padding:5px 8px!important;min-height:auto!important;letter-spacing:.05em!important;border-radius:999px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;margin-inline:auto!important}
     .svr409-construction{display:flex;align-items:center;justify-content:center;width:max-content;max-width:94%;margin:0 auto 5px;padding:4px 10px;border:1px solid rgba(201,156,255,.5);border-radius:999px;background:rgba(14,6,24,.78);color:#efdfff;font:900 9px/1.15 Rajdhani,system-ui;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 18px rgba(155,77,255,.12)}
-    .svr409-health{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin:6px auto 0;max-width:460px}
+    .svr409-health{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin:6px auto 0;max-width:520px}
     .svr409-health span{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border:1px solid rgba(141,255,180,.48);border-radius:999px;background:rgba(2,17,14,.8);color:#dfffea;font:900 7px/1 system-ui;letter-spacing:.055em;white-space:nowrap}
     .svr409-health span::before{content:'●';color:#8dffb4;text-shadow:0 0 8px #8dffb4}
+    #svr409Database{border-color:rgba(255,215,128,.55);background:rgba(32,20,4,.82);color:#ffe7ad}
+    #svr409Database::before{color:#ffd580;text-shadow:0 0 8px #ffd580}
   `;document.head.appendChild(el)}
   function adminOnline(){const publicState=window.SVR_PUBLIC_ADMIN_STATE;if(typeof publicState?.online==='boolean')return publicState.online;const admin=$('#admin-status');return admin?.dataset?.state==='online'||/admin online/i.test(admin?.textContent||'')}
   function paintThirdPill(){const online=adminOnline(),pill=$('#svr409Ai');state.admin=online?'online':'offline';state.ai=online?'standby':'online';state.thirdPill=online?'ADMIN ONLINE':'AI ONLINE';if(pill){pill.textContent=state.thirdPill;pill.dataset.mode=online?'admin':'ai';pill.setAttribute('aria-label',online?'Administrator online':'AI online while administrator is offline')}return online}
@@ -17,7 +19,7 @@
     $('#svr407Construction')?.remove();$('#svr407Health')?.remove();
     let construction=$('#svr409Construction');if(!construction){construction=document.createElement('div');construction.id='svr409Construction';construction.className='svr409-construction';construction.textContent='SITE UNDER CONSTRUCTION'}
     if(construction.parentElement!==copy||construction.nextElementSibling!==eyebrow)copy.insertBefore(construction,eyebrow);
-    let health=$('#svr409Health');if(!health){health=document.createElement('div');health.id='svr409Health';health.className='svr409-health';health.setAttribute('aria-label','SVR service status');health.innerHTML='<span id="svr409Server">SERVER ONLINE</span><span id="svr409Database">DATABASE ONLINE</span><span id="svr409Ai">AI ONLINE</span>'}
+    let health=$('#svr409Health');if(!health){health=document.createElement('div');health.id='svr409Health';health.className='svr409-health';health.setAttribute('aria-label','SVR service status');health.innerHTML='<span id="svr409Server">STATIC SITE ONLINE</span><span id="svr409Database">DATABASE ENDPOINT PENDING</span><span id="svr409Ai">AI ONLINE</span>'}
     if(health.parentElement!==copy||health.previousElementSibling!==eyebrow)eyebrow.insertAdjacentElement('afterend',health);
     paintThirdPill();state.checkedAt=new Date().toISOString();window.SVR_PHASE409_PUBLIC_STATUS={...state,refresh};window.SVR_PHASE418_PUBLIC_STATUS={...state,refresh};return true
   }
