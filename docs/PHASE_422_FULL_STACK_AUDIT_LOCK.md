@@ -1,0 +1,163 @@
+# Phase 422 — Full Stack Audit Lock
+
+Audit branch: `audit/phase422-full-stack-lock`
+Baseline audited: `main` at `56f03bdae86d9268d4f707e323493c508e6f0e5f` (`Phase 422 Quest table cleanup`)
+
+## Executive result
+
+The current repository is substantially newer than the historical phase handoff reports. Phase 422 source and the production deployment workflow are the current authority.
+
+The static site/game deployment path is mature and heavily guarded. The principal remaining full-stack gap is **remote account/tournament authority provisioning**, not the browser UI itself.
+
+The repository previously had several concrete integrity/hygiene problems that this audit branch fixes:
+
+1. a tracked `backend/.env` file;
+2. tracked `backend/node_modules/` dependencies;
+3. a second, stale GitHub Pages publishing workflow that could compete with the authoritative Phase 422 production deploy and was failing against obsolete Phase 409/372 markers;
+4. a public status strip that claimed the database was online even though the public account API endpoint is intentionally not configured;
+5. unclear backend authority caused by several generations of backend source existing side by side.
+
+## Production deployment authority
+
+Authoritative workflow: `.github/workflows/deploy.yml`
+
+Workflow name: `SVR Production Auto Deploy`
+
+The workflow:
+
+- builds committed static source directly;
+- validates the current game/site source and protected Phase 422 modules;
+- validates the public player account and tournament configuration contracts;
+- creates `deploy-health.json` with source SHA/branch/workflow metadata;
+- deploys GitHub Pages;
+- mirrors the exact validated build to `gh-pages`.
+
+The old `.github/workflows/pages-live-publish.yml` no longer performs a second Pages deployment in this audit branch. It is now a verification-only workflow that checks `gh-pages` against the authoritative `main` SHA and Phase 422 protected files.
+
+## Player account API / database state
+
+Authoritative public client config: `site/config/player-api.json`
+
+Current contract:
+
+- `enabled: true` means the account feature/client is enabled;
+- provider target: AWS;
+- identity target: Cognito;
+- storage target: DynamoDB;
+- `apiBase` is empty;
+- `accountApiEndpointConfigured` is `false`;
+- public mode is local-first/local browser fallback until the remote account endpoint is provisioned.
+
+Therefore, the remote account API/database must **not** be represented as online yet.
+
+The AWS foundation template exists at `infrastructure/aws/phase372-player-account-foundation.yml`, but repository source alone does not prove that a public API Gateway/Lambda endpoint is deployed and reachable.
+
+## Tournament authority state
+
+Authoritative config: `game/config/tournament-api.json`
+
+Current contract:
+
+- tournament hook enabled;
+- `apiBase` empty;
+- `endpointConfigured: false`;
+- local authority remains active until the remote endpoint exists.
+
+GitHub Pages cannot enforce cross-device tournament command authority without that remote endpoint.
+
+## Backend generations
+
+### `backend/server.js`
+
+Legacy Phase 211 marker-health development server. It is not the owner/admin/store/player-account production API.
+
+### `backend/backend/`
+
+Legacy Azure SQL admin/store prototype. It includes SQL health/messages/admin/store/checkout/hand routes, but it is not the current public account authority. It also requires production hardening before any future reuse.
+
+### `backend/phase345/`
+
+Hardened SQL/browser-contract account API reference. It contains materially better security patterns (password hashing, HTTP-only JWT cookies, rate limiting, origin/client checks, parameterized SQL, transactional reward logic). Its own documentation correctly distinguishes deployable source from a deployed service.
+
+### Current target
+
+The current public contract points to AWS/Cognito/DynamoDB, so no historical backend folder should be silently treated as the production account service.
+
+## Game/module integration audit
+
+`game/main.js` currently imports the following active top-level modules and all were found in the repository during the audit:
+
+- `modules/core_scene.js`
+- `modules/desktop_controls.js`
+- `modules/hands_phase228.js`
+- `modules/movement_phase228.js`
+- `modules/phase195_clean_lobby_world.js`
+- `modules/phase201_hub_content_restore.js`
+- `modules/phase202_storefront_shells.js`
+- `modules/phase262_geometry_sky_alignment_lock.js`
+- `modules/asset_base.js`
+- `modules/watch.js`
+- `modules/performance_phase148.js`
+- `modules/android_smart_controls.js`
+- `phase149_lobby_fit_alignment_lock.js`
+
+The movement/teleport chain and gesture/config dependencies checked during the audit were also present.
+
+Historical phase labels inside individual runtime modules are compatibility/subsystem markers and must not be mistaken for the release authority. The release/deployment authority is the validated production source SHA and `deploy-health.json` generated by the Phase 422 production workflow.
+
+A new `SVR Full Stack Audit Guard` workflow resolves relative imports reachable from `game/main.js` and will fail future changes when a reachable module disappears.
+
+## Source-control/security fixes in this audit branch
+
+- removed tracked `backend/.env`;
+- removed tracked `backend/node_modules/`;
+- retained `.gitignore` protections for `.env` and `node_modules`;
+- added CI rejection of tracked environment/secret files and `node_modules`;
+- added API config coherence checks;
+- added reachable game module-graph verification;
+- added JavaScript syntax checks for the active top-level runtime graph;
+- converted the obsolete second Pages publisher into a verifier;
+- changed the public database status to `DATABASE ENDPOINT PENDING` instead of falsely reporting online;
+- documented backend authority in `backend/README.md`.
+
+## Security action outside Git tree
+
+If `backend/.env` ever contained a real SQL password, Stripe secret, JWT secret, cloud key, or admin password at any point in Git history, that credential must be rotated. Removing the current tracked file does not erase historical Git objects.
+
+## What is verified vs. not yet externally verifiable
+
+### Verified from repository/source
+
+- current Phase 422 production workflow structure;
+- current account/tournament configuration state;
+- active game top-level module files and key nested locomotion dependencies;
+- security/hygiene defects fixed on this branch;
+- duplicate Pages publisher eliminated;
+- API/database public status corrected to match actual configuration.
+
+### Requires external cloud/runtime verification
+
+- reachable AWS account API endpoint;
+- Cognito user-pool behavior;
+- DynamoDB table contents/permissions;
+- API Gateway/Lambda health and logs;
+- any legacy Azure SQL/App Service deployment;
+- Stripe live-mode configuration;
+- real multi-device tournament authority;
+- Quest/Android device runtime behavior after merge.
+
+Those cannot be truthfully marked enabled from repository source alone.
+
+## Remote enablement gate
+
+Do not switch the public player client to remote mode until all of these are true in one release:
+
+1. remote account API is deployed and publicly reachable;
+2. health succeeds;
+3. register/login/logout/session/profile/daily-reward/session telemetry/hand telemetry pass end-to-end;
+4. browser CORS/cookie/origin rules pass on `https://svrpoker.com`;
+5. `site/config/player-api.json.apiBase` is set to the verified endpoint;
+6. `accountApiEndpointConfigured` is set to `true`;
+7. production deployment succeeds and `deploy-health.json` matches the intended source SHA.
+
+The same rule applies to tournament authority using `game/config/tournament-api.json`.
