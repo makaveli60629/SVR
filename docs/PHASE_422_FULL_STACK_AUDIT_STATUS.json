@@ -1,0 +1,45 @@
+{
+  "build": "PHASE-422-FULL-STACK-AUDIT-LOCK",
+  "auditedMainSha": "56f03bdae86d9268d4f707e323493c508e6f0e5f",
+  "productionDeployWorkflow": "SVR Production Auto Deploy",
+  "repositoryFixes": {
+    "trackedBackendEnvRemoved": true,
+    "trackedBackendNodeModulesRemoved": true,
+    "duplicatePagesPublisherRemoved": true,
+    "secondaryPagesWorkflowVerificationOnly": true,
+    "publicDatabaseStatusTruthful": true,
+    "backendAuthorityDocumented": true,
+    "fullStackAuditGuardAdded": true
+  },
+  "playerAccount": {
+    "clientEnabled": true,
+    "providerTarget": "aws",
+    "identityTarget": "cognito",
+    "storageTarget": "dynamodb",
+    "remoteEndpointConfigured": false,
+    "mode": "local-browser-fallback",
+    "externallyVerifiedOnline": false
+  },
+  "tournamentAuthority": {
+    "hookEnabled": true,
+    "remoteEndpointConfigured": false,
+    "mode": "local-authority-fallback",
+    "externallyVerifiedOnline": false
+  },
+  "gameRuntime": {
+    "authoritativeReleasePhase": 422,
+    "topLevelModuleGraphPresent": true,
+    "reachableModuleGraphGuardAdded": true,
+    "questAndroidRuntimeRequiresDeviceValidation": true
+  },
+  "externalVerificationRequired": [
+    "AWS API Gateway/Lambda account endpoint",
+    "Cognito user pool",
+    "DynamoDB tables and IAM permissions",
+    "legacy Azure SQL/App Service if still intended for use",
+    "Stripe live mode",
+    "remote tournament authority",
+    "Quest/Android device runtime"
+  ],
+  "securityNote": "Rotate any real credential that may ever have been committed in backend/.env history."
+}
