@@ -63,7 +63,7 @@ jobs:
               raise SystemExit('tournament-api.json mismatch: apiBase and endpointConfigured disagree')
 
           if player.get('provider') == 'aws':
-              if player.get('identity') != 'cognito' or player.get('storage') != 'dynamodb':
+              if player.get('identity') != 'cognito' or player.get('database') != 'dynamodb':
                   raise SystemExit('AWS player contract must identify Cognito + DynamoDB')
 
           print('Player account remote endpoint:', 'configured' if player_flag else 'local fallback')
