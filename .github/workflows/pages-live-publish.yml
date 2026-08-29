@@ -1,86 +1,70 @@
-name: SVR Pages Live Publish
+name: SVR Pages Live Verify
 
 on:
   workflow_dispatch:
-  push:
-    branches: [gh-pages]
   workflow_run:
     workflows: ['SVR Production Auto Deploy']
     types: [completed]
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: svr-pages-live
+  group: svr-pages-live-verify
   cancel-in-progress: true
 
 jobs:
-  deploy-pages:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  verify-live-source:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
-      - name: Checkout authoritative gh-pages branch
+      - name: Checkout authoritative main source
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          path: source
+          fetch-depth: 1
+
+      - name: Checkout authoritative gh-pages publish branch
         uses: actions/checkout@v5
         with:
           ref: gh-pages
+          path: publish
           fetch-depth: 1
-      - name: Verify Phase 409 production payload
+
+      - name: Verify published source matches main
         shell: bash
         run: |
           set -euo pipefail
-          test -s platform-device.js
-          test -s phase409-public-status.js
-          test -s game/android.html
-          test -s game/android-tabletop.html
-          test -s game/android-stable-phase405.html
-          test -s game/iphone.html
-          test -s game/iphone-tabletop.html
-          test -s game/modules/phase409_mobile_player_turn_guard.js
-          test -s game/styles/phase409_mobile_player_box_fit.css
-          test -s game/modules/phase408_holdem_street_call_truth.js
-          test -s game/modules/phase407_mobile_bot_pacing_preload.js
-          test -s game/modules/phase407_mobile_fit_login.js
-          test -s game/styles/phase407_mobile_fit_login.css
-          test -s game/modules/phase405_vox_voice.js
-          test -s site/js/phase405-profile-portrait.js
-          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' index.html
-          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android.html
-          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' game/android-stable-phase405.html
-          grep -q 'phase409_mobile_player_turn_guard.js?v=phase409' game/android-stable-phase405.html
-          grep -q 'phase409_mobile_player_box_fit.css?v=phase409' game/android-stable-phase405.html
-          grep -q 'PHASE-409-PUBLIC-CONSTRUCTION-STATUS-LOCK' phase409-public-status.js
-          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
-          grep -q 'PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK' game/modules/phase404_android_mobile_safety.js
-          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/modules/phase400_ios_safari_adapter.js
-          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
-          grep -q 'PHASE-409-PUBLIC-STATUS-PLAYER-TURN-FIT-LOCK' deploy-health.json
-          grep -q '"androidDariusToUserRuntimeGuard": true' deploy-health.json
-          grep -q '"androidCompactPlayerBoxes": true' deploy-health.json
-          grep -q '"publicConstructionAbovePublicLaunchBadge": true' deploy-health.json
-          grep -q '"publicServerOnlineDisplay": true' deploy-health.json
-          grep -q '"publicDatabaseOnlineDisplay": true' deploy-health.json
-          grep -q '"publicAiOnlineDisplay": true' deploy-health.json
-          grep -q '"publicRemoteServiceHealthVerified": false' deploy-health.json
-          grep -q '"androidProductionMatchServerConfigured": false' deploy-health.json
-          grep -q '"nativeApkRebuild": false' deploy-health.json
-          test -s downloads/svr-poker-android-rc2.apk
-          test -f CNAME
-          grep -qx 'svrpoker.com' CNAME
-      - name: Configure GitHub Pages for Actions
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - name: Upload Phase 409 Pages artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: .
-      - name: Deploy Phase 409
-        id: deployment
-        uses: actions/deploy-pages@v4
+          SOURCE_SHA="$(git -C source rev-parse HEAD)"
+          test -s publish/deploy-health.json
+          test -s publish/index.html
+          test -s publish/game/index.html
+          test -f publish/CNAME
+          grep -qx 'svrpoker.com' publish/CNAME
+          SOURCE_SHA="$SOURCE_SHA" python3 - <<'PY'
+          import json, os
+          health = json.load(open('publish/deploy-health.json', encoding='utf-8'))
+          expected = os.environ['SOURCE_SHA']
+          actual = health.get('source_sha')
+          if actual != expected:
+              raise SystemExit(f'Published source mismatch: expected {expected}, got {actual}')
+          if health.get('source_branch') != 'main':
+              raise SystemExit(f"Unexpected published source branch: {health.get('source_branch')}")
+          if health.get('workflow') != 'SVR Production Auto Deploy':
+              raise SystemExit(f"Unexpected publisher: {health.get('workflow')}")
+          print(f"Verified gh-pages source {actual} build {health.get('build', 'unknown')}")
+          PY
+
+      - name: Verify protected current runtime files exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s publish/game/modules/phase422_quest_table_geometry_theme_lock.js
+          test -s publish/game/modules/phase422_quest_seated_inspection_lock.js
+          test -s publish/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
+          test -s publish/site/config/player-api.json
+          test -s publish/game/config/tournament-api.json
+          python3 -m json.tool publish/site/config/player-api.json >/dev/null
+          python3 -m json.tool publish/game/config/tournament-api.json >/dev/null
