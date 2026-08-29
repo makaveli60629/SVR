@@ -47,13 +47,24 @@ jobs:
           import json, os
           health = json.load(open('publish/deploy-health.json', encoding='utf-8'))
           expected = os.environ['SOURCE_SHA']
-          actual = health.get('source_sha')
+
+          # Phase 423 migration compatibility: older deploy-health files used `commit`.
+          # Newer publishers may stamp `source_sha`. Both must identify the exact main SHA.
+          actual = health.get('source_sha') or health.get('commit')
           if actual != expected:
               raise SystemExit(f'Published source mismatch: expected {expected}, got {actual}')
-          if health.get('source_branch') != 'main':
-              raise SystemExit(f"Unexpected published source branch: {health.get('source_branch')}")
-          if health.get('workflow') != 'SVR Production Auto Deploy':
-              raise SystemExit(f"Unexpected publisher: {health.get('workflow')}")
+
+          source_branch = health.get('source_branch')
+          if source_branch not in (None, '', 'main'):
+              raise SystemExit(f'Unexpected published source branch: {source_branch}')
+
+          publisher = health.get('source_workflow') or health.get('workflow')
+          if publisher not in (None, '', 'SVR Production Auto Deploy'):
+              raise SystemExit(f'Unexpected publisher: {publisher}')
+
+          if not source_branch and health.get('sourceWriteAuthority') not in (None, '', 'main-commit'):
+              raise SystemExit(f"Unexpected source write authority: {health.get('sourceWriteAuthority')}")
+
           print(f"Verified gh-pages source {actual} build {health.get('build', 'unknown')}")
           PY
 

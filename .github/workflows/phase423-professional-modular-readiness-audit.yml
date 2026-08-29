@@ -1,0 +1,241 @@
+name: Phase 423 Professional Modular Readiness Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase423-modular-readiness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Protect public landing page during Phase 423
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          protected=(
+            index.html
+            launch.css
+            launch-quest.css
+            matrix.js
+            platform-device.js
+            site-public-hooks.js
+            phase409-public-status.js
+            site-local-counter.js
+            support-chat-bot.js
+          )
+          if ! git diff --quiet origin/main...HEAD -- "${protected[@]}"; then
+            echo 'Phase 423 is not authorized to modify the public landing-page runtime:' >&2
+            git diff --name-only origin/main...HEAD -- "${protected[@]}" >&2
+            exit 1
+          fi
+
+      - name: Validate module catalog and dependency graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('Manifest/Manifest/SVR-MODULE-CATALOG.json')
+          catalog = json.loads(path.read_text(encoding='utf-8'))
+          modules = catalog.get('modules') or []
+          assert catalog.get('build') == 'PHASE-423-PROFESSIONAL-MODULAR-BUSINESS-UNITY-READINESS-LOCK'
+          assert len(modules) >= 20, f'Expected a professional module catalog, found {len(modules)} modules'
+
+          ids = [m.get('id') for m in modules]
+          if any(not i for i in ids):
+              raise SystemExit('Every module needs an id')
+          if len(ids) != len(set(ids)):
+              raise SystemExit('Duplicate module IDs detected')
+          known = set(ids)
+          for module in modules:
+              for dependency in module.get('dependencies') or []:
+                  if dependency not in known:
+                      raise SystemExit(f"{module['id']} references missing dependency {dependency}")
+              if not module.get('authority'):
+                  raise SystemExit(f"{module['id']} has no authority")
+              if not module.get('enableGate'):
+                  raise SystemExit(f"{module['id']} has no enable gate")
+              if not module.get('rollbackPlan'):
+                  raise SystemExit(f"{module['id']} has no rollback plan")
+
+          required = {
+              'identity.player-account', 'admin.site-api', 'admin.database',
+              'poker.holdem-engine', 'poker.pot-rules', 'poker.tournaments',
+              'runtime.android', 'runtime.ios', 'runtime.quest-webxr',
+              'presentation.lobby', 'presentation.vr-table', 'presentation.assets',
+              'marketing.campaigns', 'marketing.sponsorships', 'marketing.email',
+              'community.fundraising', 'community.charitable-gaming',
+              'finance.ledger', 'commerce.store', 'unity.future-runtime'
+          }
+          missing = sorted(required - known)
+          if missing:
+              raise SystemExit(f'Missing required module IDs: {missing}')
+
+          gates = {m['id']: m for m in modules}
+          for module_id in ('marketing.sponsorships','marketing.email','community.fundraising','community.charitable-gaming'):
+              if gates[module_id].get('status') != 'legal-review-gated':
+                  raise SystemExit(f'{module_id} must remain legal-review-gated')
+          if gates['identity.player-account'].get('status') != 'cloud-pending':
+              raise SystemExit('Player account cloud must remain pending until a real endpoint is provisioned')
+          print(f'Validated {len(modules)} modular authorities and dependencies.')
+          PY
+
+      - name: Validate Unity migration contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s Manifest/Manifest/SVR-UNITY-MIGRATION-MAP.md
+          grep -q 'com.svrpoker.foundation' Manifest/Manifest/SVR-UNITY-MIGRATION-MAP.md
+          grep -q 'com.svrpoker.poker' Manifest/Manifest/SVR-UNITY-MIGRATION-MAP.md
+          grep -q 'com.svrpoker.presentation' Manifest/Manifest/SVR-UNITY-MIGRATION-MAP.md
+          grep -q 'com.svrpoker.xr' Manifest/Manifest/SVR-UNITY-MIGRATION-MAP.md
+          grep -q 'SVR.Poker.Core' Manifest/Manifest/SVR-UNITY-MIGRATION-MAP.md
+          grep -q 'Addressables' Manifest/Manifest/SVR-UNITY-MIGRATION-MAP.md
+          grep -q 'XR Interaction Toolkit' Manifest/Manifest/SVR-UNITY-MIGRATION-MAP.md
+          grep -q 'additive' Manifest/Manifest/SVR-UNITY-MIGRATION-MAP.md
+          grep -q 'web runtime remains the source of truth' Manifest/Manifest/SVR-UNITY-MIGRATION-MAP.md
+
+      - name: Validate business operating controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s Manifest/Manifest/SVR-BUSINESS-OPERATING-MANIFEST.md
+          grep -q 'Money-flow authority' Manifest/Manifest/SVR-BUSINESS-OPERATING-MANIFEST.md
+          grep -q 'Sponsor lifecycle' Manifest/Manifest/SVR-BUSINESS-OPERATING-MANIFEST.md
+          grep -q 'Email marketing gate' Manifest/Manifest/SVR-BUSINESS-OPERATING-MANIFEST.md
+          grep -q 'Community fundraising and charitable impact' Manifest/Manifest/SVR-BUSINESS-OPERATING-MANIFEST.md
+          grep -q 'Poker, prizes and charitable gaming gate' Manifest/Manifest/SVR-BUSINESS-OPERATING-MANIFEST.md
+          grep -q 'not a declaration' Manifest/Manifest/SVR-BUSINESS-OPERATING-MANIFEST.md
+
+      - name: Validate internal browser and API modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s site/js/phase423-internal-api-client.js
+          test -s site/css/phase423-professional-shell.css
+          node --check site/js/phase423-internal-api-client.js
+          grep -q '/api/store/items' site/js/phase423-internal-api-client.js
+          ! grep -q '/api/store/products' site/admin-preview.html
+          grep -q 'phase423-internal-api-client.js' site/admin-preview.html
+          grep -q 'phase423-professional-shell.css' site/admin-preview.html
+          ! grep -q 'site-public-hooks.js' site/admin-preview.html
+          grep -q 'session storage' site/admin-preview.html
+          grep -q 'phase423-professional-shell.css' site/advertising.html
+          grep -q 'phase423-professional-shell.css' site/sponsorship.html
+          grep -q 'Campaign ID' site/advertising.html
+          grep -q 'Disclosure standard' site/sponsorship.html
+
+      - name: Validate internal page local assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit
+
+          pages = [
+              Path('site/admin-preview.html'),
+              Path('site/advertising.html'),
+              Path('site/sponsorship.html'),
+              Path('site/login.html'),
+              Path('site/profile.html'),
+              Path('site/contact.html'),
+              Path('site/store.html'),
+          ]
+
+          class Parser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.assets=[]
+              def handle_starttag(self, tag, attrs):
+                  values=dict(attrs)
+                  if tag in ('script','img') and values.get('src'):
+                      self.assets.append(values['src'])
+                  if tag == 'link' and values.get('href') and 'stylesheet' in (values.get('rel') or ''):
+                      self.assets.append(values['href'])
+
+          missing=[]
+          for page in pages:
+              if not page.is_file():
+                  missing.append((str(page),'PAGE MISSING'))
+                  continue
+              parser=Parser(); parser.feed(page.read_text(encoding='utf-8-sig'))
+              for raw in parser.assets:
+                  parts=urlsplit(raw)
+                  if parts.scheme or raw.startswith('//') or raw.startswith('data:'):
+                      continue
+                  path=(page.parent / parts.path).resolve()
+                  if not path.exists():
+                      missing.append((str(page),raw))
+          if missing:
+              for page,asset in missing:
+                  print(f'{page}: missing local asset {asset}')
+              raise SystemExit('Internal page asset validation failed')
+          print(f'Validated local assets for {len(pages)} internal/site pages.')
+          PY
+
+      - name: Validate live provenance verifier migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "health.get('source_sha') or health.get('commit')" .github/workflows/pages-live-publish.yml
+          grep -q "SVR Production Auto Deploy" .github/workflows/pages-live-publish.yml
+          grep -q "gh-pages source" .github/workflows/pages-live-publish.yml
+
+      - name: Preserve protected current poker and Quest authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/modules/phase403_android_gameplay.js
+          test -s game/modules/phase403_android_pot_rules.js
+          test -s game/modules/phase408_holdem_street_call_truth.js
+          test -s game/modules/phase420_mobile_release_lock.js
+          test -s game/modules/phase422_quest_table_geometry_theme_lock.js
+          test -s game/modules/phase422_quest_seated_inspection_lock.js
+          test -s game/modules/phase422_quest_table_prop_alignment_flex_lock.js
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-408-HOLDEM-STREET-CALL-TRUTH-LOCK' game/modules/phase408_holdem_street_call_truth.js
+          grep -q 'PHASE-422-QUEST-TABLE-GEOMETRY-THEME-LOCK' game/modules/phase422_quest_table_geometry_theme_lock.js
+          node --check game/modules/phase403_android_gameplay.js
+          node --check game/modules/phase403_android_pot_rules.js
+          node --check game/modules/phase408_holdem_street_call_truth.js
+          node --check game/modules/phase422_quest_table_geometry_theme_lock.js
+
+      - name: Verify API/database truth remains explicit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          player=json.load(open('site/config/player-api.json'))
+          tournament=json.load(open('game/config/tournament-api.json'))
+          assert player['apiBase']==''
+          assert player['accountApiEndpointConfigured'] is False
+          assert player['deploymentState']=='cloud-endpoint-pending'
+          assert tournament['apiBase']==''
+          assert tournament['sharedRegistrationBackendLive'] is False
+          print('Cloud-pending services remain truthfully pending.')
+          PY
+          grep -q 'CREATE TABLE IF NOT EXISTS admin_users' api/phase419-admin-db-bootstrap.js
+          grep -q 'const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD' api/server.js

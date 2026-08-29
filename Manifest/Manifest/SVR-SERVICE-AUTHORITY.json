@@ -1,0 +1,68 @@
+{
+  "build": "PHASE-423-SERVICE-AUTHORITY-MAP-LOCK",
+  "principle": "Implemented source, configured service, deployed service, authenticated service and connected database are separate states.",
+  "services": [
+    {
+      "id": "static.production",
+      "sourceAuthority": ".github/workflows/deploy.yml",
+      "runtime": "GitHub Pages gh-pages",
+      "state": "deployed",
+      "verificationAuthority": ".github/workflows/pages-live-publish.yml",
+      "notes": "Phase 423 verifies the published deploy-health commit against current main."
+    },
+    {
+      "id": "admin.site.postgres-api",
+      "sourceAuthority": "api/server.js",
+      "runtime": "Node/Express + PostgreSQL",
+      "state": "deployment-unverified",
+      "publicBaseCandidate": "https://api.svrpoker.com",
+      "healthRoute": "/api/health",
+      "databaseEnv": "DATABASE_URL",
+      "authState": "legacy-env-login-not-yet-unified-with-admin_users",
+      "notes": "Do not label database/admin auth production-ready until deployment, DB connectivity and auth migration tests pass."
+    },
+    {
+      "id": "admin.database-bootstrap",
+      "sourceAuthority": "api/phase419-admin-db-bootstrap.js",
+      "runtime": "PostgreSQL",
+      "state": "prepared-not-proof-of-execution",
+      "notes": "Creates hashed admin_users credentials through pgcrypto. Current api/server.js login still uses legacy private environment credentials."
+    },
+    {
+      "id": "player.accounts",
+      "sourceAuthority": "site/config/player-api.json",
+      "runtime": "AWS Cognito + DynamoDB + future API Gateway/Lambda",
+      "state": "cloud-endpoint-pending",
+      "healthRoute": "/health",
+      "notes": "apiBase remains blank; local test fallback is permitted and must remain clearly labeled."
+    },
+    {
+      "id": "tournaments.remote-authority",
+      "sourceAuthority": "game/config/tournament-api.json",
+      "runtime": "future shared service",
+      "state": "local-fallback",
+      "notes": "Shared registration backend/background push/match authority are not live."
+    },
+    {
+      "id": "legacy.backend.phase211",
+      "sourceAuthority": "backend/server.js",
+      "runtime": "legacy Node service",
+      "state": "legacy-reference",
+      "notes": "Not current production authority."
+    },
+    {
+      "id": "legacy.backend.azure-sql",
+      "sourceAuthority": "backend/backend/src/server.js",
+      "runtime": "legacy Azure SQL-oriented service",
+      "state": "legacy-reference",
+      "notes": "Source presence does not prove a live Azure deployment."
+    },
+    {
+      "id": "legacy.backend.player-api",
+      "sourceAuthority": "backend/phase345-player-api",
+      "runtime": "Node player API prototype",
+      "state": "reference-implementation",
+      "notes": "Browser contract is useful reference; current public account config instead targets AWS and remains cloud-pending."
+    }
+  ]
+}
