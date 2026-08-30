@@ -1,11 +1,13 @@
 {
   "build": "PHASE-427-PLAYER-CREATE-LOCAL-FIRST-CLOUD-RECOVERY-LOCK",
+  "predecessorBuild": "PHASE-418-PLAYER-ACCOUNT-API-READINESS-LOCK",
   "provider": "aws",
   "database": "dynamodb",
   "identity": "cognito",
-  "deploymentState": "local-player-ready-cloud-endpoint-pending",
+  "deploymentState": "cloud-endpoint-pending",
   "accountApiEndpointConfigured": false,
   "localPlayerCreationEnabled": true,
+  "localPlayerState": "device-local-ready",
   "localPasswordStorage": "salted-pbkdf2-verifier-only",
   "foundationTemplate": "/infrastructure/aws/phase372-player-account-foundation.yml",
   "requiredNextInfrastructure": "API Gateway + Lambda player-account service matching the Phase 345 browser contract",
@@ -16,5 +18,5 @@
   "allowLocalPresenceSimulation": true,
   "dailyRewardChips": 5000,
   "minimumActivitySeconds": 300,
-  "notes": "Phase 427 removes the Create Player dead end: when the remote AWS account endpoint is unavailable, a playable device-local provisional account is created and can sign back in on that device using a salted PBKDF2 password verifier; the plaintext password is never stored. Cloud account/API status must remain pending until a real API Gateway/Lambda endpoint is provisioned and verified. Never place AWS keys, secrets, Cognito client secrets, passwords, Cash App credentials, or database credentials in this public file."
+  "notes": "Phase 427 removes the Create Player dead end with a device-local provisional player while the remote AWS endpoint remains truthfully cloud-endpoint-pending. The account API indicator must stay pending until a real API Gateway/Lambda endpoint is provisioned and verified. Local passwords use a salted PBKDF2 verifier and plaintext passwords are never stored. Never place AWS keys, secrets, Cognito client secrets, passwords, Cash App credentials, or database credentials in this public file."
 }

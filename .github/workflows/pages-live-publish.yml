@@ -1,5 +1,7 @@
 name: SVR Pages Live Verify
 
+# Publication chain: SVR Production Auto Deploy -> SVR GitHub Pages Production Deploy -> SVR Pages Live Verify.
+# This verifier intentionally waits for the official Pages artifact deployment, not the intermediate gh-pages branch copy.
 on:
   workflow_dispatch:
   workflow_run:
