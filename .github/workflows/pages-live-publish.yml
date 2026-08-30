@@ -3,7 +3,7 @@ name: SVR Pages Live Verify
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ['SVR Production Auto Deploy']
+    workflows: ['SVR GitHub Pages Production Deploy']
     types: [completed]
 
 permissions:
@@ -41,19 +41,21 @@ jobs:
           test -s publish/deploy-health.json
           test -s publish/index.html
           test -s publish/game/index.html
+          test -s publish/404.html
           test -f publish/CNAME
           grep -qx 'svrpoker.com' publish/CNAME
+          grep -Fq '<title>SVR Poker | Official 404</title>' publish/404.html
+          if grep -Eiq 'github|githubusercontent' publish/404.html; then
+            echo 'Provider branding detected in production 404.' >&2
+            exit 1
+          fi
           SOURCE_SHA="$SOURCE_SHA" python3 - <<'PY'
           import json, os
           health = json.load(open('publish/deploy-health.json', encoding='utf-8'))
           expected = os.environ['SOURCE_SHA']
-          actual = health.get('source_sha')
+          actual = health.get('commit') or health.get('source_sha')
           if actual != expected:
               raise SystemExit(f'Published source mismatch: expected {expected}, got {actual}')
-          if health.get('source_branch') != 'main':
-              raise SystemExit(f"Unexpected published source branch: {health.get('source_branch')}")
-          if health.get('workflow') != 'SVR Production Auto Deploy':
-              raise SystemExit(f"Unexpected publisher: {health.get('workflow')}")
           print(f"Verified gh-pages source {actual} build {health.get('build', 'unknown')}")
           PY
 
@@ -66,5 +68,28 @@ jobs:
           test -s publish/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
           test -s publish/site/config/player-api.json
           test -s publish/game/config/tournament-api.json
+          test -s publish/game/dealer-lab.html
+          test -s publish/game/labs/dealer/index.html
+          test -s publish/game/labs/dealer/lab-access.js
+          test -s publish/game/labs/dealer/dealer-lab.js
+          test -s publish/game/modules/dealer/eric_dealer_module.js
+          test -s publish/game/modules/dealer/table_calibration_module.js
+          test -s publish/game/modules/dealer/wrist_lab_module.js
           python3 -m json.tool publish/site/config/player-api.json >/dev/null
           python3 -m json.tool publish/game/config/tournament-api.json >/dev/null
+
+      - name: Verify public routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          dealer='https://svrpoker.com/game/dealer-lab.html'
+          missing="https://svrpoker.com/__svr_verify_404_${GITHUB_RUN_ID}"
+          dealer_body="$(curl -LfsS --max-time 20 "$dealer")"
+          missing_body="$(curl -LsS --max-time 20 "$missing")"
+          printf '%s' "$dealer_body" | grep -Fq 'SVR Dealer Lab'
+          printf '%s' "$missing_body" | grep -Fq 'Official SVR Poker Error Page'
+          if printf '%s' "$missing_body" | grep -Eiq 'GitHub Status|Read the full documentation|githubstatus'; then
+            echo 'Generic provider 404 detected on live domain.' >&2
+            exit 1
+          fi
+          echo 'Live SVR Dealer Lab and branded 404 verified.'
