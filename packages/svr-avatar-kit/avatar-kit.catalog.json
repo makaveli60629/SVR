@@ -1,0 +1,173 @@
+{
+  "build": "SVR-AVATAR-KIT-V1",
+  "schemaVersion": 2,
+  "units": "meters",
+  "bodyFamilies": [
+    {
+      "id": "male-eric-v1",
+      "label": "Male Base 01",
+      "family": "male",
+      "sourceModelId": "eric",
+      "assetUrl": "/game/assets/models/eric/eric.fbx",
+      "targetHeightMeters": 1.78,
+      "rigProfile": "svr-humanoid-v1",
+      "geometryProfile": "svr-body-male-v1"
+    },
+    {
+      "id": "female-claudia-v1",
+      "label": "Female Base 01",
+      "family": "female",
+      "sourceModelId": "claudia",
+      "assetUrl": "/game/assets/models/claudia/claudia.fbx",
+      "targetHeightMeters": 1.70,
+      "rigProfile": "svr-humanoid-v1",
+      "geometryProfile": "svr-body-female-v1"
+    }
+  ],
+  "appearance": {
+    "skinTones": [
+      { "id": "skin-01", "label": "Tone 01", "color": "#F6D8C3" },
+      { "id": "skin-02", "label": "Tone 02", "color": "#EBC1A3" },
+      { "id": "skin-03", "label": "Tone 03", "color": "#D9A17D" },
+      { "id": "skin-04", "label": "Tone 04", "color": "#C6865E" },
+      { "id": "skin-05", "label": "Tone 05", "color": "#A96F4E" },
+      { "id": "skin-06", "label": "Tone 06", "color": "#8B5A3C" },
+      { "id": "skin-07", "label": "Tone 07", "color": "#6D452F" },
+      { "id": "skin-08", "label": "Tone 08", "color": "#4E3126" },
+      { "id": "skin-09", "label": "Tone 09", "color": "#33231E" }
+    ],
+    "eyeColors": [
+      { "id": "eye-brown", "label": "Brown", "color": "#5A3825" },
+      { "id": "eye-dark-brown", "label": "Dark Brown", "color": "#2D201A" },
+      { "id": "eye-hazel", "label": "Hazel", "color": "#8A6B3E" },
+      { "id": "eye-green", "label": "Green", "color": "#5F7B55" },
+      { "id": "eye-blue", "label": "Blue", "color": "#5A84A8" },
+      { "id": "eye-gray", "label": "Gray", "color": "#7E8790" },
+      { "id": "eye-violet", "label": "Violet", "color": "#75619A", "fantasy": true }
+    ],
+    "hairColors": [
+      { "id": "hair-black", "label": "Black", "color": "#151312" },
+      { "id": "hair-dark-brown", "label": "Dark Brown", "color": "#3C2A22" },
+      { "id": "hair-brown", "label": "Brown", "color": "#694631" },
+      { "id": "hair-auburn", "label": "Auburn", "color": "#7B3E2B" },
+      { "id": "hair-blonde", "label": "Blonde", "color": "#D8B878" },
+      { "id": "hair-platinum", "label": "Platinum", "color": "#E8E3DA" },
+      { "id": "hair-gray", "label": "Gray", "color": "#8A8986" },
+      { "id": "hair-purple", "label": "SVR Purple", "color": "#7C4ED9", "fantasy": true },
+      { "id": "hair-cyan", "label": "Neon Cyan", "color": "#55D8E8", "fantasy": true }
+    ],
+    "hairStyles": [
+      { "id": "hair-none", "label": "Bald / No Hair", "equipSlot": "hair", "geometryProfile": "none" },
+      { "id": "hair-short-fade", "label": "Short Fade", "equipSlot": "hair", "geometryProfile": "svr-hair-scalp-v1" },
+      { "id": "hair-short-curl", "label": "Short Curls", "equipSlot": "hair", "geometryProfile": "svr-hair-scalp-v1" },
+      { "id": "hair-braids", "label": "Braids", "equipSlot": "hair", "geometryProfile": "svr-hair-scalp-v1" },
+      { "id": "hair-locs", "label": "Locs", "equipSlot": "hair", "geometryProfile": "svr-hair-scalp-v1" },
+      { "id": "hair-bob", "label": "Bob", "equipSlot": "hair", "geometryProfile": "svr-hair-scalp-v1" },
+      { "id": "hair-long-wave", "label": "Long Waves", "equipSlot": "hair", "geometryProfile": "svr-hair-scalp-v1" },
+      { "id": "hair-ponytail", "label": "Ponytail", "equipSlot": "hair", "geometryProfile": "svr-hair-scalp-v1" }
+    ],
+    "nailStyles": [
+      { "id": "nail-natural", "label": "Natural", "geometryProfile": "svr-nails-v1" },
+      { "id": "nail-short-round", "label": "Short Round", "geometryProfile": "svr-nails-v1" },
+      { "id": "nail-square", "label": "Square", "geometryProfile": "svr-nails-v1" },
+      { "id": "nail-almond", "label": "Almond", "geometryProfile": "svr-nails-v1" },
+      { "id": "nail-stiletto", "label": "Stiletto", "geometryProfile": "svr-nails-v1" }
+    ],
+    "nailColors": [
+      { "id": "nail-clear", "label": "Clear", "color": "#E9C5B8" },
+      { "id": "nail-black", "label": "Black", "color": "#111111" },
+      { "id": "nail-red", "label": "Casino Red", "color": "#A51C30" },
+      { "id": "nail-purple", "label": "SVR Purple", "color": "#6F42C1" },
+      { "id": "nail-gold", "label": "Gold", "color": "#C9A23B" },
+      { "id": "nail-white", "label": "White", "color": "#F3F2EE" }
+    ]
+  },
+  "morphs": {
+    "height": { "min": 0, "max": 1, "default": 0.5, "semantic": "overall stature" },
+    "bodyMass": { "min": 0, "max": 1, "default": 0.5, "semantic": "slim-to-broad body volume" },
+    "shoulderWidth": { "min": 0, "max": 1, "default": 0.5 },
+    "torsoLength": { "min": 0, "max": 1, "default": 0.5 },
+    "armLength": { "min": 0, "max": 1, "default": 0.5 },
+    "legLength": { "min": 0, "max": 1, "default": 0.5 },
+    "handScale": { "min": 0, "max": 1, "default": 0.5 },
+    "footScale": { "min": 0, "max": 1, "default": 0.5 }
+  },
+  "equipmentSlots": [
+    "hair",
+    "headwear",
+    "eyewear",
+    "faceAccessory",
+    "top",
+    "outerwear",
+    "bottom",
+    "shoes",
+    "neck",
+    "wristLeft",
+    "wristRight",
+    "handLeft",
+    "handRight"
+  ],
+  "storeCategories": [
+    { "id": "avatar.bodies", "label": "Bodies", "slots": [] },
+    { "id": "avatar.skin-face", "label": "Skin & Face", "slots": [] },
+    { "id": "avatar.eyes", "label": "Eyes", "slots": [] },
+    { "id": "avatar.hair", "label": "Hair", "slots": ["hair"] },
+    { "id": "avatar.nails", "label": "Nails", "slots": ["handLeft", "handRight"] },
+    { "id": "avatar.tops", "label": "Tops", "slots": ["top"] },
+    { "id": "avatar.bottoms", "label": "Bottoms", "slots": ["bottom"] },
+    { "id": "avatar.outerwear", "label": "Outerwear", "slots": ["outerwear"] },
+    { "id": "avatar.shoes", "label": "Shoes", "slots": ["shoes"] },
+    { "id": "avatar.headwear", "label": "Headwear", "slots": ["headwear"] },
+    { "id": "avatar.eyewear", "label": "Eyewear", "slots": ["eyewear"] },
+    { "id": "avatar.jewelry-watches", "label": "Jewelry & Watches", "slots": ["neck", "wristLeft", "wristRight"] },
+    { "id": "avatar.hands", "label": "Hands", "slots": ["handLeft", "handRight"] },
+    { "id": "avatar.bundles", "label": "Bundles & Limited Drops", "slots": [] }
+  ],
+  "starterItems": [
+    { "itemId": "top-svr-black-tee", "label": "SVR Black Tee", "storeCategory": "avatar.tops", "equipSlot": "top", "compatibleBodyFamilies": ["male", "female"], "geometryProfile": "svr-garment-upper-v1", "ownedByDefault": true, "assetStatus": "needs-fitted-mesh" },
+    { "itemId": "top-svr-purple-hoodie", "label": "SVR Purple Hoodie", "storeCategory": "avatar.outerwear", "equipSlot": "outerwear", "compatibleBodyFamilies": ["male", "female"], "geometryProfile": "svr-garment-upper-v1", "ownedByDefault": false, "assetStatus": "needs-fitted-mesh" },
+    { "itemId": "bottom-black-jeans", "label": "Black Jeans", "storeCategory": "avatar.bottoms", "equipSlot": "bottom", "compatibleBodyFamilies": ["male", "female"], "geometryProfile": "svr-garment-lower-v1", "ownedByDefault": true, "assetStatus": "needs-fitted-mesh" },
+    { "itemId": "shoe-black-low", "label": "Black Low Sneakers", "storeCategory": "avatar.shoes", "equipSlot": "shoes", "compatibleBodyFamilies": ["male", "female"], "geometryProfile": "svr-footwear-v1", "ownedByDefault": true, "assetStatus": "needs-fitted-mesh" },
+    { "itemId": "hat-svr-neon-cap", "label": "SVR Neon Cap", "storeCategory": "avatar.headwear", "equipSlot": "headwear", "compatibleBodyFamilies": ["male", "female"], "geometryProfile": "svr-headwear-v1", "ownedByDefault": false, "assetStatus": "needs-fitted-mesh" },
+    { "itemId": "glasses-neon-frame", "label": "Neon Frames", "storeCategory": "avatar.eyewear", "equipSlot": "eyewear", "compatibleBodyFamilies": ["male", "female"], "geometryProfile": "svr-eyewear-v1", "ownedByDefault": false, "assetStatus": "needs-fitted-mesh" },
+    { "itemId": "watch-svr-classic", "label": "SVR Classic Watch", "storeCategory": "avatar.jewelry-watches", "equipSlot": "wristRight", "compatibleBodyFamilies": ["male", "female"], "geometryProfile": "svr-wrist-v1", "ownedByDefault": true, "assetStatus": "needs-fitted-mesh" },
+    { "itemId": "chain-svr-gold", "label": "SVR Gold Chain", "storeCategory": "avatar.jewelry-watches", "equipSlot": "neck", "compatibleBodyFamilies": ["male", "female"], "geometryProfile": "svr-neck-v1", "ownedByDefault": false, "assetStatus": "needs-fitted-mesh" }
+  ],
+  "defaultAvatar": {
+    "schemaVersion": 2,
+    "baseBodyId": "male-eric-v1",
+    "appearance": {
+      "skinToneId": "skin-05",
+      "eyeColorId": "eye-brown",
+      "hairStyleId": "hair-short-fade",
+      "hairColorId": "hair-black",
+      "nailStyleId": "nail-natural",
+      "nailColorId": "nail-clear"
+    },
+    "morphs": {
+      "height": 0.5,
+      "bodyMass": 0.5,
+      "shoulderWidth": 0.5,
+      "torsoLength": 0.5,
+      "armLength": 0.5,
+      "legLength": 0.5,
+      "handScale": 0.5,
+      "footScale": 0.5
+    },
+    "equipment": {
+      "hair": "hair-short-fade",
+      "headwear": "none",
+      "eyewear": "none",
+      "faceAccessory": "none",
+      "top": "top-svr-black-tee",
+      "outerwear": "none",
+      "bottom": "bottom-black-jeans",
+      "shoes": "shoe-black-low",
+      "neck": "none",
+      "wristLeft": "none",
+      "wristRight": "watch-svr-classic",
+      "handLeft": "none",
+      "handRight": "none"
+    }
+  }
+}
