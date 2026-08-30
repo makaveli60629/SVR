@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const TABLE_URL = new URL('../../assets/models/table.glb', import.meta.url).href;
-const STORAGE_KEY = 'svrDealerLabTablePresetV2';
-const DEFAULTS = { tableY: 1.1, feltDrop: 0.036, innerMargin: 0.06, collisionDrop: 0.03, cardLift: 0.002 };
+const STORAGE_KEY = 'svrDealerLabTablePresetPhase424';
+const DEFAULTS = { tableY: 0.62, feltDrop: 0.014, innerMargin: 0.125, collisionDrop: 0.02, cardLift: 0.008 };
 
 function disposeObject(obj) {
   obj.traverse?.((child) => {
@@ -162,12 +162,12 @@ export class TableCalibrationModule extends EventTarget {
   saveLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.getPreset())); }
   loadLocal() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('svrDealerLabTablePresetV1');
+      const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return false;
       const preset = JSON.parse(raw);
       if (preset?.table) { this.setParams(preset.table); return true; }
     } catch (error) { console.warn('[SVR Dealer Lab] Failed to load table preset', error); }
     return false;
   }
-  reset() { this.params = { ...DEFAULTS }; localStorage.removeItem(STORAGE_KEY); localStorage.removeItem('svrDealerLabTablePresetV1'); this.apply(); }
+  reset() { this.params = { ...DEFAULTS }; localStorage.removeItem(STORAGE_KEY); this.apply(); }
 }
