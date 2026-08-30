@@ -1,0 +1,81 @@
+name: SVR Branded 404 Publish Guard
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['SVR Production Auto Deploy']
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: svr-branded-404-publish-guard
+  cancel-in-progress: true
+
+jobs:
+  enforce-branded-404:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout authoritative main source
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          path: source
+          fetch-depth: 1
+
+      - name: Checkout production publish branch
+        uses: actions/checkout@v5
+        with:
+          ref: gh-pages
+          path: publish
+          fetch-depth: 1
+
+      - name: Validate SVR-only custom 404 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s source/404.html
+          grep -Fq '<title>SVR Poker | Official 404</title>' source/404.html
+          grep -Fq 'src="/logo.png"' source/404.html
+          grep -Fq 'href="/index.html"' source/404.html
+          grep -Fq 'href="/site/index.html"' source/404.html
+          grep -Fq 'href="/game/index.html"' source/404.html
+          if grep -Eiq 'github|githubusercontent' source/404.html; then
+            echo 'Provider branding detected in SVR 404 source. Refusing publish.' >&2
+            exit 1
+          fi
+
+      - name: Enforce branded 404 on production branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp source/404.html publish/404.html
+          cd publish
+          if grep -Eiq 'github|githubusercontent' 404.html; then
+            echo 'Provider branding detected in production 404. Refusing publish.' >&2
+            exit 1
+          fi
+          git config user.name 'SVR Production Guard'
+          git config user.email 'actions@users.noreply.github.com'
+          git add 404.html
+          if git diff --cached --quiet; then
+            echo 'SVR branded 404 already locked on production.'
+            exit 0
+          fi
+          git commit -m 'Enforce SVR branded 404 fallback'
+          git push origin HEAD:gh-pages
+
+      - name: Verify Dealer Lab production routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s publish/game/dealer-lab.html
+          test -s publish/game/labs/dealer/index.html
+          test -s publish/game/labs/dealer/lab-access.js
+          test -s publish/game/labs/dealer/dealer-lab.js
+          grep -Fq '/game/labs/dealer/index.html' publish/game/dealer-lab.html
+          grep -Fq 'SVR Dealer Lab' publish/game/labs/dealer/index.html
+          echo 'SVR custom 404 and Dealer Lab publish routes verified.'
