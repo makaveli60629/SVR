@@ -1,0 +1,28 @@
+{
+  "build": "DEALER-LAB-V1-ERIC-TABLE-WRIST-LOCK",
+  "route": "/game/labs/dealer/",
+  "scope": "game-only isolated lab",
+  "productionLobbyModified": false,
+  "websiteModified": false,
+  "reusedAssets": [
+    "game/assets/models/eric/eric.fbx",
+    "game/assets/models/eric/eric_idle.fbx",
+    "game/assets/models/eric/eric_basecolor.png",
+    "game/assets/models/eric/eric_normal.png",
+    "game/assets/models/eric/eric_roughness.png",
+    "game/assets/models/eric/eric_emissive.png",
+    "game/assets/models/table.glb"
+  ],
+  "features": {
+    "ownerGate": true,
+    "noIndex": true,
+    "ericTextures": true,
+    "idleAnimation": true,
+    "proceduralDealAnimation": true,
+    "sixSeatDealLoop": true,
+    "tableCalibration": true,
+    "wristWatchXR": true,
+    "controllerFallback": true,
+    "presetPersistence": "localStorage"
+  }
+}
