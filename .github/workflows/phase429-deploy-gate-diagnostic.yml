@@ -1,0 +1,153 @@
+name: Phase 429 Deploy Gate Diagnostic
+
+on:
+  push:
+    branches: [phase429-deploy-gate-diagnostic]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Re-run production validation with command tracing
+        shell: bash
+        run: |
+          set -euxo pipefail
+          test -s platform-device.js
+          test -s phase409-public-status.js
+          test -s site-public-hooks.js
+          test -s game/android.html
+          test -s game/iphone.html
+          test -s game/android-tabletop.html
+          test -s game/iphone-tabletop.html
+          test -s game/android-stable-phase405.html
+          test -s game/modules/phase418_mobile_surface_polish.js
+          test -s game/styles/phase418_mobile_surface_polish.css
+          test -s game/modules/phase419_mobile_table_flow_polish.js
+          test -s game/styles/phase419_mobile_table_flow_polish.css
+          test -s game/modules/phase419_tournament_registration_notify.js
+          test -s game/styles/phase419_tournament_registration_notify.css
+          test -s game/modules/phase420_mobile_release_lock.js
+          test -s game/modules/phase420_tournament_start_authority.js
+          test -s game/modules/phase421_vr_table_final_polish.js
+          test -s game/modules/phase422_quest_table_geometry_theme_lock.js
+          test -s game/modules/phase422_quest_seated_inspection_lock.js
+          test -s game/modules/phase422_quest_table_prop_alignment_flex_lock.js
+          test -s game/tournament-signup.html
+          test -s game/config/tournament-api.json
+          test -s site/profile.html
+          test -s site/js/phase418-profile-eric-authority.js
+          test -s site/css/phase418-profile-mobile-fix.css
+          test -s site/login.html
+          test -s site/config/player-api.json
+          grep -q 'PHASE-419-TOURNAMENT-REGISTRATION-MOBILE-UX-LOCK' game/android-stable-phase405.html
+          grep -q 'PHASE-419-MOBILE-TABLE-FLOW-POLISH-LOCK' game/modules/phase419_mobile_table_flow_polish.js
+          grep -q 'PHASE-419-TOURNAMENT-REGISTRATION-NOTIFICATION-LOCK' game/tournament-signup.html
+          grep -q 'phase419_mobile_table_flow_polish.js?v=phase419' game/android-stable-phase405.html
+          grep -q 'phase419_tournament_registration_notify.js?v=phase419' game/tournaments.html
+          grep -q 'PHASE-420-MOBILE-RELEASE-TRUTH-LOCK' game/android.html
+          grep -q 'PHASE-420-MOBILE-RELEASE-TRUTH-LOCK' game/iphone.html
+          grep -q 'PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK' game/android-tabletop.html
+          grep -q 'PHASE-420-IPHONE-WRAPPER-RELEASE-LOCK' game/iphone-tabletop.html
+          grep -q 'PHASE-420-TOURNAMENT-START-AUTHORITY-LOCK' game/tournaments.html
+          grep -q 'phase420_tournament_start_authority.js?v=phase420' game/tournaments.html
+          grep -q 'phase420_mobile_release_lock.js?v=phase420' game/modules/phase419_mobile_table_flow_polish.js
+          grep -q 'PHASE-421-VR-TABLE-FINAL-POLISH-LOCK' game/modules/phase421_vr_table_final_polish.js
+          grep -Fq 'phase421_vr_table_final_polish.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'supersededByPhase422' game/modules/phase421_vr_table_final_polish.js
+          grep -q 'PHASE-422-QUEST-TABLE-GEOMETRY-THEME-LOCK' game/modules/phase422_quest_table_geometry_theme_lock.js
+          grep -q 'FELT_RECESS_METERS=.0254' game/modules/phase422_quest_table_geometry_theme_lock.js
+          grep -q 'PHASE422_TRUE_INNER_PLAYING_SURFACE' game/modules/phase422_quest_table_geometry_theme_lock.js
+          grep -q 'PASS / BET LINE' game/modules/phase422_quest_table_geometry_theme_lock.js
+          grep -q 'curvedLeatherRailPreserved:true' game/modules/phase422_quest_table_geometry_theme_lock.js
+          grep -q 'SEATED_RAIL_GAP=.045' game/modules/phase422_quest_seated_inspection_lock.js
+          grep -q 'SEATED_EYE_HEIGHT=1.18' game/modules/phase422_quest_seated_inspection_lock.js
+          grep -q 'SVR_HAND_TELEPORT_ENABLED' game/modules/phase422_quest_seated_inspection_lock.js
+          grep -q 'SVR_GRIP_TELEPORT_ENABLED' game/modules/phase422_quest_seated_inspection_lock.js
+          grep -q 'phase334Held' game/modules/phase422_quest_table_prop_alignment_flex_lock.js
+          grep -q 'phase422_quest_table_geometry_theme_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase422_quest_seated_inspection_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase422_quest_table_prop_alignment_flex_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422' game/index.html
+          grep -q 'data-quest-polish-build="PHASE-422-QUEST-TABLE-INSPECTION-LOCK"' game/index.html
+          grep -q 'phase418_mobile_surface_polish.js?v=phase418' game/android-stable-phase405.html
+          grep -q 'phase418_mobile_surface_polish.css?v=phase418' game/android-stable-phase405.html
+          grep -q 'PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK' site/profile.html
+          grep -q 'PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK' phase409-public-status.js
+          grep -q "ADMIN ONLINE':'AI ONLINE" phase409-public-status.js
+          grep -q "CURRENT_PHASE='phase418'" site-public-hooks.js
+          grep -q 'PHASE-418-PLAYER-ACCOUNT-API-READINESS-LOCK' site/config/player-api.json
+          grep -q '"deploymentState": "cloud-endpoint-pending"' site/config/player-api.json
+          grep -q '"accountApiEndpointConfigured": false' site/config/player-api.json
+          grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' game/modules/phase414_human_turn_rotation_authority.js
+          grep -q 'PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK' game/modules/phase413_mobile_human_action_hard_lock.js
+          grep -q 'PHASE-410-MOBILE-HUMAN-INPUT-LOCK' game/modules/phase410_mobile_human_input_lock.js
+          grep -q 'PHASE-409-MOBILE-PLAYER-TURN-GUARD-LOCK' game/modules/phase409_mobile_player_turn_guard.js
+          grep -q 'DARIUS_TO_USER_ORDER' game/modules/phase409_mobile_player_turn_guard.js
+          grep -q 'PHASE-408-HOLDEM-STREET-CALL-TRUTH-LOCK' game/modules/phase408_holdem_street_call_truth.js
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' game/modules/phase403_android_pot_rules.js
+          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK' game/modules/phase404_android_mobile_safety.js
+          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' game/modules/phase400_ios_safari_adapter.js
+          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q 'scheduleEveryHours.*5' game/manifest.json
+          grep -q '"androidSingleBurnPile": true' update/app-version.json
+          grep -q '"androidProductionMatchServerConfigured": false' update/app-version.json
+          if grep -q 'setInterval(poll,220)' game/modules/phase419_mobile_table_flow_polish.js; then exit 31; fi
+          if grep -q 'setInterval(watchdog' game/modules/phase421_vr_table_final_polish.js; then exit 32; fi
+          python3 - <<'PY'
+          import json,re
+          c=json.load(open('game/config/tournament-api.json'))
+          assert c['apiBase']==''
+          assert c['sharedRegistrationBackendLive'] is False
+          assert c['backgroundPushLive'] is False
+          assert c['scheduleEveryHours']==5
+          p=json.load(open('site/config/player-api.json'))
+          assert p['deploymentState']=='cloud-endpoint-pending'
+          assert p['accountApiEndpointConfigured'] is False
+          assert p['apiBase']==''
+          s=open('game/modules/phase422_quest_table_geometry_theme_lock.js').read()
+          recess=float(re.search(r'FELT_RECESS_METERS=([0-9.]+)',s).group(1))
+          assert abs(recess-0.0254) < 1e-9
+          PY
+          test "$(grep -o 'class="burn-zone"' game/android-stable-phase405.html | wc -l)" -eq 1
+          node --check platform-device.js
+          node --check site-public-hooks.js
+          node --check phase409-public-status.js
+          node --check game/modules/phase418_mobile_surface_polish.js
+          node --check game/modules/phase419_mobile_table_flow_polish.js
+          node --check game/modules/phase419_tournament_registration_notify.js
+          node --check game/modules/phase420_mobile_release_lock.js
+          node --check game/modules/phase420_tournament_start_authority.js
+          node --check game/modules/phase421_vr_table_final_polish.js
+          node --check game/modules/phase422_quest_table_geometry_theme_lock.js
+          node --check game/modules/phase422_quest_seated_inspection_lock.js
+          node --check game/modules/phase422_quest_table_prop_alignment_flex_lock.js
+          node --check game/modules/phase406_quest_side_burn_chip_polish.js
+          node --check site/js/phase418-profile-eric-authority.js
+          node --check game/modules/phase414_human_turn_rotation_authority.js
+          node --check game/modules/phase413_mobile_human_action_hard_lock.js
+          node --check game/modules/phase410_mobile_human_input_lock.js
+          node --check game/modules/phase409_mobile_player_turn_guard.js
+          node --check game/modules/phase408_holdem_street_call_truth.js
+          node --check game/modules/phase403_android_gameplay.js
+          node --check sw.js
+          node --check pwa-sw.js
+          python3 -m json.tool game/config/tournament-api.json >/dev/null
+          python3 -m json.tool site/config/player-api.json >/dev/null
+          python3 -m json.tool manifest.webmanifest >/dev/null
+          python3 -m json.tool game/manifest.json >/dev/null
+          python3 -m json.tool game/android-release.json >/dev/null
+          python3 -m json.tool update/app-version.json >/dev/null
+          test -s downloads/svr-poker-android-rc2.apk
+          grep -q '"apkVersionName": "0.1.0-rc2"' game/android-release.json
+          grep -q '"apkVersionCode": 2' game/android-release.json
+          grep -q '"forceUpdate": false' game/android-release.json
+          grep -q '"showUpdatePrompt": false' game/android-release.json
+          grep -q '"nativeApkRebuild": false' game/android-release.json
+          echo 'Production validation contract passed.'
