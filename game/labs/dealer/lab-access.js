@@ -16,7 +16,7 @@ async function launch() {
   gate.style.display = 'none';
   document.getElementById('hud').style.display = 'block';
   document.getElementById('xrHint').style.display = 'block';
-  await import('./dealer-lab.js');
+  await import('./dealer-lab-v427.js?v=phase427');
 }
 
 async function unlock() {
@@ -46,8 +46,5 @@ keyInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') unlock();
 });
 
-if (sessionStorage.getItem(SESSION_KEY) === '1') {
-  launch();
-} else {
-  requestAnimationFrame(() => keyInput.focus());
-}
+if (sessionStorage.getItem(SESSION_KEY) === '1') launch();
+else requestAnimationFrame(() => keyInput.focus());

@@ -1,336 +1,51 @@
-const BUILD = 'PHASE-345-PLAYER-LOGIN-PROFILE-DAILY-REWARD-API-LOCK';
+const BUILD = 'PHASE-427-PLAYER-CREATE-LOCAL-FIRST-CLOUD-RECOVERY-LOCK';
 const CONFIG_URL = '/site/config/player-api.json';
 const DEMO_KEY = 'svr_phase345_demo_player_v1';
+const LOCAL_ACCOUNT_KEY = 'svr_phase427_local_player_v1';
+const LOCAL_SIGNED_OUT_KEY = 'svr_phase427_local_signed_out_v1';
+const TEST_LOGIN_KEY = 'svr_phase427_test_login_v1';
 const SESSION_KEY = 'svr_phase345_demo_session_v1';
-
-const state = {
-  build: BUILD,
-  ready: false,
-  mode: 'loading',
-  config: null,
-  profile: null,
-  apiHealthy: false,
-  session: null,
-  lastError: null,
-  checkedAt: null
-};
-
-function emit(type = 'change') {
-  state.checkedAt = new Date().toISOString();
-  window.SVR_PLAYER_ACCOUNT_STATE = snapshot();
-  window.dispatchEvent(new CustomEvent(`svr:account-${type}`, { detail: snapshot() }));
-}
-function snapshot() {
-  return {
-    build: BUILD,
-    ready: state.ready,
-    mode: state.mode,
-    apiConfigured: Boolean(state.config?.apiBase),
-    apiHealthy: state.apiHealthy,
-    profile: state.profile ? { ...state.profile } : null,
-    session: state.session ? { ...state.session } : null,
-    lastError: state.lastError,
-    checkedAt: state.checkedAt
-  };
-}
-function safeJson(value, fallback = null) {
-  try { return JSON.parse(value); } catch { return fallback; }
-}
-function readDemoProfile() {
-  return safeJson(localStorage.getItem(DEMO_KEY), null);
-}
-function writeDemoProfile(profile) {
-  localStorage.setItem(DEMO_KEY, JSON.stringify(profile));
-  return profile;
-}
-function defaultDemoProfile(name = 'Demo Player') {
-  const now = new Date().toISOString();
-  return {
-    playerId: `demo-${crypto.randomUUID?.() || Date.now()}`,
-    displayName: String(name || 'Demo Player').slice(0, 40),
-    email: '',
-    role: 'player',
-    playMoney: 50000,
-    dailyStreak: 0,
-    lastRewardClaim: null,
-    avatarUrl: null,
-    equippedOutfit: {},
-    inventory: [],
-    createdAt: now,
-    lastLoginAt: now,
-    demoMode: true
-  };
-}
-async function loadConfig() {
-  if (state.config) return state.config;
-  try {
-    const response = await fetch(`${CONFIG_URL}?v=phase345`, { cache: 'no-store' });
-    if (!response.ok) throw new Error(`Config ${response.status}`);
-    state.config = await response.json();
-  } catch (error) {
-    state.config = { apiBase: '', allowDemoFallback: true, dailyRewardChips: 5000, minimumActivitySeconds: 300 };
-    state.lastError = String(error?.message || error);
-  }
-  state.config.apiBase = String(state.config.apiBase || '').replace(/\/$/, '');
-  return state.config;
-}
-async function request(path, options = {}) {
-  const config = await loadConfig();
-  if (!config.apiBase) throw new Error('PLAYER_API_NOT_CONFIGURED');
-  const response = await fetch(`${config.apiBase}${path}`, {
-    method: options.method || 'GET',
-    credentials: 'include',
-    cache: 'no-store',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'X-SVR-Client': BUILD,
-      ...(options.headers || {})
-    },
-    body: options.body == null ? undefined : JSON.stringify(options.body)
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const error = new Error(payload.error || payload.message || `API ${response.status}`);
-    error.status = response.status;
-    error.payload = payload;
-    throw error;
-  }
-  return payload;
-}
-function setProfile(profile, mode) {
-  state.profile = profile || null;
-  state.mode = mode;
-  state.ready = true;
-  emit('change');
-  updateAccountPill();
-  return snapshot();
-}
-
-async function health() {
-  try {
-    const result = await request('/health');
-    state.apiHealthy = result?.status === 'ok';
-    return result;
-  } catch (error) {
-    state.apiHealthy = false;
-    state.lastError = String(error?.message || error);
-    return null;
-  }
-}
-async function bootstrap() {
-  await loadConfig();
-  if (state.config.apiBase) {
-    await health();
-    if (state.apiHealthy) {
-      try {
-        const result = await request('/player/profile');
-        return setProfile(result.profile || result, 'api');
-      } catch (error) {
-        if (error.status !== 401) state.lastError = String(error?.message || error);
-      }
-    }
-  }
-  const demo = readDemoProfile();
-  if (demo) return setProfile(demo, 'demo');
-  state.ready = true;
-  state.mode = state.config.apiBase ? 'signed-out' : 'unconfigured';
-  emit('ready');
-  updateAccountPill();
-  return snapshot();
-}
-async function login({ email, password }) {
-  const result = await request('/auth/login', { method: 'POST', body: { email, password } });
-  state.apiHealthy = true;
-  return setProfile(result.profile, 'api');
-}
-async function register({ displayName, email, password }) {
-  const result = await request('/auth/register', { method: 'POST', body: { displayName, email, password } });
-  state.apiHealthy = true;
-  return setProfile(result.profile, 'api');
-}
-async function logout() {
-  if (state.mode === 'api') {
-    try { await request('/auth/logout', { method: 'POST' }); } catch {}
-  }
-  if (state.mode === 'demo') localStorage.removeItem(DEMO_KEY);
-  state.profile = null;
-  state.session = null;
-  state.mode = state.config?.apiBase ? 'signed-out' : 'unconfigured';
-  emit('change');
-  updateAccountPill();
-  return snapshot();
-}
-function continueDemo(displayName = 'Demo Player') {
-  const existing = readDemoProfile();
-  const profile = existing || defaultDemoProfile(displayName);
-  profile.displayName = String(displayName || profile.displayName || 'Demo Player').slice(0, 40);
-  profile.lastLoginAt = new Date().toISOString();
-  writeDemoProfile(profile);
-  return setProfile(profile, 'demo');
-}
-async function refreshProfile() {
-  if (state.mode === 'api') {
-    const result = await request('/player/profile');
-    return setProfile(result.profile || result, 'api');
-  }
-  if (state.mode === 'demo') return setProfile(readDemoProfile(), 'demo');
-  return snapshot();
-}
-async function updateProfile(patch = {}) {
-  const allowed = {
-    displayName: patch.displayName,
-    avatarUrl: patch.avatarUrl,
-    equippedOutfit: patch.equippedOutfit
-  };
-  if (state.mode === 'api') {
-    const result = await request('/player/profile', { method: 'PUT', body: allowed });
-    return setProfile(result.profile, 'api');
-  }
-  if (state.mode === 'demo') {
-    const profile = { ...state.profile, ...allowed, updatedAt: new Date().toISOString() };
-    writeDemoProfile(profile);
-    return setProfile(profile, 'demo');
-  }
-  throw new Error('NOT_SIGNED_IN');
-}
-async function rewardStatus() {
-  if (state.mode === 'api') return request('/rewards/daily/status');
-  const today = new Date().toISOString().slice(0, 10);
-  const claimed = String(state.profile?.lastRewardClaim || '').slice(0, 10) === today;
-  const session = safeJson(sessionStorage.getItem(SESSION_KEY), null);
-  return {
-    eligible: !claimed && Number(session?.activeSeconds || 0) >= Number(state.config?.minimumActivitySeconds || 300),
-    claimed,
-    activeSeconds: Number(session?.activeSeconds || 0),
-    requiredSeconds: Number(state.config?.minimumActivitySeconds || 300),
-    rewardChips: Number(state.config?.dailyRewardChips || 5000),
-    demoMode: true
-  };
-}
-async function claimDailyReward() {
-  if (state.mode === 'api') {
-    const result = await request('/rewards/daily/claim', { method: 'POST' });
-    if (result.profile) setProfile(result.profile, 'api');
-    return result;
-  }
-  if (state.mode === 'demo') {
-    const status = await rewardStatus();
-    if (!status.eligible) throw new Error(status.claimed ? 'REWARD_ALREADY_CLAIMED' : 'MORE_ACTIVITY_REQUIRED');
-    const profile = {
-      ...state.profile,
-      playMoney: Number(state.profile.playMoney || 0) + status.rewardChips,
-      dailyStreak: Number(state.profile.dailyStreak || 0) + 1,
-      lastRewardClaim: new Date().toISOString(),
-      demoMode: true
-    };
-    writeDemoProfile(profile);
-    setProfile(profile, 'demo');
-    return { claimed: true, rewardChips: status.rewardChips, profile, demoMode: true };
-  }
-  throw new Error('NOT_SIGNED_IN');
-}
-async function startActivitySession(platform = 'web', metadata = {}) {
-  if (!state.profile) return null;
-  if (state.mode === 'api') {
-    const result = await request('/game/session/start', { method: 'POST', body: { platform, metadata } });
-    state.session = result.session;
-  } else {
-    state.session = {
-      sessionId: `demo-session-${crypto.randomUUID?.() || Date.now()}`,
-      platform,
-      startedAt: new Date().toISOString(),
-      lastHeartbeatAt: new Date().toISOString(),
-      activeSeconds: 0,
-      heartbeatCount: 0,
-      demoMode: true
-    };
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(state.session));
-  }
-  emit('session');
-  return state.session;
-}
-async function heartbeat(metadata = {}) {
-  if (!state.session) return null;
-  if (state.mode === 'api') {
-    const result = await request('/game/session/heartbeat', { method: 'POST', body: { sessionId: state.session.sessionId, metadata } });
-    state.session = result.session;
-  } else {
-    const now = Date.now();
-    const last = Date.parse(state.session.lastHeartbeatAt || state.session.startedAt || new Date().toISOString());
-    const delta = Math.max(0, Math.min(75, Math.round((now - last) / 1000)));
-    state.session.activeSeconds = Number(state.session.activeSeconds || 0) + delta;
-    state.session.heartbeatCount = Number(state.session.heartbeatCount || 0) + 1;
-    state.session.lastHeartbeatAt = new Date(now).toISOString();
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(state.session));
-  }
-  emit('session');
-  return state.session;
-}
-async function endActivitySession(metadata = {}) {
-  if (!state.session) return null;
-  let result = null;
-  if (state.mode === 'api') {
-    result = await request('/game/session/end', { method: 'POST', body: { sessionId: state.session.sessionId, metadata } });
-  } else {
-    await heartbeat(metadata);
-    result = { session: { ...state.session, endedAt: new Date().toISOString() }, demoMode: true };
-  }
-  state.session = null;
-  sessionStorage.removeItem(SESSION_KEY);
-  emit('session');
-  return result;
-}
-function ensureAccountPill() {
-  if (document.getElementById('svr345AccountPill')) return;
-  const style = document.createElement('style');
-  style.id = 'svr345-account-style';
-  style.textContent = `#svr345AccountPill{position:fixed;top:max(10px,env(safe-area-inset-top));right:12px;z-index:2147483500;display:flex;align-items:center;gap:8px;border:1px solid rgba(127,252,255,.58);border-radius:999px;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);padding:7px 10px;color:#fff;text-decoration:none;font:900 11px system-ui,Arial;letter-spacing:.04em;box-shadow:0 8px 24px rgba(0,0,0,.32)}#svr345AccountPill[data-mode="api"]{border-color:rgba(141,255,180,.7)}#svr345AccountPill[data-mode="demo"]{border-color:rgba(255,217,138,.72)}#svr345AccountDot{width:8px;height:8px;border-radius:50%;background:#ff5b8c;box-shadow:0 0 12px currentColor}#svr345AccountPill[data-mode="api"] #svr345AccountDot{background:#8dffb4}#svr345AccountPill[data-mode="demo"] #svr345AccountDot{background:#ffd98a}`;
-  document.head.appendChild(style);
-  const pill = document.createElement('a');
-  pill.id = 'svr345AccountPill';
-  pill.href = '/site/login.html';
-  pill.innerHTML = '<span id="svr345AccountDot"></span><span id="svr345AccountText">LOGIN</span>';
-  document.body.appendChild(pill);
-}
-function updateAccountPill() {
-  ensureAccountPill();
-  const pill = document.getElementById('svr345AccountPill');
-  const text = document.getElementById('svr345AccountText');
-  if (!pill || !text) return;
-  pill.dataset.mode = state.mode;
-  if (state.profile) {
-    text.textContent = `${state.profile.displayName}${state.mode === 'demo' ? ' • DEMO' : ''}`;
-    pill.href = '/site/profile.html';
-  } else {
-    text.textContent = state.config?.apiBase ? 'LOGIN' : 'LOGIN • API SETUP';
-    pill.href = '/site/login.html';
-  }
-}
-
-export const account = {
-  BUILD,
-  state,
-  snapshot,
-  bootstrap,
-  health,
-  login,
-  register,
-  logout,
-  continueDemo,
-  refreshProfile,
-  updateProfile,
-  rewardStatus,
-  claimDailyReward,
-  startActivitySession,
-  heartbeat,
-  endActivitySession
-};
-
-window.SVR_PLAYER_ACCOUNT = account;
-bootstrap().catch((error) => {
-  state.ready = true;
-  state.mode = 'error';
-  state.lastError = String(error?.message || error);
-  emit('error');
+const TEST_ACCOUNTS = Object.freeze({
+  bre: Object.freeze({ username: 'Bre', credentialHash: 'c8b1bdc77aad7c6ff50e4dd73585460db9da50c0740c22a9534f7a16897ee872' }),
+  test: Object.freeze({ username: 'Test', credentialHash: '4d330c68a0a09bbfe6b226dcef9dc4aa74a5783ec3ff7e9dd5e18a6180c633d9' })
 });
+
+const state = { build: BUILD, ready: false, mode: 'loading', config: null, profile: null, apiHealthy: false, session: null, lastError: null, checkedAt: null };
+function emit(type='change'){state.checkedAt=new Date().toISOString();window.SVR_PLAYER_ACCOUNT_STATE=snapshot();window.dispatchEvent(new CustomEvent(`svr:account-${type}`,{detail:snapshot()}))}
+function snapshot(){return{build:BUILD,ready:state.ready,mode:state.mode,apiConfigured:Boolean(state.config?.apiBase),apiHealthy:state.apiHealthy,profile:state.profile?{...state.profile}:null,session:state.session?{...state.session}:null,lastError:state.lastError,checkedAt:state.checkedAt}}
+function safeJson(value,fallback=null){try{return JSON.parse(value)}catch{return fallback}}
+function readDemoProfile(){return safeJson(localStorage.getItem(DEMO_KEY),null)}
+function writeDemoProfile(profile){localStorage.setItem(DEMO_KEY,JSON.stringify(profile));return profile}
+function readLocalAccount(){return safeJson(localStorage.getItem(LOCAL_ACCOUNT_KEY),null)}
+function writeLocalAccount(record){localStorage.setItem(LOCAL_ACCOUNT_KEY,JSON.stringify(record));return record}
+function normalizeEmail(email=''){return String(email).trim().toLowerCase()}
+function normalizeIdentifier(value=''){return String(value).trim().toLowerCase()}
+function bytesToBase64(bytes){let s='';for(const b of bytes)s+=String.fromCharCode(b);return btoa(s)}
+function base64ToBytes(value){const s=atob(value);return Uint8Array.from(s,c=>c.charCodeAt(0))}
+async function sha256Hex(value){const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(value)));return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('')}
+async function passwordVerifier(password,saltBytes){const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(String(password)),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:saltBytes,iterations:120000,hash:'SHA-256'},material,256);return bytesToBase64(new Uint8Array(bits))}
+function localProfile(displayName,email){const now=new Date().toISOString();return{playerId:`local-${crypto.randomUUID?.()||Date.now()}`,displayName:String(displayName||'Player').trim().slice(0,40)||'Player',email:normalizeEmail(email),role:'player',playMoney:50000,dailyStreak:0,lastRewardClaim:null,avatarUrl:null,equippedOutfit:{},inventory:[],createdAt:now,lastLoginAt:now,localOnly:true,provisionalCloud:true,demoMode:false}}
+function testProfile(username){const account=TEST_ACCOUNTS[normalizeIdentifier(username)];if(!account)return null;const now=new Date().toISOString();return{playerId:`test-${normalizeIdentifier(account.username)}`,displayName:account.username,username:account.username,email:'',role:'player',playMoney:50000,dailyStreak:0,lastRewardClaim:null,avatarUrl:null,equippedOutfit:{},inventory:[],createdAt:now,lastLoginAt:now,localOnly:true,provisionalCloud:false,demoMode:false,testAccount:true}}
+function defaultDemoProfile(name='Demo Player'){const now=new Date().toISOString();return{playerId:`demo-${crypto.randomUUID?.()||Date.now()}`,displayName:String(name||'Demo Player').slice(0,40),email:'',role:'player',playMoney:50000,dailyStreak:0,lastRewardClaim:null,avatarUrl:null,equippedOutfit:{},inventory:[],createdAt:now,lastLoginAt:now,demoMode:true}}
+async function loadConfig(){if(state.config)return state.config;try{const response=await fetch(`${CONFIG_URL}?v=phase427`,{cache:'no-store'});if(!response.ok)throw new Error(`Config ${response.status}`);state.config=await response.json()}catch(error){state.config={apiBase:'',allowDemoFallback:true,dailyRewardChips:5000,minimumActivitySeconds:300};state.lastError=String(error?.message||error)}state.config.apiBase=String(state.config.apiBase||'').replace(/\/$/,'');return state.config}
+async function request(path,options={}){const config=await loadConfig();if(!config.apiBase)throw new Error('PLAYER_API_NOT_CONFIGURED');const response=await fetch(`${config.apiBase}${path}`,{method:options.method||'GET',credentials:'include',cache:'no-store',headers:{Accept:'application/json','Content-Type':'application/json','X-SVR-Client':BUILD,...(options.headers||{})},body:options.body==null?undefined:JSON.stringify(options.body)});const payload=await response.json().catch(()=>({}));if(!response.ok){const error=new Error(payload.error||payload.message||`API ${response.status}`);error.status=response.status;error.payload=payload;throw error}return payload}
+function setProfile(profile,mode){state.profile=profile||null;state.mode=mode;state.ready=true;emit('change');updateAccountPill();return snapshot()}
+async function health(){try{const result=await request('/health');state.apiHealthy=result?.status==='ok';return result}catch(error){state.apiHealthy=false;state.lastError=String(error?.message||error);return null}}
+async function bootstrap(){await loadConfig();if(state.config.apiBase){await health();if(state.apiHealthy){try{const result=await request('/player/profile');return setProfile(result.profile||result,'api')}catch(error){if(error.status!==401)state.lastError=String(error?.message||error)}}}const testUser=normalizeIdentifier(localStorage.getItem(TEST_LOGIN_KEY)||'');if(TEST_ACCOUNTS[testUser])return setProfile(testProfile(testUser),'test');const local=readLocalAccount();if(local?.profile&&localStorage.getItem(LOCAL_SIGNED_OUT_KEY)!=='1')return setProfile(local.profile,'local');const demo=readDemoProfile();if(demo)return setProfile(demo,'demo');state.ready=true;state.mode=state.config.apiBase?'signed-out':local?.profile?'signed-out':'unconfigured';emit('ready');updateAccountPill();return snapshot()}
+async function login({email,password}){const config=await loadConfig();const identifier=String(email||'').trim(),testKey=normalizeIdentifier(identifier),test=TEST_ACCOUNTS[testKey];if(!config.apiBase&&test){const digest=await sha256Hex(`${testKey}:${String(password||'')}`);if(digest!==test.credentialHash)throw new Error('INVALID_TEST_CREDENTIALS');localStorage.setItem(TEST_LOGIN_KEY,testKey);localStorage.removeItem(LOCAL_SIGNED_OUT_KEY);return setProfile(testProfile(test.username),'test')}if(config.apiBase){const result=await request('/auth/login',{method:'POST',body:{email:identifier,password}});state.apiHealthy=true;return setProfile(result.profile,'api')}if(!config.allowDemoFallback)throw new Error('PLAYER_API_NOT_CONFIGURED');const record=readLocalAccount();if(!record?.profile)throw new Error('LOCAL_PLAYER_NOT_FOUND');if(normalizeEmail(identifier)!==normalizeEmail(record.email||record.profile.email))throw new Error('LOCAL_PLAYER_NOT_FOUND');const verifier=await passwordVerifier(password,base64ToBytes(record.salt));if(verifier!==record.verifier)throw new Error('INVALID_LOCAL_CREDENTIALS');record.profile.lastLoginAt=new Date().toISOString();writeLocalAccount(record);localStorage.removeItem(LOCAL_SIGNED_OUT_KEY);return setProfile(record.profile,'local')}
+async function register({displayName,email,password}){const config=await loadConfig();if(config.apiBase){const result=await request('/auth/register',{method:'POST',body:{displayName,email,password}});state.apiHealthy=true;return setProfile(result.profile,'api')}if(!config.allowDemoFallback)throw new Error('PLAYER_API_NOT_CONFIGURED');const normalized=normalizeEmail(email);if(!normalized)throw new Error('EMAIL_REQUIRED');if(String(password||'').length<10)throw new Error('PASSWORD_TOO_SHORT');const existing=readLocalAccount();if(existing?.profile&&normalizeEmail(existing.email||existing.profile.email)===normalized)throw new Error('LOCAL_PLAYER_ALREADY_EXISTS');const salt=crypto.getRandomValues(new Uint8Array(16));const verifier=await passwordVerifier(password,salt);const profile=localProfile(displayName,normalized);writeLocalAccount({version:1,email:normalized,salt:bytesToBase64(salt),verifier,profile,createdAt:profile.createdAt});localStorage.removeItem(LOCAL_SIGNED_OUT_KEY);localStorage.removeItem(TEST_LOGIN_KEY);return setProfile(profile,'local')}
+async function logout(){if(state.mode==='api'){try{await request('/auth/logout',{method:'POST'})}catch{}}if(state.mode==='demo')localStorage.removeItem(DEMO_KEY);if(state.mode==='local')localStorage.setItem(LOCAL_SIGNED_OUT_KEY,'1');if(state.mode==='test')localStorage.removeItem(TEST_LOGIN_KEY);state.profile=null;state.session=null;state.mode=state.config?.apiBase?'signed-out':readLocalAccount()?.profile?'signed-out':'unconfigured';emit('change');updateAccountPill();return snapshot()}
+function continueDemo(displayName='Demo Player'){const existing=readDemoProfile(),profile=existing||defaultDemoProfile(displayName);profile.displayName=String(displayName||profile.displayName||'Demo Player').slice(0,40);profile.lastLoginAt=new Date().toISOString();writeDemoProfile(profile);localStorage.removeItem(TEST_LOGIN_KEY);return setProfile(profile,'demo')}
+async function refreshProfile(){if(state.mode==='api'){const result=await request('/player/profile');return setProfile(result.profile||result,'api')}if(state.mode==='local'){const record=readLocalAccount();return setProfile(record?.profile||state.profile,'local')}if(state.mode==='test')return setProfile(testProfile(state.profile?.username||state.profile?.displayName),'test');if(state.mode==='demo')return setProfile(readDemoProfile(),'demo');return snapshot()}
+async function updateProfile(patch={}){const allowed={displayName:patch.displayName,avatarUrl:patch.avatarUrl,equippedOutfit:patch.equippedOutfit};if(state.mode==='api'){const result=await request('/player/profile',{method:'PUT',body:allowed});return setProfile(result.profile,'api')}if(state.mode==='local'){const record=readLocalAccount();if(!record?.profile)throw new Error('LOCAL_PLAYER_NOT_FOUND');record.profile={...record.profile,...allowed,updatedAt:new Date().toISOString(),localOnly:true,provisionalCloud:true};writeLocalAccount(record);return setProfile(record.profile,'local')}if(state.mode==='test'){const profile={...state.profile,...allowed,displayName:state.profile?.displayName||state.profile?.username,updatedAt:new Date().toISOString(),testAccount:true,localOnly:true};return setProfile(profile,'test')}if(state.mode==='demo'){const profile={...state.profile,...allowed,updatedAt:new Date().toISOString()};writeDemoProfile(profile);return setProfile(profile,'demo')}throw new Error('NOT_SIGNED_IN')}
+function localLike(){return state.mode==='local'||state.mode==='test'||state.mode==='demo'}
+async function rewardStatus(){if(state.mode==='api')return request('/rewards/daily/status');if(localLike()){const today=new Date().toISOString().slice(0,10),claimed=String(state.profile?.lastRewardClaim||'').slice(0,10)===today,session=safeJson(sessionStorage.getItem(SESSION_KEY),null);return{eligible:!claimed&&Number(session?.activeSeconds||0)>=Number(state.config?.minimumActivitySeconds||300),claimed,activeSeconds:Number(session?.activeSeconds||0),requiredSeconds:Number(state.config?.minimumActivitySeconds||300),rewardChips:Number(state.config?.dailyRewardChips||5000),localOnly:state.mode==='local'||state.mode==='test',testAccount:state.mode==='test',demoMode:state.mode==='demo'}}throw new Error('NOT_SIGNED_IN')}
+function persistLocalLikeProfile(profile){if(state.mode==='local'){const record=readLocalAccount();if(record){record.profile=profile;writeLocalAccount(record)}}else if(state.mode==='demo')writeDemoProfile(profile)}
+async function claimDailyReward(){if(state.mode==='api'){const result=await request('/rewards/daily/claim',{method:'POST'});if(result.profile)setProfile(result.profile,'api');return result}if(localLike()){const status=await rewardStatus();if(!status.eligible)throw new Error(status.claimed?'REWARD_ALREADY_CLAIMED':'MORE_ACTIVITY_REQUIRED');const mode=state.mode,profile={...state.profile,playMoney:Number(state.profile.playMoney||0)+status.rewardChips,dailyStreak:Number(state.profile.dailyStreak||0)+1,lastRewardClaim:new Date().toISOString()};persistLocalLikeProfile(profile);setProfile(profile,mode);return{claimed:true,rewardChips:status.rewardChips,profile,localOnly:mode==='local'||mode==='test',testAccount:mode==='test',demoMode:mode==='demo'}}throw new Error('NOT_SIGNED_IN')}
+async function startActivitySession(platform='web',metadata={}){if(!state.profile)return null;if(state.mode==='api'){const result=await request('/game/session/start',{method:'POST',body:{platform,metadata}});state.session=result.session}else{state.session={sessionId:`local-session-${crypto.randomUUID?.()||Date.now()}`,platform,startedAt:new Date().toISOString(),lastHeartbeatAt:new Date().toISOString(),activeSeconds:0,heartbeatCount:0,localOnly:state.mode!=='demo',testAccount:state.mode==='test',demoMode:state.mode==='demo'};sessionStorage.setItem(SESSION_KEY,JSON.stringify(state.session))}emit('session');return state.session}
+async function heartbeat(metadata={}){if(!state.session)return null;if(state.mode==='api'){const result=await request('/game/session/heartbeat',{method:'POST',body:{sessionId:state.session.sessionId,metadata}});state.session=result.session}else{const now=Date.now(),last=Date.parse(state.session.lastHeartbeatAt||state.session.startedAt||new Date().toISOString()),delta=Math.max(0,Math.min(75,Math.round((now-last)/1000)));state.session.activeSeconds=Number(state.session.activeSeconds||0)+delta;state.session.heartbeatCount=Number(state.session.heartbeatCount||0)+1;state.session.lastHeartbeatAt=new Date(now).toISOString();sessionStorage.setItem(SESSION_KEY,JSON.stringify(state.session))}emit('session');return state.session}
+async function endActivitySession(metadata={}){if(!state.session)return null;let result=null;if(state.mode==='api')result=await request('/game/session/end',{method:'POST',body:{sessionId:state.session.sessionId,metadata}});else{await heartbeat(metadata);result={session:{...state.session,endedAt:new Date().toISOString()},localOnly:state.mode!=='demo',testAccount:state.mode==='test',demoMode:state.mode==='demo'}}state.session=null;sessionStorage.removeItem(SESSION_KEY);emit('session');return result}
+function ensureAccountPill(){if(document.getElementById('svr345AccountPill'))return;const style=document.createElement('style');style.id='svr345-account-style';style.textContent=`#svr345AccountPill{position:fixed;top:max(10px,env(safe-area-inset-top));right:12px;z-index:2147483500;display:flex;align-items:center;gap:8px;border:1px solid rgba(127,252,255,.58);border-radius:999px;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);padding:7px 10px;color:#fff;text-decoration:none;font:900 11px system-ui,Arial;letter-spacing:.04em;box-shadow:0 8px 24px rgba(0,0,0,.32)}#svr345AccountPill[data-mode="api"]{border-color:rgba(141,255,180,.7)}#svr345AccountPill[data-mode="local"]{border-color:rgba(127,252,255,.78)}#svr345AccountPill[data-mode="test"]{border-color:rgba(255,217,138,.82)}#svr345AccountPill[data-mode="demo"]{border-color:rgba(255,217,138,.72)}#svr345AccountDot{width:8px;height:8px;border-radius:50%;background:#ff5b8c}#svr345AccountPill[data-mode="api"] #svr345AccountDot{background:#8dffb4}#svr345AccountPill[data-mode="local"] #svr345AccountDot{background:#7ffcff}#svr345AccountPill[data-mode="test"] #svr345AccountDot{background:#ffd98a}#svr345AccountPill[data-mode="demo"] #svr345AccountDot{background:#ffd98a}`;document.head.appendChild(style);const pill=document.createElement('a');pill.id='svr345AccountPill';pill.href='/site/login.html';pill.innerHTML='<span id="svr345AccountDot"></span><span id="svr345AccountText">LOGIN</span>';document.body.appendChild(pill)}
+function updateAccountPill(){ensureAccountPill();const pill=document.getElementById('svr345AccountPill'),text=document.getElementById('svr345AccountText');if(!pill||!text)return;pill.dataset.mode=state.mode;if(state.profile){const suffix=state.mode==='demo'?' • DEMO':state.mode==='local'?' • LOCAL':state.mode==='test'?' • TEST':'';text.textContent=`${state.profile.displayName}${suffix}`;pill.href='/site/profile.html'}else{text.textContent=state.config?.apiBase?'LOGIN':'CREATE / LOGIN';pill.href='/site/login.html'}}
+export const account={BUILD,state,snapshot,bootstrap,health,login,register,logout,continueDemo,refreshProfile,updateProfile,rewardStatus,claimDailyReward,startActivitySession,heartbeat,endActivitySession};
+window.SVR_PLAYER_ACCOUNT=account;bootstrap().catch(error=>{state.ready=true;state.mode='error';state.lastError=String(error?.message||error);emit('error')});

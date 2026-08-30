@@ -1,118 +1,23 @@
-import { account } from './phase345-player-account-client.js?v=phase366';
+import { account } from './phase345-player-account-client.js?v=phase427';
 
-const BUILD = 'PHASE-366-PROFILE-LIVE-CAMERA-DRESSING-ROOM-RELIABILITY-LOCK';
-const DEMO_KEY = 'svr_phase345_demo_player_v1';
-const DEFAULT_AVATAR_URL = new URL('/game/assets/models/eric/eric.fbx', location.origin).href;
-const DEFAULT_OUTFIT = Object.freeze({
-  schemaVersion: 1,
-  modelId: 'eric',
-  palette: 'midnight',
-  headwear: 'none',
-  eyewear: 'none',
-  top: 'none',
-  shoes: 'none',
-  accessory: 'none'
-});
-const FALLBACK_CONFIG = Object.freeze({
-  apiBase: '',
-  allowDemoFallback: true,
-  dailyRewardChips: 5000,
-  minimumActivitySeconds: 300
-});
-const originalBootstrap = account.bootstrap.bind(account);
-const originalContinueDemo = account.continueDemo.bind(account);
-let bootstrapPromise = null;
-let fallbackCount = 0;
-let profileMigrations = 0;
-
-function safeJson(value, fallback = null) {
-  try { return JSON.parse(value); } catch { return fallback; }
-}
-
-function snapshot() {
-  return account.snapshot();
-}
-
-function publish(type = 'change') {
-  account.state.checkedAt = new Date().toISOString();
-  window.SVR_PLAYER_ACCOUNT_STATE = snapshot();
-  window.dispatchEvent(new CustomEvent(`svr:account-${type}`, { detail: snapshot() }));
-}
-
-function normalizeProfile(profile) {
-  if (!profile) return null;
-  const outfit = profile.equippedOutfit && Object.keys(profile.equippedOutfit).length
-    ? { ...DEFAULT_OUTFIT, ...profile.equippedOutfit, modelId: 'eric', top: 'none', headwear: 'none', eyewear: 'none', shoes: 'none', accessory: 'none' }
-    : { ...DEFAULT_OUTFIT };
-  const avatarUrl = !profile.avatarUrl || /avatar-default|mannequin|placeholder/i.test(String(profile.avatarUrl))
-    ? DEFAULT_AVATAR_URL
-    : profile.avatarUrl;
-  const changed = avatarUrl !== profile.avatarUrl || JSON.stringify(outfit) !== JSON.stringify(profile.equippedOutfit || {});
-  const next = { ...profile, avatarUrl, equippedOutfit: outfit };
-  if (changed) {
-    profileMigrations += 1;
-    account.state.profile = next;
-    if (account.state.mode === 'demo' || profile.demoMode) localStorage.setItem(DEMO_KEY, JSON.stringify(next));
-  }
-  return next;
-}
-
-function timeout(milliseconds) {
-  return new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('ACCOUNT_BOOTSTRAP_TIMEOUT')), milliseconds);
-  });
-}
-
-function forceLocalResolution(error) {
-  fallbackCount += 1;
-  const profile = normalizeProfile(safeJson(localStorage.getItem(DEMO_KEY), null));
-  account.state.config = account.state.config || { ...FALLBACK_CONFIG };
-  account.state.profile = profile;
-  account.state.mode = profile ? 'demo' : 'unconfigured';
-  account.state.ready = true;
-  account.state.apiHealthy = false;
-  account.state.lastError = String(error?.message || error || 'ACCOUNT_BOOTSTRAP_TIMEOUT');
-  publish(profile ? 'change' : 'ready');
-  return snapshot();
-}
-
-account.bootstrap = async function resilientBootstrap() {
-  if (account.state.ready && account.state.mode !== 'loading') {
-    normalizeProfile(account.state.profile);
-    return snapshot();
-  }
-  if (bootstrapPromise) return bootstrapPromise;
-  bootstrapPromise = Promise.race([originalBootstrap(), timeout(4500)])
-    .then((result) => {
-      normalizeProfile(account.state.profile);
-      publish(account.state.profile ? 'change' : 'ready');
-      return result;
-    })
-    .catch(forceLocalResolution)
-    .finally(() => { bootstrapPromise = null; });
-  return bootstrapPromise;
-};
-
-account.continueDemo = function phase384ContinueDemo(displayName = 'Demo Player') {
-  const result = originalContinueDemo(displayName);
-  normalizeProfile(account.state.profile);
-  publish('change');
-  return snapshot() || result;
-};
-
-window.SVR_PHASE366_ACCOUNT_QA = () => ({
-  build: BUILD,
-  successor: 'PHASE-384-ERIC-DEFAULT-AVATAR-SITE-LOCK',
-  ready: Boolean(account.state.ready),
-  mode: account.state.mode,
-  profile: Boolean(account.state.profile),
-  defaultEric: account.state.profile?.avatarUrl === DEFAULT_AVATAR_URL,
-  generatedBoxClothingDisabled: account.state.profile?.equippedOutfit?.top === 'none',
-  profileMigrations,
-  fallbackCount,
-  lastError: account.state.lastError,
-  pass: Boolean(account.state.ready && account.state.mode !== 'loading'),
-  checkedAt: new Date().toISOString()
-});
-
+const BUILD='PHASE-427-ACCOUNT-RESILIENCE-LOCAL-CLOUD-LOCK';
+const DEMO_KEY='svr_phase345_demo_player_v1';
+const LOCAL_ACCOUNT_KEY='svr_phase427_local_player_v1';
+const LOCAL_SIGNED_OUT_KEY='svr_phase427_local_signed_out_v1';
+const TEST_LOGIN_KEY='svr_phase427_test_login_v1';
+const DEFAULT_AVATAR_URL=new URL('/game/assets/models/eric/eric.fbx',location.origin).href;
+const DEFAULT_OUTFIT=Object.freeze({schemaVersion:1,modelId:'eric',palette:'midnight',headwear:'none',eyewear:'none',top:'none',shoes:'none',accessory:'none'});
+const FALLBACK_CONFIG=Object.freeze({apiBase:'',allowDemoFallback:true,dailyRewardChips:5000,minimumActivitySeconds:300});
+const originalBootstrap=account.bootstrap.bind(account),originalContinueDemo=account.continueDemo.bind(account);let bootstrapPromise=null,fallbackCount=0,profileMigrations=0;
+function safeJson(value,fallback=null){try{return JSON.parse(value)}catch{return fallback}}
+function snapshot(){return account.snapshot()}
+function publish(type='change'){account.state.checkedAt=new Date().toISOString();window.SVR_PLAYER_ACCOUNT_STATE=snapshot();window.dispatchEvent(new CustomEvent(`svr:account-${type}`,{detail:snapshot()}))}
+function persist(profile){if(account.state.mode==='local'||profile?.localOnly&&!profile?.testAccount){const record=safeJson(localStorage.getItem(LOCAL_ACCOUNT_KEY),null);if(record){record.profile=profile;localStorage.setItem(LOCAL_ACCOUNT_KEY,JSON.stringify(record))}}else if(account.state.mode==='demo'||profile?.demoMode)localStorage.setItem(DEMO_KEY,JSON.stringify(profile))}
+function normalizeProfile(profile){if(!profile)return null;const outfit=profile.equippedOutfit&&Object.keys(profile.equippedOutfit).length?{...DEFAULT_OUTFIT,...profile.equippedOutfit,modelId:'eric',top:'none',headwear:'none',eyewear:'none',shoes:'none',accessory:'none'}:{...DEFAULT_OUTFIT};const avatarUrl=!profile.avatarUrl||/avatar-default|mannequin|placeholder/i.test(String(profile.avatarUrl))?DEFAULT_AVATAR_URL:profile.avatarUrl;const changed=avatarUrl!==profile.avatarUrl||JSON.stringify(outfit)!==JSON.stringify(profile.equippedOutfit||{});const next={...profile,avatarUrl,equippedOutfit:outfit};if(changed){profileMigrations++;account.state.profile=next;persist(next)}return next}
+function testProfileFromSession(){const key=String(localStorage.getItem(TEST_LOGIN_KEY)||'').trim().toLowerCase();if(key!=='bre'&&key!=='test')return null;const name=key==='bre'?'Bre':'Test';const now=new Date().toISOString();return{playerId:`test-${key}`,displayName:name,username:name,email:'',role:'player',playMoney:50000,dailyStreak:0,lastRewardClaim:null,avatarUrl:null,equippedOutfit:{},inventory:[],createdAt:now,lastLoginAt:now,localOnly:true,provisionalCloud:false,demoMode:false,testAccount:true}}
+function timeout(ms){return new Promise((_,reject)=>setTimeout(()=>reject(new Error('ACCOUNT_BOOTSTRAP_TIMEOUT')),ms))}
+function forceLocalResolution(error){fallbackCount++;const test=testProfileFromSession(),local=safeJson(localStorage.getItem(LOCAL_ACCOUNT_KEY),null),demo=safeJson(localStorage.getItem(DEMO_KEY),null),localSignedOut=localStorage.getItem(LOCAL_SIGNED_OUT_KEY)==='1';const sourceProfile=test||(!localSignedOut&&local?.profile?local.profile:demo);const profile=normalizeProfile(sourceProfile);account.state.config=account.state.config||{...FALLBACK_CONFIG};account.state.profile=profile;account.state.mode=test?'test':!localSignedOut&&local?.profile?'local':profile?'demo':local?.profile?'signed-out':'unconfigured';account.state.ready=true;account.state.apiHealthy=false;account.state.lastError=String(error?.message||error||'ACCOUNT_BOOTSTRAP_TIMEOUT');publish(profile?'change':'ready');return snapshot()}
+account.bootstrap=async function resilientBootstrap(){if(account.state.ready&&account.state.mode!=='loading'){normalizeProfile(account.state.profile);return snapshot()}if(bootstrapPromise)return bootstrapPromise;bootstrapPromise=Promise.race([originalBootstrap(),timeout(4500)]).then(result=>{normalizeProfile(account.state.profile);publish(account.state.profile?'change':'ready');return result}).catch(forceLocalResolution).finally(()=>{bootstrapPromise=null});return bootstrapPromise};
+account.continueDemo=function phase427ContinueDemo(displayName='Demo Player'){const result=originalContinueDemo(displayName);normalizeProfile(account.state.profile);publish('change');return snapshot()||result};
+window.SVR_PHASE366_ACCOUNT_QA=()=>({build:BUILD,ready:Boolean(account.state.ready),mode:account.state.mode,profile:Boolean(account.state.profile),defaultEric:account.state.profile?.avatarUrl===DEFAULT_AVATAR_URL,localPlayable:account.state.mode==='local'||account.state.mode==='test',testAccount:account.state.mode==='test',signedOutGuard:localStorage.getItem(LOCAL_SIGNED_OUT_KEY)==='1',profileMigrations,fallbackCount,lastError:account.state.lastError,pass:Boolean(account.state.ready&&account.state.mode!=='loading'),checkedAt:new Date().toISOString()});
 export { account, BUILD };
