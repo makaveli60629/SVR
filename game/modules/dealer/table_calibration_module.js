@@ -39,7 +39,7 @@ export class TableCalibrationModule extends EventTarget {
     this.group.name = 'SVR_TableCalibrationLab';
     scene.add(this.group);
     this.params = { ...DEFAULTS, ...options };
-    this.guidesVisible = true;
+    this.guidesVisible = false;
     this.presentationVisible = true;
     this.table = null;
     this.guideGroup = new THREE.Group();
@@ -102,6 +102,10 @@ export class TableCalibrationModule extends EventTarget {
     const railTop = this.params.tableY;
     const feltY = railTop - this.params.feltDrop;
     const margin = this.params.innerMargin;
+
+    // The original table.glb owns all hand-rest / rail geometry.
+    // Lab presentation adds only the tunable felt surface; no purple cover,
+    // decorative rail, or metallic trim is generated here.
     const felt = new THREE.Mesh(
       new THREE.CircleGeometry(1, 96),
       new THREE.MeshPhysicalMaterial({ map: this.feltTexture, color: 0x0b5b3f, roughness: 0.94, metalness: 0, sheen: 0.34, sheenColor: new THREE.Color(0x42aa7e), side: THREE.DoubleSide })
@@ -112,27 +116,6 @@ export class TableCalibrationModule extends EventTarget {
     felt.position.y = feltY;
     felt.receiveShadow = true;
     this.presentationGroup.add(felt);
-
-    const rail = new THREE.Mesh(
-      new THREE.RingGeometry(0.765, 0.935, 96),
-      new THREE.MeshPhysicalMaterial({ color: 0x190d22, roughness: 0.27, metalness: 0.06, clearcoat: 0.38, clearcoatRoughness: 0.25, side: THREE.DoubleSide })
-    );
-    rail.name = 'SVR_PolishedRail';
-    rail.rotation.x = -Math.PI / 2;
-    rail.scale.set(1.53, 0.79, 1);
-    rail.position.y = railTop + 0.003;
-    rail.receiveShadow = true;
-    this.presentationGroup.add(rail);
-
-    const trim = new THREE.Mesh(
-      new THREE.RingGeometry(0.935, 0.955, 96),
-      new THREE.MeshPhysicalMaterial({ color: 0x6f4a86, roughness: 0.24, metalness: 0.58, clearcoat: 0.42, clearcoatRoughness: 0.2, side: THREE.DoubleSide })
-    );
-    trim.name = 'SVR_TableTrim';
-    trim.rotation.x = -Math.PI / 2;
-    trim.scale.set(1.53, 0.79, 1);
-    trim.position.y = railTop + 0.005;
-    this.presentationGroup.add(trim);
     this.presentationGroup.visible = this.presentationVisible;
   }
   rebuildGuides() {
@@ -144,7 +127,7 @@ export class TableCalibrationModule extends EventTarget {
     const margin = this.params.innerMargin;
     const felt = new THREE.Mesh(new THREE.CircleGeometry(1, 64), new THREE.MeshBasicMaterial({ color: 0x1bcf86, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide }));
     felt.name = 'TargetFeltSurface'; felt.rotation.x = -Math.PI / 2; felt.scale.set(Math.max(0.75, 1.23 - margin), Math.max(0.42, 0.64 - margin * 0.5), 1); felt.position.y = feltY + 0.002; this.guideGroup.add(felt);
-    const rail = new THREE.Mesh(new THREE.RingGeometry(0.77, 0.91, 64), new THREE.MeshBasicMaterial({ color: 0xb26cff, transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false }));
+    const rail = new THREE.Mesh(new THREE.RingGeometry(0.77, 0.91, 64), new THREE.MeshBasicMaterial({ color: 0x78eaff, transparent: true, opacity: 0.24, side: THREE.DoubleSide, depthWrite: false }));
     rail.name = 'RailInnerWallGuide'; rail.rotation.x = -Math.PI / 2; rail.scale.set(1.52, 0.78, 1); rail.position.y = railTop + 0.009; this.guideGroup.add(rail);
     const collision = new THREE.Mesh(new THREE.CircleGeometry(1, 48), new THREE.MeshBasicMaterial({ color: 0xffcf70, wireframe: true, transparent: true, opacity: 0.38, depthWrite: false }));
     collision.name = 'PhysicsCollisionSurface'; collision.rotation.x = -Math.PI / 2; collision.scale.set(Math.max(0.72, 1.21 - margin), Math.max(0.40, 0.62 - margin * 0.5), 1); collision.position.y = collisionY; this.guideGroup.add(collision);
