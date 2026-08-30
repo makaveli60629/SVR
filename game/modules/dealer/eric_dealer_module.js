@@ -37,15 +37,15 @@ export class EricDealerModule extends EventTarget {
     this.group.name = 'SVR_EricDealerLab';
     scene.add(this.group);
     this.params = {
-      scale: options.scale ?? 0.0145,
-      y: options.y ?? 1.34,
-      z: options.z ?? -1.67,
-      x: options.x ?? 0,
-      shoulderX: options.shoulderX ?? -0.34,
+      scale: options.scale ?? 0.0157,
+      y: options.y ?? 0.3,
+      z: options.z ?? 1.5,
+      x: options.x ?? -0.42,
+      shoulderX: options.shoulderX ?? 0.55,
       shoulderZ: options.shoulderZ ?? -0.48,
-      elbowX: options.elbowX ?? -0.48,
-      wristZ: options.wristZ ?? -0.26,
-      speed: options.speed ?? 1.05,
+      elbowX: options.elbowX ?? 0.36,
+      wristZ: options.wristZ ?? -0.45,
+      speed: options.speed ?? 1.35,
     };
     this.loaded = false;
     this.loadError = null;
@@ -59,6 +59,7 @@ export class EricDealerModule extends EventTarget {
     this.meshMaterials = new Map();
     this.lastDealSerial = -1;
     this.onceStart = 0;
+    this.lastGround = null;
     this._q = new THREE.Quaternion();
     this._e = new THREE.Euler();
     this._textureLoader = new THREE.TextureLoader();
@@ -106,6 +107,7 @@ export class EricDealerModule extends EventTarget {
           this.idleAction = this.mixer.clipAction(idleAsset.animations[0]);
           this.idleAction.setLoop(THREE.LoopRepeat, Infinity);
           this.idleAction.play();
+          this.mixer.update(0);
         }
       } catch (error) {
         console.warn('[SVR Dealer Lab] Eric idle clip unavailable; procedural motion remains active.', error);
@@ -125,11 +127,13 @@ export class EricDealerModule extends EventTarget {
     this.group.position.set(this.params.x, this.params.y, this.params.z);
     this.group.scale.setScalar(this.params.scale);
     this.group.rotation.set(0, Math.PI, 0);
+    this.group.updateMatrixWorld(true);
   }
   setParams(next = {}) { Object.assign(this.params, next); this.applyTransform(); }
   resetVisible() {
-    this.setParams({ scale: 0.0145, x: 0, y: 1.34, z: -1.67, shoulderX: -0.34, shoulderZ: -0.48, elbowX: -0.48, wristZ: -0.26, speed: 1.05 });
+    this.setParams({ scale: 0.0157, x: -0.42, y: 0.3, z: 1.5, shoulderX: 0.55, shoulderZ: -0.48, elbowX: 0.36, wristZ: -0.45, speed: 1.35 });
     this.setMode('idle');
+    if (this.loaded) this.groundToFloor(0);
     return { ...this.params };
   }
   setDebugMaterial(enabled) {
@@ -148,9 +152,32 @@ export class EricDealerModule extends EventTarget {
   }
   getBounds() {
     if (!this.model) return null;
+    this.group.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(this.group);
     if (box.isEmpty()) return null;
     return box;
+  }
+  getFeetY() {
+    const box = this.getBounds();
+    return box ? box.min.y : null;
+  }
+  groundToFloor(floorY = 0) {
+    if (!this.model) return null;
+    const before = this.getBounds();
+    if (!before) return null;
+    const delta = Number(floorY) - before.min.y;
+    if (!Number.isFinite(delta)) return null;
+    this.params.y += delta;
+    this.applyTransform();
+    const after = this.getBounds();
+    this.lastGround = {
+      floorY: Number(floorY),
+      delta: +delta.toFixed(5),
+      dealerY: +this.params.y.toFixed(5),
+      feetY: after ? +after.min.y.toFixed(5) : null,
+    };
+    this.dispatchEvent(new CustomEvent('groundchange', { detail: { ...this.lastGround } }));
+    return { ...this.lastGround };
   }
   setMode(mode) {
     this.mode = mode;
@@ -209,6 +236,20 @@ export class EricDealerModule extends EventTarget {
     const wanted = ['hips','spine','spine1','spine2','neck','head','leftarm','leftforearm','lefthand','rightarm','rightforearm','righthand','leftupleg','leftleg','rightupleg','rightleg'];
     const found = {};
     for (const part of wanted) found[part] = Boolean(this.getBone(part));
-    return { model: MODEL_URL, idle: IDLE_URL, diffuse: BASE_URL, normal: NORMAL_URL, gloss: GLOSS_URL, boneCount: this.bones.size, bones: found, textured: Boolean(this.meshMaterials.size), mixer: Boolean(this.mixer), debugMaterial: this.debugMaterial, loadError: this.loadError };
+    return {
+      model: MODEL_URL,
+      idle: IDLE_URL,
+      diffuse: BASE_URL,
+      normal: NORMAL_URL,
+      gloss: GLOSS_URL,
+      boneCount: this.bones.size,
+      bones: found,
+      textured: Boolean(this.meshMaterials.size),
+      mixer: Boolean(this.mixer),
+      debugMaterial: this.debugMaterial,
+      loadError: this.loadError,
+      feetY: this.getFeetY(),
+      lastGround: this.lastGround,
+    };
   }
 }
