@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "profile": "SVR_ENGINE_PORTABILITY_V1",
+  "sourceRuntime": {
+    "engine": "WebXR",
+    "renderer": "Three.js",
+    "sceneUnits": "meters",
+    "preferredAssetFormat": "glTF/GLB"
+  },
+  "targetRuntime": {
+    "engine": "Unity",
+    "generation": "Unity 6+",
+    "renderPipeline": "URP",
+    "xr": "OpenXR"
+  },
+  "portabilityRules": {
+    "geometry": "Keep reusable meshes in GLB/glTF with real-world meter scale and named pivots.",
+    "textures": "Keep PBR source textures separate from engine-specific materials.",
+    "audio": "Keep original WAV/OGG masters separate from runtime compression settings.",
+    "gameData": "Keep table rules, seat definitions, chip values, destinations, and tuning in JSON rather than embedding them in scene code.",
+    "sceneObjects": "Give persistent gameplay objects stable names so transforms can be exported and reconstructed in Unity.",
+    "engineCode": "Treat JavaScript/WebXR and C#/Unity behaviors as adapters around shared data rather than attempting source-to-source engine conversion."
+  },
+  "coordinateBridge": {
+    "source": "Three.js right-handed, Y-up",
+    "target": "Unity Y-up",
+    "policy": "Convert handedness during import/export and verify forward-axis orientation per mesh."
+  },
+  "qualityProfiles": {
+    "quest": {
+      "goal": "stable XR frame pacing",
+      "priority": ["table readability", "hand interaction", "card clarity", "dealer visibility", "ambient effects"]
+    },
+    "android": {
+      "goal": "stable touch gameplay with low thermal load",
+      "priority": ["table readability", "touch response", "card clarity", "dealer visibility", "ambient effects"]
+    },
+    "desktop": {
+      "goal": "high visual fidelity and migration QA",
+      "priority": ["lighting", "materials", "geometry", "animation", "ambient effects"]
+    }
+  },
+  "migrationChecklist": [
+    "Recover or create a canonical Unity project in source control.",
+    "Import owned/licensed GLB meshes and source textures.",
+    "Rebuild scene lighting and engine-specific materials in URP.",
+    "Map stable scene-object names and exported transforms into Unity prefabs.",
+    "Port gameplay adapters to C# while keeping rules and tuning data engine-neutral.",
+    "Configure OpenXR and Quest/Android build targets.",
+    "Use Unity Build Automation after Assets, Packages, and ProjectSettings are committed."
+  ]
+}
