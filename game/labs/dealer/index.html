@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="robots" content="noindex,nofollow,noarchive,nosnippet" />
   <meta name="referrer" content="no-referrer" />
-  <title>SVR Dealer Lab V2</title>
+  <title>SVR Dealer Lab V2.1</title>
   <style>
     :root{color-scheme:dark;--bg:#030207;--panel:rgba(8,6,14,.84);--panel2:rgba(17,10,27,.92);--line:#9c5cff;--line2:#6b3f9a;--text:#f7f1ff;--muted:#bbaed0;--ok:#7bf0b1;--warn:#ffcf70;--cyan:#78eaff}
     *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text)}
@@ -18,7 +18,7 @@
     #quickbar{position:fixed;z-index:22;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:none;align-items:center;gap:5px;max-width:calc(100vw - 16px);padding:6px;border:1px solid rgba(156,92,255,.42);border-radius:14px;background:rgba(7,5,12,.76);backdrop-filter:blur(12px);box-shadow:0 10px 38px #0008;overflow-x:auto;scrollbar-width:none}#quickbar::-webkit-scrollbar{display:none}#quickbar .btn{flex:0 0 auto;min-height:34px;padding:7px 10px;font-size:10px;white-space:nowrap}
     #hud{position:fixed;z-index:20;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(920px,calc(100vw - 16px));max-height:min(44vh,430px);display:none;border:1px solid rgba(156,92,255,.48);border-radius:18px;background:var(--panel);backdrop-filter:blur(14px);box-shadow:0 18px 60px #000b;overflow:hidden;transition:max-height .22s ease,opacity .2s ease}
     #hud.compact{max-height:190px}#hud.hidden{display:none!important}.hud-head{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 12px;background:linear-gradient(180deg,rgba(17,10,27,.98),rgba(12,7,20,.94));border-bottom:1px solid rgba(255,255,255,.08)}.hud-title h2{font-size:15px;margin:0}.hud-title .sub{font-size:9px;color:var(--muted);margin-top:2px}.hud-head-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.hud-head-actions .btn{font-size:9px;padding:6px 8px}
-    .hud-scroll{max-height:calc(min(44vh,430px) - 54px);overflow:auto;padding:4px 10px 12px}.compact .hud-scroll{max-height:136px}.control-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:7px 0}.control-grid .btn{min-height:38px;font-size:10px;padding:7px 5px}
+    .hud-scroll{max-height:calc(min(44vh,430px) - 54px);overflow:auto;padding:4px 10px 12px}.compact .hud-scroll{max-height:136px}.control-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:7px 0}.control-grid .btn{min-height:38px;font-size:10px;padding:7px 5px}
     details{border-top:1px solid rgba(255,255,255,.08);padding:8px 0}summary{cursor:pointer;color:#d5b9f3;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;list-style:none}summary::-webkit-details-marker{display:none}summary::after{content:'+';float:right;color:#9f72d7}details[open] summary::after{content:'–'}
     .slider{display:grid;grid-template-columns:105px minmax(120px,1fr) 90px;align-items:center;gap:8px;font-size:10px;color:#d4c7e5;margin:7px 0}.slider input[type=range]{width:100%;accent-color:#9c5cff}.val{font-variant-numeric:tabular-nums;text-align:right;color:#fff;font-size:9px}.row{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0}.row .btn{font-size:10px;flex:1 1 120px}
     textarea{width:100%;background:#08050d;color:#d7c8eb;border:1px solid #332047;border-radius:9px;font:10px/1.35 ui-monospace,monospace;padding:8px;resize:vertical}#presetInput{height:90px}#presetOut{height:95px}
@@ -26,7 +26,7 @@
     #xrHint{position:fixed;z-index:16;right:10px;top:max(9px,env(safe-area-inset-top));background:rgba(8,5,14,.7);border:1px solid rgba(156,92,255,.35);border-radius:999px;padding:6px 9px;font-size:9px;color:#ddd;display:none;pointer-events:none}
     #showHudBtn{position:fixed;z-index:21;right:10px;bottom:max(10px,env(safe-area-inset-bottom));display:none;min-height:38px;box-shadow:0 10px 34px #000c}
     body.preview #quickbar{opacity:.72}body.preview #hud{display:none!important}body.preview #showHudBtn{display:block}body.preview #xrHint{opacity:.55}
-    @media(max-width:700px){#quickbar{left:8px;right:8px;transform:none;max-width:none;justify-content:flex-start}#hud{width:calc(100vw - 12px);bottom:max(6px,env(safe-area-inset-bottom));max-height:38vh}.compact#hud{max-height:154px}.hud-scroll{max-height:calc(38vh - 52px)}.compact .hud-scroll{max-height:102px}.control-grid{grid-template-columns:repeat(4,minmax(72px,1fr))}.slider{grid-template-columns:92px minmax(100px,1fr) 74px;gap:6px}.hud-title .sub{display:none}#xrHint{display:none!important}}
+    @media(max-width:700px){#quickbar{left:8px;right:8px;transform:none;max-width:none;justify-content:flex-start}#hud{width:calc(100vw - 12px);bottom:max(6px,env(safe-area-inset-bottom));max-height:38vh}.compact#hud{max-height:154px}.hud-scroll{max-height:calc(38vh - 52px)}.compact .hud-scroll{max-height:102px}.control-grid{grid-template-columns:repeat(3,minmax(72px,1fr))}.slider{grid-template-columns:92px minmax(100px,1fr) 74px;gap:6px}.hud-title .sub{display:none}#xrHint{display:none!important}}
     @media(max-width:470px){.control-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.slider{grid-template-columns:82px minmax(80px,1fr) 68px}.hud-head-actions .btn{padding:5px 7px;font-size:8px}}
   </style>
   <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
@@ -36,33 +36,33 @@
   <div id="gate"><div class="gate-card"><h1>SVR Dealer Lab</h1><p>Private owner tuning route. Enter the lab key to load Eric, the polished table, calibration surfaces and VR wrist controls.</p><input id="labKey" type="password" autocomplete="off" spellcheck="false" placeholder="Dealer Lab key" /><button id="unlockBtn">Unlock Dealer Lab</button><div id="gateError"></div></div></div>
 
   <nav id="quickbar" aria-label="Dealer lab quick controls">
-    <button class="btn" id="idleBtn">Idle</button><button class="btn" id="dealOnceBtn">Deal Once</button><button class="btn" id="dealLoopBtn">Deal Loop</button><button class="btn" id="pauseBtn">Pause</button><button class="btn ok" id="focusEricBtn">Focus Eric</button><button class="btn" id="frontCamBtn">Front</button><button class="btn" id="handsCamBtn">Hands</button><button class="btn" id="tableCamBtn">Table</button><button class="btn" id="xrBtn">Enter VR</button>
+    <button class="btn" id="idleBtn">Idle</button><button class="btn" id="dealOnceBtn">Deal Once</button><button class="btn" id="dealLoopBtn">Deal Loop</button><button class="btn" id="pauseBtn">Pause</button><button class="btn ok" id="focusEricBtn">Focus Eric</button><button class="btn ok" id="groundEricBtn">Ground Eric</button><button class="btn" id="frontCamBtn">Front</button><button class="btn" id="handsCamBtn">Hands</button><button class="btn" id="tableCamBtn">Table</button><button class="btn" id="xrBtn">Enter VR</button>
   </nav>
 
   <aside id="hud" class="compact">
-    <div class="hud-head"><div class="hud-title"><h2>Eric Dealer Lab V2</h2><div class="sub">Work / Preview lab • production lobby and public site untouched</div></div><div class="hud-head-actions"><button class="btn" id="previewBtn">Preview</button><button class="btn" id="collapseHudBtn">Expand</button><button class="btn" id="hideHudBtn">Hide</button></div></div>
+    <div class="hud-head"><div class="hud-title"><h2>Eric Dealer Lab V2.1</h2><div class="sub">Foot-ground lock • submitted preset authority • public site untouched</div></div><div class="hud-head-actions"><button class="btn" id="previewBtn">Preview</button><button class="btn" id="collapseHudBtn">Expand</button><button class="btn" id="hideHudBtn">Hide</button></div></div>
     <div class="hud-scroll">
-      <div class="control-grid"><button class="btn ok" id="focusEricBtn2">Focus Eric</button><button class="btn" id="resetEricBtn">Reset Eric</button><button class="btn warn" id="debugEricBtn">Debug Material</button><button class="btn" id="diagBtn">Guides</button></div>
+      <div class="control-grid"><button class="btn ok" id="focusEricBtn2">Focus Eric</button><button class="btn ok" id="groundEricBtn2">Ground Eric</button><button class="btn" id="resetEricBtn">Reset Eric</button><button class="btn warn" id="debugEricBtn">Debug Material</button><button class="btn" id="diagBtn">Guides</button></div>
 
       <details open><summary>Dealer position & animation</summary>
-        <label class="slider">Eric scale <input id="dealerScale" type="range" min="0.004" max="0.060" step="0.0001" value="0.0145"><span class="val" data-for="dealerScale"></span></label>
-        <label class="slider">Dealer X <input id="dealerX" type="range" min="-1.50" max="1.50" step="0.01" value="0"><span class="val" data-for="dealerX"></span></label>
-        <label class="slider">Dealer height <input id="dealerY" type="range" min="0.30" max="2.50" step="0.01" value="1.34"><span class="val" data-for="dealerY"></span></label>
-        <label class="slider">Dealer depth <input id="dealerZ" type="range" min="-3.50" max="1.50" step="0.01" value="-1.67"><span class="val" data-for="dealerZ"></span></label>
-        <label class="slider">Shoulder X <input id="shoulderX" type="range" min="-1.20" max="1.20" step="0.01" value="-0.34"><span class="val" data-for="shoulderX"></span></label>
+        <label class="slider">Eric scale <input id="dealerScale" type="range" min="0.004" max="0.060" step="0.0001" value="0.0157"><span class="val" data-for="dealerScale"></span></label>
+        <label class="slider">Dealer X <input id="dealerX" type="range" min="-1.50" max="1.50" step="0.01" value="-0.42"><span class="val" data-for="dealerX"></span></label>
+        <label class="slider">Dealer root Y <input id="dealerY" type="range" min="-1.00" max="2.50" step="0.01" value="0.30"><span class="val" data-for="dealerY"></span></label>
+        <label class="slider">Dealer depth <input id="dealerZ" type="range" min="-3.50" max="2.50" step="0.01" value="1.50"><span class="val" data-for="dealerZ"></span></label>
+        <label class="slider">Shoulder X <input id="shoulderX" type="range" min="-1.20" max="1.20" step="0.01" value="0.55"><span class="val" data-for="shoulderX"></span></label>
         <label class="slider">Shoulder Z <input id="shoulderZ" type="range" min="-1.20" max="1.20" step="0.01" value="-0.48"><span class="val" data-for="shoulderZ"></span></label>
-        <label class="slider">Elbow X <input id="elbowX" type="range" min="-1.40" max="1.40" step="0.01" value="-0.48"><span class="val" data-for="elbowX"></span></label>
-        <label class="slider">Wrist Z <input id="wristZ" type="range" min="-1.40" max="1.40" step="0.01" value="-0.26"><span class="val" data-for="wristZ"></span></label>
-        <label class="slider">Deal speed <input id="dealSpeed" type="range" min="0.45" max="2.20" step="0.05" value="1.05"><span class="val" data-for="dealSpeed"></span></label>
+        <label class="slider">Elbow X <input id="elbowX" type="range" min="-1.40" max="1.40" step="0.01" value="0.36"><span class="val" data-for="elbowX"></span></label>
+        <label class="slider">Wrist Z <input id="wristZ" type="range" min="-1.40" max="1.40" step="0.01" value="-0.45"><span class="val" data-for="wristZ"></span></label>
+        <label class="slider">Deal speed <input id="dealSpeed" type="range" min="0.45" max="2.20" step="0.05" value="1.35"><span class="val" data-for="dealSpeed"></span></label>
       </details>
 
       <details open><summary>Table / felt geometry</summary>
-        <label class="slider">Table top Y <input id="tableY" type="range" min="0.55" max="1.35" step="0.005" value="1.10"><span class="val" data-for="tableY"></span></label>
-        <label class="slider">Rail → felt drop <input id="feltDrop" type="range" min="0.000" max="0.140" step="0.002" value="0.036"><span class="val" data-for="feltDrop"></span></label>
-        <label class="slider">Inner wall margin <input id="innerMargin" type="range" min="0.03" max="0.18" step="0.005" value="0.060"><span class="val" data-for="innerMargin"></span></label>
-        <label class="slider">Collision drop <input id="collisionDrop" type="range" min="0.000" max="0.160" step="0.002" value="0.030"><span class="val" data-for="collisionDrop"></span></label>
-        <label class="slider">Card landing +Y <input id="cardLift" type="range" min="0.001" max="0.035" step="0.001" value="0.002"><span class="val" data-for="cardLift"></span></label>
-        <div class="row"><button class="btn" id="savePresetBtn">Save Local</button><button class="btn" id="resetPresetBtn">Reset User Preset</button><button class="btn" id="copyPresetBtn">Copy Current JSON</button></div>
+        <label class="slider">Table top Y <input id="tableY" type="range" min="0.45" max="1.35" step="0.005" value="0.620"><span class="val" data-for="tableY"></span></label>
+        <label class="slider">Rail → felt drop <input id="feltDrop" type="range" min="0.000" max="0.140" step="0.002" value="0.014"><span class="val" data-for="feltDrop"></span></label>
+        <label class="slider">Inner wall margin <input id="innerMargin" type="range" min="0.03" max="0.18" step="0.005" value="0.125"><span class="val" data-for="innerMargin"></span></label>
+        <label class="slider">Collision drop <input id="collisionDrop" type="range" min="0.000" max="0.160" step="0.002" value="0.020"><span class="val" data-for="collisionDrop"></span></label>
+        <label class="slider">Card landing +Y <input id="cardLift" type="range" min="0.001" max="0.035" step="0.001" value="0.008"><span class="val" data-for="cardLift"></span></label>
+        <div class="row"><button class="btn" id="savePresetBtn">Save Local</button><button class="btn" id="resetPresetBtn">Reset Submitted Preset</button><button class="btn" id="copyPresetBtn">Copy Current JSON</button></div>
       </details>
 
       <details><summary>Paste / apply preset JSON</summary><textarea id="presetInput" spellcheck="false" placeholder="Paste dealer-lab preset JSON here"></textarea><div class="row"><button class="btn ok" id="applyPresetBtn">Apply JSON</button></div></details>
