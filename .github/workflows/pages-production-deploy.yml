@@ -1,0 +1,108 @@
+name: SVR GitHub Pages Production Deploy
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['SVR Production Auto Deploy']
+    types: [completed]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: svr-github-pages-production
+  cancel-in-progress: true
+
+jobs:
+  deploy-pages:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout authoritative main source
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          path: source
+          fetch-depth: 1
+
+      - name: Checkout production tree
+        uses: actions/checkout@v5
+        with:
+          ref: gh-pages
+          path: publish
+          fetch-depth: 1
+
+      - name: Reassert SVR 404 and Dealer Lab in Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp source/404.html publish/404.html
+          mkdir -p publish/game/labs/dealer publish/game/modules/dealer publish/game/assets/models/eric
+          cp source/game/dealer-lab.html publish/game/dealer-lab.html
+          cp -a source/game/labs/dealer/. publish/game/labs/dealer/
+          cp -a source/game/modules/dealer/. publish/game/modules/dealer/
+          cp -a source/game/assets/models/eric/. publish/game/assets/models/eric/
+          cp source/game/assets/models/table.glb publish/game/assets/models/table.glb
+
+          test -s publish/index.html
+          test -s publish/CNAME
+          grep -qx 'svrpoker.com' publish/CNAME
+          test -s publish/404.html
+          grep -Fq '<title>SVR Poker | Official 404</title>' publish/404.html
+          grep -Fq 'src="/logo.png"' publish/404.html
+          if grep -Eiq 'github|githubusercontent' publish/404.html; then
+            echo 'Provider branding detected in production 404 artifact.' >&2
+            exit 1
+          fi
+
+          test -s publish/game/dealer-lab.html
+          test -s publish/game/labs/dealer/index.html
+          test -s publish/game/labs/dealer/lab-access.js
+          test -s publish/game/labs/dealer/dealer-lab.js
+          test -s publish/game/modules/dealer/eric_dealer_module.js
+          test -s publish/game/modules/dealer/table_calibration_module.js
+          test -s publish/game/modules/dealer/wrist_lab_module.js
+          test -s publish/game/assets/models/eric/eric.fbx
+          test -s publish/game/assets/models/table.glb
+          echo 'SVR Pages artifact verified: custom 404 + Dealer Lab present.'
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: publish
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Verify public SVR routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          dealer='https://svrpoker.com/game/dealer-lab.html'
+          missing="https://svrpoker.com/__svr_404_probe_${GITHUB_RUN_ID}"
+          ok=0
+          for attempt in $(seq 1 12); do
+            dealer_body="$(curl -LfsS --max-time 20 "$dealer" || true)"
+            missing_body="$(curl -LsS --max-time 20 "$missing" || true)"
+            if printf '%s' "$dealer_body" | grep -Fq 'SVR Dealer Lab' && printf '%s' "$missing_body" | grep -Fq 'Official SVR Poker Error Page'; then
+              echo 'Live Dealer Lab and branded 404 verified.'
+              ok=1
+              break
+            fi
+            echo "Live verification attempt $attempt/12 not ready yet."
+            sleep 10
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo 'Live GitHub Pages routes did not converge to the SVR production artifact.' >&2
+            exit 1
+          fi
