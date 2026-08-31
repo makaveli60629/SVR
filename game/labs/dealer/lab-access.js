@@ -1,5 +1,7 @@
 const EXPECTED_HASH = 'ee20b3b390a6c8e31ce0dff0ed68dfc01d67edb9ad53fcf51bba66ea7f9d4292';
 const SESSION_KEY = 'svrDealerLabUnlockedV1';
+const PERSIST_KEY = 'svrDealerLabRememberedV1';
+const REMEMBER_MS = 30 * 24 * 60 * 60 * 1000;
 
 const gate = document.getElementById('gate');
 const keyInput = document.getElementById('labKey');
@@ -10,6 +12,37 @@ async function sha256Hex(text) {
   const bytes = new TextEncoder().encode(text);
   const digest = await crypto.subtle.digest('SHA-256', bytes);
   return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function rememberAccess() {
+  try {
+    localStorage.setItem(PERSIST_KEY, JSON.stringify({
+      version: 1,
+      unlockedAt: Date.now(),
+      expiresAt: Date.now() + REMEMBER_MS
+    }));
+  } catch {}
+}
+
+function hasRememberedAccess() {
+  try {
+    const raw = localStorage.getItem(PERSIST_KEY);
+    if (!raw) return false;
+    const record = JSON.parse(raw);
+    if (!record || record.version !== 1 || !Number.isFinite(Number(record.expiresAt))) return false;
+    if (Date.now() >= Number(record.expiresAt)) {
+      localStorage.removeItem(PERSIST_KEY);
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function clearRememberedAccess() {
+  try { localStorage.removeItem(PERSIST_KEY); } catch {}
+  try { sessionStorage.removeItem(SESSION_KEY); } catch {}
 }
 
 async function launch() {
@@ -35,6 +68,7 @@ async function unlock() {
       return;
     }
     sessionStorage.setItem(SESSION_KEY, '1');
+    rememberAccess();
     await launch();
   } finally {
     unlockBtn.disabled = false;
@@ -46,5 +80,18 @@ keyInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') unlock();
 });
 
-if (sessionStorage.getItem(SESSION_KEY) === '1') launch();
-else requestAnimationFrame(() => keyInput.focus());
+const params = new URLSearchParams(location.search);
+if (params.get('forgetLab') === '1') clearRememberedAccess();
+
+if (sessionStorage.getItem(SESSION_KEY) === '1' || hasRememberedAccess()) {
+  try { sessionStorage.setItem(SESSION_KEY, '1'); } catch {}
+  launch();
+} else {
+  requestAnimationFrame(() => keyInput.focus());
+}
+
+window.SVR_DEALER_LAB_ACCESS = Object.freeze({
+  remembered: hasRememberedAccess(),
+  rememberDays: 30,
+  clear: clearRememberedAccess
+});
