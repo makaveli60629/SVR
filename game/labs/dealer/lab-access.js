@@ -49,7 +49,7 @@ async function launch() {
   gate.style.display = 'none';
   document.getElementById('hud').style.display = 'block';
   document.getElementById('xrHint').style.display = 'block';
-  await import('./dealer-lab-v427.js?v=phase427');
+  await import('./dealer-lab-v427.js?v=phase434');
 }
 
 async function unlock() {
