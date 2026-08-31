@@ -45,8 +45,8 @@ jobs:
           grep -q 'phase418_mobile_surface_polish.css?v=phase418' game/android.html
           grep -q 'phase418_mobile_surface_polish.js?v=phase418' game/android.html
           grep -Eq 'ANDROID • PHASE (418|420)' game/android.html
-          grep -q 'SIGN IN' game/modules/phase418_mobile_surface_polish.js
-          grep -q 'CREATE ACCOUNT' game/modules/phase418_mobile_surface_polish.js
+          grep -Eq 'SIGN IN|PLAYER LOGIN' game/modules/phase418_mobile_surface_polish.js
+          grep -Eq 'CREATE ACCOUNT|CREATE PLAYER' game/modules/phase418_mobile_surface_polish.js
           grep -q 'phase418-one-screen' game/modules/phase418_mobile_surface_polish.js
           grep -q 'body.phase418-one-screen' game/styles/phase418_mobile_surface_polish.css
           grep -Eq 'IPHONE • PHASE (418 TEST|420)' game/iphone.html
@@ -64,6 +64,8 @@ jobs:
           grep -q 'MIC / VOX' game/modules/phase418_mobile_surface_polish.js
           grep -q 'STACK ' game/modules/phase418_mobile_surface_polish.js
           grep -q 'pokerStateMutated:false' game/modules/phase418_mobile_surface_polish.js
+          grep -q 'phase431_mobile_play_fit.css?v=phase431' game/modules/phase418_mobile_surface_polish.js
+          grep -q 'phase431_mobile_play_fit.js?v=phase431' game/modules/phase418_mobile_surface_polish.js
           python3 - <<'PY'
           from pathlib import Path
           s=Path('game/android-stable-phase405.html').read_text()
@@ -74,6 +76,7 @@ jobs:
           print('single burn pile and protected safety script order passed')
           PY
           node --check game/modules/phase418_mobile_surface_polish.js
+          node --check game/modules/phase431_mobile_play_fit.js
 
       - name: Validate wrapper direct-game recovery
         shell: bash
@@ -90,16 +93,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'phase418-profile-mobile-fix.css?v=phase418' site/profile.html
-          grep -q 'phase418-profile-eric-authority.js?v=phase418' site/profile.html
-          grep -q 'PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK' site/profile.html
-          grep -q 'foot_l' site/js/phase418-profile-eric-authority.js
-          grep -q 'foot_r' site/js/phase418-profile-eric-authority.js
-          grep -q "stopAllAction" site/js/phase418-profile-eric-authority.js
-          grep -q 'materialsWithOriginalMaps' site/js/phase418-profile-eric-authority.js
-          grep -q 'headAboveFeet' site/js/phase418-profile-eric-authority.js
-          grep -q 'phase418-profile-priority' site/css/phase418-profile-mobile-fix.css
-          node --check site/js/phase418-profile-eric-authority.js
+          if grep -q 'PHASE-430-PROFILE-DEALER-LAB-ERIC-AUTHORITY-LOCK' site/profile.html; then
+            grep -q 'phase430-profile-immediate-layout.css?v=phase430' site/profile.html
+            grep -q 'phase430-profile-lab-eric-authority.js?v=phase430' site/profile.html
+            grep -q 'EricDealerModule' site/js/phase430-profile-lab-eric-authority.js
+            grep -q 'fallbackAvatarUsed:false' site/js/phase430-profile-lab-eric-authority.js
+            node --check site/js/phase430-profile-lab-eric-authority.js
+          else
+            grep -q 'phase418-profile-mobile-fix.css?v=phase418' site/profile.html
+            grep -q 'phase418-profile-eric-authority.js?v=phase418' site/profile.html
+            grep -q 'PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK' site/profile.html
+            grep -q 'foot_l' site/js/phase418-profile-eric-authority.js
+            grep -q 'foot_r' site/js/phase418-profile-eric-authority.js
+            grep -q "stopAllAction" site/js/phase418-profile-eric-authority.js
+            grep -q 'materialsWithOriginalMaps' site/js/phase418-profile-eric-authority.js
+            grep -q 'headAboveFeet' site/js/phase418-profile-eric-authority.js
+            grep -q 'phase418-profile-priority' site/css/phase418-profile-mobile-fix.css
+            node --check site/js/phase418-profile-eric-authority.js
+          fi
 
       - name: Validate account routes and truthful API readiness
         shell: bash
@@ -111,11 +122,16 @@ jobs:
           python3 - <<'PY'
           import json
           p=json.load(open('site/config/player-api.json'))
-          assert p['build']=='PHASE-418-PLAYER-ACCOUNT-API-READINESS-LOCK'
+          assert p['build'] in {
+              'PHASE-418-PLAYER-ACCOUNT-API-READINESS-LOCK',
+              'PHASE-427-PLAYER-CREATE-LOCAL-FIRST-CLOUD-RECOVERY-LOCK',
+          }
           assert p['deploymentState']=='cloud-endpoint-pending'
           assert p['accountApiEndpointConfigured'] is False
           assert p['apiBase']==''
-          assert p['presenceApiBase']==''
+          assert p.get('presenceApiBase','')==''
+          if p['build'].startswith('PHASE-427'):
+              assert p['localPlayerCreationEnabled'] is True
           print('player API remains truthful and secret-free while cloud endpoint is pending')
           PY
           grep -q 'AWS::Cognito::UserPool' infrastructure/aws/phase372-player-account-foundation.yml
@@ -147,7 +163,9 @@ jobs:
         run: |
           set -euo pipefail
           node --check game/modules/phase418_mobile_surface_polish.js
+          node --check game/modules/phase431_mobile_play_fit.js
           node --check site/js/phase418-profile-eric-authority.js
+          node --check site/js/phase430-profile-lab-eric-authority.js
           node --check site-public-hooks.js
           node --check phase409-public-status.js
           python3 -m json.tool site/config/player-api.json >/dev/null
