@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
-import { EricDealerModule } from '../../modules/dealer/eric_dealer_module.js';
-import { TableCalibrationModule } from '../../modules/dealer/table_calibration_module.js';
-import { FeltInteractionModule } from '../../modules/dealer/felt_interaction_module.js';
-import { WristLabModule } from '../../modules/dealer/wrist_lab_module.js';
+import { EricDealerModule } from '../../modules/dealer/eric_dealer_module.js?v=phase434';
+import { TableCalibrationModule } from '../../modules/dealer/table_calibration_module.js?v=phase434';
+import { FeltInteractionModule } from '../../modules/dealer/felt_interaction_module.js?v=phase434';
+import { WristLabModule } from '../../modules/dealer/wrist_lab_module.js?v=phase434';
 
 const BUILD='DEALER-LAB-V2.3-QUEST-CLEAN-SURFACE-HUMAN-SCALE-DEALER';
 const DEALER_DEFAULTS={scale:0.0055,x:-0.10,y:0.00268026492655681,z:0.71,shoulderX:0.55,shoulderZ:-0.48,elbowX:0.36,wristZ:-0.45,speed:1.35};
@@ -28,7 +28,6 @@ const backdrop=new THREE.Mesh(new THREE.CylinderGeometry(7,7,5,96,1,true,Math.PI
 
 const dealer=new EricDealerModule(scene,DEALER_DEFAULTS),table=new TableCalibrationModule(scene,TABLE_DEFAULTS),interaction=new FeltInteractionModule(table),wrist=new WristLabModule(renderer,scene);
 
-// Lab-only stronger dealer-ready authority: deck hand stays up and the deal hand reaches across the felt.
 dealer.applyReadyPose=()=>{
   const leftArm=dealer.getBone('leftarm'),leftForeArm=dealer.getBone('leftforearm'),leftHand=dealer.getBone('lefthand');
   const rightArm=dealer.getBone('rightarm'),rightForeArm=dealer.getBone('rightforearm'),rightHand=dealer.getBone('righthand');
