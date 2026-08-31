@@ -1,6 +1,6 @@
 /* PHASE-431-MOBILE-PLAY-FIT-AUTHORITY-LOCK */
 const BUILD='PHASE-431-MOBILE-PLAY-FIT-AUTHORITY-LOCK';
-const state={build:BUILD,installed:false,viewportHeight:0,viewportWidth:0,portrait:false,tablePage:false,chooserPage:false,footerNormalized:false,secondaryFooterLinks:0,resizeEvents:0,pokerStateMutated:false,lastError:null,checkedAt:null};
+const state={build:BUILD,installed:false,viewportHeight:0,viewportWidth:0,portrait:false,tablePage:false,chooserPage:false,chooserDirectLinks:0,footerNormalized:false,secondaryFooterLinks:0,resizeEvents:0,pokerStateMutated:false,lastError:null,checkedAt:null};
 const $=s=>document.querySelector(s);
 
 function viewport(){
@@ -13,6 +13,23 @@ function viewport(){
   document.body?.classList.toggle('phase431-portrait',state.portrait);
   document.body?.classList.toggle('phase431-landscape',!state.portrait);
   return {h,w};
+}
+
+function directMobileUrl(source){
+  try{
+    const u=new URL(source,location.href),mode=['practice','regular','tournament'].includes(String(u.searchParams.get('mode')||'').toLowerCase())?String(u.searchParams.get('mode')).toLowerCase():'regular';
+    const direct=new URL('/game/android-stable-phase405.html',location.origin);direct.searchParams.set('v','phase431');direct.searchParams.set('mode',mode);direct.searchParams.set('direct','1');
+    const tournament=u.searchParams.get('tournament'),slot=u.searchParams.get('slot');if(tournament)direct.searchParams.set('tournament',tournament);if(slot)direct.searchParams.set('slot',slot);
+    return `${direct.pathname}${direct.search}`;
+  }catch{return source}
+}
+
+function normalizeChooser(){
+  if(!state.chooserPage)return false;
+  let changed=0;
+  document.querySelectorAll('a[href*="android-tabletop.html"]').forEach(link=>{const next=directMobileUrl(link.getAttribute('href')||link.href);if(next&&next!==link.getAttribute('href')){link.setAttribute('href',next);changed++}});
+  document.querySelectorAll('a[href*="android-stable-phase405.html"]').forEach(link=>{try{const u=new URL(link.getAttribute('href')||link.href,location.href);u.searchParams.set('v','phase431');u.searchParams.set('direct','1');link.setAttribute('href',`${u.pathname}${u.search}`)}catch{}});
+  state.chooserDirectLinks=Math.max(state.chooserDirectLinks,changed);return true;
 }
 
 function normalizeFooter(){
@@ -50,7 +67,7 @@ function normalizeTable(){
 
 function sweep(){
   try{
-    markPage();viewport();normalizeTable();
+    markPage();viewport();normalizeChooser();normalizeTable();
     state.installed=true;state.lastError=null;state.checkedAt=new Date().toISOString();
   }catch(error){state.lastError=String(error?.message||error);state.checkedAt=new Date().toISOString()}
   window.SVR_PHASE431_MOBILE_PLAY_STATE={...state};return window.SVR_PHASE431_MOBILE_PLAY_STATE;
