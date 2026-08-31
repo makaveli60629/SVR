@@ -70,6 +70,15 @@ jobs:
       - name: Protect website, mobile wrappers, Quest launcher and game rules
         run: |
           set -euo pipefail
-          git diff --exit-code HEAD^ -- index.html site site-public-hooks.js style.css matrix.js
+          # Phase 430/431 intentionally repairs only these profile/admin site paths.
+          # Any other site change still fails this predecessor guard.
+          changed_site="$(git diff --name-only HEAD^ -- site || true)"
+          bad_site="$(printf '%s\n' "$changed_site" | grep -Ev '^(site/profile\.html|site/admin-preview\.html|site/css/phase430-profile-immediate-layout\.css|site/js/phase430-profile-lab-eric-authority\.js)$' || true)"
+          if [ -n "$bad_site" ]; then
+            echo 'Unexpected site changes outside the authorized Phase 430 profile/admin recovery:' >&2
+            printf '%s\n' "$bad_site" >&2
+            exit 1
+          fi
+          git diff --exit-code HEAD^ -- index.html site-public-hooks.js style.css matrix.js
           git diff --exit-code HEAD^ -- game/quest.html game/android.html game/iphone.html game/android-tabletop.html game/iphone-tabletop.html game/android-release.json
           git diff --exit-code HEAD^ -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase414_human_turn_rotation_authority.js game/modules/phase416_human_seat_never_skip.js
