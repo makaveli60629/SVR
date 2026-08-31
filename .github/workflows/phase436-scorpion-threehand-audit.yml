@@ -1,0 +1,40 @@
+name: Phase 436 Scorpion Three-Hand Eric Dealer Audit
+
+on:
+  push:
+    branches: [phase436-scorpion-threehand-eric-dealer]
+  pull_request:
+    paths:
+      - 'game/labs/scorpion-poker/**'
+      - '.github/workflows/phase436-scorpion-threehand-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate isolated Scorpion three-hand test
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game/labs/scorpion-poker/index.html
+          test -s game/labs/scorpion-poker/scorpion-threehand.js
+          node --check game/labs/scorpion-poker/scorpion-threehand.js
+          grep -q 'PHASE-436-SCORPION-THREE-HAND-ERIC-DEALER-TEST' game/labs/scorpion-poker/scorpion-threehand.js
+          grep -q 'playerCount:3' game/labs/scorpion-poker/scorpion-threehand.js
+          grep -q 'botCount:2' game/labs/scorpion-poker/scorpion-threehand.js
+          grep -q 'EricDealerModule' game/labs/scorpion-poker/scorpion-threehand.js
+          grep -q "scale:0.0047" game/labs/scorpion-poker/scorpion-threehand.js
+          grep -q "dealer.addEventListener('deal'" game/labs/scorpion-poker/scorpion-threehand.js
+          grep -q 'origin' game/labs/scorpion-poker/scorpion-threehand.js
+          grep -q 'sceneTargets?.scorpion' game/labs/scorpion-poker/scorpion-threehand.js
+          grep -q 'robots.*noindex' game/labs/scorpion-poker/index.html
+          if grep -q 'game/index.html' game/labs/scorpion-poker/index.html; then
+            echo 'Scorpion test must remain isolated, not wrap or mutate the production game page.' >&2
+            exit 1
+          fi
+          echo 'Phase 436 Scorpion three-hand isolation contract passed.'
