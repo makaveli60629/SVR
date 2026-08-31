@@ -1,4 +1,4 @@
-const EXPECTED_HASH = 'ee20b3b390a6c8e31ce0dff0ed68dfc01d67edb9ad53fcf51bba66ea7f9d4292';
+const EXPECTED_HASH = '15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225';
 const SESSION_KEY = 'svrDealerLabUnlockedV1';
 const PERSIST_KEY = 'svrDealerLabRememberedV1';
 const REMEMBER_MS = 30 * 24 * 60 * 60 * 1000;
