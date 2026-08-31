@@ -1,0 +1,1 @@
+Current main already contains the merged Phase 434 Quest clean-table implementation. Phase 435 should therefore promote only the manual Eric scale authority and its lab loader wiring on top of main; table geometry should not be reintroduced from the older working branch.
