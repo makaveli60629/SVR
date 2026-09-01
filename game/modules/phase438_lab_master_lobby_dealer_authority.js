@@ -44,6 +44,7 @@ const state = {
 let scene = null;
 let renderer = null;
 let legacyTable = null;
+let legacyVault = null;
 let tableModule = null;
 let dealerModule = null;
 let lightRig = null;
@@ -85,14 +86,21 @@ function deriveAnchor(table) {
   };
 }
 
+function ensureLegacyVault() {
+  if (legacyVault?.parent) return legacyVault;
+  legacyVault = new THREE.Group();
+  legacyVault.name = 'PHASE438_HIDDEN_LOGICAL_LEGACY_AUTHORITIES';
+  legacyVault.visible = false;
+  scene?.add?.(legacyVault);
+  return legacyVault;
+}
+
 function hideLegacyTable() {
   legacyTable = findLegacyTable() || legacyTable;
   if (!legacyTable || legacyTable === tableModule?.table) return false;
-  legacyTable.visible = false;
-  legacyTable.traverse?.((object) => {
-    if (!object?.isMesh) return;
-    object.visible = false;
-  });
+  const vault = ensureLegacyVault();
+  if (legacyTable.parent !== vault) vault.attach(legacyTable);
+  vault.visible = false;
   state.legacyTableHidden = true;
   return true;
 }
@@ -100,12 +108,9 @@ function hideLegacyTable() {
 function hideLegacyEric() {
   const oldEric = window.SVR_PHASE391_ERIC_AUTHORITY || window.SVR_PHASE388_ERIC_AUTHORITY || null;
   if (!oldEric || oldEric === dealerModule?.group) return false;
-  oldEric.visible = false;
-  oldEric.traverse?.((object) => {
-    if (!object?.isMesh) return;
-    const materials = Array.isArray(object.material) ? object.material : [object.material];
-    for (const material of materials.filter(Boolean)) material.visible = false;
-  });
+  const vault = ensureLegacyVault();
+  if (oldEric.parent !== vault) vault.attach(oldEric);
+  vault.visible = false;
   state.legacyEricHidden = true;
   return true;
 }
@@ -173,6 +178,7 @@ async function install() {
 
     const anchor = deriveAnchor(legacyTable);
     state.anchor = { ...anchor };
+    ensureLegacyVault();
 
     tableModule = new TableCalibrationModule(scene, TABLE_PRESET);
     tableModule.group.name = 'PHASE438_APPROVED_LAB_TABLE_MODULE_ROOT';
@@ -192,10 +198,18 @@ async function install() {
       z: anchor.z + DEALER_PRESET.z
     });
     // Phase 391 removes objects whose names look like duplicate Eric roots. Rename
-    // the Lab master immediately so the legacy cleanup cannot delete it while FBX loads.
+    // the Lab master immediately, then guard the transient FBX model name while it loads.
     dealerModule.group.name = 'PHASE438_APPROVED_DEALER_CHARACTER_ROOT';
     dealerModule.propGroup.name = 'PHASE438_APPROVED_DEALER_PROP_ROOT';
-    await dealerModule.load();
+    const nameGuard = window.setInterval(() => {
+      const transient = scene?.getObjectByName?.('Eric_Dealer_Model');
+      if (transient && transient !== window.SVR_PHASE391_ERIC_AUTHORITY) transient.name = 'PHASE438_APPROVED_DEALER_CHARACTER_MODEL';
+    }, 25);
+    try {
+      await dealerModule.load();
+    } finally {
+      clearInterval(nameGuard);
+    }
     if (dealerModule.model) dealerModule.model.name = 'PHASE438_APPROVED_DEALER_CHARACTER_MODEL';
     dealerModule.setParams({
       ...DEALER_PRESET,
