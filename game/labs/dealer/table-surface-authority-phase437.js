@@ -9,6 +9,10 @@ const LINE_INSET_Y = 70;
 const LINE_RADIUS = 330;
 let attached = false;
 let lastMetrics = null;
+let feltTexture = null;
+let feltMaterial = null;
+let leatherMaterial = null;
+let brandingTexture = null;
 
 function roundedRect(ctx, x, y, w, h, r) {
   const rr = Math.min(r, w / 2, h / 2);
@@ -22,6 +26,7 @@ function roundedRect(ctx, x, y, w, h, r) {
 }
 
 function makeBlackFeltTexture() {
+  if (feltTexture) return feltTexture;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 512;
   const ctx = canvas.getContext('2d');
@@ -35,19 +40,20 @@ function makeBlackFeltTexture() {
       : `rgba(${lum},${lum},${lum + 2},${0.02 + Math.random() * 0.04})`;
     ctx.fillRect(Math.random() * 512, Math.random() * 512, 1, 1);
   }
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(4.4, 2.7);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 16;
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  return texture;
+  feltTexture = new THREE.CanvasTexture(canvas);
+  feltTexture.wrapS = feltTexture.wrapT = THREE.RepeatWrapping;
+  feltTexture.repeat.set(4.4, 2.7);
+  feltTexture.colorSpace = THREE.SRGBColorSpace;
+  feltTexture.anisotropy = 16;
+  feltTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  feltTexture.magFilter = THREE.LinearFilter;
+  return feltTexture;
 }
 
-function makeBlackFeltMaterial(texture) {
-  return new THREE.MeshPhysicalMaterial({
-    map: texture,
+function getBlackFeltMaterial() {
+  if (feltMaterial) return feltMaterial;
+  feltMaterial = new THREE.MeshPhysicalMaterial({
+    map: makeBlackFeltTexture(),
     color: 0xffffff,
     roughness: 0.985,
     metalness: 0,
@@ -57,10 +63,12 @@ function makeBlackFeltMaterial(texture) {
     clearcoatRoughness: 0.98,
     side: THREE.DoubleSide
   });
+  return feltMaterial;
 }
 
-function makeEdgeLeatherMaterial() {
-  return new THREE.MeshPhysicalMaterial({
+function getEdgeLeatherMaterial() {
+  if (leatherMaterial) return leatherMaterial;
+  leatherMaterial = new THREE.MeshPhysicalMaterial({
     color: 0x07070a,
     roughness: 0.31,
     metalness: 0.025,
@@ -70,6 +78,7 @@ function makeEdgeLeatherMaterial() {
     sheenColor: new THREE.Color(0x4b2b62),
     side: THREE.DoubleSide
   });
+  return leatherMaterial;
 }
 
 function drawSponsorBadge(ctx, cx, cy, label, subtitle) {
@@ -103,19 +112,19 @@ function drawSponsorBadge(ctx, cx, cy, label, subtitle) {
 }
 
 function makeBrandingTexture() {
+  if (brandingTexture) return brandingTexture;
   const canvas = document.createElement('canvas');
   canvas.width = CANVAS_W;
   canvas.height = CANVAS_H;
   const ctx = canvas.getContext('2d');
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 16;
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
+  brandingTexture = new THREE.CanvasTexture(canvas);
+  brandingTexture.colorSpace = THREE.SRGBColorSpace;
+  brandingTexture.anisotropy = 16;
+  brandingTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  brandingTexture.magFilter = THREE.LinearFilter;
 
   function drawBase() {
     ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-
     const x = LINE_INSET_X;
     const y = LINE_INSET_Y;
     const w = CANVAS_W - LINE_INSET_X * 2;
@@ -137,7 +146,7 @@ function makeBrandingTexture() {
 
     drawSponsorBadge(ctx, 354, 512, 'REIKI', 'SPONSOR');
     drawSponsorBadge(ctx, 1694, 512, 'SPONSOR', 'RESERVED');
-    texture.needsUpdate = true;
+    brandingTexture.needsUpdate = true;
   }
 
   drawBase();
@@ -154,17 +163,17 @@ function makeBrandingTexture() {
     ctx.globalAlpha = 0.99;
     ctx.drawImage(image, CANVAS_W / 2 - w / 2, CANVAS_H / 2 - h / 2, w, h);
     ctx.restore();
-    texture.needsUpdate = true;
+    brandingTexture.needsUpdate = true;
   };
   image.onerror = () => {
     ctx.textAlign = 'center';
     ctx.fillStyle = '#ffffff';
     ctx.font = '900 138px Arial, sans-serif';
     ctx.fillText('SVR POKER', CANVAS_W / 2, CANVAS_H / 2 + 45);
-    texture.needsUpdate = true;
+    brandingTexture.needsUpdate = true;
   };
   image.src = LOGO_URL;
-  return texture;
+  return brandingTexture;
 }
 
 function roundedRectContains(position, line) {
@@ -206,30 +215,26 @@ function applyAuthority(runtime) {
   const table = runtime?.table;
   if (!table?.table || !table.nativeFeltRecords?.length || !table.brandingMesh) return false;
 
-  const feltTexture = makeBlackFeltTexture();
   for (const rec of table.nativeFeltRecords) {
     rec.mesh.visible = true;
-    rec.mesh.material = makeBlackFeltMaterial(feltTexture);
+    rec.mesh.material = getBlackFeltMaterial();
   }
-
   for (const mesh of table.hiddenCoverRecords || []) mesh.visible = false;
-
   for (const rec of table.handRestRecords || []) {
     rec.mesh.visible = true;
-    rec.mesh.material = makeEdgeLeatherMaterial();
+    rec.mesh.material = getEdgeLeatherMaterial();
   }
 
   const metrics = computeMetrics(table);
   if (!metrics) return false;
   lastMetrics = metrics;
 
-  const brandingTexture = makeBrandingTexture();
   table.brandingMesh.geometry?.dispose?.();
   table.brandingMesh.geometry = new THREE.PlaneGeometry(metrics.planeWidth, metrics.planeDepth);
   table.brandingMesh.position.set(metrics.centerX, metrics.y, metrics.centerZ);
   table.brandingMesh.renderOrder = 30;
   table.brandingMesh.frustumCulled = false;
-  table.brandingMesh.material.map = brandingTexture;
+  table.brandingMesh.material.map = makeBrandingTexture();
   table.brandingMesh.material.transparent = true;
   table.brandingMesh.material.alphaTest = 0.025;
   table.brandingMesh.material.depthTest = true;
@@ -265,12 +270,34 @@ function applyAuthority(runtime) {
   return true;
 }
 
+function installReassert(runtime) {
+  const table = runtime.table;
+  if (table.userData?.phase437Wrapped) return;
+  table.userData = table.userData || {};
+  table.userData.phase437Wrapped = true;
+
+  const originalSetParams = table.setParams.bind(table);
+  table.setParams = (next = {}) => {
+    const result = originalSetParams(next);
+    setTimeout(() => applyAuthority(runtime), 0);
+    return result;
+  };
+
+  const originalReset = table.reset.bind(table);
+  table.reset = () => {
+    const result = originalReset();
+    setTimeout(() => applyAuthority(runtime), 0);
+    return result;
+  };
+}
+
 function attach() {
   const runtime = window.SVR_DEALER_LAB;
   if (!runtime?.table || !runtime?.renderer) return false;
   if (!applyAuthority(runtime)) return false;
   if (!attached) {
     attached = true;
+    installReassert(runtime);
     runtime.renderer.xr.addEventListener('sessionstart', () => setTimeout(() => applyAuthority(runtime), 80));
     runtime.table.addEventListener?.('loaded', () => setTimeout(() => applyAuthority(runtime), 0));
   }
