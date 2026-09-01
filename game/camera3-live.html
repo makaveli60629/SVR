@@ -4,36 +4,42 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
-<meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
-<title>SVR Poker Camera 3 Live Preview</title>
-<style>html,body,#app{margin:0;width:100%;height:100%;overflow:hidden;background:#050814;color:#fff;font-family:system-ui,Arial}canvas{display:block;width:100%;height:100%}#safeStage{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:radial-gradient(circle at 50% 38%,#15263b,#050814 58%,#02040a);transition:.25s opacity}.card{width:min(420px,86vw);padding:22px;border:1px solid #7ffcff;border-radius:22px;background:rgba(2,7,16,.92);text-align:center;box-shadow:0 25px 80px #000}.card img{width:70px;height:70px;object-fit:contain}.card strong{display:block;margin-top:8px;color:#8dffb4;letter-spacing:.08em}#camera3LiveStatus{position:fixed;left:12px;top:12px;z-index:30;padding:6px 9px;border:1px solid rgba(141,255,180,.65);border-radius:999px;background:rgba(0,10,16,.74);color:#8dffb4;font:900 10px/1 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(6px)}#camera3LiveStatus[data-ready="true"]{box-shadow:0 0 20px rgba(141,255,180,.2)}.boot-released #safeStage{opacity:0;pointer-events:none}</style>
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>SVR Poker Camera 3 — Live Lobby</title>
+<style>
+html,body,#app{margin:0;width:100%;height:100%;overflow:hidden;background:#020208;color:#fff;font-family:system-ui,Arial,sans-serif}canvas{display:block;width:100%;height:100%}#camera3Boot{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:radial-gradient(circle at 50% 38%,#24143c,#05050a 60%,#020208);transition:opacity .35s ease}.phase438-camera3-ready #camera3Boot{opacity:0;pointer-events:none}#camera3Boot .card{width:min(460px,88vw);padding:24px;border:1px solid #9f63ff;border-radius:22px;background:rgba(4,3,9,.93);text-align:center;box-shadow:0 28px 90px #000}#camera3Boot img{width:88px;height:88px;object-fit:contain}#camera3Boot strong{display:block;margin-top:10px;color:#fff;letter-spacing:.08em}#camera3Badge{position:fixed;left:14px;top:14px;z-index:40;display:flex;align-items:center;gap:9px;padding:8px 11px;border:1px solid rgba(179,108,255,.62);border-radius:999px;background:rgba(3,3,8,.72);backdrop-filter:blur(10px);pointer-events:none}#camera3Badge img{width:34px;height:34px;object-fit:contain}#camera3Badge strong{font-size:11px;letter-spacing:.08em}#camera3Badge span{display:block;color:#d9b9ff;font-size:9px;font-weight:800;letter-spacing:.08em}#status,#mode,#log,#err{display:none!important}
+</style>
+<script>(function(){const p=new URLSearchParams(location.search);let changed=false;if(p.get('desktop')!=='1'){p.set('desktop','1');changed=true}if(p.get('standard')!=='1'){p.set('standard','1');changed=true}if(p.get('cam3')!=='1'){p.set('cam3','1');changed=true}if(!p.has('v')){p.set('v','phase438');changed=true}if(changed)history.replaceState(null,'',location.pathname+'?'+p.toString())})();</script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-391-CAMERA3-PRODUCTION-CONSOLIDATION-LOCK" data-platform="camera3" data-route="/game/camera3-live.html">
+<body data-build="PHASE-438-CAMERA3-LIVE-LOBBY" data-route="/game/camera3-live.html">
 <div id="app"></div>
-<div id="camera3LiveStatus">CAM 3 • LOADING PRODUCTION TABLE</div>
-<div id="safeStage"><div class="card"><img src="/logo.png" alt="SVR Poker"><strong>CAMERA 3 LIVE PREVIEW</strong><p id="safeStatus">Loading one original table, the recessed playing surface, visible cards, upright Eric, production lighting, and director camera.</p></div></div>
+<div id="camera3Badge"><img src="/logo.png" alt=""><div><strong>SVR POKER</strong><span>CAMERA 3 • LIVE LOBBY</span></div></div>
+<div id="camera3Boot"><div class="card"><img src="/logo.png" alt="SVR Poker"><strong>OPENING CAMERA 3</strong><p id="camera3Status">Loading the lobby, approved Lab table, and Eric dealer module.</p></div></div>
+<div id="status"></div><div id="mode"></div><pre id="log"></pre><pre id="err"></pre>
 <script type="module">
-import {bootPlatform} from './modules/phase340_platform_core_loader.js?v=phase391';
-(async()=>{try{
-  await bootPlatform({forcedPlatform:'camera3'});
-  await import('./modules/phase380_original_table_authority_lock.js?v=phase391');
-  window.SVR_PHASE380_ORIGINAL_TABLE_REASSERT?.('phase391-camera3');
-  await import('./modules/phase341_canonical_table_geometry_card_motion_lock.js?v=phase391');
-  await window.SVR_PHASE341_REBUILD?.();
-  await import('./modules/phase391_eric_dealer_authority.js?v=phase391');
-  await import('./modules/phase390_quest_table_geometry_cards_spawn_authority.js?v=phase391');
-  await import('./modules/phase390_surface_cards_final_guard.js?v=phase391');
-  await import('./modules/phase389_camera3_live_preview.js?v=phase391');
-  await import('./modules/phase391_production_runtime_audit.js?v=phase391');
-  await window.SVR_PHASE391_ERIC_SWEEP?.('phase391-camera3');
-  await window.SVR_PHASE390_SWEEP?.('phase391-camera3');
-  await window.SVR_PHASE390_SURFACE_CARDS_SWEEP?.('phase391-camera3');
-  window.SVR_PHASE389_CAMERA3_ENFORCE?.('phase391-camera3');
-  window.SVR_PHASE391_PRODUCTION_SWEEP?.('phase391-camera3');
-  document.body.classList.add('boot-released');
-}catch(error){console.error(error);document.getElementById('safeStatus').textContent='Camera 3 recovery is restoring the production table, cards, Eric, and lighting.';document.body.classList.add('boot-released');try{await import('./modules/phase391_eric_dealer_authority.js?v=phase391');await import('./modules/phase390_quest_table_geometry_cards_spawn_authority.js?v=phase391');await import('./modules/phase390_surface_cards_final_guard.js?v=phase391');await import('./modules/phase389_camera3_live_preview.js?v=phase391');await import('./modules/phase391_production_runtime_audit.js?v=phase391');window.SVR_PHASE391_PRODUCTION_SWEEP?.('camera3-recovery')}catch(inner){console.error(inner)}}})();
-window.SVR_PHASE391_CAMERA3_ROUTE_QA=()=>({build:'PHASE-391-CAMERA3-PRODUCTION-CONSOLIDATION-LOCK',route:location.pathname,platform:window.SVR_PHASE340_PLATFORM_STATE||null,eric:window.SVR_PHASE391_ERIC_QA?.()||null,table:window.SVR_PHASE390_QA?.()||null,surfaceCards:window.SVR_PHASE390_SURFACE_CARDS_QA?.()||null,camera:window.SVR_PHASE389_CAMERA3_QA?.()||null,production:window.SVR_PHASE391_PRODUCTION_QA?.()||null,checkedAt:new Date().toISOString()});
+import { bootPlatform } from './modules/phase340_platform_core_loader.js?v=phase438';
+(async()=>{
+  const status=document.getElementById('camera3Status');
+  try{
+    status.textContent='Loading the full SVR lobby…';
+    await bootPlatform({forcedPlatform:'desktop'});
+    status.textContent='Loading the approved Lab table anchor…';
+    await import('./modules/phase380_original_table_authority_lock.js?v=phase438');
+    const started=performance.now();
+    while(performance.now()-started<20000&&!window.SVR_TABLE_AUTHORITY)await new Promise(r=>setTimeout(r,100));
+    status.textContent='Promoting the Lab table and Eric module…';
+    await import('./modules/phase438_lab_master_lobby_dealer_authority.js?v=phase438');
+    await window.SVR_PHASE438_INSTALL?.();
+    status.textContent='Starting the permanent Camera 3 director…';
+    await import('./modules/phase438_camera3_lobby_director.js?v=phase438');
+  }catch(error){
+    console.error(error);
+    status.textContent='Camera 3 recovery: reload once if the lobby does not appear.';
+  }
+})();
+window.SVR_PHASE438_CAMERA3_ROUTE_QA=()=>({build:'PHASE-438-CAMERA3-LIVE-LOBBY',route:location.pathname,module:window.SVR_PHASE438_QA?.()||null,director:window.SVR_PHASE438_CAMERA3_QA?.()||null,checkedAt:new Date().toISOString()});
 </script>
 </body>
 </html>
