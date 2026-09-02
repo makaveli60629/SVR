@@ -21,15 +21,23 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Validate Phase 396 Quest seated mode
+      - name: Validate Phase 396 Quest seated mode with Phase 440 visual successor
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
           grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/index.html
           grep -q 'phase396_quest_seated_clean_table_deal_lock.js?v=phase396' game/index.html
           grep -q 'SVR_TELEPORT_DISABLED=true' game/index.html
           grep -q "target.searchParams.set('teleport','off')" game/quest.html
+          if grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' game/quest.html; then
+            grep -q 'phase440-lab-master-hard-render' game/quest.html
+            grep -q 'data-quest-polish-build="PHASE-440-LAB-MASTER-HARD-RENDER-LOCK"' game/index.html
+            grep -q 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase440' game/index.html
+            grep -q 'SVR_PHASE440_READY_PROMISE' game/index.html
+            grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' game/modules/phase440_lab_master_hard_render_lock.js
+          else
+            grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          fi
           grep -q 'SVR_PHASE396_TELEPORT_DISABLED=true' game/modules/phase396_quest_seated_clean_table_deal_lock.js
           grep -q 'SVR_PHASE395_SEAT_USER' game/modules/phase396_quest_seated_clean_table_deal_lock.js
           grep -q 'TABLETOP_ASSET' game/modules/phase396_quest_seated_clean_table_deal_lock.js
@@ -102,6 +110,7 @@ jobs:
           node --check game/modules/phase395_quest_browser_table_gameplay_fix.js
           node --check game/modules/phase395_quest_eric_floor_guard.js
           node --check game/modules/phase406_quest_side_burn_chip_polish.js
+          if [ -f game/modules/phase440_lab_master_hard_render_lock.js ]; then node --check game/modules/phase440_lab_master_hard_render_lock.js; fi
           node --check game/modules/phase393_android_common.js
           node --check game/modules/phase393_android_evaluator.js
           node --check game/modules/phase393_android_gameplay.js
