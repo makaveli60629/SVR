@@ -34,7 +34,7 @@ jobs:
           grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
           grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' game/modules/phase403_android_pot_rules.js
           grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' game/modules/phase403_android_gameplay.js
-          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' game/quest.html
+          grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' game/quest.html
 
       - name: Validate actual Phase 406 to Phase 407 runtime order
         shell: bash
