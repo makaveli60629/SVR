@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive"><title>SVR Avatar Lab</title>
+  <style>
+    :root{color-scheme:dark;--cyan:#7ffcff;--purple:#a46cff;--gold:#ffd36a}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#03050d;color:#fff;font-family:Inter,system-ui,sans-serif}canvas{position:fixed;inset:0;width:100%;height:100%}.top,.controls,.status{position:fixed;z-index:3;background:#090712dd;border:1px solid #7050a7;border-radius:16px;backdrop-filter:blur(12px)}.top{left:12px;top:12px;padding:12px 15px}.top h1{margin:0;font-size:17px}.top p{margin:4px 0 0;color:#c7bada;font-size:11px}.controls{left:50%;bottom:12px;transform:translateX(-50%);width:min(980px,calc(100% - 18px));padding:10px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.status{right:12px;top:12px;padding:10px;font:10px/1.35 ui-monospace,monospace;max-width:330px}button,select{min-height:39px;border:1px solid #684895;border-radius:10px;background:#171022;color:#fff;font-weight:800;padding:8px}button.active{border-color:var(--cyan);box-shadow:0 0 15px #7ffcff55}.gold{border-color:#a88735}.wide{grid-column:span 2}@media(max-width:680px){.controls{grid-template-columns:repeat(3,minmax(0,1fr));max-height:44vh;overflow:auto}.status{top:86px;max-width:220px}.wide{grid-column:span 1}}
+  </style>
+  <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body data-build="PHASE-442-AVATAR-LAB-REAL-GEOMETRY-MOTION-LOCK">
+  <canvas id="avatarCanvas"></canvas>
+  <header class="top"><h1>SVR AVATAR LAB</h1><p>Real bodies • fitted curved wardrobe • locomotion preview</p></header>
+  <div id="status" class="status">Loading avatar…</div>
+  <div class="controls">
+    <select id="model"><option value="eric">Eric • Male</option><option value="claudia">Claudia • Female</option></select>
+    <select id="palette"><option value="midnight">Midnight</option><option value="scorpion">Scorpion</option><option value="emerald">Emerald</option><option value="royal">Royal</option><option value="gold">Gold Room</option></select>
+    <select id="top"><option value="jacket">Casino Jacket</option><option value="vest">Dealer Vest</option><option value="hoodie">SVR Hoodie</option><option value="none">Base Outfit</option></select>
+    <select id="headwear"><option value="cap">SVR Cap</option><option value="beanie">Night Beanie</option><option value="crown">Founder Crown</option><option value="none">No Hat</option></select>
+    <select id="eyewear"><option value="neon">Neon Frames</option><option value="visor">VR Visor</option><option value="none">No Eyewear</option></select>
+    <select id="shoes"><option value="sneakers">Neon Sneakers</option><option value="boots">Black Boots</option><option value="none">Base Shoes</option></select>
+    <select id="accessory"><option value="watch">SVR Watch</option><option value="chain">Gold Chain</option><option value="badge">Founder Badge</option><option value="none">No Accessory</option></select>
+    <button data-motion="idle">Idle</button><button data-motion="walking">Walk</button><button data-motion="running">Run</button><button data-motion="jump">Jump</button><button id="sit" data-motion="sitting">Sit</button>
+    <button id="save" class="gold wide">Save Avatar</button><button id="reset">Reset View</button><a href="../dealer/" style="display:contents"><button>Eric Dealer Lab</button></a>
+  </div>
+  <script type="module" src="./avatar-lab.js?v=phase442"></script>
+</body></html>

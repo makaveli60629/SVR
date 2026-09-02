@@ -115,14 +115,18 @@ jobs:
           test -s source/game/modules/dealer/table_calibration_module.js
           test -s source/game/modules/dealer/eric_dealer_module.js
           test -s source/game/labs/dealer/table-surface-authority-phase437.js
+          test -s source/game/labs/avatar/index.html
+          test -s source/game/labs/avatar/avatar-lab.js
+          test -s source/game/assets/models/eric/locomotion/walking.fbx
+          test -s source/game/assets/models/claudia/locomotion/walking.fbx
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' source/game/quest.html
           grep -q 'phase440-lab-master-hard-render' source/game/quest.html
           grep -q 'data-quest-polish-build="PHASE-440-LAB-MASTER-HARD-RENDER-LOCK"' source/game/index.html
-          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase440' source/game/index.html
+          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase442' source/game/index.html
           grep -q 'SVR_PHASE440_READY_PROMISE' source/game/index.html
-          grep -q 'phase438_lab_master_lobby_dealer_authority.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase438_lab_master_lobby_dealer_authority.js?v=phase440&patch=phase442' source/game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase439_lab_only_lobby_render_authority.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase440_lab_master_hard_render_lock.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase422_quest_seated_inspection_lock.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
@@ -144,6 +148,7 @@ jobs:
           node --check source/game/modules/dealer/table_calibration_module.js
           node --check source/game/modules/dealer/eric_dealer_module.js
           node --check source/game/labs/dealer/table-surface-authority-phase437.js
+          node --check source/game/labs/avatar/avatar-lab.js
 
       - name: Execute protected Phase 403 pot sanity
         shell: bash
@@ -188,6 +193,10 @@ jobs:
             "vrTableBuild": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
             "vrTablePredecessorBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
             "labTableSurfaceBuild": "DEALER-LAB-V2.5-BLACK-FELT-TABLE-SHAPE-PASSLINE-LOCK",
+            "avatarLabBuild": "PHASE-442-AVATAR-LAB-REAL-GEOMETRY-MOTION-LOCK",
+            "avatarLabRoute": "/game/labs/avatar/",
+            "avatarLabRealBodies": true,
+            "avatarLabMotionClips": 9,
             "androidBuild": "PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK",
             "androidSurfaceBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
             "androidEngineBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
@@ -237,6 +246,10 @@ jobs:
           test -s publish/game/modules/dealer/table_calibration_module.js
           test -s publish/game/modules/dealer/eric_dealer_module.js
           test -s publish/game/labs/dealer/table-surface-authority-phase437.js
+          test -s publish/game/labs/avatar/index.html
+          test -s publish/game/labs/avatar/avatar-lab.js
+          test -s publish/game/assets/models/eric/locomotion/walking.fbx
+          test -s publish/game/assets/models/claudia/locomotion/walking.fbx
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' publish/deploy-health.json
@@ -244,6 +257,7 @@ jobs:
           grep -q '"questLabMasterOnlyRenderedEric": true' publish/deploy-health.json
           grep -q '"questLegacyTableVisualsDetached": true' publish/deploy-health.json
           grep -q '"questApprovedEricScale": 0.0047' publish/deploy-health.json
+          grep -q 'PHASE-442-AVATAR-LAB-REAL-GEOMETRY-MOTION-LOCK' publish/deploy-health.json
           test -f publish/CNAME
           grep -qx 'svrpoker.com' publish/CNAME
           test -s publish/404.html

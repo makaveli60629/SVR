@@ -1,6 +1,6 @@
 {
-  "build": "PHASE-384-ERIC-DEFAULT-AVATAR-SITE-LOCK",
-  "version": 3,
+  "build": "PHASE-442-AVATAR-LAB-REAL-GEOMETRY-MOTION-LOCK",
+  "version": 4,
   "avatarModels": [
     {
       "id": "eric",
@@ -31,31 +31,31 @@
   "categories": {
     "headwear": [
       { "id": "none", "label": "Clean Base Head", "generator": "none", "ownedByDefault": true },
-      { "id": "cap", "label": "SVR Cap (future fitted geometry)", "generator": "cap", "ownedByDefault": true, "previewDisabled": true },
-      { "id": "beanie", "label": "Night Beanie (future fitted geometry)", "generator": "beanie", "ownedByDefault": true, "previewDisabled": true },
-      { "id": "crown", "label": "Founder Crown (future fitted geometry)", "generator": "crown", "ownedByDefault": true, "previewDisabled": true }
+      { "id": "cap", "label": "SVR Fitted Cap", "generator": "cap", "ownedByDefault": true },
+      { "id": "beanie", "label": "Night Beanie", "generator": "beanie", "ownedByDefault": true },
+      { "id": "crown", "label": "Founder Crown", "generator": "crown", "ownedByDefault": true }
     ],
     "eyewear": [
       { "id": "none", "label": "No Glasses", "generator": "none", "ownedByDefault": true },
-      { "id": "neon", "label": "Neon Frames (future fitted geometry)", "generator": "glasses-round", "ownedByDefault": true, "previewDisabled": true },
-      { "id": "visor", "label": "VR Visor (future fitted geometry)", "generator": "visor", "ownedByDefault": true, "previewDisabled": true }
+      { "id": "neon", "label": "Neon Frames", "generator": "glasses-round", "ownedByDefault": true },
+      { "id": "visor", "label": "VR Visor", "generator": "visor", "ownedByDefault": true }
     ],
     "top": [
       { "id": "none", "label": "Eric Base Outfit", "generator": "none", "ownedByDefault": true },
-      { "id": "jacket", "label": "Casino Jacket (fitting disabled)", "generator": "jacket", "ownedByDefault": true, "previewDisabled": true },
-      { "id": "vest", "label": "Dealer Vest (fitting disabled)", "generator": "vest", "ownedByDefault": true, "previewDisabled": true },
-      { "id": "hoodie", "label": "SVR Hoodie (fitting disabled)", "generator": "hoodie", "ownedByDefault": true, "previewDisabled": true }
+      { "id": "jacket", "label": "Tailored Casino Jacket", "generator": "jacket", "ownedByDefault": true },
+      { "id": "vest", "label": "Dealer Vest", "generator": "vest", "ownedByDefault": true },
+      { "id": "hoodie", "label": "SVR Hoodie", "generator": "hoodie", "ownedByDefault": true }
     ],
     "shoes": [
       { "id": "none", "label": "Eric Base Shoes", "generator": "none", "ownedByDefault": true },
-      { "id": "sneakers", "label": "Neon Sneakers (future fitted geometry)", "generator": "sneakers", "ownedByDefault": true, "previewDisabled": true },
-      { "id": "boots", "label": "Black Boots (future fitted geometry)", "generator": "boots", "ownedByDefault": true, "previewDisabled": true }
+      { "id": "sneakers", "label": "Neon Sneakers", "generator": "sneakers", "ownedByDefault": true },
+      { "id": "boots", "label": "Black Boots", "generator": "boots", "ownedByDefault": true }
     ],
     "accessory": [
       { "id": "none", "label": "No Accessory", "generator": "none", "ownedByDefault": true },
-      { "id": "chain", "label": "Gold Chain (future fitted geometry)", "generator": "chain", "ownedByDefault": true, "previewDisabled": true },
-      { "id": "watch", "label": "SVR Watch (future fitted geometry)", "generator": "watch", "ownedByDefault": true, "previewDisabled": true },
-      { "id": "badge", "label": "Founder Badge (future fitted geometry)", "generator": "badge", "ownedByDefault": true, "previewDisabled": true }
+      { "id": "chain", "label": "Gold Chain", "generator": "chain", "ownedByDefault": true },
+      { "id": "watch", "label": "SVR Watch", "generator": "watch", "ownedByDefault": true },
+      { "id": "badge", "label": "Founder Badge", "generator": "badge", "ownedByDefault": true }
     ]
   },
   "presets": [

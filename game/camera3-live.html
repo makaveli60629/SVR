@@ -30,7 +30,7 @@ import { bootPlatform } from './modules/phase340_platform_core_loader.js?v=phase
     const started=performance.now();
     while(performance.now()-started<20000&&!window.SVR_TABLE_AUTHORITY)await new Promise(r=>setTimeout(r,100));
     status.textContent='Promoting the Lab table and Eric module…';
-    await import('./modules/phase438_lab_master_lobby_dealer_authority.js?v=phase440');
+    await import('./modules/phase438_lab_master_lobby_dealer_authority.js?v=phase440&patch=phase442');
     await window.SVR_PHASE438_INSTALL?.();
     await import('./modules/phase439_lab_only_lobby_render_authority.js?v=phase440');
     await window.SVR_PHASE439_INSTALL?.();
