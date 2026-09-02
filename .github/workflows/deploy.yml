@@ -195,10 +195,12 @@ jobs:
             "vrTableBuild": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
             "vrTablePredecessorBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
             "labTableSurfaceBuild": "DEALER-LAB-V2.5-BLACK-FELT-TABLE-SHAPE-PASSLINE-LOCK",
-            "avatarLabBuild": "PHASE-442-AVATAR-LAB-REAL-GEOMETRY-MOTION-LOCK",
+            "avatarLabBuild": "PHASE-443-PLAYER-ONLY-ARTICULATED-AVATAR-LAB",
             "avatarLabRoute": "/game/labs/avatar/",
-            "avatarLabRealBodies": true,
-            "avatarLabMotionClips": 9,
+            "avatarLabDealerSeparated": true,
+            "avatarLabArticulatedJoints": 19,
+            "avatarLabPlaceholderBoxes": 0,
+            "tableChipShelfInches": 3.75,
             "androidBuild": "PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK",
             "androidSurfaceBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
             "androidEngineBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
@@ -250,8 +252,8 @@ jobs:
           test -s publish/game/labs/dealer/table-surface-authority-phase437.js
           test -s publish/game/labs/avatar/index.html
           test -s publish/game/labs/avatar/avatar-lab.js
-          test -s publish/game/assets/models/eric/locomotion/walking.fbx
-          test -s publish/game/assets/models/claudia/locomotion/walking.fbx
+          test -s publish/game/modules/avatar/player_avatar_module.js
+          test -s publish/game/tools/phase443-avatar-dealer-table-audit.mjs
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' publish/deploy-health.json
@@ -259,7 +261,8 @@ jobs:
           grep -q '"questLabMasterOnlyRenderedEric": true' publish/deploy-health.json
           grep -q '"questLegacyTableVisualsDetached": true' publish/deploy-health.json
           grep -q '"questApprovedEricScale": 0.0047' publish/deploy-health.json
-          grep -q 'PHASE-442-AVATAR-LAB-REAL-GEOMETRY-MOTION-LOCK' publish/deploy-health.json
+          grep -q 'PHASE-443-PLAYER-ONLY-ARTICULATED-AVATAR-LAB' publish/deploy-health.json
+          (cd publish && node game/tools/phase443-avatar-dealer-table-audit.mjs)
           test -f publish/CNAME
           grep -qx 'svrpoker.com' publish/CNAME
           test -s publish/404.html
