@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-const MODEL_URL = new URL('../../assets/models/eric/eric.fbx', import.meta.url).href;
+const MODEL_URL = `${new URL('../../assets/models/eric/eric.fbx', import.meta.url).href}?v=phase444`;
 const IDLE_URL = new URL('../../assets/models/anims/eric_idle.fbx', import.meta.url).href;
 const BASE_URL = new URL('../../assets/models/eric/rp_eric_rigged_001_dif.jpg', import.meta.url).href;
 const NORMAL_URL = new URL('../../assets/models/eric/rp_eric_rigged_001_norm.jpg', import.meta.url).href;

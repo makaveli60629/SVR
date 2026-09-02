@@ -49,8 +49,8 @@ async function launch() {
   gate.style.display = 'none';
   document.getElementById('hud').style.display = 'block';
   document.getElementById('xrHint').style.display = 'block';
-  await import('./dealer-lab-v427.js?v=phase443');
-  await import('./table-surface-authority-phase437.js?v=phase443');
+  await import('./dealer-lab-v427.js?v=phase444');
+  await import('./table-surface-authority-phase437.js?v=phase444');
 }
 
 async function unlock() {
