@@ -37,16 +37,11 @@ jobs:
           grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' game/modules/phase414_human_turn_rotation_authority.js
           grep -q 'PHASE-416-HUMAN-SEAT-NEVER-SKIP-LOCK' game/modules/phase416_human_seat_never_skip.js
 
-      - name: Validate Phase 421 predecessor yields to Phase 422
+      - name: Preserve Phase 421 and Phase 422 source authorities
         run: |
           set -euo pipefail
           grep -q 'PHASE-421-VR-TABLE-FINAL-POLISH-LOCK' game/modules/phase421_vr_table_final_polish.js
           grep -q 'supersededByPhase422' game/modules/phase421_vr_table_final_polish.js
-          node --check game/modules/phase421_vr_table_final_polish.js
-
-      - name: Validate Phase 422 Quest table inspection
-        run: |
-          set -euo pipefail
           grep -q 'FELT_RECESS_METERS=.0254' game/modules/phase422_quest_table_geometry_theme_lock.js
           grep -q 'PHASE422_TRUE_INNER_PLAYING_SURFACE' game/modules/phase422_quest_table_geometry_theme_lock.js
           grep -q 'PASS / BET LINE' game/modules/phase422_quest_table_geometry_theme_lock.js
@@ -56,18 +51,38 @@ jobs:
           grep -q 'SVR_HAND_TELEPORT_ENABLED' game/modules/phase422_quest_seated_inspection_lock.js
           grep -q 'SVR_GRIP_TELEPORT_ENABLED' game/modules/phase422_quest_seated_inspection_lock.js
           grep -q 'phase334Held' game/modules/phase422_quest_table_prop_alignment_flex_lock.js
-          grep -q 'phase422_quest_table_geometry_theme_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -q 'phase422_quest_seated_inspection_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -q 'phase422_quest_table_prop_alignment_flex_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -q 'phase406_quest_side_burn_chip_polish.js?v=phase422' game/index.html
-          grep -q 'data-quest-polish-build="PHASE-422-QUEST-TABLE-INSPECTION-LOCK"' game/index.html
-          grep -q "const BUILD='PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK'" game/index.html
+          node --check game/modules/phase421_vr_table_final_polish.js
           node --check game/modules/phase422_quest_table_geometry_theme_lock.js
           node --check game/modules/phase422_quest_seated_inspection_lock.js
           node --check game/modules/phase422_quest_table_prop_alignment_flex_lock.js
-          node --check game/modules/phase406_quest_side_burn_chip_polish.js
 
-      - name: Protect website, mobile wrappers, Quest launcher and game rules
+      - name: Validate active Quest table authority
+        run: |
+          set -euo pipefail
+          grep -q "const BUILD='PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK'" game/index.html
+          if grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' game/modules/phase440_lab_master_hard_render_lock.js; then
+            grep -q 'phase438_lab_master_lobby_dealer_authority.js?v=phase440' game/modules/phase406_quest_side_burn_chip_polish.js
+            grep -q 'phase439_lab_only_lobby_render_authority.js?v=phase440' game/modules/phase406_quest_side_burn_chip_polish.js
+            grep -q 'phase440_lab_master_hard_render_lock.js?v=phase440' game/modules/phase406_quest_side_burn_chip_polish.js
+            grep -q 'phase422_quest_seated_inspection_lock.js?v=phase440' game/modules/phase406_quest_side_burn_chip_polish.js
+            grep -q 'phase422_quest_table_prop_alignment_flex_lock.js?v=phase440' game/modules/phase406_quest_side_burn_chip_polish.js
+            ! grep -q 'phase422_quest_table_geometry_theme_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
+            grep -q 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase440' game/index.html
+            grep -q 'data-quest-polish-build="PHASE-440-LAB-MASTER-HARD-RENDER-LOCK"' game/index.html
+            grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' game/quest.html
+            grep -q 'phase440-lab-master-hard-render' game/quest.html
+            node --check game/modules/phase406_quest_side_burn_chip_polish.js
+            node --check game/modules/phase440_lab_master_hard_render_lock.js
+          else
+            grep -q 'phase422_quest_table_geometry_theme_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
+            grep -q 'phase422_quest_seated_inspection_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
+            grep -q 'phase422_quest_table_prop_alignment_flex_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
+            grep -q 'phase406_quest_side_burn_chip_polish.js?v=phase422' game/index.html
+            grep -q 'data-quest-polish-build="PHASE-422-QUEST-TABLE-INSPECTION-LOCK"' game/index.html
+            node --check game/modules/phase406_quest_side_burn_chip_polish.js
+          fi
+
+      - name: Protect website, mobile wrappers and game rules
         run: |
           set -euo pipefail
           # Phase 430/431 intentionally repairs only these profile/admin site paths.
@@ -80,5 +95,5 @@ jobs:
             exit 1
           fi
           git diff --exit-code HEAD^ -- index.html site-public-hooks.js style.css matrix.js
-          git diff --exit-code HEAD^ -- game/quest.html game/android.html game/iphone.html game/android-tabletop.html game/iphone-tabletop.html game/android-release.json
+          git diff --exit-code HEAD^ -- game/android.html game/iphone.html game/android-tabletop.html game/iphone-tabletop.html game/android-release.json
           git diff --exit-code HEAD^ -- game/modules/phase403_android_gameplay.js game/modules/phase403_android_pot_rules.js game/modules/phase414_human_turn_rotation_authority.js game/modules/phase416_human_seat_never_skip.js
