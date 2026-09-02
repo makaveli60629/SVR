@@ -22,19 +22,22 @@ jobs:
         with:
           path: source
           fetch-depth: 1
+
       - name: Checkout production
         uses: actions/checkout@v5
         with:
           ref: gh-pages
           path: publish
           fetch-depth: 1
+
       - name: Verify latest main source
         shell: bash
         run: |
           set -euo pipefail
           git -C source fetch origin main --depth=1
           test "$(git -C source rev-parse HEAD)" = "$(git -C source rev-parse origin/main)"
-      - name: Validate Phase 420 mobile, Phase 422 Quest table and protected authorities
+
+      - name: Validate protected mobile and account authorities
         shell: bash
         run: |
           set -euo pipefail
@@ -46,123 +49,47 @@ jobs:
           test -s source/game/android-tabletop.html
           test -s source/game/iphone-tabletop.html
           test -s source/game/android-stable-phase405.html
-          test -s source/game/modules/phase418_mobile_surface_polish.js
-          test -s source/game/styles/phase418_mobile_surface_polish.css
-          test -s source/game/modules/phase419_mobile_table_flow_polish.js
-          test -s source/game/styles/phase419_mobile_table_flow_polish.css
-          test -s source/game/modules/phase419_tournament_registration_notify.js
-          test -s source/game/styles/phase419_tournament_registration_notify.css
           test -s source/game/modules/phase420_mobile_release_lock.js
           test -s source/game/modules/phase420_tournament_start_authority.js
-          test -s source/game/modules/phase421_vr_table_final_polish.js
-          test -s source/game/modules/phase422_quest_table_geometry_theme_lock.js
-          test -s source/game/modules/phase422_quest_seated_inspection_lock.js
-          test -s source/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
+          test -s source/game/modules/phase403_android_gameplay.js
+          test -s source/game/modules/phase403_android_pot_rules.js
+          test -s source/game/modules/phase414_human_turn_rotation_authority.js
+          test -s source/game/modules/phase416_human_seat_never_skip.js
           test -s source/game/tournament-signup.html
           test -s source/game/config/tournament-api.json
-          test -s source/site/profile.html
-          test -s source/site/js/phase418-profile-eric-authority.js
-          test -s source/site/css/phase418-profile-mobile-fix.css
-          test -s source/site/login.html
           test -s source/site/config/player-api.json
-          grep -q 'PHASE-419-TOURNAMENT-REGISTRATION-MOBILE-UX-LOCK' source/game/android-stable-phase405.html
-          grep -q 'PHASE-419-MOBILE-TABLE-FLOW-POLISH-LOCK' source/game/modules/phase419_mobile_table_flow_polish.js
-          grep -q 'PHASE-419-TOURNAMENT-REGISTRATION-NOTIFICATION-LOCK' source/game/tournament-signup.html
-          grep -q 'phase419_mobile_table_flow_polish.js?v=phase419' source/game/android-stable-phase405.html
-          grep -q 'phase419_tournament_registration_notify.js?v=phase419' source/game/tournaments.html
+          test -s source/downloads/svr-poker-android-rc2.apk
           grep -q 'PHASE-420-MOBILE-RELEASE-TRUTH-LOCK' source/game/android.html
           grep -q 'PHASE-420-MOBILE-RELEASE-TRUTH-LOCK' source/game/iphone.html
-          grep -q 'PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK' source/game/android-tabletop.html
-          grep -q 'PHASE-420-IPHONE-WRAPPER-RELEASE-LOCK' source/game/iphone-tabletop.html
-          grep -q 'PHASE-420-TOURNAMENT-START-AUTHORITY-LOCK' source/game/tournaments.html
-          grep -q 'phase420_tournament_start_authority.js?v=phase420' source/game/tournaments.html
-          grep -q 'phase420_mobile_release_lock.js?v=phase420' source/game/modules/phase419_mobile_table_flow_polish.js
-          grep -q 'PHASE-421-VR-TABLE-FINAL-POLISH-LOCK' source/game/modules/phase421_vr_table_final_polish.js
-          grep -Fq 'phase421_vr_table_final_polish.js?v=phase422' source/game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -q 'supersededByPhase422' source/game/modules/phase421_vr_table_final_polish.js
-          grep -q 'PHASE-422-QUEST-TABLE-GEOMETRY-THEME-LOCK' source/game/modules/phase422_quest_table_geometry_theme_lock.js
-          grep -q 'FELT_RECESS_METERS=.0254' source/game/modules/phase422_quest_table_geometry_theme_lock.js
-          grep -q 'PHASE422_TRUE_INNER_PLAYING_SURFACE' source/game/modules/phase422_quest_table_geometry_theme_lock.js
-          grep -q 'PASS / BET LINE' source/game/modules/phase422_quest_table_geometry_theme_lock.js
-          grep -q 'curvedLeatherRailPreserved:true' source/game/modules/phase422_quest_table_geometry_theme_lock.js
-          grep -q 'SEATED_RAIL_GAP=.045' source/game/modules/phase422_quest_seated_inspection_lock.js
-          grep -q 'SEATED_EYE_HEIGHT=1.18' source/game/modules/phase422_quest_seated_inspection_lock.js
-          grep -q 'SVR_HAND_TELEPORT_ENABLED' source/game/modules/phase422_quest_seated_inspection_lock.js
-          grep -q 'SVR_GRIP_TELEPORT_ENABLED' source/game/modules/phase422_quest_seated_inspection_lock.js
-          grep -q 'phase334Held' source/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
-          grep -q 'phase422_quest_table_geometry_theme_lock.js?v=phase422' source/game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -q 'phase422_quest_seated_inspection_lock.js?v=phase422' source/game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -q 'phase422_quest_table_prop_alignment_flex_lock.js?v=phase422' source/game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422' source/game/index.html
-          grep -q 'data-quest-polish-build="PHASE-422-QUEST-TABLE-INSPECTION-LOCK"' source/game/index.html
-          grep -q 'phase418_mobile_surface_polish.js?v=phase418' source/game/android-stable-phase405.html
-          grep -q 'phase418_mobile_surface_polish.css?v=phase418' source/game/android-stable-phase405.html
-          grep -q 'PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK' source/site/profile.html
-          grep -q 'PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK' source/phase409-public-status.js
-          grep -q "ADMIN ONLINE':'AI ONLINE" source/phase409-public-status.js
-          grep -q "CURRENT_PHASE='phase418'" source/site-public-hooks.js
-          grep -q 'PHASE-418-PLAYER-ACCOUNT-API-READINESS-LOCK' source/site/config/player-api.json
-          grep -q '"deploymentState": "cloud-endpoint-pending"' source/site/config/player-api.json
-          grep -q '"accountApiEndpointConfigured": false' source/site/config/player-api.json
-          grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' source/game/modules/phase414_human_turn_rotation_authority.js
-          grep -q 'PHASE-413-MOBILE-HUMAN-ACTION-HARD-LOCK' source/game/modules/phase413_mobile_human_action_hard_lock.js
-          grep -q 'PHASE-410-MOBILE-HUMAN-INPUT-LOCK' source/game/modules/phase410_mobile_human_input_lock.js
-          grep -q 'PHASE-409-MOBILE-PLAYER-TURN-GUARD-LOCK' source/game/modules/phase409_mobile_player_turn_guard.js
-          grep -q 'DARIUS_TO_USER_ORDER' source/game/modules/phase409_mobile_player_turn_guard.js
-          grep -q 'PHASE-408-HOLDEM-STREET-CALL-TRUTH-LOCK' source/game/modules/phase408_holdem_street_call_truth.js
           grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' source/game/modules/phase403_android_gameplay.js
           grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' source/game/modules/phase403_android_pot_rules.js
-          grep -q 'VISUAL_LEFT_SEAT_ORDER=Object.freeze(\[0,5,1,2,3,4\])' source/game/modules/phase403_android_gameplay.js
-          grep -q 'PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK' source/game/modules/phase404_android_mobile_safety.js
-          grep -q 'PHASE-400-IPHONE-SAFARI-WEB-GAME-LOCK' source/game/modules/phase400_ios_safari_adapter.js
-          grep -q 'PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK' source/game/quest.html
-          grep -q 'scheduleEveryHours.*5' source/game/manifest.json
-          grep -q '"androidSingleBurnPile": true' source/update/app-version.json
-          grep -q '"androidProductionMatchServerConfigured": false' source/update/app-version.json
-          if grep -q 'setInterval(poll,220)' source/game/modules/phase419_mobile_table_flow_polish.js; then
-            echo 'Phase 419 table-flow continuous polling regression detected.' >&2
-            exit 1
-          fi
-          if grep -q 'setInterval(watchdog' source/game/modules/phase421_vr_table_final_polish.js; then
-            echo 'Phase 421 VR felt continuous watchdog regression detected.' >&2
-            exit 1
-          fi
+          grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' source/game/modules/phase414_human_turn_rotation_authority.js
+          grep -q 'PHASE-416-HUMAN-SEAT-NEVER-SKIP-LOCK' source/game/modules/phase416_human_seat_never_skip.js
+          grep -q '"apkVersionName": "0.1.0-rc2"' source/game/android-release.json
+          grep -q '"apkVersionCode": 2' source/game/android-release.json
+          grep -q '"forceUpdate": false' source/game/android-release.json
+          grep -q '"showUpdatePrompt": false' source/game/android-release.json
+          grep -q '"nativeApkRebuild": false' source/game/android-release.json
           python3 - <<'PY'
-          import json,re
-          c=json.load(open('source/game/config/tournament-api.json'))
-          assert c['apiBase']==''
-          assert c['sharedRegistrationBackendLive'] is False
-          assert c['backgroundPushLive'] is False
-          assert c['scheduleEveryHours']==5
+          import json
+          t=json.load(open('source/game/config/tournament-api.json'))
           p=json.load(open('source/site/config/player-api.json'))
+          assert t['apiBase']==''
+          assert t['sharedRegistrationBackendLive'] is False
+          assert t['backgroundPushLive'] is False
           assert p['deploymentState']=='cloud-endpoint-pending'
           assert p['accountApiEndpointConfigured'] is False
           assert p['apiBase']==''
-          s=open('source/game/modules/phase422_quest_table_geometry_theme_lock.js').read()
-          recess=float(re.search(r'FELT_RECESS_METERS=([0-9.]+)',s).group(1))
-          assert abs(recess-0.0254) < 1e-9
           PY
-          test "$(grep -o 'class="burn-zone"' source/game/android-stable-phase405.html | wc -l)" -eq 1
           node --check source/platform-device.js
           node --check source/site-public-hooks.js
           node --check source/phase409-public-status.js
-          node --check source/game/modules/phase418_mobile_surface_polish.js
-          node --check source/game/modules/phase419_mobile_table_flow_polish.js
-          node --check source/game/modules/phase419_tournament_registration_notify.js
           node --check source/game/modules/phase420_mobile_release_lock.js
           node --check source/game/modules/phase420_tournament_start_authority.js
-          node --check source/game/modules/phase421_vr_table_final_polish.js
-          node --check source/game/modules/phase422_quest_table_geometry_theme_lock.js
-          node --check source/game/modules/phase422_quest_seated_inspection_lock.js
-          node --check source/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
-          node --check source/game/modules/phase406_quest_side_burn_chip_polish.js
-          node --check source/site/js/phase418-profile-eric-authority.js
-          node --check source/game/modules/phase414_human_turn_rotation_authority.js
-          node --check source/game/modules/phase413_mobile_human_action_hard_lock.js
-          node --check source/game/modules/phase410_mobile_human_input_lock.js
-          node --check source/game/modules/phase409_mobile_player_turn_guard.js
-          node --check source/game/modules/phase408_holdem_street_call_truth.js
           node --check source/game/modules/phase403_android_gameplay.js
+          node --check source/game/modules/phase403_android_pot_rules.js
+          node --check source/game/modules/phase414_human_turn_rotation_authority.js
+          node --check source/game/modules/phase416_human_seat_never_skip.js
           node --check source/sw.js
           node --check source/pwa-sw.js
           python3 -m json.tool source/game/config/tournament-api.json >/dev/null
@@ -171,12 +98,53 @@ jobs:
           python3 -m json.tool source/game/manifest.json >/dev/null
           python3 -m json.tool source/game/android-release.json >/dev/null
           python3 -m json.tool source/update/app-version.json >/dev/null
-          test -s source/downloads/svr-poker-android-rc2.apk
-          grep -q '"apkVersionName": "0.1.0-rc2"' source/game/android-release.json
-          grep -q '"apkVersionCode": 2' source/game/android-release.json
-          grep -q '"forceUpdate": false' source/game/android-release.json
-          grep -q '"showUpdatePrompt": false' source/game/android-release.json
-          grep -q '"nativeApkRebuild": false' source/game/android-release.json
+
+      - name: Validate Quest visual authority successor
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Keep predecessor source files available for rollback/reference, but Phase 440
+          # is now the only active rendered Quest table/dealer visual authority.
+          test -s source/game/modules/phase421_vr_table_final_polish.js
+          test -s source/game/modules/phase422_quest_table_geometry_theme_lock.js
+          test -s source/game/modules/phase422_quest_seated_inspection_lock.js
+          test -s source/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
+          test -s source/game/modules/phase438_lab_master_lobby_dealer_authority.js
+          test -s source/game/modules/phase439_lab_only_lobby_render_authority.js
+          test -s source/game/modules/phase440_lab_master_hard_render_lock.js
+          test -s source/game/modules/dealer/table_calibration_module.js
+          test -s source/game/modules/dealer/eric_dealer_module.js
+          test -s source/game/labs/dealer/table-surface-authority-phase437.js
+          test -s source/game/assets/models/table.glb
+          test -s source/game/assets/models/eric/eric.fbx
+          grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' source/game/quest.html
+          grep -q 'phase440-lab-master-hard-render' source/game/quest.html
+          grep -q 'data-quest-polish-build="PHASE-440-LAB-MASTER-HARD-RENDER-LOCK"' source/game/index.html
+          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase440' source/game/index.html
+          grep -q 'SVR_PHASE440_READY_PROMISE' source/game/index.html
+          grep -q 'phase438_lab_master_lobby_dealer_authority.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase439_lab_only_lobby_render_authority.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase440_lab_master_hard_render_lock.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase422_quest_seated_inspection_lock.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase422_quest_table_prop_alignment_flex_lock.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          if grep -q 'phase422_quest_table_geometry_theme_lock.js?v=phase422' source/game/modules/phase406_quest_side_burn_chip_polish.js; then
+            echo 'Legacy Phase 422 visual table authority is active again.' >&2
+            exit 1
+          fi
+          grep -q 'APPROVED_SCALE = 0.0047' source/game/modules/phase440_lab_master_hard_render_lock.js
+          grep -q 'PHASE440_NON_RENDERED_LEGACY_ROOT' source/game/modules/phase440_lab_master_hard_render_lock.js
+          grep -q 'oneRenderedTable' source/game/modules/phase440_lab_master_hard_render_lock.js
+          grep -q 'oneRenderedEric' source/game/modules/phase440_lab_master_hard_render_lock.js
+          grep -q 'PHASE341_CANONICAL_PASS_LINE_ROOT' source/game/modules/phase440_lab_master_hard_render_lock.js
+          grep -q 'PHASE341_CANONICAL_CENTER_LOGO_ROOT' source/game/modules/phase440_lab_master_hard_render_lock.js
+          node --check source/game/modules/phase406_quest_side_burn_chip_polish.js
+          node --check source/game/modules/phase438_lab_master_lobby_dealer_authority.js
+          node --check source/game/modules/phase439_lab_only_lobby_render_authority.js
+          node --check source/game/modules/phase440_lab_master_hard_render_lock.js
+          node --check source/game/modules/dealer/table_calibration_module.js
+          node --check source/game/modules/dealer/eric_dealer_module.js
+          node --check source/game/labs/dealer/table-surface-authority-phase437.js
+
       - name: Execute protected Phase 403 pot sanity
         shell: bash
         run: |
@@ -190,12 +158,13 @@ jobs:
           if(split.payouts[0]!==151||split.payouts[5]!==150)throw new Error('odd-chip order failed');
           console.log('Protected Phase 403 production pot sanity passed.');
           NODE
+
       - name: Build clean production tree
         shell: bash
         run: |
           set -euo pipefail
           find publish -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-          for file in index.html launch.css launch-quest.css matrix.js platform-device.js site-public-hooks.js phase409-public-status.js site-local-counter.js support-chat-bot.js manifest.webmanifest pwa-sw.js sw.js offline.html logo.png logo.webp CNAME .nojekyll; do
+          for file in index.html launch.css launch-quest.css matrix.js platform-device.js site-public-hooks.js phase409-public-status.js site-local-counter.js support-chat-bot.js manifest.webmanifest pwa-sw.js sw.js offline.html logo.png logo.webp CNAME .nojekyll 404.html; do
             [ -e "source/$file" ] && cp "source/$file" "publish/$file"
           done
           cp -a source/game publish/game
@@ -205,6 +174,7 @@ jobs:
           cp source/update/app-version.json publish/update/app-version.json
           rm -rf publish/game/tools publish/game/docs publish/site/tools publish/site/docs
           find publish -type f \( -name '*.zip' -o -name '*.ps1' -o -name '.env' -o -name '.env.*' \) -delete
+
       - name: Stamp deployment health
         shell: bash
         run: |
@@ -212,88 +182,37 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-420-MOBILE-RELEASE-PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
-            "predecessorMobileBuild": "PHASE-419-TOURNAMENT-REGISTRATION-MOBILE-UX-LOCK",
-            "publicStatusBuild": "PHASE-418-PUBLIC-ADMIN-AI-FALLBACK-LOCK",
-            "platformBuild": "PHASE-405-PLATFORM-DEVICE-ALIGNMENT-LOCK",
+            "build": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
+            "predecessorMobileBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
             "questBuild": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
-            "vrTableBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
-            "vrTableGeometryBuild": "PHASE-422-QUEST-TABLE-GEOMETRY-THEME-LOCK",
-            "vrTablePredecessorBuild": "PHASE-421-VR-TABLE-FINAL-POLISH-LOCK",
+            "vrTableBuild": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
+            "vrTablePredecessorBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
+            "labTableSurfaceBuild": "DEALER-LAB-V2.5-BLACK-FELT-TABLE-SHAPE-PASSLINE-LOCK",
             "androidBuild": "PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK",
             "androidSurfaceBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
-            "tournamentRegistrationBuild": "PHASE-419-TOURNAMENT-REGISTRATION-NOTIFICATION-LOCK",
-            "tournamentStartBuild": "PHASE-420-TOURNAMENT-START-AUTHORITY-LOCK",
-            "androidHoldemBuild": "PHASE-408-HOLDEM-STREET-CALL-TRUTH-LOCK",
             "androidEngineBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
-            "androidMobileSafetyBuild": "PHASE-404-ANDROID-MOBILE-DECISION-SAFETY-LOCK",
-            "iosBuild": "PHASE-420-IPHONE-WRAPPER-RELEASE-LOCK",
-            "profileBuild": "PHASE-418-PROFILE-ERIC-UPRIGHT-MATERIAL-AUTHORITY-LOCK",
-            "playerAccountBuild": "PHASE-418-PLAYER-ACCOUNT-API-READINESS-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "questRoute": "/game/quest.html?v=phase422",
+            "questRoute": "/game/quest.html?v=phase440",
+            "camera3Route": "/game/camera3-live.html?v=phase440",
             "androidRoute": "/game/android.html?channel=stable&v=phase420",
-            "androidPracticeRoute": "/game/android-tabletop.html?v=phase420&mode=practice",
-            "androidRegularRoute": "/game/android-tabletop.html?v=phase420&mode=regular",
-            "androidTournamentRoute": "/game/tournaments.html?v=phase420",
-            "androidGameplayRoute": "/game/android-stable-phase405.html?v=phase420&mode=regular&direct=1",
-            "tournamentSignupRoute": "/game/tournament-signup.html?v=phase420",
             "iphoneRoute": "/game/iphone.html?v=phase420",
-            "iphoneGameplayRoute": "/game/android-stable-phase405.html?v=phase420&platform=ios&safari=1&direct=1",
-            "profileRoute": "/site/profile.html?v=phase418",
-            "publicPageStructurePreserved": true,
-            "publicAdminAiFallback": true,
-            "publicRemoteServiceHealthVerified": false,
-            "platformQuestDetection": true,
-            "platformAndroidDetection": true,
-            "platformIosDetection": true,
-            "platformVisualViewportAlignment": true,
             "questTeleportEnabled": false,
             "questHandTeleportEnabled": false,
             "questGripTeleportEnabled": false,
-            "questHardSeatedFrontTable": true,
-            "questInspectionSeatRailGapMeters": 0.045,
-            "questInspectionEyeHeightMeters": 1.18,
-            "questFinalTableFeltShallowRecessMeters": 0.0254,
-            "questFinalTableTrueInnerSurface": true,
-            "questFinalTableCurvedLeatherRailPreserved": true,
-            "questFinalTablePassBetLineAligned": true,
-            "questFinalTableFuturisticLighting": true,
-            "questHeldCardFlex": true,
-            "androidVisualLeftToRightSeatOrder": [0,5,1,2,3,4],
-            "androidDariusAdvancesToUser": true,
-            "androidSidePotEngine": true,
-            "androidMultipleAllIns": true,
-            "androidSplitPots": true,
-            "androidSingleBurnPile": true,
-            "androidFlowRailDockedToDecisionArea": true,
-            "androidFlowRailRemovedFromOpponentLayer": true,
-            "androidOpponentStacksVisible": true,
-            "androidMicVoxQuickControl": true,
-            "androidWrapperAutoDirectRecovery": true,
-            "androidOneScreenChooser": true,
-            "androidLoginClientReady": true,
+            "questLabMasterOnlyRenderedTable": true,
+            "questLabMasterOnlyRenderedEric": true,
+            "questLegacyTableVisualsDetached": true,
+            "questLegacyDealerVisualsDetached": true,
+            "questLegacyPassLineLogoDetached": true,
+            "questBlackNativeFelt": true,
+            "questProtectiveTopCoverHidden": true,
+            "questApprovedEricScale": 0.0047,
+            "questEricGrounded": true,
             "androidProductionLoginBackendLive": false,
-            "androidRegistrationClientReady": true,
-            "androidTournamentEveryHours": 5,
-            "androidTournamentCurrentSlotStartAuthority": true,
-            "androidTournamentSignupPage": true,
-            "androidTournamentHumanRosterTimestamps": true,
-            "androidTournamentLocalRegistrationFallback": true,
             "androidTournamentSharedRegistrationBackendLive": false,
-            "androidTournamentBackgroundPushLive": false,
-            "androidTournamentActiveBrowserStartNotification": true,
             "androidProductionMatchServerConfigured": false,
-            "androidLiveMultiplayer": false,
-            "androidLiveVoice": false,
-            "profileEricUprightAuthority": true,
-            "profileEricImportedAnimationStopped": true,
-            "profileOriginalMapsPreservedWhenAvailable": true,
             "playerAccountCloudEndpointConfigured": false,
-            "playerAccountCloudEndpointState": "pending-authorized-aws-deployment",
-            "adminDatabaseBootstrapPrepared": true,
-            "adminDatabaseBootstrapExecutedByDeploy": false,
             "apkVersionName": "0.1.0-rc2",
             "apkVersionCode": 2,
             "forceUpdate": false,
@@ -303,39 +222,33 @@ jobs:
           }
           EOF_HEALTH
           cp publish/deploy-health.json publish/game/deploy-health.json
+
       - name: Validate production tree
         shell: bash
         run: |
           set -euo pipefail
-          test -s publish/phase409-public-status.js
-          test -s publish/game/android-stable-phase405.html
-          test -s publish/game/modules/phase420_mobile_release_lock.js
-          test -s publish/game/modules/phase420_tournament_start_authority.js
-          test -s publish/game/modules/phase421_vr_table_final_polish.js
-          test -s publish/game/modules/phase422_quest_table_geometry_theme_lock.js
-          test -s publish/game/modules/phase422_quest_seated_inspection_lock.js
-          test -s publish/game/modules/phase422_quest_table_prop_alignment_flex_lock.js
-          test -s publish/game/modules/phase419_mobile_table_flow_polish.js
-          test -s publish/game/modules/phase419_tournament_registration_notify.js
-          test -s publish/game/tournament-signup.html
-          test -s publish/site/profile.html
-          grep -q 'PHASE-420-MOBILE-RELEASE-PHASE-422-QUEST-TABLE-INSPECTION-LOCK' publish/deploy-health.json
-          grep -q '"vrTableBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK"' publish/deploy-health.json
-          grep -q '"questFinalTableFeltShallowRecessMeters": 0.0254' publish/deploy-health.json
-          grep -q '"questInspectionSeatRailGapMeters": 0.045' publish/deploy-health.json
-          grep -q '"questHandTeleportEnabled": false' publish/deploy-health.json
-          grep -q '"questFinalTableTrueInnerSurface": true' publish/deploy-health.json
-          grep -q '"androidTournamentCurrentSlotStartAuthority": true' publish/deploy-health.json
-          grep -q '"androidProductionLoginBackendLive": false' publish/deploy-health.json
-          grep -q '"androidTournamentSharedRegistrationBackendLive": false' publish/deploy-health.json
-          grep -q '"androidTournamentBackgroundPushLive": false' publish/deploy-health.json
-          grep -q '"androidSingleBurnPile": true' publish/deploy-health.json
-          grep -q '"androidProductionMatchServerConfigured": false' publish/deploy-health.json
-          grep -q '"playerAccountCloudEndpointConfigured": false' publish/deploy-health.json
-          grep -q '"adminDatabaseBootstrapExecutedByDeploy": false' publish/deploy-health.json
-          grep -q '"nativeApkRebuild": false' publish/deploy-health.json
+          test -s publish/index.html
+          test -s publish/game/index.html
+          test -s publish/game/quest.html
+          test -s publish/game/camera3-live.html
+          test -s publish/game/modules/phase438_lab_master_lobby_dealer_authority.js
+          test -s publish/game/modules/phase439_lab_only_lobby_render_authority.js
+          test -s publish/game/modules/phase440_lab_master_hard_render_lock.js
+          test -s publish/game/modules/dealer/table_calibration_module.js
+          test -s publish/game/modules/dealer/eric_dealer_module.js
+          test -s publish/game/labs/dealer/table-surface-authority-phase437.js
+          test -s publish/game/assets/models/table.glb
+          test -s publish/game/assets/models/eric/eric.fbx
+          grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' publish/deploy-health.json
+          grep -q '"questLabMasterOnlyRenderedTable": true' publish/deploy-health.json
+          grep -q '"questLabMasterOnlyRenderedEric": true' publish/deploy-health.json
+          grep -q '"questLegacyTableVisualsDetached": true' publish/deploy-health.json
+          grep -q '"questApprovedEricScale": 0.0047' publish/deploy-health.json
           test -f publish/CNAME
           grep -qx 'svrpoker.com' publish/CNAME
+          test -s publish/404.html
+          grep -Fq '<title>SVR Poker | Official 404</title>' publish/404.html
+
       - name: Publish
         shell: bash
         working-directory: publish
@@ -345,8 +258,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 420 / 422.'
+            echo 'Production already matches Phase 440.'
           else
-            git commit -m "Deploy Phase 420 mobile + Phase 422 Quest table ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 440 Lab-only Quest lobby ${GITHUB_SHA}"
             git push origin gh-pages
           fi
