@@ -10,13 +10,13 @@
 <style>
 html,body,#app{margin:0;width:100%;height:100%;overflow:hidden;background:#020208;color:#fff;font-family:system-ui,Arial,sans-serif}canvas{display:block;width:100%;height:100%}#camera3Boot{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:radial-gradient(circle at 50% 38%,#24143c,#05050a 60%,#020208);transition:opacity .35s ease}.phase438-camera3-ready #camera3Boot{opacity:0;pointer-events:none}#camera3Boot .card{width:min(460px,88vw);padding:24px;border:1px solid #9f63ff;border-radius:22px;background:rgba(4,3,9,.93);text-align:center;box-shadow:0 28px 90px #000}#camera3Boot img{width:88px;height:88px;object-fit:contain}#camera3Boot strong{display:block;margin-top:10px;color:#fff;letter-spacing:.08em}#camera3Badge{position:fixed;left:14px;top:14px;z-index:40;display:flex;align-items:center;gap:9px;padding:8px 11px;border:1px solid rgba(179,108,255,.62);border-radius:999px;background:rgba(3,3,8,.72);backdrop-filter:blur(10px);pointer-events:none}#camera3Badge img{width:34px;height:34px;object-fit:contain}#camera3Badge strong{font-size:11px;letter-spacing:.08em}#camera3Badge span{display:block;color:#d9b9ff;font-size:9px;font-weight:800;letter-spacing:.08em}#status,#mode,#log,#err{display:none!important}
 </style>
-<script>(function(){const p=new URLSearchParams(location.search);let changed=false;if(p.get('desktop')!=='1'){p.set('desktop','1');changed=true}if(p.get('standard')!=='1'){p.set('standard','1');changed=true}if(p.get('cam3')!=='1'){p.set('cam3','1');changed=true}if(!p.has('v')){p.set('v','phase440');changed=true}if(changed)history.replaceState(null,'',location.pathname+'?'+p.toString())})();</script>
+<script>(function(){const p=new URLSearchParams(location.search);let changed=false;if(p.get('desktop')!=='1'){p.set('desktop','1');changed=true}if(p.get('standard')!=='1'){p.set('standard','1');changed=true}if(p.get('cam3')!=='1'){p.set('cam3','1');changed=true}if(!p.has('v')){p.set('v','phase441');changed=true}if(changed)history.replaceState(null,'',location.pathname+'?'+p.toString())})();</script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-440-CAMERA3-LAB-MASTER-ONLY" data-route="/game/camera3-live.html">
+<body data-build="PHASE-440-CAMERA3-LAB-MASTER-ONLY" data-surface-build="PHASE-441-QUEST-TABLE-CLEARANCE-POLISH" data-route="/game/camera3-live.html">
 <div id="app"></div>
 <div id="camera3Badge"><img src="/logo.png" alt=""><div><strong>SVR POKER</strong><span>CAMERA 3 • LIVE LOBBY</span></div></div>
-<div id="camera3Boot"><div class="card"><img src="/logo.png" alt="SVR Poker"><strong>OPENING CAMERA 3</strong><p id="camera3Status">Loading the lobby, approved Lab table, and Eric dealer module.</p></div></div>
+<div id="camera3Boot"><div class="card"><img src="/logo.png" alt="SVR Poker"><strong>OPENING CAMERA 3</strong><p id="camera3Status">Loading the lobby, approved Lab table, Eric dealer module, and Phase 441 table clearance.</p></div></div>
 <div id="status"></div><div id="mode"></div><pre id="log"></pre><pre id="err"></pre>
 <script type="module">
 import { bootPlatform } from './modules/phase340_platform_core_loader.js?v=phase440';
@@ -37,14 +37,19 @@ import { bootPlatform } from './modules/phase340_platform_core_loader.js?v=phase
     status.textContent='Hard-removing every legacy table, cover, pass-line, and dealer visual…';
     await import('./modules/phase440_lab_master_hard_render_lock.js?v=phase440');
     await window.SVR_PHASE440_INSTALL?.();
+    status.textContent='Removing the floating branding cover and fitting the inset pass line…';
+    await import('./modules/phase441_quest_table_clearance_polish.js?v=phase441');
+    await window.SVR_PHASE441_READY_PROMISE;
+    await import('./modules/phase441_quest_table_overlay_guard.js?v=phase441');
+    await window.SVR_PHASE441_OVERLAY_GUARD_READY_PROMISE;
     status.textContent='Starting the permanent Camera 3 director…';
-    await import('./modules/phase438_camera3_lobby_director.js?v=phase440');
+    await import('./modules/phase438_camera3_lobby_director.js?v=phase441');
   }catch(error){
     console.error(error);
     status.textContent='Camera 3 recovery: reload once if the lobby does not appear.';
   }
 })();
-window.SVR_PHASE440_CAMERA3_ROUTE_QA=()=>({build:'PHASE-440-CAMERA3-LAB-MASTER-ONLY',route:location.pathname,module:window.SVR_PHASE438_QA?.()||null,labOnly:window.SVR_PHASE439_QA?.()||null,hardRender:window.SVR_PHASE440_QA?.()||null,director:window.SVR_PHASE438_CAMERA3_QA?.()||null,checkedAt:new Date().toISOString()});
+window.SVR_PHASE440_CAMERA3_ROUTE_QA=()=>({build:'PHASE-440-CAMERA3-LAB-MASTER-ONLY',surfaceBuild:'PHASE-441-QUEST-TABLE-CLEARANCE-POLISH',route:location.pathname,module:window.SVR_PHASE438_QA?.()||null,labOnly:window.SVR_PHASE439_QA?.()||null,hardRender:window.SVR_PHASE440_QA?.()||null,phase441Clearance:window.SVR_PHASE441_QA?.()||null,phase441OverlayGuard:window.SVR_PHASE441_OVERLAY_GUARD_QA?.()||null,director:window.SVR_PHASE438_CAMERA3_QA?.()||null,checkedAt:new Date().toISOString()});
 </script>
 </body>
 </html>
