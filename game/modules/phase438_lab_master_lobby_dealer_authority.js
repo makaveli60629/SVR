@@ -1,7 +1,7 @@
 /* PHASE-438-LAB-MASTER-LOBBY-DEALER-AUTHORITY */
 import * as THREE from 'three';
 import { TableCalibrationModule } from './dealer/table_calibration_module.js?v=phase438';
-import { EricDealerModule } from './dealer/eric_dealer_module.js?v=phase438';
+import { EricDealerModule } from './dealer/eric_dealer_module.js?v=phase442';
 
 export const BUILD = 'PHASE-438-LAB-MASTER-LOBBY-DEALER-AUTHORITY';
 

@@ -329,12 +329,15 @@ export class SVRAvatarViewer {
     const add = (object) => { this.equipmentRoot.add(object); return object; };
 
     if (outfit.top && outfit.top !== 'none') {
-      const torso = mesh(new THREE.BoxGeometry(0.48, 0.5, 0.22), primary, `phase370-${outfit.top}`);
-      torso.position.set(0, 1.02, 0);
-      add(torso);
-      const trim = mesh(new THREE.BoxGeometry(0.035, 0.42, 0.025), accent, 'phase370-top-trim');
-      trim.position.set(0, 1.03, 0.125);
-      add(trim);
+      const torso = mesh(new THREE.CapsuleGeometry(0.235, 0.34, 10, 24), primary, `phase442-fitted-${outfit.top}`);
+      torso.position.set(0, 1.05, 0); torso.scale.set(1.08, 1, .66); add(torso);
+      const collar = mesh(new THREE.TorusGeometry(.115,.022,10,32,Math.PI), accent, 'phase442-tailored-collar');
+      collar.position.set(0,1.30,.115);collar.rotation.set(Math.PI/2,0,0);add(collar);
+      if(outfit.top==='hoodie'){
+        const hood=mesh(new THREE.TorusGeometry(.205,.055,12,38,Math.PI*1.35),primary,'phase442-sculpted-hood');
+        hood.position.set(0,1.37,-.035);hood.rotation.z=-Math.PI*.17;add(hood);
+      }
+      for(const side of [-1,1]){const sleeve=mesh(new THREE.CapsuleGeometry(.068,.37,8,18),primary,`phase442-tailored-sleeve-${side}`);sleeve.position.set(side*.30,1.06,0);sleeve.rotation.z=side*.08;add(sleeve)}
     }
     if (outfit.headwear === 'cap') {
       const cap = mesh(new THREE.SphereGeometry(0.21, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.58), primary, 'phase370-cap');
@@ -347,16 +350,20 @@ export class SVRAvatarViewer {
       const crown = mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.12, 24, 1, true), metal, 'phase370-crown');
       crown.position.y = 1.76;
       add(crown);
+    } else if (outfit.headwear === 'beanie') {
+      const beanie=mesh(new THREE.SphereGeometry(.205,28,18,0,Math.PI*2,0,Math.PI*.58),primary,'phase442-fitted-beanie');beanie.position.set(0,1.71,0);add(beanie);
+      const band=mesh(new THREE.TorusGeometry(.177,.026,10,40),accent,'phase442-beanie-band');band.position.set(0,1.67,0);band.rotation.x=Math.PI/2;add(band);
     }
     if (outfit.eyewear && outfit.eyewear !== 'none') {
-      const visor = mesh(new THREE.BoxGeometry(0.34, 0.09, 0.025), accent, 'phase370-eyewear');
-      visor.position.set(0, 1.57, 0.18);
-      add(visor);
+      if(outfit.eyewear==='neon'){
+        for(const side of [-1,1]){const lens=mesh(new THREE.TorusGeometry(.075,.012,8,28),accent,`phase442-lens-${side}`);lens.position.set(side*.082,1.57,.177);add(lens)}
+        const bridge=mesh(new THREE.CylinderGeometry(.009,.009,.055,12),metal,'phase442-glasses-bridge');bridge.position.set(0,1.57,.177);bridge.rotation.z=Math.PI/2;add(bridge);
+      }else{const visor=mesh(new THREE.CapsuleGeometry(.055,.22,8,20),accent,'phase442-curved-visor');visor.position.set(0,1.57,.17);visor.rotation.z=Math.PI/2;visor.scale.z=.35;add(visor)}
     }
     if (outfit.shoes && outfit.shoes !== 'none') {
       for (const side of [-1, 1]) {
-        const shoe = mesh(new THREE.BoxGeometry(0.17, 0.09, 0.28), primary, `phase370-shoe-${side}`);
-        shoe.position.set(side * 0.12, 0.07, 0.045);
+        const shoe = mesh(new THREE.CapsuleGeometry(.075,.18,8,20), primary, `phase442-fitted-shoe-${side}`);
+        shoe.position.set(side * 0.12, 0.07, 0.055);shoe.rotation.x=Math.PI/2;shoe.scale.set(1.05,1,.85);
         add(shoe);
       }
     }
@@ -369,6 +376,8 @@ export class SVRAvatarViewer {
       const badge = mesh(new THREE.CircleGeometry(0.045, 24), accent, 'phase370-badge');
       badge.position.set(-0.13, 1.15, 0.13);
       add(badge);
+    } else if (outfit.accessory === 'chain') {
+      const chain=mesh(new THREE.TorusGeometry(.145,.012,9,48,Math.PI*1.35),metal,'phase442-gold-chain');chain.position.set(0,1.24,.145);chain.rotation.z=-Math.PI*.175;add(chain);
     }
   }
 

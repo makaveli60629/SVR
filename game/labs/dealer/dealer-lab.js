@@ -61,10 +61,10 @@ const cardGroup = new THREE.Group(); cardGroup.name='SVR_Lab_DealtCards'; scene.
 const activeCards=[]; let cardSerial=0; let debugEric=false; let loadSummary={dealer:'loading',table:'loading'};
 function makeCard(){const mats=[0,1,2,3,4].map(()=>new THREE.MeshPhysicalMaterial({color:0xfffdf8,roughness:.42,clearcoat:.1}));mats.push(new THREE.MeshPhysicalMaterial({color:0x35134e,roughness:.36,metalness:.05}));const card=new THREE.Mesh(new THREE.BoxGeometry(.063,.0025,.089),mats);card.name=`LabCard_${++cardSerial}`;card.castShadow=true;return card}
 function seatTarget(index,y){const points=[[-.80,.42],[-.98,-.03],[-.66,-.52],[.66,-.52],[.98,-.03],[.80,.42]];const [x,z]=points[index%points.length];return new THREE.Vector3(x,y,z)}
-function spawnDealCard(seatIndex){const y=table.getSurfaceY(),card=makeCard(),start=new THREE.Vector3(.02,y+.20,-.78),end=seatTarget(seatIndex,y+.004);card.position.copy(start);card.rotation.set(0,(seatIndex-2.5)*.09,0);cardGroup.add(card);activeCards.push({card,start,end,born:performance.now()*.001,duration:.43});while(cardGroup.children.length>24)cardGroup.remove(cardGroup.children[0])}
+function spawnDealCard(seatIndex,origin){const y=table.getSurfaceY(),card=makeCard(),fallback=new THREE.Vector3(.02,y+.20,-.78),start=Array.isArray(origin)?new THREE.Vector3().fromArray(origin):fallback,end=seatTarget(seatIndex,y+.004);card.position.copy(start);card.rotation.set(0,(seatIndex-2.5)*.09,0);cardGroup.add(card);activeCards.push({card,start,end,born:performance.now()*.001,duration:.43});while(cardGroup.children.length>24)cardGroup.remove(cardGroup.children[0])}
 function updateCards(now){for(let i=activeCards.length-1;i>=0;i--){const item=activeCards[i],p=Math.min(1,(now-item.born)/item.duration),s=p*p*(3-2*p);item.card.position.lerpVectors(item.start,item.end,s);item.card.position.y+=Math.sin(Math.PI*s)*.11;item.card.rotation.z=(1-s)*.16;if(p>=1)activeCards.splice(i,1)}}
 
-dealer.addEventListener('deal',e=>spawnDealCard(e.detail.seatIndex));
+dealer.addEventListener('deal',e=>spawnDealCard(e.detail.seatIndex,e.detail.origin));
 dealer.addEventListener('modechange',refreshStatus);
 dealer.addEventListener('loaded',()=>{loadSummary.dealer='loaded';refreshStatus()});
 dealer.addEventListener('groundchange',()=>refreshStatus());
