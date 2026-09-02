@@ -1,13 +1,12 @@
 /* PHASE-441-QUEST-TABLE-CLEARANCE-POLISH */
 import * as THREE from 'three';
 
-export const BUILD = 'PHASE-441-QUEST-TABLE-CLEARANCE-POLISH';
+export const BUILD = 'PHASE-443-TABLE-LOGO-CHIP-SHELF-POLISH';
 const TABLE_SCALE_FACTOR = 1.06;
-const LINE_SCALE_X = 0.82;
-const LINE_SCALE_Z = 0.72;
+const CHIP_SHELF_INSET_METERS = 0.09525;
 const LINE_BAND = 0.018;
 const INNER_ACCENT_GAP = 0.026;
-const DECAL_LIFT = 0.0009;
+const DECAL_LIFT = 0.0014;
 const LOGO_URL = new URL('../../logo.png', import.meta.url).href;
 
 let scene = null;
@@ -27,6 +26,8 @@ const state = {
   protectiveCoversHidden: 0,
   broadOverlayMeshesHidden: 0,
   tableScaleFactor: TABLE_SCALE_FACTOR,
+  chipShelfInsetMeters: CHIP_SHELF_INSET_METERS,
+  chipShelfInsetInches: CHIP_SHELF_INSET_METERS / 0.0254,
   tableScaled: false,
   hipAligned: false,
   hipY: null,
@@ -244,8 +245,8 @@ async function rebuildDecals(table) {
   if (!feltBox) return false;
   const size = feltBox.getSize(new THREE.Vector3());
   const center = feltBox.getCenter(new THREE.Vector3());
-  const halfWidth = size.x * 0.5 * LINE_SCALE_X;
-  const halfDepth = size.z * 0.5 * LINE_SCALE_Z;
+  const halfWidth = Math.max(0.16, size.x * 0.5 - CHIP_SHELF_INSET_METERS);
+  const halfDepth = Math.max(0.12, size.z * 0.5 - CHIP_SHELF_INSET_METERS);
   const cornerRadius = Math.min(halfDepth * 0.68, halfWidth * 0.24);
   const y = feltBox.max.y + DECAL_LIFT;
   const signature = [center.x, center.z, y, halfWidth, halfDepth, cornerRadius].map(v => Number(v).toFixed(4)).join('|');
@@ -286,13 +287,13 @@ async function rebuildDecals(table) {
   decalGroup.add(accentRing);
 
   const logo = new THREE.Mesh(
-    new THREE.PlaneGeometry(size.x * 0.34, size.z * 0.31),
-    new THREE.MeshBasicMaterial({ map: await getLogoTexture(), transparent: true, alphaTest: 0.16, depthTest: true, depthWrite: false, toneMapped: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -8, polygonOffsetUnits: -8 })
+    new THREE.PlaneGeometry(size.x * 0.40, size.z * 0.35),
+    new THREE.MeshBasicMaterial({ map: await getLogoTexture(), transparent: true, alphaTest: 0.025, depthTest: false, depthWrite: false, toneMapped: false, side: THREE.DoubleSide })
   );
   logo.name = 'PHASE441_CENTER_SVR_LOGO';
   logo.rotation.x = -Math.PI / 2;
-  logo.position.set(center.x, y + 0.0003, center.z);
-  logo.renderOrder = 44;
+  logo.position.set(center.x, y + 0.0006, center.z);
+  logo.renderOrder = 60;
   decalGroup.add(logo);
 
   badgeLeftTexture ||= makeBadgeTexture('REIKI', 'SPONSOR');

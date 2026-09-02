@@ -19,7 +19,7 @@ function normalizeOutfit(input = {}) {
   const defaults = state.catalog?.defaultOutfit || {};
   return {
     schemaVersion: 1,
-    modelId: input.modelId || defaults.modelId || 'eric',
+    modelId: input.modelId || defaults.modelId || 'svr-player',
     palette: input.palette || defaults.palette || 'midnight',
     headwear: input.headwear ?? defaults.headwear ?? 'none',
     eyewear: input.eyewear ?? defaults.eyewear ?? 'none',

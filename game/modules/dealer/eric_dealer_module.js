@@ -252,7 +252,7 @@ export class EricDealerModule extends EventTarget {
   getDealOrigin() {
     const hand = this.getHandWorldPosition('right');
     if (!hand) return new THREE.Vector3(this.params.x, 0.78, this.params.z - 0.12);
-    const towardTable = new THREE.Vector3(0, hand.y - 0.025, 0).sub(hand).normalize().multiplyScalar(0.055);
+    const towardTable = new THREE.Vector3(0, 0.63, 0).sub(hand).normalize().multiplyScalar(0.055);
     return hand.clone().add(towardTable);
   }
 
@@ -274,6 +274,7 @@ export class EricDealerModule extends EventTarget {
 
   update(dt, elapsed) {
     if (!this.loaded || this.paused) return;
+    this.group.visible = true; this.propGroup.visible = true;
     if (this.mixer) this.mixer.update(dt);
     this.applyReadyPose();
 

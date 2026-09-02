@@ -8,12 +8,13 @@
   </style>
   <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-442-AVATAR-LAB-REAL-GEOMETRY-MOTION-LOCK">
+<body data-build="PHASE-443-PLAYER-ONLY-ARTICULATED-AVATAR-LAB">
   <canvas id="avatarCanvas"></canvas>
-  <header class="top"><h1>SVR AVATAR LAB</h1><p>Real bodies • fitted curved wardrobe • locomotion preview</p></header>
+  <header class="top"><h1>SVR PLAYER AVATAR LAB</h1><p>Independent articulated body • fitted curved wardrobe • live motion</p></header>
   <div id="status" class="status">Loading avatar…</div>
   <div class="controls">
-    <select id="model"><option value="eric">Eric • Male</option><option value="claudia">Claudia • Female</option></select>
+    <select id="body"><option value="athletic">Athletic Body</option><option value="slender">Slender Body</option><option value="strong">Strong Body</option></select>
+    <select id="skin"><option value="warm">Warm Skin</option><option value="deep">Deep Skin</option><option value="fair">Fair Skin</option><option value="olive">Olive Skin</option></select>
     <select id="palette"><option value="midnight">Midnight</option><option value="scorpion">Scorpion</option><option value="emerald">Emerald</option><option value="royal">Royal</option><option value="gold">Gold Room</option></select>
     <select id="top"><option value="jacket">Casino Jacket</option><option value="vest">Dealer Vest</option><option value="hoodie">SVR Hoodie</option><option value="none">Base Outfit</option></select>
     <select id="headwear"><option value="cap">SVR Cap</option><option value="beanie">Night Beanie</option><option value="crown">Founder Crown</option><option value="none">No Hat</option></select>
@@ -21,7 +22,7 @@
     <select id="shoes"><option value="sneakers">Neon Sneakers</option><option value="boots">Black Boots</option><option value="none">Base Shoes</option></select>
     <select id="accessory"><option value="watch">SVR Watch</option><option value="chain">Gold Chain</option><option value="badge">Founder Badge</option><option value="none">No Accessory</option></select>
     <button data-motion="idle">Idle</button><button data-motion="walking">Walk</button><button data-motion="running">Run</button><button data-motion="jump">Jump</button><button id="sit" data-motion="sitting">Sit</button>
-    <button id="save" class="gold wide">Save Avatar</button><button id="reset">Reset View</button><a href="../dealer/" style="display:contents"><button>Eric Dealer Lab</button></a>
+    <button id="save" class="gold wide">Save Avatar</button><button id="reset">Reset View</button><a href="../dealer/" style="display:contents"><button>Dealer Lab</button></a>
   </div>
-  <script type="module" src="./avatar-lab.js?v=phase442"></script>
+  <script type="module" src="./avatar-lab.js?v=phase443"></script>
 </body></html>

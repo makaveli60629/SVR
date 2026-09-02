@@ -4,10 +4,10 @@ import { SVRAvatarViewer } from './phase346-avatar-viewer.js?v=phase384';
 import { account } from './phase345-demo-activity-persistence.js?v=phase384';
 
 export const BUILD = 'PHASE-384-ERIC-DEFAULT-AVATAR-SITE-LOCK';
-const DEFAULT_MODEL = new URL('/game/assets/models/eric/eric.fbx', location.origin).href;
+const DEFAULT_MODEL = new URL('/game/assets/models/legend_character.glb', location.origin).href;
 const DEFAULT_OUTFIT = Object.freeze({
   schemaVersion: 1,
-  modelId: 'eric',
+  modelId: 'svr-player',
   palette: 'midnight',
   headwear: 'none',
   eyewear: 'none',
@@ -149,7 +149,7 @@ function polishViewer(viewer) {
 const originalApplyOutfit = SVRAvatarViewer.prototype.applyOutfit;
 if (!SVRAvatarViewer.prototype.__svrPhase384ApplyPatched) {
   SVRAvatarViewer.prototype.applyOutfit = function phase384ApplyOutfit(input = {}) {
-    const safe = { ...DEFAULT_OUTFIT, ...input, modelId: 'eric', headwear: 'none', eyewear: 'none', top: 'none', shoes: 'none', accessory: 'none' };
+    const safe = { ...DEFAULT_OUTFIT, ...input, modelId: 'svr-player' };
     const result = originalApplyOutfit.call(this, safe);
     removeGeneratedEquipment(this);
     enhanceEric(this.baseModel || this.modelRoot);
@@ -256,7 +256,7 @@ async function recoverProfileShowroom() {
 async function install() {
   try {
     await normalizeAccount();
-    if (/\/avatar\.html$/i.test(location.pathname)) await patchDressingRoom();
+    if (/\/avatar\.html$/i.test(location.pathname)) state.dressingRoomPatched = true;
     if (/\/profile\.html$/i.test(location.pathname)) await recoverProfileShowroom();
   } catch (error) {
     state.lastError = String(error?.message || error);
