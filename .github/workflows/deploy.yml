@@ -117,16 +117,16 @@ jobs:
           test -s source/game/labs/dealer/table-surface-authority-phase437.js
           test -s source/game/labs/avatar/index.html
           test -s source/game/labs/avatar/avatar-lab.js
-          test -s source/game/assets/models/eric/locomotion/walking.fbx
-          test -s source/game/assets/models/claudia/locomotion/walking.fbx
+          test -s source/game/modules/avatar/player_avatar_module.js
+          test -s source/game/tools/phase443-avatar-dealer-table-audit.mjs
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' source/game/quest.html
           grep -q 'phase440-lab-master-hard-render' source/game/quest.html
           grep -q 'data-quest-polish-build="PHASE-440-LAB-MASTER-HARD-RENDER-LOCK"' source/game/index.html
-          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase442' source/game/index.html
+          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase443' source/game/index.html
           grep -q 'SVR_PHASE440_READY_PROMISE' source/game/index.html
-          grep -q 'phase438_lab_master_lobby_dealer_authority.js?v=phase440&patch=phase442' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase438_lab_master_lobby_dealer_authority.js?v=phase440&patch=phase443' source/game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase439_lab_only_lobby_render_authority.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase440_lab_master_hard_render_lock.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase422_quest_seated_inspection_lock.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
@@ -149,6 +149,8 @@ jobs:
           node --check source/game/modules/dealer/eric_dealer_module.js
           node --check source/game/labs/dealer/table-surface-authority-phase437.js
           node --check source/game/labs/avatar/avatar-lab.js
+          node --check source/game/modules/avatar/player_avatar_module.js
+          (cd source && node game/tools/phase443-avatar-dealer-table-audit.mjs)
 
       - name: Execute protected Phase 403 pot sanity
         shell: bash

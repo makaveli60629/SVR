@@ -4,7 +4,7 @@ import { createCore } from '../../modules/core_scene.js';
 import { buildPhase195CleanLobbyWorld } from '../../modules/phase195_clean_lobby_world.js';
 import { createTeleportRig } from '../../modules/movement_phase228.js?v=phase169-locomotion-polish';
 import { TableCalibrationModule } from '../../modules/dealer/table_calibration_module.js?v=phase434';
-import { EricDealerModule } from '../../modules/dealer/eric_dealer_module.js?v=phase442';
+import { EricDealerModule } from '../../modules/dealer/eric_dealer_module.js?v=phase443';
 
 const BUILD='PHASE-436-SCORPION-THREE-HAND-ERIC-DEALER-TEST';
 const DEALER_PARAMS={scale:0.0047,x:0,y:0,z:-1.02,shoulderX:0.55,shoulderZ:-0.48,elbowX:0.36,wristZ:-0.45,speed:0.82};

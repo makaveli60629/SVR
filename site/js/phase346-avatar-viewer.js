@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 export const BUILD = 'PHASE-346-AVATAR-CREATOR-DRESSING-ROOM-LOCK';
 export const POLISH_BUILD = 'PHASE-370-ACCOUNT-PROFILE-AVATAR-MOBILE-POLISH-LOCK';
 
-const DEFAULT_MODEL = '/game/assets/models/eric/eric.fbx';
+const DEFAULT_MODEL = '/game/assets/models/legend_character.glb';
 const DEFAULT_PALETTE = Object.freeze({
   bodyTint: '#d8dbe4',
   primary: '#11172a',

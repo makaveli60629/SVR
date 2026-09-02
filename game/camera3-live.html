@@ -30,7 +30,7 @@ import { bootPlatform } from './modules/phase340_platform_core_loader.js?v=phase
     const started=performance.now();
     while(performance.now()-started<20000&&!window.SVR_TABLE_AUTHORITY)await new Promise(r=>setTimeout(r,100));
     status.textContent='Promoting the Lab table and Eric module…';
-    await import('./modules/phase438_lab_master_lobby_dealer_authority.js?v=phase440&patch=phase442');
+    await import('./modules/phase438_lab_master_lobby_dealer_authority.js?v=phase440&patch=phase443');
     await window.SVR_PHASE438_INSTALL?.();
     await import('./modules/phase439_lab_only_lobby_render_authority.js?v=phase440');
     await window.SVR_PHASE439_INSTALL?.();
@@ -38,9 +38,9 @@ import { bootPlatform } from './modules/phase340_platform_core_loader.js?v=phase
     await import('./modules/phase440_lab_master_hard_render_lock.js?v=phase440');
     await window.SVR_PHASE440_INSTALL?.();
     status.textContent='Removing the floating branding cover and fitting the inset pass line…';
-    await import('./modules/phase441_quest_table_clearance_polish.js?v=phase441');
+    await import('./modules/phase441_quest_table_clearance_polish.js?v=phase443');
     await window.SVR_PHASE441_READY_PROMISE;
-    await import('./modules/phase441_quest_table_overlay_guard.js?v=phase441');
+    await import('./modules/phase441_quest_table_overlay_guard.js?v=phase443');
     await window.SVR_PHASE441_OVERLAY_GUARD_READY_PROMISE;
     status.textContent='Starting the permanent Camera 3 director…';
     await import('./modules/phase438_camera3_lobby_director.js?v=phase441');
