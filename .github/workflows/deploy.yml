@@ -93,8 +93,10 @@ jobs:
           node --check source/game/modules/phase403_android_pot_rules.js
           node --check source/game/modules/phase414_human_turn_rotation_authority.js
           node --check source/game/modules/phase416_human_seat_never_skip.js
+          node --check source/game/modules/app-v1.js
           node --check source/sw.js
           node --check source/pwa-sw.js
+          (cd source && node game/tools/v1-professional-audit.mjs)
           python3 -m json.tool source/game/config/tournament-api.json >/dev/null
           python3 -m json.tool source/site/config/player-api.json >/dev/null
           python3 -m json.tool source/manifest.webmanifest >/dev/null
@@ -184,6 +186,7 @@ jobs:
           cp -a source/downloads publish/downloads
           mkdir -p publish/update
           cp source/update/app-version.json publish/update/app-version.json
+          cp source/update/app-v1-release.json publish/update/app-v1-release.json
           rm -rf publish/game/tools publish/game/docs publish/site/tools publish/site/docs
           find publish -type f \( -name '*.zip' -o -name '*.ps1' -o -name '.env' -o -name '.env.*' \) -delete
 
@@ -194,7 +197,13 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
+            "build": "SVR-POKER-V1-PROTOTYPE",
+            "productVersion": "1.0.0",
+            "appRoute": "/game/app.html?v=1.0.0",
+            "updateManifest": "/update/app-v1-release.json",
+            "updatePolicy": "optional-unless-security-or-protocol-incompatible",
+            "floatingAppDownload": false,
+            "singleAppDownloadButton": true,
             "predecessorMobileBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
             "questBuild": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
             "vrTableBuild": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",

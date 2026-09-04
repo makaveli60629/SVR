@@ -1,0 +1,11 @@
+{
+  "schema": "svr-tournaments-v1",
+  "prototype": true,
+  "currency": "play-chips",
+  "sharedRegistrationBackendLive": false,
+  "tournaments": [
+    {"id":"practice-open","name":"Practice Table Open","scheduleLabel":"Open now","entryLabel":"Free play","description":"A short table to learn the flow before tournament play.","actionLabel":"Play","href":"/game/android-tabletop.html?v=1.0.0&mode=practice"},
+    {"id":"reiki-first-50","name":"REIKI First 50","scheduleLabel":"Every 5 hours","entryLabel":"Play chips","description":"Compact prototype event with bot fill during testing.","actionLabel":"View","href":"/game/tournaments.html?v=1.0.0"},
+    {"id":"community-showcase","name":"Community Showcase","scheduleLabel":"Coming soon","entryLabel":"Play chips","description":"A small featured event reserved for the production test.","actionLabel":"Details","href":"/game/tournaments.html?v=1.0.0"}
+  ]
+}

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080511">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>SVR Poker 1.0</title>
+  <link rel="manifest" href="/manifest.webmanifest?v=1.0.0">
+  <link rel="icon" href="/logo.png">
+  <link rel="stylesheet" href="/game/styles/app-v1.css?v=1.0.0">
+</head>
+<body data-app-version="1.0.0" data-build="SVR-POKER-V1-PROTOTYPE">
+  <main class="shell">
+    <header class="hero">
+      <img src="/logo.png" alt="SVR Poker">
+      <div><span class="eyebrow">VERSION 1.0 PROTOTYPE</span><h1>Your table is ready.</h1><p>Play immediately, view the compact tournament schedule, or install the Android test app.</p></div>
+    </header>
+
+    <nav class="primary-actions" aria-label="Game actions">
+      <a class="button primary" href="/game/android.html?channel=stable&v=1.0.0">Play Poker</a>
+      <a class="button" href="/game/iphone.html?v=1.0.0">Play on iPhone</a>
+      <a class="button" href="/game/quest.html?v=phase440">Enter VR</a>
+    </nav>
+
+    <section class="panel update-card" aria-labelledby="app-heading">
+      <div><span class="section-label">APP</span><h2 id="app-heading">SVR Poker for Android</h2><p>The current signed test package is RC2. Version 1.0 checks for newer releases without interrupting a hand.</p></div>
+      <div class="install-actions">
+        <a class="button download" id="appDownload" href="/downloads/svr-poker-android-rc2.apk" download="svr-poker-android-rc2.apk">Download the App</a>
+        <button class="button quiet" id="checkUpdate" type="button">Check for Update</button>
+      </div>
+      <p class="status" id="updateStatus" role="status" aria-live="polite">Version 1.0 web app • Android 0.1.0-rc2 test package</p>
+      <div class="update-result" id="updateResult" hidden></div>
+    </section>
+
+    <section class="panel" aria-labelledby="tournament-heading">
+      <div class="section-head"><div><span class="section-label">TOURNAMENTS</span><h2 id="tournament-heading">Small schedule. Quick entry.</h2></div><a href="/game/tournaments.html?v=1.0.0">View all</a></div>
+      <div class="tournament-list" id="tournamentList"><p class="status">Loading schedule…</p></div>
+    </section>
+
+    <footer><a href="/site/index.html?v=1.0.0">Website</a><a href="/site/profile.html?v=1.0.0">Profile</a><a href="/site/contact.html?v=1.0.0">Support</a><span>© 2026 SVR Poker</span></footer>
+  </main>
+  <script type="module" src="/game/modules/app-v1.js?v=1.0.0"></script>
+</body>
+</html>
