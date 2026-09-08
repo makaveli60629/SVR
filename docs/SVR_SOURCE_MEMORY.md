@@ -8,7 +8,8 @@ This file is the short handoff future maintainers and AI coding sessions should 
 - Default branch: `main`
 - Current workstream: professional gameplay, private-lab first
 - Latest locked Quest correction: Phase 446
-- Active next phase: Phase 447
+- Completed protocol foundation: Phase 447
+- Active lab phase: Phase 448
 - Public marketing page: frozen for this workstream
 - Canonical detailed policy: `docs/SVR_MASTER_MANIFEST.md`
 
@@ -30,6 +31,6 @@ The owner wants a polished, believable poker experience before expanding the env
 
 Clients never decide deck order, hole cards, community cards, legal actions, pot totals, balances, winners, tournament advancement, or final timers. Commands carry unique action IDs and expected sequence numbers. Replays and reconnects must be idempotent.
 
-## Next execution checkpoint
+## Current execution checkpoint
 
-Phase 447 must prove the command envelope and action lifecycle using deterministic tests before it is wired into visible gameplay.
+Phase 448 provides lab-only Quest intent normalization, duplicate-input suppression, seated-comfort gates, and frame-budget measurement. It is not wired into the visible Quest route. Physical headset acceptance is required before integration with the Phase 447 command envelope.

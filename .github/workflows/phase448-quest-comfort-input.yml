@@ -1,0 +1,42 @@
+name: Phase 448 Quest Comfort Input
+
+on:
+  pull_request:
+    paths:
+      - 'docs/SVR_MASTER_MANIFEST.md'
+      - 'docs/SVR_SOURCE_MEMORY.md'
+      - 'docs/PHASE_448_QUEST_COMFORT_INPUT_LAB.md'
+      - 'game/labs/pro-playtest/phase448-quest-comfort-input.js'
+      - 'game/tools/phase448-quest-comfort-input-audit.mjs'
+      - '.github/workflows/phase448-quest-comfort-input.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quest-lab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Reject public surface changes
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          changed="$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")"
+          printf '%s
+' "$changed"
+          if printf '%s
+' "$changed" | grep -Eq '^(index\.html|site/|site\.zip$|update/site\.zip$|game/quest\.html$|game/index\.html$)'; then
+            echo 'Phase 448 is lab-only and may not change visible routes.' >&2
+            exit 1
+          fi
+      - name: Validate Phase 448
+        run: |
+          node --check game/labs/pro-playtest/phase448-quest-comfort-input.js
+          node --check game/tools/phase448-quest-comfort-input-audit.mjs
+          node game/tools/phase448-quest-comfort-input-audit.mjs
+          grep -q 'TABLE_TELEPORT_ENABLED = false' game/labs/pro-playtest/phase448-quest-comfort-input.js
