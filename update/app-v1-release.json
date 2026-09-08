@@ -2,7 +2,9 @@
   "schema": "svr-app-release-v1",
   "productVersion": "1.0.0",
   "channel": "prototype",
-  "publishedAt": "2026-09-04T00:00:00Z",
+  "publishedAt": "2026-09-08T00:00:00Z",
+  "releaseLocked": true,
+  "nativeApkRebuild": false,
   "mandatory": false,
   "minimumSupportedWebVersionCode": 10000,
   "web": {"versionName":"1.0.0","versionCode":10000,"updateMode":"service-worker-check","entry":"/game/app.html?v=1.0.0"},
@@ -11,5 +13,5 @@
     "ios": {"state":"web-app-prototype","versionName":"1.0.0","versionCode":10000,"updateAvailable":false,"url":"/game/iphone.html?v=1.0.0","store":"planned"},
     "web": {"state":"prototype","versionName":"1.0.0","versionCode":10000,"updateAvailable":false,"url":"/game/app.html?v=1.0.0"}
   },
-  "policy": {"checkOnLaunch":true,"manualCheck":true,"interruptActiveHand":false,"forceOnlyForSecurityOrProtocolBreak":true,"rememberDismissedOptionalVersion":true}
+  "policy": {"checkOnLaunch":true,"manualCheck":true,"interruptActiveHand":false,"forceOnlyForSecurityOrProtocolBreak":true,"rememberDismissedOptionalVersion":true,"minimumCheckIntervalMinutes":360}
 }

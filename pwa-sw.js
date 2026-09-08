@@ -1,1 +1,1 @@
-importScripts('/sw.js?v=1.0.0');
+importScripts('/sw.js?v=phase445');

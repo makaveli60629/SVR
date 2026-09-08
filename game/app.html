@@ -9,8 +9,9 @@
   <link rel="manifest" href="/manifest.webmanifest?v=1.0.0">
   <link rel="icon" href="/logo.png">
   <link rel="stylesheet" href="/game/styles/app-v1.css?v=1.0.0">
+  <link rel="stylesheet" href="/game/styles/phase445-v1-release.css?v=phase445">
 </head>
-<body data-app-version="1.0.0" data-build="SVR-POKER-V1-PROTOTYPE">
+<body data-app-version="1.0.0" data-app-version-code="10000" data-build="PHASE-445-V1-RELEASE-CHANNEL-HARDENING">
   <main class="shell">
     <header class="hero">
       <img src="/logo.png" alt="SVR Poker">
@@ -30,7 +31,7 @@
         <button class="button quiet" id="checkUpdate" type="button">Check for Update</button>
       </div>
       <p class="status" id="updateStatus" role="status" aria-live="polite">Version 1.0 web app • Android 0.1.0-rc2 test package</p>
-      <div class="update-result" id="updateResult" hidden></div>
+      <div class="update-result" id="updateResult" hidden><p id="updateMessage"></p><div class="update-actions" id="updateActions" hidden><button class="button primary" id="applyUpdate" type="button">Apply After This Hand</button><button class="button quiet" id="dismissUpdate" type="button">Later</button></div></div>
     </section>
 
     <section class="panel" aria-labelledby="tournament-heading">

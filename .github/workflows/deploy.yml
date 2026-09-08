@@ -197,13 +197,15 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "SVR-POKER-V1-PROTOTYPE",
+            "build": "PHASE-445-V1-RELEASE-CHANNEL-HARDENING",
             "productVersion": "1.0.0",
             "appRoute": "/game/app.html?v=1.0.0",
             "updateManifest": "/update/app-v1-release.json",
             "updatePolicy": "optional-unless-security-or-protocol-incompatible",
             "floatingAppDownload": false,
             "singleAppDownloadButton": true,
+            "nativeReleaseLocked": true,
+            "nativeApkRebuild": false,
             "predecessorMobileBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
             "questBuild": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
             "vrTableBuild": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
