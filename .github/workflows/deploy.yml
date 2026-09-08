@@ -124,6 +124,7 @@ jobs:
           test -s source/game/labs/avatar/avatar-lab.js
           test -s source/game/modules/avatar/player_avatar_module.js
           test -s source/game/modules/phase444_heads_up_avatar_demo.js
+          test -s source/game/modules/phase446_quest_lab_table_seat_lock.js
           test -s source/game/tools/phase443-avatar-dealer-table-audit.mjs
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/models/eric/eric.fbx
@@ -157,6 +158,7 @@ jobs:
           node --check source/game/labs/avatar/avatar-lab.js
           node --check source/game/modules/avatar/player_avatar_module.js
           node --check source/game/modules/phase444_heads_up_avatar_demo.js
+          node --check source/game/modules/phase446_quest_lab_table_seat_lock.js
           (cd source && node game/tools/phase443-avatar-dealer-table-audit.mjs)
 
       - name: Execute protected Phase 403 pot sanity
@@ -270,6 +272,7 @@ jobs:
           test -s publish/game/labs/avatar/avatar-lab.js
           test -s publish/game/modules/avatar/player_avatar_module.js
           test -s publish/game/modules/phase444_heads_up_avatar_demo.js
+          test -s publish/game/modules/phase446_quest_lab_table_seat_lock.js
           test -s publish/game/tools/phase443-avatar-dealer-table-audit.mjs
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/models/eric/eric.fbx
