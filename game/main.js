@@ -182,7 +182,10 @@ renderer.setAnimationLoop(()=>{
   hands.update(dt);
   if (optionalTick) hands.updateDebug();
   const leftHand = hands.getLeftHand(); const rightHand = hands.getRightHand(); const leftController = hands.getLeftController(); const rightController = hands.getRightController();
-  if (!AUTOCAM || renderer.xr.isPresenting){ tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb:setStatus, modeCb:setMode }); }
+  // A seated Quest session must stop input before the locomotion module consumes it.
+  if ((!AUTOCAM || renderer.xr.isPresenting) && !window.SVR_TELEPORT_DISABLED){
+    tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb:setStatus, modeCb:setMode });
+  }
   if (renderer.xr.isPresenting || !AUTOCAM) watch.update(dt, { leftHand, rightHand, leftController, rightController });
   renderer.render(scene, camera);
 });
