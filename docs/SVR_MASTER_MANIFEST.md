@@ -1,7 +1,7 @@
 # SVR Poker Master Manifest
 
 Status: authoritative project source memory  
-Current implementation phase: Phase 447  
+Current implementation phase: Phase 448  
 Repository: `makaveli60629/SVR`
 
 ## Product standard
@@ -46,6 +46,16 @@ Quest hands/controllers, Android touch/gyroscope, iPhone touch-raycasting, deskt
 5. Spatial audio, captions, mute/block/report controls, and tournament presentation.
 6. Asset budgets, baked lighting, instancing, merged static geometry, atlases, and adaptive effects.
 
+## Phase 448 measurable Quest gates
+
+- 180 ms duplicate-input suppression.
+- Deliberate confirmation pressure threshold.
+- Seated eye height between 1.35 m and 1.75 m.
+- Seat drift no greater than 0.08 m.
+- No face obstruction closer than 0.45 m.
+- 72 Hz frame budget: 13.89 ms; 90 Hz frame budget: 11.11 ms.
+- Table teleport explicitly false.
+
 ## Lobby architecture
 
 The approved direction is an octagonal casino atrium with four feature recesses, emissive structural trims, a central giveaway pedestal, volumetric-looking portal arches, and eye-level spatial UI. Build it modularly. Static architecture should be merged or instanced, lighting baked where possible, and real-time lights reserved for hands, chips, avatars, and small focal effects.
@@ -54,7 +64,7 @@ The approved direction is an octagonal casino atrium with four feature recesses,
 
 - Phase 446: Quest Lab table/Eric duplicate cleanup, face-overlay cleanup, teleport lock, seated placement.
 - Phase 447: canonical action lifecycle, command validation, idempotency, sequence reconciliation, protected test harness.
-- Phase 448: Quest hand/controller polish and comfort metrics.
+- Phase 448: Quest hand/controller intent, comfort gates, and frame-budget instrumentation in the lab.
 - Phase 449: Android/iPhone parity and responsive interaction.
 - Phase 450: authoritative six-seat WebSocket room and reconnect recovery.
 - Phase 451: spatial audio, social safety, holographic tournament presentation.
