@@ -1,0 +1,47 @@
+name: Phase 447 Protected Lab
+
+on:
+  pull_request:
+    paths:
+      - 'docs/SVR_MASTER_MANIFEST.md'
+      - 'docs/SVR_SOURCE_MEMORY.md'
+      - 'game/labs/pro-playtest/**'
+      - 'game/tools/phase447-professional-state-audit.mjs'
+      - '.github/workflows/phase447-protected-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  protected-lab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Reject public-page changes
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          changed="$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")"
+          printf '%s
+' "$changed"
+          if printf '%s
+' "$changed" | grep -Eq '^(index\.html|site/|site\.zip$|update/site\.zip$)'; then
+            echo 'Phase 447 may not change public-page files.' >&2
+            exit 1
+          fi
+      - name: Validate source memory
+        run: |
+          test -s docs/SVR_MASTER_MANIFEST.md
+          test -s docs/SVR_SOURCE_MEMORY.md
+          grep -q 'Public marketing page: frozen' docs/SVR_SOURCE_MEMORY.md
+          grep -q 'Table-zone teleport.*remain disabled' docs/SVR_MASTER_MANIFEST.md
+      - name: Execute deterministic state audit
+        run: |
+          node --check game/labs/pro-playtest/phase447-state-contract.js
+          node --check game/tools/phase447-professional-state-audit.mjs
+          node game/tools/phase447-professional-state-audit.mjs
