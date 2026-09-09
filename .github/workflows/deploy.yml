@@ -131,7 +131,7 @@ jobs:
           test -s source/game/tools/phase450-deploy-gameplay-recovery-audit.mjs
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/models/eric/eric.fbx
-          grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' source/game/quest.html
+          grep -q 'PHASE-449-QUEST-CLEAN-AUTO-BOOT-TELEPORT-HEIGHT-LOCK' source/game/quest.html
           grep -q 'phase440-lab-master-hard-render' source/game/quest.html
           grep -q 'data-quest-polish-build="PHASE-440-LAB-MASTER-HARD-RENDER-LOCK"' source/game/index.html
           grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase444' source/game/index.html
