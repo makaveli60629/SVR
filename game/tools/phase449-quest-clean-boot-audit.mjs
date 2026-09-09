@@ -15,6 +15,12 @@ for (const flag of ['SVR_TELEPORT_ENABLED','SVR_HAND_TELEPORT_ENABLED','SVR_WATC
 assert.match(lock,/Object\.defineProperty/);
 assert.match(seat,/TARGET_EYE_ABOVE_TABLE/);
 assert.match(seat,/seatY/);
+assert.match(game,/quest-ready/);
+assert.match(seat,/PLAYER_RAIL_GAP = 0\.16/);
+assert.match(seat,/svrPhase452TurnedForEric/);
+assert.match(seat,/QUEST_TABLE_SCALE_TRIM = 0\.96/);
+assert.match(seat,/PHASE441_TABLE_SAFE_DECALS/);
+assert.match(seat,/clearFloatingTableLines/);
 const clutterPattern = seat.match(/const TABLE_CLUTTER = \/(.+)\/i;/)?.[1] || '';
 for (const gameplayName of ['CARD','CHIP','POT','LABEL','INTERACTION']) assert.equal(clutterPattern.split('|').includes(gameplayName),false,'cleanup must preserve '+gameplayName);
 assert.doesNotMatch(game,/>RETRY GAME<\/button>/);
