@@ -128,6 +128,7 @@ jobs:
           test -s source/game/modules/phase449_quest_clean_boot_teleport_height_lock.js
           test -s source/game/tools/phase443-avatar-dealer-table-audit.mjs
           test -s source/game/tools/phase449-quest-clean-boot-audit.mjs
+          test -s source/game/tools/phase450-deploy-gameplay-recovery-audit.mjs
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' source/game/quest.html
@@ -164,6 +165,7 @@ jobs:
           node --check source/game/modules/phase449_quest_clean_boot_teleport_height_lock.js
           (cd source && node game/tools/phase443-avatar-dealer-table-audit.mjs)
           (cd source && node game/tools/phase449-quest-clean-boot-audit.mjs)
+          (cd source && node game/tools/phase450-deploy-gameplay-recovery-audit.mjs)
 
       - name: Execute protected Phase 403 pot sanity
         shell: bash
