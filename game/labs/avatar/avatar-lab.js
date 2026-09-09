@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { SVRPlayerAvatar } from '../../modules/avatar/player_avatar_module.js?v=phase443';
+import { SVRPlayerAvatar } from '../../modules/avatar/player_avatar_module.js?v=phase444';
 
 export const BUILD = 'PHASE-443-PLAYER-ONLY-ARTICULATED-AVATAR-LAB';
 const canvas = document.getElementById('avatarCanvas'), status = document.getElementById('status');
@@ -20,7 +20,7 @@ for (const id of ids) document.getElementById(id).addEventListener('change', () 
 document.querySelectorAll('[data-motion]').forEach(button => button.addEventListener('click', () => { avatar.setMotion(button.dataset.motion); document.querySelectorAll('[data-motion]').forEach(b => b.classList.toggle('active', b === button)); report('motion active'); }));
 document.getElementById('reset').addEventListener('click', () => { camera.position.set(1.7, 1.25, 3.2); controls.target.set(0, .92, 0); controls.update(); });
 document.getElementById('save').addEventListener('click', () => { const outfit = { schemaVersion: 3, modelId: 'svr-player', ...read() }; localStorage.setItem('svrPlayerAvatarV3', JSON.stringify(outfit)); window.dispatchEvent(new CustomEvent('svr:avatar-saved', { detail: outfit })); report('saved locally'); });
-const saved = JSON.parse(localStorage.getItem('svrPlayerAvatarV3') || 'null'); if (saved) for (const id of ids) if (saved[id]) document.getElementById(id).value = saved[id]; avatar.applyOutfit(read());
+const saved = JSON.parse(localStorage.getItem('svrPlayerAvatarV3') || 'null'); if (saved) for (const id of ids) if (saved[id]) document.getElementById(id).value = saved[id]; avatar.applyOutfit(read()); avatar.setMotion('walking'); document.querySelector('[data-motion="walking"]')?.classList.add('active');
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); } addEventListener('resize', resize); resize();
 let previous = performance.now() * .001; renderer.setAnimationLoop(() => { const now = performance.now() * .001, dt = Math.min(.05, now - previous); previous = now; avatar.update(dt); controls.update(); renderer.render(scene, camera); });
 window.SVR_AVATAR_LAB = { build: BUILD, avatar, qa: () => ({ ...avatar.audit(), outfit: read() }) }; report('ready');

@@ -146,6 +146,13 @@ function makeBrandingTexture() {
 
     drawSponsorBadge(ctx, 354, 512, 'REIKI', 'SPONSOR');
     drawSponsorBadge(ctx, 1694, 512, 'SPONSOR', 'RESERVED');
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(171,86,255,.85)';
+    ctx.shadowBlur = 24;
+    ctx.font = '900 104px Arial, sans-serif';
+    ctx.fillText('SVR POKER', CANVAS_W / 2, CANVAS_H / 2 + 35);
+    ctx.shadowBlur = 0;
     brandingTexture.needsUpdate = true;
   }
 
@@ -172,7 +179,7 @@ function makeBrandingTexture() {
     ctx.fillText('SVR POKER', CANVAS_W / 2, CANVAS_H / 2 + 45);
     brandingTexture.needsUpdate = true;
   };
-  image.src = LOGO_URL;
+  image.src = `${LOGO_URL}?v=phase444`;
   return brandingTexture;
 }
 
@@ -234,15 +241,18 @@ function applyAuthority(runtime) {
   table.brandingMesh.position.set(metrics.centerX, metrics.y, metrics.centerZ);
   table.brandingMesh.renderOrder = 30;
   table.brandingMesh.frustumCulled = false;
+  table.brandingMesh.visible = true;
+  table.brandingGroup.visible = true;
   table.brandingMesh.material.map = makeBrandingTexture();
   table.brandingMesh.material.transparent = true;
   table.brandingMesh.material.alphaTest = 0.025;
-  table.brandingMesh.material.depthTest = true;
+  table.brandingMesh.material.depthTest = false;
   table.brandingMesh.material.depthWrite = false;
   table.brandingMesh.material.toneMapped = false;
   table.brandingMesh.material.polygonOffset = true;
-  table.brandingMesh.material.polygonOffsetFactor = -4;
-  table.brandingMesh.material.polygonOffsetUnits = -4;
+  table.brandingMesh.material.polygonOffsetFactor = -8;
+  table.brandingMesh.material.polygonOffsetUnits = -8;
+  table.brandingMesh.renderOrder = 70;
   table.brandingMesh.material.needsUpdate = true;
 
   table.getBettingLine = () => ({

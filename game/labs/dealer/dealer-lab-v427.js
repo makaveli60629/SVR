@@ -1,15 +1,15 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
-import { EricDealerModule } from '../../modules/dealer/eric_dealer_module.js?v=phase443';
+import { EricDealerModule } from '../../modules/dealer/eric_dealer_module.js?v=phase444';
 import { TableCalibrationModule } from '../../modules/dealer/table_calibration_module.js?v=phase434';
 import { FeltInteractionModule } from '../../modules/dealer/felt_interaction_module.js?v=phase434';
 import { WristLabModule } from '../../modules/dealer/wrist_lab_module.js?v=phase434';
 
 const BUILD='PHASE-443-DEALER-LAB-ERIC-VISIBLE-ADJUSTABLE-DEALING';
-const DEALER_DEFAULTS={scale:0.0055,x:-0.10,y:0.00268026492655681,z:0.71,shoulderX:0.55,shoulderZ:-0.48,elbowX:0.36,wristZ:-0.45,speed:1.35};
+const DEALER_DEFAULTS={scale:0.0047,x:-0.10,y:0.00268026492655681,z:0.71,shoulderX:0.55,shoulderZ:-0.48,elbowX:0.36,wristZ:-0.45,speed:1.35};
 const TABLE_DEFAULTS={tableY:0.62,feltDrop:0.014,innerMargin:0.125,collisionDrop:0.02,cardLift:0.0006};
-const DEALER_STORAGE_KEY='svrDealerLabDealerPresetPhase434';
+const DEALER_STORAGE_KEY='svrDealerLabDealerPresetPhase444';
 const FLOOR_Y=0;
 const HUMAN_DEALER_HEIGHT=1.78;
 const app=document.getElementById('app'),hud=document.getElementById('hud'),quickbar=document.getElementById('quickbar'),statusEl=document.getElementById('status'),presetOut=document.getElementById('presetOut'),presetInput=document.getElementById('presetInput');
@@ -82,7 +82,13 @@ function refreshPreset(){if(presetOut)presetOut.value=JSON.stringify(getFullPres
 click('savePresetBtn',()=>{table.saveLocal();localStorage.setItem(DEALER_STORAGE_KEY,JSON.stringify(dealer.params));refreshPreset()});click('resetPresetBtn',()=>{table.reset();localStorage.removeItem(DEALER_STORAGE_KEY);dealer.setParams(DEALER_DEFAULTS);writeDealerInputs(DEALER_DEFAULTS);writeTableInputs(TABLE_DEFAULTS);if(dealer.loaded)groundEric(false);refreshPreset();refreshStatus()});click('copyPresetBtn',async()=>{refreshPreset();await navigator.clipboard.writeText(presetOut.value).catch(()=>{})});
 function applyPresetObject(preset){if(preset?.dealer){dealer.setParams({...DEALER_DEFAULTS,...preset.dealer});writeDealerInputs(dealer.params)}const tp=preset?.calibration?.table||preset?.table;if(tp){table.setParams({...TABLE_DEFAULTS,...tp,cardLift:Math.min(.004,Number(tp.cardLift??TABLE_DEFAULTS.cardLift))});writeTableInputs(table.params)}if(dealer.loaded)groundEric(false);refreshPreset();refreshStatus();setTimeout(focusEric,80)}
 click('applyPresetBtn',()=>{try{applyPresetObject(JSON.parse(presetInput.value));presetInput.value='';const b=document.getElementById('applyPresetBtn');b.textContent='Applied + Human Scale ✓';setTimeout(()=>b.textContent='Apply JSON',1100)}catch{const b=document.getElementById('applyPresetBtn');b.textContent='Invalid JSON';setTimeout(()=>b.textContent='Apply JSON',1200)}});
-function restore(){try{const saved=JSON.parse(localStorage.getItem(DEALER_STORAGE_KEY)||'null');dealer.setParams(saved?{...DEALER_DEFAULTS,...saved}:DEALER_DEFAULTS)}catch{dealer.setParams(DEALER_DEFAULTS)}writeDealerInputs(dealer.params);if(!table.loadLocal())table.setParams(TABLE_DEFAULTS);writeTableInputs(table.params)}
+function restore(){
+  let saved=null;try{saved=JSON.parse(localStorage.getItem(DEALER_STORAGE_KEY)||'null')}catch{}
+  const sane=saved&&Number(saved.scale)>=.004&&Number(saved.scale)<=.012&&Math.abs(Number(saved.x))<=1.5&&Math.abs(Number(saved.z))<=1.8;
+  dealer.setParams(sane?{...DEALER_DEFAULTS,...saved}:DEALER_DEFAULTS);
+  dealer.group.visible=true;dealer.propGroup.visible=true;
+  writeDealerInputs(dealer.params);if(!table.loadLocal())table.setParams(TABLE_DEFAULTS);writeTableInputs(table.params)
+}
 function refreshStatus(){const rig=dealer.loaded?dealer.getRigReport():null,diag=table.getDiagnostics(),feet=dealer.getFeetY?.(),line=table.getBettingLine(),height=dealer.getBounds?.()?.getSize(new THREE.Vector3()).y;statusEl.textContent=[`BUILD ${BUILD}`,`Eric: ${dealer.loaded?'LOADED':loadSummary.dealer} • ${Number.isFinite(height)?height.toFixed(2):'…'}m tall • target ${HUMAN_DEALER_HEIGHT.toFixed(2)}m`,`Dealer ready pose: ${rig?.readyPose?'ON':'…'} • deck ${rig?.deckProp?'LEFT HAND':'…'} • deal card ${rig?.dealCardProp?'RIGHT HAND':'…'}`,`Deal origin: ${rig?.dealOrigin?rig.dealOrigin.map(n=>Number(n).toFixed(2)).join(', '):'waiting'} • mode ${dealer.paused?'PAUSED':dealer.mode}`,`Eric feet Y: ${Number.isFinite(feet)?feet.toFixed(4):'…'}m • floor ${FLOOR_Y.toFixed(3)}m`,`Table: ${table.table?'GLB LOADED':'loading…'} • native felt ${diag.nativeFeltCount} • true handrest ${diag.handRestCount} • hidden cover ${diag.hiddenTopCoverCount}`,`Felt mode: ${diag.visualFeltMode} • felt Y ${diag.visualFeltY}m • card landing Y ${diag.cardLandingY}m`,`Branding: XR-clear decal • SVR center • REIKI left • reserved sponsor right`,`Bet/pass line: ${line.radiusX.toFixed(2)}m x ${line.radiusZ.toFixed(2)}m • cards=fold • chips=wager`,`Guides: ${table.guidesVisible?'ON':'OFF'} • XR ${renderer.xr.isPresenting?'ACTIVE':'screen'}`].join('\n')}
 
 Promise.allSettled([dealer.load(),table.load()]).then(results=>{loadSummary.dealer=results[0].status==='fulfilled'?'loaded':`ERROR ${String(results[0].reason?.message||results[0].reason||'load failed')}`;loadSummary.table=results[1].status==='fulfilled'?'loaded':`ERROR ${String(results[1].reason?.message||results[1].reason||'load failed')}`;restore();if(dealer.loaded)groundEric(false);refreshPreset();syncWatch();refreshStatus();quickbar.style.display='flex';hud.style.display='block';document.getElementById('xrHint').style.display='block';if(dealer.loaded)setTimeout(()=>setCameraPreset('front'),160)});
