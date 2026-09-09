@@ -13,6 +13,10 @@ const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const tableBox = new THREE.Box3(), objectBox = new THREE.Box3(), size = new THREE.Vector3(), center = new THREE.Vector3(), head = new THREE.Vector3(), world = new THREE.Vector3();
 let scene, renderer, camera, runtime, seatPose, timer = 0, seatY = -0.42;
 const TARGET_EYE_ABOVE_TABLE = 0.66;
+const PLAYER_RAIL_GAP = 0.16;
+const QUEST_TABLE_SCALE_TRIM = 0.96;
+const GAMEPLAY_VISUAL = /CARD|CHIP|POT|HAND|BUTTON|CONTROL|INTERACTION|DEAL|PLAYER|ERIC/i;
+const FLOATING_LINE = /PHASE441_TABLE_SAFE_DECALS|PASS.?LINE|WHITE.?LINE|BLINK|FLASH|FLOATING.*LINE|GUIDE.?LINE/i;
 
 function visible(object) { for (let o = object; o; o = o.parent) if (o.visible === false) return false; return Boolean(object?.parent); }
 function kept(object) {
@@ -72,14 +76,50 @@ function clearFace() {
   });
   state.faceObjectsHidden = Math.max(state.faceObjectsHidden, hidden);
 }
-function computeSeat() {
+function alignTableAndSeat() {
+  const table = runtime?.table?.table;
+  const dealer = runtime?.dealer?.group;
+  if (!table || !dealer) return null;
+  if (!table.userData.svrPhase452TurnedForEric) {
+    table.rotation.y += Math.PI;
+    table.scale.multiplyScalar(QUEST_TABLE_SCALE_TRIM);
+    table.userData.svrPhase452TurnedForEric = true;
+    table.userData.svrPhase452ScaleTrim = QUEST_TABLE_SCALE_TRIM;
+    table.updateWorldMatrix?.(true, true);
+    seatPose = null;
+  }
   const info = bounds(); if (!info) return null;
-  const yaw = Number(runtime?.anchor?.yaw || 0);
-  const front = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw).normalize();
-  const halfDepth = Math.abs(front.x) > Math.abs(front.z) ? info.size.x * .5 : info.size.z * .5;
-  const position = info.center.clone().addScaledVector(front, halfDepth + .43); position.y = 0;
+  const dealerPosition = dealer.getWorldPosition(new THREE.Vector3());
+  const toDealer = dealerPosition.sub(info.center); toDealer.y = 0;
+  if (toDealer.lengthSq() < 0.0001) toDealer.set(0, 0, 1);
+  toDealer.normalize();
+  const playerSide = toDealer.multiplyScalar(-1);
+  const projectedHalfExtent = Math.abs(playerSide.x) * info.size.x * .5 + Math.abs(playerSide.z) * info.size.z * .5;
+  const position = info.center.clone().addScaledVector(playerSide, projectedHalfExtent + PLAYER_RAIL_GAP);
+  position.y = 0;
   return { position, yaw: Math.atan2(info.center.x - position.x, info.center.z - position.z) };
 }
+function clearFloatingTableLines() {
+  const info = bounds(); if (!info || !scene) return;
+  const decalRoot = scene.getObjectByName?.('PHASE441_TABLE_SAFE_DECALS');
+  if (decalRoot) {
+    decalRoot.visible = false;
+    decalRoot.userData = { ...(decalRoot.userData || {}), svrPhase452Removed: true };
+  }
+  scene.traverse(object => {
+    if (!object?.isMesh || !visible(object) || GAMEPLAY_VISUAL.test(String(object.name || ''))) return;
+    const label = String(object.name || '') + ' ' + String(object.material?.name || '');
+    if (!FLOATING_LINE.test(label)) return;
+    try { objectBox.setFromObject(object, true); } catch { return; }
+    if (objectBox.isEmpty()) return;
+    const objectSize = objectBox.getSize(new THREE.Vector3());
+    const objectCenter = objectBox.getCenter(new THREE.Vector3());
+    const overTable = objectCenter.x >= info.box.min.x - .1 && objectCenter.x <= info.box.max.x + .1 && objectCenter.z >= info.box.min.z - .1 && objectCenter.z <= info.box.max.z + .1;
+    const nearSurface = objectBox.min.y >= info.box.min.y && objectBox.max.y <= info.box.max.y + 1.2;
+    if (overTable && nearSurface && objectSize.y <= .12) hide(object, 'svrPhase452FloatingLineRemoved');
+  });
+}
+function computeSeat() { return alignTableAndSeat(); }
 function seat(reason = 'guard') {
   const rig = window.SVR_TELEPORT_RIG_REF || window.SVR_TELEPORT_RIG;
   seatPose ||= computeSeat(); if (!rig?.setPlayerPose || !seatPose) return false;
@@ -94,14 +134,14 @@ function seat(reason = 'guard') {
   state.seated = true; state.seatY = Number(seatY.toFixed(3)); state.targetEyeAboveTable = TARGET_EYE_ABOVE_TABLE; state.seatApplications++; state.lastSeatReason = reason; return true;
 }
 function qa() {
-  return { ...state, teleportInputBlockedAtMainLoop: true, approvedTableVisible: Boolean(runtime?.table?.table && visible(runtime.table.table)), approvedEricVisible: Boolean(runtime?.dealer?.group && visible(runtime.dealer.group)), pass: Boolean(state.installed && state.seated && window.SVR_TELEPORT_DISABLED && !state.lastError), checkedAt: new Date().toISOString() };
+  return { ...state, teleportInputBlockedAtMainLoop: true, approvedTableVisible: Boolean(runtime?.table?.table && visible(runtime.table.table)), approvedEricVisible: Boolean(runtime?.dealer?.group && visible(runtime.dealer.group)), tableTurnedForEric: Boolean(runtime?.table?.table?.userData?.svrPhase452TurnedForEric), playerRailGap: PLAYER_RAIL_GAP, tableScaleTrim: QUEST_TABLE_SCALE_TRIM, floatingLineVisible: Boolean(scene?.getObjectByName?.('PHASE441_TABLE_SAFE_DECALS')?.visible), pass: Boolean(state.installed && state.seated && window.SVR_TELEPORT_DISABLED && !state.lastError), checkedAt: new Date().toISOString() };
 }
 function sweep(reason = 'guard') {
   try {
     scene = window.__SVR_SCENE__ || scene; renderer = window.__SVR_RENDERER__ || renderer; camera = window.__SVR_CAMERA__ || camera;
     runtime = window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE || runtime;
     if (!scene || !runtime?.table?.table || !runtime?.dealer?.loaded) return false;
-    disableTeleport(); clearTableArea(); clearFace(); seat(reason);
+    disableTeleport(); alignTableAndSeat(); clearTableArea(); clearFloatingTableLines(); clearFace(); seat(reason);
     runtime.table.group.visible = true; runtime.table.table.visible = true; runtime.dealer.group.visible = true; if (runtime.dealer.model) runtime.dealer.model.visible = true;
     state.installed = state.seated; state.lastError = null; state.checkedAt = new Date().toISOString(); window.SVR_PHASE446_STATE = { ...state, reason }; return qa();
   } catch (error) { state.lastError = String(error?.stack || error?.message || error); state.checkedAt = new Date().toISOString(); return false; }
