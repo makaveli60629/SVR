@@ -5,13 +5,14 @@ export const BUILD = 'PHASE-446-QUEST-LAB-TABLE-SEAT-LOCK';
 const query = new URLSearchParams(location.search);
 const ACTIVE = query.get('platform') === 'quest' || query.get('questfix') === '1' || /Quest|Oculus|Meta Quest/i.test(navigator.userAgent || '');
 const KEEP = /PHASE438_APPROVED_|PHASE441_TABLE_SAFE_DECALS|PHASE441_PASS_LINE|PHASE441_CENTER_SVR_LOGO|PHASE441_SPONSOR_/i;
-const TABLE_CLUTTER = /CARD|DECK|BURN|CHIP|POT|TABLE.*TOP|TABLETOP|PLAYING.*SURFACE|FELT|PASS.?LINE|LOGO|SPONSOR|PANEL|OVERLAY|HOLOGRAM|LABEL|INTERACTION/i;
+const TABLE_CLUTTER = /(?:LEGACY|DUPLICATE|EXTRA|FLOATING).*(?:TABLE|TOP|SURFACE|FELT|COVER|OVERLAY)|TABLE.*(?:TOP|TOPPER|COVER).*LEGACY|PROTECTIVE.*(?:TOP|COVER)|TABLETOP|PLAYING.*SURFACE.*(?:LEGACY|DUPLICATE)|HOLOGRAM.*(?:TABLE|SURFACE)|TABLE.*OVERLAY/i;
 const FACE_CLUTTER = /BLACK|DARK|SQUARE|OVERLAY|HUD|SCREEN|PANEL|GUIDE|TARGET|RETICLE|RAY|ARC|TELEPORT|WATCH.*FACE/i;
 const TELEPORT_VISUAL = /TELEPORT|TARGET.?RING|POINTER|RETICLE|PARTICLE.*ARC|ARC.*PARTICLE|LASER/i;
 const state = { build: BUILD, active: ACTIVE, installed: false, tabletopRootsHidden: 0, faceObjectsHidden: 0, teleportObjectsHidden: 0, seated: false, seatApplications: 0, lastError: null, checkedAt: null };
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const tableBox = new THREE.Box3(), objectBox = new THREE.Box3(), size = new THREE.Vector3(), center = new THREE.Vector3(), head = new THREE.Vector3(), world = new THREE.Vector3();
-let scene, renderer, camera, runtime, seatPose, timer = 0;
+let scene, renderer, camera, runtime, seatPose, timer = 0, seatY = -0.42;
+const TARGET_EYE_ABOVE_TABLE = 0.66;
 
 function visible(object) { for (let o = object; o; o = o.parent) if (o.visible === false) return false; return Boolean(object?.parent); }
 function kept(object) {
@@ -82,8 +83,15 @@ function computeSeat() {
 function seat(reason = 'guard') {
   const rig = window.SVR_TELEPORT_RIG_REF || window.SVR_TELEPORT_RIG;
   seatPose ||= computeSeat(); if (!rig?.setPlayerPose || !seatPose) return false;
-  rig.setPlayerPose(seatPose.position.x, -0.42, seatPose.position.z); rig.setPlayerYaw?.(seatPose.yaw);
-  state.seated = true; state.seatApplications++; state.lastSeatReason = reason; return true;
+  const info = bounds();
+  if (renderer?.xr?.isPresenting && info && camera) {
+    const xr = renderer.xr.getCamera(camera), eye = xr?.cameras?.[0] || xr || camera;
+    eye?.getWorldPosition?.(head);
+    const currentGap = head.y - info.box.max.y;
+    if (Number.isFinite(currentGap)) seatY = THREE.MathUtils.clamp(seatY + THREE.MathUtils.clamp(TARGET_EYE_ABOVE_TABLE - currentGap, -.10, .10) * .35, -.62, .12);
+  }
+  rig.setPlayerPose(seatPose.position.x, seatY, seatPose.position.z); rig.setPlayerYaw?.(seatPose.yaw);
+  state.seated = true; state.seatY = Number(seatY.toFixed(3)); state.targetEyeAboveTable = TARGET_EYE_ABOVE_TABLE; state.seatApplications++; state.lastSeatReason = reason; return true;
 }
 function qa() {
   return { ...state, teleportInputBlockedAtMainLoop: true, approvedTableVisible: Boolean(runtime?.table?.table && visible(runtime.table.table)), approvedEricVisible: Boolean(runtime?.dealer?.group && visible(runtime.dealer.group)), pass: Boolean(state.installed && state.seated && window.SVR_TELEPORT_DISABLED && !state.lastError), checkedAt: new Date().toISOString() };

@@ -1,0 +1,41 @@
+name: Phase 449 Quest Clean Auto Boot
+
+on:
+  pull_request:
+    paths:
+      - 'game/index.html'
+      - 'game/quest.html'
+      - 'game/modules/phase446_quest_lab_table_seat_lock.js'
+      - 'game/modules/phase449_quest_clean_boot_teleport_height_lock.js'
+      - 'game/tools/phase449-quest-clean-boot-audit.mjs'
+      - 'docs/PHASE_449_QUEST_CLEAN_AUTO_BOOT.md'
+      - '.github/workflows/phase449-quest-clean-auto-boot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quest-clean-boot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Protect public marketing page
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          changed="$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")"
+          if printf '%s
+' "$changed" | grep -Eq '^(index\.html|site/|site\.zip$|update/site\.zip$)'; then
+            echo 'Public marketing page change rejected.' >&2
+            exit 1
+          fi
+      - name: Audit automatic Quest boot
+        run: |
+          node --check game/modules/phase446_quest_lab_table_seat_lock.js
+          node --check game/modules/phase449_quest_clean_boot_teleport_height_lock.js
+          node --check game/tools/phase449-quest-clean-boot-audit.mjs
+          node game/tools/phase449-quest-clean-boot-audit.mjs
