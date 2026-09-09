@@ -15,5 +15,7 @@ for (const flag of ['SVR_TELEPORT_ENABLED','SVR_HAND_TELEPORT_ENABLED','SVR_WATC
 assert.match(lock,/Object\.defineProperty/);
 assert.match(seat,/TARGET_EYE_ABOVE_TABLE/);
 assert.match(seat,/seatY/);
+const clutterPattern = seat.match(/const TABLE_CLUTTER = \/(.+)\/i;/)?.[1] || '';
+for (const gameplayName of ['CARD','CHIP','POT','LABEL','INTERACTION']) assert.equal(clutterPattern.split('|').includes(gameplayName),false,'cleanup must preserve '+gameplayName);
 assert.doesNotMatch(game,/>RETRY GAME<\/button>/);
 console.log('PHASE-449-QUEST-CLEAN-AUTO-BOOT-TELEPORT-HEIGHT-LOCK audit passed.');
