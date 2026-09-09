@@ -1,0 +1,21 @@
+name: Phase 450 Deploy Gameplay Recovery
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/phase450-deploy-gameplay-recovery.yml'
+      - 'game/tools/phase450-deploy-gameplay-recovery-audit.mjs'
+      - 'docs/PHASE_450_DEPLOY_GAMEPLAY_RECOVERY.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recovery-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify deployment and gameplay recovery
+        run: node game/tools/phase450-deploy-gameplay-recovery-audit.mjs

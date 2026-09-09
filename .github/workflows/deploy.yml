@@ -125,7 +125,10 @@ jobs:
           test -s source/game/modules/avatar/player_avatar_module.js
           test -s source/game/modules/phase444_heads_up_avatar_demo.js
           test -s source/game/modules/phase446_quest_lab_table_seat_lock.js
+          test -s source/game/modules/phase449_quest_clean_boot_teleport_height_lock.js
           test -s source/game/tools/phase443-avatar-dealer-table-audit.mjs
+          test -s source/game/tools/phase449-quest-clean-boot-audit.mjs
+          test -s source/game/tools/phase450-deploy-gameplay-recovery-audit.mjs
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' source/game/quest.html
@@ -159,7 +162,10 @@ jobs:
           node --check source/game/modules/avatar/player_avatar_module.js
           node --check source/game/modules/phase444_heads_up_avatar_demo.js
           node --check source/game/modules/phase446_quest_lab_table_seat_lock.js
+          node --check source/game/modules/phase449_quest_clean_boot_teleport_height_lock.js
           (cd source && node game/tools/phase443-avatar-dealer-table-audit.mjs)
+          (cd source && node game/tools/phase449-quest-clean-boot-audit.mjs)
+          (cd source && node game/tools/phase450-deploy-gameplay-recovery-audit.mjs)
 
       - name: Execute protected Phase 403 pot sanity
         shell: bash
@@ -209,7 +215,7 @@ jobs:
             "nativeReleaseLocked": true,
             "nativeApkRebuild": false,
             "predecessorMobileBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
-            "questBuild": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
+            "questBuild": "PHASE-449-QUEST-CLEAN-AUTO-BOOT-TELEPORT-HEIGHT-LOCK",
             "vrTableBuild": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
             "vrTablePredecessorBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
             "labTableSurfaceBuild": "DEALER-LAB-V2.5-BLACK-FELT-TABLE-SHAPE-PASSLINE-LOCK",
@@ -224,8 +230,11 @@ jobs:
             "androidEngineBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "questRoute": "/game/quest.html?v=phase440",
+            "questRoute": "/game/quest.html?v=phase449",
             "camera3Route": "/game/camera3-live.html?v=phase440",
+            "questAutomaticLobbyBoot": true,
+            "questAdaptiveSeatHeight": true,
+            "questPokerControlsPreserved": true,
             "androidRoute": "/game/android.html?channel=stable&v=phase420",
             "iphoneRoute": "/game/iphone.html?v=phase420",
             "questTeleportEnabled": false,
@@ -273,16 +282,18 @@ jobs:
           test -s publish/game/modules/avatar/player_avatar_module.js
           test -s publish/game/modules/phase444_heads_up_avatar_demo.js
           test -s publish/game/modules/phase446_quest_lab_table_seat_lock.js
-          test -s publish/game/tools/phase443-avatar-dealer-table-audit.mjs
+          test -s publish/game/modules/phase449_quest_clean_boot_teleport_height_lock.js
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' publish/deploy-health.json
+          grep -q 'PHASE-449-QUEST-CLEAN-AUTO-BOOT-TELEPORT-HEIGHT-LOCK' publish/deploy-health.json
+          grep -q '"questAutomaticLobbyBoot": true' publish/deploy-health.json
+          grep -q '"questPokerControlsPreserved": true' publish/deploy-health.json
           grep -q '"questLabMasterOnlyRenderedTable": true' publish/deploy-health.json
           grep -q '"questLabMasterOnlyRenderedEric": true' publish/deploy-health.json
           grep -q '"questLegacyTableVisualsDetached": true' publish/deploy-health.json
           grep -q '"questApprovedEricScale": 0.0047' publish/deploy-health.json
           grep -q 'PHASE-443-PLAYER-ONLY-ARTICULATED-AVATAR-LAB' publish/deploy-health.json
-          (cd publish && node game/tools/phase443-avatar-dealer-table-audit.mjs)
           test -f publish/CNAME
           grep -qx 'svrpoker.com' publish/CNAME
           test -s publish/404.html
@@ -297,8 +308,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 440.'
+            echo 'Production already matches Phase 449.'
           else
-            git commit -m "Deploy Phase 440 Lab-only Quest lobby ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 449 clean automatic Quest gameplay ${GITHUB_SHA}"
             git push origin gh-pages
           fi
