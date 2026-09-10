@@ -9,7 +9,9 @@ const teleport=fs.readFileSync('game/modules/phase449_quest_clean_boot_teleport_
 assert.doesNotMatch(deploy,/test -s publish\/game\/tools\//);
 assert.doesNotMatch(deploy,/\(cd publish && node game\/tools\//);
 assert.match(deploy,/phase449-quest-clean-boot-audit\.mjs/);
-assert.match(deploy,/questAutomaticLobbyBoot": true/);
+assert.match(deploy,/questAutomaticLobbyBoot": false/);
+assert.match(deploy,/questDirectTableRoom": true/);
+assert.match(deploy,/questLobbyEnabled": false/);
 assert.match(deploy,/questPokerControlsPreserved": true/);
 
 for (const authority of [
@@ -18,7 +20,8 @@ for (const authority of [
   'phase360_table_conservation_next_guard_lock.js',
   'phase365_quest_vr_button_dedupe_lock.js',
   'phase396_quest_seated_clean_table_deal_lock.js',
-  'phase449_quest_clean_boot_teleport_height_lock.js'
+  'phase449_quest_clean_boot_teleport_height_lock.js',
+  'phase453_quest_direct_table_room_lock.js'
 ]) assert.match(game,new RegExp(authority.replaceAll('.','\\.')));
 
 const clutterPattern=seat.match(/const TABLE_CLUTTER = \/(.+)\/i;/)?.[1]||'';
