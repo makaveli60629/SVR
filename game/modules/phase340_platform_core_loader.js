@@ -54,11 +54,16 @@ function moduleUrl(path) {
 
 function release(reason) {
   if (state.readyAt) return;
+  const params = new URLSearchParams(location.search);
+  const holdQuestStage = state.platform === 'quest' && (params.get('direct') === '1' || params.get('autoseat') === '1' || params.get('questfix') === '1');
   document.body.classList.add(
-    'boot-released', 'runtime-visible', 'overlay-released', 'ready',
+    'runtime-visible', 'ready',
     `svr-platform-${state.platform}`, 'svr-phase340', 'svr-phase355', 'svr-phase356', 'svr-phase358'
   );
-  document.getElementById('safeStage')?.remove();
+  if (!holdQuestStage) {
+    document.body.classList.add('boot-released', 'overlay-released');
+    document.getElementById('safeStage')?.remove();
+  }
   window.__SVR_GAME_READY__ = true;
   window.SVR_GAME_READY = true;
   window.SVR_PLATFORM_READY = true;
