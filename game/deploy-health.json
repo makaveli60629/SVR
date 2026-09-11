@@ -24,7 +24,7 @@
   "androidSurfaceBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
   "androidEngineBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
   "commit": "714c108799af85b4e509d4117a567b134c44df20",
-  "deployedAt": "2026-09-11T21:14:58Z",
+  "deployedAt": "2026-09-11T21:16:12Z",
   "questRoute": "/game/quest.html?v=phase455",
   "camera3Route": "/game/camera3-live.html?v=phase440",
   "questAutomaticLobbyBoot": false,
