@@ -246,6 +246,9 @@ jobs:
             "questLobbyEnabled": false,
             "questReadinessGate": true,
             "questVerifiedSeatRequired": true,
+            "questGameplayReadinessRequired": true,
+            "questControlsRequiredBeforeEnterVr": true,
+            "questAutoStartFirstHand": true,
             "questVisibleClutterRequired": 0,
             "questAdaptiveSeatHeight": true,
             "questPokerControlsPreserved": true,
@@ -306,6 +309,9 @@ jobs:
           grep -q '"questDirectTableRoom": true' publish/deploy-health.json
           grep -q '"questAutomaticTableBoot": true' publish/deploy-health.json
           grep -q '"questVerifiedSeatRequired": true' publish/deploy-health.json
+          grep -q '"questGameplayReadinessRequired": true' publish/deploy-health.json
+          grep -q '"questControlsRequiredBeforeEnterVr": true' publish/deploy-health.json
+          grep -q '"questAutoStartFirstHand": true' publish/deploy-health.json
           grep -q '"questLobbyEnabled": false' publish/deploy-health.json
           grep -q '"questPokerControlsPreserved": true' publish/deploy-health.json
           grep -q '"questLabMasterOnlyRenderedTable": true' publish/deploy-health.json
