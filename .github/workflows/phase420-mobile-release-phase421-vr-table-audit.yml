@@ -67,7 +67,7 @@ jobs:
             grep -q 'phase422_quest_seated_inspection_lock.js?v=phase440' game/modules/phase406_quest_side_burn_chip_polish.js
             grep -q 'phase422_quest_table_prop_alignment_flex_lock.js?v=phase440' game/modules/phase406_quest_side_burn_chip_polish.js
             ! grep -q 'phase422_quest_table_geometry_theme_lock.js?v=phase422' game/modules/phase406_quest_side_burn_chip_polish.js
-            grep -q 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase440' game/index.html
+            grep -q 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase444' game/index.html
             grep -q 'data-quest-polish-build="PHASE-440-LAB-MASTER-HARD-RENDER-LOCK"' game/index.html
             grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' game/quest.html
             grep -q 'phase440-lab-master-hard-render' game/quest.html
