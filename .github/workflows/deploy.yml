@@ -127,12 +127,15 @@ jobs:
           test -s source/game/modules/phase446_quest_lab_table_seat_lock.js
           test -s source/game/modules/phase449_quest_clean_boot_teleport_height_lock.js
           test -s source/game/modules/phase453_quest_direct_table_room_lock.js
+          test -s source/game/modules/phase455_quest_table_first_lobby.js
+          test -s source/game/tools/phase455-table-first-lobby-audit.mjs
           test -s source/game/tools/phase443-avatar-dealer-table-audit.mjs
           test -s source/game/tools/phase449-quest-clean-boot-audit.mjs
           test -s source/game/tools/phase450-deploy-gameplay-recovery-audit.mjs
           test -s source/game/assets/models/table.glb
           test -s source/game/assets/models/eric/eric.fbx
-          grep -q 'PHASE-453-QUEST-DIRECT-TABLE-ROOM-LOCK' source/game/quest.html
+          grep -q 'PHASE-455-QUEST-TABLE-FIRST-BOOT' source/game/quest.html
+          grep -q 'phase455_quest_table_first_lobby.js' source/game/index.html
           grep -q 'phase440-lab-master-hard-render' source/game/quest.html
           grep -q 'data-quest-polish-build="PHASE-440-LAB-MASTER-HARD-RENDER-LOCK"' source/game/index.html
           grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase444' source/game/index.html
@@ -165,10 +168,12 @@ jobs:
           node --check source/game/modules/phase446_quest_lab_table_seat_lock.js
           node --check source/game/modules/phase449_quest_clean_boot_teleport_height_lock.js
           node --check source/game/modules/phase453_quest_direct_table_room_lock.js
+          node --check source/game/modules/phase455_quest_table_first_lobby.js
           node --check source/game/modules/phase340_platform_core_loader.js
           (cd source && node game/tools/phase443-avatar-dealer-table-audit.mjs)
           (cd source && node game/tools/phase449-quest-clean-boot-audit.mjs)
           (cd source && node game/tools/phase450-deploy-gameplay-recovery-audit.mjs)
+          (cd source && node game/tools/phase455-table-first-lobby-audit.mjs)
 
       - name: Execute protected Phase 403 pot sanity
         shell: bash
@@ -218,7 +223,7 @@ jobs:
             "nativeReleaseLocked": true,
             "nativeApkRebuild": false,
             "predecessorMobileBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
-            "questBuild": "PHASE-453-QUEST-DIRECT-TABLE-ROOM-LOCK",
+            "questBuild": "PHASE-455-QUEST-TABLE-FIRST-BOOT",
             "vrTableBuild": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
             "vrTablePredecessorBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
             "labTableSurfaceBuild": "DEALER-LAB-V2.5-BLACK-FELT-TABLE-SHAPE-PASSLINE-LOCK",
@@ -233,11 +238,15 @@ jobs:
             "androidEngineBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "questRoute": "/game/quest.html?v=phase453",
+            "questRoute": "/game/quest.html?v=phase455",
             "camera3Route": "/game/camera3-live.html?v=phase440",
             "questAutomaticLobbyBoot": false,
+            "questAutomaticTableBoot": true,
             "questDirectTableRoom": true,
             "questLobbyEnabled": false,
+            "questReadinessGate": true,
+            "questVerifiedSeatRequired": true,
+            "questVisibleClutterRequired": 0,
             "questAdaptiveSeatHeight": true,
             "questPokerControlsPreserved": true,
             "androidRoute": "/game/android.html?channel=stable&v=phase420",
@@ -289,11 +298,14 @@ jobs:
           test -s publish/game/modules/phase446_quest_lab_table_seat_lock.js
           test -s publish/game/modules/phase449_quest_clean_boot_teleport_height_lock.js
           test -s publish/game/modules/phase453_quest_direct_table_room_lock.js
+          test -s publish/game/modules/phase455_quest_table_first_lobby.js
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' publish/deploy-health.json
-          grep -q 'PHASE-453-QUEST-DIRECT-TABLE-ROOM-LOCK' publish/deploy-health.json
+          grep -q 'PHASE-455-QUEST-TABLE-FIRST-BOOT' publish/deploy-health.json
           grep -q '"questDirectTableRoom": true' publish/deploy-health.json
+          grep -q '"questAutomaticTableBoot": true' publish/deploy-health.json
+          grep -q '"questVerifiedSeatRequired": true' publish/deploy-health.json
           grep -q '"questLobbyEnabled": false' publish/deploy-health.json
           grep -q '"questPokerControlsPreserved": true' publish/deploy-health.json
           grep -q '"questLabMasterOnlyRenderedTable": true' publish/deploy-health.json
@@ -315,8 +327,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 453.'
+            echo 'Production already matches Phase 455.'
           else
-            git commit -m "Deploy Phase 453 direct Quest table-room gameplay ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 455 verified table-first Quest gameplay ${GITHUB_SHA}"
             git push origin gh-pages
           fi

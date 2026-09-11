@@ -16,5 +16,9 @@ assert.match(room, /PHASE444_SINGLE_HEADS_UP_PLAYER/);
 assert.match(room, /SVR_PHASE390_DIRECT_FRONT_SEAT/);
 assert.match(room, /state\.duplicates === 0/);
 assert.match(room, /SVR_TELEPORT_DISABLED = true/);
+assert.match(room, /qa446\.pass && qa446\.seated/);
+assert.match(room, /visibleClutterCounts\(runtime\)/);
+assert.match(room, /window\.SVR_TELEPORT_ENABLED === false/);
+assert.doesNotMatch(room, /qa446\.seated \|\| window\.SVR_TELEPORT_DISABLED/);
 
 console.log('Phase 455 table-first lobby audit: 12/12 passed');
