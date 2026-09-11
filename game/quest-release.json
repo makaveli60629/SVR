@@ -1,9 +1,21 @@
 {
   "name": "SVR Poker Quest WebXR",
   "channel": "stable-web",
-  "phase": 380,
-  "build": "PHASE-380-ORIGINAL-UPLOADED-TABLE-AUTHORITY-LOCK",
-  "webEntry": "/game/index.html?platform=quest&v=phase380",
+  "phase": 455,
+  "build": "PHASE-455-QUEST-TABLE-FIRST-LOBBY",
+  "webEntry": "/game/quest.html?v=phase455",
+  "tableFirstLobby": {
+    "enabled": true,
+    "automaticLoading": true,
+    "progressBar": true,
+    "enterVrShownOnlyWhenReady": true,
+    "startsDirectlySeated": true,
+    "teleportDisabled": true,
+    "legacyLobbyHidden": true,
+    "ericDealerRequired": true,
+    "playerBotRequired": true,
+    "duplicateTableAndOverlayTolerance": 0
+  },
   "browserAcceptance": {
     "passed": true,
     "priorCompleteGamePassed": true,
