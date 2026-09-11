@@ -240,6 +240,7 @@ jobs:
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "questRoute": "/game/quest.html?v=phase455",
             "camera3Route": "/game/camera3-live.html?v=phase440",
+            "questAutomaticLobbyBoot": false,
             "questAutomaticTableBoot": true,
             "questDirectTableRoom": true,
             "questLobbyEnabled": false,
