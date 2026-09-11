@@ -20,5 +20,10 @@ assert.match(room, /qa446\.pass && qa446\.seated/);
 assert.match(room, /visibleClutterCounts\(runtime\)/);
 assert.match(room, /window\.SVR_TELEPORT_ENABLED === false/);
 assert.doesNotMatch(room, /qa446\.seated \|\| window\.SVR_TELEPORT_DISABLED/);
+assert.match(room, /production\.pass && production\.pokerActionsReady/);
+assert.match(room, /controls\.actionBar/);
+assert.match(room, /PHASE455_TABLE_FIRST_GAMEPLAY_NOT_READY/);
+assert.match(room, /SVR_POKER_NEXT_HAND/);
+assert.match(room, /startFirstHand\('xr-sessionstart'\)/);
 
-console.log('Phase 455 table-first lobby audit: 12/12 passed');
+console.log('Phase 455 table-first lobby audit: 17/17 passed');
