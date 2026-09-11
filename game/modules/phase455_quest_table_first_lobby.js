@@ -7,9 +7,14 @@ const state = { build: BUILD, active: ACTIVE, installed: false, seated: false, e
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 let timer = 0;
 
+function isEffectivelyVisible(object) {
+  for (let current = object; current; current = current.parent) if (current.visible === false) return false;
+  return Boolean(object?.parent);
+}
+
 function countVisible(pattern) {
   let count = 0;
-  window.__SVR_SCENE__?.traverse?.(object => { if (object.visible !== false && pattern.test(String(object.name || ''))) count++; });
+  window.__SVR_SCENE__?.traverse?.(object => { if (isEffectivelyVisible(object) && pattern.test(String(object.name || ''))) count++; });
   return count;
 }
 
@@ -26,7 +31,7 @@ function visibleClutterCounts(runtime) {
   const tableClutter = /(?:LEGACY|DUPLICATE|EXTRA|FLOATING).*(?:TABLE|TOP|SURFACE|FELT|COVER|OVERLAY)|TABLE.*(?:TOP|TOPPER|COVER).*LEGACY|PROTECTIVE.*(?:TOP|COVER)|TABLETOP|HOLOGRAM.*(?:TABLE|SURFACE)|TABLE.*OVERLAY/i;
   const floatingLine = /WHITE.?LINE|BLINK|FLASH|FLOATING.*LINE|GUIDE.?LINE|PHASE441_TABLE_SAFE_DECALS/i;
   window.__SVR_SCENE__?.traverse?.(object => {
-    if (!object?.parent || object.visible === false || isRuntimeVisual(object, runtime)) return;
+    if (!isEffectivelyVisible(object) || isRuntimeVisual(object, runtime)) return;
     const label = String(object.name || '') + ' ' + String(object.material?.name || '');
     if (tableClutter.test(label)) counts.tables++;
     if (floatingLine.test(label)) counts.floatingLines++;
