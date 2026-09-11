@@ -13,6 +13,27 @@ function countVisible(pattern) {
   return count;
 }
 
+function isRuntimeVisual(object, runtime) {
+  for (let current = object; current; current = current.parent) {
+    if (current === runtime?.table?.group || current === runtime?.table?.table || current === runtime?.dealer?.group || current === runtime?.dealer?.propGroup) return true;
+    if (current.userData?.svrPhase440Approved || current.userData?.svrPhase441Approved) return true;
+  }
+  return false;
+}
+
+function visibleClutterCounts(runtime) {
+  const counts = { tables: 0, floatingLines: 0 };
+  const tableClutter = /(?:LEGACY|DUPLICATE|EXTRA|FLOATING).*(?:TABLE|TOP|SURFACE|FELT|COVER|OVERLAY)|TABLE.*(?:TOP|TOPPER|COVER).*LEGACY|PROTECTIVE.*(?:TOP|COVER)|TABLETOP|HOLOGRAM.*(?:TABLE|SURFACE)|TABLE.*OVERLAY/i;
+  const floatingLine = /WHITE.?LINE|BLINK|FLASH|FLOATING.*LINE|GUIDE.?LINE|PHASE441_TABLE_SAFE_DECALS/i;
+  window.__SVR_SCENE__?.traverse?.(object => {
+    if (!object?.parent || object.visible === false || isRuntimeVisual(object, runtime)) return;
+    const label = String(object.name || '') + ' ' + String(object.material?.name || '');
+    if (tableClutter.test(label)) counts.tables++;
+    if (floatingLine.test(label)) counts.floatingLines++;
+  });
+  return counts;
+}
+
 function hideLegacyUI() {
   document.querySelectorAll('#hud,#sceneNav,[id*="portal" i],[class*="portal" i],[id*="recovery" i],[class*="recovery" i],[id*="low-power" i],[class*="low-power" i]').forEach(element => {
     element.hidden = true;
@@ -37,18 +58,17 @@ function sweep(reason = 'guard') {
     const runtime = window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE;
     const player = window.__SVR_SCENE__?.getObjectByName?.('PHASE444_SINGLE_HEADS_UP_PLAYER');
     const qa446 = window.SVR_PHASE446_QA?.() || {};
-    const extraTables = Number(qa446.extraTableLikeVisible || 0);
-    const extraOverlays = Number(qa446.overlayLikeVisible || 0);
+    const clutter = visibleClutterCounts(runtime);
 
     state.roomReady = Boolean(room?.visible !== false && room?.parent);
     state.ericReady = Boolean(runtime?.dealer?.loaded && runtime?.dealer?.group?.visible !== false);
     state.playerReady = Boolean(player?.visible !== false && player?.parent);
-    state.seated = Boolean(qa446.seatLocked || qa446.seated || window.SVR_TELEPORT_DISABLED);
-    state.duplicates = extraTables + extraOverlays;
-    state.installed = state.roomReady && state.ericReady && state.playerReady && state.seated && state.duplicates === 0;
+    state.seated = Boolean(qa446.pass && qa446.seated && qa446.approvedTableVisible && qa446.approvedEricVisible);
+    state.duplicates = clutter.tables + clutter.floatingLines;
+    state.installed = state.roomReady && state.ericReady && state.playerReady && state.seated && state.duplicates === 0 && window.SVR_TELEPORT_DISABLED === true && window.SVR_TELEPORT_ENABLED === false && window.SVR_MOVEMENT_ENABLED === false;
     state.lastError = null;
     state.checkedAt = new Date().toISOString();
-    window.SVR_PHASE455_STATE = { ...state, reason, visibleEric: countVisible(/ERIC/i), visiblePlayer: countVisible(/PHASE444_SINGLE_HEADS_UP_PLAYER/) };
+    window.SVR_PHASE455_STATE = { ...state, reason, clutter, phase446: qa446, visibleEric: countVisible(/ERIC/i), visiblePlayer: countVisible(/PHASE444_SINGLE_HEADS_UP_PLAYER/) };
     return qa();
   } catch (error) {
     state.lastError = String(error?.stack || error?.message || error);
