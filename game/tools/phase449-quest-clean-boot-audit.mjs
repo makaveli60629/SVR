@@ -11,7 +11,8 @@ const clearance = fs.readFileSync('game/modules/phase441_quest_table_clearance_p
 
 assert.match(game,/Preparing your poker table automatically/);
 assert.match(game,/Table ready\. Press VR GAME ON/);
-assert.match(game,/body:not\(\.quest-ready\) #svr364Xr/);\nassert.doesNotMatch(game,/\.quest-direct #safeStage/);
+assert.match(game,/body:not\(\.quest-ready\) #svr364Xr/);
+assert.doesNotMatch(game,/\.quest-direct #safeStage/);
 assert.match(game,/phase449_quest_clean_boot_teleport_height_lock\.js/);
 assert.match(quest,/phase453/);
 assert.match(game,/phase453_quest_direct_table_room_lock\.js/);
