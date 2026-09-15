@@ -7,6 +7,7 @@ const lock = fs.readFileSync('game/modules/phase449_quest_clean_boot_teleport_he
 const seat = fs.readFileSync('game/modules/phase446_quest_lab_table_seat_lock.js','utf8');
 const room = fs.readFileSync('game/modules/phase453_quest_direct_table_room_lock.js','utf8');
 const loader = fs.readFileSync('game/modules/phase340_platform_core_loader.js','utf8');
+const clearance = fs.readFileSync('game/modules/phase441_quest_table_clearance_polish.js','utf8');
 
 assert.match(game,/Preparing your poker table automatically/);
 assert.match(game,/Table ready\. Enter VR/);
@@ -32,5 +33,11 @@ assert.match(seat,/PHASE441_TABLE_SAFE_DECALS/);
 assert.match(seat,/clearFloatingTableLines/);
 const clutterPattern = seat.match(/const TABLE_CLUTTER = \/(.+)\/i;/)?.[1] || '';
 for (const gameplayName of ['CARD','CHIP','POT','LABEL','INTERACTION']) assert.equal(clutterPattern.split('|').includes(gameplayName),false,'cleanup must preserve '+gameplayName);
+assert.match(game,/phase441_quest_table_clearance_polish\.js\?v=phase457/);
+assert.match(clearance,/svrPhase457SurfaceInterferenceRemoved/);
+assert.match(clearance,/remainingInterferingSurfaces === 0/);
+assert.match(clearance,/state\.surfaceClear/);
+assert.match(clearance,/touchesSurfaceBand/);
+assert.match(clearance,/mesh\.visible = false/);
 assert.doesNotMatch(game,/>RETRY GAME<\/button>/);
-console.log('PHASE-453-QUEST-DIRECT-TABLE-ROOM-LOCK audit passed.');
+console.log('PHASE-457-QUEST-TABLE-SURFACE-CLEARANCE audit passed.');
