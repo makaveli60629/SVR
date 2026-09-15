@@ -53,7 +53,8 @@ function sweep() {
   keep = remaining[0] || null;
   if (keep) {
     keep.dataset.svr365VrAuthority = '1';
-    keep.setAttribute('aria-label', 'Enter SVR Poker VR');
+    if (!keep.disabled) keep.textContent = 'VR GAME ON';
+    keep.setAttribute('aria-label', 'Start SVR Poker VR game');
   }
 
   state.sweeps += 1;
@@ -70,7 +71,8 @@ function qa() {
     ...state,
     customVrButtons,
     oldVrButtons,
-    pass: QUEST && customVrButtons === 1 && oldVrButtons === 0,
+    centeredLabel: document.querySelector('#svr364EnterVr')?.textContent || null,
+    pass: QUEST && customVrButtons === 1 && oldVrButtons === 0 && ['VR GAME ON','ENTERING VR…'].includes(document.querySelector('#svr364EnterVr')?.textContent || ''),
     checkedAt: new Date().toISOString()
   };
   window.SVR_PHASE365_QUEST_VR_BUTTON_QA_STATE = result;
