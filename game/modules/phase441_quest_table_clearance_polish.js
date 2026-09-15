@@ -25,6 +25,8 @@ const state = {
   floatingBrandingPlaneDisabled: false,
   protectiveCoversHidden: 0,
   broadOverlayMeshesHidden: 0,
+  remainingInterferingSurfaces: 0,
+  surfaceClear: false,
   tableScaleFactor: TABLE_SCALE_FACTOR,
   chipShelfInsetMeters: CHIP_SHELF_INSET_METERS,
   chipShelfInsetInches: CHIP_SHELF_INSET_METERS / 0.0254,
@@ -169,21 +171,57 @@ function hideApprovedFloatingCover(table) {
   if (table.brandingGroup) table.brandingGroup.visible = false;
 
   const feltBox = getFeltBox(table);
-  if (!feltBox) return;
+  if (!feltBox) {
+    state.surfaceClear = false;
+    return;
+  }
   const feltSize = feltBox.getSize(new THREE.Vector3());
+  const feltCenter = feltBox.getCenter(new THREE.Vector3());
   let hidden = 0;
+  let remaining = 0;
   table.table?.traverse?.(object => {
-    if (!object?.isMesh || object.userData?.svrNativeFelt || object.userData?.svrHandRest || object.userData?.svrHiddenTopCover) return;
-    const name = `${object.name || ''} ${object.material?.name || ''}`.toLowerCase();
-    if (!/(cover|protector|overlay|top.?sheet|presentation)/.test(name)) return;
-    const box = new THREE.Box3().setFromObject(object);
-    const size = box.getSize(new THREE.Vector3());
-    if (size.x >= feltSize.x * 0.58 && size.z >= feltSize.z * 0.58 && box.min.y > feltBox.max.y + 0.002) {
+    if (!object?.isMesh || object.userData?.svrNativeFelt || object.userData?.svrHandRest) return;
+    if (object.userData?.svrHiddenTopCover) {
       object.visible = false;
       hidden += 1;
+      return;
     }
+    const name = `${object.name || ''} ${object.material?.name || ''}`.toLowerCase();
+    const box = new THREE.Box3().setFromObject(object);
+    if (box.isEmpty()) return;
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const coversFelt = size.x >= feltSize.x * 0.58 && size.z >= feltSize.z * 0.58;
+    const nearlyFullCover = size.x >= feltSize.x * 0.78 && size.z >= feltSize.z * 0.78;
+    const flat = size.y <= Math.max(0.055, feltSize.y * 4);
+    const touchesSurfaceBand = box.max.y >= feltBox.max.y - 0.018 && box.min.y <= feltBox.max.y + 0.16;
+    const aboveFeltCenter = center.y >= feltCenter.y;
+    const suspiciousName = /(cover|protector|overlay|top.?sheet|presentation|glass|lid|topper)/.test(name);
+    const interfering = coversFelt && flat && touchesSurfaceBand && (suspiciousName || (nearlyFullCover && aboveFeltCenter));
+    if (!interfering) return;
+    object.visible = false;
+    object.userData = { ...(object.userData || {}), svrHiddenTopCover: true, svrPhase457SurfaceInterferenceRemoved: true };
+    if (!table.hiddenCoverRecords.includes(object)) table.hiddenCoverRecords.push(object);
+    hidden += 1;
   });
+  table.table?.traverse?.(object => {
+    if (!object?.isMesh || object.visible === false || object.userData?.svrNativeFelt || object.userData?.svrHandRest) return;
+    const box = new THREE.Box3().setFromObject(object);
+    if (box.isEmpty()) return;
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const stillInterfering = size.x >= feltSize.x * 0.58
+      && size.z >= feltSize.z * 0.58
+      && size.y <= Math.max(0.055, feltSize.y * 4)
+      && box.max.y >= feltBox.max.y - 0.018
+      && box.min.y <= feltBox.max.y + 0.16
+      && center.y >= feltCenter.y;
+    if (stillInterfering) remaining += 1;
+  });
+  state.protectiveCoversHidden = Math.max(state.protectiveCoversHidden, (table.hiddenCoverRecords || []).filter(mesh => mesh.visible === false).length);
   state.broadOverlayMeshesHidden = hidden;
+  state.remainingInterferingSurfaces = remaining;
+  state.surfaceClear = remaining === 0;
 }
 
 function scaleAndHipAlign(table, dealer) {
@@ -352,6 +390,8 @@ function qa() {
     state.installed
     && state.floatingBrandingPlaneDisabled
     && state.protectiveCoversHidden >= 1
+    && state.surfaceClear
+    && state.remainingInterferingSurfaces === 0
     && state.tableScaled
     && state.hipAligned
     && state.passLineVisible

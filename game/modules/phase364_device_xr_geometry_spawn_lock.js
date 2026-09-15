@@ -483,8 +483,8 @@ function bindSession(session) {
     clearTimeout(safetyTimer);
     xrButton.hidden = false;
     xrButton.disabled = false;
-    xrButton.textContent = 'ENTER VR';
-    message('VR session ended. Press ENTER VR to retry.', true);
+    xrButton.textContent = 'VR GAME ON';
+    message('VR session ended. Press VR GAME ON to retry.', true);
   }, { once: true });
 }
 
@@ -508,7 +508,7 @@ async function enterVr() {
     state.lastXrError = String(error?.message || error);
     xrButton.disabled = false;
     xrButton.hidden = false;
-    xrButton.textContent = 'ENTER VR';
+    xrButton.textContent = 'VR GAME ON';
     message(`VR entry failed: ${state.lastXrError}`, true);
     return false;
   }
@@ -519,11 +519,11 @@ async function ensureVrUi() {
   removeOldVrButtons();
   const style = document.createElement('style');
   style.id = 'svr364XrStyle';
-  style.textContent = '#svr364Xr{position:fixed;left:50%;top:max(14px,env(safe-area-inset-top));transform:translateX(-50%);z-index:2147483646;display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid #7ffcff;border-radius:16px;background:rgba(2,8,18,.9);font-family:system-ui}#svr364EnterVr{padding:12px 18px;border:1px solid #ffd98a;border-radius:12px;background:#09131d;color:#fff;font-weight:900}#svr364XrMessage{max-width:290px;font-size:11px;color:#d8faff}body.svr364-xr-active #svr364Xr{display:none!important}';
+  style.textContent = '#svr364Xr{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2147483646;display:flex;align-items:center;justify-content:center;font-family:system-ui}body:not(.quest-ready) #svr364Xr{display:none!important}#svr364EnterVr{min-width:220px;padding:18px 28px;border:2px solid #7ffcff;border-radius:18px;background:linear-gradient(135deg,#24103f,#07151f);color:#fff;font-size:20px;font-weight:950;letter-spacing:.08em;box-shadow:0 0 34px rgba(127,252,255,.36)}#svr364XrMessage{display:none!important}body.svr364-xr-active #svr364Xr{display:none!important}';
   document.head.appendChild(style);
   const root = document.createElement('div');
   root.id = 'svr364Xr';
-  root.innerHTML = '<button id="svr364EnterVr">ENTER VR</button><span id="svr364XrMessage">Quest ready. You will start beside the poker table.</span>';
+  root.innerHTML = '<button id="svr364EnterVr">VR GAME ON</button><span id="svr364XrMessage" aria-hidden="true"></span>';
   document.body.appendChild(root);
   xrButton = root.querySelector('#svr364EnterVr');
   xrMessage = root.querySelector('#svr364XrMessage');
