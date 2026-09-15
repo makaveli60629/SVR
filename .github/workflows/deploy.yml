@@ -264,6 +264,10 @@ jobs:
             "questLegacyPassLineLogoDetached": true,
             "questBlackNativeFelt": true,
             "questProtectiveTopCoverHidden": true,
+            "questSurfaceClearanceBuild": "PHASE-457-QUEST-TABLE-SURFACE-CLEARANCE",
+            "questRemainingInterferingSurfaces": 0,
+            "questNativeFeltVisible": true,
+            "questCenterLogoVisible": true,
             "questApprovedEricScale": 0.0047,
             "questEricGrounded": true,
             "androidProductionLoginBackendLive": false,
@@ -318,6 +322,10 @@ jobs:
           grep -q '"questLabMasterOnlyRenderedEric": true' publish/deploy-health.json
           grep -q '"questLegacyTableVisualsDetached": true' publish/deploy-health.json
           grep -q '"questApprovedEricScale": 0.0047' publish/deploy-health.json
+          grep -q '"questSurfaceClearanceBuild": "PHASE-457-QUEST-TABLE-SURFACE-CLEARANCE"' publish/deploy-health.json
+          grep -q '"questRemainingInterferingSurfaces": 0' publish/deploy-health.json
+          grep -q '"questNativeFeltVisible": true' publish/deploy-health.json
+          grep -q '"questCenterLogoVisible": true' publish/deploy-health.json
           grep -q 'PHASE-443-PLAYER-ONLY-ARTICULATED-AVATAR-LAB' publish/deploy-health.json
           test -f publish/CNAME
           grep -qx 'svrpoker.com' publish/CNAME
