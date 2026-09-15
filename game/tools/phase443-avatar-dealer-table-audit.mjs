@@ -26,7 +26,7 @@ check('card leaves Eric hand', /detail\.origin/.test(dealerLab) && /getHandWorld
 check('dealer visibility guard', /this\.group\.visible = true; this\.propGroup\.visible = true/.test(dealer));
 check('3.75-inch chip shelf', /CHIP_SHELF_INSET_METERS = 0\.09525/.test(table) && /size\.x \* 0\.5 - CHIP_SHELF_INSET_METERS/.test(table));
 check('center logo authoritative', /CENTER_SVR_LOGO/.test(table) && /logo\.png/.test(table) && /logo\.renderOrder = 60/.test(table));
-check('production cache advanced', /phase441_quest_table_clearance_polish\.js\?v=phase444/.test(game) && /patch=phase444/.test(game));
+check('production cache advanced', /phase441_quest_table_clearance_polish\.js\?v=phase457/.test(game) && /patch=phase444/.test(game));
 check('avatar demonstrates movement', /avatar\.setMotion\('walking'\)/.test(avatarJs));
 check('Eric asset cache refreshed', /eric\.fbx.*phase444/.test(dealer));
 check('logo forced above felt', /depthTest = false/.test(read('game/labs/dealer/table-surface-authority-phase437.js')) && /renderOrder = 70/.test(read('game/labs/dealer/table-surface-authority-phase437.js')));
