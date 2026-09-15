@@ -10,8 +10,8 @@ const loader = fs.readFileSync('game/modules/phase340_platform_core_loader.js','
 const clearance = fs.readFileSync('game/modules/phase441_quest_table_clearance_polish.js','utf8');
 
 assert.match(game,/Preparing your poker table automatically/);
-assert.match(game,/Table ready\. Enter VR/);
-assert.doesNotMatch(game,/\.quest-direct #safeStage/);
+assert.match(game,/Table ready\. Press VR GAME ON/);
+assert.match(game,/body:not\(\.quest-ready\) #svr364Xr/);\nassert.doesNotMatch(game,/\.quest-direct #safeStage/);
 assert.match(game,/phase449_quest_clean_boot_teleport_height_lock\.js/);
 assert.match(quest,/phase453/);
 assert.match(game,/phase453_quest_direct_table_room_lock\.js/);
