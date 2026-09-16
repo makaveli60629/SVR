@@ -37,6 +37,9 @@ function installLocks() {
   const table = runtime?.table;
   const line = window.SVR_PHASE441_QA?.()?.passLine;
   if (!table?.table || !line) return false;
+  // The seat module can rotate/resize the table after installation.
+  // Resolve the current fitted line at interaction time, not the boot snapshot.
+  const currentLine = () => window.SVR_PHASE441_QA?.()?.passLine || line;
 
   lockFalse(table.presentationGroup);
   lockFalse(table.brandingGroup);
@@ -45,17 +48,17 @@ function installLocks() {
   for (const cover of table.hiddenCoverRecords || []) lockFalse(cover);
 
   try {
-    const lineGetter = () => () => ({ ...line });
+    const lineGetter = () => () => ({ ...currentLine() });
     lineGetter.__svrPhase441Locked = true;
     Object.defineProperty(table, 'getBettingLine', { configurable: true, enumerable: true, get: lineGetter, set: () => {} });
-  } catch { table.getBettingLine = () => ({ ...line }); }
+  } catch { table.getBettingLine = () => ({ ...currentLine() }); }
 
   if (runtime.interaction) {
     try {
-      const actionGetter = () => position => roundedRectContains(position, line);
+      const actionGetter = () => position => roundedRectContains(position, currentLine());
       actionGetter.__svrPhase441Locked = true;
       Object.defineProperty(runtime.interaction, 'isPastLine', { configurable: true, enumerable: true, get: actionGetter, set: () => {} });
-    } catch { runtime.interaction.isPastLine = position => roundedRectContains(position, line); }
+    } catch { runtime.interaction.isPastLine = position => roundedRectContains(position, currentLine()); }
   }
 
   installed = true;
