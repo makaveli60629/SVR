@@ -289,6 +289,10 @@ async function rebuildDecals(table) {
   const y = feltBox.max.y + DECAL_LIFT;
   const signature = [center.x, center.z, y, halfWidth, halfDepth, cornerRadius].map(v => Number(v).toFixed(4)).join('|');
   if (signature === lastSignature && decalGroup?.children?.length) return true;
+  // Load before changing the scene; overlapping guard sweeps must not append
+  // a second logo or leave a half-built decal group while the texture loads.
+  const texture = await getLogoTexture();
+  if (signature === lastSignature && decalGroup?.children?.length) return true;
   lastSignature = signature;
 
   if (!decalGroup) {
@@ -326,7 +330,7 @@ async function rebuildDecals(table) {
 
   const logo = new THREE.Mesh(
     new THREE.PlaneGeometry(size.x * 0.40, size.z * 0.35),
-    new THREE.MeshBasicMaterial({ map: await getLogoTexture(), transparent: true, alphaTest: 0.025, depthTest: false, depthWrite: false, toneMapped: false, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.025, depthTest: true, depthWrite: false, toneMapped: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -6 })
   );
   logo.name = 'PHASE441_CENTER_SVR_LOGO';
   logo.rotation.x = -Math.PI / 2;

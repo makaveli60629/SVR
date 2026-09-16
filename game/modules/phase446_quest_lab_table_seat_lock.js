@@ -103,8 +103,10 @@ function clearFloatingTableLines() {
   const info = bounds(); if (!info || !scene) return;
   const decalRoot = scene.getObjectByName?.('PHASE441_TABLE_SAFE_DECALS');
   if (decalRoot) {
-    decalRoot.visible = false;
-    decalRoot.userData = { ...(decalRoot.userData || {}), svrPhase452Removed: true };
+    // These decals are fitted to the native felt by the surface authority.
+    // Hiding this root also removed the approved center logo and betting line.
+    decalRoot.visible = true;
+    delete decalRoot.userData.svrPhase452Removed;
   }
   scene.traverse(object => {
     if (!object?.isMesh || !visible(object) || GAMEPLAY_VISUAL.test(String(object.name || ''))) return;

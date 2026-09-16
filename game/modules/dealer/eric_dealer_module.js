@@ -62,6 +62,7 @@ export class EricDealerModule extends EventTarget {
     this.mixer = null;
     this.idleAction = null;
     this.bones = new Map();
+    this.baseRotations = new Map();
     this.meshMaterials = new Map();
     this.deckProp = null;
     this.dealCardProp = null;
@@ -102,7 +103,10 @@ export class EricDealerModule extends EventTarget {
           obj.material = material;
           this.meshMaterials.set(obj.uuid, material);
         }
-        if (obj.isBone) this.bones.set(canonicalBoneName(obj.name), obj);
+        if (obj.isBone) {
+          this.bones.set(canonicalBoneName(obj.name), obj);
+          this.baseRotations.set(obj, obj.quaternion.clone());
+        }
       });
       this.model = model;
       this.group.add(model);
@@ -275,7 +279,11 @@ export class EricDealerModule extends EventTarget {
   update(dt, elapsed) {
     if (!this.loaded || this.paused) return;
     this.group.visible = true; this.propGroup.visible = true;
+    // Procedural offsets are relative poses, not cumulative rotations.
+    // Reset even untracked bones when an idle clip is missing or incomplete.
+    for (const [bone, rotation] of this.baseRotations) bone.quaternion.copy(rotation);
     if (this.mixer) this.mixer.update(dt);
+    for (const [bone, rotation] of this.baseRotations) rotation.copy(bone.quaternion);
     this.applyReadyPose();
 
     if (this.mode === 'idle') {
