@@ -64,10 +64,10 @@ function context(extra = {}) {
 
   // Real controller fallback: no metacarpal joints are required. The proxy
   // carries a tracked controller transform plus synthetic fingertip joints.
-  const controllerObject = new THREE.Group(); controllerObject.position.set(-.2,1.1,.1); scene.add(controllerObject);
+  const controllerObject = new THREE.Group(); controllerObject.position.set(-.2,1.1,.1); c.scene.add(controllerObject);
   const proxy = new THREE.Group(); proxy.userData.controller=controllerObject; proxy.userData.trigger=0; proxy.joints={};
   for (const name of ['wrist','index-finger-tip','thumb-tip']) { const j=new THREE.Object3D(); proxy.joints[name]=j; proxy.add(j); }
-  scene.add(proxy);
+  c.scene.add(proxy);
   c.inputs.leftController = proxy;
   c.window.testFrame();
   assert.equal(watch.visible, true, 'controller proxy restores the watch without metacarpal hand joints');
