@@ -1,0 +1,134 @@
+/* PHASE-460-QUEST-VR-VISIBLE-REPAIR */
+import * as THREE from 'three';
+import { clearQuestTableObstructions } from './quest_table_clearance.js?v=phase460';
+
+export const BUILD = 'PHASE-460-QUEST-VR-VISIBLE-REPAIR';
+const params = new URLSearchParams(location.search);
+const ACTIVE = params.get('platform') === 'quest' || params.get('tableonly') === '1' || /Quest|Oculus|Meta Quest/i.test(navigator.userAgent || '');
+const LEGACY = /LOBBY|STOREFRONT|PORTAL|ATRIUM|GIVEAWAY|MOON|MARS|SKYLINE|BUILDING|BALCONY|LOUNGE|HUB/i;
+const KEEP = /PHASE453_DIRECT_TABLE_ROOM|PHASE441_TABLE_SAFE_DECALS|PHASE441_PASS_LINE|PHASE441_CENTER_SVR_LOGO|CARD|CHIP|POT|HAND|PLAYER|ERIC|SVR_WRIST_WATCH/i;
+const state = { build: BUILD, active: ACTIVE, installed: false, watchGuarded: false, hiddenLegacy: 0, clearance: null, lastError: null, checkedAt: null };
+let timer = 0;
+
+function effectiveVisible(object){
+  for (let p = object; p; p = p.parent) if (p.visible === false) return false;
+  return Boolean(object?.parent);
+}
+
+function hideLegacy(){
+  const scene = window.__SVR_SCENE__;
+  if (!scene) return 0;
+  let hidden = 0;
+  for (const object of [...scene.children]){
+    if (!object || KEEP.test(String(object.name || ''))) continue;
+    if (LEGACY.test(String(object.name || '')) && effectiveVisible(object)){
+      object.visible = false;
+      object.userData = { ...(object.userData || {}), svrPhase460LegacyHidden:true, build:BUILD };
+      hidden++;
+    }
+  }
+  state.hiddenLegacy = Math.max(state.hiddenLegacy, hidden);
+  return hidden;
+}
+
+function cameraFacingPose(source, side = 'left'){
+  const renderer = window.__SVR_RENDERER__;
+  const camera = window.__SVR_CAMERA__;
+  const controller = source?.userData?.controller || source;
+  if (!controller?.getWorldPosition || !controller?.getWorldQuaternion || !camera) return null;
+  const position = controller.getWorldPosition(new THREE.Vector3());
+  const q = controller.getWorldQuaternion(new THREE.Quaternion());
+  position.add(new THREE.Vector3(side === 'left' ? -0.055 : 0.055, 0.048, -0.065).applyQuaternion(q));
+  const activeCamera = renderer?.xr?.isPresenting ? renderer.xr.getCamera(camera) : camera;
+  const cam = activeCamera.getWorldPosition(new THREE.Vector3());
+  const z = cam.sub(position).normalize();
+  const up = new THREE.Vector3(0,1,0);
+  const x = new THREE.Vector3().crossVectors(up,z);
+  if (x.lengthSq() < 1e-6) x.set(1,0,0); else x.normalize();
+  const y = new THREE.Vector3().crossVectors(z,x).normalize();
+  const matrix = new THREE.Matrix4().makeBasis(x,y,z);
+  return { position, quaternion:new THREE.Quaternion().setFromRotationMatrix(matrix) };
+}
+
+function guardWatch(){
+  const watch = window.SVR_WRIST_WATCH;
+  if (!watch?.object || typeof watch.update !== 'function' || watch.__svrPhase460Wrapped) return false;
+  const original = watch.update.bind(watch);
+  watch.update = (dt, input, legacyRightHand) => {
+    original(dt, input, legacyRightHand);
+    if (!window.__SVR_RENDERER__?.xr?.isPresenting) return;
+    const leftController = input?.leftController;
+    const rightController = input?.rightController;
+    const source = leftController || rightController;
+    if (!source) return;
+    const pose = cameraFacingPose(source, leftController ? 'left' : 'right');
+    if (!pose) return;
+    const object = watch.object;
+    if (!object.visible || !Number.isFinite(object.position.x) || object.position.distanceTo(pose.position) > 0.20){
+      object.visible = true;
+      object.position.copy(pose.position);
+      object.quaternion.copy(pose.quaternion);
+      object.updateMatrixWorld(true);
+    }
+  };
+  watch.__svrPhase460Wrapped = true;
+  state.watchGuarded = true;
+  return true;
+}
+
+function sweep(reason = 'guard'){
+  if (!ACTIVE) return false;
+  try {
+    const scene = window.__SVR_SCENE__;
+    const runtime = window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE;
+    if (!scene || !runtime?.table?.table) return false;
+    hideLegacy();
+    guardWatch();
+    state.clearance = clearQuestTableObstructions(scene, runtime);
+    const room = scene.getObjectByName?.('PHASE453_DIRECT_TABLE_ROOM');
+    if (room) room.visible = true;
+    runtime.table.group.visible = true;
+    runtime.table.table.visible = true;
+    state.installed = true;
+    state.lastError = null;
+    state.checkedAt = new Date().toISOString();
+    window.SVR_PHASE460_STATE = { ...state, reason };
+    return qa();
+  } catch (error){
+    state.lastError = String(error?.stack || error?.message || error);
+    state.checkedAt = new Date().toISOString();
+    window.SVR_PHASE460_STATE = { ...state, reason };
+    return false;
+  }
+}
+
+function qa(){
+  const scene = window.__SVR_SCENE__;
+  const room = scene?.getObjectByName?.('PHASE453_DIRECT_TABLE_ROOM');
+  return {
+    ...state,
+    roomVisible: Boolean(room?.visible !== false && room?.parent),
+    watchObjectPresent: Boolean(window.SVR_WRIST_WATCH?.object),
+    pass: Boolean(state.installed && state.watchGuarded && room?.visible !== false && !state.lastError),
+    checkedAt: new Date().toISOString()
+  };
+}
+
+async function install(){
+  if (!ACTIVE) return false;
+  const started = performance.now();
+  while (performance.now() - started < 30000){
+    if (window.__SVR_SCENE__ && (window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE)?.table?.table) break;
+    await new Promise(resolve => setTimeout(resolve, 80));
+  }
+  sweep('install');
+  window.__SVR_RENDERER__?.xr?.addEventListener?.('sessionstart', () => setTimeout(() => sweep('xr-sessionstart'), 120));
+  for (const delay of [150, 400, 900, 1800, 3500]) setTimeout(() => sweep(`settle-${delay}`), delay);
+  if (!timer) timer = window.setInterval(() => sweep('guard'), 350);
+  return qa();
+}
+
+window.SVR_PHASE460_SWEEP = sweep;
+window.SVR_PHASE460_QA = qa;
+window.SVR_PHASE460_READY_PROMISE = install();
+addEventListener('beforeunload', () => { if (timer) clearInterval(timer); }, { once:true });
