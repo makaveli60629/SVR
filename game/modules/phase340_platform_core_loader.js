@@ -5,7 +5,7 @@ import {
   manifestFor,
   deferredManifestFor,
   validateManifest
-} from './phase340_platform_manifest.js';
+} from './phase340_platform_manifest.js?v=phase459';
 
 const state = {
   build: BUILD,
@@ -48,7 +48,7 @@ function status(message) {
 
 function moduleUrl(path) {
   const url = new URL(path, document.baseURI);
-  url.searchParams.set('v', VERSION);
+  url.searchParams.set('v', ['main.js', 'modules/phase364_device_xr_geometry_spawn_lock.js'].includes(path) ? 'phase459' : VERSION);
   return url.href;
 }
 
