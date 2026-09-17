@@ -1,5 +1,6 @@
 /* PHASE-446-QUEST-LAB-TABLE-SEAT-LOCK */
 import * as THREE from 'three';
+import { clearQuestTableObstructions } from './quest_table_clearance.js?v=phase459';
 
 export const BUILD = 'PHASE-446-QUEST-LAB-TABLE-SEAT-LOCK';
 const query = new URLSearchParams(location.search);
@@ -11,7 +12,7 @@ const TELEPORT_VISUAL = /TELEPORT|TARGET.?RING|POINTER|RETICLE|PARTICLE.*ARC|ARC
 const state = { build: BUILD, active: ACTIVE, installed: false, tabletopRootsHidden: 0, faceObjectsHidden: 0, teleportObjectsHidden: 0, seated: false, seatApplications: 0, lastError: null, checkedAt: null };
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const tableBox = new THREE.Box3(), objectBox = new THREE.Box3(), size = new THREE.Vector3(), center = new THREE.Vector3(), head = new THREE.Vector3(), world = new THREE.Vector3();
-let scene, renderer, camera, runtime, seatPose, timer = 0, seatY = -0.42;
+let scene, renderer, camera, runtime, seatPose, timer = 0, seatY = -0.42, settleUntil = 0;
 const TARGET_EYE_ABOVE_TABLE = 0.66;
 const PLAYER_RAIL_GAP = 0.16;
 const QUEST_TABLE_SCALE_TRIM = 0.96;
@@ -21,6 +22,7 @@ const FLOATING_LINE = /PHASE441_TABLE_SAFE_DECALS|PASS.?LINE|WHITE.?LINE|BLINK|F
 function visible(object) { for (let o = object; o; o = o.parent) if (o.visible === false) return false; return Boolean(object?.parent); }
 function kept(object) {
   for (let o = object; o; o = o.parent) {
+    if (o.userData?.svrUserInterface) return true;
     if (o === runtime?.table?.group || o === runtime?.table?.table || o === runtime?.dealer?.group || o === runtime?.dealer?.propGroup) return true;
     if (KEEP.test(String(o.name || '')) || o.userData?.svrPhase440Approved || o.userData?.svrPhase441Approved) return true;
   }
@@ -97,7 +99,7 @@ function alignTableAndSeat() {
   const projectedHalfExtent = Math.abs(playerSide.x) * info.size.x * .5 + Math.abs(playerSide.z) * info.size.z * .5;
   const position = info.center.clone().addScaledVector(playerSide, projectedHalfExtent + PLAYER_RAIL_GAP);
   position.y = 0;
-  return { position, yaw: Math.atan2(info.center.x - position.x, info.center.z - position.z) };
+  return { position, yaw: Math.atan2(position.x - info.center.x, position.z - info.center.z) };
 }
 function clearFloatingTableLines() {
   const info = bounds(); if (!info || !scene) return;
@@ -125,6 +127,7 @@ function computeSeat() { return alignTableAndSeat(); }
 function seat(reason = 'guard') {
   const rig = window.SVR_TELEPORT_RIG_REF || window.SVR_TELEPORT_RIG;
   seatPose ||= computeSeat(); if (!rig?.setPlayerPose || !seatPose) return false;
+  if (state.seated && performance.now() > settleUntil) return true;
   const info = bounds();
   if (renderer?.xr?.isPresenting && info && camera) {
     const xr = renderer.xr.getCamera(camera), eye = xr?.cameras?.[0] || xr || camera;
@@ -133,6 +136,11 @@ function seat(reason = 'guard') {
     if (Number.isFinite(currentGap)) seatY = THREE.MathUtils.clamp(seatY + THREE.MathUtils.clamp(TARGET_EYE_ABOVE_TABLE - currentGap, -.10, .10) * .35, -.62, .12);
   }
   rig.setPlayerPose(seatPose.position.x, seatY, seatPose.position.z); rig.setPlayerYaw?.(seatPose.yaw);
+  if (!renderer?.xr?.isPresenting && info && camera) {
+    camera.position.set(seatPose.position.x, info.box.max.y + TARGET_EYE_ABOVE_TABLE, seatPose.position.z);
+    camera.lookAt(info.center.x, info.box.max.y, info.center.z);
+  }
+  window.SVR_QUEST_SEAT_OWNER = 'phase446';
   state.seated = true; state.seatY = Number(seatY.toFixed(3)); state.targetEyeAboveTable = TARGET_EYE_ABOVE_TABLE; state.seatApplications++; state.lastSeatReason = reason; return true;
 }
 function qa() {
@@ -144,6 +152,7 @@ function sweep(reason = 'guard') {
     runtime = window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE || runtime;
     if (!scene || !runtime?.table?.table || !runtime?.dealer?.loaded) return false;
     disableTeleport(); alignTableAndSeat(); clearTableArea(); clearFloatingTableLines(); clearFace(); seat(reason);
+    state.clearance = clearQuestTableObstructions(scene, runtime);
     runtime.table.group.visible = true; runtime.table.table.visible = true; runtime.dealer.group.visible = true; if (runtime.dealer.model) runtime.dealer.model.visible = true;
     state.installed = state.seated; state.lastError = null; state.checkedAt = new Date().toISOString(); window.SVR_PHASE446_STATE = { ...state, reason }; return qa();
   } catch (error) { state.lastError = String(error?.stack || error?.message || error); state.checkedAt = new Date().toISOString(); return false; }
@@ -155,7 +164,8 @@ async function install() {
     runtime = window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE; scene = window.__SVR_SCENE__; renderer = window.__SVR_RENDERER__; camera = window.__SVR_CAMERA__;
     if (runtime?.table?.table && runtime?.dealer?.loaded && scene && renderer) break; await wait(80);
   }
-  sweep('install'); renderer?.xr?.addEventListener?.('sessionstart', () => { seatPose = null; setTimeout(() => sweep('xr-sessionstart'), 350); });
+  sweep('install'); renderer?.xr?.addEventListener?.('sessionstart', () => { seatPose = null; state.seated = false; settleUntil = performance.now() + 1600; setTimeout(() => sweep('xr-sessionstart'), 350); });
+  renderer?.xr?.addEventListener?.('sessionend', () => { seatPose = null; state.seated = false; settleUntil = 0; sweep('xr-sessionend'); });
   for (const delay of [100, 300, 700, 1500, 3000, 6000]) setTimeout(() => sweep(`settle-${delay}`), delay);
   if (!timer) timer = window.setInterval(() => sweep('guard'), 250); return qa();
 }

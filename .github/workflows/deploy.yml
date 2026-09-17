@@ -138,12 +138,12 @@ jobs:
           grep -q 'phase455_quest_table_first_lobby.js' source/game/index.html
           grep -q 'phase440-lab-master-hard-render' source/game/quest.html
           grep -q 'data-quest-polish-build="PHASE-440-LAB-MASTER-HARD-RENDER-LOCK"' source/game/index.html
-          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase422&patch=phase444' source/game/index.html
+          grep -Fq 'phase406_quest_side_burn_chip_polish.js?v=phase459&patch=phase444' source/game/index.html
           grep -q 'SVR_PHASE440_READY_PROMISE' source/game/index.html
           grep -q 'phase438_lab_master_lobby_dealer_authority.js?v=phase440&patch=phase444' source/game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase439_lab_only_lobby_render_authority.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase440_lab_master_hard_render_lock.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
-          grep -q 'phase422_quest_seated_inspection_lock.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
+          grep -q 'phase422_quest_seated_inspection_lock.js?v=phase459' source/game/modules/phase406_quest_side_burn_chip_polish.js
           grep -q 'phase422_quest_table_prop_alignment_flex_lock.js?v=phase440' source/game/modules/phase406_quest_side_burn_chip_polish.js
           if grep -q 'phase422_quest_table_geometry_theme_lock.js?v=phase422' source/game/modules/phase406_quest_side_burn_chip_polish.js; then
             echo 'Legacy Phase 422 visual table authority is active again.' >&2
@@ -174,6 +174,16 @@ jobs:
           (cd source && node game/tools/phase449-quest-clean-boot-audit.mjs)
           (cd source && node game/tools/phase450-deploy-gameplay-recovery-audit.mjs)
           (cd source && node game/tools/phase455-table-first-lobby-audit.mjs)
+
+      - name: Verify Quest watch, table world and surface behavior
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/svr-quest-tests" --no-save three@0.160.0
+          export NODE_PATH="$RUNNER_TEMP/svr-quest-tests/node_modules"
+          cd source
+          node game/tools/quest-watch-world-regression.cjs
+          node game/tools/quest-surface-motion-regression.cjs
 
       - name: Execute protected Phase 403 pot sanity
         shell: bash

@@ -103,7 +103,9 @@ export function manifestFor(platform = detectPlatform()) {
   const value = String(platform || '').toLowerCase();
   if (value === 'camera3') return unique(CAMERA3);
   if (value === 'android') return unique(ANDROID);
-  if (value === 'quest') return unique([...QUEST_FOUNDATION, ...QUEST_INTERACTION, ...QUEST_SETTLEMENT]);
+  // Quest has its own automatic progress/error UI. The old recovery modules
+  // build another lobby/renderer on a timer and can release the screen early.
+  if (value === 'quest') return unique([...QUEST_FOUNDATION, ...QUEST_INTERACTION, ...QUEST_SETTLEMENT].filter(path => !path.startsWith('phase101_')));
   return unique(DESKTOP);
 }
 

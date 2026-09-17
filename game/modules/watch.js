@@ -48,6 +48,7 @@ function computeForearmPose(hand, camera, renderer, side = 'left'){
   const forearmDir = V0.copy(wrist).sub(midpoint).normalize();
   let acrossPalm = V1.copy(index).sub(pinky).normalize();
   let faceNormal = V2.crossVectors(acrossPalm, forearmDir).normalize();
+  if (forearmDir.lengthSq() < .5 || faceNormal.lengthSq() < .5) return null;
 
   const activeCamera = getActiveCamera(camera, renderer);
   if (activeCamera){
@@ -57,7 +58,6 @@ function computeForearmPose(hand, camera, renderer, side = 'left'){
   }
 
   acrossPalm = new THREE.Vector3().crossVectors(faceNormal, forearmDir).normalize();
-  if (side === 'right') acrossPalm.multiplyScalar(-1);
 
   M0.makeBasis(forearmDir, acrossPalm, faceNormal);
   const quaternion = new THREE.Quaternion().setFromRotationMatrix(M0);
@@ -72,7 +72,7 @@ function computeForearmPose(hand, camera, renderer, side = 'left'){
   return { position, quaternion };
 }
 
-export function createWristWatch({ scene, camera = null, renderer = null, getState = ()=>({}), actions = {} }){
+export function createWristWatch({ scene, camera = null, renderer = null, getState = ()=>({}), actions = {}, tableOnly = false }){
   const canvas = document.createElement('canvas');
   canvas.width = 1024;
   canvas.height = 512;
@@ -83,6 +83,8 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   tex.anisotropy = 8;
 
   const group = new THREE.Group();
+  group.name = 'SVR_WRIST_WATCH';
+  group.userData.svrUserInterface = true;
   group.visible = false;
   scene.add(group);
 
@@ -144,9 +146,14 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
     ctx.restore();
   }
 
- function pokerState(){ return window.SVR_PHASE86_POKER_STATE || {}; }
+ function pokerState(){ return window.SVR_PHASE85_POKER_STATE || window.SVR_PHASE86_POKER_STATE || {}; }
  function pokerActionLabel(id){ return ({ pokerFold:'FOLD', pokerCheck:'CHECK', pokerCall:'CALL', pokerRaise:'RAISE', pokerAllIn:'ALL-IN', pokerNext:'NEXT' })[id] || id; }
  function buildButtons(state){
+   if (tableOnly) return ['pokerFold', 'pokerCheck', 'pokerCall', 'pokerRaise', 'pokerAllIn', 'pokerNext'].map((id, i) => ({
+     id, label: id === 'pokerNext' ? 'NEXT HAND' : pokerActionLabel(id),
+     x: 32 + (i % 3) * 328, y: 190 + Math.floor(i / 3) * 126,
+     w: 304, h: 104, font: 38, pinchOnly: true, hold: .18, margin: 4
+   }));
    const buttons = [
      { id: 'lobby', label: 'LOBBY', x: 24, y: 142, w: 110, h: 38, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
      { id: 'storeScene', label: 'STORE', x: 144, y: 142, w: 110, h: 38, font: 20, pinchOnly: true, hold: 0.16, margin: 6 },
@@ -224,6 +231,15 @@ let hoveredId = null;
     ctx.fillStyle = 'rgba(233,233,255,0.95)';
     ctx.font = 'bold 27px system-ui, Arial';
     ctx.fillText('SVR WRIST CONSOLE', 34, 105);
+    if (tableOnly) {
+      ctx.font = '26px system-ui, Arial';
+      ctx.fillStyle = '#dffcff';
+      ctx.fillText(`${(ps.phase || 'ready').toUpperCase()}  •  POT ${ps.pot ?? 0}  •  SEATED`, 34, 150);
+      for (const btn of buildButtons(state)) drawButton(btn, hoveredId === btn.id);
+      ctx.restore();
+      tex.needsUpdate = true;
+      return;
+    }
     ctx.fillStyle = 'rgba(233,233,255,0.78)';
     ctx.font = '21px system-ui, Arial';
     ctx.fillText(`Seat: ${state.seated ? state.seatLabel : 'Standing'}`, 430, 238);
@@ -270,6 +286,13 @@ let hoveredId = null;
   }
 
   function emitPoker(action){
+    // The current poker engine exposes functions; it does not consume the old
+    // phase-87 events. Call it once and let it enforce turn/stack legality.
+    if (typeof window.SVR_POKER_ACTION === 'function') {
+      const accepted = window.SVR_POKER_ACTION(action === 'all_in' ? 'allin' : action);
+      window.SVR_PHASE87_LAST_WATCH_POKER_ACTION = { action, source: 'watch', accepted: accepted !== false };
+      return accepted;
+    }
     const payload={ build:PHASE87_LABEL, action, source:'watch', tableKey:'lobby-main', seatId:'SOUTH_PLAYER', playMoneyOnly:true, createdAt:new Date().toISOString() };
     window.SVR_PHASE87_LAST_WATCH_POKER_ACTION=payload;
     try { window.dispatchEvent(new CustomEvent('svr-poker-player-action', { detail: payload })); } catch {}
@@ -303,12 +326,17 @@ let hoveredId = null;
     if (id === 'pokerNext') emitPoker('next');
   }
 
-  function update(dt, leftHand, rightHand){
-    const anchor = leftHand?.joints?.wrist ? leftHand : rightHand?.joints?.wrist ? rightHand : null;
+  function update(dt, input, legacyRightHand){
+    // Main supplies an input bundle; older callers supply two hands.
+    const bundled = input && ('leftHand' in input || 'rightHand' in input || 'leftController' in input || 'rightController' in input);
+    const leftHand = bundled ? (input.leftHand || input.leftController) : input;
+    const rightHand = bundled ? (input.rightHand || input.rightController) : legacyRightHand;
+    const tracked = hand => Boolean(hand?.joints?.wrist && hand.joints.wrist.visible !== false);
+    const anchor = tracked(leftHand) ? leftHand : tracked(rightHand) ? rightHand : null;
     if (!anchor?.joints?.wrist){
       group.visible = false;
       hoveredId = null;
-      draw(true);
+      pressed = false; pressLockId = null; pinchTime = 0; lastHovered = null;
       return;
     }
 
@@ -330,7 +358,9 @@ let hoveredId = null;
     let nextHovered = null;
     let activeInput = null;
     let bestDepth = Infinity;
-    const candidates = watchOnLeft ? [rightHand, leftHand] : [leftHand, rightHand];
+    // Only the opposite hand can press the watch; wearing-hand fingers must
+    // never fold or raise accidentally while the wrist is moving.
+    const candidates = [inputHand].filter(tracked);
     for (const candidate of candidates){
       const tip = candidate?.joints?.['index-finger-tip'];
       if (!tip) continue;

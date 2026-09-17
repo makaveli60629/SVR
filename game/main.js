@@ -3,22 +3,19 @@ import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands_phase228.js";
 import { createTeleportRig } from "./modules/movement_phase228.js?v=phase169-locomotion-polish";
-import { buildPhase195CleanLobbyWorld } from "./modules/phase195_clean_lobby_world.js";
-import { installPhase201HubContentRestore } from "./modules/phase201_hub_content_restore.js";
-import { installPhase202StorefrontShells } from "./modules/phase202_storefront_shells.js";
-import { installPhase262GeometrySkyAlignmentLock } from "./modules/phase262_geometry_sky_alignment_lock.js";
+import { createQuestTableWorld } from "./modules/quest_table_world.js?v=phase459";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
-import { createWristWatch } from "./modules/watch.js?v=phase99-clean-lobby-watch";
+import { createWristWatch } from "./modules/watch.js?v=phase459";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
-import { installPhase149LobbyFitAlignmentLock } from "./phase149_lobby_fit_alignment_lock.js";
 
 const BUILD_LABEL = "PHASE-169-UNIFIED-LOCOMOTION-TELEPORT-POLISH-LOCK";
 const params = new URLSearchParams(location.search);
+const QUEST_TABLE_ONLY = params.get('platform') === 'quest' || params.get('tableonly') === '1' || /Quest|Oculus|Meta Quest/i.test(navigator.userAgent || '');
 const IN_IFRAME = window.self !== window.top;
 const PREVIEW = params.has("preview") || params.has("live") || params.get("cam") === "director";
 const AUTOCAM = IN_IFRAME || params.has("autocam") || PREVIEW;
-const ANDROID_SMART = /Android/i.test(navigator.userAgent || "") && !params.has("desktop") && !AUTOCAM;
+const ANDROID_SMART = !QUEST_TABLE_ONLY && /Android/i.test(navigator.userAgent || "") && !params.has("desktop") && !AUTOCAM;
 
 window.SVR_DISABLE_LEGACY_SKYLINE = true;
 window.SVR_REFINED_LOBBY_GEOMETRY = true;
@@ -70,15 +67,25 @@ camera.lookAt(0, 1.45, -2.0);
 window.addEventListener("error", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "RUNTIME ERROR:\n" + (e?.error?.stack || e?.message || String(e)); });
 window.addEventListener("unhandledrejection", (e)=>{ if (!renderer.xr.isPresenting && $err) $err.style.display = "block"; if ($err) $err.textContent = "UNHANDLED PROMISE REJECTION:\n" + (e?.reason?.stack || e?.reason || String(e)); });
 
-const desktop = (AUTOCAM || ANDROID_SMART) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
-setStatus("Loading clean expanded lobby…", { force: true });
-const world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
+const desktop = (AUTOCAM || ANDROID_SMART || QUEST_TABLE_ONLY) ? null : createDesktopControls({ camera, domElement: renderer.domElement });
+setStatus(QUEST_TABLE_ONLY ? "Loading your poker table…" : "Loading clean expanded lobby…", { force: true });
+let world;
+if (QUEST_TABLE_ONLY) {
+  world = createQuestTableWorld(scene);
+} else {
+  const { buildPhase195CleanLobbyWorld } = await import('./modules/phase195_clean_lobby_world.js');
+  const { installPhase201HubContentRestore } = await import('./modules/phase201_hub_content_restore.js');
+  const { installPhase202StorefrontShells } = await import('./modules/phase202_storefront_shells.js');
+  const { installPhase262GeometrySkyAlignmentLock } = await import('./modules/phase262_geometry_sky_alignment_lock.js');
+  const { installPhase149LobbyFitAlignmentLock } = await import('./phase149_lobby_fit_alignment_lock.js');
+  world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
+  installPhase201HubContentRestore({ scene, camera, renderer, log });
+  installPhase202StorefrontShells({ scene, camera, renderer, log });
+  installPhase262GeometrySkyAlignmentLock({ scene, camera, renderer, log });
+  installPhase149LobbyFitAlignmentLock({ scene, camera, renderer, world });
+  setTimeout(()=>installPhase149LobbyFitAlignmentLock({ scene, camera, renderer, world }), 1200);
+}
 window.SVR_WORLD_REF = world;
-installPhase201HubContentRestore({ scene, camera, renderer, log });
-installPhase202StorefrontShells({ scene, camera, renderer, log });
-installPhase262GeometrySkyAlignmentLock({ scene, camera, renderer, log });
-installPhase149LobbyFitAlignmentLock({ scene, camera, renderer, world });
-setTimeout(()=>installPhase149LobbyFitAlignmentLock({ scene, camera, renderer, world }), 1200);
 const { roomClamp, seats, tableCenter, joinRadius, previewOrbitRadius, sceneTargets = {} } = world;
 const hands = createHands({ scene, renderer, log });
 const tp = createTeleportRig({ scene, renderer, camera, roomClamp, log });
@@ -94,9 +101,13 @@ const audio = {
 };
 window.SVR_AUDIO_DISABLED = true;
 
-let seated = false;
-let seatIndex = -1;
-let cash = 50000;
+let seated = QUEST_TABLE_ONLY;
+let seatIndex = QUEST_TABLE_ONLY ? 3 : -1;
+let cash = QUEST_TABLE_ONLY ? 1000 : 50000;
+window.addEventListener('svr:poker-state', event => {
+  const player = event.detail?.players?.find(player => player.human);
+  if (player && Number.isFinite(player.stack)) cash = player.stack;
+});
 function currentHeadXZ(){ if (renderer.xr.isPresenting){ const xrCam = renderer.xr.getCamera(camera); const p = new THREE.Vector3(); xrCam.getWorldPosition(p); return p; } return camera.position.clone(); }
 function inTableZone(){ const p = currentHeadXZ(); return new THREE.Vector2(p.x - tableCenter.x, p.z - tableCenter.z).length() <= (joinRadius + 0.7); }
 function seatLabel(){ return seatIndex >= 0 ? seats[seatIndex]?.label || `Seat ${seatIndex + 1}` : "Standing"; }
@@ -126,18 +137,18 @@ function createStoreWebPortal(){
 }
 $sceneButtons.forEach((btn)=>{ btn.addEventListener("click", ()=>{ const key = btn.dataset.scene; if (key === "store") openStorePortal(); else if (key) gotoScene(key); }); });
 window.addEventListener("keydown", async (e)=>{
-  if (renderer.xr.isPresenting || e.repeat) return;
+  if (renderer.xr.isPresenting || e.repeat || QUEST_TABLE_ONLY) return;
   if (e.code === "KeyJ") joinTable(); if (e.code === "KeyL") leaveTable(); if (e.code === "KeyT") tp.toggleMode(); if (e.code === "KeyO") openStorePortal();
   if (e.code === "Digit1") gotoScene("lobby"); if (e.code === "Digit2") gotoScene("table"); if (e.code === "Digit3") gotoScene("seat"); if (e.code === "Digit4") gotoScene("reiki"); if (e.code === "Digit5") gotoScene("pga"); if (e.code === "Digit6") gotoScene("legends"); if (e.code === "Digit7") gotoScene("sponsor"); if (e.code === "Digit8") gotoScene("scorpion"); if (e.code === "Digit0") openStorePortal();
 });
 
 const watch = createWristWatch({
-  scene, camera, renderer,
+  scene, camera, renderer, tableOnly: QUEST_TABLE_ONLY,
   getState: ()=>( { audioEnabled: audio.getState().enabled, trackTitle: audio.getState().trackTitle || "Music Disabled", cash, seated, inTableZone: inTableZone(), seatLabel: seatLabel(), teleportEnabled: tp.isEnabled ? tp.isEnabled() : true }),
   actions: { toggleAudio: ()=>audio.toggle(), nextTrack: ()=>audio.next(), joinTable, leaveTable, toggleTeleport: ()=>tp.toggleMode(), goLobby: ()=>gotoScene("lobby"), goTable: ()=>gotoScene("table"), goSeat: ()=>gotoScene("seat"), goReiki: ()=>gotoScene("reiki"), goPga: ()=>gotoScene("pga"), goStore: ()=>gotoScene("store"), openStore: ()=>openStorePortal(), goLegend: ()=>gotoScene("legends"), goSponsor: ()=>gotoScene("sponsor"), goScorpion: ()=>gotoScene("scorpion"), goReikiRoom: ()=>gotoScene("reikiRoom") }
 });
-createStoreWebPortal();
-installPhase262GeometrySkyAlignmentLock({ scene, camera, renderer, log });
+window.SVR_WRIST_WATCH = watch;
+if (!QUEST_TABLE_ONLY) createStoreWebPortal();
 $toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $toggleJoints.textContent = on ? "Joints On" : "Joints"; });
 
 setStatus("Loading logo…", { force: true });

@@ -65,6 +65,7 @@ function fixedFrontPose() {
   return { head: target.clone(), look: look.clone() };
 }
 function move(reason = 'manual') {
+  if (window.SVR_QUEST_SEAT_OWNER === 'phase446') return true;
   if (!ACTIVE) return false;
   renderer = window.__SVR_RENDERER__ || renderer;
   camera = window.__SVR_CAMERA__ || camera;

@@ -378,6 +378,7 @@ function scheduleStableSpawn(reason = 'xr-session-start') {
 }
 
 function questSeat(force = false) {
+  if (window.SVR_QUEST_SEAT_OWNER === 'phase446') return true;
   if (!QUEST) return false;
   const a = anchors();
   if (!a) return false;
