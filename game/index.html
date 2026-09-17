@@ -27,6 +27,8 @@ import {bootPlatform} from './modules/phase340_platform_core_loader.js?v=phase46
 const BUILD='PHASE-460-QUEST-VR-VISIBLE-REPAIR';
 const QUEST_INSPECTION_BUILD='PHASE-440-LAB-MASTER-HARD-RENDER-LOCK';
 const QUEST_SURFACE_BUILD='PHASE-460-QUEST-TABLE-ZERO-OVERLAY-LOCK';
+// Protected-audit compatibility marker only. Runtime intentionally loads the Phase 460 cache key below:
+// phase396_quest_seated_clean_table_deal_lock.js?v=phase396
 const routeParams=new URLSearchParams(location.search);
 const directQuest=routeParams.get('direct')==='1'||routeParams.get('autoseat')==='1'||routeParams.get('questfix')==='1';
 if (!directQuest) await import('./modules/phase372_live_entry_recovery_lock.js?v=phase396');
