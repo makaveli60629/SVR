@@ -3,9 +3,9 @@ import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands_phase228.js";
 import { createTeleportRig } from "./modules/movement_phase228.js?v=phase169-locomotion-polish";
-import { createQuestTableWorld } from "./modules/quest_table_world.js?v=phase459";
+import { createQuestTableWorld } from "./modules/quest_table_world.js?v=phase460";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
-import { createWristWatch } from "./modules/watch.js?v=phase459";
+import { createWristWatch } from "./modules/watch.js?v=phase460";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
@@ -193,7 +193,6 @@ renderer.setAnimationLoop(()=>{
   hands.update(dt);
   if (optionalTick) hands.updateDebug();
   const leftHand = hands.getLeftHand(); const rightHand = hands.getRightHand(); const leftController = hands.getLeftController(); const rightController = hands.getRightController();
-  // A seated Quest session must stop input before the locomotion module consumes it.
   if ((!AUTOCAM || renderer.xr.isPresenting) && !window.SVR_TELEPORT_DISABLED){
     tp.update({ dt, leftHand, rightHand, leftController, rightController, statusCb:setStatus, modeCb:setMode });
   }
