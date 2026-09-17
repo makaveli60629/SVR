@@ -15,12 +15,29 @@ function effectiveVisible(object){
   return Boolean(object?.parent);
 }
 
-function hideLegacy(){
+function belongsTo(object, root){
+  if (!object || !root) return false;
+  for (let p = object; p; p = p.parent) if (p === root) return true;
+  return false;
+}
+
+function touchesProtectedAuthority(object, runtime){
+  const protectedObjects = [
+    runtime?.table?.group,
+    runtime?.table?.table,
+    runtime?.dealer?.group,
+    runtime?.dealer?.propGroup,
+    window.SVR_WRIST_WATCH?.object
+  ].filter(Boolean);
+  return protectedObjects.some(item => belongsTo(item, object) || belongsTo(object, item));
+}
+
+function hideLegacy(runtime){
   const scene = window.__SVR_SCENE__;
   if (!scene) return 0;
   let hidden = 0;
   for (const object of [...scene.children]){
-    if (!object || KEEP.test(String(object.name || ''))) continue;
+    if (!object || KEEP.test(String(object.name || '')) || touchesProtectedAuthority(object, runtime)) continue;
     if (LEGACY.test(String(object.name || '')) && effectiveVisible(object)){
       object.visible = false;
       object.userData = { ...(object.userData || {}), svrPhase460LegacyHidden:true, build:BUILD };
@@ -82,13 +99,14 @@ function sweep(reason = 'guard'){
     const scene = window.__SVR_SCENE__;
     const runtime = window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE;
     if (!scene || !runtime?.table?.table) return false;
-    hideLegacy();
+    hideLegacy(runtime);
     guardWatch();
     state.clearance = clearQuestTableObstructions(scene, runtime);
     const room = scene.getObjectByName?.('PHASE453_DIRECT_TABLE_ROOM');
     if (room) room.visible = true;
-    runtime.table.group.visible = true;
+    if (runtime.table.group) runtime.table.group.visible = true;
     runtime.table.table.visible = true;
+    if (runtime.dealer?.group) runtime.dealer.group.visible = true;
     state.installed = true;
     state.lastError = null;
     state.checkedAt = new Date().toISOString();
@@ -105,11 +123,14 @@ function sweep(reason = 'guard'){
 function qa(){
   const scene = window.__SVR_SCENE__;
   const room = scene?.getObjectByName?.('PHASE453_DIRECT_TABLE_ROOM');
+  const runtime = window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE;
+  const tableVisible = Boolean(runtime?.table?.table && effectiveVisible(runtime.table.table));
   return {
     ...state,
     roomVisible: Boolean(room?.visible !== false && room?.parent),
+    tableVisible,
     watchObjectPresent: Boolean(window.SVR_WRIST_WATCH?.object),
-    pass: Boolean(state.installed && state.watchGuarded && room?.visible !== false && !state.lastError),
+    pass: Boolean(state.installed && state.watchGuarded && room?.visible !== false && tableVisible && !state.lastError),
     checkedAt: new Date().toISOString()
   };
 }
