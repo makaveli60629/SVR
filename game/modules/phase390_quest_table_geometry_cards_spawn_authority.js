@@ -527,6 +527,7 @@ function fixedFrontDirection() {
 }
 
 function setRigWorldHead(targetHead, lookTarget, turn = true) {
+  if (window.SVR_QUEST_SEAT_OWNER === 'phase446') return true;
   const playerRig = rig();
   const currentCamera = activeCamera();
   if (!playerRig?.position || !currentCamera) return false;

@@ -11,7 +11,7 @@ assert.doesNotMatch(quest, /low power|recovery needed|phase three|73 stable lobb
 assert.match(game, /role="progressbar"/);
 assert.match(game, /phase455_quest_table_first_lobby\.js/);
 assert.match(game, /Table ready\. Press VR GAME ON\./);
-assert.match(game, /phase364_device_xr_geometry_spawn_lock\.js\?v=phase457/);
+assert.match(game, /phase364_device_xr_geometry_spawn_lock\.js\?v=phase459/);
 assert.match(game, /phase365_quest_vr_button_dedupe_lock\.js\?v=phase457/);
 assert.doesNotMatch(game, /Recovery mode is restoring/);
 assert.match(room, /PHASE444_SINGLE_HEADS_UP_PLAYER/);

@@ -31,6 +31,7 @@ function captureSeat(){
   seatRig=rig;seatPosition=rig.position.clone();seatYaw=rig.rotation?.y??0;state.seatLocked=true;return true
 }
 function enforceSeat(){
+  if(window.SVR_QUEST_SEAT_OWNER==='phase446')return true;
   const rig=seatRig||playerRig();if(!rig?.position)return false;if(!seatPosition){captureSeat();return Boolean(seatPosition)}
   rig.position.copy(seatPosition);if(rig.rotation)rig.rotation.y=seatYaw;rig.updateWorldMatrix?.(true,true);state.seatCorrections++;state.seatLocked=true;return true
 }

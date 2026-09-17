@@ -175,6 +175,16 @@ jobs:
           (cd source && node game/tools/phase450-deploy-gameplay-recovery-audit.mjs)
           (cd source && node game/tools/phase455-table-first-lobby-audit.mjs)
 
+      - name: Verify Quest watch, table world and surface behavior
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/svr-quest-tests" --no-save three@0.160.0
+          export NODE_PATH="$RUNNER_TEMP/svr-quest-tests/node_modules"
+          cd source
+          node game/tools/quest-watch-world-regression.cjs
+          node game/tools/quest-surface-motion-regression.cjs
+
       - name: Execute protected Phase 403 pot sanity
         shell: bash
         run: |
