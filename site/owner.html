@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <title>SVR Owner Admin Panel</title>
   <style>
-    :root{--bg:#07000d;--panel:rgba(24,5,40,.92);--line:#8b49b9;--cyan:#80f8ff;--green:#58ff96;--red:#ff5f7e;--gold:#ffd879;--text:#f8edff;--muted:#c8b6d8}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 10%,rgba(128,248,255,.16),transparent 34%),radial-gradient(circle at 80% 20%,rgba(255,85,223,.18),transparent 34%),linear-gradient(135deg,#020006,#07000d 45%,#160024);color:var(--text);font-family:Arial,Helvetica,sans-serif}main{max-width:1260px;margin:auto;padding:24px}.card{border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:18px;margin:14px 0;box-shadow:0 0 24px rgba(161,70,255,.18)}h1{margin:0 0 8px;font-size:clamp(1.7rem,4vw,2.6rem)}h2{margin:0 0 12px;color:var(--cyan)}.grid{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:14px}.stats{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px}.stat{border:1px solid rgba(128,248,255,.28);border-radius:16px;background:rgba(0,0,0,.24);padding:14px}.stat b{display:block;font-size:1.7rem;color:#fff}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}input{width:100%;background:#090012;color:white;border:1px solid rgba(128,248,255,.55);border-radius:12px;padding:12px;margin:6px 0}button,a.btn{background:#3b1459;color:white;border:1px solid #a867ff;border-radius:12px;padding:11px 14px;cursor:pointer;text-decoration:none;font-weight:700}button:hover,a.btn:hover{border-color:var(--cyan)}button.good{background:rgba(88,255,150,.16)}button.bad{background:rgba(255,95,126,.16)}.good{color:var(--green)}.bad{color:var(--red)}.gold{color:var(--gold)}.muted{color:var(--muted)}.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:7px 11px;margin:4px 6px 4px 0;color:var(--muted)}.status-pill{font-weight:800;color:#fff}.status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 10px currentColor}.status-online{color:var(--green)}.status-offline{color:var(--red)}.msg{border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px;margin:10px 0;background:rgba(0,0,0,.24);white-space:pre-wrap}.msg.unread{border-color:var(--cyan)}table{width:100%;border-collapse:collapse;margin-top:10px}td,th{border-bottom:1px solid rgba(255,255,255,.12);padding:8px;text-align:left;vertical-align:top}code{color:var(--cyan)}@media(max-width:900px){main{padding:14px}.grid,.stats{grid-template-columns:1fr}}
+    :root{--bg:#07000d;--panel:rgba(24,5,40,.92);--line:#8b49b9;--cyan:#80f8ff;--green:#58ff96;--red:#ff5f7e;--gold:#ffd879;--text:#f8edff;--muted:#c8b6d8}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 10%,rgba(128,248,255,.16),transparent 34%),radial-gradient(circle at 80% 20%,rgba(255,85,223,.18),transparent 34%),linear-gradient(135deg,#020006,#07000d 45%,#160024);color:var(--text);font-family:Arial,Helvetica,sans-serif}main{max-width:1260px;margin:auto;padding:24px}.card{border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:18px;margin:14px 0;box-shadow:0 0 24px rgba(161,70,255,.18)}h1{margin:0 0 8px;font-size:clamp(1.7rem,4vw,2.6rem)}h2{margin:0 0 12px;color:var(--cyan)}.grid{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:14px}.stats{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px}.stat{border:1px solid rgba(128,248,255,.28);border-radius:16px;background:rgba(0,0,0,.24);padding:14px}.stat b{display:block;font-size:1.7rem;color:#fff}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}input{width:100%;background:#090012;color:white;border:1px solid rgba(128,248,255,.55);border-radius:12px;padding:12px;margin:6px 0}button,a.btn{background:#3b1459;color:white;border:1px solid #a867ff;border-radius:12px;padding:11px 14px;cursor:pointer;text-decoration:none;font-weight:700}button:hover,a.btn:hover{border-color:var(--cyan)}button.good{background:rgba(88,255,150,.16)}button.bad{background:rgba(255,95,126,.16)}.good{color:var(--green)}.bad{color:var(--red)}.gold{color:var(--gold)}.muted{color:var(--muted)}.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:7px 11px;margin:4px 6px 4px 0;color:var(--muted)}.status-pill{font-weight:800;color:#fff}.status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 10px currentColor}.status-online{color:var(--green)}.status-offline{color:var(--red)}.msg{border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px;margin:10px 0;background:rgba(0,0,0,.24);white-space:pre-wrap}.msg.unread{border-color:var(--cyan)}table{width:100%;border-collapse:collapse;margin-top:10px}td,th{border-bottom:1px solid rgba(255,255,255,.12);padding:8px;text-align:left;vertical-align:top}code{color:var(--cyan)}select{width:100%;background:#090012;color:white;border:1px solid rgba(128,248,255,.55);border-radius:12px;padding:12px;margin:6px 0}.upload-drop{border:1px dashed rgba(128,248,255,.55);border-radius:16px;padding:14px;background:rgba(0,0,0,.2)}.resource-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border-bottom:1px solid rgba(255,255,255,.1);padding:10px 0}.resource-row:last-child{border-bottom:0}.resource-meta{font-size:.9rem;color:var(--muted);word-break:break-word}.progress{height:8px;border-radius:999px;background:#140522;overflow:hidden;margin:10px 0}.progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#7f48ff,#80f8ff);transition:width .2s ease}@media(max-width:900px){main{padding:14px}.grid,.stats{grid-template-columns:1fr}}
   </style>
 </head>
 <body data-build="PHASE-101P-OWNER-API-TOKEN-PRESENCE-SYNC-LOCK">
@@ -42,6 +42,31 @@
 
   <div class="card"><h2>Hidden Traffic + Marketing Stats</h2><div id="analytics" class="muted">Loading hidden traffic stats...</div></div>
   <div class="card"><h2>Owner Data</h2><div class="row"><button id="tabMessages">Messages</button><button id="tabHealth">Endpoint Health</button></div><div id="dataView" class="muted">Loading owner counter panel...</div></div>
+
+  <!-- SVR_RESOURCE_UPLOADER_V1 -->
+  <div class="card" id="resourceUploaderCard">
+    <h2>Resource File Uploader</h2>
+    <p class="muted">Owner-only upload path for game-development resources. Files are stored privately in AWS S3; PostgreSQL stores the asset record and object key.</p>
+    <div class="upload-drop">
+      <label class="muted">Resource file</label>
+      <input id="resourceFile" type="file" accept=".fbx,.obj,.glb,.gltf,.mtl,.blend,.zip,.png,.jpg,.jpeg,.webp,.ktx2">
+      <label class="muted">Category</label>
+      <select id="resourceCategory">
+        <option value="3d-model">3D Model</option>
+        <option value="animation">Animation</option>
+        <option value="texture">Texture</option>
+        <option value="archive">Resource Archive</option>
+        <option value="other">Other Resource</option>
+      </select>
+      <label class="muted">Notes</label>
+      <input id="resourceNotes" type="text" maxlength="500" placeholder="Example: Eric dealer rig, table mesh, lobby prop">
+      <div class="row"><button id="uploadResourceBtn" class="good">Upload Resource</button><button id="refreshResourcesBtn">Refresh Resource List</button></div>
+      <div class="progress" aria-hidden="true"><span id="resourceProgress"></span></div>
+      <p id="resourceUploadNote" class="muted">Log in as owner before uploading. Allowed files include FBX, OBJ, GLB/GLTF, MTL, BLEND, ZIP and common texture formats.</p>
+    </div>
+    <div id="resourceList" class="muted" style="margin-top:12px">Log in, then refresh to view uploaded resources.</div>
+  </div>
+
 </main>
 <script>
 (() => {
@@ -149,10 +174,65 @@
   }
 
   async function tryLiveAnalytics() { $('analytics').textContent = 'Checking live API counters...'; try { const d = await api('/api/admin/analytics/summary'); const t = d.totals || d.summary || d || {}; const cards = [['All Page Views',t.all_page_views ?? t.totalPageViews ?? t.totalViews],['Unique Sessions',t.all_sessions ?? t.uniqueSessions ?? t.sessions],['Today Views',t.viewsToday ?? t.page_views_24h],['Store Clicks',t.storeClicks],['All Events',t.all_events ?? t.totalEvents]]; $('analytics').innerHTML = '<div class="stats">' + cards.map((c) => `<div class="stat"><span class="muted">${safe(c[0])}</span><b>${n(c[1])}</b></div>`).join('') + '</div><p class="good">Live API counters loaded.</p>'; $('controlNote').textContent = 'Live API counters loaded.'; } catch (error) { paintAnalytics(`Live API counter route unavailable: ${error.message}. Showing hidden local fallback counters instead.`); $('controlNote').textContent = 'Live API unavailable; local fallback counter shown.'; } }
-  async function health() { const checks = ['/api/health','/api/admin/status','/api/admin/online','/api/admin/presence','/api/admin/analytics/summary','/api/messages','/api/store/items']; $('dataView').innerHTML = '<p class="muted">Checking endpoints...</p>'; const rows = []; for (const path of checks) { try { await api(path, { method: path === '/api/admin/online' ? 'POST' : 'GET', headers: path === '/api/admin/online' ? { 'Content-Type':'application/json' } : {}, body: path === '/api/admin/online' ? JSON.stringify({ isOnline: readPresence() }) : undefined }); rows.push(`<tr><td>${safe(path)}</td><td class="good">Online</td></tr>`); } catch (e) { rows.push(`<tr><td>${safe(path)}</td><td class="bad">${safe(e.message)}</td></tr>`); } } $('dataView').innerHTML = '<table><thead><tr><th>Endpoint</th><th>Status</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>'; }
-  async function login() { $('loginNote').textContent = 'Checking owner API...'; try { const result = await api('/api/admin/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ email:$('email').value.trim(), password:$('password').value }) }); if(result.token) writeToken(result.token); $('loginNote').textContent = result.token ? 'Owner API login succeeded. Token stored. Admin set online.' : 'Owner API login responded without token. Admin set online locally.'; } catch (error) { $('loginNote').textContent = `API login unavailable. Local owner bridge active: ${error.message}.`; } $('password').value = ''; await setOnline(true); await tryLiveAnalytics(); paintMessages(); }
+  async function health() { const checks = ['/api/health','/api/admin/status','/api/admin/online','/api/admin/presence','/api/admin/analytics/summary','/api/messages','/api/store/items','/api/admin/resources']; $('dataView').innerHTML = '<p class="muted">Checking endpoints...</p>'; const rows = []; for (const path of checks) { try { await api(path, { method: path === '/api/admin/online' ? 'POST' : 'GET', headers: path === '/api/admin/online' ? { 'Content-Type':'application/json' } : {}, body: path === '/api/admin/online' ? JSON.stringify({ isOnline: readPresence() }) : undefined }); rows.push(`<tr><td>${safe(path)}</td><td class="good">Online</td></tr>`); } catch (e) { rows.push(`<tr><td>${safe(path)}</td><td class="bad">${safe(e.message)}</td></tr>`); } } $('dataView').innerHTML = '<table><thead><tr><th>Endpoint</th><th>Status</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>'; }
+
+  async function loadResources(){
+    if(!readToken()){ $('resourceList').textContent='Owner login required to view resources.'; return; }
+    $('resourceList').textContent='Loading resource library...';
+    try{
+      const data=await api('/api/admin/resources');
+      const items=Array.isArray(data.resources)?data.resources:[];
+      if(!items.length){ $('resourceList').textContent='No uploaded resources yet.'; return; }
+      $('resourceList').innerHTML=items.map((r)=>`<div class="resource-row"><div><b>${safe(r.original_name||r.object_key)}</b><div class="resource-meta">${safe(r.category||'resource')} · ${n(r.size_bytes)} bytes · ${safe(r.status||'ready')}<br><code>${safe(r.object_key||'')}</code><br>${safe(r.notes||'')}</div></div><span class="pill">${safe((r.extension||'').toUpperCase())}</span></div>`).join('');
+    }catch(error){ $('resourceList').innerHTML=`<span class="bad">Resource list unavailable: ${safe(error.message)}</span>`; }
+  }
+
+  async function uploadResource(){
+    const file=$('resourceFile').files && $('resourceFile').files[0];
+    if(!readToken()){ $('resourceUploadNote').textContent='Owner login required before uploading.'; return; }
+    if(!file){ $('resourceUploadNote').textContent='Choose a resource file first.'; return; }
+    $('uploadResourceBtn').disabled=true;
+    $('resourceProgress').style.width='8%';
+    $('resourceUploadNote').textContent=`Preparing ${file.name}...`;
+    try{
+      const prep=await api('/api/admin/resources/presign',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          fileName:file.name,
+          sizeBytes:file.size,
+          contentType:file.type||'application/octet-stream',
+          category:$('resourceCategory').value,
+          notes:$('resourceNotes').value.trim()
+        })
+      });
+      $('resourceProgress').style.width='30%';
+      $('resourceUploadNote').textContent='Uploading directly to private AWS S3 storage...';
+      const put=await fetch(prep.uploadUrl,{method:'PUT',body:file,headers:{'Content-Type':prep.contentType||file.type||'application/octet-stream'}});
+      if(!put.ok) throw new Error(`S3 upload failed (HTTP ${put.status})`);
+      $('resourceProgress').style.width='80%';
+      await api('/api/admin/resources/complete',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({resourceId:prep.resourceId})
+      });
+      $('resourceProgress').style.width='100%';
+      $('resourceUploadNote').innerHTML=`<span class="good">Uploaded:</span> ${safe(file.name)} · stored privately in AWS S3 and registered in PostgreSQL.`;
+      $('resourceFile').value='';
+      $('resourceNotes').value='';
+      await loadResources();
+    }catch(error){
+      $('resourceUploadNote').innerHTML=`<span class="bad">Upload failed:</span> ${safe(error.message)}`;
+      $('resourceProgress').style.width='0%';
+    }finally{
+      $('uploadResourceBtn').disabled=false;
+      setTimeout(()=>{ if($('resourceProgress').style.width==='100%') $('resourceProgress').style.width='0%'; },1800);
+    }
+  }
+
+  async function login() { $('loginNote').textContent = 'Checking owner API...'; try { const result = await api('/api/admin/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ email:$('email').value.trim(), password:$('password').value }) }); if(result.token) writeToken(result.token); $('loginNote').textContent = result.token ? 'Owner API login succeeded. Token stored. Admin set online.' : 'Owner API login responded without token. Admin set online locally.'; } catch (error) { $('loginNote').textContent = `API login unavailable. Local owner bridge active: ${error.message}.`; } $('password').value = ''; await setOnline(true); await tryLiveAnalytics(); paintMessages(); await loadResources(); }
   async function logout() { remove(LOCAL_ADMIN_SESSION_KEY); clearToken(); $('loginNote').textContent = 'Logged out. Admin set offline.'; await setOnline(false); }
-  function boot() { paintTop(); paintAnalytics(); paintMessages(); fetchLiveStatus(); $('loginBtn').onclick = login; $('logoutBtn').onclick = logout; $('onlineBtn').onclick = () => setOnline(true); $('offlineBtn').onclick = () => setOnline(false); $('analyticsBtn').onclick = tryLiveAnalytics; $('refreshBtn').onclick = paintMessages; $('healthBtn').onclick = health; $('tabMessages').onclick = paintMessages; $('tabHealth').onclick = health; window.SVR_OWNER_ADMIN_PANEL = { build:BUILD, setOnline, logout, readPresence, health, fetchLiveStatus, apiBase:API }; }
+  function boot() { paintTop(); paintAnalytics(); paintMessages(); fetchLiveStatus(); $('loginBtn').onclick = login; $('logoutBtn').onclick = logout; $('onlineBtn').onclick = () => setOnline(true); $('offlineBtn').onclick = () => setOnline(false); $('analyticsBtn').onclick = tryLiveAnalytics; $('refreshBtn').onclick = paintMessages; $('healthBtn').onclick = health; $('tabMessages').onclick = paintMessages; $('tabHealth').onclick = health; $('uploadResourceBtn').onclick = uploadResource; $('refreshResourcesBtn').onclick = loadResources; window.SVR_OWNER_ADMIN_PANEL = { build:BUILD, setOnline, logout, readPresence, health, fetchLiveStatus, apiBase:API }; }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
 </script>
