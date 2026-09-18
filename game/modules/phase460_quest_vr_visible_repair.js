@@ -99,30 +99,17 @@ function alignApprovedAuthority(runtime){
 
 function ensureBrightLightRig(runtime){
   const scene = window.__SVR_SCENE__;
-  const table = runtime?.table?.table;
-  if (!scene || !table) return false;
-  if (scene.getObjectByName('PHASE462_PROFESSIONAL_TABLE_ROOM')?.visible) {
+  if (!scene || !runtime?.table?.table) return false;
+  const professionalRoom = scene.getObjectByName('PHASE462_PROFESSIONAL_TABLE_ROOM');
+  const startup = scene.getObjectByName('QUEST_STARTUP_LIGHTING');
+  if (professionalRoom?.visible) {
+    if (startup) startup.visible = false;
     if (lightRig) lightRig.visible = false;
     return true;
   }
-  table.updateWorldMatrix?.(true, true);
-  tableBox.setFromObject(table, true);
-  tableBox.getCenter(tableCenter);
-  if (!lightRig?.parent){
-    lightRig = new THREE.Group();
-    lightRig.name = 'PHASE460_QUEST_BRIGHT_PLAY_LIGHT_RIG';
-    const hemi = new THREE.HemisphereLight(0xffffff, 0x171020, 2.15);
-    const key = new THREE.DirectionalLight(0xfff4df, 2.65);
-    key.position.set(2.6, 4.2, 2.1); key.target.position.set(0, .65, .75);
-    const fill = new THREE.DirectionalLight(0xccecff, 1.8);
-    fill.position.set(-2.8, 2.8, -1.6); fill.target.position.set(0, .7, .75);
-    const glow = new THREE.PointLight(0xd8b8ff, 2.4, 8.5, 1.35);
-    lightRig.add(hemi, key, key.target, fill, fill.target, glow);
-    scene.add(lightRig);
-  }
-  const glow = lightRig.children.find(object => object.isPointLight);
-  glow?.position.set(tableCenter.x, tableBox.max.y + 1.8, tableCenter.z);
-  lightRig.visible = true;
+  // Phase 460 no longer creates a competing light rig. The startup world owns
+  // temporary boot illumination until Phase 462 installs the professional room.
+  if (startup) startup.visible = true;
   scene.background = new THREE.Color(0x17131f);
   return true;
 }
