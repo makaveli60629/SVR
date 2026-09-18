@@ -125,3 +125,21 @@ CREATE INDEX IF NOT EXISTS idx_site_analytics_created_at ON site_analytics_event
 CREATE INDEX IF NOT EXISTS idx_site_analytics_event_type ON site_analytics_events (event_type);
 CREATE INDEX IF NOT EXISTS idx_site_analytics_page_path ON site_analytics_events (page_path);
 CREATE INDEX IF NOT EXISTS idx_site_analytics_session_id ON site_analytics_events (session_id);
+
+CREATE TABLE IF NOT EXISTS admin_uploads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  original_name TEXT NOT NULL,
+  stored_name TEXT NOT NULL,
+  content_type TEXT NOT NULL DEFAULT 'application/octet-stream',
+  byte_size INTEGER NOT NULL CHECK (byte_size >= 0),
+  sha256 TEXT NOT NULL,
+  payload BYTEA NOT NULL,
+  notes TEXT,
+  uploaded_by TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ,
+  deleted_by TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_admin_uploads_created_at ON admin_uploads (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_admin_uploads_active ON admin_uploads (deleted_at, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_admin_uploads_sha256 ON admin_uploads (sha256);
