@@ -48,7 +48,7 @@ function status(message) {
 
 function moduleUrl(path) {
   const url = new URL(path, document.baseURI);
-  url.searchParams.set('v', ['main.js', 'modules/phase364_device_xr_geometry_spawn_lock.js'].includes(path) ? 'phase459' : VERSION);
+  url.searchParams.set('v', ['main.js', 'modules/phase364_device_xr_geometry_spawn_lock.js'].includes(path) ? 'phase463' : VERSION);
   return url.href;
 }
 
