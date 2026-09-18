@@ -16,46 +16,16 @@ function approved(object) {
   }
   return false;
 }
-function material(color, roughness = .78, metalness = .04) {
-  return new THREE.MeshStandardMaterial({ color, roughness, metalness, side: THREE.DoubleSide });
-}
-function panel(name, geometry, mat, position) {
-  const mesh = new THREE.Mesh(geometry, mat);
-  mesh.name = name;
-  mesh.position.copy(position);
-  mesh.castShadow = false;
-  mesh.receiveShadow = false;
-  room.add(mesh);
-  return mesh;
-}
-function tableCenter() {
-  const table = runtime?.table?.table;
-  if (!table) return new THREE.Vector3(0, 0, .75);
-  table.updateWorldMatrix?.(true, true);
-  return new THREE.Box3().setFromObject(table, true).getCenter(new THREE.Vector3());
-}
 function buildRoom() {
   if (!scene || room?.parent) return room;
-  const center = tableCenter();
   room = new THREE.Group();
   room.name = 'PHASE453_DIRECT_TABLE_ROOM';
-  room.userData = { svrPhase453DirectTableRoom: true, build: BUILD };
-  const width = 8.5, depth = 7.0, height = 3.4, wall = .12;
-  const floor = material(0x090a10, .86, .06);
-  const walls = material(0x11101a, .82, .03);
-  const accent = material(0x35105a, .55, .18);
-  panel('PHASE453_TABLE_ROOM_FLOOR', new THREE.BoxGeometry(width, .08, depth), floor, new THREE.Vector3(center.x, -.04, center.z));
-  panel('PHASE453_TABLE_ROOM_BACK_WALL', new THREE.BoxGeometry(width, height, wall), walls, new THREE.Vector3(center.x, height * .5, center.z - depth * .5));
-  panel('PHASE453_TABLE_ROOM_FRONT_WALL', new THREE.BoxGeometry(width, height, wall), walls, new THREE.Vector3(center.x, height * .5, center.z + depth * .5));
-  panel('PHASE453_TABLE_ROOM_LEFT_WALL', new THREE.BoxGeometry(wall, height, depth), walls, new THREE.Vector3(center.x - width * .5, height * .5, center.z));
-  panel('PHASE453_TABLE_ROOM_RIGHT_WALL', new THREE.BoxGeometry(wall, height, depth), walls, new THREE.Vector3(center.x + width * .5, height * .5, center.z));
-  panel('PHASE453_TABLE_ROOM_BACK_ACCENT', new THREE.BoxGeometry(3.8, .08, .035), accent, new THREE.Vector3(center.x, 2.35, center.z - depth * .5 + .07));
-  const hemi = new THREE.HemisphereLight(0xdde7ff, 0x08050c, .78);
-  hemi.name = 'PHASE453_TABLE_ROOM_AMBIENT';
-  const fill = new THREE.PointLight(0xb989ff, .72, 9, 2);
-  fill.name = 'PHASE453_TABLE_ROOM_FILL';
-  fill.position.set(center.x, 2.65, center.z + .4);
-  room.add(hemi, fill);
+  room.userData = {
+    svrPhase453DirectTableRoom: true,
+    build: BUILD,
+    visualAuthority: false,
+    purpose: 'compatibility-anchor-only'
+  };
   scene.add(room);
   state.roomReady = true;
   return room;
@@ -133,7 +103,6 @@ async function install() {
   sweep('install');
   renderer?.xr?.addEventListener?.('sessionstart', () => setTimeout(() => sweep('xr-sessionstart'), 180));
   for (const delay of [100, 350, 800, 1600, 3200, 6000]) setTimeout(() => sweep('settle-' + delay), delay);
-  if (!timer) timer = window.setInterval(() => sweep('guard'), 500);
   return qa();
 }
 
