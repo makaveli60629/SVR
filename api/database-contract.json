@@ -1,0 +1,166 @@
+{
+  "contractVersion": 1,
+  "updatedAt": "2026-09-18",
+  "siteAdminPostgres": {
+    "authority": "api/server.js",
+    "deploymentProofRequired": true,
+    "tables": {
+      "admin_users": [
+        "id",
+        "username",
+        "email",
+        "display_name",
+        "password_hash",
+        "role",
+        "is_active",
+        "must_change_password",
+        "created_at",
+        "updated_at",
+        "last_login_at"
+      ],
+      "admin_status": [
+        "id",
+        "is_online",
+        "status_text",
+        "updated_by",
+        "updated_at"
+      ],
+      "site_messages": [
+        "id",
+        "name",
+        "email",
+        "subject",
+        "message",
+        "source",
+        "is_read",
+        "created_at",
+        "archived_at",
+        "archived_by"
+      ],
+      "admin_logs": [
+        "id",
+        "admin_email",
+        "action",
+        "details",
+        "created_at"
+      ],
+      "marketing_leads": [
+        "id",
+        "lead_type",
+        "name",
+        "email",
+        "phone",
+        "organization",
+        "message",
+        "source",
+        "consent",
+        "status",
+        "created_at",
+        "archived_at",
+        "archived_by"
+      ],
+      "store_items": [
+        "id",
+        "sku",
+        "title",
+        "category",
+        "description",
+        "price_cents",
+        "image_url",
+        "tags",
+        "is_active",
+        "is_sandbox_only",
+        "created_at",
+        "updated_at"
+      ],
+      "game_events": [
+        "id",
+        "event_type",
+        "room",
+        "build",
+        "session_id",
+        "source",
+        "payload",
+        "created_at"
+      ],
+      "site_analytics_events": [
+        "id",
+        "event_type",
+        "page_path",
+        "page_title",
+        "referrer",
+        "session_id",
+        "source",
+        "user_agent",
+        "metadata",
+        "created_at"
+      ]
+    }
+  },
+  "playerAws": {
+    "authority": "site/config/player-api.json + infrastructure/aws/phase372-player-account-foundation.yml",
+    "identity": "cognito",
+    "database": "dynamodb",
+    "remoteEndpointState": "pending-until-verified",
+    "profileTable": {
+      "partitionKey": "playerId",
+      "globalSecondaryIndex": {
+        "name": "normalized-email",
+        "partitionKey": "normalizedEmail"
+      },
+      "requiredFields": [
+        "schemaVersion",
+        "playerId",
+        "normalizedEmail",
+        "email",
+        "displayName",
+        "role",
+        "playMoney",
+        "dailyStreak",
+        "lastRewardClaim",
+        "avatarUrl",
+        "equippedOutfit",
+        "inventory",
+        "createdAt",
+        "updatedAt",
+        "lastLoginAt",
+        "isActive"
+      ]
+    },
+    "sessionTable": {
+      "partitionKey": "sessionId",
+      "ttlField": "expiresAt",
+      "globalSecondaryIndex": {
+        "name": "player-started-at",
+        "partitionKey": "playerId",
+        "sortKey": "startedAt"
+      },
+      "requiredFields": [
+        "schemaVersion",
+        "sessionId",
+        "playerId",
+        "platform",
+        "startedAt",
+        "lastHeartbeatAt",
+        "activeSeconds",
+        "heartbeatCount",
+        "endedAt",
+        "expiresAt",
+        "metadata"
+      ]
+    }
+  },
+  "tournamentRegistration": {
+    "authority": "game/config/tournament-api.json",
+    "remoteEndpointState": "pending-until-verified",
+    "requiredFields": [
+      "id",
+      "slotId",
+      "playerId",
+      "displayName",
+      "source",
+      "registeredAt",
+      "cancelledAt"
+    ]
+  }
+}
