@@ -1,6 +1,6 @@
 /* PHASE-460-QUEST-VR-VISIBLE-REPAIR */
 import * as THREE from 'three';
-import { clearQuestTableObstructions } from './quest_table_clearance.js?v=phase460';
+import { clearQuestTableObstructions } from './quest_table_clearance.js?v=phase461';
 
 export const BUILD = 'PHASE-460-QUEST-VR-VISIBLE-REPAIR';
 const params = new URLSearchParams(location.search);
@@ -9,6 +9,10 @@ const LEGACY = /LOBBY|STOREFRONT|PORTAL|ATRIUM|GIVEAWAY|MOON|MARS|SKYLINE|BUILDI
 const KEEP = /PHASE453_DIRECT_TABLE_ROOM|PHASE441_TABLE_SAFE_DECALS|PHASE441_PASS_LINE|PHASE441_CENTER_SVR_LOGO|CARD|CHIP|POT|HAND|PLAYER|ERIC|SVR_WRIST_WATCH/i;
 const state = { build: BUILD, active: ACTIVE, installed: false, watchGuarded: false, hiddenLegacy: 0, clearance: null, lastError: null, checkedAt: null };
 let timer = 0;
+let lightRig = null;
+const tableBox = new THREE.Box3();
+const tableCenter = new THREE.Vector3();
+const tableSize = new THREE.Vector3();
 
 function effectiveVisible(object){
   for (let p = object; p; p = p.parent) if (p.visible === false) return false;
@@ -46,6 +50,75 @@ function hideLegacy(runtime){
   }
   state.hiddenLegacy = Math.max(state.hiddenLegacy, hidden);
   return hidden;
+}
+
+function hardDedupe(runtime){
+  const scene = window.__SVR_SCENE__;
+  const approvedDealer = runtime?.dealer?.group;
+  const approvedTable = runtime?.table?.group;
+  if (!scene || !approvedDealer || !approvedTable) return { dealers:0, tables:0 };
+  const dealerRx = /DEALER|ERIC|SKELETON|CARD_DEALER|AVATAR_RIG/i;
+  const tableRx = /LEGACY.*TABLE|DUPLICATE.*TABLE|ORIGINAL.*TABLE|PROCEDURAL.*TABLE|TABLE.*AUTHORITY|TABLE_FALLBACK/i;
+  const candidates = [];
+  scene.traverse(object => {
+    if (!object?.parent || object === approvedDealer || object === approvedTable) return;
+    if (belongsTo(object, approvedDealer) || belongsTo(object, approvedTable)) return;
+    const label = `${object.name || ''} ${object.userData?.sourceAsset || ''}`;
+    if (dealerRx.test(label)) candidates.push({ object, kind:'dealer' });
+    else if (tableRx.test(label)) candidates.push({ object, kind:'table' });
+  });
+  const roots = candidates.filter(({object}) => !candidates.some(({object:other}) => other !== object && belongsTo(object, other)));
+  let dealers = 0, tables = 0;
+  for (const entry of roots){
+    entry.object.visible = false;
+    entry.object.userData = { ...(entry.object.userData || {}), svrPhase460HardDeduped:true, build:BUILD };
+    if (entry.kind === 'dealer') dealers++; else tables++;
+  }
+  return { dealers, tables };
+}
+
+function alignApprovedAuthority(runtime){
+  const table = runtime?.table?.table;
+  const dealer = runtime?.dealer;
+  if (!table || !dealer?.group) return false;
+  table.updateWorldMatrix?.(true, true);
+  tableBox.setFromObject(table, true);
+  if (tableBox.isEmpty()) return false;
+  tableBox.getCenter(tableCenter);
+  tableBox.getSize(tableSize);
+  const x = tableCenter.x - 0.10;
+  const z = tableCenter.z + Math.max(0.58, tableSize.z * 0.43);
+  if (Math.abs((dealer.params?.x ?? x) - x) > 0.01 || Math.abs((dealer.params?.z ?? z) - z) > 0.01) dealer.setParams?.({ x, z, scale:0.0047 });
+  dealer.groundToFloor?.(0);
+  dealer.group.visible = true;
+  if (dealer.model) dealer.model.visible = true;
+  return true;
+}
+
+function ensureBrightLightRig(runtime){
+  const scene = window.__SVR_SCENE__;
+  const table = runtime?.table?.table;
+  if (!scene || !table) return false;
+  table.updateWorldMatrix?.(true, true);
+  tableBox.setFromObject(table, true);
+  tableBox.getCenter(tableCenter);
+  if (!lightRig?.parent){
+    lightRig = new THREE.Group();
+    lightRig.name = 'PHASE460_QUEST_BRIGHT_PLAY_LIGHT_RIG';
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x171020, 2.15);
+    const key = new THREE.DirectionalLight(0xfff4df, 2.65);
+    key.position.set(2.6, 4.2, 2.1); key.target.position.set(0, .65, .75);
+    const fill = new THREE.DirectionalLight(0xccecff, 1.8);
+    fill.position.set(-2.8, 2.8, -1.6); fill.target.position.set(0, .7, .75);
+    const glow = new THREE.PointLight(0xd8b8ff, 2.4, 8.5, 1.35);
+    lightRig.add(hemi, key, key.target, fill, fill.target, glow);
+    scene.add(lightRig);
+  }
+  const glow = lightRig.children.find(object => object.isPointLight);
+  glow?.position.set(tableCenter.x, tableBox.max.y + 1.8, tableCenter.z);
+  lightRig.visible = true;
+  scene.background = new THREE.Color(0x17131f);
+  return true;
 }
 
 function cameraFacingPose(source, side = 'left'){
@@ -100,6 +173,9 @@ function sweep(reason = 'guard'){
     const runtime = window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE;
     if (!scene || !runtime?.table?.table) return false;
     hideLegacy(runtime);
+    const dedupe = hardDedupe(runtime);
+    alignApprovedAuthority(runtime);
+    ensureBrightLightRig(runtime);
     guardWatch();
     state.clearance = clearQuestTableObstructions(scene, runtime);
     const room = scene.getObjectByName?.('PHASE453_DIRECT_TABLE_ROOM');
@@ -110,7 +186,7 @@ function sweep(reason = 'guard'){
     state.installed = true;
     state.lastError = null;
     state.checkedAt = new Date().toISOString();
-    window.SVR_PHASE460_STATE = { ...state, reason };
+    window.SVR_PHASE460_STATE = { ...state, reason, dedupe };
     return qa();
   } catch (error){
     state.lastError = String(error?.stack || error?.message || error);
