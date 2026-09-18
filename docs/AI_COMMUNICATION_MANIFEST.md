@@ -230,7 +230,7 @@ A blocked task must include the smallest decision needed to continue.
 
 | ID | Owner role | Task | Status |
 |---|---|---|---|
-| SVR-001 | Coordinator | Establish AI communication manifest | In progress |
+| SVR-001 | Coordinator | Establish AI communication manifest | Complete |
 | SVR-002 | XR | Consolidate movement and calibration authority | Planned |
 | SVR-003 | Gameplay | Connect authoritative poker events to presentation | Planned |
 | SVR-004 | Presentation | Consolidate card-deal animation | Planned |
@@ -238,5 +238,6 @@ A blocked task must include the smallest decision needed to continue.
 | SVR-006 | Avatar | Implement Quest-safe avatar fallback | Prototype added |
 | SVR-007 | Multiplayer | Define server-authoritative real-player protocol | Blocked: endpoint not configured |
 | SVR-008 | QA | Execute physical Quest acceptance | Pending device access |
+| SVR-009 | Presentation / QA | Mode-aware Quest onboarding and loading feedback | In review |
 
 Update this table whenever a task changes state.
