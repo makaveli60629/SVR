@@ -1,0 +1,77 @@
+name: SVR Backend Owner Runtime Authority Guard
+
+on:
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'site/owner.html'
+      - 'game/modules/phase453_quest_direct_table_room_lock.js'
+      - 'game/modules/phase460_quest_vr_visible_repair.js'
+      - 'game/modules/phase462_quest_professional_table_room.js'
+      - 'docs/AI_COMMUNICATION_MANIFEST.md'
+      - '.github/workflows/backend-owner-runtime-audit.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'api/**'
+      - 'site/owner.html'
+      - 'game/modules/phase453_quest_direct_table_room_lock.js'
+      - 'game/modules/phase460_quest_vr_visible_repair.js'
+      - 'game/modules/phase462_quest_professional_table_room.js'
+      - 'docs/AI_COMMUNICATION_MANIFEST.md'
+      - '.github/workflows/backend-owner-runtime-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  authority-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate backend and database contract
+        run: |
+          node --check api/server.js
+          node --check api/phase419-admin-db-bootstrap.js
+          node api/tools/database-contract-audit.mjs
+          python3 -m json.tool api/database-contract.json >/dev/null
+          grep -q 'CREATE TABLE IF NOT EXISTS admin_uploads' api/sql/001_site_admin_schema.sql
+          grep -q '/api/admin/uploads' api/server.js
+          grep -q '/api/admin/database/schema' api/server.js
+          ! grep -q 'ADMIN_PASSWORD' api/server.js
+          ! grep -q 'CHANGE_ME_DEV_ONLY' api/server.js
+
+      - name: Validate private owner panel authority
+        run: |
+          grep -q 'Private Fix File Uploads' site/owner.html
+          grep -q '/api/admin/uploads' site/owner.html
+          grep -q "const endpoints = \['/api/admin/online'" site/owner.html && exit 1 || true
+          ! grep -q "/api/admin/presence" site/owner.html
+          grep -q "await api('/api/admin/online'" site/owner.html
+
+      - name: Validate single Quest room and lighting authority
+        run: |
+          node --check game/modules/phase453_quest_direct_table_room_lock.js
+          node --check game/modules/phase460_quest_vr_visible_repair.js
+          node --check game/modules/phase462_quest_professional_table_room.js
+          grep -q "purpose: 'compatibility-anchor-only'" game/modules/phase453_quest_direct_table_room_lock.js
+          ! grep -q 'new THREE.BoxGeometry' game/modules/phase453_quest_direct_table_room_lock.js
+          ! grep -q 'new THREE.HemisphereLight' game/modules/phase453_quest_direct_table_room_lock.js
+          ! grep -q 'new THREE.PointLight' game/modules/phase453_quest_direct_table_room_lock.js
+          grep -q 'PHASE462_PROFESSIONAL_TABLE_ROOM' game/modules/phase462_quest_professional_table_room.js
+          grep -q 'Phase 460 no longer creates a competing light rig' game/modules/phase460_quest_vr_visible_repair.js
+          ! grep -q 'new THREE.DirectionalLight' game/modules/phase460_quest_vr_visible_repair.js
+          ! grep -q 'new THREE.HemisphereLight' game/modules/phase460_quest_vr_visible_repair.js
+
+      - name: Protect public launch page
+        run: |
+          git diff --name-only ${{ github.event.pull_request.base.sha || github.event.before }} ${{ github.sha }} 2>/dev/null | grep -qx 'index.html' && {
+            echo 'Public launch page changed in backend/owner/runtime authority task.' >&2
+            exit 1
+          } || true
