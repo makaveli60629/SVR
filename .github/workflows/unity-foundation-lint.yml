@@ -1,0 +1,49 @@
+name: Unity Foundation Validation
+
+on:
+  pull_request:
+    paths:
+      - 'unity/SVRPoker/**'
+      - 'docs/PHASE-46*-UNITY-*.md'
+      - '.github/workflows/unity-foundation-lint.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate project structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f unity/SVRPoker/ProjectSettings/ProjectVersion.txt
+          test -f unity/SVRPoker/Packages/manifest.json
+          test -f unity/SVRPoker/Assets/SVR/Core/SVRBootstrap.cs
+          test -f unity/SVRPoker/Assets/SVR/Editor/SVRBuild.cs
+          grep -F "6000.3.15f1 (c1aa84e375f6)" unity/SVRPoker/ProjectSettings/ProjectVersion.txt
+
+      - name: Validate package JSON
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          p = Path("unity/SVRPoker/Packages/manifest.json")
+          data = json.loads(p.read_text())
+          assert isinstance(data.get("dependencies"), dict)
+          assert "com.unity.modules.webgl" in data["dependencies"]
+          assert "com.unity.modules.androidjni" in data["dependencies"]
+          print("Unity package manifest valid")
+
+      - name: Validate cloud build entry points
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F "BuildWebCloud" unity/SVRPoker/Assets/SVR/Editor/SVRBuild.cs
+          grep -F "BuildAndroidCloud" unity/SVRPoker/Assets/SVR/Editor/SVRBuild.cs
+          grep -F "WebGLCompressionFormat.Brotli" unity/SVRPoker/Assets/SVR/Editor/SVRBuild.cs
