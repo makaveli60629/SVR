@@ -41,7 +41,7 @@ app.use(cors({
     return callback(new Error("CORS origin blocked"));
   },
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "X-SVR-Filename", "X-SVR-Content-Type", "X-SVR-Notes"]
 }));
 
 function adminJwtConfigured() {
