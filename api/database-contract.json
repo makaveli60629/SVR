@@ -94,6 +94,20 @@
         "user_agent",
         "metadata",
         "created_at"
+      ],
+      "admin_uploads": [
+        "id",
+        "original_name",
+        "stored_name",
+        "content_type",
+        "byte_size",
+        "sha256",
+        "payload",
+        "notes",
+        "uploaded_by",
+        "created_at",
+        "deleted_at",
+        "deleted_by"
       ]
     }
   },
