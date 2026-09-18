@@ -14,12 +14,24 @@ This directory contains the current `svr-aws-api` Express/PostgreSQL source for 
 - game event telemetry
 - site analytics + admin analytics
 - admin logs
+- authenticated private owner file uploads/list/download/delete
 
 The database target is PostgreSQL via `DATABASE_URL`.
 
+## Owner upload authority
+
+The private owner panel at `/site/owner.html` can use the authenticated API to store small project handoff/fix files in PostgreSQL.
+
+- Maximum request payload: 8 MB
+- Authentication: owner JWT required
+- Public exposure: none
+- Metadata: original name, MIME type, byte size, SHA-256, notes, uploader, timestamps
+- Delete behavior: soft-delete from active owner list
+- These uploads are for project fixes/config/reference packets, not a public CDN.
+
 ## Current public wiring state
 
-The public root site does **not** currently send visitor messages to this service. `site-public-hooks.js` explicitly stores the visitor form locally and says secure API delivery is not enabled on the static page yet.
+The public root site is intentionally outside the owner/backend cleanup scope and is not modified by the private upload feature. The public root site does **not** currently send visitor messages to this service. `site-public-hooks.js` explicitly stores the visitor form locally and says secure API delivery is not enabled on the static page yet.
 
 Do not report this API or PostgreSQL database as live merely because the source exists.
 
