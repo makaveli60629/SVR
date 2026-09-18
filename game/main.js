@@ -3,7 +3,7 @@ import { createCore } from "./modules/core_scene.js";
 import { createDesktopControls } from "./modules/desktop_controls.js";
 import { createHands } from "./modules/hands_phase228.js";
 import { createTeleportRig } from "./modules/movement_phase228.js?v=phase169-locomotion-polish";
-import { createQuestTableWorld } from "./modules/quest_table_world.js?v=phase460";
+import { createQuestTableWorld } from "./modules/quest_table_world.js?v=phase463";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
 import { createWristWatch } from "./modules/watch.js?v=phase462";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
@@ -152,8 +152,10 @@ if (!QUEST_TABLE_ONLY) createStoreWebPortal();
 $toggleJoints?.addEventListener("click", ()=>{ const on = hands.toggleDebug(); $toggleJoints.textContent = on ? "Joints On" : "Joints"; });
 
 setStatus("Loading logo…", { force: true });
-const logoTexture = await loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace });
-tp.setLogoTexture(logoTexture);
+// Decorative images must never block the first frame or poker initialization.
+loadFirstTexture(assetUrls("ui/logo.png", "logo.png"), { colorSpace: THREE.SRGBColorSpace })
+  .then(texture => { if (texture) tp.setLogoTexture(texture); })
+  .catch(error => console.warn("Optional logo unavailable", error));
 window.SVR_PHASE208_PERFORMANCE_MAIN = true;
 perf.lockSceneForQuest();
 

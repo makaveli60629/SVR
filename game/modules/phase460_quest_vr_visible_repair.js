@@ -31,6 +31,8 @@ function touchesProtectedAuthority(object, runtime){
     runtime?.table?.table,
     runtime?.dealer?.group,
     runtime?.dealer?.propGroup,
+    window.__SVR_SCENE__?.getObjectByName('PHASE438_APPROVED_DEALER_TABLE_LIGHT_RIG'),
+    window.__SVR_SCENE__?.getObjectByName('PHASE462_PROFESSIONAL_TABLE_ROOM'),
     window.SVR_WRIST_WATCH?.object
   ].filter(Boolean);
   return protectedObjects.some(item => belongsTo(item, object) || belongsTo(object, item));
@@ -62,7 +64,7 @@ function hardDedupe(runtime){
   const candidates = [];
   scene.traverse(object => {
     if (!object?.parent || object === approvedDealer || object === approvedTable) return;
-    if (belongsTo(object, approvedDealer) || belongsTo(object, approvedTable)) return;
+    if (touchesProtectedAuthority(object, runtime)) return;
     const label = `${object.name || ''} ${object.userData?.sourceAsset || ''}`;
     if (dealerRx.test(label)) candidates.push({ object, kind:'dealer' });
     else if (tableRx.test(label)) candidates.push({ object, kind:'table' });
@@ -99,6 +101,10 @@ function ensureBrightLightRig(runtime){
   const scene = window.__SVR_SCENE__;
   const table = runtime?.table?.table;
   if (!scene || !table) return false;
+  if (scene.getObjectByName('PHASE462_PROFESSIONAL_TABLE_ROOM')?.visible) {
+    if (lightRig) lightRig.visible = false;
+    return true;
+  }
   table.updateWorldMatrix?.(true, true);
   tableBox.setFromObject(table, true);
   tableBox.getCenter(tableCenter);
