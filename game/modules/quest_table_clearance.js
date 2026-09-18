@@ -15,7 +15,10 @@ function visible(object) {
 
 function gameplay(object) {
   for (let p = object; p; p = p.parent) {
-    if (p.userData?.svrUserInterface || p.userData?.svrPhase441Approved || p.userData?.svrPhase440Approved) return true;
+    // Phase 440 marks the complete approved table root. Inheriting that marker
+    // here protected stale cover meshes nested under the table and let the old
+    // clearance audit report a false pass. Protect actual game pieces only.
+    if (p.userData?.svrUserInterface) return true;
     if (/CARD|CHIP|POT|HAND|BUTTON|CONTROL|INTERACTION|DEAL|PLAYER|ERIC|PASS.?LINE|CENTER.*LOGO|SAFE.?DECAL/i.test(p.name || '')) return true;
   }
   return false;
