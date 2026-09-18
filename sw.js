@@ -56,8 +56,6 @@ async function cacheFirstRevalidate(event,request){
 
   const fresh=await refresh;
   if(fresh)return fresh;
-  const offline=await caches.match('/offline.html');
-  if(offline)return offline;
   throw new Error('SVR_RUNTIME_ASSET_UNAVAILABLE');
 }
 
