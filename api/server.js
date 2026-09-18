@@ -8,17 +8,25 @@ const { Pool } = require("pg");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
+const NODE_ENV = String(process.env.NODE_ENV || "development").toLowerCase();
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "https://svrpoker.com";
-const JWT_SECRET = process.env.ADMIN_JWT_SECRET || "CHANGE_ME_DEV_ONLY";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const JWT_SECRET = String(process.env.ADMIN_JWT_SECRET || "");
 const ADMIN_DISPLAY_NAME = process.env.ADMIN_DISPLAY_NAME || "King";
 const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_SSL_REJECT_UNAUTHORIZED = process.env.DATABASE_SSL_REJECT_UNAUTHORIZED == null
+  ? NODE_ENV === "production"
+  : String(process.env.DATABASE_SSL_REJECT_UNAUTHORIZED).toLowerCase() === "true";
+const DATABASE_CONTRACT = require("./database-contract.json");
 
 const pool = DATABASE_URL
-  ? new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false }, connectionTimeoutMillis: 15000 })
+  ? new Pool({
+      connectionString: DATABASE_URL,
+      ssl: { rejectUnauthorized: DATABASE_SSL_REJECT_UNAUTHORIZED },
+      connectionTimeoutMillis: 15000
+    })
   : null;
 
+app.disable("x-powered-by");
 app.use(helmet());
 app.use(express.json({ limit: "128kb" }));
 app.use(cors({
@@ -32,11 +40,24 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-function signAdminToken(email) {
-  return jwt.sign({ email, role: "admin" }, JWT_SECRET, { expiresIn: "8h" });
+function adminJwtConfigured() {
+  return JWT_SECRET.length >= 32;
+}
+
+function signAdminToken(identity, adminRole = "owner") {
+  if (!adminJwtConfigured()) throw new Error("ADMIN_JWT_SECRET must be at least 32 characters.");
+  return jwt.sign({ email: identity, role: "admin", adminRole }, JWT_SECRET, { expiresIn: "8h" });
+}
+
+function sendServerError(res, publicMessage, error, status = 500) {
+  console.error(publicMessage, error);
+  const payload = { ok: false, error: publicMessage };
+  if (NODE_ENV !== "production") payload.detail = String(error?.message || error);
+  return res.status(status).json(payload);
 }
 
 function requireAdmin(req, res, next) {
+  if (!adminJwtConfigured()) return res.status(503).json({ ok: false, error: "Admin authentication is not configured." });
   const header = req.headers.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";
   if (!token) return res.status(401).json({ ok: false, error: "Missing admin token." });
@@ -71,6 +92,27 @@ function normalizeMessageId(raw) {
 
 async function ensurePgCrypto() {
   await dbQuery(`CREATE EXTENSION IF NOT EXISTS pgcrypto;`);
+}
+
+async function ensureAdminUsersTable() {
+  await ensurePgCrypto();
+  await dbQuery(`
+    CREATE TABLE IF NOT EXISTS admin_users (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      username TEXT UNIQUE NOT NULL,
+      email TEXT UNIQUE,
+      display_name TEXT NOT NULL DEFAULT 'SVR Owner',
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'owner',
+      is_active BOOLEAN NOT NULL DEFAULT TRUE,
+      must_change_password BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_login_at TIMESTAMPTZ
+    );
+    CREATE INDEX IF NOT EXISTS idx_admin_users_username ON admin_users (username);
+    CREATE INDEX IF NOT EXISTS idx_admin_users_active ON admin_users (is_active);
+  `);
 }
 
 async function ensureAdminStatusTable() {
@@ -206,6 +248,63 @@ async function ensureSiteAnalyticsTable() {
     CREATE INDEX IF NOT EXISTS idx_site_analytics_session_id ON site_analytics_events (session_id);
   `);
 }
+async function ensureSiteAdminSchema() {
+  if (!pool) return { configured: false, pass: false, reason: "DATABASE_URL_NOT_CONFIGURED" };
+  await ensureAdminUsersTable();
+  await ensureAdminStatusTable();
+  await ensureSiteMessagesTable();
+  await ensureAdminLogsTable();
+  await ensureMarketingTables();
+  await ensureStoreItemsTable();
+  await ensureGameEventsTable();
+  await ensureSiteAnalyticsTable();
+  return auditDatabaseSchema();
+}
+
+async function auditDatabaseSchema() {
+  if (!pool) return { configured: false, pass: false, reason: "DATABASE_URL_NOT_CONFIGURED" };
+  const tables = DATABASE_CONTRACT.siteAdminPostgres?.tables || {};
+  const names = Object.keys(tables);
+  const result = await dbQuery(
+    `SELECT table_name, column_name
+       FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = ANY($1::text[])`,
+    [names]
+  );
+  const found = new Map();
+  for (const row of result.rows) {
+    if (!found.has(row.table_name)) found.set(row.table_name, new Set());
+    found.get(row.table_name).add(row.column_name);
+  }
+  const missingTables = [];
+  const missingColumns = [];
+  for (const [table, requiredColumns] of Object.entries(tables)) {
+    if (!found.has(table)) {
+      missingTables.push(table);
+      continue;
+    }
+    const columns = found.get(table);
+    for (const column of requiredColumns) {
+      if (!columns.has(column)) missingColumns.push(`${table}.${column}`);
+    }
+  }
+  return {
+    configured: true,
+    contractVersion: DATABASE_CONTRACT.contractVersion,
+    pass: missingTables.length === 0 && missingColumns.length === 0,
+    missingTables,
+    missingColumns,
+    checkedAt: new Date().toISOString()
+  };
+}
+
+let databaseSchemaState = {
+  configured: Boolean(DATABASE_URL),
+  contractVersion: DATABASE_CONTRACT.contractVersion,
+  pass: false,
+  reason: DATABASE_URL ? "NOT_CHECKED" : "DATABASE_URL_NOT_CONFIGURED"
+};
+
 async function writeAdminLog(email, action, details) {
   try {
     await ensureAdminLogsTable();
@@ -305,38 +404,108 @@ async function seedStarterStoreItems(adminEmail = null) {
 }
 
 app.get("/api/health", async (req, res) => {
-  const response = { ok: true, service: "svr-aws-api", databaseConfigured: Boolean(DATABASE_URL), time: new Date().toISOString() };
-  if (!DATABASE_URL) { response.database = "not-configured"; return res.json(response); }
+  const response = {
+    ok: true,
+    service: "svr-site-admin-postgres-api",
+    databaseConfigured: Boolean(DATABASE_URL),
+    adminJwtConfigured: adminJwtConfigured(),
+    schema: {
+      contractVersion: databaseSchemaState.contractVersion,
+      pass: Boolean(databaseSchemaState.pass),
+      missingTableCount: databaseSchemaState.missingTables?.length || 0,
+      missingColumnCount: databaseSchemaState.missingColumns?.length || 0
+    },
+    time: new Date().toISOString()
+  };
+  if (!DATABASE_URL) {
+    response.database = "not-configured";
+    return res.json(response);
+  }
   try {
-    const result = await dbQuery(`SELECT current_database() AS database, current_user AS user, NOW() AS server_time`);
+    await dbQuery(`SELECT 1 AS ok`);
     response.database = "connected";
-    response.db = result.rows[0];
     return res.json(response);
   } catch (error) {
+    console.error("Database health check failed.", error);
     response.ok = false;
     response.database = "error";
-    response.error = error.message;
+    if (NODE_ENV !== "production") response.detail = String(error?.message || error);
     return res.status(500).json(response);
   }
 });
 
 app.post("/api/admin/login", async (req, res) => {
-  const email = cleanEmail(req.body?.email);
+  const identifier = cleanText(req.body?.email || req.body?.username, 255).toLowerCase();
   const password = String(req.body?.password || "");
-  if (!ADMIN_EMAIL || !ADMIN_PASSWORD || JWT_SECRET === "CHANGE_ME_DEV_ONLY") return res.status(500).json({ ok: false, error: "Admin environment variables are not configured." });
-  if (email !== ADMIN_EMAIL.toLowerCase() || password !== ADMIN_PASSWORD) return res.status(401).json({ ok: false, error: "Invalid admin login." });
+  if (!DATABASE_URL || !adminJwtConfigured()) {
+    return res.status(503).json({ ok: false, error: "Admin authentication is not configured." });
+  }
+  if (!identifier || !password) return res.status(400).json({ ok: false, error: "Email/username and password are required." });
   try {
+    await ensureAdminUsersTable();
+    const result = await dbQuery(`
+      SELECT id, username, email, display_name, role, must_change_password
+      FROM admin_users
+      WHERE is_active = TRUE
+        AND (LOWER(COALESCE(email,'')) = $1 OR LOWER(username) = $1)
+        AND password_hash = crypt($2, password_hash)
+      LIMIT 1
+    `, [identifier, password]);
+    const row = result.rows[0];
+    if (!row) return res.status(401).json({ ok: false, error: "Invalid admin login." });
+    const identity = row.email || row.username;
+    await dbQuery(`UPDATE admin_users SET last_login_at = NOW(), updated_at = NOW() WHERE id = $1`, [row.id]);
     await ensureAdminStatusTable();
     await dbQuery(`
       INSERT INTO admin_status (id, is_online, status_text, updated_by, updated_at)
       VALUES (1, TRUE, 'Admin Online', $1, NOW())
-      ON CONFLICT (id) DO UPDATE SET is_online = TRUE, status_text = 'Admin Online', updated_by = EXCLUDED.updated_by, updated_at = NOW()
-    `, [email]);
-    await writeAdminLog(email, "admin_login", { source: "api" });
+      ON CONFLICT (id) DO UPDATE SET
+        is_online = TRUE,
+        status_text = 'Admin Online',
+        updated_by = EXCLUDED.updated_by,
+        updated_at = NOW()
+    `, [identity]);
+    await writeAdminLog(identity, "admin_login", { source: "api", username: row.username, role: row.role });
+    return res.json({
+      ok: true,
+      token: signAdminToken(identity, row.role),
+      admin: {
+        email: row.email || null,
+        username: row.username,
+        displayName: row.display_name || ADMIN_DISPLAY_NAME,
+        role: row.role,
+        mustChangePassword: Boolean(row.must_change_password),
+        isOnline: true
+      }
+    });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed during login.", detail: error.message });
+    return sendServerError(res, "Admin login failed.", error);
   }
-  return res.json({ ok: true, token: signAdminToken(email), admin: { email, displayName: ADMIN_DISPLAY_NAME, isOnline: true } });
+});
+
+app.post("/api/admin/password", requireAdmin, async (req, res) => {
+  const currentPassword = String(req.body?.currentPassword || "");
+  const newPassword = String(req.body?.newPassword || "");
+  if (newPassword.length < 12) return res.status(400).json({ ok: false, error: "New password must be at least 12 characters." });
+  try {
+    await ensureAdminUsersTable();
+    const identity = String(req.admin?.email || "").toLowerCase();
+    const result = await dbQuery(`
+      UPDATE admin_users
+      SET password_hash = crypt($2, gen_salt('bf', 12)),
+          must_change_password = FALSE,
+          updated_at = NOW()
+      WHERE is_active = TRUE
+        AND (LOWER(COALESCE(email,'')) = $1 OR LOWER(username) = $1)
+        AND password_hash = crypt($3, password_hash)
+      RETURNING username, email
+    `, [identity, newPassword, currentPassword]);
+    if (!result.rows.length) return res.status(401).json({ ok: false, error: "Current password is incorrect." });
+    await writeAdminLog(identity, "admin_password_changed", { username: result.rows[0].username });
+    return res.json({ ok: true, changed: true });
+  } catch (error) {
+    return sendServerError(res, "Admin password update failed.", error);
+  }
 });
 
 app.post("/api/admin/online", requireAdmin, async (req, res) => {
@@ -352,7 +521,7 @@ app.post("/api/admin/online", requireAdmin, async (req, res) => {
     await writeAdminLog(req.admin.email, isOnline ? "admin_online" : "admin_offline", { source: "api" });
     return res.json({ ok: true, isOnline });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
   }
 });
 
@@ -364,7 +533,7 @@ app.get("/api/admin/status", async (req, res) => {
     const row = result.rows[0];
     return res.json({ ok: true, isOnline: Boolean(row.is_online), displayName: ADMIN_DISPLAY_NAME, statusText: row.status_text, updatedBy: row.updated_by, updatedAt: row.updated_at, source: "database" });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database read failed.", detail: error.message });
+    return sendServerError(res, "Database read failed.", error);
   }
 });
 
@@ -384,7 +553,7 @@ app.post("/api/messages", async (req, res) => {
     `, [name || null, email || null, subject || null, message, source]);
     return res.status(201).json({ ok: true, message: "Message received.", record: result.rows[0] });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
   }
 });
 
@@ -408,7 +577,7 @@ app.get("/api/messages/admin", requireAdmin, async (req, res) => {
     `);
     return res.json({ ok: true, messages: result.rows, counts: counts.rows[0] || {} });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database read failed.", detail: error.message });
+    return sendServerError(res, "Database read failed.", error);
   }
 });
 
@@ -423,7 +592,7 @@ app.post("/api/messages/admin/read", requireAdmin, async (req, res) => {
     await writeAdminLog(req.admin.email, isRead ? "message_mark_read" : "message_mark_unread", { id });
     return res.json({ ok: true, message: result.rows[0] });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
   }
 });
 
@@ -440,7 +609,7 @@ app.post("/api/messages/admin/archive", requireAdmin, async (req, res) => {
     await writeAdminLog(req.admin.email, archive ? "message_archive" : "message_restore", { id });
     return res.json({ ok: true, message: result.rows[0] });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
   }
 });
 
@@ -454,7 +623,7 @@ app.post("/api/messages/admin/delete", requireAdmin, async (req, res) => {
     await writeAdminLog(req.admin.email, "message_delete", { id });
     return res.json({ ok: true, deleted: result.rows[0] });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
   }
 });
 
@@ -477,7 +646,7 @@ app.post("/api/leads", async (req, res) => {
     `, [leadType, name || null, email || null, phone || null, organization || null, message || null, source, consent]);
     return res.status(201).json({ ok: true, message: "Lead received.", record: result.rows[0] });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
   }
 });
 
@@ -495,7 +664,7 @@ app.get("/api/store/items", async (req, res) => {
     `);
     return res.json({ ok: true, checkoutEnabled: false, sandboxOnly: true, items: result.rows });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database read failed.", detail: error.message });
+    return sendServerError(res, "Database read failed.", error);
   }
 });
 
@@ -516,7 +685,7 @@ app.post("/api/game/events", async (req, res) => {
     `, [eventType, room || null, build || null, sessionId || null, source, JSON.stringify(payload)]);
     return res.status(201).json({ ok: true, event: result.rows[0] });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
   }
 });
 
@@ -538,7 +707,7 @@ app.post("/api/analytics/event", async (req, res) => {
     `, [eventType, pagePath, pageTitle || null, referrer || null, sessionId || null, source, userAgent || null, JSON.stringify(metadata)]);
     return res.status(201).json({ ok: true, event: result.rows[0] });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Analytics write failed.", detail: error.message });
+    return sendServerError(res, "Analytics write failed.", error);
   }
 });
 
@@ -610,7 +779,7 @@ app.get("/api/admin/analytics/summary", requireAdmin, async (req, res) => {
     `);
     return res.json({ ok: true, totals: totals.rows[0] || {}, business: business.rows[0] || {}, topPages: topPages.rows, referrers: referrers.rows, eventCounts: eventCounts.rows, daily: daily.rows });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Analytics summary failed.", detail: error.message });
+    return sendServerError(res, "Analytics summary failed.", error);
   }
 });
 
@@ -625,7 +794,7 @@ app.get("/api/admin/analytics/events", requireAdmin, async (req, res) => {
     `);
     return res.json({ ok: true, events: result.rows });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Analytics events failed.", detail: error.message });
+    return sendServerError(res, "Analytics events failed.", error);
   }
 });
 app.get("/api/admin/leads", requireAdmin, async (req, res) => {
@@ -648,7 +817,7 @@ app.get("/api/admin/leads", requireAdmin, async (req, res) => {
     `);
     return res.json({ ok: true, leads: result.rows, counts: counts.rows[0] || {} });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database read failed.", detail: error.message });
+    return sendServerError(res, "Database read failed.", error);
   }
 });
 
@@ -663,7 +832,7 @@ app.post("/api/admin/leads/status", requireAdmin, async (req, res) => {
     await writeAdminLog(req.admin.email, "lead_status_update", { id, status });
     return res.json({ ok: true, lead: result.rows[0] });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
   }
 });
 
@@ -686,7 +855,7 @@ app.get("/api/admin/game/events", requireAdmin, async (req, res) => {
     `);
     return res.json({ ok: true, events: result.rows, counts: counts.rows });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database read failed.", detail: error.message });
+    return sendServerError(res, "Database read failed.", error);
   }
 });
 
@@ -703,7 +872,7 @@ app.get("/api/admin/store/items", requireAdmin, async (req, res) => {
     `, [includeInactive]);
     return res.json({ ok: true, items: result.rows });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database read failed.", detail: error.message });
+    return sendServerError(res, "Database read failed.", error);
   }
 });
 
@@ -712,7 +881,7 @@ app.post("/api/admin/store/items/seed", requireAdmin, async (req, res) => {
     await seedStarterStoreItems(req.admin.email);
     return res.json({ ok: true, seeded: STARTER_STORE_ITEMS.length });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
   }
 });
 
@@ -746,7 +915,7 @@ app.post("/api/admin/store/items/upsert", requireAdmin, async (req, res) => {
     await writeAdminLog(req.admin.email, "store_item_upsert", { sku });
     return res.json({ ok: true, item: result.rows[0] });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
   }
 });
 
@@ -761,7 +930,16 @@ app.post("/api/admin/store/items/active", requireAdmin, async (req, res) => {
     await writeAdminLog(req.admin.email, "store_item_active_update", { sku, isActive });
     return res.json({ ok: true, item: result.rows[0] });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+    return sendServerError(res, "Database write failed.", error);
+  }
+});
+
+app.get("/api/admin/database/schema", requireAdmin, async (req, res) => {
+  try {
+    databaseSchemaState = await auditDatabaseSchema();
+    return res.status(databaseSchemaState.pass ? 200 : 503).json({ ok: databaseSchemaState.pass, schema: databaseSchemaState });
+  } catch (error) {
+    return sendServerError(res, "Database schema audit failed.", error);
   }
 });
 
@@ -771,12 +949,28 @@ app.get("/api/admin/logs", requireAdmin, async (req, res) => {
     const result = await dbQuery(`SELECT id, admin_email, action, details, created_at FROM admin_logs ORDER BY created_at DESC LIMIT 50`);
     return res.json({ ok: true, logs: result.rows });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Database read failed.", detail: error.message });
+    return sendServerError(res, "Database read failed.", error);
   }
 });
 
 app.use("/api", (req, res) => res.status(404).json({ ok: false, error: "API route not found." }));
 
-app.listen(PORT, () => console.log(`SVR AWS PostgreSQL API listening on port ${PORT}`));
+async function startServer() {
+  if (DATABASE_URL) {
+    try {
+      databaseSchemaState = await ensureSiteAdminSchema();
+      if (!databaseSchemaState.pass) {
+        throw new Error(`Database schema contract failed: ${JSON.stringify(databaseSchemaState)}`);
+      }
+    } catch (error) {
+      console.error("SVR database bootstrap failed.", error);
+      process.exitCode = 1;
+      return;
+    }
+  }
+  app.listen(PORT, () => console.log(`SVR Site/Admin PostgreSQL API listening on port ${PORT}`));
+}
+
+startServer();
 
 
