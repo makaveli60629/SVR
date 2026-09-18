@@ -215,6 +215,7 @@ jobs:
           cp source/update/app-v1-release.json publish/update/app-v1-release.json
           rm -rf publish/game/tools publish/game/docs publish/site/tools publish/site/docs
           find publish -type f \( -name '*.zip' -o -name '*.ps1' -o -name '.env' -o -name '.env.*' \) -delete
+          cp -a source/kodi publish/kodi
 
       - name: Stamp deployment health
         shell: bash
@@ -300,6 +301,10 @@ jobs:
           set -euo pipefail
           test -s publish/index.html
           test -s publish/game/index.html
+          test -s publish/kodi/addons.xml
+          test -s publish/kodi/addons.xml.md5
+          test -s publish/kodi/repository.king-1.0.0.zip
+          test -s publish/kodi/plugin.video.kingmedia/plugin.video.kingmedia-1.0.0.zip
           test -s publish/game/quest.html
           test -s publish/game/camera3-live.html
           test -s publish/game/modules/phase438_lab_master_lobby_dealer_authority.js
