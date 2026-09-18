@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -91,6 +92,17 @@ function normalizeMessageId(raw) {
   const id = String(raw || "").trim();
   if (!/^[0-9a-fA-F-]{36}$/.test(id)) return "";
   return id;
+}
+
+function cleanFileName(value) {
+  const raw = String(value || "upload.bin").trim().replace(/\\/g, "/").split("/").pop() || "upload.bin";
+  const safe = raw.replace(/[^a-zA-Z0-9._()\- ]+/g, "_").replace(/\s+/g, " ").trim().slice(0, 180);
+  return safe || "upload.bin";
+}
+
+function cleanContentType(value) {
+  const type = String(value || "application/octet-stream").trim().toLowerCase();
+  return /^[a-z0-9.+-]+\/[a-z0-9.+-]+$/.test(type) ? type : "application/octet-stream";
 }
 
 async function ensurePgCrypto() {
@@ -936,6 +948,84 @@ app.get("/api/admin/database/schema", requireAdmin, async (req, res) => {
     return res.status(databaseSchemaState.pass ? 200 : 503).json({ ok: databaseSchemaState.pass, schema: databaseSchemaState });
   } catch (error) {
     return sendServerError(res, "Database schema audit failed.", error);
+  }
+});
+
+app.post("/api/admin/uploads", requireAdmin, express.raw({ type: "application/octet-stream", limit: "8mb" }), async (req, res) => {
+  const originalName = cleanFileName(req.get("X-SVR-Filename"));
+  const contentType = cleanContentType(req.get("X-SVR-Content-Type"));
+  const notes = cleanText(req.get("X-SVR-Notes"), 1000);
+  const payload = Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0);
+  if (!payload.length) return res.status(400).json({ ok: false, error: "File payload is required." });
+  const sha256 = crypto.createHash("sha256").update(payload).digest("hex");
+  const storedName = `${Date.now()}-${sha256.slice(0, 12)}-${originalName}`;
+  try {
+    const result = await dbQuery(`
+      INSERT INTO admin_uploads
+        (original_name, stored_name, content_type, byte_size, sha256, payload, notes, uploaded_by)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING id, original_name, stored_name, content_type, byte_size, sha256, notes, uploaded_by, created_at
+    `, [originalName, storedName, contentType, payload.length, sha256, payload, notes || null, req.admin.email]);
+    await writeAdminLog(req.admin.email, "admin_file_upload", { id: result.rows[0].id, originalName, byteSize: payload.length, sha256 });
+    return res.status(201).json({ ok: true, file: result.rows[0] });
+  } catch (error) {
+    return sendServerError(res, "File upload failed.", error);
+  }
+});
+
+app.get("/api/admin/uploads", requireAdmin, async (req, res) => {
+  try {
+    const result = await dbQuery(`
+      SELECT id, original_name, stored_name, content_type, byte_size, sha256, notes, uploaded_by, created_at
+      FROM admin_uploads
+      WHERE deleted_at IS NULL
+      ORDER BY created_at DESC
+      LIMIT 100
+    `);
+    return res.json({ ok: true, files: result.rows });
+  } catch (error) {
+    return sendServerError(res, "File list failed.", error);
+  }
+});
+
+app.get("/api/admin/uploads/:id/download", requireAdmin, async (req, res) => {
+  const id = normalizeMessageId(req.params.id);
+  if (!id) return res.status(400).json({ ok: false, error: "Valid file id is required." });
+  try {
+    const result = await dbQuery(`
+      SELECT original_name, content_type, byte_size, sha256, payload
+      FROM admin_uploads
+      WHERE id = $1 AND deleted_at IS NULL
+      LIMIT 1
+    `, [id]);
+    const row = result.rows[0];
+    if (!row) return res.status(404).json({ ok: false, error: "File not found." });
+    const name = cleanFileName(row.original_name);
+    res.setHeader("Content-Type", cleanContentType(row.content_type));
+    res.setHeader("Content-Length", String(row.byte_size));
+    res.setHeader("X-SVR-SHA256", row.sha256);
+    res.setHeader("Content-Disposition", `attachment; filename="${name.replace(/"/g, "")}"`);
+    return res.send(row.payload);
+  } catch (error) {
+    return sendServerError(res, "File download failed.", error);
+  }
+});
+
+app.post("/api/admin/uploads/:id/delete", requireAdmin, async (req, res) => {
+  const id = normalizeMessageId(req.params.id);
+  if (!id) return res.status(400).json({ ok: false, error: "Valid file id is required." });
+  try {
+    const result = await dbQuery(`
+      UPDATE admin_uploads
+      SET deleted_at = NOW(), deleted_by = $1
+      WHERE id = $2 AND deleted_at IS NULL
+      RETURNING id, original_name, byte_size, sha256, deleted_at
+    `, [req.admin.email, id]);
+    if (!result.rows.length) return res.status(404).json({ ok: false, error: "File not found." });
+    await writeAdminLog(req.admin.email, "admin_file_delete", { id, originalName: result.rows[0].original_name, sha256: result.rows[0].sha256 });
+    return res.json({ ok: true, file: result.rows[0] });
+  } catch (error) {
+    return sendServerError(res, "File delete failed.", error);
   }
 });
 
