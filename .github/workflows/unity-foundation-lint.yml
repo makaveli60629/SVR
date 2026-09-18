@@ -5,6 +5,8 @@ on:
     paths:
       - 'unity/SVRPoker/**'
       - 'docs/PHASE-46*-UNITY-*.md'
+      - 'docs/SVR_MASTER_MANIFEST.md'
+      - 'docs/SVR_MASTER_MANIFEST.json'
       - '.github/workflows/unity-foundation-lint.yml'
   workflow_dispatch:
 
@@ -47,3 +49,24 @@ jobs:
           grep -F "BuildWebCloud" unity/SVRPoker/Assets/SVR/Editor/SVRBuild.cs
           grep -F "BuildAndroidCloud" unity/SVRPoker/Assets/SVR/Editor/SVRBuild.cs
           grep -F "WebGLCompressionFormat.Brotli" unity/SVRPoker/Assets/SVR/Editor/SVRBuild.cs
+
+      - name: Validate master handoff manifest
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          md = Path("docs/SVR_MASTER_MANIFEST.md").read_text()
+          assert "Current implementation phase:** Phase 465" in md
+          assert "unity/SVRPoker" in md
+          assert "SVR.Editor.SVRBuild.BuildWebCloud" in md
+          assert "SVR.Editor.SVRBuild.BuildAndroidCloud" in md
+          assert "PR #264" in md
+
+          data = json.loads(Path("docs/SVR_MASTER_MANIFEST.json").read_text())
+          assert data["project"]["currentPhase"] == 465
+          assert data["project"]["pullRequest"] == 264
+          assert data["runtimeTracks"]["unity"]["root"] == "unity/SVRPoker"
+          assert data["runtimeTracks"]["unity"]["editorVersion"] == "6000.3.15f1"
+          assert data["phase465"]["repositoryFoundation"] == "complete"
+          print("SVR Phase 465 master manifests valid")
