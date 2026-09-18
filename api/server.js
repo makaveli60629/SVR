@@ -5,6 +5,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const jwt = require("jsonwebtoken");
 const { Pool } = require("pg");
+const crypto = require("crypto");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -14,6 +15,13 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const ADMIN_DISPLAY_NAME = process.env.ADMIN_DISPLAY_NAME || "King";
 const DATABASE_URL = process.env.DATABASE_URL;
+// SVR_RESOURCE_UPLOADER_V1
+const S3_REGION = process.env.AWS_REGION || process.env.S3_REGION || "us-east-1";
+const S3_BUCKET = process.env.SVR_RESOURCE_BUCKET || process.env.S3_BUCKET || "";
+const S3_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || "";
+const S3_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || "";
+const S3_SESSION_TOKEN = process.env.AWS_SESSION_TOKEN || "";
+const RESOURCE_MAX_BYTES = Math.max(1, Number(process.env.SVR_RESOURCE_MAX_BYTES || 262144000));
 
 const pool = DATABASE_URL
   ? new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false }, connectionTimeoutMillis: 15000 })
@@ -206,6 +214,76 @@ async function ensureSiteAnalyticsTable() {
     CREATE INDEX IF NOT EXISTS idx_site_analytics_session_id ON site_analytics_events (session_id);
   `);
 }
+
+const RESOURCE_EXTENSIONS = new Set(["fbx","obj","glb","gltf","mtl","blend","zip","png","jpg","jpeg","webp","ktx2"]);
+const RESOURCE_CONTENT_TYPES = {
+  fbx:"application/octet-stream", obj:"text/plain", glb:"model/gltf-binary", gltf:"model/gltf+json",
+  mtl:"text/plain", blend:"application/octet-stream", zip:"application/zip", png:"image/png",
+  jpg:"image/jpeg", jpeg:"image/jpeg", webp:"image/webp", ktx2:"image/ktx2"
+};
+function resourceExtension(name){
+  const match=String(name||"").toLowerCase().match(/\.([a-z0-9]+)$/);
+  return match ? match[1] : "";
+}
+function safeResourceName(name){
+  const cleaned=String(name||"resource").normalize("NFKD").replace(/[^a-zA-Z0-9._-]+/g,"-").replace(/-+/g,"-").replace(/^[-.]+|[-.]+$/g,"");
+  return cleaned.slice(0,180) || "resource";
+}
+function awsEncode(value){ return encodeURIComponent(String(value)).replace(/[!'()*]/g,(c)=>"%"+c.charCodeAt(0).toString(16).toUpperCase()); }
+function hmac(key,data,encoding){ return crypto.createHmac("sha256",key).update(data,"utf8").digest(encoding); }
+function sha256Hex(data){ return crypto.createHash("sha256").update(data,"utf8").digest("hex"); }
+function s3ConfigReady(){ return Boolean(S3_BUCKET && S3_REGION && S3_ACCESS_KEY_ID && S3_SECRET_ACCESS_KEY); }
+function createS3PresignedPut(objectKey, expiresSeconds=900){
+  if(!s3ConfigReady()) throw new Error("S3 resource storage is not configured.");
+  const now=new Date();
+  const amzDate=now.toISOString().replace(/[:-]|\.\d{3}/g,"");
+  const dateStamp=amzDate.slice(0,8);
+  const host=`${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`;
+  const canonicalUri="/"+objectKey.split("/").map(awsEncode).join("/");
+  const scope=`${dateStamp}/${S3_REGION}/s3/aws4_request`;
+  const query={
+    "X-Amz-Algorithm":"AWS4-HMAC-SHA256",
+    "X-Amz-Credential":`${S3_ACCESS_KEY_ID}/${scope}`,
+    "X-Amz-Date":amzDate,
+    "X-Amz-Expires":String(expiresSeconds),
+    "X-Amz-SignedHeaders":"host"
+  };
+  if(S3_SESSION_TOKEN) query["X-Amz-Security-Token"]=S3_SESSION_TOKEN;
+  const canonicalQuery=Object.keys(query).sort().map((k)=>`${awsEncode(k)}=${awsEncode(query[k])}`).join("&");
+  const canonicalHeaders=`host:${host}\n`;
+  const canonicalRequest=["PUT",canonicalUri,canonicalQuery,canonicalHeaders,"host","UNSIGNED-PAYLOAD"].join("\n");
+  const stringToSign=["AWS4-HMAC-SHA256",amzDate,scope,sha256Hex(canonicalRequest)].join("\n");
+  const kDate=hmac(Buffer.from("AWS4"+S3_SECRET_ACCESS_KEY,"utf8"),dateStamp);
+  const kRegion=hmac(kDate,S3_REGION);
+  const kService=hmac(kRegion,"s3");
+  const kSigning=hmac(kService,"aws4_request");
+  const signature=hmac(kSigning,stringToSign,"hex");
+  return `https://${host}${canonicalUri}?${canonicalQuery}&X-Amz-Signature=${signature}`;
+}
+async function ensureResourceAssetsTable(){
+  await ensurePgCrypto();
+  await dbQuery(`
+    CREATE TABLE IF NOT EXISTS resource_assets (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      original_name TEXT NOT NULL,
+      object_key TEXT UNIQUE NOT NULL,
+      bucket_name TEXT NOT NULL,
+      extension TEXT NOT NULL,
+      content_type TEXT NOT NULL,
+      size_bytes BIGINT NOT NULL,
+      category TEXT NOT NULL DEFAULT '3d-model',
+      notes TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      uploaded_by TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      completed_at TIMESTAMPTZ
+    );
+    CREATE INDEX IF NOT EXISTS idx_resource_assets_created_at ON resource_assets (created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_resource_assets_status ON resource_assets (status);
+    CREATE INDEX IF NOT EXISTS idx_resource_assets_category ON resource_assets (category);
+  `);
+}
+
 async function writeAdminLog(email, action, details) {
   try {
     await ensureAdminLogsTable();
@@ -762,6 +840,69 @@ app.post("/api/admin/store/items/active", requireAdmin, async (req, res) => {
     return res.json({ ok: true, item: result.rows[0] });
   } catch (error) {
     return res.status(500).json({ ok: false, error: "Database write failed.", detail: error.message });
+  }
+});
+
+
+app.post("/api/admin/resources/presign", requireAdmin, async (req, res) => {
+  const originalName=cleanText(req.body?.fileName,220);
+  const extension=resourceExtension(originalName);
+  const sizeBytes=Number(req.body?.sizeBytes||0);
+  const category=cleanText(req.body?.category||"3d-model",80);
+  const notes=cleanText(req.body?.notes||"",500);
+  if(!s3ConfigReady()) return res.status(503).json({ok:false,error:"AWS S3 resource storage is not configured on the API service."});
+  if(!originalName || !RESOURCE_EXTENSIONS.has(extension)) return res.status(400).json({ok:false,error:"Unsupported resource file type."});
+  if(!Number.isFinite(sizeBytes) || sizeBytes<1 || sizeBytes>RESOURCE_MAX_BYTES) return res.status(400).json({ok:false,error:`Resource must be between 1 byte and ${RESOURCE_MAX_BYTES} bytes.`});
+  const safeName=safeResourceName(originalName);
+  const now=new Date();
+  const objectKey=`resources/${now.getUTCFullYear()}/${String(now.getUTCMonth()+1).padStart(2,"0")}/${crypto.randomUUID()}-${safeName}`;
+  const contentType=RESOURCE_CONTENT_TYPES[extension] || "application/octet-stream";
+  try{
+    await ensureResourceAssetsTable();
+    const result=await dbQuery(`
+      INSERT INTO resource_assets (original_name,object_key,bucket_name,extension,content_type,size_bytes,category,notes,status,uploaded_by)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'pending',$9)
+      RETURNING id
+    `,[originalName,objectKey,S3_BUCKET,extension,contentType,sizeBytes,category,notes||null,req.admin.email||null]);
+    const uploadUrl=createS3PresignedPut(objectKey,900);
+    await writeAdminLog(req.admin.email,"resource_upload_presigned",{resourceId:result.rows[0].id,objectKey,originalName,sizeBytes,category});
+    return res.json({ok:true,resourceId:result.rows[0].id,objectKey,contentType,maxBytes:RESOURCE_MAX_BYTES,expiresIn:900,uploadUrl});
+  }catch(error){
+    return res.status(500).json({ok:false,error:"Resource upload preparation failed.",detail:error.message});
+  }
+});
+
+app.post("/api/admin/resources/complete", requireAdmin, async (req, res) => {
+  const id=normalizeMessageId(req.body?.resourceId);
+  if(!id) return res.status(400).json({ok:false,error:"Valid resourceId is required."});
+  try{
+    await ensureResourceAssetsTable();
+    const result=await dbQuery(`
+      UPDATE resource_assets
+      SET status='ready', completed_at=NOW()
+      WHERE id=$1 AND status='pending'
+      RETURNING id,original_name,object_key,bucket_name,extension,content_type,size_bytes,category,notes,status,created_at,completed_at
+    `,[id]);
+    if(!result.rows.length) return res.status(404).json({ok:false,error:"Pending resource record not found."});
+    await writeAdminLog(req.admin.email,"resource_upload_complete",{resourceId:id,objectKey:result.rows[0].object_key});
+    return res.json({ok:true,resource:result.rows[0]});
+  }catch(error){
+    return res.status(500).json({ok:false,error:"Resource completion failed.",detail:error.message});
+  }
+});
+
+app.get("/api/admin/resources", requireAdmin, async (req, res) => {
+  try{
+    await ensureResourceAssetsTable();
+    const result=await dbQuery(`
+      SELECT id,original_name,object_key,bucket_name,extension,content_type,size_bytes,category,notes,status,uploaded_by,created_at,completed_at
+      FROM resource_assets
+      ORDER BY created_at DESC
+      LIMIT 200
+    `);
+    return res.json({ok:true,storage:"aws-s3",bucketConfigured:Boolean(S3_BUCKET),resources:result.rows});
+  }catch(error){
+    return res.status(500).json({ok:false,error:"Resource library read failed.",detail:error.message});
   }
 });
 
