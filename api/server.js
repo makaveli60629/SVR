@@ -1,5 +1,7 @@
 ﻿require("dotenv").config();
 
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -17,6 +19,7 @@ const DATABASE_SSL_REJECT_UNAUTHORIZED = process.env.DATABASE_SSL_REJECT_UNAUTHO
   ? NODE_ENV === "production"
   : String(process.env.DATABASE_SSL_REJECT_UNAUTHORIZED).toLowerCase() === "true";
 const DATABASE_CONTRACT = require("./database-contract.json");
+const SITE_ADMIN_SCHEMA_SQL = fs.readFileSync(path.join(__dirname, "sql", "001_site_admin_schema.sql"), "utf8");
 
 const pool = DATABASE_URL
   ? new Pool({
@@ -250,14 +253,7 @@ async function ensureSiteAnalyticsTable() {
 }
 async function ensureSiteAdminSchema() {
   if (!pool) return { configured: false, pass: false, reason: "DATABASE_URL_NOT_CONFIGURED" };
-  await ensureAdminUsersTable();
-  await ensureAdminStatusTable();
-  await ensureSiteMessagesTable();
-  await ensureAdminLogsTable();
-  await ensureMarketingTables();
-  await ensureStoreItemsTable();
-  await ensureGameEventsTable();
-  await ensureSiteAnalyticsTable();
+  await dbQuery(SITE_ADMIN_SCHEMA_SQL);
   return auditDatabaseSchema();
 }
 
