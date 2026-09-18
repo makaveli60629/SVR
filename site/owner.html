@@ -42,6 +42,16 @@
 
   <div class="card"><h2>Hidden Traffic + Marketing Stats</h2><div id="analytics" class="muted">Loading hidden traffic stats...</div></div>
   <div class="card"><h2>Owner Data</h2><div class="row"><button id="tabMessages">Messages</button><button id="tabHealth">Endpoint Health</button></div><div id="dataView" class="muted">Loading owner counter panel...</div></div>
+
+  <div class="card">
+    <h2>Private Fix File Uploads</h2>
+    <p class="muted">Authenticated owner-only storage for project fix files, configs, patches, reference assets, and handoff packets. Maximum 8 MB per file. Files are not published on the public site.</p>
+    <input id="uploadFile" type="file">
+    <input id="uploadNotes" type="text" maxlength="1000" placeholder="Optional note: what this file is for">
+    <div class="row"><button id="uploadBtn" class="good">Upload Private File</button><button id="uploadRefreshBtn">Refresh Files</button></div>
+    <p id="uploadStatus" class="muted">Log in with the owner API before uploading.</p>
+    <div id="uploadList" class="muted">No private file list loaded yet.</div>
+  </div>
 </main>
 <script>
 (() => {
@@ -112,14 +122,13 @@
   }
 
   async function syncPresenceApi(value){
-    const body = JSON.stringify({ isOnline: !!value, online: !!value, adminOnline: !!value, status: value ? 'online' : 'offline', source: 'owner-panel', updatedAt: new Date().toISOString() });
-    const endpoints = ['/api/admin/online', '/api/admin/presence', '/api/admin/status'];
-    const errors = [];
-    for (const path of endpoints){
-      try { await api(path, { method:'POST', headers:{ 'Content-Type':'application/json' }, body }); return { ok:true, path }; }
-      catch (error) { errors.push(`${path}: ${error.message}`); }
+    const body = JSON.stringify({ isOnline: !!value });
+    try {
+      await api('/api/admin/online', { method:'POST', headers:{ 'Content-Type':'application/json' }, body });
+      return { ok:true, path:'/api/admin/online' };
+    } catch (error) {
+      return { ok:false, error:error.message };
     }
-    return { ok:false, error: errors.join(' | ') };
   }
 
   async function fetchLiveStatus(){
@@ -149,10 +158,125 @@
   }
 
   async function tryLiveAnalytics() { $('analytics').textContent = 'Checking live API counters...'; try { const d = await api('/api/admin/analytics/summary'); const t = d.totals || d.summary || d || {}; const cards = [['All Page Views',t.all_page_views ?? t.totalPageViews ?? t.totalViews],['Unique Sessions',t.all_sessions ?? t.uniqueSessions ?? t.sessions],['Today Views',t.viewsToday ?? t.page_views_24h],['Store Clicks',t.storeClicks],['All Events',t.all_events ?? t.totalEvents]]; $('analytics').innerHTML = '<div class="stats">' + cards.map((c) => `<div class="stat"><span class="muted">${safe(c[0])}</span><b>${n(c[1])}</b></div>`).join('') + '</div><p class="good">Live API counters loaded.</p>'; $('controlNote').textContent = 'Live API counters loaded.'; } catch (error) { paintAnalytics(`Live API counter route unavailable: ${error.message}. Showing hidden local fallback counters instead.`); $('controlNote').textContent = 'Live API unavailable; local fallback counter shown.'; } }
-  async function health() { const checks = ['/api/health','/api/admin/status','/api/admin/online','/api/admin/presence','/api/admin/analytics/summary','/api/messages','/api/store/items']; $('dataView').innerHTML = '<p class="muted">Checking endpoints...</p>'; const rows = []; for (const path of checks) { try { await api(path, { method: path === '/api/admin/online' ? 'POST' : 'GET', headers: path === '/api/admin/online' ? { 'Content-Type':'application/json' } : {}, body: path === '/api/admin/online' ? JSON.stringify({ isOnline: readPresence() }) : undefined }); rows.push(`<tr><td>${safe(path)}</td><td class="good">Online</td></tr>`); } catch (e) { rows.push(`<tr><td>${safe(path)}</td><td class="bad">${safe(e.message)}</td></tr>`); } } $('dataView').innerHTML = '<table><thead><tr><th>Endpoint</th><th>Status</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>'; }
-  async function login() { $('loginNote').textContent = 'Checking owner API...'; try { const result = await api('/api/admin/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ email:$('email').value.trim(), password:$('password').value }) }); if(result.token) writeToken(result.token); $('loginNote').textContent = result.token ? 'Owner API login succeeded. Token stored. Admin set online.' : 'Owner API login responded without token. Admin set online locally.'; } catch (error) { $('loginNote').textContent = `API login unavailable. Local owner bridge active: ${error.message}.`; } $('password').value = ''; await setOnline(true); await tryLiveAnalytics(); paintMessages(); }
-  async function logout() { remove(LOCAL_ADMIN_SESSION_KEY); clearToken(); $('loginNote').textContent = 'Logged out. Admin set offline.'; await setOnline(false); }
-  function boot() { paintTop(); paintAnalytics(); paintMessages(); fetchLiveStatus(); $('loginBtn').onclick = login; $('logoutBtn').onclick = logout; $('onlineBtn').onclick = () => setOnline(true); $('offlineBtn').onclick = () => setOnline(false); $('analyticsBtn').onclick = tryLiveAnalytics; $('refreshBtn').onclick = paintMessages; $('healthBtn').onclick = health; $('tabMessages').onclick = paintMessages; $('tabHealth').onclick = health; window.SVR_OWNER_ADMIN_PANEL = { build:BUILD, setOnline, logout, readPresence, health, fetchLiveStatus, apiBase:API }; }
+  async function health() {
+    const checks = ['/api/health','/api/admin/status','/api/admin/database/schema','/api/admin/analytics/summary','/api/messages/admin','/api/store/items','/api/admin/uploads'];
+    $('dataView').innerHTML = '<p class="muted">Checking authoritative endpoints...</p>';
+    const rows = [];
+    for (const path of checks) {
+      try { await api(path, { method:'GET' }); rows.push(`<tr><td>${safe(path)}</td><td class="good">Online</td></tr>`); }
+      catch (e) { rows.push(`<tr><td>${safe(path)}</td><td class="bad">${safe(e.message)}</td></tr>`); }
+    }
+    $('dataView').innerHTML = '<table><thead><tr><th>Endpoint</th><th>Status</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
+  }
+  async function login() {
+    $('loginNote').textContent = 'Checking owner API...';
+    try {
+      const result = await api('/api/admin/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ email:$('email').value.trim(), password:$('password').value }) });
+      if (!result.token) throw new Error('Owner API did not return an authentication token.');
+      writeToken(result.token);
+      $('loginNote').textContent = result.admin?.mustChangePassword ? 'Owner login succeeded. Temporary password must be changed.' : 'Owner API login succeeded.';
+      $('password').value = '';
+      await setOnline(true);
+      await Promise.allSettled([tryLiveAnalytics(), loadUploads()]);
+      paintMessages();
+    } catch (error) {
+      clearToken();
+      writePresence(false, 'owner-login-failed');
+      paintTop();
+      $('password').value = '';
+      $('loginNote').textContent = `Owner login failed: ${error.message}`;
+    }
+  }
+
+  async function logout() {
+    if (readToken()) await setOnline(false);
+    remove(LOCAL_ADMIN_SESSION_KEY);
+    clearToken();
+    writePresence(false, 'owner-logout');
+    $('loginNote').textContent = 'Logged out. Admin set offline.';
+    $('uploadList').textContent = 'Log in to view private files.';
+    paintTop();
+  }
+
+  function bytes(value) {
+    const n = Number(value || 0);
+    if (n < 1024) return `${n} B`;
+    if (n < 1024*1024) return `${(n/1024).toFixed(1)} KB`;
+    return `${(n/(1024*1024)).toFixed(1)} MB`;
+  }
+
+  async function loadUploads() {
+    if (!readToken()) { $('uploadList').textContent = 'Log in to view private files.'; return; }
+    $('uploadStatus').textContent = 'Loading private files...';
+    try {
+      const data = await api('/api/admin/uploads');
+      const files = Array.isArray(data.files) ? data.files : [];
+      $('uploadList').innerHTML = files.length ? files.map((file) => `<div class="msg"><b>${safe(file.original_name)}</b><br><span class="muted">${safe(bytes(file.byte_size))} · ${safe(file.content_type)} · ${safe(file.created_at)}<br>SHA-256: ${safe(file.sha256)}</span><br>${file.notes ? '<br>'+safe(file.notes)+'<br>' : ''}<div class="row"><button data-download-id="${safe(file.id)}" data-download-name="${safe(file.original_name)}">Download</button><button class="bad" data-delete-id="${safe(file.id)}">Delete</button></div></div>`).join('') : 'No private files uploaded yet.';
+      $('uploadList').querySelectorAll('[data-download-id]').forEach((button) => button.onclick = () => downloadUpload(button.dataset.downloadId, button.dataset.downloadName));
+      $('uploadList').querySelectorAll('[data-delete-id]').forEach((button) => button.onclick = () => deleteUpload(button.dataset.deleteId));
+      $('uploadStatus').textContent = `${files.length} private file${files.length===1?'':'s'} available.`;
+    } catch (error) {
+      $('uploadStatus').textContent = `Private file list unavailable: ${error.message}`;
+    }
+  }
+
+  async function uploadFile() {
+    const file = $('uploadFile').files?.[0];
+    if (!readToken()) { $('uploadStatus').textContent = 'Owner login required before upload.'; return; }
+    if (!file) { $('uploadStatus').textContent = 'Choose a file first.'; return; }
+    if (file.size > 8 * 1024 * 1024) { $('uploadStatus').textContent = 'File exceeds the 8 MB private upload limit.'; return; }
+    const safeName = String(file.name || 'upload.bin').replace(/[^a-zA-Z0-9._()\- ]+/g,'_').slice(0,180) || 'upload.bin';
+    $('uploadStatus').textContent = `Uploading ${safeName}...`;
+    try {
+      const headers = authHeaders({
+        Accept:'application/json',
+        'Content-Type':'application/octet-stream',
+        'X-SVR-Filename':safeName,
+        'X-SVR-Content-Type':file.type || 'application/octet-stream',
+        'X-SVR-Notes':String($('uploadNotes').value || '').slice(0,1000)
+      });
+      const response = await fetch(API + '/api/admin/uploads', { method:'POST', cache:'no-store', headers, body:file });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.ok === false) throw new Error(data.error || `HTTP ${response.status}`);
+      $('uploadStatus').textContent = `Uploaded ${safeName}. SHA-256: ${data.file?.sha256 || 'recorded'}`;
+      $('uploadFile').value = '';
+      $('uploadNotes').value = '';
+      await loadUploads();
+    } catch (error) {
+      $('uploadStatus').textContent = `Upload failed: ${error.message}`;
+    }
+  }
+
+  async function downloadUpload(id, name) {
+    try {
+      const response = await fetch(API + '/api/admin/uploads/' + encodeURIComponent(id) + '/download', { cache:'no-store', headers:authHeaders({ Accept:'application/octet-stream' }) });
+      if (!response.ok) { const data=await response.json().catch(()=>({})); throw new Error(data.error || `HTTP ${response.status}`); }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download=name || 'svr-owner-file'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) { $('uploadStatus').textContent = `Download failed: ${error.message}`; }
+  }
+
+  async function deleteUpload(id) {
+    if (!confirm('Remove this private file from the active owner list?')) return;
+    try {
+      await api('/api/admin/uploads/' + encodeURIComponent(id) + '/delete', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:'{}' });
+      $('uploadStatus').textContent = 'Private file removed.';
+      await loadUploads();
+    } catch (error) { $('uploadStatus').textContent = `Delete failed: ${error.message}`; }
+  }
+
+  function boot() {
+    paintTop(); paintAnalytics(); paintMessages(); fetchLiveStatus();
+    $('loginBtn').onclick = login; $('logoutBtn').onclick = logout;
+    $('onlineBtn').onclick = () => setOnline(true); $('offlineBtn').onclick = () => setOnline(false);
+    $('analyticsBtn').onclick = tryLiveAnalytics; $('refreshBtn').onclick = paintMessages; $('healthBtn').onclick = health;
+    $('tabMessages').onclick = paintMessages; $('tabHealth').onclick = health;
+    $('uploadBtn').onclick = uploadFile; $('uploadRefreshBtn').onclick = loadUploads;
+    if (readToken()) loadUploads();
+    window.SVR_OWNER_ADMIN_PANEL = { build:BUILD, setOnline, logout, readPresence, health, fetchLiveStatus, loadUploads, apiBase:API };
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
 </script>
