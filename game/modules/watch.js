@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-const BUILD = "PHASE-460-QUEST-WATCH-VISIBILITY-LOCK";
+const BUILD = "PHASE-462-QUEST-WATCH-FIT-LOCK";
 const PHASE87_LABEL = "PHASE-87-WATCH-POKER-CONTROLS-LOCK";
 const DISPLAY_MIRRORED = false;
 const DISPLAY_ROTATED_180 = true;
@@ -89,8 +89,8 @@ function computeHandWatchPose(hand, camera, renderer, side = 'left'){
   }
 
   const position = wrist.clone()
-    .addScaledVector(forearmDir, 0.072)
-    .addScaledVector(cameraDir, 0.018);
+    .addScaledVector(forearmDir, 0.058)
+    .addScaledVector(cameraDir, 0.012);
   position.x += side === 'left' ? -0.004 : 0.004;
 
   return { position, quaternion: faceCameraQuaternion(position, camera, renderer), mode: 'hand' };
@@ -102,7 +102,7 @@ function computeControllerWatchPose(proxy, camera, renderer, side = 'left'){
   controller.updateWorldMatrix?.(true, false);
   const position = controller.getWorldPosition(new THREE.Vector3());
   const q = controller.getWorldQuaternion(new THREE.Quaternion());
-  const localOffset = new THREE.Vector3(side === 'left' ? -0.055 : 0.055, 0.048, -0.065).applyQuaternion(q);
+  const localOffset = new THREE.Vector3(side === 'left' ? -0.035 : 0.035, 0.030, -0.105).applyQuaternion(q);
   position.add(localOffset);
   return { position, quaternion: faceCameraQuaternion(position, camera, renderer), mode: 'controller' };
 }
@@ -139,8 +139,8 @@ export function createWristWatch({ scene, camera = null, renderer = null, getSta
   group.visible = false;
   scene.add(group);
 
-  const plateW = 0.224;
-  const plateH = 0.116;
+  const plateW = 0.184;
+  const plateH = 0.102;
   const frame = new THREE.Mesh(
     new THREE.BoxGeometry(plateW * 0.98, plateH * 0.98, 0.006),
     new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.36, metalness: 0.20, emissive: 0x090b12, emissiveIntensity: 0.03, transparent: true, opacity: 0.92 })

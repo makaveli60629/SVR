@@ -5,7 +5,7 @@ import { createHands } from "./modules/hands_phase228.js";
 import { createTeleportRig } from "./modules/movement_phase228.js?v=phase169-locomotion-polish";
 import { createQuestTableWorld } from "./modules/quest_table_world.js?v=phase460";
 import { assetUrls, loadFirstTexture } from "./modules/asset_base.js";
-import { createWristWatch } from "./modules/watch.js?v=phase460";
+import { createWristWatch } from "./modules/watch.js?v=phase462";
 import { createPhase148QuestPerfPass } from "./modules/performance_phase148.js";
 import { createAndroidSmartControls } from "./modules/android_smart_controls.js";
 
