@@ -78,11 +78,13 @@ if (QUEST_TABLE_ONLY) {
   const { installPhase202StorefrontShells } = await import('./modules/phase202_storefront_shells.js');
   const { installPhase262GeometrySkyAlignmentLock } = await import('./modules/phase262_geometry_sky_alignment_lock.js');
   const { installPhase149LobbyFitAlignmentLock } = await import('./phase149_lobby_fit_alignment_lock.js');
+  const { installPhase464GrandLobbyRemodel } = await import('./modules/phase464_grand_lobby_remodel.js?v=phase464');
   world = await buildPhase195CleanLobbyWorld(scene, { log, renderer });
   installPhase201HubContentRestore({ scene, camera, renderer, log });
   installPhase202StorefrontShells({ scene, camera, renderer, log });
   installPhase262GeometrySkyAlignmentLock({ scene, camera, renderer, log });
   installPhase149LobbyFitAlignmentLock({ scene, camera, renderer, world });
+  installPhase464GrandLobbyRemodel({ scene, world });
   setTimeout(()=>installPhase149LobbyFitAlignmentLock({ scene, camera, renderer, world }), 1200);
 }
 window.SVR_WORLD_REF = world;
