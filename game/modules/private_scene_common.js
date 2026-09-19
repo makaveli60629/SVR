@@ -19,7 +19,8 @@ function t(title, sub){
 
 function addReturn(){
   const a = document.createElement('a');
-  a.href = './index.html?v=phase294-return';
+  const quest=/Quest|Oculus|Meta Quest/i.test(navigator.userAgent||'') || new URLSearchParams(location.search).get('platform')==='quest';
+  a.href = quest ? './quest-lobby.html?v=phase464' : './index.html?v=phase464';
   a.textContent = 'Return to Lobby';
   a.style.cssText = 'position:fixed;left:14px;top:14px;z-index:5;padding:10px 14px;border-radius:999px;border:1px solid rgba(140,255,240,.55);background:rgba(0,0,0,.62);color:white;text-decoration:none;font:700 13px system-ui';
   document.body.appendChild(a);
