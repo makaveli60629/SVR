@@ -216,6 +216,8 @@ async function ensureSiteAnalyticsTable() {
 }
 
 const RESOURCE_EXTENSIONS = new Set(["fbx","obj","glb","gltf","mtl","blend","zip","png","jpg","jpeg","webp","ktx2"]);
+// SVR_RESOURCE_MANAGER_V2
+const RESOURCE_TARGET_TYPES = new Set(["dealer","avatar-male","avatar-female","poker-table","lobby-environment","prop","animation","texture"]);
 const RESOURCE_CONTENT_TYPES = {
   fbx:"application/octet-stream", obj:"text/plain", glb:"model/gltf-binary", gltf:"model/gltf+json",
   mtl:"text/plain", blend:"application/octet-stream", zip:"application/zip", png:"image/png",
@@ -233,7 +235,38 @@ function awsEncode(value){ return encodeURIComponent(String(value)).replace(/[!'
 function hmac(key,data,encoding){ return crypto.createHmac("sha256",key).update(data,"utf8").digest(encoding); }
 function sha256Hex(data){ return crypto.createHash("sha256").update(data,"utf8").digest("hex"); }
 function s3ConfigReady(){ return Boolean(S3_BUCKET && S3_REGION && S3_ACCESS_KEY_ID && S3_SECRET_ACCESS_KEY); }
-function createS3PresignedPut(objectKey, expiresSeconds=900){
+function createS3PresignedUrl(objectKey, method="GET", expiresSeconds=900){
+  if(!s3ConfigReady()) throw new Error("S3 resource storage is not configured.");
+  const verb=String(method||"GET").toUpperCase();
+  const now=new Date();
+  const amzDate=now.toISOString().replace(/[:-]|\.\d{3}/g,"");
+  const dateStamp=amzDate.slice(0,8);
+  const host=`${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`;
+  const canonicalUri="/"+objectKey.split("/").map(awsEncode).join("/");
+  const scope=`${dateStamp}/${S3_REGION}/s3/aws4_request`;
+  const query={
+    "X-Amz-Algorithm":"AWS4-HMAC-SHA256",
+    "X-Amz-Credential":`${S3_ACCESS_KEY_ID}/${scope}`,
+    "X-Amz-Date":amzDate,
+    "X-Amz-Expires":String(expiresSeconds),
+    "X-Amz-SignedHeaders":"host"
+  };
+  if(S3_SESSION_TOKEN) query["X-Amz-Security-Token"]=S3_SESSION_TOKEN;
+  const canonicalQuery=Object.keys(query).sort().map((k)=>`${awsEncode(k)}=${awsEncode(query[k])}`).join("&");
+  const canonicalHeaders=`host:${host}\n`;
+  const canonicalRequest=[verb,canonicalUri,canonicalQuery,canonicalHeaders,"host","UNSIGNED-PAYLOAD"].join("\n");
+  const stringToSign=["AWS4-HMAC-SHA256",amzDate,scope,sha256Hex(canonicalRequest)].join("\n");
+  const kDate=hmac(Buffer.from("AWS4"+S3_SECRET_ACCESS_KEY,"utf8"),dateStamp);
+  const kRegion=hmac(kDate,S3_REGION);
+  const kService=hmac(kRegion,"s3");
+  const kSigning=hmac(kService,"aws4_request");
+  const signature=hmac(kSigning,stringToSign,"hex");
+  return `https://${host}${canonicalUri}?${canonicalQuery}&X-Amz-Signature=${signature}`;
+}
+function createS3PresignedPut(objectKey, expiresSeconds=900){ return createS3PresignedUrl(objectKey,"PUT",expiresSeconds); }
+function createS3PresignedGet(objectKey, expiresSeconds=900){ return createS3PresignedUrl(objectKey,"GET",expiresSeconds); }
+/* legacy body retained below only as unreachable documentation */
+function __legacyCreateS3PresignedPut(objectKey, expiresSeconds=900){
   if(!s3ConfigReady()) throw new Error("S3 resource storage is not configured.");
   const now=new Date();
   const amzDate=now.toISOString().replace(/[:-]|\.\d{3}/g,"");
@@ -278,9 +311,29 @@ async function ensureResourceAssetsTable(){
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       completed_at TIMESTAMPTZ
     );
+    ALTER TABLE resource_assets ADD COLUMN IF NOT EXISTS display_name TEXT;
+    ALTER TABLE resource_assets ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ;
+    ALTER TABLE resource_assets ADD COLUMN IF NOT EXISTS archived_by TEXT;
     CREATE INDEX IF NOT EXISTS idx_resource_assets_created_at ON resource_assets (created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_resource_assets_status ON resource_assets (status);
     CREATE INDEX IF NOT EXISTS idx_resource_assets_category ON resource_assets (category);
+  `);
+}
+async function ensureResourceAssignmentsTable(){
+  await ensureResourceAssetsTable();
+  await dbQuery(`
+    CREATE TABLE IF NOT EXISTS resource_assignments (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      resource_id UUID NOT NULL REFERENCES resource_assets(id) ON DELETE CASCADE,
+      target_type TEXT NOT NULL,
+      target_key TEXT NOT NULL DEFAULT 'primary',
+      assigned_by TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE(target_type,target_key)
+    );
+    CREATE INDEX IF NOT EXISTS idx_resource_assignments_resource ON resource_assignments(resource_id);
+    CREATE INDEX IF NOT EXISTS idx_resource_assignments_target ON resource_assignments(target_type,target_key);
   `);
 }
 
@@ -895,7 +948,7 @@ app.get("/api/admin/resources", requireAdmin, async (req, res) => {
   try{
     await ensureResourceAssetsTable();
     const result=await dbQuery(`
-      SELECT id,original_name,object_key,bucket_name,extension,content_type,size_bytes,category,notes,status,uploaded_by,created_at,completed_at
+      SELECT id,original_name,display_name,object_key,bucket_name,extension,content_type,size_bytes,category,notes,status,uploaded_by,created_at,completed_at,archived_at,archived_by
       FROM resource_assets
       ORDER BY created_at DESC
       LIMIT 200
@@ -904,6 +957,95 @@ app.get("/api/admin/resources", requireAdmin, async (req, res) => {
   }catch(error){
     return res.status(500).json({ok:false,error:"Resource library read failed.",detail:error.message});
   }
+});
+
+app.post("/api/admin/resources/update", requireAdmin, async (req,res)=>{
+  const id=normalizeMessageId(req.body?.resourceId);
+  const displayName=cleanText(req.body?.displayName||"",220);
+  const category=cleanText(req.body?.category||"other",80);
+  const notes=cleanText(req.body?.notes||"",500);
+  if(!id) return res.status(400).json({ok:false,error:"Valid resourceId is required."});
+  try{
+    await ensureResourceAssetsTable();
+    const result=await dbQuery(`
+      UPDATE resource_assets SET display_name=NULLIF($1,''),category=$2,notes=NULLIF($3,'')
+      WHERE id=$4 AND archived_at IS NULL
+      RETURNING id,original_name,display_name,category,notes,status
+    `,[displayName,category,notes,id]);
+    if(!result.rows.length) return res.status(404).json({ok:false,error:"Active resource not found."});
+    await writeAdminLog(req.admin.email,"resource_update",{resourceId:id,displayName,category});
+    return res.json({ok:true,resource:result.rows[0]});
+  }catch(error){ return res.status(500).json({ok:false,error:"Resource update failed.",detail:error.message}); }
+});
+
+app.post("/api/admin/resources/archive", requireAdmin, async (req,res)=>{
+  const id=normalizeMessageId(req.body?.resourceId);
+  if(!id) return res.status(400).json({ok:false,error:"Valid resourceId is required."});
+  try{
+    await ensureResourceAssignmentsTable();
+    await dbQuery("DELETE FROM resource_assignments WHERE resource_id=$1",[id]);
+    const result=await dbQuery(`
+      UPDATE resource_assets SET archived_at=NOW(),archived_by=$1,status='archived'
+      WHERE id=$2 AND archived_at IS NULL
+      RETURNING id,original_name,display_name,status,archived_at
+    `,[req.admin.email||null,id]);
+    if(!result.rows.length) return res.status(404).json({ok:false,error:"Active resource not found."});
+    await writeAdminLog(req.admin.email,"resource_archive",{resourceId:id});
+    return res.json({ok:true,resource:result.rows[0]});
+  }catch(error){ return res.status(500).json({ok:false,error:"Resource archive failed.",detail:error.message}); }
+});
+
+app.post("/api/admin/resources/assign", requireAdmin, async (req,res)=>{
+  const id=normalizeMessageId(req.body?.resourceId);
+  const targetType=cleanText(req.body?.targetType,80);
+  const targetKey=cleanText(req.body?.targetKey||"primary",120).toLowerCase();
+  if(!id) return res.status(400).json({ok:false,error:"Valid resourceId is required."});
+  if(!RESOURCE_TARGET_TYPES.has(targetType)) return res.status(400).json({ok:false,error:"Unsupported resource target type."});
+  if(!/^[a-z0-9._-]{1,120}$/.test(targetKey)) return res.status(400).json({ok:false,error:"Target key may use letters, numbers, dot, underscore and dash."});
+  try{
+    await ensureResourceAssignmentsTable();
+    const resource=await dbQuery("SELECT id FROM resource_assets WHERE id=$1 AND status='ready' AND archived_at IS NULL LIMIT 1",[id]);
+    if(!resource.rows.length) return res.status(409).json({ok:false,error:"Only ready, active resources can be assigned."});
+    const result=await dbQuery(`
+      INSERT INTO resource_assignments(resource_id,target_type,target_key,assigned_by)
+      VALUES($1,$2,$3,$4)
+      ON CONFLICT(target_type,target_key) DO UPDATE SET resource_id=EXCLUDED.resource_id,assigned_by=EXCLUDED.assigned_by,updated_at=NOW()
+      RETURNING id,resource_id,target_type,target_key,assigned_by,created_at,updated_at
+    `,[id,targetType,targetKey,req.admin.email||null]);
+    await writeAdminLog(req.admin.email,"resource_assign",{resourceId:id,targetType,targetKey});
+    return res.json({ok:true,assignment:result.rows[0]});
+  }catch(error){ return res.status(500).json({ok:false,error:"Resource assignment failed.",detail:error.message}); }
+});
+
+app.get("/api/admin/resources/assignments", requireAdmin, async (req,res)=>{
+  try{
+    await ensureResourceAssignmentsTable();
+    const result=await dbQuery(`
+      SELECT a.id,a.target_type,a.target_key,a.assigned_by,a.created_at,a.updated_at,
+             r.id AS resource_id,r.original_name,r.display_name,r.object_key,r.extension,r.category,r.status
+      FROM resource_assignments a
+      JOIN resource_assets r ON r.id=a.resource_id
+      WHERE r.archived_at IS NULL
+      ORDER BY a.target_type,a.target_key
+    `);
+    return res.json({ok:true,assignments:result.rows});
+  }catch(error){ return res.status(500).json({ok:false,error:"Resource assignments read failed.",detail:error.message}); }
+});
+
+app.get("/api/game/resources/manifest", async (req,res)=>{
+  if(!s3ConfigReady()) return res.status(503).json({ok:false,error:"Game resource storage is not configured."});
+  try{
+    await ensureResourceAssignmentsTable();
+    const result=await dbQuery(`
+      SELECT a.target_type,a.target_key,r.id AS resource_id,r.original_name,r.display_name,r.object_key,r.extension,r.content_type,r.size_bytes,r.category
+      FROM resource_assignments a
+      JOIN resource_assets r ON r.id=a.resource_id
+      WHERE r.status='ready' AND r.archived_at IS NULL
+      ORDER BY a.target_type,a.target_key
+    `);
+    const resources=result.rows.map((r)=>({...r,url:createS3PresignedGet(r.object_key,900),expiresIn:900}));
+    return res.json({ok:true,build:"SVR_RESOURCE_MANAGER_V2",storage:"aws-s3-private",resources});
+  }catch(error){ return res.status(500).json({ok:false,error:"Game resource manifest failed.",detail:error.message}); }
 });
 
 app.get("/api/admin/logs", requireAdmin, async (req, res) => {
