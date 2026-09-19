@@ -1,0 +1,94 @@
+{
+  "manifest": "SVR_AI_MANIFEST",
+  "version": "2026-09-19-phase464",
+  "authority": "PHASE-464-FULL-REMODEL-DEPLOY-LOCK",
+  "repository": "makaveli60629/SVR",
+  "branch": "main",
+  "verified": {
+    "code_commit": "37f523c47a680d0e711ccc9e23f0d995028d77be",
+    "production_workflow_run": 35420443794,
+    "production_workflow": "success",
+    "pages_workflow_run": 35420463969,
+    "pages_workflow": "success",
+    "deployed_at": "2026-09-19T04:07:53Z"
+  },
+  "routes": {
+    "quest_lobby": "/game/quest-lobby.html?v=phase464",
+    "quest_lobby_launcher": "/game/quest.html?lobby=1",
+    "quest_table": "/game/index.html?platform=quest&v=phase464&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1",
+    "android": "/game/android.html?channel=stable&v=phase464",
+    "owner": "/site/owner.html",
+    "scorpion": "/game/scorpion.html?v=phase464",
+    "reiki_vr": "/game/reiki-vr.html?v=phase464",
+    "pga_drive": "/game/pga-drive.html?v=phase464",
+    "chip_putt": "/game/chip-putt.html?v=phase464",
+    "store_room": "/game/store-room.html?v=phase464",
+    "smoker_lounge": "/game/smoker-lounge.html?v=phase464"
+  },
+  "quest": {
+    "lobby_build": "PHASE-464-QUEST-WALKABLE-LOBBY",
+    "table_build": "PHASE-464-QUEST-REMODEL-FINISH",
+    "table_authority": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
+    "seated_authority": "PHASE-446-QUEST-LAB-TABLE-SEAT-LOCK",
+    "walkable_lobby": true,
+    "table_teleport": false,
+    "single_table": true,
+    "single_eric": true,
+    "protective_cover_hidden": true
+  },
+  "android": {
+    "presentation_build": "PHASE-464-ANDROID-FINAL-FIT-GUARD",
+    "engine": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
+    "human_turn": "PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK",
+    "burn_piles": 1,
+    "action_buttons": 4
+  },
+  "resources": {
+    "owner_manager": true,
+    "preferred_storage": "private-s3",
+    "fallback_storage": "postgres-bytea",
+    "direct_fallback_max_bytes": 26214400,
+    "backend_api_deploy_verified": false,
+    "api_host": "api.svrpoker.com",
+    "api_repo_workflow_present": false
+  },
+  "asset_intake": {
+    "buildings_pack": {
+      "name": "Buildings pack by @Quaternius.zip",
+      "bytes": 6072770,
+      "archive_entries": 54,
+      "license": "CC0-1.0",
+      "formats": {
+        "blend": 10,
+        "fbx": 10,
+        "obj": 10,
+        "mtl": 10,
+        "png": 8
+      }
+    },
+    "other": [
+      {
+        "name": "BirchTree_4.fbx",
+        "bytes": 65132
+      },
+      {
+        "name": "Bush_Snow_1.fbx",
+        "bytes": 24924
+      },
+      {
+        "name": "BirchTree_Autumn_4.obj",
+        "bytes": 111642
+      }
+    ]
+  },
+  "next": [
+    "Quest physical walk test",
+    "Quest poker-room physical acceptance",
+    "Private-room walk tests",
+    "Deploy api/server.js to actual API host",
+    "Owner ZIP upload acceptance test",
+    "Resource assignment test",
+    "Optimize selected assets to GLB",
+    "Eric dealing animation acceptance"
+  ]
+}

@@ -1,69 +1,188 @@
 # SVR Poker — AI Project Manifest
 
 ## Authority
-**Current production lane:** PHASE-464-FULL-REMODEL-DEPLOY-LOCK  
-**Repository:** makaveli60629/SVR  
-**Branch:** main  
-**Primary browser game:** /game/index.html  
-**Quest acceptance route:** /game/index.html?platform=quest&v=phase464&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1
+**Current production lane:** `PHASE-464-FULL-REMODEL-DEPLOY-LOCK`  
+**Repository:** `makaveli60629/SVR`  
+**Branch:** `main`  
+**Primary browser game:** `/game/index.html`
 
-This file is the AI handoff authority. Older phase/update documents remain history only when they conflict with this manifest.
+This file is the human-readable AI handoff authority. If an older phase document conflicts with this file, this file wins unless a newer verified manifest explicitly supersedes it.
 
-## Current architecture
-- Static production deploy: GitHub Actions -> gh-pages -> GitHub Pages/custom domain.
-- Site/admin API source: /api/server.js, PostgreSQL via DATABASE_URL.
-- Owner panel: /site/owner.html.
-- Resource upload: private S3 when configured; PostgreSQL binary fallback for files up to the configured direct-upload limit.
-- Resource metadata/assignments: PostgreSQL.
-- Game resource manifest: GET /api/game/resources/manifest.
-- Secrets must stay in deployment environment variables, never browser code or GitHub source.
+## Last verified production result
+- Gameplay/remodel code baseline: `37f523c47a680d0e711ccc9e23f0d995028d77be`
+- SVR Production Auto Deploy run: `35420443794` — **success**
+- GitHub Pages Production Deploy run: `35420463969` — **success**
+- Published `gh-pages/deploy-health.json` reports:
+  - build: `PHASE-464-FULL-REMODEL-DEPLOY-LOCK`
+  - Quest build: `PHASE-464-QUEST-REMODEL-FINISH`
+  - Android build: `PHASE-464-ANDROID-FINAL-FIT-GUARD`
+  - walkable Quest lobby enabled: `true`
+  - deployed code commit: `37f523c47a680d0e711ccc9e23f0d995028d77be`
 
-## Phase 464 remodel
-### Main lobby
-- /game/modules/phase464_grand_lobby_remodel.js
-- Adds modular central runway, columns, ceiling architecture, room portal markers and controlled lighting.
-- Does not replace poker/table authority.
-- Structured as removable Three.js modules for later Unity migration.
+## Quest architecture
+Quest now has **two separate authorities** so locomotion and seated poker do not fight each other.
 
-### Quest
-- /game/modules/phase462_quest_professional_table_room.js remains the base professional table room.
-- /game/modules/phase464_quest_remodel_finish.js is the current visual finish layer.
-- Phase 440 remains the approved rendered table/dealer authority.
-- Phase 446 remains seat authority.
-- No extra table or Eric is permitted.
-- No tabletop cover may obscure native felt.
-- Current required player experience: automatic table boot, seated front position, visible Eric, readable cards/felt/watch, stable lighting.
+### Walkable lobby
+Route:
+`/game/quest-lobby.html?v=phase464`
 
-### Android
-- Protected poker engine: PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK.
-- Human turn authority: PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK.
-- Release wrapper lineage: Phase 420.
-- Current presentation guard: /game/modules/phase464_android_final_fit_guard.js.
-- Requirements: one burn pile, four action buttons, no player-name/stack overlap, safe-area fit in portrait/landscape.
+Alternate launcher:
+`/game/quest.html?lobby=1`
 
-### Private rooms
-Separate routes stay modular:
-- /game/scorpion.html
-- /game/reiki.html
-- /game/pga-drive.html
-- /game/chip-putt.html
-- /game/store-room.html
-- /game/smoker-lounge.html
+Build:
+`PHASE-464-QUEST-WALKABLE-LOBBY`
 
-Shared 3D rooms use /game/modules/private_scene_common.js with PHASE-464-PRIVATE-ROOM-REMODEL architecture.
-Reiki remains approval-safe and must not gain unapproved claims/media/payment behavior.
+Behavior:
+- real WebXR entry
+- head-direction locomotion
+- right-stick forward/back
+- 45-degree snap turn
+- hand/controller teleport path remains enabled
+- wrist console active
+- Phase 464 modular lobby architecture
+- room links to Poker, Scorpion, Reiki VR and PGA
+- does **not** load the seated-table authority
 
-## Resource Manager
-Owner-only management UI is in /site/owner.html.
-Supported resources include FBX, OBJ, GLB/GLTF, MTL, BLEND, ZIP and common texture formats.
+### Poker room
+Acceptance route:
+`/game/index.html?platform=quest&v=phase464&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1`
 
-Storage policy:
-1. Preferred: private S3 + PostgreSQL metadata.
-2. Fallback: PostgreSQL BYTEA binary storage for smaller uploads while S3 is unavailable.
-3. Game consumes only owner-assigned, ready, non-archived resources.
-4. Runtime uses short-lived signed URLs/tokens.
+Protected authorities:
+- Phase 440 = rendered table/dealer authority
+- Phase 446 = seated player authority
+- Phase 462 = professional lit poker room
+- Phase 464 = final room remodel layer
+- one rendered table only
+- one Eric only
+- native felt remains visible
+- protective table cover remains hidden
+- center logo remains visible
+- table teleport remains disabled
+- poker controls remain preserved
 
-Assignment targets:
+Protected ready text remains exactly:
+`Table ready. Press VR GAME ON.`
+
+Do not casually change that string: older regression tests intentionally protect it.
+
+## Phase 464 lobby remodel
+Primary module:
+`/game/modules/phase464_grand_lobby_remodel.js`
+
+Current goals:
+- clean modular grand-lobby architecture
+- central circulation path
+- columns / ceiling structure
+- controlled lighting
+- clear room destinations
+- swappable modules for later Unity migration
+- avoid duplicating core table/dealer authorities
+
+## Private rooms
+Shared WebXR room system:
+`/game/modules/private_scene_common.js`
+
+Current shared room behavior:
+- WebXR button
+- hands/controllers
+- locomotion/teleport rig
+- room bounds
+- Quest-aware Return to Lobby
+- Phase 464 architectural treatment
+
+Routes:
+- Scorpion: `/game/scorpion.html?v=phase464`
+- Reiki VR: `/game/reiki-vr.html?v=phase464`
+- PGA Drive: `/game/pga-drive.html?v=phase464`
+- Chip + Putt: `/game/chip-putt.html?v=phase464`
+- VR Store Room: `/game/store-room.html?v=phase464`
+- Smoker/Social Lounge: `/game/smoker-lounge.html?v=phase464`
+
+Reiki public/holding content remains approval-safe. The VR room must not add unapproved claims, checkout, or partner assertions.
+
+## Android
+Protected poker engine:
+`PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK`
+
+Protected human turn authority:
+`PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK`
+
+Current presentation guard:
+`/game/modules/phase464_android_final_fit_guard.js`
+
+Requirements:
+- one burn pile
+- four poker action buttons
+- no player-name/stack overlap
+- safe-area handling
+- portrait/landscape fit
+- do not replace the protected poker engine while doing visual work
+
+Primary mobile entry:
+`/game/android.html?channel=stable&v=phase464`
+
+## Owner Resource Manager / uploader
+Owner page:
+`/site/owner.html`
+
+Supported source/resource types include:
+FBX, OBJ, GLB, GLTF, MTL, BLEND, ZIP, PNG, JPG/JPEG, WEBP and KTX2.
+
+Storage order:
+1. private AWS S3 when configured
+2. PostgreSQL binary fallback for smaller files when S3 is unavailable
+
+Direct fallback default:
+`SVR_DIRECT_RESOURCE_MAX_BYTES = 26214400` (25 MiB)
+
+Resource database features:
+- metadata
+- display name
+- category
+- notes
+- archive state
+- assignment target
+- assignment key
+- runtime resource manifest
+
+Game manifest endpoint:
+`GET /api/game/resources/manifest`
+
+### Important backend truth
+The **static owner page is deployed**, but the repository contains **no backend deployment workflow for `api.svrpoker.com`**.
+
+Therefore:
+- do not claim the ZIP uploader fix is live merely because GitHub Pages is live
+- `api/server.js` must be deployed on the actual API host before the new fallback routes can function
+- no usable AWS deployment connector was exposed in the current ChatGPT tool session
+- never request or commit AWS/database/admin secrets
+
+## Current asset intake
+User-provided test assets:
+
+### Buildings pack by @Quaternius.zip
+- size: 6,072,770 bytes
+- archive entries: 54
+- 10 BLEND
+- 10 FBX
+- 10 OBJ
+- 10 MTL
+- 8 PNG
+- license file included
+- license: **CC0 1.0 Universal / Public Domain Dedication**
+
+This pack is approved as a technical candidate for the SVR lobby/environment pipeline.
+
+### Additional assets
+- `BirchTree_4.fbx` — 65,132 bytes
+- `Bush_Snow_1.fbx` — 24,924 bytes
+- `BirchTree_Autumn_4.obj` — 111,642 bytes
+
+These files fit comfortably within the 25 MiB PostgreSQL fallback limit.
+
+Do not claim any of these assets are live in the rendered lobby until the Owner uploader/API path has actually stored and assigned them.
+
+## Resource-assignment targets
 - dealer
 - avatar-male
 - avatar-female
@@ -73,40 +192,41 @@ Assignment targets:
 - animation
 - texture
 
-## Uploaded test resources from current work session
-User supplied:
-- Buildings pack by @Quaternius.zip (~6.1 MB)
-- BirchTree_4.fbx
-- Bush_Snow_1.fbx
-- BirchTree_Autumn_4.obj
+Recommended building/tree assignment path after API activation:
+- buildings -> `lobby-environment / city-pack`
+- Birch tree -> `prop / birch-tree`
+- snow bush -> `prop / snow-bush`
+- autumn birch -> `prop / autumn-birch`
 
-These are suitable uploader acceptance-test assets. Do not claim they are deployed into the live scene until the owner upload/API path is successfully exercised.
+For runtime performance, convert production 3D assets to optimized GLB/GLTF where practical. Keep FBX/OBJ/BLEND as source/import formats.
 
-## Auto-deploy rules
-- Pushes to main trigger SVR Production Auto Deploy.
-- Deploy must run Phase 464 remodel audit.
-- Production deploy health must report PHASE-464-FULL-REMODEL-DEPLOY-LOCK.
-- Quest health must report PHASE-464-QUEST-REMODEL-FINISH.
-- Android health must report PHASE-464-ANDROID-FINAL-FIT-GUARD.
-- Legacy Phase 440/455 source modules may remain for protected authority/rollback lineage, but deployment metadata must describe the current Phase 464 build.
+## Deployment protection
+Pushes to `main` trigger `SVR Production Auto Deploy`.
 
-## Acceptance checklist
-1. GitHub Actions production workflow succeeds.
-2. GitHub Pages workflow succeeds.
-3. /deploy-health.json commit matches current main deployment.
-4. Owner login works without exposing credentials.
-5. Admin resource ZIP upload succeeds using S3 or PostgreSQL fallback.
-6. Resource appears in owner library and can be assigned.
-7. Quest route loads without duplicate table/Eric/cover geometry.
-8. Quest table, Eric, cards, watch and room lighting are visible in headset.
-9. Android regular game loads without overlay collisions; one burn pile; four player actions.
-10. Lobby portal destinations and private room routes load without missing-route errors.
+Protected checks now include:
+- mobile/account authority checks
+- Quest visual authority checks
+- watch/table regression
+- Phase 403 pot sanity
+- Phase 464 remodel audit
+- Phase 464 walkable lobby/private-room audit
+- production tree validation
+- publish to `gh-pages`
+- downstream GitHub Pages deployment
 
-## Known external activation dependency
-The static site auto-deploy is controlled in this repo. The separate api.svrpoker.com host must actually deploy the current /api/server.js for new upload/resource endpoints to become live. Do not claim the uploader fix is live until that API deployment is verified.
+Do not bypass a failed gate. Fix the failure and rerun.
 
-## Next work after acceptance
-- Run the supplied building/tree assets through Owner Resource Uploader.
-- Assign selected optimized models to lobby/environment slots.
-- Add runtime GLB-first asset loading; keep FBX/OBJ as source/import formats.
-- Continue Eric dealing-animation acceptance and physical Quest headset QA.
+## AI / collaboration rule
+Use this manifest before starting a new SVR phase.
+
+GitHub is the connected source-of-truth tool in the current session. A separate callable GitHub Copilot agent was **not exposed** in the available tool set, so do not claim Copilot performed work unless an actual Copilot tool/result exists.
+
+## Next agenda
+1. Physically test `/game/quest-lobby.html?v=phase464` in Quest and verify walking, snap-turn, teleport and wrist console.
+2. Enter Poker Room from the lobby and verify table, Eric, felt, cards, lighting, seating and watch.
+3. Walk-test Scorpion, Reiki VR, PGA, Chip + Putt, Store and Lounge routes.
+4. Deploy current `api/server.js` to the real `api.svrpoker.com` service.
+5. Upload the Quaternius ZIP through Owner Admin.
+6. Verify Resource Manager record + assignment.
+7. Convert selected source assets to optimized GLB and integrate them through assignment slots.
+8. Continue Eric dealing-animation physical Quest acceptance.
