@@ -43,7 +43,7 @@
   <div class="card"><h2>Hidden Traffic + Marketing Stats</h2><div id="analytics" class="muted">Loading hidden traffic stats...</div></div>
   <div class="card"><h2>Owner Data</h2><div class="row"><button id="tabMessages">Messages</button><button id="tabHealth">Endpoint Health</button></div><div id="dataView" class="muted">Loading owner counter panel...</div></div>
 
-  <!-- SVR_RESOURCE_UPLOADER_V1 -->
+  <!-- SVR_RESOURCE_UPLOADER_V1 -->\n  <!-- SVR_RESOURCE_DIRECT_FALLBACK_V3 -->
   <div class="card" id="resourceUploaderCard">
     <h2>Resource File Uploader</h2>
     <p class="muted">Owner-only upload path for game-development resources. Files are stored privately in AWS S3; PostgreSQL stores the asset record and object key.</p>
@@ -291,7 +291,7 @@
       if(current && items.some((r)=>r.id===current&&!r.archived_at)) $('managerResource').value=current;
       syncManagerFields();
       if(!items.length){ $('resourceList').textContent='No uploaded resources yet.'; return; }
-      $('resourceList').innerHTML=items.map((r)=>`<div class="resource-row"><div><b>${safe(r.display_name||r.original_name||r.object_key)}</b><div class="resource-meta">${safe(r.category||'resource')} · ${n(r.size_bytes)} bytes · ${safe(r.archived_at?'archived':(r.status||'ready'))}<br><code>${safe(r.object_key||'')}</code><br>${safe(r.notes||'')}</div></div><span class="pill">${safe((r.extension||'').toUpperCase())}</span></div>`).join('');
+      $('resourceList').innerHTML=items.map((r)=>`<div class="resource-row"><div><b>${safe(r.display_name||r.original_name||r.object_key)}</b><div class="resource-meta">${safe(r.category||'resource')} · ${n(r.size_bytes)} bytes · ${safe(r.storage_backend||'s3')} · ${safe(r.archived_at?'archived':(r.status||'ready'))}<br><code>${safe(r.object_key||'')}</code><br>${safe(r.notes||'')}</div></div><span class="pill">${safe((r.extension||'').toUpperCase())}</span></div>`).join('');
     }catch(error){ $('resourceList').innerHTML=`<span class="bad">Resource list unavailable: ${safe(error.message)}</span>`; }
   }
 
@@ -303,7 +303,9 @@
     $('resourceProgress').style.width='8%';
     $('resourceUploadNote').textContent=`Preparing ${file.name}...`;
     try{
-      const prep=await api('/api/admin/resources/presign',{
+      let prep;
+      try{
+        prep=await api('/api/admin/resources/presign',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
@@ -313,7 +315,22 @@
           category:$('resourceCategory').value,
           notes:$('resourceNotes').value.trim()
         })
-      });
+        });
+      }catch(presignError){
+        const params=new URLSearchParams({fileName:file.name,category:$('resourceCategory').value,notes:$('resourceNotes').value.trim()});
+        $('resourceUploadNote').textContent='S3 is not ready; using secure PostgreSQL fallback storage...';
+        const directRes=await fetch(API+'/api/admin/resources/direct?'+params.toString(),{
+          method:'POST',
+          headers:authHeaders({'Content-Type':'application/octet-stream'}),
+          body:file
+        });
+        const directData=await directRes.json().catch(()=>({}));
+        if(!directRes.ok||directData.ok===false) throw new Error(directData.error||directData.detail||presignError.message||`HTTP ${directRes.status}`);
+        $('resourceProgress').style.width='100%';
+        $('resourceUploadNote').innerHTML=`<span class="good">Uploaded:</span> ${safe(file.name)} · stored in secure PostgreSQL fallback storage.`;
+        $('resourceFile').value=''; $('resourceNotes').value='';
+        await loadResources(); return;
+      }
       $('resourceProgress').style.width='30%';
       $('resourceUploadNote').textContent='Uploading directly to private AWS S3 storage...';
       const put=await fetch(prep.uploadUrl,{method:'PUT',body:file,headers:{'Content-Type':prep.contentType||file.type||'application/octet-stream'}});
