@@ -68,6 +68,35 @@ function addBackgroundImage(scene, url){
   loader.load(url, (tex)=>{tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=8; mat.map=tex; mat.needsUpdate=true;}, undefined, ()=>{});
 }
 
+
+const PRIVATE_BUILD='PHASE-464-PRIVATE-ROOM-REMODEL';
+function addPremiumRoomArchitecture(scene,cfg){
+  const root=new THREE.Group();root.name='PHASE464_PRIVATE_ROOM_ARCHITECTURE';scene.add(root);
+  const theme={pga:[0x0e2415,0x8dffb4],scorpion:[0x170b13,0xff5b8c],smoker:[0x161014,0xffb070],store:[0x12091d,0xa77cff],reiki:[0x071713,0x7ffcff]}[cfg.kind]||[0x10131c,0x7ffcff];
+  const wall=new THREE.MeshStandardMaterial({color:theme[0],roughness:.72,metalness:.12,emissive:theme[0],emissiveIntensity:.12});
+  const accent=new THREE.MeshStandardMaterial({color:theme[1],roughness:.34,metalness:.45,emissive:theme[1],emissiveIntensity:.28});
+  const add=(g,n,sx,sy,sz,x,y,z,m)=>{const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),m);mesh.name=n;mesh.position.set(x,y,z);g.add(mesh);return mesh;};
+  add(root,'PHASE464_ROOM_BACK_WALL',12,4,.16,0,2,-6.5,wall);
+  add(root,'PHASE464_ROOM_LEFT_WALL',.16,4,11,-5.9,2,-1,wall);
+  add(root,'PHASE464_ROOM_RIGHT_WALL',.16,4,11,5.9,2,-1,wall);
+  add(root,'PHASE464_ROOM_CROWN',10,.12,.2,0,3.85,-6.35,accent);
+  for(const x of[-4.7,4.7]) add(root,'PHASE464_ROOM_COLUMN_'+x,.42,3.5,.42,x,1.75,-5.9,accent);
+  const light=new THREE.PointLight(theme[1],1.05,12,1.8);light.position.set(0,2.7,-2.8);root.add(light);
+  if(cfg.kind==='scorpion'){
+    const overlook=new THREE.Mesh(new THREE.PlaneGeometry(7.8,2.6),new THREE.MeshBasicMaterial({color:0x080912,transparent:true,opacity:.82,side:THREE.DoubleSide}));
+    overlook.name='PHASE464_SCORPION_CITY_OVERLOOK';overlook.position.set(0,2.25,-6.35);root.add(overlook);
+  }
+  if(cfg.kind==='smoker'){
+    const lounge=new THREE.Mesh(new THREE.BoxGeometry(5.6,.38,1.45),new THREE.MeshStandardMaterial({color:0x281514,roughness:.9}));
+    lounge.name='PHASE464_LOUNGE_SEATING';lounge.position.set(0,.3,-3.5);root.add(lounge);
+  }
+  if(cfg.kind==='store'){
+    const plinth=new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.45,.24,48),accent);plinth.name='PHASE464_STORE_DISPLAY_PLINTH';plinth.position.set(0,.13,-1.8);root.add(plinth);
+  }
+  window.SVR_PHASE464_PRIVATE_ROOM={build:PRIVATE_BUILD,kind:cfg.kind||'generic',installed:true,checkedAt:new Date().toISOString()};
+  return root;
+}
+
 export function bootPrivateScene(cfg){
   const app=document.getElementById('app'); document.body.style.margin='0'; document.body.style.overflow='hidden'; document.body.style.background='#000';
   const scene=new THREE.Scene(); scene.background=new THREE.Color(0x010006);
@@ -76,6 +105,7 @@ export function bootPrivateScene(cfg){
   addReturn(); stars(scene); scene.add(new THREE.HemisphereLight(0xb7c9ff,0x111018,.9));
   if(cfg.backgroundImage) addBackgroundImage(scene, cfg.backgroundImage);
   const floor=new THREE.Mesh(new THREE.CircleGeometry(11,96),new THREE.MeshStandardMaterial({color:cfg.floor||0x071012,roughness:.85,emissive:cfg.emissive||0x061724,emissiveIntensity:.25,side:THREE.DoubleSide})); floor.rotation.x=-Math.PI/2; scene.add(floor);
+  addPremiumRoomArchitecture(scene,cfg);
   const privateTicks=[];
   const panel=new THREE.Mesh(new THREE.PlaneGeometry(5,2.35),new THREE.MeshBasicMaterial({map:t(cfg.title,cfg.body),side:THREE.DoubleSide,transparent:true,opacity:.92})); panel.position.set(0,3.1,-4.2); scene.add(panel);
   if(cfg.kind==='reiki'){
