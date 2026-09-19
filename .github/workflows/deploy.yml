@@ -40,6 +40,28 @@ jobs:
           git -C source fetch origin main --depth=1
           test "$(git -C source rev-parse HEAD)" = "$(git -C source rev-parse origin/main)"
 
+      - name: Validate API security baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s source/api/server.js
+          node --check source/api/server.js
+          grep -q 'ADMIN_AUTH_READY' source/api/server.js
+          grep -q 'ADMIN_LOGIN_MAX_ATTEMPTS' source/api/server.js
+          grep -q 'app.use("/api/admin"' source/api/server.js
+          grep -q 'app.post("/api/admin/resources/direct", requireAdmin' source/api/server.js
+          grep -q 'app.post("/api/admin/resources/assign", requireAdmin' source/api/server.js
+          grep -q 'app.get("/api/admin/resources/assignments", requireAdmin' source/api/server.js
+          grep -q 'issuer:"svr-api", audience:"svr-owner"' source/api/server.js
+          if grep -q 'CHANGE_ME_DEV_ONLY' source/api/server.js; then
+            echo 'Insecure admin JWT fallback detected.' >&2
+            exit 1
+          fi
+          if grep -q 'dev-secret' source/api/server.js; then
+            echo 'Insecure API dev-secret fallback detected.' >&2
+            exit 1
+          fi
+
       - name: Validate protected mobile and account authorities
         shell: bash
         run: |
