@@ -170,6 +170,11 @@ jobs:
           node --check source/game/modules/phase453_quest_direct_table_room_lock.js
           node --check source/game/modules/phase455_quest_table_first_lobby.js
           node --check source/game/modules/phase340_platform_core_loader.js
+          node --check source/game/modules/phase464_grand_lobby_remodel.js
+          node --check source/game/modules/phase464_quest_remodel_finish.js
+          node --check source/game/modules/phase464_android_final_fit_guard.js
+          node --check source/game/modules/private_scene_common.js
+          (cd source && node game/tools/phase464-remodel-audit.mjs)
           (cd source && node game/tools/phase443-avatar-dealer-table-audit.mjs)
           (cd source && node game/tools/phase449-quest-clean-boot-audit.mjs)
           (cd source && node game/tools/phase450-deploy-gameplay-recovery-audit.mjs)
@@ -224,7 +229,7 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-445-V1-RELEASE-CHANNEL-HARDENING",
+            "build": "PHASE-464-FULL-REMODEL-DEPLOY-LOCK",
             "productVersion": "1.0.0",
             "appRoute": "/game/app.html?v=1.0.0",
             "updateManifest": "/update/app-v1-release.json",
@@ -234,7 +239,7 @@ jobs:
             "nativeReleaseLocked": true,
             "nativeApkRebuild": false,
             "predecessorMobileBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
-            "questBuild": "PHASE-455-QUEST-TABLE-FIRST-BOOT",
+            "questBuild": "PHASE-464-QUEST-REMODEL-FINISH",
             "vrTableBuild": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
             "vrTablePredecessorBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
             "labTableSurfaceBuild": "DEALER-LAB-V2.5-BLACK-FELT-TABLE-SHAPE-PASSLINE-LOCK",
@@ -244,12 +249,12 @@ jobs:
             "avatarLabArticulatedJoints": 19,
             "avatarLabPlaceholderBoxes": 0,
             "tableChipShelfInches": 3.75,
-            "androidBuild": "PHASE-420-MOBILE-WRAPPER-RELEASE-LOCK",
+            "androidBuild": "PHASE-464-ANDROID-FINAL-FIT-GUARD",
             "androidSurfaceBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
             "androidEngineBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "questRoute": "/game/quest.html?v=phase455",
+            "questRoute": "/game/quest.html?v=phase464",
             "camera3Route": "/game/camera3-live.html?v=phase440",
             "questAutomaticLobbyBoot": false,
             "questAutomaticTableBoot": true,
@@ -263,7 +268,7 @@ jobs:
             "questVisibleClutterRequired": 0,
             "questAdaptiveSeatHeight": true,
             "questPokerControlsPreserved": true,
-            "androidRoute": "/game/android.html?channel=stable&v=phase420",
+            "androidRoute": "/game/android.html?channel=stable&v=phase464",
             "iphoneRoute": "/game/iphone.html?v=phase420",
             "questTeleportEnabled": false,
             "questHandTeleportEnabled": false,
@@ -324,7 +329,7 @@ jobs:
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' publish/deploy-health.json
-          grep -q 'PHASE-455-QUEST-TABLE-FIRST-BOOT' publish/deploy-health.json
+          grep -q 'PHASE-464-QUEST-REMODEL-FINISH' publish/deploy-health.json
           grep -q '"questDirectTableRoom": true' publish/deploy-health.json
           grep -q '"questAutomaticTableBoot": true' publish/deploy-health.json
           grep -q '"questVerifiedSeatRequired": true' publish/deploy-health.json
@@ -356,8 +361,8 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add -A
           if git diff --cached --quiet; then
-            echo 'Production already matches Phase 455.'
+            echo 'Production already matches Phase 464.'
           else
-            git commit -m "Deploy Phase 455 verified table-first Quest gameplay ${GITHUB_SHA}"
+            git commit -m "Deploy Phase 464 remodeled SVR experience ${GITHUB_SHA}"
             git push origin gh-pages
           fi
