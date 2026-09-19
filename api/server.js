@@ -10,7 +10,8 @@ const crypto = require("crypto");
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "https://svrpoker.com";
-const JWT_SECRET = process.env.ADMIN_JWT_SECRET || "CHANGE_ME_DEV_ONLY";
+const JWT_SECRET = String(process.env.ADMIN_JWT_SECRET || "").trim();
+const ADMIN_AUTH_READY = JWT_SECRET.length >= 32;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const ADMIN_DISPLAY_NAME = process.env.ADMIN_DISPLAY_NAME || "King";
@@ -27,8 +28,28 @@ const pool = DATABASE_URL
   ? new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false }, connectionTimeoutMillis: 15000 })
   : null;
 
-app.use(helmet());
+app.disable("x-powered-by");
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(express.json({ limit: "128kb" }));
+app.use("/api/admin", (req,res,next)=>{ res.setHeader("Cache-Control","no-store"); res.setHeader("Pragma","no-cache"); next(); });
+
+const ADMIN_LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const ADMIN_LOGIN_MAX_ATTEMPTS = 8;
+const adminLoginAttempts = new Map();
+function adminLoginRateLimit(req,res,next){
+  const now=Date.now();
+  const key=String(req.ip || req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim();
+  const recent=(adminLoginAttempts.get(key)||[]).filter((ts)=>now-ts<ADMIN_LOGIN_WINDOW_MS);
+  if(recent.length>=ADMIN_LOGIN_MAX_ATTEMPTS){
+    res.setHeader("Retry-After",String(Math.ceil(ADMIN_LOGIN_WINDOW_MS/1000)));
+    return res.status(429).json({ok:false,error:"Too many login attempts. Try again later."});
+  }
+  recent.push(now); adminLoginAttempts.set(key,recent);
+  return next();
+}
 app.use(cors({
   origin(origin, callback) {
     if (!origin) return callback(null, true);
@@ -41,15 +62,17 @@ app.use(cors({
 }));
 
 function signAdminToken(email) {
-  return jwt.sign({ email, role: "admin" }, JWT_SECRET, { expiresIn: "8h" });
+  if(!ADMIN_AUTH_READY) throw new Error("ADMIN_JWT_SECRET must be configured with at least 32 characters.");
+  return jwt.sign({ email, role: "admin" }, JWT_SECRET, { expiresIn: "8h", issuer:"svr-api", audience:"svr-owner" });
 }
 
 function requireAdmin(req, res, next) {
+  if(!ADMIN_AUTH_READY) return res.status(503).json({ok:false,error:"Admin authentication is not configured."});
   const header = req.headers.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";
   if (!token) return res.status(401).json({ ok: false, error: "Missing admin token." });
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET, {issuer:"svr-api", audience:"svr-owner"});
     if (decoded.role !== "admin") return res.status(403).json({ ok: false, error: "Admin role required." });
     req.admin = decoded;
     return next();
@@ -462,10 +485,10 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
-app.post("/api/admin/login", async (req, res) => {
+app.post("/api/admin/login", adminLoginRateLimit, async (req, res) => {
   const email = cleanEmail(req.body?.email);
   const password = String(req.body?.password || "");
-  if (!ADMIN_EMAIL || !ADMIN_PASSWORD || JWT_SECRET === "CHANGE_ME_DEV_ONLY") return res.status(500).json({ ok: false, error: "Admin environment variables are not configured." });
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD || !ADMIN_AUTH_READY) return res.status(503).json({ ok: false, error: "Admin authentication is not configured." });
   if (email !== ADMIN_EMAIL.toLowerCase() || password !== ADMIN_PASSWORD) return res.status(401).json({ ok: false, error: "Invalid admin login." });
   try {
     await ensureAdminStatusTable();
@@ -1100,7 +1123,7 @@ app.get("/api/admin/resources/assignments", requireAdmin, async (req,res)=>{
 });
 
 app.get("/api/game/resources/manifest", async (req,res)=>{
-  if(!s3ConfigReady()) return res.status(503).json({ok:false,error:"Game resource storage is not configured."});
+  if(!ADMIN_AUTH_READY) return res.status(503).json({ok:false,error:"Resource signing is not configured."});
   try{
     await ensureResourceAssignmentsTable();
     const result=await dbQuery(`
@@ -1119,7 +1142,7 @@ app.get("/api/game/resources/manifest", async (req,res)=>{
         ? {...r,url:createS3PresignedGet(r.object_key,900),expiresIn:900}
         : {...r,url:null,expiresIn:0,unavailable:"s3-not-configured"};
     });
-    return res.json({ok:true,build:"SVR_RESOURCE_MANAGER_V2",storage:"aws-s3-private",resources});
+    return res.json({ok:true,build:"SVR_RESOURCE_MANAGER_V3",storage:"hybrid-private",resources});
   }catch(error){ return res.status(500).json({ok:false,error:"Game resource manifest failed.",detail:error.message}); }
 });
 
