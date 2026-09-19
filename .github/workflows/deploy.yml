@@ -175,6 +175,7 @@ jobs:
           node --check source/game/modules/phase464_android_final_fit_guard.js
           node --check source/game/modules/private_scene_common.js
           (cd source && node game/tools/phase464-remodel-audit.mjs)
+          (cd source && node game/tools/phase464-walkable-lobby-audit.mjs)
           (cd source && node game/tools/phase443-avatar-dealer-table-audit.mjs)
           (cd source && node game/tools/phase449-quest-clean-boot-audit.mjs)
           (cd source && node game/tools/phase450-deploy-gameplay-recovery-audit.mjs)
@@ -255,6 +256,8 @@ jobs:
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "questRoute": "/game/quest.html?v=phase464",
+            "questWalkableLobbyRoute": "/game/quest-lobby.html?v=phase464",
+            "questWalkableLobbyEnabled": true,
             "camera3Route": "/game/camera3-live.html?v=phase440",
             "questAutomaticLobbyBoot": false,
             "questAutomaticTableBoot": true,
@@ -311,6 +314,7 @@ jobs:
           test -s publish/kodi/repository.king-1.0.0.zip
           test -s publish/kodi/plugin.video.kingmedia/plugin.video.kingmedia-1.0.0.zip
           test -s publish/game/quest.html
+          test -s publish/game/quest-lobby.html
           test -s publish/game/camera3-live.html
           test -s publish/game/modules/phase438_lab_master_lobby_dealer_authority.js
           test -s publish/game/modules/phase439_lab_only_lobby_render_authority.js
@@ -330,6 +334,8 @@ jobs:
           test -s publish/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' publish/deploy-health.json
           grep -q 'PHASE-464-QUEST-REMODEL-FINISH' publish/deploy-health.json
+          grep -q '"questWalkableLobbyEnabled": true' publish/deploy-health.json
+          grep -q 'PHASE-464-QUEST-WALKABLE-LOBBY' publish/game/quest-lobby.html
           grep -q '"questDirectTableRoom": true' publish/deploy-health.json
           grep -q '"questAutomaticTableBoot": true' publish/deploy-health.json
           grep -q '"questVerifiedSeatRequired": true' publish/deploy-health.json
