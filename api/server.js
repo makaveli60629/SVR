@@ -22,7 +22,9 @@ const S3_BUCKET = process.env.SVR_RESOURCE_BUCKET || process.env.S3_BUCKET || ""
 const S3_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || "";
 const S3_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || "";
 const S3_SESSION_TOKEN = process.env.AWS_SESSION_TOKEN || "";
-const RESOURCE_MAX_BYTES = Math.max(1, Number(process.env.SVR_RESOURCE_MAX_BYTES || 262144000));\n// SVR_RESOURCE_DIRECT_FALLBACK_V3\nconst DIRECT_RESOURCE_MAX_BYTES = Math.max(1, Number(process.env.SVR_DIRECT_RESOURCE_MAX_BYTES || 26214400));
+const RESOURCE_MAX_BYTES = Math.max(1, Number(process.env.SVR_RESOURCE_MAX_BYTES || 262144000));
+// SVR_RESOURCE_DIRECT_FALLBACK_V3
+const DIRECT_RESOURCE_MAX_BYTES = Math.max(1, Number(process.env.SVR_DIRECT_RESOURCE_MAX_BYTES || 26214400));
 
 const pool = DATABASE_URL
   ? new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false }, connectionTimeoutMillis: 15000 })
