@@ -21,7 +21,7 @@ const S3_BUCKET = process.env.SVR_RESOURCE_BUCKET || process.env.S3_BUCKET || ""
 const S3_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || "";
 const S3_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || "";
 const S3_SESSION_TOKEN = process.env.AWS_SESSION_TOKEN || "";
-const RESOURCE_MAX_BYTES = Math.max(1, Number(process.env.SVR_RESOURCE_MAX_BYTES || 262144000));
+const RESOURCE_MAX_BYTES = Math.max(1, Number(process.env.SVR_RESOURCE_MAX_BYTES || 262144000));\n// SVR_RESOURCE_DIRECT_FALLBACK_V3\nconst DIRECT_RESOURCE_MAX_BYTES = Math.max(1, Number(process.env.SVR_DIRECT_RESOURCE_MAX_BYTES || 26214400));
 
 const pool = DATABASE_URL
   ? new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false }, connectionTimeoutMillis: 15000 })
@@ -316,7 +316,18 @@ async function ensureResourceAssetsTable(){
     ALTER TABLE resource_assets ADD COLUMN IF NOT EXISTS archived_by TEXT;
     CREATE INDEX IF NOT EXISTS idx_resource_assets_created_at ON resource_assets (created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_resource_assets_status ON resource_assets (status);
+    ALTER TABLE resource_assets ADD COLUMN IF NOT EXISTS storage_backend TEXT NOT NULL DEFAULT 's3';
     CREATE INDEX IF NOT EXISTS idx_resource_assets_category ON resource_assets (category);
+  `);
+}
+async function ensureResourceBlobsTable(){
+  await ensureResourceAssetsTable();
+  await dbQuery(`
+    CREATE TABLE IF NOT EXISTS resource_blobs (
+      resource_id UUID PRIMARY KEY REFERENCES resource_assets(id) ON DELETE CASCADE,
+      data BYTEA NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
   `);
 }
 async function ensureResourceAssignmentsTable(){
@@ -897,6 +908,62 @@ app.post("/api/admin/store/items/active", requireAdmin, async (req, res) => {
 });
 
 
+
+app.post("/api/admin/resources/direct", requireAdmin, express.raw({type:"application/octet-stream",limit:DIRECT_RESOURCE_MAX_BYTES}), async (req,res)=>{
+  const originalName=cleanText(req.query?.fileName,220);
+  const extension=resourceExtension(originalName);
+  const category=cleanText(req.query?.category||"3d-model",80);
+  const notes=cleanText(req.query?.notes||"",500);
+  const body=Buffer.isBuffer(req.body)?req.body:Buffer.alloc(0);
+  if(!originalName || !RESOURCE_EXTENSIONS.has(extension)) return res.status(400).json({ok:false,error:"Unsupported resource file type."});
+  if(!body.length) return res.status(400).json({ok:false,error:"Upload body is empty."});
+  if(body.length>DIRECT_RESOURCE_MAX_BYTES) return res.status(413).json({ok:false,error:`Direct fallback uploads are limited to ${DIRECT_RESOURCE_MAX_BYTES} bytes.`});
+  const safeName=safeResourceName(originalName), contentType=RESOURCE_CONTENT_TYPES[extension]||"application/octet-stream";
+  const objectKey=`postgres/resources/${new Date().toISOString().slice(0,7)}/${crypto.randomUUID()}-${safeName}`;
+  if(!pool) return res.status(503).json({ok:false,error:"PostgreSQL fallback storage is not configured."});
+  const client=await pool.connect();
+  try{
+    await client.query("BEGIN");
+    await ensureResourceBlobsTable();
+    const asset=await client.query(`
+      INSERT INTO resource_assets(original_name,object_key,bucket_name,extension,content_type,size_bytes,category,notes,status,uploaded_by,completed_at,storage_backend)
+      VALUES($1,$2,'postgres',$3,$4,$5,$6,$7,'ready',$8,NOW(),'postgres')
+      RETURNING id,original_name,object_key,extension,content_type,size_bytes,category,notes,status,storage_backend,created_at,completed_at
+    `,[originalName,objectKey,extension,contentType,body.length,category,notes||null,req.admin.email||null]);
+    await client.query("INSERT INTO resource_blobs(resource_id,data) VALUES($1,$2)",[asset.rows[0].id,body]);
+    await client.query("COMMIT");
+    await writeAdminLog(req.admin.email,"resource_direct_upload",{resourceId:asset.rows[0].id,originalName,sizeBytes:body.length,storage:"postgres"});
+    return res.status(201).json({ok:true,storage:"postgres",resource:asset.rows[0],directMaxBytes:DIRECT_RESOURCE_MAX_BYTES});
+  }catch(error){
+    await client.query("ROLLBACK").catch(()=>{});
+    return res.status(500).json({ok:false,error:"Direct resource upload failed.",detail:error.message});
+  }finally{client.release();}
+});
+
+app.get("/api/game/resources/:id/file", async (req,res)=>{
+  const id=normalizeMessageId(req.params?.id);
+  const token=String(req.query?.token||"");
+  if(!id||!token) return res.status(401).json({ok:false,error:"Signed resource token required."});
+  try{
+    const decoded=jwt.verify(token,JWT_SECRET,{audience:"svr-resource"});
+    if(decoded.role!=="resource"||decoded.resourceId!==id) return res.status(403).json({ok:false,error:"Invalid resource token."});
+    await ensureResourceBlobsTable();
+    const result=await dbQuery(`
+      SELECT r.original_name,r.content_type,r.size_bytes,b.data
+      FROM resource_assets r JOIN resource_blobs b ON b.resource_id=r.id
+      WHERE r.id=$1 AND r.storage_backend='postgres' AND r.status='ready' AND r.archived_at IS NULL
+      LIMIT 1
+    `,[id]);
+    if(!result.rows.length) return res.status(404).json({ok:false,error:"Resource not found."});
+    const row=result.rows[0];
+    res.setHeader("Content-Type",row.content_type||"application/octet-stream");
+    res.setHeader("Content-Length",String(row.size_bytes||row.data.length));
+    res.setHeader("Content-Disposition",`inline; filename="${safeResourceName(row.original_name)}"`);
+    res.setHeader("Cache-Control","private,max-age=300");
+    return res.send(row.data);
+  }catch(error){ return res.status(401).json({ok:false,error:"Resource token expired or invalid."}); }
+});
+
 app.post("/api/admin/resources/presign", requireAdmin, async (req, res) => {
   const originalName=cleanText(req.body?.fileName,220);
   const extension=resourceExtension(originalName);
@@ -948,7 +1015,7 @@ app.get("/api/admin/resources", requireAdmin, async (req, res) => {
   try{
     await ensureResourceAssetsTable();
     const result=await dbQuery(`
-      SELECT id,original_name,display_name,object_key,bucket_name,extension,content_type,size_bytes,category,notes,status,uploaded_by,created_at,completed_at,archived_at,archived_by
+      SELECT id,original_name,display_name,object_key,bucket_name,extension,content_type,size_bytes,category,notes,status,uploaded_by,created_at,completed_at,archived_at,archived_by,storage_backend
       FROM resource_assets
       ORDER BY created_at DESC
       LIMIT 200
@@ -1037,13 +1104,19 @@ app.get("/api/game/resources/manifest", async (req,res)=>{
   try{
     await ensureResourceAssignmentsTable();
     const result=await dbQuery(`
-      SELECT a.target_type,a.target_key,r.id AS resource_id,r.original_name,r.display_name,r.object_key,r.extension,r.content_type,r.size_bytes,r.category
+      SELECT a.target_type,a.target_key,r.id AS resource_id,r.original_name,r.display_name,r.object_key,r.extension,r.content_type,r.size_bytes,r.category,r.storage_backend
       FROM resource_assignments a
       JOIN resource_assets r ON r.id=a.resource_id
       WHERE r.status='ready' AND r.archived_at IS NULL
       ORDER BY a.target_type,a.target_key
     `);
-    const resources=result.rows.map((r)=>({...r,url:createS3PresignedGet(r.object_key,900),expiresIn:900}));
+    const resources=result.rows.map((r)=>{
+      if(r.storage_backend==='postgres'){
+        const token=jwt.sign({role:'resource',resourceId:r.resource_id},JWT_SECRET,{expiresIn:'15m',audience:'svr-resource'});
+        return {...r,url:`/api/game/resources/${r.resource_id}/file?token=${encodeURIComponent(token)}`,expiresIn:900};
+      }
+      return {...r,url:createS3PresignedGet(r.object_key,900),expiresIn:900};
+    });
     return res.json({ok:true,build:"SVR_RESOURCE_MANAGER_V2",storage:"aws-s3-private",resources});
   }catch(error){ return res.status(500).json({ok:false,error:"Game resource manifest failed.",detail:error.message}); }
 });
