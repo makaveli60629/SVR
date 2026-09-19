@@ -1,0 +1,17 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+const lobby=fs.readFileSync("game/quest-lobby.html","utf8");
+const rooms=fs.readFileSync("game/modules/private_scene_common.js","utf8");
+const game=fs.readFileSync("game/index.html","utf8");
+assert.match(game,/Table ready\. Press VR GAME ON\./);
+assert.match(lobby,/PHASE-464-QUEST-WALKABLE-LOBBY/);
+assert.match(lobby,/phase464_grand_lobby_remodel\.js/);
+assert.match(lobby,/createTeleportRig/);
+assert.match(lobby,/createWristWatch/);
+assert.match(lobby,/POKER ROOM/);
+assert.match(lobby,/teleportDisabled:Boolean\(window\.SVR_TELEPORT_DISABLED\)/);
+assert.match(rooms,/PHASE-464-PRIVATE-ROOM-WALKABLE-XR/);
+assert.match(rooms,/VRButton\.createButton/);
+assert.match(rooms,/createTeleportRig/);
+assert.match(rooms,/tp\.update/);
+console.log("Phase 464 walkable Quest lobby/private-room audit passed.");
