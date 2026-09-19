@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<title>SVR Poker Quest Lobby</title>
+<meta name="theme-color" content="#050508">
+<style>
+html,body,#app{width:100%;height:100%;margin:0;overflow:hidden;background:#050508;color:#fff;font-family:system-ui,Arial,sans-serif;touch-action:none}
+canvas{display:block;width:100%;height:100%}
+#hud{position:fixed;z-index:20;left:12px;right:12px;top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px;border:1px solid #7ffcff55;border-radius:16px;background:#050812cc;backdrop-filter:blur(8px)}
+#hud img{width:42px;height:42px;object-fit:contain}.title{font-weight:950}.status{color:#bffcff;font-size:12px;flex:1;min-width:180px}
+#hud a,#hud button{border:1px solid #ffd98a66;border-radius:10px;background:#111827;color:#fff;padding:8px 10px;text-decoration:none;font-weight:900}
+.xr-active #hud{display:none}
+#hint{position:fixed;z-index:15;left:50%;bottom:14px;transform:translateX(-50%);max-width:min(90vw,760px);padding:9px 13px;border:1px solid #a77cff66;border-radius:999px;background:#070a12d9;text-align:center;color:#e9ddff;font-size:12px}
+.xr-active #hint{display:none}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body data-build="PHASE-464-QUEST-WALKABLE-LOBBY">
+<div id="app"></div>
+<div id="hud"><img src="/logo.png" alt="SVR Poker"><div><div class="title">SVR QUEST LOBBY</div><div class="status" id="status">Building the walkable lobby…</div></div><button id="centerBtn">LOBBY CENTER</button><a href="/game/index.html?platform=quest&v=phase464&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1">POKER ROOM</a><a href="/game/scorpion.html?v=phase464">SCORPION</a><a href="/game/reiki.html?v=phase464">REIKI</a><a href="/game/pga-drive.html?v=phase464">PGA</a></div>
+<div id="hint">Quest: right stick forward/back follows your head direction • left/right snap-turns • grip/trigger/hand gesture teleport stays available in the lobby.</div>
+<script type="module">
+import * as THREE from "three";
+import {createCore} from "./modules/core_scene.js";
+import {createHands} from "./modules/hands_phase228.js";
+import {createTeleportRig} from "./modules/movement_phase228.js?v=phase170-quest-lobby";
+import {createWristWatch} from "./modules/watch.js?v=phase462";
+import {buildPhase195CleanLobbyWorld} from "./modules/phase195_clean_lobby_world.js";
+import {installPhase201HubContentRestore} from "./modules/phase201_hub_content_restore.js";
+import {installPhase202StorefrontShells} from "./modules/phase202_storefront_shells.js";
+import {installPhase262GeometrySkyAlignmentLock} from "./modules/phase262_geometry_sky_alignment_lock.js";
+import {installPhase149LobbyFitAlignmentLock} from "./phase149_lobby_fit_alignment_lock.js";
+import {installPhase464GrandLobbyRemodel} from "./modules/phase464_grand_lobby_remodel.js?v=phase464";
+
+const BUILD="PHASE-464-QUEST-WALKABLE-LOBBY";
+const status=document.getElementById("status");
+window.SVR_TELEPORT_DISABLED=false;
+window.SVR_TELEPORT_ENABLED=true;
+window.SVR_HAND_TELEPORT_ENABLED=true;
+window.SVR_WATCH_TELEPORT_ENABLED=true;
+window.SVR_GRIP_TELEPORT_ENABLED=true;
+
+const {scene,camera,renderer}=createCore({containerId:"app"});
+window.__SVR_SCENE__=scene;window.__SVR_CAMERA__=camera;window.__SVR_RENDERER__=renderer;
+camera.position.set(0,1.62,8.4);camera.lookAt(0,1.55,-2.0);
+renderer.toneMappingExposure=1.18;
+const world=await buildPhase195CleanLobbyWorld(scene,{log:()=>{},renderer});
+installPhase201HubContentRestore({scene,camera,renderer,log:()=>{}});
+installPhase202StorefrontShells({scene,camera,renderer,log:()=>{}});
+installPhase262GeometrySkyAlignmentLock({scene,camera,renderer,log:()=>{}});
+installPhase149LobbyFitAlignmentLock({scene,camera,renderer,world});
+installPhase464GrandLobbyRemodel({scene,world});
+window.SVR_WORLD_REF=world;
+const {roomClamp,sceneTargets={}}=world;
+const hands=createHands({scene,renderer,log:()=>{}});
+const tp=createTeleportRig({scene,renderer,camera,roomClamp,log:()=>{}});
+const route=url=>{location.href=url};
+const moveTo=key=>{const r=sceneTargets[key];if(!r?.pos)return false;tp.setPlayerPose?.(r.pos.x,0,r.pos.z);return true};
+const pokerRoute="/game/index.html?platform=quest&v=phase464&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1";
+const watch=createWristWatch({
+ scene,camera,renderer,tableOnly:false,
+ getState:()=>({audioEnabled:false,trackTitle:"Music Disabled",cash:50000,seated:false,inTableZone:false,seatLabel:"Lobby",teleportEnabled:tp.isEnabled?tp.isEnabled():true}),
+ actions:{
+  toggleAudio:()=>false,nextTrack:()=>false,
+  joinTable:()=>route(pokerRoute),leaveTable:()=>false,
+  toggleTeleport:()=>tp.toggleMode?.(),
+  goLobby:()=>moveTo("lobby"),
+  goTable:()=>route(pokerRoute),
+  goSeat:()=>route(pokerRoute),
+  goReiki:()=>route("/game/reiki.html?v=phase464"),
+  goPga:()=>route("/game/pga-drive.html?v=phase464"),
+  goStore:()=>route("/game/store-room.html?v=phase464"),
+  openStore:()=>window.open("/site/store.html","_blank","noopener"),
+  goLegend:()=>moveTo("legends"),
+  goSponsor:()=>moveTo("sponsor"),
+  goScorpion:()=>route("/game/scorpion.html?v=phase464"),
+  goReikiRoom:()=>route("/game/reiki.html?v=phase464")
+ }
+});
+document.getElementById("centerBtn").onclick=()=>moveTo("lobby");
+renderer.xr.addEventListener("sessionstart",async()=>{document.body.classList.add("xr-active");await tp.onSessionStart?.();});
+renderer.xr.addEventListener("sessionend",()=>document.body.classList.remove("xr-active"));
+let prev=performance.now();
+renderer.setAnimationLoop(()=>{
+ const now=performance.now(),dt=Math.min((now-prev)/1000,.033);prev=now;
+ scene.userData._camera=renderer.xr.isPresenting?renderer.xr.getCamera(camera):camera;
+ scene.userData._tickWorld?.(dt);
+ hands.update(dt);
+ const leftHand=hands.getLeftHand(),rightHand=hands.getRightHand(),leftController=hands.getLeftController(),rightController=hands.getRightController();
+ tp.update({dt,leftHand,rightHand,leftController,rightController,statusCb:t=>{if(t)status.textContent=t},modeCb:()=>{}});
+ watch.update(dt,{leftHand,rightHand,leftController,rightController});
+ renderer.render(scene,camera);
+});
+status.textContent="Lobby ready. Enter VR and explore, or open the Poker Room.";
+window.SVR_PHASE464_QUEST_LOBBY_QA=()=>({build:BUILD,walkable:true,teleportDisabled:Boolean(window.SVR_TELEPORT_DISABLED),phase464Lobby:Boolean(window.SVR_PHASE464_LOBBY?.installed),privateRoomRoutes:true,pokerRoute,pass:Boolean(window.SVR_PHASE464_LOBBY?.installed&&!window.SVR_TELEPORT_DISABLED),checkedAt:new Date().toISOString()});
+</script>
+</body>
+</html>
