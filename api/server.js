@@ -1115,7 +1115,9 @@ app.get("/api/game/resources/manifest", async (req,res)=>{
         const token=jwt.sign({role:'resource',resourceId:r.resource_id},JWT_SECRET,{expiresIn:'15m',audience:'svr-resource'});
         return {...r,url:`/api/game/resources/${r.resource_id}/file?token=${encodeURIComponent(token)}`,expiresIn:900};
       }
-      return {...r,url:createS3PresignedGet(r.object_key,900),expiresIn:900};
+      return s3ConfigReady()
+        ? {...r,url:createS3PresignedGet(r.object_key,900),expiresIn:900}
+        : {...r,url:null,expiresIn:0,unavailable:"s3-not-configured"};
     });
     return res.json({ok:true,build:"SVR_RESOURCE_MANAGER_V2",storage:"aws-s3-private",resources});
   }catch(error){ return res.status(500).json({ok:false,error:"Game resource manifest failed.",detail:error.message}); }
