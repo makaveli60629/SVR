@@ -1,100 +1,112 @@
-# SVR Poker Game Manifest
+# SVR Poker — AI Project Manifest
 
-## Purpose
-This folder preserves working state, priorities, and handoff notes so progress is not lost between phases.
+## Authority
+**Current production lane:** PHASE-464-FULL-REMODEL-DEPLOY-LOCK  
+**Repository:** makaveli60629/SVR  
+**Branch:** main  
+**Primary browser game:** /game/index.html  
+**Quest acceptance route:** /game/index.html?platform=quest&v=phase464&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1
 
-## Current locked version
-**UPDATE-1.5-STABILITY-BUILD**
+This file is the AI handoff authority. Older phase/update documents remain history only when they conflict with this manifest.
 
-Update 1.5 is the current working target. Numeric phase names are now subordinate labels only. Do not roll the repo backward to Phase 84 when the active goal is Update 1.5.
+## Current architecture
+- Static production deploy: GitHub Actions -> gh-pages -> GitHub Pages/custom domain.
+- Site/admin API source: /api/server.js, PostgreSQL via DATABASE_URL.
+- Owner panel: /site/owner.html.
+- Resource upload: private S3 when configured; PostgreSQL binary fallback for files up to the configured direct-upload limit.
+- Resource metadata/assignments: PostgreSQL.
+- Game resource manifest: GET /api/game/resources/manifest.
+- Secrets must stay in deployment environment variables, never browser code or GitHub source.
 
-## Current package baseline
-Current repo baseline:
-- `main` branch
-- Game boot path: `game/index.html`
-- Game-only track
-- Site and public website remain locked and must not be edited in this game track.
+## Phase 464 remodel
+### Main lobby
+- /game/modules/phase464_grand_lobby_remodel.js
+- Adds modular central runway, columns, ceiling architecture, room portal markers and controlled lighting.
+- Does not replace poker/table authority.
+- Structured as removable Three.js modules for later Unity migration.
 
-## Locked baselines
-- Official forearm watch baseline remains the reference watch.
-- Watch screen should face the user/upward and stay readable.
-- Correct spelling is **Reiki**.
-- Reiki public/sponsor branding remains approval-safe unless explicitly approved.
-- Use secure API architecture for data. Do not expose backend/database/payment/admin secrets in browser code.
-- Game modules must remain removable/swappable.
-- Private rooms must remain separate scenes/routes, not full rooms embedded inside the lobby.
-- Quest, Android, and desktop locomotion must remain locked modules, not scattered across unrelated files.
+### Quest
+- /game/modules/phase462_quest_professional_table_room.js remains the base professional table room.
+- /game/modules/phase464_quest_remodel_finish.js is the current visual finish layer.
+- Phase 440 remains the approved rendered table/dealer authority.
+- Phase 446 remains seat authority.
+- No extra table or Eric is permitted.
+- No tabletop cover may obscure native felt.
+- Current required player experience: automatic table boot, seated front position, visible Eric, readable cards/felt/watch, stable lighting.
 
-## Current implemented areas
-- Main lobby shell
-- Live game preview route
-- Store/site/game bridge route
-- Private room portal hub
-- Scorpion private room route
-- Reiki private room route
-- PGA Drive private room route
-- Chip/Putt private room route
-- VR Store private room route
-- Smoker Lounge private room route
-- Camera-forward locomotion module
-- Teleport release commit guard
-- Moon and Mars sky polish track
-- Reiki approval-safe hub polish track
+### Android
+- Protected poker engine: PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK.
+- Human turn authority: PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK.
+- Release wrapper lineage: Phase 420.
+- Current presentation guard: /game/modules/phase464_android_final_fit_guard.js.
+- Requirements: one burn pile, four action buttons, no player-name/stack overlap, safe-area fit in portrait/landscape.
 
-## Update 1.5 control lock
-- Android movement is working and must not be touched unless explicitly requested.
-- Desktop movement is working and must not be touched unless explicitly requested.
-- Quest controller movement needs the active fix path:
-  - right stick up/down = camera-facing forward/back movement
-  - right stick left/right = 45-degree snap turn
-  - no sideways drift when the headset is turned 45 degrees
-- Quest controllers should be visible as controllers.
-- Grip/squeeze should show teleport ray and SVR logo marker.
-- Trigger should commit teleport/leap when teleport is aimed.
-- A button should toggle action laser.
-- Trigger while action laser is active should activate UI/raycastable buttons.
-- Hand/fist teleport is secondary after controller stability.
+### Private rooms
+Separate routes stay modular:
+- /game/scorpion.html
+- /game/reiki.html
+- /game/pga-drive.html
+- /game/chip-putt.html
+- /game/store-room.html
+- /game/smoker-lounge.html
 
-## Moon and Mars lock
-- Remove duplicate geometry-only Moon/Mars props.
-- Use textured planet meshes only.
-- Moon must be bigger and higher.
-- Mars must be slightly bigger and higher.
-- Mars should orbit the Moon.
-- Add denser stars and lightweight constellation clusters.
-- Keep sky objects above the skyline and away from building collision.
+Shared 3D rooms use /game/modules/private_scene_common.js with PHASE-464-PRIVATE-ROOM-REMODEL architecture.
+Reiki remains approval-safe and must not gain unapproved claims/media/payment behavior.
 
-## Private room routes
-- `game/scorpion.html`
-- `game/reiki.html`
-- `game/pga-drive.html`
-- `game/chip-putt.html`
-- `game/store-room.html`
-- `game/smoker-lounge.html`
+## Resource Manager
+Owner-only management UI is in /site/owner.html.
+Supported resources include FBX, OBJ, GLB/GLTF, MTL, BLEND, ZIP and common texture formats.
 
-## Site/game/data target
-- Site stays professional and locked.
-- Game uses bridge/fallback data for profile, rooms, ads, store products, manifest, and game events.
-- Secure API default remains external to browser secrets.
-- Browser code must never include private database credentials, Stripe/payment secrets, or admin secrets.
+Storage policy:
+1. Preferred: private S3 + PostgreSQL metadata.
+2. Fallback: PostgreSQL BYTEA binary storage for smaller uploads while S3 is unavailable.
+3. Game consumes only owner-assigned, ready, non-archived resources.
+4. Runtime uses short-lived signed URLs/tokens.
 
-## Current priority order
-1. Fix deploy/workflow extraction so Update 1.5 can publish reliably.
-2. Sync build labels away from Phase 84 and into Update 1.5.
-3. Verify Quest controller camera-forward locomotion.
-4. Verify grip teleport marker and trigger commit.
-5. Verify A-button action laser and trigger activation.
-6. Verify Moon/Mars scale, height, texture, orbit, and duplicate removal.
-7. Verify lobby remains intact and site is untouched.
+Assignment targets:
+- dealer
+- avatar-male
+- avatar-female
+- poker-table
+- lobby-environment
+- prop
+- animation
+- texture
 
-## Known open items
-- Full playable poker interaction is not finished.
-- Dealer/card gameplay still needs full lock.
-- Watch hologram still needs final activation-only polish.
-- Private-room interiors need deeper visual polish after locomotion is stable.
-- Site admin/profile/store pages still need final live API connection once backend endpoints are available.
+## Uploaded test resources from current work session
+User supplied:
+- Buildings pack by @Quaternius.zip (~6.1 MB)
+- BirchTree_4.fbx
+- Bush_Snow_1.fbx
+- BirchTree_Autumn_4.obj
 
-## Latest Update 1.5 note
-- Update 1.5 supersedes the Phase 84 label for current work.
-- Phase 84 should be treated as an accidental/old label unless specifically referenced as an internal patch label.
-- The current objective is Update 1.5 Stability Build: sky, Quest controller locomotion, deploy extraction, route stability, and approval-safe storefront polish.
+These are suitable uploader acceptance-test assets. Do not claim they are deployed into the live scene until the owner upload/API path is successfully exercised.
+
+## Auto-deploy rules
+- Pushes to main trigger SVR Production Auto Deploy.
+- Deploy must run Phase 464 remodel audit.
+- Production deploy health must report PHASE-464-FULL-REMODEL-DEPLOY-LOCK.
+- Quest health must report PHASE-464-QUEST-REMODEL-FINISH.
+- Android health must report PHASE-464-ANDROID-FINAL-FIT-GUARD.
+- Legacy Phase 440/455 source modules may remain for protected authority/rollback lineage, but deployment metadata must describe the current Phase 464 build.
+
+## Acceptance checklist
+1. GitHub Actions production workflow succeeds.
+2. GitHub Pages workflow succeeds.
+3. /deploy-health.json commit matches current main deployment.
+4. Owner login works without exposing credentials.
+5. Admin resource ZIP upload succeeds using S3 or PostgreSQL fallback.
+6. Resource appears in owner library and can be assigned.
+7. Quest route loads without duplicate table/Eric/cover geometry.
+8. Quest table, Eric, cards, watch and room lighting are visible in headset.
+9. Android regular game loads without overlay collisions; one burn pile; four player actions.
+10. Lobby portal destinations and private room routes load without missing-route errors.
+
+## Known external activation dependency
+The static site auto-deploy is controlled in this repo. The separate api.svrpoker.com host must actually deploy the current /api/server.js for new upload/resource endpoints to become live. Do not claim the uploader fix is live until that API deployment is verified.
+
+## Next work after acceptance
+- Run the supplied building/tree assets through Owner Resource Uploader.
+- Assign selected optimized models to lobby/environment slots.
+- Add runtime GLB-first asset loading; keep FBX/OBJ as source/import formats.
+- Continue Eric dealing-animation acceptance and physical Quest headset QA.
