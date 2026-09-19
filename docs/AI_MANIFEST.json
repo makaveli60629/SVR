@@ -10,7 +10,9 @@
     "production_workflow": "success",
     "pages_workflow_run": 35420463969,
     "pages_workflow": "success",
-    "deployed_at": "2026-09-19T04:07:53Z"
+    "deployed_at": "2026-09-19T04:07:53Z",
+    "security_workflow_run": 35454940251,
+    "security_workflow": "success"
   },
   "routes": {
     "quest_lobby": "/game/quest-lobby.html?v=phase464",
@@ -90,5 +92,29 @@
     "Resource assignment test",
     "Optimize selected assets to GLB",
     "Eric dealing animation acceptance"
-  ]
+  ],
+  "security": {
+    "source_baseline": "a3e955d3bc2ca239b20221350114c9663a762ca1",
+    "production_workflow_run": 35454940251,
+    "production_workflow": "success",
+    "api_syntax_checked": true,
+    "admin_jwt_fail_closed": true,
+    "admin_jwt_min_secret_length": 32,
+    "admin_jwt_issuer": "svr-api",
+    "admin_jwt_audience": "svr-owner",
+    "admin_no_store": true,
+    "admin_login_rate_limited": true,
+    "resource_admin_routes_protected": true,
+    "obvious_secret_pattern_sweep": {
+      "aws_akia": false,
+      "github_ghp": false,
+      "github_pat": false,
+      "stripe_live": false,
+      "google_aiza": false,
+      "slack_bot": false,
+      "private_key_block": false
+    },
+    "api_host_deploy_verified": false,
+    "note": "api.svrpoker.com is external to the GitHub Pages deployment and must run the current api/server.js before backend hardening/upload changes are live."
+  }
 }

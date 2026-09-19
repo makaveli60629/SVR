@@ -200,6 +200,39 @@ Recommended building/tree assignment path after API activation:
 
 For runtime performance, convert production 3D assets to optimized GLB/GLTF where practical. Keep FBX/OBJ/BLEND as source/import formats.
 
+
+## Security hardening — verified
+Security hardening source baseline:
+`a3e955d3bc2ca239b20221350114c9663a762ca1`
+
+Production workflow run:
+`35454940251` — **success**
+
+The workflow now has a dedicated **Validate API security baseline** gate. It verifies:
+- `api/server.js` parses with `node --check`
+- no `CHANGE_ME_DEV_ONLY` admin JWT fallback
+- no `dev-secret` fallback in the production API source
+- admin authentication is disabled unless `ADMIN_JWT_SECRET` is configured with at least 32 characters
+- admin JWTs use explicit issuer `svr-api` and audience `svr-owner`
+- admin routes send no-store/no-cache headers
+- admin login is rate-limited
+- direct resource upload is protected by `requireAdmin`
+- resource assignment/list management is protected by `requireAdmin`
+- resource runtime signing fails closed if JWT signing is not configured
+
+Repository secret sweep found no obvious committed:
+- AWS `AKIA` access-key prefix
+- GitHub `ghp_` or `github_pat_` token
+- Stripe `sk_live_` key
+- Google `AIza` key
+- Slack `xoxb-` token
+- private-key block
+
+This code/search sweep is not a substitute for GitHub Advanced Security secret scanning or credential rotation if any credential was ever exposed historically.
+
+### Security boundary still external
+The hardened API source is committed, but `api.svrpoker.com` is a separately hosted service and is **not deployed by this repository's GitHub Pages workflow**. The actual API host must run the current `api/server.js` and its production secrets must remain in host environment/secret storage.
+
 ## Deployment protection
 Pushes to `main` trigger `SVR Production Auto Deploy`.
 
