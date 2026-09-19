@@ -20,7 +20,7 @@ canvas{display:block;width:100%;height:100%}
 </head>
 <body data-build="PHASE-464-QUEST-WALKABLE-LOBBY">
 <div id="app"></div>
-<div id="hud"><img src="/logo.png" alt="SVR Poker"><div><div class="title">SVR QUEST LOBBY</div><div class="status" id="status">Building the walkable lobby…</div></div><button id="centerBtn">LOBBY CENTER</button><a href="/game/index.html?platform=quest&v=phase464&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1">POKER ROOM</a><a href="/game/scorpion.html?v=phase464">SCORPION</a><a href="/game/reiki.html?v=phase464">REIKI</a><a href="/game/pga-drive.html?v=phase464">PGA</a></div>
+<div id="hud"><img src="/logo.png" alt="SVR Poker"><div><div class="title">SVR QUEST LOBBY</div><div class="status" id="status">Building the walkable lobby…</div></div><button id="centerBtn">LOBBY CENTER</button><a href="/game/index.html?platform=quest&v=phase464&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1">POKER ROOM</a><a href="/game/scorpion.html?v=phase464">SCORPION</a><a href="/game/reiki-vr.html?v=phase464">REIKI</a><a href="/game/pga-drive.html?v=phase464">PGA</a></div>
 <div id="hint">Quest: right stick forward/back follows your head direction • left/right snap-turns • grip/trigger/hand gesture teleport stays available in the lobby.</div>
 <script type="module">
 import * as THREE from "three";
@@ -70,14 +70,14 @@ const watch=createWristWatch({
   goLobby:()=>moveTo("lobby"),
   goTable:()=>route(pokerRoute),
   goSeat:()=>route(pokerRoute),
-  goReiki:()=>route("/game/reiki.html?v=phase464"),
+  goReiki:()=>route("/game/reiki-vr.html?v=phase464"),
   goPga:()=>route("/game/pga-drive.html?v=phase464"),
   goStore:()=>route("/game/store-room.html?v=phase464"),
   openStore:()=>window.open("/site/store.html","_blank","noopener"),
   goLegend:()=>moveTo("legends"),
   goSponsor:()=>moveTo("sponsor"),
   goScorpion:()=>route("/game/scorpion.html?v=phase464"),
-  goReikiRoom:()=>route("/game/reiki.html?v=phase464")
+  goReikiRoom:()=>route("/game/reiki-vr.html?v=phase464")
  }
 });
 document.getElementById("centerBtn").onclick=()=>moveTo("lobby");
