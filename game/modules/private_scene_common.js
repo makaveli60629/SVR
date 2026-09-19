@@ -1,4 +1,7 @@
 import * as THREE from "three";
+import { VRButton } from "three/addons/webxr/VRButton.js";
+import { createHands } from "./hands_phase228.js";
+import { createTeleportRig } from "./movement_phase228.js?v=phase170-private-room";
 
 function t(title, sub){
   const c = document.createElement('canvas'); c.width = 1100; c.height = 520;
@@ -101,7 +104,9 @@ export function bootPrivateScene(cfg){
   const app=document.getElementById('app'); document.body.style.margin='0'; document.body.style.overflow='hidden'; document.body.style.background='#000';
   const scene=new THREE.Scene(); scene.background=new THREE.Color(0x010006);
   const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.1,500); camera.position.set(0,1.65,7.5);
-  const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,1.5)); renderer.setSize(innerWidth,innerHeight); renderer.xr.enabled=true; app.appendChild(renderer.domElement);
+  const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,1.25)); renderer.setSize(innerWidth,innerHeight); renderer.xr.enabled=true; renderer.xr.setReferenceSpaceType('local-floor'); app.appendChild(renderer.domElement);
+  window.__SVR_SCENE__=scene; window.__SVR_RENDERER__=renderer; window.__SVR_CAMERA__=camera;
+  const vrButton=VRButton.createButton(renderer,{optionalFeatures:['local-floor','bounded-floor','hand-tracking']}); vrButton.classList.add('svr-vr-button'); document.body.appendChild(vrButton);
   addReturn(); stars(scene); scene.add(new THREE.HemisphereLight(0xb7c9ff,0x111018,.9));
   if(cfg.backgroundImage) addBackgroundImage(scene, cfg.backgroundImage);
   const floor=new THREE.Mesh(new THREE.CircleGeometry(11,96),new THREE.MeshStandardMaterial({color:cfg.floor||0x071012,roughness:.85,emissive:cfg.emissive||0x061724,emissiveIntensity:.25,side:THREE.DoubleSide})); floor.rotation.x=-Math.PI/2; scene.add(floor);
@@ -119,6 +124,12 @@ export function bootPrivateScene(cfg){
   const earth=new THREE.Mesh(new THREE.SphereGeometry(4.8,44,22),new THREE.MeshBasicMaterial({color:0x2e86ff})); earth.position.set(0,82,-120); scene.add(earth);
   const moon=new THREE.Mesh(new THREE.SphereGeometry(1.9,40,20),new THREE.MeshBasicMaterial({color:0xdeddda})); moon.position.set(-13,88,-124); scene.add(moon);
   const mars=new THREE.Mesh(new THREE.SphereGeometry(1.55,36,18),new THREE.MeshBasicMaterial({color:0xb14d2e})); mars.position.set(18,94,-132); scene.add(mars);
+  const roomClamp=(x,z)=>({x:THREE.MathUtils.clamp(x,-5.35,5.35),z:THREE.MathUtils.clamp(z,-6.1,5.5)});
+  const hands=createHands({scene,renderer,log:()=>{}});
+  const tp=createTeleportRig({scene,renderer,camera,roomClamp,log:()=>{}});
+  renderer.xr.addEventListener('sessionstart',()=>tp.onSessionStart?.());
   addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-  renderer.setAnimationLoop(()=>{const time=performance.now()/1000; earth.rotation.y+=.0009; moon.rotation.y+=.001; mars.rotation.y+=.0015; const ot=time*.22; moon.position.set(earth.position.x+Math.cos(ot)*13,earth.position.y+5,earth.position.z+Math.sin(ot)*9); mars.position.set(earth.position.x+Math.cos(ot*.55)*24,earth.position.y+10,earth.position.z+Math.sin(ot*.55)*16); privateTicks.forEach(g=>g?.userData?.tick?.(.016,time)); camera.lookAt(0,1.5,-1.5); renderer.render(scene,camera);});
+  let last=performance.now();
+  renderer.setAnimationLoop(()=>{const now=performance.now(),dt=Math.min((now-last)/1000,.033);last=now;const time=now/1000; earth.rotation.y+=.0009; moon.rotation.y+=.001; mars.rotation.y+=.0015; const ot=time*.22; moon.position.set(earth.position.x+Math.cos(ot)*13,earth.position.y+5,earth.position.z+Math.sin(ot)*9); mars.position.set(earth.position.x+Math.cos(ot*.55)*24,earth.position.y+10,earth.position.z+Math.sin(ot*.55)*16); privateTicks.forEach(g=>g?.userData?.tick?.(dt,time)); hands.update(dt); const leftHand=hands.getLeftHand(),rightHand=hands.getRightHand(),leftController=hands.getLeftController(),rightController=hands.getRightController(); tp.update({dt,leftHand,rightHand,leftController,rightController,statusCb:()=>{},modeCb:()=>{}}); if(!renderer.xr.isPresenting)camera.lookAt(0,1.5,-1.5); renderer.render(scene,camera);});
+  window.SVR_PHASE464_PRIVATE_ROOM_MOVEMENT={build:'PHASE-464-PRIVATE-ROOM-WALKABLE-XR',walkable:true,webxr:true,roomClamp:true,checkedAt:new Date().toISOString()};
 }
