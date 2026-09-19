@@ -1,4 +1,7 @@
 import * as THREE from "three";
+import { VRButton } from "three/addons/webxr/VRButton.js";
+import { createHands } from "./hands_phase228.js";
+import { createTeleportRig } from "./movement_phase228.js?v=phase170-private-room";
 
 function t(title, sub){
   const c = document.createElement('canvas'); c.width = 1100; c.height = 520;
@@ -68,14 +71,46 @@ function addBackgroundImage(scene, url){
   loader.load(url, (tex)=>{tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=8; mat.map=tex; mat.needsUpdate=true;}, undefined, ()=>{});
 }
 
+
+const PRIVATE_BUILD='PHASE-464-PRIVATE-ROOM-REMODEL';
+function addPremiumRoomArchitecture(scene,cfg){
+  const root=new THREE.Group();root.name='PHASE464_PRIVATE_ROOM_ARCHITECTURE';scene.add(root);
+  const theme={pga:[0x0e2415,0x8dffb4],scorpion:[0x170b13,0xff5b8c],smoker:[0x161014,0xffb070],store:[0x12091d,0xa77cff],reiki:[0x071713,0x7ffcff]}[cfg.kind]||[0x10131c,0x7ffcff];
+  const wall=new THREE.MeshStandardMaterial({color:theme[0],roughness:.72,metalness:.12,emissive:theme[0],emissiveIntensity:.12});
+  const accent=new THREE.MeshStandardMaterial({color:theme[1],roughness:.34,metalness:.45,emissive:theme[1],emissiveIntensity:.28});
+  const add=(g,n,sx,sy,sz,x,y,z,m)=>{const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),m);mesh.name=n;mesh.position.set(x,y,z);g.add(mesh);return mesh;};
+  add(root,'PHASE464_ROOM_BACK_WALL',12,4,.16,0,2,-6.5,wall);
+  add(root,'PHASE464_ROOM_LEFT_WALL',.16,4,11,-5.9,2,-1,wall);
+  add(root,'PHASE464_ROOM_RIGHT_WALL',.16,4,11,5.9,2,-1,wall);
+  add(root,'PHASE464_ROOM_CROWN',10,.12,.2,0,3.85,-6.35,accent);
+  for(const x of[-4.7,4.7]) add(root,'PHASE464_ROOM_COLUMN_'+x,.42,3.5,.42,x,1.75,-5.9,accent);
+  const light=new THREE.PointLight(theme[1],1.05,12,1.8);light.position.set(0,2.7,-2.8);root.add(light);
+  if(cfg.kind==='scorpion'){
+    const overlook=new THREE.Mesh(new THREE.PlaneGeometry(7.8,2.6),new THREE.MeshBasicMaterial({color:0x080912,transparent:true,opacity:.82,side:THREE.DoubleSide}));
+    overlook.name='PHASE464_SCORPION_CITY_OVERLOOK';overlook.position.set(0,2.25,-6.35);root.add(overlook);
+  }
+  if(cfg.kind==='smoker'){
+    const lounge=new THREE.Mesh(new THREE.BoxGeometry(5.6,.38,1.45),new THREE.MeshStandardMaterial({color:0x281514,roughness:.9}));
+    lounge.name='PHASE464_LOUNGE_SEATING';lounge.position.set(0,.3,-3.5);root.add(lounge);
+  }
+  if(cfg.kind==='store'){
+    const plinth=new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.45,.24,48),accent);plinth.name='PHASE464_STORE_DISPLAY_PLINTH';plinth.position.set(0,.13,-1.8);root.add(plinth);
+  }
+  window.SVR_PHASE464_PRIVATE_ROOM={build:PRIVATE_BUILD,kind:cfg.kind||'generic',installed:true,checkedAt:new Date().toISOString()};
+  return root;
+}
+
 export function bootPrivateScene(cfg){
   const app=document.getElementById('app'); document.body.style.margin='0'; document.body.style.overflow='hidden'; document.body.style.background='#000';
   const scene=new THREE.Scene(); scene.background=new THREE.Color(0x010006);
   const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.1,500); camera.position.set(0,1.65,7.5);
-  const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,1.5)); renderer.setSize(innerWidth,innerHeight); renderer.xr.enabled=true; app.appendChild(renderer.domElement);
+  const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,1.25)); renderer.setSize(innerWidth,innerHeight); renderer.xr.enabled=true; renderer.xr.setReferenceSpaceType('local-floor'); app.appendChild(renderer.domElement);
+  window.__SVR_SCENE__=scene; window.__SVR_RENDERER__=renderer; window.__SVR_CAMERA__=camera;
+  const vrButton=VRButton.createButton(renderer,{optionalFeatures:['local-floor','bounded-floor','hand-tracking']}); vrButton.classList.add('svr-vr-button'); document.body.appendChild(vrButton);
   addReturn(); stars(scene); scene.add(new THREE.HemisphereLight(0xb7c9ff,0x111018,.9));
   if(cfg.backgroundImage) addBackgroundImage(scene, cfg.backgroundImage);
   const floor=new THREE.Mesh(new THREE.CircleGeometry(11,96),new THREE.MeshStandardMaterial({color:cfg.floor||0x071012,roughness:.85,emissive:cfg.emissive||0x061724,emissiveIntensity:.25,side:THREE.DoubleSide})); floor.rotation.x=-Math.PI/2; scene.add(floor);
+  addPremiumRoomArchitecture(scene,cfg);
   const privateTicks=[];
   const panel=new THREE.Mesh(new THREE.PlaneGeometry(5,2.35),new THREE.MeshBasicMaterial({map:t(cfg.title,cfg.body),side:THREE.DoubleSide,transparent:true,opacity:.92})); panel.position.set(0,3.1,-4.2); scene.add(panel);
   if(cfg.kind==='reiki'){
@@ -89,6 +124,12 @@ export function bootPrivateScene(cfg){
   const earth=new THREE.Mesh(new THREE.SphereGeometry(4.8,44,22),new THREE.MeshBasicMaterial({color:0x2e86ff})); earth.position.set(0,82,-120); scene.add(earth);
   const moon=new THREE.Mesh(new THREE.SphereGeometry(1.9,40,20),new THREE.MeshBasicMaterial({color:0xdeddda})); moon.position.set(-13,88,-124); scene.add(moon);
   const mars=new THREE.Mesh(new THREE.SphereGeometry(1.55,36,18),new THREE.MeshBasicMaterial({color:0xb14d2e})); mars.position.set(18,94,-132); scene.add(mars);
+  const roomClamp=(x,z)=>({x:THREE.MathUtils.clamp(x,-5.35,5.35),z:THREE.MathUtils.clamp(z,-6.1,5.5)});
+  const hands=createHands({scene,renderer,log:()=>{}});
+  const tp=createTeleportRig({scene,renderer,camera,roomClamp,log:()=>{}});
+  renderer.xr.addEventListener('sessionstart',()=>tp.onSessionStart?.());
   addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-  renderer.setAnimationLoop(()=>{const time=performance.now()/1000; earth.rotation.y+=.0009; moon.rotation.y+=.001; mars.rotation.y+=.0015; const ot=time*.22; moon.position.set(earth.position.x+Math.cos(ot)*13,earth.position.y+5,earth.position.z+Math.sin(ot)*9); mars.position.set(earth.position.x+Math.cos(ot*.55)*24,earth.position.y+10,earth.position.z+Math.sin(ot*.55)*16); privateTicks.forEach(g=>g?.userData?.tick?.(.016,time)); camera.lookAt(0,1.5,-1.5); renderer.render(scene,camera);});
+  let last=performance.now();
+  renderer.setAnimationLoop(()=>{const now=performance.now(),dt=Math.min((now-last)/1000,.033);last=now;const time=now/1000; earth.rotation.y+=.0009; moon.rotation.y+=.001; mars.rotation.y+=.0015; const ot=time*.22; moon.position.set(earth.position.x+Math.cos(ot)*13,earth.position.y+5,earth.position.z+Math.sin(ot)*9); mars.position.set(earth.position.x+Math.cos(ot*.55)*24,earth.position.y+10,earth.position.z+Math.sin(ot*.55)*16); privateTicks.forEach(g=>g?.userData?.tick?.(dt,time)); hands.update(dt); const leftHand=hands.getLeftHand(),rightHand=hands.getRightHand(),leftController=hands.getLeftController(),rightController=hands.getRightController(); tp.update({dt,leftHand,rightHand,leftController,rightController,statusCb:()=>{},modeCb:()=>{}}); if(!renderer.xr.isPresenting)camera.lookAt(0,1.5,-1.5); renderer.render(scene,camera);});
+  window.SVR_PHASE464_PRIVATE_ROOM_MOVEMENT={build:'PHASE-464-PRIVATE-ROOM-WALKABLE-XR',walkable:true,webxr:true,roomClamp:true,checkedAt:new Date().toISOString()};
 }
