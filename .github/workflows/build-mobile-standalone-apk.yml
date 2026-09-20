@@ -8,6 +8,13 @@ on:
       - 'mobile/**'
       - 'android-mobile/**'
       - '.github/workflows/build-mobile-standalone-apk.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'mobile/**'
+      - 'android-mobile/**'
+      - '.github/workflows/build-mobile-standalone-apk.yml'
   workflow_dispatch:
 
 permissions:
