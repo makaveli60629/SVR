@@ -52,6 +52,33 @@ function moduleUrl(path) {
   return url.href;
 }
 
+const PRELOADED_MODULES = new Set();
+function preloadCriticalModules(paths) {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const effectiveType = String(connection?.effectiveType || '');
+  const saveData = Boolean(connection?.saveData);
+  const limit = saveData || effectiveType.includes('2g')
+    ? 2
+    : effectiveType === '3g'
+      ? 4
+      : state.platform === 'quest'
+        ? 10
+        : 8;
+  const hinted = [];
+  for (const path of paths.slice(0, limit)) {
+    const href = moduleUrl(path);
+    if (PRELOADED_MODULES.has(href)) continue;
+    const link = document.createElement('link');
+    link.rel = 'modulepreload';
+    link.href = href;
+    link.fetchPriority = 'high';
+    document.head.appendChild(link);
+    PRELOADED_MODULES.add(href);
+    hinted.push(path);
+  }
+  return { limit, saveData, effectiveType, hinted };
+}
+
 function release(reason) {
   if (state.readyAt) return;
   const params = new URLSearchParams(location.search);
@@ -232,6 +259,7 @@ function auditSnapshot() {
     totalMs: state.totalMs,
     deferredTotalMs: state.deferredTotalMs,
     prewarm: state.prewarm,
+    modulePreload: state.modulePreload || null,
     authority: window.SVR_PHASE340_AUTHORITY_AUDIT?.() || state.audit,
     phase356: window.SVR_PHASE356_QA?.() || null,
     phase358: window.SVR_PHASE358_QA?.() || null,
@@ -291,6 +319,7 @@ export async function bootPlatform(options = {}) {
   state.modules = manifestFor(state.platform);
   state.deferredModules = deferredManifestFor(state.platform);
   window.SVR_PHASE340_MANIFEST = manifestAudit;
+  state.modulePreload = preloadCriticalModules(state.modules);
 
   await importList(state.modules, false);
   status('Finishing table and cards…');

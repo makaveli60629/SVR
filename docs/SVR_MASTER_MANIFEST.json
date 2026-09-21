@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "manifestVersion": "phase465",
+  "updated": "2026-09-18",
+  "project": {
+    "name": "SVR Poker / Scarlett VR Poker",
+    "domain": "svrpoker.com",
+    "repository": "makaveli60629/SVR",
+    "productionBranch": "main",
+    "activeBranch": "feat/unity6-web-runtime-fastpath-20260918",
+    "pullRequest": 264,
+    "currentPhase": 465
+  },
+  "runtimeTracks": {
+    "production": {
+      "engine": [
+        "A-Frame",
+        "Three.js",
+        "Vanilla JavaScript",
+        "WebXR"
+      ],
+      "entry": "game/index.html",
+      "role": "live/fallback during Unity migration"
+    },
+    "unity": {
+      "root": "unity/SVRPoker",
+      "editorVersion": "6000.3.15f1",
+      "revision": "c1aa84e375f6",
+      "track": "Unity 6.3 LTS",
+      "webBuildMethod": "SVR.Editor.SVRBuild.BuildWebCloud",
+      "androidBuildMethod": "SVR.Editor.SVRBuild.BuildAndroidCloud",
+      "questPrototypeMethod": "SVR.Editor.SVRBuild.BuildQuestPrototype",
+      "androidApplicationId": "com.svrpoker.game",
+      "webEvents": [
+        "svr:unity-progress",
+        "svr:unity-ready"
+      ]
+    }
+  },
+  "phase464": {
+    "status": "implemented in PR 264",
+    "items": [
+      "CDN preconnect",
+      "boot logo preload",
+      "connection-aware modulepreload",
+      "version-aware service-worker caching",
+      "network-first navigation",
+      "fresh updater/APK paths"
+    ]
+  },
+  "phase465": {
+    "repositoryFoundation": "complete",
+    "structuralValidation": "passed",
+    "unityCompilation": "pending external Unity Build Automation connection",
+    "firstAcceptanceGate": [
+      "Unity Web build succeeds",
+      "Android APK build succeeds",
+      "Web emits svr:unity-ready",
+      "Android bootstrap scene renders"
+    ]
+  },
+  "protected": [
+    "keep production browser runtime during migration",
+    "do not expose secrets or authoritative RNG",
+    "do not force APK updates during ordinary development",
+    "do not auto-promote lab builds",
+    "do not hand-author unverified Meta/OpenXR generated settings"
+  ],
+  "nextExecutionOrder": [
+    "connect Unity Build Automation to GitHub repository",
+    "create Unity WebGL config rooted at unity/SVRPoker",
+    "run first Web build",
+    "fix compiler/package errors",
+    "create Android config",
+    "run first Android APK build",
+    "test bootstrap artifacts",
+    "migrate canonical poker table",
+    "verify table scale/origin/seated camera",
+    "migrate lighting",
+    "migrate Eric and dealer animation",
+    "migrate cards/chips/gameplay presentation",
+    "configure OpenXR/Meta XR in a real Unity Editor session",
+    "add Quest hands/controllers",
+    "migrate avatars",
+    "move optional rooms/content to progressive loading",
+    "integrate Unity Web build with svrpoker.com while retaining browser fallback"
+  ],
+  "handoff": "Read docs/SVR_MASTER_MANIFEST.md, inspect PR #264 and current branch, verify repository state, then continue from nextExecutionOrder."
+}
