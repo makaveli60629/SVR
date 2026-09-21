@@ -356,7 +356,7 @@ jobs:
           test -s publish/game/assets/models/table.glb
           test -s publish/game/assets/models/eric/eric.fbx
           grep -q 'PHASE-440-LAB-MASTER-HARD-RENDER-LOCK' publish/deploy-health.json
-          grep -q 'PHASE-464-QUEST-REMODEL-FINISH' publish/deploy-health.json
+          grep -q 'PHASE-465-QUEST-LOBBY-AUTO-BOOT' publish/deploy-health.json
           grep -q '"questWalkableLobbyEnabled": true' publish/deploy-health.json
           grep -q 'PHASE-464-QUEST-WALKABLE-LOBBY' publish/game/quest-lobby.html
           grep -q 'PHASE-465-QUEST-LOBBY-AUTO-BOOT' publish/game/quest.html
