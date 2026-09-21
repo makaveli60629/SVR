@@ -252,7 +252,7 @@ jobs:
           cat > publish/deploy-health.json <<EOF_HEALTH
           {
             "status": "ok",
-            "build": "PHASE-464-FULL-REMODEL-DEPLOY-LOCK",
+            "build": "PHASE-465-NEW-LOBBY-AUTO-DEPLOY-LOCK",
             "productVersion": "1.0.0",
             "appRoute": "/game/app.html?v=1.0.0",
             "updateManifest": "/update/app-v1-release.json",
@@ -262,7 +262,7 @@ jobs:
             "nativeReleaseLocked": true,
             "nativeApkRebuild": false,
             "predecessorMobileBuild": "PHASE-420-MOBILE-RELEASE-TRUTH-LOCK",
-            "questBuild": "PHASE-464-QUEST-REMODEL-FINISH",
+            "questBuild": "PHASE-465-QUEST-LOBBY-AUTO-BOOT",
             "vrTableBuild": "PHASE-440-LAB-MASTER-HARD-RENDER-LOCK",
             "vrTablePredecessorBuild": "PHASE-422-QUEST-TABLE-INSPECTION-LOCK",
             "labTableSurfaceBuild": "DEALER-LAB-V2.5-BLACK-FELT-TABLE-SHAPE-PASSLINE-LOCK",
@@ -277,14 +277,14 @@ jobs:
             "androidEngineBuild": "PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK",
             "commit": "${GITHUB_SHA}",
             "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "questRoute": "/game/quest.html?v=phase464",
-            "questWalkableLobbyRoute": "/game/quest-lobby.html?v=phase464",
+            "questRoute": "/game/quest-lobby.html?v=phase465",
+            "questWalkableLobbyRoute": "/game/quest-lobby.html?v=phase465",
             "questWalkableLobbyEnabled": true,
             "camera3Route": "/game/camera3-live.html?v=phase440",
-            "questAutomaticLobbyBoot": false,
-            "questAutomaticTableBoot": true,
-            "questDirectTableRoom": true,
-            "questLobbyEnabled": false,
+            "questAutomaticLobbyBoot": true,
+            "questAutomaticTableBoot": false,
+            "questDirectTableRoom": false,
+            "questLobbyEnabled": true,
             "questReadinessGate": true,
             "questVerifiedSeatRequired": true,
             "questGameplayReadinessRequired": true,
@@ -295,9 +295,9 @@ jobs:
             "questPokerControlsPreserved": true,
             "androidRoute": "/game/android.html?channel=stable&v=phase464",
             "iphoneRoute": "/game/iphone.html?v=phase420",
-            "questTeleportEnabled": false,
-            "questHandTeleportEnabled": false,
-            "questGripTeleportEnabled": false,
+            "questTeleportEnabled": true,
+            "questHandTeleportEnabled": true,
+            "questGripTeleportEnabled": true,
             "questLabMasterOnlyRenderedTable": true,
             "questLabMasterOnlyRenderedEric": true,
             "questLegacyTableVisualsDetached": true,
@@ -359,14 +359,17 @@ jobs:
           grep -q 'PHASE-464-QUEST-REMODEL-FINISH' publish/deploy-health.json
           grep -q '"questWalkableLobbyEnabled": true' publish/deploy-health.json
           grep -q 'PHASE-464-QUEST-WALKABLE-LOBBY' publish/game/quest-lobby.html
+          grep -q 'PHASE-465-QUEST-LOBBY-AUTO-BOOT' publish/game/quest.html
+          grep -q 'quest-lobby.html?v=phase465&autoboot=1' publish/game/quest.html
+          grep -q 'quest.html?v=phase465' publish/game/index.html
           grep -q 'PHASE-464-REIKI-WELLNESS-VR' publish/game/reiki-vr.html
-          grep -q '"questDirectTableRoom": true' publish/deploy-health.json
-          grep -q '"questAutomaticTableBoot": true' publish/deploy-health.json
+          grep -q '"questDirectTableRoom": false' publish/deploy-health.json
+          grep -q '"questAutomaticTableBoot": false' publish/deploy-health.json
           grep -q '"questVerifiedSeatRequired": true' publish/deploy-health.json
           grep -q '"questGameplayReadinessRequired": true' publish/deploy-health.json
           grep -q '"questControlsRequiredBeforeEnterVr": true' publish/deploy-health.json
           grep -q '"questAutoStartFirstHand": true' publish/deploy-health.json
-          grep -q '"questLobbyEnabled": false' publish/deploy-health.json
+          grep -q '"questLobbyEnabled": true' publish/deploy-health.json
           grep -q '"questPokerControlsPreserved": true' publish/deploy-health.json
           grep -q '"questLabMasterOnlyRenderedTable": true' publish/deploy-health.json
           grep -q '"questLabMasterOnlyRenderedEric": true' publish/deploy-health.json
