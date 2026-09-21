@@ -9,9 +9,11 @@ const teleport=fs.readFileSync('game/modules/phase449_quest_clean_boot_teleport_
 assert.doesNotMatch(deploy,/test -s publish\/game\/tools\//);
 assert.doesNotMatch(deploy,/\(cd publish && node game\/tools\//);
 assert.match(deploy,/phase449-quest-clean-boot-audit\.mjs/);
-assert.match(deploy,/questAutomaticLobbyBoot": false/);
-assert.match(deploy,/questDirectTableRoom": true/);
-assert.match(deploy,/questLobbyEnabled": false/);
+assert.match(deploy,/questAutomaticLobbyBoot": true/);
+assert.match(deploy,/questDirectTableRoom": false/);
+assert.match(deploy,/questLobbyEnabled": true/);
+assert.match(deploy,/questAutomaticTableBoot\": false/);
+assert.match(deploy,/questRoute\": "\/game\/quest-lobby\.html\?v=phase465"/);
 assert.match(deploy,/questPokerControlsPreserved": true/);
 
 for (const authority of [
