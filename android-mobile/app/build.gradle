@@ -1,0 +1,27 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.svrpoker.mobile'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.svrpoker.mobile"
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName "0.1.0-mobile-mvp1"
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            applicationIdSuffix ".test"
+            versionNameSuffix "-test"
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies { }
