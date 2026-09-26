@@ -244,6 +244,8 @@ jobs:
           rm -rf publish/game/tools publish/game/docs publish/site/tools publish/site/docs
           find publish -type f \( -name '*.zip' -o -name '*.ps1' -o -name '.env' -o -name '.env.*' \) -delete
           cp -a source/kodi publish/kodi
+          cp -a source/thy-kingdom-come publish/thy-kingdom-come
+          test -s publish/thy-kingdom-come/index.html
 
       - name: Stamp deployment health
         shell: bash
