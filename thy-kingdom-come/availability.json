@@ -1,0 +1,15 @@
+{
+  "projectStage": "predevelopment",
+  "acceptingReservations": false,
+  "availableCount": 0,
+  "note": "Reservations are not open. Property acquisition, health/zoning approvals, infrastructure, insurance and construction must be completed first.",
+  "lastUpdated": "2026-09-26",
+  "sites": [
+    {"id":"RV-01","type":"Future pull-through site","status":"planned"},
+    {"id":"RV-02","type":"Future pull-through site","status":"planned"},
+    {"id":"RV-03","type":"Future full-hookup site","status":"planned"},
+    {"id":"RV-04","type":"Future full-hookup site","status":"planned"},
+    {"id":"RV-05","type":"Future full-hookup site","status":"planned"},
+    {"id":"RV-06","type":"Future full-hookup site","status":"planned"}
+  ]
+}
