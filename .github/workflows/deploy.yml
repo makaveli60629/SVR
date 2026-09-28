@@ -46,6 +46,9 @@ jobs:
           set -euo pipefail
           test -s source/api/server.js
           node --check source/api/server.js
+          test -s source/api/mobile-player-tournament.js
+          node --check source/api/mobile-player-tournament.js
+          grep -q 'installMobilePlayerTournamentApi' source/api/server.js
           grep -q 'ADMIN_AUTH_READY' source/api/server.js
           grep -q 'ADMIN_LOGIN_MAX_ATTEMPTS' source/api/server.js
           grep -q 'app.use("/api/admin"' source/api/server.js
@@ -99,12 +102,14 @@ jobs:
           import json
           t=json.load(open('source/game/config/tournament-api.json'))
           p=json.load(open('source/site/config/player-api.json'))
-          assert t['apiBase']==''
+          assert t['apiBase']=='https://api.svrpoker.com'
           assert t['sharedRegistrationBackendLive'] is False
+          assert t['autoProbeSharedRegistrationBackend'] is True
           assert t['backgroundPushLive'] is False
-          assert p['deploymentState']=='cloud-endpoint-pending'
-          assert p['accountApiEndpointConfigured'] is False
-          assert p['apiBase']==''
+          assert p['deploymentState']=='configured-live-health-required'
+          assert p['accountApiEndpointConfigured'] is True
+          assert p['apiBase']=='https://api.svrpoker.com/api'
+          assert p['allowDemoFallback'] is True
           PY
           node --check source/platform-device.js
           node --check source/site-public-hooks.js
@@ -315,8 +320,12 @@ jobs:
             "questEricGrounded": true,
             "androidProductionLoginBackendLive": false,
             "androidTournamentSharedRegistrationBackendLive": false,
+            "androidTournamentApiConfigured": true,
+            "androidTournamentApiAutoProbe": true,
             "androidProductionMatchServerConfigured": false,
             "playerAccountCloudEndpointConfigured": false,
+            "playerAccountApiConfigured": true,
+            "playerAccountApiAutoProbe": true,
             "apkVersionName": "0.1.0-rc2",
             "apkVersionCode": 2,
             "forceUpdate": false,

@@ -1,0 +1,71 @@
+name: Phase 466 Android Production Integration Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - name: Preserve Matrix public root
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'id="binary-rain"' index.html
+          grep -q 'Site under construction' index.html
+          grep -q 'Leave Message' index.html
+          grep -q './matrix.js' index.html
+      - name: Validate Android production shell
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-466-ANDROID-PRODUCTION-INTEGRATION-LOCK' game/android.html
+          grep -q 'PHASE-466-ANDROID-PRODUCTION-WRAPPER-LOCK' game/android-tabletop.html
+          grep -q 'phase466_android_production_guard.js?v=phase466' game/android-stable-phase405.html
+          grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' game/modules/phase403_android_gameplay.js
+          grep -q 'PHASE-414-HUMAN-TURN-ROTATION-AUTHORITY-LOCK' game/modules/phase414_human_turn_rotation_authority.js
+          grep -q 'PHASE-416-HUMAN-SEAT-NEVER-SKIP-LOCK' game/modules/phase416_human_seat_never_skip.js
+          node --check game/modules/phase466_android_production_guard.js
+      - name: Validate unified mobile API contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'installMobilePlayerTournamentApi' api/server.js
+          grep -q 'playerApiReady' api/server.js
+          grep -q 'tournamentApiReady' api/server.js
+          grep -q '/api/tournaments/:id/register' api/mobile-player-tournament.js
+          grep -q '/api/player/profile' api/mobile-player-tournament.js
+          grep -q '/api/game/session/heartbeat' api/mobile-player-tournament.js
+          node --check api/server.js
+          node --check api/mobile-player-tournament.js
+          node --check site/js/phase345-player-account-client.js
+          node --check game/modules/phase419_tournament_registration_notify.js
+          python3 - <<'PY'
+          import json
+          p=json.load(open('site/config/player-api.json'))
+          t=json.load(open('game/config/tournament-api.json'))
+          a=json.load(open('update/app-version.json'))
+          assert p['apiBase']=='https://api.svrpoker.com/api'
+          assert p['accountApiEndpointConfigured'] is True
+          assert p['allowDemoFallback'] is True
+          assert t['apiBase']=='https://api.svrpoker.com'
+          assert t['autoProbeSharedRegistrationBackend'] is True
+          assert a['androidApiAutoProbe'] is True
+          assert a['androidApiLocalFallback'] is True
+          PY
+      - name: Validate current cache authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'svr-poker-phase466-android-runtime-v1' sw.js
+          grep -q '/sw.js?v=phase466' pwa-sw.js
+          node --check sw.js
