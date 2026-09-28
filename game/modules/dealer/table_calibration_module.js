@@ -139,7 +139,7 @@ function makeBrandingTexture() {
     ctx.strokeStyle = 'rgba(156,92,255,.72)';
     ctx.stroke();
 
-    drawSponsorBadge(ctx, 385, 512, 'REIKI', 'SPONSOR');
+    drawSponsorBadge(ctx, 385, 512, 'AWAITING', 'APPROVAL');
     drawSponsorBadge(ctx, 1663, 512, 'SPONSOR', 'RESERVED');
     texture.needsUpdate = true;
   };
