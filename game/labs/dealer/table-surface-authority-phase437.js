@@ -144,7 +144,7 @@ function makeBrandingTexture() {
     ctx.strokeStyle = 'rgba(156,92,255,.72)';
     ctx.stroke();
 
-    drawSponsorBadge(ctx, 354, 512, 'REIKI', 'SPONSOR');
+    drawSponsorBadge(ctx, 354, 512, 'AWAITING', 'APPROVAL');
     drawSponsorBadge(ctx, 1694, 512, 'SPONSOR', 'RESERVED');
     ctx.textAlign = 'center';
     ctx.fillStyle = '#ffffff';
