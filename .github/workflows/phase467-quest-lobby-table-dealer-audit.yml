@@ -67,10 +67,11 @@ jobs:
           grep -q 'Math.sign(r.x).*Math.PI/4' game/modules/teleport_phase103_standing_direct_lock.js
           grep -q 'headForward().clone' game/modules/teleport_phase103_standing_direct_lock.js
           grep -q 'controller.visible = false' game/modules/hands.js
-          grep -q 'PHASE-462-QUEST-WATCH-FIT-LOCK' game/modules/watch.js
+          grep -q 'PHASE-468-QUEST-FOREARM-WATCH-ALIGNMENT-LOCK' game/modules/watch.js
           node --check game/modules/movement_phase169_locomotion_polish_lock.js
           node --check game/modules/teleport_phase103_standing_direct_lock.js
           node --check game/modules/hands.js
+          grep -q 'forearmWatchQuaternion' game/modules/watch.js
           node --check game/modules/watch.js
 
       - name: Validate approval and deploy lock
