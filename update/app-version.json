@@ -73,15 +73,33 @@
   "questEricTargetHeightMeters": 1.78,
   "questEricFloorAnchored": true,
   "questEricDealerGapMeters": 0.22,
-  "questSeatedRailGapMeters": 0.10,
+  "questSeatedRailGapMeters": 0.1,
   "questSeatedEyeHeightMeters": 1.22,
   "questLightingBoost": true,
   "questSideBurnPile": true,
   "questSinglePhysicalBurnRootGuard": true,
   "questChipPalettePolish": true,
-  "androidModes": ["practice", "regular", "tournament"],
-  "androidVisualLeftToRightSeatOrder": [0, 5, 1, 2, 3, 4],
-  "androidVisualLeftToRightSeatNames": ["YOU", "Nova", "Claudia", "Eric", "Maya", "Darius"],
+  "androidModes": [
+    "practice",
+    "regular",
+    "tournament"
+  ],
+  "androidVisualLeftToRightSeatOrder": [
+    0,
+    5,
+    1,
+    2,
+    3,
+    4
+  ],
+  "androidVisualLeftToRightSeatNames": [
+    "YOU",
+    "Nova",
+    "Claudia",
+    "Eric",
+    "Maya",
+    "Darius"
+  ],
   "androidDealerUsesVisualOrder": true,
   "androidBlindsUseVisualOrder": true,
   "androidDealUsesVisualOrder": true,
@@ -149,7 +167,13 @@
   "androidChipRackAligned": true,
   "androidActionsRaisedForMobile": true,
   "androidCasinoChipDenominationLabels": true,
-  "androidCasinoChipDenominations": [50, 100, 500, 1000, 5000],
+  "androidCasinoChipDenominations": [
+    50,
+    100,
+    500,
+    1000,
+    5000
+  ],
   "androidPokerHandsButton": true,
   "androidHandHelperCards": 12,
   "androidOfficialRankedHandCategories": 10,
@@ -189,7 +213,11 @@
   "androidTournamentChampionCrownHours": 24,
   "androidTournamentChampionCrownPersistentExpiry": true,
   "androidTournamentChampionCrownMultiplayerMetadataReady": true,
-  "androidTournamentPrototypePlacementPayoutPlayChips": {"1": 100000, "2": 50000, "3": 25000},
+  "androidTournamentPrototypePlacementPayoutPlayChips": {
+    "1": 100000,
+    "2": 50000,
+    "3": 25000
+  },
   "androidTournamentPayoutNoCashValue": true,
   "androidMatchmakingClientReady": true,
   "androidProductionMatchServerConfigured": false,
@@ -275,5 +303,12 @@
   "androidPhase407Qa": "SVR_PHASE407_MOBILE_QA",
   "androidBotPacingQa": "SVR_PHASE407_BOT_PACING_QA",
   "questPhase406Qa": "SVR_PHASE406_QUEST_TABLE_QA",
-  "note": "RC2 APK remains unchanged. Phase 407 is a mobile web runtime update. Guest testing remains available until the account API is configured. Production multiplayer and live peer voice remain disabled until a secure authoritative match/signaling backend is configured."
+  "note": "RC2 APK remains unchanged. Phase 407 is a mobile web runtime update. Guest testing remains available until the account API is configured. Production multiplayer and live peer voice remain disabled until a secure authoritative match/signaling backend is configured.",
+  "androidProductionIntegrationBuild": "PHASE-466-ANDROID-PRODUCTION-INTEGRATION-LOCK",
+  "androidApiHostConfigured": true,
+  "androidPlayerApiConfigured": true,
+  "androidTournamentApiConfigured": true,
+  "androidApiAutoProbe": true,
+  "androidApiLocalFallback": true,
+  "androidMatchmakingConfigured": false
 }

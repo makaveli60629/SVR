@@ -1,9 +1,10 @@
 {
-  "build": "PHASE-419-TOURNAMENT-REGISTRATION-NOTIFICATION-LOCK",
-  "apiBase": "",
+  "build": "PHASE-466-TOURNAMENT-API-AUTO-PROBE-LOCK",
+  "apiBase": "https://api.svrpoker.com",
   "sharedRegistrationBackendLive": false,
   "backgroundPushLive": false,
   "registrationCap": 100,
   "scheduleEveryHours": 5,
-  "note": "Keep apiBase blank until a real HTTPS tournament registration endpoint is deployed and verified. Local registration remains available for device testing."
+  "note": "Phase 466 probes the unified SVR API. Shared registration activates only when /api/health reports tournamentApiReady=true; otherwise local registration remains available.",
+  "autoProbeSharedRegistrationBackend": true
 }
