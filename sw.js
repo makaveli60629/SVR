@@ -1,4 +1,4 @@
-const SVR_CACHE='svr-poker-phase445-v1-release-channel';
+const SVR_CACHE='svr-poker-phase466-android-runtime-v1';
 const CORE=['/offline.html','/logo.png','/manifest.webmanifest?v=1.0.0','/game/app.html?v=1.0.0','/game/styles/app-v1.css?v=1.0.0','/game/styles/phase445-v1-release.css?v=phase445','/game/modules/app-v1.js?v=1.0.0','/game/data/tournaments-v1.json','/update/app-v1-release.json'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(SVR_CACHE).then(cache=>cache.addAll(CORE.map(url=>new Request(url,{cache:'reload'}))).catch(()=>undefined)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==SVR_CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
