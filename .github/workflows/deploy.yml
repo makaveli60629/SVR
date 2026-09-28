@@ -87,7 +87,7 @@ jobs:
           test -s source/game/config/tournament-api.json
           test -s source/site/config/player-api.json
           test -s source/downloads/svr-poker-android-rc2.apk
-          grep -q 'PHASE-420-MOBILE-RELEASE-TRUTH-LOCK' source/game/android.html
+          grep -q 'PHASE-466-ANDROID-PRODUCTION-INTEGRATION-LOCK' source/game/android.html
           grep -q 'PHASE-420-MOBILE-RELEASE-TRUTH-LOCK' source/game/iphone.html
           grep -q 'PHASE-403-ANDROID-POKER-ENGINE-RELIABILITY-LOCK' source/game/modules/phase403_android_gameplay.js
           grep -q 'PHASE-403-ANDROID-SIDE-POT-RULES-LOCK' source/game/modules/phase403_android_pot_rules.js
