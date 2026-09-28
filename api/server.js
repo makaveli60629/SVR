@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const jwt = require("jsonwebtoken");
 const { Pool } = require("pg");
 const crypto = require("crypto");
+const { installMobilePlayerTournamentApi } = require("./mobile-player-tournament");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -16,6 +17,9 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const ADMIN_DISPLAY_NAME = process.env.ADMIN_DISPLAY_NAME || "King";
 const DATABASE_URL = process.env.DATABASE_URL;
+const PLAYER_JWT_SECRET = String(process.env.PLAYER_JWT_SECRET || process.env.ADMIN_JWT_SECRET || "").trim();
+const PLAYER_AUTH_READY = PLAYER_JWT_SECRET.length >= 32;
+const PLAYER_COOKIE_DOMAIN = process.env.PLAYER_COOKIE_DOMAIN || ".svrpoker.com";
 // SVR_RESOURCE_UPLOADER_V1
 const S3_REGION = process.env.AWS_REGION || process.env.S3_REGION || "us-east-1";
 const S3_BUCKET = process.env.SVR_RESOURCE_BUCKET || process.env.S3_BUCKET || "";
@@ -59,8 +63,9 @@ app.use(cors({
     if (allowed.includes(origin)) return callback(null, true);
     return callback(new Error("CORS origin blocked"));
   },
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  methods: ["GET", "POST", "PUT", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-SVR-Client"],
+  credentials: true
 }));
 
 function signAdminToken(email) {
@@ -472,7 +477,7 @@ async function seedStarterStoreItems(adminEmail = null) {
 }
 
 app.get("/api/health", async (req, res) => {
-  const response = { ok: true, service: "svr-aws-api", databaseConfigured: Boolean(DATABASE_URL), time: new Date().toISOString() };
+  const response = { ok: true, status: "ok", service: "svr-aws-api", databaseConfigured: Boolean(DATABASE_URL), playerApiReady: Boolean(DATABASE_URL && PLAYER_AUTH_READY), tournamentApiReady: Boolean(DATABASE_URL), mobileApiBuild: "PHASE-466-ANDROID-PRODUCTION-INTEGRATION-LOCK", time: new Date().toISOString() };
   if (!DATABASE_URL) { response.database = "not-configured"; return res.json(response); }
   try {
     const result = await dbQuery(`SELECT current_database() AS database, current_user AS user, NOW() AS server_time`);
@@ -1156,6 +1161,18 @@ app.get("/api/admin/logs", requireAdmin, async (req, res) => {
   } catch (error) {
     return res.status(500).json({ ok: false, error: "Database read failed.", detail: error.message });
   }
+});
+
+installMobilePlayerTournamentApi({
+  app,
+  dbQuery,
+  cleanText,
+  cleanEmail,
+  jwt,
+  crypto,
+  playerJwtSecret: PLAYER_JWT_SECRET,
+  playerCookieDomain: PLAYER_COOKIE_DOMAIN,
+  playerAuthReady: PLAYER_AUTH_READY
 });
 
 app.use("/api", (req, res) => res.status(404).json({ ok: false, error: "API route not found." }));
