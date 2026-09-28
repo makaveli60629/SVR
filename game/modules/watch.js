@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { isPinching } from "./gestures.js";
 
-const BUILD = "PHASE-462-QUEST-WATCH-FIT-LOCK";
+const BUILD = "PHASE-468-QUEST-FOREARM-WATCH-ALIGNMENT-LOCK";
 const PHASE87_LABEL = "PHASE-87-WATCH-POKER-CONTROLS-LOCK";
 const DISPLAY_MIRRORED = false;
 const DISPLAY_ROTATED_180 = true;
@@ -70,6 +70,29 @@ function faceCameraQuaternion(position, camera, renderer){
   return new THREE.Quaternion().setFromRotationMatrix(TMP.m0);
 }
 
+function forearmWatchQuaternion(position, forearmDir, camera, renderer){
+  const activeCamera = getActiveCamera(camera, renderer);
+  if (!activeCamera || !forearmDir) return faceCameraQuaternion(position, camera, renderer);
+  TMP.y.copy(forearmDir);
+  if (TMP.y.lengthSq() < 1e-6) TMP.y.set(0, 0, -1);
+  TMP.y.normalize();
+
+  activeCamera.getWorldPosition(TMP.p3);
+  TMP.z.copy(TMP.p3).sub(position);
+  TMP.z.addScaledVector(TMP.y, -TMP.z.dot(TMP.y));
+  if (TMP.z.lengthSq() < 1e-6){
+    TMP.z.crossVectors(TMP.y, TMP.up);
+    if (TMP.z.lengthSq() < 1e-6) TMP.z.set(0, 0, 1);
+  }
+  TMP.z.normalize();
+  TMP.x.crossVectors(TMP.y, TMP.z);
+  if (TMP.x.lengthSq() < 1e-6) TMP.x.set(1, 0, 0);
+  TMP.x.normalize();
+  TMP.z.crossVectors(TMP.x, TMP.y).normalize();
+  TMP.m0.makeBasis(TMP.x, TMP.y, TMP.z);
+  return new THREE.Quaternion().setFromRotationMatrix(TMP.m0);
+}
+
 function computeHandWatchPose(hand, camera, renderer, side = 'left'){
   const wrist = getJointWorld(hand, ['wrist']);
   const index = getJointWorld(hand, ['index-finger-metacarpal', 'index-finger-phalanx-proximal', 'index-finger-tip']);
@@ -93,7 +116,7 @@ function computeHandWatchPose(hand, camera, renderer, side = 'left'){
     .addScaledVector(cameraDir, 0.012);
   position.x += side === 'left' ? -0.004 : 0.004;
 
-  return { position, quaternion: faceCameraQuaternion(position, camera, renderer), mode: 'hand' };
+  return { position, quaternion: forearmWatchQuaternion(position, forearmDir, camera, renderer), mode: 'hand' };
 }
 
 function computeControllerWatchPose(proxy, camera, renderer, side = 'left'){
