@@ -1,0 +1,86 @@
+name: Phase 467 Quest Lobby Table Dealer Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'game/quest.html'
+      - 'game/quest-lobby.html'
+      - 'game/index.html'
+      - 'game/modules/phase467_quest_lobby_table_dealer.js'
+      - 'game/modules/movement_phase169_locomotion_polish_lock.js'
+      - 'game/modules/teleport_phase103_standing_direct_lock.js'
+      - 'game/modules/hands.js'
+      - 'game/modules/watch.js'
+      - 'game/modules/dealer/**'
+      - 'game/labs/dealer/table-surface-authority-phase437.js'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/phase467-quest-lobby-table-dealer-audit.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Protect Matrix public page
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'id="binary-rain"' index.html
+          grep -q 'Site under construction' index.html
+          grep -q 'Leave Message' index.html
+          grep -q './matrix.js' index.html
+
+      - name: Validate Quest lobby route and approved table
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'PHASE-467-QUEST-LOBBY-TABLE-DEALER-ENTRY' game/quest.html
+          grep -q 'quest-lobby.html?v=phase467&autoboot=1' game/quest.html
+          grep -q 'PHASE-467-QUEST-WALKABLE-LOBBY-TABLE-DEALER' game/quest-lobby.html
+          grep -q 'phase467_quest_lobby_table_dealer.js?v=phase467' game/quest-lobby.html
+          grep -q 'PHASE-467-QUEST-LOBBY-TABLE-DEALER-AUTHORITY' game/modules/phase467_quest_lobby_table_dealer.js
+          grep -q 'TableCalibrationModule' game/modules/phase467_quest_lobby_table_dealer.js
+          grep -q 'EricDealerModule' game/modules/phase467_quest_lobby_table_dealer.js
+          grep -q 'setMode("deal-loop")' game/modules/phase467_quest_lobby_table_dealer.js
+          test -s game/assets/models/table.glb
+          test -s game/assets/models/eric/eric.fbx
+          node --check game/modules/phase467_quest_lobby_table_dealer.js
+
+      - name: Validate Quest movement and input
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'thumbstickForwardBackHeadDirection: true' game/modules/movement_phase169_locomotion_polish_lock.js
+          grep -q 'thumbstickLeftRightSnapTurn45: true' game/modules/movement_phase169_locomotion_polish_lock.js
+          grep -q 'controllerTriggerGripHoldAimReleaseTeleport: true' game/modules/movement_phase169_locomotion_polish_lock.js
+          grep -q 'handFistHoldAimReleaseTeleport: true' game/modules/movement_phase169_locomotion_polish_lock.js
+          grep -q 'handPinchHoldAimReleaseTeleport: true' game/modules/movement_phase169_locomotion_polish_lock.js
+          grep -q 'Math.sign(r.x).*Math.PI/4' game/modules/teleport_phase103_standing_direct_lock.js
+          grep -q 'headForward().clone' game/modules/teleport_phase103_standing_direct_lock.js
+          grep -q 'controller.visible = false' game/modules/hands.js
+          grep -q 'PHASE-462-QUEST-WATCH-FIT-LOCK' game/modules/watch.js
+          node --check game/modules/movement_phase169_locomotion_polish_lock.js
+          node --check game/modules/teleport_phase103_standing_direct_lock.js
+          node --check game/modules/hands.js
+          node --check game/modules/watch.js
+
+      - name: Validate approval and deploy lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -q "REIKI', 'SPONSOR" game/modules/dealer/table_calibration_module.js
+          ! grep -q "REIKI', 'SPONSOR" game/labs/dealer/table-surface-authority-phase437.js
+          grep -q "AWAITING', 'APPROVAL" game/modules/dealer/table_calibration_module.js
+          grep -q 'PHASE-467-QUEST-LOBBY-TABLE-DEALER-AUTHORITY' .github/workflows/deploy.yml
+          grep -q '"questAutomaticLobbyBoot": true' .github/workflows/deploy.yml
+          grep -q '"questLobbyEnabled": true' .github/workflows/deploy.yml
+          grep -q '"questAutomaticTableBoot": false' .github/workflows/deploy.yml
