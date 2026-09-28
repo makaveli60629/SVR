@@ -18,9 +18,9 @@ canvas{display:block;width:100%;height:100%}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
-<body data-build="PHASE-464-QUEST-WALKABLE-LOBBY">
+<body data-build="PHASE-467-QUEST-WALKABLE-LOBBY-TABLE-DEALER">
 <div id="app"></div>
-<div id="hud"><img src="/logo.png" alt="SVR Poker"><div><div class="title">SVR QUEST LOBBY</div><div class="status" id="status">Building the walkable lobby…</div></div><button id="centerBtn">LOBBY CENTER</button><a href="/game/index.html?platform=quest&v=phase464&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1">POKER ROOM</a><a href="/game/scorpion.html?v=phase464">SCORPION</a><a href="/game/reiki-vr.html?v=phase464">REIKI</a><a href="/game/pga-drive.html?v=phase464">PGA</a></div>
+<div id="hud"><img src="/logo.png" alt="SVR Poker"><div><div class="title">SVR QUEST LOBBY</div><div class="status" id="status">Building the walkable lobby…</div></div><button id="centerBtn">LOBBY CENTER</button><a href="/game/index.html?platform=quest&v=phase467&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1">POKER ROOM</a><a href="/game/scorpion.html?v=phase464">SCORPION</a><a href="/game/reiki-vr.html?v=phase464">REIKI</a><a href="/game/pga-drive.html?v=phase464">PGA</a></div>
 <div id="hint">Quest: right stick forward/back follows your head direction • left/right snap-turns • grip/trigger/hand gesture teleport stays available in the lobby.</div>
 <script type="module">
 import * as THREE from "three";
@@ -34,8 +34,9 @@ import {installPhase202StorefrontShells} from "./modules/phase202_storefront_she
 import {installPhase262GeometrySkyAlignmentLock} from "./modules/phase262_geometry_sky_alignment_lock.js";
 import {installPhase149LobbyFitAlignmentLock} from "./phase149_lobby_fit_alignment_lock.js";
 import {installPhase464GrandLobbyRemodel} from "./modules/phase464_grand_lobby_remodel.js?v=phase464";
+import {installPhase467QuestLobbyTableDealer} from "./modules/phase467_quest_lobby_table_dealer.js?v=phase467";
 
-const BUILD="PHASE-464-QUEST-WALKABLE-LOBBY";
+const BUILD="PHASE-467-QUEST-WALKABLE-LOBBY-TABLE-DEALER";
 const status=document.getElementById("status");
 window.SVR_TELEPORT_DISABLED=false;
 window.SVR_TELEPORT_ENABLED=true;
@@ -53,6 +54,8 @@ installPhase202StorefrontShells({scene,camera,renderer,log:()=>{}});
 installPhase262GeometrySkyAlignmentLock({scene,camera,renderer,log:()=>{}});
 installPhase149LobbyFitAlignmentLock({scene,camera,renderer,world});
 installPhase464GrandLobbyRemodel({scene,world});
+status.textContent="Loading the approved SVR table and Eric…";
+const lobbyTableDealer=await installPhase467QuestLobbyTableDealer({scene,renderer});
 window.SVR_WORLD_REF=world;
 const {roomClamp,sceneTargets={}}=world;
 const hands=createHands({scene,renderer,log:()=>{}});
@@ -92,10 +95,11 @@ renderer.setAnimationLoop(()=>{
  const leftHand=hands.getLeftHand(),rightHand=hands.getRightHand(),leftController=hands.getLeftController(),rightController=hands.getRightController();
  tp.update({dt,leftHand,rightHand,leftController,rightController,statusCb:t=>{if(t)status.textContent=t},modeCb:()=>{}});
  watch.update(dt,{leftHand,rightHand,leftController,rightController});
+ lobbyTableDealer?.update?.(dt,now/1000);
  renderer.render(scene,camera);
 });
-status.textContent="Lobby ready. Enter VR and explore, or open the Poker Room.";
-window.SVR_PHASE464_QUEST_LOBBY_QA=()=>({build:BUILD,walkable:true,teleportDisabled:Boolean(window.SVR_TELEPORT_DISABLED),phase464Lobby:Boolean(window.SVR_PHASE464_LOBBY?.installed),privateRoomRoutes:true,pokerRoute,pass:Boolean(window.SVR_PHASE464_LOBBY?.installed&&!window.SVR_TELEPORT_DISABLED),checkedAt:new Date().toISOString()});
+status.textContent="Lobby ready. Approved table and Eric are live. Enter VR and explore, or open the Poker Room.";
+window.SVR_PHASE467_QUEST_LOBBY_QA=()=>{const tableDealer=lobbyTableDealer?.qa?.()||null;return{build:BUILD,walkable:true,teleportDisabled:Boolean(window.SVR_TELEPORT_DISABLED),phase464Lobby:Boolean(window.SVR_PHASE464_LOBBY?.installed),tableDealer,privateRoomRoutes:true,pokerRoute,pass:Boolean(window.SVR_PHASE464_LOBBY?.installed&&!window.SVR_TELEPORT_DISABLED&&tableDealer?.pass),checkedAt:new Date().toISOString()}};
 </script>
 </body>
 </html>
