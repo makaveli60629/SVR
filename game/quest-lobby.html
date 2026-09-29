@@ -35,6 +35,7 @@ import {installPhase262GeometrySkyAlignmentLock} from "./modules/phase262_geomet
 import {installPhase149LobbyFitAlignmentLock} from "./phase149_lobby_fit_alignment_lock.js";
 import {installPhase464GrandLobbyRemodel} from "./modules/phase464_grand_lobby_remodel.js?v=phase464";
 import {installPhase467QuestLobbyTableDealer} from "./modules/phase467_quest_lobby_table_dealer.js?v=phase467";
+import {installPhase469QuestPresentationPolish} from "./modules/phase469_quest_presentation_polish.js?v=phase469";
 
 const BUILD="PHASE-467-QUEST-WALKABLE-LOBBY-TABLE-DEALER";
 const status=document.getElementById("status");
@@ -56,6 +57,7 @@ installPhase149LobbyFitAlignmentLock({scene,camera,renderer,world});
 installPhase464GrandLobbyRemodel({scene,world});
 status.textContent="Loading the approved SVR table and Eric…";
 const lobbyTableDealer=await installPhase467QuestLobbyTableDealer({scene,renderer});
+const presentation=installPhase469QuestPresentationPolish({scene,renderer});
 window.SVR_WORLD_REF=world;
 const {roomClamp,sceneTargets={}}=world;
 const hands=createHands({scene,renderer,log:()=>{}});
@@ -98,8 +100,8 @@ renderer.setAnimationLoop(()=>{
  lobbyTableDealer?.update?.(dt,now/1000);
  renderer.render(scene,camera);
 });
-status.textContent="Lobby ready. Approved table and Eric are live. Enter VR and explore, or open the Poker Room.";
-window.SVR_PHASE467_QUEST_LOBBY_QA=()=>{const tableDealer=lobbyTableDealer?.qa?.()||null;return{build:BUILD,walkable:true,teleportDisabled:Boolean(window.SVR_TELEPORT_DISABLED),phase464Lobby:Boolean(window.SVR_PHASE464_LOBBY?.installed),tableDealer,privateRoomRoutes:true,pokerRoute,pass:Boolean(window.SVR_PHASE464_LOBBY?.installed&&!window.SVR_TELEPORT_DISABLED&&tableDealer?.pass),checkedAt:new Date().toISOString()}};
+status.textContent="Lobby ready. Approved table, Eric, and Phase 469 visibility polish are live. Enter VR and explore, or open the Poker Room.";
+window.SVR_PHASE467_QUEST_LOBBY_QA=()=>{const tableDealer=lobbyTableDealer?.qa?.()||null;const visibility=presentation?.qa?.()||null;return{build:BUILD,walkable:true,teleportDisabled:Boolean(window.SVR_TELEPORT_DISABLED),phase464Lobby:Boolean(window.SVR_PHASE464_LOBBY?.installed),tableDealer,visibility,privateRoomRoutes:true,pokerRoute,pass:Boolean(window.SVR_PHASE464_LOBBY?.installed&&!window.SVR_TELEPORT_DISABLED&&tableDealer?.pass&&visibility?.pass),checkedAt:new Date().toISOString()}};
 </script>
 </body>
 </html>
