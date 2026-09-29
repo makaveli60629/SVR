@@ -132,3 +132,12 @@ Source package used for this phase:
 
 ## Phase 42 modular overlay
 - AWAITING_APPROVAL building ad refreshed to `AWAITING_APPROVAL.COM / L.A.` in neon green presentation styling.
+
+
+## Phase 469 Quest presentation polish
+- Added a non-destructive Quest visibility layer after the approved Phase 467 lobby/table/dealer authority.
+- Added soft ambient, hemisphere, warm table fill, cool dealer fill, and front rim lighting.
+- Raised tone-mapping exposure only to a conservative minimum of 1.24.
+- Did not change poker rules, dealer animation, locomotion, hand tracking, seating logic, or watch actions.
+- Quest lobby QA now includes a presentation visibility check in addition to the Phase 467 table/dealer QA.
+- Current VR presentation target remains: readable table, visible dealer, stable watch, and no regression of the known-good Quest route.
