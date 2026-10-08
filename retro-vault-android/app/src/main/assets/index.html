@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Retro Vault</title>
+<style>
+:root{--bg:#070812;--panel:#111426;--line:#2d3150;--cyan:#25e7ff;--pink:#ef35d4;--text:#f7f8ff;--muted:#a7acc3}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#3e165f 0,#111426 36%,#070812 70%);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
+.wrap{max-width:900px;margin:auto;padding:18px}.brand{text-align:center;padding:12px 0 8px}.logo{width:210px;max-width:68vw;margin:auto;display:block}
+h1{margin:4px 0 0;font-size:34px;letter-spacing:2px}.retro{font-style:italic;color:var(--cyan);text-shadow:2px 2px var(--pink)}.vault{display:block;font-size:41px;line-height:1;color:white}
+.tag{color:var(--muted);font-size:13px;margin-top:8px}
+.card{background:rgba(17,20,38,.95);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:14px}
+label{font-size:12px;color:var(--muted);display:block;margin:11px 0 7px}.pick,select,button{width:100%;min-height:52px;border-radius:14px;border:1px solid var(--line);font-size:16px}
+.pick{display:flex;align-items:center;justify-content:center;background:#171b31;color:white;font-weight:700;position:relative}.pick input{position:absolute;inset:0;opacity:0}
+select{background:#0d1020;color:white;padding:0 12px}button{border:0;margin-top:14px;background:linear-gradient(90deg,var(--pink),var(--cyan));font-weight:900;color:#05060c}
+button:disabled{opacity:.38}.status{font-size:13px;color:var(--muted);margin:12px 2px 0}.legal{font-size:11px;line-height:1.45;color:#777f9d;margin-top:14px}
+#player{display:none}.bar{display:flex;gap:10px;align-items:center;margin-bottom:10px}.bar button{width:auto;min-height:44px;margin:0;padding:0 14px}.now{min-width:0;flex:1}.now b,.now span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.now span{font-size:12px;color:var(--muted)}
+#game{height:72vh;background:#000;border-radius:16px;overflow:hidden}.pulse{width:128px;height:128px;margin:0 auto 5px;border-radius:30px;border:3px solid var(--cyan);position:relative;box-shadow:0 0 18px rgba(37,231,255,.4), inset 0 0 20px rgba(239,53,212,.18)}
+.wheel{position:absolute;inset:25px;border:6px solid var(--pink);border-radius:50%}.wheel:before,.wheel:after{content:"";position:absolute;background:var(--cyan);left:50%;top:50%;transform:translate(-50%,-50%);border-radius:3px}.wheel:before{width:42px;height:13px}.wheel:after{width:13px;height:42px}
+@media(min-width:700px){.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid .wide{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section id="launcher">
+  <div class="brand">
+    <div class="pulse"><div class="wheel"></div></div>
+    <h1><span class="retro">RETRO</span><span class="vault">VAULT</span></h1>
+    <div class="tag">YOUR GAMES • ONE VAULT • ANDROID TEST BUILD</div>
+  </div>
+  <div class="card">
+    <div class="grid">
+      <div class="wide">
+        <label>1. CHOOSE A ROM YOU LEGALLY OWN</label>
+        <div class="pick">SELECT GAME FILE<input id="rom" type="file" accept=".nes,.fds,.sfc,.smc,.gb,.gbc,.gba,.gen,.md,.smd,.sms,.gg,.32x,.z64,.n64,.v64,.nds,.cue,.chd,.iso,.cso,.pbp,.zip,.7z,.a26,.a52,.a78,.lnx,.bin"></div>
+      </div>
+      <div>
+        <label>2. SYSTEM</label>
+        <select id="system">
+          <option value="auto">Auto detect</option><option value="nes">NES</option><option value="snes">SNES</option>
+          <option value="gb">Game Boy / Color</option><option value="gba">Game Boy Advance</option>
+          <option value="segaMD">Genesis / Mega Drive</option><option value="segaMS">Master System</option>
+          <option value="segaGG">Game Gear</option><option value="sega32x">32X</option>
+          <option value="n64">Nintendo 64</option><option value="nds">Nintendo DS</option>
+          <option value="psx">PlayStation</option><option value="psp">PSP</option>
+          <option value="saturn">Saturn</option><option value="3do">3DO</option><option value="arcade">Arcade</option>
+          <option value="atari2600">Atari 2600</option><option value="atari5200">Atari 5200</option><option value="atari7800">Atari 7800</option>
+        </select>
+      </div>
+      <div>
+        <label>OPTIONAL BIOS</label>
+        <div class="pick">SELECT BIOS<input id="bios" type="file"></div>
+      </div>
+      <button id="start" class="wide" disabled>START GAME</button>
+    </div>
+    <div id="status" class="status">Choose a ROM to begin.</div>
+    <div class="legal">Retro Vault does not include commercial ROMs or proprietary BIOS files. Use only files you are authorized to use. Internet access is required in this test build to load the emulator engine.</div>
+  </div>
+</section>
+<section id="player">
+  <div class="bar"><button id="back">← Library</button><div class="now"><b id="title">Game</b><span id="sys">System</span></div></div>
+  <div id="game"></div>
+</section>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const exts={nes:['nes','fds'],snes:['sfc','smc'],gb:['gb','gbc'],gba:['gba'],segaMD:['gen','md','smd'],segaMS:['sms'],segaGG:['gg'],sega32x:['32x'],n64:['z64','n64','v64'],nds:['nds'],psx:['cue','chd','pbp','bin'],psp:['iso','cso'],arcade:['zip','7z'],atari2600:['a26'],atari5200:['a52'],atari7800:['a78']};
+const names={nes:'NES',snes:'SNES',gb:'Game Boy / Color',gba:'Game Boy Advance',segaMD:'Genesis / Mega Drive',segaMS:'Master System',segaGG:'Game Gear',sega32x:'32X',n64:'Nintendo 64',nds:'Nintendo DS',psx:'PlayStation',psp:'PSP',saturn:'Saturn','3do':'3DO',arcade:'Arcade',atari2600:'Atari 2600',atari5200:'Atari 5200',atari7800:'Atari 7800'};
+let rom=null,bios=null;
+function detect(f){const e=f.name.toLowerCase().split('.').pop();for(const k in exts)if(exts[k].includes(e))return k;return 'arcade'}
+function sys(){return $('system').value==='auto'?detect(rom):$('system').value}
+$('rom').addEventListener('change',e=>{rom=e.target.files[0]||null;$('start').disabled=!rom;if(rom)$('status').textContent='Ready: '+rom.name+' • '+(names[sys()]||sys())});
+$('bios').addEventListener('change',e=>{bios=e.target.files[0]||null;if(bios)$('status').textContent='BIOS selected: '+bios.name});
+$('system').addEventListener('change',()=>{if(rom)$('status').textContent='Ready: '+rom.name+' • '+(names[sys()]||sys())});
+$('start').addEventListener('click',()=>{
+ if(!rom)return; const core=sys();
+ $('launcher').style.display='none'; $('player').style.display='block'; $('title').textContent=rom.name; $('sys').textContent=names[core]||core;
+ window.EJS_player='#game'; window.EJS_core=core; window.EJS_gameName=rom.name; window.EJS_gameUrl=URL.createObjectURL(rom);
+ if(bios) window.EJS_biosUrl=URL.createObjectURL(bios);
+ window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
+ window.EJS_startOnLoaded=true; window.EJS_color='#25e7ff';
+ const s=document.createElement('script'); s.src='https://cdn.emulatorjs.org/stable/data/loader.js';
+ s.onerror=()=>{alert('Could not load emulator engine. Check your internet connection.');location.reload()};
+ document.body.appendChild(s);
+});
+$('back').addEventListener('click',()=>location.reload());
+</script>
+</body>
+</html>
