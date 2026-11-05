@@ -1,0 +1,19 @@
+{
+  "build":"SVR-MOBILE-STANDALONE-MVP-1",
+  "product":"SVR Poker Mobile",
+  "currencyPolicy":"play-money-only-no-cash-value-no-redemption",
+  "routes":{
+    "quickPlay":"../game/android-tabletop.html?mode=regular&source=mobile-standalone",
+    "practice":"../game/android-tabletop.html?mode=practice&source=mobile-standalone",
+    "tournaments":"../game/tournaments.html?source=mobile-standalone",
+    "login":"../site/login.html",
+    "profile":"../site/profile.html",
+    "vr":"../game/quest.html?source=mobile-standalone"
+  },
+  "monetization":{
+    "googlePlayBilling":"adapter-prepared-not-connected",
+    "appleStoreKit":"adapter-prepared-not-connected",
+    "rewardedAds":"adapter-prepared-not-connected",
+    "cashOut":false
+  }
+}

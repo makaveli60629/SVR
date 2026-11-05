@@ -1,0 +1,75 @@
+name: Build SVR Poker Mobile APK
+
+on:
+  push:
+    branches:
+      - mobile-standalone-mvp
+    paths:
+      - 'mobile/**'
+      - 'android-mobile/**'
+      - '.github/workflows/build-mobile-standalone-apk.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'mobile/**'
+      - 'android-mobile/**'
+      - '.github/workflows/build-mobile-standalone-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepare Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort | tail -1)"
+          echo "Using $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Package standalone web assets
+        run: |
+          rm -rf android-mobile/app/src/main/assets/mobile
+          mkdir -p android-mobile/app/src/main/assets/mobile
+          cp -R mobile/. android-mobile/app/src/main/assets/mobile/
+          cp logo.png android-mobile/app/src/main/assets/logo.png
+
+      - name: Build debug APK
+        working-directory: android-mobile
+        run: gradle --no-daemon :app:assembleDebug
+
+      - name: Rename APK
+        run: |
+          mkdir -p apk-output
+          cp android-mobile/app/build/outputs/apk/debug/app-debug.apk apk-output/SVR-Poker-Mobile-MVP1.apk
+          sha256sum apk-output/SVR-Poker-Mobile-MVP1.apk | tee apk-output/SVR-Poker-Mobile-MVP1.sha256.txt
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SVR-Poker-Mobile-MVP1-APK
+          path: apk-output/*
+          if-no-files-found: error
+          retention-days: 30
