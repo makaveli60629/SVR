@@ -1,0 +1,29 @@
+name: IONOS VPS Preflight
+
+on:
+  pull_request:
+    paths:
+      - 'infra/ionos/**'
+      - '.github/workflows/ionos-vps-preflight.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'infra/ionos/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate shell scripts
+        run: |
+          bash -n infra/ionos/bootstrap.sh
+          bash -n infra/ionos/deploy.sh
+          bash -n infra/ionos/vr-asset-audit.sh
+          bash -n infra/ionos/optimize-gltf.sh
+      - name: Check required files
+        run: |
+          test -s infra/ionos/api.env.example
+          test -s infra/ionos/nginx-svr.conf
+          test -s infra/ionos/svr-api.service
+          test -s infra/ionos/README.md
