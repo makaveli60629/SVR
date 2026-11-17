@@ -320,6 +320,7 @@ function buildHud(){
 
   hudGroup = new THREE.Group();
   hudGroup.name = "PHASE333_GAMEPLAY_STATUS_GROUP";
+  hudGroup.userData.svrUserInterface = true;
   hudCanvas = document.createElement("canvas");
   hudCanvas.width = 1024;
   hudCanvas.height = 320;
@@ -346,6 +347,7 @@ function buildHud(){
 
   actionGroup = new THREE.Group();
   actionGroup.name = "PHASE333_XR_ACTION_BAR";
+  actionGroup.userData.svrUserInterface = true;
   actionGroup.position.set(tableInfo.center.x + tableInfo.width * 0.30, tableInfo.surfaceY + 0.27, tableInfo.center.z + tableInfo.depth * 0.47);
   root.add(actionGroup);
 

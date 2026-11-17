@@ -1,5 +1,10 @@
 # SVR Poker Game Manifest
 
+## Current Quest repair — 2026-11-17
+
+See [QUEST_PROGRESS.md](QUEST_PROGRESS.md) for the current implementation, validation and remaining headset checks. Quest opens a walkable lobby, then a seated local play-money table against five bots. The tested practice baseline is 1,000 chips per player (6,000 total); the older 10,000-chip tournament/turn-clock policy is historical and is not loaded by this Quest entry. Earlier phase notes below are retained as project history.
+
+
 ## Purpose
 This folder exists to preserve working state, priorities, and handoff notes so progress is not lost between phases.
 

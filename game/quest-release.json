@@ -23,21 +23,6 @@
       "p87_scorpion_seat_authority.js"
     ]
   },
-  "tablePolicy": {
-    "originalUploadedTableRequired": true,
-    "originalUploadedTablePrimary": "game/assets/models/table.glb",
-    "originalUploadedTableFallback": "game/assets/table.fbx",
-    "proceduralTableEmergencyOnly": true,
-    "startingStackPerPlayer": 10000,
-    "players": 6,
-    "tableBankroll": 60000,
-    "turnSeconds": 15,
-    "autoFoldOnTimeout": true,
-    "continuousUntilOneFundedPlayer": true,
-    "championReset": "All six seats restart at 10,000 on the next hand after one funded player remains.",
-    "leaveRejoinReset": "A deliberate LEAVE TABLE followed by PLAY GAME starts a fresh six-player table at 10,000 each.",
-    "humanBustBehavior": "The remaining funded players continue until a champion exists."
-  },
   "npcPresentation": {
     "ericTextureFallback": "procedural purple SVR fabric when the FBX mesh has no texture",
     "botTextureFallback": "procedural cyan SVR fabric when a bot mesh has no texture",
@@ -168,9 +153,19 @@
     "appliesToCurrentBuild": false
   },
   "browserAcceptance": {
-    "passed": false,
-    "pending": true,
-    "note": "Current build checks are recorded in game/docs/QUEST_PROGRESS.md; historical certification is not current headset acceptance."
+    "passed": true,
+    "pending": false,
+    "testedOn": "2026-11-17",
+    "environment": "Chromium with software WebGL; physical headset not tested",
+    "lobbyReady": true,
+    "tableRoomReady": true,
+    "fullHandThroughShowdown": true,
+    "nextHand": true,
+    "lobbyImportFailureRecovery": true,
+    "normalPageErrors": 0,
+    "normalHttpErrors": 0,
+    "pokerEngineConservationHands": 100,
+    "evidence": "game/docs/QUEST_PROGRESS.md"
   },
   "legacyPhase361SessionContract": {
     "startsStandingInLobby": true,
@@ -201,5 +196,33 @@
     "headLookPreservedWhileSeated": true,
     "controllerSelectSupported": true,
     "handPinchSupported": true
+  },
+  "legacyPhase362TablePolicy": {
+    "originalUploadedTableRequired": true,
+    "originalUploadedTablePrimary": "game/assets/models/table.glb",
+    "originalUploadedTableFallback": "game/assets/table.fbx",
+    "proceduralTableEmergencyOnly": true,
+    "startingStackPerPlayer": 10000,
+    "players": 6,
+    "tableBankroll": 60000,
+    "turnSeconds": 15,
+    "autoFoldOnTimeout": true,
+    "continuousUntilOneFundedPlayer": true,
+    "championReset": "All six seats restart at 10,000 on the next hand after one funded player remains.",
+    "leaveRejoinReset": "A deliberate LEAVE TABLE followed by PLAY GAME starts a fresh six-player table at 10,000 each.",
+    "humanBustBehavior": "The remaining funded players continue until a champion exists."
+  },
+  "tablePolicy": {
+    "originalUploadedTableRequired": true,
+    "originalUploadedTablePrimary": "game/assets/models/table.glb",
+    "startingStackPerPlayer": 1000,
+    "players": 6,
+    "tableBankroll": 6000,
+    "smallBlind": 10,
+    "bigBlind": 20,
+    "continuousPlay": true,
+    "turnClockVerified": false,
+    "practiceReset": "The practice table resets when fewer than two funded players remain or the human player busts.",
+    "historicalTournamentPolicyActive": false
   }
 }

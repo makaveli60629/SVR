@@ -539,11 +539,11 @@ function placeGameplayPanels(){
   }
   if (action){
     action.position.set(
-      tableInfo.center.x,
-      tableInfo.surfaceY + 0.22,
-      tableInfo.center.z + playerSign * tableInfo.depth * 0.515
+      tableInfo.center.x + tableInfo.width * 0.34,
+      tableInfo.surfaceY + 0.12,
+      tableInfo.center.z + playerSign * tableInfo.depth * 0.25
     );
-    action.scale.setScalar(1.12);
+    action.scale.setScalar(0.72);
     action.visible = snapshot.waitingHuman || ["showdown", "idle"].includes(snapshot.phase);
     action.lookAt(cam.x, action.position.y, cam.z);
   }

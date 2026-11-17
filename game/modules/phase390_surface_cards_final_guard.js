@@ -152,6 +152,22 @@ function alignmentDelta(cards, top) {
 async function sweep(reason = 'interval') {
   if (!ACTIVE) return false;
   scene = window.__SVR_SCENE__ || scene;
+  const current = window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE;
+  if (current?.table?.table && current.table.nativeFeltRecords?.length) {
+    // Canonical cards now use the approved native felt. Comparing them to the
+    // retired recessed surface restarts their deal animation on every sweep.
+    let snapshot = normalizeCards();
+    if (!snapshot.root || snapshot.cards.length < 17) {
+      await rebuild('approved-table-missing-cards');
+      snapshot = normalizeCards();
+    }
+    state.surfaceReady = true;
+    state.surfaceTopY = current.table.getSurfaceY?.(.0025) ?? null;
+    state.installed = Boolean(snapshot.root && snapshot.cards.length >= 17);
+    state.checkedAt = new Date().toISOString();
+    window.SVR_PHASE390_SURFACE_CARDS_STATE = { ...state };
+    return state.installed;
+  }
   surface = findSurface();
   const top = surfaceTop();
   if (!scene || top == null) return false;

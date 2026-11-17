@@ -40,6 +40,7 @@ function cleanTabletop(){
   const known=['PHASE331_QUEST_TABLE_INTERACTION_ROOT','PHASE337_PHYSICAL_POT_ROOT','PHASE338_CHIP_INVENTORY_ROOT','PHASE390_RECESSED_BRANDED_PLAYING_SURFACE'];
   for(const name of known){const o=scene.getObjectByName?.(name);if(o&&o!==felt){o.visible=false;o.userData={...(o.userData||{}),svrPhase396TabletopHidden:true};hidden++}}
   walk(scene,o=>{
+    for(let parent=o;parent;parent=parent.parent)if(parent.userData?.svrUserInterface)return;
     if(!o?.isObject3D||o===scene||o===table||o===felt||inside(o,table)||inside(o,felt))return;const name=String(o.name||'');if(KEEP.test(name)||!TABLETOP_ASSET.test(name))return;let b;try{b=bounds(o)}catch{return}if(!b)return;
     const withinX=b.center.x>=t.box.min.x-.15&&b.center.x<=t.box.max.x+.15,withinZ=b.center.z>=t.box.min.z-.15&&b.center.z<=t.box.max.z+.15,nearTop=b.box.max.y>=top-.08&&b.box.min.y<=t.box.max.y+.65;
     if(withinX&&withinZ&&nearTop){o.visible=false;o.userData={...(o.userData||{}),svrPhase396TabletopHidden:true};hidden++}

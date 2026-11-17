@@ -170,5 +170,9 @@ async function install() {
   if (!timer) timer = window.setInterval(() => sweep('guard'), 250); return qa();
 }
 
+window.SVR_PHASE446_RECENTER = () => {
+  seatPose = null; state.seated = false; settleUntil = performance.now() + 1600;
+  return sweep('final-room-recenter');
+};
 window.SVR_PHASE446_SWEEP = sweep; window.SVR_PHASE446_QA = qa; window.SVR_PHASE446_READY_PROMISE = install();
 addEventListener('beforeunload', () => { if (timer) clearInterval(timer); }, { once: true });
