@@ -27,7 +27,14 @@ function pulse01(p) {
   return 1 - smooth((p - 0.57) / 0.43);
 }
 function canonicalBoneName(name = '') {
-  return name.replace(/^.*?(?=(Hips|Spine|Neck|Head|Left|Right))/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+  const key = name.replace(/^.*?(?=(Hips|Spine|Neck|Head|Left|Right))/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+  const aliases = {hip:'hips',pelvis:'hips',spine01:'spine',spine02:'spine1',spine03:'spine2'};
+  for (const [suffix, side] of [['l','left'],['r','right']]) {
+    for (const [source, target] of Object.entries({shoulder:'shoulder',upperarm:'arm',lowerarm:'forearm',hand:'hand',upperleg:'upleg',lowerleg:'leg',foot:'foot'})) {
+      aliases[source + suffix] = side + target;
+    }
+  }
+  return aliases[key] || key;
 }
 async function optionalTexture(loader, url, srgb = false) {
   try {
@@ -47,6 +54,7 @@ export class EricDealerModule extends EventTarget {
     this.scene = scene;
     this.group = new THREE.Group();
     this.group.name = 'SVR_EricDealerLab';
+    this.group.userData.svrDealerInstance = true;
     scene.add(this.group);
     this.propGroup = new THREE.Group();
     this.propGroup.name = 'SVR_EricDealerProps';

@@ -42,6 +42,8 @@ function sceneRoot(){
 }
 
 function authoritativeTable(){
+  const current=(window.SVR_LOBBY_DEALER_MODULE||window.SVR_APPROVED_DEALER_TABLE_MODULE)?.table?.table||window.SVR_TABLE_AUTHORITY;
+  if(current?.isObject3D)return current;
   const base = sceneRoot();
   for (const name of TABLE_NAMES){
     const object = base?.getObjectByName?.(name) || scene?.getObjectByName?.(name);

@@ -1,7 +1,7 @@
 /* PHASE-467-QUEST-LOBBY-TABLE-DEALER-AUTHORITY */
 import * as THREE from "three";
 import { TableCalibrationModule } from "./dealer/table_calibration_module.js?v=phase467";
-import { EricDealerModule } from "./dealer/eric_dealer_module.js?v=phase467";
+import { EricDealerModule } from "./dealer/eric_dealer_module.js?v=phase470";
 
 export const BUILD="PHASE-467-QUEST-LOBBY-TABLE-DEALER-AUTHORITY";
 const TABLE_PRESET=Object.freeze({tableY:0.62,feltDrop:0.014,innerMargin:0.125,collisionDrop:0.02,cardLift:0.0006});

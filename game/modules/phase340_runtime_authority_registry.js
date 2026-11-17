@@ -34,9 +34,12 @@ function instrumentEvents() {
   const remove = EventTarget.prototype.removeEventListener;
   const targets = new WeakMap();
   EventTarget.prototype.addEventListener = function(type, listener, options) {
+    // Window event methods also support unqualified calls from ES modules.
+    // Their implicit receiver is undefined here, but the native method uses window.
+    const target = this ?? window;
     if (listener) {
-      let byType = targets.get(this);
-      if (!byType) { byType = new Map(); targets.set(this, byType); }
+      let byType = targets.get(target);
+      if (!byType) { byType = new Map(); targets.set(target, byType); }
       let listeners = byType.get(type);
       if (!listeners) { listeners = new WeakSet(); byType.set(type, listeners); }
       if ((typeof listener === 'function' || typeof listener === 'object') && !listeners.has(listener)) {
@@ -44,10 +47,10 @@ function instrumentEvents() {
         state.eventCounts.set(type, (state.eventCounts.get(type) || 0) + 1);
       }
     }
-    return add.call(this, type, listener, options);
+    return add.call(target, type, listener, options);
   };
   EventTarget.prototype.removeEventListener = function(type, listener, options) {
-    return remove.call(this, type, listener, options);
+    return remove.call(this ?? window, type, listener, options);
   };
 }
 

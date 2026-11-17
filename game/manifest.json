@@ -21,11 +21,12 @@
     "iphone": "./iphone.html?v=phase407",
     "iphoneTabletop": "./iphone-tabletop.html?v=phase407&platform=ios&safari=1",
     "iphoneGameplay": "./android-stable-phase405.html?v=phase407&platform=ios&safari=1&direct=1",
-    "quest": "./quest.html?v=phase396",
-    "questRuntime": "./index.html?platform=quest&v=phase396&direct=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1",
+    "quest": "./quest.html?v=phase470",
+    "questRuntime": "./index.html?platform=quest&v=phase470&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1",
     "camera3Showcase": "./camera3-showcase.html?v=phase392",
     "profile": "/site/profile.html?v=phase392&deploy=phase407",
-    "login": "/site/login.html?v=phase407"
+    "login": "/site/login.html?v=phase407",
+    "questLobby": "./quest-lobby.html?v=phase470"
   },
   "platform": {
     "build": "PHASE-405-PLATFORM-DEVICE-ALIGNMENT-LOCK",
@@ -82,11 +83,11 @@
     "runtimeQa": "SVR_PHASE400_IOS_SAFARI_QA"
   },
   "quest": {
-    "build": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
+    "build": "QUEST-PLAYABILITY-REPAIR-2026-11-17",
     "phase406TablePolishBuild": "PHASE-406-QUEST-SIDE-BURN-CHIP-POLISH-LOCK",
     "originalTablePrimary": true,
-    "teleportEnabled": false,
-    "hardSeatedAtFrontTable": true,
+    "teleportEnabled": true,
+    "hardSeatedAtFrontTable": false,
     "targetTableWidthMeters": 3.58,
     "targetTableTopMeters": 1.03,
     "targetTableBottomMeters": -0.015,
@@ -103,8 +104,17 @@
     "singlePhysicalBurnRootGuard": true,
     "chipPalettePolish": true,
     "pokerHandsVrPopupDeferred": true,
-    "qa": "SVR_PHASE396_QUEST_QA",
-    "phase406Qa": "SVR_PHASE406_QUEST_TABLE_QA"
+    "qa": "SVR_PHASE467_QUEST_LOBBY_QA",
+    "phase406Qa": "SVR_PHASE406_QUEST_TABLE_QA",
+    "previousTableBuild": "PHASE-396-QUEST-SEATED-CLEAN-TABLE-DEAL-LOCK",
+    "defaultEntry": "walkable-lobby",
+    "tableRoom": {
+      "directlySeated": true,
+      "movementEnabled": false,
+      "teleportEnabled": false
+    },
+    "tableQa": "SVR_PHASE396_BOOT_QA",
+    "physicalHeadsetAcceptancePending": true
   },
   "android": {
     "build": "PHASE-407-MOBILE-FIT-PACING-STATUS-LOGIN-LOCK",
@@ -124,9 +134,27 @@
     "phase405SocialPreserved": true,
     "phase406CasinoPresentation": true,
     "phase407FitPacingLogin": true,
-    "modes": ["practice", "regular", "tournament"],
-    "visualLeftToRightSeatOrder": [0, 5, 1, 2, 3, 4],
-    "visualLeftToRightSeatNames": ["YOU", "Nova", "Claudia", "Eric", "Maya", "Darius"],
+    "modes": [
+      "practice",
+      "regular",
+      "tournament"
+    ],
+    "visualLeftToRightSeatOrder": [
+      0,
+      5,
+      1,
+      2,
+      3,
+      4
+    ],
+    "visualLeftToRightSeatNames": [
+      "YOU",
+      "Nova",
+      "Claudia",
+      "Eric",
+      "Maya",
+      "Darius"
+    ],
     "dealerUsesVisualOrder": true,
     "blindsUseVisualOrder": true,
     "dealUsesVisualOrder": true,
@@ -213,7 +241,13 @@
     "actionsRaisedForMobile": true,
     "landscapeFitPolished": true,
     "casinoChipDenominationLabels": true,
-    "casinoChipDenominations": [50,100,500,1000,5000],
+    "casinoChipDenominations": [
+      50,
+      100,
+      500,
+      1000,
+      5000
+    ],
     "compactReikiSponsorPresentation": true,
     "phoneTabletNotVrMessage": true,
     "androidApkDiscoverability": true,
@@ -242,7 +276,11 @@
       "championCrownHours": 24,
       "championCrownPersistentExpiry": true,
       "championCrownMultiplayerMetadataReady": true,
-      "prototypePlacementPayoutPlayChips": {"1":100000,"2":50000,"3":25000},
+      "prototypePlacementPayoutPlayChips": {
+        "1": 100000,
+        "2": 50000,
+        "3": 25000
+      },
       "payoutNoCashValue": true,
       "payoutStorage": "localStorage prototype"
     },

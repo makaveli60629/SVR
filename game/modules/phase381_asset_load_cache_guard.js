@@ -1,4 +1,5 @@
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';
 
 export const BUILD = 'PHASE-381-ASSET-LOAD-CACHE-GUARD';
 const key = Symbol.for('svr.phase381.fbxLoadCacheInstalled');
@@ -16,7 +17,17 @@ if (!FBXLoader.prototype[key]) {
       });
       pending.set(resolved, request);
     }
-    return pending.get(resolved);
+    // Cache the download/parse, never a live scene instance. Legacy and current
+    // dealers may request the same FBX; sharing it reparents the model and lets
+    // their floor/animation guards fight over one skeleton.
+    return pending.get(resolved).then((asset) => {
+      const instance = cloneSkeleton(asset);
+      instance.traverse((object) => {
+        if (Array.isArray(object.material)) object.material = object.material.map(material => material?.clone?.() || material);
+        else if (object.material?.clone) object.material = object.material.clone();
+      });
+      return instance;
+    });
   };
   window.SVR_PHASE381_FBX_LOAD_CACHE = pending;
 }

@@ -19,7 +19,12 @@ function sweep(){
   const authoritative=window.SVR_PHASE388_ERIC_AUTHORITY||dealers[dealers.length-1]||null;
   for(const dealer of dealers){if(dealer!==authoritative&&dealer.parent){dealer.parent.remove(dealer);dealer.visible=false;state.duplicateDealersRemoved++}}
   if(authoritative){authoritative.visible=true;walk(authoritative,o=>{if(o?.isMesh){o.visible=true;o.frustumCulled=false}})}
-  document.body.classList.add('boot-released');
+  // The direct Quest entry owns its loading/error screen until all room
+  // authorities finish. A renderer alone does not establish playability.
+  const params=new URLSearchParams(location.search);
+  const directQuest=(params.get('platform')==='quest'||/Quest|Oculus/i.test(navigator.userAgent||''))
+    && (params.get('direct')==='1'||params.get('autoseat')==='1'||params.get('questfix')==='1');
+  if(!directQuest)document.body.classList.add('boot-released');
   state.canvasVisible=Boolean(canvas&&getComputedStyle(canvas).visibility!=='hidden'&&getComputedStyle(canvas).display!=='none');
   state.tableVisible=visibleBox(table);
   state.dealerVisible=visibleBox(authoritative);

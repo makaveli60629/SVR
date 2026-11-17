@@ -176,6 +176,8 @@ function post(player, amount, label) {
 }
 
 export function startHand() {
+  // Every input path (including the keyboard shortcut) shares this guard.
+  if (!['idle', 'showdown'].includes(state.phase)) return false;
   clearTimeout(timer);
   if (funded().length < 2) {
     state.phase = 'idle';
@@ -287,7 +289,7 @@ export function legal(player = players[state.current]) {
   const needed = Math.max(0, state.currentBet - player.bet);
   const actions = ['fold', needed ? 'call' : 'check'];
   if (player.stack > needed && !player.raiseClosed) actions.push(state.currentBet ? 'raise' : 'bet');
-  actions.push('allin');
+  if (!player.raiseClosed || player.stack <= needed) actions.push('allin');
   return actions;
 }
 
@@ -297,6 +299,9 @@ function raise(player, target, source = 'raise') {
   const minimum = old ? old + state.minRaise : Math.max(state.bigBlind, state.minRaise);
   const previouslyActed = actors().filter((candidate) => candidate.id !== player.id && candidate.acted);
   let desired = Math.min(maximum, Math.max(player.bet, Math.floor(Number(target) || 0)));
+  // A short all-in does not reopen raising for players who already acted.
+  // Physical chips and the bet alias must obey the same restriction.
+  if (player.raiseClosed && desired > old) return false;
 
   if (desired <= old) {
     const paid = commit(player, old - player.bet);
@@ -368,7 +373,7 @@ function apply(player, input) {
     player.lastAction = player.allIn && paid < needed ? `All-in ${player.bet}` : `Call ${paid}`;
     log(`${player.name} ${player.allIn && paid < needed ? 'is all in for' : 'calls'} ${paid}`);
   } else if (action.type === 'allin') {
-    raise(player, player.bet + player.stack, 'allin');
+    if (raise(player, player.bet + player.stack, 'allin') === false) return false;
   } else if (action.type === 'physical-bet') {
     let amount = Math.max(0, Math.floor(Number(action.amount) || 0));
     if (amount < needed && player.stack > amount) {
@@ -382,7 +387,7 @@ function apply(player, input) {
       player.lastAction = `Call ${paid}`;
       log(`${player.name} calls ${paid} with physical chips`);
     } else {
-      raise(player, target, 'physical');
+      if (raise(player, target, 'physical') === false) return false;
     }
   } else {
     const explicit = Number(action.raiseTo ?? action.target ?? 0);
@@ -390,7 +395,7 @@ function apply(player, input) {
     const fallback = state.currentBet
       ? state.currentBet + Math.max(state.minRaise, state.bigBlind)
       : Math.max(state.bigBlind, state.minRaise);
-    raise(player, explicit > 0 ? explicit : by > 0 ? player.bet + by : fallback);
+    if (raise(player, explicit > 0 ? explicit : by > 0 ? player.bet + by : fallback) === false) return false;
   }
 
   state.waitingHuman = false;
@@ -608,6 +613,7 @@ function restore() {
 
 export function resetTable(stack = 1000) {
   clearTimeout(timer);
+  state.phase = 'idle';
   players.forEach((player) => { player.stack = Math.max(0, Number(stack) || 1000); });
   state.dealer = -1;
   state.handNo = 0;

@@ -90,6 +90,11 @@ function removeDuplicateDealers() {
   const remove = [];
   walk(scene, (object) => {
     if (!object?.isObject3D || object === eric || inside(object, eric)) return;
+    // The current dealer sets its ownership marker before loading the FBX.
+    // Its transient Eric_Dealer_Model name must not be removed mid-load.
+    for (let parent = object; parent; parent = parent.parent) {
+      if (parent.userData?.svrDealerInstance) return;
+    }
     const label = `${object.name || ''} ${object.userData?.sourceAsset || ''}`;
     if (object.isSkeletonHelper || /(PHASE368_CARD_DEALER_ROOT|PHASE381_APPROVED_CARD_DEALER_RIG|PHASE388_AUTHORITATIVE_DEALER_MODEL|approvedDealer|eric[_ -]?(dealer|avatar|rig)|external[_ -]?skeleton|debug[_ -]?skeleton)/i.test(label)) remove.push(object);
   });

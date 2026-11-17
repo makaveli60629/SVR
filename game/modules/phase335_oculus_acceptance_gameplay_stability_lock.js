@@ -10,7 +10,7 @@ let hiddenDisplays=0,recoveredChips=0,repairedCards=0,repairedBots=0,blockedActi
 const A=new THREE.Vector3(),B=new THREE.Vector3();
 
 function sceneRoot(){return scene?.getObjectByName?.("PHASE200_ORDERED_GRAND_LOBBY_ROOT")||scene}
-function table(){const base=sceneRoot();for(const n of TABLE_NAMES){const o=base?.getObjectByName?.(n)||scene?.getObjectByName?.(n);if(o)return o}return null}
+function table(){const current=(window.SVR_LOBBY_DEALER_MODULE||window.SVR_APPROVED_DEALER_TABLE_MODULE)?.table?.table||window.SVR_TABLE_AUTHORITY;if(current?.isObject3D)return current;const base=sceneRoot();for(const n of TABLE_NAMES){const o=base?.getObjectByName?.(n)||scene?.getObjectByName?.(n);if(o)return o}return null}
 function boxInfo(o){o.updateWorldMatrix(true,true);const box=new THREE.Box3().setFromObject(o),size=new THREE.Vector3(),center=new THREE.Vector3();box.getSize(size);box.getCenter(center);return{box,size,center}}
 function matNames(o){const m=Array.isArray(o?.material)?o.material:[o?.material];return m.map(x=>x?.name||"").join(" ").toLowerCase()}
 function detectTable(){const t=table();if(!t)return null;const full=boxInfo(t);let felt=null,best=-Infinity;t.traverse(o=>{if(!o.isMesh)return;let r;try{r=boxInfo(o)}catch{return}const label=`${o.name||""} ${matNames(o)}`.toLowerCase(),flat=Math.max(r.size.x,r.size.z)/Math.max(.001,r.size.y),score=(/polotno|felt|cloth|baize|surface|play/.test(label)?180:0)+r.size.x*r.size.z*2+(flat>20?35:0);if(score>best){best=score;felt={object:o,...r}}});const s=felt||{object:null,...full};return{table:t,felt:felt?.object||null,full,center:s.center.clone(),surfaceY:s.box.max.y+.01,width:Math.max(2.2,Math.min(s.size.x*.94,full.size.x*.74,4.1)),depth:Math.max(1.18,Math.min(s.size.z*.92,full.size.z*.70,2.25))}}
