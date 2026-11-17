@@ -4,12 +4,13 @@ const path=require('node:path');
 const {chromium}=require('playwright');
 const base=process.env.SVR_TEST_BASE||'http://127.0.0.1:8000';
 const out=process.env.SVR_TEST_ARTIFACTS||'/tmp/svr-quest-browser';
+const questUserAgent='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) OculusBrowser/37.0.0.0.0 MetaQuestBrowser/37.0 Quest 3 Safari/537.36';
 fs.mkdirSync(out,{recursive:true});
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.SVR_CHROMIUM||undefined,headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
- const results={};
+ const results={questUserAgent:process.env.SVR_TEST_QUEST_UA==='1'};
  try{
-  const page=await browser.newPage({viewport:{width:960,height:640},ignoreHTTPSErrors:process.env.SVR_TEST_IGNORE_HTTPS_ERRORS==='1'});
+  const page=await browser.newPage({viewport:{width:960,height:640},userAgent:process.env.SVR_TEST_QUEST_UA==='1'?questUserAgent:undefined,ignoreHTTPSErrors:process.env.SVR_TEST_IGNORE_HTTPS_ERRORS==='1'});
   let errors=[];const httpErrors=[];results.errors=errors;results.httpErrors=httpErrors;
   page.on('pageerror',e=>errors.push(String(e)));
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});

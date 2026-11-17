@@ -65,3 +65,9 @@ SVR_CHROMIUM=/usr/bin/chromium node game/tools/quest-playability-browser.cjs
 The browser test defaults to `http://127.0.0.1:8000`, writes screenshots and JSON to `/tmp/svr-quest-browser`, and accepts `SVR_TEST_BASE` and `SVR_TEST_ARTIFACTS` overrides. Install Playwright's Chromium and omit `SVR_CHROMIUM` when a system Chromium is unavailable. Physical headset testing requires a secure origin (HTTPS).
 
 No production deployment or merge was performed. All project changes are under `game/`. Current playability is local practice poker against bots, not shared multiplayer.
+
+## Follow-up: Quest device detection
+
+The same complete browser playthrough also passes with Quest/Oculus Browser identification enabled: lobby, room readiness, full hand, showdown, next hand and blocked-module recovery, with zero normal console/page or HTTP errors. This uses Chromium/software WebGL with a Quest user-agent string; it does not simulate an actual XR session or certify headset/controller behavior.
+
+Repeat with `SVR_TEST_QUEST_UA=1` when running `game/tools/quest-playability-browser.cjs`.
