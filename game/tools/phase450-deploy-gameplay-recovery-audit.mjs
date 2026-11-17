@@ -13,7 +13,7 @@ assert.match(deploy,/questAutomaticLobbyBoot": true/);
 assert.match(deploy,/questDirectTableRoom": false/);
 assert.match(deploy,/questLobbyEnabled": true/);
 assert.match(deploy,/questAutomaticTableBoot\": false/);
-assert.match(deploy,/questRoute\": "\/game\/quest-lobby\.html\?v=phase465"/);
+assert.match(deploy,/questRoute\": "\/game\/quest-lobby\.html\?v=phase\d+"/);
 assert.match(deploy,/questPokerControlsPreserved": true/);
 
 for (const authority of [

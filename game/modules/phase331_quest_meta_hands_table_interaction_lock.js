@@ -24,6 +24,8 @@ const fallbackParents = { left: null, right: null };
 
 function sceneRoot(){ return scene?.getObjectByName?.("PHASE200_ORDERED_GRAND_LOBBY_ROOT") || scene; }
 function table(){
+  const current=(window.SVR_LOBBY_DEALER_MODULE||window.SVR_APPROVED_DEALER_TABLE_MODULE)?.table?.table||window.SVR_TABLE_AUTHORITY;
+  if(current?.isObject3D)return current;
   const r = sceneRoot();
   return r?.getObjectByName?.("PHASE159_ACTUAL_UPLOADED_TABLE_FBX_FLAT_SCALED")
     || r?.getObjectByName?.("PHASE159_FBX_TABLE_FLAT_SCALE_FIX_ROOT")

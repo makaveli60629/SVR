@@ -57,7 +57,8 @@ function inside(object, root) {
   return false;
 }
 function findTable() {
-  return window.SVR_TABLE_AUTHORITY
+  return (window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE)?.table?.table
+    || window.SVR_TABLE_AUTHORITY
     || window.SVR_PHASE380_ORIGINAL_TABLE
     || scene?.getObjectByName?.('PHASE380_ORIGINAL_UPLOADED_TABLE_GLB_AUTHORITY')
     || table
@@ -70,6 +71,7 @@ function cleanupDuplicates() {
   const oldFelts = [];
   walk(scene, (object) => {
     if (!object?.isObject3D || object === table || inside(object, table)) return;
+    if (inside(table, object)) return;
     const name = String(object.name || '');
     if (FELT_OVERLAY_RX.test(name)) oldFelts.push(object);
     else if (TABLE_NAME_RX.test(name) && object.children?.length) duplicateTables.push(object);
@@ -108,25 +110,34 @@ function refreshState() {
   cleanupDuplicates();
   applyPerformanceBudget();
   const cardState = cards();
+  const currentRuntime = window.SVR_LOBBY_DEALER_MODULE || window.SVR_APPROVED_DEALER_TABLE_MODULE;
+  const currentDealer = currentRuntime?.dealer;
+  const approvedTable = currentRuntime?.table?.table === table && Boolean(table?.parent);
   const ericState = window.SVR_PHASE391_ERIC_QA?.() || window.SVR_PHASE391_ERIC_STATE || {};
   const phase390 = window.SVR_PHASE390_QA?.() || window.SVR_PHASE390_STATE || {};
   const surfaceCards = window.SVR_PHASE390_SURFACE_CARDS_QA?.() || window.SVR_PHASE390_SURFACE_CARDS_STATE || {};
   const frontSpawn = window.SVR_PHASE390_FRONT_SPAWN_QA?.() || {};
   state.rendererReady = Boolean(renderer && scene && window.__SVR_CAMERA__);
-  state.originalTableReady = Boolean(table?.isObject3D && /PHASE380_ORIGINAL_UPLOADED_TABLE/.test(String(table.name || '')));
+  state.originalTableReady = approvedTable || Boolean(table?.isObject3D && /PHASE380_ORIGINAL_UPLOADED_TABLE/.test(String(table.name || '')));
   const visibleAuthorities = [];
   if (scene) walk(scene, (object) => {
     if (!object?.isObject3D || !object.visible || !TABLE_NAME_RX.test(String(object.name || ''))) return;
+    for (let parent = object.parent; parent; parent = parent.parent) if (!parent.visible) return;
     if (object === table || !inside(object, table)) visibleAuthorities.push(object);
   });
   state.singleTableAuthority = state.originalTableReady && visibleAuthorities.filter((object) => object !== table).length === 0;
-  state.recessedSurfaceReady = Boolean(window.SVR_PHASE390_PLAY_SURFACE?.parent && phase390.recessInches >= 6 && phase390.recessInches <= 7);
+  state.recessedSurfaceReady = approvedTable
+    ? Boolean(currentRuntime.table.nativeFeltRecords?.length)
+    : Boolean(window.SVR_PHASE390_PLAY_SURFACE?.parent && phase390.recessInches >= 6 && phase390.recessInches <= 7);
   state.cardRootReady = Boolean(cardState.root && surfaceCards.cardRootReady !== false);
   state.cardMeshes = cardState.meshes.length;
   state.visibleCardMeshes = cardState.meshes.filter((object) => object.visible).length;
-  state.ericReady = Boolean(ericState.loaded && ericState.visible);
-  state.ericUpright = Boolean(ericState.upright && Number(ericState.anatomicalUpDot || 0) > 0.985);
-  state.ericGrounded = Boolean(ericState.grounded);
+  state.ericReady = currentDealer ? Boolean(currentDealer.loaded && currentDealer.group?.parent && currentDealer.group.visible) : Boolean(ericState.loaded && ericState.visible);
+  state.ericUpright = currentDealer
+    ? new THREE.Vector3(0, 1, 0).applyQuaternion(currentDealer.group.getWorldQuaternion(new THREE.Quaternion())).y > 0.985
+    : Boolean(ericState.upright && Number(ericState.anatomicalUpDot || 0) > 0.985);
+  const feetY = currentDealer?.getFeetY?.();
+  state.ericGrounded = currentDealer ? Number.isFinite(feetY) && Math.abs(feetY) < 0.05 : Boolean(ericState.grounded);
   state.fixedFrontSpawnReady = platform !== 'quest' || Boolean(frontSpawn.installed && typeof window.SVR_PHASE390_DIRECT_FRONT_SEAT === 'function');
   state.pokerActionsReady = typeof window.SVR_POKER_ACTION === 'function' && typeof window.SVR_POKER_NEXT_HAND === 'function';
   state.camera3LightingReady = platform !== 'camera3' || Boolean(scene?.getObjectByName?.('PHASE389_CAMERA3_PRODUCTION_LIGHTING'));

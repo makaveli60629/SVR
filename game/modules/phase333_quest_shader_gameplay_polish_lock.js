@@ -42,6 +42,8 @@ function sceneRoot(){
 }
 
 function authoritativeTable(){
+  const current=(window.SVR_LOBBY_DEALER_MODULE||window.SVR_APPROVED_DEALER_TABLE_MODULE)?.table?.table||window.SVR_TABLE_AUTHORITY;
+  if(current?.isObject3D)return current;
   const base = sceneRoot();
   for (const name of TABLE_NAMES){
     const object = base?.getObjectByName?.(name) || scene?.getObjectByName?.(name);
@@ -318,6 +320,7 @@ function buildHud(){
 
   hudGroup = new THREE.Group();
   hudGroup.name = "PHASE333_GAMEPLAY_STATUS_GROUP";
+  hudGroup.userData.svrUserInterface = true;
   hudCanvas = document.createElement("canvas");
   hudCanvas.width = 1024;
   hudCanvas.height = 320;
@@ -344,6 +347,7 @@ function buildHud(){
 
   actionGroup = new THREE.Group();
   actionGroup.name = "PHASE333_XR_ACTION_BAR";
+  actionGroup.userData.svrUserInterface = true;
   actionGroup.position.set(tableInfo.center.x + tableInfo.width * 0.30, tableInfo.surfaceY + 0.27, tableInfo.center.z + tableInfo.depth * 0.47);
   root.add(actionGroup);
 

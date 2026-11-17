@@ -48,7 +48,7 @@ function status(message) {
 
 function moduleUrl(path) {
   const url = new URL(path, document.baseURI);
-  url.searchParams.set('v', ['main.js', 'modules/phase364_device_xr_geometry_spawn_lock.js'].includes(path) ? 'phase463' : VERSION);
+  url.searchParams.set('v', ['modules/phase340_runtime_authority_registry.js','modules/phase331_quest_meta_hands_table_interaction_lock.js','modules/phase333_quest_shader_gameplay_polish_lock.js','modules/phase334_table_layout_gesture_poker_lock.js','modules/phase335_oculus_acceptance_gameplay_stability_lock.js'].includes(path) ? 'phase470' : ['main.js', 'modules/phase364_device_xr_geometry_spawn_lock.js'].includes(path) ? 'phase463' : VERSION);
   return url.href;
 }
 

@@ -72,6 +72,8 @@ function sceneRoot(){
 }
 
 function authoritativeTable(){
+  const current=(window.SVR_LOBBY_DEALER_MODULE||window.SVR_APPROVED_DEALER_TABLE_MODULE)?.table?.table||window.SVR_TABLE_AUTHORITY;
+  if(current?.isObject3D)return current;
   const base = sceneRoot();
   for (const name of TABLE_NAMES){
     const object = base?.getObjectByName?.(name) || scene?.getObjectByName?.(name);
@@ -487,8 +489,9 @@ function commitVisualChips(amount, all = false){
 
 function wrapPokerAction(){
   const current = window.SVR_POKER_ACTION;
-  if (typeof current !== "function" || current === wrappedPokerAction) return;
+  if (typeof current !== "function" || current.__svrPhase334) return;
   originalPokerAction = current;
+  const delegate = current;
   wrappedPokerAction = function phase334PokerAction(action){
     const snapshot = pokerSnapshot();
     const physical = performance.now() - lastPhysicalAt < 1250;
@@ -499,9 +502,10 @@ function wrapPokerAction(){
       else if (action === "allin") commitVisualChips(snapshot.you.stack || 0, true);
       else if (action === "fold") animateFoldCards();
     }
-    return originalPokerAction(action);
+    return delegate(action);
   };
   wrappedPokerAction.__svrPhase334 = true;
+  wrappedPokerAction.__svrPhase335 = Boolean(current.__svrPhase335);
   window.SVR_POKER_ACTION = wrappedPokerAction;
 }
 
@@ -535,11 +539,11 @@ function placeGameplayPanels(){
   }
   if (action){
     action.position.set(
-      tableInfo.center.x,
-      tableInfo.surfaceY + 0.22,
-      tableInfo.center.z + playerSign * tableInfo.depth * 0.515
+      tableInfo.center.x + tableInfo.width * 0.34,
+      tableInfo.surfaceY + 0.12,
+      tableInfo.center.z + playerSign * tableInfo.depth * 0.25
     );
-    action.scale.setScalar(1.12);
+    action.scale.setScalar(0.72);
     action.visible = snapshot.waitingHuman || ["showdown", "idle"].includes(snapshot.phase);
     action.lookAt(cam.x, action.position.y, cam.z);
   }
