@@ -25,6 +25,8 @@ body:not(.lobby-ready) .svr-vr-button{display:none!important}
 <div id="hud"><img src="/logo.png" alt="SVR Poker"><div><div class="title">SVR QUEST LOBBY</div><div class="status" id="status" role="status" aria-live="polite">Building the walkable lobby…</div></div><button id="retryBtn" hidden>RETRY LOADING</button><button id="centerBtn">LOBBY CENTER</button><a href="/game/index.html?platform=quest&v=phase470&direct=1&tableonly=1&autoseat=1&questfix=1&seated=1&teleport=off&clean=1">POKER ROOM</a><a href="/game/scorpion.html?v=phase464">SCORPION</a><a href="/game/reiki-vr.html?v=phase464">REIKI</a><a href="/game/pga-drive.html?v=phase464">PGA</a></div>
 <div id="hint">Quest: right stick forward/back follows your head direction • left/right snap-turns • grip/trigger/hand gesture teleport stays available in the lobby.</div>
 <script type="module">
+window.SVR_TELEPORT_DISABLED=false;
+window.SVR_TELEPORT_ENABLED=true;
 const status=document.getElementById('status');
 const retry=document.getElementById('retryBtn');
 retry.onclick=()=>location.reload();

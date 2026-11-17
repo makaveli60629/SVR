@@ -13,7 +13,7 @@ fs.mkdirSync(out,{recursive:true});
   let errors=[];const httpErrors=[];results.errors=errors;results.httpErrors=httpErrors;
   page.on('pageerror',e=>errors.push(String(e)));
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
-  page.on('response',r=>{if(r.url().startsWith(base)&&r.status()>=400)httpErrors.push(`${r.status()} ${r.url()}`)});
+  page.on('response',r=>{if(r.status()>=400)httpErrors.push(`${r.status()} ${r.url()}`)});
   await page.addInitScript(()=>{window.SVR_POKER_QA_PASSIVE_BOTS=true;window.addEventListener('svr:boot-progress',e=>console.log('BOOT',e.detail.percent,e.detail.message));});
   page.on('console',m=>{if(m.text().startsWith('BOOT'))console.log(m.text())});
   await page.goto(base+'/game/quest-lobby.html',{waitUntil:'domcontentloaded'});

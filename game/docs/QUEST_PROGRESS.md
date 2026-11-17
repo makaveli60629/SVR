@@ -1,6 +1,6 @@
 # Quest playability progress — 2026-11-17
 
-Repository branch: `codex/quest-playability`.
+Repository branch: `codex/quest-playability`. Draft PR: https://github.com/makaveli60629/SVR/pull/269.
 Scope: game sources, game manifests, game documentation and game tests only. No website source, hosting configuration, account backend or production deployment changes.
 
 ## Repairs under verification
@@ -11,6 +11,8 @@ Scope: game sources, game manifests, game documentation and game tests only. No 
 - Connected hands, action buttons and layout modules to the current approved table instead of retired table names.
 - Serialized card presentation rebuilding, built card meshes before optional logo loading and prevented burn-record accumulation.
 - Changed the FBX cache to return separate scene instances, skeletons and materials while retaining one download/parse. This prevents legacy and current dealer guards from manipulating the same model.
+- Protected in-flight dealer models from legacy duplicate cleanup using an ownership marker set before FBX loading.
+- Stabilized the action wrapper chain so presentation and debounce guards cannot repeatedly wrap each other or reject every valid action.
 - Mapped the actual Eric FBX bone names to the dealer's procedural pose controls.
 - Updated room audit measurements to inspect the active approved table/dealer rather than a retired visual authority.
 - Prevented restarting an active hand through NEXT/H. Closed raising after a short all-in now also applies to all-in, bet-alias and physical-chip inputs.
@@ -20,9 +22,10 @@ Scope: game sources, game manifests, game documentation and game tests only. No 
 ## Completed checks
 
 - Existing Quest watch/world, surface/motion and room behavior regression suites pass.
-- New window-event, active-table, card-rebuild and FBX-instance regression suites pass.
+- New window-event, active-table, card-rebuild, action-wrapper and FBX-instance regression suites pass.
 - Poker rule regression completed 100 hands, checking showdown, chip conservation, a unique 52-card deck, five community cards and three burns. It also checks rejected raising inputs, short all-in calls, active-hand restart prevention and explicit reset.
-- Initial Chromium lobby inspection rendered the table, dealer and lighting successfully.
+- Chromium lobby inspection rendered the table, dealer and lighting successfully. The repaired poker room now reaches its full readiness gate, with seating, gameplay and control checks passing. A separate actual-model diagnostic confirms Eric is grounded with valid transforms and skeleton matrices.
+- Several GitHub audit failures also exist on base main (`660993b`), including the full-stack guard and older mobile/site audits. Those unrelated sources and deployment workflows have not been changed.
 
 ## Still being verified
 
@@ -37,6 +40,7 @@ Install test dependencies outside the repository:
 ```sh
 npm install --prefix /tmp/svr-quest-tests --no-save three@0.160.0 playwright
 export NODE_PATH=/tmp/svr-quest-tests/node_modules
+node game/tools/quest-action-wrapper-regression.cjs
 node game/tools/quest-event-instrumentation-regression.cjs
 node game/tools/quest-current-authority-regression.cjs
 node game/tools/quest-card-rebuild-regression.cjs

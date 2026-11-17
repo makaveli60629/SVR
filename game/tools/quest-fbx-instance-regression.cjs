@@ -16,5 +16,17 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
  const sceneA=new THREE.Scene(),sceneB=new THREE.Scene();sceneA.add(a);sceneB.add(b);assert.equal(a.parent,sceneA,'second load cannot steal the first model');
  const eric=fs.readFileSync('game/modules/dealer/eric_dealer_module.js','utf8');const start=eric.indexOf('function canonicalBoneName('),end=eric.indexOf('async function optionalTexture',start);vm.runInContext(eric.slice(start,end),context);
  for(const [name,key] of Object.entries({hip:'hips',spine_03:'spine2',upperarm_l:'leftarm',lowerarm_r:'rightforearm',hand_l:'lefthand',upperleg_r:'rightupleg',LeftHand:'lefthand'})) assert.equal(vm.runInContext(`canonicalBoneName('${name}')`,context),key);
- console.log('PASS: one cached FBX parse, isolated scene instances/skeletons/materials, and actual Eric rig bone aliases.');
+ // Run the actual legacy cleanup against a dealer still using its loading name.
+ const dealerContext=vm.createContext({THREE,EventTarget,performance});
+ vm.runInContext(eric.replace(/^import .*;$/gm,'').replace(/^const .*_URL = .*;$/gm,'').replace('export class EricDealerModule','globalThis.EricDealerModule=class EricDealerModule'),dealerContext);
+ const protectedScene=new THREE.Scene(),current=new dealerContext.EricDealerModule(protectedScene);
+ const transient=new THREE.Group();transient.name='Eric_Dealer_Model';current.group.add(transient);
+ const duplicate=new THREE.Group();duplicate.name='LEGACY_ERIC_DEALER';protectedScene.add(duplicate);
+ const cleanupSource=fs.readFileSync('game/modules/phase391_eric_dealer_authority.js','utf8');
+ const aStart=cleanupSource.indexOf('function removeDuplicateDealers()'),aEnd=cleanupSource.indexOf('\nfunction ',aStart+10);
+ const cleanup=vm.createContext({scene:protectedScene,eric:null,state:{duplicateDealersRemoved:0},walk:(root,fn)=>root.traverse(fn),inside:()=>false});
+ vm.runInContext(cleanupSource.slice(aStart,aEnd),cleanup);vm.runInContext('removeDuplicateDealers()',cleanup);
+ assert.equal(transient.parent,current.group,'legacy cleanup must preserve the in-flight dealer model');
+ assert.equal(duplicate.parent,null,'unowned legacy dealers must still be removed');
+ console.log('PASS: one cached FBX parse, isolated scene instances/skeletons/materials, actual Eric rig bone aliases, and preservation during legacy cleanup.');
 })().catch(e=>{console.error(e);process.exitCode=1});

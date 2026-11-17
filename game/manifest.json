@@ -111,7 +111,8 @@
     "tableRoom": {
       "directlySeated": true,
       "movementEnabled": false,
-      "teleportEnabled": false
+      "teleportEnabled": false,
+      "hardSeatedAtFrontTable": true
     },
     "tableQa": "SVR_PHASE396_BOOT_QA",
     "physicalHeadsetAcceptancePending": true

@@ -489,8 +489,9 @@ function commitVisualChips(amount, all = false){
 
 function wrapPokerAction(){
   const current = window.SVR_POKER_ACTION;
-  if (typeof current !== "function" || current === wrappedPokerAction) return;
+  if (typeof current !== "function" || current.__svrPhase334) return;
   originalPokerAction = current;
+  const delegate = current;
   wrappedPokerAction = function phase334PokerAction(action){
     const snapshot = pokerSnapshot();
     const physical = performance.now() - lastPhysicalAt < 1250;
@@ -501,9 +502,10 @@ function wrapPokerAction(){
       else if (action === "allin") commitVisualChips(snapshot.you.stack || 0, true);
       else if (action === "fold") animateFoldCards();
     }
-    return originalPokerAction(action);
+    return delegate(action);
   };
   wrappedPokerAction.__svrPhase334 = true;
+  wrappedPokerAction.__svrPhase335 = Boolean(current.__svrPhase335);
   window.SVR_POKER_ACTION = wrappedPokerAction;
 }
 
